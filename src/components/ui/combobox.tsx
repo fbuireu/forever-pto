@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useState, useId } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -10,14 +9,15 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { Label } from "@/components/ui/label";
 import { cn } from '@/lib/utils';
+import { Check, ChevronsUpDown } from "lucide-react";
+import { useId, useState } from "react";
 
 export default function Combobox({
   value = "",
@@ -37,9 +37,9 @@ export default function Combobox({
       ? options.find((option) => option?.value === value)?.label : placeholder;
 
   return (
-      <div className={cn("flex items-center gap-2", className)}>
+      <div className={cn("flex flex-col gap-1.5", className)}>
         {label && (
-            <Label htmlFor={id} className={cn("whitespace-nowrap")}>
+            <Label htmlFor={id} className={cn("text-sm font-medium")}>
               {label}
             </Label>
         )}

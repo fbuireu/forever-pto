@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
-import { Calendar } from "@/components/ui/calendar";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from '@/components/ui/checkbox';
+import Combobox from '@/components/ui/combobox';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
@@ -14,24 +15,23 @@ import {
     SelectValue
 } from "@/components/ui/select";
 import {
-    format,
-    addMonths,
-    getYear,
-    startOfMonth,
-    endOfMonth,
-    eachDayOfInterval,
-    isSameDay,
-    isToday,
-    isWeekend,
     addDays,
-    isSameMonth,
+    addMonths,
+    differenceInDays,
+    eachDayOfInterval,
+    endOfMonth,
+    format,
     getDate,
     getMonth,
-    differenceInDays
+    getYear,
+    isSameDay,
+    isSameMonth,
+    isToday,
+    isWeekend,
+    startOfMonth
 } from "date-fns";
 import { es } from "date-fns/locale";
-import Combobox from '@/components/ui/combobox';
-import { Checkbox } from '@/components/ui/checkbox';
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 // Constantes
 const DEFAULT_PTO_DAYS = 22;
@@ -1112,21 +1112,22 @@ export default function PTOPlanner() {
                         <span>días libres</span>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <Combobox
-                            value={selectedCountry}
-                            onChange={handleCountryChange}
-                            options={countryOptions}
-                            label="País"
-                            placeholder="Selecciona país..."
-                            searchPlaceholder="Buscar país..."
-                            notFoundText="País no encontrado."
-                        />
-                        <p className="text-xs text-gray-500">inferred from your IP. Feel free to change it or</p>
-                    </div>
+        <div className="flex flex-col gap-1 w-full">
+    <Combobox
+        value={selectedCountry}
+        onChange={handleCountryChange}
+        options={countryOptions}
+        label="País"
+        placeholder="Selecciona país..."
+        searchPlaceholder="Buscar país..."
+        notFoundText="País no encontrado."
+        className="w-full"
+    />
+    <p className="text-xs text-gray-500 pl-2">inferred from your IP. Feel free to change it or</p>
+</div>
 
                     {selectedRegion && (
-                        <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-1 w-full">
                             <Combobox
                                 value={selectedRegion}
                                 onChange={handleRegionChange}
@@ -1135,8 +1136,10 @@ export default function PTOPlanner() {
                                 placeholder="Selecciona region..."
                                 searchPlaceholder="Buscar region..."
                                 notFoundText="Region no encontrada."
+                                        className="w-full"
+
                             />
-                            <p className="text-xs text-gray-500">inferred from your IP. Feel free to change it or</p>
+    <p className="text-xs text-gray-500 pl-2">inferred from your IP. Feel free to change it or</p>
                         </div>
                     )}
 
@@ -1179,9 +1182,12 @@ export default function PTOPlanner() {
             </header>
 
             <main className="flex flex-col gap-8 items-center w-full">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {monthsToShow.map((month) => (
-                        <Card key={month.toISOString()} className="mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols- gap-4">
+                    {monthsToShow.map((month, index) => {
+                        const gridClass = index >= 6 && index <= 12 
+                        ? 'lg:row-start-2' 
+                        : '';
+                        return         <Card key={month.toISOString()} className={`mb-4 flex flex-col ${gridClass}`}>
                             <Calendar
                                 mode="multiple"
                                 selected={selectedDays}
@@ -1214,6 +1220,8 @@ export default function PTOPlanner() {
                                                     data-date={dateKey}
                                                     onMouseOver={handleDayMouseOver}
                                                     onMouseOut={handleDayMouseOut}
+                                                    onBlur={handleDayMouseOut}
+                                                    onFocus={handleDayMouseOver}
                                                 >
                                                     {date.getDate()}
                                                 </button>
@@ -1224,7 +1232,7 @@ export default function PTOPlanner() {
                             />
                             {getMonthSummary(month)}
                         </Card>
-                    ))}
+                    })}
                 </div>
             </main>
 
@@ -1277,3 +1285,4 @@ export default function PTOPlanner() {
 // 23- Adjust threshold (paid funcionality)
 // 24- Edit weekends (paid functionality)
 // 25- Edit festivities (paid functionality)
+// 26- Recheck alternatives and suggestions
