@@ -145,9 +145,5 @@ export const detectUserLocation = cache(async () => {
     };
   } catch (error) {
     console.error('Error al detectar ubicación del usuario:', error);
-    return {
-      country: 'es',
-      region: 'ca'
-    };
   }
 });

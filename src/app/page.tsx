@@ -20,8 +20,8 @@ export default async function PTOPlannerPage({
 }) {
     // Get values from URL with defaults
     const {
-        country = 'es',
-        region = 'ca',
+        country,
+        region,
         year = String(new Date().getFullYear()),
         availablePtoDays = 22,
         allowPastDays = false,
@@ -69,6 +69,6 @@ export default async function PTOPlannerPage({
 // 23- Adjust threshold (paid funcionality)
 // 24- Edit weekends (paid functionality)
 // 25- Edit festivities (paid functionality)
-// 26- Recheck algorythm
+// 26- RECHECK ALGORYTHM
 
 

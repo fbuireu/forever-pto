@@ -45,85 +45,89 @@ export default function Combobox({
     const selectedOption = options.find((option) => option.value === value);
 
     return (
-            <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                    <Button
-                            variant="outline"
-                            role="combobox"
-                            disabled={disabled}
-                            aria-expanded={open}
-                            className={cn('w-full justify-between', className)}
-                            {...props}
-                    >
-                        {selectedOption ? (
-                                <div className="flex items-center gap-2">
-                                    {selectedOption.flagUrl && (
-                                            <div className="relative h-4 w-6 overflow-hidden rounded">
-                                                <Image
-                                                        src={selectedOption.flagUrl}
-                                                        alt={`Bandera de ${selectedOption.label}`}
-                                                        fill
-                                                        className="object-cover"
-                                                />
-                                            </div>
-                                    )}
-                                    <span>{selectedOption.label}</span>
-                                </div>
-                        ) : (
-                                <span className="text-muted-foreground">{placeholder}</span>
-                        )}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                    <Command>
-                        <CommandInput placeholder={searchPlaceholder} />
-                        <CommandEmpty>{notFoundText}</CommandEmpty>
-                        <CommandGroup className="max-h-64 overflow-y-auto">
+            <div className="relative w-full">
+                <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                        <Button
+                                variant="outline"
+                                role="combobox"
+                                disabled={disabled}
+                                aria-expanded={open}
+                                className={cn('w-full justify-between', className)}
+                                {...props}
+                        >
+                            {selectedOption ? (
+                                    <div className="flex items-center gap-2">
+                                        {selectedOption.flagUrl && (
+                                                <div className="relative h-4 w-6 overflow-hidden rounded">
+                                                    <Image
+                                                            src={selectedOption.flagUrl}
+                                                            alt={`Bandera de ${selectedOption.label}`}
+                                                            fill
+                                                            className="object-cover"
+                                                    />
+                                                </div>
+                                        )}
+                                        <span>{selectedOption.label}</span>
+                                    </div>
+                            ) : (
+                                    <span className="text-muted-foreground">{placeholder}</span>
+                            )}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                            className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
+                        <Command className="w-full">
+                            <CommandInput placeholder={searchPlaceholder} />
                             <CommandList>
-                                {options?.map((option) => (
-                                        <CommandItem
-                                                key={option.label}
-                                                value={option?.label}
-                                                onSelect={(currentValue) => {
-                                                    startTransition(() => {
-                                                        const selectedOption = options.find(
-                                                                option => option.label == currentValue);
-                                                        router.push(
-                                                                pathname + '?' +
-                                                                createQueryString(type,
-                                                                        selectedOption.value.toLowerCase()),
-                                                                { scroll: false });
+                                <CommandEmpty>{notFoundText}</CommandEmpty>
+                                <CommandGroup className="w-full">
+                                    {options?.map((option) => (
+                                            <CommandItem
+                                                    key={option.label}
+                                                    value={option?.label}
+                                                    className="rounded-md cursor-pointer hover:bg-slate-250 transition-colors duration-200"
+                                                    onSelect={(currentValue) => {
+                                                        startTransition(() => {
+                                                            const selectedOption = options.find(
+                                                                    option => option.label == currentValue);
+                                                            router.replace(
+                                                                    pathname + '?' +
+                                                                    createQueryString(type,
+                                                                            selectedOption.value.toLowerCase()),
+                                                                    { scroll: false });
 
-                                                        setOpen(false);
-                                                    });
-                                                }}
-                                        >
-                                            <div className="flex items-center gap-2 w-full">
-                                                {option.flagUrl && (
-                                                        <div className="relative h-4 w-6 overflow-hidden rounded">
-                                                            <Image
-                                                                    src={option.flagUrl}
-                                                                    alt={`Bandera de ${option.label}`}
-                                                                    fill
-                                                                    className="object-cover"
-                                                            />
-                                                        </div>
-                                                )}
-                                                <span>{option.label}</span>
-                                            </div>
-                                            <Check
-                                                    className={cn(
-                                                            'ml-auto h-4 w-4',
-                                                            value === option.value ? 'opacity-100' : 'opacity-0',
+                                                            setOpen(false);
+                                                        });
+                                                    }}
+                                            >
+                                                <div className="flex items-center gap-2 w-full">
+                                                    {option.flagUrl && (
+                                                            <div className="relative h-4 w-6 overflow-hidden rounded">
+                                                                <Image
+                                                                        src={option.flagUrl}
+                                                                        alt={`Bandera de ${option.label}`}
+                                                                        fill
+                                                                        className="object-cover"
+                                                                />
+                                                            </div>
                                                     )}
-                                            />
-                                        </CommandItem>
-                                ))}
+                                                    <span>{option.label}</span>
+                                                </div>
+                                                <Check
+                                                        className={cn(
+                                                                'ml-auto h-4 w-4',
+                                                                value === option.value ? 'opacity-100' : 'opacity-0',
+                                                        )}
+                                                />
+                                            </CommandItem>
+                                    ))}
+                                </CommandGroup>
                             </CommandList>
-                        </CommandGroup>
-                    </Command>
-                </PopoverContent>
-            </Popover>
+                        </Command>
+                    </PopoverContent>
+                </Popover>
+            </div>
     );
 }

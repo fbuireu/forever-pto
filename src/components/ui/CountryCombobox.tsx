@@ -6,8 +6,6 @@ interface CountryComboboxProps {
 }
 
 export default async function CountryCombobox({ selectedCountry }: CountryComboboxProps) {
-    // Esta función se ejecuta en el servidor y espera a que se resuelva
-    // Esto es lo que Suspense puede manejar mientras carga
     const countries = await getCountries();
 
     return (

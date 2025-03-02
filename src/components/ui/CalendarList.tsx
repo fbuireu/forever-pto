@@ -21,11 +21,19 @@ import {
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Holiday } from '@/lib/holidays';
+import { Badge } from '@/components/ui/badge';
+import { Loader2 } from 'lucide-react';
 
 const MONTHS_TO_DISPLAY = 12;
 const ALTERNATIVE_THRESHOLD = .75;
 const MAX_BLOCK_SIZE = 5; // Máximo tamaño de bloque a considerar
 const MAX_ALTERNATIVES = 5; // Límite de alternativas por bloque
+
+const LoadingSpinner = () => (
+    <div className="absolute inset-0 flex items-center justify-center bg-background/60 opacity-10 z-10 rounded-md">
+      <Loader2 className="h-10 w-10 animate-spin text-primary" />
+    </div>
+);
 
 // Interfaces for typing
 interface DayInfo {
@@ -72,29 +80,14 @@ export default function CalendarList({
   const [alternativeBlocks, setAlternativeBlocks] = useState<Record<string, BlockOpportunity[]>>({});
   const [dayToBlockIdMap, setDayToBlockIdMap] = useState<Record<string, string>>({});
   const [optimizationSummary, setOptimizationSummary] = useState('');
-  const [effectiveDaysData, setEffectiveDaysData] = useState({ effective: 0, ratio: 0 });
   const [hoveredBlockId, setHoveredBlockId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  console.log('CALCULO', isPending);
-  // Process holidays to handle the new format (converting ISO string dates to Date objects)
+
   const processedHolidays = useMemo(() => {
     return holidays.map(holiday => ({
       ...holiday,
-      date: holiday.date instanceof Date ? holiday.date : parseISO(holiday.date as unknown as string),
-    })).filter(holiday => {
-      // Filtrar por región: incluir festividades nacionales (location === null) y
-      // festividades específicas de la región seleccionada
-      if (holiday.location === null) {
-        return true; // Incluir festividades nacionales
-      }
-
-      if (Array.isArray(holiday.location)) {
-        const regionCode = `${country.toUpperCase()}-${region.toUpperCase()}`;
-        return holiday.location.includes(regionCode);
-      }
-
-      return false;
-    });
+      date: holiday.date,
+    }));
   }, [holidays, country, region]);
 
   // Memoizar el mapa de días festivos para búsquedas rápidas O(1)
@@ -536,8 +529,24 @@ export default function CalendarList({
       setSuggestedDays([]);
       setAlternativeBlocks({});
       setDayToBlockIdMap({});
-      setOptimizationSummary(`Has utilizado todos tus ${availablePtoDays} días PTO disponibles.`);
-      setEffectiveDaysData(calculateEffectiveDays([]));
+      setOptimizationSummary(
+          <span>
+          Has utilizado todos tus <span className="font-medium">{availablePtoDays} días PTO</span> disponibles.
+        </span>,
+      );
+      return;
+    }
+
+    // Si no hay días PTO disponibles desde el inicio
+    if (availablePtoDays <= 0) {
+      setSuggestedDays([]);
+      setAlternativeBlocks({});
+      setDayToBlockIdMap({});
+      setOptimizationSummary(
+          <span>
+          No tienes días PTO disponibles para asignar.
+        </span>,
+      );
       return;
     }
 
@@ -555,7 +564,6 @@ export default function CalendarList({
       setSuggestedDays(optimal);
       setAlternativeBlocks(alternatives);
       setDayToBlockIdMap(newDayToBlockIdMap);
-      setEffectiveDaysData(effectiveData);
 
       // Generar resumen de optimización
       if (optimal.length > 0) {
@@ -571,13 +579,22 @@ export default function CalendarList({
         );
 
         setOptimizationSummary(
-            `¡Con tus ${availablePtoDays} días PTO conseguirás ${effectiveData.effective} días totales de vacaciones! ` +
-            `(ratio ${effectiveData.ratio}x). Sugerencia: ${optimal.length} días distribuidos estratégicamente (${summaryParts.join(
-                ', ')})`,
+            <>
+              ¡Con tus {availablePtoDays} días PTO conseguirás{' '}
+              <span className="font-medium">{effectiveData.effective} días totales</span> de vacaciones!{' '}
+              <Badge variant="outline" className="ml-1 bg-primary/10 text-primary-foreground/90 hover:bg-primary/20">
+                ratio {effectiveData.ratio}x
+              </Badge>
+              <span className="ml-2">
+                Sugerencia: {optimal.length} días distribuidos estratégicamente ({summaryParts.join(', ')})
+              </span>
+            </>,
         );
       } else {
         setOptimizationSummary(
-            `Tienes ${remainingDays} días PTO disponibles para asignar.`,
+            <span>
+              Tienes <span className="font-medium">{remainingDays} días PTO</span> disponibles para asignar.
+            </span>,
         );
       }
     });
@@ -616,9 +633,67 @@ export default function CalendarList({
     );
   }, [hoveredBlockId, suggestedDays, alternativeBlocks]);
 
+  // Función para determinar la posición de un día en un bloque sugerido
+  const getDayPositionInBlock = useCallback((date: Date) => {
+    if (!isDaySuggested(date)) return null;
+
+    const dateKey = format(date, 'yyyy-MM-dd');
+    const blockId = dayToBlockIdMap[dateKey] || '';
+    if (!blockId) return null;
+
+    // Encuentra todos los días con el mismo blockId
+    const blockDayKeys = Object.entries(dayToBlockIdMap)
+        .filter(([_, id]) => id === blockId)
+        .map(([dayKey]) => dayKey);
+
+    if (blockDayKeys.length <= 1) return 'single';
+
+    // Convertir claves a fechas y ordenar
+    const blockDays = blockDayKeys
+        .map(dayKey => parseISO(dayKey))
+        .sort((a, b) => a.getTime() - b.getTime());
+
+    // Encuentra la posición
+    const index = blockDays.findIndex(d => isSameDay(d, date));
+    if (index === 0) return 'start';
+    if (index === blockDays.length - 1) return 'end';
+    return 'middle';
+  }, [isDaySuggested, dayToBlockIdMap]);
+
+  // Función para determinar la posición de un día alternativo en su bloque
+  const getAlternativeDayPosition = useCallback((date: Date) => {
+    if (!hoveredBlockId || !isDayAlternative(date)) return null;
+
+    const alternatives = alternativeBlocks[hoveredBlockId] || [];
+
+    // Encuentra el bloque alternativo al que pertenece este día
+    for (const block of alternatives) {
+      if (!block.days) continue;
+
+      const blockDays = [...block.days].sort((a, b) => a.getTime() - b.getTime());
+      const dayIndex = blockDays.findIndex(d => isSameDay(d, date));
+
+      if (dayIndex >= 0) {
+        if (blockDays.length === 1) return 'single';
+        if (dayIndex === 0) return 'start';
+        if (dayIndex === blockDays.length - 1) return 'end';
+        return 'middle';
+      }
+    }
+
+    return null;
+  }, [hoveredBlockId, isDayAlternative, alternativeBlocks]);
+
   // Memoizar clase de día para evitar recálculos
   const getDayClassName = useCallback((date: Date, displayMonth: Date) => {
-    const classes = ['h-8 w-8 p-0 font-normal'];
+    // Base classes siguiendo la estética shadcn/ui
+    const classes = [
+      'h-8 w-8 p-0', // Tamaño reducido para evitar solapamiento
+      'inline-flex items-center justify-center',
+      'rounded-sm text-sm font-medium', // Bordes menos pronunciados
+      'transition-colors focus-visible:outline-none',
+      'aria-selected:opacity-100',
+    ];
 
     // Invisible day if not in current month (this check first for early return)
     if (!isSameMonth(date, displayMonth)) {
@@ -628,25 +703,34 @@ export default function CalendarList({
 
     // Past day (not selectable if not allowed)
     if (!allowPastDays && date < new Date() && !selectedDays.some(d => isSameDay(d, date))) {
-      classes.push('opacity-50 cursor-not-allowed');
+      classes.push('text-muted-foreground opacity-50 cursor-not-allowed');
+    } else {
+      // Default hover for selectable days
+      classes.push('hover:bg-accent hover:text-accent-foreground');
     }
 
-    // Apply styles based on day type
-    if (isWeekend(date)) classes.push('bg-slate-100 text-slate-500');
-    if (isHoliday(date)) classes.push('bg-yellow-100 text-yellow-800');
-    if (isToday(date)) classes.push('ring-2 ring-blue-400');
-    if (isDaySuggested(date)) classes.push('border-2 border-green-500');
-    if (isDayAlternative(date)) classes.push('border-2 border-purple-500');
+    // Apply styles based on day type with shadcn/ui classes
+    if (isWeekend(date)) {
+      classes.push('bg-accent/30 text-muted-foreground');
+    }
+
+    if (isHoliday(date)) {
+      classes.push('bg-yellow-100 text-yellow-800');
+    }
+
+    if (isToday(date)) {
+      classes.push('border border-primary');
+    }
 
     // Selected day (weekends, holidays, or PTO days)
     if (selectedDays.some(d => isSameDay(d, date))) {
       if (!isWeekend(date) && !isHoliday(date)) {
-        classes.push('bg-blue-500 text-white hover:bg-blue-600');
+        classes.push('bg-primary text-primary-foreground hover:bg-primary/90');
       }
     }
 
     return classes.join(' ');
-  }, [isHoliday, isDaySuggested, isDayAlternative, selectedDays, allowPastDays]);
+  }, [isHoliday, selectedDays, allowPastDays]);
 
   // Handle day selection
   const handleDaySelect = useCallback((date: Date) => {
@@ -692,9 +776,15 @@ export default function CalendarList({
 
   // Generate summary of suggestions for a month as intervals
   const getMonthSummary = useCallback((month: Date) => {
+    // Si no hay días de vacaciones disponibles o no hay sugerencias generales, retornar null
+    if (availablePtoDays <= 0 || suggestedDays.length === 0) {
+      return null;
+    }
+
     const suggestedInMonth = getSuggestedDaysForMonth(month);
 
-    if (suggestedInMonth.length === 0) {
+    // Si no hay sugerencias para este mes específico, retornar null
+    if (!suggestedInMonth || suggestedInMonth.length === 0) {
       return null;
     }
 
@@ -728,6 +818,11 @@ export default function CalendarList({
       }
     }
 
+    // Si después de procesar no tenemos intervalos válidos, retornar null
+    if (intervals.length === 0) {
+      return null;
+    }
+
     // Calculate total free days for each interval
     const intervalsWithTotalDays = intervals.map(interval => {
       const effectiveResult = calculateEffectiveDays(interval);
@@ -740,6 +835,11 @@ export default function CalendarList({
         endDate: interval[interval.length - 1],
       };
     });
+
+    // Si no hay intervalos con días efectivos, retornar null
+    if (intervalsWithTotalDays.length === 0) {
+      return null;
+    }
 
     // Format the intervals
     const formattedIntervals = intervalsWithTotalDays.map(
@@ -762,28 +862,27 @@ export default function CalendarList({
           };
         });
 
-    return (
-        <div className="text-xs mt-2 p-2 bg-green-50 border border-green-200 rounded text-green-700">
-          <p className="font-semibold mb-1">Sugerencia:</p>
-          {formattedIntervals.map(({ text, totalDays }, idx) => (
-              <p key={idx} className={totalDays >= 7 ? 'font-semibold' : ''}>{text}</p>
-          ))}
+    // Si no hay intervalos formateados, retornar null
+    if (formattedIntervals.length === 0) {
+      return null;
+    }
 
-          <div className="mt-2 text-xs text-gray-600">
-            <p>Pasa el cursor sobre un día sugerido <br /> para ver alternativas similares.</p>
-          </div>
-        </div>
+    return (
+        <>
+          {formattedIntervals.map(({ text, totalDays }, idx) => (
+              <p key={idx} className={totalDays >= 7 ? 'font-medium text-primary' : ''}>
+                {text}
+              </p>
+          ))}
+        </>
     );
-  }, [getSuggestedDaysForMonth, calculateEffectiveDays]);
+  }, [availablePtoDays, suggestedDays, getSuggestedDaysForMonth, calculateEffectiveDays]);
 
   return (
       <main className="flex flex-col gap-8 items-center w-full">
         {optimizationSummary && (
-            <div className="bg-blue-50 border border-blue-200 p-3 rounded w-full">
+            <div className="bg-primary/10 border border-primary/20 p-3 rounded-md w-full">
               <p className="text-sm">{optimizationSummary}</p>
-              {isPending && (
-                  <p className="text-xs text-blue-600 mt-1">Calculando optimizaciones...</p>
-              )}
             </div>
         )}
 
@@ -793,6 +892,7 @@ export default function CalendarList({
                 ? 'lg:row-start-2'
                 : '';
             return <Card key={month.toISOString()} className={`mb-4 flex flex-col ${gridClass}`}>
+              {isPending && <LoadingSpinner />}
               <Calendar
                   mode="multiple"
                   selected={selectedDays}
@@ -811,14 +911,42 @@ export default function CalendarList({
                       const holiday = getHolidayName(date);
                       const dateKey = format(date, 'yyyy-MM-dd');
                       const isSuggested = isDaySuggested(date);
+                      const isAlternative = isDayAlternative(date);
                       const blockId = isSuggested ? dayToBlockIdMap[dateKey] || '' : '';
+                      const blockPosition = getDayPositionInBlock(date);
+                      const alternativePosition = getAlternativeDayPosition(date);
+
+                      // Clases para bloques
+                      let blockStyles = '';
+                      if (isSuggested && blockPosition) {
+                        if (blockPosition === 'single') {
+                          blockStyles = 'ring-2 ring-green-500 rounded-md';
+                        } else if (blockPosition === 'start') {
+                          blockStyles = 'border-l-2 border-t-2 border-b-2 border-green-500 rounded-l-md pl-0.5';
+                        } else if (blockPosition === 'end') {
+                          blockStyles = 'border-r-2 border-t-2 border-b-2 border-green-500 rounded-r-md pr-0.5';
+                        } else { // middle
+                          blockStyles = 'border-t-2 border-b-2 border-green-500';
+                        }
+                      } else if (isAlternative && alternativePosition) {
+                        if (alternativePosition === 'single') {
+                          blockStyles = 'ring-2 ring-purple-500 rounded-md';
+                        } else if (alternativePosition === 'start') {
+                          blockStyles = 'border-l-2 border-t-2 border-b-2 border-purple-500 rounded-l-md pl-0.5';
+                        } else if (alternativePosition === 'end') {
+                          blockStyles = 'border-r-2 border-t-2 border-b-2 border-purple-500 rounded-r-md pr-0.5';
+                        } else { // middle
+                          blockStyles = 'border-t-2 border-b-2 border-purple-500';
+                        }
+                      }
 
                       return (
                           <div className="relative">
                             <button
                                 type="button"
                                 {...props}
-                                className={`${props.className || ''} ${getDayClassName(date, displayMonth)}`}
+                                className={`${props.className || ''} ${getDayClassName(date,
+                                    displayMonth)} ${blockStyles}`}
                                 title={holiday || ''}
                                 data-suggested={isSuggested ? 'true' : 'false'}
                                 data-block-id={blockId}
@@ -835,31 +963,55 @@ export default function CalendarList({
                     },
                   }}
               />
-              {getMonthSummary(month)}
+              {availablePtoDays > 0 && suggestedDays.length > 0 && getSuggestedDaysForMonth(month).length > 0 && (
+                  <>
+                    {getMonthSummary(month) && (
+                        <div
+                            className="text-xs mt-2 p-2 bg-primary/10 border border-primary/20 rounded-md text-primary-foreground/90">
+                          <p className="font-semibold mb-1">Sugerencia:</p>
+                          {getMonthSummary(month)}
+                          <div className="mt-2 text-xs text-muted-foreground">
+                            <p>Pasa el cursor sobre un día sugerido <br /> para ver alternativas similares.</p>
+                          </div>
+                        </div>
+                    )}
+                  </>
+              )}
             </Card>;
           })}
         </div>
 
-        <footer className="mt-8 text-center text-sm text-gray-500">
+        <footer className="mt-8 text-center text-sm text-muted-foreground">
           <div className="flex flex-wrap justify-center gap-4 mb-2">
             <div className="flex items-center">
-              <div className="w-4 h-4 bg-slate-100 mr-2 border border-slate-300"></div>
+              <div className="w-4 h-4 bg-accent/30 mr-2 rounded-sm"></div>
               <span>Fines de semana</span>
             </div>
             <div className="flex items-center">
-              <div className="w-4 h-4 bg-yellow-100 mr-2 border border-yellow-300"></div>
+              <div className="w-4 h-4 bg-yellow-100 mr-2 rounded-sm border border-yellow-300"></div>
               <span>Festivos</span>
             </div>
             <div className="flex items-center">
-              <div className="w-4 h-4 bg-blue-500 mr-2"></div>
+              <div
+                  className="w-4 h-4 bg-primary text-primary-foreground mr-2 rounded-sm flex items-center justify-center">
+                <span className="text-xs">P</span>
+              </div>
               <span>Días PTO seleccionados</span>
             </div>
             <div className="flex items-center">
-              <div className="w-4 h-4 border-2 border-green-500 mr-2"></div>
+              <div className="flex">
+                <div className="h-4 w-2 border-l-2 border-t-2 border-b-2 border-green-500 rounded-l-sm mr-0"></div>
+                <div className="h-4 w-2 border-t-2 border-b-2 border-green-500 mr-0"></div>
+                <div className="h-4 w-2 border-r-2 border-t-2 border-b-2 border-green-500 rounded-r-sm mr-2"></div>
+              </div>
               <span>Días sugeridos</span>
             </div>
             <div className="flex items-center">
-              <div className="w-4 h-4 border-2 border-purple-500 mr-2"></div>
+              <div className="flex">
+                <div className="h-4 w-2 border-l-2 border-t-2 border-b-2 border-purple-500 rounded-l-sm mr-0"></div>
+                <div className="h-4 w-2 border-t-2 border-b-2 border-purple-500 mr-0"></div>
+                <div className="h-4 w-2 border-r-2 border-t-2 border-b-2 border-purple-500 rounded-r-sm mr-2"></div>
+              </div>
               <span>Alternativas similares ({(ALTERNATIVE_THRESHOLD * 100).toFixed(0)}%)</span>
             </div>
           </div>

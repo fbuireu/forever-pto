@@ -8,55 +8,6 @@ export interface Holiday {
   location?: string; // país o región específica
 }
 
-// Tipos de APIs utilizados (para mejor mantenimiento)
-const HOLIDAY_API_TYPES = {
-  NAGER: 'nager',
-  CALENDARIFIC: 'calendarific',
-  ENRICO: 'enrico'
-} as const;
-
-
-// Convierte códigos ISO a formato específico de cada API
-function normalizeCountryCode(code: string, apiType: keyof typeof HOLIDAY_API_TYPES): string {
-  const code2 = code.toLowerCase();
-
-  // Mapeos específicos por API
-  if (apiType === 'nager') {
-    // Nager.Date usa códigos ISO de 2 letras en mayúsculas
-    const mapping: Record<string, string> = {
-      'uk': 'GB' // Reino Unido es GB en ISO 3166-1
-    };
-
-    return mapping[code2] || code2.toUpperCase();
-  }
-
-  // Calendarific usa códigos ISO de 2 letras
-  if (apiType === 'calendarific') {
-    const mapping: Record<string, string> = {
-      'uk': 'gb'
-    };
-
-    return mapping[code2] || code2;
-  }
-
-  // ENRICO API usa nombres de países en inglés
-  if (apiType === 'enrico') {
-    const mapping: Record<string, string> = {
-      'es': 'spain',
-      'us': 'usa',
-      'uk': 'uk',
-      'ca': 'canada',
-      'fr': 'france',
-      'de': 'germany',
-      'it': 'italy'
-    };
-
-    return mapping[code2] || code2;
-  }
-
-  return code2;
-}
-
 /**
  * Obtiene feriados/festividades de la API Nager.Date
  * Esta API proporciona días festivos nacionales para muchos países
@@ -65,10 +16,11 @@ function normalizeCountryCode(code: string, apiType: keyof typeof HOLIDAY_API_TY
  * @param year Año para obtener feriados
  */
 async function getNagerHolidays(countryCode: string, year: number): Promise<Holiday[]> {
-  const country = normalizeCountryCode(countryCode, 'nager');
-
+  console.log('nager', countryCode, year);
   try {
-    const response = await fetch(`https://date.nager.at/api/v3/publicholidays/${year}/${country}`, {
+    // https://date.nager.at/api/v3/publicholidays/2025/ES
+    console.log(`https://date.nager.at/api/v3/publicholidays/${year}/${countryCode}`);
+    const response = await fetch(`https://date.nager.at/api/v3/publicholidays/${year}/${countryCode}`, {
       next: { revalidate: 86400 * 30 } // Revalidar cada 30 días
     });
 
@@ -102,7 +54,6 @@ async function getCalendarificHolidays(countryCode: string, year: number, region
   // En una implementación real, deberías obtener la clave API de variables de entorno
   // Para este ejemplo, no usamos clave para evitar problemas, lo que limitará los resultados
   const API_KEY = process.env.CALENDARIFIC_API_KEY || '';
-  const country = normalizeCountryCode(countryCode, 'calendarific');
 
   if (!API_KEY) {
     console.warn('Calendarific API key not configured. Using limited functionality.');
@@ -112,7 +63,7 @@ async function getCalendarificHolidays(countryCode: string, year: number, region
     // Construir URL con parámetros
     const url = new URL('https://calendarific.com/api/v2/holidays');
     url.searchParams.append('api_key', API_KEY);
-    url.searchParams.append('country', country);
+    url.searchParams.append('country', countryCode);
     url.searchParams.append('year', year.toString());
 
     if (region) {
@@ -151,11 +102,8 @@ async function getCalendarificHolidays(countryCode: string, year: number, region
  * Combina varias fuentes para proporcionar la mejor cobertura
  */
 export const getHolidays = cache(async (country: string, region: string, year: number) => {
-  // Simulamos un pequeño retraso para mostrar el comportamiento real
-  await new Promise(resolve => setTimeout(resolve, 300));
-
   let holidayList: Holiday[] = [];
-
+  console.log(country, region, year);
   try {
     // 1. Obtener festividades nacionales desde la API principal
     const nationalHolidays = await getNagerHolidays(country, year);
@@ -170,7 +118,7 @@ export const getHolidays = cache(async (country: string, region: string, year: n
     }
 
     // 5. Añadir feriados de enero del año siguiente (original)
-    const nextYear = year + 1;
+    const nextYear = Number(year) + 1;
 
     // Intentar obtener festividades del siguiente año desde la API
     let nextYearJanuaryHolidays: Holiday[] = [];
@@ -210,7 +158,7 @@ export const getHolidays = cache(async (country: string, region: string, year: n
       // Incluir elementos donde:
       return (
         (Array.isArray(item.location) &&
-          item.location.some(loc => loc.includes(`-${region.toUpperCase()}`))) ||
+          item.location.some(loc => loc.includes(`-${region?.toUpperCase()}`))) ||
 
         item.location === null
       );

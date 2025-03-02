@@ -12,19 +12,17 @@ export default async function RegionCombobox({
 }: RegionComboboxProps) {
     const countries = await getCountries();
     const countryData = countries.find(c => c.value === selectedCountry);
+    const regions = countryData ? await getRegions(countryData.label) : [];
+    const isDisabled = !countryData || !regions?.length;
 
-    if (!countryData) {
-        return;
-    }
-
-    const regions = await getRegions(countryData.label);
+    console.log('selected', selectedRegion);
     return (
             <Combobox
                     value={selectedRegion}
                     options={regions}
                     label="Region"
                     type="region"
-                    disabled={!regions?.length}
+                    disabled={isDisabled}
                     placeholder="Selecciona región..."
                     searchPlaceholder="Buscar región..."
                     notFoundText="Región no encontrada."
