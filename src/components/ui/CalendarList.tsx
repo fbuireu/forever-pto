@@ -83,21 +83,14 @@ export default function CalendarList({
   const [hoveredBlockId, setHoveredBlockId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const processedHolidays = useMemo(() => {
-    return holidays.map(holiday => ({
-      ...holiday,
-      date: holiday.date,
-    }));
-  }, [holidays, country, region]);
-
   // Memoizar el mapa de días festivos para búsquedas rápidas O(1)
   const holidaysMap = useMemo(() => {
     const map = new Map<string, Holiday>();
-    processedHolidays.forEach(holiday => {
+    holidays.forEach(holiday => {
       map.set(format(holiday.date, 'yyyy-MM-dd'), holiday);
     });
     return map;
-  }, [processedHolidays]);
+  }, [holidays]);
 
   // Generate months to display based on the year, including next January
   const monthsToShow = useMemo(() => {
@@ -141,14 +134,14 @@ export default function CalendarList({
     });
 
     // Add holidays
-    processedHolidays.forEach(holiday => {
+    holidays.forEach(holiday => {
       if (!initialSelection.some(day => isSameDay(day, holiday.date))) {
         initialSelection.push(holiday.date);
       }
     });
 
     setSelectedDays(initialSelection);
-  }, [processedHolidays, monthsToShow, year, isHoliday]);
+  }, [holidays, monthsToShow, year, isHoliday]);
 
   // Calculate selected PTO days (only workdays)
   const selectedPtoDays = useMemo(() => {
@@ -174,7 +167,7 @@ export default function CalendarList({
     });
 
     // Add holidays (pre-calculados)
-    processedHolidays.forEach(holiday => {
+    holidays.forEach(holiday => {
       map.set(format(holiday.date, 'yyyy-MM-dd'), holiday.date);
     });
 
@@ -184,7 +177,7 @@ export default function CalendarList({
     });
 
     return map;
-  }, [monthsToShow, processedHolidays, selectedPtoDays]);
+  }, [monthsToShow, holidays, selectedPtoDays]);
 
   // Calculate effective days - optimized version
   const calculateEffectiveDays = useCallback((ptoDaysToAdd: Date[] = []): { effective: number; ratio: number } => {

@@ -6,7 +6,6 @@ let cacheTimestamp = null;
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
 
 export async function GET() {
-  console.log('IN');
   try {
     // Verificar si tenemos datos en caché válidos
     const now = Date.now();
