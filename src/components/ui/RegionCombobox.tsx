@@ -1,5 +1,5 @@
-import { getCountries, getRegions } from '@/lib/services/countryService';
 import Combobox from '@/components/ui/combobox';
+import { getCountries, getRegions } from '@/lib/services/countryService';
 
 interface RegionComboboxProps {
     selectedCountry: string;
@@ -11,11 +11,10 @@ export default async function RegionCombobox({
     selectedRegion,
 }: RegionComboboxProps) {
     const countries = await getCountries();
-    const countryData = countries.find(c => c.value === selectedCountry);
-    const regions = countryData ? await getRegions(countryData.label) : [];
+    const countryData = countries.find(c => c.value.toLowerCase() === selectedCountry);
+    const regions = countryData ? await getRegions(countryData.value) : [];
     const isDisabled = !countryData || !regions?.length;
 
-    console.log('selected', selectedRegion);
     return (
             <Combobox
                     value={selectedRegion}

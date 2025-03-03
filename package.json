@@ -20,6 +20,8 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
+    "date-holidays": "^3.23.22",
+    "i18n-iso-countries": "^7.14.0",
     "lucide-react": "^0.476.0",
     "next": "15.1.7",
     "react": "^19.0.0",

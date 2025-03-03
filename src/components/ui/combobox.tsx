@@ -1,13 +1,12 @@
 'use client';
 
-import { startTransition, useCallback, useState } from 'react';
-import { Check, ChevronsUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
+import { Check, ChevronsUpDown } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { startTransition, useCallback, useState } from 'react';
 
 export default function Combobox({
     value,
@@ -42,7 +41,7 @@ export default function Combobox({
     );
     const [open, setOpen] = useState(false);
 
-    const selectedOption = options.find((option) => option.value === value);
+    const selectedOption = options.find((option) => option.value.toLowerCase() === value);
 
     return (
             <div className="relative w-full">
@@ -58,14 +57,9 @@ export default function Combobox({
                         >
                             {selectedOption ? (
                                     <div className="flex items-center gap-2">
-                                        {selectedOption.flagUrl && (
+                                        {selectedOption.flag && (
                                                 <div className="relative h-4 w-6 overflow-hidden rounded">
-                                                    <Image
-                                                            src={selectedOption.flagUrl}
-                                                            alt={`Bandera de ${selectedOption.label}`}
-                                                            fill
-                                                            className="object-cover"
-                                                    />
+                                                {selectedOption.flag}
                                                 </div>
                                         )}
                                         <span>{selectedOption.label}</span>
@@ -103,14 +97,9 @@ export default function Combobox({
                                                     }}
                                             >
                                                 <div className="flex items-center gap-2 w-full">
-                                                    {option.flagUrl && (
+                                                    {option.flag && (
                                                             <div className="relative h-4 w-6 overflow-hidden rounded">
-                                                                <Image
-                                                                        src={option.flagUrl}
-                                                                        alt={`Bandera de ${option.label}`}
-                                                                        fill
-                                                                        className="object-cover"
-                                                                />
+                                                                    {option.flag}
                                                             </div>
                                                     )}
                                                     <span>{option.label}</span>

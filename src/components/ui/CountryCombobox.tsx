@@ -1,5 +1,5 @@
-import { getCountries } from '@/lib/services/countryService';
 import Combobox from '@/components/ui/combobox';
+import { getCountries } from '@/lib/services/countryService';
 
 interface CountryComboboxProps {
     selectedCountry: string;
@@ -7,7 +7,6 @@ interface CountryComboboxProps {
 
 export default async function CountryCombobox({ selectedCountry }: CountryComboboxProps) {
     const countries = await getCountries();
-
     return (
             <Combobox
                     value={selectedCountry}

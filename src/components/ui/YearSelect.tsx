@@ -1,9 +1,9 @@
 'use client';
 
 import { Label } from '@/components/ui/label';
-import { startTransition, useCallback } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { startTransition, useCallback } from 'react';
 
 export const YearSelect = ({ year }) => {
     const router = useRouter();
@@ -21,7 +21,6 @@ export const YearSelect = ({ year }) => {
 
     const handleYearChange = useCallback((value: string) => {
         startTransition(() => {
-            console.log('Selected year:', value);
             router.push(
                     pathname + '?' + createQueryString('year', value),
                     { scroll: false },

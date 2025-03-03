@@ -20,7 +20,7 @@ import {
   startOfMonth,
 } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Holiday } from '@/lib/holidays';
+import type { Holiday } from '@/lib/holidays';
 import { Badge } from '@/components/ui/badge';
 import { Loader2 } from 'lucide-react';
 
@@ -67,8 +67,6 @@ interface CalendarListProps {
 }
 
 export default function CalendarList({
-  country,
-  region,
   year,
   availablePtoDays,
   allowPastDays,

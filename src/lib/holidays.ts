@@ -1,170 +1,77 @@
+import { eachDayOfInterval } from 'date-fns';
+import Holidays from 'date-holidays';
 import { cache } from 'react';
 
-// Interfaz para la estructura de feriados/festividades
 export interface Holiday {
   date: Date;
   name: string;
   type?: string; // nacional, regional, religioso, etc.
-  location?: string; // país o región específica
+  location?: string | string[] | null; // país o región específica
 }
 
-/**
- * Obtiene feriados/festividades de la API Nager.Date
- * Esta API proporciona días festivos nacionales para muchos países
- *
- * @param countryCode Código ISO del país (2 letras)
- * @param year Año para obtener feriados
- */
-async function getNagerHolidays(countryCode: string, year: number): Promise<Holiday[]> {
-  console.log('nager', countryCode, year);
-  try {
-    // https://date.nager.at/api/v3/publicholidays/2025/ES
-    console.log(`https://date.nager.at/api/v3/publicholidays/${year}/${countryCode}`);
-    const response = await fetch(`https://date.nager.at/api/v3/publicholidays/${year}/${countryCode}`, {
-      next: { revalidate: 86400 * 30 } // Revalidar cada 30 días
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error fetching holidays: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    return data.map((holiday: any) => ({
-      date: new Date(holiday.date),
-      name: holiday.localName || holiday.name,
-      type: holiday.types?.join(', ') || 'Public',
-      location: holiday.counties || null
-    }));
-  } catch (error) {
-    console.error(`Error fetching Nager holidays for ${countryCode} (${year}):`, error);
-    return [];
-  }
+function getDaysInRange(start: Date, end: Date): Date[] {
+  return eachDayOfInterval({ start, end });
 }
 
-/**
- * Obtiene feriados/festividades de la API Calendarific
- * Esta API requiere una clave API pero tiene mejor cobertura regional
- *
- * @param countryCode Código ISO del país (2 letras)
- * @param year Año para obtener feriados
- * @param region Código de región opcional
- */
-async function getCalendarificHolidays(countryCode: string, year: number, region?: string): Promise<Holiday[]> {
-  // En una implementación real, deberías obtener la clave API de variables de entorno
-  // Para este ejemplo, no usamos clave para evitar problemas, lo que limitará los resultados
-  const API_KEY = process.env.CALENDARIFIC_API_KEY || '';
-
-  if (!API_KEY) {
-    console.warn('Calendarific API key not configured. Using limited functionality.');
-  }
-
-  try {
-    // Construir URL con parámetros
-    const url = new URL('https://calendarific.com/api/v2/holidays');
-    url.searchParams.append('api_key', API_KEY);
-    url.searchParams.append('country', countryCode);
-    url.searchParams.append('year', year.toString());
-
-    if (region) {
-      url.searchParams.append('location', region);
-    }
-
-    const response = await fetch(url.toString(), {
-      next: { revalidate: 86400 * 30 } // Revalidar cada 30 días
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error fetching holidays: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (!data.response || !data.response.holidays) {
-      return [];
-    }
-
-    return data.response.holidays.map((holiday: any) => ({
-      date: new Date(holiday.date.iso),
-      name: holiday.name,
-      type: holiday.type.join(', '),
-      location: holiday.states === 'All' ? null : holiday.states
-    }));
-  } catch (error) {
-    console.error(`Error fetching Calendarific holidays for ${countryCode} (${year}):`, error);
-    return [];
-  }
-}
-
-
-/**
- * Función principal cacheada para obtener festividades
- * Combina varias fuentes para proporcionar la mejor cobertura
- */
 export const getHolidays = cache(async (country: string, region: string, year: number) => {
   let holidayList: Holiday[] = [];
-  console.log(country, region, year);
+
   try {
-    // 1. Obtener festividades nacionales desde la API principal
-    const nationalHolidays = await getNagerHolidays(country, year);
-    holidayList = [...nationalHolidays];
+    const opts = {
+      languages: typeof navigator !== 'undefined' ? navigator.languages.map((lang) => lang.split('-')[0]) : ['en'],
+      timezone: typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'UTC',
+    };
 
+    const hd = region ? new Holidays(country, region, opts) : new Holidays(country, opts);
+    console.log(country, region, year);
 
-    // 3. Intento alternativo con Calendarific si no hay resultados
-    if (holidayList.length === 0) {
-      console.log('Falling back to Calendarific API...');
-      const calendarificHolidays = await getCalendarificHolidays(country, year, region);
-      holidayList = [...calendarificHolidays];
-    }
+    const currentYearHolidays = hd
+      .getHolidays(year)
+      .filter((holiday) => holiday.type === 'public')
+      .flatMap((holiday) => {
+        const daysInRange = getDaysInRange(new Date(holiday.start), new Date(holiday.end));
 
-    // 5. Añadir feriados de enero del año siguiente (original)
+        return daysInRange.map((date) => ({
+          date,
+          name: holiday.name,
+          type: holiday.type,
+          location: null,
+        }));
+      });
+
     const nextYear = Number(year) + 1;
-
-    // Intentar obtener festividades del siguiente año desde la API
-    let nextYearJanuaryHolidays: Holiday[] = [];
-
     try {
-      const nextYearHolidays = await getNagerHolidays(country, nextYear);
-      nextYearJanuaryHolidays = nextYearHolidays.filter(
-        holiday => holiday.date.getMonth() === 0  // Enero
-      );
+      const nextYearHolidays = hd
+        .getHolidays(nextYear)
+        .filter((holiday) => holiday.type === 'public' && new Date(holiday.start).getMonth() === 0)
+        .flatMap((holiday) => {
+          const daysInRange = getDaysInRange(new Date(holiday.start), new Date(holiday.end));
+
+          return daysInRange.map((date) => ({
+            date,
+            name: `${holiday.name} (siguiente año)`,
+            type: 'public',
+            location: null,
+          }));
+        });
+
+      holidayList = [...currentYearHolidays, ...nextYearHolidays];
     } catch (error) {
       console.error('Error fetching next year holidays:', error);
-      // Fallback: Usar festividades actuales de enero y actualizar el año
-      const januaryHolidays = holidayList.filter(
-        holiday => holiday.date.getMonth() === 0
-      );
-
-      nextYearJanuaryHolidays = januaryHolidays.map(holiday => ({
-        date: new Date(nextYear, 0, holiday.date.getDate()),
-        name: holiday.name,
-        type: holiday.type,
-        location: holiday.location
-      }));
     }
-
-    // Añadir etiqueta de "siguiente año" a los feriados de enero
-    nextYearJanuaryHolidays.forEach(holiday => {
-      holiday.name = `${holiday.name} (siguiente año)`;
-      holidayList.push(holiday);
-    });
-
   } catch (error) {
     console.error('Error retrieving holidays:', error);
   }
-  //transformer
-  const finalList = holidayList
-    .filter(item => {
-      // Incluir elementos donde:
-      return (
-        (Array.isArray(item.location) &&
-          item.location.some(loc => loc.includes(`-${region?.toUpperCase()}`))) ||
 
-        item.location === null
+  const finalList = holidayList
+    .filter((item) => {
+      return (
+        !item.location ||
+        (Array.isArray(item.location) &&
+          (item.location.some((loc) => loc?.includes(`-${region?.toUpperCase()}`)) || item.location.length === 0))
       );
     })
     .sort((a, b) => a.date.getTime() - b.date.getTime());
-  console.log('finalList', finalList);
 
   return finalList;
 });
