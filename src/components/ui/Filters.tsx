@@ -9,7 +9,7 @@ export interface FiltersProps {
   country: string;
   region: string;
   year: number;
-  availablePtoDays: number;
+  ptoDays: number;
   allowPastDays: boolean;
 }
 
@@ -17,7 +17,7 @@ export default function Filters({
   country,
   region,
   year,
-  availablePtoDays,
+  ptoDays,
   allowPastDays,
 }: FiltersProps) {
   return (
@@ -26,13 +26,13 @@ export default function Filters({
           <h1 className="text-2xl font-bold">Optimizador de PTO</h1>
           <div className="flex flex-col sm:flex-row gap-2">
             <Badge variant="outline">
-              Días PTO disponibles: {availablePtoDays}
+              Días PTO disponibles: {ptoDays}
             </Badge>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-lg">
-          <PtoDaysInput availablePtoDays={availablePtoDays} />
+          <PtoDaysInput ptoDays={ptoDays} />
 
           <div className="flex flex-col gap-1 w-full">
             <Suspense fallback={<div className="h-10 w-full animate-pulse bg-slate-200 rounded"></div>}>

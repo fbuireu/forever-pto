@@ -1,5 +1,6 @@
 import Combobox from '@/components/ui/combobox';
-import { getCountries, getRegions } from '@/lib/services/countryService';
+import { getCountries } from '@/infrastructure/services/country';
+import { getRegions } from '@/infrastructure/services/regions';
 
 interface RegionComboboxProps {
     selectedCountry: string;

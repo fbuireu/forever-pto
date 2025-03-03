@@ -1,7 +1,7 @@
 // app/page.tsx - Server Component
 import CalendarList from '@/components/ui/CalendarList';
 import Filters from '@/components/ui/Filters';
-import { getHolidays } from '@/lib/holidays';
+import { getHolidays } from '@/infrastructure/services/holidays';
 
 const DEFAULT_PTO_DAYS = 22;
 
@@ -9,7 +9,7 @@ interface SearchParams {
     country?: string;
     region?: string;
     year?: string;
-    availablePtoDays?: string;
+    ptoDays?: string;
     allowPastDays?: string;
 }
 
@@ -22,7 +22,7 @@ export default async function PTOPlannerPage({
         country,
         region,
         year = String(new Date().getFullYear()),
-        availablePtoDays = 22,
+        ptoDays = 22,
         allowPastDays = false,
     } = await searchParams;
     const holidays = await getHolidays(country, region, year);
@@ -33,7 +33,7 @@ export default async function PTOPlannerPage({
                         country={country}
                         region={region}
                         year={year}
-                        availablePtoDays={availablePtoDays}
+                        availablePtoDays={ptoDays}
                         allowPastDays={allowPastDays}
                 />
                 <CalendarList
@@ -41,7 +41,7 @@ export default async function PTOPlannerPage({
                         country={country}
                         region={region}
                         year={year}
-                        availablePtoDays={availablePtoDays}
+                        ptoDays={ptoDays}
                         allowPastDays={allowPastDays}
                         holidays={holidays}
                 />

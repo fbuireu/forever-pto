@@ -61,14 +61,14 @@ interface CalendarListProps {
   country: string;
   region: string;
   year: number;
-  availablePtoDays: number;
+  ptoDays: number;
   allowPastDays: boolean;
   holidays: Holiday[];
 }
 
 export default function CalendarList({
   year,
-  availablePtoDays,
+  ptoDays,
   allowPastDays,
   holidays,
 }: CalendarListProps) {
@@ -298,7 +298,7 @@ export default function CalendarList({
 
   // Optimized function to find optimal gaps
   const findOptimalGaps = useCallback(() => {
-    const remainingPtoDays = availablePtoDays - selectedPtoDays.length;
+    const remainingPtoDays = ptoDays - selectedPtoDays.length;
     if (remainingPtoDays <= 0) return {
       suggestedDays: [],
       alternativeBlocks: {},
@@ -508,11 +508,11 @@ export default function CalendarList({
       alternativeBlocks: alternativesByBlockId,
       dayToBlockIdMap: newDayToBlockIdMap,
     };
-  }, [yearMap, availablePtoDays, selectedPtoDays.length, calculateEffectiveDays, isHoliday]);
+  }, [yearMap, ptoDays, selectedPtoDays.length, calculateEffectiveDays, isHoliday]);
 
   // Actualizar sugerencias con useTransition para evitar bloquear la UI
   useEffect(() => {
-    const remainingDays = availablePtoDays - selectedPtoDays.length;
+    const remainingDays = ptoDays - selectedPtoDays.length;
 
     if (remainingDays <= 0) {
       // Actualizaciones inmediatas para el caso simple
@@ -521,14 +521,14 @@ export default function CalendarList({
       setDayToBlockIdMap({});
       setOptimizationSummary(
           <span>
-          Has utilizado todos tus <span className="font-medium">{availablePtoDays} días PTO</span> disponibles.
+          Has utilizado todos tus <span className="font-medium">{ptoDays} días PTO</span> disponibles.
         </span>,
       );
       return;
     }
 
     // Si no hay días PTO disponibles desde el inicio
-    if (availablePtoDays <= 0) {
+    if (ptoDays <= 0) {
       setSuggestedDays([]);
       setAlternativeBlocks({});
       setDayToBlockIdMap({});
@@ -570,7 +570,7 @@ export default function CalendarList({
 
         setOptimizationSummary(
             <>
-              ¡Con tus {availablePtoDays} días PTO conseguirás{' '}
+              ¡Con tus {ptoDays} días PTO conseguirás{' '}
               <span className="font-medium">{effectiveData.effective} días totales</span> de vacaciones!{' '}
               <Badge variant="outline" className="ml-1 bg-primary/10 text-primary-foreground/90 hover:bg-primary/20">
                 ratio {effectiveData.ratio}x
@@ -588,7 +588,7 @@ export default function CalendarList({
         );
       }
     });
-  }, [availablePtoDays, selectedPtoDays.length, findOptimalGaps, calculateEffectiveDays]);
+  }, [ptoDays, selectedPtoDays.length, findOptimalGaps, calculateEffectiveDays]);
 
   // FUNCIONES ACTUALIZADAS PARA MANEJAR HOVER DE BLOQUES
 
@@ -778,9 +778,9 @@ export default function CalendarList({
         // Check if it exceeds the PTO day limit
         const currentPtoDays = prev.filter(d => !isWeekend(d) && !isHoliday(d)).length;
 
-        if (currentPtoDays >= availablePtoDays) {
+        if (currentPtoDays >= ptoDays) {
           alert(
-              `No puedes seleccionar más de ${availablePtoDays} días PTO. Quita algún día para poder seleccionar otros.`);
+              `No puedes seleccionar más de ${ptoDays} días PTO. Quita algún día para poder seleccionar otros.`);
           return prev;
         }
 
@@ -788,7 +788,7 @@ export default function CalendarList({
         return [...prev, date];
       }
     });
-  }, [isHoliday, availablePtoDays, allowPastDays]);
+  }, [isHoliday, ptoDays, allowPastDays]);
 
   // Get suggested days for a specific month
   const getSuggestedDaysForMonth = useCallback((month: Date) => {
@@ -798,7 +798,7 @@ export default function CalendarList({
   // Generate summary of suggestions for a month as intervals
   const getMonthSummary = useCallback((month: Date) => {
     // Si no hay días de vacaciones disponibles o no hay sugerencias generales, retornar null
-    if (availablePtoDays <= 0 || suggestedDays.length === 0) {
+    if (ptoDays <= 0 || suggestedDays.length === 0) {
       return null;
     }
 
@@ -897,7 +897,7 @@ export default function CalendarList({
           ))}
         </>
     );
-  }, [availablePtoDays, suggestedDays, getSuggestedDaysForMonth, calculateEffectiveDays]);
+  }, [ptoDays, suggestedDays, getSuggestedDaysForMonth, calculateEffectiveDays]);
 
   return (
       <main className="flex flex-col gap-8 items-center w-full">
@@ -907,12 +907,9 @@ export default function CalendarList({
             </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {monthsToShow.map((month, index) => {
-            const gridClass = index >= 6 && index <= 12
-                ? 'lg:row-start-2'
-                : '';
-            return <Card key={month.toISOString()} className={`mb-4 flex flex-col ${gridClass}`}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-7 gap-4">
+          {monthsToShow.map((month) => {
+            return <Card key={month.toISOString()} className="mb-4 flex flex-col">
               {isPending && <LoadingSpinner />}
               <Calendar
                   mode="multiple"
@@ -996,7 +993,7 @@ export default function CalendarList({
                     },
                   }}
               />
-              {availablePtoDays > 0 && suggestedDays.length > 0 && getSuggestedDaysForMonth(month).length > 0 && (
+              {ptoDays > 0 && suggestedDays.length > 0 && getSuggestedDaysForMonth(month).length > 0 && (
                   <>
                     {getMonthSummary(month) && (
                         <div
