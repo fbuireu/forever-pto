@@ -1,89 +1,92 @@
 'use client';
 
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { startTransition, useCallback } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useDebounce } from "@uidotdev/usehooks";
 import { Minus, Plus } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { startTransition, useCallback, useEffect, useState } from 'react';
 
 export const PtoDaysInput = ({ availablePtoDays }) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const currentValue = parseInt(availablePtoDays) || 0;
+        const [inputValue, setInputValue] = useState(parseInt(availablePtoDays) || 0);
+        const debouncedValue = useDebounce(inputValue, 300);
 
     const createQueryString = useCallback(
-            (name: string, value: string) => {
-                const params = new URLSearchParams(searchParams.toString());
-                params.set(name, value);
-                return params.toString();
-            },
-            [searchParams],
+        (name: string, value: string) => {
+            const params = new URLSearchParams(searchParams.toString());
+            params.set(name, value);
+            return params.toString();
+        },
+        [searchParams],
     );
 
-    const decrementDays = () => {
-        if (currentValue > 0) {
-            const newValue = (currentValue - 1).toString();
+    useEffect(() => {
+        if (debouncedValue.toString() !== (searchParams.get('availablePtoDays') || '0')) {
             startTransition(() => {
                 router.push(
-                        pathname + '?' +
-                        createQueryString('availablePtoDays', newValue),
-                        { scroll: false },
+                    pathname + '?' + createQueryString('availablePtoDays', debouncedValue.toString()),
+                    { scroll: false }
                 );
             });
+        }
+    }, [debouncedValue, createQueryString, pathname, router, searchParams]);
+
+    const decrementDays = () => {
+        if (inputValue > 0) {
+            setInputValue(inputValue - 1);
         }
     };
 
     const incrementDays = () => {
-        const newValue = (currentValue + 1).toString();
-        startTransition(() => {
-            router.push(
-                    pathname + '?' +
-                    createQueryString('availablePtoDays', newValue),
-                    { scroll: false },
-            );
-        });
+        setInputValue(inputValue + 1);
     };
 
-    return <div className="flex items-center gap-2">
-        <Label htmlFor="available-days" className="whitespace-nowrap">
-            Tengo
-        </Label>
-        <Button
+    const handleInputChange = (event) => {
+        const newValue = parseInt(event.currentTarget.value);
+        if (!isNaN(newValue) && newValue >= 0) {
+            setInputValue(newValue);
+        } else if (event.currentTarget.value === '') {
+            setInputValue(0);
+        }
+    };
+
+    return (
+        <div className="flex items-center gap-2">
+            <Label htmlFor="available-days" className="whitespace-nowrap">
+                Tengo
+            </Label>
+            <Button
                 variant="outline"
                 size="icon"
                 className="h-8 w-8 shrink-0 rounded-full"
                 onClick={decrementDays}
-                disabled={currentValue <= 0}
-        >
-            <Minus />
-            <span className="sr-only">Increase</span>
-        </Button>
-        <Input
+                disabled={inputValue <= 0}
+            >
+                <Minus />
+                <span className="sr-only">Decrease</span>
+            </Button>
+            <Input
                 id="available-days"
                 type="number"
-                value={currentValue}
-                onChange={(event) => {
-                    startTransition(() => {
-                        router.push(
-                                pathname + '?' +
-                                createQueryString('availablePtoDays', event.currentTarget.value),
-                                { scroll: false });
-                    });
-                }}
+                value={inputValue}
+                onChange={handleInputChange}
                 className="w-20"
                 min="0"
-        />
-        <Button
+            />
+            <Button
                 variant="outline"
                 size="icon"
                 className="h-8 w-8 shrink-0 rounded-full"
                 onClick={incrementDays}
-        >
-            <Plus />
-            <span className="sr-only">Decrease</span>
-        </Button>
-        <span>días libres</span>
-    </div>;
+            >
+                <Plus />
+                <span className="sr-only">Increase</span>
+            </Button>
+            <span>días libres</span>
+        </div>
+    );
 };

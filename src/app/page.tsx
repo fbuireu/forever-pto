@@ -18,7 +18,6 @@ export default async function PTOPlannerPage({
 }: {
     searchParams: SearchParams;
 }) {
-    // Get values from URL with defaults
     const {
         country,
         region,
@@ -69,6 +68,7 @@ export default async function PTOPlannerPage({
 // 23- Adjust threshold (paid funcionality)
 // 24- Edit weekends (paid functionality)
 // 25- Edit festivities (paid functionality)
-// 26- RECHECK ALGORYTHM
+// 25- Add custom debounce hook
+// 26- RECHECK ALGORYTHM (both alternatives + suggestions)
 
 

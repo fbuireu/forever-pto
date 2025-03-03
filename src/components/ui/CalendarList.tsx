@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Card } from '@/components/ui/card';
+import type { Holiday } from '@/lib/holidays';
 import {
   addDays,
   addMonths,
@@ -20,14 +21,13 @@ import {
   startOfMonth,
 } from 'date-fns';
 import { es } from 'date-fns/locale';
-import type { Holiday } from '@/lib/holidays';
-import { Badge } from '@/components/ui/badge';
 import { Loader2 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 
 const MONTHS_TO_DISPLAY = 12;
 const ALTERNATIVE_THRESHOLD = .75;
 const MAX_BLOCK_SIZE = 5; // Máximo tamaño de bloque a considerar
-const MAX_ALTERNATIVES = 5; // Límite de alternativas por bloque
+const MAX_ALTERNATIVES = 10; // Límite de alternativas por bloque
 
 const LoadingSpinner = () => (
     <div className="absolute inset-0 flex items-center justify-center bg-background/60 opacity-10 z-10 rounded-md">
@@ -79,6 +79,8 @@ export default function CalendarList({
   const [dayToBlockIdMap, setDayToBlockIdMap] = useState<Record<string, string>>({});
   const [optimizationSummary, setOptimizationSummary] = useState('');
   const [hoveredBlockId, setHoveredBlockId] = useState<string | null>(null);
+  // Estado adicional para el bloque con hover (para estilo)
+  const [hoveredStyleBlockId, setHoveredStyleBlockId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   // Memoizar el mapa de días festivos para búsquedas rápidas O(1)
@@ -113,8 +115,6 @@ export default function CalendarList({
 
   // Initialize with weekends and holidays
   useEffect(() => {
-    // Este efecto solo se ejecuta cuando los parámetros clave cambian
-    // No necesitamos optimizar aquí porque solo se ejecuta una vez por cambio de año
     const initialSelection: Date[] = [];
 
     // Add all weekends of the year
@@ -591,6 +591,8 @@ export default function CalendarList({
     });
   }, [availablePtoDays, selectedPtoDays.length, findOptimalGaps, calculateEffectiveDays]);
 
+  // FUNCIONES ACTUALIZADAS PARA MANEJAR HOVER DE BLOQUES
+
   // Memoizar funciones de eventos para evitar recreaciones
   const handleDayMouseOver = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const button = e.currentTarget;
@@ -600,18 +602,22 @@ export default function CalendarList({
 
     const blockId = button.dataset.blockId;
     if (blockId && alternativeBlocks[blockId]) {
+      // Mostrar alternativas
       setHoveredBlockId(blockId);
+      // Además, activar hover en todo el bloque
+      setHoveredStyleBlockId(blockId);
     }
   }, [alternativeBlocks]);
 
   const handleDayMouseOut = useCallback(() => {
     setHoveredBlockId(null);
+    setHoveredStyleBlockId(null);
   }, []);
 
   // Memoizar verificadores de día
   const isDaySuggested = useCallback((day: Date) =>
-          suggestedDays.some(d => isSameDay(d, day)),
-      [suggestedDays]);
+    suggestedDays.some(d => isSameDay(d, day)),
+  [suggestedDays]);
 
   const isDayAlternative = useCallback((day: Date) => {
     if (!hoveredBlockId || suggestedDays.some(d => isSameDay(d, day))) {
@@ -620,9 +626,33 @@ export default function CalendarList({
 
     const alternatives = alternativeBlocks[hoveredBlockId] || [];
     return alternatives.some(block =>
-        block.days && block.days.some(d => isSameDay(d, day)),
+      block.days && block.days.some(d => isSameDay(d, day)),
     );
   }, [hoveredBlockId, suggestedDays, alternativeBlocks]);
+
+  // Función para determinar si un día está en el bloque con hover
+  const isDayInHoveredBlock = useCallback((date: Date) => {
+    if (!hoveredStyleBlockId) return false;
+
+    const dateKey = format(date, 'yyyy-MM-dd');
+    return dayToBlockIdMap[dateKey] === hoveredStyleBlockId;
+  }, [hoveredStyleBlockId, dayToBlockIdMap]);
+
+  // Verificar si un día está en un bloque alternativo con hover
+  const isDayInHoveredAlternativeBlock = useCallback((date: Date) => {
+    if (!hoveredBlockId || !isDayAlternative(date)) return false;
+
+    // Buscar el bloque alternativo al que pertenece este día
+    const alternatives = alternativeBlocks[hoveredBlockId] || [];
+    for (const block of alternatives) {
+      if (block.days && block.days.some(d => isSameDay(d, date))) {
+        // Este día es parte de un bloque alternativo que tiene hover
+        return true;
+      }
+    }
+
+    return false;
+  }, [hoveredBlockId, isDayAlternative, alternativeBlocks]);
 
   // Función para determinar la posición de un día en un bloque sugerido
   const getDayPositionInBlock = useCallback((date: Date) => {
@@ -675,7 +705,7 @@ export default function CalendarList({
     return null;
   }, [hoveredBlockId, isDayAlternative, alternativeBlocks]);
 
-  // Memoizar clase de día para evitar recálculos
+  // Memoizar clase de día para evitar recálculos - CORREGIDO PARA EL HOVER
   const getDayClassName = useCallback((date: Date, displayMonth: Date) => {
     // Base classes siguiendo la estética shadcn/ui
     const classes = [
@@ -695,33 +725,34 @@ export default function CalendarList({
     // Past day (not selectable if not allowed)
     if (!allowPastDays && date < new Date() && !selectedDays.some(d => isSameDay(d, date))) {
       classes.push('text-muted-foreground opacity-50 cursor-not-allowed');
-    } else {
-      // Default hover for selectable days
-      classes.push('hover:bg-accent hover:text-accent-foreground');
     }
 
-    // Apply styles based on day type with shadcn/ui classes
-    if (isWeekend(date)) {
-      classes.push('bg-accent/30 text-muted-foreground');
-    }
-
-    if (isHoliday(date)) {
-      classes.push('bg-yellow-100 text-yellow-800');
-    }
-
+    // Determine day type and apply appropriate styling
     if (isToday(date)) {
-      classes.push('border border-primary');
-    }
-
-    // Selected day (weekends, holidays, or PTO days)
-    if (selectedDays.some(d => isSameDay(d, date))) {
-      if (!isWeekend(date) && !isHoliday(date)) {
-        classes.push('bg-primary text-primary-foreground hover:bg-primary/90');
+      // Today with dark gray background and black hover
+      classes.push('bg-gray-800 dark:bg-gray-900 text-white hover:bg-black');
+    } else if (selectedDays.some(d => isSameDay(d, date)) && !isWeekend(date) && !isHoliday(date)) {
+      // Selected PTO days
+      classes.push('bg-primary text-primary-foreground hover:bg-primary/90');
+    } else if (isHoliday(date)) {
+      // Holiday days
+      classes.push('bg-yellow-100 text-yellow-800 hover:bg-yellow-200');
+    } else if (isWeekend(date)) {
+      // Weekend days
+      classes.push('bg-accent/30 text-muted-foreground hover:bg-accent/60');
+    } else {
+      // Solo aplicamos hover gris a días normales que no pertenecen a bloques
+      const isSuggested = isDaySuggested(date);
+      const isAlternative = isDayAlternative(date);
+      
+      // Si no es parte de un bloque sugerido ni alternativo, entonces aplicamos hover gris
+      if (!isSuggested && !isAlternative) {
+        classes.push('hover:bg-gray-100 dark:hover:bg-gray-800');
       }
     }
 
     return classes.join(' ');
-  }, [isHoliday, selectedDays, allowPastDays]);
+  }, [isHoliday, selectedDays, allowPastDays, isDaySuggested, isDayAlternative]);
 
   // Handle day selection
   const handleDaySelect = useCallback((date: Date) => {
@@ -906,28 +937,40 @@ export default function CalendarList({
                       const blockId = isSuggested ? dayToBlockIdMap[dateKey] || '' : '';
                       const blockPosition = getDayPositionInBlock(date);
                       const alternativePosition = getAlternativeDayPosition(date);
+                      
+                      // Verificar si el día pertenece a un bloque con hover
+                      const isInHoveredBlock = isDayInHoveredBlock(date);
+                      const isInHoveredAlternativeBlock = isDayInHoveredAlternativeBlock(date);
 
-                      // Clases para bloques
+                      // Clases base para los bloques
                       let blockStyles = '';
+                      
+                      // Día sugerido
                       if (isSuggested && blockPosition) {
+                        const baseColor = isInHoveredBlock ? 'bg-green-200 dark:bg-green-800/50' : 'bg-green-100 dark:bg-green-900/30';
+                        
                         if (blockPosition === 'single') {
-                          blockStyles = 'ring-2 ring-green-500 rounded-md';
+                          blockStyles = `${baseColor} rounded-md`;
                         } else if (blockPosition === 'start') {
-                          blockStyles = 'border-l-2 border-t-2 border-b-2 border-green-500 rounded-l-md pl-0.5';
+                          blockStyles = `${baseColor} rounded-l-md`;
                         } else if (blockPosition === 'end') {
-                          blockStyles = 'border-r-2 border-t-2 border-b-2 border-green-500 rounded-r-md pr-0.5';
+                          blockStyles = `${baseColor} rounded-r-md`;
                         } else { // middle
-                          blockStyles = 'border-t-2 border-b-2 border-green-500';
+                          blockStyles = baseColor;
                         }
-                      } else if (isAlternative && alternativePosition) {
+                      } 
+                      // Día alternativo
+                      else if (isAlternative && alternativePosition) {
+                        const baseColor = isInHoveredAlternativeBlock ? 'bg-purple-200 dark:bg-purple-800/50' : 'bg-purple-100 dark:bg-purple-900/30';
+                        
                         if (alternativePosition === 'single') {
-                          blockStyles = 'ring-2 ring-purple-500 rounded-md';
+                          blockStyles = `${baseColor} rounded-md`;
                         } else if (alternativePosition === 'start') {
-                          blockStyles = 'border-l-2 border-t-2 border-b-2 border-purple-500 rounded-l-md pl-0.5';
+                          blockStyles = `${baseColor} rounded-l-md`;
                         } else if (alternativePosition === 'end') {
-                          blockStyles = 'border-r-2 border-t-2 border-b-2 border-purple-500 rounded-r-md pr-0.5';
+                          blockStyles = `${baseColor} rounded-r-md`;
                         } else { // middle
-                          blockStyles = 'border-t-2 border-b-2 border-purple-500';
+                          blockStyles = baseColor;
                         }
                       }
 
@@ -990,19 +1033,11 @@ export default function CalendarList({
               <span>Días PTO seleccionados</span>
             </div>
             <div className="flex items-center">
-              <div className="flex">
-                <div className="h-4 w-2 border-l-2 border-t-2 border-b-2 border-green-500 rounded-l-sm mr-0"></div>
-                <div className="h-4 w-2 border-t-2 border-b-2 border-green-500 mr-0"></div>
-                <div className="h-4 w-2 border-r-2 border-t-2 border-b-2 border-green-500 rounded-r-sm mr-2"></div>
-              </div>
+              <div className="w-4 h-4 bg-green-100 dark:bg-green-900/30 mr-2 rounded-sm"></div>
               <span>Días sugeridos</span>
             </div>
             <div className="flex items-center">
-              <div className="flex">
-                <div className="h-4 w-2 border-l-2 border-t-2 border-b-2 border-purple-500 rounded-l-sm mr-0"></div>
-                <div className="h-4 w-2 border-t-2 border-b-2 border-purple-500 mr-0"></div>
-                <div className="h-4 w-2 border-r-2 border-t-2 border-b-2 border-purple-500 rounded-r-sm mr-2"></div>
-              </div>
+              <div className="w-4 h-4 bg-purple-100 dark:bg-purple-900/30 mr-2 rounded-sm"></div>
               <span>Alternativas similares ({(ALTERNATIVE_THRESHOLD * 100).toFixed(0)}%)</span>
             </div>
           </div>
