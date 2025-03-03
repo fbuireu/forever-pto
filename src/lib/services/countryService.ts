@@ -32,7 +32,6 @@ export const getRegions = cache(async (countryCode: string) => {
 
     return Object.entries(states)
       .map(([regionCode, regionName]) => {
-
         return {
           value: regionCode,
           label: String(regionName),
@@ -44,32 +43,3 @@ export const getRegions = cache(async (countryCode: string) => {
     return [];
   }
 });
-
-export const detectCountryFromIP = cache(async () => {
-  try {
-    const ipResponse = await fetch('https://api.ipify.org?format=json', {
-      cache: 'no-store',
-    });
-
-    if (!ipResponse.ok) {
-      throw new Error('No se pudo obtener la IP del cliente');
-    }
-
-    const { ip } = await ipResponse.json();
-
-    const geoResponse = await fetch(`https://ipinfo.io/${ip}/json`, {
-      headers: {
-        Accept: 'application/json',
-      },
-      cache: 'no-store',
-    });
-
-    if (!geoResponse.ok) {
-      throw new Error('No se pudieron obtener datos geográficos');
-    }
-
-    const geoData = await geoResponse.json();
-    return geoData.country?.toLowerCase() || '';
-  } catch (error) {}
-});
-// method 2 to get location and region: https://stretchmytimeoff.com/cdn-cgi/trace

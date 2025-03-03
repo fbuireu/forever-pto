@@ -82,7 +82,6 @@ export default function CalendarList({
   // Estado adicional para el bloque con hover (para estilo)
   const [hoveredStyleBlockId, setHoveredStyleBlockId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-
   // Memoizar el mapa de días festivos para búsquedas rápidas O(1)
   const holidaysMap = useMemo(() => {
     const map = new Map<string, Holiday>();

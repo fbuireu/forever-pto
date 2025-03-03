@@ -1,7 +1,7 @@
 // app/page.tsx - Server Component
-import { getHolidays } from '@/lib/holidays';
-import Filters from '@/components/ui/Filters';
 import CalendarList from '@/components/ui/CalendarList';
+import Filters from '@/components/ui/Filters';
+import { getHolidays } from '@/lib/holidays';
 
 const DEFAULT_PTO_DAYS = 22;
 
