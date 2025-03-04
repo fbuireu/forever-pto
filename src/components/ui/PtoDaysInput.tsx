@@ -14,7 +14,7 @@ export const PtoDaysInput = ({ ptoDays = 22 }) => {
     const searchParams = useSearchParams();
     const [inputValue, setInputValue] = useState(() => {    
     const paramValue = searchParams.get('ptoDays');
-    return paramValue ? Number(paramValue) : Number(ptoDays);
+    return paramValue ? Number(paramValue) : parseInt(ptoDays);
 });
     
     const debouncedValue = useDebounce(inputValue, 300);
@@ -29,7 +29,7 @@ export const PtoDaysInput = ({ ptoDays = 22 }) => {
     );
 
     useEffect(() => {
-        if (debouncedValue.toString() !== (searchParams.get('ptoDays')) {
+        if (debouncedValue.toString() !== (searchParams.get('ptoDays'))) {
             startTransition(() => {
                 router.push(
                     pathname + '?' + createQueryString('ptoDays', debouncedValue.toString()),
