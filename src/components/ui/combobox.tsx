@@ -24,6 +24,7 @@ export default function Combobox({
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const [open, setOpen] = useState(false);
 
     const createQueryString = useCallback(
             (name: string, value: string) => {
@@ -39,7 +40,6 @@ export default function Combobox({
             },
             [searchParams],
     );
-    const [open, setOpen] = useState(false);
 
     const selectedOption = options.find((option) => option.value.toLowerCase() === value);
 

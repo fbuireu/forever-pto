@@ -9,11 +9,15 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { startTransition, useCallback, useEffect, useState } from 'react';
 
 export const PtoDaysInput = ({ ptoDays = 22 }) => {
-    const router = useRouter();
+   const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-        const [inputValue, setInputValue] = useState(parseInt(ptoDays) || 0);
-        const debouncedValue = useDebounce(inputValue, 300);
+    const [inputValue, setInputValue] = useState(() => {    
+    const paramValue = searchParams.get('ptoDays');
+    return paramValue ? Number(paramValue) : Number(ptoDays);
+});
+    
+    const debouncedValue = useDebounce(inputValue, 300);
 
     const createQueryString = useCallback(
         (name: string, value: string) => {
@@ -25,7 +29,7 @@ export const PtoDaysInput = ({ ptoDays = 22 }) => {
     );
 
     useEffect(() => {
-        if (debouncedValue.toString() !== (searchParams.get('ptoDays') || '0')) {
+        if (debouncedValue.toString() !== (searchParams.get('ptoDays')) {
             startTransition(() => {
                 router.push(
                     pathname + '?' + createQueryString('ptoDays', debouncedValue.toString()),

@@ -9,7 +9,8 @@ export interface Holiday {
   location: string | null;
 }
 
-export const getHolidays = cache(async (country: string, region: string, year: number) => {
+export const getHolidays = cache(async (country?: string, region: string, year: number) => {
+  if(!country) return
   try {
     const opts = {
       languages: typeof navigator !== 'undefined' ? navigator.languages.map((lang) => lang.split('-')[0]) : ['en'],
@@ -56,7 +57,6 @@ function getNationalHolidays(country, opts, year) {
         start: new Date(holiday.start),
         end: new Date(holiday.end),
       });
-
       return daysInRange.map((date) => ({
         date,
         name: `${holiday.name} (siguiente año)`,
@@ -125,6 +125,6 @@ function getRegionalHolidays(country, region, opts, year, nationalHolidays) {
       });
     })
     .filter((holiday) => holiday.location !== null);
-console.log(currentYearRegionalHolidays);
+
   return [...currentYearRegionalHolidays, ...nextYearRegionalHolidays];
 }

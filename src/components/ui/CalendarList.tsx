@@ -26,16 +26,17 @@ import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 
 const MONTHS_TO_DISPLAY = 12;
 const ALTERNATIVE_THRESHOLD = .75;
-const MAX_BLOCK_SIZE = 5; // Máximo tamaño de bloque a considerar
-const MAX_ALTERNATIVES = 10; // Límite de alternativas por bloque
+const MAX_BLOCK_SIZE = 5; 
+const MAX_ALTERNATIVES = 10;
 
+// Componente de spinner para estados de carga
 const LoadingSpinner = () => (
-    <div className="absolute inset-0 flex items-center justify-center bg-background/60 opacity-10 z-10 rounded-md">
-      <Loader2 className="h-10 w-10 animate-spin text-primary" />
-    </div>
+  <div className="absolute inset-0 flex items-center justify-center bg-background/60 opacity-10 z-10 rounded-md">
+    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+  </div>
 );
 
-// Interfaces for typing
+// Interfaces para tipado
 interface DayInfo {
   date: Date;
   isWeekend: boolean;
@@ -66,38 +67,79 @@ interface CalendarListProps {
   holidays: Holiday[];
 }
 
+// Interfaz para festivos en formato raw (si los datos vienen con formato diferente)
+interface RawHoliday {
+  fecha: string;
+  nombre: string;
+  año: number;
+  location: string | null;
+}
+
 export default function CalendarList({
   year,
   ptoDays,
   allowPastDays,
   holidays,
 }: CalendarListProps) {
-  // States
   const [selectedDays, setSelectedDays] = useState<Date[]>([]);
   const [suggestedDays, setSuggestedDays] = useState<Date[]>([]);
   const [alternativeBlocks, setAlternativeBlocks] = useState<Record<string, BlockOpportunity[]>>({});
   const [dayToBlockIdMap, setDayToBlockIdMap] = useState<Record<string, string>>({});
-  const [optimizationSummary, setOptimizationSummary] = useState('');
+  const [optimizationSummary, setOptimizationSummary] = useState<React.ReactNode>('');
   const [hoveredBlockId, setHoveredBlockId] = useState<string | null>(null);
-  // Estado adicional para el bloque con hover (para estilo)
-  const [hoveredStyleBlockId, setHoveredStyleBlockId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  // Normalizar los festivos para asegurar que todas las fechas sean objetos Date
+  // y manejar posibles diferentes formatos de entrada
+  const normalizedHolidays = useMemo(() => {
+    // Verificar formato de los datos de entrada
+    const needsNormalization = holidays.length > 0 && 'fecha' in holidays[0];
+    
+    if (needsNormalization) {
+      // Si tienen el formato { fecha, nombre, año, location }
+      return (holidays as unknown as RawHoliday[]).map(holiday => ({
+        date: new Date(holiday.fecha),
+        name: holiday.nombre,
+        type: 'public',
+        location: holiday.location
+      }));
+    } else {
+      // Si ya tienen el formato { date, name, type, location }
+      return holidays.map(holiday => ({
+        ...holiday,
+        date: holiday.date instanceof Date ? holiday.date : new Date(holiday.date)
+      }));
+    }
+  }, [holidays]);
+
+  // Log para verificar normalización de festivos
+  useEffect(() => {
+    console.log("Festivos normalizados:", normalizedHolidays.map(h => ({
+      fecha: format(h.date, 'yyyy-MM-dd'),
+      nombre: h.name,
+      año: h.date.getFullYear(),
+      location: h.location,
+      esEnero2026: h.date.getFullYear() === 2026 && h.date.getMonth() === 0
+    })));
+  }, [normalizedHolidays]);
+
   // Memoizar el mapa de días festivos para búsquedas rápidas O(1)
   const holidaysMap = useMemo(() => {
     const map = new Map<string, Holiday>();
-    holidays.forEach(holiday => {
-      map.set(format(holiday.date, 'yyyy-MM-dd'), holiday);
+    normalizedHolidays.forEach(holiday => {
+      const key = format(holiday.date, 'yyyy-MM-dd');
+      map.set(key, holiday);
     });
     return map;
-  }, [holidays]);
+  }, [normalizedHolidays]);
 
   // Generate months to display based on the year, including next January
   const monthsToShow = useMemo(() => {
     const start = startOfMonth(new Date(year, 0, 1));
     const months = Array.from({ length: MONTHS_TO_DISPLAY }, (_, i) => addMonths(start, i));
 
-    // Add January of next year
-    const nextJanuary = startOfMonth(new Date(year + 1, 0, 1));
+    // Add January of next year - usando Number explícito para asegurar el tipo
+    const nextJanuary = startOfMonth(new Date(Number(year) + 1, 0, 1));
     return [...months, nextJanuary];
   }, [year]);
 
@@ -106,7 +148,7 @@ export default function CalendarList({
     return holidaysMap.has(format(date, 'yyyy-MM-dd'));
   }, [holidaysMap]);
 
-  // Function to get holiday name if exists - Updated for new format
+  // Function to get holiday name if exists
   const getHolidayName = useCallback((date: Date): string | null => {
     const holiday = holidaysMap.get(format(date, 'yyyy-MM-dd'));
     return holiday ? holiday.name : null;
@@ -131,19 +173,19 @@ export default function CalendarList({
     });
 
     // Add holidays
-    holidays.forEach(holiday => {
+    normalizedHolidays.forEach(holiday => {
       if (!initialSelection.some(day => isSameDay(day, holiday.date))) {
         initialSelection.push(holiday.date);
       }
     });
 
     setSelectedDays(initialSelection);
-  }, [holidays, monthsToShow, year, isHoliday]);
+  }, [normalizedHolidays, monthsToShow]);
 
   // Calculate selected PTO days (only workdays)
   const selectedPtoDays = useMemo(() => {
     return selectedDays.filter(day =>
-        !isWeekend(day) && !isHoliday(day),
+      !isWeekend(day) && !isHoliday(day)
     );
   }, [selectedDays, isHoliday]);
 
@@ -164,7 +206,7 @@ export default function CalendarList({
     });
 
     // Add holidays (pre-calculados)
-    holidays.forEach(holiday => {
+    normalizedHolidays.forEach(holiday => {
       map.set(format(holiday.date, 'yyyy-MM-dd'), holiday.date);
     });
 
@@ -174,7 +216,7 @@ export default function CalendarList({
     });
 
     return map;
-  }, [monthsToShow, holidays, selectedPtoDays]);
+  }, [monthsToShow, normalizedHolidays, selectedPtoDays]);
 
   // Calculate effective days - optimized version
   const calculateEffectiveDays = useCallback((ptoDaysToAdd: Date[] = []): { effective: number; ratio: number } => {
@@ -196,7 +238,7 @@ export default function CalendarList({
 
     // Identificar secuencias de días consecutivos
     const freeDays = Array.from(freeDaysMap.values())
-        .sort((a, b) => a.getTime() - b.getTime());
+      .sort((a, b) => a.getTime() - b.getTime());
 
     const sequences: Date[][] = [];
     let currentSequence: Date[] = [];
@@ -238,7 +280,7 @@ export default function CalendarList({
     sequences.forEach(sequence => {
       // Verificar si algún día de la secuencia es un día PTO
       const hasAnyPtoDay = sequence.some(day =>
-          ptoDayKeys.has(format(day, 'yyyy-MM-dd')),
+        ptoDayKeys.has(format(day, 'yyyy-MM-dd')),
       );
 
       if (hasAnyPtoDay) {
@@ -280,7 +322,7 @@ export default function CalendarList({
       const isWeekendDay = isWeekend(day);
       const isHolidayDay = isHoliday(day);
       const isAlreadySelected = selectedDays.some(selectedDay =>
-          !isWeekend(selectedDay) && !isHoliday(selectedDay) && isSameDay(selectedDay, day),
+        !isWeekend(selectedDay) && !isHoliday(selectedDay) && isSameDay(selectedDay, day),
       );
 
       map.set(format(day, 'yyyy-MM-dd'), {
@@ -483,10 +525,10 @@ export default function CalendarList({
         // Crear conjunto de claves de días sugeridos para búsqueda rápida
         const suggestedDayKeys = new Set(finalSuggestedDays.map(d => format(d, 'yyyy-MM-dd')));
 
-        // Limitar la búsqueda a solo 20 bloques con tamaño similar
+        // Limitar la búsqueda a solo 30 bloques con tamaño similar
         const potentialAlternatives = blockOpportunities
-            .filter(op => op !== block && op.blockSize === blockSize)
-            .slice(0, 30);
+          .filter(op => op !== block && op.blockSize === blockSize)
+          .slice(0, 30);
 
         for (const candidate of potentialAlternatives) {
           // Verificar que tenga la misma efectividad y no tenga conflictos
@@ -520,9 +562,9 @@ export default function CalendarList({
       setAlternativeBlocks({});
       setDayToBlockIdMap({});
       setOptimizationSummary(
-          <span>
+        <span>
           Has utilizado todos tus <span className="font-medium">{ptoDays} días PTO</span> disponibles.
-        </span>,
+        </span>
       );
       return;
     }
@@ -533,9 +575,9 @@ export default function CalendarList({
       setAlternativeBlocks({});
       setDayToBlockIdMap({});
       setOptimizationSummary(
-          <span>
+        <span>
           No tienes días PTO disponibles para asignar.
-        </span>,
+        </span>
       );
       return;
     }
@@ -565,26 +607,26 @@ export default function CalendarList({
         });
 
         const summaryParts = Object.entries(monthCounts).map(
-            ([month, count]) => `${count} días en ${month}`,
+          ([month, count]) => `${count} días en ${month}`
         );
 
         setOptimizationSummary(
-            <>
-              ¡Con tus {ptoDays} días PTO conseguirás{' '}
-              <span className="font-medium">{effectiveData.effective} días totales</span> de vacaciones!{' '}
-              <Badge variant="outline" className="ml-1 bg-primary/10 text-primary-foreground/90 hover:bg-primary/20">
-                ratio {effectiveData.ratio}x
-              </Badge>
-              <span className="ml-2">
-                Sugerencia: {optimal.length} días distribuidos estratégicamente ({summaryParts.join(', ')})
-              </span>
-            </>,
+          <>
+            ¡Con tus {ptoDays} días PTO conseguirás{' '}
+            <span className="font-medium">{effectiveData.effective} días totales</span> de vacaciones!{' '}
+            <Badge variant="outline" className="ml-1 bg-primary/10 text-primary-foreground/90 hover:bg-primary/20">
+              ratio {effectiveData.ratio}x
+            </Badge>
+            <span className="ml-2">
+              Sugerencia: {optimal.length} días distribuidos estratégicamente ({summaryParts.join(', ')})
+            </span>
+          </>
         );
       } else {
         setOptimizationSummary(
-            <span>
-              Tienes <span className="font-medium">{remainingDays} días PTO</span> disponibles para asignar.
-            </span>,
+          <span>
+            Tienes <span className="font-medium">{remainingDays} días PTO</span> disponibles para asignar.
+          </span>
         );
       }
     });
@@ -603,14 +645,11 @@ export default function CalendarList({
     if (blockId && alternativeBlocks[blockId]) {
       // Mostrar alternativas
       setHoveredBlockId(blockId);
-      // Además, activar hover en todo el bloque
-      setHoveredStyleBlockId(blockId);
     }
   }, [alternativeBlocks]);
 
   const handleDayMouseOut = useCallback(() => {
     setHoveredBlockId(null);
-    setHoveredStyleBlockId(null);
   }, []);
 
   // Memoizar verificadores de día
@@ -629,30 +668,6 @@ export default function CalendarList({
     );
   }, [hoveredBlockId, suggestedDays, alternativeBlocks]);
 
-  // Función para determinar si un día está en el bloque con hover
-  const isDayInHoveredBlock = useCallback((date: Date) => {
-    if (!hoveredStyleBlockId) return false;
-
-    const dateKey = format(date, 'yyyy-MM-dd');
-    return dayToBlockIdMap[dateKey] === hoveredStyleBlockId;
-  }, [hoveredStyleBlockId, dayToBlockIdMap]);
-
-  // Verificar si un día está en un bloque alternativo con hover
-  const isDayInHoveredAlternativeBlock = useCallback((date: Date) => {
-    if (!hoveredBlockId || !isDayAlternative(date)) return false;
-
-    // Buscar el bloque alternativo al que pertenece este día
-    const alternatives = alternativeBlocks[hoveredBlockId] || [];
-    for (const block of alternatives) {
-      if (block.days && block.days.some(d => isSameDay(d, date))) {
-        // Este día es parte de un bloque alternativo que tiene hover
-        return true;
-      }
-    }
-
-    return false;
-  }, [hoveredBlockId, isDayAlternative, alternativeBlocks]);
-
   // Función para determinar la posición de un día en un bloque sugerido
   const getDayPositionInBlock = useCallback((date: Date) => {
     if (!isDaySuggested(date)) return null;
@@ -663,15 +678,15 @@ export default function CalendarList({
 
     // Encuentra todos los días con el mismo blockId
     const blockDayKeys = Object.entries(dayToBlockIdMap)
-        .filter(([_, id]) => id === blockId)
-        .map(([dayKey]) => dayKey);
+      .filter(([_, id]) => id === blockId)
+      .map(([dayKey]) => dayKey);
 
     if (blockDayKeys.length <= 1) return 'single';
 
     // Convertir claves a fechas y ordenar
     const blockDays = blockDayKeys
-        .map(dayKey => parseISO(dayKey))
-        .sort((a, b) => a.getTime() - b.getTime());
+      .map(dayKey => parseISO(dayKey))
+      .sort((a, b) => a.getTime() - b.getTime());
 
     // Encuentra la posición
     const index = blockDays.findIndex(d => isSameDay(d, date));
@@ -704,7 +719,7 @@ export default function CalendarList({
     return null;
   }, [hoveredBlockId, isDayAlternative, alternativeBlocks]);
 
-  // Memoizar clase de día para evitar recálculos - CORREGIDO PARA EL HOVER
+  // Memoizar clase de día para evitar recálculos
   const getDayClassName = useCallback((date: Date, displayMonth: Date) => {
     // Base classes siguiendo la estética shadcn/ui
     const classes = [
@@ -713,7 +728,7 @@ export default function CalendarList({
       'rounded-sm text-sm font-medium', // Bordes menos pronunciados
       'transition-colors focus-visible:outline-none',
       'aria-selected:opacity-100',
-    ];
+      ];
 
     // Invisible day if not in current month (this check first for early return)
     if (!isSameMonth(date, displayMonth)) {
@@ -780,7 +795,8 @@ export default function CalendarList({
 
         if (currentPtoDays >= ptoDays) {
           alert(
-              `No puedes seleccionar más de ${ptoDays} días PTO. Quita algún día para poder seleccionar otros.`);
+            `No puedes seleccionar más de ${ptoDays} días PTO. Quita algún día para poder seleccionar otros.`
+          );
           return prev;
         }
 
@@ -864,24 +880,25 @@ export default function CalendarList({
 
     // Format the intervals
     const formattedIntervals = intervalsWithTotalDays.map(
-        ({ interval, ptoDays, totalFreeDays }) => {
-          const start = interval[0];
-          const end = interval[interval.length - 1];
+      ({ interval, ptoDays, totalFreeDays }) => {
+        const start = interval[0];
+        const end = interval[interval.length - 1];
 
-          let text = '';
-          if (interval.length === 1) {
-            // Single day
-            text = `${getDate(start)} de ${format(start, 'MMMM', { locale: es })}: 1 día.`;
-          } else {
-            // Interval of days
-            text = `${getDate(start)} al ${getDate(end)} de ${format(start, 'MMMM', { locale: es })}: ${ptoDays} días.`;
-          }
+        let text = '';
+        if (interval.length === 1) {
+          // Single day
+          text = `${getDate(start)} de ${format(start, 'MMMM', { locale: es })}: 1 día.`;
+        } else {
+          // Interval of days
+          text = `${getDate(start)} al ${getDate(end)} de ${format(start, 'MMMM', { locale: es })}: ${ptoDays} días.`;
+        }
 
-          return {
-            text,
-            totalDays: totalFreeDays,
-          };
-        });
+        return {
+          text,
+          totalDays: totalFreeDays,
+        };
+      }
+    );
 
     // Si no hay intervalos formateados, retornar null
     if (formattedIntervals.length === 0) {
@@ -889,157 +906,132 @@ export default function CalendarList({
     }
 
     return (
-        <>
-          {formattedIntervals.map(({ text, totalDays }, idx) => (
-              <p key={idx} className={totalDays >= 7 ? 'font-medium text-primary' : ''}>
-                {text}
-              </p>
-          ))}
-        </>
+      <>
+        {formattedIntervals.map(({ text, totalDays }, idx) => (
+          <p key={idx} className={totalDays >= 7 ? 'font-medium text-primary' : ''}>
+            {text}
+          </p>
+        ))}
+      </>
     );
   }, [ptoDays, suggestedDays, getSuggestedDaysForMonth, calculateEffectiveDays]);
 
   return (
-      <main className="flex flex-col gap-8 items-center w-full">
-        {optimizationSummary && (
-            <div className="bg-primary/10 border border-primary/20 p-3 rounded-md w-full">
-              <p className="text-sm">{optimizationSummary}</p>
-            </div>
-        )}
+    <main className="flex flex-col gap-8 items-center w-full">
+      {optimizationSummary && (
+        <div className="bg-primary/10 border border-primary/20 p-3 rounded-md w-full">
+          <p className="text-sm">{optimizationSummary}</p>
+        </div>
+      )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-7 gap-4">
-          {monthsToShow.map((month) => {
-            return <Card key={month.toISOString()} className="mb-4 flex flex-col">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-7 gap-4">
+        {monthsToShow.map((month) => {
+          return (
+            <Card key={month.toISOString()} className="mb-4 flex flex-col">
               {isPending && <LoadingSpinner />}
               <Calendar
-                  mode="multiple"
-                  selected={selectedDays}
-                  onSelect={handleDaySelect}
-                  className="rounded-md border"
-                  defaultMonth={month}
-                  month={month}
-                  weekStartsOn={1}
-                  fixedWeeks
-                  locale={es}
-                  components={{
-                    IconRight: () => null,
-                    IconLeft: () => null,
-                    IconDropdown: () => null,
-                    Day: ({ day, date, displayMonth, ...props }) => {
-                      const holiday = getHolidayName(date);
-                      const dateKey = format(date, 'yyyy-MM-dd');
-                      const isSuggested = isDaySuggested(date);
-                      const isAlternative = isDayAlternative(date);
-                      const blockId = isSuggested ? dayToBlockIdMap[dateKey] || '' : '';
-                      const blockPosition = getDayPositionInBlock(date);
-                      const alternativePosition = getAlternativeDayPosition(date);
-                      
-                      // Verificar si el día pertenece a un bloque con hover
-                      const isInHoveredBlock = isDayInHoveredBlock(date);
-                      const isInHoveredAlternativeBlock = isDayInHoveredAlternativeBlock(date);
-
-                      // Clases base para los bloques
-                      let blockStyles = '';
-                      
-                      // Día sugerido
-                      if (isSuggested && blockPosition) {
-                        const baseColor = isInHoveredBlock ? 'bg-green-200 dark:bg-green-800/50' : 'bg-green-100 dark:bg-green-900/30';
-                        
-                        if (blockPosition === 'single') {
-                          blockStyles = `${baseColor} rounded-md`;
-                        } else if (blockPosition === 'start') {
-                          blockStyles = `${baseColor} rounded-l-md`;
-                        } else if (blockPosition === 'end') {
-                          blockStyles = `${baseColor} rounded-r-md`;
-                        } else { // middle
-                          blockStyles = baseColor;
-                        }
-                      } 
-                      // Día alternativo
-                      else if (isAlternative && alternativePosition) {
-                        const baseColor = isInHoveredAlternativeBlock ? 'bg-purple-200 dark:bg-purple-800/50' : 'bg-purple-100 dark:bg-purple-900/30';
-                        
-                        if (alternativePosition === 'single') {
-                          blockStyles = `${baseColor} rounded-md`;
-                        } else if (alternativePosition === 'start') {
-                          blockStyles = `${baseColor} rounded-l-md`;
-                        } else if (alternativePosition === 'end') {
-                          blockStyles = `${baseColor} rounded-r-md`;
-                        } else { // middle
-                          blockStyles = baseColor;
-                        }
-                      }
-
-                      return (
-                          <div className="relative">
-                            <button
-                                type="button"
-                                {...props}
-                                className={`${props.className || ''} ${getDayClassName(date,
-                                    displayMonth)} ${blockStyles}`}
-                                title={holiday || ''}
-                                data-suggested={isSuggested ? 'true' : 'false'}
-                                data-block-id={blockId}
-                                data-date={dateKey}
-                                onMouseOver={handleDayMouseOver}
-                                onMouseOut={handleDayMouseOut}
-                                onBlur={handleDayMouseOut}
-                                onFocus={handleDayMouseOver}
-                            >
-                              {date.getDate()}
-                            </button>
-                          </div>
-                      );
-                    },
-                  }}
+                mode="multiple"
+                selected={selectedDays}
+                onSelect={handleDaySelect}
+                className="rounded-md border"
+                defaultMonth={month}
+                month={month}
+                weekStartsOn={1}
+                fixedWeeks
+                locale={es}
+                components={{
+                  IconRight: () => null,
+                  IconLeft: () => null,
+                  IconDropdown: () => null,
+                  Day: ({ day, date, displayMonth, ...props }) => {
+                    const holiday = getHolidayName(date);
+                    const dateKey = format(date, 'yyyy-MM-dd');
+                    const isSuggested = isDaySuggested(date);
+                    const isAlternative = isDayAlternative(date);
+                    const blockId = isSuggested ? dayToBlockIdMap[dateKey] || '' : '';
+                    const blockPosition = getDayPositionInBlock(date);
+                    const alternativePosition = getAlternativeDayPosition(date);
+                    
+                    return (
+                      <div className="relative">
+                        <button
+                          type="button"
+                          {...props}
+                          className={`${props.className || ''} ${getDayClassName(date, displayMonth)}`}
+                          title={holiday || ''}
+                          data-suggested={isSuggested ? 'true' : 'false'}
+                          data-alternative={isAlternative ? 'true' : 'false'}
+                          data-block-id={blockId}
+                          data-block-position={blockPosition || ''}
+                          data-alternative-position={alternativePosition || ''}
+                          data-hovered-block={hoveredBlockId === blockId ? 'true' : ''}
+                          data-date={dateKey}
+                          onMouseOver={handleDayMouseOver}
+                          onMouseOut={handleDayMouseOut}
+                          onBlur={handleDayMouseOut}
+                          onFocus={handleDayMouseOver}
+                        >
+                          {date.getDate()}
+                          
+                          {/* Usar clases basadas en data-attributes en lugar de estilos inline */}
+<span 
+  className="absolute inset-0 rounded-none -z-10"
+/>
+                        </button>
+                      </div>
+                    );
+                  },
+                }}
               />
               {ptoDays > 0 && suggestedDays.length > 0 && getSuggestedDaysForMonth(month).length > 0 && (
-                  <>
-                    {getMonthSummary(month) && (
-                        <div
-                            className="text-xs mt-2 p-2 bg-primary/10 border border-primary/20 rounded-md text-primary-foreground/90">
-                          <p className="font-semibold mb-1">Sugerencia:</p>
-                          {getMonthSummary(month)}
-                          <div className="mt-2 text-xs text-muted-foreground">
-                            <p>Pasa el cursor sobre un día sugerido <br /> para ver alternativas similares.</p>
-                          </div>
-                        </div>
-                    )}
-                  </>
+                <>
+                  {getMonthSummary(month) && (
+                    <div className="text-xs mt-2 p-2 bg-primary/10 border border-primary/20 rounded-md text-primary-foreground/90">
+                      <p className="font-semibold mb-1">Sugerencia:</p>
+                      {getMonthSummary(month)}
+                      <div className="mt-2 text-xs text-muted-foreground">
+                        <p>
+                          Pasa el cursor sobre un día sugerido <br /> para ver alternativas similares.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
-            </Card>;
-          })}
-        </div>
+            </Card>
+          );
+        })}
+      </div>
 
-        <footer className="mt-8 text-center text-sm text-muted-foreground">
-          <div className="flex flex-wrap justify-center gap-4 mb-2">
-            <div className="flex items-center">
-              <div className="w-4 h-4 bg-accent/30 mr-2 rounded-sm"></div>
-              <span>Fines de semana</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-4 h-4 bg-yellow-100 mr-2 rounded-sm border border-yellow-300"></div>
-              <span>Festivos</span>
-            </div>
-            <div className="flex items-center">
-              <div
-                  className="w-4 h-4 bg-primary text-primary-foreground mr-2 rounded-sm flex items-center justify-center">
-                <span className="text-xs">P</span>
-              </div>
-              <span>Días PTO seleccionados</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-4 h-4 bg-green-100 dark:bg-green-900/30 mr-2 rounded-sm"></div>
-              <span>Días sugeridos</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-4 h-4 bg-purple-100 dark:bg-purple-900/30 mr-2 rounded-sm"></div>
-              <span>Alternativas similares ({(ALTERNATIVE_THRESHOLD * 100).toFixed(0)}%)</span>
-            </div>
+      <footer className="mt-8 text-center text-sm text-muted-foreground">
+        <div className="flex flex-wrap justify-center gap-4 mb-2">
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-accent/30 mr-2 rounded-sm"></div>
+            <span>Fines de semana</span>
           </div>
-          <p>Los fines de semana y festivos ya están preseleccionados.
-            Haz clic en cualquier día laborable para añadirlo como día PTO.</p>
-        </footer>
-      </main>
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-yellow-100 mr-2 rounded-sm border border-yellow-300"></div>
+            <span>Festivos</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-primary text-primary-foreground mr-2 rounded-sm flex items-center justify-center">
+              <span className="text-xs">P</span>
+            </div>
+            <span>Días PTO seleccionados</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-green-100 dark:bg-green-900/30 mr-2 rounded-sm"></div>
+            <span>Días sugeridos</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-purple-100 dark:bg-purple-900/30 mr-2 rounded-sm"></div>
+            <span>Alternativas similares ({(ALTERNATIVE_THRESHOLD * 100).toFixed(0)}%)</span>
+          </div>
+        </div>
+        <p>
+          Los fines de semana y festivos ya están preseleccionados. Haz clic en cualquier día laborable para añadirlo como día PTO.
+        </p>
+      </footer>
+    </main>
   );
 }

@@ -38,8 +38,6 @@ export default async function PTOPlannerPage({
                 />
                 <CalendarList
                         key={holidays}
-                        country={country}
-                        region={region}
                         year={year}
                         ptoDays={ptoDays}
                         allowPastDays={allowPastDays}
@@ -69,6 +67,6 @@ export default async function PTOPlannerPage({
 // 24- Edit weekends (paid functionality)
 // 25- Edit festivities (paid functionality)
 // 25- Add custom debounce hook
-// 26- RECHECK ALGORYTHM (both alternatives + suggestions)
+// 26- RECHECK ALGORYTHM (both alternatives + suggestions). 4 days issue
 
 
