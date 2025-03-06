@@ -1,31 +1,31 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { detectCountryFromRequest } from './infrastructure/services/location';
+import { detectLocation } from '@/infrastructure/services/location/detectLocation';
+import { PAGES_ROUTES } from '@/const/const';
 
-export async function middleware(request: NextRequest) {
-  const url = new URL(request.url);
-  const searchParams = url.searchParams;
+export async function middleware(request: NextRequest): Promise<NextResponse> {
+  const { searchParams } = new URL(request.url);
 
   if (searchParams.has('country')) {
     return NextResponse.next();
   }
 
-  const detectedCountry = await detectCountryFromRequest(request);
+  const country = await detectLocation(request);
 
-  if (detectedCountry) {
-    const newSearchParams = new URLSearchParams(searchParams.toString());
-
-    newSearchParams.set('country', detectedCountry);
-
-    const newUrl = new URL(request.url);
-    newUrl.search = newSearchParams.toString();
-
-    return NextResponse.redirect(newUrl);
+  if(!country) {
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
+  const newSearchParams = new URLSearchParams(searchParams.toString());
+
+  newSearchParams.set('country', country);
+
+  const newUrl = new URL(request.url);
+  newUrl.search = newSearchParams.toString();
+
+  return NextResponse.redirect(newUrl);
 }
 
 export const config = {
-  matcher: ['/'],
+  matcher: [PAGES_ROUTES.HOME],
 };

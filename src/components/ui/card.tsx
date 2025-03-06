@@ -1,6 +1,5 @@
 import * as React from "react"
-
-import { cn } from "@/lib/utils"
+import { mergeClass } from '@/shared/ui/utils/mergeClass';
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -8,7 +7,7 @@ const Card = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn(
+    className={mergeClass(
       "rounded-xl border bg-card text-card-foreground shadow",
       className
     )}
@@ -23,7 +22,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    className={mergeClass("flex flex-col space-y-1.5 p-6", className)}
     {...props}
   />
 ))
@@ -35,7 +34,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("font-semibold leading-none tracking-tight", className)}
+    className={mergeClass("font-semibold leading-none tracking-tight", className)}
     {...props}
   />
 ))
@@ -47,7 +46,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={mergeClass("text-sm text-muted-foreground", className)}
     {...props}
   />
 ))
@@ -57,7 +56,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+  <div ref={ref} className={mergeClass("p-6 pt-0", className)} {...props} />
 ))
 CardContent.displayName = "CardContent"
 
@@ -67,7 +66,7 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center p-6 pt-0", className)}
+    className={mergeClass("flex items-center p-6 pt-0", className)}
     {...props}
   />
 ))

@@ -1,17 +1,13 @@
-import { Suspense } from 'react';
+import { ReactNode, Suspense } from 'react';
 import { Badge } from '@/components/ui/badge';
 import CountryCombobox from './CountryCombobox';
 import RegionCombobox from './RegionCombobox';
 import { PtoDaysInput } from '@/components/ui/PtoDaysInput';
 import { YearSelect } from '@/components/ui/YearSelect';
+import { Skeleton } from '@/components/ui/skeleton';
+import { SearchParams } from '@/app/page';
 
-export interface FiltersProps {
-  country: string;
-  region: string;
-  year: number;
-  ptoDays: number;
-  allowPastDays: boolean;
-}
+export type FiltersProps = SearchParams
 
 export default function Filters({
   country,
@@ -33,21 +29,18 @@ export default function Filters({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-lg">
           <PtoDaysInput ptoDays={ptoDays} />
-
           <div className="flex flex-col gap-1 w-full">
-            <Suspense fallback={<div className="h-10 w-full animate-pulse bg-slate-200 rounded"></div>}>
-              <CountryCombobox selectedCountry={country} />
+            <Suspense fallback={<Skeleton className="h-10 w-full animate-pulse bg-slate-200 rounded" /> as ReactNode}>
+              <CountryCombobox country={country} />
             </Suspense>
-            <p className="text-xs text-gray-500 pl-2">inferred from your IP. Feel free to change it or</p>
+            <p className="text-xs text-gray-500 pl-2">Inferred from your IP. Feel free to change it</p>
           </div>
 
           <div className="flex flex-col gap-1 w-full">
-            <Suspense fallback={<div className="h-10 w-full animate-pulse bg-slate-200 rounded"></div>}>
-              <RegionCombobox selectedCountry={country} selectedRegion={region} />
+            <Suspense fallback={<Skeleton className="h-10 w-full animate-pulse bg-slate-200 rounded" /> as ReactNode}>
+              <RegionCombobox country={country} region={region} />
             </Suspense>
-            <p className="text-xs text-gray-500 pl-2">inferred from your IP. Feel free to change it or</p>
           </div>
-
           <YearSelect year={year} />
         </div>
 

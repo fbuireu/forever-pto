@@ -1,29 +1,31 @@
-import Combobox from '@/components/ui/combobox';
-import { getCountries } from '@/infrastructure/services/country';
-import { getRegions } from '@/infrastructure/services/regions';
+import { Combobox } from '@/components/ui/combobox';
+import { getCountries } from '@/infrastructure/services/country/getCountries';
+import { getRegions } from '@/infrastructure/services/regions/getRegions';
+import { SearchParams } from '@/app/page';
 
 interface RegionComboboxProps {
-    selectedCountry: string;
-    selectedRegion: string;
+    country: SearchParams['country'];
+    region: SearchParams['region'];
 }
 
 export default async function RegionCombobox({
-    selectedCountry,
-    selectedRegion,
+    country,
+    region,
 }: RegionComboboxProps) {
-    const countries = await getCountries();
-    const countryData = countries.find(c => c.value.toLowerCase() === selectedCountry);
-    const regions = countryData ? await getRegions(countryData.value) : [];
-    const isDisabled = !countryData || !regions?.length;
+    const countries = getCountries()
+    const userCountry = countries.find(({ value }) => value.toLowerCase() === country);
+    const regions = await getRegions(userCountry?.value);
+    const isDisabled = !userCountry || !regions?.length;
 
     return (
             <Combobox
-                    value={selectedRegion}
+                    value={region}
                     options={regions}
                     label="Region"
+                    heading={`Regiones en ${userCountry!.label}`}
                     type="region"
                     disabled={isDisabled}
-                    placeholder="Selecciona región..."
+                    placeholder={regions.length ? `Selecciona región...`: `No se han encontrado regiones para ${userCountry!.label}`}
                     searchPlaceholder="Buscar región..."
                     notFoundText="Región no encontrada."
                     className="w-full"

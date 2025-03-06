@@ -1,31 +1,30 @@
-// app/page.tsx - Server Component
 import CalendarList from '@/components/ui/CalendarList';
 import Filters from '@/components/ui/Filters';
-import { getHolidays } from '@/infrastructure/services/holidays';
+import { getHolidays } from '@/infrastructure/services/holidays/getHolidays';
+import { DEFAULT_SEARCH_PARAMS } from '@/const/const';
 
-const DEFAULT_PTO_DAYS = 22;
-
-interface SearchParams {
-    country?: string;
-    region?: string;
-    year?: string;
-    ptoDays?: string;
-    allowPastDays?: string;
+export interface SearchParams{
+  country?: string;
+  region?: string;
+  year: string;
+  ptoDays: string;
+  allowPastDays: boolean;
 }
 
-export default async function PTOPlannerPage({
-    searchParams,
-}: {
-    searchParams: SearchParams;
-}) {
+interface ForeverPtoProps{
+  searchParams: Promise<SearchParams>
+}
+
+export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
+  const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS } = DEFAULT_SEARCH_PARAMS
     const {
         country,
         region,
-        year = String(new Date().getFullYear()),
-        ptoDays = 22,
-        allowPastDays = false,
+        year = YEAR,
+        ptoDays = PTO_DAYS,
+        allowPastDays = ALLOW_PAST_DAYS.toLowerCase() === "true",
     } = await searchParams;
-    const holidays = await getHolidays(country, region, year);
+    const holidays = getHolidays({ country, region, year });
 
     return (
             <div className="grid grid-rows-[auto_1fr_auto] min-h-screen p-4 gap-8 sm:p-8">
@@ -33,7 +32,7 @@ export default async function PTOPlannerPage({
                         country={country}
                         region={region}
                         year={year}
-                        availablePtoDays={ptoDays}
+                        ptoDays={ptoDays}
                         allowPastDays={allowPastDays}
                 />
                 <CalendarList
@@ -68,5 +67,6 @@ export default async function PTOPlannerPage({
 // 25- Edit festivities (paid functionality)
 // 25- Add custom debounce hook
 // 26- RECHECK ALGORYTHM (both alternatives + suggestions). 4 days issue
+// 27- DataTable to bulk actions to remove days
 
-
+// 28- add summary holidays in view

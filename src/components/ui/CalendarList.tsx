@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Card } from '@/components/ui/card';
-import type { Holiday } from '@/lib/holidays';
+
 import {
   addDays,
   addMonths,
@@ -23,6 +23,7 @@ import {
 import { es } from 'date-fns/locale';
 import { Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { HolidayDTO } from '@/application/dto/holiday/types';
 
 const MONTHS_TO_DISPLAY = 12;
 const ALTERNATIVE_THRESHOLD = .75;
@@ -59,20 +60,10 @@ interface BlockOpportunity {
 }
 
 interface CalendarListProps {
-  country: string;
-  region: string;
   year: number;
   ptoDays: number;
   allowPastDays: boolean;
-  holidays: Holiday[];
-}
-
-// Interfaz para festivos en formato raw (si los datos vienen con formato diferente)
-interface RawHoliday {
-  fecha: string;
-  nombre: string;
-  año: number;
-  location: string | null;
+  holidays: HolidayDTO[];
 }
 
 export default function CalendarList({
@@ -89,56 +80,20 @@ export default function CalendarList({
   const [hoveredBlockId, setHoveredBlockId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  // Normalizar los festivos para asegurar que todas las fechas sean objetos Date
-  // y manejar posibles diferentes formatos de entrada
-  const normalizedHolidays = useMemo(() => {
-    // Verificar formato de los datos de entrada
-    const needsNormalization = holidays.length > 0 && 'fecha' in holidays[0];
-    
-    if (needsNormalization) {
-      // Si tienen el formato { fecha, nombre, año, location }
-      return (holidays as unknown as RawHoliday[]).map(holiday => ({
-        date: new Date(holiday.fecha),
-        name: holiday.nombre,
-        type: 'public',
-        location: holiday.location
-      }));
-    } else {
-      // Si ya tienen el formato { date, name, type, location }
-      return holidays.map(holiday => ({
-        ...holiday,
-        date: holiday.date instanceof Date ? holiday.date : new Date(holiday.date)
-      }));
-    }
-  }, [holidays]);
-
-  // Log para verificar normalización de festivos
-  useEffect(() => {
-    console.log("Festivos normalizados:", normalizedHolidays.map(h => ({
-      fecha: format(h.date, 'yyyy-MM-dd'),
-      nombre: h.name,
-      año: h.date.getFullYear(),
-      location: h.location,
-      esEnero2026: h.date.getFullYear() === 2026 && h.date.getMonth() === 0
-    })));
-  }, [normalizedHolidays]);
-
   // Memoizar el mapa de días festivos para búsquedas rápidas O(1)
   const holidaysMap = useMemo(() => {
-    const map = new Map<string, Holiday>();
-    normalizedHolidays.forEach(holiday => {
+    const map = new Map<string, HolidayDTO>();
+    holidays.forEach(holiday => {
       const key = format(holiday.date, 'yyyy-MM-dd');
       map.set(key, holiday);
     });
     return map;
-  }, [normalizedHolidays]);
+  }, [holidays]);
 
-  // Generate months to display based on the year, including next January
   const monthsToShow = useMemo(() => {
     const start = startOfMonth(new Date(year, 0, 1));
     const months = Array.from({ length: MONTHS_TO_DISPLAY }, (_, i) => addMonths(start, i));
 
-    // Add January of next year - usando Number explícito para asegurar el tipo
     const nextJanuary = startOfMonth(new Date(Number(year) + 1, 0, 1));
     return [...months, nextJanuary];
   }, [year]);
@@ -173,14 +128,14 @@ export default function CalendarList({
     });
 
     // Add holidays
-    normalizedHolidays.forEach(holiday => {
+    holidays.forEach(holiday => {
       if (!initialSelection.some(day => isSameDay(day, holiday.date))) {
         initialSelection.push(holiday.date);
       }
     });
 
     setSelectedDays(initialSelection);
-  }, [normalizedHolidays, monthsToShow]);
+  }, [holidays, monthsToShow]);
 
   // Calculate selected PTO days (only workdays)
   const selectedPtoDays = useMemo(() => {
@@ -206,7 +161,7 @@ export default function CalendarList({
     });
 
     // Add holidays (pre-calculados)
-    normalizedHolidays.forEach(holiday => {
+    holidays.forEach(holiday => {
       map.set(format(holiday.date, 'yyyy-MM-dd'), holiday.date);
     });
 
@@ -216,7 +171,7 @@ export default function CalendarList({
     });
 
     return map;
-  }, [monthsToShow, normalizedHolidays, selectedPtoDays]);
+  }, [monthsToShow, holidays, selectedPtoDays]);
 
   // Calculate effective days - optimized version
   const calculateEffectiveDays = useCallback((ptoDaysToAdd: Date[] = []): { effective: number; ratio: number } => {

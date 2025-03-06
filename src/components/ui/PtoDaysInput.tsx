@@ -29,7 +29,7 @@ export const PtoDaysInput = ({ ptoDays = 22 }) => {
     );
 
     useEffect(() => {
-        if (debouncedValue.toString() !== (searchParams.get('ptoDays'))) {
+        if (String(debouncedValue) !== (searchParams.get('ptoDays'))) {
             startTransition(() => {
                 router.push(
                     pathname + '?' + createQueryString('ptoDays', debouncedValue.toString()),
@@ -50,7 +50,7 @@ export const PtoDaysInput = ({ ptoDays = 22 }) => {
     };
 
     const handleInputChange = (event) => {
-        const newValue = parseInt(event.currentTarget.value);
+        const newValue = Number(event.currentTarget.value);
         if (!isNaN(newValue) && newValue >= 0) {
             setInputValue(newValue);
         } else if (event.currentTarget.value === '') {
