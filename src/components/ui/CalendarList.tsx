@@ -2,6 +2,7 @@
 
 import { Calendar } from '@/components/ui/calendar';
 import { Card } from '@/components/ui/card';
+
 import {
     addDays,
     addMonths,
@@ -19,17 +20,18 @@ import {
     startOfMonth,
 } from 'date-fns';
 import { es } from 'date-fns/locale';
-import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
-import { HolidayDTO } from '@/application/dto/holiday/types';
 import { Loader2 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { HolidayDTO } from '@/application/dto/holiday/types';
 
 const MONTHS_TO_DISPLAY = 12;
 const ALTERNATIVE_THRESHOLD = .75;
 const MAX_BLOCK_SIZE = 5;
 const MAX_ALTERNATIVES = 10;
 
+// Componente de spinner para estados de carga
 const LoadingSpinner = () => (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/60 opacity-10 z-10 rounded-md w-100vh">
+        <div className="absolute inset-0 flex items-center justify-center bg-background/60 opacity-10 z-10 rounded-md">
             <Loader2 className="h-10 w-10 animate-spin text-primary" />
         </div>
 );
@@ -76,6 +78,7 @@ export default function CalendarList({
     const [hoveredBlockId, setHoveredBlockId] = useState<string | null>(null);
     const [isPending, startTransition] = useTransition();
 
+    // Memoizar el mapa de días festivos para búsquedas rápidas O(1)
     const holidaysMap = useMemo(() => {
         const map = new Map<string, HolidayDTO>();
         holidays.forEach(holiday => {
@@ -88,26 +91,27 @@ export default function CalendarList({
     const monthsToShow = useMemo(() => {
         const start = startOfMonth(new Date(year, 0, 1));
         const months = Array.from({ length: MONTHS_TO_DISPLAY }, (_, i) => addMonths(start, i));
+
         const nextJanuary = startOfMonth(new Date(Number(year) + 1, 0, 1));
         return [...months, nextJanuary];
     }, [year]);
 
-    // Función para verificar si un día es festivo (optimizada)
+    // Optimized function to check if a day is a holiday using the map (O(1) lookup)
     const isHoliday = useCallback((date: Date): boolean => {
         return holidaysMap.has(format(date, 'yyyy-MM-dd'));
     }, [holidaysMap]);
 
-    // Función para obtener el nombre de un festivo
+    // Function to get holiday name if exists
     const getHolidayName = useCallback((date: Date): string | null => {
         const holiday = holidaysMap.get(format(date, 'yyyy-MM-dd'));
         return holiday ? holiday.name : null;
     }, [holidaysMap]);
 
-    // Este useEffect ES necesario - inicializa los días seleccionados (fines de semana y festivos)
+    // Initialize with weekends and holidays
     useEffect(() => {
         const initialSelection: Date[] = [];
 
-        // Agregar todos los fines de semana del año
+        // Add all weekends of the year
         monthsToShow.forEach(month => {
             const daysInMonth = eachDayOfInterval({
                 start: startOfMonth(month),
@@ -121,30 +125,28 @@ export default function CalendarList({
             });
         });
 
-        // Agregar festivos que NO caen en fin de semana (mejora)
+        // Add holidays
         holidays.forEach(holiday => {
-            // Sólo agregar si no es fin de semana (para evitar contar doble)
-            if (!isWeekend(holiday.date) &&
-                    !initialSelection.some(day => isSameDay(day, holiday.date))) {
+            if (!initialSelection.some(day => isSameDay(day, holiday.date))) {
                 initialSelection.push(holiday.date);
             }
         });
 
         setSelectedDays(initialSelection);
-    }, [holidays, monthsToShow, isWeekend, isHoliday]);
+    }, [holidays, monthsToShow]);
 
-    // Días PTO seleccionados (días laborables seleccionados, no fines de semana ni festivos)
+    // Calculate selected PTO days (only workdays)
     const selectedPtoDays = useMemo(() => {
         return selectedDays.filter(day =>
                 !isWeekend(day) && !isHoliday(day),
         );
     }, [selectedDays, isHoliday]);
 
-    // Mapa de días libres base
+    // Memoizar el mapa de días libres para reutilizarlo
     const freeDaysBaseMap = useMemo(() => {
         const map = new Map<string, Date>();
 
-        // Agregar fines de semana
+        // Add weekends (pre-calculados)
         monthsToShow.forEach(month => {
             eachDayOfInterval({
                 start: startOfMonth(month),
@@ -156,15 +158,12 @@ export default function CalendarList({
             });
         });
 
-        // Agregar festivos (sólo si no son fin de semana)
+        // Add holidays (pre-calculados)
         holidays.forEach(holiday => {
-            const key = format(holiday.date, 'yyyy-MM-dd');
-            if (!map.has(key)) { // Evita duplicar si ya está como fin de semana
-                map.set(key, holiday.date);
-            }
+            map.set(format(holiday.date, 'yyyy-MM-dd'), holiday.date);
         });
 
-        // Agregar días PTO seleccionados
+        // Add selected PTO days
         selectedPtoDays.forEach(day => {
             map.set(format(day, 'yyyy-MM-dd'), day);
         });
@@ -172,12 +171,14 @@ export default function CalendarList({
         return map;
     }, [monthsToShow, holidays, selectedPtoDays]);
 
-    // Cálculo de días efectivos - versión optimizada y mejorada
+    // Calculate effective days - optimized version
     const calculateEffectiveDays = useCallback((ptoDaysToAdd: Date[] = []): { effective: number; ratio: number } => {
+        // Si no hay días PTO, no hay días efectivos
         if (selectedPtoDays.length === 0 && ptoDaysToAdd.length === 0) {
             return { effective: 0, ratio: 0 };
         }
 
+        // Clonar el mapa base para no modificarlo
         const freeDaysMap = new Map(freeDaysBaseMap);
 
         // Añadir los días PTO adicionales
@@ -215,6 +216,7 @@ export default function CalendarList({
             }
         }
 
+        // Añadir la última secuencia
         if (currentSequence.length >= 1) {
             sequences.push(currentSequence);
         }
@@ -222,12 +224,14 @@ export default function CalendarList({
         // Calcular días efectivos (secuencias que incluyen al menos un día PTO)
         let effectiveDays = 0;
 
+        // Crear un conjunto de claves de días PTO para búsquedas más rápidas
         const ptoDayKeys = new Set([
             ...selectedPtoDays.map(day => format(day, 'yyyy-MM-dd')),
             ...ptoDaysToAdd.map(day => format(day, 'yyyy-MM-dd')),
         ]);
 
         sequences.forEach(sequence => {
+            // Verificar si algún día de la secuencia es un día PTO
             const hasAnyPtoDay = sequence.some(day =>
                     ptoDayKeys.has(format(day, 'yyyy-MM-dd')),
             );
@@ -239,7 +243,7 @@ export default function CalendarList({
 
         // Calcular ratio
         const totalPtoDays = ptoDayKeys.size;
-        const ratio = totalPtoDays > 0 ? parseFloat((effectiveDays / totalPtoDays).toFixed(1)) : 0;
+        const ratio = parseFloat((effectiveDays / totalPtoDays).toFixed(1));
 
         return { effective: effectiveDays, ratio };
     }, [freeDaysBaseMap, selectedPtoDays]);
@@ -287,7 +291,7 @@ export default function CalendarList({
         return { map, allDays };
     }, [monthsToShow, isHoliday, selectedDays, allowPastDays]);
 
-    // Algoritmo mejorado para encontrar bloques óptimos
+    // Optimized function to find optimal gaps
     const findOptimalGaps = useCallback(() => {
         const remainingPtoDays = ptoDays - selectedPtoDays.length;
         if (remainingPtoDays <= 0) return {
@@ -296,19 +300,20 @@ export default function CalendarList({
             dayToBlockIdMap: {},
         };
 
+        // Usar el mapa de días pre-calculado
         const { map: daysMap, allDays } = yearMap;
 
-        // Filtrar sólo días laborables disponibles
+        // Filtrar solo días laborables disponibles
         const availableWorkdays = allDays.filter(day => {
             const dayInfo = daysMap.get(format(day, 'yyyy-MM-dd'));
             return dayInfo && !dayInfo.isFreeDay;
         });
 
-        // MEJORA: Algoritmo de búsqueda de bloques óptimos
+        // STRATEGY: FIND OPTIMAL BLOCKS OF DAYS
         const blockOpportunities: BlockOpportunity[] = [];
         const blockCache = new Map<string, { blockDays: Date[], result: ReturnType<typeof calculateEffectiveDays> }>();
 
-        // Evaluar bloques posibles con nueva puntuación
+        // Evaluar bloques posibles
         for (let startDayIndex = 0; startDayIndex < availableWorkdays.length; startDayIndex++) {
             const startDay = availableWorkdays[startDayIndex];
             const startDayKey = format(startDay, 'yyyy-MM-dd');
@@ -322,6 +327,7 @@ export default function CalendarList({
 
                 // Añadir días siguientes al bloque
                 for (let i = 1; i < blockSize; i++) {
+                    // Optimización: buscar directamente el siguiente día en workdays en lugar de calcular addDays
                     if (startDayIndex + i >= availableWorkdays.length) {
                         validBlock = false;
                         break;
@@ -342,10 +348,10 @@ export default function CalendarList({
 
                 if (!validBlock) continue;
 
-                // Generar una clave única para este bloque
+                // Generar una clave única para este bloque de días
                 const blockCacheKey = Array.from(blockDayKeys).sort().join('|');
 
-                // Usar caché para días efectivos
+                // Usar caché para días efectivos si ya lo calculamos antes
                 let effectiveResult;
                 if (blockCache.has(blockCacheKey)) {
                     effectiveResult = blockCache.get(blockCacheKey)!.result;
@@ -355,8 +361,9 @@ export default function CalendarList({
                 }
 
                 // Calcular días antes y después del bloque
+                // Optimización: calculamos esto solo una vez por bloque, no para cada día
                 let daysBeforeBlock = 0;
-                for (let i = 1; i <= 7; i++) {
+                for (let i = 1; i <= 7; i++) { // Limitar a 7 días antes para eficiencia
                     const dayBefore = addDays(startDay, -i);
                     const dayBeforeKey = format(dayBefore, 'yyyy-MM-dd');
                     const dayInfo = daysMap.get(dayBeforeKey);
@@ -369,7 +376,7 @@ export default function CalendarList({
                 }
 
                 let daysAfterBlock = 0;
-                for (let i = 1; i <= 7; i++) {
+                for (let i = 1; i <= 7; i++) { // Limitar a 7 días después para eficiencia
                     const dayAfter = addDays(blockDays[blockDays.length - 1], i);
                     const dayAfterKey = format(dayAfter, 'yyyy-MM-dd');
                     const dayInfo = daysMap.get(dayAfterKey);
@@ -381,46 +388,33 @@ export default function CalendarList({
                     }
                 }
 
-                // MEJORA DEL ALGORITMO DE PUNTUACIÓN
+                // Calcular valor del bloque
                 const totalConsecutiveDays = daysBeforeBlock + blockSize + daysAfterBlock;
+                const efficiencyRatio = totalConsecutiveDays / blockSize;
 
-                // Cambio principal: mejor valor por eficiencia PTO
-                // Valoramos especialmente cuántos días libres conseguimos por cada día PTO usado
-                const ptoEfficiency = effectiveResult.effective / blockSize;
+                // Simplificar cálculo de puntuación
+                let score = efficiencyRatio * totalConsecutiveDays * 100;
 
-                // Base score - eficiencia PTO es el factor principal
-                let score = ptoEfficiency * 100;
+                // Bonificación simple para bloques largos
+                if (totalConsecutiveDays >= 7) score *= 1.5;
+                if (blockSize >= 3) score *= 1.2;
 
-                // Bonus por bloques largos (vacaciones extendidas)
-                if (totalConsecutiveDays >= 9) score *= 2.0;  // Más de una semana completa
-                else if (totalConsecutiveDays >= 7) score *= 1.7;  // Una semana
-                else if (totalConsecutiveDays >= 4) score *= 1.3;  // Puente largo
-
-                // Análisis estratégico mejorado - conexiones a fin de semana
+                // Análisis estratégico simplificado
                 const hasWeekendConnection = blockDays.some(day => {
                     const dayOfWeek = day.getDay();
                     return dayOfWeek === 1 || dayOfWeek === 5; // Lunes o viernes
                 });
 
-                // Conexiones a festivos - ahora comprobamos también 2 días antes/después
-                // para considerar puentes más largos
                 const hasHolidayConnection = blockDays.some(day => {
-                    for (let offset = -2; offset <= 2; offset++) {
-                        if (offset === 0) continue; // Saltar el propio día
-                        const nearbyDay = addDays(day, offset);
-                        if (isHoliday(nearbyDay)) return true;
-                    }
-                    return false;
+                    const dayBefore = addDays(day, -1);
+                    const dayAfter = addDays(day, 1);
+                    return isHoliday(dayBefore) || isHoliday(dayAfter);
                 });
 
-                // Bonificación por conexión estratégica
-                if (hasWeekendConnection) score *= 1.5;  // Mayor prioridad a extender fines de semana
-                if (hasHolidayConnection) score *= 1.4;  // Mayor valor a conexiones con festivos
+                if (hasWeekendConnection) score *= 1.3;
+                if (hasHolidayConnection) score *= 1.2;
 
-                // Bonificación por eficiencia extrema (3x o más días libres por día PTO)
-                if (ptoEfficiency >= 3) score *= 1.5;
-
-                // Añadir oportunidad con puntuación mejorada
+                // Añadir oportunidad
                 blockOpportunities.push({
                     startDay,
                     days: blockDays,
@@ -435,7 +429,7 @@ export default function CalendarList({
             }
         }
 
-        // Ordenar por puntuación
+        // Ordenar por puntuación (solo las N mejores para mayor eficiencia)
         blockOpportunities.sort((a, b) => b.score - a.score);
 
         // SELECCIÓN GREEDY DE MEJORES BLOQUES
@@ -459,7 +453,7 @@ export default function CalendarList({
         };
 
         // Seleccionar mejores bloques
-        for (let i = 0; i < Math.min(blockOpportunities.length, 100); i++) {
+        for (let i = 0; i < Math.min(blockOpportunities.length, 100); i++) { // Limitar a 100 para eficiencia
             if (daysRemaining <= 0) break;
 
             const block = blockOpportunities[i];
@@ -476,22 +470,26 @@ export default function CalendarList({
                     newDayToBlockIdMap[format(day, 'yyyy-MM-dd')] = blockId;
                 });
 
-                // Buscar alternativas eficientemente
+                // Buscar alternativas de manera eficiente
                 const blockEffectiveDays = block.effectiveDays;
                 const blockSize = block.blockSize;
                 const alternativesForBlock: BlockOpportunity[] = [];
 
+                // Crear conjunto de claves de días sugeridos para búsqueda rápida
                 const suggestedDayKeys = new Set(finalSuggestedDays.map(d => format(d, 'yyyy-MM-dd')));
 
-                // Buscar bloques alternativos del mismo tamaño y similar eficiencia
+                // Limitar la búsqueda a solo 30 bloques con tamaño similar
                 const potentialAlternatives = blockOpportunities
                         .filter(op => op !== block && op.blockSize === blockSize)
                         .slice(0, 30);
 
                 for (const candidate of potentialAlternatives) {
+                    // Verificar que tenga la misma efectividad y no tenga conflictos
                     if (Math.abs(candidate.effectiveDays - blockEffectiveDays) <= 1 &&
                             !candidate.days.some(d => suggestedDayKeys.has(format(d, 'yyyy-MM-dd')))) {
+
                         alternativesForBlock.push(candidate);
+
                         if (alternativesForBlock.length >= MAX_ALTERNATIVES) break;
                     }
                 }
@@ -507,7 +505,7 @@ export default function CalendarList({
         };
     }, [yearMap, ptoDays, selectedPtoDays.length, calculateEffectiveDays, isHoliday]);
 
-    // Este useEffect ES necesario - actualiza las sugerencias cuando cambian los parámetros relevantes
+    // Actualizar sugerencias con useTransition para evitar bloquear la UI
     useEffect(() => {
         const remainingDays = ptoDays - selectedPtoDays.length;
 
@@ -527,7 +525,7 @@ export default function CalendarList({
             return;
         }
 
-        // Usar startTransition para las actualizaciones pesadas
+        // Usar startTransition para las actualizaciones que requieren cálculos pesados
         startTransition(() => {
             const result = findOptimalGaps();
             const optimal = result.suggestedDays;
@@ -541,18 +539,9 @@ export default function CalendarList({
         });
     }, [ptoDays, selectedPtoDays.length, findOptimalGaps, calculateEffectiveDays]);
 
-    const handleDayFocus = useCallback((e: React.FocusEvent<HTMLButtonElement>) => {
-        const button = e.currentTarget;
-        const isSuggested = button.dataset.suggested === 'true';
+    // FUNCIONES ACTUALIZADAS PARA MANEJAR HOVER DE BLOQUES
 
-        if (!isSuggested) return;
-
-        const blockId = button.dataset.blockId;
-        if (blockId && alternativeBlocks[blockId]) {
-            setHoveredBlockId(blockId);
-        }
-    }, [alternativeBlocks]);
-
+    // Memoizar funciones de eventos para evitar recreaciones
     const handleDayMouseOver = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
         const button = e.currentTarget;
         const isSuggested = button.dataset.suggested === 'true';
@@ -687,10 +676,8 @@ export default function CalendarList({
     }, [isHoliday, selectedDays, allowPastDays, isDaySuggested, isDayAlternative]);
 
     // Handle day selection
-    const handleDaySelect = useCallback((dates: Date[] | undefined) => {
-        if (!dates || dates.length === 0) return;
-
-        const date = dates[dates.length - 1];
+    const handleDaySelect = useCallback((date: Date) => {
+        if (!date) return;
 
         // Don't allow selecting weekends or holidays
         if (isWeekend(date) || isHoliday(date)) {
@@ -872,7 +859,8 @@ export default function CalendarList({
                                                                 <button
                                                                         type="button"
                                                                         {...props}
-                                                                        className={getDayClassName(date, displayMonth)}
+                                                                        className={`${getDayClassName(date,
+                                                                                displayMonth)}`}
                                                                         title={holiday || ''}
                                                                         data-suggested={isSuggested ? 'true' : 'false'}
                                                                         data-alternative={isAlternative
@@ -889,9 +877,14 @@ export default function CalendarList({
                                                                         onMouseOver={handleDayMouseOver}
                                                                         onMouseOut={handleDayMouseOut}
                                                                         onBlur={handleDayMouseOut}
-                                                                        onFocus={handleDayFocus}
+                                                                        onFocus={handleDayMouseOver}
                                                                 >
                                                                     {date.getDate()}
+
+                                                                    {/* Usar clases basadas en data-attributes en lugar de estilos inline */}
+                                                                    <span
+                                                                            className="absolute inset-0 rounded-none -z-10"
+                                                                    />
                                                                 </button>
                                                             </div>
                                                     );
@@ -902,7 +895,7 @@ export default function CalendarList({
                                             0 && (
                                                     <>
                                                         {getMonthSummary(month) && (
-                                                                <div className="text-xs mt-2 p-2 bg-primary/10 border border-primary/20 rounded-md">
+                                                                <div className="text-xs mt-2 p-2 bg-primary/10 border border-primary/20 rounded-md text-primary-foreground/90">
                                                                     <p className="font-semibold mb-1">Sugerencia:</p>
                                                                     {getMonthSummary(month)}
                                                                     <div className="mt-2 text-xs text-muted-foreground">

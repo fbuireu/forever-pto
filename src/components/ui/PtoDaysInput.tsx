@@ -34,7 +34,7 @@ export const PtoDaysInput = ({ ptoDays }: PtoDaysInputProps) => {
         startTransition(() => router.push(`${pathname}?${query}`, { scroll: false }));
     }, [router, pathname, searchParams]);
 
-    const updateQueryDebounced = useDebouncedCallback((value: number) => updateQueryString(value), 300);
+    const updateQueryDebounced = useDebouncedCallback((value: number) => updateQueryString(value), 200);
 
     const decrementDays = () => {
         if (inputValue <= 0) return;

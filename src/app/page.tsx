@@ -98,7 +98,9 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 17- Allow user to hide festivities (or add them)
 // 18- Allow user to change weekends
 // 19- change forEach to for...of
-// 23- Adjust threshold (paid funcionality)
+// 20- Permitir al usuario cambiar los dias sugeridos
+// 21- Añadir un summary de cuanto hemos optimizado las vacaciones
+// 23- Adjust thresholds (paid funcionality)
 // 24- Edit weekends (paid functionality)
 // 25- Edit festivities (paid functionality)
 // 25- Add sidebar
