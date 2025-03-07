@@ -30,14 +30,14 @@ export default function Filters({
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-lg">
           <PtoDaysInput ptoDays={ptoDays} />
           <div className="flex flex-col gap-1 w-full">
-            <Suspense fallback={<Skeleton className="h-10 w-full animate-pulse bg-slate-200 rounded" /> as ReactNode}>
+            <Suspense fallback={<Skeleton className="h-10 w-full rounded" /> as ReactNode}>
               <CountryCombobox country={country} />
             </Suspense>
             <p className="text-xs text-gray-500 pl-2">Inferred from your IP. Feel free to change it</p>
           </div>
 
           <div className="flex flex-col gap-1 w-full">
-            <Suspense fallback={<Skeleton className="h-10 w-full animate-pulse bg-slate-200 rounded" /> as ReactNode}>
+            <Suspense fallback={<Skeleton className="h-10 w-full rounded" /> as ReactNode}>
               <RegionCombobox country={country} region={region} />
             </Suspense>
           </div>

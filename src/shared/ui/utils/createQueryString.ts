@@ -1,18 +1,31 @@
+import { SearchParams } from '@/app/page';
+
 interface CreateQueryStringParams {
   value: string
-  type: 'country' | 'region'
+  type?: keyof SearchParams
   searchParams: URLSearchParams;
 }
 
-export function createQueryString({ value, type, searchParams}: CreateQueryStringParams) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (type === 'country') {
+export function createQueryString({
+  value,
+  type,
+  searchParams
+}: CreateQueryStringParams): string {
+  const params = new URLSearchParams(searchParams);
+
+  if (!type) return params.toString();
+
+  switch (type) {
+    case 'country':
       params.set(type, value);
       params.delete('region');
-    } else {
+      break;
+    case 'allowPastDays':
+      params.set(type, String(!Boolean(value)));
+      break;
+    default:
       params.set(type, value);
-    }
+  }
 
-    return params.toString();
-
+  return params.toString();
 }

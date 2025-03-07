@@ -1,31 +1,42 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { detectLocation } from '@/infrastructure/services/location/detectLocation';
-import { PAGES_ROUTES } from '@/const/const';
+import { DEFAULT_SEARCH_PARAMS } from '@/const/const';
+
+const REQUIRED_PARAMS = {
+  country: async (request: NextRequest) => await detectLocation(request),
+  year: () => DEFAULT_SEARCH_PARAMS.YEAR,
+  ptoDays: () => DEFAULT_SEARCH_PARAMS.PTO_DAYS
+};
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
-  const { searchParams } = new URL(request.url);
+  const url = new URL(request.url);
+  const { searchParams } = url
 
-  if (searchParams.has('country')) {
+  const missingParams = (Object.keys(REQUIRED_PARAMS)).filter(param => !searchParams.has(param));
+
+  if (missingParams.length === 0) {
     return NextResponse.next();
   }
 
-  const country = await detectLocation(request);
+  const paramsToAdd: Record<string, string> = {};
 
-  if(!country) {
-    return NextResponse.next();
+  for (const param of missingParams) {
+    const value = await REQUIRED_PARAMS[param](request);
+    if (value && typeof value === 'string') {
+      paramsToAdd[param] = value;
+    }
   }
 
-  const newSearchParams = new URLSearchParams(searchParams.toString());
+  missingParams.forEach(param => {
+    if (paramsToAdd[param]) {
+      searchParams.set(param, paramsToAdd[param]);
+    }
+  });
 
-  newSearchParams.set('country', country);
-
-  const newUrl = new URL(request.url);
-  newUrl.search = newSearchParams.toString();
-
-  return NextResponse.redirect(newUrl);
+  return NextResponse.redirect(url);
 }
 
 export const config = {
-  matcher: [PAGES_ROUTES.HOME],
+  matcher: ["/"],
 };

@@ -2,6 +2,7 @@ import CalendarList from '@/components/ui/CalendarList';
 import Filters from '@/components/ui/Filters';
 import { getHolidays } from '@/infrastructure/services/holidays/getHolidays';
 import { DEFAULT_SEARCH_PARAMS } from '@/const/const';
+import HolidaysSummary from '@/components/ui/HolidaysSummary';
 
 export interface SearchParams{
   country?: string;
@@ -16,7 +17,7 @@ interface ForeverPtoProps{
 }
 
 export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
-  const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS } = DEFAULT_SEARCH_PARAMS
+  const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS }= DEFAULT_SEARCH_PARAMS
     const {
         country,
         region,
@@ -35,13 +36,14 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
                         ptoDays={ptoDays}
                         allowPastDays={allowPastDays}
                 />
-                <CalendarList
-                        key={holidays}
-                        year={year}
-                        ptoDays={ptoDays}
-                        allowPastDays={allowPastDays}
-                        holidays={holidays}
-                />
+              <HolidaysSummary holidays={holidays} />
+               <CalendarList
+                  key={holidays}
+                  year={Number(year)}
+                  ptoDays={Number(ptoDays)}
+                  allowPastDays={allowPastDays}
+                  holidays={holidays}
+              />
             </div>
     );
 }
@@ -68,5 +70,3 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 25- Add custom debounce hook
 // 26- RECHECK ALGORYTHM (both alternatives + suggestions). 4 days issue
 // 27- DataTable to bulk actions to remove days
-
-// 28- add summary holidays in view

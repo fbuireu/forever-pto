@@ -9,7 +9,10 @@ export async function detectCountryFromIP(){
       }
 
       const { ip } = await ipResponse.json();
-
+      console.log(ip);
+      if(!ip) {
+        return ''
+      }
       const geoResponse = await fetch(`https://ipinfo.io/${ip}/json`, {
         headers: {
           Accept: 'application/json',
@@ -18,7 +21,7 @@ export async function detectCountryFromIP(){
       });
 
       if (!geoResponse.ok) {
-        throw new Error('Geographic data couldn\'t be obtained');
+        return '';
       }
 
       const geoData = await geoResponse.json();

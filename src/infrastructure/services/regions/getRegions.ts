@@ -8,7 +8,7 @@ export async function getRegions(countryCode?: string){
       const holidays = new Holidays(countryCode);
       const regions = holidays.getStates(countryCode.toLowerCase());
 
-      if (!regions || !Object.keys(regions).length) return [];
+      if (!regions || !Object.values(regions).length) return [];
 
       return regionDTO.create({ raw: regions }).sort((a, b) => a.label.localeCompare(b.label))
     } catch (error) {

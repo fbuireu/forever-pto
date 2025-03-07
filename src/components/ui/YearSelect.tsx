@@ -3,49 +3,60 @@
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { startTransition, useCallback } from 'react';
+import { startTransition, useState } from 'react';
+import { createQueryString } from '@/shared/ui/utils/createQueryString';
+import { SearchParams } from '@/app/page';
 
-export const YearSelect = ({ year }) => {
+interface YearSelectProps {
+    year: SearchParams['year'];
+}
+
+export const YearSelect = ({ year }: YearSelectProps) => {
+    const yearOptions = Array.from({ length: 11 }, (_, i) => new Date().getFullYear() - 5 + i);
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    const createQueryString = useCallback(
-            (name: string, value: string) => {
-                const params = new URLSearchParams(searchParams.toString());
-                params.set(name, value);
-                return params.toString();
-            },
-            [searchParams],
-    );
+    const [selectedYear, setSelectedYear] = useState(() => {
+        const paramYear = searchParams.get('year');
+        return paramYear ? Number(paramYear) : year;
+    });
 
-    const handleYearChange = useCallback((value: string) => {
-        startTransition(() => {
-            router.push(
-                    pathname + '?' + createQueryString('year', value),
-                    { scroll: false },
-            );
+    const handleYearChange = (value: string) => {
+        const newYear = Number(value);
+        setSelectedYear(newYear);
+
+        const query = createQueryString({
+            type: 'year',
+            value: String(newYear),
+            searchParams
         });
-    }, [router, pathname, createQueryString]);
 
-    return <div className="flex items-center gap-2">
-        <Label htmlFor="year-select" className="whitespace-nowrap">
-            Año:
-        </Label>
-        <Select
-                value={year.toString()}
+        startTransition(() => {
+            router.push(`${pathname}?${query}`, { scroll: false });
+        });
+    };
+
+    return (
+        <div className="flex items-center gap-2">
+            <Label htmlFor="year-select" className="whitespace-nowrap">
+                Año:
+            </Label>
+            <Select
+                value={selectedYear.toString()}
                 onValueChange={handleYearChange}
-        >
-            <SelectTrigger id="year-select" className="w-24">
-                <SelectValue placeholder="Año" />
-            </SelectTrigger>
-            <SelectContent>
-                {[2024, 2025, 2026, 2027].map(yearOption => (
-                        <SelectItem key={yearOption} value={yearOption.toString()}>
-                            {yearOption}
+            >
+                <SelectTrigger id="year-select" className="w-24">
+                    <SelectValue placeholder="Año" />
+                </SelectTrigger>
+                <SelectContent>
+                    {yearOptions.map(year => (
+                        <SelectItem key={year} value={year.toString()}>
+                            {year}
                         </SelectItem>
-                ))}
-            </SelectContent>
-        </Select>
-    </div>;
+                    ))}
+                </SelectContent>
+            </Select>
+        </div>
+    );
 };

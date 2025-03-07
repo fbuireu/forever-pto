@@ -24,8 +24,9 @@ export function getHolidays({ year, country, region }: GetHolidaysParams): Holid
 
     const nationalHolidays = getNationalHolidays({ country, configuration, year: Number(year) })
     const regionalHolidays = getRegionalHolidays({ country, region, configuration, year: Number(year) })
-
-    return holidayDTO.create({ raw: [...nationalHolidays, ...regionalHolidays], configuration: Number(year) }).sort((a, b) => a.date - b.date)
+console.log(nationalHolidays)
+console.log(regionalHolidays)
+    return holidayDTO.create({ raw: [...nationalHolidays, ...regionalHolidays], configuration: { year: Number(year), countryCode: country} }).sort((a, b) => a.date - b.date)
   } catch (error) {
     console.error('Error retrieving holidays:', error);
     return []

@@ -22,7 +22,6 @@ interface ComboboxProps extends React.HTMLProps<HTMLInputElement> {
 export const Combobox: React.FC<ComboboxProps> = ({
     value = "",
     label,
-    onChange,
     options = [],
     placeholder,
     searchPlaceholder,
@@ -37,6 +36,17 @@ export const Combobox: React.FC<ComboboxProps> = ({
     const searchParams = useSearchParams();
     const [isOpen, setIsOpen] = useState(false);
     const selectedOption = options.find((option) => option.value.toLowerCase() === value?.toLowerCase());
+
+    const handleSelect = (currentValue)=>{
+        const selectedOption = options.find((option): option is CountryDTO | RegionDTO => option.label == currentValue);
+        if (selectedOption?.value) {
+            const query = createQueryString({ value: selectedOption.value.toLowerCase(), type, searchParams })
+            startTransition(() => {
+                router.replace(`${pathname}?${query}`, { scroll: false });
+                setIsOpen(false);
+            })
+        }
+    }
 
     return (
         <div className="relative w-full">
@@ -77,18 +87,7 @@ export const Combobox: React.FC<ComboboxProps> = ({
                                         key={option.label}
                                         value={option?.label}
                                         className="rounded-md cursor-pointer hover:bg-slate-250 transition-colors duration-200"
-                                        onSelect={(currentValue) => {
-                                            startTransition(() => {
-                                                const selectedOption = options.find((option): option is CountryDTO | RegionDTO =>
-                                                    option.label == currentValue
-                                                );
-                                                if (selectedOption) {
-                                                    const query = createQueryString({ value: selectedOption.value.toLowerCase(), type, searchParams })
-                                                    router.replace(`${pathname}?${query}`,{ scroll: false });
-                                                    setIsOpen(false);
-                                                }
-                                            });
-                                        }}
+                                        onSelect={handleSelect}
                                     >
                                         <div className="flex items-center gap-2 w-full">
                                             {option.flag && (
