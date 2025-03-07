@@ -17,10 +17,15 @@ interface ComboboxProps extends React.HTMLProps<HTMLInputElement> {
     heading: string;
     type: 'country' | 'region';
     options?: CountryDTO[] | RegionDTO[];
+    value?: string,
 }
 
-export const Combobox: React.FC<ComboboxProps> = ({
-    value = "",
+function hasFlag(option: CountryDTO | RegionDTO): option is CountryDTO {
+    return 'flag' in option && !!option.flag;
+}
+
+export const Combobox = ({
+    value = '',
     label,
     options = [],
     placeholder,
@@ -30,86 +35,90 @@ export const Combobox: React.FC<ComboboxProps> = ({
     heading,
     disabled,
     type,
-}) => {
+}: ComboboxProps) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const [isOpen, setIsOpen] = useState(false);
-    const selectedOption = options.find((option) => option.value.toLowerCase() === value?.toLowerCase());
+    const selectedOption = options.find((option) => option.value.toLowerCase() === value.toLowerCase());
 
-    const handleSelect = (currentValue)=>{
-        const selectedOption = options.find((option): option is CountryDTO | RegionDTO => option.label == currentValue);
+    const handleSelect = (currentValue: string) => {
+        const selectedOption = options.find((option) => option.label === currentValue);
         if (selectedOption?.value) {
-            const query = createQueryString({ value: selectedOption.value.toLowerCase(), type, searchParams })
+            const query = createQueryString({
+                value: selectedOption.value.toLowerCase(),
+                type,
+                searchParams,
+            });
             startTransition(() => {
                 router.replace(`${pathname}?${query}`, { scroll: false });
                 setIsOpen(false);
-            })
+            });
         }
-    }
+    };
 
     return (
-        <div className="relative w-full">
-            <p className="text-sm text-muted-foreground">{label}</p>
-            <Popover open={isOpen} onOpenChange={setIsOpen}>
-                <PopoverTrigger asChild>
-                    <Button
-                        variant="outline"
-                        role="combobox"
-                        disabled={disabled}
-                        aria-expanded={isOpen}
-                        className={mergeClass('w-full justify-between', className)}
-                    >
-                        {selectedOption ? (
-                            <div className="flex items-center gap-2">
-                                {selectedOption.flag && (
-                                    <div className="relative h-4 w-6 overflow-hidden rounded">
-                                        {selectedOption.flag}
-                                    </div>
-                                )}
-                                <span>{selectedOption.label}</span>
-                            </div>
-                        ) : (
-                            <span className="text-muted-foreground">{placeholder}</span>
-                        )}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                </PopoverTrigger>
-                <PopoverContent
-                    className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
-                    <Command className="w-full">
-                        <CommandInput placeholder={searchPlaceholder} />
-                        <CommandList>
-                            <CommandEmpty>{notFoundText}</CommandEmpty>
-                            <CommandGroup heading={heading} className="w-full">
-                                {options?.map((option) => (
-                                    <CommandItem
-                                        key={option.label}
-                                        value={option?.label}
-                                        className="rounded-md cursor-pointer hover:bg-slate-250 transition-colors duration-200"
-                                        onSelect={handleSelect}
-                                    >
-                                        <div className="flex items-center gap-2 w-full">
-                                            {option.flag && (
+            <div className="relative w-full">
+                <p className="text-sm text-muted-foreground">{label}</p>
+                <Popover open={isOpen} onOpenChange={setIsOpen}>
+                    <PopoverTrigger asChild>
+                        <Button
+                                variant="outline"
+                                role="combobox"
+                                disabled={disabled}
+                                aria-expanded={isOpen}
+                                className={mergeClass('w-full justify-between', className)}
+                        >
+                            {selectedOption ? (
+                                    <div className="flex items-center gap-2">
+                                        {hasFlag(selectedOption) && (
                                                 <div className="relative h-4 w-6 overflow-hidden rounded">
-                                                    {option.flag}
+                                                    {selectedOption.flag}
                                                 </div>
-                                            )}
-                                            <span>{option.label}</span>
-                                        </div>
-                                        <Check
-                                            className={mergeClass(
-                                                'ml-auto h-4 w-4',
-                                                value === option.value ? 'opacity-100' : 'opacity-0',
-                                            )}
-                                        />
-                                    </CommandItem>
-                                ))}
-                            </CommandGroup>
-                        </CommandList>
-                    </Command>
-                </PopoverContent>
-            </Popover>
-        </div>
+                                        )}
+                                        <span>{selectedOption.label}</span>
+                                    </div>
+                            ) : (
+                                    <span className="text-muted-foreground">{placeholder}</span>
+                            )}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                            className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
+                        <Command className="w-full">
+                            <CommandInput placeholder={searchPlaceholder} />
+                            <CommandList>
+                                <CommandEmpty>{notFoundText}</CommandEmpty>
+                                <CommandGroup heading={heading} className="w-full">
+                                    {options?.map((option) => (
+                                            <CommandItem
+                                                    key={option.label}
+                                                    value={option?.label}
+                                                    className="rounded-md cursor-pointer hover:bg-slate-250 transition-colors duration-200"
+                                                    onSelect={handleSelect}
+                                            >
+                                                <div className="flex items-center gap-2 w-full">
+                                                    {hasFlag(option) && (
+                                                            <div className="relative h-4 w-6 overflow-hidden rounded">
+                                                                {option.flag}
+                                                            </div>
+                                                    )}
+                                                    <span>{option.label}</span>
+                                                </div>
+                                                <Check
+                                                        className={mergeClass(
+                                                                'ml-auto h-4 w-4',
+                                                                value === option.value ? 'opacity-100' : 'opacity-0',
+                                                        )}
+                                                />
+                                            </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                            </CommandList>
+                        </Command>
+                    </PopoverContent>
+                </Popover>
+            </div>
     );
 };

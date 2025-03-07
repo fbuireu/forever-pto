@@ -4,26 +4,26 @@ import { getHolidays } from '@/infrastructure/services/holidays/getHolidays';
 import { DEFAULT_SEARCH_PARAMS } from '@/const/const';
 import HolidaysSummary from '@/components/ui/HolidaysSummary';
 
-export interface SearchParams{
-  country?: string;
-  region?: string;
-  year: string;
-  ptoDays: string;
-  allowPastDays: boolean;
+export interface SearchParams {
+    country?: string;
+    region?: string;
+    year: string;
+    ptoDays: string;
+    allowPastDays: boolean;
 }
 
-interface ForeverPtoProps{
-  searchParams: Promise<SearchParams>
+interface ForeverPtoProps {
+    searchParams: Promise<SearchParams>;
 }
 
 export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
-  const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS }= DEFAULT_SEARCH_PARAMS
+    const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS } = DEFAULT_SEARCH_PARAMS;
     const {
         country,
         region,
         year = YEAR,
         ptoDays = PTO_DAYS,
-        allowPastDays = ALLOW_PAST_DAYS.toLowerCase() === "true",
+        allowPastDays = ALLOW_PAST_DAYS.toLowerCase() === 'true',
     } = await searchParams;
     const holidays = getHolidays({ country, region, year });
 
@@ -36,14 +36,14 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
                         ptoDays={ptoDays}
                         allowPastDays={allowPastDays}
                 />
-              <HolidaysSummary holidays={holidays} />
-               <CalendarList
-                  key={holidays}
-                  year={Number(year)}
-                  ptoDays={Number(ptoDays)}
-                  allowPastDays={allowPastDays}
-                  holidays={holidays}
-              />
+                <HolidaysSummary holidays={holidays} />
+                <CalendarList
+                        key={JSON.stringify(holidays)}
+                        year={Number(year)}
+                        ptoDays={Number(ptoDays)}
+                        allowPastDays={allowPastDays}
+                        holidays={holidays}
+                />
             </div>
     );
 }
@@ -67,6 +67,6 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 23- Adjust threshold (paid funcionality)
 // 24- Edit weekends (paid functionality)
 // 25- Edit festivities (paid functionality)
-// 25- Add custom debounce hook
+// 25- Add sidebar
 // 26- RECHECK ALGORYTHM (both alternatives + suggestions). 4 days issue
 // 27- DataTable to bulk actions to remove days

@@ -21,8 +21,6 @@ export function getRegionsMap(countryCode: string): Record<string, string> {
     for (const [code, name] of Object.entries(regions)) {
       REGIONS_CACHE[countryCode][code.toLowerCase()] = name as string;
     }
-
-    console.log(`Regiones cargadas para ${countryCode}:`, REGIONS_CACHE[countryCode]);
   } catch (error) {
     console.error(`Error al cargar regiones para ${countryCode}:`, error);
   }
