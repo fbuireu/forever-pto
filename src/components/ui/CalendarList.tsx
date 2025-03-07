@@ -555,7 +555,6 @@ export default function CalendarList({
 
     const handleDayMouseOver = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
         const button = e.currentTarget;
-        console.log(e);
         const isSuggested = button.dataset.suggested === 'true';
 
         if (!isSuggested) return;
@@ -839,7 +838,7 @@ export default function CalendarList({
     }, [ptoDays, suggestedDays, getSuggestedDaysForMonth, calculateEffectiveDays]);
 
     return (
-            <main className="flex flex-col gap-8 items-center w-full">
+            <section className="flex flex-col gap-8 items-center w-full">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-7 gap-4">
                     {monthsToShow.map((month) => {
                         return (
@@ -921,40 +920,6 @@ export default function CalendarList({
                         );
                     })}
                 </div>
-
-                <footer className="mt-8 text-center text-sm text-muted-foreground">
-                    <div className="flex flex-wrap justify-center gap-4 mb-2">
-                        <div className="flex items-center">
-                            <div className="w-4 h-4 bg-accent/30 mr-2 rounded-sm"></div>
-                            <span>Fines de semana</span>
-                        </div>
-                        <div className="flex items-center">
-                            <div className="w-4 h-4 bg-yellow-100 mr-2 rounded-sm border border-yellow-300"></div>
-                            <span>Festivos</span>
-                        </div>
-                        <div className="flex items-center">
-                            <div className="w-4 h-4 bg-primary text-primary-foreground mr-2 rounded-sm flex items-center justify-center">
-                                <span className="text-xs">P</span>
-                            </div>
-                            <span>Días PTO seleccionados</span>
-                        </div>
-                        <div className="flex items-center">
-                            <div className="w-4 h-4 bg-green-100 dark:bg-green-900/30 mr-2 rounded-sm"></div>
-                            <span>Días sugeridos</span>
-                        </div>
-                        <div className="flex items-center">
-                            <div className="w-4 h-4 bg-purple-100 dark:bg-purple-900/30 mr-2 rounded-sm"></div>
-                            <span>Alternativas similares ({(ALTERNATIVE_THRESHOLD * 100).toFixed(0)}%)</span>
-                        </div>
-                    </div>
-                    <p>
-                        Los fines de semana y festivos ya están preseleccionados. Haz clic en cualquier día laborable
-                        para añadirlo como día PTO.
-                    </p>
-                    <p>Limitations: las sugerencias se basan en los bloques de dias (si se hace hover sobre un grupo de
-                        3 dias sugeridos se buscaran alternativas que, con 3 dias de PTO, generen los mismos dias
-                        festivos)</p>
-                </footer>
-            </main>
+            </section>
     );
 }
