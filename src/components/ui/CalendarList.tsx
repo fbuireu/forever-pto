@@ -666,7 +666,7 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays }:
 				classes.push("bg-yellow-100 text-yellow-800 hover:bg-yellow-200");
 			} else if (isWeekend(date)) {
 				// Weekend days
-				classes.push("bg-accent/30 text-muted-foreground hover:bg-accent/60");
+				classes.push("bg-gray-200 dark:bg-gray-900 text-muted-foreground hover:bg-gray-300");
 			} else {
 				// Solo aplicamos hover gris a días normales que no pertenecen a bloques
 				const isSuggested = isDaySuggested(date);
@@ -674,7 +674,7 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays }:
 
 				// Si no es parte de un bloque sugerido ni alternativo, entonces aplicamos hover gris
 				if (!isSuggested && !isAlternative) {
-					classes.push("hover:bg-gray-100 dark:hover:bg-gray-800");
+					classes.push("hover:bg-gray-200 dark:hover:bg-gray-800");
 				}
 			}
 
@@ -858,10 +858,10 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays }:
 								fixedWeeks
 								locale={es}
 								components={{
-									IconRight: () => null,
-									IconLeft: () => null,
-									IconDropdown: () => null,
-									Day: ({ date, displayMonth, ...props }) => {
+									Chevron: () => null,
+									Dropdown: () => null,
+									Day: ({ day }) => {
+										const { date, displayMonth } = day;
 										const holiday = getHolidayName(date);
 										const dateKey = format(date, "yyyy-MM-dd");
 										const isSuggested = isDaySuggested(date);
@@ -871,10 +871,9 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays }:
 										const alternativePosition = getAlternativeDayPosition(date);
 
 										return (
-											<div className="relative">
+											<td className="p-0 relative">
 												<button
 													type="button"
-													{...props}
 													className={`${getDayClassName(date, displayMonth)}`}
 													title={holiday || ""}
 													data-suggested={isSuggested ? "true" : "false"}
@@ -890,11 +889,8 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays }:
 													onFocus={handleDayInteraction}
 												>
 													{date.getDate()}
-
-													{/* Usar clases basadas en data-attributes en lugar de estilos inline */}
-													<span className="absolute inset-0 -z-10 rounded-none" />
 												</button>
-											</div>
+											</td>
 										);
 									},
 								}}

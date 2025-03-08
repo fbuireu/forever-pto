@@ -3,7 +3,7 @@
 	"description": "The all-in-one tool to squish your valuable PTO days",
 	"keywords": ["nextjs", "typescript", "css", "tailwind", "cloudflare", "pto", "seo", "turbopack", "shadcn"],
 	"author": "Ferran Buireu <fbuireu@gmail.com>",
-	"packageManager": "npm@10.9.2",
+	"packageManager": "npm@11.2.0",
 	"engines": {
 		"node": ">=22.0.0"
 	},
@@ -49,16 +49,16 @@
 		"lucide-react": "^0.479.0",
 		"next": "15.2.1",
 		"react": "^19.0.0",
-		"react-day-picker": "^8.10.1",
+		"react-day-picker": "^9.6.0",
 		"react-dom": "^19.0.0",
 		"tailwind-merge": "^3.0.2",
 		"tailwindcss-animate": "^1.0.7"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
-		"@commitlint/cli": "^19.7.1",
-		"@commitlint/config-conventional": "^19.7.1",
-		"@commitlint/format": "^19.5.0",
+		"@commitlint/cli": "^19.8.0",
+		"@commitlint/config-conventional": "^19.8.0",
+		"@commitlint/format": "^19.8.0",
 		"@tailwindcss/postcss": "^4.0.12",
 		"@testing-library/react": "^16.2.0",
 		"@types/node": "^22.13.10",
