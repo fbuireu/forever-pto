@@ -27,8 +27,6 @@ export async function detectCountryFromIP() {
     const geoData = await geoResponse.json();
     return geoData.country?.toLowerCase() || '';
   } catch (error) {
-    console.error('Error while getting the country from the IP:', error);
     return '';
   }
-
 }

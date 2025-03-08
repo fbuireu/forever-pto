@@ -1,20 +1,20 @@
-import Holidays from 'date-holidays';
-import { RawHoliday } from '@/application/dto/holiday/types';
+import type { RawHoliday } from "@/application/dto/holiday/types";
+import Holidays from "date-holidays";
 
 interface GetNationalHolidaysParams {
-  country: string;
-  configuration: {
-    languages: string[];
-    timezone: string;
-  };
-  year: number;
+	country: string;
+	configuration: {
+		languages: string[];
+		timezone: string;
+	};
+	year: number;
 }
 
-export function getNationalHolidays({ country, configuration, year }: GetNationalHolidaysParams): RawHoliday[]  {
-  const holidays = new Holidays(country, configuration);
+export function getNationalHolidays({ country, configuration, year }: GetNationalHolidaysParams): RawHoliday[] {
+	const holidays = new Holidays(country, configuration);
 
-  const currentYearHolidays = holidays.getHolidays(year)
-  const nextYearHolidays = holidays.getHolidays(year +1)
+	const currentYearHolidays = holidays.getHolidays(year);
+	const nextYearHolidays = holidays.getHolidays(year + 1);
 
-  return [...currentYearHolidays, ...nextYearHolidays];
+	return [...currentYearHolidays, ...nextYearHolidays];
 }

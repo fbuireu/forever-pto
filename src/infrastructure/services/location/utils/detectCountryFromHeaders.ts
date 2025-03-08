@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 export async function detectCountryFromHeaders(request: NextRequest): Promise<string> {
   try {
@@ -10,7 +10,7 @@ export async function detectCountryFromHeaders(request: NextRequest): Promise<st
 
     const geoResponse = await fetch(`https://ipinfo.io/${clientIP}/json`, {
       headers: { Accept: 'application/json' },
-      cache: 'no-store',
+      cache: 'no-store'
     });
 
     if (!geoResponse.ok) {
@@ -24,7 +24,6 @@ export async function detectCountryFromHeaders(request: NextRequest): Promise<st
 
     return geoData.country.toLowerCase();
   } catch (error) {
-    console.error('Error detecting the country via direct headers:', error);
     return '';
   }
 }

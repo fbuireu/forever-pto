@@ -1,9 +1,9 @@
-const LOCATION_IDENTIFIER="loc="
+const LOCATION_IDENTIFIER = 'loc=';
 
 export async function detectCountryFromCDN(): Promise<string> {
   try {
     const response = await fetch('https://stretchmytimeoff.com/cdn-cgi/trace', {
-      cache: 'no-store',
+      cache: 'no-store'
     });
 
     if (!response.ok) {
@@ -20,7 +20,6 @@ export async function detectCountryFromCDN(): Promise<string> {
 
     return '';
   } catch (error) {
-    console.error('Error detecting the country via CDN:', error);
     return '';
   }
 }

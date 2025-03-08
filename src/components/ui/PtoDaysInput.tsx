@@ -1,14 +1,15 @@
 'use client';
 
+import type { SearchParams } from '@/app/page';
+import { useDebouncedCallback } from '@/components/hooks/useDebounceCallback';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { createQueryString } from '@/shared/ui/utils/createQueryString';
 import { Minus, Plus } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import React, { startTransition, useCallback, useState } from 'react';
-import { createQueryString } from '@/shared/ui/utils/createQueryString';
-import { SearchParams } from '@/app/page';
-import { useDebouncedCallback } from '@/components/hooks/useDebounceCallback';
+import type React from 'react';
+import { startTransition, useCallback, useState } from 'react';
 
 interface PtoDaysInputProps {
     ptoDays: SearchParams['ptoDays'];
@@ -24,15 +25,18 @@ export const PtoDaysInput = ({ ptoDays }: PtoDaysInputProps) => {
         return paramPtoDays ? Number(paramPtoDays) : Number(ptoDays);
     });
 
-    const updateQueryString = useCallback((newValue: number) => {
-        const query = createQueryString({
-            type: 'ptoDays',
-            value: String(newValue),
-            searchParams,
-        });
+    const updateQueryString = useCallback(
+            (newValue: number) => {
+                const query = createQueryString({
+                    type: 'ptoDays',
+                    value: String(newValue),
+                    searchParams,
+                });
 
-        startTransition(() => router.push(`${pathname}?${query}`, { scroll: false }));
-    }, [router, pathname, searchParams]);
+                startTransition(() => router.push(`${pathname}?${query}`, { scroll: false }));
+            },
+            [router, pathname, searchParams],
+    );
 
     const updateQueryDebounced = useDebouncedCallback((value: number) => updateQueryString(value), 200);
 
@@ -51,7 +55,7 @@ export const PtoDaysInput = ({ ptoDays }: PtoDaysInputProps) => {
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = Number(event.currentTarget.value);
-        if (!isNaN(newValue) && newValue >= 0) {
+        if (!Number.isNaN(newValue) && newValue >= 0) {
             setInputValue(newValue);
             updateQueryDebounced(newValue);
         } else if (event.currentTarget.value === '') {
@@ -83,12 +87,7 @@ export const PtoDaysInput = ({ ptoDays }: PtoDaysInputProps) => {
                         className="w-20"
                         min="0"
                 />
-                <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8 shrink-0 rounded-full"
-                        onClick={incrementDays}
-                >
+                <Button variant="outline" size="icon" className="h-8 w-8 shrink-0 rounded-full" onClick={incrementDays}>
                     <Plus />
                     <span className="sr-only">Increase</span>
                 </Button>

@@ -22,7 +22,6 @@ export function getRegionsMap(countryCode: string): Record<string, string> {
       REGIONS_CACHE[countryCode][code.toLowerCase()] = name as string;
     }
   } catch (error) {
-    console.error(`Error al cargar regiones para ${countryCode}:`, error);
   }
 
   return REGIONS_CACHE[countryCode];

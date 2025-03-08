@@ -1,0 +1,4 @@
+{
+	"src/**/*.{ts,tsx,css}": ["npm run format:changed", "npm run lint:changed"],
+	"src/**/*.{test,spec}.{ts,tsx}": ["npm run test:ut:changed"]
+}
