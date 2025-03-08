@@ -82,7 +82,7 @@ export const Combobox = ({
 						<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 					</Button>
 				</PopoverTrigger>
-				<PopoverContent className="max-h-[--radix-popover-content-available-height] w-[--radix-popover-trigger-width] p-0">
+				<PopoverContent className="max-h-(--radix-popover-content-available-height) w-(--radix-popover-trigger-width) p-0">
 					<Command className="w-full">
 						<CommandInput placeholder={searchPlaceholder} />
 						<CommandList>

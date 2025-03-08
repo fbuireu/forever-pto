@@ -26,7 +26,7 @@ const HolidaysSummary: React.FC<HolidaysSummaryProps> = ({ holidays }) => {
 
     return (
             <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-                <Accordion type="single" collapsible className="rounded-md border shadow-sm">
+                <Accordion type="single" collapsible className="rounded-md border shadow-xs">
                     <AccordionItem value="national" className="border-none">
                         <AccordionTrigger className="px-4 py-3 hover:bg-muted/50">
                             <div className="flex items-center">
@@ -77,7 +77,7 @@ const HolidaysSummary: React.FC<HolidaysSummaryProps> = ({ holidays }) => {
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>
-                <Accordion type="single" collapsible className="rounded-md border shadow-sm">
+                <Accordion type="single" collapsible className="rounded-md border shadow-xs">
                     <AccordionItem value="regional" className="border-none">
                         <AccordionTrigger className="px-4 py-3 hover:bg-muted/50">
                             <div className="flex items-center">

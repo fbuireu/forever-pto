@@ -639,7 +639,7 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays }:
 				"h-8 w-8 p-0", // Tamaño reducido para evitar solapamiento
 				"inline-flex items-center justify-center",
 				"rounded-sm text-sm font-medium", // Bordes menos pronunciados
-				"transition-colors focus-visible:outline-none",
+				"transition-colors focus-visible:outline-hidden",
 				"aria-selected:opacity-100",
 			];
 

@@ -80,8 +80,7 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 1- Refactor
 // 2- Isolate functions
 // 4- Tema fin de semana
-// 5- Revisar seleccion i ratio
-// 6- Add tests
+// 6- Add tests (also e2e)
 // 9- Add CI/CD
 // 13- Next Config + TS Config
 // 14- i18n
@@ -97,4 +96,5 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 25- Add sidebar
 // 26- RECHECK ALGORYTHM (both alternatives + suggestions). 4 days issue
 // 27- DataTable to bulk actions to remove days
-// 28- bump deps (breaking changes in tailwind + react-day-picker)
+// 28- bump deps (breaking changes in react-day-picker)
+// 29- weekends lost color
