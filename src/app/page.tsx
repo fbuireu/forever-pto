@@ -1,9 +1,9 @@
-import CalendarList from "@/components/ui/CalendarList";
-import Filters from "@/components/ui/Filters";
-import HolidaysSummary from "@/components/ui/HolidaysSummary";
-import { DEFAULT_SEARCH_PARAMS } from "@/const/const";
-import { getHolidays } from "@/infrastructure/services/holidays/getHolidays";
-import React from "react";
+import CalendarList from '@/components/ui/CalendarList';
+import Filters from '@/components/ui/Filters';
+import HolidaysSummary from '@/components/ui/HolidaysSummary';
+import { DEFAULT_SEARCH_PARAMS } from '@/const/const';
+import { getHolidays } from '@/infrastructure/services/holidays/getHolidays';
+import React from 'react';
 
 export interface SearchParams {
 	country?: string;
@@ -94,6 +94,6 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 23- Adjust thresholds (paid funcionality)
 // 24- Edit weekends (paid functionality)
 // 25- Edit festivities (paid functionality)
-// 25- Add sidebar
+// 25- Refine sidebar + remove main filters
 // 26- RECHECK ALGORYTHM (both alternatives + suggestions). 4 days issue
 // 27- DataTable to bulk actions to remove days

@@ -651,6 +651,9 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays }:
 			// Past day (not selectable if not allowed)
 			if (!allowPastDays && date < new Date() && !selectedDays.some((d) => isSameDay(d, date))) {
 				classes.push("text-muted-foreground opacity-50 cursor-not-allowed");
+			} else {
+				// Solo añadir pointer a los días que no son pasados o están permitidos
+				classes.push("cursor-pointer");
 			}
 
 			// Determine day type and apply appropriate styling
