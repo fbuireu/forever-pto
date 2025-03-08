@@ -97,3 +97,4 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 25- Add sidebar
 // 26- RECHECK ALGORYTHM (both alternatives + suggestions). 4 days issue
 // 27- DataTable to bulk actions to remove days
+// 28- bump deps (breaking changes in tailwind + react-day-picker)
