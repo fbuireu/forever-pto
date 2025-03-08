@@ -19,7 +19,8 @@
 		"lint": "biome lint --no-errors-on-unmatched",
 		"lint:all": "npm run lint .",
 		"lint:all:fix": "npm run lint:all -- --write",
-		"lint:changed": "npm run lint -- --write --changed",
+		"lint:changed": "npm run lint -- --changed",
+		"lint:changed:fix": "npm run lint -- --write --changed",
 		"lint:ts:typecheck": "tsc --project . --noEmit",
 		"prepare": "husky"
 	},
