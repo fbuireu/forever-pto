@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Ocultar botones de navegación del calendario */
 button[name="previous-month"],
 button[name="next-month"] {
 	display: none;

@@ -1,6 +1,12 @@
 {
 	"name": "forever-pto",
 	"description": "The all-in-one tool to squish your valuable PTO days",
+	"keywords": ["nextjs", "typescript", "css", "tailwind", "cloudflare", "pto", "seo", "turbopack", "shadcn"],
+	"author": "Ferran Buireu <fbuireu@gmail.com>",
+	"packageManager": "npm@10.9.2",
+	"engines": {
+		"node": ">=22.0.0"
+	},
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
@@ -36,14 +42,14 @@
 		"@tanstack/react-table": "^8.21.2",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
-		"cmdk": "^1.0.0",
-		"date-fns": "^3.6.0",
-		"date-holidays": "^3.23.22",
+		"cmdk": "^1.0.4",
+		"date-fns": "^4.1.0",
+		"date-holidays": "^3.24.0",
 		"i18n-iso-countries": "^7.14.0",
-		"lucide-react": "^0.476.0",
-		"next": "15.1.7",
+		"lucide-react": "^0.479.0",
+		"next": "15.2.1",
 		"react": "^19.0.0",
-		"react-day-picker": "^8.10.1",
+		"react-day-picker": "^9.5.1",
 		"react-dom": "^19.0.0",
 		"tailwind-merge": "^3.0.2",
 		"tailwindcss-animate": "^1.0.7"
@@ -52,9 +58,9 @@
 		"@biomejs/biome": "1.9.4",
 		"@tailwindcss/postcss": "^4.0.12",
 		"@testing-library/react": "^16.2.0",
-		"@types/node": "^20",
-		"@types/react": "^19",
-		"@types/react-dom": "^19",
+		"@types/node": "^22.13.10",
+		"@types/react": "^19.0.10",
+		"@types/react-dom": "^19.0.4",
 		"@vitejs/plugin-react": "^4.3.4",
 		"husky": "^9.1.7",
 		"jsdom": "^26.0.0",
@@ -62,8 +68,8 @@
 		"postcss": "^8.5.3",
 		"prettier": "^3.5.3",
 		"prettier-plugin-tailwindcss": "^0.6.11",
-		"tailwindcss": "^3.4.17",
-		"typescript": "^5",
+		"tailwindcss": "^4.0.12",
+		"typescript": "^5.7.3",
 		"vitest": "^3.0.8"
 	}
 }
