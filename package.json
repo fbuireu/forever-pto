@@ -56,6 +56,10 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
+		"@commitlint/cli": "^19.7.1",
+		"@commitlint/config-conventional": "^19.7.1",
+		"@commitlint/format": "^19.5.0",
+		"conventional-changelog-atom": "^5.0.0",
 		"@tailwindcss/postcss": "^4.0.12",
 		"@testing-library/react": "^16.2.0",
 		"@types/node": "^22.13.10",
