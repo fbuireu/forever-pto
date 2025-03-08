@@ -1,28 +1,27 @@
 "use client";
 
-import { Calendar } from "@/components/ui/calendar";
-import { Card } from "@/components/ui/card";
-
-import type { HolidayDTO } from "@/application/dto/holiday/types";
+import type { HolidayDTO } from '@/application/dto/holiday/types';
+import { Calendar } from '@/components/ui/calendar';
+import { Card } from '@/components/ui/card';
 import {
-	addDays,
-	addMonths,
-	differenceInDays,
-	eachDayOfInterval,
-	endOfMonth,
-	format,
-	getDate,
-	getMonth,
-	isSameDay,
-	isSameMonth,
-	isToday,
-	isWeekend,
-	parseISO,
-	startOfMonth,
-} from "date-fns";
-import { es } from "date-fns/locale";
-import { Loader2 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+    addDays,
+    addMonths,
+    differenceInDays,
+    eachDayOfInterval,
+    endOfMonth,
+    format,
+    getDate,
+    getMonth,
+    isSameDay,
+    isSameMonth,
+    isToday,
+    isWeekend,
+    parseISO,
+    startOfMonth,
+} from 'date-fns';
+import { es } from 'date-fns/locale';
+import { Loader2 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 
 const MONTHS_TO_DISPLAY = 12;
 const MAX_BLOCK_SIZE = 5;
@@ -858,8 +857,8 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays }:
 								fixedWeeks
 								locale={es}
 								components={{
-									Chevron: () => null,
-									Dropdown: () => null,
+									Chevron: () => <></>,
+									Dropdown: () => <></>,
 									Day: ({ day }) => {
 										const { date, displayMonth } = day;
 										const holiday = getHolidayName(date);
