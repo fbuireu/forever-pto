@@ -2,26 +2,41 @@
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
 	"exclude": ["node_modules"],
 	"compilerOptions": {
-		"target": "ES2017",
-		"lib": ["dom", "dom.iterable", "esnext"],
+		"target": "ESNext",
+		"strictNullChecks": true,
+		"allowSyntheticDefaultImports": true,
 		"allowJs": false,
 		"skipLibCheck": true,
 		"strict": true,
 		"noEmit": true,
 		"esModuleInterop": true,
-		"module": "esnext",
+		"module": "ESNext",
 		"moduleResolution": "bundler",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"jsx": "preserve",
 		"incremental": true,
+		"lib": ["dom", "dom.iterable", "esnext"],
 		"plugins": [
 			{
 				"name": "next"
 			}
 		],
 		"paths": {
-			"@/*": ["./src/*"]
+			"@const/*": ["./src/const/*"],
+			"@app/*": ["./src/app/*"],
+			"@infrastructure/*": ["./src/infrastructure/*"],
+			"@ui/*": ["./src/ui/*"],
+			"@domain/*": ["./src/domain/*"],
+			"@application/*": ["./src/application/*"],
+			"@modules/*": ["./src/ui/modules/*"],
+			"@utils/*": ["./src/utils/*"],
+			"@assets/*": ["./src/ui/assets/*"],
+			"@shared/*": ["./src/shared/*"],
+			"@content/*": ["./src/content/*"],
+			"@i18n/*": ["./src/i18n/*"],
+			"@mocks/*": ["./src/mocks/*"],
+			"@types/*": ["./src/types/*"]
 		}
 	}
 }

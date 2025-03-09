@@ -1,9 +1,9 @@
-import CalendarList from '@/components/ui/CalendarList';
-import HolidaysSummary from '@/components/ui/HolidaysSummary';
-import { AppSidebar } from '@/components/ui/app-sidebar';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { DEFAULT_SEARCH_PARAMS } from '@/const/const';
-import { getHolidays } from '@/infrastructure/services/holidays/getHolidays';
+import { DEFAULT_SEARCH_PARAMS } from '@const/const';
+import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
+import { AppSidebar } from '@modules/core/app-sidebar';
+import { SidebarProvider, SidebarTrigger } from '@modules/core/sidebar';
+import CalendarList from '@modules/home/CalendarList';
+import HolidaysSummary from '@modules/home/HolidaysSummary';
 import React from 'react';
 
 export interface SearchParams {

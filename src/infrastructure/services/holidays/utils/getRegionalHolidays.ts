@@ -1,5 +1,5 @@
-import type { RawHoliday } from "@/application/dto/holiday/types";
-import Holidays from "date-holidays";
+import type { RawHoliday } from '@application/dto/holiday/types';
+import Holidays from 'date-holidays';
 
 interface GetRegionalHolidaysParams {
 	country: string;

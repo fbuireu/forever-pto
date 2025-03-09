@@ -1,4 +1,4 @@
-import type { RawHoliday } from "@/application/dto/holiday/types";
+import type { RawHoliday } from '@application/dto/holiday/types';
 
 interface ShouldIncludeHolidayParams {
 	holiday: RawHoliday;

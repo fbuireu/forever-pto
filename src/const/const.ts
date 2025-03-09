@@ -1,6 +1,6 @@
-import type { CapitalizeKeys } from "@/const/types";
-import { capitalizeKeys } from "@/const/utils/capitalizeKeys";
-import type { Metadata } from "next";
+import type { CapitalizeKeys } from '@const/types';
+import { capitalizeKeys } from '@const/utils/capitalizeKeys';
+import type { Metadata } from 'next';
 
 export enum Pages {
 	HOME = "home",

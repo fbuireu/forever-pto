@@ -1,9 +1,9 @@
-import type { HolidayDTO, RawHoliday } from "@/application/dto/holiday/types";
-import { getDateKey } from "@/application/dto/holiday/utils/getDataKey";
-import { getRegionName } from "@/application/dto/holiday/utils/getRegionName";
-import { isInTargetYear } from "@/application/dto/holiday/utils/isInTargetYear";
-import { shouldIncludeHoliday } from "@/application/dto/holiday/utils/shouldIncludeHoliday";
-import type { BaseDTO } from "@/shared/application/dto/baseDTO";
+import type { HolidayDTO, RawHoliday } from '@application/dto/holiday/types';
+import { getDateKey } from '@application/dto/holiday/utils/getDataKey';
+import { getRegionName } from '@application/dto/holiday/utils/getRegionName';
+import { isInTargetYear } from '@application/dto/holiday/utils/isInTargetYear';
+import { shouldIncludeHoliday } from '@application/dto/holiday/utils/shouldIncludeHoliday';
+import type { BaseDTO } from '@shared/application/dto/baseDTO';
 
 type HolidayDTOConfiguration = {
 	year: number;
@@ -11,7 +11,8 @@ type HolidayDTOConfiguration = {
 };
 
 export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOConfiguration> = {
-	create: ({ raw, configuration: { year, countryCode } }) => {
+	create: ({ raw, configuration }) => {
+		const { year, countryCode } = configuration as HolidayDTOConfiguration;
 		const targetYears = [year, year + 1];
 		const monthsToShow = 13;
 

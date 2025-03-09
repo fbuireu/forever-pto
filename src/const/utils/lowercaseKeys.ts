@@ -1,4 +1,4 @@
-import type { LowercaseKeys } from "@/const/types";
+import type { LowercaseKeys } from '@const/types';
 
 export function lowercaseKeys<T extends Record<string, unknown>>(object: T): LowercaseKeys<T> {
 	const result = {} as LowercaseKeys<T>;
