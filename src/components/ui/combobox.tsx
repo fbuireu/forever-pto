@@ -1,16 +1,16 @@
 "use client";
 
-import type { CountryDTO } from "@/application/dto/country/types";
-import type { RegionDTO } from "@/application/dto/region/types";
-import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { createQueryString } from "@/shared/ui/utils/createQueryString";
-import { mergeClass } from "@/shared/ui/utils/mergeClass";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type React from "react";
-import { startTransition, useState } from "react";
+import type { CountryDTO } from '@/application/dto/country/types';
+import type { RegionDTO } from '@/application/dto/region/types';
+import { Button } from '@/components/ui/button';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { createQueryString } from '@/shared/ui/utils/createQueryString';
+import { mergeClass } from '@/shared/ui/utils/mergeClass';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import type React from 'react';
+import { startTransition, useState } from 'react';
 
 interface ComboboxProps extends React.HTMLProps<HTMLInputElement> {
 	searchPlaceholder?: string;
@@ -60,7 +60,6 @@ export const Combobox = ({
 
 	return (
 		<div className="relative w-full">
-			<p className="text-sm text-muted-foreground">{label}</p>
 			<Popover open={isOpen} onOpenChange={setIsOpen}>
 				<PopoverTrigger asChild>
 					<Button

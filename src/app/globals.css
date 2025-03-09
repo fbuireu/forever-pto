@@ -197,10 +197,6 @@
 	}
 }
 
-/*
-  ---break---
-*/
-
 :root {
 	--sidebar: hsl(0 0% 98%);
 	--sidebar-foreground: hsl(240 5.3% 26.1%);
@@ -211,10 +207,6 @@
 	--sidebar-border: hsl(220 13% 91%);
 	--sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
-
-/*
-  ---break---
-*/
 
 .dark {
 	--sidebar: hsl(240 5.9% 10%);
@@ -227,10 +219,6 @@
 	--sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
-/*
-  ---break---
-*/
-
 @theme inline {
 	--color-sidebar: var(--sidebar);
 	--color-sidebar-foreground: var(--sidebar-foreground);
@@ -241,10 +229,6 @@
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
 }
-
-/*
-  ---break---
-*/
 
 @layer base {
 	* {

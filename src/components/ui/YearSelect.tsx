@@ -1,11 +1,11 @@
 "use client";
 
-import type { SearchParams } from "@/app/page";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { createQueryString } from "@/shared/ui/utils/createQueryString";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { startTransition, useState } from "react";
+import type { SearchParams } from '@/app/page';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { createQueryString } from '@/shared/ui/utils/createQueryString';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { startTransition, useState } from 'react';
 
 interface YearSelectProps {
 	year: SearchParams["year"];
@@ -39,12 +39,10 @@ export const YearSelect = ({ year }: YearSelectProps) => {
 
 	return (
 		<div className="flex items-center gap-2">
-			<Label htmlFor="year-select" className="whitespace-nowrap">
-				Año:
-			</Label>
+			<Label htmlFor="year-select" className="whitespace-nowrap" />
 			<Select value={selectedYear.toString()} onValueChange={handleYearChange}>
-				<SelectTrigger id="year-select" className="w-24">
-					<SelectValue placeholder="Año" />
+				<SelectTrigger id="year-select" className="w-full">
+					<SelectValue placeholder="Year" />
 				</SelectTrigger>
 				<SelectContent>
 					{yearOptions.map((year) => (
