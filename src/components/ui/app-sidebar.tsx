@@ -7,6 +7,7 @@ import { YearSelect } from '@/components/ui/YearSelect';
 import {
     Sidebar,
     SidebarContent,
+    SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
     SidebarHeader,
@@ -16,6 +17,7 @@ import {
     SidebarMenuSub,
     SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
+import { ModeToggle } from '@/components/ui/theme-toggle';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import type { LucideIcon } from 'lucide-react';
 import { Calendar, CalendarDays, MapPin, MapPinned, ToggleLeftIcon } from 'lucide-react';
@@ -105,6 +107,13 @@ export function AppSidebar({ country, region, ptoDays, year, allowPastDays }: Ap
 					</SidebarMenu>
 				</SidebarGroup>
 			</SidebarContent>
+			<SidebarFooter>
+				<SidebarMenu>
+					<SidebarMenuItem>
+						<ModeToggle />
+					</SidebarMenuItem>
+				</SidebarMenu>
+			</SidebarFooter>
 		</Sidebar>
 	);
 }

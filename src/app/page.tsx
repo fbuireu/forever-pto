@@ -91,7 +91,6 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 9- Add CI/CD
 // 13- Next Config + TS Config
 // 14- i18n
-// 15- dark mode
 // 17- Allow user to hide festivities (or add them)
 // 18- Allow user to change weekends
 // 19- change forEach to for...of
@@ -103,4 +102,5 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 25- Refine sidebar
 // 26- RECHECK ALGORYTHM (both alternatives + suggestions). 4 days issue
 // 27- DataTable to bulk actions to remove days
-// 28- Tabs
+// 28- Tabs for holiday summary
+// 29- Refine styles
