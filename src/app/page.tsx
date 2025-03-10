@@ -1,10 +1,9 @@
 import { DEFAULT_SEARCH_PARAMS } from '@const/const';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
-import { AppSidebar } from '@modules/core/app-sidebar';
-import { SidebarProvider, SidebarTrigger } from '@modules/core/sidebar';
-import CalendarList from '@modules/home/CalendarList';
-import HolidaysSummary from '@modules/home/HolidaysSummary';
-import React from 'react';
+import { SidebarProvider, SidebarTrigger } from '@modules/components/core/Sidebar';
+import CalendarList from '@modules/components/home/CalendarList';
+import HolidaysSummary from '@modules/components/home/HolidaysSummary';
+import { AppSidebar } from '@modules/components/sidebar/AppSidebar';
 
 export interface SearchParams {
 	country?: string;

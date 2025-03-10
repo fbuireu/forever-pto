@@ -28,20 +28,17 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 	const paramsToAdd: Record<string, string> = {};
 
-	for (const param of missingParams) {
-		const defaultValueFn = REQUIRED_PARAMS[param];
+	for (const missingParam of missingParams) {
+		const defaultValueFn = REQUIRED_PARAMS[missingParam];
 
 		if (defaultValueFn) {
-			const value = await defaultValueFn(request);
-			if (value && typeof value === "string") {
-				paramsToAdd[param as string] = value;
-			}
+			paramsToAdd[missingParam] = await defaultValueFn(request);
 		}
 	}
 
-	for (const param of missingParams) {
-		if (paramsToAdd[param as string]) {
-			searchParams.set(param as string, paramsToAdd[param as string]);
+	for (const missingParam of missingParams) {
+		if (paramsToAdd[missingParam]) {
+			searchParams.set(missingParam, paramsToAdd[missingParam]);
 		}
 	}
 
