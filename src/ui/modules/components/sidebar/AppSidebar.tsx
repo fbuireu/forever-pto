@@ -22,6 +22,7 @@ import {
 			SidebarMenuSub,
 			SidebarMenuSubItem,
 }  from '@modules/components/core/Sidebar';
+import { AllowPastDaysSwitch } from '@modules/components/sidebar/atoms/AllowPastDaysSwitch';
 
 type AppSidebarProps = SearchParams;
 
@@ -56,7 +57,7 @@ export function AppSidebar({ country, region, ptoDays, year, allowPastDays }: Ap
 		{
 			title: "Allow Past Days",
 			icon: ToggleLeftIcon,
-			// renderComponent: () => <SwitchInput name="allowPastDays" checked={allowPastDays} />
+			 renderComponent: () => <AllowPastDaysSwitch allowPastDays={allowPastDays} />
 		},
 	];
 

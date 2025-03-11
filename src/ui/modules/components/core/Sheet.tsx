@@ -1,7 +1,7 @@
 "use client";
 
 import * as SheetPrimitive from '@radix-ui/react-dialog';
-import { MergeClasses } from '@shared/ui/utils/mergeClasses';
+import { mergeClasses } from '@shared/ui/utils/mergeClasses';
 import { XIcon } from 'lucide-react';
 import type { ComponentProps } from 'react';
 
@@ -25,7 +25,7 @@ function SheetOverlay({ className, ...props }: ComponentProps<typeof SheetPrimit
 	return (
 		<SheetPrimitive.Overlay
 			data-slot="sheet-overlay"
-			className={MergeClasses(
+			className={mergeClasses(
 				"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/80",
 				className,
 			)}
@@ -47,7 +47,7 @@ function SheetContent({
 			<SheetOverlay />
 			<SheetPrimitive.Content
 				data-slot="sheet-content"
-				className={MergeClasses(
+				className={mergeClasses(
 					"bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
 					side === "right" &&
 						"data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
@@ -72,12 +72,12 @@ function SheetContent({
 }
 
 function SheetHeader({ className, ...props }: ComponentProps<"div">) {
-	return <div data-slot="sheet-header" className={MergeClasses("flex flex-col gap-1.5 p-4", className)} {...props} />;
+	return <div data-slot="sheet-header" className={mergeClasses("flex flex-col gap-1.5 p-4", className)} {...props} />;
 }
 
 function SheetFooter({ className, ...props }: ComponentProps<"div">) {
 	return (
-		<div data-slot="sheet-footer" className={MergeClasses("mt-auto flex flex-col gap-2 p-4", className)} {...props} />
+		<div data-slot="sheet-footer" className={mergeClasses("mt-auto flex flex-col gap-2 p-4", className)} {...props} />
 	);
 }
 
@@ -85,7 +85,7 @@ function SheetTitle({ className, ...props }: ComponentProps<typeof SheetPrimitiv
 	return (
 		<SheetPrimitive.Title
 			data-slot="sheet-title"
-			className={MergeClasses("text-foreground font-semibold", className)}
+			className={mergeClasses("text-foreground font-semibold", className)}
 			{...props}
 		/>
 	);
@@ -95,7 +95,7 @@ function SheetDescription({ className, ...props }: ComponentProps<typeof SheetPr
 	return (
 		<SheetPrimitive.Description
 			data-slot="sheet-description"
-			className={MergeClasses("text-muted-foreground text-sm", className)}
+			className={mergeClasses("text-muted-foreground text-sm", className)}
 			{...props}
 		/>
 	);

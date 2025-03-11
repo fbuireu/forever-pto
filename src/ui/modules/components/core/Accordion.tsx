@@ -1,7 +1,7 @@
 "use client";
 
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
-import { MergeClasses } from '@shared/ui/utils/mergeClasses';
+import { mergeClasses } from '@shared/ui/utils/mergeClasses';
 import { ChevronDown } from 'lucide-react';
 import * as React from 'react';
 
@@ -11,7 +11,7 @@ const AccordionItem = React.forwardRef<
 	React.ElementRef<typeof AccordionPrimitive.Item>,
 	React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
 >(({ className, ...props }, ref) => (
-	<AccordionPrimitive.Item ref={ref} className={MergeClasses("border-b", className)} {...props} />
+	<AccordionPrimitive.Item ref={ref} className={mergeClasses("border-b", className)} {...props} />
 ));
 AccordionItem.displayName = "AccordionItem";
 
@@ -22,7 +22,7 @@ const AccordionTrigger = React.forwardRef<
 	<AccordionPrimitive.Header className="flex">
 		<AccordionPrimitive.Trigger
 			ref={ref}
-			className={MergeClasses(
+			className={mergeClasses(
 				"flex flex-1 items-center justify-between py-4 text-left text-sm font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180",
 				className,
 			)}
@@ -44,7 +44,7 @@ const AccordionContent = React.forwardRef<
 		className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
 		{...props}
 	>
-		<div className={MergeClasses("pb-4 pt-0", className)}>{children}</div>
+		<div className={mergeClasses("pb-4 pt-0", className)}>{children}</div>
 	</AccordionPrimitive.Content>
 ));
 AccordionContent.displayName = AccordionPrimitive.Content.displayName;

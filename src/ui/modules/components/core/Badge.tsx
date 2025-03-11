@@ -1,4 +1,4 @@
-import { MergeClasses } from '@shared/ui/utils/mergeClasses';
+import { mergeClasses } from '@shared/ui/utils/mergeClasses';
 import { cva, type VariantProps } from 'class-variance-authority';
 import type * as React from 'react';
 
@@ -22,7 +22,7 @@ const badgeVariants = cva(
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, variant, ...props }: BadgeProps) {
-	return <div className={MergeClasses(badgeVariants({ variant }), className)} {...props} />;
+	return <div className={mergeClasses(badgeVariants({ variant }), className)} {...props} />;
 }
 
 export { Badge, badgeVariants };

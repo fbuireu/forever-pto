@@ -10,7 +10,7 @@ export interface SearchParams {
 	region?: string;
 	year: string;
 	ptoDays: string;
-	allowPastDays: boolean;
+	allowPastDays: string;
 }
 
 interface ForeverPtoProps {
@@ -24,7 +24,7 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 		region,
 		year = YEAR,
 		ptoDays = PTO_DAYS,
-		allowPastDays = ALLOW_PAST_DAYS.toLowerCase() === "true",
+		allowPastDays = ALLOW_PAST_DAYS,
 	} = await searchParams;
 	const holidays = getHolidays({ country, region, year });
 

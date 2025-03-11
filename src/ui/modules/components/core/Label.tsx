@@ -1,7 +1,7 @@
 "use client";
 
 import * as LabelPrimitive from '@radix-ui/react-label';
-import { MergeClasses } from '@shared/ui/utils/mergeClasses';
+import { mergeClasses } from '@shared/ui/utils/mergeClasses';
 import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 
@@ -11,7 +11,7 @@ const Label = React.forwardRef<
 	React.ElementRef<typeof LabelPrimitive.Root>,
 	React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & VariantProps<typeof labelVariants>
 >(({ className, ...props }, ref) => (
-	<LabelPrimitive.Root ref={ref} className={MergeClasses(labelVariants(), className)} {...props} />
+	<LabelPrimitive.Root ref={ref} className={mergeClasses(labelVariants(), className)} {...props} />
 ));
 Label.displayName = LabelPrimitive.Root.displayName;
 

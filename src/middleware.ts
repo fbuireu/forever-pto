@@ -12,6 +12,7 @@ const REQUIRED_PARAMS: RequiredParamsMap = {
 	country: async (request: NextRequest) => await detectLocation(request),
 	year: () => DEFAULT_SEARCH_PARAMS.YEAR,
 	ptoDays: () => DEFAULT_SEARCH_PARAMS.PTO_DAYS,
+	allowPastDays: () => DEFAULT_SEARCH_PARAMS.ALLOW_PAST_DAYS,
 };
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {

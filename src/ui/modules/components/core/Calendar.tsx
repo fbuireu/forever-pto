@@ -1,6 +1,6 @@
 "use client";
 
-import { MergeClasses } from '@shared/ui/utils/mergeClasses';
+import { mergeClasses } from '@shared/ui/utils/mergeClasses';
 import type * as React from 'react';
 import { DayPicker } from 'react-day-picker';
 import { buttonVariants } from '@modules/components/core/Button';
@@ -11,7 +11,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
 	return (
 		<DayPicker
 			showOutsideDays={showOutsideDays}
-			className={MergeClasses("p-3", className)}
+			className={mergeClasses("p-3", className)}
 			classNames={{
 				months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
 				month: "space-y-4 text-center",
@@ -25,12 +25,12 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
 				weekdays: "flex",
 				weekday: "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]",
 				week: "flex w-full mt-2",
-				day: MergeClasses(
+				day: mergeClasses(
 					props.mode === "range"
 						? "[&:has(>.day-range-end)]:rounded-r-md [&:has(>.day-range-start)]:rounded-l-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md"
 						: "[&:has([aria-selected])]:rounded-md",
 				),
-				day_button: MergeClasses(
+				day_button: mergeClasses(
 					buttonVariants({ variant: "ghost" }),
 					"h-8 w-8 p-0 font-normal aria-selected:opacity-100",
 				),

@@ -1,7 +1,7 @@
 "use client"
 
 import * as TabsPrimitive from "@radix-ui/react-tabs";
-import { MergeClasses } from '@shared/ui/utils/mergeClasses';
+import { mergeClasses } from '@shared/ui/utils/mergeClasses';
 import type * as React from 'react';
 
 function Tabs({
@@ -11,7 +11,7 @@ function Tabs({
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
-      className={MergeClasses("flex flex-col gap-2", className)}
+      className={mergeClasses("flex flex-col gap-2", className)}
       {...props}
     />
   )
@@ -24,7 +24,7 @@ function TabsList({
   return (
     <TabsPrimitive.List
       data-slot="tabs-list"
-      className={MergeClasses(
+      className={mergeClasses(
         "bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-1",
         className
       )}
@@ -40,7 +40,7 @@ function TabsTrigger({
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
-      className={MergeClasses(
+      className={mergeClasses(
         "data-[state=active]:bg-background data-[state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring inline-flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
@@ -56,7 +56,7 @@ function TabsContent({
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
-      className={MergeClasses("flex-1 outline-none", className)}
+      className={mergeClasses("flex-1 outline-none", className)}
       {...props}
     />
   )

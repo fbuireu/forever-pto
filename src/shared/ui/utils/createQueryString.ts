@@ -16,9 +16,6 @@ export function createQueryString({ value, type, searchParams }: CreateQueryStri
 			params.set(type, value);
 			params.delete("region");
 			break;
-		case "allowPastDays":
-			params.set(type, String(!value));
-			break;
 		default:
 			params.set(type, value);
 	}

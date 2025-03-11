@@ -60,7 +60,7 @@ interface BlockOpportunity {
 interface CalendarListProps {
 	year: number;
 	ptoDays: number;
-	allowPastDays: boolean;
+	allowPastDays: string;
 	holidays: HolidayDTO[];
 }
 
@@ -264,7 +264,7 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays }:
 		});
 
 		// Filtrar días pasados si es necesario
-		if (!allowPastDays) {
+		if (allowPastDays==="false") {
 			allDays = allDays.filter((day) => day >= today);
 		}
 

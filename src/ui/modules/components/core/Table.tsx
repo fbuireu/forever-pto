@@ -1,23 +1,23 @@
-import { MergeClasses } from '@shared/ui/utils/mergeClasses';
+import { mergeClasses } from '@shared/ui/utils/mergeClasses';
 import * as React from 'react';
 
 const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
 	({ className, ...props }, ref) => (
 		<div className="relative w-full overflow-auto">
-			<table ref={ref} className={MergeClasses("w-full caption-bottom text-sm", className)} {...props} />
+			<table ref={ref} className={mergeClasses("w-full caption-bottom text-sm", className)} {...props} />
 		</div>
 	),
 );
 Table.displayName = "Table";
 
 const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
-	({ className, ...props }, ref) => <thead ref={ref} className={MergeClasses("[&_tr]:border-b", className)} {...props} />,
+	({ className, ...props }, ref) => <thead ref={ref} className={mergeClasses("[&_tr]:border-b", className)} {...props} />,
 );
 TableHeader.displayName = "TableHeader";
 
 const TableBody = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
 	({ className, ...props }, ref) => (
-		<tbody ref={ref} className={MergeClasses("[&_tr:last-child]:border-0", className)} {...props} />
+		<tbody ref={ref} className={mergeClasses("[&_tr:last-child]:border-0", className)} {...props} />
 	),
 );
 TableBody.displayName = "TableBody";
@@ -26,7 +26,7 @@ const TableFooter = React.forwardRef<HTMLTableSectionElement, React.HTMLAttribut
 	({ className, ...props }, ref) => (
 		<tfoot
 			ref={ref}
-			className={MergeClasses("border-t bg-muted/50 font-medium last:[&>tr]:border-b-0", className)}
+			className={mergeClasses("border-t bg-muted/50 font-medium last:[&>tr]:border-b-0", className)}
 			{...props}
 		/>
 	),
@@ -37,7 +37,7 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
 	({ className, ...props }, ref) => (
 		<tr
 			ref={ref}
-			className={MergeClasses("border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", className)}
+			className={mergeClasses("border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", className)}
 			{...props}
 		/>
 	),
@@ -48,7 +48,7 @@ const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<
 	({ className, ...props }, ref) => (
 		<th
 			ref={ref}
-			className={MergeClasses(
+			className={mergeClasses(
 				"h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
 				className,
 			)}
@@ -62,7 +62,7 @@ const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<
 	({ className, ...props }, ref) => (
 		<td
 			ref={ref}
-			className={MergeClasses(
+			className={mergeClasses(
 				"p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
 				className,
 			)}
@@ -74,7 +74,7 @@ TableCell.displayName = "TableCell";
 
 const TableCaption = React.forwardRef<HTMLTableCaptionElement, React.HTMLAttributes<HTMLTableCaptionElement>>(
 	({ className, ...props }, ref) => (
-		<caption ref={ref} className={MergeClasses("mt-4 text-sm text-muted-foreground", className)} {...props} />
+		<caption ref={ref} className={mergeClasses("mt-4 text-sm text-muted-foreground", className)} {...props} />
 	),
 );
 TableCaption.displayName = "TableCaption";

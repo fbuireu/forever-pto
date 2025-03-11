@@ -4,7 +4,7 @@ import type { CountryDTO } from '@application/dto/country/types';
 import type { RegionDTO } from '@application/dto/region/types';
 import { Popover, PopoverTrigger } from '@radix-ui/react-popover';
 import { createQueryString } from '@shared/ui/utils/createQueryString';
-import { MergeClasses } from '@shared/ui/utils/mergeClasses';
+import { mergeClasses } from '@shared/ui/utils/mergeClasses';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type React from 'react';
@@ -75,7 +75,7 @@ export const Combobox = ({
 						variant="outline"
 						disabled={disabled}
 						aria-expanded={isOpen}
-						className={MergeClasses("w-full justify-between", className)}
+						className={mergeClasses("w-full justify-between", className)}
 					>
 						{selectedOption ? (
 							<div className="flex items-center gap-2">
@@ -108,7 +108,7 @@ export const Combobox = ({
 											<span>{option.label}</span>
 										</div>
 										<Check
-											className={MergeClasses("ml-auto h-4 w-4", value === option.value ? "opacity-100" : "opacity-0")}
+											className={mergeClasses("ml-auto h-4 w-4", value === option.value ? "opacity-100" : "opacity-0")}
 										/>
 									</CommandItem>
 								))}
