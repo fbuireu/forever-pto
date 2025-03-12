@@ -6,7 +6,7 @@ import { useDebouncedCallback } from '@ui/hooks/useDebounceCallback';
 import { Minus, Plus } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type React from 'react';
-import { startTransition, useCallback } from 'react';
+import { startTransition, useCallback, useState } from 'react';
 import { Label } from '@modules/components/core/Label';
 import { Button } from '@modules/components/core/Button';
 import { Input } from '../../core/Input';
@@ -19,10 +19,13 @@ export const PtoDaysInput = ({ ptoDays }: PtoDaysInputProps) => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
-	const daysValue = Number(ptoDays);
+	const initialDaysValue = Number(ptoDays);
+	const [localDaysValue, setLocalDaysValue] = useState(initialDaysValue);
 
 	const updateQueryString = useCallback(
 			(newValue: number) => {
+				setLocalDaysValue(newValue);
+
 				const query = createQueryString({
 					type: "ptoDays",
 					value: String(newValue),
@@ -37,19 +40,21 @@ export const PtoDaysInput = ({ ptoDays }: PtoDaysInputProps) => {
 	const updateQueryDebounced = useDebouncedCallback((value: number) => updateQueryString(value), 200);
 
 	const decrementDays = () => {
-		if (daysValue <= 0) return;
-		updateQueryString(daysValue - 1);
+		if (localDaysValue <= 0) return;
+		updateQueryString(localDaysValue - 1);
 	};
 
 	const incrementDays = () => {
-		updateQueryString(daysValue + 1);
+		updateQueryString(localDaysValue + 1);
 	};
 
 	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const newValue = Number(event.currentTarget.value);
 		if (!Number.isNaN(newValue) && newValue >= 0) {
+			setLocalDaysValue(newValue);
 			updateQueryDebounced(newValue);
 		} else if (event.currentTarget.value === "") {
+			setLocalDaysValue(0);
 			updateQueryDebounced(0);
 		}
 	};
@@ -64,7 +69,7 @@ export const PtoDaysInput = ({ ptoDays }: PtoDaysInputProps) => {
 						size="icon"
 						className="h-8 w-8 shrink-0 rounded-full"
 						onClick={decrementDays}
-						disabled={daysValue <= 0}
+						disabled={localDaysValue <= 0}
 				>
 					<Minus />
 					<span className="sr-only">Decrease</span>
@@ -72,7 +77,7 @@ export const PtoDaysInput = ({ ptoDays }: PtoDaysInputProps) => {
 				<Input
 						id="available-days"
 						type="number"
-						value={daysValue}
+						value={localDaysValue}
 						onChange={handleInputChange}
 						className="w-20"
 						min="0"

@@ -3,7 +3,7 @@
 import type { SearchParams } from '@app/page';
 import { createQueryString } from '@shared/ui/utils/createQueryString';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { startTransition } from 'react';
+import { startTransition, useState } from 'react';
 import { Label } from '../../core/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../core/Select';
 
@@ -16,11 +16,13 @@ export const YearSelect = ({ year }: YearSelectProps) => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
-	const currentYear = Number(year);
+	const initialYear = Number(year);
+	const [localYear, setLocalYear] = useState(initialYear.toString());
 
 	const handleYearChange = (value: string) => {
-		const newYear = Number(value);
+		setLocalYear(value);
 
+		const newYear = Number(value);
 		const query = createQueryString({
 			type: "year",
 			value: String(newYear),
@@ -35,7 +37,7 @@ export const YearSelect = ({ year }: YearSelectProps) => {
 	return (
 			<div className="flex items-center gap-2">
 				<Label htmlFor="year-select" className="whitespace-nowrap" />
-				<Select value={currentYear.toString()} onValueChange={handleYearChange}>
+				<Select value={localYear} onValueChange={handleYearChange}>
 					<SelectTrigger id="year-select" className="w-full">
 						<SelectValue placeholder="Year" />
 					</SelectTrigger>

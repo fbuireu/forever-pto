@@ -29,8 +29,8 @@ const HolidaysSummary: React.FC<HolidaysSummaryProps> = ({ holidays }) => {
 		<div className="mb-6">
 		<Tabs defaultValue="national-holidays" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="national-holidays" disabled={regionalHolidays.length > 0}>Festivos Nacionales</TabsTrigger>
-        <TabsTrigger value="regional-holidays" disabled={nationalHolidays.length > 0}>Festivos Regionales</TabsTrigger>
+        <TabsTrigger value="national-holidays" disabled={!nationalHolidays.length}>Festivos Nacionales</TabsTrigger>
+        <TabsTrigger value="regional-holidays" disabled={!regionalHolidays.length}>Festivos Regionales</TabsTrigger>
       </TabsList>
       <TabsContent value="national-holidays">
 			<Accordion type="single" collapsible className="rounded-md border shadow-xs">
