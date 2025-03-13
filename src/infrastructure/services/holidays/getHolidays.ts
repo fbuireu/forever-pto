@@ -4,6 +4,7 @@ import { getNationalHolidays } from '@infrastructure/services/holidays/utils/get
 import { getRegionalHolidays } from '@infrastructure/services/holidays/utils/getRegionalHolidays';
 import { getUserLanguage } from '@shared/infrastructure/services/utils/getUserLanguage';
 import { getUserTimezone } from '@shared/infrastructure/services/utils/getUserTimezone';
+import { cookies } from 'next/headers';
 
 interface GetHolidaysParams {
 	year: string;
@@ -12,7 +13,7 @@ interface GetHolidaysParams {
 	monthsToShow: string;
 }
 
-export function getHolidays({ year, country, region, monthsToShow }: GetHolidaysParams): HolidayDTO[] {
+export async function getHolidays({ year, country, region, monthsToShow }: GetHolidaysParams): Promise<HolidayDTO[]> {
 	if (!country) {
 		return [];
 	}
@@ -22,6 +23,7 @@ export function getHolidays({ year, country, region, monthsToShow }: GetHolidays
 			languages: getUserLanguage(),
 			timezone: getUserTimezone(),
 		};
+		const isPremium = (await cookies()).get("premium")?.value === "true";
 
 		const nationalHolidays = getNationalHolidays({
 			country,
@@ -38,7 +40,7 @@ export function getHolidays({ year, country, region, monthsToShow }: GetHolidays
 		return holidayDTO
 			.create({
 				raw: [...nationalHolidays, ...regionalHolidays],
-				configuration: { year: Number(year), countryCode: country, monthsToShow: Number(monthsToShow) },
+				configuration: { year: Number(year), countryCode: country, monthsToShow: isPremium ? Number(monthsToShow) : 1 },
 			})
 			.sort((a, b) => a.date.getTime() - b.date.getTime());
 	} catch (error) {
