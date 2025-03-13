@@ -6,7 +6,7 @@ interface CountryComboboxProps {
 	country: SearchParams["country"];
 }
 
-export default async function CountryCombobox({ country }: CountryComboboxProps) {
+export default async function Countries({ country }: CountryComboboxProps) {
 	const countries = getCountries();
 
 	return (

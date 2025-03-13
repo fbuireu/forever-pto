@@ -8,7 +8,7 @@ interface RegionComboboxProps {
 	region: SearchParams["region"];
 }
 
-export default async function RegionCombobox({ country, region }: RegionComboboxProps) {
+export default async function Regions({ country, region }: RegionComboboxProps) {
 	const countries = getCountries();
 	const userCountry = countries.find(({ value }) => value.toLowerCase() === country);
 	const regions = await getRegions(userCountry?.value);

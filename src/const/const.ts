@@ -15,6 +15,7 @@ export const DEFAULT_SEARCH_PARAMS: Record<CapitalizeKeys<string>, string> = {
 	YEAR: String(new Date().getFullYear()),
 	PTO_DAYS: "22",
 	ALLOW_PAST_DAYS: "false",
+	MONTHS_TO_SHOW: "1",
 };
 
 export const DEFAULT_SEO_PARAMS: CapitalizeKeys<Metadata> = {

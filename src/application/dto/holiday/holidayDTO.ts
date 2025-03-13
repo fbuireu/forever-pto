@@ -8,17 +8,17 @@ import type { BaseDTO } from '@shared/application/dto/baseDTO';
 type HolidayDTOConfiguration = {
 	year: number;
 	countryCode: string;
+	monthsToShow: number;
 };
 
 export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOConfiguration> = {
 	create: ({ raw, configuration }) => {
-		const { year, countryCode } = configuration as HolidayDTOConfiguration;
+		const { year, countryCode, monthsToShow } = configuration as HolidayDTOConfiguration;
 		const targetYears = [year, year + 1];
-		const monthsToShow = 13;
 
 		const nationalHolidays = raw
 			.filter((holiday) => isInTargetYear({ holiday, targetYears }))
-			.filter((holiday) => shouldIncludeHoliday({ holiday, monthsToShow, year }))
+			.filter((holiday) => shouldIncludeHoliday({ holiday, monthsToShow: monthsToShow + 12, year }))
 			.filter((holiday) => holiday.type === "public" && !holiday.location);
 
 		const nationalDateSet = new Set(nationalHolidays.map((holiday) => getDateKey(new Date(holiday.date))));
@@ -26,7 +26,7 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOConfigura
 
 		const regionalHolidays = raw
 			.filter((holiday) => isInTargetYear({ holiday, targetYears }))
-			.filter((holiday) => shouldIncludeHoliday({ holiday, monthsToShow, year }))
+			.filter((holiday) => shouldIncludeHoliday({ holiday, monthsToShow: monthsToShow + 12, year }))
 			.filter((holiday) => holiday.type === "public" && holiday.location)
 			.filter((holiday) => {
 				const dateKey = getDateKey(new Date(holiday.date));

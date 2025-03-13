@@ -9,9 +9,10 @@ interface GetHolidaysParams {
 	year: string;
 	country?: string;
 	region?: string;
+	monthsToShow: string;
 }
 
-export function getHolidays({ year, country, region }: GetHolidaysParams): HolidayDTO[] {
+export function getHolidays({ year, country, region, monthsToShow }: GetHolidaysParams): HolidayDTO[] {
 	if (!country) {
 		return [];
 	}
@@ -37,7 +38,7 @@ export function getHolidays({ year, country, region }: GetHolidaysParams): Holid
 		return holidayDTO
 			.create({
 				raw: [...nationalHolidays, ...regionalHolidays],
-				configuration: { year: Number(year), countryCode: country },
+				configuration: { year: Number(year), countryCode: country, monthsToShow: Number(monthsToShow) },
 			})
 			.sort((a, b) => a.date.getTime() - b.date.getTime());
 	} catch (error) {

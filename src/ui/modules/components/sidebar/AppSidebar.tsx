@@ -1,28 +1,29 @@
 import type { SearchParams } from '@app/page';
 
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubItem,
+} from '@modules/components/core/Sidebar';
+import { AllowPastDays } from '@modules/components/sidebar/atoms/AllowPastDays';
+import Countries from '@modules/components/sidebar/atoms/Countries';
+import { GearSettings } from '@modules/components/sidebar/atoms/GearSettings';
+import { PtoDays } from '@modules/components/sidebar/atoms/PtoDays';
+import Regions from '@modules/components/sidebar/atoms/Regions';
+import { ThemeToggle } from '@modules/components/sidebar/atoms/ThemeToggle';
+import { Years } from '@modules/components/sidebar/atoms/Years';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { Calendar, CalendarDays, type LucideIcon, MapPin, MapPinned, ToggleLeftIcon } from 'lucide-react';
 import type React from 'react';
-import { PtoDaysInput } from '@modules/components/sidebar/atoms/PtoDaysInput';
-import CountryCombobox from '@modules/components/sidebar/atoms/CountryCombobox';
-import RegionCombobox from '@modules/components/sidebar/atoms/RegionCombobox';
-import { YearSelect } from '@modules/components/sidebar/atoms/YearSelect';
-import { GearSettings } from '@modules/components/sidebar/atoms/GearSettings';
-import { ThemeToggle } from '@modules/components/sidebar/atoms/ThemeToggle';
-import {
-	Sidebar,
-			SidebarContent,
-			SidebarFooter,
-			SidebarGroup,
-			SidebarGroupContent,
-			SidebarHeader,
-			SidebarMenu,
-			SidebarMenuButton,
-			SidebarMenuItem,
-			SidebarMenuSub,
-			SidebarMenuSubItem,
-}  from '@modules/components/core/Sidebar';
-import { AllowPastDaysSwitch } from '@modules/components/sidebar/atoms/AllowPastDaysSwitch';
+import { MonthsToShow } from './atoms/MonthsToShow';
 
 type AppSidebarProps = SearchParams;
 
@@ -32,32 +33,37 @@ type MenuItem = {
 	renderComponent?: () => React.ReactNode;
 };
 
-export function AppSidebar({ country, region, ptoDays, year, allowPastDays }: AppSidebarProps) {
+export function AppSidebar({ country, region, ptoDays, year, allowPastDays, monthsToShow }: AppSidebarProps) {
 	const items: MenuItem[] = [
 		{
 			title: "PTO days",
 			icon: CalendarDays,
-			renderComponent: () => <PtoDaysInput ptoDays={ptoDays} />,
+			renderComponent: () => <PtoDays ptoDays={ptoDays} />,
 		},
 		{
 			title: "Country",
 			icon: MapPin,
-			renderComponent: () => <CountryCombobox country={country} />,
+			renderComponent: () => <Countries country={country} />,
 		},
 		{
 			title: "Region",
 			icon: MapPinned,
-			renderComponent: () => <RegionCombobox country={country} region={region} />,
+			renderComponent: () => <Regions country={country} region={region} />,
 		},
 		{
 			title: "Year",
 			icon: Calendar,
-			renderComponent: () => <YearSelect year={year} />,
+			renderComponent: () => <Years year={year} />,
 		},
 		{
 			title: "Allow Past Days",
 			icon: ToggleLeftIcon,
-			 renderComponent: () => <AllowPastDaysSwitch allowPastDays={allowPastDays} />
+			renderComponent: () => <AllowPastDays allowPastDays={allowPastDays} />,
+		},
+		{
+			title: "Months to Show",
+			icon: ToggleLeftIcon,
+			renderComponent: () => <MonthsToShow monthsToShow={monthsToShow} />,
 		},
 	];
 

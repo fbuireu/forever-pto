@@ -11,6 +11,7 @@ export interface SearchParams {
 	year: string;
 	ptoDays: string;
 	allowPastDays: string;
+	monthsToShow: string;
 }
 
 interface ForeverPtoProps {
@@ -18,19 +19,27 @@ interface ForeverPtoProps {
 }
 
 export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
-	const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS } = DEFAULT_SEARCH_PARAMS;
+	const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS, MONTHS_TO_SHOW } = DEFAULT_SEARCH_PARAMS;
 	const {
 		country,
 		region,
 		year = YEAR,
 		ptoDays = PTO_DAYS,
 		allowPastDays = ALLOW_PAST_DAYS,
+		monthsToShow = MONTHS_TO_SHOW,
 	} = await searchParams;
-	const holidays = getHolidays({ country, region, year });
+	const holidays = getHolidays({ country, region, year, monthsToShow });
 
 	return (
 		<SidebarProvider>
-			<AppSidebar country={country} ptoDays={ptoDays} region={region} year={year} allowPastDays={allowPastDays} />
+			<AppSidebar
+				country={country}
+				ptoDays={ptoDays}
+				region={region}
+				year={year}
+				allowPastDays={allowPastDays}
+				monthsToShow={monthsToShow}
+			/>
 			<SidebarTrigger />
 			<main>
 				<div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-8">
@@ -41,6 +50,7 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 						ptoDays={Number(ptoDays)}
 						allowPastDays={allowPastDays}
 						holidays={holidays}
+						monthsToShow={Number(monthsToShow)}
 					/>
 					<footer className="mt-8 text-center text-sm text-muted-foreground">
 						<div className="mb-2 flex flex-wrap justify-center gap-4">
