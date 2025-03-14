@@ -119,3 +119,4 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 29- Refine styles (hover blocks, etc)
 // 30- Improve way of handling premium features (right now monthsToShow are set to 1 but once it's present, it can be changed in the URL)
 // 31- Add form shadcn and zod
+// 32- Add safeguard to avoid rerenders when same data is passed etc
