@@ -3,10 +3,10 @@ import type { RawHoliday } from '@application/dto/holiday/types';
 interface ShouldIncludeHolidayParams {
 	holiday: RawHoliday;
 	year: number;
-	monthsToShow: number;
+	carryOverMonths: number;
 }
 
-export function shouldIncludeHoliday({ holiday, year, monthsToShow }: ShouldIncludeHolidayParams): boolean {
+export function shouldIncludeHoliday({ holiday, year, carryOverMonths }: ShouldIncludeHolidayParams): boolean {
 	const date = new Date(holiday.date);
 	const holidayYear = date.getFullYear();
 	const holidayMonth = date.getMonth();
@@ -16,7 +16,7 @@ export function shouldIncludeHoliday({ holiday, year, monthsToShow }: ShouldIncl
 	}
 
 	if (holidayYear === year + 1) {
-		const monthsFromNextYear = monthsToShow - 12;
+		const monthsFromNextYear = carryOverMonths - 12;
 		return holidayMonth < monthsFromNextYear;
 	}
 

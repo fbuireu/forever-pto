@@ -7,11 +7,11 @@ import { startTransition, useState } from 'react';
 import { Label } from '../../core/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../core/Select';
 
-interface YearSelectProps {
+interface YearsProps {
 	year: SearchParams["year"];
 }
 
-export const Years = ({ year: yearProps }: YearSelectProps) => {
+export const Years = ({ year: yearProps }: YearsProps) => {
 	const yearOptions = Array.from({ length: 11 }, (_, i) => new Date().getFullYear() - 5 + i);
 	const router = useRouter();
 	const pathname = usePathname();

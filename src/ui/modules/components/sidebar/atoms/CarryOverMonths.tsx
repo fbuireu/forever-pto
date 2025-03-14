@@ -11,16 +11,16 @@ import { InfoIcon } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { startTransition, useState } from 'react';
 
-interface MonthsToShowSliderProps {
-	monthsToShow: SearchParams["monthsToShow"];
+interface CarryOverMonthsProps {
+	carryOverMonths: SearchParams["carryOverMonths"];
 }
 
-export const MonthsToShow = ({ monthsToShow }: MonthsToShowSliderProps) => {
+export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const { isPremium } = usePremium();
-	const [value, setValue] = useState([Number(monthsToShow)]);
+	const [value, setValue] = useState([Number(carryOverMonths)]);
 	const maxValue = isPremium ? 12 : 1;
 
 	const handleValueChange = (newValue: number[]) => {
@@ -31,7 +31,7 @@ export const MonthsToShow = ({ monthsToShow }: MonthsToShowSliderProps) => {
 		setValue(newValue);
 
 		const query = createQueryString({
-			type: "monthsToShow",
+			type: "carryOverMonths",
 			value: String(newValue[0]),
 			searchParams,
 		});

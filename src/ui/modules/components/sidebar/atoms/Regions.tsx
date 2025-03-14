@@ -3,12 +3,12 @@ import { getCountries } from '@infrastructure/services/country/getCountries';
 import { getRegions } from '@infrastructure/services/regions/getRegions';
 import { Combobox } from '@modules/components/core/Combobox';
 
-interface RegionComboboxProps {
+interface RegionProps {
 	country: SearchParams["country"];
 	region: SearchParams["region"];
 }
 
-export default async function Regions({ country, region }: RegionComboboxProps) {
+export default async function Regions({ country, region }: RegionProps) {
 	const countries = getCountries();
 	const userCountry = countries.find(({ value }) => value.toLowerCase() === country);
 	const regions = await getRegions(userCountry?.value);

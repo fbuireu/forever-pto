@@ -11,11 +11,11 @@ import type React from 'react';
 import { startTransition, useCallback, useState } from 'react';
 import { Input } from '../../core/Input';
 
-interface PtoDaysInputProps {
+interface PtoDaysProps {
 	ptoDays: SearchParams["ptoDays"];
 }
 
-export const PtoDays = ({ ptoDays }: PtoDaysInputProps) => {
+export const PtoDays = ({ ptoDays }: PtoDaysProps) => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();

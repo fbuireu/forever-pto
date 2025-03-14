@@ -23,7 +23,7 @@ import { Years } from '@modules/components/sidebar/atoms/Years';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { Calendar, CalendarDays, type LucideIcon, MapPin, MapPinned, ToggleLeftIcon } from 'lucide-react';
 import type React from 'react';
-import { MonthsToShow } from './atoms/MonthsToShow';
+import { CarryOverMonths } from 'src/ui/modules/components/sidebar/atoms/CarryOverMonths';
 
 type AppSidebarProps = SearchParams;
 
@@ -63,7 +63,7 @@ export function AppSidebar({ country, region, ptoDays, year, allowPastDays, mont
 		{
 			title: "Months to Show",
 			icon: ToggleLeftIcon,
-			renderComponent: () => <MonthsToShow monthsToShow={monthsToShow} />,
+			renderComponent: () => <CarryOverMonths monthsToShow={monthsToShow} />,
 		},
 	];
 

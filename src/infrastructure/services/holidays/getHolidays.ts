@@ -10,10 +10,10 @@ interface GetHolidaysParams {
 	year: string;
 	country?: string;
 	region?: string;
-	monthsToShow: string;
+	carryOverMonths: string;
 }
 
-export async function getHolidays({ year, country, region, monthsToShow }: GetHolidaysParams): Promise<HolidayDTO[]> {
+export async function getHolidays({ year, country, region, carryOverMonths }: GetHolidaysParams): Promise<HolidayDTO[]> {
 	if (!country) {
 		return [];
 	}
@@ -40,7 +40,7 @@ export async function getHolidays({ year, country, region, monthsToShow }: GetHo
 		return holidayDTO
 			.create({
 				raw: [...nationalHolidays, ...regionalHolidays],
-				configuration: { year: Number(year), countryCode: country, monthsToShow: isPremium ? Number(monthsToShow) : 1 },
+				configuration: { year: Number(year), countryCode: country, carryOverMonths: isPremium ? Number(carryOverMonths) : 1 },
 			})
 			.sort((a, b) => a.date.getTime() - b.date.getTime());
 	} catch (error) {

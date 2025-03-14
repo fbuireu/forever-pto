@@ -13,7 +13,7 @@ export interface SearchParams {
 	year: string;
 	ptoDays: string;
 	allowPastDays: string;
-	monthsToShow: string;
+	carryOverMonths: string;
 }
 
 interface ForeverPtoProps {
@@ -21,16 +21,16 @@ interface ForeverPtoProps {
 }
 
 export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
-	const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS, MONTHS_TO_SHOW } = DEFAULT_SEARCH_PARAMS;
+	const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS, CARRY_OVER_MONTHS } = DEFAULT_SEARCH_PARAMS;
 	const {
 		country,
 		region,
 		year = YEAR,
 		ptoDays = PTO_DAYS,
 		allowPastDays = ALLOW_PAST_DAYS,
-		monthsToShow = MONTHS_TO_SHOW,
+		carryOverMonths = CARRY_OVER_MONTHS,
 	} = await searchParams;
-	const holidays = await getHolidays({ country, region, year, monthsToShow });
+	const holidays = await getHolidays({ country, region, year, carryOverMonths });
 	const isPremium = (await cookies()).get("premium")?.value === "true";
 
 	return (
@@ -42,7 +42,7 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 					region={region}
 					year={year}
 					allowPastDays={allowPastDays}
-					monthsToShow={monthsToShow}
+					carryOverMonths={carryOverMonths}
 				/>
 				<SidebarTrigger />
 				<main>
@@ -54,7 +54,7 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 							ptoDays={Number(ptoDays)}
 							allowPastDays={allowPastDays}
 							holidays={holidays}
-							monthsToShow={Number(monthsToShow)}
+							carryOverMonths={Number(carryOverMonths)}
 						/>
 						<footer className="mt-8 text-center text-sm text-muted-foreground">
 							<div className="mb-2 flex flex-wrap justify-center gap-4">
@@ -119,4 +119,3 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 29- Refine styles (hover blocks, etc)
 // 30- Improve way of handling premium features (right now monthsToShow are set to 1 but once it's present, it can be changed in the URL)
 // 31- Add form shadcn and zod
-// 32- Change to carryovermonths

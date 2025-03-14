@@ -2,11 +2,11 @@ import type { SearchParams } from '@app/page';
 import { getCountries } from '@infrastructure/services/country/getCountries';
 import { Combobox } from '@modules/components/core/Combobox';
 
-interface CountryComboboxProps {
+interface CountriesProps {
 	country: SearchParams["country"];
 }
 
-export default async function Countries({ country }: CountryComboboxProps) {
+export default async function Countries({ country }: CountriesProps) {
 	const countries = getCountries();
 
 	return (

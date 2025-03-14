@@ -13,14 +13,14 @@ const REQUIRED_PARAMS: RequiredParamsMap = {
 	year: () => DEFAULT_SEARCH_PARAMS.YEAR,
 	ptoDays: () => DEFAULT_SEARCH_PARAMS.PTO_DAYS,
 	allowPastDays: () => DEFAULT_SEARCH_PARAMS.ALLOW_PAST_DAYS,
-	monthsToShow: async (request: NextRequest) => {
+	carryOverMonths: async (request: NextRequest) => {
 		const isPremium = request.cookies.get("premium")?.value === "true";
 
 		if (!isPremium) {
 			return "1";
 		}
 
-		return DEFAULT_SEARCH_PARAMS.MONTHS_TO_SHOW;
+		return DEFAULT_SEARCH_PARAMS.CARRY_OVER_MONTHS;
 	},
 };
 

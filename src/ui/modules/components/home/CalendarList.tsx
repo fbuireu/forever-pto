@@ -53,10 +53,10 @@ interface CalendarListProps {
 	ptoDays: number;
 	allowPastDays: string;
 	holidays: HolidayDTO[];
-	monthsToShow: number; // Número de meses del año siguiente a mostrar
+	carryOverMonths: number; // Número de meses del año siguiente a mostrar
 }
 
-export default function CalendarList({ year, ptoDays, allowPastDays, holidays, monthsToShow }: CalendarListProps) {
+export default function CalendarList({ year, ptoDays, allowPastDays, holidays, carryOverMonths }: CalendarListProps) {
 	const [selectedDays, setSelectedDays] = useState<Date[]>([]);
 	const [suggestedDays, setSuggestedDays] = useState<Date[]>([]);
 	const [alternativeBlocks, setAlternativeBlocks] = useState<Record<string, BlockOpportunity[]>>({});
@@ -76,10 +76,10 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays, m
 
 		// Añadir un mes adicional para mostrar siempre el primer mes del año siguiente
 		// Esto asegura que se muestre enero del año siguiente para la planificación
-		const totalMonths = monthsToShow + 12;
+		const totalMonths = carryOverMonths + 12;
 
 		return Array.from({ length: totalMonths }, (_, i) => addMonths(start, i));
-	}, [year, monthsToShow]);
+	}, [year, carryOverMonths]);
 
 	// Memoizar el mapa de días festivos para búsquedas rápidas O(1)
 	const holidaysMap = useMemo(() => {

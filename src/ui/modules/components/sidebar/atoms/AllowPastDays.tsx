@@ -9,11 +9,11 @@ import { Label } from '../../core/Label';
 import { Switch } from '../../core/Switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../core/Tooltip';
 
-interface AllowPastDaysSwitchProps {
+interface AllowPastDaysProps {
 	allowPastDays: SearchParams["allowPastDays"];
 }
 
-export const AllowPastDays = ({ allowPastDays }: AllowPastDaysSwitchProps) => {
+export const AllowPastDays = ({ allowPastDays }: AllowPastDaysProps) => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
