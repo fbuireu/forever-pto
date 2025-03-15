@@ -85,7 +85,6 @@
 		@apply bg-background text-foreground;
 	}
 
-
 	:root {
 		--background: 0 0% 100%;
 		--foreground: 240 10% 3.9%;
@@ -166,15 +165,15 @@
 @layer components {
 	/* Estilos para días con atributos de datos */
 	[data-suggested="true"] {
-		@apply bg-green-100 dark:bg-green-900/30;
+		@apply bg-green-300 dark:bg-green-900/30;
 	}
 
 	[data-suggested="true"][data-hovered-block="true"] {
-		@apply bg-green-200 dark:bg-green-800/50;
+		@apply bg-green-400 dark:bg-green-800/50;
 	}
 
 	[data-alternative="true"] {
-		@apply bg-purple-100 dark:bg-purple-900/30;
+		@apply bg-purple-300 dark:bg-purple-900/30;
 	}
 
 	/* Agrupación de posiciones con formas similares */

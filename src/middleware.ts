@@ -30,7 +30,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 	const requiredParamKeys = Object.keys(REQUIRED_PARAMS) as Array<keyof SearchParams>;
 
-	const missingParams = requiredParamKeys.filter((param) => !searchParams.has(param as string));
+	const missingParams = requiredParamKeys.filter((param) => !searchParams.has(param));
 
 	if (missingParams.length === 0) {
 		return NextResponse.next();

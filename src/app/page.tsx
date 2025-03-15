@@ -54,7 +54,7 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 							ptoDays={Number(ptoDays)}
 							allowPastDays={allowPastDays}
 							holidays={holidays}
-							carryOverMonths={Number(carryOverMonths)}
+							carryOverMonths={isPremium ? Number(carryOverMonths) : 1}
 						/>
 						<footer className="mt-8 text-center text-sm text-muted-foreground">
 							<div className="mb-2 flex flex-wrap justify-center gap-4">
