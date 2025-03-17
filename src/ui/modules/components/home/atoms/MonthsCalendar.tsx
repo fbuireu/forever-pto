@@ -107,8 +107,6 @@ export const MonthCalendar = ({
 					},
 				}}
 			/>
-
-			{/* Mostrar sugerencias solo si hay días PTO disponibles y sugerencias para este mes */}
 			{ptoDays > 0 && suggestedDays.length > 0 && getSuggestedDaysForMonth(month).length > 0 && (
 				<div>
 					{getMonthSummary(month) && (

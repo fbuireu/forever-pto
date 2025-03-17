@@ -51,7 +51,6 @@ export const PremiumLock = ({
 		setIsSubmitting(true);
 
 		try {
-			// Simulamos un retraso para la demo (en producción puedes quitar esto)
 			await new Promise((resolve) => setTimeout(resolve, 1500));
 
 			await activatePremium();

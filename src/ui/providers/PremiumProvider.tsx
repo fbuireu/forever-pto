@@ -6,7 +6,7 @@ import {
     deactivatePremium as deactivatePremiumAction,
 } from '@application/actions/premium';
 import { usePathname } from 'next/navigation';
-import React, { createContext, ReactNode, useContext, useEffect, useState, useTransition } from 'react';
+import { createContext, type ReactNode, useContext, useEffect, useState, useTransition } from 'react';
 
 interface PremiumContextType {
 	isPremium: boolean;

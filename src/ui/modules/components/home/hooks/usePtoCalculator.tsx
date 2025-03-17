@@ -1,4 +1,3 @@
-// hooks/usePtoCalculator.ts
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import {
     addDays,
@@ -18,7 +17,6 @@ import {
 import { es } from 'date-fns/locale';
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'; // Constantes
 
-// Constantes
 const MAX_BLOCK_SIZE = 5;
 const MAX_ALTERNATIVES = 10;
 const MAX_CANDIDATE_ALTERNATIVES = 50;
@@ -759,7 +757,6 @@ export function usePTOCalculator({ year, ptoDays, allowPastDays, holidays, carry
 		[ptoDays, suggestedDays, getSuggestedDaysForMonth, calculateEffectiveDays],
 	);
 
-	// Retornar todos los valores y funciones necesarias
 	return {
 		selectedDays,
 		suggestedDays,

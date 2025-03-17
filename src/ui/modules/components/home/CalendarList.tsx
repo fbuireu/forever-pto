@@ -1,10 +1,10 @@
 "use client";
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { MonthCalendar } from '@modules/components/home/MonthsCalendar';
+import { MonthCalendar } from '@modules/components/home/atoms/MonthsCalendar';
 import { usePTOCalculator } from '@modules/components/home/hooks/usePtoCalculator';
-import { getDateKey } from '@modules/components/home/utils/day';
 import React, { memo } from 'react';
+import { areArraysEqual } from '@modules/components/home/utils/arrayIsEqual';
 
 interface CalendarListProps {
 	year: number;
@@ -14,44 +14,6 @@ interface CalendarListProps {
 	carryOverMonths: number;
 }
 
-function isSameDay(date1: Date, date2: Date): boolean {
-	return (
-		date1.getDate() === date2.getDate() &&
-		date1.getMonth() === date2.getMonth() &&
-		date1.getFullYear() === date2.getFullYear()
-	);
-}
-
-function areArraysEqual(arr1: Date[], arr2: Date[]): boolean {
-	if (arr1.length !== arr2.length) return false;
-
-	// Para arrays pequeños, es más eficiente hacer una comparación directa
-	if (arr1.length < 10) {
-		return arr1.every((date1) => arr2.some((date2) => isSameDay(date1, date2)));
-	}
-
-	// Para arrays más grandes, usar un Set para optimizar
-	const set = new Set<string>();
-	arr1.forEach((date) => set.add(getDateKey(date)));
-
-	return arr2.every((date) => set.has(getDateKey(date)));
-}
-
-const MemoizedMonthCalendar = memo(MonthCalendar, (prevProps, nextProps) => {
-	return (
-		prevProps.month.getTime() === nextProps.month.getTime() &&
-		prevProps.ptoDays === nextProps.ptoDays &&
-		prevProps.isPending === nextProps.isPending &&
-		prevProps.hoveredBlockId === nextProps.hoveredBlockId &&
-		areArraysEqual(prevProps.selectedDays, nextProps.selectedDays) &&
-		areArraysEqual(
-			prevProps.getSuggestedDaysForMonth(prevProps.month),
-			nextProps.getSuggestedDaysForMonth(nextProps.month),
-		)
-	);
-});
-
-MemoizedMonthCalendar.displayName = "MemoizedMonthCalendar";
 
 export default function CalendarList({ year, ptoDays, allowPastDays, holidays, carryOverMonths }: CalendarListProps) {
 	const {
@@ -112,3 +74,19 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays, c
 		</section>
 	);
 }
+
+const MemoizedMonthCalendar = memo(MonthCalendar, (prevProps, nextProps) => {
+	return (
+			prevProps.month.getTime() === nextProps.month.getTime() &&
+			prevProps.ptoDays === nextProps.ptoDays &&
+			prevProps.isPending === nextProps.isPending &&
+			prevProps.hoveredBlockId === nextProps.hoveredBlockId &&
+			areArraysEqual(prevProps.selectedDays, nextProps.selectedDays) &&
+			areArraysEqual(
+					prevProps.getSuggestedDaysForMonth(prevProps.month),
+					nextProps.getSuggestedDaysForMonth(nextProps.month),
+			)
+	);
+});
+
+MemoizedMonthCalendar.displayName = "MemoizedMonthCalendar";

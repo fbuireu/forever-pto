@@ -55,7 +55,3 @@ export function getDayClassName({
 
 	return BASE_CLASSES.join(" ");
 }
-
-export function getDateKey(date: Date): string {
-	return format(date, "yyyy-MM-dd");
-}

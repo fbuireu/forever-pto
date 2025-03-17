@@ -1,34 +1,14 @@
 import type { SearchParams } from '@app/page';
-import { DEFAULT_SEARCH_PARAMS } from '@const/const';
-import { detectLocation } from '@infrastructure/services/location/detectLocation';
+import { MIDDLEWARE_PARAMS } from '@const/const';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-type RequiredParamsMap = {
-	[K in keyof SearchParams]?: (request: NextRequest) => string | Promise<string>;
-};
-
-const REQUIRED_PARAMS: RequiredParamsMap = {
-	country: async (request: NextRequest) => await detectLocation(request),
-	year: () => DEFAULT_SEARCH_PARAMS.YEAR,
-	ptoDays: () => DEFAULT_SEARCH_PARAMS.PTO_DAYS,
-	allowPastDays: () => DEFAULT_SEARCH_PARAMS.ALLOW_PAST_DAYS,
-	carryOverMonths: async (request: NextRequest) => {
-		const isPremium = request.cookies.get("premium")?.value === "true";
-
-		if (!isPremium) {
-			return "1";
-		}
-
-		return DEFAULT_SEARCH_PARAMS.CARRY_OVER_MONTHS;
-	},
-};
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
 	const url = new URL(request.url);
 	const { searchParams } = url;
 
-	const requiredParamKeys = Object.keys(REQUIRED_PARAMS) as Array<keyof SearchParams>;
+	const requiredParamKeys = Object.keys(MIDDLEWARE_PARAMS) as Array<keyof SearchParams>;
 
 	const missingParams = requiredParamKeys.filter((param) => !searchParams.has(param));
 
@@ -39,7 +19,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 	const paramsToAdd: Record<string, string> = {};
 
 	for (const missingParam of missingParams) {
-		const defaultValueFn = REQUIRED_PARAMS[missingParam];
+		const defaultValueFn = MIDDLEWARE_PARAMS[missingParam];
 
 		if (defaultValueFn) {
 			paramsToAdd[missingParam] = await defaultValueFn(request);

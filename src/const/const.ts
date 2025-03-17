@@ -1,6 +1,9 @@
 import type { CapitalizeKeys } from '@const/types';
 import { capitalizeKeys } from '@const/utils/capitalizeKeys';
 import type { Metadata } from 'next';
+import type { SearchParams } from '@app/page';
+import type { NextRequest } from 'next/server';
+import { detectLocation } from '@infrastructure/services/location/detectLocation';
 
 const Pages = {
   HOME: 'home',
@@ -29,6 +32,26 @@ export const DEFAULT_SEO_PARAMS: CapitalizeKeys<Metadata> = {
   },
   IMAGE: '',
 } as unknown as CapitalizeKeys<Metadata>;
+
+type RequiredParamsMap = {
+  [K in keyof SearchParams]?: (request: NextRequest) => string | Promise<string>;
+};
+
+export const MIDDLEWARE_PARAMS: RequiredParamsMap = {
+  country: async (request: NextRequest) => await detectLocation(request),
+  year: () => DEFAULT_SEARCH_PARAMS.YEAR,
+  ptoDays: () => DEFAULT_SEARCH_PARAMS.PTO_DAYS,
+  allowPastDays: () => DEFAULT_SEARCH_PARAMS.ALLOW_PAST_DAYS,
+  carryOverMonths: async (request: NextRequest) => {
+    const isPremium = request.cookies.get("premium")?.value === "true";
+
+    if (!isPremium) {
+      return "1";
+    }
+
+    return DEFAULT_SEARCH_PARAMS.CARRY_OVER_MONTHS;
+  },
+};
 
 export const CONTACT_DETAILS: Record<CapitalizeKeys<string>, string> = {
   NAME: '',

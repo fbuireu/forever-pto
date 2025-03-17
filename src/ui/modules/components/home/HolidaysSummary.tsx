@@ -13,7 +13,7 @@ interface HolidaysSummaryProps {
 	holidays: HolidayDTO[];
 }
 
-const HolidaysSummary: React.FC<HolidaysSummaryProps> = ({ holidays }) => {
+const HolidaysSummary= ({ holidays }: HolidaysSummaryProps) => {
 	const nationalHolidays = holidays.filter((holiday) => !holiday.location);
 	const regionalHolidays = holidays.filter((holiday) => holiday.location);
 
