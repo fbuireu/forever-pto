@@ -1,14 +1,6 @@
-import { format, isSameDay, isSameMonth, isToday, isWeekend } from 'date-fns';
+import { isSameDay, isSameMonth, isToday, isWeekend } from 'date-fns';
 
-export function getDayClassName({
-	date,
-	displayMonth,
-	selectedDays,
-	isHoliday,
-	isDaySuggested,
-	isDayAlternative,
-	isPastDayAllowed,
-}: {
+interface SetDayClassNameParams {
 	date: Date;
 	displayMonth: Date;
 	selectedDays: Date[];
@@ -16,14 +8,26 @@ export function getDayClassName({
 	isDaySuggested: (date: Date) => boolean;
 	isDayAlternative: (date: Date) => boolean;
 	isPastDayAllowed: () => boolean;
-}): string {
-	const BASE_CLASSES = [
-		"h-8 w-8 p-0",
-		"inline-flex items-center justify-center",
-		"rounded-sm text-sm font-medium",
-		"transition-colors focus-visible:outline-hidden",
-		"aria-selected:opacity-100",
-	];
+}
+
+
+
+export function setDayClassName({
+	date,
+	displayMonth,
+	selectedDays,
+	isHoliday,
+	isDaySuggested,
+	isDayAlternative,
+	isPastDayAllowed,
+}: SetDayClassNameParams): string {
+  const BASE_CLASSES = [
+    "h-8 w-8 p-0",
+    "inline-flex items-center justify-center",
+    "rounded-sm text-sm font-medium",
+    "transition-colors focus-visible:outline-hidden",
+    "aria-selected:opacity-100",
+  ];
 
 	if (!isSameMonth(date, displayMonth)) {
 		BASE_CLASSES.push("opacity-0 invisible");

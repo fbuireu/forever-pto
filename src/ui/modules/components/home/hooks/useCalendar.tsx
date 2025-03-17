@@ -88,7 +88,7 @@ function groupConsecutiveDays(days: Date[]): Date[][] {
 	return sequences;
 }
 
-export function usePTOCalculator({ year, ptoDays, allowPastDays, holidays, carryOverMonths }: PTOCalculatorProps) {
+export function useCalendar({ year, ptoDays, allowPastDays, holidays, carryOverMonths }: PTOCalculatorProps) {
 	// Estados
 	const [selectedDays, setSelectedDays] = useState<Date[]>([]);
 	const [suggestedDays, setSuggestedDays] = useState<Date[]>([]);

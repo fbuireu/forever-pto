@@ -2,9 +2,9 @@
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { MonthCalendar } from '@modules/components/home/atoms/MonthsCalendar';
-import { usePTOCalculator } from '@modules/components/home/hooks/usePtoCalculator';
-import React, { memo } from 'react';
+import { useCalendar } from '@modules/components/home/hooks/useCalendar';
 import { areArraysEqual } from '@modules/components/home/utils/arrayIsEqual';
+import React, { memo } from 'react';
 
 interface CalendarListProps {
 	year: number;
@@ -13,7 +13,6 @@ interface CalendarListProps {
 	holidays: HolidayDTO[];
 	carryOverMonths: number;
 }
-
 
 export default function CalendarList({ year, ptoDays, allowPastDays, holidays, carryOverMonths }: CalendarListProps) {
 	const {
@@ -35,7 +34,7 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays, c
 		handleDaySelect,
 		handleDayInteraction,
 		handleDayMouseOut,
-	} = usePTOCalculator({
+	} = useCalendar({
 		year,
 		ptoDays,
 		allowPastDays,
@@ -77,15 +76,15 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays, c
 
 const MemoizedMonthCalendar = memo(MonthCalendar, (prevProps, nextProps) => {
 	return (
-			prevProps.month.getTime() === nextProps.month.getTime() &&
-			prevProps.ptoDays === nextProps.ptoDays &&
-			prevProps.isPending === nextProps.isPending &&
-			prevProps.hoveredBlockId === nextProps.hoveredBlockId &&
-			areArraysEqual(prevProps.selectedDays, nextProps.selectedDays) &&
-			areArraysEqual(
-					prevProps.getSuggestedDaysForMonth(prevProps.month),
-					nextProps.getSuggestedDaysForMonth(nextProps.month),
-			)
+		prevProps.month.getTime() === nextProps.month.getTime() &&
+		prevProps.ptoDays === nextProps.ptoDays &&
+		prevProps.isPending === nextProps.isPending &&
+		prevProps.hoveredBlockId === nextProps.hoveredBlockId &&
+		areArraysEqual(prevProps.selectedDays, nextProps.selectedDays) &&
+		areArraysEqual(
+			prevProps.getSuggestedDaysForMonth(prevProps.month),
+			nextProps.getSuggestedDaysForMonth(nextProps.month),
+		)
 	);
 });
 

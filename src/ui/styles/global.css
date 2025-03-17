@@ -1,0 +1,6 @@
+@layer global {
+	button[name="previous-month"],
+	button[name="next-month"] {
+		display: none;
+	}
+}

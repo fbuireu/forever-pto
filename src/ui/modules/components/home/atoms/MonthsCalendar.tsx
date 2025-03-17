@@ -1,9 +1,11 @@
 import { Calendar } from '@modules/components/core/Calendar';
 import { Card } from '@modules/components/core/Card';
 import { LoadingSpinner } from '@modules/components/core/Spinner';
-import { getDayClassName } from '@modules/components/home/utils/day';
+import { setDayClassName } from '@modules/components/home/utils/setDayClassName';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import type { FocusEvent, MouseEvent, ReactNode } from 'react';
+import './months-calendar.css';
 
 interface MonthCalendarProps {
 	month: Date;
@@ -20,10 +22,10 @@ interface MonthCalendarProps {
 	getDayPositionInBlock: (date: Date) => string | null;
 	getAlternativeDayPosition: (date: Date) => string | null;
 	handleDaySelect: (days: Date[] | undefined) => void;
-	handleDayInteraction: (e: React.MouseEvent<HTMLButtonElement> | React.FocusEvent<HTMLButtonElement>) => void;
+	handleDayInteraction: (e: MouseEvent<HTMLButtonElement> | FocusEvent<HTMLButtonElement>) => void;
 	handleDayMouseOut: () => void;
 	getSuggestedDaysForMonth: (month: Date) => Date[];
-	getMonthSummary: (month: Date) => React.ReactNode;
+	getMonthSummary: (month: Date) => ReactNode;
 	isPastDayAllowed: () => boolean;
 }
 
@@ -66,19 +68,30 @@ export const MonthCalendar = ({
 					Dropdown: () => <></>,
 					Day: ({ day }) => {
 						const { date, displayMonth } = day;
+						const dayKey = format(date, "yyyy-MM-dd");
 						const holiday = getHolidayName(date);
-						const dateKey = format(date, "yyyy-MM-dd");
 						const isSuggested = isDaySuggested(date);
 						const isAlternative = isDayAlternative(date);
-						const blockId = isSuggested ? dayToBlockIdMap[dateKey] || "" : "";
+						const blockId = isSuggested ? dayToBlockIdMap[dayKey] || "" : "";
 						const blockPosition = getDayPositionInBlock(date);
 						const alternativePosition = getAlternativeDayPosition(date);
+
+						const DATA_ATTRIBUTES = {
+							"data-date": dayKey,
+							...(isSuggested && { "data-suggested": true }),
+							...(isAlternative && { "data-alternative": true }),
+							...(isHoliday(date) && { "data-holiday": true }),
+							...(blockId && { "data-block-id": blockId }),
+							...(blockPosition && { "data-block-position": blockPosition }),
+							...(alternativePosition && { "data-alternative-position": alternativePosition }),
+							...(hoveredBlockId === blockId && { "data-hovered-block": true }),
+						};
 
 						return (
 							<td className="p-0 relative">
 								<button
 									type="button"
-									className={getDayClassName({
+									className={setDayClassName({
 										date,
 										displayMonth,
 										selectedDays,
@@ -88,17 +101,11 @@ export const MonthCalendar = ({
 										isPastDayAllowed,
 									})}
 									title={holiday || ""}
-									data-suggested={isSuggested ? "true" : "false"}
-									data-alternative={isAlternative ? "true" : "false"}
-									data-block-id={blockId}
-									data-block-position={blockPosition || ""}
-									data-alternative-position={alternativePosition || ""}
-									data-hovered-block={hoveredBlockId === blockId ? "true" : ""}
-									data-date={dateKey}
 									onMouseOver={handleDayInteraction}
 									onMouseOut={handleDayMouseOut}
 									onBlur={handleDayMouseOut}
 									onFocus={handleDayInteraction}
+									{...DATA_ATTRIBUTES}
 								>
 									{date.getDate()}
 								</button>
