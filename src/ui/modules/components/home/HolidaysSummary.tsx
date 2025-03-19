@@ -8,6 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { Badge } from '../core/Badge';
 import { Alert, AlertDescription, AlertTitle } from '../core/Alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../core/Table';
+import { formatFullDate, getWeekday } from '@shared/ui/utils/dates';
 
 interface HolidaysSummaryProps {
 	holidays: HolidayDTO[];
@@ -16,14 +17,6 @@ interface HolidaysSummaryProps {
 const HolidaysSummary= ({ holidays }: HolidaysSummaryProps) => {
 	const nationalHolidays = holidays.filter((holiday) => !holiday.location);
 	const regionalHolidays = holidays.filter((holiday) => holiday.location);
-
-	const formatFullDate = (date: Date) => {
-		return format(date, "dd MMMM yyyy", { locale: es });
-	};
-
-	const getWeekday = (date: Date) => {
-		return format(date, "EEEE", { locale: es });
-	};
 
 	return (
 		<div className="mb-6">

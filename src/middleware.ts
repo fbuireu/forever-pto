@@ -9,7 +9,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 	const { searchParams } = url;
 
 	const requiredParamKeys = Object.keys(MIDDLEWARE_PARAMS) as Array<keyof SearchParams>;
-
 	const missingParams = requiredParamKeys.filter((param) => !searchParams.has(param));
 
 	if (missingParams.length === 0) {
@@ -23,11 +22,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 		if (defaultValueFn) {
 			paramsToAdd[missingParam] = await defaultValueFn(request);
-		}
-	}
-
-	for (const missingParam of missingParams) {
-		if (paramsToAdd[missingParam]) {
 			searchParams.set(missingParam, paramsToAdd[missingParam]);
 		}
 	}

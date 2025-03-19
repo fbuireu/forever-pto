@@ -1,17 +1,17 @@
 "use client";
 
 import { ChevronRight, Settings } from 'lucide-react';
-import React, { useCallback } from 'react';
+import { type ComponentPropsWithoutRef, forwardRef, useCallback } from 'react';
 import { SidebarMenuButton, useSidebar } from '@modules/components/core/Sidebar';
 
-export const GearSettings = React.forwardRef<
+export const GearSettings = forwardRef<
 	HTMLButtonElement,
-	React.ComponentPropsWithoutRef<typeof SidebarMenuButton>
+	ComponentPropsWithoutRef<typeof SidebarMenuButton>
 >((props, ref) => {
 	const { toggleSidebar, state } = useSidebar();
 
 	const handleClick = useCallback(
-		(e: React.MouseEvent<HTMLButtonElement>) => {
+		(e: MouseEvent<HTMLButtonElement>) => {
 			if (state === "collapsed") {
 				e.preventDefault();
 				e.stopPropagation();

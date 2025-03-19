@@ -7,7 +7,7 @@ import { createQueryString } from '@shared/ui/utils/createQueryString';
 import { useDebouncedCallback } from '@ui/hooks/useDebounceCallback';
 import { Minus, Plus } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import type React from 'react';
+import type { ChangeEvent } from 'react';
 import { startTransition, useCallback, useState } from 'react';
 import { Input } from '../../core/Input';
 
@@ -48,7 +48,7 @@ export const PtoDays = ({ ptoDays }: PtoDaysProps) => {
 		updateQueryString(localDaysValue + 1);
 	};
 
-	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+	const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const newValue = Number(event.currentTarget.value);
 		if (!Number.isNaN(newValue) && newValue >= 0) {
 			setLocalDaysValue(newValue);

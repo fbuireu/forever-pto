@@ -15,7 +15,7 @@ import {
     startOfMonth,
 } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'; // Constantes
+import { useCallback, useEffect, useMemo, useState, useTransition, type MouseEvent, type FocusEvent } from 'react';
 
 const MAX_BLOCK_SIZE = 5;
 const MAX_ALTERNATIVES = 10;
@@ -528,7 +528,7 @@ export function useCalendar({ year, ptoDays, allowPastDays, holidays, carryOverM
 
 	// Manejar interacción con días (mostrar alternativas)
 	const handleDayInteraction = useCallback(
-		(e: React.MouseEvent<HTMLButtonElement> | React.FocusEvent<HTMLButtonElement>) => {
+		(e: MouseEvent<HTMLButtonElement> | FocusEvent<HTMLButtonElement>) => {
 			const button = e.currentTarget;
 			const isSuggested = button.dataset.suggested === "true";
 

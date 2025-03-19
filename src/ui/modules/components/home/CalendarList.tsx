@@ -4,7 +4,7 @@ import type { HolidayDTO } from '@application/dto/holiday/types';
 import { MonthCalendar } from '@modules/components/home/atoms/MonthsCalendar';
 import { useCalendar } from '@modules/components/home/hooks/useCalendar';
 import { areArraysEqual } from '@modules/components/home/utils/arrayIsEqual';
-import React, { memo } from 'react';
+import { memo } from 'react';
 
 interface CalendarListProps {
 	year: number;

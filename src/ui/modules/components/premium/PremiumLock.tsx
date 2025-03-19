@@ -13,14 +13,14 @@ import { Input } from '@modules/components/core/Input';
 import { Label } from '@modules/components/core/Label';
 import { usePremium } from '@ui/providers/PremiumProvider';
 import { LockIcon, X } from 'lucide-react';
-import { useState } from 'react';
+import { type ReactNode, type MouseEvent, type FormEvent, useState } from 'react';
 
 interface PremiumLockProps {
-	children: React.ReactNode;
+	children: ReactNode;
 	isActive?: boolean;
 	featureName?: string;
 	description?: string;
-	renderUnlocked?: (isPremium: boolean) => React.ReactNode;
+	renderUnlocked?: (isPremium: boolean) => ReactNode;
 }
 
 export const PremiumLock = ({
@@ -40,13 +40,13 @@ export const PremiumLock = ({
 		return renderUnlocked ? renderUnlocked(isPremium) : children;
 	}
 
-	const handleModalClick = (e: React.MouseEvent) => {
+	const handleModalClick = (e: MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
 		setIsModalOpen(true);
 	};
 
-	const handleSubmitEmail = async (e: React.FormEvent) => {
+	const handleSubmitEmail = async (e: FormEvent) => {
 		e.preventDefault();
 		setIsSubmitting(true);
 

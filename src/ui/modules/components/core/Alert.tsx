@@ -1,6 +1,6 @@
 import { mergeClasses } from '@shared/ui/utils/mergeClasses';
 import { cva, type VariantProps } from 'class-variance-authority';
-import * as React from 'react';
+import { forwardRef, type HTMLAttributes } from 'react';
 
 const alertVariants = cva(
 	"relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7",
@@ -17,22 +17,22 @@ const alertVariants = cva(
 	},
 );
 
-const Alert = React.forwardRef<
+const Alert = forwardRef<
 	HTMLDivElement,
-	React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
+	HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
 >(({ className, variant, ...props }, ref) => (
 	<div ref={ref} role="alert" className={mergeClasses(alertVariants({ variant }), className)} {...props} />
 ));
 Alert.displayName = "Alert";
 
-const AlertTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
+const AlertTitle = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLHeadingElement>>(
 	({ className, ...props }, ref) => (
 		<h5 ref={ref} className={mergeClasses("mb-1 font-medium leading-none tracking-tight", className)} {...props} />
 	),
 );
 AlertTitle.displayName = "AlertTitle";
 
-const AlertDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
+const AlertDescription = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLParagraphElement>>(
 	({ className, ...props }, ref) => (
 		<div ref={ref} className={mergeClasses("text-sm [&_p]:leading-relaxed", className)} {...props} />
 	),

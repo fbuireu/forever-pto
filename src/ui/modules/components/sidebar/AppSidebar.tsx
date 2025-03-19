@@ -22,15 +22,15 @@ import { ThemeToggle } from '@modules/components/sidebar/atoms/ThemeToggle';
 import { Years } from '@modules/components/sidebar/atoms/Years';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { Calendar, CalendarDays, type LucideIcon, MapPin, MapPinned, ToggleLeftIcon } from 'lucide-react';
-import type React from 'react';
 import { CarryOverMonths } from './atoms/CarryOverMonths';
+import type { ReactNode } from 'react';
 
 type AppSidebarProps = SearchParams;
 
 type MenuItem = {
 	title: string;
 	icon: LucideIcon;
-	renderComponent?: () => React.ReactNode;
+	renderComponent?: () => ReactNode;
 };
 
 export function AppSidebar({ country, region, ptoDays, year, allowPastDays, carryOverMonths }: AppSidebarProps) {

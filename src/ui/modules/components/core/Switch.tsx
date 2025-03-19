@@ -2,11 +2,11 @@
 
 import * as SwitchPrimitives from '@radix-ui/react-switch';
 import { mergeClasses } from '@shared/ui/utils/mergeClasses';
-import * as React from 'react';
+import { type ComponentPropsWithoutRef, type ComponentRef, forwardRef } from 'react';
 
-const Switch = React.forwardRef<
-	React.ElementRef<typeof SwitchPrimitives.Root>,
-	React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
+const Switch = forwardRef<
+		ComponentRef<typeof SwitchPrimitives.Root>,
+	ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
 >(({ className, ...props }, ref) => (
 	<SwitchPrimitives.Root
 		className={mergeClasses(

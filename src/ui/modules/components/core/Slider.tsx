@@ -1,8 +1,8 @@
 "use client"
 
-import * as React from "react"
 import * as SliderPrimitive from "@radix-ui/react-slider"
 import { mergeClasses } from '@shared/ui/utils/mergeClasses';
+import { type ComponentProps, useMemo } from 'react';
 
 const Slider=({
   className,
@@ -11,8 +11,8 @@ const Slider=({
   min = 0,
   max = 100,
   ...props
-}: React.ComponentProps<typeof SliderPrimitive.Root>)=> {
-  const _values = React.useMemo(
+}: ComponentProps<typeof SliderPrimitive.Root>)=> {
+  const _values = useMemo(
     () =>
       Array.isArray(value)
         ? value

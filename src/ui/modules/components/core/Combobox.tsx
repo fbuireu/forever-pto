@@ -7,7 +7,7 @@ import { createQueryString } from '@shared/ui/utils/createQueryString';
 import { mergeClasses } from '@shared/ui/utils/mergeClasses';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import type React from 'react';
+import type { HTMLProps } from 'react';
 import { startTransition, useState } from 'react';
 import { Button } from '@modules/components/core/Button';
 import { PopoverContent } from '@modules/components/core/Popover';
@@ -21,7 +21,7 @@ import {
 } from '@modules/components/core/Command';
 
 
-interface ComboboxProps extends React.HTMLProps<HTMLInputElement> {
+interface ComboboxProps extends HTMLProps<HTMLInputElement> {
 	searchPlaceholder?: string;
 	notFoundText?: string;
 	heading: string;

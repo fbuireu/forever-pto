@@ -19,7 +19,7 @@ export function getRegionsMap(countryCode: string): Record<string, string> {
     const regions = holidays.getStates(countryCode);
 
     for (const [code, name] of Object.entries(regions)) {
-      REGIONS_CACHE[countryCode][code.toLowerCase()] = name as string;
+      REGIONS_CACHE[countryCode][code.toLowerCase()] = name;
     }
   } catch (error) {
   }

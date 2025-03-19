@@ -4,10 +4,11 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
 const PREMIUM_COOKIE_NAME = "premium";
-const PREMIUM_COOKIE_DURATION = 30 * 24 * 60 * 60; // 30 días en segundos
+const PREMIUM_COOKIE_DURATION = 30 * 24 * 60 * 60;
 
 export async function checkPremiumStatus(): Promise<boolean> {
 	const cookieStore = await cookies();
+
 	return cookieStore.get(PREMIUM_COOKIE_NAME)?.value === "true";
 }
 
@@ -35,6 +36,5 @@ export async function deactivatePremium(path: string): Promise<void> {
 		path: "/",
 	});
 
-	// Revalidar la ruta para reflejar el cambio de estado
 	revalidatePath(path);
 }

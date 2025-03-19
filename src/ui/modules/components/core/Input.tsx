@@ -1,7 +1,7 @@
 import { mergeClasses } from '@shared/ui/utils/mergeClasses';
-import * as React from 'react';
+import { type ComponentProps, forwardRef } from 'react';
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
+const Input = forwardRef<HTMLInputElement, ComponentProps<"input">>(
 	({ className, type, ...props }, ref) => {
 		return (
 			<input

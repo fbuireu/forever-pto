@@ -5,6 +5,6 @@ interface IsInTargetYearParams {
 	targetYears: number[];
 }
 
-export function isInTargetYear({ holiday, targetYears }: IsInTargetYearParams) {
+export function isInTargetYear({ holiday, targetYears }: IsInTargetYearParams): boolean {
 	return targetYears.includes(new Date(holiday.date).getFullYear());
 }
