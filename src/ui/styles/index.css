@@ -1,7 +1,7 @@
-@import url("variables.css");
-@import url("animations.css");
-@import url("global.css");
-@import url("base.css");
+@import url("variables/variables.css");
+@import url("animations/animations.css");
+@import url("global/global.css");
+@import url("base/base.css");
 @import "tailwindcss";
 @plugin 'tailwindcss-animate';
 

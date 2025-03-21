@@ -1,0 +1,28 @@
+@reference "../../../../../../styles/index.css";
+
+[data-suggested="true"] {
+	@apply bg-green-300 dark:bg-green-600;
+}
+
+[data-suggested="true"][data-hovered-block="true"] {
+	@apply bg-green-400 dark:bg-green-800;
+}
+
+[data-alternative="true"] {
+	@apply bg-purple-300 dark:bg-purple-900;
+}
+
+[data-block-position="single"],
+[data-alternative-position="single"] {
+	@apply rounded-md;
+}
+
+[data-block-position="start"],
+[data-alternative-position="start"] {
+	@apply rounded-l-md;
+}
+
+[data-block-position="end"],
+[data-alternative-position="end"] {
+	@apply rounded-r-md;
+}

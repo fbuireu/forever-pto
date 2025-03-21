@@ -1,11 +1,11 @@
 import { DEFAULT_SEARCH_PARAMS } from '@const/const';
+import { isPremium } from '@infrastructure/services/cookies/isPremium';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
-import { SidebarProvider, SidebarTrigger } from '@modules/components/core/Sidebar';
-import CalendarList from '@modules/components/home/CalendarList';
-import HolidaysSummary from '@modules/components/home/HolidaysSummary';
-import { AppSidebar } from '@modules/components/sidebar/AppSidebar';
-import { PremiumProvider } from '@ui/providers/PremiumProvider';
-import { cookies } from 'next/headers';
+import { AppSidebar } from '@ui/modules/components/appSidebar/components/appSidebar/AppSidebar';
+import { SidebarProvider, SidebarTrigger } from '@ui/modules/components/core/sidebar/Sidebar';
+import CalendarList from '@ui/modules/components/home/components/calendarList/CalendarList';
+import HolidaysSummary from '@ui/modules/components/home/components/holidaySummary/HolidaysSummary';
+import { PremiumProvider } from '@ui/providers/premium/PremiumProvider';
 
 export interface SearchParams {
 	country?: string;
@@ -31,11 +31,10 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 		carryOverMonths = CARRY_OVER_MONTHS,
 	} = await searchParams;
 	const holidays = await getHolidays({ country, region, year, carryOverMonths });
-	const isPremium = (await cookies()).get("premium")?.value === "true";
 
 	return (
 		<SidebarProvider>
-			<PremiumProvider initialPremiumStatus={isPremium}>
+			<PremiumProvider initialPremiumStatus={await isPremium()}>
 				<AppSidebar
 					country={country}
 					ptoDays={ptoDays}
@@ -45,7 +44,6 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 					carryOverMonths={carryOverMonths}
 				/>
 				<SidebarTrigger />
-				<main>
 					<div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-8">
 						<HolidaysSummary holidays={holidays} />
 						<CalendarList
@@ -56,50 +54,15 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 							holidays={holidays}
 							carryOverMonths={isPremium ? Number(carryOverMonths) : 1}
 						/>
-						<footer className="mt-8 text-center text-sm text-muted-foreground">
-							<div className="mb-2 flex flex-wrap justify-center gap-4">
-								<div className="flex items-center">
-									<div className="mr-2 h-4 w-4 rounded-sm bg-accent/30" />
-									<span>Fines de semana</span>
-								</div>
-								<div className="flex items-center">
-									<div className="mr-2 h-4 w-4 rounded-sm border border-yellow-300 bg-yellow-100" />
-									<span>Festivos</span>
-								</div>
-								<div className="flex items-center">
-									<div className="mr-2 flex h-4 w-4 items-center justify-center rounded-sm bg-primary text-primary-foreground">
-										<span className="text-xs">P</span>
-									</div>
-									<span>Días PTO seleccionados</span>
-								</div>
-								<div className="flex items-center">
-									<div className="mr-2 h-4 w-4 rounded-sm bg-green-100 dark:bg-green-900/30" />
-									<span>Días sugeridos</span>
-								</div>
-								<div className="flex items-center">
-									<div className="mr-2 h-4 w-4 rounded-sm bg-purple-100 dark:bg-purple-900/30" />
-									<span>Alternativas similares</span>
-								</div>
-							</div>
-							<p>
-								Los fines de semana y festivos ya están preseleccionados. Haz clic en cualquier día laborable para
-								añadirlo como día PTO.
-							</p>
-							<p>
-								Limitations: las sugerencias se basan en los bloques de dias (si se hace hover sobre un grupo de 3 dias
-								sugeridos se buscaran alternativas que, con 3 dias de PTO, generen los mismos dias festivos)
-							</p>
-						</footer>
 					</div>
-				</main>
-			</PremiumProvider>
+			</PremiumProvider >
 		</SidebarProvider>
 	);
 }
+
 // TODO:
 // 1- Refactor
 // 2- Isolate functions
-// 3- Folder structure
 // 4- Tema fin de semana
 // 6- Add tests (also e2e)
 // 9- Add CI/CD

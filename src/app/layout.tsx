@@ -1,7 +1,8 @@
+import '@styles/index.css';
+import { Footer } from '@ui/modules/components/core/footer/Footer';
 import type { Metadata } from 'next';
 import { ThemeProvider } from 'next-themes';
 import { Geist, Geist_Mono } from 'next/font/google';
-import '@styles/index.css';
 import type { ReactNode } from 'react';
 
 const geistSans = Geist({
@@ -28,7 +29,10 @@ export default function RootLayout({
 		<html lang="en">
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-					{children}
+					<main>
+						{children}
+					</main>
+					<Footer />
 				</ThemeProvider>
 			</body>
 		</html>

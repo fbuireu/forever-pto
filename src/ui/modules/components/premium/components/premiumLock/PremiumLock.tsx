@@ -1,0 +1,132 @@
+"use client";
+
+import { Button } from '@ui/modules/components/core/button/Button';
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+} from '@ui/modules/components/core/dialog/Dialog';
+import { Input } from '@ui/modules/components/core/input/Input';
+import { Label } from '@ui/modules/components/core/label/Label';
+import { usePremium } from '@ui/providers/premium/PremiumProvider';
+import { LockIcon, X } from 'lucide-react';
+import { type FormEvent, type MouseEvent, type ReactNode, useState } from 'react';
+
+interface PremiumLockProps {
+	children: ReactNode;
+	isActive?: boolean;
+	featureName?: string;
+	description?: string;
+	renderUnlocked?: (isPremium: boolean) => ReactNode;
+}
+
+export const PremiumLock = ({
+	children,
+	isActive = true,
+	featureName = "Función Premium",
+	description = "Para acceder a esta función premium, introduce tu email para comenzar tu suscripción.",
+	renderUnlocked,
+}: PremiumLockProps) => {
+	const { isPremium, isPremiumLoading, activatePremium } = usePremium();
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [email, setEmail] = useState("");
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [submitSuccess, setSubmitSuccess] = useState(false);
+
+	if (!isActive || isPremium) {
+		return renderUnlocked ? renderUnlocked(isPremium) : children;
+	}
+
+	const handleModalClick = (e: MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setIsModalOpen(true);
+	};
+
+	const handleSubmitEmail = async (e: FormEvent) => {
+		e.preventDefault();
+		setIsSubmitting(true);
+
+		try {
+			await new Promise((resolve) => setTimeout(resolve, 1500));
+
+			await activatePremium();
+
+			setSubmitSuccess(true);
+			setTimeout(() => {
+				setIsModalOpen(false);
+				setSubmitSuccess(false);
+			}, 2000);
+		} catch (error) {
+			console.error("Error al procesar la suscripción:", error);
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
+	return (
+		<div className="relative overflow-hidden w-full h-full">
+			<div className="pointer-events-none opacity-70 filter blur-[2px] scale-[1.05] transform origin-center absolute inset-0 w-[105%] h-[105%] -left-[2.5%] -top-[2.5%]">
+				{children}
+			</div>
+			<div className="invisible">{children}</div>
+			<button
+				type="button"
+				className="absolute inset-0 z-10 bg-white/50 dark:bg-black/50 backdrop-blur-sm rounded-md flex flex-col items-center justify-center cursor-pointer"
+				onClick={handleModalClick}
+			>
+				<div className="w-10 h-10 rounded-full bg-primary/80 flex items-center justify-center mb-2">
+					<LockIcon className="w-5 h-5 text-white" />
+				</div>
+				<p className="text-sm font-medium">{featureName}</p>
+				<p className="text-xs text-muted-foreground">Clic para desbloquear</p>
+			</button>
+
+			<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>{submitSuccess ? "¡Suscripción exitosa!" : "Desbloquea funciones premium"}</DialogTitle>
+						<DialogDescription>{description}</DialogDescription>
+					</DialogHeader>
+
+					{!submitSuccess ? (
+						<form onSubmit={handleSubmitEmail} className="space-y-4">
+							<div className="space-y-2">
+								<Label htmlFor="email">Email</Label>
+								<Input
+									id="email"
+									type="email"
+									value={email}
+									onChange={(e) => setEmail(e.target.value)}
+									required
+									placeholder="tu@email.com"
+									autoComplete="off"
+								/>
+							</div>
+
+							<Button
+								type="submit"
+								disabled={isSubmitting || isPremiumLoading}
+								className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary/90 transition-colors"
+							>
+								{isSubmitting || isPremiumLoading ? "Procesando..." : "Suscribirse"}
+							</Button>
+						</form>
+					) : (
+						<p className="text-green-600 dark:text-green-400 mt-2">
+							Tu suscripción se ha activado correctamente. ¡Disfruta de todas las funciones premium!
+						</p>
+					)}
+
+					<DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+						<X className="h-4 w-4" />
+						<span className="sr-only">Cerrar</span>
+					</DialogClose>
+				</DialogContent>
+			</Dialog>
+		</div>
+	);
+};
