@@ -1,5 +1,7 @@
 import { DEFAULT_SEARCH_PARAMS, FILTER_MAXIMUM_VALUES, PREMIUM_COOKIE, SEARCH_PARAM_KEYS } from '@const/const';
 import type { RequiredParamsMap, ValidatorFunction } from '@const/types';
+import { getDefaultValue } from '@infrastructure/middleware/utils/getDefaultValue';
+import { validateParam } from '@infrastructure/middleware/utils/validateParam';
 import { detectLocation } from '@infrastructure/services/location/detectLocation';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -72,26 +74,21 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 	const url = new URL(request.url);
 	const { searchParams } = url;
 	let needsRedirect = false;
-
 	const requiredParamKeys = Object.keys(MIDDLEWARE_PARAMS) as Array<keyof typeof MIDDLEWARE_PARAMS>;
 
 	for (const paramKey of requiredParamKeys) {
 		if (searchParams.has(paramKey)) {
 			const currentValue = searchParams.get(paramKey) || "";
-			const validator = PARAM_VALIDATORS[paramKey];
+			const correctedValue = await validateParam({ key: paramKey, value: currentValue, request });
 
-			if (validator) {
-				const correctedValue = await validator(currentValue, request);
-
-				if (correctedValue) {
-					searchParams.set(paramKey, correctedValue);
-					needsRedirect = true;
-				}
+			if (correctedValue !== null) {
+				searchParams.set(paramKey, correctedValue);
+				needsRedirect = true;
 			}
 		} else {
-			const defaultValueFn = MIDDLEWARE_PARAMS[paramKey];
-			if (defaultValueFn) {
-				const defaultValue = await defaultValueFn(request);
+			const defaultValue = await getDefaultValue({ key: paramKey, request });
+
+			if (defaultValue !== null) {
 				searchParams.set(paramKey, defaultValue);
 				needsRedirect = true;
 			}
