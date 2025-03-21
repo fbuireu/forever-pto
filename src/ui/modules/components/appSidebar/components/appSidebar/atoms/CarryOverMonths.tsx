@@ -1,6 +1,6 @@
 "use client";
 
-import type { SearchParams } from '@app/page';
+import type { SearchParams } from '@const/types';
 import { createQueryString } from '@shared/ui/utils/createQueryString';
 import { Label } from '@ui/modules/components/core/label/Label';
 import { Slider } from '@ui/modules/components/core/slider/Slider';
@@ -10,6 +10,7 @@ import { usePremium } from '@ui/providers/premium/PremiumProvider';
 import { InfoIcon } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { startTransition, useState } from 'react';
+import { FILTER_MAXIMUM_VALUES } from '@const/const';
 
 interface CarryOverMonthsProps {
 	carryOverMonths: SearchParams["carryOverMonths"];
@@ -21,7 +22,9 @@ export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 	const searchParams = useSearchParams();
 	const { isPremium } = usePremium();
 	const [value, setValue] = useState([Number(carryOverMonths)]);
-	const maxValue = isPremium ? 12 : 1;
+	const maxValue = isPremium
+		? FILTER_MAXIMUM_VALUES.CARRY_OVER_MONTHS.PREMIUM
+		: FILTER_MAXIMUM_VALUES.CARRY_OVER_MONTHS.FREE;
 
 	const handleValueChange = (newValue: number[]) => {
 		if (!isPremium && newValue[0] > 1) {

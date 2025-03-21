@@ -1,6 +1,6 @@
 "use client";
 
-import type { SearchParams } from '@app/page';
+import type { SearchParams } from '@const/types';
 import { createQueryString } from '@shared/ui/utils/createQueryString';
 import { InfoIcon } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';

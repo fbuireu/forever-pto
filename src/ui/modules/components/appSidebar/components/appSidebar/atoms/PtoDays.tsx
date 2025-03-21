@@ -1,6 +1,6 @@
 "use client";
 
-import type { SearchParams } from '@app/page';
+import type { SearchParams } from '@const/types';
 import { createQueryString } from '@shared/ui/utils/createQueryString';
 import { useDebouncedCallback } from '@ui/hooks/useDebounceCallback/useDebounceCallback';
 import { Button } from '@ui/modules/components/core/button/Button';

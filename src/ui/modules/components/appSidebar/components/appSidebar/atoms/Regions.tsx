@@ -1,4 +1,4 @@
-import type { SearchParams } from '@app/page';
+import type { SearchParams } from '@const/types';
 import { getCountries } from '@infrastructure/services/country/getCountries';
 import { getRegions } from '@infrastructure/services/regions/getRegions';
 import { Combobox } from '@ui/modules/components/core/combobox/Combobox';
@@ -22,9 +22,7 @@ export default async function Regions({ country, region }: RegionProps) {
 			heading={userCountry?.label ? `Regiones en ${userCountry.label}` : ""}
 			type="region"
 			disabled={isDisabled}
-			placeholder={
-				regions.length ? "Selecciona región..." : `No se han encontrado regiones para ${userCountry?.label ?? ""}`
-			}
+			placeholder={regions.length ? "Selecciona región..." : `No regions found for ${userCountry?.label ?? ""}`}
 			searchPlaceholder="Buscar región..."
 			notFoundText="Región no encontrada."
 			className="w-full"

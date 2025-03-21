@@ -6,15 +6,7 @@ import { SidebarProvider, SidebarTrigger } from '@ui/modules/components/core/sid
 import CalendarList from '@ui/modules/components/home/components/calendarList/CalendarList';
 import HolidaysSummary from '@ui/modules/components/home/components/holidaySummary/HolidaysSummary';
 import { PremiumProvider } from '@ui/providers/premium/PremiumProvider';
-
-export interface SearchParams {
-	country?: string;
-	region?: string;
-	year: string;
-	ptoDays: string;
-	allowPastDays: string;
-	carryOverMonths: string;
-}
+import type { SearchParams } from '@const/types';
 
 interface ForeverPtoProps {
 	searchParams: Promise<SearchParams>;
@@ -31,10 +23,11 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 		carryOverMonths = CARRY_OVER_MONTHS,
 	} = await searchParams;
 	const holidays = await getHolidays({ country, region, year, carryOverMonths });
+	const premiumStatus = await isPremium();
 
 	return (
 		<SidebarProvider>
-			<PremiumProvider initialPremiumStatus={await isPremium()}>
+			<PremiumProvider initialPremiumStatus={premiumStatus}>
 				<AppSidebar
 					country={country}
 					ptoDays={ptoDays}
@@ -44,18 +37,18 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 					carryOverMonths={carryOverMonths}
 				/>
 				<SidebarTrigger />
-					<div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-8">
-						<HolidaysSummary holidays={holidays} />
-						<CalendarList
-							key={JSON.stringify(holidays)}
-							year={Number(year)}
-							ptoDays={Number(ptoDays)}
-							allowPastDays={allowPastDays}
-							holidays={holidays}
-							carryOverMonths={isPremium ? Number(carryOverMonths) : 1}
-						/>
-					</div>
-			</PremiumProvider >
+				<div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-8">
+					<HolidaysSummary holidays={holidays} />
+					<CalendarList
+						key={JSON.stringify(holidays)}
+						year={Number(year)}
+						ptoDays={Number(ptoDays)}
+						allowPastDays={allowPastDays}
+						holidays={holidays}
+						carryOverMonths={premiumStatus ? Number(carryOverMonths) : 1}
+					/>
+				</div>
+			</PremiumProvider>
 		</SidebarProvider>
 	);
 }
@@ -83,3 +76,4 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 30- Improve way of handling premium features (right now monthsToShow are set to 1 but once it's present, it can be changed in the URL)
 // 31- Add form shadcn and zod
 // 32- Add safeguard to avoid rerenders when same data is passed etc
+// 32- Handle edge cases (when strings are passed instead of numbers as query param, etc)

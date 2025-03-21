@@ -1,4 +1,4 @@
-import type { SearchParams } from '@app/page';
+import type { SearchParams } from '@const/types';
 import { getCountries } from '@infrastructure/services/country/getCountries';
 import { Combobox } from '@ui/modules/components/core/combobox/Combobox';
 

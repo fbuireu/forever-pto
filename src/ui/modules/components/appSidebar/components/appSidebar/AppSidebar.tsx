@@ -1,5 +1,4 @@
-import type { SearchParams } from '@app/page';
-
+import type { SearchParams } from '@const/types';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { AllowPastDays } from '@ui/modules/components/appSidebar/components/appSidebar/atoms/AllowPastDays';
 import Countries from '@ui/modules/components/appSidebar/components/appSidebar/atoms/Countries';
@@ -9,17 +8,17 @@ import Regions from '@ui/modules/components/appSidebar/components/appSidebar/ato
 import { ThemeToggle } from '@ui/modules/components/appSidebar/components/appSidebar/atoms/ThemeToggle';
 import { Years } from '@ui/modules/components/appSidebar/components/appSidebar/atoms/Years';
 import {
-	Sidebar,
-	SidebarContent,
-	SidebarFooter,
-	SidebarGroup,
-	SidebarGroupContent,
-	SidebarHeader,
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
-	SidebarMenuSub,
-	SidebarMenuSubItem,
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubItem,
 } from '@ui/modules/components/core/sidebar/Sidebar';
 import { Calendar, CalendarDays, type LucideIcon, MapPin, MapPinned, ToggleLeftIcon } from 'lucide-react';
 import type { ReactNode } from 'react';

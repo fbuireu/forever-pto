@@ -1,6 +1,7 @@
 "use client";
 
-import type { SearchParams } from '@app/page';
+import type { SearchParams } from '@const/types';
+import { FILTER_MAXIMUM_VALUES } from '@const/const';
 import { createQueryString } from '@shared/ui/utils/createQueryString';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { startTransition, useState } from 'react';
@@ -12,7 +13,6 @@ interface YearsProps {
 }
 
 export const Years = ({ year: yearProps }: YearsProps) => {
-	const yearOptions = Array.from({ length: 11 }, (_, i) => new Date().getFullYear() - 5 + i);
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
@@ -41,7 +41,7 @@ export const Years = ({ year: yearProps }: YearsProps) => {
 					<SelectValue placeholder="Year" />
 				</SelectTrigger>
 				<SelectContent>
-					{yearOptions.map((yearOption) => (
+					{FILTER_MAXIMUM_VALUES.YEARS(year).map((yearOption) => (
 						<SelectItem key={yearOption} value={yearOption.toString()}>
 							{yearOption}
 						</SelectItem>
