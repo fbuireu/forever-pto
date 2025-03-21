@@ -1,8 +1,6 @@
-import type { CapitalizeKeys, FilterMaximumValues, RequiredParamsMap } from '@const/types';
+import type { CapitalizeKeys, FilterMaximumValues } from '@const/types';
 import { capitalizeKeys } from '@const/utils/capitalizeKeys';
-import { detectLocation } from '@infrastructure/services/location/detectLocation';
 import type { Metadata } from 'next';
-import type { NextRequest } from 'next/server';
 
 export const SEARCH_PARAM_KEYS = {
 	COUNTRY: "country",
@@ -40,22 +38,6 @@ export const DEFAULT_SEO_PARAMS: CapitalizeKeys<Metadata> = {
 	},
 	IMAGE: "",
 } as unknown as CapitalizeKeys<Metadata>;
-
-export const MIDDLEWARE_PARAMS: RequiredParamsMap = {
-	[SEARCH_PARAM_KEYS.COUNTRY]: async (request: NextRequest) => await detectLocation(request),
-	[SEARCH_PARAM_KEYS.YEAR]: () => DEFAULT_SEARCH_PARAMS.YEAR,
-	[SEARCH_PARAM_KEYS.PTO_DAYS]: () => DEFAULT_SEARCH_PARAMS.PTO_DAYS,
-	[SEARCH_PARAM_KEYS.ALLOW_PAST_DAYS]: () => DEFAULT_SEARCH_PARAMS.ALLOW_PAST_DAYS,
-	[SEARCH_PARAM_KEYS.CARRY_OVER_MONTHS]: async (request: NextRequest) => {
-		const isPremium = request.cookies.get(PREMIUM_COOKIE.NAME)?.value === "true";
-
-		if (!isPremium) {
-			return String(FILTER_MAXIMUM_VALUES.CARRY_OVER_MONTHS.FREE);
-		}
-
-		return DEFAULT_SEARCH_PARAMS.CARRY_OVER_MONTHS;
-	},
-};
 
 export const FILTER_MAXIMUM_VALUES: FilterMaximumValues = {
 	CARRY_OVER_MONTHS: {

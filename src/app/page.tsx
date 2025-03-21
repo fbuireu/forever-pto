@@ -1,4 +1,5 @@
 import { DEFAULT_SEARCH_PARAMS } from '@const/const';
+import type { SearchParams } from '@const/types';
 import { isPremium } from '@infrastructure/services/cookies/isPremium';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
 import { AppSidebar } from '@ui/modules/components/appSidebar/components/appSidebar/AppSidebar';
@@ -6,7 +7,6 @@ import { SidebarProvider, SidebarTrigger } from '@ui/modules/components/core/sid
 import CalendarList from '@ui/modules/components/home/components/calendarList/CalendarList';
 import HolidaysSummary from '@ui/modules/components/home/components/holidaySummary/HolidaysSummary';
 import { PremiumProvider } from '@ui/providers/premium/PremiumProvider';
-import type { SearchParams } from '@const/types';
 
 interface ForeverPtoProps {
 	searchParams: Promise<SearchParams>;
@@ -76,4 +76,3 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 30- Improve way of handling premium features (right now monthsToShow are set to 1 but once it's present, it can be changed in the URL)
 // 31- Add form shadcn and zod
 // 32- Add safeguard to avoid rerenders when same data is passed etc
-// 32- Handle edge cases (when strings are passed instead of numbers as query param, etc)

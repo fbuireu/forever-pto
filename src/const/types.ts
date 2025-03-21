@@ -22,6 +22,8 @@ export interface SearchParams {
 	[SEARCH_PARAM_KEYS.CARRY_OVER_MONTHS]: string;
 }
 
+export type ValidatorFunction = (value: string, request: NextRequest) => Promise<string | null> | string | null;
+
 export type SearchParamKey = (typeof SEARCH_PARAM_KEYS)[keyof typeof SEARCH_PARAM_KEYS];
 
 export interface PremiumFeatureLimit {
