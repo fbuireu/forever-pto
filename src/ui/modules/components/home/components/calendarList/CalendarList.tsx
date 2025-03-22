@@ -2,8 +2,14 @@
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { MonthCalendar } from '@modules/components/home/components/calendarList/atoms/monthCalendar/MonthsCalendar';
+import { useCalendar } from '@modules/components/home/components/calendarList/hooks/useCalendar/useCalendar';
+import {
+    useCalendarInfo,
+} from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/useCalendarInfo';
+import {
+    useCalendarInteractions,
+} from '@modules/components/home/components/calendarList/hooks/useCalendarInteractions/useCalendarInteractions';
 import { areArraysEqual } from '@modules/components/home/utils/arrayIsEqual';
-import { useCalendar } from '@ui/modules/components/home/components/calendarList/hooks/useCalendar/useCalendar';
 import { memo } from 'react';
 
 interface CalendarListProps {
@@ -23,11 +29,38 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays, c
 		carryOverMonths,
 	});
 
+	const interactions = useCalendarInteractions({
+		selectedDays: calendar.selectedDays,
+		setSelectedDays: calendar.setSelectedDays,
+		setHoveredBlockId: calendar.setHoveredBlockId,
+		ptoDays,
+		isHoliday: calendar.isHoliday,
+		isPastDayAllowed: calendar.isPastDayAllowed,
+		alternativeBlocks: calendar.alternativeBlocks,
+		dayToBlockIdMap: calendar.dayToBlockIdMap,
+	});
+
+	const calendarInfo = useCalendarInfo({
+		suggestedDays: calendar.suggestedDays,
+		dayToBlockIdMap: calendar.dayToBlockIdMap,
+		hoveredBlockId: calendar.hoveredBlockId,
+		alternativeBlocks: calendar.alternativeBlocks,
+		ptoDays,
+		calculateEffectiveDays: calendar.calculateEffectiveDays,
+		isDaySuggested: interactions.isDaySuggested,
+	});
+
+	const calendarProps = {
+		...calendar,
+		...interactions,
+		...calendarInfo,
+	};
+
 	return (
 		<section className="flex w-full flex-col items-center gap-8">
 			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-7">
 				{calendar.monthsToShowDates.map((month) => (
-					<MemoizedMonthCalendar key={month.toISOString()} month={month} ptoDays={ptoDays} {...calendar} />
+					<MemoizedMonthCalendar key={month.toISOString()} month={month} ptoDays={ptoDays} {...calendarProps} />
 				))}
 			</div>
 		</section>
@@ -41,10 +74,7 @@ const MemoizedMonthCalendar = memo(MonthCalendar, (prevProps, nextProps) => {
 		prevProps.isPending === nextProps.isPending &&
 		prevProps.hoveredBlockId === nextProps.hoveredBlockId &&
 		areArraysEqual(prevProps.selectedDays, nextProps.selectedDays) &&
-		areArraysEqual(
-			prevProps.getSuggestedDaysForMonth(prevProps.month),
-			nextProps.getSuggestedDaysForMonth(nextProps.month),
-		)
+		areArraysEqual(prevProps.suggestedDayForMonth(prevProps.month), nextProps.suggestedDayForMonth(nextProps.month))
 	);
 });
 

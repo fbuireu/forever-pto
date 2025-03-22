@@ -2,9 +2,11 @@
 
 import { FILTER_MAXIMUM_VALUES } from '@const/const';
 import type { SearchParams } from '@const/types';
+import {
+    createQueryString,
+} from '@modules/components/appSidebar/components/appSidebar/utils/createQueryString/createQueryString';
 import { Label } from '@modules/components/core/label/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@modules/components/core/select/Select';
-import { createQueryString } from '@shared/ui/utils/createQueryString';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { startTransition, useState } from 'react';
 

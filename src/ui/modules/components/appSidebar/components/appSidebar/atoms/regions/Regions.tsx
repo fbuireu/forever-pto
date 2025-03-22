@@ -1,6 +1,6 @@
 import type { SearchParams } from '@const/types';
-import { getCountries } from '@infrastructure/services/country/getCountries';
-import { getRegions } from '@infrastructure/services/regions/getRegions';
+import { getCountries } from '@infrastructure/services/country/getCountries/getCountries';
+import { getRegions } from '@infrastructure/services/regions/getRegions/getRegions';
 import { Combobox } from '@ui/modules/components/core/combobox/Combobox';
 
 interface RegionProps {

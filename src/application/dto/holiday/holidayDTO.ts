@@ -1,8 +1,8 @@
 import type { HolidayDTO, RawHoliday } from '@application/dto/holiday/types';
-import { getDateKey } from '@application/dto/holiday/utils/getDataKey';
-import { getRegionName } from '@application/dto/holiday/utils/getRegionName';
-import { isInTargetYear } from '@application/dto/holiday/utils/isInTargetYear';
-import { shouldIncludeHoliday } from '@application/dto/holiday/utils/shouldIncludeHoliday';
+import { getDTODateKey } from '@application/dto/holiday/utils/getDTODateKey/getDTODateKey';
+import { getRegionName } from '@application/dto/holiday/utils/getRegionName/getRegionName';
+import { isInTargetYear } from '@application/dto/holiday/utils/isInTargetYear/isInTargetYear';
+import { shouldIncludeHoliday } from '@application/dto/holiday/utils/shouldIncludeHoliday/shouldIncludeHoliday';
 import type { BaseDTO } from '@shared/application/dto/baseDTO';
 
 type HolidayDTOConfiguration = {
@@ -21,7 +21,7 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOConfigura
 			.filter((holiday) => shouldIncludeHoliday({ holiday, carryOverMonths: carryOverMonths + 12, year }))
 			.filter((holiday) => holiday.type === "public" && !holiday.location);
 
-		const nationalDateSet = new Set(nationalHolidays.map((holiday) => getDateKey(new Date(holiday.date))));
+		const nationalDateSet = new Set(nationalHolidays.map((holiday) => getDTODateKey(new Date(holiday.date))));
 		const regionalDateSet = new Set();
 
 		const regionalHolidays = raw
@@ -29,7 +29,7 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOConfigura
 			.filter((holiday) => shouldIncludeHoliday({ holiday, carryOverMonths: carryOverMonths + 12, year }))
 			.filter((holiday) => holiday.type === "public" && holiday.location)
 			.filter((holiday) => {
-				const dateKey = getDateKey(new Date(holiday.date));
+				const dateKey = getDTODateKey(new Date(holiday.date));
 
 				if (nationalDateSet.has(dateKey) || regionalDateSet.has(dateKey)) {
 					return false;

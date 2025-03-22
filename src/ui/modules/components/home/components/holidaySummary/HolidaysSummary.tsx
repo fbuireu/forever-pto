@@ -1,5 +1,6 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { formatFullDate, getWeekday } from '@shared/ui/utils/dates';
+import { formatFullDate } from '@modules/components/home/components/holidaySummary/utils/formatFullDate/formatFullDate';
+import { getWeekday } from '@modules/components/home/components/holidaySummary/utils/getWeekDay/getWeekDay';
 import {
     Accordion,
     AccordionContent,

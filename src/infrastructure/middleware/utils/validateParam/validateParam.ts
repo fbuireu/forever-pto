@@ -1,5 +1,5 @@
 import { DEFAULT_SEARCH_PARAMS, FILTER_MAXIMUM_VALUES, PREMIUM_COOKIE, SEARCH_PARAM_KEYS } from '@const/const';
-import { detectLocation } from '@infrastructure/services/location/detectLocation';
+import { detectLocation } from '@infrastructure/services/location/detectLocation/detectLocation';
 import type { NextRequest } from 'next/server';
 import type { MIDDLEWARE_PARAMS } from '@infrastructure/middleware/middleware';
 

@@ -1,5 +1,5 @@
 import type { SearchParams } from '@const/types';
-import { getCountries } from '@infrastructure/services/country/getCountries';
+import { getCountries } from '@infrastructure/services/country/getCountries/getCountries';
 import { Combobox } from '@ui/modules/components/core/combobox/Combobox';
 
 interface CountriesProps {

@@ -2,7 +2,7 @@ import { DEFAULT_SEARCH_PARAMS, FILTER_MAXIMUM_VALUES, PREMIUM_COOKIE, SEARCH_PA
 import type { RequiredParamsMap } from '@const/types';
 import { getDefaultValue } from '@infrastructure/middleware/utils/getDefaultValue/getDefaultValue';
 import { validateParam } from '@infrastructure/middleware/utils/validateParam/validateParam';
-import { detectLocation } from '@infrastructure/services/location/detectLocation';
+import { detectLocation } from '@infrastructure/services/location/detectLocation/detectLocation';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 

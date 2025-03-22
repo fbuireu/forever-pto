@@ -1,6 +1,6 @@
 import { DEFAULT_SEARCH_PARAMS } from '@const/const';
 import type { SearchParams } from '@const/types';
-import { isPremium } from '@infrastructure/services/cookies/isPremium';
+import { isPremium as isPremiumFn } from '@infrastructure/services/cookies/isPremium/isPremium';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
 import { AppSidebar } from '@ui/modules/components/appSidebar/components/appSidebar/AppSidebar';
 import { SidebarProvider, SidebarTrigger } from '@ui/modules/components/core/sidebar/Sidebar';
@@ -23,11 +23,11 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 		carryOverMonths = CARRY_OVER_MONTHS,
 	} = await searchParams;
 	const holidays = await getHolidays({ country, region, year, carryOverMonths });
-	const premiumStatus = await isPremium();
+	const isPremium = await isPremiumFn();
 
 	return (
 		<SidebarProvider>
-			<PremiumProvider initialPremiumStatus={premiumStatus}>
+			<PremiumProvider initialPremiumStatus={isPremium}>
 				<AppSidebar
 					country={country}
 					ptoDays={ptoDays}
@@ -45,7 +45,7 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 						ptoDays={Number(ptoDays)}
 						allowPastDays={allowPastDays}
 						holidays={holidays}
-						carryOverMonths={premiumStatus ? Number(carryOverMonths) : 1}
+						carryOverMonths={isPremium ? Number(carryOverMonths) : 1}
 					/>
 				</div>
 			</PremiumProvider>
@@ -74,5 +74,5 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 27- DataTable to bulk actions to remove days
 // 29- Refine styles (hover blocks, etc)
 // 31- Add form shadcn and zod
-// 31- semantig html
+// 31- semantic html
 // 32- Add safeguard to avoid rerenders when same data is passed etc (memo previous request?)

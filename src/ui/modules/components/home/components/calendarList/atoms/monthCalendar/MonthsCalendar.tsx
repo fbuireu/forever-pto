@@ -21,12 +21,12 @@ interface MonthCalendarProps {
 	getHolidayName: (date: Date) => string | null;
 	isDaySuggested: (date: Date) => boolean;
 	isDayAlternative: (date: Date) => boolean;
-	getDayPositionInBlock: (date: Date) => string | null;
-	getAlternativeDayPosition: (date: Date) => string | null;
+	datePositionInBlock: (date: Date) => string | null;
+	alternativeDayPosition: (date: Date) => string | null;
 	handleDaySelect: (days: Date[] | undefined) => void;
 	handleDayInteraction: (e: MouseEvent<HTMLButtonElement> | FocusEvent<HTMLButtonElement>) => void;
 	handleDayMouseOut: () => void;
-	getSuggestedDaysForMonth: (month: Date) => Date[];
+	suggestedDayForMonth: (month: Date) => Date[];
 	getMonthSummary: (month: Date) => ReactNode;
 	isPastDayAllowed: () => boolean;
 }
@@ -43,12 +43,12 @@ export const MonthCalendar = ({
 	getHolidayName,
 	isDaySuggested,
 	isDayAlternative,
-	getDayPositionInBlock,
-	getAlternativeDayPosition,
+	datePositionInBlock,
+	alternativeDayPosition,
 	handleDaySelect,
 	handleDayInteraction,
 	handleDayMouseOut,
-	getSuggestedDaysForMonth,
+	suggestedDayForMonth,
 	getMonthSummary,
 	isPastDayAllowed,
 }: MonthCalendarProps) => {
@@ -76,8 +76,8 @@ export const MonthCalendar = ({
 							const isSuggested = isDaySuggested(date);
 							const isAlternative = isDayAlternative(date);
 							const blockId = isSuggested ? dayToBlockIdMap[dayKey] || "" : "";
-							const blockPosition = getDayPositionInBlock(date);
-							const alternativePosition = getAlternativeDayPosition(date);
+							const blockPosition = datePositionInBlock(date);
+							const alternativePosition = alternativeDayPosition(date);
 
 							const DATA_ATTRIBUTES = {
 								"data-date": dayKey,
@@ -118,7 +118,7 @@ export const MonthCalendar = ({
 					}}
 				/>
 			</Card>
-			{ptoDays > 0 && suggestedDays.length > 0 && getSuggestedDaysForMonth(month).length > 0 && (
+			{ptoDays > 0 && suggestedDays.length > 0 && suggestedDayForMonth(month).length > 0 && (
 				<div>
 					{getMonthSummary(month) && (
 						<div className="rounded-md border border-primary/20 bg-green-200/10 p-2 text-xs">

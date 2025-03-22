@@ -3,6 +3,13 @@
 import type { CountryDTO } from '@application/dto/country/types';
 import type { RegionDTO } from '@application/dto/region/types';
 import {
+    createQueryString,
+} from '@modules/components/appSidebar/components/appSidebar/utils/createQueryString/createQueryString';
+import { hasFlag } from '@modules/components/core/combobox/utils/hasFlag/hasFlag';
+import { Popover, PopoverTrigger } from '@radix-ui/react-popover';
+import { mergeClasses } from '@shared/ui/utils/mergeClasses';
+import { Button } from '@ui/modules/components/core/button/Button';
+import {
     Command,
     CommandEmpty,
     CommandGroup,
@@ -11,15 +18,10 @@ import {
     CommandList,
 } from '@ui/modules/components/core/command/Command';
 import { PopoverContent } from '@ui/modules/components/core/popover/Popover';
-import { Popover, PopoverTrigger } from '@radix-ui/react-popover';
-import { createQueryString } from '@shared/ui/utils/createQueryString';
-import { mergeClasses } from '@shared/ui/utils/mergeClasses';
-import { Button } from '@ui/modules/components/core/button/Button';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { HTMLProps } from 'react';
 import { startTransition, useState } from 'react';
-
 
 interface ComboboxProps extends HTMLProps<HTMLInputElement> {
 	searchPlaceholder?: string;
@@ -28,10 +30,6 @@ interface ComboboxProps extends HTMLProps<HTMLInputElement> {
 	type: "country" | "region";
 	options?: CountryDTO[] | RegionDTO[];
 	value?: string;
-}
-
-function hasFlag(option: CountryDTO | RegionDTO): option is CountryDTO {
-	return "flag" in option && !!option.flag;
 }
 
 export const Combobox = ({
@@ -67,63 +65,64 @@ export const Combobox = ({
 				setIsOpen(false);
 				router.replace(`${pathname}?${query}`, { scroll: false });
 			});
-
 		}
 	};
 
 	return (
-			<div className="relative w-full">
-				<Popover open={isOpen} onOpenChange={setIsOpen}>
-					<PopoverTrigger asChild>
-						<Button
-								variant="outline"
-								disabled={disabled}
-								aria-expanded={isOpen}
-								className={mergeClasses("w-full justify-between", className)}
-						>
-							{selectedOption ? (
-									<div className="flex items-center gap-2">
-										{hasFlag(selectedOption) && (
-												<div className="relative h-4 w-6 overflow-hidden rounded">{selectedOption.flag}</div>
-										)}
-										<span>{selectedOption.label}</span>
-									</div>
-							) : (
-									<span className="text-muted-foreground">{placeholder}</span>
-							)}
-							<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-						</Button>
-					</PopoverTrigger>
-					<PopoverContent className="max-h-(--radix-popover-content-available-height) w-(--radix-popover-trigger-width) p-0">
-						<Command className="w-full">
-							<CommandInput placeholder={searchPlaceholder} />
-							<CommandList>
-								<CommandEmpty>{notFoundText}</CommandEmpty>
-								<CommandGroup heading={heading} className="w-full">
-									{options?.map((option) => (
-											<CommandItem
-													key={option.label}
-													value={option?.label}
-													className="hover:bg-slate-250 cursor-pointer rounded-md transition-colors duration-200"
-													onSelect={(value) => {
-
-														handleSelect(value);
-													}}
-											>
-												<div className="flex w-full items-center gap-2">
-													{hasFlag(option) && <div className="relative h-4 w-6 overflow-hidden rounded">{option.flag}</div>}
-													<span>{option.label}</span>
-												</div>
-												<Check
-														className={mergeClasses("ml-auto h-4 w-4", localValue === option.value ? "opacity-100" : "opacity-0")}
-												/>
-											</CommandItem>
-									))}
-								</CommandGroup>
-							</CommandList>
-						</Command>
-					</PopoverContent>
-				</Popover>
-			</div>
+		<div className="relative w-full">
+			<Popover open={isOpen} onOpenChange={setIsOpen}>
+				<PopoverTrigger asChild>
+					<Button
+						variant="outline"
+						disabled={disabled}
+						aria-expanded={isOpen}
+						className={mergeClasses("w-full justify-between", className)}
+					>
+						{selectedOption ? (
+							<div className="flex items-center gap-2">
+								{hasFlag(selectedOption) && (
+									<div className="relative h-4 w-6 overflow-hidden rounded">{selectedOption.flag}</div>
+								)}
+								<span>{selectedOption.label}</span>
+							</div>
+						) : (
+							<span className="text-muted-foreground">{placeholder}</span>
+						)}
+						<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+					</Button>
+				</PopoverTrigger>
+				<PopoverContent className="max-h-(--radix-popover-content-available-height) w-(--radix-popover-trigger-width) p-0">
+					<Command className="w-full">
+						<CommandInput placeholder={searchPlaceholder} />
+						<CommandList>
+							<CommandEmpty>{notFoundText}</CommandEmpty>
+							<CommandGroup heading={heading} className="w-full">
+								{options?.map((option) => (
+									<CommandItem
+										key={option.label}
+										value={option?.label}
+										className="hover:bg-slate-250 cursor-pointer rounded-md transition-colors duration-200"
+										onSelect={(value) => {
+											handleSelect(value);
+										}}
+									>
+										<div className="flex w-full items-center gap-2">
+											{hasFlag(option) && <div className="relative h-4 w-6 overflow-hidden rounded">{option.flag}</div>}
+											<span>{option.label}</span>
+										</div>
+										<Check
+											className={mergeClasses(
+												"ml-auto h-4 w-4",
+												localValue === option.value ? "opacity-100" : "opacity-0",
+											)}
+										/>
+									</CommandItem>
+								))}
+							</CommandGroup>
+						</CommandList>
+					</Command>
+				</PopoverContent>
+			</Popover>
+		</div>
 	);
 };

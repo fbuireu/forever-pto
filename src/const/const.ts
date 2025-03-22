@@ -1,5 +1,5 @@
 import type { CapitalizeKeys, FilterMaximumValues } from '@const/types';
-import { capitalizeKeys } from '@const/utils/capitalizeKeys';
+import { capitalizeKeys } from '@const/utils/capitalizeKeys/capitalizeKeys';
 import type { Metadata } from 'next';
 
 export const SEARCH_PARAM_KEYS = {
@@ -61,8 +61,8 @@ export const CONTACT_DETAILS: Record<CapitalizeKeys<string>, string> = {
 	ENCODED_EMAIL_SELF: "",
 };
 
-export const PREMIUM_COOKIE: Record<CapitalizeKeys<string>, string | number> = {
-	NAME: "premium",
+export const PREMIUM_COOKIE = {
+	NAME: "premium" as const,
 	DURATION: 30 * 24 * 60 * 60,
 };
 

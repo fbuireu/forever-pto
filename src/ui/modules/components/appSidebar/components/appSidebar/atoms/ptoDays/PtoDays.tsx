@@ -1,8 +1,10 @@
 "use client";
 
 import type { SearchParams } from '@const/types';
+import {
+    createQueryString,
+} from '@modules/components/appSidebar/components/appSidebar/utils/createQueryString/createQueryString';
 import { Input } from '@modules/components/core/input/Input';
-import { createQueryString } from '@shared/ui/utils/createQueryString';
 import { useDebouncedCallback } from '@ui/hooks/useDebounceCallback/useDebounceCallback';
 import { Button } from '@ui/modules/components/core/button/Button';
 import { Label } from '@ui/modules/components/core/label/Label';
