@@ -1,5 +1,5 @@
+import { MIDDLEWARE_PARAMS } from '@infrastructure/middleware/middleware';
 import type { NextRequest } from 'next/server';
-import { MIDDLEWARE_PARAMS } from '../../../middleware';
 
 interface GetDefaultValueParams {
 	key: keyof typeof MIDDLEWARE_PARAMS;

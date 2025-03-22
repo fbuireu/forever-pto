@@ -22,17 +22,11 @@ export interface SearchParams {
 	[SEARCH_PARAM_KEYS.CARRY_OVER_MONTHS]: string;
 }
 
-export type ValidatorFunction = (value: string, request: NextRequest) => Promise<string | null> | string | null;
-
-export type SearchParamKey = (typeof SEARCH_PARAM_KEYS)[keyof typeof SEARCH_PARAM_KEYS];
-
-export interface PremiumFeatureLimit {
-	FREE: number;
-	PREMIUM: number;
-}
-
 export interface FilterMaximumValues {
-	CARRY_OVER_MONTHS: PremiumFeatureLimit;
+	CARRY_OVER_MONTHS: {
+		FREE: number;
+		PREMIUM: number;
+	};
 	YEARS: (year: string) => number[];
 }
 

@@ -54,7 +54,7 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 }
 
 // TODO:
-// 1- Refactor
+// 1- Refactor (useCalendar)
 // 2- Isolate functions
 // 4- Tema fin de semana
 // 6- Add tests (also e2e)
@@ -73,6 +73,6 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 26- RECHECK ALGORYTHM (both alternatives + suggestions). 4 days issue
 // 27- DataTable to bulk actions to remove days
 // 29- Refine styles (hover blocks, etc)
-// 30- Improve way of handling premium features (right now monthsToShow are set to 1 but once it's present, it can be changed in the URL)
 // 31- Add form shadcn and zod
-// 32- Add safeguard to avoid rerenders when same data is passed etc
+// 31- semantig html
+// 32- Add safeguard to avoid rerenders when same data is passed etc (memo previous request?)

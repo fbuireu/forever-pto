@@ -1,6 +1,7 @@
 "use client";
 
 import type { SearchParams } from '@const/types';
+import { Input } from '@modules/components/core/input/Input';
 import { createQueryString } from '@shared/ui/utils/createQueryString';
 import { useDebouncedCallback } from '@ui/hooks/useDebounceCallback/useDebounceCallback';
 import { Button } from '@ui/modules/components/core/button/Button';
@@ -9,7 +10,6 @@ import { Minus, Plus } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { ChangeEvent } from 'react';
 import { startTransition, useCallback, useState } from 'react';
-import { Input } from '../../../../core/input/Input';
 
 interface PtoDaysProps {
 	ptoDays: SearchParams["ptoDays"];

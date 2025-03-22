@@ -1,13 +1,13 @@
 "use client";
 
 import type { SearchParams } from '@const/types';
+import { Label } from '@modules/components/core/label/Label';
+import { Switch } from '@modules/components/core/switch/Switch';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@modules/components/core/tooltip/Tooltip';
 import { createQueryString } from '@shared/ui/utils/createQueryString';
 import { InfoIcon } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { startTransition, useState } from 'react';
-import { Label } from '../../../../core/label/Label';
-import { Switch } from '../../../../core/switch/Switch';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../../core/tooltip/Tooltip';
 
 interface AllowPastDaysProps {
 	allowPastDays: SearchParams["allowPastDays"];
@@ -41,7 +41,6 @@ export const AllowPastDays = ({ allowPastDays }: AllowPastDaysProps) => {
 					{isEnabled ? "Activado" : "Desactivado"}
 				</Label>
 			</div>
-
 			<TooltipProvider>
 				<Tooltip>
 					<TooltipTrigger asChild>

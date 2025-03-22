@@ -1,9 +1,9 @@
 "use client";
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { MonthCalendar } from '@ui/modules/components/home/components/calendarList/atoms/MonthsCalendar';
-import { useCalendar } from '@ui/modules/components/home/components/calendarList/hooks/useCalendar';
+import { MonthCalendar } from '@modules/components/home/components/calendarList/atoms/monthCalendar/MonthsCalendar';
 import { areArraysEqual } from '@modules/components/home/utils/arrayIsEqual';
+import { useCalendar } from '@ui/modules/components/home/components/calendarList/hooks/useCalendar/useCalendar';
 import { memo } from 'react';
 
 interface CalendarListProps {
@@ -15,26 +15,7 @@ interface CalendarListProps {
 }
 
 export default function CalendarList({ year, ptoDays, allowPastDays, holidays, carryOverMonths }: CalendarListProps) {
-	const {
-		selectedDays,
-		suggestedDays,
-		dayToBlockIdMap,
-		hoveredBlockId,
-		isPending,
-		monthsToShowDates,
-		isHoliday,
-		getHolidayName,
-		isPastDayAllowed,
-		isDaySuggested,
-		isDayAlternative,
-		getDayPositionInBlock,
-		getAlternativeDayPosition,
-		getSuggestedDaysForMonth,
-		getMonthSummary,
-		handleDaySelect,
-		handleDayInteraction,
-		handleDayMouseOut,
-	} = useCalendar({
+	const calendar = useCalendar({
 		year,
 		ptoDays,
 		allowPastDays,
@@ -45,29 +26,8 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays, c
 	return (
 		<section className="flex w-full flex-col items-center gap-8">
 			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-7">
-				{monthsToShowDates.map((month) => (
-					<MemoizedMonthCalendar
-						key={month.toISOString()}
-						month={month}
-						ptoDays={ptoDays}
-						isPending={isPending}
-						selectedDays={selectedDays}
-						suggestedDays={suggestedDays}
-						hoveredBlockId={hoveredBlockId}
-						dayToBlockIdMap={dayToBlockIdMap}
-						isHoliday={isHoliday}
-						getHolidayName={getHolidayName}
-						isDaySuggested={isDaySuggested}
-						isDayAlternative={isDayAlternative}
-						getDayPositionInBlock={getDayPositionInBlock}
-						getAlternativeDayPosition={getAlternativeDayPosition}
-						handleDaySelect={handleDaySelect}
-						handleDayInteraction={handleDayInteraction}
-						handleDayMouseOut={handleDayMouseOut}
-						getSuggestedDaysForMonth={getSuggestedDaysForMonth}
-						getMonthSummary={getMonthSummary}
-						isPastDayAllowed={isPastDayAllowed}
-					/>
+				{calendar.monthsToShowDates.map((month) => (
+					<MemoizedMonthCalendar key={month.toISOString()} month={month} ptoDays={ptoDays} {...calendar} />
 				))}
 			</div>
 		</section>

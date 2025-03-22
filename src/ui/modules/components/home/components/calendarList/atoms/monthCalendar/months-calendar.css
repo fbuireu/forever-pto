@@ -1,4 +1,4 @@
-@reference "../../../../../../styles/index.css";
+@reference "../../../../../../../styles/index.css";
 
 [data-suggested="true"] {
 	@apply bg-green-300 dark:bg-green-600;

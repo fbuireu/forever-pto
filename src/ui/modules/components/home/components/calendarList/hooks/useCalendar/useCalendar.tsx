@@ -1,4 +1,18 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
+import { DEFAULT_CALENDAR_LIMITS } from '@const/const';
+import type {
+    BlockOpportunity,
+    DayInfo,
+} from '@modules/components/home/components/calendarList/hooks/useCalendar/types';
+import {
+    getDateFromKey,
+} from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/getDateFromKey/getDateFromKey';
+import {
+    getDateKey,
+} from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/getDateKey/getDateKey';
+import {
+    groupConsecutiveDays,
+} from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/groupConsecutiveDays/groupConsecutiveDays';
 import {
     addDays,
     addMonths,
@@ -11,44 +25,12 @@ import {
     isSameDay,
     isSameMonth,
     isWeekend,
-    parseISO,
     startOfMonth,
 } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { useCallback, useEffect, useMemo, useState, useTransition, type MouseEvent, type FocusEvent } from 'react';
+import { type FocusEvent, type MouseEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 
-const MAX_BLOCK_SIZE = 5;
-const MAX_ALTERNATIVES = 10;
-const MAX_CANDIDATE_ALTERNATIVES = 50;
-const MAX_SEARCH_DEPTH = 100;
-
-// Funciones utilitarias
-export const getDateKey = (date: Date): string => format(date, "yyyy-MM-dd");
-const getDateFromKey = (key: string): Date => parseISO(key);
-
-// Interfaces
-interface DayInfo {
-	date: Date;
-	isWeekend: boolean;
-	isHoliday: boolean;
-	isSelected: boolean;
-	isFreeDay: boolean;
-	month: number;
-}
-
-export interface BlockOpportunity {
-	startDay: Date;
-	days: Date[];
-	blockSize: number;
-	daysBeforeBlock: number;
-	daysAfterBlock: number;
-	totalConsecutiveDays: number;
-	score: number;
-	month: number;
-	effectiveDays: number;
-}
-
-interface PTOCalculatorProps {
+interface UseCalendarParams {
 	year: number;
 	ptoDays: number;
 	allowPastDays: string;
@@ -56,40 +38,7 @@ interface PTOCalculatorProps {
 	carryOverMonths: number;
 }
 
-// Función para agrupar días en secuencias consecutivas
-function groupConsecutiveDays(days: Date[]): Date[][] {
-	if (days.length === 0) return [];
-
-	// Ordenar días por fecha
-	const sortedDays = [...days].sort((a, b) => a.getTime() - b.getTime());
-
-	const sequences: Date[][] = [];
-	let currentSequence: Date[] = [sortedDays[0]];
-
-	for (let i = 1; i < sortedDays.length; i++) {
-		const prevDay = sortedDays[i - 1];
-		const currentDay = sortedDays[i];
-
-		// Si es el día siguiente, añadir a la secuencia actual
-		if (differenceInDays(currentDay, prevDay) === 1) {
-			currentSequence.push(currentDay);
-		} else {
-			// Si no es consecutivo, cerrar secuencia actual y empezar una nueva
-			sequences.push([...currentSequence]);
-			currentSequence = [currentDay];
-		}
-	}
-
-	// Añadir la última secuencia
-	if (currentSequence.length > 0) {
-		sequences.push(currentSequence);
-	}
-
-	return sequences;
-}
-
-export function useCalendar({ year, ptoDays, allowPastDays, holidays, carryOverMonths }: PTOCalculatorProps) {
-	// Estados
+export function useCalendar({ year, ptoDays, allowPastDays, holidays, carryOverMonths }: UseCalendarParams) {
 	const [selectedDays, setSelectedDays] = useState<Date[]>([]);
 	const [suggestedDays, setSuggestedDays] = useState<Date[]>([]);
 	const [alternativeBlocks, setAlternativeBlocks] = useState<Record<string, BlockOpportunity[]>>({});
@@ -227,8 +176,6 @@ export function useCalendar({ year, ptoDays, allowPastDays, holidays, carryOverM
 
 			// Convertir el mapa a un array ordenado
 			const freeDays = Array.from(freeDaysMap.values()).sort((a, b) => a.getTime() - b.getTime());
-
-			// Agrupar en secuencias de días consecutivos
 			const sequences = groupConsecutiveDays(freeDays);
 
 			// Set de claves de días PTO para búsquedas O(1)
@@ -330,7 +277,11 @@ export function useCalendar({ year, ptoDays, allowPastDays, holidays, carryOverM
 			const startDay = availableWorkdays[startDayIndex];
 
 			// Intentar bloques de diferentes tamaños
-			for (let blockSize = 1; blockSize <= Math.min(MAX_BLOCK_SIZE, remainingPtoDays); blockSize++) {
+			for (
+				let blockSize = 1;
+				blockSize <= Math.min(DEFAULT_CALENDAR_LIMITS.MAX_BLOCK_SIZE, remainingPtoDays);
+				blockSize++
+			) {
 				// Verificar si tenemos suficientes días disponibles
 				if (startDayIndex + blockSize > availableWorkdays.length) {
 					continue;
@@ -434,7 +385,7 @@ export function useCalendar({ year, ptoDays, allowPastDays, holidays, carryOverM
 		};
 
 		// Seleccionar mejores bloques (limitado para eficiencia)
-		for (let i = 0; i < Math.min(blockOpportunities.length, MAX_SEARCH_DEPTH); i++) {
+		for (let i = 0; i < Math.min(blockOpportunities.length, DEFAULT_CALENDAR_LIMITS.MAX_SEARCH_DEPTH); i++) {
 			if (daysRemaining <= 0) break;
 
 			const block = blockOpportunities[i];
@@ -480,11 +431,11 @@ export function useCalendar({ year, ptoDays, allowPastDays, holidays, carryOverM
 						// No debe tener conflicto con días ya sugeridos
 						!op.days.some((d) => suggestedDaysSet.has(getDateKey(d))),
 				)
-				.slice(0, MAX_CANDIDATE_ALTERNATIVES); // Usar límite mayor para candidatos
+				.slice(0, DEFAULT_CALENDAR_LIMITS.MAX_CANDIDATE_ALTERNATIVES); // Usar límite mayor para candidatos
 
 			for (const alt of potentialAlternatives) {
 				alternativesForBlock.push(alt);
-				if (alternativesForBlock.length >= MAX_ALTERNATIVES) break;
+				if (alternativesForBlock.length >= DEFAULT_CALENDAR_LIMITS.MAX_ALTERNATIVES) break;
 			}
 
 			alternativesByBlockId[block.id] = alternativesForBlock;
