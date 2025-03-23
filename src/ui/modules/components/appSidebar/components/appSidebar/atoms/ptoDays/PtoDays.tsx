@@ -11,7 +11,23 @@ import { Label } from '@ui/modules/components/core/label/Label';
 import { Minus, Plus } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { ChangeEvent } from 'react';
-import { startTransition, useCallback, useState } from 'react';
+import { memo, startTransition, useCallback, useMemo, useState } from 'react';
+
+const MinusButton = memo(({ onClick, disabled }: { onClick: () => void; disabled: boolean }) => (
+	<Button variant="outline" size="icon" className="h-8 w-8 shrink-0 rounded-full" onClick={onClick} disabled={disabled}>
+		<Minus />
+		<span className="sr-only">Decrease</span>
+	</Button>
+));
+MinusButton.displayName = "MinusButton";
+
+const PlusButton = memo(({ onClick }: { onClick: () => void }) => (
+	<Button variant="outline" size="icon" className="h-8 w-8 shrink-0 rounded-full" onClick={onClick}>
+		<Plus />
+		<span className="sr-only">Increase</span>
+	</Button>
+));
+PlusButton.displayName = "PlusButton";
 
 interface PtoDaysProps {
 	ptoDays: SearchParams["ptoDays"];
@@ -41,41 +57,31 @@ export const PtoDays = ({ ptoDays }: PtoDaysProps) => {
 
 	const updateQueryDebounced = useDebouncedCallback((value: number) => updateQueryString(value), 200);
 
-	const decrementDays = () => {
+	const decrementDays = useCallback(() => {
 		if (localDaysValue <= 0) return;
 		updateQueryString(localDaysValue - 1);
-	};
+	}, [localDaysValue, updateQueryString]);
 
-	const incrementDays = () => {
+	const incrementDays = useCallback(() => {
 		updateQueryString(localDaysValue + 1);
-	};
+	}, [localDaysValue, updateQueryString]);
 
-	const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-		const newValue = Number(event.currentTarget.value);
-		if (!Number.isNaN(newValue) && newValue >= 0) {
-			setLocalDaysValue(newValue);
-			updateQueryDebounced(newValue);
-		} else if (event.currentTarget.value === "") {
-			setLocalDaysValue(0);
-			updateQueryDebounced(0);
-		}
-	};
+	const handleInputChange = useCallback(
+		(event: ChangeEvent<HTMLInputElement>) => {
+			const newValue = Number(event.currentTarget.value);
+			if (!Number.isNaN(newValue) && newValue >= 0) {
+				setLocalDaysValue(newValue);
+				updateQueryDebounced(newValue);
+			} else if (event.currentTarget.value === "") {
+				setLocalDaysValue(0);
+				updateQueryDebounced(0);
+			}
+		},
+		[updateQueryDebounced],
+	);
 
-	return (
-		<div className="flex items-center gap-2">
-			<Label htmlFor="available-days" className="whitespace-nowrap">
-				Tengo
-			</Label>
-			<Button
-				variant="outline"
-				size="icon"
-				className="h-8 w-8 shrink-0 rounded-full"
-				onClick={decrementDays}
-				disabled={localDaysValue <= 0}
-			>
-				<Minus />
-				<span className="sr-only">Decrease</span>
-			</Button>
+	const daysInput = useMemo(
+		() => (
 			<Input
 				id="available-days"
 				type="number"
@@ -84,10 +90,18 @@ export const PtoDays = ({ ptoDays }: PtoDaysProps) => {
 				className="w-20"
 				min="0"
 			/>
-			<Button variant="outline" size="icon" className="h-8 w-8 shrink-0 rounded-full" onClick={incrementDays}>
-				<Plus />
-				<span className="sr-only">Increase</span>
-			</Button>
+		),
+		[localDaysValue, handleInputChange],
+	);
+
+	return (
+		<div className="flex items-center gap-2">
+			<Label htmlFor="available-days" className="whitespace-nowrap">
+				Tengo
+			</Label>
+			<MinusButton onClick={decrementDays} disabled={localDaysValue <= 0} />
+			{daysInput}
+			<PlusButton onClick={incrementDays} />
 			<span>días libres</span>
 		</div>
 	);

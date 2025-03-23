@@ -2,6 +2,10 @@ import type { SearchParams } from '@const/types';
 import { getCountries } from '@infrastructure/services/country/getCountries/getCountries';
 import { getRegions } from '@infrastructure/services/regions/getRegions/getRegions';
 import { Combobox } from '@ui/modules/components/core/combobox/Combobox';
+import { cache } from 'react';
+
+const getCachedCountries = cache(getCountries);
+const getCachedRegions = cache(getRegions);
 
 interface RegionProps {
 	country: SearchParams["country"];
@@ -9,9 +13,9 @@ interface RegionProps {
 }
 
 export const Regions = async ({ country, region }: RegionProps) => {
-	const countries = getCountries();
+	const countries = getCachedCountries();
 	const userCountry = countries.find(({ value }) => value.toLowerCase() === country);
-	const regions = await getRegions(userCountry?.value);
+	const regions = await getCachedRegions(userCountry?.value);
 	const isDisabled = !userCountry || !regions?.length;
 
 	return (

@@ -1,5 +1,6 @@
 import '@styles/index.css';
 import { THEME_STORAGE_KEY } from '@const/const';
+import { ErrorBoundary } from '@modules/components/core/errorBoundary/ErrorBoundary';
 import { Footer } from '@ui/modules/components/core/footer/Footer';
 import type { Metadata } from 'next';
 import { ThemeProvider } from 'next-themes';
@@ -27,13 +28,15 @@ export default function RootLayout({
 	children: ReactNode;
 }>) {
 	return (
-		<html lang="en">
-			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				<ThemeProvider attribute="class" defaultTheme="system" storageKey={THEME_STORAGE_KEY} enableSystem>
-					<main>{children}</main>
-					<Footer />
-				</ThemeProvider>
-			</body>
-		</html>
+		<ErrorBoundary>
+			<html lang="en">
+				<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+					<ThemeProvider attribute="class" defaultTheme="system" storageKey={THEME_STORAGE_KEY} enableSystem>
+						<main>{children}</main>
+						<Footer />
+					</ThemeProvider>
+				</body>
+			</html>
+		</ErrorBoundary>
 	);
 }

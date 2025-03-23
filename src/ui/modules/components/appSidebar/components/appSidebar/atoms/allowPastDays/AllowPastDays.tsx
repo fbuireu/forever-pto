@@ -9,7 +9,24 @@ import { Switch } from '@modules/components/core/switch/Switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@modules/components/core/tooltip/Tooltip';
 import { InfoIcon } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { startTransition, useState } from 'react';
+import { memo, startTransition, useCallback, useMemo, useState } from 'react';
+
+const InfoTooltip = memo(() => (
+	<TooltipProvider>
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
+			</TooltipTrigger>
+			<TooltipContent className="max-w-xs">
+				<p>
+					Este switch permite habilitar o deshabilitar la sugerencia de días festivos pasados para ver las oportunidades
+					perdidas.
+				</p>
+			</TooltipContent>
+		</Tooltip>
+	</TooltipProvider>
+));
+InfoTooltip.displayName = "InfoTooltip";
 
 interface AllowPastDaysProps {
 	allowPastDays: SearchParams["allowPastDays"];
@@ -21,41 +38,41 @@ export const AllowPastDays = ({ allowPastDays }: AllowPastDaysProps) => {
 	const searchParams = useSearchParams();
 	const [isEnabled, setIsEnabled] = useState(allowPastDays === "true");
 
-	const handleSwitchChange = (checked: boolean) => {
-		setIsEnabled(checked);
+	const handleSwitchChange = useCallback(
+		(checked: boolean) => {
+			setIsEnabled(checked);
 
-		const query = createQueryString({
-			type: "allowPastDays",
-			value: String(checked),
-			searchParams,
-		});
+			const query = createQueryString({
+				type: "allowPastDays",
+				value: String(checked),
+				searchParams,
+			});
 
-		startTransition(() => {
-			router.push(`${pathname}?${query}`, { scroll: false });
-		});
-	};
+			startTransition(() => {
+				router.push(`${pathname}?${query}`, { scroll: false });
+			});
+		},
+		[pathname, router, searchParams],
+	);
 
-	return (
-		<div className="flex items-center justify-between">
+	const labelText = useMemo(() => (isEnabled ? "Activado" : "Desactivado"), [isEnabled]);
+
+	const switchControl = useMemo(
+		() => (
 			<div className="flex items-center gap-2">
 				<Switch id="allow-past-days" checked={isEnabled} onCheckedChange={handleSwitchChange} />
 				<Label htmlFor="allow-past-days" className="text-sm cursor-pointer select-none">
-					{isEnabled ? "Activado" : "Desactivado"}
+					{labelText}
 				</Label>
 			</div>
-			<TooltipProvider>
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
-					</TooltipTrigger>
-					<TooltipContent className="max-w-xs">
-						<p>
-							Este switch permite habilitar o deshabilitar la sugerencia de días festivos pasados para ver las
-							oportunidades perdidas.
-						</p>
-					</TooltipContent>
-				</Tooltip>
-			</TooltipProvider>
+		),
+		[isEnabled, handleSwitchChange, labelText],
+	);
+
+	return (
+		<div className="flex items-center justify-between">
+			{switchControl}
+			<InfoTooltip />
 		</div>
 	);
 };
