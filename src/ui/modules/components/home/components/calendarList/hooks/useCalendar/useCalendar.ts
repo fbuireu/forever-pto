@@ -43,11 +43,11 @@ export function useCalendar({
 	holidays,
 	carryOverMonths,
 }: UseCalendarParams): UseCalendarReturn {
-	const [selectedDays, setSelectedDays] = useState<Date[]>([]);
-	const [suggestedDays, setSuggestedDays] = useState<Date[]>([]);
-	const [alternativeBlocks, setAlternativeBlocks] = useState<Record<string, BlockOpportunity[]>>({});
-	const [dayToBlockIdMap, setDayToBlockIdMap] = useState<Record<string, string>>({});
-	const [hoveredBlockId, setHoveredBlockId] = useState<string | null>(null);
+	const [selectedDays, setSelectedDays] = useState<UseCalendarReturn["selectedDays"]>([]);
+	const [suggestedDays, setSuggestedDays] = useState<UseCalendarReturn["suggestedDays"]>([]);
+	const [alternativeBlocks, setAlternativeBlocks] = useState<UseCalendarReturn["alternativeBlocks"]>({});
+	const [dayToBlockIdMap, setDayToBlockIdMap] = useState<UseCalendarReturn["dayToBlockIdMap"]>({});
+	const [hoveredBlockId, setHoveredBlockId] = useState<UseCalendarReturn["hoveredBlockId"]>(null);
 	const [isPending, startTransition] = useTransition();
 	const monthsToShowDates = useMemo(() => {
 		const start = startOfMonth(new Date(year, 0, 1));
