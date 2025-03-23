@@ -18,11 +18,11 @@ export function generateAlternativesForBlock({
 
 	const potentialAlternatives = blockOpportunities
 		.filter(
-			(op) =>
-				op !== block &&
-				op.blockSize === block.blockSize &&
-				Math.abs(op.effectiveDays - blockEffective) <= 1 &&
-				!op.days.some((d) => suggestedDaysSet.has(getDateKey(d))),
+			(opportunityBlock) =>
+				opportunityBlock !== block &&
+				opportunityBlock.blockSize === block.blockSize &&
+				Math.abs(opportunityBlock.effectiveDays - blockEffective) <= 1 &&
+				!opportunityBlock.days.some((d) => suggestedDaysSet.has(getDateKey(d))),
 		)
 		.slice(0, DEFAULT_CALENDAR_LIMITS.MAX_CANDIDATE_ALTERNATIVES);
 

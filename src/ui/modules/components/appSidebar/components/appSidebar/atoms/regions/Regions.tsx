@@ -8,7 +8,7 @@ interface RegionProps {
 	region: SearchParams["region"];
 }
 
-export default async function Regions({ country, region }: RegionProps) {
+export const Regions = async ({ country, region }: RegionProps) => {
 	const countries = getCountries();
 	const userCountry = countries.find(({ value }) => value.toLowerCase() === country);
 	const regions = await getRegions(userCountry?.value);
@@ -28,4 +28,4 @@ export default async function Regions({ country, region }: RegionProps) {
 			className="w-full"
 		/>
 	);
-}
+};

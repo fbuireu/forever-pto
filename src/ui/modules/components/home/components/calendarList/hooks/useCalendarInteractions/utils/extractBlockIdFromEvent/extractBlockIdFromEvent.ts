@@ -12,7 +12,7 @@ export function extractBlockIdFromEvent({ event, alternativeBlocks }: ExtractBlo
 
 	if (!isSuggested) return null;
 
-	const blockId = button.dataset.blockId;
+	const { blockId } = button.dataset;
 	if (!blockId || !alternativeBlocks[blockId]) return null;
 
 	return blockId;

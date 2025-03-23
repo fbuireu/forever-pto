@@ -32,9 +32,7 @@ export const PremiumProvider = ({ children, initialPremiumStatus }: PremiumProvi
 			try {
 				await activatePremiumAction(pathname);
 				setIsPremium(true);
-			} catch (error) {
-				console.error("Error al activar premium:", error);
-			}
+			} catch (error) {}
 		});
 	};
 
@@ -43,9 +41,7 @@ export const PremiumProvider = ({ children, initialPremiumStatus }: PremiumProvi
 			try {
 				await deactivatePremiumAction(pathname);
 				setIsPremium(false);
-			} catch (error) {
-				console.error("Error al desactivar premium:", error);
-			}
+			} catch (error) {}
 		});
 	};
 

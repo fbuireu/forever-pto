@@ -10,8 +10,6 @@ interface SetDayClassNameParams {
 	isPastDayAllowed: () => boolean;
 }
 
-
-
 export function setDayClassName({
 	date,
 	displayMonth,
@@ -21,13 +19,13 @@ export function setDayClassName({
 	isDayAlternative,
 	isPastDayAllowed,
 }: SetDayClassNameParams): string {
-  const BASE_CLASSES = [
-    "h-8 w-8 p-0",
-    "inline-flex items-center justify-center",
-    "rounded-sm text-sm font-medium",
-    "transition-colors focus-visible:outline-hidden",
-    "aria-selected:opacity-100",
-  ];
+	const BASE_CLASSES = [
+		"h-8 w-8 p-0",
+		"inline-flex items-center justify-center",
+		"rounded-sm text-sm font-medium",
+		"transition-colors focus-visible:outline-hidden",
+		"aria-selected:opacity-100",
+	];
 
 	if (!isSameMonth(date, displayMonth)) {
 		BASE_CLASSES.push("opacity-0 invisible");

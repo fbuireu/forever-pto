@@ -1,4 +1,5 @@
 import type { BlockPosition } from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/types';
+import { determineDayPosition } from '@modules/components/home/components/calendarList/hooks/useCalendarInteractions/utils/determineDayPosition/determineDayPosition';
 import { getDaysInBlock } from '@modules/components/home/components/calendarList/hooks/useCalendarInteractions/utils/getDaysInBlock/getDaysInBlock';
 import { getDateKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey';
 import { isSameDay } from 'date-fns';
@@ -22,11 +23,9 @@ export function getDayPositionInBlock({
 
 	const blockDays = getDaysInBlock({ blockId, dayToBlockIdMap });
 
-	if (blockDays.length <= 1) return "single";
-
-	const index = blockDays.findIndex((d) => isSameDay(d, date));
-	if (index === 0) return "start";
-	if (index === blockDays.length - 1) return "end";
-
-	return "middle";
+	return determineDayPosition({
+		orderedDays: blockDays,
+		targetDate: date,
+		compareFn: isSameDay,
+	});
 }

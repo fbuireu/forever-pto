@@ -1,27 +1,15 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import type { EffectiveRatio } from '@modules/components/home/components/calendarList/hooks/types';
 import type { BlockOpportunity } from '@modules/components/home/components/calendarList/hooks/useCalendar/types';
-import {
-	calculateEffectiveDays,
-} from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/calculateEffectiveDays/calculateEffectiveDays';
-import {
-	createFreeDaysBaseMap,
-} from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/createFreeDaysBaseMap/createFreeDaysBaseMap';
-import {
-	createHolidaysMap,
-} from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/createHolidaysMap/createHolidaysMap';
-import {
-	createYearMap,
-} from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/createYearMap/createYearMap';
-import {
-	findOptimalGaps,
-} from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/findOptimalGaps/findOptimalGaps';
-import {
-	generateInitialSelectedDays,
-} from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/generateInitialSelectedDays/generateInitialSelectedDays';
+import { calculateEffectiveDays } from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/calculateEffectiveDays/calculateEffectiveDays';
+import { createFreeDaysBaseMap } from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/createFreeDaysBaseMap/createFreeDaysBaseMap';
+import { createHolidaysMap } from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/createHolidaysMap/createHolidaysMap';
+import { createYearMap } from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/createYearMap/createYearMap';
+import { findOptimalGaps } from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/findOptimalGaps/findOptimalGaps';
+import { generateInitialSelectedDays } from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/generateInitialSelectedDays/generateInitialSelectedDays';
 import { getDateKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey';
-import { addMonths, isWeekend, startOfMonth } from 'date-fns';
-import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { addMonths, startOfMonth } from 'date-fns';
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 
 interface UseCalendarParams {
 	year: number;
@@ -31,17 +19,40 @@ interface UseCalendarParams {
 	carryOverMonths: number;
 }
 
-export function useCalendar({ year, ptoDays, allowPastDays, holidays, carryOverMonths }: UseCalendarParams) {
+interface UseCalendarReturn {
+	selectedDays: Date[];
+	setSelectedDays: Dispatch<SetStateAction<Date[]>>;
+	suggestedDays: Date[];
+	alternativeBlocks: Record<string, BlockOpportunity[]>;
+	dayToBlockIdMap: Record<string, string>;
+	hoveredBlockId: string | null;
+	setHoveredBlockId: Dispatch<SetStateAction<string | null>>;
+	isPending: boolean;
+	monthsToShowDates: Date[];
+	freeDaysBaseMap: Map<string, Date>;
+	isHoliday: (date: Date) => boolean;
+	getHolidayName: (date: Date) => string | null;
+	isPastDayAllowed: () => boolean;
+	calculateEffectiveDays: (ptoDaysToAdd: Date[]) => EffectiveRatio;
+}
+
+export function useCalendar({
+	year,
+	ptoDays,
+	allowPastDays,
+	holidays,
+	carryOverMonths,
+}: UseCalendarParams): UseCalendarReturn {
 	const [selectedDays, setSelectedDays] = useState<Date[]>([]);
 	const [suggestedDays, setSuggestedDays] = useState<Date[]>([]);
 	const [alternativeBlocks, setAlternativeBlocks] = useState<Record<string, BlockOpportunity[]>>({});
 	const [dayToBlockIdMap, setDayToBlockIdMap] = useState<Record<string, string>>({});
 	const [hoveredBlockId, setHoveredBlockId] = useState<string | null>(null);
 	const [isPending, startTransition] = useTransition();
-
 	const monthsToShowDates = useMemo(() => {
 		const start = startOfMonth(new Date(year, 0, 1));
 		const totalMonths = carryOverMonths + 12;
+
 		return Array.from({ length: totalMonths }, (_, i) => addMonths(start, i));
 	}, [year, carryOverMonths]);
 
@@ -57,35 +68,42 @@ export function useCalendar({ year, ptoDays, allowPastDays, holidays, carryOverM
 		[holidaysMap],
 	);
 
-	const isPastDayAllowed = useCallback(() => {
-		return !(allowPastDays === "false");
-	}, [allowPastDays]);
+	const isPastDayAllowed = useCallback(() => allowPastDays !== "false", [allowPastDays]);
 
 	useEffect(() => {
 		const initialDays = generateInitialSelectedDays({ monthsToShow: monthsToShowDates, holidays });
 		setSelectedDays(initialDays);
 	}, [holidays, monthsToShowDates]);
 
-	const selectedPtoDays = useMemo(() => {
-		return selectedDays.filter((day) => !isWeekend(day) && !isHoliday(day));
-	}, [selectedDays, isHoliday]);
-
 	const freeDaysBaseMap = useMemo(
-		() => createFreeDaysBaseMap({ monthsToShow: monthsToShowDates, holidays, selectedPtoDays: selectedDays }),
+		() =>
+			createFreeDaysBaseMap({
+				monthsToShow: monthsToShowDates,
+				holidays,
+				selectedPtoDays: selectedDays,
+			}),
 		[monthsToShowDates, holidays, selectedDays],
 	);
 
 	const calculateEffectiveDaysCallback = useCallback(
-		(ptoDaysToAdd: Date[] = []): EffectiveRatio => {
-			return calculateEffectiveDays({ freeDaysBaseMap, selectedPtoDays, ptoDaysToAdd });
-		},
-		[freeDaysBaseMap, selectedPtoDays],
+		(ptoDaysToEvaluate: Date[] = []): EffectiveRatio =>
+			calculateEffectiveDays({
+				freeDaysBaseMap,
+				ptoDays: ptoDaysToEvaluate,
+			}),
+		[freeDaysBaseMap],
 	);
 
 	const yearMap = useMemo(
 		() =>
-			createYearMap({ monthsToShow: monthsToShowDates, isHoliday, selectedDays, selectedPtoDays, isPastDayAllowed }),
-		[monthsToShowDates, isHoliday, selectedDays, selectedPtoDays, isPastDayAllowed],
+			createYearMap({
+				monthsToShow: monthsToShowDates,
+				isHoliday,
+				selectedDays,
+				selectedPtoDays: [],
+				isPastDayAllowed,
+			}),
+		[monthsToShowDates, isHoliday, selectedDays, isPastDayAllowed],
 	);
 
 	const findOptimalGapsCallback = useCallback(
@@ -93,16 +111,13 @@ export function useCalendar({ year, ptoDays, allowPastDays, holidays, carryOverM
 			findOptimalGaps({
 				yearMap,
 				ptoDays,
-				selectedPtoDaysLength: selectedPtoDays.length,
 				calculateEffectiveDays: calculateEffectiveDaysCallback,
 			}),
-		[yearMap, ptoDays, selectedPtoDays.length, calculateEffectiveDaysCallback],
+		[yearMap, ptoDays, calculateEffectiveDaysCallback],
 	);
 
 	useEffect(() => {
-		const remainingDays = ptoDays - selectedPtoDays.length;
-
-		if (remainingDays <= 0 || ptoDays <= 0) {
+		if (ptoDays <= 0) {
 			setSuggestedDays([]);
 			setAlternativeBlocks({});
 			setDayToBlockIdMap({});
@@ -121,7 +136,7 @@ export function useCalendar({ year, ptoDays, allowPastDays, holidays, carryOverM
 				setDayToBlockIdMap({});
 			}
 		});
-	}, [ptoDays, selectedPtoDays.length, findOptimalGapsCallback]);
+	}, [ptoDays, findOptimalGapsCallback]);
 
 	return {
 		selectedDays,
@@ -133,7 +148,6 @@ export function useCalendar({ year, ptoDays, allowPastDays, holidays, carryOverM
 		setHoveredBlockId,
 		isPending,
 		monthsToShowDates,
-		selectedPtoDays,
 		freeDaysBaseMap,
 		isHoliday,
 		getHolidayName,

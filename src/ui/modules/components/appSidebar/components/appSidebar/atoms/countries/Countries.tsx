@@ -6,7 +6,7 @@ interface CountriesProps {
 	country: SearchParams["country"];
 }
 
-export default async function Countries({ country }: CountriesProps) {
+export const Countries = async ({ country }: CountriesProps) => {
 	const countries = getCountries();
 
 	return (
@@ -22,4 +22,4 @@ export default async function Countries({ country }: CountriesProps) {
 			className="w-full"
 		/>
 	);
-}
+};

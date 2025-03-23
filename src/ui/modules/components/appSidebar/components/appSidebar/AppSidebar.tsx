@@ -6,10 +6,10 @@ import {
 import {
     CarryOverMonths,
 } from '@ui/modules/components/appSidebar/components/appSidebar/atoms/carryOverMonths/CarryOverMonths';
-import Countries from '@ui/modules/components/appSidebar/components/appSidebar/atoms/countries/Countries';
+import { Countries } from '@ui/modules/components/appSidebar/components/appSidebar/atoms/countries/Countries';
 import { GearSettings } from '@ui/modules/components/appSidebar/components/appSidebar/atoms/gearSettings/GearSettings';
 import { PtoDays } from '@ui/modules/components/appSidebar/components/appSidebar/atoms/ptoDays/PtoDays';
-import Regions from '@ui/modules/components/appSidebar/components/appSidebar/atoms/regions/Regions';
+import { Regions } from '@ui/modules/components/appSidebar/components/appSidebar/atoms/regions/Regions';
 import { ThemeToggle } from '@ui/modules/components/appSidebar/components/appSidebar/atoms/themeToggle/ThemeToggle';
 import { Years } from '@ui/modules/components/appSidebar/components/appSidebar/atoms/years/Years';
 import {

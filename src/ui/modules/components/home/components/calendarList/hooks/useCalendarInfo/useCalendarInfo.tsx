@@ -1,4 +1,7 @@
+import type { HolidayDTO } from '@application/dto/holiday/types';
+import type { EffectiveRatio } from '@modules/components/home/components/calendarList/hooks/types';
 import type { BlockOpportunity } from '@modules/components/home/components/calendarList/hooks/useCalendar/types';
+import type { CalendarStats } from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/types';
 import {
     calculateIntervalsForMonth,
 } from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/calculateIntervalsForMonth/calculateIntervalsForMonth';
@@ -8,7 +11,6 @@ import {
 import {
     formatIntervals,
 } from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/formatIntervals/formatIntervals';
-
 import {
     getDayPositionInBlock,
 } from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/getDayPositionInBlock/getDayPositionInBlock';
@@ -18,8 +20,8 @@ import {
 import {
     getAlternativeDayPosition,
 } from '@modules/components/home/components/calendarList/hooks/useCalendarInteractions/utils/getAlternativeDayPosition/getAlternativeDayPosition';
-import { useCallback } from 'react';
-import type { EffectiveRatio } from '@modules/components/home/components/calendarList/hooks/types';
+import countries from 'i18n-iso-countries';
+import { type ReactNode, useCallback, useMemo } from 'react';
 
 interface UseCalendarInfoParams {
 	suggestedDays: Date[];
@@ -27,8 +29,20 @@ interface UseCalendarInfoParams {
 	hoveredBlockId: string | null;
 	alternativeBlocks: Record<string, BlockOpportunity[]>;
 	ptoDays: number;
+	holidays: HolidayDTO[];
+	country?: string;
+	region?: string;
 	calculateEffectiveDays: (ptoDaysToAdd: Date[]) => EffectiveRatio;
 	isDaySuggested: (day: Date) => boolean;
+}
+
+interface UseCalendarInfoReturn {
+	isDayAlternative: (day: Date) => boolean;
+	datePositionInBlock: (date: Date) => string | null;
+	alternativeDayPosition: (date: Date) => string | null;
+	suggestedDayForMonth: (month: Date) => Date[];
+	getMonthSummary: (month: Date) => ReactNode | null;
+	stats: CalendarStats;
 }
 
 export function useCalendarInfo({
@@ -37,9 +51,12 @@ export function useCalendarInfo({
 	hoveredBlockId,
 	alternativeBlocks,
 	ptoDays,
+	holidays,
+	country,
+	region,
 	calculateEffectiveDays,
 	isDaySuggested,
-}: UseCalendarInfoParams) {
+}: UseCalendarInfoParams): UseCalendarInfoReturn {
 	const isDayAlternative = useCallback(
 		(day: Date) => checkIsDayAlternative({ day, hoveredBlockId, alternativeBlocks, isDaySuggested }),
 		[hoveredBlockId, alternativeBlocks, isDaySuggested],
@@ -91,11 +108,34 @@ export function useCalendarInfo({
 		[ptoDays, suggestedDays, calculateEffectiveDays],
 	);
 
+	const stats = useMemo(() => {
+		countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
+		const nationalHolidays = holidays.filter((holiday) => !holiday.location);
+		const regionalHolidays = holidays.filter((holiday) => !!holiday.location);
+		const totalHolidays = nationalHolidays.length + regionalHolidays.length;
+		const ptoDaysUsed = suggestedDays.length;
+		const effectiveResult = ptoDaysUsed > 0 ? calculateEffectiveDays(suggestedDays) : { effective: 0, ratio: 0 };
+		const effectiveRatio = ptoDaysUsed > 0 ? (effectiveResult.effective / ptoDaysUsed).toFixed(2) : "0.00";
+
+		return {
+			country: country ? (countries.getName(country.toUpperCase(), "en") ?? country) : undefined,
+			region: regionalHolidays[0].location ?? region,
+			nationalHolidays: nationalHolidays.length,
+			regionalHolidays: regionalHolidays.length,
+			totalHolidays,
+			ptoDaysAvailable: ptoDays,
+			ptoDaysUsed,
+			effectiveDays: effectiveResult.effective,
+			effectiveRatio,
+		};
+	}, [holidays, suggestedDays, calculateEffectiveDays, country, region, ptoDays]);
+
 	return {
 		isDayAlternative,
 		datePositionInBlock,
 		alternativeDayPosition,
 		suggestedDayForMonth,
 		getMonthSummary,
+		stats,
 	};
 }

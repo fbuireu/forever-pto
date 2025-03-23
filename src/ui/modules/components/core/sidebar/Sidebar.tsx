@@ -1,21 +1,26 @@
 "use client";
 
-
 import { Separator } from '@radix-ui/react-menu';
 import { Slot } from '@radix-ui/react-slot';
 import { mergeClasses } from '@shared/ui/utils/mergeClasses';
 import { useMobile } from '@ui/hooks/useMobile/useMobile';
 import { Button } from '@ui/modules/components/core/button/Button';
 import { Input } from '@ui/modules/components/core/input/Input';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@ui/modules/components/core/sheet/Sheet';
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+} from '@ui/modules/components/core/sheet/Sheet';
 import { Skeleton } from '@ui/modules/components/core/skeleton/Skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/modules/components/core/tooltip/Tooltip';
-import { type VariantProps, cva } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { PanelLeftIcon } from 'lucide-react';
 import {
-    type CSSProperties,
     type ComponentProps,
     createContext,
+    type CSSProperties,
     useCallback,
     useContext,
     useEffect,
@@ -66,9 +71,6 @@ function SidebarProvider({
 }) {
 	const isMobile = useMobile();
 	const [openMobile, setOpenMobile] = useState(false);
-
-	// This is the internal state of the sidebar.
-	// We use openProp and setOpenProp for control from outside the component.
 	const [_open, _setOpen] = useState(defaultOpen);
 	const open = openProp ?? _open;
 	const setOpen = useCallback(
@@ -79,19 +81,15 @@ function SidebarProvider({
 			} else {
 				_setOpen(openState);
 			}
-
-			// This sets the cookie to keep the sidebar state.
 			document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
 		},
 		[setOpenProp, open],
 	);
 
-	// Helper to toggle the sidebar.
 	const toggleSidebar = useCallback(() => {
 		return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
 	}, [isMobile, setOpen]);
 
-	// Adds a keyboard shortcut to toggle the sidebar.
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === SIDEBAR_KEYBOARD_SHORTCUT && (event.metaKey || event.ctrlKey)) {
@@ -104,10 +102,7 @@ function SidebarProvider({
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, [toggleSidebar]);
 
-	// We add a state so that we can do data-state="expanded" or "collapsed".
-	// This makes it easier to style the sidebar with Tailwind classes.
 	const state = open ? "expanded" : "collapsed";
-
 	const contextValue = useMemo<SidebarContext>(
 		() => ({
 			state,
@@ -164,7 +159,10 @@ function Sidebar({
 		return (
 			<div
 				data-slot="sidebar"
-				className={mergeClasses("bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col", className)}
+				className={mergeClasses(
+					"bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col",
+					className,
+				)}
 				{...props}
 			>
 				{children}
@@ -372,11 +370,7 @@ function SidebarGroup({ className, ...props }: ComponentProps<"div">) {
 	);
 }
 
-function SidebarGroupLabel({
-	className,
-	asChild = false,
-	...props
-}: ComponentProps<"div"> & { asChild?: boolean }) {
+function SidebarGroupLabel({ className, asChild = false, ...props }: ComponentProps<"div"> & { asChild?: boolean }) {
 	const Comp = asChild ? Slot : "div";
 
 	return (
@@ -659,29 +653,28 @@ function SidebarMenuSubButton({
 }
 
 export {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupAction,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarHeader,
-    SidebarInput,
-    SidebarInset,
-    SidebarMenu,
-    SidebarMenuAction,
-    SidebarMenuBadge,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarMenuSkeleton,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
-    SidebarProvider,
-    SidebarRail,
-    SidebarSeparator,
-    SidebarTrigger,
-    useSidebar
+	Sidebar,
+	SidebarContent,
+	SidebarFooter,
+	SidebarGroup,
+	SidebarGroupAction,
+	SidebarGroupContent,
+	SidebarGroupLabel,
+	SidebarHeader,
+	SidebarInput,
+	SidebarInset,
+	SidebarMenu,
+	SidebarMenuAction,
+	SidebarMenuBadge,
+	SidebarMenuButton,
+	SidebarMenuItem,
+	SidebarMenuSkeleton,
+	SidebarMenuSub,
+	SidebarMenuSubButton,
+	SidebarMenuSubItem,
+	SidebarProvider,
+	SidebarRail,
+	SidebarSeparator,
+	SidebarTrigger,
+	useSidebar,
 };
-

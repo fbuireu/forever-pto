@@ -2,7 +2,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@modul
 import { setDayClassName } from '@modules/components/home/utils/setDayClassName';
 import { Calendar } from '@ui/modules/components/core/calendar/Calendar';
 import { Card } from '@ui/modules/components/core/card/Card';
-import { LoadingSpinner } from '@ui/modules/components/core/spinner/Spinner';
+import { Spinner } from '@ui/modules/components/core/spinner/Spinner';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { InfoIcon } from 'lucide-react';
@@ -24,7 +24,7 @@ interface MonthCalendarProps {
 	datePositionInBlock: (date: Date) => string | null;
 	alternativeDayPosition: (date: Date) => string | null;
 	handleDaySelect: (days: Date[] | undefined) => void;
-	handleDayInteraction: (e: MouseEvent<HTMLButtonElement> | FocusEvent<HTMLButtonElement>) => void;
+	handleDayInteraction: (event: MouseEvent<HTMLButtonElement> | FocusEvent<HTMLButtonElement>) => void;
 	handleDayMouseOut: () => void;
 	suggestedDayForMonth: (month: Date) => Date[];
 	getMonthSummary: (month: Date) => ReactNode;
@@ -55,7 +55,7 @@ export const MonthCalendar = ({
 	return (
 		<div className="mb-4">
 			<Card key={month.toISOString()} className="flex mb-2 flex-col">
-				{isPending && <LoadingSpinner />}
+				{isPending && <Spinner />}
 				<Calendar
 					mode="multiple"
 					selected={selectedDays}

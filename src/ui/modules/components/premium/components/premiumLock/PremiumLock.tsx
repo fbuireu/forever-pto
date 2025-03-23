@@ -2,18 +2,18 @@
 
 import { Button } from '@ui/modules/components/core/button/Button';
 import {
-	Dialog,
-	DialogClose,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
 } from '@ui/modules/components/core/dialog/Dialog';
 import { Input } from '@ui/modules/components/core/input/Input';
 import { Label } from '@ui/modules/components/core/label/Label';
 import { usePremium } from '@ui/providers/premium/PremiumProvider';
 import { LockIcon, X } from 'lucide-react';
-import { type FormEvent, type MouseEvent, type ReactNode, useState } from 'react';
+import { type FormEvent, type MouseEvent, type ReactNode, useState, useTransition } from 'react';
 
 interface PremiumLockProps {
 	children: ReactNode;
@@ -33,8 +33,8 @@ export const PremiumLock = ({
 	const { isPremium, isPremiumLoading, activatePremium } = usePremium();
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [email, setEmail] = useState("");
-	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [submitSuccess, setSubmitSuccess] = useState(false);
+	const [isPending, startTransition] = useTransition();
 
 	if (!isActive || isPremium) {
 		return renderUnlocked ? renderUnlocked(isPremium) : children;
@@ -48,24 +48,23 @@ export const PremiumLock = ({
 
 	const handleSubmitEmail = async (e: FormEvent) => {
 		e.preventDefault();
-		setIsSubmitting(true);
 
-		try {
-			await new Promise((resolve) => setTimeout(resolve, 1500));
+		startTransition(async () => {
+			try {
+				await new Promise((resolve) => setTimeout(resolve, 1500));
+				await activatePremium();
 
-			await activatePremium();
+				setSubmitSuccess(true);
 
-			setSubmitSuccess(true);
-			setTimeout(() => {
-				setIsModalOpen(false);
-				setSubmitSuccess(false);
-			}, 2000);
-		} catch (error) {
-			console.error("Error al procesar la suscripción:", error);
-		} finally {
-			setIsSubmitting(false);
-		}
+				setTimeout(() => {
+					setIsModalOpen(false);
+					setSubmitSuccess(false);
+				}, 2000);
+			} catch (error) {}
+		});
 	};
+
+	const isLoading = isPending || isPremiumLoading;
 
 	return (
 		<div className="relative overflow-hidden w-full h-full">
@@ -84,14 +83,12 @@ export const PremiumLock = ({
 				<p className="text-sm font-medium">{featureName}</p>
 				<p className="text-xs text-muted-foreground">Clic para desbloquear</p>
 			</button>
-
 			<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>{submitSuccess ? "¡Suscripción exitosa!" : "Desbloquea funciones premium"}</DialogTitle>
 						<DialogDescription>{description}</DialogDescription>
 					</DialogHeader>
-
 					{!submitSuccess ? (
 						<form onSubmit={handleSubmitEmail} className="space-y-4">
 							<div className="space-y-2">
@@ -104,15 +101,15 @@ export const PremiumLock = ({
 									required
 									placeholder="tu@email.com"
 									autoComplete="off"
+									disabled={isLoading}
 								/>
 							</div>
-
 							<Button
 								type="submit"
-								disabled={isSubmitting || isPremiumLoading}
+								disabled={isLoading}
 								className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary/90 transition-colors"
 							>
-								{isSubmitting || isPremiumLoading ? "Procesando..." : "Suscribirse"}
+								{isLoading ? "Procesando..." : "Suscribirse"}
 							</Button>
 						</form>
 					) : (
@@ -120,7 +117,6 @@ export const PremiumLock = ({
 							Tu suscripción se ha activado correctamente. ¡Disfruta de todas las funciones premium!
 						</p>
 					)}
-
 					<DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
 						<X className="h-4 w-4" />
 						<span className="sr-only">Cerrar</span>

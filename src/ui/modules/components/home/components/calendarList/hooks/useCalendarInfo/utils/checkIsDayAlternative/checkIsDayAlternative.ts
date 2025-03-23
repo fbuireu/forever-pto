@@ -21,11 +21,5 @@ export function checkIsDayAlternative({
 	const alternatives = alternativeBlocks[hoveredBlockId] || [];
 	const dayKey = getDateKey(day);
 
-	for (const block of alternatives) {
-		if (block.days.some((d) => getDateKey(d) === dayKey)) {
-			return true;
-		}
-	}
-
-	return false;
+	return alternatives.some((block) => block.days.some((d) => getDateKey(d) === dayKey));
 }

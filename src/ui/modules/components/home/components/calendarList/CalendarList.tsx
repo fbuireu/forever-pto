@@ -9,10 +9,13 @@ import {
 import {
     useCalendarInteractions,
 } from '@modules/components/home/components/calendarList/hooks/useCalendarInteractions/useCalendarInteractions';
+import { Stats } from '@modules/components/home/components/stats/Stats';
 import { areArraysEqual } from '@modules/components/home/utils/arrayIsEqual';
 import { memo } from 'react';
 
 interface CalendarListProps {
+	country?: string;
+	region?: string;
 	year: number;
 	ptoDays: number;
 	allowPastDays: string;
@@ -20,7 +23,15 @@ interface CalendarListProps {
 	carryOverMonths: number;
 }
 
-export default function CalendarList({ year, ptoDays, allowPastDays, holidays, carryOverMonths }: CalendarListProps) {
+export default function CalendarList({
+	country,
+	region,
+	year,
+	ptoDays,
+	allowPastDays,
+	holidays,
+	carryOverMonths,
+}: CalendarListProps) {
 	const calendar = useCalendar({
 		year,
 		ptoDays,
@@ -46,11 +57,15 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays, c
 		hoveredBlockId: calendar.hoveredBlockId,
 		alternativeBlocks: calendar.alternativeBlocks,
 		ptoDays,
+		holidays,
+		country,
+		region,
 		calculateEffectiveDays: calendar.calculateEffectiveDays,
 		isDaySuggested: interactions.isDaySuggested,
 	});
 
 	const calendarProps = {
+		ptoDays,
 		...calendar,
 		...interactions,
 		...calendarInfo,
@@ -58,9 +73,10 @@ export default function CalendarList({ year, ptoDays, allowPastDays, holidays, c
 
 	return (
 		<section className="flex w-full flex-col items-center gap-8">
+			<Stats stats={calendarInfo.stats} />
 			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-7">
 				{calendar.monthsToShowDates.map((month) => (
-					<MemoizedMonthCalendar key={month.toISOString()} month={month} ptoDays={ptoDays} {...calendarProps} />
+					<MemoizedMonthCalendar key={month.toISOString()} month={month} {...calendarProps} />
 				))}
 			</div>
 		</section>

@@ -4,8 +4,8 @@ import * as SwitchPrimitives from '@radix-ui/react-switch';
 import { mergeClasses } from '@shared/ui/utils/mergeClasses';
 import { type ComponentPropsWithoutRef, type ComponentRef, forwardRef } from 'react';
 
-const Switch = forwardRef<
-		ComponentRef<typeof SwitchPrimitives.Root>,
+export const Switch = forwardRef<
+	ComponentRef<typeof SwitchPrimitives.Root>,
 	ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
 >(({ className, ...props }, ref) => (
 	<SwitchPrimitives.Root
@@ -24,5 +24,3 @@ const Switch = forwardRef<
 	</SwitchPrimitives.Root>
 ));
 Switch.displayName = SwitchPrimitives.Root.displayName;
-
-export { Switch };

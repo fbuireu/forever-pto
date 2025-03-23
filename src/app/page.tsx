@@ -41,6 +41,8 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 					<HolidaysSummary holidays={holidays} />
 					<CalendarList
 						key={JSON.stringify(holidays)}
+						country={country}
+						region={region}
 						year={Number(year)}
 						ptoDays={Number(ptoDays)}
 						allowPastDays={allowPastDays}
@@ -54,8 +56,8 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 }
 
 // TODO:
-// 1- Refactor (useCalendar)
-// 2- Isolate functions
+// 1- Rethink calculations in DTO (maybe get region name and country name there?)
+// 2- Isolate components
 // 4- Tema fin de semana
 // 6- Add tests (also e2e)
 // 9- Add CI/CD
