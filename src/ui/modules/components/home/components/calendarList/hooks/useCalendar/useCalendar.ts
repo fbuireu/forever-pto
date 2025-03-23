@@ -126,10 +126,10 @@ export function useCalendar({
 
 		startTransition(() => {
 			try {
-				const result = findOptimalGapsCallback();
-				setSuggestedDays(result.suggestedDays);
-				setAlternativeBlocks(result.alternativeBlocks);
-				setDayToBlockIdMap(result.dayToBlockIdMap);
+				const { suggestedDays, alternativeBlocks, dayToBlockIdMap } = findOptimalGapsCallback();
+				setSuggestedDays(suggestedDays);
+				setAlternativeBlocks(alternativeBlocks);
+				setDayToBlockIdMap(dayToBlockIdMap);
 			} catch (error) {
 				setSuggestedDays([]);
 				setAlternativeBlocks({});
