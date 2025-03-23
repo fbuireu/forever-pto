@@ -19,3 +19,15 @@ export interface CalendarStats {
 	effectiveDays: number;
 	effectiveRatio: string;
 }
+
+export interface VacationStats {
+	country?: string;
+	region?: string;
+	nationalHolidays: number;
+	regionalHolidays: number;
+	totalHolidays: number;
+	ptoDaysAvailable: number;
+	ptoDaysUsed: number;
+	effectiveDays: number;
+	effectiveRatio: string;
+}

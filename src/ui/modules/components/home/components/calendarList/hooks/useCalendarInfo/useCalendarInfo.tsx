@@ -6,6 +6,9 @@ import {
     calculateIntervalsForMonth,
 } from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/calculateIntervalsForMonth/calculateIntervalsForMonth';
 import {
+    calculateStats,
+} from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/calculateStats';
+import {
     checkIsDayAlternative,
 } from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/checkIsDayAlternative/checkIsDayAlternative';
 import {
@@ -20,7 +23,6 @@ import {
 import {
     getAlternativeDayPosition,
 } from '@modules/components/home/components/calendarList/hooks/useCalendarInteractions/utils/getAlternativeDayPosition/getAlternativeDayPosition';
-import countries from 'i18n-iso-countries';
 import { type ReactNode, useCallback, useMemo } from 'react';
 
 interface UseCalendarInfoParams {
@@ -108,27 +110,18 @@ export function useCalendarInfo({
 		[ptoDays, suggestedDays, calculateEffectiveDays],
 	);
 
-	const stats = useMemo(() => {
-		countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
-		const nationalHolidays = holidays.filter((holiday) => !holiday.location);
-		const regionalHolidays = holidays.filter((holiday) => !!holiday.location);
-		const totalHolidays = nationalHolidays.length + regionalHolidays.length;
-		const ptoDaysUsed = suggestedDays.length;
-		const effectiveResult = ptoDaysUsed > 0 ? calculateEffectiveDays(suggestedDays) : { effective: 0, ratio: 0 };
-		const effectiveRatio = ptoDaysUsed > 0 ? (effectiveResult.effective / ptoDaysUsed).toFixed(2) : "0.00";
-
-		return {
-			country: country ? (countries.getName(country.toUpperCase(), "en") ?? country) : undefined,
-			region: regionalHolidays[0].location ?? region,
-			nationalHolidays: nationalHolidays.length,
-			regionalHolidays: regionalHolidays.length,
-			totalHolidays,
-			ptoDaysAvailable: ptoDays,
-			ptoDaysUsed,
-			effectiveDays: effectiveResult.effective,
-			effectiveRatio,
-		};
-	}, [holidays, suggestedDays, calculateEffectiveDays, country, region, ptoDays]);
+	const stats = useMemo(
+		() =>
+			calculateStats({
+				holidays,
+				suggestedDays,
+				calculateEffectiveDays,
+				country,
+				region,
+				ptoDays,
+			}),
+		[holidays, suggestedDays, calculateEffectiveDays, country, region, ptoDays],
+	);
 
 	return {
 		isDayAlternative,

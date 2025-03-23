@@ -73,4 +73,6 @@ export const SOCIAL_NETWORKS: Record<CapitalizeKeys<string>, string> = {
 
 export const THEME_STORAGE_KEY: string = "theme";
 
+export const DEFAULT_LANGUAGE = "en";
+
 export const DEFAULT_LOCALE_STRING: Intl.LocalesArgument = "es-ES";

@@ -20,7 +20,7 @@ interface HolidaysSummaryProps {
 
 const HolidaysSummary = ({ holidays }: HolidaysSummaryProps) => {
 	const nationalHolidays = holidays.filter((holiday) => !holiday.location);
-	const regionalHolidays = holidays.filter((holiday) => holiday.location);
+	const regionalHolidays = holidays.filter((holiday) => !!holiday.location);
 
 	return (
 		<div className="mb-6">
