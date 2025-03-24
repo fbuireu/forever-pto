@@ -1,6 +1,8 @@
 "use client";
 
+import type { CountryDTO } from '@application/dto/country/types';
 import type { HolidayDTO } from '@application/dto/holiday/types';
+import type { RegionDTO } from '@application/dto/region/types';
 import { MonthCalendar } from '@modules/components/home/components/calendarList/atoms/monthCalendar/MonthsCalendar';
 import { useCalendar } from '@modules/components/home/components/calendarList/hooks/useCalendar/useCalendar';
 import {
@@ -14,23 +16,23 @@ import { areArraysEqual } from '@modules/components/home/utils/arrayIsEqual';
 import { memo } from 'react';
 
 interface CalendarListProps {
-	country?: string;
-	region?: string;
 	year: number;
 	ptoDays: number;
 	allowPastDays: string;
 	holidays: HolidayDTO[];
 	carryOverMonths: number;
+	userCountry?: CountryDTO;
+	userRegion?: RegionDTO["label"];
 }
 
 export default function CalendarList({
-	country,
-	region,
 	year,
 	ptoDays,
 	allowPastDays,
 	holidays,
 	carryOverMonths,
+	userCountry,
+	userRegion,
 }: CalendarListProps) {
 	const calendar = useCalendar({
 		year,
@@ -58,8 +60,6 @@ export default function CalendarList({
 		alternativeBlocks: calendar.alternativeBlocks,
 		ptoDays,
 		holidays,
-		country,
-		region,
 		calculateEffectiveDays: calendar.calculateEffectiveDays,
 		isDaySuggested: interactions.isDaySuggested,
 	});
@@ -73,7 +73,7 @@ export default function CalendarList({
 
 	return (
 		<section className="flex w-full flex-col items-center gap-8">
-			<Stats stats={calendarInfo.stats} />
+			<Stats stats={calendarInfo.stats} userCountry={userCountry} userRegion={userRegion} />
 			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-7">
 				{calendar.monthsToShowDates.map((month) => (
 					<MemoizedMonthCalendar key={month.toISOString()} month={month} {...calendarProps} />

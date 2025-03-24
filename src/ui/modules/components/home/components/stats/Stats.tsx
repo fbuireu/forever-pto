@@ -1,9 +1,13 @@
+import type { CountryDTO } from '@application/dto/country/types';
+import type { RegionDTO } from '@application/dto/region/types';
 import { getBadgeVariant } from '@modules/components/home/components/stats/utils/getBadgeVariant';
 import { Badge } from '@ui/modules/components/core/badge/Badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/components/core/card/Card';
 import { Separator } from '@ui/modules/components/core/separator/Separator';
 
 interface StatsProps {
+	userCountry?: CountryDTO;
+	userRegion?: RegionDTO["label"];
 	stats: {
 		country?: string;
 		region?: string;
@@ -17,7 +21,7 @@ interface StatsProps {
 	};
 }
 
-export const Stats = ({ stats }: StatsProps) => {
+export const Stats = ({ stats, userCountry, userRegion }: StatsProps) => {
 	if (!stats) {
 		return null;
 	}
@@ -31,13 +35,13 @@ export const Stats = ({ stats }: StatsProps) => {
 				<div className="text-sm text-slate-700 dark:text-slate-300">
 					<h3 className="font-medium text-base mb-2">Resumen de días festivos</h3>
 					<p>
-						{stats.country ? `En ${stats.country} hay ` : "Hay "}
+						{userCountry?.label ? `En ${userCountry.label} (${userCountry.flag}) hay ` : "Hay "}
 						<span className="font-medium">{stats.nationalHolidays} festivos nacionales</span>
 						{stats.regionalHolidays > 0 && (
 							<>
 								{". Sumados a los "}
 								<span className="font-medium">
-									{stats.regionalHolidays} festivos de la {stats.region ? `región ${stats.region}` : "región"}
+									{stats.regionalHolidays} festivos en {userRegion ? `${userRegion}` : "la región"}
 								</span>
 							</>
 						)}

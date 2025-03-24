@@ -1,6 +1,6 @@
 import type { SearchParams } from '@const/types';
 import { getCountries } from '@infrastructure/services/country/getCountries/getCountries';
-import { getRegions } from '@infrastructure/services/regions/getRegions/getRegions';
+import { getRegions } from '@infrastructure/services/region/getRegions/getRegions';
 import { Combobox } from '@ui/modules/components/core/combobox/Combobox';
 import { cache } from 'react';
 

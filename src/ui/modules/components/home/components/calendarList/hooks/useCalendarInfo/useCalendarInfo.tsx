@@ -54,7 +54,6 @@ export function useCalendarInfo({
 	alternativeBlocks,
 	ptoDays,
 	holidays,
-	country,
 	region,
 	calculateEffectiveDays,
 	isDaySuggested,
@@ -116,11 +115,9 @@ export function useCalendarInfo({
 				holidays,
 				suggestedDays,
 				calculateEffectiveDays,
-				country,
-				region,
 				ptoDays,
 			}),
-		[holidays, suggestedDays, calculateEffectiveDays, country, region, ptoDays],
+		[holidays, suggestedDays, calculateEffectiveDays, ptoDays],
 	);
 
 	return {

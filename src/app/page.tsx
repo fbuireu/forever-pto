@@ -1,7 +1,9 @@
 import { DEFAULT_SEARCH_PARAMS } from '@const/const';
 import type { SearchParams } from '@const/types';
 import { isPremium as isPremiumFn } from '@infrastructure/services/cookies/isPremium/isPremium';
-import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
+import { getCountry } from '@infrastructure/services/country/getCountry/getCountry';
+import { getHolidays } from '@infrastructure/services/holiday/getHolidays';
+import { getRegion } from '@infrastructure/services/region/getRegion/getRegion';
 import { AppSidebar } from '@ui/modules/components/appSidebar/components/appSidebar/AppSidebar';
 import { SidebarProvider, SidebarTrigger } from '@ui/modules/components/core/sidebar/Sidebar';
 import CalendarList from '@ui/modules/components/home/components/calendarList/CalendarList';
@@ -23,6 +25,8 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 		carryOverMonths = CARRY_OVER_MONTHS,
 	} = await searchParams;
 	const holidays = await getHolidays({ country, region, year, carryOverMonths });
+	const userCountry = getCountry(country);
+	const userRegion = getRegion(holidays);
 	const isPremium = await isPremiumFn();
 
 	return (
@@ -41,13 +45,13 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 					<HolidaysSummary holidays={holidays} />
 					<CalendarList
 						key={JSON.stringify(holidays)}
-						country={country}
-						region={region}
 						year={Number(year)}
 						ptoDays={Number(ptoDays)}
 						allowPastDays={allowPastDays}
 						holidays={holidays}
 						carryOverMonths={isPremium ? Number(carryOverMonths) : 1}
+						userCountry={userCountry}
+						userRegion={userRegion}
 					/>
 				</div>
 			</PremiumProvider>
@@ -78,3 +82,5 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 // 31- Add form shadcn and zod
 // 31- semantic html
 // 32- Add safeguard to avoid rerenders when same data is passed etc (memo previous request?)
+// 33- check memo and cache methods
+// 34- services folder singular name
