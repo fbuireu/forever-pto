@@ -7,25 +7,25 @@ import { useMobile } from '@ui/hooks/useMobile/useMobile';
 import { Button } from '@ui/modules/components/core/button/Button';
 import { Input } from '@ui/modules/components/core/input/Input';
 import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
+	Sheet,
+	SheetContent,
+	SheetDescription,
+	SheetHeader,
+	SheetTitle,
 } from '@ui/modules/components/core/sheet/Sheet';
 import { Skeleton } from '@ui/modules/components/core/skeleton/Skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/modules/components/core/tooltip/Tooltip';
-import { cva, type VariantProps } from 'class-variance-authority';
+import { type VariantProps, cva } from 'class-variance-authority';
 import { PanelLeftIcon } from 'lucide-react';
 import {
-    type ComponentProps,
-    createContext,
-    type CSSProperties,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useState,
+	type CSSProperties,
+	type ComponentProps,
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
 } from 'react';
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
@@ -157,7 +157,7 @@ function Sidebar({
 
 	if (collapsible === "none") {
 		return (
-			<div
+			<aside
 				data-slot="sidebar"
 				className={mergeClasses(
 					"bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col",
@@ -166,7 +166,7 @@ function Sidebar({
 				{...props}
 			>
 				{children}
-			</div>
+			</aside>
 		);
 	}
 
@@ -177,7 +177,7 @@ function Sidebar({
 					data-sidebar="sidebar"
 					data-slot="sidebar"
 					data-mobile="true"
-					className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
+					className="bg:inherit text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
 					style={
 						{
 							"--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -196,7 +196,7 @@ function Sidebar({
 	}
 
 	return (
-		<div
+		<aside
 			className="group peer text-sidebar-foreground hidden md:block"
 			data-state={state}
 			data-collapsible={state === "collapsed" ? collapsible : ""}
@@ -236,7 +236,7 @@ function Sidebar({
 					{children}
 				</div>
 			</div>
-		</div>
+		</aside>
 	);
 }
 
@@ -676,5 +676,6 @@ export {
 	SidebarRail,
 	SidebarSeparator,
 	SidebarTrigger,
-	useSidebar,
+	useSidebar
 };
+
