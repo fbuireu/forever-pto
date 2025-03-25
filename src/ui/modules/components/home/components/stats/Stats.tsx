@@ -1,9 +1,9 @@
-import type { CountryDTO } from '@application/dto/country/types';
-import type { RegionDTO } from '@application/dto/region/types';
-import { getBadgeVariant } from '@modules/components/home/components/stats/utils/getBadgeVariant';
-import { Badge } from '@ui/modules/components/core/badge/Badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/components/core/card/Card';
-import { Separator } from '@ui/modules/components/core/separator/Separator';
+import type { CountryDTO } from "@application/dto/country/types";
+import type { RegionDTO } from "@application/dto/region/types";
+import { getBadgeVariant } from "@modules/components/home/components/stats/utils/getBadgeVariant";
+import { Badge } from "@ui/modules/components/core/badge/Badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@ui/modules/components/core/card/Card";
+import { Separator } from "@ui/modules/components/core/separator/Separator";
 
 interface StatsProps {
 	userCountry?: CountryDTO;

@@ -1,29 +1,15 @@
-import type { HolidayDTO } from '@application/dto/holiday/types';
-import type { EffectiveRatio } from '@modules/components/home/components/calendarList/hooks/types';
-import type { BlockOpportunity } from '@modules/components/home/components/calendarList/hooks/useCalendar/types';
-import type { CalendarStats } from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/types';
-import {
-    calculateIntervalsForMonth,
-} from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/calculateIntervalsForMonth/calculateIntervalsForMonth';
-import {
-    calculateStats,
-} from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/calculateStats';
-import {
-    checkIsDayAlternative,
-} from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/checkIsDayAlternative/checkIsDayAlternative';
-import {
-    formatIntervals,
-} from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/formatIntervals/formatIntervals';
-import {
-    getDayPositionInBlock,
-} from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/getDayPositionInBlock/getDayPositionInBlock';
-import {
-    getSuggestedDaysForMonth,
-} from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/getSuggestedDaysForMonth/getSuggestedDaysForMonth';
-import {
-    getAlternativeDayPosition,
-} from '@modules/components/home/components/calendarList/hooks/useCalendarInteractions/utils/getAlternativeDayPosition/getAlternativeDayPosition';
-import { type ReactNode, useCallback, useMemo } from 'react';
+import type { HolidayDTO } from "@application/dto/holiday/types";
+import type { EffectiveRatio } from "@modules/components/home/components/calendarList/hooks/types";
+import type { BlockOpportunity } from "@modules/components/home/components/calendarList/hooks/useCalendar/types";
+import type { CalendarStats } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/types";
+import { calculateIntervalsForMonth } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/calculateIntervalsForMonth/calculateIntervalsForMonth";
+import { calculateStats } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/calculateStats";
+import { checkIsDayAlternative } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/checkIsDayAlternative/checkIsDayAlternative";
+import { formatIntervals } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/formatIntervals/formatIntervals";
+import { getDayPositionInBlock } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/getDayPositionInBlock/getDayPositionInBlock";
+import { getSuggestedDaysForMonth } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/getSuggestedDaysForMonth/getSuggestedDaysForMonth";
+import { getAlternativeDayPosition } from "@modules/components/home/components/calendarList/hooks/useCalendarInteractions/utils/getAlternativeDayPosition/getAlternativeDayPosition";
+import { type ReactNode, useCallback, useMemo } from "react";
 
 interface UseCalendarInfoParams {
 	suggestedDays: Date[];

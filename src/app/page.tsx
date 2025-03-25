@@ -1,14 +1,14 @@
-import { DEFAULT_SEARCH_PARAMS } from '@const/const';
-import type { SearchParams } from '@const/types';
-import { isPremium as isPremiumFn } from '@infrastructure/services/cookies/isPremium/isPremium';
-import { getCountry } from '@infrastructure/services/country/getCountry/getCountry';
-import { getHolidays } from '@infrastructure/services/holiday/getHolidays';
-import { getRegion } from '@infrastructure/services/region/getRegion/getRegion';
-import { AppSidebar } from '@ui/modules/components/appSidebar/components/appSidebar/AppSidebar';
-import { SidebarProvider, SidebarTrigger } from '@ui/modules/components/core/sidebar/Sidebar';
-import CalendarList from '@ui/modules/components/home/components/calendarList/CalendarList';
-import HolidaysSummary from '@ui/modules/components/home/components/holidaySummary/HolidaysSummary';
-import { PremiumProvider } from '@ui/providers/premium/PremiumProvider';
+import { DEFAULT_SEARCH_PARAMS } from "@const/const";
+import type { SearchParams } from "@const/types";
+import { isPremium as isPremiumFn } from "@infrastructure/services/cookies/isPremium/isPremium";
+import { getCountry } from "@infrastructure/services/country/getCountry/getCountry";
+import { getHolidays } from "@infrastructure/services/holiday/getHolidays";
+import { getRegion } from "@infrastructure/services/region/getRegion/getRegion";
+import { AppSidebar } from "@ui/modules/components/appSidebar/components/appSidebar/AppSidebar";
+import { SidebarProvider, SidebarTrigger } from "@ui/modules/components/core/sidebar/Sidebar";
+import CalendarList from "@ui/modules/components/home/components/calendarList/CalendarList";
+import HolidaysSummary from "@ui/modules/components/home/components/holidaySummary/HolidaysSummary";
+import { PremiumProvider } from "@ui/providers/premium/PremiumProvider";
 
 interface ForeverPtoProps {
 	searchParams: Promise<SearchParams>;

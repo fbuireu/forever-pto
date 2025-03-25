@@ -1,8 +1,8 @@
-import type { SearchParams } from '@const/types';
-import { getCountries } from '@infrastructure/services/country/getCountries/getCountries';
-import { getRegions } from '@infrastructure/services/region/getRegions/getRegions';
-import { Combobox } from '@ui/modules/components/core/combobox/Combobox';
-import { cache } from 'react';
+import type { SearchParams } from "@const/types";
+import { getCountries } from "@infrastructure/services/country/getCountries/getCountries";
+import { getRegions } from "@infrastructure/services/region/getRegions/getRegions";
+import { Combobox } from "@ui/modules/components/core/combobox/Combobox";
+import { cache } from "react";
 
 const getCachedCountries = cache(getCountries);
 const getCachedRegions = cache(getRegions);

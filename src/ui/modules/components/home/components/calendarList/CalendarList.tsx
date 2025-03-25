@@ -1,19 +1,15 @@
 "use client";
 
-import type { CountryDTO } from '@application/dto/country/types';
-import type { HolidayDTO } from '@application/dto/holiday/types';
-import type { RegionDTO } from '@application/dto/region/types';
-import { MonthCalendar } from '@modules/components/home/components/calendarList/atoms/monthCalendar/MonthsCalendar';
-import { useCalendar } from '@modules/components/home/components/calendarList/hooks/useCalendar/useCalendar';
-import {
-    useCalendarInfo,
-} from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/useCalendarInfo';
-import {
-    useCalendarInteractions,
-} from '@modules/components/home/components/calendarList/hooks/useCalendarInteractions/useCalendarInteractions';
-import { Stats } from '@modules/components/home/components/stats/Stats';
-import { areArraysEqual } from '@modules/components/home/utils/arrayIsEqual';
-import { memo } from 'react';
+import type { CountryDTO } from "@application/dto/country/types";
+import type { HolidayDTO } from "@application/dto/holiday/types";
+import type { RegionDTO } from "@application/dto/region/types";
+import { MonthCalendar } from "@modules/components/home/components/calendarList/atoms/monthCalendar/MonthsCalendar";
+import { useCalendar } from "@modules/components/home/components/calendarList/hooks/useCalendar/useCalendar";
+import { useCalendarInfo } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/useCalendarInfo";
+import { useCalendarInteractions } from "@modules/components/home/components/calendarList/hooks/useCalendarInteractions/useCalendarInteractions";
+import { Stats } from "@modules/components/home/components/stats/Stats";
+import { areArraysEqual } from "@modules/components/home/utils/arrayIsEqual";
+import { memo } from "react";
 
 interface CalendarListProps {
 	year: number;

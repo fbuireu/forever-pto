@@ -1,5 +1,5 @@
-import { regionDTO } from '@application/dto/region/regionDTO';
-import Holidays from 'date-holidays';
+import { regionDTO } from "@application/dto/region/regionDTO";
+import Holidays from "date-holidays";
 
 export async function getRegions(countryCode?: string) {
 	try {

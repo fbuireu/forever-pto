@@ -1,6 +1,6 @@
-import type { HolidayDTO } from '@application/dto/holiday/types';
-import type { EffectiveRatio } from '@modules/components/home/components/calendarList/hooks/types';
-import type { VacationStats } from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/types';
+import type { HolidayDTO } from "@application/dto/holiday/types";
+import type { EffectiveRatio } from "@modules/components/home/components/calendarList/hooks/types";
+import type { VacationStats } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/types";
 
 interface CalculateStatsParams {
 	holidays: HolidayDTO[];

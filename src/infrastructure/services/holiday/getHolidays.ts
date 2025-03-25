@@ -1,10 +1,10 @@
-import { holidayDTO } from '@application/dto/holiday/holidayDTO';
-import type { HolidayDTO } from '@application/dto/holiday/types';
-import { isPremium } from '@infrastructure/services/cookies/isPremium/isPremium';
-import { getNationalHolidays } from '@infrastructure/services/holiday/utils/getNationalHolidays/getNationalHolidays';
-import { getRegionalHolidays } from '@infrastructure/services/holiday/utils/getRegionalHolidays/getRegionalHolidays';
-import { getUserLanguage } from '@shared/infrastructure/services/utils/getUserLanguage/getUserLanguage';
-import { getUserTimezone } from '@shared/infrastructure/services/utils/getUserTimezone/getUserTimezone';
+import { holidayDTO } from "@application/dto/holiday/holidayDTO";
+import type { HolidayDTO } from "@application/dto/holiday/types";
+import { isPremium } from "@infrastructure/services/cookies/isPremium/isPremium";
+import { getNationalHolidays } from "@infrastructure/services/holiday/utils/getNationalHolidays/getNationalHolidays";
+import { getRegionalHolidays } from "@infrastructure/services/holiday/utils/getRegionalHolidays/getRegionalHolidays";
+import { getUserLanguage } from "@shared/infrastructure/services/utils/getUserLanguage/getUserLanguage";
+import { getUserTimezone } from "@shared/infrastructure/services/utils/getUserTimezone/getUserTimezone";
 
 interface GetHolidaysParams {
 	year: string;
