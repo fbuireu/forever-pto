@@ -14,7 +14,7 @@ interface ForeverPtoProps {
 	searchParams: Promise<SearchParams>;
 }
 
-export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
+const ForeverPto = async ({ searchParams }: ForeverPtoProps) =>  {
 	const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS, CARRY_OVER_MONTHS } = DEFAULT_SEARCH_PARAMS;
 	const {
 		country,
@@ -58,6 +58,8 @@ export default async function ForeverPto({ searchParams }: ForeverPtoProps) {
 		</SidebarProvider>
 	);
 }
+
+export default ForeverPto
 
 // TODO:
 // 1- Rethink calculations in DTO (maybe get region name and country name there?)

@@ -22,12 +22,9 @@ export const metadata: Metadata = {
 	description: "Aplicación para optimizar la selección de días PTO y maximizar tu tiempo libre",
 };
 
-export default function RootLayout({
-	children,
-}: Readonly<{
-	children: ReactNode;
-}>) {
-	return (
+type RootLayoutProps =Readonly<{ children: ReactNode}>
+
+const RootLayout = ({ children}: RootLayoutProps) => (
 		<ErrorBoundary>
 			<html lang="en">
 				<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
@@ -38,5 +35,6 @@ export default function RootLayout({
 				</body>
 			</html>
 		</ErrorBoundary>
-	);
-}
+)
+
+export default RootLayout;
