@@ -1,4 +1,4 @@
-import { isSameDay, isSameMonth, isToday, isWeekend } from 'date-fns';
+import { isSameDay, isSameMonth, isToday, isWeekend } from "date-fns";
 
 interface SetDayClassNameParams {
 	date: Date;

@@ -1,4 +1,4 @@
-import { getDateFromKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateFromKey/getDateFromKey';
+import { getDateFromKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateFromKey/getDateFromKey";
 
 interface GetDaysInBlockParams {
 	blockId: string;

@@ -1,13 +1,14 @@
 "use client";
 
-import { Button } from '@modules/components/core/button/Button';
-import { useEffect, useState } from 'react';
+import { Button } from "@modules/components/core/button/Button";
+import { type ReactNode, useEffect, useState } from "react";
 
-export const ErrorBoundary = ({ children }: { children: React.ReactNode }) => {
+export const ErrorBoundary = ({ children }: { children: ReactNode }) => {
 	const [hasError, setHasError] = useState(false);
 
 	useEffect(() => {
 		const handleError = (error: ErrorEvent) => {
+			// biome-ignore lint/suspicious/noConsole: ErrorBoundary description
 			console.error("Error caught by error boundary:", error);
 			setHasError(true);
 		};

@@ -1,7 +1,7 @@
-import type { EffectiveRatio } from '@modules/components/home/components/calendarList/hooks/types';
-import type { IntervalInfo } from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/types';
-import { getSuggestedDaysForMonth } from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/getSuggestedDaysForMonth/getSuggestedDaysForMonth';
-import { groupConsecutiveDays } from '@modules/components/home/components/calendarList/hooks/utils/groupConsecutiveDays/groupConsecutiveDays';
+import type { EffectiveRatio } from "@modules/components/home/components/calendarList/hooks/types";
+import type { IntervalInfo } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/types";
+import { getSuggestedDaysForMonth } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/getSuggestedDaysForMonth/getSuggestedDaysForMonth";
+import { groupConsecutiveDays } from "@modules/components/home/components/calendarList/hooks/utils/groupConsecutiveDays/groupConsecutiveDays";
 
 interface CalculateIntervalsForMonthParams {
 	month: Date;

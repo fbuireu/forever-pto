@@ -1,15 +1,15 @@
-import type { HolidayDTO } from '@application/dto/holiday/types';
-import type { EffectiveRatio } from '@modules/components/home/components/calendarList/hooks/types';
-import type { BlockOpportunity } from '@modules/components/home/components/calendarList/hooks/useCalendar/types';
-import { calculateEffectiveDays } from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/calculateEffectiveDays/calculateEffectiveDays';
-import { createFreeDaysBaseMap } from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/createFreeDaysBaseMap/createFreeDaysBaseMap';
-import { createHolidaysMap } from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/createHolidaysMap/createHolidaysMap';
-import { createYearMap } from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/createYearMap/createYearMap';
-import { findOptimalGaps } from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/findOptimalGaps/findOptimalGaps';
-import { generateInitialSelectedDays } from '@modules/components/home/components/calendarList/hooks/useCalendar/utils/generateInitialSelectedDays/generateInitialSelectedDays';
-import { getDateKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey';
-import { addMonths, startOfMonth } from 'date-fns';
-import { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import type { HolidayDTO } from "@application/dto/holiday/types";
+import type { EffectiveRatio } from "@modules/components/home/components/calendarList/hooks/types";
+import type { BlockOpportunity } from "@modules/components/home/components/calendarList/hooks/useCalendar/types";
+import { calculateEffectiveDays } from "@modules/components/home/components/calendarList/hooks/useCalendar/utils/calculateEffectiveDays/calculateEffectiveDays";
+import { createFreeDaysBaseMap } from "@modules/components/home/components/calendarList/hooks/useCalendar/utils/createFreeDaysBaseMap/createFreeDaysBaseMap";
+import { createHolidaysMap } from "@modules/components/home/components/calendarList/hooks/useCalendar/utils/createHolidaysMap/createHolidaysMap";
+import { createYearMap } from "@modules/components/home/components/calendarList/hooks/useCalendar/utils/createYearMap/createYearMap";
+import { findOptimalGaps } from "@modules/components/home/components/calendarList/hooks/useCalendar/utils/findOptimalGaps/findOptimalGaps";
+import { generateInitialSelectedDays } from "@modules/components/home/components/calendarList/hooks/useCalendar/utils/generateInitialSelectedDays/generateInitialSelectedDays";
+import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
+import { addMonths, startOfMonth } from "date-fns";
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
 interface UseCalendarParams {
 	year: number;

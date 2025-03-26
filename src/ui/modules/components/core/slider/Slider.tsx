@@ -1,8 +1,8 @@
 "use client";
 
-import * as SliderPrimitive from '@radix-ui/react-slider';
-import { mergeClasses } from '@shared/ui/utils/mergeClasses';
-import { type ComponentProps, useMemo } from 'react';
+import * as SliderPrimitive from "@radix-ui/react-slider";
+import { mergeClasses } from "@ui/utils/mergeClasses";
+import { type ComponentProps, useMemo } from "react";
 
 export const Slider = ({
 	className,
@@ -43,10 +43,10 @@ export const Slider = ({
 					)}
 				/>
 			</SliderPrimitive.Track>
-			{Array.from({ length: _values.length }, (_, index) => (
+			{Array.from({ length: _values.length }, (_) => (
 				<SliderPrimitive.Thumb
 					data-slot="slider-thumb"
-					key={index}
+					key={crypto.randomUUID()}
 					className="border-primary bg-background ring-ring/50 block size-4 shrink-0 rounded-full border shadow-sm transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
 				/>
 			))}

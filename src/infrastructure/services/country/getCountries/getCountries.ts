@@ -1,7 +1,7 @@
-import { countryDTO } from '@application/dto/country/countryDTO';
-import type { CountryDTO } from '@application/dto/country/types';
-import { getUserLanguage } from '@shared/infrastructure/services/utils/getUserLanguage/getUserLanguage';
-import countries from 'i18n-iso-countries';
+import { countryDTO } from "@application/dto/country/countryDTO";
+import type { CountryDTO } from "@application/dto/country/types";
+import { getUserLanguage } from "@shared/infrastructure/services/utils/getUserLanguage/getUserLanguage";
+import countries from "i18n-iso-countries";
 
 export function getCountries(): CountryDTO[] {
 	try {

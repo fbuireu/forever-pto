@@ -1,9 +1,9 @@
 "use client";
 
-import { mergeClasses } from '@shared/ui/utils/mergeClasses';
-import { buttonVariants } from '@ui/modules/components/core/button/Button';
-import type { ComponentProps } from 'react';
-import { DayPicker } from 'react-day-picker';
+import { buttonVariants } from "@modules/components/core/button/config";
+import { mergeClasses } from "@ui/utils/mergeClasses";
+import type { ComponentProps } from "react";
+import { DayPicker } from "react-day-picker";
 
 export type CalendarProps = ComponentProps<typeof DayPicker>;
 

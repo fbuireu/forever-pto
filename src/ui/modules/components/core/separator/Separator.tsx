@@ -1,8 +1,8 @@
 "use client";
 
-import * as SeparatorPrimitive from '@radix-ui/react-separator';
-import { mergeClasses } from '@shared/ui/utils/mergeClasses';
-import type { ComponentProps } from 'react';
+import * as SeparatorPrimitive from "@radix-ui/react-separator";
+import { mergeClasses } from "@ui/utils/mergeClasses";
+import type { ComponentProps } from "react";
 
 export const Separator = ({
 	className,

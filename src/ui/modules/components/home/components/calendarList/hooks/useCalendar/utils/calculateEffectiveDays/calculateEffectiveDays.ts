@@ -1,6 +1,6 @@
-import type { EffectiveRatio } from '@modules/components/home/components/calendarList/hooks/types';
-import { getDateKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey';
-import { groupConsecutiveDays } from '@modules/components/home/components/calendarList/hooks/utils/groupConsecutiveDays/groupConsecutiveDays';
+import type { EffectiveRatio } from "@modules/components/home/components/calendarList/hooks/types";
+import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
+import { groupConsecutiveDays } from "@modules/components/home/components/calendarList/hooks/utils/groupConsecutiveDays/groupConsecutiveDays";
 
 interface CalculateEffectiveDaysParams {
 	freeDaysBaseMap: Map<string, Date>;

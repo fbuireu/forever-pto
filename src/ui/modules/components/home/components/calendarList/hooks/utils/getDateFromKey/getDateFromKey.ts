@@ -1,4 +1,4 @@
-import { parseISO } from 'date-fns';
+import { parseISO } from "date-fns";
 
 export function getDateFromKey(key: string): Date {
 	return parseISO(key);

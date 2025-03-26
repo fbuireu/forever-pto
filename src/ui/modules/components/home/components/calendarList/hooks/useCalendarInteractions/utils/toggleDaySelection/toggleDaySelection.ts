@@ -1,5 +1,5 @@
-import { isSameDay } from 'date-fns';
-import { getDateKey } from '../../../utils/getDateKey/getDateKey';
+import { isSameDay } from "date-fns";
+import { getDateKey } from "../../../utils/getDateKey/getDateKey";
 
 interface ToggleDaySelectionParams {
 	day: Date;

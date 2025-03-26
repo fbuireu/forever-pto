@@ -1,9 +1,9 @@
-import { DEFAULT_CALENDAR_LIMITS } from '@const/const';
-import { differenceInDays, getMonth } from 'date-fns';
-import type { BlockOpportunity, DayInfo } from '../../types';
-import { calculateBlockScore } from '../calculateBlockScore/calculateBlockScore';
-import { calculateSurroundingFreeDays } from '../calculateSurroundingFreeDays/calculateSurroundingFreeDays';
-import type { EffectiveRatio } from '@modules/components/home/components/calendarList/hooks/types';
+import { DEFAULT_CALENDAR_LIMITS } from "@const/const";
+import type { EffectiveRatio } from "@modules/components/home/components/calendarList/hooks/types";
+import { differenceInDays, getMonth } from "date-fns";
+import type { BlockOpportunity, DayInfo } from "../../types";
+import { calculateBlockScore } from "../calculateBlockScore/calculateBlockScore";
+import { calculateSurroundingFreeDays } from "../calculateSurroundingFreeDays/calculateSurroundingFreeDays";
 
 interface GenerateBlockOpportunitiesParams {
 	availableWorkdays: Date[];

@@ -1,4 +1,4 @@
-import { differenceInDays } from 'date-fns';
+import { differenceInDays } from "date-fns";
 
 export function groupConsecutiveDays(days: Date[]): Date[][] {
 	if (days.length === 0) return [];

@@ -1,5 +1,5 @@
-import { SEARCH_PARAM_KEYS } from '@const/const';
-import type { NextRequest } from 'next/server';
+import { SEARCH_PARAM_KEYS } from "@const/const";
+import type { NextRequest } from "next/server";
 
 export type CapitalizeKeys<T> = {
 	[K in keyof T as Uppercase<K & string>]: T[K] extends object ? CapitalizeKeys<T[K]> : T[K];

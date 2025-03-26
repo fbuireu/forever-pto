@@ -1,4 +1,4 @@
-import type { SearchParams } from '@const/types';
+import type { SearchParams } from "@const/types";
 
 interface CreateQueryStringParams {
 	value: string;

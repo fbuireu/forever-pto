@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format } from "date-fns";
 
 export function areArraysEqual(arr1: Date[], arr2: Date[]): boolean {
 	if (arr1.length !== arr2.length) return false;

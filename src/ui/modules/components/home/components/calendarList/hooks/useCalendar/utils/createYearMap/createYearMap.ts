@@ -1,6 +1,6 @@
-import { eachDayOfInterval, endOfMonth, getMonth, isWeekend, startOfMonth } from 'date-fns';
-import { getDateKey } from '../../../utils/getDateKey/getDateKey';
-import type { DayInfo } from '../../types';
+import { eachDayOfInterval, endOfMonth, getMonth, isWeekend, startOfMonth } from "date-fns";
+import { getDateKey } from "../../../utils/getDateKey/getDateKey";
+import type { DayInfo } from "../../types";
 
 interface CreateYearMapParams {
 	monthsToShow: Date[];

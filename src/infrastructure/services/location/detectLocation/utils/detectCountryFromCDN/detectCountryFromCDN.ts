@@ -1,25 +1,25 @@
-const LOCATION_IDENTIFIER = 'loc=';
+const LOCATION_IDENTIFIER = "loc=";
 
 export async function detectCountryFromCDN(): Promise<string> {
-  try {
-    const response = await fetch('https://stretchmytimeoff.com/cdn-cgi/trace', {
-      cache: 'no-store'
-    });
+	try {
+		const response = await fetch("https://stretchmytimeoff.com/cdn-cgi/trace", {
+			cache: "no-store",
+		});
 
-    if (!response.ok) {
-      throw new Error('Error while getting information from the CDN');
-    }
+		if (!response.ok) {
+			throw new Error("Error while getting information from the CDN");
+		}
 
-    const text = await response.text();
-    const lines = text.split('\n');
-    const location = lines.find((line) => line.startsWith(LOCATION_IDENTIFIER));
+		const text = await response.text();
+		const lines = text.split("\n");
+		const location = lines.find((line) => line.startsWith(LOCATION_IDENTIFIER));
 
-    if (location) {
-      return location.substring(LOCATION_IDENTIFIER.length).trim().toLowerCase();
-    }
+		if (location) {
+			return location.substring(LOCATION_IDENTIFIER.length).trim().toLowerCase();
+		}
 
-    return '';
-  } catch (error) {
-    return '';
-  }
+		return "";
+	} catch (error) {
+		return "";
+	}
 }

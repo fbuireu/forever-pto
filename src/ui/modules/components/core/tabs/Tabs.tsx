@@ -1,42 +1,9 @@
-"use client";
+'use client';
 
 import * as TabsPrimitive from '@radix-ui/react-tabs';
-import { mergeClasses } from '@shared/ui/utils/mergeClasses';
-import type * as React from 'react';
+import { mergeClasses } from '@ui/utils/mergeClasses';
 import type { ComponentProps } from 'react';
 
-const Tabs = ({ className, ...props }: ComponentProps<typeof TabsPrimitive.Root>) => (
-	<TabsPrimitive.Root data-slot="tabs" className={mergeClasses("flex flex-col gap-2", className)} {...props} />
+export const Tabs = ({ className, ...props }: ComponentProps<typeof TabsPrimitive.Root>) => (
+    <TabsPrimitive.Root data-slot="tabs" className={mergeClasses('flex flex-col gap-2', className)} {...props} />
 );
-
-const TabsList = ({ className, ...props }: ComponentProps<typeof TabsPrimitive.List>) => (
-	<TabsPrimitive.List
-		data-slot="tabs-list"
-		className={mergeClasses(
-			"bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-1",
-			className,
-		)}
-		{...props}
-	/>
-);
-
-const TabsTrigger = ({ className, ...props }: ComponentProps<typeof TabsPrimitive.Trigger>) => (
-	<TabsPrimitive.Trigger
-		data-slot="tabs-trigger"
-		className={mergeClasses(
-			"data-[state=active]:bg-background data-[state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring inline-flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 disabled:opacity-50 disabled:cursor-not-allowed data-[state=active]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-			className,
-		)}
-		{...props}
-	/>
-);
-
-const TabsContent = ({ className, ...props }: ComponentProps<typeof TabsPrimitive.Content>) => (
-	<TabsPrimitive.Content
-		data-slot="tabs-content"
-		className={mergeClasses("flex-1 outline-none", className)}
-		{...props}
-	/>
-);
-
-export { Tabs, TabsContent, TabsList, TabsTrigger };

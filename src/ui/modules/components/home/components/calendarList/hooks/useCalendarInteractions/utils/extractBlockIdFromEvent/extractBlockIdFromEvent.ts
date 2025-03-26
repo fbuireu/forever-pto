@@ -1,5 +1,5 @@
-import type { BlockOpportunity } from '@modules/components/home/components/calendarList/hooks/useCalendar/types';
-import type { FocusEvent, MouseEvent } from 'react';
+import type { BlockOpportunity } from "@modules/components/home/components/calendarList/hooks/useCalendar/types";
+import type { FocusEvent, MouseEvent } from "react";
 
 interface ExtractBlockIdFromEventParams {
 	event: MouseEvent<HTMLButtonElement> | FocusEvent<HTMLButtonElement>;

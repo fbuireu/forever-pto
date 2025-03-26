@@ -1,4 +1,4 @@
-import type { CapitalizeKeys } from '@const/types';
+import type { CapitalizeKeys } from "@const/types";
 
 export function capitalizeKeys<T extends Record<string, unknown>>(object: T): CapitalizeKeys<T> {
 	const result = {} as CapitalizeKeys<T>;

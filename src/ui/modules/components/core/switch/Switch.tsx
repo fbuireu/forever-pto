@@ -1,8 +1,8 @@
 "use client";
 
-import * as SwitchPrimitives from '@radix-ui/react-switch';
-import { mergeClasses } from '@shared/ui/utils/mergeClasses';
-import { type ComponentPropsWithoutRef, type ComponentRef, forwardRef } from 'react';
+import * as SwitchPrimitives from "@radix-ui/react-switch";
+import { mergeClasses } from "@ui/utils/mergeClasses";
+import { type ComponentPropsWithoutRef, type ComponentRef, forwardRef } from "react";
 
 export const Switch = forwardRef<
 	ComponentRef<typeof SwitchPrimitives.Root>,

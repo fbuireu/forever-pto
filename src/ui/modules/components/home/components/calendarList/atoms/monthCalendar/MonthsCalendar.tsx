@@ -1,145 +1,137 @@
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@modules/components/core/tooltip/Tooltip';
 import { setDayClassName } from '@modules/components/home/utils/setDayClassName';
 import { Calendar } from '@ui/modules/components/core/calendar/Calendar';
 import { Card } from '@ui/modules/components/core/card/Card';
 import { Spinner } from '@ui/modules/components/core/spinner/Spinner';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { InfoIcon } from 'lucide-react';
 import type { FocusEvent, MouseEvent, ReactNode } from 'react';
 import './months-calendar.css';
+import {
+  MonthSummaryTooltip,
+} from '@modules/components/home/components/calendarList/atoms/monthCalendar/atoms/monthSummaryTooltip/MonthSummaryTooltip';
 
 interface MonthCalendarProps {
-	month: Date;
-	ptoDays: number;
-	isPending: boolean;
-	selectedDays: Date[];
-	suggestedDays: Date[];
-	hoveredBlockId: string | null;
-	dayToBlockIdMap: Record<string, string>;
-	isHoliday: (date: Date) => boolean;
-	getHolidayName: (date: Date) => string | null;
-	isDaySuggested: (date: Date) => boolean;
-	isDayAlternative: (date: Date) => boolean;
-	datePositionInBlock: (date: Date) => string | null;
-	alternativeDayPosition: (date: Date) => string | null;
-	handleDaySelect: (days: Date[] | undefined) => void;
-	handleDayInteraction: (event: MouseEvent<HTMLButtonElement> | FocusEvent<HTMLButtonElement>) => void;
-	handleDayMouseOut: () => void;
-	suggestedDayForMonth: (month: Date) => Date[];
-	getMonthSummary: (month: Date) => ReactNode;
-	isPastDayAllowed: () => boolean;
+  month: Date;
+  ptoDays: number;
+  isPending: boolean;
+  selectedDays: Date[];
+  suggestedDays: Date[];
+  hoveredBlockId: string | null;
+  dayToBlockIdMap: Record<string, string>;
+  isHoliday: (date: Date) => boolean;
+  getHolidayName: (date: Date) => string | null;
+  isDaySuggested: (date: Date) => boolean;
+  isDayAlternative: (date: Date) => boolean;
+  datePositionInBlock: (date: Date) => string | null;
+  alternativeDayPosition: (date: Date) => string | null;
+  handleDaySelect: (days: Date[] | undefined) => void;
+  handleDayInteraction: (event: MouseEvent<HTMLButtonElement> | FocusEvent<HTMLButtonElement>) => void;
+  handleDayMouseOut: () => void;
+  suggestedDayForMonth: (month: Date) => Date[];
+  getMonthSummary: (month: Date) => ReactNode;
+  isPastDayAllowed: () => boolean;
 }
 
 export const MonthCalendar = ({
-	month,
-	ptoDays,
-	isPending,
-	selectedDays,
-	suggestedDays,
-	hoveredBlockId,
-	dayToBlockIdMap,
-	isHoliday,
-	getHolidayName,
-	isDaySuggested,
-	isDayAlternative,
-	datePositionInBlock,
-	alternativeDayPosition,
-	handleDaySelect,
-	handleDayInteraction,
-	handleDayMouseOut,
-	suggestedDayForMonth,
-	getMonthSummary,
-	isPastDayAllowed,
+  month,
+  ptoDays,
+  isPending,
+  selectedDays,
+  suggestedDays,
+  hoveredBlockId,
+  dayToBlockIdMap,
+  isHoliday,
+  getHolidayName,
+  isDaySuggested,
+  isDayAlternative,
+  datePositionInBlock,
+  alternativeDayPosition,
+  handleDaySelect,
+  handleDayInteraction,
+  handleDayMouseOut,
+  suggestedDayForMonth,
+  getMonthSummary,
+  isPastDayAllowed,
 }: MonthCalendarProps) => {
-	return (
-		<div className="mb-4">
-			<Card key={month.toISOString()} className="flex mb-2 flex-col">
-				{isPending && <Spinner />}
-				<Calendar
-					mode="multiple"
-					selected={selectedDays}
-					onSelect={handleDaySelect}
-					className="rounded-md border"
-					defaultMonth={month}
-					month={month}
-					weekStartsOn={1}
-					fixedWeeks
-					locale={es}
-					components={{
-						Chevron: () => <></>,
-						Dropdown: () => <></>,
-						Day: ({ day }) => {
-							const { date, displayMonth } = day;
-							const dayKey = format(date, "yyyy-MM-dd");
-							const holiday = getHolidayName(date);
-							const isSuggested = isDaySuggested(date);
-							const isAlternative = isDayAlternative(date);
-							const blockId = isSuggested ? dayToBlockIdMap[dayKey] || "" : "";
-							const blockPosition = datePositionInBlock(date);
-							const alternativePosition = alternativeDayPosition(date);
+  return (
+      <div className="mb-4">
+        <Card key={month.toISOString()} className="flex mb-2 flex-col">
+          {isPending && <Spinner />}
+          <Calendar
+              mode="multiple"
+              selected={selectedDays}
+              onSelect={handleDaySelect}
+              className="rounded-md border"
+              defaultMonth={month}
+              month={month}
+              weekStartsOn={1}
+              fixedWeeks
+              locale={es}
+              components={{
+                Chevron: () => <></>,
+                Dropdown: () => <></>,
+                Day: ({ day }) => {
+                  const { date, displayMonth } = day;
+                  const dayKey = format(date, 'yyyy-MM-dd');
+                  const holiday = getHolidayName(date);
+                  const isSuggested = isDaySuggested(date);
+                  const isAlternative = isDayAlternative(date);
+                  const blockId = isSuggested ? dayToBlockIdMap[dayKey] || '' : '';
+                  const blockPosition = datePositionInBlock(date);
+                  const alternativePosition = alternativeDayPosition(date);
 
-							const DATA_ATTRIBUTES = {
-								"data-date": dayKey,
-								...(isSuggested && { "data-suggested": true }),
-								...(isAlternative && { "data-alternative": true }),
-								...(isHoliday(date) && { "data-holiday": true }),
-								...(blockId && { "data-block-id": blockId }),
-								...(blockPosition && { "data-block-position": blockPosition }),
-								...(alternativePosition && { "data-alternative-position": alternativePosition }),
-								...(hoveredBlockId === blockId && { "data-hovered-block": true }),
-							};
+                  const DATA_ATTRIBUTES = {
+                    'data-date': dayKey,
+                    ...(isSuggested && { 'data-suggested': true }),
+                    ...(isAlternative && { 'data-alternative': true }),
+                    ...(isHoliday(date) && { 'data-holiday': true }),
+                    ...(blockId && { 'data-block-id': blockId }),
+                    ...(blockPosition && { 'data-block-position': blockPosition }),
+                    ...(alternativePosition && { 'data-alternative-position': alternativePosition }),
+                    ...(hoveredBlockId === blockId && { 'data-hovered-block': true }),
+                  };
 
-							return (
-								<td className="p-0 relative">
-									<button
-										type="button"
-										className={setDayClassName({
-											date,
-											displayMonth,
-											selectedDays,
-											isHoliday,
-											isDaySuggested,
-											isDayAlternative,
-											isPastDayAllowed,
-										})}
-										title={holiday || ""}
-										onMouseOver={handleDayInteraction}
-										onMouseOut={handleDayMouseOut}
-										onBlur={handleDayMouseOut}
-										onFocus={handleDayInteraction}
-										{...DATA_ATTRIBUTES}
-									>
-										{date.getDate()}
-									</button>
-								</td>
-							);
-						},
-					}}
-				/>
-			</Card>
-			{ptoDays > 0 && suggestedDays.length > 0 && suggestedDayForMonth(month).length > 0 && (
-				<div>
-					{getMonthSummary(month) && (
-						<div className="rounded-md border border-primary/20 bg-green-200/10 p-2 text-xs">
-							<div className="flex items-center justify-between">
-								<p className="mb-1 font-semibold">Sugerencia:</p>
-								<TooltipProvider>
-									<Tooltip>
-										<TooltipTrigger asChild>
-											<InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
-										</TooltipTrigger>
-										<TooltipContent>
-											<p>Pasa el cursor sobre un día sugerido para ver alternativas similares.</p>
-										</TooltipContent>
-									</Tooltip>
-								</TooltipProvider>
-							</div>
-							{getMonthSummary(month)}
-						</div>
-					)}
-				</div>
-			)}
-		</div>
-	);
+                  return (
+                      <td className="p-0 relative">
+                        <button
+                            type="button"
+                            className={setDayClassName({
+                              date,
+                              displayMonth,
+                              selectedDays,
+                              isHoliday,
+                              isDaySuggested,
+                              isDayAlternative,
+                              isPastDayAllowed,
+                            })}
+                            title={holiday || ''}
+                            onMouseOver={handleDayInteraction}
+                            onMouseOut={handleDayMouseOut}
+                            onBlur={handleDayMouseOut}
+                            onFocus={handleDayInteraction}
+                            {...DATA_ATTRIBUTES}
+                        >
+                          {date.getDate()}
+                        </button>
+                      </td>
+                  );
+                },
+              }}
+          />
+        </Card>
+        {ptoDays > 0 && suggestedDays.length > 0 && suggestedDayForMonth(month).length > 0 && (
+            <div>
+              {getMonthSummary(month) && (
+                  <div className="rounded-md border border-primary/20 bg-green-200/10 p-2 text-xs">
+                    <div className="flex items-center justify-between">
+                      <p className="mb-1 font-semibold">Sugerencia:</p>
+                      <MonthSummaryTooltip />
+                    </div>
+                    {getMonthSummary(month)}
+                  </div>
+              )}
+            </div>
+        )}
+      </div>
+  );
 };

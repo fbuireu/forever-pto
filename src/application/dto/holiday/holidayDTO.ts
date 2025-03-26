@@ -1,9 +1,9 @@
-import type { HolidayDTO, RawHoliday } from '@application/dto/holiday/types';
-import { getDTODateKey } from '@application/dto/holiday/utils/getDTODateKey/getDTODateKey';
-import { getRegionName } from '@application/dto/holiday/utils/getRegionName/getRegionName';
-import { isInTargetYear } from '@application/dto/holiday/utils/isInTargetYear/isInTargetYear';
-import { shouldIncludeHoliday } from '@application/dto/holiday/utils/shouldIncludeHoliday/shouldIncludeHoliday';
-import type { BaseDTO } from '@shared/application/dto/baseDTO';
+import type { HolidayDTO, RawHoliday } from "@application/dto/holiday/types";
+import { getDTODateKey } from "@application/dto/holiday/utils/getDTODateKey/getDTODateKey";
+import { getRegionName } from "@application/dto/holiday/utils/getRegionName/getRegionName";
+import { isInTargetYear } from "@application/dto/holiday/utils/isInTargetYear/isInTargetYear";
+import { shouldIncludeHoliday } from "@application/dto/holiday/utils/shouldIncludeHoliday/shouldIncludeHoliday";
+import type { BaseDTO } from "@shared/application/dto/baseDTO";
 
 type HolidayDTOConfiguration = {
 	year: number;

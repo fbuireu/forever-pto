@@ -1,5 +1,5 @@
-import type { BlockPosition } from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/types';
-import { isSameDay } from 'date-fns';
+import type { BlockPosition } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/types";
+import { isSameDay } from "date-fns";
 
 interface DetermineDayPositionParams {
 	orderedDays: Date[];

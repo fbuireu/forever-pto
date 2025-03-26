@@ -1,4 +1,4 @@
-import { isWeekend } from 'date-fns';
+import { isWeekend } from "date-fns";
 
 interface IsPTOLimitReachedParams {
 	selectedDays: Date[];

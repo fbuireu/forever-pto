@@ -1,19 +1,14 @@
 "use client";
 
-import { Button } from '@ui/modules/components/core/button/Button';
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@ui/modules/components/core/dialog/Dialog';
-import { Input } from '@ui/modules/components/core/input/Input';
-import { Label } from '@ui/modules/components/core/label/Label';
-import { usePremium } from '@ui/providers/premium/PremiumProvider';
-import { LockIcon, X } from 'lucide-react';
-import { type FormEvent, type MouseEvent, type ReactNode, useState, useTransition } from 'react';
+import { DialogHeader } from "@modules/components/core/dialog/atoms/dialogHeader/DialogHeader";
+import { DialogClose, DialogContent, DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
+import { Button } from "@ui/modules/components/core/button/Button";
+import { Dialog } from "@ui/modules/components/core/dialog/Dialog";
+import { Input } from "@ui/modules/components/core/input/Input";
+import { Label } from "@ui/modules/components/core/label/Label";
+import { usePremium } from "@ui/providers/premium/PremiumProvider";
+import { LockIcon, X } from "lucide-react";
+import { type FormEvent, type MouseEvent, type ReactNode, useState, useTransition } from "react";
 
 interface PremiumLockProps {
 	children: ReactNode;

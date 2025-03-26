@@ -1,8 +1,8 @@
 "use server";
 
-import { PREMIUM_COOKIE } from '@const/const';
-import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers';
+import { PREMIUM_COOKIE } from "@const/const";
+import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 
 export async function checkPremiumStatus(): Promise<boolean> {
 	const cookieStore = await cookies();

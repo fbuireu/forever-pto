@@ -1,4 +1,4 @@
-import { DEFAULT_LANGUAGE } from '@const/const';
+import { DEFAULT_LANGUAGE } from "@const/const";
 
 export function getUserLanguage(): string[] {
 	try {

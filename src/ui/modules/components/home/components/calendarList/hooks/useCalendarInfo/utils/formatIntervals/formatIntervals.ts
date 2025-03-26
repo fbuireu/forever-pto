@@ -1,6 +1,6 @@
-import type { IntervalInfo } from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/types';
-import { format, getDate } from 'date-fns';
-import { es } from 'date-fns/locale';
+import type { IntervalInfo } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/types";
+import { format, getDate } from "date-fns";
+import { es } from "date-fns/locale";
 
 export type FormattedIntervalsReturn = {
 	text: string;

@@ -1,69 +1,70 @@
-import { DEFAULT_SEARCH_PARAMS } from "@const/const";
-import type { SearchParams } from "@const/types";
-import { isPremium as isPremiumFn } from "@infrastructure/services/cookies/isPremium/isPremium";
-import { getCountry } from "@infrastructure/services/country/getCountry/getCountry";
-import { getHolidays } from "@infrastructure/services/holiday/getHolidays";
-import { getRegion } from "@infrastructure/services/region/getRegion/getRegion";
-import { AppSidebar } from "@ui/modules/components/appSidebar/components/appSidebar/AppSidebar";
-import { SidebarProvider, SidebarTrigger } from "@ui/modules/components/core/sidebar/Sidebar";
-import CalendarList from "@ui/modules/components/home/components/calendarList/CalendarList";
-import HolidaysSummary from "@ui/modules/components/home/components/holidaySummary/HolidaysSummary";
-import { PremiumProvider } from "@ui/providers/premium/PremiumProvider";
+import { DEFAULT_SEARCH_PARAMS } from '@const/const';
+import type { SearchParams } from '@const/types';
+import { isPremium as isPremiumFn } from '@infrastructure/services/cookies/isPremium/isPremium';
+import { getCountry } from '@infrastructure/services/country/getCountry/getCountry';
+import { getHolidays } from '@infrastructure/services/holiday/getHolidays';
+import { getRegion } from '@infrastructure/services/region/getRegion/getRegion';
+import { SidebarTrigger } from '@modules/components/core/sidebar/atoms/sidebarTrigger/SidebarTrigger';
+import { SidebarProvider } from '@modules/components/core/sidebar/provider/SidebarProvider';
+import { AppSidebar } from '@ui/modules/components/appSidebar/components/appSidebar/AppSidebar';
+import CalendarList from '@ui/modules/components/home/components/calendarList/CalendarList';
+import HolidaysSummary from '@ui/modules/components/home/components/holidaySummary/HolidaysSummary';
+import { PremiumProvider } from '@ui/providers/premium/PremiumProvider';
 
 interface ForeverPtoProps {
-	searchParams: Promise<SearchParams>;
+  searchParams: Promise<SearchParams>;
 }
 
-const ForeverPto = async ({ searchParams }: ForeverPtoProps) =>  {
-	const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS, CARRY_OVER_MONTHS } = DEFAULT_SEARCH_PARAMS;
-	const {
-		country,
-		region,
-		year = YEAR,
-		ptoDays = PTO_DAYS,
-		allowPastDays = ALLOW_PAST_DAYS,
-		carryOverMonths = CARRY_OVER_MONTHS,
-	} = await searchParams;
-	const holidays = await getHolidays({ country, region, year, carryOverMonths });
-	const userCountry = getCountry(country);
-	const userRegion = getRegion(holidays);
-	const isPremium = await isPremiumFn();
+const ForeverPto = async ({ searchParams }: ForeverPtoProps) => {
+  const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS, CARRY_OVER_MONTHS } = DEFAULT_SEARCH_PARAMS;
+  const {
+    country,
+    region,
+    year = YEAR,
+    ptoDays = PTO_DAYS,
+    allowPastDays = ALLOW_PAST_DAYS,
+    carryOverMonths = CARRY_OVER_MONTHS,
+  } = await searchParams;
+  const [isPremium, holidays] = await Promise.all([
+    isPremiumFn(),
+    getHolidays({ country, region, year, carryOverMonths }),
+  ]);
+  const userCountry = getCountry(country);
+  const userRegion = getRegion(holidays);
 
-	return (
-		<SidebarProvider>
-			<PremiumProvider initialPremiumStatus={isPremium}>
-				<AppSidebar
-					country={country}
-					ptoDays={ptoDays}
-					region={region}
-					year={year}
-					allowPastDays={allowPastDays}
-					carryOverMonths={carryOverMonths}
-				/>
-				<SidebarTrigger />
-				<div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-8">
-					<HolidaysSummary holidays={holidays} />
-					<CalendarList
-						key={JSON.stringify(holidays)}
-						year={Number(year)}
-						ptoDays={Number(ptoDays)}
-						allowPastDays={allowPastDays}
-						holidays={holidays}
-						carryOverMonths={isPremium ? Number(carryOverMonths) : 1}
-						userCountry={userCountry}
-						userRegion={userRegion}
-					/>
-				</div>
-			</PremiumProvider>
-		</SidebarProvider>
-	);
-}
+  return (
+      <SidebarProvider>
+        <PremiumProvider initialPremiumStatus={isPremium}>
+          <AppSidebar
+              country={country}
+              ptoDays={ptoDays}
+              region={region}
+              year={year}
+              allowPastDays={allowPastDays}
+              carryOverMonths={carryOverMonths}
+          />
+          <SidebarTrigger />
+          <div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-8">
+            <HolidaysSummary holidays={holidays} />
+            <CalendarList
+                key={JSON.stringify(holidays)}
+                year={Number(year)}
+                ptoDays={Number(ptoDays)}
+                allowPastDays={allowPastDays}
+                holidays={holidays}
+                carryOverMonths={isPremium ? Number(carryOverMonths) : 1}
+                userCountry={userCountry}
+                userRegion={userRegion}
+            />
+          </div>
+        </PremiumProvider>
+      </SidebarProvider>
+  );
+};
 
-export default ForeverPto
+export default ForeverPto;
 
 // TODO:
-// 1- Rethink calculations in DTO (maybe get region name and country name there?)
-// 2- Isolate components
 // 4- Tema fin de semana
 // 6- Add tests (also e2e)
 // 9- Add CI/CD
@@ -71,9 +72,7 @@ export default ForeverPto
 // 14- i18n
 // 17- Allow user to hide festivities (or add them)
 // 18- Allow user to change weekends
-// 19- change forEach to for...of
 // 20- Permitir al usuario cambiar los dias sugeridos
-// 21- Añadir un summary de cuanto hemos optimizado las vacaciones
 // 23- Adjust thresholds (paid funcionality)
 // 24- Edit weekends (paid functionality)
 // 25- Edit festivities (paid functionality)
@@ -82,7 +81,6 @@ export default ForeverPto
 // 27- DataTable to bulk actions to remove days
 // 29- Refine styles (hover blocks, etc)
 // 31- Add form shadcn and zod
-// 31- semantic html
 // 32- Add safeguard to avoid rerenders when same data is passed etc (memo previous request?)
 // 33- check memo and cache methods
-// 34- services folder singular name
+// 34- MCP server? (paid func)

@@ -1,6 +1,6 @@
-import { DEFAULT_CALENDAR_LIMITS } from '@const/const';
-import { getDateKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey';
-import type { BlockOpportunity } from '../../types';
+import { DEFAULT_CALENDAR_LIMITS } from "@const/const";
+import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
+import type { BlockOpportunity } from "../../types";
 
 interface GenerateAlternativesForBlockParams {
 	block: BlockOpportunity & { id: string };

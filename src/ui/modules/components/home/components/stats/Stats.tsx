@@ -1,8 +1,11 @@
 import type { CountryDTO } from "@application/dto/country/types";
 import type { RegionDTO } from "@application/dto/region/types";
+import { CardContent } from "@modules/components/core/card/atoms/cardContent/CardContent";
+import { CardHeader } from "@modules/components/core/card/atoms/cardHeader/CardHeader";
+import { CardTitle } from "@modules/components/core/card/atoms/cardTitle/CardTitle";
 import { getBadgeVariant } from "@modules/components/home/components/stats/utils/getBadgeVariant";
 import { Badge } from "@ui/modules/components/core/badge/Badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@ui/modules/components/core/card/Card";
+import { Card } from "@ui/modules/components/core/card/Card";
 import { Separator } from "@ui/modules/components/core/separator/Separator";
 
 interface StatsProps {

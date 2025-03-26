@@ -1,12 +1,12 @@
 "use client";
 
 import {
-    activatePremium as activatePremiumAction,
-    checkPremiumStatus,
-    deactivatePremium as deactivatePremiumAction,
-} from '@application/actions/premium';
-import { usePathname } from 'next/navigation';
-import { createContext, type ReactNode, useContext, useEffect, useState, useTransition } from 'react';
+	activatePremium as activatePremiumAction,
+	checkPremiumStatus,
+	deactivatePremium as deactivatePremiumAction,
+} from "@application/actions/premium";
+import { usePathname } from "next/navigation";
+import { type ReactNode, createContext, useContext, useEffect, useState, useTransition } from "react";
 
 interface PremiumContextType {
 	isPremium: boolean;

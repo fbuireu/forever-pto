@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from "lucide-react";
 
 export const Spinner = () => (
 	<div className="absolute inset-0 z-10 flex items-center justify-center rounded-md bg-background/60 opacity-10">

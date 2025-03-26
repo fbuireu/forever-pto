@@ -1,4 +1,4 @@
-import { getDateKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey';
+import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
 
 interface CanAddBlockParams {
 	blockDays: Date[];

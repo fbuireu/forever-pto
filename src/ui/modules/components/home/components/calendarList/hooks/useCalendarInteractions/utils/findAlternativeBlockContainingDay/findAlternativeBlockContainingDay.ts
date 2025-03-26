@@ -1,5 +1,5 @@
-import type { BlockOpportunity } from '@modules/components/home/components/calendarList/hooks/useCalendar/types';
-import { getDateKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey';
+import type { BlockOpportunity } from "@modules/components/home/components/calendarList/hooks/useCalendar/types";
+import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
 
 interface FindAlternativeBlockContainingDayParams {
 	day: Date;

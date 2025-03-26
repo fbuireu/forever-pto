@@ -1,8 +1,8 @@
-import type { BlockPosition } from '@modules/components/home/components/calendarList/hooks/useCalendarInfo/types';
-import { determineDayPosition } from '@modules/components/home/components/calendarList/hooks/useCalendarInteractions/utils/determineDayPosition/determineDayPosition';
-import { getDaysInBlock } from '@modules/components/home/components/calendarList/hooks/useCalendarInteractions/utils/getDaysInBlock/getDaysInBlock';
-import { getDateKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey';
-import { isSameDay } from 'date-fns';
+import type { BlockPosition } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/types";
+import { determineDayPosition } from "@modules/components/home/components/calendarList/hooks/useCalendarInteractions/utils/determineDayPosition/determineDayPosition";
+import { getDaysInBlock } from "@modules/components/home/components/calendarList/hooks/useCalendarInteractions/utils/getDaysInBlock/getDaysInBlock";
+import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
+import { isSameDay } from "date-fns";
 
 interface GetDayPositionInBlockParams {
 	date: Date;

@@ -1,6 +1,6 @@
-import type { DayInfo } from '@modules/components/home/components/calendarList/hooks/useCalendar/types';
-import { getDateKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey';
-import { addDays } from 'date-fns';
+import type { DayInfo } from "@modules/components/home/components/calendarList/hooks/useCalendar/types";
+import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
+import { addDays } from "date-fns";
 
 interface CalculateSurroundingFreeDaysParams {
 	blockDays: Date[];

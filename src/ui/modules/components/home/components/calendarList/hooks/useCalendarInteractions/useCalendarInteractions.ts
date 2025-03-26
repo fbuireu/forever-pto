@@ -1,7 +1,7 @@
-import type { BlockOpportunity } from '@modules/components/home/components/calendarList/hooks/useCalendar/types';
-import { extractBlockIdFromEvent } from '@modules/components/home/components/calendarList/hooks/useCalendarInteractions/utils/extractBlockIdFromEvent/extractBlockIdFromEvent';
-import { getDateKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey';
-import { type Dispatch, type FocusEvent, type MouseEvent, type SetStateAction, useCallback } from 'react';
+import type { BlockOpportunity } from "@modules/components/home/components/calendarList/hooks/useCalendar/types";
+import { extractBlockIdFromEvent } from "@modules/components/home/components/calendarList/hooks/useCalendarInteractions/utils/extractBlockIdFromEvent/extractBlockIdFromEvent";
+import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
+import { type Dispatch, type FocusEvent, type MouseEvent, type SetStateAction, useCallback } from "react";
 
 interface UseCalendarInteractionsParams {
 	selectedDays: Date[];
