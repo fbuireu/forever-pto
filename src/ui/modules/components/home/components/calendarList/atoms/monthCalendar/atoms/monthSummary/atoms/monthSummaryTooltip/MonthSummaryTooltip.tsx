@@ -3,17 +3,16 @@ import { TooltipContent } from "@modules/components/core/tooltip/atoms/tooltipCo
 import { TooltipTrigger } from "@modules/components/core/tooltip/atoms/tooltipTrigger/TooltipTrigger";
 import { TooltipProvider } from "@modules/components/core/tooltip/provider/TooltipProvider";
 import { InfoIcon } from "lucide-react";
-import { memo } from "react";
 
-export const CarryOverMonthsTooltip = memo(() => (
+export const MonthSummaryTooltip = () => (
 	<TooltipProvider>
 		<Tooltip>
 			<TooltipTrigger asChild>
 				<InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
 			</TooltipTrigger>
-			<TooltipContent className="max-w-xs">
-				<p>Permite añadir meses de carryover al siguiente año</p>
+			<TooltipContent>
+				<p>Pasa el cursor sobre un día sugerido para ver alternativas similares.</p>
 			</TooltipContent>
 		</Tooltip>
 	</TooltipProvider>
-));
+);
