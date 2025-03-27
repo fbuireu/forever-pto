@@ -1,6 +1,6 @@
-import type { CapitalizeKeys, FilterMaximumValues, PremiumParams } from "@const/types";
-import { capitalizeKeys } from "@const/utils/capitalizeKeys/capitalizeKeys";
-import type { Metadata } from "next";
+import type { CapitalizeKeys, FilterMaximumValues, PremiumParams } from '@const/types';
+import { capitalizeKeys } from '@const/utils/capitalizeKeys/capitalizeKeys';
+import type { Metadata } from 'next';
 
 export const SEARCH_PARAM_KEYS = {
 	COUNTRY: "country",
@@ -21,7 +21,7 @@ const pagesRoutes = {
 
 export const PAGES_ROUTES: CapitalizeKeys<typeof pagesRoutes> = capitalizeKeys(pagesRoutes);
 
-export const DEFAULT_SEARCH_PARAMS: Record<CapitalizeKeys<string>, string> = {
+export const DEFAULT_QUERY_PARAMS: Record<CapitalizeKeys<string>, string> = {
 	YEAR: String(new Date().getFullYear()),
 	PTO_DAYS: "22",
 	ALLOW_PAST_DAYS: "false",

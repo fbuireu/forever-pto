@@ -1,7 +1,7 @@
-import { DEFAULT_SEARCH_PARAMS, FILTER_MAXIMUM_VALUES, PREMIUM_PARAMS, SEARCH_PARAM_KEYS } from "@const/const";
-import type { MIDDLEWARE_PARAMS } from "@infrastructure/middleware/middleware";
-import { detectLocation } from "@infrastructure/services/location/detectLocation/detectLocation";
-import type { NextRequest } from "next/server";
+import { DEFAULT_QUERY_PARAMS, FILTER_MAXIMUM_VALUES, PREMIUM_PARAMS, SEARCH_PARAM_KEYS } from '@const/const';
+import type { MIDDLEWARE_PARAMS } from '@infrastructure/middleware/middleware';
+import { detectLocation } from '@infrastructure/services/location/detectLocation/detectLocation';
+import type { NextRequest } from 'next/server';
 
 type ValidatorFunction = (value: string, request: NextRequest) => Promise<string | null> | string | null;
 
@@ -19,7 +19,7 @@ const PARAM_VALIDATORS: Record<string, ValidatorFunction> = {
 		const allowedYears = (FILTER_MAXIMUM_VALUES.YEARS as (year: string) => number[])(String(currentYear));
 
 		if (Number.isNaN(year) || !allowedYears.includes(year)) {
-			return DEFAULT_SEARCH_PARAMS.YEAR;
+			return DEFAULT_QUERY_PARAMS.YEAR;
 		}
 		return null;
 	},
@@ -27,13 +27,13 @@ const PARAM_VALIDATORS: Record<string, ValidatorFunction> = {
 		const days = Number.parseInt(value, 10);
 
 		if (Number.isNaN(days) || days < 0 || days > 365) {
-			return DEFAULT_SEARCH_PARAMS.PTO_DAYS;
+			return DEFAULT_QUERY_PARAMS.PTO_DAYS;
 		}
 		return null;
 	},
 	[SEARCH_PARAM_KEYS.ALLOW_PAST_DAYS]: (value) => {
 		if (value !== "true" && value !== "false") {
-			return DEFAULT_SEARCH_PARAMS.ALLOW_PAST_DAYS;
+			return DEFAULT_QUERY_PARAMS.ALLOW_PAST_DAYS;
 		}
 		return null;
 	},
