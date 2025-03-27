@@ -1,6 +1,6 @@
+import { isPremium as isPremiumFn } from "@application/actions/premium";
 import { DEFAULT_SEARCH_PARAMS } from "@const/const";
 import type { SearchParams } from "@const/types";
-import { isPremium as isPremiumFn } from "@infrastructure/services/cookies/isPremium/isPremium";
 import { getCountry } from "@infrastructure/services/country/getCountry/getCountry";
 import { getHolidays } from "@infrastructure/services/holiday/getHolidays";
 import { getRegion } from "@infrastructure/services/region/getRegion/getRegion";
@@ -34,7 +34,7 @@ const ForeverPto = async ({ searchParams }: ForeverPtoProps) => {
 
 	return (
 		<SidebarProvider>
-			<PremiumProvider initialPremiumStatus={isPremium}>
+			<PremiumProvider isPremium={isPremium}>
 				<AppSidebar
 					country={country}
 					ptoDays={ptoDays}

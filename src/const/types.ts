@@ -22,12 +22,18 @@ export interface SearchParams {
 	[SEARCH_PARAM_KEYS.CARRY_OVER_MONTHS]: string;
 }
 
+export interface PremiumParams {
+	cookie_name: string;
+	duration: number;
+	check_delay: number;
+}
+
 export interface FilterMaximumValues {
-	CARRY_OVER_MONTHS: {
-		FREE: number;
-		PREMIUM: number;
+	carry_over_months: {
+		free: number;
+		premium: number;
 	};
-	YEARS: (year: string) => number[];
+	years: (year: string) => number[];
 }
 
 export type RequiredParamsMap = {

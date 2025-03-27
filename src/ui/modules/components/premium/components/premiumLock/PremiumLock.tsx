@@ -2,11 +2,11 @@
 
 import { DialogHeader } from "@modules/components/core/dialog/atoms/dialogHeader/DialogHeader";
 import { DialogClose, DialogContent, DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
+import { usePremium } from "@ui/hooks/usePremium/usePremium";
 import { Button } from "@ui/modules/components/core/button/Button";
 import { Dialog } from "@ui/modules/components/core/dialog/Dialog";
 import { Input } from "@ui/modules/components/core/input/Input";
 import { Label } from "@ui/modules/components/core/label/Label";
-import { usePremium } from "@ui/providers/premium/PremiumProvider";
 import { LockIcon, X } from "lucide-react";
 import { type FormEvent, type MouseEvent, type ReactNode, useState, useTransition } from "react";
 
@@ -25,14 +25,14 @@ export const PremiumLock = ({
 	description = "Para acceder a esta función premium, introduce tu email para comenzar tu suscripción.",
 	renderUnlocked,
 }: PremiumLockProps) => {
-	const { isPremium, isPremiumLoading, activatePremium } = usePremium();
+	const { isPremiumUser, isPremiumUserLoading, activatePremium } = usePremium();
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [email, setEmail] = useState("");
 	const [submitSuccess, setSubmitSuccess] = useState(false);
 	const [isPending, startTransition] = useTransition();
 
-	if (!isActive || isPremium) {
-		return renderUnlocked ? renderUnlocked(isPremium) : children;
+	if (!isActive || isPremiumUser) {
+		return renderUnlocked ? renderUnlocked(isPremiumUser) : children;
 	}
 
 	const handleModalClick = (e: MouseEvent) => {
@@ -59,7 +59,7 @@ export const PremiumLock = ({
 		});
 	};
 
-	const isLoading = isPending || isPremiumLoading;
+	const isLoading = isPending || isPremiumUserLoading;
 
 	return (
 		<div className="relative overflow-hidden w-full h-full">

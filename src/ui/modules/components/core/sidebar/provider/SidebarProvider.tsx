@@ -8,6 +8,12 @@ import { useMobile } from "@ui/hooks/useMobile/useMobile";
 import { mergeClasses } from "@ui/utils/mergeClasses";
 import { type CSSProperties, type ComponentProps, useCallback, useEffect, useMemo, useState } from "react";
 
+interface SidebarProviderProps extends ComponentProps<"div"> {
+	defaultOpen?: boolean;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+}
+
 export const SidebarProvider = ({
 	defaultOpen = true,
 	open: openProp,
@@ -16,11 +22,7 @@ export const SidebarProvider = ({
 	style,
 	children,
 	...props
-}: ComponentProps<"div"> & {
-	defaultOpen?: boolean;
-	open?: boolean;
-	onOpenChange?: (open: boolean) => void;
-}) => {
+}: SidebarProviderProps) => {
 	const isMobile = useMobile();
 	const [openMobile, setOpenMobile] = useState(false);
 	const [_open, _setOpen] = useState(defaultOpen);

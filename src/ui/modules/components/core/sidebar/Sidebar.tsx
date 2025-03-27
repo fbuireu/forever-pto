@@ -10,6 +10,12 @@ import { mergeClasses } from "@ui/utils/mergeClasses";
 import type { CSSProperties, ComponentProps } from "react";
 import { useSidebar } from "./hooks/useSidebar/useSidebar";
 
+interface SidebarProps extends ComponentProps<"div"> {
+	side?: "left" | "right";
+	variant?: "sidebar" | "floating" | "inset";
+	collapsible?: "offcanvas" | "icon" | "none";
+}
+
 export const Sidebar = ({
 	side = "left",
 	variant = "sidebar",
@@ -17,11 +23,7 @@ export const Sidebar = ({
 	className,
 	children,
 	...props
-}: ComponentProps<"div"> & {
-	side?: "left" | "right";
-	variant?: "sidebar" | "floating" | "inset";
-	collapsible?: "offcanvas" | "icon" | "none";
-}) => {
+}: SidebarProps) => {
 	const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 
 	if (collapsible === "none") {

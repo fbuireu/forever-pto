@@ -1,4 +1,4 @@
-import { DEFAULT_SEARCH_PARAMS, FILTER_MAXIMUM_VALUES, PREMIUM_COOKIE, SEARCH_PARAM_KEYS } from "@const/const";
+import { DEFAULT_SEARCH_PARAMS, FILTER_MAXIMUM_VALUES, PREMIUM_PARAMS, SEARCH_PARAM_KEYS } from "@const/const";
 import type { RequiredParamsMap } from "@const/types";
 import { getDefaultValue } from "@infrastructure/middleware/utils/getDefaultValue/getDefaultValue";
 import { validateParam } from "@infrastructure/middleware/utils/validateParam/validateParam";
@@ -12,7 +12,7 @@ export const MIDDLEWARE_PARAMS: RequiredParamsMap = {
 	[SEARCH_PARAM_KEYS.PTO_DAYS]: () => DEFAULT_SEARCH_PARAMS.PTO_DAYS,
 	[SEARCH_PARAM_KEYS.ALLOW_PAST_DAYS]: () => DEFAULT_SEARCH_PARAMS.ALLOW_PAST_DAYS,
 	[SEARCH_PARAM_KEYS.CARRY_OVER_MONTHS]: async (request: NextRequest) => {
-		const isPremium = request.cookies.get(PREMIUM_COOKIE.NAME)?.value === "true";
+		const isPremium = request.cookies.get(PREMIUM_PARAMS.COOKIE_NAME)?.value === "true";
 
 		if (!isPremium) {
 			return String(FILTER_MAXIMUM_VALUES.CARRY_OVER_MONTHS.FREE);

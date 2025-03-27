@@ -1,4 +1,4 @@
-import { DEFAULT_SEARCH_PARAMS, FILTER_MAXIMUM_VALUES, PREMIUM_COOKIE, SEARCH_PARAM_KEYS } from "@const/const";
+import { DEFAULT_SEARCH_PARAMS, FILTER_MAXIMUM_VALUES, PREMIUM_PARAMS, SEARCH_PARAM_KEYS } from "@const/const";
 import type { MIDDLEWARE_PARAMS } from "@infrastructure/middleware/middleware";
 import { detectLocation } from "@infrastructure/services/location/detectLocation/detectLocation";
 import type { NextRequest } from "next/server";
@@ -16,7 +16,7 @@ const PARAM_VALIDATORS: Record<string, ValidatorFunction> = {
 	[SEARCH_PARAM_KEYS.YEAR]: (value) => {
 		const year = Number.parseInt(value, 10);
 		const currentYear = new Date().getFullYear();
-		const allowedYears = FILTER_MAXIMUM_VALUES.YEARS(String(currentYear));
+		const allowedYears = (FILTER_MAXIMUM_VALUES.YEARS as (year: string) => number[])(String(currentYear));
 
 		if (Number.isNaN(year) || !allowedYears.includes(year)) {
 			return DEFAULT_SEARCH_PARAMS.YEAR;
@@ -38,7 +38,7 @@ const PARAM_VALIDATORS: Record<string, ValidatorFunction> = {
 		return null;
 	},
 	[SEARCH_PARAM_KEYS.CARRY_OVER_MONTHS]: async (value, request) => {
-		const isPremium = request.cookies.get(PREMIUM_COOKIE.NAME)?.value === "true";
+		const isPremium = request.cookies.get(PREMIUM_PARAMS.COOKIE_NAME)?.value === "true";
 		const maxValue = isPremium
 			? FILTER_MAXIMUM_VALUES.CARRY_OVER_MONTHS.PREMIUM
 			: FILTER_MAXIMUM_VALUES.CARRY_OVER_MONTHS.FREE;

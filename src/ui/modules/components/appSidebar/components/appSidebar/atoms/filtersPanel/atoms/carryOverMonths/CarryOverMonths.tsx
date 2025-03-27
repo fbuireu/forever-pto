@@ -3,10 +3,10 @@
 import { FILTER_MAXIMUM_VALUES } from "@const/const";
 import type { SearchParams } from "@const/types";
 import { createQueryString } from "@modules/components/appSidebar/components/appSidebar/utils/createQueryString/createQueryString";
+import { usePremium } from "@ui/hooks/usePremium/usePremium";
 import { Label } from "@ui/modules/components/core/label/Label";
 import { Slider } from "@ui/modules/components/core/slider/Slider";
 import { PremiumLock } from "@ui/modules/components/premium/components/premiumLock/PremiumLock";
-import { usePremium } from "@ui/providers/premium/PremiumProvider";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { startTransition, useCallback, useMemo, useState } from "react";
 
@@ -18,17 +18,18 @@ export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
-	const { isPremium } = usePremium();
+	const { isPremiumUser } = usePremium();
 	const [value, setValue] = useState([Number(carryOverMonths)]);
 
 	const maxValue = useMemo(
-		() => (isPremium ? FILTER_MAXIMUM_VALUES.CARRY_OVER_MONTHS.PREMIUM : FILTER_MAXIMUM_VALUES.CARRY_OVER_MONTHS.FREE),
-		[isPremium],
+		() =>
+			isPremiumUser ? FILTER_MAXIMUM_VALUES.CARRY_OVER_MONTHS.PREMIUM : FILTER_MAXIMUM_VALUES.CARRY_OVER_MONTHS.FREE,
+		[isPremiumUser],
 	);
 
 	const handleValueChange = useCallback(
 		(newValue: number[]) => {
-			if (!isPremium && newValue[0] > 1) {
+			if (!isPremiumUser && newValue[0] > 1) {
 				return;
 			}
 
@@ -44,10 +45,10 @@ export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 				router.push(`${pathname}?${query}`, { scroll: false });
 			});
 		},
-		[isPremium, router, pathname, searchParams],
+		[isPremiumUser, router, pathname, searchParams],
 	);
 
-	const sliderDisabled = useMemo(() => !isPremium && value[0] > 1, [isPremium, value]);
+	const sliderDisabled = useMemo(() => !isPremiumUser && value[0] > 1, [isPremiumUser, value]);
 
 	const label = useMemo(
 		() => (
@@ -90,7 +91,7 @@ export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 		[label, maxValue, value, handleValueChange, sliderDisabled, sliderRangeLabels],
 	);
 
-	if (!isPremium) {
+	if (!isPremiumUser) {
 		return (
 			<PremiumLock
 				isActive={true}

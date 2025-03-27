@@ -2,36 +2,29 @@
 
 import {
 	activatePremium as activatePremiumAction,
-	checkPremiumStatus,
 	deactivatePremium as deactivatePremiumAction,
+	isPremium as isPremiumAction,
 } from "@application/actions/premium";
+import { PREMIUM_PARAMS } from "@const/const";
+import { PremiumContext } from "@ui/hooks/usePremium/usePremium";
 import { usePathname } from "next/navigation";
-import { type ReactNode, createContext, useContext, useEffect, useState, useTransition } from "react";
-
-interface PremiumContextType {
-	isPremium: boolean;
-	isPremiumLoading: boolean;
-	activatePremium: () => Promise<void>;
-	deactivatePremium: () => Promise<void>;
-}
-
-const PremiumContext = createContext<PremiumContextType | undefined>(undefined);
+import { type ReactNode, useEffect, useState, useTransition } from "react";
 
 interface PremiumProviderProps {
 	children: ReactNode;
-	initialPremiumStatus: boolean;
+	isPremium: boolean;
 }
 
-export const PremiumProvider = ({ children, initialPremiumStatus }: PremiumProviderProps) => {
+export const PremiumProvider = ({ children, isPremium }: PremiumProviderProps) => {
 	const pathname = usePathname();
-	const [isPremium, setIsPremium] = useState(initialPremiumStatus);
+	const [isPremiumUser, setIsPremiumUser] = useState(isPremium);
 	const [isPending, startTransition] = useTransition();
 
 	const activatePremium = async () => {
 		startTransition(async () => {
 			try {
 				await activatePremiumAction(pathname);
-				setIsPremium(true);
+				setIsPremiumUser(true);
 			} catch (error) {}
 		});
 	};
@@ -40,30 +33,30 @@ export const PremiumProvider = ({ children, initialPremiumStatus }: PremiumProvi
 		startTransition(async () => {
 			try {
 				await deactivatePremiumAction(pathname);
-				setIsPremium(false);
+				setIsPremiumUser(false);
 			} catch (error) {}
 		});
 	};
 
 	useEffect(() => {
 		const verifyPremiumStatus = async () => {
-			const status = await checkPremiumStatus();
-			if (status !== isPremium) {
-				setIsPremium(status);
+			const isPremium = await isPremiumAction();
+			if (isPremium !== isPremiumUser) {
+				setIsPremiumUser(isPremium);
 			}
 		};
 
 		verifyPremiumStatus();
-		const interval = setInterval(verifyPremiumStatus, 5 * 60 * 1000);
+		const interval = setInterval(verifyPremiumStatus, PREMIUM_PARAMS.CHECK_DELAY);
 
 		return () => clearInterval(interval);
-	}, [isPremium]);
+	}, [isPremiumUser]);
 
 	return (
 		<PremiumContext.Provider
 			value={{
-				isPremium,
-				isPremiumLoading: isPending,
+				isPremiumUser,
+				isPremiumUserLoading: isPending,
 				activatePremium,
 				deactivatePremium,
 			}}
@@ -71,12 +64,4 @@ export const PremiumProvider = ({ children, initialPremiumStatus }: PremiumProvi
 			{children}
 		</PremiumContext.Provider>
 	);
-};
-
-export const usePremium = () => {
-	const context = useContext(PremiumContext);
-	if (!context) {
-		throw new Error("usePremium must be used inside a PremiumProvider");
-	}
-	return context;
 };
