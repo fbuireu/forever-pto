@@ -12,54 +12,54 @@ import HolidaysSummary from '@ui/modules/components/home/components/holidaySumma
 import { PremiumProvider } from '@ui/providers/premium/PremiumProvider';
 
 interface ForeverPtoProps {
-	searchParams: Promise<SearchParams>;
+  searchParams: Promise<SearchParams>;
 }
 
 const ForeverPto = async ({ searchParams }: ForeverPtoProps) => {
-	const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS, CARRY_OVER_MONTHS } = DEFAULT_QUERY_PARAMS;
-	const {
-		country,
-		region,
-		year = YEAR,
-		ptoDays = PTO_DAYS,
-		allowPastDays = ALLOW_PAST_DAYS,
-		carryOverMonths = CARRY_OVER_MONTHS,
-	} = await searchParams;
-	const [isPremium, holidays] = await Promise.all([
-		isPremiumFn(),
-		getHolidays({ country, region, year, carryOverMonths }),
-	]);
-	const userCountry = getCountry(country);
-	const userRegion = getRegion(holidays);
+  const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS, CARRY_OVER_MONTHS } = DEFAULT_QUERY_PARAMS;
+  const {
+    country,
+    region,
+    year = YEAR,
+    ptoDays = PTO_DAYS,
+    allowPastDays = ALLOW_PAST_DAYS,
+    carryOverMonths = CARRY_OVER_MONTHS,
+  } = await searchParams;
+  const [isPremium, holidays] = await Promise.all([
+    isPremiumFn(),
+    getHolidays({ country, region, year, carryOverMonths }),
+  ]);
+  const userCountry = getCountry(country);
+  const userRegion = getRegion(holidays);
 
-	return (
-		<SidebarProvider>
-			<PremiumProvider isPremium={isPremium}>
-				<AppSidebar
-					country={country}
-					ptoDays={ptoDays}
-					region={region}
-					year={year}
-					allowPastDays={allowPastDays}
-					carryOverMonths={carryOverMonths}
-				/>
-				<SidebarTrigger />
-				<div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-8">
-					<HolidaysSummary holidays={holidays} />
-					<CalendarList
-						key={JSON.stringify(holidays)}
-						year={Number(year)}
-						ptoDays={Number(ptoDays)}
-						allowPastDays={allowPastDays}
-						holidays={holidays}
-						carryOverMonths={isPremium ? Number(carryOverMonths) : 1}
-						userCountry={userCountry}
-						userRegion={userRegion}
-					/>
-				</div>
-			</PremiumProvider>
-		</SidebarProvider>
-	);
+  return (
+      <SidebarProvider>
+        <PremiumProvider isPremium={isPremium}>
+          <AppSidebar
+              country={country}
+              ptoDays={ptoDays}
+              region={region}
+              year={year}
+              allowPastDays={allowPastDays}
+              carryOverMonths={carryOverMonths}
+          />
+          <SidebarTrigger />
+          <div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-8">
+            <HolidaysSummary holidays={holidays} />
+            <CalendarList
+                key={JSON.stringify(holidays)}
+                year={Number(year)}
+                ptoDays={Number(ptoDays)}
+                allowPastDays={allowPastDays}
+                holidays={holidays}
+                carryOverMonths={isPremium ? Number(carryOverMonths) : 1}
+                userCountry={userCountry}
+                userRegion={userRegion}
+            />
+          </div>
+        </PremiumProvider>
+      </SidebarProvider>
+  );
 };
 
 export default ForeverPto;
@@ -79,7 +79,6 @@ export default ForeverPto;
 // 27- DataTable to bulk actions to remove days
 // 29- Refine styles (hover blocks, etc)
 // 31- Add form shadcn and zod
-// 32- Add safeguard to avoid rerenders when same data is passed etc (memo previous request?)
 // 33- check memo and cache methods
 // 34- MCP server? (paid func)
 // 34- premium with UUID value (not boolean)
