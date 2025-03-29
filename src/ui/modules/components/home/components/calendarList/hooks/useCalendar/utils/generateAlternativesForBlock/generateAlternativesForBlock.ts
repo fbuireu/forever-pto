@@ -1,6 +1,7 @@
-import { DEFAULT_CALENDAR_LIMITS } from "@const/const";
+import { DEFAULT_CALENDAR_LIMITS, SCORE_MULTIPLIERS } from "@const/const";
 import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
 import type { BlockOpportunity } from "../../types";
+import { areBlocksEquivalent } from "../areBlocksEquivalent/areBlocksEquivalent";
 
 interface GenerateAlternativesForBlockParams {
 	block: BlockOpportunity & { id: string };
@@ -13,23 +14,21 @@ export function generateAlternativesForBlock({
 	blockOpportunities,
 	suggestedDaysSet,
 }: GenerateAlternativesForBlockParams): BlockOpportunity[] {
-	const alternativesForBlock: BlockOpportunity[] = [];
-	const blockEffective = block.effectiveDays;
+	const tolerance =
+		block.blockSize === 1 ? SCORE_MULTIPLIERS.TOLERANCE.SINGLE_DAY : SCORE_MULTIPLIERS.TOLERANCE.MULTI_DAY;
 
-	const potentialAlternatives = blockOpportunities
-		.filter(
-			(opportunityBlock) =>
-				opportunityBlock !== block &&
-				opportunityBlock.blockSize === block.blockSize &&
-				Math.abs(opportunityBlock.effectiveDays - blockEffective) <= 1 &&
-				!opportunityBlock.days.some((d) => suggestedDaysSet.has(getDateKey(d))),
-		)
-		.slice(0, DEFAULT_CALENDAR_LIMITS.MAX_CANDIDATE_ALTERNATIVES);
+	return blockOpportunities
+		.filter((opportunityBlock) => {
+			if (opportunityBlock === block) return false;
 
-	for (const alt of potentialAlternatives) {
-		alternativesForBlock.push(alt);
-		if (alternativesForBlock.length >= DEFAULT_CALENDAR_LIMITS.MAX_ALTERNATIVES) break;
-	}
+			if (block.days.some((d) => suggestedDaysSet.has(getDateKey(d)))) return false;
 
-	return alternativesForBlock;
+			if (opportunityBlock.blockSize !== block.blockSize) return false;
+
+			if (block.blockSize === 1) {
+				return opportunityBlock.effectiveDays === block.effectiveDays;
+			}
+			return areBlocksEquivalent({ block1: block, block2: opportunityBlock, tolerance });
+		})
+		.slice(0, DEFAULT_CALENDAR_LIMITS.MAX_ALTERNATIVES);
 }

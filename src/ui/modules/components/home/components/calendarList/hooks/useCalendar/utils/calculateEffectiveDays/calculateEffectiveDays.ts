@@ -1,6 +1,7 @@
 import type { EffectiveRatio } from "@modules/components/home/components/calendarList/hooks/types";
 import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
 import { groupConsecutiveDays } from "@modules/components/home/components/calendarList/hooks/utils/groupConsecutiveDays/groupConsecutiveDays";
+import { isWeekend } from "date-fns";
 
 interface CalculateEffectiveDaysParams {
 	freeDaysBaseMap: Map<string, Date>;
@@ -28,9 +29,19 @@ export function calculateEffectiveDays({ freeDaysBaseMap, ptoDays }: CalculateEf
 	let effectiveDays = 0;
 	for (const sequence of sequences) {
 		const hasAnyPtoDay = sequence.some((day) => ptoDayKeys.has(getDateKey(day)));
-		if (hasAnyPtoDay) {
-			effectiveDays += sequence.length;
+		if (!hasAnyPtoDay) continue;
+
+		const hasHolidays = sequence.some((day) => {
+			const dayKey = getDateKey(day);
+			return freeDaysBaseMap.has(dayKey) && !isWeekend(day);
+		});
+
+		if (!hasHolidays) {
+			effectiveDays += ptoDays.length;
+			continue;
 		}
+
+		effectiveDays += sequence.length;
 	}
 
 	const ratio = Number.parseFloat((effectiveDays / ptoDays.length).toFixed(1));

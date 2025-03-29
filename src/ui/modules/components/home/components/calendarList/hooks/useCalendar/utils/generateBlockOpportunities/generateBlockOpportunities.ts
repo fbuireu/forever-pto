@@ -21,8 +21,6 @@ export function generateBlockOpportunities({
 	const blockOpportunities: BlockOpportunity[] = [];
 
 	for (let startDayIndex = 0; startDayIndex < availableWorkdays.length; startDayIndex++) {
-		const startDay = availableWorkdays[startDayIndex];
-
 		for (
 			let blockSize = 1;
 			blockSize <= Math.min(DEFAULT_CALENDAR_LIMITS.MAX_BLOCK_SIZE, remainingPtoDays);
@@ -54,9 +52,13 @@ export function generateBlockOpportunities({
 			const { daysBeforeBlock, daysAfterBlock } = calculateSurroundingFreeDays({ blockDays, daysMap });
 			const totalConsecutiveDays = daysBeforeBlock + blockSize + daysAfterBlock;
 
-			const score = calculateBlockScore({ blockSize, totalConsecutiveDays });
-
 			const effectiveResult = calculateEffectiveDays(blockDays);
+
+			const score = calculateBlockScore({
+				blockSize,
+				totalConsecutiveDays,
+				effectiveDays: effectiveResult.effective,
+			});
 
 			blockOpportunities.push({
 				startDay: blockDays[0],

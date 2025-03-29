@@ -23,9 +23,43 @@ export interface SearchParams {
 }
 
 export interface PremiumParams {
-	cookie_name: string;
+	cookie_name: "premium";
 	duration: number;
 	check_delay: number;
+}
+
+export interface CalendarLimits {
+	max_block_size: number;
+	max_search_depth: number;
+	max_alternatives: number;
+	max_candidate_alternatives: number;
+}
+
+export interface ScoreMultipliers {
+	default: number;
+	consecutive_days: {
+		threshold: number;
+		multiplier: number;
+	};
+	block_size: {
+		min: number;
+		max: number;
+		multiplier: number;
+	};
+	efficiency_ratio: {
+		threshold: number;
+		high: number;
+		medium: number;
+	};
+	bonus: {
+		high_efficiency: number;
+		medium_efficiency: number;
+		long_sequence: number;
+	};
+	tolerance: {
+		single_day: number;
+		multi_day: number;
+	};
 }
 
 export interface FilterMaximumValues {

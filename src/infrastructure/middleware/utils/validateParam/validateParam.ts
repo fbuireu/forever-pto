@@ -1,7 +1,7 @@
-import { DEFAULT_QUERY_PARAMS, FILTER_MAXIMUM_VALUES, PREMIUM_PARAMS, SEARCH_PARAM_KEYS } from '@const/const';
-import type { MIDDLEWARE_PARAMS } from '@infrastructure/middleware/middleware';
-import { detectLocation } from '@infrastructure/services/location/detectLocation/detectLocation';
-import type { NextRequest } from 'next/server';
+import { DEFAULT_QUERY_PARAMS, FILTER_MAXIMUM_VALUES, PREMIUM_PARAMS, SEARCH_PARAM_KEYS } from "@const/const";
+import type { MIDDLEWARE_PARAMS } from "@infrastructure/middleware/middleware";
+import { detectLocation } from "@infrastructure/services/location/detectLocation/detectLocation";
+import type { NextRequest } from "next/server";
 
 type ValidatorFunction = (value: string, request: NextRequest) => Promise<string | null> | string | null;
 

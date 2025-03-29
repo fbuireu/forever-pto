@@ -1,6 +1,12 @@
-import type { CapitalizeKeys, FilterMaximumValues, PremiumParams } from '@const/types';
-import { capitalizeKeys } from '@const/utils/capitalizeKeys/capitalizeKeys';
-import type { Metadata } from 'next';
+import type {
+	CalendarLimits,
+	CapitalizeKeys,
+	FilterMaximumValues,
+	PremiumParams,
+	ScoreMultipliers,
+} from "@const/types";
+import { capitalizeKeys } from "@const/utils/capitalizeKeys/capitalizeKeys";
+import type { Metadata } from "next";
 
 export const SEARCH_PARAM_KEYS = {
 	COUNTRY: "country",
@@ -28,13 +34,6 @@ export const DEFAULT_QUERY_PARAMS: Record<CapitalizeKeys<string>, string> = {
 	CARRY_OVER_MONTHS: "1",
 };
 
-export const DEFAULT_CALENDAR_LIMITS: Record<CapitalizeKeys<string>, number> = {
-	MAX_BLOCK_SIZE: 5,
-	MAX_ALTERNATIVES: 10,
-	MAX_CANDIDATE_ALTERNATIVES: 50,
-	MAX_SEARCH_DEPTH: 100,
-};
-
 export const DEFAULT_SIDEBAR_CONFIG: Record<CapitalizeKeys<string>, string | number> = {
 	SIDEBAR_COOKIE_NAME: "sidebar_state",
 	SIDEBAR_COOKIE_MAX_AGE: 60 * 60 * 24 * 7,
@@ -54,6 +53,40 @@ export const DEFAULT_SEO_PARAMS: CapitalizeKeys<Metadata> = {
 	},
 	IMAGE: "",
 } as unknown as CapitalizeKeys<Metadata>;
+
+export const DEFAULT_CALENDAR_LIMITS: CapitalizeKeys<CalendarLimits> = {
+	MAX_BLOCK_SIZE: 5,
+	MAX_SEARCH_DEPTH: 10,
+	MAX_ALTERNATIVES: 5,
+	MAX_CANDIDATE_ALTERNATIVES: 20,
+} as const;
+
+export const SCORE_MULTIPLIERS: CapitalizeKeys<ScoreMultipliers> = {
+	DEFAULT: 1.0,
+	CONSECUTIVE_DAYS: {
+		THRESHOLD: 5,
+		MULTIPLIER: 1.2,
+	},
+	BLOCK_SIZE: {
+		MIN: 1,
+		MAX: 5,
+		MULTIPLIER: 1.1,
+	},
+	EFFICIENCY_RATIO: {
+		THRESHOLD: 1.5,
+		HIGH: 3,
+		MEDIUM: 2,
+	},
+	BONUS: {
+		HIGH_EFFICIENCY: 1.3,
+		MEDIUM_EFFICIENCY: 1.2,
+		LONG_SEQUENCE: 1.2,
+	},
+	TOLERANCE: {
+		SINGLE_DAY: 1,
+		MULTI_DAY: 2,
+	},
+} as const;
 
 export const FILTER_MAXIMUM_VALUES: CapitalizeKeys<FilterMaximumValues> = {
 	CARRY_OVER_MONTHS: {

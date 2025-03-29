@@ -29,6 +29,8 @@ export const Stats = ({ stats, userCountry, userRegion }: StatsProps) => {
 		return null;
 	}
 
+	const hasHolidays = stats.totalHolidays > 0;
+
 	return (
 		<Card className="w-full max-w-4xl mb-6">
 			<CardHeader className="pb-2">
@@ -37,23 +39,36 @@ export const Stats = ({ stats, userCountry, userRegion }: StatsProps) => {
 			<CardContent className="space-y-4">
 				<div className="text-sm text-slate-700 dark:text-slate-300">
 					<h3 className="font-medium text-base mb-2">Resumen de días festivos</h3>
-					<p>
-						{userCountry?.label ? `En ${userCountry.label} (${userCountry.flag}) hay ` : "Hay "}
-						<span className="font-medium">{stats.nationalHolidays} festivos nacionales</span>
-						{stats.regionalHolidays > 0 && (
-							<>
-								{". Sumados a los "}
-								<span className="font-medium">
-									{stats.regionalHolidays} festivos en {userRegion ? `${userRegion}` : "la región"}
-								</span>
-							</>
-						)}
-						{", hacen un total de "}
-						<span className="font-medium">{stats.totalHolidays} días festivos</span>.
-					</p>
+					{hasHolidays ? (
+						<p>
+							{userCountry?.label ? `En ${userCountry.label} (${userCountry.flag}) hay ` : "Hay "}
+							<span className="font-medium">{stats.nationalHolidays} festivos nacionales</span>
+							{stats.regionalHolidays > 0 && (
+								<>
+									{". Sumados a los "}
+									<span className="font-medium">
+										{stats.regionalHolidays} festivos en {userRegion ? `${userRegion}` : "la región"}
+									</span>
+								</>
+							)}
+							{", hacen un total de "}
+							<span className="font-medium">{stats.totalHolidays} días festivos</span>.
+						</p>
+					) : (
+						<p>
+							{userCountry?.label ? (
+								<>
+									No se han encontrado días festivos para este país. Prueba a usar el buscador
+									{userRegion && `Tampoco para la región ${userRegion}.`}
+								</>
+							) : (
+								"No se han encontrado días festivos para tu país."
+							)}
+						</p>
+					)}
 				</div>
 
-				{stats.ptoDaysAvailable > 0 && (
+				{stats.totalHolidays > 0 && userCountry?.label && (
 					<>
 						<Separator />
 						<div className="text-sm text-slate-700 dark:text-slate-300">

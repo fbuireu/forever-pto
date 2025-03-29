@@ -1,13 +1,12 @@
-import { DEFAULT_CALENDAR_LIMITS } from "@const/const";
 import type { EffectiveRatio } from "@modules/components/home/components/calendarList/hooks/types";
 import type {
 	BlockOpportunity,
 	DayInfo,
 } from "@modules/components/home/components/calendarList/hooks/useCalendar/types";
-import { canAddBlock } from "@modules/components/home/components/calendarList/hooks/useCalendar/utils/canAddBlock/canAddBlock";
 import { generateAlternativesForBlock } from "@modules/components/home/components/calendarList/hooks/useCalendar/utils/generateAlternativesForBlock/generateAlternativesForBlock";
 import { getDateKey } from "../../../utils/getDateKey/getDateKey";
 import { generateBlockOpportunities } from "../generateBlockOpportunities/generateBlockOpportunities";
+import { selectBlocks } from "../selectBlocks/selectBlocks";
 
 interface FindOptimalGapsParams {
 	yearMap: { map: Map<string, DayInfo>; allDays: Date[] };
@@ -48,34 +47,37 @@ export function findOptimalGaps({
 		calculateEffectiveDays,
 	});
 
-	const selectedBlocks: (BlockOpportunity & { id: string })[] = [];
-	const finalSuggestedDays: Date[] = [];
 	const suggestedDaysSet = new Set<string>();
 	let daysRemaining = ptoDays;
 	let blockIdCounter = 0;
+	const allSelectedBlocks: (BlockOpportunity & { id: string })[] = [];
+	const allSuggestedDays: Date[] = [];
 
-	for (let i = 0; i < Math.min(blockOpportunities.length, DEFAULT_CALENDAR_LIMITS.MAX_SEARCH_DEPTH); i++) {
-		if (daysRemaining <= 0) break;
+	const firstPhaseResult = selectBlocks({ blockOpportunities, daysRemaining, blockIdCounter, suggestedDaysSet });
+	allSelectedBlocks.push(...firstPhaseResult.selectedBlocks);
+	allSuggestedDays.push(...firstPhaseResult.finalSuggestedDays);
+	daysRemaining = firstPhaseResult.daysRemaining;
+	blockIdCounter = firstPhaseResult.blockIdCounter;
 
-		const block = blockOpportunities[i];
+	if (daysRemaining > 0) {
+		const remainingOpportunities = blockOpportunities
+			.filter((block) => !allSelectedBlocks.some((selected) => selected === block))
+			.sort((a, b) => a.blockSize - b.blockSize);
 
-		if (canAddBlock({ blockDays: block.days, suggestedDaysSet, daysRemaining })) {
-			const blockId = `block_${++blockIdCounter}`;
-
-			selectedBlocks.push({ ...block, id: blockId });
-
-			for (const day of block.days) {
-				finalSuggestedDays.push(day);
-				suggestedDaysSet.add(getDateKey(day));
-			}
-
-			daysRemaining -= block.days.length;
-		}
+		const secondPhaseResult = selectBlocks({
+			blockOpportunities: remainingOpportunities,
+			daysRemaining,
+			blockIdCounter,
+			suggestedDaysSet,
+		});
+		allSelectedBlocks.push(...secondPhaseResult.selectedBlocks);
+		allSuggestedDays.push(...secondPhaseResult.finalSuggestedDays);
+		blockIdCounter = secondPhaseResult.blockIdCounter;
 	}
 
 	const newDayToBlockIdMap: Record<string, string> = {};
 
-	for (const block of selectedBlocks) {
+	for (const block of allSelectedBlocks) {
 		for (const day of block.days) {
 			newDayToBlockIdMap[getDateKey(day)] = block.id;
 		}
@@ -83,12 +85,12 @@ export function findOptimalGaps({
 
 	const alternativesByBlockId: Record<string, BlockOpportunity[]> = {};
 
-	for (const block of selectedBlocks) {
+	for (const block of allSelectedBlocks) {
 		alternativesByBlockId[block.id] = generateAlternativesForBlock({ block, blockOpportunities, suggestedDaysSet });
 	}
 
 	return {
-		suggestedDays: finalSuggestedDays,
+		suggestedDays: allSuggestedDays,
 		alternativeBlocks: alternativesByBlockId,
 		dayToBlockIdMap: newDayToBlockIdMap,
 	};

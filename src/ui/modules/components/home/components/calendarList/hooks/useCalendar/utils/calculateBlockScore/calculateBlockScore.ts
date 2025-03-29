@@ -1,14 +1,39 @@
+import { SCORE_MULTIPLIERS } from "@const/const";
+
 interface CalculateBlockScoreParams {
 	blockSize: number;
 	totalConsecutiveDays: number;
+	effectiveDays: number;
 }
 
-export function calculateBlockScore({ blockSize, totalConsecutiveDays }: CalculateBlockScoreParams): number {
-	const efficiencyRatio = totalConsecutiveDays / blockSize;
-	let score = efficiencyRatio * totalConsecutiveDays * 100;
+interface EfficiencyThreshold {
+	threshold: number;
+	bonus: number;
+}
 
-	if (totalConsecutiveDays >= 7) score *= 1.5;
-	if (blockSize >= 3) score *= 1.2;
+const EFFICIENCY_THRESHOLDS: EfficiencyThreshold[] = [
+	{ threshold: SCORE_MULTIPLIERS.EFFICIENCY_RATIO.HIGH, bonus: SCORE_MULTIPLIERS.BONUS.HIGH_EFFICIENCY },
+	{ threshold: SCORE_MULTIPLIERS.EFFICIENCY_RATIO.MEDIUM, bonus: SCORE_MULTIPLIERS.BONUS.MEDIUM_EFFICIENCY },
+	{ threshold: 0, bonus: SCORE_MULTIPLIERS.DEFAULT },
+] as const;
+
+export function calculateBlockScore({
+	blockSize,
+	totalConsecutiveDays,
+	effectiveDays,
+}: CalculateBlockScoreParams): number {
+	const efficiencyRatio = effectiveDays / blockSize;
+
+	const efficiencyBonus =
+		EFFICIENCY_THRESHOLDS.find(({ threshold }) => efficiencyRatio >= threshold)?.bonus ?? SCORE_MULTIPLIERS.DEFAULT;
+
+	const sequenceBonus =
+		totalConsecutiveDays >= SCORE_MULTIPLIERS.CONSECUTIVE_DAYS.THRESHOLD
+			? SCORE_MULTIPLIERS.BONUS.LONG_SEQUENCE
+			: SCORE_MULTIPLIERS.DEFAULT;
+
+	let score = efficiencyRatio * 100;
+	score *= efficiencyBonus * sequenceBonus;
 
 	return score;
 }
