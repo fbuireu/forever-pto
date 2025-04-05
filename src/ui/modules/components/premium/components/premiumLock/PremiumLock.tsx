@@ -10,23 +10,26 @@ import { Button } from "@ui/modules/components/core/button/Button";
 import { Dialog } from "@ui/modules/components/core/dialog/Dialog";
 import { Input } from "@ui/modules/components/core/input/Input";
 import { Label } from "@ui/modules/components/core/label/Label";
+import { mergeClasses } from "@ui/utils/mergeClasses";
 import { LockIcon, X } from "lucide-react";
 import { type FormEvent, type MouseEvent, type ReactNode, useState, useTransition } from "react";
 
 interface PremiumLockProps {
-	children: ReactNode;
+	children?: ReactNode;
 	isActive?: boolean;
 	featureName?: string;
 	description?: string;
 	renderUnlocked?: (isPremium: boolean) => ReactNode;
+	variant?: "small" | "large" | "minimal";
 }
 
 export const PremiumLock = ({
 	children,
 	isActive = true,
-	featureName = "Función Premium",
-	description = "Para acceder a esta función premium, introduce tu email para comenzar tu suscripción.",
+	featureName,
+	description,
 	renderUnlocked,
+	variant = "large",
 }: PremiumLockProps) => {
 	const { isPremiumUser, isPremiumUserLoading, activatePremium } = usePremium();
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,21 +68,44 @@ export const PremiumLock = ({
 	const isLoading = isPending || isPremiumUserLoading;
 
 	return (
-		<div className="relative overflow-hidden w-full h-full">
-			<div className="pointer-events-none opacity-70 filter blur-[2px] scale-[1.05] transform origin-center absolute inset-0 w-[105%] h-[105%] -left-[2.5%] -top-[2.5%]">
-				{children}
-			</div>
-			<div className="invisible">{children}</div>
+		<div
+			className={mergeClasses(
+				"relative",
+				variant === "large" ? "w-full h-full overflow-hidden" : variant === "minimal" ? "w-full h-full" : "w-4 h-4",
+			)}
+		>
+			{children && (
+				<div className={mergeClasses("pointer-events-none", variant !== "minimal" && "opacity-70 filter blur-[2px]")}>
+					{children}
+				</div>
+			)}
 			<button
 				type="button"
-				className="absolute inset-0 z-10 bg-white/50 dark:bg-black/50 backdrop-blur-sm rounded-md flex flex-col items-center justify-center cursor-pointer"
+				className={mergeClasses(
+					"absolute inset-0 z-10 cursor-pointer flex flex-col items-center justify-center",
+					variant !== "minimal" && "bg-white/50 dark:bg-black/50 backdrop-blur-sm rounded-md",
+				)}
 				onClick={handleModalClick}
 			>
-				<div className="w-10 h-10 rounded-full bg-primary/80 flex items-center justify-center mb-2">
-					<LockIcon className="w-5 h-5 text-white" />
-				</div>
-				<p className="text-sm font-medium">{featureName}</p>
-				<p className="text-xs text-muted-foreground">Clic para desbloquear</p>
+				{variant !== "minimal" && (
+					<>
+						<div
+							className={mergeClasses(
+								"w-10 h-10 rounded-full flex items-center justify-center",
+								variant === "large" && "bg-primary/50 mb-2",
+							)}
+						>
+							<LockIcon
+								className={mergeClasses("w-5 h-5", variant === "small" ? "text-black" : "text-white")}
+								size={20}
+							/>
+						</div>
+						{featureName && variant === "large" && <p className="text-sm font-medium">{featureName}</p>}
+						{description && variant === "large" && (
+							<p className="text-xs text-muted-foreground">Clic para desbloquear</p>
+						)}
+					</>
+				)}
 			</button>
 			<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
 				<DialogContent>

@@ -1,5 +1,5 @@
-import { isWeekend } from 'date-fns';
-import type { BlockOpportunity } from '../../types';
+import { isWeekend } from "date-fns";
+import type { BlockOpportunity } from "../../types";
 
 interface AreBlocksEquivalentParams {
 	block1: BlockOpportunity;

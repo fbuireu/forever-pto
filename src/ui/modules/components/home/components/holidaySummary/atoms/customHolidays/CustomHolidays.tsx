@@ -29,11 +29,11 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import { AlertTriangle, ArrowDownIcon, ArrowUpIcon, ChevronsUpDown } from "lucide-react";
+import { ArrowDownIcon, ArrowUpIcon, ChevronsUpDown, Lock } from "lucide-react";
 import { useState } from "react";
 
-interface NationalHolidaysProps {
-	nationalHolidays: HolidayDTO[];
+interface CustomHolidaysProps {
+	customHolidays: HolidayDTO[];
 }
 
 const columns: ColumnDef<HolidayDTO>[] = [
@@ -49,6 +49,7 @@ const columns: ColumnDef<HolidayDTO>[] = [
 					checked={table.getIsAllPageRowsSelected()}
 					onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
 					aria-label="Seleccionar todo"
+					disabled
 				/>
 			</PremiumLock>
 		),
@@ -62,6 +63,7 @@ const columns: ColumnDef<HolidayDTO>[] = [
 					checked={row.getIsSelected()}
 					onCheckedChange={(value) => row.toggleSelected(!!value)}
 					aria-label="Seleccionar fila"
+					disabled
 				/>
 			</PremiumLock>
 		),
@@ -120,12 +122,12 @@ const columns: ColumnDef<HolidayDTO>[] = [
 	},
 ];
 
-export const NationalHolidays = ({ nationalHolidays }: NationalHolidaysProps) => {
+export const CustomHolidays = ({ customHolidays }: CustomHolidaysProps) => {
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [rowSelection, setRowSelection] = useState({});
 
 	const table = useReactTable({
-		data: nationalHolidays,
+		data: customHolidays,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
@@ -144,21 +146,26 @@ export const NationalHolidays = ({ nationalHolidays }: NationalHolidaysProps) =>
 	});
 
 	return (
-		<TabsContent value="national-holidays">
-			<Accordion type="single" collapsible className="rounded-md border shadow-xs" disabled={!nationalHolidays.length}>
-				<AccordionItem value="national-holidays">
-					<AccordionTrigger className="px-4">Festivos Nacionales</AccordionTrigger>
+		<TabsContent value="custom-holidays">
+			<Accordion type="single" collapsible className="rounded-md border shadow-xs" disabled>
+				<AccordionItem value="custom-holidays">
+					<PremiumLock variant="minimal">
+						<AccordionTrigger className="px-4">
+							<div className="flex items-center gap-2">
+								Festivos Personalizados
+								<Lock className="h-4 w-4" />
+							</div>
+						</AccordionTrigger>
+					</PremiumLock>
+
 					<AccordionContent>
 						<div className="p-4">
 							<Alert className="mb-3">
 								<div className="flex items-center">
-									<AlertTriangle className="h-4 w-4 mr-2" />
-									<AlertTitle>Atención</AlertTitle>
+									<Lock className="h-4 w-4 mr-2" />
+									<AlertTitle>Próximamente</AlertTitle>
 								</div>
-								<AlertDescription>
-									Los festivos mostrados pueden ser incorrectos. Podrás modificarlos próximamente para ajustarlos a tus
-									necesidades.
-								</AlertDescription>
+								<AlertDescription>Podrás añadir tus propios festivos personalizados próximamente.</AlertDescription>
 							</Alert>
 
 							<div className="rounded-md border">
@@ -190,7 +197,7 @@ export const NationalHolidays = ({ nationalHolidays }: NationalHolidaysProps) =>
 										) : (
 											<TableRow>
 												<TableCell colSpan={columns.length} className="h-24 text-center">
-													No hay festivos nacionales configurados
+													No hay festivos personalizados configurados
 												</TableCell>
 											</TableRow>
 										)}

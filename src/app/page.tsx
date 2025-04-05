@@ -1,15 +1,15 @@
-import { isPremium as isPremiumFn } from '@application/actions/premium';
-import { DEFAULT_QUERY_PARAMS } from '@const/const';
-import type { SearchParams } from '@const/types';
-import { getCountry } from '@infrastructure/services/country/getCountry/getCountry';
-import { getHolidays } from '@infrastructure/services/holiday/getHolidays';
-import { getRegion } from '@infrastructure/services/region/getRegion/getRegion';
-import { SidebarTrigger } from '@modules/components/core/sidebar/atoms/sidebarTrigger/SidebarTrigger';
-import { SidebarProvider } from '@modules/components/core/sidebar/provider/SidebarProvider';
-import { AppSidebar } from '@ui/modules/components/appSidebar/components/appSidebar/AppSidebar';
-import CalendarList from '@ui/modules/components/home/components/calendarList/CalendarList';
-import HolidaysSummary from '@ui/modules/components/home/components/holidaySummary/HolidaysSummary';
-import { PremiumProvider } from '@ui/providers/premium/PremiumProvider';
+import { isPremium as isPremiumFn } from "@application/actions/premium";
+import { DEFAULT_QUERY_PARAMS } from "@const/const";
+import type { SearchParams } from "@const/types";
+import { getCountry } from "@infrastructure/services/country/getCountry/getCountry";
+import { getHolidays } from "@infrastructure/services/holiday/getHolidays";
+import { getRegion } from "@infrastructure/services/region/getRegion/getRegion";
+import { SidebarTrigger } from "@modules/components/core/sidebar/atoms/sidebarTrigger/SidebarTrigger";
+import { SidebarProvider } from "@modules/components/core/sidebar/provider/SidebarProvider";
+import { AppSidebar } from "@ui/modules/components/appSidebar/components/appSidebar/AppSidebar";
+import CalendarList from "@ui/modules/components/home/components/calendarList/CalendarList";
+import HolidaysSummary from "@ui/modules/components/home/components/holidaySummary/HolidaysSummary";
+import { PremiumProvider } from "@ui/providers/premium/PremiumProvider";
 
 interface ForeverPtoProps {
 	searchParams: Promise<SearchParams>;
@@ -78,3 +78,4 @@ export default ForeverPto;
 // 34- MCP server? (paid func)
 // 34- premium with UUID value (not boolean)
 // 34- use fn to format messages in stats
+// 34- improve premium lock variant to be more semantic (tab, checkbox, etc)

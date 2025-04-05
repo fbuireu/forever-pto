@@ -1,12 +1,12 @@
 import type {
-  CalendarLimits,
-  CapitalizeKeys,
-  FilterMaximumValues,
-  PremiumParams,
-  ScoreMultipliers
-} from '@const/types';
-import { capitalizeKeys } from '@const/utils/capitalizeKeys/capitalizeKeys';
-import type { Metadata } from 'next';
+	CalendarLimits,
+	CapitalizeKeys,
+	FilterMaximumValues,
+	PremiumParams,
+	ScoreMultipliers,
+} from "@const/types";
+import { capitalizeKeys } from "@const/utils/capitalizeKeys/capitalizeKeys";
+import type { Metadata } from "next";
 
 export const SEARCH_PARAM_KEYS = {
 	COUNTRY: "country",

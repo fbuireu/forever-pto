@@ -1,7 +1,7 @@
-import { DEFAULT_CALENDAR_LIMITS, SCORE_MULTIPLIERS } from '@const/const';
-import { getDateKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey';
-import type { BlockOpportunity } from '../../types';
-import { areBlocksEquivalent } from '../areBlocksEquivalent/areBlocksEquivalent';
+import { DEFAULT_CALENDAR_LIMITS, SCORE_MULTIPLIERS } from "@const/const";
+import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
+import type { BlockOpportunity } from "../../types";
+import { areBlocksEquivalent } from "../areBlocksEquivalent/areBlocksEquivalent";
 
 interface GenerateAlternativesForBlockParams {
 	block: BlockOpportunity & { id: string };

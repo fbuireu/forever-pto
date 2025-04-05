@@ -1,6 +1,6 @@
-import { getDateKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey';
-import type { BlockOpportunity } from '../../types';
-import { canAddBlock } from '../canAddBlock/canAddBlock';
+import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
+import type { BlockOpportunity } from "../../types";
+import { canAddBlock } from "../canAddBlock/canAddBlock";
 
 interface SelectBlocksParams {
 	blockOpportunities: BlockOpportunity[];
