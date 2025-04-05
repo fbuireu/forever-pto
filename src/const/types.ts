@@ -1,5 +1,5 @@
-import { SEARCH_PARAM_KEYS } from "@const/const";
-import type { NextRequest } from "next/server";
+import { SEARCH_PARAM_KEYS } from '@const/const';
+import type { NextRequest } from 'next/server';
 
 export type CapitalizeKeys<T> = {
 	[K in keyof T as Uppercase<K & string>]: T[K] extends object ? CapitalizeKeys<T[K]> : T[K];
@@ -32,22 +32,14 @@ export interface CalendarLimits {
 	max_block_size: number;
 	max_search_depth: number;
 	max_alternatives: number;
-	max_candidate_alternatives: number;
 }
 
 export interface ScoreMultipliers {
 	default: number;
 	consecutive_days: {
 		threshold: number;
-		multiplier: number;
-	};
-	block_size: {
-		min: number;
-		max: number;
-		multiplier: number;
 	};
 	efficiency_ratio: {
-		threshold: number;
 		high: number;
 		medium: number;
 	};

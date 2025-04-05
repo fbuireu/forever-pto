@@ -1,6 +1,6 @@
-import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
-import type { BlockOpportunity } from "../../types";
-import { canAddBlock } from "../canAddBlock/canAddBlock";
+import { getDateKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey';
+import type { BlockOpportunity } from '../../types';
+import { canAddBlock } from '../canAddBlock/canAddBlock';
 
 interface SelectBlocksParams {
 	blockOpportunities: BlockOpportunity[];
@@ -30,16 +30,24 @@ export function selectBlocks({
 
 		if (canAddBlock({ blockDays: block.days, suggestedDaysSet, daysRemaining })) {
 			const blockId = `block_${++blockIdCounter}`;
+
 			selectedBlocks.push({ ...block, id: blockId });
 
-			for (const day of block.days) {
+			const blockLength = block.days.length;
+			for (let i = 0; i < blockLength; i++) {
+				const day = block.days[i];
 				finalSuggestedDays.push(day);
 				suggestedDaysSet.add(getDateKey(day));
 			}
 
-			daysRemaining -= block.days.length;
+			daysRemaining -= blockLength;
 		}
 	}
 
-	return { selectedBlocks, finalSuggestedDays, daysRemaining, blockIdCounter };
+	return {
+		selectedBlocks,
+		finalSuggestedDays,
+		daysRemaining,
+		blockIdCounter,
+	};
 }

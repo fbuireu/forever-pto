@@ -1,12 +1,12 @@
 import type {
-	CalendarLimits,
-	CapitalizeKeys,
-	FilterMaximumValues,
-	PremiumParams,
-	ScoreMultipliers,
-} from "@const/types";
-import { capitalizeKeys } from "@const/utils/capitalizeKeys/capitalizeKeys";
-import type { Metadata } from "next";
+  CalendarLimits,
+  CapitalizeKeys,
+  FilterMaximumValues,
+  PremiumParams,
+  ScoreMultipliers
+} from '@const/types';
+import { capitalizeKeys } from '@const/utils/capitalizeKeys/capitalizeKeys';
+import type { Metadata } from 'next';
 
 export const SEARCH_PARAM_KEYS = {
 	COUNTRY: "country",
@@ -57,23 +57,15 @@ export const DEFAULT_SEO_PARAMS: CapitalizeKeys<Metadata> = {
 export const DEFAULT_CALENDAR_LIMITS: CapitalizeKeys<CalendarLimits> = {
 	MAX_BLOCK_SIZE: 5,
 	MAX_SEARCH_DEPTH: 10,
-	MAX_ALTERNATIVES: 5,
-	MAX_CANDIDATE_ALTERNATIVES: 20,
+	MAX_ALTERNATIVES: 10,
 } as const;
 
 export const SCORE_MULTIPLIERS: CapitalizeKeys<ScoreMultipliers> = {
 	DEFAULT: 1.0,
 	CONSECUTIVE_DAYS: {
 		THRESHOLD: 5,
-		MULTIPLIER: 1.2,
-	},
-	BLOCK_SIZE: {
-		MIN: 1,
-		MAX: 5,
-		MULTIPLIER: 1.1,
 	},
 	EFFICIENCY_RATIO: {
-		THRESHOLD: 1.5,
 		HIGH: 3,
 		MEDIUM: 2,
 	},

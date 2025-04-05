@@ -14,25 +14,29 @@ export function generateAlternativesForBlock({
 	blockOpportunities,
 	suggestedDaysSet,
 }: GenerateAlternativesForBlockParams): BlockOpportunity[] {
+	const blockDayKeys = new Set(block.days.map((d) => getDateKey(d)));
+
 	const tolerance =
 		block.blockSize === 1 ? SCORE_MULTIPLIERS.TOLERANCE.SINGLE_DAY : SCORE_MULTIPLIERS.TOLERANCE.MULTI_DAY;
+
+	const originalEffectiveDays = block.effectiveDays;
 
 	return blockOpportunities
 		.filter((opportunityBlock) => {
 			if (opportunityBlock === block) return false;
 
-			const blockDayKeys = new Set(block.days.map((d) => getDateKey(d)));
+			if (opportunityBlock.blockSize !== block.blockSize) return false;
+
+			if (block.blockSize === 1) {
+				return opportunityBlock.effectiveDays === originalEffectiveDays;
+			}
+
 			const hasSuggestedDays = opportunityBlock.days.some((d) => {
 				const dayKey = getDateKey(d);
 				return suggestedDaysSet.has(dayKey) && !blockDayKeys.has(dayKey);
 			});
 			if (hasSuggestedDays) return false;
 
-			if (opportunityBlock.blockSize !== block.blockSize) return false;
-
-			if (block.blockSize === 1) {
-				return opportunityBlock.effectiveDays === block.effectiveDays;
-			}
 			return areBlocksEquivalent({ block1: block, block2: opportunityBlock, tolerance });
 		})
 		.slice(0, DEFAULT_CALENDAR_LIMITS.MAX_ALTERNATIVES);

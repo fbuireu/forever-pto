@@ -1,9 +1,10 @@
-import { DEFAULT_CALENDAR_LIMITS } from "@const/const";
-import type { EffectiveRatio } from "@modules/components/home/components/calendarList/hooks/types";
-import { differenceInDays, getMonth } from "date-fns";
-import type { BlockOpportunity, DayInfo } from "../../types";
-import { calculateBlockScore } from "../calculateBlockScore/calculateBlockScore";
-import { calculateSurroundingFreeDays } from "../calculateSurroundingFreeDays/calculateSurroundingFreeDays";
+import { DEFAULT_CALENDAR_LIMITS } from '@const/const';
+import type { EffectiveRatio } from '@modules/components/home/components/calendarList/hooks/types';
+import { getDateKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey';
+import { differenceInDays, getMonth } from 'date-fns';
+import type { BlockOpportunity, DayInfo } from '../../types';
+import { calculateBlockScore } from '../calculateBlockScore/calculateBlockScore';
+import { calculateSurroundingFreeDays } from '../calculateSurroundingFreeDays/calculateSurroundingFreeDays';
 
 interface GenerateBlockOpportunitiesParams {
 	availableWorkdays: Date[];
@@ -19,32 +20,36 @@ export function generateBlockOpportunities({
 	calculateEffectiveDays,
 }: GenerateBlockOpportunitiesParams): BlockOpportunity[] {
 	const blockOpportunities: BlockOpportunity[] = [];
+	const maxBlockSize = Math.min(DEFAULT_CALENDAR_LIMITS.MAX_BLOCK_SIZE, remainingPtoDays);
+	const availableWorkdaysLength = availableWorkdays.length;
 
-	for (let startDayIndex = 0; startDayIndex < availableWorkdays.length; startDayIndex++) {
-		for (
-			let blockSize = 1;
-			blockSize <= Math.min(DEFAULT_CALENDAR_LIMITS.MAX_BLOCK_SIZE, remainingPtoDays);
-			blockSize++
-		) {
-			if (startDayIndex + blockSize > availableWorkdays.length) {
+	const dayKeysMap = new Map<Date, string>();
+	for (let i = 0; i < availableWorkdaysLength; i++) {
+		dayKeysMap.set(availableWorkdays[i], getDateKey(availableWorkdays[i]));
+	}
+
+	for (let startDayIndex = 0; startDayIndex < availableWorkdaysLength; startDayIndex++) {
+		for (let blockSize = 1; blockSize <= maxBlockSize; blockSize++) {
+			if (startDayIndex + blockSize > availableWorkdaysLength) {
 				continue;
 			}
 
 			let validBlock = true;
 			const blockDays: Date[] = [];
+			blockDays.length = blockSize;
 
 			for (let i = 0; i < blockSize; i++) {
 				const day = availableWorkdays[startDayIndex + i];
 
-				if (blockDays.length > 0) {
-					const lastDay = blockDays[blockDays.length - 1];
+				if (i > 0) {
+					const lastDay = blockDays[i - 1];
 					if (differenceInDays(day, lastDay) !== 1) {
 						validBlock = false;
 						break;
 					}
 				}
 
-				blockDays.push(day);
+				blockDays[i] = day;
 			}
 
 			if (!validBlock || blockDays.length === 0) continue;
