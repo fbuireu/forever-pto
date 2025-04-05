@@ -1,7 +1,7 @@
-import { DEFAULT_CALENDAR_LIMITS, SCORE_MULTIPLIERS } from "@const/const";
-import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
-import type { BlockOpportunity } from "../../types";
-import { areBlocksEquivalent } from "../areBlocksEquivalent/areBlocksEquivalent";
+import { DEFAULT_CALENDAR_LIMITS, SCORE_MULTIPLIERS } from '@const/const';
+import { getDateKey } from '@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey';
+import type { BlockOpportunity } from '../../types';
+import { areBlocksEquivalent } from '../areBlocksEquivalent/areBlocksEquivalent';
 
 interface GenerateAlternativesForBlockParams {
 	block: BlockOpportunity & { id: string };
@@ -21,7 +21,12 @@ export function generateAlternativesForBlock({
 		.filter((opportunityBlock) => {
 			if (opportunityBlock === block) return false;
 
-			if (block.days.some((d) => suggestedDaysSet.has(getDateKey(d)))) return false;
+			const blockDayKeys = new Set(block.days.map((d) => getDateKey(d)));
+			const hasSuggestedDays = opportunityBlock.days.some((d) => {
+				const dayKey = getDateKey(d);
+				return suggestedDaysSet.has(dayKey) && !blockDayKeys.has(dayKey);
+			});
+			if (hasSuggestedDays) return false;
 
 			if (opportunityBlock.blockSize !== block.blockSize) return false;
 
