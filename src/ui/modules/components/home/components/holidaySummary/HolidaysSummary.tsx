@@ -1,20 +1,22 @@
-import { isPremium } from "@application/actions/premium";
-import type { HolidayDTO } from "@application/dto/holiday/types";
-import { Badge } from "@modules/components/core/badge/Badge";
-import { TabsList } from "@modules/components/core/tabs/atoms/tabsList/TabsList";
-import { TabsTrigger } from "@modules/components/core/tabs/atoms/tabsTrigger/TabsTrigger";
-import { CustomHolidays } from "@modules/components/home/components/holidaySummary/atoms/customHolidays/CustomHolidays";
-import { NationalHolidays } from "@modules/components/home/components/holidaySummary/atoms/nationalHolidays/NationalHolidays";
-import { RegionalHolidays } from "@modules/components/home/components/holidaySummary/atoms/regionalHolidays/RegionalHolidays";
-import { PremiumLock } from "@modules/components/premium/components/premiumLock/PremiumLock";
-import { Tabs } from "@ui/modules/components/core/tabs/Tabs";
-import { LockIcon } from "lucide-react";
+import type { HolidayDTO } from '@application/dto/holiday/types';
+import { Badge } from '@modules/components/core/badge/Badge';
+import { TabsList } from '@modules/components/core/tabs/atoms/tabsList/TabsList';
+import { TabsTrigger } from '@modules/components/core/tabs/atoms/tabsTrigger/TabsTrigger';
+import { CustomHolidays } from '@modules/components/home/components/holidaySummary/atoms/customHolidays/CustomHolidays';
+import {
+    NationalHolidays,
+} from '@modules/components/home/components/holidaySummary/atoms/nationalHolidays/NationalHolidays';
+import {
+    RegionalHolidays,
+} from '@modules/components/home/components/holidaySummary/atoms/regionalHolidays/RegionalHolidays';
+import { PremiumLock } from '@modules/components/premium/components/premiumLock/PremiumLock';
+import { Tabs } from '@ui/modules/components/core/tabs/Tabs';
 
 interface HolidaysSummaryProps {
 	holidays: HolidayDTO[];
 }
 
-const HolidaysSummary = async ({ holidays }: HolidaysSummaryProps) => {
+const HolidaysSummary = ({ holidays }: HolidaysSummaryProps) => {
 	const nationalHolidays = holidays.filter((holiday) => !holiday.location);
 	const regionalHolidays = holidays.filter((holiday) => !!holiday.location);
 	const customHolidays: HolidayDTO[] = [];
@@ -42,11 +44,10 @@ const HolidaysSummary = async ({ holidays }: HolidaysSummaryProps) => {
 					<PremiumLock
 						featureName="Selección múltiple"
 						description="Para poder seleccionar múltiples festivos, necesitas una suscripción premium."
-						variant="minimal"
+						variant="stacked"
 					>
 						<TabsTrigger value="custom-holidays" disabled className="relative">
 							<div className="flex items-center gap-2">Festivos Personalizados</div>
-							{!(await isPremium()) && <LockIcon />}
 						</TabsTrigger>
 					</PremiumLock>
 				</TabsList>

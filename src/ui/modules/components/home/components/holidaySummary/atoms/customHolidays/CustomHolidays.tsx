@@ -1,36 +1,36 @@
 "use client";
 
-import type { HolidayDTO } from "@application/dto/holiday/types";
-import { Accordion } from "@modules/components/core/accordion/Accordion";
-import { AccordionContent } from "@modules/components/core/accordion/atoms/accordionContent/AccordionContent";
-import { AccordionItem } from "@modules/components/core/accordion/atoms/accordionItem/AccordionItem";
-import { AccordionTrigger } from "@modules/components/core/accordion/atoms/accordionTrigger/AccordionTrigger";
-import { Alert } from "@modules/components/core/alert/Alert";
-import { AlertDescription } from "@modules/components/core/alert/atoms/alertDescription/AlertDescription";
-import { AlertTitle } from "@modules/components/core/alert/atoms/alertTitle/AlertTitle";
-import { Button } from "@modules/components/core/button/Button";
-import { Checkbox } from "@modules/components/core/checkbox/Checkbox";
-import { Table } from "@modules/components/core/table/Table";
-import { TableHead } from "@modules/components/core/table/atoms/tablHead/TableHead";
-import { TableBody } from "@modules/components/core/table/atoms/tableBody/TableBody";
-import { TableCell } from "@modules/components/core/table/atoms/tableCell/TableCell";
-import { TableHeader } from "@modules/components/core/table/atoms/tableHeader/TableHeader";
-import { TableRow } from "@modules/components/core/table/atoms/tableRow/TableRow";
-import { TabsContent } from "@modules/components/core/tabs/atoms/tabsContent/TabsContent";
-import { formatFullDate } from "@modules/components/home/components/holidaySummary/utils/formatFullDate/formatFullDate";
-import { getWeekday } from "@modules/components/home/components/holidaySummary/utils/getWeekDay/getWeekDay";
-import { PremiumLock } from "@modules/components/premium/components/premiumLock/PremiumLock";
+import type { HolidayDTO } from '@application/dto/holiday/types';
+import { Accordion } from '@modules/components/core/accordion/Accordion';
+import { AccordionContent } from '@modules/components/core/accordion/atoms/accordionContent/AccordionContent';
+import { AccordionItem } from '@modules/components/core/accordion/atoms/accordionItem/AccordionItem';
+import { AccordionTrigger } from '@modules/components/core/accordion/atoms/accordionTrigger/AccordionTrigger';
+import { Alert } from '@modules/components/core/alert/Alert';
+import { AlertDescription } from '@modules/components/core/alert/atoms/alertDescription/AlertDescription';
+import { AlertTitle } from '@modules/components/core/alert/atoms/alertTitle/AlertTitle';
+import { Button } from '@modules/components/core/button/Button';
+import { Checkbox } from '@modules/components/core/checkbox/Checkbox';
+import { Table } from '@modules/components/core/table/Table';
+import { TableHead } from '@modules/components/core/table/atoms/tablHead/TableHead';
+import { TableBody } from '@modules/components/core/table/atoms/tableBody/TableBody';
+import { TableCell } from '@modules/components/core/table/atoms/tableCell/TableCell';
+import { TableHeader } from '@modules/components/core/table/atoms/tableHeader/TableHeader';
+import { TableRow } from '@modules/components/core/table/atoms/tableRow/TableRow';
+import { TabsContent } from '@modules/components/core/tabs/atoms/tabsContent/TabsContent';
+import { formatFullDate } from '@modules/components/home/components/holidaySummary/utils/formatFullDate/formatFullDate';
+import { getWeekday } from '@modules/components/home/components/holidaySummary/utils/getWeekDay/getWeekDay';
+import { PremiumLock } from '@modules/components/premium/components/premiumLock/PremiumLock';
 import {
-	type ColumnDef,
-	type SortingState,
-	flexRender,
-	getCoreRowModel,
-	getPaginationRowModel,
-	getSortedRowModel,
-	useReactTable,
-} from "@tanstack/react-table";
-import { ArrowDownIcon, ArrowUpIcon, ChevronsUpDown, Lock } from "lucide-react";
-import { useState } from "react";
+    type ColumnDef,
+    flexRender,
+    getCoreRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    type SortingState,
+    useReactTable,
+} from '@tanstack/react-table';
+import { ArrowDownIcon, ArrowUpIcon, ChevronsUpDown, Lock } from 'lucide-react';
+import { useState } from 'react';
 
 interface CustomHolidaysProps {
 	customHolidays: HolidayDTO[];
@@ -149,7 +149,7 @@ export const CustomHolidays = ({ customHolidays }: CustomHolidaysProps) => {
 		<TabsContent value="custom-holidays">
 			<Accordion type="single" collapsible className="rounded-md border shadow-xs" disabled>
 				<AccordionItem value="custom-holidays">
-					<PremiumLock variant="minimal">
+					<PremiumLock variant="stacked">
 						<AccordionTrigger className="px-4">
 							<div className="flex items-center gap-2">
 								Festivos Personalizados

@@ -1,26 +1,26 @@
 "use client";
 
-import { DialogClose } from "@modules/components/core/dialog/atoms/dialogClose/DialogClose";
-import { DialogContent } from "@modules/components/core/dialog/atoms/dialogContent/DialogContent";
-import { DialogDescription } from "@modules/components/core/dialog/atoms/dialogDescription/DialogDescription";
-import { DialogHeader } from "@modules/components/core/dialog/atoms/dialogHeader/DialogHeader";
-import { DialogTitle } from "@radix-ui/react-dialog";
-import { usePremium } from "@ui/hooks/usePremium/usePremium";
-import { Button } from "@ui/modules/components/core/button/Button";
-import { Dialog } from "@ui/modules/components/core/dialog/Dialog";
-import { Input } from "@ui/modules/components/core/input/Input";
-import { Label } from "@ui/modules/components/core/label/Label";
-import { mergeClasses } from "@ui/utils/mergeClasses";
-import { LockIcon, X } from "lucide-react";
-import { type FormEvent, type MouseEvent, type ReactNode, useState, useTransition } from "react";
+import { DialogClose } from '@modules/components/core/dialog/atoms/dialogClose/DialogClose';
+import { DialogContent } from '@modules/components/core/dialog/atoms/dialogContent/DialogContent';
+import { DialogDescription } from '@modules/components/core/dialog/atoms/dialogDescription/DialogDescription';
+import { DialogHeader } from '@modules/components/core/dialog/atoms/dialogHeader/DialogHeader';
+import { DialogTitle } from '@radix-ui/react-dialog';
+import { usePremium } from '@ui/hooks/usePremium/usePremium';
+import { Button } from '@ui/modules/components/core/button/Button';
+import { Dialog } from '@ui/modules/components/core/dialog/Dialog';
+import { Input } from '@ui/modules/components/core/input/Input';
+import { Label } from '@ui/modules/components/core/label/Label';
+import { mergeClasses } from '@ui/utils/mergeClasses';
+import { LockIcon, X } from 'lucide-react';
+import { type FormEvent, type MouseEvent, type ReactNode, useState, useTransition } from 'react';
 
 interface PremiumLockProps {
-	children?: ReactNode;
+	children: ReactNode;
 	isActive?: boolean;
 	featureName?: string;
 	description?: string;
 	renderUnlocked?: (isPremium: boolean) => ReactNode;
-	variant?: "small" | "large" | "minimal";
+	variant?: "small" | "default" | "stacked";
 }
 
 export const PremiumLock = ({
@@ -29,7 +29,7 @@ export const PremiumLock = ({
 	featureName,
 	description,
 	renderUnlocked,
-	variant = "large",
+	variant = "default",
 }: PremiumLockProps) => {
 	const { isPremiumUser, isPremiumUserLoading, activatePremium } = usePremium();
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -71,28 +71,37 @@ export const PremiumLock = ({
 		<div
 			className={mergeClasses(
 				"relative",
-				variant === "large" ? "w-full h-full overflow-hidden" : variant === "minimal" ? "w-full h-full" : "w-4 h-4",
+				variant === "default"
+					? "w-full h-full overflow-hidden"
+					: variant === "stacked"
+						? "w-full h-full flex"
+						: "w-4 h-4",
 			)}
 		>
-			{children && (
-				<div className={mergeClasses("pointer-events-none", variant !== "minimal" && "opacity-70 filter blur-[2px]")}>
-					{children}
-				</div>
-			)}
+			<div
+				className={mergeClasses(
+					"pointer-events-none",
+					variant === "default" && "opacity-90 filter blur-[1px] flex items-center justify-center",
+					variant === "small" && "opacity-70 filter blur-[2px] flex items-center justify-center",
+				)}
+			>
+				{children}
+			</div>
 			<button
 				type="button"
 				className={mergeClasses(
 					"absolute inset-0 z-10 cursor-pointer flex flex-col items-center justify-center",
-					variant !== "minimal" && "bg-white/50 dark:bg-black/50 backdrop-blur-sm rounded-md",
+					variant === "default" && "bg-white/30 dark:bg-black/30 backdrop-blur-[2px] rounded-md",
+					variant === "small" && "bg-white/50 dark:bg-black/50 backdrop-blur-sm rounded-md",
 				)}
 				onClick={handleModalClick}
 			>
-				{variant !== "minimal" && (
+				{variant !== "stacked" && (
 					<>
 						<div
 							className={mergeClasses(
 								"w-10 h-10 rounded-full flex items-center justify-center",
-								variant === "large" && "bg-primary/50 mb-2",
+								variant === "default" && "bg-primary/50 mb-2",
 							)}
 						>
 							<LockIcon
@@ -100,13 +109,14 @@ export const PremiumLock = ({
 								size={20}
 							/>
 						</div>
-						{featureName && variant === "large" && <p className="text-sm font-medium">{featureName}</p>}
-						{description && variant === "large" && (
+						{featureName && variant === "default" && <p className="text-sm font-medium">{featureName}</p>}
+						{description && variant === "default" && (
 							<p className="text-xs text-muted-foreground">Clic para desbloquear</p>
 						)}
 					</>
 				)}
 			</button>
+			{variant === "stacked" && !isPremiumUser && <LockIcon />}
 			<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
 				<DialogContent>
 					<DialogHeader>
