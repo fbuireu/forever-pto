@@ -99,11 +99,14 @@ export const Stats = ({ stats, userCountry, userRegion }: StatsProps) => {
 											Tienes <span className="font-medium">{stats.ptoDaysAvailable} días de PTO disponibles</span> que
 											se han convertido en <span className="font-medium">{stats.effectiveDays} días libres</span> usando
 											nuestro sistema, lo que supone un incremento de{" "}
+											<Badge
+												variant={getBadgeVariant(stats.effectiveRatio)}
+												className="inline-flex items-center mx-1 font-medium"
+											>
+												x{stats.effectiveRatio}
+											</Badge>
+											de efectividad.
 										</p>
-										<Badge variant={getBadgeVariant(stats.effectiveRatio)} className="font-medium">
-											x{stats.effectiveRatio}
-										</Badge>{" "}
-										<p>de efectividad.</p>
 									</div>
 								</>
 							) : (
