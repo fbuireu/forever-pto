@@ -1,16 +1,12 @@
-import type { HolidayDTO } from '@application/dto/holiday/types';
-import { Badge } from '@modules/components/core/badge/Badge';
-import { TabsList } from '@modules/components/core/tabs/atoms/tabsList/TabsList';
-import { TabsTrigger } from '@modules/components/core/tabs/atoms/tabsTrigger/TabsTrigger';
-import { CustomHolidays } from '@modules/components/home/components/holidaySummary/atoms/customHolidays/CustomHolidays';
-import {
-    NationalHolidays,
-} from '@modules/components/home/components/holidaySummary/atoms/nationalHolidays/NationalHolidays';
-import {
-    RegionalHolidays,
-} from '@modules/components/home/components/holidaySummary/atoms/regionalHolidays/RegionalHolidays';
-import { PremiumLock } from '@modules/components/premium/components/premiumLock/PremiumLock';
-import { Tabs } from '@ui/modules/components/core/tabs/Tabs';
+import type { HolidayDTO } from "@application/dto/holiday/types";
+import { Badge } from "@modules/components/core/badge/Badge";
+import { TabsList } from "@modules/components/core/tabs/atoms/tabsList/TabsList";
+import { TabsTrigger } from "@modules/components/core/tabs/atoms/tabsTrigger/TabsTrigger";
+import { CustomHolidays } from "@modules/components/home/components/holidaySummary/atoms/customHolidays/CustomHolidays";
+import { NationalHolidays } from "@modules/components/home/components/holidaySummary/atoms/nationalHolidays/NationalHolidays";
+import { RegionalHolidays } from "@modules/components/home/components/holidaySummary/atoms/regionalHolidays/RegionalHolidays";
+import { PremiumLock } from "@modules/components/premium/components/premiumLock/PremiumLock";
+import { Tabs } from "@ui/modules/components/core/tabs/Tabs";
 
 interface HolidaysSummaryProps {
 	holidays: HolidayDTO[];
