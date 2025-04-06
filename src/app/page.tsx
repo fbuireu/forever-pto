@@ -9,6 +9,7 @@ import { SidebarProvider } from "@modules/components/core/sidebar/provider/Sideb
 import { AppSidebar } from "@ui/modules/components/appSidebar/components/appSidebar/AppSidebar";
 import CalendarList from "@ui/modules/components/home/components/calendarList/CalendarList";
 import HolidaysSummary from "@ui/modules/components/home/components/holidaySummary/HolidaysSummary";
+import { HolidaysProvider } from "@ui/providers/holidays/HolidaysProvider";
 import { PremiumProvider } from "@ui/providers/premium/PremiumProvider";
 
 interface ForeverPtoProps {
@@ -45,16 +46,17 @@ const ForeverPto = async ({ searchParams }: ForeverPtoProps) => {
 				/>
 				<SidebarTrigger />
 				<div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-8">
-					<HolidaysSummary holidays={holidays} />
-					<CalendarList
-						year={Number(year)}
-						ptoDays={Number(ptoDays)}
-						allowPastDays={allowPastDays}
-						holidays={holidays}
-						carryOverMonths={isPremium ? Number(carryOverMonths) : 1}
-						userCountry={userCountry}
-						userRegion={userRegion}
-					/>
+					<HolidaysProvider initialHolidays={holidays}>
+						<HolidaysSummary />
+						<CalendarList
+							year={Number(year)}
+							ptoDays={Number(ptoDays)}
+							allowPastDays={allowPastDays}
+							carryOverMonths={isPremium ? Number(carryOverMonths) : 1}
+							userCountry={userCountry}
+							userRegion={userRegion}
+						/>
+					</HolidaysProvider>
 				</div>
 			</PremiumProvider>
 		</SidebarProvider>

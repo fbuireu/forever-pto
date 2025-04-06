@@ -1,4 +1,5 @@
-import type { HolidayDTO } from "@application/dto/holiday/types";
+"use client";
+
 import { Badge } from "@modules/components/core/badge/Badge";
 import { TabsList } from "@modules/components/core/tabs/atoms/tabsList/TabsList";
 import { TabsTrigger } from "@modules/components/core/tabs/atoms/tabsTrigger/TabsTrigger";
@@ -7,15 +8,15 @@ import { NationalHolidays } from "@modules/components/home/components/holidaySum
 import { RegionalHolidays } from "@modules/components/home/components/holidaySummary/atoms/regionalHolidays/RegionalHolidays";
 import { PremiumLock } from "@modules/components/premium/components/premiumLock/PremiumLock";
 import { Tabs } from "@ui/modules/components/core/tabs/Tabs";
+import { useHolidays } from "@ui/providers/holidays/HolidaysProvider";
 
-interface HolidaysSummaryProps {
-	holidays: HolidayDTO[];
-}
-
-const HolidaysSummary = ({ holidays }: HolidaysSummaryProps) => {
-	const nationalHolidays = holidays.filter(({ variant }) => variant === "national");
-	const regionalHolidays = holidays.filter(({ variant }) => variant === "regional");
-	const customHolidays = holidays.filter(({ variant }) => variant === "custom");
+const HolidaysSummary = () => {
+	const {
+		state: { effectiveHolidays },
+	} = useHolidays();
+	const nationalHolidays = effectiveHolidays.filter(({ variant }) => variant === "national");
+	const regionalHolidays = effectiveHolidays.filter(({ variant }) => variant === "regional");
+	const customHolidays = effectiveHolidays.filter(({ variant }) => variant === "custom");
 
 	return (
 		<section className="mb-6">
