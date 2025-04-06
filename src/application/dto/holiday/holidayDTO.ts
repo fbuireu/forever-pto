@@ -16,15 +16,15 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOConfigura
 		const { year, countryCode, carryOverMonths } = configuration as HolidayDTOConfiguration;
 		const targetYears = [year, year + 1];
 
-		const nationalHolidays = raw
+		const rawNationalHolidays = raw
 			.filter((holiday) => isInTargetYear({ holiday, targetYears }))
 			.filter((holiday) => shouldIncludeHoliday({ holiday, carryOverMonths: carryOverMonths + 12, year }))
 			.filter((holiday) => holiday.type === "public" && !holiday.location);
 
-		const nationalDateSet = new Set(nationalHolidays.map((holiday) => getDTODateKey(new Date(holiday.date))));
+		const nationalDateSet = new Set(rawNationalHolidays.map((holiday) => getDTODateKey(new Date(holiday.date))));
 		const regionalDateSet = new Set();
 
-		const regionalHolidays = raw
+		const rawRegionalHolidays = raw
 			.filter((holiday) => isInTargetYear({ holiday, targetYears }))
 			.filter((holiday) => shouldIncludeHoliday({ holiday, carryOverMonths: carryOverMonths + 12, year }))
 			.filter((holiday) => holiday.type === "public" && holiday.location)
@@ -39,18 +39,24 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOConfigura
 				return true;
 			});
 
-		return [...nationalHolidays, ...regionalHolidays]
-			.map((holiday) => ({
-				date: new Date(holiday.date),
-				name: holiday.name,
-				type: holiday.type,
-				...(holiday.location && {
-					location: getRegionName({
-						countryCode,
-						regionCode: holiday.location,
-					}),
-				}),
-			}))
-			.sort((a, b) => a.date.getTime() - b.date.getTime());
+		const nationalHolidays = rawNationalHolidays.map((holiday) => ({
+			date: new Date(holiday.date),
+			name: holiday.name,
+			type: holiday.type,
+			variant: "national" as const,
+		}));
+
+		const regionalHolidays = rawRegionalHolidays.map((holiday) => ({
+			date: new Date(holiday.date),
+			name: holiday.name,
+			type: holiday.type,
+			location: getRegionName({
+				countryCode,
+				regionCode: holiday.location as string,
+			}),
+			variant: "regional" as const,
+		}));
+
+		return [...nationalHolidays, ...regionalHolidays].sort((a, b) => a.date.getTime() - b.date.getTime());
 	},
 };

@@ -17,10 +17,11 @@ export function calculateStats({
 	calculateEffectiveDays,
 	ptoDays,
 }: CalculateStatsParams): VacationStats {
-	const nationalHolidays = holidays.filter((holiday) => !holiday.location);
-	const regionalHolidays = holidays.filter((holiday) => !!holiday.location);
+	const nationalHolidays = holidays.filter(({ variant }) => variant === "national");
+	const regionalHolidays = holidays.filter(({ variant }) => variant === "regional");
+	const customHolidays = holidays.filter(({ variant }) => variant === "custom");
 
-	const totalHolidays = nationalHolidays.length + regionalHolidays.length;
+	const totalHolidays = nationalHolidays.length + regionalHolidays.length + customHolidays.length;
 	const ptoDaysUsed = suggestedDays.length;
 	const effectiveResult = ptoDaysUsed > 0 ? calculateEffectiveDays(suggestedDays) : { effective: 0, ratio: 0 };
 	const effectiveRatio = ptoDaysUsed > 0 ? (effectiveResult.effective / ptoDaysUsed).toFixed(2) : "0.00";

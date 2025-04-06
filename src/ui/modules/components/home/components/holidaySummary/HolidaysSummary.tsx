@@ -13,9 +13,9 @@ interface HolidaysSummaryProps {
 }
 
 const HolidaysSummary = ({ holidays }: HolidaysSummaryProps) => {
-	const nationalHolidays = holidays.filter((holiday) => !holiday.location);
-	const regionalHolidays = holidays.filter((holiday) => !!holiday.location);
-	const customHolidays: HolidayDTO[] = [];
+	const nationalHolidays = holidays.filter(({ variant }) => variant === "national");
+	const regionalHolidays = holidays.filter(({ variant }) => variant === "regional");
+	const customHolidays = holidays.filter(({ variant }) => variant === "custom");
 
 	return (
 		<section className="mb-6">

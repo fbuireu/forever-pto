@@ -9,4 +9,5 @@ export interface HolidayDTO {
 	name: string;
 	type?: string;
 	location?: string;
+	variant: "national" | "regional" | "custom";
 }

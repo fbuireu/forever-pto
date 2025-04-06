@@ -72,7 +72,7 @@ export default ForeverPto;
 // 20- Permitir al usuario cambiar los dias sugeridos
 // 24- Edit weekends (paid functionality)
 // 25- Edit festivities (paid functionality)
-// 27- DataTable to bulk actions to remove days
+// 27- DataTable to bulk actions to remove days -> This imply to create a context
 // 29- Refine styles (hover blocks, etc)
 // 31- Add form shadcn and zod
 // 34- MCP server? (paid func)
