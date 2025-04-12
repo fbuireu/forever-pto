@@ -9,6 +9,7 @@ interface HolidaysState {
 	restoreHoliday: (date: string) => void;
 	reset: () => void;
 	setInitialHolidays: (holidays: HolidayDTO[]) => void;
+	updateHoliday: (date: string, updatedHoliday: HolidayDTO) => void;
 }
 
 export const useHolidaysStore = create<HolidaysState>((set) => ({
@@ -54,4 +55,18 @@ export const useHolidaysStore = create<HolidaysState>((set) => ({
 			removedHolidays: new Set<string>(),
 			effectiveHolidays: state.originalHolidays,
 		})),
+
+	updateHoliday: (date, updatedHoliday) =>
+		set((state) => {
+			const updatedOriginalHolidays = state.originalHolidays.map((holiday) =>
+				holiday.date.toISOString() === date ? updatedHoliday : holiday,
+			);
+
+			return {
+				originalHolidays: updatedOriginalHolidays,
+				effectiveHolidays: updatedOriginalHolidays.filter(
+					(holiday) => !state.removedHolidays.has(holiday.date.toISOString()),
+				),
+			};
+		}),
 }));

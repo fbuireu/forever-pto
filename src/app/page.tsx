@@ -66,18 +66,15 @@ const ForeverPto = async ({ searchParams }: ForeverPtoProps) => {
 export default ForeverPto;
 
 // TODO:
+// 1- recheck and refactor
 // 6- Add tests (also e2e)
 // 9- Add CI/CD
 // 10- repo settings and rules
 // 14- i18n
-// 17- Allow user to hide festivities (or add them)
 // 20- Permitir al usuario cambiar los dias sugeridos
 // 24- Edit weekends (paid functionality)
-// 25- Edit festivities (paid functionality)
-// 27- DataTable to bulk actions to remove days -> This imply to create a context
 // 29- Refine styles (hover blocks, etc)
 // 31- Add form shadcn and zod
 // 34- MCP server? (paid func)
 // 34- premium with UUID value (not boolean)
 // 34- use fn to format messages in stats
-// 34- improve premium lock variant to be more semantic (tab, checkbox, etc)

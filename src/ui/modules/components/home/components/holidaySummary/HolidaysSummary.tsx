@@ -4,9 +4,8 @@ import { useHolidaysStore } from "@application/stores/holidays/holidaysStore";
 import { Badge } from "@modules/components/core/badge/Badge";
 import { TabsList } from "@modules/components/core/tabs/atoms/tabsList/TabsList";
 import { TabsTrigger } from "@modules/components/core/tabs/atoms/tabsTrigger/TabsTrigger";
-import { CustomHolidays } from "@modules/components/home/components/holidaySummary/atoms/customHolidays/CustomHolidays";
-import { NationalHolidays } from "@modules/components/home/components/holidaySummary/atoms/nationalHolidays/NationalHolidays";
-import { RegionalHolidays } from "@modules/components/home/components/holidaySummary/atoms/regionalHolidays/RegionalHolidays";
+import { HolidaysTable } from "@modules/components/home/components/holidaySummary/atoms/holidaysTable/HolidaysTable";
+import { HolidayTabVariant } from "@modules/components/home/components/holidaySummary/types";
 import { PremiumLock } from "@modules/components/premium/components/premiumLock/PremiumLock";
 import { Tabs } from "@ui/modules/components/core/tabs/Tabs";
 
@@ -21,7 +20,11 @@ const HolidaysSummary = () => {
 		<section className="mb-6">
 			<Tabs defaultValue="national-holidays" className="w-full">
 				<TabsList className="grid w-full grid-cols-3 mb-4">
-					<TabsTrigger value="national-holidays" disabled={!nationalHolidays.length} className="relative">
+					<TabsTrigger
+						value={HolidayTabVariant.nationalHolidays}
+						disabled={!nationalHolidays.length}
+						className="relative"
+					>
 						Festivos Nacionales
 						{nationalHolidays.length > 0 && (
 							<Badge variant="outline" className="ml-2 bg-primary/10 absolute right-2">
@@ -29,7 +32,11 @@ const HolidaysSummary = () => {
 							</Badge>
 						)}
 					</TabsTrigger>
-					<TabsTrigger value="regional-holidays" disabled={!regionalHolidays.length} className="relative">
+					<TabsTrigger
+						value={HolidayTabVariant.regionalHolidays}
+						disabled={!regionalHolidays.length}
+						className="relative"
+					>
 						Festivos Regionales
 						{regionalHolidays.length > 0 && (
 							<Badge variant="outline" className="ml-2 bg-primary/10 absolute right-2">
@@ -42,14 +49,26 @@ const HolidaysSummary = () => {
 						description="Para poder seleccionar múltiples festivos, necesitas una suscripción premium."
 						variant="stacked"
 					>
-						<TabsTrigger value="custom-holidays" disabled className="relative">
+						<TabsTrigger value={HolidayTabVariant.customHolidays} disabled className="relative">
 							<div className="flex items-center gap-2">Festivos Personalizados</div>
 						</TabsTrigger>
 					</PremiumLock>
 				</TabsList>
-				<NationalHolidays nationalHolidays={nationalHolidays} />
-				<RegionalHolidays regionalHolidays={regionalHolidays} />
-				<CustomHolidays customHolidays={customHolidays} />
+				<HolidaysTable
+					holidays={nationalHolidays}
+					title="Festivos Nacionales"
+					tabValue={HolidayTabVariant.nationalHolidays}
+				/>
+				<HolidaysTable
+					holidays={regionalHolidays}
+					title="Festivos Regionales"
+					tabValue={HolidayTabVariant.regionalHolidays}
+				/>
+				<HolidaysTable
+					holidays={customHolidays}
+					title="Festivos Personalizados"
+					tabValue={HolidayTabVariant.customHolidays}
+				/>
 			</Tabs>
 		</section>
 	);
