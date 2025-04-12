@@ -1,5 +1,6 @@
 "use client";
 
+import { useHolidaysStore } from "@application/stores/holidays/holidaysStore";
 import { Badge } from "@modules/components/core/badge/Badge";
 import { TabsList } from "@modules/components/core/tabs/atoms/tabsList/TabsList";
 import { TabsTrigger } from "@modules/components/core/tabs/atoms/tabsTrigger/TabsTrigger";
@@ -8,12 +9,10 @@ import { NationalHolidays } from "@modules/components/home/components/holidaySum
 import { RegionalHolidays } from "@modules/components/home/components/holidaySummary/atoms/regionalHolidays/RegionalHolidays";
 import { PremiumLock } from "@modules/components/premium/components/premiumLock/PremiumLock";
 import { Tabs } from "@ui/modules/components/core/tabs/Tabs";
-import { useHolidays } from "@ui/providers/holidays/HolidaysProvider";
 
 const HolidaysSummary = () => {
-	const {
-		state: { effectiveHolidays },
-	} = useHolidays();
+	const effectiveHolidays = useHolidaysStore((state) => state.effectiveHolidays);
+
 	const nationalHolidays = effectiveHolidays.filter(({ variant }) => variant === "national");
 	const regionalHolidays = effectiveHolidays.filter(({ variant }) => variant === "regional");
 	const customHolidays = effectiveHolidays.filter(({ variant }) => variant === "custom");

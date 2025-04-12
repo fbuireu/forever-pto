@@ -2,13 +2,13 @@
 
 import type { CountryDTO } from "@application/dto/country/types";
 import type { RegionDTO } from "@application/dto/region/types";
+import { useHolidaysStore } from "@application/stores/holidays/holidaysStore";
 import { MonthCalendar } from "@modules/components/home/components/calendarList/atoms/monthCalendar/MonthsCalendar";
 import { useCalendar } from "@modules/components/home/components/calendarList/hooks/useCalendar/useCalendar";
 import { useCalendarInfo } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/useCalendarInfo";
 import { useCalendarInteractions } from "@modules/components/home/components/calendarList/hooks/useCalendarInteractions/useCalendarInteractions";
 import { Stats } from "@modules/components/home/components/stats/Stats";
 import { areArraysEqual } from "@modules/components/home/utils/arrayIsEqual";
-import { useHolidays } from "@ui/providers/holidays/HolidaysProvider";
 import { memo } from "react";
 
 interface CalendarListProps {
@@ -28,15 +28,13 @@ export default function CalendarList({
 	userCountry,
 	userRegion,
 }: CalendarListProps) {
-	const {
-		state: { effectiveHolidays: holidays },
-	} = useHolidays();
+	const effectiveHolidays = useHolidaysStore((state) => state.effectiveHolidays);
 
 	const calendar = useCalendar({
 		year,
 		ptoDays,
 		allowPastDays,
-		holidays,
+		holidays: effectiveHolidays,
 		carryOverMonths,
 	});
 
@@ -57,7 +55,7 @@ export default function CalendarList({
 		hoveredBlockId: calendar.hoveredBlockId,
 		alternativeBlocks: calendar.alternativeBlocks,
 		ptoDays,
-		holidays,
+		holidays: effectiveHolidays,
 		calculateEffectiveDays: calendar.calculateEffectiveDays,
 		isDaySuggested: interactions.isDaySuggested,
 	});

@@ -32,7 +32,7 @@ export const DEFAULT_QUERY_PARAMS: Record<CapitalizeKeys<string>, string> = {
 	PTO_DAYS: "22",
 	ALLOW_PAST_DAYS: "false",
 	CARRY_OVER_MONTHS: "1",
-};
+} as const;
 
 export const DEFAULT_SIDEBAR_CONFIG: Record<CapitalizeKeys<string>, string | number> = {
 	SIDEBAR_COOKIE_NAME: "sidebar_state",
@@ -41,7 +41,7 @@ export const DEFAULT_SIDEBAR_CONFIG: Record<CapitalizeKeys<string>, string | num
 	SIDEBAR_WIDTH_MOBILE: "18rem",
 	SIDEBAR_WIDTH_ICON: "3rem",
 	SIDEBAR_KEYBOARD_SHORTCUT: "b",
-};
+} as const;
 
 export const DEFAULT_SEO_PARAMS: CapitalizeKeys<Metadata> = {
 	TITLE: "",
@@ -86,7 +86,7 @@ export const FILTER_MAXIMUM_VALUES: CapitalizeKeys<FilterMaximumValues> = {
 		PREMIUM: 12,
 	},
 	YEARS: (year: string) => Array.from({ length: 11 }, (_, i) => Number(year) - 5 + i),
-};
+} as const;
 
 export const PREMIUM_PARAMS: CapitalizeKeys<PremiumParams> = {
 	COOKIE_NAME: "premium" as const,
@@ -99,13 +99,13 @@ export const CONTACT_DETAILS: Record<CapitalizeKeys<string>, string> = {
 	EMAIL_SUBJECT: "Web contact form submission",
 	ENCODED_EMAIL_FROM: "",
 	ENCODED_EMAIL_SELF: "",
-};
+} as const;
 
 export const SOCIAL_NETWORKS: Record<CapitalizeKeys<string>, string> = {
 	LINKEDIN: "",
 	GITHUB: "",
-};
+} as const;
 
-export const THEME_STORAGE_KEY: string = "theme";
+export const THEME_STORAGE_KEY: string = "theme" as const;
 
-export const DEFAULT_LANGUAGE = "en";
+export const DEFAULT_LANGUAGE = "en" as const;

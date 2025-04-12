@@ -1,9 +1,9 @@
 "use client";
 
+import { usePremiumStore } from "@application/stores/premium/premiumStore";
 import { FILTER_MAXIMUM_VALUES } from "@const/const";
 import type { SearchParams } from "@const/types";
 import { createQueryString } from "@modules/components/appSidebar/components/appSidebar/utils/createQueryString/createQueryString";
-import { usePremium } from "@ui/hooks/usePremium/usePremium";
 import { Label } from "@ui/modules/components/core/label/Label";
 import { Slider } from "@ui/modules/components/core/slider/Slider";
 import { PremiumLock } from "@ui/modules/components/premium/components/premiumLock/PremiumLock";
@@ -18,7 +18,7 @@ export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
-	const { isPremiumUser } = usePremium();
+	const { isPremiumUser } = usePremiumStore();
 	const [value, setValue] = useState([Number(carryOverMonths)]);
 
 	const maxValue = useMemo(

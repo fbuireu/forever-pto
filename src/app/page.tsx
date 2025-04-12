@@ -81,4 +81,3 @@ export default ForeverPto;
 // 34- premium with UUID value (not boolean)
 // 34- use fn to format messages in stats
 // 34- improve premium lock variant to be more semantic (tab, checkbox, etc)
-// 35- use zustand to manage state

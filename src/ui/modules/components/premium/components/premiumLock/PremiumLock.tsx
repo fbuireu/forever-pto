@@ -1,11 +1,11 @@
 "use client";
 
+import { usePremiumStore } from "@application/stores/premium/premiumStore";
 import { DialogClose } from "@modules/components/core/dialog/atoms/dialogClose/DialogClose";
 import { DialogContent } from "@modules/components/core/dialog/atoms/dialogContent/DialogContent";
 import { DialogDescription } from "@modules/components/core/dialog/atoms/dialogDescription/DialogDescription";
 import { DialogHeader } from "@modules/components/core/dialog/atoms/dialogHeader/DialogHeader";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { usePremium } from "@ui/hooks/usePremium/usePremium";
 import { Button } from "@ui/modules/components/core/button/Button";
 import { Dialog } from "@ui/modules/components/core/dialog/Dialog";
 import { Input } from "@ui/modules/components/core/input/Input";
@@ -31,7 +31,7 @@ export const PremiumLock = ({
 	renderUnlocked,
 	variant = "default",
 }: PremiumLockProps) => {
-	const { isPremiumUser, isPremiumUserLoading, activatePremium } = usePremium();
+	const { isPremiumUser, isPremiumUserLoading, activatePremium } = usePremiumStore();
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [email, setEmail] = useState("");
 	const [submitSuccess, setSubmitSuccess] = useState(false);
