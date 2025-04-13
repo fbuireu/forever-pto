@@ -2,6 +2,7 @@ import type {
 	CalendarLimits,
 	CapitalizeKeys,
 	FilterMaximumValues,
+	KofiWidget,
 	PremiumParams,
 	ScoreMultipliers,
 } from "@const/types";
@@ -105,6 +106,15 @@ export const SOCIAL_NETWORKS: Record<CapitalizeKeys<string>, string> = {
 	LINKEDIN: "",
 	GITHUB: "",
 } as const;
+
+export const KOFFI_WIDGET: CapitalizeKeys<KofiWidget> = {
+	USERNAME: process.env.NEXT_PUBLIC_KOFI_USERNAME || "ferranbuireu",
+	TYPE: "floating-chat",
+	DONATE_BUTTON: {
+		TEXT: "Unlock Premium",
+		TEXT_COLOR: "#ffffff",
+	},
+};
 
 export const THEME_STORAGE_KEY: string = "theme" as const;
 

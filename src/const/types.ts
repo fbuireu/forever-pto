@@ -28,6 +28,15 @@ export interface PremiumParams {
 	check_delay: number;
 }
 
+export interface KofiWidget {
+	username: string;
+	type: "floating-chat";
+	donate_button: {
+		text: string;
+		text_color: string;
+	};
+}
+
 export interface CalendarLimits {
 	max_block_size: number;
 	max_search_depth: number;

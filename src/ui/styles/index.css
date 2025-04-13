@@ -1,4 +1,5 @@
 @import url("variables/variables.css");
+@import url("vendor/vendor.css");
 @import url("animations/animations.css");
 @import url("global/global.css");
 @import url("base/base.css");

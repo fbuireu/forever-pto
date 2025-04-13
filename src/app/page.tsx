@@ -70,12 +70,12 @@ export default ForeverPto;
 // 6- Add tests (also e2e)
 // 9- Add CI/CD
 // 10- repo settings and rules
+// 11- .env management
 // 14- i18n
 // 20- Permitir al usuario cambiar los dias sugeridos
 // 24- Edit weekends (paid functionality)
 // 29- Refine styles (hover blocks, etc)
 // 31- Add form shadcn and zod
 // 34- MCP server? (paid func)
-// 34- Stripe BE integration
-// 34- premium with UUID value (not boolean)
+// 34- Ko-Fi BE integration // 34- premium with UUID value (not boolean)
 // 34- use fn to format messages in stats

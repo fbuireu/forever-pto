@@ -1,11 +1,12 @@
-import "@styles/index.css";
-import { THEME_STORAGE_KEY } from "@const/const";
+import { KOFFI_WIDGET, THEME_STORAGE_KEY } from "@const/const";
 import { ErrorBoundary } from "@modules/components/core/errorBoundary/ErrorBoundary";
-import { Footer } from "@ui/modules/components/core/footer/Footer";
+import { Footer } from "@modules/components/core/footer/Footer";
+import { KofiWidget } from "@modules/components/core/kofiWidget/KofiWidget";
+import { ThemeProvider } from "@ui/providers/theme/ThemeProvider";
 import type { Metadata } from "next";
-import { ThemeProvider } from "next-themes";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
+import "@styles/index.css";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -15,6 +16,7 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
 	variable: "--font-geist-mono",
 	subsets: ["latin"],
+	display: "swap",
 } as const);
 
 export const metadata: Metadata = {
@@ -26,7 +28,7 @@ type RootLayoutProps = Readonly<{ children: ReactNode }>;
 
 const RootLayout = ({ children }: RootLayoutProps) => (
 	<ErrorBoundary>
-		<html lang="en">
+		<html lang="en" className={geistSans.className}>
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<ThemeProvider
 					attribute="class"
@@ -40,6 +42,7 @@ const RootLayout = ({ children }: RootLayoutProps) => (
 				</ThemeProvider>
 			</body>
 		</html>
+		<KofiWidget username={KOFFI_WIDGET.USERNAME} />
 	</ErrorBoundary>
 );
 
