@@ -2,6 +2,7 @@
 
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import { useHolidaysStore } from "@application/stores/holidays/holidaysStore";
+import { usePremiumStore } from "@application/stores/premium/premiumStore";
 import { Accordion } from "@modules/components/core/accordion/Accordion";
 import { AccordionContent } from "@modules/components/core/accordion/atoms/accordionContent/AccordionContent";
 import { AccordionItem } from "@modules/components/core/accordion/atoms/accordionItem/AccordionItem";
@@ -10,6 +11,7 @@ import { Alert } from "@modules/components/core/alert/Alert";
 import { AlertDescription } from "@modules/components/core/alert/atoms/alertDescription/AlertDescription";
 import { AlertTitle } from "@modules/components/core/alert/atoms/alertTitle/AlertTitle";
 import { Button } from "@modules/components/core/button/Button";
+import { AddHolidayModal } from "@modules/components/core/modal/AddHolidayModal";
 import { Table } from "@modules/components/core/table/Table";
 import { TableHead } from "@modules/components/core/table/atoms/tablHead/TableHead";
 import { TableBody } from "@modules/components/core/table/atoms/tableBody/TableBody";
@@ -19,7 +21,7 @@ import { TableRow } from "@modules/components/core/table/atoms/tableRow/TableRow
 import { TabsContent } from "@modules/components/core/tabs/atoms/tabsContent/TabsContent";
 import { ConfirmModal } from "@modules/components/home/components/holidaySummary/atoms/confirmModal/ConfirmModal";
 import { COLUMNS } from "@modules/components/home/components/holidaySummary/atoms/holidaysTable/config";
-import type { HolidayTabVariant } from "@modules/components/home/components/holidaySummary/types";
+import { HolidayTabVariant } from "@modules/components/home/components/holidaySummary/types";
 import { PremiumLock } from "@modules/components/premium/components/premiumLock/PremiumLock";
 import {
 	type SortingState,
@@ -29,7 +31,8 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import { AlertTriangle, Trash2 } from "lucide-react";
+import { mergeClasses } from "@ui/utils/mergeClasses";
+import { AlertTriangle, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface HolidaysTableProps {
@@ -39,10 +42,12 @@ interface HolidaysTableProps {
 }
 
 export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps) => {
+	const { isPremiumUser } = usePremiumStore();
+	const { removeHoliday, addHoliday } = useHolidaysStore();
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [rowSelection, setRowSelection] = useState({});
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-	const { removeHoliday } = useHolidaysStore();
+	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
 	const table = useReactTable({
 		data: holidays,
@@ -75,12 +80,28 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 
 	return (
 		<TabsContent value={tabValue}>
-			<Accordion type="single" collapsible className="rounded-md border shadow-xs" disabled={!holidays.length}>
+			<Accordion
+				type="single"
+				collapsible
+				className="rounded-md border shadow-xs"
+				disabled={!holidays.length && tabValue !== HolidayTabVariant.customHolidays}
+			>
 				<AccordionItem value={tabValue}>
 					<AccordionTrigger className="px-4">{title}</AccordionTrigger>
 					<AccordionContent>
 						<div className="p-4">
-							<div className="flex justify-end gap-2 mb-4">
+							<div
+								className={mergeClasses(
+									"flex justify-end gap-2 mb-4 [&>div>button]:mt-2",
+									!isPremiumUser && "w-95/100",
+								)}
+							>
+								{tabValue === HolidayTabVariant.customHolidays && (
+									<Button variant="outline" size="sm" onClick={() => setIsAddModalOpen(true)} className="gap-2">
+										<Plus className="h-4 w-4" />
+										Añadir festivo
+									</Button>
+								)}
 								<PremiumLock
 									featureName="Eliminación múltiple"
 									description="Para poder eliminar múltiples festivos, necesitas una suscripción premium."
@@ -150,9 +171,19 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 				isOpen={isDeleteModalOpen}
 				onClose={() => setIsDeleteModalOpen(false)}
 				onConfirm={handleBulkDelete}
-				title="Eliminar festivos seleccionados"
-				description="¿Estás seguro de que quieres eliminar los festivos seleccionados? Esta acción no se puede deshacer."
-				confirmText="Eliminar"
+				title="Eliminar festivos"
+				description="¿Estás seguro de que quieres eliminar los festivos seleccionados?"
+			/>
+			<AddHolidayModal
+				isOpen={isAddModalOpen}
+				onClose={() => setIsAddModalOpen(false)}
+				onSave={(date, name) => {
+					addHoliday({
+						date,
+						name,
+						variant: "custom",
+					});
+				}}
 			/>
 		</TabsContent>
 	);

@@ -10,6 +10,7 @@ interface HolidaysState {
 	reset: () => void;
 	setInitialHolidays: (holidays: HolidayDTO[]) => void;
 	updateHoliday: (date: string, updatedHoliday: HolidayDTO) => void;
+	addHoliday: (holiday: HolidayDTO) => void;
 }
 
 export const useHolidaysStore = create<HolidaysState>((set) => ({
@@ -69,4 +70,9 @@ export const useHolidaysStore = create<HolidaysState>((set) => ({
 				),
 			};
 		}),
+
+	addHoliday: (holiday) =>
+		set((state) => ({
+			effectiveHolidays: [...state.effectiveHolidays, holiday],
+		})),
 }));

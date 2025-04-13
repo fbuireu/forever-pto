@@ -112,7 +112,7 @@ export const COLUMNS: ColumnDef<HolidayDTO>[] = [
 									Editar
 								</DropdownMenuItem>
 								<DropdownMenuItem
-									className="text-destructive bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:text-destructive-foreground"
+									className="bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:text-destructive-foreground"
 									onClick={() => setIsDeleteModalOpen(true)}
 								>
 									<Trash2 className="mr-2 h-4 w-4 text-white" />

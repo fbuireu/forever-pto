@@ -1,6 +1,7 @@
 "use client";
 
 import { useHolidaysStore } from "@application/stores/holidays/holidaysStore";
+import { usePremiumStore } from "@application/stores/premium/premiumStore";
 import { Badge } from "@modules/components/core/badge/Badge";
 import { TabsList } from "@modules/components/core/tabs/atoms/tabsList/TabsList";
 import { TabsTrigger } from "@modules/components/core/tabs/atoms/tabsTrigger/TabsTrigger";
@@ -11,6 +12,7 @@ import { Tabs } from "@ui/modules/components/core/tabs/Tabs";
 
 const HolidaysSummary = () => {
 	const effectiveHolidays = useHolidaysStore((state) => state.effectiveHolidays);
+	const { isPremiumUser } = usePremiumStore();
 
 	const nationalHolidays = effectiveHolidays.filter(({ variant }) => variant === "national");
 	const regionalHolidays = effectiveHolidays.filter(({ variant }) => variant === "regional");
@@ -49,7 +51,7 @@ const HolidaysSummary = () => {
 						description="Para poder seleccionar múltiples festivos, necesitas una suscripción premium."
 						variant="stacked"
 					>
-						<TabsTrigger value={HolidayTabVariant.customHolidays} disabled className="relative">
+						<TabsTrigger value={HolidayTabVariant.customHolidays} disabled={!isPremiumUser} className="relative">
 							<div className="flex items-center gap-2">Festivos Personalizados</div>
 						</TabsTrigger>
 					</PremiumLock>

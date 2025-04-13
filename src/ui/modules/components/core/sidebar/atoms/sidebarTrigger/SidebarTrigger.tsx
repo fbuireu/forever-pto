@@ -15,7 +15,7 @@ export const SidebarTrigger = ({ className, onClick, ...props }: ComponentProps<
 			data-slot="sidebar-trigger"
 			variant="ghost"
 			size="icon"
-			className={mergeClasses("h-7 w-7", className)}
+			className={mergeClasses("h-10 w-10 sticky top-0", className)}
 			onClick={(event) => {
 				onClick?.(event);
 				toggleSidebar();
