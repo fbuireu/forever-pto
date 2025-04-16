@@ -108,7 +108,7 @@ export const SOCIAL_NETWORKS: Record<CapitalizeKeys<string>, string> = {
 } as const;
 
 export const KOFFI_WIDGET: CapitalizeKeys<KofiWidget> = {
-	USERNAME: process.env.NEXT_PUBLIC_KOFI_USERNAME || "ferranbuireu",
+	USERNAME: process.env.NEXT_PUBLIC_KOFI_USERNAME,
 	TYPE: "floating-chat",
 	DONATE_BUTTON: {
 		TEXT: "Unlock Premium",
