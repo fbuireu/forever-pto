@@ -1,5 +1,6 @@
 "use client";
 
+import { checkPremiumByEmail } from "@application/actions/premium";
 import { usePremiumStore } from "@application/stores/premium/premiumStore";
 import { DialogClose } from "@modules/components/core/dialog/atoms/dialogClose/DialogClose";
 import { DialogContent } from "@modules/components/core/dialog/atoms/dialogContent/DialogContent";
@@ -35,6 +36,7 @@ export const PremiumLock = ({
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [email, setEmail] = useState("");
 	const [submitSuccess, setSubmitSuccess] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 	const [isPending, startTransition] = useTransition();
 
 	if (!isActive || isPremiumUser) {
@@ -49,19 +51,26 @@ export const PremiumLock = ({
 
 	const handleSubmitEmail = async (e: FormEvent) => {
 		e.preventDefault();
+		setError(null);
 
 		startTransition(async () => {
 			try {
-				await new Promise((resolve) => setTimeout(resolve, 1500));
-				await activatePremium();
+				const { isPremium, messageId } = await checkPremiumByEmail(email);
 
-				setSubmitSuccess(true);
-
-				setTimeout(() => {
-					setIsModalOpen(false);
+				if (isPremium && messageId) {
+					await activatePremium(messageId);
+					setSubmitSuccess(true);
+					setError(null);
+				} else {
 					setSubmitSuccess(false);
-				}, 2000);
-			} catch (error) {}
+					setError(
+						"No se ha encontrado ninguna suscripción premium con este email. Si ya has realizado un pago, asegúrate de usar el mismo email que utilizaste en Ko-fi.",
+					);
+					return;
+				}
+			} catch (_) {
+				setError("Ha ocurrido un error al verificar tu suscripción. Por favor, inténtalo de nuevo más tarde.");
+			}
 		});
 	};
 
@@ -111,7 +120,7 @@ export const PremiumLock = ({
 						</div>
 						{featureName && variant === "default" && <p className="text-sm font-medium">{featureName}</p>}
 						{description && variant === "default" && (
-							<p className="text-xs text-muted-foreground">Clic para desbloquear</p>
+							<p className="text-xs text-muted-foreground">Clic para verificar tu suscripción</p>
 						)}
 					</>
 				)}
@@ -120,8 +129,12 @@ export const PremiumLock = ({
 			<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>{submitSuccess ? "¡Suscripción exitosa!" : "Desbloquea funciones premium"}</DialogTitle>
-						<DialogDescription>{description}</DialogDescription>
+						<DialogTitle>{submitSuccess ? "¡Suscripción verificada!" : "Verifica tu suscripción premium"}</DialogTitle>
+						<DialogDescription>
+							{submitSuccess
+								? "Tu suscripción premium ha sido verificada correctamente. ¡Disfruta de todas las funciones premium!"
+								: "Introduce el email que utilizaste en Ko-fi para verificar tu suscripción premium."}
+						</DialogDescription>
 					</DialogHeader>
 					{!submitSuccess ? (
 						<form onSubmit={handleSubmitEmail} className="space-y-4">
@@ -138,17 +151,18 @@ export const PremiumLock = ({
 									disabled={isLoading}
 								/>
 							</div>
+							{error && <p className="text-red-500 text-sm">{error}</p>}
 							<Button
 								type="submit"
 								disabled={isLoading}
 								className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary/90 transition-colors"
 							>
-								{isLoading ? "Procesando..." : "Suscribirse"}
+								{isLoading ? "Verificando..." : "Verificar suscripción"}
 							</Button>
 						</form>
 					) : (
 						<p className="text-green-600 dark:text-green-400 mt-2">
-							Tu suscripción se ha activado correctamente. ¡Disfruta de todas las funciones premium!
+							Tu suscripción premium ha sido verificada correctamente. ¡Disfruta de todas las funciones premium!
 						</p>
 					)}
 					<DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">

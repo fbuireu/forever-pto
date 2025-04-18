@@ -8,7 +8,7 @@ interface PremiumState {
 	isPremiumUser: boolean;
 	isPremiumUserLoading: boolean;
 	setPremiumStatus: (status: boolean) => void;
-	activatePremium: () => Promise<void>;
+	activatePremium: (messageId: string) => Promise<void>;
 	deactivatePremium: () => Promise<void>;
 }
 
@@ -18,10 +18,10 @@ export const usePremiumStore = create<PremiumState>((set) => ({
 
 	setPremiumStatus: (status) => set({ isPremiumUser: status }),
 
-	activatePremium: async () => {
+	activatePremium: async (messageId: string) => {
 		set({ isPremiumUserLoading: true });
 		try {
-			await activatePremiumAction(window.location.pathname);
+			await activatePremiumAction({ messageId, path: window.location.pathname });
 			set({ isPremiumUser: true });
 		} catch (_) {
 		} finally {

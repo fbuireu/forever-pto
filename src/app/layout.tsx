@@ -1,4 +1,4 @@
-import { KOFFI_WIDGET, THEME_STORAGE_KEY } from "@const/const";
+import { THEME_STORAGE_KEY } from "@const/const";
 import { ErrorBoundary } from "@modules/components/core/errorBoundary/ErrorBoundary";
 import { Footer } from "@modules/components/core/footer/Footer";
 import { KofiWidget } from "@modules/components/core/kofiWidget/KofiWidget";
@@ -42,7 +42,7 @@ const RootLayout = ({ children }: RootLayoutProps) => (
 				</ThemeProvider>
 			</body>
 		</html>
-		<KofiWidget username={KOFFI_WIDGET.USERNAME} />
+		<KofiWidget />
 	</ErrorBoundary>
 );
 

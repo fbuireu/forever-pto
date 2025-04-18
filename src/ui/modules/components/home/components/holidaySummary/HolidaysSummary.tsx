@@ -20,7 +20,7 @@ const HolidaysSummary = () => {
 
 	return (
 		<section className="mb-6">
-			<Tabs defaultValue="national-holidays" className="w-full">
+			<Tabs defaultValue={HolidayTabVariant.nationalHolidays} className="w-full">
 				<TabsList className="grid w-full grid-cols-3 mb-4">
 					<TabsTrigger
 						value={HolidayTabVariant.nationalHolidays}

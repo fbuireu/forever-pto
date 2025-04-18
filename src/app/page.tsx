@@ -70,11 +70,13 @@ export default ForeverPto;
 // 6- Add tests (also e2e)
 // 9- Add CI/CD
 // 10- repo settings and rules
+// 10- HTML div descendant p (modals)
+// 10- Adapt copies premiumLock
 // 14- i18n
 // 20- Permitir al usuario cambiar los dias sugeridos
 // 24- Edit weekends (paid functionality)
 // 29- Refine styles (hover blocks, etc)
 // 31- Add form shadcn and zod
 // 34- MCP server? (paid func)
-// 34- Ko-Fi BE integration // 34- premium with UUID value (not boolean). Webhook -> turso + transaction ID (https://docs.turso.tech/sdk/ts/guides/nextjs and https://ko-fi.com/manage/webhooks?src=sidemenu)
+// 34- Ko-Fi BE integration (webhook not working on localhost)
 // 34- use fn to format messages in stats
