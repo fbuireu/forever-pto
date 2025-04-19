@@ -2,18 +2,28 @@
 
 import { checkPremiumByEmail } from "@application/actions/premium";
 import { usePremiumStore } from "@application/stores/premium/premiumStore";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogClose } from "@modules/components/core/dialog/atoms/dialogClose/DialogClose";
 import { DialogContent } from "@modules/components/core/dialog/atoms/dialogContent/DialogContent";
 import { DialogDescription } from "@modules/components/core/dialog/atoms/dialogDescription/DialogDescription";
 import { DialogHeader } from "@modules/components/core/dialog/atoms/dialogHeader/DialogHeader";
+import { FormMessage } from "@modules/components/core/form/atoms/FormMessage";
+import { FormFieldProvider as FormField } from "@modules/components/core/form/providers/FormFieldProvider/FormFieldProvider";
+import { FormItemProvider as FormItem } from "@modules/components/core/form/providers/FormItemProvider/FormItemProvider";
+import { emailFormSchema } from "@modules/components/premium/components/premiumLock/schema";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Button } from "@ui/modules/components/core/button/Button";
 import { Dialog } from "@ui/modules/components/core/dialog/Dialog";
+import { Form } from "@ui/modules/components/core/form/Form";
+import { FormLabel } from "@ui/modules/components/core/form/atoms/FormLabel";
 import { Input } from "@ui/modules/components/core/input/Input";
-import { Label } from "@ui/modules/components/core/label/Label";
 import { mergeClasses } from "@ui/utils/mergeClasses";
 import { LockIcon, X } from "lucide-react";
-import { type FormEvent, type MouseEvent, type ReactNode, useState, useTransition } from "react";
+import { type MouseEvent, type ReactNode, useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
+
+type FormValues = z.infer<typeof emailFormSchema>;
 
 interface PremiumLockProps {
 	children: ReactNode;
@@ -34,10 +44,15 @@ export const PremiumLock = ({
 }: PremiumLockProps) => {
 	const { isPremiumUser, isPremiumUserLoading, activatePremium } = usePremiumStore();
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [email, setEmail] = useState("");
 	const [submitSuccess, setSubmitSuccess] = useState(false);
-	const [error, setError] = useState<string | null>(null);
 	const [isPending, startTransition] = useTransition();
+
+	const form = useForm<FormValues>({
+		resolver: zodResolver(emailFormSchema),
+		defaultValues: {
+			email: "",
+		},
+	});
 
 	if (!isActive || isPremiumUser) {
 		return renderUnlocked ? renderUnlocked(isPremiumUser) : children;
@@ -49,27 +64,25 @@ export const PremiumLock = ({
 		setIsModalOpen(true);
 	};
 
-	const handleSubmitEmail = async (e: FormEvent) => {
-		e.preventDefault();
-		setError(null);
-
+	const onSubmit = async (values: FormValues) => {
 		startTransition(async () => {
 			try {
-				const { isPremium, messageId } = await checkPremiumByEmail(email);
+				const { isPremium, messageId } = await checkPremiumByEmail(values.email);
 
 				if (isPremium && messageId) {
 					await activatePremium(messageId);
 					setSubmitSuccess(true);
-					setError(null);
 				} else {
-					setSubmitSuccess(false);
-					setError(
-						"No se ha encontrado ninguna suscripción premium con este email. Si ya has realizado un pago, asegúrate de usar el mismo email que utilizaste en Ko-fi.",
-					);
+					form.setError("email", {
+						message:
+							"No se ha encontrado ninguna suscripción premium con este email. Si ya has realizado un pago, asegúrate de usar el mismo email que utilizaste en Ko-fi.",
+					});
 					return;
 				}
 			} catch (_) {
-				setError("Ha ocurrido un error al verificar tu suscripción. Por favor, inténtalo de nuevo más tarde.");
+				form.setError("email", {
+					message: "Ha ocurrido un error al verificar tu suscripción. Por favor, inténtalo de nuevo más tarde.",
+				});
 			}
 		});
 	};
@@ -137,29 +150,34 @@ export const PremiumLock = ({
 						</DialogDescription>
 					</DialogHeader>
 					{!submitSuccess ? (
-						<form onSubmit={handleSubmitEmail} className="space-y-4">
-							<div className="space-y-2">
-								<Label htmlFor="email">Email</Label>
-								<Input
-									id="email"
-									type="email"
-									value={email}
-									onChange={(e) => setEmail(e.target.value)}
-									required
-									placeholder="tu@email.com"
-									autoComplete="off"
-									disabled={isLoading}
+						<Form {...form}>
+							<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+								<FormField
+									control={form.control}
+									name="email"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Email</FormLabel>
+											<Input
+												{...field}
+												type="email"
+												placeholder="tu@email.com"
+												autoComplete="off"
+												disabled={isLoading}
+											/>
+											<FormMessage />
+										</FormItem>
+									)}
 								/>
-							</div>
-							{error && <p className="text-red-500 text-sm">{error}</p>}
-							<Button
-								type="submit"
-								disabled={isLoading}
-								className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary/90 transition-colors"
-							>
-								{isLoading ? "Verificando..." : "Verificar suscripción"}
-							</Button>
-						</form>
+								<Button
+									type="submit"
+									disabled={isLoading}
+									className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary/90 transition-colors"
+								>
+									{isLoading ? "Verificando..." : "Verificar suscripción"}
+								</Button>
+							</form>
+						</Form>
 					) : (
 						<p className="text-green-600 dark:text-green-400 mt-2">
 							Tu suscripción premium ha sido verificada correctamente. ¡Disfruta de todas las funciones premium!

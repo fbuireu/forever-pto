@@ -11,7 +11,6 @@ import { Alert } from "@modules/components/core/alert/Alert";
 import { AlertDescription } from "@modules/components/core/alert/atoms/alertDescription/AlertDescription";
 import { AlertTitle } from "@modules/components/core/alert/atoms/alertTitle/AlertTitle";
 import { Button } from "@modules/components/core/button/Button";
-import { AddHolidayModal } from "@modules/components/core/modal/AddHolidayModal";
 import { Table } from "@modules/components/core/table/Table";
 import { TableHead } from "@modules/components/core/table/atoms/tablHead/TableHead";
 import { TableBody } from "@modules/components/core/table/atoms/tableBody/TableBody";
@@ -19,6 +18,7 @@ import { TableCell } from "@modules/components/core/table/atoms/tableCell/TableC
 import { TableHeader } from "@modules/components/core/table/atoms/tableHeader/TableHeader";
 import { TableRow } from "@modules/components/core/table/atoms/tableRow/TableRow";
 import { TabsContent } from "@modules/components/core/tabs/atoms/tabsContent/TabsContent";
+import { AddHolidayModal } from "@modules/components/home/components/holidaySummary/atoms/addHolidayModal/AddHolidayModal";
 import { ConfirmModal } from "@modules/components/home/components/holidaySummary/atoms/confirmModal/ConfirmModal";
 import { COLUMNS } from "@modules/components/home/components/holidaySummary/atoms/holidaysTable/config";
 import { HolidayTabVariant } from "@modules/components/home/components/holidaySummary/types";

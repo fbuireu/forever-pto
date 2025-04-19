@@ -7,7 +7,7 @@ import { DropdownMenuContent } from "@modules/components/core/dropdownMenu/atoms
 import { DropdownMenuItem } from "@modules/components/core/dropdownMenu/atoms/dropdownMenuItem/DropdownMenuItem";
 import { DropdownMenuTrigger } from "@modules/components/core/dropdownMenu/atoms/dropdownMenuTrigger/DropdownMenuTrigger";
 import { ConfirmModal } from "@modules/components/home/components/holidaySummary/atoms/confirmModal/ConfirmModal";
-import { EditHolidayModal } from "@modules/components/home/components/holidaySummary/atoms/editModal/EditHolidayModal";
+import { EditHolidayModal } from "@modules/components/home/components/holidaySummary/atoms/editHolidayModal/EditHolidayModal";
 import { formatFullDate } from "@modules/components/home/components/holidaySummary/utils/formatFullDate/formatFullDate";
 import { getWeekday } from "@modules/components/home/components/holidaySummary/utils/getWeekDay/getWeekDay";
 import { PremiumLock } from "@modules/components/premium/components/premiumLock/PremiumLock";

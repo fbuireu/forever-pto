@@ -5,7 +5,7 @@ import { getCountry } from "@infrastructure/services/country/getCountry/getCount
 import { getHolidays } from "@infrastructure/services/holiday/getHolidays";
 import { getRegion } from "@infrastructure/services/region/getRegion/getRegion";
 import { SidebarTrigger } from "@modules/components/core/sidebar/atoms/sidebarTrigger/SidebarTrigger";
-import { SidebarProvider } from "@modules/components/core/sidebar/provider/SidebarProvider";
+import { SidebarProvider } from "@modules/components/core/sidebar/provider/SidebarProvider/SidebarProvider";
 import { AppSidebar } from "@ui/modules/components/appSidebar/components/appSidebar/AppSidebar";
 import CalendarList from "@ui/modules/components/home/components/calendarList/CalendarList";
 import HolidaysSummary from "@ui/modules/components/home/components/holidaySummary/HolidaysSummary";
@@ -67,6 +67,7 @@ export default ForeverPto;
 
 // TODO:
 // 1- recheck and refactor
+// 2- refine styles
 // 6- Add tests (also e2e)
 // 9- Add CI/CD
 // 10- repo settings and rules
@@ -76,7 +77,6 @@ export default ForeverPto;
 // 20- Permitir al usuario cambiar los dias sugeridos
 // 24- Edit weekends (paid functionality)
 // 29- Refine styles (hover blocks, etc)
-// 31- Add form shadcn and zod
 // 34- MCP server? (paid func)
 // 34- Ko-Fi BE integration (webhook not working on localhost)
 // 34- use fn to format messages in stats
