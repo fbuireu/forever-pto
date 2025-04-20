@@ -39,10 +39,10 @@ const RootLayout = ({ children }: RootLayoutProps) => (
 				>
 					<main>{children}</main>
 					<Footer />
+					<KofiWidget />
 				</ThemeProvider>
 			</body>
 		</html>
-		<KofiWidget />
 	</ErrorBoundary>
 );
 

@@ -71,7 +71,6 @@ export default ForeverPto;
 // 6- Add tests (also e2e)
 // 9- Add CI/CD
 // 10- repo settings and rules
-// 10- HTML div descendant p (modals)
 // 10- Adapt copies premiumLock
 // 14- i18n
 // 20- Permitir al usuario cambiar los dias sugeridos

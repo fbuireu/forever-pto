@@ -95,7 +95,7 @@ export const Stats = ({ stats, userCountry, userRegion }: StatsProps) => {
 										</div>
 									</div>
 									<div className="flex flex-col items-start">
-										<p>
+										<span>
 											Tienes <span className="font-medium">{stats.ptoDaysAvailable} días de PTO disponibles</span> que
 											se han convertido en <span className="font-medium">{stats.effectiveDays} días libres</span> usando
 											nuestro sistema, lo que supone un incremento de{" "}
@@ -106,7 +106,7 @@ export const Stats = ({ stats, userCountry, userRegion }: StatsProps) => {
 												x{stats.effectiveRatio}
 											</Badge>
 											de efectividad.
-										</p>
+										</span>
 									</div>
 								</>
 							) : (

@@ -64,10 +64,10 @@ export const COLUMNS: ColumnDef<HolidayDTO>[] = [
 		cell: ({ row }) => {
 			const date = row.getValue("date") as Date;
 			return (
-				<div className="flex flex-col">
+				<p className="flex flex-col">
 					<span>{formatFullDate(date)}</span>
 					<span className="text-sm text-muted-foreground">{getWeekday(date)}</span>
-				</div>
+				</p>
 			);
 		},
 	},
