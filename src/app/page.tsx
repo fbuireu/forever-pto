@@ -67,15 +67,18 @@ export default ForeverPto;
 
 // TODO:
 // 1- recheck and refactor
-// 2- refine styles
 // 6- Add tests (also e2e)
 // 9- Add CI/CD
 // 10- repo settings and rules
 // 10- Adapt copies premiumLock
+// 29- Refine styles (hover blocks, etc)
+// 34- MCP server? (paid func)
+// 34- use fn to format messages in stats
+
+// TODO: (release)
+// 2- SEO + check messages
+// 2- refine styles
 // 14- i18n
 // 20- Permitir al usuario cambiar los dias sugeridos
 // 24- Edit weekends (paid functionality)
-// 29- Refine styles (hover blocks, etc)
-// 34- MCP server? (paid func)
 // 34- Ko-Fi BE integration (webhook not working on localhost)
-// 34- use fn to format messages in stats
