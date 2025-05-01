@@ -33,8 +33,7 @@
 			"@assets/*": ["./src/ui/assets/*"],
 			"@styles/*": ["./src/ui/styles/*"],
 			"@shared/*": ["./src/shared/*"],
-			"@content/*": ["./src/content/*"],
-			"@i18n/*": ["./src/i18n/*"],
+			"@i18n/*": ["./src/ui/i18n/*"],
 			"@mocks/*": ["./src/mocks/*"],
 			"@types/*": ["./src/types/*"]
 		}

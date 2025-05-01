@@ -1,6 +1,7 @@
 import type { SearchParams } from "@const/types";
 import { FiltersPanel } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/FiltersPanel";
 import { useSidebarItems } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/atoms/settingsItem/hooks/useSidebarItems/useSidebarItems";
+import { LanguageSelector } from "@modules/components/appSidebar/components/appSidebar/atoms/languageSelector/LanguageSelector";
 import { SidebarLogo } from "@modules/components/appSidebar/components/appSidebar/atoms/sidebarLogo/SidebarLogo";
 import { SidebarContent } from "@modules/components/core/sidebar/atoms/sidebarContent/SidebarContent";
 import { SidebarFooter } from "@modules/components/core/sidebar/atoms/sidebarFooter/SidebarFooter";
@@ -39,6 +40,9 @@ export const AppSidebar = memo((params: SearchParams) => {
 			</SidebarContent>
 			<SidebarFooter>
 				<SidebarMenu>
+					<SidebarMenuItem>
+						<LanguageSelector />
+					</SidebarMenuItem>
 					<SidebarMenuItem>
 						<ThemeToggle />
 					</SidebarMenuItem>

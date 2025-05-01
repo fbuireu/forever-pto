@@ -6,8 +6,8 @@ import type {
 	PremiumParams,
 	ScoreMultipliers,
 } from "@const/types";
-import { capitalizeKeys } from "@const/utils/capitalizeKeys/capitalizeKeys";
 import type { Metadata } from "next";
+import { capitalizeKeys } from "./utils/capitalizeKeys/capitalizeKeys";
 
 export const SEARCH_PARAM_KEYS = {
 	COUNTRY: "country",
@@ -42,6 +42,14 @@ export const DEFAULT_SIDEBAR_CONFIG: Record<CapitalizeKeys<string>, string | num
 	SIDEBAR_WIDTH_MOBILE: "18rem",
 	SIDEBAR_WIDTH_ICON: "3rem",
 	SIDEBAR_KEYBOARD_SHORTCUT: "b",
+} as const;
+
+export const I18N_CONFIG = {
+	locales: ["en", "es", "ca", "it"] as const,
+	defaultLocale: "en" as const,
+	localeDetection: true,
+	localePrefix: "always" as const,
+	pathnames: {},
 } as const;
 
 export const DEFAULT_SEO_PARAMS: CapitalizeKeys<Metadata> = {

@@ -1,4 +1,5 @@
 import { SEARCH_PARAM_KEYS } from "@const/const";
+import type { defineRouting } from "next-intl/routing";
 import type { NextRequest } from "next/server";
 
 export type CapitalizeKeys<T> = {
@@ -29,7 +30,7 @@ export interface PremiumParams {
 }
 
 export interface KofiWidget {
-	username: string;
+	username?: string;
 	type: "floating-chat";
 	donate_button: {
 		text: string;
@@ -70,6 +71,8 @@ export interface FilterMaximumValues {
 	};
 	years: (year: string) => number[];
 }
+
+export type I18nConfig = ReturnType<typeof defineRouting>;
 
 export type RequiredParamsMap = {
 	[K in keyof SearchParams]?: (request: NextRequest) => string | Promise<string>;

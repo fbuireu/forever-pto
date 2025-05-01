@@ -77,7 +77,9 @@ export default ForeverPto;
 // TODO: (release)
 // 2- SEO + check messages
 // 2- refine styles (hover blocks, dark mode, etc)
-// 14- i18n
+// 2- remove env vars
 // 20- Permitir al usuario cambiar los dias sugeridos
 // 24- Edit weekends (paid functionality)
 // 34- Ko-Fi BE integration (webhook not working on localhost)
+// 35- Check copies
+// 36- Check algorithm

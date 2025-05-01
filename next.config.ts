@@ -1,4 +1,7 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin("./src/infrastructure/i18n/config/config.ts");
 
 const nextConfig: NextConfig = {
 	experimental: {
@@ -11,4 +14,4 @@ const nextConfig: NextConfig = {
 	env: {},
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

@@ -1,0 +1,31 @@
+{
+  "common": {
+    "title": "Forever PTO - Ottimizza i tuoi giorni liberi",
+    "description": "Applicazione per ottimizzare la selezione dei giorni PTO e massimizzare il tuo tempo libero"
+  },
+  "navigation": {
+    "home": "Home",
+    "settings": "Impostazioni"
+  },
+  "calendar": {
+    "selectDays": "Seleziona i tuoi giorni PTO",
+    "holidays": "Festività",
+    "weekends": "Weekend",
+    "selected": "Selezionati",
+    "totalDays": "Totale giorni"
+  },
+  "settings": {
+    "country": "Paese",
+    "region": "Regione",
+    "year": "Anno",
+    "ptoDays": "Giorni PTO",
+    "allowPastDays": "Permetti giorni passati",
+    "carryOverMonths": "Mesi di riporto"
+  },
+  "languages": {
+    "en": "Inglese",
+    "es": "Spagnolo",
+    "ca": "Catalano",
+    "it": "Italiano"
+  }
+} 
