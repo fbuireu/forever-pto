@@ -1,17 +1,7 @@
 {
 	"name": "forever-pto",
 	"description": "The all-in-one tool to squish your valuable PTO days",
-	"keywords": [
-		"nextjs",
-		"typescript",
-		"css",
-		"tailwind",
-		"cloudflare",
-		"pto",
-		"seo",
-		"turbopack",
-		"shadcn"
-	],
+	"keywords": ["nextjs", "typescript", "css", "tailwind", "cloudflare", "pto", "seo", "turbopack", "shadcn"],
 	"author": "Ferran Buireu <fbuireu@gmail.com>",
 	"packageManager": "npm@11.3.0",
 	"engines": {

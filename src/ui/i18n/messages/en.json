@@ -1,31 +1,31 @@
 {
-  "common": {
-    "title": "Forever PTO - Optimize your time off",
-    "description": "Application to optimize PTO day selection and maximize your free time"
-  },
-  "navigation": {
-    "home": "Home",
-    "settings": "Settings"
-  },
-  "calendar": {
-    "selectDays": "Select your PTO days",
-    "holidays": "Holidays",
-    "weekends": "Weekends",
-    "selected": "Selected",
-    "totalDays": "Total days"
-  },
-  "settings": {
-    "country": "Country",
-    "region": "Region",
-    "year": "Year",
-    "ptoDays": "PTO Days",
-    "allowPastDays": "Allow past days",
-    "carryOverMonths": "Carry over months"
-  },
-  "languages": {
-    "en": "English",
-    "es": "Spanish",
-    "ca": "Catalan",
-    "it": "Italian"
-  }
-} 
+	"common": {
+		"title": "Forever PTO - Optimize your time off",
+		"description": "Application to optimize PTO day selection and maximize your free time"
+	},
+	"navigation": {
+		"home": "Home",
+		"settings": "Settings"
+	},
+	"calendar": {
+		"selectDays": "Select your PTO days",
+		"holidays": "Holidays",
+		"weekends": "Weekends",
+		"selected": "Selected",
+		"totalDays": "Total days"
+	},
+	"settings": {
+		"country": "Country",
+		"region": "Region",
+		"year": "Year",
+		"ptoDays": "PTO Days",
+		"allowPastDays": "Allow past days",
+		"carryOverMonths": "Carry over months"
+	},
+	"languages": {
+		"en": "English",
+		"es": "Spanish",
+		"ca": "Catalan",
+		"it": "Italian"
+	}
+}

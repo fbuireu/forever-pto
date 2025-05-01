@@ -1,31 +1,31 @@
 {
-  "common": {
-    "title": "Forever PTO - Optimitza els teus dies lliures",
-    "description": "Aplicació per optimitzar la selecció de dies PTO i maximitzar el teu temps lliure"
-  },
-  "navigation": {
-    "home": "Inici",
-    "settings": "Configuració"
-  },
-  "calendar": {
-    "selectDays": "Selecciona els teus dies PTO",
-    "holidays": "Festius",
-    "weekends": "Cap de setmana",
-    "selected": "Seleccionats",
-    "totalDays": "Total dies"
-  },
-  "settings": {
-    "country": "País",
-    "region": "Regió",
-    "year": "Any",
-    "ptoDays": "Dies PTO",
-    "allowPastDays": "Permetre dies passats",
-    "carryOverMonths": "Mesos d'arrossegament"
-  },
-  "languages": {
-    "en": "Anglès",
-    "es": "Castellà",
-    "ca": "Català",
-    "it": "Italià"
-  }
-} 
+	"common": {
+		"title": "Forever PTO - Optimitza els teus dies lliures",
+		"description": "Aplicació per optimitzar la selecció de dies PTO i maximitzar el teu temps lliure"
+	},
+	"navigation": {
+		"home": "Inici",
+		"settings": "Configuració"
+	},
+	"calendar": {
+		"selectDays": "Selecciona els teus dies PTO",
+		"holidays": "Festius",
+		"weekends": "Cap de setmana",
+		"selected": "Seleccionats",
+		"totalDays": "Total dies"
+	},
+	"settings": {
+		"country": "País",
+		"region": "Regió",
+		"year": "Any",
+		"ptoDays": "Dies PTO",
+		"allowPastDays": "Permetre dies passats",
+		"carryOverMonths": "Mesos d'arrossegament"
+	},
+	"languages": {
+		"en": "Anglès",
+		"es": "Castellà",
+		"ca": "Català",
+		"it": "Italià"
+	}
+}

@@ -1,31 +1,31 @@
 {
-  "common": {
-    "title": "Forever PTO - Optimiza tus días libres",
-    "description": "Aplicación para optimizar la selección de días PTO y maximizar tu tiempo libre"
-  },
-  "navigation": {
-    "home": "Inicio",
-    "settings": "Configuración"
-  },
-  "calendar": {
-    "selectDays": "Selecciona tus días PTO",
-    "holidays": "Festivos",
-    "weekends": "Fines de semana",
-    "selected": "Seleccionados",
-    "totalDays": "Total días"
-  },
-  "settings": {
-    "country": "País",
-    "region": "Región",
-    "year": "Año",
-    "ptoDays": "Días PTO",
-    "allowPastDays": "Permitir días pasados",
-    "carryOverMonths": "Meses de arrastre"
-  },
-  "languages": {
-    "en": "Inglés",
-    "es": "Español",
-    "ca": "Catalán",
-    "it": "Italiano"
-  }
-} 
+	"common": {
+		"title": "Forever PTO - Optimiza tus días libres",
+		"description": "Aplicación para optimizar la selección de días PTO y maximizar tu tiempo libre"
+	},
+	"navigation": {
+		"home": "Inicio",
+		"settings": "Configuración"
+	},
+	"calendar": {
+		"selectDays": "Selecciona tus días PTO",
+		"holidays": "Festivos",
+		"weekends": "Fines de semana",
+		"selected": "Seleccionados",
+		"totalDays": "Total días"
+	},
+	"settings": {
+		"country": "País",
+		"region": "Región",
+		"year": "Año",
+		"ptoDays": "Días PTO",
+		"allowPastDays": "Permitir días pasados",
+		"carryOverMonths": "Meses de arrastre"
+	},
+	"languages": {
+		"en": "Inglés",
+		"es": "Español",
+		"ca": "Catalán",
+		"it": "Italiano"
+	}
+}
