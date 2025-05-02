@@ -1,5 +1,5 @@
 import { useFormField } from "@modules/components/core/form/hooks/useFormField";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import type { ComponentProps } from "react";
 
 export function FormDescription({ className, ...props }: ComponentProps<"p">) {

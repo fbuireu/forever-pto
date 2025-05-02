@@ -11,12 +11,15 @@ import CalendarList from "@ui/modules/components/home/components/calendarList/Ca
 import HolidaysSummary from "@ui/modules/components/home/components/holidaySummary/HolidaysSummary";
 import { HolidaysProvider } from "@ui/providers/holidays/HolidaysProvider";
 import { PremiumProvider } from "@ui/providers/premium/PremiumProvider";
+import type { Locale } from "next-intl";
+import { generateMetadata } from "./metadata";
 
-interface ForeverPtoProps {
+export interface ForeverPtoProps {
 	searchParams: Promise<SearchParams>;
+	params: Promise<{ locale: Locale }>;
 }
 
-const ForeverPto = async ({ searchParams }: ForeverPtoProps) => {
+const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 	const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS, CARRY_OVER_MONTHS } = DEFAULT_QUERY_PARAMS;
 	const {
 		country,
@@ -26,11 +29,12 @@ const ForeverPto = async ({ searchParams }: ForeverPtoProps) => {
 		allowPastDays = ALLOW_PAST_DAYS,
 		carryOverMonths = CARRY_OVER_MONTHS,
 	} = await searchParams;
-	const [isPremium, holidays] = await Promise.all([
+	const [isPremium, holidays, { locale }] = await Promise.all([
 		isPremiumFn(),
 		getHolidays({ country, region, year, carryOverMonths }),
+		params,
 	]);
-	const userCountry = getCountry(country);
+	const userCountry = await getCountry(country);
 	const userRegion = getRegion(holidays);
 
 	return (
@@ -64,7 +68,7 @@ const ForeverPto = async ({ searchParams }: ForeverPtoProps) => {
 };
 
 export default ForeverPto;
-
+export { generateMetadata };
 // TODO:
 // 1- recheck and refactor
 // 6- Add tests (also e2e)
@@ -78,6 +82,7 @@ export default ForeverPto;
 // 2- SEO + check messages
 // 2- refine styles (hover blocks, dark mode, etc)
 // 2- remove env vars
+// 2- remove import { es } from "date-fns/locale"; references
 // 20- Permitir al usuario cambiar los dias sugeridos
 // 24- Edit weekends (paid functionality)
 // 34- Ko-Fi BE integration (webhook not working on localhost)

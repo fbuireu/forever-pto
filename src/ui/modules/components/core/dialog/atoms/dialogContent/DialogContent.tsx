@@ -1,7 +1,7 @@
 import { DialogOverlay } from "@modules/components/core/dialog/atoms/dialogOverlay/DialogOverlay";
 import { DialogPortal } from "@modules/components/core/dialog/atoms/dialogPortal/DialogPortal";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { X } from "lucide-react";
 import { type ComponentPropsWithoutRef, type ComponentRef, forwardRef } from "react";
 

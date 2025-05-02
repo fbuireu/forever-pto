@@ -2,7 +2,7 @@
 
 import { Button } from "@modules/components/core/button/Button";
 import { useSidebar } from "@modules/components/core/sidebar/hooks/useSidebar/useSidebar";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { PanelLeftIcon } from "lucide-react";
 import type { ComponentProps } from "react";
 

@@ -1,7 +1,7 @@
 import { SelectScrollDownButton } from "@modules/components/core/select/atoms/selectScrollDownButton/SelectScrollDownButton";
 import { SelectScrollUpButton } from "@modules/components/core/select/atoms/selectScrollUpButton/SelectScrollUpButton";
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { type ComponentPropsWithoutRef, type ComponentRef, forwardRef } from "react";
 
 export const SelectContent = forwardRef<

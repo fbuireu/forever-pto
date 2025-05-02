@@ -1,6 +1,6 @@
 import { buttonVariants } from "@modules/components/core/button/config";
 import { Slot } from "@radix-ui/react-slot";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import type { VariantProps } from "class-variance-authority";
 import { type ButtonHTMLAttributes, forwardRef } from "react";
 

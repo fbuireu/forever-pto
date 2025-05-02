@@ -9,8 +9,8 @@ export interface CountriesProps {
 
 const getCachedCountries = cache(getCountries);
 
-export const Countries = memo(({ country }: CountriesProps) => {
-	const countries = getCachedCountries();
+export const Countries = memo(async ({ country }: CountriesProps) => {
+	const countries = await getCachedCountries();
 
 	return (
 		<Combobox

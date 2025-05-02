@@ -6,7 +6,7 @@ import { Tooltip } from "@modules/components/core/tooltip/Tooltip";
 import { TooltipContent } from "@modules/components/core/tooltip/atoms/tooltipContent/TooltipContent";
 import { TooltipTrigger } from "@modules/components/core/tooltip/atoms/tooltipTrigger/TooltipTrigger";
 import { Slot } from "@radix-ui/react-slot";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import type { VariantProps } from "class-variance-authority";
 import type { ComponentProps } from "react";
 

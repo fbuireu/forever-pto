@@ -1,10 +1,11 @@
+import type { ForeverPtoProps } from "@app/[locale]/page";
 import { I18N_CONFIG } from "@const/const";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
-export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
-	const t = await getTranslations("common");
-	const { locale } = params;
+export async function generateMetadata({ params }: ForeverPtoProps): Promise<Metadata> {
+	const { locale } = await params;
+	const t = await getTranslations({ locale, namespace: "common" });
 
 	return {
 		title: t("title"),

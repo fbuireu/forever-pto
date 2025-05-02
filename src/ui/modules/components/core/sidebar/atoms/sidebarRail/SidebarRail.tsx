@@ -1,7 +1,7 @@
 "use client";
 
 import { useSidebar } from "@modules/components/core/sidebar/hooks/useSidebar/useSidebar";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import type { ComponentProps } from "react";
 
 export const SidebarRail = ({ className, ...props }: ComponentProps<"button">) => {

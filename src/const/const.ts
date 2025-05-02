@@ -2,6 +2,7 @@ import type {
 	CalendarLimits,
 	CapitalizeKeys,
 	FilterMaximumValues,
+	I18nConfig,
 	KofiWidget,
 	PremiumParams,
 	ScoreMultipliers,
@@ -44,12 +45,13 @@ export const DEFAULT_SIDEBAR_CONFIG: Record<CapitalizeKeys<string>, string | num
 	SIDEBAR_KEYBOARD_SHORTCUT: "b",
 } as const;
 
-export const I18N_CONFIG = {
+export const I18N_CONFIG: I18nConfig = {
 	locales: ["en", "es", "ca", "it"] as const,
 	defaultLocale: "en" as const,
 	localeDetection: true,
 	localePrefix: "always" as const,
 	pathnames: {},
+	cookieName: "NEXT_LOCALE" as const,
 } as const;
 
 export const DEFAULT_SEO_PARAMS: CapitalizeKeys<Metadata> = {
@@ -125,5 +127,3 @@ export const KOFFI_WIDGET: CapitalizeKeys<KofiWidget> = {
 };
 
 export const THEME_STORAGE_KEY: string = "theme" as const;
-
-export const DEFAULT_LANGUAGE = "en" as const;

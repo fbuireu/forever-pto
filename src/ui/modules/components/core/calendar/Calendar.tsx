@@ -1,7 +1,7 @@
 "use client";
 
 import { buttonVariants } from "@modules/components/core/button/config";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import type { ComponentProps } from "react";
 import { DayPicker } from "react-day-picker";
 

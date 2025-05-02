@@ -5,7 +5,7 @@ import { SidebarContext } from "@modules/components/core/sidebar/hooks/useSideba
 import type { SidebarContextProps } from "@modules/components/core/sidebar/types";
 import { TooltipProvider } from "@modules/components/core/tooltip/provider/TooltipProvider";
 import { useMobile } from "@ui/hooks/useMobile/useMobile";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { type CSSProperties, type ComponentProps, useCallback, useEffect, useMemo, useState } from "react";
 
 interface SidebarProviderProps extends ComponentProps<"div"> {

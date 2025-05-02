@@ -17,7 +17,7 @@ import { Dialog } from "@ui/modules/components/core/dialog/Dialog";
 import { Form } from "@ui/modules/components/core/form/Form";
 import { FormLabel } from "@ui/modules/components/core/form/atoms/FormLabel";
 import { Input } from "@ui/modules/components/core/input/Input";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { LockIcon, X } from "lucide-react";
 import { type MouseEvent, type ReactNode, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";

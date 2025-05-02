@@ -31,7 +31,7 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { AlertTriangle, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 

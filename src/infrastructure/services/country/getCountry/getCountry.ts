@@ -1,12 +1,13 @@
+import { getUserLocale } from "@application/actions/language";
 import { countryDTO } from "@application/dto/country/countryDTO";
 import type { CountryDTO, RawCountry } from "@application/dto/country/types";
 import { getUserLanguage } from "@shared/infrastructure/services/utils/getUserLanguage/getUserLanguage";
 import countries from "i18n-iso-countries";
 
-export function getCountry(country?: string): CountryDTO | undefined {
+export async function getCountry(country?: string): Promise<CountryDTO | undefined> {
 	try {
 		if (!country) return undefined;
-		const [userLanguage] = getUserLanguage();
+		const userLanguage = (await getUserLocale()) ?? getUserLanguage()[0];
 		countries.registerLocale(require(`i18n-iso-countries/langs/${userLanguage}.json`));
 		const countryName = countries.getName(country.toUpperCase(), userLanguage) ?? country;
 		const raw: RawCountry = { [country]: countryName };

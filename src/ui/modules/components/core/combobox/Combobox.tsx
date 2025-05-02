@@ -14,7 +14,7 @@ import { PopoverContent } from "@modules/components/core/popover/atoms/popoverCo
 import { PopoverTrigger } from "@modules/components/core/popover/atoms/popoverTrigger/PopoverTrigger";
 import { Button } from "@ui/modules/components/core/button/Button";
 import { Command } from "@ui/modules/components/core/command/Command";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { HTMLProps } from "react";

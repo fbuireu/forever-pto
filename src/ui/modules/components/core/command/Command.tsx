@@ -1,6 +1,6 @@
 "use client";
 
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { Command as CommandPrimitive } from "cmdk";
 import { type ComponentPropsWithoutRef, type ComponentRef, forwardRef } from "react";
 

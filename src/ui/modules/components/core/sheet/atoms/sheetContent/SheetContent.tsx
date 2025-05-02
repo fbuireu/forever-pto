@@ -1,7 +1,7 @@
 import { SheetOverlay } from "@modules/components/core/sheet/atoms/sheetOverlay/SheetOverlay";
 import { SheetPortal } from "@modules/components/core/sheet/atoms/sheetPortal/SheetPortal";
 import * as SheetPrimitive from "@radix-ui/react-dialog";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { XIcon } from "lucide-react";
 import type { ComponentProps } from "react";
 

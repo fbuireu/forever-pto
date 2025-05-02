@@ -72,7 +72,12 @@ export interface FilterMaximumValues {
 	years: (year: string) => number[];
 }
 
-export type I18nConfig = ReturnType<typeof defineRouting>;
+export type Locales = readonly ["en", "es", "ca", "it"];
+
+export interface I18nConfig extends ReturnType<typeof defineRouting> {
+	locales: Locales;
+	cookieName: string;
+}
 
 export type RequiredParamsMap = {
 	[K in keyof SearchParams]?: (request: NextRequest) => string | Promise<string>;

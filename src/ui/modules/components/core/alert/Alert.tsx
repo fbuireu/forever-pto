@@ -1,5 +1,5 @@
 import { alertVariants } from "@modules/components/core/alert/config";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import type { VariantProps } from "class-variance-authority";
 import { type HTMLAttributes, forwardRef } from "react";
 

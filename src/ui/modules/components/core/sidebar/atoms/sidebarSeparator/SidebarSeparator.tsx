@@ -1,5 +1,5 @@
 import { Separator } from "@radix-ui/react-menu";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import type { ComponentProps } from "react";
 
 export const SidebarSeparator = ({ className, ...props }: ComponentProps<typeof Separator>) => (

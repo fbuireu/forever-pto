@@ -2,7 +2,7 @@
 
 import { labelVariants } from "@modules/components/core/label/config";
 import * as LabelPrimitive from "@radix-ui/react-label";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import type { VariantProps } from "class-variance-authority";
 import { type ComponentPropsWithoutRef, type ComponentRef, forwardRef } from "react";
 

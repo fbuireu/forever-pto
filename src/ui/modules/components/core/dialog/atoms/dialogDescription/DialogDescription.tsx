@@ -1,5 +1,5 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { type ComponentPropsWithoutRef, type ComponentRef, forwardRef } from "react";
 
 export const DialogDescription = forwardRef<

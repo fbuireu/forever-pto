@@ -6,7 +6,7 @@ import { SheetDescription } from "@modules/components/core/sheet/atoms/sheetDesc
 import { SheetHeader } from "@modules/components/core/sheet/atoms/sheetHeader/SheetHeader";
 import { SheetTitle } from "@modules/components/core/sheet/atoms/sheetTitle/SheetTitle";
 import { Sheet } from "@ui/modules/components/core/sheet/Sheet";
-import { mergeClasses } from "@ui/utils/mergeClasses";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import type { CSSProperties, ComponentProps } from "react";
 import { useSidebar } from "./hooks/useSidebar/useSidebar";
 
