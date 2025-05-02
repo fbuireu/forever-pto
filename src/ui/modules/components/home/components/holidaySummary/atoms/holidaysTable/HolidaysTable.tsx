@@ -20,7 +20,7 @@ import { TableRow } from "@modules/components/core/table/atoms/tableRow/TableRow
 import { TabsContent } from "@modules/components/core/tabs/atoms/tabsContent/TabsContent";
 import { AddHolidayModal } from "@modules/components/home/components/holidaySummary/atoms/addHolidayModal/AddHolidayModal";
 import { ConfirmModal } from "@modules/components/home/components/holidaySummary/atoms/confirmModal/ConfirmModal";
-import { COLUMNS } from "@modules/components/home/components/holidaySummary/atoms/holidaysTable/config";
+import { getColumns } from "@modules/components/home/components/holidaySummary/atoms/holidaysTable/config";
 import { HolidayTabVariant } from "@modules/components/home/components/holidaySummary/types";
 import { PremiumLock } from "@modules/components/premium/components/premiumLock/PremiumLock";
 import {
@@ -31,8 +31,10 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
+import type { LocaleKey } from "@ui/utils/date/getDateFnsLocale";
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { AlertTriangle, Plus, Trash2 } from "lucide-react";
+import { useLocale } from "next-intl";
 import { useState } from "react";
 
 interface HolidaysTableProps {
@@ -48,10 +50,11 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 	const [rowSelection, setRowSelection] = useState({});
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+	const locale = useLocale() as LocaleKey;
 
 	const table = useReactTable({
 		data: holidays,
-		columns: COLUMNS,
+		columns: getColumns(locale),
 		getCoreRowModel: getCoreRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
 		getSortedRowModel: getSortedRowModel(),
@@ -155,7 +158,7 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 											))
 										) : (
 											<TableRow>
-												<TableCell colSpan={COLUMNS.length} className="h-24 text-center">
+												<TableCell colSpan={getColumns(locale).length} className="h-24 text-center">
 													No hay resultados.
 												</TableCell>
 											</TableRow>

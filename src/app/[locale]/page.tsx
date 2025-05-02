@@ -82,7 +82,6 @@ export { generateMetadata };
 // 2- SEO + check messages
 // 2- refine styles (hover blocks, dark mode, etc)
 // 2- remove env vars
-// 2- remove import { es } from "date-fns/locale"; references
 // 20- Permitir al usuario cambiar los dias sugeridos
 // 24- Edit weekends (paid functionality)
 // 34- Ko-Fi BE integration (webhook not working on localhost)

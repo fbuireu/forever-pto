@@ -3,10 +3,11 @@ import { Calendar } from "@ui/modules/components/core/calendar/Calendar";
 import { Card } from "@ui/modules/components/core/card/Card";
 import { Spinner } from "@ui/modules/components/core/spinner/Spinner";
 import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import type { FocusEvent, MouseEvent, ReactNode } from "react";
 import "./months-calendar.css";
 import { MonthSummary } from "@modules/components/home/components/calendarList/atoms/monthCalendar/atoms/monthSummary/MonthSummary";
+import { getLocalizedDateFns } from "@ui/utils/i18n/getLocalizedDateFns/getLocalizedDateFns";
+import { useLocale } from "next-intl";
 
 interface MonthCalendarProps {
 	month: Date;
@@ -49,6 +50,7 @@ export const MonthCalendar = ({
 	getMonthSummary,
 	isPastDayAllowed,
 }: MonthCalendarProps) => {
+	const locale = useLocale();
 	return (
 		<div className="mb-4">
 			<Card key={month.toISOString()} className="flex mb-2 flex-col">
@@ -62,7 +64,7 @@ export const MonthCalendar = ({
 					month={month}
 					weekStartsOn={1}
 					fixedWeeks
-					locale={es}
+					locale={getLocalizedDateFns(locale)}
 					components={{
 						Chevron: () => <></>,
 						Dropdown: () => <></>,

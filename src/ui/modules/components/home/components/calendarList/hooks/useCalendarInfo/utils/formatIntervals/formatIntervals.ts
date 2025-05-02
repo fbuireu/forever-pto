@@ -1,6 +1,7 @@
 import type { IntervalInfo } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/types";
+import { getLocalizedDateFns } from "@ui/utils/i18n/getLocalizedDateFns/getLocalizedDateFns";
 import { format, getDate } from "date-fns";
-import { es } from "date-fns/locale";
+import { useLocale } from "next-intl";
 
 export type FormattedIntervalsReturn = {
 	text: string;
@@ -8,15 +9,17 @@ export type FormattedIntervalsReturn = {
 };
 
 export function formatIntervals(intervalsInfo: IntervalInfo[]): FormattedIntervalsReturn[] {
+	const locale = useLocale();
+
 	return intervalsInfo.map(({ interval, ptoDays, totalFreeDays }) => {
 		const start = interval[0];
 		const end = interval[interval.length - 1];
 
 		let text: string;
 		if (interval.length === 1) {
-			text = `${getDate(start)} de ${format(start, "MMMM", { locale: es })}: 1 día.`;
+			text = `${getDate(start)} de ${format(start, "MMMM", { locale: getLocalizedDateFns(locale) })}: 1 día.`;
 		} else {
-			text = `${getDate(start)} al ${getDate(end)} de ${format(start, "MMMM", { locale: es })}: ${ptoDays} días.`;
+			text = `${getDate(start)} al ${getDate(end)} de ${format(start, "MMMM", { locale: getLocalizedDateFns(locale) })}: ${ptoDays} días.`;
 		}
 
 		return {

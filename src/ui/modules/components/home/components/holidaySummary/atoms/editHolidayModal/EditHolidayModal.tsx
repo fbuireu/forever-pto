@@ -9,9 +9,10 @@ import { DialogHeader } from "@modules/components/core/dialog/atoms/dialogHeader
 import { DialogTitle } from "@modules/components/core/dialog/atoms/dialogTitle/DialogTitle";
 import { Input } from "@modules/components/core/input/Input";
 import { Label } from "@modules/components/core/label/Label";
+import { getLocalizedDateFns } from "@ui/utils/i18n/getLocalizedDateFns/getLocalizedDateFns";
 import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
+import { useLocale } from "next-intl";
 import { useState } from "react";
 
 interface EditHolidayModalProps {
@@ -25,6 +26,7 @@ interface EditHolidayModalProps {
 export const EditHolidayModal = ({ isOpen, onClose, onSave, initialDate, initialName }: EditHolidayModalProps) => {
 	const [date, setDate] = useState<Date>(initialDate);
 	const [name, setName] = useState(initialName);
+	const locale = useLocale();
 
 	const handleSave = () => {
 		onSave(date, name);
@@ -45,12 +47,12 @@ export const EditHolidayModal = ({ isOpen, onClose, onSave, initialDate, initial
 								mode="single"
 								selected={date}
 								onSelect={(newDate) => newDate && setDate(newDate)}
-								locale={es}
+								locale={getLocalizedDateFns(locale)}
 								month={date}
 							/>
 							<div className="flex items-center gap-2 rounded-md border p-2">
 								<CalendarIcon className="h-4 w-4" />
-								<span>{format(date, "PPP", { locale: es })}</span>
+								<span>{format(date, "PPP", { locale: getLocalizedDateFns(locale) })}</span>
 							</div>
 						</div>
 					</div>
