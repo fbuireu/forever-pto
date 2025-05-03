@@ -11,15 +11,13 @@ import CalendarList from "@ui/modules/components/home/components/calendarList/Ca
 import HolidaysSummary from "@ui/modules/components/home/components/holidaySummary/HolidaysSummary";
 import { HolidaysProvider } from "@ui/providers/holidays/HolidaysProvider";
 import { PremiumProvider } from "@ui/providers/premium/PremiumProvider";
-import type { Locale } from "next-intl";
 import { generateMetadata } from "./metadata";
 
 export interface ForeverPtoProps {
 	searchParams: Promise<SearchParams>;
-	params: Promise<{ locale: Locale }>;
 }
 
-const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
+const ForeverPto = async ({ searchParams }: ForeverPtoProps) => {
 	const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS, CARRY_OVER_MONTHS } = DEFAULT_QUERY_PARAMS;
 	const {
 		country,
@@ -29,10 +27,9 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 		allowPastDays = ALLOW_PAST_DAYS,
 		carryOverMonths = CARRY_OVER_MONTHS,
 	} = await searchParams;
-	const [isPremium, holidays, { locale }, userCountry] = await Promise.all([
+	const [isPremium, holidays, userCountry] = await Promise.all([
 		isPremiumFn(),
 		getHolidays({ country, region, year, carryOverMonths }),
-		params,
 		getCountry(country),
 	]);
 	const userRegion = getRegion(holidays);
