@@ -41,9 +41,9 @@ const RootLayout = async ({ children, params }: RootLayoutProps) => {
 						>
 							<main>{children}</main>
 							<Footer />
-							<KofiWidget />
 						</ThemeProvider>
 					</NextIntlClientProvider>
+					<KofiWidget />
 				</body>
 			</html>
 		</ErrorBoundary>

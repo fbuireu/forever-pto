@@ -7,8 +7,8 @@ import { MonthCalendar } from "@modules/components/home/components/calendarList/
 import { useCalendar } from "@modules/components/home/components/calendarList/hooks/useCalendar/useCalendar";
 import { useCalendarInfo } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/useCalendarInfo";
 import { useCalendarInteractions } from "@modules/components/home/components/calendarList/hooks/useCalendarInteractions/useCalendarInteractions";
+import { areArraysEqual } from "@modules/components/home/components/calendarList/utils/arrayIsEqual/arrayIsEqual";
 import { Stats } from "@modules/components/home/components/stats/Stats";
-import { areArraysEqual } from "@modules/components/home/utils/arrayIsEqual";
 import { memo } from "react";
 
 interface CalendarListProps {
@@ -85,6 +85,6 @@ const MemoizedMonthCalendar = memo(MonthCalendar, (prevProps, nextProps) => {
 		prevProps.ptoDays === nextProps.ptoDays &&
 		prevProps.isPending === nextProps.isPending &&
 		prevProps.hoveredBlockId === nextProps.hoveredBlockId &&
-		areArraysEqual(prevProps.selectedDays, nextProps.selectedDays)
+		areArraysEqual({ arr1: prevProps.selectedDays, arr2: nextProps.selectedDays })
 	);
 });

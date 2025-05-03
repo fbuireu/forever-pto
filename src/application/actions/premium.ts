@@ -55,7 +55,7 @@ export async function activatePremium({ messageId, path }: { messageId: string; 
 		name: PREMIUM_PARAMS.COOKIE_NAME,
 		value: messageId,
 		path: "/",
-		maxAge: PREMIUM_PARAMS.DURATION,
+		maxAge: PREMIUM_PARAMS.COOKIE_DURATION,
 		httpOnly: true,
 		secure: process.env.NODE_ENV === "production",
 		sameSite: "strict",

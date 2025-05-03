@@ -29,12 +29,12 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 		allowPastDays = ALLOW_PAST_DAYS,
 		carryOverMonths = CARRY_OVER_MONTHS,
 	} = await searchParams;
-	const [isPremium, holidays, { locale }] = await Promise.all([
+	const [isPremium, holidays, { locale }, userCountry] = await Promise.all([
 		isPremiumFn(),
 		getHolidays({ country, region, year, carryOverMonths }),
 		params,
+		getCountry(country),
 	]);
-	const userCountry = await getCountry(country);
 	const userRegion = getRegion(holidays);
 
 	return (
@@ -80,9 +80,9 @@ export { generateMetadata };
 
 // TODO: (release)
 // 2- SEO + check messages
+// 2- add FAQ + roadmap
 // 2- refine styles (hover blocks, dark mode, etc)
 // 2- remove env vars
-// 20- Permitir al usuario cambiar los dias sugeridos
 // 24- Edit weekends (paid functionality)
 // 34- Ko-Fi BE integration (webhook not working on localhost)
 // 35- Check copies

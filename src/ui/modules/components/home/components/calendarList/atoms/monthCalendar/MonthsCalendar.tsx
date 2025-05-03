@@ -1,4 +1,3 @@
-import { setDayClassName } from "@modules/components/home/utils/setDayClassName";
 import { Calendar } from "@ui/modules/components/core/calendar/Calendar";
 import { Card } from "@ui/modules/components/core/card/Card";
 import { Spinner } from "@ui/modules/components/core/spinner/Spinner";
@@ -6,6 +5,7 @@ import { format } from "date-fns";
 import type { FocusEvent, MouseEvent, ReactNode } from "react";
 import "./months-calendar.css";
 import { MonthSummary } from "@modules/components/home/components/calendarList/atoms/monthCalendar/atoms/monthSummary/MonthSummary";
+import { setDayClassName } from "@modules/components/home/components/calendarList/atoms/monthCalendar/utils/setDayClassName/setDayClassName";
 import { getLocalizedDateFns } from "@ui/utils/i18n/getLocalizedDateFns/getLocalizedDateFns";
 import { useLocale } from "next-intl";
 

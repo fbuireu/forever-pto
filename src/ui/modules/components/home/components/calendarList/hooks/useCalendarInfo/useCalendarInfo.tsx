@@ -9,6 +9,7 @@ import { formatIntervals } from "@modules/components/home/components/calendarLis
 import { getDayPositionInBlock } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/getDayPositionInBlock/getDayPositionInBlock";
 import { getSuggestedDaysForMonth } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/getSuggestedDaysForMonth/getSuggestedDaysForMonth";
 import { getAlternativeDayPosition } from "@modules/components/home/components/calendarList/hooks/useCalendarInteractions/utils/getAlternativeDayPosition/getAlternativeDayPosition";
+import { useLocale } from "next-intl";
 import { type ReactNode, useCallback, useMemo } from "react";
 
 interface UseCalendarInfoParams {
@@ -44,6 +45,8 @@ export function useCalendarInfo({
 	calculateEffectiveDays,
 	isDaySuggested,
 }: UseCalendarInfoParams): UseCalendarInfoReturn {
+	const locale = useLocale();
+
 	const isDayAlternative = useCallback(
 		(day: Date) => checkIsDayAlternative({ day, hoveredBlockId, alternativeBlocks, isDaySuggested }),
 		[hoveredBlockId, alternativeBlocks, isDaySuggested],
@@ -76,7 +79,7 @@ export function useCalendarInfo({
 				return null;
 			}
 
-			const formattedIntervals = formatIntervals(intervals);
+			const formattedIntervals = formatIntervals(intervals, locale);
 
 			if (formattedIntervals.length === 0) {
 				return null;
@@ -92,7 +95,7 @@ export function useCalendarInfo({
 				</>
 			);
 		},
-		[ptoDays, suggestedDays, calculateEffectiveDays],
+		[ptoDays, suggestedDays, calculateEffectiveDays, locale],
 	);
 
 	const stats = useMemo(

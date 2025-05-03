@@ -50,7 +50,7 @@ export const I18N_CONFIG: CapitalizeKeys<I18nConfig> = {
 	LOCALE_DETECTION: true,
 	LOCALE_PREFIX: "always" as const,
 	PATHNAMES: {},
-	COOKIE_NAME: "next_locale" as const,
+	COOKIE_NAME: "NEXT_LOCALE" as const,
 } as const;
 
 export const DEFAULT_CALENDAR_LIMITS: CapitalizeKeys<CalendarLimits> = {
@@ -89,7 +89,7 @@ export const FILTER_MAXIMUM_VALUES: CapitalizeKeys<FilterMaximumValues> = {
 
 export const PREMIUM_PARAMS: CapitalizeKeys<PremiumParams> = {
 	COOKIE_NAME: "premium" as const,
-	DURATION: 30 * 24 * 60 * 60,
+	COOKIE_DURATION: 30 * 24 * 60 * 60,
 	CHECK_DELAY: 5 * 60 * 1000,
 } as const;
 

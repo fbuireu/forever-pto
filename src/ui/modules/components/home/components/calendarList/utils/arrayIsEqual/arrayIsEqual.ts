@@ -1,6 +1,11 @@
 import { format } from "date-fns";
 
-export function areArraysEqual(arr1: Date[], arr2: Date[]): boolean {
+interface ArrayIsEqualParams {
+	arr1: Date[];
+	arr2: Date[];
+}
+
+export function areArraysEqual({ arr1, arr2 }: ArrayIsEqualParams): boolean {
 	if (arr1.length !== arr2.length) return false;
 
 	const set = new Set<string>();

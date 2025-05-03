@@ -31,7 +31,7 @@ export interface SearchParams {
 
 export interface PremiumParams {
 	cookie_name: "premium";
-	duration: number;
+	cookie_duration: number;
 	check_delay: number;
 }
 
@@ -82,7 +82,7 @@ export type Locales = readonly ["en", "es", "ca", "it"];
 
 export interface I18nConfig extends Except<ReturnType<typeof defineRouting>, "defaultLocale"> {
 	locales: Locales;
-	cookie_name: "next_locale";
+	cookie_name: "NEXT_LOCALE";
 	default_locale: ReturnType<typeof defineRouting>["defaultLocale"];
 	locale_detection: ReturnType<typeof defineRouting>["localeDetection"];
 	locale_prefix: ReturnType<typeof defineRouting>["localePrefix"];

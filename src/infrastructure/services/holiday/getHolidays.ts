@@ -1,3 +1,4 @@
+import { getUserLocale } from "@application/actions/language";
 import { isPremium } from "@application/actions/premium";
 import { holidayDTO } from "@application/dto/holiday/holidayDTO";
 import type { HolidayDTO } from "@application/dto/holiday/types";
@@ -24,8 +25,10 @@ export async function getHolidays({
 	}
 
 	try {
+		const userLanguage = (await getUserLocale()) ?? getUserLanguage()[0];
+
 		const configuration = {
-			languages: getUserLanguage(),
+			languages: [userLanguage],
 			timezone: getUserTimezone(),
 		};
 

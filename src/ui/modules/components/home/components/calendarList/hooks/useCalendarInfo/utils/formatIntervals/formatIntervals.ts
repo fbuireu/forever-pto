@@ -1,16 +1,14 @@
 import type { IntervalInfo } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/types";
 import { getLocalizedDateFns } from "@ui/utils/i18n/getLocalizedDateFns/getLocalizedDateFns";
 import { format, getDate } from "date-fns";
-import { useLocale } from "next-intl";
+import type { Locale } from "next-intl";
 
 export type FormattedIntervalsReturn = {
 	text: string;
 	totalDays: number;
 };
 
-export function formatIntervals(intervalsInfo: IntervalInfo[]): FormattedIntervalsReturn[] {
-	const locale = useLocale();
-
+export function formatIntervals(intervalsInfo: IntervalInfo[], locale: Locale): FormattedIntervalsReturn[] {
 	return intervalsInfo.map(({ interval, ptoDays, totalFreeDays }) => {
 		const start = interval[0];
 		const end = interval[interval.length - 1];
