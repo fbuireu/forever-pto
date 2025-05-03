@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: ForeverPtoProps): Promise<Met
 		metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"),
 		alternates: {
 			canonical: "/",
-			languages: I18N_CONFIG.locales.reduce((acc, lang) => Object.assign(acc, { [lang]: `/${lang}` }), {}),
+			languages: I18N_CONFIG.LOCALES.reduce((acc, lang) => Object.assign(acc, { [lang]: `/${lang}` }), {}),
 		},
 		openGraph: {
 			title: t("title"),

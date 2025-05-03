@@ -27,9 +27,7 @@ export const AllowPastDays = ({ allowPastDays }: AllowPastDaysProps) => {
 				searchParams,
 			});
 
-			startTransition(() => {
-				router.push(`${pathname}?${query}`, { scroll: false });
-			});
+			startTransition(() => router.push(`${pathname}?${query}`, { scroll: false }));
 		},
 		[pathname, router, searchParams],
 	);

@@ -3,7 +3,13 @@ import type { defineRouting } from "next-intl/routing";
 import type { NextRequest } from "next/server";
 
 export type CapitalizeKeys<T> = {
-	[K in keyof T as Uppercase<K & string>]: T[K] extends object ? CapitalizeKeys<T[K]> : T[K];
+	[K in keyof T as Uppercase<string & K>]: T[K] extends readonly string[]
+		? T[K]
+		: T[K] extends (year: string) => number[]
+			? T[K]
+			: T[K] extends object
+				? CapitalizeKeys<T[K]>
+				: T[K];
 };
 
 export type LowercaseKeys<T> = {
@@ -74,9 +80,12 @@ export interface FilterMaximumValues {
 
 export type Locales = readonly ["en", "es", "ca", "it"];
 
-export interface I18nConfig extends ReturnType<typeof defineRouting> {
+export interface I18nConfig extends Except<ReturnType<typeof defineRouting>, "defaultLocale"> {
 	locales: Locales;
-	cookieName: string;
+	cookie_name: "next_locale";
+	default_locale: ReturnType<typeof defineRouting>["defaultLocale"];
+	locale_detection: ReturnType<typeof defineRouting>["localeDetection"];
+	locale_prefix: ReturnType<typeof defineRouting>["localePrefix"];
 }
 
 export type RequiredParamsMap = {

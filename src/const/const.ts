@@ -7,7 +7,6 @@ import type {
 	PremiumParams,
 	ScoreMultipliers,
 } from "@const/types";
-import type { Metadata } from "next";
 import { capitalizeKeys } from "./utils/capitalizeKeys/capitalizeKeys";
 
 export const SEARCH_PARAM_KEYS = {
@@ -45,25 +44,14 @@ export const DEFAULT_SIDEBAR_CONFIG: Record<CapitalizeKeys<string>, string | num
 	SIDEBAR_KEYBOARD_SHORTCUT: "b",
 } as const;
 
-export const I18N_CONFIG: I18nConfig = {
-	locales: ["en", "es", "ca", "it"] as const,
-	defaultLocale: "en" as const,
-	localeDetection: true,
-	localePrefix: "always" as const,
-	pathnames: {},
-	cookieName: "NEXT_LOCALE" as const,
+export const I18N_CONFIG: CapitalizeKeys<I18nConfig> = {
+	LOCALES: ["en", "es", "ca", "it"] as const,
+	DEFAULT_LOCALE: "en" as const,
+	LOCALE_DETECTION: true,
+	LOCALE_PREFIX: "always" as const,
+	PATHNAMES: {},
+	COOKIE_NAME: "next_locale" as const,
 } as const;
-
-export const DEFAULT_SEO_PARAMS: CapitalizeKeys<Metadata> = {
-	TITLE: "",
-	SITE: "",
-	DESCRIPTION: "Welcome to my website!",
-	ROBOTS: {
-		INDEX: true,
-		FOLLOW: true,
-	},
-	IMAGE: "",
-} as unknown as CapitalizeKeys<Metadata>;
 
 export const DEFAULT_CALENDAR_LIMITS: CapitalizeKeys<CalendarLimits> = {
 	MAX_BLOCK_SIZE: 5,

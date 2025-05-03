@@ -33,16 +33,14 @@ export const Years = ({ year: yearProps }: YearsProps) => {
 				searchParams,
 			});
 
-			startTransition(() => {
-				router.push(`${pathname}?${query}`, { scroll: false });
-			});
+			startTransition(() => router.push(`${pathname}?${query}`, { scroll: false }));
 		},
 		[pathname, router, searchParams],
 	);
 
 	const yearOptions = useMemo(
 		() =>
-			FILTER_MAXIMUM_VALUES.YEARS(year).map((yearOption) => (
+			(FILTER_MAXIMUM_VALUES.YEARS as (year: string) => number[])(year).map((yearOption) => (
 				<SelectItem key={yearOption} value={yearOption.toString()}>
 					{yearOption}
 				</SelectItem>

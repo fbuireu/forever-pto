@@ -9,7 +9,7 @@ interface UseLanguagesReturn {
 export function useLanguages(): UseLanguagesReturn[] {
 	const t = useTranslations("languages");
 
-	return I18N_CONFIG.locales.map((code) => ({
+	return I18N_CONFIG.LOCALES.map((code) => ({
 		code,
 		label: t(code),
 	}));

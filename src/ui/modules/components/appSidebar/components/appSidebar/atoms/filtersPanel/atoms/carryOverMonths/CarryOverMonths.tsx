@@ -41,9 +41,7 @@ export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 				searchParams,
 			});
 
-			startTransition(() => {
-				router.push(`${pathname}?${query}`, { scroll: false });
-			});
+			startTransition(() => router.push(`${pathname}?${query}`, { scroll: false }));
 		},
 		[isPremiumUser, router, pathname, searchParams],
 	);

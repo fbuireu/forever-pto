@@ -1,5 +1,6 @@
 import { I18N_CONFIG } from "@const/const";
-import { ca, enUS, es, it } from "date-fns/locale";
+import type { Locales } from "@const/types";
+import { type Locale, ca, enUS, es, it } from "date-fns/locale";
 
 export type LocaleKey = keyof typeof DATE_FNS_LOCALES;
 
@@ -10,6 +11,6 @@ export const DATE_FNS_LOCALES = {
 	it: it,
 } as const;
 
-export function getLocalizedDateFns(locale: LocaleKey = I18N_CONFIG.defaultLocale) {
+export function getLocalizedDateFns(locale: LocaleKey = I18N_CONFIG.DEFAULT_LOCALE as Locales[number]): Locale {
 	return DATE_FNS_LOCALES[locale];
 }
