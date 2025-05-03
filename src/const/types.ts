@@ -78,10 +78,8 @@ export interface FilterMaximumValues {
 	years: (year: string) => number[];
 }
 
-export type Locales = readonly ["en", "es", "ca", "it"];
-
 export interface I18nConfig extends Except<ReturnType<typeof defineRouting>, "defaultLocale"> {
-	locales: Locales;
+	locales: readonly ["en", "es", "ca", "it"];
 	cookie_name: "NEXT_LOCALE";
 	default_locale: ReturnType<typeof defineRouting>["defaultLocale"];
 	locale_detection: ReturnType<typeof defineRouting>["localeDetection"];
