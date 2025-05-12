@@ -1,7 +1,7 @@
 import { DEFAULT_CALENDAR_LIMITS } from "@const/const";
 import type { EffectiveRatio } from "@modules/components/home/components/calendarList/hooks/types";
 import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
-import { differenceInDays, getMonth } from "date-fns";
+import { addDays, differenceInDays, getMonth, startOfWeek } from "date-fns";
 import type { BlockOpportunity, DayInfo } from "../../types";
 import { calculateBlockScore } from "../calculateBlockScore/calculateBlockScore";
 import { calculateSurroundingFreeDays } from "../calculateSurroundingFreeDays/calculateSurroundingFreeDays";
@@ -22,10 +22,26 @@ export function generateBlockOpportunities({
 	const blockOpportunities: BlockOpportunity[] = [];
 	const maxBlockSize = Math.min(DEFAULT_CALENDAR_LIMITS.MAX_BLOCK_SIZE, remainingPtoDays);
 	const availableWorkdaysLength = availableWorkdays.length;
-
+	const sortedWorkdays = [...availableWorkdays].sort((a, b) => a.getTime() - b.getTime());
 	const dayKeysMap = new Map<Date, string>();
 	for (let i = 0; i < availableWorkdaysLength; i++) {
-		dayKeysMap.set(availableWorkdays[i], getDateKey(availableWorkdays[i]));
+		dayKeysMap.set(sortedWorkdays[i], getDateKey(sortedWorkdays[i]));
+	}
+
+	function evaluateWeekHolidayValue(weekStart: Date): number {
+		let holidayCount = 0;
+		const weekEnd = addDays(weekStart, 6);
+
+		for (let day = weekStart; day <= weekEnd; day = addDays(day, 1)) {
+			const dayKey = getDateKey(day);
+			const dayInfo = daysMap.get(dayKey);
+
+			if (dayInfo && (dayInfo.isHoliday || dayInfo.isWeekend)) {
+				holidayCount++;
+			}
+		}
+
+		return holidayCount;
 	}
 
 	for (let startDayIndex = 0; startDayIndex < availableWorkdaysLength; startDayIndex++) {
@@ -39,7 +55,7 @@ export function generateBlockOpportunities({
 			blockDays.length = blockSize;
 
 			for (let i = 0; i < blockSize; i++) {
-				const day = availableWorkdays[startDayIndex + i];
+				const day = sortedWorkdays[startDayIndex + i];
 
 				if (i > 0) {
 					const lastDay = blockDays[i - 1];
@@ -59,11 +75,16 @@ export function generateBlockOpportunities({
 
 			const effectiveResult = calculateEffectiveDays(blockDays);
 
-			const score = calculateBlockScore({
+			const weekStart = startOfWeek(blockDays[0]);
+			const holidayValue = evaluateWeekHolidayValue(weekStart);
+
+			const baseScore = calculateBlockScore({
 				blockSize,
 				totalConsecutiveDays,
 				effectiveDays: effectiveResult.effective,
 			});
+
+			const adjustedScore = baseScore * (1 + holidayValue);
 
 			blockOpportunities.push({
 				startDay: blockDays[0],
@@ -72,7 +93,7 @@ export function generateBlockOpportunities({
 				daysBeforeBlock,
 				daysAfterBlock,
 				totalConsecutiveDays,
-				score,
+				score: adjustedScore,
 				month: getMonth(blockDays[0]),
 				effectiveDays: effectiveResult.effective,
 			});

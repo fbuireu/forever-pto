@@ -1,4 +1,5 @@
-import { DEFAULT_QUERY_PARAMS, FILTER_MAXIMUM_VALUES, PREMIUM_PARAMS, SEARCH_PARAM_KEYS } from "@const/const";
+import { isPremium } from "@application/actions/premium";
+import { DEFAULT_QUERY_PARAMS, FILTER_MAXIMUM_VALUES, SEARCH_PARAM_KEYS } from "@const/const";
 import type { MIDDLEWARE_PARAMS } from "@infrastructure/middleware/middleware";
 import { detectLocation } from "@infrastructure/services/location/detectLocation/detectLocation";
 import type { NextRequest } from "next/server";
@@ -38,8 +39,8 @@ const PARAM_VALIDATORS: Record<string, ValidatorFunction> = {
 		return null;
 	},
 	[SEARCH_PARAM_KEYS.CARRY_OVER_MONTHS]: async (value, request) => {
-		const isPremium = request.cookies.get(PREMIUM_PARAMS.COOKIE_NAME)?.value === "true";
-		const maxValue = isPremium
+		const isPremiumUser = await isPremium();
+		const maxValue = isPremiumUser
 			? FILTER_MAXIMUM_VALUES.CARRY_OVER_MONTHS.PREMIUM
 			: FILTER_MAXIMUM_VALUES.CARRY_OVER_MONTHS.FREE;
 

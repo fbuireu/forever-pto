@@ -35,9 +35,9 @@ export function findOptimalGaps({
 
 	const { map: daysMap, allDays } = yearMap;
 
-	const availableWorkdays = allDays.filter((day) => {
-		const dayInfo = daysMap.get(getDateKey(day));
-		return dayInfo && !dayInfo.isFreeDay;
+	const availableWorkdays = allDays.filter((date) => {
+		const day = daysMap.get(getDateKey(date));
+		return day && !day.isFreeDay;
 	});
 
 	const blockOpportunities = generateBlockOpportunities({

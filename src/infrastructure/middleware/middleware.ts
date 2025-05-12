@@ -1,4 +1,5 @@
-import { DEFAULT_QUERY_PARAMS, FILTER_MAXIMUM_VALUES, PREMIUM_PARAMS, SEARCH_PARAM_KEYS } from "@const/const";
+import { isPremium } from "@application/actions/premium";
+import { DEFAULT_QUERY_PARAMS, FILTER_MAXIMUM_VALUES, SEARCH_PARAM_KEYS } from "@const/const";
 import type { RequiredParamsMap } from "@const/types";
 import { validateParam } from "@infrastructure/middleware/utils/validateParam/validateParam";
 import { detectLocation } from "@infrastructure/services/location/detectLocation/detectLocation";
@@ -10,8 +11,9 @@ export const MIDDLEWARE_PARAMS: RequiredParamsMap = {
 	[SEARCH_PARAM_KEYS.PTO_DAYS]: () => DEFAULT_QUERY_PARAMS.PTO_DAYS,
 	[SEARCH_PARAM_KEYS.ALLOW_PAST_DAYS]: () => DEFAULT_QUERY_PARAMS.ALLOW_PAST_DAYS,
 	[SEARCH_PARAM_KEYS.CARRY_OVER_MONTHS]: async (request: NextRequest) => {
-		const isPremium = request.cookies.get(PREMIUM_PARAMS.COOKIE_NAME)?.value === "true";
-		return isPremium ? DEFAULT_QUERY_PARAMS.CARRY_OVER_MONTHS : String(FILTER_MAXIMUM_VALUES.CARRY_OVER_MONTHS.FREE);
+		const premiumUser = await isPremium();
+
+		return premiumUser ? DEFAULT_QUERY_PARAMS.CARRY_OVER_MONTHS : String(FILTER_MAXIMUM_VALUES.CARRY_OVER_MONTHS.FREE);
 	},
 };
 
