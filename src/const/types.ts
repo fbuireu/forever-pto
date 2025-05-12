@@ -3,13 +3,11 @@ import type { defineRouting } from "next-intl/routing";
 import type { NextRequest } from "next/server";
 
 export type CapitalizeKeys<T> = {
-	[K in keyof T as Uppercase<string & K>]: T[K] extends readonly string[]
+	[K in keyof T as Uppercase<string & K>]: T[K] extends readonly unknown[]
 		? T[K]
-		: T[K] extends (year: string) => number[]
-			? T[K]
-			: T[K] extends object
-				? CapitalizeKeys<T[K]>
-				: T[K];
+		: T[K] extends object
+			? CapitalizeKeys<T[K]>
+			: T[K];
 };
 
 export type LowercaseKeys<T> = {

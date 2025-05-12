@@ -103,7 +103,6 @@ export function findOptimalGaps({
 		});
 	}
 
-	// Devolver resultados
 	return {
 		suggestedDays: allSuggestedDays,
 		alternativeBlocks: alternativesByBlockId,

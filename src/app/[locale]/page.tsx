@@ -83,4 +83,4 @@ export { generateMetadata };
 // 24- Edit weekends (paid functionality)
 // 34- Ko-Fi BE integration (webhook not working on localhost)
 // 35- Check copies
-// 36- Check algorithm
+// 36- CHECK ALGO
