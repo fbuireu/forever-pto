@@ -1,31 +1,15 @@
 "use client";
 
 import type { SearchParams } from "@const/types";
+import { MinusButton } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/atoms/ptoDays/atoms/MinusButton/MinusButton";
+import { PlusButton } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/atoms/ptoDays/atoms/PlusButton/PlusButton";
 import { createQueryString } from "@modules/components/appSidebar/components/appSidebar/utils/createQueryString/createQueryString";
 import { Input } from "@modules/components/core/input/Input";
 import { useDebouncedCallback } from "@ui/hooks/useDebounceCallback/useDebounceCallback";
-import { Button } from "@ui/modules/components/core/button/Button";
 import { Label } from "@ui/modules/components/core/label/Label";
-import { Minus, Plus } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ChangeEvent } from "react";
-import { memo, startTransition, useCallback, useMemo, useState } from "react";
-
-const MinusButton = memo(({ onClick, disabled }: { onClick: () => void; disabled: boolean }) => (
-	<Button variant="outline" size="icon" className="h-8 w-8 shrink-0 rounded-full" onClick={onClick} disabled={disabled}>
-		<Minus />
-		<span className="sr-only">Decrease</span>
-	</Button>
-));
-MinusButton.displayName = "MinusButton";
-
-const PlusButton = memo(({ onClick }: { onClick: () => void }) => (
-	<Button variant="outline" size="icon" className="h-8 w-8 shrink-0 rounded-full" onClick={onClick}>
-		<Plus />
-		<span className="sr-only">Increase</span>
-	</Button>
-));
-PlusButton.displayName = "PlusButton";
+import { startTransition, useCallback, useMemo, useState } from "react";
 
 export interface PtoDaysProps {
 	ptoDays: SearchParams["ptoDays"];

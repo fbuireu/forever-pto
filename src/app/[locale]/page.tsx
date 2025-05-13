@@ -4,6 +4,7 @@ import type { SearchParams } from "@const/types";
 import { getCountry } from "@infrastructure/services/country/getCountry/getCountry";
 import { getHolidays } from "@infrastructure/services/holiday/getHolidays";
 import { getRegion } from "@infrastructure/services/region/getRegion/getRegion";
+import { Footer } from "@modules/components/core/footer/Footer";
 import { SidebarTrigger } from "@modules/components/core/sidebar/atoms/sidebarTrigger/SidebarTrigger";
 import { SidebarProvider } from "@modules/components/core/sidebar/provider/SidebarProvider/SidebarProvider";
 import { AppSidebar } from "@ui/modules/components/appSidebar/components/appSidebar/AppSidebar";
@@ -58,6 +59,7 @@ const ForeverPto = async ({ searchParams }: ForeverPtoProps) => {
 							userRegion={userRegion}
 						/>
 					</HolidaysProvider>
+					<Footer />
 				</div>
 			</PremiumProvider>
 		</SidebarProvider>
@@ -78,7 +80,7 @@ export { generateMetadata };
 // TODO: (release)
 // 2- SEO + check messages
 // 2- add FAQ + roadmap
-// 2- refine styles (hover blocks, dark mode, etc)
+// 2- refine styles (hover blocks, dark mode, modals, calendar, days etc)
 // 2- remove env vars
 // 24- Edit weekends (paid functionality)
 // 34- Ko-Fi BE integration (webhook not working on localhost)

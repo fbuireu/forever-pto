@@ -25,6 +25,7 @@ export const Calendar = ({ className, classNames, showOutsideDays = true, ...pro
 			weekday: "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]",
 			week: "flex w-full mt-2",
 			day: mergeClasses(
+				"rounded-sm",
 				props.mode === "range"
 					? "[&:has(>.day-range-end)]:rounded-r-md [&:has(>.day-range-start)]:rounded-l-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md"
 					: "[&:has([aria-selected])]:rounded-md",
@@ -47,4 +48,3 @@ export const Calendar = ({ className, classNames, showOutsideDays = true, ...pro
 		{...props}
 	/>
 );
-Calendar.displayName = "Calendar";

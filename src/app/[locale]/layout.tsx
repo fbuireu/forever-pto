@@ -1,6 +1,5 @@
 import { THEME_STORAGE_KEY } from "@const/const";
 import { ErrorBoundary } from "@modules/components/core/errorBoundary/ErrorBoundary";
-import { Footer } from "@modules/components/core/footer/Footer";
 import { KofiWidget } from "@modules/components/core/kofiWidget/KofiWidget";
 import "@styles/index.css";
 import { ThemeProvider } from "@ui/providers/theme/ThemeProvider";
@@ -40,7 +39,6 @@ const RootLayout = async ({ children, params }: RootLayoutProps) => {
 							disableTransitionOnChange
 						>
 							<main>{children}</main>
-							<Footer />
 						</ThemeProvider>
 					</NextIntlClientProvider>
 					<KofiWidget />

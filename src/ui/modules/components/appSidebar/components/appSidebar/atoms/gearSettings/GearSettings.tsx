@@ -39,5 +39,3 @@ export const GearSettings = forwardRef<HTMLButtonElement, ComponentPropsWithoutR
 		);
 	},
 );
-
-GearSettings.displayName = "GearSettings";

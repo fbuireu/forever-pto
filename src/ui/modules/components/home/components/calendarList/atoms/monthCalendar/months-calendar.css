@@ -1,7 +1,7 @@
 @reference "../../../../../../../styles/index.css";
 
 [data-suggested="true"] {
-	@apply bg-green-300 dark:bg-green-600;
+	@apply bg-green-300 dark:bg-green-500;
 }
 
 [data-suggested="true"][data-hovered-block="true"] {

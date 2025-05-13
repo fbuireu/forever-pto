@@ -102,7 +102,7 @@ export const MonthCalendar = ({
 											isDayAlternative,
 											isPastDayAllowed,
 										})}
-										title={holiday || ""}
+										title={holiday ?? ""}
 										onMouseOver={handleDayInteraction}
 										onMouseOut={handleDayMouseOut}
 										onBlur={handleDayMouseOut}

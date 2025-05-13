@@ -31,7 +31,6 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import type { LocaleKey } from "@ui/utils/date/getDateFnsLocale";
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { AlertTriangle, Plus, Trash2 } from "lucide-react";
 import { useLocale } from "next-intl";
@@ -50,7 +49,7 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 	const [rowSelection, setRowSelection] = useState({});
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-	const locale = useLocale() as LocaleKey;
+	const locale = useLocale();
 
 	const table = useReactTable({
 		data: holidays,

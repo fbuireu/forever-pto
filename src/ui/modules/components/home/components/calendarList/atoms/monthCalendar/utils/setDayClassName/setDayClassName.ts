@@ -39,13 +39,13 @@ export function setDayClassName({
 	}
 
 	if (isToday(date)) {
-		BASE_CLASSES.push("bg-gray-800 dark:bg-gray-900 text-white hover:bg-black");
+		BASE_CLASSES.push("bg-gray-800 dark:bg-gray-500 text-white hover:bg-gray-400");
 	} else if (selectedDays.some((d) => isSameDay(d, date)) && !isWeekend(date) && !isHoliday(date)) {
 		BASE_CLASSES.push("bg-primary text-primary-foreground hover:bg-primary/90");
 	} else if (isHoliday(date)) {
 		BASE_CLASSES.push("bg-yellow-300 text-yellow-800 hover:bg-yellow-400");
 	} else if (isWeekend(date)) {
-		BASE_CLASSES.push("bg-gray-200 dark:bg-gray-900 text-muted-foreground hover:bg-gray-300");
+		BASE_CLASSES.push("bg-gray-200 dark:bg-gray-900 text-muted-foreground hover:bg-gray-700");
 	} else {
 		const isSuggested = isDaySuggested(date);
 		const isAlternative = isDayAlternative(date);
