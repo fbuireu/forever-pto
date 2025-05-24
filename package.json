@@ -3,7 +3,7 @@
 	"description": "The all-in-one tool to squish your valuable PTO days",
 	"keywords": ["nextjs", "typescript", "css", "tailwind", "cloudflare", "pto", "seo", "turbopack", "shadcn"],
 	"author": "Ferran Buireu <fbuireu@gmail.com>",
-	"packageManager": "npm@11.4.0",
+	"packageManager": "npm@11.4.1",
 	"engines": {
 		"node": ">=22.0.0"
 	},
@@ -63,8 +63,8 @@
 		"react-hook-form": "^7.56.4",
 		"tailwind-merge": "^3.3.0",
 		"tailwindcss-animate": "^1.0.7",
-		"zod": "^3.25.13",
-		"zustand": "^5.0.4"
+		"zod": "^3.25.28",
+		"zustand": "^5.0.5"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
@@ -74,9 +74,9 @@
 		"@tailwindcss/postcss": "^4.1.7",
 		"@testing-library/react": "^16.3.0",
 		"@types/node": "^22.15.21",
-		"@types/react": "^19.1.4",
+		"@types/react": "^19.1.5",
 		"@types/react-dom": "^19.1.5",
-		"@vitejs/plugin-react": "^4.4.1",
+		"@vitejs/plugin-react": "^4.5.0",
 		"conventional-changelog-atom": "^5.0.0",
 		"husky": "^9.1.7",
 		"jsdom": "^26.1.0",
