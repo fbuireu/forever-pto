@@ -7,6 +7,7 @@ import { createQueryString } from "@modules/components/appSidebar/components/app
 import { Input } from "@modules/components/core/input/Input";
 import { useDebouncedCallback } from "@ui/hooks/useDebounceCallback/useDebounceCallback";
 import { Label } from "@ui/modules/components/core/label/Label";
+import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ChangeEvent } from "react";
 import { startTransition, useCallback, useMemo, useState } from "react";
@@ -16,6 +17,7 @@ export interface PtoDaysProps {
 }
 
 export const PtoDays = ({ ptoDays }: PtoDaysProps) => {
+	const t = useTranslations("ptoDays");
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
@@ -79,12 +81,12 @@ export const PtoDays = ({ ptoDays }: PtoDaysProps) => {
 	return (
 		<div className="flex items-center gap-2">
 			<Label htmlFor="available-days" className="whitespace-nowrap">
-				Tengo
+				{t("got")}
 			</Label>
 			<MinusButton onClick={decrementDays} disabled={localDaysValue <= 0} />
 			{daysInput}
 			<PlusButton onClick={incrementDays} />
-			<span>días libres</span>
+			<span>{t("days", { days: localDaysValue })}</span>
 		</div>
 	);
 };

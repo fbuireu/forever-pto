@@ -12,6 +12,7 @@
 		"totalDays": "Totale giorni"
 	},
 	"filters": {
+		"title": "Configurazione & Filtri",
 		"country": "Paese",
 		"region": "Regione",
 		"year": "Anno",
@@ -29,5 +30,13 @@
 		"light": "Ciaro",
 		"dark": "Scuro",
 		"system": "Sistema"
+	},
+	"ptoDays": {
+		"got": "Ho",
+		"days": "{days, plural, one {dia libero} other {dia liberi}}",
+		"tooltip": "Questo interruttore permette di abilitare o disabilitare il suggerimento dei giorni festivi passati. Questo consente di vedere le opportunità di ferie perse nel passato"
+	},
+	"carryOverMonths": {
+		"tooltip": "Permette di aggiungere mesi all'anno seguente per ampliare la ricerca di opportunità"
 	}
 }

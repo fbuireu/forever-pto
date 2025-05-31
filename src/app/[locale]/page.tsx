@@ -12,13 +12,16 @@ import CalendarList from "@ui/modules/components/home/components/calendarList/Ca
 import HolidaysSummary from "@ui/modules/components/home/components/holidaySummary/HolidaysSummary";
 import { HolidaysProvider } from "@ui/providers/holidays/HolidaysProvider";
 import { PremiumProvider } from "@ui/providers/premium/PremiumProvider";
+import type { Locale } from "next-intl";
 import { generateMetadata } from "./metadata";
 
 export interface ForeverPtoProps {
 	searchParams: Promise<SearchParams>;
+	params: Promise<{ locale: Locale }>;
 }
 
-const ForeverPto = async ({ searchParams }: ForeverPtoProps) => {
+const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
+	const { locale } = await params;
 	const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS, CARRY_OVER_MONTHS } = DEFAULT_QUERY_PARAMS;
 	const {
 		country,
@@ -45,6 +48,7 @@ const ForeverPto = async ({ searchParams }: ForeverPtoProps) => {
 					year={year}
 					allowPastDays={allowPastDays}
 					carryOverMonths={carryOverMonths}
+					locale={locale}
 				/>
 				<SidebarTrigger />
 				<div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-8">

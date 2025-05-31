@@ -9,11 +9,15 @@ import { Regions } from "@modules/components/appSidebar/components/appSidebar/at
 import { Years } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/atoms/years/Years";
 import type { SidebarItem } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/types";
 import { Calendar, CalendarDays, MapPin, MapPinned, ToggleLeftIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { type Locale, useTranslations } from "next-intl";
 import { useMemo } from "react";
 
-export function useSidebarItems(params: SearchParams): SidebarItem[] {
-	const { country, region, ptoDays, year, allowPastDays, carryOverMonths } = params;
+interface UseSidebarItemsParams extends SearchParams {
+	locale: Locale;
+}
+
+export function useSidebarItems(params: UseSidebarItemsParams): SidebarItem[] {
+	const { country, region, ptoDays, year, allowPastDays, carryOverMonths, locale } = params;
 	const t = useTranslations("filters");
 
 	return useMemo(
@@ -47,16 +51,16 @@ export function useSidebarItems(params: SearchParams): SidebarItem[] {
 				title: t("allowPastDays"),
 				icon: ToggleLeftIcon,
 				renderComponent: () => <AllowPastDays allowPastDays={allowPastDays} />,
-				renderTooltip: () => <AllowPasDaysInfoTooltip />,
+				renderTooltip: () => <AllowPasDaysInfoTooltip locale={locale} />,
 			},
 			{
 				id: "carry-over-months",
 				title: t("carryOverMonths"),
 				icon: ToggleLeftIcon,
 				renderComponent: () => <CarryOverMonths carryOverMonths={carryOverMonths} />,
-				renderTooltip: () => <CarryOverMonthsTooltip />,
+				renderTooltip: () => <CarryOverMonthsTooltip locale={locale} />,
 			},
 		],
-		[country, region, ptoDays, year, allowPastDays, carryOverMonths, t],
+		[country, region, ptoDays, year, allowPastDays, carryOverMonths, locale, t],
 	);
 }

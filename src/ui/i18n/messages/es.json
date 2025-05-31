@@ -12,6 +12,7 @@
 		"totalDays": "Total días"
 	},
 	"filters": {
+		"title": "Configuración & Filtros",
 		"country": "País",
 		"region": "Región",
 		"year": "Año",
@@ -29,5 +30,13 @@
 		"light": "Claro",
 		"dark": "Oscuro",
 		"system": "Sistema"
+	},
+	"ptoDays": {
+		"got": "Tengo",
+		"days": "{days, plural, one {día libre} other {días libres}}",
+		"tooltip": "Este switch permite habilitar o deshabilitar la sugerencia de días festivos pasados. Esto permite ver las oportunidades de PTO que se perdieron en el pasado"
+	},
+	"carryOverMonths": {
+		"tooltip": "Permite añadir meses al siguiente año para ampliar la búsqueda de oportunidades"
 	}
 }

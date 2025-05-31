@@ -12,10 +12,15 @@ import { SidebarMenuButton } from "@modules/components/core/sidebar/atoms/sideba
 import { SidebarMenuItem } from "@modules/components/core/sidebar/atoms/sidebarMenuItem/SidebarMenuItem";
 import { ThemeToggle } from "@ui/modules/components/appSidebar/components/appSidebar/atoms/themeToggle/ThemeToggle";
 import { Sidebar } from "@ui/modules/components/core/sidebar/Sidebar";
+import type { Locale } from "next-intl";
 import { memo } from "react";
 
-export const AppSidebar = memo((params: SearchParams) => {
-	const sidebarItems = useSidebarItems(params);
+interface AppSidebarProps extends SearchParams {
+	locale: Locale;
+}
+
+export const AppSidebar = memo((params: AppSidebarProps) => {
+	const sidebarItems = useSidebarItems({ ...params });
 
 	return (
 		<Sidebar collapsible="icon" variant="sidebar">

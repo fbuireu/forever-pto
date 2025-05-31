@@ -12,6 +12,7 @@
 		"totalDays": "Total days"
 	},
 	"filters": {
+		"title": "Configuration & Filters",
 		"country": "Country",
 		"region": "Region",
 		"year": "Year",
@@ -29,5 +30,13 @@
 		"light": "Light",
 		"dark": "Dark",
 		"system": "System"
+	},
+	"ptoDays": {
+		"got": "I got",
+		"days": "free {days, plural, one {day} other {days}}",
+		"tooltip": "This switch allows you to enable or disable the suggestion of past holidays. This lets you see PTO opportunities that were missed in the past"
+	},
+	"carryOverMonths": {
+		"tooltip": "Allows adding months to the following year to expand the search for opportunities"
 	}
 }
