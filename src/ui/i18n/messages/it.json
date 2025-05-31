@@ -2,7 +2,7 @@
 	"metadata": {
 		"title": "Forever PTO - Ottimizza i tuoi giorni liberi",
 		"description": "Applicazione per ottimizzare la selezione dei giorni PTO e massimizzare il tuo tempo libero",
-        "keywords": "giorni liberi, calendario dei giorni liberi, tracciamento dei giorni liberi, pianificatore dei giorni liberi, gestione dei giorni liberi"
+		"keywords": "giorni liberi, calendario dei giorni liberi, tracciamento dei giorni liberi, pianificatore dei giorni liberi, gestione dei giorni liberi"
 	},
 	"calendar": {
 		"selectDays": "Seleziona i tuoi giorni PTO",
@@ -25,7 +25,7 @@
 		"ca": "Catalano",
 		"it": "Italiano"
 	},
-    "theme": {
+	"theme": {
 		"light": "Ciaro",
 		"dark": "Scuro",
 		"system": "Sistema"

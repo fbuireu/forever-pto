@@ -10,6 +10,6 @@ const getThemeProvider = async () => {
 
 const NextThemesProvider = dynamic(() => getThemeProvider(), { ssr: false });
 
-export function ThemeProvider({ children, ...props }: ComponentProps<typeof NextThemesProvider>) {
+export function ThemeProvider({ children, ...props }: Readonly<ComponentProps<typeof NextThemesProvider>>) {
 	return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
 }

@@ -10,6 +10,6 @@ export const DATE_FNS_LOCALES = {
 	it: it,
 } as const;
 
-export function getLocalizedDateFns(locale: LocaleKey = I18N_CONFIG.DEFAULT_LOCALE as Locale): Locale {
+export function getLocalizedDateFns(locale: LocaleKey = I18N_CONFIG.DEFAULT_LOCALE): Locale {
 	return DATE_FNS_LOCALES[locale];
 }

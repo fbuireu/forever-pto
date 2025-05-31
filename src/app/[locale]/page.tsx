@@ -83,5 +83,5 @@ export { generateMetadata };
 // 2- add FAQ + roadmap
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc)
 // 2- remove env vars
-// 24- Edit weekends (paid functionality)
+// 24- Edit weekends (paid functionality). Edit days (add and remove days) (paid functionality)
 // 34- Ko-Fi BE integration (webhook not working on localhost)

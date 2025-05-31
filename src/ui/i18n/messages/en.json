@@ -25,7 +25,7 @@
 		"ca": "Catalan",
 		"it": "Italian"
 	},
-    "theme": {
+	"theme": {
 		"light": "Light",
 		"dark": "Dark",
 		"system": "System"
