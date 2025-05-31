@@ -1,11 +1,8 @@
 {
-	"common": {
+	"metadata": {
 		"title": "Forever PTO - Optimize your time off",
-		"description": "Application to optimize PTO day selection and maximize your free time"
-	},
-	"navigation": {
-		"home": "Home",
-		"settings": "Settings"
+		"description": "Application to optimize PTO day selection and maximize your free time",
+		"keywords": "pto, pto calendar, pto tracker, pto planner, pto management"
 	},
 	"calendar": {
 		"selectDays": "Select your PTO days",
@@ -14,7 +11,7 @@
 		"selected": "Selected",
 		"totalDays": "Total days"
 	},
-	"settings": {
+	"filters": {
 		"country": "Country",
 		"region": "Region",
 		"year": "Year",
@@ -27,5 +24,10 @@
 		"es": "Spanish",
 		"ca": "Catalan",
 		"it": "Italian"
+	},
+    "theme": {
+		"light": "Light",
+		"dark": "Dark",
+		"system": "System"
 	}
 }

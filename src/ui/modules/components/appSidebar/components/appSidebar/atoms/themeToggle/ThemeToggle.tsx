@@ -3,15 +3,15 @@
 import { DropdownMenuContent } from "@modules/components/core/dropdownMenu/atoms/dropdownMenuContent/DropdownMenuContent";
 import { DropdownMenuItem } from "@modules/components/core/dropdownMenu/atoms/dropdownMenuItem/DropdownMenuItem";
 import { DropdownMenuTrigger } from "@modules/components/core/dropdownMenu/atoms/dropdownMenuTrigger/DropdownMenuTrigger";
-import { useSidebar } from "@modules/components/core/sidebar/hooks/useSidebar/useSidebar";
 import { Button } from "@ui/modules/components/core/button/Button";
 import { DropdownMenu } from "@ui/modules/components/core/dropdownMenu/DropdownMenu";
 import { Moon, Sun } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 
 export const ThemeToggle = () => {
 	const { setTheme } = useTheme();
-	const { state } = useSidebar();
+	const t = useTranslations("theme");
 
 	return (
 		<DropdownMenu>
@@ -23,9 +23,9 @@ export const ThemeToggle = () => {
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end">
-				<DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
-				<DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>
-				<DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>
+				<DropdownMenuItem onClick={() => setTheme("light")}>{t("light")}</DropdownMenuItem>
+				<DropdownMenuItem onClick={() => setTheme("dark")}>{t("dark")}</DropdownMenuItem>
+				<DropdownMenuItem onClick={() => setTheme("system")}>{t("system")}</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

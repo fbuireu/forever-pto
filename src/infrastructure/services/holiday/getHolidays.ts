@@ -26,23 +26,17 @@ export async function getHolidays({
 
 	try {
 		const userLanguage = (await getUserLocale()) ?? getUserLanguage()[0];
-
 		const configuration = {
 			languages: [userLanguage],
 			timezone: getUserTimezone(),
 		};
-
-		const nationalHolidays = getNationalHolidays({
+		const params = {
 			country,
 			configuration,
 			year: Number(year),
-		});
-		const regionalHolidays = getRegionalHolidays({
-			country,
-			region,
-			configuration,
-			year: Number(year),
-		});
+		};
+		const nationalHolidays = getNationalHolidays(params);
+		const regionalHolidays = getRegionalHolidays({ ...params, region });
 
 		return holidayDTO
 			.create({

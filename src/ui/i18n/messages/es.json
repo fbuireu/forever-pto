@@ -1,11 +1,8 @@
 {
-	"common": {
+	"metadata": {
 		"title": "Forever PTO - Optimiza tus días libres",
-		"description": "Aplicación para optimizar la selección de días PTO y maximizar tu tiempo libre"
-	},
-	"navigation": {
-		"home": "Inicio",
-		"settings": "Configuración"
+		"description": "Aplicación para optimizar la selección de días PTO y maximizar tu tiempo libre",
+        "keywords": "días libres, calendario de días libres, seguimiento de días libres, planificador de días libres, gestión de días libres"
 	},
 	"calendar": {
 		"selectDays": "Selecciona tus días PTO",
@@ -14,7 +11,7 @@
 		"selected": "Seleccionados",
 		"totalDays": "Total días"
 	},
-	"settings": {
+	"filters": {
 		"country": "País",
 		"region": "Región",
 		"year": "Año",
@@ -27,5 +24,10 @@
 		"es": "Español",
 		"ca": "Catalán",
 		"it": "Italiano"
+	},
+    "theme": {
+		"light": "Claro",
+		"dark": "Oscuro",
+		"system": "Sistema"
 	}
 }

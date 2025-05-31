@@ -9,13 +9,15 @@ interface GenerateMetadataParams {
 
 export async function generateMetadata({ params }: GenerateMetadataParams): Promise<Metadata> {
 	const { locale } = await params;
-	const t = await getTranslations({ locale, namespace: "common" });
+	const t = await getTranslations({ locale, namespace: "metadata" });
 
 	return {
 		title: t("title"),
 		description: t("description"),
-		metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"),
-		keywords: ["pto", "pto calendar", "pto tracker", "pto planner", "pto management"],
+		metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"),
+		keywords: t("keywords")
+			.split(",")
+			.map((keyword: string) => keyword.trim()),
 		alternates: {
 			canonical: "/",
 			languages: I18N_CONFIG.LOCALES.reduce((acc, lang) => Object.assign(acc, { [lang]: `/${lang}` }), {}),

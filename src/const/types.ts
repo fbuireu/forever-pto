@@ -79,7 +79,7 @@ export interface FilterMaximumValues {
 export interface I18nConfig extends Except<ReturnType<typeof defineRouting>, "defaultLocale"> {
 	locales: readonly ["en", "es", "ca", "it"];
 	cookie_name: "NEXT_LOCALE";
-	default_locale: ReturnType<typeof defineRouting>["defaultLocale"];
+	default_locale: typeof defineRouting extends { defaultLocale: infer D } ? D : "en";
 	locale_detection: ReturnType<typeof defineRouting>["localeDetection"];
 	locale_prefix: ReturnType<typeof defineRouting>["localePrefix"];
 }

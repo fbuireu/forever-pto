@@ -1,11 +1,8 @@
 {
-	"common": {
+	"metadata": {
 		"title": "Forever PTO - Optimitza els teus dies lliures",
-		"description": "Aplicació per optimitzar la selecció de dies PTO i maximitzar el teu temps lliure"
-	},
-	"navigation": {
-		"home": "Inici",
-		"settings": "Configuració"
+		"description": "Aplicació per optimitzar la selecció de dies PTO i maximitzar el teu temps lliure",
+        "keywords": "dies lliures, calendari de dies lliures, seguiment de dies lliures, planificador de dies lliures, gestió de dies lliures" 
 	},
 	"calendar": {
 		"selectDays": "Selecciona els teus dies PTO",
@@ -14,7 +11,7 @@
 		"selected": "Seleccionats",
 		"totalDays": "Total dies"
 	},
-	"settings": {
+	"filters": {
 		"country": "País",
 		"region": "Regió",
 		"year": "Any",
@@ -27,5 +24,10 @@
 		"es": "Castellà",
 		"ca": "Català",
 		"it": "Italià"
+	},
+    "theme": {
+		"light": "Clar",
+		"dark": "Fosc",
+		"system": "Sistema"
 	}
 }
