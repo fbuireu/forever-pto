@@ -8,7 +8,7 @@ import { PtoDays } from "@modules/components/appSidebar/components/appSidebar/at
 import { Regions } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/atoms/regions/Regions";
 import { Years } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/atoms/years/Years";
 import type { SidebarItem } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/types";
-import { Calendar, CalendarDays, MapPin, MapPinned, ToggleLeftIcon } from "lucide-react";
+import { Calendar, CalendarDays, MapPin, MapPinned, SlidersHorizontal, ToggleLeftIcon } from "lucide-react";
 import { type Locale, useTranslations } from "next-intl";
 import { useMemo } from "react";
 
@@ -56,7 +56,7 @@ export function useSidebarItems(params: UseSidebarItemsParams): SidebarItem[] {
 			{
 				id: "carry-over-months",
 				title: t("carryOverMonths"),
-				icon: ToggleLeftIcon,
+				icon: SlidersHorizontal,
 				renderComponent: () => <CarryOverMonths carryOverMonths={carryOverMonths} />,
 				renderTooltip: () => <CarryOverMonthsTooltip locale={locale} />,
 			},
