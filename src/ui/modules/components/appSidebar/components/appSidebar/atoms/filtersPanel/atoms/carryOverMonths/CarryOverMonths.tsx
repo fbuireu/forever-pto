@@ -93,11 +93,7 @@ export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 
 	if (!isPremiumUser) {
 		return (
-			<PremiumLock
-				isActive={true}
-				featureName="Meses adicionales"
-				description="Desbloquea la posibilidad de ver más meses del próximo año con tu suscripción premium."
-			>
+			<PremiumLock featureName={t("premiumTooltip")} description={t("premiumDescription")}>
 				{sliderComponent}
 			</PremiumLock>
 		);

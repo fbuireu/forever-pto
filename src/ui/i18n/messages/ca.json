@@ -58,6 +58,8 @@
 		"monthsToShow": "Mesos a mostrar: {months}",
 		"rangeMin": "1 mes",
 		"rangeMax": "{months, plural, one {# mes} other {# mesos}}",
-		"tooltip": "Permet afegir mesos a l'any següent per ampliar la cerca d'oportunitats"
+		"tooltip": "Permet afegir mesos a l'any següent per ampliar la cerca d'oportunitats",
+		"premiumTooltip": "Mesos addicionals",
+		"premiumDescription": "Desbloqueja la possibilitat d'afegir mesos a l'any següent"
 	}
 }

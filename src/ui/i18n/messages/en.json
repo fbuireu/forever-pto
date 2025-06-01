@@ -58,6 +58,8 @@
 		"monthsToShow": "Months to show: {months}",
 		"rangeMin": "1 month",
 		"rangeMax": "{months, plural, one {# month} other {# months}}",
-		"tooltip": "Allows adding months to the following year to expand opportunity search"
+		"tooltip": "Allows adding months to the following year to expand opportunity search",
+		"premiumTooltip": "Additional months",
+		"premiumDescription": "Unlocks the ability to add months to the following year"
 	}
 }

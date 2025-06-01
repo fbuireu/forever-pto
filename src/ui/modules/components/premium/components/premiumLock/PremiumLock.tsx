@@ -132,9 +132,7 @@ export const PremiumLock = ({
 							/>
 						</div>
 						{featureName && variant === "default" && <p className="text-sm font-medium">{featureName}</p>}
-						{description && variant === "default" && (
-							<p className="text-xs text-muted-foreground">Clic para verificar tu suscripción</p>
-						)}
+						{description && variant === "default" && <p className="text-xs text-muted-foreground">{description}</p>}
 					</>
 				)}
 			</button>
