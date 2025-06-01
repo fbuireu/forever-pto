@@ -12,7 +12,7 @@ interface AllowPasDaysInfoTooltipProps {
 }
 
 export const AllowPasDaysInfoTooltip = memo(async ({ locale }: AllowPasDaysInfoTooltipProps) => {
-	const t = await getTranslations({ locale, namespace: "ptoDays" });
+	const t = await getTranslations({ locale, namespace: "allowPastDays" });
 
 	return (
 		<TooltipProvider>

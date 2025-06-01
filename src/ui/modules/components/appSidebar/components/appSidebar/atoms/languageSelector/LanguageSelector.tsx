@@ -7,6 +7,7 @@ import { DropdownMenuContent } from "@modules/components/core/dropdownMenu/atoms
 import { DropdownMenuItem } from "@modules/components/core/dropdownMenu/atoms/dropdownMenuItem/DropdownMenuItem";
 import { DropdownMenuTrigger } from "@modules/components/core/dropdownMenu/atoms/dropdownMenuTrigger/DropdownMenuTrigger";
 import { useSidebar } from "@modules/components/core/sidebar/hooks/useSidebar/useSidebar";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { Check } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
@@ -36,7 +37,7 @@ export const LanguageSelector = () => {
 					<DropdownMenuItem
 						key={language.code}
 						onClick={() => handleLanguageChange(language.code)}
-						className="flex items-center justify-between"
+						className={mergeClasses("flex items-center justify-between", language.code === locale && "bg-accent")}
 					>
 						<span>{language.label}</span>
 						{language.code === locale && <Check className="h-4 w-4" />}

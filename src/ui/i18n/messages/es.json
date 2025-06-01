@@ -33,10 +33,31 @@
 	},
 	"ptoDays": {
 		"got": "Tengo",
-		"days": "{days, plural, one {día libre} other {días libres}}",
+		"days": "{days, plural, one {día libre} other {días libres}}"
+	},
+	"countries": {
+		"heading": "Países",
+		"label": "País",
+		"placeholder": "Selecciona tu país",
+		"searchPlaceholder": "Buscar país...",
+		"notFound": "País no encontrado"
+	},
+	"regions": {
+		"label": "Región",
+		"heading": "{hasCountry, plural, =0 {Regiones} other {Regiones en {country}}}",
+		"placeholder": "{count, plural, =0 {No se encontraron regiones para {country}} other {Selecciona región...}}",
+		"searchPlaceholder": "Buscar región...",
+		"notFound": "Región no encontrada."
+	},
+	"allowPastDays": {
+		"enabled": "Activado",
+		"disabled": "Desactivado",
 		"tooltip": "Este switch permite habilitar o deshabilitar la sugerencia de días festivos pasados. Esto permite ver las oportunidades de PTO que se perdieron en el pasado"
 	},
 	"carryOverMonths": {
-		"tooltip": "Permite añadir meses al siguiente año para ampliar la búsqueda de oportunidades"
+		"monthsToShow": "Meses a mostrar: {months}",
+		"rangeMin": "1 mes",
+		"rangeMax": "{months, plural, one {# mes} other {# meses}}",
+		"tooltip": "Permite agregar meses al año siguiente para ampliar la búsqueda de oportunidades"
 	}
 }

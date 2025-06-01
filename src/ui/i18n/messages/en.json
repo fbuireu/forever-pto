@@ -33,10 +33,31 @@
 	},
 	"ptoDays": {
 		"got": "I got",
-		"days": "free {days, plural, one {day} other {days}}",
+		"days": "free {days, plural, one {day} other {days}}"
+	},
+	"countries": {
+		"heading": "Countries",
+		"label": "Country",
+		"placeholder": "Select your country",
+		"searchPlaceholder": "Search country...",
+		"notFound": "Country not found"
+	},
+	"regions": {
+		"label": "Region",
+		"heading": "{hasCountry, plural, =0 {Regions} other {Regions in {country}}}",
+		"placeholder": "{count, plural, =0 {Regions not found for {country}} other {Search region...}}",
+		"searchPlaceholder": "Search region...",
+		"notFound": "Region not found"
+	},
+	"allowPastDays": {
+		"enabled": "Enabled",
+		"disabled": "Disabled",
 		"tooltip": "This switch allows you to enable or disable the suggestion of past holidays. This lets you see PTO opportunities that were missed in the past"
 	},
 	"carryOverMonths": {
-		"tooltip": "Allows adding months to the following year to expand the search for opportunities"
+		"monthsToShow": "Months to show: {months}",
+		"rangeMin": "1 month",
+		"rangeMax": "{months, plural, one {# month} other {# months}}",
+		"tooltip": "Allows adding months to the following year to expand opportunity search"
 	}
 }

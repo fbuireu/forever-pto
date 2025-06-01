@@ -7,6 +7,7 @@ import { createQueryString } from "@modules/components/appSidebar/components/app
 import { Label } from "@ui/modules/components/core/label/Label";
 import { Slider } from "@ui/modules/components/core/slider/Slider";
 import { PremiumLock } from "@ui/modules/components/premium/components/premiumLock/PremiumLock";
+import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { startTransition, useCallback, useMemo, useState } from "react";
 
@@ -15,6 +16,7 @@ export interface CarryOverMonthsProps {
 }
 
 export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
+	const t = useTranslations("carryOverMonths");
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
@@ -52,21 +54,21 @@ export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 		() => (
 			<div className="flex items-center justify-between">
 				<Label htmlFor="months-slider" className="text-sm select-none">
-					Meses a mostrar: {value[0]}
+					{t("monthsToShow", { months: value[0] })}
 				</Label>
 			</div>
 		),
-		[value],
+		[value, t],
 	);
 
 	const sliderRangeLabels = useMemo(
 		() => (
 			<div className="flex justify-between text-xs text-muted-foreground">
-				<span>1 mes</span>
-				<span>{maxValue} meses</span>
+				<span>{t("rangeMin")}</span>
+				<span>{t("rangeMax", { months: maxValue })}</span>
 			</div>
 		),
-		[maxValue],
+		[maxValue, t],
 	);
 
 	const sliderComponent = useMemo(

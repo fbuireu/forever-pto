@@ -32,13 +32,13 @@ export function useSidebarItems(params: UseSidebarItemsParams): SidebarItem[] {
 				id: "country",
 				title: t("country"),
 				icon: MapPin,
-				renderComponent: () => <Countries country={country} />,
+				renderComponent: () => <Countries country={country} locale={locale} />,
 			},
 			{
 				id: "region",
 				title: t("region"),
 				icon: MapPinned,
-				renderComponent: () => <Regions country={country} region={region} />,
+				renderComponent: () => <Regions country={country} region={region} locale={locale} />,
 			},
 			{
 				id: "year",

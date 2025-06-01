@@ -54,19 +54,18 @@ export const Combobox = ({
 	const handleSelect = useCallback(
 		(currentValue: string) => {
 			const selectedOption = options.find((option) => option.label === currentValue);
-			if (selectedOption?.value) {
-				setLocalValue(selectedOption.value.toLowerCase());
+			if (!selectedOption) return;
+			setLocalValue(selectedOption.value.toLowerCase());
 
-				const query = createQueryString({
-					value: selectedOption.value.toLowerCase(),
-					type,
-					searchParams,
-				});
-				startTransition(() => {
-					setIsOpen(false);
-					router.replace(`${pathname}?${query}`, { scroll: false });
-				});
-			}
+			const query = createQueryString({
+				value: selectedOption.value.toLowerCase(),
+				type,
+				searchParams,
+			});
+			startTransition(() => {
+				setIsOpen(false);
+				router.replace(`${pathname}?${query}`, { scroll: false });
+			});
 		},
 		[options, type, searchParams, pathname, router],
 	);
@@ -77,17 +76,21 @@ export const Combobox = ({
 				<CommandItem
 					key={option.label}
 					value={option?.label}
-					className="hover:bg-slate-250 cursor-pointer rounded-md transition-colors duration-200"
-					onSelect={(value) => {
-						handleSelect(value);
-					}}
+					className={mergeClasses(
+						"hover:bg-slate-250 cursor-pointer rounded-md transition-colors duration-200",
+						localValue?.toLocaleLowerCase() === option.value.toLocaleLowerCase() && "bg-slate-250",
+					)}
+					onSelect={(value) => handleSelect(value)}
 				>
 					<div className="flex w-full items-center gap-2">
 						{hasFlag(option) && <div className="relative h-4 w-6 overflow-hidden rounded">{option.flag}</div>}
 						<span>{option.label}</span>
 					</div>
 					<Check
-						className={mergeClasses("ml-auto h-4 w-4", localValue === option.value ? "opacity-100" : "opacity-0")}
+						className={mergeClasses(
+							"ml-auto h-4 w-4",
+							localValue?.toLocaleLowerCase() === option.value.toLocaleLowerCase() ? "opacity-100" : "opacity-0",
+						)}
 					/>
 				</CommandItem>
 			)),

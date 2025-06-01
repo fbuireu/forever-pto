@@ -33,10 +33,31 @@
 	},
 	"ptoDays": {
 		"got": "Tinc",
-		"days": "{days, plural, one {dia lliure} other {dies lliures}}",
+		"days": "{days, plural, one {dia lliure} other {dies lliures}}"
+	},
+	"countries": {
+		"heading": "Països",
+		"label": "País",
+		"placeholder": "Selecciona el teu país",
+		"searchPlaceholder": "Cerca país...",
+		"notFound": "País no trobat"
+	},
+	"regions": {
+		"label": "Regió",
+		"heading": "{hasCountry, plural, =0 {Regions} other {Regions in {country}}}",
+		"placeholder": "{count, plural, =0 {No s'han trobat regions per a {country}} other {Selecciona regió...}}",
+		"searchPlaceholder": "Cerca regió...",
+		"notFound": "Regió no trobada."
+	},
+	"allowPastDays": {
+		"enabled": "Activat",
+		"disabled": "Desactivat",
 		"tooltip": "Aquest interruptor permet habilitar o deshabilitar el suggeriment de dies festius passats. Això permet veure les oportunitats de vacances que es van perdre en el passat"
 	},
 	"carryOverMonths": {
+		"monthsToShow": "Mesos a mostrar: {months}",
+		"rangeMin": "1 mes",
+		"rangeMax": "{months, plural, one {# mes} other {# mesos}}",
 		"tooltip": "Permet afegir mesos a l'any següent per ampliar la cerca d'oportunitats"
 	}
 }

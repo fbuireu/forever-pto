@@ -4,6 +4,7 @@ import type { SearchParams } from "@const/types";
 import { createQueryString } from "@modules/components/appSidebar/components/appSidebar/utils/createQueryString/createQueryString";
 import { Label } from "@modules/components/core/label/Label";
 import { Switch } from "@modules/components/core/switch/Switch";
+import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { startTransition, useCallback, useMemo, useState } from "react";
 
@@ -16,6 +17,7 @@ export const AllowPastDays = ({ allowPastDays }: AllowPastDaysProps) => {
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const [isEnabled, setIsEnabled] = useState(allowPastDays === "true");
+	const t = useTranslations("allowPastDays");
 
 	const handleSwitchChange = useCallback(
 		(checked: boolean) => {
@@ -32,7 +34,7 @@ export const AllowPastDays = ({ allowPastDays }: AllowPastDaysProps) => {
 		[pathname, router, searchParams],
 	);
 
-	const labelText = useMemo(() => (isEnabled ? "Activado" : "Desactivado"), [isEnabled]);
+	const labelText = useMemo(() => (isEnabled ? t("enabled") : t("disabled")), [isEnabled, t]);
 
 	const switchControl = useMemo(
 		() => (
