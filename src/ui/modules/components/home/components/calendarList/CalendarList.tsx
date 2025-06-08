@@ -9,6 +9,7 @@ import { useCalendarInfo } from "@modules/components/home/components/calendarLis
 import { useCalendarInteractions } from "@modules/components/home/components/calendarList/hooks/useCalendarInteractions/useCalendarInteractions";
 import { areArraysEqual } from "@modules/components/home/components/calendarList/utils/arrayIsEqual/arrayIsEqual";
 import { Stats } from "@modules/components/home/components/stats/Stats";
+import { useTranslations } from "next-intl";
 import { memo } from "react";
 
 interface CalendarListProps {
@@ -28,6 +29,7 @@ export default function CalendarList({
 	userCountry,
 	userRegion,
 }: CalendarListProps) {
+	const t = useTranslations("calendarList");
 	const effectiveHolidays = useHolidaysStore((state) => state.effectiveHolidays);
 
 	const calendar = useCalendar({
@@ -58,6 +60,7 @@ export default function CalendarList({
 		holidays: effectiveHolidays,
 		calculateEffectiveDays: calendar.calculateEffectiveDays,
 		isDaySuggested: interactions.isDaySuggested,
+		t,
 	});
 
 	const calendarProps = {

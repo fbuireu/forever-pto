@@ -9,7 +9,7 @@ import { formatIntervals } from "@modules/components/home/components/calendarLis
 import { getDayPositionInBlock } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/getDayPositionInBlock/getDayPositionInBlock";
 import { getSuggestedDaysForMonth } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/getSuggestedDaysForMonth/getSuggestedDaysForMonth";
 import { getAlternativeDayPosition } from "@modules/components/home/components/calendarList/hooks/useCalendarInteractions/utils/getAlternativeDayPosition/getAlternativeDayPosition";
-import { useLocale } from "next-intl";
+import { useLocale, type useTranslations } from "next-intl";
 import { type ReactNode, useCallback, useMemo } from "react";
 
 interface UseCalendarInfoParams {
@@ -20,9 +20,9 @@ interface UseCalendarInfoParams {
 	ptoDays: number;
 	holidays: HolidayDTO[];
 	country?: string;
-	region?: string;
 	calculateEffectiveDays: (ptoDaysToAdd: Date[]) => EffectiveRatio;
 	isDaySuggested: (day: Date) => boolean;
+	t: ReturnType<typeof useTranslations>;
 }
 
 interface UseCalendarInfoReturn {
@@ -41,9 +41,9 @@ export function useCalendarInfo({
 	alternativeBlocks,
 	ptoDays,
 	holidays,
-	region,
 	calculateEffectiveDays,
 	isDaySuggested,
+	t,
 }: UseCalendarInfoParams): UseCalendarInfoReturn {
 	const locale = useLocale();
 
@@ -79,7 +79,7 @@ export function useCalendarInfo({
 				return null;
 			}
 
-			const formattedIntervals = formatIntervals(intervals, locale);
+			const formattedIntervals = formatIntervals({ intervals, locale, t });
 
 			if (formattedIntervals.length === 0) {
 				return null;
@@ -95,7 +95,7 @@ export function useCalendarInfo({
 				</>
 			);
 		},
-		[ptoDays, suggestedDays, calculateEffectiveDays, locale],
+		[ptoDays, suggestedDays, calculateEffectiveDays, locale, t],
 	);
 
 	const stats = useMemo(

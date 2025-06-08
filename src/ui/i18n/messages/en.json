@@ -4,6 +4,9 @@
 		"description": "Application to optimize PTO day selection and maximize your free time",
 		"keywords": "pto, pto calendar, pto tracker, pto planner, pto management"
 	},
+	"payments": {
+		"cta": "Premium"
+	},
 	"calendar": {
 		"selectDays": "Select your PTO days",
 		"holidays": "Holidays",
@@ -161,5 +164,26 @@
 			"calculating": "You have {ptoDaysAvailable} PTO days available. The system is calculating optimal gaps to maximize your vacation."
 		},
 		"noPtoDays": "You must set the number of available PTO days so the system can suggest optimal days to maximize your vacation."
+	},
+	"calendarList": {
+		"monthlySummary": {
+			"title": "Suggestions",
+			"tooltip": "Hover over a suggested day to see similar alternatives."
+		},
+		"intervals": {
+			"singleDay": "{month} {day}: 1 day",
+			"multipleDay": "{month} {startDay} to {endDay}: {amount} days"
+		}
+	},
+	"footer": {
+		"legend": {
+			"today": "Today",
+			"weekends": "Weekends",
+			"holidays": "Holidays",
+			"suggested": "Suggested days",
+			"alternatives": "Similar alternatives"
+		},
+		"instructions": "Weekends and holidays are already preselected. Click on any workday to add it as a PTO day.",
+		"limitations": "Limitations: suggestions are based on day blocks (if you hover over a group of 3 suggested days, alternatives will be searched that, with 3 PTO days, generate the same holidays)"
 	}
 }

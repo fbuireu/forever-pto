@@ -37,7 +37,6 @@ export interface KofiWidget {
 	username?: string;
 	type: "floating-chat";
 	donate_button: {
-		text: string;
 		text_color: string;
 	};
 }

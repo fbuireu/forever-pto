@@ -4,6 +4,9 @@
 		"description": "Aplicación para optimizar la selección de días PTO y maximizar tu tiempo libre",
 		"keywords": "días libres, calendario de días libres, seguimiento de días libres, planificador de días libres, gestión de días libres"
 	},
+	"payments": {
+		"cta": "Premium"
+	},
 	"calendar": {
 		"selectDays": "Selecciona tus días PTO",
 		"holidays": "Festivos",
@@ -161,5 +164,26 @@
 			"calculating": "Tienes {ptoDaysAvailable} días de PTO disponibles. El sistema está calculando los huecos óptimos para maximizar tus vacaciones."
 		},
 		"noPtoDays": "Debes establecer la cantidad de días PTO disponibles para que el sistema pueda sugerir los días óptimos para maximizar tus vacaciones."
+	},
+	"calendarList": {
+		"monthlySummary": {
+			"title": "Sugerencias",
+			"tooltip": "Pasa el cursor sobre un día sugerido para ver alternativas similares."
+		},
+		"intervals": {
+			"singleDay": "{day} de {month}: 1 día",
+			"multipleDay": "{startDay} al {endDay} de {month}: {amount} días"
+		}
+	},
+	"footer": {
+		"legend": {
+			"today": "Hoy",
+			"weekends": "Fines de semana",
+			"holidays": "Festivos",
+			"suggested": "Días sugeridos",
+			"alternatives": "Alternativas similares"
+		},
+		"instructions": "Los fines de semana y festivos ya están preseleccionados. Haz clic en cualquier día laborable para añadirlo como día PTO.",
+		"limitations": "Limitaciones: las sugerencias se basan en los bloques de días (si se hace hover sobre un grupo de 3 días sugeridos se buscarán alternativas que, con 3 días de PTO, generen los mismos días festivos)"
 	}
 }

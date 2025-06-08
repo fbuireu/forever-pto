@@ -109,7 +109,6 @@ export const KOFFI_WIDGET: CapitalizeKeys<KofiWidget> = {
 	USERNAME: process.env.NEXT_PUBLIC_KOFI_USERNAME,
 	TYPE: "floating-chat",
 	DONATE_BUTTON: {
-		TEXT: "Unlock Premium",
 		TEXT_COLOR: "#ffffff",
 	},
 };

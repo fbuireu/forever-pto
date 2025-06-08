@@ -4,6 +4,9 @@
 		"description": "Aplicació per optimitzar la selecció de dies PTO i maximitzar el teu temps lliure",
 		"keywords": "dies lliures, calendari de dies lliures, seguiment de dies lliures, planificador de dies lliures, gestió de dies lliures"
 	},
+	"payments": {
+		"cta": "Premium"
+	},
 	"calendar": {
 		"selectDays": "Selecciona els teus dies PTO",
 		"holidays": "Festius",
@@ -161,5 +164,26 @@
 			"calculating": "Tens {ptoDaysAvailable} dies de PTO disponibles. El sistema està calculant els forats òptims per maximitzar les teves vacances."
 		},
 		"noPtoDays": "Has d'establir la quantitat de dies PTO disponibles perquè el sistema pugui suggerir els dies òptims per maximitzar les teves vacances."
+	},
+	"calendarList": {
+		"monthlySummary": {
+			"title": "Suggeriments",
+			"tooltip": "Passa el cursor sobre un dia suggerit per veure alternatives similars"
+		},
+		"intervals": {
+			"singleDay": "{day} de {month}: 1 día",
+			"multipleDay": "{startDay} al {endDay} de {month}: {amount} días"
+		}
+	},
+	"footer": {
+		"legend": {
+			"today": "Avui",
+			"weekends": "Caps de setmana",
+			"holidays": "Festius",
+			"suggested": "Dies suggerits",
+			"alternatives": "Alternatives similars"
+		},
+		"instructions": "Els caps de setmana i festius ja estan preseleccionats. Fes clic en qualsevol dia laborable per afegir-lo com a dia PTO.",
+		"limitations": "Limitacions: els suggeriments es basen en els blocs de dies (si es fa hover sobre un grup de 3 dies suggerits es buscaran alternatives que, amb 3 dies de PTO, generin els mateixos dies festius)"
 	}
 }

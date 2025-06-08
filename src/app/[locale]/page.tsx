@@ -63,7 +63,7 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 							userRegion={userRegion}
 						/>
 					</HolidaysProvider>
-					<Footer />
+					<Footer locale={locale} />
 				</div>
 			</PremiumProvider>
 		</SidebarProvider>
@@ -80,13 +80,14 @@ export { generateMetadata };
 // 34- MCP server? (paid func)
 // 34- use fn to format messages in stats
 // 34- Readme
+// 35- Replace kofi for stripe
 
 // TODO: (release)
 // 2- SEO + check messages
-// 35- Check messages in premium modals (passed or not?)
 // 35- Check copies
 // 2- add FAQ + roadmap
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc)
 // 2- remove env vars
+// 2- suggestions should be same length
 // 24- Edit weekends (paid functionality). Edit days (add and remove days) (paid functionality)
 // 34- Ko-Fi BE integration (webhook not working on localhost)
