@@ -12,7 +12,7 @@ import { Label } from "@modules/components/core/label/Label";
 import { getLocalizedDateFns } from "@ui/utils/i18n/getLocalizedDateFns/getLocalizedDateFns";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
 interface EditHolidayModalProps {
@@ -27,6 +27,7 @@ export const EditHolidayModal = ({ isOpen, onClose, onSave, initialDate, initial
 	const [date, setDate] = useState<Date>(initialDate);
 	const [name, setName] = useState(initialName);
 	const locale = useLocale();
+	const t = useTranslations("editModal");
 
 	const handleSave = () => {
 		onSave(date, name);
@@ -37,11 +38,11 @@ export const EditHolidayModal = ({ isOpen, onClose, onSave, initialDate, initial
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Editar festivo</DialogTitle>
+					<DialogTitle>{t("title")}</DialogTitle>
 				</DialogHeader>
 				<div className="grid gap-4 py-4">
 					<div className="grid gap-2">
-						<Label htmlFor="date">Fecha</Label>
+						<Label htmlFor="date">{t("dateLabel")}</Label>
 						<div className="flex items-center gap-2">
 							<Calendar
 								mode="single"
@@ -57,15 +58,20 @@ export const EditHolidayModal = ({ isOpen, onClose, onSave, initialDate, initial
 						</div>
 					</div>
 					<div className="grid gap-2">
-						<Label htmlFor="name">Nombre</Label>
-						<Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre del festivo" />
+						<Label htmlFor="name">{t("nameLabel")}</Label>
+						<Input
+							id="name"
+							value={name}
+							onChange={(e) => setName(e.target.value)}
+							placeholder={t("namePlaceholder")}
+						/>
 					</div>
 				</div>
 				<DialogFooter>
 					<Button variant="outline" onClick={onClose}>
-						Cancelar
+						{t("cancel")}
 					</Button>
-					<Button onClick={handleSave}>Guardar</Button>
+					<Button onClick={handleSave}>{t("save")}</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

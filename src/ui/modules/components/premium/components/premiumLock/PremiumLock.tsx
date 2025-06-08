@@ -17,8 +17,13 @@ import { Dialog } from "@ui/modules/components/core/dialog/Dialog";
 import { Form } from "@ui/modules/components/core/form/Form";
 import { FormLabel } from "@ui/modules/components/core/form/atoms/FormLabel";
 import { Input } from "@ui/modules/components/core/input/Input";
+import { Tooltip } from "@ui/modules/components/core/tooltip/Tooltip";
+import { TooltipContent } from "@ui/modules/components/core/tooltip/atoms/tooltipContent/TooltipContent";
+import { TooltipTrigger } from "@ui/modules/components/core/tooltip/atoms/tooltipTrigger/TooltipTrigger";
+import { TooltipProvider } from "@ui/modules/components/core/tooltip/provider/TooltipProvider";
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { LockIcon, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { type MouseEvent, type ReactNode, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
@@ -29,7 +34,7 @@ interface PremiumLockProps {
 	children: ReactNode;
 	isActive?: boolean;
 	featureName?: string;
-	description?: string;
+	featureDescription?: string;
 	renderUnlocked?: (isPremium: boolean) => ReactNode;
 	variant?: "small" | "default" | "stacked";
 }
@@ -38,7 +43,7 @@ export const PremiumLock = ({
 	children,
 	isActive = true,
 	featureName,
-	description,
+	featureDescription,
 	renderUnlocked,
 	variant = "default",
 }: PremiumLockProps) => {
@@ -46,6 +51,7 @@ export const PremiumLock = ({
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [submitSuccess, setSubmitSuccess] = useState(false);
 	const [isPending, startTransition] = useTransition();
+	const t = useTranslations("premiumLock");
 
 	const form = useForm<FormValues>({
 		resolver: zodResolver(emailFormSchema),
@@ -74,14 +80,13 @@ export const PremiumLock = ({
 					setSubmitSuccess(true);
 				} else {
 					form.setError("email", {
-						message:
-							"No se ha encontrado ninguna suscripción premium con este email. Si ya has realizado un pago, asegúrate de usar el mismo email que utilizaste en Ko-fi.",
+						message: t("errors.notFound"),
 					});
 					return;
 				}
 			} catch (_) {
 				form.setError("email", {
-					message: "Ha ocurrido un error al verificar tu suscripción. Por favor, inténtalo de nuevo más tarde.",
+					message: t("errors.generic"),
 				});
 			}
 		});
@@ -89,14 +94,14 @@ export const PremiumLock = ({
 
 	const isLoading = isPending || isPremiumUserLoading;
 
-	return (
+	const premiumLockContent = (
 		<div
 			className={mergeClasses(
 				"relative",
 				variant === "default"
 					? "w-full h-full overflow-hidden"
 					: variant === "stacked"
-						? "w-full h-full flex"
+						? "w-full h-full flex justify-center items-center"
 						: "w-4 h-4",
 			)}
 		>
@@ -132,19 +137,19 @@ export const PremiumLock = ({
 							/>
 						</div>
 						{featureName && variant === "default" && <p className="text-sm font-medium">{featureName}</p>}
-						{description && variant === "default" && <p className="text-xs text-muted-foreground">{description}</p>}
+						{featureDescription && variant === "default" && (
+							<p className="text-xs text-muted-foreground">{featureDescription}</p>
+						)}
 					</>
 				)}
 			</button>
-			{variant === "stacked" && !isPremiumUser && <LockIcon />}
+			{variant === "stacked" && !isPremiumUser && <LockIcon size={16} />}
 			<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>{submitSuccess ? "¡Suscripción verificada!" : "Verifica tu suscripción premium"}</DialogTitle>
+						<DialogTitle>{submitSuccess ? t("modal.successTitle") : t("modal.title")}</DialogTitle>
 						<DialogDescription>
-							{submitSuccess
-								? "Tu suscripción premium ha sido verificada correctamente. ¡Disfruta de todas las funciones premium!"
-								: "Introduce el email que utilizaste en Ko-fi para verificar tu suscripción premium."}
+							{submitSuccess ? t("modal.successDescription") : t("modal.description")}
 						</DialogDescription>
 					</DialogHeader>
 					{!submitSuccess ? (
@@ -155,11 +160,11 @@ export const PremiumLock = ({
 									name="email"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Email</FormLabel>
+											<FormLabel>{t("modal.emailLabel")}</FormLabel>
 											<Input
 												{...field}
 												type="email"
-												placeholder="tu@email.com"
+												placeholder={t("modal.emailPlaceholder")}
 												autoComplete="off"
 												disabled={isLoading}
 											/>
@@ -172,21 +177,32 @@ export const PremiumLock = ({
 									disabled={isLoading}
 									className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary/90 transition-colors"
 								>
-									{isLoading ? "Verificando..." : "Verificar suscripción"}
+									{isLoading ? t("modal.verifying") : t("modal.verify")}
 								</Button>
 							</form>
 						</Form>
 					) : (
-						<p className="text-green-600 dark:text-green-400 mt-2">
-							Tu suscripción premium ha sido verificada correctamente. ¡Disfruta de todas las funciones premium!
-						</p>
+						<p className="text-green-600 dark:text-green-400 mt-2">{t("modal.successMessage")}</p>
 					)}
 					<DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
 						<X className="h-4 w-4" />
-						<span className="sr-only">Cerrar</span>
+						<span className="sr-only">{t("modal.close")}</span>
 					</DialogClose>
 				</DialogContent>
 			</Dialog>
 		</div>
 	);
+
+	if (variant !== "default" && featureDescription) {
+		return (
+			<TooltipProvider>
+				<Tooltip>
+					<TooltipTrigger asChild>{premiumLockContent}</TooltipTrigger>
+					<TooltipContent className="max-w-xs text-pretty">{featureDescription}</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
+		);
+	}
+
+	return premiumLockContent;
 };

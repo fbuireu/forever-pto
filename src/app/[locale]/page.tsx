@@ -83,6 +83,7 @@ export { generateMetadata };
 
 // TODO: (release)
 // 2- SEO + check messages
+// 35- Check messages in premium modals (passed or not?)
 // 35- Check copies
 // 2- add FAQ + roadmap
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc)

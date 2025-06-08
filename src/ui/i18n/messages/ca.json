@@ -59,7 +59,66 @@
 		"rangeMin": "1 mes",
 		"rangeMax": "{months, plural, one {# mes} other {# mesos}}",
 		"tooltip": "Permet afegir mesos a l'any següent per ampliar la cerca d'oportunitats",
-		"premiumTooltip": "Mesos addicionals",
-		"premiumDescription": "Desbloqueja la possibilitat d'afegir mesos a l'any següent"
+		"featureName": "Mesos addicionals",
+		"featureDescription": "Afegeix mesos a l'any següent"
+	},
+	"holidaysSummary": {
+		"national": "Festius nacionals",
+		"regional": "Festius regionals",
+		"custom": "Festius personalitzats",
+		"featureName": "Sel·lecció multiple",
+		"featureDescription": "Afegeix festius personalitzats"
+	},
+	"holidaysTable": {
+		"addHoliday": "Afegir festiu",
+		"selectAll": "Sel·lecionar tot",
+		"selectRow": "Sel·lecionar fila",
+		"removeSelected": "Eliminar seleccionados",
+		"notFound": "No s'han trobat {holiday} per a l'any següent",
+		"noResults": "No hi ha resultats",
+		"confirmTitle": "Eliminar festius",
+		"confirmDescription": "Estas segur que vols eliminar els festius seleccioants?",
+		"name": "Nom",
+		"actions": "Accions",
+		"date": "Data",
+		"edit": "Edita",
+		"remove": "Elimina",
+		"openMenu": "Obrir menu",
+		"featureName": "Sel·lecció multiple",
+		"featureDescription": "Elimina festius multiples",
+		"featureDescription2": "Edita o elimina festius",
+		"featureDescription3": "Seleciona festius multiples"
+	},
+	"confirmModal": {
+		"title": "Eliminar festiu",
+		"description": "Estás segur que vols eliminar aquest festiu? Aquesta acció no es pot desfer.",
+		"cancel": "Cancel·lar",
+		"confirm": "Eliminar"
+	},
+	"editModal": {
+		"title": "Editar festiu",
+		"dateLabel": "Data",
+		"nameLabel": "Nom",
+		"namePlaceholder": "Nom del festiu",
+		"cancel": "Cancel·lar",
+		"save": "Guardar"
+	},
+	"premiumLock": {
+		"modal": {
+			"title": "Verifica la teva subscripció premium",
+			"description": "Introdueix l'email que vas utilitzar a Ko-fi per verificar la teva subscripció premium.",
+			"successTitle": "Subscripció verificada!",
+			"successDescription": "La teva subscripció premium s'ha verificat correctament. Gaudeix de totes les funcions premium!",
+			"successMessage": "La teva subscripció premium s'ha verificat correctament. Gaudeix de totes les funcions premium!",
+			"emailLabel": "Email",
+			"emailPlaceholder": "el.teu@email.com",
+			"verify": "Verificar subscripció",
+			"verifying": "Verificant...",
+			"close": "Tancar"
+		},
+		"errors": {
+			"notFound": "No s'ha trobat cap subscripció premium amb aquest email. Si ja has fet un pagament, assegura't d'usar el mateix email que vas utilitzar a Ko-fi.",
+			"generic": "Ha ocorregut un error en verificar la teva subscripció. Siusplau, torna-ho a intentar més tard."
+		}
 	}
 }

@@ -59,7 +59,66 @@
 		"rangeMin": "1 mese",
 		"rangeMax": "{months, plural, one {# mese} other {# mesi}}",
 		"tooltip": "Permette di aggiungere mesi all'anno seguente per ampliare la ricerca di opportunità",
-		"premiumTooltip": "Mesi aditionali",
-		"premiumDescription": "Permete di aggiungere mesi all'anno seguente"
+		"featureName": "Mesi aditionali",
+		"featureDescription": "Aggiungere mesi all'anno seguente"
+	},
+	"holidaysSummary": {
+		"national": "Festività nazionali",
+		"regional": "Festività regionali",
+		"custom": "Festività personalizzate",
+		"featureName": "Selezione multipla",
+		"featureDescription": "Aggiungere festività personalizzate"
+	},
+	"holidaysTable": {
+		"addHoliday": "Aggiungi festività",
+		"selectAll": "Selezionare tuto",
+		"selectRow": "Selezionare fila",
+		"removeSelected": "Elimina selezionati",
+		"notFound": "Non sono state trovate {holiday} per l'anno prossimo",
+		"noResults": "Nessun risultato",
+		"confirmTitle": "Eliminare festività",
+		"confirmDescription": "Sei sicuro di voler eliminare le festività selezionate?",
+		"name": "Nome",
+		"actions": "Azione",
+		"date": "Date",
+		"edit": "Edita",
+		"remove": "Elimina",
+		"openMenu": "Aprire menu",
+		"featureName": "Selezione multipla",
+		"featureDescription": "Elimina multiple holidays",
+		"featureDescription2": "Edita o remuevi holidays",
+		"featureDescription3": "Seleziona multipli festività"
+	},
+	"confirmModal": {
+		"title": "Eliminare festività",
+		"description": "Sei sicuro di voler eliminare questa festività? Questa azione non può essere annullata.",
+		"cancel": "Annulla",
+		"confirm": "Elimina"
+	},
+	"editModal": {
+		"title": "Modifica festività",
+		"dateLabel": "Data",
+		"nameLabel": "Nome",
+		"namePlaceholder": "Nome della festività",
+		"cancel": "Annulla",
+		"save": "Salva"
+	},
+	"premiumLock": {
+		"modal": {
+			"title": "Verifica il tuo abbonamento premium",
+			"description": "Inserisci l'email che hai utilizzato su Ko-fi per verificare il tuo abbonamento premium.",
+			"successTitle": "Abbonamento verificato!",
+			"successDescription": "Il tuo abbonamento premium è stato verificato correttamente. Goditi tutte le funzionalità premium!",
+			"successMessage": "Il tuo abbonamento premium è stato verificato correttamente. Goditi tutte le funzionalità premium!",
+			"emailLabel": "Email",
+			"emailPlaceholder": "tua@email.com",
+			"verify": "Verifica abbonamento",
+			"verifying": "Verificando...",
+			"close": "Chiudi"
+		},
+		"errors": {
+			"notFound": "Non è stato trovato alcun abbonamento premium con questa email. Se hai già effettuato un pagamento, assicurati di utilizzare la stessa email che hai usato su Ko-fi.",
+			"generic": "Si è verificato un errore durante la verifica del tuo abbonamento. Riprova più tardi."
+		}
 	}
 }

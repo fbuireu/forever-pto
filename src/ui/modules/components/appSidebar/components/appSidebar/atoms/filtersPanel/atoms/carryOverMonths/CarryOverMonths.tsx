@@ -93,7 +93,7 @@ export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 
 	if (!isPremiumUser) {
 		return (
-			<PremiumLock featureName={t("premiumTooltip")} description={t("premiumDescription")}>
+			<PremiumLock featureName={t("featureName")} featureDescription={t("featureDescription")}>
 				{sliderComponent}
 			</PremiumLock>
 		);

@@ -1,4 +1,4 @@
-import type { badgeVariants } from "@modules/components/core/badge/Badge";
+import type { badgeVariants } from "@modules/components/core/badge/config";
 import type { VariantProps } from "class-variance-authority";
 
 export function getBadgeVariant(ratio: string): VariantProps<typeof badgeVariants>["variant"] {

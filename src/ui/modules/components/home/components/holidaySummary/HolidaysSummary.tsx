@@ -9,10 +9,13 @@ import { HolidaysTable } from "@modules/components/home/components/holidaySummar
 import { HolidayTabVariant } from "@modules/components/home/components/holidaySummary/types";
 import { PremiumLock } from "@modules/components/premium/components/premiumLock/PremiumLock";
 import { Tabs } from "@ui/modules/components/core/tabs/Tabs";
+import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
+import { useTranslations } from "next-intl";
 
 const HolidaysSummary = () => {
 	const effectiveHolidays = useHolidaysStore((state) => state.effectiveHolidays);
 	const { isPremiumUser } = usePremiumStore();
+	const t = useTranslations("holidaysSummary");
 
 	const nationalHolidays = effectiveHolidays.filter(({ variant }) => variant === "national");
 	const regionalHolidays = effectiveHolidays.filter(({ variant }) => variant === "regional");
@@ -27,7 +30,7 @@ const HolidaysSummary = () => {
 						disabled={!nationalHolidays.length}
 						className="relative"
 					>
-						Festivos Nacionales
+						{t("national")}
 						{nationalHolidays.length > 0 && (
 							<Badge variant="outline" className="ml-2 bg-primary/10 absolute right-2">
 								{nationalHolidays.length}
@@ -39,38 +42,37 @@ const HolidaysSummary = () => {
 						disabled={!regionalHolidays.length}
 						className="relative"
 					>
-						Festivos Regionales
+						{t("regional")}
 						{regionalHolidays.length > 0 && (
 							<Badge variant="outline" className="ml-2 bg-primary/10 absolute right-2">
 								{regionalHolidays.length}
 							</Badge>
 						)}
 					</TabsTrigger>
-					<PremiumLock
-						featureName="Selección múltiple"
-						description="Para poder seleccionar múltiples festivos, necesitas una suscripción premium."
-						variant="stacked"
-					>
-						<TabsTrigger value={HolidayTabVariant.customHolidays} disabled={!isPremiumUser} className="relative">
-							<div className="flex items-center gap-2">Festivos Personalizados</div>
+					<PremiumLock featureName={t("featureName")} featureDescription={t("featureDescription")} variant="stacked">
+						<TabsTrigger
+							value={HolidayTabVariant.customHolidays}
+							disabled={!isPremiumUser}
+							className={mergeClasses(
+								"relative",
+								!isPremiumUser && "opacity-50 data-[state=active]:opacity-50 shadow-none pointer-events-none",
+							)}
+						>
+							<div className="flex items-center gap-2">{t("custom")}</div>
 						</TabsTrigger>
 					</PremiumLock>
 				</TabsList>
 				<HolidaysTable
 					holidays={nationalHolidays}
-					title="Festivos Nacionales"
+					title={t("national")}
 					tabValue={HolidayTabVariant.nationalHolidays}
 				/>
 				<HolidaysTable
 					holidays={regionalHolidays}
-					title="Festivos Regionales"
+					title={t("regional")}
 					tabValue={HolidayTabVariant.regionalHolidays}
 				/>
-				<HolidaysTable
-					holidays={customHolidays}
-					title="Festivos Personalizados"
-					tabValue={HolidayTabVariant.customHolidays}
-				/>
+				<HolidaysTable holidays={customHolidays} title={t("custom")} tabValue={HolidayTabVariant.customHolidays} />
 			</Tabs>
 		</section>
 	);

@@ -33,7 +33,7 @@ import {
 } from "@tanstack/react-table";
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { AlertTriangle, Plus, Trash2 } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
 interface HolidaysTableProps {
@@ -50,10 +50,11 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 	const locale = useLocale();
+	const t = useTranslations("holidaysTable");
 
 	const table = useReactTable({
 		data: holidays,
-		columns: getColumns(locale),
+		columns: getColumns({ locale, translation: t }),
 		getCoreRowModel: getCoreRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
 		getSortedRowModel: getSortedRowModel(),
@@ -88,7 +89,7 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 				className="rounded-md border shadow-xs"
 				disabled={!holidays.length && tabValue !== HolidayTabVariant.customHolidays}
 			>
-				<AccordionItem value={tabValue}>
+				<AccordionItem value={tabValue} className="border-b-0 ">
 					<AccordionTrigger className="px-4">{title}</AccordionTrigger>
 					<AccordionContent>
 						<div className="p-4">
@@ -101,12 +102,12 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 								{tabValue === HolidayTabVariant.customHolidays && (
 									<Button variant="outline" size="sm" onClick={() => setIsAddModalOpen(true)} className="gap-2">
 										<Plus className="h-4 w-4" />
-										Añadir festivo
+										{t("addHoliday")}
 									</Button>
 								)}
 								<PremiumLock
-									featureName="Eliminación múltiple"
-									description="Para poder eliminar múltiples festivos, necesitas una suscripción premium."
+									featureName={t("featureName")}
+									featureDescription={t("featureDescription")}
 									variant="small"
 								>
 									<Button
@@ -117,7 +118,7 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 										className="gap-2"
 									>
 										<Trash2 className="h-4 w-4" />
-										Eliminar seleccionados
+										{t("removeSelected")}
 									</Button>
 								</PremiumLock>
 							</div>
@@ -125,9 +126,7 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 								<Alert>
 									<AlertTriangle className="h-4 w-4" />
 									<AlertTitle>No hay {title.toLowerCase()}</AlertTitle>
-									<AlertDescription>
-										No se han encontrado {title.toLowerCase()} para el año seleccionado.
-									</AlertDescription>
+									<AlertDescription>{t("notFound", { holiday: title.toLowerCase() })}</AlertDescription>
 								</Alert>
 							) : (
 								<Table>
@@ -157,8 +156,8 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 											))
 										) : (
 											<TableRow>
-												<TableCell colSpan={getColumns(locale).length} className="h-24 text-center">
-													No hay resultados.
+												<TableCell colSpan={getColumns({ locale, translation: t }).length} className="h-24 text-center">
+													{t("noResults")}
 												</TableCell>
 											</TableRow>
 										)}
@@ -173,8 +172,6 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 				isOpen={isDeleteModalOpen}
 				onClose={() => setIsDeleteModalOpen(false)}
 				onConfirm={handleBulkDelete}
-				title="Eliminar festivos"
-				description="¿Estás seguro de que quieres eliminar los festivos seleccionados?"
 			/>
 			<AddHolidayModal
 				isOpen={isAddModalOpen}

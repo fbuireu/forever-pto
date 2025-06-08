@@ -59,7 +59,66 @@
 		"rangeMin": "1 month",
 		"rangeMax": "{months, plural, one {# month} other {# months}}",
 		"tooltip": "Allows adding months to the following year to expand opportunity search",
-		"premiumTooltip": "Additional months",
-		"premiumDescription": "Unlocks the ability to add months to the following year"
+		"featureName": "Additional months",
+		"featureDescription": "Add months to the following year"
+	},
+	"holidaysSummary": {
+		"national": "National holidays",
+		"regional": "Regional holidays",
+		"custom": "Custom holidays",
+		"featureName": "Multiple selection",
+		"featureDescription": "Add custom or missing holidays"
+	},
+	"holidaysTable": {
+		"addHoliday": "Add holiday",
+		"selectAll": "Select all",
+		"selectRow": "Select row",
+		"removeSelected": "Remove selected",
+		"notFound": "No {holiday} found for next year",
+		"noResults": "No results",
+		"confirmTitle": "Delete holidays",
+		"confirmDescription": "Are you sure you want to delete the selected holidays?",
+		"name": "Name",
+		"actions": "Actions",
+		"date": "Date",
+		"edit": "Edit",
+		"remove": "Remove",
+		"openMenu": "Open menu",
+		"featureName": "Multiple selection",
+		"featureDescription": "Remove multiple holidays",
+		"featureDescription2": "Edit or remove holidays",
+		"featureDescription3": "Select holidays"
+	},
+	"confirmModal": {
+		"title": "Delete holiday",
+		"description": "Are you sure you want to delete this holiday? This action cannot be undone.",
+		"cancel": "Cancel",
+		"confirm": "Delete"
+	},
+	"editModal": {
+		"title": "Edit holiday",
+		"dateLabel": "Date",
+		"nameLabel": "Name",
+		"namePlaceholder": "Holiday name",
+		"cancel": "Cancel",
+		"save": "Save"
+	},
+	"premiumLock": {
+		"modal": {
+			"title": "Verify your premium subscription",
+			"description": "Enter the email you used on Ko-fi to verify your premium subscription.",
+			"successTitle": "Subscription verified!",
+			"successDescription": "Your premium subscription has been verified successfully. Enjoy all premium features!",
+			"successMessage": "Your premium subscription has been verified successfully. Enjoy all premium features!",
+			"emailLabel": "Email",
+			"emailPlaceholder": "your@email.com",
+			"verify": "Verify subscription",
+			"verifying": "Verifying...",
+			"close": "Close"
+		},
+		"errors": {
+			"notFound": "No premium subscription found with this email. If you have already made a payment, make sure to use the same email you used on Ko-fi.",
+			"generic": "An error occurred while verifying your subscription. Please try again later."
+		}
 	}
 }

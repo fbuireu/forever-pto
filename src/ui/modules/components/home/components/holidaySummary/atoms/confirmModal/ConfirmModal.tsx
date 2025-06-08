@@ -7,42 +7,33 @@ import { DialogFooter } from "@modules/components/core/dialog/atoms/dialogFooter
 import { DialogHeader } from "@modules/components/core/dialog/atoms/dialogHeader/DialogHeader";
 import { DialogTitle } from "@modules/components/core/dialog/atoms/dialogTitle/DialogTitle";
 import { AlertTriangle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface ConfirmModalProps {
 	isOpen: boolean;
 	onClose: () => void;
 	onConfirm: () => void;
-	title: string;
-	description: string;
-	confirmText?: string;
-	cancelText?: string;
 }
 
-export const ConfirmModal = ({
-	isOpen,
-	onClose,
-	onConfirm,
-	title,
-	description,
-	confirmText = "Confirmar",
-	cancelText = "Cancelar",
-}: ConfirmModalProps) => {
+export const ConfirmModal = ({ isOpen, onClose, onConfirm }: ConfirmModalProps) => {
+	const t = useTranslations("confirmModal");
+
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent>
 				<DialogHeader>
 					<div className="flex items-center gap-2">
 						<AlertTriangle className="h-5 w-5 text-destructive" />
-						<DialogTitle>{title}</DialogTitle>
+						<DialogTitle>{t("title")}</DialogTitle>
 					</div>
 				</DialogHeader>
-				<p className="text-sm text-muted-foreground">{description}</p>
+				<p className="text-sm text-muted-foreground">{t("description")}</p>
 				<DialogFooter>
 					<Button variant="outline" onClick={onClose}>
-						{cancelText}
+						{t("cancel")}
 					</Button>
 					<Button variant="destructive" onClick={onConfirm}>
-						{confirmText}
+						{t("confirm")}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
