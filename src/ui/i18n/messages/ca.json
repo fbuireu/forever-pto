@@ -16,9 +16,40 @@
 		"country": "País",
 		"region": "Regió",
 		"year": "Any",
-		"ptoDays": "Dies PTO",
-		"allowPastDays": "Permetre dies passats",
-		"carryOverMonths": "Mesos d'arrossegament"
+		"days": "Dies PTO",
+		"allowPastDays": {
+			"label": "Permetre dies passats",
+			"enabled": "Activat",
+			"disabled": "Desactivat",
+			"tooltip": "Aquest interruptor permet habilitar o deshabilitar el suggeriment de dies festius passats. Això permet veure les oportunitats de vacances que es van perdre en el passat"
+		},
+		"carryOverMonths": {
+			"label": "Mesos d'arrossegament",
+			"monthsToShow": "Mesos a mostrar: {months}",
+			"rangeMin": "1 mes",
+			"rangeMax": "{months, plural, one {# mes} other {# mesos}}",
+			"tooltip": "Permet afegir mesos a l'any següent per ampliar la cerca d'oportunitats",
+			"featureName": "Mesos addicionals",
+			"featureDescription": "Afegeix mesos a l'any següent"
+		},
+		"countries": {
+			"heading": "Països",
+			"label": "País",
+			"placeholder": "Selecciona el teu país",
+			"searchPlaceholder": "Cerca país...",
+			"notFound": "País no trobat"
+		},
+		"regions": {
+			"label": "Regió",
+			"heading": "{hasCountry, plural, =0 {Regions} other {Regions in {country}}}",
+			"placeholder": "{count, plural, =0 {No s'han trobat regions per a {country}} other {Selecciona regió...}}",
+			"searchPlaceholder": "Cerca regió...",
+			"notFound": "Regió no trobada."
+		},
+		"ptoDays": {
+			"got": "Tinc",
+			"days": "{days, plural, one {dia lliure} other {dies lliures}}"
+		}
 	},
 	"languages": {
 		"en": "Anglès",
@@ -31,37 +62,6 @@
 		"dark": "Fosc",
 		"system": "Sistema"
 	},
-	"ptoDays": {
-		"got": "Tinc",
-		"days": "{days, plural, one {dia lliure} other {dies lliures}}"
-	},
-	"countries": {
-		"heading": "Països",
-		"label": "País",
-		"placeholder": "Selecciona el teu país",
-		"searchPlaceholder": "Cerca país...",
-		"notFound": "País no trobat"
-	},
-	"regions": {
-		"label": "Regió",
-		"heading": "{hasCountry, plural, =0 {Regions} other {Regions in {country}}}",
-		"placeholder": "{count, plural, =0 {No s'han trobat regions per a {country}} other {Selecciona regió...}}",
-		"searchPlaceholder": "Cerca regió...",
-		"notFound": "Regió no trobada."
-	},
-	"allowPastDays": {
-		"enabled": "Activat",
-		"disabled": "Desactivat",
-		"tooltip": "Aquest interruptor permet habilitar o deshabilitar el suggeriment de dies festius passats. Això permet veure les oportunitats de vacances que es van perdre en el passat"
-	},
-	"carryOverMonths": {
-		"monthsToShow": "Mesos a mostrar: {months}",
-		"rangeMin": "1 mes",
-		"rangeMax": "{months, plural, one {# mes} other {# mesos}}",
-		"tooltip": "Permet afegir mesos a l'any següent per ampliar la cerca d'oportunitats",
-		"featureName": "Mesos addicionals",
-		"featureDescription": "Afegeix mesos a l'any següent"
-	},
 	"holidaysSummary": {
 		"national": "Festius nacionals",
 		"regional": "Festius regionals",
@@ -71,37 +71,53 @@
 	},
 	"holidaysTable": {
 		"addHoliday": "Afegir festiu",
-		"selectAll": "Sel·lecionar tot",
-		"selectRow": "Sel·lecionar fila",
-		"removeSelected": "Eliminar seleccionados",
 		"notFound": "No s'han trobat {holiday} per a l'any següent",
 		"noResults": "No hi ha resultats",
 		"confirmTitle": "Eliminar festius",
-		"confirmDescription": "Estas segur que vols eliminar els festius seleccioants?",
-		"name": "Nom",
-		"actions": "Accions",
-		"date": "Data",
-		"edit": "Edita",
-		"remove": "Elimina",
-		"openMenu": "Obrir menu",
-		"featureName": "Sel·lecció multiple",
-		"featureDescription": "Elimina festius multiples",
-		"featureDescription2": "Edita o elimina festius",
-		"featureDescription3": "Seleciona festius multiples"
+		"confirmDescription": "Estàs segur que vols eliminar els festius seleccionats?",
+		"headers": {
+			"name": "Nom",
+			"actions": "Accions",
+			"date": "Data"
+		},
+		"actions": {
+			"selectAll": "Sel·leccionar tot",
+			"selectRow": "Sel·leccionar fila",
+			"removeSelected": "Eliminar seleccionats",
+			"edit": "Editar",
+			"remove": "Eliminar",
+			"openMenu": "Obrir menú"
+		},
+		"features": {
+			"multipleSelection": "Sel·lecció multiple",
+			"removeMultiple": "Elimina festius múltiples",
+			"editRemove": "Edita o elimina festius",
+			"selectHolidays": "Selecciona festius múltiples"
+		}
 	},
-	"confirmModal": {
-		"title": "Eliminar festiu",
-		"description": "Estás segur que vols eliminar aquest festiu? Aquesta acció no es pot desfer.",
-		"cancel": "Cancel·lar",
-		"confirm": "Eliminar"
-	},
-	"editModal": {
-		"title": "Editar festiu",
-		"dateLabel": "Data",
-		"nameLabel": "Nom",
-		"namePlaceholder": "Nom del festiu",
-		"cancel": "Cancel·lar",
-		"save": "Guardar"
+	"modals": {
+		"confirm": {
+			"title": "Eliminar festiu",
+			"description": "Estàs segur que vols eliminar aquest festiu? Aquesta acció no es pot desfer.",
+			"cancel": "Cancel·lar",
+			"confirm": "Eliminar"
+		},
+		"edit": {
+			"title": "Editar festiu",
+			"dateLabel": "Data",
+			"nameLabel": "Nom",
+			"placeholder": "Nom del festiu",
+			"cancel": "Cancel·lar",
+			"save": "Guardar"
+		},
+		"add": {
+			"title": "Afegir festiu",
+			"dateLabel": "Data",
+			"nameLabel": "Nom",
+			"placeholder": "Nom del festiu",
+			"cancel": "Cancel·lar",
+			"save": "Guardar"
+		}
 	},
 	"premiumLock": {
 		"modal": {
@@ -118,7 +134,32 @@
 		},
 		"errors": {
 			"notFound": "No s'ha trobat cap subscripció premium amb aquest email. Si ja has fet un pagament, assegura't d'usar el mateix email que vas utilitzar a Ko-fi.",
-			"generic": "Ha ocorregut un error en verificar la teva subscripció. Siusplau, torna-ho a intentar més tard."
+			"generic": "Ha ocorregut un error en verificar la teva subscripció. Sisplau, torna-ho a intentar més tard.",
+			"validation": "Sisplau, introdueix un email vàlid"
 		}
+	},
+	"stats": {
+		"title": "Optimització de Vacances",
+		"holidaysSummary": {
+			"title": "Resum de dies festius",
+			"withCountry": "A {country} ({flag}) hi ha {nationalHolidays} festius nacionals",
+			"withoutCountry": "Hi ha {nationalHolidays} festius nacionals",
+			"regionalPart": ". Sumats als {regionalHolidays} festius de {region}",
+			"totalPart": ", fan un total de {totalHolidays} dies festius",
+			"defaultRegion": "la regió",
+			"noHolidaysFound": "No s'han trobat dies festius per a aquest país. Prova a usar el cercador",
+			"noRegionalHolidays": " Tampoc per a la regió {region}.",
+			"noCountryHolidays": "No s'han trobat dies festius per al teu país."
+		},
+		"effectiveness": {
+			"title": "Efectivitat dels teus dies PTO",
+			"ptoUsed": "Dies PTO utilitzats",
+			"totalFreeDays": "Dies lliures totals",
+			"ratio": "Ràtio d'efectivitat",
+			"summaryStart": "Tens {ptoDaysAvailable} dies de PTO disponibles que s'han convertit en {effectiveDays} dies lliures usant el nostre sistema, el que suposa un increment de",
+			"summaryEnd": "d'efectivitat.",
+			"calculating": "Tens {ptoDaysAvailable} dies de PTO disponibles. El sistema està calculant els forats òptims per maximitzar les teves vacances."
+		},
+		"noPtoDays": "Has d'establir la quantitat de dies PTO disponibles perquè el sistema pugui suggerir els dies òptims per maximitzar les teves vacances."
 	}
 }

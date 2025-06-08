@@ -24,7 +24,7 @@ export function useSidebarItems(params: UseSidebarItemsParams): SidebarItem[] {
 		() => [
 			{
 				id: "pto-days",
-				title: t("ptoDays"),
+				title: t("days"),
 				icon: CalendarDays,
 				renderComponent: () => <PtoDays ptoDays={ptoDays} />,
 			},
@@ -48,14 +48,14 @@ export function useSidebarItems(params: UseSidebarItemsParams): SidebarItem[] {
 			},
 			{
 				id: "allow-past-days",
-				title: t("allowPastDays"),
+				title: t("allowPastDays.label"),
 				icon: ToggleLeftIcon,
 				renderComponent: () => <AllowPastDays allowPastDays={allowPastDays} />,
 				renderTooltip: () => <AllowPasDaysInfoTooltip locale={locale} />,
 			},
 			{
 				id: "carry-over-months",
-				title: t("carryOverMonths"),
+				title: t("carryOverMonths.label"),
 				icon: SlidersHorizontal,
 				renderComponent: () => <CarryOverMonths carryOverMonths={carryOverMonths} />,
 				renderTooltip: () => <CarryOverMonthsTooltip locale={locale} />,

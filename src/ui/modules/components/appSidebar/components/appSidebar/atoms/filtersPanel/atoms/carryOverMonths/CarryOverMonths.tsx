@@ -16,7 +16,7 @@ export interface CarryOverMonthsProps {
 }
 
 export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
-	const t = useTranslations("carryOverMonths");
+	const t = useTranslations("filters.carryOverMonths");
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();

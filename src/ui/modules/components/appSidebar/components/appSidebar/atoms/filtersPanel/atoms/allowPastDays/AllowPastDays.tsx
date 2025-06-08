@@ -17,7 +17,7 @@ export const AllowPastDays = ({ allowPastDays }: AllowPastDaysProps) => {
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const [isEnabled, setIsEnabled] = useState(allowPastDays === "true");
-	const t = useTranslations("allowPastDays");
+	const t = useTranslations("filters.allowPastDays");
 
 	const handleSwitchChange = useCallback(
 		(checked: boolean) => {

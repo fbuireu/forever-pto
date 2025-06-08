@@ -17,7 +17,7 @@ export interface PtoDaysProps {
 }
 
 export const PtoDays = ({ ptoDays }: PtoDaysProps) => {
-	const t = useTranslations("ptoDays");
+	const t = useTranslations("filters.ptoDays");
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();

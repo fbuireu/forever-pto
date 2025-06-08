@@ -12,7 +12,7 @@ interface CarryOverMonthsTooltipProps {
 }
 
 export const CarryOverMonthsTooltip = memo(async ({ locale }: CarryOverMonthsTooltipProps) => {
-	const t = await getTranslations({ locale, namespace: "carryOverMonths" });
+	const t = await getTranslations({ locale, namespace: "filters.carryOverMonths" });
 
 	return (
 		<TooltipProvider>

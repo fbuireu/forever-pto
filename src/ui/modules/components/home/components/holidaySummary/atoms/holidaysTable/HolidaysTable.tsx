@@ -105,11 +105,7 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 										{t("addHoliday")}
 									</Button>
 								)}
-								<PremiumLock
-									featureName={t("featureName")}
-									featureDescription={t("featureDescription")}
-									variant="small"
-								>
+								<PremiumLock featureDescription={t("features.removeMultiple")} variant="small">
 									<Button
 										variant="destructive"
 										size="sm"
@@ -118,7 +114,7 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 										className="gap-2"
 									>
 										<Trash2 className="h-4 w-4" />
-										{t("removeSelected")}
+										{t("actions.removeSelected")}
 									</Button>
 								</PremiumLock>
 							</div>

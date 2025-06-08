@@ -16,7 +16,7 @@ export interface RegionsProps {
 }
 
 export const Regions = async ({ country, region, locale }: RegionsProps) => {
-	const t = await getTranslations({ locale, namespace: "regions" });
+	const t = await getTranslations({ locale, namespace: "filters.regions" });
 	const countries = await getCachedCountries();
 	const userCountry = countries.find(({ value }) => value.toLowerCase() === country);
 	const regions = await getCachedRegions(userCountry?.value);

@@ -16,9 +16,40 @@
 		"country": "Paese",
 		"region": "Regione",
 		"year": "Anno",
-		"ptoDays": "Giorni PTO",
-		"allowPastDays": "Permetti giorni passati",
-		"carryOverMonths": "Mesi di riporto"
+		"days": "Giorni PTO",
+		"allowPastDays": {
+			"label": "Permetti giorni passati",
+			"enabled": "Abilita",
+			"disabled": "Disabilita",
+			"tooltip": "Questo interruttore permette di abilitare o disabilitare il suggerimento dei giorni festivi passati. Questo consente di vedere le opportunità di ferie perse nel passato"
+		},
+		"carryOverMonths": {
+			"label": "Mesi di riporto",
+			"monthsToShow": "Mesi da mostrare: {months}",
+			"rangeMin": "1 mese",
+			"rangeMax": "{months, plural, one {# mese} other {# mesi}}",
+			"tooltip": "Permette di aggiungere mesi all'anno seguente per ampliare la ricerca di opportunità",
+			"featureName": "Mesi aggiuntivi",
+			"featureDescription": "Aggiungere mesi all'anno seguente"
+		},
+		"countries": {
+			"heading": "Paesi",
+			"label": "Paese",
+			"placeholder": "Seleziona il tuo paese",
+			"searchPlaceholder": "Cerca paese...",
+			"notFound": "Paese non trovato"
+		},
+		"regions": {
+			"label": "Regione",
+			"heading": "{hasCountry, plural, =0 {Regioni} other {Regioni in {country}}}",
+			"placeholder": "{count, plural, =0 {Nessuna regione trovata per {country}} other {Seleziona regione...}}",
+			"searchPlaceholder": "Cerca regione...",
+			"notFound": "Regione non trovata."
+		},
+		"ptoDays": {
+			"got": "Ho",
+			"days": "{days, plural, one {giorno libero} other {giorni liberi}}"
+		}
 	},
 	"languages": {
 		"en": "Inglese",
@@ -27,40 +58,9 @@
 		"it": "Italiano"
 	},
 	"theme": {
-		"light": "Ciaro",
+		"light": "Chiaro",
 		"dark": "Scuro",
 		"system": "Sistema"
-	},
-	"ptoDays": {
-		"got": "Ho",
-		"days": "{days, plural, one {dia libero} other {dia liberi}}"
-	},
-	"countries": {
-		"heading": "Paesi ",
-		"label": "Paese",
-		"placeholder": "Seleziona il tuo paese",
-		"searchPlaceholder": "Cerca paese...",
-		"notFound": "Paese non trovato"
-	},
-	"regions": {
-		"label": "Regione",
-		"heading": "{hasCountry, plural, =0 {Regioni} other {Regioni in {country}}}",
-		"placeholder": "{count, plural, =0 {Nessuna regione trovata per {country}} other {Seleziona regione...}}",
-		"searchPlaceholder": "Cerca regione...",
-		"notFound": "Regione non trovata."
-	},
-	"allowPastDays": {
-		"enabled": "Abilita",
-		"disabled": "Disabilita",
-		"tooltip": "Questo interruttore permette di abilitare o disabilitare il suggerimento dei giorni festivi passati. Questo consente di vedere le opportunità di ferie perse nel passato"
-	},
-	"carryOverMonths": {
-		"monthsToShow": "Mesi da mostrare: {months}",
-		"rangeMin": "1 mese",
-		"rangeMax": "{months, plural, one {# mese} other {# mesi}}",
-		"tooltip": "Permette di aggiungere mesi all'anno seguente per ampliare la ricerca di opportunità",
-		"featureName": "Mesi aditionali",
-		"featureDescription": "Aggiungere mesi all'anno seguente"
 	},
 	"holidaysSummary": {
 		"national": "Festività nazionali",
@@ -71,37 +71,53 @@
 	},
 	"holidaysTable": {
 		"addHoliday": "Aggiungi festività",
-		"selectAll": "Selezionare tuto",
-		"selectRow": "Selezionare fila",
-		"removeSelected": "Elimina selezionati",
 		"notFound": "Non sono state trovate {holiday} per l'anno prossimo",
 		"noResults": "Nessun risultato",
 		"confirmTitle": "Eliminare festività",
 		"confirmDescription": "Sei sicuro di voler eliminare le festività selezionate?",
-		"name": "Nome",
-		"actions": "Azione",
-		"date": "Date",
-		"edit": "Edita",
-		"remove": "Elimina",
-		"openMenu": "Aprire menu",
-		"featureName": "Selezione multipla",
-		"featureDescription": "Elimina multiple holidays",
-		"featureDescription2": "Edita o remuevi holidays",
-		"featureDescription3": "Seleziona multipli festività"
+		"headers": {
+			"name": "Nome",
+			"actions": "Azioni",
+			"date": "Data"
+		},
+		"actions": {
+			"selectAll": "Seleziona tutto",
+			"selectRow": "Seleziona riga",
+			"removeSelected": "Elimina selezionati",
+			"edit": "Modifica",
+			"remove": "Elimina",
+			"openMenu": "Apri menu"
+		},
+		"features": {
+			"multipleSelection": "Selezione multipla",
+			"removeMultiple": "Elimina multiple festività",
+			"editRemove": "Modifica o rimuovi festività",
+			"selectHolidays": "Seleziona multiple festività"
+		}
 	},
-	"confirmModal": {
-		"title": "Eliminare festività",
-		"description": "Sei sicuro di voler eliminare questa festività? Questa azione non può essere annullata.",
-		"cancel": "Annulla",
-		"confirm": "Elimina"
-	},
-	"editModal": {
-		"title": "Modifica festività",
-		"dateLabel": "Data",
-		"nameLabel": "Nome",
-		"namePlaceholder": "Nome della festività",
-		"cancel": "Annulla",
-		"save": "Salva"
+	"modals": {
+		"confirm": {
+			"title": "Eliminare festività",
+			"description": "Sei sicuro di voler eliminare questa festività? Questa azione non può essere annullata.",
+			"cancel": "Annulla",
+			"confirm": "Elimina"
+		},
+		"edit": {
+			"title": "Modifica festività",
+			"dateLabel": "Data",
+			"nameLabel": "Nome",
+			"placeholder": "Nome della festività",
+			"cancel": "Annulla",
+			"save": "Salva"
+		},
+		"add": {
+			"title": "Aggiungi festività",
+			"dateLabel": "Data",
+			"nameLabel": "Nome",
+			"placeholder": "Nome della festività",
+			"cancel": "Annulla",
+			"save": "Salva"
+		}
 	},
 	"premiumLock": {
 		"modal": {
@@ -118,7 +134,32 @@
 		},
 		"errors": {
 			"notFound": "Non è stato trovato alcun abbonamento premium con questa email. Se hai già effettuato un pagamento, assicurati di utilizzare la stessa email che hai usato su Ko-fi.",
-			"generic": "Si è verificato un errore durante la verifica del tuo abbonamento. Riprova più tardi."
+			"generic": "Si è verificato un errore durante la verifica del tuo abbonamento. Riprova più tardi.",
+			"validation": "Per favore, inserisci un'email valida"
 		}
+	},
+	"stats": {
+		"title": "Ottimizzazione Vacanze",
+		"holidaysSummary": {
+			"title": "Riassunto festività",
+			"withCountry": "In {country} ({flag}) ci sono {nationalHolidays} festività nazionali",
+			"withoutCountry": "Ci sono {nationalHolidays} festività nazionali",
+			"regionalPart": ". Aggiunte alle {regionalHolidays} festività in {region}",
+			"totalPart": ", fanno un totale di {totalHolidays} giorni festivi",
+			"defaultRegion": "la regione",
+			"noHolidaysFound": "Nessuna festività trovata per questo paese. Prova a usare la ricerca",
+			"noRegionalHolidays": " Anche nessuna per la regione {region}.",
+			"noCountryHolidays": "Nessuna festività trovata per il tuo paese."
+		},
+		"effectiveness": {
+			"title": "Efficacia dei tuoi giorni PTO",
+			"ptoUsed": "Giorni PTO utilizzati",
+			"totalFreeDays": "Giorni liberi totali",
+			"ratio": "Rapporto di efficacia",
+			"summaryStart": "Hai {ptoDaysAvailable} giorni PTO disponibili che sono stati convertiti in {effectiveDays} giorni liberi usando il nostro sistema, che rappresenta un incremento di",
+			"summaryEnd": "di efficacia.",
+			"calculating": "Hai {ptoDaysAvailable} giorni PTO disponibili. Il sistema sta calcolando i gap ottimali per massimizzare le tue vacanze."
+		},
+		"noPtoDays": "Devi impostare il numero di giorni PTO disponibili affinché il sistema possa suggerire i giorni ottimali per massimizzare le tue vacanze."
 	}
 }

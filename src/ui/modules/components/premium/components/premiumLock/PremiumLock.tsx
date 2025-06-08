@@ -10,7 +10,7 @@ import { DialogHeader } from "@modules/components/core/dialog/atoms/dialogHeader
 import { FormMessage } from "@modules/components/core/form/atoms/FormMessage";
 import { FormFieldProvider as FormField } from "@modules/components/core/form/providers/FormFieldProvider/FormFieldProvider";
 import { FormItemProvider as FormItem } from "@modules/components/core/form/providers/FormItemProvider/FormItemProvider";
-import { emailFormSchema } from "@modules/components/premium/components/premiumLock/schema";
+import { useEmailFormSchema } from "@modules/components/premium/components/premiumLock/hooks/useEmailFormSchema";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Button } from "@ui/modules/components/core/button/Button";
 import { Dialog } from "@ui/modules/components/core/dialog/Dialog";
@@ -27,8 +27,6 @@ import { useTranslations } from "next-intl";
 import { type MouseEvent, type ReactNode, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
-
-type FormValues = z.infer<typeof emailFormSchema>;
 
 interface PremiumLockProps {
 	children: ReactNode;
@@ -52,8 +50,9 @@ export const PremiumLock = ({
 	const [submitSuccess, setSubmitSuccess] = useState(false);
 	const [isPending, startTransition] = useTransition();
 	const t = useTranslations("premiumLock");
+	const emailFormSchema = useEmailFormSchema();
 
-	const form = useForm<FormValues>({
+	const form = useForm<z.infer<typeof emailFormSchema>>({
 		resolver: zodResolver(emailFormSchema),
 		defaultValues: {
 			email: "",
@@ -70,7 +69,7 @@ export const PremiumLock = ({
 		setIsModalOpen(true);
 	};
 
-	const onSubmit = async (values: FormValues) => {
+	const onSubmit = async (values: z.infer<typeof emailFormSchema>) => {
 		startTransition(async () => {
 			try {
 				const { isPremium, messageId } = await checkPremiumByEmail(values.email);

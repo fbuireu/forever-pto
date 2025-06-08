@@ -13,7 +13,7 @@ export interface CountriesProps {
 const getCachedCountries = cache(getCountries);
 
 export const Countries = memo(async ({ country, locale }: CountriesProps) => {
-	const t = await getTranslations({ locale, namespace: "countries" });
+	const t = await getTranslations({ locale, namespace: "filters.countries" });
 	const countries = await getCachedCountries();
 
 	return (

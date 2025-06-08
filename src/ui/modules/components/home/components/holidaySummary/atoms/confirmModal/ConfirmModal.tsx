@@ -16,7 +16,7 @@ interface ConfirmModalProps {
 }
 
 export const ConfirmModal = ({ isOpen, onClose, onConfirm }: ConfirmModalProps) => {
-	const t = useTranslations("confirmModal");
+	const t = useTranslations("modals.confirm");
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
