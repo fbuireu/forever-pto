@@ -86,7 +86,7 @@ export const PtoDays = ({ ptoDays }: PtoDaysProps) => {
 			<MinusButton onClick={decrementDays} disabled={localDaysValue <= 0} />
 			{daysInput}
 			<PlusButton onClick={incrementDays} />
-			<span>{t("days", { days: localDaysValue })}</span>
+			<span className="text-end">{t("days", { days: localDaysValue })}</span>
 		</div>
 	);
 };

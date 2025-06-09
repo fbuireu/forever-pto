@@ -183,7 +183,7 @@
 			"suggested": "Días sugeridos",
 			"alternatives": "Alternativas similares"
 		},
-		"instructions": "Los fines de semana y festivos ya están preseleccionados. Haz clic en cualquier día laborable para añadirlo como día PTO.",
+		"instructions": "Los fines de semana y festivos ya están preseleccionados",
 		"limitations": "Limitaciones: las sugerencias se basan en los bloques de días (si se hace hover sobre un grupo de 3 días sugeridos se buscarán alternativas que, con 3 días de PTO, generen los mismos días festivos)"
 	}
 }

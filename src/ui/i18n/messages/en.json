@@ -183,7 +183,7 @@
 			"suggested": "Suggested days",
 			"alternatives": "Similar alternatives"
 		},
-		"instructions": "Weekends and holidays are already preselected. Click on any workday to add it as a PTO day.",
+		"instructions": "Weekends and holidays are already preselected",
 		"limitations": "Limitations: suggestions are based on day blocks (if you hover over a group of 3 suggested days, alternatives will be searched that, with 3 PTO days, generate the same holidays)"
 	}
 }

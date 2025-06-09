@@ -183,7 +183,7 @@
 			"suggested": "Dies suggerits",
 			"alternatives": "Alternatives similars"
 		},
-		"instructions": "Els caps de setmana i festius ja estan preseleccionats. Fes clic en qualsevol dia laborable per afegir-lo com a dia PTO.",
+		"instructions": "Els caps de setmana i festius ja estan preseleccionats",
 		"limitations": "Limitacions: els suggeriments es basen en els blocs de dies (si es fa hover sobre un grup de 3 dies suggerits es buscaran alternatives que, amb 3 dies de PTO, generin els mateixos dies festius)"
 	}
 }
