@@ -1,7 +1,7 @@
 import type { EffectiveRatio } from "@modules/components/home/components/calendarList/hooks/types";
 import type { IntervalInfo } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/types";
-import { getSuggestedDaysForMonth } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/getSuggestedDaysForMonth/getSuggestedDaysForMonth";
 import { groupConsecutiveDays } from "@modules/components/home/components/calendarList/hooks/utils/groupConsecutiveDays/groupConsecutiveDays";
+import { isSameMonth } from "date-fns";
 
 interface CalculateIntervalsForMonthParams {
 	month: Date;
@@ -14,17 +14,13 @@ export function calculateIntervalsForMonth({
 	suggestedDays,
 	calculateEffectiveDays,
 }: CalculateIntervalsForMonthParams): IntervalInfo[] {
-	const suggestedInMonth = getSuggestedDaysForMonth({ month, suggestedDays });
+	const suggestedInMonth = suggestedDays.filter((day) => isSameMonth(day, month));
 
-	if (!suggestedInMonth || suggestedInMonth.length === 0) {
+	if (suggestedInMonth.length === 0) {
 		return [];
 	}
 
 	const intervals = groupConsecutiveDays(suggestedInMonth);
-
-	if (intervals.length === 0) {
-		return [];
-	}
 
 	return intervals.map((interval) => {
 		const effectiveResult = calculateEffectiveDays(interval);

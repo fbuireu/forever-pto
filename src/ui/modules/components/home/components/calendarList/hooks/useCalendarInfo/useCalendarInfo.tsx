@@ -7,8 +7,8 @@ import { calculateStats } from "@modules/components/home/components/calendarList
 import { checkIsDayAlternative } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/checkIsDayAlternative/checkIsDayAlternative";
 import { formatIntervals } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/formatIntervals/formatIntervals";
 import { getDayPositionInBlock } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/getDayPositionInBlock/getDayPositionInBlock";
-import { getSuggestedDaysForMonth } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/utils/getSuggestedDaysForMonth/getSuggestedDaysForMonth";
 import { getAlternativeDayPosition } from "@modules/components/home/components/calendarList/hooks/useCalendarInteractions/utils/getAlternativeDayPosition/getAlternativeDayPosition";
+import { isSameMonth } from "date-fns";
 import { useLocale, type useTranslations } from "next-intl";
 import { type ReactNode, useCallback, useMemo } from "react";
 
@@ -63,7 +63,7 @@ export function useCalendarInfo({
 	);
 
 	const suggestedDayForMonth = useCallback(
-		(month: Date) => getSuggestedDaysForMonth({ month, suggestedDays }),
+		(month: Date) => suggestedDays.filter((day) => isSameMonth(day, month)),
 		[suggestedDays],
 	);
 

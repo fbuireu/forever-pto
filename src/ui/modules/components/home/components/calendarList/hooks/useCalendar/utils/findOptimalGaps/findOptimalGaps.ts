@@ -138,13 +138,15 @@ function findOptimalUsingDP(blocks: BlockOpportunity[], maxDays: number): BlockO
 
 	for (let i = 1; i <= n; i++) {
 		const block = blocks[i - 1];
+		const blockKeys = new Set(block.days.map(getDateKey));
+
 		for (let days = 0; days <= maxDays; days++) {
 			dp[i][days] = { ...dp[i - 1][days] };
 
 			if (days >= block.blockSize) {
 				const prevState = dp[i - 1][days - block.blockSize];
 				const hasConflict = prevState.blocks.some((prevBlock) =>
-					block.days.some((day) => prevBlock.days.some((prevDay) => getDateKey(day) === getDateKey(prevDay))),
+					prevBlock.days.some((prevDay) => blockKeys.has(getDateKey(prevDay))),
 				);
 
 				if (!hasConflict) {
