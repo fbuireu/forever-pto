@@ -1,7 +1,8 @@
 import { DEFAULT_CALENDAR_LIMITS } from "@const/const";
 import type { EffectiveRatio } from "@modules/components/home/components/calendarList/hooks/types";
 import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
-import { addDays, differenceInDays, getMonth, startOfWeek } from "date-fns";
+import { groupConsecutiveDays } from "@modules/components/home/components/calendarList/hooks/utils/groupConsecutiveDays/groupConsecutiveDays";
+import { addDays, differenceInDays, getMonth, isWeekend, startOfWeek } from "date-fns";
 import type { BlockOpportunity, DayInfo } from "../../types";
 import { calculateBlockScore } from "../calculateBlockScore/calculateBlockScore";
 import { calculateSurroundingFreeDays } from "../calculateSurroundingFreeDays/calculateSurroundingFreeDays";
@@ -36,12 +37,51 @@ export function generateBlockOpportunities({
 			const dayKey = getDateKey(day);
 			const dayInfo = daysMap.get(dayKey);
 
-			if (dayInfo && (dayInfo.isHoliday || dayInfo.isWeekend)) {
+			// Only count holidays that fall on weekdays
+			if (dayInfo?.isHoliday && !isWeekend(day)) {
 				holidayCount++;
 			}
 		}
 
 		return holidayCount;
+	}
+
+	function calculateHolidayDays(blockDays: Date[], daysMap: Map<string, DayInfo>): number {
+		// Create a map with all free days (weekends, holidays, and the block's PTO days)
+		const freeDaysMap = new Map<string, Date>();
+
+		// Add all holidays and weekends from the entire map
+		for (const [dayKey, dayInfo] of daysMap) {
+			if (dayInfo.isFreeDay) {
+				freeDaysMap.set(dayKey, dayInfo.date);
+			}
+		}
+
+		// Add the block's PTO days
+		for (const day of blockDays) {
+			freeDaysMap.set(getDateKey(day), day);
+		}
+
+		const freeDays = Array.from(freeDaysMap.values()).sort((a, b) => a.getTime() - b.getTime());
+		const sequences = groupConsecutiveDays(freeDays);
+		const blockDayKeys = new Set(blockDays.map(getDateKey));
+
+		let holidayDays = 0;
+		for (const sequence of sequences) {
+			const hasBlockDay = sequence.some((day) => blockDayKeys.has(getDateKey(day)));
+			if (!hasBlockDay) continue;
+
+			// Count weekday holidays in this sequence (exclude weekends and the block's own days)
+			const weekdayHolidays = sequence.filter((day) => {
+				const dayKey = getDateKey(day);
+				const dayInfo = daysMap.get(dayKey);
+				return dayInfo?.isHoliday && !isWeekend(day) && !blockDayKeys.has(dayKey);
+			});
+
+			holidayDays += weekdayHolidays.length;
+		}
+
+		return holidayDays;
 	}
 
 	for (let startDayIndex = 0; startDayIndex < availableWorkdaysLength; startDayIndex++) {
@@ -86,6 +126,8 @@ export function generateBlockOpportunities({
 
 			const adjustedScore = baseScore * (1 + holidayValue);
 
+			const holidayDays = calculateHolidayDays(blockDays, daysMap);
+
 			blockOpportunities.push({
 				startDay: blockDays[0],
 				days: blockDays,
@@ -96,6 +138,7 @@ export function generateBlockOpportunities({
 				score: adjustedScore,
 				month: getMonth(blockDays[0]),
 				effectiveDays: effectiveResult.effective,
+				holidayDays,
 			});
 		}
 	}

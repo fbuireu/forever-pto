@@ -17,4 +17,5 @@ export interface BlockOpportunity {
 	score: number;
 	month: number;
 	effectiveDays: number;
+	holidayDays: number;
 }

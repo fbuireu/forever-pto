@@ -29,7 +29,9 @@ export function createFreeDaysBaseMap({
 	}
 
 	for (const holiday of holidays) {
-		freeDays.set(getDateKey(holiday.date), holiday.date);
+		if (!isWeekend(holiday.date)) {
+			freeDays.set(getDateKey(holiday.date), holiday.date);
+		}
 	}
 
 	for (const day of selectedPtoDays) {

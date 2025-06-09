@@ -81,6 +81,7 @@ export { generateMetadata };
 // 34- use fn to format messages in stats
 // 34- Readme
 // 35- Replace kofi for stripe
+// 35- allow the user to select score stragety
 
 // TODO: (release)
 // 2- SEO + check messages
@@ -88,6 +89,5 @@ export { generateMetadata };
 // 2- add FAQ + roadmap
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc)
 // 2- remove env vars
-// 2- suggestions should be same length
 // 24- Edit weekends (paid functionality). Edit days (add and remove days) (paid functionality)
 // 34- Ko-Fi BE integration (webhook not working on localhost)

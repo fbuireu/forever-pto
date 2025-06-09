@@ -28,20 +28,21 @@ export function calculateEffectiveDays({ freeDaysBaseMap, ptoDays }: CalculateEf
 
 	let effectiveDays = 0;
 	for (const sequence of sequences) {
-		const hasAnyPtoDay = sequence.some((day) => ptoDayKeys.has(getDateKey(day)));
-		if (!hasAnyPtoDay) continue;
+		const ptoInSequence = sequence.filter((day) => ptoDayKeys.has(getDateKey(day)));
+		if (ptoInSequence.length === 0) continue;
 
-		const hasHolidays = sequence.some((day) => {
+		const hasWeekdayHolidays = sequence.some((day) => {
 			const dayKey = getDateKey(day);
-			return freeDaysBaseMap.has(dayKey) && !isWeekend(day);
+			return freeDaysBaseMap.has(dayKey) && !isWeekend(day) && !ptoDayKeys.has(dayKey);
 		});
 
-		if (!hasHolidays) {
-			effectiveDays += ptoDays.length;
-			continue;
+		if (!hasWeekdayHolidays) {
+			// Only PTO days, no benefit from holidays
+			effectiveDays += ptoInSequence.length;
+		} else {
+			// Benefits from weekday holidays - count entire sequence
+			effectiveDays += sequence.length;
 		}
-
-		effectiveDays += sequence.length;
 	}
 
 	const ratio = Number.parseFloat((effectiveDays / ptoDays.length).toFixed(1));

@@ -32,5 +32,5 @@ export function calculateBlockScore({
 			? SCORE_MULTIPLIERS.BONUS.LONG_SEQUENCE
 			: SCORE_MULTIPLIERS.DEFAULT;
 
-	return efficiencyRatio * sequenceBonus;
+	return efficiencyRatio * efficiencyBonus * sequenceBonus;
 }

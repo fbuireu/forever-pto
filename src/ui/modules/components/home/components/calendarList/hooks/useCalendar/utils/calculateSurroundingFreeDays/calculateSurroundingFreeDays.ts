@@ -22,7 +22,7 @@ export function calculateSurroundingFreeDays({
 		const dayBefore = addDays(blockDays[0], -i);
 		const dayInfo = daysMap.get(getDateKey(dayBefore));
 
-		if (dayInfo?.isFreeDay) {
+		if (dayInfo?.isFreeDay && !dayInfo.isWeekend) {
 			daysBeforeBlock++;
 		} else {
 			break;
@@ -34,7 +34,7 @@ export function calculateSurroundingFreeDays({
 		const dayAfter = addDays(blockDays[blockDays.length - 1], i);
 		const dayInfo = daysMap.get(getDateKey(dayAfter));
 
-		if (dayInfo?.isFreeDay) {
+		if (dayInfo?.isFreeDay && !dayInfo.isWeekend) {
 			daysAfterBlock++;
 		} else {
 			break;

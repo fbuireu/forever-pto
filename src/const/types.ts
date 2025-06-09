@@ -64,6 +64,17 @@ export interface ScoreMultipliers {
 	tolerance: {
 		single_day: number;
 		multi_day: number;
+		score_difference: number;
+	};
+	selection: {
+		high_efficiency_threshold: number;
+		holiday_benefit_threshold: number;
+		benefit_alternative_threshold: number;
+		block_size_difference: number;
+		efficiency_difference: number;
+		score_difference: number;
+		min_score_per_day: number;
+		min_multi_day_size: number;
 	};
 }
 
