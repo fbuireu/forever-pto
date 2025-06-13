@@ -39,7 +39,7 @@ export const PtoDays = ({ ptoDays }: PtoDaysProps) => {
 		[router, pathname, searchParams],
 	);
 
-	const updateQueryDebounced = useDebouncedCallback((value: number) => updateQueryString(value), 200);
+	const updateQueryDebounced = useDebouncedCallback((value: number) => updateQueryString(value), 100);
 
 	const decrementDays = useCallback(() => {
 		if (localDaysValue <= 0) return;

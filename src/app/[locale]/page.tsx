@@ -7,6 +7,7 @@ import { getRegion } from "@infrastructure/services/region/getRegion/getRegion";
 import { Legend } from "@modules/components/core/legend/Legend";
 import { SidebarTrigger } from "@modules/components/core/sidebar/atoms/sidebarTrigger/SidebarTrigger";
 import { SidebarProvider } from "@modules/components/core/sidebar/provider/SidebarProvider/SidebarProvider";
+import { DevFooter } from "@modules/components/home/components/devFooter/DevFooter";
 import { Faq } from "@modules/components/home/components/faq/Faq";
 import { HowItWorks } from "@modules/components/home/components/howItWorks/HowItWorks";
 import { Roadmap } from "@modules/components/home/components/roadmap/Roadmap";
@@ -70,6 +71,7 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 					<HowItWorks locale={locale} />
 					<Faq locale={locale} />
 					<Roadmap locale={locale} />
+					<DevFooter />
 				</div>
 			</PremiumProvider>
 		</SidebarProvider>
@@ -94,7 +96,7 @@ export { generateMetadata };
 
 // TODO: (release)
 // 35- Check copies
-// 2- devFooter/contact
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc)
 // 2- remove env vars
 // 34- Ko-Fi BE integration (webhook not working on localhost)
+// 34- check functionality (email, links, ContactModal (isolate), etc)
