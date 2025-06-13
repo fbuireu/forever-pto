@@ -3,7 +3,7 @@
 	"description": "The all-in-one tool to squish your valuable PTO days",
 	"keywords": ["nextjs", "typescript", "css", "tailwind", "cloudflare", "pto", "seo", "turbopack", "shadcn"],
 	"author": "Ferran Buireu <fbuireu@gmail.com>",
-	"packageManager": "npm@11.4.1",
+	"packageManager": "npm@11.4.2",
 	"engines": {
 		"node": ">=22.0.0"
 	},
@@ -53,7 +53,7 @@
 		"date-fns": "^4.1.0",
 		"date-holidays": "^3.24.3",
 		"i18n-iso-countries": "^7.14.0",
-		"lucide-react": "^0.514.0",
+		"lucide-react": "^0.515.0",
 		"next": "15.3.3",
 		"next-intl": "^4.1.0",
 		"next-themes": "^0.4.6",
@@ -63,7 +63,7 @@
 		"react-hook-form": "^7.57.0",
 		"tailwind-merge": "^3.3.1",
 		"tailwindcss-animate": "^1.0.7",
-		"zod": "^3.25.58",
+		"zod": "^3.25.64",
 		"zustand": "^5.0.5"
 	},
 	"devDependencies": {
@@ -71,18 +71,18 @@
 		"@commitlint/cli": "^19.8.1",
 		"@commitlint/config-conventional": "^19.8.1",
 		"@commitlint/format": "^19.8.1",
-		"@tailwindcss/postcss": "^4.1.8",
+		"@tailwindcss/postcss": "^4.1.10",
 		"@testing-library/react": "^16.3.0",
-		"@types/node": "^24.0.0",
-		"@types/react": "^19.1.7",
+		"@types/node": "^24.0.1",
+		"@types/react": "^19.1.8",
 		"@types/react-dom": "^19.1.6",
 		"@vitejs/plugin-react": "^4.5.2",
 		"conventional-changelog-atom": "^5.0.0",
 		"husky": "^9.1.7",
 		"jsdom": "^26.1.0",
 		"lint-staged": "^16.1.0",
-		"postcss": "^8.5.4",
-		"tailwindcss": "^4.1.8",
+		"postcss": "^8.5.5",
+		"tailwindcss": "^4.1.10",
 		"typescript": "^5.8.3",
 		"vitest": "^3.2.3"
 	}
