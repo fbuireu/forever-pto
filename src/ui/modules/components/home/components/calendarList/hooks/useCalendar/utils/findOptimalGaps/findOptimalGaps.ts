@@ -46,7 +46,7 @@ export function findOptimalGaps({
 		calculateEffectiveDays,
 	});
 
-	const optimalCombination = findGloballyOptimalCombination(blockOpportunities, ptoDays);
+	const optimalCombination = findBestCombinationFavoringLongerBlocks(blockOpportunities, ptoDays);
 
 	const suggestedDaysSet = new Set<string>();
 	const allSuggestedDays: Date[] = [];
@@ -85,106 +85,88 @@ export function findOptimalGaps({
 	};
 }
 
-function findGloballyOptimalCombination(blocks: BlockOpportunity[], maxDays: number): BlockOpportunity[] {
+function findBestCombinationFavoringLongerBlocks(blocks: BlockOpportunity[], maxDays: number): BlockOpportunity[] {
 	if (blocks.length === 0 || maxDays <= 0) return [];
 
 	const viableBlocks = blocks.filter((block) => block.blockSize <= maxDays);
 	if (viableBlocks.length === 0) return [];
 
-	const searchLimit = viableBlocks.length > 50 ? 50 : viableBlocks.length;
-	const topBlocks = viableBlocks
-		.sort((a, b) => b.effectiveDays / b.blockSize - a.effectiveDays / a.blockSize)
-		.slice(0, searchLimit);
+	const strategies = [
+		() => findOptimalUsingMaxEffectiveDays(viableBlocks, maxDays),
+		() => findOptimalUsingBestRatio(viableBlocks, maxDays),
+		() => findOptimalUsingBalanced(viableBlocks, maxDays),
+	];
 
 	let bestCombination: BlockOpportunity[] = [];
-	let bestEffectiveRatio = 0;
-
-	const strategies = [
-		() => findOptimalUsingDP(topBlocks, maxDays),
-		() => findOptimalUsingGreedy(topBlocks, maxDays),
-		() => findOptimalUsingBalanced(topBlocks, maxDays),
-	];
+	let bestTotalEffective = 0;
 
 	for (const strategy of strategies) {
 		const combination = strategy();
-		if (combination.length > 0) {
-			const totalPtoDays = combination.reduce((sum, block) => sum + block.blockSize, 0);
-			const totalEffectiveDays = combination.reduce((sum, block) => sum + block.effectiveDays, 0);
-			const effectiveRatio = totalEffectiveDays / totalPtoDays;
+		const totalEffective = combination.reduce((sum, block) => sum + block.effectiveDays, 0);
+		const totalPtoDays = combination.reduce((sum, block) => sum + block.blockSize, 0);
 
-			if (
-				effectiveRatio > bestEffectiveRatio ||
-				(Math.abs(effectiveRatio - bestEffectiveRatio) < 0.1 &&
-					totalPtoDays > bestCombination.reduce((sum, b) => sum + b.blockSize, 0))
-			) {
-				bestCombination = combination;
-				bestEffectiveRatio = effectiveRatio;
-			}
+		const isEfficiencyBetter = totalEffective > bestTotalEffective;
+		const isSameEfficiencyButMorePto =
+			totalEffective === bestTotalEffective && totalPtoDays > bestCombination.reduce((sum, b) => sum + b.blockSize, 0);
+
+		if (isEfficiencyBetter || isSameEfficiencyButMorePto) {
+			bestCombination = combination;
+			bestTotalEffective = totalEffective;
 		}
 	}
 
 	return bestCombination;
 }
 
-function findOptimalUsingDP(blocks: BlockOpportunity[], maxDays: number): BlockOpportunity[] {
-	const n = blocks.length;
-	const dp: Array<Array<{ effectiveDays: number; blocks: BlockOpportunity[] }>> = Array(n + 1)
-		.fill(null)
-		.map(() =>
-			Array(maxDays + 1)
-				.fill(null)
-				.map(() => ({ effectiveDays: 0, blocks: [] })),
-		);
+function findOptimalUsingMaxEffectiveDays(blocks: BlockOpportunity[], maxDays: number): BlockOpportunity[] {
+	const sortedBlocks = [...blocks].sort((a, b) => b.effectiveDays - a.effectiveDays);
 
-	for (let i = 1; i <= n; i++) {
-		const block = blocks[i - 1];
-		const blockKeys = new Set(block.days.map(getDateKey));
-
-		for (let days = 0; days <= maxDays; days++) {
-			dp[i][days] = { ...dp[i - 1][days] };
-
-			if (days >= block.blockSize) {
-				const prevState = dp[i - 1][days - block.blockSize];
-				const hasConflict = prevState.blocks.some((prevBlock) =>
-					prevBlock.days.some((prevDay) => blockKeys.has(getDateKey(prevDay))),
-				);
-
-				if (!hasConflict) {
-					const newEffective = prevState.effectiveDays + block.effectiveDays;
-					if (newEffective > dp[i][days].effectiveDays) {
-						dp[i][days] = {
-							effectiveDays: newEffective,
-							blocks: [...prevState.blocks, block],
-						};
-					}
-				}
-			}
-		}
-	}
-
-	let best = dp[n][maxDays];
-	for (let days = maxDays - 1; days >= Math.max(1, maxDays - 2); days--) {
-		if (dp[n][days].effectiveDays > best.effectiveDays) {
-			best = dp[n][days];
-		}
-	}
-
-	return best.blocks;
-}
-
-function findOptimalUsingGreedy(blocks: BlockOpportunity[], maxDays: number): BlockOpportunity[] {
-	const sorted = [...blocks].sort((a, b) => b.effectiveDays / b.blockSize - a.effectiveDays / a.blockSize);
 	const result: BlockOpportunity[] = [];
 	const usedDayKeys = new Set<string>();
 	let remainingDays = maxDays;
 
-	for (const block of sorted) {
+	for (const block of sortedBlocks) {
 		if (block.blockSize <= remainingDays) {
 			const hasConflict = block.days.some((day) => usedDayKeys.has(getDateKey(day)));
+
 			if (!hasConflict) {
 				result.push(block);
-				block.days.forEach((day) => usedDayKeys.add(getDateKey(day)));
+				for (const day of block.days) {
+					usedDayKeys.add(getDateKey(day));
+				}
 				remainingDays -= block.blockSize;
+
+				if (remainingDays === 0) break;
+			}
+		}
+	}
+
+	return result;
+}
+
+function findOptimalUsingBestRatio(blocks: BlockOpportunity[], maxDays: number): BlockOpportunity[] {
+	const sortedBlocks = [...blocks].sort((a, b) => {
+		const ratioA = a.effectiveDays / a.blockSize;
+		const ratioB = b.effectiveDays / b.blockSize;
+		return ratioB - ratioA;
+	});
+
+	const result: BlockOpportunity[] = [];
+	const usedDayKeys = new Set<string>();
+	let remainingDays = maxDays;
+
+	for (const block of sortedBlocks) {
+		if (block.blockSize <= remainingDays) {
+			const hasConflict = block.days.some((day) => usedDayKeys.has(getDateKey(day)));
+
+			if (!hasConflict) {
+				result.push(block);
+				for (const day of block.days) {
+					usedDayKeys.add(getDateKey(day));
+				}
+				remainingDays -= block.blockSize;
+
+				if (remainingDays === 0) break;
 			}
 		}
 	}
@@ -193,28 +175,37 @@ function findOptimalUsingGreedy(blocks: BlockOpportunity[], maxDays: number): Bl
 }
 
 function findOptimalUsingBalanced(blocks: BlockOpportunity[], maxDays: number): BlockOpportunity[] {
+	const sortedBlocks = [...blocks].sort((a, b) => {
+		const ratioA = a.effectiveDays / a.blockSize;
+		const ratioB = b.effectiveDays / b.blockSize;
+
+		if (Math.abs(ratioA - ratioB) > 0.5) {
+			return ratioB - ratioA;
+		}
+
+		if (a.effectiveDays !== b.effectiveDays) {
+			return b.effectiveDays - a.effectiveDays;
+		}
+
+		return b.blockSize - a.blockSize;
+	});
+
 	const result: BlockOpportunity[] = [];
 	const usedDayKeys = new Set<string>();
 	let remainingDays = maxDays;
 
-	const sorted = [...blocks].sort((a, b) => {
-		const aEfficiency = a.effectiveDays / a.blockSize;
-		const bEfficiency = b.effectiveDays / b.blockSize;
-
-		if (Math.abs(aEfficiency - bEfficiency) > 0.3) {
-			return bEfficiency - aEfficiency;
-		}
-
-		return a.blockSize - b.blockSize;
-	});
-
-	for (const block of sorted) {
+	for (const block of sortedBlocks) {
 		if (block.blockSize <= remainingDays) {
 			const hasConflict = block.days.some((day) => usedDayKeys.has(getDateKey(day)));
+
 			if (!hasConflict) {
 				result.push(block);
-				block.days.forEach((day) => usedDayKeys.add(getDateKey(day)));
+				for (const day of block.days) {
+					usedDayKeys.add(getDateKey(day));
+				}
 				remainingDays -= block.blockSize;
+
+				if (remainingDays === 0) break;
 			}
 		}
 	}

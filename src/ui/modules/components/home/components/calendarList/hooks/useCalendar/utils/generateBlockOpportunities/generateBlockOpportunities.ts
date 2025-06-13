@@ -47,17 +47,14 @@ export function generateBlockOpportunities({
 	}
 
 	function calculateHolidayDays(blockDays: Date[], daysMap: Map<string, DayInfo>): number {
-		// Create a map with all free days (weekends, holidays, and the block's PTO days)
 		const freeDaysMap = new Map<string, Date>();
 
-		// Add all holidays and weekends from the entire map
 		for (const [dayKey, dayInfo] of daysMap) {
 			if (dayInfo.isFreeDay) {
 				freeDaysMap.set(dayKey, dayInfo.date);
 			}
 		}
 
-		// Add the block's PTO days
 		for (const day of blockDays) {
 			freeDaysMap.set(getDateKey(day), day);
 		}
@@ -71,7 +68,6 @@ export function generateBlockOpportunities({
 			const hasBlockDay = sequence.some((day) => blockDayKeys.has(getDateKey(day)));
 			if (!hasBlockDay) continue;
 
-			// Count weekday holidays in this sequence (exclude weekends and the block's own days)
 			const weekdayHolidays = sequence.filter((day) => {
 				const dayKey = getDateKey(day);
 				const dayInfo = daysMap.get(dayKey);

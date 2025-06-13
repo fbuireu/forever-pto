@@ -37,10 +37,8 @@ export function calculateEffectiveDays({ freeDaysBaseMap, ptoDays }: CalculateEf
 		});
 
 		if (!hasWeekdayHolidays) {
-			// Only PTO days, no benefit from holidays
 			effectiveDays += ptoInSequence.length;
 		} else {
-			// Benefits from weekday holidays - count entire sequence
 			effectiveDays += sequence.length;
 		}
 	}

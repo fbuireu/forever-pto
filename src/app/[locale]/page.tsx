@@ -4,9 +4,12 @@ import type { SearchParams } from "@const/types";
 import { getCountry } from "@infrastructure/services/country/getCountry/getCountry";
 import { getHolidays } from "@infrastructure/services/holiday/getHolidays";
 import { getRegion } from "@infrastructure/services/region/getRegion/getRegion";
-import { Footer } from "@modules/components/core/footer/Footer";
+import { Legend } from "@modules/components/core/legend/Legend";
 import { SidebarTrigger } from "@modules/components/core/sidebar/atoms/sidebarTrigger/SidebarTrigger";
 import { SidebarProvider } from "@modules/components/core/sidebar/provider/SidebarProvider/SidebarProvider";
+import { Faq } from "@modules/components/home/components/faq/Faq";
+import { HowItWorks } from "@modules/components/home/components/howItWorks/HowItWorks";
+import { Roadmap } from "@modules/components/home/components/roadmap/Roadmap";
 import { AppSidebar } from "@ui/modules/components/appSidebar/components/appSidebar/AppSidebar";
 import CalendarList from "@ui/modules/components/home/components/calendarList/CalendarList";
 import HolidaysSummary from "@ui/modules/components/home/components/holidaySummary/HolidaysSummary";
@@ -63,7 +66,10 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 							userRegion={userRegion}
 						/>
 					</HolidaysProvider>
-					<Footer locale={locale} />
+					<Legend locale={locale} />
+					<HowItWorks locale={locale} />
+					<Faq locale={locale} />
+					<Roadmap locale={locale} />
 				</div>
 			</PremiumProvider>
 		</SidebarProvider>
@@ -74,11 +80,13 @@ export default ForeverPto;
 export { generateMetadata };
 // TODO:
 // 1- recheck and refactor
+// 2- migrate to pnpm
 // 6- Add tests (also e2e)
 // 9- Add CI/CD
 // 10- repo settings and rules (README, etc)
 // 34- MCP server? (paid func)
 // 34- use fn to format messages in stats
+// 35- use own cdn to check country
 // 34- Readme
 // 35- Replace kofi for stripe
 // 35- allow the user to select score stragety
@@ -86,7 +94,7 @@ export { generateMetadata };
 
 // TODO: (release)
 // 35- Check copies
-// 2- add FAQ + roadmap
+// 2- devFooter/contact
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc)
 // 2- remove env vars
 // 34- Ko-Fi BE integration (webhook not working on localhost)
