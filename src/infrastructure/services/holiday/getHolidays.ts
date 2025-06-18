@@ -48,7 +48,7 @@ export async function getHolidays({
 				},
 			})
 			.sort((a, b) => a.date.getTime() - b.date.getTime());
-	} catch (error) {
+	} catch (_) {
 		return [];
 	}
 }

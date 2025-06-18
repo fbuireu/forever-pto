@@ -21,7 +21,7 @@ export function getRegionsMap(countryCode: string): Record<string, string> {
 		for (const [code, name] of Object.entries(regions)) {
 			REGIONS_CACHE[countryCode][code.toLowerCase()] = name;
 		}
-	} catch (error) {}
+	} catch (_) {}
 
 	return REGIONS_CACHE[countryCode];
 }

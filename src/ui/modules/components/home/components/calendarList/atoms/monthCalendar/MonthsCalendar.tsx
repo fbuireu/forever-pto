@@ -1,13 +1,15 @@
 import { Calendar } from "@ui/modules/components/core/calendar/Calendar";
 import { Card } from "@ui/modules/components/core/card/Card";
 import { Spinner } from "@ui/modules/components/core/spinner/Spinner";
-import { format } from "date-fns";
 import type { FocusEvent, MouseEvent, ReactNode } from "react";
 import "./months-calendar.css";
+import { Chevron } from "@modules/components/home/components/calendarList/atoms/monthCalendar/atoms/chevron/Chevron";
+import { Day } from "@modules/components/home/components/calendarList/atoms/monthCalendar/atoms/day/Day";
+import { Dropdown } from "@modules/components/home/components/calendarList/atoms/monthCalendar/atoms/dropdown/Dropdown";
 import { MonthSummary } from "@modules/components/home/components/calendarList/atoms/monthCalendar/atoms/monthSummary/MonthSummary";
-import { setDayClassName } from "@modules/components/home/components/calendarList/atoms/monthCalendar/utils/setDayClassName/setDayClassName";
 import { getLocalizedDateFns } from "@ui/utils/i18n/getLocalizedDateFns/getLocalizedDateFns";
 import { useLocale } from "next-intl";
+import type { CalendarDay } from "react-day-picker";
 
 interface MonthCalendarProps {
 	month: Date;
@@ -29,6 +31,15 @@ interface MonthCalendarProps {
 	getMonthSummary: (month: Date) => ReactNode;
 	isPastDayAllowed: () => boolean;
 }
+
+const createDayComponent =
+	(
+		additionalProps: Omit<
+			MonthCalendarProps,
+			"month" | "ptoDays" | "isPending" | "suggestedDays" | "handleDaySelect" | "getMonthSummary"
+		>,
+	) =>
+	({ day }: { day: CalendarDay }) => <Day day={day} {...additionalProps} />;
 
 export const MonthCalendar = ({
 	month,
@@ -66,54 +77,22 @@ export const MonthCalendar = ({
 					fixedWeeks
 					locale={getLocalizedDateFns(locale)}
 					components={{
-						Chevron: () => <></>,
-						Dropdown: () => <></>,
-						Day: ({ day }) => {
-							const { date, displayMonth } = day;
-							const dayKey = format(date, "yyyy-MM-dd");
-							const holiday = getHolidayName(date);
-							const isSuggested = isDaySuggested(date);
-							const isAlternative = isDayAlternative(date);
-							const blockId = isSuggested ? dayToBlockIdMap[dayKey] || "" : "";
-							const blockPosition = datePositionInBlock(date);
-							const alternativePosition = alternativeDayPosition(date);
-
-							const DATA_ATTRIBUTES = {
-								"data-date": dayKey,
-								...(isSuggested && { "data-suggested": true }),
-								...(isAlternative && { "data-alternative": true }),
-								...(isHoliday(date) && { "data-holiday": true }),
-								...(blockId && { "data-block-id": blockId }),
-								...(blockPosition && { "data-block-position": blockPosition }),
-								...(alternativePosition && { "data-alternative-position": alternativePosition }),
-								...(hoveredBlockId === blockId && { "data-hovered-block": true }),
-							};
-
-							return (
-								<td className="p-0 relative">
-									<button
-										type="button"
-										className={setDayClassName({
-											date,
-											displayMonth,
-											selectedDays,
-											isHoliday,
-											isDaySuggested,
-											isDayAlternative,
-											isPastDayAllowed,
-										})}
-										title={holiday ?? ""}
-										onMouseOver={handleDayInteraction}
-										onMouseOut={handleDayMouseOut}
-										onBlur={handleDayMouseOut}
-										onFocus={handleDayInteraction}
-										{...DATA_ATTRIBUTES}
-									>
-										{date.getDate()}
-									</button>
-								</td>
-							);
-						},
+						Chevron,
+						Dropdown,
+						Day: createDayComponent({
+							selectedDays,
+							hoveredBlockId,
+							dayToBlockIdMap,
+							isHoliday,
+							getHolidayName,
+							isDaySuggested,
+							isDayAlternative,
+							datePositionInBlock,
+							alternativeDayPosition,
+							handleDayInteraction,
+							handleDayMouseOut,
+							isPastDayAllowed,
+						}),
 					}}
 				/>
 			</Card>

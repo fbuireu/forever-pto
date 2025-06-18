@@ -92,6 +92,7 @@ export { generateMetadata };
 // 34- Readme
 // 35- Replace kofi for stripe
 // 35- allow the user to select score stragety
+// 36- https://animate-ui.com/
 // 24- Edit weekends (paid functionality). Edit days (add and remove days) (paid functionality)
 
 // TODO: (release)

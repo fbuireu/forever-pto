@@ -4,9 +4,9 @@ import type { SearchParams } from "@const/types";
 import { createQueryString } from "@modules/components/appSidebar/components/appSidebar/utils/createQueryString/createQueryString";
 import { Label } from "@modules/components/core/label/Label";
 import { Switch } from "@modules/components/core/switch/Switch";
-import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { startTransition, useCallback, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
+import { startTransition, useCallback, useId, useMemo, useState } from "react";
 
 export interface AllowPastDaysProps {
 	allowPastDays: SearchParams["allowPastDays"];
@@ -16,6 +16,7 @@ export const AllowPastDays = ({ allowPastDays }: AllowPastDaysProps) => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
+	const id = useId();
 	const [isEnabled, setIsEnabled] = useState(allowPastDays === "true");
 	const t = useTranslations("filters.allowPastDays");
 
@@ -39,13 +40,13 @@ export const AllowPastDays = ({ allowPastDays }: AllowPastDaysProps) => {
 	const switchControl = useMemo(
 		() => (
 			<div className="flex items-center gap-2">
-				<Switch id="allow-past-days" checked={isEnabled} onCheckedChange={handleSwitchChange} />
-				<Label htmlFor="allow-past-days" className="text-sm cursor-pointer select-none">
+				<Switch id={id} checked={isEnabled} onCheckedChange={handleSwitchChange} />
+				<Label htmlFor={id} className="text-sm cursor-pointer select-none">
 					{labelText}
 				</Label>
 			</div>
 		),
-		[isEnabled, handleSwitchChange, labelText],
+		[isEnabled, handleSwitchChange, labelText, id],
 	);
 
 	return <div className="flex items-center justify-between">{switchControl}</div>;

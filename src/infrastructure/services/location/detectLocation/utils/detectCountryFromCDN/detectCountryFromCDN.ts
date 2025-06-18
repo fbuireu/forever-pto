@@ -19,7 +19,7 @@ export async function detectCountryFromCDN(): Promise<string> {
 		}
 
 		return "";
-	} catch (error) {
+	} catch (_) {
 		return "";
 	}
 }

@@ -13,7 +13,7 @@ export async function getCountry(country?: string): Promise<CountryDTO | undefin
 		const raw: RawCountry = { [country]: countryName };
 
 		return countryDTO.create({ raw }).at(0);
-	} catch (error) {
+	} catch (_) {
 		return undefined;
 	}
 }

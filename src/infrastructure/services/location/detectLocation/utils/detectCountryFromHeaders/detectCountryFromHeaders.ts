@@ -23,7 +23,7 @@ export async function detectCountryFromHeaders(request: NextRequest): Promise<st
 		}
 
 		return geoData.country.toLowerCase();
-	} catch (error) {
+	} catch (_) {
 		return "";
 	}
 }

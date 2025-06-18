@@ -5,7 +5,6 @@ import type { DayInfo } from "../../types";
 interface CreateYearMapParams {
 	monthsToShow: Date[];
 	isHoliday: (date: Date) => boolean;
-	selectedDays: Date[];
 	selectedPtoDays: Date[];
 	isPastDayAllowed: () => boolean;
 }
@@ -18,7 +17,6 @@ interface CreateYearMapReturn {
 export function createYearMap({
 	monthsToShow,
 	isHoliday,
-	selectedDays,
 	selectedPtoDays,
 	isPastDayAllowed,
 }: CreateYearMapParams): CreateYearMapReturn {
@@ -40,7 +38,6 @@ export function createYearMap({
 		allDays = allDays.filter((day) => day >= today);
 	}
 
-	const selectedDaysSet = new Set(selectedDays.map(getDateKey));
 	const selectedPtoDaysSet = new Set(selectedPtoDays.map(getDateKey));
 
 	for (const day of allDays) {

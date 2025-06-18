@@ -11,7 +11,7 @@ export async function getRegions(countryCode?: string) {
 		if (!regions || !Object.values(regions).length) return [];
 
 		return regionDTO.create({ raw: regions }).sort((a, b) => a.label.localeCompare(b.label));
-	} catch (error) {
+	} catch (_) {
 		return [];
 	}
 }

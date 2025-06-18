@@ -15,18 +15,6 @@
 		}
 	},
 	"linter": {
-		"ignore": ["*.d.ts*"],
-		"rules": {
-			"recommended": true,
-			"correctness": {
-				"noUnknownProperty": "info"
-			},
-			"suspicious": {
-				"noConsole": "warn"
-			},
-			"complexity": {
-				"noForEach": "warn"
-			}
-		}
+		"includes": ["**", "!**/*.d.ts*"]
 	}
 }

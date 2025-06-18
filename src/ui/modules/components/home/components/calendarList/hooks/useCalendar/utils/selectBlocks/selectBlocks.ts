@@ -58,7 +58,7 @@ export function selectBlocks({
 		return b.score - a.score;
 	});
 
-	const filteredOpportunities = sortedOpportunities.filter((block, index, array) => {
+	const filteredOpportunities = sortedOpportunities.filter((block, _, array) => {
 		if (block.effectiveDays / block.blockSize > SCORE_MULTIPLIERS.SELECTION.HIGH_EFFICIENCY_THRESHOLD) return true;
 
 		if (

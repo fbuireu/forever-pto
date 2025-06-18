@@ -9,7 +9,7 @@ export async function getCountries(): Promise<CountryDTO[]> {
 		const userLanguage = (await getUserLocale()) ?? getUserLanguage()[0];
 
 		return countryDTO.create({ raw: countries.getNames(userLanguage) }).sort((a, b) => a.label.localeCompare(b.label));
-	} catch (error) {
+	} catch (_) {
 		return [];
 	}
 }

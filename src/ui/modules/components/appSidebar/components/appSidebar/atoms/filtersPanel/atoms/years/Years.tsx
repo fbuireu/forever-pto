@@ -4,13 +4,13 @@ import { FILTER_MAXIMUM_VALUES } from "@const/const";
 import type { SearchParams } from "@const/types";
 import { createQueryString } from "@modules/components/appSidebar/components/appSidebar/utils/createQueryString/createQueryString";
 import { Label } from "@modules/components/core/label/Label";
-import { Select } from "@modules/components/core/select/Select";
 import { SelectItem } from "@modules/components/core/select/atoms/selectItem/SelectItem";
 import { SelectTrigger } from "@modules/components/core/select/atoms/selectTrigger/SelectTrigger";
 import { SelectValue } from "@modules/components/core/select/atoms/selectValue/SelectValue";
+import { Select } from "@modules/components/core/select/Select";
 import { SelectContent } from "@ui/modules/components/core/select/atoms/selectContent/SelectContent";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { startTransition, useCallback, useMemo, useState } from "react";
+import { startTransition, useCallback, useId, useMemo, useState } from "react";
 
 export interface YearsProps {
 	year: SearchParams["year"];
@@ -20,6 +20,7 @@ export const Years = ({ year: yearProps }: YearsProps) => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
+	const id = useId();
 	const [year, setYear] = useState(yearProps);
 
 	const handleYearChange = useCallback(
@@ -51,13 +52,13 @@ export const Years = ({ year: yearProps }: YearsProps) => {
 	const selectComponent = useMemo(
 		() => (
 			<Select value={year} onValueChange={handleYearChange}>
-				<SelectTrigger id="year-select" className="w-full">
+				<SelectTrigger id={id} className="w-full">
 					<SelectValue placeholder="Year" />
 				</SelectTrigger>
 				<SelectContent>{yearOptions}</SelectContent>
 			</Select>
 		),
-		[year, handleYearChange, yearOptions],
+		[year, handleYearChange, yearOptions, id],
 	);
 
 	return (

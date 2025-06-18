@@ -84,11 +84,10 @@ export function useCalendar({
 			createYearMap({
 				monthsToShow: monthsToShowDates,
 				isHoliday: calendarMaps.isHoliday,
-				selectedDays,
 				selectedPtoDays: [],
 				isPastDayAllowed,
 			}),
-		[monthsToShowDates, calendarMaps.isHoliday, selectedDays, isPastDayAllowed],
+		[monthsToShowDates, calendarMaps.isHoliday, isPastDayAllowed],
 	);
 
 	useEffect(() => {
@@ -114,7 +113,7 @@ export function useCalendar({
 				setSuggestedDays(suggestedDays);
 				setAlternativeBlocks(alternativeBlocks);
 				setDayToBlockIdMap(dayToBlockIdMap);
-			} catch (error) {
+			} catch (_) {
 				setSuggestedDays([]);
 				setAlternativeBlocks({});
 				setDayToBlockIdMap({});

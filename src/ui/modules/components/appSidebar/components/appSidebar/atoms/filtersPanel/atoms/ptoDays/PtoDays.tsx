@@ -7,10 +7,10 @@ import { createQueryString } from "@modules/components/appSidebar/components/app
 import { Input } from "@modules/components/core/input/Input";
 import { useDebouncedCallback } from "@ui/hooks/useDebounceCallback/useDebounceCallback";
 import { Label } from "@ui/modules/components/core/label/Label";
-import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import type { ChangeEvent } from "react";
-import { startTransition, useCallback, useMemo, useState } from "react";
+import { startTransition, useCallback, useId, useMemo, useState } from "react";
 
 export interface PtoDaysProps {
 	ptoDays: SearchParams["ptoDays"];
@@ -20,6 +20,7 @@ export const PtoDays = ({ ptoDays }: PtoDaysProps) => {
 	const t = useTranslations("filters.ptoDays");
 	const router = useRouter();
 	const pathname = usePathname();
+	const id = useId();
 	const searchParams = useSearchParams();
 	const initialDaysValue = Number(ptoDays);
 	const [localDaysValue, setLocalDaysValue] = useState(initialDaysValue);
@@ -65,22 +66,13 @@ export const PtoDays = ({ ptoDays }: PtoDaysProps) => {
 	);
 
 	const daysInput = useMemo(
-		() => (
-			<Input
-				id="available-days"
-				type="number"
-				value={localDaysValue}
-				onChange={handleInputChange}
-				className="w-20"
-				min="0"
-			/>
-		),
-		[localDaysValue, handleInputChange],
+		() => <Input id={id} type="number" value={localDaysValue} onChange={handleInputChange} className="w-20" min="0" />,
+		[localDaysValue, handleInputChange, id],
 	);
 
 	return (
 		<div className="flex items-center gap-2">
-			<Label htmlFor="available-days" className="whitespace-nowrap">
+			<Label htmlFor={id} className="whitespace-nowrap">
 				{t("got")}
 			</Label>
 			<MinusButton onClick={decrementDays} disabled={localDaysValue <= 0} />

@@ -2,18 +2,18 @@
 
 import { Button } from "@modules/components/core/button/Button";
 import { Calendar } from "@modules/components/core/calendar/Calendar";
-import { Dialog } from "@modules/components/core/dialog/Dialog";
 import { DialogContent } from "@modules/components/core/dialog/atoms/dialogContent/DialogContent";
 import { DialogFooter } from "@modules/components/core/dialog/atoms/dialogFooter/DialogFooter";
 import { DialogHeader } from "@modules/components/core/dialog/atoms/dialogHeader/DialogHeader";
 import { DialogTitle } from "@modules/components/core/dialog/atoms/dialogTitle/DialogTitle";
+import { Dialog } from "@modules/components/core/dialog/Dialog";
 import { Input } from "@modules/components/core/input/Input";
 import { Label } from "@modules/components/core/label/Label";
 import { getLocalizedDateFns } from "@ui/utils/i18n/getLocalizedDateFns/getLocalizedDateFns";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useId, useState } from "react";
 
 interface EditHolidayModalProps {
 	isOpen: boolean;
@@ -26,8 +26,9 @@ interface EditHolidayModalProps {
 export const EditHolidayModal = ({ isOpen, onClose, onSave, initialDate, initialName }: EditHolidayModalProps) => {
 	const [date, setDate] = useState<Date>(initialDate);
 	const [name, setName] = useState(initialName);
+	const id = useId();
 	const locale = useLocale();
-	const t = useTranslations("editModal");
+	const t = useTranslations("modals.edit");
 
 	const handleSave = () => {
 		onSave(date, name);
@@ -58,13 +59,8 @@ export const EditHolidayModal = ({ isOpen, onClose, onSave, initialDate, initial
 						</div>
 					</div>
 					<div className="grid gap-2">
-						<Label htmlFor="name">{t("nameLabel")}</Label>
-						<Input
-							id="name"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-							placeholder={t("namePlaceholder")}
-						/>
+						<Label htmlFor={id}>{t("nameLabel")}</Label>
+						<Input id={id} value={name} onChange={(e) => setName(e.target.value)} placeholder={t("placeholder")} />
 					</div>
 				</div>
 				<DialogFooter>

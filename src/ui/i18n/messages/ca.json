@@ -1,358 +1,359 @@
 {
-	"metadata": {
-		"title": "Forever PTO - Optimitza els teus dies lliures",
-		"description": "Aplicació per optimitzar la selecció de dies PTO i maximitzar el teu temps lliure",
-		"keywords": "dies lliures, calendari de dies lliures, seguiment de dies lliures, planificador de dies lliures, gestió de dies lliures"
-	},
-	"payments": {
-		"cta": "Premium"
-	},
-	"calendar": {
-		"selectDays": "Selecciona els teus dies PTO",
-		"holidays": "Festius",
-		"weekends": "Cap de setmana",
-		"selected": "Seleccionats",
-		"totalDays": "Total dies"
-	},
-	"filters": {
-		"title": "Configuració & Filtres",
-		"country": "País",
-		"region": "Regió",
-		"year": "Any",
-		"days": "Dies PTO",
-		"allowPastDays": {
-			"label": "Permetre dies passats",
-			"enabled": "Activat",
-			"disabled": "Desactivat",
-			"tooltip": "Aquest interruptor permet habilitar o deshabilitar el suggeriment de dies festius passats. Això permet veure les oportunitats de vacances que es van perdre en el passat"
-		},
-		"carryOverMonths": {
-			"label": "Mesos d'arrossegament",
-			"monthsToShow": "Mesos a mostrar: {months}",
-			"rangeMin": "1 mes",
-			"rangeMax": "{months, plural, one {# mes} other {# mesos}}",
-			"tooltip": "Permet afegir mesos a l'any següent per ampliar la cerca d'oportunitats",
-			"featureName": "Mesos addicionals",
-			"featureDescription": "Afegeix mesos a l'any següent"
-		},
-		"countries": {
-			"heading": "Països",
-			"label": "País",
-			"placeholder": "Selecciona el teu país",
-			"searchPlaceholder": "Cerca país...",
-			"notFound": "País no trobat"
-		},
-		"regions": {
-			"label": "Regió",
-			"heading": "{hasCountry, plural, =0 {Regions} other {Regions in {country}}}",
-			"placeholder": "{count, plural, =0 {No s'han trobat regions per a {country}} other {Selecciona regió...}}",
-			"searchPlaceholder": "Cerca regió...",
-			"notFound": "Regió no trobada."
-		},
-		"ptoDays": {
-			"got": "Tinc",
-			"days": "{days, plural, one {dia lliure} other {dies lliures}}"
-		}
-	},
-	"languages": {
-		"en": "Anglès",
-		"es": "Castellà",
-		"ca": "Català",
-		"it": "Italià"
-	},
-	"theme": {
-		"light": "Clar",
-		"dark": "Fosc",
-		"system": "Sistema"
-	},
-	"holidaysSummary": {
-		"national": "Festius nacionals",
-		"regional": "Festius regionals",
-		"custom": "Festius personalitzats",
-		"featureName": "Sel·lecció multiple",
-		"featureDescription": "Afegeix festius personalitzats"
-	},
-	"holidaysTable": {
-		"addHoliday": "Afegir festiu",
-		"notFound": "No s'han trobat {holiday} per a l'any següent",
-		"noResults": "No hi ha resultats",
-		"confirmTitle": "Eliminar festius",
-		"confirmDescription": "Estàs segur que vols eliminar els festius seleccionats?",
-		"headers": {
-			"name": "Nom",
-			"actions": "Accions",
-			"date": "Data"
-		},
-		"actions": {
-			"selectAll": "Sel·leccionar tot",
-			"selectRow": "Sel·leccionar fila",
-			"removeSelected": "Eliminar seleccionats",
-			"edit": "Editar",
-			"remove": "Eliminar",
-			"openMenu": "Obrir menú"
-		},
-		"features": {
-			"multipleSelection": "Sel·lecció multiple",
-			"removeMultiple": "Elimina festius múltiples",
-			"editRemove": "Edita o elimina festius",
-			"selectHolidays": "Selecciona festius múltiples"
-		}
-	},
-	"modals": {
-		"confirm": {
-			"title": "Eliminar festiu",
-			"description": "Estàs segur que vols eliminar aquest festiu? Aquesta acció no es pot desfer.",
-			"cancel": "Cancel·lar",
-			"confirm": "Eliminar"
-		},
-		"edit": {
-			"title": "Editar festiu",
-			"dateLabel": "Data",
-			"nameLabel": "Nom",
-			"placeholder": "Nom del festiu",
-			"cancel": "Cancel·lar",
-			"save": "Guardar"
-		},
-		"add": {
-			"title": "Afegir festiu",
-			"dateLabel": "Data",
-			"nameLabel": "Nom",
-			"placeholder": "Nom del festiu",
-			"cancel": "Cancel·lar",
-			"save": "Guardar"
-		}
-	},
-	"premiumLock": {
-		"modal": {
-			"title": "Verifica la teva subscripció premium",
-			"description": "Introdueix l'email que vas utilitzar a Ko-fi per verificar la teva subscripció premium.",
-			"successTitle": "Subscripció verificada!",
-			"successDescription": "La teva subscripció premium s'ha verificat correctament. Gaudeix de totes les funcions premium!",
-			"successMessage": "La teva subscripció premium s'ha verificat correctament. Gaudeix de totes les funcions premium!",
-			"emailLabel": "Email",
-			"emailPlaceholder": "el.teu@email.com",
-			"verify": "Verificar subscripció",
-			"verifying": "Verificant...",
-			"close": "Tancar"
-		},
-		"errors": {
-			"notFound": "No s'ha trobat cap subscripció premium amb aquest email. Si ja has fet un pagament, assegura't d'usar el mateix email que vas utilitzar a Ko-fi.",
-			"generic": "Ha ocorregut un error en verificar la teva subscripció. Sisplau, torna-ho a intentar més tard.",
-			"validation": "Sisplau, introdueix un email vàlid"
-		}
-	},
-	"stats": {
-		"title": "Optimització de Vacances",
-		"holidaysSummary": {
-			"title": "Resum de dies festius",
-			"withCountry": "A {country} ({flag}) hi ha {nationalHolidays} festius nacionals",
-			"withoutCountry": "Hi ha {nationalHolidays} festius nacionals",
-			"regionalPart": ". Sumats als {regionalHolidays} festius de {region}",
-			"totalPart": ", fan un total de {totalHolidays} dies festius",
-			"defaultRegion": "la regió",
-			"noHolidaysFound": "No s'han trobat dies festius per a aquest país. Prova a usar el cercador",
-			"noRegionalHolidays": " Tampoc per a la regió {region}.",
-			"noCountryHolidays": "No s'han trobat dies festius per al teu país."
-		},
-		"effectiveness": {
-			"title": "Efectivitat dels teus dies PTO",
-			"ptoUsed": "Dies PTO utilitzats",
-			"totalFreeDays": "Dies lliures totals",
-			"ratio": "Ràtio d'efectivitat",
-			"summaryStart": "Tens {ptoDaysAvailable} dies de PTO disponibles que s'han convertit en {effectiveDays} dies lliures usant el nostre sistema, el que suposa un increment de",
-			"summaryEnd": "d'efectivitat.",
-			"calculating": "Tens {ptoDaysAvailable} dies de PTO disponibles. El sistema està calculant els forats òptims per maximitzar les teves vacances."
-		},
-		"noPtoDays": "Has d'establir la quantitat de dies PTO disponibles perquè el sistema pugui suggerir els dies òptims per maximitzar les teves vacances."
-	},
-	"calendarList": {
-		"monthlySummary": {
-			"title": "Suggeriments",
-			"tooltip": "Passa el cursor sobre un dia suggerit per veure alternatives similars"
-		},
-		"intervals": {
-			"singleDay": "{day} de {month}: 1 día",
-			"multipleDay": "{startDay} al {endDay} de {month}: {amount} días"
-		}
-	},
-	"legend": {
-		"today": "Avui",
-		"weekends": "Caps de setmana",
-		"holidays": "Festius",
-		"suggested": "Dies suggerits",
-		"alternatives": "Alternatives similars"
-	},
-	"howItWorks": {
-		"title": "Com funciona l'optimitzador de vacances?",
-		"description": "L'optimitzador de vacances analitza tots els dies laborables de l'any i troba les millors combinacions per maximitzar els teus dies lliures consecutius.",
-		"process": {
-			"blockGeneration": {
-				"title": "Procés de Generació de Blocs",
-				"steps": {
-					"workdayAnalysis": "Anàlisi de dies laborables: Identifica tots els dies de treball disponibles",
-					"sequenceCalculation": "Càlcul de seqüències: Per a cada dia, calcula quants dies lliures consecutius generaria agafar-lo com a PTO",
-					"blockGeneration": "Generació de blocs: Crea blocs d'1-5 dies consecutius i avalua la seva efectivitat",
-					"scoring": "Puntuació: Cada bloc rep una puntuació basada en dies efectius totals generats, ràtio d'eficiència (dies lliures / dies PTO) i proximitat a festius"
-				}
-			},
-			"strategies": {
-				"title": "Estratègies de Selecció",
-				"description": "L'algoritme prova 3 estratègies diferents i tria la millor:",
-				"maxEffective": "Maximitzar Dies Efectius: Prioritza blocs que generin més dies lliures totals. Ideal per maximitzar temps lliure absolut.",
-				"maxEfficiency": "Maximitzar Eficiència: Prioritza millor ràtio dies_lliures / dies_PTO. Ideal per conservar dies PTO.",
-				"balanced": "Estratègia Balancejada: Combina tots dos criteris. Afavoreix blocs llargs només si són significativament millors."
-			},
-			"alternatives": {
-				"title": "Dies Alternatius",
-				"description": "Quan passes el cursor sobre un dia suggerit, es mostren alternatives que tenen els mateixos dies efectius que el bloc original, generen el mateix nombre de festius adjacents i no se solapen amb altres dies suggerits."
-			}
-		}
-	},
-	"faq": {
-		"title": "Preguntes Freqüents",
-		"description": "Tot el que necessites saber sobre l'optimitzador de vacances",
-		"limitationsTitle": "Limitacions i Detalls Tècnics",
-		"limitationsDescription": "Entenent les restriccions actuals i límits tècnics",
-		"questions": {
-			"individualVsBlocks": {
-				"question": "Per què suggereix dies individuals en lloc de blocs llargs?",
-				"answer": "Quan dies individuals estratègics (ex: al costat de festius) generen més dies lliures totals que un bloc llarg, l'algoritme els prioritza per a màxima efectivitat. L'optimitzador sempre tria la combinació que et dona més temps lliure."
-			},
-			"allPtoUsage": {
-				"question": "Per què usa tots els meus dies de vacances?",
-				"answer": "L'optimitzador està dissenyat per maximitzar el teu temps lliure usant tots els dies disponibles. Si no vols usar tots els teus dies, simplement introdueix un número menor que la teva assignació real de vacances."
-			},
-			"blockSizes": {
-				"question": "Per què els blocs estan limitats a 1-5 dies consecutius?",
-				"answer": "Aquest rang cobreix la majoria de patrons de vacances pràctics: 1 dia per a dies estratègics al costat de festius/caps de setmana, 2-3 dies per a caps de setmana llargs, i 4-5 dies per a setmanes de vacances estàndard. Els blocs més llargs (6+ dies) són rars i generalment menys eficients que dividir en blocs estratègics més petits."
-			},
-			"weekendsHandling": {
-				"question": "Com es gestionen els caps de setmana?",
-				"answer": "Només els caps de setmana adjacents a dies de vacances o festius es consideren valuosos. Els caps de setmana aïllats no afegeixen valor a l'optimització ja que ja els tens lliures."
-			},
-			"pastDates": {
-				"question": "Puc incloure dates passades?",
-				"answer": "Pots activar si es permeten dates passades a la configuració. Quan està desactivat, només es consideren dates futures per a les suggerències."
-			},
-			"differentCountries": {
-				"question": "Com gestiona diferents països?",
-				"answer": "L'optimitzador usa el teu país i regió seleccionats per carregar els festius apropiats i calcular dies òptims al voltant d'ells. Diferents països tenen diferents calendaris festius."
-			},
-			"alternativeDays": {
-				"question": "Què són els dies alternatius?",
-				"answer": "Quan passes el cursor sobre un dia suggerit, es mostren alternatives que generen exactament el mateix número de dies efectius i festius adjacents, però no se solapen amb altres suggerències."
-			},
-			"weekendCustomization": {
-				"question": "Puc personalitzar els dies de cap de setmana?",
-				"answer": "Actualment, l'optimitzador usa dissabte-diumenge com a caps de setmana. Caps de setmana personalitzables (ex: divendres-dissabte per a Orient Mitjà) estan planificats per a futures actualitzacions."
-			},
-			"partialPto": {
-				"question": "Què passa si no vull usar tots els meus dies de vacances?",
-				"answer": "Introdueix menys dies dels que realment tens. Per exemple, si tens 25 dies però només vols optimitzar 15, introdueix 15 al camp de vacances."
-			}
-		},
-		"limitations": {
-			"algorithmType": {
-				"question": "Garanteix la solució matemàticament òptima?",
-				"answer": "No, l'optimitzador usa un algoritme greedy que troba molt bones solucions ràpidament, però no garanteix la solució matemàticament òptima global. Prova 3 estratègies diferents i tria el millor resultat."
-			},
-			"maxAlternatives": {
-				"question": "Quantes alternatives es mostren?",
-				"answer": "Màxim 10 alternatives per bloc (configurable). El sistema prioritza mostrar les alternatives més rellevants amb criteris de coincidència exacta."
-			},
-			"personalPreferences": {
-				"question": "Considera preferències personals?",
-				"answer": "Actualment no. No té en compte preferències com evitar certs mesos, restriccions de viatge, o esdeveniments personals específics. Les versions futures inclouran preferències personalitzables."
-			},
-			"externalEvents": {
-				"question": "Pot optimitzar al voltant d'esdeveniments externs?",
-				"answer": "Actualment no. L'optimitzador no s'integra amb calendaris externs, conferències, esdeveniments familiars, o reserves de viatges. Només considera festius oficials."
-			},
-			"fixedPto": {
-				"question": "Puc usar només part dels meus dies de vacances?",
-				"answer": "La versió actual requereix usar tots els dies de vacances especificats. Les opcions d'ús parcial de vacances estan planificades per a futurs llançaments."
-			}
-		}
-	},
-	"roadmap": {
-		"title": "Full de Ruta",
-		"description": "Veu què ve després per a l'optimitzador de vacances",
-		"status": {
-			"completed": "Disponible",
-			"inProgress": "En Progrés",
-			"planned": "Planificat",
-			"future": "Futur"
-		},
-		"sections": {
-			"current": {
-				"title": "Característiques Actuals",
-				"description": "El que està disponible ara mateix",
-				"features": {
-					"multiStrategy": "3 estratègies d'optimització (Màx Efectiu, Màx Eficiència, Balancejat)",
-					"holidayOptimization": "Detecció i optimització intel·ligent de festius",
-					"alternatives": "Suggerències de dies alternatius amb coincidència exacta",
-					"multiCountry": "Suport per a múltiples països i regions"
-				}
-			},
-			"shortTerm": {
-				"title": "Proper Llançament",
-				"description": "Properament en els següents mesos",
-				"features": {
-					"customWeekends": "Dies de cap de setmana personalitzables (divendres-dissabte, etc.)",
-					"manualAdjustments": "Afegir/treure dies individuals amb reoptimització en temps real",
-					"strategySelection": "Tria la teva estratègia d'optimització preferida",
-					"improvedUI": "Interfície millorada i millor experiència mòbil"
-				}
-			},
-			"midTerm": {
-				"title": "Mitjà Termini",
-				"description": "Planificat per a més tard aquest any",
-				"features": {
-					"customScoring": "Algoritmes de puntuació personalitzats amb pesos definits per l'usuari",
-					"seasonPriorities": "Preferències de mes i estació",
-					"dateRestrictions": "Bloquejar dates o rangs específics",
-					"partialPto": "Usar només part dels teus dies de vacances disponibles"
-				}
-			},
-			"longTerm": {
-				"title": "Visió a Llarg Termini",
-				"description": "Innovacions futures que estem explorant",
-				"features": {
-					"aiOptimization": "Optimització amb IA basada en les teves preferències",
-					"travelIntegration": "Integració amb plataformes de reserva de viatges",
-					"teamCoordination": "Coordinar temps lliure amb el teu equip",
-					"mobileApp": "Aplicació mòbil nativa"
-				}
-			}
-		},
-		"feedback": {
-			"title": "La Teva Opinió Importa",
-			"description": "Tens suggerències o sol·licituds de característiques? Ens encantaria escoltar-te per donar forma al futur de l'optimització de vacances."
-		}
-	},
-	"footer": {
-		"madeWith": "Fet amb",
-		"by": "per",
-		"contact": "Contacte",
-		"poweredBy": "Alimentat per procrastinació i",
-		"emojiClickTooltip": "Fes clic per un emoji diferent!",
-		"emojiAriaLabel": "Canviar emoji",
-		"modal": {
-			"title": "Posa't en contacte",
-			"subtitle": "Has trobat un bug? Tens una idea? Només vols saludar?",
-			"email": {
-				"label": "Email",
-				"address": "ferran@buireu.com"
-			},
-			"github": {
-				"label": "GitHub",
-				"username": "@ferranbuireu"
-			},
-			"twitter": {
-				"label": "Twitter",
-				"username": "@ferranbuireu"
-			},
-			"responseTime": "Temps de resposta: Entre ⚡ instantani i 🐌 \"ja et contestaré\""
-		}
-	}
+  "metadata": {
+    "title": "Forever PTO - Optimitza els teus dies lliures",
+    "description": "Aplicació per optimitzar la selecció de dies PTO i maximitzar el teu temps lliure",
+    "keywords": "dies lliures, calendari de dies lliures, seguiment de dies lliures, planificador de dies lliures, gestió de dies lliures"
+  },
+  "payments": {
+    "cta": "Premium"
+  },
+  "calendar": {
+    "selectDays": "Selecciona els teus dies PTO",
+    "holidays": "Festius",
+    "weekends": "Cap de setmana",
+    "selected": "Seleccionats",
+    "totalDays": "Total dies"
+  },
+  "filters": {
+    "title": "Configuració & Filtres",
+    "country": "País",
+    "region": "Regió",
+    "year": "Any",
+    "days": "Dies PTO",
+    "allowPastDays": {
+      "label": "Permetre dies passats",
+      "enabled": "Activat",
+      "disabled": "Desactivat",
+      "tooltip": "Aquest interruptor permet habilitar o deshabilitar el suggeriment de dies festius passats. Això permet veure les oportunitats de vacances que es van perdre en el passat"
+    },
+    "carryOverMonths": {
+      "label": "Mesos d'arrossegament",
+      "monthsToShow": "Mesos a mostrar: {months}",
+      "rangeMin": "1 mes",
+      "rangeMax": "{months, plural, one {# mes} other {# mesos}}",
+      "tooltip": "Permet afegir mesos a l'any següent per ampliar la cerca d'oportunitats",
+      "featureName": "Mesos addicionals",
+      "featureDescription": "Afegeix mesos a l'any següent"
+    },
+    "countries": {
+      "heading": "Països",
+      "label": "País",
+      "placeholder": "Selecciona el teu país",
+      "searchPlaceholder": "Cerca país...",
+      "notFound": "País no trobat"
+    },
+    "regions": {
+      "label": "Regió",
+      "heading": "{hasCountry, plural, =0 {Regions} other {Regions in {country}}}",
+      "placeholder": "{count, plural, =0 {No s'han trobat regions per a {country}} other {Selecciona regió...}}",
+      "searchPlaceholder": "Cerca regió...",
+      "notFound": "Regió no trobada."
+    },
+    "ptoDays": {
+      "got": "Tinc",
+      "days": "{days, plural, one {dia lliure} other {dies lliures}}"
+    }
+  },
+  "languages": {
+    "en": "Anglès",
+    "es": "Castellà",
+    "ca": "Català",
+    "it": "Italià"
+  },
+  "theme": {
+    "light": "Clar",
+    "dark": "Fosc",
+    "system": "Sistema"
+  },
+  "holidaysSummary": {
+    "national": "Festius nacionals",
+    "regional": "Festius regionals",
+    "custom": "Festius personalitzats",
+    "featureName": "Sel·lecció multiple",
+    "featureDescription": "Afegeix festius personalitzats"
+  },
+  "holidaysTable": {
+    "addHoliday": "Afegir festiu",
+    "notFound": "No s'han trobat {holiday} per a l'any següent",
+    "noResults": "No hi ha resultats",
+    "confirmTitle": "Eliminar festius",
+    "confirmDescription": "Estàs segur que vols eliminar els festius seleccionats?",
+    "headers": {
+      "name": "Nom",
+      "actions": "Accions",
+      "date": "Data"
+    },
+    "actions": {
+      "selectAll": "Sel·leccionar tot",
+      "selectRow": "Sel·leccionar fila",
+      "removeSelected": "Eliminar seleccionats",
+      "edit": "Editar",
+      "remove": "Eliminar",
+      "openMenu": "Obrir menú"
+    },
+    "features": {
+      "multipleSelection": "Sel·lecció multiple",
+      "removeMultiple": "Elimina festius múltiples",
+      "editRemove": "Edita o elimina festius",
+      "selectHolidays": "Selecciona festius múltiples"
+    }
+  },
+  "modals": {
+    "confirm": {
+      "title": "Eliminar festiu",
+      "description": "Estàs segur que vols eliminar aquest festiu? Aquesta acció no es pot desfer.",
+      "cancel": "Cancel·lar",
+      "confirm": "Eliminar"
+    },
+    "edit": {
+      "title": "Editar festiu",
+      "dateLabel": "Data",
+      "nameLabel": "Nom",
+      "placeholder": "Nom del festiu",
+      "cancel": "Cancel·lar",
+      "save": "Guardar"
+    },
+    "add": {
+      "title": "Afegir festiu",
+      "dateLabel": "Data",
+      "nameLabel": "Nom",
+      "placeholder": "Nom del festiu",
+      "cancel": "Cancel·lar",
+      "save": "Guardar"
+    }
+  },
+  "premiumLock": {
+    "modal": {
+      "title": "Verifica la teva subscripció premium",
+      "description": "Introdueix l'email que vas utilitzar a Ko-fi per verificar la teva subscripció premium.",
+      "successTitle": "Subscripció verificada!",
+      "successDescription": "La teva subscripció premium s'ha verificat correctament. Gaudeix de totes les funcions premium!",
+      "successMessage": "La teva subscripció premium s'ha verificat correctament. Gaudeix de totes les funcions premium!",
+      "emailLabel": "Email",
+      "emailPlaceholder": "el.teu@email.com",
+      "verify": "Verificar subscripció",
+      "verifying": "Verificant...",
+      "close": "Tancar"
+    },
+    "errors": {
+      "notFound": "No s'ha trobat cap subscripció premium amb aquest email. Si ja has fet un pagament, assegura't d'usar el mateix email que vas utilitzar a Ko-fi.",
+      "generic": "Ha ocorregut un error en verificar la teva subscripció. Sisplau, torna-ho a intentar més tard.",
+      "validation": "Sisplau, introdueix un email vàlid"
+    }
+  },
+  "stats": {
+    "title": "Optimització de Vacances",
+    "holidaysSummary": {
+      "title": "Resum de dies festius",
+      "withCountry": "A {country} ({flag}) hi ha {nationalHolidays} festius nacionals",
+      "withoutCountry": "Hi ha {nationalHolidays} festius nacionals",
+      "regionalPart": ". Sumats als {regionalHolidays} festius de {region}",
+      "totalPart": ", fan un total de {totalHolidays} dies festius",
+      "defaultRegion": "la regió",
+      "noHolidaysFound": "No s'han trobat dies festius per a aquest país. Prova a usar el cercador",
+      "noRegionalHolidays": " Tampoc per a la regió {region}.",
+      "noCountryHolidays": "No s'han trobat dies festius per al teu país."
+    },
+    "effectiveness": {
+      "title": "Efectivitat dels teus dies PTO",
+      "ptoUsed": "Dies PTO utilitzats",
+      "totalFreeDays": "Dies lliures totals",
+      "ratio": "Ràtio d'efectivitat",
+      "summaryStart": "Tens {ptoDaysAvailable} dies de PTO disponibles que s'han convertit en {effectiveDays} dies lliures usant el nostre sistema, el que suposa un increment de",
+      "summaryEnd": "d'efectivitat.",
+      "calculating": "Tens {ptoDaysAvailable} dies de PTO disponibles. El sistema està calculant els forats òptims per maximitzar les teves vacances."
+    },
+    "noPtoDays": "Has d'establir la quantitat de dies PTO disponibles perquè el sistema pugui suggerir els dies òptims per maximitzar les teves vacances."
+  },
+  "calendarList": {
+    "monthlySummary": {
+      "title": "Suggeriments",
+      "tooltip": "Passa el cursor sobre un dia suggerit per veure alternatives similars"
+    },
+    "intervals": {
+      "singleDay": "{day} de {month}: 1 día",
+      "multipleDay": "{startDay} al {endDay} de {month}: {amount} días"
+    }
+  },
+  "legend": {
+    "today": "Avui",
+    "weekends": "Caps de setmana",
+    "holidays": "Festius",
+    "suggested": "Dies suggerits",
+    "alternatives": "Alternatives similars"
+  },
+  "howItWorks": {
+    "title": "Com funciona l'optimitzador de vacances?",
+    "description": "L'optimitzador de vacances analitza tots els dies laborables de l'any i troba les millors combinacions per maximitzar els teus dies lliures consecutius.",
+    "process": {
+      "blockGeneration": {
+        "title": "Procés de Generació de Blocs",
+        "steps": {
+          "workdayAnalysis": "Anàlisi de dies laborables: Identifica tots els dies de treball disponibles",
+          "sequenceCalculation": "Càlcul de seqüències: Per a cada dia, calcula quants dies lliures consecutius generaria agafar-lo com a PTO",
+          "blockGeneration": "Generació de blocs: Crea blocs d'1-5 dies consecutius i avalua la seva efectivitat",
+          "scoring": "Puntuació: Cada bloc rep una puntuació basada en dies efectius totals generats, ràtio d'eficiència (dies lliures / dies PTO) i proximitat a festius"
+        }
+      },
+      "strategies": {
+        "title": "Estratègies de Selecció",
+        "description": "L'algoritme prova 3 estratègies diferents i tria la millor:",
+        "maxEffective": "Maximitzar Dies Efectius: Prioritza blocs que generin més dies lliures totals. Ideal per maximitzar temps lliure absolut.",
+        "maxEfficiency": "Maximitzar Eficiència: Prioritza millor ràtio dies_lliures / dies_PTO. Ideal per conservar dies PTO.",
+        "balanced": "Estratègia Balancejada: Combina tots dos criteris. Afavoreix blocs llargs només si són significativament millors."
+      },
+      "alternatives": {
+        "title": "Dies Alternatius",
+        "description": "Quan passes el cursor sobre un dia suggerit, es mostren alternatives que tenen els mateixos dies efectius que el bloc original, generen el mateix nombre de festius adjacents i no se solapen amb altres dies suggerits."
+      }
+    }
+  },
+  "faq": {
+    "title": "Preguntes Freqüents",
+    "description": "Tot el que necessites saber sobre l'optimitzador de vacances",
+    "limitationsTitle": "Limitacions i Detalls Tècnics",
+    "limitationsDescription": "Entenent les restriccions actuals i límits tècnics",
+    "questions": {
+      "individualVsBlocks": {
+        "question": "Per què suggereix dies individuals en lloc de blocs llargs?",
+        "answer": "Quan dies individuals estratègics (ex: al costat de festius) generen més dies lliures totals que un bloc llarg, l'algoritme els prioritza per a màxima efectivitat. L'optimitzador sempre tria la combinació que et dona més temps lliure."
+      },
+      "allPtoUsage": {
+        "question": "Per què usa tots els meus dies de vacances?",
+        "answer": "L'optimitzador està dissenyat per maximitzar el teu temps lliure usant tots els dies disponibles. Si no vols usar tots els teus dies, simplement introdueix un número menor que la teva assignació real de vacances."
+      },
+      "blockSizes": {
+        "question": "Per què els blocs estan limitats a 1-5 dies consecutius?",
+        "answer": "Aquest rang cobreix la majoria de patrons de vacances pràctics: 1 dia per a dies estratègics al costat de festius/caps de setmana, 2-3 dies per a caps de setmana llargs, i 4-5 dies per a setmanes de vacances estàndard. Els blocs més llargs (6+ dies) són rars i generalment menys eficients que dividir en blocs estratègics més petits."
+      },
+      "weekendsHandling": {
+        "question": "Com es gestionen els caps de setmana?",
+        "answer": "Només els caps de setmana adjacents a dies de vacances o festius es consideren valuosos. Els caps de setmana aïllats no afegeixen valor a l'optimització ja que ja els tens lliures."
+      },
+      "pastDates": {
+        "question": "Puc incloure dates passades?",
+        "answer": "Pots activar si es permeten dates passades a la configuració. Quan està desactivat, només es consideren dates futures per a les suggerències."
+      },
+      "differentCountries": {
+        "question": "Com gestiona diferents països?",
+        "answer": "L'optimitzador usa el teu país i regió seleccionats per carregar els festius apropiats i calcular dies òptims al voltant d'ells. Diferents països tenen diferents calendaris festius."
+      },
+      "alternativeDays": {
+        "question": "Què són els dies alternatius?",
+        "answer": "Quan passes el cursor sobre un dia suggerit, es mostren alternatives que generen exactament el mateix número de dies efectius i festius adjacents, però no se solapen amb altres suggerències."
+      },
+      "weekendCustomization": {
+        "question": "Puc personalitzar els dies de cap de setmana?",
+        "answer": "Actualment, l'optimitzador usa dissabte-diumenge com a caps de setmana. Caps de setmana personalitzables (ex: divendres-dissabte per a Orient Mitjà) estan planificats per a futures actualitzacions."
+      },
+      "partialPto": {
+        "question": "Què passa si no vull usar tots els meus dies de vacances?",
+        "answer": "Introdueix menys dies dels que realment tens. Per exemple, si tens 25 dies però només vols optimitzar 15, introdueix 15 al camp de vacances."
+      }
+    },
+    "limitations": {
+      "algorithmType": {
+        "question": "Garanteix la solució matemàticament òptima?",
+        "answer": "No, l'optimitzador usa un algoritme greedy que troba molt bones solucions ràpidament, però no garanteix la solució matemàticament òptima global. Prova 3 estratègies diferents i tria el millor resultat."
+      },
+      "maxAlternatives": {
+        "question": "Quantes alternatives es mostren?",
+        "answer": "Màxim 10 alternatives per bloc (configurable). El sistema prioritza mostrar les alternatives més rellevants amb criteris de coincidència exacta."
+      },
+      "personalPreferences": {
+        "question": "Considera preferències personals?",
+        "answer": "Actualment no. No té en compte preferències com evitar certs mesos, restriccions de viatge, o esdeveniments personals específics. Les versions futures inclouran preferències personalitzables."
+      },
+      "externalEvents": {
+        "question": "Pot optimitzar al voltant d'esdeveniments externs?",
+        "answer": "Actualment no. L'optimitzador no s'integra amb calendaris externs, conferències, esdeveniments familiars, o reserves de viatges. Només considera festius oficials."
+      },
+      "fixedPto": {
+        "question": "Puc usar només part dels meus dies de vacances?",
+        "answer": "La versió actual requereix usar tots els dies de vacances especificats. Les opcions d'ús parcial de vacances estan planificades per a futurs llançaments."
+      }
+    }
+  },
+  "roadmap": {
+    "title": "Full de Ruta",
+    "description": "Veu què ve després per a l'optimitzador de vacances",
+    "status": {
+      "completed": "Disponible",
+      "inProgress": "En Progrés",
+      "planned": "Planificat",
+      "future": "Futur"
+    },
+    "sections": {
+      "current": {
+        "title": "Característiques Actuals",
+        "description": "El que està disponible ara mateix",
+        "features": {
+          "multiStrategy": "3 estratègies d'optimització (Màx Efectiu, Màx Eficiència, Balancejat)",
+          "holidayOptimization": "Detecció i optimització intel·ligent de festius",
+          "alternatives": "Suggerències de dies alternatius amb coincidència exacta",
+          "multiCountry": "Suport per a múltiples països i regions"
+        }
+      },
+      "shortTerm": {
+        "title": "Proper Llançament",
+        "description": "Properament en els següents mesos",
+        "features": {
+          "customWeekends": "Dies de cap de setmana personalitzables (divendres-dissabte, etc.)",
+          "manualAdjustments": "Afegir/treure dies individuals amb reoptimització en temps real",
+          "strategySelection": "Tria la teva estratègia d'optimització preferida",
+          "improvedUI": "Interfície millorada i millor experiència mòbil"
+        }
+      },
+      "midTerm": {
+        "title": "Mitjà Termini",
+        "description": "Planificat per a més tard aquest any",
+        "features": {
+          "customScoring": "Algoritmes de puntuació personalitzats amb pesos definits per l'usuari",
+          "seasonPriorities": "Preferències de mes i estació",
+          "dateRestrictions": "Bloquejar dates o rangs específics",
+          "partialPto": "Usar només part dels teus dies de vacances disponibles"
+        }
+      },
+      "longTerm": {
+        "title": "Visió a Llarg Termini",
+        "description": "Innovacions futures que estem explorant",
+        "features": {
+          "aiOptimization": "Optimització amb IA basada en les teves preferències",
+          "travelIntegration": "Integració amb plataformes de reserva de viatges",
+          "teamCoordination": "Coordinar temps lliure amb el teu equip",
+          "mobileApp": "Aplicació mòbil nativa"
+        }
+      }
+    },
+    "feedback": {
+      "title": "La Teva Opinió Importa",
+      "description": "Tens suggerències o sol·licituds de característiques? Ens encantaria escoltar-te per donar forma al futur de l'optimització de vacances."
+    }
+  },
+  "footer": {
+    "madeWith": "Fet amb",
+    "by": "per",
+    "contact": "Contacte",
+    "poweredBy": "Alimentat per procrastinació i",
+    "emojiClickTooltip": "Fes clic per un emoji diferent!",
+    "emojiAriaLabel": "Canviar emoji",
+    "modal": {
+      "title": "Posa't en contacte",
+      "subtitle": "Has trobat un error? Tens un suggeriment? Només vols saludar?",
+      "email": {
+        "label": "Email",
+        "address": "ferran@buireu.com",
+        "description": "Envia'm un missatge"
+      },
+      "github": {
+        "label": "GitHub",
+        "username": "@ferranbuireu"
+      },
+      "twitter": {
+        "label": "Twitter",
+        "username": "@ferranbuireu"
+      },
+      "responseTime": "Temps de resposta: Entre ⚡ instantani i 🐌 \"ja et respondré\""
+    }
+  }
 }
