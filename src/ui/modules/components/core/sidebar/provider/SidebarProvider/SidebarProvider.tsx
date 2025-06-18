@@ -14,6 +14,23 @@ interface SidebarProviderProps extends ComponentProps<"div"> {
 	onOpenChange?: (open: boolean) => void;
 }
 
+const getCookieValue = (name: string): string | null => {
+	if (typeof document === "undefined") return null;
+
+	const value = `; ${document.cookie}`;
+	const parts = value.split(`; ${name}=`);
+	if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+	return null;
+};
+
+const getInitialOpenState = (defaultOpen: boolean): boolean => {
+	const cookieValue = getCookieValue(String(DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_NAME));
+	if (cookieValue !== null) {
+		return cookieValue === "true";
+	}
+	return defaultOpen;
+};
+
 export const SidebarProvider = ({
 	defaultOpen = true,
 	open: openProp,
@@ -25,26 +42,19 @@ export const SidebarProvider = ({
 }: SidebarProviderProps) => {
 	const isMobile = useMobile();
 	const [openMobile, setOpenMobile] = useState(false);
-	const [_open, _setOpen] = useState(defaultOpen);
+	const [_open, _setOpen] = useState(() => getInitialOpenState(defaultOpen));
 
 	const open = openProp ?? _open;
 
 	const setOpen = useCallback(
-		async (value: boolean | ((value: boolean) => boolean)) => {
+		(value: boolean | ((value: boolean) => boolean)) => {
 			const openState = typeof value === "function" ? value(open) : value;
-
 			if (setOpenProp) {
 				setOpenProp(openState);
 			} else {
 				_setOpen(openState);
 			}
-
-			await cookieStore.set({
-				name: DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_NAME,
-				value: String(openState),
-				path: "/",
-				expires: Date.now() + Number(DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_MAX_AGE) * 1000,
-			});
+			document.cookie = `${DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_MAX_AGE}`;
 		},
 		[setOpenProp, open],
 	);
