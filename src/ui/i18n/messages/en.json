@@ -120,6 +120,24 @@
 			"placeholder": "Holiday name",
 			"cancel": "Cancel",
 			"save": "Save"
+		},
+		"contact": {
+			"title": "Get in touch",
+			"subtitle": "Found a bug? Have a feature request? Just want to say hi?",
+			"email": {
+				"label": "Email",
+				"address": "ferran@buireu.com",
+				"description": "Send me a message"
+			},
+			"github": {
+				"label": "GitHub",
+				"username": "@ferranbuireu"
+			},
+			"twitter": {
+				"label": "Twitter",
+				"username": "@ferranbuireu"
+			},
+			"responseTime": "Response time: Somewhere between ⚡ instant and 🐌 \"I'll get back to you\""
 		}
 	},
 	"premiumLock": {
@@ -336,24 +354,6 @@
 		"contact": "Contact",
 		"poweredBy": "Powered by procrastination and",
 		"emojiClickTooltip": "Click for a different emoji!",
-		"emojiAriaLabel": "Change emoji",
-		"modal": {
-			"title": "Get in touch",
-			"subtitle": "Found a bug? Have a feature request? Just want to say hi?",
-			"email": {
-				"label": "Email",
-				"address": "ferran@buireu.com",
-				"description": "Send me a message"
-			},
-			"github": {
-				"label": "GitHub",
-				"username": "@ferranbuireu"
-			},
-			"twitter": {
-				"label": "Twitter",
-				"username": "@ferranbuireu"
-			},
-			"responseTime": "Response time: Somewhere between ⚡ instant and 🐌 \"I'll get back to you\""
-		}
+		"emojiAriaLabel": "Change emoji"
 	}
 }

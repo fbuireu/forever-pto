@@ -120,6 +120,24 @@
 			"placeholder": "Nombre del festivo",
 			"cancel": "Cancelar",
 			"save": "Guardar"
+		},
+        "contact": {
+			"title": "Ponte en contacto",
+			"subtitle": "¿Encontraste un error? ¿Tienes una sugerencia? ¿Solo quieres saludar?",
+			"email": {
+				"label": "Email",
+				"address": "ferran@buireu.com",
+				"description": "Envíame un mensaje"
+			},
+			"github": {
+				"label": "GitHub",
+				"username": "@ferranbuireu"
+			},
+			"twitter": {
+				"label": "Twitter",
+				"username": "@ferranbuireu"
+			},
+			"responseTime": "Tiempo de respuesta: Entre ⚡ instantáneo y 🐌 \"ya te responderé\""
 		}
 	},
 	"premiumLock": {
@@ -336,24 +354,6 @@
 		"contact": "Contacto",
 		"poweredBy": "Alimentado por procrastinación y",
 		"emojiClickTooltip": "¡Haz clic para un emoji diferente!",
-		"emojiAriaLabel": "Cambiar emoji",
-		"modal": {
-			"title": "Ponte en contacto",
-			"subtitle": "¿Encontraste un error? ¿Tienes una sugerencia? ¿Solo quieres saludar?",
-			"email": {
-				"label": "Email",
-				"address": "ferran@buireu.com",
-				"description": "Envíame un mensaje"
-			},
-			"github": {
-				"label": "GitHub",
-				"username": "@ferranbuireu"
-			},
-			"twitter": {
-				"label": "Twitter",
-				"username": "@ferranbuireu"
-			},
-			"responseTime": "Tiempo de respuesta: Entre ⚡ instantáneo y 🐌 \"ya te responderé\""
-		}
+		"emojiAriaLabel": "Cambiar emoji"
 	}
 }

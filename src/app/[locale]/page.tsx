@@ -101,4 +101,4 @@ export { generateMetadata };
 // 2- devfooter functionality
 // 2- remove env vars
 // 34- Ko-Fi BE integration (webhook not working on localhost)
-// 34- check functionality (email, links, ContactModal (isolate), etc)
+// 34- check functionality (email, links, etc)

@@ -120,6 +120,24 @@
 			"placeholder": "Nom del festiu",
 			"cancel": "Cancel·lar",
 			"save": "Guardar"
+		},
+        "contact": {
+			"title": "Posa't en contacte",
+			"subtitle": "Has trobat un error? Tens un suggeriment? Només vols saludar?",
+			"email": {
+				"label": "Email",
+				"address": "ferran@buireu.com",
+				"description": "Envia'm un missatge"
+			},
+			"github": {
+				"label": "GitHub",
+				"username": "@ferranbuireu"
+			},
+			"twitter": {
+				"label": "Twitter",
+				"username": "@ferranbuireu"
+			},
+			"responseTime": "Temps de resposta: Entre ⚡ instantani i 🐌 \"ja et respondré\""
 		}
 	},
 	"premiumLock": {
@@ -336,24 +354,6 @@
 		"contact": "Contacte",
 		"poweredBy": "Alimentat per procrastinació i",
 		"emojiClickTooltip": "Fes clic per un emoji diferent!",
-		"emojiAriaLabel": "Canviar emoji",
-		"modal": {
-			"title": "Posa't en contacte",
-			"subtitle": "Has trobat un error? Tens un suggeriment? Només vols saludar?",
-			"email": {
-				"label": "Email",
-				"address": "ferran@buireu.com",
-				"description": "Envia'm un missatge"
-			},
-			"github": {
-				"label": "GitHub",
-				"username": "@ferranbuireu"
-			},
-			"twitter": {
-				"label": "Twitter",
-				"username": "@ferranbuireu"
-			},
-			"responseTime": "Temps de resposta: Entre ⚡ instantani i 🐌 \"ja et respondré\""
-		}
+		"emojiAriaLabel": "Canviar emoji"
 	}
 }

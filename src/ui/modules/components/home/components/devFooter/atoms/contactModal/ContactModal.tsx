@@ -5,7 +5,7 @@ import { DialogTitle } from "@modules/components/core/dialog/atoms/dialogTitle/D
 import { useTranslations } from "next-intl";
 
 export const ContactModal = () => {
-	const t = useTranslations("footer.modal");
+	const t = useTranslations("modals.contact");
 
 	return (
 		<DialogContent className="sm:max-w-md">
