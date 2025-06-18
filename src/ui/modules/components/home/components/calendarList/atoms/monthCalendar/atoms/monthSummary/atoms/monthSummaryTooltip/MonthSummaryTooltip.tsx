@@ -1,7 +1,7 @@
-import { Tooltip } from "@modules/components/core/tooltip/Tooltip";
 import { TooltipContent } from "@modules/components/core/tooltip/atoms/tooltipContent/TooltipContent";
 import { TooltipTrigger } from "@modules/components/core/tooltip/atoms/tooltipTrigger/TooltipTrigger";
 import { TooltipProvider } from "@modules/components/core/tooltip/provider/TooltipProvider";
+import { Tooltip } from "@modules/components/core/tooltip/Tooltip";
 import { InfoIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 

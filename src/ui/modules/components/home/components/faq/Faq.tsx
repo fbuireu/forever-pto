@@ -2,11 +2,11 @@ import { Accordion } from "@modules/components/core/accordion/Accordion";
 import { AccordionContent } from "@modules/components/core/accordion/atoms/accordionContent/AccordionContent";
 import { AccordionItem } from "@modules/components/core/accordion/atoms/accordionItem/AccordionItem";
 import { AccordionTrigger } from "@modules/components/core/accordion/atoms/accordionTrigger/AccordionTrigger";
-import { Card } from "@modules/components/core/card/Card";
 import { CardContent } from "@modules/components/core/card/atoms/cardContent/CardContent";
 import { CardDescription } from "@modules/components/core/card/atoms/cardDescription/CardDescription";
 import { CardHeader } from "@modules/components/core/card/atoms/cardHeader/CardHeader";
 import { CardTitle } from "@modules/components/core/card/atoms/cardTitle/CardTitle";
+import { Card } from "@modules/components/core/card/Card";
 import type { LocaleKey } from "@ui/utils/i18n/getLocalizedDateFns/getLocalizedDateFns";
 import { getTranslations } from "next-intl/server";
 

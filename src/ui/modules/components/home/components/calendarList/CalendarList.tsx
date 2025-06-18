@@ -41,8 +41,6 @@ export default function CalendarList({
 	});
 
 	const interactions = useCalendarInteractions({
-		selectedDays: calendar.selectedDays,
-		setSelectedDays: calendar.setSelectedDays,
 		setHoveredBlockId: calendar.setHoveredBlockId,
 		ptoDays,
 		isHoliday: calendar.isHoliday,

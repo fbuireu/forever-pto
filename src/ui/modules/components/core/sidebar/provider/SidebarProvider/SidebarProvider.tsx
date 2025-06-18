@@ -6,7 +6,7 @@ import type { SidebarContextProps } from "@modules/components/core/sidebar/types
 import { TooltipProvider } from "@modules/components/core/tooltip/provider/TooltipProvider";
 import { useMobile } from "@ui/hooks/useMobile/useMobile";
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
-import { type CSSProperties, type ComponentProps, useCallback, useEffect, useMemo, useState } from "react";
+import { type ComponentProps, type CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
 
 interface SidebarProviderProps extends ComponentProps<"div"> {
 	defaultOpen?: boolean;
@@ -26,22 +26,31 @@ export const SidebarProvider = ({
 	const isMobile = useMobile();
 	const [openMobile, setOpenMobile] = useState(false);
 	const [_open, _setOpen] = useState(defaultOpen);
+
 	const open = openProp ?? _open;
+
 	const setOpen = useCallback(
-		(value: boolean | ((value: boolean) => boolean)) => {
+		async (value: boolean | ((value: boolean) => boolean)) => {
 			const openState = typeof value === "function" ? value(open) : value;
+
 			if (setOpenProp) {
 				setOpenProp(openState);
 			} else {
 				_setOpen(openState);
 			}
-			document.cookie = `${DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_MAX_AGE}`;
+
+			await cookieStore.set({
+				name: DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_NAME,
+				value: String(openState),
+				path: "/",
+				expires: Date.now() + Number(DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_MAX_AGE) * 1000,
+			});
 		},
 		[setOpenProp, open],
 	);
 
 	const toggleSidebar = useCallback(() => {
-		return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
+		return isMobile ? setOpenMobile((prev) => !prev) : setOpen((prev) => !prev);
 	}, [isMobile, setOpen]);
 
 	useEffect(() => {
@@ -56,10 +65,9 @@ export const SidebarProvider = ({
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, [toggleSidebar]);
 
-	const state = open ? "expanded" : "collapsed";
 	const contextValue = useMemo<SidebarContextProps>(
 		() => ({
-			state,
+			state: open ? "expanded" : "collapsed",
 			open,
 			setOpen,
 			isMobile,
@@ -67,7 +75,7 @@ export const SidebarProvider = ({
 			setOpenMobile,
 			toggleSidebar,
 		}),
-		[state, open, setOpen, isMobile, openMobile, toggleSidebar],
+		[open, setOpen, isMobile, openMobile, toggleSidebar],
 	);
 
 	return (

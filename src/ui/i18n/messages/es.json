@@ -1,359 +1,359 @@
 {
-  "metadata": {
-    "title": "Forever PTO - Optimiza tus días libres",
-    "description": "Aplicación para optimizar la selección de días PTO y maximizar tu tiempo libre",
-    "keywords": "días libres, calendario de días libres, seguimiento de días libres, planificador de días libres, gestión de días libres"
-  },
-  "payments": {
-    "cta": "Premium"
-  },
-  "calendar": {
-    "selectDays": "Selecciona tus días PTO",
-    "holidays": "Festivos",
-    "weekends": "Fines de semana",
-    "selected": "Seleccionados",
-    "totalDays": "Total días"
-  },
-  "filters": {
-    "title": "Configuración & Filtros",
-    "country": "País",
-    "region": "Región",
-    "year": "Año",
-    "days": "Días PTO",
-    "allowPastDays": {
-      "label": "Permitir días pasados",
-      "enabled": "Activado",
-      "disabled": "Desactivado",
-      "tooltip": "Este switch permite habilitar o deshabilitar la sugerencia de días festivos pasados. Esto permite ver las oportunidades de PTO que se perdieron en el pasado"
-    },
-    "carryOverMonths": {
-      "label": "Meses de arrastre",
-      "monthsToShow": "Meses a mostrar: {months}",
-      "rangeMin": "1 mes",
-      "rangeMax": "{months, plural, one {# mes} other {# meses}}",
-      "tooltip": "Permite agregar meses al año siguiente para ampliar la búsqueda de oportunidades",
-      "featureName": "Meses adicionales",
-      "featureDescription": "Añade meses del próximo año"
-    },
-    "countries": {
-      "heading": "Países",
-      "label": "País",
-      "placeholder": "Selecciona tu país",
-      "searchPlaceholder": "Buscar país...",
-      "notFound": "País no encontrado"
-    },
-    "regions": {
-      "label": "Región",
-      "heading": "{hasCountry, plural, =0 {Regiones} other {Regiones en {country}}}",
-      "placeholder": "{count, plural, =0 {No se encontraron regiones para {country}} other {Selecciona región...}}",
-      "searchPlaceholder": "Buscar región...",
-      "notFound": "Región no encontrada."
-    },
-    "ptoDays": {
-      "got": "Tengo",
-      "days": "{days, plural, one {día libre} other {días libres}}"
-    }
-  },
-  "languages": {
-    "en": "Inglés",
-    "es": "Español",
-    "ca": "Catalán",
-    "it": "Italiano"
-  },
-  "theme": {
-    "light": "Claro",
-    "dark": "Oscuro",
-    "system": "Sistema"
-  },
-  "holidaysSummary": {
-    "national": "Festivos nacionales",
-    "regional": "Festivos regionales",
-    "custom": "Festivos personalizados",
-    "featureName": "Selección múltiple",
-    "featureDescription": "Añade festivos personalizados"
-  },
-  "holidaysTable": {
-    "addHoliday": "Añadir festivo",
-    "notFound": "No se han encontrado {holiday} para el año siguiente",
-    "noResults": "No hay resultados",
-    "confirmTitle": "Eliminar festivos",
-    "confirmDescription": "¿Estás seguro de que quieres eliminar los festivos seleccionados?",
-    "headers": {
-      "name": "Nombre",
-      "actions": "Acciones",
-      "date": "Fecha"
-    },
-    "actions": {
-      "selectAll": "Seleccionar todo",
-      "selectRow": "Seleccionar fila",
-      "removeSelected": "Eliminar seleccionados",
-      "edit": "Editar",
-      "remove": "Eliminar",
-      "openMenu": "Abrir menú"
-    },
-    "features": {
-      "multipleSelection": "Selección múltiple",
-      "removeMultiple": "Elimina múltiples festivos",
-      "editRemove": "Edita o elimina festivos",
-      "selectHolidays": "Selecciona festivos múltiples"
-    }
-  },
-  "modals": {
-    "confirm": {
-      "title": "Eliminar festivo",
-      "description": "¿Estás seguro de que quieres eliminar este festivo? Esta acción no se puede deshacer.",
-      "cancel": "Cancelar",
-      "confirm": "Eliminar"
-    },
-    "edit": {
-      "title": "Editar festivo",
-      "dateLabel": "Fecha",
-      "nameLabel": "Nombre",
-      "placeholder": "Nombre del festivo",
-      "cancel": "Cancelar",
-      "save": "Guardar"
-    },
-    "add": {
-      "title": "Añadir festivo",
-      "dateLabel": "Fecha",
-      "nameLabel": "Nombre",
-      "placeholder": "Nombre del festivo",
-      "cancel": "Cancelar",
-      "save": "Guardar"
-    }
-  },
-  "premiumLock": {
-    "modal": {
-      "title": "Verifica tu suscripción premium",
-      "description": "Introduce el email que utilizaste en Ko-fi para verificar tu suscripción premium.",
-      "successTitle": "¡Suscripción verificada!",
-      "successDescription": "Tu suscripción premium ha sido verificada correctamente. ¡Disfruta de todas las funciones premium!",
-      "successMessage": "Tu suscripción premium ha sido verificada correctamente. ¡Disfruta de todas las funciones premium!",
-      "emailLabel": "Email",
-      "emailPlaceholder": "tu@email.com",
-      "verify": "Verificar suscripción",
-      "verifying": "Verificando...",
-      "close": "Cerrar"
-    },
-    "errors": {
-      "notFound": "No se ha encontrado ninguna suscripción premium con este email. Si ya has realizado un pago, asegúrate de usar el mismo email que utilizaste en Ko-fi.",
-      "generic": "Ha ocurrido un error al verificar tu suscripción. Por favor, inténtalo de nuevo más tarde.",
-      "validation": "Por favor, introduce un email válid"
-    }
-  },
-  "stats": {
-    "title": "Optimización de Vacaciones",
-    "holidaysSummary": {
-      "title": "Resumen de días festivos",
-      "withCountry": "En {country} ({flag}) hay {nationalHolidays} festivos nacionales",
-      "withoutCountry": "Hay {nationalHolidays} festivos nacionales",
-      "regionalPart": ". Sumados a los {regionalHolidays} festivos en {region}",
-      "totalPart": ", hacen un total de {totalHolidays} días festivos",
-      "defaultRegion": "la región",
-      "noHolidaysFound": "No se han encontrado días festivos para este país. Prueba a usar el buscador",
-      "noRegionalHolidays": " Tampoco para la región {region}.",
-      "noCountryHolidays": "No se han encontrado días festivos para tu país."
-    },
-    "effectiveness": {
-      "title": "Efectividad de tus días PTO",
-      "ptoUsed": "Días PTO utilizados",
-      "totalFreeDays": "Días libres totales",
-      "ratio": "Ratio de efectividad",
-      "summaryStart": "Tienes {ptoDaysAvailable} días de PTO disponibles que se han convertido en {effectiveDays} días libres usando nuestro sistema, lo que supone un incremento de",
-      "summaryEnd": "de efectividad.",
-      "calculating": "Tienes {ptoDaysAvailable} días de PTO disponibles. El sistema está calculando los huecos óptimos para maximizar tus vacaciones."
-    },
-    "noPtoDays": "Debes establecer la cantidad de días PTO disponibles para que el sistema pueda sugerir los días óptimos para maximizar tus vacaciones."
-  },
-  "calendarList": {
-    "monthlySummary": {
-      "title": "Sugerencias",
-      "tooltip": "Pasa el cursor sobre un día sugerido para ver alternativas similares."
-    },
-    "intervals": {
-      "singleDay": "{day} de {month}: 1 día",
-      "multipleDay": "{startDay} al {endDay} de {month}: {amount} días"
-    }
-  },
-  "legend": {
-    "today": "Hoy",
-    "weekends": "Fines de semana",
-    "holidays": "Festivos",
-    "suggested": "Días sugeridos",
-    "alternatives": "Alternativas similares"
-  },
-  "howItWorks": {
-    "title": "¿Cómo funciona el optimizador de vacaciones?",
-    "description": "El optimizador de vacaciones analiza todos los días laborables del año y encuentra las mejores combinaciones para maximizar tus días libres consecutivos.",
-    "process": {
-      "blockGeneration": {
-        "title": "Proceso de Generación de Bloques",
-        "steps": {
-          "workdayAnalysis": "Análisis de días laborables: Identifica todos los días de trabajo disponibles",
-          "sequenceCalculation": "Cálculo de secuencias: Para cada día, calcula cuántos días libres consecutivos generaría tomarlo como PTO",
-          "blockGeneration": "Generación de bloques: Crea bloques de 1-5 días consecutivos y evalúa su efectividad",
-          "scoring": "Puntuación: Cada bloque recibe una puntuación basada en días efectivos totales generados, ratio de eficiencia (días libres / días PTO) y proximidad a festivos"
-        }
-      },
-      "strategies": {
-        "title": "Estrategias de Selección",
-        "description": "El algoritmo prueba 3 estrategias diferentes y elige la mejor:",
-        "maxEffective": "Maximizar Días Efectivos: Prioriza bloques que generen más días libres totales. Ideal para maximizar tiempo libre absoluto.",
-        "maxEfficiency": "Maximizar Eficiencia: Prioriza mejor ratio días_libres / días_PTO. Ideal para conservar días PTO.",
-        "balanced": "Estrategia Balanceada: Combina ambos criterios. Favorece bloques largos solo si son significativamente mejores."
-      },
-      "alternatives": {
-        "title": "Días Alternativos",
-        "description": "Cuando haces hover sobre un día sugerido, se muestran alternativas que tienen los mismos días efectivos que el bloque original, generan el mismo número de festivos adyacentes y no se solapan con otros días sugeridos."
-      }
-    }
-  },
-  "faq": {
-    "title": "Preguntas Frecuentes",
-    "description": "Todo lo que necesitas saber sobre el optimizador de vacaciones",
-    "limitationsTitle": "Limitaciones y Detalles Técnicos",
-    "limitationsDescription": "Entendiendo las restricciones actuales y límites técnicos",
-    "questions": {
-      "individualVsBlocks": {
-        "question": "¿Por qué sugiere días individuales en lugar de bloques largos?",
-        "answer": "Cuando días individuales estratégicos (ej: junto a festivos) generan más días libres totales que un bloque largo, el algoritmo los prioriza para máxima efectividad. El optimizador siempre elige la combinación que te da más tiempo libre."
-      },
-      "allPtoUsage": {
-        "question": "¿Por qué usa todos mis días de vacaciones?",
-        "answer": "El optimizador está diseñado para maximizar tu tiempo libre usando todos los días disponibles. Si no quieres usar todos tus días, simplemente introduce un número menor que tu asignación real de vacaciones."
-      },
-      "blockSizes": {
-        "question": "¿Por qué los bloques están limitados a 1-5 días consecutivos?",
-        "answer": "Este rango cubre la mayoría de patrones de vacaciones prácticos: 1 día para días estratégicos junto a festivos/fines de semana, 2-3 días para fines de semana largos, y 4-5 días para semanas de vacaciones estándar. Los bloques más largos (6+ días) son raros y generalmente menos eficientes que dividir en bloques estratégicos más pequeños."
-      },
-      "weekendsHandling": {
-        "question": "¿Cómo se manejan los fines de semana?",
-        "answer": "Solo los fines de semana adyacentes a días de vacaciones o festivos se consideran valiosos. Los fines de semana aislados no añaden valor a la optimización ya que ya los tienes libres."
-      },
-      "pastDates": {
-        "question": "¿Puedo incluir fechas pasadas?",
-        "answer": "Puedes activar si se permiten fechas pasadas en la configuración. Cuando está desactivado, solo se consideran fechas futuras para las sugerencias."
-      },
-      "differentCountries": {
-        "question": "¿Cómo maneja diferentes países?",
-        "answer": "El optimizador usa tu país y región seleccionados para cargar los festivos apropiados y calcular días óptimos alrededor de ellos. Diferentes países tienen diferentes calendarios festivos."
-      },
-      "alternativeDays": {
-        "question": "¿Qué son los días alternativos?",
-        "answer": "Cuando pasas el cursor sobre un día sugerido, se muestran alternativas que generan exactamente el mismo número de días efectivos y festivos adyacentes, pero no se solapan con otras sugerencias."
-      },
-      "weekendCustomization": {
-        "question": "¿Puedo personalizar los días de fin de semana?",
-        "answer": "Actualmente, el optimizador usa sábado-domingo como fines de semana. Fines de semana personalizables (ej: viernes-sábado para Oriente Medio) están planificados para futuras actualizaciones."
-      },
-      "partialPto": {
-        "question": "¿Qué pasa si no quiero usar todos mis días de vacaciones?",
-        "answer": "Introduce menos días de los que realmente tienes. Por ejemplo, si tienes 25 días pero solo quieres optimizar 15, introduce 15 en el campo de vacaciones."
-      }
-    },
-    "limitations": {
-      "algorithmType": {
-        "question": "¿Garantiza la solución matemáticamente óptima?",
-        "answer": "No, el optimizador usa un algoritmo greedy que encuentra muy buenas soluciones rápidamente, pero no garantiza la solución matemáticamente óptima global. Prueba 3 estrategias diferentes y elige el mejor resultado."
-      },
-      "maxAlternatives": {
-        "question": "¿Cuántas alternativas se muestran?",
-        "answer": "Máximo 10 alternativas por bloque (configurable). El sistema prioriza mostrar las alternativas más relevantes con criterios de coincidencia exacta."
-      },
-      "personalPreferences": {
-        "question": "¿Considera preferencias personales?",
-        "answer": "Actualmente no. No tiene en cuenta preferencias como evitar ciertos meses, restricciones de viaje, o eventos personales específicos. Las versiones futuras incluirán preferencias personalizables."
-      },
-      "externalEvents": {
-        "question": "¿Puede optimizar alrededor de eventos externos?",
-        "answer": "Actualmente no. El optimizador no se integra con calendarios externos, conferencias, eventos familiares, o reservas de viajes. Solo considera festivos oficiales."
-      },
-      "fixedPto": {
-        "question": "¿Puedo usar solo parte de mis días de vacaciones?",
-        "answer": "La versión actual requiere usar todos los días de vacaciones especificados. Las opciones de uso parcial de vacaciones están planificadas para futuros lanzamientos."
-      }
-    }
-  },
-  "roadmap": {
-    "title": "Hoja de Ruta",
-    "description": "Ve qué viene después para el optimizador de vacaciones",
-    "status": {
-      "completed": "Disponible",
-      "inProgress": "En Progreso",
-      "planned": "Planificado",
-      "future": "Futuro"
-    },
-    "sections": {
-      "current": {
-        "title": "Características Actuales",
-        "description": "Lo que está disponible ahora mismo",
-        "features": {
-          "multiStrategy": "3 estrategias de optimización (Máx Efectivo, Máx Eficiencia, Balanceado)",
-          "holidayOptimization": "Detección y optimización inteligente de festivos",
-          "alternatives": "Sugerencias de días alternativos con coincidencia exacta",
-          "multiCountry": "Soporte para múltiples países y regiones"
-        }
-      },
-      "shortTerm": {
-        "title": "Próximo Lanzamiento",
-        "description": "Próximamente en los siguientes meses",
-        "features": {
-          "customWeekends": "Días de fin de semana personalizables (viernes-sábado, etc.)",
-          "manualAdjustments": "Añadir/quitar días individuales con reoptimización en tiempo real",
-          "strategySelection": "Elige tu estrategia de optimización preferida",
-          "improvedUI": "Interfaz mejorada y mejor experiencia móvil"
-        }
-      },
-      "midTerm": {
-        "title": "Medio Plazo",
-        "description": "Planificado para más tarde este año",
-        "features": {
-          "customScoring": "Algoritmos de puntuación personalizados con pesos definidos por el usuario",
-          "seasonPriorities": "Preferencias de mes y estación",
-          "dateRestrictions": "Bloquear fechas o rangos específicos",
-          "partialPto": "Usar solo parte de tus días de vacaciones disponibles"
-        }
-      },
-      "longTerm": {
-        "title": "Visión a Largo Plazo",
-        "description": "Innovaciones futuras que estamos explorando",
-        "features": {
-          "aiOptimization": "Optimización con IA basada en tus preferencias",
-          "travelIntegration": "Integración con plataformas de reserva de viajes",
-          "teamCoordination": "Coordinar tiempo libre con tu equipo",
-          "mobileApp": "Aplicación móvil nativa"
-        }
-      }
-    },
-    "feedback": {
-      "title": "Tu Opinión Importa",
-      "description": "¿Tienes sugerencias o solicitudes de características? Nos encantaría escucharte para dar forma al futuro de la optimización de vacaciones."
-    }
-  },
-  "footer": {
-    "madeWith": "Hecho con",
-    "by": "por",
-    "contact": "Contacto",
-    "poweredBy": "Alimentado por procrastinación y",
-    "emojiClickTooltip": "¡Haz clic para un emoji diferente!",
-    "emojiAriaLabel": "Cambiar emoji",
-    "modal": {
-      "title": "Ponte en contacto",
-      "subtitle": "¿Encontraste un error? ¿Tienes una sugerencia? ¿Solo quieres saludar?",
-      "email": {
-        "label": "Email",
-        "address": "ferran@buireu.com",
-        "description": "Envíame un mensaje"
-      },
-      "github": {
-        "label": "GitHub",
-        "username": "@ferranbuireu"
-      },
-      "twitter": {
-        "label": "Twitter",
-        "username": "@ferranbuireu"
-      },
-      "responseTime": "Tiempo de respuesta: Entre ⚡ instantáneo y 🐌 \"ya te responderé\""
-    }
-  }
+	"metadata": {
+		"title": "Forever PTO - Optimiza tus días libres",
+		"description": "Aplicación para optimizar la selección de días PTO y maximizar tu tiempo libre",
+		"keywords": "días libres, calendario de días libres, seguimiento de días libres, planificador de días libres, gestión de días libres"
+	},
+	"payments": {
+		"cta": "Premium"
+	},
+	"calendar": {
+		"selectDays": "Selecciona tus días PTO",
+		"holidays": "Festivos",
+		"weekends": "Fines de semana",
+		"selected": "Seleccionados",
+		"totalDays": "Total días"
+	},
+	"filters": {
+		"title": "Configuración & Filtros",
+		"country": "País",
+		"region": "Región",
+		"year": "Año",
+		"days": "Días PTO",
+		"allowPastDays": {
+			"label": "Permitir días pasados",
+			"enabled": "Activado",
+			"disabled": "Desactivado",
+			"tooltip": "Este switch permite habilitar o deshabilitar la sugerencia de días festivos pasados. Esto permite ver las oportunidades de PTO que se perdieron en el pasado"
+		},
+		"carryOverMonths": {
+			"label": "Meses de arrastre",
+			"monthsToShow": "Meses a mostrar: {months}",
+			"rangeMin": "1 mes",
+			"rangeMax": "{months, plural, one {# mes} other {# meses}}",
+			"tooltip": "Permite agregar meses al año siguiente para ampliar la búsqueda de oportunidades",
+			"featureName": "Meses adicionales",
+			"featureDescription": "Añade meses del próximo año"
+		},
+		"countries": {
+			"heading": "Países",
+			"label": "País",
+			"placeholder": "Selecciona tu país",
+			"searchPlaceholder": "Buscar país...",
+			"notFound": "País no encontrado"
+		},
+		"regions": {
+			"label": "Región",
+			"heading": "{hasCountry, plural, =0 {Regiones} other {Regiones en {country}}}",
+			"placeholder": "{count, plural, =0 {No se encontraron regiones para {country}} other {Selecciona región...}}",
+			"searchPlaceholder": "Buscar región...",
+			"notFound": "Región no encontrada."
+		},
+		"ptoDays": {
+			"got": "Tengo",
+			"days": "{days, plural, one {día libre} other {días libres}}"
+		}
+	},
+	"languages": {
+		"en": "Inglés",
+		"es": "Español",
+		"ca": "Catalán",
+		"it": "Italiano"
+	},
+	"theme": {
+		"light": "Claro",
+		"dark": "Oscuro",
+		"system": "Sistema"
+	},
+	"holidaysSummary": {
+		"national": "Festivos nacionales",
+		"regional": "Festivos regionales",
+		"custom": "Festivos personalizados",
+		"featureName": "Selección múltiple",
+		"featureDescription": "Añade festivos personalizados"
+	},
+	"holidaysTable": {
+		"addHoliday": "Añadir festivo",
+		"notFound": "No se han encontrado {holiday} para el año siguiente",
+		"noResults": "No hay resultados",
+		"confirmTitle": "Eliminar festivos",
+		"confirmDescription": "¿Estás seguro de que quieres eliminar los festivos seleccionados?",
+		"headers": {
+			"name": "Nombre",
+			"actions": "Acciones",
+			"date": "Fecha"
+		},
+		"actions": {
+			"selectAll": "Seleccionar todo",
+			"selectRow": "Seleccionar fila",
+			"removeSelected": "Eliminar seleccionados",
+			"edit": "Editar",
+			"remove": "Eliminar",
+			"openMenu": "Abrir menú"
+		},
+		"features": {
+			"multipleSelection": "Selección múltiple",
+			"removeMultiple": "Elimina múltiples festivos",
+			"editRemove": "Edita o elimina festivos",
+			"selectHolidays": "Selecciona festivos múltiples"
+		}
+	},
+	"modals": {
+		"confirm": {
+			"title": "Eliminar festivo",
+			"description": "¿Estás seguro de que quieres eliminar este festivo? Esta acción no se puede deshacer.",
+			"cancel": "Cancelar",
+			"confirm": "Eliminar"
+		},
+		"edit": {
+			"title": "Editar festivo",
+			"dateLabel": "Fecha",
+			"nameLabel": "Nombre",
+			"placeholder": "Nombre del festivo",
+			"cancel": "Cancelar",
+			"save": "Guardar"
+		},
+		"add": {
+			"title": "Añadir festivo",
+			"dateLabel": "Fecha",
+			"nameLabel": "Nombre",
+			"placeholder": "Nombre del festivo",
+			"cancel": "Cancelar",
+			"save": "Guardar"
+		}
+	},
+	"premiumLock": {
+		"modal": {
+			"title": "Verifica tu suscripción premium",
+			"description": "Introduce el email que utilizaste en Ko-fi para verificar tu suscripción premium.",
+			"successTitle": "¡Suscripción verificada!",
+			"successDescription": "Tu suscripción premium ha sido verificada correctamente. ¡Disfruta de todas las funciones premium!",
+			"successMessage": "Tu suscripción premium ha sido verificada correctamente. ¡Disfruta de todas las funciones premium!",
+			"emailLabel": "Email",
+			"emailPlaceholder": "tu@email.com",
+			"verify": "Verificar suscripción",
+			"verifying": "Verificando...",
+			"close": "Cerrar"
+		},
+		"errors": {
+			"notFound": "No se ha encontrado ninguna suscripción premium con este email. Si ya has realizado un pago, asegúrate de usar el mismo email que utilizaste en Ko-fi.",
+			"generic": "Ha ocurrido un error al verificar tu suscripción. Por favor, inténtalo de nuevo más tarde.",
+			"validation": "Por favor, introduce un email válid"
+		}
+	},
+	"stats": {
+		"title": "Optimización de Vacaciones",
+		"holidaysSummary": {
+			"title": "Resumen de días festivos",
+			"withCountry": "En {country} ({flag}) hay {nationalHolidays} festivos nacionales",
+			"withoutCountry": "Hay {nationalHolidays} festivos nacionales",
+			"regionalPart": ". Sumados a los {regionalHolidays} festivos en {region}",
+			"totalPart": ", hacen un total de {totalHolidays} días festivos",
+			"defaultRegion": "la región",
+			"noHolidaysFound": "No se han encontrado días festivos para este país. Prueba a usar el buscador",
+			"noRegionalHolidays": " Tampoco para la región {region}.",
+			"noCountryHolidays": "No se han encontrado días festivos para tu país."
+		},
+		"effectiveness": {
+			"title": "Efectividad de tus días PTO",
+			"ptoUsed": "Días PTO utilizados",
+			"totalFreeDays": "Días libres totales",
+			"ratio": "Ratio de efectividad",
+			"summaryStart": "Tienes {ptoDaysAvailable} días de PTO disponibles que se han convertido en {effectiveDays} días libres usando nuestro sistema, lo que supone un incremento de",
+			"summaryEnd": "de efectividad.",
+			"calculating": "Tienes {ptoDaysAvailable} días de PTO disponibles. El sistema está calculando los huecos óptimos para maximizar tus vacaciones."
+		},
+		"noPtoDays": "Debes establecer la cantidad de días PTO disponibles para que el sistema pueda sugerir los días óptimos para maximizar tus vacaciones."
+	},
+	"calendarList": {
+		"monthlySummary": {
+			"title": "Sugerencias",
+			"tooltip": "Pasa el cursor sobre un día sugerido para ver alternativas similares."
+		},
+		"intervals": {
+			"singleDay": "{day} de {month}: 1 día",
+			"multipleDay": "{startDay} al {endDay} de {month}: {amount} días"
+		}
+	},
+	"legend": {
+		"today": "Hoy",
+		"weekends": "Fines de semana",
+		"holidays": "Festivos",
+		"suggested": "Días sugeridos",
+		"alternatives": "Alternativas similares"
+	},
+	"howItWorks": {
+		"title": "¿Cómo funciona el optimizador de vacaciones?",
+		"description": "El optimizador de vacaciones analiza todos los días laborables del año y encuentra las mejores combinaciones para maximizar tus días libres consecutivos.",
+		"process": {
+			"blockGeneration": {
+				"title": "Proceso de Generación de Bloques",
+				"steps": {
+					"workdayAnalysis": "Análisis de días laborables: Identifica todos los días de trabajo disponibles",
+					"sequenceCalculation": "Cálculo de secuencias: Para cada día, calcula cuántos días libres consecutivos generaría tomarlo como PTO",
+					"blockGeneration": "Generación de bloques: Crea bloques de 1-5 días consecutivos y evalúa su efectividad",
+					"scoring": "Puntuación: Cada bloque recibe una puntuación basada en días efectivos totales generados, ratio de eficiencia (días libres / días PTO) y proximidad a festivos"
+				}
+			},
+			"strategies": {
+				"title": "Estrategias de Selección",
+				"description": "El algoritmo prueba 3 estrategias diferentes y elige la mejor:",
+				"maxEffective": "Maximizar Días Efectivos: Prioriza bloques que generen más días libres totales. Ideal para maximizar tiempo libre absoluto.",
+				"maxEfficiency": "Maximizar Eficiencia: Prioriza mejor ratio días_libres / días_PTO. Ideal para conservar días PTO.",
+				"balanced": "Estrategia Balanceada: Combina ambos criterios. Favorece bloques largos solo si son significativamente mejores."
+			},
+			"alternatives": {
+				"title": "Días Alternativos",
+				"description": "Cuando haces hover sobre un día sugerido, se muestran alternativas que tienen los mismos días efectivos que el bloque original, generan el mismo número de festivos adyacentes y no se solapan con otros días sugeridos."
+			}
+		}
+	},
+	"faq": {
+		"title": "Preguntas Frecuentes",
+		"description": "Todo lo que necesitas saber sobre el optimizador de vacaciones",
+		"limitationsTitle": "Limitaciones y Detalles Técnicos",
+		"limitationsDescription": "Entendiendo las restricciones actuales y límites técnicos",
+		"questions": {
+			"individualVsBlocks": {
+				"question": "¿Por qué sugiere días individuales en lugar de bloques largos?",
+				"answer": "Cuando días individuales estratégicos (ej: junto a festivos) generan más días libres totales que un bloque largo, el algoritmo los prioriza para máxima efectividad. El optimizador siempre elige la combinación que te da más tiempo libre."
+			},
+			"allPtoUsage": {
+				"question": "¿Por qué usa todos mis días de vacaciones?",
+				"answer": "El optimizador está diseñado para maximizar tu tiempo libre usando todos los días disponibles. Si no quieres usar todos tus días, simplemente introduce un número menor que tu asignación real de vacaciones."
+			},
+			"blockSizes": {
+				"question": "¿Por qué los bloques están limitados a 1-5 días consecutivos?",
+				"answer": "Este rango cubre la mayoría de patrones de vacaciones prácticos: 1 día para días estratégicos junto a festivos/fines de semana, 2-3 días para fines de semana largos, y 4-5 días para semanas de vacaciones estándar. Los bloques más largos (6+ días) son raros y generalmente menos eficientes que dividir en bloques estratégicos más pequeños."
+			},
+			"weekendsHandling": {
+				"question": "¿Cómo se manejan los fines de semana?",
+				"answer": "Solo los fines de semana adyacentes a días de vacaciones o festivos se consideran valiosos. Los fines de semana aislados no añaden valor a la optimización ya que ya los tienes libres."
+			},
+			"pastDates": {
+				"question": "¿Puedo incluir fechas pasadas?",
+				"answer": "Puedes activar si se permiten fechas pasadas en la configuración. Cuando está desactivado, solo se consideran fechas futuras para las sugerencias."
+			},
+			"differentCountries": {
+				"question": "¿Cómo maneja diferentes países?",
+				"answer": "El optimizador usa tu país y región seleccionados para cargar los festivos apropiados y calcular días óptimos alrededor de ellos. Diferentes países tienen diferentes calendarios festivos."
+			},
+			"alternativeDays": {
+				"question": "¿Qué son los días alternativos?",
+				"answer": "Cuando pasas el cursor sobre un día sugerido, se muestran alternativas que generan exactamente el mismo número de días efectivos y festivos adyacentes, pero no se solapan con otras sugerencias."
+			},
+			"weekendCustomization": {
+				"question": "¿Puedo personalizar los días de fin de semana?",
+				"answer": "Actualmente, el optimizador usa sábado-domingo como fines de semana. Fines de semana personalizables (ej: viernes-sábado para Oriente Medio) están planificados para futuras actualizaciones."
+			},
+			"partialPto": {
+				"question": "¿Qué pasa si no quiero usar todos mis días de vacaciones?",
+				"answer": "Introduce menos días de los que realmente tienes. Por ejemplo, si tienes 25 días pero solo quieres optimizar 15, introduce 15 en el campo de vacaciones."
+			}
+		},
+		"limitations": {
+			"algorithmType": {
+				"question": "¿Garantiza la solución matemáticamente óptima?",
+				"answer": "No, el optimizador usa un algoritmo greedy que encuentra muy buenas soluciones rápidamente, pero no garantiza la solución matemáticamente óptima global. Prueba 3 estrategias diferentes y elige el mejor resultado."
+			},
+			"maxAlternatives": {
+				"question": "¿Cuántas alternativas se muestran?",
+				"answer": "Máximo 10 alternativas por bloque (configurable). El sistema prioriza mostrar las alternativas más relevantes con criterios de coincidencia exacta."
+			},
+			"personalPreferences": {
+				"question": "¿Considera preferencias personales?",
+				"answer": "Actualmente no. No tiene en cuenta preferencias como evitar ciertos meses, restricciones de viaje, o eventos personales específicos. Las versiones futuras incluirán preferencias personalizables."
+			},
+			"externalEvents": {
+				"question": "¿Puede optimizar alrededor de eventos externos?",
+				"answer": "Actualmente no. El optimizador no se integra con calendarios externos, conferencias, eventos familiares, o reservas de viajes. Solo considera festivos oficiales."
+			},
+			"fixedPto": {
+				"question": "¿Puedo usar solo parte de mis días de vacaciones?",
+				"answer": "La versión actual requiere usar todos los días de vacaciones especificados. Las opciones de uso parcial de vacaciones están planificadas para futuros lanzamientos."
+			}
+		}
+	},
+	"roadmap": {
+		"title": "Hoja de Ruta",
+		"description": "Ve qué viene después para el optimizador de vacaciones",
+		"status": {
+			"completed": "Disponible",
+			"inProgress": "En Progreso",
+			"planned": "Planificado",
+			"future": "Futuro"
+		},
+		"sections": {
+			"current": {
+				"title": "Características Actuales",
+				"description": "Lo que está disponible ahora mismo",
+				"features": {
+					"multiStrategy": "3 estrategias de optimización (Máx Efectivo, Máx Eficiencia, Balanceado)",
+					"holidayOptimization": "Detección y optimización inteligente de festivos",
+					"alternatives": "Sugerencias de días alternativos con coincidencia exacta",
+					"multiCountry": "Soporte para múltiples países y regiones"
+				}
+			},
+			"shortTerm": {
+				"title": "Próximo Lanzamiento",
+				"description": "Próximamente en los siguientes meses",
+				"features": {
+					"customWeekends": "Días de fin de semana personalizables (viernes-sábado, etc.)",
+					"manualAdjustments": "Añadir/quitar días individuales con reoptimización en tiempo real",
+					"strategySelection": "Elige tu estrategia de optimización preferida",
+					"improvedUI": "Interfaz mejorada y mejor experiencia móvil"
+				}
+			},
+			"midTerm": {
+				"title": "Medio Plazo",
+				"description": "Planificado para más tarde este año",
+				"features": {
+					"customScoring": "Algoritmos de puntuación personalizados con pesos definidos por el usuario",
+					"seasonPriorities": "Preferencias de mes y estación",
+					"dateRestrictions": "Bloquear fechas o rangos específicos",
+					"partialPto": "Usar solo parte de tus días de vacaciones disponibles"
+				}
+			},
+			"longTerm": {
+				"title": "Visión a Largo Plazo",
+				"description": "Innovaciones futuras que estamos explorando",
+				"features": {
+					"aiOptimization": "Optimización con IA basada en tus preferencias",
+					"travelIntegration": "Integración con plataformas de reserva de viajes",
+					"teamCoordination": "Coordinar tiempo libre con tu equipo",
+					"mobileApp": "Aplicación móvil nativa"
+				}
+			}
+		},
+		"feedback": {
+			"title": "Tu Opinión Importa",
+			"description": "¿Tienes sugerencias o solicitudes de características? Nos encantaría escucharte para dar forma al futuro de la optimización de vacaciones."
+		}
+	},
+	"footer": {
+		"madeWith": "Hecho con",
+		"by": "por",
+		"contact": "Contacto",
+		"poweredBy": "Alimentado por procrastinación y",
+		"emojiClickTooltip": "¡Haz clic para un emoji diferente!",
+		"emojiAriaLabel": "Cambiar emoji",
+		"modal": {
+			"title": "Ponte en contacto",
+			"subtitle": "¿Encontraste un error? ¿Tienes una sugerencia? ¿Solo quieres saludar?",
+			"email": {
+				"label": "Email",
+				"address": "ferran@buireu.com",
+				"description": "Envíame un mensaje"
+			},
+			"github": {
+				"label": "GitHub",
+				"username": "@ferranbuireu"
+			},
+			"twitter": {
+				"label": "Twitter",
+				"username": "@ferranbuireu"
+			},
+			"responseTime": "Tiempo de respuesta: Entre ⚡ instantáneo y 🐌 \"ya te responderé\""
+		}
+	}
 }

@@ -30,7 +30,7 @@ export function getAlternativeDayPosition({
 	const blockDays = [...alternativeBlock.days].sort((a, b) => a.getTime() - b.getTime());
 
 	const dateKey = getDateKey(date);
-	const compareByKey = (a: Date, b: Date) => getDateKey(a) === dateKey;
+	const compareByKey = (a: Date, b: Date) => getDateKey(a) === dateKey || getDateKey(b) === dateKey;
 
 	return determineDayPosition({
 		orderedDays: blockDays,

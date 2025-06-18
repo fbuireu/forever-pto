@@ -1,6 +1,6 @@
 import { SEARCH_PARAM_KEYS } from "@const/const";
-import type { defineRouting } from "next-intl/routing";
 import type { NextRequest } from "next/server";
+import type { defineRouting } from "next-intl/routing";
 
 export type CapitalizeKeys<T> = {
 	[K in keyof T as Uppercase<string & K>]: T[K] extends readonly unknown[]

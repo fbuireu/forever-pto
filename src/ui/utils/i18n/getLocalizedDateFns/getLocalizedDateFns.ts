@@ -1,5 +1,5 @@
 import { I18N_CONFIG } from "@const/const";
-import { type Locale, ca, enUS, es, it } from "date-fns/locale";
+import { ca, enUS, es, it, type Locale } from "date-fns/locale";
 
 export type LocaleKey = keyof typeof DATE_FNS_LOCALES;
 

@@ -1,8 +1,8 @@
 import { I18N_CONFIG } from "@const/const";
 import { middleware as customMiddleware } from "@infrastructure/middleware/middleware";
+import type { NextRequest, NextResponse } from "next/server";
 import type { Locale } from "next-intl";
 import createMiddleware from "next-intl/middleware";
-import type { NextRequest, NextResponse } from "next/server";
 
 const i18nMiddleware = createMiddleware({
 	locales: I18N_CONFIG.LOCALES,

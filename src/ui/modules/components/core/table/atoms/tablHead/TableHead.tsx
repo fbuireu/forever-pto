@@ -1,5 +1,5 @@
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
-import { type ThHTMLAttributes, forwardRef } from "react";
+import { forwardRef, type ThHTMLAttributes } from "react";
 
 export const TableHead = forwardRef<HTMLTableCellElement, ThHTMLAttributes<HTMLTableCellElement>>(
 	({ className, ...props }, ref) => (

@@ -1,6 +1,6 @@
 import type { SearchParams } from "@const/types";
-import { FiltersPanel } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/FiltersPanel";
 import { useSidebarItems } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/atoms/settingsItem/hooks/useSidebarItems/useSidebarItems";
+import { FiltersPanel } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/FiltersPanel";
 import { LanguageSelector } from "@modules/components/appSidebar/components/appSidebar/atoms/languageSelector/LanguageSelector";
 import { SidebarLogo } from "@modules/components/appSidebar/components/appSidebar/atoms/sidebarLogo/SidebarLogo";
 import { SidebarContent } from "@modules/components/core/sidebar/atoms/sidebarContent/SidebarContent";

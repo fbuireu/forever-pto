@@ -4,8 +4,6 @@ import { getDateKey } from "@modules/components/home/components/calendarList/hoo
 import { type Dispatch, type FocusEvent, type MouseEvent, type SetStateAction, useCallback } from "react";
 
 interface UseCalendarInteractionsParams {
-	selectedDays: Date[];
-	setSelectedDays: Dispatch<SetStateAction<Date[]>>;
 	setHoveredBlockId: Dispatch<SetStateAction<string | null>>;
 	ptoDays: number;
 	isHoliday: (date: Date) => boolean;
@@ -22,13 +20,11 @@ export interface UseCalendarInteractionsReturn {
 }
 
 export function useCalendarInteractions({
-	selectedDays,
-	setSelectedDays,
 	setHoveredBlockId,
 	alternativeBlocks,
 	dayToBlockIdMap,
 }: UseCalendarInteractionsParams): UseCalendarInteractionsReturn {
-	const handleDaySelect = useCallback((days: Date[] | undefined) => {}, []);
+	const handleDaySelect = useCallback((_: Date[] | undefined) => {}, []);
 
 	const isDaySuggested = useCallback(
 		(day: Date) => {

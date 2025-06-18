@@ -7,8 +7,8 @@ import { createQueryString } from "@modules/components/appSidebar/components/app
 import { Label } from "@ui/modules/components/core/label/Label";
 import { Slider } from "@ui/modules/components/core/slider/Slider";
 import { PremiumLock } from "@ui/modules/components/premium/components/premiumLock/PremiumLock";
-import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { startTransition, useCallback, useMemo, useState } from "react";
 
 export interface CarryOverMonthsProps {

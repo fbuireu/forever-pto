@@ -3,8 +3,8 @@ import { ErrorBoundary } from "@modules/components/core/errorBoundary/ErrorBound
 import { KofiWidget } from "@modules/components/core/kofiWidget/KofiWidget";
 import "@styles/index.css";
 import { ThemeProvider } from "@ui/providers/theme/ThemeProvider";
-import { type Locale, NextIntlClientProvider } from "next-intl";
 import { Geist, Geist_Mono } from "next/font/google";
+import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 
 const geistSans = Geist({

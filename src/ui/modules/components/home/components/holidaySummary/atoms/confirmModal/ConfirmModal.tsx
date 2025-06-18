@@ -1,11 +1,11 @@
 "use client";
 
 import { Button } from "@modules/components/core/button/Button";
-import { Dialog } from "@modules/components/core/dialog/Dialog";
 import { DialogContent } from "@modules/components/core/dialog/atoms/dialogContent/DialogContent";
 import { DialogFooter } from "@modules/components/core/dialog/atoms/dialogFooter/DialogFooter";
 import { DialogHeader } from "@modules/components/core/dialog/atoms/dialogHeader/DialogHeader";
 import { DialogTitle } from "@modules/components/core/dialog/atoms/dialogTitle/DialogTitle";
+import { Dialog } from "@modules/components/core/dialog/Dialog";
 import { AlertTriangle } from "lucide-react";
 import { useTranslations } from "next-intl";
 

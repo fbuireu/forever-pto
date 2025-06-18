@@ -2,15 +2,15 @@
 
 import { useLanguages } from "@modules/components/appSidebar/components/appSidebar/atoms/languageSelector/hooks/useLanguages/useLanguages";
 import { Button } from "@modules/components/core/button/Button";
-import { DropdownMenu } from "@modules/components/core/dropdownMenu/DropdownMenu";
 import { DropdownMenuContent } from "@modules/components/core/dropdownMenu/atoms/dropdownMenuContent/DropdownMenuContent";
 import { DropdownMenuItem } from "@modules/components/core/dropdownMenu/atoms/dropdownMenuItem/DropdownMenuItem";
 import { DropdownMenuTrigger } from "@modules/components/core/dropdownMenu/atoms/dropdownMenuTrigger/DropdownMenuTrigger";
+import { DropdownMenu } from "@modules/components/core/dropdownMenu/DropdownMenu";
 import { useSidebar } from "@modules/components/core/sidebar/hooks/useSidebar/useSidebar";
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { Check } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 
 export const LanguageSelector = () => {
 	const t = useTranslations("languages");

@@ -4,7 +4,7 @@ import { SidebarMenuButton } from "@modules/components/core/sidebar/atoms/sideba
 import { useSidebar } from "@modules/components/core/sidebar/hooks/useSidebar/useSidebar";
 import { ChevronRight, Settings } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { type ComponentPropsWithoutRef, type MouseEvent, forwardRef, useCallback } from "react";
+import { type ComponentPropsWithoutRef, forwardRef, type MouseEvent, useCallback } from "react";
 
 export const GearSettings = forwardRef<HTMLButtonElement, ComponentPropsWithoutRef<typeof SidebarMenuButton>>(
 	(props, ref) => {

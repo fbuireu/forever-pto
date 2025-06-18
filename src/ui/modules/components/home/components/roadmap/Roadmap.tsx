@@ -1,9 +1,9 @@
 import { Badge } from "@modules/components/core/badge/Badge";
-import { Card } from "@modules/components/core/card/Card";
 import { CardContent } from "@modules/components/core/card/atoms/cardContent/CardContent";
 import { CardDescription } from "@modules/components/core/card/atoms/cardDescription/CardDescription";
 import { CardHeader } from "@modules/components/core/card/atoms/cardHeader/CardHeader";
 import { CardTitle } from "@modules/components/core/card/atoms/cardTitle/CardTitle";
+import { Card } from "@modules/components/core/card/Card";
 import type { LocaleKey } from "@ui/utils/i18n/getLocalizedDateFns/getLocalizedDateFns";
 import { Calculator, Calendar, CheckCircle, Settings, Zap } from "lucide-react";
 import { getTranslations } from "next-intl/server";

@@ -9,9 +9,9 @@ import { CommandGroup } from "@modules/components/core/command/atoms/commandGrou
 import { CommandInput } from "@modules/components/core/command/atoms/commandInput/CommandInput";
 import { CommandItem } from "@modules/components/core/command/atoms/commandItem/CommandItem";
 import { CommandList } from "@modules/components/core/command/atoms/commandList/CommandList";
-import { Popover } from "@modules/components/core/popover/Popover";
 import { PopoverContent } from "@modules/components/core/popover/atoms/popoverContent/PopoverContent";
 import { PopoverTrigger } from "@modules/components/core/popover/atoms/popoverTrigger/PopoverTrigger";
+import { Popover } from "@modules/components/core/popover/Popover";
 import { Button } from "@ui/modules/components/core/button/Button";
 import { Command } from "@ui/modules/components/core/command/Command";
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";

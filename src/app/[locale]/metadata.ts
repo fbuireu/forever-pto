@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
 			.map((keyword: string) => keyword.trim()),
 		alternates: {
 			canonical: "/",
-			languages: I18N_CONFIG.LOCALES.reduce((acc, lang) => Object.assign(acc, { [lang]: `/${lang}` }), {}),
+			languages: Object.fromEntries(I18N_CONFIG.LOCALES.map((lang) => [lang, `/${lang}`])),
 		},
 		openGraph: {
 			title: t("title"),

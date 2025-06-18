@@ -14,13 +14,6 @@ interface FormattedIntervalsReturn {
 	totalDays: number;
 }
 
-type FormatParams = {
-	startDay: number;
-	endDay?: number;
-	month: string;
-	ptoDays: number;
-};
-
 export function formatIntervals({ intervals, locale, t }: FormatIntervalsParams): FormattedIntervalsReturn[] {
 	const localizedDateFns = getLocalizedDateFns(locale);
 
@@ -29,12 +22,6 @@ export function formatIntervals({ intervals, locale, t }: FormatIntervalsParams)
 		const end = interval[interval.length - 1];
 		const startDay = getDate(start);
 		const month = format(start, "MMMM", { locale: localizedDateFns });
-
-		const formatParams: FormatParams = {
-			startDay,
-			month,
-			ptoDays,
-		};
 
 		let text: string;
 		if (interval.length === 1) {

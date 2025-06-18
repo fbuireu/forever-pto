@@ -1,6 +1,6 @@
 import { Command } from "@modules/components/core/command/Command";
-import { Dialog } from "@modules/components/core/dialog/Dialog";
 import { DialogContent } from "@modules/components/core/dialog/atoms/dialogContent/DialogContent";
+import { Dialog } from "@modules/components/core/dialog/Dialog";
 import type { DialogProps } from "@radix-ui/react-dialog";
 
 export const CommandDialog = ({ children, ...props }: DialogProps) => {

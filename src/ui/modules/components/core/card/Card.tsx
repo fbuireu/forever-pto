@@ -1,5 +1,5 @@
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
-import { type HTMLAttributes, forwardRef } from "react";
+import { forwardRef, type HTMLAttributes } from "react";
 
 export const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
 	<div

@@ -11,12 +11,12 @@ import { Alert } from "@modules/components/core/alert/Alert";
 import { AlertDescription } from "@modules/components/core/alert/atoms/alertDescription/AlertDescription";
 import { AlertTitle } from "@modules/components/core/alert/atoms/alertTitle/AlertTitle";
 import { Button } from "@modules/components/core/button/Button";
-import { Table } from "@modules/components/core/table/Table";
-import { TableHead } from "@modules/components/core/table/atoms/tablHead/TableHead";
 import { TableBody } from "@modules/components/core/table/atoms/tableBody/TableBody";
 import { TableCell } from "@modules/components/core/table/atoms/tableCell/TableCell";
 import { TableHeader } from "@modules/components/core/table/atoms/tableHeader/TableHeader";
 import { TableRow } from "@modules/components/core/table/atoms/tableRow/TableRow";
+import { TableHead } from "@modules/components/core/table/atoms/tablHead/TableHead";
+import { Table } from "@modules/components/core/table/Table";
 import { TabsContent } from "@modules/components/core/tabs/atoms/tabsContent/TabsContent";
 import { AddHolidayModal } from "@modules/components/home/components/holidaySummary/atoms/addHolidayModal/AddHolidayModal";
 import { ConfirmModal } from "@modules/components/home/components/holidaySummary/atoms/confirmModal/ConfirmModal";
@@ -24,11 +24,11 @@ import { getColumns } from "@modules/components/home/components/holidaySummary/a
 import { HolidayTabVariant } from "@modules/components/home/components/holidaySummary/types";
 import { PremiumLock } from "@modules/components/premium/components/premiumLock/PremiumLock";
 import {
-	type SortingState,
 	flexRender,
 	getCoreRowModel,
 	getPaginationRowModel,
 	getSortedRowModel,
+	type SortingState,
 	useReactTable,
 } from "@tanstack/react-table";
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";

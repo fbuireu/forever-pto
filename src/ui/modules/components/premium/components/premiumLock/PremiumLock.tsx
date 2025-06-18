@@ -14,13 +14,13 @@ import { useEmailFormSchema } from "@modules/components/premium/components/premi
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Button } from "@ui/modules/components/core/button/Button";
 import { Dialog } from "@ui/modules/components/core/dialog/Dialog";
-import { Form } from "@ui/modules/components/core/form/Form";
 import { FormLabel } from "@ui/modules/components/core/form/atoms/FormLabel";
+import { Form } from "@ui/modules/components/core/form/Form";
 import { Input } from "@ui/modules/components/core/input/Input";
-import { Tooltip } from "@ui/modules/components/core/tooltip/Tooltip";
 import { TooltipContent } from "@ui/modules/components/core/tooltip/atoms/tooltipContent/TooltipContent";
 import { TooltipTrigger } from "@ui/modules/components/core/tooltip/atoms/tooltipTrigger/TooltipTrigger";
 import { TooltipProvider } from "@ui/modules/components/core/tooltip/provider/TooltipProvider";
+import { Tooltip } from "@ui/modules/components/core/tooltip/Tooltip";
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { LockIcon, X } from "lucide-react";
 import { useTranslations } from "next-intl";

@@ -5,7 +5,6 @@ import { MinusButton } from "@modules/components/appSidebar/components/appSideba
 import { PlusButton } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/atoms/ptoDays/atoms/PlusButton/PlusButton";
 import { createQueryString } from "@modules/components/appSidebar/components/appSidebar/utils/createQueryString/createQueryString";
 import { Input } from "@modules/components/core/input/Input";
-import { useDebouncedCallback } from "@ui/hooks/useDebounceCallback/useDebounceCallback";
 import { Label } from "@ui/modules/components/core/label/Label";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -40,8 +39,6 @@ export const PtoDays = ({ ptoDays }: PtoDaysProps) => {
 		[router, pathname, searchParams],
 	);
 
-	const updateQueryDebounced = useDebouncedCallback((value: number) => updateQueryString(value), 100);
-
 	const decrementDays = useCallback(() => {
 		if (localDaysValue <= 0) return;
 		updateQueryString(localDaysValue - 1);
@@ -56,13 +53,13 @@ export const PtoDays = ({ ptoDays }: PtoDaysProps) => {
 			const newValue = Number(event.currentTarget.value);
 			if (!Number.isNaN(newValue) && newValue >= 0) {
 				setLocalDaysValue(newValue);
-				updateQueryDebounced(newValue);
+				updateQueryString(newValue);
 			} else if (event.currentTarget.value === "") {
 				setLocalDaysValue(0);
-				updateQueryDebounced(0);
+				updateQueryString(0);
 			}
 		},
-		[updateQueryDebounced],
+		[updateQueryString],
 	);
 
 	const daysInput = useMemo(

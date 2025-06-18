@@ -1,6 +1,6 @@
 import { Skeleton } from "@modules/components/core/skeleton/Skeleton";
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
-import { type CSSProperties, type ComponentProps, useMemo } from "react";
+import { type ComponentProps, type CSSProperties, useMemo } from "react";
 
 export const SidebarMenuSkeleton = ({
 	className,

@@ -1,5 +1,5 @@
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
-import { type HTMLAttributes, forwardRef } from "react";
+import { forwardRef, type HTMLAttributes } from "react";
 
 export const TableCaption = forwardRef<HTMLTableCaptionElement, HTMLAttributes<HTMLTableCaptionElement>>(
 	({ className, ...props }, ref) => (

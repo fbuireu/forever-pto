@@ -38,7 +38,7 @@ const PARAM_VALIDATORS: Record<string, ValidatorFunction> = {
 		}
 		return null;
 	},
-	[SEARCH_PARAM_KEYS.CARRY_OVER_MONTHS]: async (value, request) => {
+	[SEARCH_PARAM_KEYS.CARRY_OVER_MONTHS]: async (value) => {
 		const isPremiumUser = await isPremium();
 		const maxValue = isPremiumUser
 			? FILTER_MAXIMUM_VALUES.CARRY_OVER_MONTHS.PREMIUM

@@ -8,7 +8,6 @@ export const ErrorBoundary = ({ children }: { children: ReactNode }) => {
 
 	useEffect(() => {
 		const handleError = (error: ErrorEvent) => {
-			// biome-ignore lint/suspicious/noConsole: ErrorBoundary error management
 			console.error("Error caught by error boundary:", error);
 			setHasError(true);
 		};
