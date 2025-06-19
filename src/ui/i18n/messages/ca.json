@@ -342,16 +342,16 @@
 			"subtitle": "Has trobat un error? Tens un suggeriment? Només vols saludar?",
 			"email": {
 				"label": "Email",
-				"address": "ferran@buireu.com",
+				"address": "fbuireu@gmail.com",
 				"description": "Envia'm un missatge"
 			},
 			"github": {
 				"label": "GitHub",
-				"username": "@ferranbuireu"
+				"username": "@fbuireu"
 			},
 			"twitter": {
 				"label": "Twitter",
-				"username": "@ferranbuireu"
+				"username": "@fbuireu"
 			},
 			"responseTime": "Temps de resposta: Entre ⚡ instantani i 🐌 \"ja et respondré\""
 		}
