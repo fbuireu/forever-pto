@@ -131,7 +131,10 @@ export const PremiumLock = ({
 							)}
 						>
 							<LockIcon
-								className={mergeClasses("w-5 h-5", variant === "small" ? "text-black" : "text-white")}
+								className={mergeClasses(
+									"w-5 h-5",
+									variant === "small" ? "text-black dark:text-gray-400" : "text-white dark:text-gray-300",
+								)}
 								size={20}
 							/>
 						</div>
@@ -142,7 +145,7 @@ export const PremiumLock = ({
 					</>
 				)}
 			</button>
-			{variant === "stacked" && !isPremiumUser && <LockIcon size={16} />}
+			{variant === "stacked" && !isPremiumUser && <LockIcon size={16} className="text-white dark:text-gray-300" />}
 			<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
 				<DialogContent>
 					<DialogHeader>
@@ -174,7 +177,7 @@ export const PremiumLock = ({
 								<Button
 									type="submit"
 									disabled={isLoading}
-									className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary/90 transition-colors"
+									className="w-full bg-primary py-2 rounded-md hover:bg-primary/90 transition-colors"
 								>
 									{isLoading ? t("modal.verifying") : t("modal.verify")}
 								</Button>
