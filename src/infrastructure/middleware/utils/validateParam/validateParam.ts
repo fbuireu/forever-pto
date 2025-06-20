@@ -1,7 +1,8 @@
 import { isPremium } from "@application/actions/premium";
-import { DEFAULT_QUERY_PARAMS, FILTER_MAXIMUM_VALUES, SEARCH_PARAM_KEYS } from "@const/const";
+import { DEFAULT_QUERY_PARAMS, SEARCH_PARAM_KEYS } from "@const/const";
 import type { MIDDLEWARE_PARAMS } from "@infrastructure/middleware/middleware";
 import { detectLocation } from "@infrastructure/services/location/detectLocation/detectLocation";
+import { FILTER_MAXIMUM_VALUES } from "@ui/modules/components/appSidebar/const";
 import type { NextRequest } from "next/server";
 
 type ValidatorFunction = (value: string, request: NextRequest) => Promise<string | null> | string | null;

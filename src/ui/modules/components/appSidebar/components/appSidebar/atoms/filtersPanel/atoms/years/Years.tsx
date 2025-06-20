@@ -1,8 +1,8 @@
 "use client";
 
-import { FILTER_MAXIMUM_VALUES } from "@const/const";
 import type { SearchParams } from "@const/types";
 import { createQueryString } from "@modules/components/appSidebar/components/appSidebar/utils/createQueryString/createQueryString";
+import { FILTER_MAXIMUM_VALUES } from "@modules/components/appSidebar/const";
 import { Label } from "@modules/components/core/label/Label";
 import { SelectItem } from "@modules/components/core/select/atoms/selectItem/SelectItem";
 import { SelectTrigger } from "@modules/components/core/select/atoms/selectTrigger/SelectTrigger";

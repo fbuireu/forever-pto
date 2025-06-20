@@ -1,4 +1,4 @@
-import { DEFAULT_CALENDAR_LIMITS } from "@const/const";
+import { DEFAULT_CALENDAR_LIMITS } from "@modules/components/home/components/calendarList/hooks/const";
 import type { EffectiveRatio } from "@modules/components/home/components/calendarList/hooks/types";
 import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
 import { groupConsecutiveDays } from "@modules/components/home/components/calendarList/hooks/utils/groupConsecutiveDays/groupConsecutiveDays";

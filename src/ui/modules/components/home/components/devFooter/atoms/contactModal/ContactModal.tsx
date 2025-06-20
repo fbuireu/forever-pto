@@ -37,7 +37,7 @@ export const ContactModal = () => {
 							variant="outline"
 							className="flex items-center justify-center gap-3 p-6 h-auto group"
 							onClick={() => {
-								window.open("https://github.com/ferranbuireu", "_blank", "noopener,noreferrer");
+								window.open("https://github.com/fbuireu", "_blank", "noopener,noreferrer");
 							}}
 						>
 							<span className="text-xl">🐙</span>

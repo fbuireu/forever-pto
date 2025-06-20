@@ -1,6 +1,6 @@
 "use client";
 
-import { DEFAULT_SIDEBAR_CONFIG } from "@const/const";
+import { DEFAULT_SIDEBAR_CONFIG } from "@modules/components/appSidebar/const";
 import { SheetContent } from "@modules/components/core/sheet/atoms/sheetContent/SheetContent";
 import { SheetDescription } from "@modules/components/core/sheet/atoms/sheetDescription/SheetDescription";
 import { SheetHeader } from "@modules/components/core/sheet/atoms/sheetHeader/SheetHeader";

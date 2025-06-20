@@ -1,12 +1,4 @@
-import type {
-	CalendarLimits,
-	CapitalizeKeys,
-	FilterMaximumValues,
-	I18nConfig,
-	KofiWidget,
-	PremiumParams,
-	ScoreMultipliers,
-} from "@const/types";
+import type { CapitalizeKeys, I18nConfig, PremiumParams } from "@const/types";
 import { capitalizeKeys } from "./utils/capitalizeKeys/capitalizeKeys";
 
 export const SEARCH_PARAM_KEYS = {
@@ -35,15 +27,6 @@ export const DEFAULT_QUERY_PARAMS: Record<CapitalizeKeys<string>, string> = {
 	CARRY_OVER_MONTHS: "1",
 } as const;
 
-export const DEFAULT_SIDEBAR_CONFIG: Record<CapitalizeKeys<string>, string | number> = {
-	SIDEBAR_COOKIE_NAME: "sidebar_state",
-	SIDEBAR_COOKIE_MAX_AGE: 60 * 60 * 24 * 7,
-	SIDEBAR_WIDTH: "20rem",
-	SIDEBAR_WIDTH_MOBILE: "18rem",
-	SIDEBAR_WIDTH_ICON: "3rem",
-	SIDEBAR_KEYBOARD_SHORTCUT: "b",
-} as const;
-
 export const I18N_CONFIG: CapitalizeKeys<I18nConfig> = {
 	LOCALES: ["en", "es", "ca", "it"] as const,
 	DEFAULT_LOCALE: "en" as const,
@@ -53,75 +36,10 @@ export const I18N_CONFIG: CapitalizeKeys<I18nConfig> = {
 	COOKIE_NAME: "NEXT_LOCALE" as const,
 } as const;
 
-export const DEFAULT_CALENDAR_LIMITS: CapitalizeKeys<CalendarLimits> = {
-	MAX_BLOCK_SIZE: 5,
-	MAX_SEARCH_DEPTH: 10,
-	MAX_ALTERNATIVES: 10,
-} as const;
-
-export const SCORE_MULTIPLIERS: CapitalizeKeys<ScoreMultipliers> = {
-	DEFAULT: 1.0,
-	CONSECUTIVE_DAYS: {
-		THRESHOLD: 5,
-	},
-	EFFICIENCY_RATIO: {
-		HIGH: 3,
-		MEDIUM: 2,
-	},
-	BONUS: {
-		HIGH_EFFICIENCY: 1.3,
-		MEDIUM_EFFICIENCY: 1.2,
-		LONG_SEQUENCE: 1.2,
-	},
-	TOLERANCE: {
-		SINGLE_DAY: 1,
-		MULTI_DAY: 2,
-		SCORE_DIFFERENCE: 0.1,
-	},
-	SELECTION: {
-		HIGH_EFFICIENCY_THRESHOLD: 1.5,
-		HOLIDAY_BENEFIT_THRESHOLD: 1.0,
-		BENEFIT_ALTERNATIVE_THRESHOLD: 1.2,
-		BLOCK_SIZE_DIFFERENCE: 1,
-		EFFICIENCY_DIFFERENCE: 0.2,
-		SCORE_DIFFERENCE: 0.1,
-		MIN_SCORE_PER_DAY: 2.5,
-		MIN_MULTI_DAY_SIZE: 2,
-	},
-} as const;
-
-export const FILTER_MAXIMUM_VALUES: CapitalizeKeys<FilterMaximumValues> = {
-	CARRY_OVER_MONTHS: {
-		FREE: 1,
-		PREMIUM: 12,
-	},
-	YEARS: (year: string) => Array.from({ length: 11 }, (_, i) => Number(year) - 5 + i),
-} as const;
-
 export const PREMIUM_PARAMS: CapitalizeKeys<PremiumParams> = {
 	COOKIE_NAME: "premium" as const,
 	COOKIE_DURATION: 30 * 24 * 60 * 60,
 	CHECK_DELAY: 5 * 60 * 1000,
 } as const;
-
-export const CONTACT_DETAILS: Record<CapitalizeKeys<string>, string> = {
-	NAME: "",
-	EMAIL_SUBJECT: "Web contact form submission",
-	ENCODED_EMAIL_FROM: "",
-	ENCODED_EMAIL_SELF: "",
-} as const;
-
-export const SOCIAL_NETWORKS: Record<CapitalizeKeys<string>, string> = {
-	LINKEDIN: "",
-	GITHUB: "",
-} as const;
-
-export const KOFFI_WIDGET: CapitalizeKeys<KofiWidget> = {
-	USERNAME: process.env.NEXT_PUBLIC_KOFI_USERNAME,
-	TYPE: "floating-chat",
-	DONATE_BUTTON: {
-		TEXT_COLOR: "#ffffff",
-	},
-};
 
 export const THEME_STORAGE_KEY: string = "theme" as const;

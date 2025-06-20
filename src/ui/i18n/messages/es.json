@@ -121,12 +121,12 @@
 			"cancel": "Cancelar",
 			"save": "Guardar"
 		},
-        "contact": {
+		"contact": {
 			"title": "Ponte en contacto",
 			"subtitle": "¿Encontraste un error? ¿Tienes una sugerencia? ¿Solo quieres saludar?",
 			"email": {
 				"label": "Email",
-				"address": "ferran@buireu.com",
+				"address": "fbuireu@gmail.com",
 				"description": "Envíame un mensaje"
 			},
 			"github": {
@@ -138,25 +138,25 @@
 				"username": "@ferranbuireu"
 			},
 			"responseTime": "Tiempo de respuesta: Entre ⚡ instantáneo y 🐌 \"ya te responderé\""
-		}
-	},
-	"premiumLock": {
-		"modal": {
-			"title": "Verifica tu suscripción premium",
-			"description": "Introduce el email que utilizaste en Ko-fi para verificar tu suscripción premium.",
-			"successTitle": "¡Suscripción verificada!",
-			"successDescription": "Tu suscripción premium ha sido verificada correctamente. ¡Disfruta de todas las funciones premium!",
-			"successMessage": "Tu suscripción premium ha sido verificada correctamente. ¡Disfruta de todas las funciones premium!",
-			"emailLabel": "Email",
-			"emailPlaceholder": "tu@email.com",
-			"verify": "Verificar suscripción",
-			"verifying": "Verificando...",
-			"close": "Cerrar"
 		},
-		"errors": {
-			"notFound": "No se ha encontrado ninguna suscripción premium con este email. Si ya has realizado un pago, asegúrate de usar el mismo email que utilizaste en Ko-fi.",
-			"generic": "Ha ocurrido un error al verificar tu suscripción. Por favor, inténtalo de nuevo más tarde.",
-			"validation": "Por favor, introduce un email válid"
+		"premiumLock": {
+			"form": {
+				"title": "Verifica tu suscripción premium",
+				"description": "Introduce el email que utilizaste en Ko-fi para verificar tu suscripción premium.",
+				"successTitle": "¡Suscripción verificada!",
+				"successDescription": "Tu suscripción premium ha sido verificada correctamente. ¡Disfruta de todas las funciones premium!",
+				"successMessage": "Tu suscripción premium ha sido verificada correctamente. ¡Disfruta de todas las funciones premium!",
+				"emailLabel": "Email",
+				"emailPlaceholder": "tu@email.com",
+				"verify": "Verificar suscripción",
+				"verifying": "Verificando...",
+				"close": "Cerrar"
+			},
+			"errors": {
+				"notFound": "No se ha encontrado ninguna suscripción premium con este email. Si ya has realizado un pago, asegúrate de usar el mismo email que utilizaste en Ko-fi.",
+				"generic": "Ha ocurrido un error al verificar tu suscripción. Por favor, inténtalo de nuevo más tarde.",
+				"validation": "Por favor, introduce un email válid"
+			}
 		}
 	},
 	"stats": {

@@ -49,7 +49,7 @@ export const PremiumLock = ({
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [submitSuccess, setSubmitSuccess] = useState(false);
 	const [isPending, startTransition] = useTransition();
-	const t = useTranslations("premiumLock");
+	const t = useTranslations("modals.premiumLock");
 	const emailFormSchema = useEmailFormSchema();
 
 	const form = useForm<z.infer<typeof emailFormSchema>>({
@@ -131,7 +131,10 @@ export const PremiumLock = ({
 							)}
 						>
 							<LockIcon
-								className={mergeClasses("w-5 h-5", variant === "small" ? "text-black" : "text-white")}
+								className={mergeClasses(
+									"w-5 h-5",
+									variant === "small" ? "text-black dark:text-gray-400" : "text-white dark:text-gray-300",
+								)}
 								size={20}
 							/>
 						</div>
@@ -142,13 +145,13 @@ export const PremiumLock = ({
 					</>
 				)}
 			</button>
-			{variant === "stacked" && !isPremiumUser && <LockIcon size={16} />}
+			{variant === "stacked" && !isPremiumUser && <LockIcon size={16} className="text-white dark:text-gray-300" />}
 			<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>{submitSuccess ? t("modal.successTitle") : t("modal.title")}</DialogTitle>
+						<DialogTitle>{submitSuccess ? t("form.successTitle") : t("form.title")}</DialogTitle>
 						<DialogDescription>
-							{submitSuccess ? t("modal.successDescription") : t("modal.description")}
+							{submitSuccess ? t("form.successDescription") : t("form.description")}
 						</DialogDescription>
 					</DialogHeader>
 					{!submitSuccess ? (
@@ -159,11 +162,11 @@ export const PremiumLock = ({
 									name="email"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>{t("modal.emailLabel")}</FormLabel>
+											<FormLabel>{t("form.emailLabel")}</FormLabel>
 											<Input
 												{...field}
 												type="email"
-												placeholder={t("modal.emailPlaceholder")}
+												placeholder={t("form.emailPlaceholder")}
 												autoComplete="off"
 												disabled={isLoading}
 											/>
@@ -174,18 +177,18 @@ export const PremiumLock = ({
 								<Button
 									type="submit"
 									disabled={isLoading}
-									className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary/90 transition-colors"
+									className="w-full bg-primary py-2 rounded-md hover:bg-primary/90 transition-colors"
 								>
-									{isLoading ? t("modal.verifying") : t("modal.verify")}
+									{isLoading ? t("form.verifying") : t("form.verify")}
 								</Button>
 							</form>
 						</Form>
 					) : (
-						<p className="text-green-600 dark:text-green-400 mt-2">{t("modal.successMessage")}</p>
+						<p className="text-green-600 dark:text-green-400 mt-2">{t("form.successMessage")}</p>
 					)}
 					<DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
 						<X className="h-4 w-4" />
-						<span className="sr-only">{t("modal.close")}</span>
+						<span className="sr-only">{t("form.close")}</span>
 					</DialogClose>
 				</DialogContent>
 			</Dialog>

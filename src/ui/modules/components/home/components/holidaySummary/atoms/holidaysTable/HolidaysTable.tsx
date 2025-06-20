@@ -20,7 +20,7 @@ import { Table } from "@modules/components/core/table/Table";
 import { TabsContent } from "@modules/components/core/tabs/atoms/tabsContent/TabsContent";
 import { AddHolidayModal } from "@modules/components/home/components/holidaySummary/atoms/addHolidayModal/AddHolidayModal";
 import { ConfirmModal } from "@modules/components/home/components/holidaySummary/atoms/confirmModal/ConfirmModal";
-import { getColumns } from "@modules/components/home/components/holidaySummary/atoms/holidaysTable/config";
+import { getColumns } from "@modules/components/home/components/holidaySummary/atoms/holidaysTable/utils/getColumns";
 import { HolidayTabVariant } from "@modules/components/home/components/holidaySummary/types";
 import { PremiumLock } from "@modules/components/premium/components/premiumLock/PremiumLock";
 import {

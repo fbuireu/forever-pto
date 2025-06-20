@@ -1,6 +1,6 @@
 "use client";
 
-import { KOFFI_WIDGET } from "@const/const";
+import { KOFFI_WIDGET } from "@modules/components/core/kofiWidget/const";
 import Script from "next/script";
 import { useTranslations } from "next-intl";
 import { useId } from "react";
@@ -10,7 +10,7 @@ export const KofiWidget = () => {
 	const id = useId();
 	return (
 		<>
-			<Script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js" strategy="beforeInteractive" />
+			<Script src={KOFFI_WIDGET.SRC} strategy="beforeInteractive" />
 			<Script id={id} strategy="beforeInteractive">
 				{`kofiWidgetOverlay.draw('${KOFFI_WIDGET.USERNAME}', {
                     'type': '${KOFFI_WIDGET.TYPE}',

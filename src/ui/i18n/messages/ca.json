@@ -121,42 +121,42 @@
 			"cancel": "Cancel·lar",
 			"save": "Guardar"
 		},
-        "contact": {
+		"contact": {
 			"title": "Posa't en contacte",
 			"subtitle": "Has trobat un error? Tens un suggeriment? Només vols saludar?",
 			"email": {
 				"label": "Email",
-				"address": "ferran@buireu.com",
+				"address": "fbuireu@gmail.com",
 				"description": "Envia'm un missatge"
 			},
 			"github": {
 				"label": "GitHub",
-				"username": "@ferranbuireu"
+				"username": "@fbuireu"
 			},
 			"twitter": {
 				"label": "Twitter",
-				"username": "@ferranbuireu"
+				"username": "@fbuireu"
 			},
 			"responseTime": "Temps de resposta: Entre ⚡ instantani i 🐌 \"ja et respondré\""
-		}
-	},
-	"premiumLock": {
-		"modal": {
-			"title": "Verifica la teva subscripció premium",
-			"description": "Introdueix l'email que vas utilitzar a Ko-fi per verificar la teva subscripció premium.",
-			"successTitle": "Subscripció verificada!",
-			"successDescription": "La teva subscripció premium s'ha verificat correctament. Gaudeix de totes les funcions premium!",
-			"successMessage": "La teva subscripció premium s'ha verificat correctament. Gaudeix de totes les funcions premium!",
-			"emailLabel": "Email",
-			"emailPlaceholder": "el.teu@email.com",
-			"verify": "Verificar subscripció",
-			"verifying": "Verificant...",
-			"close": "Tancar"
 		},
-		"errors": {
-			"notFound": "No s'ha trobat cap subscripció premium amb aquest email. Si ja has fet un pagament, assegura't d'usar el mateix email que vas utilitzar a Ko-fi.",
-			"generic": "Ha ocorregut un error en verificar la teva subscripció. Sisplau, torna-ho a intentar més tard.",
-			"validation": "Sisplau, introdueix un email vàlid"
+		"premiumLock": {
+			"form": {
+				"title": "Verifica la teva subscripció premium",
+				"description": "Introdueix l'email que vas utilitzar a Ko-fi per verificar la teva subscripció premium.",
+				"successTitle": "Subscripció verificada!",
+				"successDescription": "La teva subscripció premium s'ha verificat correctament. Gaudeix de totes les funcions premium!",
+				"successMessage": "La teva subscripció premium s'ha verificat correctament. Gaudeix de totes les funcions premium!",
+				"emailLabel": "Email",
+				"emailPlaceholder": "el.teu@email.com",
+				"verify": "Verificar subscripció",
+				"verifying": "Verificant...",
+				"close": "Tancar"
+			},
+			"errors": {
+				"notFound": "No s'ha trobat cap subscripció premium amb aquest email. Si ja has fet un pagament, assegura't d'usar el mateix email que vas utilitzar a Ko-fi.",
+				"generic": "Ha ocorregut un error en verificar la teva subscripció. Sisplau, torna-ho a intentar més tard.",
+				"validation": "Sisplau, introdueix un email vàlid"
+			}
 		}
 	},
 	"stats": {
@@ -353,7 +353,6 @@
 		"by": "per",
 		"contact": "Contacte",
 		"poweredBy": "Alimentat per procrastinació i",
-		"emojiClickTooltip": "Fes clic per un emoji diferent!",
-		"emojiAriaLabel": "Canviar emoji"
+		"emojiClickTooltip": "Fes clic per un emoji diferent!"
 	}
 }

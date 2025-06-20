@@ -1,4 +1,7 @@
-import { DEFAULT_CALENDAR_LIMITS, SCORE_MULTIPLIERS } from "@const/const";
+import {
+	DEFAULT_CALENDAR_LIMITS,
+	SCORE_MULTIPLIERS,
+} from "@modules/components/home/components/calendarList/hooks/const";
 import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
 import type { BlockOpportunity } from "../../types";
 
@@ -20,18 +23,15 @@ export function generateAlternativesForBlock({
 	return blockOpportunities
 		.filter((opportunityBlock) => {
 			if (opportunityBlock === block) return false;
-
 			if (opportunityBlock.effectiveDays !== originalEffectiveDays) return false;
-
 			if (opportunityBlock.holidayDays !== originalHolidayDays) return false;
 
 			const hasSuggestedDays = opportunityBlock.days.some((d) => {
 				const dayKey = getDateKey(d);
 				return suggestedDaysSet.has(dayKey) && !blockDayKeys.has(dayKey);
 			});
-			if (hasSuggestedDays) return false;
 
-			return true;
+			return !hasSuggestedDays;
 		})
 		.sort((a, b) => {
 			if (Math.abs(a.score - b.score) > SCORE_MULTIPLIERS.TOLERANCE.SCORE_DIFFERENCE) {

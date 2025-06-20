@@ -94,11 +94,13 @@ export { generateMetadata };
 // 35- allow the user to select score stragety
 // 36- https://animate-ui.com/
 // 24- Edit weekends (paid functionality). Edit days (add and remove days) (paid functionality)
+// 24- Resend for contact (this implies changing the layout to avoid overlapping modals. Contact directly triggers the contact modal)
 
 // TODO: (release)
-// 35- Check copies
+// 2- devfooter functionality (add gmail, github, etc to vars and secrets)
+// 3- analytics
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc)
-// 2- devfooter functionality
 // 2- remove env vars
+// 35- Check copies
 // 34- Ko-Fi BE integration (webhook not working on localhost)
-// 34- check functionality (email, links, etc)
+// 34- QA

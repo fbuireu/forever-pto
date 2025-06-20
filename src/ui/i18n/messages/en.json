@@ -126,37 +126,37 @@
 			"subtitle": "Found a bug? Have a feature request? Just want to say hi?",
 			"email": {
 				"label": "Email",
-				"address": "ferran@buireu.com",
+				"address": "fbuireu@gmail.com",
 				"description": "Send me a message"
 			},
 			"github": {
 				"label": "GitHub",
-				"username": "@ferranbuireu"
+				"username": "@fbuireu"
 			},
 			"twitter": {
 				"label": "Twitter",
-				"username": "@ferranbuireu"
+				"username": "@fbuireu"
 			},
 			"responseTime": "Response time: Somewhere between ⚡ instant and 🐌 \"I'll get back to you\""
-		}
-	},
-	"premiumLock": {
-		"modal": {
-			"title": "Verify your premium subscription",
-			"description": "Enter the email you used on Ko-fi to verify your premium subscription.",
-			"successTitle": "Subscription verified!",
-			"successDescription": "Your premium subscription has been verified successfully. Enjoy all premium features!",
-			"successMessage": "Your premium subscription has been verified successfully. Enjoy all premium features!",
-			"emailLabel": "Email",
-			"emailPlaceholder": "your@email.com",
-			"verify": "Verify subscription",
-			"verifying": "Verifying...",
-			"close": "Close"
 		},
-		"errors": {
-			"notFound": "No premium subscription found with this email. If you have already made a payment, make sure to use the same email you used on Ko-fi.",
-			"generic": "An error occurred while verifying your subscription. Please try again later.",
-			"validation": "Please enter a valid email"
+		"premiumLock": {
+			"form": {
+				"title": "Verify your premium subscription",
+				"description": "Enter the email you used on Ko-fi to verify your premium subscription.",
+				"successTitle": "Subscription verified!",
+				"successDescription": "Your premium subscription has been verified successfully. Enjoy all premium features!",
+				"successMessage": "Your premium subscription has been verified successfully. Enjoy all premium features!",
+				"emailLabel": "Email",
+				"emailPlaceholder": "your@email.com",
+				"verify": "Verify subscription",
+				"verifying": "Verifying...",
+				"close": "Close"
+			},
+			"errors": {
+				"notFound": "No premium subscription found with this email. If you have already made a payment, make sure to use the same email you used on Ko-fi.",
+				"generic": "An error occurred while verifying your subscription. Please try again later.",
+				"validation": "Please enter a valid email"
+			}
 		}
 	},
 	"stats": {

@@ -43,7 +43,7 @@ export const DevFooter = () => {
 							variant="ghost"
 							size="sm"
 							onClick={() => {
-								window.open("https://github.com/ferranbuireu", "_blank", "noopener,noreferrer");
+								window.open("https://github.com/fbuireu", "_blank", "noopener,noreferrer");
 							}}
 							className="font-medium text-foreground hover:text-primary transition-colors underline decoration-dotted underline-offset-4 cursor-pointer p-0 h-auto min-w-0"
 						>

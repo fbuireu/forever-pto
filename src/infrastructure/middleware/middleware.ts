@@ -1,8 +1,9 @@
 import { isPremium } from "@application/actions/premium";
-import { DEFAULT_QUERY_PARAMS, FILTER_MAXIMUM_VALUES, SEARCH_PARAM_KEYS } from "@const/const";
-import type { RequiredParamsMap } from "@const/types";
+import { DEFAULT_QUERY_PARAMS, SEARCH_PARAM_KEYS } from "@const/const";
+import type { RequiredParamsMap } from "@infrastructure/middleware/types";
 import { validateParam } from "@infrastructure/middleware/utils/validateParam/validateParam";
 import { detectLocation } from "@infrastructure/services/location/detectLocation/detectLocation";
+import { FILTER_MAXIMUM_VALUES } from "@modules/components/appSidebar/const";
 import { type NextRequest, NextResponse } from "next/server";
 
 export const MIDDLEWARE_PARAMS: RequiredParamsMap = {

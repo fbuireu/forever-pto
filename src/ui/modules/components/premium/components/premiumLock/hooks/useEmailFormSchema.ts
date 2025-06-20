@@ -4,7 +4,7 @@ import type { ZodObject, ZodString } from "zod";
 import { z } from "zod";
 
 export const useEmailFormSchema = (): ZodObject<{ email: ZodString }> => {
-	const t = useTranslations("premiumLock.errors");
+	const t = useTranslations("modals.premiumLock.errors");
 
 	return useMemo(
 		() =>

@@ -1,5 +1,5 @@
-import { SCORE_MULTIPLIERS } from "@const/const";
 import { getDateKey } from "@modules/components/home/components/calendarList/hooks/utils/getDateKey/getDateKey";
+import { SCORE_MULTIPLIERS } from "../../../const";
 import type { BlockOpportunity } from "../../types";
 import { canAddBlock } from "../canAddBlock/canAddBlock";
 

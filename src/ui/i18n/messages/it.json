@@ -121,42 +121,42 @@
 			"cancel": "Annulla",
 			"save": "Salva"
 		},
-        "contact": {
+		"contact": {
 			"title": "Mettiti in contatto",
 			"subtitle": "Hai trovato un bug? Hai una richiesta di funzionalità? Vuoi solo salutare?",
 			"email": {
 				"label": "Email",
-				"address": "ferran@buireu.com",
+				"address": "fbuireu@gmail.com",
 				"description": "Inviami un messaggio"
 			},
 			"github": {
 				"label": "GitHub",
-				"username": "@ferranbuireu"
+				"username": "@fbuireu"
 			},
 			"twitter": {
 				"label": "Twitter",
-				"username": "@ferranbuireu"
+				"username": "@fbuireu"
 			},
 			"responseTime": "Tempo di risposta: Da ⚡ istantaneo a 🐌 \"ti risponderò\""
-		}
-	},
-	"premiumLock": {
-		"modal": {
-			"title": "Verifica il tuo abbonamento premium",
-			"description": "Inserisci l'email che hai utilizzato su Ko-fi per verificare il tuo abbonamento premium.",
-			"successTitle": "Abbonamento verificato!",
-			"successDescription": "Il tuo abbonamento premium è stato verificato correttamente. Goditi tutte le funzionalità premium!",
-			"successMessage": "Il tuo abbonamento premium è stato verificato correttamente. Goditi tutte le funzionalità premium!",
-			"emailLabel": "Email",
-			"emailPlaceholder": "tua@email.com",
-			"verify": "Verifica abbonamento",
-			"verifying": "Verificando...",
-			"close": "Chiudi"
 		},
-		"errors": {
-			"notFound": "Non è stato trovato alcun abbonamento premium con questa email. Se hai già effettuato un pagamento, assicurati di utilizzare la stessa email che hai usato su Ko-fi.",
-			"generic": "Si è verificato un errore durante la verifica del tuo abbonamento. Riprova più tardi.",
-			"validation": "Per favore, inserisci un'email valida"
+		"premiumLock": {
+			"form": {
+				"title": "Verifica il tuo abbonamento premium",
+				"description": "Inserisci l'email che hai utilizzato su Ko-fi per verificare il tuo abbonamento premium.",
+				"successTitle": "Abbonamento verificato!",
+				"successDescription": "Il tuo abbonamento premium è stato verificato correttamente. Goditi tutte le funzionalità premium!",
+				"successMessage": "Il tuo abbonamento premium è stato verificato correttamente. Goditi tutte le funzionalità premium!",
+				"emailLabel": "Email",
+				"emailPlaceholder": "tua@email.com",
+				"verify": "Verifica abbonamento",
+				"verifying": "Verificando...",
+				"close": "Chiudi"
+			},
+			"errors": {
+				"notFound": "Non è stato trovato alcun abbonamento premium con questa email. Se hai già effettuato un pagamento, assicurati di utilizzare la stessa email che hai usato su Ko-fi.",
+				"generic": "Si è verificato un errore durante la verifica del tuo abbonamento. Riprova più tardi.",
+				"validation": "Per favore, inserisci un'email valida"
+			}
 		}
 	},
 	"stats": {

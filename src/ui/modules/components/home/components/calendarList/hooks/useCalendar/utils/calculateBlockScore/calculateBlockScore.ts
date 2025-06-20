@@ -1,4 +1,4 @@
-import { SCORE_MULTIPLIERS } from "@const/const";
+import { SCORE_MULTIPLIERS } from "../../../const";
 
 interface CalculateBlockScoreParams {
 	blockSize: number;
