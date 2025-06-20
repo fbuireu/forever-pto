@@ -1,5 +1,5 @@
-import messages from '@i18n/messages/en.json';
-import { routing } from '@infrastructure/i18n/routing/routing';
+import messages from "@i18n/messages/en.json";
+import { routing } from "@infrastructure/i18n/routing/routing";
 
 declare namespace NodeJS {
 	interface ProcessEnv {

@@ -83,7 +83,9 @@ export { generateMetadata };
 // TODO:
 // 1- recheck and refactor
 // 2- migrate to pnpm
+// 2- change style to circle days (like pencil)
 // 6- Add tests (also e2e)
+// 6- add pnpm
 // 9- Add CI/CD
 // 10- repo settings and rules (README, etc)
 // 34- MCP server? (paid func)
@@ -99,6 +101,7 @@ export { generateMetadata };
 // TODO: (release)
 // 2- devfooter functionality (add gmail, github, etc to vars and secrets)
 // 3- analytics
+// 3- cookiestore on sidebarprovider
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc)
 // 2- remove env vars
 // 35- Check copies
