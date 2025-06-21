@@ -18,28 +18,28 @@ import { useState } from "react";
 
 interface GetColumnsParams {
 	locale: LocaleKey;
-	translation: ReturnType<typeof useTranslations<"holidaysTable">>;
+	t: ReturnType<typeof useTranslations<"holidaysTable">>;
 }
 
-export const getColumns = ({ locale, translation }: GetColumnsParams): ColumnDef<HolidayDTO>[] =>
+export const getColumns = ({ locale, t }: GetColumnsParams): ColumnDef<HolidayDTO>[] =>
 	[
 		{
 			id: "select",
 			header: ({ table }) => (
-				<PremiumLock featureDescription={translation("features.selectHolidays")} variant="small">
+				<PremiumLock featureDescription={t("features.selectHolidays")} variant="small">
 					<Checkbox
 						checked={table.getIsAllPageRowsSelected()}
 						onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-						aria-label={translation("actions.selectAll")}
+						aria-label={t("actions.selectAll")}
 					/>
 				</PremiumLock>
 			),
 			cell: ({ row }) => (
-				<PremiumLock featureDescription={translation("features.selectHolidays")} variant="small">
+				<PremiumLock featureDescription={t("features.selectHolidays")} variant="small">
 					<Checkbox
 						checked={row.getIsSelected()}
 						onCheckedChange={(value) => row.toggleSelected(!!value)}
-						aria-label={translation("actions.selectRow")}
+						aria-label={t("actions.selectRow")}
 					/>
 				</PremiumLock>
 			),
@@ -49,7 +49,7 @@ export const getColumns = ({ locale, translation }: GetColumnsParams): ColumnDef
 			header: ({ column }) => {
 				return (
 					<Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						{translation("headers.date")}
+						{t("headers.date")}
 						{column.getIsSorted() === "asc" ? (
 							<ArrowUpIcon className="ml-2 h-4 w-4" />
 						) : column.getIsSorted() === "desc" ? (
@@ -74,11 +74,11 @@ export const getColumns = ({ locale, translation }: GetColumnsParams): ColumnDef
 		},
 		{
 			accessorKey: "name",
-			header: translation("headers.name"),
+			header: t("headers.name"),
 		},
 		{
 			id: "actions",
-			header: translation("headers.actions"),
+			header: t("headers.actions"),
 			cell: ({ row }) => {
 				const holiday = row.original;
 				const { removeHoliday, updateHoliday } = useHolidaysStore();
@@ -95,25 +95,25 @@ export const getColumns = ({ locale, translation }: GetColumnsParams): ColumnDef
 
 				return (
 					<>
-						<PremiumLock featureDescription={translation("features.editRemove")} variant="small">
+						<PremiumLock featureDescription={t("features.editRemove")} variant="small">
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<Button variant="ghost" className="h-8 w-8 p-0">
-										<span className="sr-only">{translation("actions.openMenu")}</span>
+										<span className="sr-only">{t("actions.openMenu")}</span>
 										<MoreHorizontal className="h-4 w-4" />
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end">
 									<DropdownMenuItem onClick={() => setIsEditModalOpen(true)}>
 										<Edit2 className="mr-2 h-4 w-4" />
-										{translation("actions.edit")}
+										{t("actions.edit")}
 									</DropdownMenuItem>
 									<DropdownMenuItem
 										className="bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:text-destructive-foreground"
 										onClick={() => setIsDeleteModalOpen(true)}
 									>
 										<Trash2 className="mr-2 h-4 w-4 text-white" />
-										{translation("actions.remove")}
+										{t("actions.remove")}
 									</DropdownMenuItem>
 								</DropdownMenuContent>
 							</DropdownMenu>

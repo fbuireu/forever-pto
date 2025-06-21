@@ -121,24 +121,6 @@
 			"cancel": "Cancel",
 			"save": "Save"
 		},
-		"contact": {
-			"title": "Get in touch",
-			"subtitle": "Found a bug? Have a feature request? Just want to say hi?",
-			"email": {
-				"label": "Email",
-				"address": "fbuireu@gmail.com",
-				"description": "Send me a message"
-			},
-			"github": {
-				"label": "GitHub",
-				"username": "@fbuireu"
-			},
-			"twitter": {
-				"label": "Twitter",
-				"username": "@fbuireu"
-			},
-			"responseTime": "Response time: Somewhere between ⚡ instant and 🐌 \"I'll get back to you\""
-		},
 		"premiumLock": {
 			"form": {
 				"title": "Verify your premium subscription",
@@ -161,7 +143,7 @@
 	},
 	"stats": {
 		"title": "Vacation Optimization",
-		"holidaysSummary": {
+		"summary": {
 			"title": "Holiday Summary",
 			"withCountry": "In {country} ({flag}) there are {nationalHolidays} national holidays",
 			"withoutCountry": "There are {nationalHolidays} national holidays",
@@ -170,7 +152,9 @@
 			"defaultRegion": "the region",
 			"noHolidaysFound": "No holidays found for this country. Try using the search",
 			"noRegionalHolidays": " Also none for the {region} region.",
-			"noCountryHolidays": "No holidays found for your country."
+			"noCountryHolidays": "No holidays found for your country.",
+			"noRegionSelected": ". No regions selected that add more holidays",
+			"noRegionalHolidaysForRegion": ". No additional holidays found for {region}"
 		},
 		"effectiveness": {
 			"title": "Effectiveness of your PTO days",
@@ -232,6 +216,10 @@
 		"limitationsTitle": "Limitations & Technical Details",
 		"limitationsDescription": "Understanding the current constraints and technical boundaries",
 		"questions": {
+			"whatIsPremium": {
+				"question": "What is Premium and why does it exist?",
+				"answer": "The application is completely free and functional. However, there are some premium features behind a symbolic voluntary payment. This allows me to cover servers, domain, and various features that have associated costs, since this site doesn't rely on advertising."
+			},
 			"individualVsBlocks": {
 				"question": "Why does it suggest individual days instead of long blocks?",
 				"answer": "When strategic individual days (e.g., adjacent to holidays) generate more total free days than a long block, the algorithm prioritizes them for maximum effectiveness. The optimizer always chooses the combination that gives you the most time off."
@@ -283,8 +271,8 @@
 				"answer": "Currently no. It doesn't account for preferences like avoiding certain months, travel constraints, or specific personal events. Future versions will include customizable preferences."
 			},
 			"externalEvents": {
-				"question": "Can it optimize around external events?",
-				"answer": "Not currently. The optimizer doesn't integrate with external calendars, conferences, family events, or travel bookings. It only considers official holidays."
+				"question": "Can it optimize around external or missing events?",
+				"answer": "Yes, you can add custom, missing, or incorrect holidays. This is a premium feature"
 			},
 			"fixedPto": {
 				"question": "Can I use only part of my PTO allowance?",

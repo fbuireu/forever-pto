@@ -121,24 +121,6 @@
 			"cancel": "Cancelar",
 			"save": "Guardar"
 		},
-		"contact": {
-			"title": "Ponte en contacto",
-			"subtitle": "¿Encontraste un error? ¿Tienes una sugerencia? ¿Solo quieres saludar?",
-			"email": {
-				"label": "Email",
-				"address": "fbuireu@gmail.com",
-				"description": "Envíame un mensaje"
-			},
-			"github": {
-				"label": "GitHub",
-				"username": "@ferranbuireu"
-			},
-			"twitter": {
-				"label": "Twitter",
-				"username": "@ferranbuireu"
-			},
-			"responseTime": "Tiempo de respuesta: Entre ⚡ instantáneo y 🐌 \"ya te responderé\""
-		},
 		"premiumLock": {
 			"form": {
 				"title": "Verifica tu suscripción premium",
@@ -161,7 +143,7 @@
 	},
 	"stats": {
 		"title": "Optimización de Vacaciones",
-		"holidaysSummary": {
+		"summary": {
 			"title": "Resumen de días festivos",
 			"withCountry": "En {country} ({flag}) hay {nationalHolidays} festivos nacionales",
 			"withoutCountry": "Hay {nationalHolidays} festivos nacionales",
@@ -170,7 +152,9 @@
 			"defaultRegion": "la región",
 			"noHolidaysFound": "No se han encontrado días festivos para este país. Prueba a usar el buscador",
 			"noRegionalHolidays": " Tampoco para la región {region}.",
-			"noCountryHolidays": "No se han encontrado días festivos para tu país."
+			"noCountryHolidays": "No se han encontrado días festivos para tu país.",
+			"noRegionSelected": ". No hay regiones seleccionadas que añadan más días festivos",
+			"noRegionalHolidaysForRegion": ". No se encontraron días festivos adicionales para {region}"
 		},
 		"effectiveness": {
 			"title": "Efectividad de tus días PTO",
@@ -232,6 +216,10 @@
 		"limitationsTitle": "Limitaciones y Detalles Técnicos",
 		"limitationsDescription": "Entendiendo las restricciones actuales y límites técnicos",
 		"questions": {
+			"whatIsPremium": {
+				"question": "¿Qué es el Premium y por qué existe?",
+				"answer": "La aplicación es totalmente gratuita y funcional. Sin embargo, hay algunas funcionalidades premium que están detrás de un pago simbólico de cantidad voluntaria. Esto me permite costear los servidores, dominio y diversas funcionalidades que tienen un costo asociado, ya que este sitio no se sustenta con publicidad."
+			},
 			"individualVsBlocks": {
 				"question": "¿Por qué sugiere días individuales en lugar de bloques largos?",
 				"answer": "Cuando días individuales estratégicos (ej: junto a festivos) generan más días libres totales que un bloque largo, el algoritmo los prioriza para máxima efectividad. El optimizador siempre elige la combinación que te da más tiempo libre."
@@ -284,7 +272,7 @@
 			},
 			"externalEvents": {
 				"question": "¿Puede optimizar alrededor de eventos externos?",
-				"answer": "Actualmente no. El optimizador no se integra con calendarios externos, conferencias, eventos familiares, o reservas de viajes. Solo considera festivos oficiales."
+				"answer": "Sí, se pueden añadir festivos personalizados, faltantes o incorrectos. Esta es una funcionalidad premium"
 			},
 			"fixedPto": {
 				"question": "¿Puedo usar solo parte de mis días de vacaciones?",

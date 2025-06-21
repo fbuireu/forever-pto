@@ -19,6 +19,11 @@ export const Faq = async ({ locale }: FaqProps) => {
 
 	const faqItems = [
 		{
+			id: "iwhat-is-premium",
+			question: t("questions.whatIsPremium.question"),
+			answer: t("questions.whatIsPremium.answer"),
+		},
+		{
 			id: "individual-vs-blocks",
 			question: t("questions.individualVsBlocks.question"),
 			answer: t("questions.individualVsBlocks.answer"),

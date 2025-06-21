@@ -54,7 +54,7 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 
 	const table = useReactTable({
 		data: holidays,
-		columns: getColumns({ locale, translation: t }),
+		columns: getColumns({ locale, t: t }),
 		getCoreRowModel: getCoreRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
 		getSortedRowModel: getSortedRowModel(),
@@ -152,7 +152,7 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 											))
 										) : (
 											<TableRow>
-												<TableCell colSpan={getColumns({ locale, translation: t }).length} className="h-24 text-center">
+												<TableCell colSpan={getColumns({ locale, t: t }).length} className="h-24 text-center">
 													{t("noResults")}
 												</TableCell>
 											</TableRow>

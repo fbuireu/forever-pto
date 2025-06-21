@@ -55,7 +55,7 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 					locale={locale}
 				/>
 				<SidebarTrigger />
-				<div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-8">
+				<div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-2">
 					<HolidaysProvider initialHolidays={holidays}>
 						<HolidaysSummary />
 						<CalendarList
@@ -89,19 +89,17 @@ export { generateMetadata };
 // 9- Add CI/CD
 // 10- repo settings and rules (README, etc)
 // 34- MCP server? (paid func)
-// 34- use fn to format messages in stats
 // 35- use own cdn to check country
+// 35- google verification site
 // 34- Readme
 // 35- Replace kofi for stripe
 // 35- allow the user to select score stragety
 // 36- https://animate-ui.com/
 // 24- Edit weekends (paid functionality). Edit days (add and remove days) (paid functionality)
-// 24- Resend for contact (this implies changing the layout to avoid overlapping modals. Contact directly triggers the contact modal)
+// 24- Resend for contact
 
 // TODO: (release)
-// 2- devfooter functionality (add gmail, github, etc to vars and secrets)
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc)
-// 2- remove env vars
-// 35- Check copies
+// 35- Check copies (what is premium, limitations, behind flag features, etc)
 // 34- Ko-Fi BE integration (webhook not working on localhost)
 // 34- QA

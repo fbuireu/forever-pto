@@ -121,24 +121,6 @@
 			"cancel": "Cancel·lar",
 			"save": "Guardar"
 		},
-		"contact": {
-			"title": "Posa't en contacte",
-			"subtitle": "Has trobat un error? Tens un suggeriment? Només vols saludar?",
-			"email": {
-				"label": "Email",
-				"address": "fbuireu@gmail.com",
-				"description": "Envia'm un missatge"
-			},
-			"github": {
-				"label": "GitHub",
-				"username": "@fbuireu"
-			},
-			"twitter": {
-				"label": "Twitter",
-				"username": "@fbuireu"
-			},
-			"responseTime": "Temps de resposta: Entre ⚡ instantani i 🐌 \"ja et respondré\""
-		},
 		"premiumLock": {
 			"form": {
 				"title": "Verifica la teva subscripció premium",
@@ -161,7 +143,7 @@
 	},
 	"stats": {
 		"title": "Optimització de Vacances",
-		"holidaysSummary": {
+		"summary": {
 			"title": "Resum de dies festius",
 			"withCountry": "A {country} ({flag}) hi ha {nationalHolidays} festius nacionals",
 			"withoutCountry": "Hi ha {nationalHolidays} festius nacionals",
@@ -170,7 +152,9 @@
 			"defaultRegion": "la regió",
 			"noHolidaysFound": "No s'han trobat dies festius per a aquest país. Prova a usar el cercador",
 			"noRegionalHolidays": " Tampoc per a la regió {region}.",
-			"noCountryHolidays": "No s'han trobat dies festius per al teu país."
+			"noCountryHolidays": "No s'han trobat dies festius per al teu país.",
+			"noRegionSelected": ". No hi ha regions seleccionades que afegeixin més dies festius",
+			"noRegionalHolidaysForRegion": ". No s'han trobat dies festius addicionals per a {region}"
 		},
 		"effectiveness": {
 			"title": "Efectivitat dels teus dies PTO",
@@ -232,6 +216,10 @@
 		"limitationsTitle": "Limitacions i Detalls Tècnics",
 		"limitationsDescription": "Entenent les restriccions actuals i límits tècnics",
 		"questions": {
+			"whatIsPremium": {
+				"question": "Què és el Premium i per què existeix?",
+				"answer": "L'aplicació és completament gratuïta i funcional. No obstant això, hi ha algunes funcionalitats premium darrere d'un pagament simbòlic voluntari. Això em permet costejar els servidors, domini i diverses funcionalitats que tenen un cost associat, ja que aquest lloc no es sustenta amb publicitat."
+			},
 			"individualVsBlocks": {
 				"question": "Per què suggereix dies individuals en lloc de blocs llargs?",
 				"answer": "Quan dies individuals estratègics (ex: al costat de festius) generen més dies lliures totals que un bloc llarg, l'algoritme els prioritza per a màxima efectivitat. L'optimitzador sempre tria la combinació que et dona més temps lliure."
@@ -284,7 +272,7 @@
 			},
 			"externalEvents": {
 				"question": "Pot optimitzar al voltant d'esdeveniments externs?",
-				"answer": "Actualment no. L'optimitzador no s'integra amb calendaris externs, conferències, esdeveniments familiars, o reserves de viatges. Només considera festius oficials."
+				"answer": "Sí, es poden afegir festius personalitzats, que falten o incorrectes. Aquesta és una funcionalitat premium"
 			},
 			"fixedPto": {
 				"question": "Puc usar només part dels meus dies de vacances?",

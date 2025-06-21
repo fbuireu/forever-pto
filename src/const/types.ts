@@ -1,11 +1,13 @@
 import { SEARCH_PARAM_KEYS } from "@const/const";
 import type { defineRouting } from "next-intl/routing";
 
-export type CapitalizeKeys<T> = {
+export type CapitalizeKeys<T, Shallow extends boolean = false> = {
 	[K in keyof T as Uppercase<string & K>]: T[K] extends readonly unknown[]
 		? T[K]
 		: T[K] extends object
-			? CapitalizeKeys<T[K]>
+			? Shallow extends true
+				? T[K] // Si es shallow, mantiene el objeto original sin transformar
+				: CapitalizeKeys<T[K], Shallow> // Si no es shallow, recursa como antes
 			: T[K];
 };
 
