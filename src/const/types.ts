@@ -6,8 +6,8 @@ export type CapitalizeKeys<T, Shallow extends boolean = false> = {
 		? T[K]
 		: T[K] extends object
 			? Shallow extends true
-				? T[K] // Si es shallow, mantiene el objeto original sin transformar
-				: CapitalizeKeys<T[K], Shallow> // Si no es shallow, recursa como antes
+				? T[K]
+				: CapitalizeKeys<T[K], Shallow>
 			: T[K];
 };
 
