@@ -100,8 +100,6 @@ export { generateMetadata };
 
 // TODO: (release)
 // 2- devfooter functionality (add gmail, github, etc to vars and secrets)
-// 3- analytics
-// 3- cookiestore on sidebarprovider
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc)
 // 2- remove env vars
 // 35- Check copies

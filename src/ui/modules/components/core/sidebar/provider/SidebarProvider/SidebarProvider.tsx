@@ -14,23 +14,6 @@ interface SidebarProviderProps extends ComponentProps<"div"> {
 	onOpenChange?: (open: boolean) => void;
 }
 
-const getCookieValue = (name: string): string | null => {
-	if (typeof document === "undefined") return null;
-
-	const value = `; ${document.cookie}`;
-	const parts = value.split(`; ${name}=`);
-	if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
-	return null;
-};
-
-const getInitialOpenState = (defaultOpen: boolean): boolean => {
-	const cookieValue = getCookieValue(String(DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_NAME));
-	if (cookieValue !== null) {
-		return cookieValue === "true";
-	}
-	return defaultOpen;
-};
-
 export const SidebarProvider = ({
 	defaultOpen = true,
 	open: openProp,
@@ -42,19 +25,40 @@ export const SidebarProvider = ({
 }: SidebarProviderProps) => {
 	const isMobile = useMobile();
 	const [openMobile, setOpenMobile] = useState(false);
-	const [_open, _setOpen] = useState(() => getInitialOpenState(defaultOpen));
+	const [isOpen, setIsOpen] = useState(defaultOpen);
 
-	const open = openProp ?? _open;
+	const open = openProp ?? isOpen;
+
+	useEffect(() => {
+		const loadCookieState = async () => {
+			if (openProp === undefined) {
+				const cookie = await cookieStore.get(String(DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_NAME));
+
+				if (cookie?.value !== undefined) {
+					const cookieState = cookie.value === "true";
+					if (cookieState !== isOpen) {
+						setIsOpen(cookieState);
+					}
+				}
+			}
+		};
+
+		loadCookieState();
+	}, [openProp, isOpen]);
 
 	const setOpen = useCallback(
 		(value: boolean | ((value: boolean) => boolean)) => {
 			const openState = typeof value === "function" ? value(open) : value;
-			if (setOpenProp) {
-				setOpenProp(openState);
-			} else {
-				_setOpen(openState);
-			}
-			document.cookie = `${DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_MAX_AGE}`;
+			const openFn = setOpenProp || setIsOpen;
+
+			openFn(openState);
+
+			cookieStore.set({
+				name: String(DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_NAME),
+				value: String(openState),
+				path: "/",
+				maxAge: DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_MAX_AGE,
+			});
 		},
 		[setOpenProp, open],
 	);

@@ -2,6 +2,7 @@ import { THEME_STORAGE_KEY } from "@const/const";
 import { ErrorBoundary } from "@modules/components/core/errorBoundary/ErrorBoundary";
 import { KofiWidget } from "@modules/components/core/kofiWidget/KofiWidget";
 import "@styles/index.css";
+import { Analytics } from "@ui/modules/components/core/analytics/Analytics";
 import { ThemeProvider } from "@ui/providers/theme/ThemeProvider";
 import { Geist, Geist_Mono } from "next/font/google";
 import { type Locale, NextIntlClientProvider } from "next-intl";
@@ -41,6 +42,7 @@ const RootLayout = async ({ children, params }: RootLayoutProps) => {
 							<main>{children}</main>
 						</ThemeProvider>
 						<KofiWidget />
+						<Analytics />
 					</NextIntlClientProvider>
 				</body>
 			</html>
