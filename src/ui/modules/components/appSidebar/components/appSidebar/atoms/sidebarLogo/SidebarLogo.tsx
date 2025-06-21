@@ -8,7 +8,7 @@ export const SidebarLogo = () => {
 	const { state } = useSidebar();
 	return (
 		<div className="flex aspect-square size-8 items-center justify-center gap-2 rounded-lg bg-sidebar-primary text-sidebar-primary-foreground w-full">
-			<Image src={logo} width={50} alt="Forever PTO" />
+			<Image src={logo} width={75} alt="Forever PTO" />
 			{state !== "collapsed" && <p className="mt-2">Forever PTO</p>}
 		</div>
 	);

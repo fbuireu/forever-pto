@@ -220,6 +220,10 @@
 				"question": "Cos'è il Premium e perché esiste?",
 				"answer": "L'applicazione è completamente gratuita e funzionale. Tuttavia, ci sono alcune funzionalità premium dietro un pagamento simbolico volontario. Questo mi permette di coprire server, dominio e varie funzionalità che hanno costi associati, poiché questo sito non si basa sulla pubblicità."
 			},
+            "alreadyPaidDevice": {
+                "question": "Ho già pagato/donato su un altro dispositivo. Devo pagare di nuovo?",
+                "answer": "No. Se hai già pagato, devi solo inserire l'email utilizzata durante il pagamento. Se esiste un registro nel nostro database, ti verranno concessi nuovamente i benefici premium. Se hai dubbi o problemi, utilizza il modulo di contatto."
+            },
 			"individualVsBlocks": {
 				"question": "Perché suggerisce giorni individuali invece di blocchi lunghi?",
 				"answer": "Quando giorni individuali strategici (es: adiacenti a festivi) generano più giorni liberi totali di un blocco lungo, l'algoritmo li priorizza per massima efficacia. L'ottimizzatore sceglie sempre la combinazione che ti dà più tempo libero."
@@ -264,7 +268,7 @@
 			},
 			"maxAlternatives": {
 				"question": "Quante alternative vengono mostrate?",
-				"answer": "Massimo 10 alternative per blocco (configurabile). Il sistema prioritizza mostrare le alternative più rilevanti con criteri di corrispondenza esatta."
+				"answer": "Massimo 10 alternative per blocco (limitato dall'efficienza). Il sistema prioritizza mostrare le alternative più rilevanti con criteri di corrispondenza esatta."
 			},
 			"personalPreferences": {
 				"question": "Considera le preferenze personali?",

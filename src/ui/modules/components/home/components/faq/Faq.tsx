@@ -9,6 +9,7 @@ import { CardTitle } from "@modules/components/core/card/atoms/cardTitle/CardTit
 import { Card } from "@modules/components/core/card/Card";
 import type { LocaleKey } from "@ui/utils/i18n/getLocalizedDateFns/getLocalizedDateFns";
 import { getTranslations } from "next-intl/server";
+import { FAQ_LIMITATIONS, FAQ_QUESTIONS } from "./const";
 
 interface FaqProps {
 	locale: LocaleKey;
@@ -17,86 +18,17 @@ interface FaqProps {
 export const Faq = async ({ locale }: FaqProps) => {
 	const t = await getTranslations({ locale, namespace: "faq" });
 
-	const faqItems = [
-		{
-			id: "iwhat-is-premium",
-			question: t("questions.whatIsPremium.question"),
-			answer: t("questions.whatIsPremium.answer"),
-		},
-		{
-			id: "individual-vs-blocks",
-			question: t("questions.individualVsBlocks.question"),
-			answer: t("questions.individualVsBlocks.answer"),
-		},
-		{
-			id: "all-pto-usage",
-			question: t("questions.allPtoUsage.question"),
-			answer: t("questions.allPtoUsage.answer"),
-		},
-		{
-			id: "block-sizes",
-			question: t("questions.blockSizes.question"),
-			answer: t("questions.blockSizes.answer"),
-		},
-		{
-			id: "weekends-handling",
-			question: t("questions.weekendsHandling.question"),
-			answer: t("questions.weekendsHandling.answer"),
-		},
-		{
-			id: "past-dates",
-			question: t("questions.pastDates.question"),
-			answer: t("questions.pastDates.answer"),
-		},
-		{
-			id: "different-countries",
-			question: t("questions.differentCountries.question"),
-			answer: t("questions.differentCountries.answer"),
-		},
-		{
-			id: "alternative-days",
-			question: t("questions.alternativeDays.question"),
-			answer: t("questions.alternativeDays.answer"),
-		},
-		{
-			id: "weekend-customization",
-			question: t("questions.weekendCustomization.question"),
-			answer: t("questions.weekendCustomization.answer"),
-		},
-		{
-			id: "partial-pto",
-			question: t("questions.partialPto.question"),
-			answer: t("questions.partialPto.answer"),
-		},
-	];
+	const faqs = FAQ_QUESTIONS.map((key, index) => ({
+		id: `question-${index}`,
+		question: t(`questions.${key}.question`),
+		answer: t(`questions.${key}.answer`),
+	}));
 
-	const limitationItems = [
-		{
-			id: "algorithm-type",
-			question: t("limitations.algorithmType.question"),
-			answer: t("limitations.algorithmType.answer"),
-		},
-		{
-			id: "max-alternatives",
-			question: t("limitations.maxAlternatives.question"),
-			answer: t("limitations.maxAlternatives.answer"),
-		},
-		{
-			id: "personal-preferences",
-			question: t("limitations.personalPreferences.question"),
-			answer: t("limitations.personalPreferences.answer"),
-		},
-		{
-			id: "external-events",
-			question: t("limitations.externalEvents.question"),
-			answer: t("limitations.externalEvents.answer"),
-		},
-		{
-			id: "fixed-pto",
-			question: t("limitations.fixedPto.question"),
-			answer: t("limitations.fixedPto.answer"),
-		},
-	];
+	const limitations = FAQ_LIMITATIONS.map((key, index) => ({
+		id: `limitation-${index}`,
+		question: t(`limitations.${key}.question`),
+		answer: t(`limitations.${key}.answer`),
+	}));
 
 	return (
 		<section className="w-full max-w-4xl mx-auto space-y-6">
@@ -107,7 +39,7 @@ export const Faq = async ({ locale }: FaqProps) => {
 				</CardHeader>
 				<CardContent>
 					<Accordion type="single" collapsible className="w-full">
-						{faqItems.map((item) => (
+						{faqs.map((item) => (
 							<AccordionItem key={item.id} value={item.id}>
 								<AccordionTrigger className="text-left">{item.question}</AccordionTrigger>
 								<AccordionContent className="text-muted-foreground">{item.answer}</AccordionContent>
@@ -124,7 +56,7 @@ export const Faq = async ({ locale }: FaqProps) => {
 				</CardHeader>
 				<CardContent>
 					<Accordion type="single" collapsible className="w-full">
-						{limitationItems.map((item) => (
+						{limitations.map((item) => (
 							<AccordionItem key={item.id} value={item.id}>
 								<AccordionTrigger className="text-left">{item.question}</AccordionTrigger>
 								<AccordionContent className="text-muted-foreground">{item.answer}</AccordionContent>
