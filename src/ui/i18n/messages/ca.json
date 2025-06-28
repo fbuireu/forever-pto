@@ -220,10 +220,10 @@
 				"question": "Què és el Premium i per què existeix?",
 				"answer": "L'aplicació és completament gratuïta i funcional. No obstant això, hi ha algunes funcionalitats premium darrere d'un pagament simbòlic voluntari. Això em permet costejar els servidors, domini i diverses funcionalitats que tenen un cost associat, ja que aquest lloc no es sustenta amb publicitat."
 			},
-            "alreadyPaidDevice": {
-                "question": "Ja he pagat/donat en un altre dispositiu. He de tornar a pagar?",
-                "answer": "No. Si ja has pagat només has d'introduir el correu usat durant el pagament. Si existeix un registre a la nostra base de dades se t'atorgarà el benefici premium de nou. Si tens dubtes o problemes sisplau usa el formulari de contacte."
-            },
+			"alreadyPaidDevice": {
+				"question": "Ja he pagat/donat en un altre dispositiu. He de tornar a pagar?",
+				"answer": "No. Si ja has pagat només has d'introduir el correu usat durant el pagament. Si existeix un registre a la nostra base de dades se t'atorgarà el benefici premium de nou. Si tens dubtes o problemes sisplau usa el formulari de contacte."
+			},
 			"individualVsBlocks": {
 				"question": "Per què suggereix dies individuals en lloc de blocs llargs?",
 				"answer": "Quan dies individuals estratègics (ex: al costat de festius) generen més dies lliures totals que un bloc llarg, l'algoritme els prioritza per a màxima efectivitat. L'optimitzador sempre tria la combinació que et dona més temps lliure."

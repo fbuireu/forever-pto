@@ -220,10 +220,10 @@
 				"question": "What is Premium and why does it exist?",
 				"answer": "The application is completely free and functional. However, there are some premium features behind a symbolic voluntary payment. This allows me to cover servers, domain, and various features that have associated costs, since this site doesn't rely on advertising."
 			},
-            "alreadyPaidDevice": {
-                "question": "I already paid/donated on another device. Do I have to pay again?",
-                "answer": "No. If you have already paid, you just need to enter the email used during payment. If an entry exists in our database, you will be granted premium benefits again. If you have questions or problems, please use the contact form."
-            },
+			"alreadyPaidDevice": {
+				"question": "I already paid/donated on another device. Do I have to pay again?",
+				"answer": "No. If you have already paid, you just need to enter the email used during payment. If an entry exists in our database, you will be granted premium benefits again. If you have questions or problems, please use the contact form."
+			},
 			"individualVsBlocks": {
 				"question": "Why does it suggest individual days instead of long blocks?",
 				"answer": "When strategic individual days (e.g., adjacent to holidays) generate more total free days than a long block, the algorithm prioritizes them for maximum effectiveness. The optimizer always chooses the combination that gives you the most time off."

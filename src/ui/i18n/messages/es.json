@@ -220,10 +220,10 @@
 				"question": "¿Qué es el Premium y por qué existe?",
 				"answer": "La aplicación es totalmente gratuita y funcional. Sin embargo, hay algunas funcionalidades premium que están detrás de un pago simbólico de cantidad voluntaria. Esto me permite costear los servidores, dominio y diversas funcionalidades que tienen un costo asociado, ya que este sitio no se sustenta con publicidad."
 			},
-            "alreadyPaidDevice": {
-                "question": "Ya he pagado/donado en otro dispositivo. ¿Tengo que volver a pagar?",
-                "answer": "No. Si ya has pagado solo tienes que introducir el correo usado durante el pago. Si existe un registro en nuestra base de datos se te otorgará el beneficio premium de nuevo. Si tienes dudas o problemas por favor usa el formulario de contacto."
-            },
+			"alreadyPaidDevice": {
+				"question": "Ya he pagado/donado en otro dispositivo. ¿Tengo que volver a pagar?",
+				"answer": "No. Si ya has pagado solo tienes que introducir el correo usado durante el pago. Si existe un registro en nuestra base de datos se te otorgará el beneficio premium de nuevo. Si tienes dudas o problemas por favor usa el formulario de contacto."
+			},
 			"individualVsBlocks": {
 				"question": "¿Por qué sugiere días individuales en lugar de bloques largos?",
 				"answer": "Cuando días individuales estratégicos (ej: junto a festivos) generan más días libres totales que un bloque largo, el algoritmo los prioriza para máxima efectividad. El optimizador siempre elige la combinación que te da más tiempo libre."
