@@ -31,7 +31,6 @@ export interface SearchParams {
 export interface PremiumParams {
 	cookie_name: "premium";
 	cookie_duration: number;
-	check_delay: number;
 }
 
 export interface I18nConfig extends Except<ReturnType<typeof defineRouting>, "defaultLocale"> {

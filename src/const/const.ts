@@ -39,7 +39,6 @@ export const I18N_CONFIG: CapitalizeKeys<I18nConfig> = {
 export const PREMIUM_PARAMS: CapitalizeKeys<PremiumParams> = {
 	COOKIE_NAME: "premium" as const,
 	COOKIE_DURATION: 30 * 24 * 60 * 60,
-	CHECK_DELAY: 5 * 60 * 1000,
 } as const;
 
 export const THEME_STORAGE_KEY: string = "theme" as const;

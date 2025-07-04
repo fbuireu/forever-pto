@@ -15,7 +15,7 @@ export async function isPremium(): Promise<boolean> {
 
 	try {
 		const result = await database.execute({
-			sql: "SELECT * FROM payments WHERE messageId = ?",
+			sql: "SELECT 1 FROM payments WHERE messageId = ? LIMIT 1",
 			args: [messageId],
 		});
 

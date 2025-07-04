@@ -1,25 +1,29 @@
 import { isPremium as isPremiumAction } from "@application/actions/premium";
 import { usePremiumStore } from "@application/stores/premium/premiumStore";
-import { PREMIUM_PARAMS } from "@const/const";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 export function usePremiumStatusVerification() {
 	const { isPremiumUser, setPremiumStatus } = usePremiumStore();
 
-	useEffect(() => {
-		const verifyPremiumStatus = async () => {
-			try {
-				const isPremium = await isPremiumAction();
-				if (isPremium !== isPremiumUser) {
-					setPremiumStatus(isPremium);
-				}
-			} catch (_) {}
-		};
+	const verifyPremiumStatus = useCallback(async () => {
+		try {
+			const isPremium = await isPremiumAction();
+			if (isPremium !== isPremiumUser) {
+				setPremiumStatus(isPremium);
+			}
+		} catch (_) {}
+	}, [isPremiumUser, setPremiumStatus]);
 
+	useEffect(() => {
 		void verifyPremiumStatus();
 
-		const interval = setInterval(() => void verifyPremiumStatus(), PREMIUM_PARAMS.CHECK_DELAY);
+		const handleVisibilityChange = () => {
+			if (!document.hidden) {
+				void verifyPremiumStatus();
+			}
+		};
 
-		return () => clearInterval(interval);
-	}, [isPremiumUser, setPremiumStatus]);
+		document.addEventListener("visibilitychange", handleVisibilityChange);
+		return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+	}, [verifyPremiumStatus]);
 }
