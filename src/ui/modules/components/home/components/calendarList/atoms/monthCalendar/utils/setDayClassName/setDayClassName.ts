@@ -7,7 +7,7 @@ interface SetDayClassNameParams {
 	isHoliday: (date: Date) => boolean;
 	isDaySuggested: (date: Date) => boolean;
 	isDayAlternative: (date: Date) => boolean;
-	isPastDayAllowed: () => boolean;
+	isPastDaysAllowed: () => boolean;
 }
 
 export function setDayClassName({
@@ -17,7 +17,7 @@ export function setDayClassName({
 	isHoliday,
 	isDaySuggested,
 	isDayAlternative,
-	isPastDayAllowed,
+	isPastDaysAllowed,
 }: SetDayClassNameParams): string {
 	const BASE_CLASSES = [
 		"h-8 w-8 p-0",
@@ -32,7 +32,7 @@ export function setDayClassName({
 		return BASE_CLASSES.join(" ");
 	}
 
-	if (!isPastDayAllowed() && date < new Date() && !selectedDays.some((d) => isSameDay(d, date))) {
+	if (!isPastDaysAllowed() && date < new Date() && !selectedDays.some((d) => isSameDay(d, date))) {
 		BASE_CLASSES.push("text-muted-foreground opacity-50 cursor-not-allowed");
 	} else {
 		BASE_CLASSES.push("cursor-pointer");

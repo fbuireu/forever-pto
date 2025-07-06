@@ -16,7 +16,7 @@ interface DayProps {
 	alternativeDayPosition: (date: Date) => string | null;
 	handleDayInteraction: (event: MouseEvent<HTMLButtonElement> | FocusEvent<HTMLButtonElement>) => void;
 	handleDayMouseOut: () => void;
-	isPastDayAllowed: () => boolean;
+	isPastDaysAllowed: () => boolean;
 }
 
 export const Day = ({
@@ -32,7 +32,7 @@ export const Day = ({
 	alternativeDayPosition,
 	handleDayInteraction,
 	handleDayMouseOut,
-	isPastDayAllowed,
+	isPastDaysAllowed,
 }: DayProps) => {
 	const { date, displayMonth } = day;
 	const dayKey = format(date, "yyyy-MM-dd");
@@ -65,7 +65,7 @@ export const Day = ({
 					isHoliday,
 					isDaySuggested,
 					isDayAlternative,
-					isPastDayAllowed,
+					isPastDaysAllowed,
 				})}
 				title={holiday ?? ""}
 				onMouseOver={handleDayInteraction}

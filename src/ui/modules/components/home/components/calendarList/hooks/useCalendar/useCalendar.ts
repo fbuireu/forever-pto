@@ -31,7 +31,7 @@ interface UseCalendarReturn {
 	freeDaysBaseMap: Map<string, Date>;
 	isHoliday: (date: Date) => boolean;
 	getHolidayName: (date: Date) => string | null;
-	isPastDayAllowed: () => boolean;
+	isPastDaysAllowed: () => boolean;
 	calculateEffectiveDays: (ptoDaysToAdd: Date[]) => EffectiveRatio;
 }
 
@@ -68,7 +68,7 @@ export function useCalendar({
 		[calendarMaps.holidaysMap],
 	);
 
-	const isPastDayAllowed = useCallback(() => allowPastDays !== "false", [allowPastDays]);
+	const isPastDaysAllowed = useCallback(() => allowPastDays !== "false", [allowPastDays]);
 
 	const calculateEffectiveDaysCallback = useCallback(
 		(ptoDaysToEvaluate: Date[] = []): EffectiveRatio =>
@@ -85,9 +85,9 @@ export function useCalendar({
 				monthsToShow: monthsToShowDates,
 				isHoliday: calendarMaps.isHoliday,
 				selectedPtoDays: [],
-				isPastDayAllowed,
+				isPastDaysAllowed,
 			}),
-		[monthsToShowDates, calendarMaps.isHoliday, isPastDayAllowed],
+		[monthsToShowDates, calendarMaps.isHoliday, isPastDaysAllowed],
 	);
 
 	useEffect(() => {
@@ -134,7 +134,7 @@ export function useCalendar({
 		freeDaysBaseMap: calendarMaps.freeDaysBaseMap,
 		isHoliday: calendarMaps.isHoliday,
 		getHolidayName,
-		isPastDayAllowed,
+		isPastDaysAllowed,
 		calculateEffectiveDays: calculateEffectiveDaysCallback,
 	};
 }

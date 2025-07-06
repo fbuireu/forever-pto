@@ -6,7 +6,7 @@ interface CreateYearMapParams {
 	monthsToShow: Date[];
 	isHoliday: (date: Date) => boolean;
 	selectedPtoDays: Date[];
-	isPastDayAllowed: () => boolean;
+	isPastDaysAllowed: () => boolean;
 }
 
 interface CreateYearMapReturn {
@@ -18,7 +18,7 @@ export function createYearMap({
 	monthsToShow,
 	isHoliday,
 	selectedPtoDays,
-	isPastDayAllowed,
+	isPastDaysAllowed,
 }: CreateYearMapParams): CreateYearMapReturn {
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
@@ -34,7 +34,7 @@ export function createYearMap({
 		allDays.push(...daysInMonth);
 	}
 
-	if (!isPastDayAllowed()) {
+	if (!isPastDaysAllowed()) {
 		allDays = allDays.filter((day) => day >= today);
 	}
 

@@ -28,7 +28,7 @@ export default function CalendarList({
 	carryOverMonths,
 	userCountry,
 	userRegion,
-}: CalendarListProps) {
+}: Readonly<CalendarListProps>) {
 	const t = useTranslations("calendarList");
 	const effectiveHolidays = useHolidaysStore((state) => state.effectiveHolidays);
 
@@ -44,7 +44,7 @@ export default function CalendarList({
 		setHoveredBlockId: calendar.setHoveredBlockId,
 		ptoDays,
 		isHoliday: calendar.isHoliday,
-		isPastDayAllowed: calendar.isPastDayAllowed,
+		isPastDaysAllowed: calendar.isPastDaysAllowed,
 		alternativeBlocks: calendar.alternativeBlocks,
 		dayToBlockIdMap: calendar.dayToBlockIdMap,
 	});

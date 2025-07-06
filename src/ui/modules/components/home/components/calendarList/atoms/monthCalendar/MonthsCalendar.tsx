@@ -29,7 +29,7 @@ interface MonthCalendarProps {
 	handleDayInteraction: (event: MouseEvent<HTMLButtonElement> | FocusEvent<HTMLButtonElement>) => void;
 	handleDayMouseOut: () => void;
 	getMonthSummary: (month: Date) => ReactNode;
-	isPastDayAllowed: () => boolean;
+	isPastDaysAllowed: () => boolean;
 }
 
 const createDayComponent =
@@ -59,7 +59,7 @@ export const MonthCalendar = ({
 	handleDayInteraction,
 	handleDayMouseOut,
 	getMonthSummary,
-	isPastDayAllowed,
+	isPastDaysAllowed,
 }: MonthCalendarProps) => {
 	const locale = useLocale();
 	return (
@@ -91,7 +91,7 @@ export const MonthCalendar = ({
 							alternativeDayPosition,
 							handleDayInteraction,
 							handleDayMouseOut,
-							isPastDayAllowed,
+							isPastDaysAllowed,
 						}),
 					}}
 				/>

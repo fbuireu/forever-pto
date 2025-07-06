@@ -7,7 +7,7 @@ interface UseCalendarInteractionsParams {
 	setHoveredBlockId: Dispatch<SetStateAction<string | null>>;
 	ptoDays: number;
 	isHoliday: (date: Date) => boolean;
-	isPastDayAllowed: () => boolean;
+	isPastDaysAllowed: () => boolean;
 	alternativeBlocks: Record<string, BlockOpportunity[]>;
 	dayToBlockIdMap: Record<string, string>;
 }
