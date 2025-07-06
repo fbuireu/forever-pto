@@ -178,6 +178,7 @@
 		}
 	},
 	"legend": {
+		"title": "Llegenda",
 		"today": "Avui",
 		"weekends": "Caps de setmana",
 		"holidays": "Festius",

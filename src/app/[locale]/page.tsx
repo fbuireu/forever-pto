@@ -85,7 +85,6 @@ export { generateMetadata };
 // 2- migrate to pnpm
 // 2- change style to circle days (like pencil)
 // 6- Add tests (also e2e)
-// 6- add pnpm
 // 9- Add CI/CD
 // 10- repo settings and rules (README, etc)
 // 34- MCP server? (paid func)
@@ -99,7 +98,7 @@ export { generateMetadata };
 // 24- Resend for contact
 
 // TODO: (release)
-// 2- refine styles (hover blocks, dark mode, modals, calendar, days etc)
+// 2- refine styles (hover blocks, dark mode, modals, calendar, days etc. Use palette). link in stats to scroll to FAQ
 // 35- Check copies (what is premium, limitations, behind flag features, etc)
 // 34- Ko-Fi BE integration (webhook not working on localhost)
 // 34- QA

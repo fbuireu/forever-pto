@@ -178,6 +178,7 @@
 		}
 	},
 	"legend": {
+        "title": "Leyenda",
 		"today": "Hoy",
 		"weekends": "Fines de semana",
 		"holidays": "Festivos",

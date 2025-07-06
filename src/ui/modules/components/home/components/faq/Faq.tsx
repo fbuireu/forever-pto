@@ -31,14 +31,14 @@ export const Faq = async ({ locale }: FaqProps) => {
 	}));
 
 	return (
-		<section className="w-full max-w-4xl mx-auto space-y-6">
+		<section className="w-full max-w-4xl mx-auto space-y-6" id="faq">
 			<Card>
 				<CardHeader className="text-center">
 					<CardTitle className="text-2xl font-bold">{t("title")}</CardTitle>
 					<CardDescription>{t("description")}</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<Accordion type="single" collapsible className="w-full">
+					<Accordion type="single" collapsible className="w-full cursor-pointer">
 						{faqs.map((item) => (
 							<AccordionItem key={item.id} value={item.id}>
 								<AccordionTrigger className="text-left">{item.question}</AccordionTrigger>
@@ -48,7 +48,6 @@ export const Faq = async ({ locale }: FaqProps) => {
 					</Accordion>
 				</CardContent>
 			</Card>
-
 			<Card>
 				<CardHeader className="text-center">
 					<CardTitle className="text-xl font-bold">{t("limitationsTitle")}</CardTitle>
