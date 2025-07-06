@@ -178,7 +178,7 @@
 		}
 	},
 	"legend": {
-        "title": "Legend",
+		"title": "Legend",
 		"today": "Today",
 		"weekends": "Weekends",
 		"holidays": "Holidays",
