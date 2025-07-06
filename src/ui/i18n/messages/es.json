@@ -165,7 +165,11 @@
 			"summaryEnd": "de efectividad.",
 			"calculating": "Tienes {ptoDaysAvailable} días de PTO disponibles. El sistema está calculando los huecos óptimos para maximizar tus vacaciones."
 		},
-		"noPtoDays": "Debes establecer la cantidad de días PTO disponibles para que el sistema pueda sugerir los días óptimos para maximizar tus vacaciones."
+		"noPtoDays": "Debes establecer la cantidad de días PTO disponibles para que el sistema pueda sugerir los días óptimos para maximizar tus vacaciones.",
+        "footer": {
+            "faqDoubts":"Tienes dudas? Visita las",
+            "faqLink":"FAQ"
+        }
 	},
 	"calendarList": {
 		"monthlySummary": {
@@ -345,8 +349,8 @@
 		"madeWith": "Hecho con",
 		"by": "por",
 		"contact": "Contacto",
-		"poweredBy": "Alimentado por procrastinación y",
 		"emojiClickTooltip": "¡Haz clic para un emoji diferente!",
-		"emojiAriaLabel": "Cambiar emoji"
+		"emojiAriaLabel": "Cambiar emoji",
+        "youCanAlsoFindMe": "También me puedes encontrar en:"
 	}
 }

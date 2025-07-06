@@ -165,7 +165,11 @@
 			"summaryEnd": "di efficacia.",
 			"calculating": "Hai {ptoDaysAvailable} giorni PTO disponibili. Il sistema sta calcolando i gap ottimali per massimizzare le tue vacanze."
 		},
-		"noPtoDays": "Devi impostare il numero di giorni PTO disponibili affinché il sistema possa suggerire i giorni ottimali per massimizzare le tue vacanze."
+		"noPtoDays": "Devi impostare il numero di giorni PTO disponibili affinché il sistema possa suggerire i giorni ottimali per massimizzare le tue vacanze.",
+        "footer": {
+            "faqTextBefore": "Hai dubbi? Visita le ",
+            "faqLink": "FAQ"
+        }
 	},
 	"calendarList": {
 		"monthlySummary": {
@@ -345,8 +349,8 @@
 		"madeWith": "Fatto con",
 		"by": "da",
 		"contact": "Contatto",
-		"poweredBy": "Alimentato da procrastinazione e",
 		"emojiClickTooltip": "Clicca per un emoji diverso!",
-		"emojiAriaLabel": "Cambia emoji"
+		"emojiAriaLabel": "Cambia emoji",
+        "youCanAlsoFindMe": "Puoi anche trovarmi su:"
 	}
 }

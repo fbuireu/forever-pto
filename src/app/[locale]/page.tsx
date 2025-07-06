@@ -98,7 +98,7 @@ export { generateMetadata };
 // 24- Resend for contact
 
 // TODO: (release)
-// 2- refine styles (hover blocks, dark mode, modals, calendar, days etc. Use palette). link in stats to scroll to FAQ
+// 2- refine styles (hover blocks, dark mode, modals, calendar, days etc. Use palette).
 // 35- Check copies (what is premium, limitations, behind flag features, etc)
 // 34- Ko-Fi BE integration (webhook not working on localhost)
 // 34- QA

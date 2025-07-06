@@ -38,9 +38,9 @@ export const Faq = async ({ locale }: FaqProps) => {
 					<CardDescription>{t("description")}</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<Accordion type="single" collapsible className="w-full cursor-pointer">
+					<Accordion type="single" collapsible className="w-full">
 						{faqs.map((item) => (
-							<AccordionItem key={item.id} value={item.id}>
+							<AccordionItem key={item.id} value={item.id} className="last:border-0">
 								<AccordionTrigger className="text-left">{item.question}</AccordionTrigger>
 								<AccordionContent className="text-muted-foreground">{item.answer}</AccordionContent>
 							</AccordionItem>
@@ -54,7 +54,7 @@ export const Faq = async ({ locale }: FaqProps) => {
 					<CardDescription>{t("limitationsDescription")}</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<Accordion type="single" collapsible className="w-full">
+					<Accordion type="single" collapsible className="last:border-0">
 						{limitations.map((item) => (
 							<AccordionItem key={item.id} value={item.id}>
 								<AccordionTrigger className="text-left">{item.question}</AccordionTrigger>

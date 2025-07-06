@@ -61,7 +61,7 @@ export const HowItWorks = async ({ locale }: HowItWorksProps) => {
 				<CardContent>
 					<Accordion type="single" collapsible className="w-full">
 						{processItems.map((item) => (
-							<AccordionItem key={item.id} value={item.id}>
+							<AccordionItem key={item.id} value={item.id} className="last:border-0">
 								<AccordionTrigger className="text-left">{item.question}</AccordionTrigger>
 								<AccordionContent className="text-muted-foreground">{item.answer}</AccordionContent>
 							</AccordionItem>

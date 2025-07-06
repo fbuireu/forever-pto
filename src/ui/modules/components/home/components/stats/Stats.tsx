@@ -44,24 +44,32 @@ export const Stats = ({ stats, userCountry, userRegion }: StatsProps) => {
 	const { showEffectiveness, showMetrics, effectivenessState } = getStatsVisibility(stats, userCountry);
 
 	return (
-		<Card className="w-full max-w-4xl mb-6">
-			<CardHeader className="pb-2">
-				<CardTitle className="text-lg">{t("title")}</CardTitle>
-			</CardHeader>
-			<CardContent className="space-y-4">
-				<StatsTitle title={t("summary.title")} message={holidayMessage} />
-				{showEffectiveness && (
-					<Effectiveness
-						title={t("effectiveness.title")}
-						showMetrics={showMetrics}
-						effectivenessMessage={effectivenessMessage}
-						effectivenessMetrics={effectivenessMetrics}
-						effectiveRatio={stats.effectiveRatio}
-						t={t}
-					/>
-				)}
-				{effectivenessState === "disabled" && <StatsDisabled message={effectivenessMessage} />}
-			</CardContent>
-		</Card>
+		<section className="w-full max-w-4xl mb-6">
+			<Card className="w-full">
+				<CardHeader className="pb-2">
+					<CardTitle className="text-lg">{t("title")}</CardTitle>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<StatsTitle title={t("summary.title")} message={holidayMessage} />
+					{showEffectiveness && (
+						<Effectiveness
+							title={t("effectiveness.title")}
+							showMetrics={showMetrics}
+							effectivenessMessage={effectivenessMessage}
+							effectivenessMetrics={effectivenessMetrics}
+							effectiveRatio={stats.effectiveRatio}
+							t={t}
+						/>
+					)}
+					{effectivenessState === "disabled" && <StatsDisabled message={effectivenessMessage} />}
+				</CardContent>
+			</Card>
+			<span className="text-xs text-muted-foreground">
+				{t("footer.faqDoubts")}{" "}
+				<a href="#faq" className="text-primary hover:underline">
+					{t("footer.faqLink")}
+				</a>
+			</span>
+		</section>
 	);
 };
