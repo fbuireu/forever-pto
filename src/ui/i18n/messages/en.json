@@ -166,10 +166,10 @@
 			"calculating": "You have {ptoDaysAvailable} PTO days available. The system is calculating optimal gaps to maximize your vacation."
 		},
 		"noPtoDays": "You must set the number of available PTO days so the system can suggest optimal days to maximize your vacation.",
-        "footer": {
-            "faqDoubts":"Still doubts? Check the",
-            "faqLink":"FAQ"
-        }
+		"footer": {
+			"faqDoubts": "Still doubts? Check the",
+			"faqLink": "FAQ"
+		}
 	},
 	"calendarList": {
 		"monthlySummary": {
@@ -351,6 +351,6 @@
 		"contact": "Contact",
 		"emojiClickTooltip": "Click for a different emoji!",
 		"emojiAriaLabel": "Change emoji",
-        "youCanAlsoFindMe": "You can also find me at:"
+		"youCanAlsoFindMe": "You can also find me at:"
 	}
 }

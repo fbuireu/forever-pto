@@ -166,11 +166,11 @@
 			"calculating": "Tens {ptoDaysAvailable} dies de PTO disponibles. El sistema està calculant els forats òptims per maximitzar les teves vacances."
 		},
 		"noPtoDays": "Has d'establir la quantitat de dies PTO disponibles perquè el sistema pugui suggerir els dies òptims per maximitzar les teves vacances.",
-        "footer": {
-            "faqDoubts":"Tens dubtes? Visita les",
-            "faqLink":"FAQ"
-        }
-    },
+		"footer": {
+			"faqDoubts": "Tens dubtes? Visita les",
+			"faqLink": "FAQ"
+		}
+	},
 	"calendarList": {
 		"monthlySummary": {
 			"title": "Suggeriments",
@@ -350,6 +350,6 @@
 		"by": "per",
 		"contact": "Contacte",
 		"emojiClickTooltip": "Fes clic per un emoji diferent!",
-        "youCanAlsoFindMe": "També em pots trobar a:"
+		"youCanAlsoFindMe": "També em pots trobar a:"
 	}
 }
