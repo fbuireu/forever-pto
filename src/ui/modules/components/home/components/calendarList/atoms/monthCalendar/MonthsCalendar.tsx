@@ -1,15 +1,15 @@
-import { Calendar } from "@ui/modules/components/core/calendar/Calendar";
-import { Card } from "@ui/modules/components/core/card/Card";
-import { Spinner } from "@ui/modules/components/core/spinner/Spinner";
-import type { FocusEvent, MouseEvent, ReactNode } from "react";
-import "./months-calendar.css";
 import { Chevron } from "@modules/components/home/components/calendarList/atoms/monthCalendar/atoms/chevron/Chevron";
 import { Day } from "@modules/components/home/components/calendarList/atoms/monthCalendar/atoms/day/Day";
 import { Dropdown } from "@modules/components/home/components/calendarList/atoms/monthCalendar/atoms/dropdown/Dropdown";
 import { MonthSummary } from "@modules/components/home/components/calendarList/atoms/monthCalendar/atoms/monthSummary/MonthSummary";
+import { Calendar } from "@ui/modules/components/core/calendar/Calendar";
+import { Card } from "@ui/modules/components/core/card/Card";
+import { Spinner } from "@ui/modules/components/core/spinner/Spinner";
 import { getLocalizedDateFns } from "@ui/utils/i18n/getLocalizedDateFns/getLocalizedDateFns";
 import { useLocale } from "next-intl";
+import type { FocusEvent, MouseEvent, ReactNode } from "react";
 import type { CalendarDay } from "react-day-picker";
+import "./months-calendar.css";
 
 interface MonthCalendarProps {
 	month: Date;
@@ -70,7 +70,7 @@ export const MonthCalendar = ({
 					mode="multiple"
 					selected={selectedDays}
 					onSelect={handleDaySelect}
-					className="rounded-md border"
+					className="rounded-md"
 					defaultMonth={month}
 					month={month}
 					weekStartsOn={1}

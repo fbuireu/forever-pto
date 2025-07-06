@@ -33,11 +33,11 @@ export const Legend = async ({ locale }: LegendProps) => {
 							<span>{t("holidays")}</span>
 						</div>
 						<div className="flex items-center">
-							<div className="mr-2 h-4 w-4 rounded-sm border border-green-400 bg-green-300 dark:bg-green-500 dark:border-green-800" />
+							<div className="mr-2 h-4 w-4 rounded-sm border border-teal-500 bg-teal-400 dark:bg-teal-600 dark:border-teal-800" />
 							<span>{t("suggested")}</span>
 						</div>
 						<div className="flex items-center">
-							<div className="mr-2 h-4 w-4 rounded-sm border border-purple-400 bg-purple-300 dark:bg-purple-900" />
+							<div className="mr-2 h-4 w-4 rounded-sm border border-orange-500 bg-orange-400 dark:bg-orange-700 dark:border-orange-800" />
 							<span>{t("alternatives")}</span>
 						</div>
 					</div>
