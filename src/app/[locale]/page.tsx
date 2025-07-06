@@ -91,6 +91,7 @@ export { generateMetadata };
 // 35- use own cdn to check country
 // 35- google verification site
 // 34- Readme
+// 34- migrate astro
 // 35- Replace kofi for stripe
 // 35- allow the user to select score stragety
 // 36- https://animate-ui.com/

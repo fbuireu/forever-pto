@@ -2,6 +2,7 @@
 	html {
 		scroll-behavior: smooth;
 	}
+    
 	button[name="previous-month"],
 	button[name="next-month"] {
 		display: none;
