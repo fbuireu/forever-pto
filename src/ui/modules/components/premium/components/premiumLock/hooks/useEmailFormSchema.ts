@@ -9,7 +9,7 @@ export const useEmailFormSchema = (): ZodObject<{ email: ZodString }> => {
 	return useMemo(
 		() =>
 			z.object({
-				email: z.string().email(t("validation")),
+				email: z.email(t("validation")),
 			}),
 		[t],
 	);
