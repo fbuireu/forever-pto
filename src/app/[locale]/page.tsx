@@ -19,6 +19,8 @@ import { PremiumProvider } from "@ui/providers/premium/PremiumProvider";
 import type { Locale } from "next-intl";
 import { generateMetadata } from "./metadata";
 
+export const runtime = "edge";
+
 export interface ForeverPtoProps {
 	searchParams: Promise<SearchParams>;
 	params: Promise<{ locale: Locale }>;
@@ -83,7 +85,6 @@ export default ForeverPto;
 export { generateMetadata };
 // TODO:
 // 2- analytics
-// 2- install wrangler //npm warn exec The following package was not found and will be installed: wrangler@4.26.0
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc).
 // 35- Check copies (what is premium, limitations, behind flag features, etc)
 // 34- Ko-Fi BE integration (webhook not working on localhost)
