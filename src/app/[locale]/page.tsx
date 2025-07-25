@@ -82,6 +82,11 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 export default ForeverPto;
 export { generateMetadata };
 // TODO:
+// 2- analytics
+// 2- refine styles (hover blocks, dark mode, modals, calendar, days etc).
+// 35- Check copies (what is premium, limitations, behind flag features, etc)
+// 34- Ko-Fi BE integration (webhook not working on localhost)
+// 34- QA (what happens if there are less days than remaining)
 // 1- recheck and refactor
 // 2- migrate to pnpm
 // 2- change style to circle days (like pencil)
@@ -98,7 +103,3 @@ export { generateMetadata };
 // 36- https://animate-ui.com/
 // 24- Edit weekends (paid functionality). Edit days (add and remove days) (paid functionality)
 // 24- Resend for contact
-// 2- refine styles (hover blocks, dark mode, modals, calendar, days etc).
-// 35- Check copies (what is premium, limitations, behind flag features, etc)
-// 34- Ko-Fi BE integration (webhook not working on localhost)
-// 34- QA (what happens if there are less days than remaining)

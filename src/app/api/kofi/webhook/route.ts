@@ -1,7 +1,8 @@
-import { database } from "@infrastructure/client/database";
+import { getDatabase } from "@infrastructure/client/database";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
+	const database = getDatabase();
 	try {
 		const data = await request.json();
 
