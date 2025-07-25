@@ -1,6 +1,6 @@
 import type { CountryDTO } from "@application/dto/country/types";
 import type { useTranslations } from "next-intl";
-import type { StatsData } from "../../../Stats";
+import type { StatsData } from "../../Stats";
 
 export interface HolidayMessageParams {
 	userCountry?: CountryDTO;

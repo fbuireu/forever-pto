@@ -1,9 +1,11 @@
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import type { ZodObject, ZodString } from "zod";
+import type { ZodEmail, ZodObject } from "zod";
 import { z } from "zod";
 
-export const useEmailFormSchema = (): ZodObject<{ email: ZodString }> => {
+export const useEmailFormSchema = (): ZodObject<{
+	email: ZodEmail;
+}> => {
 	const t = useTranslations("modals.premiumLock.errors");
 
 	return useMemo(

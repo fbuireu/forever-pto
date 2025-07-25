@@ -11,7 +11,7 @@ import type { BaseSocialNetworks } from "./types";
 export const CONTACT_DETAILS: Record<CapitalizeKeys<string>, string> = {
 	NAME: "Ferran Buireu",
 	EMAIL_SUBJECT: "Web contact submission - Forever PTO",
-	ENCODED_EMAIL_SELF: btoa(process.env.NEXT_PUBLIC_EMAIL_SELF),
+	ENCODED_EMAIL_SELF: btoa(process.env.NEXT_PUBLIC_EMAIL_SELF ?? ""),
 } as const;
 
 export const EMOJIS: string[] = ["☕", "🍺", "❤️", "🚀", "⚡", "🔥", "💻", "🌮", "🍕", "🎵", "🎮", "😴", "🤯", "💡"];
