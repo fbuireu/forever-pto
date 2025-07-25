@@ -26,6 +26,9 @@
 		"dev": "next dev --turbopack",
 		"build": "next build",
 		"start": "next start",
+        "pages:build": "npx @cloudflare/next-on-pages",
+        "preview": "pnpm run pages:build && wrangler pages dev",
+        "deploy": "pnpm run pages:build && wrangler pages deploy",
 		"test:all": "pnpm run test:ut && pnpm run test:e2e",
 		"test:ut": "vitest --passWithNoTests --logHeapUsage",
 		"test:ut:changed": "pnpm run test:ut -- --bail --findRelatedTests",
@@ -84,6 +87,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.1.2",
+		"@cloudflare/next-on-pages": "^1.13.13",
 		"@commitlint/cli": "^19.8.1",
 		"@commitlint/config-conventional": "^19.8.1",
 		"@commitlint/format": "^19.8.1",
