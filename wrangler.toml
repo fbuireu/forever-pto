@@ -1,4 +1,4 @@
-name = "forever-pto.com"
-compatibility_date = "2025-07-25"
-pages_build_output_dir = ".next"
+name = 'forever-pto'
+compatibility_date = '2025-07-25'
+pages_build_output_dir = '.next'
 
