@@ -129,6 +129,9 @@ importers:
       '@commitlint/format':
         specifier: ^19.8.1
         version: 19.8.1
+      '@commitlint/types':
+        specifier: ^19.8.1
+        version: 19.8.1
       '@tailwindcss/postcss':
         specifier: ^4.1.11
         version: 4.1.11

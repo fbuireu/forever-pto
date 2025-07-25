@@ -41,7 +41,7 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 		getCountry(country),
 	]);
 	const userRegion = getRegion(holidays);
-    const carryOverMonthsNumber = isPremium ? Number(carryOverMonths) : Number(CARRY_OVER_MONTHS);
+	const carryOverMonthsNumber = isPremium ? Number(carryOverMonths) : Number(CARRY_OVER_MONTHS);
 
 	return (
 		<SidebarProvider>
@@ -98,8 +98,6 @@ export { generateMetadata };
 // 36- https://animate-ui.com/
 // 24- Edit weekends (paid functionality). Edit days (add and remove days) (paid functionality)
 // 24- Resend for contact
-
-// TODO: (release)
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc).
 // 35- Check copies (what is premium, limitations, behind flag features, etc)
 // 34- Ko-Fi BE integration (webhook not working on localhost)
