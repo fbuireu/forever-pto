@@ -41,6 +41,7 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 		getCountry(country),
 	]);
 	const userRegion = getRegion(holidays);
+    const carryOverMonthsNumber = isPremium ? Number(carryOverMonths) : Number(CARRY_OVER_MONTHS);
 
 	return (
 		<SidebarProvider>
@@ -62,7 +63,7 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 							year={Number(year)}
 							ptoDays={Number(ptoDays)}
 							allowPastDays={allowPastDays}
-							carryOverMonths={isPremium ? Number(carryOverMonths) : 1}
+							carryOverMonths={carryOverMonthsNumber}
 							userCountry={userCountry}
 							userRegion={userRegion}
 						/>
@@ -102,4 +103,4 @@ export { generateMetadata };
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc).
 // 35- Check copies (what is premium, limitations, behind flag features, etc)
 // 34- Ko-Fi BE integration (webhook not working on localhost)
-// 34- QA
+// 34- QA (what happens if there are less days than remaining)
