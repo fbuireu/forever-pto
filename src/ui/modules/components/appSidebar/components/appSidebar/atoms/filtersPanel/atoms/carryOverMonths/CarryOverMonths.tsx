@@ -2,14 +2,13 @@
 
 import { usePremiumStore } from "@application/stores/premium/premiumStore";
 import type { SearchParams } from "@const/types";
-import { createQueryString } from "@modules/components/appSidebar/components/appSidebar/utils/createQueryString/createQueryString";
+import { useFilterAction } from "@ui/hooks/useFilterAction/useFilterAction";
 import { FILTER_MAXIMUM_VALUES } from "@ui/modules/components/appSidebar/const";
 import { Label } from "@ui/modules/components/core/label/Label";
 import { Slider } from "@ui/modules/components/core/slider/Slider";
 import { PremiumLock } from "@ui/modules/components/premium/components/premiumLock/PremiumLock";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { startTransition, useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 export interface CarryOverMonthsProps {
 	carryOverMonths: SearchParams["carryOverMonths"];
@@ -17,11 +16,12 @@ export interface CarryOverMonthsProps {
 
 export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 	const t = useTranslations("filters.carryOverMonths");
-	const router = useRouter();
-	const pathname = usePathname();
-	const searchParams = useSearchParams();
+	const { updateFilter, isPending } = useFilterAction();
 	const { isPremiumUser } = usePremiumStore();
-	const [value, setValue] = useState([Number(carryOverMonths)]);
+	const debounceRef = useRef<NodeJS.Timeout>(null);
+
+	const currentValue = Number(carryOverMonths) || 1;
+	const value = useMemo(() => [currentValue], [currentValue]);
 
 	const maxValue = useMemo(
 		() =>
@@ -35,30 +35,31 @@ export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 				return;
 			}
 
-			setValue(newValue);
+			if (debounceRef.current) {
+				clearTimeout(debounceRef.current);
+			}
 
-			const query = createQueryString({
-				type: "carryOverMonths",
-				value: String(newValue[0]),
-				searchParams,
-			});
-
-			startTransition(() => router.push(`${pathname}?${query}`, { scroll: false }));
+			debounceRef.current = setTimeout(() => {
+				updateFilter("carryOverMonths", String(newValue[0]));
+			}, 100);
 		},
-		[isPremiumUser, router, pathname, searchParams],
+		[isPremiumUser, updateFilter],
 	);
 
-	const sliderDisabled = useMemo(() => !isPremiumUser && value[0] > 1, [isPremiumUser, value]);
+	const sliderDisabled = useMemo(
+		() => isPending || (!isPremiumUser && currentValue > 1),
+		[isPending, isPremiumUser, currentValue],
+	);
 
 	const label = useMemo(
 		() => (
 			<div className="flex items-center justify-between">
 				<Label htmlFor="months-slider" className="text-sm select-none">
-					{t("monthsToShow", { months: value[0] })}
+					{t("monthsToShow", { months: currentValue })}
 				</Label>
 			</div>
 		),
-		[value, t],
+		[currentValue, t],
 	);
 
 	const sliderRangeLabels = useMemo(
@@ -73,7 +74,7 @@ export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 
 	const sliderComponent = useMemo(
 		() => (
-			<div className="space-y-4">
+			<div className={`space-y-4 ${isPending ? "opacity-50" : ""}`}>
 				{label}
 				<Slider
 					min={1}
@@ -84,11 +85,10 @@ export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 					disabled={sliderDisabled}
 					className="w-full"
 				/>
-
 				{sliderRangeLabels}
 			</div>
 		),
-		[label, maxValue, value, handleValueChange, sliderDisabled, sliderRangeLabels],
+		[label, maxValue, value, handleValueChange, sliderDisabled, sliderRangeLabels, isPending],
 	);
 
 	if (!isPremiumUser) {
