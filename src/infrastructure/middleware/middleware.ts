@@ -23,21 +23,21 @@ export async function middleware(request: NextRequest, response: NextResponse): 
 	const { searchParams } = url;
 	let needsRedirect = false;
 
-	for (const [key, getValue] of Object.entries(MIDDLEWARE_PARAMS)) {
-		const paramKey = key as keyof typeof MIDDLEWARE_PARAMS;
-		if (searchParams.has(paramKey)) {
-			const value = searchParams.get(paramKey) ?? "";
-			const correctedValue = await validateParam({ key: paramKey, value, request });
-			if (correctedValue) {
-				searchParams.set(paramKey, correctedValue);
-				needsRedirect = true;
-			}
-		} else {
-			const defaultValue = await getValue(request);
-			searchParams.set(paramKey, defaultValue);
-			needsRedirect = true;
-		}
-	}
+	// for (const [key, getValue] of Object.entries(MIDDLEWARE_PARAMS)) {
+	// 	const paramKey = key as keyof typeof MIDDLEWARE_PARAMS;
+	// 	if (searchParams.has(paramKey)) {
+	// 		const value = searchParams.get(paramKey) ?? "";
+	// 		const correctedValue = await validateParam({ key: paramKey, value, request });
+	// 		if (correctedValue) {
+	// 			searchParams.set(paramKey, correctedValue);
+	// 			needsRedirect = true;
+	// 		}
+	// 	} else {
+	// 		const defaultValue = await getValue(request);
+	// 		searchParams.set(paramKey, defaultValue);
+	// 		needsRedirect = true;
+	// 	}
+	// }
 
 	if (needsRedirect) {
 		return NextResponse.redirect(url);
