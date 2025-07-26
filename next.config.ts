@@ -7,7 +7,6 @@ const withNextIntl = createNextIntlPlugin('./src/infrastructure/i18n/config/conf
 const nextConfig: NextConfig = {
   trailingSlash: false,
   experimental: {
-    ppr: 'incremental',
     cssChunking: true,
     inlineCss: true,
     viewTransition: true,
