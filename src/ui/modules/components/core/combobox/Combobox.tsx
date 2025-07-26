@@ -2,6 +2,7 @@
 
 import type { CountryDTO } from "@application/dto/country/types";
 import type { RegionDTO } from "@application/dto/region/types";
+import { createQueryString } from "@modules/components/appSidebar/components/appSidebar/utils/createQueryString/createQueryString";
 import { hasFlag } from "@modules/components/core/combobox/utils/hasFlag/hasFlag";
 import { CommandEmpty } from "@modules/components/core/command/atoms/commandEmpty/CommandEmpty";
 import { CommandGroup } from "@modules/components/core/command/atoms/commandGroup/CommandGroup";
@@ -11,13 +12,13 @@ import { CommandList } from "@modules/components/core/command/atoms/commandList/
 import { PopoverContent } from "@modules/components/core/popover/atoms/popoverContent/PopoverContent";
 import { PopoverTrigger } from "@modules/components/core/popover/atoms/popoverTrigger/PopoverTrigger";
 import { Popover } from "@modules/components/core/popover/Popover";
-import { useFilterAction } from "@ui/hooks/useFilterAction/useFilterAction";
 import { Button } from "@ui/modules/components/core/button/Button";
 import { Command } from "@ui/modules/components/core/command/Command";
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { Check, ChevronsUpDown } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { HTMLProps } from "react";
-import { useCallback, useMemo, useState } from "react";
+import { startTransition, useCallback, useMemo, useState } from "react";
 
 interface ComboboxProps extends HTMLProps<HTMLInputElement> {
 	searchPlaceholder?: string;
@@ -39,23 +40,34 @@ export const Combobox = ({
 	disabled,
 	type,
 }: ComboboxProps) => {
-	const { updateFilter, isPending } = useFilterAction();
+	const router = useRouter();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
 	const [isOpen, setIsOpen] = useState(false);
+	const [localValue, setLocalValue] = useState(value);
 
 	const selectedOption = useMemo(
-		() => options.find((option) => option.value.toLowerCase() === value.toLowerCase()),
-		[options, value],
+		() => options.find((option) => option.value.toLowerCase() === localValue.toLowerCase()),
+		[options, localValue],
 	);
 
 	const handleSelect = useCallback(
-		(selectedLabel: string) => {
-			const selectedOption = options.find((option) => option.label === selectedLabel);
+		(currentValue: string) => {
+			const selectedOption = options.find((option) => option.label === currentValue);
 			if (!selectedOption) return;
+			setLocalValue(selectedOption.value.toLowerCase());
 
-			setIsOpen(false);
-			updateFilter(type, selectedOption.value.toLowerCase());
+			const query = createQueryString({
+				value: selectedOption.value.toLowerCase(),
+				type,
+				searchParams,
+			});
+			startTransition(() => {
+				setIsOpen(false);
+				router.replace(`${pathname}?${query}`, { scroll: false });
+			});
 		},
-		[options, type, updateFilter],
+		[options, type, searchParams, pathname, router],
 	);
 
 	const commandItems = useMemo(
@@ -66,9 +78,9 @@ export const Combobox = ({
 					value={option?.label}
 					className={mergeClasses(
 						"hover:bg-slate-250 cursor-pointer rounded-md transition-colors duration-200",
-						value?.toLowerCase() === option.value.toLowerCase() && "bg-slate-250",
+						localValue?.toLocaleLowerCase() === option.value.toLocaleLowerCase() && "bg-slate-250",
 					)}
-					onSelect={handleSelect}
+					onSelect={(value) => handleSelect(value)}
 				>
 					<div className="flex w-full items-center gap-2">
 						{hasFlag(option) && <div className="relative h-4 w-6 overflow-hidden rounded">{option.flag}</div>}
@@ -77,12 +89,12 @@ export const Combobox = ({
 					<Check
 						className={mergeClasses(
 							"ml-auto h-4 w-4",
-							value?.toLowerCase() === option.value.toLowerCase() ? "opacity-100" : "opacity-0",
+							localValue?.toLocaleLowerCase() === option.value.toLocaleLowerCase() ? "opacity-100" : "opacity-0",
 						)}
 					/>
 				</CommandItem>
 			)),
-		[options, value, handleSelect],
+		[options, localValue, handleSelect],
 	);
 
 	const triggerContent = useMemo(() => {
@@ -100,12 +112,12 @@ export const Combobox = ({
 	}, [selectedOption, placeholder]);
 
 	return (
-		<div className={`relative w-full ${isPending ? "opacity-50" : ""}`}>
+		<div className="relative w-full">
 			<Popover open={isOpen} onOpenChange={setIsOpen}>
 				<PopoverTrigger asChild>
 					<Button
 						variant="outline"
-						disabled={disabled || isPending}
+						disabled={disabled}
 						aria-expanded={isOpen}
 						className={mergeClasses("w-full justify-between", className)}
 					>
