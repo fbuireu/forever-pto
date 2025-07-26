@@ -50,7 +50,8 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 	return (
 		<SidebarProvider>
 			<PremiumProvider isPremium={isPremium}>
-				<AppSidebar
+                hello world
+				{/* <AppSidebar
 					country={country}
 					ptoDays={ptoDays}
 					region={region}
@@ -81,7 +82,7 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 					<Faq locale={locale} />
 					<Roadmap locale={locale} />
 					<DevFooter />
-				</div>
+				</div> */}
 			</PremiumProvider>
 		</SidebarProvider>
 	);
