@@ -21,7 +21,7 @@ const PARAM_VALIDATORS: Record<string, ValidatorFunction> = {
 		const allowedYears = (FILTER_MAXIMUM_VALUES.YEARS as (year: string) => number[])(String(currentYear));
 
 		if (Number.isNaN(year) || !allowedYears.includes(year)) {
-			return DEFAULT_QUERY_PARAMS.YEAR;
+			return String(currentYear);
 		}
 		return null;
 	},
