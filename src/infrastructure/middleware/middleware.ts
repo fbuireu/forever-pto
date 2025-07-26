@@ -21,7 +21,7 @@ export const MIDDLEWARE_PARAMS: RequiredParamsMap = {
 export async function middleware(request: NextRequest, response: NextResponse): Promise<NextResponse> {
 	const url = new URL(response.headers.get("location") ?? request.url);
 	const { searchParams } = url;
-	let needsRedirect = false;
+	const needsRedirect = false;
 
 	// for (const [key, getValue] of Object.entries(MIDDLEWARE_PARAMS)) {
 	// 	const paramKey = key as keyof typeof MIDDLEWARE_PARAMS;
