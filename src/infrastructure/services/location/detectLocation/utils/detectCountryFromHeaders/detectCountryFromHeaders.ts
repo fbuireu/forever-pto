@@ -10,7 +10,7 @@ export async function detectCountryFromHeaders(request: NextRequest): Promise<st
 
 		const geoResponse = await fetch(`https://ipinfo.io/${clientIP}/json`, {
 			headers: { Accept: "application/json" },
-			cache: "no-store",
+			cache: "force-cache",
 		});
 
 		if (!geoResponse.ok) {

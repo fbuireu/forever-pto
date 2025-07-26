@@ -5,7 +5,11 @@ import { detectCountryFromHeaders } from "./utils/detectCountryFromHeaders/detec
 
 export async function detectLocation(request: NextRequest): Promise<string> {
 	try {
-		return await Promise.race([detectCountryFromHeaders(request), detectCountryFromIP(), detectCountryFromCDN()]);
+		const location = await detectCountryFromCDN();
+		if (!location) {
+			return await Promise.race([detectCountryFromHeaders(request), detectCountryFromIP()]);
+		}
+		return location;
 	} catch (_) {
 		return "";
 	}

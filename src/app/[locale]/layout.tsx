@@ -3,8 +3,8 @@ import { ErrorBoundary } from "@modules/components/core/errorBoundary/ErrorBound
 import "@styles/index.css";
 import { Analytics } from "@ui/modules/components/core/analytics/Analytics";
 import { ThemeProvider } from "@ui/providers/theme/ThemeProvider";
-import { type Locale, NextIntlClientProvider } from "next-intl";
 import { Geist, Geist_Mono } from "next/font/google";
+import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 
 const geistSans = Geist({
@@ -40,7 +40,7 @@ const RootLayout = async ({ children, params }: RootLayoutProps) => {
 						>
 							<main>{children}</main>
 						</ThemeProvider>
-						{/* <KofiWidget /> */}
+						<KofiWidget />
 						<Analytics />
 					</NextIntlClientProvider>
 				</body>
