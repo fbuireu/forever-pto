@@ -2,7 +2,7 @@ import { I18N_CONFIG } from "@const/const";
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-	const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "";
+	const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
 
 	const sitemapEntries: MetadataRoute.Sitemap = I18N_CONFIG.LOCALES.map((locale) => ({
 		url: `${baseUrl}/${locale}`,
