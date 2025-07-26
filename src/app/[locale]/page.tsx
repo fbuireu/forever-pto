@@ -86,6 +86,7 @@ export { generateMetadata };
 // TODO:
 // 2- legal pages and cookies
 // 2- configure CI releases
+// 2- migrate to eslint
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc).
 // 35- Check copies (what is premium, limitations, behind flag features, etc)
 // 34- Ko-Fi BE integration (webhook not working on localhost)
