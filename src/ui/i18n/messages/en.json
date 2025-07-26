@@ -54,6 +54,10 @@
 			"days": "free {days, plural, one {day} other {days}}"
 		}
 	},
+    "home": {
+        "title": "Forever PTO",
+        "subtitle": "Your personal PTO calendar. Squeeze every last drop out of your vacation days!"
+    },
 	"languages": {
 		"en": "English",
 		"es": "Spanish",

@@ -2,7 +2,6 @@
 
 import { useHolidaysStore } from "@application/stores/holidays/holidaysStore";
 import { usePremiumStore } from "@application/stores/premium/premiumStore";
-import { Badge } from "@modules/components/core/badge/Badge";
 import { TabsList } from "@modules/components/core/tabs/atoms/tabsList/TabsList";
 import { TabsTrigger } from "@modules/components/core/tabs/atoms/tabsTrigger/TabsTrigger";
 import { HolidaysTable } from "@modules/components/home/components/holidaySummary/atoms/holidaysTable/HolidaysTable";
@@ -28,26 +27,16 @@ const HolidaysSummary = () => {
 					<TabsTrigger
 						value={HolidayTabVariant.nationalHolidays}
 						disabled={!nationalHolidays.length}
-						className="relative"
+						className="flex flex-col items-center gap-1 py-2"
 					>
-						{t("national")}
-						{nationalHolidays.length > 0 && (
-							<Badge variant="outline" className="ml-2 bg-primary/10 absolute right-2">
-								{nationalHolidays.length}
-							</Badge>
-						)}
+						<span>{t("national")}</span>
 					</TabsTrigger>
 					<TabsTrigger
 						value={HolidayTabVariant.regionalHolidays}
 						disabled={!regionalHolidays.length}
-						className="relative"
+						className="flex flex-col items-center gap-1 py-2"
 					>
-						{t("regional")}
-						{regionalHolidays.length > 0 && (
-							<Badge variant="outline" className="ml-2 bg-primary/10 absolute right-2">
-								{regionalHolidays.length}
-							</Badge>
-						)}
+						<span>{t("regional")}</span>
 					</TabsTrigger>
 					<PremiumLock featureName={t("featureName")} featureDescription={t("featureDescription")} variant="stacked">
 						<TabsTrigger

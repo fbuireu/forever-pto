@@ -70,6 +70,9 @@ export const DevFooter = () => {
 							</a>
 						))}
 					</div>
+					<p className="text-xs text-muted-foreground mt-4">
+						Site still under beta. Some features may not work as expected.
+					</p>
 				</div>
 			</div>
 		</footer>

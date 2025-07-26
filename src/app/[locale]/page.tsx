@@ -17,6 +17,7 @@ import HolidaysSummary from "@ui/modules/components/home/components/holidaySumma
 import { HolidaysProvider } from "@ui/providers/holidays/HolidaysProvider";
 import { PremiumProvider } from "@ui/providers/premium/PremiumProvider";
 import type { Locale } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { generateMetadata } from "./metadata";
 
 export const runtime = "edge";
@@ -29,6 +30,7 @@ export interface ForeverPtoProps {
 const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 	const { locale } = await params;
 	const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS, CARRY_OVER_MONTHS } = DEFAULT_QUERY_PARAMS;
+	const t = await getTranslations({ locale, namespace: "home" });
 	const {
 		country,
 		region,
@@ -60,6 +62,10 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 				<SidebarTrigger />
 				<div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-2">
 					<HolidaysProvider initialHolidays={holidays}>
+						<div className="text-center mt-4">
+							<h1 className="text-xl font-extrabold tracking-tight lg:text-6xl">{t("title")}</h1>
+							<p className="mt-3 text-lg text-muted-foreground">{t("subtitle")}</p>
+						</div>
 						<HolidaysSummary />
 						<CalendarList
 							year={Number(year)}
@@ -84,22 +90,22 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 export default ForeverPto;
 export { generateMetadata };
 // TODO:
+// 2- migrate to eslint
 // 2- legal pages and cookies
 // 2- configure CI releases
-// 2- migrate to eslint
+// 2- add slider for mobile calendars
+// 2- change spinner for skeleton
+// 2- add sitemap and update robots.txt
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc).
 // 35- Check copies (what is premium, limitations, behind flag features, etc)
 // 34- Ko-Fi BE integration (webhook not working on localhost)
 // 34- QA (what happens if there are less days than remaining)
 // 1- recheck and refactor
-// 2- migrate to pnpm
 // 2- change style to circle days (like pencil)
 // 6- Add tests (also e2e)
 // 9- Add CI/CD
 // 10- repo settings and rules (README, etc)
 // 34- MCP server? (paid func)
-// 35- use own cdn to check country
-// 35- google verification site
 // 34- Readme
 // 34- migrate astro
 // 35- Replace kofi for stripe

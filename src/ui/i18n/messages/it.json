@@ -54,6 +54,10 @@
 			"days": "{days, plural, one {giorno libero} other {giorni liberi}}"
 		}
 	},
+    "home": {
+        "title": "Forever PTO",
+        "subtitle": "Il tuo calendario personale PTO. Spremere fino all'ultima goccia dai tuoi giorni di ferie!"
+    },
 	"languages": {
 		"en": "Inglese",
 		"es": "Spagnolo",

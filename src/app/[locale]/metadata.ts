@@ -43,8 +43,5 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
 				follow: true,
 			},
 		},
-		verification: {
-			// google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
-		},
 	};
 }

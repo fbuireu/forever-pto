@@ -31,6 +31,7 @@ import {
 	type SortingState,
 	useReactTable,
 } from "@tanstack/react-table";
+import { Badge } from "@ui/modules/components/core/badge/Badge";
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { AlertTriangle, Plus, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -90,7 +91,16 @@ export const HolidaysTable = ({ holidays, title, tabValue }: HolidaysTableProps)
 				disabled={!holidays.length && tabValue !== HolidayTabVariant.customHolidays}
 			>
 				<AccordionItem value={tabValue} className="border-b-0 ">
-					<AccordionTrigger className="px-4">{title}</AccordionTrigger>
+					<AccordionTrigger className="px-4">
+						<div className="flex gap-2">
+							{title}
+							{holidays.length > 0 && (
+								<Badge variant="outline" className="bg-primary/10 text-xs">
+									{holidays.length}
+								</Badge>
+							)}
+						</div>
+					</AccordionTrigger>
 					<AccordionContent>
 						<div className="p-4">
 							<div
