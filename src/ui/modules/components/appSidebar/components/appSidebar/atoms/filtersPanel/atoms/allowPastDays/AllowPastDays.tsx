@@ -1,38 +1,28 @@
 "use client";
 
 import type { SearchParams } from "@const/types";
-import { createQueryString } from "@modules/components/appSidebar/components/appSidebar/utils/createQueryString/createQueryString";
 import { Label } from "@modules/components/core/label/Label";
 import { Switch } from "@modules/components/core/switch/Switch";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useFilterAction } from "@ui/hooks/useFilterAction/useFilterAction";
 import { useTranslations } from "next-intl";
-import { startTransition, useCallback, useId, useMemo, useState } from "react";
+import { useCallback, useId, useMemo } from "react";
 
 export interface AllowPastDaysProps {
 	allowPastDays: SearchParams["allowPastDays"];
 }
 
 export const AllowPastDays = ({ allowPastDays }: AllowPastDaysProps) => {
-	const router = useRouter();
-	const pathname = usePathname();
-	const searchParams = useSearchParams();
 	const id = useId();
-	const [isEnabled, setIsEnabled] = useState(allowPastDays === "true");
+	const { updateFilter, isPending } = useFilterAction();
 	const t = useTranslations("filters.allowPastDays");
+
+	const isEnabled = allowPastDays === "true";
 
 	const handleSwitchChange = useCallback(
 		(checked: boolean) => {
-			setIsEnabled(checked);
-
-			const query = createQueryString({
-				type: "allowPastDays",
-				value: String(checked),
-				searchParams,
-			});
-
-			startTransition(() => router.push(`${pathname}?${query}`, { scroll: false }));
+			updateFilter("allowPastDays", String(checked));
 		},
-		[pathname, router, searchParams],
+		[updateFilter],
 	);
 
 	const labelText = useMemo(() => (isEnabled ? t("enabled") : t("disabled")), [isEnabled, t]);
@@ -40,14 +30,14 @@ export const AllowPastDays = ({ allowPastDays }: AllowPastDaysProps) => {
 	const switchControl = useMemo(
 		() => (
 			<div className="flex items-center gap-2">
-				<Switch id={id} checked={isEnabled} onCheckedChange={handleSwitchChange} />
+				<Switch id={id} checked={isEnabled} onCheckedChange={handleSwitchChange} disabled={isPending} />
 				<Label htmlFor={id} className="text-sm cursor-pointer select-none">
 					{labelText}
 				</Label>
 			</div>
 		),
-		[isEnabled, handleSwitchChange, labelText, id],
+		[isEnabled, handleSwitchChange, labelText, id, isPending],
 	);
 
-	return <div className="flex items-center justify-between">{switchControl}</div>;
+	return <div className={`flex items-center justify-between ${isPending ? "opacity-50" : ""}`}>{switchControl}</div>;
 };

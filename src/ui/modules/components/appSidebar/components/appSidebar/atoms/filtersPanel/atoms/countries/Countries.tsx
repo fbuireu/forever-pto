@@ -1,32 +1,16 @@
 import type { SearchParams } from "@const/types";
 import { getCountries } from "@infrastructure/services/country/getCountries/getCountries";
-import { Combobox } from "@ui/modules/components/core/combobox/Combobox";
-import type { Locale } from "next-intl";
-import { getTranslations } from "next-intl/server";
-import { cache, memo } from "react";
-
-export interface CountriesProps {
-	country: SearchParams["country"];
-	locale: Locale;
-}
+import { cache } from "react";
+import { CountriesClient } from "./atoms/CountriesClient";
 
 const getCachedCountries = cache(getCountries);
 
-export const Countries = memo(async ({ country, locale }: CountriesProps) => {
-	const t = await getTranslations({ locale, namespace: "filters.countries" });
+export interface CountriesProps {
+	country: SearchParams["country"];
+}
+
+export const Countries = async ({ country }: CountriesProps) => {
 	const countries = await getCachedCountries();
 
-	return (
-		<Combobox
-			value={country}
-			options={countries}
-			type="country"
-			className="w-full"
-			label={t("label")}
-			heading={t("heading")}
-			placeholder={t("placeholder")}
-			searchPlaceholder={t("searchPlaceholder")}
-			notFoundText={t("notFound")}
-		/>
-	);
-});
+	return <CountriesClient countries={countries} selectedCountry={country} />;
+};
