@@ -5,6 +5,7 @@ import { SidebarProvider } from "@modules/components/core/sidebar/provider/Sideb
 import { PremiumProvider } from "@ui/providers/premium/PremiumProvider";
 import type { Locale } from "next-intl";
 import { getTranslations } from "next-intl/server";
+import { Suspense } from "react";
 import { generateMetadata } from "./metadata";
 
 export const runtime = "edge";
@@ -37,9 +38,10 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 
 	return (
 		<SidebarProvider>
-			<PremiumProvider isPremium={isPremium}>
-				hello world
-				{/* <AppSidebar
+			<Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+				<PremiumProvider isPremium={isPremium}>
+					hello world
+					{/* <AppSidebar
 					country={country}
 					ptoDays={ptoDays}
 					region={region}
@@ -71,7 +73,8 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 					<Roadmap locale={locale} />
 					<DevFooter />
 				</div> */}
-			</PremiumProvider>
+				</PremiumProvider>
+			</Suspense>
 		</SidebarProvider>
 	);
 };
