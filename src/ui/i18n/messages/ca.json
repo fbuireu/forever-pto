@@ -54,10 +54,10 @@
 			"days": "{days, plural, one {dia lliure} other {dies lliures}}"
 		}
 	},
-    "home": {
-        "title": "Forever PTO",
-        "subtitle": "El teu calendari personal de PTO. Exprimeix fins a l'última gota dels teus dies de vacances!"
-    },
+	"home": {
+		"title": "Forever PTO",
+		"subtitle": "El teu calendari personal de PTO. Exprimeix fins a l'última gota dels teus dies de vacances!"
+	},
 	"languages": {
 		"en": "Anglès",
 		"es": "Castellà",

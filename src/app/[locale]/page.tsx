@@ -95,7 +95,6 @@ export { generateMetadata };
 // 2- configure CI releases
 // 2- add slider for mobile calendars
 // 2- change spinner for skeleton
-// 2- add sitemap and update robots.txt
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc).
 // 35- Check copies (what is premium, limitations, behind flag features, etc)
 // 34- Ko-Fi BE integration (webhook not working on localhost)
