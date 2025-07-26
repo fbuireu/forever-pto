@@ -91,11 +91,11 @@ export default ForeverPto;
 export { generateMetadata };
 // TODO:
 // 2- migrate to eslint
-// 2- legal pages and cookies
+// 2- legal pages and cookies (check consent Cloudflare)
 // 2- configure CI releases
 // 2- add slider for mobile calendars
 // 2- change spinner for skeleton
-// 2- improve SEO (a11y) + performance
+// 2- improve SEO (a11y)
 // 2- refine styles (hover blocks, dark mode, modals, calendar, days etc).
 // 35- Check copies (what is premium, limitations, behind flag features, etc)
 // 34- Ko-Fi BE integration (webhook not working on localhost)

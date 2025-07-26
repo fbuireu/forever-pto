@@ -10,6 +10,7 @@ interface GenerateMetadataParams {
 export async function generateMetadata({ params }: GenerateMetadataParams): Promise<Metadata> {
 	const { locale } = await params;
 	const t = await getTranslations({ locale, namespace: "metadata" });
+	const canonical = `/${locale}`;
 
 	return {
 		title: t("title"),
@@ -19,13 +20,13 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
 			.split(",")
 			.map((keyword: string) => keyword.trim()),
 		alternates: {
-			canonical: "/",
+			canonical,
 			languages: Object.fromEntries(I18N_CONFIG.LOCALES.map((lang) => [lang, `/${lang}`])),
 		},
 		openGraph: {
 			title: t("title"),
 			description: t("description"),
-			url: "/",
+			url: canonical,
 			siteName: t("title"),
 			locale,
 			type: "website",
