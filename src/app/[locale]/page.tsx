@@ -32,14 +32,14 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 	// 	// getHolidays({ country, region, year, carryOverMonths }),
 	// 	// getCountry(country),
 	// ]);
-	const isPremium = await isPremiumFn();
+	// const isPremium = await isPremiumFn();
 	// const userRegion = getRegion(holidays);
 	// const carryOverMonthsNumber = isPremium ? Number(carryOverMonths) : Number(CARRY_OVER_MONTHS);
 
 	return (
 		<SidebarProvider>
 			<Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-				<PremiumProvider isPremium={isPremium}>
+				<PremiumProvider isPremium={false}>
 					hello world
 					{/* <AppSidebar
 					country={country}
