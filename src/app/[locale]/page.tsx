@@ -90,6 +90,7 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 export default ForeverPto;
 export { generateMetadata };
 // TODO:
+// 2- improve SEO (a11y) + performance (db middleware, etc)
 // 2- migrate to eslint
 // 2- legal pages and cookies
 // 2- configure CI releases

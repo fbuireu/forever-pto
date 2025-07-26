@@ -1,7 +1,7 @@
 export async function detectCountryFromIP() {
 	try {
 		const ipResponse = await fetch("https://api.ipify.org?format=json", {
-			cache: "no-store",
+			cache: "force-cache",
 		});
 
 		if (!ipResponse.ok) {
@@ -17,7 +17,7 @@ export async function detectCountryFromIP() {
 			headers: {
 				Accept: "application/json",
 			},
-			cache: "no-store",
+			cache: "force-cache",
 		});
 
 		if (!geoResponse.ok) {
