@@ -1,4 +1,0 @@
-{
-	"src/**/*.{ts,tsx,css}": ["pnpm run format:all", "pnpm run lint:changed"],
-	"src/**/*.{test,spec}.{ts,tsx}": ["pnpm run test:ut:changed"]
-}

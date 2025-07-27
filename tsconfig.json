@@ -1,41 +1,27 @@
 {
-	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-	"exclude": ["node_modules"],
-	"compilerOptions": {
-		"target": "ESNext",
-		"strictNullChecks": true,
-		"allowSyntheticDefaultImports": true,
-		"allowJs": false,
-		"skipLibCheck": true,
-		"strict": true,
-		"noEmit": true,
-		"esModuleInterop": true,
-		"module": "ESNext",
-		"moduleResolution": "bundler",
-		"resolveJsonModule": true,
-		"isolatedModules": true,
-		"jsx": "preserve",
-		"incremental": true,
-		"lib": ["dom", "dom.iterable", "esnext"],
-		"plugins": [
-			{
-				"name": "next"
-			}
-		],
-		"paths": {
-			"@const/*": ["./src/const/*"],
-			"@app/*": ["./src/app/*"],
-			"@infrastructure/*": ["./src/infrastructure/*"],
-			"@ui/*": ["./src/ui/*"],
-			"@application/*": ["./src/application/*"],
-			"@modules/*": ["./src/ui/modules/*"],
-			"@utils/*": ["./src/utils/*"],
-			"@assets/*": ["./src/ui/assets/*"],
-			"@styles/*": ["./src/ui/styles/*"],
-			"@shared/*": ["./src/shared/*"],
-			"@i18n/*": ["./src/ui/i18n/*"],
-			"@mocks/*": ["./src/mocks/*"],
-			"@types/*": ["./src/types/*"]
-		}
-	}
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }
