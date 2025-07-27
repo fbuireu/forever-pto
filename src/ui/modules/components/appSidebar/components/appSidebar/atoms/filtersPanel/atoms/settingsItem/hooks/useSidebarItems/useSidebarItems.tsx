@@ -1,3 +1,4 @@
+import { useServerStore } from "@application/stores/server/serverStore";
 import { AllowPastDays } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/atoms/allowPastDays/AllowPastDays";
 import { AllowPasDaysInfoTooltip } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/atoms/allowPastDays/atoms/allowPasDaysInfoTooltip/AllowPasDaysInfoTooltip";
 import { CarryOverMonthsTooltip } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/atoms/carryOverMonths/atoms/carryOverMonthsTooltip/CarryOverMonthsTooltip";
@@ -19,7 +20,7 @@ interface UseSidebarItemsParams {
 export function useSidebarItems(params: UseSidebarItemsParams): SidebarItem[] {
 	const { locale } = params;
 	const t = useTranslations("filters");
-
+	const { carryOverMonths } = useServerStore();
 	return useMemo(
 		() => [
 			{
@@ -57,10 +58,10 @@ export function useSidebarItems(params: UseSidebarItemsParams): SidebarItem[] {
 				id: "carry-over-months",
 				title: t("carryOverMonths.label"),
 				icon: SlidersHorizontal,
-				renderComponent: () => <CarryOverMonths />,
+				renderComponent: () => <CarryOverMonths carryOverMonths={carryOverMonths} />,
 				renderTooltip: () => <CarryOverMonthsTooltip locale={locale} />,
 			},
 		],
-		[locale, t],
+		[locale, t, carryOverMonths],
 	);
 }
