@@ -1,11 +1,7 @@
 import { THEME_STORAGE_KEY } from "@const/const";
-import { ErrorBoundary } from "@modules/components/core/errorBoundary/ErrorBoundary";
-import "@styles/index.css";
-import { Analytics } from "@ui/modules/components/core/analytics/Analytics";
-import { KofiWidget } from "@ui/modules/components/core/kofiWidget/KofiWidget";
 import { ThemeProvider } from "@ui/providers/theme/ThemeProvider";
-import { Geist, Geist_Mono } from "next/font/google";
 import { type Locale, NextIntlClientProvider } from "next-intl";
+import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 
 const geistSans = Geist({
@@ -28,7 +24,6 @@ const RootLayout = async ({ children, params }: RootLayoutProps) => {
 	const { locale } = await params;
 
 	return (
-		<ErrorBoundary>
 			<html lang={locale} className={geistSans.className}>
 				<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 					<NextIntlClientProvider locale={locale}>
@@ -41,12 +36,9 @@ const RootLayout = async ({ children, params }: RootLayoutProps) => {
 						>
 							<main>{children}</main>
 						</ThemeProvider>
-						<KofiWidget />
-						<Analytics />
 					</NextIntlClientProvider>
 				</body>
 			</html>
-		</ErrorBoundary>
 	);
 };
 

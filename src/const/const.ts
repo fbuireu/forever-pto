@@ -1,14 +1,3 @@
-import type { CapitalizeKeys, I18nConfig, PremiumParams } from "@const/types";
-import { capitalizeKeys } from "./utils/capitalizeKeys/capitalizeKeys";
-
-export const SEARCH_PARAM_KEYS = {
-	COUNTRY: "country",
-	REGION: "region",
-	YEAR: "year",
-	PTO_DAYS: "ptoDays",
-	ALLOW_PAST_DAYS: "allowPastDays",
-	CARRY_OVER_MONTHS: "carryOverMonths",
-} as const;
 
 const Pages = {
 	HOME: "home",
@@ -18,16 +7,9 @@ const pagesRoutes = {
 	[Pages.HOME]: "/",
 } as const;
 
-export const PAGES_ROUTES: CapitalizeKeys<typeof pagesRoutes> = capitalizeKeys(pagesRoutes);
+export const PAGES_ROUTES: typeof pagesRoutes = pagesRoutes;
 
-export const DEFAULT_QUERY_PARAMS: Record<CapitalizeKeys<string>, string> = {
-	YEAR: String(new Date().getFullYear()),
-	PTO_DAYS: "22",
-	ALLOW_PAST_DAYS: "false",
-	CARRY_OVER_MONTHS: "1",
-} as const;
-
-export const I18N_CONFIG: CapitalizeKeys<I18nConfig> = {
+export const I18N_CONFIG = {
 	LOCALES: ["en", "es", "ca", "it"] as const,
 	DEFAULT_LOCALE: "en" as const,
 	LOCALE_DETECTION: true,
@@ -36,7 +18,7 @@ export const I18N_CONFIG: CapitalizeKeys<I18nConfig> = {
 	COOKIE_NAME: "NEXT_LOCALE" as const,
 } as const;
 
-export const PREMIUM_PARAMS: CapitalizeKeys<PremiumParams> = {
+export const PREMIUM_PARAMS = {
 	COOKIE_NAME: "premium" as const,
 	COOKIE_DURATION: 30 * 24 * 60 * 60,
 } as const;

@@ -1,4 +1,4 @@
-"use client";
+/* "use client";
 
 import { checkPremiumByEmail } from "@application/actions/premium";
 import { usePremiumStore } from "@application/stores/premium/premiumStore";
@@ -208,3 +208,4 @@ export const PremiumLock = ({
 
 	return premiumLockContent;
 };
+ */

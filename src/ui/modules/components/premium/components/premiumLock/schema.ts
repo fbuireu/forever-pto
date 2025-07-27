@@ -1,5 +1,5 @@
-import { z } from "zod";
+// import { z } from "zod";
 
-export const emailFormSchema = z.object({
-	email: z.email(),
-});
+// export const emailFormSchema = z.object({
+// 	email: z.email(),
+// });
