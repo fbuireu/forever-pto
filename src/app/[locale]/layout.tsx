@@ -27,7 +27,7 @@ export const Layout = async ({
   children: React.ReactNode;
     params: Promise<{locale: string}>;
 }>) => {
-    const {locale} = await params;
+    const { locale } = await params;
 
     if (!hasLocale(routing.locales, locale)) {
     notFound();
