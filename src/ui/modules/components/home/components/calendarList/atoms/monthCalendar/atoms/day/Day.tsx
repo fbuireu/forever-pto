@@ -68,8 +68,8 @@ export const Day = ({
 					isPastDaysAllowed,
 				})}
 				title={holiday ?? ""}
-				onMouseOver={handleDayInteraction}
-				onMouseOut={handleDayMouseOut}
+				// onMouseOver={handleDayInteraction}
+				// onMouseOut={handleDayMouseOut}
 				onBlur={handleDayMouseOut}
 				onFocus={handleDayInteraction}
 				{...DATA_ATTRIBUTES}

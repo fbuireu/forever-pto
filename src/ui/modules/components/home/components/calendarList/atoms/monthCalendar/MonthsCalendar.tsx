@@ -4,7 +4,6 @@ import { Dropdown } from "@modules/components/home/components/calendarList/atoms
 import { MonthSummary } from "@modules/components/home/components/calendarList/atoms/monthCalendar/atoms/monthSummary/MonthSummary";
 import { Calendar } from "@ui/modules/components/core/calendar/Calendar";
 import { Card } from "@ui/modules/components/core/card/Card";
-import { Spinner } from "@ui/modules/components/core/spinner/Spinner";
 import { getLocalizedDateFns } from "@ui/utils/i18n/getLocalizedDateFns/getLocalizedDateFns";
 import { useLocale } from "next-intl";
 import type { FocusEvent, MouseEvent, ReactNode } from "react";
@@ -65,7 +64,7 @@ export const MonthCalendar = ({
 	return (
 		<div className="mb-4">
 			<Card key={month.toISOString()} className="flex mb-2 flex-col">
-				{isPending && <Spinner />}
+				{/* {isPending && <Spinner />} */}
 				<Calendar
 					mode="multiple"
 					selected={selectedDays}

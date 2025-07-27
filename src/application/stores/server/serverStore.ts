@@ -23,23 +23,7 @@ interface ServerState {
 	updateCarryOverMonths: (carryOverMonths: string) => void;
 }
 
-// Helper function to update URL with history.pushState
-const updateUrl = (key: string, value: string) => {
-	if (typeof window === "undefined") return;
-
-	const url = new URL(window.location.href);
-	const searchParams = url.searchParams;
-
-	if (value && value !== "") {
-		searchParams.set(key, value);
-	} else {
-		searchParams.delete(key);
-	}
-
-	window.history.pushState({}, "", url.toString());
-};
-
-export const useServerStore = create<ServerState>((set) => ({
+export const useServerStore = create<ServerState>((set, get) => ({
 	// Default URL params
 	country: "",
 	region: "",
@@ -49,45 +33,77 @@ export const useServerStore = create<ServerState>((set) => ({
 	carryOverMonths: DEFAULT_QUERY_PARAMS.CARRY_OVER_MONTHS,
 
 	// Actions
-	setUrlParams: (params: SearchParams) =>
-		set({
-			country: params.country || "",
-			region: params.region || "",
-			year: params.year || DEFAULT_QUERY_PARAMS.YEAR,
-			ptoDays: params.ptoDays || DEFAULT_QUERY_PARAMS.PTO_DAYS,
-			allowPastDays: params.allowPastDays || DEFAULT_QUERY_PARAMS.ALLOW_PAST_DAYS,
-			carryOverMonths: params.carryOverMonths || DEFAULT_QUERY_PARAMS.CARRY_OVER_MONTHS,
-		}),
+	setUrlParams: (params: SearchParams) => {
+		const currentState = get();
+		// Solo actualizar si los valores han cambiado
+		const newState: Partial<ServerState> = {};
+		let hasChanges = false;
 
-	// Filter actions - only update URL and store, no data reload
+		if (currentState.country !== (params.country || "")) {
+			newState.country = params.country || "";
+			hasChanges = true;
+		}
+		if (currentState.region !== (params.region || "")) {
+			newState.region = params.region || "";
+			hasChanges = true;
+		}
+		if (currentState.year !== (params.year || DEFAULT_QUERY_PARAMS.YEAR)) {
+			newState.year = params.year || DEFAULT_QUERY_PARAMS.YEAR;
+			hasChanges = true;
+		}
+		if (currentState.ptoDays !== (params.ptoDays || DEFAULT_QUERY_PARAMS.PTO_DAYS)) {
+			newState.ptoDays = params.ptoDays || DEFAULT_QUERY_PARAMS.PTO_DAYS;
+			hasChanges = true;
+		}
+		if (currentState.allowPastDays !== (params.allowPastDays || DEFAULT_QUERY_PARAMS.ALLOW_PAST_DAYS)) {
+			newState.allowPastDays = params.allowPastDays || DEFAULT_QUERY_PARAMS.ALLOW_PAST_DAYS;
+			hasChanges = true;
+		}
+		if (currentState.carryOverMonths !== (params.carryOverMonths || DEFAULT_QUERY_PARAMS.CARRY_OVER_MONTHS)) {
+			newState.carryOverMonths = params.carryOverMonths || DEFAULT_QUERY_PARAMS.CARRY_OVER_MONTHS;
+			hasChanges = true;
+		}
+
+		if (hasChanges) {
+			set(newState);
+		}
+	},
+
+	// Filter actions - optimized single property updates
 	updateCountry: (country: string) => {
-		set({ country });
-		updateUrl("country", country);
+		if (get().country !== country) {
+			set({ country });
+		}
 	},
 
 	updateRegion: (region: string) => {
-		set({ region });
-		updateUrl("region", region);
+		if (get().region !== region) {
+			set({ region });
+		}
 	},
 
 	updateYear: (year: string) => {
-		set({ year });
-		updateUrl("year", year);
+		if (get().year !== year) {
+			set({ year });
+		}
 	},
 
 	updatePtoDays: (ptoDays: string) => {
-		set({ ptoDays });
-		updateUrl("ptoDays", ptoDays);
+		if (get().ptoDays !== ptoDays) {
+			set({ ptoDays });
+		}
 	},
 
 	updateAllowPastDays: (allowPastDays: string) => {
-		set({ allowPastDays });
-		updateUrl("allowPastDays", allowPastDays);
+		if (get().allowPastDays !== allowPastDays) {
+			set({ allowPastDays });
+		}
 	},
 
 	updateCarryOverMonths: (carryOverMonths: string) => {
-		set({ carryOverMonths });
-		updateUrl("carryOverMonths", carryOverMonths);
+		if (get().carryOverMonths !== carryOverMonths) {
+			set({ carryOverMonths });
+		}
 	},
 }));
 
