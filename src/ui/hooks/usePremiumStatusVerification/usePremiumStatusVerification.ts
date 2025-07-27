@@ -8,7 +8,7 @@ const DEBOUNCE_DELAY = 1000; // 1 segundo
 export function usePremiumStatusVerification() {
 	const { isPremiumUser, setPremiumStatus } = usePremiumStore();
 	const lastVerificationRef = useRef<number>(0);
-	const debounceTimeoutRef = useRef<NodeJS.Timeout>();
+	const debounceTimeoutRef = useRef<NodeJS.Timeout>(null);
 
 	const verifyPremiumStatus = useCallback(async () => {
 		const now = Date.now();

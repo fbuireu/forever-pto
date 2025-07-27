@@ -13,6 +13,9 @@ interface PremiumTokenPayload {
 	messageId: string;
 	email?: string;
 	exp: number;
+	iat?: number;
+	iss?: string;
+	[key: string]: unknown; // Index signature para compatibilidad con JWTPayload
 }
 
 export async function generatePremiumToken(messageId: string, email?: string): Promise<string> {
