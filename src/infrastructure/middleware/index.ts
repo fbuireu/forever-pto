@@ -1,7 +1,12 @@
 import { detectLocation } from "@infrastructure/services/location/detectLocation";
 import type { NextRequest, NextResponse } from "next/server";
 
-export async function middleware(request: NextRequest, response: NextResponse): Promise<NextResponse> {
+interface MiddlewareParams{
+    request: NextRequest;
+    response: NextResponse;
+}
+
+export async function middleware({request, response}: MiddlewareParams): Promise<NextResponse> {
     const userLocation = await detectLocation(request);
     const locationCookie = request.cookies.get('location')?.value;
     

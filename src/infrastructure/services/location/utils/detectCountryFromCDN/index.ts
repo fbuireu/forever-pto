@@ -10,8 +10,7 @@ export async function detectCountryFromCDN(): Promise<string> {
 			throw new Error("Error while getting information from the CDN");
 		}
 
-		const text = await response.text();
-		const lines = text.split("\n");
+		const lines = (await response.text()).split("\n");
 		const location = lines.find((line) => line.startsWith(LOCATION_IDENTIFIER));
 
         if (location) {

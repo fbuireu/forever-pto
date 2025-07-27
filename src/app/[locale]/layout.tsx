@@ -36,9 +36,9 @@ const Layout = async ({
     <html lang={locale}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <NextIntlClientProvider>
-                  <main>
-                      {children}
-                   </main>
+            <main>
+                {children}
+            </main>
             <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center"></footer>
         </NextIntlClientProvider>
       </body>

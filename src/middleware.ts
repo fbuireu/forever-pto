@@ -6,9 +6,9 @@ import type { NextRequest, NextResponse } from "next/server";
 const i18nMiddleware = createMiddleware(routing);
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
-    const i18nResponse = await i18nMiddleware(request) as NextResponse;
+    const i18nResponse = i18nMiddleware(request);
     
-    return await customMiddleware(request, i18nResponse);
+    return await customMiddleware({ request, response: i18nResponse });
 }
 
 export const config = {
