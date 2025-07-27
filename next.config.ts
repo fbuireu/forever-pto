@@ -9,7 +9,6 @@ const isProd = process.env.NODE_ENV === "production";
 
 const nextConfig: NextConfig = {
   trailingSlash: false,
-  compress: isProd,
   compiler: {
     removeConsole: isProd,
   },
