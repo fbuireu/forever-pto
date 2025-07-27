@@ -11,14 +11,17 @@ const compat = new FlatCompat({
 
 export default [
   ...compat.extends(
-    "next/core-web-vitals", 
+    "next/core-web-vitals",
     "next/typescript",
     "plugin:eslint-plugin-next-on-pages/recommended",
-    "prettier"
+    "prettier",
   ),
   {
     rules: {
-      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_" },
+      ],
       "@typescript-eslint/no-explicit-any": "warn",
       "prefer-const": "error",
       "no-console": ["warn", { allow: ["warn", "error"] }],
@@ -27,7 +30,7 @@ export default [
   {
     ignores: [
       ".next/**",
-      "out/**", 
+      "out/**",
       "build/**",
       "dist/**",
       "node_modules/**",

@@ -1,8 +1,8 @@
-import { routing } from '@infrastructure/i18n/routing';
+import { routing } from "@infrastructure/i18n/routing";
 import type { Metadata } from "next";
-import { NextIntlClientProvider, hasLocale } from 'next-intl';
+import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { Geist, Geist_Mono } from "next/font/google";
-import { notFound } from 'next/navigation';
+import { notFound } from "next/navigation";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -25,11 +25,11 @@ export const Layout = async ({
   params,
 }: Readonly<{
   children: React.ReactNode;
-    params: Promise<{locale: string}>;
+  params: Promise<{ locale: string }>;
 }>) => {
-    const { locale } = await params;
+  const { locale } = await params;
 
-    if (!hasLocale(routing.locales, locale)) {
+  if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
   return (
@@ -41,6 +41,6 @@ export const Layout = async ({
       </body>
     </html>
   );
-}
+};
 
-export default Layout
+export default Layout;

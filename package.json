@@ -26,10 +26,20 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
     "pages:build": "npx @cloudflare/next-on-pages",
     "preview": "pnpm run pages:build && wrangler pages dev",
-    "deploy": "pnpm run pages:build && wrangler pages deploy"
+    "deploy": "pnpm run pages:build && wrangler pages deploy",
+    "format:changed": "git diff --name-only --diff-filter=ACMR | grep -E \"\\.(js|jsx|ts|tsx|json|css|scss|md)$\" | xargs -r prettier --write",
+    "format:all": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint:changed": "git diff --name-only --diff-filter=ACMR | grep -E \"\\.(js|jsx|ts|tsx)$\" | xargs -r eslint --fix",
+    "lint:all": "next lint",
+    "lint:fix": "next lint --fix",
+    "lint:ts:typecheck": "tsc --project . --noEmit",
+    "test:e2e": "playwright test --pass-with-no-tests",
+    "test:e2e:ui": "pnpm run test:e2e -- --ui",
+    "test:e2e:changed": "pnpm run test:e2e -- --only-changed",
+    "prepare": "husky"
   },
   "dependencies": {
     "@cloudflare/next-on-pages": "^1.13.13",
@@ -39,17 +49,29 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@commitlint/format": "^19.8.1",
+    "@commitlint/types": "^19.8.1",
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.54.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4.7.0",
+    "conventional-changelog-atom": "^5.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.4.4",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-next-on-pages": "^1.13.13",
     "eslint-plugin-prettier": "^5.5.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.2",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.26.0"
   }
 }
