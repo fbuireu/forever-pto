@@ -1,6 +1,6 @@
 "use client";
 
-import { useHolidaysStore } from "@application/stores/holidays/holidaysStore";
+import { useEffectiveHolidays } from "@application/stores/holidays/holidaysStore";
 import { usePremiumStore } from "@application/stores/premium/premiumStore";
 import { TabsList } from "@modules/components/core/tabs/atoms/tabsList/TabsList";
 import { TabsTrigger } from "@modules/components/core/tabs/atoms/tabsTrigger/TabsTrigger";
@@ -12,7 +12,7 @@ import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { useTranslations } from "next-intl";
 
 const HolidaysSummary = () => {
-	const effectiveHolidays = useHolidaysStore((state) => state.effectiveHolidays);
+	const effectiveHolidays = useEffectiveHolidays();
 	const { isPremiumUser } = usePremiumStore();
 	const t = useTranslations("holidaysSummary");
 

@@ -1,5 +1,6 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import { create } from "zustand";
+import { subscribeWithSelector } from "zustand/middleware";
 
 interface HolidaysState {
 	removedHolidays: Set<string>;
@@ -13,66 +14,72 @@ interface HolidaysState {
 	addHoliday: (holiday: HolidayDTO) => void;
 }
 
-export const useHolidaysStore = create<HolidaysState>((set) => ({
-	removedHolidays: new Set<string>(),
-	originalHolidays: [],
-	effectiveHolidays: [],
+// Función helper para calcular holidays efectivos
+const calculateEffectiveHolidays = (original: HolidayDTO[], removed: Set<string>): HolidayDTO[] => {
+	return original.filter((holiday) => !removed.has(holiday.date.toISOString()));
+};
 
-	setInitialHolidays: (holidays) =>
-		set({
-			originalHolidays: holidays,
-			effectiveHolidays: holidays,
-			removedHolidays: new Set<string>(),
-		}),
+export const useHolidaysStore = create<HolidaysState>()(
+	subscribeWithSelector((set, get) => ({
+		removedHolidays: new Set<string>(),
+		originalHolidays: [],
+		effectiveHolidays: [],
 
-	removeHoliday: (date) =>
-		set((state) => {
-			const newRemovedHolidays = new Set<string>([...state.removedHolidays]);
-			newRemovedHolidays.add(date);
+		setInitialHolidays: (holidays) =>
+			set({
+				originalHolidays: holidays,
+				effectiveHolidays: holidays,
+				removedHolidays: new Set<string>(),
+			}),
 
-			return {
-				removedHolidays: newRemovedHolidays,
-				effectiveHolidays: state.originalHolidays.filter(
-					(holiday) => !newRemovedHolidays.has(holiday.date.toISOString()),
-				),
-			};
-		}),
+		removeHoliday: (date) =>
+			set((state) => {
+				const newRemovedHolidays = new Set<string>([...state.removedHolidays]);
+				newRemovedHolidays.add(date);
 
-	restoreHoliday: (date) =>
-		set((state) => {
-			const newRemovedHolidays = new Set<string>([...state.removedHolidays]);
-			newRemovedHolidays.delete(date);
+				return {
+					removedHolidays: newRemovedHolidays,
+					effectiveHolidays: calculateEffectiveHolidays(state.originalHolidays, newRemovedHolidays),
+				};
+			}),
 
-			return {
-				removedHolidays: newRemovedHolidays,
-				effectiveHolidays: state.originalHolidays.filter(
-					(holiday) => !newRemovedHolidays.has(holiday.date.toISOString()),
-				),
-			};
-		}),
+		restoreHoliday: (date) =>
+			set((state) => {
+				const newRemovedHolidays = new Set<string>([...state.removedHolidays]);
+				newRemovedHolidays.delete(date);
 
-	reset: () =>
-		set((state) => ({
-			removedHolidays: new Set<string>(),
-			effectiveHolidays: state.originalHolidays,
-		})),
+				return {
+					removedHolidays: newRemovedHolidays,
+					effectiveHolidays: calculateEffectiveHolidays(state.originalHolidays, newRemovedHolidays),
+				};
+			}),
 
-	updateHoliday: (date, updatedHoliday) =>
-		set((state) => {
-			const updatedOriginalHolidays = state.originalHolidays.map((holiday) =>
-				holiday.date.toISOString() === date ? updatedHoliday : holiday,
-			);
+		reset: () =>
+			set((state) => ({
+				removedHolidays: new Set<string>(),
+				effectiveHolidays: state.originalHolidays,
+			})),
 
-			return {
-				originalHolidays: updatedOriginalHolidays,
-				effectiveHolidays: updatedOriginalHolidays.filter(
-					(holiday) => !state.removedHolidays.has(holiday.date.toISOString()),
-				),
-			};
-		}),
+		updateHoliday: (date, updatedHoliday) =>
+			set((state) => {
+				const updatedOriginalHolidays = state.originalHolidays.map((holiday) =>
+					holiday.date.toISOString() === date ? updatedHoliday : holiday,
+				);
 
-	addHoliday: (holiday) =>
-		set((state) => ({
-			effectiveHolidays: [...state.effectiveHolidays, holiday],
-		})),
-}));
+				return {
+					originalHolidays: updatedOriginalHolidays,
+					effectiveHolidays: calculateEffectiveHolidays(updatedOriginalHolidays, state.removedHolidays),
+				};
+			}),
+
+		addHoliday: (holiday) =>
+			set((state) => ({
+				effectiveHolidays: [...state.effectiveHolidays, holiday],
+			})),
+	})),
+);
+
+// Selectores optimizados para evitar re-renders
+export const useEffectiveHolidays = () => useHolidaysStore((state) => state.effectiveHolidays);
+export const useOriginalHolidays = () => useHolidaysStore((state) => state.originalHolidays);
+export const useRemovedHolidays = () => useHolidaysStore((state) => state.removedHolidays);

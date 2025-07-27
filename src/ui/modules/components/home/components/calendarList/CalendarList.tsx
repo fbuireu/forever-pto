@@ -2,7 +2,7 @@
 
 import type { CountryDTO } from "@application/dto/country/types";
 import type { RegionDTO } from "@application/dto/region/types";
-import { useHolidaysStore } from "@application/stores/holidays/holidaysStore";
+import { useEffectiveHolidays } from "@application/stores/holidays/holidaysStore";
 import { MonthCalendar } from "@modules/components/home/components/calendarList/atoms/monthCalendar/MonthsCalendar";
 import { useCalendar } from "@modules/components/home/components/calendarList/hooks/useCalendar/useCalendar";
 import { useCalendarInfo } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/useCalendarInfo";
@@ -30,7 +30,7 @@ export default function CalendarList({
 	userRegion,
 }: Readonly<CalendarListProps>) {
 	const t = useTranslations("calendarList");
-	const effectiveHolidays = useHolidaysStore((state) => state.effectiveHolidays);
+	const effectiveHolidays = useEffectiveHolidays();
 
 	const calendar = useCalendar({
 		year,

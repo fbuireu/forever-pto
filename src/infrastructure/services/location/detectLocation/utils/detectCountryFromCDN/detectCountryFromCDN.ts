@@ -2,7 +2,7 @@ const LOCATION_IDENTIFIER = "loc=";
 
 export async function detectCountryFromCDN(): Promise<string> {
 	try {
-		const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/cdn-cgi/trace`, {
+		const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/cdn-cgi/trace            `, {
 			cache: "force-cache",
 		});
 

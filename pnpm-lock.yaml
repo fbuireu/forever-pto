@@ -80,6 +80,9 @@ importers:
       i18n-iso-countries:
         specifier: ^7.14.0
         version: 7.14.0
+      jose:
+        specifier: ^6.0.12
+        version: 6.0.12
       lucide-react:
         specifier: ^0.525.0
         version: 0.525.0(react@19.1.0)
@@ -3196,6 +3199,9 @@ packages:
 
   jose@5.9.6:
     resolution: {integrity: sha512-AMlnetc9+CV9asI19zHmrgS/WYsWUwCn2R7RzlbJWD7F9eWYUTGyBmU9o6PxngtLGOiDGPRu+Uc4fhKzbpteZQ==}
+
+  jose@6.0.12:
+    resolution: {integrity: sha512-T8xypXs8CpmiIi78k0E+Lk7T2zlK4zDyg+o1CZ4AkOHgDg98ogdP2BeZ61lTFKFyoEwJ9RgAgN+SdM3iPgNonQ==}
 
   js-base64@3.7.7:
     resolution: {integrity: sha512-7rCnleh0z2CkXhH67J8K1Ytz0b2Y+yxTPL+/KOJoa20hfnVQ/3/T6W/KflYI4bRHRagNeXeU2bkNGI3v1oS/lw==}
@@ -7262,6 +7268,8 @@ snapshots:
   jiti@2.5.1: {}
 
   jose@5.9.6: {}
+
+  jose@6.0.12: {}
 
   js-base64@3.7.7: {}
 
