@@ -1,4 +1,5 @@
 import { isPremium as isPremiumFn } from "@application/actions/premium";
+import type { CountryDTO } from "@application/dto/country/types";
 import { DEFAULT_QUERY_PARAMS } from "@const/const";
 import type { SearchParams } from "@const/types";
 import { getCountry } from "@infrastructure/services/country/getCountry/getCountry";
@@ -69,7 +70,14 @@ export interface ForeverPtoProps {
 }
 
 // Componente para cargar datos críticos
-async function CriticalDataLoader({ searchParams, locale }: { searchParams: Promise<SearchParams>; locale: Locale }) {
+async function CriticalDataLoader({
+	searchParams,
+	locale,
+}: {
+	searchParams: Promise<SearchParams>;
+	locale: Locale;
+	userCountry?: CountryDTO;
+}) {
 	const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS, CARRY_OVER_MONTHS } = DEFAULT_QUERY_PARAMS;
 	const {
 		country,
@@ -94,7 +102,9 @@ async function CriticalDataLoader({ searchParams, locale }: { searchParams: Prom
 		holidays,
 		userCountry,
 		userRegion,
+		country,
 		year,
+		region,
 		ptoDays,
 		allowPastDays,
 		carryOverMonths,
