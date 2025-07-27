@@ -1,8 +1,7 @@
 "use client";
 
 import { usePremiumStore } from "@application/stores/premium/premiumStore";
-import type { SearchParams } from "@const/types";
-import { useFilterAction } from "@ui/hooks/useFilterAction/useFilterAction";
+import { useServerStore } from "@application/stores/server/serverStore";
 import { FILTER_MAXIMUM_VALUES } from "@ui/modules/components/appSidebar/const";
 import { Label } from "@ui/modules/components/core/label/Label";
 import { Slider } from "@ui/modules/components/core/slider/Slider";
@@ -10,13 +9,9 @@ import { PremiumLock } from "@ui/modules/components/premium/components/premiumLo
 import { useTranslations } from "next-intl";
 import { useCallback, useMemo, useRef } from "react";
 
-export interface CarryOverMonthsProps {
-	carryOverMonths: SearchParams["carryOverMonths"];
-}
-
-export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
+export const CarryOverMonths = () => {
 	const t = useTranslations("filters.carryOverMonths");
-	const { updateFilter, isPending } = useFilterAction();
+	const { carryOverMonths, updateCarryOverMonths } = useServerStore();
 	const { isPremiumUser } = usePremiumStore();
 	const debounceRef = useRef<NodeJS.Timeout>(null);
 
@@ -40,16 +35,13 @@ export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 			}
 
 			debounceRef.current = setTimeout(() => {
-				updateFilter("carryOverMonths", String(newValue[0]));
+				updateCarryOverMonths(String(newValue[0]));
 			}, 100);
 		},
-		[isPremiumUser, updateFilter],
+		[isPremiumUser, updateCarryOverMonths],
 	);
 
-	const sliderDisabled = useMemo(
-		() => isPending || (!isPremiumUser && currentValue > 1),
-		[isPending, isPremiumUser, currentValue],
-	);
+	const sliderDisabled = useMemo(() => !isPremiumUser && currentValue > 1, [isPremiumUser, currentValue]);
 
 	const label = useMemo(
 		() => (
@@ -74,7 +66,7 @@ export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 
 	const sliderComponent = useMemo(
 		() => (
-			<div className={`space-y-4 ${isPending ? "opacity-50" : ""}`}>
+			<div className="space-y-4">
 				{label}
 				<Slider
 					min={1}
@@ -88,7 +80,7 @@ export const CarryOverMonths = ({ carryOverMonths }: CarryOverMonthsProps) => {
 				{sliderRangeLabels}
 			</div>
 		),
-		[label, maxValue, value, handleValueChange, sliderDisabled, sliderRangeLabels, isPending],
+		[label, maxValue, value, handleValueChange, sliderDisabled, sliderRangeLabels],
 	);
 
 	if (!isPremiumUser) {

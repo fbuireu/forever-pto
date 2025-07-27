@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
 		removeConsole: process.env.NODE_ENV === "production",
 	},
 	images: {
-		unoptimized: true, // Para Cloudflare Pages
+		unoptimized: true, 
 	},
 	compress: true,
 };

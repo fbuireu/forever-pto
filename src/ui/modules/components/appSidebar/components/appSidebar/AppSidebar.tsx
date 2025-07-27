@@ -1,4 +1,5 @@
-import type { SearchParams } from "@const/types";
+"use client";
+
 import { useSidebarItems } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/atoms/settingsItem/hooks/useSidebarItems/useSidebarItems";
 import { FiltersPanel } from "@modules/components/appSidebar/components/appSidebar/atoms/filtersPanel/FiltersPanel";
 import { LanguageSelector } from "@modules/components/appSidebar/components/appSidebar/atoms/languageSelector/LanguageSelector";
@@ -15,12 +16,12 @@ import { Sidebar } from "@ui/modules/components/core/sidebar/Sidebar";
 import type { Locale } from "next-intl";
 import { memo } from "react";
 
-interface AppSidebarProps extends SearchParams {
+interface AppSidebarProps {
 	locale: Locale;
 }
 
-export const AppSidebar = memo((params: AppSidebarProps) => {
-	const sidebarItems = useSidebarItems({ ...params });
+export const AppSidebar = memo(({ locale }: AppSidebarProps) => {
+	const sidebarItems = useSidebarItems({ locale });
 
 	return (
 		<Sidebar collapsible="icon" variant="sidebar">

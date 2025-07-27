@@ -3,16 +3,15 @@ import { TooltipTrigger } from "@modules/components/core/tooltip/atoms/tooltipTr
 import { TooltipProvider } from "@modules/components/core/tooltip/provider/TooltipProvider";
 import { Tooltip } from "@modules/components/core/tooltip/Tooltip";
 import { InfoIcon } from "lucide-react";
-import type { Locale } from "next-intl";
-import { getTranslations } from "next-intl/server";
+import { type Locale, useTranslations } from "next-intl";
 import { memo } from "react";
 
 interface AllowPasDaysInfoTooltipProps {
 	locale: Locale;
 }
 
-export const AllowPasDaysInfoTooltip = memo(async ({ locale }: AllowPasDaysInfoTooltipProps) => {
-	const t = await getTranslations({ locale, namespace: "filters.allowPastDays" });
+export const AllowPasDaysInfoTooltip = memo(({ locale }: AllowPasDaysInfoTooltipProps) => {
+	const t = useTranslations("filters.allowPastDays");
 
 	return (
 		<TooltipProvider>

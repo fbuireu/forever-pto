@@ -3,16 +3,15 @@ import { TooltipTrigger } from "@modules/components/core/tooltip/atoms/tooltipTr
 import { TooltipProvider } from "@modules/components/core/tooltip/provider/TooltipProvider";
 import { Tooltip } from "@modules/components/core/tooltip/Tooltip";
 import { InfoIcon } from "lucide-react";
-import type { Locale } from "next-intl";
-import { getTranslations } from "next-intl/server";
+import { type Locale, useTranslations } from "next-intl";
 import { memo } from "react";
 
 interface CarryOverMonthsTooltipProps {
 	locale: Locale;
 }
 
-export const CarryOverMonthsTooltip = memo(async ({ locale }: CarryOverMonthsTooltipProps) => {
-	const t = await getTranslations({ locale, namespace: "filters.carryOverMonths" });
+export const CarryOverMonthsTooltip = memo(({ locale }: CarryOverMonthsTooltipProps) => {
+	const t = useTranslations("filters.carryOverMonths");
 
 	return (
 		<TooltipProvider>

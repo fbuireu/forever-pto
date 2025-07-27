@@ -11,21 +11,24 @@ import { CommandList } from "@modules/components/core/command/atoms/commandList/
 import { PopoverContent } from "@modules/components/core/popover/atoms/popoverContent/PopoverContent";
 import { PopoverTrigger } from "@modules/components/core/popover/atoms/popoverTrigger/PopoverTrigger";
 import { Popover } from "@modules/components/core/popover/Popover";
-import { useFilterAction } from "@ui/hooks/useFilterAction/useFilterAction";
 import { Button } from "@ui/modules/components/core/button/Button";
 import { Command } from "@ui/modules/components/core/command/Command";
 import { mergeClasses } from "@ui/utils/mergeClasses/mergeClasses";
 import { Check, ChevronsUpDown } from "lucide-react";
-import type { HTMLProps } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-interface ComboboxProps extends HTMLProps<HTMLInputElement> {
+interface ComboboxProps {
 	searchPlaceholder?: string;
 	notFoundText?: string;
 	heading: string;
 	type: "country" | "region";
 	options?: CountryDTO[] | RegionDTO[];
 	value?: string;
+	onChange?: (value: string) => void;
+	label?: string;
+	placeholder?: string;
+	disabled?: boolean;
+	className?: string;
 }
 
 export const Combobox = ({
@@ -38,8 +41,9 @@ export const Combobox = ({
 	heading,
 	disabled,
 	type,
+	onChange,
+	label,
 }: ComboboxProps) => {
-	const { updateFilter, isPending } = useFilterAction();
 	const [isOpen, setIsOpen] = useState(false);
 
 	const selectedOption = useMemo(
@@ -53,9 +57,9 @@ export const Combobox = ({
 			if (!selectedOption) return;
 
 			setIsOpen(false);
-			updateFilter(type, selectedOption.value.toLowerCase());
+			onChange?.(selectedOption.value.toLowerCase());
 		},
-		[options, type, updateFilter],
+		[options, onChange],
 	);
 
 	const commandItems = useMemo(
@@ -100,12 +104,12 @@ export const Combobox = ({
 	}, [selectedOption, placeholder]);
 
 	return (
-		<div className={`relative w-full ${isPending ? "opacity-50" : ""}`}>
+		<div className="relative w-full">
 			<Popover open={isOpen} onOpenChange={setIsOpen}>
 				<PopoverTrigger asChild>
 					<Button
 						variant="outline"
-						disabled={disabled || isPending}
+						disabled={disabled}
 						aria-expanded={isOpen}
 						className={mergeClasses("w-full justify-between", className)}
 					>

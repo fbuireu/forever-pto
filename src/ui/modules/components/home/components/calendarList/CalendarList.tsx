@@ -1,91 +1,30 @@
 "use client";
 
-import type { CountryDTO } from "@application/dto/country/types";
-import type { RegionDTO } from "@application/dto/region/types";
 import { useEffectiveHolidays } from "@application/stores/holidays/holidaysStore";
-import { MonthCalendar } from "@modules/components/home/components/calendarList/atoms/monthCalendar/MonthsCalendar";
-import { useCalendar } from "@modules/components/home/components/calendarList/hooks/useCalendar/useCalendar";
-import { useCalendarInfo } from "@modules/components/home/components/calendarList/hooks/useCalendarInfo/useCalendarInfo";
-import { useCalendarInteractions } from "@modules/components/home/components/calendarList/hooks/useCalendarInteractions/useCalendarInteractions";
-import { areArraysEqual } from "@modules/components/home/components/calendarList/utils/arrayIsEqual/arrayIsEqual";
-import { Stats } from "@modules/components/home/components/stats/Stats";
+import { useServerStore } from "@application/stores/server/serverStore";
+import { useCalendar } from "@ui/modules/components/home/components/calendarList/hooks/useCalendar/useCalendar";
 import { useTranslations } from "next-intl";
 import { memo } from "react";
+import { CalendarListContent } from "./atoms/calendarListContent/CalendarListContent";
 
-interface CalendarListProps {
-	year: number;
-	ptoDays: number;
-	allowPastDays: string;
-	carryOverMonths: number;
-	userCountry?: CountryDTO;
-	userRegion?: RegionDTO["label"];
-}
-
-export default function CalendarList({
-	year,
-	ptoDays,
-	allowPastDays,
-	carryOverMonths,
-	userCountry,
-	userRegion,
-}: Readonly<CalendarListProps>) {
+export default function CalendarList() {
 	const t = useTranslations("calendarList");
 	const effectiveHolidays = useEffectiveHolidays();
 
+	// Read from server store (URL params only)
+	const { year, ptoDays, allowPastDays, carryOverMonths } = useServerStore();
+
 	const calendar = useCalendar({
-		year,
-		ptoDays,
+		year: Number(year),
+		ptoDays: Number(ptoDays),
 		allowPastDays,
 		holidays: effectiveHolidays,
-		carryOverMonths,
+		carryOverMonths: Number(carryOverMonths),
 	});
-
-	const interactions = useCalendarInteractions({
-		setHoveredBlockId: calendar.setHoveredBlockId,
-		ptoDays,
-		isHoliday: calendar.isHoliday,
-		isPastDaysAllowed: calendar.isPastDaysAllowed,
-		alternativeBlocks: calendar.alternativeBlocks,
-		dayToBlockIdMap: calendar.dayToBlockIdMap,
-	});
-
-	const calendarInfo = useCalendarInfo({
-		suggestedDays: calendar.suggestedDays,
-		dayToBlockIdMap: calendar.dayToBlockIdMap,
-		hoveredBlockId: calendar.hoveredBlockId,
-		alternativeBlocks: calendar.alternativeBlocks,
-		ptoDays,
-		holidays: effectiveHolidays,
-		calculateEffectiveDays: calendar.calculateEffectiveDays,
-		isDaySuggested: interactions.isDaySuggested,
-		t,
-	});
-
-	const calendarProps = {
-		ptoDays,
-		...calendar,
-		...interactions,
-		...calendarInfo,
-	};
 
 	return (
-		<section className="flex w-full flex-col items-center gap-8">
-			<Stats stats={calendarInfo.stats} userCountry={userCountry} userRegion={userRegion} />
-			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-7">
-				{calendar.monthsToShowDates.map((month) => (
-					<MemoizedMonthCalendar key={month.toISOString()} month={month} {...calendarProps} />
-				))}
-			</div>
+		<section className="space-y-4">
+			<CalendarListContent calendar={calendar} />
 		</section>
 	);
 }
-
-const MemoizedMonthCalendar = memo(MonthCalendar, (prevProps, nextProps) => {
-	return (
-		prevProps.month.getTime() === nextProps.month.getTime() &&
-		prevProps.ptoDays === nextProps.ptoDays &&
-		prevProps.isPending === nextProps.isPending &&
-		prevProps.hoveredBlockId === nextProps.hoveredBlockId &&
-		areArraysEqual({ arr1: prevProps.selectedDays, arr2: nextProps.selectedDays })
-	);
-});

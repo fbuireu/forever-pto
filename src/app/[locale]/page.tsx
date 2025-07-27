@@ -1,16 +1,12 @@
-import { isPremium as isPremiumFn } from "@application/actions/premium";
-import type { CountryDTO } from "@application/dto/country/types";
-import { DEFAULT_QUERY_PARAMS } from "@const/const";
+import { initializeServerData } from "@application/stores/server/serverStore";
 import type { SearchParams } from "@const/types";
 import { getCountry } from "@infrastructure/services/country/getCountry/getCountry";
 import { getHolidays } from "@infrastructure/services/holiday/getHolidays";
-import { getRegion } from "@infrastructure/services/region/getRegion/getRegion";
 import { SidebarTrigger } from "@modules/components/core/sidebar/atoms/sidebarTrigger/SidebarTrigger";
 import { SidebarProvider } from "@modules/components/core/sidebar/provider/SidebarProvider/SidebarProvider";
 import { AppSidebar } from "@ui/modules/components/appSidebar/components/appSidebar/AppSidebar";
 import { Skeleton } from "@ui/modules/components/core/skeleton/Skeleton";
-import { HolidaysProvider } from "@ui/providers/holidays/HolidaysProvider";
-import { PremiumProvider } from "@ui/providers/premium/PremiumProvider";
+import { AppProvider } from "@ui/providers/app/AppProvider";
 import dynamic from "next/dynamic";
 import type { Locale } from "next-intl";
 import { getTranslations } from "next-intl/server";
@@ -69,51 +65,6 @@ export interface ForeverPtoProps {
 	params: Promise<{ locale: Locale }>;
 }
 
-// Componente para cargar datos críticos
-async function CriticalDataLoader({
-	searchParams,
-	locale,
-}: {
-	searchParams: Promise<SearchParams>;
-	locale: Locale;
-	userCountry?: CountryDTO;
-}) {
-	const { YEAR, PTO_DAYS, ALLOW_PAST_DAYS, CARRY_OVER_MONTHS } = DEFAULT_QUERY_PARAMS;
-	const {
-		country,
-		region,
-		year = YEAR,
-		ptoDays = PTO_DAYS,
-		allowPastDays = ALLOW_PAST_DAYS,
-		carryOverMonths = CARRY_OVER_MONTHS,
-	} = await searchParams;
-
-	const [isPremium, holidays, userCountry] = await Promise.all([
-		isPremiumFn(),
-		getHolidays({ country, region, year, carryOverMonths }),
-		getCountry(country),
-	]);
-
-	const userRegion = getRegion(holidays);
-	const carryOverMonthsNumber = isPremium ? Number(carryOverMonths) : Number(CARRY_OVER_MONTHS);
-
-	return {
-		isPremium,
-		holidays,
-		userCountry,
-		userRegion,
-		country,
-		year,
-		region,
-		ptoDays,
-		allowPastDays,
-		carryOverMonths,
-		carryOverMonthsNumber,
-		locale,
-	};
-}
-
-// Componente para el header
 async function PageHeader({ locale }: { locale: Locale }) {
 	const t = await getTranslations({ locale, namespace: "home" });
 
@@ -127,73 +78,70 @@ async function PageHeader({ locale }: { locale: Locale }) {
 
 const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
 	const { locale } = await params;
-	const criticalData = await CriticalDataLoader({ searchParams, locale });
+	const resolvedSearchParams = await searchParams;
+
+	// Initialize server store with URL params
+	await initializeServerData(resolvedSearchParams);
+
+	// Load data for providers
+	const { country, region, year, carryOverMonths } = resolvedSearchParams;
+	const [isPremium, holidays, userCountry] = await Promise.all([
+		import("@application/actions/premium").then((mod) => mod.isPremium()),
+		getHolidays({ country, region, year, carryOverMonths }),
+		getCountry(country),
+	]);
 
 	return (
 		<SidebarProvider>
-			<PremiumProvider isPremium={criticalData.isPremium}>
-				<AppSidebar
-					country={criticalData.country}
-					ptoDays={criticalData.ptoDays}
-					region={criticalData.region}
-					year={criticalData.year}
-					allowPastDays={criticalData.allowPastDays}
-					carryOverMonths={criticalData.carryOverMonths}
-					locale={criticalData.locale}
-				/>
+			<AppProvider initialHolidays={holidays} initialIsPremium={isPremium}>
+				<AppSidebar locale={locale} />
 				<SidebarTrigger />
+
 				<div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-2">
 					<Suspense fallback={<Skeleton size="2xl" className="w-full" />}>
-						<PageHeader locale={criticalData.locale} />
+						<PageHeader locale={locale} />
 					</Suspense>
 
-					<HolidaysProvider initialHolidays={criticalData.holidays}>
-						<Suspense fallback={<Skeleton size="4xl" className="w-full" />}>
-							<HolidaysSummary />
-						</Suspense>
+					<Suspense fallback={<Skeleton size="4xl" className="w-full" />}>
+						<HolidaysSummary />
+					</Suspense>
 
-						<Suspense fallback={<Skeleton size="11xl" className="w-full" />}>
-							<CalendarList
-								year={Number(criticalData.year)}
-								ptoDays={Number(criticalData.ptoDays)}
-								allowPastDays={criticalData.allowPastDays}
-								carryOverMonths={criticalData.carryOverMonthsNumber}
-								userCountry={criticalData.userCountry}
-								userRegion={criticalData.userRegion}
-							/>
-						</Suspense>
-					</HolidaysProvider>
+					<Suspense fallback={<Skeleton size="11xl" className="w-full" />}>
+						<CalendarList />
+					</Suspense>
 
 					<Suspense fallback={<Skeleton size="2xl" className="w-full" />}>
-						<Legend locale={criticalData.locale} />
+						<Legend locale={locale} />
 					</Suspense>
 
 					<Suspense fallback={<Skeleton size="7xl" className="w-full" />}>
-						<HowItWorks locale={criticalData.locale} />
+						<HowItWorks locale={locale} />
 					</Suspense>
 
 					<Suspense fallback={<Skeleton size="5xl" className="w-full" />}>
-						<Faq locale={criticalData.locale} />
+						<Faq locale={locale} />
 					</Suspense>
 
 					<Suspense fallback={<Skeleton size="5xl" className="w-full" />}>
-						<Roadmap locale={criticalData.locale} />
+						<Roadmap locale={locale} />
 					</Suspense>
 
 					<Suspense fallback={<Skeleton size="2xl" className="w-full" />}>
 						<DevFooter />
 					</Suspense>
 				</div>
-			</PremiumProvider>
+			</AppProvider>
 		</SidebarProvider>
 	);
 };
 
 export default ForeverPto;
 export { generateMetadata };
+
 // TODO:
-// 2- fix country not set URL + try
-// 2- improve SEO (a11y) + performance (db middleware, etc)
+// 2- performance (if a component needs to be client usew tanstack)
+// 2- improve SEO (a11y)
+// 2- favicon
 // 2- migrate to eslint
 // 2- legal pages and cookies
 // 2- configure CI releases
