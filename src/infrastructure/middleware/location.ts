@@ -1,4 +1,4 @@
-import { detectLocation } from '@infrastructure/services/location/detectLocation';
+import { detectCountry } from '@infrastructure/services/location/detectCountry';
 import type { NextRequest, NextResponse } from 'next/server';
 
 interface MiddlewareParams {
@@ -7,11 +7,11 @@ interface MiddlewareParams {
 }
 
 export async function location({ request, response }: MiddlewareParams): Promise<NextResponse> {
-  const userLocation = await detectLocation(request);
-  const locationCookie = request.cookies.get('location')?.value;
+  const userCountry = await detectCountry(request);
+  const userCountryCookie = request.cookies.get('user-country')?.value;
 
-  if (userLocation && userLocation !== locationCookie) {
-    response.cookies.set('location', userLocation, {
+  if (userCountry && userCountry !== userCountryCookie) {
+    response.cookies.set('user-country', userCountry, {
       httpOnly: true,
       secure: true,
       sameSite: 'lax',
