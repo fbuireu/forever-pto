@@ -5,13 +5,22 @@ import { detectCountryFromIP } from './utils/detectCountryFromIP';
 
 export async function detectLocation(request: NextRequest): Promise<string> {
   try {
-      const cdnLocation = await detectCountryFromCDN();
-
+    const cdnLocation = await detectCountryFromCDN();
     if (cdnLocation) return cdnLocation;
   } catch {}
 
-   return await Promise.race([
+  const [headerLocation, ipLocation] = await Promise.allSettled([
     detectCountryFromHeaders(request),
-    detectCountryFromIP()
+    detectCountryFromIP(),
   ]);
+
+  if (headerLocation.status === 'fulfilled' && headerLocation.value) {
+    return headerLocation.value;
+  }
+
+  if (ipLocation.status === 'fulfilled' && ipLocation.value) {
+    return ipLocation.value;
+  }
+
+  return '';
 }

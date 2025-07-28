@@ -1,6 +1,7 @@
 import { routing } from "@infrastructure/i18n/routing";
 import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
+import { ThemeProvider } from "next-themes";
 import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import "../globals.css";
@@ -23,23 +24,29 @@ export const metadata: Metadata = {
 const Layout = async ({
   children,
   params,
-}: Readonly<{
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-}>) => {
+}: Readonly<{ children: React.ReactNode; params: Promise<{ locale: string }>}>) => {
   const { locale } = await params;
 
-  if (!hasLocale(routing.locales, locale)) {
+  if (!hasLocale(routing.locales, locale)) { 
     notFound();
   }
+
   return (
     <html lang={locale}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <NextIntlClientProvider>
+          <ThemeProvider
+            attribute="data-theme"
+            defaultTheme="system"
+            storageKey="theme"
+            enableSystem
+            disableTransitionOnChange
+          >
             <main>
                 {children}
             </main>
             <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center"></footer>
+            </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>
