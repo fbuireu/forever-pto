@@ -11,7 +11,7 @@
 # Next.js
 /.next/
 /out/
-.vercel
+.vercel/
 
 # Production
 /build
@@ -31,8 +31,8 @@ pnpm-debug.log*
 *.tsbuildinfo
 
 # IDE
-.idea
-.vscode
+.idea/
+.vscode/
 
 # Cloudflare
-.wrangler
+.wrangler/
