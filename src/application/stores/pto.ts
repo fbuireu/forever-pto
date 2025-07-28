@@ -35,16 +35,16 @@ const initialState: PtoState = {
 export const usePtoStore = create<PtoStore>()(
   devtools(
     persist(
-      (set, get) => ({
+      (set) => ({
         ...initialState,
         setPtoDays: (days: number) => set({ ptoDays: days }, false, 'setPtoDays'),
-        setCountry: (country: string) => set({ country }, false, 'setCountry'),
+        setCountry: (country: string) => set({ country, region: '' }, false, 'setCountry'),
         setRegion: (region: string) => set({ region }, false, 'setRegion'),
         setAllowPastDays: (allow: boolean) => set({ allowPastDays: allow }, false, 'setAllowPastDays'),
         setYear: (year: number) => set({ year }, false, 'setYear'),
         setCarryOverMonths: (months: number) => set({ carryOverMonths: months }, false, 'setCarryOverMonths'),
         resetToDefaults: () => set(initialState, false, 'resetToDefaults'),
-        updateStore: (config: Partial<PtoState>) => set((state) => ({ ...state, ...config }), false, 'updateConfig'),
+        updateStore: (config: Partial<PtoState>) => set((state) => ({ ...state, ...config }))
       }),
       {
         name: 'pto-config-storage',
@@ -63,14 +63,11 @@ export const usePtoStore = create<PtoStore>()(
 );
 
 export const usePtoDays = () => usePtoStore((state) => state.ptoDays);
-
 export const useAllowPastDays = () => usePtoStore((state) => state.allowPastDays);
-
-export const useLocation = () =>
-  usePtoStore((state) => ({
-    country: state.country,
-    region: state.region,
-  }));
+export const useCountry = () => usePtoStore((state) => state.country);
+export const useRegion = () => usePtoStore((state) => state.region);
+export const useYear = () => usePtoStore((state) => state.year);
+export const useCarryOverMonths = () => usePtoStore((state) => state.carryOverMonths);
 
 export const useSetPtoDays = () => usePtoStore((state) => state.setPtoDays);
 export const useSetAllowPastDays = () => usePtoStore((state) => state.setAllowPastDays);
