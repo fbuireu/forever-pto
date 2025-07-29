@@ -3,7 +3,7 @@
 import { useFetchCountries } from '@application/stores/location';
 import { useCountry, usePtoStore, useUpdateStore } from '@application/stores/pto';
 import { Locale } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 interface StoreInitializerProps {
   userCountry?: string;
@@ -14,35 +14,22 @@ export const StoreInitializer = ({ userCountry, locale }: StoreInitializerProps)
   const updateStore = useUpdateStore();
   const fetchCountries = useFetchCountries();
   const currentCountry = useCountry();
-  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = usePtoStore.persist.onHydrate(() => {
-      setHydrated(false);
-    });
-    
-    const unsubscribeFinish = usePtoStore.persist.onFinishHydration(() => {
-      setHydrated(true);
+    const unsubscribeEnd = usePtoStore.persist.onFinishHydration(() => {
+      if (currentCountry || !userCountry) return;
+
+      updateStore({ country: userCountry });
     });
 
-    return () => {
-      unsubscribe();
-      unsubscribeFinish();
-    };
-  }, []);
+    return unsubscribeEnd;
+  }, [currentCountry, userCountry, updateStore]);
 
   useEffect(() => {
-    if(!locale) return;
+    if (!locale) return;
+
     fetchCountries(locale);
   }, [fetchCountries, locale]);
 
-  useEffect(() => {
-    if (!hydrated) return;
-    
-    if (!currentCountry && userCountry) {
-      updateStore({ country: userCountry });
-    }
-  }, [hydrated, currentCountry, userCountry, updateStore]);
-
-  return null; 
+  return null;
 };

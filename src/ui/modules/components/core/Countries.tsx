@@ -15,17 +15,19 @@ export const Countries = () => {
   const selectedCountry = getCountryByCode(currentCountry);
 
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium">Country</label>
+    <div className='space-y-2'>
+      <label className='text-sm font-medium'>Country</label>
       <Combobox
         options={countries}
         value={currentCountry}
         onChange={setCountry}
-        placeholder={countriesLoading ? "Loading countries..." : "Select country..."}
-        searchPlaceholder="Search countries..."
+        placeholder={countriesLoading ? 'Loading countries...' : 'Select country...'}
+        searchPlaceholder='Search countries...'
       />
       {selectedCountry && (
-          <span>Selected: <RotatingText text={`${selectedCountry.flag} ${selectedCountry.label}`} /></span>
+        <span>
+          Selected: <RotatingText text={`${selectedCountry.flag} ${selectedCountry.label}`} />
+        </span>
       )}
     </div>
   );

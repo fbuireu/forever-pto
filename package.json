@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@cloudflare/next-on-pages": "^1.13.13",
+    "@headlessui/react": "^2.2.6",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-slot": "^1.2.3",
     "class-variance-authority": "^0.7.1",

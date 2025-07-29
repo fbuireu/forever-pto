@@ -6,7 +6,7 @@ interface PtoState {
   allowPastDays: boolean;
   country: string;
   region: string;
-  year: number;
+  year: string;
   carryOverMonths: number;
 }
 
@@ -15,7 +15,7 @@ interface PtoActions {
   setAllowPastDays: (allow: boolean) => void;
   setCountry: (country: string) => void;
   setRegion: (region: string) => void;
-  setYear: (year: number) => void;
+  setYear: (year: string) => void;
   setCarryOverMonths: (months: number) => void;
   resetToDefaults: () => void;
   updateStore: (config: Partial<PtoState>) => void;
@@ -28,7 +28,7 @@ const initialState: PtoState = {
   allowPastDays: false,
   country: '',
   region: '',
-  year: new Date().getFullYear(),
+  year: String(new Date().getFullYear()),
   carryOverMonths: 1,
 };
 
@@ -41,7 +41,7 @@ export const usePtoStore = create<PtoStore>()(
         setCountry: (country: string) => set({ country, region: '' }, false, 'setCountry'),
         setRegion: (region: string) => set({ region }, false, 'setRegion'),
         setAllowPastDays: (allow: boolean) => set({ allowPastDays: allow }, false, 'setAllowPastDays'),
-        setYear: (year: number) => set({ year }, false, 'setYear'),
+        setYear: (year: string) => set({ year }, false, 'setYear'),
         setCarryOverMonths: (months: number) => set({ carryOverMonths: months }, false, 'setCarryOverMonths'),
         resetToDefaults: () => set(initialState, false, 'resetToDefaults'),
         updateStore: (config: Partial<PtoState>) => set((state) => ({ ...state, ...config }))

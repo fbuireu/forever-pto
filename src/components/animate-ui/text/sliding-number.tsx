@@ -1,15 +1,15 @@
 'use client';
 
+import * as React from 'react';
 import {
-  motion,
-  useInView,
   useSpring,
   useTransform,
+  motion,
+  useInView,
   type MotionValue,
   type SpringOptions,
   type UseInViewOptions,
 } from 'motion/react';
-import * as React from 'react';
 import useMeasure from 'react-use-measure';
 
 import { cn } from '@const/lib/utils';
@@ -26,7 +26,7 @@ function SlidingNumberRoller({
   value,
   place,
   transition,
-}: Readonly<SlidingNumberRollerProps>) {
+}: SlidingNumberRollerProps) {
   const startNumber = Math.floor(prevValue / place) % 10;
   const targetNumber = Math.floor(value / place) % 10;
   const animatedValue = useSpring(startNumber, transition);
