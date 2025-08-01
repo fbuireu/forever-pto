@@ -1,3 +1,4 @@
+import { AppSidebar } from '@ui/modules/components/core/appSidebar/AppSidebar';
 import { Countries } from '@ui/modules/components/core/Countries';
 import { Header } from '@ui/modules/components/core/Header';
 import { Regions } from '@ui/modules/components/core/Regions';
@@ -17,15 +18,19 @@ const ForeverPto = async ({ params }: ForeverPtoProps) => {
   const userCountry = cookieStore.get('user-country')?.value;
 
   return (
-    <div className='font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20'>
-      <StoreInitializer userCountry={userCountry} locale={locale} />
-      <h1>
-        Hello world {locale}/{userCountry}
-      </h1>
-      <Header />
-      <Countries />
-      <Regions />
-    </div>
+    <AppSidebar>
+      <div className='flex h-16 shrink-0 items-center gap-2 px-4'>
+        <h1 className='text-lg font-semibold'>
+          Hello world {locale}/{userCountry}
+        </h1>
+      </div>
+      <div className='flex-1 space-y-4 p-4'>
+        <StoreInitializer userCountry={userCountry} locale={locale} />
+        <Header />
+        <Countries />
+        <Regions />
+      </div>
+    </AppSidebar>
   );
 };
 

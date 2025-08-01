@@ -98,7 +98,13 @@ export const Header = () => {
         </div>
         <div>
           <p>1</p>
-          <Slider value={[carryOverMonths]} max={12} step={1} onValueChange={(value) => setCarryOverMonths(value[0])} />
+          <Slider
+            value={[carryOverMonths]}
+            max={12}
+            min={1}
+            step={1}
+            onValueChange={(value) => setCarryOverMonths(value[0])}
+          />
           <SlidingNumber number={carryOverMonths} padStart />
           <p>12</p>
         </div>
