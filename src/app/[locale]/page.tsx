@@ -1,4 +1,5 @@
 import { AppSidebar } from '@ui/modules/components/core/appSidebar/AppSidebar';
+import { CalendarList } from '@ui/modules/components/home/CalendarList';
 import { StoresInitializer } from '@ui/store/StoresInitializer';
 import { Locale } from 'next-intl';
 import { cookies } from 'next/headers';
@@ -16,14 +17,8 @@ const ForeverPto = async ({ params }: ForeverPtoProps) => {
 
   return (
     <AppSidebar>
-      <div className='flex h-16 shrink-0 items-center gap-2 px-4'>
-        <h1 className='text-lg font-semibold'>
-          Hello world {locale}/{userCountry}
-        </h1>
-      </div>
-      <div className='flex-1 space-y-4 p-4'>
-        <StoresInitializer userCountry={userCountry} locale={locale} />
-      </div>
+      <StoresInitializer userCountry={userCountry} locale={locale} />
+      <CalendarList />
     </AppSidebar>
   );
 };

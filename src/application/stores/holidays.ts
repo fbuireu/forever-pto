@@ -6,21 +6,18 @@ import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
 import { PtoState } from './pto';
 
-interface HolidaysState {
+export interface HolidaysState {
   holidays: HolidayDTO[];
   holidaysLoading: boolean;
-  ptoDays: number;
   suggestions: HolidayDTO[];
   suggestionsLoading: boolean;
   alternativeDays: HolidayDTO[];
   alternativeDaysLoading: boolean;
-  currentYear: number;
 }
 
 interface GenerateSuggestionsParams {
   country: string;
   year: number;
-  ptoDays: number;
 }
 
 interface FetchHolidaysParams extends Omit<PtoState, 'ptoDays' | 'allowPastDays'> {
@@ -29,11 +26,9 @@ interface FetchHolidaysParams extends Omit<PtoState, 'ptoDays' | 'allowPastDays'
 
 interface HolidaysActions {
   fetchHolidays: (params: FetchHolidaysParams) => Promise<void>;
-  setPtoDays: (days: number) => void;
-  generateSuggestions: (params: GenerateSuggestionsParams) => Promise<void>;
+  generateSuggestions: (params: GenerateSuggestionsParams) => Promise<void>; // ← Arreglado: removido ptoDays
   fetchAlternativeDays: (country: string, year: number) => Promise<void>;
   getHolidaysByMonth: (month: number) => HolidayDTO[];
-  getHolidaysByDateRange: (startDate: string, endDate: string) => HolidayDTO[];
   clearSuggestions: () => void;
   addAlternativeDay: (alternativeDay: HolidayDTO) => void;
   removeAlternativeDay: (date: Date) => void;
@@ -44,12 +39,10 @@ type HolidaysStore = HolidaysState & HolidaysActions;
 const initialState: HolidaysState = {
   holidays: [],
   holidaysLoading: false,
-  ptoDays: 0,
   suggestions: [],
   suggestionsLoading: false,
   alternativeDays: [],
   alternativeDaysLoading: false,
-  currentYear: new Date().getFullYear(),
 };
 
 export const useHolidaysStore = create<HolidaysStore>()(
@@ -75,16 +68,11 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
         },
 
-        setPtoDays: (days: number) => {
-          set({ ptoDays: days });
-        },
-
-        generateSuggestions: async ({ country, year, ptoDays }: GenerateSuggestionsParams) => {
+        generateSuggestions: async ({ country, year }: GenerateSuggestionsParams) => {
           set({ suggestionsLoading: true });
 
           try {
-            // Replace with your actual API call
-            // const suggestions = await generateHolidaySuggestions(country, year, ptoDays);
+            // const suggestions = await generateHolidaySuggestions(country, year);
             const suggestions: HolidayDTO[] = []; // Placeholder
 
             set({
@@ -103,7 +91,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
           set({ alternativeDaysLoading: true });
 
           try {
-            // Replace with your actual API call
             // const alternativeDays = await getAlternativeDays(country, year);
             const alternativeDays: HolidayDTO[] = []; // Placeholder
 
@@ -127,17 +114,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
           });
         },
 
-        getHolidaysByDateRange: (startDate: string, endDate: string) => {
-          const { holidays } = get();
-          const start = new Date(startDate);
-          const end = new Date(endDate);
-
-          return holidays.filter((holiday) => {
-            const holidayDate = new Date(holiday.date);
-            return holidayDate >= start && holidayDate <= end;
-          });
-        },
-
         clearSuggestions: () => {
           set({ suggestions: [] });
         },
@@ -149,7 +125,12 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
         removeAlternativeDay: (date: Date) => {
           const { alternativeDays } = get();
-          set({ alternativeDays: alternativeDays.filter((day) => day.date !== date) });
+          set({
+            alternativeDays: alternativeDays.filter((day) => {
+              const dayDate = new Date(day.date);
+              return dayDate.getTime() !== date.getTime();
+            }),
+          });
         },
       }),
       {
@@ -157,10 +138,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
         storage: encryptedStorage,
         partialize: (state) => ({
           holidays: state.holidays,
-          ptoDays: state.ptoDays,
           suggestions: state.suggestions,
           alternativeDays: state.alternativeDays,
-          currentYear: state.currentYear,
         }),
       }
     ),
@@ -171,19 +150,15 @@ export const useHolidaysStore = create<HolidaysStore>()(
 export const useHolidaysState = () => useHolidaysStore((state) => state);
 export const useHolidays = () => useHolidaysStore((state) => state.holidays);
 export const useHolidaysLoading = () => useHolidaysStore((state) => state.holidaysLoading);
-export const usePtoDays = () => useHolidaysStore((state) => state.ptoDays);
-export const useSetPtoDays = () => useHolidaysStore((state) => state.setPtoDays);
 export const useSuggestions = () => useHolidaysStore((state) => state.suggestions);
 export const useSuggestionsLoading = () => useHolidaysStore((state) => state.suggestionsLoading);
 export const useAlternativeDays = () => useHolidaysStore((state) => state.alternativeDays);
 export const useAlternativeDaysLoading = () => useHolidaysStore((state) => state.alternativeDaysLoading);
-export const useCurrentYear = () => useHolidaysStore((state) => state.currentYear);
 
 export const useFetchHolidays = () => useHolidaysStore((state) => state.fetchHolidays);
 export const useGenerateSuggestions = () => useHolidaysStore((state) => state.generateSuggestions);
 export const useFetchAlternativeDays = () => useHolidaysStore((state) => state.fetchAlternativeDays);
 export const useGetHolidaysByMonth = () => useHolidaysStore((state) => state.getHolidaysByMonth);
-export const useGetHolidaysByDateRange = () => useHolidaysStore((state) => state.getHolidaysByDateRange);
 export const useClearSuggestions = () => useHolidaysStore((state) => state.clearSuggestions);
 export const useAddAlternativeDay = () => useHolidaysStore((state) => state.addAlternativeDay);
 export const useRemoveAlternativeDay = () => useHolidaysStore((state) => state.removeAlternativeDay);

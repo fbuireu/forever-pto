@@ -1,6 +1,6 @@
 import { createJSONStorage } from 'zustand/middleware';
 
-const SECRET_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'your-fallback-secret-key';
+const SECRET_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'fallback-secret-key';
 const isDev = process.env.NODE_ENV === 'development';
 
 interface CryptoParams {
@@ -49,7 +49,8 @@ export const encryptedStorage = createJSONStorage(() => {
     },
 
     setItem: (key: string, value: string): void => {
-      const encrypted = encrypt({text: value, key: SECRET_KEY});
+        const encrypted = encrypt({ text: value, key: SECRET_KEY });
+        
       localStorage.setItem(key, encrypted);
     },
 
