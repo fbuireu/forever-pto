@@ -1,3 +1,5 @@
+import { ChevronRight, Settings } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import {
   Sidebar,
   SidebarContent,
@@ -9,10 +11,18 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
 } from 'src/components/animate-ui/radix/sidebar';
+import { AllowPastDays } from './atoms/AllowPastDays';
+import { Countries } from './atoms/Countries';
+import { PtoDays } from './atoms/PtoDays';
+import { Regions } from './atoms/Regions';
+import { Years } from './atoms/Years';
+import { CarryOverMonths } from './atoms/CarryOverMonths';
 
 interface AppSidebarProps {
   children: React.ReactNode;
@@ -21,47 +31,55 @@ interface AppSidebarProps {
 export const AppSidebar = ({ children }: AppSidebarProps) => {
   return (
     <SidebarProvider>
-      <Sidebar>
+      <Sidebar collapsible='icon' variant='sidebar'>
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton>Item 1</SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton>Item 2</SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton>Item 3</SidebarMenuButton>
+              <SidebarMenuButton>LOGO</SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Label 1</SidebarGroupLabel>
+            <SidebarGroupLabel>Filters</SidebarGroupLabel>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton>Item 1</SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton>Item 2</SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton>Item 3</SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroup>
-          <SidebarGroup>
-            <SidebarGroupLabel>Label 2</SidebarGroupLabel>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton>Item 1</SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton>Item 2</SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton>Item 3</SidebarMenuButton>
-              </SidebarMenuItem>
+              <Collapsible defaultOpen className='group/collapsible w-[--radix-popper-anchor-width]'>
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton variant='outline' tooltip='Filters'>
+                      <Settings className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
+                      <span className='data-[collapsed=true]:hidden'>Filters & Configuration</span>
+                      <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <PtoDays />
+                      <SidebarMenuSubItem />
+                    </SidebarMenuSub>
+                    <SidebarMenuSub>
+                      <Countries />
+                      <SidebarMenuSubItem />
+                    </SidebarMenuSub>
+                    <SidebarMenuSub>
+                      <Regions />
+                      <SidebarMenuSubItem />
+                    </SidebarMenuSub>
+                    <SidebarMenuSub>
+                      <Years />
+                      <SidebarMenuSubItem />
+                    </SidebarMenuSub>
+                    <SidebarMenuSub>
+                      <AllowPastDays />
+                      <SidebarMenuSubItem />
+                    </SidebarMenuSub>
+                    <SidebarMenuSub>
+                      <CarryOverMonths />
+                      <SidebarMenuSubItem />
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>

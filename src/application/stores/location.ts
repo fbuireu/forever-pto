@@ -46,15 +46,13 @@ export const useLocationStore = create<LocationStore>()(
         ...initialState,
 
         fetchCountries: async (locale: Locale) => {
+          set({ countriesLoading: true });
           const { countriesLastFetched } = get();
           const now = Date.now();
 
           if (now - countriesLastFetched < 24 * 60 * 60 * 1000) {
             return;
           }
-
-          set({ countriesLoading: true });
-
           try {
             const countries = await getCountries(locale);
             set({
@@ -65,6 +63,7 @@ export const useLocationStore = create<LocationStore>()(
           } catch (error) {
             set({
               countriesLoading: false,
+              countries: [],
             });
           }
         },
@@ -76,13 +75,13 @@ export const useLocationStore = create<LocationStore>()(
         },
 
         fetchRegions: async (countryCode: string) => {
+          set({ regionsLoading: true });
+
           const { currentCountry: currentCountryCode } = get();
 
           if (currentCountryCode === countryCode) {
             return;
           }
-
-          set({ regionsLoading: true });
 
           try {
             const regionData = getRegions(countryCode);
@@ -94,6 +93,7 @@ export const useLocationStore = create<LocationStore>()(
           } catch (error) {
             set({
               regionsLoading: false,
+              regions: [],
             });
           }
         },

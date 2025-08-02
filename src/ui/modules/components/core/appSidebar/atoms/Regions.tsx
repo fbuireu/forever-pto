@@ -1,10 +1,11 @@
 'use client';
 
-import { useFetchRegions, useGetRegion, useRegions, useRegionsLoading } from '@application/stores/location';
+import { useFetchRegions, useRegions, useRegionsLoading } from '@application/stores/location';
 import { useCountry, useRegion, useSetRegion } from '@application/stores/pto';
 import { Combobox } from '@const/components/ui/combobox';
+import { Field, Label } from '@headlessui/react';
+import { MapPinned } from 'lucide-react';
 import { useEffect } from 'react';
-import { RotatingText } from 'src/components/animate-ui/text/rotating';
 
 export const Regions = () => {
   const country = useCountry();
@@ -12,7 +13,6 @@ export const Regions = () => {
   const regionsLoading = useRegionsLoading();
   const currentRegion = useRegion();
   const setRegion = useSetRegion();
-  const getRegion = useGetRegion();
   const fetchRegions = useFetchRegions();
 
   useEffect(() => {
@@ -21,12 +21,13 @@ export const Regions = () => {
     fetchRegions(country);
   }, [country, fetchRegions]);
 
-  const selectedRegion = getRegion({ country, region: currentRegion });
-
   return (
-    <div className='space-y-2'>
-      <label className='text-sm font-medium'>Region</label>
+    <Field className='space-y-2'>
+      <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='regions'>
+        <MapPinned size={16} /> Region
+      </Label>
       <Combobox
+        id='regions'
         options={regions}
         value={currentRegion}
         onChange={setRegion}
@@ -34,11 +35,6 @@ export const Regions = () => {
         placeholder={regionsLoading ? 'Loading regions...' : 'Select region...'}
         searchPlaceholder='Search regions. ..'
       />
-      {selectedRegion && (
-        <span>
-          Selected: <RotatingText text={`${selectedRegion.label}`} />
-        </span>
-      )}
-    </div>
+    </Field>
   );
 };

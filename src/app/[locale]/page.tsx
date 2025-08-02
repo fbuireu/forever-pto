@@ -1,8 +1,5 @@
 import { AppSidebar } from '@ui/modules/components/core/appSidebar/AppSidebar';
-import { Countries } from '@ui/modules/components/core/Countries';
-import { Header } from '@ui/modules/components/core/Header';
-import { Regions } from '@ui/modules/components/core/Regions';
-import { StoreInitializer } from '@ui/modules/components/store/StoreInitializer';
+import { StoreInitializer } from '@ui/store/StoreInitializer';
 import { Locale } from 'next-intl';
 import { cookies } from 'next/headers';
 
@@ -26,9 +23,6 @@ const ForeverPto = async ({ params }: ForeverPtoProps) => {
       </div>
       <div className='flex-1 space-y-4 p-4'>
         <StoreInitializer userCountry={userCountry} locale={locale} />
-        <Header />
-        <Countries />
-        <Regions />
       </div>
     </AppSidebar>
   );
