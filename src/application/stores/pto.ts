@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { encryptedStorage } from './crypto';
 
-interface PtoState {
+export interface PtoState {
   ptoDays: number;
   allowPastDays: boolean;
   country: string;
@@ -44,10 +45,11 @@ export const usePtoStore = create<PtoStore>()(
         setYear: (year: string) => set({ year }, false, 'setYear'),
         setCarryOverMonths: (months: number) => set({ carryOverMonths: months }, false, 'setCarryOverMonths'),
         resetToDefaults: () => set(initialState, false, 'resetToDefaults'),
-        updateStore: (config: Partial<PtoState>) => set((state) => ({ ...state, ...config }))
+        updateStore: (config: Partial<PtoState>) => set((state) => ({ ...state, ...config })),
       }),
       {
         name: 'pto-config-storage',
+        storage: encryptedStorage,
         partialize: (state) => ({
           ptoDays: state.ptoDays,
           allowPastDays: state.allowPastDays,
@@ -62,6 +64,7 @@ export const usePtoStore = create<PtoStore>()(
   )
 );
 
+export const usePtoState = () => usePtoStore((state) => state);
 export const usePtoDays = () => usePtoStore((state) => state.ptoDays);
 export const useAllowPastDays = () => usePtoStore((state) => state.allowPastDays);
 export const useCountry = () => usePtoStore((state) => state.country);

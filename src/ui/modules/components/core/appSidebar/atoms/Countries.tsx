@@ -1,16 +1,15 @@
 'use client';
 
-import { useCountries, useCountriesLoading } from '@application/stores/location';
-import { useCountry, useSetCountry } from '@application/stores/pto';
+import { usePtoState } from '@application/stores/pto';
+import { useLocationState } from '@application/stores/location';
 import { Combobox } from '@const/components/ui/combobox';
 import { Field, Label } from '@headlessui/react';
 import { MapPin } from 'lucide-react';
 
 export const Countries = () => {
-  const countries = useCountries();
-  const countriesLoading = useCountriesLoading();
-  const currentCountry = useCountry();
-  const setCountry = useSetCountry();
+    const { country, setCountry } = usePtoState();
+    const { countries, countriesLoading } = useLocationState();
+    
 
   return (
     <Field className='space-y-2 w-full'>
@@ -21,7 +20,7 @@ export const Countries = () => {
         className='w-full'
         id='countries'
         options={countries}
-        value={currentCountry}
+        value={country}
         onChange={setCountry}
         placeholder={countriesLoading ? 'Loading countries...' : 'Select country...'}
         searchPlaceholder='Search countries...'

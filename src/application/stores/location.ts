@@ -5,6 +5,7 @@ import { getRegions } from '@infrastructure/services/regions/getRegions';
 import { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { encryptedStorage } from './crypto';
 
 interface LocationState {
   countries: CountryDTO[];
@@ -12,7 +13,6 @@ interface LocationState {
   countriesLastFetched: number;
   regions: RegionDTO[];
   regionsLoading: boolean;
-  currentCountry: string;
 }
 
 interface GetRegionParams {
@@ -24,8 +24,7 @@ interface LocationActions {
   fetchCountries: (locale: Locale) => Promise<void>;
   getCountryByCode: (code: string) => CountryDTO | undefined;
   fetchRegions: (countryCode: string) => Promise<void>;
-  getRegionsByCountry: (countryCode: string) => RegionDTO[];
-  getRegion: ({ country, region }: GetRegionParams) => RegionDTO | undefined;
+  getRegion: ({ region }: GetRegionParams) => RegionDTO | undefined;
 }
 
 type LocationStore = LocationState & LocationActions;
@@ -36,7 +35,6 @@ const initialState: LocationState = {
   countriesLastFetched: 0,
   regions: [],
   regionsLoading: false,
-  currentCountry: '',
 };
 
 export const useLocationStore = create<LocationStore>()(
@@ -46,13 +44,15 @@ export const useLocationStore = create<LocationStore>()(
         ...initialState,
 
         fetchCountries: async (locale: Locale) => {
-          set({ countriesLoading: true });
           const { countriesLastFetched } = get();
           const now = Date.now();
 
           if (now - countriesLastFetched < 24 * 60 * 60 * 1000) {
             return;
           }
+
+          set({ countriesLoading: true });
+
           try {
             const countries = await getCountries(locale);
             set({
@@ -63,31 +63,22 @@ export const useLocationStore = create<LocationStore>()(
           } catch (error) {
             set({
               countriesLoading: false,
-              countries: [],
             });
           }
         },
 
         getCountryByCode: (code: string) => {
           const { countries } = get();
-
           return countries.find((country) => country.value.toLowerCase() === code.toLowerCase());
         },
 
         fetchRegions: async (countryCode: string) => {
           set({ regionsLoading: true });
 
-          const { currentCountry: currentCountryCode } = get();
-
-          if (currentCountryCode === countryCode) {
-            return;
-          }
-
           try {
             const regionData = getRegions(countryCode);
             set({
               regions: regionData,
-              currentCountry: countryCode,
               regionsLoading: false,
             });
           } catch (error) {
@@ -98,24 +89,18 @@ export const useLocationStore = create<LocationStore>()(
           }
         },
 
-        getRegionsByCountry: (countryCode: string) => {
-          const { regions, currentCountry: currentCountryCode } = get();
-          return currentCountryCode === countryCode ? regions : [];
-        },
-
-        getRegion: ({ country, region }: GetRegionParams) => {
-          const { regions, currentCountry: currentCountryCode } = get();
-          if (currentCountryCode !== country) return undefined;
+        getRegion: ({ region }: GetRegionParams) => {
+          const { regions } = get();
           return regions.find((item) => item.value.toLowerCase() === region.toLowerCase());
         },
       }),
       {
-        name: 'location-store',
+          name: 'location-store',
+          storage: encryptedStorage,
         partialize: (state) => ({
           countries: state.countries,
           countriesLastFetched: state.countriesLastFetched,
           regions: state.regions,
-          currentCountryCode: state.currentCountry,
         }),
       }
     ),
@@ -123,11 +108,10 @@ export const useLocationStore = create<LocationStore>()(
   )
 );
 
+export const useLocationState = () => useLocationStore((state) => state);
 export const useCountries = () => useLocationStore((state) => state.countries);
 export const useCountriesLoading = () => useLocationStore((state) => state.countriesLoading);
-
 export const useRegions = () => useLocationStore((state) => state.regions);
-export const useCurrentCountry = () => useLocationStore((state) => state.currentCountry);
 export const useRegionsLoading = () => useLocationStore((state) => state.regionsLoading);
 
 export const useFetchCountries = () => useLocationStore((state) => state.fetchCountries);

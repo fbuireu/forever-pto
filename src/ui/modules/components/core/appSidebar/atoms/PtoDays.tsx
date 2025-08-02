@@ -15,7 +15,14 @@ export const PtoDays = () => {
         <CalendarDays size={16} /> PTO Days
       </Label>
       <div className='flex items-center font-normal gap-2 justify-between'>
-        I have <Counter id='pto-days' number={ptoDays} setNumber={setPtoDays} /> days
+        <p className='font-normal text-sm'>I have</p>
+        <Counter
+          id='pto-days'
+          number={ptoDays}
+          setNumber={setPtoDays}
+          slidingNumberProps={{ className: 'font-normal text-base' }}
+        />
+        <p className='font-normal text-sm'>days</p>
       </div>
     </Field>
   );

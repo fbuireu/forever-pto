@@ -1,5 +1,5 @@
 import { AppSidebar } from '@ui/modules/components/core/appSidebar/AppSidebar';
-import { StoreInitializer } from '@ui/store/StoreInitializer';
+import { StoresInitializer } from '@ui/store/StoresInitializer';
 import { Locale } from 'next-intl';
 import { cookies } from 'next/headers';
 
@@ -22,10 +22,12 @@ const ForeverPto = async ({ params }: ForeverPtoProps) => {
         </h1>
       </div>
       <div className='flex-1 space-y-4 p-4'>
-        <StoreInitializer userCountry={userCountry} locale={locale} />
+        <StoresInitializer userCountry={userCountry} locale={locale} />
       </div>
     </AppSidebar>
   );
 };
 
 export default ForeverPto;
+
+// add safe guard to avoid manipulating the store directly and get more carry over months

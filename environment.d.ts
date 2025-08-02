@@ -8,6 +8,7 @@ declare namespace NodeJS {
     NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: string;
     NEXT_PUBLIC_EMAIL_SELF: string;
     NEXT_PUBLIC_SITE_URL: string;
+    NEXT_PUBLIC_STORAGE_KEY: string;
   }
 }
 

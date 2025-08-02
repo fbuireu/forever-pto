@@ -43,7 +43,7 @@ export const Years = () => {
                       setOpen(false);
                     }}
                   >
-                    <span>{yearOption}</span>
+                    <p>{yearOption}</p>
                     <Check className={cn('ml-auto', Number(year) === yearOption ? 'opacity-100' : 'opacity-0')} />
                   </CommandItem>
                 ))}

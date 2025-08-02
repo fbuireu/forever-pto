@@ -1,19 +1,15 @@
 'use client';
 
-import { useFetchRegions, useRegions, useRegionsLoading } from '@application/stores/location';
-import { useCountry, useRegion, useSetRegion } from '@application/stores/pto';
+import { useLocationState } from '@application/stores/location';
+import { usePtoState } from '@application/stores/pto';
 import { Combobox } from '@const/components/ui/combobox';
 import { Field, Label } from '@headlessui/react';
 import { MapPinned } from 'lucide-react';
 import { useEffect } from 'react';
 
 export const Regions = () => {
-  const country = useCountry();
-  const regions = useRegions();
-  const regionsLoading = useRegionsLoading();
-  const currentRegion = useRegion();
-  const setRegion = useSetRegion();
-  const fetchRegions = useFetchRegions();
+  const { regions, regionsLoading, fetchRegions } = useLocationState();
+  const { country, region, setRegion } = usePtoState();
 
   useEffect(() => {
     if (!country) return;
@@ -30,7 +26,7 @@ export const Regions = () => {
         className='w-full'
         id='regions'
         options={regions}
-        value={currentRegion}
+        value={region}
         onChange={setRegion}
         disabled={!country}
         placeholder={regionsLoading ? 'Loading regions...' : 'Select region...'}
