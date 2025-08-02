@@ -16,7 +16,7 @@ export const CarryOverMonths = () => {
   const setCarryOverMonths = useSetCarryOverMonths();
 
   return (
-    <Field className='space-y-2'>
+    <Field className='space-y-2 w-full'>
       <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='carry-over-months'>
         <SlidersHorizontal size={16} /> Carry Over Months
         <TooltipProvider delayDuration={200}>
@@ -30,7 +30,7 @@ export const CarryOverMonths = () => {
           </Tooltip>
         </TooltipProvider>
       </Label>
-      <div className='flex gap-2 relative'>
+      <div className='flex gap-2 relative w-full'>
         <p className='font-normal text-sm'>{MIN_VALUE}</p>
         <Slider
           id='carry-over-months'

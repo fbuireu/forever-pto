@@ -10,7 +10,7 @@ export const AllowPastDays = () => {
   const allowPastDays = useAllowPastDays();
   const setAllowPastDays = useSetAllowPastDays();
   return (
-    <Field className='space-y-2'>
+    <Field className='space-y-2 w-full'>
       <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='allow-past-days'>
         <Undo2 size={16} /> Allow Past Days
         <TooltipProvider delayDuration={200}>
@@ -25,7 +25,7 @@ export const AllowPastDays = () => {
           </Tooltip>
         </TooltipProvider>
       </Label>
-      <div className='flex gap-2'>
+      <div className='flex gap-2 w-full'>
         <Switch
           checked={allowPastDays}
           id='allow-past-days'

@@ -10,11 +10,11 @@ export const PtoDays = () => {
   const ptoDays = usePtoDays();
 
   return (
-    <Field className='space-y-2'>
+    <Field className='space-y-2 w-full'>
       <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='pto-days'>
         <CalendarDays size={16} /> PTO Days
       </Label>
-      <div className='flex items-center font-normal'>
+      <div className='flex items-center font-normal gap-2 justify-between'>
         I have <Counter id='pto-days' number={ptoDays} setNumber={setPtoDays} /> days
       </div>
     </Field>

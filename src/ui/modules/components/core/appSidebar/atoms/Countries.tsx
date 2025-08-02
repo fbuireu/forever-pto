@@ -13,11 +13,12 @@ export const Countries = () => {
   const setCountry = useSetCountry();
 
   return (
-    <Field className='space-y-2'>
+    <Field className='space-y-2 w-full'>
       <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='countries'>
         <MapPin size={16} /> Country
       </Label>
       <Combobox
+        className='w-full'
         id='countries'
         options={countries}
         value={currentCountry}

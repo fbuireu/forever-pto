@@ -22,11 +22,12 @@ export const Regions = () => {
   }, [country, fetchRegions]);
 
   return (
-    <Field className='space-y-2'>
+    <Field className='space-y-2 w-full'>
       <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='regions'>
         <MapPinned size={16} /> Region
       </Label>
       <Combobox
+        className='w-full'
         id='regions'
         options={regions}
         value={currentRegion}

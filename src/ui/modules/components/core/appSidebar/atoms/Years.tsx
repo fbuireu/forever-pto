@@ -19,13 +19,13 @@ export const Years = () => {
   const years = Array.from({ length: MAX_YEARS }, (_, index) => new Date().getFullYear() - MAX_YEARS / 2 + index);
 
   return (
-    <Field className='space-y-2'>
+    <Field className='space-y-2 w-full'>
       <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='years'>
         <Calendar size={16} /> Year
       </Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant='outline' role='combobox' aria-expanded={open} className={cn('w-[200px] justify-between')}>
+          <Button variant='outline' role='combobox' aria-expanded={open} className={cn('w-full justify-between')}>
             {year}
             <ChevronsUpDown className='opacity-50' />
           </Button>
