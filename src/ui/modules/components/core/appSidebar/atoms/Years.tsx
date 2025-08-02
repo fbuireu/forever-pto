@@ -5,7 +5,7 @@ import { Button } from '@const/components/ui/button';
 import { Command, CommandGroup, CommandItem, CommandList } from '@const/components/ui/command';
 import { cn } from '@const/lib/utils';
 import { Field, Label } from '@headlessui/react';
-import { Calendar, Check, ChevronsUpDown } from 'lucide-react';
+import { Calendar, Check, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
 
@@ -27,7 +27,7 @@ export const Years = () => {
         <PopoverTrigger asChild>
           <Button variant='outline' role='combobox' aria-expanded={open} className={cn('w-full justify-between')}>
             {year}
-            <ChevronsUpDown className='opacity-50' />
+            <ChevronDown className={cn('opacity-50 transition-transform duration-200', open && 'rotate-180')} />
           </Button>
         </PopoverTrigger>
         <PopoverContent className='w-[200px] p-0'>
@@ -43,7 +43,7 @@ export const Years = () => {
                       setOpen(false);
                     }}
                   >
-                    <p>{yearOption}</p>
+                    <p className='font-normal text-sm'>{yearOption}</p>
                     <Check className={cn('ml-auto', Number(year) === yearOption ? 'opacity-100' : 'opacity-0')} />
                   </CommandItem>
                 ))}

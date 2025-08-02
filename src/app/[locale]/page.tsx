@@ -29,5 +29,3 @@ const ForeverPto = async ({ params }: ForeverPtoProps) => {
 };
 
 export default ForeverPto;
-
-// add safe guard to avoid manipulating the store directly and get more carry over months

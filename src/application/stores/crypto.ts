@@ -1,8 +1,14 @@
 import { createJSONStorage } from 'zustand/middleware';
 
-const SECRET_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY ?? '';
+const SECRET_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'your-fallback-secret-key';
+const isDev = process.env.NODE_ENV === 'development';
 
-function encrypt(text: string, key: string): string {
+interface CryptoParams {
+    text: string;
+    key: string;
+}
+
+function encrypt({text, key}: CryptoParams): string {
   return btoa(
     text
       .split('')
@@ -11,9 +17,9 @@ function encrypt(text: string, key: string): string {
   );
 }
 
-function decrypt(encryptedText: string, key: string): string {
+function decrypt({ text, key }: CryptoParams): string {
   try {
-    const decoded = atob(encryptedText);
+    const decoded = atob(text);
     return decoded
       .split('')
       .map((char, i) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length)))
@@ -24,19 +30,29 @@ function decrypt(encryptedText: string, key: string): string {
   }
 }
 
-export const encryptedStorage = createJSONStorage(() => ({
-  getItem: (key: string): string | null => {
-    const encryptedValue = localStorage.getItem(key);
-    if (!encryptedValue) return null;
+export const encryptedStorage = createJSONStorage(() => {
+  if (isDev) {
+    return {
+      getItem: (key: string): string | null => localStorage.getItem(key),
+      setItem: (key: string, value: string): void => localStorage.setItem(key, value),
+      removeItem: (key: string): void => localStorage.removeItem(key),
+    };
+  }
 
-    const decrypted = decrypt(encryptedValue, SECRET_KEY);
-    return decrypted || null;
-  },
+  return {
+    getItem: (key: string): string | null => {
+      const encryptedValue = localStorage.getItem(key);
+      if (!encryptedValue) return null;
 
-  setItem: (key: string, value: string): void => {
-    const encrypted = encrypt(value, SECRET_KEY);
-    localStorage.setItem(key, encrypted);
-  },
+      const decrypted = decrypt({text: encryptedValue, key: SECRET_KEY});
+      return decrypted || null;
+    },
 
-  removeItem: (key: string): void => localStorage.removeItem(key),
-}));
+    setItem: (key: string, value: string): void => {
+      const encrypted = encrypt({text: value, key: SECRET_KEY});
+      localStorage.setItem(key, encrypted);
+    },
+
+    removeItem: (key: string): void => localStorage.removeItem(key)
+  };
+});
