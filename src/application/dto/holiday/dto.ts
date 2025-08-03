@@ -1,23 +1,22 @@
 import { BaseDTO } from '@application/shared/dto/baseDTO';
-import { addMonths, compareAsc, endOfMonth, isWithinInterval, startOfYear } from 'date-fns';
+import { compareAsc, endOfYear, isWithinInterval, startOfYear } from 'date-fns';
 import { HolidayDTO, RawHoliday } from './types';
 import { getRegionName } from './utils/getRegionName';
 
-type HolidayDTOConfiguration = {
+type HolidayDTOParams = {
   year: number;
-  carryOverMonths: number;
 };
 
-export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOConfiguration> = {
-  create: ({ raw, configuration }) => {
-    if (!configuration) {
+export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> = {
+  create: ({ raw, params }) => {
+    if (!params) {
       throw new Error('Configuration is required for holiday DTO');
     }
-    const { year, carryOverMonths } = configuration;
+    const { year } = params;
     const processedDates = new Set<string>();
 
     const yearStart = startOfYear(new Date(year, 0, 1));
-    const carryOverEnd = endOfMonth(addMonths(new Date(year + 1, 0, 1), carryOverMonths - 1));
+    const nextYearEnd = endOfYear(new Date(year + 1, 0, 1));
 
     return raw
       .toSorted((a, _) => (a.location ? 1 : -1))
@@ -26,7 +25,7 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOConfigura
 
         return isWithinInterval(holidayDate, {
           start: yearStart,
-          end: carryOverEnd,
+          end: nextYearEnd,
         });
       })
       .filter((holiday) => {

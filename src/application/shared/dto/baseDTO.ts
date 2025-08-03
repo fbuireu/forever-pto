@@ -1,3 +1,3 @@
-export type BaseDTO<INPUT, OUTPUT, CONFIGURATION = unknown> = {
-	create: (params: { raw: INPUT; configuration?: CONFIGURATION }) => OUTPUT;
+export type BaseDTO<INPUT, OUTPUT, PARAMS = unknown> = {
+  create: (params: { raw: INPUT; params?: PARAMS }) => OUTPUT;
 };

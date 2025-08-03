@@ -39,7 +39,7 @@ export async function getHolidays({
     return holidayDTO
       .create({
         raw: [...nationalHolidays, ...regionalHolidays],
-        configuration: { carryOverMonths, year: Number(year) },
+        params: { year: Number(year) },
       })
       .sort((a, b) => a.date.getTime() - b.date.getTime());
   } catch (_) {
