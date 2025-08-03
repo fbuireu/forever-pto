@@ -1,15 +1,26 @@
 'use client';
 
-import { usePtoState } from '@application/stores/pto';
 import { useLocationState } from '@application/stores/location';
+import { usePtoState } from '@application/stores/pto';
 import { Combobox } from '@const/components/ui/combobox';
 import { Field, Label } from '@headlessui/react';
 import { MapPin } from 'lucide-react';
+import type { Locale } from 'next-intl';
+import { useEffect } from 'react';
 
-export const Countries = () => {
-    const { country, setCountry } = usePtoState();
-    const { countries, countriesLoading } = useLocationState();
-    
+interface CountriesProps {
+  locale: Locale;
+}
+
+export const Countries = ({ locale }: CountriesProps) => {
+  const { country, setCountry } = usePtoState();
+  const { countries, countriesLoading } = useLocationState();
+  const { fetchCountries } = useLocationState();
+
+  useEffect(() => {
+    if (!locale) return;
+    fetchCountries(locale);
+  }, [fetchCountries, locale]);
 
   return (
     <Field className='space-y-2 w-full'>

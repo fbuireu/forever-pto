@@ -13,9 +13,7 @@ interface StoreInitializerProps {
 
 export const StoresInitializer = ({ userCountry, locale }: StoreInitializerProps) => {
   const [ptoStoreHydrated, setPtoStoreHydrated] = useState(false);
-  const { country, region, year, carryOverMonths, updateStore } = usePtoState();
-  const { fetchCountries } = useLocationState();
-  const fetchHolidays = useFetchHolidays();
+  const { country, updateStore } = usePtoState();
 
   useEffect(() => {
     const unsubscribeStart = usePtoStore.persist.onHydrate(() => setPtoStoreHydrated(false));
@@ -37,15 +35,6 @@ export const StoresInitializer = ({ userCountry, locale }: StoreInitializerProps
     updateStore({ country: userCountry });
   }, [ptoStoreHydrated, country, userCountry, updateStore]);
 
-  useEffect(() => {
-    if (!locale) return;
-    fetchCountries(locale);
-  }, [fetchCountries, locale]);
-
-  useEffect(() => {
-    if (!ptoStoreHydrated || !country) return;
-    fetchHolidays({ year, region, country, locale, carryOverMonths });
-  }, [ptoStoreHydrated, fetchHolidays, year, region, country, carryOverMonths, locale]);
 
   return null;
 };

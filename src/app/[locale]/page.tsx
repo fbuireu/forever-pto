@@ -16,7 +16,7 @@ const ForeverPto = async ({ params }: ForeverPtoProps) => {
   const userCountry = cookieStore.get('user-country')?.value;
 
   return (
-    <AppSidebar>
+    <AppSidebar locale={locale}>
       <StoresInitializer userCountry={userCountry} locale={locale} />
       <CalendarList />
     </AppSidebar>

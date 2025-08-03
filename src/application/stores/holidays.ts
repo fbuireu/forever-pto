@@ -20,7 +20,7 @@ interface GenerateSuggestionsParams {
   year: number;
 }
 
-interface FetchHolidaysParams extends Omit<PtoState, 'ptoDays' | 'allowPastDays'> {
+interface FetchHolidaysParams extends Omit<PtoState, 'ptoDays' | 'allowPastDays' | 'carryOverMonths'> {
   locale: Locale;
 }
 

@@ -1,12 +1,12 @@
 'use client';
 
 import { getLocalizedDateFns } from '@application/i18n/localize';
-import { useHolidaysStore } from '@application/stores/holidays';
+import { useFetchHolidays, useHolidaysStore } from '@application/stores/holidays';
 import { usePtoStore } from '@application/stores/pto';
 import { Calendar } from '@const/components/ui/calendar';
 import { addMonths, format, isWeekend, startOfMonth } from 'date-fns';
 import { useLocale } from 'next-intl';
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo } from 'react';
 import { isHoliday, isPastDay } from './utils/modifiers';
 
 const MemoizedCalendar = memo(Calendar);
@@ -23,8 +23,14 @@ const HOLIDAY_CLASSES =
 
 export const CalendarList = () => {
   const locale = useLocale();
-  const { carryOverMonths, year, allowPastDays } = usePtoStore();
+  const fetchHolidays = useFetchHolidays();
+  const { carryOverMonths, year, allowPastDays, country, region } = usePtoStore();
   const { holidays } = useHolidaysStore();
+
+  useEffect(() => {
+    if (!country) return;
+    fetchHolidays({ year, region, country, locale });
+  }, [fetchHolidays, year, region, country, locale]);
 
   const months = useMemo(() => {
     const totalMonths = 12 + carryOverMonths;

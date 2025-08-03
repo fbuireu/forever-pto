@@ -1,4 +1,5 @@
 import { ChevronRight, Settings } from 'lucide-react';
+import type { Locale } from 'next-intl';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import {
   Sidebar,
@@ -18,17 +19,18 @@ import {
   SidebarTrigger,
 } from 'src/components/animate-ui/radix/sidebar';
 import { AllowPastDays } from './atoms/AllowPastDays';
+import { CarryOverMonths } from './atoms/CarryOverMonths';
 import { Countries } from './atoms/Countries';
 import { PtoDays } from './atoms/PtoDays';
 import { Regions } from './atoms/Regions';
 import { Years } from './atoms/Years';
-import { CarryOverMonths } from './atoms/CarryOverMonths';
 
 interface AppSidebarProps {
   children: React.ReactNode;
+  locale: Locale;
 }
 
-export const AppSidebar = ({ children }: AppSidebarProps) => {
+export const AppSidebar = ({ locale, children }: AppSidebarProps) => {
   return (
     <SidebarProvider>
       <Sidebar collapsible='icon' variant='sidebar'>
@@ -58,7 +60,7 @@ export const AppSidebar = ({ children }: AppSidebarProps) => {
                       <SidebarMenuSubItem />
                     </SidebarMenuSub>
                     <SidebarMenuSub>
-                      <Countries />
+                      <Countries locale={locale} />
                       <SidebarMenuSubItem />
                     </SidebarMenuSub>
                     <SidebarMenuSub>

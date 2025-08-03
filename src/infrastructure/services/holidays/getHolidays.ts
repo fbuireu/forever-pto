@@ -9,16 +9,9 @@ interface GetHolidaysParams {
   country?: string;
   region?: string;
   locale: Locale;
-  carryOverMonths: number;
 }
 
-export async function getHolidays({
-  year,
-  country,
-  region,
-  locale,
-  carryOverMonths,
-}: GetHolidaysParams): Promise<HolidayDTO[]> {
+export async function getHolidays({ year, country, region, locale }: GetHolidaysParams): Promise<HolidayDTO[]> {
   if (!country) {
     return [];
   }
@@ -31,7 +24,6 @@ export async function getHolidays({
       country,
       configuration,
       year: Number(year),
-      carryOverMonths,
     };
     const nationalHolidays = getNationalHolidays(params);
     const regionalHolidays = getRegionalHolidays({ ...params, region });
