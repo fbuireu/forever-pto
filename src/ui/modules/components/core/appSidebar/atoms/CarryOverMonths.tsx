@@ -54,7 +54,7 @@ export const CarryOverMonths = () => {
         <p className='font-normal text-sm'>{MIN_VALUE}</p>
         <Slider
           id='carry-over-months'
-          value={[localValue]} // UI usa valor local
+          value={[localValue]} 
           max={MAX_VALUE}
           min={MIN_VALUE}
           step={1}
@@ -62,7 +62,7 @@ export const CarryOverMonths = () => {
         />
         <SlidingNumber
           className='absolute -bottom-4 left-0 right-0 mx-auto justify-center'
-          number={localValue} // UI usa valor local
+          number={localValue} 
           padStart
         />
         <p className='font-normal text-sm'>{MAX_VALUE}</p>

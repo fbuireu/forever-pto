@@ -26,7 +26,7 @@ interface FetchHolidaysParams extends Omit<PtoState, 'ptoDays' | 'allowPastDays'
 
 interface HolidaysActions {
   fetchHolidays: (params: FetchHolidaysParams) => Promise<void>;
-  generateSuggestions: (params: GenerateSuggestionsParams) => Promise<void>; // ← Arreglado: removido ptoDays
+  generateSuggestions: (params: GenerateSuggestionsParams) => Promise<void>;
   fetchAlternativeDays: (country: string, year: number) => Promise<void>;
   getHolidaysByMonth: (month: number) => HolidayDTO[];
   clearSuggestions: () => void;

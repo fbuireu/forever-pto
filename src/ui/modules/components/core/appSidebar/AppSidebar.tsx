@@ -1,5 +1,6 @@
 import { ChevronRight, Settings } from 'lucide-react';
 import type { Locale } from 'next-intl';
+import { Suspense } from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import {
   Sidebar,
@@ -60,7 +61,9 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => {
                       <SidebarMenuSubItem />
                     </SidebarMenuSub>
                     <SidebarMenuSub>
-                      <Countries locale={locale} />
+                      <Suspense fallback={'Loading...'}>
+                        <Countries locale={locale} />
+                      </Suspense>
                       <SidebarMenuSubItem />
                     </SidebarMenuSub>
                     <SidebarMenuSub>

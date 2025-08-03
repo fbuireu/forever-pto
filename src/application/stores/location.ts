@@ -22,6 +22,7 @@ interface GetRegionParams {
 
 interface LocationActions {
   fetchCountries: (locale: Locale) => Promise<void>;
+  setCountries: (countries: CountryDTO[]) => void; 
   getCountryByCode: (code: string) => CountryDTO | undefined;
   fetchRegions: (countryCode: string) => Promise<void>;
   getRegion: ({ region }: GetRegionParams) => RegionDTO | undefined;
@@ -67,6 +68,14 @@ export const useLocationStore = create<LocationStore>()(
           }
         },
 
+        setCountries: (countries: CountryDTO[]) => {
+          set({
+            countries,
+            countriesLastFetched: Date.now(),
+            countriesLoading: false,
+          });
+        },
+
         getCountryByCode: (code: string) => {
           const { countries } = get();
           return countries.find((country) => country.value.toLowerCase() === code.toLowerCase());
@@ -95,8 +104,8 @@ export const useLocationStore = create<LocationStore>()(
         },
       }),
       {
-          name: 'location-store',
-          storage: encryptedStorage,
+        name: 'location-store',
+        storage: encryptedStorage,
         partialize: (state) => ({
           countries: state.countries,
           countriesLastFetched: state.countriesLastFetched,
@@ -115,6 +124,7 @@ export const useRegions = () => useLocationStore((state) => state.regions);
 export const useRegionsLoading = () => useLocationStore((state) => state.regionsLoading);
 
 export const useFetchCountries = () => useLocationStore((state) => state.fetchCountries);
+export const useSetCountries = () => useLocationStore((state) => state.setCountries);
 export const useFetchRegions = () => useLocationStore((state) => state.fetchRegions);
 export const useGetCountryByCode = () => useLocationStore((state) => state.getCountryByCode);
 export const useGetRegion = () => useLocationStore((state) => state.getRegion);
