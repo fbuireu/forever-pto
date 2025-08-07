@@ -20,7 +20,7 @@ export const PtoDays = () => {
           id='pto-days'
           number={ptoDays}
           setNumber={setPtoDays}
-          slidingNumberProps={{ className: 'font-normal text-base' }}
+          slidingNumberProps={{ className: 'font-normal text-sm' }}
         />
         <p className='font-normal text-sm'>days</p>
       </div>

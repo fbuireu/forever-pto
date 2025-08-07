@@ -1,88 +1,74 @@
 'use client';
 
 import { getLocalizedDateFns } from '@application/i18n/localize';
-import { useFetchHolidays, useHolidaysStore } from '@application/stores/holidays';
+import { useHolidaysStore } from '@application/stores/holidays';
 import { usePtoStore } from '@application/stores/pto';
-import { Calendar } from '@const/components/ui/calendar';
-import { addMonths, format, isWeekend, startOfMonth } from 'date-fns';
+import { format, isWeekend } from 'date-fns';
 import { useLocale } from 'next-intl';
-import { memo, useEffect, useMemo } from 'react';
-import { isHoliday, isPastDay } from './utils/modifiers';
+import { useEffect, useMemo } from 'react';
+import { Calendar } from '../core/Calendar';
+import { getTotalMonths } from '../utils/helpers';
+import { isHoliday, isPastDay, isToday as isTodayModifier } from '../utils/modifiers';
 
-const MemoizedCalendar = memo(Calendar);
-
-const CALENDAR_COMPONENTS = {
-  Chevron: () => <></>,
-  Dropdown: () => <></>,
-};
-
-const WEEKEND_CLASSES =
-  'text-muted-foreground bg-muted rounded-md enabled:hover:text-accent-foreground enabled:hover:bg-accent/50 transition-colors';
-const HOLIDAY_CLASSES =
-  'bg-yellow-300 text-yellow-800 enabled:hover:bg-yellow-400 font-semibold rounded-md transition-colors';
+const MODIFIERS_CLASS_NAMES = {
+      weekend: 'text-muted-foreground bg-muted/50 hover:bg-muted transition-colors',
+      holiday:
+        'bg-gradient-to-br from-yellow-300 to-yellow-400 text-yellow-900 hover:from-yellow-400 hover:to-yellow-500 font-semibold shadow-sm transition-all duration-200',
+      today: 'bg-accent text-accent-foreground font-medium ring-1 ring-ring',
+    }
 
 export const CalendarList = () => {
   const locale = useLocale();
-  const fetchHolidays = useFetchHolidays();
   const { carryOverMonths, year, allowPastDays, country, region } = usePtoStore();
-  const { holidays } = useHolidaysStore();
+  const { holidays, fetchHolidays } = useHolidaysStore();
 
   useEffect(() => {
     if (!country) return;
     fetchHolidays({ year, region, country, locale });
   }, [fetchHolidays, year, region, country, locale]);
 
-  const months = useMemo(() => {
-    const totalMonths = 12 + carryOverMonths;
-    const start = startOfMonth(new Date(Number(year), 0, 1));
+  const months = useMemo(() => getTotalMonths({ carryOverMonths, year }), [carryOverMonths, year]);
 
-    return Array.from({ length: totalMonths }, (_, i) => addMonths(start, i));
-  }, [carryOverMonths, year]);
+  const holidayModifier = useMemo(() => {
+    const holidayFn = isHoliday(holidays);
+    return (date: Date) => holidayFn(date);
+  }, [holidays]);
 
-  const localizedDateFns = useMemo(() => getLocalizedDateFns(locale), [locale]);
-
-  const holidayModifier = useMemo(() => isHoliday(holidays), [holidays]);
-  const pastDayModifier = useMemo(() => isPastDay(allowPastDays), [allowPastDays]);
+  const pastDayModifier = useMemo(() => {
+    const pastFn = isPastDay(allowPastDays);
+    return (date: Date) => pastFn(date);
+  }, [allowPastDays]);
 
   const modifiers = useMemo(
     () => ({
       weekend: isWeekend,
       holiday: holidayModifier,
+      today: isTodayModifier,
     }),
-    [holidayModifier, pastDayModifier]
+    [holidayModifier]
   );
 
-  const modifiersClassNames = useMemo(
-    () => ({
-      weekend: WEEKEND_CLASSES,
-      holiday: HOLIDAY_CLASSES,
-    }),
-    []
-  );
+  const modifiersClassNames = useMemo(() => MODIFIERS_CLASS_NAMES, []);
 
   return (
     <section className='flex w-full flex-col items-center gap-8'>
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-7'>
-        {months.map((month, index) => {
-          const key = `${format(month, 'yyyy-MM')}-${index}`;
-
-          return (
-            <MemoizedCalendar
-              key={key}
-              mode='multiple'
-              className='rounded-md'
-              defaultMonth={month}
-              month={month}
-              weekStartsOn={1}
-              fixedWeeks
-              locale={localizedDateFns}
-              modifiers={modifiers}
-              disabled={pastDayModifier}
-              modifiersClassNames={modifiersClassNames}
-              components={CALENDAR_COMPONENTS}
-            />
-          );
-        })}
+        {months.map((month) => (
+          <Calendar
+            key={format(month, 'yyyy-MM')}
+            mode='multiple'
+            className='rounded-lg border shadow-sm bg-card'
+            month={month}
+            weekStartsOn={1}
+            locale={getLocalizedDateFns(locale)}
+            modifiers={modifiers}
+            disabled={pastDayModifier}
+            modifiersClassNames={modifiersClassNames}
+            holidays={holidays}
+            showOutsideDays
+            fixedWeeks
+          />
+        ))}
       </div>
     </section>
   );

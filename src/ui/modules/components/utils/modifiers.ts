@@ -15,3 +15,6 @@ export const isPastDay = (allowPastDays: boolean) => {
   const today = startOfToday();
   return (date: Date) => isBefore(date, today);
 };
+
+// Fixes: https://github.com/date-fns/date-fns/issues/583
+export const isToday = (date: Date) => isSameDay(date, new Date());

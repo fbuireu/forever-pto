@@ -1,4 +1,5 @@
-import { ca, enUS, es, it, type Locale } from 'date-fns/locale';
+import { ca, enUS, es, it } from 'date-fns/locale';
+import { Locale } from 'next-intl';
 
 export type LocaleKey = keyof typeof DATE_FNS_LOCALES;
 
@@ -10,5 +11,5 @@ export const DATE_FNS_LOCALES = {
 } as const;
 
 export function getLocalizedDateFns(locale: LocaleKey = 'en'): Locale {
-  return DATE_FNS_LOCALES[locale];
+  return DATE_FNS_LOCALES[locale] as unknown as Locale;
 }
