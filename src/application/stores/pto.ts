@@ -65,18 +65,3 @@ export const usePtoStore = create<PtoStore>()(
 );
 
 export const usePtoState = () => usePtoStore((state) => state);
-export const usePtoDays = () => usePtoStore((state) => state.ptoDays);
-export const useAllowPastDays = () => usePtoStore((state) => state.allowPastDays);
-export const useCountry = () => usePtoStore((state) => state.country);
-export const useRegion = () => usePtoStore((state) => state.region);
-export const useYear = () => usePtoStore((state) => state.year);
-export const useCarryOverMonths = () => usePtoStore((state) => state.carryOverMonths);
-
-export const useSetPtoDays = () => usePtoStore((state) => state.setPtoDays);
-export const useSetAllowPastDays = () => usePtoStore((state) => state.setAllowPastDays);
-export const useSetCountry = () => usePtoStore((state) => state.setCountry);
-export const useSetRegion = () => usePtoStore((state) => state.setRegion);
-export const useSetYear = () => usePtoStore((state) => state.setYear);
-export const useSetCarryOverMonths = () => usePtoStore((state) => state.setCarryOverMonths);
-export const useResetToDefaults = () => usePtoStore((state) => state.resetToDefaults);
-export const useUpdateStore = () => usePtoStore((state) => state.updateStore);

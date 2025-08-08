@@ -1,13 +1,12 @@
 'use client';
 
-import { usePtoDays, useSetPtoDays } from '@application/stores/pto';
+import { usePtoState } from '@application/stores/pto';
 import { Field, Label } from '@headlessui/react';
 import { CalendarDays } from 'lucide-react';
 import { Counter } from 'src/components/animate-ui/components/counter';
 
 export const PtoDays = () => {
-  const setPtoDays = useSetPtoDays();
-  const ptoDays = usePtoDays();
+  const { setPtoDays, ptoDays } = usePtoState();
 
   return (
     <Field className='space-y-2 w-full'>

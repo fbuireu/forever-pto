@@ -1,6 +1,6 @@
 'use client';
 
-import { useSetYear, useYear } from '@application/stores/pto';
+import { usePtoState } from '@application/stores/pto';
 import { Button } from '@const/components/ui/button';
 import { Command, CommandGroup, CommandItem, CommandList } from '@const/components/ui/command';
 import { cn } from '@const/lib/utils';
@@ -13,9 +13,8 @@ const MAX_YEARS = 10;
 
 export const Years = () => {
   const [open, setOpen] = useState(false);
+  const { year, setYear } = usePtoState();
 
-  const year = useYear();
-  const setYear = useSetYear();
   const years = Array.from({ length: MAX_YEARS }, (_, index) => new Date().getFullYear() - MAX_YEARS / 2 + index);
 
   return (

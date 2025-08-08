@@ -118,13 +118,3 @@ export const useLocationStore = create<LocationStore>()(
 );
 
 export const useLocationState = () => useLocationStore((state) => state);
-export const useCountries = () => useLocationStore((state) => state.countries);
-export const useCountriesLoading = () => useLocationStore((state) => state.countriesLoading);
-export const useRegions = () => useLocationStore((state) => state.regions);
-export const useRegionsLoading = () => useLocationStore((state) => state.regionsLoading);
-
-export const useFetchCountries = () => useLocationStore((state) => state.fetchCountries);
-export const useSetCountries = () => useLocationStore((state) => state.setCountries);
-export const useFetchRegions = () => useLocationStore((state) => state.fetchRegions);
-export const useGetCountryByCode = () => useLocationStore((state) => state.getCountryByCode);
-export const useGetRegion = () => useLocationStore((state) => state.getRegion);

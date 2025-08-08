@@ -148,17 +148,3 @@ export const useHolidaysStore = create<HolidaysStore>()(
 );
 
 export const useHolidaysState = () => useHolidaysStore((state) => state);
-export const useHolidays = () => useHolidaysStore((state) => state.holidays);
-export const useHolidaysLoading = () => useHolidaysStore((state) => state.holidaysLoading);
-export const useSuggestions = () => useHolidaysStore((state) => state.suggestions);
-export const useSuggestionsLoading = () => useHolidaysStore((state) => state.suggestionsLoading);
-export const useAlternativeDays = () => useHolidaysStore((state) => state.alternativeDays);
-export const useAlternativeDaysLoading = () => useHolidaysStore((state) => state.alternativeDaysLoading);
-
-export const useFetchHolidays = () => useHolidaysStore((state) => state.fetchHolidays);
-export const useGenerateSuggestions = () => useHolidaysStore((state) => state.generateSuggestions);
-export const useFetchAlternativeDays = () => useHolidaysStore((state) => state.fetchAlternativeDays);
-export const useGetHolidaysByMonth = () => useHolidaysStore((state) => state.getHolidaysByMonth);
-export const useClearSuggestions = () => useHolidaysStore((state) => state.clearSuggestions);
-export const useAddAlternativeDay = () => useHolidaysStore((state) => state.addAlternativeDay);
-export const useRemoveAlternativeDay = () => useHolidaysStore((state) => state.removeAlternativeDay);
