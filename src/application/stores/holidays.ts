@@ -1,14 +1,14 @@
-// stores/holidays.ts
-import { HolidayDTO } from '@application/dto/holiday/types';
+import type { HolidayDTO } from '@application/dto/holiday/types';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
+import { isSameDay } from 'date-fns';
 import { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
 import { PtoState } from './pto';
-import { generateOptimalSuggestions, SuggestionBlock } from './utils/generators';
-import { ensureDate } from './utils/helpers';
-import { isSameDay } from 'date-fns';
+import { SuggestionBlock } from '@infrastructure/services/calendar/suggestions/types';
+import { ensureDate } from '@shared/utils/dates';
+import { generateSuggestions } from '@infrastructure/services/calendar/suggestions/generateSuggestions';
 
 export interface HolidaysState {
   holidays: HolidayDTO[];
@@ -62,7 +62,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
           set({ holidaysLoading: true });
           try {
             const holidays = await getHolidays(params);
-            // Asegurar que las fechas de holidays sean objetos Date
             const holidaysWithDates = holidays.map((h) => ({
               ...h,
               date: ensureDate(h.date),
@@ -93,13 +92,12 @@ export const useHolidaysStore = create<HolidaysStore>()(
           set({ suggestionsLoading: true });
 
           try {
-            // Asegurar que holidays tengan fechas válidas
             const holidaysWithDates = holidays.map((h) => ({
               ...h,
               date: ensureDate(h.date),
             }));
 
-            const { blocks, alternatives } = generateOptimalSuggestions({
+            const { blocks, alternatives } = generateSuggestions({
               year,
               ptoDays,
               holidays: holidaysWithDates,
@@ -193,7 +191,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
             );
           }
 
-          // Verificar si la fecha está en las alternativas de un bloque específico
           const alternatives = alternativeBlocks[blockId] || [];
           return alternatives.some((block) =>
             block.days.some((day) => {
@@ -211,15 +208,13 @@ export const useHolidaysStore = create<HolidaysStore>()(
           suggestedBlocks: state.suggestedBlocks,
           alternativeBlocks: state.alternativeBlocks,
         }),
-        // Opcional: Añadir onRehydrateStorage para manejar la rehidratación
         onRehydrateStorage: () => (state) => {
           if (state) {
-            // Convertir strings a Dates cuando se rehidrata el store
             if (state.holidays) {
               state.holidays = state.holidays.map((h) => ({
                 ...h,
                 date: ensureDate(h.date),
-              })); 
+              }));
             }
 
             if (state.suggestedBlocks) {
