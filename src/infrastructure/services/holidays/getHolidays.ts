@@ -1,6 +1,6 @@
 import { holidayDTO } from '@application/dto/holiday/dto';
-import { HolidayDTO } from '@application/dto/holiday/types';
-import { Locale } from 'next-intl';
+import type { HolidayDTO } from '@application/dto/holiday/types';
+import type { Locale } from 'next-intl';
 import { getNationalHolidays } from './utils/getNationalHolidays';
 import { getRegionalHolidays } from './utils/getRegionalHolidays';
 

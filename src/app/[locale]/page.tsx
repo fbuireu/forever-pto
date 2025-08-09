@@ -1,7 +1,7 @@
 import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { CalendarList } from '@ui/modules/components/home/CalendarList';
 import { StoresInitializer } from '@ui/store/StoresInitializer';
-import { Locale } from 'next-intl';
+import type { Locale } from 'next-intl';
 import { cookies } from 'next/headers';
 
 export const runtime = 'edge';

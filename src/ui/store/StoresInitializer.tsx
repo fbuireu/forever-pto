@@ -1,10 +1,9 @@
 'use client';
 
-import { useFetchHolidays } from '@application/stores/holidays';
-import { useLocationState } from '@application/stores/location';
-import { usePtoState, usePtoStore } from '@application/stores/pto';
-import { Locale } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { usePtoStore } from '@application/stores/pto';
+import { useStoresReady } from '@ui/hooks/useStoresReady';
+import type { Locale } from 'next-intl';
+import { useEffect } from 'react';
 
 interface StoreInitializerProps {
   userCountry?: string;
@@ -12,29 +11,16 @@ interface StoreInitializerProps {
 }
 
 export const StoresInitializer = ({ userCountry, locale }: StoreInitializerProps) => {
-  const [ptoStoreHydrated, setPtoStoreHydrated] = useState(false);
-  const { country, updateStore } = usePtoState();
+  const {isReady} = useStoresReady();
+  const { country, setCountry } = usePtoStore();
 
   useEffect(() => {
-    const unsubscribeStart = usePtoStore.persist.onHydrate(() => setPtoStoreHydrated(false));
-    const unsubscribeEnd = usePtoStore.persist.onFinishHydration(() => setPtoStoreHydrated(true));
+    if (!isReady || !userCountry) return;
 
-    if (usePtoStore.persist.hasHydrated()) {
-      setPtoStoreHydrated(true);
+    if (!country) {
+      setCountry(userCountry);
     }
-
-    return () => {
-      unsubscribeStart();
-      unsubscribeEnd();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!ptoStoreHydrated || !userCountry || country) return;
-
-    updateStore({ country: userCountry });
-  }, [ptoStoreHydrated, country, userCountry, updateStore]);
-
+  }, [isReady, userCountry, country, setCountry]);
 
   return null;
 };

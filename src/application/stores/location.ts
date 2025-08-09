@@ -1,8 +1,8 @@
-import { CountryDTO } from '@application/dto/country/types';
-import { RegionDTO } from '@application/dto/region/types';
+import type { CountryDTO } from '@application/dto/country/types';
+import type { RegionDTO } from '@application/dto/region/types';
 import { getCountries } from '@infrastructure/services/countries/getCountries';
 import { getRegions } from '@infrastructure/services/regions/getRegions';
-import { Locale } from 'next-intl';
+import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
@@ -22,7 +22,7 @@ interface GetRegionParams {
 
 interface LocationActions {
   fetchCountries: (locale: Locale) => Promise<void>;
-  setCountries: (countries: CountryDTO[]) => void; 
+  setCountries: (countries: CountryDTO[]) => void;
   getCountryByCode: (code: string) => CountryDTO | undefined;
   fetchRegions: (countryCode: string) => Promise<void>;
   getRegion: ({ region }: GetRegionParams) => RegionDTO | undefined;

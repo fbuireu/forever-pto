@@ -1,8 +1,8 @@
-import { HolidayDTO } from '@application/dto/holiday/types';
+import type { HolidayDTO } from '@application/dto/holiday/types';
+import type { Day } from 'date-fns';
 import {
   addDays,
   addMonths,
-  Day,
   eachDayOfInterval,
   endOfMonth,
   endOfWeek,
@@ -12,7 +12,7 @@ import {
   startOfWeek,
 } from 'date-fns';
 import { type Locale as DateFnsLocale } from 'date-fns/locale';
-import { Locale } from 'next-intl';
+import type { Locale } from 'next-intl';
 
 const CALENDAR_WEEKS = 6;
 const DAYS_PER_WEEK = 7;

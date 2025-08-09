@@ -1,5 +1,5 @@
 import { ca, enUS, es, it } from 'date-fns/locale';
-import { Locale } from 'next-intl';
+import type { Locale } from 'next-intl';
 
 export type LocaleKey = keyof typeof DATE_FNS_LOCALES;
 

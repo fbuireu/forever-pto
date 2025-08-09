@@ -1,4 +1,4 @@
-import { HolidaysState } from '@application/stores/holidays';
+import type { HolidaysState } from '@application/stores/holidays';
 import { isBefore, isSameDay, startOfToday } from 'date-fns';
 
 export const isHoliday = (holidays: HolidaysState['holidays']) => {

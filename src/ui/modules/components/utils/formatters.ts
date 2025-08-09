@@ -1,5 +1,6 @@
-import { Locale as DateFnsLocale, format } from 'date-fns';
-import { Locale } from 'next-intl';
+import type { Locale as DateFnsLocale } from 'date-fns';
+import { format } from 'date-fns';
+import type { Locale } from 'next-intl';
 
 interface FormatterParams {
   date: Date;

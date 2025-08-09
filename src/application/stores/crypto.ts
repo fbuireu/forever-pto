@@ -4,11 +4,11 @@ const SECRET_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'fallback-secret-key';
 const isDev = process.env.NODE_ENV === 'development';
 
 interface CryptoParams {
-    text: string;
-    key: string;
+  text: string;
+  key: string;
 }
 
-function encrypt({text, key}: CryptoParams): string {
+function encrypt({ text, key }: CryptoParams): string {
   return btoa(
     text
       .split('')
@@ -44,16 +44,16 @@ export const encryptedStorage = createJSONStorage(() => {
       const encryptedValue = localStorage.getItem(key);
       if (!encryptedValue) return null;
 
-      const decrypted = decrypt({text: encryptedValue, key: SECRET_KEY});
+      const decrypted = decrypt({ text: encryptedValue, key: SECRET_KEY });
       return decrypted || null;
     },
 
     setItem: (key: string, value: string): void => {
-        const encrypted = encrypt({ text: value, key: SECRET_KEY });
-        
+      const encrypted = encrypt({ text: value, key: SECRET_KEY });
+
       localStorage.setItem(key, encrypted);
     },
 
-    removeItem: (key: string): void => localStorage.removeItem(key)
+    removeItem: (key: string): void => localStorage.removeItem(key),
   };
 });

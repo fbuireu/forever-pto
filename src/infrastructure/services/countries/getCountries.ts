@@ -1,7 +1,7 @@
 import { countryDTO } from '@application/dto/country/dto';
-import { CountryDTO } from '@application/dto/country/types';
+import type { CountryDTO } from '@application/dto/country/types';
 import countries from 'i18n-iso-countries';
-import { Locale } from 'next-intl';
+import type { Locale } from 'next-intl';
 
 export async function getCountries(locale: Locale): Promise<CountryDTO[]> {
   try {

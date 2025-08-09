@@ -1,8 +1,9 @@
-import { HolidayDTO } from '@application/dto/holiday/types';
+import type { HolidayDTO } from '@application/dto/holiday/types';
 import { Button } from '@const/components/ui/button';
 import { cn } from '@const/lib/utils';
-import { Day, isSameDay, isSameMonth } from 'date-fns';
-import { Locale } from 'next-intl';
+import type { Day } from 'date-fns';
+import { isSameDay, isSameMonth } from 'date-fns';
+import type { Locale } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
 import { formatDay, formatMonthYear } from '../utils/formatters';
 import { getCalendarDays, getDayLabel, getWeekdayNames } from '../utils/helpers';

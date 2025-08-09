@@ -1,6 +1,6 @@
-import { BaseDTO } from '@application/shared/dto/baseDTO';
+import type { BaseDTO } from '@application/shared/dto/baseDTO';
 import { compareAsc, endOfYear, isWithinInterval, startOfYear } from 'date-fns';
-import { HolidayDTO, RawHoliday } from './types';
+import type { HolidayDTO, RawHoliday } from './types';
 import { getRegionName } from './utils/getRegionName';
 
 type HolidayDTOParams = {

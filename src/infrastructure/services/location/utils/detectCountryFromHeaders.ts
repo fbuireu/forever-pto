@@ -8,7 +8,7 @@ export async function detectCountryFromHeaders(request: NextRequest): Promise<st
   try {
     const country = request.headers.get(CLOUDFLARE_COUNTRY_HEADER);
 
-	if (!country || country === UNIDENTIFIED_COUNTRY || country === TOR_COUNTRY) {
+    if (!country || country === UNIDENTIFIED_COUNTRY || country === TOR_COUNTRY) {
       return '';
     }
 

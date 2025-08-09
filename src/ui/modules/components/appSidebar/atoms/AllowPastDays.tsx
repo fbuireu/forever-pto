@@ -7,8 +7,8 @@ import { Switch } from 'src/components/animate-ui/headless/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 
 export const AllowPastDays = () => {
-    const { allowPastDays, setAllowPastDays } = usePtoState();
-    
+  const { allowPastDays, setAllowPastDays } = usePtoState();
+
   return (
     <Field className='space-y-2 w-full'>
       <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='allow-past-days'>

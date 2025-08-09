@@ -1,5 +1,5 @@
-import { BaseDTO } from '@application/shared/dto/baseDTO';
-import { RawRegion, RegionDTO } from './types';
+import type { BaseDTO } from '@application/shared/dto/baseDTO';
+import type { RawRegion, RegionDTO } from './types';
 
 export const regionDTO: BaseDTO<RawRegion, RegionDTO[]> = {
   create: ({ raw }) => {

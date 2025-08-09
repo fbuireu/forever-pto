@@ -1,6 +1,6 @@
 'use client';
 
-import { CountryDTO } from '@application/dto/country/types';
+import type { CountryDTO } from '@application/dto/country/types';
 import { useLocationState } from '@application/stores/location';
 import { usePtoState } from '@application/stores/pto';
 import { Combobox } from '@const/components/ui/combobox';

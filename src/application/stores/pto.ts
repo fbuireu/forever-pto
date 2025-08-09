@@ -19,7 +19,6 @@ interface PtoActions {
   setYear: (year: string) => void;
   setCarryOverMonths: (months: number) => void;
   resetToDefaults: () => void;
-  updateStore: (config: Partial<PtoState>) => void;
 }
 
 type PtoStore = PtoState & PtoActions;
@@ -45,7 +44,6 @@ export const usePtoStore = create<PtoStore>()(
         setYear: (year: string) => set({ year }, false, 'setYear'),
         setCarryOverMonths: (months: number) => set({ carryOverMonths: months }, false, 'setCarryOverMonths'),
         resetToDefaults: () => set(initialState, false, 'resetToDefaults'),
-        updateStore: (config: Partial<PtoState>) => set((state) => ({ ...state, ...config })),
       }),
       {
         name: 'pto-config-storage',
