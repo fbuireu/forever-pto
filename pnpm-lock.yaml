@@ -115,7 +115,7 @@ importers:
         version: 1.0.7(tailwindcss@4.1.11)
       zod:
         specifier: ^4.0.10
-        version: 4.0.14
+        version: 4.0.16
       zustand:
         specifier: ^5.0.6
         version: 5.0.7(@types/react@19.1.9)(react@19.1.1)
@@ -4483,8 +4483,8 @@ packages:
   zod@3.22.3:
     resolution: {integrity: sha512-EjIevzuJRiRPbVH4mGc8nApb/lVLKVpmUhAaR5R5doKGfAnGJ6Gr3CViAVjP+4FWSxCsybeWQdcgCtbX+7oZug==}
 
-  zod@4.0.14:
-    resolution: {integrity: sha512-nGFJTnJN6cM2v9kXL+SOBq3AtjQby3Mv5ySGFof5UGRHrRioSJ5iG680cYNjE/yWk671nROcpPj4hAS8nyLhSw==}
+  zod@4.0.16:
+    resolution: {integrity: sha512-Djo/cM339grjI7/HmN+ixYO2FzEMcWr/On50UlQ/RjrWK1I/hPpWhpC76heCptnRFpH0LMwrEbUY50HDc0V8wg==}
 
   zustand@5.0.7:
     resolution: {integrity: sha512-Ot6uqHDW/O2VdYsKLLU8GQu8sCOM1LcoE8RwvLv9uuRT9s6SOHCKs0ZEOhxg+I1Ld+A1Q5lwx+UlKXXUoCZITg==}
@@ -8526,7 +8526,7 @@ snapshots:
 
   zod@3.22.3: {}
 
-  zod@4.0.14: {}
+  zod@4.0.16: {}
 
   zustand@5.0.7(@types/react@19.1.9)(react@19.1.1):
     optionalDependencies:
