@@ -18,6 +18,7 @@ const ForeverPto = async ({ params }: ForeverPtoProps) => {
   return (
     <AppSidebar locale={locale}>
       <StoresInitializer userCountry={userCountry} locale={locale} />
+      {/* <HolidaysTabs /> */}
       <CalendarList />
     </AppSidebar>
   );

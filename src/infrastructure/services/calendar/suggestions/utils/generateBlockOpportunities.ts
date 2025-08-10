@@ -1,6 +1,6 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { differenceInDays } from 'date-fns';
-import type { BaseBlock } from '../types';
+import type { Block } from '../types';
 import { calculateBlockScore } from './calculateBlockScore';
 import { calculateEffectiveDays } from './calculateEffectiveDays';
 
@@ -13,7 +13,7 @@ export function generateBlockOpportunities({
   holidays: HolidayDTO[];
   maxBlockSize: number;
 }) {
-  const opportunities: BaseBlock[] = [];
+  const opportunities: Block[] = [];
 
   for (let i = 0; i < availableWorkdays.length; i++) {
     for (let size = 1; size <= maxBlockSize; size++) {

@@ -39,10 +39,6 @@ export const getDayClassNames = ({
 
   if (isSelectedAndEnabled) {
     // classes.push('bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground');
-
-    if (modifiers.today?.(date)) {
-      classes.push('ring-2 ring-ring ring-offset-2');
-    }
   }
 
   if (isDisabled) {

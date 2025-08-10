@@ -10,20 +10,29 @@ import { useEffect, useMemo } from 'react';
 import { Calendar } from '../core/Calendar';
 import { getTotalMonths } from '../utils/helpers';
 import { isHoliday, isPastDay, isToday as isTodayModifier } from '../utils/modifiers';
+import './calendar-list.scss';
 
 const MODIFIERS_CLASS_NAMES = {
   weekend: 'text-muted-foreground bg-muted/50 hover:bg-muted transition-colors',
   holiday:
-    'bg-gradient-to-br from-yellow-300 to-yellow-400 text-yellow-900 hover:from-yellow-400 hover:to-yellow-500 font-semibold shadow-sm transition-all duration-200',
-  today: 'bg-accent text-accent-foreground font-medium ring-1 ring-ring',
-  suggested: 'bg-teal-400 dark:bg-teal-600 hover:bg-teal-500 dark:hover:bg-teal-700 font-semibold',
-  alternative: 'bg-orange-400 dark:bg-orange-600 hover:bg-orange-500 dark:hover:bg-orange-700',
+    'bg-gradient-to-br from-yellow-400 to-yellow-500 text-yellow-900 hover:from-yellow-500 hover:to-yellow-600 font-semibold shadow-sm transition-bg duration-200 ring-2 ring-yellow-200 dark:ring-yellow-300',
+  today: 'bg-accent text-accent-foreground font-medium ring-2 ring-ring',
+  suggested:
+    'bg-teal-400 dark:bg-teal-600 hover:bg-teal-500 dark:hover:bg-teal-700 ring-2 ring-teal-300 dark:ring-teal-400 text-white font-semibold  transition-b duration-200 shadow-md',
 };
 
 export const CalendarList = () => {
   const locale = useLocale();
   const { carryOverMonths, year, allowPastDays, country, region, ptoDays } = usePtoStore();
-  const { holidays, fetchHolidays, generateSuggestions, isDateSuggested, isDateAlternative } = useHolidaysStore();
+  const {
+    holidays,
+    fetchHolidays,
+    generateSuggestions,
+    isDateSuggested,
+    isDateAlternative,
+    suggestedBlocks,
+    alternativeBlocks,
+  } = useHolidaysStore();
 
   const months = useMemo(() => getTotalMonths({ carryOverMonths, year }), [carryOverMonths, year]);
 
@@ -61,9 +70,8 @@ export const CalendarList = () => {
       holiday: holidayModifier,
       today: isTodayModifier,
       suggested: isDateSuggested,
-      //   alternative: isDateAlternative,
     }),
-    [holidayModifier, isDateSuggested, isDateAlternative]
+    [holidayModifier, isDateSuggested]
   );
 
   const modifiersClassNames = useMemo(() => MODIFIERS_CLASS_NAMES, []);
@@ -72,7 +80,7 @@ export const CalendarList = () => {
 
   return (
     <section className='flex w-full flex-col items-center gap-8'>
-      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-7'>
+      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5'>
         {months.map((month) => (
           <Calendar
             key={format(month, 'yyyy-MM')}
@@ -85,6 +93,8 @@ export const CalendarList = () => {
             disabled={pastDayModifier}
             modifiersClassNames={modifiersClassNames}
             holidays={holidays}
+            suggestedBlocks={suggestedBlocks}
+            alternativeBlocks={alternativeBlocks}
             showOutsideDays
             fixedWeeks
           />
