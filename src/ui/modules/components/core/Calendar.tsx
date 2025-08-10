@@ -1,14 +1,13 @@
-
 import type { HolidayDTO } from '@application/dto/holiday/types';
+import { useHolidaysStore } from '@application/stores/holidays';
 import { Button } from '@const/components/ui/button';
 import { cn } from '@const/lib/utils';
-import { SuggestionBlock } from '@infrastructure/services/calendar/suggestions/types';
 import type { Day } from 'date-fns';
 import { isSameDay, isSameMonth } from 'date-fns';
 import type { Locale } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
 import { formatDay, formatMonthYear } from '../utils/formatters';
-import { getCalendarDays, getDayLabel, getWeekdayNames } from '../utils/helpers';
+import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
 import { getDayClassNames } from './utils/helpers';
 
 interface FromTo {
@@ -21,7 +20,6 @@ interface CalendarProps {
   selected?: Date | Date[] | FromTo;
   onSelect?: (date: Date | Date[] | FromTo | undefined) => void;
   month: Date;
-  defaultMonth?: Date;
   className?: string;
   weekStartsOn?: Day;
   fixedWeeks?: boolean;
@@ -31,8 +29,6 @@ interface CalendarProps {
   disabled?: (date: Date) => boolean;
   showOutsideDays?: boolean;
   holidays: HolidayDTO[];
-  suggestedBlocks?: SuggestionBlock[];
-  alternativeBlocks?: Record<string, SuggestionBlock[]>;
 }
 
 export function Calendar({
@@ -40,7 +36,6 @@ export function Calendar({
   selected,
   onSelect,
   month,
-  defaultMonth = new Date(),
   className,
   weekStartsOn = 1,
   fixedWeeks = false,
@@ -50,10 +45,9 @@ export function Calendar({
   disabled,
   showOutsideDays = true,
   holidays,
-  suggestedBlocks = [],
-  alternativeBlocks = {},
   ...props
 }: Readonly<CalendarProps>) {
+  const { getDateInfo } = useHolidaysStore();
   const [selectedDates, setSelectedDates] = useState<Date[]>(() => {
     if (mode === 'multiple' && Array.isArray(selected)) {
       return selected;
@@ -66,7 +60,6 @@ export function Calendar({
 
   const weekdayNames = useMemo(() => getWeekdayNames({ locale, weekStartsOn }), [locale, weekStartsOn]);
   const monthYearLabel = useMemo(() => formatMonthYear({ date: month, locale }), [month, locale]);
-
   const calendarDays = useMemo(
     () => getCalendarDays({ month, weekStartsOn, fixedWeeks }),
     [month, weekStartsOn, fixedWeeks]
@@ -78,73 +71,16 @@ export function Calendar({
 
       if (mode === 'multiple') {
         const isSelected = selectedDates.some((d) => isSameDay(d, date));
-        let newSelection: Date[];
-
-        if (isSelected) {
-          newSelection = selectedDates.filter((d) => !isSameDay(d, date));
-        } else {
-          newSelection = [...selectedDates, date];
-        }
+        const newSelection = isSelected ? selectedDates.filter((d) => !isSameDay(d, date)) : [...selectedDates, date];
 
         setSelectedDates(newSelection);
         onSelect?.(newSelection);
       } else if (mode === 'single') {
-        const newSelection = [date];
-        setSelectedDates(newSelection);
+        setSelectedDates([date]);
         onSelect?.(date);
       }
     },
     [disabled, mode, selectedDates, onSelect]
-  );
-
-  const normalizeDate = useCallback((date: Date | string): string => {
-    const d = new Date(date);
-    return d.toISOString().split('T')[0];
-  }, []);
-
-  const isDateInBlock = useCallback(
-    (date: Date, block: SuggestionBlock): boolean => {
-      const targetDateStr = normalizeDate(date);
-      return block.days.some((day) => normalizeDate(day) === targetDateStr);
-    },
-    [normalizeDate]
-  );
-
-  const getDayBlockInfo = useCallback(
-    (date: Date) => {
-      const suggestionBlock = suggestedBlocks.find((block) => isDateInBlock(date, block));
-      
-      // Encontrar todos los IDs de bloques donde este día es alternativo
-      const alternativeForBlocks: string[] = [];
-      Object.entries(alternativeBlocks).forEach(([blockId, alternatives]) => {
-        if (alternatives.some(alt => isDateInBlock(date, alt))) {
-          alternativeForBlocks.push(blockId);
-        }
-      });
-
-      return {
-        suggestionBlock,
-        alternativeForBlocks,
-      };
-    },
-    [suggestedBlocks, alternativeBlocks, isDateInBlock]
-  );
-
-  const getDayClasses = useCallback(
-    (date: Date) => {
-      const baseClasses = getDayClassNames({
-        date,
-        month,
-        selectedDates,
-        disabled,
-        showOutsideDays,
-        modifiers,
-        modifiersClassNames,
-      });
-
-      return cn(baseClasses, 'calendar-day-button');
-    },
-    [month, selectedDates, disabled, showOutsideDays, modifiers, modifiersClassNames]
   );
 
   return (
@@ -168,33 +104,49 @@ export function Calendar({
         {calendarDays.map((date) => {
           const isDisabled = disabled?.(date);
           const isOutsideMonth = !isSameMonth(date, month);
-          const { suggestionBlock, alternativeForBlocks } = getDayBlockInfo(date);
 
           if (!showOutsideDays && isOutsideMonth) {
             return <div key={date.toISOString()} className='h-8 w-8' />;
           }
+
+          const dateInfo = getDateInfo(date);
+
+          const dataAttributes: Record<string, string> = {};
+          if (dateInfo.suggestionBlockId) {
+            dataAttributes['data-block-id'] = dateInfo.suggestionBlockId;
+          }
+          if (dateInfo.alternativeForBlockId) {
+            dataAttributes['data-alternative-for'] = dateInfo.alternativeForBlockId;
+          }
+
+          const baseClasses = getDayClassNames({
+            date,
+            month,
+            selectedDates,
+            disabled,
+            showOutsideDays,
+            modifiers,
+            modifiersClassNames,
+          });
+
+          const classes = cn(baseClasses, 'calendar-day-button');
 
           return (
             <div
               role='group'
               key={date.toISOString()}
               className='calendar-day rounded-md relative h-8 w-8 p-0'
-              {...(suggestionBlock?.id ? { 'data-block-id': suggestionBlock.id } : {})}
-              {...(alternativeForBlocks.length ? { 'data-alternative-for': alternativeForBlocks.join(' ') } : {})}
+              {...dataAttributes}
             >
               <Button
                 type='button'
-                className={getDayClasses(date)}
+                className={classes}
                 variant='ghost'
                 onClick={() => handleDayClick(date)}
                 disabled={isDisabled}
-                title={getDayLabel({ holidays, date })}
               >
                 <span className='relative z-10'>{formatDay({ date, locale })}</span>
               </Button>
-              {suggestionBlock && alternativeBlocks[suggestionBlock.id]?.length > 0 && (
-                <span className='absolute -top-1 -right-1 h-2 w-2 bg-orange-500 rounded-full border shadow-sm ring-2 ring-orange-400 z-30' />
-              )}
             </div>
           );
         })}
