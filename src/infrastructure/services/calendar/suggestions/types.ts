@@ -9,15 +9,3 @@ export interface SuggestionBlock extends Block {
   ptoDays: number;
 }
 
-export interface AlternativeBlock extends SuggestionBlock {
-  alternativeFor: string;
-  metadata: AlternativeBlockMetadata;
-}
-
-interface AlternativeBlockMetadata {
-  similarityScore: number;
-  effectiveDiff: number;
-  sizeDiff: number;
-  temporalDistance: number;
-  reason: string;
-}

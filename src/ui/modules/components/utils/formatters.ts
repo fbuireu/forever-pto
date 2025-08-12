@@ -12,3 +12,4 @@ export const formatMonthYear = ({ date, locale }: FormatterParams): string =>
 
 export const formatDay = ({ date, locale }: FormatterParams): string =>
   format(date, 'd', { locale: locale as unknown as DateFnsLocale });
+

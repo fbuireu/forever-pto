@@ -1,20 +1,29 @@
 import type { ElementType, HTMLAttributes, ReactNode } from 'react';
 
-interface ConditionalWrapperProps<T extends ElementType = 'div'> {
+interface ConditionalWrapperHTMLProps<T extends ElementType = 'div'> {
   doWrap: boolean;
   as?: T;
   wrapperProps?: HTMLAttributes<HTMLElement>;
   children: ReactNode;
 }
 
-export function ConditionalWrapper<T extends ElementType = 'div'>({
-  doWrap,
-  as,
-  wrapperProps,
-  children,
-}: Readonly<ConditionalWrapperProps<T>>) {
-  if (!doWrap) return <>{children}</>;
+interface ConditionalWrapperCustomProps {
+  doWrap: boolean;
+  wrapper: (children: ReactNode) => ReactNode;
+  children: ReactNode;
+}
 
-  const Component = as ?? 'div';
-  return <Component {...wrapperProps}>{children}</Component>;
+type ConditionalWrapperProps<T extends ElementType = 'div'> =
+  | ConditionalWrapperHTMLProps<T>
+  | ConditionalWrapperCustomProps;
+
+export function ConditionalWrapper<T extends ElementType = 'div'>(props: Readonly<ConditionalWrapperProps<T>>) {
+  if (!props.doWrap) return <>{props.children}</>;
+
+  if ('wrapper' in props) {
+    return <>{props.wrapper(props.children)}</>;
+  }
+
+  const Component = props.as ?? 'div';
+  return <Component {...props.wrapperProps}>{props.children}</Component>;
 }

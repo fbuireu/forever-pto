@@ -1,13 +1,14 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { useHolidaysStore } from '@application/stores/holidays';
 import { Button } from '@const/components/ui/button';
 import { cn } from '@const/lib/utils';
 import type { Day } from 'date-fns';
 import { isSameDay, isSameMonth } from 'date-fns';
 import type { Locale } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { formatDay, formatMonthYear } from '../utils/formatters';
 import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
+import { ConditionalWrapper } from './ConditionalWrapper';
 import { getDayClassNames } from './utils/helpers';
 
 interface FromTo {
@@ -47,7 +48,6 @@ export function Calendar({
   holidays,
   ...props
 }: Readonly<CalendarProps>) {
-  const { getDateInfo } = useHolidaysStore();
   const [selectedDates, setSelectedDates] = useState<Date[]>(() => {
     if (mode === 'multiple' && Array.isArray(selected)) {
       return selected;
@@ -64,6 +64,15 @@ export function Calendar({
     () => getCalendarDays({ month, weekStartsOn, fixedWeeks }),
     [month, weekStartsOn, fixedWeeks]
   );
+
+  const holidaysMap = useMemo(() => {
+    const map = new Map<string, string>();
+    holidays.forEach((holiday) => {
+      const key = holiday.date.toDateString();
+      map.set(key, holiday.name);
+    });
+    return map;
+  }, [holidays]);
 
   const handleDayClick = useCallback(
     (date: Date) => {
@@ -109,15 +118,7 @@ export function Calendar({
             return <div key={date.toISOString()} className='h-8 w-8' />;
           }
 
-          const dateInfo = getDateInfo(date);
-
-          const dataAttributes: Record<string, string> = {};
-          if (dateInfo.suggestionBlockId) {
-            dataAttributes['data-block-id'] = dateInfo.suggestionBlockId;
-          }
-          if (dateInfo.alternativeForBlockId) {
-            dataAttributes['data-alternative-for'] = dateInfo.alternativeForBlockId;
-          }
+          const holidayName = holidaysMap.get(date.toDateString());
 
           const baseClasses = getDayClassNames({
             date,
@@ -132,21 +133,28 @@ export function Calendar({
           const classes = cn(baseClasses, 'calendar-day-button');
 
           return (
-            <div
-              role='group'
-              key={date.toISOString()}
-              className='calendar-day rounded-md relative h-8 w-8 p-0'
-              {...dataAttributes}
-            >
-              <Button
-                type='button'
-                className={classes}
-                variant='ghost'
-                onClick={() => handleDayClick(date)}
-                disabled={isDisabled}
+            <div role='group' key={date.toISOString()} className='calendar-day rounded-md relative h-8 w-8 p-0'>
+              <ConditionalWrapper
+                doWrap={!!holidayName}
+                wrapper={(children) => (
+                  <TooltipProvider delayDuration={100}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>{children}</TooltipTrigger>
+                      <TooltipContent>{holidayName}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
               >
-                <span className='relative z-10'>{formatDay({ date, locale })}</span>
-              </Button>
+                <Button
+                  type='button'
+                  className={classes}
+                  variant='ghost'
+                  onClick={() => handleDayClick(date)}
+                  disabled={isDisabled}
+                >
+                  {formatDay({ date, locale })}
+                </Button>
+              </ConditionalWrapper>
             </div>
           );
         })}
