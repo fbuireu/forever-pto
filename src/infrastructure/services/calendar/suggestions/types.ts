@@ -1,11 +1,4 @@
-export interface Block {
+export interface Suggestion {
   days: Date[];
-  effectiveDays: number;
-  score: number;
+  totalEffectiveDays: number;
 }
-
-export interface SuggestionBlock extends Block {
-  id: string;
-  ptoDays: number;
-}
-

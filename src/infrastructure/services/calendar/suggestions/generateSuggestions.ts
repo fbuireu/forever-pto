@@ -1,7 +1,8 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { generateBlockOpportunities } from './utils/generateBlockOpportunities';
+import { Suggestion } from './types';
+import { calculateTotalEffectiveDays } from './utils/calculateTotalEffectiveDays';
+import { findOptimalDays } from './utils/findOptimalDays';
 import { getAvailableWorkdays } from './utils/getWorkdays';
-import { selectOptimalBlocks } from './utils/selectOptimalBlocks';
 
 export interface GenerateSuggestionsParams {
   year: number;
@@ -11,31 +12,32 @@ export interface GenerateSuggestionsParams {
   months: Date[];
 }
 
-export function generateSuggestions(params: GenerateSuggestionsParams) {
+export function generateSuggestions(params: GenerateSuggestionsParams): Suggestion {
   const { ptoDays, holidays, allowPastDays, months } = params;
 
   if (ptoDays <= 0) {
-    return { blocks: [] };
+    return { days: [], totalEffectiveDays: 0 };
   }
 
+  // Get all available workdays
   const availableWorkdays = getAvailableWorkdays({
     months,
     holidays,
     allowPastDays,
   });
 
-  const opportunities = generateBlockOpportunities({
+  // Find the optimal days using the block logic but returning just days
+  const selectedDays = findOptimalDays({
     availableWorkdays,
     holidays,
-    maxBlockSize: Math.min(5, ptoDays),
+    targetPtoDays: ptoDays,
   });
 
-  const selectedBlocks = selectOptimalBlocks({
-    opportunities,
-    targetDays: ptoDays,
-  });
+  // Calculate total effective days
+  const totalEffectiveDays = calculateTotalEffectiveDays(selectedDays, holidays);
 
   return {
-    blocks: selectedBlocks,
+    days: selectedDays,
+    totalEffectiveDays,
   };
 }

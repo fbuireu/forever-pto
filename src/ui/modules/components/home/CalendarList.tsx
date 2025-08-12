@@ -24,7 +24,7 @@ const MODIFIERS_CLASS_NAMES = {
 export const CalendarList = () => {
   const locale = useLocale();
   const { carryOverMonths, year, allowPastDays, country, region, ptoDays } = usePtoStore();
-  const { holidays, fetchHolidays, generateSuggestions, isDateSuggested } = useHolidaysStore();
+  const { holidays, fetchHolidays, generateSuggestions, isDateSuggested, alternatives } = useHolidaysStore();
   const { isReady } = useStoresReady();
 
   const months = useMemo(() => getTotalMonths({ carryOverMonths, year }), [carryOverMonths, year]);
@@ -44,7 +44,7 @@ export const CalendarList = () => {
       });
     }
   }, [generateSuggestions, year, ptoDays, allowPastDays, holidays, months]);
-
+console
   const modifiers = useMemo(() => {
     const holidayFn = isHoliday(holidays);
     const pastFn = isPastDay(allowPastDays);

@@ -1,21 +1,24 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
+import { generateAlternatives } from '@infrastructure/services/calendar/suggestions/generateAlternatives';
 import { generateSuggestions } from '@infrastructure/services/calendar/suggestions/generateSuggestions';
-import { SuggestionBlock } from '@infrastructure/services/calendar/suggestions/types';
+import { Suggestion } from '@infrastructure/services/calendar/suggestions/types';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
 import { ensureDate } from '@shared/utils/dates';
+import { getMonth, isSameDay } from 'date-fns';
 import { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
 import { PtoState } from './pto';
-import { getDateKey } from './utils/helpers';
 
 export interface HolidaysState {
   holidays: HolidayDTO[];
   holidaysLoading: boolean;
-  suggestions: SuggestionBlock[];
+  suggestion: Suggestion | null;
   suggestionsLoading: boolean;
-  suggestedDates: Set<string>;
+  maxAlternatives: number;
+  alternatives: Suggestion[];
+  alternativesLoading: boolean;
 }
 
 interface GenerateSuggestionsParams {
@@ -25,6 +28,10 @@ interface GenerateSuggestionsParams {
   months: Date[];
 }
 
+interface GenerateAlternativesParams extends GenerateSuggestionsParams {
+  maxAlternatives?: number;
+}
+
 interface FetchHolidaysParams extends Omit<PtoState, 'ptoDays' | 'allowPastDays' | 'carryOverMonths'> {
   locale: Locale;
 }
@@ -32,13 +39,13 @@ interface FetchHolidaysParams extends Omit<PtoState, 'ptoDays' | 'allowPastDays'
 interface HolidaysActions {
   fetchHolidays: (params: FetchHolidaysParams) => Promise<void>;
   generateSuggestions: (params: GenerateSuggestionsParams) => void;
+  generateAlternatives: (params: GenerateAlternativesParams) => void;
   getHolidaysByMonth: (month: number) => HolidayDTO[];
   clearSuggestions: () => void;
+  clearAlternatives: () => void;
   isDateSuggested: (date: Date) => boolean;
-  getDateInfo: (date: Date) => {
-    isSuggested: boolean;
-    suggestionBlockId?: string;
-  };
+  isDateInAlternative: (date: Date, alternativeIndex: number) => boolean;
+  setMaxAlternatives: (max: number) => void;
 }
 
 type HolidaysStore = HolidaysState & HolidaysActions;
@@ -46,9 +53,11 @@ type HolidaysStore = HolidaysState & HolidaysActions;
 const initialState: HolidaysState = {
   holidays: [],
   holidaysLoading: false,
-  suggestions: [],
+  suggestion: null,
   suggestionsLoading: false,
-  suggestedDates: new Set(),
+  maxAlternatives: 3,
+  alternatives: [],
+  alternativesLoading: false,
 };
 
 export const useHolidaysStore = create<HolidaysStore>()(
@@ -78,13 +87,10 @@ export const useHolidaysStore = create<HolidaysStore>()(
         },
 
         generateSuggestions: ({ year, ptoDays, allowPastDays, months }: GenerateSuggestionsParams) => {
-          const { holidays } = get();
+          const { holidays, maxAlternatives } = get();
 
           if (ptoDays <= 0 || holidays.length === 0) {
-            set({
-              suggestions: [],
-              suggestedDates: new Set(),
-            });
+            set({ suggestion: null });
             return;
           }
 
@@ -96,7 +102,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               date: ensureDate(h.date),
             }));
 
-            const { blocks } = generateSuggestions({
+            const suggestion = generateSuggestions({
               year,
               ptoDays,
               holidays: holidaysDates,
@@ -104,24 +110,73 @@ export const useHolidaysStore = create<HolidaysStore>()(
               months,
             });
 
-            const suggestedDates = new Set<string>();
-            blocks.forEach((block) => {
-              block.days.forEach((day) => {
-                suggestedDates.add(getDateKey(day));
-              });
-            });
+          const alternatives = generateAlternatives({
+            year,
+            ptoDays,
+            holidays: holidaysDates,
+            allowPastDays,
+            months,
+            maxAlternatives: maxAlternatives,
+            existingSuggestion: suggestion.days,
+          });
 
             set({
-              suggestions: blocks,
-              suggestedDates,
+              suggestion,
+              alternatives,
+              alternativesLoading: false,
               suggestionsLoading: false,
             });
           } catch (error) {
             console.error('Error generating suggestions:', error);
             set({
-              suggestions: [],
-              suggestedDates: new Set(),
+              suggestion: null,
               suggestionsLoading: false,
+            });
+          }
+        },
+
+        generateAlternatives: ({
+          year,
+          ptoDays,
+          allowPastDays,
+          months,
+          maxAlternatives,
+        }: GenerateAlternativesParams) => {
+          const { holidays, maxAlternatives: stateMaxAlternatives, suggestion } = get();
+          const maxToGenerate = maxAlternatives ?? stateMaxAlternatives;
+
+          if (ptoDays <= 0 || holidays.length === 0 || maxToGenerate <= 0 || !suggestion) {
+            set({ alternatives: [] });
+            return;
+          }
+
+          set({ alternativesLoading: true });
+
+          try {
+            const holidaysDates = holidays.map((h) => ({
+              ...h,
+              date: ensureDate(h.date),
+            }));
+
+            const alternatives = generateAlternatives({
+              year,
+              ptoDays,
+              holidays: holidaysDates,
+              allowPastDays,
+              months,
+              maxAlternatives: maxToGenerate,
+              existingSuggestion: suggestion.days,
+            });
+            console.log({ alternatives });
+            set({
+              alternatives,
+              alternativesLoading: false,
+            });
+          } catch (error) {
+            console.error('Error generating alternatives:', error);
+            set({
+              alternatives: [],
+              alternativesLoading: false,
             });
           }
         },
@@ -130,38 +185,33 @@ export const useHolidaysStore = create<HolidaysStore>()(
           const { holidays } = get();
           return holidays.filter((holiday) => {
             const holidayDate = ensureDate(holiday.date);
-            return holidayDate.getMonth() + 1 === month;
+            return getMonth(holidayDate) + 1 === month;
           });
         },
 
         clearSuggestions: () => {
-          set({
-            suggestions: [],
-            suggestedDates: new Set(),
-          });
+          set({ suggestion: null });
+        },
+
+        clearAlternatives: () => {
+          set({ alternatives: [] });
         },
 
         isDateSuggested: (date: Date) => {
-          const { suggestedDates } = get();
-          return suggestedDates.has(getDateKey(date));
+          const { suggestion } = get();
+          if (!suggestion) return false;
+          return suggestion.days.some((d) => isSameDay(d, date));
         },
 
-        getDateInfo: (date: Date) => {
-          const { suggestedDates, suggestions } = get();
-          const dateKey = getDateKey(date);
+        isDateInAlternative: (date: Date, alternativeIndex: number) => {
+          const { alternatives } = get();
+          const alternative = alternatives[alternativeIndex];
+          if (!alternative) return false;
+          return alternative.days.some((d) => isSameDay(d, date));
+        },
 
-          const isSuggested = suggestedDates.has(dateKey);
-
-          let suggestionBlockId: string | undefined;
-          if (isSuggested) {
-            const block = suggestions.find((s) => s.days.some((d) => getDateKey(d) === dateKey));
-            suggestionBlockId = block?.id;
-          }
-
-          return {
-            isSuggested,
-            suggestionBlockId,
-          };
+        setMaxAlternatives: (max: number) => {
+          set({ maxAlternatives: Math.max(0, max) });
         },
       }),
       {
@@ -169,7 +219,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
         storage: encryptedStorage,
         partialize: (state) => ({
           holidays: state.holidays,
-          suggestions: state.suggestions,
+          suggestion: state.suggestion,
+          maxAlternatives: state.maxAlternatives,
+          alternatives: state.alternatives,
         }),
         onRehydrateStorage: () => (state) => {
           if (state) {
@@ -180,19 +232,18 @@ export const useHolidaysStore = create<HolidaysStore>()(
               }));
             }
 
-            if (state.suggestions) {
-              const suggestedDates = new Set<string>();
-              state.suggestions = state.suggestions.map((block) => {
-                const updatedBlock = {
-                  ...block,
-                  days: block.days.map(ensureDate),
-                };
-                updatedBlock.days.forEach((day) => {
-                  suggestedDates.add(getDateKey(day));
-                });
-                return updatedBlock;
-              });
-              state.suggestedDates = suggestedDates;
+            if (state.suggestion) {
+              state.suggestion = {
+                ...state.suggestion,
+                days: state.suggestion.days.map(ensureDate),
+              };
+            }
+
+            if (state.alternatives) {
+              state.alternatives = state.alternatives.map((alt) => ({
+                ...alt,
+                days: alt.days.map(ensureDate),
+              }));
             }
           }
         },
