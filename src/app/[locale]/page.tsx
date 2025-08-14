@@ -29,3 +29,5 @@ const ForeverPto = async ({ params }: ForeverPtoProps) => {
 };
 
 export default ForeverPto;
+
+// todo: refactor calcs (generatesugg and generate alt)

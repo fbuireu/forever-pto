@@ -3,16 +3,11 @@
 import { useHolidaysStore } from '@application/stores/holidays';
 import { Suggestion } from '@infrastructure/services/calendar/suggestions/types';
 import { useCallback } from 'react';
-import { AlternativesManager } from 'src/components/animate-ui/ui-elements/management-bar';
+import { AlternativesManager } from 'src/components/animate-ui/ui-elements/AlternativesManager';
 
 export const ManagementBar = () => {
-  const {
-    alternatives,
-    suggestion,
-    setCurrentSelection,
-    setTemporalSelection,
-    temporalSelectionIndex,
-  } = useHolidaysStore();
+  const { alternatives, suggestion, setCurrentSelection, setTemporalSelection, temporalSelectionIndex } =
+    useHolidaysStore();
 
   const handlePreviewChange = useCallback(
     (selection: Suggestion, index: number) => {

@@ -13,9 +13,9 @@ import { getTotalMonths } from '../utils/helpers';
 import {
   isAlternative as isAlternativeFn,
   isHoliday,
+  isPast as isPastFn,
   isSuggestion as isSuggestionFn,
   isToday,
-  isPast as isPastFn,
 } from '../utils/modifiers';
 
 const MODIFIERS_CLASS_NAMES = {
@@ -26,7 +26,7 @@ const MODIFIERS_CLASS_NAMES = {
   suggested:
     'bg-teal-400 dark:bg-teal-600 hover:bg-teal-500 dark:hover:bg-teal-700 ring-2 ring-teal-300 dark:ring-teal-400 text-white font-semibold transition-b duration-200 shadow-md',
   alternative:
-    'bg-orange-100 dark:bg-orange-900/30 text-white font-semibold animate-pulse shadow-md border-2 border-dashed border-orange-300 dark:border-orange-400 transition-all duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(255,165,0,0.8)_2px,rgba(255,165,0,0.8)_4px)]',
+    'bg-orange-100 dark:bg-orange-900/30 text-white font-semibold animate-pulse shadow-md ring-2 ring-orange-300 dark:ring-orange-400 transition-all duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(255,165,0,0.8)_2px,rgba(255,165,0,0.8)_4px)]',
 };
 
 export const CalendarList = () => {

@@ -19,7 +19,7 @@ const STAT_CARD_MOTION_CONFIG = {
   whileHover: 'hover',
   whileTap: 'tap',
   variants: {
-    rest: { maxWidth: '100px' },
+    rest: { maxWidth: '120px' },
     hover: {
       maxWidth: '200px',
       transition: { type: 'spring', stiffness: 200, damping: 35, delay: 0.15 },
@@ -99,17 +99,17 @@ export const AlternativesManager = ({
 
   return (
     <div className='flex w-fit flex-wrap items-center gap-y-2 rounded-2xl border border-border bg-background p-2 shadow-lg'>
-      <div className='flex shrink-0 items-center rounded-lg bg-muted/50 px-2'>
+      <div className='flex shrink-0 items-center rounded-lg bg-muted/50 px-2 h-full'>
         <button
           disabled={currentIndex === 0}
-          className='p-1 text-muted-foreground transition-colors hover:text-foreground disabled:text-muted-foreground/30 disabled:hover:text-muted-foreground/30'
+          className='cursor-pointer h-full p-1 text-muted-foreground transition-colors hover:text-foreground disabled:text-muted-foreground/30 disabled:hover:text-muted-foreground/30'
           onClick={handlePrevious}
           aria-label='Previous suggestion'
         >
           <ChevronLeft size={20} />
         </button>
 
-        <div className='mx-2 flex flex-col items-center'>
+        <div className='mx-2 flex flex-col items-center relative w-25'>
           <div className='flex items-center space-x-1 text-sm tabular-nums'>
             <span className='text-xs text-muted-foreground'>Option</span>
             <SlidingNumber className='text-base font-semibold text-foreground' padStart number={currentIndex + 1} />
@@ -120,9 +120,9 @@ export const AlternativesManager = ({
               variants={BADGE_VARIANTS}
               initial='initial'
               animate='animate'
-              className='mt-0.5 flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400'
+              className='mt-0.5 flex items-center gap-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 px-1.5 py-px text-[10px] font-normal text-amber-700 dark:text-amber-400'
             >
-              <Sparkles size={10} />
+              <Sparkles size={8} />
               Recommended
             </motion.span>
           )}
@@ -130,7 +130,7 @@ export const AlternativesManager = ({
 
         <button
           disabled={currentIndex === totalOptions - 1}
-          className='p-1 text-muted-foreground transition-colors hover:text-foreground disabled:text-muted-foreground/30 disabled:hover:text-muted-foreground/30'
+          className='cursor-pointer h-full p-1 text-muted-foreground transition-colors hover:text-foreground disabled:text-muted-foreground/30 disabled:hover:text-muted-foreground/30'
           onClick={handleNext}
           aria-label='Next suggestion'
         >
@@ -171,7 +171,10 @@ export const AlternativesManager = ({
               className='text-sm font-semibold text-green-700 dark:text-green-300'
               number={effectiveDays}
             />
-            <span className='text-xs text-green-600 dark:text-green-400'>(+{gainedDays})</span>
+            <span className='text-xs text-green-600 dark:text-green-400 flex'>
+              (+
+              <SlidingNumber number={gainedDays} />)
+            </span>
           </div>
           <motion.span
             variants={LABEL_VARIANTS}
@@ -190,7 +193,12 @@ export const AlternativesManager = ({
         >
           <TrendingUp size={20} className='text-purple-600 dark:text-purple-400 shrink-0' />
           <div className='flex items-center gap-1'>
-            <span className='text-sm font-semibold text-purple-700 dark:text-purple-300'>{efficiency.toFixed(1)}x</span>
+            <SlidingNumber
+              className='text-sm font-semibold text-purple-700 dark:text-purple-300'
+              number={parseFloat(efficiency.toFixed(1))}
+              decimalPlaces={1}
+            />
+            <span className='text-sm font-semibold text-purple-700 dark:text-purple-300'>x</span>
             {!isMainSuggestion && (
               <span
                 className={`text-xs ${
@@ -198,7 +206,7 @@ export const AlternativesManager = ({
                 }`}
               >
                 {efficiencyDiff >= 0 ? '+' : ''}
-                {efficiencyDiff.toFixed(1)}
+                <SlidingNumber number={parseFloat(efficiencyDiff.toFixed(1))} decimalPlaces={1} />
               </span>
             )}
           </div>
@@ -219,6 +227,14 @@ export const AlternativesManager = ({
           >
             <BarChart3 size={20} className='text-neutral-600 dark:text-neutral-400 shrink-0' />
             <div className='flex items-center gap-1'>
+              <SlidingNumber
+                className={`text-sm font-semibold ${
+                  efficiencyDiff >= -0.5
+                    ? 'text-amber-600 dark:text-amber-400'
+                    : 'text-neutral-600 dark:text-neutral-400'
+                }`}
+                number={Math.round((efficiency / mainEfficiency) * 100)}
+              />
               <span
                 className={`text-sm font-semibold ${
                   efficiencyDiff >= -0.5
@@ -226,7 +242,7 @@ export const AlternativesManager = ({
                     : 'text-neutral-600 dark:text-neutral-400'
                 }`}
               >
-                {((efficiency / mainEfficiency) * 100).toFixed(0)}%
+                %
               </span>
             </div>
             <motion.span
