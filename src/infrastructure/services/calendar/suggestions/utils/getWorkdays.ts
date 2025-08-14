@@ -1,6 +1,4 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { ensureDate } from '@shared/utils/dates';
-import { eachDayOfInterval, endOfMonth, isSameDay, isWeekend, startOfMonth } from 'date-fns';
 
 export function getAvailableWorkdays({
   months,
@@ -13,22 +11,40 @@ export function getAvailableWorkdays({
 }) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  const todayTime = today.getTime();
+
+  // Create holiday set for O(1) lookup
+  const holidaySet = new Set<string>();
+  for (const holiday of holidays) {
+    const date = new Date(holiday.date);
+    const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    holidaySet.add(key);
+  }
+
   const workdays: Date[] = [];
 
   for (const month of months) {
-    const days = eachDayOfInterval({
-      start: startOfMonth(month),
-      end: endOfMonth(month),
-    });
+    const year = month.getFullYear();
+    const monthNum = month.getMonth();
 
-    for (const day of days) {
-      if (!allowPastDays && day < today) continue;
-      if (isWeekend(day)) continue;
+    // Get days in month more efficiently
+    const daysInMonth = new Date(year, monthNum + 1, 0).getDate();
 
-      const isHoliday = holidays.some((h) => isSameDay(ensureDate(h.date), day));
-      if (isHoliday) continue;
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, monthNum, day);
 
-      workdays.push(day);
+      // Skip past days if not allowed
+      if (!allowPastDays && date.getTime() < todayTime) continue;
+
+      const dayOfWeek = date.getDay();
+      // Skip weekends (0 = Sunday, 6 = Saturday)
+      if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+
+      // Skip holidays (O(1) lookup)
+      const key = `${year}-${monthNum}-${day}`;
+      if (holidaySet.has(key)) continue;
+
+      workdays.push(date);
     }
   }
 

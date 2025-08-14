@@ -21,146 +21,222 @@ export function generateAlternatives(params: GenerateAlternativesParams): Sugges
     return [];
   }
 
-  // Get all available workdays
+  const holidaySet = createHolidaySet(holidays);
+
   const availableWorkdays = getAvailableWorkdays({
     months,
     holidays,
     allowPastDays,
   });
 
-  const alternatives: Suggestion[] = [];
+  if (availableWorkdays.length < ptoDays) {
+    return [];
+  }
+
+  const mainEffectiveDays = calculateTotalEffectiveDays(existingSuggestion, holidays);
+
   const usedCombinations = new Set<string>();
+  
+  const getCombinationKey = (days: Date[]) => {
+    return days
+      .map((d) => d.getTime())
+      .sort((a, b) => a - b)
+      .join(',');
+  };
 
   // Add existing suggestion to used combinations
-  const existingKey = existingSuggestion
-    .map((d) => d.toISOString())
-    .sort()
-    .join(',');
-  usedCombinations.add(existingKey);
+  usedCombinations.add(getCombinationKey(existingSuggestion));
 
-  // Strategy 1: Remove some of the best days to force different combinations
-  for (let skip = 1; skip <= maxAlternatives && alternatives.length < maxAlternatives; skip++) {
-    const filteredWorkdays = availableWorkdays.filter((day, index) => {
-      // Skip every nth best day to create variation
-      if (index < skip * 2 && index % 2 === 0) {
-        return false;
-      }
-      return true;
-    });
+  const alternatives: Suggestion[] = [];
 
-    const alternativeDays = findOptimalDays({
-      availableWorkdays: filteredWorkdays,
-      holidays,
-      targetPtoDays: ptoDays,
-    });
+  // Strategy based on PTO days count
+  if (ptoDays <= 5) {
+    // For few PTO days: explore more combinations systematically
+    generateFewDaysAlternatives();
+  } else {
+    // For many PTO days: use parameter variations
+    generateManyDaysAlternatives();
+  }
 
-    const key = alternativeDays
-      .map((d) => d.toISOString())
-      .sort()
-      .join(',');
+  // Helper function for few PTO days (1-5)
+  function generateFewDaysAlternatives() {
+    // Create a scoring map for all workdays (cache scores)
+    const scoredWorkdays = availableWorkdays.map((day) => ({
+      day,
+      score: calculateDayScoreOptimized(day, holidaySet),
+      timestamp: day.getTime(),
+    }));
 
-    if (!usedCombinations.has(key) && alternativeDays.length === ptoDays) {
-      alternatives.push({
-        days: alternativeDays,
-        totalEffectiveDays: calculateTotalEffectiveDays(alternativeDays, holidays),
+    // Sort by score descending
+    scoredWorkdays.sort((a, b) => b.score - a.score);
+
+    // Take top candidates (limit to reduce combinations)
+    const candidateCount = Math.min(scoredWorkdays.length, ptoDays * 4);
+    const topCandidates = scoredWorkdays.slice(0, candidateCount);
+
+    // Create set of main suggestion timestamps for O(1) lookup
+    const mainDayTimestamps = new Set(existingSuggestion.map((d) => d.getTime()));
+
+    // Try different combinations by progressively excluding days
+    for (let excludeIdx = 0; excludeIdx < candidateCount && alternatives.length < maxAlternatives; excludeIdx++) {
+      const filteredCandidates = topCandidates.filter(({ timestamp }, idx) => {
+        // Skip some days to create variation
+        if (idx === excludeIdx || (mainDayTimestamps.has(timestamp) && idx < Math.ceil(ptoDays / 3))) {
+          return false;
+        }
+        return true;
       });
-      usedCombinations.add(key);
+
+      // Get the best days from filtered list
+      const selectedDays = filteredCandidates.slice(0, ptoDays).map((item) => item.day);
+
+      if (selectedDays.length === ptoDays) {
+        addAlternativeIfValid(selectedDays);
+      }
     }
   }
 
-  // Strategy 2: Prioritize different months
-  const monthGroups = new Map<number, Date[]>();
-  availableWorkdays.forEach((day) => {
-    const month = day.getMonth();
-    if (!monthGroups.has(month)) {
-      monthGroups.set(month, []);
-    }
-    monthGroups.get(month)!.push(day);
-  });
-
-  const sortedMonths = Array.from(monthGroups.keys()).sort((a, b) => {
-    // Prioritize different months than the main suggestion
-    const aCount = existingSuggestion.filter((d) => d.getMonth() === a).length;
-    const bCount = existingSuggestion.filter((d) => d.getMonth() === b).length;
-    return aCount - bCount;
-  });
-
-  for (const priorityMonth of sortedMonths) {
-    if (alternatives.length >= maxAlternatives) break;
-
-    // Create workdays list prioritizing this month
-    const prioritizedWorkdays = [
-      ...(monthGroups.get(priorityMonth) || []),
-      ...availableWorkdays.filter((d) => d.getMonth() !== priorityMonth),
+  // Helper function for many PTO days (6+)
+  function generateManyDaysAlternatives() {
+    const variations = [
+      { maxSequenceSize: 2 }, // Force scattered vacation
+      { maxSequenceSize: 7 }, // Allow longer sequences
+      { excludeMonths: getTopMonths(existingSuggestion, 1) }, // Exclude most used month
+      { preferExtendedWeekends: true }, // Prioritize Friday/Monday
+      { shiftDays: 7 }, // Shift pattern by a week
     ];
 
-    const alternativeDays = findOptimalDays({
-      availableWorkdays: prioritizedWorkdays,
-      holidays,
-      targetPtoDays: ptoDays,
-    });
+    for (let i = 0; i < variations.length && alternatives.length < maxAlternatives; i++) {
+      const variation = variations[i];
 
-    const key = alternativeDays
-      .map((d) => d.toISOString())
-      .sort()
-      .join(',');
+      // Filter or modify workdays based on variation
+      let modifiedWorkdays = [...availableWorkdays];
 
-    if (!usedCombinations.has(key) && alternativeDays.length === ptoDays) {
-      alternatives.push({
-        days: alternativeDays,
-        totalEffectiveDays: calculateTotalEffectiveDays(alternativeDays, holidays),
+      if (variation.excludeMonths) {
+        modifiedWorkdays = modifiedWorkdays.filter((day) => !variation.excludeMonths!.includes(day.getMonth()));
+      }
+
+      if (variation.preferExtendedWeekends) {
+        // Sort to prioritize Monday (1) and Friday (5)
+        modifiedWorkdays.sort((a, b) => {
+          const aScore = a.getDay() === 1 || a.getDay() === 5 ? 10 : 1;
+          const bScore = b.getDay() === 1 || b.getDay() === 5 ? 10 : 1;
+          return bScore - aScore;
+        });
+      }
+
+      if (variation.shiftDays) {
+        // Rotate the array to start from a different point
+        const shift = variation.shiftDays % modifiedWorkdays.length;
+        modifiedWorkdays = [...modifiedWorkdays.slice(shift), ...modifiedWorkdays.slice(0, shift)];
+      }
+
+      // Generate alternative with variation
+      const alternativeDays = findOptimalDays({
+        availableWorkdays: modifiedWorkdays,
+        holidays,
+        targetPtoDays: ptoDays,
+        maxSequenceSize: variation.maxSequenceSize,
       });
-      usedCombinations.add(key);
+
+      if (alternativeDays.length === ptoDays) {
+        addAlternativeIfValid(alternativeDays);
+      }
+    }
+
+    // If still need more alternatives, try random sampling
+    while (alternatives.length < maxAlternatives) {
+      const shuffled = [...availableWorkdays].sort(() => Math.random() - 0.5);
+      const randomDays = findOptimalDays({
+        availableWorkdays: shuffled.slice(0, Math.min(ptoDays * 3, shuffled.length)),
+        holidays,
+        targetPtoDays: ptoDays,
+        maxSequenceSize: Math.random() > 0.5 ? 3 : 5,
+      });
+
+      if (randomDays.length === ptoDays) {
+        addAlternativeIfValid(randomDays);
+      } else {
+        break; // No more valid combinations found
+      }
     }
   }
 
-  // Strategy 3: Force smaller sequences (more scattered days)
-  if (alternatives.length < maxAlternatives) {
-    const scatteredDays = findScatteredOptimalDays({
-      availableWorkdays,
-      holidays,
-      targetPtoDays: ptoDays,
-      maxSequenceSize: 2, // Force smaller sequences
+  // Helper to add alternative if valid
+  function addAlternativeIfValid(days: Date[]) {
+    const key = getCombinationKey(days);
+
+    // Check if already used
+    if (usedCombinations.has(key)) return;
+
+    // Calculate effective days
+    const effectiveDays = calculateTotalEffectiveDays(days, holidays);
+
+    // IMPORTANT: Alternative should not be better than main suggestion
+    if (effectiveDays > mainEffectiveDays) return;
+
+    alternatives.push({
+      days,
+      totalEffectiveDays: effectiveDays,
     });
 
-    const key = scatteredDays
-      .map((d) => d.toISOString())
-      .sort()
-      .join(',');
-
-    if (!usedCombinations.has(key) && scatteredDays.length === ptoDays) {
-      alternatives.push({
-        days: scatteredDays,
-        totalEffectiveDays: calculateTotalEffectiveDays(scatteredDays, holidays),
-      });
-    }
+    usedCombinations.add(key);
   }
 
-  // Sort alternatives by effective days (descending) but they should be less than main suggestion
-  return alternatives.sort((a, b) => b.totalEffectiveDays - a.totalEffectiveDays);
+  // Sort by effective days (best alternatives first, but all <= main suggestion)
+  return alternatives.sort((a, b) => b.totalEffectiveDays - a.totalEffectiveDays).slice(0, maxAlternatives);
 }
 
-// Helper function for scattered days strategy
-function findScatteredOptimalDays({
-  availableWorkdays,
-  holidays,
-  targetPtoDays,
-  maxSequenceSize,
-}: {
-  availableWorkdays: Date[];
-  holidays: HolidayDTO[];
-  targetPtoDays: number;
-  maxSequenceSize: number;
-}): Date[] {
-  // This is similar to findOptimalDays but with a smaller max sequence size
-  // to force more scattered vacation days
-  const modifiedFindOptimalDays = findOptimalDays({
-    availableWorkdays,
-    holidays,
-    targetPtoDays,
-  });
+// Create optimized holiday lookup structure
+function createHolidaySet(holidays: HolidayDTO[]): Set<string> {
+  const holidaySet = new Set<string>();
+  for (const holiday of holidays) {
+    const date = new Date(holiday.date);
+    // Create YYYY-MM-DD key for O(1) lookup
+    const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    holidaySet.add(key);
+  }
+  return holidaySet;
+}
 
-  // For now, return the standard result
-  // In a real implementation, you'd modify findOptimalDays to accept maxSequenceSize
-  return modifiedFindOptimalDays;
+// Optimized day scoring function
+function calculateDayScoreOptimized(day: Date, holidaySet: Set<string>): number {
+  let score = 1;
+  const dayOfWeek = day.getDay();
+
+  // Prefer Monday/Friday
+  if (dayOfWeek === 1 || dayOfWeek === 5) score += 2;
+
+  // Check adjacent to holidays using optimized lookup
+  const year = day.getFullYear();
+  const month = day.getMonth();
+  const date = day.getDate();
+
+  const beforeKey = `${year}-${month}-${date - 1}`;
+  const afterKey = `${year}-${month}-${date + 1}`;
+
+  if (holidaySet.has(beforeKey) || holidaySet.has(afterKey)) {
+    score += 3; // Adjacent to holiday
+  }
+
+  // Extra bonus for creating long weekends
+  if (dayOfWeek === 1 && holidaySet.has(beforeKey)) score += 2; // Monday after holiday weekend
+  if (dayOfWeek === 5 && holidaySet.has(afterKey)) score += 2; // Friday before holiday weekend
+
+  return score;
+}
+
+// Get months with most days in the suggestion
+function getTopMonths(days: Date[], count: number): number[] {
+  const monthCounts = new Map<number, number>();
+
+  for (const day of days) {
+    const month = day.getMonth();
+    monthCounts.set(month, (monthCounts.get(month) || 0) + 1);
+  }
+
+  return Array.from(monthCounts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, count)
+    .map(([month]) => month);
 }

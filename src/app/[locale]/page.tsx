@@ -1,5 +1,6 @@
 import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { CalendarList } from '@ui/modules/components/home/CalendarList';
+import { ManagementBar } from '@ui/modules/components/home/ManagementBar';
 import { StoresInitializer } from '@ui/store/StoresInitializer';
 import type { Locale } from 'next-intl';
 import { cookies } from 'next/headers';
@@ -18,8 +19,11 @@ const ForeverPto = async ({ params }: ForeverPtoProps) => {
   return (
     <AppSidebar locale={locale}>
       <StoresInitializer userCountry={userCountry} locale={locale} />
-      {/* <HolidaysTabs /> */}
-      <CalendarList />
+      <section className='flex w-fit mx-auto items-start flex-col items-center gap-8'>
+        {/* <HolidaysTabs /> */}
+        <ManagementBar />
+        <CalendarList />
+      </section>
     </AppSidebar>
   );
 };

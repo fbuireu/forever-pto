@@ -4,7 +4,6 @@ import { generateSuggestions } from '@infrastructure/services/calendar/suggestio
 import { Suggestion } from '@infrastructure/services/calendar/suggestions/types';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
 import { ensureDate } from '@shared/utils/dates';
-import { getMonth, isSameDay } from 'date-fns';
 import { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -13,12 +12,13 @@ import { PtoState } from './pto';
 
 export interface HolidaysState {
   holidays: HolidayDTO[];
-  holidaysLoading: boolean;
   suggestion: Suggestion | null;
-  suggestionsLoading: boolean;
   maxAlternatives: number;
   alternatives: Suggestion[];
-  alternativesLoading: boolean;
+  currentSelection: Suggestion | null;
+  currentSelectionIndex: number;
+  temporalSelection: Suggestion | null;
+  temporalSelectionIndex: number;
 }
 
 interface GenerateSuggestionsParams {
@@ -40,24 +40,22 @@ interface HolidaysActions {
   fetchHolidays: (params: FetchHolidaysParams) => Promise<void>;
   generateSuggestions: (params: GenerateSuggestionsParams) => void;
   generateAlternatives: (params: GenerateAlternativesParams) => void;
-  getHolidaysByMonth: (month: number) => HolidayDTO[];
-  clearSuggestions: () => void;
-  clearAlternatives: () => void;
-  isDateSuggested: (date: Date) => boolean;
-  isDateInAlternative: (date: Date, alternativeIndex: number) => boolean;
   setMaxAlternatives: (max: number) => void;
+  setCurrentSelection: (selection: Suggestion | null, index: number) => void;
+  setTemporalSelection: (selection: Suggestion | null, index: number) => void;
 }
 
 type HolidaysStore = HolidaysState & HolidaysActions;
 
 const initialState: HolidaysState = {
   holidays: [],
-  holidaysLoading: false,
   suggestion: null,
-  suggestionsLoading: false,
-  maxAlternatives: 3,
+  maxAlternatives: 10,
   alternatives: [],
-  alternativesLoading: false,
+  currentSelection: null,
+  currentSelectionIndex: 0,
+  temporalSelection: null,
+  temporalSelectionIndex: 0,
 };
 
 export const useHolidaysStore = create<HolidaysStore>()(
@@ -67,7 +65,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
         ...initialState,
 
         fetchHolidays: async (params: FetchHolidaysParams) => {
-          set({ holidaysLoading: true });
           try {
             const holidays = await getHolidays(params);
             const holidaysWithDates = holidays.map((h) => ({
@@ -76,11 +73,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
             }));
             set({
               holidays: holidaysWithDates,
-              holidaysLoading: false,
             });
           } catch (error) {
             set({
-              holidaysLoading: false,
               holidays: [],
             });
           }
@@ -90,11 +85,16 @@ export const useHolidaysStore = create<HolidaysStore>()(
           const { holidays, maxAlternatives } = get();
 
           if (ptoDays <= 0 || holidays.length === 0) {
-            set({ suggestion: null });
+            set({
+              suggestion: null,
+              alternatives: [],
+              currentSelection: null,
+              currentSelectionIndex: 0,
+              temporalSelection: null,
+              temporalSelectionIndex: 0,
+            });
             return;
           }
-
-          set({ suggestionsLoading: true });
 
           try {
             const holidaysDates = holidays.map((h) => ({
@@ -110,27 +110,33 @@ export const useHolidaysStore = create<HolidaysStore>()(
               months,
             });
 
-          const alternatives = generateAlternatives({
-            year,
-            ptoDays,
-            holidays: holidaysDates,
-            allowPastDays,
-            months,
-            maxAlternatives: maxAlternatives,
-            existingSuggestion: suggestion.days,
-          });
+            const alternatives = generateAlternatives({
+              year,
+              ptoDays,
+              holidays: holidaysDates,
+              allowPastDays,
+              months,
+              maxAlternatives,
+              existingSuggestion: suggestion.days,
+            });
 
             set({
               suggestion,
               alternatives,
-              alternativesLoading: false,
-              suggestionsLoading: false,
+              currentSelection: suggestion,
+              currentSelectionIndex: 0,
+              temporalSelection: suggestion,
+              temporalSelectionIndex: 0,
             });
           } catch (error) {
             console.error('Error generating suggestions:', error);
             set({
               suggestion: null,
-              suggestionsLoading: false,
+              alternatives: [],
+              currentSelection: null,
+              currentSelectionIndex: 0,
+              temporalSelection: null,
+              temporalSelectionIndex: 0,
             });
           }
         },
@@ -150,8 +156,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
             return;
           }
 
-          set({ alternativesLoading: true });
-
           try {
             const holidaysDates = holidays.map((h) => ({
               ...h,
@@ -167,51 +171,36 @@ export const useHolidaysStore = create<HolidaysStore>()(
               maxAlternatives: maxToGenerate,
               existingSuggestion: suggestion.days,
             });
-            console.log({ alternatives });
+
             set({
               alternatives,
-              alternativesLoading: false,
             });
           } catch (error) {
             console.error('Error generating alternatives:', error);
             set({
               alternatives: [],
-              alternativesLoading: false,
             });
           }
         },
 
-        getHolidaysByMonth: (month: number) => {
-          const { holidays } = get();
-          return holidays.filter((holiday) => {
-            const holidayDate = ensureDate(holiday.date);
-            return getMonth(holidayDate) + 1 === month;
+        setMaxAlternatives: (max: number) => {
+          set({ maxAlternatives: Math.max(0, max) });
+        },
+
+        setCurrentSelection: (selection: Suggestion | null, index: number) => {
+          set({
+            currentSelection: selection,
+            currentSelectionIndex: index,
+            temporalSelection: selection,
+            temporalSelectionIndex: index,
           });
         },
 
-        clearSuggestions: () => {
-          set({ suggestion: null });
-        },
-
-        clearAlternatives: () => {
-          set({ alternatives: [] });
-        },
-
-        isDateSuggested: (date: Date) => {
-          const { suggestion } = get();
-          if (!suggestion) return false;
-          return suggestion.days.some((d) => isSameDay(d, date));
-        },
-
-        isDateInAlternative: (date: Date, alternativeIndex: number) => {
-          const { alternatives } = get();
-          const alternative = alternatives[alternativeIndex];
-          if (!alternative) return false;
-          return alternative.days.some((d) => isSameDay(d, date));
-        },
-
-        setMaxAlternatives: (max: number) => {
-          set({ maxAlternatives: Math.max(0, max) });
+        setTemporalSelection: (selection: Suggestion | null, index: number) => {
+          set({
+            temporalSelection: selection,
+            temporalSelectionIndex: index,
+          });
         },
       }),
       {
@@ -222,6 +211,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
           suggestion: state.suggestion,
           maxAlternatives: state.maxAlternatives,
           alternatives: state.alternatives,
+          currentSelection: state.currentSelection,
+          currentSelectionIndex: state.currentSelectionIndex,
         }),
         onRehydrateStorage: () => (state) => {
           if (state) {
@@ -237,6 +228,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
                 ...state.suggestion,
                 days: state.suggestion.days.map(ensureDate),
               };
+              state.temporalSelection = state.suggestion;
+              state.temporalSelectionIndex = 0;
             }
 
             if (state.alternatives) {
@@ -244,6 +237,15 @@ export const useHolidaysStore = create<HolidaysStore>()(
                 ...alt,
                 days: alt.days.map(ensureDate),
               }));
+            }
+
+            if (state.currentSelection) {
+              state.currentSelection = {
+                ...state.currentSelection,
+                days: state.currentSelection.days.map(ensureDate),
+              };
+              state.temporalSelection = state.currentSelection;
+              state.temporalSelectionIndex = state.currentSelectionIndex || 0;
             }
           }
         },

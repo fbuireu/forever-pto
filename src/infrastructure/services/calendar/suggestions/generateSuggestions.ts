@@ -19,21 +19,18 @@ export function generateSuggestions(params: GenerateSuggestionsParams): Suggesti
     return { days: [], totalEffectiveDays: 0 };
   }
 
-  // Get all available workdays
   const availableWorkdays = getAvailableWorkdays({
     months,
     holidays,
     allowPastDays,
   });
 
-  // Find the optimal days using the block logic but returning just days
   const selectedDays = findOptimalDays({
     availableWorkdays,
     holidays,
     targetPtoDays: ptoDays,
   });
 
-  // Calculate total effective days
   const totalEffectiveDays = calculateTotalEffectiveDays(selectedDays, holidays);
 
   return {

@@ -10,7 +10,13 @@ import { useLocale } from 'next-intl';
 import { useEffect, useMemo } from 'react';
 import { Calendar } from '../core/Calendar';
 import { getTotalMonths } from '../utils/helpers';
-import { isHoliday, isPastDay, isToday } from '../utils/modifiers';
+import {
+  isAlternative as isAlternativeFn,
+  isHoliday,
+  isSuggestion as isSuggestionFn,
+  isToday,
+  isPast as isPastFn,
+} from '../utils/modifiers';
 
 const MODIFIERS_CLASS_NAMES = {
   weekend: 'text-muted-foreground bg-muted/50 hover:bg-muted transition-colors',
@@ -19,12 +25,23 @@ const MODIFIERS_CLASS_NAMES = {
   today: 'bg-accent text-accent-foreground font-medium ring-2 ring-ring',
   suggested:
     'bg-teal-400 dark:bg-teal-600 hover:bg-teal-500 dark:hover:bg-teal-700 ring-2 ring-teal-300 dark:ring-teal-400 text-white font-semibold transition-b duration-200 shadow-md',
+  alternative:
+    'bg-orange-100 dark:bg-orange-900/30 text-white font-semibold animate-pulse shadow-md border-2 border-dashed border-orange-300 dark:border-orange-400 transition-all duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(255,165,0,0.8)_2px,rgba(255,165,0,0.8)_4px)]',
 };
 
 export const CalendarList = () => {
   const locale = useLocale();
   const { carryOverMonths, year, allowPastDays, country, region, ptoDays } = usePtoStore();
-  const { holidays, fetchHolidays, generateSuggestions, isDateSuggested, alternatives } = useHolidaysStore();
+  const {
+    holidays,
+    alternatives,
+    suggestion,
+    currentSelection,
+    fetchHolidays,
+    generateSuggestions,
+    currentSelectionIndex,
+    temporalSelectionIndex,
+  } = useHolidaysStore();
   const { isReady } = useStoresReady();
 
   const months = useMemo(() => getTotalMonths({ carryOverMonths, year }), [carryOverMonths, year]);
@@ -44,62 +61,71 @@ export const CalendarList = () => {
       });
     }
   }, [generateSuggestions, year, ptoDays, allowPastDays, holidays, months]);
-console
+
   const modifiers = useMemo(() => {
     const holidayFn = isHoliday(holidays);
-    const pastFn = isPastDay(allowPastDays);
+    const isPast = isPastFn(allowPastDays);
+    const isSuggestion = isSuggestionFn(currentSelection);
+    const isAlternative = isAlternativeFn(alternatives, suggestion, temporalSelectionIndex, currentSelectionIndex);
 
     return {
       weekend: isWeekend,
       holiday: holidayFn,
       today: isToday,
-      suggested: isDateSuggested,
-      disabled: pastFn,
+      suggested: isSuggestion,
+      alternative: isAlternative,
+      disabled: isPast,
     };
-  }, [holidays, allowPastDays, isDateSuggested]);
+  }, [
+    holidays,
+    allowPastDays,
+    currentSelection,
+    alternatives,
+    suggestion,
+    temporalSelectionIndex,
+    currentSelectionIndex,
+  ]);
 
   return (
-    <section className='flex w-full flex-col items-center gap-8'>
-      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5'>
-        {isReady
-          ? months.map((month) => (
-              <Calendar
-                key={month.toISOString()}
-                mode='multiple'
-                className='rounded-lg border shadow-sm bg-card'
-                month={month}
-                weekStartsOn={1}
-                locale={getLocalizedDateFns(locale)}
-                modifiers={modifiers}
-                disabled={modifiers.disabled}
-                modifiersClassNames={MODIFIERS_CLASS_NAMES}
-                holidays={holidays}
-                showOutsideDays
-                fixedWeeks
-              />
-            ))
-          : Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className='calendar-container p-3 w-fit select-none rounded-xl border bg-card shadow-sm'>
-                <div className='flex justify-center items-center mb-4'>
-                  <Skeleton className='h-5 w-28' />
-                </div>
-                <div className='grid grid-cols-7 gap-1 mb-2'>
-                  {Array.from({ length: 7 }).map((_, idx) => (
-                    <div key={idx} className='h-8 w-8 flex items-center justify-center'>
-                      <Skeleton className='h-4 w-6' />
-                    </div>
-                  ))}
-                </div>
-                <div className='grid grid-cols-7 gap-2'>
-                  {Array.from({ length: 42 }).map((_, idx) => (
-                    <div key={idx} className='calendar-day rounded-md relative h-8 w-8 p-0'>
-                      <Skeleton className='h-8 w-8 rounded-md' />
-                    </div>
-                  ))}
-                </div>
+    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5'>
+      {isReady
+        ? months.map((month) => (
+            <Calendar
+              key={month.toISOString()}
+              mode='multiple'
+              className='rounded-lg border shadow-sm bg-card'
+              month={month}
+              weekStartsOn={1}
+              locale={getLocalizedDateFns(locale)}
+              modifiers={modifiers}
+              disabled={modifiers.disabled}
+              modifiersClassNames={MODIFIERS_CLASS_NAMES}
+              holidays={holidays}
+              showOutsideDays
+              fixedWeeks
+            />
+          ))
+        : Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className='calendar-container p-3 w-fit select-none rounded-xl border bg-card shadow-sm'>
+              <div className='flex justify-center items-center mb-4'>
+                <Skeleton className='h-5 w-28' />
               </div>
-            ))}
-      </div>
-    </section>
+              <div className='grid grid-cols-7 gap-1 mb-2'>
+                {Array.from({ length: 7 }).map((_, idx) => (
+                  <div key={idx} className='h-8 w-8 flex items-center justify-center'>
+                    <Skeleton className='h-4 w-6' />
+                  </div>
+                ))}
+              </div>
+              <div className='grid grid-cols-7 gap-2'>
+                {Array.from({ length: 42 }).map((_, idx) => (
+                  <div key={idx} className='calendar-day rounded-md relative h-8 w-8 p-0'>
+                    <Skeleton className='h-8 w-8 rounded-md' />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+    </div>
   );
 };
