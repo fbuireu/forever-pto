@@ -1,8 +1,8 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { isWeekend } from 'date-fns';
 import { OptimizationStrategy, Suggestion } from '../types';
-import { getAvailableWorkdays } from '../utils/helpers';
-import { generateBalancedAlternatives, generateGroupedAlternatives, generateOptimizedAlternatives } from './utils/generators';
+import { getAvailableWorkdays, cleanupSuggestion } from '../utils/helpers';
+import { generateOptimizedAlternatives, generateBalancedAlternatives, generateGroupedAlternatives } from './utils/generators';
 
 export interface GenerateAlternativesParams {
   year: number;
@@ -43,11 +43,11 @@ export function generateAlternatives(params: GenerateAlternativesParams): Sugges
 
   switch (strategy) {
     case 'optimized':
-      return generateOptimizedAlternatives(params, availableWorkdays, effectiveHolidays);
+      return generateOptimizedAlternatives(params, availableWorkdays, effectiveHolidays).map(cleanupSuggestion);
     case 'balanced':
-      return generateBalancedAlternatives(params, availableWorkdays, effectiveHolidays);
+      return generateBalancedAlternatives(params, availableWorkdays, effectiveHolidays).map(cleanupSuggestion);
     case 'grouped':
     default:
-      return generateGroupedAlternatives(params, availableWorkdays, effectiveHolidays);
+      return generateGroupedAlternatives(params, availableWorkdays, effectiveHolidays).map(cleanupSuggestion);
   }
 }

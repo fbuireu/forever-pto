@@ -2,6 +2,7 @@ import type { HolidayDTO } from '@application/dto/holiday/types';
 import { generateAlternatives } from '@infrastructure/services/calendar/alternatives/generateAlternatives';
 import { generateSuggestions } from '@infrastructure/services/calendar/suggestions/generateSuggestions';
 import { Suggestion } from '@infrastructure/services/calendar/types';
+import { clearDateKeyCache } from '@infrastructure/services/calendar/utils/cache';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
 import { ensureDate } from '@shared/utils/dates';
 import { Locale } from 'next-intl';
@@ -94,6 +95,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
 
           try {
+            clearDateKeyCache();
             const holidaysDates = holidays.map((h) => ({
               ...h,
               date: ensureDate(h.date),
@@ -107,7 +109,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               months,
               strategy: 'grouped',
             });
-
+            console.log('suggesting', suggestion);
             const alternatives = generateAlternatives({
               year,
               ptoDays,

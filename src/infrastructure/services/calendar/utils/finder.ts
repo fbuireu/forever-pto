@@ -2,7 +2,8 @@ import type { HolidayDTO } from '@application/dto/holiday/types';
 import { addDays, differenceInDays, isWeekend } from 'date-fns';
 import { PTO_CONSTANTS } from '../const';
 import type { Bridge } from '../types';
-import { createHolidaySet, getDateKey, isFreeDay } from './helpers';
+import { getDateKey } from '@application/stores/utils/helpers';
+import { createHolidaySet, isFreeDay } from './helpers';
 
 export function findBridges(availableWorkdays: Date[], holidays: HolidayDTO[]): Bridge[] {
   const bridges: Bridge[] = [];

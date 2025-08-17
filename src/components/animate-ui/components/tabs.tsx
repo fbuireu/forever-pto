@@ -4,10 +4,8 @@ import * as React from 'react';
 import { motion, type Transition, type HTMLMotionProps } from 'motion/react';
 
 import { cn } from '@const/lib/utils';
-import {
-  MotionHighlight,
-  MotionHighlightItem,
-} from '@const/components/animate-ui/effects/motion-highlight';
+import { MotionHighlight, MotionHighlightItem } from '../effects/motion-highlight';
+
 
 type TabsContextType<T extends string> = {
   activeValue: T;

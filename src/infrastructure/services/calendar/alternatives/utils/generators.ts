@@ -2,10 +2,11 @@ import { HolidayDTO } from '@application/dto/holiday/types';
 import { addDays, isWeekend } from 'date-fns';
 import { PTO_CONSTANTS } from '../../const';
 import { Suggestion } from '../../types';
-import { findBridges } from '../../utils/finder';
-import { getCombinationKey, getDateKey } from '../../utils/helpers';
 import { GenerateAlternativesParams } from '../generateAlternatives';
 import { calculateGroupedEffectiveDays, findSimilarSizeBlocks, selectAlternativeBridges } from './helpers';
+import { getDateKey } from '@application/stores/utils/helpers';
+import { getCombinationKey } from '../../utils/helpers';
+import { findBridges } from '../../utils/finder';
 
 export function generateBlockShifts(
   existingSuggestion: Date[],
