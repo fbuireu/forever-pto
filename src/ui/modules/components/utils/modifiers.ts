@@ -1,5 +1,5 @@
 import type { HolidaysState } from '@application/stores/holidays';
-import { Suggestion } from '@infrastructure/services/calendar/suggestions/types';
+import { Suggestion } from '@infrastructure/services/calendar/types';
 import { isBefore, isSameDay, startOfToday } from 'date-fns';
 
 export const isHoliday = (holidays: HolidaysState['holidays']) => (date: Date) =>
@@ -28,10 +28,9 @@ export const isAlternative = (
   alternatives: HolidaysState['alternatives'],
   suggestion: Suggestion | null,
   temporalSelectionIndex: number,
-  currentSelectionIndex: number
 ) => {
   return (date: Date): boolean => {
-    if (temporalSelectionIndex === currentSelectionIndex || !alternatives.length) return false;
+    if (!alternatives.length) return false;
 
     const isSuggestion = temporalSelectionIndex === 0;
 

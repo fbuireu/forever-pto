@@ -1,14 +1,13 @@
 'use client';
 
-import type { Suggestion } from '@infrastructure/services/calendar/suggestions/types';
+import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { BarChart3, Calendar, CalendarDays, ChevronLeft, ChevronRight, Sparkles, TrendingUp } from 'lucide-react';
 import { motion, type Transition, type Variants } from 'motion/react';
 import * as React from 'react';
 import { SlidingNumber } from '../text/sliding-number';
 
 interface AlternativeManagerProps {
-  suggestion: Suggestion | null;
-  alternatives: Suggestion[];
+  allSuggestions: Suggestion[];
   onSelectionChange?: (selection: Suggestion, index: number) => void;
   onPreviewChange?: (selection: Suggestion, index: number) => void;
   selectedIndex?: number;
@@ -51,18 +50,12 @@ const BADGE_VARIANTS: Variants = {
 };
 
 export const AlternativesManager = ({
-  suggestion,
-  alternatives,
+allSuggestions,
   onSelectionChange,
   onPreviewChange,
   selectedIndex = 0,
 }: AlternativeManagerProps) => {
   const [currentIndex, setCurrentIndex] = React.useState(selectedIndex);
-
-  const allSuggestions = React.useMemo(() => {
-    if (!suggestion) return [];
-    return [suggestion, ...alternatives];
-  }, [suggestion, alternatives]);
 
   const totalOptions = allSuggestions.length;
   const currentSuggestion = allSuggestions[currentIndex];
@@ -83,7 +76,7 @@ export const AlternativesManager = ({
     }
   }, [currentIndex, totalOptions, allSuggestions, onPreviewChange]);
 
-  if (!suggestion || !currentSuggestion) {
+  if (!currentSuggestion) {
     return null;
   }
 
@@ -93,7 +86,7 @@ export const AlternativesManager = ({
   const gainedDays = effectiveDays - ptoDays;
 
   // Calculate comparison with main suggestion
-  const mainEfficiency = suggestion.totalEffectiveDays / suggestion.days.length;
+  const mainEfficiency = allSuggestions[0].totalEffectiveDays / allSuggestions[0].days.length;
   const efficiencyDiff = efficiency - mainEfficiency;
   const isMainSuggestion = currentIndex === 0;
 
@@ -201,7 +194,7 @@ export const AlternativesManager = ({
             <span className='text-sm font-semibold text-purple-700 dark:text-purple-300'>x</span>
             {!isMainSuggestion && (
               <span
-                className={`text-xs ${
+                className={`text-xs flex ${
                   efficiencyDiff >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                 }`}
               >

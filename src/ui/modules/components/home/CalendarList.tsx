@@ -39,8 +39,7 @@ export const CalendarList = () => {
     currentSelection,
     fetchHolidays,
     generateSuggestions,
-    currentSelectionIndex,
-    temporalSelectionIndex,
+    previewAlternativeIndex,
   } = useHolidaysStore();
   const { isReady } = useStoresReady();
 
@@ -66,7 +65,7 @@ export const CalendarList = () => {
     const holidayFn = isHoliday(holidays);
     const isPast = isPastFn(allowPastDays);
     const isSuggestion = isSuggestionFn(currentSelection);
-    const isAlternative = isAlternativeFn(alternatives, suggestion, temporalSelectionIndex, currentSelectionIndex);
+    const isAlternative = isAlternativeFn(alternatives, suggestion, previewAlternativeIndex);
 
     return {
       weekend: isWeekend,
@@ -76,15 +75,7 @@ export const CalendarList = () => {
       alternative: isAlternative,
       disabled: isPast,
     };
-  }, [
-    holidays,
-    allowPastDays,
-    currentSelection,
-    alternatives,
-    suggestion,
-    temporalSelectionIndex,
-    currentSelectionIndex,
-  ]);
+  }, [holidays, allowPastDays, currentSelection, alternatives, suggestion, previewAlternativeIndex]);
 
   return (
     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5'>
@@ -94,7 +85,7 @@ export const CalendarList = () => {
               key={month.toISOString()}
               mode='multiple'
               className='rounded-lg border shadow-sm bg-card'
-              month={month}
+              month={month}            
               weekStartsOn={1}
               locale={getLocalizedDateFns(locale)}
               modifiers={modifiers}

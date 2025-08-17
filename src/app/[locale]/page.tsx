@@ -19,8 +19,7 @@ const ForeverPto = async ({ params }: ForeverPtoProps) => {
   return (
     <AppSidebar locale={locale}>
       <StoresInitializer userCountry={userCountry} locale={locale} />
-      <section className='flex w-fit mx-auto items-start flex-col items-center gap-8'>
-        {/* <HolidaysTabs /> */}
+      <section className='flex w-fit mx-auto items-start flex-col gap-8'>
         <ManagementBar />
         <CalendarList />
       </section>
@@ -30,4 +29,5 @@ const ForeverPto = async ({ params }: ForeverPtoProps) => {
 
 export default ForeverPto;
 
-// todo: refactor calcs (generatesugg and generate alt)
+// todo: recheck algo (should split days if needed) + alternative algo weird decisions
+// todo: in the FAQ section add a clearall button

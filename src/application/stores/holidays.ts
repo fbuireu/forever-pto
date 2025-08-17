@@ -1,7 +1,7 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { generateAlternatives } from '@infrastructure/services/calendar/suggestions/generateAlternatives';
+import { generateAlternatives } from '@infrastructure/services/calendar/alternatives/generateAlternatives';
 import { generateSuggestions } from '@infrastructure/services/calendar/suggestions/generateSuggestions';
-import { Suggestion } from '@infrastructure/services/calendar/suggestions/types';
+import { Suggestion } from '@infrastructure/services/calendar/types';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
 import { ensureDate } from '@shared/utils/dates';
 import { Locale } from 'next-intl';
@@ -16,9 +16,8 @@ export interface HolidaysState {
   maxAlternatives: number;
   alternatives: Suggestion[];
   currentSelection: Suggestion | null;
-  currentSelectionIndex: number;
-  temporalSelection: Suggestion | null;
-  temporalSelectionIndex: number;
+  previewAlternativeSelection: Suggestion | null;
+  previewAlternativeIndex: number;
 }
 
 interface GenerateSuggestionsParams {
@@ -41,8 +40,8 @@ interface HolidaysActions {
   generateSuggestions: (params: GenerateSuggestionsParams) => void;
   generateAlternatives: (params: GenerateAlternativesParams) => void;
   setMaxAlternatives: (max: number) => void;
-  setCurrentSelection: (selection: Suggestion | null, index: number) => void;
-  setTemporalSelection: (selection: Suggestion | null, index: number) => void;
+  setCurrentAlternativeSelection: (selection: Suggestion | null, index: number) => void;
+  setPreviewAlternativeSelection: (selection: Suggestion | null, index: number) => void;
 }
 
 type HolidaysStore = HolidaysState & HolidaysActions;
@@ -50,12 +49,11 @@ type HolidaysStore = HolidaysState & HolidaysActions;
 const initialState: HolidaysState = {
   holidays: [],
   suggestion: null,
-  maxAlternatives: 10,
+  maxAlternatives: 4,
   alternatives: [],
   currentSelection: null,
-  currentSelectionIndex: 0,
-  temporalSelection: null,
-  temporalSelectionIndex: 0,
+  previewAlternativeSelection: null,
+  previewAlternativeIndex: 0,
 };
 
 export const useHolidaysStore = create<HolidaysStore>()(
@@ -89,9 +87,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
               suggestion: null,
               alternatives: [],
               currentSelection: null,
-              currentSelectionIndex: 0,
-              temporalSelection: null,
-              temporalSelectionIndex: 0,
+              previewAlternativeSelection: null,
+              previewAlternativeIndex: 0,
             });
             return;
           }
@@ -108,6 +105,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               holidays: holidaysDates,
               allowPastDays,
               months,
+              strategy: 'grouped',
             });
 
             const alternatives = generateAlternatives({
@@ -118,15 +116,15 @@ export const useHolidaysStore = create<HolidaysStore>()(
               months,
               maxAlternatives,
               existingSuggestion: suggestion.days,
+              strategy: 'grouped',
             });
 
             set({
               suggestion,
               alternatives,
               currentSelection: suggestion,
-              currentSelectionIndex: 0,
-              temporalSelection: suggestion,
-              temporalSelectionIndex: 0,
+              previewAlternativeSelection: suggestion,
+              previewAlternativeIndex: 0,
             });
           } catch (error) {
             console.error('Error generating suggestions:', error);
@@ -134,9 +132,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
               suggestion: null,
               alternatives: [],
               currentSelection: null,
-              currentSelectionIndex: 0,
-              temporalSelection: null,
-              temporalSelectionIndex: 0,
+              previewAlternativeSelection: null,
+              previewAlternativeIndex: 0,
             });
           }
         },
@@ -170,6 +167,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               months,
               maxAlternatives: maxToGenerate,
               existingSuggestion: suggestion.days,
+              strategy: 'grouped',
             });
 
             set({
@@ -187,19 +185,18 @@ export const useHolidaysStore = create<HolidaysStore>()(
           set({ maxAlternatives: Math.max(0, max) });
         },
 
-        setCurrentSelection: (selection: Suggestion | null, index: number) => {
+        setCurrentAlternativeSelection: (selection: Suggestion | null, index: number) => {
           set({
             currentSelection: selection,
-            currentSelectionIndex: index,
-            temporalSelection: selection,
-            temporalSelectionIndex: index,
+            previewAlternativeSelection: selection,
+            previewAlternativeIndex: index,
           });
         },
 
-        setTemporalSelection: (selection: Suggestion | null, index: number) => {
+        setPreviewAlternativeSelection: (selection: Suggestion | null, index: number) => {
           set({
-            temporalSelection: selection,
-            temporalSelectionIndex: index,
+            previewAlternativeSelection: selection,
+            previewAlternativeIndex: index,
           });
         },
       }),
@@ -212,7 +209,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
           maxAlternatives: state.maxAlternatives,
           alternatives: state.alternatives,
           currentSelection: state.currentSelection,
-          currentSelectionIndex: state.currentSelectionIndex,
         }),
         onRehydrateStorage: () => (state) => {
           if (state) {
@@ -228,8 +224,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
                 ...state.suggestion,
                 days: state.suggestion.days.map(ensureDate),
               };
-              state.temporalSelection = state.suggestion;
-              state.temporalSelectionIndex = 0;
+              state.previewAlternativeSelection = state.suggestion;
+              state.previewAlternativeIndex = 0;
             }
 
             if (state.alternatives) {
@@ -244,8 +240,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
                 ...state.currentSelection,
                 days: state.currentSelection.days.map(ensureDate),
               };
-              state.temporalSelection = state.currentSelection;
-              state.temporalSelectionIndex = state.currentSelectionIndex || 0;
+              state.previewAlternativeSelection = state.currentSelection;
             }
           }
         },
