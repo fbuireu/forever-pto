@@ -1,8 +1,8 @@
-import { getDateKey } from '@application/stores/utils/helpers';
 import { addDays, differenceInDays, isWeekend } from 'date-fns';
 import { PTO_CONSTANTS } from '../../const';
 import { Bridge } from '../../types';
 import { isFreeDay } from '../../utils/helpers';
+import { getOptimizedDateKey } from '../../utils/cache';
 
 export function groupConsecutiveDays(days: Date[]): Array<{ start: Date; end: Date }> {
   if (days.length === 0) return [];
@@ -61,11 +61,11 @@ export function selectOptimalBridges(bridges: Bridge[], targetPtoDays: number): 
   for (const bridge of bridges) {
     if (totalPtoDays >= targetPtoDays) break;
 
-    const hasConflict = bridge.ptoDays.some((day) => usedDates.has(getDateKey(day)));
+    const hasConflict = bridge.ptoDays.some((day) => usedDates.has(getOptimizedDateKey(day)));
 
     if (!hasConflict && totalPtoDays + bridge.ptoDaysNeeded <= targetPtoDays) {
       selected.push(bridge);
-      bridge.ptoDays.forEach((day) => usedDates.add(getDateKey(day)));
+      bridge.ptoDays.forEach((day) => usedDates.add(getOptimizedDateKey(day)));
       totalPtoDays += bridge.ptoDaysNeeded;
     }
   }
@@ -85,13 +85,13 @@ export function findAdjacentWorkday(
   const lastDay = sortedDays[sortedDays.length - 1];
 
   const nextDay = addDays(lastDay, 1);
-  if (!isWeekend(nextDay) && !usedDates.has(getDateKey(nextDay))) {
+  if (!isWeekend(nextDay) && !usedDates.has(getOptimizedDateKey(nextDay))) {
     const isAvailable = availableWorkdays.some((d) => d.getTime() === nextDay.getTime());
     if (isAvailable) return nextDay;
   }
 
   const prevDay = addDays(firstDay, -1);
-  if (!isWeekend(prevDay) && !usedDates.has(getDateKey(prevDay))) {
+  if (!isWeekend(prevDay) && !usedDates.has(getOptimizedDateKey(prevDay))) {
     const isAvailable = availableWorkdays.some((d) => d.getTime() === prevDay.getTime());
     if (isAvailable) return prevDay;
   }
@@ -100,12 +100,12 @@ export function findAdjacentWorkday(
     const candidateNext = addDays(lastDay, i);
     const candidatePrev = addDays(firstDay, -i);
 
-    if (!isWeekend(candidateNext) && !usedDates.has(getDateKey(candidateNext))) {
+    if (!isWeekend(candidateNext) && !usedDates.has(getOptimizedDateKey(candidateNext))) {
       const isAvailable = availableWorkdays.some((d) => d.getTime() === candidateNext.getTime());
       if (isAvailable) return candidateNext;
     }
 
-    if (!isWeekend(candidatePrev) && !usedDates.has(getDateKey(candidatePrev))) {
+    if (!isWeekend(candidatePrev) && !usedDates.has(getOptimizedDateKey(candidatePrev))) {
       const isAvailable = availableWorkdays.some((d) => d.getTime() === candidatePrev.getTime());
       if (isAvailable) return candidatePrev;
     }

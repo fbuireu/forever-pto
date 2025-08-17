@@ -1,8 +1,12 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { isWeekend } from 'date-fns';
 import { OptimizationStrategy, Suggestion } from '../types';
-import { getAvailableWorkdays, cleanupSuggestion } from '../utils/helpers';
-import { generateOptimizedAlternatives, generateBalancedAlternatives, generateGroupedAlternatives } from './utils/generators';
+import { cleanupSuggestion, getAvailableWorkdays } from '../utils/helpers';
+import {
+  generateBalancedAlternatives,
+  generateGroupedAlternatives,
+  generateOptimizedAlternatives,
+} from './utils/generators';
 
 export interface GenerateAlternativesParams {
   year: number;

@@ -28,20 +28,15 @@ export const isAlternative = (
   alternatives: HolidaysState['alternatives'],
   suggestion: Suggestion | null,
   temporalSelectionIndex: number,
+  currentSelection?: Suggestion | null
 ) => {
   return (date: Date): boolean => {
-    if (!alternatives.length) return false;
-
-    const isSuggestion = temporalSelectionIndex === 0;
-
-    if (isSuggestion) {
-      return suggestion ? suggestion.days.some((d) => isSameDay(d, date)) : false;
+    if (currentSelection?.days.some((d) => isSameDay(d, date))) {
+      return false;
     }
 
-    const alternative = alternatives[temporalSelectionIndex - 1];
+    const targetSuggestion = temporalSelectionIndex === 0 ? suggestion : alternatives[temporalSelectionIndex - 1];
 
-    if (!alternative) return false;
-
-    return alternative.days.some((d) => isSameDay(d, date));
+    return targetSuggestion?.days.some((d) => isSameDay(d, date)) ?? false;
   };
 };

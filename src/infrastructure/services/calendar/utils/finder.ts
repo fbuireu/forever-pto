@@ -1,48 +1,31 @@
-import type { HolidayDTO } from '@application/dto/holiday/types';
 import { addDays, differenceInDays, isWeekend } from 'date-fns';
 import { PTO_CONSTANTS } from '../const';
 import type { Bridge } from '../types';
-import { getDateKey } from '@application/stores/utils/helpers';
-import { createHolidaySet, isFreeDay } from './helpers';
-
-export function findBridges(availableWorkdays: Date[], holidays: HolidayDTO[]): Bridge[] {
-  const bridges: Bridge[] = [];
-
-  const effectiveHolidays = holidays.filter((h) => {
-    const date = new Date(h.date);
-    return !isWeekend(date);
-  });
-
-  const holidaySet = createHolidaySet(effectiveHolidays);
-  const workdaySet = new Set(availableWorkdays.map((d) => getDateKey(d)));
-
-  for (const workday of availableWorkdays) {
-    const singleDayBridge = analyzeSingleDayBridge(workday, holidaySet);
-    if (singleDayBridge && singleDayBridge.efficiency >= PTO_CONSTANTS.EFFICIENCY.MINIMUM_FOR_SINGLE_BRIDGE) {
-      bridges.push(singleDayBridge);
-    }
-  }
-
-  const multiDayBridges = findMultiDayBridges(availableWorkdays, holidaySet, workdaySet);
-  bridges.push(...multiDayBridges);
-
-  return deduplicateAndSortBridges(bridges, holidaySet);
-}
+import { getOptimizedDateKey } from './cache';
+import { isFreeDay } from './helpers';
 
 function analyzeSingleDayBridge(day: Date, holidaySet: Set<string>): Bridge | null {
   let start = day;
   let end = day;
 
+  // ✅ AÑADIR LÍMITES DE SEGURIDAD
   let current = addDays(day, -1);
-  while (isFreeDay(current, holidaySet)) {
+  let safetyCounter = 0;
+  const MAX_ITERATIONS = PTO_CONSTANTS.SAFETY_LIMIT || 30;
+
+  while (isFreeDay(current, holidaySet) && safetyCounter < MAX_ITERATIONS) {
     start = current;
     current = addDays(current, -1);
+    safetyCounter++;
   }
 
   current = addDays(day, 1);
-  while (isFreeDay(current, holidaySet)) {
+  safetyCounter = 0;
+
+  while (isFreeDay(current, holidaySet) && safetyCounter < MAX_ITERATIONS) {
     end = current;
     current = addDays(current, 1);
+    safetyCounter++;
   }
 
   const effectiveDays = differenceInDays(end, start) + 1;
@@ -109,7 +92,7 @@ function findMultiDayBridges(availableWorkdays: Date[], holidaySet: Set<string>,
 
       let dayInGap = new Date(gapStart);
       while (dayInGap <= gapEnd) {
-        if (!isWeekend(dayInGap) && workdaySet.has(getDateKey(dayInGap))) {
+        if (!isWeekend(dayInGap) && workdaySet.has(getOptimizedDateKey(dayInGap))) {
           ptoDays.push(new Date(dayInGap));
           workdaysInGap++;
         }
@@ -149,7 +132,7 @@ function deduplicateAndSortBridges(bridges: Bridge[], holidaySet: Set<string>): 
 
   for (const bridge of bridges) {
     const key = bridge.ptoDays
-      .map((d) => getDateKey(d))
+      .map((d) => getOptimizedDateKey(d))
       .sort((a, b) => a.localeCompare(b))
       .join(',');
     const existing = uniqueBridges.get(key);
@@ -179,7 +162,7 @@ function countHolidayConnections(bridge: Bridge, holidaySet: Set<string>): numbe
   let current = new Date(bridge.startDate);
 
   while (current <= bridge.endDate) {
-    if (holidaySet.has(getDateKey(current))) {
+    if (holidaySet.has(getOptimizedDateKey(current))) {
       connections++;
     }
     current = addDays(current, 1);

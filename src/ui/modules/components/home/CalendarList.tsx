@@ -65,7 +65,7 @@ export const CalendarList = () => {
     const holidayFn = isHoliday(holidays);
     const isPast = isPastFn(allowPastDays);
     const isSuggestion = isSuggestionFn(currentSelection);
-    const isAlternative = isAlternativeFn(alternatives, suggestion, previewAlternativeIndex);
+    const isAlternative = isAlternativeFn(alternatives, suggestion, previewAlternativeIndex, currentSelection);
 
     return {
       weekend: isWeekend,
@@ -85,7 +85,7 @@ export const CalendarList = () => {
               key={month.toISOString()}
               mode='multiple'
               className='rounded-lg border shadow-sm bg-card'
-              month={month}            
+              month={month}
               weekStartsOn={1}
               locale={getLocalizedDateFns(locale)}
               modifiers={modifiers}

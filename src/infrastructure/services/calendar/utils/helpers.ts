@@ -1,5 +1,4 @@
 import { HolidayDTO } from '@application/dto/holiday/types';
-import { getDateKey } from '@application/stores/utils/helpers';
 import { isWeekend } from 'date-fns';
 import { Bridge, Suggestion } from '../types';
 import { getOptimizedDateKey } from './cache';
@@ -88,7 +87,7 @@ export function getAvailableWorkdays({
   for (const holiday of holidays) {
     const date = new Date(holiday.date);
     if (!isWeekend(date)) {
-      const key = getDateKey(date);
+      const key = getOptimizedDateKey(date);
       holidaySet.add(key);
     }
   }
@@ -108,7 +107,7 @@ export function getAvailableWorkdays({
 
       if (isWeekend(date)) continue;
 
-      const key = getDateKey(date);
+      const key = getOptimizedDateKey(date);
       if (holidaySet.has(key)) continue;
 
       workdays.push(date);
@@ -119,7 +118,7 @@ export function getAvailableWorkdays({
 }
 
 export function isFreeDay(date: Date, holidaySet: Set<string>): boolean {
-  return isWeekend(date) || holidaySet.has(getDateKey(date));
+  return isWeekend(date) || holidaySet.has(getOptimizedDateKey(date));
 }
 
 export function createHolidaySet(holidays: HolidayDTO[]): Set<string> {
@@ -131,7 +130,7 @@ export function createHolidaySet(holidays: HolidayDTO[]): Set<string> {
       })
       .map((h) => {
         const date = new Date(h.date);
-        return getDateKey(date);
+        return getOptimizedDateKey (date);
       })
   );
 }

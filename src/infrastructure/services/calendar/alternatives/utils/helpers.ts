@@ -1,9 +1,9 @@
 import { HolidayDTO } from '@application/dto/holiday/types';
-import { getDateKey } from '@application/stores/utils/helpers';
 import { addDays, differenceInDays, isWeekend } from 'date-fns';
 import { PTO_CONSTANTS } from '../../const';
 import { Bridge, Suggestion } from '../../types';
 import { getCombinationKey } from '../../utils/helpers';
+import { getOptimizedDateKey } from '../../utils/cache';
 
 export function selectAlternativeBridges(
   bridges: Bridge[],
@@ -19,13 +19,13 @@ export function selectAlternativeBridges(
   for (const bridge of bridges) {
     if (totalPtoDays >= targetPtoDays) break;
 
-    const hasConflict = bridge.ptoDays.some((day) => usedDates.has(getDateKey(day)));
+    const hasConflict = bridge.ptoDays.some((day) => usedDates.has(getOptimizedDateKey(day)));
 
     if (!hasConflict && totalPtoDays + bridge.ptoDaysNeeded <= targetPtoDays) {
       selectedBridges.push(bridge);
       bridge.ptoDays.forEach((day) => {
         selectedDays.push(day);
-        usedDates.add(getDateKey(day));
+        usedDates.add(getOptimizedDateKey(day));
       });
       totalPtoDays += bridge.ptoDaysNeeded;
       totalEffectiveDays += bridge.effectiveDays;
@@ -39,7 +39,7 @@ export function selectAlternativeBridges(
       .filter(
         (b) => b.ptoDaysNeeded === 1 && b.efficiency >= PTO_CONSTANTS.BRIDGE_GENERATION.MIN_EFFICIENCY_FOR_ALTERNATIVES
       )
-      .filter((b) => !usedDates.has(getDateKey(b.ptoDays[0])))
+      .filter((b) => !usedDates.has(getOptimizedDateKey(b.ptoDays[0])))
       .slice(0, remainingDays);
 
     for (const bridge of valuableDays) {
@@ -115,7 +115,7 @@ export function findSimilarSizeBlocks(
     for (let j = i; j < bridges.length && currentSize < targetSize; j++) {
       const bridge = bridges[j];
 
-      const hasConflict = bridge.ptoDays.some((day: Date) => existingDaySet.has(getDateKey(day)));
+      const hasConflict = bridge.ptoDays.some((day: Date) => existingDaySet.has(getOptimizedDateKey(day)));
 
       if (!hasConflict && currentSize + bridge.ptoDaysNeeded <= targetSize) {
         block.push(...bridge.ptoDays);
@@ -154,7 +154,7 @@ export function calculateGroupedEffectiveDays(days: Date[], holidays: HolidayDTO
   if (days.length === 0) return 0;
 
   const sortedDays = [...days].sort((a, b) => a.getTime() - b.getTime());
-  const holidaySet = new Set(holidays.map((h) => getDateKey(new Date(h.date))));
+  const holidaySet = new Set(holidays.map((h) => getOptimizedDateKey(new Date(h.date))));
 
   let totalEffectiveDays = 0;
   let currentGroup: Date[] = [];
@@ -192,7 +192,10 @@ function calculateGroupEffectiveDays(group: Date[], holidaySet: Set<string>): nu
 
   let current = addDays(start, -1);
   let safetyCounter = 0;
-  while ((isWeekend(current) || holidaySet.has(getDateKey(current))) && safetyCounter < PTO_CONSTANTS.SAFETY_LIMIT) {
+  while (
+    (isWeekend(current) || holidaySet.has(getOptimizedDateKey(current))) &&
+    safetyCounter < PTO_CONSTANTS.SAFETY_LIMIT
+  ) {
     start = current;
     current = addDays(current, -1);
     safetyCounter++;
@@ -200,7 +203,10 @@ function calculateGroupEffectiveDays(group: Date[], holidaySet: Set<string>): nu
 
   current = addDays(end, 1);
   safetyCounter = 0;
-  while ((isWeekend(current) || holidaySet.has(getDateKey(current))) && safetyCounter < PTO_CONSTANTS.SAFETY_LIMIT) {
+  while (
+    (isWeekend(current) || holidaySet.has(getOptimizedDateKey(current))) &&
+    safetyCounter < PTO_CONSTANTS.SAFETY_LIMIT
+  ) {
     end = current;
     current = addDays(current, 1);
     safetyCounter++;

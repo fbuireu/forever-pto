@@ -2,11 +2,10 @@ import { HolidayDTO } from '@application/dto/holiday/types';
 import { addDays, isWeekend } from 'date-fns';
 import { PTO_CONSTANTS } from '../../const';
 import { Suggestion } from '../../types';
+import { findBridgesOptimized, getOptimizedDateKey } from '../../utils/cache';
+import { getCombinationKey } from '../../utils/helpers';
 import { GenerateAlternativesParams } from '../generateAlternatives';
 import { calculateGroupedEffectiveDays, findSimilarSizeBlocks, selectAlternativeBridges } from './helpers';
-import { getDateKey } from '@application/stores/utils/helpers';
-import { getCombinationKey } from '../../utils/helpers';
-import { findBridges } from '../../utils/finder';
 
 export function generateBlockShifts(
   existingSuggestion: Date[],
@@ -64,19 +63,27 @@ export function generateBlockRotations(
 
     let currentDay = startDay;
     let daysAdded = 0;
+    let iterationsCounter = 0; // ✅ MOVER AQUÍ
+    const MAX_SEARCH_DAYS = 365 * 2; // 2 años para cubrir carryover
 
-    while (daysAdded < targetDays && daysAdded < PTO_CONSTANTS.BLOCK_SHIFTS.MAX_DAYS_TO_ADD) {
+    // ✅ UN SOLO BUCLE WHILE CON TODAS LAS CONDICIONES
+    while (
+      daysAdded < targetDays &&
+      daysAdded < PTO_CONSTANTS.BLOCK_SHIFTS.MAX_DAYS_TO_ADD &&
+      iterationsCounter < MAX_SEARCH_DAYS
+    ) {
       if (!isWeekend(currentDay)) {
         const isAvailable = availableWorkdays.some((wd) => wd.getTime() === currentDay.getTime());
 
-        if (isAvailable && !usedDates.has(getDateKey(currentDay))) {
+        if (isAvailable && !usedDates.has(getOptimizedDateKey(currentDay))) {
           newDays.push(new Date(currentDay));
-          usedDates.add(getDateKey(currentDay));
+          usedDates.add(getOptimizedDateKey(currentDay));
           daysAdded++;
         }
       }
 
       currentDay = addDays(currentDay, 1);
+      iterationsCounter++; // ✅ Contador de seguridad
     }
 
     if (newDays.length === targetDays) {
@@ -132,8 +139,8 @@ export function generateGroupedAlternatives(
   }
 
   if (alternatives.length < maxAlternatives) {
-    const allBridges = findBridges(availableWorkdays, effectiveHolidays);
-    const existingDaySet = new Set(existingSuggestion.map((d) => getDateKey(d)));
+    const allBridges = findBridgesOptimized(availableWorkdays, effectiveHolidays);
+    const existingDaySet = new Set(existingSuggestion.map((d) => getOptimizedDateKey(d)));
 
     const targetBlockSize = existingSuggestion.length;
     const similarBlocks = findSimilarSizeBlocks(allBridges, targetBlockSize, existingDaySet, usedCombinations);
@@ -165,10 +172,10 @@ export function generateOptimizedAlternatives(
 
   usedCombinations.add(getCombinationKey(existingSuggestion));
 
-  const allBridges = findBridges(availableWorkdays, effectiveHolidays);
-  const existingDaySet = new Set(existingSuggestion.map((d) => getDateKey(d)));
+  const allBridges = findBridgesOptimized(availableWorkdays, effectiveHolidays);
+  const existingDaySet = new Set(existingSuggestion.map((d) => getOptimizedDateKey(d)));
   const unusedBridges = allBridges.filter(
-    (bridge) => !bridge.ptoDays.some((day) => existingDaySet.has(getDateKey(day)))
+    (bridge) => !bridge.ptoDays.some((day) => existingDaySet.has(getOptimizedDateKey(day)))
   );
 
   for (
@@ -211,7 +218,7 @@ export function generateBalancedAlternatives(
 
   usedCombinations.add(getCombinationKey(existingSuggestion));
 
-  const allBridges = findBridges(availableWorkdays, effectiveHolidays);
+  const allBridges = findBridgesOptimized(availableWorkdays, effectiveHolidays);
 
   const mediumBlocks = allBridges.filter(
     (b) =>
@@ -220,12 +227,12 @@ export function generateBalancedAlternatives(
       b.efficiency >= PTO_CONSTANTS.BRIDGE_GENERATION.MIN_EFFICIENCY_FOR_MEDIUM
   );
 
-  const existingDaySet = new Set(existingSuggestion.map((d) => getDateKey(d)));
+  const existingDaySet = new Set(existingSuggestion.map((d) => getOptimizedDateKey(d)));
 
   for (const block of mediumBlocks.slice(0, PTO_CONSTANTS.BRIDGE_GENERATION.MAX_MEDIUM_BLOCKS)) {
     if (alternatives.length >= maxAlternatives) break;
 
-    const hasConflict = block.ptoDays.some((day) => existingDaySet.has(getDateKey(day)));
+    const hasConflict = block.ptoDays.some((day) => existingDaySet.has(getOptimizedDateKey(day)));
 
     if (!hasConflict) {
       const days = [...block.ptoDays];
