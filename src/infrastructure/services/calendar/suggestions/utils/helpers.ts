@@ -1,8 +1,8 @@
 import { addDays, differenceInDays, isWeekend } from 'date-fns';
 import { PTO_CONSTANTS } from '../../const';
 import { Bridge } from '../../types';
-import { isFreeDay } from '../../utils/helpers';
-import { getOptimizedDateKey } from '../../utils/cache';
+import { getKey } from '../../utils/cache';
+import { createDateSet, hasDateConflict, isFreeDay } from '../../utils/helpers';
 
 export function groupConsecutiveDays(days: Date[]): Array<{ start: Date; end: Date }> {
   if (days.length === 0) return [];
@@ -55,17 +55,15 @@ export function expandRange(range: { start: Date; end: Date }, holidaySet: Set<s
 
 export function selectOptimalBridges(bridges: Bridge[], targetPtoDays: number): Bridge[] {
   const selected: Bridge[] = [];
-  const usedDates = new Set<string>();
+  const usedDates = createDateSet([]);
   let totalPtoDays = 0;
 
   for (const bridge of bridges) {
     if (totalPtoDays >= targetPtoDays) break;
 
-    const hasConflict = bridge.ptoDays.some((day) => usedDates.has(getOptimizedDateKey(day)));
-
-    if (!hasConflict && totalPtoDays + bridge.ptoDaysNeeded <= targetPtoDays) {
+    if (!hasDateConflict(bridge.ptoDays, usedDates) && totalPtoDays + bridge.ptoDaysNeeded <= targetPtoDays) {
       selected.push(bridge);
-      bridge.ptoDays.forEach((day) => usedDates.add(getOptimizedDateKey(day)));
+      bridge.ptoDays.forEach((day) => usedDates.add(getKey(day)));
       totalPtoDays += bridge.ptoDaysNeeded;
     }
   }
@@ -85,13 +83,13 @@ export function findAdjacentWorkday(
   const lastDay = sortedDays[sortedDays.length - 1];
 
   const nextDay = addDays(lastDay, 1);
-  if (!isWeekend(nextDay) && !usedDates.has(getOptimizedDateKey(nextDay))) {
+  if (!isWeekend(nextDay) && !usedDates.has(getKey(nextDay))) {
     const isAvailable = availableWorkdays.some((d) => d.getTime() === nextDay.getTime());
     if (isAvailable) return nextDay;
   }
 
   const prevDay = addDays(firstDay, -1);
-  if (!isWeekend(prevDay) && !usedDates.has(getOptimizedDateKey(prevDay))) {
+  if (!isWeekend(prevDay) && !usedDates.has(getKey(prevDay))) {
     const isAvailable = availableWorkdays.some((d) => d.getTime() === prevDay.getTime());
     if (isAvailable) return prevDay;
   }
@@ -100,12 +98,12 @@ export function findAdjacentWorkday(
     const candidateNext = addDays(lastDay, i);
     const candidatePrev = addDays(firstDay, -i);
 
-    if (!isWeekend(candidateNext) && !usedDates.has(getOptimizedDateKey(candidateNext))) {
+    if (!isWeekend(candidateNext) && !usedDates.has(getKey(candidateNext))) {
       const isAvailable = availableWorkdays.some((d) => d.getTime() === candidateNext.getTime());
       if (isAvailable) return candidateNext;
     }
 
-    if (!isWeekend(candidatePrev) && !usedDates.has(getOptimizedDateKey(candidatePrev))) {
+    if (!isWeekend(candidatePrev) && !usedDates.has(getKey(candidatePrev))) {
       const isAvailable = availableWorkdays.some((d) => d.getTime() === candidatePrev.getTime());
       if (isAvailable) return candidatePrev;
     }

@@ -8,9 +8,10 @@ import { SlidingNumber } from '../text/sliding-number';
 
 interface AlternativeManagerProps {
   allSuggestions: Suggestion[];
-  onSelectionChange?: (selection: Suggestion, index: number) => void;
-  onPreviewChange?: (selection: Suggestion, index: number) => void;
-  selectedIndex?: number;
+  onSelectionChange: (selection: Suggestion, index: number) => void;
+  onPreviewChange: (selection: Suggestion, index: number) => void;
+  selectedIndex: number;
+  currentSelectionIndex: number;
 }
 
 const STAT_CARD_MOTION_CONFIG = {
@@ -50,10 +51,11 @@ const BADGE_VARIANTS: Variants = {
 };
 
 export const AlternativesManager = ({
-allSuggestions,
+  allSuggestions,
   onSelectionChange,
   onPreviewChange,
   selectedIndex = 0,
+  currentSelectionIndex = 0,
 }: AlternativeManagerProps) => {
   const [currentIndex, setCurrentIndex] = React.useState(selectedIndex);
 
@@ -64,7 +66,7 @@ allSuggestions,
     if (currentIndex > 0) {
       const newIndex = currentIndex - 1;
       setCurrentIndex(newIndex);
-      onPreviewChange?.(allSuggestions[newIndex], newIndex);
+      onPreviewChange(allSuggestions[newIndex], newIndex);
     }
   }, [currentIndex, allSuggestions, onPreviewChange]);
 
@@ -72,7 +74,7 @@ allSuggestions,
     if (currentIndex < totalOptions - 1) {
       const newIndex = currentIndex + 1;
       setCurrentIndex(newIndex);
-      onPreviewChange?.(allSuggestions[newIndex], newIndex);
+      onPreviewChange(allSuggestions[newIndex], newIndex);
     }
   }, [currentIndex, totalOptions, allSuggestions, onPreviewChange]);
 
@@ -252,9 +254,10 @@ allSuggestions,
       <div className='mx-3 hidden h-6 w-px bg-border sm:block rounded-full' />
 
       <motion.button
+        disabled={currentSelectionIndex === currentIndex}
         whileTap={{ scale: 0.975 }}
         className={`flex w-full h-10 text-sm cursor-pointer items-center justify-center rounded-lg px-3 py-2 font-medium transition-colors duration-300 sm:w-auto ${'bg-teal-500 text-white hover:bg-teal-600 dark:bg-teal-600/80 dark:hover:bg-teal-700'}`}
-        onClick={() => onSelectionChange?.(currentSuggestion, currentIndex)}
+        onClick={() => onSelectionChange(currentSuggestion, currentIndex)}
       >
         Apply
       </motion.button>

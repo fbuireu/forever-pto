@@ -6,7 +6,6 @@ export interface Bridge {
   efficiency: number;
   ptoDays: Date[];
   type: 'perfect' | 'good' | 'acceptable' | 'regular';
-  description?: string;
 }
 
 export interface Suggestion {

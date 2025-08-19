@@ -19,6 +19,7 @@ export interface HolidaysState {
   currentSelection: Suggestion | null;
   previewAlternativeSelection: Suggestion | null;
   previewAlternativeIndex: number;
+  currentSelectionIndex: number;
 }
 
 interface GenerateSuggestionsParams {
@@ -55,6 +56,7 @@ const initialState: HolidaysState = {
   currentSelection: null,
   previewAlternativeSelection: null,
   previewAlternativeIndex: 0,
+  currentSelectionIndex: 0,
 };
 
 export const useHolidaysStore = create<HolidaysStore>()(
@@ -90,12 +92,12 @@ export const useHolidaysStore = create<HolidaysStore>()(
               currentSelection: null,
               previewAlternativeSelection: null,
               previewAlternativeIndex: 0,
+              currentSelectionIndex: 0,
             });
             return;
           }
 
           try {
-            clearDateKeyCache();
             const holidaysDates = holidays.map((h) => ({
               ...h,
               date: ensureDate(h.date),
@@ -109,7 +111,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               months,
               strategy: 'grouped',
             });
-            console.log('suggesting', suggestion);
+
             const alternatives = generateAlternatives({
               year,
               ptoDays,
@@ -127,6 +129,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               currentSelection: suggestion,
               previewAlternativeSelection: suggestion,
               previewAlternativeIndex: 0,
+              currentSelectionIndex: 0,
             });
           } catch (error) {
             console.error('Error generating suggestions:', error);
@@ -136,6 +139,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               currentSelection: null,
               previewAlternativeSelection: null,
               previewAlternativeIndex: 0,
+              currentSelectionIndex: 0,
             });
           }
         },
@@ -192,6 +196,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
             currentSelection: selection,
             previewAlternativeSelection: selection,
             previewAlternativeIndex: index,
+            currentSelectionIndex: index,
           });
         },
 
@@ -228,6 +233,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               };
               state.previewAlternativeSelection = state.suggestion;
               state.previewAlternativeIndex = 0;
+              state.currentSelectionIndex = 0;
             }
 
             if (state.alternatives) {

@@ -12,6 +12,7 @@ export const ManagementBar = () => {
     setPreviewAlternativeSelection,
     setCurrentAlternativeSelection,
     previewAlternativeIndex,
+    currentSelectionIndex,
   } = useHolidaysStore();
 
   const handlePreviewChange = useCallback(
@@ -24,15 +25,17 @@ export const ManagementBar = () => {
   const handleSelectionChange = useCallback(
     (selection: Suggestion, index: number) => {
       setCurrentAlternativeSelection(selection, index);
+      setCurrentAlternativeSelection(selection, index);
     },
     [setCurrentAlternativeSelection]
   );
 
   if (!suggestion) return null;
-
+  console.log('currentSelectionIndex', currentSelectionIndex);
   return (
     <AlternativesManager
       key={previewAlternativeIndex}
+      currentSelectionIndex={currentSelectionIndex}
       allSuggestions={[suggestion, ...alternatives]}
       onSelectionChange={handleSelectionChange}
       onPreviewChange={handlePreviewChange}
