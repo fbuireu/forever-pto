@@ -2,32 +2,38 @@ import { PTO_CONSTANTS } from '../../const';
 import { Bridge, Suggestion } from '../../types';
 import { getCombinationKey, getKey } from '../../utils/cache';
 
-export function findAlternativeCombinations(
-  bridges: Bridge[],
-  ptoDays: number,
-  existingSuggestionSet: Set<number>,
-  maxAlternatives: number,
-  minEfficiency: number
-): Suggestion[] {
+interface FindAlternativeCombinationsParams {
+  bridges: Bridge[];
+  ptoDays: number;
+  existingSuggestionSet: Set<number>;
+  maxAlternatives: number;
+  minEfficiency: number;
+}
+
+export function findAlternativeCombinations({
+  bridges,
+  ptoDays,
+  existingSuggestionSet,
+  maxAlternatives,
+  minEfficiency,
+}: FindAlternativeCombinationsParams): Suggestion[] {
+  const { EFFICIENCY_COMPARISON_THRESHOLD } = PTO_CONSTANTS.BRIDGE_GENERATION;
   const alternatives: Suggestion[] = [];
   const usedCombinations = new Set<string>();
 
-  // Filtrar puentes disponibles
   const availableBridges = bridges.filter(
     (bridge) => !bridge.ptoDays.some((day) => existingSuggestionSet.has(day.getTime()))
   );
 
-  // Usar backtracking con límite de profundidad adaptativo
   const maxDepth = Math.min(availableBridges.length, ptoDays * 2);
   const combinations = generateCombinationsWithBacktracking(
     availableBridges,
     ptoDays,
     minEfficiency,
-    maxAlternatives * 3, // Generar más para luego filtrar
+    maxAlternatives * 3,
     maxDepth
   );
 
-  // Diversificar resultados por distribución temporal
   const diversified = diversifyCombinations(combinations, maxAlternatives);
 
   for (const combo of diversified) {
@@ -39,9 +45,9 @@ export function findAlternativeCombinations(
   }
 
   return alternatives
-    .sort((a, b) => {
+    .toSorted((a, b) => {
       const effDiff = (b.efficiency || 0) - (a.efficiency || 0);
-      return Math.abs(effDiff) > PTO_CONSTANTS.BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD
+      return Math.abs(effDiff) > EFFICIENCY_COMPARISON_THRESHOLD
         ? effDiff
         : b.totalEffectiveDays - a.totalEffectiveDays;
     })
@@ -59,12 +65,13 @@ function generateCombinationsWithBacktracking(
   const visitedStates = new Set<string>();
 
   function backtrack(index: number, selected: Bridge[], remainingDays: number, usedDates: Set<string>, depth: number) {
-    // Estado para evitar duplicados
-    const stateKey = `${index}-${remainingDays}-${Array.from(usedDates).sort().join(',')}`;
+    const stateKey = `${index}-${remainingDays}-${Array.from(usedDates)
+      .toSorted((a, b) => a.localeCompare(b))
+      .join(',')}`;
+
     if (visitedStates.has(stateKey)) return;
     visitedStates.add(stateKey);
 
-    // Caso base: objetivo alcanzado
     if (remainingDays === 0) {
       const days = selected.flatMap((b) => b.ptoDays);
       const totalEffective = selected.reduce((sum, b) => sum + b.effectiveDays, 0);
@@ -72,7 +79,7 @@ function generateCombinationsWithBacktracking(
 
       if (efficiency >= minEfficiency) {
         results.push({
-          days: days.sort((a, b) => a.getTime() - b.getTime()),
+          days: days.toSorted((a, b) => a.getTime() - b.getTime()),
           totalEffectiveDays: totalEffective,
           efficiency,
           bridges: selected,
@@ -81,12 +88,10 @@ function generateCombinationsWithBacktracking(
       return;
     }
 
-    // Límites de búsqueda
     if (results.length >= maxResults || depth > maxDepth || index >= bridges.length) {
       return;
     }
 
-    // Probar cada puente restante
     for (let i = index; i < bridges.length; i++) {
       const bridge = bridges[i];
 
@@ -110,11 +115,9 @@ function generateCombinationsWithBacktracking(
 function diversifyCombinations(combinations: Suggestion[], targetCount: number): Suggestion[] {
   if (combinations.length <= targetCount) return combinations;
 
-  // Agrupar por características para diversificar
   const grouped = new Map<string, Suggestion[]>();
 
   combinations.forEach((combo) => {
-    // Crear una clave basada en distribución temporal
     const months = combo.days.map((d) => d.getMonth());
     const uniqueMonths = new Set(months);
     const spread = uniqueMonths.size;
@@ -125,7 +128,6 @@ function diversifyCombinations(combinations: Suggestion[], targetCount: number):
     grouped.get(groupKey)!.push(combo);
   });
 
-  // Tomar elementos de cada grupo proporcionalmente
   const result: Suggestion[] = [];
   const perGroup = Math.ceil(targetCount / grouped.size);
 

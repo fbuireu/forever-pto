@@ -1,7 +1,7 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { generateAlternatives } from '@infrastructure/services/calendar/alternatives/generateAlternatives';
 import { generateSuggestions } from '@infrastructure/services/calendar/suggestions/generateSuggestions';
-import { Suggestion } from '@infrastructure/services/calendar/types';
+import { OptimizationStrategy, Suggestion } from '@infrastructure/services/calendar/types';
 import { clearDateKeyCache } from '@infrastructure/services/calendar/utils/cache';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
 import { ensureDate } from '@shared/utils/dates';
@@ -109,7 +109,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               holidays: holidaysDates,
               allowPastDays,
               months,
-              strategy: 'grouped',
+              strategy: OptimizationStrategy.GROUPED,
             });
 
             const alternatives = generateAlternatives({
@@ -120,7 +120,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               months,
               maxAlternatives,
               existingSuggestion: suggestion.days,
-              strategy: 'grouped',
+              strategy: OptimizationStrategy.GROUPED,
             });
 
             set({
@@ -173,7 +173,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               months,
               maxAlternatives: maxToGenerate,
               existingSuggestion: suggestion.days,
-              strategy: 'grouped',
+              strategy: OptimizationStrategy.GROUPED,
             });
 
             set({

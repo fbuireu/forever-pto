@@ -1,9 +1,9 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { isWeekend } from 'date-fns';
-import type { OptimizationStrategy, Suggestion } from '../types';
+import { Bridge, OptimizationStrategy, Suggestion } from '../types';
 import { clearDateKeyCache, clearHolidayCache } from '../utils/cache';
 import { findBridges, getAvailableWorkdays } from '../utils/helpers';
-import { selectBridgesForStrategy, selectOptimalDaysFromBridges } from '../utils/selectors';
+import { selectBridgesForStrategy, selectOptimalDaysFromBridges } from './utils/selectors';
 
 export interface GenerateSuggestionsParams {
   year: number;
@@ -14,9 +14,13 @@ export interface GenerateSuggestionsParams {
   strategy: OptimizationStrategy;
 }
 
-export function generateSuggestions(params: GenerateSuggestionsParams): Suggestion {
-  const { ptoDays, holidays, allowPastDays, months, strategy = 'grouped' } = params;
-
+export function generateSuggestions({
+  ptoDays,
+  holidays,
+  allowPastDays,
+  months,
+  strategy,
+}: GenerateSuggestionsParams): Suggestion {
   clearDateKeyCache();
   clearHolidayCache();
 
@@ -39,13 +43,21 @@ export function generateSuggestions(params: GenerateSuggestionsParams): Suggesti
     return { days: [], totalEffectiveDays: 0 };
   }
 
-  const bridges = findBridges(availableWorkdays, effectiveHolidays);
-  const selection =
-    strategy === 'balanced'
-      ? selectOptimalDaysFromBridges(bridges, ptoDays)
-      : selectBridgesForStrategy(bridges, ptoDays, strategy);
+  const bridges = findBridges({ availableWorkdays, holidays: effectiveHolidays });
+
+  const STRATEGY_MAP = {
+    balanced: (bridges: Bridge[], ptoDays: number) => selectOptimalDaysFromBridges({ bridges, targetPtoDays: ptoDays }),
+    grouped: (bridges: Bridge[], ptoDays: number) =>
+      selectBridgesForStrategy({ bridges, targetPtoDays: ptoDays, strategy: OptimizationStrategy.GROUPED }),
+    optimized: (bridges: Bridge[], ptoDays: number) =>
+      selectBridgesForStrategy({ bridges, targetPtoDays: ptoDays, strategy: OptimizationStrategy.OPTIMIZED }),
+  };
+
+  const selector = STRATEGY_MAP[strategy] || STRATEGY_MAP.grouped;
+  const selection = selector(bridges, ptoDays);
+
   return {
-    days: selection.days.sort((a, b) => a.getTime() - b.getTime()),
+    days: selection.days.toSorted((a, b) => a.getTime() - b.getTime()),
     totalEffectiveDays: selection.totalEffectiveDays,
     efficiency: selection.days.length > 0 ? selection.totalEffectiveDays / selection.days.length : 0,
     bridges: selection.bridges,

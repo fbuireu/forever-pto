@@ -5,6 +5,7 @@ import { BarChart3, Calendar, CalendarDays, ChevronLeft, ChevronRight, Sparkles,
 import { motion, type Transition, type Variants } from 'motion/react';
 import * as React from 'react';
 import { SlidingNumber } from '../text/sliding-number';
+import { Button } from '@const/components/ui/button';
 
 interface AlternativeManagerProps {
   allSuggestions: Suggestion[];
@@ -87,7 +88,6 @@ export const AlternativesManager = ({
   const efficiency = effectiveDays / ptoDays;
   const gainedDays = effectiveDays - ptoDays;
 
-  // Calculate comparison with main suggestion
   const mainEfficiency = allSuggestions[0].totalEffectiveDays / allSuggestions[0].days.length;
   const efficiencyDiff = efficiency - mainEfficiency;
   const isMainSuggestion = currentIndex === 0;
@@ -180,7 +180,6 @@ export const AlternativesManager = ({
           </motion.span>
         </motion.button>
 
-        {/* Efficiency */}
         <motion.button
           {...STAT_CARD_MOTION_CONFIG}
           className='flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-purple-100/60 px-2.5 py-2 dark:bg-purple-900/30'
@@ -253,14 +252,13 @@ export const AlternativesManager = ({
 
       <div className='mx-3 hidden h-6 w-px bg-border sm:block rounded-full' />
 
-      <motion.button
+      <Button
         disabled={currentSelectionIndex === currentIndex}
-        whileTap={{ scale: 0.975 }}
         className={`flex w-full h-10 text-sm cursor-pointer items-center justify-center rounded-lg px-3 py-2 font-medium transition-colors duration-300 sm:w-auto ${'bg-teal-500 text-white hover:bg-teal-600 dark:bg-teal-600/80 dark:hover:bg-teal-700'}`}
         onClick={() => onSelectionChange(currentSuggestion, currentIndex)}
       >
-        Apply
-      </motion.button>
+        Apply Alternative
+      </Button>
     </div>
   );
 };

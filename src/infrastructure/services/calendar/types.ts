@@ -5,7 +5,6 @@ export interface Bridge {
   effectiveDays: number;
   efficiency: number;
   ptoDays: Date[];
-  type: 'perfect' | 'good' | 'acceptable' | 'regular';
 }
 
 export interface Suggestion {
@@ -13,7 +12,11 @@ export interface Suggestion {
   totalEffectiveDays: number;
   efficiency?: number;
   bridges?: Bridge[];
-  strategy?: OptimizationStrategy;
+  strategy: OptimizationStrategy;
 }
 
-export type OptimizationStrategy = 'grouped' | 'optimized' | 'balanced';
+export const enum OptimizationStrategy {
+  GROUPED = 'grouped',
+  OPTIMIZED = 'optimized',
+  BALANCED = 'balanced',
+}

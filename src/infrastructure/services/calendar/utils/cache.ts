@@ -20,7 +20,7 @@ export const getKey = (date: Date): string => {
 export const getCombinationKey = (days: Date[]): string => {
   return days
     .map((d) => getKey(d))
-    .sort()
+    .sort((a, b) => a.localeCompare(b))
     .join(',');
 };
 

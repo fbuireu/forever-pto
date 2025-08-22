@@ -5,84 +5,91 @@ import { findBridges } from '../../utils/helpers';
 import { GenerateAlternativesParams } from '../generateAlternatives';
 import { findAlternativeCombinations } from './helpers';
 
-// Main strategy functions
-export function generateGroupedAlternatives(
-  params: GenerateAlternativesParams,
-  availableWorkdays: Date[],
-  effectiveHolidays: HolidayDTO[],
-  existingSuggestionSet: Set<number>
-): Suggestion[] {
+interface GenerateAlternativesBaseParams {
+  params: GenerateAlternativesParams;
+  availableWorkdays: Date[];
+  effectiveHolidays: HolidayDTO[];
+  existingSuggestionSet: Set<number>;
+}
+
+export function generateGroupedAlternatives({
+  params,
+  availableWorkdays,
+  effectiveHolidays,
+  existingSuggestionSet,
+}: GenerateAlternativesBaseParams): Suggestion[] {
   const { ptoDays, maxAlternatives } = params;
+  const { MIN_EFFICIENCY_FOR_ALTERNATIVES } = PTO_CONSTANTS.BRIDGE_GENERATION;
 
-  const bridges = findBridges(availableWorkdays, effectiveHolidays);
+  const bridges = findBridges({ availableWorkdays, holidays: effectiveHolidays });
 
-  // For grouped strategy, prefer larger blocks
-  const sortedBridges = bridges.sort((a, b) => {
-    // Prioritize multi-day bridges for grouping
+  const sortedBridges = bridges.toSorted((a, b) => {
     if (a.ptoDaysNeeded !== b.ptoDaysNeeded) {
       return b.ptoDaysNeeded - a.ptoDaysNeeded;
     }
     return b.efficiency - a.efficiency;
   });
 
-  return findAlternativeCombinations(
-    sortedBridges,
+  return findAlternativeCombinations({
+    bridges: sortedBridges,
     ptoDays,
     existingSuggestionSet,
     maxAlternatives,
-    PTO_CONSTANTS.BRIDGE_GENERATION.MIN_EFFICIENCY_FOR_ALTERNATIVES
-  );
+    minEfficiency: MIN_EFFICIENCY_FOR_ALTERNATIVES,
+  });
 }
 
-export function generateOptimizedAlternatives(
-  params: GenerateAlternativesParams,
-  availableWorkdays: Date[],
-  effectiveHolidays: HolidayDTO[],
-  existingSuggestionSet: Set<number>
-): Suggestion[] {
+export function generateOptimizedAlternatives({
+  params,
+  availableWorkdays,
+  effectiveHolidays,
+  existingSuggestionSet,
+}: GenerateAlternativesBaseParams): Suggestion[] {
   const { ptoDays, maxAlternatives } = params;
+  const { MIN_EFFICIENCY_FOR_OPTIMIZED } = PTO_CONSTANTS.BRIDGE_GENERATION;
 
-  const bridges = findBridges(availableWorkdays, effectiveHolidays);
+  const bridges = findBridges({ availableWorkdays, holidays: effectiveHolidays });
 
-  // For optimized strategy, pure efficiency focus
-  const sortedBridges = bridges.sort((a, b) => {
+  const sortedBridges = bridges.toSorted((a, b) => {
     const effDiff = b.efficiency - a.efficiency;
     if (Math.abs(effDiff) > 0.1) return effDiff;
     return b.effectiveDays - a.effectiveDays;
   });
 
-  return findAlternativeCombinations(
-    sortedBridges,
+  return findAlternativeCombinations({
+    bridges: sortedBridges,
     ptoDays,
     existingSuggestionSet,
     maxAlternatives,
-    PTO_CONSTANTS.BRIDGE_GENERATION.MIN_EFFICIENCY_FOR_OPTIMIZED
-  );
+    minEfficiency: MIN_EFFICIENCY_FOR_OPTIMIZED,
+  });
 }
 
-export function generateBalancedAlternatives(
-  params: GenerateAlternativesParams,
-  availableWorkdays: Date[],
-  effectiveHolidays: HolidayDTO[],
-  existingSuggestionSet: Set<number>
-): Suggestion[] {
+export function generateBalancedAlternatives({
+  params,
+  availableWorkdays,
+  effectiveHolidays,
+  existingSuggestionSet,
+}: GenerateAlternativesBaseParams): Suggestion[] {
   const { ptoDays, maxAlternatives } = params;
+  const {
+    SCORING: { BASE_SCORE, BALANCED_MULTI_DAY },
+    BRIDGE_GENERATION: { MIN_EFFICIENCY_FOR_BALANCED },
+  } = PTO_CONSTANTS;
 
-  const bridges = findBridges(availableWorkdays, effectiveHolidays);
+  const bridges = findBridges({ availableWorkdays, holidays: effectiveHolidays });
 
-  // For balanced strategy, mix of efficiency and grouping
-  const sortedBridges = bridges.sort((a, b) => {
-    // Balance between efficiency and block size
-    const aScore = a.efficiency * (a.ptoDaysNeeded > 1 ? 1.2 : 1);
-    const bScore = b.efficiency * (b.ptoDaysNeeded > 1 ? 1.2 : 1);
+  const sortedBridges = bridges.toSorted((a, b) => {
+    const aScore = a.efficiency * (a.ptoDaysNeeded > BASE_SCORE ? BALANCED_MULTI_DAY : BASE_SCORE);
+    const bScore = b.efficiency * (b.ptoDaysNeeded > BASE_SCORE ? BALANCED_MULTI_DAY : BASE_SCORE);
     return bScore - aScore;
   });
 
-  return findAlternativeCombinations(
-    sortedBridges,
+  return findAlternativeCombinations({
+    bridges: sortedBridges,
     ptoDays,
     existingSuggestionSet,
     maxAlternatives,
-    PTO_CONSTANTS.BRIDGE_GENERATION.MIN_EFFICIENCY_FOR_ALTERNATIVES
-  );
+    minEfficiency: MIN_EFFICIENCY_FOR_BALANCED,
+  });
 }

@@ -27,7 +27,7 @@ export function generateAlternatives(params: GenerateAlternativesParams): Sugges
     months,
     maxAlternatives,
     existingSuggestion,
-    strategy = 'grouped',
+    strategy,
   } = params;
   if (ptoDays <= 0 || maxAlternatives <= 0 || existingSuggestion.length === 0) {
     return [];
@@ -46,13 +46,13 @@ export function generateAlternatives(params: GenerateAlternativesParams): Sugges
 
   const existingSuggestionSet = new Set(existingSuggestion.map((d) => d.getTime()));
 
-  const strategyMap = {
+  const STRATEGY_MAP = {
     optimized: generateOptimizedAlternatives,
     balanced: generateBalancedAlternatives,
     grouped: generateGroupedAlternatives,
   } as const;
 
-  const generateFunction = strategyMap[strategy] || strategyMap.grouped;
+  const strategyFunction = STRATEGY_MAP[strategy] || STRATEGY_MAP.grouped;
 
-  return generateFunction(params, availableWorkdays, effectiveHolidays, existingSuggestionSet);
+  return strategyFunction({ params, availableWorkdays, effectiveHolidays, existingSuggestionSet });
 }
