@@ -1,206 +1,137 @@
-import type { HolidayDTO } from '@application/dto/holiday/types';
-import { addDays, differenceInDays, isWeekend } from 'date-fns';
 import { PTO_CONSTANTS } from '../../const';
 import { Bridge, Suggestion } from '../../types';
 import { getCombinationKey, getKey } from '../../utils/cache';
-import { createDateSet, hasDateConflict } from '../../utils/helpers';
 
-export function selectAlternativeBridges(
+export function findAlternativeCombinations(
   bridges: Bridge[],
-  targetPtoDays: number,
-  usedCombinations: Set<string>
-): Suggestion {
-  const selectedDays: Date[] = [];
-  const selectedBridges: Bridge[] = [];
-  const usedDates = createDateSet([]);
-  let totalPtoDays = 0;
-  let totalEffectiveDays = 0;
-
-  for (const bridge of bridges) {
-    if (totalPtoDays >= targetPtoDays) break;
-
-    if (!hasDateConflict(bridge.ptoDays, usedDates) && totalPtoDays + bridge.ptoDaysNeeded <= targetPtoDays) {
-      selectedBridges.push(bridge);
-      bridge.ptoDays.forEach((day) => {
-        selectedDays.push(day);
-        usedDates.add(getKey(day));
-      });
-      totalPtoDays += bridge.ptoDaysNeeded;
-      totalEffectiveDays += bridge.effectiveDays;
-    }
-  }
-
-  if (selectedDays.length < targetPtoDays) {
-    const remainingDays = targetPtoDays - selectedDays.length;
-
-    const valuableDays = bridges
-      .filter(
-        (b) => b.ptoDaysNeeded === 1 && b.efficiency >= PTO_CONSTANTS.BRIDGE_GENERATION.MIN_EFFICIENCY_FOR_ALTERNATIVES
-      )
-      .filter((b) => !usedDates.has(getKey(b.ptoDays[0])))
-      .slice(0, remainingDays);
-
-    for (const bridge of valuableDays) {
-      if (selectedDays.length >= targetPtoDays) break;
-      selectedDays.push(bridge.ptoDays[0]);
-      totalEffectiveDays += bridge.effectiveDays;
-      selectedBridges.push(bridge);
-    }
-  }
-
-  return {
-    days: selectedDays.toSorted((a, b) => a.getTime() - b.getTime()),
-    totalEffectiveDays,
-    efficiency: selectedDays.length > 0 ? totalEffectiveDays / selectedDays.length : 0,
-    bridges: selectedBridges,
-  };
-}
-
-export function combineMonthlyBridges(
-  month1Bridges: Bridge[],
-  month2Bridges: Bridge[],
-  targetDays: number
-): Suggestion {
-  const selectedDays: Date[] = [];
-  let totalEffectiveDays = 0;
-
-  const halfTarget = Math.floor(targetDays / 2);
-
-  let taken = 0;
-  for (const bridge of month1Bridges) {
-    if (taken + bridge.ptoDaysNeeded <= halfTarget) {
-      selectedDays.push(...bridge.ptoDays);
-      totalEffectiveDays += bridge.effectiveDays;
-      taken += bridge.ptoDaysNeeded;
-    }
-  }
-
-  const remaining = targetDays - taken;
-  taken = 0;
-  for (const bridge of month2Bridges) {
-    if (taken + bridge.ptoDaysNeeded <= remaining) {
-      selectedDays.push(...bridge.ptoDays);
-      totalEffectiveDays += bridge.effectiveDays;
-      taken += bridge.ptoDaysNeeded;
-    }
-  }
-
-  return {
-    days: selectedDays.toSorted((a, b) => a.getTime() - b.getTime()),
-    totalEffectiveDays,
-    efficiency: selectedDays.length > 0 ? totalEffectiveDays / selectedDays.length : 0,
-  };
-}
-
-export function findSimilarSizeBlocks(
-  bridges: any[],
-  targetSize: number,
-  existingDaySet: Set<string>,
-  usedCombinations: Set<string>
+  ptoDays: number,
+  existingSuggestionSet: Set<number>,
+  maxAlternatives: number,
+  minEfficiency: number
 ): Suggestion[] {
   const alternatives: Suggestion[] = [];
+  const usedCombinations = new Set<string>();
 
-  const blockCombinations: Date[][] = [];
+  // Filtrar puentes disponibles
+  const availableBridges = bridges.filter(
+    (bridge) => !bridge.ptoDays.some((day) => existingSuggestionSet.has(day.getTime()))
+  );
 
-  for (
-    let i = 0;
-    i < bridges.length && blockCombinations.length < PTO_CONSTANTS.BRIDGE_GENERATION.MAX_BLOCK_COMBINATIONS;
-    i++
-  ) {
-    const block: Date[] = [];
-    let currentSize = 0;
+  // Usar backtracking con límite de profundidad adaptativo
+  const maxDepth = Math.min(availableBridges.length, ptoDays * 2);
+  const combinations = generateCombinationsWithBacktracking(
+    availableBridges,
+    ptoDays,
+    minEfficiency,
+    maxAlternatives * 3, // Generar más para luego filtrar
+    maxDepth
+  );
 
-    for (let j = i; j < bridges.length && currentSize < targetSize; j++) {
-      const bridge = bridges[j];
+  // Diversificar resultados por distribución temporal
+  const diversified = diversifyCombinations(combinations, maxAlternatives);
 
-      if (!hasDateConflict(bridge.ptoDays, existingDaySet) && currentSize + bridge.ptoDaysNeeded <= targetSize) {
-        block.push(...bridge.ptoDays);
-        currentSize += bridge.ptoDaysNeeded;
+  for (const combo of diversified) {
+    const key = getCombinationKey(combo.days);
+    if (!usedCombinations.has(key)) {
+      alternatives.push(combo);
+      usedCombinations.add(key);
+    }
+  }
 
-        if (currentSize === targetSize) {
-          blockCombinations.push([...block]);
-          break;
+  return alternatives
+    .sort((a, b) => {
+      const effDiff = (b.efficiency || 0) - (a.efficiency || 0);
+      return Math.abs(effDiff) > PTO_CONSTANTS.BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD
+        ? effDiff
+        : b.totalEffectiveDays - a.totalEffectiveDays;
+    })
+    .slice(0, maxAlternatives);
+}
+
+function generateCombinationsWithBacktracking(
+  bridges: Bridge[],
+  targetDays: number,
+  minEfficiency: number,
+  maxResults: number,
+  maxDepth: number
+): Suggestion[] {
+  const results: Suggestion[] = [];
+  const visitedStates = new Set<string>();
+
+  function backtrack(index: number, selected: Bridge[], remainingDays: number, usedDates: Set<string>, depth: number) {
+    // Estado para evitar duplicados
+    const stateKey = `${index}-${remainingDays}-${Array.from(usedDates).sort().join(',')}`;
+    if (visitedStates.has(stateKey)) return;
+    visitedStates.add(stateKey);
+
+    // Caso base: objetivo alcanzado
+    if (remainingDays === 0) {
+      const days = selected.flatMap((b) => b.ptoDays);
+      const totalEffective = selected.reduce((sum, b) => sum + b.effectiveDays, 0);
+      const efficiency = totalEffective / days.length;
+
+      if (efficiency >= minEfficiency) {
+        results.push({
+          days: days.sort((a, b) => a.getTime() - b.getTime()),
+          totalEffectiveDays: totalEffective,
+          efficiency,
+          bridges: selected,
+        });
+      }
+      return;
+    }
+
+    // Límites de búsqueda
+    if (results.length >= maxResults || depth > maxDepth || index >= bridges.length) {
+      return;
+    }
+
+    // Probar cada puente restante
+    for (let i = index; i < bridges.length; i++) {
+      const bridge = bridges[i];
+
+      if (bridge.ptoDaysNeeded <= remainingDays) {
+        const hasConflict = bridge.ptoDays.some((day) => usedDates.has(getKey(day)));
+
+        if (!hasConflict) {
+          const newUsedDates = new Set(usedDates);
+          bridge.ptoDays.forEach((day) => newUsedDates.add(getKey(day)));
+
+          backtrack(i + 1, [...selected, bridge], remainingDays - bridge.ptoDaysNeeded, newUsedDates, depth + 1);
         }
       }
     }
   }
 
-  for (const block of blockCombinations) {
-    const key = getCombinationKey(block);
-    if (!usedCombinations.has(key)) {
-      const totalEffectiveDays = calculateGroupedEffectiveDays(block, bridges[0].holidays || []);
-      const efficiency = totalEffectiveDays / block.length;
-
-      if (efficiency >= PTO_CONSTANTS.BRIDGE_GENERATION.MIN_EFFICIENCY_FOR_ALTERNATIVES) {
-        alternatives.push({
-          days: block.toSorted((a, b) => a.getTime() - b.getTime()),
-          totalEffectiveDays,
-          efficiency,
-          strategy: 'grouped',
-        });
-        usedCombinations.add(key);
-      }
-    }
-  }
-
-  return alternatives;
+  backtrack(0, [], targetDays, new Set(), 0);
+  return results;
 }
 
-export function calculateGroupedEffectiveDays(days: Date[], holidays: HolidayDTO[]): number {
-  if (days.length === 0) return 0;
+function diversifyCombinations(combinations: Suggestion[], targetCount: number): Suggestion[] {
+  if (combinations.length <= targetCount) return combinations;
 
-  const sortedDays = [...days].sort((a, b) => a.getTime() - b.getTime());
-  const holidaySet = createDateSet(holidays.map((h) => new Date(h.date)));
+  // Agrupar por características para diversificar
+  const grouped = new Map<string, Suggestion[]>();
 
-  let totalEffectiveDays = 0;
-  let currentGroup: Date[] = [];
-
-  for (let i = 0; i < sortedDays.length; i++) {
-    const currentDay = sortedDays[i];
-
-    if (currentGroup.length === 0) {
-      currentGroup = [currentDay];
-    } else {
-      const lastDay = currentGroup[currentGroup.length - 1];
-      const daysDiff = differenceInDays(currentDay, lastDay);
-
-      if (daysDiff <= PTO_CONSTANTS.DAY_GROUPING.MAX_DAYS_DIFF) {
-        currentGroup.push(currentDay);
-      } else {
-        totalEffectiveDays += calculateGroupEffectiveDays(currentGroup, holidaySet);
-        currentGroup = [currentDay];
-      }
+  combinations.forEach((combo) => {
+    // Crear una clave basada en distribución temporal
+    const months = combo.days.map((d) => d.getMonth());
+    const uniqueMonths = new Set(months);
+    const spread = uniqueMonths.size;
+    const groupKey = `${spread}-${Math.floor(combo.efficiency || 0)}`;
+    if (!grouped.has(groupKey)) {
+      grouped.set(groupKey, []);
     }
+    grouped.get(groupKey)!.push(combo);
+  });
+
+  // Tomar elementos de cada grupo proporcionalmente
+  const result: Suggestion[] = [];
+  const perGroup = Math.ceil(targetCount / grouped.size);
+
+  for (const [_, group] of grouped) {
+    result.push(...group.slice(0, perGroup));
   }
 
-  if (currentGroup.length > 0) {
-    totalEffectiveDays += calculateGroupEffectiveDays(currentGroup, holidaySet);
-  }
-
-  return totalEffectiveDays;
-}
-
-function calculateGroupEffectiveDays(group: Date[], holidaySet: Set<string>): number {
-  if (group.length === 0) return 0;
-
-  let start = group[0];
-  let end = group[group.length - 1];
-
-  let current = addDays(start, -1);
-  let safetyCounter = 0;
-  while ((isWeekend(current) || holidaySet.has(getKey(current))) && safetyCounter < PTO_CONSTANTS.SAFETY_LIMIT) {
-    start = current;
-    current = addDays(current, -1);
-    safetyCounter++;
-  }
-
-  current = addDays(end, 1);
-  safetyCounter = 0;
-  while ((isWeekend(current) || holidaySet.has(getKey(current))) && safetyCounter < PTO_CONSTANTS.SAFETY_LIMIT) {
-    end = current;
-    current = addDays(current, 1);
-    safetyCounter++;
-  }
-
-  return differenceInDays(end, start) + 1;
+  return result.slice(0, targetCount);
 }

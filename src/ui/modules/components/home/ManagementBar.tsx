@@ -31,7 +31,6 @@ export const ManagementBar = () => {
   );
 
   if (!suggestion) return null;
-  console.log('currentSelectionIndex', currentSelectionIndex);
   return (
     <AlternativesManager
       key={previewAlternativeIndex}

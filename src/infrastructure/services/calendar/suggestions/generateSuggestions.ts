@@ -3,7 +3,7 @@ import { isWeekend } from 'date-fns';
 import type { OptimizationStrategy, Suggestion } from '../types';
 import { clearDateKeyCache, clearHolidayCache } from '../utils/cache';
 import { findBridges, getAvailableWorkdays } from '../utils/helpers';
-import { selectOptimalDaysFromBridges } from '../utils/selectors';
+import { selectBridgesForStrategy, selectOptimalDaysFromBridges } from '../utils/selectors';
 
 export interface GenerateSuggestionsParams {
   year: number;
@@ -40,8 +40,10 @@ export function generateSuggestions(params: GenerateSuggestionsParams): Suggesti
   }
 
   const bridges = findBridges(availableWorkdays, effectiveHolidays);
-  const selection = selectOptimalDaysFromBridges(bridges, ptoDays);
-
+  const selection =
+    strategy === 'balanced'
+      ? selectOptimalDaysFromBridges(bridges, ptoDays)
+      : selectBridgesForStrategy(bridges, ptoDays, strategy);
   return {
     days: selection.days.sort((a, b) => a.getTime() - b.getTime()),
     totalEffectiveDays: selection.totalEffectiveDays,

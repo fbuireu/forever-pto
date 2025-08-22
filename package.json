@@ -33,8 +33,8 @@
     "format:all": "prettier --write .",
     "format:check": "prettier --check .",
     "lint:changed": "git diff --name-only --diff-filter=ACMR | grep -E \"\\.(js|jsx|ts|tsx)$\" | xargs -r eslint --fix",
-    "lint:all": "next lint",
-    "lint:fix": "next lint --fix",
+    "lint:all": "eslint",
+    "lint:fix": "eslint --fix",
     "lint:ts:typecheck": "tsc --project . --noEmit",
     "test:e2e": "playwright test --pass-with-no-tests",
     "test:e2e:ui": "pnpm run test:e2e -- --ui",
@@ -42,7 +42,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@cloudflare/next-on-pages": "^1.13.13",
+    "@cloudflare/next-on-pages": "^1.13.14",
     "@headlessui/react": "^2.2.7",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-label": "^2.1.7",
@@ -57,15 +57,15 @@
     "i18n-iso-countries": "^7.14.0",
     "lucide-react": "^0.528.0",
     "motion": "^12.23.12",
-    "next": "^15.4.6",
-    "next-intl": "^4.3.4",
+    "next": "^15.5.0",
+    "next-intl": "^4.3.5",
     "next-themes": "^0.4.6",
     "radix-ui": "^1.4.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-use-measure": "^2.1.7",
     "tailwind-merge": "^3.3.1",
-    "zustand": "^5.0.7"
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
@@ -75,13 +75,13 @@
     "@eslint/compat": "^1.3.2",
     "@eslint/eslintrc": "^3",
     "@eslint/js": "^9.33.0",
-    "@playwright/test": "^1.54.2",
+    "@playwright/test": "^1.55.0",
     "@tailwindcss/postcss": "^4.1.12",
-    "@types/node": "^20.19.10",
+    "@types/node": "^20.19.11",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
-    "@typescript-eslint/eslint-plugin": "^8.39.1",
-    "@typescript-eslint/parser": "^8.39.1",
+    "@typescript-eslint/eslint-plugin": "^8.40.0",
+    "@typescript-eslint/parser": "^8.40.0",
     "@vitejs/plugin-react": "^4.7.0",
     "@vitest/ui": "^3.2.4",
     "conventional-changelog-atom": "^5.0.0",
@@ -90,7 +90,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-next-on-pages": "^1.13.13",
+    "eslint-plugin-next-on-pages": "^1.13.14",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-vitest": "^0.5.4",
@@ -102,9 +102,9 @@
     "prettier": "^3.6.2",
     "sass": "^1.90.0",
     "tailwindcss": "^4.1.12",
-    "tw-animate-css": "^1.3.6",
+    "tw-animate-css": "^1.3.7",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4",
-    "wrangler": "^4.30.0"
+    "wrangler": "^4.32.0"
   }
 }
