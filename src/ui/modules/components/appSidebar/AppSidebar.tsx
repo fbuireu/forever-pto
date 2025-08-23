@@ -19,13 +19,15 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from 'src/components/animate-ui/radix/sidebar';
-import { AllowPastDays } from './atoms/AllowPastDays';
-import { CarryOverMonths } from './atoms/CarryOverMonths';
-import { Countries } from './atoms/Countries';
-import { PtoDays } from './atoms/PtoDays';
-import { Regions } from './atoms/Regions';
-import { Years } from './atoms/Years';
-import { Strategy } from './atoms/Strategy';
+import { AllowPastDays } from './orgamisms/AllowPastDays';
+import { CarryOverMonths } from './orgamisms/CarryOverMonths';
+import { Countries } from './orgamisms/Countries';
+import { LanguageSelector } from './orgamisms/LanguageSelector';
+import { PtoDays } from './orgamisms/PtoDays';
+import { Regions } from './orgamisms/Regions';
+import { Strategy } from './orgamisms/Strategy';
+import { ThemeSelector } from './orgamisms/ThemeSelector';
+import { Years } from './orgamisms/Years';
 
 interface AppSidebarProps {
   children: React.ReactNode;
@@ -96,13 +98,10 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => {
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton>Item 1</SidebarMenuButton>
+              <LanguageSelector />
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton>Item 2</SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton>Item 3</SidebarMenuButton>
+              <ThemeSelector />
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>

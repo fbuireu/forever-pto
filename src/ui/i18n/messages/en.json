@@ -2,5 +2,16 @@
   "home": {
     "title": "Forever PTO",
     "description": "This is the home page where you can find the latest updates and features."
+  },
+  "languages": {
+    "en": "English",
+    "es": "Spanish",
+    "ca": "Catalan",
+    "it": "Italian"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
   }
 }
