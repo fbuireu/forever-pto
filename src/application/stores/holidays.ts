@@ -1,15 +1,14 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { generateAlternatives } from '@infrastructure/services/calendar/alternatives/generateAlternatives';
 import { generateSuggestions } from '@infrastructure/services/calendar/suggestions/generateSuggestions';
-import { OptimizationStrategy, Suggestion } from '@infrastructure/services/calendar/types';
-import { clearDateKeyCache } from '@infrastructure/services/calendar/utils/cache';
+import { FilterStrategy, Suggestion } from '@infrastructure/services/calendar/types';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
 import { ensureDate } from '@shared/utils/dates';
 import { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
-import { PtoState } from './pto';
+import { FiltersState } from './filters';
 
 export interface HolidaysState {
   holidays: HolidayDTO[];
@@ -26,14 +25,15 @@ interface GenerateSuggestionsParams {
   year: number;
   ptoDays: number;
   allowPastDays: boolean;
-  months: Date[];
+    months: Date[];
+    strategy: FilterStrategy;
 }
 
 interface GenerateAlternativesParams extends GenerateSuggestionsParams {
   maxAlternatives?: number;
 }
 
-interface FetchHolidaysParams extends Omit<PtoState, 'ptoDays' | 'allowPastDays' | 'carryOverMonths'> {
+interface FetchHolidaysParams extends Omit<FiltersState, 'ptoDays' | 'allowPastDays' | 'carryOverMonths' | 'strategy'> {
   locale: Locale;
 }
 
@@ -47,6 +47,8 @@ interface HolidaysActions {
 }
 
 type HolidaysStore = HolidaysState & HolidaysActions;
+
+const STORE_NAME = 'holidays-store';
 
 const initialState: HolidaysState = {
   holidays: [],
@@ -82,7 +84,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
         },
 
-        generateSuggestions: ({ year, ptoDays, allowPastDays, months }: GenerateSuggestionsParams) => {
+        generateSuggestions: ({ year, ptoDays, allowPastDays, months, strategy }: GenerateSuggestionsParams) => {
           const { holidays, maxAlternatives } = get();
 
           if (ptoDays <= 0 || holidays.length === 0) {
@@ -109,7 +111,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               holidays: holidaysDates,
               allowPastDays,
               months,
-              strategy: OptimizationStrategy.GROUPED,
+              strategy,
             });
 
             const alternatives = generateAlternatives({
@@ -120,7 +122,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               months,
               maxAlternatives,
               existingSuggestion: suggestion.days,
-              strategy: OptimizationStrategy.GROUPED,
+              strategy,
             });
 
             set({
@@ -149,7 +151,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
           ptoDays,
           allowPastDays,
           months,
-          maxAlternatives,
+            maxAlternatives,
+          strategy,
         }: GenerateAlternativesParams) => {
           const { holidays, maxAlternatives: stateMaxAlternatives, suggestion } = get();
           const maxToGenerate = maxAlternatives ?? stateMaxAlternatives;
@@ -173,7 +176,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               months,
               maxAlternatives: maxToGenerate,
               existingSuggestion: suggestion.days,
-              strategy: OptimizationStrategy.GROUPED,
+              strategy,
             });
 
             set({
@@ -208,7 +211,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
         },
       }),
       {
-        name: 'holidays-store',
+        name: STORE_NAME,
         storage: encryptedStorage,
         partialize: (state) => ({
           holidays: state.holidays,
@@ -254,7 +257,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
         },
       }
     ),
-    { name: 'holidays-store' }
+    { name: STORE_NAME }
   )
 );
 

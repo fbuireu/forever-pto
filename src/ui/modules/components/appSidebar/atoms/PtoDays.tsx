@@ -1,6 +1,6 @@
 'use client';
 
-import { usePtoState } from '@application/stores/pto';
+import { useFiltersState } from '@application/stores/filters';
 import { cn } from '@const/lib/utils';
 import { Field, Label } from '@headlessui/react';
 import { useDebounce } from '@ui/hooks/useDebounce';
@@ -11,7 +11,7 @@ const MIN_VALUE = 1;
 const MAX_VALUE = 365;
 
 export const PtoDays = () => {
-  const { setPtoDays, ptoDays } = usePtoState();
+  const { setPtoDays, ptoDays } = useFiltersState();
   const [localValue, setLocalValue] = useDebounce({ value: ptoDays, delay: 100, callback: setPtoDays });
   const isDecrementDisabled = localValue <= MIN_VALUE;
   const isIncrementDisabled = localValue >= MAX_VALUE;

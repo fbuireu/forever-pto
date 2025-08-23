@@ -1,6 +1,6 @@
 'use client';
 
-import { usePtoState } from '@application/stores/pto';
+import { useFiltersState } from '@application/stores/filters';
 import { Slider } from '@const/components/ui/slider';
 import { Field, Label } from '@headlessui/react';
 import { InfoIcon, SlidersHorizontal } from 'lucide-react';
@@ -13,7 +13,7 @@ const MAX_VALUE = 12;
 const DEBOUNCE_DELAY = 300;
 
 export const CarryOverMonths = () => {
-  const { setCarryOverMonths, carryOverMonths } = usePtoState();
+  const { setCarryOverMonths, carryOverMonths } = useFiltersState();
   const [localValue, setLocalValue] = useState(carryOverMonths);
   const timeoutRef = useRef<NodeJS.Timeout>(null);
 

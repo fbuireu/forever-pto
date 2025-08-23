@@ -1,5 +1,5 @@
 import { PTO_CONSTANTS } from '../../const';
-import { Bridge, OptimizationStrategy } from '../../types';
+import { Bridge, FilterStrategy } from '../../types';
 import { getKey } from '../../utils/cache';
 
 interface SelectOptimalDaysBase {
@@ -120,7 +120,7 @@ function selectOptimalCombination({ bridges, targetPtoDays }: SelectOptimalCombi
 interface SelectBridgesForStrategy {
   bridges: Bridge[];
   targetPtoDays: number;
-  strategy: OptimizationStrategy;
+  strategy: FilterStrategy;
 }
 
 export const selectBridgesForStrategy = ({
@@ -131,7 +131,7 @@ export const selectBridgesForStrategy = ({
   let sortedBridges: Bridge[];
 
   switch (strategy) {
-    case OptimizationStrategy.GROUPED:
+    case FilterStrategy.GROUPED:
       sortedBridges = [...bridges].sort((a, b) => {
         if (a.ptoDaysNeeded !== b.ptoDaysNeeded) {
           return b.ptoDaysNeeded - a.ptoDaysNeeded;
@@ -140,7 +140,7 @@ export const selectBridgesForStrategy = ({
       });
       break;
 
-    case OptimizationStrategy.OPTIMIZED:
+    case FilterStrategy.OPTIMIZED:
       sortedBridges = [...bridges].sort((a, b) => {
         const effDiff = b.efficiency - a.efficiency;
         if (Math.abs(effDiff) > PTO_CONSTANTS.BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD) {
@@ -150,7 +150,7 @@ export const selectBridgesForStrategy = ({
       });
       break;
 
-    case OptimizationStrategy.BALANCED:
+    case FilterStrategy.BALANCED:
     default:
       return selectOptimalDaysFromBridges({ bridges, targetPtoDays });
   }

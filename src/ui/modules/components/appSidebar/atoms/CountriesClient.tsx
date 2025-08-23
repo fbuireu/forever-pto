@@ -1,8 +1,8 @@
 'use client';
 
 import type { CountryDTO } from '@application/dto/country/types';
+import { useFiltersState } from '@application/stores/filters';
 import { useLocationState } from '@application/stores/location';
-import { usePtoState } from '@application/stores/pto';
 import { Combobox } from '@const/components/ui/combobox';
 import { Field, Label } from '@headlessui/react';
 import { MapPin } from 'lucide-react';
@@ -13,7 +13,7 @@ interface CountriesClientProps {
 }
 
 export const CountriesClient = ({ countries }: CountriesClientProps) => {
-  const { country, setCountry } = usePtoState();
+  const { country, setCountry } = useFiltersState();
   const { countriesLoading, setCountries } = useLocationState();
 
   useEffect(() => {

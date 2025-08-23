@@ -1,6 +1,6 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { isWeekend } from 'date-fns';
-import { OptimizationStrategy, Suggestion } from '../types';
+import { FilterStrategy, Suggestion } from '../types';
 import { getAvailableWorkdays } from '../utils/helpers';
 import {
   generateBalancedAlternatives,
@@ -16,19 +16,11 @@ export interface GenerateAlternativesParams {
   months: Date[];
   maxAlternatives: number;
   existingSuggestion: Date[];
-  strategy: OptimizationStrategy;
+  strategy: FilterStrategy;
 }
 
 export function generateAlternatives(params: GenerateAlternativesParams): Suggestion[] {
-  const {
-    ptoDays,
-    holidays,
-    allowPastDays,
-    months,
-    maxAlternatives,
-    existingSuggestion,
-    strategy,
-  } = params;
+  const { ptoDays, holidays, allowPastDays, months, maxAlternatives, existingSuggestion, strategy } = params;
   if (ptoDays <= 0 || maxAlternatives <= 0 || existingSuggestion.length === 0) {
     return [];
   }

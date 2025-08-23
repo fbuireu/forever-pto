@@ -4,14 +4,15 @@ import { ManagementBar } from '@ui/modules/components/home/ManagementBar';
 import { StoresInitializer } from '@ui/store/StoresInitializer';
 import type { Locale } from 'next-intl';
 import { cookies } from 'next/headers';
+import { generateMetadata } from './metadata';
 
 export const runtime = 'edge';
 
-interface ForeverPtoProps {
+interface HomeProps {
   params: Promise<{ locale: Locale }>;
 }
 
-const ForeverPto = async ({ params }: ForeverPtoProps) => {
+const Home = async ({ params }: HomeProps) => {
   const { locale } = await params;
   const cookieStore = await cookies();
   const userCountry = cookieStore.get('user-country')?.value;
@@ -27,7 +28,8 @@ const ForeverPto = async ({ params }: ForeverPtoProps) => {
   );
 };
 
-export default ForeverPto;
+export default Home;
+export { generateMetadata };
 
 // todo: recheck algo (should split days if needed) + alternative algo weird decisions
 // todo: in the FAQ section add a clearall button

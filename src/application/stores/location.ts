@@ -30,6 +30,8 @@ interface LocationActions {
 
 type LocationStore = LocationState & LocationActions;
 
+const STORE_NAME = 'location-store';
+
 const initialState: LocationState = {
   countries: [],
   countriesLoading: false,
@@ -104,7 +106,7 @@ export const useLocationStore = create<LocationStore>()(
         },
       }),
       {
-        name: 'location-store',
+        name: STORE_NAME,
         storage: encryptedStorage,
         partialize: (state) => ({
           countries: state.countries,
@@ -113,7 +115,7 @@ export const useLocationStore = create<LocationStore>()(
         }),
       }
     ),
-    { name: 'location-store' }
+    { name: STORE_NAME }
   )
 );
 

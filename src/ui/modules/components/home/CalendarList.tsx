@@ -1,8 +1,8 @@
 'use client';
 
 import { getLocalizedDateFns } from '@application/i18n/localize';
+import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { usePtoStore } from '@application/stores/pto';
 import { Skeleton } from '@const/components/ui/skeleton';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { isWeekend } from 'date-fns';
@@ -11,11 +11,11 @@ import { useEffect, useMemo } from 'react';
 import { Calendar } from '../core/Calendar';
 import { getTotalMonths } from '../utils/helpers';
 import {
-  isAlternative as isAlternativeFn,
-  isHoliday,
-  isPast as isPastFn,
-  isSuggestion as isSuggestionFn,
-  isToday,
+    isAlternative as isAlternativeFn,
+    isHoliday,
+    isPast as isPastFn,
+    isSuggestion as isSuggestionFn,
+    isToday,
 } from '../utils/modifiers';
 
 const MODIFIERS_CLASS_NAMES = {
@@ -31,7 +31,7 @@ const MODIFIERS_CLASS_NAMES = {
 
 export const CalendarList = () => {
   const locale = useLocale();
-  const { carryOverMonths, year, allowPastDays, country, region, ptoDays } = usePtoStore();
+  const { carryOverMonths, year, allowPastDays, country, region, ptoDays, strategy } = useFiltersStore();
   const {
     holidays,
     alternatives,
@@ -57,9 +57,10 @@ export const CalendarList = () => {
         ptoDays,
         allowPastDays,
         months,
+        strategy,
       });
     }
-  }, [generateSuggestions, year, ptoDays, allowPastDays, holidays, months]);
+  }, [generateSuggestions, year, ptoDays, allowPastDays, holidays, months, strategy]);
 
   const modifiers = useMemo(() => {
     const holidayFn = isHoliday(holidays);

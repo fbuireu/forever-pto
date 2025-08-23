@@ -1,13 +1,13 @@
 'use client';
 
-import { usePtoState } from '@application/stores/pto';
+import { useFiltersState } from '@application/stores/filters';
 import { Field, Label } from '@headlessui/react';
 import { InfoIcon, Undo2 } from 'lucide-react';
 import { Switch } from 'src/components/animate-ui/headless/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 
 export const AllowPastDays = () => {
-  const { allowPastDays, setAllowPastDays } = usePtoState();
+  const { allowPastDays, setAllowPastDays } = useFiltersState();
 
   return (
     <Field className='space-y-2 w-full'>

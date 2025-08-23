@@ -1,7 +1,7 @@
 'use client';
 
+import { useFiltersState } from '@application/stores/filters';
 import { useLocationState } from '@application/stores/location';
-import { usePtoState } from '@application/stores/pto';
 import { Combobox } from '@const/components/ui/combobox';
 import { Field, Label } from '@headlessui/react';
 import { MapPinned } from 'lucide-react';
@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 
 export const Regions = () => {
   const { regions, regionsLoading, fetchRegions } = useLocationState();
-  const { country, region, setRegion } = usePtoState();
+  const { country, region, setRegion } = useFiltersState();
 
   useEffect(() => {
     if (!country) return;

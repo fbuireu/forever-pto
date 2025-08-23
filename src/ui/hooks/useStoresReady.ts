@@ -1,13 +1,13 @@
+import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useLocationStore } from '@application/stores/location';
-import { usePtoStore } from '@application/stores/pto';
 import { useEffect, useState } from 'react';
 
 export const useStoresReady = () => {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const stores = [usePtoStore, useHolidaysStore, useLocationStore];
+    const stores = [useFiltersStore, useHolidaysStore, useLocationStore];
 
     const checkAllReady = () => stores.every((store) => store.persist.hasHydrated());
 
@@ -18,7 +18,7 @@ export const useStoresReady = () => {
 
     const unsubscribes = stores.map((store) =>
       store.persist.onFinishHydration(() => {
-          setIsReady(checkAllReady());
+        setIsReady(checkAllReady());
       })
     );
 

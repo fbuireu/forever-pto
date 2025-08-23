@@ -1,38 +1,44 @@
+import { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
 
-export interface PtoState {
+export interface FiltersState {
   ptoDays: number;
   allowPastDays: boolean;
   country: string;
   region: string;
   year: string;
   carryOverMonths: number;
+  strategy: FilterStrategy;
 }
 
-interface PtoActions {
+interface FilterActions {
   setPtoDays: (days: number) => void;
   setAllowPastDays: (allow: boolean) => void;
   setCountry: (country: string) => void;
   setRegion: (region: string) => void;
   setYear: (year: string) => void;
   setCarryOverMonths: (months: number) => void;
+  setStrategy: (strategy: string) => void;
   resetToDefaults: () => void;
 }
 
-type PtoStore = PtoState & PtoActions;
+type FiltersStore = FiltersState & FilterActions;
 
-const initialState: PtoState = {
+const STORE_NAME = 'filters-store';
+
+const initialState: FiltersState = {
   ptoDays: 22,
   allowPastDays: false,
   country: '',
   region: '',
   year: String(new Date().getFullYear()),
   carryOverMonths: 1,
+  strategy: FilterStrategy.GROUPED,
 };
 
-export const usePtoStore = create<PtoStore>()(
+export const useFiltersStore = create<FiltersStore>()(
   devtools(
     persist(
       (set) => ({
@@ -43,10 +49,11 @@ export const usePtoStore = create<PtoStore>()(
         setAllowPastDays: (allow: boolean) => set({ allowPastDays: allow }, false, 'setAllowPastDays'),
         setYear: (year: string) => set({ year }, false, 'setYear'),
         setCarryOverMonths: (months: number) => set({ carryOverMonths: months }, false, 'setCarryOverMonths'),
+        setStrategy: (strategy: FilterStrategy) => set({ strategy }, false, 'setStrategy'),
         resetToDefaults: () => set(initialState, false, 'resetToDefaults'),
       }),
       {
-        name: 'pto-config-storage',
+        name: STORE_NAME,
         storage: encryptedStorage,
         partialize: (state) => ({
           ptoDays: state.ptoDays,
@@ -55,11 +62,12 @@ export const usePtoStore = create<PtoStore>()(
           region: state.region,
           year: state.year,
           carryOverMonths: state.carryOverMonths,
+          strategy: state.strategy,
         }),
       }
     ),
-    { name: 'pto-store' }
+    { name: STORE_NAME }
   )
 );
 
-export const usePtoState = () => usePtoStore((state) => state);
+export const useFiltersState = () => useFiltersStore((state) => state);

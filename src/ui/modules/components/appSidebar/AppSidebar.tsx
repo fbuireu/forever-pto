@@ -25,6 +25,7 @@ import { Countries } from './atoms/Countries';
 import { PtoDays } from './atoms/PtoDays';
 import { Regions } from './atoms/Regions';
 import { Years } from './atoms/Years';
+import { Strategy } from './atoms/Strategy';
 
 interface AppSidebarProps {
   children: React.ReactNode;
@@ -72,6 +73,10 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => {
                     </SidebarMenuSub>
                     <SidebarMenuSub>
                       <Years />
+                      <SidebarMenuSubItem />
+                    </SidebarMenuSub>
+                    <SidebarMenuSub>
+                      <Strategy />
                       <SidebarMenuSubItem />
                     </SidebarMenuSub>
                     <SidebarMenuSub>

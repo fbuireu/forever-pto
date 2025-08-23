@@ -12,10 +12,10 @@ export interface Suggestion {
   totalEffectiveDays: number;
   efficiency?: number;
   bridges?: Bridge[];
-  strategy: OptimizationStrategy;
+  strategy: FilterStrategy;
 }
 
-export const enum OptimizationStrategy {
+export const enum FilterStrategy {
   GROUPED = 'grouped',
   OPTIMIZED = 'optimized',
   BALANCED = 'balanced',

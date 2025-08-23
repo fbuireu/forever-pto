@@ -1,6 +1,6 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { isWeekend } from 'date-fns';
-import { Bridge, OptimizationStrategy, Suggestion } from '../types';
+import { Bridge, FilterStrategy, Suggestion } from '../types';
 import { clearDateKeyCache, clearHolidayCache } from '../utils/cache';
 import { findBridges, getAvailableWorkdays } from '../utils/helpers';
 import { selectBridgesForStrategy, selectOptimalDaysFromBridges } from './utils/selectors';
@@ -11,7 +11,7 @@ export interface GenerateSuggestionsParams {
   holidays: HolidayDTO[];
   allowPastDays: boolean;
   months: Date[];
-  strategy: OptimizationStrategy;
+  strategy: FilterStrategy;
 }
 
 export function generateSuggestions({
@@ -25,9 +25,9 @@ export function generateSuggestions({
   clearHolidayCache();
 
   if (ptoDays <= 0) {
-    return { days: [], totalEffectiveDays: 0 };
+    return { days: [], totalEffectiveDays: 0, strategy };
   }
-
+  console.log('STRA', strategy);
   const effectiveHolidays = holidays.filter((h) => {
     const date = new Date(h.date);
     return !isWeekend(date);
@@ -40,7 +40,7 @@ export function generateSuggestions({
   });
 
   if (availableWorkdays.length < ptoDays) {
-    return { days: [], totalEffectiveDays: 0 };
+    return { days: [], totalEffectiveDays: 0, strategy };
   }
 
   const bridges = findBridges({ availableWorkdays, holidays: effectiveHolidays });
@@ -48,9 +48,9 @@ export function generateSuggestions({
   const STRATEGY_MAP = {
     balanced: (bridges: Bridge[], ptoDays: number) => selectOptimalDaysFromBridges({ bridges, targetPtoDays: ptoDays }),
     grouped: (bridges: Bridge[], ptoDays: number) =>
-      selectBridgesForStrategy({ bridges, targetPtoDays: ptoDays, strategy: OptimizationStrategy.GROUPED }),
+      selectBridgesForStrategy({ bridges, targetPtoDays: ptoDays, strategy: FilterStrategy.GROUPED }),
     optimized: (bridges: Bridge[], ptoDays: number) =>
-      selectBridgesForStrategy({ bridges, targetPtoDays: ptoDays, strategy: OptimizationStrategy.OPTIMIZED }),
+      selectBridgesForStrategy({ bridges, targetPtoDays: ptoDays, strategy: FilterStrategy.OPTIMIZED }),
   };
 
   const selector = STRATEGY_MAP[strategy] || STRATEGY_MAP.grouped;
