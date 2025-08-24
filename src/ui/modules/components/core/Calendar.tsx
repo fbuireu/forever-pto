@@ -130,7 +130,7 @@ export function Calendar({
           const classes = cn(baseClasses, 'calendar-day-button');
 
           return (
-            <div role='group' key={date.toISOString()} className='calendar-day rounded-md relative h-8 w-8 p-0'>
+            <div key={date.toISOString()} className='calendar-day rounded-md relative h-8 w-8 p-0'>
               <ConditionalWrapper
                 doWrap={!!holidayName}
                 wrapper={(children) => (

@@ -14,6 +14,23 @@ export interface GenerateSuggestionsParams {
   strategy: FilterStrategy;
 }
 
+const selectGroupedStrategy = (bridges: Bridge[], ptoDays: number) =>
+  selectBridgesForStrategy({ bridges, targetPtoDays: ptoDays, strategy: FilterStrategy.GROUPED });
+
+const selectOptimizedStrategy = (bridges: Bridge[], ptoDays: number) =>
+  selectBridgesForStrategy({ bridges, targetPtoDays: ptoDays, strategy: FilterStrategy.OPTIMIZED });
+
+const selectBalancedStrategy = (bridges: Bridge[], ptoDays: number) =>
+  selectOptimalDaysFromBridges({ bridges, targetPtoDays: ptoDays });
+
+const DEFAULT_STRATEGY = selectGroupedStrategy;
+
+const STRATEGY_MAP = new Map([
+  [FilterStrategy.BALANCED, selectBalancedStrategy],
+  [FilterStrategy.GROUPED, selectGroupedStrategy],
+  [FilterStrategy.OPTIMIZED, selectOptimizedStrategy],
+]);
+
 export function generateSuggestions({
   ptoDays,
   holidays,
@@ -27,7 +44,6 @@ export function generateSuggestions({
   if (ptoDays <= 0) {
     return { days: [], totalEffectiveDays: 0, strategy };
   }
-  console.log('STRA', strategy);
   const effectiveHolidays = holidays.filter((h) => {
     const date = new Date(h.date);
     return !isWeekend(date);
@@ -45,15 +61,8 @@ export function generateSuggestions({
 
   const bridges = findBridges({ availableWorkdays, holidays: effectiveHolidays });
 
-  const STRATEGY_MAP = {
-    balanced: (bridges: Bridge[], ptoDays: number) => selectOptimalDaysFromBridges({ bridges, targetPtoDays: ptoDays }),
-    grouped: (bridges: Bridge[], ptoDays: number) =>
-      selectBridgesForStrategy({ bridges, targetPtoDays: ptoDays, strategy: FilterStrategy.GROUPED }),
-    optimized: (bridges: Bridge[], ptoDays: number) =>
-      selectBridgesForStrategy({ bridges, targetPtoDays: ptoDays, strategy: FilterStrategy.OPTIMIZED }),
-  };
+  const selector = STRATEGY_MAP.get(strategy) ?? DEFAULT_STRATEGY;
 
-  const selector = STRATEGY_MAP[strategy] || STRATEGY_MAP.grouped;
   const selection = selector(bridges, ptoDays);
 
   return {

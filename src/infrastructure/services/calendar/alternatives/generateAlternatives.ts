@@ -19,6 +19,14 @@ export interface GenerateAlternativesParams {
   strategy: FilterStrategy;
 }
 
+const STRATEGY_MAP = new Map([
+  [FilterStrategy.OPTIMIZED, generateOptimizedAlternatives],
+  [FilterStrategy.BALANCED, generateBalancedAlternatives],
+  [FilterStrategy.GROUPED, generateGroupedAlternatives],
+]);
+
+const DEFAULT_STRATEGY = generateGroupedAlternatives;
+
 export function generateAlternatives(params: GenerateAlternativesParams): Suggestion[] {
   const { ptoDays, holidays, allowPastDays, months, maxAlternatives, existingSuggestion, strategy } = params;
   if (ptoDays <= 0 || maxAlternatives <= 0 || existingSuggestion.length === 0) {
@@ -38,13 +46,9 @@ export function generateAlternatives(params: GenerateAlternativesParams): Sugges
 
   const existingSuggestionSet = new Set(existingSuggestion.map((d) => d.getTime()));
 
-  const STRATEGY_MAP = {
-    optimized: generateOptimizedAlternatives,
-    balanced: generateBalancedAlternatives,
-    grouped: generateGroupedAlternatives,
-  } as const;
 
-  const strategyFunction = STRATEGY_MAP[strategy] || STRATEGY_MAP.grouped;
+    
+  const strategyFunction = STRATEGY_MAP.get(strategy) ?? DEFAULT_STRATEGY;
 
   return strategyFunction({ params, availableWorkdays, effectiveHolidays, existingSuggestionSet });
 }

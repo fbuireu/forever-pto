@@ -12,7 +12,7 @@ export interface Suggestion {
   totalEffectiveDays: number;
   efficiency?: number;
   bridges?: Bridge[];
-  strategy: FilterStrategy;
+  strategy?: FilterStrategy;
 }
 
 export const enum FilterStrategy {
