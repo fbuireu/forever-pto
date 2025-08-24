@@ -1,7 +1,6 @@
 'use client';
 
 import { Button } from '@const/components/ui/button';
-import { cn } from '@const/lib/utils';
 import { MonitorCog, Moon, Sun } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
@@ -39,11 +38,7 @@ export const ThemeSelector = () => {
         {themes.map((theme) => {
           const IconComponent = THEME_ICONS.get(theme);
           return (
-            <DropdownMenuItem
-              key={theme}
-              className={cn('flex justify-between', currentTheme === theme && 'bg-accent')}
-              onClick={() => changeTheme(theme)}
-            >
+            <DropdownMenuItem key={theme} className={'flex justify-between'} onClick={() => changeTheme(theme)}>
               {t(theme as Parameters<typeof t>[0])}
               {IconComponent && <IconComponent className='h-4 w-4' />}
             </DropdownMenuItem>

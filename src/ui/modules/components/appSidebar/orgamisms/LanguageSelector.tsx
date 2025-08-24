@@ -1,7 +1,6 @@
 'use client';
 
 import { Button } from '@const/components/ui/button';
-import { cn } from '@const/lib/utils';
 import { useLanguages } from '@ui/hooks/useLanguages';
 import { Check } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -38,7 +37,7 @@ export const LanguageSelector = () => {
         {languages.map((language) => (
           <DropdownMenuItem
             key={language.code}
-            className={cn('flex justify-between', locale === language.code && 'bg-accent')}
+            className={'flex justify-between'}
             onClick={() => handleLanguageChange(language.code)}
           >
             <span>{language.label}</span>

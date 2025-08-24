@@ -4,15 +4,19 @@ import { useFiltersState } from '@application/stores/filters';
 import { Badge } from '@const/components/ui/badge';
 import { Card, CardDescription } from '@const/components/ui/card';
 import { Combobox } from '@const/components/ui/combobox';
+import { cn } from '@const/lib/utils';
 import { Field, Label } from '@headlessui/react';
 import { FilterStrategy } from '@infrastructure/services/calendar/types';
-import { AlertCircle, CheckCircle2, DicesIcon } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ChevronDown, DicesIcon, Scale, TrendingUp, Users } from 'lucide-react';
+
+import { useState } from 'react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 
 const STRATEGIES = [
   {
     value: FilterStrategy.GROUPED,
     label: 'Grouped',
-    emoji: '🏖️',
+    icon: Users,
     description: 'Prioriza vacaciones largas y continuas',
     subtitle: 'Agrupa días puentes con festivos consecutivos',
     pros: ['Simula la selección humana', 'Puentes largos'],
@@ -21,7 +25,7 @@ const STRATEGIES = [
   {
     value: FilterStrategy.OPTIMIZED,
     label: 'Optimized',
-    emoji: '📈',
+    icon: TrendingUp,
     description: 'Maximiza eficiencia de días PTO',
     subtitle: 'Obtén la mayor cantidad de días libres',
     pros: ['Máximo rendimiento', 'Más días totales'],
@@ -30,7 +34,7 @@ const STRATEGIES = [
   {
     value: FilterStrategy.BALANCED,
     label: 'Balanced',
-    emoji: '⚖️',
+    icon: Scale,
     description: 'Equilibrio inteligente',
     subtitle: 'Combina eficiencia con agrupación',
     pros: ['Flexible', 'Períodos medianos', 'Versátil'],
@@ -40,6 +44,7 @@ const STRATEGIES = [
 
 export const Strategy = () => {
   const { setStrategy, strategy } = useFiltersState();
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const currentStrategy = STRATEGIES.find(({ value }) => value === strategy);
 
   return (
@@ -57,38 +62,47 @@ export const Strategy = () => {
         placeholder={'Select strategy...'}
         searchPlaceholder='Search strategies...'
       />
-
       {currentStrategy && (
-        <Card className='p-4 bg-muted/50'>
-          <div className='space-y-3'>
-            <div className='flex items-start gap-3'>
-              <span className='text-2xl'>{currentStrategy.emoji}</span>
-              <div className='flex-1'>
-                <h4 className='font-semibold text-sm'>{currentStrategy.description}</h4>
-                <CardDescription className='text-xs'>{currentStrategy.subtitle}</CardDescription>
+        <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
+          <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-xs font-medium hover:bg-muted/50 rounded-md transition-colors'>
+            <span>{detailsOpen ? 'Hide' : 'Expand'} strategy details</span>
+            <ChevronDown className={cn('h-4 w-4 transition-transform duration-200', detailsOpen && 'rotate-180')} />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <Card className='p-4 bg-muted/50 mt-2 text-xs'>
+              <div className='space-y-3'>
+                <div className='flex items-start gap-3'>
+                  {(() => {
+                    const Icon = currentStrategy.icon;
+                    return <Icon className='w-6 h-6 text-primary' />;
+                  })()}
+                  <div className='flex-1'>
+                    <h4 className='font-semibold'>{currentStrategy.description}</h4>
+                    <CardDescription className='text-xs'>{currentStrategy.subtitle}</CardDescription>
+                  </div>
+                </div>
+                <div className='grid gap-2'>
+                  <div className='flex flex-wrap gap-1.5'>
+                    {currentStrategy.pros.map((pro) => (
+                      <Badge key={pro} variant='outline' className='text-xs border-green-500/30 bg-green-500/10'>
+                        <CheckCircle2 className='w-3 h-3 mr-1' />
+                        {pro}
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className='flex flex-wrap gap-1.5'>
+                    {currentStrategy.cons.map((con) => (
+                      <Badge key={con} variant='outline' className='text-xs border-orange-500/30 bg-orange-500/10'>
+                        <AlertCircle className='w-3 h-3 mr-1' />
+                        {con}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-
-            <div className='grid gap-2'>
-              <div className='flex flex-wrap gap-1.5'>
-                {currentStrategy.pros.map((pro) => (
-                  <Badge key={pro} variant='outline' className='text-xs border-green-500/30 bg-green-500/10'>
-                    <CheckCircle2 className='w-3 h-3 mr-1' />
-                    {pro}
-                  </Badge>
-                ))}
-              </div>
-              <div className='flex flex-wrap gap-1.5'>
-                {currentStrategy.cons.map((con) => (
-                  <Badge key={con} variant='outline' className='text-xs border-orange-500/30 bg-orange-500/10'>
-                    <AlertCircle className='w-3 h-3 mr-1' />
-                    {con}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </div>
-        </Card>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
       )}
     </Field>
   );

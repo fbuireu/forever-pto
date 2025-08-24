@@ -12,7 +12,7 @@ import { FiltersState } from './filters';
 
 export interface HolidaysState {
   holidays: HolidayDTO[];
-  suggestion: Suggestion | null;
+  suggestion: Suggestion;
   maxAlternatives: number;
   alternatives: Suggestion[];
   currentSelection: Suggestion | null;
@@ -52,7 +52,7 @@ const STORE_NAME = 'holidays-store';
 
 const initialState: HolidaysState = {
   holidays: [],
-  suggestion: null,
+  suggestion: {} as Suggestion,
   maxAlternatives: 4,
   alternatives: [],
   currentSelection: null,

@@ -26,7 +26,6 @@ interface CalendarProps {
   fixedWeeks?: boolean;
   locale: Locale;
   modifiers?: Record<string, (date: Date) => boolean>;
-  modifiersClassNames?: Record<string, string>;
   disabled?: (date: Date) => boolean;
   showOutsideDays?: boolean;
   holidays: HolidayDTO[];
@@ -42,7 +41,6 @@ export function Calendar({
   fixedWeeks = false,
   locale,
   modifiers = {},
-  modifiersClassNames = {},
   disabled,
   showOutsideDays = true,
   holidays,
@@ -127,7 +125,6 @@ export function Calendar({
             disabled,
             showOutsideDays,
             modifiers,
-            modifiersClassNames,
           });
 
           const classes = cn(baseClasses, 'calendar-day-button');

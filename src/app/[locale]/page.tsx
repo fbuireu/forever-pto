@@ -20,7 +20,7 @@ const Home = async ({ params }: HomeProps) => {
   return (
     <AppSidebar locale={locale}>
       <StoresInitializer userCountry={userCountry} locale={locale} />
-      <section className='flex w-fit mx-auto items-start flex-col gap-8'>
+      <section className='flex w-fit mx-auto items-start flex-col gap-4'>
         <ManagementBar />
         <CalendarList />
       </section>

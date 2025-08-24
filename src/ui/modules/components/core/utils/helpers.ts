@@ -7,8 +7,19 @@ interface GetDayClassNamesParams {
   disabled?: (date: Date) => boolean;
   showOutsideDays: boolean;
   modifiers: Record<string, (date: Date) => boolean>;
-  modifiersClassNames: Record<string, string>;
 }
+
+const MODIFIERS_CLASS_NAMES: Record<string, string> = {
+  weekend: 'text-muted-foreground bg-muted/50 hover:bg-muted transition-colors',
+  holiday:
+    'bg-gradient-to-br from-yellow-400 to-yellow-500 text-yellow-900 hover:from-yellow-500 hover:to-yellow-600 font-semibold shadow-sm transition-bg duration-200 ring-2 ring-yellow-200 dark:ring-yellow-300',
+  today: 'bg-accent text-accent-foreground font-medium ring-2 ring-ring',
+  suggested:
+    'bg-teal-400 dark:bg-teal-600 hover:bg-teal-500 dark:hover:bg-teal-700 ring-2 ring-teal-300 dark:ring-teal-400 text-white font-semibold transition-b duration-200 shadow-md',
+  alternative:
+    'bg-orange-100 dark:bg-orange-900/30 text-white font-semibold animate-pulse shadow-md ring-2 ring-orange-300 dark:ring-orange-400 transition-all duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(255,165,0,0.8)_2px,rgba(255,165,0,0.8)_4px)]',
+};
+
 export const getDayClassNames = ({
   date,
   month,
@@ -16,7 +27,6 @@ export const getDayClassNames = ({
   disabled,
   showOutsideDays,
   modifiers,
-  modifiersClassNames,
 }: GetDayClassNamesParams): string => {
   const classes = [];
   const isDisabled = disabled?.(date);
@@ -31,9 +41,9 @@ export const getDayClassNames = ({
 
   Object.entries(modifiers).forEach(([name, modifierFn]) => {
     const shouldApplyModifier =
-      modifierFn?.(date) && modifiersClassNames[name] && !(name === 'today' && (isDisabled || isSelected));
+      modifierFn?.(date) && MODIFIERS_CLASS_NAMES[name] && !(name === 'today' && (isDisabled || isSelected));
     if (shouldApplyModifier) {
-      classes.push(modifiersClassNames[name]);
+      classes.push(MODIFIERS_CLASS_NAMES[name]);
     }
   });
 
