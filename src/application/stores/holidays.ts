@@ -89,7 +89,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
           if (ptoDays <= 0 || holidays.length === 0) {
             set({
-              suggestion: null,
+              suggestion: undefined,
               alternatives: [],
               currentSelection: null,
               previewAlternativeSelection: null,
@@ -136,7 +136,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           } catch (error) {
             console.error('Error generating suggestions:', error);
             set({
-              suggestion: null,
+              suggestion: undefined,
               alternatives: [],
               currentSelection: null,
               previewAlternativeSelection: null,
