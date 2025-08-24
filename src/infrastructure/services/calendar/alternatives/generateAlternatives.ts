@@ -47,7 +47,7 @@ export function generateAlternatives(params: GenerateAlternativesParams): Sugges
   const existingSuggestionSet = new Set(existingSuggestion.map((d) => d.getTime()));
 
 
-  const strategyFunction = STRATEGY_MAP[strategy] ?? DEFAULT_SATEGY;
+  const strategyFunction = STRATEGY_MAP[strategy] ?? DEFAULT_STRATEGY;
 
   return strategyFunction({ params, availableWorkdays, effectiveHolidays, existingSuggestionSet });
 }
