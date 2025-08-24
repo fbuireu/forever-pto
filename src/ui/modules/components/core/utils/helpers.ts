@@ -9,22 +9,16 @@ interface GetDayClassNamesParams {
   modifiers: Record<string, (date: Date) => boolean>;
 }
 
-const MODIFIERS_CLASS_NAMES = new Map([
-  ['weekend', 'text-muted-foreground bg-muted/50 hover:bg-muted transition-colors'],
-  [
-    'holiday',
+const MODIFIERS_CLASS_NAMES: Record<string, string> = {
+  weekend: 'text-muted-foreground bg-muted/50 hover:bg-muted transition-colors',
+  holiday:
     'bg-gradient-to-br from-yellow-400 to-yellow-500 text-yellow-900 hover:from-yellow-500 hover:to-yellow-600 font-semibold shadow-sm transition-bg duration-200 ring-2 ring-yellow-200 dark:ring-yellow-300',
-  ],
-  [
-    'suggested',
+  suggested:
     'bg-teal-400 dark:bg-teal-600 hover:bg-teal-500 dark:hover:bg-teal-700 ring-2 ring-teal-300 dark:ring-teal-400 text-white font-semibold transition-b duration-200 shadow-md',
-  ],
-  ['today', 'bg-accent text-accent-foreground font-medium ring-2 ring-ring'],
-  [
-    'alternative',
+  today: 'bg-accent text-accent-foreground font-medium ring-2 ring-ring',
+  alternative:
     'bg-orange-100 dark:bg-orange-900/30 text-white font-semibold animate-pulse shadow-md ring-2 ring-orange-300 dark:ring-orange-400 transition-all duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(255,165,0,0.8)_2px,rgba(255,165,0,0.8)_4px)]',
-  ],
-]);
+} as const;
 
 export const getDayClassNames = ({
   date,
@@ -47,9 +41,9 @@ export const getDayClassNames = ({
 
   Object.entries(modifiers).forEach(([name, modifierFn]) => {
     const shouldApplyModifier =
-      modifierFn?.(date) && MODIFIERS_CLASS_NAMES.get(name) && !(name === 'today' && (isDisabled || isSelected));
+      modifierFn?.(date) && MODIFIERS_CLASS_NAMES[name] && !(name === 'today' && (isDisabled || isSelected));
     if (shouldApplyModifier) {
-      classes.push(MODIFIERS_CLASS_NAMES.get(name));
+      classes.push(MODIFIERS_CLASS_NAMES[name]);
     }
   });
 

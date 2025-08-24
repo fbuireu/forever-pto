@@ -25,11 +25,11 @@ const selectBalancedStrategy = (bridges: Bridge[], ptoDays: number) =>
 
 const DEFAULT_STRATEGY = selectGroupedStrategy;
 
-const STRATEGY_MAP = new Map([
-  [FilterStrategy.BALANCED, selectBalancedStrategy],
-  [FilterStrategy.GROUPED, selectGroupedStrategy],
-  [FilterStrategy.OPTIMIZED, selectOptimizedStrategy],
-]);
+const STRATEGY_MAP = {
+  [FilterStrategy.BALANCED]: selectBalancedStrategy,
+  [FilterStrategy.GROUPED]: selectGroupedStrategy,
+  [FilterStrategy.OPTIMIZED]: selectOptimizedStrategy,
+} as const;
 
 export function generateSuggestions({
   ptoDays,
@@ -61,7 +61,7 @@ export function generateSuggestions({
 
   const bridges = findBridges({ availableWorkdays, holidays: effectiveHolidays });
 
-  const selector = STRATEGY_MAP.get(strategy) ?? DEFAULT_STRATEGY;
+  const selector = STRATEGY_MAP[strategy] ?? DEFAULT_STRATEGY;
 
   const selection = selector(bridges, ptoDays);
 

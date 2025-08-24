@@ -11,11 +11,11 @@ import {
   DropdownMenuTrigger,
 } from 'src/components/animate-ui/radix/dropdown-menu';
 
-const THEME_ICONS = new Map([
-  ['light', Sun],
-  ['dark', Moon],
-  ['system', MonitorCog],
-]);
+const THEME_ICONS: Record<string, typeof Sun> = {
+    'light': Sun,
+    'dark': Moon,
+    'system': MonitorCog,
+};
 
 export const ThemeSelector = () => {
   const { setTheme, theme: currentTheme, themes } = useTheme();
@@ -36,7 +36,7 @@ export const ThemeSelector = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         {themes.map((theme) => {
-          const IconComponent = THEME_ICONS.get(theme);
+          const IconComponent = THEME_ICONS[theme];
           return (
             <DropdownMenuItem key={theme} className={'flex justify-between'} onClick={() => changeTheme(theme)}>
               {t(theme as Parameters<typeof t>[0])}

@@ -19,11 +19,11 @@ export interface GenerateAlternativesParams {
   strategy: FilterStrategy;
 }
 
-const STRATEGY_MAP = new Map([
-  [FilterStrategy.OPTIMIZED, generateOptimizedAlternatives],
-  [FilterStrategy.BALANCED, generateBalancedAlternatives],
-  [FilterStrategy.GROUPED, generateGroupedAlternatives],
-]);
+const STRATEGY_MAP = {
+    [FilterStrategy.OPTIMIZED]: generateOptimizedAlternatives,
+    [FilterStrategy.BALANCED]: generateBalancedAlternatives,
+    [FilterStrategy.GROUPED]: generateGroupedAlternatives,
+} as const;
 
 const DEFAULT_STRATEGY = generateGroupedAlternatives;
 
@@ -47,8 +47,7 @@ export function generateAlternatives(params: GenerateAlternativesParams): Sugges
   const existingSuggestionSet = new Set(existingSuggestion.map((d) => d.getTime()));
 
 
-    
-  const strategyFunction = STRATEGY_MAP.get(strategy) ?? DEFAULT_STRATEGY;
+  const strategyFunction = STRATEGY_MAP[strategy] ?? DEFAULT_SATEGY;
 
   return strategyFunction({ params, availableWorkdays, effectiveHolidays, existingSuggestionSet });
 }
