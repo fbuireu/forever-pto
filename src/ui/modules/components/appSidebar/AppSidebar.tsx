@@ -19,15 +19,15 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from 'src/components/animate-ui/radix/sidebar';
-import { AllowPastDays } from './orgamisms/AllowPastDays';
-import { CarryOverMonths } from './orgamisms/CarryOverMonths';
-import { Countries } from './orgamisms/Countries';
-import { LanguageSelector } from './orgamisms/LanguageSelector';
-import { PtoDays } from './orgamisms/PtoDays';
-import { Regions } from './orgamisms/Regions';
-import { Strategy } from './orgamisms/Strategy';
-import { ThemeSelector } from './orgamisms/ThemeSelector';
-import { Years } from './orgamisms/Years';
+import { AllowPastDays } from './components/AllowPastDays';
+import { CarryOverMonths } from './components/CarryOverMonths';
+import { Countries } from './components/Countries';
+import { LanguageSelector } from './components/LanguageSelector';
+import { PtoDays } from './components/PtoDays';
+import { Regions } from './components/Regions';
+import { Strategy } from './components/Strategy';
+import { ThemeSelector } from './components/ThemeSelector';
+import { Years } from './components/Years';
 
 interface AppSidebarProps {
   children: React.ReactNode;

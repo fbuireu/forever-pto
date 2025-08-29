@@ -9,5 +9,11 @@ export interface HolidayDTO {
   name: string;
   type?: string;
   location?: string;
-  variant: 'national' | 'regional' | 'custom';
+  variant: HolidayVariant;
+}
+
+export const enum HolidayVariant {
+  NATIONAL = 'national',
+  REGIONAL = 'regional',
+  CUSTOM = 'custom',
 }
