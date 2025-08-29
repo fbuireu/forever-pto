@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 interface UseDebounceParams<T> {
   value: T;
   delay: number;
-  callback: (value: T) => void;
+  callback?: (value: T) => void;
 }
 
 export const useDebounce = <T>({ value, delay, callback }: UseDebounceParams<T>) => {
@@ -30,7 +30,7 @@ export const useDebounce = <T>({ value, delay, callback }: UseDebounceParams<T>)
     }
 
     timeoutRef.current = setTimeout(() => {
-      callback(newValue);
+      callback?.(newValue);
     }, delay);
   };
 

@@ -6,7 +6,7 @@ import { isSameDay, isSameMonth } from 'date-fns';
 import type { Locale } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
-import { formatDay, formatMonthYear } from '../utils/formatters';
+import { formatDate  } from '../utils/formatters';
 import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
 import { ConditionalWrapper } from './ConditionalWrapper';
 import { getDayClassNames } from './utils/helpers';
@@ -57,7 +57,7 @@ export function Calendar({
   });
 
   const weekdayNames = useMemo(() => getWeekdayNames({ locale, weekStartsOn }), [locale, weekStartsOn]);
-  const monthYearLabel = useMemo(() => formatMonthYear({ date: month, locale }), [month, locale]);
+  const monthYearLabel = useMemo(() => formatDate({ date: month, locale, format: 'LLLL yyyy' }), [month, locale]);
   const calendarDays = useMemo(
     () => getCalendarDays({ month, weekStartsOn, fixedWeeks }),
     [month, weekStartsOn, fixedWeeks]
@@ -149,7 +149,7 @@ export function Calendar({
                   onClick={() => handleDayClick(date)}
                   disabled={isDisabled}
                 >
-                  {formatDay({ date, locale })}
+                  {formatDate({ date, locale, format: 'd' })}
                 </Button>
               </ConditionalWrapper>
             </div>
