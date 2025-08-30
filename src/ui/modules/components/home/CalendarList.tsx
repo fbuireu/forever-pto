@@ -1,6 +1,5 @@
 'use client';
 
-import { getLocalizedDateFns } from '@application/i18n/localize';
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
@@ -77,7 +76,7 @@ export const CalendarList = () => {
             className='rounded-lg border shadow-sm bg-card'
             month={month}
             weekStartsOn={1}
-            locale={getLocalizedDateFns(locale)}
+            locale={locale}
             modifiers={modifiers}
             disabled={modifiers.disabled}
             holidays={holidays}

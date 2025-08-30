@@ -15,50 +15,70 @@ import { Checkbox } from 'src/components/animate-ui/base/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { HolidayRow } from './components/HolidayRow';
 import { HolidayTableHeader } from './components/HolidayTableHeader';
+import { cn } from '@const/lib/utils';
 interface HolidaysTableProps {
+  title: string;
   variant: HolidayVariant;
-  onDelete: (selectedHolidays: HolidayDTO[]) => void;
   defaultOpen?: boolean;
 }
 
-const CONFIG = {
-  [HolidayVariant.NATIONAL]: {
-    title: 'Fiestas Nacionales',
-  },
-  [HolidayVariant.REGIONAL]: {
-    title: 'Fiestas Regionales',
-  },
-  [HolidayVariant.CUSTOM]: {
-    title: 'Fiestas Personalizadas',
-  },
-} as const;
-
-export const HolidaysTable = ({ variant, onDelete, defaultOpen = false }: HolidaysTableProps) => {
+export const HolidaysTable = ({  title, variant, defaultOpen = false }: HolidaysTableProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const locale = useLocale();
   const [selectedHolidays, setSelectedHolidays] = useState<Set<string>>(new Set());
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof HolidayDTO | null;
+    direction: 'asc' | 'desc';
+  }>({ key: null, direction: 'asc' });
   const [debouncedSearchTerm] = useDebounce({
     value: searchTerm,
     delay: 100,
+    callback: () => {},
   });
   const { holidays } = useHolidaysStore();
 
-  const filteredByVariant = useMemo(
-    () => holidays.filter((holiday) => holiday.variant === variant),
-    [variant, holidays]
-  );
+  const variantHolidays = useMemo(() => holidays.filter((holiday) => holiday.variant === variant), [variant, holidays]);
 
-  const filteredHolidays = useMemo(
-    () =>
-      filteredByVariant.filter(
-        (holiday) =>
-          holiday.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ??
-          holiday.type?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ??
-          holiday.location?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-      ),
-    [filteredByVariant, debouncedSearchTerm]
-  );
+  const filteredHolidays = useMemo(() => {
+    let filtered = variantHolidays.filter(
+      (holiday) =>
+        holiday.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ??
+        holiday.type?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ??
+        holiday.location?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+    );
+
+    if (sortConfig.key) {
+      const sortKey = sortConfig.key;
+      filtered = [...filtered].sort((a, b) => {
+        const aValue = a[sortKey];
+        const bValue = b[sortKey];
+
+        if (aValue === null || aValue === undefined) return 1;
+        if (bValue === null || bValue === undefined) return -1;
+
+        let comparison = 0;
+        if (sortKey === 'date') {
+          comparison = new Date(aValue as Date).getTime() - new Date(bValue as Date).getTime();
+        } else if (typeof aValue === 'string' && typeof bValue === 'string') {
+          comparison = aValue.localeCompare(bValue);
+        } else {
+          comparison = Math.sign(Number(aValue) - Number(bValue));
+        }
+
+        return sortConfig.direction === 'desc' ? -comparison : comparison;
+      });
+    }
+
+    return filtered;
+  }, [variantHolidays, debouncedSearchTerm, sortConfig]);
+
+  const handleSort = useCallback((key: keyof HolidayDTO) => {
+    setSortConfig((current) => ({
+      key,
+      direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  }, []);
 
   const getHolidayId = useCallback((holiday: HolidayDTO, index: number) => {
     return `${holiday.name}-${holiday.date.getTime()}-${index}`;
@@ -115,9 +135,12 @@ export const HolidaysTable = ({ variant, onDelete, defaultOpen = false }: Holida
   }, [filteredHolidays, selectedHolidays, getHolidayId]);
 
   const handleDelete = useCallback(() => {
-    const selected = getSelectedHolidays();
-    onDelete(selected);
-  }, [getSelectedHolidays, onDelete]);
+    const selectedHolidaysList = getSelectedHolidays();
+
+    console.log('Eliminar estos holidays:', selectedHolidaysList);
+
+    setSelectedHolidays(new Set());
+  }, [getSelectedHolidays]);
 
   const SelectAllButton = useMemo(() => {
     const { type } = selectionState;
@@ -145,10 +168,15 @@ export const HolidaysTable = ({ variant, onDelete, defaultOpen = false }: Holida
   }, [selectionState, toggleSelectAll]);
 
   const selectedCount = selectedHolidays.size;
-  const shouldShowLocationColumn = filteredByVariant.some((h) => h.location);
+  const shouldShowLocationColumn = variantHolidays.some((h) => h.location);
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className='space-y-4'>
+    <Collapsible
+      open={isOpen}
+      onOpenChange={setIsOpen}
+      className={cn('space-y-4 w-full overflow-hidden', !variantHolidays.length && 'opacity-50 pointer-events-none')}
+      disabled={!variantHolidays.length}
+    >
       <CollapsibleTrigger asChild>
         <div className='flex items-center justify-between cursor-pointer group hover:bg-muted/50 p-3 rounded-lg border transition-colors'>
           <div className='flex items-center space-x-3'>
@@ -158,16 +186,16 @@ export const HolidaysTable = ({ variant, onDelete, defaultOpen = false }: Holida
               ) : (
                 <ChevronRight className='h-4 w-4 text-muted-foreground transition-transform' />
               )}
-              <h3 className='text-lg font-semibold'>{CONFIG[variant].title}</h3>
+              <h3 className='text-lg font-semibold'>{title}</h3>
             </div>
             <div className='flex items-center space-x-2'>
-              <Badge variant='outline'>{filteredByVariant.length} total</Badge>
+              <Badge variant='outline'>{variantHolidays.length} total</Badge>
             </div>
           </div>
           <div className='flex items-center space-x-2 text-sm text-muted-foreground'>
-            <span>{filteredByVariant.filter((h) => !isWeekend(h.date)).length} laborables</span>
+            <span>{variantHolidays.filter((h) => !isWeekend(h.date)).length} laborables</span>
             <span>•</span>
-            <span>{filteredByVariant.filter((h) => isWeekend(h.date)).length} fines de semana</span>
+            <span>{variantHolidays.filter((h) => isWeekend(h.date)).length} fines de semana</span>
           </div>
         </div>
       </CollapsibleTrigger>
@@ -176,7 +204,7 @@ export const HolidaysTable = ({ variant, onDelete, defaultOpen = false }: Holida
           <div className='flex items-center space-x-2'>
             {selectedCount > 0 && (
               <div className='flex items-center space-x-2'>
-                <Button variant='destructive' size='sm' onClick={() => {}}>
+                <Button variant='destructive' size='sm' onClick={handleDelete}>
                   <Trash2 className='h-4 w-4 mr-1' />
                   Eliminar {selectedCount} festivos
                 </Button>
@@ -194,78 +222,67 @@ export const HolidaysTable = ({ variant, onDelete, defaultOpen = false }: Holida
           </div>
         </div>
       )}
-      {isOpen && (
-        <div className='rounded-md border m-0'>
-          <Table>
-            <colgroup>
-              <col className='w-[50px]' />
-              <col className='w-[300px]' />
-              <col className='w-[120px]' />
-              <col className='w-[100px]' />
-              <col className='w-[80px]' />
-              <col className='w-[100px]' />
-              {shouldShowLocationColumn && <col className='w-[150px]' />}
-            </colgroup>
-            <HolidayTableHeader
-              selectAllButton={SelectAllButton}
-              shouldShowLocationColumn={shouldShowLocationColumn}
-              variant={variant}
-            />
-          </Table>
-        </div>
-      )}
-      <CollapsibleContent className='space-y-4'>
-        <div className='rounded-md border border-t-0 max-h-96 overflow-y-auto'>
-          <Table>
-            <colgroup>
-              <col className='w-[50px]' />
-              <col className='w-[300px]' />
-              <col className='w-[120px]' />
-              <col className='w-[100px]' />
-              <col className='w-[80px]' />
-              <col className='w-[100px]' />
-              {shouldShowLocationColumn && <col className='w-[150px]' />}
-            </colgroup>
-            <TableBody>
-              {filteredHolidays.length > 0 ? (
-                filteredHolidays.map((holiday, index) => {
-                  const holidayId = getHolidayId(holiday, index);
-                  const isSelected = selectedHolidays.has(holidayId);
+      <CollapsibleContent className='space-y-4 overflow-hidden'>
+        {isOpen && (
+          <div className='rounded-md border max-h-96 overflow-hidden'>
+            <div className='max-h-96 overflow-y-auto overflow-x-hidden'>
+              <Table className='table-fixed w-full'>
+                <colgroup>
+                  <col className='w-[50px]' />
+                  <col className='w-[300px]' />
+                  <col className='w-[120px]' />
+                  <col className='w-[100px]' />
+                  <col className='w-[80px]' />
+                  <col className='w-[100px]' />
+                  {shouldShowLocationColumn && <col className='w-[150px]' />}
+                </colgroup>
+                <HolidayTableHeader
+                  selectAllButton={SelectAllButton}
+                  shouldShowLocationColumn={shouldShowLocationColumn}
+                  variant={variant}
+                  sortConfig={sortConfig}
+                  onSort={handleSort}
+                />
+                <TableBody>
+                  {filteredHolidays.length > 0 ? (
+                    filteredHolidays.map((holiday, index) => {
+                      const holidayId = getHolidayId(holiday, index);
+                      const isSelected = selectedHolidays.has(holidayId);
 
-                  return (
-                    <HolidayRow
-                      key={holidayId}
-                      holiday={holiday}
-                      index={index}
-                      isSelected={isSelected}
-                      shouldShowLocationColumn={shouldShowLocationColumn}
-                      variant={variant}
-                      locale={locale}
-                      onToggle={toggleSelectHoliday}
-                    />
-                  );
-                })
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={shouldShowLocationColumn ? 7 : 6} className='h-24 text-center'>
-                    <div className='flex flex-col items-center space-y-2 text-muted-foreground'>
-                      <Search className='h-8 w-8' />
-                      <span>{debouncedSearchTerm ? 'No se encontraron festividades' : 'No hay festividades'}</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                      return (
+                        <HolidayRow
+                          key={holidayId}
+                          holiday={holiday}
+                          index={index}
+                          isSelected={isSelected}
+                          locale={locale}
+                          onToggle={toggleSelectHoliday}
+                        />
+                      );
+                    })
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={shouldShowLocationColumn ? 7 : 6} className='h-24 text-center'>
+                        <div className='flex flex-col items-center space-y-2 text-muted-foreground'>
+                          <Search className='h-8 w-8' />
+                          <span>{debouncedSearchTerm ? 'No se encontraron festividades' : 'No hay festividades'}</span>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        )}
         <div className='flex items-center justify-between text-sm text-muted-foreground border-t pt-3'>
           <div className='flex items-center space-x-4'>
-            <span>En fin de semana: {filteredByVariant.filter((h) => isWeekend(h.date)).length}</span>
-            <span>En laborables: {filteredByVariant.filter((h) => !isWeekend(h.date)).length}</span>
+            <span>En fin de semana: {variantHolidays.filter((h) => isWeekend(h.date)).length}</span>
+            <span>En laborables: {variantHolidays.filter((h) => !isWeekend(h.date)).length}</span>
           </div>
           <div className='flex items-center space-x-2'>
             <span>
-              Mostrando {filteredHolidays.length} de {filteredByVariant.length}
+              Mostrando {filteredHolidays.length} de {variantHolidays.length}
             </span>
           </div>
         </div>

@@ -1,24 +1,22 @@
-import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
+import { type HolidayDTO } from '@application/dto/holiday/types';
 import { Badge } from '@const/components/ui/badge';
 import { TableCell, TableRow } from '@const/components/ui/table';
 import { isWeekend } from 'date-fns/isWeekend';
+import type { Locale } from 'next-intl';
 import { memo } from 'react';
 import { Checkbox } from 'src/components/animate-ui/base/checkbox';
 import { formatDate } from '../../utils/formatters';
-import type { Locale } from 'next-intl';
 
 interface HolidayRowProps {
   holiday: HolidayDTO;
   index: number;
   isSelected: boolean;
-  shouldShowLocationColumn: boolean;
-  variant: HolidayVariant;
   locale: Locale;
   onToggle: (holiday: HolidayDTO, index: number) => void;
 }
 
 export const HolidayRow = memo<HolidayRowProps>(
-  ({ holiday, index, isSelected, shouldShowLocationColumn, variant, locale, onToggle }) => {
+  ({ holiday, index, isSelected, locale, onToggle }) => {
     const getWorkdayStatus = (date: Date) => {
       const isWeekendDay = isWeekend(date);
       return {
@@ -63,16 +61,9 @@ export const HolidayRow = memo<HolidayRowProps>(
         </TableCell>
         <TableCell>
           <Badge variant={workdayStatus.variant} className='text-xs'>
-            {workdayStatus.isWorkday ? 'Lab.' : 'F.S.'}
+            {workdayStatus.isWorkday ? 'Laborable' : 'Weekend'}
           </Badge>
         </TableCell>
-        {shouldShowLocationColumn && (
-          <TableCell className='text-sm text-muted-foreground'>
-            <span className='truncate'>
-              {holiday.location ?? (variant === HolidayVariant.NATIONAL ? 'Nacional' : '-')}
-            </span>
-          </TableCell>
-        )}
       </TableRow>
     );
   }

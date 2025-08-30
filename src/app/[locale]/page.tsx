@@ -1,7 +1,7 @@
 import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { CalendarList } from '@ui/modules/components/home/CalendarList';
-import { ManagementBar } from '@ui/modules/components/home/ManagementBar';
 import { HolidaysList } from '@ui/modules/components/home/HolidaysList';
+import { ManagementBar } from '@ui/modules/components/home/ManagementBar';
 import { StoresInitializer } from '@ui/store/StoresInitializer';
 import type { Locale } from 'next-intl';
 import { cookies } from 'next/headers';
@@ -21,7 +21,7 @@ const Home = async ({ params }: HomeProps) => {
   return (
     <AppSidebar locale={locale}>
       <StoresInitializer userCountry={userCountry} locale={locale} />
-      <section className='flex w-fit mx-auto items-start flex-col gap-4'>
+      <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4'>
         <HolidaysList />
         <ManagementBar />
         <CalendarList />

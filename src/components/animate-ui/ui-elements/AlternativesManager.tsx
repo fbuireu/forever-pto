@@ -1,11 +1,11 @@
 'use client';
 
+import { Button } from '@const/components/ui/button';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { BarChart3, Calendar, CalendarDays, ChevronLeft, ChevronRight, Sparkles, TrendingUp } from 'lucide-react';
 import { motion, type Transition, type Variants } from 'motion/react';
 import * as React from 'react';
 import { SlidingNumber } from '../text/sliding-number';
-import { Button } from '@const/components/ui/button';
 
 interface AlternativeManagerProps {
   allSuggestions: Suggestion[];
@@ -257,7 +257,7 @@ export const AlternativesManager = ({
         className={`flex w-full h-10 text-sm cursor-pointer items-center justify-center rounded-lg px-3 py-2 font-medium transition-colors duration-300 sm:w-auto ${'bg-teal-500 text-white hover:bg-teal-600 dark:bg-teal-600/80 dark:hover:bg-teal-700'}`}
         onClick={() => onSelectionChange(currentSuggestion, currentIndex)}
       >
-        Apply Alternative
+        {currentSelectionIndex === currentIndex ? 'Already Applied' : 'Apply Alternative'}
       </Button>
     </div>
   );

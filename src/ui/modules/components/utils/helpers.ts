@@ -1,4 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
+import { getLocalizedDateFns } from '@application/i18n/localize';
 import type { Day } from 'date-fns';
 import {
   addDays,
@@ -31,7 +32,7 @@ export const getWeekdayNames = ({ locale, weekStartsOn }: GetWeekdayNamesParams)
 
   for (let i = 0; i < DAYS_PER_WEEK; i++) {
     const day = addDays(weekStart, i);
-    days.push(format(day, 'EE', { locale: locale as unknown as DateFnsLocale }));
+    days.push(format(day, 'EE', { locale: getLocalizedDateFns(locale) }));
   }
 
   return days;
