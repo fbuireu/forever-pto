@@ -25,15 +25,15 @@ interface GenerateSuggestionsParams {
   year: number;
   ptoDays: number;
   allowPastDays: boolean;
-    months: Date[];
-    strategy: FilterStrategy;
+  months: Date[];
+  strategy: FilterStrategy;
 }
 
 interface GenerateAlternativesParams extends GenerateSuggestionsParams {
   maxAlternatives?: number;
 }
 
-interface FetchHolidaysParams extends Omit<FiltersState, 'ptoDays' | 'allowPastDays' | 'carryOverMonths' | 'strategy'> {
+interface FetchHolidaysParams extends Pick<FiltersState, 'year' | 'country' | 'region'> {
   locale: Locale;
 }
 
@@ -44,6 +44,7 @@ interface HolidaysActions {
   setMaxAlternatives: (max: number) => void;
   setCurrentAlternativeSelection: (selection: Suggestion | null, index: number) => void;
   setPreviewAlternativeSelection: (selection: Suggestion | null, index: number) => void;
+  resetToDefaults: () => void;
 }
 
 type HolidaysStore = HolidaysState & HolidaysActions;
@@ -78,7 +79,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               holidays: holidaysWithDates,
             });
           } catch (error) {
-            console.warn("Error in fetchHolidays:", error);
+            console.warn('Error in fetchHolidays:', error);
             set({
               holidays: [],
             });
@@ -87,7 +88,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
         generateSuggestions: ({ year, ptoDays, allowPastDays, months, strategy }: GenerateSuggestionsParams) => {
           const { holidays, maxAlternatives } = get();
-
+            
           if (ptoDays <= 0 || holidays.length === 0) {
             set({
               suggestion: undefined,
@@ -126,7 +127,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               strategy,
             });
 
-            set({
+              set({
               suggestion,
               alternatives,
               currentSelection: suggestion,
@@ -152,7 +153,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           ptoDays,
           allowPastDays,
           months,
-            maxAlternatives,
+          maxAlternatives,
           strategy,
         }: GenerateAlternativesParams) => {
           const { holidays, maxAlternatives: stateMaxAlternatives, suggestion } = get();
@@ -208,6 +209,12 @@ export const useHolidaysStore = create<HolidaysStore>()(
           set({
             previewAlternativeSelection: selection,
             previewAlternativeIndex: index,
+          });
+        },
+
+        resetToDefaults: () => {
+          set({
+            ...initialState,
           });
         },
       }),

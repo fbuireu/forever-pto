@@ -6,6 +6,7 @@ import { StoresInitializer } from '@ui/store/StoresInitializer';
 import type { Locale } from 'next-intl';
 import { cookies } from 'next/headers';
 import { generateMetadata } from './metadata';
+import { Faq } from '@ui/modules/components/home/Faq';
 
 export const runtime = 'edge';
 
@@ -20,11 +21,12 @@ const Home = async ({ params }: HomeProps) => {
 
   return (
     <AppSidebar locale={locale}>
-      <StoresInitializer userCountry={userCountry} locale={locale} />
+      <StoresInitializer userCountry={userCountry} />
       <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4'>
         <HolidaysList />
         <ManagementBar />
         <CalendarList />
+        <Faq />
       </section>
     </AppSidebar>
   );
@@ -33,5 +35,4 @@ const Home = async ({ params }: HomeProps) => {
 export default Home;
 export { generateMetadata };
 
-// todo: recheck algo (should split days if needed) + alternative algo weird decisions
 // todo: in the FAQ section add a clearall button

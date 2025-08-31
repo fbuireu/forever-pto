@@ -39,6 +39,8 @@ export const isAlternative = (
 
     const targetSuggestion = temporalSelectionIndex === 0 ? suggestion : alternatives[temporalSelectionIndex - 1];
 
+    if (!targetSuggestion?.days) return false;
+
     return targetSuggestion?.days.some((d) => isSameDay(d, date)) ?? false;
   };
 };

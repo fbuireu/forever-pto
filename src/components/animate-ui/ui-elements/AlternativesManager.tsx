@@ -79,7 +79,7 @@ export const AlternativesManager = ({
     }
   }, [currentIndex, totalOptions, allSuggestions, onPreviewChange]);
 
-  if (!currentSuggestion) {
+    if (!currentSuggestion?.days) {
     return null;
   }
 
