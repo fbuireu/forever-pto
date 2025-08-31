@@ -76,7 +76,7 @@ importers:
         version: 4.1.0
       date-holidays:
         specifier: ^3.24.4
-        version: 3.25.1
+        version: 3.25.2
       i18n-iso-countries:
         specifier: ^7.14.0
         version: 7.14.0
@@ -2277,8 +2277,8 @@ packages:
     resolution: {integrity: sha512-O0yuUDnZeQDL+ncNGlJ78BiO4jnYI3bvMsD5prT0/nsgijG/LpNBIr63gTjVTNsiGkgQhiyCShTgxt8oXOrklA==}
     engines: {node: '>=4'}
 
-  astronomia@4.1.1:
-    resolution: {integrity: sha512-TcJD9lUC5eAo0/Ji7rnQauX/yQbi0yZWM+JsNr77W3OA5fsrgvuFgubLMFwfw4VlZ29cu9dG/yfJbfvuTSftjg==}
+  astronomia@4.2.0:
+    resolution: {integrity: sha512-mTvpBGyXB80aSsDhAAiuwza5VqAyqmj5yzhjBrFhRy17DcWDzJrb8Vdl4Sm+g276S+mY7bk/5hi6akZ5RQFeHg==}
     engines: {node: '>=12.0.0'}
 
   async-listen@1.2.0:
@@ -2571,8 +2571,8 @@ packages:
     resolution: {integrity: sha512-h09ZEtM6u5cYM6m1bX+1Ny9f+nLO9KVZUKNPEnH7lhbXYTfqZogaGTnhONswGeIJFF91UImIftS3CdM9HLW5oQ==}
     engines: {node: '>=12.0.0'}
 
-  date-holidays@3.25.1:
-    resolution: {integrity: sha512-PcZjMd41yGaGZRj11lXTqWQm2Wq9A2/VzsR9XObOOJlkgYs9dg/e40QAt2DLk+9TsvPdfFRyDoTpfM1vj4DryQ==}
+  date-holidays@3.25.2:
+    resolution: {integrity: sha512-xtgGWIBn5tGTA6QdYxKKVH1nogrY0SSbluDRDeUqnAvJy5fKMNjlrsAwmnzypjzF+TcdPvMd9KYfXs3KinQ2BA==}
     engines: {node: '>=12.0.0'}
     hasBin: true
 
@@ -6482,7 +6482,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  astronomia@4.1.1: {}
+  astronomia@4.2.0: {}
 
   async-listen@1.2.0: {}
 
@@ -6732,7 +6732,7 @@ snapshots:
 
   date-chinese@2.1.4:
     dependencies:
-      astronomia: 4.1.1
+      astronomia: 4.2.0
 
   date-easter@1.0.3: {}
 
@@ -6742,7 +6742,7 @@ snapshots:
 
   date-holidays-parser@3.4.7:
     dependencies:
-      astronomia: 4.1.1
+      astronomia: 4.2.0
       caldate: 2.0.5
       date-bengali-revised: 2.0.2
       date-chinese: 2.1.4
@@ -6751,7 +6751,7 @@ snapshots:
       jalaali-js: 1.2.8
       moment-timezone: 0.5.48
 
-  date-holidays@3.25.1:
+  date-holidays@3.25.2:
     dependencies:
       date-holidays-parser: 3.4.7
       js-yaml: 4.1.0
