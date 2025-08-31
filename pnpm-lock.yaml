@@ -125,7 +125,7 @@ importers:
         version: 2.2.2
       '@cloudflare/next-on-pages':
         specifier: ^1.13.13
-        version: 1.13.14(vercel@44.5.5(rollup@4.45.1))(wrangler@4.32.0)
+        version: 1.13.15(vercel@44.5.5(rollup@4.45.1))(wrangler@4.32.0)
       '@commitlint/cli':
         specifier: ^19.8.1
         version: 19.8.1(@types/node@24.3.0)(typescript@5.8.3)
@@ -345,8 +345,8 @@ packages:
     resolution: {integrity: sha512-+tv3z+SPp+gqTIcImN9o0hqE9xyfQjI1XD9pL6NuKjua9B1y7mNYv0S9cP+QEbA4ppVgGZEmKOvHX5G5Ei1CVA==}
     engines: {node: '>=18.0.0'}
 
-  '@cloudflare/next-on-pages@1.13.14':
-    resolution: {integrity: sha512-pxopQWuYg8JnERqmeAgdqJh3A+QZ6IZxbFYbWKs85p+po0E2zCrzH0t4L6P1oTsRLQf8Y79b61qZp5cDSfJlew==}
+  '@cloudflare/next-on-pages@1.13.15':
+    resolution: {integrity: sha512-HTLgU4S6ESRz79E6a5iTKLk7J/i0/5DL+3q8WfG47muH/dQpSl98ZpZh4R3qPf77HGghZUX934Mt5zwHle8uDw==}
     hasBin: true
     peerDependencies:
       '@cloudflare/workers-types': ^4.20240208.0
@@ -4696,7 +4696,7 @@ snapshots:
     dependencies:
       mime: 3.0.0
 
-  '@cloudflare/next-on-pages@1.13.14(vercel@44.5.5(rollup@4.45.1))(wrangler@4.32.0)':
+  '@cloudflare/next-on-pages@1.13.15(vercel@44.5.5(rollup@4.45.1))(wrangler@4.32.0)':
     dependencies:
       acorn: 8.15.0
       ast-types: 0.14.2
