@@ -1,7 +1,8 @@
 'use client';
 
-import { useAnimation, type AnimationPlaybackControls, type SVGMotionProps, type Variants } from 'motion/react';
 import * as React from 'react';
+import type { SVGMotionProps } from 'motion/react';
+import { useAnimation, type LegacyAnimationControls, type Variants, type SVGMotionProps } from 'motion/react';
 
 import { cn } from '@const/lib/utils';
 
@@ -36,7 +37,8 @@ type StaticAnimations = keyof typeof staticAnimations;
 type TriggerProp<T = string> = boolean | StaticAnimations | T;
 
 interface AnimateIconContextValue {
-  controls: AnimationPlaybackControls | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
+  controls: LegacyAnimationControls | undefined;
   animation: StaticAnimations | string;
   loop: boolean;
   loopDelay: number;
@@ -294,14 +296,14 @@ function getVariants<V extends { default: T; [key: string]: T }, T extends Recor
 }
 
 export {
-  AnimateIcon,
-  getVariants,
-  IconWrapper,
   pathClassName,
   staticAnimations,
+  AnimateIcon,
+  IconWrapper,
   useAnimateIconContext,
-  type AnimateIconContextValue,
-  type AnimateIconProps,
+  getVariants,
   type IconProps,
   type IconWrapperProps,
+  type AnimateIconProps,
+  type AnimateIconContextValue,
 };
