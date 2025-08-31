@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@const/components/ui/button';
-import { MonitorCog, Moon, Sun } from 'lucide-react';
+import { Check, Moon, Sun } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import {
@@ -11,14 +11,8 @@ import {
   DropdownMenuTrigger,
 } from 'src/components/animate-ui/radix/dropdown-menu';
 
-const THEME_ICONS: Record<string, typeof Sun> = {
-    'light': Sun,
-    'dark': Moon,
-    'system': MonitorCog,
-};
-
 export const ThemeSelector = () => {
-  const { setTheme, themes } = useTheme();
+  const { setTheme, themes, theme: currentTheme } = useTheme();
   const t = useTranslations('theme');
 
   const changeTheme = (theme: string) => {
@@ -36,11 +30,10 @@ export const ThemeSelector = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         {themes.map((theme) => {
-          const IconComponent = THEME_ICONS[theme];
           return (
             <DropdownMenuItem key={theme} className={'flex justify-between'} onClick={() => changeTheme(theme)}>
               {t(theme as Parameters<typeof t>[0])}
-              {IconComponent && <IconComponent className='h-4 w-4' />}
+              {currentTheme === theme && <Check className='h-4 w-4' />}
             </DropdownMenuItem>
           );
         })}

@@ -1,5 +1,5 @@
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { Troubleshooting } from '@ui/modules/components/faq/Troubleshooting';
+import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from 'src/components/animate-ui/base/accordion';
 import type { FaqData } from 'src/ui/modules/components/faq/types';
 
 const FAQ: FaqData = [
@@ -90,26 +90,21 @@ const FAQ: FaqData = [
 
 export const Faq = () => {
   return (
-    <section aria-labelledby='faq-title' className='space-y-6'>
+    <section aria-labelledby='faq-title' className='space-y-6 m-auto mt-8 max-w-4xl w-full'>
       <h2 id='faq-title' className='text-2xl font-semibold'>
         Preguntas frecuentes
       </h2>
-
       {FAQ.map((section) => (
         <div key={section.id}>
-          <h3 className='text-lg font-medium mb-2'>{section.title}</h3>
-          <div className='space-y-2'>
+          <h3 className='text-lg font-medium mb-4'>{section.title}</h3>
+          <Accordion openMultiple className='w-full'>
             {section.items.map((item) => (
-              <Collapsible key={item.id}>
-                <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-sm font-medium hover:bg-muted/50 rounded-md'>
-                  <span>{item.question}</span>
-                </CollapsibleTrigger>
-                <CollapsibleContent className='px-2 pb-2 text-sm text-muted-foreground'>
-                  {item.answer}
-                </CollapsibleContent>
-              </Collapsible>
+              <AccordionItem key={item.id} value={item.id} className="cursor-pointer">
+                <AccordionTrigger className='text-left'>{item.question}</AccordionTrigger>
+                <AccordionPanel className='text-muted-foreground'>{item.answer}</AccordionPanel>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
         </div>
       ))}
     </section>
