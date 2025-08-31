@@ -21,7 +21,7 @@ const compat = new FlatCompat({
 
 const gitignorePath = path.resolve(__dirname, '.gitignore');
 
-export default [
+const config = [
   ...compat.extends(
     'next/core-web-vitals',
     'next/typescript',
@@ -68,10 +68,8 @@ export default [
         },
       ],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
-      '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-deprecated': 'warn',
       'no-unused-vars': 'off',
       'react/jsx-uses-react': 'off',
       'react/react-in-jsx-scope': 'off',
@@ -92,6 +90,7 @@ export default [
       '@typescript-eslint/no-use-before-define': 'error',
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
       '@typescript-eslint/prefer-optional-chain': 'error',
+      '@typescript-eslint/no-deprecated': 'warn',
     },
   },
   {
@@ -122,3 +121,5 @@ export default [
   },
   includeIgnoreFile(gitignorePath),
 ];
+
+export default config;

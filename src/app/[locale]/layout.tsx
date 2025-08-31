@@ -1,3 +1,4 @@
+import { cn } from '@const/lib/utils';
 import { routing } from '@infrastructure/i18n/routing';
 import { type Locale, NextIntlClientProvider, hasLocale } from 'next-intl';
 import { ThemeProvider } from 'next-themes';
@@ -31,7 +32,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
 
   return (
     <html lang={locale}>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={cn(geistSans.variable, geistMono.variable, 'antialiased')}>
         <NextIntlClientProvider>
           <ThemeProvider
             attribute='data-theme'

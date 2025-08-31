@@ -1,5 +1,6 @@
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import { TableHead, TableHeader, TableRow } from '@const/components/ui/table';
+import { cn } from '@const/lib/utils';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { memo } from 'react';
 
@@ -32,7 +33,7 @@ const SortableHeader = ({
 
   return (
     <TableHead
-      className={`cursor-pointer select-none hover:bg-muted/50 transition-colors ${className}`}
+      className={cn('cursor-pointer select-none hover:bg-muted/50 transition-colors', className)}
       onClick={() => onSort(sortKey)}
     >
       <div className='flex items-center space-x-1'>

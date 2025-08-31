@@ -204,7 +204,10 @@ function DropdownMenuItem({
 }: DropdownMenuItemProps) {
   return (
     <MotionHighlightItem
-      activeClassName={variant === 'default' ? 'bg-accent' : 'bg-destructive/10 dark:bg-destructive/20'}
+      activeClassName={cn(
+        variant === 'default' && 'bg-accent',
+        variant === 'destructive' && 'bg-destructive/10 dark:bg-destructive/20'
+      )}
       disabled={disabled}
     >
       <DropdownMenuPrimitive.Item {...props} disabled={disabled} asChild>

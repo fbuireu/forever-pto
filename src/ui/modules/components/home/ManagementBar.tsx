@@ -1,7 +1,7 @@
 'use client';
 
 import { useHolidaysStore } from '@application/stores/holidays';
-import { Suggestion } from '@infrastructure/services/calendar/types';
+import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useCallback } from 'react';
 import { AlternativesManager } from 'src/components/animate-ui/ui-elements/AlternativesManager';
