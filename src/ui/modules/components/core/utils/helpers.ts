@@ -41,7 +41,7 @@ export const getDayClassNames = ({
 
   Object.entries(modifiers).forEach(([name, modifierFn]) => {
     const shouldApplyModifier =
-      modifierFn?.(date) && MODIFIERS_CLASS_NAMES[name] && !(name === 'today' && (isDisabled || isSelected));
+      modifierFn?.(date) && MODIFIERS_CLASS_NAMES[name] && !(name === 'today' && (isDisabled ?? isSelected));
     if (shouldApplyModifier) {
       classes.push(MODIFIERS_CLASS_NAMES[name]);
     }

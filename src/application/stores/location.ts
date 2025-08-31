@@ -64,6 +64,7 @@ export const useLocationStore = create<LocationStore>()(
               countriesLoading: false,
             });
           } catch (error) {
+            console.warn('Error in fetchCountries:', error);
             set({
               countriesLoading: false,
             });
@@ -93,6 +94,8 @@ export const useLocationStore = create<LocationStore>()(
               regionsLoading: false,
             });
           } catch (error) {
+            console.warn('Error in fetchRegions:', error);
+
             set({
               regionsLoading: false,
               regions: [],

@@ -2,7 +2,7 @@ import type { HolidayDTO } from '@application/dto/holiday/types';
 import { PTO_CONSTANTS } from '../../const';
 import type { Suggestion } from '../../types';
 import { findBridges } from '../../utils/helpers';
-import { GenerateAlternativesParams } from '../generateAlternatives';
+import type { GenerateAlternativesParams } from '../generateAlternatives';
 import { findAlternativeCombinations } from './helpers';
 
 interface GenerateAlternativesBaseParams {

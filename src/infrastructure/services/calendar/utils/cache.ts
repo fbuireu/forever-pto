@@ -1,4 +1,4 @@
-import { HolidayDTO } from '@application/dto/holiday/types';
+import type { HolidayDTO } from '@application/dto/holiday/types';
 import { isWeekend } from 'date-fns';
 
 const DATE_KEY_CACHE = new Map<number, string>();
@@ -25,7 +25,7 @@ export const getCombinationKey = (days: Date[]): string => {
 };
 
 export const createHolidaySet = (holidays: HolidayDTO[], cacheKey?: string): Set<string> => {
-  const key = cacheKey || 'default';
+  const key = cacheKey ?? 'default';
 
   if (HOLIDAY_CACHE.has(key)) {
     return HOLIDAY_CACHE.get(key)!;

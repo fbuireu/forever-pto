@@ -7,5 +7,5 @@ export function getRegionName(regionCode: string): string {
 
   const region = regions.find((r) => r.value.toLowerCase() === regionCode.toLowerCase());
 
-  return region?.label || regionCode;
+  return region?.label ?? regionCode;
 }

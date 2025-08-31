@@ -12,7 +12,6 @@ import {
   startOfMonth,
   startOfWeek,
 } from 'date-fns';
-import { type Locale as DateFnsLocale } from 'date-fns/locale';
 import type { Locale } from 'next-intl';
 
 const CALENDAR_WEEKS = 6;

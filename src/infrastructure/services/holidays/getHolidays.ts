@@ -34,7 +34,8 @@ export async function getHolidays({ year, country, region, locale }: GetHolidays
         params: { year: Number(year) },
       })
       .sort((a, b) => a.date.getTime() - b.date.getTime());
-  } catch (_) {
+  } catch (error) {
+    console.warn('Error in getHolidays:', error);
     return [];
   }
 }

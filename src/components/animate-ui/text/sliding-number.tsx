@@ -11,8 +11,33 @@ import {
   type UseInViewOptions,
 } from 'motion/react';
 import useMeasure from 'react-use-measure';
-
 import { cn } from '@const/lib/utils';
+
+function SlidingNumberDisplay({ motionValue, number, height, transition }: SlidingNumberDisplayProps) {
+  const y = useTransform(motionValue, (latest) => {
+    if (!height) return 0;
+    const currentNumber = latest % 10;
+    const offset = (10 + number - currentNumber) % 10;
+    let translateY = offset * height;
+    if (offset > 5) translateY -= 10 * height;
+    return translateY;
+  });
+
+  if (!height) {
+    return <span className='invisible absolute'>{number}</span>;
+  }
+
+  return (
+    <motion.span
+      data-slot='sliding-number-display'
+      style={{ y }}
+      className='absolute inset-0 flex items-center justify-center'
+      transition={{ ...transition, type: 'spring' }}
+    >
+      {number}
+    </motion.span>
+  );
+}
 
 type SlidingNumberRollerProps = {
   prevValue: number;
@@ -52,32 +77,6 @@ type SlidingNumberDisplayProps = {
   height: number;
   transition: SpringOptions;
 };
-
-function SlidingNumberDisplay({ motionValue, number, height, transition }: SlidingNumberDisplayProps) {
-  const y = useTransform(motionValue, (latest) => {
-    if (!height) return 0;
-    const currentNumber = latest % 10;
-    const offset = (10 + number - currentNumber) % 10;
-    let translateY = offset * height;
-    if (offset > 5) translateY -= 10 * height;
-    return translateY;
-  });
-
-  if (!height) {
-    return <span className='invisible absolute'>{number}</span>;
-  }
-
-  return (
-    <motion.span
-      data-slot='sliding-number-display'
-      style={{ y }}
-      className='absolute inset-0 flex items-center justify-center'
-      transition={{ ...transition, type: 'spring' }}
-    >
-      {number}
-    </motion.span>
-  );
-}
 
 type SlidingNumberProps = React.ComponentProps<'span'> & {
   number: number | string;

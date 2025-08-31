@@ -18,7 +18,7 @@ const THEME_ICONS: Record<string, typeof Sun> = {
 };
 
 export const ThemeSelector = () => {
-  const { setTheme, theme: currentTheme, themes } = useTheme();
+  const { setTheme, themes } = useTheme();
   const t = useTranslations('theme');
 
   const changeTheme = (theme: string) => {

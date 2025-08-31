@@ -1,11 +1,12 @@
 'use client';
 
-import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
+import type { HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { Badge } from '@const/components/ui/badge';
 import { Button } from '@const/components/ui/button';
 import { Input } from '@const/components/ui/input';
 import { Table, TableBody, TableCell, TableRow } from '@const/components/ui/table';
+import { cn } from '@const/lib/utils';
 import { useDebounce } from '@ui/hooks/useDebounce';
 import { isWeekend } from 'date-fns/isWeekend';
 import { ChevronDown, ChevronRight, Search, Trash2 } from 'lucide-react';
@@ -15,7 +16,6 @@ import { Checkbox } from 'src/components/animate-ui/base/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { HolidayRow } from './components/HolidayRow';
 import { HolidayTableHeader } from './components/HolidayTableHeader';
-import { cn } from '@const/lib/utils';
 interface HolidaysTableProps {
   title: string;
   variant: HolidayVariant;
@@ -135,9 +135,8 @@ export const HolidaysTable = ({  title, variant, defaultOpen = false }: Holidays
   }, [filteredHolidays, selectedHolidays, getHolidayId]);
 
   const handleDelete = useCallback(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const selectedHolidaysList = getSelectedHolidays();
-
-    console.log('Eliminar estos holidays:', selectedHolidaysList);
 
     setSelectedHolidays(new Set());
   }, [getSelectedHolidays]);

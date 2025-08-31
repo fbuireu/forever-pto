@@ -1,58 +1,6 @@
 import { PTO_CONSTANTS } from '../../const';
-import { Bridge, Suggestion } from '../../types';
+import type { Bridge, Suggestion } from '../../types';
 import { getCombinationKey, getKey } from '../../utils/cache';
-
-interface FindAlternativeCombinationsParams {
-  bridges: Bridge[];
-  ptoDays: number;
-  existingSuggestionSet: Set<number>;
-  maxAlternatives: number;
-  minEfficiency: number;
-}
-
-export function findAlternativeCombinations({
-  bridges,
-  ptoDays,
-  existingSuggestionSet,
-  maxAlternatives,
-  minEfficiency,
-}: FindAlternativeCombinationsParams): Suggestion[] {
-  const { EFFICIENCY_COMPARISON_THRESHOLD } = PTO_CONSTANTS.BRIDGE_GENERATION;
-  const alternatives: Suggestion[] = [];
-  const usedCombinations = new Set<string>();
-
-  const availableBridges = bridges.filter(
-    (bridge) => !bridge.ptoDays.some((day) => existingSuggestionSet.has(day.getTime()))
-  );
-
-  const maxDepth = Math.min(availableBridges.length, ptoDays * 2);
-  const combinations = generateCombinationsWithBacktracking(
-    availableBridges,
-    ptoDays,
-    minEfficiency,
-    maxAlternatives * 3,
-    maxDepth
-  );
-
-  const diversified = diversifyCombinations(combinations, maxAlternatives);
-
-  for (const combo of diversified) {
-    const key = getCombinationKey(combo.days);
-    if (!usedCombinations.has(key)) {
-      alternatives.push(combo);
-      usedCombinations.add(key);
-    }
-  }
-
-  return alternatives
-    .toSorted((a, b) => {
-      const effDiff = (b.efficiency || 0) - (a.efficiency || 0);
-      return Math.abs(effDiff) > EFFICIENCY_COMPARISON_THRESHOLD
-        ? effDiff
-        : b.totalEffectiveDays - a.totalEffectiveDays;
-    })
-    .slice(0, maxAlternatives);
-}
 
 function generateCombinationsWithBacktracking(
   bridges: Bridge[],
@@ -121,7 +69,7 @@ function diversifyCombinations(combinations: Suggestion[], targetCount: number):
     const months = combo.days.map((d) => d.getMonth());
     const uniqueMonths = new Set(months);
     const spread = uniqueMonths.size;
-    const groupKey = `${spread}-${Math.floor(combo.efficiency || 0)}`;
+    const groupKey = `${spread}-${Math.floor(combo.efficiency ?? 0)}`;
     if (!grouped.has(groupKey)) {
       grouped.set(groupKey, []);
     }
@@ -136,4 +84,56 @@ function diversifyCombinations(combinations: Suggestion[], targetCount: number):
   }
 
   return result.slice(0, targetCount);
+}
+
+interface FindAlternativeCombinationsParams {
+  bridges: Bridge[];
+  ptoDays: number;
+  existingSuggestionSet: Set<number>;
+  maxAlternatives: number;
+  minEfficiency: number;
+}
+
+export function findAlternativeCombinations({
+  bridges,
+  ptoDays,
+  existingSuggestionSet,
+  maxAlternatives,
+  minEfficiency,
+}: FindAlternativeCombinationsParams): Suggestion[] {
+  const { EFFICIENCY_COMPARISON_THRESHOLD } = PTO_CONSTANTS.BRIDGE_GENERATION;
+  const alternatives: Suggestion[] = [];
+  const usedCombinations = new Set<string>();
+
+  const availableBridges = bridges.filter(
+    (bridge) => !bridge.ptoDays.some((day) => existingSuggestionSet.has(day.getTime()))
+  );
+
+  const maxDepth = Math.min(availableBridges.length, ptoDays * 2);
+  const combinations = generateCombinationsWithBacktracking(
+    availableBridges,
+    ptoDays,
+    minEfficiency,
+    maxAlternatives * 3,
+    maxDepth
+  );
+
+  const diversified = diversifyCombinations(combinations, maxAlternatives);
+
+  for (const combo of diversified) {
+    const key = getCombinationKey(combo.days);
+    if (!usedCombinations.has(key)) {
+      alternatives.push(combo);
+      usedCombinations.add(key);
+    }
+  }
+
+  return alternatives
+    .toSorted((a, b) => {
+      const effDiff = (b.efficiency ?? 0) - (a.efficiency ?? 0);
+      return Math.abs(effDiff) > EFFICIENCY_COMPARISON_THRESHOLD
+        ? effDiff
+        : b.totalEffectiveDays - a.totalEffectiveDays;
+    })
+    .slice(0, maxAlternatives);
 }

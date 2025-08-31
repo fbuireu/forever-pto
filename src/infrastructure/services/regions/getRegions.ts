@@ -11,7 +11,8 @@ export function getRegions(countryCode?: string) {
     if (!regions || !Object.values(regions).length) return [];
 
     return regionDTO.create({ raw: regions }).sort((a, b) => a.label.localeCompare(b.label));
-  } catch (_) {
+  } catch (error) {
+    console.warn("Error in getRegions:", error);
     return [];
   }
 }

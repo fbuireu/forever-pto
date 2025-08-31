@@ -22,6 +22,7 @@ const compat = new FlatCompat({
 const gitignorePath = path.resolve(__dirname, '.gitignore');
 
 const config = [
+  { ignores: ['next-env.d.ts'] },
   ...compat.extends(
     'next/core-web-vitals',
     'next/typescript',

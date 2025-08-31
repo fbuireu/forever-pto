@@ -1,56 +1,12 @@
 import { PTO_CONSTANTS } from '../../const';
-import { Bridge, FilterStrategy } from '../../types';
+import type { Bridge} from '../../types';
+import { FilterStrategy } from '../../types';
 import { getKey } from '../../utils/cache';
 
 interface SelectOptimalDaysBase {
   bridges: Bridge[];
   targetPtoDays: number;
 }
-
-interface SelectOptimalDaysBaseReturn {
-  days: Date[];
-  totalEffectiveDays: number;
-  bridges: Bridge[];
-}
-
-export const selectOptimalDaysFromBridges = ({
-  bridges,
-  targetPtoDays,
-}: SelectOptimalDaysBase): SelectOptimalDaysBaseReturn => {
-  const {
-    SCORING: { BASE_SCORE, MULTI_DAY_BONUS, EFFICIENCY, TOTAL_VALUE },
-    SELECTION_WEIGHTS: { HIGH_VALUE_THRESHOLD_EFFECTIVE, HIGH_VALUE_THRESHOLD_DAYS },
-  } = PTO_CONSTANTS;
-  const scoredBridges = bridges.map((bridge) => {
-    const efficiencyScore = bridge.efficiency;
-    const valueScore = bridge.effectiveDays / 10;
-
-    const multiDayBonus =
-      bridge.ptoDaysNeeded >= HIGH_VALUE_THRESHOLD_DAYS && bridge.effectiveDays >= HIGH_VALUE_THRESHOLD_EFFECTIVE
-        ? MULTI_DAY_BONUS
-        : BASE_SCORE;
-
-    const totalScore = (efficiencyScore * EFFICIENCY + valueScore * TOTAL_VALUE) * multiDayBonus;
-
-    return {
-      ...bridge,
-      score: totalScore,
-    };
-  });
-
-  scoredBridges.sort((a, b) => b.score - a.score);
-
-  const selectedBridges = selectOptimalCombination({ bridges: scoredBridges, targetPtoDays });
-
-  const selectedDays = selectedBridges.flatMap((bridge) => bridge.ptoDays);
-  const totalEffectiveDays = selectedBridges.reduce((sum, b) => sum + b.effectiveDays, 0);
-
-  return {
-    days: selectedDays.toSorted((a, b) => a.getTime() - b.getTime()),
-    totalEffectiveDays,
-    bridges: selectedBridges,
-  };
-};
 
 interface SelectOptimalCombinationParams extends SelectOptimalDaysBase {
   bridges: (Bridge & { score: number })[];
@@ -116,6 +72,53 @@ function selectOptimalCombination({ bridges, targetPtoDays }: SelectOptimalCombi
 
   return selectedBridges;
 }
+
+interface SelectOptimalDaysBaseReturn {
+  days: Date[];
+  totalEffectiveDays: number;
+  bridges: Bridge[];
+}
+
+export const selectOptimalDaysFromBridges = ({
+  bridges,
+  targetPtoDays,
+}: SelectOptimalDaysBase): SelectOptimalDaysBaseReturn => {
+  const {
+    SCORING: { BASE_SCORE, MULTI_DAY_BONUS, EFFICIENCY, TOTAL_VALUE },
+    SELECTION_WEIGHTS: { HIGH_VALUE_THRESHOLD_EFFECTIVE, HIGH_VALUE_THRESHOLD_DAYS },
+  } = PTO_CONSTANTS;
+  const scoredBridges = bridges.map((bridge) => {
+    const efficiencyScore = bridge.efficiency;
+    const valueScore = bridge.effectiveDays / 10;
+
+    const multiDayBonus =
+      bridge.ptoDaysNeeded >= HIGH_VALUE_THRESHOLD_DAYS && bridge.effectiveDays >= HIGH_VALUE_THRESHOLD_EFFECTIVE
+        ? MULTI_DAY_BONUS
+        : BASE_SCORE;
+
+    const totalScore = (efficiencyScore * EFFICIENCY + valueScore * TOTAL_VALUE) * multiDayBonus;
+
+    return {
+      ...bridge,
+      score: totalScore,
+    };
+  });
+
+  scoredBridges.sort((a, b) => b.score - a.score);
+
+  const selectedBridges = selectOptimalCombination({ bridges: scoredBridges, targetPtoDays });
+
+  const selectedDays = selectedBridges.flatMap((bridge) => bridge.ptoDays);
+  const totalEffectiveDays = selectedBridges.reduce((sum, b) => sum + b.effectiveDays, 0);
+
+  return {
+    days: selectedDays.toSorted((a, b) => a.getTime() - b.getTime()),
+    totalEffectiveDays,
+    bridges: selectedBridges,
+  };
+};
+
+
 
 interface SelectBridgesForStrategy {
   bridges: Bridge[];

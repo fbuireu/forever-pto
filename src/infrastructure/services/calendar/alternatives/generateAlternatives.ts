@@ -1,6 +1,7 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { isWeekend } from 'date-fns';
-import { FilterStrategy, Suggestion } from '../types';
+import type { Suggestion } from '../types';
+import { FilterStrategy } from '../types';
 import { getAvailableWorkdays } from '../utils/helpers';
 import {
   generateBalancedAlternatives,

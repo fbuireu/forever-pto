@@ -13,7 +13,8 @@ export async function detectCountryFromHeaders(request: NextRequest): Promise<st
     }
 
     return country.toLowerCase();
-  } catch (_) {
+  } catch (error) {
+    console.warn("Error while detecting country from headers:", error)
     return '';
   }
 }

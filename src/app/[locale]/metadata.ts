@@ -6,6 +6,7 @@ interface GenerateMetadataParams {
 }
 
 export async function generateMetadata({ params }: GenerateMetadataParams): Promise<Metadata> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { locale } = await params;
 
   return {

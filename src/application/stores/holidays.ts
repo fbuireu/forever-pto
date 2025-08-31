@@ -1,14 +1,14 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { generateAlternatives } from '@infrastructure/services/calendar/alternatives/generateAlternatives';
 import { generateSuggestions } from '@infrastructure/services/calendar/suggestions/generateSuggestions';
-import { FilterStrategy, Suggestion } from '@infrastructure/services/calendar/types';
+import type { FilterStrategy, Suggestion } from '@infrastructure/services/calendar/types';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
 import { ensureDate } from '@shared/utils/dates';
-import { Locale } from 'next-intl';
+import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
-import { FiltersState } from './filters';
+import type { FiltersState } from './filters';
 
 export interface HolidaysState {
   holidays: HolidayDTO[];
@@ -78,6 +78,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               holidays: holidaysWithDates,
             });
           } catch (error) {
+            console.warn("Error in fetchHolidays:", error);
             set({
               holidays: [],
             });

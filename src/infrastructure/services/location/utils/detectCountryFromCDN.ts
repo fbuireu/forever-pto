@@ -19,7 +19,8 @@ export async function detectCountryFromCDN(): Promise<string> {
     }
 
     return '';
-  } catch (_) {
+  } catch (error) {
+    console.warn('Error while detecting country from CDN:', error);
     return '';
   }
 }
