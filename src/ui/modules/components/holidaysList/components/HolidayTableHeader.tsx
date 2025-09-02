@@ -1,5 +1,5 @@
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
-import { TableHead, TableHeader, TableRow } from '@const/components/ui/table';
+import { TableHead, TableHeader as BaseTableHeader, TableRow } from '@const/components/ui/table';
 import { cn } from '@const/lib/utils';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { memo } from 'react';
@@ -15,19 +15,21 @@ interface HolidayTableHeaderProps {
   onSort: (key: keyof HolidayDTO) => void;
 }
 
-const SortableHeader = ({
-  children,
-  sortKey,
-  currentSort,
-  onSort,
-  className = '',
-}: {
+interface TableHeaderProps {
   children: React.ReactNode;
   sortKey: keyof HolidayDTO;
   currentSort: { key: keyof HolidayDTO | null; direction: 'asc' | 'desc' };
   onSort: (key: keyof HolidayDTO) => void;
   className?: string;
-}) => {
+}
+
+const TableHeader = ({
+  children,
+  sortKey,
+  currentSort,
+  onSort,
+  className = '',
+}: TableHeaderProps) => {
   const isActive = currentSort.key === sortKey;
   const Icon = isActive ? (currentSort.direction === 'asc' ? ArrowUp : ArrowDown) : ArrowUpDown;
 
@@ -46,27 +48,27 @@ const SortableHeader = ({
 
 export const HolidayTableHeader = memo<HolidayTableHeaderProps>(
   ({ selectAllButton, shouldShowLocationColumn, variant, sortConfig, onSort }) => (
-    <TableHeader className='sticky top-0 bg-background z-10'>
+    <BaseTableHeader className='sticky top-0 bg-background z-10'>
       <TableRow>
         <TableHead>{selectAllButton}</TableHead>
-        <SortableHeader sortKey='name' currentSort={sortConfig} onSort={onSort}>
+        <TableHeader sortKey='name' currentSort={sortConfig} onSort={onSort}>
           Festividad
-        </SortableHeader>
-        <SortableHeader sortKey='date' currentSort={sortConfig} onSort={onSort}>
+        </TableHeader>
+        <TableHeader sortKey='date' currentSort={sortConfig} onSort={onSort}>
           Fecha
-        </SortableHeader>
+        </TableHeader>
         <TableHead>Día</TableHead>
-        <SortableHeader sortKey='type' currentSort={sortConfig} onSort={onSort}>
+        <TableHeader sortKey='type' currentSort={sortConfig} onSort={onSort}>
           Tipo
-        </SortableHeader>
+        </TableHeader>
         <TableHead>Estado</TableHead>
         {shouldShowLocationColumn && (
-          <SortableHeader sortKey='location' currentSort={sortConfig} onSort={onSort}>
+          <TableHeader sortKey='location' currentSort={sortConfig} onSort={onSort}>
             {variant === HolidayVariant.REGIONAL ? 'Región' : 'Ubicación'}
-          </SortableHeader>
+          </TableHeader>
         )}
       </TableRow>
-    </TableHeader>
+    </BaseTableHeader>
   )
 );
 
