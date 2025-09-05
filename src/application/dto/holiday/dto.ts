@@ -1,6 +1,6 @@
 import type { BaseDTO } from '@application/shared/dto/baseDTO';
 import { compareAsc, endOfYear, isWithinInterval, startOfYear } from 'date-fns';
-import type { HolidayDTO, RawHoliday } from './types';
+import { HolidayVariant, type HolidayDTO, type RawHoliday } from './types';
 import { getRegionName } from './utils/getRegionName';
 
 type HolidayDTOParams = {
@@ -40,7 +40,7 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> =
         date: new Date(holiday.date),
         name: holiday.name,
         type: holiday.type,
-        variant: holiday.location ? ('regional' as const) : ('national' as const),
+        variant: holiday.location ? HolidayVariant.REGIONAL : HolidayVariant.NATIONAL,
         ...(holiday.location && {
           location: getRegionName(holiday.location),
         }),
