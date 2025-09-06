@@ -7,6 +7,7 @@ import type { Locale } from 'next-intl';
 import { cookies } from 'next/headers';
 import { generateMetadata } from './metadata';
 import { Faq } from '@ui/modules/components/home/Faq';
+import { Legend } from '@ui/modules/components/home/Legend';
 
 export const runtime = 'edge';
 
@@ -25,7 +26,8 @@ const Home = async ({ params }: HomeProps) => {
       <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4'>
         <HolidaysList />
         <ManagementBar />
-        <CalendarList />
+              <CalendarList />
+              <Legend />
         <Faq />
       </section>
     </AppSidebar>
