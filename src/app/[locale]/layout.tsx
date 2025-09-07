@@ -6,6 +6,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { SidebarProvider } from 'src/components/animate-ui/radix/sidebar';
 import '../globals.css';
+import { PremiumModal } from '@ui/modules/components/premium/PremiumModal';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -41,7 +42,10 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
             enableSystem
             disableTransitionOnChange
           >
-            <SidebarProvider>{children}</SidebarProvider>
+            <SidebarProvider>
+              {children}
+              <PremiumModal />
+            </SidebarProvider>
             <footer className='row-start-3 flex gap-[24px] flex-wrap items-center justify-center' />
           </ThemeProvider>
         </NextIntlClientProvider>

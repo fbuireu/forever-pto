@@ -7,6 +7,7 @@ import { InfoIcon, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
+import { PremiumFeature } from '../../premium/PremiumFeature';
 
 const MIN_VALUE = 1;
 const MAX_VALUE = 12;
@@ -50,23 +51,25 @@ export const CarryOverMonths = () => {
           </Tooltip>
         </TooltipProvider>
       </Label>
-      <div className='flex gap-2 relative w-full'>
-        <p className='font-normal text-sm'>{MIN_VALUE}</p>
-        <Slider
-          id='carry-over-months'
-          value={[localValue]}
-          max={MAX_VALUE}
-          min={MIN_VALUE}
-          step={1}
-          onValueChange={handleChange}
-        />
-        <SlidingNumber
-          className='absolute -bottom-4 left-0 right-0 mx-auto justify-center font-normal text-sm'
-          number={localValue}
-          padStart
-        />
-        <p className='font-normal text-sm'>{MAX_VALUE}</p>
-      </div>
+      <PremiumFeature feature='Carry Over Months'>
+        <div className='flex gap-2 relative w-full'>
+          <p className='font-normal text-sm'>{MIN_VALUE}</p>
+          <Slider
+            id='carry-over-months'
+            value={[localValue]}
+            max={MAX_VALUE}
+            min={MIN_VALUE}
+            step={1}
+            onValueChange={handleChange}
+          />
+          <SlidingNumber
+            className='absolute -bottom-4 left-0 right-0 mx-auto justify-center font-normal text-sm'
+            number={localValue}
+            padStart
+          />
+          <p className='font-normal text-sm'>{MAX_VALUE}</p>
+        </div>
+      </PremiumFeature>
     </Field>
   );
 };

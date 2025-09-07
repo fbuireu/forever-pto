@@ -1,12 +1,14 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useLocationStore } from '@application/stores/location';
+import { usePremiumStore } from '@application/stores/premium';
 import { useEffect, useState } from 'react';
 
 const STORES = [
   { name: 'filters', store: useFiltersStore },
   { name: 'holidays', store: useHolidaysStore },
   { name: 'location', store: useLocationStore },
+  { name: 'premium', store: usePremiumStore },
 ] as const;
 
 export const useStoresReady = () => {
