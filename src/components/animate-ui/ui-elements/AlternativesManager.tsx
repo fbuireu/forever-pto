@@ -93,7 +93,7 @@ export const AlternativesManager = ({
   const isMainSuggestion = currentIndex === 0;
 
   return (
-    <div className='flex w-fit flex-wrap items-center gap-y-2 rounded-2xl border border-border bg-background p-2 shadow-lg'>
+    <div className='sticky top-0 z-[10] flex w-fit flex-wrap items-center gap-y-2 rounded-2xl border border-border bg-background p-2 shadow-sm'>
       <div className='flex shrink-0 items-center rounded-lg bg-muted/50 px-2 h-full'>
         <button
           disabled={currentIndex === 0}
