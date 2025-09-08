@@ -26,8 +26,8 @@ const Home = async ({ params }: HomeProps) => {
       <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4'>
         <HolidaysList />
         <ManagementBar />
-              <CalendarList />
-              <Legend />
+          <CalendarList />
+          <Legend />
         <Faq />
       </section>
     </AppSidebar>

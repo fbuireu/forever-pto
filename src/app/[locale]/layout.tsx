@@ -2,11 +2,11 @@ import { cn } from '@const/lib/utils';
 import { routing } from '@infrastructure/i18n/routing';
 import { type Locale, NextIntlClientProvider, hasLocale } from 'next-intl';
 import { ThemeProvider } from 'next-themes';
+import dynamic from 'next/dynamic';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { SidebarProvider } from 'src/components/animate-ui/radix/sidebar';
 import '../globals.css';
-import { PremiumModal } from '@ui/modules/components/premium/PremiumModal';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -23,6 +23,10 @@ interface LayoutProps {
   children: React.ReactNode;
   params: Promise<{ locale: Locale }>;
 }
+
+const PremiumModal = dynamic(() =>
+  import('@ui/modules/components/premium/PremiumModal').then((module) => ({ default: module.PremiumModal }))
+);
 
 const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
   const { locale } = await params;

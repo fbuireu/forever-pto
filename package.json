@@ -16,7 +16,7 @@
     "pnpm"
   ],
   "author": "Ferran Buireu <fbuireu@gmail.com>",
-  "packageManager": "pnpm@10.15.0",
+  "packageManager": "pnpm@10.15.1",
   "engines": {
     "node": ">=22.0.0"
   },
