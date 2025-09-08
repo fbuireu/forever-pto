@@ -79,7 +79,7 @@ export const AlternativesManager = ({
     }
   }, [currentIndex, totalOptions, allSuggestions, onPreviewChange]);
 
-    if (!currentSuggestion?.days) {
+  if (!currentSuggestion?.days) {
     return null;
   }
 
@@ -104,7 +104,7 @@ export const AlternativesManager = ({
           <ChevronLeft size={20} />
         </button>
 
-        <div className='mx-2 flex flex-col items-center relative w-25'>
+        <div className='mx-2 flex flex-col items-center relative w-25 transition-[height,padding] duration-300 ease-out'>
           <div className='flex items-center space-x-1 text-sm tabular-nums'>
             <span className='text-xs text-muted-foreground'>Option</span>
             <SlidingNumber className='text-base font-semibold text-foreground' padStart number={currentIndex + 1} />

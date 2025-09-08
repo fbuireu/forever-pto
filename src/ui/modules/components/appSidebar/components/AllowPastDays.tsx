@@ -5,6 +5,7 @@ import { Field, Label } from '@headlessui/react';
 import { InfoIcon, Undo2 } from 'lucide-react';
 import { Switch } from 'src/components/animate-ui/headless/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
+import { PremiumFeature } from '../../premium/PremiumFeature';
 
 export const AllowPastDays = () => {
   const { allowPastDays, setAllowPastDays } = useFiltersState();
@@ -25,6 +26,7 @@ export const AllowPastDays = () => {
           </Tooltip>
         </TooltipProvider>
       </Label>
+      <PremiumFeature feature='Allow Past Days'>
       <div className='flex gap-2 w-full'>
         <Switch
           checked={allowPastDays}
@@ -33,6 +35,7 @@ export const AllowPastDays = () => {
         />
         <p className='font-normal text-sm'>{allowPastDays ? 'Enabled' : 'Disabled'}</p>
       </div>
+      </PremiumFeature>
     </Field>
   );
 };

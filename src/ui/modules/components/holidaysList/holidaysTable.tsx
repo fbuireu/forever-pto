@@ -2,12 +2,15 @@
 
 import type { HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
+import { usePremiumStore } from '@application/stores/premium';
 import { Badge } from '@const/components/ui/badge';
 import { Button } from '@const/components/ui/button';
 import { Input } from '@const/components/ui/input';
 import { Table, TableBody, TableCell, TableRow } from '@const/components/ui/table';
 import { cn } from '@const/lib/utils';
 import { useDebounce } from '@ui/hooks/useDebounce';
+import { ConditionalWrapper } from '@ui/modules/components/core/ConditionalWrapper';
+import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/components/premium/PremiumFeature';
 import { isWeekend } from 'date-fns/isWeekend';
 import { ChevronDown, ChevronRight, Search, Trash2 } from 'lucide-react';
 import { useLocale } from 'next-intl';
@@ -22,7 +25,8 @@ interface HolidaysTableProps {
   defaultOpen?: boolean;
 }
 
-export const HolidaysTable = ({  title, variant, defaultOpen = false }: HolidaysTableProps) => {
+export const HolidaysTable = ({ title, variant, defaultOpen = false }: HolidaysTableProps) => {
+  const { isPremium } = usePremiumStore();
   const [searchTerm, setSearchTerm] = useState('');
   const locale = useLocale();
   const [selectedHolidays, setSelectedHolidays] = useState<Set<string>>(new Set());
@@ -156,15 +160,24 @@ export const HolidaysTable = ({  title, variant, defaultOpen = false }: Holidays
     };
 
     return (
-      <Checkbox
-        checked={type === 'all'}
-        indeterminate={type === 'some'}
-        onCheckedChange={toggleSelectAll}
-        aria-label={getLabel()}
-        title={getLabel()}
-      />
+      <ConditionalWrapper
+        doWrap={!isPremium}
+        wrapper={(children) => (
+          <PremiumFeature feature='Select All Holidays' variant={PremiumFeatureVariant.STACK} iconSize='h-4 w-4'>
+            {children}
+          </PremiumFeature>
+        )}
+      >
+        <Checkbox
+          checked={type === 'all'}
+          indeterminate={type === 'some'}
+          onCheckedChange={toggleSelectAll}
+          aria-label={getLabel()}
+          title={getLabel()}
+        />
+      </ConditionalWrapper>
     );
-  }, [selectionState, toggleSelectAll]);
+  }, [selectionState, toggleSelectAll, variant]);
 
   const selectedCount = selectedHolidays.size;
   const shouldShowLocationColumn = variantHolidays.some((h) => h.location);

@@ -5,39 +5,60 @@ import { cn } from '@const/lib/utils';
 import { Lock } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 
+export const enum PremiumFeatureVariant {
+  DEFAULT = 'default',
+  STACK = 'stack',
+}
+
 interface PremiumFeatureProps {
   feature: string;
   children: React.ReactNode;
   className?: string;
   description?: string;
+  variant?: PremiumFeatureVariant;
+  iconSize?: string;
 }
 
-export const PremiumFeature = ({ feature, children, className, description }: PremiumFeatureProps) => {
+export const PremiumFeature = ({
+  feature,
+  children,
+  className,
+  description,
+  variant = PremiumFeatureVariant.DEFAULT,
+  iconSize = 'w-6 h-6',
+}: PremiumFeatureProps) => {
   const { isPremium, showUpgradeModal } = usePremiumStore();
 
   if (isPremium) {
     return <>{children}</>;
   }
 
+  const getButtonClass = () => {
+    switch (variant) {
+      case PremiumFeatureVariant.STACK:
+        return 'p-2 rounded-full cursor-pointer backdrop-blur-sm m-0';
+      case PremiumFeatureVariant.DEFAULT:
+      default:
+        return 'p-2 w-full rounded-full cursor-pointer backdrop-blur-sm m-0';
+    }
+  };
+
   return (
     <div className={cn('relative m-0', className)}>
-      <button
-        onClick={() => showUpgradeModal(feature)}
-        className='p-2 w-full rounded-full cursor-pointer backdrop-blur-sm m-0'
-      >
+      <button onClick={() => showUpgradeModal(feature)} className={getButtonClass()}>
         <div className='blur-sm pointer-events-none'>{children}</div>
         <div className='absolute inset-0 flex items-center justify-center'>
           {description ? (
             <TooltipProvider delayDuration={200}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Lock className='w-6 h-6 text-muted-foreground' />
+                  <Lock className={cn(iconSize, 'text-muted-foreground')} />
                 </TooltipTrigger>
                 <TooltipContent className='w-50 text-pretty'>{description}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           ) : (
-            <Lock className='w-6 h-6 text-muted-foreground' />
+            <Lock className={cn(iconSize, 'text-muted-foreground')} />
           )}
         </div>
       </button>
