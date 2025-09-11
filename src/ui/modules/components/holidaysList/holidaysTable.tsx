@@ -4,7 +4,6 @@ import type { HolidayDTO, HolidayVariant } from '@application/dto/holiday/types'
 import { useHolidaysStore } from '@application/stores/holidays';
 import { usePremiumStore } from '@application/stores/premium';
 import { Badge } from '@const/components/ui/badge';
-import { Button } from '@const/components/ui/button';
 import { Input } from '@const/components/ui/input';
 import { Table, TableBody, TableCell, TableRow } from '@const/components/ui/table';
 import { cn } from '@const/lib/utils';
@@ -16,6 +15,7 @@ import { ChevronDown, ChevronRight, Search, Trash2 } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
 import { Checkbox } from 'src/components/animate-ui/base/checkbox';
+import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { HolidayRow } from './components/HolidayRow';
 import { HolidayTableHeader } from './components/HolidayTableHeader';

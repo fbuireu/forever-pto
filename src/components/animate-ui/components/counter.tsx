@@ -1,10 +1,10 @@
 'use client';
 
-import { Button } from '@const/components/ui/button';
 import { cn } from '@const/lib/utils';
 import { motion, type HTMLMotionProps, type Transition } from 'motion/react';
 import type { SlidingNumberProps } from '../text/sliding-number';
 import { SlidingNumber } from '../text/sliding-number';
+import { Button } from './buttons/button';
 
 type CounterProps = HTMLMotionProps<'div'> & {
   number: number;

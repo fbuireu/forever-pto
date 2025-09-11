@@ -2,9 +2,10 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { Button } from '@const/components/ui/button';
+
 import { useLocale } from 'next-intl';
 import { useState } from 'react';
+import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { getTotalMonths } from '../utils/helpers';
 
 export const Troubleshooting = () => {
@@ -35,7 +36,7 @@ export const Troubleshooting = () => {
         Clearing local storage forces a fresh state.
       </p>
       <div className='flex items-center gap-2'>
-        <Button variant='destructive' onClick={resetToDefaults} disabled={cleared}>
+        <Button variant='destructive' onClick={resetToDefaults} disabled={cleared} className='m-auto'>
           {cleared ? 'Cleared' : 'Reset Local Storage'}
         </Button>
       </div>

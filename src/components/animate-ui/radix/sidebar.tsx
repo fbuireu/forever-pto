@@ -6,8 +6,6 @@ import { PanelLeftIcon } from 'lucide-react';
 import { type Transition } from 'motion/react';
 import { Slot } from 'radix-ui';
 import * as React from 'react';
-
-import { Button } from '@const/components/ui/button';
 import { Input } from '@const/components/ui/input';
 import { Separator } from '@const/components/ui/separator';
 import { Skeleton } from '@const/components/ui/skeleton';
@@ -16,6 +14,7 @@ import { cn } from '@const/lib/utils';
 import { MotionHighlight, MotionHighlightItem } from '../effects/motion-highlight';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
+import { Button } from '../components/buttons/button';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;

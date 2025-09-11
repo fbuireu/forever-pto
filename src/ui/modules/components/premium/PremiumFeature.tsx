@@ -36,7 +36,7 @@ export const PremiumFeature = ({
   const getButtonClass = () => {
     switch (variant) {
       case PremiumFeatureVariant.STACK:
-        return 'p-2 rounded-full cursor-pointer backdrop-blur-sm m-0';
+        return 'p-2 rounded-full cursor-pointer m-0 w-fit';
       case PremiumFeatureVariant.DEFAULT:
       default:
         return 'p-2 w-full rounded-full cursor-pointer backdrop-blur-sm m-0';
@@ -44,24 +44,34 @@ export const PremiumFeature = ({
   };
 
   return (
-    <div className={cn('relative m-0', className)}>
-      <button onClick={() => showUpgradeModal(feature)} className={getButtonClass()}>
-        <div className='blur-sm pointer-events-none'>{children}</div>
-        <div className='absolute inset-0 flex items-center justify-center'>
-          {description ? (
-            <TooltipProvider delayDuration={200}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Lock className={cn(iconSize, 'text-muted-foreground')} />
-                </TooltipTrigger>
-                <TooltipContent className='w-50 text-pretty'>{description}</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          ) : (
-            <Lock className={cn(iconSize, 'text-muted-foreground')} />
-          )}
-        </div>
-      </button>
+    <div
+      className={cn('relative m-0 focus:outline-none', getButtonClass(), className)}
+      role='button'
+      tabIndex={0}
+      aria-label={description ?? `Unlock premium feature: ${feature}`}
+      onClick={() => showUpgradeModal(feature)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          showUpgradeModal(feature);
+        }
+      }}
+    >
+      <div className='blur-sm pointer-events-none'>{children}</div>
+      <div className='absolute inset-0 flex items-center justify-center'>
+        {description ? (
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Lock className={cn(iconSize, 'text-muted-foreground')} />
+              </TooltipTrigger>
+              <TooltipContent className='w-50 text-pretty'>{description}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : (
+          <Lock className={cn(iconSize, 'text-muted-foreground')} />
+        )}
+      </div>
     </div>
   );
 };

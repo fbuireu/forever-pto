@@ -1,12 +1,12 @@
 'use client';
 
 import { useFiltersState } from '@application/stores/filters';
-import { Button } from '@const/components/ui/button';
 import { Command, CommandGroup, CommandItem, CommandList } from '@const/components/ui/command';
 import { cn } from '@const/lib/utils';
 import { Field, Label } from '@headlessui/react';
 import { Calendar, Check, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
+import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
 
 const MAX_YEARS = 10;

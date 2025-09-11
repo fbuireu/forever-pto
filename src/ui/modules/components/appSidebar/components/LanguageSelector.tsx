@@ -1,10 +1,10 @@
 'use client';
 
-import { Button } from '@const/components/ui/button';
 import { useLanguages } from '@ui/hooks/useLanguages';
 import { Check } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
+import { Button } from 'src/components/animate-ui/components/buttons/button';
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -1,5 +1,5 @@
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
-import { TableHead, TableHeader as BaseTableHeader, TableRow } from '@const/components/ui/table';
+import { TableHeader as BaseTableHeader, TableHead, TableRow } from '@const/components/ui/table';
 import { cn } from '@const/lib/utils';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { memo } from 'react';
@@ -23,19 +23,16 @@ interface TableHeaderProps {
   className?: string;
 }
 
-const TableHeader = ({
-  children,
-  sortKey,
-  currentSort,
-  onSort,
-  className = '',
-}: TableHeaderProps) => {
+const TableHeader = ({ children, sortKey, currentSort, onSort, className = '' }: TableHeaderProps) => {
   const isActive = currentSort.key === sortKey;
   const Icon = isActive ? (currentSort.direction === 'asc' ? ArrowUp : ArrowDown) : ArrowUpDown;
 
   return (
     <TableHead
-      className={cn('cursor-pointer select-none hover:bg-muted/50 transition-colors', className)}
+      className={cn(
+        'cursor-pointer select-none hover:bg-muted/50 transition-colors',
+        className
+      )}
       onClick={() => onSort(sortKey)}
     >
       <div className='flex items-center space-x-1'>

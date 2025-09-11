@@ -33,7 +33,12 @@ export const HolidayRow = memo<HolidayRowProps>(({ holiday, index, isSelected, l
   return (
     <TableRow className={cn('hover:bg-muted/50', isSelected && 'bg-muted/25')}>
       <TableCell>
-        <PremiumFeature feature='Edit Holidays' variant={PremiumFeatureVariant.STACK} iconSize='h-4 w-4'>
+        <PremiumFeature
+          feature='Edit Holidays'
+          variant={PremiumFeatureVariant.STACK}
+          iconSize='h-4 w-4'
+          className='bg-none'
+        >
           <Checkbox
             checked={isSelected}
             onCheckedChange={() => onToggle(holiday, index)}

@@ -1,5 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { Button } from '@const/components/ui/button';
+
 import { cn } from '@const/lib/utils';
 import type { Day } from 'date-fns';
 import { isSameDay, isSameMonth } from 'date-fns';
@@ -10,6 +10,7 @@ import { formatDate  } from '../utils/formatters';
 import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
 import { ConditionalWrapper } from './ConditionalWrapper';
 import { getDayClassNames } from './utils/helpers';
+import { Button } from 'src/components/animate-ui/components/buttons/button';
 
 interface FromTo {
   from: Date;

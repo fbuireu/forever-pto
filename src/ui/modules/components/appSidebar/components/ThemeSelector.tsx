@@ -1,9 +1,9 @@
 'use client';
 
-import { Button } from '@const/components/ui/button';
 import { Check, Moon, Sun } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
+import { Button } from 'src/components/animate-ui/components/buttons/button';
 import {
   DropdownMenu,
   DropdownMenuContent,

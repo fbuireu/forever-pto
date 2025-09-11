@@ -6,9 +6,9 @@ import { cn } from '@const/lib/utils';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
-import { Button } from './button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './command';
 import { hasFlag } from './utils/helpers';
+import { Button } from 'src/components/animate-ui/components/buttons/button';
 
 interface ComboboxProps extends Omit<React.HTMLProps<HTMLInputElement>, 'onChange'> {
   searchPlaceholder?: string;
