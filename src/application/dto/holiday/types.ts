@@ -5,6 +5,7 @@ export interface RawHoliday extends HolidaysTypes.Holiday {
 }
 
 export interface HolidayDTO {
+  id: string;
   date: Date;
   name: string;
   type?: string;

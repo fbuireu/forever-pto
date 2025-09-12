@@ -9,13 +9,6 @@ import { useEffect, useMemo } from 'react';
 import { Calendar } from '../core/Calendar';
 import { CalendarListSkeleton } from '../skeletons/CalendarListSkeleton';
 import { getTotalMonths } from '../utils/helpers';
-import {
-  isAlternative as isAlternativeFn,
-  isHoliday,
-  isPast as isPastFn,
-  isSuggestion as isSuggestionFn,
-  isToday,
-} from '../utils/modifiers';
 
 export const CalendarList = () => {
   const locale = useLocale();
@@ -50,21 +43,6 @@ export const CalendarList = () => {
     }
   }, [generateSuggestions, year, ptoDays, allowPastDays, holidays, months, strategy]);
 
-  const modifiers = useMemo(() => {
-    const holidayFn = isHoliday(holidays);
-    const isPast = isPastFn(allowPastDays);
-    const isSuggestion = isSuggestionFn(currentSelection);
-    const isAlternative = isAlternativeFn(alternatives, suggestion, previewAlternativeIndex, currentSelection);
-
-    return {
-      weekend: isWeekend,
-      holiday: holidayFn,
-      today: isToday,
-      suggested: isSuggestion,
-      alternative: isAlternative,
-      disabled: isPast,
-    };
-  }, [holidays, allowPastDays, currentSelection, alternatives, suggestion, previewAlternativeIndex]);
 
   return (
     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5'>
@@ -77,9 +55,12 @@ export const CalendarList = () => {
             month={month}
             weekStartsOn={1}
             locale={locale}
-            modifiers={modifiers}
-            disabled={modifiers.disabled}
             holidays={holidays}
+            allowPastDays={allowPastDays}
+            currentSelection={currentSelection}
+            alternatives={alternatives}
+            suggestion={suggestion}
+            previewAlternativeIndex={previewAlternativeIndex}
             showOutsideDays
             fixedWeeks
           />

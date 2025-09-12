@@ -37,6 +37,7 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> =
         return true;
       })
       .map((holiday) => ({
+        id: `${holiday.location ? 'regional' : 'national'}-${holiday.date}`,
         date: new Date(holiday.date),
         name: holiday.name,
         type: holiday.type,

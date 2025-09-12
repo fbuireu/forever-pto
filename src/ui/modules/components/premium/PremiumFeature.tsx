@@ -10,6 +10,11 @@ export const enum PremiumFeatureVariant {
   STACK = 'stack',
 }
 
+const enum KeyboardKey {
+  ENTER = 'Enter',
+  SPACE = ' ',
+}
+
 interface PremiumFeatureProps {
   feature: string;
   children: React.ReactNode;
@@ -51,7 +56,7 @@ export const PremiumFeature = ({
       aria-label={description ?? `Unlock premium feature: ${feature}`}
       onClick={() => showUpgradeModal(feature)}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === KeyboardKey.ENTER || e.key === KeyboardKey.SPACE) {
           e.preventDefault();
           showUpgradeModal(feature);
         }

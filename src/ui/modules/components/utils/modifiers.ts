@@ -1,3 +1,4 @@
+import { HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import type { HolidaysState } from '@application/stores/holidays';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { isBefore, isSameDay, startOfToday } from 'date-fns';
@@ -43,4 +44,12 @@ export const isAlternative = (
 
     return targetSuggestion?.days.some((d) => isSameDay(d, date)) ?? false;
   };
+};
+
+export const isCustom = (holidays: HolidayDTO[]) => (date: Date) => {
+  return holidays.some(
+    (holiday) => 
+      isSameDay(holiday.date, date) && 
+      holiday.variant === HolidayVariant.CUSTOM 
+  );
 };

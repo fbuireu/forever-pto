@@ -1,9 +1,10 @@
-import type { HolidayDTO } from '@application/dto/holiday/types';
+import { HolidayVariant, type HolidayDTO } from '@application/dto/holiday/types';
 import { generateAlternatives } from '@infrastructure/services/calendar/alternatives/generateAlternatives';
 import { generateSuggestions } from '@infrastructure/services/calendar/suggestions/generateSuggestions';
 import type { FilterStrategy, Suggestion } from '@infrastructure/services/calendar/types';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
 import { ensureDate } from '@shared/utils/dates';
+import { formatDate } from '@ui/modules/components/utils/formatters';
 import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -37,6 +38,11 @@ interface FetchHolidaysParams extends Pick<FiltersState, 'year' | 'country' | 'r
   locale: Locale;
 }
 
+interface AddHolidayParams {
+  holiday: Omit<HolidayDTO, 'id' | 'variant'>;
+  locale: Locale;
+}
+
 interface HolidaysActions {
   fetchHolidays: (params: FetchHolidaysParams) => Promise<void>;
   generateSuggestions: (params: GenerateSuggestionsParams) => void;
@@ -45,6 +51,9 @@ interface HolidaysActions {
   setCurrentAlternativeSelection: (selection: Suggestion | null, index: number) => void;
   setPreviewAlternativeSelection: (selection: Suggestion | null, index: number) => void;
   resetToDefaults: () => void;
+  addHoliday: (params: AddHolidayParams) => void;
+  removeHoliday: (holidayId: string) => void;
+  editHoliday: (holidayId: string, updates: { name?: string; date?: Date }) => void;
 }
 
 type HolidaysStore = HolidaysState & HolidaysActions;
@@ -70,13 +79,12 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
         fetchHolidays: async (params: FetchHolidaysParams) => {
           try {
+            const { holidays: currentHolidays } = get();
+            const customHolidays = currentHolidays.filter((h) => h.variant === HolidayVariant.CUSTOM);
             const holidays = await getHolidays(params);
-            const holidaysWithDates = holidays.map((h) => ({
-              ...h,
-              date: ensureDate(h.date),
-            }));
+
             set({
-              holidays: holidaysWithDates,
+              holidays: [...customHolidays, ...holidays].sort((a, b) => a.date.getTime() - b.date.getTime()),
             });
           } catch (error) {
             console.warn('Error in fetchHolidays:', error);
@@ -88,7 +96,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
         generateSuggestions: ({ year, ptoDays, allowPastDays, months, strategy }: GenerateSuggestionsParams) => {
           const { holidays, maxAlternatives } = get();
-            
+
           if (ptoDays <= 0 || holidays.length === 0) {
             set({
               suggestion: undefined,
@@ -127,7 +135,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               strategy,
             });
 
-              set({
+            set({
               suggestion,
               alternatives,
               currentSelection: suggestion,
@@ -215,6 +223,56 @@ export const useHolidaysStore = create<HolidaysStore>()(
         resetToDefaults: () => {
           set({
             ...initialState,
+          });
+        },
+        addHoliday: ({ holiday, locale }) => {
+          const { holidays } = get();
+          const existingHoliday = holidays.find((h) => h.date.toDateString() === holiday.date.toDateString());
+
+          if (existingHoliday) {
+            console.warn('Holiday already exists on this date');
+            return;
+          }
+
+          const newHoliday: HolidayDTO = {
+            id: `custom-${formatDate({ date: holiday.date, locale, format: 'yyyy-MM-dd HH:mm:ss' })}`,
+            name: holiday.name,
+            date: ensureDate(holiday.date),
+            variant: HolidayVariant.CUSTOM,
+          };
+
+          set({
+            holidays: [...holidays, newHoliday].sort((a, b) => a.date.getTime() - b.date.getTime()),
+          });
+        },
+        removeHoliday: (holidayId: string) => {
+          const { holidays } = get();
+
+          set({
+            holidays: holidays.filter((h) => h.id !== holidayId),
+          });
+        },
+        editHoliday: (holidayId: string, updates: { name?: string; date?: Date }) => {
+          const { holidays } = get();
+
+          const updatedHolidays = holidays.map((h) => {
+            if (h.id === holidayId) {
+              return {
+                ...h,
+                ...(updates.name && { name: updates.name }),
+                ...(updates.date && { date: ensureDate(updates.date) }),
+              };
+            }
+            return h;
+          });
+
+          // Si se cambió la fecha, reordenar la lista
+          if (updates.date) {
+            updatedHolidays.sort((a, b) => a.date.getTime() - b.date.getTime());
+          }
+
+          set({
+            holidays: updatedHolidays,
           });
         },
       }),

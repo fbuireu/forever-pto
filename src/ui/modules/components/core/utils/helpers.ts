@@ -18,6 +18,8 @@ const MODIFIERS_CLASS_NAMES: Record<string, string> = {
   today: 'bg-accent text-accent-foreground font-medium ring-2 ring-ring',
   alternative:
     'bg-orange-100 dark:bg-orange-900/30 text-white font-semibold animate-pulse shadow-md ring-2 ring-orange-300 dark:ring-orange-400 transition-all duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(255,165,0,0.8)_2px,rgba(255,165,0,0.8)_4px)]',
+  custom:
+    'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-semibold shadow-md ring-2 ring-purple-300 dark:ring-purple-400 transition-all duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(147,51,234,0.8)_2px,rgba(147,51,234,0.8)_4px)]',
 } as const;
 
 export const getDayClassNames = ({

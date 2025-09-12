@@ -1,6 +1,7 @@
 'use client';
 
-import type { HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
+import type { HolidayDTO } from '@application/dto/holiday/types';
+import { HolidayVariant } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { usePremiumStore } from '@application/stores/premium';
 import { Badge } from '@const/components/ui/badge';
@@ -11,7 +12,7 @@ import { useDebounce } from '@ui/hooks/useDebounce';
 import { ConditionalWrapper } from '@ui/modules/components/core/ConditionalWrapper';
 import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/components/premium/PremiumFeature';
 import { isWeekend } from 'date-fns/isWeekend';
-import { ChevronDown, ChevronRight, Search, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Search, Trash2 } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
 import { Checkbox } from 'src/components/animate-ui/base/checkbox';
@@ -19,16 +20,23 @@ import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { HolidayRow } from './components/HolidayRow';
 import { HolidayTableHeader } from './components/HolidayTableHeader';
+import dynamic from 'next/dynamic';
+
 interface HolidaysTableProps {
   title: string;
   variant: HolidayVariant;
   defaultOpen?: boolean;
 }
 
+const AddHolidayModal = dynamic(() =>
+  import('./components/AddHolidayModal').then((module) => ({ default: module.AddHolidayModal }))
+);
+ 
 export const HolidaysTable = ({ title, variant, defaultOpen = false }: HolidaysTableProps) => {
-  const { isPremium } = usePremiumStore();
-  const [searchTerm, setSearchTerm] = useState('');
+    const { isPremium } = usePremiumStore();
   const locale = useLocale();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
   const [selectedHolidays, setSelectedHolidays] = useState<Set<string>>(new Set());
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [sortConfig, setSortConfig] = useState<{
@@ -183,12 +191,7 @@ export const HolidaysTable = ({ title, variant, defaultOpen = false }: HolidaysT
   const shouldShowLocationColumn = variantHolidays.some((h) => h.location);
 
   return (
-    <Collapsible
-      open={isOpen}
-      onOpenChange={setIsOpen}
-      className={cn('space-y-4 w-full overflow-hidden', !variantHolidays.length && 'opacity-50 pointer-events-none')}
-      disabled={!variantHolidays.length}
-    >
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className={cn('space-y-4 w-full overflow-hidden')}>
       <CollapsibleTrigger asChild>
         <div className='flex items-center justify-between cursor-pointer group hover:bg-muted/50 p-3 rounded-lg border transition-colors'>
           <div className='flex items-center space-x-3'>
@@ -214,6 +217,17 @@ export const HolidaysTable = ({ title, variant, defaultOpen = false }: HolidaysT
       {isOpen && (
         <div className='flex items-center justify-between'>
           <div className='flex items-center space-x-2'>
+            {variant === HolidayVariant.CUSTOM && (
+              <Button
+                variant='default'
+                size='sm'
+                onClick={() => setShowAddModal(true)}
+                className='bg-green-600 hover:bg-green-700 text-white'
+              >
+                <Plus className='h-4 w-4 mr-1' />
+                Añadir Festivo
+              </Button>
+            )}
             {selectedCount > 0 && (
               <div className='flex items-center space-x-2'>
                 <Button variant='destructive' size='sm' onClick={handleDelete}>
@@ -299,6 +313,11 @@ export const HolidaysTable = ({ title, variant, defaultOpen = false }: HolidaysT
           </div>
         </div>
       </CollapsibleContent>
+      <AddHolidayModal
+        open={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        locale={locale}
+      />
     </Collapsible>
   );
 };

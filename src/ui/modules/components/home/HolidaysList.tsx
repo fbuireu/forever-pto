@@ -5,11 +5,11 @@ import { useHolidaysStore } from '@application/stores/holidays';
 import { cn } from '@const/lib/utils';
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from 'src/components/animate-ui/components/tabs';
 import { HolidaysTable } from '../holidaysList/HolidaysTable';
+import { PremiumFeature } from '../premium/PremiumFeature';
 
 export const HolidaysList = () => {
   const { holidays } = useHolidaysStore();
   const regionalHolidays = holidays.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL);
-  const customHolidays = holidays.filter((holiday) => holiday.variant === HolidayVariant.CUSTOM);
 
   return (
     <Tabs defaultValue='national' className='rounded-lg w-full overflow-hidden'>
@@ -21,12 +21,13 @@ export const HolidaysList = () => {
         >
           Regional
         </TabsTrigger>
-        <TabsTrigger
-          value={HolidayVariant.CUSTOM}
-          className={cn(!customHolidays.length && 'opacity-50 pointer-events-none cursor-not-allowed')}
+        <PremiumFeature
+          feature='Custom Holidays'
+          description='Allows to add custom holidays. This is useful when the provided data is inaccurate or when you want to add your specific details into account'
+          className='p-0'
         >
-          Custom
-        </TabsTrigger>
+          <TabsTrigger value={HolidayVariant.CUSTOM}>Custom</TabsTrigger>
+        </PremiumFeature>
       </TabsList>
       <TabsContents className='mx-1 mb-1 -mt-2 rounded-sm h-full bg-background'>
         <TabsContent value={HolidayVariant.NATIONAL} className='space-y-6 py-6'>

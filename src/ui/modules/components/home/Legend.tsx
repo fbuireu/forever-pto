@@ -29,6 +29,10 @@ export const Legend = () => {
               <div className='mr-2 h-6 w-6 rounded-sm bg-orange-100 dark:bg-orange-900/30 border-2 border-orange-300 dark:border-orange-400 shadow-md [background-image:repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(255,165,0,0.8)_2px,rgba(255,165,0,0.8)_4px)]' />
               <span>Alternatives</span>
             </div>
+            <div className='flex items-center'>
+              <div className='mr-2 h-6 w-6 rounded-sm bg-purple-100 dark:bg-purple-900/30 border-2 border-purple-300 dark:border-purple-400 shadow-md [background-image:repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(147,51,234,0.8)_2px,rgba(147,51,234,0.8)_4px)]' />
+              <span>Custom</span>
+            </div>
           </div>
         </CardContent>
       </Card>

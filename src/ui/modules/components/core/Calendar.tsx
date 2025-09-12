@@ -1,18 +1,27 @@
-import type { HolidayDTO } from '@application/dto/holiday/types';
-
 import { cn } from '@const/lib/utils';
 import type { Day } from 'date-fns';
-import { isSameDay, isSameMonth } from 'date-fns';
+import { addMonths, isSameDay, isSameMonth, subMonths, isWeekend } from 'date-fns';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
+import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
-import { formatDate  } from '../utils/formatters';
+import { formatDate } from '../utils/formatters';
 import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
 import { ConditionalWrapper } from './ConditionalWrapper';
 import { getDayClassNames } from './utils/helpers';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
+import {
+  isHoliday,
+  isCustom as isCustomFn,
+  isPast as isPastFn,
+  isSuggestion as isSuggestionFn,
+  isAlternative as isAlternativeFn,
+  isToday,
+} from '../utils/modifiers';
+import type { HolidaysState } from '@application/stores/holidays';
+import type { FiltersState } from '@application/stores/filters';
 
-interface FromTo {
+export interface FromTo {
   from: Date;
   to: Date;
 }
@@ -21,32 +30,46 @@ interface CalendarProps {
   mode?: 'single' | 'multiple' | 'range';
   selected?: Date | Date[] | FromTo;
   onSelect?: (date: Date | Date[] | FromTo | undefined) => void;
-  month: Date;
+  month?: Date;
+  showNavigation?: boolean;
   className?: string;
   weekStartsOn?: Day;
   fixedWeeks?: boolean;
   locale: Locale;
-  modifiers?: Record<string, (date: Date) => boolean>;
   disabled?: (date: Date) => boolean;
   showOutsideDays?: boolean;
-  holidays: HolidayDTO[];
+  holidays: HolidaysState['holidays'];
+  allowPastDays?: FiltersState['allowPastDays'];
+  currentSelection?: HolidaysState['currentSelection'];
+  alternatives?: HolidaysState['alternatives'];
+  suggestion?: HolidaysState['suggestion'];
+  previewAlternativeIndex?: HolidaysState['previewAlternativeIndex'];
 }
+
 
 export function Calendar({
   mode = 'single',
   selected,
   onSelect,
-  month,
+  month: initialMonth,
+  showNavigation = false,
   className,
   weekStartsOn = 1,
   fixedWeeks = false,
   locale,
-  modifiers = {},
   disabled,
   showOutsideDays = true,
   holidays,
+  allowPastDays = true,
+  currentSelection,
+  alternatives = [],
+  suggestion,
+  previewAlternativeIndex = -1,
   ...props
 }: Readonly<CalendarProps>) {
+  const [currentMonth, setCurrentMonth] = useState(initialMonth ?? new Date());
+  const month = initialMonth ?? currentMonth;
+
   const [selectedDates, setSelectedDates] = useState<Date[]>(() => {
     if (mode === 'multiple' && Array.isArray(selected)) {
       return selected;
@@ -56,6 +79,24 @@ export function Calendar({
     }
     return [];
   });
+
+  const modifiers = useMemo(() => {
+    const holidayFn = isHoliday(holidays);
+    const customFn = isCustomFn(holidays);
+    const isPast = isPastFn(allowPastDays);
+    const isSuggestion = isSuggestionFn(currentSelection);
+    const isAlternative = isAlternativeFn(alternatives, suggestion, previewAlternativeIndex, currentSelection);
+
+    return {
+      weekend: isWeekend,
+      holiday: holidayFn,
+      custom: customFn,
+      today: isToday,
+      suggested: isSuggestion,
+      alternative: isAlternative,
+      disabled: isPast,
+    };
+  }, [holidays, allowPastDays, currentSelection, alternatives, suggestion, previewAlternativeIndex]);
 
   const weekdayNames = useMemo(() => getWeekdayNames({ locale, weekStartsOn }), [locale, weekStartsOn]);
   const monthYearLabel = useMemo(() => formatDate({ date: month, locale, format: 'LLLL yyyy' }), [month, locale]);
@@ -72,6 +113,18 @@ export function Calendar({
     });
     return map;
   }, [holidays]);
+
+  const handlePreviousMonth = useCallback(() => {
+    if (!initialMonth) {
+      setCurrentMonth(subMonths(month, 1));
+    }
+  }, [month, initialMonth]);
+
+  const handleNextMonth = useCallback(() => {
+    if (!initialMonth) {
+      setCurrentMonth(addMonths(month, 1));
+    }
+  }, [month, initialMonth]);
 
   const handleDayClick = useCallback(
     (date: Date) => {
@@ -94,7 +147,35 @@ export function Calendar({
   return (
     <div className={cn('calendar-container p-3 w-fit select-none', className)} {...props}>
       <div className='flex justify-center items-center mb-4'>
-        <h3 className='text-sm font-medium'>{monthYearLabel}</h3>
+        {showNavigation ? (
+          <>
+            <Button
+              variant='ghost'
+              type='button'
+              size='sm'
+              onClick={handlePreviousMonth}
+              className='h-8 w-8 p-0 hover:bg-muted'
+              aria-label='Previous month'
+            >
+              <ChevronLeft className='h-4 w-4' />
+            </Button>
+
+            <h3 className='text-sm font-medium flex-1 text-center'>{monthYearLabel}</h3>
+
+            <Button
+              variant='ghost'
+              type='button'
+              size='sm'
+              onClick={handleNextMonth}
+              className='h-8 w-8 p-0 hover:bg-muted'
+              aria-label='Next month'
+            >
+              <ChevronRight className='h-4 w-4' />
+            </Button>
+          </>
+        ) : (
+          <h3 className='text-sm font-medium'>{monthYearLabel}</h3>
+        )}
       </div>
 
       <div className='grid grid-cols-7 gap-1 mb-2'>
@@ -110,7 +191,7 @@ export function Calendar({
 
       <div className='grid grid-cols-7 gap-2'>
         {calendarDays.map((date) => {
-          const isDisabled = disabled?.(date);
+          const isDisabled = disabled?.(date) ?? modifiers.disabled(date);
           const isOutsideMonth = !isSameMonth(date, month);
 
           if (!showOutsideDays && isOutsideMonth) {
@@ -123,7 +204,7 @@ export function Calendar({
             date,
             month,
             selectedDates,
-            disabled,
+            disabled: () => isDisabled,
             showOutsideDays,
             modifiers,
           });

@@ -60,13 +60,9 @@ export const HolidayRow = memo<HolidayRowProps>(({ holiday, index, isSelected, l
         </span>
       </TableCell>
       <TableCell>
-        {holiday.type ? (
-          <Badge variant='outline' className='capitalize text-xs'>
-            {holiday.type}
-          </Badge>
-        ) : (
-          <span className='text-muted-foreground text-sm'>-</span>
-        )}
+        <Badge variant='outline' className='capitalize text-xs'>
+          {holiday.type ?? holiday.variant}
+        </Badge>
       </TableCell>
       <TableCell>
         <Badge variant={workdayStatus.variant} className={cn('text-xs', workdayStatus.className)}>

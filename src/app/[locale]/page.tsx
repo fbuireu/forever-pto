@@ -1,13 +1,13 @@
 import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { CalendarList } from '@ui/modules/components/home/CalendarList';
+import { Faq } from '@ui/modules/components/home/Faq';
 import { HolidaysList } from '@ui/modules/components/home/HolidaysList';
+import { Legend } from '@ui/modules/components/home/Legend';
 import { ManagementBar } from '@ui/modules/components/home/ManagementBar';
 import { StoresInitializer } from '@ui/store/StoresInitializer';
 import type { Locale } from 'next-intl';
 import { cookies } from 'next/headers';
 import { generateMetadata } from './metadata';
-import { Faq } from '@ui/modules/components/home/Faq';
-import { Legend } from '@ui/modules/components/home/Legend';
 
 export const runtime = 'edge';
 
@@ -26,8 +26,8 @@ const Home = async ({ params }: HomeProps) => {
       <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4'>
         <HolidaysList />
         <ManagementBar />
-          <CalendarList />
-          <Legend />
+        <CalendarList />
+        <Legend />
         <Faq />
       </section>
     </AppSidebar>
@@ -37,4 +37,7 @@ const Home = async ({ params }: HomeProps) => {
 export default Home;
 export { generateMetadata };
 
-// todo: in the FAQ section add a clearall button
+// todo: check validation premium
+// todo: add support for intervals
+// todo: afinar el add (marcar dia seleccionat)
+// todo: close collapsible on change tabs
