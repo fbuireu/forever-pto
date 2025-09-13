@@ -35,11 +35,9 @@ export const Troubleshooting = () => {
         objects can change shape, causing the client to reuse incompatible structures and fail to revalidate correctly.
         Clearing local storage forces a fresh state.
       </p>
-      <div className='flex items-center gap-2'>
-        <Button variant='destructive' onClick={resetToDefaults} disabled={cleared} className='m-auto'>
-          {cleared ? 'Cleared' : 'Reset Local Storage'}
-        </Button>
-      </div>
+      <Button variant='destructive' onClick={resetToDefaults} disabled={cleared}>
+        {cleared ? 'Cleared' : 'Reset Local Storage'}
+      </Button>
     </div>
   );
 };

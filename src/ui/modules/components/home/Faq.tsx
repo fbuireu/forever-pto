@@ -97,9 +97,12 @@ export const Faq = () => {
       {FAQ.map((section) => (
         <div key={section.id}>
           <h3 className='text-lg font-medium mb-4'>{section.title}</h3>
-          <Accordion openMultiple className='w-full'>
+          <Accordion
+            openMultiple
+            className='w-full [mask:none!important] [&_[data-slot="accordion-panel"]]:overflow-visible [&_[data-slot="accordion-panel"]]:[mask:none!important]'
+          >
             {section.items.map((item) => (
-              <AccordionItem key={item.id} value={item.id} className="cursor-pointer">
+              <AccordionItem key={item.id} value={item.id} className='cursor-pointer'>
                 <AccordionTrigger className='text-left'>{item.question}</AccordionTrigger>
                 <AccordionPanel className='text-muted-foreground'>{item.answer}</AccordionPanel>
               </AccordionItem>

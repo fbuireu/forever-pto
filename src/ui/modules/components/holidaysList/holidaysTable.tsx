@@ -7,38 +7,36 @@ import { usePremiumStore } from '@application/stores/premium';
 import { Badge } from '@const/components/ui/badge';
 import { Input } from '@const/components/ui/input';
 import { Table, TableBody, TableCell, TableRow } from '@const/components/ui/table';
-import { cn } from '@const/lib/utils';
 import { useDebounce } from '@ui/hooks/useDebounce';
 import { ConditionalWrapper } from '@ui/modules/components/core/ConditionalWrapper';
 import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/components/premium/PremiumFeature';
 import { isWeekend } from 'date-fns/isWeekend';
 import { ChevronDown, ChevronRight, Plus, Search, Trash2 } from 'lucide-react';
 import { useLocale } from 'next-intl';
-import { useCallback, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Checkbox } from 'src/components/animate-ui/base/checkbox';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { HolidayRow } from './components/HolidayRow';
 import { HolidayTableHeader } from './components/HolidayTableHeader';
-import dynamic from 'next/dynamic';
 
 interface HolidaysTableProps {
   title: string;
   variant: HolidayVariant;
-  defaultOpen?: boolean;
+  open: boolean;
 }
 
 const AddHolidayModal = dynamic(() =>
   import('./components/AddHolidayModal').then((module) => ({ default: module.AddHolidayModal }))
 );
- 
-export const HolidaysTable = ({ title, variant, defaultOpen = false }: HolidaysTableProps) => {
-    const { isPremium } = usePremiumStore();
+
+export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
+  const { isPremium } = usePremiumStore();
   const locale = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedHolidays, setSelectedHolidays] = useState<Set<string>>(new Set());
-  const [isOpen, setIsOpen] = useState(defaultOpen);
   const [sortConfig, setSortConfig] = useState<{
     key: keyof HolidayDTO | null;
     direction: 'asc' | 'desc';
@@ -49,6 +47,15 @@ export const HolidaysTable = ({ title, variant, defaultOpen = false }: HolidaysT
     callback: () => {},
   });
   const { holidays } = useHolidaysStore();
+  const [innerOpen, setInnerOpen] = useState(false);
+  const prevOpen = useRef(open);
+
+  useEffect(() => {
+    if (prevOpen.current && !open) {
+      setInnerOpen(false);
+    }
+    prevOpen.current = open;
+  }, [open]);
 
   const variantHolidays = useMemo(() => holidays.filter((holiday) => holiday.variant === variant), [variant, holidays]);
 
@@ -185,18 +192,18 @@ export const HolidaysTable = ({ title, variant, defaultOpen = false }: HolidaysT
         />
       </ConditionalWrapper>
     );
-  }, [selectionState, toggleSelectAll, variant]);
+  }, [selectionState, toggleSelectAll, isPremium]);
 
   const selectedCount = selectedHolidays.size;
   const shouldShowLocationColumn = variantHolidays.some((h) => h.location);
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className={cn('space-y-4 w-full overflow-hidden')}>
+    <Collapsible open={innerOpen} onOpenChange={setInnerOpen} className={'space-y-4 w-full'}>
       <CollapsibleTrigger asChild>
         <div className='flex items-center justify-between cursor-pointer group hover:bg-muted/50 p-3 rounded-lg border transition-colors'>
           <div className='flex items-center space-x-3'>
             <div className='flex items-center space-x-2'>
-              {isOpen ? (
+              {innerOpen ? (
                 <ChevronDown className='h-4 w-4 text-muted-foreground transition-transform' />
               ) : (
                 <ChevronRight className='h-4 w-4 text-muted-foreground transition-transform' />
@@ -214,7 +221,7 @@ export const HolidaysTable = ({ title, variant, defaultOpen = false }: HolidaysT
           </div>
         </div>
       </CollapsibleTrigger>
-      {isOpen && (
+      {innerOpen && (
         <div className='flex items-center justify-between'>
           <div className='flex items-center space-x-2'>
             {variant === HolidayVariant.CUSTOM && (
@@ -249,10 +256,10 @@ export const HolidaysTable = ({ title, variant, defaultOpen = false }: HolidaysT
         </div>
       )}
       <CollapsibleContent className='space-y-4 overflow-hidden'>
-        {isOpen && (
+        {innerOpen && (
           <div className='rounded-md border max-h-96 overflow-hidden'>
-            <div className='max-h-96 overflow-y-auto overflow-x-hidden'>
-              <Table className='table-fixed w-full'>
+            <div className='max-h-96 overflow-y-auto'>
+              <Table className='w-full'>
                 <colgroup>
                   <col className='w-[50px]' />
                   <col className='w-[300px]' />
@@ -301,7 +308,7 @@ export const HolidaysTable = ({ title, variant, defaultOpen = false }: HolidaysT
             </div>
           </div>
         )}
-        <div className='flex items-center justify-between text-sm text-muted-foreground border-t pt-3'>
+        <div className='flex items-center justify-between text-sm text-muted-foreground'>
           <div className='flex items-center space-x-4'>
             <span>En fin de semana: {variantHolidays.filter((h) => isWeekend(h.date)).length}</span>
             <span>En laborables: {variantHolidays.filter((h) => !isWeekend(h.date)).length}</span>
@@ -313,11 +320,7 @@ export const HolidaysTable = ({ title, variant, defaultOpen = false }: HolidaysT
           </div>
         </div>
       </CollapsibleContent>
-      <AddHolidayModal
-        open={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        locale={locale}
-      />
+      <AddHolidayModal open={showAddModal} onClose={() => setShowAddModal(false)} locale={locale} />
     </Collapsible>
   );
 };

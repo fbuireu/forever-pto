@@ -1,6 +1,8 @@
+import type { FiltersState } from '@application/stores/filters';
+import type { HolidaysState } from '@application/stores/holidays';
 import { cn } from '@const/lib/utils';
 import type { Day } from 'date-fns';
-import { addMonths, isSameDay, isSameMonth, subMonths, isWeekend } from 'date-fns';
+import { addMonths, isSameDay, isSameMonth, isWeekend, subMonths } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
@@ -8,18 +10,17 @@ import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { formatDate } from '../utils/formatters';
 import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
-import { ConditionalWrapper } from './ConditionalWrapper';
-import { getDayClassNames } from './utils/helpers';
 import {
-  isHoliday,
-  isCustom as isCustomFn,
-  isPast as isPastFn,
-  isSuggestion as isSuggestionFn,
   isAlternative as isAlternativeFn,
+  isCustom as isCustomFn,
+  isHoliday,
+  isPast as isPastFn,
+  isSelected as isSelectedFn,
+  isSuggestion as isSuggestionFn,
   isToday,
 } from '../utils/modifiers';
-import type { HolidaysState } from '@application/stores/holidays';
-import type { FiltersState } from '@application/stores/filters';
+import { ConditionalWrapper } from './ConditionalWrapper';
+import { getDayClassNames } from './utils/helpers';
 
 export interface FromTo {
   from: Date;
@@ -39,13 +40,12 @@ interface CalendarProps {
   disabled?: (date: Date) => boolean;
   showOutsideDays?: boolean;
   holidays: HolidaysState['holidays'];
-  allowPastDays?: FiltersState['allowPastDays'];
-  currentSelection?: HolidaysState['currentSelection'];
-  alternatives?: HolidaysState['alternatives'];
-  suggestion?: HolidaysState['suggestion'];
+  allowPastDays: FiltersState['allowPastDays'];
+  currentSelection: HolidaysState['currentSelection'];
+  alternatives: HolidaysState['alternatives'];
+  suggestion: HolidaysState['suggestion'];
   previewAlternativeIndex?: HolidaysState['previewAlternativeIndex'];
 }
-
 
 export function Calendar({
   mode = 'single',
@@ -85,7 +85,8 @@ export function Calendar({
     const customFn = isCustomFn(holidays);
     const isPast = isPastFn(allowPastDays);
     const isSuggestion = isSuggestionFn(currentSelection);
-    const isAlternative = isAlternativeFn(alternatives, suggestion, previewAlternativeIndex, currentSelection);
+    const isAlternative = isAlternativeFn({ alternatives, suggestion, previewAlternativeIndex, currentSelection });
+    const isSelected = isSelectedFn(selectedDates);
 
     return {
       weekend: isWeekend,
@@ -95,6 +96,7 @@ export function Calendar({
       suggested: isSuggestion,
       alternative: isAlternative,
       disabled: isPast,
+      selected: isSelected,
     };
   }, [holidays, allowPastDays, currentSelection, alternatives, suggestion, previewAlternativeIndex]);
 
