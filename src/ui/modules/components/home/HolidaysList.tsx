@@ -1,6 +1,7 @@
 'use client';
 
 import { HolidayVariant } from '@application/dto/holiday/types';
+import { Link } from '@application/i18n/navigtion';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { cn } from '@const/lib/utils';
 import { useState } from 'react';
@@ -18,7 +19,7 @@ export const HolidaysList = () => {
   };
 
   return (
-    <div className='rounded-lg w-full transition-all'>
+    <div className='rounded-lg w-full'>
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className='grid w-full grid-cols-3'>
           <TabsTrigger value={HolidayVariant.NATIONAL}>National</TabsTrigger>
@@ -37,7 +38,10 @@ export const HolidaysList = () => {
           </PremiumFeature>
         </TabsList>
       </Tabs>
-      <div className='mx-1 mb-1 mt-2 rounded-sm h-full bg-background space-y-6 py-6'>
+      <Link className='text-xs text-muted-foreground hover:underline' href='#faq'>
+        Doubts? Check our FAQs
+      </Link>
+      <div className='mx-1 mb-1 rounded-sm h-full bg-background space-y-6 py-4'>
         {activeTab === HolidayVariant.NATIONAL && (
           <HolidaysTable
             variant={HolidayVariant.NATIONAL}

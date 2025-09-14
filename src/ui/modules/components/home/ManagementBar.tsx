@@ -1,14 +1,15 @@
 'use client';
 
 import { useHolidaysStore } from '@application/stores/holidays';
+import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useCallback } from 'react';
 import { AlternativesManager } from 'src/components/animate-ui/ui-elements/AlternativesManager';
 import { AlternativesManagerSkeleton } from '../skeletons/AlternativesManagerSkeleton';
-import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 
 export const ManagementBar = () => {
   const { isReady } = useStoresReady();
+  console.log('isrt', isReady);
   const {
     alternatives,
     suggestion,

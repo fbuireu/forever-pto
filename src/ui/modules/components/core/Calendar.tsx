@@ -68,7 +68,6 @@ export function Calendar({
   ...props
 }: Readonly<CalendarProps>) {
   const [currentMonth, setCurrentMonth] = useState(initialMonth ?? new Date());
-  const month = initialMonth ?? currentMonth;
 
   const [selectedDates, setSelectedDates] = useState<Date[]>(() => {
     if (mode === 'multiple' && Array.isArray(selected)) {
@@ -98,13 +97,13 @@ export function Calendar({
       disabled: isPast,
       selected: isSelected,
     };
-  }, [holidays, allowPastDays, currentSelection, alternatives, suggestion, previewAlternativeIndex]);
+  }, [holidays, allowPastDays, currentSelection, alternatives, suggestion, previewAlternativeIndex, selectedDates]);
 
   const weekdayNames = useMemo(() => getWeekdayNames({ locale, weekStartsOn }), [locale, weekStartsOn]);
-  const monthYearLabel = useMemo(() => formatDate({ date: month, locale, format: 'LLLL yyyy' }), [month, locale]);
+  const monthYearLabel = useMemo(() => formatDate({ date: currentMonth, locale, format: 'LLLL yyyy' }), [currentMonth, locale]);
   const calendarDays = useMemo(
-    () => getCalendarDays({ month, weekStartsOn, fixedWeeks }),
-    [month, weekStartsOn, fixedWeeks]
+    () => getCalendarDays({ month: currentMonth, weekStartsOn, fixedWeeks }),
+    [currentMonth, weekStartsOn, fixedWeeks]
   );
 
   const holidaysMap = useMemo(() => {
@@ -117,16 +116,12 @@ export function Calendar({
   }, [holidays]);
 
   const handlePreviousMonth = useCallback(() => {
-    if (!initialMonth) {
-      setCurrentMonth(subMonths(month, 1));
-    }
-  }, [month, initialMonth]);
+    setCurrentMonth(subMonths(currentMonth, 1));
+  }, [currentMonth]);
 
   const handleNextMonth = useCallback(() => {
-    if (!initialMonth) {
-      setCurrentMonth(addMonths(month, 1));
-    }
-  }, [month, initialMonth]);
+    setCurrentMonth(addMonths(currentMonth, 1)); 
+  }, [currentMonth]);  
 
   const handleDayClick = useCallback(
     (date: Date) => {
@@ -161,9 +156,7 @@ export function Calendar({
             >
               <ChevronLeft className='h-4 w-4' />
             </Button>
-
             <h3 className='text-sm font-medium flex-1 text-center'>{monthYearLabel}</h3>
-
             <Button
               variant='ghost'
               type='button'
@@ -194,7 +187,7 @@ export function Calendar({
       <div className='grid grid-cols-7 gap-2'>
         {calendarDays.map((date) => {
           const isDisabled = disabled?.(date) ?? modifiers.disabled(date);
-          const isOutsideMonth = !isSameMonth(date, month);
+          const isOutsideMonth = !isSameMonth(date, currentMonth);
 
           if (!showOutsideDays && isOutsideMonth) {
             return <div key={date.toISOString()} className='h-8 w-8' />;
@@ -204,10 +197,10 @@ export function Calendar({
 
           const baseClasses = getDayClassNames({
             date,
-            month,
+            month: currentMonth,
             selectedDates,
             disabled: () => isDisabled,
-            showOutsideDays,
+            showOutsideDays, 
             modifiers,
           });
 

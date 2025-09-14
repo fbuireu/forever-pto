@@ -2,7 +2,14 @@
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@const/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@const/components/ui/dialog';
 import { AlertTriangle, Trash2 } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
@@ -31,7 +38,7 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className='sm:max-w-md'>
+      <DialogContent className='sm:max-w-sm'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2 text-destructive'>
             <AlertTriangle className='w-5 h-5' />
@@ -57,16 +64,17 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
             </div>
           </DialogDescription>
         </DialogHeader>
-
-        <div className='flex gap-2 pt-4'>
-          <Button variant='destructive' onClick={handleDelete} className='flex-1'>
-            <Trash2 className='w-4 h-4 mr-2' />
-            Delete {holidays.length} {holidayText}
-          </Button>
-          <Button variant='outline' onClick={onClose} className='flex-1'>
-            Cancel
-          </Button>
-        </div>
+        <DialogFooter>
+          <div className='flex gap-2 pt-4'>
+            <Button variant='destructive' onClick={handleDelete} className='flex-1'>
+              <Trash2 className='w-4 h-4 mr-2' />
+              Delete {holidays.length} {holidayText}
+            </Button>
+            <Button variant='outline' onClick={onClose} className='flex-1'>
+              Cancel
+            </Button>
+          </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

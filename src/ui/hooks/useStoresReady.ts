@@ -15,7 +15,12 @@ export const useStoresReady = () => {
   const [hydrationStatus, setHydrationStatus] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    const initialStatus = Object.fromEntries(STORES.map(({ name, store }) => [name, store.persist.hasHydrated()]));
+    const initialStatus = Object.fromEntries(
+      STORES.map(({ name, store }) => {
+        const hasHydrated = store.persist.hasHydrated();
+        return [name, hasHydrated];
+      })
+    );
 
     setHydrationStatus(initialStatus);
 
@@ -23,21 +28,23 @@ export const useStoresReady = () => {
       return;
     }
 
-    const unsubscribes = STORES.filter(({ name }) => !initialStatus[name]).map(({ name, store }) =>
-      store.persist.onFinishHydration(() => {
+    const unsubscribes = STORES.filter(({ name }) => !initialStatus[name]).map(({ name, store }) => {
+      return store.persist.onFinishHydration(() => {
         setHydrationStatus((prev) => ({
           ...prev,
           [name]: true,
         }));
-      })
-    );
+      });
+    });
 
     return () => {
       unsubscribes.forEach((unsubscribe) => unsubscribe());
     };
   }, []);
 
-  const isReady = Object.values(hydrationStatus).every(Boolean);
+  const hasAllStores = STORES.every(({ name }) => name in hydrationStatus);
+  const allStoresHydrated = Object.values(hydrationStatus).every(Boolean);
+  const isReady = hasAllStores && allStoresHydrated;
 
   return {
     isReady,

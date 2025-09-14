@@ -2,7 +2,14 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@const/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@const/components/ui/dialog';
 import { Input } from '@const/components/ui/input';
 import { Label } from '@const/components/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -67,7 +74,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-lg'>
+      <DialogContent className='sm:max-w-sm'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Plus className='w-5 h-5 text-green-500' />
@@ -80,50 +87,50 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
             </span>
           </DialogDescription>
         </DialogHeader>
-
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-6' noValidate>
           <div className='space-y-2'>
             <Label htmlFor='name'>Holiday Name</Label>
             <Input id='name' type='text' placeholder='e.g. My birthday' autoFocus {...register('name')} />
             {errors.name && <p className='text-sm text-destructive mt-1'>{errors.name.message}</p>}
           </div>
-
           <div className='space-y-2'>
-            <Label>Select Date</Label>
-            <div className='border rounded-lg p-3'>
-              <Calendar
-                key={String(selectedDate)}
-                mode='single'
-                showNavigation
-                selected={selectedDate}
-                onSelect={handleDateSelect}
-                locale={locale}
-                holidays={holidays}
-                allowPastDays={allowPastDays}
-                currentSelection={currentSelection}
-                alternatives={alternatives}
-                suggestion={suggestion}
-                className='w-full'
-              />
-              {selectedDate && (
-                <div className='mt-3 p-2 bg-muted rounded text-sm'>
-                  <CalendarIcon className='w-4 h-4 inline mr-2' />
-                  Selected: {formatDate({ date: selectedDate, locale, format: 'EEEE, MMMM d, yyyy' })}
-                </div>
-              )}
-            </div>
+            <Label className='flex flex-direction-column flex-wrap align-items-flex-start'>
+              Select Date
+              <div className='border rounded-lg p-3'>
+                <Calendar
+                  mode='single'
+                  showNavigation
+                  selected={selectedDate}
+                  onSelect={handleDateSelect}
+                  locale={locale}
+                  holidays={holidays}
+                  allowPastDays={allowPastDays}
+                  currentSelection={currentSelection}
+                  alternatives={alternatives}
+                  suggestion={suggestion}
+                  className='w-full'
+                />
+                {selectedDate && (
+                  <div className='mt-3 p-2 bg-muted rounded text-sm flex align-items-center'>
+                    <CalendarIcon className='w-4 h-4 inline mr-2' />
+                    Selected: {formatDate({ date: selectedDate, locale, format: 'EEEE, MMMM d, yyyy' })}
+                  </div>
+                )}
+              </div>
+            </Label>
             {errors.date && <p className='text-sm text-destructive mt-1'>{errors.date.message}</p>}
           </div>
-
-          <div className='flex gap-2 pt-2'>
-            <Button type='submit' className='flex-1'>
-              <Plus className='w-4 h-4 mr-2' />
-              Add Holiday
-            </Button>
-            <Button type='button' variant='outline' onClick={handleClose}>
-              Cancel
-            </Button>
-          </div>
+          <DialogFooter>
+            <div className='flex gap-2 pt-2'>
+              <Button type='submit' className='flex-1'>
+                <Plus className='w-4 h-4 mr-2' />
+                Add Holiday
+              </Button>
+              <Button type='button' variant='outline' onClick={handleClose}>
+                Cancel
+              </Button>
+            </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
