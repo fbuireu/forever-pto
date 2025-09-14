@@ -11,7 +11,7 @@ import { useDebounce } from '@ui/hooks/useDebounce';
 import { ConditionalWrapper } from '@ui/modules/components/core/ConditionalWrapper';
 import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/components/premium/PremiumFeature';
 import { isWeekend } from 'date-fns/isWeekend';
-import { ChevronDown, ChevronRight, Plus, Search, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, Edit, Plus, Search, Trash2 } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -30,12 +30,22 @@ interface HolidaysTableProps {
 const AddHolidayModal = dynamic(() =>
   import('./components/AddHolidayModal').then((module) => ({ default: module.AddHolidayModal }))
 );
+const EditHolidayModal = dynamic(() =>
+  import('./components/EditHolidayModal').then((module) => ({ default: module.EditHolidayModal }))
+);
+const DeleteHolidayModal = dynamic(() =>
+  import('./components/DeleteHolidayModal').then((module) => ({ default: module.DeleteHolidayModal }))
+);
 
 export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   const { isPremium } = usePremiumStore();
+  const { holidays } = useHolidaysStore();
   const locale = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [innerOpen, setInnerOpen] = useState(false);
   const [selectedHolidays, setSelectedHolidays] = useState<Set<string>>(new Set());
   const [sortConfig, setSortConfig] = useState<{
     key: keyof HolidayDTO | null;
@@ -46,8 +56,6 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
     delay: 100,
     callback: () => {},
   });
-  const { holidays } = useHolidaysStore();
-  const [innerOpen, setInnerOpen] = useState(false);
   const prevOpen = useRef(open);
 
   useEffect(() => {
@@ -153,13 +161,6 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
     return filteredHolidays.filter((holiday, index) => selectedHolidays.has(getHolidayId(holiday, index)));
   }, [filteredHolidays, selectedHolidays, getHolidayId]);
 
-  const handleDelete = useCallback(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const selectedHolidaysList = getSelectedHolidays();
-
-    setSelectedHolidays(new Set());
-  }, [getSelectedHolidays]);
-
   const SelectAllButton = useMemo(() => {
     const { type } = selectionState;
 
@@ -226,7 +227,6 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
           <div className='flex items-center space-x-2'>
             {variant === HolidayVariant.CUSTOM && (
               <Button
-                variant='default'
                 size='sm'
                 onClick={() => setShowAddModal(true)}
                 className='bg-green-600 hover:bg-green-700 text-white'
@@ -235,9 +235,15 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                 Añadir Festivo
               </Button>
             )}
+            {selectedCount === 1 && (
+              <Button variant='outline' size='sm' onClick={() => setShowEditModal(true)} className='py-4'>
+                <Edit className='h-4 w-4 mr-1' />
+                Editar festivo
+              </Button>
+            )}
             {selectedCount > 0 && (
               <div className='flex items-center space-x-2'>
-                <Button variant='destructive' size='sm' onClick={handleDelete}>
+                <Button variant='destructive' size='sm' onClick={() => setShowDeleteModal(true)}>
                   <Trash2 className='h-4 w-4 mr-1' />
                   Eliminar {selectedCount} festivos
                 </Button>
@@ -321,6 +327,20 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
         </div>
       </CollapsibleContent>
       <AddHolidayModal open={showAddModal} onClose={() => setShowAddModal(false)} locale={locale} />
+      {getSelectedHolidays().length === 1 && (
+        <EditHolidayModal
+          open={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          locale={locale}
+          holiday={getSelectedHolidays()[0]}
+        />
+      )}
+      <DeleteHolidayModal
+        open={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        locale={locale}
+        holidays={getSelectedHolidays()}
+      />
     </Collapsible>
   );
 };

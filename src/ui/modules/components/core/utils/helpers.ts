@@ -21,7 +21,7 @@ const MODIFIERS_CLASS_NAMES: Record<string, string> = {
   custom:
     'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-semibold shadow-md ring-2 ring-purple-300 dark:ring-purple-400 transition-all duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(147,51,234,0.8)_2px,rgba(147,51,234,0.8)_4px)]',
   selected:
-    'bg-primary text-primary-foreground hover:bg-primary/90 ring-2 ring-primary/20 font-semibold shadow-md transition-all duration-200',
+    'bg-primary text-primary-foreground hover:bg-primary/90 ring-2 ring-primary font-semibold shadow-md transition-all duration-200',
 } as const;
 
 export const getDayClassNames = ({

@@ -1,11 +1,11 @@
 'use client';
 
 import { useHolidaysStore } from '@application/stores/holidays';
-import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useCallback } from 'react';
 import { AlternativesManager } from 'src/components/animate-ui/ui-elements/AlternativesManager';
 import { AlternativesManagerSkeleton } from '../skeletons/AlternativesManagerSkeleton';
+import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 
 export const ManagementBar = () => {
   const { isReady } = useStoresReady();
@@ -19,15 +19,15 @@ export const ManagementBar = () => {
   } = useHolidaysStore();
 
   const handlePreviewChange = useCallback(
-    (selection: Suggestion, index: number) => {
-      setPreviewAlternativeSelection(selection, index);
+    (params: AlternativeSelectionBaseParams) => {
+      setPreviewAlternativeSelection(params);
     },
     [setPreviewAlternativeSelection]
   );
 
   const handleSelectionChange = useCallback(
-    (selection: Suggestion, index: number) => {
-      setCurrentAlternativeSelection(selection, index);
+    (params: AlternativeSelectionBaseParams) => {
+      setCurrentAlternativeSelection(params);
     },
     [setCurrentAlternativeSelection]
   );

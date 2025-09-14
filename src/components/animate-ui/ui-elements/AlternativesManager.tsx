@@ -1,16 +1,18 @@
 'use client';
 
+import type { HolidaysActions } from '@application/stores/holidays';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { BarChart3, Calendar, CalendarDays, ChevronLeft, ChevronRight, Sparkles, TrendingUp } from 'lucide-react';
 import { motion, type Transition, type Variants } from 'motion/react';
-import * as React from 'react';
-import { SlidingNumber } from '../text/sliding-number';
+import { useCallback, useState } from 'react';
 import { Button } from '../components/buttons/button';
+import { SlidingNumber } from '../text/sliding-number';
+import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 
 interface AlternativeManagerProps {
   allSuggestions: Suggestion[];
-  onSelectionChange: (selection: Suggestion, index: number) => void;
-  onPreviewChange: (selection: Suggestion, index: number) => void;
+  onSelectionChange: (params: AlternativeSelectionBaseParams) => void;
+  onPreviewChange: (params: AlternativeSelectionBaseParams) => void;
   selectedIndex: number;
   currentSelectionIndex: number;
 }
@@ -58,24 +60,24 @@ export const AlternativesManager = ({
   selectedIndex = 0,
   currentSelectionIndex = 0,
 }: AlternativeManagerProps) => {
-  const [currentIndex, setCurrentIndex] = React.useState(selectedIndex);
+  const [currentIndex, setCurrentIndex] = useState(selectedIndex);
 
   const totalOptions = allSuggestions.length;
   const currentSuggestion = allSuggestions[currentIndex];
 
-  const handlePrevious = React.useCallback(() => {
+  const handlePrevious = useCallback(() => {
     if (currentIndex > 0) {
       const newIndex = currentIndex - 1;
       setCurrentIndex(newIndex);
-      onPreviewChange(allSuggestions[newIndex], newIndex);
+      onPreviewChange({ suggestion: allSuggestions[newIndex], index: newIndex });
     }
   }, [currentIndex, allSuggestions, onPreviewChange]);
 
-  const handleNext = React.useCallback(() => {
+  const handleNext = useCallback(() => {
     if (currentIndex < totalOptions - 1) {
       const newIndex = currentIndex + 1;
       setCurrentIndex(newIndex);
-      onPreviewChange(allSuggestions[newIndex], newIndex);
+      onPreviewChange({ suggestion: allSuggestions[newIndex], index: newIndex });
     }
   }, [currentIndex, totalOptions, allSuggestions, onPreviewChange]);
 
@@ -95,14 +97,9 @@ export const AlternativesManager = ({
   return (
     <div className='sticky top-0 z-[10] flex w-fit flex-wrap items-center gap-y-2 rounded-2xl border border-border bg-background p-2 shadow-sm'>
       <div className='flex shrink-0 items-center rounded-lg bg-muted/50 px-2 h-full'>
-        <button
-          disabled={currentIndex === 0}
-          className='cursor-pointer h-full p-1 text-muted-foreground transition-colors hover:text-foreground disabled:text-muted-foreground/30 disabled:hover:text-muted-foreground/30'
-          onClick={handlePrevious}
-          aria-label='Previous suggestion'
-        >
+        <Button disabled={currentIndex === 0} variant='ghost' onClick={handlePrevious} aria-label='Previous suggestion'>
           <ChevronLeft size={20} />
-        </button>
+        </Button>
 
         <div className='mx-2 flex flex-col items-center relative w-25 transition-[height,padding] duration-300 ease-out'>
           <div className='flex items-center space-x-1 text-sm tabular-nums'>
@@ -123,14 +120,14 @@ export const AlternativesManager = ({
           )}
         </div>
 
-        <button
+        <Button
           disabled={currentIndex === totalOptions - 1}
-          className='cursor-pointer h-full p-1 text-muted-foreground transition-colors hover:text-foreground disabled:text-muted-foreground/30 disabled:hover:text-muted-foreground/30'
+          variant='ghost'
           onClick={handleNext}
           aria-label='Next suggestion'
         >
           <ChevronRight size={20} />
-        </button>
+        </Button>
       </div>
 
       <div className='mx-3 h-6 w-px bg-border rounded-full' />
@@ -255,7 +252,7 @@ export const AlternativesManager = ({
       <Button
         disabled={currentSelectionIndex === currentIndex}
         className={`flex w-full h-10 text-sm cursor-pointer items-center justify-center rounded-lg px-3 py-2 font-medium transition-colors duration-300 sm:w-auto ${'bg-teal-500 text-white hover:bg-teal-600 dark:bg-teal-600/80 dark:hover:bg-teal-700'}`}
-        onClick={() => onSelectionChange(currentSuggestion, currentIndex)}
+        onClick={() => onSelectionChange({ suggestion: currentSuggestion, index: currentIndex })}
       >
         {currentSelectionIndex === currentIndex ? 'Already Applied' : 'Apply Alternative'}
       </Button>

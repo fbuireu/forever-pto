@@ -39,4 +39,5 @@ export { generateMetadata };
 
 // todo: check validation premium
 // todo: add support for intervals selection
-// todo: afinar el add (marcar dia seleccionat)
+// todo: store with maps?
+// todo: control to store/persist localstorage to avoid recalc

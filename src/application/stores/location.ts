@@ -6,6 +6,7 @@ import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
+import type { GetRegionParams } from './types';
 
 interface LocationState {
   countries: CountryDTO[];
@@ -13,11 +14,6 @@ interface LocationState {
   countriesLastFetched: number;
   regions: RegionDTO[];
   regionsLoading: boolean;
-}
-
-interface GetRegionParams {
-  country: string;
-  region: string;
 }
 
 interface LocationActions {

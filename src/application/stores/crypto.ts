@@ -1,12 +1,8 @@
 import { createJSONStorage } from 'zustand/middleware';
+import type { CryptoParams } from './types';
 
 const SECRET_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY ?? 'fallback-secret-key';
 const isDev = process.env.NODE_ENV === 'development';
-
-interface CryptoParams {
-  text: string;
-  key: string;
-}
 
 function encrypt({ text, key }: CryptoParams): string {
   return btoa(

@@ -37,8 +37,7 @@ export const HolidaysList = () => {
           </PremiumFeature>
         </TabsList>
       </Tabs>
-
-      <div className='mx-1 mb-1 mt-2 rounded-sm h-full bg-background space-y-6 py-6 transition-all'>
+      <div className='mx-1 mb-1 mt-2 rounded-sm h-full bg-background space-y-6 py-6'>
         {activeTab === HolidayVariant.NATIONAL && (
           <HolidaysTable
             variant={HolidayVariant.NATIONAL}
