@@ -15,9 +15,10 @@ import { Label } from '@const/components/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarDays, Calendar as CalendarIcon, Edit } from 'lucide-react';
 import type { Locale } from 'next-intl';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
+import { toast } from 'sonner';
 import { z } from 'zod';
 import { Calendar, type FromTo } from '../../core/Calendar';
 import { formatDate } from '../../utils/formatters';
@@ -39,18 +40,20 @@ type HolidayFormData = z.infer<typeof holidaySchema>;
 export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHolidayModalProps) => {
   const { holidays, editHoliday, currentSelection, alternatives, suggestion } = useHolidaysStore();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(holiday.date);
+  const [isPending, startTransition] = useTransition();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    setError,
     setValue,
   } = useForm<HolidayFormData>({
     resolver: zodResolver(holidaySchema),
     mode: 'onSubmit',
     defaultValues: {
       name: holiday.name,
+      date: holiday.date,
     },
   });
 
@@ -60,23 +63,62 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
     onClose();
   };
 
-  const onSubmit = async (data: HolidayFormData) => {
-    if (!holiday) return;
+  const onSubmit = (data: HolidayFormData) => {
+    startTransition(() => {
+      try {
+        if (!holiday) {
+          toast.error('Error editing holiday', {
+            description: 'Holiday data not found. Please try again.',
+          });
+          return;
+        }
 
-    if (data.date.getTime() === holiday.date.getTime()) {
-      setValue('date', undefined as any, {
-        shouldValidate: true,
-      });
-      setError('date', { message: 'Please select a different date' });
-      return;
-    }
+        if (data.date.getTime() === holiday.date.getTime() && data.name === holiday.name) {
+          toast.warning('No changes detected', {
+            description: 'Please modify the name or date to save changes.',
+          });
+          return;
+        }
 
-    editHoliday({
-      holidayId: holiday.id,
-      updates: { name: data.name, date: data.date },
-      locale,
+        if (data.date.getTime() !== holiday.date.getTime()) {
+          const existingHoliday = holidays.find(
+            (h) => h.id !== holiday.id && h.date.toDateString() === data.date.toDateString()
+          );
+
+          if (existingHoliday) {
+            toast.error('Holiday already exists', {
+              description: `There's already a holiday on ${formatDate({
+                date: data.date,
+                locale,
+                format: 'MMMM d, yyyy',
+              })}: ${existingHoliday.name}`,
+            });
+            return;
+          }
+        }
+
+        editHoliday({
+          holidayId: holiday.id,
+          updates: { name: data.name, date: data.date },
+          locale,
+        });
+
+        toast.success('Holiday updated successfully', {
+          description: `${data.name} has been updated for ${formatDate({
+            date: data.date,
+            locale,
+            format: 'MMMM d, yyyy',
+          })}`,
+        });
+
+        handleClose();
+      } catch (error) {
+        console.error('Error editing holiday:', error);
+        toast.error('Error editing holiday', {
+          description: 'Something went wrong. Please try again.',
+        });
+      }
     });
-    handleClose();
   };
 
   const handleDateSelect = (date: Date | Date[] | FromTo | undefined) => {
@@ -104,7 +146,14 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-6' noValidate>
           <div className='space-y-2'>
             <Label htmlFor='name'>Holiday Name</Label>
-            <Input id='name' type='text' placeholder='e.g. My birthday' autoFocus {...register('name')} />
+            <Input
+              id='name'
+              type='text'
+              placeholder='e.g. My birthday'
+              autoFocus
+              disabled={isPending}
+              {...register('name')}
+            />
             {errors.name && <p className='text-sm text-destructive mt-1'>{errors.name.message}</p>}
           </div>
           <div className='space-y-2'>
@@ -124,6 +173,7 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
                   alternatives={alternatives}
                   suggestion={suggestion}
                   className='w-full'
+                  disabled={isPending}
                 />
                 {selectedDate && (
                   <div className='mt-3 p-2 bg-muted rounded text-sm align-items-center flex'>
@@ -137,11 +187,11 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
           </div>
           <DialogFooter>
             <div className='flex gap-2 pt-2'>
-              <Button type='submit' className='flex-1'>
+              <Button type='submit' className='flex-1' disabled={isPending}>
                 <Edit className='w-4 h-4 mr-2' />
-                Edit Holiday
+                {isPending ? 'Updating...' : 'Edit Holiday'}
               </Button>
-              <Button type='button' variant='outline' onClick={handleClose}>
+              <Button type='button' variant='outline' onClick={handleClose} disabled={isPending}>
                 Cancel
               </Button>
             </div>

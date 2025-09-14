@@ -18,7 +18,7 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> =
     const yearStart = startOfYear(new Date(year, 0, 1));
     const nextYearEnd = endOfYear(new Date(year + 1, 0, 1));
 
-    return raw
+        return raw
       .toSorted((a, _) => (a.location ? 1 : -1))
       .filter((holiday) => {
         const holidayDate = new Date(holiday.date);

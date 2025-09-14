@@ -9,7 +9,6 @@ import { AlternativesManagerSkeleton } from '../skeletons/AlternativesManagerSke
 
 export const ManagementBar = () => {
   const { isReady } = useStoresReady();
-  console.log('isrt', isReady);
   const {
     alternatives,
     suggestion,
@@ -29,6 +28,10 @@ export const ManagementBar = () => {
   const handleSelectionChange = useCallback(
     (params: AlternativeSelectionBaseParams) => {
       setCurrentAlternativeSelection(params);
+      toast.success('Suggestion applied successfully', {
+        description: `Selected combination with ${params.suggestion?.days.length} PTO days`,
+        duration: 2000,
+      });
     },
     [setCurrentAlternativeSelection]
   );

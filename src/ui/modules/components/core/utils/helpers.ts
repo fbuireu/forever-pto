@@ -1,11 +1,12 @@
-import { isSameDay, isSameMonth } from 'date-fns';
+import { isBefore, isSameDay, isSameMonth, startOfDay } from 'date-fns';
 
 interface GetDayClassNamesParams {
   date: Date;
   month: Date;
   selectedDates: Date[];
-  disabled?: (date: Date) => boolean;
+  disabled?: boolean;
   showOutsideDays: boolean;
+  allowPastDays?: boolean;
   modifiers: Record<string, (date: Date) => boolean>;
 }
 
@@ -28,15 +29,19 @@ export const getDayClassNames = ({
   date,
   month,
   selectedDates,
-  disabled,
+  disabled = false,
   showOutsideDays,
+  allowPastDays = true,
   modifiers,
 }: GetDayClassNamesParams): string => {
   const classes = [];
-  const isDisabled = disabled?.(date);
   const isOutsideMonth = !isSameMonth(date, month);
   const isSelected = selectedDates.some((d) => isSameDay(d, date));
-  const isSelectedAndEnabled = isSelected && !isDisabled;
+  const isSelectedAndEnabled = isSelected && !disabled;
+
+  const today = startOfDay(new Date());
+  const isPastDay = isBefore(startOfDay(date), today);
+  const shouldShowAsPast = isPastDay && !allowPastDays;
 
   classes.push(
     'h-8 w-8 p-0 font-normal text-sm',
@@ -45,23 +50,22 @@ export const getDayClassNames = ({
 
   Object.entries(modifiers).forEach(([name, modifierFn]) => {
     const shouldApplyModifier =
-      modifierFn?.(date) && MODIFIERS_CLASS_NAMES[name] && !(name === 'today' && (isDisabled ?? isSelected));
+      modifierFn?.(date) && MODIFIERS_CLASS_NAMES[name] && !(name === 'today' && (disabled ?? isSelected));
     if (shouldApplyModifier) {
       classes.push(MODIFIERS_CLASS_NAMES[name]);
     }
   });
 
-  if (isSelectedAndEnabled) {
-    // classes.push('bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground');
-  }
-
-  if (isDisabled) {
+  if (disabled) {
     const opacity = isOutsideMonth ? '!opacity-20' : '!opacity-40';
     classes.push(opacity, 'cursor-not-allowed pointer-events-none text-muted-foreground');
   } else {
     const outsideMonthClass = showOutsideDays ? 'text-muted-foreground opacity-50' : 'invisible';
+
     if (isOutsideMonth) {
       classes.push(outsideMonthClass);
+    } else if (shouldShowAsPast) {
+      classes.push('text-muted-foreground opacity-50');
     }
 
     if (!isSelected) {

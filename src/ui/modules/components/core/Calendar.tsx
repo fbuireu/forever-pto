@@ -37,7 +37,7 @@ interface CalendarProps {
   weekStartsOn?: Day;
   fixedWeeks?: boolean;
   locale: Locale;
-  disabled?: (date: Date) => boolean;
+  disabled?: boolean;
   showOutsideDays?: boolean;
   holidays: HolidaysState['holidays'];
   allowPastDays: FiltersState['allowPastDays'];
@@ -57,7 +57,7 @@ export function Calendar({
   weekStartsOn = 1,
   fixedWeeks = false,
   locale,
-  disabled,
+  disabled = false,
   showOutsideDays = true,
   holidays,
   allowPastDays = true,
@@ -100,7 +100,10 @@ export function Calendar({
   }, [holidays, allowPastDays, currentSelection, alternatives, suggestion, previewAlternativeIndex, selectedDates]);
 
   const weekdayNames = useMemo(() => getWeekdayNames({ locale, weekStartsOn }), [locale, weekStartsOn]);
-  const monthYearLabel = useMemo(() => formatDate({ date: currentMonth, locale, format: 'LLLL yyyy' }), [currentMonth, locale]);
+  const monthYearLabel = useMemo(
+    () => formatDate({ date: currentMonth, locale, format: 'LLLL yyyy' }),
+    [currentMonth, locale]
+  );
   const calendarDays = useMemo(
     () => getCalendarDays({ month: currentMonth, weekStartsOn, fixedWeeks }),
     [currentMonth, weekStartsOn, fixedWeeks]
@@ -120,12 +123,12 @@ export function Calendar({
   }, [currentMonth]);
 
   const handleNextMonth = useCallback(() => {
-    setCurrentMonth(addMonths(currentMonth, 1)); 
-  }, [currentMonth]);  
+    setCurrentMonth(addMonths(currentMonth, 1));
+  }, [currentMonth]);
 
   const handleDayClick = useCallback(
     (date: Date) => {
-      if (disabled?.(date)) return;
+      if (disabled) return;
 
       if (mode === 'multiple') {
         const isSelected = selectedDates.some((d) => isSameDay(d, date));
@@ -186,7 +189,7 @@ export function Calendar({
 
       <div className='grid grid-cols-7 gap-2'>
         {calendarDays.map((date) => {
-          const isDisabled = disabled?.(date) ?? modifiers.disabled(date);
+          const isDisabled = disabled ?? modifiers.disabled(date);
           const isOutsideMonth = !isSameMonth(date, currentMonth);
 
           if (!showOutsideDays && isOutsideMonth) {
@@ -199,8 +202,9 @@ export function Calendar({
             date,
             month: currentMonth,
             selectedDates,
-            disabled: () => isDisabled,
-            showOutsideDays, 
+            disabled,
+            showOutsideDays,
+            allowPastDays,
             modifiers,
           });
 

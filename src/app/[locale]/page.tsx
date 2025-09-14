@@ -41,4 +41,3 @@ export { generateMetadata };
 // todo: add support for intervals selection
 // todo: store with maps?
 // todo: control to store/persist localstorage to avoid recalc?
-// todo: add banner notifications on CRUD actions (+reset store)

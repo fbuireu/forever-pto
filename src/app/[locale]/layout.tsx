@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { SidebarProvider } from 'src/components/animate-ui/radix/sidebar';
+import { Toaster } from '@const/components/ui/sonner';
 import '../globals.css';
 
 const geistSans = Geist({
@@ -48,6 +49,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
           >
             <SidebarProvider>
               {children}
+              <Toaster />
               <PremiumModal />
             </SidebarProvider>
             <footer className='row-start-3 flex gap-[24px] flex-wrap items-center justify-center' />

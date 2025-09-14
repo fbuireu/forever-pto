@@ -3,15 +3,17 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@const/components/ui/dialog';
 import { AlertTriangle, Trash2 } from 'lucide-react';
 import type { Locale } from 'next-intl';
+import { useTransition } from 'react';
+import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { formatDate } from '../../utils/formatters';
 
@@ -24,17 +26,34 @@ interface DeleteHolidayModalProps {
 
 export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHolidayModalProps) => {
   const { removeHoliday } = useHolidaysStore();
-
+  const [isPending, startTransition] = useTransition();
+  const isMultiple = holidays.length > 1;
+    const holidayText = isMultiple ? 'holidays' : 'holiday';
+    
   const handleDelete = () => {
-    holidays.forEach((holiday) => {
-      removeHoliday(holiday.id);
-    });
+    startTransition(() => {
+      try {
+        holidays.forEach((holiday) => {
+          removeHoliday(holiday.id);
+        });
 
-    onClose();
+        toast.success(`${isMultiple ? 'Holidays' : 'Holiday'} deleted successfully`, {
+          description: isMultiple
+            ? `${holidays.length} holidays have been removed`
+            : `${holidays[0].name} has been removed`,
+        });
+
+        onClose();
+      } catch (error) {
+        console.error('Error deleting holiday:', error);
+        toast.error('Error deleting holiday', {
+          description: 'Something went wrong. Please try again.',
+        });
+      }
+    });
   };
 
-  const isMultiple = holidays.length > 1;
-  const holidayText = isMultiple ? 'holidays' : 'holiday';
+
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -45,10 +64,10 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
             Delete {holidayText}
           </DialogTitle>
           <DialogDescription className='space-y-3'>
-            <p>
+            <span className='block my-2 '>
               Are you sure you want to delete {isMultiple ? 'these' : 'this'} {holidayText}? This action cannot be
               undone.
-            </p>
+            </span>
 
             <div className='bg-muted rounded-lg p-3 max-h-32 overflow-y-auto'>
               <div className='space-y-2'>
@@ -66,11 +85,11 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
         </DialogHeader>
         <DialogFooter>
           <div className='flex gap-2 pt-4'>
-            <Button variant='destructive' onClick={handleDelete} className='flex-1'>
+            <Button variant='destructive' onClick={handleDelete} className='flex-1' disabled={isPending}>
               <Trash2 className='w-4 h-4 mr-2' />
-              Delete {holidays.length} {holidayText}
+              {isPending ? 'Deleting...' : `Delete ${holidays.length} ${holidayText}`}
             </Button>
-            <Button variant='outline' onClick={onClose} className='flex-1'>
+            <Button variant='outline' onClick={onClose} className='flex-1' disabled={isPending}>
               Cancel
             </Button>
           </div>

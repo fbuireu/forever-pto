@@ -28,7 +28,7 @@ export const CalendarList = () => {
 
   useEffect(() => {
     if (!country) return;
-    fetchHolidays({ year, region, country, locale });
+    fetchHolidays({ year, region, country, locale,   });
   }, [fetchHolidays, year, region, country, locale]);
 
   useEffect(() => {

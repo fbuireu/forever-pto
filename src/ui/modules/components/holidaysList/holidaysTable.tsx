@@ -157,6 +157,21 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
     [selectedHolidays, getHolidayId]
   );
 
+  const handleCloseAddModal = useCallback(() => {
+    setShowAddModal(false);
+    setSelectedHolidays(new Set());
+  }, []);
+
+  const handleCloseEditModal = useCallback(() => {
+    setShowEditModal(false);
+    setSelectedHolidays(new Set());
+  }, []);
+
+  const handleCloseDeleteModal = useCallback(() => {
+    setShowDeleteModal(false);
+    setSelectedHolidays(new Set());
+  }, []);
+
   const getSelectedHolidays = useCallback(() => {
     return filteredHolidays.filter((holiday, index) => selectedHolidays.has(getHolidayId(holiday, index)));
   }, [filteredHolidays, selectedHolidays, getHolidayId]);
@@ -326,18 +341,18 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
           </div>
         </div>
       </CollapsibleContent>
-      <AddHolidayModal open={showAddModal} onClose={() => setShowAddModal(false)} locale={locale} />
+      <AddHolidayModal open={showAddModal} onClose={handleCloseAddModal} locale={locale} />
       {getSelectedHolidays().length === 1 && (
         <EditHolidayModal
           open={showEditModal}
-          onClose={() => setShowEditModal(false)}
+          onClose={handleCloseEditModal}
           locale={locale}
           holiday={getSelectedHolidays()[0]}
         />
       )}
       <DeleteHolidayModal
         open={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
+        onClose={handleCloseDeleteModal}
         locale={locale}
         holidays={getSelectedHolidays()}
       />

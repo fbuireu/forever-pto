@@ -9,12 +9,12 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
 import type {
-  FetchHolidaysParams,
-  GenerateSuggestionsParams,
-  GenerateAlternativesParams,
-  AlternativeSelectionBaseParams,
   AddHolidayParams,
+  AlternativeSelectionBaseParams,
   EditHolidayParams,
+  FetchHolidaysParams,
+  GenerateAlternativesParams,
+  GenerateSuggestionsParams,
 } from './types';
 
 export interface HolidaysState {
@@ -67,9 +67,14 @@ export const useHolidaysStore = create<HolidaysStore>()(
             const { holidays: currentHolidays } = get();
             const customHolidays = currentHolidays.filter((h) => h.variant === HolidayVariant.CUSTOM);
             const holidays = await getHolidays(params);
-
+            const filteredHolidays = holidays.filter((fetchedHoliday) => {
+              const hasCustomOnSameDate = customHolidays.some(
+                (customHoliday) => customHoliday.date.toDateString() === fetchedHoliday.date.toDateString()
+              );
+              return !hasCustomOnSameDate;
+            });
             set({
-              holidays: [...customHolidays, ...holidays].sort((a, b) => a.date.getTime() - b.date.getTime()),
+              holidays: [...customHolidays, ...filteredHolidays].sort((a, b) => a.date.getTime() - b.date.getTime()),
             });
           } catch (error) {
             console.warn('Error in fetchHolidays:', error);

@@ -1,7 +1,7 @@
+import type { HolidayDTO } from '@application/dto/holiday/types';
 import type { FilterStrategy, Suggestion } from '@infrastructure/services/calendar/types';
 import type { Locale } from 'next-intl';
-import type { FiltersState } from "./filters";
-import type { HolidayDTO } from '@application/dto/holiday/types';
+import type { FiltersState } from './filters';
 
 export interface GenerateSuggestionsParams {
   year: number;

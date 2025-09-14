@@ -15,12 +15,13 @@ import { Label } from '@const/components/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarDays, Calendar as CalendarIcon, Plus } from 'lucide-react';
 import type { Locale } from 'next-intl';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { z } from 'zod';
 import { Calendar, type FromTo } from '../../core/Calendar';
 import { formatDate } from '../../utils/formatters';
+import { toast } from 'sonner';
 
 interface AddHolidayModalProps {
   open: boolean;
@@ -39,6 +40,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
   const { holidays, addHoliday, currentSelection, alternatives, suggestion } = useHolidaysStore();
   const { allowPastDays } = useFiltersStore();
   const [selectedDate, setSelectedDate] = useState<Date>();
+  const [isPending, startTransition] = useTransition(); 
 
   const {
     register,
@@ -60,9 +62,40 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
     onClose();
   };
 
-  const onSubmit = async (data: HolidayFormData) => {
-    addHoliday({ holiday: { name: data.name, date: data.date }, locale });
-    handleClose();
+  const onSubmit = (data: HolidayFormData) => {
+    startTransition(() => {
+      try {
+        const existingHoliday = holidays.find((holiday) => holiday.date.toDateString() === data.date.toDateString());
+
+        if (existingHoliday) {
+          toast.error('Holiday already exists', {
+            description: `There's already a holiday on ${formatDate({
+              date: data.date,
+              locale,
+              format: 'MMMM d, yyyy',
+            })}: ${existingHoliday.name}`,
+          });
+          return;
+        }
+
+        addHoliday({ holiday: { name: data.name, date: data.date }, locale });
+
+        toast.success('Holiday created successfully', {
+          description: `${data.name} has been added on ${formatDate({
+            date: data.date,
+            locale,
+            format: 'MMMM d, yyyy',
+          })}`,
+        });
+
+        handleClose();
+      } catch (error) {
+        console.error('Error creating holiday:', error);
+        toast.error('Error creating holiday', {
+          description: 'Something went wrong. Please try again.',
+        });
+      }
+    });
   };
 
   const handleDateSelect = (date: Date | Date[] | FromTo | undefined) => {
@@ -90,7 +123,14 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-6' noValidate>
           <div className='space-y-2'>
             <Label htmlFor='name'>Holiday Name</Label>
-            <Input id='name' type='text' placeholder='e.g. My birthday' autoFocus {...register('name')} />
+            <Input
+              id='name'
+              type='text'
+              placeholder='e.g. My birthday'
+              autoFocus
+              disabled={isPending} 
+              {...register('name')}
+            />
             {errors.name && <p className='text-sm text-destructive mt-1'>{errors.name.message}</p>}
           </div>
           <div className='space-y-2'>
@@ -109,6 +149,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
                   alternatives={alternatives}
                   suggestion={suggestion}
                   className='w-full'
+                  disabled={isPending}
                 />
                 {selectedDate && (
                   <div className='mt-3 p-2 bg-muted rounded text-sm flex align-items-center'>
@@ -122,11 +163,20 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
           </div>
           <DialogFooter>
             <div className='flex gap-2 pt-2'>
-              <Button type='submit' className='flex-1'>
+              <Button
+                type='submit'
+                className='flex-1'
+                disabled={isPending} 
+              >
                 <Plus className='w-4 h-4 mr-2' />
-                Add Holiday
+                {isPending ? 'Adding...' : 'Add Holiday'} 
               </Button>
-              <Button type='button' variant='outline' onClick={handleClose}>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={handleClose}
+                disabled={isPending} 
+              >
                 Cancel
               </Button>
             </div>
