@@ -37,7 +37,6 @@ export const getDayClassNames = ({
   const classes = [];
   const isOutsideMonth = !isSameMonth(date, month);
   const isSelected = selectedDates.some((d) => isSameDay(d, date));
-  const isSelectedAndEnabled = isSelected && !disabled;
 
   const today = startOfDay(new Date());
   const isPastDay = isBefore(startOfDay(date), today);
