@@ -42,4 +42,4 @@ export { generateMetadata };
 // todo: add summary (move doubts there)
 // todo: footer
 // todo: add limit selector for alternatives (from 1 to 5)
-// todo: recheck algo: alternatives shouldn't be better than suggestion
+// todo: add animate icons (https://animate-ui.com/docs/icons)

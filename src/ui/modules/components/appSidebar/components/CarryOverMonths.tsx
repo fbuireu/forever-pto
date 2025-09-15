@@ -40,7 +40,7 @@ export const CarryOverMonths = () => {
     <Field className='space-y-2 w-full'>
       <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='carry-over-months'>
         <SlidersHorizontal size={16} /> Carry Over Months
-        <TooltipProvider delayDuration={200}>
+        <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild className='ml-auto'>
               <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />

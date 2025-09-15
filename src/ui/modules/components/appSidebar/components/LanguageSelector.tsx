@@ -3,7 +3,7 @@
 import { useLanguages } from '@ui/hooks/useLanguages';
 import { Check } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter } from '@application/i18n/navigtion';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import {
   DropdownMenu,

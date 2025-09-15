@@ -65,7 +65,7 @@ export const PremiumFeature = ({
       <div className='blur-sm pointer-events-none'>{children}</div>
       <div className='absolute inset-0 flex items-center justify-center'>
         {description ? (
-          <TooltipProvider delayDuration={200}>
+          <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Lock className={cn(iconSize, 'text-muted-foreground')} />

@@ -35,7 +35,7 @@ export const getDayClassNames = ({
   allowPastDays = true,
   modifiers,
 }: GetDayClassNamesParams): string => {
-  const classes = [];
+  const classes: string[] = [];
   const isOutsideMonth = !isSameMonth(date, month);
   const isSelected = selectedDates.some((d) => isSameDay(d, date));
 
@@ -50,15 +50,20 @@ export const getDayClassNames = ({
 
   const isTodayActive = modifiers.today?.(date);
 
-  if (isTodayActive) {
-    console.log("Applying 'today' modifier to date:", date);
-    classes.push(MODIFIERS_CLASS_NAMES.today);
-  } else {
-    Object.entries(modifiers).forEach(([name, modifierFn]) => {
-      if (modifierFn?.(date) && MODIFIERS_CLASS_NAMES[name] && !(disabled || isSelected)) {
-        classes.push(MODIFIERS_CLASS_NAMES[name]);
-      }
-    });
+  if (!disabled && !isSelected) {
+    if (isTodayActive) {
+      classes.push(MODIFIERS_CLASS_NAMES.today);
+    } else {
+      Object.entries(modifiers).forEach(([name, modifierFn]) => {
+        if (modifierFn?.(date) && MODIFIERS_CLASS_NAMES[name]) {
+          classes.push(MODIFIERS_CLASS_NAMES[name]);
+        }
+      });
+    }
+  }
+
+  if (isSelected && !disabled) {
+    classes.push(MODIFIERS_CLASS_NAMES.selected);
   }
 
   if (disabled) {

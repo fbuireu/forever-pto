@@ -45,6 +45,7 @@ export function generateSuggestions({
   if (ptoDays <= 0) {
     return { days: [], totalEffectiveDays: 0, strategy };
   }
+
   const effectiveHolidays = holidays.filter((h) => {
     const date = new Date(h.date);
     return !isWeekend(date);

@@ -34,83 +34,81 @@ interface AppSidebarProps {
   locale: Locale;
 }
 
-export const AppSidebar = ({ locale, children }: AppSidebarProps) => {
-  return (
-    <SidebarProvider>
-      <Sidebar collapsible='icon' variant='sidebar'>
-        <SidebarHeader>
+export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
+  <SidebarProvider>
+    <Sidebar collapsible='icon' variant='sidebar'>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton>LOGO</SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Filters</SidebarGroupLabel>
           <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton>LOGO</SidebarMenuButton>
-            </SidebarMenuItem>
+            <Collapsible defaultOpen className='group/collapsible w-[--radix-popper-anchor-width]'>
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton variant='outline' tooltip='Filters'>
+                    <Settings className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
+                    <span className='data-[collapsed=true]:hidden'>Filters & Configuration</span>
+                    <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    <PtoDays />
+                    <SidebarMenuSubItem />
+                  </SidebarMenuSub>
+                  <SidebarMenuSub>
+                    <Suspense fallback={'Loading...'}>
+                      <Countries locale={locale} />
+                    </Suspense>
+                    <SidebarMenuSubItem />
+                  </SidebarMenuSub>
+                  <SidebarMenuSub>
+                    <Regions />
+                    <SidebarMenuSubItem />
+                  </SidebarMenuSub>
+                  <SidebarMenuSub>
+                    <Years />
+                    <SidebarMenuSubItem />
+                  </SidebarMenuSub>
+                  <SidebarMenuSub>
+                    <Strategy />
+                    <SidebarMenuSubItem />
+                  </SidebarMenuSub>
+                  <SidebarMenuSub>
+                    <AllowPastDays />
+                    <SidebarMenuSubItem />
+                  </SidebarMenuSub>
+                  <SidebarMenuSub>
+                    <CarryOverMonths />
+                    <SidebarMenuSubItem />
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
           </SidebarMenu>
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel>Filters</SidebarGroupLabel>
-            <SidebarMenu>
-              <Collapsible defaultOpen className='group/collapsible w-[--radix-popper-anchor-width]'>
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton variant='outline' tooltip='Filters'>
-                      <Settings className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
-                      <span className='data-[collapsed=true]:hidden'>Filters & Configuration</span>
-                      <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      <PtoDays />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <Suspense fallback={'Loading...'}>
-                        <Countries locale={locale} />
-                      </Suspense>
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <Regions />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <Years />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <Strategy />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <AllowPastDays />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <CarryOverMonths />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
-            </SidebarMenu>
-          </SidebarGroup>
-        </SidebarContent>
-        <SidebarFooter>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <LanguageSelector />
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <ThemeSelector />
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter>
-        <SidebarRail />
-      </Sidebar>
-      <SidebarInset>
-        <SidebarTrigger />
-        {children}
-      </SidebarInset>
-    </SidebarProvider>
-  );
-};
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <LanguageSelector />
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <ThemeSelector />
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
+    <SidebarInset>
+      <SidebarTrigger />
+      {children}
+    </SidebarInset>
+  </SidebarProvider>
+);
