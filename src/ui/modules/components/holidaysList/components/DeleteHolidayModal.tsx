@@ -3,12 +3,12 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@const/components/ui/dialog';
 import { AlertTriangle, Trash2 } from 'lucide-react';
 import type { Locale } from 'next-intl';
@@ -28,8 +28,8 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
   const { removeHoliday } = useHolidaysStore();
   const [isPending, startTransition] = useTransition();
   const isMultiple = holidays.length > 1;
-    const holidayText = isMultiple ? 'holidays' : 'holiday';
-    
+  const holidayText = isMultiple ? 'holidays' : 'holiday';
+
   const handleDelete = () => {
     startTransition(() => {
       try {
@@ -53,8 +53,6 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
     });
   };
 
-
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className='sm:max-w-sm'>
@@ -63,22 +61,23 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
             <AlertTriangle className='w-5 h-5' />
             Delete {holidayText}
           </DialogTitle>
-          <DialogDescription className='space-y-3'>
-            <span className='block my-2 '>
-              Are you sure you want to delete {isMultiple ? 'these' : 'this'} {holidayText}? This action cannot be
-              undone.
-            </span>
-
-            <div className='bg-muted rounded-lg p-3 max-h-32 overflow-y-auto'>
-              <div className='space-y-2'>
-                {holidays.map((holiday) => (
-                  <div key={holiday.id} className='flex items-center justify-between text-sm'>
-                    <span className='font-medium'>{holiday.name}</span>
-                    <span className='text-muted-foreground'>
-                      {formatDate({ date: holiday.date, locale, format: 'MMM d, yyyy' })}
-                    </span>
-                  </div>
-                ))}
+          <DialogDescription asChild className='space-y-3'>
+            <div>
+              <span className='block my-2 '>
+                Are you sure you want to delete {isMultiple ? 'these' : 'this'} {holidayText}? This action cannot be
+                undone.
+              </span>
+              <div className='bg-muted rounded-lg p-3 max-h-32 overflow-y-auto'>
+                <div className='space-y-2'>
+                  {holidays.map((holiday) => (
+                    <div key={holiday.id} className='flex items-center justify-between text-sm'>
+                      <span className='font-medium'>{holiday.name}</span>
+                      <span className='text-muted-foreground'>
+                        {formatDate({ date: holiday.date, locale, format: 'MMM d, yyyy' })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </DialogDescription>

@@ -4,6 +4,7 @@ import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useCallback } from 'react';
+import { toast } from 'sonner';
 import { AlternativesManager } from 'src/components/animate-ui/ui-elements/AlternativesManager';
 import { AlternativesManagerSkeleton } from '../skeletons/AlternativesManagerSkeleton';
 

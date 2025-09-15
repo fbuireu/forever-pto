@@ -1,4 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@const/components/ui/card';
+import { cn } from '@const/lib/utils';
+import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers';
 
 export const Legend = () => {
   return (
@@ -10,27 +12,27 @@ export const Legend = () => {
         <CardContent>
           <div className='mb-2 flex flex-wrap justify-center gap-4'>
             <div className='flex items-center'>
-              <div className='mr-2 h-6 w-6 rounded-sm bg-accent border border-ring font-medium' />
+              <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.today)} />
               <span>Today</span>
             </div>
             <div className='flex items-center'>
-              <div className='mr-2 h-6 w-6 rounded-sm bg-muted/50 border border-muted' />
+              <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.weekend)} />
               <span>Weekends</span>
             </div>
             <div className='flex items-center'>
-              <div className='mr-2 h-6 w-6 rounded-sm bg-gradient-to-br from-yellow-400 to-yellow-500 border-2 border-yellow-200 dark:border-yellow-300 shadow-sm' />
+              <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.holiday)} />
               <span>Holidays</span>
             </div>
             <div className='flex items-center'>
-              <div className='mr-2 h-6 w-6 rounded-sm bg-teal-400 dark:bg-teal-600 border-2 border-teal-300 dark:border-teal-400 shadow-md' />
+              <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.suggested)} />
               <span>Suggested</span>
             </div>
             <div className='flex items-center'>
-              <div className='mr-2 h-6 w-6 rounded-sm bg-orange-100 dark:bg-orange-900/30 border-2 border-orange-300 dark:border-orange-400 shadow-md [background-image:repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(255,165,0,0.8)_2px,rgba(255,165,0,0.8)_4px)]' />
+              <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.alternative, 'animate-none')} />
               <span>Alternatives</span>
             </div>
             <div className='flex items-center'>
-              <div className='mr-2 h-6 w-6 rounded-sm bg-purple-100 dark:bg-purple-900/30 border-2 border-purple-300 dark:border-purple-400 shadow-md [background-image:repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(147,51,234,0.8)_2px,rgba(147,51,234,0.8)_4px)]' />
+              <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.custom)} />
               <span>Custom</span>
             </div>
           </div>
