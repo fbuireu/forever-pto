@@ -38,6 +38,8 @@ export default Home;
 export { generateMetadata };
 
 // todo: check validation premium
-// todo: add support for intervals selection
-// todo: store with maps?
-// todo: control to store/persist localstorage to avoid recalc?
+// todo: add support for intervals selection (add first the selection to edit days)
+// todo: add summary (move doubts there)
+// todo: footer
+// todo: add limit selector for alternatives (from 1 to 5)
+// todo: recheck algo: alternatives shouldn't be better than suggestion

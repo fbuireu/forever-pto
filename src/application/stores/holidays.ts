@@ -48,7 +48,7 @@ const STORE_NAME = 'holidays-store';
 const initialState: HolidaysState = {
   holidays: [],
   suggestion: {} as Suggestion,
-  maxAlternatives: 4,
+  maxAlternatives: 2,
   alternatives: [],
   currentSelection: null,
   previewAlternativeSelection: null,
