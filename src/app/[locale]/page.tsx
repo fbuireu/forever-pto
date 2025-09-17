@@ -1,13 +1,13 @@
 import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { CalendarList } from '@ui/modules/components/home/CalendarList';
 import { Faq } from '@ui/modules/components/home/Faq';
-import { HolidaysList } from '@ui/modules/components/home/HolidaysList';
 import { Legend } from '@ui/modules/components/home/Legend';
 import { ManagementBar } from '@ui/modules/components/home/ManagementBar';
 import { StoresInitializer } from '@ui/store/StoresInitializer';
 import type { Locale } from 'next-intl';
 import { cookies } from 'next/headers';
 import { generateMetadata } from './metadata';
+import { HolidaysList } from '@ui/modules/components/home/HolidaysList';
 
 export const runtime = 'edge';
 

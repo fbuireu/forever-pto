@@ -3,16 +3,29 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
-import { isWeekend } from 'date-fns';
 import { useLocale } from 'next-intl';
 import { useEffect, useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { Calendar } from '../core/Calendar';
 import { CalendarListSkeleton } from '../skeletons/CalendarListSkeleton';
 import { getTotalMonths } from '../utils/helpers';
 
 export const CalendarList = () => {
   const locale = useLocale();
-  const { carryOverMonths, year, allowPastDays, country, region, ptoDays, strategy } = useFiltersStore();
+  const { areStoresReady } = useStoresReady();
+
+  const { carryOverMonths, year, allowPastDays, country, region, ptoDays, strategy } = useFiltersStore(
+    useShallow((state) => ({
+      carryOverMonths: state.carryOverMonths,
+      year: state.year,
+      allowPastDays: state.allowPastDays,
+      country: state.country,
+      region: state.region,
+      ptoDays: state.ptoDays,
+      strategy: state.strategy,
+    }))
+  );
+
   const {
     holidays,
     alternatives,
@@ -21,14 +34,23 @@ export const CalendarList = () => {
     fetchHolidays,
     generateSuggestions,
     previewAlternativeIndex,
-  } = useHolidaysStore();
-  const { isReady } = useStoresReady();
+  } = useHolidaysStore(
+    useShallow((state) => ({
+      holidays: state.holidays,
+      alternatives: state.alternatives,
+      suggestion: state.suggestion,
+      currentSelection: state.currentSelection,
+      fetchHolidays: state.fetchHolidays,
+      generateSuggestions: state.generateSuggestions,
+      previewAlternativeIndex: state.previewAlternativeIndex,
+    }))
+  );
 
   const months = useMemo(() => getTotalMonths({ carryOverMonths, year }), [carryOverMonths, year]);
 
   useEffect(() => {
     if (!country) return;
-    fetchHolidays({ year, region, country, locale,   });
+    fetchHolidays({ year, region, country, locale });
   }, [fetchHolidays, year, region, country, locale]);
 
   useEffect(() => {
@@ -43,10 +65,9 @@ export const CalendarList = () => {
     }
   }, [generateSuggestions, year, ptoDays, allowPastDays, holidays, months, strategy]);
 
-
   return (
     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5'>
-      {isReady ? (
+      {areStoresReady ? (
         months.map((month) => (
           <Calendar
             key={month.toISOString()}

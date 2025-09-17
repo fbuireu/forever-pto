@@ -1,6 +1,6 @@
 'use client';
 
-import { useFiltersState } from '@application/stores/filters';
+import { useFiltersStore } from '@application/stores/filters';
 import { Badge } from '@const/components/ui/badge';
 import { Card, CardDescription } from '@const/components/ui/card';
 import { Combobox } from '@const/components/ui/combobox';
@@ -11,6 +11,7 @@ import { AlertCircle, CheckCircle2, ChevronDown, DicesIcon, Scale, TrendingUp, U
 
 import { useState } from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
+import { useShallow } from 'zustand/react/shallow';
 
 const STRATEGIES = [
   {
@@ -43,8 +44,12 @@ const STRATEGIES = [
 ];
 
 export const Strategy = () => {
-  const { setStrategy, strategy } = useFiltersState();
-  const [detailsOpen, setDetailsOpen] = useState(false);
+const { strategy, setStrategy } = useFiltersStore(
+  useShallow((state) => ({
+    strategy: state.strategy,
+    setStrategy: state.setStrategy,
+  }))
+);  const [detailsOpen, setDetailsOpen] = useState(false);
   const currentStrategy = STRATEGIES.find(({ value }) => value === strategy);
 
   return (

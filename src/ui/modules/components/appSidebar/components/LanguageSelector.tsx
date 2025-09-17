@@ -1,9 +1,9 @@
 'use client';
 
+import { usePathname, useRouter } from '@application/i18n/navigtion';
 import { useLanguages } from '@ui/hooks/useLanguages';
 import { Check } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { usePathname, useRouter } from '@application/i18n/navigtion';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import {
   DropdownMenu,
@@ -29,8 +29,12 @@ export const LanguageSelector = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant='outline' size='icon' className='w-full'>
-          <span className='capitalize'>{state === 'collapsed' ? locale : t(locale)}</span>
+        <Button variant='outline' size='icon' className='w-full focus-visible:ring-1'>
+          <span className='capitalize'>
+            {state === 'collapsed'
+              ? languages.find(({ code }) => code === locale)?.code
+              : languages.find(({ code }) => code === locale)?.label}
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>

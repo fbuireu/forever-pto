@@ -1,6 +1,5 @@
 'use client';
 
-import { useFiltersState } from '@application/stores/filters';
 import { Slider } from '@const/components/ui/slider';
 import { Field, Label } from '@headlessui/react';
 import { InfoIcon, SlidersHorizontal } from 'lucide-react';
@@ -8,13 +7,20 @@ import { useEffect, useRef, useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { PremiumFeature } from '../../premium/PremiumFeature';
+import { useFiltersStore } from '@application/stores/filters';
+import { useShallow } from 'zustand/react/shallow';
 
 const MIN_VALUE = 1;
 const MAX_VALUE = 12;
 const DEBOUNCE_DELAY = 300;
 
 export const CarryOverMonths = () => {
-  const { setCarryOverMonths, carryOverMonths } = useFiltersState();
+  const { carryOverMonths, setCarryOverMonths } = useFiltersStore(
+    useShallow((state) => ({
+      carryOverMonths: state.carryOverMonths,
+      setCarryOverMonths: state.setCarryOverMonths,
+    }))
+  );
   const [localValue, setLocalValue] = useState(carryOverMonths);
   const timeoutRef = useRef<NodeJS.Timeout>(null);
 
@@ -40,7 +46,7 @@ export const CarryOverMonths = () => {
     <Field className='space-y-2 w-full'>
       <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='carry-over-months'>
         <SlidersHorizontal size={16} /> Carry Over Months
-        <TooltipProvider delayDuration={0}>
+        <TooltipProvider delayDuration={200}>
           <Tooltip>
             <TooltipTrigger asChild className='ml-auto'>
               <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />

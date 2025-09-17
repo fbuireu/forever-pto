@@ -2,8 +2,6 @@
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { HolidayVariant } from '@application/dto/holiday/types';
-import { useHolidaysStore } from '@application/stores/holidays';
-import { usePremiumStore } from '@application/stores/premium';
 import { Badge } from '@const/components/ui/badge';
 import { Input } from '@const/components/ui/input';
 import { Table, TableBody, TableCell, TableRow } from '@const/components/ui/table';
@@ -20,6 +18,9 @@ import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { HolidayRow } from './components/HolidayRow';
 import { HolidayTableHeader } from './components/HolidayTableHeader';
+import { usePremiumStore } from '@application/stores/premium';
+import { useShallow } from 'zustand/react/shallow';
+import { useHolidaysStore } from '@application/stores/holidays';
 
 interface HolidaysTableProps {
   title: string;
@@ -38,8 +39,8 @@ const DeleteHolidayModal = dynamic(() =>
 );
 
 export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
-  const { isPremium } = usePremiumStore();
-  const { holidays } = useHolidaysStore();
+const isPremium = usePremiumStore((state) => state.isPremium);
+const holidays = useHolidaysStore((state) => state.holidays);
   const locale = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);

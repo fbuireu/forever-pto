@@ -20,13 +20,11 @@ interface FilterActions {
   setRegion: (region: string) => void;
   setYear: (year: string) => void;
   setCarryOverMonths: (months: number) => void;
-  setStrategy: (strategy: string) => void;
+  setStrategy: (strategy: FilterStrategy) => void;
   resetToDefaults: () => void;
 }
 
 type FiltersStore = FiltersState & FilterActions;
-
-const STORE_NAME = 'filters-store';
 
 const initialState: FiltersState = {
   ptoDays: 22,
@@ -53,7 +51,7 @@ export const useFiltersStore = create<FiltersStore>()(
         resetToDefaults: () => set(initialState, false, 'resetToDefaults'),
       }),
       {
-        name: STORE_NAME,
+        name: 'filters-store',
         storage: encryptedStorage,
         partialize: (state) => ({
           ptoDays: state.ptoDays,
@@ -66,8 +64,6 @@ export const useFiltersStore = create<FiltersStore>()(
         }),
       }
     ),
-    { name: STORE_NAME }
+    { name: 'filters-store' }
   )
 );
-
-export const useFiltersState = () => useFiltersStore((state) => state);

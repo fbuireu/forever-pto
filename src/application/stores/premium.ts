@@ -2,13 +2,14 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
 
-interface PremiumState {
+export interface PremiumState {
   isPremium: boolean;
   userEmail: string | null;
   lastVerified: number | null;
   isLoading: boolean;
   modalOpen: boolean;
   currentFeature: string;
+  needsSessionCheck: boolean;
 }
 
 interface PremiumActions {
@@ -20,22 +21,24 @@ interface PremiumActions {
 
 type PremiumStore = PremiumState & PremiumActions;
 
-const initialState: PremiumState = {
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+
+const premiumInitialState: PremiumState = {
   isPremium: false,
   userEmail: null,
   lastVerified: null,
   isLoading: false,
   modalOpen: false,
   currentFeature: '',
+  needsSessionCheck: false,
 };
-
-const STORE_NAME = 'premium-store';
 
 export const usePremiumStore = create<PremiumStore>()(
   devtools(
     persist(
-      (set) => ({
-        ...initialState,
+      (set, get) => ({
+        ...premiumInitialState,
+
         verifyEmail: async (email: string) => {
           set({ isLoading: true });
 
@@ -57,6 +60,7 @@ export const usePremiumStore = create<PremiumStore>()(
                   lastVerified: Date.now(),
                   modalOpen: false,
                   isLoading: false,
+                  needsSessionCheck: false,
                 });
                 return true;
               }
@@ -72,6 +76,10 @@ export const usePremiumStore = create<PremiumStore>()(
         },
 
         checkExistingSession: async () => {
+          const { needsSessionCheck } = get();
+
+          if (!needsSessionCheck) return;
+
           try {
             const response = await fetch('/api/check-session', {
               credentials: 'include',
@@ -80,16 +88,24 @@ export const usePremiumStore = create<PremiumStore>()(
             if (response.ok) {
               const { isPremium, email } = await response.json();
 
-              if (isPremium) {
-                set({
-                  isPremium: true,
-                  userEmail: email,
-                  lastVerified: Date.now(),
-                });
-              }
+              set({
+                isPremium: !!isPremium,
+                userEmail: email ?? null,
+                lastVerified: Date.now(),
+                needsSessionCheck: false,
+              });
+            } else {
+              set({
+                lastVerified: Date.now(),
+                needsSessionCheck: false,
+              });
             }
           } catch (error) {
             console.error('Error checking session:', error);
+            set({
+              lastVerified: Date.now(),
+              needsSessionCheck: false,
+            });
           }
         },
 
@@ -105,10 +121,10 @@ export const usePremiumStore = create<PremiumStore>()(
             modalOpen: false,
             currentFeature: '',
           });
-        }
+        },
       }),
       {
-        name: STORE_NAME,
+        name: 'premium-store',
         storage: encryptedStorage,
         partialize: (state) => ({
           isPremium: state.isPremium,
@@ -116,17 +132,15 @@ export const usePremiumStore = create<PremiumStore>()(
           lastVerified: state.lastVerified,
         }),
         onRehydrateStorage: () => (state) => {
-          const twentyFourHours = 24 * 60 * 60 * 1000;
-          const isExpired = state?.lastVerified && Date.now() - state.lastVerified > twentyFourHours;
-
-          if (isExpired) {
-            state.checkExistingSession?.();
+          if (state) {
+            const isExpired = state.lastVerified && Date.now() - state.lastVerified > TWENTY_FOUR_HOURS;
+            if (isExpired) {
+              state.needsSessionCheck = true;
+            }
           }
         },
       }
     ),
-    { name: STORE_NAME }
+    { name: 'premium-store' }
   )
 );
-
-export const usePremiumState = () => usePremiumStore((state) => state);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useFiltersState } from '@application/stores/filters';
+import { useFiltersStore } from '@application/stores/filters';
 import { Command, CommandGroup, CommandItem, CommandList } from '@const/components/ui/command';
 import { cn } from '@const/lib/utils';
 import { Field, Label } from '@headlessui/react';
@@ -8,12 +8,18 @@ import { Calendar, Check, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
+import { useShallow } from 'zustand/react/shallow';
 
 const MAX_YEARS = 10;
 
 export const Years = () => {
   const [open, setOpen] = useState(false);
-  const { year, setYear } = useFiltersState();
+  const { year, setYear } = useFiltersStore(
+    useShallow((state) => ({
+      year: state.year,
+      setYear: state.setYear,
+    }))
+  );
 
   const years = Array.from({ length: MAX_YEARS }, (_, index) => new Date().getFullYear() - MAX_YEARS / 2 + index);
 

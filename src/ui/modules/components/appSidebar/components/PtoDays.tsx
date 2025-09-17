@@ -1,17 +1,23 @@
 'use client';
 
-import { useFiltersState } from '@application/stores/filters';
+import { useFiltersStore } from '@application/stores/filters';
 import { cn } from '@const/lib/utils';
 import { Field, Label } from '@headlessui/react';
 import { useDebounce } from '@ui/hooks/useDebounce';
 import { CalendarDays } from 'lucide-react';
 import { Counter } from 'src/components/animate-ui/components/counter';
+import { useShallow } from 'zustand/react/shallow';
 
 const MIN_VALUE = 1;
 const MAX_VALUE = 365;
 
 export const PtoDays = () => {
-  const { setPtoDays, ptoDays } = useFiltersState();
+const { ptoDays, setPtoDays } = useFiltersStore(
+  useShallow((state) => ({
+    ptoDays: state.ptoDays,
+    setPtoDays: state.setPtoDays,
+  }))
+);
   const [localValue, setLocalValue] = useDebounce({ value: ptoDays, delay: 100, callback: setPtoDays });
   const isDecrementDisabled = localValue <= MIN_VALUE;
   const isIncrementDisabled = localValue >= MAX_VALUE;

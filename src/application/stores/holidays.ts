@@ -28,7 +28,7 @@ export interface HolidaysState {
   currentSelectionIndex: number;
 }
 
-export interface HolidaysActions {
+interface HolidaysActions {
   fetchHolidays: (params: FetchHolidaysParams) => Promise<void>;
   generateSuggestions: (params: GenerateSuggestionsParams) => void;
   generateAlternatives: (params: GenerateAlternativesParams) => void;
@@ -43,9 +43,7 @@ export interface HolidaysActions {
 
 type HolidaysStore = HolidaysState & HolidaysActions;
 
-const STORE_NAME = 'holidays-store';
-
-const initialState: HolidaysState = {
+const holidaysInitialState: HolidaysState = {
   holidays: [],
   suggestion: {} as Suggestion,
   maxAlternatives: 4,
@@ -60,7 +58,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
   devtools(
     persist(
       (set, get) => ({
-        ...initialState,
+        ...holidaysInitialState,
 
         fetchHolidays: async (params: FetchHolidaysParams) => {
           try {
@@ -78,9 +76,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
             });
           } catch (error) {
             console.warn('Error in fetchHolidays:', error);
-            set({
-              holidays: [],
-            });
+            set({ holidays: [] });
           }
         },
 
@@ -89,7 +85,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
           if (ptoDays <= 0 || holidays.length === 0) {
             set({
-              suggestion: undefined,
+              suggestion: {} as Suggestion,
               alternatives: [],
               currentSelection: null,
               previewAlternativeSelection: null,
@@ -136,7 +132,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           } catch (error) {
             console.error('Error generating suggestions:', error);
             set({
-              suggestion: undefined,
+              suggestion: {} as Suggestion,
               alternatives: [],
               currentSelection: null,
               previewAlternativeSelection: null,
@@ -179,14 +175,10 @@ export const useHolidaysStore = create<HolidaysStore>()(
               strategy,
             });
 
-            set({
-              alternatives,
-            });
+            set({ alternatives });
           } catch (error) {
             console.error('Error generating alternatives:', error);
-            set({
-              alternatives: [],
-            });
+            set({ alternatives: [] });
           }
         },
 
@@ -211,10 +203,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
         },
 
         resetToDefaults: () => {
-          set({
-            ...initialState,
-          });
+          set({ ...holidaysInitialState });
         },
+
         addHoliday: ({ holiday, locale }) => {
           const { holidays } = get();
           const existingHoliday = holidays.find((h) => h.date.toDateString() === holiday.date.toDateString());
@@ -235,17 +226,19 @@ export const useHolidaysStore = create<HolidaysStore>()(
             holidays: [...holidays, newHoliday].sort((a, b) => a.date.getTime() - b.date.getTime()),
           });
         },
+
         removeHoliday: (holidayId: string) => {
           const { holidays } = get();
-
           set({
             holidays: holidays.filter((h) => h.id !== holidayId),
           });
         },
+
         editHoliday: ({ holidayId, locale, updates }: EditHolidayParams) => {
           const { holidays } = get();
-
           const holidayIndex = holidays.findIndex((h) => h.id === holidayId);
+
+          if (holidayIndex === -1) return;
 
           const updatedHoliday = {
             ...holidays[holidayIndex],
@@ -263,20 +256,35 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
           updatedHolidays.sort((a, b) => a.date.getTime() - b.date.getTime());
 
-          set({
-            holidays: updatedHolidays,
-          });
+          set({ holidays: updatedHolidays });
         },
       }),
       {
-        name: STORE_NAME,
+        name: 'holidays-store',
         storage: encryptedStorage,
         partialize: (state) => ({
-          holidays: state.holidays,
-          suggestion: state.suggestion,
+          holidays: state.holidays.map((h) => ({
+            ...h,
+            date: h.date.toISOString(),
+          })),
+          suggestion:
+            state.suggestion && Object.keys(state.suggestion).length > 0
+              ? {
+                  ...state.suggestion,
+                  days: state.suggestion.days.map((d) => d.toISOString()),
+                }
+              : state.suggestion,
           maxAlternatives: state.maxAlternatives,
-          alternatives: state.alternatives,
-          currentSelection: state.currentSelection,
+          alternatives: state.alternatives.map((alt) => ({
+            ...alt,
+            days: alt.days.map((d) => d.toISOString()),
+          })),
+          currentSelection: state.currentSelection
+            ? {
+                ...state.currentSelection,
+                days: state.currentSelection.days.map((d) => d.toISOString()),
+              }
+            : null,
         }),
         onRehydrateStorage: () => (state) => {
           if (state) {
@@ -287,14 +295,11 @@ export const useHolidaysStore = create<HolidaysStore>()(
               }));
             }
 
-            if (state.suggestion) {
+            if (state.suggestion && state.suggestion.days) {
               state.suggestion = {
                 ...state.suggestion,
                 days: state.suggestion.days.map(ensureDate),
               };
-              state.previewAlternativeSelection = state.suggestion;
-              state.previewAlternativeIndex = 0;
-              state.currentSelectionIndex = 0;
             }
 
             if (state.alternatives) {
@@ -309,14 +314,11 @@ export const useHolidaysStore = create<HolidaysStore>()(
                 ...state.currentSelection,
                 days: state.currentSelection.days.map(ensureDate),
               };
-              state.previewAlternativeSelection = state.currentSelection;
             }
           }
         },
       }
     ),
-    { name: STORE_NAME }
+    { name: 'holidays-store' }
   )
 );
-
-export const useHolidaysState = () => useHolidaysStore((state) => state);

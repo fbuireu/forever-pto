@@ -1,23 +1,33 @@
 'use client';
 
-import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { AlternativesManager } from 'src/components/animate-ui/ui-elements/AlternativesManager';
 import { AlternativesManagerSkeleton } from '../skeletons/AlternativesManagerSkeleton';
+import { useHolidaysStore } from '@application/stores/holidays';
+import { useShallow } from 'zustand/react/shallow';
 
 export const ManagementBar = () => {
-  const { isReady } = useStoresReady();
-  const {
-    alternatives,
-    suggestion,
-    setPreviewAlternativeSelection,
-    setCurrentAlternativeSelection,
-    previewAlternativeIndex,
-    currentSelectionIndex,
-  } = useHolidaysStore();
+  const { areStoresReady } = useStoresReady();
+const {
+  alternatives,
+  suggestion,
+  setPreviewAlternativeSelection,
+  setCurrentAlternativeSelection,
+  previewAlternativeIndex,
+  currentSelectionIndex,
+} = useHolidaysStore(
+  useShallow((state) => ({
+    alternatives: state.alternatives,
+    suggestion: state.suggestion,
+    setPreviewAlternativeSelection: state.setPreviewAlternativeSelection,
+    setCurrentAlternativeSelection: state.setCurrentAlternativeSelection,
+    previewAlternativeIndex: state.previewAlternativeIndex,
+    currentSelectionIndex: state.currentSelectionIndex,
+  }))
+);
 
   const handlePreviewChange = useCallback(
     (params: AlternativeSelectionBaseParams) => {
@@ -37,7 +47,7 @@ export const ManagementBar = () => {
     [setCurrentAlternativeSelection]
   );
 
-  return isReady ? (
+  return areStoresReady ? (
     <AlternativesManager
       key={previewAlternativeIndex}
       currentSelectionIndex={currentSelectionIndex}

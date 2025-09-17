@@ -215,7 +215,7 @@ export function Calendar({
               <ConditionalWrapper
                 doWrap={!!holidayName}
                 wrapper={(children) => (
-                  <TooltipProvider delayDuration={100}>
+                  <TooltipProvider delayDuration={200}>
                     <Tooltip>
                       <TooltipTrigger asChild>{children}</TooltipTrigger>
                       <TooltipContent>{holidayName}</TooltipContent>

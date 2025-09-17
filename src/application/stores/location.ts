@@ -6,9 +6,9 @@ import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
-import type { GetRegionParams } from './types';
+import { GetRegionParams } from './types';
 
-interface LocationState {
+export interface LocationState {
   countries: CountryDTO[];
   countriesLoading: boolean;
   countriesLastFetched: number;
@@ -26,9 +26,7 @@ interface LocationActions {
 
 type LocationStore = LocationState & LocationActions;
 
-const STORE_NAME = 'location-store';
-
-const initialState: LocationState = {
+const locationInitialState: LocationState = {
   countries: [],
   countriesLoading: false,
   countriesLastFetched: 0,
@@ -40,7 +38,7 @@ export const useLocationStore = create<LocationStore>()(
   devtools(
     persist(
       (set, get) => ({
-        ...initialState,
+        ...locationInitialState,
 
         fetchCountries: async (locale: Locale) => {
           const { countriesLastFetched } = get();
@@ -61,9 +59,7 @@ export const useLocationStore = create<LocationStore>()(
             });
           } catch (error) {
             console.warn('Error in fetchCountries:', error);
-            set({
-              countriesLoading: false,
-            });
+            set({ countriesLoading: false });
           }
         },
 
@@ -91,7 +87,6 @@ export const useLocationStore = create<LocationStore>()(
             });
           } catch (error) {
             console.warn('Error in fetchRegions:', error);
-
             set({
               regionsLoading: false,
               regions: [],
@@ -105,7 +100,7 @@ export const useLocationStore = create<LocationStore>()(
         },
       }),
       {
-        name: STORE_NAME,
+        name: 'location-store',
         storage: encryptedStorage,
         partialize: (state) => ({
           countries: state.countries,
@@ -114,8 +109,6 @@ export const useLocationStore = create<LocationStore>()(
         }),
       }
     ),
-    { name: STORE_NAME }
+    { name: 'location-store' }
   )
 );
-
-export const useLocationState = () => useLocationStore((state) => state);

@@ -10,7 +10,7 @@ import { HolidaysTable } from '../holidaysList/HolidaysTable';
 import { PremiumFeature } from '../premium/PremiumFeature';
 
 export const HolidaysList = () => {
-  const { holidays } = useHolidaysStore();
+  const holidays = useHolidaysStore((state) => state.holidays);
   const [activeTab, setActiveTab] = useState<HolidayVariant>(HolidayVariant.NATIONAL);
   const regionalHolidays = holidays.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL);
 

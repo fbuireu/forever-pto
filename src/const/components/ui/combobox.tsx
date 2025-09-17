@@ -9,13 +9,14 @@ import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './command';
 import { hasFlag } from './utils/helpers';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
+import { FilterStrategy } from '@infrastructure/services/calendar/types';
 
 interface ComboboxProps extends Omit<React.HTMLProps<HTMLInputElement>, 'onChange'> {
   searchPlaceholder?: string;
   notFoundText?: string;
   options?: CountryDTO[] | RegionDTO[];
   value?: string;
-  onChange: (value: string) => void;
+  onChange: (value: FilterStrategy) => void;
 }
 
 export const Combobox = ({
@@ -36,7 +37,7 @@ export const Combobox = ({
     const option = options.find((opt) => opt.label === selectedLabel);
     if (option) {
       if (option.value.toLowerCase() !== value.toLowerCase()) {
-        onChange(option.value.toLowerCase());
+        onChange(option.value.toLowerCase() as FilterStrategy);
       }
       setOpen(false);
     }

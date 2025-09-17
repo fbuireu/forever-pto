@@ -2,8 +2,10 @@
 
 import { usePremiumStore } from '@application/stores/premium';
 import { cn } from '@const/lib/utils';
-import { Lock } from 'lucide-react';
+import { InfoIcon, Lock } from 'lucide-react';
+import { useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
+import { useShallow } from 'zustand/react/shallow';
 
 export const enum PremiumFeatureVariant {
   DEFAULT = 'default',
@@ -32,7 +34,16 @@ export const PremiumFeature = ({
   variant = PremiumFeatureVariant.DEFAULT,
   iconSize = 'w-6 h-6',
 }: PremiumFeatureProps) => {
-  const { isPremium, showUpgradeModal } = usePremiumStore();
+  const { isPremium, showUpgradeModal, checkExistingSession } = usePremiumStore(
+    useShallow((state) => ({
+      isPremium: state.isPremium,
+      showUpgradeModal: state.showUpgradeModal,
+      checkExistingSession: state.checkExistingSession,
+    }))
+  );
+  useEffect(() => {
+    checkExistingSession();
+  }, [checkExistingSession]);
 
   if (isPremium) {
     return <>{children}</>;
@@ -65,10 +76,13 @@ export const PremiumFeature = ({
       <div className='blur-sm pointer-events-none'>{children}</div>
       <div className='absolute inset-0 flex items-center justify-center'>
         {description ? (
-          <TooltipProvider delayDuration={0}>
+          <TooltipProvider delayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Lock className={cn(iconSize, 'text-muted-foreground')} />
+                <span className='relative flex items-center'>
+                  <Lock className={cn(iconSize, 'text-muted-foreground')} />
+                  <InfoIcon className='absolute -top-2 -right-2 size-4 text-muted-foreground' />
+                </span>
               </TooltipTrigger>
               <TooltipContent className='w-50 text-pretty'>{description}</TooltipContent>
             </Tooltip>

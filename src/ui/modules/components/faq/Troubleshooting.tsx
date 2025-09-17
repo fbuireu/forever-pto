@@ -4,15 +4,36 @@ import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useLocale } from 'next-intl';
 import { useState, useTransition } from 'react';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { toast } from 'sonner';
+import { Button } from 'src/components/animate-ui/components/buttons/button';
+import { useShallow } from 'zustand/react/shallow';
 import { getTotalMonths } from '../utils/helpers';
 
 export const Troubleshooting = () => {
   const locale = useLocale();
-  const { resetToDefaults: resetHolidaysStore, fetchHolidays } = useHolidaysStore();
-  const { carryOverMonths, country, region, year, allowPastDays, ptoDays, strategy } = useFiltersStore();
-  const { generateSuggestions } = useHolidaysStore();
+  const { carryOverMonths, country, region, year, allowPastDays, ptoDays, strategy } = useFiltersStore(
+    useShallow((state) => ({
+      carryOverMonths: state.carryOverMonths,
+      country: state.country,
+      region: state.region,
+      year: state.year,
+      allowPastDays: state.allowPastDays,
+      ptoDays: state.ptoDays,
+      strategy: state.strategy,
+    }))
+  );
+
+  const {
+    resetToDefaults: resetHolidaysStore,
+    fetchHolidays,
+    generateSuggestions,
+  } = useHolidaysStore(
+    useShallow((state) => ({
+      resetToDefaults: state.resetToDefaults,
+      fetchHolidays: state.fetchHolidays,
+      generateSuggestions: state.generateSuggestions,
+    }))
+  );
   const [cleared, setCleared] = useState(false);
   const [isPending, startTransition] = useTransition();
 

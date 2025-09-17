@@ -44,10 +44,10 @@ export const useStoresReady = () => {
 
   const hasAllStores = STORES.every(({ name }) => name in hydrationStatus);
   const allStoresHydrated = Object.values(hydrationStatus).every(Boolean);
-  const isReady = hasAllStores && allStoresHydrated;
+  const areStoresReady = hasAllStores && allStoresHydrated;
 
   return {
-    isReady,
+    areStoresReady,
     hydrationStatus,
   };
 };
