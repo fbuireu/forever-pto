@@ -1,13 +1,14 @@
 import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
+import { Footer } from '@ui/modules/components/footer/Footer';
 import { CalendarList } from '@ui/modules/components/home/CalendarList';
 import { Faq } from '@ui/modules/components/home/Faq';
+import { HolidaysList } from '@ui/modules/components/home/HolidaysList';
 import { Legend } from '@ui/modules/components/home/Legend';
 import { ManagementBar } from '@ui/modules/components/home/ManagementBar';
 import { StoresInitializer } from '@ui/store/StoresInitializer';
 import type { Locale } from 'next-intl';
 import { cookies } from 'next/headers';
 import { generateMetadata } from './metadata';
-import { HolidaysList } from '@ui/modules/components/home/HolidaysList';
 
 export const runtime = 'edge';
 
@@ -23,13 +24,14 @@ const Home = async ({ params }: HomeProps) => {
   return (
     <AppSidebar locale={locale}>
       <StoresInitializer userCountry={userCountry} />
-      <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4'>
+      <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4 mb-8'>
         <HolidaysList />
         <ManagementBar />
         <CalendarList />
         <Legend />
         <Faq />
       </section>
+      <Footer />
     </AppSidebar>
   );
 };
