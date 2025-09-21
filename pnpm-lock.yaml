@@ -106,7 +106,7 @@ importers:
         version: 7.62.0(react@19.1.1)
       simple-icons:
         specifier: ^15.7.0
-        version: 15.13.0
+        version: 15.16.0
       tailwind-merge:
         specifier: ^3.3.1
         version: 3.3.1
@@ -347,7 +347,7 @@ packages:
 
   '@cloudflare/next-on-pages@1.13.16':
     resolution: {integrity: sha512-52h51WNcfmx3szTdTd+n/xgz4qNxFtjOGG0zwnUAhTg8cjPwSUYmZp0OPRNw2jYG9xHwRS2ttSPAS8tcGkQGsw==}
-    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+    deprecated: 'Please use the OpenNext adapter instead: https://opennext.js.org/cloudflare'
     hasBin: true
     peerDependencies:
       '@cloudflare/workers-types': ^4.20240208.0
@@ -1160,6 +1160,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.30':
     resolution: {integrity: sha512-GQ7Nw5G2lTu/BtHTKfXhKHok2WGetd4XYcVKGx00SjAk8GMwgJM3zr6zORiPGuOE+/vkc90KtTosSSvaCjKb2Q==}
+
+  '@jridgewell/trace-mapping@0.3.31':
+    resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
@@ -3290,8 +3293,8 @@ packages:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
 
-  simple-icons@15.13.0:
-    resolution: {integrity: sha512-Tk3p1Lgmji+8kdUOIvvU3f0loYtWVo/bvO1T82Whpb6BhQ+wM2JR8BaVLQT+TiqqF25DVGrVYXeXrsPo6YDOvg==}
+  simple-icons@15.16.0:
+    resolution: {integrity: sha512-AeyYdQ5BsFe7ONruVRClZ+2921tQIEcHuP9AZdNUR0in1jFeakH0pA9Rkjj0T/RkTH7Icx2jprXxWWY3aaCDJQ==}
     engines: {node: '>=0.12.18'}
 
   simple-swizzle@0.2.2:
@@ -4512,7 +4515,7 @@ snapshots:
   '@jridgewell/source-map@0.3.11':
     dependencies:
       '@jridgewell/gen-mapping': 0.3.13
-      '@jridgewell/trace-mapping': 0.3.30
+      '@jridgewell/trace-mapping': 0.3.31
     optional: true
 
   '@jridgewell/sourcemap-codec@1.5.4': {}
@@ -4528,6 +4531,12 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@jridgewell/trace-mapping@0.3.31':
+    dependencies:
+      '@jridgewell/resolve-uri': 3.1.2
+      '@jridgewell/sourcemap-codec': 1.5.5
+    optional: true
 
   '@jridgewell/trace-mapping@0.3.9':
     dependencies:
@@ -6579,7 +6588,7 @@ snapshots:
 
   signal-exit@4.1.0: {}
 
-  simple-icons@15.13.0: {}
+  simple-icons@15.16.0: {}
 
   simple-swizzle@0.2.2:
     dependencies:
