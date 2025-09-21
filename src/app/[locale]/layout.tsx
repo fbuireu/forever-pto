@@ -1,3 +1,4 @@
+import { Toaster } from '@const/components/ui/sonner';
 import { cn } from '@const/lib/utils';
 import { routing } from '@infrastructure/i18n/routing';
 import { type Locale, NextIntlClientProvider, hasLocale } from 'next-intl';
@@ -6,7 +7,6 @@ import dynamic from 'next/dynamic';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { SidebarProvider } from 'src/components/animate-ui/radix/sidebar';
-import { Toaster } from '@const/components/ui/sonner';
 import '../globals.css';
 
 const geistSans = Geist({

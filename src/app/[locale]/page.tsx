@@ -5,12 +5,11 @@ import { Faq } from '@ui/modules/components/home/Faq';
 import { HolidaysList } from '@ui/modules/components/home/HolidaysList';
 import { Legend } from '@ui/modules/components/home/Legend';
 import { ManagementBar } from '@ui/modules/components/home/ManagementBar';
+import { Summary } from '@ui/modules/components/home/Summary';
 import { StoresInitializer } from '@ui/store/StoresInitializer';
 import type { Locale } from 'next-intl';
 import { cookies } from 'next/headers';
 import { generateMetadata } from './metadata';
-
-export const runtime = 'edge';
 
 interface HomeProps {
   params: Promise<{ locale: Locale }>;
@@ -28,6 +27,7 @@ const Home = async ({ params }: HomeProps) => {
         <HolidaysList />
         <ManagementBar />
         <CalendarList />
+        <Summary />
         <Legend />
         <Faq />
       </section>
