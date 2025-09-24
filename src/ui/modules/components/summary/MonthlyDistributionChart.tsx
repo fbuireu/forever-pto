@@ -5,7 +5,7 @@ import { useLocale } from 'next-intl';
 import { useMemo } from 'react';
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-interface TimelineAreaChartProps {
+interface MonthlyDistributionChartProps {
   monthlyDist: number[];
   year: number;
   carryOverMonths: number;
@@ -16,7 +16,7 @@ interface LegendPayload {
   color: string;
 }
 
-const TimelineAreaLegend = ({ payload }: { payload?: readonly LegendPayload[] }) => (
+const MonthlyDistributionChartLegend = ({ payload }: { payload?: readonly LegendPayload[] }) => (
   <ul className='flex flex-row gap-4 justify-center mt-2'>
     {payload?.map((entry) => (
       <li key={entry.value} className='flex items-center gap-2'>
@@ -51,7 +51,7 @@ const getMonthNames = (locale: string, monthCount: number, startYear: number): s
   return monthNames;
 };
 
-export const TimelineAreaChart = ({ monthlyDist, year, carryOverMonths }: TimelineAreaChartProps) => {
+export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }: MonthlyDistributionChartProps) => {
   const locale = useLocale();
   const { monthNames, timelineData } = useMemo(() => {
     const totalMonths = 12 + carryOverMonths;
@@ -116,7 +116,9 @@ export const TimelineAreaChart = ({ monthlyDist, year, carryOverMonths }: Timeli
               height={20}
               iconType='line'
               wrapperStyle={{ fontSize: '14px' }}
-              content={(props) => <TimelineAreaLegend payload={props.payload as readonly LegendPayload[]} />}
+              content={(props) => (
+                <MonthlyDistributionChartLegend payload={props.payload as readonly LegendPayload[]} />
+              )}
             />
           </AreaChart>
         </ResponsiveContainer>

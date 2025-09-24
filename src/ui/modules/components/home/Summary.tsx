@@ -9,11 +9,21 @@ import { Badge } from '@const/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { Award, BarChart3, Calendar, CalendarDays, Clock, Sparkles, Star, TrendingUp, Zap } from 'lucide-react';
 import { motion } from 'motion/react';
+import dynamic from 'next/dynamic';
 import { useShallow } from 'zustand/react/shallow';
-import { LongBlocksBarChart } from '../summary/LongBlocksBarChart';
-import { PieChartSummary } from '../summary/PieChartSummary';
-import { QuarterBarChart } from '../summary/QuarterBarChart';
-import { TimelineAreaChart } from '../summary/TimelineAreaChart';
+
+const HolidaysDistributionChart = dynamic(() =>
+  import('../summary/HolidaysDistributionChart').then((module) => ({ default: module.HolidaysDistributionChart }))
+);
+const QuarterDistributionChart = dynamic(() =>
+  import('../summary/QuarterDistributionChart').then((module) => ({ default: module.QuarterDistributionChart }))
+);
+const LongBlockPerQuarterChart = dynamic(() =>
+  import('../summary/BlocksPerQuarterChart').then((module) => ({ default: module.BlocksPerQuarterChart }))
+);
+const MonthlyDistributionChart = dynamic(() =>
+  import('../summary/MonthlyDistributionChart').then((module) => ({ default: module.MonthlyDistributionChart }))
+);
 
 export const Summary = () => {
   const { ptoDays, country, region, strategy, year, carryOverMonths } = useFiltersStore(
@@ -135,12 +145,16 @@ export const Summary = () => {
 
         <CardContent className='space-y-6'>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-            <PieChartSummary ptoDays={ptoDays} holidays={holidays || []} bonusDays={metrics.bonusDays} />
-            <QuarterBarChart quarterDist={metrics.quarterDist} />
+            <HolidaysDistributionChart ptoDays={ptoDays} holidays={holidays} />
+            <QuarterDistributionChart quarterDist={metrics.quarterDist} />
           </div>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-            <LongBlocksBarChart longBlocksPerQuarter={metrics.longBlocksPerQuarter} />
-            <TimelineAreaChart monthlyDist={metrics.monthlyDist} year={Number(year)} carryOverMonths={carryOverMonths} />
+            <LongBlockPerQuarterChart blocksPerQuarter={metrics.longBlocksPerQuarter} />
+            <MonthlyDistributionChart
+              monthlyDist={metrics.monthlyDist}
+              year={Number(year)}
+              carryOverMonths={carryOverMonths}
+            />
           </div>
           <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
             <div className='flex flex-col items-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg'>

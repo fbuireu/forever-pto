@@ -3,7 +3,7 @@ import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers
 import { BarChart3 } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, Cell, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-interface QuarterBarChartProps {
+interface QuarterDistributionChartChartProps {
   quarterDist: number[];
 }
 
@@ -14,7 +14,7 @@ interface LegendPayload {
   color: string;
 }
 
-const QuarterBarLegend = ({ payload }: { payload?: readonly LegendPayload[] }) => (
+const QuarterDistributionChartLegend = ({ payload }: { payload?: readonly LegendPayload[] }) => (
   <ul className='flex flex-row gap-4 justify-center mt-2'>
     {payload?.map((entry) => (
       <li key={entry.value} className='flex items-center gap-2'>
@@ -34,7 +34,7 @@ const QuarterBarLegend = ({ payload }: { payload?: readonly LegendPayload[] }) =
   </ul>
 );
 
-export const QuarterBarChart = ({ quarterDist }: QuarterBarChartProps) => {
+export const QuarterDistributionChart = ({ quarterDist }: QuarterDistributionChartChartProps) => {
   const quarterData = quarterDist.map((value, index) => ({
     name: `Q${index + 1}`,
     días: value,
@@ -84,7 +84,7 @@ export const QuarterBarChart = ({ quarterDist }: QuarterBarChartProps) => {
               height={20}
               iconType='rect'
               wrapperStyle={{ fontSize: '14px' }}
-              content={(props) => <QuarterBarLegend payload={props.payload as readonly LegendPayload[]} />}
+              content={(props) => <QuarterDistributionChartLegend payload={props.payload as readonly LegendPayload[]} />}
             />
           </BarChart>
         </ResponsiveContainer>

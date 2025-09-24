@@ -1,17 +1,12 @@
+import { HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@const/components/ui/card';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers';
 import { PieChart } from 'lucide-react';
 import { Cell, Legend, Pie, PieChart as RechartsPieChart, ResponsiveContainer, Tooltip } from 'recharts';
-import { HolidayVariant } from '@application/dto/holiday/types';
 
-interface Holiday {
-  variant: HolidayVariant;
-}
-
-interface PieChartSummaryProps {
+interface HolidaysDistributionChartProps {
   ptoDays: number;
-  holidays: Holiday[];
-  bonusDays: number;
+  holidays: HolidayDTO[];
 }
 
 interface LegendPayload {
@@ -19,7 +14,7 @@ interface LegendPayload {
   color: string;
 }
 
-const PieChartLegend = ({ payload }: { payload?: readonly LegendPayload[] }) => (
+const HolidaysDistributionChartLegend = ({ payload }: { payload?: readonly LegendPayload[] }) => (
   <ul className='flex flex-row gap-4 justify-center mt-2'>
     {payload?.map((entry) => (
       <li key={entry.value} className='flex items-center gap-2'>
@@ -39,7 +34,7 @@ const PieChartLegend = ({ payload }: { payload?: readonly LegendPayload[] }) => 
   </ul>
 );
 
-export const PieChartSummary = ({ ptoDays, holidays, bonusDays }: PieChartSummaryProps) => {
+export const HolidaysDistributionChart = ({ ptoDays, holidays }: HolidaysDistributionChartProps) => {
   const nationalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.NATIONAL).length ?? 0;
   const regionalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL).length ?? 0;
   const customDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.CUSTOM).length ?? 0;
@@ -97,7 +92,9 @@ export const PieChartSummary = ({ ptoDays, holidays, bonusDays }: PieChartSummar
               height={36}
               iconType='circle'
               wrapperStyle={{ fontSize: '14px' }}
-              content={(props) => <PieChartLegend payload={props.payload as readonly LegendPayload[]} />}
+              content={(props) => (
+                <HolidaysDistributionChartLegend payload={props.payload as readonly LegendPayload[]} />
+              )}
             />
           </RechartsPieChart>
         </ResponsiveContainer>

@@ -19,7 +19,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/compone
 import { HolidayRow } from './components/HolidayRow';
 import { HolidayTableHeader } from './components/HolidayTableHeader';
 import { usePremiumStore } from '@application/stores/premium';
-import { useShallow } from 'zustand/react/shallow';
 import { useHolidaysStore } from '@application/stores/holidays';
 
 interface HolidaysTableProps {

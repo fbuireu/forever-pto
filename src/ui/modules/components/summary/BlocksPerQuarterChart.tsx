@@ -3,8 +3,8 @@ import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers
 import { Calendar } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, Cell, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-interface LongBlocksBarChartProps {
-  longBlocksPerQuarter: number[];
+interface BlockPerQuarterChartProps {
+  blocksPerQuarter: number[];
 }
 
 const QUARTER_COLORS = ['#06b6d4', '#8b5cf6', '#f97316', '#84cc16'];
@@ -14,7 +14,7 @@ interface LegendPayload {
   color: string;
 }
 
-const LongBlocksBarLegend = ({ payload }: { payload?: readonly LegendPayload[] }) => (
+const BlocksPerQuarterChartLegend = ({ payload }: { payload?: readonly LegendPayload[] }) => (
   <ul className='flex flex-row gap-4 justify-center mt-2'>
     {payload?.map((entry) => (
       <li key={entry.value} className='flex items-center gap-2'>
@@ -34,17 +34,17 @@ const LongBlocksBarLegend = ({ payload }: { payload?: readonly LegendPayload[] }
   </ul>
 );
 
-export const LongBlocksBarChart = ({ longBlocksPerQuarter }: LongBlocksBarChartProps) => {
-  const longBlocksData = longBlocksPerQuarter.map((value, index) => ({
+export const BlocksPerQuarterChart = ({ blocksPerQuarter }: BlockPerQuarterChartProps) => {
+  const longBlocksData = blocksPerQuarter.map((value, index) => ({
     name: `Q${index + 1}`,
     bloques: value,
     color: QUARTER_COLORS[index],
   }));
 
-  const totalBlocks = longBlocksPerQuarter.reduce((sum, blocks) => sum + blocks, 0);
-  const bestQuarterIndex = longBlocksPerQuarter.indexOf(Math.max(...longBlocksPerQuarter));
+  const totalBlocks = blocksPerQuarter.reduce((sum, blocks) => sum + blocks, 0);
+  const bestQuarterIndex = blocksPerQuarter.indexOf(Math.max(...blocksPerQuarter));
   const bestQuarter = bestQuarterIndex + 1;
-  const maxBlocks = Math.max(...longBlocksPerQuarter);
+  const maxBlocks = Math.max(...blocksPerQuarter);
 
   const description = `${totalBlocks} bloques largos (3+ días consecutivos) ideales para vacaciones${totalBlocks > 0 ? `. Mejor trimestre: Q${bestQuarter} con ${maxBlocks} bloque${maxBlocks !== 1 ? 's' : ''}` : ''}.`;
 
@@ -86,7 +86,9 @@ export const LongBlocksBarChart = ({ longBlocksPerQuarter }: LongBlocksBarChartP
               height={20}
               iconType='rect'
               wrapperStyle={{ fontSize: '14px' }}
-              content={(props) => <LongBlocksBarLegend payload={props.payload as readonly LegendPayload[]} />}
+              content={(props) => (
+                <BlocksPerQuarterChartLegend payload={props.payload as readonly LegendPayload[]} />
+              )}
             />
           </BarChart>
         </ResponsiveContainer>

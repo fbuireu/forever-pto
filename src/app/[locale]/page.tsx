@@ -2,7 +2,6 @@ import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { Footer } from '@ui/modules/components/footer/Footer';
 import { CalendarList } from '@ui/modules/components/home/CalendarList';
 import { Faq } from '@ui/modules/components/home/Faq';
-import { HolidaysList } from '@ui/modules/components/home/HolidaysList';
 import { Legend } from '@ui/modules/components/home/Legend';
 import { ManagementBar } from '@ui/modules/components/home/ManagementBar';
 import { Summary } from '@ui/modules/components/home/Summary';
@@ -24,7 +23,6 @@ const Home = async ({ params }: HomeProps) => {
     <AppSidebar locale={locale}>
       <StoresInitializer userCountry={userCountry} />
       <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4 mb-8'>
-        <HolidaysList />
         <ManagementBar />
         <CalendarList />
         <Legend />
@@ -45,4 +43,4 @@ export { generateMetadata };
 // todo: footer
 // todo: add limit selector for alternatives (from 1 to 5)
 // todo: add animate icons (https://animate-ui.com/docs/icons)
-// todo: summary> add meaningful text, add skeleton, refine style
+// todo: summary> add meaningful text, add skeleton, refine style, (move state to components)
