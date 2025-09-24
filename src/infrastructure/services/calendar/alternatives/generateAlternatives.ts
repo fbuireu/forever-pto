@@ -5,6 +5,8 @@ import type { Bridge, Suggestion } from '../types';
 import { FilterStrategy } from '../types';
 import { getCombinationKey } from '../utils/cache';
 import { findBridges, getAvailableWorkdays } from '../utils/helpers';
+import { generateMetrics } from '../metrics/generateMetrics';
+import { Locale } from 'next-intl';
 
 export interface GenerateAlternativesParams {
   year: number;
@@ -15,6 +17,7 @@ export interface GenerateAlternativesParams {
   maxAlternatives: number;
   existingSuggestion: Date[];
   strategy: FilterStrategy;
+  locale: Locale;
 }
 
 export function generateAlternatives(params: GenerateAlternativesParams): Suggestion[] {
@@ -70,8 +73,6 @@ export function generateAlternatives(params: GenerateAlternativesParams): Sugges
     if (selection.days.length > 0) {
       const alternative: Suggestion = {
         days: selection.days.toSorted((a, b) => a.getTime() - b.getTime()),
-        totalEffectiveDays: selection.totalEffectiveDays,
-        efficiency: selection.days.length > 0 ? selection.totalEffectiveDays / selection.days.length : 0,
         bridges: selection.bridges,
         strategy,
       };
@@ -84,5 +85,10 @@ export function generateAlternatives(params: GenerateAlternativesParams): Sugges
     }
   }
 
-  return alternatives.sort((a, b) => b.totalEffectiveDays - a.totalEffectiveDays).slice(0, maxAlternatives);
+  return alternatives.map((alt) => ({
+    days: alt.days.toSorted((a, b) => a.getTime() - b.getTime()),
+    bridges: alt.bridges,
+      strategy: alt.strategy,
+    metrics: generateMetrics({ suggestion: alt, locale: params.locale, bridges: alt.bridges }),
+  }));
 }

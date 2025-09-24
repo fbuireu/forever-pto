@@ -1,0 +1,94 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@const/components/ui/card';
+import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers';
+import { BarChart3 } from 'lucide-react';
+import { Bar, BarChart, CartesianGrid, Cell, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+
+interface QuarterBarChartProps {
+  quarterDist: number[];
+}
+
+const QUARTER_COLORS = ['#06b6d4', '#8b5cf6', '#f97316', '#84cc16'];
+
+interface LegendPayload {
+  value: string;
+  color: string;
+}
+
+const QuarterBarLegend = ({ payload }: { payload?: readonly LegendPayload[] }) => (
+  <ul className='flex flex-row gap-4 justify-center mt-2'>
+    {payload?.map((entry) => (
+      <li key={entry.value} className='flex items-center gap-2'>
+        <span
+          className='inline-block w-3 h-3 rounded-sm'
+          style={{
+            backgroundColor:
+              typeof entry.value === 'string' &&
+              MODIFIERS_CLASS_NAMES[entry.value as keyof typeof MODIFIERS_CLASS_NAMES]
+                ? MODIFIERS_CLASS_NAMES[entry.value as keyof typeof MODIFIERS_CLASS_NAMES]
+                : entry.color,
+          }}
+        />
+        <span className='text-sm text-gray-800 dark:text-gray-200'>{entry.value}</span>
+      </li>
+    ))}
+  </ul>
+);
+
+export const QuarterBarChart = ({ quarterDist }: QuarterBarChartProps) => {
+  const quarterData = quarterDist.map((value, index) => ({
+    name: `Q${index + 1}`,
+    días: value,
+    color: QUARTER_COLORS[index],
+  }));
+
+  const totalDays = quarterDist.reduce((sum, days) => sum + days, 0);
+  const activeQuarters = quarterDist.filter((days) => days > 0).length;
+  const description = `Distribución de ${totalDays} días libres efectivos a lo largo de ${activeQuarters} trimestre${activeQuarters !== 1 ? 's' : ''} del año.`;
+
+  return (
+    <Card className='shadow-md'>
+      <CardHeader className='pb-3'>
+        <CardTitle className='flex items-center gap-2 text-base'>
+          <BarChart3 className='w-5 h-5 text-blue-500' />
+          Distribución por Trimestre
+        </CardTitle>
+        <div className='text-xs text-muted-foreground mt-1'>{description}</div>
+      </CardHeader>
+      <CardContent className='h-64'>
+        <ResponsiveContainer width='100%' height='100%'>
+          <BarChart data={quarterData} margin={{ top: 20, right: 20, left: 10, bottom: 30 }}>
+            <CartesianGrid strokeDasharray='3 3' stroke='#d1d5db' opacity={0.8} />
+
+            <XAxis dataKey='name' axisLine={false} tickLine={false} fontSize={14} />
+            <YAxis axisLine={false} tickLine={false} fontSize={14} allowDecimals={false} />
+            <Bar dataKey='días' radius={[6, 6, 0, 0]} maxBarSize={60}>
+              {quarterData.map((entry) => (
+                <Cell key={entry.name} fill={MODIFIERS_CLASS_NAMES[entry.name] || entry.color} />
+              ))}
+            </Bar>
+            <Tooltip
+              formatter={(value) => [`${value} días`, 'Días libres']}
+              contentStyle={{
+                backgroundColor: 'white',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                fontSize: '14px',
+                color: '#222',
+                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+              }}
+              cursor={{ fill: 'rgba(0, 0, 0, 0.5)' }}
+              labelStyle={{ color: '#222' }}
+            />
+            <Legend
+              verticalAlign='bottom'
+              height={20}
+              iconType='rect'
+              wrapperStyle={{ fontSize: '14px' }}
+              content={(props) => <QuarterBarLegend payload={props.payload as readonly LegendPayload[]} />}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+};

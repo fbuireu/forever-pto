@@ -85,11 +85,13 @@ export const AlternativesManager = ({
   }
 
   const ptoDays = currentSuggestion.days.length;
-  const effectiveDays = currentSuggestion.totalEffectiveDays;
-  const efficiency = effectiveDays / ptoDays;
-  const gainedDays = effectiveDays - ptoDays;
+  const effectiveDays = currentSuggestion.metrics?.totalEffectiveDays;
+  const efficiency = (effectiveDays ?? 0) / ptoDays;
+  const gainedDays = (effectiveDays ?? 0) - ptoDays;
 
-  const mainEfficiency = allSuggestions[0].totalEffectiveDays / allSuggestions[0].days.length;
+  const mainEfficiency =
+    (allSuggestions[0]?.metrics?.totalEffectiveDays ?? 0) /
+    (allSuggestions[0]?.days?.length ?? 1);
   const efficiencyDiff = efficiency - mainEfficiency;
   const isMainSuggestion = currentIndex === 0;
 
@@ -160,7 +162,7 @@ export const AlternativesManager = ({
           <div className='flex items-center gap-1'>
             <SlidingNumber
               className='text-sm font-semibold text-green-700 dark:text-green-300'
-              number={effectiveDays}
+              number={effectiveDays ?? 0}
             />
             <span className='text-xs text-green-600 dark:text-green-400 flex'>
               (+

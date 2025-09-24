@@ -61,6 +61,7 @@ export const CalendarList = () => {
         allowPastDays,
         months,
         strategy,
+        locale
       });
     }
   }, [generateSuggestions, year, ptoDays, allowPastDays, holidays, months, strategy]);

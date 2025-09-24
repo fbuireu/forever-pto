@@ -50,6 +50,7 @@ export const Troubleshooting = () => {
           allowPastDays,
           months: getTotalMonths({ carryOverMonths, year }),
           strategy,
+          locale
         });
 
         setCleared(true);

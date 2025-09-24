@@ -1,0 +1,107 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@const/components/ui/card';
+import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers';
+import { PieChart } from 'lucide-react';
+import { Cell, Legend, Pie, PieChart as RechartsPieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import { HolidayVariant } from '@application/dto/holiday/types';
+
+interface Holiday {
+  variant: HolidayVariant;
+}
+
+interface PieChartSummaryProps {
+  ptoDays: number;
+  holidays: Holiday[];
+  bonusDays: number;
+}
+
+interface LegendPayload {
+  value: string;
+  color: string;
+}
+
+const PieChartLegend = ({ payload }: { payload?: readonly LegendPayload[] }) => (
+  <ul className='flex flex-row gap-4 justify-center mt-2'>
+    {payload?.map((entry) => (
+      <li key={entry.value} className='flex items-center gap-2'>
+        <span
+          className='inline-block w-3 h-3 rounded-sm'
+          style={{
+            backgroundColor:
+              typeof entry.value === 'string' &&
+              MODIFIERS_CLASS_NAMES[entry.value as keyof typeof MODIFIERS_CLASS_NAMES]
+                ? MODIFIERS_CLASS_NAMES[entry.value as keyof typeof MODIFIERS_CLASS_NAMES]
+                : entry.color,
+          }}
+        />
+        <span className='text-sm text-gray-800 dark:text-gray-200'>{entry.value}</span>
+      </li>
+    ))}
+  </ul>
+);
+
+export const PieChartSummary = ({ ptoDays, holidays, bonusDays }: PieChartSummaryProps) => {
+  const nationalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.NATIONAL).length ?? 0;
+  const regionalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL).length ?? 0;
+  const customDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.CUSTOM).length ?? 0;
+
+  const pieData = [
+    { name: 'PTO', value: ptoDays, color: '#3b82f6' },
+    { name: 'Nacionales', value: nationalDays, color: '#10b981' },
+    { name: 'Regionales', value: regionalDays, color: '#8b5cf6' },
+    { name: 'Personalizados', value: customDays, color: '#f59e0b' },
+  ].filter((item) => item.value > 0);
+
+  const description = `Distribución de tus ${ptoDays} días PTO, ${nationalDays} festivos nacionales${regionalDays > 0 ? `, ${regionalDays} regionales` : ''}${customDays > 0 ? ` y ${customDays} personalizados` : ''}.`;
+
+  return (
+    <Card className='shadow-md'>
+      <CardHeader className='pb-3'>
+        <CardTitle className='flex items-center gap-2 text-base'>
+          <PieChart className='w-5 h-5 text-purple-500' />
+          Composición de Días Libres
+        </CardTitle>
+        <div className='text-xs text-muted-foreground mt-1'>{description}</div>
+      </CardHeader>
+      <CardContent className='h-64'>
+        <ResponsiveContainer width='100%' height='100%'>
+          <RechartsPieChart>
+            <Pie
+              data={pieData}
+              dataKey='value'
+              nameKey='name'
+              cx='50%'
+              cy='50%'
+              innerRadius={35}
+              outerRadius={85}
+              paddingAngle={2}
+            >
+              {pieData.map((entry) => (
+                <Cell key={entry.name} fill={MODIFIERS_CLASS_NAMES[entry.name] || entry.color} />
+              ))}
+            </Pie>
+            <Tooltip
+              formatter={(value, name) => [`${value} días`, name]}
+              contentStyle={{
+                backgroundColor: 'white',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                fontSize: '14px',
+                color: '#222',
+                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+              }}
+              cursor={{ fill: 'rgba(0, 0, 0, 0.5)' }}
+              labelStyle={{ color: '#222' }}
+            />
+            <Legend
+              verticalAlign='bottom'
+              height={36}
+              iconType='circle'
+              wrapperStyle={{ fontSize: '14px' }}
+              content={(props) => <PieChartLegend payload={props.payload as readonly LegendPayload[]} />}
+            />
+          </RechartsPieChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+};

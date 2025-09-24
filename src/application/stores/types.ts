@@ -8,7 +8,8 @@ export interface GenerateSuggestionsParams {
   ptoDays: number;
   allowPastDays: boolean;
   months: Date[];
-  strategy: FilterStrategy;
+    strategy: FilterStrategy;
+    locale: Locale,
 }
 
 export interface GenerateAlternativesParams extends GenerateSuggestionsParams {

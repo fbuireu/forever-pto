@@ -16,6 +16,7 @@ import type {
   GenerateAlternativesParams,
   GenerateSuggestionsParams,
 } from './types';
+import { generateMetrics } from '@infrastructure/services/calendar/metrics/generateMetrics';
 
 export interface HolidaysState {
   holidays: HolidayDTO[];
@@ -120,7 +121,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               existingSuggestion: suggestion.days,
               strategy,
             });
-
+              
             set({
               suggestion,
               alternatives,

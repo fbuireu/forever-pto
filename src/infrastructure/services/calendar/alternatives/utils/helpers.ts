@@ -50,8 +50,6 @@ function generateGreedyAlternatives(
       if (!usedCombinations.has(combinationKey)) {
         results.push({
           days: days.toSorted((a, b) => a.getTime() - b.getTime()),
-          totalEffectiveDays: totalEffective,
-          efficiency,
           bridges: selected,
         });
         usedCombinations.add(combinationKey);
@@ -87,10 +85,10 @@ export function findAlternativeCombinations({
 
   return alternatives
     .toSorted((a, b) => {
-      const effDiff = (b.efficiency ?? 0) - (a.efficiency ?? 0);
+      const effDiff = (b.metrics?.efficiency ?? 0) - (a.metrics?.efficiency ?? 0);
       return Math.abs(effDiff) > EFFICIENCY_COMPARISON_THRESHOLD
         ? effDiff
-        : b.totalEffectiveDays - a.totalEffectiveDays;
+        : (b.metrics?.totalEffectiveDays ?? 0) - (a.metrics?.totalEffectiveDays ?? 0);
     })
     .slice(0, maxAlternatives);
 }

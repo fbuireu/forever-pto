@@ -27,8 +27,8 @@ const Home = async ({ params }: HomeProps) => {
         <HolidaysList />
         <ManagementBar />
         <CalendarList />
-        <Summary />
         <Legend />
+        <Summary />
         <Faq />
       </section>
       <Footer />
@@ -45,3 +45,4 @@ export { generateMetadata };
 // todo: footer
 // todo: add limit selector for alternatives (from 1 to 5)
 // todo: add animate icons (https://animate-ui.com/docs/icons)
+// todo: summary> add meaningful text, add skeleton, refine style

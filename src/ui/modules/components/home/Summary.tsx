@@ -7,62 +7,23 @@ import { useLocationStore } from '@application/stores/location';
 import { usePremiumStore } from '@application/stores/premium';
 import { Badge } from '@const/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
-import { Award, BarChart3, Calendar, CalendarDays, Sparkles, Star, TrendingUp, Zap } from 'lucide-react';
+import { Award, BarChart3, Calendar, CalendarDays, Clock, Sparkles, Star, TrendingUp, Zap } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-
-// Simple utility functions for useful metrics
-const calculateLongWeekends = (dates: Date[]) => {
-  if (!dates || dates.length === 0) return 0;
-
-  const sortedDates = [...dates].sort((a, b) => a.getTime() - b.getTime());
-  let longWeekends = 0;
-
-  for (let i = 0; i < sortedDates.length; i++) {
-    const date = sortedDates[i];
-    const dayOfWeek = date.getDay();
-
-    // Count Friday or Monday as potential long weekend
-    if (dayOfWeek === 1 || dayOfWeek === 5) {
-      longWeekends++;
-    }
-  }
-
-  return longWeekends;
-};
-
-const calculateQuarterDistribution = (dates: Date[]) => {
-  const quarters = [0, 0, 0, 0]; // Q1, Q2, Q3, Q4
-
-  dates?.forEach((date) => {
-    const month = date.getMonth();
-    const quarter = Math.floor(month / 3);
-    quarters[quarter]++;
-  });
-
-  return quarters;
-};
-
-const getSeasonBalance = (quarters: number[]) => {
-  const total = quarters.reduce((sum, q) => sum + q, 0);
-  if (total === 0) return 'Sin datos';
-
-  const max = Math.max(...quarters);
-  const min = Math.min(...quarters);
-  const isBalanced = max - min <= 1;
-
-  return isBalanced ? 'Equilibrado' : 'Desbalanceado';
-};
+import { LongBlocksBarChart } from '../summary/LongBlocksBarChart';
+import { PieChartSummary } from '../summary/PieChartSummary';
+import { QuarterBarChart } from '../summary/QuarterBarChart';
+import { TimelineAreaChart } from '../summary/TimelineAreaChart';
 
 export const Summary = () => {
-  const { ptoDays, country, region, strategy, year } = useFiltersStore(
+  const { ptoDays, country, region, strategy, year, carryOverMonths } = useFiltersStore(
     useShallow((state) => ({
       ptoDays: state.ptoDays,
       country: state.country,
       region: state.region,
       strategy: state.strategy,
       year: state.year,
+      carryOverMonths: state.carryOverMonths || 0,
     }))
   );
 
@@ -88,57 +49,36 @@ export const Summary = () => {
     }))
   );
 
-  // Simple but useful metrics
-  const metrics = useMemo(() => {
-    const activeSuggestion = currentSelection || suggestion;
-    if (!activeSuggestion?.days) return null;
+  const activeSuggestion = currentSelection || suggestion;
 
-    const longWeekends = calculateLongWeekends(activeSuggestion.days);
-    const quarterDist = calculateQuarterDistribution(activeSuggestion.days);
-    const seasonBalance = getSeasonBalance(quarterDist);
+  if (!activeSuggestion?.metrics) {
+    return null;
+  }
 
-    // Best alternative available
-    const bestAlternative = alternatives?.find((alt) => alt.totalEffectiveDays > activeSuggestion.totalEffectiveDays);
-    const canImprove = bestAlternative ? bestAlternative.totalEffectiveDays - activeSuggestion.totalEffectiveDays : 0;
-
-    return {
-      longWeekends,
-      seasonBalance,
-      quarterDist,
-      canImprove,
-      hasAlternatives: alternatives && alternatives.length > 0,
-    };
-  }, [currentSelection, suggestion, alternatives]);
-
-  // Basic calculations
-  const effectiveDays = currentSelection?.totalEffectiveDays ?? suggestion?.totalEffectiveDays ?? 0;
+  const { metrics } = activeSuggestion;
+  const effectiveDays = metrics.totalEffectiveDays;
   const increment = effectiveDays - ptoDays;
   const efficiencyPercentage = ptoDays > 0 ? (increment / ptoDays) * 100 : 0;
-
-  // Holiday breakdown
   const regionalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL).length ?? 0;
   const nationalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.NATIONAL).length ?? 0;
   const customDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.CUSTOM).length ?? 0;
   const totalHolidays = nationalDays + regionalDays + customDays;
-
-  // Location info
   const userCountry = countries.find(({ label }) => label.toLowerCase() === country.toLowerCase());
   const userRegion = regions.find(({ label }) => label.toLowerCase() === region?.toLowerCase());
-
-  const strategyNames = {
-    GROUPED: 'Agrupada',
-    DISTRIBUTED: 'Distribuida',
-    MAXIMIZED: 'Maximizada',
-  };
+  const maxAlternative = Math.max(
+    effectiveDays,
+    ...(alternatives?.map((a) => a?.metrics?.totalEffectiveDays).filter((n): n is number => typeof n === 'number') ??
+      [])
+  );
+  const canImprove = Math.max(0, maxAlternative - effectiveDays);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, type: 'spring', stiffness: 80 }}
-      className='w-full max-w-5xl mx-auto space-y-6'
+      className='w-full max-w-6xl mx-auto space-y-6'
     >
-      {/* Main Summary Card */}
       <Card className='shadow-lg border-2 border-primary/30 bg-gradient-to-br from-background via-muted/40 to-background rounded-2xl'>
         <CardHeader className='pb-4'>
           <CardTitle className='flex items-center justify-between'>
@@ -156,7 +96,6 @@ export const Summary = () => {
               </Badge>
             )}
           </CardTitle>
-
           <CardDescription className='text-muted-foreground space-y-2'>
             <div className='flex flex-wrap items-center gap-2'>
               <Badge variant='outline' className='mx-1'>
@@ -172,10 +111,9 @@ export const Summary = () => {
               )}
               <span className='text-xs'>•</span>
               <Badge variant='outline' className='bg-blue-50 dark:bg-blue-900/20'>
-                Estrategia: {strategyNames[strategy] || strategy}
+                Estrategia: {strategy}
               </Badge>
             </div>
-
             <div className='text-sm'>
               Con <span className='font-semibold text-primary'>{ptoDays}</span> días de PTO y{' '}
               <span className='font-semibold text-green-700'>{totalHolidays}</span> festivos disponibles, obtienes{' '}
@@ -196,6 +134,14 @@ export const Summary = () => {
         </CardHeader>
 
         <CardContent className='space-y-6'>
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+            <PieChartSummary ptoDays={ptoDays} holidays={holidays || []} bonusDays={metrics.bonusDays} />
+            <QuarterBarChart quarterDist={metrics.quarterDist} />
+          </div>
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+            <LongBlocksBarChart longBlocksPerQuarter={metrics.longBlocksPerQuarter} />
+            <TimelineAreaChart monthlyDist={metrics.monthlyDist} year={Number(year)} carryOverMonths={carryOverMonths} />
+          </div>
           <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
             <div className='flex flex-col items-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg'>
               <span className='text-xs text-muted-foreground mb-1'>PTO Base</span>
@@ -229,7 +175,6 @@ export const Summary = () => {
                 {increment > 0 ? `+${increment}` : '0'} extra
               </Badge>
             </div>
-
             <div className='flex flex-col items-center p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg'>
               <span className='text-xs text-muted-foreground mb-1'>Eficiencia</span>
               <div className='flex items-center gap-2'>
@@ -243,96 +188,96 @@ export const Summary = () => {
               </Badge>
             </div>
           </div>
-
-          {metrics && (
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-              {/* Long weekends */}
-              <div className='p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg'>
-                <div className='flex items-center gap-2 mb-2'>
-                  <Calendar className='w-4 h-4 text-emerald-500' />
-                  <span className='text-sm font-medium text-emerald-700 dark:text-emerald-300'>
-                    Fines de Semana Largos
-                  </span>
-                </div>
-                <div className='space-y-1'>
-                  <div className='text-2xl font-bold text-emerald-700 dark:text-emerald-300'>
-                    {metrics.longWeekends}
-                  </div>
-                  <div className='text-xs text-muted-foreground'>oportunidades de viaje</div>
-                </div>
-              </div>
-
-              <div className='p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg'>
-                <div className='flex items-center gap-2 mb-2'>
-                  <BarChart3 className='w-4 h-4 text-cyan-500' />
-                  <span className='text-sm font-medium text-cyan-700 dark:text-cyan-300'>Balance Estacional</span>
-                </div>
-                <div className='space-y-1'>
-                  <div className='text-lg font-bold text-cyan-700 dark:text-cyan-300'>{metrics.seasonBalance}</div>
-                  <div className='text-xs text-muted-foreground'>distribución del año</div>
-                </div>
-              </div>
-
-              <div className='p-4 bg-violet-50 dark:bg-violet-900/20 rounded-lg'>
-                <div className='flex items-center gap-2 mb-2'>
-                  <Award className='w-4 h-4 text-violet-500' />
-                  <span className='text-sm font-medium text-violet-700 dark:text-violet-300'>Potencial de Mejora</span>
-                </div>
-                <div className='space-y-1'>
-                  <div className='text-2xl font-bold text-violet-700 dark:text-violet-300'>
-                    {metrics.canImprove > 0 ? `+${metrics.canImprove}` : '✓'}
-                  </div>
-                  <div className='text-xs text-muted-foreground'>
-                    {metrics.canImprove > 0 ? 'días adicionales posibles' : 'optimizado'}
-                  </div>
-                </div>
-              </div>
+          <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3'>
+            <div className='p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg text-center'>
+              <Calendar className='w-4 h-4 text-emerald-500 mx-auto mb-1' />
+              <div className='text-lg font-bold text-emerald-700 dark:text-emerald-300'>{metrics.longWeekends}</div>
+              <div className='text-xs text-muted-foreground'>Fines largos</div>
             </div>
-          )}
 
-          {metrics?.quarterDist && (
-            <div className='p-4 bg-slate-50 dark:bg-slate-900/20 rounded-lg'>
+            <div className='p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg text-center'>
+              <BarChart3 className='w-4 h-4 text-purple-500 mx-auto mb-1' />
+              <div className='text-lg font-bold text-purple-700 dark:text-purple-300'>{metrics.restBlocks}</div>
+              <div className='text-xs text-muted-foreground'>Bloques</div>
+            </div>
+
+            <div className='p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-center'>
+              <TrendingUp className='w-4 h-4 text-amber-500 mx-auto mb-1' />
+              <div className='text-lg font-bold text-amber-700 dark:text-amber-300'>
+                {metrics.averageEfficiency.toFixed(1)}
+              </div>
+              <div className='text-xs text-muted-foreground'>Promedio</div>
+            </div>
+
+            <div className='p-3 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg text-center'>
+              <BarChart3 className='w-4 h-4 text-cyan-500 mx-auto mb-1' />
+              <div className='text-lg font-bold text-cyan-700 dark:text-cyan-300'>{metrics.activeQuarters}</div>
+              <div className='text-xs text-muted-foreground'>Trimestres</div>
+            </div>
+
+            <div className='p-3 bg-violet-50 dark:bg-violet-900/20 rounded-lg text-center'>
+              <Award className='w-4 h-4 text-violet-500 mx-auto mb-1' />
+              <div className='text-lg font-bold text-violet-700 dark:text-violet-300'>
+                {canImprove > 0 ? `+${canImprove}` : '✓'}
+              </div>
+              <div className='text-xs text-muted-foreground'>Potencial</div>
+            </div>
+
+            <div className='p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg text-center'>
+              <Star className='w-4 h-4 text-rose-500 mx-auto mb-1' />
+              <div className='text-lg font-bold text-rose-700 dark:text-rose-300'>+{metrics.bonusDays}</div>
+              <div className='text-xs text-muted-foreground'>Bonus</div>
+            </div>
+          </div>
+          {metrics.firstLastBreak && (
+            <div className='p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg'>
               <div className='flex items-center gap-2 mb-3'>
-                <BarChart3 className='w-4 h-4 text-slate-500' />
-                <span className='text-sm font-medium text-slate-700 dark:text-slate-300'>
-                  Distribución por Trimestre
-                </span>
+                <Clock className='w-4 h-4 text-indigo-500' />
+                <span className='text-sm font-medium text-indigo-700 dark:text-indigo-300'>Resumen del Año</span>
               </div>
-              <div className='grid grid-cols-4 gap-4'>
-                {metrics.quarterDist.map((days, index) => (
-                  <div key={index} className='text-center'>
-                    <div className='text-lg font-bold text-slate-700 dark:text-slate-300'>{days}</div>
-                    <div className='text-xs text-muted-foreground'>Q{index + 1}</div>
-                    <div className='w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mt-1'>
-                      <div
-                        className='bg-slate-500 h-2 rounded-full transition-all duration-300'
-                        style={{ width: `${Math.max(20, (days / Math.max(...metrics.quarterDist)) * 100)}%` }}
-                      />
-                    </div>
+              <div className='grid grid-cols-3 gap-4 text-center'>
+                <div>
+                  <div className='text-sm text-muted-foreground'>Primer descanso</div>
+                  <div className='text-lg font-bold text-indigo-700 dark:text-indigo-300'>
+                    {metrics.firstLastBreak.first}
                   </div>
-                ))}
+                </div>
+                <div>
+                  <div className='text-sm text-muted-foreground'>Max trabajo seguido</div>
+                  <div className='text-lg font-bold text-indigo-700 dark:text-indigo-300'>
+                    {metrics.maxWorkingPeriod}d
+                  </div>
+                </div>
+                <div>
+                  <div className='text-sm text-muted-foreground'>Último descanso</div>
+                  <div className='text-lg font-bold text-indigo-700 dark:text-indigo-300'>
+                    {metrics.firstLastBreak.last}
+                  </div>
+                </div>
+              </div>
+              <div className='mt-3 text-center'>
+                <div className='text-xs text-muted-foreground mb-1'>Días bonus totales</div>
+                <div className='text-2xl font-bold text-indigo-700 dark:text-indigo-300'>+{metrics.bonusDays}</div>
+                <div className='text-xs text-indigo-600 dark:text-indigo-400'>días gratis obtenidos</div>
               </div>
             </div>
           )}
-
-          {metrics?.canImprove > 0 && (
+          {canImprove > 0 && (
             <div className='p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800'>
               <div className='flex items-center gap-2 mb-2'>
                 <Zap className='w-4 h-4 text-orange-500' />
-                <span className='text-sm font-medium text-orange-700 dark:text-orange-300'>💡 Sugerencia</span>
+                <span className='text-sm font-medium text-orange-700 dark:text-orange-300'>Sugerencia</span>
               </div>
               <div className='text-sm text-orange-800 dark:text-orange-200'>
-                Hay alternativas que te darían <strong>{metrics.canImprove} días más</strong>.
+                Hay alternativas que te darían <strong>{canImprove} días más</strong>.
                 {isPremium ? ' Revisa las opciones disponibles.' : ' Considera Premium para más análisis.'}
               </div>
             </div>
           )}
-
-          {/* Custom holidays notice */}
           {customDays > 0 && (
             <div className='p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800'>
               <div className='text-sm text-blue-800 dark:text-blue-200'>
-                <strong>🎯 Días personalizados:</strong> Has añadido {customDays} día{customDays !== 1 ? 's' : ''}
+                <strong>Días personalizados:</strong> Has añadido {customDays} día{customDays !== 1 ? 's' : ''}
                 que optimizan tu planificación.
               </div>
             </div>
