@@ -38,7 +38,7 @@ const DeleteHolidayModal = dynamic(() =>
 );
 
 export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
-const isPremium = usePremiumStore((state) => state.isPremium);
+const premiumKey = usePremiumStore((state) => state.premiumKey);
 const holidays = useHolidaysStore((state) => state.holidays);
   const locale = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
@@ -192,7 +192,7 @@ const holidays = useHolidaysStore((state) => state.holidays);
 
     return (
       <ConditionalWrapper
-        doWrap={!isPremium}
+        doWrap={!premiumKey}
         wrapper={(children) => (
           <PremiumFeature feature='Select All Holidays' variant={PremiumFeatureVariant.STACK} iconSize='h-4 w-4'>
             {children}
@@ -208,7 +208,7 @@ const holidays = useHolidaysStore((state) => state.holidays);
         />
       </ConditionalWrapper>
     );
-  }, [selectionState, toggleSelectAll, isPremium]);
+  }, [selectionState, toggleSelectAll, premiumKey]);
 
   const selectedCount = selectedHolidays.size;
   const shouldShowLocationColumn = variantHolidays.some((h) => h.location);

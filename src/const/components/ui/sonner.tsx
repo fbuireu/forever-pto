@@ -12,7 +12,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
       className='toaster group'
       richColors
       closeButton
-      duration={5000} 
+      position={props.position ?? 'bottom-center'}
+      duration={5000}
       {...props}
     />
   );

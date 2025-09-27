@@ -6,14 +6,14 @@ export const SummarySkeleton = () => {
     <div className='w-full max-w-4xl mx-auto space-y-6'>
       <Card>
         <CardHeader className='pb-4'>
-          <CardTitle className='flex items-center justify-between'>
+          <CardTitle className='flex items-center justify-between text-center'>
             <div className='flex items-center gap-2'>
               <Skeleton className='w-5 h-5 rounded-full' />
               <Skeleton className='h-6 w-40' />
             </div>
           </CardTitle>
           <CardDescription className='space-y-2'>
-            <div className='flex flex-wrap items-center gap-2'>
+            <div className='flex flex-wrap items-center gap-2 justify-center'>
               <Skeleton className='h-5 w-16 rounded-full' />
               <Skeleton className='h-3 w-8' />
               <Skeleton className='h-5 w-20 rounded-full' />

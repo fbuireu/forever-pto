@@ -76,7 +76,7 @@ export const HolidaysDistributionChart = ({ ptoDays, holidays }: HolidaysDistrib
                 cy='50%'
                 innerRadius={35}
                 outerRadius={85}
-                paddingAngle={2}
+                paddingAngle={5}
               >
                 {data.map((entry) => (
                   <Cell key={entry.name} fill={MODIFIERS_CLASS_NAMES[entry.name] || entry.color} />

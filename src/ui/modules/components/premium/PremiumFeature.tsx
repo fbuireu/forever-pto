@@ -36,9 +36,9 @@ export const PremiumFeature = ({
   iconSize = 'w-6 h-6',
   inlineDescription = false,
 }: PremiumFeatureProps) => {
-  const { isPremium, showUpgradeModal, checkExistingSession } = usePremiumStore(
+  const { premiumKey, showUpgradeModal, checkExistingSession } = usePremiumStore(
     useShallow((state) => ({
-      isPremium: state.isPremium,
+      premiumKey: state.premiumKey,
       showUpgradeModal: state.showUpgradeModal,
       checkExistingSession: state.checkExistingSession,
     }))
@@ -47,7 +47,7 @@ export const PremiumFeature = ({
     checkExistingSession();
   }, [checkExistingSession]);
 
-  if (isPremium) {
+  if (premiumKey) {
     return <>{children}</>;
   }
 

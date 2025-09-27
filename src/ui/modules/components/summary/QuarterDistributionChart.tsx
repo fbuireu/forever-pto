@@ -8,30 +8,6 @@ import { COLOR_SCHEMES } from './const';
 interface QuarterDistributionChartChartProps {
   quarterDist: number[];
 }
-interface LegendPayload {
-  value: string;
-  color: string;
-}
-
-const QuarterDistributionChartLegend = ({ payload }: { payload?: readonly LegendPayload[] }) => (
-  <ul className='flex flex-row gap-4 justify-center mt-2'>
-    {payload?.map((entry) => (
-      <li key={entry.value} className='flex items-center gap-2'>
-        <span
-          className='inline-block w-3 h-3 rounded-sm'
-          style={{
-            backgroundColor:
-              typeof entry.value === 'string' &&
-              MODIFIERS_CLASS_NAMES[entry.value as keyof typeof MODIFIERS_CLASS_NAMES]
-                ? MODIFIERS_CLASS_NAMES[entry.value as keyof typeof MODIFIERS_CLASS_NAMES]
-                : entry.color,
-          }}
-        />
-        <span className='text-sm text-gray-800 dark:text-gray-200'>{entry.value}</span>
-      </li>
-    ))}
-  </ul>
-);
 
 export const QuarterDistributionChart = ({ quarterDist }: QuarterDistributionChartChartProps) => {
   const data = quarterDist.map((value, index) => ({
@@ -63,7 +39,6 @@ export const QuarterDistributionChart = ({ quarterDist }: QuarterDistributionCha
           <ResponsiveContainer width='100%' height='100%'>
             <BarChart data={data} margin={{ top: 20, right: 20, left: 10, bottom: 30 }}>
               <CartesianGrid strokeDasharray='3 3' stroke='#d1d5db' opacity={0.8} />
-
               <XAxis dataKey='name' axisLine={false} tickLine={false} fontSize={14} />
               <YAxis axisLine={false} tickLine={false} fontSize={14} allowDecimals={false} />
               <Bar dataKey='días' radius={[6, 6, 0, 0]} maxBarSize={60}>
@@ -83,15 +58,6 @@ export const QuarterDistributionChart = ({ quarterDist }: QuarterDistributionCha
                 }}
                 cursor={{ fill: 'rgba(0, 0, 0, 0.5)' }}
                 labelStyle={{ color: 'var(--primary-foreground)' }}
-              />
-              <Legend
-                verticalAlign='bottom'
-                height={20}
-                iconType='rect'
-                wrapperStyle={{ fontSize: '14px' }}
-                content={(props) => (
-                  <QuarterDistributionChartLegend payload={props.payload as readonly LegendPayload[]} />
-                )}
               />
             </BarChart>
           </ResponsiveContainer>

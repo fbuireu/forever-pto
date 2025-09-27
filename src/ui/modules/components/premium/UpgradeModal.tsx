@@ -1,13 +1,13 @@
 'use client';
 
+import { Button } from '@const/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@const/components/ui/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
 import { Input } from '@const/components/ui/input';
-import { Label } from '@const/components/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Crown, Loader2, Lock } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { z } from 'zod';
 
 interface UpgradeModalProps {
@@ -28,16 +28,13 @@ const emailSchema = z.object({
   email: z.email('Please enter a valid email address').min(1, 'Email is required'),
 });
 
+type EmailFormData = z.infer<typeof emailSchema>;
+
 export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading }: UpgradeModalProps) => {
   const [step, setStep] = useState<Step>(Step.INPUT);
   const [verificationError, setVerificationError] = useState('');
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<z.infer<typeof emailSchema>>({
+  const form = useForm<EmailFormData>({
     resolver: zodResolver(emailSchema),
     defaultValues: {
       email: '',
@@ -45,12 +42,13 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
   });
 
   const handleClose = () => {
-    reset();
+    form.reset();
     setVerificationError('');
     setStep(Step.INPUT);
     onClose();
   };
-  const onSubmit = async (data: z.infer<typeof emailSchema>) => {
+
+  const onSubmit = async (data: EmailFormData) => {
     setVerificationError('');
 
     const success = await onVerifyEmail(data.email);
@@ -94,39 +92,45 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
             </span>
           </DialogDescription>
         </DialogHeader>
-        {step === Step.INPUT && (
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-4' noValidate>
-            <div className='space-y-2'>
-              <Label htmlFor='email'>Enter your premium email</Label>
-              <Input
-                id='email'
-                type='email'
-                placeholder='your@email.com'
-                disabled={isLoading}
-                autoFocus
-                {...register('email')}
-              />
-              {errors.email && <p className='text-sm text-destructive mt-1'>{errors.email.message}</p>}
-              {verificationError && <p className='text-sm text-destructive mt-1'>{verificationError}</p>}
-            </div>
 
-            <div className='flex gap-2'>
-              <Button type='submit' disabled={isLoading} className='flex-1'>
-                {isLoading ? (
-                  <>
-                    <Loader2 className='w-4 h-4 mr-2 animate-spin' />
-                    Verifying...
-                  </>
-                ) : (
-                  'Verify Access'
+        {step === Step.INPUT && (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4' noValidate>
+              <FormField
+                control={form.control}
+                name='email'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Enter your premium email</FormLabel>
+                    <FormControl>
+                      <Input type='email' placeholder='your@email.com' disabled={isLoading} autoFocus {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </Button>
-              <Button type='button' variant='outline' onClick={handleClose} disabled={isLoading}>
-                Cancel
-              </Button>
-            </div>
-          </form>
+              />
+
+              {verificationError && <p className='text-sm text-destructive'>{verificationError}</p>}
+
+              <div className='flex gap-2'>
+                <Button type='submit' disabled={isLoading} className='flex-1'>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                      Verifying...
+                    </>
+                  ) : (
+                    'Verify Access'
+                  )}
+                </Button>
+                <Button type='button' variant='outline' onClick={handleClose} disabled={isLoading}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </Form>
         )}
+
         {step === Step.SUCCESS && (
           <div className='text-center space-y-4 py-4'>
             <Crown className='w-12 h-12 text-yellow-500 mx-auto animate-pulse' />
@@ -136,7 +140,8 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
             </div>
           </div>
         )}
-        {step === 'error' && (
+
+        {step === Step.ERROR && (
           <div className='text-center space-y-4'>
             <AlertCircle className='w-12 h-12 text-destructive mx-auto' />
             <div>

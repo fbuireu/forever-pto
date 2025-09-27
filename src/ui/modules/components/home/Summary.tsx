@@ -56,9 +56,9 @@ export const Summary = () => {
       regions: state.regions,
     }))
   );
-  const { isPremium } = usePremiumStore(
+  const { premiumKey } = usePremiumStore(
     useShallow((state) => ({
-      isPremium: state.isPremium,
+      premiumKey: state.premiumKey,
     }))
   );
 
@@ -97,7 +97,7 @@ export const Summary = () => {
             Resumen de PTO {year} - {Number(year) + 1}
           </CardTitle>
           <CardDescription className='text-muted-foreground space-y-2'>
-            <div className='flex flex-wrap items-center gap-2'>
+            <div className='flex flex-wrap items-center gap-2 justify-center'>
               <Badge variant='outline' className='mx-1'>
                 {userCountry?.label || country}
               </Badge>
@@ -272,7 +272,7 @@ export const Summary = () => {
               icon={Zap}
               title='Sugerencia'
               message={`Hay alternativas que te darían <strong>${canImprove} días más</strong>. ${
-                isPremium ? 'Revisa las opciones disponibles.' : 'Considera Premium para más análisis.'
+                premiumKey ? 'Revisa las opciones disponibles.' : 'Considera Premium para más análisis.'
               }`}
               colorScheme='orange'
             />

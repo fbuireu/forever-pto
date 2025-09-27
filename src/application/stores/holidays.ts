@@ -81,7 +81,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
         },
 
-        generateSuggestions: ({ year, ptoDays, allowPastDays, months, strategy }: GenerateSuggestionsParams) => {
+        generateSuggestions: ({ year, ptoDays, allowPastDays, months, strategy, locale }: GenerateSuggestionsParams) => {
           const { holidays, maxAlternatives } = get();
 
           if (ptoDays <= 0 || holidays.length === 0) {
@@ -108,7 +108,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
               holidays: holidaysDates,
               allowPastDays,
               months,
-              strategy,
+                strategy,
+              locale,
             });
 
             const alternatives = generateAlternatives({
@@ -119,7 +120,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
               months,
               maxAlternatives,
               existingSuggestion: suggestion.days,
-              strategy,
+                strategy,
+              locale,
             });
               
             set({
@@ -150,6 +152,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           months,
           maxAlternatives,
           strategy,
+          locale,
         }: GenerateAlternativesParams) => {
           const { holidays, maxAlternatives: stateMaxAlternatives, suggestion } = get();
           const maxToGenerate = maxAlternatives ?? stateMaxAlternatives;
@@ -174,6 +177,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               maxAlternatives: maxToGenerate,
               existingSuggestion: suggestion.days,
               strategy,
+              locale,
             });
 
             set({ alternatives });

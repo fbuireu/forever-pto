@@ -3,7 +3,7 @@ import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
 
 export interface PremiumState {
-  isPremium: boolean;
+  premiumKey: string | null;
   userEmail: string | null;
   lastVerified: number | null;
   isLoading: boolean;
@@ -12,11 +12,18 @@ export interface PremiumState {
   needsSessionCheck: boolean;
 }
 
+interface SetPremiumStatusParams {
+  email: string;
+  premiumKey: string | null;
+}
+
 interface PremiumActions {
   verifyEmail: (email: string) => Promise<boolean>;
   checkExistingSession: () => Promise<void>;
   showUpgradeModal: (feature: string) => void;
   closeModal: () => void;
+  setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => void;
+  refreshPremiumStatus: () => Promise<void>;
 }
 
 type PremiumStore = PremiumState & PremiumActions;
@@ -24,7 +31,7 @@ type PremiumStore = PremiumState & PremiumActions;
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 
 const premiumInitialState: PremiumState = {
-  isPremium: false,
+  premiumKey: null,
   userEmail: null,
   lastVerified: null,
   isLoading: false,
@@ -43,7 +50,7 @@ export const usePremiumStore = create<PremiumStore>()(
           set({ isLoading: true });
 
           try {
-            const response = await fetch('/api/verify-premium', {
+            const response = await fetch('/api/check-session', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email }),
@@ -51,11 +58,11 @@ export const usePremiumStore = create<PremiumStore>()(
             });
 
             if (response.ok) {
-              const { isPremium } = await response.json();
+              const { premiumKey } = await response.json();
 
-              if (isPremium) {
+              if (premiumKey) {
                 set({
-                  isPremium: true,
+                  premiumKey,
                   userEmail: email,
                   lastVerified: Date.now(),
                   modalOpen: false,
@@ -86,10 +93,10 @@ export const usePremiumStore = create<PremiumStore>()(
             });
 
             if (response.ok) {
-              const { isPremium, email } = await response.json();
+              const { premiumKey, email } = await response.json();
 
               set({
-                isPremium: !!isPremium,
+                premiumKey,
                 userEmail: email ?? null,
                 lastVerified: Date.now(),
                 needsSessionCheck: false,
@@ -108,7 +115,21 @@ export const usePremiumStore = create<PremiumStore>()(
             });
           }
         },
+        setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => {
+          set({
+            premiumKey,
+            userEmail: email,
+            lastVerified: Date.now(),
+            needsSessionCheck: false,
+          });
+        },
 
+        refreshPremiumStatus: async () => {
+          const { userEmail } = get();
+          if (userEmail) {
+            await get().verifyEmail(userEmail);
+          }
+        },
         showUpgradeModal: (feature: string) => {
           set({
             currentFeature: feature,
@@ -127,7 +148,7 @@ export const usePremiumStore = create<PremiumStore>()(
         name: 'premium-store',
         storage: encryptedStorage,
         partialize: (state) => ({
-          isPremium: state.isPremium,
+          premiumKey: state.premiumKey,
           userEmail: state.userEmail,
           lastVerified: state.lastVerified,
         }),
