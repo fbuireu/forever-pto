@@ -61,35 +61,35 @@ export const CalendarList = () => {
         allowPastDays,
         months,
         strategy,
-        locale
+        locale,
       });
     }
   }, [generateSuggestions, year, ptoDays, allowPastDays, holidays, months, strategy]);
 
+  if (!areStoresReady) {
+    return <CalendarListSkeleton />;
+  }
+
   return (
     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5'>
-      {areStoresReady ? (
-        months.map((month) => (
-          <Calendar
-            key={month.toISOString()}
-            mode='multiple'
-            className='rounded-lg border shadow-sm bg-card'
-            month={month}
-            weekStartsOn={1}
-            locale={locale}
-            holidays={holidays}
-            allowPastDays={allowPastDays}
-            currentSelection={currentSelection}
-            alternatives={alternatives}
-            suggestion={suggestion}
-            previewAlternativeIndex={previewAlternativeIndex}
-            showOutsideDays
-            fixedWeeks
-          />
-        ))
-      ) : (
-        <CalendarListSkeleton />
-      )}
+      {months.map((month) => (
+        <Calendar
+          key={month.toISOString()}
+          mode='multiple'
+          className='rounded-lg border shadow-sm bg-card'
+          month={month}
+          weekStartsOn={1}
+          locale={locale}
+          holidays={holidays}
+          allowPastDays={allowPastDays}
+          currentSelection={currentSelection}
+          alternatives={alternatives}
+          suggestion={suggestion}
+          previewAlternativeIndex={previewAlternativeIndex}
+          showOutsideDays
+          fixedWeeks
+        />
+      ))}
     </div>
   );
 };

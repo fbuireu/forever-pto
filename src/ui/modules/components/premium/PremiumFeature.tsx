@@ -24,6 +24,7 @@ interface PremiumFeatureProps {
   description?: string;
   variant?: PremiumFeatureVariant;
   iconSize?: string;
+  inlineDescription?: boolean;
 }
 
 export const PremiumFeature = ({
@@ -33,6 +34,7 @@ export const PremiumFeature = ({
   description,
   variant = PremiumFeatureVariant.DEFAULT,
   iconSize = 'w-6 h-6',
+  inlineDescription = false,
 }: PremiumFeatureProps) => {
   const { isPremium, showUpgradeModal, checkExistingSession } = usePremiumStore(
     useShallow((state) => ({
@@ -75,7 +77,7 @@ export const PremiumFeature = ({
     >
       <div className='blur-sm pointer-events-none'>{children}</div>
       <div className='absolute inset-0 flex items-center justify-center'>
-        {description ? (
+        {description && !inlineDescription ? (
           <TooltipProvider delayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -88,7 +90,10 @@ export const PremiumFeature = ({
             </Tooltip>
           </TooltipProvider>
         ) : (
-          <Lock className={cn(iconSize, 'text-muted-foreground')} />
+          <div className={'flex flex-col items-center gap-2 text-center px-4'}>
+            <Lock className={cn(iconSize, 'text-muted-foreground')} />
+            {inlineDescription && <div className='text-sm text-muted-foreground'>{description}</div>}
+          </div>
         )}
       </div>
     </div>
