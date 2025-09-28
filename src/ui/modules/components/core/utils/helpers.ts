@@ -24,6 +24,10 @@ export const MODIFIERS_CLASS_NAMES: Record<string, string> = {
     'bg-primary text-primary-foreground hover:bg-primary/90 ring-2 ring-primary font-semibold shadow-md transition-[background-color,box-shadow] duration-200',
   today:
     'bg-slate-400 dark:bg-slate-500 hover:bg-slate-500 dark:hover:bg-slate-700 text-white font-semibold shadow-md ring-2 ring-slate-300 dark:ring-slate-400 ring-offset-1 ring-offset-background transition-[background-color,box-shadow] duration-200',
+  inRange: 'bg-primary/20',
+  rangeStart: 'bg-primary text-primary-foreground hover:bg-primary/90 font-semibold rounded-l-md',
+  rangeEnd: 'bg-primary text-primary-foreground hover:bg-primary/90 font-semibold rounded-r-md',
+  previewRange: 'bg-primary/15',
 } as const;
 
 export const getDayClassNames = ({
@@ -50,16 +54,34 @@ export const getDayClassNames = ({
 
   const isTodayActive = modifiers.today?.(date);
 
+  const isInRangeDay = modifiers.inRange?.(date);
+  const isRangeStartDay = modifiers.rangeStart?.(date);
+  const isRangeEndDay = modifiers.rangeEnd?.(date);
+
   if (!disabled && !isSelected) {
     if (isTodayActive) {
       classes.push(MODIFIERS_CLASS_NAMES.today);
     } else {
       Object.entries(modifiers).forEach(([name, modifierFn]) => {
-        if (modifierFn?.(date) && MODIFIERS_CLASS_NAMES[name]) {
+        if (
+          modifierFn?.(date) &&
+          MODIFIERS_CLASS_NAMES[name] &&
+          !['inRange', 'rangeStart', 'rangeEnd'].includes(name)
+        ) {
           classes.push(MODIFIERS_CLASS_NAMES[name]);
         }
       });
     }
+  }
+
+  if (isInRangeDay && !isSelected && !disabled) {
+    classes.push(MODIFIERS_CLASS_NAMES.inRange);
+  }
+  if (isRangeStartDay && !disabled) {
+    classes.push(MODIFIERS_CLASS_NAMES.rangeStart);
+  }
+  if (isRangeEndDay && !disabled) {
+    classes.push(MODIFIERS_CLASS_NAMES.rangeEnd);
   }
 
   if (isSelected && !disabled) {
@@ -78,7 +100,7 @@ export const getDayClassNames = ({
       classes.push('text-muted-foreground opacity-50');
     }
 
-    if (!isSelected && !modifiers.today?.(date)) {
+    if (!isSelected && !modifiers.today?.(date) && !isRangeStartDay && !isRangeEndDay) {
       classes.push('hover:bg-accent hover:text-accent-foreground');
     }
   }
@@ -89,7 +111,7 @@ export const getDayClassNames = ({
 export function getViewBoxFromSvg(svg: string): string {
   const VIEWBOX_REGEX = /viewBox="([^"]*)"/;
   const DEFAULT_VIEWBOX = '0 0 24 24';
-  const viewBoxMatch = svg.match(VIEWBOX_REGEX);
+  const viewBoxMatch = RegExp(VIEWBOX_REGEX).exec(svg);
 
   return viewBoxMatch ? viewBoxMatch[1] : DEFAULT_VIEWBOX;
 }

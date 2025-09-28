@@ -29,6 +29,7 @@ import { PtoSalaryCalculator } from './components/PtoSalaryCalculator';
 import { Regions } from './components/Regions';
 import { Strategy } from './components/Strategy';
 import { ThemeSelector } from './components/ThemeSelector';
+import { WorkdayCounter } from './components/WorkdayCounter';
 import { Years } from './components/Years';
 
 interface AppSidebarProps {
@@ -114,6 +115,10 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
                   </SidebarMenuSub>
                   <SidebarMenuSub>
                     <PtoSalaryCalculator />
+                    <SidebarMenuSubItem />
+                  </SidebarMenuSub>
+                  <SidebarMenuSub>
+                    <WorkdayCounter />
                     <SidebarMenuSubItem />
                   </SidebarMenuSub>
                 </CollapsibleContent>

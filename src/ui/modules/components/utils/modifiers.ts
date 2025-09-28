@@ -58,3 +58,38 @@ export const isCustom = (holidays: HolidayDTO[]) => (date: Date) => {
 };
 
 export const isSelected = (selectedDates: Date[]) => (date: Date) => selectedDates.some((d) => isSameDay(d, date));
+
+export const isInRange =
+  (from?: Date, to?: Date) =>
+  (date: Date): boolean => {
+    if (!from || !to) return false;
+    return date >= from && date <= to;
+  };
+
+export const isRangeStart =
+  (from?: Date) =>
+  (date: Date): boolean => {
+    if (!from) return false;
+    return isSameDay(date, from);
+  };
+
+export const isRangeEnd =
+  (to?: Date) =>
+  (date: Date): boolean => {
+    if (!to) return false;
+    return isSameDay(date, to);
+  };
+
+export const getPreviewRange =
+  (from?: Date, isSelectingTo?: boolean, hoverDate?: Date) =>
+  (date: Date): boolean => {
+    if (!from || !isSelectingTo || !hoverDate) return false;
+
+    const start = from;
+    const end = hoverDate;
+
+    const minDate = start <= end ? start : end;
+    const maxDate = start <= end ? end : start;
+
+    return date >= minDate && date <= maxDate;
+  };

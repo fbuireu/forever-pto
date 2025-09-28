@@ -1,3 +1,4 @@
+// src/components/calendar/Calendar.tsx
 import type { FiltersState } from '@application/stores/filters';
 import type { HolidaysState } from '@application/stores/holidays';
 import { cn } from '@const/lib/utils';
@@ -11,12 +12,16 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/co
 import { formatDate } from '../utils/formatters';
 import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
 import {
-  isAlternative as isAlternativeFn,
+  getPreviewRange,
+  isAlternative,
   isCustom as isCustomFn,
   isHoliday,
-  isPast as isPastFn,
-  isSelected as isSelectedFn,
-  isSuggestion as isSuggestionFn,
+  isInRange,
+  isPast,
+  isRangeEnd,
+  isRangeStart,
+  isSelected,
+  isSuggestion,
   isToday,
 } from '../utils/modifiers';
 import { ConditionalWrapper } from './ConditionalWrapper';
@@ -68,6 +73,21 @@ export function Calendar({
   ...props
 }: Readonly<CalendarProps>) {
   const [currentMonth, setCurrentMonth] = useState(initialMonth ?? new Date());
+  const [hoverDate, setHoverDate] = useState<Date | undefined>();
+  const [rangeSelection, setRangeSelection] = useState<{
+    from?: Date;
+    to?: Date;
+    selecting: 'from' | 'to';
+  }>(() => {
+    if (mode === 'range' && selected && typeof selected === 'object' && 'from' in selected) {
+      return {
+        from: selected.from,
+        to: selected.to,
+        selecting: 'from',
+      };
+    }
+    return { selecting: 'from' };
+  });
 
   const [selectedDates, setSelectedDates] = useState<Date[]>(() => {
     if (mode === 'multiple' && Array.isArray(selected)) {
@@ -76,28 +96,55 @@ export function Calendar({
     if (mode === 'single' && selected instanceof Date) {
       return [selected];
     }
+    if (mode === 'range' && selected && typeof selected === 'object' && 'from' in selected) {
+      return [selected.from, selected.to];
+    }
     return [];
   });
 
   const modifiers = useMemo(() => {
     const holidayFn = isHoliday(holidays);
     const customFn = isCustomFn(holidays);
-    const isPast = isPastFn(allowPastDays);
-    const isSuggestion = isSuggestionFn(currentSelection);
-    const isAlternative = isAlternativeFn({ alternatives, suggestion, previewAlternativeIndex, currentSelection });
-    const isSelected = isSelectedFn(selectedDates);
+    const isPastFn = isPast(allowPastDays);
+    const isSuggestionFn = isSuggestion(currentSelection);
+    const isAlternativeFn = isAlternative({ alternatives, suggestion, previewAlternativeIndex, currentSelection });
+    const isSelectedModifier =
+      mode === 'range'
+        ? (date: Date) => isRangeStart(rangeSelection.from)(date) || isRangeEnd(rangeSelection.to)(date)
+        : isSelected(selectedDates);
 
-    return {
+    const baseModifiers = {
       weekend: isWeekend,
       holiday: holidayFn,
       custom: customFn,
       today: isToday,
-      suggested: isSuggestion,
-      alternative: isAlternative,
-      disabled: isPast,
-      selected: isSelected,
+      suggested: isSuggestionFn,
+      alternative: isAlternativeFn,
+      disabled: isPastFn,
+      selected: isSelectedModifier,
     };
-  }, [holidays, allowPastDays, currentSelection, alternatives, suggestion, previewAlternativeIndex, selectedDates]);
+
+    return mode === 'range'
+      ? {
+          ...baseModifiers,
+          inRange: isInRange(rangeSelection.from, rangeSelection.to),
+          rangeStart: isRangeStart(rangeSelection.from),
+          rangeEnd: isRangeEnd(rangeSelection.to),
+          previewRange: getPreviewRange(rangeSelection.from, rangeSelection.selecting === 'to', hoverDate),
+        }
+      : baseModifiers;
+  }, [
+    holidays,
+    allowPastDays,
+    currentSelection,
+    alternatives,
+    suggestion,
+    previewAlternativeIndex,
+    selectedDates,
+    mode,
+    rangeSelection,
+    hoverDate,
+  ]);
 
   const weekdayNames = useMemo(() => getWeekdayNames({ locale, weekStartsOn }), [locale, weekStartsOn]);
   const monthYearLabel = useMemo(
@@ -139,10 +186,50 @@ export function Calendar({
       } else if (mode === 'single') {
         setSelectedDates([date]);
         onSelect?.(date);
+      } else if (mode === 'range') {
+        if (rangeSelection.selecting === 'from' || !rangeSelection.from) {
+          // Seleccionando fecha de inicio
+          const newRangeSelection = {
+            from: date,
+            to: undefined,
+            selecting: 'to' as const,
+          };
+          setRangeSelection(newRangeSelection);
+          onSelect?.(undefined); // Range incompleto
+        } else {
+          // Seleccionando fecha de fin
+          const from = rangeSelection.from;
+          const to = date;
+
+          // Asegurar que from <= to
+          const orderedRange: FromTo = from <= to ? { from, to } : { from: to, to: from };
+
+          const newRangeSelection = {
+            from: orderedRange.from,
+            to: orderedRange.to,
+            selecting: 'from' as const,
+          };
+
+          setRangeSelection(newRangeSelection);
+          onSelect?.(orderedRange);
+        }
       }
     },
-    [disabled, mode, selectedDates, onSelect]
+    [disabled, mode, selectedDates, onSelect, rangeSelection]
   );
+
+  const handleDayHover = useCallback(
+    (date: Date) => {
+      if (mode === 'range' && rangeSelection.selecting === 'to' && rangeSelection.from) {
+        setHoverDate(date);
+      }
+    },
+    [mode, rangeSelection]
+  );
+
+  const handleDayLeave = useCallback(() => {
+    setHoverDate(undefined);
+  }, []);
 
   return (
     <div className={cn('calendar-container p-3 w-fit select-none', className)} {...props}>
@@ -201,7 +288,7 @@ export function Calendar({
           const baseClasses = getDayClassNames({
             date,
             month: currentMonth,
-            selectedDates,
+            selectedDates: mode === 'range' ? [] : selectedDates,
             disabled,
             showOutsideDays,
             allowPastDays,
@@ -228,6 +315,8 @@ export function Calendar({
                   className={classes}
                   variant='ghost'
                   onClick={() => handleDayClick(date)}
+                  onMouseEnter={() => handleDayHover(date)}
+                  onMouseLeave={handleDayLeave}
                   disabled={isDisabled}
                 >
                   {formatDate({ date, locale, format: 'd' })}

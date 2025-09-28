@@ -40,20 +40,7 @@ export default Home;
 export { generateMetadata };
 
 // todo: check validation premium
-// todo: add support for intervals selection (add first the selection to edit days)
 // todo: footer
 // todo: add animate icons (https://animate-ui.com/docs/icons)
 // todo: add animate components to summary
-/*
-
-2. Holiday Impact Calculator
-Analiza qué días festivos caen en fines de semana (se "pierden")
-Sugiere mejores fechas para maximizar días libres consecutivos
-Calcula "long weekends" automáticos
-
-3. Workday Counter
-Contador de días laborables entre dos fechas
-Excluye fines de semana y festivos automáticamente
-Útil para calcular duración real de proyectos
-
-*/
+// todo: add tooltip instead of long description in tools

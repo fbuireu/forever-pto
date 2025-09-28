@@ -1,20 +1,20 @@
 'use client';
 
+import { Input } from '@const/components/ui/input';
+import { Separator } from '@const/components/ui/separator';
+import { Skeleton } from '@const/components/ui/skeleton';
+import { useIsMobile } from '@const/hooks/use-mobile';
+import { cn } from '@const/lib/utils';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { PanelLeftIcon } from 'lucide-react';
 import { type Transition } from 'motion/react';
 import { Slot } from 'radix-ui';
 import * as React from 'react';
-import { Input } from '@const/components/ui/input';
-import { Separator } from '@const/components/ui/separator';
-import { Skeleton } from '@const/components/ui/skeleton';
-import { useIsMobile } from '@const/hooks/use-mobile';
-import { cn } from '@const/lib/utils';
+import { Button } from '../components/buttons/button';
 import { MotionHighlight, MotionHighlightItem } from '../effects/motion-highlight';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
-import { Button } from '../components/buttons/button';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -677,7 +677,7 @@ function SidebarMenuSub({ className, ...props }: SidebarMenuSubProps) {
       data-slot='sidebar-menu-sub'
       data-sidebar='menu-sub'
       className={cn(
-        'border-sidebar-border mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l px-2.5 py-0.5',
+        'border-sidebar-border mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l px-2.5 py-1.5',
         'group-data-[collapsible=icon]:hidden',
         className
       )}

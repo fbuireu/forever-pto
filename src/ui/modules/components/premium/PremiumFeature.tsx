@@ -54,7 +54,7 @@ export const PremiumFeature = ({
 
   return (
     <div
-      className={cn('relative m-0 focus:outline-none', getButtonClass(), className)}
+      className={cn('relative m-0 focus:outline-none', getButtonClass(variant), className)}
       role='button'
       tabIndex={0}
       aria-label={description ?? `Unlock premium feature: ${feature}`}
@@ -67,7 +67,7 @@ export const PremiumFeature = ({
       }}
     >
       <div className='blur-sm pointer-events-none'>{children}</div>
-      <div className='absolute inset-0 flex items-center justify-center'>
+      <div className={cn('absolute inset-0 flex items-center', variant === PremiumFeatureVariant.STACK ? 'justify-start -translate-x-1' : 'justify-center')}>
         {description && !inlineDescription ? (
           <TooltipProvider delayDuration={200}>
             <Tooltip>
