@@ -6,6 +6,7 @@ import { InfoIcon, Lock } from 'lucide-react';
 import { useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { useShallow } from 'zustand/react/shallow';
+import { getButtonClass } from './utils/helpers';
 
 export const enum PremiumFeatureVariant {
   DEFAULT = 'default',
@@ -50,16 +51,6 @@ export const PremiumFeature = ({
   if (premiumKey) {
     return <>{children}</>;
   }
-
-  const getButtonClass = () => {
-    switch (variant) {
-      case PremiumFeatureVariant.STACK:
-        return 'p-2 rounded-full cursor-pointer m-0 w-fit';
-      case PremiumFeatureVariant.DEFAULT:
-      default:
-        return 'p-2 w-full rounded-full cursor-pointer backdrop-blur-sm m-0';
-    }
-  };
 
   return (
     <div

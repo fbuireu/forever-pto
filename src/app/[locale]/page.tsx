@@ -41,8 +41,6 @@ export { generateMetadata };
 
 // todo: check validation premium
 // todo: add support for intervals selection (add first the selection to edit days)
-// todo: add summary (move doubts there)
 // todo: footer
-// todo: add limit selector for alternatives (from 1 to 5)
 // todo: add animate icons (https://animate-ui.com/docs/icons)
-// todo: summary> add meaningful text, add skeleton, refine style, block premium features,
+// todo: add animate components to summary

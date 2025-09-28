@@ -1,4 +1,5 @@
-import { loadStripe, Stripe, StripeError } from '@stripe/stripe-js';
+import { loadStripe, type PaymentIntent, Stripe, type StripeError } from '@stripe/stripe-js';
+import StripeNode from 'stripe';
 
 export interface PaymentResult {
   success: boolean;
@@ -41,7 +42,7 @@ export class StripeClient {
       const result = await stripe.confirmPayment({
         clientSecret: params.clientSecret,
         confirmParams: {
-          return_url: params.returnUrl || window.location.href,
+          return_url: params.returnUrl ?? window.location.href,
         },
         redirect: params.alwaysRedirect ? 'always' : undefined,
       });
@@ -62,11 +63,11 @@ export class StripeClient {
     }
   }
 
-  private handlePaymentResult(result: { error: StripeError } | { paymentIntent: any }): PaymentResult {
+  private handlePaymentResult(result: { error: StripeError } | { paymentIntent: PaymentIntent }): PaymentResult {
     if (this.isErrorResult(result)) {
       return {
         success: false,
-        error: result.error.message || 'Payment failed',
+        error: result.error.message ?? 'Payment failed',
       };
     }
 
@@ -81,18 +82,41 @@ export class StripeClient {
 
     return {
       success: false,
-      error: `Payment status: ${paymentIntent?.status || 'unknown'}`,
+      error: `Payment status: ${paymentIntent?.status ?? 'unknown'}`,
     };
   }
 
-  private isErrorResult(result: { error: StripeError } | { paymentIntent: any }): result is { error: StripeError } {
+  private isErrorResult(
+    result: { error: StripeError } | { paymentIntent: PaymentIntent }
+  ): result is { error: StripeError } {
     return 'error' in result;
   }
 
   private handleError(error: unknown): PaymentResult {
+    if (error instanceof StripeNode.errors.StripeCardError) {
+      return {
+        success: false,
+        error: 'Your card was declined. Please try a different payment method.',
+      };
+    }
+
+    if (error instanceof StripeNode.errors.StripeInvalidRequestError) {
+      return {
+        success: false,
+        error: 'Payment request is invalid. Please try again.',
+      };
+    }
+
+    if (error instanceof StripeNode.errors.StripeAuthenticationError) {
+      return {
+        success: false,
+        error: 'Payment service temporarily unavailable. Please try again later.',
+      };
+    }
+
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown payment error',
+      error: 'Payment could not be processed. Please try again.',
     };
   }
 
@@ -104,7 +128,7 @@ export class StripeClient {
     });
 
     if (error) {
-      throw new Error(error.message || 'Checkout redirection failed');
+      throw new Error(error.message ?? 'Checkout redirection failed');
     }
   }
 
@@ -125,6 +149,6 @@ export const getStripeClient = (): StripeClient => {
 
     stripeClientInstance = new StripeClient(publishableKey);
   }
-
+  console.log('stripeClientInstance', stripeClientInstance);
   return stripeClientInstance;
 };

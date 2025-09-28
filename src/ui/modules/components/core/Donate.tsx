@@ -1,5 +1,6 @@
 'use client';
 
+import { PaymentDTO } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { Button } from '@const/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
@@ -46,7 +47,7 @@ export const Donate = () => {
   const form = useForm<DonationFormData>({
     resolver: zodResolver(donationSchema),
     defaultValues: {
-      amount: 1,
+      amount: 5,
       email: '',
     },
   });
@@ -70,32 +71,38 @@ export const Donate = () => {
           }),
         });
 
-        const { client_secret } = await response.json();
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result: PaymentDTO = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.error);
+        }
 
         const stripeClient = getStripeClient();
-        const result = await stripeClient.confirmPayment({
-          clientSecret: client_secret,
+        const payment = await stripeClient.confirmPayment({
+          clientSecret: result.clientSecret,
           returnUrl: window.location.href,
           alwaysRedirect: false,
         });
 
-        if (result.success) {
-          setPremiumStatus({ email: data.email, premiumKey: client_secret });
-          toast.success(`Thank you! Donation of €${data.amount.toFixed(2)} processed successfully.`);
-          form.reset();
-          setIsOpen(false);
-        } else {
-          throw new Error(result.error);
+        if (!payment.success) {
+          throw new Error(payment.error ?? 'Payment was not completed.');
         }
-      } catch (_) {
+
+        setPremiumStatus({ email: data.email, premiumKey: result.clientSecret });
+        toast.success(`Thank you! Donation of €${data.amount.toFixed(2)} processed successfully.`);
+        form.reset();
+        setIsOpen(false);
+      } catch (error) {
         toast.error('Payment failed', {
-          description: 'Please try again.',
+          description: error instanceof Error ? error.message : 'Please try again.',
         });
       }
     });
   };
-
-  const isPresetSelected = (preset: number) => currentAmount === preset;
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -116,7 +123,6 @@ export const Donate = () => {
               </div>
             )}
           </div>
-
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} noValidate className='grid gap-3'>
               <FormField
@@ -138,13 +144,12 @@ export const Donate = () => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name='amount'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Amount (€)</FormLabel>
+                    <FormLabel>CustomAmount (€)</FormLabel>
                     <FormControl>
                       <Input
                         type='number'
@@ -153,7 +158,7 @@ export const Donate = () => {
                         min='0'
                         disabled={isPending}
                         {...field}
-                        value={field.value || ''}
+                        value={field.value ?? ''}
                         onChange={(e) => {
                           const value = e.target.value;
                           field.onChange(value === '' ? undefined : parseFloat(value));
@@ -165,7 +170,6 @@ export const Donate = () => {
                   </FormItem>
                 )}
               />
-
               <div className='space-y-2'>
                 <Label>Quick amounts</Label>
                 <div className='flex gap-2'>
@@ -180,7 +184,7 @@ export const Donate = () => {
                       <Button
                         key={preset}
                         type='button'
-                        variant={isPresetSelected(preset) ? 'default' : 'outline'}
+                        variant={currentAmount === preset ? 'default' : 'outline'}
                         size='sm'
                         onClick={() => handlePresetClick(preset)}
                         disabled={isPending}
@@ -195,7 +199,7 @@ export const Donate = () => {
 
               <Button
                 type='submit'
-                disabled={!formState.isValid || isPending}
+                disabled={!formState.isValid ?? isPending}
                 className='w-full bg-green-600 hover:bg-green-700'
               >
                 {isPending ? 'Processing...' : `Donate ${currentAmount ? `€${currentAmount.toFixed(2)}` : ''}`}

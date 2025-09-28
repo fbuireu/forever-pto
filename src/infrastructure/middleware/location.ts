@@ -6,6 +6,8 @@ interface MiddlewareParams {
   response: NextResponse;
 }
 
+const ONE_WEEK = 60 * 60 * 24 * 7;
+
 export async function location({ request, response }: MiddlewareParams): Promise<NextResponse> {
   const userCountry = await detectCountry(request);
   const userCountryCookie = request.cookies.get('user-country')?.value;
@@ -15,7 +17,7 @@ export async function location({ request, response }: MiddlewareParams): Promise
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: ONE_WEEK,
       path: '/',
     });
   }

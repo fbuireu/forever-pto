@@ -55,7 +55,7 @@ async function handleSuccessfulPayment(paymentIntent: Stripe.PaymentIntent) {
   }
 }
 
-async function addToPremiumDatabase(data: {
+async function addRecord(data: {
   email: string;
   amount: number;
   stripePaymentId: string;

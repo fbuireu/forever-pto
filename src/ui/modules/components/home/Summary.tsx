@@ -183,7 +183,6 @@ export const Summary = () => {
                 size='compact'
               />
             </PremiumFeature>
-
             <PremiumFeature
               feature={'Métricas Avanzadas'}
               description={'Análisis detallado de tus días libres.'}
@@ -197,7 +196,6 @@ export const Summary = () => {
                 size='compact'
               />
             </PremiumFeature>
-
             <MetricCard
               label='Promedio'
               value={metrics.averageEfficiency.toFixed(1)}
