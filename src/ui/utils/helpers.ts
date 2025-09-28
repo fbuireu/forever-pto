@@ -1,11 +1,16 @@
-interface GetMonthsParamsNames{
-    locale: string;
-    monthCount: number;
-    startYear: number;
-    monthOutputFormat?: 'short' | 'long';
+interface GetMonthsParamsNames {
+  locale: string;
+  monthCount: number;
+  startYear: number;
+  monthOutputFormat?: 'short' | 'long';
 }
 
-export const getMonthNames = ({ locale, monthCount, startYear, monthOutputFormat = 'short' }: GetMonthsParamsNames): string[] => {
+export const getMonthNames = ({
+  locale,
+  monthCount,
+  startYear,
+  monthOutputFormat = 'short',
+}: GetMonthsParamsNames): string[] => {
   const monthNames: string[] = [];
   for (let i = 0; i < monthCount; i++) {
     const year = startYear + Math.floor(i / 12);

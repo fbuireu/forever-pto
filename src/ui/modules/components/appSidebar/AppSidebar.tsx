@@ -1,4 +1,4 @@
-import { ChevronRight, Settings } from 'lucide-react';
+import { Calculator, ChevronRight, Settings } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { Suspense } from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
@@ -23,6 +23,7 @@ import { AllowPastDays } from './components/AllowPastDays';
 import { CarryOverMonths } from './components/CarryOverMonths';
 import { Countries } from './components/Countries';
 import { LanguageSelector } from './components/LanguageSelector';
+import { PtoCalculator } from './components/PtoCalculator';
 import { PtoDays } from './components/PtoDays';
 import { Regions } from './components/Regions';
 import { Strategy } from './components/Strategy';
@@ -86,6 +87,28 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
                   </SidebarMenuSub>
                   <SidebarMenuSub>
                     <CarryOverMonths />
+                    <SidebarMenuSubItem />
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
+          </SidebarMenu>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Tools</SidebarGroupLabel>
+          <SidebarMenu>
+            <Collapsible defaultOpen={false} className='group/collapsible w-[--radix-popper-anchor-width]'>
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton variant='outline' tooltip='Tools'>
+                    <Calculator className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
+                    <span className='data-[collapsed=true]:hidden'>PTO Calculator</span>
+                    <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    <PtoCalculator />
                     <SidebarMenuSubItem />
                   </SidebarMenuSub>
                 </CollapsibleContent>
