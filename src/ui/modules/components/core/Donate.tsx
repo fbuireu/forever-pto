@@ -144,32 +144,7 @@ export const Donate = () => {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name='amount'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>CustomAmount (€)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='number'
-                        placeholder='Enter amount'
-                        step='0.01'
-                        min='0'
-                        disabled={isPending}
-                        {...field}
-                        value={field.value ?? ''}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          field.onChange(value === '' ? undefined : parseFloat(value));
-                        }}
-                        className='h-10'
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+
               <div className='space-y-2'>
                 <Label>Quick amounts</Label>
                 <div className='flex gap-2'>
@@ -197,9 +172,36 @@ export const Donate = () => {
                 </div>
               </div>
 
+              <FormField
+                control={form.control}
+                name='amount'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Amount (€)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type='number'
+                        placeholder='Enter amount'
+                        step='0.01'
+                        min='0'
+                        disabled={isPending}
+                        {...field}
+                        value={field.value ?? ''}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(value === '' ? undefined : parseFloat(value));
+                        }}
+                        className='h-10'
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <Button
                 type='submit'
-                disabled={!formState.isValid ?? isPending}
+                disabled={!formState.isValid || isPending}
                 className='w-full bg-green-600 hover:bg-green-700'
               >
                 {isPending ? 'Processing...' : `Donate ${currentAmount ? `€${currentAmount.toFixed(2)}` : ''}`}

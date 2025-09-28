@@ -25,6 +25,7 @@ import { Countries } from './components/Countries';
 import { LanguageSelector } from './components/LanguageSelector';
 import { PtoCalculator } from './components/PtoCalculator';
 import { PtoDays } from './components/PtoDays';
+import { PtoSalaryCalculator } from './components/PtoSalaryCalculator';
 import { Regions } from './components/Regions';
 import { Strategy } from './components/Strategy';
 import { ThemeSelector } from './components/ThemeSelector';
@@ -102,13 +103,17 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton variant='outline' tooltip='Tools'>
                     <Calculator className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
-                    <span className='data-[collapsed=true]:hidden'>PTO Calculator</span>
+                    <span className='data-[collapsed=true]:hidden'>Calculators</span>
                     <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
                     <PtoCalculator />
+                    <SidebarMenuSubItem />
+                  </SidebarMenuSub>
+                  <SidebarMenuSub>
+                    <PtoSalaryCalculator />
                     <SidebarMenuSubItem />
                   </SidebarMenuSub>
                 </CollapsibleContent>

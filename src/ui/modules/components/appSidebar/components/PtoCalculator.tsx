@@ -63,7 +63,10 @@ export const PtoCalculator = () => {
         <Calculator className='w-4 h-4' />
         <span className='text-sm font-medium'>PTO Accumulator</span>
       </div>
-
+      <p className='text-xs text-muted-foreground leading-relaxed'>
+        Calculate your accumulated PTO days based on monthly accrual. Most companies offer 2-3 days per month. Select
+        the target month to see your total available days.
+      </p>
       <div className='space-y-2'>
         <Label htmlFor='daysPerMonth' className='text-xs'>
           Days per month
@@ -73,7 +76,7 @@ export const PtoCalculator = () => {
           type='number'
           step='0.1'
           min='0'
-          max='10'
+          max='8'
           value={daysPerMonth}
           onChange={(e) => setDaysPerMonth(Number(e.target.value))}
           className='h-8 text-xs'
