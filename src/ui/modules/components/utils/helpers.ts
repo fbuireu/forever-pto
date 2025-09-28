@@ -9,10 +9,12 @@ import {
   endOfWeek,
   format,
   isSameDay,
+  isWeekend,
   startOfMonth,
   startOfWeek,
 } from 'date-fns';
 import type { Locale } from 'next-intl';
+import { FromTo } from '../core/Calendar';
 
 const CALENDAR_WEEKS = 6;
 const DAYS_PER_WEEK = 7;
@@ -81,4 +83,68 @@ export const getCalendarDays = ({ month, weekStartsOn, fixedWeeks }: GetCalendar
   }
 
   return days;
+};
+
+export function calculateWorkdays(range: FromTo, holidays: HolidayDTO[]): number {
+  const days = eachDayOfInterval({
+    start: range.from,
+    end: range.to,
+  });
+
+  return days.filter((day) => {
+    if (isWeekend(day)) return false;
+
+    const isHoliday = holidays.some((holiday) => holiday.date.toDateString() === day.toDateString());
+    if (isHoliday) return false;
+
+    return true;
+  }).length;
+}
+
+export function calculateWeekends(range: FromTo): number {
+  const days = eachDayOfInterval({
+    start: range.from,
+    end: range.to,
+  });
+  return days.filter((day) => isWeekend(day)).length;
+}
+
+export function calculateHolidaysInRange(range: FromTo, holidays: HolidayDTO[]): number {
+  const days = eachDayOfInterval({
+    start: range.from,
+    end: range.to,
+  });
+
+  return days.filter((day) => {
+    if (isWeekend(day)) return false;
+    return holidays.some((holiday) => holiday.date.toDateString() === day.toDateString());
+  }).length;
+}
+
+interface GetMonthsParamsNames {
+  locale: string;
+  monthCount: number;
+  startYear: number;
+  monthOutputFormat?: 'short' | 'long';
+}
+
+export const getMonthNames = ({
+  locale,
+  monthCount,
+  startYear,
+  monthOutputFormat = 'short',
+}: GetMonthsParamsNames): string[] => {
+  const monthNames: string[] = [];
+  for (let i = 0; i < monthCount; i++) {
+    const year = startYear + Math.floor(i / 12);
+    const month = i % 12;
+    const date = new Date(year, month, 1);
+
+    const monthName = date.toLocaleDateString(locale, { month: monthOutputFormat });
+    const yearSuffix = i >= 12 ? ` '${year.toString().slice(-2)}` : '';
+
+    monthNames.push(`${monthName}${yearSuffix}`);
+  }
+
+  return monthNames;
 };

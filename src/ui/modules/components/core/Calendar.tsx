@@ -1,4 +1,3 @@
-// src/components/calendar/Calendar.tsx
 import type { FiltersState } from '@application/stores/filters';
 import type { HolidaysState } from '@application/stores/holidays';
 import { cn } from '@const/lib/utils';
@@ -188,20 +187,17 @@ export function Calendar({
         onSelect?.(date);
       } else if (mode === 'range') {
         if (rangeSelection.selecting === 'from' || !rangeSelection.from) {
-          // Seleccionando fecha de inicio
           const newRangeSelection = {
             from: date,
             to: undefined,
             selecting: 'to' as const,
           };
           setRangeSelection(newRangeSelection);
-          onSelect?.(undefined); // Range incompleto
+          onSelect?.(undefined); 
         } else {
-          // Seleccionando fecha de fin
           const from = rangeSelection.from;
           const to = date;
 
-          // Asegurar que from <= to
           const orderedRange: FromTo = from <= to ? { from, to } : { from: to, to: from };
 
           const newRangeSelection = {

@@ -1,22 +1,29 @@
 'use client';
 
 import { useHolidaysStore } from '@application/stores/holidays';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@const/components/ui/dialog';
 import { Label } from '@const/components/ui/label';
-import { differenceInCalendarDays, eachDayOfInterval, isWeekend } from 'date-fns';
-import { CalendarDays, Calendar as CalendarIcon } from 'lucide-react';
+import { differenceInCalendarDays } from 'date-fns';
+import { CalendarDays, InfoIcon } from 'lucide-react';
 import { useLocale } from 'next-intl';
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
+import { Button } from 'src/components/animate-ui/components/buttons/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
-import { Calendar, FromTo } from '../../core/Calendar';
+import { FromTo } from '../../core/Calendar';
 import { formatDate } from '../../utils/formatters';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
+import { calculateHolidaysInRange, calculateWeekends, calculateWorkdays } from '../../utils/helpers';
+
+const CalendarModal = dynamic(() =>
+  import('./WorkdayCounterCalendarModal').then((module) => ({ default: module.WorkdayCounterCalendarModal }))
+);
 
 export const WorkdayCounter = () => {
   const locale = useLocale();
   const [selectedRange, setSelectedRange] = useState<FromTo | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
   const { holidays } = useHolidaysStore(
     useShallow((state) => ({
       holidays: state.holidays,
@@ -48,45 +55,29 @@ export const WorkdayCounter = () => {
       <div className='flex items-center gap-2'>
         <CalendarDays className='w-4 h-4' />
         <span className='text-sm font-medium'>Workday Counter</span>
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild className='ml-auto'>
+              <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
+            </TooltipTrigger>
+            <TooltipContent className='w-60 text-pretty'>
+              Count working days between two dates, automatically excluding weekends and holidays. Useful for project
+              planning and deadline calculations.
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
-
-      <p className='text-xs text-muted-foreground leading-relaxed'>
-        Count working days between two dates, automatically excluding weekends and holidays. Useful for project planning
-        and deadline calculations.
-      </p>
 
       <div className='space-y-2'>
         <Label className='text-xs'>Select Date Range</Label>
-        <Dialog open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-          <DialogTrigger asChild>
-            <Button variant='outline' className='w-full h-8 text-xs justify-start'>
-              <CalendarIcon className='w-3 h-3 mr-1' />
-              {selectedRange
-                ? `${formatDate({ date: selectedRange.from, locale, format: 'MMM d' })} - ${formatDate({ date: selectedRange.to, locale, format: 'MMM d' })}`
-                : 'Select date range'}
-            </Button>
-          </DialogTrigger>
-          <DialogContent className='sm:max-w-sm'>
-            <DialogHeader>
-              <DialogTitle className='text-sm'>Select date range</DialogTitle>
-            </DialogHeader>
-            <div className='border rounded-lg p-3'>
-              <Calendar
-                mode='range'
-                selected={selectedRange}
-                onSelect={handleRangeSelect}
-                showNavigation={true}
-                locale={locale}
-                holidays={holidays}
-                allowPastDays
-                currentSelection={{ days: [] }}
-                alternatives={[]}
-                suggestion={{ days: [] }}
-                className='w-full'
-              />
-            </div>
-          </DialogContent>
-        </Dialog>
+        <CalendarModal
+          open={isCalendarOpen}
+          setOpen={setIsCalendarOpen}
+          selectedRange={selectedRange}
+          handleRangeSelect={handleRangeSelect}
+          locale={locale}
+          holidays={holidays}
+        />
 
         {selectedRange && (
           <Button variant='ghost' onClick={clearSelection} className='h-6 text-xs w-full'>
@@ -98,7 +89,7 @@ export const WorkdayCounter = () => {
       {selectedRange && (
         <div className='space-y-3 p-3 bg-muted rounded-md'>
           <div className='text-xs'>
-            <span className='font-medium'>Working Days:</span>
+            <span className='font-medium'>Working Days</span>
             <div className='text-2xl font-bold text-primary'>
               <SlidingNumber number={workdayCount} decimalPlaces={0} />
             </div>
@@ -138,38 +129,3 @@ export const WorkdayCounter = () => {
     </div>
   );
 };
-
-function calculateWorkdays(range: FromTo, holidays: any[]): number {
-  const days = eachDayOfInterval({
-    start: range.from,
-    end: range.to,
-  });
-
-  return days.filter((day) => {
-    if (isWeekend(day)) return false;
-
-    const isHoliday = holidays.some((holiday) => holiday.date.toDateString() === day.toDateString());
-    if (isHoliday) return false;
-
-    return true;
-  }).length;
-}
-
-function calculateWeekends(range: FromTo): number {
-  const days = eachDayOfInterval({
-    start: range.from,
-    end: range.to,
-  });
-  return days.filter((day) => isWeekend(day)).length;
-}
-
-function calculateHolidaysInRange(range: FromTo, holidays: any[]): number {
-  const days = eachDayOfInterval({
-    start: range.from,
-    end: range.to,
-  });
-
-  return days.filter((day) => {
-    return holidays.some((holiday) => holiday.date.toDateString() === day.toDateString());
-  }).length;
-}

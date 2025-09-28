@@ -2,15 +2,16 @@
 
 import { Input } from '@const/components/ui/input';
 import { Label } from '@const/components/ui/label';
-import { Euro } from 'lucide-react';
+import { Euro, InfoIcon } from 'lucide-react';
 import { useState } from 'react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 
 const WORKING_DAYS_PER_YEAR = 252;
 const HOURS_PER_DAY = 8;
 
 export const PtoSalaryCalculator = () => {
-  const [annualSalary, setAnnualSalary] = useState<number|undefined>();
+  const [annualSalary, setAnnualSalary] = useState<number | undefined>();
   const [unusedPTODays, setUnusedPTODays] = useState<number>(5);
 
   const dailyRate = annualSalary ? annualSalary / WORKING_DAYS_PER_YEAR : 0;
@@ -23,11 +24,18 @@ export const PtoSalaryCalculator = () => {
       <div className='flex items-center gap-2'>
         <Euro className='w-4 h-4' />
         <span className='text-sm font-medium'>PTO vs Salary Calculator</span>
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild className='ml-auto'>
+              <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
+            </TooltipTrigger>
+            <TooltipContent className='w-60 text-pretty'>
+              Calculate the monetary value of unused PTO days and see the real cost of not taking your earned vacation
+              time.
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
-
-      <p className='text-xs text-muted-foreground leading-relaxed'>
-        Calculate the monetary value of unused PTO days and see the real cost of not taking your earned vacation time.
-      </p>
 
       <div className='space-y-2'>
         <Label htmlFor='annualSalary' className='text-xs'>

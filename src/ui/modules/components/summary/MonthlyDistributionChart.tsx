@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { PremiumFeature } from '../premium/PremiumFeature';
 import { COLOR_SCHEMES } from './const';
-import { getMonthNames } from '@ui/utils/helpers';
+import { getMonthNames } from '../utils/helpers';
 
 interface MonthlyDistributionChartProps {
   monthlyDist: number[];

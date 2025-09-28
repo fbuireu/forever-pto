@@ -53,7 +53,7 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
           <SidebarMenu>
             <Collapsible defaultOpen className='group/collapsible w-[--radix-popper-anchor-width]'>
               <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
+                <CollapsibleTrigger asChild className='cursor-pointer'>
                   <SidebarMenuButton variant='outline' tooltip='Filters'>
                     <Settings className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
                     <span className='data-[collapsed=true]:hidden'>Filters & Configuration</span>
@@ -101,7 +101,7 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
           <SidebarMenu>
             <Collapsible defaultOpen={false} className='group/collapsible w-[--radix-popper-anchor-width]'>
               <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
+                <CollapsibleTrigger asChild className='cursor-pointer'>
                   <SidebarMenuButton variant='outline' tooltip='Tools'>
                     <Calculator className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
                     <span className='data-[collapsed=true]:hidden'>Calculators</span>

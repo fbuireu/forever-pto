@@ -43,4 +43,3 @@ export { generateMetadata };
 // todo: footer
 // todo: add animate icons (https://animate-ui.com/docs/icons)
 // todo: add animate components to summary
-// todo: add tooltip instead of long description in tools

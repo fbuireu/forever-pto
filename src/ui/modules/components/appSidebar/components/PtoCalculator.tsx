@@ -4,13 +4,14 @@ import { useFiltersStore } from '@application/stores/filters';
 import { Combobox } from '@const/components/ui/combobox';
 import { Input } from '@const/components/ui/input';
 import { Label } from '@const/components/ui/label';
-import { getMonthNames } from '@ui/utils/helpers';
-import { Calculator, Plus } from 'lucide-react';
+import { Calculator, InfoIcon, Plus } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
+import { TooltipContent, TooltipProvider, TooltipTrigger, Tooltip } from 'src/components/animate-ui/radix/tooltip';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
+import { getMonthNames } from '../../utils/helpers';
 
 interface MonthOption {
   value: string;
@@ -62,11 +63,18 @@ export const PtoCalculator = () => {
       <div className='flex items-center gap-2'>
         <Calculator className='w-4 h-4' />
         <span className='text-sm font-medium'>PTO Accumulator</span>
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild className='ml-auto'>
+              <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
+            </TooltipTrigger>
+            <TooltipContent className='w-60 text-pretty'>
+              Calculate your accumulated PTO days based on monthly accrual. Most companies offer 2-3 days per month.
+              Select the target month to see your total available days.
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
-      <p className='text-xs text-muted-foreground leading-relaxed'>
-        Calculate your accumulated PTO days based on monthly accrual. Most companies offer 2-3 days per month. Select
-        the target month to see your total available days.
-      </p>
       <div className='space-y-2'>
         <Label htmlFor='daysPerMonth' className='text-xs'>
           Days per month

@@ -44,12 +44,13 @@ const STRATEGIES = [
 ];
 
 export const Strategy = () => {
-const { strategy, setStrategy } = useFiltersStore(
-  useShallow((state) => ({
-    strategy: state.strategy,
-    setStrategy: state.setStrategy,
-  }))
-);  const [detailsOpen, setDetailsOpen] = useState(false);
+  const { strategy, setStrategy } = useFiltersStore(
+    useShallow((state) => ({
+      strategy: state.strategy,
+      setStrategy: state.setStrategy,
+    }))
+  );
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const currentStrategy = STRATEGIES.find(({ value }) => value === strategy);
 
   return (
@@ -69,7 +70,7 @@ const { strategy, setStrategy } = useFiltersStore(
       />
       {currentStrategy && (
         <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
-          <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-xs font-medium hover:bg-muted/50 rounded-md transition-colors'>
+          <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-xs font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors'>
             <span>{detailsOpen ? 'Hide' : 'Expand'} strategy details</span>
             <ChevronDown className={cn('h-4 w-4 transition-transform duration-200', detailsOpen && 'rotate-180')} />
           </CollapsibleTrigger>

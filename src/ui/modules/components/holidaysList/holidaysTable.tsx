@@ -215,7 +215,7 @@ const holidays = useHolidaysStore((state) => state.holidays);
 
   return (
     <Collapsible open={innerOpen} onOpenChange={setInnerOpen} className={'space-y-4 w-full'}>
-      <CollapsibleTrigger asChild>
+                <CollapsibleTrigger asChild className='cursor-pointer'>
         <div className='flex items-center justify-between cursor-pointer group hover:bg-muted/50 p-3 rounded-lg border transition-colors'>
           <div className='flex items-center space-x-3'>
             <div className='flex items-center space-x-2'>
