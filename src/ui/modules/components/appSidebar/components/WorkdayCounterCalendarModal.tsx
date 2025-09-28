@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import type { FromTo } from '../../core/Calendar';
-import { Calendar } from '../../core/Calendar';
+import { Calendar, CalendarSelectionMode } from '../../core/Calendar';
 import { formatDate } from '../../utils/formatters';
 
 export interface WorkdayCounterCalendarModalProps {
@@ -39,7 +39,7 @@ export const WorkdayCounterCalendarModal = ({
         </DialogHeader>
         <div className='border rounded-lg p-3'>
           <Calendar
-            mode='range'
+            mode={CalendarSelectionMode.RANGE}
             selected={selectedRange}
             onSelect={handleRangeSelect}
             showNavigation={true}

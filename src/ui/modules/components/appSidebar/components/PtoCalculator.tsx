@@ -8,7 +8,7 @@ import { Calculator, InfoIcon, Plus } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { TooltipContent, TooltipProvider, TooltipTrigger, Tooltip } from 'src/components/animate-ui/radix/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 import { getMonthNames } from '../../utils/helpers';
@@ -126,7 +126,7 @@ export const PtoCalculator = () => {
           <Button
             onClick={() => applyToStore(calculatedDays)}
             size='sm'
-            className='w-full h-7 text-xs bg-green-600 hover:bg-green-700'
+            className='w-full h-7 text-xs bg-green-600 hover:bg-green-700 justify-start'
           >
             <Plus className='w-3 h-3 mr-1' />
             Apply to PTO Days

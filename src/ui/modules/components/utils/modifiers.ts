@@ -2,6 +2,7 @@ import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types'
 import type { HolidaysState } from '@application/stores/holidays';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { isBefore, isSameDay, startOfToday } from 'date-fns';
+import { FromTo } from '../core/Calendar';
 
 export const isHoliday = (holidays: HolidaysState['holidays']) => (date: Date) =>
   holidays.some((holiday) => isSameDay(date, holiday.date));
@@ -60,32 +61,38 @@ export const isCustom = (holidays: HolidayDTO[]) => (date: Date) => {
 export const isSelected = (selectedDates: Date[]) => (date: Date) => selectedDates.some((d) => isSameDay(d, date));
 
 export const isInRange =
-  (from?: Date, to?: Date) =>
+  ({ from, to }: Partial<FromTo>) =>
   (date: Date): boolean => {
     if (!from || !to) return false;
     return date >= from && date <= to;
   };
 
 export const isRangeStart =
-  (from?: Date) =>
+  (range?: Partial<FromTo>) =>
   (date: Date): boolean => {
-    if (!from) return false;
-    return isSameDay(date, from);
+    if (!range?.from) return false;
+    return isSameDay(date, range.from);
   };
 
 export const isRangeEnd =
-  (to?: Date) =>
+  (range?: Partial<FromTo>) =>
   (date: Date): boolean => {
-    if (!to) return false;
-    return isSameDay(date, to);
+    if (!range?.to) return false;
+    return isSameDay(date, range.to);
   };
 
-export const getPreviewRange =
-  (from?: Date, isSelectingTo?: boolean, hoverDate?: Date) =>
-  (date: Date): boolean => {
-    if (!from || !isSelectingTo || !hoverDate) return false;
+interface GetPreviewRangeParams{
+range?: Partial<FromTo>;
+isSelectingTo?: boolean;
+hoverDate?: Date;
+}
 
-    const start = from;
+export const getPreviewRange =
+  ({ range, isSelectingTo, hoverDate }: GetPreviewRangeParams) =>
+  (date: Date): boolean => {
+    if (!range?.from || !isSelectingTo || !hoverDate) return false;
+
+    const start = range.from;
     const end = hoverDate;
 
     const minDate = start <= end ? start : end;

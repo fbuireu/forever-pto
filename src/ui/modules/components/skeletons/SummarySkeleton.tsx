@@ -6,8 +6,8 @@ export const SummarySkeleton = () => {
     <div className='w-full max-w-4xl mx-auto space-y-6'>
       <Card>
         <CardHeader className='pb-4'>
-          <CardTitle className='flex items-center justify-between text-center'>
-            <div className='flex items-center gap-2'>
+          <CardTitle className='flex items-center justify-between mx-auto mb-2'>
+            <div className='flex items-center gap-2 text-center'>
               <Skeleton className='w-5 h-5 rounded-full' />
               <Skeleton className='h-6 w-40' />
             </div>

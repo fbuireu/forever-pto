@@ -24,15 +24,27 @@ import {
   isToday,
 } from '../utils/modifiers';
 import { ConditionalWrapper } from './ConditionalWrapper';
-import { getDayClassNames } from './utils/helpers';
+import { getDayClassNames, isFromToObject } from './utils/helpers';
 
 export interface FromTo {
   from: Date;
   to: Date;
 }
 
+export const enum CalendarSelectionMode {
+  SINGLE = 'single',
+  MULTIPLE = 'multiple',
+  RANGE = 'range',
+  NONE = 'none',
+}
+
+export const enum RangeSelection {
+  FROM = 'from',
+  TO = 'to',
+}
+
 interface CalendarProps {
-  mode?: 'single' | 'multiple' | 'range';
+  mode?: CalendarSelectionMode;
   selected?: Date | Date[] | FromTo;
   onSelect?: (date: Date | Date[] | FromTo | undefined) => void;
   month?: Date;
@@ -51,8 +63,14 @@ interface CalendarProps {
   previewAlternativeIndex?: HolidaysState['previewAlternativeIndex'];
 }
 
+interface RangeState {
+  from?: Date;
+  to?: Date;
+  selecting: RangeSelection;
+}
+
 export function Calendar({
-  mode = 'single',
+  mode = CalendarSelectionMode.SINGLE,
   selected,
   onSelect,
   month: initialMonth,
@@ -73,32 +91,28 @@ export function Calendar({
 }: Readonly<CalendarProps>) {
   const [currentMonth, setCurrentMonth] = useState(initialMonth ?? new Date());
   const [hoverDate, setHoverDate] = useState<Date | undefined>();
-  const [rangeSelection, setRangeSelection] = useState<{
-    from?: Date;
-    to?: Date;
-    selecting: 'from' | 'to';
-  }>(() => {
-    if (mode === 'range' && selected && typeof selected === 'object' && 'from' in selected) {
+  const [rangeSelection, setRangeSelection] = useState<RangeState>(() => {
+    if (mode === CalendarSelectionMode.RANGE && isFromToObject(selected)) {
       return {
         from: selected.from,
         to: selected.to,
-        selecting: 'from',
+        selecting: RangeSelection.FROM,
       };
     }
-    return { selecting: 'from' };
+    return { selecting: RangeSelection.FROM };
   });
 
   const [selectedDates, setSelectedDates] = useState<Date[]>(() => {
-    if (mode === 'multiple' && Array.isArray(selected)) {
-      return selected;
+    switch (mode) {
+      case CalendarSelectionMode.MULTIPLE:
+        return Array.isArray(selected) ? selected : [];
+      case CalendarSelectionMode.SINGLE:
+        return selected instanceof Date ? [selected] : [];
+      case CalendarSelectionMode.RANGE:
+        return isFromToObject(selected) ? [selected.from, selected.to] : [];
+      default:
+        return [];
     }
-    if (mode === 'single' && selected instanceof Date) {
-      return [selected];
-    }
-    if (mode === 'range' && selected && typeof selected === 'object' && 'from' in selected) {
-      return [selected.from, selected.to];
-    }
-    return [];
   });
 
   const modifiers = useMemo(() => {
@@ -108,8 +122,8 @@ export function Calendar({
     const isSuggestionFn = isSuggestion(currentSelection);
     const isAlternativeFn = isAlternative({ alternatives, suggestion, previewAlternativeIndex, currentSelection });
     const isSelectedModifier =
-      mode === 'range'
-        ? (date: Date) => isRangeStart(rangeSelection.from)(date) || isRangeEnd(rangeSelection.to)(date)
+      mode === CalendarSelectionMode.RANGE
+        ? (date: Date) => isRangeStart(rangeSelection)(date) || isRangeEnd(rangeSelection)(date)
         : isSelected(selectedDates);
 
     const baseModifiers = {
@@ -123,15 +137,19 @@ export function Calendar({
       selected: isSelectedModifier,
     };
 
-    return mode === 'range'
-      ? {
-          ...baseModifiers,
-          inRange: isInRange(rangeSelection.from, rangeSelection.to),
-          rangeStart: isRangeStart(rangeSelection.from),
-          rangeEnd: isRangeEnd(rangeSelection.to),
-          previewRange: getPreviewRange(rangeSelection.from, rangeSelection.selecting === 'to', hoverDate),
-        }
-      : baseModifiers;
+    return {
+      ...baseModifiers,
+      ...(mode === CalendarSelectionMode.RANGE && {
+        inRange: isInRange({ from: rangeSelection.from, to: rangeSelection.to }),
+        rangeStart: isRangeStart(rangeSelection),
+        rangeEnd: isRangeEnd(rangeSelection),
+        previewRange: getPreviewRange({
+          range: rangeSelection,
+          isSelectingTo: rangeSelection.selecting === RangeSelection.TO,
+          hoverDate,
+        }),
+      }),
+    };
   }, [
     holidays,
     allowPastDays,
@@ -174,40 +192,49 @@ export function Calendar({
 
   const handleDayClick = useCallback(
     (date: Date) => {
-      if (disabled) return;
+      if (disabled || mode === CalendarSelectionMode.NONE) return;
 
-      if (mode === 'multiple') {
-        const isSelected = selectedDates.some((d) => isSameDay(d, date));
-        const newSelection = isSelected ? selectedDates.filter((d) => !isSameDay(d, date)) : [...selectedDates, date];
+      switch (mode) {
+        case CalendarSelectionMode.MULTIPLE: {
+          const isSelected = selectedDates.some((d) => isSameDay(d, date));
+          const newSelection = isSelected ? selectedDates.filter((d) => !isSameDay(d, date)) : [...selectedDates, date];
 
-        setSelectedDates(newSelection);
-        onSelect?.(newSelection);
-      } else if (mode === 'single') {
-        setSelectedDates([date]);
-        onSelect?.(date);
-      } else if (mode === 'range') {
-        if (rangeSelection.selecting === 'from' || !rangeSelection.from) {
-          const newRangeSelection = {
-            from: date,
-            to: undefined,
-            selecting: 'to' as const,
-          };
-          setRangeSelection(newRangeSelection);
-          onSelect?.(undefined); 
-        } else {
-          const from = rangeSelection.from;
-          const to = date;
+          setSelectedDates(newSelection);
+          onSelect?.(newSelection);
+          break;
+        }
 
-          const orderedRange: FromTo = from <= to ? { from, to } : { from: to, to: from };
+        case CalendarSelectionMode.SINGLE: {
+          setSelectedDates([date]);
+          onSelect?.(date);
+          break;
+        }
 
-          const newRangeSelection = {
-            from: orderedRange.from,
-            to: orderedRange.to,
-            selecting: 'from' as const,
-          };
+        case CalendarSelectionMode.RANGE: {
+          if (rangeSelection.selecting === RangeSelection.FROM || !rangeSelection.from) {
+            const newRangeSelection: RangeState = {
+              from: date,
+              to: undefined,
+              selecting: RangeSelection.TO,
+            };
+            setRangeSelection(newRangeSelection);
+            onSelect?.(undefined);
+          } else {
+            const from = rangeSelection.from;
+            const to = date;
 
-          setRangeSelection(newRangeSelection);
-          onSelect?.(orderedRange);
+            const orderedRange: FromTo = from <= to ? { from, to } : { from: to, to: from };
+
+            const newRangeSelection: RangeState = {
+              from: orderedRange.from,
+              to: orderedRange.to,
+              selecting: RangeSelection.FROM,
+            };
+
+            setRangeSelection(newRangeSelection);
+            onSelect?.(orderedRange);
+          }
+          break;
         }
       }
     },
@@ -216,7 +243,11 @@ export function Calendar({
 
   const handleDayHover = useCallback(
     (date: Date) => {
-      if (mode === 'range' && rangeSelection.selecting === 'to' && rangeSelection.from) {
+      if (
+        mode === CalendarSelectionMode.RANGE &&
+        rangeSelection.selecting === RangeSelection.TO &&
+        rangeSelection.from
+      ) {
         setHoverDate(date);
       }
     },
@@ -284,7 +315,7 @@ export function Calendar({
           const baseClasses = getDayClassNames({
             date,
             month: currentMonth,
-            selectedDates: mode === 'range' ? [] : selectedDates,
+            selectedDates: mode === CalendarSelectionMode.RANGE ? [] : selectedDates,
             disabled,
             showOutsideDays,
             allowPastDays,
@@ -308,12 +339,16 @@ export function Calendar({
               >
                 <Button
                   type='button'
-                  className={classes}
+                  className={cn(classes)}
                   variant='ghost'
                   onClick={() => handleDayClick(date)}
                   onMouseEnter={() => handleDayHover(date)}
                   onMouseLeave={handleDayLeave}
                   disabled={isDisabled}
+                  {...(mode === CalendarSelectionMode.NONE && {
+                    tapScale: 1,
+                    hoverScale: 1,
+                  })}
                 >
                   {formatDate({ date, locale, format: 'd' })}
                 </Button>

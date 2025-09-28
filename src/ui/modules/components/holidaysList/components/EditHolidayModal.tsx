@@ -17,10 +17,10 @@ import { CalendarDays, Calendar as CalendarIcon, Edit } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { toast } from 'sonner';
+import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { z } from 'zod';
-import { Calendar, type FromTo } from '../../core/Calendar';
+import { Calendar, CalendarSelectionMode, type FromTo } from '../../core/Calendar';
 import { formatDate } from '../../utils/formatters';
 
 interface EditHolidayModalProps {
@@ -161,7 +161,7 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
               Select Date
               <div className='border rounded-lg p-3'>
                 <Calendar
-                  mode='single'
+                  mode={CalendarSelectionMode.SINGLE}
                   month={holiday.date}
                   showNavigation
                   selected={selectedDate}

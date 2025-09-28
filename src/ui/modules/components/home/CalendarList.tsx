@@ -6,7 +6,7 @@ import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useLocale } from 'next-intl';
 import { useEffect, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { Calendar } from '../core/Calendar';
+import { Calendar, CalendarSelectionMode } from '../core/Calendar';
 import { CalendarListSkeleton } from '../skeletons/CalendarListSkeleton';
 import { getTotalMonths } from '../utils/helpers';
 
@@ -75,7 +75,7 @@ export const CalendarList = () => {
       {months.map((month) => (
         <Calendar
           key={month.toISOString()}
-          mode='multiple'
+          mode={CalendarSelectionMode.NONE}
           className='rounded-lg border shadow-sm bg-card'
           month={month}
           weekStartsOn={1}

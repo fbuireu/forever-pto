@@ -1,4 +1,5 @@
 import { isBefore, isSameDay, isSameMonth, startOfDay } from 'date-fns';
+import { FromTo } from '../Calendar';
 
 interface GetDayClassNamesParams {
   date: Date;
@@ -115,3 +116,15 @@ export function getViewBoxFromSvg(svg: string): string {
 
   return viewBoxMatch ? viewBoxMatch[1] : DEFAULT_VIEWBOX;
 }
+
+export const isFromToObject = (obj: unknown): obj is FromTo => {
+  return (
+    obj !== null &&
+    typeof obj === 'object' &&
+    obj !== undefined &&
+    'from' in obj &&
+    'to' in obj &&
+    (obj as FromTo).from instanceof Date &&
+    (obj as FromTo).to instanceof Date
+  );
+};
