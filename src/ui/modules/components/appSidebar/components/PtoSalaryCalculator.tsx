@@ -100,7 +100,7 @@ export const PtoSalaryCalculator = () => {
             {unusedPTODays > 0 && (
               <div className='bg-amber-50 dark:bg-amber-900/20 p-2 rounded text-xs'>
                 <p className='text-amber-700 dark:text-amber-400 font-medium'>Opportunity Cost Analysis</p>
-                <p className='text-amber-600 dark:text-amber-300'>
+                <p className='text-amber-600 dark:text-amber-300 flex gap-x-0.5 flex-row flex-wrap'>
                   By not taking {unusedPTODays} PTO days, you're effectively working for free and missing €
                   <SlidingNumber number={unusedPTOValue} decimalPlaces={0} /> worth of paid time off.
                 </p>

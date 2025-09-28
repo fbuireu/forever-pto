@@ -8,8 +8,7 @@ export const SummarySkeleton = () => {
         <CardHeader className='pb-4'>
           <CardTitle className='flex items-center justify-between mx-auto mb-2'>
             <div className='flex items-center gap-2 text-center'>
-              <Skeleton className='w-5 h-5 rounded-full' />
-              <Skeleton className='h-6 w-40' />
+              <Skeleton className='h-6 w-80' />
             </div>
           </CardTitle>
           <CardDescription className='space-y-2'>
