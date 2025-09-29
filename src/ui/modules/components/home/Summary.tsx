@@ -170,11 +170,7 @@ export const Summary = () => {
             />
           </div>
           <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3'>
-            <PremiumFeature
-              feature={'Métricas Avanzadas'}
-              description={'Análisis detallado de tus días libres.'}
-              iconSize='h12 w-12'
-            >
+            <PremiumFeature feature={'Métricas Avanzadas'} iconSize='h12 w-12'>
               <MetricCard
                 label='Fines largos'
                 value={metrics.longWeekends}
@@ -183,11 +179,7 @@ export const Summary = () => {
                 size='compact'
               />
             </PremiumFeature>
-            <PremiumFeature
-              feature={'Métricas Avanzadas'}
-              description={'Análisis detallado de tus días libres.'}
-              iconSize='h12 w-12'
-            >
+            <PremiumFeature feature={'Métricas Avanzadas'} iconSize='h12 w-12'>
               <MetricCard
                 label='Bloques'
                 value={metrics.restBlocks}
@@ -203,11 +195,7 @@ export const Summary = () => {
               colorScheme='amber'
               size='compact'
             />
-            <PremiumFeature
-              feature={'Métricas Avanzadas'}
-              description={'Análisis detallado de tus días libres.'}
-              iconSize='h12 w-12'
-            >
+            <PremiumFeature feature={'Métricas Avanzadas'} iconSize='h12 w-12'>
               <MetricCard
                 label='Trimestres'
                 value={metrics.activeQuarters}

@@ -39,10 +39,7 @@ const {
   const handleSelectionChange = useCallback(
     (params: AlternativeSelectionBaseParams) => {
       setCurrentAlternativeSelection(params);
-      toast.success('Suggestion applied successfully', {
-        description: `Selected combination with ${params.suggestion?.days.length} PTO days`,
-        duration: 2000,
-      });
+      toast.success('Suggestion applied successfully');
     },
     [setCurrentAlternativeSelection]
   );
