@@ -2,6 +2,12 @@ import { Badge } from '@const/components/ui/badge';
 import { cn } from '@const/lib/utils';
 import { LucideIcon } from 'lucide-react';
 import { ReactNode } from 'react';
+import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
+
+export const enum MetricCardSize {
+  DEFAULT = 'default',
+  COMPACT = 'compact',
+}
 
 interface MetricCardProps {
   label: string;
@@ -9,7 +15,7 @@ interface MetricCardProps {
   icon: LucideIcon;
   badge?: string | ReactNode;
   colorScheme: keyof typeof COLOR_SCHEMES;
-  size?: 'default' | 'compact';
+  size?: MetricCardSize;
   className?: string;
 }
 
@@ -70,16 +76,18 @@ export const MetricCard = ({
   icon: Icon,
   badge,
   colorScheme,
-  size = 'default',
+  size = MetricCardSize.DEFAULT,
   className = '',
 }: MetricCardProps) => {
   const colors = COLOR_SCHEMES[colorScheme];
 
-  if (size === 'compact') {
+  if (size === MetricCardSize.COMPACT) {
     return (
       <div className={cn('p-3', colors.bg, 'rounded-lg text-center', className)}>
         <Icon className={cn('w-4 h-4', colors.icon, 'mx-auto mb-1')} />
-        <div className={cn('text-lg font-bold', colors.text)}>{value}</div>
+        <div className={cn('text-lg font-bold flex justify-center', colors.text)}>
+          <SlidingNumber number={value} className={cn('text-lg font-bold', colors.text)} decimalPlaces={0} />
+        </div>
         <div className={cn('text-xs text-muted-foreground')}>{label}</div>
       </div>
     );
@@ -90,7 +98,9 @@ export const MetricCard = ({
       <span className={cn('text-xs text-muted-foreground mb-1')}>{label}</span>
       <div className={cn('flex items-center gap-2')}>
         <Icon className={cn('w-4 h-4', colors.icon)} />
-        <span className={cn('text-xl font-bold', colors.text)}>{value}</span>
+        <span className={cn('text-xl font-bold', colors.text)}>
+          <SlidingNumber number={value} decimalPlaces={0} />
+        </span>
       </div>
       {badge && (
         <Badge variant='outline' className={cn('text-xs mt-1', colors.badge)}>

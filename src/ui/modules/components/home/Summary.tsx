@@ -13,7 +13,7 @@ import dynamic from 'next/dynamic';
 import { useShallow } from 'zustand/react/shallow';
 import { PremiumFeature } from '../premium/PremiumFeature';
 import { SummarySkeleton } from '../skeletons/SummarySkeleton';
-import { MetricCard } from '../summary/MetricCard';
+import { MetricCard, MetricCardSize } from '../summary/MetricCard';
 import { NotificationCard } from '../summary/NotificationCard';
 
 const HolidaysDistributionChart = dynamic(() =>
@@ -176,7 +176,7 @@ export const Summary = () => {
                 value={metrics.longWeekends}
                 icon={Calendar}
                 colorScheme='emerald'
-                size='compact'
+                size={MetricCardSize.COMPACT}
               />
             </PremiumFeature>
             <PremiumFeature feature={'Métricas Avanzadas'} iconSize='h12 w-12'>
@@ -185,7 +185,7 @@ export const Summary = () => {
                 value={metrics.restBlocks}
                 icon={BarChart3}
                 colorScheme='purple'
-                size='compact'
+                size={MetricCardSize.COMPACT}
               />
             </PremiumFeature>
             <MetricCard
@@ -193,7 +193,7 @@ export const Summary = () => {
               value={metrics.averageEfficiency.toFixed(1)}
               icon={TrendingUp}
               colorScheme='amber'
-              size='compact'
+              size={MetricCardSize.COMPACT}
             />
             <PremiumFeature feature={'Métricas Avanzadas'} iconSize='h12 w-12'>
               <MetricCard
@@ -201,7 +201,7 @@ export const Summary = () => {
                 value={metrics.activeQuarters}
                 icon={BarChart3}
                 colorScheme='cyan'
-                size='compact'
+                size={MetricCardSize.COMPACT}
               />
             </PremiumFeature>
             <MetricCard
@@ -209,9 +209,9 @@ export const Summary = () => {
               value={canImprove > 0 ? `+${canImprove}` : '✓'}
               icon={Award}
               colorScheme='violet'
-              size='compact'
+              size={MetricCardSize.COMPACT}
             />
-            <MetricCard label='Bonus' value={`+${metrics.bonusDays}`} icon={Star} colorScheme='rose' size='compact' />
+            <MetricCard label='Bonus' value={`+${metrics.bonusDays}`} icon={Star} colorScheme='rose' size={MetricCardSize.COMPACT} />
           </div>
           {metrics.firstLastBreak && (
             <PremiumFeature

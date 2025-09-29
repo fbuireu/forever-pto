@@ -44,4 +44,3 @@ export { generateMetadata };
 // todo: legal and cookies (banner included)
 // todo: footer
 // todo: add animate icons (https://animate-ui.com/docs/icons)
-// todo: add animate components to summary
