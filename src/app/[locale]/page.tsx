@@ -40,6 +40,8 @@ export default Home;
 export { generateMetadata };
 
 // todo: check validation premium
+// todo: locale all
+// todo: legal and cookies (banner included)
 // todo: footer
 // todo: add animate icons (https://animate-ui.com/docs/icons)
 // todo: add animate components to summary
