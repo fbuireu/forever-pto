@@ -1,13 +1,8 @@
 'use client';
 
-import * as React from 'react';
 import { Accordion as AccordionPrimitive } from '@base-ui-components/react/accordion';
-import {
-  AnimatePresence,
-  motion,
-  type HTMLMotionProps,
-  type Transition,
-} from 'motion/react';
+import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from 'motion/react';
+import * as React from 'react';
 
 import { cn } from '@const/lib/utils';
 import { ChevronDown } from 'lucide-react';
@@ -17,9 +12,7 @@ type AccordionItemContextType = {
   setIsOpen: (open: boolean) => void;
 };
 
-const AccordionItemContext = React.createContext<
-  AccordionItemContextType | undefined
->(undefined);
+const AccordionItemContext = React.createContext<AccordionItemContextType | undefined>(undefined);
 
 const useAccordionItem = (): AccordionItemContextType => {
   const context = React.useContext(AccordionItemContext);
@@ -32,12 +25,10 @@ const useAccordionItem = (): AccordionItemContextType => {
 type AccordionProps = React.ComponentProps<typeof AccordionPrimitive.Root>;
 
 function Accordion(props: AccordionProps) {
-  return <AccordionPrimitive.Root data-slot="accordion" {...props} />;
+  return <AccordionPrimitive.Root data-slot='accordion' {...props} />;
 }
 
-type AccordionItemProps = React.ComponentProps<
-  typeof AccordionPrimitive.Item
-> & {
+type AccordionItemProps = React.ComponentProps<typeof AccordionPrimitive.Item> & {
   children: React.ReactNode;
 };
 
@@ -46,20 +37,14 @@ function AccordionItem({ className, children, ...props }: AccordionItemProps) {
 
   return (
     <AccordionItemContext.Provider value={{ isOpen, setIsOpen }}>
-      <AccordionPrimitive.Item
-        data-slot="accordion-item"
-        className={cn('border-b', className)}
-        {...props}
-      >
+      <AccordionPrimitive.Item data-slot='accordion-item' className={cn('border-b', className)} {...props}>
         {children}
       </AccordionPrimitive.Item>
     </AccordionItemContext.Provider>
   );
 }
 
-type AccordionTriggerProps = React.ComponentProps<
-  typeof AccordionPrimitive.Trigger
-> & {
+type AccordionTriggerProps = React.ComponentProps<typeof AccordionPrimitive.Trigger> & {
   transition?: Transition;
   chevron?: boolean;
 };
@@ -97,13 +82,13 @@ function AccordionTrigger({
   }, [setIsOpen]);
 
   return (
-    <AccordionPrimitive.Header data-slot="accordion-header" className="flex">
+    <AccordionPrimitive.Header data-slot='accordion-header' className='flex'>
       <AccordionPrimitive.Trigger
         ref={triggerRef}
-        data-slot="accordion-trigger"
+        data-slot='accordion-trigger'
         className={cn(
-          'flex flex-1 text-start items-center justify-between py-4 font-medium hover:underline',
-          className,
+          'flex flex-1 text-start items-center justify-between py-4 font-medium hover:underline cursor-pointer',
+          className
         )}
         {...props}
       >
@@ -111,11 +96,11 @@ function AccordionTrigger({
 
         {chevron && (
           <motion.div
-            data-slot="accordion-trigger-chevron"
+            data-slot='accordion-trigger-chevron'
             animate={{ rotate: isOpen ? 180 : 0 }}
             transition={transition}
           >
-            <ChevronDown className="size-5 shrink-0" />
+            <ChevronDown className='size-5 shrink-0' />
           </motion.div>
         )}
       </AccordionPrimitive.Trigger>
@@ -123,9 +108,7 @@ function AccordionTrigger({
   );
 }
 
-type AccordionPanelProps = React.ComponentProps<
-  typeof AccordionPrimitive.Panel
-> & {
+type AccordionPanelProps = React.ComponentProps<typeof AccordionPrimitive.Panel> & {
   motionProps?: HTMLMotionProps<'div'>;
   transition?: Transition;
 };
@@ -147,24 +130,20 @@ function AccordionPanel({
           keepMounted
           render={
             <motion.div
-              key="accordion-panel"
-              data-slot="accordion-panel"
+              key='accordion-panel'
+              data-slot='accordion-panel'
               initial={{ height: 0, opacity: 0, '--mask-stop': '0%' }}
               animate={{ height: 'auto', opacity: 1, '--mask-stop': '100%' }}
               exit={{ height: 0, opacity: 0, '--mask-stop': '0%' }}
               transition={transition}
               style={{
-                maskImage:
-                  'linear-gradient(black var(--mask-stop), transparent var(--mask-stop))',
-                WebkitMaskImage:
-                  'linear-gradient(black var(--mask-stop), transparent var(--mask-stop))',
+                maskImage: 'linear-gradient(black var(--mask-stop), transparent var(--mask-stop))',
+                WebkitMaskImage: 'linear-gradient(black var(--mask-stop), transparent var(--mask-stop))',
               }}
-              className="overflow-hidden"
+              className='overflow-hidden'
               {...motionProps}
             >
-              <div className={cn('pb-4 pt-0 text-sm', className)}>
-                {children}
-              </div>
+              <div className={cn('pb-4 pt-0 text-sm', className)}>{children}</div>
             </motion.div>
           }
           {...props}
@@ -177,12 +156,12 @@ function AccordionPanel({
 export {
   Accordion,
   AccordionItem,
-  AccordionTrigger,
   AccordionPanel,
+  AccordionTrigger,
   useAccordionItem,
   type AccordionItemContextType,
-  type AccordionProps,
   type AccordionItemProps,
-  type AccordionTriggerProps,
   type AccordionPanelProps,
+  type AccordionProps,
+  type AccordionTriggerProps,
 };

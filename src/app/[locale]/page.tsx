@@ -40,7 +40,7 @@ export default Home;
 export { generateMetadata };
 
 // todo: check validation premium
-// todo: unify component and folder structure (components VS modules)
+// todo: unify component and folder structure
 // todo: locale all
 // todo: legal and cookies (banner included) -->https://github.com/r2hu1/shadcn-cookie-consent (manual)
 // todo: unify forms (disabled VS showing error message) --> buton active + feedback on input

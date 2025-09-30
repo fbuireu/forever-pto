@@ -1,37 +1,49 @@
 'use client';
 
-import { useLocale } from 'next-intl';
-import { useTheme } from 'next-themes';
-import { useEffect } from 'react';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { reset, run, showPreferences } from 'vanilla-cookieconsent';
-import { cookiesConfig } from './const';
-import { updateDarkMode } from './utils/helpers';
+import { Button } from '@const/components/ui/button';
+import { useCookieConsent } from '@ui/hooks/useCookieConsent';
+import { useState } from 'react';
+import { CookieConsentDialog } from '../../core/CookieConsentDialog';
 
 export const CookieButton = () => {
-  const locale = useLocale();
-  const { theme } = useTheme();
+  const [showPreferences, setShowPreferences] = useState(false);
+  const { analyticsEnabled, setAnalyticsEnabled, handleAcceptAll, handleRejectAll, handleSavePreferences } =
+    useCookieConsent();
 
-  useEffect(() => {
-    updateDarkMode(theme);
-    run(cookiesConfig(locale));
+  const onAcceptAll = () => {
+    handleAcceptAll();
+    setShowPreferences(false);
+  };
 
-    if (theme === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      mediaQuery.addEventListener('change', () => updateDarkMode(theme));
+  const onRejectAll = () => {
+    handleRejectAll();
+    setShowPreferences(false);
+  };
 
-      return () => {
-        mediaQuery.removeEventListener('change', () => updateDarkMode(theme));
-        reset();
-      };
-    }
-
-    return () => reset();
-  }, [theme, locale]);
+  const onSave = () => {
+    handleSavePreferences();
+    setShowPreferences(false);
+  };
 
   return (
-    <Button variant='ghost' onClick={showPreferences}>
-      Manage cookies
-    </Button>
+    <>
+      <Button
+        variant='ghost'
+        className='cookies_consent_button --is-clickable --underline-on-hover'
+        onClick={() => setShowPreferences(true)}
+      >
+        Manage cookies
+      </Button>
+
+      <CookieConsentDialog
+        open={showPreferences}
+        onOpenChange={setShowPreferences}
+        analyticsEnabled={analyticsEnabled}
+        onAnalyticsChange={setAnalyticsEnabled}
+        onAcceptAll={onAcceptAll}
+        onRejectAll={onRejectAll}
+        onSave={onSave}
+      />
+    </>
   );
 };
