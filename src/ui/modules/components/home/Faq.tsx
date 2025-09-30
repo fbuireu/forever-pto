@@ -32,6 +32,12 @@ const FAQ: FaqData = [
     title: 'General',
     items: [
       {
+        id: 'why',
+        question: "Why I'm not seeing my country holidays correctly?",
+        answer:
+          'For simplicity and performance we use a third-party tool to get the bank holidays for a given country and year. It may happen that your country is not supported or the data is not up to date. You can always get premium by making a donation and add those days as "custom holidays" in our system ',
+      },
+      {
         id: 'what',
         question: 'What is Forever PTO?',
         answer:

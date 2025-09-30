@@ -6,7 +6,7 @@ import { Input } from '@const/components/ui/input';
 import { Label } from '@const/components/ui/label';
 import { Calculator, InfoIcon, Plus } from 'lucide-react';
 import { useLocale } from 'next-intl';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
@@ -21,8 +21,9 @@ interface MonthOption {
 export const PtoCalculator = () => {
   const locale = useLocale();
   const [daysPerMonth, setDaysPerMonth] = useState<number>(2.5);
-  const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
+  const [selectedMonth, setSelectedMonth] = useState<string>('1');
   const [calculatedDays, setCalculatedDays] = useState<number | null>(null);
+  const calculationSnapshotRef = useRef<{ days: number; month: number } | null>(null);
 
   const { setPtoDays } = useFiltersStore(
     useShallow((state) => ({
@@ -45,8 +46,15 @@ export const PtoCalculator = () => {
     }));
   }, [locale]);
 
-  const calculateAccumulatedDays = () => {
-    const accumulated = daysPerMonth * Number(selectedMonth);
+  const handleCalculate = () => {
+    const monthNumber = Number(selectedMonth);
+    const accumulated = daysPerMonth * monthNumber;
+
+    calculationSnapshotRef.current = {
+      days: daysPerMonth,
+      month: monthNumber,
+    };
+
     setCalculatedDays(Number(accumulated.toFixed(2)));
   };
 
@@ -75,6 +83,7 @@ export const PtoCalculator = () => {
           </Tooltip>
         </TooltipProvider>
       </div>
+
       <div className='space-y-2'>
         <Label htmlFor='daysPerMonth' className='text-xs'>
           Days per month
@@ -104,12 +113,12 @@ export const PtoCalculator = () => {
         />
       </div>
 
-      <Button onClick={calculateAccumulatedDays} size='sm' className='w-full h-8 text-xs' variant='outline'>
+      <Button onClick={handleCalculate} size='sm' className='w-full h-8 text-xs' variant='outline'>
         <Calculator className='w-3 h-3 mr-1' />
         Calculate
       </Button>
 
-      {calculatedDays !== null && (
+      {calculatedDays !== null && calculationSnapshotRef.current && (
         <div className='space-y-2 p-2 bg-muted rounded-md'>
           <div className='text-xs'>
             <span className='font-medium'>Result:</span>
@@ -118,8 +127,8 @@ export const PtoCalculator = () => {
               <span>days</span>
             </div>
             <p className='text-muted-foreground flex gap-0.5'>
-              <SlidingNumber number={daysPerMonth} decimalPlaces={1} /> days/month ×{' '}
-              <SlidingNumber number={selectedMonth} /> months
+              <SlidingNumber number={calculationSnapshotRef.current.days} decimalPlaces={1} /> days/month ×{' '}
+              <SlidingNumber number={calculationSnapshotRef.current.month} decimalPlaces={0} /> months
             </p>
           </div>
 

@@ -2,63 +2,126 @@ import { headers } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-08-27.basil',
 });
 
-const secret = process.env.STRIPE_WEBHOOK_SECRET;
+const STRIPE_EVENTS = {
+  PAYMENT_INTENT_SUCCEEDED: 'payment_intent.succeeded',
+  PAYMENT_INTENT_FAILED: 'payment_intent.payment_failed',
+} as const;
+
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
-    const signature = (await headers()).get('stripe-signature');
-    
-  if (!signature || !secret) {
-    return Response.json({ error: 'Missing signature or webhook secret' }, { status: 400 });
+  const signature = (await headers()).get('stripe-signature');
+
+  if (!signature) {
+    console.error('Missing stripe signature');
+    return Response.json({ error: 'Missing signature' }, { status: 400 });
   }
+
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, secret);
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
-    console.error('Webhook signature verification failed:', err);
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    console.error('Webhook signature verification failed:', errorMessage);
     return Response.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
-  if (event.type === 'payment_intent.succeeded') {
-      await handleSuccessfulPayment(event.data.object);
-  } else {
-      console.log(`Unhandled event type: ${event.type}`);
+  try {
+    switch (event.type) {
+      case STRIPE_EVENTS.PAYMENT_INTENT_SUCCEEDED:
+        await handleSuccessfulPayment(event.data.object as Stripe.PaymentIntent);
+        break;
+      case STRIPE_EVENTS.PAYMENT_INTENT_FAILED:
+        await handleFailedPayment(event.data.object as Stripe.PaymentIntent);
+        break;
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
+    }
+  } catch (error) {
+    console.error('Error processing webhook:', error);
+    return Response.json({ error: 'Webhook processing failed' }, { status: 500 });
   }
 
   return Response.json({ received: true });
 }
 
 async function handleSuccessfulPayment(paymentIntent: Stripe.PaymentIntent) {
-  const { email, type } = paymentIntent.metadata;
-  const amount = paymentIntent.amount / 100;
+  const metadata = paymentIntent.metadata;
 
-  console.log(`Payment succeeded: €${amount} from ${email}`);
+  const paymentData = {
+    stripePaymentId: paymentIntent.id,
+    customerId:
+      typeof paymentIntent.customer === 'string' ? paymentIntent.customer : paymentIntent.customer?.id || null,
+    email: metadata.email,
+    name: metadata.name || null,
+    amount: paymentIntent.amount / 100,
+    currency: paymentIntent.currency.toUpperCase(),
+    status: paymentIntent.status,
+    type: metadata.type,
+    method: 'stripe' as const,
+    promoCode: metadata.promoCode || null,
+    timestamp: metadata.timestamp || new Date(paymentIntent.created * 1000).toISOString(),
+    createdAt: new Date(paymentIntent.created * 1000),
+    userAgent: metadata.userAgent || null,
+    ipAddress: metadata.ipAddress || null,
+    description: paymentIntent.description || null,
+    receiptUrl: null as string | null,
+    chargeId: null as string | null,
+  };
 
   try {
-    // add to db
-    // await addToPremiumDatabase({
-    //   email,
-    //   amount,
-    //   stripePaymentId: paymentIntent.id,
-    //   timestamp: new Date(),
-    //   type: 'donation',
-    // });
+    if (paymentIntent.latest_charge) {
+      const chargeId =
+        typeof paymentIntent.latest_charge === 'string' ? paymentIntent.latest_charge : paymentIntent.latest_charge.id;
 
-    console.log(`Added ${email} to premium users`);
+      const charge = await stripe.charges.retrieve(chargeId);
+      paymentData.receiptUrl = charge.receipt_url;
+      paymentData.chargeId = charge.id;
+    }
   } catch (error) {
-    console.error('Error adding to database:', error);
+    console.error('Error fetching charge details:', error);
+  }
+
+  try {
+    await saveDonationToDatabase(paymentData);
+    console.log(`Donation recorded: ${paymentData.email} - €${paymentData.amount}`);
+  } catch (error) {
+    console.error('Error saving donation to database:', error);
+    throw error;
   }
 }
 
-async function addRecord(data: {
-  email: string;
-  amount: number;
-  stripePaymentId: string;
-  timestamp: Date;
-  type: string;
-}) {}
+async function handleFailedPayment(paymentIntent: Stripe.PaymentIntent) {
+  const failureData = {
+    stripePaymentId: paymentIntent.id,
+    email: paymentIntent.metadata.email,
+    amount: paymentIntent.amount / 100,
+    currency: paymentIntent.currency.toUpperCase(),
+    status: paymentIntent.status,
+    errorMessage: paymentIntent.last_payment_error?.message || 'Unknown error',
+    errorCode: paymentIntent.last_payment_error?.code || null,
+    timestamp: new Date().toISOString(),
+  };
+
+  console.error('Payment failed:', failureData);
+
+  try {
+    await saveFailedPaymentToDatabase(failureData);
+  } catch (error) {
+    console.error('Error saving failed payment:', error);
+  }
+}
+
+async function saveDonationToDatabase(data: any) {
+  console.log('Saving donation:', data);
+}
+
+async function saveFailedPaymentToDatabase(data: any) {
+  console.log('Saving failed payment:', data);
+}

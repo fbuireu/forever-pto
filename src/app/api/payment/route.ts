@@ -10,16 +10,17 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: NextRequest) {
   try {
-    const { amount, email } = await request.json();
+    const { amount, email, name, promoCode } = await request.json();
 
-    if (amount <= 0 || amount > 10000) {
+    if (!amount || amount <= 0 || amount > 10000) {
       return Response.json(
         paymentDTO.create({
           raw: {
             type: 'error',
             error: new Error('Invalid amount. Must be between 0.01 and 10,000'),
           },
-        })
+        }),
+        { status: 400 }
       );
     }
 
@@ -30,17 +31,27 @@ export async function POST(request: NextRequest) {
             type: 'error',
             error: new Error('Valid email is required'),
           },
-        })
+        }),
+        { status: 400 }
       );
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount * 100,
       currency: 'eur',
+      description: `Donation from ${email}`,
+      receipt_email: email, 
       metadata: {
         type: 'donation',
         email,
+        name: name || '',
+        promoCode: promoCode || '',
         timestamp: new Date().toISOString(),
+        userAgent: request.headers.get('user-agent') || '',
+        ipAddress:
+          request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+          request.headers.get('x-real-ip') ||
+          'unknown',
       },
       automatic_payment_methods: {
         enabled: true,
@@ -49,14 +60,23 @@ export async function POST(request: NextRequest) {
 
     return Response.json(
       paymentDTO.create({
-        raw: { type: 'success', data: paymentIntent },
+        raw: {
+          type: 'success',
+          data: paymentIntent
+        },
       })
     );
   } catch (error) {
+    console.error('Payment creation error:', error);
+
     return Response.json(
       paymentDTO.create({
-        raw: { type: 'error', error },
-      })
+        raw: {
+          type: 'error',
+          error: error instanceof Error ? error : new Error('Unknown error occurred'),
+        },
+      }),
+      { status: 500 }
     );
   }
 }

@@ -1,6 +1,7 @@
 import { Toaster } from '@const/components/ui/sonner';
 import { cn } from '@const/lib/utils';
 import { routing } from '@infrastructure/i18n/routing';
+import { CookieConsent } from '@ui/modules/components/core/CookieConsent';
 import { Donate } from '@ui/modules/components/core/Donate';
 import { type Locale, NextIntlClientProvider, hasLocale } from 'next-intl';
 import { ThemeProvider } from 'next-themes';
@@ -53,6 +54,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
               <Toaster />
               <Donate />
               <PremiumModal />
+              <CookieConsent />
             </SidebarProvider>
             <footer className='row-start-3 flex gap-[24px] flex-wrap items-center justify-center' />
           </ThemeProvider>

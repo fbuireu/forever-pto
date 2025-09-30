@@ -149,6 +149,6 @@ export const getStripeClient = (): StripeClient => {
 
     stripeClientInstance = new StripeClient(publishableKey);
   }
-  console.log('stripeClientInstance', stripeClientInstance);
+
   return stripeClientInstance;
 };

@@ -6,13 +6,15 @@ import { Button } from '@const/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
 import { Input } from '@const/components/ui/input';
 import { Label } from '@const/components/ui/label';
+import { cn } from '@const/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getStripeClient } from '@infrastructure/payments/stripe/client';
-import { Star } from 'lucide-react';
+import { ChevronDown, Star } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
 import * as z from 'zod';
 import { useShallow } from 'zustand/react/shallow';
@@ -26,6 +28,7 @@ const donationSchema = z.object({
     .max(10000, 'Amount cannot exceed 10,000')
     .multipleOf(0.01, 'Amount must have maximum 2 decimal places'),
   email: z.email('Please enter a valid email address').min(1, 'Email is required'),
+  promoCode: z.string().optional(),
 });
 
 type DonationFormData = z.infer<typeof donationSchema>;
@@ -35,6 +38,7 @@ const PRESET_AMOUNTS = [5, 10, 15];
 export const Donate = () => {
   const locale = useLocale();
   const [isOpen, setIsOpen] = useState(false);
+  const [showPromoCode, setShowPromoCode] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const { premiumKey, setPremiumStatus } = usePremiumStore(
@@ -198,6 +202,37 @@ export const Donate = () => {
                   </FormItem>
                 )}
               />
+              <Collapsible open={showPromoCode} onOpenChange={setShowPromoCode}>
+                <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-sm font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors'>
+                  <span className='text-muted-foreground'>Have a promo code?</span>
+                  <ChevronDown
+                    className={cn(
+                      'h-4 w-4 text-muted-foreground transition-transform duration-200',
+                      showPromoCode && 'rotate-180'
+                    )}
+                  />
+                </CollapsibleTrigger>
+                <CollapsibleContent className='pt-2'>
+                  <FormField
+                    control={form.control}
+                    name='promoCode'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            type='text'
+                            placeholder='Enter promo code'
+                            disabled={isPending}
+                            {...field}
+                            className='h-10'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CollapsibleContent>
+              </Collapsible>
 
               <Button
                 type='submit'
