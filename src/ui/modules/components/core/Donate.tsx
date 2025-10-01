@@ -204,7 +204,7 @@ export const Donate = () => {
                 )}
               />
               <Collapsible open={showPromoCode} onOpenChange={setShowPromoCode}>
-                <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-sm font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors'>
+                <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-sm font-medium hover:bg-muted/50 cursor-pointer rounded-md'>
                   <span className='text-muted-foreground'>Have a promo code?</span>
                   <ChevronDown
                     className={cn(
@@ -213,26 +213,28 @@ export const Donate = () => {
                     )}
                   />
                 </CollapsibleTrigger>
-                <CollapsibleContent className='pt-2'>
-                  <FormField
-                    control={form.control}
-                    name='promoCode'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            type='text'
-                            placeholder='Enter promo code'
-                            disabled={isPending}
-                            {...field}
-                            className='h-10'
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CollapsibleContent>
+                {showPromoCode && (
+                  <CollapsibleContent className='pt-2 min-h-[60px]'>
+                    <FormField
+                      control={form.control}
+                      name='promoCode'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              type='text'
+                              placeholder='Enter promo code'
+                              disabled={isPending}
+                              {...field}
+                              className='h-10'
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CollapsibleContent>
+                )}
               </Collapsible>
 
               <Button type='submit' disabled={isPending} className='w-full bg-green-600 hover:bg-green-700'>
