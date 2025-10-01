@@ -9,8 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@const/components/ui/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
 import { Input } from '@const/components/ui/input';
-import { Label } from '@const/components/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarDays, Calendar as CalendarIcon, Plus } from 'lucide-react';
 import type { Locale } from 'next-intl';
@@ -40,13 +40,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [isPending, startTransition] = useTransition();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setValue,
-  } = useForm<HolidayFormData>({
+  const form = useForm<HolidayFormData>({
     resolver: zodResolver(holidaySchema),
     mode: 'onSubmit',
     defaultValues: {
@@ -55,7 +49,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
   });
 
   const handleClose = () => {
-    reset();
+    form.reset();
     setSelectedDate(undefined);
     onClose();
   };
@@ -99,7 +93,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
   const handleDateSelect = (date: Date | Date[] | FromTo | undefined) => {
     if (date instanceof Date) {
       setSelectedDate(date);
-      setValue('date', date, { shouldValidate: true });
+      form.setValue('date', date, { shouldValidate: true });
     }
   };
 
@@ -118,64 +112,73 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
             </span>
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6' noValidate>
-          <div className='space-y-2'>
-            <Label htmlFor='name'>Holiday Name</Label>
-            <Input
-              id='name'
-              type='text'
-              placeholder='e.g. My birthday'
-              autoFocus
-              disabled={isPending}
-              {...register('name')}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6' noValidate>
+            <FormField
+              control={form.control}
+              name='name'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Holiday Name</FormLabel>
+                  <FormControl>
+                    <Input type='text' placeholder='e.g. My birthday' autoFocus disabled={isPending} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.name && <p className='text-sm text-destructive mt-1'>{errors.name.message}</p>}
-          </div>
-          <div className='space-y-2'>
-            <Label className='flex flex-direction-column flex-wrap align-items-flex-start'>
-              Select Date
-              <div className='border rounded-lg p-3'>
-                <Calendar
-                  mode={CalendarSelectionMode.SINGLE}
-                  showNavigation
-                  selected={selectedDate}
-                  onSelect={handleDateSelect}
-                  locale={locale}
-                  holidays={holidays}
-                  allowPastDays
-                  currentSelection={currentSelection}
-                  alternatives={alternatives}
-                  suggestion={suggestion}
-                  className='w-full'
-                  disabled={isPending}
-                />
-                {selectedDate && (
-                  <div className='mt-3 p-2 bg-muted rounded text-sm flex align-items-center'>
-                    <CalendarIcon className='w-4 h-4 inline mr-2' />
-                    Selected:{' '}
-                    {formatDate({
-                      date: selectedDate,
-                      locale,
-                      format: 'EEEE, MMMM d, yyyy',
-                    })}
-                  </div>
-                )}
+            <FormField
+              control={form.control}
+              name='date'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Select Date</FormLabel>
+                  <FormControl>
+                    <div className='border rounded-lg p-3'>
+                      <Calendar
+                        mode={CalendarSelectionMode.SINGLE}
+                        showNavigation
+                        selected={selectedDate}
+                        onSelect={handleDateSelect}
+                        locale={locale}
+                        holidays={holidays}
+                        allowPastDays
+                        currentSelection={currentSelection}
+                        alternatives={alternatives}
+                        suggestion={suggestion}
+                        className='w-full'
+                        disabled={isPending}
+                      />
+                      {selectedDate && (
+                        <div className='mt-3 p-2 bg-muted rounded text-sm flex align-items-center'>
+                          <CalendarIcon className='w-4 h-4 inline mr-2' />
+                          Selected:{' '}
+                          {formatDate({
+                            date: selectedDate,
+                            locale,
+                            format: 'EEEE, MMMM d, yyyy',
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter>
+              <div className='flex gap-2 pt-2'>
+                <Button type='submit' className='flex-1' disabled={isPending}>
+                  <Plus className='w-4 h-4 mr-2' />
+                  {isPending ? 'Adding...' : 'Add Holiday'}
+                </Button>
+                <Button type='button' variant='outline' onClick={handleClose} disabled={isPending}>
+                  Cancel
+                </Button>
               </div>
-            </Label>
-            {errors.date && <p className='text-sm text-destructive mt-1'>{errors.date.message}</p>}
-          </div>
-          <DialogFooter>
-            <div className='flex gap-2 pt-2'>
-              <Button type='submit' className='flex-1' disabled={isPending}>
-                <Plus className='w-4 h-4 mr-2' />
-                {isPending ? 'Adding...' : 'Add Holiday'}
-              </Button>
-              <Button type='button' variant='outline' onClick={handleClose} disabled={isPending}>
-                Cancel
-              </Button>
-            </div>
-          </DialogFooter>
-        </form>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

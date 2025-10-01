@@ -29,7 +29,7 @@ export const CookieButton = () => {
     <>
       <Button
         variant='ghost'
-        className='cookies_consent_button --is-clickable --underline-on-hover'
+        className='cookies_consent_button text-muted-foreground'
         onClick={() => setShowPreferences(true)}
       >
         Manage cookies

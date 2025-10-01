@@ -54,43 +54,36 @@ export const DevFooter = () => {
   }, []);
 
   return (
-    <footer className='w-full border-t bg-background/50 backdrop-blur-sm'>
-      <div className='container mx-auto px-4 py-4'>
-        <div className='flex flex-col items-center justify-center space-y-2'>
-          <div className='text-sm flex items-baseline gap-1.5 text-muted-foreground text-center'>
-            Made with
-            <RotatingTextContainer text={EMOJIS}>
-              <RotatingText
-                text={currentEmoji}
-                transition={{ type: 'spring', bounce: 0.5, stiffness: 300, duration: 2 }}
-              />
-            </RotatingTextContainer>
-            by
-            <span className='font-medium text-foreground hover:text-primary p-0 h-auto min-w-0'>
-              {CONTACT_DETAILS.NAME}
-            </span>
-          </div>
-          <p className='text-sm text-muted-foreground text-center mb-2'>You can also find me</p>
-          <div className='flex gap-5 items-center space-x-1 text-xs text-muted-foreground/70'>
-            {Object.values(SOCIAL_NETWORKS).map((network) => (
-              <a
-                key={network.BASE_URL}
-                href={`${network.BASE_URL}/${network.USERNAME}`}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='transition-all duration-200 hover:scale-110 hover:text-opacity-100'
-                style={{ '--hover-color': network.COLOR } as React.CSSProperties & { '--hover-color': string }}
-              >
-                <Icon
-                  icon={network.ICON}
-                  size={24}
-                  className='transition-colors duration-200 hover:[color:var(--hover-color)]'
-                />
-              </a>
-            ))}
-          </div>
-        </div>
+    <div className='container max-w-4xl px-4 py-4 flex flex-col items-center justify-center space-y-2 gap-4'>
+      <div className='text-sm flex items-baseline gap-1.5 text-muted-foreground text-center'>
+        Made with
+        <RotatingTextContainer text={EMOJIS}>
+          <RotatingText text={currentEmoji} transition={{ type: 'spring', bounce: 0.5, stiffness: 300, duration: 2 }} />
+        </RotatingTextContainer>
+        by
+        <span className='font-medium text-foreground hover:text-primary p-0 h-auto min-w-0'>
+          {CONTACT_DETAILS.NAME}
+        </span>
       </div>
-    </footer>
+      <p className='text-sm text-muted-foreground text-center'>You can also find me</p>
+      <div className='flex gap-5 items-center space-x-1 text-xs text-muted-foreground/70'>
+        {Object.values(SOCIAL_NETWORKS).map((network) => (
+          <a
+            key={network.BASE_URL}
+            href={`${network.BASE_URL}/${network.USERNAME}`}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='transition-all duration-200 hover:scale-110 hover:text-opacity-100'
+            style={{ '--hover-color': network.COLOR } as React.CSSProperties & { '--hover-color': string }}
+          >
+            <Icon
+              icon={network.ICON}
+              size={24}
+              className='transition-colors duration-200 hover:[color:var(--hover-color)]'
+            />
+          </a>
+        ))}
+      </div>
+    </div>
   );
 };

@@ -32,7 +32,6 @@ type EmailFormData = z.infer<typeof emailSchema>;
 
 export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading }: UpgradeModalProps) => {
   const [step, setStep] = useState<Step>(Step.INPUT);
-  const [verificationError, setVerificationError] = useState('');
 
   const form = useForm<EmailFormData>({
     resolver: zodResolver(emailSchema),
@@ -43,14 +42,11 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
 
   const handleClose = () => {
     form.reset();
-    setVerificationError('');
     setStep(Step.INPUT);
     onClose();
   };
 
   const onSubmit = async (data: EmailFormData) => {
-    setVerificationError('');
-
     const success = await onVerifyEmail(data.email);
 
     if (success) {
@@ -59,14 +55,17 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
         handleClose();
       }, 1500);
     } else {
+      form.setError('email', {
+        type: 'manual',
+        message: 'Email not found in our premium users list',
+      });
       setStep(Step.ERROR);
-      setVerificationError('Email not found in our premium users list');
     }
   };
 
   const handleTryAgain = () => {
     setStep(Step.INPUT);
-    setVerificationError('');
+    form.clearErrors();
   };
 
   return (
@@ -109,8 +108,6 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
                   </FormItem>
                 )}
               />
-
-              {verificationError && <p className='text-sm text-destructive'>{verificationError}</p>}
 
               <div className='flex gap-2'>
                 <Button type='submit' disabled={isLoading} className='flex-1'>

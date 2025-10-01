@@ -42,13 +42,10 @@ export { generateMetadata };
 // todo: check validation premium
 // todo: unify component and folder structure
 // todo: locale all
-// todo: legal and cookies (banner included) -->https://github.com/r2hu1/shadcn-cookie-consent (manual)
-// todo: unify forms (disabled VS showing error message) --> buton active + feedback on input
-// todo: footer
+// todo: legal and cookies 
 // todo: roadmap
 // todo: legal pages
 // todo: add animate icons (https://animate-ui.com/docs/icons)
 // todo: add animate components to summary (sliding)
 // todo: setup stripe
-// todo: setup promo code
-
+// todo: setup promo code + apply feedback and checks

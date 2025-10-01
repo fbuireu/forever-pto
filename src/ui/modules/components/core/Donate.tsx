@@ -56,7 +56,7 @@ export const Donate = () => {
     },
   });
 
-  const { watch, setValue, formState } = form;
+  const { watch, setValue } = form;
   const currentAmount = watch('amount');
 
   const handlePresetClick = (value: number) => {
@@ -72,6 +72,7 @@ export const Donate = () => {
           body: JSON.stringify({
             amount: data.amount,
             email: data.email,
+            promoCode: data.promoCode,
           }),
         });
 
@@ -234,11 +235,7 @@ export const Donate = () => {
                 </CollapsibleContent>
               </Collapsible>
 
-              <Button
-                type='submit'
-                disabled={!formState.isValid || isPending}
-                className='w-full bg-green-600 hover:bg-green-700'
-              >
+              <Button type='submit' disabled={isPending} className='w-full bg-green-600 hover:bg-green-700'>
                 {isPending ? 'Processing...' : `Donate ${currentAmount ? `€${currentAmount.toFixed(2)}` : ''}`}
               </Button>
             </form>
