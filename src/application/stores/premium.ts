@@ -171,12 +171,6 @@ export const usePremiumStore = create<PremiumStore>()(
             return;
           }
 
-          console.log('Premium store rehydrated:', {
-            hasKey: !!state.premiumKey,
-            hasEmail: !!state.userEmail,
-            lastVerified: state.lastVerified,
-          });
-
           if (state.lastVerified && Date.now() - state.lastVerified > TWENTY_FOUR_HOURS) {
             console.log('Session expired, marking for recheck');
             state.needsSessionCheck = true;

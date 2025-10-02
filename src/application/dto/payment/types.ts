@@ -1,16 +1,35 @@
 import Stripe from 'stripe';
 
-export type PaymentDTO =
-  | {
-      success: true;
-      clientSecret: string;
-    }
-  | {
-      success: false;
-      error: string;
-      stripeError?: Stripe.StripeRawError;
-      code?: string;
-      type?: string;
-    };
+export type DiscountInfo = {
+  type: 'percent' | 'fixed';
+  value: number;
+  originalAmount: number;
+  finalAmount: number;
+  couponId: string;
+  couponName: string | null;
+};
 
-export type RawPayment = { type: 'success'; data: Stripe.PaymentIntent } | { type: 'error'; error: unknown };
+export type RawPaymentSuccess = {
+  type: 'success';
+  data: {
+    paymentIntent: Stripe.PaymentIntent;
+    discountInfo: DiscountInfo | null;
+  };
+};
+
+export type RawPaymentError = {
+  type: 'error';
+  error: Error | Stripe.errors.StripeError;
+};
+
+export type RawPayment = RawPaymentSuccess | RawPaymentError;
+
+export type PaymentDTO = {
+  success: boolean;
+  clientSecret?: string;
+  error?: string;
+  discountInfo?: DiscountInfo;
+  stripeError?: Stripe.StripeRawError;
+  code?: string;
+  type?: string;
+};

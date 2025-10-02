@@ -17,22 +17,15 @@ import { updateDarkMode } from '../footer/components/utils/helpers';
 import { CookieConsentDialog } from './CookieConsentDialog';
 
 export const CookieConsent = () => {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [showModal, setShowModal] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
   const { analyticsEnabled, setAnalyticsEnabled, handleAcceptAll, handleRejectAll, handleSavePreferences } =
     useCookieConsent();
 
   useEffect(() => {
-    updateDarkMode(theme);
-
-    if (theme === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const handleChange = () => updateDarkMode(theme);
-      mediaQuery.addEventListener('change', handleChange);
-      return () => mediaQuery.removeEventListener('change', handleChange);
-    }
-  }, [theme]);
+    updateDarkMode(resolvedTheme);
+  }, [resolvedTheme]);
 
   useEffect(() => {
     const cookie = getCookie();

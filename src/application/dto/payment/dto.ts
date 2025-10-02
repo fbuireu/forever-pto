@@ -29,7 +29,7 @@ export const paymentDTO: BaseDTO<RawPayment, PaymentDTO> = {
       };
     }
 
-    const paymentIntent = raw.data;
+    const { paymentIntent, discountInfo } = raw.data;
 
     if (!paymentIntent.client_secret) {
       return {
@@ -42,6 +42,7 @@ export const paymentDTO: BaseDTO<RawPayment, PaymentDTO> = {
     return {
       success: true,
       clientSecret: paymentIntent.client_secret,
+      discountInfo: discountInfo || undefined,
     };
   },
 };

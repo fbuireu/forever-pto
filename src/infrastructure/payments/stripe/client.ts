@@ -22,6 +22,11 @@ export class StripeClient {
     this.publishableKey = publishableKey;
   }
 
+  getStripePromise(): Promise<Stripe | null> {
+    this.stripePromise ??= loadStripe(this.publishableKey);
+    return this.stripePromise;
+  }
+
   private async getStripe(): Promise<Stripe> {
     if (!this.stripe) {
       this.stripePromise ??= loadStripe(this.publishableKey);
@@ -149,6 +154,5 @@ export const getStripeClient = (): StripeClient => {
 
     stripeClientInstance = new StripeClient(publishableKey);
   }
-
   return stripeClientInstance;
 };
