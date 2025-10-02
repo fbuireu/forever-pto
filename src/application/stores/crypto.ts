@@ -22,7 +22,7 @@ function getDeviceKey(): string {
   const DEVICE_KEY_NAME = '__device_crypto_key';
 
   if (!isClient) {
-    return 'fallback-memory-key';
+    return process.env.NEXT_PUBLIC_STORAGE_KEY;
   }
 
   let deviceKey = BROWSER_STORAGE.getItem(DEVICE_KEY_NAME);
