@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
-import { encryptedStorage } from './crypto';
+import { createJSONStorage, devtools, persist } from 'zustand/middleware';
+import { createEncryptedStorage } from './crypto';
 
 export interface PremiumState {
   premiumKey: string | null;
@@ -29,6 +29,8 @@ interface PremiumActions {
 type PremiumStore = PremiumState & PremiumActions;
 
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+const STORAGE_NAME = 'premium-store';
+const STORAGE_VERSION = 1;
 
 const premiumInitialState: PremiumState = {
   premiumKey: null,
@@ -115,6 +117,7 @@ export const usePremiumStore = create<PremiumStore>()(
             });
           }
         },
+
         setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => {
           set({
             premiumKey,
@@ -130,6 +133,7 @@ export const usePremiumStore = create<PremiumStore>()(
             await get().verifyEmail(userEmail);
           }
         },
+
         showUpgradeModal: (feature: string) => {
           set({
             currentFeature: feature,
@@ -145,23 +149,41 @@ export const usePremiumStore = create<PremiumStore>()(
         },
       }),
       {
-        name: 'premium-store',
-        storage: encryptedStorage,
+        name: STORAGE_NAME,
+        version: STORAGE_VERSION,
+        storage: createJSONStorage(
+          () => createEncryptedStorage({ storeName: STORAGE_NAME, version: STORAGE_VERSION }).storage
+        ),
         partialize: (state) => ({
           premiumKey: state.premiumKey,
           userEmail: state.userEmail,
           lastVerified: state.lastVerified,
+          needsSessionCheck: state.needsSessionCheck,
         }),
-        onRehydrateStorage: () => (state) => {
-          if (state) {
-            const isExpired = state.lastVerified && Date.now() - state.lastVerified > TWENTY_FOUR_HOURS;
-            if (isExpired) {
-              state.needsSessionCheck = true;
-            }
+        onRehydrateStorage: () => (state, error) => {
+          if (error) {
+            console.error('Error rehydrating premium store:', error);
+            return;
+          }
+
+          if (!state) {
+            console.warn('No state to rehydrate');
+            return;
+          }
+
+          console.log('Premium store rehydrated:', {
+            hasKey: !!state.premiumKey,
+            hasEmail: !!state.userEmail,
+            lastVerified: state.lastVerified,
+          });
+
+          if (state.lastVerified && Date.now() - state.lastVerified > TWENTY_FOUR_HOURS) {
+            console.log('Session expired, marking for recheck');
+            state.needsSessionCheck = true;
           }
         },
       }
     ),
-    { name: 'premium-store' }
+    { name: STORAGE_NAME }
   )
 );

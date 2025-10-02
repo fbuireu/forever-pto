@@ -1,7 +1,7 @@
 import { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
-import { encryptedStorage } from './crypto';
+import { createJSONStorage, devtools, persist } from 'zustand/middleware';
+import { createEncryptedStorage } from './crypto';
 
 export interface FiltersState {
   ptoDays: number;
@@ -25,6 +25,9 @@ interface FilterActions {
 }
 
 type FiltersStore = FiltersState & FilterActions;
+
+const STORAGE_NAME = 'filters-store';
+const STORAGE_VERSION = 1;
 
 const initialState: FiltersState = {
   ptoDays: 22,
@@ -51,19 +54,13 @@ export const useFiltersStore = create<FiltersStore>()(
         resetToDefaults: () => set(initialState, false, 'resetToDefaults'),
       }),
       {
-        name: 'filters-store',
-        storage: encryptedStorage,
-        partialize: (state) => ({
-          ptoDays: state.ptoDays,
-          allowPastDays: state.allowPastDays,
-          country: state.country,
-          region: state.region,
-          year: state.year,
-          carryOverMonths: state.carryOverMonths,
-          strategy: state.strategy,
-        }),
+        name: STORAGE_NAME,
+        version: STORAGE_VERSION,
+        storage: createJSONStorage(
+          () => createEncryptedStorage({ storeName: STORAGE_NAME, version: STORAGE_VERSION }).storage
+        ),
       }
     ),
-    { name: 'filters-store' }
+    { name: STORAGE_NAME }
   )
 );

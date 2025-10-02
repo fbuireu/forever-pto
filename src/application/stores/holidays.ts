@@ -6,8 +6,9 @@ import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
 import { ensureDate } from '@shared/utils/dates';
 import { formatDate } from '@ui/modules/components/utils/formatters';
 import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
-import { encryptedStorage } from './crypto';
+import { createJSONStorage, devtools, persist } from 'zustand/middleware';
+import { createEncryptedStorage } from './crypto';
+
 import type {
   AddHolidayParams,
   AlternativeSelectionBaseParams,
@@ -16,7 +17,6 @@ import type {
   GenerateAlternativesParams,
   GenerateSuggestionsParams,
 } from './types';
-import { generateMetrics } from '@infrastructure/services/calendar/metrics/generateMetrics';
 
 export interface HolidaysState {
   holidays: HolidayDTO[];
@@ -43,6 +43,9 @@ interface HolidaysActions {
 }
 
 type HolidaysStore = HolidaysState & HolidaysActions;
+
+const STORAGE_NAME = 'holidays-store';
+const STORAGE_VERSION = 1;
 
 const holidaysInitialState: HolidaysState = {
   holidays: [],
@@ -81,7 +84,14 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
         },
 
-        generateSuggestions: ({ year, ptoDays, allowPastDays, months, strategy, locale }: GenerateSuggestionsParams) => {
+        generateSuggestions: ({
+          year,
+          ptoDays,
+          allowPastDays,
+          months,
+          strategy,
+          locale,
+        }: GenerateSuggestionsParams) => {
           const { holidays, maxAlternatives } = get();
 
           if (ptoDays <= 0 || holidays.length === 0) {
@@ -108,7 +118,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               holidays: holidaysDates,
               allowPastDays,
               months,
-                strategy,
+              strategy,
               locale,
             });
 
@@ -120,10 +130,10 @@ export const useHolidaysStore = create<HolidaysStore>()(
               months,
               maxAlternatives,
               existingSuggestion: suggestion.days,
-                strategy,
+              strategy,
               locale,
             });
-              
+
             set({
               suggestion,
               alternatives,
@@ -265,8 +275,11 @@ export const useHolidaysStore = create<HolidaysStore>()(
         },
       }),
       {
-        name: 'holidays-store',
-        storage: encryptedStorage,
+        name: STORAGE_NAME,
+        version: STORAGE_VERSION,
+        storage: createJSONStorage(
+          () => createEncryptedStorage({ storeName: STORAGE_NAME, version: STORAGE_VERSION }).storage
+        ),
         partialize: (state) => ({
           holidays: state.holidays.map((h) => ({
             ...h,
@@ -324,6 +337,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
         },
       }
     ),
-    { name: 'holidays-store' }
+    { name: STORAGE_NAME }
   )
 );

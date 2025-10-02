@@ -42,9 +42,9 @@ export { generateMetadata };
 // todo: check validation premium
 // todo: unify component and folder structure
 // todo: locale all
-// todo: legal and cookies 
 // todo: roadmap
-// todo: legal pages
+// todo: responsive
+// todo: legal pages and cookies (what info do I need to provide?)
 // todo: add animate icons (https://animate-ui.com/docs/icons)
 // todo: add animate components to summary (sliding)
 // todo: setup stripe
