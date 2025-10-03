@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { getStripeClient } from '@infrastructure/payments/stripe/client';
 import { ChevronDown, Star } from 'lucide-react';
 import { useLocale } from 'next-intl';
-import { useCallback, useMemo, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
@@ -22,7 +22,7 @@ import PaymentForm from './PaymentForm';
 
 const donationSchema = z.object({
   amount: z
-    .number({ invalid_type_error: 'Amount must be a number' })
+    .number({ error: 'Amount must be a number' })
     .min(0.01, 'Amount must be at least €0.01')
     .max(10000, 'Amount cannot exceed €10,000')
     .multipleOf(0.01, 'Amount must have maximum 2 decimal places'),
@@ -42,11 +42,6 @@ interface PaymentState {
 
 const stripeClient = getStripeClient();
 
-const premiumSelector = (state) => ({
-  premiumKey: state.premiumKey,
-  setPremiumStatus: state.setPremiumStatus,
-});
-
 export const Donate = () => {
   const locale = useLocale();
   const [isOpen, setIsOpen] = useState(false);
@@ -54,7 +49,12 @@ export const Donate = () => {
   const [isPending, startTransition] = useTransition();
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
 
-  const { premiumKey, setPremiumStatus } = usePremiumStore(useShallow(premiumSelector));
+  const { premiumKey, setPremiumStatus } = usePremiumStore(
+    useShallow((state) => ({
+      premiumKey: state.premiumKey,
+      setPremiumStatus: state.setPremiumStatus,
+    }))
+  ); 
 
   const form = useForm<DonationFormData>({
     resolver: zodResolver(donationSchema),
@@ -275,7 +275,7 @@ export const Donate = () => {
                     />
                   </CollapsibleTrigger>
                   {showPromoCode && (
-                    <CollapsibleContent className='pt-2'>
+                    <CollapsibleContent className='pt-2 min-h-[60px]'>
                       <FormField
                         control={form.control}
                         name='promoCode'
@@ -284,7 +284,7 @@ export const Donate = () => {
                             <FormControl>
                               <Input
                                 type='text'
-                                placeholder='Enter promo code'
+                                placeholder='YOU_WISH_IT_WAS_THAT_EASY'
                                 disabled={isPending}
                                 {...field}
                                 className='h-10 uppercase'

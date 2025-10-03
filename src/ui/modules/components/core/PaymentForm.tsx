@@ -3,8 +3,8 @@
 import { DiscountInfo } from '@application/dto/payment/types';
 import { Button } from '@const/components/ui/button';
 import { Skeleton } from '@const/components/ui/skeleton';
-import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import type { Stripe, StripeElements } from '@stripe/stripe-js';
+import { Elements, ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import type { Stripe, StripeElements, StripeElementsOptions } from '@stripe/stripe-js';
 import { ChevronLeft } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { FormEvent, useCallback, useMemo, useState } from 'react';
@@ -20,8 +20,9 @@ interface CheckoutFormProps {
 function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel }: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
+  const [isExpressReady, setIsExpressReady] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
-  const [isReady, setIsReady] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const formattedAmount = useMemo(() => amount.toFixed(2), [amount]);
@@ -43,6 +44,7 @@ function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel }: Chec
 
       const { error } = await stripe.confirmPayment({
         elements,
+        redirect: 'if_required',
         confirmParams: {
           return_url: `${window.location.origin}/payment/success`,
           receipt_email: email,
@@ -75,7 +77,26 @@ function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel }: Chec
     [stripe, elements, processPayment, onSuccess]
   );
 
-  const isDisabled = !stripe || isLoading || !isReady;
+  const handleExpressCheckout = useCallback(
+    async (event: any) => {
+      if (!stripe || !elements) return;
+
+      setIsLoading(true);
+      setErrorMessage(null);
+
+      const error = await processPayment(stripe, elements);
+
+      if (error) {
+        setErrorMessage(error);
+        setIsLoading(false);
+      } else {
+        onSuccess();
+      }
+    },
+    [stripe, elements, processPayment, onSuccess]
+  );
+
+  const isDisabled = !stripe || isLoading || !elements;
 
   return (
     <div className='space-y-4'>
@@ -105,25 +126,35 @@ function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel }: Chec
           )}
         </div>
       </div>
-
       <form onSubmit={handleSubmit} className='space-y-4'>
-        {!isReady && (
-          <div className='space-y-3'>
-            <Skeleton className='h-10 w-full' />
-            <Skeleton className='h-10 w-full' />
-            <Skeleton className='h-10 w-full' />
-          </div>
-        )}
+        <div className='relative min-h-[48px]'>
+          {!isExpressReady && (
+            <div className='gap-2 flex'>
+              <Skeleton className='h-12 flex-1' />
+              <Skeleton className='h-12 flex-1' />
+              <Skeleton className='h-12 flex-1' />
+            </div>
+          )}
 
-        <div className={!isReady ? 'hidden' : undefined}>
-          <PaymentElement onReady={() => setIsReady(true)} />
+          <div className={!isExpressReady ? 'invisible' : 'visible'}>
+            <ExpressCheckoutElement onConfirm={handleExpressCheckout} onReady={() => setIsExpressReady(true)} />
+          </div>
         </div>
 
-        {errorMessage && (
-          <div role='alert' className='rounded-md bg-destructive/10 border border-destructive/20 p-3'>
-            <p className='text-sm text-destructive'>{errorMessage}</p>
+        <div className='relative'>
+          <div className='absolute inset-0 flex items-center'>
+            <span className='w-full border-t' />
           </div>
-        )}
+          <div className='relative flex justify-center text-xs uppercase'>
+            <span className='relative bg-popover px-2 before:absolute before:right-full before:top-1/2 before:mr-4 before:h-px before:w-[100px] before:content-[""] after:absolute after:left-full after:top-1/2 after:ml-4 after:h-px after:w-[100px] after:content-[""]'>
+              Or pay with card
+            </span>
+          </div>
+        </div>
+
+        <PaymentElement />
+
+        {errorMessage && <p className='text-sm text-destructive'>{errorMessage}</p>}
 
         <Button
           type='submit'
@@ -158,15 +189,103 @@ export default function PaymentForm({
   onCancel,
 }: PaymentFormProps) {
   const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
-  const elementsOptions = useMemo(
+  const elementsOptions = useMemo<StripeElementsOptions>(
     () => ({
       clientSecret,
+      loader: 'always',
       appearance: {
-        theme: resolvedTheme === 'dark' ? 'night' : 'stripe',
-      } as const,
+        theme: isDark ? 'night' : 'flat',
+        variables: {
+          colorPrimary: isDark ? 'hsl(210 40% 98%)' : 'hsl(222.2 47.4% 11.2%)',
+          colorBackground: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
+          colorText: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
+          colorDanger: isDark ? 'hsl(0 62.8% 60.6%)' : 'hsl(0 84.2% 60.2%)',
+          fontFamily: 'system-ui, sans-serif',
+          spacingUnit: '4px',
+          borderRadius: '8px',
+          fontSizeBase: '14px',
+        },
+        rules: {
+          '.Input': {
+            backgroundColor: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
+            border: isDark ? '1px solid hsl(240 3.7% 15.9%)' : '1px solid hsl(240 5.9% 90%)',
+            padding: '8px 12px',
+            fontSize: '14px',
+            color: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
+            transition: 'border-color 0.2s, box-shadow 0.2s',
+          },
+          '.Input:hover': {
+            borderColor: isDark ? 'hsl(240 3.7% 20%)' : 'hsl(240 5.9% 85%)',
+          },
+          '.Input:focus': {
+            border: isDark ? '1px solid hsl(240 3.7% 15.9%)' : '1px solid hsl(240 5.9% 90%)',
+            boxShadow: isDark ? '0 0 0 3px hsl(240 3.7% 15.9%)' : '0 0 0 1px hsl(240 5.9% 10%)',
+            outline: 'none',
+          },
+          '.Input--invalid': {
+            border: isDark ? '1px solid hsl(0 62.8% 60.6%)' : '1px solid hsl(0 84.2% 60.2%)',
+          },
+          '.Input--invalid:focus': {
+            border: isDark ? '1px solid hsl(0 62.8% 60.6%)' : '1px solid hsl(0 84.2% 60.2%)',
+          },
+          '.Input::placeholder': {
+            color: isDark ? 'hsl(240 5% 64.9%)' : 'hsl(240 3.8% 46.1%)',
+          },
+          '.Input:disabled': {
+            backgroundColor: isDark ? 'hsl(240 3.7% 15.9%)' : 'hsl(240 4.8% 95.9%)',
+            color: isDark ? 'hsl(240 5% 64.9%)' : 'hsl(240 3.8% 46.1%)',
+            cursor: 'not-allowed',
+            opacity: '0.5',
+          },
+          '.Label': {
+            fontSize: '14px',
+            fontWeight: '500',
+            color: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
+            marginBottom: '8px',
+          },
+          '.Error': {
+            fontSize: '12px',
+            color: isDark ? 'hsl(0 62.8% 60.6%)' : 'hsl(0 84.2% 60.2%)',
+            border: 'none',
+            marginTop: '6px',
+            fontWeight: '500',
+          },
+          '.Tab': {
+            backgroundColor: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
+            border: isDark ? '1px solid hsl(240 3.7% 15.9%)' : '1px solid hsl(240 5.9% 90%)',
+            boxShadow: 'none',
+            color: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
+            borderRadius: '6px',
+            padding: '10px 16px',
+            transition: 'all 0.2s',
+          },
+          '.Tab:hover': {
+            backgroundColor: isDark ? 'hsl(240 3.7% 15.9%)' : 'hsl(240 4.8% 95.9%)',
+            borderColor: isDark ? 'hsl(240 3.7% 20%)' : 'hsl(240 5.9% 85%)',
+          },
+          '.Tab--selected': {
+            backgroundColor: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
+            color: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 98%)',
+            border: isDark ? '1px solid hsl(0 0% 98%)' : '1px solid hsl(240 10% 3.9%)',
+          },
+          '.Tab--selected:hover': {
+            backgroundColor: isDark ? 'hsl(240 5% 84%)' : 'hsl(240 5.9% 10%)',
+            borderColor: isDark ? 'hsl(240 5% 84%)' : 'hsl(240 5.9% 10%)',
+          },
+          '.TabIcon': {
+            fill: 'currentColor',
+          },
+          '.Block': {
+            backgroundColor: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
+            border: isDark ? '1px solid hsl(240 3.7% 15.9%)' : '1px solid hsl(240 5.9% 90%)',
+            borderRadius: '8px',
+          },
+        },
+      },
     }),
-    [clientSecret, resolvedTheme]
+    [clientSecret, isDark]
   );
 
   return (
