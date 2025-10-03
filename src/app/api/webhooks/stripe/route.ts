@@ -1,5 +1,5 @@
 import { headers } from 'next/headers';
-import type { NextRequest } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
   if (!signature) {
     console.error('Missing stripe signature');
-    return Response.json({ error: 'Missing signature' }, { status: 400 });
+    return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
   }
 
   let event: Stripe.Event;
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     console.error('Webhook signature verification failed:', errorMessage);
-    return Response.json({ error: 'Invalid signature' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
   try {
@@ -45,10 +45,10 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error('Error processing webhook:', error);
-    return Response.json({ error: 'Webhook processing failed' }, { status: 500 });
+    return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
   }
 
-  return Response.json({ received: true });
+  return NextResponse.json({ received: true });
 }
 
 async function handleSuccessfulPayment(paymentIntent: Stripe.PaymentIntent) {

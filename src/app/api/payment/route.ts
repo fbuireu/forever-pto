@@ -1,5 +1,5 @@
 import { paymentDTO } from '@application/dto/payment/dto';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
 
     // Validate amount
     if (!validateAmount(amount)) {
-      return Response.json(
+      return NextResponse.json(
         paymentDTO.create({
           raw: {
             type: 'error',
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
 
     // Validate email
     if (!validateEmail(email)) {
-      return Response.json(
+      return NextResponse.json(
         paymentDTO.create({
           raw: {
             type: 'error',
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return Response.json(
+    return NextResponse.json(
       paymentDTO.create({
         raw: {
           type: 'success',
@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
     const errorMessage =
       error instanceof Stripe.errors.StripeError ? error.message : 'An unexpected error occurred. Please try again.';
 
-    return Response.json(
+    return NextResponse.json(
       paymentDTO.create({
         raw: {
           type: 'error',
