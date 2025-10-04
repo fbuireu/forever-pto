@@ -1,12 +1,16 @@
 import { Toaster } from '@const/components/ui/sonner';
 import { cn } from '@const/lib/utils';
 import { routing } from '@infrastructure/i18n/routing';
+import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { CookieConsent } from '@ui/modules/components/core/CookieConsent';
 import { Donate } from '@ui/modules/components/core/Donate';
+import { Footer } from '@ui/modules/components/footer/Footer';
+import { StoresInitializer } from '@ui/store/StoresInitializer';
 import { type Locale, NextIntlClientProvider, hasLocale } from 'next-intl';
 import { ThemeProvider } from 'next-themes';
 import dynamic from 'next/dynamic';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { SidebarProvider } from 'src/components/animate-ui/radix/sidebar';
 import '../globals.css';
@@ -33,7 +37,9 @@ const PremiumModal = dynamic(() =>
 
 const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
   const { locale } = await params;
-
+  const cookieStore = await cookies();
+  const userCountry = cookieStore.get('user-country')?.value;
+  console.log('Layout - userCountry from cookie:', userCountry);
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
@@ -50,13 +56,16 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
             disableTransitionOnChange
           >
             <SidebarProvider>
-              {children}
-              <Toaster />
-              <Donate />
-              <PremiumModal />
-              <CookieConsent />
+              <StoresInitializer userCountry={userCountry} />
+              <AppSidebar locale={locale}>
+                {children}
+                <Toaster />
+                <Donate />
+                <PremiumModal />
+                <CookieConsent />
+              </AppSidebar>
             </SidebarProvider>
-            <footer className='row-start-3 flex gap-[24px] flex-wrap items-center justify-center' />
+            <Footer />
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

@@ -4,8 +4,8 @@ import { getCountries } from '@infrastructure/services/countries/getCountries';
 import { getRegions } from '@infrastructure/services/regions/getRegions';
 import type { Locale } from 'next-intl';
 import { create } from 'zustand';
-import { createJSONStorage, devtools, persist } from 'zustand/middleware';
-import { createEncryptedStorage } from './crypto';
+import { devtools, persist } from 'zustand/middleware';
+import { encryptedStorage } from './crypto';
 import { GetRegionParams } from './types';
 
 export interface LocationState {
@@ -105,9 +105,7 @@ export const useLocationStore = create<LocationStore>()(
       {
         name: STORAGE_NAME,
         version: STORAGE_VERSION,
-        storage: createJSONStorage(
-          () => createEncryptedStorage({ storeName: STORAGE_NAME, version: STORAGE_VERSION }).storage
-        ),
+        storage: encryptedStorage,
         partialize: (state) => ({
           countries: state.countries,
           countriesLastFetched: state.countriesLastFetched,

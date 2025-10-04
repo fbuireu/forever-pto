@@ -1,7 +1,7 @@
 import { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { create } from 'zustand';
-import { createJSONStorage, devtools, persist } from 'zustand/middleware';
-import { createEncryptedStorage } from './crypto';
+import { devtools, persist } from 'zustand/middleware';
+import { encryptedStorage } from './crypto';
 
 export interface FiltersState {
   ptoDays: number;
@@ -56,9 +56,7 @@ export const useFiltersStore = create<FiltersStore>()(
       {
         name: STORAGE_NAME,
         version: STORAGE_VERSION,
-        storage: createJSONStorage(
-          () => createEncryptedStorage({ storeName: STORAGE_NAME, version: STORAGE_VERSION }).storage
-        ),
+        storage: encryptedStorage,
       }
     ),
     { name: STORAGE_NAME }

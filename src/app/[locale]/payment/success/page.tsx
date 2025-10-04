@@ -2,10 +2,11 @@ import { Link } from '@application/i18n/navigtion';
 import { Button } from '@const/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { CheckCircle2, XCircle } from 'lucide-react';
+import { Locale } from 'next-intl';
 import { redirect } from 'next/navigation';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2025-08-27.basil',
 });
 
@@ -14,10 +15,11 @@ interface PaymentSuccessParams {
     payment_intent?: string;
     redirect_status?: string;
   }>;
+  params: Promise<{ locale: Locale }>;
 }
 
-export default async function PaymentSuccessPage({ searchParams }: PaymentSuccessParams) {
-  const { payment_intent: paymentIntentId } = await searchParams;
+export default async function PaymentSuccessPage({ searchParams, params }: Readonly<PaymentSuccessParams>) {
+  const [{ payment_intent: paymentIntentId }, { locale }] = await Promise.all([searchParams, params]);
 
   if (!paymentIntentId) {
     redirect('/');
@@ -40,7 +42,7 @@ export default async function PaymentSuccessPage({ searchParams }: PaymentSucces
   const currency = paymentIntent.currency.toUpperCase();
 
   return (
-    <div className='min-h-screen flex items-center justify-center p-4 bg-background'>
+    <div className='min-h-screen flex items-center justify-center p-4 bg-background m-auto'>
       <Card className='w-full max-w-md border-green-500/50'>
         <CardHeader className='text-center'>
           <div className='mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10'>

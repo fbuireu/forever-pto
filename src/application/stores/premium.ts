@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { createJSONStorage, devtools, persist } from 'zustand/middleware';
-import { createEncryptedStorage } from './crypto';
+import { devtools, persist } from 'zustand/middleware';
+import { encryptedStorage } from './crypto';
 
 export interface PremiumState {
   premiumKey: string | null;
@@ -151,9 +151,7 @@ export const usePremiumStore = create<PremiumStore>()(
       {
         name: STORAGE_NAME,
         version: STORAGE_VERSION,
-        storage: createJSONStorage(
-          () => createEncryptedStorage({ storeName: STORAGE_NAME, version: STORAGE_VERSION }).storage
-        ),
+        storage: encryptedStorage,
         partialize: (state) => ({
           premiumKey: state.premiumKey,
           userEmail: state.userEmail,
