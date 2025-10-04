@@ -25,6 +25,18 @@ const FAQ: FaqData = [
         answer:
           'We keep a cache of generated combinations and a set of already-selected dates; when producing alternatives we filter out bridges that include used dates to avoid overlaps and ensure variety.',
       },
+      {
+        id: 'encryption',
+        question: 'Is my data encrypted?',
+        answer:
+          "Your vacation planning data is stored locally in your browser. In production, we apply XOR cipher obfuscation to make the data unreadable in casual inspection. This is method is designed to prevent accidental exposure, not protect against determined attackers. We don't store sensitive personal information, and you maintain full control of your data on your device.",
+      },
+      {
+        id: 'data-privacy',
+        question: 'What data do you store?',
+        answer:
+          "All your data (PTO days, selected dates, custom holidays, preferences) is stored exclusively in your browser's local storage. We never send this information to our servers. Your vacation planning stays completely private on your device.",
+      },
     ],
   },
   {

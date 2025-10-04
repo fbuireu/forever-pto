@@ -19,7 +19,7 @@ export const StoresInitializer = ({ userCountry }: StoreInitializerProps) => {
   );
 
   useEffect(() => {
-    if (!userCountry || country) return;
+    if (!areStoresReady || !userCountry || country) return;
     setCountry(userCountry);
   }, [areStoresReady, userCountry, country, setCountry]);
 

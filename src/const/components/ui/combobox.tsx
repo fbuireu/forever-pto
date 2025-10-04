@@ -3,13 +3,13 @@
 import type { CountryDTO } from '@application/dto/country/types';
 import type { RegionDTO } from '@application/dto/region/types';
 import { cn } from '@const/lib/utils';
+import { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { useState } from 'react';
+import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './command';
 import { hasFlag } from './utils/helpers';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { FilterStrategy } from '@infrastructure/services/calendar/types';
 
 interface ComboboxProps extends Omit<React.HTMLProps<HTMLInputElement>, 'onChange'> {
   searchPlaceholder?: string;
@@ -54,9 +54,9 @@ export const Combobox = ({
           className={cn('w-[200px] justify-between', className)}
         >
           {selectedOption ? (
-            <div className='flex items-center gap-2'>
-              {hasFlag(selectedOption) && <span>{selectedOption.flag}</span>}
-              <span>{selectedOption.label}</span>
+            <div className='flex items-center gap-2 min-w-0 flex-1'>
+              {hasFlag(selectedOption) && <span className='flex-shrink-0'>{selectedOption.flag}</span>}
+              <span className='truncate'>{selectedOption.label}</span>
             </div>
           ) : (
             placeholder

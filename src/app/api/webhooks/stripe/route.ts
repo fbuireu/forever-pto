@@ -41,7 +41,6 @@ export async function POST(request: NextRequest) {
         await handleFailedPayment(event.data.object as Stripe.PaymentIntent);
         break;
       default:
-        console.log(`Unhandled event type: ${event.type}`);
     }
   } catch (error) {
     console.error('Error processing webhook:', error);

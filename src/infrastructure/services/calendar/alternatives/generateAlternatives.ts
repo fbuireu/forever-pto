@@ -88,7 +88,7 @@ export function generateAlternatives(params: GenerateAlternativesParams): Sugges
   return alternatives.map((alt) => ({
     days: alt.days.toSorted((a, b) => a.getTime() - b.getTime()),
     bridges: alt.bridges,
-      strategy: alt.strategy,
-    metrics: generateMetrics({ suggestion: alt, locale: params.locale, bridges: alt.bridges }),
+    strategy: alt.strategy,
+    metrics: generateMetrics({ suggestion: alt, locale: params.locale, bridges: alt.bridges, holidays: params.holidays }),
   }));
 }

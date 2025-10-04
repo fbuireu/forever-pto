@@ -33,7 +33,8 @@ export interface Metrics {
   averageEfficiency: number;
   bonusDays: number;
   quarterDist: number[];
-  activeQuarters: string;
+  bridgesUsed: number;
+  workingDaysPerMonth: number;
   totalEffectiveDays: number;
   efficiency?: number;
   monthlyDist: number[];

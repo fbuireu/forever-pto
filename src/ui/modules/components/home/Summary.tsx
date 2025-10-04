@@ -197,21 +197,27 @@ export const Summary = () => {
             />
             <PremiumFeature feature={'Métricas Avanzadas'} iconSize='h12 w-12'>
               <MetricCard
-                label='Trimestres'
-                value={metrics.activeQuarters}
+                label='Puentes usados'
+                value={metrics.bridgesUsed}
                 icon={BarChart3}
                 colorScheme='cyan'
                 size={MetricCardSize.COMPACT}
               />
             </PremiumFeature>
             <MetricCard
-              label='Potencial'
-              value={canImprove > 0 ? `+${canImprove}` : '✓'}
+              label='Average working days per month'
+              value={metrics.workingDaysPerMonth}
               icon={Award}
               colorScheme='violet'
               size={MetricCardSize.COMPACT}
             />
-            <MetricCard label='Bonus' value={`+${metrics.bonusDays}`} icon={Star} colorScheme='rose' size={MetricCardSize.COMPACT} />
+            <MetricCard
+              label='Bonus'
+              value={`+${metrics.bonusDays}`}
+              icon={Star}
+              colorScheme='rose'
+              size={MetricCardSize.COMPACT}
+            />
           </div>
           {metrics.firstLastBreak && (
             <PremiumFeature

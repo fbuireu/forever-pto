@@ -39,7 +39,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
   const { locale } = await params;
   const cookieStore = await cookies();
   const userCountry = cookieStore.get('user-country')?.value;
-  console.log('Layout - userCountry from cookie:', userCountry);
+
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }

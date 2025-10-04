@@ -3,6 +3,7 @@ import type { CryptoParams } from './types';
 
 const SECRET_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY ?? 'fallback-secret-key';
 const isDev = process.env.NODE_ENV === 'development';
+const isClient = typeof window !== 'undefined';
 
 function encrypt({ text, key }: CryptoParams): string {
   return btoa(
@@ -27,6 +28,13 @@ function decrypt({ text, key }: CryptoParams): string {
 }
 
 export const encryptedStorage = createJSONStorage(() => {
+  if (!isClient) {
+    return {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    };
+  }
   if (isDev) {
     return {
       getItem: (key: string): string | null => localStorage.getItem(key),

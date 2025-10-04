@@ -40,9 +40,10 @@ export function getTotalEffectiveDays(days: Date[], bridges?: { effectiveDays: n
   return days.length;
 }
 import { formatDate } from '@ui/modules/components/utils/formatters';
-import { getMonth } from 'date-fns';
+import { eachDayOfInterval, endOfYear, getMonth, isWeekend, startOfYear } from 'date-fns';
 import { Locale } from 'next-intl';
 import { FirstLastBreak } from '../../types';
+import { HolidayDTO } from '@application/dto/holiday/types';
 
 export const calculateRestBlocks = (dates: Date[]): number => {
   if (dates.length === 0) return 0;
@@ -87,7 +88,7 @@ export const getFirstLastBreak = ({ dates, locale }: GetFirstLastBreak): FirstLa
 };
 
 export const calculateQuarterDistribution = (dates: Date[]): number[] => {
-  const quarters = [0, 0, 0, 0]; // Q1, Q2, Q3, Q4
+  const quarters = [0, 0, 0, 0];
 
   dates?.forEach((date) => {
     const month = getMonth(date);
@@ -98,18 +99,23 @@ export const calculateQuarterDistribution = (dates: Date[]): number[] => {
   return quarters;
 };
 
-export const getMostActiveQuarters = (quarters: number[]): string => {
-  const total = quarters.reduce((sum, q) => sum + q, 0);
-  if (total === 0) return '';
 
-  const maxDays = Math.max(...quarters);
-  const topQuarters = quarters
-    .map((days, index) => ({ quarter: `Q${index + 1}`, days }))
-    .filter((q) => q.days === maxDays);
+interface GetWorkingDaysPerWeekParams {
+    ptoDays: Date[];
+    year: string;
+    holidays: HolidayDTO[];
+}
 
-  if (topQuarters.length > 1) {
-    return topQuarters.map((q) => q.quarter).join(' y ');
-  }
+export const getWorkingDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkingDaysPerWeekParams): number => {
+  const yearNum = parseInt(year);
+  const yearStart = startOfYear(new Date(yearNum, 0, 1));
+  const yearEnd = endOfYear(new Date(yearNum, 11, 31));
+  const allDaysInYear = eachDayOfInterval({ start: yearStart, end: yearEnd });
+  const workingDaysInYear = allDaysInYear.filter((day) => !isWeekend(day)).length;
+  const holidaysOnWorkdays = holidays.filter((h) => !isWeekend(h.date)).length;
+  const ptoOnWorkdays = ptoDays.filter((d) => !isWeekend(d)).length;
+  const actualWorkingDays = workingDaysInYear - holidaysOnWorkdays - ptoOnWorkdays;
+  const avgPerMonth = actualWorkingDays / 12;
 
-  return topQuarters[0].quarter;
+  return parseFloat(avgPerMonth.toFixed(1));
 };

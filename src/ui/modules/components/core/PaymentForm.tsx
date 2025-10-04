@@ -46,7 +46,7 @@ function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel }: Chec
         elements,
         redirect: 'if_required',
         confirmParams: {
-          return_url: `${window.location.origin}/payment/success`,
+          return_url: `${window.location.origin}/payment/confirmation`,
           receipt_email: email,
         },
       });

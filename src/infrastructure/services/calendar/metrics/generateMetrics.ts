@@ -1,3 +1,4 @@
+import { formatDate } from '@ui/modules/components/utils/formatters';
 import { Locale } from 'next-intl';
 import type { Bridge, Metrics, Suggestion } from '../types';
 import {
@@ -7,17 +8,20 @@ import {
   getFirstLastBreak,
   getLongBlocksPerQuarter,
   getMonthlyDist,
-  getMostActiveQuarters,
   getTotalEffectiveDays,
+  getWorkingDaysPerMonth,
+
 } from './utils/helpers';
+import { HolidayDTO } from '@application/dto/holiday/types';
 
 interface GenerateMetricsParams {
   suggestion: Omit<Suggestion, 'metrics'>;
   locale: Locale;
   bridges?: Bridge[];
+  holidays: HolidayDTO[];
 }
 
-export const generateMetrics = ({ suggestion, locale, bridges }: GenerateMetricsParams): Metrics => {
+export const generateMetrics = ({ suggestion, locale, bridges, holidays }: GenerateMetricsParams): Metrics => {
   const { days } = suggestion;
 
   if (days.length === 0) {
@@ -29,7 +33,8 @@ export const generateMetrics = ({ suggestion, locale, bridges }: GenerateMetrics
       averageEfficiency: 0,
       bonusDays: 0,
       quarterDist: [0, 0, 0, 0],
-      activeQuarters: '',
+      bridgesUsed: 0,
+      workingDaysPerMonth: 0,
       totalEffectiveDays: 0,
       efficiency: 0,
       monthlyDist: Array(12).fill(0),
@@ -48,7 +53,11 @@ export const generateMetrics = ({ suggestion, locale, bridges }: GenerateMetrics
   const maxWorkingPeriod = calculateMaxWorkingPeriod(days);
   const firstLastBreak = getFirstLastBreak({ dates: days, locale });
   const quarterDist = calculateQuarterDistribution(days);
-  const activeQuarters = getMostActiveQuarters(quarterDist);
+  const workingDaysPerMonth = getWorkingDaysPerMonth({
+    ptoDays: days,
+    holidays,
+    year: formatDate({ date: days[0], format: 'yyyy', locale }),
+  });
   const efficiency = totalEffectiveDays / days.length;
   const bonusDays = totalEffectiveDays - days.length;
 
@@ -60,7 +69,8 @@ export const generateMetrics = ({ suggestion, locale, bridges }: GenerateMetrics
     averageEfficiency: efficiency,
     bonusDays,
     quarterDist,
-    activeQuarters,
+    bridgesUsed: bridges?.length || 0,
+    workingDaysPerMonth,
     totalEffectiveDays,
     efficiency,
     monthlyDist,
