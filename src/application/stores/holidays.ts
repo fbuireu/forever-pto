@@ -3,7 +3,7 @@ import { generateAlternatives } from '@infrastructure/services/calendar/alternat
 import { generateSuggestions } from '@infrastructure/services/calendar/suggestions/generateSuggestions';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
-import { ensureDate } from '@shared/utils/dates';
+import { ensureDate } from '@shared/utils/helpers';
 import { formatDate } from '@ui/modules/components/utils/formatters';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';

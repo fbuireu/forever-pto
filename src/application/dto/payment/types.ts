@@ -24,12 +24,18 @@ export type RawPaymentError = {
 
 export type RawPayment = RawPaymentSuccess | RawPaymentError;
 
-export type PaymentDTO = {
-  success: boolean;
-  clientSecret?: string;
-  error?: string;
+export type PaymentDTOSuccess = {
+  success: true;
+  clientSecret: string;
   discountInfo?: DiscountInfo;
+};
+
+export type PaymentDTOError = {
+  success: false;
+  error: string;
   stripeError?: Stripe.StripeRawError;
   code?: string;
   type?: string;
 };
+
+export type PaymentDTO = PaymentDTOSuccess | PaymentDTOError;

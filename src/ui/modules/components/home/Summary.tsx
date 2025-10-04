@@ -71,11 +71,7 @@ export const Summary = () => {
   const { metrics } = activeSuggestion;
   const effectiveDays = metrics.totalEffectiveDays;
   const increment = effectiveDays - ptoDays;
-  console.log('INCREMENT', increment, effectiveDays, ptoDays);
-
   const efficiencyPercentage = ptoDays > 0 ? (increment / ptoDays) * 100 : 0;
-  console.log('Rendering efficiency:', efficiencyPercentage);
-
   const regionalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL).length ?? 0;
   const nationalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.NATIONAL).length ?? 0;
   const customDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.CUSTOM).length ?? 0;

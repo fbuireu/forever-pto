@@ -1,6 +1,6 @@
 'use client';
 
-import { DiscountInfo, PaymentDTO } from '@application/dto/payment/types';
+import { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { Button } from '@const/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
@@ -9,16 +9,19 @@ import { Label } from '@const/components/ui/label';
 import { cn } from '@const/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getStripeClient } from '@infrastructure/payments/stripe/client';
+import { amountFormatter } from '@shared/utils/helpers';
 import { ChevronDown, Star } from 'lucide-react';
 import { useLocale } from 'next-intl';
-import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { useCallback, useMemo, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
-import * as z from 'zod';
 import { useShallow } from 'zustand/react/shallow';
+import * as z from 'zod';
 import PaymentForm from './PaymentForm';
+import { initializePayment } from '@infrastructure/services/payments/checkout';
+import { calculateFinalAmount, formatDiscountMessage } from '@infrastructure/services/payments/utils/helpers';
 
 const donationSchema = z.object({
   amount: z
@@ -54,7 +57,7 @@ export const Donate = () => {
       premiumKey: state.premiumKey,
       setPremiumStatus: state.setPremiumStatus,
     }))
-  ); 
+  );
 
   const form = useForm<DonationFormData>({
     resolver: zodResolver(donationSchema),
@@ -68,18 +71,7 @@ export const Donate = () => {
   const { watch, setValue } = form;
   const currentAmount = watch('amount');
 
-  const amountFormatter = useMemo(
-    () =>
-      new Intl.NumberFormat(locale, {
-        style: 'currency',
-        currency: 'EUR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }),
-    [locale]
-  );
-
-  const formatAmount = useCallback((amount: number): string => amountFormatter.format(amount), [amountFormatter]);
+  const amount = useMemo(() => amountFormatter(locale), [locale]);
 
   const handlePresetClick = useCallback(
     (value: number) => {
@@ -88,63 +80,34 @@ export const Donate = () => {
     [setValue]
   );
 
-  const handlePaymentInitialization = useCallback(async (data: DonationFormData): Promise<PaymentDTO> => {
-    const response = await fetch('/api/payment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+const onSubmit = useCallback(async (data: DonationFormData) => {
+  startTransition(async () => {
+    try {
+      const result = await initializePayment({
         amount: data.amount,
         email: data.email,
-        promoCode: data.promoCode?.trim() || undefined,
-      }),
-    });
-
-    const result: PaymentDTO = await response.json();
-
-    if (!response.ok || !result.success) {
-      throw new Error(result.error || 'Payment initialization failed');
-    }
-
-    if (!result.clientSecret) {
-      throw new Error('No client secret received');
-    }
-
-    return result;
-  }, []);
-
-  const showDiscountToast = useCallback((discountInfo: DiscountInfo) => {
-    const discountValue =
-      discountInfo.type === 'percent' ? `${discountInfo.value}%` : `€${discountInfo.value.toFixed(2)}`;
-
-    toast.success('Promo code applied!', {
-      description: `${discountValue} discount - New amount: €${discountInfo.finalAmount.toFixed(2)}`,
-    });
-  }, []);
-
-  const onSubmit = useCallback(
-    async (data: DonationFormData) => {
-      startTransition(async () => {
-        try {
-          const result = await handlePaymentInitialization(data);
-
-          if (result.discountInfo) {
-            showDiscountToast(result.discountInfo);
-          }
-
-          setPaymentState({
-            clientSecret: result.clientSecret!,
-            data,
-            discountInfo: result.discountInfo || null,
-          });
-        } catch (error) {
-          toast.error('Payment initialization failed', {
-            description: error instanceof Error ? error.message : 'Please try again.',
-          });
-        }
+        promoCode: data.promoCode,
       });
-    },
-    [handlePaymentInitialization, showDiscountToast]
-  );
+
+      if (result.discountInfo) {
+        const message = formatDiscountMessage(result.discountInfo);
+        toast.success(message.title, {
+          description: message.description,
+        });
+      }
+
+      setPaymentState({
+        clientSecret: result.clientSecret,
+        data,
+        discountInfo: result.discountInfo || null,
+      });
+    } catch (error) {
+      toast.error('Payment initialization failed', {
+        description: error instanceof Error ? error.message : 'Please try again.',
+      });
+    }
+  });
+}, []);
 
   const handlePaymentSuccess = useCallback(() => {
     if (!paymentState) return;
@@ -168,9 +131,11 @@ export const Donate = () => {
     setPaymentState(null);
   }, []);
 
-  const finalAmount = paymentState?.discountInfo?.finalAmount ?? currentAmount;
+  const finalAmount = calculateFinalAmount({
+    baseAmount: currentAmount,
+    discountInfo: paymentState?.discountInfo ?? null,
+  });
 
-  const hasPremium = Boolean(premiumKey);
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen} modal>
@@ -182,7 +147,7 @@ export const Donate = () => {
           <div className='space-y-2'>
             <h4 className='leading-none font-medium'>Support & Unblock</h4>
             <p className='text-muted-foreground text-sm'>Make a donation to support the content and unblock access.</p>
-            {hasPremium && (
+            { Boolean(premiumKey) && (
               <div className='flex items-center gap-2 p-2 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700'>
                 <Star className='w-4 h-4 text-green-500' fill='currentColor' aria-hidden='true' />
                 <span className='text-green-700 dark:text-green-300 font-semibold text-sm'>
@@ -191,7 +156,6 @@ export const Donate = () => {
               </div>
             )}
           </div>
-
           {!paymentState ? (
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} noValidate className='grid gap-3'>
@@ -215,7 +179,6 @@ export const Donate = () => {
                     </FormItem>
                   )}
                 />
-
                 <div className='space-y-2'>
                   <Label>Quick amounts</Label>
                   <div className='flex gap-2'>
@@ -229,12 +192,11 @@ export const Donate = () => {
                         disabled={isPending}
                         className='flex-1'
                       >
-                        {formatAmount(preset)}
+                        {amount.format(preset)}
                       </Button>
                     ))}
                   </div>
                 </div>
-
                 <FormField
                   control={form.control}
                   name='amount'
@@ -262,7 +224,6 @@ export const Donate = () => {
                     </FormItem>
                   )}
                 />
-
                 <Collapsible open={showPromoCode} onOpenChange={setShowPromoCode}>
                   <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-sm font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors'>
                     <span className='text-muted-foreground'>Have a promo code?</span>
@@ -297,7 +258,6 @@ export const Donate = () => {
                     </CollapsibleContent>
                   )}
                 </Collapsible>
-
                 <Button type='submit' disabled={isPending} className='w-full bg-green-600 hover:bg-green-700'>
                   {isPending ? 'Processing...' : 'Continue to Payment'}
                 </Button>

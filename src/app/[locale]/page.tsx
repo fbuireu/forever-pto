@@ -29,3 +29,4 @@ export { generateMetadata };
 // todo: add animate icons (https://animate-ui.com/docs/icons)
 // todo: add animate components to summary (sliding)
 // todo: setup stripe
+// todo: save email localStorage to prefill payment form
