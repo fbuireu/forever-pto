@@ -74,7 +74,7 @@ export function generateSuggestions({
   return {
     days: selection.days.toSorted((a, b) => a.getTime() - b.getTime()),
     bridges: selection.bridges,
-      strategy,
-    metrics: generateMetrics({ suggestion: { days: selection.days, bridges: selection.bridges, strategy }, locale, bridges: selection.bridges, holidays }), 
+    strategy,
+    metrics: generateMetrics({ suggestion: { days: selection.days, bridges: selection.bridges, strategy }, allowPastDays, locale, bridges: selection.bridges, holidays }), 
   };
 }

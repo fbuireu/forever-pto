@@ -14,7 +14,6 @@ export const SummarySkeleton = () => {
           <CardDescription className='space-y-2'>
             <div className='flex flex-wrap items-center gap-2 justify-center'>
               <Skeleton className='h-5 w-16 rounded-full' />
-              <Skeleton className='h-3 w-8' />
               <Skeleton className='h-5 w-20 rounded-full' />
               <Skeleton className='h-3 w-1' />
               <Skeleton className='h-5 w-24 rounded-full' />

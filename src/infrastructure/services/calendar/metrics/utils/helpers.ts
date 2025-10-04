@@ -39,11 +39,11 @@ export function getTotalEffectiveDays(days: Date[], bridges?: { effectiveDays: n
   }
   return days.length;
 }
+import { HolidayDTO } from '@application/dto/holiday/types';
 import { formatDate } from '@ui/modules/components/utils/formatters';
-import { eachDayOfInterval, endOfYear, getMonth, isWeekend, startOfYear } from 'date-fns';
+import { eachDayOfInterval, endOfYear, getMonth, isWeekend, startOfToday, startOfYear } from 'date-fns';
 import { Locale } from 'next-intl';
 import { FirstLastBreak } from '../../types';
-import { HolidayDTO } from '@application/dto/holiday/types';
 
 export const calculateRestBlocks = (dates: Date[]): number => {
   if (dates.length === 0) return 0;
@@ -59,20 +59,39 @@ export const calculateRestBlocks = (dates: Date[]): number => {
   return blocks;
 };
 
-export const calculateMaxWorkingPeriod = (dates: Date[]): number => {
-  if (dates.length < 2) return 0;
+interface CalculateMaxWorkingPeriodParams {
+  ptoDays: Date[];
+  holidays: HolidayDTO[];
+  year: string;
+  allowPastDays: boolean;
+}
 
-  const sorted = [...dates].sort((a, b) => a.getTime() - b.getTime());
-  let maxGap = 0;
+export const calculateMaxWorkingPeriod = ({ ptoDays, holidays, year, allowPastDays }: CalculateMaxWorkingPeriodParams): number => {
+  const yearNum = parseInt(year);
+  const yearStart = allowPastDays ? startOfYear(new Date(yearNum, 0, 1)) : startOfToday(); 
+  const yearEnd = endOfYear(new Date(yearNum, 11, 31));
+  if (yearStart > yearEnd) return 0;
 
-  for (let i = 1; i < sorted.length; i++) {
-    const gap = (sorted[i].getTime() - sorted[i - 1].getTime()) / (1000 * 60 * 60 * 24) - 1;
-    if (gap > maxGap) maxGap = gap;
+  const restDays = new Set([...ptoDays.map((d) => d.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
+
+  let maxWorkingStreak = 0;
+  let currentStreak = 0;
+
+  for (const day of eachDayOfInterval({ start: yearStart, end: yearEnd })) {
+    if (isWeekend(day)) continue;
+
+    if (restDays.has(day.toDateString())) {
+      maxWorkingStreak = Math.max(maxWorkingStreak, currentStreak);
+      currentStreak = 0;
+    } else {
+      currentStreak++;
+    }
   }
 
-  return Math.max(0, Math.floor(maxGap));
-};
+  maxWorkingStreak = Math.max(maxWorkingStreak, currentStreak);
 
+  return maxWorkingStreak;
+};
 interface GetFirstLastBreak {
   dates: Date[];
   locale: Locale;
@@ -99,11 +118,10 @@ export const calculateQuarterDistribution = (dates: Date[]): number[] => {
   return quarters;
 };
 
-
 interface GetWorkingDaysPerWeekParams {
-    ptoDays: Date[];
-    year: string;
-    holidays: HolidayDTO[];
+  ptoDays: Date[];
+  year: string;
+  holidays: HolidayDTO[];
 }
 
 export const getWorkingDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkingDaysPerWeekParams): number => {

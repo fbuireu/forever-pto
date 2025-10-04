@@ -19,9 +19,10 @@ interface GenerateMetricsParams {
   locale: Locale;
   bridges?: Bridge[];
   holidays: HolidayDTO[];
+  allowPastDays: boolean;
 }
 
-export const generateMetrics = ({ suggestion, locale, bridges, holidays }: GenerateMetricsParams): Metrics => {
+export const generateMetrics = ({ suggestion, locale, bridges, holidays, allowPastDays }: GenerateMetricsParams): Metrics => {
   const { days } = suggestion;
 
   if (days.length === 0) {
@@ -50,7 +51,12 @@ export const generateMetrics = ({ suggestion, locale, bridges, holidays }: Gener
   }).length;
 
   const restBlocks = calculateRestBlocks(days);
-  const maxWorkingPeriod = calculateMaxWorkingPeriod(days);
+  const maxWorkingPeriod = calculateMaxWorkingPeriod({
+    ptoDays: days,
+    holidays,
+    allowPastDays,
+    year: formatDate({ date: days[0], format: 'yyyy', locale }),
+  });
   const firstLastBreak = getFirstLastBreak({ dates: days, locale });
   const quarterDist = calculateQuarterDistribution(days);
   const workingDaysPerMonth = getWorkingDaysPerMonth({
@@ -59,8 +65,8 @@ export const generateMetrics = ({ suggestion, locale, bridges, holidays }: Gener
     year: formatDate({ date: days[0], format: 'yyyy', locale }),
   });
   const efficiency = totalEffectiveDays / days.length;
-  const bonusDays = totalEffectiveDays - days.length;
-
+    const bonusDays = totalEffectiveDays - days.length;
+    
   return {
     longWeekends,
     restBlocks,

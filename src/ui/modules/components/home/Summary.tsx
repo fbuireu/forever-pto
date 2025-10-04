@@ -71,20 +71,23 @@ export const Summary = () => {
   const { metrics } = activeSuggestion;
   const effectiveDays = metrics.totalEffectiveDays;
   const increment = effectiveDays - ptoDays;
+  console.log('INCREMENT', increment, effectiveDays, ptoDays);
+
   const efficiencyPercentage = ptoDays > 0 ? (increment / ptoDays) * 100 : 0;
+  console.log('Rendering efficiency:', efficiencyPercentage);
+
   const regionalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL).length ?? 0;
   const nationalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.NATIONAL).length ?? 0;
   const customDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.CUSTOM).length ?? 0;
   const totalHolidays = nationalDays + regionalDays + customDays;
-  const userCountry = countries.find(({ label }) => label.toLowerCase() === country.toLowerCase());
-  const userRegion = regions.find(({ label }) => label.toLowerCase() === region?.toLowerCase());
+  const userCountry = countries.find(({ value }) => value.toLowerCase() === country.toLowerCase());
+  const userRegion = regions.find(({ value }) => value.toLowerCase() === region?.toLowerCase());
   const maxAlternative = Math.max(
     effectiveDays,
     ...(alternatives?.map((a) => a?.metrics?.totalEffectiveDays).filter((n): n is number => typeof n === 'number') ??
       [])
   );
   const canImprove = Math.max(0, maxAlternative - effectiveDays);
-
   if (!areStoresReady) {
     return <SummarySkeleton />;
   }
@@ -99,19 +102,17 @@ export const Summary = () => {
           <CardDescription className='text-muted-foreground space-y-2'>
             <div className='flex flex-wrap items-center gap-2 justify-center'>
               <Badge variant='outline' className='mx-1'>
-                {userCountry?.label || country}
+                <span className='mr-2'>{userCountry?.flag}</span>
+                <span>{userCountry?.label}</span>
               </Badge>
               {region && userRegion && (
-                <>
-                  <span className='text-xs'>región</span>
-                  <Badge variant='secondary' className='mx-1'>
-                    {userRegion.label}
-                  </Badge>
-                </>
+                <Badge variant='secondary' className='mx-1'>
+                  <span>{userRegion.label}</span>
+                </Badge>
               )}
               <span className='text-xs'>•</span>
               <Badge variant='outline' className='bg-blue-50 dark:bg-blue-900/20'>
-                Estrategia: {strategy}
+                {strategy}
               </Badge>
             </div>
             <div className='text-sm'>
@@ -163,7 +164,8 @@ export const Summary = () => {
             />
             <MetricCard
               label='Eficiencia'
-              value={`${efficiencyPercentage.toFixed(0)}%`}
+              value={efficiencyPercentage.toFixed(0)}
+              symbol={'%'}
               icon={Zap}
               badge='ganancia'
               colorScheme='amber'

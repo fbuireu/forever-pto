@@ -17,6 +17,7 @@ interface MetricCardProps {
   colorScheme: keyof typeof COLOR_SCHEMES;
   size?: MetricCardSize;
   className?: string;
+  symbol?: string;
 }
 
 const COLOR_SCHEMES = {
@@ -76,6 +77,7 @@ export const MetricCard = ({
   icon: Icon,
   badge,
   colorScheme,
+  symbol,
   size = MetricCardSize.DEFAULT,
   className = '',
 }: MetricCardProps) => {
@@ -87,6 +89,7 @@ export const MetricCard = ({
         <Icon className={cn('w-4 h-4', colors.icon, 'mx-auto mb-1')} />
         <div className={cn('text-lg font-bold flex justify-center', colors.text)}>
           <SlidingNumber number={value} className={cn('text-lg font-bold', colors.text)} decimalPlaces={0} />
+          {symbol}
         </div>
         <div className={cn('text-xs text-muted-foreground')}>{label}</div>
       </div>
@@ -98,8 +101,9 @@ export const MetricCard = ({
       <span className={cn('text-xs text-muted-foreground mb-1')}>{label}</span>
       <div className={cn('flex items-center gap-2')}>
         <Icon className={cn('w-4 h-4', colors.icon)} />
-        <span className={cn('text-xl font-bold', colors.text)}>
+        <span className={cn('text-xl font-bold flex', colors.text)}>
           <SlidingNumber number={value} decimalPlaces={0} />
+          {symbol}
         </span>
       </div>
       {badge && (
