@@ -54,7 +54,7 @@ export const HolidaysDistributionChart = ({ ptoDays, holidays }: HolidaysDistrib
     <PremiumFeature
       feature={'Gráfica de Composición de Días Libres'}
       description={description}
-      iconSize='h12 w-12'
+      iconSize='size-12'
       inlineDescription
     >
       <Card className='shadow-md'>

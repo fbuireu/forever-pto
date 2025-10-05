@@ -194,7 +194,7 @@ const holidays = useHolidaysStore((state) => state.holidays);
       <ConditionalWrapper
         doWrap={!premiumKey}
         wrapper={(children) => (
-          <PremiumFeature feature='Select All Holidays' variant={PremiumFeatureVariant.STACK} iconSize='h-4 w-4'>
+          <PremiumFeature feature='Select All Holidays' variant={PremiumFeatureVariant.STACK} iconSize='size-4'>
             {children}
           </PremiumFeature>
         )}

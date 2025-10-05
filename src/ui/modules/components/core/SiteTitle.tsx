@@ -6,6 +6,7 @@ export const SiteTitle = () => (
       Forever{' '}
       <GradientText
         text='PTO'
+        className='tracking-wider'
         gradient='linear-gradient(90deg, 
       #eab308 0%,  
       #14b8a6 20%,   

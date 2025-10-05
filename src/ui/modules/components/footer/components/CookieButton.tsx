@@ -29,7 +29,7 @@ export const CookieButton = () => {
     <>
       <Button
         variant='ghost'
-        className='cookies_consent_button text-muted-foreground'
+        className='cookies_consent_button text-muted-foreground -ml-2 font-normal'
         onClick={() => setShowPreferences(true)}
       >
         Manage cookies
