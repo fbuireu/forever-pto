@@ -84,6 +84,7 @@ export const Summary = () => {
       [])
   );
   const canImprove = Math.max(0, maxAlternative - effectiveDays);
+
   if (!areStoresReady) {
     return <SummarySkeleton />;
   }
@@ -92,11 +93,9 @@ export const Summary = () => {
     <div className='w-full max-w-4xl mx-auto space-y-6'>
       <Card>
         <CardHeader className='pb-2'>
-          <CardTitle className='text-2xl font-bold text-center'>
+          <CardTitle className='text-3xl font-bold text-center'>
             Resumen de PTO {year} - {Number(year) + 1}
-          </CardTitle>
-          <CardDescription className='text-muted-foreground space-y-2'>
-            <div className='flex flex-wrap items-center gap-2 justify-center'>
+            <div className='flex flex-wrap items-center gap-2 mt-2 mb-4 justify-center'>
               <Badge variant='outline' className='mx-1'>
                 <span className='mr-2'>{userCountry?.flag}</span>
                 <span>{userCountry?.label}</span>
@@ -106,11 +105,12 @@ export const Summary = () => {
                   <span>{userRegion.label}</span>
                 </Badge>
               )}
-              <span className='text-xs'>•</span>
               <Badge variant='outline' className='bg-blue-50 dark:bg-blue-900/20'>
                 {strategy}
               </Badge>
             </div>
+          </CardTitle>
+          <CardDescription className='text-muted-foreground space-y-2'>
             <div className='text-sm'>
               Con <span className='font-semibold text-primary'>{ptoDays}</span> días de PTO y{' '}
               <span className='font-semibold text-green-700'>{totalHolidays}</span> festivos disponibles, obtienes{' '}

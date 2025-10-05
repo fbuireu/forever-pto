@@ -12,8 +12,10 @@ import dynamic from 'next/dynamic';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
+import { GradientText } from 'src/components/animate-ui/primitives/texts/gradient';
 import { SidebarProvider } from 'src/components/animate-ui/radix/sidebar';
 import '../globals.css';
+import { SiteTitle } from '@ui/modules/components/core/SiteTitle';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -58,6 +60,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
             <SidebarProvider>
               <StoresInitializer userCountry={userCountry} />
               <AppSidebar locale={locale}>
+                <SiteTitle />
                 {children}
                 <Toaster />
                 <Donate />

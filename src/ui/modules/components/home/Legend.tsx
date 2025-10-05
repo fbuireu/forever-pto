@@ -5,9 +5,9 @@ import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers
 export const Legend = () => {
   return (
     <section className='mt-8 text-center text-sm w-full max-w-4xl mx-auto'>
-      <Card>
+      <Card className='gap-4'>
         <CardHeader className='text-center'>
-          <CardTitle className='text-2xl font-bold'>Legend</CardTitle>
+          <CardTitle className='text-3xl font-bold'>Legend</CardTitle>
         </CardHeader>
         <CardContent>
           <div className='mb-2 flex flex-wrap justify-center gap-4'>

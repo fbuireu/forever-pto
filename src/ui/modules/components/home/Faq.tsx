@@ -109,12 +109,12 @@ const FAQ: FaqData = [
 export const Faq = () => {
   return (
     <section aria-labelledby='faq-title' className='space-y-6 m-auto mt-8 max-w-4xl w-full scroll-mt-[60px]' id='faq'>
-      <h2 id='faq-title' className='text-2xl font-semibold'>
+      <h2 id='faq-title' className='text-3xl font-semibold'>
         Preguntas frecuentes
       </h2>
       {FAQ.map((section) => (
         <div key={section.id}>
-          <h3 className='text-lg font-medium mb-4'>{section.title}</h3>
+          <h3 className='text-2xl font-medium mb-4'>{section.title}</h3>
           <Accordion
             openMultiple
             className='w-full [mask:none!important] [&_[data-slot="accordion-panel"]]:overflow-visible [&_[data-slot="accordion-panel"]]:[mask:none!important]'

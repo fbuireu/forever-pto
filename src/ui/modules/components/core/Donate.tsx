@@ -9,6 +9,8 @@ import { Label } from '@const/components/ui/label';
 import { cn } from '@const/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getStripeClient } from '@infrastructure/payments/stripe/client';
+import { initializePayment } from '@infrastructure/services/payments/checkout';
+import { calculateFinalAmount, formatDiscountMessage } from '@infrastructure/services/payments/utils/helpers';
 import { amountFormatter } from '@shared/utils/helpers';
 import { ChevronDown, Star } from 'lucide-react';
 import { useLocale } from 'next-intl';
@@ -17,11 +19,9 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
-import { useShallow } from 'zustand/react/shallow';
 import * as z from 'zod';
+import { useShallow } from 'zustand/react/shallow';
 import PaymentForm from './PaymentForm';
-import { initializePayment } from '@infrastructure/services/payments/checkout';
-import { calculateFinalAmount, formatDiscountMessage } from '@infrastructure/services/payments/utils/helpers';
 
 const donationSchema = z.object({
   amount: z
@@ -52,10 +52,11 @@ export const Donate = () => {
   const [isPending, startTransition] = useTransition();
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
 
-  const { premiumKey, setPremiumStatus } = usePremiumStore(
+  const { premiumKey, setPremiumStatus, userEmail } = usePremiumStore(
     useShallow((state) => ({
       premiumKey: state.premiumKey,
       setPremiumStatus: state.setPremiumStatus,
+      userEmail: state.userEmail,
     }))
   );
 
@@ -63,7 +64,7 @@ export const Donate = () => {
     resolver: zodResolver(donationSchema),
     defaultValues: {
       amount: 5,
-      email: '',
+      email: userEmail ?? '',
       promoCode: '',
     },
   });
@@ -80,34 +81,34 @@ export const Donate = () => {
     [setValue]
   );
 
-const onSubmit = useCallback(async (data: DonationFormData) => {
-  startTransition(async () => {
-    try {
-      const result = await initializePayment({
-        amount: data.amount,
-        email: data.email,
-        promoCode: data.promoCode,
-      });
+  const onSubmit = useCallback(async (data: DonationFormData) => {
+    startTransition(async () => {
+      try {
+        const result = await initializePayment({
+          amount: data.amount,
+          email: data.email,
+          promoCode: data.promoCode,
+        });
 
-      if (result.discountInfo) {
-        const message = formatDiscountMessage(result.discountInfo);
-        toast.success(message.title, {
-          description: message.description,
+        if (result.discountInfo) {
+          const message = formatDiscountMessage(result.discountInfo);
+          toast.success(message.title, {
+            description: message.description,
+          });
+        }
+
+        setPaymentState({
+          clientSecret: result.clientSecret,
+          data,
+          discountInfo: result.discountInfo || null,
+        });
+      } catch (error) {
+        toast.error('Payment initialization failed', {
+          description: error instanceof Error ? error.message : 'Please try again.',
         });
       }
-
-      setPaymentState({
-        clientSecret: result.clientSecret,
-        data,
-        discountInfo: result.discountInfo || null,
-      });
-    } catch (error) {
-      toast.error('Payment initialization failed', {
-        description: error instanceof Error ? error.message : 'Please try again.',
-      });
-    }
-  });
-}, []);
+    });
+  }, []);
 
   const handlePaymentSuccess = useCallback(() => {
     if (!paymentState) return;
@@ -136,7 +137,6 @@ const onSubmit = useCallback(async (data: DonationFormData) => {
     discountInfo: paymentState?.discountInfo ?? null,
   });
 
-
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen} modal>
       <PopoverTrigger asChild>
@@ -147,7 +147,7 @@ const onSubmit = useCallback(async (data: DonationFormData) => {
           <div className='space-y-2'>
             <h4 className='leading-none font-medium'>Support & Unblock</h4>
             <p className='text-muted-foreground text-sm'>Make a donation to support the content and unblock access.</p>
-            { Boolean(premiumKey) && (
+            {Boolean(premiumKey) && (
               <div className='flex items-center gap-2 p-2 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700'>
                 <Star className='w-4 h-4 text-green-500' fill='currentColor' aria-hidden='true' />
                 <span className='text-green-700 dark:text-green-300 font-semibold text-sm'>

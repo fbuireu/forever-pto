@@ -199,13 +199,16 @@ function RadialNav({ size = 180, items, menuButtonConfig, defaultActiveId, onAct
     >
       <motion.div
         initial={false}
-        className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'
+        className={cn(
+          'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
+          activeId && items[activeId - 1].className
+        )}
         animate={{ rotate: rotateAngle }}
         transition={POINTER_ROT_SPRING}
         style={{ originX: 0.5, originY: 0.5 }}
         aria-hidden='true'
       >
-        <MousePointer2 className='size-5 text-foreground' />
+        <MousePointer2 className='size-5 text-current' />
       </motion.div>
       {items.map((item) => {
         const { id, angle } = item;

@@ -1,10 +1,10 @@
 'use client';
 
-import { Badge } from '@const/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { cn } from '@const/lib/utils';
 import { CheckCircle2, Circle, Clock, Sparkles } from 'lucide-react';
 import { useState } from 'react';
+import { FeatureList } from 'src/components/animate-ui/components/community/FeatureList';
 import { RadialNav, RadialNavItem } from 'src/components/animate-ui/components/community/radial-nav';
 
 interface RoadmapFeature {
@@ -23,9 +23,23 @@ const CategoryStatus = {
 
 type CategoryStatus = (typeof CategoryStatus)[keyof typeof CategoryStatus];
 
-const ROADMAP_CATEGORIES: Array<RadialNavItem & { status: CategoryStatus, className: string }> = [
-  { id: 1, icon: CheckCircle2, label: 'Completed', angle: 0, status: CategoryStatus.COMPLETED, className: 'text-green-500' },
-  { id: 2, icon: Clock, label: 'In Progress', angle: 90, status: CategoryStatus.IN_PROGRESS, className: 'text-blue-500' },
+const ROADMAP_CATEGORIES: Array<RadialNavItem & { status: CategoryStatus; className: string }> = [
+  {
+    id: 1,
+    icon: CheckCircle2,
+    label: 'Completed',
+    angle: 0,
+    status: CategoryStatus.COMPLETED,
+    className: 'text-green-500',
+  },
+  {
+    id: 2,
+    icon: Clock,
+    label: 'In Progress',
+    angle: 90,
+    status: CategoryStatus.IN_PROGRESS,
+    className: 'text-blue-500',
+  },
   { id: 3, icon: Circle, label: 'Planned', angle: 180, status: CategoryStatus.PLANNED, className: 'text-orange-500' },
   { id: 4, icon: Sparkles, label: 'Future', angle: 270, status: CategoryStatus.FUTURE, className: 'text-purple-500' },
 ];
@@ -123,11 +137,11 @@ export function Roadmap() {
 
   return (
     <div className='container max-w-4xl py-8 space-y-8 m-auto'>
-      <div className='space-y-2 text-center'>
-        <h3 className='text-4xl font-bold tracking-tight'>Roadmap</h3>
-        <p className='text-muted-foreground text-lg'>Explore what we've built and what's coming next</p>
+      <div className='space-y-2 text-center mb-0'>
+        <h3 className='text-3xl font-bold tracking-tight'>Roadmap</h3>
+        <p className='text-muted-foreground'>Explore what we've built and what's coming next</p>
       </div>
-      <div className='flex flex-col lg:flex-row gap-8 items-start'>
+      <div className='flex flex-col lg:flex-row gap-8 items-center'>
         <div className='lg:sticky lg:top-8 flex flex-col items-center w-full lg:w-auto'>
           <div className='relative h-80 w-80 flex items-center justify-center'>
             <RadialNav
@@ -144,25 +158,7 @@ export function Roadmap() {
           )}
         </div>
         <div className='flex-1 space-y-4'>
-          <div className='grid gap-4'>
-            {features.map((feature) => (
-              <Card key={feature.id}>
-                <CardHeader>
-                  <div className='flex items-start justify-between gap-4'>
-                    <div className='space-y-1 flex-1'>
-                      <CardTitle className='text-xl'>{feature.title}</CardTitle>
-                      <CardDescription>{feature.description}</CardDescription>
-                    </div>
-                    {feature.quarter && (
-                      <Badge variant='secondary' className='shrink-0'>
-                        {feature.quarter}
-                      </Badge>
-                    )}
-                  </div>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
+          <FeatureList features={features} categoryLabel={selectedNavItem?.label ?? 'Features'} />
         </div>
       </div>
       <Card className='border-dashed'>
