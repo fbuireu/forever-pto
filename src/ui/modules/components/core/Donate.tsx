@@ -141,7 +141,11 @@ export const Donate = () => {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen} modal>
       <PopoverTrigger asChild>
-        <Button className='fixed bottom-4 right-4 z-50 shadow-lg'>Donate & Unblock</Button>
+        <div className='fixed bottom-4 right-4 z-50'>
+          <div className='donate-rainbow relative z-0 overflow-hidden p-0.5 flex items-center justify-center rounded-md hover:scale-102 transition duration-200 active:scale-100'>
+            <Button className='shadow-lg rounded-md w-full h-full'>Donate & Unblock</Button>
+          </div>
+        </div>
       </PopoverTrigger>
       <PopoverContent className='w-96'>
         <div className='grid gap-4'>

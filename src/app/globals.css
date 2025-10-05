@@ -125,3 +125,26 @@
     scroll-behavior: smooth;
   }
 }
+@layer utilities {
+      @keyframes rotate-glow {
+        100% {
+          transform: rotate(1turn);
+        }
+      }
+    
+      .donate-rainbow::before {
+        content: '';
+        position: absolute;
+        z-index: -2;
+        left: -50%;
+        top: -50%;
+        width: 200%;
+        height: 200%;
+        background-position: 100% 50%;
+        background-repeat: no-repeat;
+        background-size: 50% 50%;
+        filter: blur(8px);
+        background-image: linear-gradient(90deg, #eab308, #14b8a6, #f97316, #a855f7, #eab308);
+        animation: rotate-glow 4s linear infinite;
+      }
+}
