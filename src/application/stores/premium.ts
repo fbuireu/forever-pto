@@ -24,6 +24,7 @@ interface PremiumActions {
   closeModal: () => void;
   setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => void;
   refreshPremiumStatus: () => Promise<void>;
+  setEmail: (email: string) => void;
 }
 
 type PremiumStore = PremiumState & PremiumActions;
@@ -116,6 +117,10 @@ export const usePremiumStore = create<PremiumStore>()(
               needsSessionCheck: false,
             });
           }
+        },
+
+        setEmail: (email: string) => {
+          set({ userEmail: email });
         },
 
         setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => {

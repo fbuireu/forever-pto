@@ -141,7 +141,7 @@ export function Roadmap() {
         <h3 className='text-3xl font-bold tracking-tight'>Roadmap</h3>
         <p className='text-muted-foreground'>Explore what we've built and what's coming next</p>
       </div>
-      <div className='flex flex-col lg:flex-row gap-8 items-center'>
+      <div className='flex flex-col lg:flex-row gap-8 items-center mt-4'>
         <div className='lg:sticky lg:top-8 flex flex-col items-center w-full lg:w-auto'>
           <div className='relative h-80 w-80 flex items-center justify-center'>
             <RadialNav

@@ -1,24 +1,19 @@
-import { PaymentDTO, PaymentDTOSuccess } from '@application/dto/payment/types';
-import { Stripe, StripeElements } from '@stripe/stripe-js';
+import { createPaymentIntent } from '@app/actions/payment';
+import type { PaymentDTOSuccess } from '@application/dto/payment/types';
+import type { Stripe, StripeElements } from '@stripe/stripe-js';
 
 export const initializePayment = async (params: {
   amount: number;
   email: string;
   promoCode?: string;
 }): Promise<PaymentDTOSuccess> => {
-  const response = await fetch('/api/payment', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      amount: params.amount,
-      email: params.email,
-      promoCode: params.promoCode?.trim() || undefined,
-    }),
+  const result = await createPaymentIntent({
+    amount: params.amount,
+    email: params.email,
+    promoCode: params.promoCode?.trim(),
   });
 
-  const result: PaymentDTO = await response.json();
-
-  if (!response.ok || !result.success) {
+  if (!result.success) {
     const error = result.success === false ? result.error : 'Payment initialization failed';
     throw new Error(error);
   }

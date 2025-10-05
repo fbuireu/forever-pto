@@ -2,7 +2,6 @@
 
 import { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
-import { Button } from '@const/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
 import { Input } from '@const/components/ui/input';
 import { Label } from '@const/components/ui/label';
@@ -17,6 +16,7 @@ import { useLocale } from 'next-intl';
 import { useCallback, useMemo, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
 import * as z from 'zod';
@@ -29,7 +29,7 @@ const donationSchema = z.object({
     .min(0.01, 'Amount must be at least €0.01')
     .max(10000, 'Amount cannot exceed €10,000')
     .multipleOf(0.01, 'Amount must have maximum 2 decimal places'),
-  email: z.string().email('Please enter a valid email address').min(1, 'Email is required'),
+  email: z.email('Please enter a valid email address').min(1, 'Email is required'),
   promoCode: z.string().optional(),
 });
 
@@ -52,20 +52,20 @@ export const Donate = () => {
   const [isPending, startTransition] = useTransition();
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
 
-  const { premiumKey, setPremiumStatus, userEmail } = usePremiumStore(
+  const { premiumKey, setPremiumStatus, userEmail, setEmail } = usePremiumStore(
     useShallow((state) => ({
       premiumKey: state.premiumKey,
       setPremiumStatus: state.setPremiumStatus,
       userEmail: state.userEmail,
+      setEmail: state.setEmail,
     }))
   );
-
   const form = useForm<DonationFormData>({
     resolver: zodResolver(donationSchema),
-    defaultValues: {
+    values: {
       amount: 5,
-      email: userEmail ?? '',
       promoCode: '',
+      email: userEmail ?? '',
     },
   });
 
@@ -84,6 +84,7 @@ export const Donate = () => {
   const onSubmit = useCallback(async (data: DonationFormData) => {
     startTransition(async () => {
       try {
+        setEmail(data.email);
         const result = await initializePayment({
           amount: data.amount,
           email: data.email,

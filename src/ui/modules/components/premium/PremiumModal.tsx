@@ -2,7 +2,9 @@
 
 import { usePremiumStore } from '@application/stores/premium';
 import { useShallow } from 'zustand/react/shallow';
-import { UpgradeModal } from './UpgradeModal';
+import dynamic from 'next/dynamic';
+
+const UpgradeModal = dynamic(() => import('./UpgradeModal').then((module) => ({ default: module.UpgradeModal })));
 
 export const PremiumModal = () => {
   const { closeModal, verifyEmail, modalOpen, currentFeature, isLoading } = usePremiumStore(

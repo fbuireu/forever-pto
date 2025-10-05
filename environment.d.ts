@@ -16,17 +16,9 @@ declare global {
       STRIPE_SECRET_KEY: string;
       JWT_SECRET: string;
       STRIPE_WEBHOOK_SECRET: string;
+      RESEND_API_KEY: string;
     }
   }
-
-  interface Window {
-    cookieStore: {
-      get(name: string): Promise<{ name: string; value: string } | undefined>;
-      set(options: { name: string; value: string; path?: string; maxAge: number }): Promise<void>;
-    };
-  }
-
-  const cookieStore: Window['cookieStore'];
 }
 
 declare module 'next-intl' {

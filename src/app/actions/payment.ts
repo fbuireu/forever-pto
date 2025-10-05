@@ -1,8 +1,10 @@
+'use server';
+
 import { paymentDTO } from '@application/dto/payment/dto';
-import { NextRequest, NextResponse } from 'next/server';
+import type { PaymentDTO } from '@application/dto/payment/types';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2025-08-27.basil',
 });
 
@@ -50,12 +52,10 @@ const validatePromoCode = async (
       return { success: false, error: 'This promo code is no longer valid' };
     }
 
-    // Check redemption limits
     if (coupon.max_redemptions && coupon.times_redeemed >= coupon.max_redemptions) {
       return { success: false, error: 'This promo code has reached its usage limit' };
     }
 
-    // Check expiration
     if (coupon.redeem_by && coupon.redeem_by < Math.floor(Date.now() / 1000)) {
       return { success: false, error: 'This promo code has expired' };
     }
@@ -69,7 +69,6 @@ const validatePromoCode = async (
       finalAmount = amount - discountEur;
     }
 
-    // Ensure minimum amount
     if (finalAmount < MIN_FINAL_AMOUNT) {
       return {
         success: false,
@@ -94,65 +93,53 @@ const validatePromoCode = async (
   }
 };
 
-const getClientIp = (request: NextRequest): string => {
-  return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || 'unknown';
-};
+interface CreatePaymentIntentParams {
+  amount: number;
+  email: string;
+  promoCode?: string;
+}
 
-export async function POST(request: NextRequest) {
+export async function createPaymentIntent(params: CreatePaymentIntentParams): Promise<PaymentDTO> {
   try {
-    const body = await request.json();
-    const { amount, email, name, promoCode } = body;
+    const { amount, email, promoCode } = params;
 
-    // Validate amount
     if (!validateAmount(amount)) {
-      return NextResponse.json(
-        paymentDTO.create({
-          raw: {
-            type: 'error',
-            error: new Error(`Invalid amount. Must be between ${MIN_AMOUNT} and ${MAX_AMOUNT}`),
-          },
-        }),
-        { status: 400 }
-      );
+      return paymentDTO.create({
+        raw: {
+          type: 'error',
+          error: new Error(`Invalid amount. Must be between ${MIN_AMOUNT} and ${MAX_AMOUNT}`),
+        },
+      });
     }
 
-    // Validate email
     if (!validateEmail(email)) {
-      return NextResponse.json(
-        paymentDTO.create({
-          raw: {
-            type: 'error',
-            error: new Error('Valid email is required'),
-          },
-        }),
-        { status: 400 }
-      );
+      return paymentDTO.create({
+        raw: {
+          type: 'error',
+          error: new Error('Valid email is required'),
+        },
+      });
     }
 
     let finalAmount = amount;
     let discountInfo: DiscountInfo | null = null;
 
-    // Validate and apply promo code
-    if (promoCode && typeof promoCode === 'string' && promoCode.trim()) {
+    if (promoCode?.trim()) {
       const validation = await validatePromoCode(promoCode, amount);
 
       if (!validation.success) {
-        return Response.json(
-          paymentDTO.create({
-            raw: {
-              type: 'error',
-              error: new Error(validation.error),
-            },
-          }),
-          { status: 400 }
-        );
+        return paymentDTO.create({
+          raw: {
+            type: 'error',
+            error: new Error(validation.error),
+          },
+        });
       }
 
       discountInfo = validation.discountInfo;
       finalAmount = discountInfo.finalAmount;
     }
 
-    // Create payment intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(finalAmount * 100),
       currency: 'eur',
@@ -161,7 +148,6 @@ export async function POST(request: NextRequest) {
       metadata: {
         type: 'donation',
         email,
-        name: name || '',
         promoCode: promoCode || '',
         ...(discountInfo && {
           couponId: discountInfo.couponId,
@@ -172,39 +158,32 @@ export async function POST(request: NextRequest) {
           discountAmount: (discountInfo.originalAmount - discountInfo.finalAmount).toFixed(2),
         }),
         timestamp: new Date().toISOString(),
-        userAgent: request.headers.get('user-agent') || '',
-        ipAddress: getClientIp(request),
       },
       automatic_payment_methods: {
         enabled: true,
       },
     });
 
-    return NextResponse.json(
-      paymentDTO.create({
-        raw: {
-          type: 'success',
-          data: {
-            paymentIntent,
-            discountInfo,
-          },
+    return paymentDTO.create({
+      raw: {
+        type: 'success',
+        data: {
+          paymentIntent,
+          discountInfo,
         },
-      })
-    );
+      },
+    });
   } catch (error) {
     console.error('Payment creation error:', error);
 
     const errorMessage =
       error instanceof Stripe.errors.StripeError ? error.message : 'An unexpected error occurred. Please try again.';
 
-    return NextResponse.json(
-      paymentDTO.create({
-        raw: {
-          type: 'error',
-          error: new Error(errorMessage),
-        },
-      }),
-      { status: 500 }
-    );
+    return paymentDTO.create({
+      raw: {
+        type: 'error',
+        error: new Error(errorMessage),
+      },
+    });
   }
 }

@@ -2,8 +2,12 @@
 
 import { Button } from '@const/components/ui/button';
 import { useCookieConsent } from '@ui/hooks/useCookieConsent';
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
-import { CookieConsentDialog } from '../../core/CookieConsentDialog';
+
+const CookieConsentDialog = dynamic(() =>
+  import('../../core/CookieConsentDialog').then((module) => ({ default: module.CookieConsentDialog }))
+);
 
 export const CookieButton = () => {
   const [showPreferences, setShowPreferences] = useState(false);
@@ -29,7 +33,7 @@ export const CookieButton = () => {
     <>
       <Button
         variant='ghost'
-        className='cookies_consent_button text-muted-foreground -ml-2 font-normal'
+        className='text-muted-foreground -ml-2 font-normal'
         onClick={() => setShowPreferences(true)}
       >
         Manage cookies

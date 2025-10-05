@@ -139,7 +139,10 @@ function MenuButton({
       {...BUTTON_MOTION_CONFIG}
       initial={false}
       animate={isActive ? 'hover' : 'rest'}
-      className='relative flex space-x-1 items-center overflow-hidden whitespace-nowrap rounded-full cursor-pointer border border-neutral-800 dark:border-neutral-200 bg-background text-foreground font-medium'
+      className={cn(
+        'relative flex space-x-1 items-center overflow-hidden whitespace-nowrap rounded-full cursor-pointer border border-neutral-800 dark:border-neutral-200 bg-background text-foreground font-medium transition-transform duration-200',
+        !isActive && 'hover:[transform:_scale(1.05)]'
+      )}
       style={{
         height: buttonSize,
         minWidth: buttonSize,
@@ -151,7 +154,6 @@ function MenuButton({
       onClick={onActivate}
       type='button'
       role='menuitem'
-      aria-pressed={!!isActive}
       aria-label={label}
     >
       <Icon

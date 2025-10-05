@@ -1,6 +1,7 @@
 import { Link } from '@application/i18n/navigtion';
 import { CookieButton } from './components/CookieButton';
 import { DevFooter } from './components/DevFooter';
+import { ContactButton } from '../contact/ContactButton';
 
 export const Footer = () => (
   <footer className='mt-8 w-full border-t m-auto flex justify-center'>
@@ -13,7 +14,8 @@ export const Footer = () => (
         <Link href='/terms-of-service' className='text-sm text-muted-foreground hover:underline'>
           Terms of Service
         </Link>
-        <CookieButton />
+                <CookieButton />
+                  <ContactButton />
       </div>
     </section>
   </footer>
