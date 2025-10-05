@@ -14,11 +14,13 @@ export interface Suggestion {
   metrics?: Metrics;
 }
 
-export const enum FilterStrategy {
-  GROUPED = 'grouped',
-  OPTIMIZED = 'optimized',
-  BALANCED = 'balanced',
-}
+export const FilterStrategy = {
+  GROUPED: 'grouped',
+  OPTIMIZED: 'optimized',
+  BALANCED: 'balanced',
+} as const;
+
+export type FilterStrategy = (typeof FilterStrategy)[keyof typeof FilterStrategy];
 
 export interface FirstLastBreak {
   first: string;

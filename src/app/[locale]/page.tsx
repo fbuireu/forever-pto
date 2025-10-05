@@ -3,6 +3,7 @@ import { Faq } from '@ui/modules/components/home/Faq';
 import { HolidaysList } from '@ui/modules/components/home/HolidaysList';
 import { Legend } from '@ui/modules/components/home/Legend';
 import { ManagementBar } from '@ui/modules/components/home/ManagementBar';
+import { Roadmap } from '@ui/modules/components/home/Roadmap';
 import { Summary } from '@ui/modules/components/home/Summary';
 import { generateMetadata } from './metadata';
 
@@ -14,6 +15,7 @@ const Home = async () => (
     <Legend />
     <Summary />
     <Faq />
+    <Roadmap />
   </section>
 );
 
@@ -30,3 +32,4 @@ export { generateMetadata };
 // todo: add animate components to summary (sliding)
 // todo: setup stripe
 // todo: save email localStorage to prefill payment form
+// todo: https://animate-ui.com/docs/components/community/notification-list

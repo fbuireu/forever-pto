@@ -18,11 +18,13 @@ interface UpgradeModalProps {
   isLoading: boolean;
 }
 
-const enum Step {
-  INPUT = 'input',
-  SUCCESS = 'success',
-  ERROR = 'error',
-}
+const Step = {
+  INPUT: 'input',
+  SUCCESS: 'success',
+  ERROR: 'error',
+} as const;
+
+type Step = (typeof Step)[keyof typeof Step];
 
 const emailSchema = z.object({
   email: z.email('Please enter a valid email address').min(1, 'Email is required'),

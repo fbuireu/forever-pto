@@ -102,10 +102,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
             <div className={!isExpressReady ? 'invisible absolute inset-0' : 'visible'}>
               <ExpressCheckoutElement
                 onConfirm={handleExpressCheckout}
-                onReady={() => {
-                  console.log('Express checkout ready');
-                  setIsExpressReady(true);
-                }}
+                onReady={() =>  setIsExpressReady(true)}
               />
             </div>
           </div>

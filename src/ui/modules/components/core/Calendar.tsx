@@ -31,17 +31,21 @@ export interface FromTo {
   to: Date;
 }
 
-export const enum CalendarSelectionMode {
-  SINGLE = 'single',
-  MULTIPLE = 'multiple',
-  RANGE = 'range',
-  NONE = 'none',
-}
+export const CalendarSelectionMode = {
+  SINGLE: 'single',
+  MULTIPLE: 'multiple',
+  RANGE: 'range',
+  NONE: 'none',
+} as const;
 
-export const enum RangeSelection {
-  FROM = 'from',
-  TO = 'to',
-}
+export type CalendarSelectionMode = (typeof CalendarSelectionMode)[keyof typeof CalendarSelectionMode];
+
+export const RangeSelection = {
+  FROM: 'from',
+  TO: 'to',
+} as const;
+
+export type RangeSelection = (typeof RangeSelection)[keyof typeof RangeSelection];
 
 interface CalendarProps {
   mode?: CalendarSelectionMode;

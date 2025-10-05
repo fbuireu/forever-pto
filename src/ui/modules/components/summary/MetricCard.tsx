@@ -4,10 +4,12 @@ import { LucideIcon } from 'lucide-react';
 import { ReactNode } from 'react';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 
-export const enum MetricCardSize {
-  DEFAULT = 'default',
-  COMPACT = 'compact',
-}
+export const MetricCardSize = {
+  DEFAULT: 'default',
+  COMPACT: 'compact',
+};
+
+export type MetricCardSize = (typeof MetricCardSize)[keyof typeof MetricCardSize];
 
 interface MetricCardProps {
   label: string;

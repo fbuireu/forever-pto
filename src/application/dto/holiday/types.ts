@@ -13,8 +13,10 @@ export interface HolidayDTO {
   variant: HolidayVariant;
 }
 
-export const enum HolidayVariant {
-  NATIONAL = 'national',
-  REGIONAL = 'regional',
-  CUSTOM = 'custom',
-}
+export const HolidayVariant = {
+  NATIONAL: 'national',
+  REGIONAL: 'regional',
+  CUSTOM: 'custom',
+} as const;
+
+export type HolidayVariant = (typeof HolidayVariant)[keyof typeof HolidayVariant];

@@ -8,15 +8,19 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/co
 import { useShallow } from 'zustand/react/shallow';
 import { getButtonClass } from './utils/helpers';
 
-export const enum PremiumFeatureVariant {
-  DEFAULT = 'default',
-  STACK = 'stack',
-}
+export const PremiumFeatureVariant = {
+  DEFAULT: 'default',
+  STACK: 'stack',
+} as const;
 
-const enum KeyboardKey {
-  ENTER = 'Enter',
-  SPACE = ' ',
-}
+export type PremiumFeatureVariant = (typeof PremiumFeatureVariant)[keyof typeof PremiumFeatureVariant];
+
+const KeyboardKey = {
+  ENTER: 'Enter',
+  SPACE: ' ',
+} as const;
+
+type KeyboardKey = (typeof KeyboardKey)[keyof typeof KeyboardKey];
 
 interface PremiumFeatureProps {
   feature: string;
