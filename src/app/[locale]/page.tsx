@@ -25,7 +25,6 @@ export { generateMetadata };
 // todo: check validation premium
 // todo: unify component and folder structure
 // todo: locale all
-// todo: roadmap
 // todo: responsive
 // todo: legal pages and cookies (what info do I need to provide?)
 // todo: add animate icons (https://animate-ui.com/docs/icons)

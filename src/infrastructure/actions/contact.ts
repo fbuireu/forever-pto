@@ -1,5 +1,6 @@
 'use server';
 
+import { createEmail } from '@infrastructure/contact/email';
 import { ContactFormData, contactSchema } from '@ui/modules/components/contact/schema';
 import { Resend } from 'resend';
 
@@ -9,18 +10,19 @@ export async function sendContactEmail(data: ContactFormData) {
   try {
     const validatedData = contactSchema.parse(data);
 
-    const { error } = await resend.emails.send({
-      from: 'Forever PTO Contact <noreply@foreverpto.com>',
-      to: 'support@foreverpto.com', 
-      replyTo: validatedData.email,
-      subject: `Contact Form: ${validatedData.subject}`,
-      html: `
-        <h2>New Contact Form Submission</h2>
-        <p><strong>From:</strong> ${validatedData.name} (${validatedData.email})</p>
-        <p><strong>Subject:</strong> ${validatedData.subject}</p>
-        <h3>Message:</h3>
-        <p>${validatedData.message.replace(/\n/g, '<br>')}</p>
-      `,
+		const email = createEmail({ ...validatedData });
+
+    const { data, error } = await emails.send({
+      from: `${params.name} <${atob(CONTACT_DETAILS.ENCODED_EMAIL_FROM)}>`,
+      to: atob(CONTACT_DETAILS.ENCODED_EMAIL_BIANCA),
+      subject: `${CONTACT_DETAILS.EMAIL_SUBJECT} from ${params.name} (${params.email})`,
+      tags: [
+        {
+          name: 'category',
+          value: 'web_contact_form',
+        },
+      ],
+      html: email,
     });
 
     if (error) {

@@ -1,4 +1,4 @@
-import { createPaymentIntent } from '@app/actions/payment';
+import { createPaymentIntent } from '@infrastructure/actions/payment';
 import type { PaymentDTOSuccess } from '@application/dto/payment/types';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
 
