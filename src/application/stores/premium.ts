@@ -1,3 +1,4 @@
+import { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
@@ -10,6 +11,8 @@ export interface PremiumState {
   modalOpen: boolean;
   currentFeature: string;
   needsSessionCheck: boolean;
+  currency: string;
+  currencySymbol: string;
 }
 
 interface SetPremiumStatusParams {
@@ -25,6 +28,8 @@ interface PremiumActions {
   setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => void;
   refreshPremiumStatus: () => Promise<void>;
   setEmail: (email: string) => void;
+  setCurrency: (currency: string) => void;
+  getCurrencyFromLocale: (locale: Locale) => void;
 }
 
 type PremiumStore = PremiumState & PremiumActions;
@@ -32,6 +37,8 @@ type PremiumStore = PremiumState & PremiumActions;
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 const STORAGE_NAME = 'premium-store';
 const STORAGE_VERSION = 1;
+const DEFAULT_CURRENCY = 'EUR';
+const DEFAULT_CURRENCY_SYMBOL = '€';
 
 const premiumInitialState: PremiumState = {
   premiumKey: null,
@@ -41,6 +48,8 @@ const premiumInitialState: PremiumState = {
   modalOpen: false,
   currentFeature: '',
   needsSessionCheck: false,
+  currency: DEFAULT_CURRENCY,
+  currencySymbol: DEFAULT_CURRENCY_SYMBOL,
 };
 
 export const usePremiumStore = create<PremiumStore>()(
@@ -123,6 +132,26 @@ export const usePremiumStore = create<PremiumStore>()(
           set({ userEmail: email });
         },
 
+        setCurrency: (currency: string) => {
+          set({ currency });
+        },
+
+        getCurrencyFromLocale: (locale: Locale) => {
+          try {
+            const formatter = new Intl.NumberFormat(locale, {
+              style: 'currency',
+              currency: DEFAULT_CURRENCY,
+            });
+            const resolvedCurrency = formatter.resolvedOptions().currency;
+            const currency = resolvedCurrency || DEFAULT_CURRENCY;
+            const symbol = formatter.formatToParts(0).find(({ type }) => type === 'currency')?.value || currency;
+            
+            set({ currency, currencySymbol: symbol });
+          } catch {
+            set({ currency: DEFAULT_CURRENCY, currencySymbol: DEFAULT_CURRENCY_SYMBOL });
+          }
+        },
+
         setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => {
           set({
             premiumKey,
@@ -162,6 +191,8 @@ export const usePremiumStore = create<PremiumStore>()(
           userEmail: state.userEmail,
           lastVerified: state.lastVerified,
           needsSessionCheck: state.needsSessionCheck,
+          currency: state.currency,
+          currencySymbol: state.currencySymbol,
         }),
         onRehydrateStorage: () => (state, error) => {
           if (error) {

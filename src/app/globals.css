@@ -126,25 +126,46 @@
   }
 }
 @layer utilities {
-      @keyframes rotate-glow {
-        100% {
-          transform: rotate(1turn);
-        }
+  @keyframes rotate-glow {
+    100% {
+      transform: rotate(1turn);
+    }
+  }
+
+  .donate-rainbow::before {
+    content: '';
+    position: absolute;
+    z-index: -2;
+    left: -50%;
+    top: -50%;
+    width: 200%;
+    height: 200%;
+    background-position: 100% 50%;
+    background-repeat: no-repeat;
+    background-size: 50% 50%;
+    filter: blur(8px);
+    background-image: linear-gradient(90deg, #eab308, #14b8a6, #f97316, #a855f7, #eab308);
+    animation: rotate-glow 4s linear infinite;
+  }
+  
+  @supports (view-transition-name: root) {
+    ::view-transition-old(root) {
+      animation: none;
+    }
+    ::view-transition-new(root) {
+      animation: circle-blur-expand 0.5s ease-out;
+      transform-origin: top right;
+      filter: blur(0);
+    }
+    @keyframes circle-blur-expand {
+      from {
+        clip-path: circle(0% at 100% 0%);
+        filter: blur(4px);
       }
-    
-      .donate-rainbow::before {
-        content: '';
-        position: absolute;
-        z-index: -2;
-        left: -50%;
-        top: -50%;
-        width: 200%;
-        height: 200%;
-        background-position: 100% 50%;
-        background-repeat: no-repeat;
-        background-size: 50% 50%;
-        filter: blur(8px);
-        background-image: linear-gradient(90deg, #eab308, #14b8a6, #f97316, #a855f7, #eab308);
-        animation: rotate-glow 4s linear infinite;
+      to {
+        clip-path: circle(150% at 100% 0%);
+        filter: blur(0);
       }
+    }
+  }
 }

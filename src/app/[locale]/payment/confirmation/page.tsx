@@ -18,6 +18,20 @@ interface PaymentSuccessParams {
   params: Promise<{ locale: Locale }>;
 }
 
+const getCurrencySymbol = (locale: string, currency: string): string => {
+  try {
+    const formatter = new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+    return formatter.formatToParts(0).find(({ type }) => type === 'currency')?.value || currency;
+  } catch {
+    return currency;
+  }
+};
+
 export default async function PaymentSuccessPage({ searchParams, params }: Readonly<PaymentSuccessParams>) {
   const [{ payment_intent: paymentIntentId }, { locale }] = await Promise.all([searchParams, params]);
 
@@ -40,6 +54,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
 
   const amount = paymentIntent.amount / 100;
   const currency = paymentIntent.currency.toUpperCase();
+  const currencySymbol = getCurrencySymbol(locale, currency);
 
   return (
     <div className='min-h-screen flex items-center justify-center p-4 bg-background m-auto'>
@@ -56,7 +71,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
             <div className='flex justify-between text-sm'>
               <span className='text-muted-foreground'>Amount paid</span>
               <span className='font-medium'>
-                {currency === 'EUR' ? '€' : currency}
+                {currencySymbol}
                 {amount.toFixed(2)}
               </span>
             </div>

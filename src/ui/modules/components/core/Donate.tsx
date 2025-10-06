@@ -4,6 +4,7 @@ import { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
 import { Input } from '@const/components/ui/input';
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@const/components/ui/input-group';
 import { Label } from '@const/components/ui/label';
 import { cn } from '@const/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,7 +14,7 @@ import { calculateFinalAmount, formatDiscountMessage } from '@infrastructure/ser
 import { amountFormatter } from '@shared/utils/helpers';
 import { ChevronDown, Star } from 'lucide-react';
 import { useLocale } from 'next-intl';
-import { useCallback, useMemo, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
@@ -26,8 +27,8 @@ import PaymentForm from './PaymentForm';
 const donationSchema = z.object({
   amount: z
     .number({ error: 'Amount must be a number' })
-    .min(0.01, 'Amount must be at least €0.01')
-    .max(10000, 'Amount cannot exceed €10,000')
+    .min(0.01, 'Amount must be at least 1')
+    .max(10000, 'Amount cannot exceed 10,000')
     .multipleOf(0.01, 'Amount must have maximum 2 decimal places'),
   email: z.email('Please enter a valid email address').min(1, 'Email is required'),
   promoCode: z.string().optional(),
@@ -52,14 +53,23 @@ export const Donate = () => {
   const [isPending, startTransition] = useTransition();
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
 
-  const { premiumKey, setPremiumStatus, userEmail, setEmail } = usePremiumStore(
-    useShallow((state) => ({
-      premiumKey: state.premiumKey,
-      setPremiumStatus: state.setPremiumStatus,
-      userEmail: state.userEmail,
-      setEmail: state.setEmail,
-    }))
-  );
+  const { premiumKey, setPremiumStatus, userEmail, setEmail, getCurrencyFromLocale, currency, currencySymbol } =
+    usePremiumStore(
+      useShallow((state) => ({
+        premiumKey: state.premiumKey,
+        setPremiumStatus: state.setPremiumStatus,
+        userEmail: state.userEmail,
+        setEmail: state.setEmail,
+        getCurrencyFromLocale: state.getCurrencyFromLocale,
+        currency: state.currency,
+        currencySymbol: state.currencySymbol,
+      }))
+    );
+
+  useEffect(() => {
+    getCurrencyFromLocale(locale);
+  }, [locale, getCurrencyFromLocale]);
+
   const form = useForm<DonationFormData>({
     resolver: zodResolver(donationSchema),
     values: {
@@ -81,35 +91,38 @@ export const Donate = () => {
     [setValue]
   );
 
-  const onSubmit = useCallback(async (data: DonationFormData) => {
-    startTransition(async () => {
-      try {
-        setEmail(data.email);
-        const result = await initializePayment({
-          amount: data.amount,
-          email: data.email,
-          promoCode: data.promoCode,
-        });
+  const onSubmit = useCallback(
+    async (data: DonationFormData) => {
+      startTransition(async () => {
+        try {
+          setEmail(data.email);
+          const result = await initializePayment({
+            amount: data.amount,
+            email: data.email,
+            promoCode: data.promoCode,
+          });
 
-        if (result.discountInfo) {
-          const message = formatDiscountMessage(result.discountInfo);
-          toast.success(message.title, {
-            description: message.description,
+          if (result.discountInfo) {
+            const message = formatDiscountMessage(result.discountInfo);
+            toast.success(message.title, {
+              description: message.description,
+            });
+          }
+
+          setPaymentState({
+            clientSecret: result.clientSecret,
+            data,
+            discountInfo: result.discountInfo || null,
+          });
+        } catch (error) {
+          toast.error('Payment initialization failed', {
+            description: error instanceof Error ? error.message : 'Please try again.',
           });
         }
-
-        setPaymentState({
-          clientSecret: result.clientSecret,
-          data,
-          discountInfo: result.discountInfo || null,
-        });
-      } catch (error) {
-        toast.error('Payment initialization failed', {
-          description: error instanceof Error ? error.message : 'Please try again.',
-        });
-      }
-    });
-  }, []);
+      });
+    },
+    [setEmail]
+  );
 
   const handlePaymentSuccess = useCallback(() => {
     if (!paymentState) return;
@@ -147,7 +160,7 @@ export const Donate = () => {
           </div>
         </div>
       </PopoverTrigger>
-      <PopoverContent className='w-96'>
+      <PopoverContent className='w-96' onOpenAutoFocus={(e) => e.preventDefault()}>
         <div className='grid gap-4'>
           <div className='space-y-2'>
             <h4 className='leading-none font-medium'>Support & Unblock</h4>
@@ -207,24 +220,32 @@ export const Donate = () => {
                   name='amount'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Amount (€)</FormLabel>
+                      <FormLabel>Donation Amount</FormLabel>
                       <FormControl>
-                        <Input
-                          type='number'
-                          placeholder='Enter amount'
-                          step='0.01'
-                          min='0.01'
-                          max='10000'
-                          disabled={isPending}
-                          {...field}
-                          value={field.value ?? ''}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            field.onChange(value === '' ? undefined : parseFloat(value));
-                          }}
-                          className='h-10'
-                        />
+                        <InputGroup>
+                          <InputGroupAddon>
+                            <InputGroupText>{currencySymbol}</InputGroupText>
+                          </InputGroupAddon>
+                          <InputGroupInput
+                            type='number'
+                            placeholder='Enter amount'
+                            step='1'
+                            min='1'
+                            max='10000'
+                            disabled={isPending}
+                            {...field}
+                            value={field.value ?? ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              field.onChange(value === '' ? undefined : parseFloat(value));
+                            }}
+                          />
+                        </InputGroup>
                       </FormControl>
+                      <p className='text-xs text-muted-foreground mt-1'>
+                        Base price in {currency}. Final amount will be converted to your local currency at current
+                        exchange rates.
+                      </p>
                       <FormMessage />
                     </FormItem>
                   )}

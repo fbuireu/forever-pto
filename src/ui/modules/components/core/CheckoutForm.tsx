@@ -1,10 +1,13 @@
 import { DiscountInfo } from '@application/dto/payment/types';
+import { usePremiumStore } from '@application/stores/premium';
 import { Button } from '@const/components/ui/button';
 import { confirmPayment } from '@infrastructure/services/payments/checkout';
 import { formatDiscountText } from '@infrastructure/services/payments/utils/helpers';
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { ChevronLeft } from 'lucide-react';
-import { FormEvent, useCallback, useMemo, useState, useTransition } from 'react';
+import { useLocale } from 'next-intl';
+import { FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { ExpressCheckoutSkeleton } from '../skeletons/ExpressCheckoutSkeleton';
 
 interface CheckoutFormProps {
@@ -18,9 +21,21 @@ interface CheckoutFormProps {
 export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel }: Readonly<CheckoutFormProps>) {
   const stripe = useStripe();
   const elements = useElements();
+  const locale = useLocale();
   const [isExpressReady, setIsExpressReady] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const { getCurrencyFromLocale, currencySymbol } = usePremiumStore(
+    useShallow((state) => ({
+      getCurrencyFromLocale: state.getCurrencyFromLocale,
+      currencySymbol: state.currencySymbol,
+    }))
+  );
+
+  useEffect(() => {
+    getCurrencyFromLocale(locale);
+  }, [locale, getCurrencyFromLocale]);
 
   const formattedAmount = useMemo(() => amount.toFixed(2), [amount]);
   const discountText = useMemo(() => formatDiscountText(discountInfo), [discountInfo]);
@@ -78,7 +93,8 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
         <div className='text-right'>
           <p className='text-sm text-muted-foreground'>Total amount</p>
           <p className='text-2xl font-bold' aria-live='polite'>
-            €{formattedAmount}
+            {currencySymbol}
+            {formattedAmount}
           </p>
           {discountText && (
             <p className='text-xs text-green-600 dark:text-green-400' aria-live='polite'>
@@ -100,10 +116,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
           <div className='relative min-h-[48px]'>
             {!isExpressReady && <ExpressCheckoutSkeleton />}
             <div className={!isExpressReady ? 'invisible absolute inset-0' : 'visible'}>
-              <ExpressCheckoutElement
-                onConfirm={handleExpressCheckout}
-                onReady={() =>  setIsExpressReady(true)}
-              />
+              <ExpressCheckoutElement onConfirm={handleExpressCheckout} onReady={() => setIsExpressReady(true)} />
             </div>
           </div>
         </div>
@@ -126,7 +139,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
           className='w-full bg-green-600 hover:bg-green-700'
           aria-busy={isPending}
         >
-          {isPending ? 'Processing...' : `Pay €${formattedAmount}`}
+          {isPending ? 'Processing...' : `Pay ${currencySymbol}${formattedAmount}`}
         </Button>
       </form>
     </div>

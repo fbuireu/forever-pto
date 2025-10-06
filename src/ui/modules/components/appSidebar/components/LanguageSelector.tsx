@@ -1,9 +1,11 @@
 'use client';
 
 import { usePathname, useRouter } from '@application/i18n/navigtion';
+import { usePremiumStore } from '@application/stores/premium';
 import { useLanguages } from '@ui/hooks/useLanguages';
 import { Check } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useEffect } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import {
   DropdownMenu,
@@ -12,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from 'src/components/animate-ui/radix/dropdown-menu';
 import { useSidebar } from 'src/components/animate-ui/radix/sidebar';
+import { useShallow } from 'zustand/react/shallow';
 
 export const LanguageSelector = () => {
   const t = useTranslations('languages');
@@ -21,10 +24,20 @@ export const LanguageSelector = () => {
   const { state } = useSidebar();
   const languages = useLanguages();
 
+  const { getCurrencyFromLocale } = usePremiumStore(
+    useShallow((state) => ({
+      getCurrencyFromLocale: state.getCurrencyFromLocale,
+    }))
+  );
+
   const handleLanguageChange = (newLocale: string) => {
     const newPathname = pathname.replace(`/${locale}`, `/${newLocale}`);
     router.push(newPathname, { locale: newLocale });
   };
+  
+  useEffect(() => {
+    getCurrencyFromLocale(locale);
+  }, [locale, getCurrencyFromLocale]);
 
   return (
     <DropdownMenu>

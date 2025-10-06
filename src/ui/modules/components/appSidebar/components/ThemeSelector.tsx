@@ -3,6 +3,7 @@
 import { Check, Moon, Sun } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
+import { useCallback } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import {
   DropdownMenu,
@@ -12,12 +13,37 @@ import {
 } from 'src/components/animate-ui/radix/dropdown-menu';
 
 export const ThemeSelector = () => {
-  const { setTheme, themes, theme: currentTheme } = useTheme();
+  const { setTheme, themes, theme: currentTheme, resolvedTheme } = useTheme();
   const t = useTranslations('theme');
 
-  const changeTheme = (theme: string) => {
-    setTheme(theme);
+  const startViewTransition = useCallback((updateFn: () => void) => {
+    if ('startViewTransition' in document) {
+      (document as any).startViewTransition(updateFn);
+    } else {
+      updateFn();
+    }
+  }, []);
+
+  const getResolvedTheme = (theme: ReturnType<typeof useTheme>['theme']) => {
+    if (theme !== 'system') return theme;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   };
+
+  const changeTheme = useCallback(
+    (newTheme: string) => {
+      const newResolvedTheme = getResolvedTheme(newTheme);
+
+      if (newResolvedTheme === resolvedTheme) {
+        setTheme(newTheme);
+        return;
+      }
+
+      startViewTransition(() => {
+        setTheme(newTheme);
+      });
+    },
+    [setTheme, startViewTransition, resolvedTheme]
+  );
 
   return (
     <DropdownMenu>

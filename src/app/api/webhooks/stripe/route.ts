@@ -89,7 +89,6 @@ async function handleSuccessfulPayment(paymentIntent: Stripe.PaymentIntent) {
 
   try {
     await saveDonationToDatabase(paymentData);
-    console.log(`Donation recorded: ${paymentData.email} - €${paymentData.amount}`);
   } catch (error) {
     console.error('Error saving donation to database:', error);
     throw error;

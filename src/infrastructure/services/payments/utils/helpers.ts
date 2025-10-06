@@ -24,7 +24,7 @@ export const formatDiscountMessage = (discountInfo: DiscountInfo): {
 
   return {
     title: 'Promo code applied!',
-    description: `${discountValue} discount - New amount: €${discountInfo.finalAmount.toFixed(2)}`,
+    description: `${discountValue} discount - New amount: ${discountInfo.finalAmount.toFixed(2)}`,
   };
 };
 

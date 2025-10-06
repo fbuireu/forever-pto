@@ -80,7 +80,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-lg'>
+      <DialogContent className='sm:max-w-lg' onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Mail className='w-5 h-5 text-primary' />
@@ -113,13 +113,12 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input
-                        type='email'
-                        placeholder='your@email.com'
-                        disabled={isPending}
-                        autoFocus={!userEmail}
-                        {...field}
-                      />
+                      <InputGroup>
+                        <InputLeftElement>
+                          <Mail className='h-4 w-4 text-muted-foreground' />
+                        </InputLeftElement>
+                        <Input type='email' placeholder='your@email.com' disabled={isPending} {...field} />
+                      </InputGroup>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

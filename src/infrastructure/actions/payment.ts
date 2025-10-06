@@ -9,8 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MIN_AMOUNT = 0.01;
-const MAX_AMOUNT = 10000;
+const MIN_AMOUNT = 1;
 const MIN_FINAL_AMOUNT = 0.5;
 
 type DiscountInfo = {
@@ -23,7 +22,7 @@ type DiscountInfo = {
 };
 
 const validateAmount = (amount: unknown): amount is number => {
-  return typeof amount === 'number' && amount > 0 && amount <= MAX_AMOUNT;
+  return typeof amount === 'number' && amount > 0;
 };
 
 const validateEmail = (email: unknown): email is string => {
@@ -72,7 +71,7 @@ const validatePromoCode = async (
     if (finalAmount < MIN_FINAL_AMOUNT) {
       return {
         success: false,
-        error: `Discount cannot reduce amount below €${MIN_FINAL_AMOUNT.toFixed(2)}`,
+        error: `Discount cannot reduce amount below ${MIN_FINAL_AMOUNT.toFixed(2)}`,
       };
     }
 
@@ -107,7 +106,7 @@ export async function createPaymentIntent(params: CreatePaymentIntentParams): Pr
       return paymentDTO.create({
         raw: {
           type: 'error',
-          error: new Error(`Invalid amount. Must be between ${MIN_AMOUNT} and ${MAX_AMOUNT}`),
+          error: new Error(`Invalid amount. Minimum amount is ${MIN_AMOUNT}`),
         },
       });
     }

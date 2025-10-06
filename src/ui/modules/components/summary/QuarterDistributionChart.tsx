@@ -24,7 +24,7 @@ export const QuarterDistributionChart = ({ quarterDist }: QuarterDistributionCha
     <PremiumFeature
       feature={'Gráfica de Distribución por Trimestre'}
       description={description}
-      iconSize='size-12'
+      iconSize='size-7'
       inlineDescription
     >
       <Card className='shadow-md'>

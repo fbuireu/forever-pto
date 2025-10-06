@@ -38,7 +38,7 @@ export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }:
     <PremiumFeature
       feature={'Gráfica de Timeline Anual'}
       description={description}
-      iconSize='size-12'
+      iconSize='size-7'
       inlineDescription
     >
       <Card className='shadow-md'>

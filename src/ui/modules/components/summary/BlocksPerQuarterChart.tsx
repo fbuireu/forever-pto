@@ -26,7 +26,7 @@ export const BlocksPerQuarterChart = ({ blocksPerQuarter }: BlockPerQuarterChart
     <PremiumFeature
       feature={'Gráfica de Bloques Largos por Trimestre'}
       description={description}
-      iconSize='h12 w-12'
+      iconSize='size-7'
       inlineDescription
     >
       <Card className='shadow-md'>

@@ -31,4 +31,3 @@ export { generateMetadata };
 // todo: add animate components to summary (sliding)
 // todo: setup stripe
 // todo: contact form resend
-// todo: remove autofocus on open modal
