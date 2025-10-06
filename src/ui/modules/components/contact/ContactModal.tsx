@@ -113,12 +113,13 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <InputGroup>
-                        <InputLeftElement>
-                          <Mail className='h-4 w-4 text-muted-foreground' />
-                        </InputLeftElement>
-                        <Input type='email' placeholder='your@email.com' disabled={isPending} {...field} />
-                      </InputGroup>
+                      <Input
+                        type='email'
+                        placeholder='your@email.com'
+                        disabled={isPending}
+                        autoFocus={!userEmail}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

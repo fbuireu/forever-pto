@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@cons
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { Award, BarChart3, Calendar, CalendarDays, Clock, Star, TrendingUp, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 import { PremiumFeature } from '../premium/PremiumFeature';
 import { SummarySkeleton } from '../skeletons/SummarySkeleton';
@@ -238,8 +239,8 @@ export const Summary = () => {
                   </div>
                   <div>
                     <div className='text-sm text-muted-foreground'>Max trabajo seguido</div>
-                    <div className='text-lg font-bold text-indigo-700 dark:text-indigo-300'>
-                      {metrics.maxWorkingPeriod}d
+                    <div className='text-lg font-bold text-indigo-700 flex justify-center dark:text-indigo-300'>
+                      <SlidingNumber number={metrics.maxWorkingPeriod} />d
                     </div>
                   </div>
                   <div>
@@ -251,29 +252,34 @@ export const Summary = () => {
                 </div>
                 <div className='mt-3 text-center'>
                   <div className='text-xs text-muted-foreground mb-1'>Días bonus totales</div>
-                  <div className='text-2xl font-bold text-indigo-700 dark:text-indigo-300'>+{metrics.bonusDays}</div>
+                  <div className='text-2xl font-bold text-indigo-700 dark:text-indigo-300 flex justify-center'>
+                    +<SlidingNumber number={metrics.bonusDays} />
+                  </div>
                   <div className='text-xs text-indigo-600 dark:text-indigo-400'>días gratis obtenidos</div>
                 </div>
               </div>
             </PremiumFeature>
           )}
           {canImprove > 0 && (
-            <NotificationCard
-              icon={Zap}
-              title='Sugerencia'
-              message={`Hay alternativas que te darían <strong>${canImprove} días más</strong>. ${
-                premiumKey ? 'Revisa las opciones disponibles.' : 'Considera Premium para más análisis.'
-              }`}
-              colorScheme='orange'
-            />
+            <NotificationCard icon={Zap} title='Sugerencia' colorScheme='orange'>
+              <>
+                Hay alternativas que te darían{' '}
+                <strong className='flex gap-1 mx-1'>
+                  <SlidingNumber number={canImprove} />
+                  días más.
+                </strong>
+                {premiumKey ? 'Revisa las opciones disponibles.' : 'Considera Premium para más análisis.'}
+              </>
+            </NotificationCard>
           )}
           {customDays > 0 && (
-            <NotificationCard
-              icon={CalendarDays}
-              title='Días personalizados:'
-              message={`Has añadido ${customDays} día${customDays !== 1 ? 's' : ''} que optimizan tu planificación.`}
-              colorScheme='blue'
-            />
+            <NotificationCard icon={CalendarDays} title='Días personalizados:' colorScheme='blue'>
+              Has añadido{' '}
+              <strong className='flex gap-1 mx-1'>
+                <SlidingNumber number={customDays} /> día${customDays !== 1 ? 's' : ''}
+              </strong>{' '}
+              que optimizan tu planificación.
+            </NotificationCard>
           )}
         </CardContent>
       </Card>

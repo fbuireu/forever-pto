@@ -4,7 +4,7 @@ import { LucideIcon } from 'lucide-react';
 interface NotificationCardProps {
   icon: LucideIcon;
   title: string;
-  message: string;
+  children: React.ReactNode;
   colorScheme: keyof typeof COLOR_SCHEMES;
   className?: string;
 }
@@ -29,7 +29,7 @@ const COLOR_SCHEMES = {
 export const NotificationCard = ({
   icon: Icon,
   title,
-  message,
+  children,
   colorScheme,
   className = '',
 }: NotificationCardProps) => {
@@ -41,7 +41,7 @@ export const NotificationCard = ({
         <Icon className={cn('w-4 h-4', colors.icon)} />
         <span className={cn('text-sm font-medium', colors.title)}>{title}</span>
       </div>
-      <div className={cn('text-sm', colors.message)} dangerouslySetInnerHTML={{ __html: message }} />
+      <div className={cn('text-sm flex justify-start', colors.message)}>{children}</div>
     </div>
   );
 };
