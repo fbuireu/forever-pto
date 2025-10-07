@@ -22,11 +22,11 @@ const Home = async () => (
 export default Home;
 export { generateMetadata };
 
+// todo: add animate icons (https://animate-ui.com/docs/icons)
+// todo: contact form resend
 // todo: check validation premium
 // todo: unify component and folder structure
 // todo: locale all
 // todo: responsive
 // todo: legal pages and cookies (what info do I need to provide?)
-// todo: add animate icons (https://animate-ui.com/docs/icons)
 // todo: setup stripe
-// todo: contact form resend

@@ -147,7 +147,7 @@
     background-image: linear-gradient(90deg, #eab308, #14b8a6, #f97316, #a855f7, #eab308);
     animation: rotate-glow 4s linear infinite;
   }
-  
+
   @supports (view-transition-name: root) {
     ::view-transition-old(root) {
       animation: none;

@@ -66,9 +66,14 @@ interface CalculateMaxWorkingPeriodParams {
   allowPastDays: boolean;
 }
 
-export const calculateMaxWorkingPeriod = ({ ptoDays, holidays, year, allowPastDays }: CalculateMaxWorkingPeriodParams): number => {
+export const calculateMaxWorkingPeriod = ({
+  ptoDays,
+  holidays,
+  year,
+  allowPastDays,
+}: CalculateMaxWorkingPeriodParams): number => {
   const yearNum = parseInt(year);
-  const yearStart = allowPastDays ? startOfYear(new Date(yearNum, 0, 1)) : startOfToday(); 
+  const yearStart = allowPastDays ? startOfYear(new Date(yearNum, 0, 1)) : startOfToday();
   const yearEnd = endOfYear(new Date(yearNum, 11, 31));
   if (yearStart > yearEnd) return 0;
 
@@ -101,8 +106,8 @@ export const getFirstLastBreak = ({ dates, locale }: GetFirstLastBreak): FirstLa
 
   const sorted = [...dates].sort((a, b) => a.getTime() - b.getTime());
   return {
-    first: formatDate({ date: sorted[0], format: 'MMM', locale }),
-    last: formatDate({ date: sorted[sorted.length - 1], format: 'MMM', locale }),
+    first: formatDate({ date: sorted[0], format: 'MMMM', locale }),
+    last: formatDate({ date: sorted[sorted.length - 1], format: 'MMMM', locale }),
   };
 };
 

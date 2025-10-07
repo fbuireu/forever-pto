@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@cons
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { Award, BarChart3, Calendar, CalendarDays, Clock, Star, TrendingUp, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { RotatingText } from 'src/components/animate-ui/text/rotating';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 import { PremiumFeature } from '../premium/PremiumFeature';
@@ -233,8 +234,8 @@ export const Summary = () => {
                 <div className='grid grid-cols-3 gap-4 text-center'>
                   <div>
                     <div className='text-sm text-muted-foreground'>Primer descanso</div>
-                    <div className='text-lg font-bold text-indigo-700 dark:text-indigo-300'>
-                      {metrics.firstLastBreak.first}
+                    <div className='text-lg flex justify-center font-bold text-indigo-700 dark:text-indigo-300'>
+                      <RotatingText text={metrics.firstLastBreak.first} />
                     </div>
                   </div>
                   <div>
@@ -246,7 +247,7 @@ export const Summary = () => {
                   <div>
                     <div className='text-sm text-muted-foreground'>Último descanso</div>
                     <div className='text-lg font-bold text-indigo-700 dark:text-indigo-300'>
-                      {metrics.firstLastBreak.last}
+                      <RotatingText text={metrics.firstLastBreak.last} />
                     </div>
                   </div>
                 </div>
