@@ -22,8 +22,8 @@ const Home = async () => (
 export default Home;
 export { generateMetadata };
 
+// todo: contact form resend (db)
 // todo: add animate icons (https://animate-ui.com/docs/icons)
-// todo: contact form resend
 // todo: check validation premium
 // todo: unify component and folder structure
 // todo: locale all

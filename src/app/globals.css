@@ -154,16 +154,16 @@
     }
     ::view-transition-new(root) {
       animation: circle-blur-expand 0.5s ease-out;
-      transform-origin: top right;
+      transform-origin: bottom left;
       filter: blur(0);
     }
     @keyframes circle-blur-expand {
       from {
-        clip-path: circle(0% at 100% 0%);
+        clip-path: circle(0% at 0% 100%);
         filter: blur(4px);
       }
       to {
-        clip-path: circle(150% at 100% 0%);
+        clip-path: circle(150% at 0% 100%);
         filter: blur(0);
       }
     }

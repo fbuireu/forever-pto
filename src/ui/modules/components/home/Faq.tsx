@@ -116,7 +116,7 @@ export const Faq = () => {
         <div key={section.id}>
           <h3 className='text-2xl font-medium mb-4'>{section.title}</h3>
           <Accordion
-            openMultiple
+            multiple
             className='w-full [mask:none!important] [&_[data-slot="accordion-panel"]]:overflow-visible [&_[data-slot="accordion-panel"]]:[mask:none!important]'
           >
             {section.items.map((item) => (

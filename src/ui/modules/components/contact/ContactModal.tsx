@@ -7,10 +7,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@const/components/ui/input';
 import { Textarea } from '@const/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, CheckCircle2, Loader2, Mail } from 'lucide-react';
-import { useState, useTransition } from 'react';
+import { sendContactEmail } from '@infrastructure/actions/contact';
+import { AlertCircle, CheckCircle2, Mail } from 'lucide-react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useShallow } from 'zustand/react/shallow';
+import { FormButtons } from './FormButtons';
 import { ContactFormData, contactSchema } from './schema';
 
 interface ContactModalProps {
@@ -28,7 +30,6 @@ type Step = (typeof Step)[keyof typeof Step];
 
 export const ContactModal = ({ open, onClose }: ContactModalProps) => {
   const [step, setStep] = useState<Step>(Step.INPUT);
-  const [isPending, startTransition] = useTransition();
   const { setEmail, userEmail } = usePremiumStore(
     useShallow((state) => ({
       setEmail: state.setEmail,
@@ -48,29 +49,22 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
   });
 
   const handleClose = () => {
-    form.reset();
-    setStep(Step.INPUT);
-    setErrorMessage('');
     onClose();
+    setStep(Step.INPUT);
+    form.reset();
+    setErrorMessage('');
   };
 
   const onSubmit = async (data: ContactFormData) => {
-    // startTransition(async () => {
-    //   const result = await sendContactEmail(data);
+    const result = await sendContactEmail(data);
     setEmail(data.email);
-    //   if (result.success) {
-    //     setStep(Step.SUCCESS);
-    //  setEmail(data.email);
-    //     toast.success('Message sent successfully!');
-    //     setTimeout(() => {
-    //       handleClose();
-    //     }, 2000);
-    //   } else {
-    //     setErrorMessage(result.error || 'Failed to send message');
-    // toast.error('Failed to send message');
-    //     setStep(Step.ERROR);
-    //   }
-    // });
+
+    if (result.success) {
+      setStep(Step.SUCCESS);
+    } else {
+      setErrorMessage(result.error || 'Failed to send message');
+      setStep(Step.ERROR);
+    }
   };
 
   const handleTryAgain = () => {
@@ -99,7 +93,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder='John Doe' disabled={isPending} {...field} />
+                      <Input placeholder='John Doe' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -113,13 +107,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input
-                        type='email'
-                        placeholder='your@email.com'
-                        disabled={isPending}
-                        autoFocus={!userEmail}
-                        {...field}
-                      />
+                      <Input type='email' placeholder='your@email.com' autoFocus={!userEmail} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -133,7 +121,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                   <FormItem>
                     <FormLabel>Subject</FormLabel>
                     <FormControl>
-                      <Input placeholder='What is this about?' disabled={isPending} {...field} />
+                      <Input placeholder='What is this about?' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -150,7 +138,6 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                       <Textarea
                         placeholder='Tell us what you need...'
                         className='min-h-[120px] resize-none field-sizing-content'
-                        disabled={isPending}
                         {...field}
                       />
                     </FormControl>
@@ -158,22 +145,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                   </FormItem>
                 )}
               />
-
-              <div className='flex gap-2 pt-2'>
-                <Button type='submit' disabled={isPending} className='flex-1'>
-                  {isPending ? (
-                    <>
-                      <Loader2 className='w-4 h-4 mr-2 animate-spin' />
-                      Sending...
-                    </>
-                  ) : (
-                    'Send Message'
-                  )}
-                </Button>
-                <Button type='button' variant='outline' onClick={handleClose} disabled={isPending}>
-                  Cancel
-                </Button>
-              </div>
+              <FormButtons onCancel={handleClose} />
             </form>
           </Form>
         )}
