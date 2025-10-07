@@ -1,12 +1,13 @@
 'use client';
 
-import { Check, ChevronRight, Circle } from 'lucide-react';
+import { Circle } from 'lucide-react';
 import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from 'motion/react';
 import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui';
 import * as React from 'react';
-
 import { cn } from '@const/lib/utils';
 import { MotionHighlight, MotionHighlightItem } from '../effects/motion-highlight';
+import { ChevronRight } from '../icons/chevron-right';
+import { Check } from '../icons/check';
 
 type DropdownMenuContextType = {
   isOpen: boolean;
@@ -108,7 +109,7 @@ function DropdownMenuSubTrigger({ className, children, inset, disabled, ...props
           )}
         >
           {children}
-          <ChevronRight data-chevron className='ml-auto' />
+          <ChevronRight data-chevron className='ml-auto' animateOnHover />
         </motion.div>
       </DropdownMenuPrimitive.SubTrigger>
     </MotionHighlightItem>
@@ -247,7 +248,7 @@ function DropdownMenuCheckboxItem({ className, children, checked, disabled, ...p
         >
           <span className='absolute left-2 flex size-3.5 items-center justify-center'>
             <DropdownMenuPrimitive.ItemIndicator data-slot='dropdown-menu-checkbox-item-indicator'>
-              <Check className='size-4' />
+              <Check className='size-4' animateOnHover />
             </DropdownMenuPrimitive.ItemIndicator>
           </span>
           {children}

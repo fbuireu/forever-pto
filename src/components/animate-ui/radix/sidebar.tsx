@@ -7,7 +7,6 @@ import { useIsMobile } from '@const/hooks/use-mobile';
 import { cn } from '@const/lib/utils';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
-import { PanelLeftIcon } from 'lucide-react';
 import { type Transition } from 'motion/react';
 import { Slot } from 'radix-ui';
 import * as React from 'react';
@@ -15,6 +14,7 @@ import { Button } from '../components/buttons/button';
 import { MotionHighlight, MotionHighlightItem } from '../effects/motion-highlight';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
+import { PanelLeftIcon } from '../icons/panel-left';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -291,7 +291,7 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
       }}
       {...props}
     >
-      <PanelLeftIcon width={32} height={32} className={className} />
+      <PanelLeftIcon width={32} height={32} className={className} animateOnHover />
       <span className='sr-only'>Toggle Sidebar</span>
     </Button>
   );

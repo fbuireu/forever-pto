@@ -3,7 +3,6 @@ import type { HolidaysState } from '@application/stores/holidays';
 import { cn } from '@const/lib/utils';
 import type { Day } from 'date-fns';
 import { addMonths, isSameDay, isSameMonth, isWeekend, subMonths } from 'date-fns';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
@@ -25,6 +24,8 @@ import {
 } from '../utils/modifiers';
 import { ConditionalWrapper } from './ConditionalWrapper';
 import { getDayClassNames, isFromToObject } from './utils/helpers';
+import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
+import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
 
 export interface FromTo {
   from: Date;
@@ -275,7 +276,7 @@ export function Calendar({
               className='h-8 w-8 p-0 hover:bg-muted'
               aria-label='Previous month'
             >
-              <ChevronLeft className='h-4 w-4' />
+              <ChevronLeft className='h-4 w-4' animateOnHover />
             </Button>
             <h3 className='text-sm font-medium flex-1 text-center'>{monthYearLabel}</h3>
             <Button
@@ -286,7 +287,7 @@ export function Calendar({
               className='h-8 w-8 p-0 hover:bg-muted'
               aria-label='Next month'
             >
-              <ChevronRight className='h-4 w-4' />
+              <ChevronRight className='h-4 w-4' animateOnHover />
             </Button>
           </>
         ) : (

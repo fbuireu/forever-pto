@@ -2,11 +2,13 @@
 
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
-import { BarChart3, Calendar, CalendarDays, ChevronLeft, ChevronRight, Sparkles, TrendingUp } from 'lucide-react';
+import { BarChart3, Calendar, CalendarDays, Sparkles, TrendingUp } from 'lucide-react';
 import { motion, type Transition, type Variants } from 'motion/react';
 import { useCallback, useState } from 'react';
 import { Button } from '../components/buttons/button';
 import { SlidingNumber } from '../text/sliding-number';
+import { ChevronRight } from '../icons/chevron-right';
+import { ChevronLeft } from '../icons/chevron-left';
 
 interface AlternativeManagerProps {
   allSuggestions: Suggestion[];
@@ -99,7 +101,7 @@ export const AlternativesManager = ({
     <div className='sticky top-0 z-[10] flex w-fit flex-wrap items-center gap-y-2 rounded-2xl border border-border bg-background p-2 shadow-sm'>
       <div className='flex shrink-0 items-center rounded-lg bg-muted/50 px-2 h-full'>
         <Button disabled={currentIndex === 0} variant='ghost' onClick={handlePrevious} aria-label='Previous suggestion'>
-          <ChevronLeft size={20} />
+          <ChevronLeft size={20} animateOnHover/>
         </Button>
 
         <div className='mx-2 flex flex-col items-center relative w-25 transition-[height,padding] duration-300 ease-out'>
@@ -127,7 +129,7 @@ export const AlternativesManager = ({
           onClick={handleNext}
           aria-label='Next suggestion'
         >
-          <ChevronRight size={20} />
+          <ChevronRight size={20} animateOnHover />
         </Button>
       </div>
 

@@ -5,10 +5,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
 import { Input } from '@const/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, Crown, Loader2, Lock } from 'lucide-react';
+import { AlertCircle, Crown, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { Lock } from 'src/components/animate-ui/icons/lock';
 
 interface UpgradeModalProps {
   open: boolean;
@@ -80,7 +81,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
           </DialogTitle>
           <DialogDescription>
             <span className='block my-2'>
-              <Lock className='w-4 h-4 inline mr-1' />
+              <Lock className='w-4 h-4 inline mr-1' animateOnHover />
               <strong>{feature}</strong> requires premium access
             </span>
             <span className='block text-muted-foreground leading-relaxed'>

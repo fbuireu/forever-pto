@@ -8,7 +8,7 @@ import { usePremiumStore } from '@application/stores/premium';
 import { Badge } from '@const/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
-import { Award, BarChart3, Calendar, CalendarDays, Clock, Star, TrendingUp, Zap } from 'lucide-react';
+import { Award, BarChart3, Calendar, CalendarDays, TrendingUp, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { RotatingText } from 'src/components/animate-ui/text/rotating';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
@@ -17,6 +17,8 @@ import { PremiumFeature } from '../premium/PremiumFeature';
 import { SummarySkeleton } from '../skeletons/SummarySkeleton';
 import { MetricCard, MetricCardSize } from '../summary/MetricCard';
 import { NotificationCard } from '../summary/NotificationCard';
+import { Star } from 'src/components/animate-ui/icons/star';
+import { Clock } from 'src/components/animate-ui/icons/clock';
 
 const HolidaysDistributionChart = dynamic(() =>
   import('../summary/HolidaysDistributionChart').then((module) => ({ default: module.HolidaysDistributionChart }))
@@ -228,7 +230,7 @@ export const Summary = () => {
             >
               <div className='p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg'>
                 <div className='flex items-center gap-2 mb-3'>
-                  <Clock className='w-4 h-4 text-indigo-500' />
+                  <Clock className='w-4 h-4 text-indigo-500' animateOnHover />
                   <span className='text-sm font-medium text-indigo-700 dark:text-indigo-300'>Resumen del Año</span>
                 </div>
                 <div className='grid grid-cols-3 gap-4 text-center'>

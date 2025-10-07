@@ -3,10 +3,10 @@
 import { usePathname, useRouter } from '@application/i18n/navigtion';
 import { usePremiumStore } from '@application/stores/premium';
 import { useLanguages } from '@ui/hooks/useLanguages';
-import { Check } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
+import { Check } from 'src/components/animate-ui/icons/check';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,7 +58,7 @@ export const LanguageSelector = () => {
             onClick={() => handleLanguageChange(language.code)}
           >
             <span>{language.label}</span>
-            {language.code === locale && <Check className='h-4 w-4' />}
+            {language.code === locale && <Check animateOnHover className='h-4 w-4' />}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

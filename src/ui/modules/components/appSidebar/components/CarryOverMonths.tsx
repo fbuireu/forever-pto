@@ -2,13 +2,14 @@
 
 import { Slider } from '@const/components/ui/slider';
 import { Field, Label } from '@headlessui/react';
-import { InfoIcon, SlidersHorizontal } from 'lucide-react';
+import { InfoIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { PremiumFeature } from '../../premium/PremiumFeature';
 import { useFiltersStore } from '@application/stores/filters';
 import { useShallow } from 'zustand/react/shallow';
+import { SlidersHorizontal } from 'src/components/animate-ui/icons/sliders-horizontal';
 
 const MIN_VALUE = 1;
 const MAX_VALUE = 12;
@@ -45,7 +46,7 @@ export const CarryOverMonths = () => {
   return (
     <Field className='space-y-2 w-full'>
       <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='carry-over-months'>
-        <SlidersHorizontal size={16} /> Carry Over Months
+        <SlidersHorizontal size={16} animateOnHover/> Carry Over Months
         <TooltipProvider delayDuration={200}>
           <Tooltip>
             <TooltipTrigger asChild className='ml-auto'>

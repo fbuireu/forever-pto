@@ -12,7 +12,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
 import { Input } from '@const/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CalendarDays, Calendar as CalendarIcon, Plus } from 'lucide-react';
+import { CalendarDays, Calendar as CalendarIcon } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
@@ -21,6 +21,7 @@ import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { z } from 'zod';
 import { Calendar, CalendarSelectionMode, type FromTo } from '../../core/Calendar';
 import { formatDate } from '../../utils/formatters';
+import { Plus } from 'src/components/animate-ui/icons/plus';
 
 interface AddHolidayModalProps {
   open: boolean;
@@ -102,7 +103,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
       <DialogContent className='sm:max-w-sm' onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
-            <Plus className='w-5 h-5 text-green-500' />
+            <Plus className='w-5 h-5 text-green-500' animateOnHover />
             Add New Holiday
           </DialogTitle>
           <DialogDescription>

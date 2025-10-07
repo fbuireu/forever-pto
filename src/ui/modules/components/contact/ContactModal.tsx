@@ -8,12 +8,13 @@ import { Input } from '@const/components/ui/input';
 import { Textarea } from '@const/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { sendContactEmail } from '@infrastructure/actions/contact';
-import { AlertCircle, CheckCircle2, Mail } from 'lucide-react';
+import { AlertCircle, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useShallow } from 'zustand/react/shallow';
 import { FormButtons } from './FormButtons';
 import { ContactFormData, contactSchema } from './schema';
+import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
 
 interface ContactModalProps {
   open: boolean;
@@ -152,7 +153,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
         {step === Step.SUCCESS && (
           <div className='text-center space-y-4 py-4'>
-            <CheckCircle2 className='w-12 h-12 text-green-500 mx-auto' />
+            <CircleCheckBig animateOnHover className='w-12 h-12 text-green-500 mx-auto' />
             <div>
               <h3 className='font-semibold text-green-600'>Message Sent!</h3>
               <p className='text-sm text-muted-foreground mt-1'>We'll get back to you as soon as possible.</p>

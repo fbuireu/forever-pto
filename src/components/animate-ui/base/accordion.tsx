@@ -5,7 +5,7 @@ import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from '
 import * as React from 'react';
 
 import { cn } from '@const/lib/utils';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown } from '../icons/chevron-down';
 
 type AccordionItemContextType = {
   isOpen: boolean;
@@ -100,7 +100,7 @@ function AccordionTrigger({
             animate={{ rotate: isOpen ? 180 : 0 }}
             transition={transition}
           >
-            <ChevronDown className='size-5 shrink-0' />
+            <ChevronDown animateOnHover className='size-5 shrink-0' />
           </motion.div>
         )}
       </AccordionPrimitive.Trigger>

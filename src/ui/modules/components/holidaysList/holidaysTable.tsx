@@ -9,7 +9,7 @@ import { useDebounce } from '@ui/hooks/useDebounce';
 import { ConditionalWrapper } from '@ui/modules/components/core/ConditionalWrapper';
 import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/components/premium/PremiumFeature';
 import { isWeekend } from 'date-fns/isWeekend';
-import { ChevronDown, ChevronRight, Edit, Plus, Search, Trash2 } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -20,6 +20,11 @@ import { HolidayRow } from './components/HolidayRow';
 import { HolidayTableHeader } from './components/HolidayTableHeader';
 import { usePremiumStore } from '@application/stores/premium';
 import { useHolidaysStore } from '@application/stores/holidays';
+import { ChevronDown } from 'src/components/animate-ui/icons/chevron-down';
+import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
+import { Plus } from 'src/components/animate-ui/icons/plus';
+import { Search } from 'src/components/animate-ui/icons/search';
+import { Trash2 } from 'src/components/animate-ui/icons/trash-2';
 
 interface HolidaysTableProps {
   title: string;
@@ -220,9 +225,9 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
           <div className='flex items-center space-x-3'>
             <div className='flex items-center space-x-2'>
               {innerOpen ? (
-                <ChevronDown className='h-4 w-4 text-muted-foreground transition-transform' />
+                <ChevronDown className='h-4 w-4 text-muted-foreground transition-transform' animateOnHover />
               ) : (
-                <ChevronRight className='h-4 w-4 text-muted-foreground transition-transform' />
+                <ChevronRight className='h-4 w-4 text-muted-foreground transition-transform' animateOnHover />
               )}
               <h3 className='text-lg font-semibold'>{title}</h3>
             </div>
@@ -246,7 +251,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                 onClick={() => setShowAddModal(true)}
                 className='bg-green-600 hover:bg-green-700 text-white'
               >
-                <Plus className='h-4 w-4 mr-1' />
+                <Plus className='h-4 w-4 mr-1' animateOnHover />
                 Añadir Festivo
               </Button>
             )}
@@ -259,7 +264,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
             {selectedCount > 0 && (
               <div className='flex items-center space-x-2'>
                 <Button variant='destructive' size='sm' onClick={() => setShowDeleteModal(true)}>
-                  <Trash2 className='h-4 w-4 mr-1' />
+                  <Trash2 className='h-4 w-4 mr-1' animateOnHover />
                   Eliminar {selectedCount} festivos
                 </Button>
               </div>
@@ -318,7 +323,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                     <TableRow>
                       <TableCell colSpan={shouldShowLocationColumn ? 7 : 6} className='h-24 text-center'>
                         <div className='flex flex-col items-center space-y-2 text-muted-foreground'>
-                          <Search className='h-8 w-8' />
+                          <Search className='h-8 w-8' animateOnHover />
                           <span>{debouncedSearchTerm ? 'No se encontraron festividades' : 'No hay festividades'}</span>
                         </div>
                       </TableCell>

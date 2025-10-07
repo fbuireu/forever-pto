@@ -2,11 +2,12 @@
 
 import { usePremiumStore } from '@application/stores/premium';
 import { cn } from '@const/lib/utils';
-import { InfoIcon, Lock } from 'lucide-react';
+import { InfoIcon } from 'lucide-react';
 import { useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { useShallow } from 'zustand/react/shallow';
 import { getButtonClass } from './utils/helpers';
+import { Lock } from 'src/components/animate-ui/icons/lock';
 
 export const PremiumFeatureVariant = {
   DEFAULT: 'default',
@@ -82,7 +83,7 @@ export const PremiumFeature = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className='relative flex items-center'>
-                  <Lock className={cn(iconSize, 'text-muted-foreground')} />
+                  <Lock className={cn(iconSize, 'text-muted-foreground')} animateOnHover />
                   <InfoIcon className='absolute -top-2 -right-2 size-4 text-muted-foreground' />
                 </span>
               </TooltipTrigger>
@@ -91,7 +92,7 @@ export const PremiumFeature = ({
           </TooltipProvider>
         ) : (
           <div className={'flex flex-col items-center gap-2 text-center px-4'}>
-            <Lock className={cn(iconSize, 'text-muted-foreground')} />
+            <Lock className={cn(iconSize, 'text-muted-foreground')} animateOnHover />
             {inlineDescription && (
               <div className='text-sm text-foreground [text-shadow:0_2px_4px_rgba(0,0,0,1)]'>{description}</div>
             )}

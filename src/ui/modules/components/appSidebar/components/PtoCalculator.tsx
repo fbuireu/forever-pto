@@ -4,7 +4,7 @@ import { useFiltersStore } from '@application/stores/filters';
 import { Combobox } from '@const/components/ui/combobox';
 import { Input } from '@const/components/ui/input';
 import { Label } from '@const/components/ui/label';
-import { Calculator, InfoIcon, Plus } from 'lucide-react';
+import { Calculator, InfoIcon } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { useMemo, useRef, useState } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/co
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 import { getMonthNames } from '../../utils/helpers';
+import { Plus } from 'src/components/animate-ui/icons/plus';
 
 interface MonthOption {
   value: string;
@@ -137,7 +138,7 @@ export const PtoCalculator = () => {
             size='sm'
             className='w-full h-7 text-xs bg-green-600 hover:bg-green-700 justify-start'
           >
-            <Plus className='w-3 h-3 mr-1' />
+            <Plus className='w-3 h-3 mr-1' animateOnHover />
             Apply to PTO Days
           </Button>
         </div>

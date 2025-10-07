@@ -23,7 +23,7 @@ export default Home;
 export { generateMetadata };
 
 // todo: contact form resend (db)
-// todo: add animate icons (https://animate-ui.com/docs/icons)
+// todo: add <AnimateIcon animateOnHover> + check use-cases (Star always animate). Refine when animateOnHover is used on Lucide (holidaysList and radialNav)
 // todo: check validation premium
 // todo: unify component and folder structure
 // todo: locale all

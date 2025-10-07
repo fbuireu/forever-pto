@@ -2,10 +2,12 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { cn } from '@const/lib/utils';
-import { CheckCircle2, Circle, Clock, Sparkles } from 'lucide-react';
+import { Circle, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { FeatureList } from 'src/components/animate-ui/components/community/FeatureList';
 import { RadialNav, RadialNavItem } from 'src/components/animate-ui/components/community/radial-nav';
+import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
+import { Clock } from 'src/components/animate-ui/icons/clock';
 
 interface RoadmapFeature {
   id: string;
@@ -26,7 +28,7 @@ type CategoryStatus = (typeof CategoryStatus)[keyof typeof CategoryStatus];
 const ROADMAP_CATEGORIES: Array<RadialNavItem & { status: CategoryStatus; className: string }> = [
   {
     id: 1,
-    icon: CheckCircle2,
+    icon: CircleCheckBig,
     label: 'Completed',
     angle: 0,
     status: CategoryStatus.COMPLETED,

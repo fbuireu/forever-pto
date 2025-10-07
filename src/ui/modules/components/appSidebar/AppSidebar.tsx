@@ -1,4 +1,4 @@
-import { Calculator, ChevronRight, Settings } from 'lucide-react';
+import { Calculator } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { Suspense } from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
@@ -31,6 +31,8 @@ import { Strategy } from './components/Strategy';
 import { ThemeSelector } from './components/ThemeSelector';
 import { WorkdayCounter } from './components/WorkdayCounter';
 import { Years } from './components/Years';
+import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
+import { Settings } from 'src/components/animate-ui/icons/settings';
 
 interface AppSidebarProps {
   children: React.ReactNode;
@@ -55,7 +57,7 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild className='cursor-pointer'>
                   <SidebarMenuButton variant='outline' tooltip='Filters'>
-                    <Settings className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
+                    <Settings animateOnHover className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
                     <span className='data-[collapsed=true]:hidden'>Filters & Configuration</span>
                     <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
                   </SidebarMenuButton>
@@ -105,7 +107,7 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
                   <SidebarMenuButton variant='outline' tooltip='Tools'>
                     <Calculator className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
                     <span className='data-[collapsed=true]:hidden'>Calculators</span>
-                    <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
+                    <ChevronRight animateOnHover className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>

@@ -4,11 +4,11 @@ import { Button } from '@const/components/ui/button';
 import { confirmPayment } from '@infrastructure/services/payments/checkout';
 import { formatDiscountText } from '@infrastructure/services/payments/utils/helpers';
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import { ChevronLeft } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { ExpressCheckoutSkeleton } from '../skeletons/ExpressCheckoutSkeleton';
+import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
 
 interface CheckoutFormProps {
   amount: number;
@@ -87,7 +87,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
           className='gap-2'
           aria-label='Go back to donation form'
         >
-          <ChevronLeft className='w-4 h-4' aria-hidden='true' />
+          <ChevronLeft className='w-4 h-4' aria-hidden='true' animateOnHover />
           Back
         </Button>
         <div className='text-right'>

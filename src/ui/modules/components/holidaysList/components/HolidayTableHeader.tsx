@@ -1,8 +1,10 @@
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import { TableHeader as BaseTableHeader, TableHead, TableRow } from '@const/components/ui/table';
 import { cn } from '@const/lib/utils';
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown } from 'lucide-react';
 import { memo } from 'react';
+import { ArrowUp } from 'src/components/animate-ui/icons/arrow-up';
+import { ArrowDown } from 'src/components/animate-ui/icons/arrow-down';
 
 interface HolidayTableHeaderProps {
   selectAllButton: React.ReactNode;
@@ -37,7 +39,7 @@ const TableHeader = ({ children, sortKey, currentSort, onSort, className = '' }:
     >
       <div className='flex items-center space-x-1'>
         <span>{children}</span>
-        <Icon className='h-4 w-4' />
+        <Icon className='h-4 w-4' animateOnHover/>
       </div>
     </TableHead>
   );

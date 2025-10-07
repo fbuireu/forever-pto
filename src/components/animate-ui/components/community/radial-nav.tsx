@@ -162,7 +162,8 @@ function MenuButton({
           height: iconSize,
           width: iconSize,
           transform: `translateX(${translateX}px)`,
-        }}
+              }}
+              animateOnHover
       />
       <motion.span variants={LABEL_VARIANTS} transition={LABEL_TRANSITION} className='invisible text-sm w-0'>
         {label}
