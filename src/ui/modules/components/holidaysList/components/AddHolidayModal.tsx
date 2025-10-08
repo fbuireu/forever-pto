@@ -103,7 +103,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
       <DialogContent className='sm:max-w-sm' onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
-            <Plus className='w-5 h-5 text-green-500' animateOnView />
+            <Plus className='w-5 h-5 text-green-500' animateOnView loop />
             Add New Holiday
           </DialogTitle>
           <DialogDescription>
@@ -131,7 +131,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
             <FormField
               control={form.control}
               name='date'
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel>Select Date</FormLabel>
                   <FormControl>
