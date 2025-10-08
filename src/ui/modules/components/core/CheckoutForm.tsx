@@ -9,6 +9,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useState, useTransition } f
 import { useShallow } from 'zustand/react/shallow';
 import { ExpressCheckoutSkeleton } from '../skeletons/ExpressCheckoutSkeleton';
 import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 interface CheckoutFormProps {
   amount: number;
@@ -78,6 +79,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   return (
     <div className='space-y-4'>
       <div className='flex items-center justify-between'>
+        <AnimateIcon animateOnHover>
         <Button
           type='button'
           variant='ghost'
@@ -87,9 +89,10 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
           className='gap-2'
           aria-label='Go back to donation form'
         >
-          <ChevronLeft className='w-4 h-4' aria-hidden='true' animateOnHover />
+          <ChevronLeft className='w-4 h-4' aria-hidden='true' />
           Back
         </Button>
+        </AnimateIcon>
         <div className='text-right'>
           <p className='text-sm text-muted-foreground'>Total amount</p>
           <p className='text-2xl font-bold' aria-live='polite'>

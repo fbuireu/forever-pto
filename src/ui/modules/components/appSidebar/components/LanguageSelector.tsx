@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Check } from 'src/components/animate-ui/icons/check';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,14 +53,12 @@ export const LanguageSelector = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         {languages.map((language) => (
-          <DropdownMenuItem
-            key={language.code}
-            className={'flex justify-between'}
-            onClick={() => handleLanguageChange(language.code)}
-          >
-            <span>{language.label}</span>
-            {language.code === locale && <Check animateOnHover className='h-4 w-4' />}
-          </DropdownMenuItem>
+          <AnimateIcon animateOnHover key={language.code}>
+            <DropdownMenuItem className={'flex justify-between'} onClick={() => handleLanguageChange(language.code)}>
+              <span>{language.label}</span>
+              {language.code === locale && <Check className='h-4 w-4' />}
+            </DropdownMenuItem>
+          </AnimateIcon>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>

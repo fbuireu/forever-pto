@@ -5,6 +5,7 @@ import { ArrowUpDown } from 'lucide-react';
 import { memo } from 'react';
 import { ArrowUp } from 'src/components/animate-ui/icons/arrow-up';
 import { ArrowDown } from 'src/components/animate-ui/icons/arrow-down';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 interface HolidayTableHeaderProps {
   selectAllButton: React.ReactNode;
@@ -31,16 +32,15 @@ const TableHeader = ({ children, sortKey, currentSort, onSort, className = '' }:
 
   return (
     <TableHead
-      className={cn(
-        'cursor-pointer select-none hover:bg-muted/50 transition-colors',
-        className
-      )}
+      className={cn('cursor-pointer select-none hover:bg-muted/50 transition-colors', className)}
       onClick={() => onSort(sortKey)}
     >
-      <div className='flex items-center space-x-1'>
-        <span>{children}</span>
-        <Icon className='h-4 w-4' animateOnHover/>
-      </div>
+      <AnimateIcon animateOnHover>
+        <div className='flex items-center space-x-1'>
+          <span>{children}</span>
+          <Icon className='h-4 w-4' />
+        </div>
+      </AnimateIcon>
     </TableHead>
   );
 };

@@ -103,7 +103,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
       <DialogContent className='sm:max-w-sm' onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
-            <Plus className='w-5 h-5 text-green-500' animateOnHover />
+            <Plus className='w-5 h-5 text-green-500' animateOnView />
             Add New Holiday
           </DialogTitle>
           <DialogDescription>

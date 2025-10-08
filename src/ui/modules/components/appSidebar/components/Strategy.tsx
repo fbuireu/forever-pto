@@ -10,6 +10,7 @@ import { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { AlertCircle, CheckCircle2, DicesIcon, Scale, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import { ChevronDown } from 'src/components/animate-ui/icons/chevron-down';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { Users } from 'src/components/animate-ui/icons/users';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { useShallow } from 'zustand/react/shallow';
@@ -71,13 +72,14 @@ export const Strategy = () => {
       />
       {currentStrategy && (
         <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
-          <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-xs font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors'>
-            <span>{detailsOpen ? 'Hide' : 'Expand'} strategy details</span>
-            <ChevronDown
-              className={cn('h-4 w-4 transition-transform duration-200', detailsOpen && 'rotate-180')}
-              animateOnHover
-            />
-          </CollapsibleTrigger>
+          <>
+            <AnimateIcon animateOnHover>
+              <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-xs font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors'>
+                <span>{detailsOpen ? 'Hide' : 'Expand'} strategy details</span>
+                <ChevronDown className={cn('h-4 w-4 transition-transform duration-200', detailsOpen && 'rotate-180')} />
+              </CollapsibleTrigger>
+            </AnimateIcon>
+          </>
           <CollapsibleContent>
             <Card className='p-4 bg-muted/50 mt-2 text-xs'>
               <div className='space-y-3'>

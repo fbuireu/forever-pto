@@ -3,7 +3,6 @@
 import { Badge } from '@const/components/ui/badge';
 import { motion, type Transition } from 'motion/react';
 import * as React from 'react';
-import { ArrowRight } from '../../icons/arrow-right';
 
 interface RoadmapFeature {
   id: string;
@@ -99,7 +98,7 @@ export function FeatureList({ features, categoryLabel }: FeatureListProps) {
             variants={viewAllTextVariants}
             transition={textSwitchTransition}
           >
-            Detailed view <ArrowRight animateOnHover className='size-4' />
+            Detailed view
           </motion.span>
         </span>
       </div>

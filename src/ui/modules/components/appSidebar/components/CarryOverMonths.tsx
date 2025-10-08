@@ -10,6 +10,7 @@ import { PremiumFeature } from '../../premium/PremiumFeature';
 import { useFiltersStore } from '@application/stores/filters';
 import { useShallow } from 'zustand/react/shallow';
 import { SlidersHorizontal } from 'src/components/animate-ui/icons/sliders-horizontal';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 const MIN_VALUE = 1;
 const MAX_VALUE = 12;
@@ -44,39 +45,41 @@ export const CarryOverMonths = () => {
   };
 
   return (
-    <Field className='space-y-2 w-full'>
-      <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='carry-over-months'>
-        <SlidersHorizontal size={16} animateOnHover/> Carry Over Months
-        <TooltipProvider delayDuration={200}>
-          <Tooltip>
-            <TooltipTrigger asChild className='ml-auto'>
-              <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
-            </TooltipTrigger>
-            <TooltipContent className='w-50 text-pretty'>
-              Allows adding months to the following year to expand opportunity search
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </Label>
-      <PremiumFeature feature='Carry Over Months'>
-        <div className='flex gap-2 relative w-full'>
-          <p className='font-normal text-sm'>{MIN_VALUE}</p>
-          <Slider
-            id='carry-over-months'
-            value={[localValue]}
-            max={MAX_VALUE}
-            min={MIN_VALUE}
-            step={1}
-            onValueChange={handleChange}
-          />
-          <SlidingNumber
-            className='absolute -bottom-4 left-0 right-0 mx-auto justify-center font-normal text-sm'
-            number={localValue}
-            padStart
-          />
-          <p className='font-normal text-sm'>{MAX_VALUE}</p>
-        </div>
-      </PremiumFeature>
-    </Field>
+    <AnimateIcon animateOnHover>
+      <Field className='space-y-2 w-full'>
+        <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='carry-over-months'>
+          <SlidersHorizontal size={16} /> Carry Over Months
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild className='ml-auto'>
+                <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
+              </TooltipTrigger>
+              <TooltipContent className='w-50 text-pretty'>
+                Allows adding months to the following year to expand opportunity search
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </Label>
+        <PremiumFeature feature='Carry Over Months'>
+          <div className='flex gap-2 relative w-full'>
+            <p className='font-normal text-sm'>{MIN_VALUE}</p>
+            <Slider
+              id='carry-over-months'
+              value={[localValue]}
+              max={MAX_VALUE}
+              min={MIN_VALUE}
+              step={1}
+              onValueChange={handleChange}
+            />
+            <SlidingNumber
+              className='absolute -bottom-4 left-0 right-0 mx-auto justify-center font-normal text-sm'
+              number={localValue}
+              padStart
+            />
+            <p className='font-normal text-sm'>{MAX_VALUE}</p>
+          </div>
+        </PremiumFeature>
+      </Field>
+    </AnimateIcon>
   );
 };

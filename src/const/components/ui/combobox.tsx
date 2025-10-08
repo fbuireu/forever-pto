@@ -11,6 +11,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { hasFlag } from './utils/helpers';
 import { ChevronUpDown } from 'src/components/animate-ui/icons/chevron-up-down';
 import { Check } from 'src/components/animate-ui/icons/check';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 interface ComboboxProps extends Omit<React.HTMLProps<HTMLInputElement>, 'onChange'> {
   searchPlaceholder?: string;
@@ -47,23 +48,25 @@ export const Combobox = ({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant='outline'
-          role='combobox'
-          aria-expanded={open}
-          disabled={disabled}
-          className={cn('w-[200px] justify-between', className)}
-        >
-          {selectedOption ? (
-            <div className='flex items-center gap-2 min-w-0 flex-1'>
-              {hasFlag(selectedOption) && <span className='flex-shrink-0'>{selectedOption.flag}</span>}
-              <span className='truncate'>{selectedOption.label}</span>
-            </div>
-          ) : (
-            placeholder
-          )}
-          <ChevronUpDown className='opacity-50' animateOnHover />
-        </Button>
+        <AnimateIcon animateOnHover>
+          <Button
+            variant='outline'
+            role='combobox'
+            aria-expanded={open}
+            disabled={disabled}
+            className={cn('w-[200px] justify-between', className)}
+          >
+            {selectedOption ? (
+              <div className='flex items-center gap-2 min-w-0 flex-1'>
+                {hasFlag(selectedOption) && <span className='flex-shrink-0'>{selectedOption.flag}</span>}
+                <span className='truncate'>{selectedOption.label}</span>
+              </div>
+            ) : (
+              placeholder
+            )}
+            <ChevronUpDown className='opacity-50' />
+          </Button>
+        </AnimateIcon>
       </PopoverTrigger>
       <PopoverContent className='w-[200px] p-0'>
         <Command>

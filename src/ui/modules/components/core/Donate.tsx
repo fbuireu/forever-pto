@@ -168,7 +168,7 @@ export const Donate = () => {
             <p className='text-muted-foreground text-sm'>Make a donation to support the content and unblock access.</p>
             {Boolean(premiumKey) && (
               <div className='flex items-center gap-2 p-2 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700'>
-                <Star className='w-4 h-4 text-green-500' fill='currentColor' aria-hidden='true' animateOnHover />
+                <Star className='w-4 h-4 text-green-500' fill='currentColor' aria-hidden='true' animateOnView loop />
                 <span className='text-green-700 dark:text-green-300 font-semibold text-sm'>
                   You are a premium user already. Thank you for your support!
                 </span>
@@ -254,8 +254,8 @@ export const Donate = () => {
                 <Collapsible open={showPromoCode} onOpenChange={setShowPromoCode}>
                   <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-sm font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors'>
                     <span className='text-muted-foreground'>Have a promo code?</span>
-                                      <ChevronDown
-                                          animateOnHover
+                    <ChevronDown
+                      animateOnHover
                       className={cn(
                         'h-4 w-4 text-muted-foreground transition-transform duration-200',
                         showPromoCode && 'rotate-180'

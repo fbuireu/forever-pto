@@ -13,6 +13,7 @@ import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 import { getMonthNames } from '../../utils/helpers';
 import { Plus } from 'src/components/animate-ui/icons/plus';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 interface MonthOption {
   value: string;
@@ -132,15 +133,16 @@ export const PtoCalculator = () => {
               <SlidingNumber number={calculationSnapshotRef.current.month} decimalPlaces={0} /> months
             </p>
           </div>
-
+          <AnimateIcon animateOnHover>
           <Button
             onClick={() => applyToStore(calculatedDays)}
             size='sm'
             className='w-full h-7 text-xs bg-green-600 hover:bg-green-700 justify-start'
           >
-            <Plus className='w-3 h-3 mr-1' animateOnHover />
+            <Plus className='w-3 h-3 mr-1' />
             Apply to PTO Days
           </Button>
+          </AnimateIcon>
         </div>
       )}
     </div>

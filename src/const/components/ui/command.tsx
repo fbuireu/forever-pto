@@ -6,6 +6,7 @@ import { Command as CommandPrimitive } from 'cmdk';
 import { cn } from '@const/lib/utils';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@const/components/ui/dialog';
 import { SearchIcon } from 'src/components/animate-ui/icons/search';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {
   return (
@@ -51,15 +52,17 @@ function CommandDialog({
 function CommandInput({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Input>) {
   return (
     <div data-slot='command-input-wrapper' className='flex h-9 items-center gap-2 border-b px-3'>
-      <SearchIcon className='size-4 shrink-0 opacity-50' animateOnHover/>
-      <CommandPrimitive.Input
-        data-slot='command-input'
-        className={cn(
-          'placeholder:text-muted-foreground flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50',
-          className
-        )}
-        {...props}
-      />
+      <AnimateIcon animateOnHover>
+        <SearchIcon className='size-4 shrink-0 opacity-50' />
+        <CommandPrimitive.Input
+          data-slot='command-input'
+          className={cn(
+            'placeholder:text-muted-foreground flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50',
+            className
+          )}
+          {...props}
+        />
+      </AnimateIcon>
     </div>
   );
 }

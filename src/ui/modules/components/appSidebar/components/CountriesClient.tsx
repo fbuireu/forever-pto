@@ -7,6 +7,7 @@ import { Combobox } from '@const/components/ui/combobox';
 import { Field, Label } from '@headlessui/react';
 import { InfoIcon } from 'lucide-react';
 import { useEffect } from 'react';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { MapPin } from 'src/components/animate-ui/icons/map-pin';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { useShallow } from 'zustand/react/shallow';
@@ -36,9 +37,11 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
   }, [countries, setCountries]);
 
   return (
+                <AnimateIcon animateOnHover>
+
     <Field className='space-y-2 w-full'>
       <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='countries'>
-        <MapPin size={16} animateOnHover /> Country
+        <MapPin size={16} /> Country
         <TooltipProvider delayDuration={200}>
           <Tooltip>
             <TooltipTrigger asChild className='ml-auto'>
@@ -61,5 +64,6 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
         searchPlaceholder='Search countries...'
       />
     </Field>
+    </AnimateIcon>
   );
 };

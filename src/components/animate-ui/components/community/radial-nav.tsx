@@ -2,7 +2,7 @@
 
 import { cn } from '@const/lib/utils';
 import { MousePointer2, type LucideIcon } from 'lucide-react';
-import { motion, type Transition, type Variants } from 'motion/react';
+import { motion, SVGMotionProps, type Transition, type Variants } from 'motion/react';
 import * as React from 'react';
 
 type RadialNavProps = {
@@ -15,7 +15,7 @@ type RadialNavProps = {
 
 type RadialNavItem = {
   id: number;
-  icon: LucideIcon;
+  icon: LucideIcon | React.ComponentType<SVGMotionProps<SVGSVGElement>>;
   label: string;
   angle: number;
 } & React.HTMLAttributes<HTMLDivElement>;
@@ -134,6 +134,8 @@ function MenuButton({
     bias: -1,
   });
 
+  const supportsAnimation = 'animateOnHover' in Icon || (Icon as any).$$typeof !== Symbol.for('react.forward_ref'); 
+
   return (
     <motion.button
       {...BUTTON_MOTION_CONFIG}
@@ -162,8 +164,8 @@ function MenuButton({
           height: iconSize,
           width: iconSize,
           transform: `translateX(${translateX}px)`,
-              }}
-              animateOnHover
+        }}
+        {...(supportsAnimation ? { animateOnHover: true } : {})}
       />
       <motion.span variants={LABEL_VARIANTS} transition={LABEL_TRANSITION} className='invisible text-sm w-0'>
         {label}

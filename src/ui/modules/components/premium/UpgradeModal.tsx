@@ -81,7 +81,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
           </DialogTitle>
           <DialogDescription>
             <span className='block my-2'>
-              <Lock className='w-4 h-4 inline mr-1' animateOnHover />
+              <Lock className='w-4 h-4 inline mr-1' animateOnView loop />
               <strong>{feature}</strong> requires premium access
             </span>
             <span className='block text-muted-foreground leading-relaxed'>

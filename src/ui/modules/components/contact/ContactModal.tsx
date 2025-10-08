@@ -153,7 +153,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
         {step === Step.SUCCESS && (
           <div className='text-center space-y-4 py-4'>
-            <CircleCheckBig animateOnHover className='w-12 h-12 text-green-500 mx-auto' />
+            <CircleCheckBig animateOnView loop className='w-12 h-12 text-green-500 mx-auto' />
             <div>
               <h3 className='font-semibold text-green-600'>Message Sent!</h3>
               <p className='text-sm text-muted-foreground mt-1'>We'll get back to you as soon as possible.</p>

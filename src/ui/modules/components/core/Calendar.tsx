@@ -26,6 +26,7 @@ import { ConditionalWrapper } from './ConditionalWrapper';
 import { getDayClassNames, isFromToObject } from './utils/helpers';
 import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
 import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 export interface FromTo {
   from: Date;
@@ -268,27 +269,31 @@ export function Calendar({
       <div className='flex justify-center items-center mb-4'>
         {showNavigation ? (
           <>
-            <Button
-              variant='ghost'
-              type='button'
-              size='sm'
-              onClick={handlePreviousMonth}
-              className='h-8 w-8 p-0 hover:bg-muted'
-              aria-label='Previous month'
-            >
-              <ChevronLeft className='h-4 w-4' animateOnHover />
-            </Button>
+            <AnimateIcon animateOnHover>
+              <Button
+                variant='ghost'
+                type='button'
+                size='sm'
+                onClick={handlePreviousMonth}
+                className='h-8 w-8 p-0 hover:bg-muted'
+                aria-label='Previous month'
+              >
+                <ChevronLeft className='h-4 w-4' />
+              </Button>
+            </AnimateIcon>
             <h3 className='text-sm font-medium flex-1 text-center'>{monthYearLabel}</h3>
-            <Button
-              variant='ghost'
-              type='button'
-              size='sm'
-              onClick={handleNextMonth}
-              className='h-8 w-8 p-0 hover:bg-muted'
-              aria-label='Next month'
-            >
-              <ChevronRight className='h-4 w-4' animateOnHover />
-            </Button>
+            <AnimateIcon animateOnHover>
+              <Button
+                variant='ghost'
+                type='button'
+                size='sm'
+                onClick={handleNextMonth}
+                className='h-8 w-8 p-0 hover:bg-muted'
+                aria-label='Next month'
+              >
+                <ChevronRight className='h-4 w-4' />
+              </Button>
+            </AnimateIcon>
           </>
         ) : (
           <h3 className='text-sm font-medium'>{monthYearLabel}</h3>

@@ -6,9 +6,10 @@ import { BarChart3, Calendar, CalendarDays, Sparkles, TrendingUp } from 'lucide-
 import { motion, type Transition, type Variants } from 'motion/react';
 import { useCallback, useState } from 'react';
 import { Button } from '../components/buttons/button';
-import { SlidingNumber } from '../text/sliding-number';
-import { ChevronRight } from '../icons/chevron-right';
 import { ChevronLeft } from '../icons/chevron-left';
+import { ChevronRight } from '../icons/chevron-right';
+import { AnimateIcon } from '../icons/icon';
+import { SlidingNumber } from '../text/sliding-number';
 
 interface AlternativeManagerProps {
   allSuggestions: Suggestion[];
@@ -91,19 +92,23 @@ export const AlternativesManager = ({
   const efficiency = (effectiveDays ?? 0) / ptoDays;
   const gainedDays = (effectiveDays ?? 0) - ptoDays;
 
-  const mainEfficiency =
-    (allSuggestions[0]?.metrics?.totalEffectiveDays ?? 0) /
-    (allSuggestions[0]?.days?.length ?? 1);
+  const mainEfficiency = (allSuggestions[0]?.metrics?.totalEffectiveDays ?? 0) / (allSuggestions[0]?.days?.length ?? 1);
   const efficiencyDiff = efficiency - mainEfficiency;
   const isMainSuggestion = currentIndex === 0;
 
   return (
     <div className='sticky top-0 z-[10] flex w-fit flex-wrap items-center gap-y-2 rounded-2xl border border-border bg-background p-2 shadow-sm'>
       <div className='flex shrink-0 items-center rounded-lg bg-muted/50 px-2 h-full'>
-        <Button disabled={currentIndex === 0} variant='ghost' onClick={handlePrevious} aria-label='Previous suggestion'>
-          <ChevronLeft size={20} animateOnHover/>
-        </Button>
-
+        <AnimateIcon animateOnHover={currentIndex !== 0}>
+          <Button
+            disabled={currentIndex === 0}
+            variant='ghost'
+            onClick={handlePrevious}
+            aria-label='Previous suggestion'
+          >
+            <ChevronLeft size={20} />
+          </Button>
+        </AnimateIcon>
         <div className='mx-2 flex flex-col items-center relative w-25 transition-[height,padding] duration-300 ease-out'>
           <div className='flex items-center space-x-1 text-sm tabular-nums'>
             <span className='text-xs text-muted-foreground'>Option</span>
@@ -122,15 +127,16 @@ export const AlternativesManager = ({
             </motion.span>
           )}
         </div>
-
-        <Button
-          disabled={currentIndex === totalOptions - 1}
-          variant='ghost'
-          onClick={handleNext}
-          aria-label='Next suggestion'
-        >
-          <ChevronRight size={20} animateOnHover />
-        </Button>
+        <AnimateIcon animateOnHover={currentIndex !== totalOptions - 1}>
+          <Button
+            disabled={currentIndex === totalOptions - 1}
+            variant='ghost'
+            onClick={handleNext}
+            aria-label='Next suggestion'
+          >
+            <ChevronRight size={20} />
+          </Button>
+        </AnimateIcon>
       </div>
 
       <div className='mx-3 h-6 w-px bg-border rounded-full' />

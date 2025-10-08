@@ -6,6 +6,7 @@ import * as React from 'react';
 
 import { cn } from '@const/lib/utils';
 import { ChevronDown } from '../icons/chevron-down';
+import { AnimateIcon } from '../icons/icon';
 
 type AccordionItemContextType = {
   isOpen: boolean;
@@ -83,27 +84,29 @@ function AccordionTrigger({
 
   return (
     <AccordionPrimitive.Header data-slot='accordion-header' className='flex'>
-      <AccordionPrimitive.Trigger
-        ref={triggerRef}
-        data-slot='accordion-trigger'
-        className={cn(
-          'flex flex-1 text-start items-center justify-between py-4 font-medium hover:underline cursor-pointer',
-          className
-        )}
-        {...props}
-      >
-        {children}
+      <AnimateIcon animateOnHover>
+        <AccordionPrimitive.Trigger
+          ref={triggerRef}
+          data-slot='accordion-trigger'
+          className={cn(
+            'flex flex-1 text-start items-center justify-between py-4 font-medium hover:underline cursor-pointer',
+            className
+          )}
+          {...props}
+        >
+          {children}
 
-        {chevron && (
-          <motion.div
-            data-slot='accordion-trigger-chevron'
-            animate={{ rotate: isOpen ? 180 : 0 }}
-            transition={transition}
-          >
-            <ChevronDown animateOnHover className='size-5 shrink-0' />
-          </motion.div>
-        )}
-      </AccordionPrimitive.Trigger>
+          {chevron && (
+            <motion.div
+              data-slot='accordion-trigger-chevron'
+              animate={{ rotate: isOpen ? 180 : 0 }}
+              transition={transition}
+            >
+              <ChevronDown className='size-5 shrink-0' />
+            </motion.div>
+          )}
+        </AccordionPrimitive.Trigger>
+      </AnimateIcon>
     </AccordionPrimitive.Header>
   );
 }

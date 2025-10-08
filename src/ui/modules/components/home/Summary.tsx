@@ -19,6 +19,7 @@ import { MetricCard, MetricCardSize } from '../summary/MetricCard';
 import { NotificationCard } from '../summary/NotificationCard';
 import { Star } from 'src/components/animate-ui/icons/star';
 import { Clock } from 'src/components/animate-ui/icons/clock';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 const HolidaysDistributionChart = dynamic(() =>
   import('../summary/HolidaysDistributionChart').then((module) => ({ default: module.HolidaysDistributionChart }))
@@ -222,6 +223,7 @@ export const Summary = () => {
             />
           </div>
           {metrics.firstLastBreak && (
+            <AnimateIcon animateOnHover>
             <PremiumFeature
               feature={'Year Summary'}
               description={'Análisis detallado de tus días libres.'}
@@ -230,7 +232,7 @@ export const Summary = () => {
             >
               <div className='p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg'>
                 <div className='flex items-center gap-2 mb-3'>
-                  <Clock className='w-4 h-4 text-indigo-500' animateOnHover />
+                  <Clock className='w-4 h-4 text-indigo-500' />
                   <span className='text-sm font-medium text-indigo-700 dark:text-indigo-300'>Resumen del Año</span>
                 </div>
                 <div className='grid grid-cols-3 gap-4 text-center'>
@@ -262,6 +264,7 @@ export const Summary = () => {
                 </div>
               </div>
             </PremiumFeature>
+            </AnimateIcon>
           )}
           {canImprove > 0 && (
             <NotificationCard icon={Zap} title='Sugerencia' colorScheme='orange'>

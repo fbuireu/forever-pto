@@ -4,11 +4,12 @@ import { useFiltersStore } from '@application/stores/filters';
 import { Command, CommandGroup, CommandItem, CommandList } from '@const/components/ui/command';
 import { cn } from '@const/lib/utils';
 import { Field, Label } from '@headlessui/react';
-import { Calendar} from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { ChevronDown } from 'src/components/animate-ui/icons/chevron-down';
 import { Check } from 'src/components/animate-ui/icons/check';
+import { ChevronDown } from 'src/components/animate-ui/icons/chevron-down';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -32,19 +33,21 @@ export const Years = () => {
       </Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant='outline' role='combobox' aria-expanded={open} className={cn('w-full justify-between')}>
-            {year}
-            <ChevronDown
-              animateOnHover
-              className={cn('opacity-50 transition-transform duration-200', open && 'rotate-180')}
-            />
-          </Button>
+          <AnimateIcon animateOnHover>
+            <Button variant='outline' role='combobox' aria-expanded={open} className={cn('w-full justify-between')}>
+              {year}
+              <ChevronDown
+                className={cn('opacity-50 transition-transform duration-200', open && 'rotate-180')}
+              />
+            </Button>
+          </AnimateIcon>
         </PopoverTrigger>
         <PopoverContent className='w-[200px] p-0'>
           <Command id='years'>
             <CommandList>
               <CommandGroup>
                 {years.map((yearOption) => (
+                    <AnimateIcon animateOnHover key={yearOption}>
                   <CommandItem
                     key={yearOption}
                     value={String(yearOption)}
@@ -59,6 +62,7 @@ export const Years = () => {
                       className={cn('ml-auto', Number(year) === yearOption ? 'opacity-100' : 'opacity-0')}
                     />
                   </CommandItem>
+                  </AnimateIcon>
                 ))}
               </CommandGroup>
             </CommandList>

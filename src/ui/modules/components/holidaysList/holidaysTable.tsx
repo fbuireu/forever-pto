@@ -2,6 +2,8 @@
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { HolidayVariant } from '@application/dto/holiday/types';
+import { useHolidaysStore } from '@application/stores/holidays';
+import { usePremiumStore } from '@application/stores/premium';
 import { Badge } from '@const/components/ui/badge';
 import { Input } from '@const/components/ui/input';
 import { Table, TableBody, TableCell, TableRow } from '@const/components/ui/table';
@@ -15,16 +17,15 @@ import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Checkbox } from 'src/components/animate-ui/base/checkbox';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
-import { HolidayRow } from './components/HolidayRow';
-import { HolidayTableHeader } from './components/HolidayTableHeader';
-import { usePremiumStore } from '@application/stores/premium';
-import { useHolidaysStore } from '@application/stores/holidays';
 import { ChevronDown } from 'src/components/animate-ui/icons/chevron-down';
 import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { Plus } from 'src/components/animate-ui/icons/plus';
 import { Search } from 'src/components/animate-ui/icons/search';
 import { Trash2 } from 'src/components/animate-ui/icons/trash-2';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
+import { HolidayRow } from './components/HolidayRow';
+import { HolidayTableHeader } from './components/HolidayTableHeader';
 
 interface HolidaysTableProps {
   title: string;
@@ -220,40 +221,44 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 
   return (
     <Collapsible open={innerOpen} onOpenChange={setInnerOpen} className={'space-y-4 w-full'}>
-      <CollapsibleTrigger asChild className='cursor-pointer'>
-        <div className='flex items-center justify-between cursor-pointer group hover:bg-muted/50 p-3 rounded-lg border transition-colors'>
-          <div className='flex items-center space-x-3'>
-            <div className='flex items-center space-x-2'>
-              {innerOpen ? (
-                <ChevronDown className='h-4 w-4 text-muted-foreground transition-transform' animateOnHover />
-              ) : (
-                <ChevronRight className='h-4 w-4 text-muted-foreground transition-transform' animateOnHover />
-              )}
-              <h3 className='text-lg font-semibold'>{title}</h3>
+      <AnimateIcon animateOnHover>
+        <CollapsibleTrigger asChild className='cursor-pointer'>
+          <div className='flex items-center justify-between cursor-pointer group hover:bg-muted/50 p-3 rounded-lg border transition-colors'>
+            <div className='flex items-center space-x-3'>
+              <div className='flex items-center space-x-2'>
+                {innerOpen ? (
+                  <ChevronDown className='h-4 w-4 text-muted-foreground transition-transform' />
+                ) : (
+                  <ChevronRight className='h-4 w-4 text-muted-foreground transition-transform' />
+                )}
+                <h3 className='text-lg font-semibold'>{title}</h3>
+              </div>
+              <div className='flex items-center space-x-2'>
+                <Badge variant='outline'>{variantHolidays.length} total</Badge>
+              </div>
             </div>
-            <div className='flex items-center space-x-2'>
-              <Badge variant='outline'>{variantHolidays.length} total</Badge>
+            <div className='flex items-center space-x-2 text-sm text-muted-foreground'>
+              <span>{variantHolidays.filter((h) => !isWeekend(h.date)).length} laborables</span>
+              <span>•</span>
+              <span>{variantHolidays.filter((h) => isWeekend(h.date)).length} fines de semana</span>
             </div>
           </div>
-          <div className='flex items-center space-x-2 text-sm text-muted-foreground'>
-            <span>{variantHolidays.filter((h) => !isWeekend(h.date)).length} laborables</span>
-            <span>•</span>
-            <span>{variantHolidays.filter((h) => isWeekend(h.date)).length} fines de semana</span>
-          </div>
-        </div>
-      </CollapsibleTrigger>
+        </CollapsibleTrigger>
+      </AnimateIcon>
       {innerOpen && (
         <div className='flex items-center justify-between'>
           <div className='flex items-center space-x-2'>
             {variant === HolidayVariant.CUSTOM && (
-              <Button
-                size='sm'
-                onClick={() => setShowAddModal(true)}
-                className='bg-green-600 hover:bg-green-700 text-white'
-              >
-                <Plus className='h-4 w-4 mr-1' animateOnHover />
-                Añadir Festivo
-              </Button>
+              <AnimateIcon animateOnHover>
+                <Button
+                  size='sm'
+                  onClick={() => setShowAddModal(true)}
+                  className='bg-green-600 hover:bg-green-700 text-white'
+                >
+                  <Plus className='h-4 w-4 mr-1' />
+                  Añadir Festivo
+                </Button>
+              </AnimateIcon>
             )}
             {selectedCount === 1 && (
               <Button variant='outline' size='sm' onClick={() => setShowEditModal(true)} className='py-4'>
@@ -263,10 +268,12 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
             )}
             {selectedCount > 0 && (
               <div className='flex items-center space-x-2'>
-                <Button variant='destructive' size='sm' onClick={() => setShowDeleteModal(true)}>
-                  <Trash2 className='h-4 w-4 mr-1' animateOnHover />
-                  Eliminar {selectedCount} festivos
-                </Button>
+                <AnimateIcon animateOnHover>
+                  <Button variant='destructive' size='sm' onClick={() => setShowDeleteModal(true)}>
+                    <Trash2 className='h-4 w-4 mr-1' />
+                    Eliminar {selectedCount} festivos
+                  </Button>
+                </AnimateIcon>
               </div>
             )}
           </div>
@@ -321,12 +328,16 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                     })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={shouldShowLocationColumn ? 7 : 6} className='h-24 text-center'>
-                        <div className='flex flex-col items-center space-y-2 text-muted-foreground'>
-                          <Search className='h-8 w-8' animateOnHover />
-                          <span>{debouncedSearchTerm ? 'No se encontraron festividades' : 'No hay festividades'}</span>
-                        </div>
-                      </TableCell>
+                      <AnimateIcon animateOnHover>
+                        <TableCell colSpan={shouldShowLocationColumn ? 7 : 6} className='h-24 text-center'>
+                          <div className='flex flex-col items-center space-y-2 text-muted-foreground'>
+                            <Search className='h-8 w-8' />
+                            <span>
+                              {debouncedSearchTerm ? 'No se encontraron festividades' : 'No hay festividades'}
+                            </span>
+                          </div>
+                        </TableCell>
+                      </AnimateIcon>
                     </TableRow>
                   )}
                 </TableBody>

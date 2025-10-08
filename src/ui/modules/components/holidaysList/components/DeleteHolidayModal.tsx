@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { formatDate } from '../../utils/formatters';
 import { Trash2 } from 'src/components/animate-ui/icons/trash-2';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 interface DeleteHolidayModalProps {
   open: boolean;
@@ -85,10 +86,12 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
         </DialogHeader>
         <DialogFooter>
           <div className='flex gap-2 pt-4'>
-            <Button variant='destructive' onClick={handleDelete} className='flex-1' disabled={isPending}>
-              <Trash2 className='w-4 h-4 mr-2' animateOnHover />
-              {isPending ? 'Deleting...' : `Delete ${holidays.length} ${holidayText}`}
-            </Button>
+            <AnimateIcon animateOnHover>
+              <Button variant='destructive' onClick={handleDelete} className='flex-1' disabled={isPending}>
+                <Trash2 className='w-4 h-4 mr-2' />
+                {isPending ? 'Deleting...' : `Delete ${holidays.length} ${holidayText}`}
+              </Button>
+            </AnimateIcon>
             <Button variant='outline' onClick={onClose} className='flex-1' disabled={isPending}>
               Cancel
             </Button>

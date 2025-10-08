@@ -59,7 +59,7 @@ const FAQ: FaqData = [
         id: 'pricing',
         question: 'Why is there a paid model?',
         answer:
-          'Maintaining data, infrastructure and continuous improvements requires resources. The paid model funds updates, support and hosting.',
+          "Maintaining data, infrastructure and continuous improvements requires resources. The paid model funds updates, support and hosting. We also offer a free tier with core features to ensure everyone can benefit from better PTO planning.If you want to go ad free and support the project there's a volunteer donation",
       },
       {
         id: 'scope',
