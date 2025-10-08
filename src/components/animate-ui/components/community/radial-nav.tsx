@@ -134,8 +134,6 @@ function MenuButton({
     bias: -1,
   });
 
-  const supportsAnimation = 'animateOnHover' in Icon || (Icon as any).$$typeof !== Symbol.for('react.forward_ref'); 
-
   return (
     <motion.button
       {...BUTTON_MOTION_CONFIG}
@@ -165,7 +163,7 @@ function MenuButton({
           width: iconSize,
           transform: `translateX(${translateX}px)`,
         }}
-        {...(supportsAnimation ? { animateOnHover: true } : {})}
+        {...('animateOnHover' in Icon ? { animateOnHover: true } : {})}
       />
       <motion.span variants={LABEL_VARIANTS} transition={LABEL_TRANSITION} className='invisible text-sm w-0'>
         {label}
