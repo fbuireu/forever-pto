@@ -1,35 +1,48 @@
 'use server';
 
-import { ContactFormData } from '@ui/modules/components/contact/schema';
+import { ContactFormEmail } from '@infrastructure/services/email/templates/Contact';
+import { render } from '@react-email/render';
+import { ContactFormData, contactSchema } from '@ui/modules/components/contact/schema';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendContactEmail(data: ContactFormData) {
   try {
-    // const validatedData = contactSchema.parse(data);
+    const { email, name, subject, message } = contactSchema.parse(data);
 
-    // const email = createEmail({ ...validatedData });
+    const emailHtml = await render(
+      ContactFormEmail({
+        email,
+        name,
+        subject,
+        message,
+      })
+    );
 
-    // const { data, error } = await resend.emails.send({
-    //   from: `${params.name} <${atob(CONTACT_DETAILS.ENCODED_EMAIL_FROM)}>`,
-    //   to: atob(CONTACT_DETAILS.ENCODED_EMAIL_BIANCA),
-    //   subject: `${CONTACT_DETAILS.EMAIL_SUBJECT} from ${params.name} (${params.email})`,
-    //   tags: [
-    //     {
-    //       name: 'category',
-    //       value: 'web_contact_form',
-    //     },
-    //   ],
-    //   html: email,
-    // });
+    // todo: save contact email
 
-    // if (error) {
-    //   console.error('Resend error:', error);
-    //   return { success: false, error: 'Failed to send email. Please try again.' };
-    // }
+    const { data: result, error } = await resend.emails.send({
+      from: 'Forever PTO <contact@forever-pto.com>',
+      to: 'your@email.com',
+      subject: `[Forever PTO Contact] ${subject}`,
+      html: emailHtml,
+      replyTo: email,
+      tags: [
+        {
+          name: 'category',
+          value: 'web_contact_form',
+        },
+      ],
+    });
 
-    return { success: true };
+    if (error) {
+      console.error('Resend error:', error);
+      return { success: false, error: 'Failed to send email. Please try again.' };
+    }
+
+    console.log('Email sent successfully:', result);
+    return { success: !!data };
   } catch (error) {
     console.error('Contact form error:', error);
     return { success: false, error: 'An unexpected error occurred. Please try again.' };

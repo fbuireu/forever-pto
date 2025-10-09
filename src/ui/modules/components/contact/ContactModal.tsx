@@ -11,10 +11,10 @@ import { sendContactEmail } from '@infrastructure/actions/contact';
 import { AlertCircle, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
 import { useShallow } from 'zustand/react/shallow';
 import { FormButtons } from './FormButtons';
 import { ContactFormData, contactSchema } from './schema';
-import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
 
 interface ContactModalProps {
   open: boolean;
@@ -59,9 +59,9 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
   const onSubmit = async (data: ContactFormData) => {
     const result = await sendContactEmail(data);
     setEmail(data.email);
-
     if (result.success) {
       setStep(Step.SUCCESS);
+      sendContactEmail(data);
     } else {
       setErrorMessage(result.error || 'Failed to send message');
       setStep(Step.ERROR);
