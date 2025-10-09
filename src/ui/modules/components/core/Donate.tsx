@@ -135,6 +135,7 @@ export const Donate = () => {
 
     toast.success('Payment successful!', {
       description: 'Thank you for your support! You now have premium access.',
+      duration: 8000,
     });
 
     form.reset();

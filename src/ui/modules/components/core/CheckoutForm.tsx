@@ -61,7 +61,9 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
       setErrorMessage(error);
     } else {
       setShowConfetti(true);
-      onSuccess();
+      setTimeout(() => {
+        onSuccess();
+      }, 1000);
     }
   }, [stripe, elements, email, onSuccess]);
 
