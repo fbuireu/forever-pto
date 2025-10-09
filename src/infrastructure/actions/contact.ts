@@ -20,8 +20,6 @@ export async function sendContactEmail(data: ContactFormData) {
       })
     );
 
-    // todo: save contact email
-
     const { data: result, error } = await resend.emails.send({
       from: 'Forever PTO <contact@forever-pto.com>',
       to: 'your@email.com',
@@ -36,13 +34,13 @@ export async function sendContactEmail(data: ContactFormData) {
       ],
     });
 
+    // todo: save contact email
+
     if (error) {
-      console.error('Resend error:', error);
       return { success: false, error: 'Failed to send email. Please try again.' };
     }
 
-    console.log('Email sent successfully:', result);
-    return { success: !!data };
+    return { success: !!result.id };
   } catch (error) {
     console.error('Contact form error:', error);
     return { success: false, error: 'An unexpected error occurred. Please try again.' };

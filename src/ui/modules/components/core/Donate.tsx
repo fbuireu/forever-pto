@@ -2,28 +2,24 @@
 
 import { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
-import { Input } from '@const/components/ui/input';
-import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@const/components/ui/input-group';
-import { Label } from '@const/components/ui/label';
-import { cn } from '@const/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getStripeClient } from '@infrastructure/payments/stripe/client';
 import { initializePayment } from '@infrastructure/services/payments/checkout';
 import { calculateFinalAmount, formatDiscountMessage } from '@infrastructure/services/payments/utils/helpers';
-import { amountFormatter } from '@shared/utils/helpers';
+import { Elements } from '@stripe/react-stripe-js';
+import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { useLocale } from 'next-intl';
+import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
+import { Star } from 'src/components/animate-ui/icons/star';
 import * as z from 'zod';
 import { useShallow } from 'zustand/react/shallow';
-import PaymentForm from './PaymentForm';
-import { ChevronDown } from 'src/components/animate-ui/icons/chevron-down';
-import { Star } from 'src/components/animate-ui/icons/star';
+import { CheckoutForm } from './CheckoutForm';
+import { DonationForm } from './DonationForm';
 
 const donationSchema = z.object({
   amount: z
@@ -35,9 +31,7 @@ const donationSchema = z.object({
   promoCode: z.string().optional(),
 });
 
-type DonationFormData = z.infer<typeof donationSchema>;
-
-const PRESET_AMOUNTS = [5, 10, 15] as const;
+export type DonationFormData = z.infer<typeof donationSchema>;
 
 interface PaymentState {
   clientSecret: string;
@@ -45,12 +39,12 @@ interface PaymentState {
   discountInfo: DiscountInfo | null;
 }
 
-const stripeClient = getStripeClient();
+const stripePromise = getStripeClient().getStripePromise();
 
 export const Donate = () => {
   const locale = useLocale();
+  const { resolvedTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
-  const [showPromoCode, setShowPromoCode] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
 
@@ -80,17 +74,7 @@ export const Donate = () => {
     },
   });
 
-  const { watch, setValue } = form;
-  const currentAmount = watch('amount');
-
-  const amount = useMemo(() => amountFormatter(locale), [locale]);
-
-  const handlePresetClick = useCallback(
-    (value: number) => {
-      setValue('amount', value, { shouldValidate: true });
-    },
-    [setValue]
-  );
+  const currentAmount = form.watch('amount');
 
   const onSubmit = useCallback(
     async (data: DonationFormData) => {
@@ -140,7 +124,6 @@ export const Donate = () => {
 
     form.reset();
     setPaymentState(null);
-    setShowPromoCode(false);
     setIsOpen(false);
   }, [paymentState, setPremiumStatus, form]);
 
@@ -152,6 +135,106 @@ export const Donate = () => {
     baseAmount: currentAmount,
     discountInfo: paymentState?.discountInfo ?? null,
   });
+
+  const elementsOptions = useMemo<StripeElementsOptions | null>(() => {
+    if (!paymentState?.clientSecret) return null;
+
+    const isDark = resolvedTheme === 'dark';
+
+    return {
+      clientSecret: paymentState.clientSecret,
+      loader: 'always',
+      appearance: {
+        theme: isDark ? 'night' : 'flat',
+        variables: {
+          colorPrimary: isDark ? 'hsl(210 40% 98%)' : 'hsl(222.2 47.4% 11.2%)',
+          colorBackground: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
+          colorText: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
+          colorDanger: isDark ? 'hsl(0 62.8% 60.6%)' : 'hsl(0 84.2% 60.2%)',
+          fontFamily: 'system-ui, sans-serif',
+          spacingUnit: '4px',
+          borderRadius: '8px',
+          fontSizeBase: '14px',
+        },
+        rules: {
+          '.Input': {
+            backgroundColor: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
+            border: isDark ? '1px solid hsl(240 3.7% 15.9%)' : '1px solid hsl(240 5.9% 90%)',
+            padding: '8px 12px',
+            fontSize: '14px',
+            color: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
+            transition: 'border-color 0.2s, box-shadow 0.2s',
+          },
+          '.Input:hover': {
+            borderColor: isDark ? 'hsl(240 3.7% 20%)' : 'hsl(240 5.9% 85%)',
+          },
+          '.Input:focus': {
+            border: isDark ? '1px solid hsl(240 3.7% 15.9%)' : '1px solid hsl(240 5.9% 90%)',
+            boxShadow: isDark ? '0 0 0 3px hsl(240 3.7% 15.9%)' : '0 0 0 1px hsl(240 5.9% 10%)',
+            outline: 'none',
+          },
+          '.Input--invalid': {
+            border: isDark ? '1px solid hsl(0 62.8% 60.6%)' : '1px solid hsl(0 84.2% 60.2%)',
+          },
+          '.Input--invalid:focus': {
+            border: isDark ? '1px solid hsl(0 62.8% 60.6%)' : '1px solid hsl(0 84.2% 60.2%)',
+          },
+          '.Input::placeholder': {
+            color: isDark ? 'hsl(240 5% 64.9%)' : 'hsl(240 3.8% 46.1%)',
+          },
+          '.Input:disabled': {
+            backgroundColor: isDark ? 'hsl(240 3.7% 15.9%)' : 'hsl(240 4.8% 95.9%)',
+            color: isDark ? 'hsl(240 5% 64.9%)' : 'hsl(240 3.8% 46.1%)',
+            cursor: 'not-allowed',
+            opacity: '0.5',
+          },
+          '.Label': {
+            fontSize: '14px',
+            fontWeight: '500',
+            color: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
+            marginBottom: '8px',
+          },
+          '.Error': {
+            fontSize: '12px',
+            color: isDark ? 'hsl(0 62.8% 60.6%)' : 'hsl(0 84.2% 60.2%)',
+            border: 'none',
+            marginTop: '6px',
+            fontWeight: '500',
+          },
+          '.Tab': {
+            backgroundColor: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
+            border: isDark ? '1px solid hsl(240 3.7% 15.9%)' : '1px solid hsl(240 5.9% 90%)',
+            boxShadow: 'none',
+            color: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
+            borderRadius: '6px',
+            padding: '10px 16px',
+            transition: 'all 0.2s',
+          },
+          '.Tab:hover': {
+            backgroundColor: isDark ? 'hsl(240 3.7% 15.9%)' : 'hsl(240 4.8% 95.9%)',
+            borderColor: isDark ? 'hsl(240 3.7% 20%)' : 'hsl(240 5.9% 85%)',
+          },
+          '.Tab--selected': {
+            backgroundColor: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
+            color: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 98%)',
+            border: isDark ? '1px solid hsl(0 0% 98%)' : '1px solid hsl(240 10% 3.9%)',
+          },
+          '.Tab--selected:hover': {
+            backgroundColor: isDark ? 'hsl(240 5% 84%)' : 'hsl(240 5.9% 10%)',
+            borderColor: isDark ? 'hsl(240 5% 84%)' : 'hsl(240 5.9% 10%)',
+          },
+          '.TabIcon': {
+            fill: 'currentColor',
+          },
+          '.Block': {
+            backgroundColor: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
+            border: isDark ? '1px solid hsl(240 3.7% 15.9%)' : '1px solid hsl(240 5.9% 90%)',
+            borderRadius: '8px',
+          },
+        },
+      },
+    };
+  }, [paymentState?.clientSecret, resolvedTheme]);
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen} modal>
@@ -176,131 +259,39 @@ export const Donate = () => {
               </div>
             )}
           </div>
-          {!paymentState ? (
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} noValidate className='grid gap-3'>
-                <FormField
-                  control={form.control}
-                  name='email'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='email'
-                          placeholder='your@email.com'
-                          disabled={isPending}
-                          {...field}
-                          className='h-10'
-                          autoComplete='email'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+
+          {/* Si tenemos clientSecret, montamos Elements */}
+          {elementsOptions ? (
+            <Elements stripe={stripePromise} options={elementsOptions}>
+              {!paymentState ? (
+                <DonationForm
+                  form={form}
+                  onSubmit={onSubmit}
+                  isPending={isPending}
+                  currentAmount={currentAmount}
+                  locale={locale}
+                  currency={currency}
+                  currencySymbol={currencySymbol}
                 />
-                <div className='space-y-2'>
-                  <Label>Quick amounts</Label>
-                  <div className='flex gap-2'>
-                    {PRESET_AMOUNTS.map((preset) => (
-                      <Button
-                        key={preset}
-                        type='button'
-                        variant={currentAmount === preset ? 'default' : 'outline'}
-                        size='sm'
-                        onClick={() => handlePresetClick(preset)}
-                        disabled={isPending}
-                        className='flex-1'
-                      >
-                        {amount.format(preset)}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                <FormField
-                  control={form.control}
-                  name='amount'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Donation Amount</FormLabel>
-                      <FormControl>
-                        <InputGroup>
-                          <InputGroupAddon>
-                            <InputGroupText>{currencySymbol}</InputGroupText>
-                          </InputGroupAddon>
-                          <InputGroupInput
-                            type='number'
-                            placeholder='Enter amount'
-                            step='1'
-                            min='1'
-                            max='10000'
-                            disabled={isPending}
-                            {...field}
-                            value={field.value ?? ''}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              field.onChange(value === '' ? undefined : parseFloat(value));
-                            }}
-                          />
-                        </InputGroup>
-                      </FormControl>
-                      <p className='text-xs text-muted-foreground mt-1'>
-                        Base price in {currency}. Final amount will be converted to your local currency at current
-                        exchange rates.
-                      </p>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+              ) : (
+                <CheckoutForm
+                  amount={finalAmount}
+                  email={paymentState.data.email}
+                  discountInfo={paymentState.discountInfo}
+                  onSuccess={handlePaymentSuccess}
+                  onCancel={handlePaymentCancel}
                 />
-                <Collapsible open={showPromoCode} onOpenChange={setShowPromoCode}>
-                  <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-sm font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors'>
-                    <span className='text-muted-foreground'>Have a promo code?</span>
-                    <ChevronDown
-                      animateOnHover
-                      className={cn(
-                        'h-4 w-4 text-muted-foreground transition-transform duration-200',
-                        showPromoCode && 'rotate-180'
-                      )}
-                      aria-hidden='true'
-                    />
-                  </CollapsibleTrigger>
-                  {showPromoCode && (
-                    <CollapsibleContent className='pt-2 min-h-[60px]'>
-                      <FormField
-                        control={form.control}
-                        name='promoCode'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input
-                                type='text'
-                                placeholder='YOU_WISH_IT_WAS_THAT_EASY'
-                                disabled={isPending}
-                                {...field}
-                                className='h-10 uppercase'
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </CollapsibleContent>
-                  )}
-                </Collapsible>
-                <Button type='submit' disabled={isPending} className='w-full bg-green-600 hover:bg-green-700'>
-                  {isPending ? 'Processing...' : 'Continue to Payment'}
-                </Button>
-              </form>
-            </Form>
+              )}
+            </Elements>
           ) : (
-            <PaymentForm
-              stripe={stripeClient.getStripePromise()}
-              clientSecret={paymentState.clientSecret}
-              amount={finalAmount}
-              email={paymentState.data.email}
-              discountInfo={paymentState.discountInfo}
-              onSuccess={handlePaymentSuccess}
-              onCancel={handlePaymentCancel}
+            <DonationForm
+              form={form}
+              onSubmit={onSubmit}
+              isPending={isPending}
+              currentAmount={currentAmount}
+              locale={locale}
+              currency={currency}
+              currencySymbol={currencySymbol}
             />
           )}
         </div>
