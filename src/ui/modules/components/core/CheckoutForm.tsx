@@ -5,11 +5,12 @@ import { confirmPayment } from '@infrastructure/services/payments/checkout';
 import { formatDiscountText } from '@infrastructure/services/payments/utils/helpers';
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useLocale } from 'next-intl';
+import dynamic from 'next/dynamic';
 import { FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
-import { useShallow } from 'zustand/react/shallow';
-import { ExpressCheckoutSkeleton } from '../skeletons/ExpressCheckoutSkeleton';
 import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
+import { useShallow } from 'zustand/react/shallow';
+import { ExpressCheckoutSkeleton } from '../skeletons/ExpressCheckoutSkeleton';
 
 interface CheckoutFormProps {
   amount: number;
@@ -19,6 +20,8 @@ interface CheckoutFormProps {
   onCancel: () => void;
 }
 
+const ConfettiCannon = dynamic(() => import('./ConfettiCannon').then((module) => ({ default: module.ConfettiCannon })));
+
 export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel }: Readonly<CheckoutFormProps>) {
   const stripe = useStripe();
   const elements = useElements();
@@ -26,6 +29,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   const [isExpressReady, setIsExpressReady] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const { getCurrencyFromLocale, currencySymbol } = usePremiumStore(
     useShallow((state) => ({
@@ -56,6 +60,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
     if (error) {
       setErrorMessage(error);
     } else {
+      setShowConfetti(true);
       onSuccess();
     }
   }, [stripe, elements, email, onSuccess]);
@@ -78,20 +83,21 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 
   return (
     <div className='space-y-4'>
+      {showConfetti && <ConfettiCannon onComplete={() => setShowConfetti(false)} />}
       <div className='flex items-center justify-between'>
         <AnimateIcon animateOnHover>
-        <Button
-          type='button'
-          variant='ghost'
-          size='sm'
-          onClick={onCancel}
-          disabled={isPending}
-          className='gap-2'
-          aria-label='Go back to donation form'
-        >
-          <ChevronLeft className='w-4 h-4' aria-hidden='true' />
-          Back
-        </Button>
+          <Button
+            type='button'
+            variant='ghost'
+            size='sm'
+            onClick={onCancel}
+            disabled={isPending}
+            className='gap-2'
+            aria-label='Go back to donation form'
+          >
+            <ChevronLeft className='w-4 h-4' aria-hidden='true' />
+            Back
+          </Button>
         </AnimateIcon>
         <div className='text-right'>
           <p className='text-sm text-muted-foreground'>Total amount</p>

@@ -1,8 +1,8 @@
 'use client';
 
-import * as React from 'react';
-import { Popover as PopoverPrimitive } from 'radix-ui';
 import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from 'motion/react';
+import { Popover as PopoverPrimitive } from 'radix-ui';
+import * as React from 'react';
 
 import { cn } from '@const/lib/utils';
 
@@ -70,6 +70,8 @@ function PopoverTrigger(props: PopoverTriggerProps) {
 type PopoverContentProps = React.ComponentProps<typeof PopoverPrimitive.Content> &
   HTMLMotionProps<'div'> & {
     transition?: Transition;
+  } & {
+    onOpenAutoFocus?: (event: Event) => void;
   };
 
 function PopoverContent({
@@ -79,6 +81,7 @@ function PopoverContent({
   sideOffset = 4,
   transition = { type: 'spring', stiffness: 300, damping: 25 },
   children,
+  onOpenAutoFocus,
   ...props
 }: PopoverContentProps) {
   const { isOpen } = usePopover();
@@ -88,7 +91,7 @@ function PopoverContent({
     <AnimatePresence>
       {isOpen && (
         <PopoverPrimitive.Portal forceMount data-slot='popover-portal'>
-          <PopoverPrimitive.Content forceMount align={align} sideOffset={sideOffset} className='z-50' {...props}>
+          <PopoverPrimitive.Content forceMount align={align} sideOffset={sideOffset} className='z-50' {...props} {...(onOpenAutoFocus && { onOpenAutoFocus })}>
             <motion.div
               key='popover-content'
               data-slot='popover-content'
@@ -119,13 +122,13 @@ function PopoverAnchor({ ...props }: PopoverAnchorProps) {
 
 export {
   Popover,
-  PopoverTrigger,
-  PopoverContent,
   PopoverAnchor,
+  PopoverContent,
+  PopoverTrigger,
   usePopover,
+  type PopoverAnchorProps,
+  type PopoverContentProps,
   type PopoverContextType,
   type PopoverProps,
   type PopoverTriggerProps,
-  type PopoverContentProps,
-  type PopoverAnchorProps,
 };

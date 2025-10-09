@@ -12,7 +12,6 @@ import dynamic from 'next/dynamic';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
-import { GradientText } from 'src/components/animate-ui/primitives/texts/gradient';
 import { SidebarProvider } from 'src/components/animate-ui/radix/sidebar';
 import '../globals.css';
 import { SiteTitle } from '@ui/modules/components/core/SiteTitle';
