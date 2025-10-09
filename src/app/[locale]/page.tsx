@@ -22,7 +22,7 @@ const Home = async () => (
 export default Home;
 export { generateMetadata };
 
-// todo: contact form resend (db)
+// turso: webhook update payment status
 // todo: ads?
 // todo: check validation premium
 // todo: unify component and folder structure

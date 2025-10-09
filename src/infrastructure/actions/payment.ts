@@ -2,11 +2,14 @@
 
 import { paymentDTO } from '@application/dto/payment/dto';
 import type { PaymentDTO } from '@application/dto/payment/types';
+import { getTursoClient } from '@infrastructure/db/turso/client';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-08-27.basil',
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2025-09-30.clover',
 });
+
+const turso = getTursoClient();
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_AMOUNT = 1;
@@ -44,8 +47,18 @@ const validatePromoCode = async (
       return { success: false, error: 'Invalid or expired promo code' };
     }
 
-    const promotion = promotionCodes.data[0];
-    const coupon = promotion.coupon;
+    const promotionCode = promotionCodes.data[0];
+    const couponData = await stripe.promotionCodes.retrieve(promotionCode.id, {
+      expand: ['coupon'],
+    });
+
+    const couponExpandable = (couponData as unknown as { coupon: Stripe.Coupon }).coupon;
+
+    if (!couponExpandable) {
+      return { success: false, error: 'Failed to load coupon details' };
+    }
+
+    const coupon = couponExpandable;
 
     if (!coupon.valid) {
       return { success: false, error: 'This promo code is no longer valid' };
@@ -162,6 +175,57 @@ export async function createPaymentIntent(params: CreatePaymentIntentParams): Pr
         enabled: true,
       },
     });
+
+    const customerId =
+      typeof paymentIntent.customer === 'string' ? paymentIntent.customer : paymentIntent.customer?.id || null;
+
+    const chargeId =
+      typeof paymentIntent.latest_charge === 'string'
+        ? paymentIntent.latest_charge
+        : paymentIntent.latest_charge?.id || null;
+
+    const dbResult = await turso.execute(
+      `INSERT INTO payments (
+        id,
+        stripe_created_at,
+        stripe_customer_id,
+        stripe_charge_id,
+        email,
+        amount,
+        currency,
+        status,
+        payment_method_type,
+        description,
+        receipt_url,
+        promo_code,
+        created_at,
+        updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+      [
+        paymentIntent.id,
+        new Date(paymentIntent.created * 1000).toISOString(),
+        customerId,
+        chargeId,
+        email,
+        Math.round(finalAmount * 100),
+        paymentIntent.currency,
+        paymentIntent.status,
+        paymentIntent.payment_method_types?.[0] || null,
+        paymentIntent.description || null,
+        null,
+        promoCode || null,
+      ]
+    );
+    console.log('dbResult', dbResult);
+    if (!dbResult.success) {
+      console.error('Failed to save payment to database:', dbResult.error);
+      return paymentDTO.create({
+        raw: {
+          type: 'error',
+          error: new Error('Payment intent created but failed to save. Please contact support.'),
+        },
+      });
+    }
 
     return paymentDTO.create({
       raw: {

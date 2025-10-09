@@ -1,14 +1,18 @@
+import { getTursoClient } from '@infrastructure/db/turso/client';
 import { headers } from 'next/headers';
 import { NextResponse, type NextRequest } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-08-27.basil',
+  apiVersion: '2025-09-30.clover',
 });
+
+const turso = getTursoClient();
 
 const STRIPE_EVENTS = {
   PAYMENT_INTENT_SUCCEEDED: 'payment_intent.succeeded',
   PAYMENT_INTENT_FAILED: 'payment_intent.payment_failed',
+  CHARGE_SUCCEEDED: 'charge.succeeded',
 } as const;
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -40,7 +44,11 @@ export async function POST(request: NextRequest) {
       case STRIPE_EVENTS.PAYMENT_INTENT_FAILED:
         await handleFailedPayment(event.data.object as Stripe.PaymentIntent);
         break;
+      case STRIPE_EVENTS.CHARGE_SUCCEEDED:
+        await handleChargeSucceeded(event.data.object as Stripe.Charge);
+        break;
       default:
+        console.log(`Unhandled event type: ${event.type}`);
     }
   } catch (error) {
     console.error('Error processing webhook:', error);
@@ -51,75 +59,116 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleSuccessfulPayment(paymentIntent: Stripe.PaymentIntent) {
-  const metadata = paymentIntent.metadata;
-
-  const paymentData = {
-    stripePaymentId: paymentIntent.id,
-    customerId:
-      typeof paymentIntent.customer === 'string' ? paymentIntent.customer : paymentIntent.customer?.id || null,
-    email: metadata.email,
-    name: metadata.name || null,
-    amount: paymentIntent.amount / 100,
-    currency: paymentIntent.currency.toUpperCase(),
-    status: paymentIntent.status,
-    type: metadata.type,
-    method: 'stripe' as const,
-    promoCode: metadata.promoCode || null,
-    timestamp: metadata.timestamp || new Date(paymentIntent.created * 1000).toISOString(),
-    createdAt: new Date(paymentIntent.created * 1000),
-    userAgent: metadata.userAgent || null,
-    ipAddress: metadata.ipAddress || null,
-    description: paymentIntent.description || null,
-    receiptUrl: null as string | null,
-    chargeId: null as string | null,
-  };
+  console.log('Processing successful payment:', paymentIntent.id);
 
   try {
+    const updateResult = await turso.execute(
+      `UPDATE payments 
+       SET status = ?,
+           succeeded_at = datetime('now'),
+           updated_at = datetime('now')
+       WHERE id = ?`,
+      [paymentIntent.status, paymentIntent.id]
+    );
+
+    if (!updateResult.success) {
+      console.error('Failed to update payment status:', updateResult.error);
+      throw new Error('Failed to update payment status');
+    }
+
     if (paymentIntent.latest_charge) {
       const chargeId =
         typeof paymentIntent.latest_charge === 'string' ? paymentIntent.latest_charge : paymentIntent.latest_charge.id;
 
-      const charge = await stripe.charges.retrieve(chargeId);
-      paymentData.receiptUrl = charge.receipt_url;
-      paymentData.chargeId = charge.id;
-    }
-  } catch (error) {
-    console.error('Error fetching charge details:', error);
-  }
+      try {
+        const charge = await stripe.charges.retrieve(chargeId);
 
-  try {
-    await saveDonationToDatabase(paymentData);
+        const chargeUpdateResult = await turso.execute(
+          `UPDATE payments 
+           SET stripe_charge_id = ?,
+               receipt_url = ?,
+               payment_method_type = ?,
+               updated_at = datetime('now')
+           WHERE id = ?`,
+          [charge.id, charge.receipt_url, charge.payment_method_details?.type || null, paymentIntent.id]
+        );
+
+        if (!chargeUpdateResult.success) {
+          console.error('Failed to update charge details:', chargeUpdateResult.error);
+        }
+      } catch (error) {
+        console.error('Error fetching charge details:', error);
+      }
+    }
+
+    console.log('Payment successfully processed:', paymentIntent.id);
   } catch (error) {
-    console.error('Error saving donation to database:', error);
+    console.error('Error handling successful payment:', error);
     throw error;
   }
 }
 
 async function handleFailedPayment(paymentIntent: Stripe.PaymentIntent) {
-  const failureData = {
-    stripePaymentId: paymentIntent.id,
-    email: paymentIntent.metadata.email,
-    amount: paymentIntent.amount / 100,
-    currency: paymentIntent.currency.toUpperCase(),
-    status: paymentIntent.status,
-    errorMessage: paymentIntent.last_payment_error?.message || 'Unknown error',
-    errorCode: paymentIntent.last_payment_error?.code || null,
-    timestamp: new Date().toISOString(),
-  };
-
-  console.error('Payment failed:', failureData);
+  console.log('Processing failed payment:', paymentIntent.id);
 
   try {
-    await saveFailedPaymentToDatabase(failureData);
+    const updateResult = await turso.execute(
+      `UPDATE payments 
+       SET status = ?,
+           updated_at = datetime('now')
+       WHERE id = ?`,
+      [paymentIntent.status, paymentIntent.id]
+    );
+
+    if (!updateResult.success) {
+      console.error('Failed to update failed payment:', updateResult.error);
+      throw new Error('Failed to update failed payment');
+    }
+
+    const errorInfo = {
+      paymentIntentId: paymentIntent.id,
+      email: paymentIntent.metadata.email,
+      amount: paymentIntent.amount / 100,
+      currency: paymentIntent.currency.toUpperCase(),
+      errorMessage: paymentIntent.last_payment_error?.message || 'Unknown error',
+      errorCode: paymentIntent.last_payment_error?.code || null,
+    };
+
+    console.error('Payment failed details:', errorInfo);
   } catch (error) {
-    console.error('Error saving failed payment:', error);
+    console.error('Error handling failed payment:', error);
+    throw error;
   }
 }
 
-async function saveDonationToDatabase(data: any) {
-  console.log('Saving donation:', data);
-}
+async function handleChargeSucceeded(charge: Stripe.Charge) {
+  console.log('Processing charge succeeded:', charge.id);
 
-async function saveFailedPaymentToDatabase(data: any) {
-  console.log('Saving failed payment:', data);
+  try {
+    const paymentIntentId =
+      typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent?.id || null;
+
+    if (!paymentIntentId) {
+      console.error('No payment intent ID found in charge');
+      return;
+    }
+
+    const updateResult = await turso.execute(
+      `UPDATE payments 
+       SET stripe_charge_id = ?,
+           receipt_url = ?,
+           payment_method_type = ?,
+           updated_at = datetime('now')
+       WHERE id = ?`,
+      [charge.id, charge.receipt_url, charge.payment_method_details?.type || null, paymentIntentId]
+    );
+
+    if (!updateResult.success) {
+      console.error('Failed to update charge info:', updateResult.error);
+    } else {
+      console.log('Charge info updated successfully:', charge.id);
+    }
+  } catch (error) {
+    console.error('Error handling charge succeeded:', error);
+  }
 }
