@@ -57,7 +57,6 @@ export const SidebarProvider = ({
 				name: String(DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_NAME),
 				value: String(openState),
 				path: "/",
-				maxAge: DEFAULT_SIDEBAR_CONFIG.SIDEBAR_COOKIE_MAX_AGE as number,
 			});
 		},
 		[setOpenProp, open],

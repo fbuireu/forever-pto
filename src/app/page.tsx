@@ -4,8 +4,6 @@ import type { SearchParams } from '@const/types';
 import { getCountry } from '@infrastructure/services/country/getCountry/getCountry';
 import { getHolidays } from '@infrastructure/services/holiday/getHolidays';
 import { getRegion } from '@infrastructure/services/region/getRegion/getRegion';
-import { SidebarTrigger } from '@modules/components/core/sidebar/atoms/sidebarTrigger/SidebarTrigger';
-import { SidebarProvider } from '@modules/components/core/sidebar/provider/SidebarProvider/SidebarProvider';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { generateMetadata } from './metadata';
@@ -38,15 +36,13 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
   const carryOverMonthsNumber = isPremium ? Number(carryOverMonths) : Number(CARRY_OVER_MONTHS);
 
   return (
-    <SidebarProvider>
-      <SidebarTrigger />
       <div className='grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-2'>
         <div className='flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6'>
           <div className='relative'>
             <div className='absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 rounded-full blur-2xl opacity-20 animate-pulse'></div>
             <div className='relative bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent'>
               <h1 className='text-4xl md:text-6xl font-extrabold tracking-tight'>🚀 Coming Soon</h1>
-            </div>
+            </div> 
           </div>
           <div className='max-w-2xl space-y-4'>
             <p className='text-xl md:text-2xl text-muted-foreground'>We're cooking up something amazing!</p>
@@ -74,7 +70,6 @@ const ForeverPto = async ({ searchParams, params }: ForeverPtoProps) => {
           </div>
         </div>
       </div>
-    </SidebarProvider>
   );
 };
 
