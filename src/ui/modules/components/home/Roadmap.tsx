@@ -163,7 +163,7 @@ export function Roadmap() {
           <FeatureList features={features} categoryLabel={selectedNavItem?.label ?? 'Features'} />
         </div>
       </div>
-      <Card className='border-dashed'>
+      <Card className='border-dashed '>
         <CardHeader>
           <CardTitle>Have a suggestion?</CardTitle>
           <CardDescription>We'd love to hear your ideas! Send us feedback or feature requests.</CardDescription>

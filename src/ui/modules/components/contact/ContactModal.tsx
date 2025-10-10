@@ -1,5 +1,6 @@
 'use client';
 
+import { ContactFormData, contactSchema } from '@application/dto/contact/schema';
 import { usePremiumStore } from '@application/stores/premium';
 import { Button } from '@const/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@const/components/ui/dialog';
@@ -13,8 +14,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
 import { useShallow } from 'zustand/react/shallow';
-import { FormButtons } from './FormButtons';
-import { ContactFormData, contactSchema } from './schema';
+import { FormButtons } from '../core/FormButtons';
 
 interface ContactModalProps {
   open: boolean;
@@ -61,7 +61,6 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
     setEmail(data.email);
     if (result.success) {
       setStep(Step.SUCCESS);
-      sendContactEmail(data);
     } else {
       setErrorMessage(result.error || 'Failed to send message');
       setStep(Step.ERROR);
@@ -86,7 +85,14 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
         {step === Step.INPUT && (
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4' noValidate>
+            <form
+              action={async () => {
+                const data = form.getValues();
+                await onSubmit(data);
+              }}
+              className='space-y-4'
+              noValidate
+            >
               <FormField
                 control={form.control}
                 name='name'
@@ -146,7 +152,12 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                   </FormItem>
                 )}
               />
-              <FormButtons onCancel={handleClose} />
+              <FormButtons
+                submitText='Send Message'
+                loadingText='Sending...'
+                cancelText='Cancel'
+                onCancel={handleClose}
+              />
             </form>
           </Form>
         )}

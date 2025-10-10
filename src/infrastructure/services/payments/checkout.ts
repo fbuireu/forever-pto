@@ -1,47 +1,58 @@
-import { createPaymentIntent } from '@infrastructure/actions/payment';
-import type { PaymentDTOSuccess } from '@application/dto/payment/types';
+import type { CreatePaymentInput } from '@application/dto/payment/schema';
+import type { DiscountInfo } from '@application/dto/payment/types';
+import { createPayment } from '@infrastructure/actions/payment';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
 
-export const initializePayment = async (params: {
-  amount: number;
-  email: string;
-  promoCode?: string;
-}): Promise<PaymentDTOSuccess> => {
-  const result = await createPaymentIntent({
-    amount: params.amount,
-    email: params.email,
-    promoCode: params.promoCode?.trim(),
-  });
+interface InitializePaymentResult {
+  clientSecret: string;
+  discountInfo: DiscountInfo | null;
+}
+
+export const initializePayment = async (params: CreatePaymentInput): Promise<InitializePaymentResult> => {
+  const result = await createPayment(params);
 
   if (!result.success) {
-    const error = result.success === false ? result.error : 'Payment initialization failed';
-    throw new Error(error);
+    throw new Error(result.error);
   }
 
-  return result;
+  return {
+    clientSecret: result.clientSecret,
+    discountInfo: result.discountInfo || null,
+  };
 };
 
-export const confirmPayment = async (params: {
+interface ConfirmPaymentParams {
   stripe: Stripe;
   elements: StripeElements;
   email: string;
   returnUrl: string;
-}): Promise<string | null> => {
+}
+
+export const confirmPayment = async (params: ConfirmPaymentParams): Promise<string | null> => {
   const { stripe, elements, email, returnUrl } = params;
 
-  const { error: submitError } = await elements.submit();
-  if (submitError) {
-    return submitError.message ?? 'An error occurred during submission';
+  try {
+    const { error: submitError } = await elements.submit();
+    if (submitError) {
+      return submitError.message ?? 'Payment submission failed';
+    }
+
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: returnUrl,
+        receipt_email: email,
+      },
+      redirect: 'if_required',
+    });
+
+    if (error) {
+      return error.message ?? 'Payment confirmation failed';
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Payment error:', error);
+    return error instanceof Error ? error.message : 'An unexpected error occurred';
   }
-
-  const { error } = await stripe.confirmPayment({
-    elements,
-    redirect: 'if_required',
-    confirmParams: {
-      return_url: returnUrl,
-      receipt_email: email,
-    },
-  });
-
-  return error ? (error.message ?? 'An error occurred during payment') : null;
 };

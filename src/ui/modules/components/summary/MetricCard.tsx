@@ -87,7 +87,9 @@ export const MetricCard = ({
 
   if (size === MetricCardSize.COMPACT) {
     return (
-      <div className={cn('p-3', colors.bg, 'rounded-lg text-center', className)}>
+      <div
+        className={cn('p-3', colors.bg, 'rounded-lg text-center flex flex-col justify-between items-center', className)}
+      >
         <Icon className={cn('w-4 h-4', colors.icon, 'mx-auto mb-1')} />
         <div className={cn('text-lg font-bold flex justify-center', colors.text)}>
           <SlidingNumber number={value} className={cn('text-lg font-bold', colors.text)} decimalPlaces={0} />
@@ -99,7 +101,14 @@ export const MetricCard = ({
   }
 
   return (
-    <div className={cn('flex flex-col items-center p-4', colors.bg, 'rounded-lg', className)}>
+    <div
+      className={cn(
+        'items-center p-4',
+        colors.bg,
+        'rounded-lg flex flex-col justify-between items-center',
+        className
+      )}
+    >
       <span className={cn('text-xs text-muted-foreground mb-1')}>{label}</span>
       <div className={cn('flex items-center gap-2')}>
         <Icon className={cn('w-4 h-4', colors.icon)} />

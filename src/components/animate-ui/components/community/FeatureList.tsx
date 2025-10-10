@@ -51,7 +51,7 @@ const viewAllTextVariants = {
 export function FeatureList({ features, categoryLabel }: FeatureListProps) {
   return (
     <motion.div
-      className='bg-card border rounded-3xl p-4 w-full space-y-3 shadow-md'
+      className='bg-card border rounded-xl p-4 w-full space-y-3 shadow-md'
       initial='collapsed'
       whileHover='expanded'
     >

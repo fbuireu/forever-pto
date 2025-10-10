@@ -27,6 +27,7 @@
       "@const/*": ["./src/const/*"],
       "@app/*": ["./src/app/*"],
       "@infrastructure/*": ["./src/infrastructure/*"],
+      "@domain/*": ["./src/domain/*"],
       "@ui/*": ["./src/ui/*"],
       "@application/*": ["./src/application/*"],
       "@modules/*": ["./src/ui/modules/*"],

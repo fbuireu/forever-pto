@@ -78,7 +78,7 @@ export const ContactFormEmail = ({ email, name, subject, message }: ContactFormE
 
             <Section className='mt-[32px] mb-[32px] text-center'>
               <Button
-                className='rounded bg-[#059669] px-6 py-3 text-center font-semibold text-[14px] text-white no-underline hover:bg-[#047857]'
+                className='rounded bg-[#059669] px-6 py-3 text-center font-semibold text-[14px] text-white no-underline'
                 href={`mailto:${email}?subject=Re: ${subject}`}
               >
                 Reply to {name}

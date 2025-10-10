@@ -2,7 +2,6 @@ import { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { Button } from '@const/components/ui/button';
 import { confirmPayment } from '@infrastructure/services/payments/checkout';
-import { formatDiscountText } from '@infrastructure/services/payments/utils/helpers';
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useLocale } from 'next-intl';
 import dynamic from 'next/dynamic';
@@ -11,6 +10,7 @@ import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { useShallow } from 'zustand/react/shallow';
 import { ExpressCheckoutSkeleton } from '../skeletons/ExpressCheckoutSkeleton';
+import { formatDiscountText } from '@infrastructure/services/payments/utils/formatters';
 
 interface CheckoutFormProps {
   amount: number;

@@ -1,5 +1,6 @@
 'use client';
 
+import { CreatePaymentInput } from '@application/dto/payment/schema';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
 import { Input } from '@const/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@const/components/ui/input-group';
@@ -7,35 +8,28 @@ import { Label } from '@const/components/ui/label';
 import { cn } from '@const/lib/utils';
 import { amountFormatter } from '@shared/utils/helpers';
 import { useCallback, useMemo, useState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { UseFormReturn } from 'react-hook-form';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { ChevronDown } from 'src/components/animate-ui/icons/chevron-down';
-import { DonationFormData } from './Donate';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
+import { FormButtons } from './FormButtons';
 
 const PRESET_AMOUNTS = [5, 10, 15] as const;
 
 interface DonationFormProps {
-  form: UseFormReturn<DonationFormData>;
-  onSubmit: (data: DonationFormData) => void;
-  isPending: boolean;
+  form: UseFormReturn<CreatePaymentInput>;
+  onSubmit: (data: CreatePaymentInput) => Promise<void>;
   currentAmount: number;
   locale: string;
   currency: string;
   currencySymbol: string;
 }
 
-export function DonationForm({
-  form,
-  onSubmit,
-  isPending,
-  currentAmount,
-  locale,
-  currency,
-  currencySymbol,
-}: DonationFormProps) {
+export function DonationForm({ form, onSubmit, currentAmount, locale, currency, currencySymbol }: DonationFormProps) {
   const [showPromoCode, setShowPromoCode] = useState(false);
   const { setValue } = form;
+  const { pending } = useFormStatus();
 
   const amount = useMemo(() => amountFormatter(locale), [locale]);
 
@@ -48,7 +42,14 @@ export function DonationForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} noValidate className='grid gap-3'>
+      <form
+        action={async () => {
+          const data = form.getValues();
+          await onSubmit(data);
+        }}
+        noValidate
+        className='grid gap-3'
+      >
         <FormField
           control={form.control}
           name='email'
@@ -59,7 +60,7 @@ export function DonationForm({
                 <Input
                   type='email'
                   placeholder='your@email.com'
-                  disabled={isPending}
+                  disabled={pending}
                   {...field}
                   className='h-10'
                   autoComplete='email'
@@ -69,6 +70,7 @@ export function DonationForm({
             </FormItem>
           )}
         />
+
         <div className='space-y-2'>
           <Label>Quick amounts</Label>
           <div className='flex gap-2'>
@@ -79,7 +81,7 @@ export function DonationForm({
                 variant={currentAmount === preset ? 'default' : 'outline'}
                 size='sm'
                 onClick={() => handlePresetClick(preset)}
-                disabled={isPending}
+                disabled={pending}
                 className='flex-1'
               >
                 {amount.format(preset)}
@@ -87,6 +89,7 @@ export function DonationForm({
             ))}
           </div>
         </div>
+
         <FormField
           control={form.control}
           name='amount'
@@ -104,7 +107,7 @@ export function DonationForm({
                     step='1'
                     min='1'
                     max='10000'
-                    disabled={isPending}
+                    disabled={pending}
                     {...field}
                     value={field.value ?? ''}
                     onChange={(e) => {
@@ -122,6 +125,7 @@ export function DonationForm({
             </FormItem>
           )}
         />
+
         <Collapsible open={showPromoCode} onOpenChange={setShowPromoCode}>
           <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-sm font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors'>
             <span className='text-muted-foreground'>Have a promo code?</span>
@@ -145,7 +149,7 @@ export function DonationForm({
                       <Input
                         type='text'
                         placeholder='YOU_WISH_IT_WAS_THAT_EASY'
-                        disabled={isPending}
+                        disabled={pending}
                         {...field}
                         className='h-10 uppercase'
                       />
@@ -157,9 +161,12 @@ export function DonationForm({
             </CollapsibleContent>
           )}
         </Collapsible>
-        <Button type='submit' disabled={isPending} className='w-full bg-green-600 hover:bg-green-700'>
-          {isPending ? 'Processing...' : 'Continue to Payment'}
-        </Button>
+        <FormButtons
+          submitText='Continue to Payment'
+          loadingText='Processing...'
+          hideCancel
+          submitClassName='w-full bg-green-600 hover:bg-green-700'
+        />
       </form>
     </Form>
   );

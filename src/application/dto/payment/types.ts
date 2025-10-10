@@ -39,3 +39,17 @@ export type PaymentDTOError = {
 };
 
 export type PaymentDTO = PaymentDTOSuccess | PaymentDTOError;
+
+export interface PaymentData {
+  id: string;
+  stripeCreatedAt: Date;
+  customerId: string | null;
+  chargeId: string | null;
+  email: string;
+  amount: number;
+  currency: string;
+  status: string;
+  paymentMethodType: string | null;
+  description: string | null;
+  promoCode: string | null;
+}

@@ -3,39 +3,28 @@
 import { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { getStripeClient } from '@infrastructure/payments/stripe/client';
+import { getStripeClient } from '@infrastructure/clients/payments/stripe/client';
 import { initializePayment } from '@infrastructure/services/payments/checkout';
-import { calculateFinalAmount, formatDiscountMessage } from '@infrastructure/services/payments/utils/helpers';
+import { formatDiscountMessage } from '@infrastructure/services/payments/utils/formatters';
+import { calculateFinalAmount } from '@infrastructure/services/payments/utils/helpers';
 import { Elements } from '@stripe/react-stripe-js';
 import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { useLocale } from 'next-intl';
 import { useTheme } from 'next-themes';
-import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
 import { Star } from 'src/components/animate-ui/icons/star';
-import * as z from 'zod';
+import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
 import { useShallow } from 'zustand/react/shallow';
 import { CheckoutForm } from './CheckoutForm';
 import { DonationForm } from './DonationForm';
-
-const donationSchema = z.object({
-  amount: z
-    .number({ error: 'Amount must be a number' })
-    .min(0.01, 'Amount must be at least 1')
-    .max(10000, 'Amount cannot exceed 10,000')
-    .multipleOf(0.01, 'Amount must have maximum 2 decimal places'),
-  email: z.email('Please enter a valid email address').min(1, 'Email is required'),
-  promoCode: z.string().optional(),
-});
-
-export type DonationFormData = z.infer<typeof donationSchema>;
+import { CreatePaymentInput, createPaymentSchema } from '@application/dto/payment/schema';
 
 interface PaymentState {
   clientSecret: string;
-  data: DonationFormData;
+  data: CreatePaymentInput;
   discountInfo: DiscountInfo | null;
 }
 
@@ -45,7 +34,6 @@ export const Donate = () => {
   const locale = useLocale();
   const { resolvedTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
 
   const { premiumKey, setPremiumStatus, userEmail, setEmail, getCurrencyFromLocale, currency, currencySymbol } =
@@ -65,8 +53,8 @@ export const Donate = () => {
     getCurrencyFromLocale(locale);
   }, [locale, getCurrencyFromLocale]);
 
-  const form = useForm<DonationFormData>({
-    resolver: zodResolver(donationSchema),
+  const form = useForm<CreatePaymentInput>({
+    resolver: zodResolver(createPaymentSchema),
     values: {
       amount: 5,
       promoCode: '',
@@ -77,34 +65,32 @@ export const Donate = () => {
   const currentAmount = form.watch('amount');
 
   const onSubmit = useCallback(
-    async (data: DonationFormData) => {
-      startTransition(async () => {
-        try {
-          setEmail(data.email);
-          const result = await initializePayment({
-            amount: data.amount,
-            email: data.email,
-            promoCode: data.promoCode,
-          });
+    async (data: CreatePaymentInput) => {
+      try {
+        setEmail(data.email);
+        const result = await initializePayment({
+          amount: data.amount,
+          email: data.email,
+          promoCode: data.promoCode,
+        });
 
-          if (result.discountInfo) {
-            const message = formatDiscountMessage(result.discountInfo);
-            toast.success(message.title, {
-              description: message.description,
-            });
-          }
-
-          setPaymentState({
-            clientSecret: result.clientSecret,
-            data,
-            discountInfo: result.discountInfo || null,
-          });
-        } catch (error) {
-          toast.error('Payment initialization failed', {
-            description: error instanceof Error ? error.message : 'Please try again.',
+        if (result.discountInfo) {
+          const message = formatDiscountMessage(result.discountInfo);
+          toast.success(message.title, {
+            description: message.description,
           });
         }
-      });
+
+        setPaymentState({
+          clientSecret: result.clientSecret,
+          data,
+          discountInfo: result.discountInfo || null,
+        });
+      } catch (error) {
+        toast.error('Payment initialization failed', {
+          description: error instanceof Error ? error.message : 'Please try again.',
+        });
+      }
     },
     [setEmail]
   );
@@ -260,14 +246,12 @@ export const Donate = () => {
             )}
           </div>
 
-          {/* Si tenemos clientSecret, montamos Elements */}
           {elementsOptions ? (
             <Elements stripe={stripePromise} options={elementsOptions}>
               {!paymentState ? (
                 <DonationForm
                   form={form}
                   onSubmit={onSubmit}
-                  isPending={isPending}
                   currentAmount={currentAmount}
                   locale={locale}
                   currency={currency}
@@ -287,7 +271,6 @@ export const Donate = () => {
             <DonationForm
               form={form}
               onSubmit={onSubmit}
-              isPending={isPending}
               currentAmount={currentAmount}
               locale={locale}
               currency={currency}

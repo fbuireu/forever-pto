@@ -29,4 +29,5 @@ export { generateMetadata };
 // todo: locale all
 // todo: responsive
 // todo: legal pages and cookies (what info do I need to provide?)
+// todo: https://nextjs.org/docs/app/api-reference/config/next-config-js/reactCompiler
 // todo: setup stripe
