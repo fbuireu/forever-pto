@@ -1,5 +1,6 @@
 'use client';
 
+import { CreatePaymentInput, createPaymentSchema } from '@application/dto/payment/schema';
 import { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,7 +21,6 @@ import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-
 import { useShallow } from 'zustand/react/shallow';
 import { CheckoutForm } from './CheckoutForm';
 import { DonationForm } from './DonationForm';
-import { CreatePaymentInput, createPaymentSchema } from '@application/dto/payment/schema';
 
 interface PaymentState {
   clientSecret: string;
@@ -223,7 +223,7 @@ export const Donate = () => {
   }, [paymentState?.clientSecret, resolvedTheme]);
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen} modal>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <div className='fixed bottom-4 right-4 z-50'>
           <div className='donate-rainbow relative z-0 overflow-hidden p-0.5 flex items-center justify-center rounded-md hover:scale-102 transition duration-200 active:scale-100'>

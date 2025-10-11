@@ -36,6 +36,6 @@ export const createContactError = {
 
   unknown: (message?: string): ContactError => ({
     type: CONTACT_ERROR_TYPES.UNKNOWN,
-    message: message || 'An unexpected error occurred. Please try again.',
+    message: message ?? 'An unexpected error occurred. Please try again.',
   }),
 };

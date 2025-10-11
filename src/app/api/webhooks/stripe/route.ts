@@ -10,7 +10,7 @@ import { headers } from 'next/headers';
 import { NextResponse, type NextRequest } from 'next/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2025-09-30.clover',
 });
 
@@ -21,8 +21,6 @@ const STRIPE_EVENTS = {
   PAYMENT_INTENT_FAILED: 'payment_intent.payment_failed',
   CHARGE_SUCCEEDED: 'charge.succeeded',
 } as const;
-
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -36,7 +34,7 @@ export async function POST(request: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     console.error('Webhook signature verification failed:', errorMessage);
@@ -46,13 +44,13 @@ export async function POST(request: NextRequest) {
   try {
     switch (event.type) {
       case STRIPE_EVENTS.PAYMENT_INTENT_SUCCEEDED:
-        await handleSuccessfulPayment(event.data.object as Stripe.PaymentIntent);
+        await handleSuccessfulPayment(event.data.object);
         break;
       case STRIPE_EVENTS.PAYMENT_INTENT_FAILED:
-        await handleFailedPayment(event.data.object as Stripe.PaymentIntent);
+        await handleFailedPayment(event.data.object);
         break;
       case STRIPE_EVENTS.CHARGE_SUCCEEDED:
-        await handleChargeSucceeded(event.data.object as Stripe.Charge);
+        await handleChargeSucceeded(event.data.object);
         break;
       default:
         console.log(`Unhandled event type: ${event.type}`);

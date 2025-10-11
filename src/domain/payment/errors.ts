@@ -36,6 +36,6 @@ export const createPaymentError = {
 
   unknown: (message?: string): PaymentError => ({
     type: PAYMENT_ERROR_TYPES.UNKNOWN,
-    message: message || 'An unexpected error occurred. Please try again.',
+    message: message ?? 'An unexpected error occurred. Please try again.',
   }),
 };

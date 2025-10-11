@@ -1,6 +1,9 @@
 import { Calculator } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { Suspense } from 'react';
+import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
+import { Settings } from 'src/components/animate-ui/icons/settings';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import {
   Sidebar,
@@ -19,6 +22,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from 'src/components/animate-ui/radix/sidebar';
+import { Logo } from '../core/Logo';
 import { AllowPastDays } from './components/AllowPastDays';
 import { CarryOverMonths } from './components/CarryOverMonths';
 import { Countries } from './components/Countries';
@@ -31,9 +35,6 @@ import { Strategy } from './components/Strategy';
 import { ThemeSelector } from './components/ThemeSelector';
 import { WorkdayCounter } from './components/WorkdayCounter';
 import { Years } from './components/Years';
-import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
-import { Settings } from 'src/components/animate-ui/icons/settings';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 interface AppSidebarProps {
   children: React.ReactNode;
@@ -46,7 +47,8 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton>LOGO</SidebarMenuButton>
+
+              <Logo />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
