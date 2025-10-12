@@ -1,7 +1,7 @@
 import { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { Button } from '@const/components/ui/button';
-import { confirmPayment } from '@infrastructure/services/payments/checkout';
+import { confirmPayment } from '@ui/adapters/payments/checkout';
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useLocale } from 'next-intl';
 import dynamic from 'next/dynamic';
@@ -31,10 +31,11 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  const { getCurrencyFromLocale, currencySymbol } = usePremiumStore(
+  const { getCurrencyFromLocale, currencySymbol, setPremiumStatus } = usePremiumStore(
     useShallow((state) => ({
       getCurrencyFromLocale: state.getCurrencyFromLocale,
       currencySymbol: state.currencySymbol,
+      setPremiumStatus: state.setPremiumStatus,
     }))
   );
 
@@ -50,22 +51,29 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 
     setErrorMessage(null);
 
-    const error = await confirmPayment({
+    const result = await confirmPayment({
       stripe,
       elements,
       email,
       returnUrl: `${window.location.origin}/payment/confirmation`,
     });
 
-    if (error) {
-      setErrorMessage(error);
+    if (!result.success) {
+      setErrorMessage(result.error || 'Payment failed');
     } else {
+      if (result.sessionData) {
+        setPremiumStatus({
+          email: result.sessionData.email,
+          premiumKey: result.sessionData.premiumKey,
+        });
+      }
+
       setShowConfetti(true);
       setTimeout(() => {
         onSuccess();
       }, 1000);
     }
-  }, [stripe, elements, email, onSuccess]);
+  }, [stripe, elements, email, onSuccess, setPremiumStatus]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {

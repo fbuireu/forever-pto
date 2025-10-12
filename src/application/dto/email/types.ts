@@ -12,5 +12,3 @@ export interface SendEmailResult {
   messageId?: string;
   error?: string;
 }
-
-export type EmailSender = (params: SendEmailParams) => Promise<SendEmailResult>;

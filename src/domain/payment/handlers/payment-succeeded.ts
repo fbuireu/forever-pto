@@ -1,18 +1,12 @@
-import type { TursoClient } from '@infrastructure/clients/db/turso/client';
-import {
-  getPaymentById,
-  savePayment,
-  updatePaymentStatus,
-  updatePaymentCharge,
-} from '@infrastructure/services/payments/repository';
-import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
+import type { PaymentData } from '@application/dto/payment/types';
+import { createPaymentError } from '../events/factory/errors';
 import type { PaymentSucceededEvent } from '../events/types';
-import { createPaymentError } from '../errors';
-import type Stripe from 'stripe';
+import type { ChargeService } from '../services/charge';
+import { PaymentRepository } from '../repository/types';
 
 interface HandlePaymentSucceededDeps {
-  db: TursoClient;
-  stripe: Stripe;
+  paymentRepository: PaymentRepository;
+  chargeService: ChargeService;
 }
 
 export const handlePaymentSucceeded = async (
@@ -22,12 +16,12 @@ export const handlePaymentSucceeded = async (
   console.log('Processing successful payment:', event.paymentId);
 
   try {
-    const existingPayment = await getPaymentById(deps.db, event.paymentId);
+    const existingPayment = await deps.paymentRepository.getById(event.paymentId);
 
     if (existingPayment.success && existingPayment.data) {
-      await updateExistingPayment(event, deps.db);
+      await updateExistingPayment(event, deps.paymentRepository);
     } else {
-      await createPaymentFromWebhook(event, deps.db);
+      await createPaymentFromWebhook(event, deps.paymentRepository);
     }
 
     await updateChargeDetails(event, deps);
@@ -39,18 +33,18 @@ export const handlePaymentSucceeded = async (
   }
 };
 
-const updateExistingPayment = async (event: PaymentSucceededEvent, db: TursoClient): Promise<void> => {
-  const result = await updatePaymentStatus(db, event.paymentId, event.status);
+const updateExistingPayment = async (event: PaymentSucceededEvent, repository: PaymentRepository): Promise<void> => {
+  const result = await repository.updateStatus(event.paymentId, event.status);
 
   if (!result.success) {
     throw createPaymentError.updateStatusFailed(event.paymentId, result.error);
   }
 };
 
-const createPaymentFromWebhook = async (event: PaymentSucceededEvent, db: TursoClient): Promise<void> => {
+const createPaymentFromWebhook = async (event: PaymentSucceededEvent, repository: PaymentRepository): Promise<void> => {
   console.warn('Payment not found in DB, creating from webhook:', event.paymentId);
 
-  const result = await savePayment(db, {
+  const paymentData: PaymentData = {
     id: event.paymentIntent.id,
     stripeCreatedAt: new Date(event.paymentIntent.created * 1000),
     customerId: extractCustomerId(event.paymentIntent.customer),
@@ -62,7 +56,9 @@ const createPaymentFromWebhook = async (event: PaymentSucceededEvent, db: TursoC
     paymentMethodType: event.paymentIntent.payment_method_types?.[0] || null,
     description: event.paymentIntent.description || null,
     promoCode: event.paymentIntent.metadata.promoCode || null,
-  });
+  };
+
+  const result = await repository.save(paymentData);
 
   if (!result.success) {
     throw createPaymentError.saveFromWebhookFailed(event.paymentId, result.error);
@@ -78,22 +74,40 @@ const updateChargeDetails = async (event: PaymentSucceededEvent, deps: HandlePay
       : event.paymentIntent.latest_charge.id;
 
   try {
-    const charge = await deps.stripe.charges.retrieve(chargeId);
+    const chargeResult = await deps.chargeService.retrieveCharge(chargeId);
 
-    const result = await updatePaymentCharge(
-      deps.db,
+    if (!chargeResult.success || !chargeResult.data) {
+      console.error('Failed to retrieve charge details:', chargeResult.error);
+      return;
+    }
+
+    const result = await deps.paymentRepository.updateCharge(
       event.paymentId,
-      charge.id,
-      charge.receipt_url,
-      charge.payment_method_details?.type || null
+      chargeResult.data.id,
+      chargeResult.data.receiptUrl,
+      chargeResult.data.paymentMethodType
     );
 
     if (!result.success) {
       console.error('Failed to update charge details:', result.error);
-      // No lanzamos error porque no es crítico
     }
   } catch (error) {
     console.error('Error fetching charge details:', error);
-    // No lanzamos error porque no es crítico
   }
+};
+
+const extractCustomerId = (customer: unknown): string | null => {
+  if (typeof customer === 'string') return customer;
+  if (customer && typeof customer === 'object' && 'id' in customer) {
+    return (customer as { id: string }).id;
+  }
+  return null;
+};
+
+const extractChargeId = (charge: unknown): string | null => {
+  if (typeof charge === 'string') return charge;
+  if (charge && typeof charge === 'object' && 'id' in charge) {
+    return (charge as { id: string }).id;
+  }
+  return null;
 };

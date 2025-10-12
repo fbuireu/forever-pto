@@ -1,17 +1,16 @@
-import type { TursoClient } from '@infrastructure/clients/db/turso/client';
-import { updatePaymentStatus } from '@infrastructure/services/payments/repository';
+import { createPaymentError } from '../events/factory/errors';
 import type { PaymentFailedEvent } from '../events/types';
-import { createPaymentError } from '../errors';
+import { PaymentRepository } from '../repository/types';
 
 interface HandlePaymentFailedDeps {
-  db: TursoClient;
+  paymentRepository: PaymentRepository;
 }
 
 export const handlePaymentFailed = async (event: PaymentFailedEvent, deps: HandlePaymentFailedDeps): Promise<void> => {
   console.log('Processing failed payment:', event.paymentId);
 
   try {
-    const result = await updatePaymentStatus(deps.db, event.paymentId, event.paymentIntent.status);
+    const result = await deps.paymentRepository.updateStatus(event.paymentId, event.paymentIntent.status);
 
     if (!result.success) {
       throw createPaymentError.updateStatusFailed(event.paymentId, result.error);

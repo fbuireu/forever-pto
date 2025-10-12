@@ -43,10 +43,7 @@ export function DonationForm({ form, onSubmit, currentAmount, locale, currency, 
   return (
     <Form {...form}>
       <form
-        action={async () => {
-          const data = form.getValues();
-          await onSubmit(data);
-        }}
+        onSubmit={form.handleSubmit(onSubmit)}
         noValidate
         className='grid gap-3'
       >

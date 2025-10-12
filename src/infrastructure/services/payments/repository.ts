@@ -1,4 +1,5 @@
 import type { PaymentData } from '@application/dto/payment/types';
+import { PaymentRepository } from '@domain/payment/repository/types';
 import type { TursoClient } from '@infrastructure/clients/db/turso/client';
 
 export const savePayment = async (
@@ -40,7 +41,7 @@ export const updatePaymentStatus = async (
   status: string
 ): Promise<{ success: boolean; error?: string }> => {
   const result = await turso.execute(
-    `UPDATE payments 
+    `UPDATE payments
      SET status = ?, succeeded_at = datetime('now'), updated_at = datetime('now')
      WHERE id = ?`,
     [status, paymentIntentId]
@@ -61,7 +62,7 @@ export const updatePaymentCharge = async (
   paymentMethodType: string | null
 ): Promise<{ success: boolean; error?: string }> => {
   const result = await turso.execute(
-    `UPDATE payments 
+    `UPDATE payments
      SET stripe_charge_id = ?, receipt_url = ?, payment_method_type = ?, updated_at = datetime('now')
      WHERE id = ?`,
     [chargeId, receiptUrl, paymentMethodType, paymentIntentId]
@@ -99,10 +100,10 @@ export const getPaymentByEmail = async (
   email: string
 ): Promise<{ success: boolean; data?: PaymentData; error?: string }> => {
   const result = await turso.execute(
-    `SELECT * FROM payments 
-     WHERE email = ? 
-     AND status = 'succeeded' 
-     ORDER BY stripe_created_at DESC 
+    `SELECT * FROM payments
+     WHERE email = ?
+     AND status = 'succeeded'
+     ORDER BY stripe_created_at DESC
      LIMIT 1`,
     [email]
   );
@@ -120,3 +121,12 @@ export const getPaymentByEmail = async (
     data: (result.data as unknown[])[0] as PaymentData,
   };
 };
+
+export const createPaymentRepository = (turso: TursoClient): PaymentRepository => ({
+  getById: (paymentId: string) => getPaymentById(turso, paymentId),
+  getByEmail: (email: string) => getPaymentByEmail(turso, email),
+  save: (payment: PaymentData) => savePayment(turso, payment),
+  updateStatus: (paymentId: string, status: string) => updatePaymentStatus(turso, paymentId, status),
+  updateCharge: (paymentId: string, chargeId: string, receiptUrl: string | null, paymentMethodType: string | null) =>
+    updatePaymentCharge(turso, paymentId, chargeId, receiptUrl, paymentMethodType),
+});

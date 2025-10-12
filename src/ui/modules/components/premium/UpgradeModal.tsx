@@ -56,7 +56,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
       setStep(Step.SUCCESS);
       setTimeout(() => {
         handleClose();
-      }, 7500);
+      }, 5000);
     } else {
       form.setError('email', {
         type: 'manual',
@@ -136,7 +136,9 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
             <Crown className='w-12 h-12 text-yellow-500 mx-auto animate-pulse' />
             <div>
               <h3 className='font-semibold text-green-600'>Access Granted!</h3>
-              <p className='text-sm text-muted-foreground mt-1'>Welcome to premium features.</p>
+              <p className='text-sm text-muted-foreground mt-1'>
+                Welcome to premium features. You can close this modal or we will do so in 5 seconds.
+              </p>
             </div>
           </div>
         )}

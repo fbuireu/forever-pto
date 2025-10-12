@@ -1,14 +1,13 @@
 import { Link } from '@application/i18n/navigtion';
 import { Button } from '@const/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
+import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { Locale } from 'next-intl';
 import { redirect } from 'next/navigation';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-08-27.basil',
-});
+const stripe = getStripeServerInstance();
 
 interface PaymentSuccessParams {
   searchParams: Promise<{

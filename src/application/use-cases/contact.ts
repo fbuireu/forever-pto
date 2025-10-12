@@ -2,7 +2,7 @@
 
 import { contactSchema } from '@application/dto/contact/schema';
 import type { ContactFormData, ContactResult } from '@application/dto/contact/types';
-import { createContactError } from '@domain/contact/errors';
+import { createContactError } from '@domain/contact/events/factory/errors';
 import { getTursoClient } from '@infrastructure/clients/db/turso/client';
 import { getResendClient } from '@infrastructure/clients/email/resend/client';
 import { saveContact } from '@infrastructure/services/contact/repository';

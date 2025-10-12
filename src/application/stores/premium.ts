@@ -77,7 +77,6 @@ export const usePremiumStore = create<PremiumStore>()(
                   premiumKey,
                   userEmail: email,
                   lastVerified: Date.now(),
-                  modalOpen: false,
                   isLoading: false,
                   needsSessionCheck: false,
                 });

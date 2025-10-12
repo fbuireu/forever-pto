@@ -1,9 +1,8 @@
-import type { TursoClient } from '@infrastructure/clients/db/turso/client';
-import { updatePaymentCharge } from '@infrastructure/services/payments/repository';
 import type { ChargeSucceededEvent } from '../events/types';
+import { PaymentRepository } from '../repository/types';
 
 interface HandleChargeSucceededDeps {
-  db: TursoClient;
+  paymentRepository: PaymentRepository;
 }
 
 export const handleChargeSucceeded = async (
@@ -18,8 +17,7 @@ export const handleChargeSucceeded = async (
   }
 
   try {
-    const result = await updatePaymentCharge(
-      deps.db,
+    const result = await deps.paymentRepository.updateCharge(
       event.paymentIntentId,
       event.chargeId,
       event.charge.receipt_url,
@@ -33,6 +31,5 @@ export const handleChargeSucceeded = async (
     }
   } catch (error) {
     console.error('Error handling charge succeeded:', error);
-    // No lanzamos porque no es crítico
   }
 };

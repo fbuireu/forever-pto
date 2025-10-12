@@ -8,13 +8,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@const/components/ui/input';
 import { Textarea } from '@const/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { sendContactEmail } from '@infrastructure/actions/contact';
 import { AlertCircle, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
 import { useShallow } from 'zustand/react/shallow';
 import { FormButtons } from '../core/FormButtons';
+import { sendContactEmail } from '@application/use-cases/contact';
 
 interface ContactModalProps {
   open: boolean;

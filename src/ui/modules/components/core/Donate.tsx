@@ -4,8 +4,8 @@ import { CreatePaymentInput, createPaymentSchema } from '@application/dto/paymen
 import { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { getStripeClient } from '@infrastructure/clients/payments/stripe/client';
-import { initializePayment } from '@infrastructure/services/payments/checkout';
+import { getStripeClientInstance } from '@infrastructure/clients/payments/stripe/client';
+import { initializePayment } from '@ui/adapters/payments/checkout';
 import { formatDiscountMessage } from '@infrastructure/services/payments/utils/formatters';
 import { calculateFinalAmount } from '@infrastructure/services/payments/utils/helpers';
 import { Elements } from '@stripe/react-stripe-js';
@@ -28,7 +28,7 @@ interface PaymentState {
   discountInfo: DiscountInfo | null;
 }
 
-const stripePromise = getStripeClient().getStripePromise();
+const stripePromise = getStripeClientInstance().getStripePromise();
 
 export const Donate = () => {
   const locale = useLocale();
@@ -36,17 +36,16 @@ export const Donate = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
 
-  const { premiumKey, userEmail, setEmail, getCurrencyFromLocale, currency, currencySymbol } =
-    usePremiumStore(
-      useShallow((state) => ({
-        premiumKey: state.premiumKey,
-        userEmail: state.userEmail,
-        setEmail: state.setEmail,
-        getCurrencyFromLocale: state.getCurrencyFromLocale,
-        currency: state.currency,
-        currencySymbol: state.currencySymbol,
-      }))
-    );
+  const { premiumKey, userEmail, setEmail, getCurrencyFromLocale, currency, currencySymbol } = usePremiumStore(
+    useShallow((state) => ({
+      premiumKey: state.premiumKey,
+      userEmail: state.userEmail,
+      setEmail: state.setEmail,
+      getCurrencyFromLocale: state.getCurrencyFromLocale,
+      currency: state.currency,
+      currencySymbol: state.currencySymbol,
+    }))
+  );
 
   useEffect(() => {
     getCurrencyFromLocale(locale);
@@ -96,8 +95,6 @@ export const Donate = () => {
 
   const handlePaymentSuccess = useCallback(async () => {
     if (!paymentState) return;
-
-    await usePremiumStore.getState().checkExistingSession();
 
     toast.success('Payment successful!', {
       description: 'Thank you for your support! You now have premium access.',
@@ -242,28 +239,7 @@ export const Donate = () => {
             )}
           </div>
 
-          {elementsOptions ? (
-            <Elements stripe={stripePromise} options={elementsOptions}>
-              {!paymentState ? (
-                <DonationForm
-                  form={form}
-                  onSubmit={onSubmit}
-                  currentAmount={currentAmount}
-                  locale={locale}
-                  currency={currency}
-                  currencySymbol={currencySymbol}
-                />
-              ) : (
-                <CheckoutForm
-                  amount={finalAmount}
-                  email={paymentState.data.email}
-                  discountInfo={paymentState.discountInfo}
-                  onSuccess={handlePaymentSuccess}
-                  onCancel={handlePaymentCancel}
-                />
-              )}
-            </Elements>
-          ) : (
+          {!paymentState ? (
             <DonationForm
               form={form}
               onSubmit={onSubmit}
@@ -272,6 +248,18 @@ export const Donate = () => {
               currency={currency}
               currencySymbol={currencySymbol}
             />
+          ) : (
+            elementsOptions && (
+              <Elements stripe={stripePromise} options={elementsOptions}>
+                <CheckoutForm
+                  amount={finalAmount}
+                  email={paymentState.data.email}
+                  discountInfo={paymentState.discountInfo}
+                  onSuccess={handlePaymentSuccess}
+                  onCancel={handlePaymentCancel}
+                />
+              </Elements>
+            )
           )}
         </div>
       </PopoverContent>

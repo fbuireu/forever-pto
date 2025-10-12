@@ -27,7 +27,7 @@ export class StripeClient {
     return this.stripePromise;
   }
 
-  private async getStripe(): Promise<Stripe> {
+  async getStripe(): Promise<Stripe> {
     if (!this.stripe) {
       this.stripePromise ??= loadStripe(this.publishableKey);
       this.stripe = await this.stripePromise;
@@ -68,6 +68,10 @@ export class StripeClient {
     }
   }
 
+  isLoaded(): boolean {
+    return this.stripe !== null;
+  }
+
   private handlePaymentResult(result: { error: StripeError } | { paymentIntent: PaymentIntent }): PaymentResult {
     if (this.isErrorResult(result)) {
       return {
@@ -98,21 +102,23 @@ export class StripeClient {
   }
 
   private handleError(error: unknown): PaymentResult {
-    if (error instanceof StripeNode.errors.StripeCardError) {
+    const stripeError = error as StripeError;
+
+    if (stripeError?.type === 'card_error') {
       return {
         success: false,
-        error: 'Your card was declined. Please try a different payment method.',
+        error: stripeError.message ?? 'Your card was declined. Please try a different payment method.',
       };
     }
 
-    if (error instanceof StripeNode.errors.StripeInvalidRequestError) {
+    if (stripeError?.type === 'invalid_request_error') {
       return {
         success: false,
         error: 'Payment request is invalid. Please try again.',
       };
     }
 
-    if (error instanceof StripeNode.errors.StripeAuthenticationError) {
+    if (stripeError?.type === 'authentication_error') {
       return {
         success: false,
         error: 'Payment service temporarily unavailable. Please try again later.',
@@ -121,30 +127,14 @@ export class StripeClient {
 
     return {
       success: false,
-      error: 'Payment could not be processed. Please try again.',
+      error: stripeError?.message ?? 'Payment could not be processed. Please try again.',
     };
-  }
-
-  async redirectToCheckout(sessionId: string): Promise<void> {
-    const stripe = await this.getStripe();
-
-    const { error } = await stripe.redirectToCheckout({
-      sessionId,
-    });
-
-    if (error) {
-      throw new Error(error.message ?? 'Checkout redirection failed');
-    }
-  }
-
-  isLoaded(): boolean {
-    return this.stripe !== null;
   }
 }
 
 let stripeClientInstance: StripeClient | null = null;
 
-export const getStripeClient = (): StripeClient => {
+export const getStripeClientInstance = (): StripeClient => {
   if (!stripeClientInstance) {
     const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
@@ -155,4 +145,49 @@ export const getStripeClient = (): StripeClient => {
     stripeClientInstance = new StripeClient(publishableKey);
   }
   return stripeClientInstance;
+};
+
+export const resetStripeClient = (): void => {
+  stripeClientInstance = null;
+};
+
+let stripeServerInstance: StripeNode | null = null;
+
+export const getStripeServerInstance = (): StripeNode => {
+  if (!stripeServerInstance) {
+    const secretKey = process.env.STRIPE_SECRET_KEY;
+
+    if (!secretKey) {
+      throw new Error('STRIPE_SECRET_KEY environment variable is not set');
+    }
+
+    stripeServerInstance = new StripeNode(secretKey, {
+      apiVersion: '2025-09-30.clover',
+    });
+  }
+
+  return stripeServerInstance;
+};
+
+export const resetStripeServerClient = (): void => {
+  stripeServerInstance = null;
+};
+
+export const constructWebhookEvent = (payload: string | Buffer, signature: string): StripeNode.Event => {
+  const stripe = getStripeServerInstance();
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!webhookSecret) {
+    throw new Error('STRIPE_WEBHOOK_SECRET is not defined');
+  }
+
+  return stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+};
+
+export const validateStripeConfig = (): { client: boolean; server: boolean; webhook: boolean } => {
+  return {
+    client: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    server: !!process.env.STRIPE_SECRET_KEY,
+    webhook: !!process.env.STRIPE_WEBHOOK_SECRET,
+  };
 };
