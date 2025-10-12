@@ -13,20 +13,22 @@ export const handlePaymentSucceeded = async (
   event: PaymentSucceededEvent,
   deps: HandlePaymentSucceededDeps
 ): Promise<void> => {
-  console.log('Processing successful payment:', event.paymentId);
-
   try {
     const existingPayment = await deps.paymentRepository.getById(event.paymentId);
 
     if (existingPayment.success && existingPayment.data) {
+      if (existingPayment.data.status === 'succeeded') {
+        await updateChargeDetails(event, deps);
+        return;
+      }
+
       await updateExistingPayment(event, deps.paymentRepository);
     } else {
+      console.warn('Payment not found in DB, creating from webhook:', event.paymentId);
       await createPaymentFromWebhook(event, deps.paymentRepository);
     }
 
     await updateChargeDetails(event, deps);
-
-    console.log('Payment successfully processed:', event.paymentId);
   } catch (error) {
     console.error('Error handling successful payment:', error);
     throw error;

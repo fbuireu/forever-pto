@@ -130,7 +130,7 @@ export const Donate = () => {
           colorBackground: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
           colorText: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
           colorDanger: isDark ? 'hsl(0 62.8% 60.6%)' : 'hsl(0 84.2% 60.2%)',
-          fontFamily: 'system-ui, sans-serif',
+          fontFamily: 'sans-serif',
           spacingUnit: '4px',
           borderRadius: '8px',
           fontSizeBase: '14px',

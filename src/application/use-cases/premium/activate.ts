@@ -1,7 +1,9 @@
+import type { PaymentData } from '@application/dto/payment/types';
 import type { PremiumActivationResult } from '@application/dto/premium/types';
 import type { SessionRepository } from '@domain/payment/repository/session';
 import { PaymentRepository } from '@domain/payment/repository/types';
 import { PaymentValidator } from '@domain/payment/services/validators';
+import type Stripe from 'stripe';
 
 interface ActivatePremiumWithPaymentParams {
   email: string;
@@ -17,6 +19,38 @@ interface ActivatePremiumDeps {
   paymentValidator: PaymentValidator;
   paymentRepository: PaymentRepository;
 }
+
+const extractCustomerId = (customer: unknown): string | null => {
+  if (typeof customer === 'string') return customer;
+  if (customer && typeof customer === 'object' && 'id' in customer) {
+    return (customer as { id: string }).id;
+  }
+  return null;
+};
+
+const extractChargeId = (charge: unknown): string | null => {
+  if (typeof charge === 'string') return charge;
+  if (charge && typeof charge === 'object' && 'id' in charge) {
+    return (charge as { id: string }).id;
+  }
+  return null;
+};
+
+const buildPaymentDataFromIntent = (paymentIntent: Stripe.PaymentIntent, email: string): PaymentData => {
+  return {
+    id: paymentIntent.id,
+    stripeCreatedAt: new Date(paymentIntent.created * 1000),
+    customerId: extractCustomerId(paymentIntent.customer),
+    chargeId: extractChargeId(paymentIntent.latest_charge),
+    email,
+    amount: paymentIntent.amount,
+    currency: paymentIntent.currency,
+    status: paymentIntent.status,
+    paymentMethodType: paymentIntent.payment_method_types?.[0] || null,
+    description: paymentIntent.description || null,
+    promoCode: paymentIntent.metadata.promoCode || null,
+  };
+};
 
 export const activateWithPayment = async (
   params: ActivatePremiumWithPaymentParams,
@@ -42,6 +76,29 @@ export const activateWithPayment = async (
       email: null,
       error: 'Email mismatch',
     };
+  }
+
+  if (validation.paymentIntent) {
+    const existingPayment = await deps.paymentRepository.getById(paymentIntentId);
+
+    if (existingPayment.success && existingPayment.data) {
+      if (existingPayment.data.status !== 'succeeded' && validation.paymentIntent.status === 'succeeded') {
+        const updateResult = await deps.paymentRepository.updateStatus(paymentIntentId, 'succeeded');
+
+        if (!updateResult.success) {
+          console.error('Failed to update payment status:', updateResult.error);
+        }
+      }
+    } else {
+      const paymentData = buildPaymentDataFromIntent(validation.paymentIntent, email);
+      const saveResult = await deps.paymentRepository.save(paymentData);
+
+      if (!saveResult.success) {
+        console.error('Failed to save payment to DB:', saveResult.error);
+      } else {
+        console.log('Payment created successfully');
+      }
+    }
   }
 
   const token = await deps.sessionRepository.create({

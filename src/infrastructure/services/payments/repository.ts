@@ -7,7 +7,7 @@ export const savePayment = async (
   data: PaymentData
 ): Promise<{ success: boolean; error?: string }> => {
   const result = await turso.execute(
-    `INSERT INTO payments (
+    `INSERT OR IGNORE INTO payments (
       id, stripe_created_at, stripe_customer_id, stripe_charge_id,
       email, amount, currency, status, payment_method_type,
       description, receipt_url, promo_code, created_at, updated_at

@@ -9,8 +9,6 @@ export const handleChargeSucceeded = async (
   event: ChargeSucceededEvent,
   deps: HandleChargeSucceededDeps
 ): Promise<void> => {
-  console.log('Processing charge succeeded:', event.chargeId);
-
   if (!event.paymentIntentId) {
     console.error('No payment intent ID found in charge');
     return;

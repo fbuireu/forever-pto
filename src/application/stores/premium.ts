@@ -205,7 +205,6 @@ export const usePremiumStore = create<PremiumStore>()(
           }
 
           if (state.lastVerified && Date.now() - state.lastVerified > TWENTY_FOUR_HOURS) {
-            console.log('Session expired, marking for recheck');
             state.needsSessionCheck = true;
           }
         },

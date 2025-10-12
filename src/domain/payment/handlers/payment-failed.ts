@@ -7,8 +7,6 @@ interface HandlePaymentFailedDeps {
 }
 
 export const handlePaymentFailed = async (event: PaymentFailedEvent, deps: HandlePaymentFailedDeps): Promise<void> => {
-  console.log('Processing failed payment:', event.paymentId);
-
   try {
     const result = await deps.paymentRepository.updateStatus(event.paymentId, event.paymentIntent.status);
 

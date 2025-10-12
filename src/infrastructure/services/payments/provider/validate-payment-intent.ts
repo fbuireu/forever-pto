@@ -9,6 +9,7 @@ const validatePaymentIntent = async (stripe: Stripe, paymentIntentId: string): P
       return {
         valid: false,
         status: paymentIntent.status,
+        paymentIntent,
         error: 'Payment not completed',
       };
     }
@@ -19,6 +20,7 @@ const validatePaymentIntent = async (stripe: Stripe, paymentIntentId: string): P
       valid: true,
       paymentEmail,
       status: paymentIntent.status,
+      paymentIntent,
     };
   } catch (error) {
     return {
