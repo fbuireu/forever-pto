@@ -1,5 +1,5 @@
-import { activateWithEmail, activateWithPayment } from '@application/use-cases/premium/activate';
-import { verifySession } from '@application/use-cases/premium/verify';
+import { activateWithEmail, activateWithPayment } from '@application/use-cases/activate-premium';
+import { verifySession } from '@application/use-cases/verify-session';
 import { getTursoClient } from '@infrastructure/clients/db/turso/client';
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
 import { createPaymentValidator } from '@infrastructure/services/payments/provider/validate-payment-intent';

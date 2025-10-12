@@ -1,5 +1,5 @@
-import { SessionVerificationResult } from "@application/dto/premium/types";
-import { SessionRepository } from "@domain/payment/repository/session";
+import type { SessionVerificationResult } from '@application/dto/premium/types';
+import type { SessionRepository } from '@domain/payment/repository/session';
 
 interface VerifySessionDeps {
   sessionRepository: SessionRepository;

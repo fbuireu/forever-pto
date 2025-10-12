@@ -1,8 +1,9 @@
 import type { PaymentData } from '@application/dto/payment/types';
+import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
 import { createPaymentError } from '../events/factory/errors';
 import type { PaymentSucceededEvent } from '../events/types';
-import type { ChargeService } from '../services/charge';
 import { PaymentRepository } from '../repository/types';
+import type { ChargeService } from '../services/charge';
 
 interface HandlePaymentSucceededDeps {
   paymentRepository: PaymentRepository;
@@ -98,18 +99,3 @@ const updateChargeDetails = async (event: PaymentSucceededEvent, deps: HandlePay
   }
 };
 
-const extractCustomerId = (customer: unknown): string | null => {
-  if (typeof customer === 'string') return customer;
-  if (customer && typeof customer === 'object' && 'id' in customer) {
-    return (customer as { id: string }).id;
-  }
-  return null;
-};
-
-const extractChargeId = (charge: unknown): string | null => {
-  if (typeof charge === 'string') return charge;
-  if (charge && typeof charge === 'object' && 'id' in charge) {
-    return (charge as { id: string }).id;
-  }
-  return null;
-};

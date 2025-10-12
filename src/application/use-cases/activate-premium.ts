@@ -3,6 +3,7 @@ import type { PremiumActivationResult } from '@application/dto/premium/types';
 import type { SessionRepository } from '@domain/payment/repository/session';
 import { PaymentRepository } from '@domain/payment/repository/types';
 import { PaymentValidator } from '@domain/payment/services/validators';
+import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
 import type Stripe from 'stripe';
 
 interface ActivatePremiumWithPaymentParams {
@@ -19,22 +20,6 @@ interface ActivatePremiumDeps {
   paymentValidator: PaymentValidator;
   paymentRepository: PaymentRepository;
 }
-
-const extractCustomerId = (customer: unknown): string | null => {
-  if (typeof customer === 'string') return customer;
-  if (customer && typeof customer === 'object' && 'id' in customer) {
-    return (customer as { id: string }).id;
-  }
-  return null;
-};
-
-const extractChargeId = (charge: unknown): string | null => {
-  if (typeof charge === 'string') return charge;
-  if (charge && typeof charge === 'object' && 'id' in charge) {
-    return (charge as { id: string }).id;
-  }
-  return null;
-};
 
 const buildPaymentDataFromIntent = (paymentIntent: Stripe.PaymentIntent, email: string): PaymentData => {
   return {
