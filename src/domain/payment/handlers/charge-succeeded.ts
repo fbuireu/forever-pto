@@ -15,12 +15,24 @@ export const handleChargeSucceeded = async (
   }
 
   try {
+    const billingDetails = event.charge.billing_details;
+    const paymentMethodDetails = event.charge.payment_method_details;
+    const netAmount = event.charge.amount - (event.charge.application_fee_amount || 0);
+
     const result = await params.paymentRepository.updateCharge(
       event.paymentIntentId,
       event.chargeId,
       event.charge.receipt_url,
-      event.charge.payment_method_details?.type || null,
-      event.charge.billing_details?.address?.country || null
+      paymentMethodDetails?.type || null,
+      billingDetails?.address?.country || null,
+      billingDetails?.name || null,
+      billingDetails?.address?.postal_code || null,
+      billingDetails?.address?.city || null,
+      billingDetails?.address?.state || null,
+      paymentMethodDetails?.card?.brand || null,
+      paymentMethodDetails?.card?.last4 || null,
+      event.charge.application_fee_amount || null,
+      netAmount
     );
 
     if (!result.success) {

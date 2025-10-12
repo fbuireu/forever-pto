@@ -64,7 +64,20 @@ export async function createPayment(params: CreatePaymentInput): Promise<Payment
       promoCode: validated.promoCode || null,
       userAgent,
       ipAddress,
-      country: null, 
+      country: null,
+      customerName: null,
+      postalCode: null,
+      city: null,
+      state: null,
+      paymentBrand: null,
+      paymentLast4: null,
+      feeAmount: null,
+      netAmount: null,
+      refundedAt: null,
+      refundReason: null,
+      disputedAt: null,
+      disputeReason: null,
+      parentPaymentId: null,
     });
 
     if (!saveResult.success) {

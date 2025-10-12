@@ -62,6 +62,19 @@ const createPaymentFromWebhook = async (event: PaymentSucceededEvent, repository
     userAgent: event.paymentIntent.metadata.userAgent || null,
     ipAddress: event.paymentIntent.metadata.ipAddress || null,
     country: null,
+    customerName: null,
+    postalCode: null,
+    city: null,
+    state: null,
+    paymentBrand: null,
+    paymentLast4: null,
+    feeAmount: null,
+    netAmount: null,
+    refundedAt: null,
+    refundReason: null,
+    disputedAt: null,
+    disputeReason: null,
+    parentPaymentId: null,
   };
 
   const result = await repository.save(paymentData);
@@ -92,7 +105,15 @@ const updateChargeDetails = async (event: PaymentSucceededEvent, params: HandleP
       chargeResult.data.id,
       chargeResult.data.receiptUrl,
       chargeResult.data.paymentMethodType,
-      chargeResult.data.country
+      chargeResult.data.country,
+      chargeResult.data.customerName,
+      chargeResult.data.postalCode,
+      chargeResult.data.city,
+      chargeResult.data.state,
+      chargeResult.data.paymentBrand,
+      chargeResult.data.paymentLast4,
+      chargeResult.data.feeAmount,
+      chargeResult.data.netAmount
     );
 
     if (!result.success) {

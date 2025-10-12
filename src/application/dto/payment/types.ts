@@ -55,4 +55,17 @@ export interface PaymentData {
   userAgent: string | null;
   ipAddress: string | null;
   country: string | null;
+  customerName: string | null;
+  postalCode: string | null;
+  city: string | null;
+  state: string | null;
+  paymentBrand: string | null;
+  paymentLast4: string | null;
+  feeAmount: number | null;
+  netAmount: number | null;
+  refundedAt: Date | null;
+  refundReason: string | null;
+  disputedAt: Date | null;
+  disputeReason: string | null;
+  parentPaymentId: string | null;
 }

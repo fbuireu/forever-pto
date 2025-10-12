@@ -6,19 +6,43 @@ const retrieveCharge = async (
   chargeId: string
 ): Promise<{
   success: boolean;
-  data?: { id: string; receiptUrl: string | null; paymentMethodType: string | null; country: string | null };
+  data?: {
+    id: string;
+    receiptUrl: string | null;
+    paymentMethodType: string | null;
+    country: string | null;
+    customerName: string | null;
+    postalCode: string | null;
+    city: string | null;
+    state: string | null;
+    paymentBrand: string | null;
+    paymentLast4: string | null;
+    feeAmount: number | null;
+    netAmount: number | null;
+  };
   error?: string;
 }> => {
   try {
     const charge = await stripe.charges.retrieve(chargeId);
+    const billingDetails = charge.billing_details;
+    const paymentMethodDetails = charge.payment_method_details;
+    const netAmount = charge.amount - (charge.application_fee_amount || 0);
 
     return {
       success: true,
       data: {
         id: charge.id,
         receiptUrl: charge.receipt_url,
-        paymentMethodType: charge.payment_method_details?.type || null,
-        country: charge.billing_details?.address?.country || null,
+        paymentMethodType: paymentMethodDetails?.type || null,
+        country: billingDetails?.address?.country || null,
+        customerName: billingDetails?.name || null,
+        postalCode: billingDetails?.address?.postal_code || null,
+        city: billingDetails?.address?.city || null,
+        state: billingDetails?.address?.state || null,
+        paymentBrand: paymentMethodDetails?.card?.brand || null,
+        paymentLast4: paymentMethodDetails?.card?.last4 || null,
+        feeAmount: charge.application_fee_amount || null,
+        netAmount: netAmount,
       },
     };
   } catch (error) {

@@ -11,8 +11,13 @@ export const savePayment = async (
       id, stripe_created_at, stripe_customer_id, stripe_charge_id,
       email, amount, currency, status, payment_method_type,
       description, receipt_url, promo_code, user_agent, ip_address, country,
+      customer_name, postal_code, city, state,
+      payment_brand, payment_last4,
+      fee_amount, net_amount,
+      refunded_at, refund_reason, disputed_at, dispute_reason,
+      parent_payment_id,
       created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
     [
       data.id,
       data.stripeCreatedAt.toISOString(),
@@ -24,11 +29,24 @@ export const savePayment = async (
       data.status,
       data.paymentMethodType,
       data.description,
-      null,
+      null, 
       data.promoCode,
       data.userAgent,
       data.ipAddress,
       data.country,
+      data.customerName,
+      data.postalCode,
+      data.city,
+      data.state,
+      data.paymentBrand,
+      data.paymentLast4,
+      data.feeAmount,
+      data.netAmount,
+      data.refundedAt?.toISOString() || null,
+      data.refundReason,
+      data.disputedAt?.toISOString() || null,
+      data.disputeReason,
+      data.parentPaymentId,
     ]
   );
 
@@ -66,13 +84,39 @@ export const updatePaymentCharge = async (
   chargeId: string,
   receiptUrl: string | null,
   paymentMethodType: string | null,
-  country: string | null
+  country: string | null,
+  customerName: string | null,
+  postalCode: string | null,
+  city: string | null,
+  state: string | null,
+  paymentBrand: string | null,
+  paymentLast4: string | null,
+  feeAmount: number | null,
+  netAmount: number | null
 ): Promise<{ success: boolean; error?: string }> => {
   const result = await turso.execute(
     `UPDATE payments
-     SET stripe_charge_id = ?, receipt_url = ?, payment_method_type = ?, country = ?, updated_at = datetime('now')
+     SET stripe_charge_id = ?, receipt_url = ?, payment_method_type = ?, country = ?,
+         customer_name = ?, postal_code = ?, city = ?, state = ?,
+         payment_brand = ?, payment_last4 = ?,
+         fee_amount = ?, net_amount = ?,
+         updated_at = datetime('now')
      WHERE id = ?`,
-    [chargeId, receiptUrl, paymentMethodType, country, paymentIntentId]
+    [
+      chargeId,
+      receiptUrl,
+      paymentMethodType,
+      country,
+      customerName,
+      postalCode,
+      city,
+      state,
+      paymentBrand,
+      paymentLast4,
+      feeAmount,
+      netAmount,
+      paymentIntentId,
+    ]
   );
 
   if (!result.success) {
@@ -134,6 +178,35 @@ export const createPaymentRepository = (turso: TursoClient): PaymentRepository =
   getByEmail: (email: string) => getPaymentByEmail(turso, email),
   save: (payment: PaymentData) => savePayment(turso, payment),
   updateStatus: (paymentId: string, status: string) => updatePaymentStatus(turso, paymentId, status),
-  updateCharge: (paymentId: string, chargeId: string, receiptUrl: string | null, paymentMethodType: string | null, country: string | null) =>
-    updatePaymentCharge(turso, paymentId, chargeId, receiptUrl, paymentMethodType, country),
+  updateCharge: (
+    paymentId: string,
+    chargeId: string,
+    receiptUrl: string | null,
+    paymentMethodType: string | null,
+    country: string | null,
+    customerName: string | null,
+    postalCode: string | null,
+    city: string | null,
+    state: string | null,
+    paymentBrand: string | null,
+    paymentLast4: string | null,
+    feeAmount: number | null,
+    netAmount: number | null
+  ) =>
+    updatePaymentCharge(
+      turso,
+      paymentId,
+      chargeId,
+      receiptUrl,
+      paymentMethodType,
+      country,
+      customerName,
+      postalCode,
+      city,
+      state,
+      paymentBrand,
+      paymentLast4,
+      feeAmount,
+      netAmount
+    ),
 });

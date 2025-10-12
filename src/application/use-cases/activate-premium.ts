@@ -36,7 +36,20 @@ const buildPaymentDataFromIntent = (paymentIntent: Stripe.PaymentIntent, email: 
     promoCode: paymentIntent.metadata.promoCode || null,
     userAgent: paymentIntent.metadata.userAgent || null,
     ipAddress: paymentIntent.metadata.ipAddress || null,
-    country: null, 
+    country: null,
+    customerName: null,
+    postalCode: null,
+    city: null,
+    state: null,
+    paymentBrand: null,
+    paymentLast4: null,
+    feeAmount: null,
+    netAmount: null,
+    refundedAt: null,
+    refundReason: null,
+    disputedAt: null,
+    disputeReason: null,
+    parentPaymentId: null,
   };
 };
 

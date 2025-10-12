@@ -10,6 +10,14 @@ export interface PaymentRepository {
     chargeId: string,
     receiptUrl: string | null,
     paymentMethodType: string | null,
-    country: string | null
+    country: string | null,
+    customerName: string | null,
+    postalCode: string | null,
+    city: string | null,
+    state: string | null,
+    paymentBrand: string | null,
+    paymentLast4: string | null,
+    feeAmount: number | null,
+    netAmount: number | null
   ): Promise<{ success: boolean; error?: string }>;
 }
