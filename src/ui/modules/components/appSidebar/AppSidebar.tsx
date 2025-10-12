@@ -47,7 +47,6 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-
               <Logo />
           </SidebarMenuItem>
         </SidebarMenu>

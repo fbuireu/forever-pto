@@ -8,8 +8,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Crown, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { Lock } from 'src/components/animate-ui/icons/lock';
+import { z } from 'zod';
 
 interface UpgradeModalProps {
   open: boolean;
@@ -56,7 +56,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
       setStep(Step.SUCCESS);
       setTimeout(() => {
         handleClose();
-      }, 1500);
+      }, 7500);
     } else {
       form.setError('email', {
         type: 'manual',

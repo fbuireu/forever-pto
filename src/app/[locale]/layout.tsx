@@ -1,10 +1,10 @@
 import { Toaster } from '@const/components/ui/sonner';
 import { cn } from '@const/lib/utils';
 import { routing } from '@infrastructure/i18n/routing';
+import '@styles/index.css';
 import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { CookieConsent } from '@ui/modules/components/core/CookieConsent';
 import { Donate } from '@ui/modules/components/core/Donate';
-import { ErrorBoundary } from '@ui/modules/components/core/ErrorBoundary';
 import { SiteTitle } from '@ui/modules/components/core/SiteTitle';
 import { Footer } from '@ui/modules/components/footer/Footer';
 import { StoresInitializer } from '@ui/store/StoresInitializer';
@@ -15,7 +15,6 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { SidebarProvider } from 'src/components/animate-ui/radix/sidebar';
-import '../globals.css';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -47,34 +46,34 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
   }
 
   return (
+    // <ErrorBoundary>
     <html lang={locale}>
-      <ErrorBoundary>
-        <body className={cn(geistSans.variable, geistMono.variable, 'antialiased')}>
-          <NextIntlClientProvider>
-            <ThemeProvider
-              attribute='data-theme'
-              defaultTheme='system'
-              storageKey='theme'
-              enableSystem
-              disableTransitionOnChange
-            >
-              <SidebarProvider>
-                <StoresInitializer userCountry={userCountry} />
-                <AppSidebar locale={locale}>
-                  <SiteTitle />
-                  {children}
-                  <Toaster />
-                  <Donate />
-                  <PremiumModal />
-                  <CookieConsent />
-                </AppSidebar>
-              </SidebarProvider>
-              <Footer />
-            </ThemeProvider>
-          </NextIntlClientProvider>
-        </body>
-      </ErrorBoundary>
+      <body className={cn(geistSans.variable, geistMono.variable, 'antialiased')}>
+        <NextIntlClientProvider>
+          <ThemeProvider
+            attribute='data-theme'
+            defaultTheme='system'
+            storageKey='theme'
+            enableSystem
+            disableTransitionOnChange
+          >
+            <SidebarProvider>
+              <StoresInitializer userCountry={userCountry} />
+              <AppSidebar locale={locale}>
+                <SiteTitle />
+                {children}
+                <Toaster />
+                <Donate />
+                <PremiumModal />
+                <CookieConsent />
+              </AppSidebar>
+            </SidebarProvider>
+            <Footer />
+          </ThemeProvider>
+        </NextIntlClientProvider>
+      </body>
     </html>
+    // </ErrorBoundary>
   );
 };
 

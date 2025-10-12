@@ -93,3 +93,30 @@ export const getPaymentById = async (
     data: (result.data as unknown[])[0] as PaymentData,
   };
 };
+
+export const getPaymentByEmail = async (
+  turso: TursoClient,
+  email: string
+): Promise<{ success: boolean; data?: PaymentData; error?: string }> => {
+  const result = await turso.execute(
+    `SELECT * FROM payments 
+     WHERE email = ? 
+     AND status = 'succeeded' 
+     ORDER BY stripe_created_at DESC 
+     LIMIT 1`,
+    [email]
+  );
+
+  if (!result.success) {
+    return { success: false, error: result.error };
+  }
+
+  if (!result.data || (result.data as unknown[]).length === 0) {
+    return { success: true, data: undefined };
+  }
+
+  return {
+    success: true,
+    data: (result.data as unknown[])[0] as PaymentData,
+  };
+};

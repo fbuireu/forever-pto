@@ -12,7 +12,7 @@ import { extractChargeId, extractCustomerId } from '@infrastructure/services/pay
 import Stripe from 'stripe';
 import { ZodError } from 'zod';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2025-09-30.clover',
 });
 

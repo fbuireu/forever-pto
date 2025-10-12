@@ -11,31 +11,46 @@ export type ContactErrorType = (typeof CONTACT_ERROR_TYPES)[keyof typeof CONTACT
 export interface ContactError {
   type: ContactErrorType;
   message: string;
+  code?: string;
+  details?: Record<string, unknown>;
 }
 
+const DEFAULT_ERROR_MESSAGES: Record<ContactErrorType, string> = {
+  [CONTACT_ERROR_TYPES.VALIDATION_ERROR]: 'Invalid input data provided.',
+  [CONTACT_ERROR_TYPES.EMAIL_SEND_FAILED]: 'Failed to send email. Please try again.',
+  [CONTACT_ERROR_TYPES.SAVE_FAILED]: 'Email sent but failed to save contact. Please try again.',
+  [CONTACT_ERROR_TYPES.RENDER_FAILED]: 'Failed to prepare email. Please try again.',
+  [CONTACT_ERROR_TYPES.UNKNOWN]: 'An unexpected error occurred. Please try again.',
+} as const;
+
 export const createContactError = {
-  validation: (message: string): ContactError => ({
+  validation: (message?: string, details?: Record<string, unknown>): ContactError => ({
     type: CONTACT_ERROR_TYPES.VALIDATION_ERROR,
-    message,
+    message: message ?? DEFAULT_ERROR_MESSAGES[CONTACT_ERROR_TYPES.VALIDATION_ERROR],
+    details,
   }),
 
-  emailSendFailed: (): ContactError => ({
+  emailSendFailed: (message?: string, code?: string): ContactError => ({
     type: CONTACT_ERROR_TYPES.EMAIL_SEND_FAILED,
-    message: 'Failed to send email. Please try again.',
+    message: message ?? DEFAULT_ERROR_MESSAGES[CONTACT_ERROR_TYPES.EMAIL_SEND_FAILED],
+    code,
   }),
 
-  saveFailed: (): ContactError => ({
+  saveFailed: (message?: string): ContactError => ({
     type: CONTACT_ERROR_TYPES.SAVE_FAILED,
-    message: 'Email sent but failed to save contact. Please try again.',
+    message: message ?? DEFAULT_ERROR_MESSAGES[CONTACT_ERROR_TYPES.SAVE_FAILED],
   }),
 
-  renderFailed: (): ContactError => ({
+  renderFailed: (message?: string, details?: Record<string, unknown>): ContactError => ({
     type: CONTACT_ERROR_TYPES.RENDER_FAILED,
-    message: 'Failed to prepare email. Please try again.',
+    message: message ?? DEFAULT_ERROR_MESSAGES[CONTACT_ERROR_TYPES.RENDER_FAILED],
+    details,
   }),
 
-  unknown: (message?: string): ContactError => ({
+  unknown: (message?: string, details?: Record<string, unknown>): ContactError => ({
     type: CONTACT_ERROR_TYPES.UNKNOWN,
-    message: message ?? 'An unexpected error occurred. Please try again.',
+    message: message ?? DEFAULT_ERROR_MESSAGES[CONTACT_ERROR_TYPES.UNKNOWN],
+    details,
   }),
-};
+} as const;
+

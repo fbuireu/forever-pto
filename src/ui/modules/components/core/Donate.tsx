@@ -36,11 +36,10 @@ export const Donate = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
 
-  const { premiumKey, setPremiumStatus, userEmail, setEmail, getCurrencyFromLocale, currency, currencySymbol } =
+  const { premiumKey, userEmail, setEmail, getCurrencyFromLocale, currency, currencySymbol } =
     usePremiumStore(
       useShallow((state) => ({
         premiumKey: state.premiumKey,
-        setPremiumStatus: state.setPremiumStatus,
         userEmail: state.userEmail,
         setEmail: state.setEmail,
         getCurrencyFromLocale: state.getCurrencyFromLocale,
@@ -95,13 +94,10 @@ export const Donate = () => {
     [setEmail]
   );
 
-  const handlePaymentSuccess = useCallback(() => {
+  const handlePaymentSuccess = useCallback(async () => {
     if (!paymentState) return;
 
-    setPremiumStatus({
-      email: paymentState.data.email,
-      premiumKey: paymentState.clientSecret,
-    });
+    await usePremiumStore.getState().checkExistingSession();
 
     toast.success('Payment successful!', {
       description: 'Thank you for your support! You now have premium access.',
@@ -111,7 +107,7 @@ export const Donate = () => {
     form.reset();
     setPaymentState(null);
     setIsOpen(false);
-  }, [paymentState, setPremiumStatus, form]);
+  }, [paymentState, form]);
 
   const handlePaymentCancel = useCallback(() => {
     setPaymentState(null);

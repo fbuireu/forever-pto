@@ -2,6 +2,7 @@
 
 import { GradientText } from 'src/components/animate-ui/primitives/texts/gradient';
 import { SidebarMenuButton, useSidebar } from 'src/components/animate-ui/radix/sidebar';
+import { OceanSunset } from './OceanSunset';
 import { PalmTree } from './PalmTree';
 
 export function Logo() {
@@ -15,20 +16,17 @@ export function Logo() {
           <div className='flex text-center justify-center gap-2'>
             <p className='text-3xl font-bold'>Forever</p>
             <p className='text-3xl font-bold -mr-3'>
-              <GradientText
-                text='P'
-                gradient='linear-gradient(90deg, 
-          #eab308 0%,  
-          #14b8a6 20%,   
-          #f97316 50%,  
-          #a855f7 80%,   
-          #eab308 100%    
-        )'
-              />
+              <GradientText text='P' gradient='var(--brand-gradient)' />
             </p>
           </div>
         )}
         <PalmTree width={isOpen ? 40 : 30} height={isOpen ? 40 : 30} gradientId='flowGradientLogo' />
+        <OceanSunset
+          width={isOpen ? 20 : 15}
+          height={isOpen ? 20 : 15}
+          gradientId='flowGradientTitle'
+          className={'inline-block right-0'}
+        />
       </div>
     </SidebarMenuButton>
   );

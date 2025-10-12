@@ -37,7 +37,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<stri
       return submitError.message ?? 'Payment submission failed';
     }
 
-    const { error } = await stripe.confirmPayment({
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         return_url: returnUrl,
@@ -50,6 +50,15 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<stri
       return error.message ?? 'Payment confirmation failed';
     }
 
+    await fetch('/api/check-session', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        premiumKey: paymentIntent.id,
+      }),
+    });
     return null;
   } catch (error) {
     console.error('Payment error:', error);
