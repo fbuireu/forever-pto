@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     const paymentValidator = createPaymentValidator(stripe);
     const paymentRepository = createPaymentRepository(turso);
 
-    const deps = {
+    const params = {
       sessionRepository,
       paymentValidator,
       paymentRepository,
@@ -68,11 +68,10 @@ export async function POST(request: NextRequest) {
     let result;
 
     if (premiumKey) {
-      console.log(`Activating premium for ${email} with payment ${premiumKey}`);
-      result = await activateWithPayment({ email, paymentIntentId: premiumKey }, deps);
+      result = await activateWithPayment({ email, paymentIntentId: premiumKey }, params);
     } else {
       console.log(`Checking existing payment for ${email}`);
-      result = await activateWithEmail({ email }, deps);
+      result = await activateWithEmail({ email }, params);
     }
 
     if (!result.success) {

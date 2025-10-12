@@ -9,6 +9,7 @@ export interface PaymentRepository {
     paymentId: string,
     chargeId: string,
     receiptUrl: string | null,
-    paymentMethodType: string | null
+    paymentMethodType: string | null,
+    country: string | null
   ): Promise<{ success: boolean; error?: string }>;
 }

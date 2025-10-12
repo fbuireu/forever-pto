@@ -5,31 +5,31 @@ import type { PaymentSucceededEvent } from '../events/types';
 import { PaymentRepository } from '../repository/types';
 import type { ChargeService } from '../services/charge';
 
-interface HandlePaymentSucceededDeps {
+interface HandlePaymentSucceededParams {
   paymentRepository: PaymentRepository;
   chargeService: ChargeService;
 }
 
 export const handlePaymentSucceeded = async (
   event: PaymentSucceededEvent,
-  deps: HandlePaymentSucceededDeps
+  params: HandlePaymentSucceededParams
 ): Promise<void> => {
   try {
-    const existingPayment = await deps.paymentRepository.getById(event.paymentId);
+    const existingPayment = await params.paymentRepository.getById(event.paymentId);
 
     if (existingPayment.success && existingPayment.data) {
       if (existingPayment.data.status === 'succeeded') {
-        await updateChargeDetails(event, deps);
+        await updateChargeDetails(event, params);
         return;
       }
 
-      await updateExistingPayment(event, deps.paymentRepository);
+      await updateExistingPayment(event, params.paymentRepository);
     } else {
       console.warn('Payment not found in DB, creating from webhook:', event.paymentId);
-      await createPaymentFromWebhook(event, deps.paymentRepository);
+      await createPaymentFromWebhook(event, params.paymentRepository);
     }
 
-    await updateChargeDetails(event, deps);
+    await updateChargeDetails(event, params);
   } catch (error) {
     console.error('Error handling successful payment:', error);
     throw error;
@@ -59,6 +59,9 @@ const createPaymentFromWebhook = async (event: PaymentSucceededEvent, repository
     paymentMethodType: event.paymentIntent.payment_method_types?.[0] || null,
     description: event.paymentIntent.description || null,
     promoCode: event.paymentIntent.metadata.promoCode || null,
+    userAgent: event.paymentIntent.metadata.userAgent || null,
+    ipAddress: event.paymentIntent.metadata.ipAddress || null,
+    country: null,
   };
 
   const result = await repository.save(paymentData);
@@ -68,7 +71,7 @@ const createPaymentFromWebhook = async (event: PaymentSucceededEvent, repository
   }
 };
 
-const updateChargeDetails = async (event: PaymentSucceededEvent, deps: HandlePaymentSucceededDeps): Promise<void> => {
+const updateChargeDetails = async (event: PaymentSucceededEvent, params: HandlePaymentSucceededParams): Promise<void> => {
   if (!event.paymentIntent.latest_charge) return;
 
   const chargeId =
@@ -77,18 +80,19 @@ const updateChargeDetails = async (event: PaymentSucceededEvent, deps: HandlePay
       : event.paymentIntent.latest_charge.id;
 
   try {
-    const chargeResult = await deps.chargeService.retrieveCharge(chargeId);
+    const chargeResult = await params.chargeService.retrieveCharge(chargeId);
 
     if (!chargeResult.success || !chargeResult.data) {
       console.error('Failed to retrieve charge details:', chargeResult.error);
       return;
     }
 
-    const result = await deps.paymentRepository.updateCharge(
+    const result = await params.paymentRepository.updateCharge(
       event.paymentId,
       chargeResult.data.id,
       chargeResult.data.receiptUrl,
-      chargeResult.data.paymentMethodType
+      chargeResult.data.paymentMethodType,
+      chargeResult.data.country
     );
 
     if (!result.success) {

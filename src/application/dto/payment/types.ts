@@ -52,4 +52,7 @@ export interface PaymentData {
   paymentMethodType: string | null;
   description: string | null;
   promoCode: string | null;
+  userAgent: string | null;
+  ipAddress: string | null;
+  country: string | null;
 }

@@ -10,8 +10,9 @@ export const savePayment = async (
     `INSERT OR IGNORE INTO payments (
       id, stripe_created_at, stripe_customer_id, stripe_charge_id,
       email, amount, currency, status, payment_method_type,
-      description, receipt_url, promo_code, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+      description, receipt_url, promo_code, user_agent, ip_address, country,
+      created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
     [
       data.id,
       data.stripeCreatedAt.toISOString(),
@@ -25,6 +26,9 @@ export const savePayment = async (
       data.description,
       null,
       data.promoCode,
+      data.userAgent,
+      data.ipAddress,
+      data.country,
     ]
   );
 
@@ -42,9 +46,11 @@ export const updatePaymentStatus = async (
 ): Promise<{ success: boolean; error?: string }> => {
   const result = await turso.execute(
     `UPDATE payments
-     SET status = ?, succeeded_at = datetime('now'), updated_at = datetime('now')
+     SET status = ?,
+         succeeded_at = CASE WHEN ? = 'succeeded' THEN datetime('now') ELSE succeeded_at END,
+         updated_at = datetime('now')
      WHERE id = ?`,
-    [status, paymentIntentId]
+    [status, status, paymentIntentId]
   );
 
   if (!result.success) {
@@ -59,13 +65,14 @@ export const updatePaymentCharge = async (
   paymentIntentId: string,
   chargeId: string,
   receiptUrl: string | null,
-  paymentMethodType: string | null
+  paymentMethodType: string | null,
+  country: string | null
 ): Promise<{ success: boolean; error?: string }> => {
   const result = await turso.execute(
     `UPDATE payments
-     SET stripe_charge_id = ?, receipt_url = ?, payment_method_type = ?, updated_at = datetime('now')
+     SET stripe_charge_id = ?, receipt_url = ?, payment_method_type = ?, country = ?, updated_at = datetime('now')
      WHERE id = ?`,
-    [chargeId, receiptUrl, paymentMethodType, paymentIntentId]
+    [chargeId, receiptUrl, paymentMethodType, country, paymentIntentId]
   );
 
   if (!result.success) {
@@ -127,6 +134,6 @@ export const createPaymentRepository = (turso: TursoClient): PaymentRepository =
   getByEmail: (email: string) => getPaymentByEmail(turso, email),
   save: (payment: PaymentData) => savePayment(turso, payment),
   updateStatus: (paymentId: string, status: string) => updatePaymentStatus(turso, paymentId, status),
-  updateCharge: (paymentId: string, chargeId: string, receiptUrl: string | null, paymentMethodType: string | null) =>
-    updatePaymentCharge(turso, paymentId, chargeId, receiptUrl, paymentMethodType),
+  updateCharge: (paymentId: string, chargeId: string, receiptUrl: string | null, paymentMethodType: string | null, country: string | null) =>
+    updatePaymentCharge(turso, paymentId, chargeId, receiptUrl, paymentMethodType, country),
 });

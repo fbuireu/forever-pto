@@ -6,13 +6,15 @@ interface CreatePaymentIntentParams {
   email: string;
   promoCode?: string;
   discountInfo: DiscountInfo | null;
+  userAgent?: string | null;
+  ipAddress?: string | null;
 }
 
 export const createPaymentIntent = async (
   stripe: Stripe,
   params: CreatePaymentIntentParams
 ): Promise<Stripe.PaymentIntent> => {
-  const { amount, email, promoCode, discountInfo } = params;
+  const { amount, email, promoCode, discountInfo, userAgent, ipAddress } = params;
 
   return await stripe.paymentIntents.create({
     amount: Math.round(amount * 100),
@@ -23,6 +25,8 @@ export const createPaymentIntent = async (
       type: 'donation',
       email,
       promoCode: promoCode || '',
+      userAgent: userAgent || '',
+      ipAddress: ipAddress || '',
       ...(discountInfo && {
         couponId: discountInfo.couponId,
         couponName: discountInfo.couponName || '',

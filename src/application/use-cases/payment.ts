@@ -10,6 +10,7 @@ import { createPaymentIntent } from '@infrastructure/services/payments/provider/
 import { validatePromoCode } from '@infrastructure/services/payments/provider/promo-code';
 import { savePayment } from '@infrastructure/services/payments/repository';
 import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
+import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { ZodError } from 'zod';
 
@@ -17,6 +18,9 @@ const stripe = getStripeServerInstance();
 const turso = getTursoClient();
 
 export async function createPayment(params: CreatePaymentInput): Promise<PaymentDTO> {
+  const headersList = await headers();
+  const userAgent = headersList.get('user-agent') || null;
+  const ipAddress = headersList.get('x-forwarded-for') || headersList.get('x-real-ip') || null;
   try {
     const validated = createPaymentSchema.parse(params);
 
@@ -42,6 +46,8 @@ export async function createPayment(params: CreatePaymentInput): Promise<Payment
       email: validated.email,
       promoCode: validated.promoCode,
       discountInfo,
+      userAgent,
+      ipAddress,
     });
 
     const saveResult = await savePayment(turso, {
@@ -56,6 +62,9 @@ export async function createPayment(params: CreatePaymentInput): Promise<Payment
       paymentMethodType: paymentIntent.payment_method_types?.[0] || null,
       description: paymentIntent.description || null,
       promoCode: validated.promoCode || null,
+      userAgent,
+      ipAddress,
+      country: null, 
     });
 
     if (!saveResult.success) {

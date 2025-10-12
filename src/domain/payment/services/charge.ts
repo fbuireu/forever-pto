@@ -5,6 +5,7 @@ export interface ChargeService {
       id: string;
       receiptUrl: string | null;
       paymentMethodType: string | null;
+      country: string | null;
     };
     error?: string;
   }>;

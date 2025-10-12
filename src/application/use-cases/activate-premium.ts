@@ -15,7 +15,7 @@ interface ActivatePremiumWithEmailParams {
   email: string;
 }
 
-interface ActivatePremiumDeps {
+interface ActivatePremiumParams {
   sessionRepository: SessionRepository;
   paymentValidator: PaymentValidator;
   paymentRepository: PaymentRepository;
@@ -34,16 +34,19 @@ const buildPaymentDataFromIntent = (paymentIntent: Stripe.PaymentIntent, email: 
     paymentMethodType: paymentIntent.payment_method_types?.[0] || null,
     description: paymentIntent.description || null,
     promoCode: paymentIntent.metadata.promoCode || null,
+    userAgent: paymentIntent.metadata.userAgent || null,
+    ipAddress: paymentIntent.metadata.ipAddress || null,
+    country: null, 
   };
 };
 
 export const activateWithPayment = async (
-  params: ActivatePremiumWithPaymentParams,
-  deps: ActivatePremiumDeps
+  input: ActivatePremiumWithPaymentParams,
+  params: ActivatePremiumParams
 ): Promise<PremiumActivationResult> => {
-  const { email, paymentIntentId } = params;
+  const { email, paymentIntentId } = input;
 
-  const validation = await deps.paymentValidator.validatePaymentIntent(paymentIntentId);
+  const validation = await params.paymentValidator.validatePaymentIntent(paymentIntentId);
 
   if (!validation.valid) {
     return {
@@ -64,11 +67,11 @@ export const activateWithPayment = async (
   }
 
   if (validation.paymentIntent) {
-    const existingPayment = await deps.paymentRepository.getById(paymentIntentId);
+    const existingPayment = await params.paymentRepository.getById(paymentIntentId);
 
     if (existingPayment.success && existingPayment.data) {
       if (existingPayment.data.status !== 'succeeded' && validation.paymentIntent.status === 'succeeded') {
-        const updateResult = await deps.paymentRepository.updateStatus(paymentIntentId, 'succeeded');
+        const updateResult = await params.paymentRepository.updateStatus(paymentIntentId, 'succeeded');
 
         if (!updateResult.success) {
           console.error('Failed to update payment status:', updateResult.error);
@@ -76,7 +79,7 @@ export const activateWithPayment = async (
       }
     } else {
       const paymentData = buildPaymentDataFromIntent(validation.paymentIntent, email);
-      const saveResult = await deps.paymentRepository.save(paymentData);
+      const saveResult = await params.paymentRepository.save(paymentData);
 
       if (!saveResult.success) {
         console.error('Failed to save payment to DB:', saveResult.error);
@@ -86,7 +89,7 @@ export const activateWithPayment = async (
     }
   }
 
-  const token = await deps.sessionRepository.create({
+  const token = await params.sessionRepository.create({
     email,
     paymentIntentId,
   });
@@ -100,12 +103,12 @@ export const activateWithPayment = async (
 };
 
 export const activateWithEmail = async (
-  params: ActivatePremiumWithEmailParams,
-  deps: ActivatePremiumDeps
+  input: ActivatePremiumWithEmailParams,
+  params: ActivatePremiumParams
 ): Promise<PremiumActivationResult> => {
-  const { email } = params;
+  const { email } = input;
 
-  const paymentResult = await deps.paymentRepository.getByEmail(email);
+  const paymentResult = await params.paymentRepository.getByEmail(email);
 
   if (!paymentResult.success || !paymentResult.data) {
     return {
@@ -127,7 +130,7 @@ export const activateWithEmail = async (
     };
   }
 
-  const token = await deps.sessionRepository.create({
+  const token = await params.sessionRepository.create({
     email,
     paymentIntentId: payment.id,
   });

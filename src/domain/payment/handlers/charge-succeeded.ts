@@ -1,13 +1,13 @@
 import type { ChargeSucceededEvent } from '../events/types';
 import { PaymentRepository } from '../repository/types';
 
-interface HandleChargeSucceededDeps {
+interface HandleChargeSucceededParams {
   paymentRepository: PaymentRepository;
 }
 
 export const handleChargeSucceeded = async (
   event: ChargeSucceededEvent,
-  deps: HandleChargeSucceededDeps
+  params: HandleChargeSucceededParams
 ): Promise<void> => {
   if (!event.paymentIntentId) {
     console.error('No payment intent ID found in charge');
@@ -15,11 +15,12 @@ export const handleChargeSucceeded = async (
   }
 
   try {
-    const result = await deps.paymentRepository.updateCharge(
+    const result = await params.paymentRepository.updateCharge(
       event.paymentIntentId,
       event.chargeId,
       event.charge.receipt_url,
-      event.charge.payment_method_details?.type || null
+      event.charge.payment_method_details?.type || null,
+      event.charge.billing_details?.address?.country || null
     );
 
     if (!result.success) {

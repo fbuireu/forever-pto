@@ -6,7 +6,7 @@ const retrieveCharge = async (
   chargeId: string
 ): Promise<{
   success: boolean;
-  data?: { id: string; receiptUrl: string | null; paymentMethodType: string | null };
+  data?: { id: string; receiptUrl: string | null; paymentMethodType: string | null; country: string | null };
   error?: string;
 }> => {
   try {
@@ -18,6 +18,7 @@ const retrieveCharge = async (
         id: charge.id,
         receiptUrl: charge.receipt_url,
         paymentMethodType: charge.payment_method_details?.type || null,
+        country: charge.billing_details?.address?.country || null,
       },
     };
   } catch (error) {
