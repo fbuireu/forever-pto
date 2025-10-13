@@ -2,6 +2,7 @@
 
 import { type ContactFormData, contactSchema } from '@application/dto/contact/schema';
 import { usePremiumStore } from '@application/stores/premium';
+import { sendContactEmail } from '@application/use-cases/contact';
 import { Button } from '@const/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@const/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
@@ -14,7 +15,6 @@ import { useForm } from 'react-hook-form';
 import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
 import { useShallow } from 'zustand/react/shallow';
 import { FormButtons } from '../core/FormButtons';
-import { sendContactEmail } from '@application/use-cases/contact';
 
 interface ContactModalProps {
   open: boolean;
@@ -85,14 +85,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
         {step === Step.INPUT && (
           <Form {...form}>
-            <form
-              action={async () => {
-                const data = form.getValues();
-                await onSubmit(data);
-              }}
-              className='space-y-4'
-              noValidate
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4' noValidate>
               <FormField
                 control={form.control}
                 name='name'
