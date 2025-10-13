@@ -6,7 +6,7 @@ import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
-import { GetRegionParams } from './types';
+import type { GetRegionParams } from './types';
 
 export interface LocationState {
   countries: CountryDTO[];

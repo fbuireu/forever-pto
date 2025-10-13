@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@const/components/ui/card';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers';
 import { BarChart3 } from 'lucide-react';
-import { Bar, BarChart, CartesianGrid, Cell, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { PremiumFeature } from '../premium/PremiumFeature';
 import { COLOR_SCHEMES } from './const';
 

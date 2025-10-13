@@ -46,7 +46,7 @@ export const SummarySkeleton = () => {
             </div>
           </div>
           <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-            {Array.from({ length: 4 }).map((_, i) => (
+            {Array.from({ length: 4 }).map(() => (
               <div
                 key={crypto.randomUUID()}
                 className='flex flex-col items-center p-4 bg-muted/30 rounded-lg space-y-2'
@@ -61,7 +61,7 @@ export const SummarySkeleton = () => {
             ))}
           </div>
           <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3'>
-            {Array.from({ length: 6 }).map((_, i) => (
+            {Array.from({ length: 6 }).map(() => (
               <div key={crypto.randomUUID()} className='p-3 bg-muted/30 rounded-lg text-center space-y-1'>
                 <Skeleton className='w-4 h-4 mx-auto rounded-sm' />
                 <Skeleton className='h-5 w-8 mx-auto' />
@@ -75,7 +75,7 @@ export const SummarySkeleton = () => {
               <Skeleton className='h-4 w-32' />
             </div>
             <div className='grid grid-cols-3 gap-4 text-center'>
-              {Array.from({ length: 3 }).map((_, i) => (
+              {Array.from({ length: 3 }).map(() => (
                 <div key={crypto.randomUUID()} className='space-y-1'>
                   <Skeleton className='h-3 w-20 mx-auto' />
                   <Skeleton className='h-5 w-12 mx-auto' />

@@ -1,11 +1,12 @@
-// @ts-nocheck
-'use client';
+//@ts-nocheck
+// eslint-disable
+
 import * as React from 'react';
 import { Tabs as TabsPrimitive } from '@base-ui-components/react/tabs';
 import { motion, AnimatePresence, type HTMLMotionProps } from 'motion/react';
 import { useControlledState } from 'src/hooks/use-controlled-state';
 import { getStrictContext } from 'src/lib/get-strict-context';
-import { type HighlightProps, type HighlightItemProps, HighlightItem } from '../effects/highlight';
+import { type HighlightProps, type HighlightItemProps, HighlightItem, Highlight } from '../effects/highlight';
 
 type TabsContextType = {
   value: string | undefined;

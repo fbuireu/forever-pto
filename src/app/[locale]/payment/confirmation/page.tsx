@@ -3,9 +3,9 @@ import { Button } from '@const/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
 import { CheckCircle2, XCircle } from 'lucide-react';
-import { Locale } from 'next-intl';
+import type { Locale } from 'next-intl';
 import { redirect } from 'next/navigation';
-import Stripe from 'stripe';
+import type Stripe from 'stripe';
 
 const stripe = getStripeServerInstance();
 
@@ -25,11 +25,43 @@ const getCurrencySymbol = (locale: string, currency: string): string => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     });
-    return formatter.formatToParts(0).find(({ type }) => type === 'currency')?.value || currency;
+    return formatter.formatToParts(0).find(({ type }) => type === 'currency')?.value ?? currency;
   } catch {
     return currency;
   }
 };
+
+function PaymentError() {
+  return (
+    <div className='min-h-screen flex items-center justify-center p-4 bg-background'>
+      <Card className='w-full max-w-md border-destructive/50'>
+        <CardHeader className='text-center'>
+          <div className='mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10'>
+            <XCircle className='h-6 w-6 text-destructive' />
+          </div>
+          <CardTitle className='text-destructive'>Payment Failed</CardTitle>
+          <CardDescription>We couldn&apos;t process your payment. You have not been charged.</CardDescription>
+        </CardHeader>
+        <CardContent className='space-y-4'>
+          <div className='rounded-lg bg-muted p-4 text-sm text-muted-foreground'>
+            <p className='mb-2 font-medium text-foreground'>What happened?</p>
+            <ul className='space-y-1 list-disc list-inside'>
+              <li>Your payment may have been declined</li>
+              <li>Authentication may have failed</li>
+              <li>The session may have expired</li>
+            </ul>
+          </div>
+          <div className='flex flex-col gap-2'>
+            <Button asChild className='w-full'>
+              <Link href='/'>Return to homepage</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 
 export default async function PaymentSuccessPage({ searchParams, params }: Readonly<PaymentSuccessParams>) {
   const [{ payment_intent: paymentIntentId }, { locale }] = await Promise.all([searchParams, params]);
@@ -99,33 +131,3 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
   );
 }
 
-function PaymentError() {
-  return (
-    <div className='min-h-screen flex items-center justify-center p-4 bg-background'>
-      <Card className='w-full max-w-md border-destructive/50'>
-        <CardHeader className='text-center'>
-          <div className='mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10'>
-            <XCircle className='h-6 w-6 text-destructive' />
-          </div>
-          <CardTitle className='text-destructive'>Payment Failed</CardTitle>
-          <CardDescription>We couldn't process your payment. You have not been charged.</CardDescription>
-        </CardHeader>
-        <CardContent className='space-y-4'>
-          <div className='rounded-lg bg-muted p-4 text-sm text-muted-foreground'>
-            <p className='mb-2 font-medium text-foreground'>What happened?</p>
-            <ul className='space-y-1 list-disc list-inside'>
-              <li>Your payment may have been declined</li>
-              <li>Authentication may have failed</li>
-              <li>The session may have expired</li>
-            </ul>
-          </div>
-          <div className='flex flex-col gap-2'>
-            <Button asChild className='w-full'>
-              <Link href='/'>Return to homepage</Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}

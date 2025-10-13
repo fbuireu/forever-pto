@@ -24,12 +24,12 @@ export const createPaymentIntent = async (
     metadata: {
       type: 'donation',
       email,
-      promoCode: promoCode || '',
-      userAgent: userAgent || '',
-      ipAddress: ipAddress || '',
+      promoCode: promoCode ?? '',
+      userAgent: userAgent ?? '',
+      ipAddress: ipAddress ?? '',
       ...(discountInfo && {
         couponId: discountInfo.couponId,
-        couponName: discountInfo.couponName || '',
+        couponName: discountInfo.couponName ?? '',
         originalAmount: discountInfo.originalAmount.toFixed(2),
         discountType: discountInfo.type,
         discountValue: discountInfo.value.toString(),

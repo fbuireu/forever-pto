@@ -1,4 +1,4 @@
-import { loadStripe, type PaymentIntent, Stripe, type StripeError } from '@stripe/stripe-js';
+import { loadStripe, type PaymentIntent, type Stripe, type StripeError } from '@stripe/stripe-js';
 import StripeNode from 'stripe';
 
 export interface PaymentResult {

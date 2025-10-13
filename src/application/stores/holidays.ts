@@ -311,7 +311,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               }));
             }
 
-            if (state.suggestion && state.suggestion.days) {
+            if (state.suggestion?.days) {
               state.suggestion = {
                 ...state.suggestion,
                 days: state.suggestion.days.map(ensureDate),

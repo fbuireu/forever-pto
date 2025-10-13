@@ -11,7 +11,7 @@ import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
-import { FromTo } from '../../core/Calendar';
+import type { FromTo } from '../../core/Calendar';
 import { formatDate } from '../../utils/formatters';
 import { calculateHolidaysInRange, calculateWeekends, calculateWorkdays } from '../../utils/helpers';
 

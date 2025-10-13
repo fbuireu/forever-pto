@@ -1,5 +1,5 @@
 import { cn } from '@const/lib/utils';
-import { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface NotificationCardProps {
   icon: LucideIcon;

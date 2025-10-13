@@ -43,8 +43,6 @@ function generateGreedyAlternatives(
 
     if (selected.length > 0) {
       const days = selected.flatMap((b) => b.ptoDays);
-      const totalEffective = selected.reduce((sum, b) => sum + b.effectiveDays, 0);
-      const efficiency = totalEffective / days.length;
 
       const combinationKey = getCombinationKey(days);
       if (!usedCombinations.has(combinationKey)) {

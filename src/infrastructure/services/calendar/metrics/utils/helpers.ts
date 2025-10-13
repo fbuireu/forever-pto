@@ -39,11 +39,11 @@ export function getTotalEffectiveDays(days: Date[], bridges?: { effectiveDays: n
   }
   return days.length;
 }
-import { HolidayDTO } from '@application/dto/holiday/types';
+import type { HolidayDTO } from '@application/dto/holiday/types';
 import { formatDate } from '@ui/modules/components/utils/formatters';
 import { eachDayOfInterval, endOfYear, getMonth, isWeekend, startOfToday, startOfYear } from 'date-fns';
-import { Locale } from 'next-intl';
-import { FirstLastBreak } from '../../types';
+import type { Locale } from 'next-intl';
+import type { FirstLastBreak } from '../../types';
 
 export const calculateRestBlocks = (dates: Date[]): number => {
   if (dates.length === 0) return 0;

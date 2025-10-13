@@ -1,4 +1,4 @@
-import { Locale } from 'next-intl';
+import type { Locale } from 'next-intl';
 
 export const ensureDate = (date: Date | string): Date => {
   if (typeof date === 'string') {

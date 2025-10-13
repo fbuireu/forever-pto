@@ -1,6 +1,6 @@
 'use client';
 
-import { ContactFormData, contactSchema } from '@application/dto/contact/schema';
+import { type ContactFormData, contactSchema } from '@application/dto/contact/schema';
 import { usePremiumStore } from '@application/stores/premium';
 import { Button } from '@const/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@const/components/ui/dialog';
@@ -62,7 +62,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
     if (result.success) {
       setStep(Step.SUCCESS);
     } else {
-      setErrorMessage(result.error || 'Failed to send message');
+      setErrorMessage(result.error ?? 'Failed to send message');
       setStep(Step.ERROR);
     }
   };
@@ -80,7 +80,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
             <Mail className='w-5 h-5 text-primary' />
             Contact Us
           </DialogTitle>
-          <DialogDescription>Have a question or feedback? We'd love to hear from you!</DialogDescription>
+          <DialogDescription>Have a question or feedback? We&apos;d love to hear from you!</DialogDescription>
         </DialogHeader>
 
         {step === Step.INPUT && (
@@ -167,7 +167,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
             <CircleCheckBig animateOnView loop className='w-12 h-12 text-green-500 mx-auto' />
             <div>
               <h3 className='font-semibold text-green-600'>Message Sent!</h3>
-              <p className='text-sm text-muted-foreground mt-1'>We'll get back to you as soon as possible.</p>
+              <p className='text-sm text-muted-foreground mt-1'>We&apos;ll get back to you as soon as possible.</p>
             </div>
           </div>
         )}

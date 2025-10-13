@@ -42,7 +42,7 @@ export const WorkdayCounterCalendarModal = ({
             mode={CalendarSelectionMode.RANGE}
             selected={selectedRange}
             onSelect={handleRangeSelect}
-            showNavigation={true}
+            showNavigation
             locale={locale}
             holidays={holidays}
             allowPastDays

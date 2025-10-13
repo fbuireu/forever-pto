@@ -1,7 +1,7 @@
 'use client';
 
-import { CreatePaymentInput, createPaymentSchema } from '@application/dto/payment/schema';
-import { DiscountInfo } from '@application/dto/payment/types';
+import {type  CreatePaymentInput, createPaymentSchema } from '@application/dto/payment/schema';
+import { type DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getStripeClientInstance } from '@infrastructure/clients/payments/stripe/client';
@@ -82,7 +82,7 @@ export const Donate = () => {
         setPaymentState({
           clientSecret: result.clientSecret,
           data,
-          discountInfo: result.discountInfo || null,
+          discountInfo: result.discountInfo ?? null,
         });
       } catch (error) {
         toast.error('Payment initialization failed', {

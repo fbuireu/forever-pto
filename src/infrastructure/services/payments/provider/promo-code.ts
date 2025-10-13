@@ -5,6 +5,23 @@ const MIN_FINAL_AMOUNT = 0.5;
 
 type PromoValidationResult = { success: true; data: DiscountInfo } | { success: false; error: string };
 
+const getCouponValidationError = (coupon: Stripe.Coupon): string | null => {
+  if (!coupon.valid) return 'This promo code is no longer valid';
+  if (coupon.max_redemptions && coupon.times_redeemed >= coupon.max_redemptions) {
+    return 'This promo code has reached its usage limit';
+  }
+  if (coupon.redeem_by && coupon.redeem_by < Math.floor(Date.now() / 1000)) {
+    return 'This promo code has expired';
+  }
+  return null;
+};
+
+const calculateFinalAmount = (coupon: Stripe.Coupon, amount: number): number => {
+  if (coupon.percent_off) return amount * (1 - coupon.percent_off / 100);
+  if (coupon.amount_off) return amount - coupon.amount_off / 100;
+  return amount;
+};
+
 export const validatePromoCode = async (
   stripe: Stripe,
   code: string,
@@ -50,7 +67,7 @@ export const validatePromoCode = async (
       success: true,
       data: {
         type: coupon.percent_off ? 'percent' : 'fixed',
-        value: coupon.percent_off || (coupon.amount_off ? coupon.amount_off / 100 : 0),
+        value: coupon.percent_off ?? (coupon.amount_off ? coupon.amount_off / 100 : 0),
         originalAmount: amount,
         finalAmount,
         couponId: coupon.id,
@@ -61,21 +78,4 @@ export const validatePromoCode = async (
     console.error('Promo code validation error:', error);
     return { success: false, error: 'Error validating promo code. Please try again.' };
   }
-};
-
-const getCouponValidationError = (coupon: Stripe.Coupon): string | null => {
-  if (!coupon.valid) return 'This promo code is no longer valid';
-  if (coupon.max_redemptions && coupon.times_redeemed >= coupon.max_redemptions) {
-    return 'This promo code has reached its usage limit';
-  }
-  if (coupon.redeem_by && coupon.redeem_by < Math.floor(Date.now() / 1000)) {
-    return 'This promo code has expired';
-  }
-  return null;
-};
-
-const calculateFinalAmount = (coupon: Stripe.Coupon, amount: number): number => {
-  if (coupon.percent_off) return amount * (1 - coupon.percent_off / 100);
-  if (coupon.amount_off) return amount - coupon.amount_off / 100;
-  return amount;
 };

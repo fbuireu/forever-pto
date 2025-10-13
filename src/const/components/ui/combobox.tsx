@@ -3,7 +3,7 @@
 import type { CountryDTO } from '@application/dto/country/types';
 import type { RegionDTO } from '@application/dto/region/types';
 import { cn } from '@const/lib/utils';
-import { FilterStrategy } from '@infrastructure/services/calendar/types';
+import type { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { useState } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';

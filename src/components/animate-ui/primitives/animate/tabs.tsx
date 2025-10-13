@@ -1,11 +1,12 @@
-// @ts-nocheck
+/* eslint-disable */
+//@ts-nocheck
 'use client';
 
-import * as React from 'react';
-import { motion, type Transition, type HTMLMotionProps } from 'motion/react';
+import { motion, type HTMLMotionProps, type Transition } from 'motion/react';
 import { Slot } from 'radix-ui';
+import * as React from 'react';
 import { getStrictContext } from 'src/lib/get-strict-context';
-import { HighlightProps, HighlightItemProps, HighlightItem } from '../effects/highlight';
+import { Highlight, HighlightItem, HighlightItemProps, HighlightProps } from '../effects/highlight';
 import { WithAsChild } from './slot';
 
 type TabsContextType = {
@@ -153,52 +154,115 @@ function TabsTrigger({ ref, value, asChild = false, ...props }: TabsTriggerProps
   );
 }
 
-type TabsContentsProps = React.ComponentProps<'div'> & {
+type TabsContentsProps = HTMLMotionProps<'div'> & {
   children: React.ReactNode;
   transition?: Transition;
 };
 
 function TabsContents({
   children,
-  style,
   transition = {
     type: 'spring',
     stiffness: 300,
-    damping: 32,
+    damping: 30,
     bounce: 0,
     restDelta: 0.01,
   },
   ...props
 }: TabsContentsProps) {
   const { activeValue } = useTabs();
-  const childrenArray = React.useMemo(() => React.Children.toArray(children), [children]);
-  const activeIndex = React.useMemo(
-    () =>
-      childrenArray.findIndex(
-        (child): child is React.ReactElement<{ value: string }> =>
-          React.isValidElement(child) &&
-          typeof child.props === 'object' &&
-          child.props !== null &&
-          'value' in child.props &&
-          child.props.value === activeValue
-      ),
-    [childrenArray, activeValue]
+  const childrenArray = React.Children.toArray(children);
+  const activeIndex = childrenArray.findIndex(
+    (child): child is React.ReactElement<{ value: string }> =>
+      React.isValidElement(child) &&
+      typeof child.props === 'object' &&
+      child.props !== null &&
+      'value' in child.props &&
+      child.props.value === activeValue
   );
 
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const itemRefs = React.useRef<Array<HTMLDivElement | null>>([]);
+  const [height, setHeight] = React.useState(0);
+  const roRef = React.useRef<ResizeObserver | null>(null);
+
+  const measure = React.useCallback(() => {
+    const pane = itemRefs.current[activeIndex];
+    const container = containerRef.current;
+    if (!pane || !container) return 0;
+
+    const base = pane.getBoundingClientRect().height || 0;
+
+    const cs = getComputedStyle(container);
+    const isBorderBox = cs.boxSizing === 'border-box';
+    const paddingY = (parseFloat(cs.paddingTop || '0') || 0) + (parseFloat(cs.paddingBottom || '0') || 0);
+    const borderY = (parseFloat(cs.borderTopWidth || '0') || 0) + (parseFloat(cs.borderBottomWidth || '0') || 0);
+
+    let total = base + (isBorderBox ? paddingY + borderY : 0);
+
+    const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
+    total = Math.ceil(total * dpr) / dpr;
+
+    return total;
+  }, [activeIndex]);
+
+  React.useEffect(() => {
+    if (roRef.current) {
+      roRef.current.disconnect();
+      roRef.current = null;
+    }
+
+    const pane = itemRefs.current[activeIndex];
+    const container = containerRef.current;
+    if (!pane || !container) return;
+
+    setHeight(measure());
+
+    const ro = new ResizeObserver(() => {
+      const next = measure();
+      requestAnimationFrame(() => setHeight(next));
+    });
+
+    ro.observe(pane);
+    ro.observe(container);
+
+    roRef.current = ro;
+    return () => {
+      ro.disconnect();
+      roRef.current = null;
+    };
+  }, [activeIndex, childrenArray.length, measure]);
+
+  React.useLayoutEffect(() => {
+    if (height === 0 && activeIndex >= 0) {
+      const next = measure();
+      if (next !== 0) setHeight(next);
+    }
+  }, [activeIndex, height, measure]);
+
   return (
-    <div data-slot='tabs-contents' style={{ overflow: 'hidden', ...style }} {...props}>
-      <motion.div
-        style={{ display: 'flex', marginInline: '-20px' }}
-        animate={{ x: activeIndex * -100 + '%' }}
-        transition={transition}
-      >
+    <motion.div
+      ref={containerRef}
+      data-slot='tabs-contents'
+      style={{ overflow: 'hidden' }}
+      animate={{ height }}
+      transition={transition}
+      {...props}
+    >
+      <motion.div className='flex -mx-2' animate={{ x: activeIndex * -100 + '%' }} transition={transition}>
         {childrenArray.map((child, index) => (
-          <div key={index} style={{ width: '100%', flexShrink: 0, paddingInline: '20px' }}>
+          <div
+            key={index}
+            ref={(el) => {
+              itemRefs.current[index] = el;
+            }}
+            className='w-full shrink-0 px-2 h-full'
+          >
             {child}
           </div>
         ))}
       </motion.div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -219,6 +283,7 @@ function TabsContent({ value, style, asChild = false, ...props }: TabsContentPro
     <Component
       role='tabpanel'
       data-slot='tabs-content'
+      inert={!isActive}
       style={{ overflow: 'hidden', ...style }}
       initial={{ filter: 'blur(0px)' }}
       animate={{ filter: isActive ? 'blur(0px)' : 'blur(4px)' }}
@@ -231,19 +296,19 @@ function TabsContent({ value, style, asChild = false, ...props }: TabsContentPro
 
 export {
   Tabs,
-  TabsList,
+  TabsContent,
+  TabsContents,
   TabsHighlight,
   TabsHighlightItem,
+  TabsList,
   TabsTrigger,
-  TabsContents,
-  TabsContent,
   useTabs,
-  type TabsProps,
-  type TabsListProps,
-  type TabsHighlightProps,
-  type TabsHighlightItemProps,
-  type TabsTriggerProps,
-  type TabsContentsProps,
   type TabsContentProps,
+  type TabsContentsProps,
   type TabsContextType,
+  type TabsHighlightItemProps,
+  type TabsHighlightProps,
+  type TabsListProps,
+  type TabsProps,
+  type TabsTriggerProps,
 };

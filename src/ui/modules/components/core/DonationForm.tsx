@@ -1,6 +1,6 @@
 'use client';
 
-import { CreatePaymentInput } from '@application/dto/payment/schema';
+import type { CreatePaymentInput } from '@application/dto/payment/schema';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
 import { Input } from '@const/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@const/components/ui/input-group';
@@ -9,7 +9,7 @@ import { cn } from '@const/lib/utils';
 import { amountFormatter } from '@shared/utils/helpers';
 import { useCallback, useMemo, useState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { UseFormReturn } from 'react-hook-form';
+import type { UseFormReturn } from 'react-hook-form';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { ChevronDown } from 'src/components/animate-ui/icons/chevron-down';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';

@@ -5,7 +5,7 @@ export const createPaymentSucceededEvent = (paymentIntent: Stripe.PaymentIntent)
   type: 'payment_succeeded',
   paymentIntent,
   paymentId: paymentIntent.id,
-  email: paymentIntent.metadata.email || paymentIntent.receipt_email || '',
+  email: paymentIntent.metadata.email ?? paymentIntent.receipt_email ?? '',
   amount: paymentIntent.amount,
   status: paymentIntent.status,
 });
@@ -14,7 +14,7 @@ export const createPaymentFailedEvent = (paymentIntent: Stripe.PaymentIntent): P
   type: 'payment_failed',
   paymentIntent,
   paymentId: paymentIntent.id,
-  errorMessage: paymentIntent.last_payment_error?.message || 'Unknown error',
+  errorMessage: paymentIntent.last_payment_error?.message ?? 'Unknown error',
 });
 
 export const createChargeSucceededEvent = (charge: Stripe.Charge): ChargeSucceededEvent => ({
@@ -22,5 +22,5 @@ export const createChargeSucceededEvent = (charge: Stripe.Charge): ChargeSucceed
   charge,
   chargeId: charge.id,
   paymentIntentId:
-    typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent?.id || null,
+    typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent?.id ?? null,
 });

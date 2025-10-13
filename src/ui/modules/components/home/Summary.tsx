@@ -44,7 +44,7 @@ export const Summary = () => {
       region: state.region,
       strategy: state.strategy,
       year: state.year,
-      carryOverMonths: state.carryOverMonths || 0,
+      carryOverMonths: state.carryOverMonths ?? 0,
     }))
   );
   const { suggestion, holidays, alternatives, currentSelection } = useHolidaysStore(
@@ -67,7 +67,7 @@ export const Summary = () => {
     }))
   );
 
-  const activeSuggestion = currentSelection || suggestion;
+  const activeSuggestion = currentSelection ?? suggestion;
 
   if (!activeSuggestion?.metrics) {
     return null;
@@ -136,7 +136,7 @@ export const Summary = () => {
         </CardHeader>
         <CardContent className='space-y-6'>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
-            <HolidaysDistributionChart ptoDays={ptoDays} holidays={holidays || []} />
+            <HolidaysDistributionChart ptoDays={ptoDays} holidays={holidays ?? []} />
             <QuarterDistributionChart quarterDist={metrics.quarterDist} />
           </div>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>

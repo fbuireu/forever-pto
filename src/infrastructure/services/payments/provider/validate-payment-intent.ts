@@ -1,4 +1,4 @@
-import { PaymentValidationResult, PaymentValidator } from '@domain/payment/services/validators';
+import type { PaymentValidationResult, PaymentValidator } from '@domain/payment/services/validators';
 import type Stripe from 'stripe';
 
 const validatePaymentIntent = async (stripe: Stripe, paymentIntentId: string): Promise<PaymentValidationResult> => {
@@ -14,7 +14,7 @@ const validatePaymentIntent = async (stripe: Stripe, paymentIntentId: string): P
       };
     }
 
-    const paymentEmail = paymentIntent.metadata.email || paymentIntent.receipt_email || undefined;
+    const paymentEmail = paymentIntent.metadata.email ?? paymentIntent.receipt_email ?? undefined;
 
     return {
       valid: true,

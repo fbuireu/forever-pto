@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, type Variants } from 'motion/react';
-import { getVariants, IconProps, IconWrapper, useAnimateIconContext } from './icon';
+import { getVariants, type IconProps, IconWrapper, useAnimateIconContext } from './icon';
 
 type ArrowDownProps = IconProps<keyof typeof animations>;
 

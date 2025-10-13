@@ -82,8 +82,8 @@ export const PtoSalaryCalculator = () => {
               <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
             </TooltipTrigger>
             <TooltipContent className='w-60 text-pretty'>
-              Calculate how much paid time off you're giving up by not using your PTO days. You still get your full
-              salary, but you're working days you could have taken as paid vacation.
+              Calculate how much paid time off you&apos;re giving up by not using your PTO days. You still get your full
+              salary, but you&apos;re working days you could have taken as paid vacation.
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -170,7 +170,7 @@ export const PtoSalaryCalculator = () => {
                 <div className='bg-amber-50 dark:bg-amber-900/20 p-2 rounded text-xs'>
                   <p className='text-amber-700 dark:text-amber-400 font-medium'>Opportunity Cost</p>
                   <p className='text-amber-600 dark:text-amber-300'>
-                    You worked {unusedPTODays} days that you could have taken as paid vacation. That's{' '}
+                    You worked {unusedPTODays} days that you could have taken as paid vacation. That&apos;s{' '}
                     <span className='inline-flex font-semibold'>
                       <CurrencyNumber value={unusedPTOValue} decimalPlaces={0} />
                     </span>{' '}

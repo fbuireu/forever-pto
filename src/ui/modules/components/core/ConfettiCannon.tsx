@@ -15,7 +15,7 @@ export const ConfettiCannon = ({ onComplete }: ConfettiCannonProps) => {
       colors: ['#10b981', '#059669', '#047857', '#065f46', '#fbbf24', '#f59e0b', '#d97706', '#b45309'],
     };
 
-    function fire(particleRatio: number, opts: any) {
+    function fire(particleRatio: number, opts: Partial<confetti.Options>) {
       confetti({
         ...defaults,
         ...opts,

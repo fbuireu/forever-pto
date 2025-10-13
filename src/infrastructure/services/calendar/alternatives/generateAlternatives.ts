@@ -6,7 +6,7 @@ import { FilterStrategy } from '../types';
 import { getCombinationKey } from '../utils/cache';
 import { findBridges, getAvailableWorkdays } from '../utils/helpers';
 import { generateMetrics } from '../metrics/generateMetrics';
-import { Locale } from 'next-intl';
+import type { Locale } from 'next-intl';
 
 export interface GenerateAlternativesParams {
   year: number;

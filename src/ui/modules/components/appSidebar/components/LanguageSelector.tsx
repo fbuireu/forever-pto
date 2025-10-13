@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from '@application/i18n/navigtion';
 import { usePremiumStore } from '@application/stores/premium';
 import { useLanguages } from '@ui/hooks/useLanguages';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { useEffect } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Check } from 'src/components/animate-ui/icons/check';
@@ -18,7 +18,7 @@ import { useSidebar } from 'src/components/animate-ui/radix/sidebar';
 import { useShallow } from 'zustand/react/shallow';
 
 export const LanguageSelector = () => {
-  const t = useTranslations('languages');
+  // const t = useTranslations('languages');
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();

@@ -1,5 +1,5 @@
 import { isBefore, isSameDay, isSameMonth, startOfDay } from 'date-fns';
-import { FromTo } from '../Calendar';
+import type { FromTo } from '../Calendar';
 
 interface GetDayClassNamesParams {
   date: Date;

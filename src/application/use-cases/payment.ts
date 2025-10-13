@@ -19,8 +19,8 @@ const turso = getTursoClient();
 
 export async function createPayment(params: CreatePaymentInput): Promise<PaymentDTO> {
   const headersList = await headers();
-  const userAgent = headersList.get('user-agent') || null;
-  const ipAddress = headersList.get('x-forwarded-for') || headersList.get('x-real-ip') || null;
+  const userAgent = headersList.get('user-agent') ?? null;
+  const ipAddress = headersList.get('x-forwarded-for') ?? headersList.get('x-real-ip') ?? null;
   try {
     const validated = createPaymentSchema.parse(params);
 
@@ -59,9 +59,9 @@ export async function createPayment(params: CreatePaymentInput): Promise<Payment
       amount: Math.round(finalAmount * 100),
       currency: paymentIntent.currency,
       status: paymentIntent.status,
-      paymentMethodType: paymentIntent.payment_method_types?.[0] || null,
-      description: paymentIntent.description || null,
-      promoCode: validated.promoCode || null,
+      paymentMethodType: paymentIntent.payment_method_types?.[0] ?? null,
+      description: paymentIntent.description ?? null,
+      promoCode: validated.promoCode ?? null,
       userAgent,
       ipAddress,
       country: null,
@@ -94,7 +94,7 @@ export async function createPayment(params: CreatePaymentInput): Promise<Payment
   } catch (error) {
     if (error instanceof ZodError) {
       const firstError = error.issues[0];
-      const validationError = createPaymentError.validation(firstError?.message || 'Invalid payment data');
+      const validationError = createPaymentError.validation(firstError?.message ?? 'Invalid payment data');
       return paymentDTO.create({
         raw: { type: 'error', error: new Error(validationError.message) },
       });

@@ -1,8 +1,8 @@
 import type { PaymentData } from '@application/dto/payment/types';
 import type { PremiumActivationResult } from '@application/dto/premium/types';
 import type { SessionRepository } from '@domain/payment/repository/session';
-import { PaymentRepository } from '@domain/payment/repository/types';
-import { PaymentValidator } from '@domain/payment/services/validators';
+import type { PaymentRepository } from '@domain/payment/repository/types';
+import type { PaymentValidator } from '@domain/payment/services/validators';
 import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
 import type Stripe from 'stripe';
 
@@ -31,11 +31,11 @@ const buildPaymentDataFromIntent = (paymentIntent: Stripe.PaymentIntent, email: 
     amount: paymentIntent.amount,
     currency: paymentIntent.currency,
     status: paymentIntent.status,
-    paymentMethodType: paymentIntent.payment_method_types?.[0] || null,
-    description: paymentIntent.description || null,
-    promoCode: paymentIntent.metadata.promoCode || null,
-    userAgent: paymentIntent.metadata.userAgent || null,
-    ipAddress: paymentIntent.metadata.ipAddress || null,
+    paymentMethodType: paymentIntent.payment_method_types?.[0] ?? null,
+    description: paymentIntent.description ?? null,
+    promoCode: paymentIntent.metadata.promoCode ?? null,
+    userAgent: paymentIntent.metadata.userAgent ?? null,
+    ipAddress: paymentIntent.metadata.ipAddress ?? null,
     country: null,
     customerName: null,
     postalCode: null,
@@ -66,7 +66,7 @@ export const activateWithPayment = async (
       success: false,
       premiumKey: null,
       email: null,
-      error: validation.error || 'Payment validation failed',
+      error: validation.error ?? 'Payment validation failed',
     };
   }
 
@@ -97,7 +97,7 @@ export const activateWithPayment = async (
       if (!saveResult.success) {
         console.error('Failed to save payment to DB:', saveResult.error);
       } else {
-        console.log('Payment created successfully');
+        console.warn('Payment created successfully');
       }
     }
   }

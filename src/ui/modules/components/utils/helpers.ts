@@ -14,7 +14,7 @@ import {
   startOfWeek,
 } from 'date-fns';
 import type { Locale } from 'next-intl';
-import { FromTo } from '../core/Calendar';
+import type { FromTo } from '../core/Calendar';
 
 const CALENDAR_WEEKS = 6;
 const DAYS_PER_WEEK = 7;

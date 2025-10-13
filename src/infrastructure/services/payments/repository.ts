@@ -1,5 +1,5 @@
 import type { PaymentData } from '@application/dto/payment/types';
-import { PaymentRepository } from '@domain/payment/repository/types';
+import type { PaymentRepository } from '@domain/payment/repository/types';
 import type { TursoClient } from '@infrastructure/clients/db/turso/client';
 
 export const savePayment = async (
@@ -42,9 +42,9 @@ export const savePayment = async (
       data.paymentLast4,
       data.feeAmount,
       data.netAmount,
-      data.refundedAt?.toISOString() || null,
+      data.refundedAt?.toISOString() ?? null,
       data.refundReason,
-      data.disputedAt?.toISOString() || null,
+      data.disputedAt?.toISOString() ?? null,
       data.disputeReason,
       data.parentPaymentId,
     ]

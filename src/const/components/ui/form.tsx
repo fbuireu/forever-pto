@@ -1,8 +1,8 @@
 'use client';
 
-import * as React from 'react';
-import * as LabelPrimitive from '@radix-ui/react-label';
+import type * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
+import * as React from 'react';
 import {
   Controller,
   FormProvider,
@@ -13,8 +13,8 @@ import {
   type FieldValues,
 } from 'react-hook-form';
 
-import { cn } from '@const/lib/utils';
 import { Label } from '@const/components/ui/label';
+import { cn } from '@const/lib/utils';
 
 const Form = FormProvider;
 
@@ -26,6 +26,12 @@ type FormFieldContextValue<
 };
 
 const FormFieldContext = React.createContext<FormFieldContextValue>({} as FormFieldContextValue);
+
+type FormItemContextValue = {
+  id: string;
+};
+
+const FormItemContext = React.createContext<FormItemContextValue>({} as FormItemContextValue);
 
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
@@ -62,12 +68,6 @@ const useFormField = () => {
     ...fieldState,
   };
 };
-
-type FormItemContextValue = {
-  id: string;
-};
-
-const FormItemContext = React.createContext<FormItemContextValue>({} as FormItemContextValue);
 
 function FormItem({ className, ...props }: React.ComponentProps<'div'>) {
   const id = React.useId();
@@ -135,4 +135,4 @@ function FormMessage({ className, ...props }: React.ComponentProps<'p'>) {
   );
 }
 
-export { useFormField, Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormField };
+export { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage, useFormField };

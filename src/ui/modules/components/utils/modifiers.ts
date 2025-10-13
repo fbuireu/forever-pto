@@ -2,7 +2,7 @@ import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types'
 import type { HolidaysState } from '@application/stores/holidays';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { isBefore, isSameDay, startOfToday } from 'date-fns';
-import { FromTo } from '../core/Calendar';
+import type { FromTo } from '../core/Calendar';
 
 export const isHoliday = (holidays: HolidaysState['holidays']) => (date: Date) =>
   holidays.some((holiday) => isSameDay(date, holiday.date));

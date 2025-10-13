@@ -1,4 +1,4 @@
-import { createPaymentError, PaymentError, PaymentErrorType } from '../events/factory/errors';
+import { createPaymentError, type PaymentError, type PaymentErrorType } from '../events/factory/errors';
 
 export const isPaymentErrorType = (error: PaymentError, type: PaymentErrorType): boolean => {
   return error.type === type;

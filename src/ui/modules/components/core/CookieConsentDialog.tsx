@@ -51,7 +51,7 @@ export const CookieConsentDialog = ({
                   Essential for the website to function. Cannot be disabled.
                 </p>
               </div>
-              <Switch checked={true} disabled />
+              <Switch checked disabled />
             </div>
 
             <Accordion>

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { motion, AnimatePresence, type HTMLMotionProps } from 'motion/react';
-import { useIsInView, UseIsInViewOptions } from 'src/hooks/use-is-in-view';
+import { useIsInView, type UseIsInViewOptions } from 'src/hooks/use-is-in-view';
 import { getStrictContext } from 'src/lib/get-strict-context';
 
 type RotatingTextContextType = {

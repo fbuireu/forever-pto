@@ -2,7 +2,7 @@
 
 import { cn } from '@const/lib/utils';
 import { MousePointer2, type LucideIcon } from 'lucide-react';
-import { motion, SVGMotionProps, type Transition, type Variants } from 'motion/react';
+import { motion, type SVGMotionProps, type Transition, type Variants } from 'motion/react';
 import * as React from 'react';
 
 type RadialNavProps = {

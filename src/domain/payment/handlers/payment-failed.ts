@@ -1,6 +1,6 @@
 import { createPaymentError } from '../events/factory/errors';
 import type { PaymentFailedEvent } from '../events/types';
-import { PaymentRepository } from '../repository/types';
+import type { PaymentRepository } from '../repository/types';
 
 interface HandlePaymentFailedParams {
   paymentRepository: PaymentRepository;

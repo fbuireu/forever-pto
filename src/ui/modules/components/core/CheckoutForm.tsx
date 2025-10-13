@@ -1,4 +1,4 @@
-import { DiscountInfo } from '@application/dto/payment/types';
+import type { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { Button } from '@const/components/ui/button';
 import { formatDiscountText } from '@infrastructure/services/payments/utils/formatters';
@@ -7,7 +7,7 @@ import { confirmPayment } from '@ui/adapters/payments/checkout';
 import { AlertCircle } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import dynamic from 'next/dynamic';
-import { FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { type FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { useShallow } from 'zustand/react/shallow';
@@ -60,7 +60,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
     });
 
     if (!result.success) {
-      const errorMsg = result.error || 'Payment failed';
+      const errorMsg = result.error ?? 'Payment failed';
       setErrorMessage(errorMsg);
     } else {
       if (result.sessionData) {

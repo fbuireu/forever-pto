@@ -87,6 +87,7 @@ const config = [
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
       '@typescript-eslint/prefer-optional-chain': 'error',
       '@typescript-eslint/no-deprecated': 'warn',
+      '@typescript-eslint/ban-ts-comments': 'warn'
     },
   },
   {

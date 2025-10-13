@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import { cn } from '@const/lib/utils';
@@ -11,9 +10,9 @@ type CounterProps = HTMLMotionProps<'div'> & {
   number: number;
   setNumber: (number: number) => void;
   slidingNumberProps?: Omit<SlidingNumberProps, 'number'>;
-  buttonProps?: Omit<React.ComponentProps<typeof Button>, 'onClick'>;
-  decrementButtonProps?: Omit<React.ComponentProps<typeof Button>, 'onClick'>;
-  incrementButtonProps?: Omit<React.ComponentProps<typeof Button>, 'onClick'>;
+  buttonProps?: Omit<React.ComponentProps<typeof Button>, 'onClick' | 'asChild'>;
+  decrementButtonProps?: Omit<React.ComponentProps<typeof Button>, 'onClick' | 'asChild'>;
+  incrementButtonProps?: Omit<React.ComponentProps<typeof Button>, 'onClick' | 'asChild'>;
   transition?: Transition;
 };
 

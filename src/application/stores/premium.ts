@@ -1,4 +1,4 @@
-import { Locale } from 'next-intl';
+import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
@@ -142,8 +142,8 @@ export const usePremiumStore = create<PremiumStore>()(
               currency: DEFAULT_CURRENCY,
             });
             const resolvedCurrency = formatter.resolvedOptions().currency;
-            const currency = resolvedCurrency || DEFAULT_CURRENCY;
-            const symbol = formatter.formatToParts(0).find(({ type }) => type === 'currency')?.value || currency;
+            const currency = resolvedCurrency ?? DEFAULT_CURRENCY;
+            const symbol = formatter.formatToParts(0).find(({ type }) => type === 'currency')?.value ?? currency;
 
             set({ currency, currencySymbol: symbol });
           } catch {

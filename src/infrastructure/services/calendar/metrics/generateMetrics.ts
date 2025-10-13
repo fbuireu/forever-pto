@@ -1,5 +1,5 @@
 import { formatDate } from '@ui/modules/components/utils/formatters';
-import { Locale } from 'next-intl';
+import type { Locale } from 'next-intl';
 import type { Bridge, Metrics, Suggestion } from '../types';
 import {
   calculateMaxWorkingPeriod,
@@ -11,7 +11,7 @@ import {
   getTotalEffectiveDays,
   getWorkingDaysPerMonth,
 } from './utils/helpers';
-import { HolidayDTO } from '@application/dto/holiday/types';
+import type { HolidayDTO } from '@application/dto/holiday/types';
 
 interface GenerateMetricsParams {
   suggestion: Omit<Suggestion, 'metrics'>;
@@ -80,7 +80,7 @@ export const generateMetrics = ({
     averageEfficiency: efficiency,
     bonusDays,
     quarterDist,
-    bridgesUsed: bridges?.length || 0,
+    bridgesUsed: bridges?.length ?? 0,
     workingDaysPerMonth,
     totalEffectiveDays,
     efficiency,

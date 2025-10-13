@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { motion, type Variants } from 'motion/react';
-import { IconProps, useAnimateIconContext, getVariants, IconWrapper } from './icon';
+import { type IconProps, useAnimateIconContext, getVariants, IconWrapper } from './icon';
 
 type ArrowUpProps = IconProps<keyof typeof animations>;
 

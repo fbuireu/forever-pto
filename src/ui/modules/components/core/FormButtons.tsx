@@ -1,3 +1,4 @@
+import { cn } from '@const/lib/utils';
 import { Loader2 } from 'lucide-react';
 import { useFormStatus } from 'react-dom';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
@@ -27,7 +28,7 @@ export const FormButtons = ({
 
   return (
     <div className='flex gap-2 pt-2'>
-      <Button type='submit' disabled={pending} className={submitClassName || 'flex-1'} variant={submitVariant}>
+      <Button type='submit' disabled={pending} className={cn(submitClassName ?? 'flex-1')} variant={submitVariant}>
         {pending ? (
           <>
             <Loader2 className='w-4 h-4 mr-2 animate-spin' />

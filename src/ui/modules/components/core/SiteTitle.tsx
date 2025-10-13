@@ -11,7 +11,7 @@ export const SiteTitle = () => (
       <OceanSunset gradientId='flowGradientTitle' className='inline-block' />
     </h1>
     <p className='text-center text-muted-foreground mt-2'>
-      Your ultimate solution for managing paid time off. Don't work anymore
+      Your ultimate solution for managing paid time off. Don&apos;t work anymore
     </p>
   </div>
 );

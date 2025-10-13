@@ -47,8 +47,8 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
                 <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
               </TooltipTrigger>
               <TooltipContent className='w-50 text-pretty'>
-                This data is inferred from your CDN and your connection. If you feel that it's not accurate or you want
-                sneak peak into other's countries holidays, you can select it manually here
+                This data is inferred from your CDN and your connection. If you feel that it&apos;s not accurate or you want
+                sneak peak into other&apos;s countries holidays, you can select it manually here
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

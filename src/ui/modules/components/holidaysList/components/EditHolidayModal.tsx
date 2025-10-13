@@ -158,7 +158,7 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
             <FormField
               control={form.control}
               name='date'
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel>Select Date</FormLabel>
                   <FormControl>

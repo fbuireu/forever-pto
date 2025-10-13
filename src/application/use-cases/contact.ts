@@ -50,7 +50,7 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
       name: validated.name,
       subject: validated.subject,
       message: validated.message,
-      messageId: emailResult.messageId || null,
+      messageId: emailResult.messageId ?? null,
     });
 
     if (!saveResult.success) {
@@ -63,7 +63,7 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
   } catch (error) {
     if (error instanceof z.ZodError) {
       const firstError = error.issues[0];
-      const validationError = createContactError.validation(firstError?.message || 'Invalid form data');
+      const validationError = createContactError.validation(firstError?.message ?? 'Invalid form data');
       return { success: false, error: validationError.message };
     }
 

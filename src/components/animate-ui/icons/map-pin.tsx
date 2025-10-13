@@ -1,8 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { motion, Variants } from 'motion/react';
-import { IconProps, useAnimateIconContext, getVariants, IconWrapper } from './icon';
+import { motion, type Variants } from 'motion/react';
+import { type IconProps, useAnimateIconContext, getVariants, IconWrapper } from './icon';
 
 type MapPinProps = IconProps<keyof typeof animations>;
 

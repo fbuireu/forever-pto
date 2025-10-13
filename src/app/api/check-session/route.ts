@@ -39,8 +39,8 @@ export async function GET() {
   }
 
   return NextResponse.json({
-    premiumKey: verification.data?.paymentIntentId || null,
-    email: verification.data?.email || null,
+    premiumKey: verification.data?.paymentIntentId ?? null,
+    email: verification.data?.email ?? null,
   });
 }
 
@@ -70,12 +70,12 @@ export async function POST(request: NextRequest) {
     if (premiumKey) {
       result = await activateWithPayment({ email, paymentIntentId: premiumKey }, params);
     } else {
-      console.log(`Checking existing payment for ${email}`);
+      console.warn(`Checking existing payment for ${email}`);
       result = await activateWithEmail({ email }, params);
     }
 
     if (!result.success) {
-      console.log(`Premium activation failed: ${result.error}`);
+      console.warn(`Premium activation failed: ${result.error}`);
       return NextResponse.json(
         {
           error: result.error,

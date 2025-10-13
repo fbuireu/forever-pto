@@ -17,7 +17,7 @@ export const initializePayment = async (params: CreatePaymentInput): Promise<Ini
 
   return {
     clientSecret: result.clientSecret,
-    discountInfo: result.discountInfo || null,
+    discountInfo: result.discountInfo ?? null,
   };
 };
 
@@ -80,7 +80,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
       console.error('Session activation failed:', errorData);
       return {
         success: false,
-        error: errorData.error || 'Failed to activate premium access',
+        error: errorData.error ?? 'Failed to activate premium access',
       };
     }
     const sessionData = await sessionResponse.json();

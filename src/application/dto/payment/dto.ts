@@ -1,6 +1,6 @@
-import { BaseDTO } from '@application/shared/dto/baseDTO';
+import type { BaseDTO } from '@application/shared/dto/baseDTO';
 import Stripe from 'stripe';
-import { PaymentDTO, RawPayment } from './types';
+import type { PaymentDTO, RawPayment } from './types';
 
 export const paymentDTO: BaseDTO<RawPayment, PaymentDTO> = {
   create: ({ raw }) => {
@@ -42,7 +42,7 @@ export const paymentDTO: BaseDTO<RawPayment, PaymentDTO> = {
     return {
       success: true,
       clientSecret: paymentIntent.client_secret,
-      discountInfo: discountInfo || undefined,
+      discountInfo: discountInfo ?? undefined,
     };
   },
 };

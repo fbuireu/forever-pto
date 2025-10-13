@@ -3,10 +3,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { cn } from '@const/lib/utils';
 import { Circle, Sparkles } from 'lucide-react';
-import { SVGMotionProps } from 'motion/react';
-import { ComponentType, useState } from 'react';
+import type { SVGMotionProps } from 'motion/react';
+import { type ComponentType, useState } from 'react';
 import { FeatureList } from 'src/components/animate-ui/components/community/FeatureList';
-import { RadialNav, RadialNavItem, RadialNavProps } from 'src/components/animate-ui/components/community/radial-nav';
+import { RadialNav, type RadialNavProps } from 'src/components/animate-ui/components/community/radial-nav';
 import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
 import { Clock } from 'src/components/animate-ui/icons/clock';
 
@@ -155,7 +155,7 @@ export function Roadmap() {
     <div className='container max-w-4xl py-8 space-y-8 m-auto'>
       <div className='space-y-2 text-center mb-0'>
         <h3 className='text-3xl font-bold tracking-tight'>Roadmap</h3>
-        <p className='text-muted-foreground'>Explore what we've built and what's coming next</p>
+        <p className='text-muted-foreground'>Explore what we&apos;ve built and what&apos;s coming next</p>
       </div>
       <div className='flex flex-col lg:flex-row gap-8 items-center mt-4'>
         <div className='lg:sticky lg:top-8 flex flex-col items-center w-full lg:w-auto'>
@@ -180,7 +180,7 @@ export function Roadmap() {
       <Card className='border-dashed '>
         <CardHeader>
           <CardTitle>Have a suggestion?</CardTitle>
-          <CardDescription>We'd love to hear your ideas! Send us feedback or feature requests.</CardDescription>
+          <CardDescription>We&apos;d love to hear your ideas! Send us feedback or feature requests.</CardDescription>
         </CardHeader>
         <CardContent>
           <p className='text-sm text-muted-foreground'>Have an idea for a new feature? Let us know!</p>

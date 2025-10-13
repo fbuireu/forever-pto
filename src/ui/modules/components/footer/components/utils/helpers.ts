@@ -1,4 +1,4 @@
-import { useTheme } from 'next-themes';
+import type { useTheme } from 'next-themes';
 
 type Theme = ReturnType<typeof useTheme>['theme'];
 

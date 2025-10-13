@@ -39,6 +39,6 @@ export const processWebhookEvent = async (event: Stripe.Event): Promise<void> =>
     }
 
     default:
-      console.log(`Unhandled event type: ${event.type}`);
+      console.warn(`Unhandled event type: ${event.type}`);
   }
 };

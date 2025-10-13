@@ -1,4 +1,4 @@
-import { DiscountInfo } from '@application/dto/payment/types';
+import type { DiscountInfo } from '@application/dto/payment/types';
 import type Stripe from 'stripe';
 
 interface CalculateFinalAmount {
@@ -14,17 +14,17 @@ export const extractCustomerId = (
   customer: string | Stripe.Customer | Stripe.DeletedCustomer | null
 ): string | null => {
   if (typeof customer === 'string') return customer;
-  return customer?.id || null;
+  return customer?.id ?? null;
 };
 
 export const extractChargeId = (charge: string | Stripe.Charge | null): string | null => {
   if (typeof charge === 'string') return charge;
-  return charge?.id || null;
+  return charge?.id ?? null;
 };
 
 export const extractPaymentIntentId = (paymentIntent: string | Stripe.PaymentIntent | null): string | null => {
   if (typeof paymentIntent === 'string') return paymentIntent;
-  return paymentIntent?.id || null;
+  return paymentIntent?.id ?? null;
 };
 
 export const stripeTimestampToDate = (timestamp: number): Date => {

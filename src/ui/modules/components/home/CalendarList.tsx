@@ -64,7 +64,7 @@ export const CalendarList = () => {
         locale,
       });
     }
-  }, [generateSuggestions, year, ptoDays, allowPastDays, holidays, months, strategy]);
+  }, [generateSuggestions, year, ptoDays, allowPastDays, holidays, months, strategy, locale]);
 
   if (!areStoresReady) {
     return <CalendarListSkeleton />;

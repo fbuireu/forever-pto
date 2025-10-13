@@ -1,4 +1,5 @@
-// @ts-nocheck
+//eslint-disable
+//@ts-nocheck
 'use client';
 
 import { Input } from '@const/components/ui/input';

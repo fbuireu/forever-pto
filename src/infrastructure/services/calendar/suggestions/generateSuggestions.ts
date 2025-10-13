@@ -5,7 +5,7 @@ import { FilterStrategy } from '../types';
 import { clearDateKeyCache, clearHolidayCache } from '../utils/cache';
 import { findBridges, getAvailableWorkdays } from '../utils/helpers';
 import { selectBridgesForStrategy, selectOptimalDaysFromBridges } from './utils/selectors';
-import { Locale } from 'next-intl';
+import type { Locale } from 'next-intl';
 import { generateMetrics } from '../metrics/generateMetrics';
 
 export interface GenerateSuggestionsParams {

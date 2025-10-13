@@ -1,8 +1,8 @@
 import { Badge } from '@const/components/ui/badge';
 import { cn } from '@const/lib/utils';
-import { LucideIcon } from 'lucide-react';
-import { SVGMotionProps } from 'motion/react';
-import { ReactNode } from 'react';
+import { type LucideIcon } from 'lucide-react';
+import { type SVGMotionProps } from 'motion/react';
+import { type ReactNode } from 'react';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 
 export const MetricCardSize = {

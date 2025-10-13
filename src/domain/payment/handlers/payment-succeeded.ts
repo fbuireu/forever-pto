@@ -2,39 +2,13 @@ import type { PaymentData } from '@application/dto/payment/types';
 import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
 import { createPaymentError } from '../events/factory/errors';
 import type { PaymentSucceededEvent } from '../events/types';
-import { PaymentRepository } from '../repository/types';
+import type { PaymentRepository } from '../repository/types';
 import type { ChargeService } from '../services/charge';
 
 interface HandlePaymentSucceededParams {
   paymentRepository: PaymentRepository;
   chargeService: ChargeService;
 }
-
-export const handlePaymentSucceeded = async (
-  event: PaymentSucceededEvent,
-  params: HandlePaymentSucceededParams
-): Promise<void> => {
-  try {
-    const existingPayment = await params.paymentRepository.getById(event.paymentId);
-
-    if (existingPayment.success && existingPayment.data) {
-      if (existingPayment.data.status === 'succeeded') {
-        await updateChargeDetails(event, params);
-        return;
-      }
-
-      await updateExistingPayment(event, params.paymentRepository);
-    } else {
-      console.warn('Payment not found in DB, creating from webhook:', event.paymentId);
-      await createPaymentFromWebhook(event, params.paymentRepository);
-    }
-
-    await updateChargeDetails(event, params);
-  } catch (error) {
-    console.error('Error handling successful payment:', error);
-    throw error;
-  }
-};
 
 const updateExistingPayment = async (event: PaymentSucceededEvent, repository: PaymentRepository): Promise<void> => {
   const result = await repository.updateStatus(event.paymentId, event.status);
@@ -56,11 +30,11 @@ const createPaymentFromWebhook = async (event: PaymentSucceededEvent, repository
     amount: event.amount,
     currency: event.paymentIntent.currency,
     status: event.status,
-    paymentMethodType: event.paymentIntent.payment_method_types?.[0] || null,
-    description: event.paymentIntent.description || null,
-    promoCode: event.paymentIntent.metadata.promoCode || null,
-    userAgent: event.paymentIntent.metadata.userAgent || null,
-    ipAddress: event.paymentIntent.metadata.ipAddress || null,
+    paymentMethodType: event.paymentIntent.payment_method_types?.[0] ?? null,
+    description: event.paymentIntent.description ?? null,
+    promoCode: event.paymentIntent.metadata.promoCode ?? null,
+    userAgent: event.paymentIntent.metadata.userAgent ?? null,
+    ipAddress: event.paymentIntent.metadata.ipAddress ?? null,
     country: null,
     customerName: null,
     postalCode: null,
@@ -124,5 +98,31 @@ const updateChargeDetails = async (
     }
   } catch (error) {
     console.error('Error fetching charge details:', error);
+  }
+};
+
+export const handlePaymentSucceeded = async (
+  event: PaymentSucceededEvent,
+  params: HandlePaymentSucceededParams
+): Promise<void> => {
+  try {
+    const existingPayment = await params.paymentRepository.getById(event.paymentId);
+
+    if (existingPayment.success && existingPayment.data) {
+      if (existingPayment.data.status === 'succeeded') {
+        await updateChargeDetails(event, params);
+        return;
+      }
+
+      await updateExistingPayment(event, params.paymentRepository);
+    } else {
+      console.warn('Payment not found in DB, creating from webhook:', event.paymentId);
+      await createPaymentFromWebhook(event, params.paymentRepository);
+    }
+
+    await updateChargeDetails(event, params);
+  } catch (error) {
+    console.error('Error handling successful payment:', error);
+    throw error;
   }
 };
