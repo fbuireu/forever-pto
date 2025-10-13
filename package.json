@@ -26,7 +26,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "pages:build": "npx next build",
+    "pages:build": "npx @cloudflare/next-on-pages",
     "preview": "pnpm run pages:build && wrangler pages dev",
     "deploy": "pnpm run pages:build && wrangler pages deploy",
     "test:all": "pnpm run test:ut && pnpm run test:e2e",
