@@ -57,13 +57,11 @@ export function PalmTree({
         viewBox='133.5 84 29 69'
         preserveAspectRatio='xMidYMid meet'
         className={className}
-        initial={{ y: 60, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{
-          type: 'spring',
-          stiffness: 200,
-          damping: 8,
-          mass: 1,
+          duration: 0.6,
+          ease: 'easeOut',
         }}
       >
         {svgContent}

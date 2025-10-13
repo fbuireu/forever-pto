@@ -1,8 +1,10 @@
 import { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { Button } from '@const/components/ui/button';
-import { confirmPayment } from '@ui/adapters/payments/checkout';
+import { formatDiscountText } from '@infrastructure/services/payments/utils/formatters';
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { confirmPayment } from '@ui/adapters/payments/checkout';
+import { AlertCircle } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
@@ -10,7 +12,6 @@ import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { useShallow } from 'zustand/react/shallow';
 import { ExpressCheckoutSkeleton } from '../skeletons/ExpressCheckoutSkeleton';
-import { formatDiscountText } from '@infrastructure/services/payments/utils/formatters';
 
 interface CheckoutFormProps {
   amount: number;
@@ -59,7 +60,8 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
     });
 
     if (!result.success) {
-      setErrorMessage(result.error || 'Payment failed');
+      const errorMsg = result.error || 'Payment failed';
+      setErrorMessage(errorMsg);
     } else {
       if (result.sessionData) {
         setPremiumStatus({
@@ -151,7 +153,20 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 
           <PaymentElement />
         </div>
-        {errorMessage && <p className='text-sm text-destructive'>{errorMessage}</p>}
+        {errorMessage && (
+          <div className='relative overflow-hidden rounded-lg border border-destructive/20 bg-destructive/5 p-4 backdrop-blur-sm'>
+            <div className='absolute inset-0 bg-gradient-to-r from-destructive/10 to-transparent' />
+            <div className='relative flex items-start gap-3'>
+              <div className='flex-shrink-0 w-5 h-5 rounded-full bg-destructive/20 flex items-center justify-center mt-0.5'>
+                <AlertCircle className='w-3 h-3 text-destructive' />
+              </div>
+              <div className='flex-1'>
+                <h4 className='text-sm font-medium text-destructive mb-1'>Payment Error</h4>
+                <p className='text-sm text-destructive/80'>{errorMessage}</p>
+              </div>
+            </div>
+          </div>
+        )}
         <Button
           type='submit'
           disabled={!stripe || isPending || !elements}

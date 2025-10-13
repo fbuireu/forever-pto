@@ -23,6 +23,7 @@ export default Home;
 export { generateMetadata };
 
 // todo: ads?
+// todo: toast vs error messages
 // todo: unify component and folder structure
 // todo: locale all
 // todo: responsive
