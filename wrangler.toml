@@ -16,3 +16,6 @@ invocation_logs = true
 [[routes]]
 pattern = "forever-pto.com/*"
 zone_name = "forever-pto.com"
+
+[placement]
+mode = "smart"
