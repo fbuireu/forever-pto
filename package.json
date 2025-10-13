@@ -26,9 +26,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "pages:build": "npx @cloudflare/next-on-pages@1",
-    "preview": "pnpm run pages:build && wrangler pages dev .vercel/output/static",
-    "deploy": "pnpm run pages:build && wrangler pages deploy .vercel/output/static",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "test:all": "pnpm run test:ut && pnpm run test:e2e",
     "test:ut": "vitest --passWithNoTests --logHeapUsage",
     "test:ut:changed": "pnpm run test:ut -- --bail --findRelatedTests",
@@ -87,11 +87,11 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.5",
-    "@cloudflare/next-on-pages": "^1.13.13",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@commitlint/format": "^19.8.1",
     "@commitlint/types": "^19.8.1",
+    "@opennextjs/cloudflare": "^1.10.1",
     "@tailwindcss/postcss": "^4.1.11",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^24.1.0",
@@ -106,6 +106,6 @@
     "tailwindcss": "^4.1.11",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4",
-    "wrangler": "^4.26.0"
+    "wrangler": "^4.42.2"
   }
 }

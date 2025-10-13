@@ -1,4 +1,3 @@
-import { setupDevPlatform } from '@cloudflare/next-on-pages/next-dev';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
@@ -10,7 +9,5 @@ const nextConfig: NextConfig = {
     webVitalsAttribution: ['FCP', 'CLS', 'TTFB', 'FID', 'LCP', 'INP'],
   },
 };
-
-if (process.env.NODE_ENV === 'development') {
-  await setupDevPlatform();
-}
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+initOpenNextCloudflareForDev();
