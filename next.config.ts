@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+    experimental: {
+    serverComponentsExternalPackages: ['@libsql/client'],
+  },
+  serverExternalPackages: ['@libsql/client'],
 };
 
 export default withNextIntl(nextConfig);
