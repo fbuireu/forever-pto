@@ -20,10 +20,14 @@ export class TursoClient {
   }
 
   private getClient(): Client {
-    this.client ??= createClient({
-      url: this.config.url,
-      authToken: this.config.authToken,
-    });
+    if (!this.client) {
+      this.client = createClient({
+        url: this.config.url,
+        authToken: this.config.authToken,
+        intMode: 'number',
+        fetch: globalThis.fetch,
+      });
+    }
     return this.client;
   }
 
