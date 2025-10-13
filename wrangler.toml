@@ -1,6 +1,3 @@
 name = "forever-pto"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
-
-# Para Cloudflare Pages con next-on-pages
-pages_build_output_dir = ".vercel/output/static"
