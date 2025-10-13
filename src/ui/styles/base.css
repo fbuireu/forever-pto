@@ -1,0 +1,17 @@
+@layer base {
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentColor);
+	}
+	* {
+		border-color: var(--color-border);
+		outline-color: color-mix(in srgb, var(--color-ring) 50%, transparent);
+	}
+	body {
+		background-color: var(--color-background);
+		color: var(--color-foreground);
+	}
+}
