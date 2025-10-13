@@ -1,5 +1,3 @@
-import messages from "@i18n/messages/en.json";
-import { routing } from "@infrastructure/i18n/routing/routing";
 
 declare namespace NodeJS {
 	interface ProcessEnv {
@@ -9,14 +7,6 @@ declare namespace NodeJS {
 		NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: string;
 		NEXT_PUBLIC_EMAIL_SELF: string;
 		NEXT_PUBLIC_SITE_URL: string;
-	}
-}
-
-declare module "next-intl" {
-	interface AppConfig {
-		Locale: (typeof routing.locales)[number];
-		Messages: typeof messages;
-		Formats: typeof getRequestConfig;
 	}
 }
 

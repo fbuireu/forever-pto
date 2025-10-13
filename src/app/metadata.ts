@@ -1,4 +1,3 @@
-import { I18N_CONFIG } from '@const/const';
 import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
@@ -20,7 +19,6 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
       .map((keyword: string) => keyword.trim()),
     alternates: {
       canonical: '/',
-      languages: Object.fromEntries(I18N_CONFIG.LOCALES.map((lang) => [lang, `/${lang}`])),
     },
     openGraph: {
       title: t('title'),
