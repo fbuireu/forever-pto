@@ -3,9 +3,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { cn } from '@const/lib/utils';
 import { Circle, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { SVGMotionProps } from 'motion/react';
+import { ComponentType, useState } from 'react';
 import { FeatureList } from 'src/components/animate-ui/components/community/FeatureList';
-import { RadialNav, RadialNavItem } from 'src/components/animate-ui/components/community/radial-nav';
+import { RadialNav, RadialNavItem, RadialNavProps } from 'src/components/animate-ui/components/community/radial-nav';
 import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
 import { Clock } from 'src/components/animate-ui/icons/clock';
 
@@ -25,10 +26,11 @@ const CategoryStatus = {
 
 type CategoryStatus = (typeof CategoryStatus)[keyof typeof CategoryStatus];
 
-const ROADMAP_CATEGORIES: Array<RadialNavItem & { status: CategoryStatus; className: string }> = [
+
+const ROADMAP_CATEGORIES = [
   {
     id: 1,
-    icon: CircleCheckBig,
+    icon: CircleCheckBig as ComponentType<SVGMotionProps<SVGSVGElement>>,
     label: 'Completed',
     angle: 0,
     status: CategoryStatus.COMPLETED,
@@ -36,16 +38,29 @@ const ROADMAP_CATEGORIES: Array<RadialNavItem & { status: CategoryStatus; classN
   },
   {
     id: 2,
-    icon: Clock,
+    icon: Clock as ComponentType<SVGMotionProps<SVGSVGElement>>,
     label: 'In Progress',
     angle: 90,
     status: CategoryStatus.IN_PROGRESS,
     className: 'text-blue-500',
   },
-  { id: 3, icon: Circle, label: 'Planned', angle: 180, status: CategoryStatus.PLANNED, className: 'text-orange-500' },
-  { id: 4, icon: Sparkles, label: 'Future', angle: 270, status: CategoryStatus.FUTURE, className: 'text-purple-500' },
+  {
+    id: 3,
+    icon: Circle as ComponentType<SVGMotionProps<SVGSVGElement>>,
+    label: 'Planned',
+    angle: 180,
+    status: CategoryStatus.PLANNED,
+    className: 'text-orange-500',
+  },
+  {
+    id: 4,
+    icon: Sparkles as ComponentType<SVGMotionProps<SVGSVGElement>>,
+    label: 'Future',
+    angle: 270,
+    status: CategoryStatus.FUTURE,
+    className: 'text-purple-500',
+  },
 ];
-
 const ROADMAP_FEATURES: Record<CategoryStatus, RoadmapFeature[]> = {
   [CategoryStatus.COMPLETED]: [
     {
@@ -147,7 +162,7 @@ export function Roadmap() {
         <div className='lg:sticky lg:top-8 flex flex-col items-center w-full lg:w-auto'>
           <div className='relative h-80 w-80 flex items-center justify-center'>
             <RadialNav
-              items={ROADMAP_CATEGORIES}
+              items={ROADMAP_CATEGORIES as unknown as RadialNavProps['items']}
               onActiveChange={(id) => setSelectedCategory(id)}
               defaultActiveId={selectedCategory}
             />

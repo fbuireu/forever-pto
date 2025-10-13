@@ -2,12 +2,8 @@
 
 import * as React from 'react';
 import { motion, type HTMLMotionProps } from 'motion/react';
-
-import {
-  useIsInView,
-  type UseIsInViewOptions,
-} from '@const/hooks/use-is-in-view';
-import { getStrictContext } from '@const/lib/get-strict-context';
+import { UseIsInViewOptions, useIsInView } from 'src/hooks/use-is-in-view';
+import { getStrictContext } from 'src/lib/get-strict-context';
 
 type TypingTextContextType = {
   isTyping: boolean;

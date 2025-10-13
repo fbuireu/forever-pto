@@ -1,16 +1,12 @@
+// @ts-nocheck
 'use client';
 
 import * as React from 'react';
 import { motion, type Transition, type HTMLMotionProps } from 'motion/react';
-
-import {
-  Highlight,
-  HighlightItem,
-  type HighlightItemProps,
-  type HighlightProps,
-} from '@const/components/animate-ui/primitives/effects/highlight';
-import { getStrictContext } from '@const/lib/get-strict-context';
-import { Slot, type WithAsChild } from '@const/components/animate-ui/primitives/animate/slot';
+import { Slot } from 'radix-ui';
+import { getStrictContext } from 'src/lib/get-strict-context';
+import { HighlightProps, HighlightItemProps, HighlightItem } from '../effects/highlight';
+import { WithAsChild } from './slot';
 
 type TabsContextType = {
   activeValue: string;

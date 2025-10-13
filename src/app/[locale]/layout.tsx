@@ -27,7 +27,6 @@ const geistMono = Geist_Mono({
 });
 
 interface LayoutProps {
-  locale: Locale;
   children: React.ReactNode;
   params: Promise<{ locale: Locale }>;
 }

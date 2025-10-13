@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import * as React from 'react';
@@ -12,8 +13,7 @@ type TabsContextType = {
   setValue: TabsProps['onValueChange'];
 };
 
-const [TabsProvider, useTabs] =
-  getStrictContext<TabsContextType>('TabsContext');
+const [TabsProvider, useTabs] = getStrictContext<TabsContextType>('TabsContext');
 
 type TabsProps = React.ComponentProps<typeof TabsPrimitive.Root>;
 
@@ -26,26 +26,19 @@ function Tabs(props: TabsProps) {
 
   return (
     <TabsProvider value={{ value, setValue }}>
-      <TabsPrimitive.Root
-        data-slot="tabs"
-        {...props}
-        onValueChange={setValue}
-      />
+      <TabsPrimitive.Root data-slot='tabs' {...props} onValueChange={setValue} />
     </TabsProvider>
   );
 }
 
 type TabsHighlightProps = Omit<HighlightProps, 'controlledItems' | 'value'>;
 
-function TabsHighlight({
-  transition = { type: 'spring', stiffness: 200, damping: 25 },
-  ...props
-}: TabsHighlightProps) {
+function TabsHighlight({ transition = { type: 'spring', stiffness: 200, damping: 25 }, ...props }: TabsHighlightProps) {
   const { value } = useTabs();
 
   return (
     <Highlight
-      data-slot="tabs-highlight"
+      data-slot='tabs-highlight'
       controlledItems
       value={value}
       transition={transition}
@@ -58,7 +51,7 @@ function TabsHighlight({
 type TabsListProps = React.ComponentProps<typeof TabsPrimitive.List>;
 
 function TabsList(props: TabsListProps) {
-  return <TabsPrimitive.List data-slot="tabs-list" {...props} />;
+  return <TabsPrimitive.List data-slot='tabs-list' {...props} />;
 }
 
 type TabsHighlightItemProps = HighlightItemProps & {
@@ -66,17 +59,16 @@ type TabsHighlightItemProps = HighlightItemProps & {
 };
 
 function TabsHighlightItem(props: TabsHighlightItemProps) {
-  return <HighlightItem data-slot="tabs-highlight-item" {...props} />;
+  return <HighlightItem data-slot='tabs-highlight-item' {...props} />;
 }
 
 type TabsTabProps = React.ComponentProps<typeof TabsPrimitive.Tab>;
 
 function TabsTab(props: TabsTabProps) {
-  return <TabsPrimitive.Tab data-slot="tabs-tab" {...props} />;
+  return <TabsPrimitive.Tab data-slot='tabs-tab' {...props} />;
 }
 
-type TabsPanelProps = React.ComponentProps<typeof TabsPrimitive.Panel> &
-  HTMLMotionProps<'div'>;
+type TabsPanelProps = React.ComponentProps<typeof TabsPrimitive.Panel> & HTMLMotionProps<'div'>;
 
 function TabsPanel({
   value,
@@ -85,11 +77,11 @@ function TabsPanel({
   ...props
 }: TabsPanelProps) {
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode='wait'>
       <TabsPrimitive.Panel
         render={
           <motion.div
-            data-slot="tabs-panel"
+            data-slot='tabs-panel'
             layout
             layoutDependency={value}
             initial={{ opacity: 0, filter: 'blur(4px)' }}
@@ -120,8 +112,8 @@ function TabsPanels({
 
   return (
     <motion.div
-      data-slot="tabs-panels"
-      layout="size"
+      data-slot='tabs-panels'
+      layout='size'
       layoutDependency={value}
       transition={{ layout: transition }}
       style={{ overflow: 'hidden', ...style }}

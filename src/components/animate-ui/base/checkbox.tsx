@@ -18,9 +18,9 @@ function Checkbox({ className, onCheckedChange, motionProps, ...props }: Checkbo
   }, [props?.checked]);
 
   const handleCheckedChange = React.useCallback(
-    (checked: boolean, event: Event) => {
+    (checked: boolean, eventDetails: CheckboxPrimitive.Root.ChangeEventDetails) => {
       setIsChecked(checked);
-      onCheckedChange?.(checked, event);
+      onCheckedChange?.(checked, eventDetails);
     },
     [onCheckedChange]
   );

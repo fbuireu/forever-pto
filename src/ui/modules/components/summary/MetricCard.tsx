@@ -1,6 +1,7 @@
 import { Badge } from '@const/components/ui/badge';
 import { cn } from '@const/lib/utils';
 import { LucideIcon } from 'lucide-react';
+import { SVGMotionProps } from 'motion/react';
 import { ReactNode } from 'react';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 
@@ -14,7 +15,14 @@ export type MetricCardSize = (typeof MetricCardSize)[keyof typeof MetricCardSize
 interface MetricCardProps {
   label: string;
   value: string | number;
-  icon: LucideIcon;
+  icon:
+    | LucideIcon
+    | React.ComponentType<
+        {
+          size?: number;
+          className?: string;
+        } & Omit<SVGMotionProps<SVGSVGElement>, 'animate'>
+      >;
   badge?: string | ReactNode;
   colorScheme: keyof typeof COLOR_SCHEMES;
   size?: MetricCardSize;
@@ -102,12 +110,7 @@ export const MetricCard = ({
 
   return (
     <div
-      className={cn(
-        'items-center p-4',
-        colors.bg,
-        'rounded-lg flex flex-col justify-between items-center',
-        className
-      )}
+      className={cn('items-center p-4', colors.bg, 'rounded-lg flex flex-col justify-between items-center', className)}
     >
       <span className={cn('text-xs text-muted-foreground mb-1')}>{label}</span>
       <div className={cn('flex items-center gap-2')}>

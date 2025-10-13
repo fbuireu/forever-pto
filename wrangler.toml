@@ -1,0 +1,7 @@
+main = ".open-next/worker.js"
+name = "forever-pto"
+compatibility_date = "2025-10-13"
+compatibility_flags = ["nodejs_compat"]
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
