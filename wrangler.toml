@@ -1,4 +1,7 @@
 name = "forever-pto"
+main = ".open-next/worker.js"
 compatibility_date = "2025-10-13"
-pages_build_output_dir = ".open-next/worker"
 compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
