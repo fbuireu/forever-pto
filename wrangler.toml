@@ -1,4 +1,4 @@
 name = "forever-pto"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
-build_output_directory=".vercel/output/static"
+build_output_directory="out"

@@ -1,7 +1,5 @@
 import '@styles/index.css'; 
 
-export const runtime = 'edge';
-
 const ForeverPto = async () => {
   return (
     <div className='grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 p-4 sm:p-2'>
