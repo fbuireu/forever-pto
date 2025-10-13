@@ -26,7 +26,6 @@ const CategoryStatus = {
 
 type CategoryStatus = (typeof CategoryStatus)[keyof typeof CategoryStatus];
 
-
 const ROADMAP_CATEGORIES = [
   {
     id: 1,

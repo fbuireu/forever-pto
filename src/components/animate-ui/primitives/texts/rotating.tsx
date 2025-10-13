@@ -5,15 +5,13 @@ import { motion, AnimatePresence, type HTMLMotionProps } from 'motion/react';
 import { useIsInView, UseIsInViewOptions } from 'src/hooks/use-is-in-view';
 import { getStrictContext } from 'src/lib/get-strict-context';
 
-
 type RotatingTextContextType = {
   currentText: string;
   y: number;
   isInView: boolean;
 };
 
-const [RotatingTextProvider, useRotatingText] =
-  getStrictContext<RotatingTextContextType>('RotatingTextContext');
+const [RotatingTextProvider, useRotatingText] = getStrictContext<RotatingTextContextType>('RotatingTextContext');
 
 type RotatingTextContainerProps = React.ComponentProps<'div'> & {
   text: string | string[];
@@ -36,14 +34,11 @@ function RotatingTextContainer({
 }: RotatingTextContainerProps) {
   const [index, setIndex] = React.useState(0);
 
-  const { ref: localRef, isInView } = useIsInView(
-    ref as React.Ref<HTMLDivElement>,
-    {
-      inView,
-      inViewOnce,
-      inViewMargin,
-    },
-  );
+  const { ref: localRef, isInView } = useIsInView(ref as React.Ref<HTMLDivElement>, {
+    inView,
+    inViewOnce,
+    inViewMargin,
+  });
 
   React.useEffect(() => {
     if (!Array.isArray(text)) return;
@@ -53,10 +48,7 @@ function RotatingTextContainer({
 
     const timeoutId = setTimeout(() => {
       setIndex((prev) => (prev + 1) % text.length);
-      intervalId = setInterval(
-        () => setIndex((prev) => (prev + 1) % text.length),
-        duration,
-      );
+      intervalId = setInterval(() => setIndex((prev) => (prev + 1) % text.length), duration);
     }, delay);
 
     return () => {
@@ -84,14 +76,11 @@ function RotatingTextContainer({
 
 type RotatingTextProps = Omit<HTMLMotionProps<'div'>, 'children'>;
 
-function RotatingText({
-  transition = { duration: 0.3, ease: 'easeOut' },
-  ...props
-}: RotatingTextProps) {
+function RotatingText({ transition = { duration: 0.3, ease: 'easeOut' }, ...props }: RotatingTextProps) {
   const { currentText, y, isInView } = useRotatingText();
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode='wait'>
       {isInView && (
         <motion.div
           key={currentText}

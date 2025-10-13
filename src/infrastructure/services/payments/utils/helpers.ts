@@ -31,7 +31,6 @@ export const stripeTimestampToDate = (timestamp: number): Date => {
   return new Date(timestamp * 1000);
 };
 
-
 export const eurosToCents = (euros: number): number => {
   return Math.round(euros * 100);
 };
@@ -43,7 +42,6 @@ export const centsToEuros = (cents: number): number => {
 export const calculateDiscountAmount = (discountInfo: DiscountInfo): number => {
   return discountInfo.originalAmount - discountInfo.finalAmount;
 };
-
 
 export const getCouponValidationError = (coupon: Stripe.Coupon): string | null => {
   if (!coupon.valid) {

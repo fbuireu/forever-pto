@@ -88,9 +88,7 @@ type IconWrapperProps<T> = IconProps<T> & {
   icon: React.ComponentType<IconProps<T>>;
 };
 
-const AnimateIconContext = React.createContext<AnimateIconContextValue | null>(
-  null,
-);
+const AnimateIconContext = React.createContext<AnimateIconContextValue | null>(null);
 
 function useAnimateIconContext() {
   const context = React.useContext(AnimateIconContext);
@@ -112,7 +110,7 @@ function useAnimateIconContext() {
 
 function composeEventHandlers<E extends React.SyntheticEvent<unknown>>(
   theirs?: (event: E) => void,
-  ours?: (event: E) => void,
+  ours?: (event: E) => void
 ) {
   return (event: E) => {
     theirs?.(event);
@@ -147,9 +145,9 @@ function AnimateIcon({
     if (animate === undefined || animate === false) return false;
     return delay <= 0;
   });
-  const [currentAnimation, setCurrentAnimation] = React.useState<
-    string | StaticAnimations
-  >(typeof animate === 'string' ? animate : animation);
+  const [currentAnimation, setCurrentAnimation] = React.useState<string | StaticAnimations>(
+    typeof animate === 'string' ? animate : animation
+  );
   const [status, setStatus] = React.useState<'initial' | 'animate'>('initial');
 
   const delayRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -184,7 +182,7 @@ function AnimateIcon({
         setLocalAnimate(true);
       }
     },
-    [animation, delay, bumpGeneration],
+    [animation, delay, bumpGeneration]
   );
 
   const stopAnimation = React.useCallback(() => {
@@ -235,7 +233,7 @@ function AnimateIcon({
         return;
       }
     },
-    [controls],
+    [controls]
   );
 
   React.useEffect(() => {
@@ -255,11 +253,7 @@ function AnimateIcon({
       }
 
       if (!localAnimate) {
-        if (
-          completeOnStop &&
-          isAnimateInProgressRef.current &&
-          animateEndPromiseRef.current
-        ) {
+        if (completeOnStop && isAnimateInProgressRef.current && animateEndPromiseRef.current) {
           try {
             await animateEndPromiseRef.current;
           } catch {
@@ -336,14 +330,12 @@ function AnimateIcon({
             return;
           }
           if (!activeRef.current) {
-            if (status !== 'initial' && !persistOnAnimateEnd)
-              await startAnim('initial');
+            if (status !== 'initial' && !persistOnAnimateEnd) await startAnim('initial');
             return;
           }
         } else {
           if (!activeRef.current) {
-            if (status !== 'initial' && !persistOnAnimateEnd)
-              await startAnim('initial');
+            if (status !== 'initial' && !persistOnAnimateEnd) await startAnim('initial');
             return;
           }
         }
@@ -371,36 +363,23 @@ function AnimateIcon({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localAnimate, controls]);
 
-  const childProps = (
-    React.isValidElement(children) ? (children as React.ReactElement).props : {}
-  ) as AnyProps;
+  const childProps = (React.isValidElement(children) ? (children as React.ReactElement).props : {}) as AnyProps;
 
-  const handleMouseEnter = composeEventHandlers<React.MouseEvent<HTMLElement>>(
-    childProps.onMouseEnter,
-    () => {
-      if (animateOnHover) startAnimation(animateOnHover);
-    },
-  );
+  const handleMouseEnter = composeEventHandlers<React.MouseEvent<HTMLElement>>(childProps.onMouseEnter, () => {
+    if (animateOnHover) startAnimation(animateOnHover);
+  });
 
-  const handleMouseLeave = composeEventHandlers<React.MouseEvent<HTMLElement>>(
-    childProps.onMouseLeave,
-    () => {
-      if (animateOnHover || animateOnTap) stopAnimation();
-    },
-  );
+  const handleMouseLeave = composeEventHandlers<React.MouseEvent<HTMLElement>>(childProps.onMouseLeave, () => {
+    if (animateOnHover || animateOnTap) stopAnimation();
+  });
 
-  const handlePointerDown = composeEventHandlers<
-    React.PointerEvent<HTMLElement>
-  >(childProps.onPointerDown, () => {
+  const handlePointerDown = composeEventHandlers<React.PointerEvent<HTMLElement>>(childProps.onPointerDown, () => {
     if (animateOnTap) startAnimation(animateOnTap);
   });
 
-  const handlePointerUp = composeEventHandlers<React.PointerEvent<HTMLElement>>(
-    childProps.onPointerUp,
-    () => {
-      if (animateOnTap) stopAnimation();
-    },
-  );
+  const handlePointerUp = composeEventHandlers<React.PointerEvent<HTMLElement>>(childProps.onPointerUp, () => {
+    if (animateOnTap) stopAnimation();
+  });
 
   const content = asChild ? (
     <Slot
@@ -445,8 +424,7 @@ function AnimateIcon({
   );
 }
 
-const pathClassName =
-  "[&_[stroke-dasharray='1px_1px']]:![stroke-dasharray:1px_0px]";
+const pathClassName = "[&_[stroke-dasharray='1px_1px']]:![stroke-dasharray:1px_0px]";
 
 function IconWrapper<T extends string>({
   size = 28,
@@ -496,13 +474,9 @@ function IconWrapper<T extends string>({
       completeOnStop !== undefined;
 
     if (hasOverrides) {
-      const inheritedAnimate: Trigger = parentActive
-        ? (animationProp ?? parentAnimation ?? 'default')
-        : false;
+      const inheritedAnimate: Trigger = parentActive ? (animationProp ?? parentAnimation ?? 'default') : false;
 
-      const finalAnimate: Trigger = (animate ??
-        parentAnimate ??
-        inheritedAnimate) as Trigger;
+      const finalAnimate: Trigger = (animate ?? parentAnimate ?? inheritedAnimate) as Trigger;
 
       return (
         <AnimateIcon
@@ -525,9 +499,8 @@ function IconWrapper<T extends string>({
             size={size}
             className={cn(
               className,
-              ((animationProp ?? parentAnimation) === 'path' ||
-                (animationProp ?? parentAnimation) === 'path-loop') &&
-                pathClassName,
+              ((animationProp ?? parentAnimation) === 'path' || (animationProp ?? parentAnimation) === 'path-loop') &&
+                pathClassName
             )}
             {...props}
           />
@@ -555,11 +528,7 @@ function IconWrapper<T extends string>({
       >
         <IconComponent
           size={size}
-          className={cn(
-            className,
-            (animationToUse === 'path' || animationToUse === 'path-loop') &&
-              pathClassName,
-          )}
+          className={cn(className, (animationToUse === 'path' || animationToUse === 'path-loop') && pathClassName)}
           {...props}
         />
       </AnimateIconContext.Provider>
@@ -590,11 +559,7 @@ function IconWrapper<T extends string>({
       >
         <IconComponent
           size={size}
-          className={cn(
-            className,
-            (animationProp === 'path' || animationProp === 'path-loop') &&
-              pathClassName,
-          )}
+          className={cn(className, (animationProp === 'path' || animationProp === 'path-loop') && pathClassName)}
           {...props}
         />
       </AnimateIcon>
@@ -604,20 +569,13 @@ function IconWrapper<T extends string>({
   return (
     <IconComponent
       size={size}
-      className={cn(
-        className,
-        (animationProp === 'path' || animationProp === 'path-loop') &&
-          pathClassName,
-      )}
+      className={cn(className, (animationProp === 'path' || animationProp === 'path-loop') && pathClassName)}
       {...props}
     />
   );
 }
 
-function getVariants<
-  V extends { default: T; [key: string]: T },
-  T extends Record<string, Variants>,
->(animations: V): T {
+function getVariants<V extends { default: T; [key: string]: T }, T extends Record<string, Variants>>(animations: V): T {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { animation: animationType } = useAnimateIconContext();
 
@@ -627,11 +585,7 @@ function getVariants<
     const variant = staticAnimations[animationType as StaticAnimations];
     result = {} as T;
     for (const key in animations.default) {
-      if (
-        (animationType === 'path' || animationType === 'path-loop') &&
-        key.includes('group')
-      )
-        continue;
+      if ((animationType === 'path' || animationType === 'path-loop') && key.includes('group')) continue;
       result[key] = variant as T[Extract<keyof T, string>];
     }
   } else {

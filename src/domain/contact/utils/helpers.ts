@@ -1,4 +1,4 @@
-import { ContactError, ContactErrorType, createContactError } from "../events/factory/errors";
+import { ContactError, ContactErrorType, createContactError } from '../events/factory/errors';
 
 export const isContactErrorType = (error: ContactError, type: ContactErrorType): boolean => {
   return error.type === type;

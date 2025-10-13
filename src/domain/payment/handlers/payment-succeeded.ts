@@ -84,7 +84,10 @@ const createPaymentFromWebhook = async (event: PaymentSucceededEvent, repository
   }
 };
 
-const updateChargeDetails = async (event: PaymentSucceededEvent, params: HandlePaymentSucceededParams): Promise<void> => {
+const updateChargeDetails = async (
+  event: PaymentSucceededEvent,
+  params: HandlePaymentSucceededParams
+): Promise<void> => {
   if (!event.paymentIntent.latest_charge) return;
 
   const chargeId =
@@ -123,4 +126,3 @@ const updateChargeDetails = async (event: PaymentSucceededEvent, params: HandleP
     console.error('Error fetching charge details:', error);
   }
 };
-

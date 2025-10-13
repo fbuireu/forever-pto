@@ -10,7 +10,6 @@ import {
   getMonthlyDist,
   getTotalEffectiveDays,
   getWorkingDaysPerMonth,
-
 } from './utils/helpers';
 import { HolidayDTO } from '@application/dto/holiday/types';
 
@@ -22,7 +21,13 @@ interface GenerateMetricsParams {
   allowPastDays: boolean;
 }
 
-export const generateMetrics = ({ suggestion, locale, bridges, holidays, allowPastDays }: GenerateMetricsParams): Metrics => {
+export const generateMetrics = ({
+  suggestion,
+  locale,
+  bridges,
+  holidays,
+  allowPastDays,
+}: GenerateMetricsParams): Metrics => {
   const { days } = suggestion;
 
   if (days.length === 0) {
@@ -65,8 +70,8 @@ export const generateMetrics = ({ suggestion, locale, bridges, holidays, allowPa
     year: formatDate({ date: days[0], format: 'yyyy', locale }),
   });
   const efficiency = totalEffectiveDays / days.length;
-    const bonusDays = totalEffectiveDays - days.length;
-    
+  const bonusDays = totalEffectiveDays - days.length;
+
   return {
     longWeekends,
     restBlocks,

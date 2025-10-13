@@ -28,11 +28,7 @@ function GradientText({
   };
 
   return (
-    <span
-      data-slot="gradient-text"
-      style={{ position: 'relative', display: 'inline-block', ...style }}
-      {...props}
-    >
+    <span data-slot='gradient-text' style={{ position: 'relative', display: 'inline-block', ...style }} {...props}>
       <motion.span
         style={baseStyle}
         initial={{ backgroundPosition: '0% 0%' }}

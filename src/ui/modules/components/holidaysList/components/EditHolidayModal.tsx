@@ -32,7 +32,10 @@ interface EditHolidayModalProps {
 
 const holidaySchema = z.object({
   name: z.string().min(1, 'Holiday name is required').max(100, 'Holiday name is too long'),
-  date: z.date({ error: 'Please select a date' }),
+  date: z.date({
+    required_error: 'Please select a date',
+    invalid_type_error: 'Please select a valid date',
+  }),
 });
 
 type HolidayFormData = z.infer<typeof holidaySchema>;

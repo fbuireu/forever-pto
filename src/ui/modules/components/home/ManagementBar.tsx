@@ -11,23 +11,23 @@ import { useShallow } from 'zustand/react/shallow';
 
 export const ManagementBar = () => {
   const { areStoresReady } = useStoresReady();
-const {
-  alternatives,
-  suggestion,
-  setPreviewAlternativeSelection,
-  setCurrentAlternativeSelection,
-  previewAlternativeIndex,
-  currentSelectionIndex,
-} = useHolidaysStore(
-  useShallow((state) => ({
-    alternatives: state.alternatives,
-    suggestion: state.suggestion,
-    setPreviewAlternativeSelection: state.setPreviewAlternativeSelection,
-    setCurrentAlternativeSelection: state.setCurrentAlternativeSelection,
-    previewAlternativeIndex: state.previewAlternativeIndex,
-    currentSelectionIndex: state.currentSelectionIndex,
-  }))
-);
+  const {
+    alternatives,
+    suggestion,
+    setPreviewAlternativeSelection,
+    setCurrentAlternativeSelection,
+    previewAlternativeIndex,
+    currentSelectionIndex,
+  } = useHolidaysStore(
+    useShallow((state) => ({
+      alternatives: state.alternatives,
+      suggestion: state.suggestion,
+      setPreviewAlternativeSelection: state.setPreviewAlternativeSelection,
+      setCurrentAlternativeSelection: state.setCurrentAlternativeSelection,
+      previewAlternativeIndex: state.previewAlternativeIndex,
+      currentSelectionIndex: state.currentSelectionIndex,
+    }))
+  );
 
   const handlePreviewChange = useCallback(
     (params: AlternativeSelectionBaseParams) => {

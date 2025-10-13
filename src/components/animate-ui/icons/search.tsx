@@ -4,7 +4,6 @@ import * as React from 'react';
 import { motion, type Variants } from 'motion/react';
 import { IconProps, useAnimateIconContext, getVariants, IconWrapper } from './icon';
 
-
 type SearchProps = IconProps<keyof typeof animations>;
 
 const animations = {
@@ -45,34 +44,22 @@ function IconComponent({ size, ...props }: SearchProps) {
 
   return (
     <motion.svg
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns='http://www.w3.org/2000/svg'
       width={size}
       height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
       strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      strokeLinecap='round'
+      strokeLinejoin='round'
       variants={variants.group}
-      initial="initial"
+      initial='initial'
       animate={controls}
       {...props}
     >
-      <motion.path
-        d="m21 21-4.34-4.34"
-        variants={variants.path}
-        initial="initial"
-        animate={controls}
-      />
-      <motion.circle
-        cx={11}
-        cy={11}
-        r={8}
-        variants={variants.circle}
-        initial="initial"
-        animate={controls}
-      />
+      <motion.path d='m21 21-4.34-4.34' variants={variants.path} initial='initial' animate={controls} />
+      <motion.circle cx={11} cy={11} r={8} variants={variants.circle} initial='initial' animate={controls} />
     </motion.svg>
   );
 }
@@ -81,10 +68,4 @@ function Search(props: SearchProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export {
-  animations,
-  Search,
-  Search as SearchIcon,
-  type SearchProps,
-  type SearchProps as SearchIconProps,
-};
+export { animations, Search, Search as SearchIcon, type SearchProps, type SearchProps as SearchIconProps };

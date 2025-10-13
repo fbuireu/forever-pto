@@ -9,12 +9,12 @@ import { PremiumFeature } from '../../premium/PremiumFeature';
 import { useShallow } from 'zustand/react/shallow';
 
 export const AllowPastDays = () => {
-const { allowPastDays, setAllowPastDays } = useFiltersStore(
-  useShallow((state) => ({
-    allowPastDays: state.allowPastDays,
-    setAllowPastDays: state.setAllowPastDays,
-  }))
-);
+  const { allowPastDays, setAllowPastDays } = useFiltersStore(
+    useShallow((state) => ({
+      allowPastDays: state.allowPastDays,
+      setAllowPastDays: state.setAllowPastDays,
+    }))
+  );
 
   return (
     <Field className='space-y-2 w-full'>

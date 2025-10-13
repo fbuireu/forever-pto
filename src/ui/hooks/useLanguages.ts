@@ -5,7 +5,7 @@ interface UseLanguagesReturn {
   label: string;
 }
 
-const LOCALES = ["en", "es", "ca", "it"] as const;
+const LOCALES = ['en', 'es', 'ca', 'it'] as const;
 
 export function useLanguages(): UseLanguagesReturn[] {
   const t = useTranslations('languages');

@@ -134,14 +134,14 @@ export const PtoCalculator = () => {
             </p>
           </div>
           <AnimateIcon animateOnHover>
-          <Button
-            onClick={() => applyToStore(calculatedDays)}
-            size='sm'
-            className='w-full h-7 text-xs bg-green-600 hover:bg-green-700 justify-start'
-          >
-            <Plus className='w-3 h-3 mr-1' />
-            Apply to PTO Days
-          </Button>
+            <Button
+              onClick={() => applyToStore(calculatedDays)}
+              size='sm'
+              className='w-full h-7 text-xs bg-green-600 hover:bg-green-700 justify-start'
+            >
+              <Plus className='w-3 h-3 mr-1' />
+              Apply to PTO Days
+            </Button>
           </AnimateIcon>
         </div>
       )}

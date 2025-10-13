@@ -19,4 +19,3 @@ export const handleStripeWebhook = async (body: string, signature: string): Prom
     return { success: false, error: errorMessage };
   }
 };
- 

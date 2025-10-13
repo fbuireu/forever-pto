@@ -1,6 +1,5 @@
 // @ts-nocheck
 'use client';
-
 import * as React from 'react';
 import { Tabs as TabsPrimitive } from '@base-ui-components/react/tabs';
 import { motion, AnimatePresence, type HTMLMotionProps } from 'motion/react';

@@ -4,7 +4,6 @@ import * as React from 'react';
 import { motion, type Variants } from 'motion/react';
 import { IconProps, useAnimateIconContext, getVariants, IconWrapper } from './icon';
 
-
 type LockProps = IconProps<keyof typeof animations>;
 
 const animations = {
@@ -103,37 +102,32 @@ function IconComponent({ size, ...props }: LockProps) {
 
   return (
     <motion.svg
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns='http://www.w3.org/2000/svg'
       width={size}
       height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
       strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      initial="initial"
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      initial='initial'
       animate={controls}
       {...props}
     >
-      <motion.g variants={variants.group} initial="initial" animate={controls}>
+      <motion.g variants={variants.group} initial='initial' animate={controls}>
         <motion.rect
-          width="18"
-          height="11"
-          x="3"
-          y="11"
-          rx="2"
-          ry="2"
+          width='18'
+          height='11'
+          x='3'
+          y='11'
+          rx='2'
+          ry='2'
           variants={variants.rect}
-          initial="initial"
+          initial='initial'
           animate={controls}
         />
-        <motion.path
-          d="M7 11V7a5 5 0 0 1 10 0v4"
-          variants={variants.path}
-          initial="initial"
-          animate={controls}
-        />
+        <motion.path d='M7 11V7a5 5 0 0 1 10 0v4' variants={variants.path} initial='initial' animate={controls} />
       </motion.g>
     </motion.svg>
   );
@@ -143,10 +137,4 @@ function Lock(props: LockProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export {
-  animations,
-  Lock,
-  Lock as LockIcon,
-  type LockProps,
-  type LockProps as LockIconProps,
-};
+export { animations, Lock, Lock as LockIcon, type LockProps, type LockProps as LockIconProps };

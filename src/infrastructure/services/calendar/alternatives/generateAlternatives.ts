@@ -89,6 +89,12 @@ export function generateAlternatives(params: GenerateAlternativesParams): Sugges
     days: alt.days.toSorted((a, b) => a.getTime() - b.getTime()),
     bridges: alt.bridges,
     strategy: alt.strategy,
-    metrics: generateMetrics({ suggestion: alt, locale: params.locale, bridges: alt.bridges, holidays: params.holidays, allowPastDays: params.allowPastDays }),
+    metrics: generateMetrics({
+      suggestion: alt,
+      locale: params.locale,
+      bridges: alt.bridges,
+      holidays: params.holidays,
+      allowPastDays: params.allowPastDays,
+    }),
   }));
 }

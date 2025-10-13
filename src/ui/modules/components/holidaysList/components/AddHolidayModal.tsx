@@ -18,10 +18,10 @@ import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
+import { Plus } from 'src/components/animate-ui/icons/plus';
 import { z } from 'zod';
 import { Calendar, CalendarSelectionMode, type FromTo } from '../../core/Calendar';
 import { formatDate } from '../../utils/formatters';
-import { Plus } from 'src/components/animate-ui/icons/plus';
 
 interface AddHolidayModalProps {
   open: boolean;
@@ -31,7 +31,10 @@ interface AddHolidayModalProps {
 
 const holidaySchema = z.object({
   name: z.string().min(1, 'Holiday name is required').max(100, 'Holiday name is too long'),
-  date: z.date({ error: 'Please select a date' }),
+  date: z.date({
+    required_error: 'Please select a date',
+    invalid_type_error: 'Please select a valid date',
+  }),
 });
 
 type HolidayFormData = z.infer<typeof holidaySchema>;

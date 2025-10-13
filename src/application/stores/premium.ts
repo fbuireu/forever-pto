@@ -144,7 +144,7 @@ export const usePremiumStore = create<PremiumStore>()(
             const resolvedCurrency = formatter.resolvedOptions().currency;
             const currency = resolvedCurrency || DEFAULT_CURRENCY;
             const symbol = formatter.formatToParts(0).find(({ type }) => type === 'currency')?.value || currency;
-            
+
             set({ currency, currencySymbol: symbol });
           } catch {
             set({ currency: DEFAULT_CURRENCY, currencySymbol: DEFAULT_CURRENCY_SYMBOL });

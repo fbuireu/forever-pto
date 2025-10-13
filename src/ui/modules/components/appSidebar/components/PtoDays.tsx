@@ -12,12 +12,12 @@ const MIN_VALUE = 1;
 const MAX_VALUE = 365;
 
 export const PtoDays = () => {
-const { ptoDays, setPtoDays } = useFiltersStore(
-  useShallow((state) => ({
-    ptoDays: state.ptoDays,
-    setPtoDays: state.setPtoDays,
-  }))
-);
+  const { ptoDays, setPtoDays } = useFiltersStore(
+    useShallow((state) => ({
+      ptoDays: state.ptoDays,
+      setPtoDays: state.setPtoDays,
+    }))
+  );
   const [localValue, setLocalValue] = useDebounce({ value: ptoDays, delay: 100, callback: setPtoDays });
   const isDecrementDisabled = localValue <= MIN_VALUE;
   const isIncrementDisabled = localValue >= MAX_VALUE;

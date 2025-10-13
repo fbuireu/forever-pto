@@ -14,8 +14,8 @@ export const Footer = () => (
         <Link href='/terms-of-service' className='text-sm text-muted-foreground hover:underline'>
           Terms of Service
         </Link>
-                <CookieButton />
-                  <ContactButton />
+        <CookieButton />
+        <ContactButton />
       </div>
     </section>
   </footer>

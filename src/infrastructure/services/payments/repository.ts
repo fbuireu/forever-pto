@@ -29,7 +29,7 @@ export const savePayment = async (
       data.status,
       data.paymentMethodType,
       data.description,
-      null, 
+      null,
       data.promoCode,
       data.userAgent,
       data.ipAddress,

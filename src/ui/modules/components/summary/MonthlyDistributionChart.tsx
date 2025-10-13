@@ -35,12 +35,7 @@ export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }:
   const description = `Evolución mensual de ${totalDays} días libres distribuidos en ${activeMonths} meses. Pico en ${peakMonth} con ${peakDays} días.`;
 
   return (
-    <PremiumFeature
-      feature={'Gráfica de Timeline Anual'}
-      description={description}
-      iconSize='size-7'
-      inlineDescription
-    >
+    <PremiumFeature feature={'Gráfica de Timeline Anual'} description={description} iconSize='size-7' inlineDescription>
       <Card className='shadow-md'>
         <CardHeader className='pb-3'>
           <CardTitle className='flex items-center gap-2 text-base'>

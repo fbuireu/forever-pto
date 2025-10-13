@@ -9,21 +9,21 @@ import { useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 export const Regions = () => {
-const { regions, regionsLoading, fetchRegions } = useLocationStore(
-  useShallow((state) => ({
-    regions: state.regions,
-    regionsLoading: state.regionsLoading,
-    fetchRegions: state.fetchRegions,
-  }))
-);
+  const { regions, regionsLoading, fetchRegions } = useLocationStore(
+    useShallow((state) => ({
+      regions: state.regions,
+      regionsLoading: state.regionsLoading,
+      fetchRegions: state.fetchRegions,
+    }))
+  );
 
-const { country, region, setRegion } = useFiltersStore(
-  useShallow((state) => ({
-    country: state.country,
-    region: state.region,
-    setRegion: state.setRegion,
-  }))
-);
+  const { country, region, setRegion } = useFiltersStore(
+    useShallow((state) => ({
+      country: state.country,
+      region: state.region,
+      setRegion: state.setRegion,
+    }))
+  );
 
   useEffect(() => {
     if (!country) return;

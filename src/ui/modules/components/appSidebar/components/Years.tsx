@@ -36,9 +36,7 @@ export const Years = () => {
           <AnimateIcon animateOnHover>
             <Button variant='outline' role='combobox' aria-expanded={open} className={cn('w-full justify-between')}>
               {year}
-              <ChevronDown
-                className={cn('opacity-50 transition-transform duration-200', open && 'rotate-180')}
-              />
+              <ChevronDown className={cn('opacity-50 transition-transform duration-200', open && 'rotate-180')} />
             </Button>
           </AnimateIcon>
         </PopoverTrigger>
@@ -47,21 +45,21 @@ export const Years = () => {
             <CommandList>
               <CommandGroup>
                 {years.map((yearOption) => (
-                    <AnimateIcon animateOnHover key={yearOption}>
-                  <CommandItem
-                    key={yearOption}
-                    value={String(yearOption)}
-                    onSelect={() => {
-                      setYear(String(yearOption));
-                      setOpen(false);
-                    }}
-                  >
-                    <p className='font-normal text-sm'>{yearOption}</p>
-                    <Check
-                      animateOnHover
-                      className={cn('ml-auto', Number(year) === yearOption ? 'opacity-100' : 'opacity-0')}
-                    />
-                  </CommandItem>
+                  <AnimateIcon animateOnHover key={yearOption}>
+                    <CommandItem
+                      key={yearOption}
+                      value={String(yearOption)}
+                      onSelect={() => {
+                        setYear(String(yearOption));
+                        setOpen(false);
+                      }}
+                    >
+                      <p className='font-normal text-sm'>{yearOption}</p>
+                      <Check
+                        animateOnHover
+                        className={cn('ml-auto', Number(year) === yearOption ? 'opacity-100' : 'opacity-0')}
+                      />
+                    </CommandItem>
                   </AnimateIcon>
                 ))}
               </CommandGroup>

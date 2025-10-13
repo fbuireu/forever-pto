@@ -34,8 +34,8 @@ export const PTO_CONSTANTS = {
     ACCEPTABLE: 2.5,
     MINIMUM: 2,
     MINIMUM_FOR_SINGLE_BRIDGE: 3,
-    },
-  
+  },
+
   BRIDGE_SEARCH: {
     MIN_MULTI_DAY_SIZE: 2,
     MAX_MULTI_DAY_SIZE: 3,

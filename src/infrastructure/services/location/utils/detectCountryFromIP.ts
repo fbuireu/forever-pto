@@ -33,7 +33,7 @@ export async function detectCountryFromIP() {
 
     return geoData.country?.toLowerCase() ?? '';
   } catch (error) {
-        console.warn('Error while detecting country from IP:', error);
+    console.warn('Error while detecting country from IP:', error);
 
     return '';
   }

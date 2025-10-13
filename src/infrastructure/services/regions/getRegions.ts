@@ -12,7 +12,7 @@ export function getRegions(countryCode?: string) {
 
     return regionDTO.create({ raw: regions }).sort((a, b) => a.label.localeCompare(b.label));
   } catch (error) {
-    console.warn("Error in getRegions:", error);
+    console.warn('Error in getRegions:', error);
     return [];
   }
 }

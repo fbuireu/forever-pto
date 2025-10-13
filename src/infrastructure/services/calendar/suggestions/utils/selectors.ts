@@ -1,5 +1,5 @@
 import { PTO_CONSTANTS } from '../../const';
-import type { Bridge} from '../../types';
+import type { Bridge } from '../../types';
 import { FilterStrategy } from '../../types';
 import { getKey } from '../../utils/cache';
 
@@ -117,8 +117,6 @@ export const selectOptimalDaysFromBridges = ({
     bridges: selectedBridges,
   };
 };
-
-
 
 interface SelectBridgesForStrategy {
   bridges: Bridge[];

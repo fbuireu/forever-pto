@@ -81,10 +81,10 @@ export const isRangeEnd =
     return isSameDay(date, range.to);
   };
 
-interface GetPreviewRangeParams{
-range?: Partial<FromTo>;
-isSelectingTo?: boolean;
-hoverDate?: Date;
+interface GetPreviewRangeParams {
+  range?: Partial<FromTo>;
+  isSelectingTo?: boolean;
+  hoverDate?: Date;
 }
 
 export const getPreviewRange =

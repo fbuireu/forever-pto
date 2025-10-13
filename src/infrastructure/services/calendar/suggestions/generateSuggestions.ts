@@ -14,8 +14,8 @@ export interface GenerateSuggestionsParams {
   holidays: HolidayDTO[];
   allowPastDays: boolean;
   months: Date[];
-    strategy: FilterStrategy;
-    locale: Locale
+  strategy: FilterStrategy;
+  locale: Locale;
 }
 
 const selectGroupedStrategy = (bridges: Bridge[], ptoDays: number) =>
@@ -40,7 +40,7 @@ export function generateSuggestions({
   holidays,
   allowPastDays,
   months,
-    strategy,
+  strategy,
   locale,
 }: GenerateSuggestionsParams): Suggestion {
   clearDateKeyCache();
@@ -75,6 +75,12 @@ export function generateSuggestions({
     days: selection.days.toSorted((a, b) => a.getTime() - b.getTime()),
     bridges: selection.bridges,
     strategy,
-    metrics: generateMetrics({ suggestion: { days: selection.days, bridges: selection.bridges, strategy }, allowPastDays, locale, bridges: selection.bridges, holidays }), 
+    metrics: generateMetrics({
+      suggestion: { days: selection.days, bridges: selection.bridges, strategy },
+      allowPastDays,
+      locale,
+      bridges: selection.bridges,
+      holidays,
+    }),
   };
 }

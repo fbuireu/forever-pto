@@ -5,7 +5,6 @@ import { motion, type Variants } from 'motion/react';
 
 import { IconProps, useAnimateIconContext, getVariants, IconWrapper } from './icon';
 
-
 type SlidersHorizontalProps = IconProps<keyof typeof animations>;
 
 const animations = {
@@ -135,98 +134,26 @@ function IconComponent({ size, ...props }: SlidersHorizontalProps) {
 
   return (
     <motion.svg
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns='http://www.w3.org/2000/svg'
       width={size}
       height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
       strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      strokeLinecap='round'
+      strokeLinejoin='round'
       {...props}
     >
-      <motion.line
-        x1="3"
-        y1="5"
-        x2="10"
-        y2="5"
-        variants={variants.line1}
-        initial="initial"
-        animate={controls}
-      />
-      <motion.line
-        x1="14"
-        y1="3"
-        x2="14"
-        y2="7"
-        variants={variants.line2}
-        initial="initial"
-        animate={controls}
-      />
-      <motion.line
-        x1="14"
-        y1="5"
-        x2="21"
-        y2="5"
-        variants={variants.line3}
-        initial="initial"
-        animate={controls}
-      />
-      <motion.line
-        x1="3"
-        y1="12"
-        x2="8"
-        y2="12"
-        variants={variants.line4}
-        initial="initial"
-        animate={controls}
-      />
-      <motion.line
-        x1="8"
-        y1="10"
-        x2="8"
-        y2="14"
-        variants={variants.line5}
-        initial="initial"
-        animate={controls}
-      />
-      <motion.line
-        x1="12"
-        y1="12"
-        x2="21"
-        y2="12"
-        variants={variants.line6}
-        initial="initial"
-        animate={controls}
-      />
-      <motion.line
-        x1="3"
-        y1="19"
-        x2="12"
-        y2="19"
-        variants={variants.line7}
-        initial="initial"
-        animate={controls}
-      />
-      <motion.line
-        x1="16"
-        y1="17"
-        x2="16"
-        y2="21"
-        variants={variants.line8}
-        initial="initial"
-        animate={controls}
-      />
-      <motion.line
-        x1="16"
-        y1="19"
-        x2="21"
-        y2="19"
-        variants={variants.line9}
-        initial="initial"
-        animate={controls}
-      />
+      <motion.line x1='3' y1='5' x2='10' y2='5' variants={variants.line1} initial='initial' animate={controls} />
+      <motion.line x1='14' y1='3' x2='14' y2='7' variants={variants.line2} initial='initial' animate={controls} />
+      <motion.line x1='14' y1='5' x2='21' y2='5' variants={variants.line3} initial='initial' animate={controls} />
+      <motion.line x1='3' y1='12' x2='8' y2='12' variants={variants.line4} initial='initial' animate={controls} />
+      <motion.line x1='8' y1='10' x2='8' y2='14' variants={variants.line5} initial='initial' animate={controls} />
+      <motion.line x1='12' y1='12' x2='21' y2='12' variants={variants.line6} initial='initial' animate={controls} />
+      <motion.line x1='3' y1='19' x2='12' y2='19' variants={variants.line7} initial='initial' animate={controls} />
+      <motion.line x1='16' y1='17' x2='16' y2='21' variants={variants.line8} initial='initial' animate={controls} />
+      <motion.line x1='16' y1='19' x2='21' y2='19' variants={variants.line9} initial='initial' animate={controls} />
     </motion.svg>
   );
 }

@@ -37,33 +37,32 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
   }, [countries, setCountries]);
 
   return (
-                <AnimateIcon animateOnHover>
-
-    <Field className='space-y-2 w-full'>
-      <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='countries'>
-        <MapPin size={16} /> Country
-        <TooltipProvider delayDuration={200}>
-          <Tooltip>
-            <TooltipTrigger asChild className='ml-auto'>
-              <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
-            </TooltipTrigger>
-            <TooltipContent className='w-50 text-pretty'>
-              This data is inferred from your CDN and your connection. If you feel that it's not accurate or you want
-              sneak peak into other's countries holidays, you can select it manually here
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </Label>
-      <Combobox
-        className='w-full'
-        id='countries'
-        options={countries}
-        value={country}
-        onChange={setCountry}
-        placeholder={countriesLoading ? 'Loading countries...' : 'Select country...'}
-        searchPlaceholder='Search countries...'
-      />
-    </Field>
+    <AnimateIcon animateOnHover>
+      <Field className='space-y-2 w-full'>
+        <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='countries'>
+          <MapPin size={16} /> Country
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild className='ml-auto'>
+                <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
+              </TooltipTrigger>
+              <TooltipContent className='w-50 text-pretty'>
+                This data is inferred from your CDN and your connection. If you feel that it's not accurate or you want
+                sneak peak into other's countries holidays, you can select it manually here
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </Label>
+        <Combobox
+          className='w-full'
+          id='countries'
+          options={countries}
+          value={country}
+          onChange={setCountry}
+          placeholder={countriesLoading ? 'Loading countries...' : 'Select country...'}
+          searchPlaceholder='Search countries...'
+        />
+      </Field>
     </AnimateIcon>
   );
 };

@@ -61,7 +61,7 @@ export const ContactFormEmail = ({ email, name, subject, message }: ContactFormE
                 <strong>From:</strong> {name}
               </Text>
               <Text className='text-[14px] text-black leading-[20px] margin-0'>
-                <strong>Email:</strong> 
+                <strong>Email:</strong>
                 <Link href={`mailto:${email}`} className='text-[#059669] no-underline font-medium'>
                   {email}
                 </Link>

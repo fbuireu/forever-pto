@@ -35,7 +35,7 @@ export const LanguageSelector = () => {
     const newPathname = pathname.replace(`/${locale}`, `/${newLocale}`);
     router.push(newPathname, { locale: newLocale });
   };
-  
+
   useEffect(() => {
     getCurrencyFromLocale(locale);
   }, [locale, getCurrencyFromLocale]);

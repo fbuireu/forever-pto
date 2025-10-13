@@ -224,46 +224,46 @@ export const Summary = () => {
           </div>
           {metrics.firstLastBreak && (
             <AnimateIcon animateOnHover>
-            <PremiumFeature
-              feature={'Year Summary'}
-              description={'Análisis detallado de tus días libres.'}
-              iconSize='size-7'
-              inlineDescription
-            >
-              <div className='p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg'>
-                <div className='flex items-center gap-2 mb-3'>
-                  <Clock className='w-4 h-4 text-indigo-500' />
-                  <span className='text-sm font-medium text-indigo-700 dark:text-indigo-300'>Resumen del Año</span>
-                </div>
-                <div className='grid grid-cols-3 gap-4 text-center'>
-                  <div>
-                    <div className='text-sm text-muted-foreground'>Primer descanso</div>
-                    <div className='text-lg flex justify-center font-bold text-indigo-700 dark:text-indigo-300'>
-                      <RotatingText text={metrics.firstLastBreak.first} />
+              <PremiumFeature
+                feature={'Year Summary'}
+                description={'Análisis detallado de tus días libres.'}
+                iconSize='size-7'
+                inlineDescription
+              >
+                <div className='p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg'>
+                  <div className='flex items-center gap-2 mb-3'>
+                    <Clock className='w-4 h-4 text-indigo-500' />
+                    <span className='text-sm font-medium text-indigo-700 dark:text-indigo-300'>Resumen del Año</span>
+                  </div>
+                  <div className='grid grid-cols-3 gap-4 text-center'>
+                    <div>
+                      <div className='text-sm text-muted-foreground'>Primer descanso</div>
+                      <div className='text-lg flex justify-center font-bold text-indigo-700 dark:text-indigo-300'>
+                        <RotatingText text={metrics.firstLastBreak.first} />
+                      </div>
+                    </div>
+                    <div>
+                      <div className='text-sm text-muted-foreground'>Max trabajo seguido</div>
+                      <div className='text-lg font-bold text-indigo-700 flex justify-center dark:text-indigo-300'>
+                        <SlidingNumber number={metrics.maxWorkingPeriod} />d
+                      </div>
+                    </div>
+                    <div>
+                      <div className='text-sm text-muted-foreground'>Último descanso</div>
+                      <div className='text-lg font-bold text-indigo-700 dark:text-indigo-300'>
+                        <RotatingText text={metrics.firstLastBreak.last} />
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <div className='text-sm text-muted-foreground'>Max trabajo seguido</div>
-                    <div className='text-lg font-bold text-indigo-700 flex justify-center dark:text-indigo-300'>
-                      <SlidingNumber number={metrics.maxWorkingPeriod} />d
+                  <div className='mt-3 text-center'>
+                    <div className='text-xs text-muted-foreground mb-1'>Días bonus totales</div>
+                    <div className='text-2xl font-bold text-indigo-700 dark:text-indigo-300 flex justify-center'>
+                      +<SlidingNumber number={metrics.bonusDays} />
                     </div>
-                  </div>
-                  <div>
-                    <div className='text-sm text-muted-foreground'>Último descanso</div>
-                    <div className='text-lg font-bold text-indigo-700 dark:text-indigo-300'>
-                      <RotatingText text={metrics.firstLastBreak.last} />
-                    </div>
+                    <div className='text-xs text-indigo-600 dark:text-indigo-400'>días gratis obtenidos</div>
                   </div>
                 </div>
-                <div className='mt-3 text-center'>
-                  <div className='text-xs text-muted-foreground mb-1'>Días bonus totales</div>
-                  <div className='text-2xl font-bold text-indigo-700 dark:text-indigo-300 flex justify-center'>
-                    +<SlidingNumber number={metrics.bonusDays} />
-                  </div>
-                  <div className='text-xs text-indigo-600 dark:text-indigo-400'>días gratis obtenidos</div>
-                </div>
-              </div>
-            </PremiumFeature>
+              </PremiumFeature>
             </AnimateIcon>
           )}
           {canImprove > 0 && (

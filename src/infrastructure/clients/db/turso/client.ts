@@ -21,9 +21,9 @@ export class TursoClient {
 
   private getClient(): Client {
     this.client ??= createClient({
-        url: this.config.url,
-        authToken: this.config.authToken,
-      });
+      url: this.config.url,
+      authToken: this.config.authToken,
+    });
     return this.client;
   }
 

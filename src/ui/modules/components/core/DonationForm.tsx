@@ -42,11 +42,7 @@ export function DonationForm({ form, onSubmit, currentAmount, locale, currency, 
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        noValidate
-        className='grid gap-3'
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} noValidate className='grid gap-3'>
         <FormField
           control={form.control}
           name='email'

@@ -91,7 +91,14 @@ function PopoverContent({
     <AnimatePresence>
       {isOpen && (
         <PopoverPrimitive.Portal forceMount data-slot='popover-portal'>
-          <PopoverPrimitive.Content forceMount align={align} sideOffset={sideOffset} className='z-50' {...props} {...(onOpenAutoFocus && { onOpenAutoFocus })}>
+          <PopoverPrimitive.Content
+            forceMount
+            align={align}
+            sideOffset={sideOffset}
+            className='z-50'
+            {...props}
+            {...(onOpenAutoFocus && { onOpenAutoFocus })}
+          >
             <motion.div
               key='popover-content'
               data-slot='popover-content'

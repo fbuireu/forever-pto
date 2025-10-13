@@ -4,7 +4,6 @@ import * as React from 'react';
 import { motion, type Variants } from 'motion/react';
 import { IconProps, useAnimateIconContext, getVariants, IconWrapper } from './icon';
 
-
 type CircleCheckBigProps = IconProps<keyof typeof animations>;
 
 const animations = {
@@ -35,29 +34,19 @@ function IconComponent({ size, ...props }: CircleCheckBigProps) {
 
   return (
     <motion.svg
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns='http://www.w3.org/2000/svg'
       width={size}
       height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
       strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      strokeLinecap='round'
+      strokeLinejoin='round'
       {...props}
     >
-      <motion.path
-        d="M21.801 10A10 10 0 1 1 17 3.335"
-        variants={variants.path1}
-        initial="initial"
-        animate={controls}
-      />
-      <motion.path
-        d="m9 11 3 3L22 4"
-        variants={variants.path2}
-        initial="initial"
-        animate={controls}
-      />
+      <motion.path d='M21.801 10A10 10 0 1 1 17 3.335' variants={variants.path1} initial='initial' animate={controls} />
+      <motion.path d='m9 11 3 3L22 4' variants={variants.path2} initial='initial' animate={controls} />
     </motion.svg>
   );
 }

@@ -16,7 +16,7 @@ export interface PaymentError {
   type: PaymentErrorType;
   message: string;
   code?: string;
-  paymentId?: string; 
+  paymentId?: string;
   details?: Record<string, unknown>;
 }
 

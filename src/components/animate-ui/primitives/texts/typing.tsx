@@ -10,8 +10,7 @@ type TypingTextContextType = {
   setIsTyping: (isTyping: boolean) => void;
 };
 
-const [TypingTextProvider, useTypingText] =
-  getStrictContext<TypingTextContextType>('TypingTextContext');
+const [TypingTextProvider, useTypingText] = getStrictContext<TypingTextContextType>('TypingTextContext');
 
 type TypingTextProps = React.ComponentProps<'span'> & {
   duration?: number;
@@ -34,14 +33,11 @@ function TypingText({
   text,
   ...props
 }: TypingTextProps) {
-  const { ref: localRef, isInView } = useIsInView(
-    ref as React.Ref<HTMLElement>,
-    {
-      inView,
-      inViewOnce,
-      inViewMargin,
-    },
-  );
+  const { ref: localRef, isInView } = useIsInView(ref as React.Ref<HTMLElement>, {
+    inView,
+    inViewOnce,
+    inViewMargin,
+  });
 
   const [isTyping, setIsTyping] = React.useState(false);
   const [started, setStarted] = React.useState(false);
@@ -121,7 +117,7 @@ function TypingText({
 
   return (
     <TypingTextProvider value={{ isTyping, setIsTyping }}>
-      <span ref={localRef} data-slot="typing-text" {...props}>
+      <span ref={localRef} data-slot='typing-text' {...props}>
         <motion.span>{displayedText}</motion.span>
         {children}
       </span>
@@ -131,16 +127,12 @@ function TypingText({
 
 type TypingTextCursorProps = Omit<HTMLMotionProps<'span'>, 'children'>;
 
-function TypingTextCursor({
-  style,
-  variants,
-  ...props
-}: TypingTextCursorProps) {
+function TypingTextCursor({ style, variants, ...props }: TypingTextCursorProps) {
   const { isTyping } = useTypingText();
 
   return (
     <motion.span
-      data-slot="typing-text-cursor"
+      data-slot='typing-text-cursor'
       variants={{
         blinking: {
           opacity: [0, 0, 1, 1],
@@ -171,9 +163,4 @@ function TypingTextCursor({
   );
 }
 
-export {
-  TypingText,
-  TypingTextCursor,
-  type TypingTextProps,
-  type TypingTextCursorProps,
-};
+export { TypingText, TypingTextCursor, type TypingTextProps, type TypingTextCursorProps };
