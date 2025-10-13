@@ -1,6 +1,6 @@
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
-import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
 
 const withNextIntl = createNextIntlPlugin('./src/infrastructure/i18n/config.ts');
 
@@ -13,10 +13,12 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-    experimental: {
-    serverComponentsExternalPackages: ['@libsql/client'],
-  },
-  serverExternalPackages: ['@libsql/client'],
+  serverExternalPackages: [
+    '@libsql/client',
+    '@libsql/hrana-client',
+    '@libsql/isomorphic-ws',
+    '@libsql/isomorphic-fetch',
+  ],
 };
 
 export default withNextIntl(nextConfig);
