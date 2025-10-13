@@ -12,3 +12,7 @@ binding = "ASSETS"
 enabled = true
 head_sampling_rate = 1
 invocation_logs = true
+
+[[routes]]
+pattern = "forever-pto.com/*"
+zone_name = "forever-pto.com"
