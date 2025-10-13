@@ -26,7 +26,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "pages:build": "next build && npx @cloudflare/next-on-pages",
+    "pages:build": "npx @cloudflare/next-on-pages@1",
     "preview": "pnpm run pages:build && wrangler pages dev .vercel/output/static",
     "deploy": "pnpm run pages:build && wrangler pages deploy .vercel/output/static",
     "test:all": "pnpm run test:ut && pnpm run test:e2e",
