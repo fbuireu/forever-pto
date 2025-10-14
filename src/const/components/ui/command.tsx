@@ -1,12 +1,12 @@
 'use client';
 
-import * as React from 'react';
 import { Command as CommandPrimitive } from 'cmdk';
+import * as React from 'react';
 
-import { cn } from '@const/lib/utils';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@const/components/ui/dialog';
-import { SearchIcon } from 'src/components/animate-ui/icons/search';
+import { cn } from '@const/lib/utils';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
+import { SearchIcon } from 'src/components/animate-ui/icons/search';
 
 function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {
   return (
@@ -51,8 +51,8 @@ function CommandDialog({
 
 function CommandInput({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Input>) {
   return (
-    <div data-slot='command-input-wrapper' className='flex h-9 items-center gap-2 border-b px-3'>
-      <AnimateIcon animateOnHover>
+    <AnimateIcon animateOnHover>
+      <div data-slot='command-input-wrapper' className='flex h-9 items-center gap-2 border-b px-3'>
         <SearchIcon className='size-4 shrink-0 opacity-50' />
         <CommandPrimitive.Input
           data-slot='command-input'
@@ -62,8 +62,8 @@ function CommandInput({ className, ...props }: React.ComponentProps<typeof Comma
           )}
           {...props}
         />
-      </AnimateIcon>
-    </div>
+      </div>
+    </AnimateIcon>
   );
 }
 
@@ -130,11 +130,11 @@ function CommandShortcut({ className, ...props }: React.ComponentProps<'span'>) 
 export {
   Command,
   CommandDialog,
-  CommandInput,
-  CommandList,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
-  CommandShortcut,
+  CommandList,
   CommandSeparator,
+  CommandShortcut,
 };
