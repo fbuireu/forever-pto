@@ -2,6 +2,7 @@ import { Link } from '@application/i18n/navigtion';
 import { Button } from '@const/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
+import { log } from '@logtail/next';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { redirect } from 'next/navigation';
@@ -26,12 +27,19 @@ const getCurrencySymbol = (locale: string, currency: string): string => {
       maximumFractionDigits: 0,
     });
     return formatter.formatToParts(0).find(({ type }) => type === 'currency')?.value ?? currency;
-  } catch {
+  } catch (error) {
+    log.warn('Failed to format currency symbol', {
+      locale,
+      currency,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
     return currency;
   }
 };
 
 function PaymentError() {
+  log.info('Payment error page rendered');
+
   return (
     <div className='min-h-screen flex items-center justify-center p-4 bg-background'>
       <Card className='w-full max-w-md border-destructive/50'>
@@ -62,11 +70,20 @@ function PaymentError() {
   );
 }
 
-
 export default async function PaymentSuccessPage({ searchParams, params }: Readonly<PaymentSuccessParams>) {
-  const [{ payment_intent: paymentIntentId }, { locale }] = await Promise.all([searchParams, params]);
+  const [{ payment_intent: paymentIntentId, redirect_status: redirectStatus }, { locale }] = await Promise.all([
+    searchParams,
+    params,
+  ]);
+
+  log.info('Payment success page accessed', {
+    hasPaymentIntent: !!paymentIntentId,
+    redirectStatus,
+    locale,
+  });
 
   if (!paymentIntentId) {
+    log.warn('Payment success page accessed without payment_intent, redirecting to home');
     redirect('/');
   }
 
@@ -74,18 +91,42 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
 
   try {
     paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    log.info('Payment intent retrieved', {
+      paymentIntentId,
+      status: paymentIntent.status,
+      amount: paymentIntent.amount,
+      currency: paymentIntent.currency,
+    });
   } catch (error) {
-    console.error('Error retrieving payment intent:', error);
+    log.error('Error retrieving payment intent', {
+      paymentIntentId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return <PaymentError />;
   }
 
   if (paymentIntent.status !== 'succeeded') {
+    log.warn('Payment intent not succeeded', {
+      paymentIntentId,
+      status: paymentIntent.status,
+      amount: paymentIntent.amount,
+      currency: paymentIntent.currency,
+    });
     return <PaymentError />;
   }
 
   const amount = paymentIntent.amount / 100;
   const currency = paymentIntent.currency.toUpperCase();
   const currencySymbol = getCurrencySymbol(locale, currency);
+
+  log.info('Payment success page rendered successfully', {
+    paymentIntentId,
+    amount,
+    currency,
+    locale,
+  });
 
   return (
     <div className='min-h-screen flex items-center justify-center p-4 bg-background m-auto'>
@@ -130,4 +171,3 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
     </div>
   );
 }
-

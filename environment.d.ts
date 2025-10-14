@@ -16,6 +16,8 @@ declare global {
       STRIPE_SECRET_KEY: string;
       STRIPE_WEBHOOK_SECRET: string;
       RESEND_API_KEY: string;
+      NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: string;
+      NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: string;
     }
   }
 }

@@ -62,6 +62,7 @@ export function PalmTree({
         transition={{
           duration: 0.6,
           ease: 'easeOut',
+          delay: 2,
         }}
       >
         {svgContent}
