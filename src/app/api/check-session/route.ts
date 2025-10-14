@@ -1,11 +1,11 @@
 import { activateWithEmail, activateWithPayment } from '@application/use-cases/activate-premium';
 import { verifySession } from '@application/use-cases/verify-session';
 import { getTursoClient } from '@infrastructure/clients/db/turso/client';
+import { getBetterStackClient } from '@infrastructure/clients/logging/better-stack/client';
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
 import { createPaymentValidator } from '@infrastructure/services/payments/provider/validate-payment-intent';
 import { createPaymentRepository } from '@infrastructure/services/payments/repository';
 import { createSessionRepository } from '@infrastructure/services/premium/repository';
-import { withBetterStack, type BetterStackRequest } from '@logtail/next';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -22,14 +22,15 @@ const getJWTSecret = () => {
   return secret;
 };
 
-export const GET = withBetterStack(async (req: BetterStackRequest) => {
-  req.log.info('GET /check-session called');
+export async function GET() {
+  const logger = getBetterStackClient();
+  logger.info('GET /api/check-session');
 
   const cookieStore = await cookies();
   const token = cookieStore.get(PREMIUM_COOKIE)?.value;
 
   if (!token) {
-    req.log.info('No premium token found in cookies');
+    logger.info('No premium token found in cookies');
     return NextResponse.json({ premiumKey: null, email: null });
   }
 
@@ -37,13 +38,15 @@ export const GET = withBetterStack(async (req: BetterStackRequest) => {
   const verification = await verifySession(token, { sessionRepository });
 
   if (!verification.valid) {
-    req.log.warn('Invalid session token', { hasData: !!verification.data });
+    logger.warn('Invalid session token', {
+      hasData: !!verification.data,
+    });
     const response = NextResponse.json({ premiumKey: null, email: null });
     response.cookies.delete(PREMIUM_COOKIE);
     return response;
   }
 
-  req.log.info('Session verified successfully', {
+  logger.info('Session verified successfully', {
     email: verification.data?.email,
     hasPaymentIntent: !!verification.data?.paymentIntentId,
   });
@@ -52,22 +55,34 @@ export const GET = withBetterStack(async (req: BetterStackRequest) => {
     premiumKey: verification.data?.paymentIntentId ?? null,
     email: verification.data?.email ?? null,
   });
-});
+}
 
-export const POST = withBetterStack(async (req: BetterStackRequest & NextRequest) => {
-  req.log.info('POST /check-session called');
+export async function POST(request: NextRequest) {
+  const logger = getBetterStackClient();
+  const requestId = crypto.randomUUID();
+  const requestLogger = logger.withContext({
+    requestId,
+    method: request.method,
+    path: '/api/check-session',
+  });
+
+  requestLogger.info('POST /api/check-session started');
 
   try {
-    const body = await req.json();
+    const body = await request.json();
     const { email, premiumKey } = body as { email?: string; premiumKey?: string };
 
     if (!email) {
-      req.log.warn('Email missing in request body');
+      requestLogger.warn('Email missing in request body');
       return NextResponse.json({ error: 'Email required' }, { status: 400 });
     }
 
-    const log = req.log.with({ email, hasPremiumKey: !!premiumKey });
-    log.info('Processing premium activation request');
+    const userLogger = requestLogger.withContext({
+      email,
+      hasPremiumKey: !!premiumKey,
+    });
+
+    userLogger.info('Processing premium activation');
 
     const stripe = getStripeServerInstance();
     const turso = getTursoClient();
@@ -84,15 +99,17 @@ export const POST = withBetterStack(async (req: BetterStackRequest & NextRequest
     let result;
 
     if (premiumKey) {
-      log.info('Activating with payment intent', { premiumKey });
+      userLogger.info('Activating with payment intent', { premiumKey });
       result = await activateWithPayment({ email, paymentIntentId: premiumKey }, params);
     } else {
-      log.info('Checking existing payment for email');
+      userLogger.info('Checking existing payment for email');
       result = await activateWithEmail({ email }, params);
     }
 
     if (!result.success) {
-      log.warn('Premium activation failed', { error: result.error });
+      userLogger.warn('Premium activation failed', {
+        error: result.error,
+      });
       return NextResponse.json(
         {
           error: result.error,
@@ -102,7 +119,7 @@ export const POST = withBetterStack(async (req: BetterStackRequest & NextRequest
       );
     }
 
-    log.info('Premium activated successfully', {
+    userLogger.info('Premium activated successfully', {
       premiumKey: result.premiumKey,
     });
 
@@ -120,12 +137,13 @@ export const POST = withBetterStack(async (req: BetterStackRequest & NextRequest
       path: '/',
     });
 
+    requestLogger.info('POST /api/check-session completed successfully', {
+      status: 200,
+    });
+
     return response;
   } catch (error) {
-    req.log.error('Error in check-session POST', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-    });
+    requestLogger.logError('POST /api/check-session failed', error);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
-});
+}
