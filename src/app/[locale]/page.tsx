@@ -29,6 +29,7 @@ export { generateMetadata };
 
 // todo: ads?
 // todo: toast vs error messages
+// todo: setup better stack
 // todo: unify component and folder structure
 // todo: locale all
 // todo: responsive

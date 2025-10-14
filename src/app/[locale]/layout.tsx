@@ -6,7 +6,6 @@ import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { Analytics } from '@ui/modules/components/core/Analytics';
 import { CookieConsent } from '@ui/modules/components/core/CookieConsent';
 import { Donate } from '@ui/modules/components/core/Donate';
-import { ErrorBoundary } from '@ui/modules/components/core/ErrorBoundary';
 import { SiteTitle } from '@ui/modules/components/core/SiteTitle';
 import { Footer } from '@ui/modules/components/footer/Footer';
 import { StoresInitializer } from '@ui/store/StoresInitializer';
@@ -47,35 +46,35 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
   }
 
   return (
-    <ErrorBoundary>
-      <html lang={locale}>
-        <body className={cn(geistSans.variable, geistMono.variable, 'antialiased')}>
-          <NextIntlClientProvider>
-            <ThemeProvider
-              attribute='data-theme'
-              defaultTheme='system'
-              storageKey='theme'
-              enableSystem
-              disableTransitionOnChange
-            >
-              <SidebarProvider>
-                <StoresInitializer userCountry={userCountry} />
-                <AppSidebar locale={locale}>
-                  <SiteTitle />
-                  {children}
-                  <Toaster />
-                  <Donate />
-                  <PremiumModal />
-                  <CookieConsent />
-                </AppSidebar>
-              </SidebarProvider>
-              <Footer />
-            </ThemeProvider>
-          </NextIntlClientProvider>
-          <Analytics />
-        </body>
-      </html>
-    </ErrorBoundary>
+    // <ErrorBoundary>
+    <html lang={locale}>
+      <body className={cn(geistSans.variable, geistMono.variable, 'antialiased')}>
+        <NextIntlClientProvider>
+          <ThemeProvider
+            attribute='data-theme'
+            defaultTheme='system'
+            storageKey='theme'
+            enableSystem
+            disableTransitionOnChange
+          >
+            <SidebarProvider>
+              <StoresInitializer userCountry={userCountry} />
+              <AppSidebar locale={locale}>
+                <SiteTitle />
+                {children}
+                <Toaster />
+                <Donate />
+                <PremiumModal />
+                <CookieConsent />
+              </AppSidebar>
+            </SidebarProvider>
+            <Footer />
+          </ThemeProvider>
+        </NextIntlClientProvider>
+        <Analytics />
+      </body>
+    </html>
+    // </ErrorBoundary>
   );
 };
 
