@@ -4,6 +4,8 @@ packages:
 minimumReleaseAge: 1440
 
 onlyBuiltDependencies:
+  - '@parcel/watcher'
   - '@tailwindcss/oxide'
   - sharp
+  - unrs-resolver
   - workerd
