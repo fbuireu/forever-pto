@@ -46,7 +46,6 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
   }
 
   return (
-    // <ErrorBoundary>
     <html lang={locale}>
       <body className={cn(geistSans.variable, geistMono.variable, 'antialiased')}>
         <NextIntlClientProvider>
@@ -74,7 +73,6 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
         <Analytics />
       </body>
     </html>
-    // </ErrorBoundary>
   );
 };
 

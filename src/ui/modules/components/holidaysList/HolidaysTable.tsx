@@ -327,18 +327,16 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                       );
                     })
                   ) : (
-                    <TableRow>
-                      <AnimateIcon animateOnHover>
+                    <AnimateIcon animateOnView loop asChild>
+                      <TableRow>
                         <TableCell colSpan={shouldShowLocationColumn ? 7 : 6} className='h-24 text-center'>
                           <div className='flex flex-col items-center space-y-2 text-muted-foreground'>
                             <Search className='h-8 w-8' />
-                            <span>
-                              {debouncedSearchTerm ? 'No se encontraron festividades' : 'No hay festividades'}
-                            </span>
+                            {debouncedSearchTerm ? 'No se encontraron festividades' : 'No hay festividades'}
                           </div>
                         </TableCell>
-                      </AnimateIcon>
-                    </TableRow>
+                      </TableRow>
+                    </AnimateIcon>
                   )}
                 </TableBody>
               </Table>
