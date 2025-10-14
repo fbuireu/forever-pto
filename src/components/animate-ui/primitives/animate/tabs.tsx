@@ -1,13 +1,11 @@
-/* eslint-disable */
-//@ts-nocheck
 'use client';
 
+import { Slot } from '@radix-ui/react-slot';
 import { motion, type HTMLMotionProps, type Transition } from 'motion/react';
-import { Slot } from 'radix-ui';
 import * as React from 'react';
 import { getStrictContext } from 'src/lib/get-strict-context';
-import { Highlight, HighlightItem, HighlightItemProps, HighlightProps } from '../effects/highlight';
-import { WithAsChild } from './slot';
+import { Highlight, HighlightItem, type HighlightItemProps, type HighlightProps } from '../effects/highlight';
+import type { WithAsChild } from './slot';
 
 type TabsContextType = {
   activeValue: string;
@@ -43,7 +41,7 @@ function Tabs({ defaultValue, value, onValueChange, children, ...props }: TabsPr
 
   React.useEffect(() => {
     if (!isControlled && activeValue === undefined && triggersRef.current.size > 0 && !initialSet.current) {
-      const firstTab = triggersRef.current.keys().next().value as string | undefined;
+      const firstTab = triggersRef.current.keys().next().value;
       if (firstTab !== undefined) {
         setActiveValue(firstTab);
         initialSet.current = true;
@@ -140,18 +138,20 @@ function TabsTrigger({ ref, value, asChild = false, ...props }: TabsTriggerProps
     return () => registerTrigger(value, null);
   }, [value, registerTrigger]);
 
-  const Component = asChild ? Slot : motion.button;
+  const commonProps = {
+    ref: localRef,
+    'data-slot': 'tabs-trigger' as const,
+    role: 'tab' as const,
+    onClick: () => handleValueChange(value),
+    'data-state': activeValue === value ? ('active' as const) : ('inactive' as const),
+  };
 
-  return (
-    <Component
-      ref={localRef}
-      data-slot='tabs-trigger'
-      role='tab'
-      onClick={() => handleValueChange(value)}
-      data-state={activeValue === value ? 'active' : 'inactive'}
-      {...props}
-    />
-  );
+  if (asChild) {
+    const { ...slotProps } = props;
+    return <Slot {...commonProps} {...(slotProps as React.ComponentPropsWithRef<'button'>)} />;
+  }
+
+  return <motion.button {...commonProps} {...props} />;
 }
 
 type TabsContentsProps = HTMLMotionProps<'div'> & {
@@ -252,7 +252,7 @@ function TabsContents({
       <motion.div className='flex -mx-2' animate={{ x: activeIndex * -100 + '%' }} transition={transition}>
         {childrenArray.map((child, index) => (
           <div
-            key={index}
+            key={String(child)}
             ref={(el) => {
               itemRefs.current[index] = el;
             }}
@@ -277,21 +277,26 @@ function TabsContent({ value, style, asChild = false, ...props }: TabsContentPro
   const { activeValue } = useTabs();
   const isActive = activeValue === value;
 
-  const Component = asChild ? Slot : motion.div;
+  const commonProps = {
+    role: 'tabpanel' as const,
+    'data-slot': 'tabs-content' as const,
+    inert: !isActive ? (true as unknown as undefined) : undefined,
+    style: { overflow: 'hidden', ...style } as React.CSSProperties,
+  };
 
-  return (
-    <Component
-      role='tabpanel'
-      data-slot='tabs-content'
-      inert={!isActive}
-      style={{ overflow: 'hidden', ...style }}
-      initial={{ filter: 'blur(0px)' }}
-      animate={{ filter: isActive ? 'blur(0px)' : 'blur(4px)' }}
-      exit={{ filter: 'blur(0px)' }}
-      transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-      {...props}
-    />
-  );
+  const motionProps = {
+    initial: { filter: 'blur(0px)' },
+    animate: { filter: isActive ? 'blur(0px)' : 'blur(4px)' },
+    exit: { filter: 'blur(0px)' },
+    transition: { type: 'spring' as const, stiffness: 200, damping: 25 },
+  };
+
+  if (asChild) {
+    const { ...slotProps } = props;
+    return <Slot {...commonProps} {...(slotProps as React.ComponentPropsWithRef<'div'>)} />;
+  }
+
+  return <motion.div {...commonProps} {...motionProps} {...props} />;
 }
 
 export {

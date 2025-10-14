@@ -3,11 +3,12 @@ import Script from 'next/script';
 export const Analytics = () => {
   return (
     <>
-      <Script
+          <Script
+              id="google-analytics"
         strategy='afterInteractive'
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}`}
       />
-      <Script strategy='afterInteractive'>
+      <Script strategy='afterInteractive' id="google-analytics-inline">
         {`
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}

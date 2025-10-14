@@ -1,12 +1,9 @@
-//@ts-nocheck
-// eslint-disable
-
-import * as React from 'react';
 import { Tabs as TabsPrimitive } from '@base-ui-components/react/tabs';
-import { motion, AnimatePresence, type HTMLMotionProps } from 'motion/react';
-import { useControlledState } from 'src/hooks/use-controlled-state';
+import { AnimatePresence, motion, type HTMLMotionProps } from 'motion/react';
+import * as React from 'react';
 import { getStrictContext } from 'src/lib/get-strict-context';
-import { type HighlightProps, type HighlightItemProps, HighlightItem, Highlight } from '../effects/highlight';
+import { Highlight, HighlightItem, type HighlightItemProps, type HighlightProps } from '../effects/highlight';
+import { useControlledState } from '@ui/hooks/useControlledState';
 
 type TabsContextType = {
   value: string | undefined;
@@ -129,14 +126,14 @@ export {
   TabsHighlight,
   TabsHighlightItem,
   TabsList,
-  TabsTab,
   TabsPanel,
   TabsPanels,
-  type TabsProps,
-  type TabsHighlightProps,
+  TabsTab,
   type TabsHighlightItemProps,
+  type TabsHighlightProps,
   type TabsListProps,
-  type TabsTabProps,
   type TabsPanelProps,
   type TabsPanelsProps,
+  type TabsProps,
+  type TabsTabProps,
 };

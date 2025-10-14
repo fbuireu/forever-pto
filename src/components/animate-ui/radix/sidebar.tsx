@@ -1,5 +1,3 @@
-//eslint-disable
-//@ts-nocheck
 'use client';
 
 import { Input } from '@const/components/ui/input';
@@ -7,10 +5,10 @@ import { Separator } from '@const/components/ui/separator';
 import { Skeleton } from '@const/components/ui/skeleton';
 import { useIsMobile } from '@const/hooks/use-mobile';
 import { cn } from '@const/lib/utils';
+import { Slot } from '@radix-ui/react-slot';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { type Transition } from 'motion/react';
-import { Slot } from 'radix-ui';
 import * as React from 'react';
 import { Button } from '../components/buttons/button';
 import { MotionHighlight, MotionHighlightItem } from '../effects/motion-highlight';
@@ -293,8 +291,10 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
       }}
       {...props}
     >
-      <PanelLeftIcon width={32} height={32} className={className} animateOnHover />
-      <span className='sr-only'>Toggle Sidebar</span>
+      <React.Fragment>
+        <PanelLeftIcon width={32} height={32} className={className} animateOnHover />
+        <span className='sr-only'>Toggle Sidebar</span>
+      </React.Fragment>
     </Button>
   );
 }
@@ -428,7 +428,7 @@ type SidebarGroupLabelProps = React.ComponentProps<'div'> & {
 };
 
 function SidebarGroupLabel({ className, asChild = false, ...props }: SidebarGroupLabelProps) {
-  const Comp = asChild ? Slot.Root : 'div';
+  const Comp = asChild ? Slot : 'div';
 
   return (
     <Comp
@@ -449,7 +449,7 @@ type SidebarGroupActionProps = React.ComponentProps<'button'> & {
 };
 
 function SidebarGroupAction({ className, asChild = false, ...props }: SidebarGroupActionProps) {
-  const Comp = asChild ? Slot.Root : 'button';
+  const Comp = asChild ? Slot : 'button';
 
   return (
     <Comp
@@ -556,7 +556,7 @@ function SidebarMenuButton({
   className,
   ...props
 }: SidebarMenuButtonProps) {
-  const Comp = asChild ? Slot.Root : 'button';
+  const Comp = asChild ? Slot : 'button';
   const { isMobile, state } = useSidebar();
 
   const button = (
@@ -596,7 +596,7 @@ type SidebarMenuActionProps = React.ComponentProps<'button'> & {
 };
 
 function SidebarMenuAction({ className, asChild = false, showOnHover = false, ...props }: SidebarMenuActionProps) {
-  const Comp = asChild ? Slot.Root : 'button';
+  const Comp = asChild ? Slot : 'button';
 
   return (
     <Comp
@@ -714,7 +714,7 @@ function SidebarMenuSubButton({
   className,
   ...props
 }: SidebarMenuSubButtonProps) {
-  const Comp = asChild ? Slot.Root : 'a';
+  const Comp = asChild ? Slot : 'a';
 
   return (
     <MotionHighlightItem activeClassName='bg-sidebar-accent text-sidebar-accent-foreground rounded-md'>

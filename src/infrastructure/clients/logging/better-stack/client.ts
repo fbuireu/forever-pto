@@ -52,8 +52,6 @@ export class BetterStackClient {
 let instance: BetterStackClient | null = null;
 
 export const getBetterStackClient = (): BetterStackClient => {
-  if (!instance) {
-    instance = new BetterStackClient();
-  }
+  instance ??= new BetterStackClient();
   return instance;
 };

@@ -6,14 +6,13 @@ import {
   useAnimation,
   type SVGMotionProps,
   type UseInViewOptions,
-  type LegacyAnimationControls,
   type Variants,
   type HTMLMotionProps,
 } from 'motion/react';
 
 import { cn } from '@const/lib/utils';
-import { useIsInView } from 'src/hooks/use-is-in-view';
 import { Slot, type WithAsChild } from '../primitives/animate/slot';
+import { useIsInView } from '@ui/hooks/useIsInView';
 
 const staticAnimations = {
   path: {
@@ -43,7 +42,7 @@ type TriggerProp<T = string> = boolean | StaticAnimations | T;
 type Trigger = TriggerProp<string>;
 
 type AnimateIconContextValue = {
-  controls: LegacyAnimationControls | undefined;
+  controls: ReturnType<typeof useAnimation> | undefined;
   animation: StaticAnimations | string;
   loop: boolean;
   loopDelay: number;
