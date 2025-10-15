@@ -1,4 +1,11 @@
-import { loadStripe, StripeElementLocale, type PaymentIntent, type Stripe, type StripeElements, type StripeError } from '@stripe/stripe-js';
+import {
+  loadStripe,
+  type PaymentIntent,
+  type Stripe,
+  type StripeElementLocale,
+  type StripeElements,
+  type StripeError,
+} from '@stripe/stripe-js';
 import StripeNode from 'stripe';
 
 export interface PaymentResult {
@@ -108,7 +115,7 @@ export class StripeClient {
     }
   }
 
- async confirmCardPayment(
+  async confirmCardPayment(
     clientSecret: string,
     cardElement?: any,
     billingDetails?: {
@@ -151,8 +158,8 @@ export class StripeClient {
 
   isLoaded(): boolean {
     return this.stripe !== null;
-    }
-    
+  }
+
   destroy(): void {
     this.elements = null;
   }
