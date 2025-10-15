@@ -2,8 +2,8 @@ import type { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { Button } from '@const/components/ui/button';
 import { formatDiscountText } from '@infrastructure/services/payments/utils/formatters';
-import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import { confirmPayment } from '@ui/adapters/payments/checkout';
+import { getStripeClientInstance } from '@infrastructure/clients/payments/stripe/client';
+import { ExpressCheckoutElement, PaymentElement } from '@stripe/react-stripe-js';
 import { AlertCircle } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import dynamic from 'next/dynamic';
@@ -16,6 +16,7 @@ import { ExpressCheckoutSkeleton } from '../skeletons/ExpressCheckoutSkeleton';
 interface CheckoutFormProps {
   amount: number;
   email: string;
+  clientSecret: string;
   discountInfo: DiscountInfo | null;
   onSuccess: () => void;
   onCancel: () => void;
@@ -23,14 +24,21 @@ interface CheckoutFormProps {
 
 const ConfettiCannon = dynamic(() => import('./ConfettiCannon').then((module) => ({ default: module.ConfettiCannon })));
 
-export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel }: Readonly<CheckoutFormProps>) {
-  const stripe = useStripe();
-  const elements = useElements();
+export function CheckoutForm({
+  amount,
+  email,
+  clientSecret,
+  discountInfo,
+  onSuccess,
+  onCancel,
+}: Readonly<CheckoutFormProps>) {
   const locale = useLocale();
   const [isExpressReady, setIsExpressReady] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+
+  const stripeClient = useMemo(() => getStripeClientInstance(), []);
 
   const { getCurrencyFromLocale, currencySymbol, setPremiumStatus } = usePremiumStore(
     useShallow((state) => ({
@@ -48,14 +56,10 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   const discountText = useMemo(() => formatDiscountText(discountInfo), [discountInfo]);
 
   const processPayment = useCallback(async () => {
-    if (!stripe || !elements) return;
-
     setErrorMessage(null);
 
-    const result = await confirmPayment({
-      stripe,
-      elements,
-      email,
+    const result = await stripeClient.confirmPayment({
+      clientSecret,
       returnUrl: `${window.location.origin}/payment/confirmation`,
     });
 
@@ -63,19 +67,17 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
       const errorMsg = result.error ?? 'Payment failed';
       setErrorMessage(errorMsg);
     } else {
-      if (result.sessionData) {
-        setPremiumStatus({
-          email: result.sessionData.email,
-          premiumKey: result.sessionData.premiumKey,
-        });
-      }
+      setPremiumStatus({
+        email,
+        premiumKey: result.paymentIntentId ?? '',
+      });
 
       setShowConfetti(true);
       setTimeout(() => {
         onSuccess();
       }, 1000);
     }
-  }, [stripe, elements, email, onSuccess, setPremiumStatus]);
+  }, [stripeClient, clientSecret, email, onSuccess, setPremiumStatus]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -169,7 +171,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
         )}
         <Button
           type='submit'
-          disabled={!stripe || isPending || !elements}
+          disabled={isPending}
           className='w-full bg-green-600 hover:bg-green-700'
           aria-busy={isPending}
         >

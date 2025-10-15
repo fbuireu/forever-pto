@@ -253,6 +253,7 @@ export const Donate = () => {
               <Elements stripe={stripePromise} options={elementsOptions}>
                 <CheckoutForm
                   amount={finalAmount}
+                  clientSecret={paymentState.clientSecret}
                   email={paymentState.data.email}
                   discountInfo={paymentState.discountInfo}
                   onSuccess={handlePaymentSuccess}

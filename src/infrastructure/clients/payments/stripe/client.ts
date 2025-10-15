@@ -1,4 +1,4 @@
-import { loadStripe, type PaymentIntent, type Stripe, type StripeError } from '@stripe/stripe-js';
+import { loadStripe, StripeElementLocale, type PaymentIntent, type Stripe, type StripeElements, type StripeError } from '@stripe/stripe-js';
 import StripeNode from 'stripe';
 
 export interface PaymentResult {
@@ -16,6 +16,7 @@ export interface PaymentParams {
 export class StripeClient {
   private stripePromise: Promise<Stripe | null> | null = null;
   private stripe: Stripe | null = null;
+  private elements: StripeElements | null = null;
   private readonly publishableKey: string;
 
   constructor(publishableKey: string) {
@@ -40,6 +41,55 @@ export class StripeClient {
     return this.stripe;
   }
 
+  async createElements(
+    clientSecret: string,
+    options?: {
+      appearance?: {
+        theme?: 'stripe' | 'night' | 'flat';
+        variables?: Record<string, string>;
+      };
+      locale?: StripeElementLocale;
+    }
+  ): Promise<StripeElements> {
+    const stripe = await this.getStripe();
+
+    this.elements = stripe.elements({
+      clientSecret,
+      appearance: options?.appearance,
+      locale: options?.locale,
+    });
+
+    return this.elements;
+  }
+
+  async mountCardElement(containerId: string, clientSecret: string): Promise<void> {
+    if (!this.elements) {
+      await this.createElements(clientSecret, { locale: 'auto' });
+    }
+
+    const cardElement = this.elements!.create('card', {
+      style: {
+        base: {
+          fontSize: '16px',
+          color: '#424770',
+          '::placeholder': {
+            color: '#aab7c4',
+          },
+        },
+        invalid: {
+          color: '#9e2146',
+        },
+      },
+    });
+
+    const container = document.getElementById(containerId);
+    if (!container) {
+      throw new Error(`Container with id "${containerId}" not found`);
+    }
+
+    cardElement.mount(`#${containerId}`);
+  }
+
   async confirmPayment(params: PaymentParams): Promise<PaymentResult> {
     try {
       const stripe = await this.getStripe();
@@ -58,10 +108,41 @@ export class StripeClient {
     }
   }
 
-  async confirmCardPayment(clientSecret: string): Promise<PaymentResult> {
+ async confirmCardPayment(
+    clientSecret: string,
+    cardElement?: any,
+    billingDetails?: {
+      name?: string;
+      email?: string;
+      phone?: string;
+      address?: {
+        line1?: string;
+        line2?: string;
+        city?: string;
+        state?: string;
+        postal_code?: string;
+        country?: string;
+      };
+    }
+  ): Promise<PaymentResult> {
     try {
       const stripe = await this.getStripe();
-      const result = await stripe.confirmCardPayment(clientSecret);
+
+      const paymentMethodData = billingDetails
+        ? {
+            billing_details: billingDetails,
+          }
+        : undefined;
+
+      const result = cardElement
+        ? await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+              card: cardElement,
+              ...paymentMethodData,
+            },
+          })
+        : await stripe.confirmCardPayment(clientSecret);
+
       return this.handlePaymentResult(result);
     } catch (error) {
       return this.handleError(error);
@@ -70,6 +151,10 @@ export class StripeClient {
 
   isLoaded(): boolean {
     return this.stripe !== null;
+    }
+    
+  destroy(): void {
+    this.elements = null;
   }
 
   private handlePaymentResult(result: { error: StripeError } | { paymentIntent: PaymentIntent }): PaymentResult {
@@ -148,6 +233,7 @@ export const getStripeClientInstance = (): StripeClient => {
 };
 
 export const resetStripeClient = (): void => {
+  stripeClientInstance?.destroy();
   stripeClientInstance = null;
 };
 
