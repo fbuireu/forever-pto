@@ -27,7 +27,6 @@ const Home = async () => {
 export default Home;
 export { generateMetadata };
 
-// todo: check stripe implementation (express checkout loading?)
 // todo: setup better stack (replace console.logs/warns/errors)
 // todo: stripe appearance (warnings + fix)
 // todo: responsive

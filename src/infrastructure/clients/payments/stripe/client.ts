@@ -58,6 +58,16 @@ export class StripeClient {
     }
   }
 
+  async confirmCardPayment(clientSecret: string): Promise<PaymentResult> {
+    try {
+      const stripe = await this.getStripe();
+      const result = await stripe.confirmCardPayment(clientSecret);
+      return this.handlePaymentResult(result);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
   isLoaded(): boolean {
     return this.stripe !== null;
   }
