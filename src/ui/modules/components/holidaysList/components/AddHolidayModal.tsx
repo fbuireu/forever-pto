@@ -19,25 +19,15 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Plus } from 'src/components/animate-ui/icons/plus';
-import { z } from 'zod';
 import { Calendar, CalendarSelectionMode, type FromTo } from '../../core/Calendar';
 import { formatDate } from '../../utils/formatters';
+import { type HolidayFormData, holidaySchema } from './schema';
 
 interface AddHolidayModalProps {
   open: boolean;
   onClose: () => void;
   locale: Locale;
 }
-
-const holidaySchema = z.object({
-  name: z.string().min(1, 'Holiday name is required').max(100, 'Holiday name is too long'),
-  date: z.date({
-    required_error: 'Please select a date',
-    invalid_type_error: 'Please select a valid date',
-  }),
-});
-
-type HolidayFormData = z.infer<typeof holidaySchema>;
 
 export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps) => {
   const { holidays, addHoliday, currentSelection, alternatives, suggestion } = useHolidaysStore();
