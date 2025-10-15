@@ -1,8 +1,8 @@
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { Button } from '@const/components/ui/button';
-import { formatDiscountText } from '@infrastructure/services/payments/utils/formatters';
 import { getStripeClientInstance } from '@infrastructure/clients/payments/stripe/client';
+import { formatDiscountText } from '@infrastructure/services/payments/utils/formatters';
 import { ExpressCheckoutElement, PaymentElement } from '@stripe/react-stripe-js';
 import { AlertCircle } from 'lucide-react';
 import { useLocale } from 'next-intl';
