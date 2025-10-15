@@ -3,15 +3,15 @@
 import { contactSchema } from '@application/dto/contact/schema';
 import type { ContactFormData, ContactResult } from '@application/dto/contact/types';
 import { createContactError } from '@domain/contact/events/factory/errors';
-import { getTursoClient } from '@infrastructure/clients/db/turso/client';
-import { getResendClient } from '@infrastructure/clients/email/resend/client';
+import { getTursoClientInstance } from '@infrastructure/clients/db/turso/client';
+import { getResendClientInstance } from '@infrastructure/clients/email/resend/client';
 import { saveContact } from '@infrastructure/services/contact/repository';
 import { ContactFormEmail } from '@infrastructure/services/email/templates/Contact';
 import { render } from '@react-email/render';
 import { z } from 'zod';
 
-const turso = getTursoClient();
-const resend = getResendClient();
+const turso = getTursoClientInstance();
+const resend = getResendClientInstance();
 
 export async function sendContactEmail(data: ContactFormData): Promise<ContactResult> {
   try {

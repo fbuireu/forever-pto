@@ -1,7 +1,7 @@
 import { activateWithEmail, activateWithPayment } from '@application/use-cases/activate-premium';
 import { verifySession } from '@application/use-cases/verify-session';
-import { getTursoClient } from '@infrastructure/clients/db/turso/client';
-import { getBetterStackClient } from '@infrastructure/clients/logging/better-stack/client';
+import { getTursoClientInstance } from '@infrastructure/clients/db/turso/client';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
 import { createPaymentValidator } from '@infrastructure/services/payments/provider/validate-payment-intent';
 import { createPaymentRepository } from '@infrastructure/services/payments/repository';
@@ -23,7 +23,7 @@ const getJWTSecret = () => {
 };
 
 export async function GET() {
-  const logger = getBetterStackClient();
+  const logger = getBetterStackInstance();
   logger.info('GET /api/check-session');
 
   const cookieStore = await cookies();
@@ -58,7 +58,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const logger = getBetterStackClient();
+  const logger = getBetterStackInstance();
   const requestId = crypto.randomUUID();
   const requestLogger = logger.withContext({
     requestId,
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     userLogger.info('Processing premium activation');
 
     const stripe = getStripeServerInstance();
-    const turso = getTursoClient();
+    const turso = getTursoClientInstance();
     const sessionRepository = createSessionRepository({ jwtSecret: getJWTSecret() });
     const paymentValidator = createPaymentValidator(stripe);
     const paymentRepository = createPaymentRepository(turso);

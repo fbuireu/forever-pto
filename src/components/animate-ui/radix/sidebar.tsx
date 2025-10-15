@@ -291,10 +291,10 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
       }}
       {...props}
     >
-      <React.Fragment>
-        <PanelLeftIcon width={32} height={32} className={className} animateOnHover />
+      <>
+        <PanelLeftIcon width={32} height={32} className={cn('rounded-sm bg-accent', className)} animateOnHover />
         <span className='sr-only'>Toggle Sidebar</span>
-      </React.Fragment>
+      </>
     </Button>
   );
 }

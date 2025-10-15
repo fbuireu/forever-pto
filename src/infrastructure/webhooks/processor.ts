@@ -1,18 +1,18 @@
-import { handlePaymentSucceeded } from '@domain/payment/handlers/payment-succeeded';
-import { handlePaymentFailed } from '@domain/payment/handlers/payment-failed';
-import { handleChargeSucceeded } from '@domain/payment/handlers/charge-succeeded';
-import { createPaymentRepository } from '@infrastructure/services/payments/repository';
-import { createChargeService } from '@infrastructure/services/payments/provider/charge-service';
-import { getTursoClient } from '@infrastructure/clients/db/turso/client';
-import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
-import type Stripe from 'stripe';
 import {
-  createPaymentSucceededEvent,
-  createPaymentFailedEvent,
   createChargeSucceededEvent,
+  createPaymentFailedEvent,
+  createPaymentSucceededEvent,
 } from '@domain/payment/events/factory/events';
+import { handleChargeSucceeded } from '@domain/payment/handlers/charge-succeeded';
+import { handlePaymentFailed } from '@domain/payment/handlers/payment-failed';
+import { handlePaymentSucceeded } from '@domain/payment/handlers/payment-succeeded';
+import { getTursoClientInstance } from '@infrastructure/clients/db/turso/client';
+import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
+import { createChargeService } from '@infrastructure/services/payments/provider/charge-service';
+import { createPaymentRepository } from '@infrastructure/services/payments/repository';
+import type Stripe from 'stripe';
 
-const turso = getTursoClient();
+const turso = getTursoClientInstance();
 const stripe = getStripeServerInstance();
 
 export const processWebhookEvent = async (event: Stripe.Event): Promise<void> => {

@@ -27,12 +27,12 @@ const Home = async () => {
 export default Home;
 export { generateMetadata };
 
+// todo: setup better stack (replace console.logs/warns/errors)
+// todo: stripe appearance (warnings + fix)
+// todo: responsive
 // todo: ads?
 // todo: toast vs error messages
-// todo: setup better stack
-// todo: stripe appearance (warnings + fix)
-// todo: unify component and folder structure
+// todo: unify component and folder structure (payment/provider should be dto?)
 // todo: locale all
-// todo: responsive
 // todo: legal pages and cookies (what info do I need to provide?)
 // todo: setup stripe

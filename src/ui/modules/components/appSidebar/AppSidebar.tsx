@@ -148,7 +148,7 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
       <SidebarRail />
     </Sidebar>
     <SidebarInset>
-      <SidebarTrigger className={'cursor-pointer size-6 fixed m-3'} />
+      <SidebarTrigger className={'cursor-pointer size-6 fixed m-3 z-50'} />
       {children}
     </SidebarInset>
   </SidebarProvider>

@@ -1,7 +1,7 @@
 import { createJSONStorage } from 'zustand/middleware';
 import type { CryptoParams } from './types';
 
-const SECRET_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY ?? 'fallback-secret-key';
+const SECRET_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY;
 const isDev = process.env.NODE_ENV === 'development';
 const isClient = typeof window !== 'undefined';
 const hasNodeAPIs = typeof Buffer !== 'undefined';

@@ -4,7 +4,7 @@ import { paymentDTO } from '@application/dto/payment/dto';
 import { createPaymentSchema, type CreatePaymentInput } from '@application/dto/payment/schema';
 import type { DiscountInfo, PaymentDTO } from '@application/dto/payment/types';
 import { createPaymentError } from '@domain/payment/events/factory/errors';
-import { getTursoClient } from '@infrastructure/clients/db/turso/client';
+import { getTursoClientInstance } from '@infrastructure/clients/db/turso/client';
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
 import { createPaymentIntent } from '@infrastructure/services/payments/provider/payment-intent';
 import { validatePromoCode } from '@infrastructure/services/payments/provider/promo-code';
@@ -15,7 +15,7 @@ import Stripe from 'stripe';
 import { ZodError } from 'zod';
 
 const stripe = getStripeServerInstance();
-const turso = getTursoClient();
+const turso = getTursoClientInstance();
 
 export async function createPayment(params: CreatePaymentInput): Promise<PaymentDTO> {
   const headersList = await headers();

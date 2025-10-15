@@ -1,10 +1,10 @@
-import { getBetterStackClient } from '@infrastructure/clients/logging/better-stack/client';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { handleStripeWebhook } from '@infrastructure/webhooks/stripe/service';
 import { headers } from 'next/headers';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  const logger = getBetterStackClient();
+  const logger = getBetterStackInstance();
   const requestId = crypto.randomUUID();
   const webhookLogger = logger.withContext({
     requestId,

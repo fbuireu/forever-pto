@@ -60,7 +60,7 @@ export class ResendClient {
 
 let resendClientInstance: ResendClient | null = null;
 
-export const getResendClient = (): ResendClient => {
+export const getResendClientInstance = (): ResendClient => {
   if (!resendClientInstance) {
     const apiKey = process.env.RESEND_API_KEY;
 

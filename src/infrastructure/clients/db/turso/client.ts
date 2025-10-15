@@ -21,11 +21,11 @@ export class TursoClient {
 
   private getClient(): Client {
     this.client ??= createClient({
-        url: this.config.url,
-        authToken: this.config.authToken,
-        intMode: 'number',
-        fetch: globalThis.fetch,
-      });
+      url: this.config.url,
+      authToken: this.config.authToken,
+      intMode: 'number',
+      fetch: globalThis.fetch,
+    });
     return this.client;
   }
 
@@ -99,7 +99,7 @@ export class TursoClient {
 
 let tursoClientInstance: TursoClient | null = null;
 
-export const getTursoClient = (): TursoClient => {
+export const getTursoClientInstance = (): TursoClient => {
   if (!tursoClientInstance) {
     const url = process.env.TURSO_DATABASE_URL;
     const authToken = process.env.TURSO_AUTH_TOKEN;
