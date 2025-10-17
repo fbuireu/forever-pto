@@ -38,8 +38,6 @@ const getCurrencySymbol = (locale: string, currency: string): string => {
 };
 
 function PaymentError() {
-  log.info('Payment error page rendered');
-
   return (
     <div className='min-h-screen flex items-center justify-center p-4 bg-background'>
       <Card className='w-full max-w-md border-destructive/50'>
@@ -76,12 +74,6 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
     params,
   ]);
 
-  log.info('Payment success page accessed', {
-    hasPaymentIntent: !!paymentIntentId,
-    redirectStatus,
-    locale,
-  });
-
   if (!paymentIntentId) {
     log.warn('Payment success page accessed without payment_intent, redirecting to home');
     redirect('/');
@@ -91,19 +83,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
 
   try {
     paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-
-    log.info('Payment intent retrieved', {
-      paymentIntentId,
-      status: paymentIntent.status,
-      amount: paymentIntent.amount,
-      currency: paymentIntent.currency,
-    });
   } catch (error) {
-    log.error('Error retrieving payment intent', {
-      paymentIntentId,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-    });
     return <PaymentError />;
   }
 
@@ -120,13 +100,6 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
   const amount = paymentIntent.amount / 100;
   const currency = paymentIntent.currency.toUpperCase();
   const currencySymbol = getCurrencySymbol(locale, currency);
-
-  log.info('Payment success page rendered successfully', {
-    paymentIntentId,
-    amount,
-    currency,
-    locale,
-  });
 
   return (
     <div className='min-h-screen flex items-center justify-center p-4 bg-background m-auto'>

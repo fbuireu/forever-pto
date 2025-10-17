@@ -6,6 +6,8 @@ minimumReleaseAge: 1440
 onlyBuiltDependencies:
   - '@parcel/watcher'
   - '@tailwindcss/oxide'
+  - esbuild
+  - rclone.js
   - sharp
   - unrs-resolver
   - workerd

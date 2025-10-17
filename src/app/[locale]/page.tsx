@@ -9,8 +9,6 @@ import { Summary } from '@ui/modules/components/home/Summary';
 import { generateMetadata } from './metadata';
 
 const Home = async () => {
-  log.info('Home page rendered');
-
   return (
       <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4 mb-8'>
         <HolidaysList />
@@ -27,7 +25,7 @@ const Home = async () => {
 export default Home;
 export { generateMetadata };
 
-// todo: setup better stack (replace console.logs/warns/errors)
+// todo: setup better stack (replace console.logs/warns/errors, and catch)
 // todo: stripe appearance (warnings + fix)
 // todo: responsive
 // todo: ads?
@@ -36,3 +34,4 @@ export { generateMetadata };
 // todo: locale all
 // todo: legal pages and cookies (what info do I need to provide?)
 // todo: setup stripe
+// todo: CI to work on releases
