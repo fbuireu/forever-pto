@@ -10,7 +10,8 @@ export interface HolidayDTO {
   name: string;
   type?: string;
   location?: string;
-  variant: HolidayVariant;
+    variant: HolidayVariant;
+    isInSelectedRange: boolean;
 }
 
 export const HolidayVariant = {

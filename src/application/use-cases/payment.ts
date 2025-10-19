@@ -5,6 +5,7 @@ import { createPaymentSchema, type CreatePaymentInput } from '@application/dto/p
 import type { DiscountInfo, PaymentDTO } from '@application/dto/payment/types';
 import { createPaymentError } from '@domain/payment/events/factory/errors';
 import { getTursoClientInstance } from '@infrastructure/clients/db/turso/client';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
 import { createPaymentIntent } from '@infrastructure/services/payments/provider/payment-intent';
 import { validatePromoCode } from '@infrastructure/services/payments/provider/promo-code';
@@ -16,6 +17,7 @@ import { ZodError } from 'zod';
 
 const stripe = getStripeServerInstance();
 const turso = getTursoClientInstance();
+const logger = getBetterStackInstance();
 
 export async function createPayment(params: CreatePaymentInput): Promise<PaymentDTO> {
   const headersList = await headers();
@@ -81,8 +83,11 @@ export async function createPayment(params: CreatePaymentInput): Promise<Payment
     });
 
     if (!saveResult.success) {
-      console.error('Failed to save payment:', saveResult.error);
-      console.warn('Payment will be saved via webhook fallback');
+      logger.warn('Failed to save payment to database, will use webhook fallback', {
+        error: saveResult.error,
+        paymentIntentId: paymentIntent.id,
+        email: validated.email,
+      });
     }
 
     return paymentDTO.create({
@@ -94,6 +99,11 @@ export async function createPayment(params: CreatePaymentInput): Promise<Payment
   } catch (error) {
     if (error instanceof ZodError) {
       const firstError = error.issues[0];
+      logger.warn('Payment validation error', {
+        field: firstError?.path.join('.'),
+        message: firstError?.message,
+        code: firstError?.code,
+      });
       const validationError = createPaymentError.validation(firstError?.message ?? 'Invalid payment data');
       return paymentDTO.create({
         raw: { type: 'error', error: new Error(validationError.message) },
@@ -101,12 +111,25 @@ export async function createPayment(params: CreatePaymentInput): Promise<Payment
     }
 
     if (error instanceof Stripe.errors.StripeError) {
+      logger.logError('Stripe payment creation error', error, {
+        stripeErrorType: error.type,
+        stripeErrorCode: error.code,
+        amount: params.amount,
+        hasPromoCode: !!params.promoCode,
+        userAgent,
+        ipAddress,
+      });
       return paymentDTO.create({
         raw: { type: 'error', error },
       });
     }
 
-    console.error('Payment creation error:', error);
+    logger.logError('Unknown payment creation error', error, {
+      amount: params.amount,
+      hasPromoCode: !!params.promoCode,
+      userAgent,
+      ipAddress,
+    });
     const unknownError = createPaymentError.unknown(error instanceof Error ? error.message : undefined);
     return paymentDTO.create({
       raw: { type: 'error', error: new Error(unknownError.message) },

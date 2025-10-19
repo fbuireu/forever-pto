@@ -1,4 +1,5 @@
 import { HolidayVariant, type HolidayDTO } from '@application/dto/holiday/types';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { generateAlternatives } from '@infrastructure/services/calendar/alternatives/generateAlternatives';
 import { generateSuggestions } from '@infrastructure/services/calendar/suggestions/generateSuggestions';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
@@ -8,7 +9,6 @@ import { formatDate } from '@ui/modules/components/utils/formatters';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
-
 import type {
   AddHolidayParams,
   AlternativeSelectionBaseParams,
@@ -17,6 +17,8 @@ import type {
   GenerateAlternativesParams,
   GenerateSuggestionsParams,
 } from './types';
+
+const logger = getBetterStackInstance();
 
 export interface HolidaysState {
   holidays: HolidayDTO[];
@@ -79,7 +81,11 @@ export const useHolidaysStore = create<HolidaysStore>()(
               holidays: [...customHolidays, ...filteredHolidays].sort((a, b) => a.date.getTime() - b.date.getTime()),
             });
           } catch (error) {
-            console.warn('Error in fetchHolidays:', error);
+            logger.logError('Error fetching holidays in holidays store', error, {
+              year: params.year,
+              country: params.country,
+              region: params.region,
+            });
             set({ holidays: [] });
           }
         },
@@ -143,7 +149,14 @@ export const useHolidaysStore = create<HolidaysStore>()(
               currentSelectionIndex: 0,
             });
           } catch (error) {
-            console.error('Error generating suggestions:', error);
+            logger.logError('Error generating suggestions in holidays store', error, {
+              year,
+              ptoDays,
+              holidaysCount: holidays.length,
+              allowPastDays,
+              strategy,
+              locale,
+            });
             set({
               suggestion: {} as Suggestion,
               alternatives: [],
@@ -192,7 +205,15 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
             set({ alternatives });
           } catch (error) {
-            console.error('Error generating alternatives:', error);
+            logger.logError('Error generating alternatives in holidays store', error, {
+              year,
+              ptoDays,
+              holidaysCount: holidays.length,
+              maxAlternatives: maxToGenerate,
+              allowPastDays,
+              strategy,
+              locale,
+            });
             set({ alternatives: [] });
           }
         },

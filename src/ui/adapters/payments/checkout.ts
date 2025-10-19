@@ -1,6 +1,7 @@
 import type { CreatePaymentInput } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { createPayment } from '@application/use-cases/payment';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
 
 interface InitializePaymentResult {
@@ -36,6 +37,8 @@ interface ConfirmPaymentResult {
     email: string;
   };
 }
+
+const logger = getBetterStackInstance();
 
 export const confirmPayment = async (params: ConfirmPaymentParams): Promise<ConfirmPaymentResult> => {
   const { stripe, elements, email, returnUrl } = params;
@@ -77,7 +80,12 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
 
     if (!sessionResponse.ok) {
       const errorData = await sessionResponse.json();
-      console.error('Session activation failed:', errorData);
+      logger.error('Session activation failed after payment', {
+        statusCode: sessionResponse.status,
+        error: errorData.error,
+        email,
+        paymentIntentId: paymentIntent.id,
+      });
       return {
         success: false,
         error: errorData.error ?? 'Failed to activate premium access',
@@ -93,7 +101,10 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
       },
     };
   } catch (error) {
-    console.error('Payment error:', error);
+    logger.logError('Payment confirmation error in checkout adapter', error, {
+      email,
+      returnUrl,
+    });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'An unexpected error occurred',

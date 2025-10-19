@@ -26,7 +26,7 @@ interface DonationFormProps {
   currencySymbol: string;
 }
 
-export function DonationForm({ form, onSubmit, currentAmount, locale, currency, currencySymbol }: DonationFormProps) {
+export function DonationForm({ form, onSubmit, currentAmount, locale, currency, currencySymbol }: Readonly<DonationFormProps>) {
   const [showPromoCode, setShowPromoCode] = useState(false);
   const { setValue } = form;
   const { pending } = useFormStatus();

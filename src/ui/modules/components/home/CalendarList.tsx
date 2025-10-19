@@ -50,8 +50,8 @@ export const CalendarList = () => {
 
   useEffect(() => {
     if (!country) return;
-    fetchHolidays({ year, region, country, locale });
-  }, [fetchHolidays, year, region, country, locale]);
+    fetchHolidays({ year, region, country, locale, carryOverMonths });
+  }, [fetchHolidays, year, region, country, locale, carryOverMonths]);
 
   useEffect(() => {
     if (ptoDays > 0 && holidays.length > 0 && months.length > 0) {
@@ -61,7 +61,7 @@ export const CalendarList = () => {
         allowPastDays,
         months,
         strategy,
-        locale,
+          locale,
       });
     }
   }, [generateSuggestions, year, ptoDays, allowPastDays, holidays, months, strategy, locale]);

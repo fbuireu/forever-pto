@@ -1,5 +1,8 @@
 import type { DiscountInfo } from '@application/dto/payment/types';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import type Stripe from 'stripe';
+
+const logger = getBetterStackInstance();
 
 const MIN_FINAL_AMOUNT = 0.5;
 
@@ -75,7 +78,10 @@ export const validatePromoCode = async (
       },
     };
   } catch (error) {
-    console.error('Promo code validation error:', error);
+    logger.logError('Promo code validation error in promo-code service', error, {
+      promoCode: code?.toUpperCase().trim().slice(0, 5) + '...',
+      amount,
+    });
     return { success: false, error: 'Error validating promo code. Please try again.' };
   }
 };

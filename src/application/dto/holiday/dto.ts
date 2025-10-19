@@ -1,10 +1,11 @@
 import type { BaseDTO } from '@application/shared/dto/baseDTO';
-import { compareAsc, endOfYear, isWithinInterval, startOfYear } from 'date-fns';
+import { addMonths, compareAsc, endOfYear, isWithinInterval, startOfYear } from 'date-fns';
 import { HolidayVariant, type HolidayDTO, type RawHoliday } from './types';
 import { getRegionName } from './utils/getRegionName';
 
 type HolidayDTOParams = {
   year: number;
+  carryOverMonths: number;
 };
 
 export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> = {
@@ -12,11 +13,13 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> =
     if (!params) {
       throw new Error('Configuration is required for holiday DTO');
     }
-    const { year } = params;
+
+    const { year, carryOverMonths } = params;
     const processedDates = new Set<string>();
 
     const yearStart = startOfYear(new Date(year, 0, 1));
     const nextYearEnd = endOfYear(new Date(year + 1, 0, 1));
+    const selectedRangeEnd = addMonths(endOfYear(new Date(year, 0, 1)), carryOverMonths);
 
     return raw
       .toSorted((a, _) => (a.location ? 1 : -1))
@@ -36,16 +39,25 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> =
 
         return true;
       })
-      .map((holiday) => ({
-        id: `${holiday.location ? 'regional' : 'national'}-${holiday.date}`,
-        date: new Date(holiday.date),
-        name: holiday.name,
-        type: holiday.type,
-        variant: holiday.location ? HolidayVariant.REGIONAL : HolidayVariant.NATIONAL,
-        ...(holiday.location && {
-          location: getRegionName(holiday.location),
-        }),
-      }))
+      .map((holiday) => {
+        const holidayDate = new Date(holiday.date);
+        const isInSelectedRange = isWithinInterval(holidayDate, {
+          start: yearStart,
+          end: selectedRangeEnd,
+        });
+
+        return {
+          id: `${holiday.location ? 'regional' : 'national'}-${holiday.date}`,
+          date: holidayDate,
+          name: holiday.name,
+          type: holiday.type,
+          variant: holiday.location ? HolidayVariant.REGIONAL : HolidayVariant.NATIONAL,
+          ...(holiday.location && {
+            location: getRegionName(holiday.location),
+          }),
+          isInSelectedRange,
+        };
+      })
       .toSorted((a, b) => compareAsc(a.date, b.date));
   },
 };

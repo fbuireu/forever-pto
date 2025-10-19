@@ -1,7 +1,10 @@
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
+
+const logger = getBetterStackInstance();
 
 export interface PremiumState {
   premiumKey: string | null;
@@ -87,7 +90,10 @@ export const usePremiumStore = create<PremiumStore>()(
             set({ isLoading: false });
             return false;
           } catch (error) {
-            console.error('Error verifying premium:', error);
+            logger.logError('Error verifying premium email in premium store', error, {
+              emailDomain: email?.split('@')[1],
+              hasEmail: !!email,
+            });
             set({ isLoading: false });
             return false;
           }
@@ -119,7 +125,9 @@ export const usePremiumStore = create<PremiumStore>()(
               });
             }
           } catch (error) {
-            console.error('Error checking session:', error);
+            logger.logError('Error checking existing session in premium store', error, {
+              needsSessionCheck,
+            });
             set({
               lastVerified: Date.now(),
               needsSessionCheck: false,
@@ -195,12 +203,14 @@ export const usePremiumStore = create<PremiumStore>()(
         }),
         onRehydrateStorage: () => (state, error) => {
           if (error) {
-            console.error('Error rehydrating premium store:', error);
+            logger.logError('Error rehydrating premium store', error);
             return;
           }
 
           if (!state) {
-            console.warn('No state to rehydrate');
+            logger.warn('No state to rehydrate in premium store', {
+              storeName: STORAGE_NAME,
+            });
             return;
           }
 

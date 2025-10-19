@@ -7,11 +7,18 @@ import { getRegionalHolidays } from './utils/getRegionalHolidays';
 interface GetHolidaysParams {
   year: string;
   country?: string;
+  carryOverMonths: number;
   region?: string;
   locale: Locale;
 }
 
-export async function getHolidays({ year, country, region, locale }: GetHolidaysParams): Promise<HolidayDTO[]> {
+export async function getHolidays({
+  year,
+  country,
+  region,
+  locale,
+  carryOverMonths,
+}: GetHolidaysParams): Promise<HolidayDTO[]> {
   if (!country) {
     return [];
   }
@@ -31,7 +38,7 @@ export async function getHolidays({ year, country, region, locale }: GetHolidays
     return holidayDTO
       .create({
         raw: [...nationalHolidays, ...regionalHolidays],
-        params: { year: Number(year) },
+        params: { year: Number(year), carryOverMonths },
       })
       .sort((a, b) => a.date.getTime() - b.date.getTime());
   } catch (error) {

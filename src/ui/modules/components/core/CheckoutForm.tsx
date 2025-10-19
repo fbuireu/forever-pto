@@ -56,7 +56,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
       stripe,
       elements,
       email,
-      returnUrl: `${window.location.origin}/payment/confirmation`,
+      returnUrl: `${globalThis.location.origin}/payment/confirmation`,
     });
 
     if (!result.success) {
@@ -150,7 +150,6 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
               <span className='bg-popover px-2 text-muted-foreground'>Or pay with card</span>
             </div>
           </div>
-
           <PaymentElement />
         </div>
         {errorMessage && (

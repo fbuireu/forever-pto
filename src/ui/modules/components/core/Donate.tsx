@@ -1,15 +1,16 @@
 'use client';
 
-import {type  CreatePaymentInput, createPaymentSchema } from '@application/dto/payment/schema';
+import { type CreatePaymentInput, createPaymentSchema } from '@application/dto/payment/schema';
 import { type DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { getStripeClientInstance } from '@infrastructure/clients/payments/stripe/client';
-import { initializePayment } from '@ui/adapters/payments/checkout';
 import { formatDiscountMessage } from '@infrastructure/services/payments/utils/formatters';
 import { calculateFinalAmount } from '@infrastructure/services/payments/utils/helpers';
 import { Elements } from '@stripe/react-stripe-js';
 import type { StripeElementsOptions } from '@stripe/stripe-js';
+import { initializePayment } from '@ui/adapters/payments/checkout';
 import { useLocale } from 'next-intl';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -29,6 +30,7 @@ interface PaymentState {
 }
 
 const stripePromise = getStripeClientInstance().getStripePromise();
+const logger = getBetterStackInstance();
 
 export const Donate = () => {
   const locale = useLocale();
@@ -85,6 +87,13 @@ export const Donate = () => {
           discountInfo: result.discountInfo ?? null,
         });
       } catch (error) {
+        logger.logError('Payment initialization failed in Donate component', error, {
+          amount: data.amount,
+          hasPromoCode: !!data.promoCode,
+          promoCodeLength: data.promoCode?.length,
+          currency,
+          locale,
+        });
         toast.error('Payment initialization failed', {
           description: error instanceof Error ? error.message : 'Please try again.',
         });
@@ -115,105 +124,141 @@ export const Donate = () => {
     discountInfo: paymentState?.discountInfo ?? null,
   });
 
-  const elementsOptions = useMemo<StripeElementsOptions | null>(() => {
-    if (!paymentState?.clientSecret) return null;
+const elementsOptions = useMemo<StripeElementsOptions | null>(() => {
+  if (!paymentState?.clientSecret) return null;
 
-    const isDark = resolvedTheme === 'dark';
+  const isDark = resolvedTheme === 'dark';
 
-    return {
-      clientSecret: paymentState.clientSecret,
-      loader: 'always',
-      appearance: {
-        theme: isDark ? 'night' : 'flat',
-        variables: {
-          colorPrimary: isDark ? 'hsl(210 40% 98%)' : 'hsl(222.2 47.4% 11.2%)',
-          colorBackground: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
-          colorText: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
-          colorDanger: isDark ? 'hsl(0 62.8% 60.6%)' : 'hsl(0 84.2% 60.2%)',
-          fontFamily: 'sans-serif',
-          spacingUnit: '4px',
-          borderRadius: '8px',
-          fontSizeBase: '14px',
+  const colors = {
+    background: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
+    foreground: isDark ? 'hsl(210 40% 98%)' : 'hsl(222.2 84% 4.9%)',
+    primary: isDark ? 'hsl(210 40% 98%)' : 'hsl(222.2 47.4% 11.2%)',
+    primaryForeground: isDark ? 'hsl(222.2 47.4% 11.2%)' : 'hsl(210 40% 98%)',
+    border: isDark ? 'hsl(240 3.7% 15.9%)' : 'hsl(214.3 31.8% 91.4%)',
+    borderHover: isDark ? 'hsl(240 3.7% 20%)' : 'hsl(214.3 31.8% 85%)',
+    accent: isDark ? 'hsl(240 3.7% 15.9%)' : 'hsl(240 4.8% 95.9%)',
+    accentHover: isDark ? 'hsl(240 3.7% 18%)' : 'hsl(240 4.8% 95.9%)',
+    destructive: isDark ? 'hsl(0 62.8% 30.6%)' : 'hsl(0 84.2% 60.2%)',
+    mutedForeground: isDark ? 'hsl(215 20.2% 65.1%)' : 'hsl(215.4 16.3% 46.9%)',
+  };
+
+  return {
+    clientSecret: paymentState.clientSecret,
+    loader: 'always',
+    appearance: {
+      theme: isDark ? 'night' : 'stripe',
+      variables: {
+        colorBackground: colors.background,
+        colorText: colors.foreground,
+        colorPrimary: colors.primary,
+        colorDanger: colors.destructive,
+        colorTextSecondary: colors.mutedForeground,
+        colorTextPlaceholder: colors.mutedForeground,
+        fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        fontSizeBase: '14px',
+        fontWeightNormal: '400',
+        fontWeightMedium: '500',
+        fontWeightBold: '600',
+        spacingUnit: '4px',
+        borderRadius: '10px',
+      },
+      rules: {
+        '.Input': {
+          backgroundColor: colors.background,
+          border: `1px solid ${colors.border}`,
+          padding: '10px 12px',
+          fontSize: '14px',
+          color: colors.foreground,
+          boxShadow: isDark ? '0 1px 2px 0 rgba(0, 0, 0, 0.3)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+          transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+          borderRadius: '10px',
         },
-        rules: {
-          '.Input': {
-            backgroundColor: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
-            border: isDark ? '1px solid hsl(240 3.7% 15.9%)' : '1px solid hsl(240 5.9% 90%)',
-            padding: '8px 12px',
-            fontSize: '14px',
-            color: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
-            transition: 'border-color 0.2s, box-shadow 0.2s',
-          },
-          '.Input:hover': {
-            borderColor: isDark ? 'hsl(240 3.7% 20%)' : 'hsl(240 5.9% 85%)',
-          },
-          '.Input:focus': {
-            border: isDark ? '1px solid hsl(240 3.7% 15.9%)' : '1px solid hsl(240 5.9% 90%)',
-            boxShadow: isDark ? '0 0 0 3px hsl(240 3.7% 15.9%)' : '0 0 0 1px hsl(240 5.9% 10%)',
-            outline: 'none',
-          },
-          '.Input--invalid': {
-            border: isDark ? '1px solid hsl(0 62.8% 60.6%)' : '1px solid hsl(0 84.2% 60.2%)',
-          },
-          '.Input--invalid:focus': {
-            border: isDark ? '1px solid hsl(0 62.8% 60.6%)' : '1px solid hsl(0 84.2% 60.2%)',
-          },
-          '.Input::placeholder': {
-            color: isDark ? 'hsl(240 5% 64.9%)' : 'hsl(240 3.8% 46.1%)',
-          },
-          '.Input:disabled': {
-            backgroundColor: isDark ? 'hsl(240 3.7% 15.9%)' : 'hsl(240 4.8% 95.9%)',
-            color: isDark ? 'hsl(240 5% 64.9%)' : 'hsl(240 3.8% 46.1%)',
-            cursor: 'not-allowed',
-            opacity: '0.5',
-          },
-          '.Label': {
-            fontSize: '14px',
-            fontWeight: '500',
-            color: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
-            marginBottom: '8px',
-          },
-          '.Error': {
-            fontSize: '12px',
-            color: isDark ? 'hsl(0 62.8% 60.6%)' : 'hsl(0 84.2% 60.2%)',
-            border: 'none',
-            marginTop: '6px',
-            fontWeight: '500',
-          },
-          '.Tab': {
-            backgroundColor: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
-            border: isDark ? '1px solid hsl(240 3.7% 15.9%)' : '1px solid hsl(240 5.9% 90%)',
-            boxShadow: 'none',
-            color: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
-            borderRadius: '6px',
-            padding: '10px 16px',
-            transition: 'all 0.2s',
-          },
-          '.Tab:hover': {
-            backgroundColor: isDark ? 'hsl(240 3.7% 15.9%)' : 'hsl(240 4.8% 95.9%)',
-            borderColor: isDark ? 'hsl(240 3.7% 20%)' : 'hsl(240 5.9% 85%)',
-          },
-          '.Tab--selected': {
-            backgroundColor: isDark ? 'hsl(0 0% 98%)' : 'hsl(240 10% 3.9%)',
-            color: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 98%)',
-            border: isDark ? '1px solid hsl(0 0% 98%)' : '1px solid hsl(240 10% 3.9%)',
-          },
-          '.Tab--selected:hover': {
-            backgroundColor: isDark ? 'hsl(240 5% 84%)' : 'hsl(240 5.9% 10%)',
-            borderColor: isDark ? 'hsl(240 5% 84%)' : 'hsl(240 5.9% 10%)',
-          },
-          '.TabIcon': {
-            fill: 'currentColor',
-          },
-          '.Block': {
-            backgroundColor: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
-            border: isDark ? '1px solid hsl(240 3.7% 15.9%)' : '1px solid hsl(240 5.9% 90%)',
-            borderRadius: '8px',
-          },
+        '.Input:hover': {
+          borderColor: colors.borderHover,
+        },
+        '.Input:focus': {
+          borderColor: isDark ? colors.border : colors.primary,
+          boxShadow: isDark ? `0 0 0 3px ${colors.border}` : `0 0 0 2px ${colors.primary.replace(')', ' / 0.2)')}`,
+          outline: 'none',
+        },
+        '.Input--invalid': {
+          borderColor: colors.destructive,
+        },
+        '.Input--invalid:focus': {
+          borderColor: colors.destructive,
+          boxShadow: isDark
+            ? `0 0 0 3px ${colors.destructive.replace(')', ' / 0.3)')}`
+            : `0 0 0 2px ${colors.destructive.replace(')', ' / 0.2)')}`,
+        },
+        '.Input::placeholder': {
+          color: colors.mutedForeground,
+        },
+        '.Label': {
+          fontSize: '14px',
+          fontWeight: '500',
+          color: colors.foreground,
+          marginBottom: '6px',
+        },
+        '.Error': {
+          fontSize: '13px',
+          color: colors.destructive,
+          marginTop: '6px',
+          fontWeight: '400',
+        },
+        '.Tab': {
+          backgroundColor: colors.background,
+          border: `1px solid ${colors.border}`,
+          boxShadow: isDark ? '0 1px 2px 0 rgba(0, 0, 0, 0.3)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+          color: colors.foreground,
+          borderRadius: '10px',
+          padding: '10px 16px',
+          transition: 'all 0.15s ease',
+        },
+        '.Tab:hover': {
+          backgroundColor: colors.accent,
+          borderColor: colors.borderHover,
+        },
+        '.Tab--selected': {
+          backgroundColor: colors.primary,
+          color: colors.primaryForeground,
+          borderColor: colors.primary,
+          boxShadow: 'none',
+        },
+        '.Tab--selected:hover': {
+          backgroundColor: isDark ? 'hsl(210 40% 95%)' : 'hsl(222.2 47.4% 9%)',
+        },
+        '.TabIcon': {
+          fill: 'currentColor',
+        },
+        '.Block': {
+          backgroundColor: colors.background,
+          border: `1px solid ${colors.border}`,
+          borderRadius: '10px',
+          boxShadow: isDark ? '0 1px 3px 0 rgba(0, 0, 0, 0.3)' : '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+        },
+        '.PickerItem': {
+          backgroundColor: colors.background,
+          border: `1px solid ${colors.border}`,
+          borderRadius: '10px',
+          padding: '12px',
+          transition: 'all 0.15s ease',
+        },
+        '.PickerItem:hover': {
+          backgroundColor: colors.accent,
+          borderColor: colors.borderHover,
+        },
+        '.PickerItem--selected': {
+          borderColor: colors.primary,
+          backgroundColor: colors.accent,
+          boxShadow: `0 0 0 1px ${colors.primary}`,
+        },
+        '.PickerItem--selected:hover': {
+          backgroundColor: colors.accentHover,
         },
       },
-    };
-  }, [paymentState?.clientSecret, resolvedTheme]);
+    },
+  };
+}, [paymentState?.clientSecret, resolvedTheme]);
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>

@@ -1,5 +1,6 @@
 import type { CountryDTO } from '@application/dto/country/types';
 import type { RegionDTO } from '@application/dto/region/types';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { getCountries } from '@infrastructure/services/countries/getCountries';
 import { getRegions } from '@infrastructure/services/regions/getRegions';
 import type { Locale } from 'next-intl';
@@ -7,6 +8,8 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
 import type { GetRegionParams } from './types';
+
+const logger = getBetterStackInstance();
 
 export interface LocationState {
   countries: CountryDTO[];
@@ -61,7 +64,11 @@ export const useLocationStore = create<LocationStore>()(
               countriesLoading: false,
             });
           } catch (error) {
-            console.warn('Error in fetchCountries:', error);
+            logger.logError('Error fetching countries in location store', error, {
+              locale,
+              lastFetched: countriesLastFetched,
+              timeSinceLastFetch: now - countriesLastFetched,
+            });
             set({ countriesLoading: false });
           }
         },
@@ -89,7 +96,9 @@ export const useLocationStore = create<LocationStore>()(
               regionsLoading: false,
             });
           } catch (error) {
-            console.warn('Error in fetchRegions:', error);
+            logger.logError('Error fetching regions in location store', error, {
+              countryCode,
+            });
             set({
               regionsLoading: false,
               regions: [],

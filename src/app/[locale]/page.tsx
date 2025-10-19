@@ -1,4 +1,3 @@
-import { log } from '@logtail/next';
 import { CalendarList } from '@ui/modules/components/home/CalendarList';
 import { Faq } from '@ui/modules/components/home/Faq';
 import { HolidaysList } from '@ui/modules/components/home/HolidaysList';
@@ -10,24 +9,24 @@ import { generateMetadata } from './metadata';
 
 const Home = async () => {
   return (
-      <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4 mb-8'>
-        <HolidaysList />
-        <ManagementBar />
-        <CalendarList />
-        <Legend />
-        <Summary />
-        <Faq />
-        <Roadmap />
-      </section>
+    <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4 mb-8'>
+      <HolidaysList />
+      <ManagementBar />
+      <CalendarList />
+      <Legend />
+      <Summary />
+      <Faq />
+      <Roadmap />
+    </section>
   );
 };
 
 export default Home;
 export { generateMetadata };
 
-// todo: setup better stack (replace console.logs/warns/errors, and catch)
-// todo: stripe appearance (warnings + fix)
+// todo: simplify (bianca's feedback)
 // todo: responsive
+// todo: add tutorial (driverjs)
 // todo: ads?
 // todo: toast vs error messages
 // todo: unify component and folder structure (payment/provider should be dto?)

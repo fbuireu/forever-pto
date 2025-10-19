@@ -16,7 +16,7 @@ export interface GenerateAlternativesParams extends GenerateSuggestionsParams {
   maxAlternatives?: number;
 }
 
-export interface FetchHolidaysParams extends Pick<FiltersState, 'year' | 'country' | 'region'> {
+export interface FetchHolidaysParams extends Pick<FiltersState, 'year' | 'country' | 'region' | 'carryOverMonths'> {
   locale: Locale;
 }
 

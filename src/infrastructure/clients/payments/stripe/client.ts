@@ -1,3 +1,4 @@
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { loadStripe, type PaymentIntent, type Stripe, type StripeError } from '@stripe/stripe-js';
 import StripeNode from 'stripe';
 
@@ -17,6 +18,7 @@ export class StripeClient {
   private stripePromise: Promise<Stripe | null> | null = null;
   private stripe: Stripe | null = null;
   private readonly publishableKey: string;
+  private logger = getBetterStackInstance();
 
   constructor(publishableKey: string) {
     this.publishableKey = publishableKey;
@@ -54,6 +56,12 @@ export class StripeClient {
 
       return this.handlePaymentResult(result);
     } catch (error) {
+      this.logger.logError('Stripe confirmPayment failed', error, {
+        hasClientSecret: !!params.clientSecret,
+        hasReturnUrl: !!params.returnUrl,
+        alwaysRedirect: params.alwaysRedirect,
+        location: window.location.href,
+      });
       return this.handleError(error);
     }
   }
@@ -64,6 +72,9 @@ export class StripeClient {
       const result = await stripe.confirmCardPayment(clientSecret);
       return this.handlePaymentResult(result);
     } catch (error) {
+      this.logger.logError('Stripe confirmCardPayment failed', error, {
+        hasClientSecret: !!clientSecret,
+      });
       return this.handleError(error);
     }
   }

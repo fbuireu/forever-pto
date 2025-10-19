@@ -26,6 +26,7 @@ import { Trash2 } from 'src/components/animate-ui/icons/trash-2';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { HolidayRow } from './components/HolidayRow';
 import { HolidayTableHeader } from './components/HolidayTableHeader';
+import { useFiltersStore } from '@application/stores/filters';
 
 interface HolidaysTableProps {
   title: string;
@@ -46,6 +47,7 @@ const DeleteHolidayModal = dynamic(() =>
 export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   const premiumKey = usePremiumStore((state) => state.premiumKey);
   const holidays = useHolidaysStore((state) => state.holidays);
+  const filters = useFiltersStore((state) => state);
   const locale = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -71,7 +73,10 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
     prevOpen.current = open;
   }, [open]);
 
-  const variantHolidays = useMemo(() => holidays.filter((holiday) => holiday.variant === variant), [variant, holidays]);
+  const variantHolidays = useMemo(
+    () => holidays.filter((holiday) => holiday.variant === variant && holiday.isInSelectedRange),
+    [variant, holidays, filters]
+  );
 
   const filteredHolidays = useMemo(() => {
     let filtered = variantHolidays.filter(
@@ -327,7 +332,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                       );
                     })
                   ) : (
-                    <AnimateIcon animateOnView loop asChild>
+                    <AnimateIcon animateOnView loop loopDelay={1500} asChild>
                       <TableRow>
                         <TableCell colSpan={shouldShowLocationColumn ? 7 : 6} className='h-24 text-center'>
                           <div className='flex flex-col items-center space-y-2 text-muted-foreground'>

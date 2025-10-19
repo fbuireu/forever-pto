@@ -1,5 +1,8 @@
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { createJSONStorage } from 'zustand/middleware';
 import type { CryptoParams } from './types';
+
+const logger = getBetterStackInstance();
 
 const SECRET_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY;
 const isDev = process.env.NODE_ENV === 'development';
@@ -27,7 +30,10 @@ function base64Decode(str: string): string {
     }
     return new TextDecoder().decode(bytes);
   } catch (error) {
-    console.warn('Failed to decode base64:', error);
+    logger.logError('Failed to decode base64 in crypto storage', error, {
+      hasNodeAPIs,
+      stringLength: str?.length,
+    });
     return '';
   }
 }
@@ -48,7 +54,11 @@ function decrypt({ text, key }: CryptoParams): string {
       .map((char, i) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length)))
       .join('');
   } catch (error) {
-    console.warn('Failed to decrypt storage value:', error);
+    logger.logError('Failed to decrypt storage value in crypto', error, {
+      hasText: !!text,
+      textLength: text?.length,
+      hasKey: !!key,
+    });
     return '';
   }
 }

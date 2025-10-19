@@ -1,4 +1,5 @@
 import { createClient, type Client, type InValue } from '@libsql/client';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 export interface QueryResult<T = unknown> {
   success: boolean;
@@ -14,6 +15,7 @@ export interface TursoConfig {
 export class TursoClient {
   private client: Client | null = null;
   private readonly config: TursoConfig;
+  private logger = getBetterStackInstance();
 
   constructor(config: TursoConfig) {
     this.config = config;
@@ -39,6 +41,11 @@ export class TursoClient {
         data: result.rows as T,
       };
     } catch (error) {
+      this.logger.logError('Turso execute query failed', error, {
+        sql: sql.slice(0, 100),
+        hasArgs: !!args,
+        argsCount: args?.length,
+      });
       return this.handleError<T>(error);
     }
   }
@@ -53,6 +60,10 @@ export class TursoClient {
         data: results.map((r) => r.rows) as T[],
       };
     } catch (error) {
+      this.logger.logError('Turso batch query failed', error, {
+        statementCount: statements.length,
+        firstSql: statements[0]?.sql.slice(0, 100),
+      });
       return this.handleError<T[]>(error);
     }
   }
@@ -67,6 +78,9 @@ export class TursoClient {
         data: result,
       };
     } catch (error) {
+      this.logger.logError('Turso transaction failed', error, {
+        callbackName: callback.name || 'anonymous',
+      });
       return this.handleError<T>(error);
     }
   }
