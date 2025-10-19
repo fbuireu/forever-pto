@@ -7,6 +7,7 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { redirect } from 'next/navigation';
 import type Stripe from 'stripe';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 const stripe = getStripeServerInstance();
 
@@ -69,7 +70,7 @@ function PaymentError() {
 }
 
 export default async function PaymentSuccessPage({ searchParams, params }: Readonly<PaymentSuccessParams>) {
-  const [{ payment_intent: paymentIntentId, redirect_status: redirectStatus }, { locale }] = await Promise.all([
+  const [{ payment_intent: paymentIntentId }, { locale }] = await Promise.all([
     searchParams,
     params,
   ]);
@@ -84,6 +85,10 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
   try {
     paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
   } catch (error) {
+    getBetterStackInstance().logError('Failed to retrieve payment intent', error, {
+      paymentIntentId,
+        page: 'PaymentConfirmation',
+    });
     return <PaymentError />;
   }
 

@@ -42,8 +42,8 @@ export async function GET(request: NextRequest) {
     requestId,
     method: 'GET',
     path: '/api/check-session',
-    userAgent: request.headers.get('user-agent') || 'unknown',
-    origin: request.headers.get('origin') || 'unknown',
+    userAgent: request.headers.get('user-agent') ?? 'unknown',
+    origin: request.headers.get('origin') ?? 'unknown',
   });
 
   requestLogger.info('GET /api/check-session - Session check started');
@@ -122,9 +122,9 @@ export async function POST(request: NextRequest) {
     requestId,
     method: 'POST',
     path: '/api/check-session',
-    userAgent: request.headers.get('user-agent') || 'unknown',
-    origin: request.headers.get('origin') || 'unknown',
-    contentType: request.headers.get('content-type') || 'unknown',
+    userAgent: request.headers.get('user-agent') ?? 'unknown',
+    origin: request.headers.get('origin') ?? 'unknown',
+    contentType: request.headers.get('content-type') ?? 'unknown',
   });
 
   requestLogger.info('POST /api/check-session - Premium activation request started');

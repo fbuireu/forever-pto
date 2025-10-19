@@ -1,5 +1,6 @@
 import type { ChargeService } from '@domain/payment/services/charge';
 import type Stripe from 'stripe';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 const retrieveCharge = async (
   stripe: Stripe,
@@ -46,7 +47,7 @@ const retrieveCharge = async (
       },
     };
   } catch (error) {
-    console.error('Error retrieving charge:', error);
+    getBetterStackInstance().logError('Error retrieving charge', error, { chargeId });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to retrieve charge',

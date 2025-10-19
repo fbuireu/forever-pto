@@ -1,5 +1,6 @@
 import type { ChargeSucceededEvent } from '../events/types';
 import type { PaymentRepository } from '../repository/types';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 interface HandleChargeSucceededParams {
   paymentRepository: PaymentRepository;
@@ -10,7 +11,7 @@ export const handleChargeSucceeded = async (
   params: HandleChargeSucceededParams
 ): Promise<void> => {
   if (!event.paymentIntentId) {
-    console.error('No payment intent ID found in charge');
+    getBetterStackInstance().error('No payment intent ID found in charge', { chargeId: event.chargeId });
     return;
   }
 
@@ -36,11 +37,11 @@ export const handleChargeSucceeded = async (
     );
 
     if (!result.success) {
-      console.error('Failed to update charge info:', result.error);
+      getBetterStackInstance().error('Failed to update charge info', { error: result.error, chargeId: event.chargeId });
     } else {
-      console.warn('Charge info updated successfully:', event.chargeId);
+      getBetterStackInstance().info('Charge info updated successfully', { chargeId: event.chargeId });
     }
   } catch (error) {
-    console.error('Error handling charge succeeded:', error);
+    getBetterStackInstance().logError('Error handling charge succeeded', error, { chargeId: event.chargeId });
   }
 };

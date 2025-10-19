@@ -18,6 +18,7 @@ import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { formatDate } from '../../utils/formatters';
 import { Trash2 } from 'src/components/animate-ui/icons/trash-2';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 interface DeleteHolidayModalProps {
   open: boolean;
@@ -47,7 +48,7 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
 
         onClose();
       } catch (error) {
-        console.error('Error deleting holiday:', error);
+        getBetterStackInstance().logError('Error deleting holiday', error, { component: 'DeleteHolidayModal' });
         toast.error('Error deleting holiday', {
           description: 'Something went wrong. Please try again.',
         });

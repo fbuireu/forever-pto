@@ -21,7 +21,9 @@ export interface FetchHolidaysParams extends Pick<FiltersState, 'year' | 'countr
 }
 
 export interface AddHolidayParams {
-  holiday: Omit<HolidayDTO, 'id' | 'variant'>;
+  holiday: Omit<HolidayDTO, 'id' | 'variant' | 'isInSelectedRange'>;
+  year: FiltersState['year'];
+  carryOverMonths: FiltersState['carryOverMonths'];
   locale: Locale;
 }
 

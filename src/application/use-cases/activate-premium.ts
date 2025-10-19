@@ -5,6 +5,7 @@ import type { PaymentRepository } from '@domain/payment/repository/types';
 import type { PaymentValidator } from '@domain/payment/services/validators';
 import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
 import type Stripe from 'stripe';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 interface ActivatePremiumWithPaymentParams {
   email: string;
@@ -87,7 +88,7 @@ export const activateWithPayment = async (
         const updateResult = await params.paymentRepository.updateStatus(paymentIntentId, 'succeeded');
 
         if (!updateResult.success) {
-          console.error('Failed to update payment status:', updateResult.error);
+          getBetterStackInstance().error('Failed to update payment status', { error: updateResult.error, paymentIntentId });
         }
       }
     } else {
@@ -95,9 +96,9 @@ export const activateWithPayment = async (
       const saveResult = await params.paymentRepository.save(paymentData);
 
       if (!saveResult.success) {
-        console.error('Failed to save payment to DB:', saveResult.error);
+        getBetterStackInstance().error('Failed to save payment to DB', { error: saveResult.error, paymentIntentId });
       } else {
-        console.warn('Payment created successfully');
+        getBetterStackInstance().info('Payment created successfully', { paymentIntentId });
       }
     }
   }

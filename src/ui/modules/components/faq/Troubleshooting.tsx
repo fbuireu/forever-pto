@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { useShallow } from 'zustand/react/shallow';
 import { getTotalMonths } from '../utils/helpers';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 export const Troubleshooting = () => {
   const locale = useLocale();
@@ -59,7 +60,7 @@ export const Troubleshooting = () => {
           description: 'All data has been reset and refreshed from the server.',
         });
       } catch (error) {
-        console.error('Error resetting to defaults:', error);
+        getBetterStackInstance().logError('Error resetting to defaults', error, { component: 'Troubleshooting' });
         toast.error('Error clearing local storage', {
           description: 'Something went wrong while resetting the data. Please try again.',
         });

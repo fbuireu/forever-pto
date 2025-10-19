@@ -1,3 +1,5 @@
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+
 const LOCATION_IDENTIFIER = 'loc=';
 const CDN_TRACE = 'cdn-cgi/trace';
 
@@ -20,7 +22,7 @@ export async function detectCountryFromCDN(): Promise<string> {
 
     return '';
   } catch (error) {
-    console.warn('Error while detecting country from CDN:', error);
+    getBetterStackInstance().warn('Error while detecting country from CDN', { error });
     return '';
   }
 }

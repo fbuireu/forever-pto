@@ -11,6 +11,7 @@ import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe
 import { createChargeService } from '@infrastructure/services/payments/provider/charge-service';
 import { createPaymentRepository } from '@infrastructure/services/payments/repository';
 import type Stripe from 'stripe';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 const turso = getTursoClientInstance();
 const stripe = getStripeServerInstance();
@@ -39,6 +40,6 @@ export const processWebhookEvent = async (event: Stripe.Event): Promise<void> =>
     }
 
     default:
-      console.warn(`Unhandled event type: ${event.type}`);
+      getBetterStackInstance().warn('Unhandled webhook event type', { eventType: event.type, eventId: event.id });
   }
 };

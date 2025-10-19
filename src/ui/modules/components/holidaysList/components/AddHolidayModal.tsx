@@ -22,6 +22,8 @@ import { Plus } from 'src/components/animate-ui/icons/plus';
 import { Calendar, CalendarSelectionMode, type FromTo } from '../../core/Calendar';
 import { formatDate } from '../../utils/formatters';
 import { type HolidayFormData, holidaySchema } from './schema';
+import { useFiltersStore } from '@application/stores/filters';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 interface AddHolidayModalProps {
   open: boolean;
@@ -31,6 +33,7 @@ interface AddHolidayModalProps {
 
 export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps) => {
   const { holidays, addHoliday, currentSelection, alternatives, suggestion } = useHolidaysStore();
+  const { carryOverMonths, year } = useFiltersStore();
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [isPending, startTransition] = useTransition();
 
@@ -64,7 +67,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
           return;
         }
 
-        addHoliday({ holiday: { name: data.name, date: data.date }, locale });
+        addHoliday({ holiday: { name: data.name, date: data.date }, locale, carryOverMonths, year });
 
         toast.success('Holiday created successfully', {
           description: `${data.name} has been added on ${formatDate({
@@ -76,7 +79,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
 
         handleClose();
       } catch (error) {
-        console.error('Error creating holiday:', error);
+        getBetterStackInstance().logError('Error creating holiday', error, { component: 'AddHolidayModal' });
         toast.error('Error creating holiday', {
           description: 'Something went wrong. Please try again.',
         });

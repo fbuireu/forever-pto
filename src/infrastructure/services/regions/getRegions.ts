@@ -1,5 +1,6 @@
 import { regionDTO } from '@application/dto/region/dto';
 import Holidays from 'date-holidays';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 export function getRegions(countryCode?: string) {
   try {
@@ -12,7 +13,7 @@ export function getRegions(countryCode?: string) {
 
     return regionDTO.create({ raw: regions }).sort((a, b) => a.label.localeCompare(b.label));
   } catch (error) {
-    console.warn('Error in getRegions:', error);
+    getBetterStackInstance().logError('Error in getRegions', error, { countryCode });
     return [];
   }
 }

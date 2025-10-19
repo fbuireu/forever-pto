@@ -3,6 +3,7 @@ import type { HolidayDTO } from '@application/dto/holiday/types';
 import type { Locale } from 'next-intl';
 import { getNationalHolidays } from './utils/getNationalHolidays';
 import { getRegionalHolidays } from './utils/getRegionalHolidays';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 interface GetHolidaysParams {
   year: string;
@@ -42,7 +43,7 @@ export async function getHolidays({
       })
       .sort((a, b) => a.date.getTime() - b.date.getTime());
   } catch (error) {
-    console.warn('Error in getHolidays:', error);
+    getBetterStackInstance().logError('Error in getHolidays', error, { country, region, year });
     return [];
   }
 }

@@ -22,6 +22,7 @@ import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Calendar, CalendarSelectionMode, type FromTo } from '../../core/Calendar';
 import { formatDate } from '../../utils/formatters';
 import { type HolidayFormData, holidaySchema } from './schema';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 interface EditHolidayModalProps {
   open: boolean;
@@ -100,7 +101,7 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
 
         handleClose();
       } catch (error) {
-        console.error('Error editing holiday:', error);
+        getBetterStackInstance().logError('Error editing holiday', error, { component: 'EditHolidayModal' });
         toast.error('Error editing holiday', {
           description: 'Something went wrong. Please try again.',
         });

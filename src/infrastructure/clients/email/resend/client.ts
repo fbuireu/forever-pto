@@ -36,7 +36,7 @@ export class ResendClient {
         });
         return {
           success: false,
-          error: error.message || 'Failed to send email',
+          error: error.message ?? 'Failed to send email',
         };
       }
 

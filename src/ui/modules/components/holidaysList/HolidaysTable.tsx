@@ -47,7 +47,6 @@ const DeleteHolidayModal = dynamic(() =>
 export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   const premiumKey = usePremiumStore((state) => state.premiumKey);
   const holidays = useHolidaysStore((state) => state.holidays);
-  const filters = useFiltersStore((state) => state);
   const locale = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -75,7 +74,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 
   const variantHolidays = useMemo(
     () => holidays.filter((holiday) => holiday.variant === variant && holiday.isInSelectedRange),
-    [variant, holidays, filters]
+    [variant, holidays]
   );
 
   const filteredHolidays = useMemo(() => {

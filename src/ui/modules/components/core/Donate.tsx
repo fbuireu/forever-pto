@@ -99,7 +99,7 @@ export const Donate = () => {
         });
       }
     },
-    [setEmail]
+    [setEmail, locale, currency]
   );
 
   const handlePaymentSuccess = useCallback(async () => {

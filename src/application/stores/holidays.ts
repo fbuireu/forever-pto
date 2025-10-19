@@ -17,6 +17,8 @@ import type {
   GenerateAlternativesParams,
   GenerateSuggestionsParams,
 } from './types';
+import { isInSelectedRange } from '@application/dto/holiday/utils/helpers';
+import { startOfYear, endOfYear, addMonths } from 'date-fns';
 
 const logger = getBetterStackInstance();
 
@@ -242,20 +244,23 @@ export const useHolidaysStore = create<HolidaysStore>()(
           set({ ...holidaysInitialState });
         },
 
-        addHoliday: ({ holiday, locale }) => {
+        addHoliday: ({ holiday, locale, year, carryOverMonths }) => {
           const { holidays } = get();
           const existingHoliday = holidays.find((h) => h.date.toDateString() === holiday.date.toDateString());
 
           if (existingHoliday) {
-            console.warn('Holiday already exists on this date');
+            logger.warn('Holiday already exists on this date', { date: holiday.date.toISOString() });
             return;
           }
-
+            const yearStart = startOfYear(new Date(Number(year), 0, 1));
+            const selectedRangeEnd = addMonths(endOfYear(new Date(Number(year), 0, 1)), carryOverMonths);
+            
           const newHoliday: HolidayDTO = {
             id: `custom-${formatDate({ date: holiday.date, locale, format: 'yyyy-MM-dd HH:mm:ss' })}`,
             name: holiday.name,
             date: ensureDate(holiday.date),
             variant: HolidayVariant.CUSTOM,
+            isInSelectedRange: isInSelectedRange({date: holiday.date, rangeStart: yearStart , rangeEnd: selectedRangeEnd}),
           };
 
           set({

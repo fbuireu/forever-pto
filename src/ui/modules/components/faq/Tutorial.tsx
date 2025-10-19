@@ -1,11 +1,8 @@
 'use client';
 
-import { useLocale } from 'next-intl';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 
 export const Tutorial = () => {
-  const locale = useLocale();
-
   return (
     <div className='space-y-2'>
       <p className='text-sm text-muted-foreground'>

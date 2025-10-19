@@ -1,7 +1,7 @@
 import type { BaseDTO } from '@application/shared/dto/baseDTO';
 import { addMonths, compareAsc, endOfYear, isWithinInterval, startOfYear } from 'date-fns';
 import { HolidayVariant, type HolidayDTO, type RawHoliday } from './types';
-import { getRegionName } from './utils/getRegionName';
+import { getRegionName, isInSelectedRange } from './utils/helpers';
 
 type HolidayDTOParams = {
   year: number;
@@ -41,10 +41,6 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> =
       })
       .map((holiday) => {
         const holidayDate = new Date(holiday.date);
-        const isInSelectedRange = isWithinInterval(holidayDate, {
-          start: yearStart,
-          end: selectedRangeEnd,
-        });
 
         return {
           id: `${holiday.location ? 'regional' : 'national'}-${holiday.date}`,
@@ -55,7 +51,11 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> =
           ...(holiday.location && {
             location: getRegionName(holiday.location),
           }),
-          isInSelectedRange,
+          isInSelectedRange: isInSelectedRange({
+            date: new Date(holiday.date),
+            rangeStart: yearStart,
+            rangeEnd: selectedRangeEnd,
+          }),
         };
       })
       .toSorted((a, b) => compareAsc(a.date, b.date));

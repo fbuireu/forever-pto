@@ -4,6 +4,7 @@ import { createPaymentError } from '../events/factory/errors';
 import type { PaymentSucceededEvent } from '../events/types';
 import type { PaymentRepository } from '../repository/types';
 import type { ChargeService } from '../services/charge';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 interface HandlePaymentSucceededParams {
   paymentRepository: PaymentRepository;
@@ -19,7 +20,7 @@ const updateExistingPayment = async (event: PaymentSucceededEvent, repository: P
 };
 
 const createPaymentFromWebhook = async (event: PaymentSucceededEvent, repository: PaymentRepository): Promise<void> => {
-  console.warn('Payment not found in DB, creating from webhook:', event.paymentId);
+  getBetterStackInstance().warn('Payment not found in DB, creating from webhook', { paymentId: event.paymentId });
 
   const paymentData: PaymentData = {
     id: event.paymentIntent.id,
@@ -73,7 +74,7 @@ const updateChargeDetails = async (
     const chargeResult = await params.chargeService.retrieveCharge(chargeId);
 
     if (!chargeResult.success || !chargeResult.data) {
-      console.error('Failed to retrieve charge details:', chargeResult.error);
+      getBetterStackInstance().error('Failed to retrieve charge details', { error: chargeResult.error, chargeId });
       return;
     }
 
@@ -94,10 +95,10 @@ const updateChargeDetails = async (
     );
 
     if (!result.success) {
-      console.error('Failed to update charge details:', result.error);
+      getBetterStackInstance().error('Failed to update charge details', { error: result.error, paymentId: event.paymentId });
     }
   } catch (error) {
-    console.error('Error fetching charge details:', error);
+    getBetterStackInstance().logError('Error fetching charge details', error, { chargeId, paymentId: event.paymentId });
   }
 };
 
@@ -116,13 +117,13 @@ export const handlePaymentSucceeded = async (
 
       await updateExistingPayment(event, params.paymentRepository);
     } else {
-      console.warn('Payment not found in DB, creating from webhook:', event.paymentId);
+      getBetterStackInstance().warn('Payment not found in DB, creating from webhook', { paymentId: event.paymentId });
       await createPaymentFromWebhook(event, params.paymentRepository);
     }
 
     await updateChargeDetails(event, params);
   } catch (error) {
-    console.error('Error handling successful payment:', error);
+    getBetterStackInstance().logError('Error handling successful payment', error, { paymentId: event.paymentId });
     throw error;
   }
 };
