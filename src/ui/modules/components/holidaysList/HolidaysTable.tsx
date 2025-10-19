@@ -26,7 +26,6 @@ import { Trash2 } from 'src/components/animate-ui/icons/trash-2';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { HolidayRow } from './components/HolidayRow';
 import { HolidayTableHeader } from './components/HolidayTableHeader';
-import { useFiltersStore } from '@application/stores/filters';
 
 interface HolidaysTableProps {
   title: string;
