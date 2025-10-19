@@ -42,7 +42,7 @@ export const Troubleshooting = () => {
       try {
         resetHolidaysStore();
 
-        await fetchHolidays({ country, region, year, locale });
+        await fetchHolidays({ country, region, year, locale, carryOverMonths });
 
         generateSuggestions({
           year: parseInt(year),

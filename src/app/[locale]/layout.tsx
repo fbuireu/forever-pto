@@ -6,6 +6,7 @@ import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { Analytics } from '@ui/modules/components/core/Analytics';
 import { CookieConsent } from '@ui/modules/components/core/CookieConsent';
 import { Donate } from '@ui/modules/components/core/Donate';
+import { SiteSubtitle } from '@ui/modules/components/core/SiteSubtitle';
 import { SiteTitle } from '@ui/modules/components/core/SiteTitle';
 import { Footer } from '@ui/modules/components/footer/Footer';
 import { StoresInitializer } from '@ui/store/StoresInitializer';
@@ -60,6 +61,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
               <StoresInitializer userCountry={userCountry} />
               <AppSidebar locale={locale}>
                 <SiteTitle />
+                <SiteSubtitle />
                 {children}
                 <Toaster />
                 <Donate />

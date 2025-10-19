@@ -8,7 +8,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/compone
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -26,13 +25,12 @@ import { Logo } from '../core/Logo';
 import { AllowPastDays } from './components/AllowPastDays';
 import { CarryOverMonths } from './components/CarryOverMonths';
 import { Countries } from './components/Countries';
-import { LanguageSelector } from './components/LanguageSelector';
 import { PtoCalculator } from './components/PtoCalculator';
 import { PtoDays } from './components/PtoDays';
 import { PtoSalaryCalculator } from './components/PtoSalaryCalculator';
 import { Regions } from './components/Regions';
+import { SidebarFooterButtons } from './components/SidebarFooterButtons';
 import { Strategy } from './components/Strategy';
-import { ThemeSelector } from './components/ThemeSelector';
 import { WorkdayCounter } from './components/WorkdayCounter';
 import { Years } from './components/Years';
 
@@ -135,16 +133,7 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <LanguageSelector />
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <ThemeSelector />
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
+      <SidebarFooterButtons />
       <SidebarRail />
     </Sidebar>
     <SidebarInset>

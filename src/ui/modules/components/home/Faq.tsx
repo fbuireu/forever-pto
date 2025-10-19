@@ -1,48 +1,18 @@
 import { Troubleshooting } from '@ui/modules/components/faq/Troubleshooting';
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from 'src/components/animate-ui/base/accordion';
 import type { FaqData } from 'src/ui/modules/components/faq/types';
+import { Tutorial } from '../faq/Tutorial';
 
 const FAQ: FaqData = [
-  {
-    id: 'technical',
-    title: 'Technical',
-    items: [
-      {
-        id: 'algorithms',
-        question: 'How does the suggestion algorithm work?',
-        answer:
-          'The system analyzes available workdays, holidays and user preferences (e.g. avoiding past days) to produce PTO combinations that maximize effective time off. It applies heuristics based on efficiency and scoring to prioritize bridges and grouped days.',
-      },
-      {
-        id: 'strategies',
-        question: 'What is the difference between "balanced" and "optimized" strategies?',
-        answer:
-          'Balanced aims to spread time off across the year for steady value, while Optimized focuses on maximizing efficiency (effective days per PTO day) by prioritizing the best ratio combinations.',
-      },
-      {
-        id: 'overlap',
-        question: 'How do you avoid overlapping suggestions?',
-        answer:
-          'We keep a cache of generated combinations and a set of already-selected dates; when producing alternatives we filter out bridges that include used dates to avoid overlaps and ensure variety.',
-      },
-      {
-        id: 'encryption',
-        question: 'Is my data encrypted?',
-        answer:
-          "Your vacation planning data is stored locally in your browser. In production, we apply XOR cipher obfuscation to make the data unreadable in casual inspection. This is method is designed to prevent accidental exposure, not protect against determined attackers. We don't store sensitive personal information, and you maintain full control of your data on your device.",
-      },
-      {
-        id: 'data-privacy',
-        question: 'What data do you store?',
-        answer:
-          "All your data (PTO days, selected dates, custom holidays, preferences) is stored exclusively in your browser's local storage. We never send this information to our servers. Your vacation planning stays completely private on your device.",
-      },
-    ],
-  },
   {
     id: 'general',
     title: 'General',
     items: [
+      {
+        id: 'how-works',
+        question: "How does it work?",
+        answer: <Tutorial />,
+      },
       {
         id: 'why',
         question: "Why I'm not seeing my country holidays correctly?",
@@ -70,20 +40,26 @@ const FAQ: FaqData = [
     ],
   },
   {
-    id: 'collaborate',
-    title: 'Interested in collaborating?',
+    id: 'technical',
+    title: 'Technical',
     items: [
       {
-        id: 'code',
-        question: 'How to contribute code or ideas?',
+        id: 'algorithms',
+        question: 'How does the suggestion algorithm work?',
         answer:
-          'Open issues or merge requests with proposals. We need help on algorithms, integrations and UX improvements.',
+          'The system analyzes available workdays, holidays and user preferences (e.g. avoiding past days) to produce PTO combinations that maximize effective time off. It applies heuristics based on efficiency and scoring to prioritize bridges and grouped days.',
       },
       {
-        id: 'business',
-        question: 'Propose integrations or corporate partnerships',
+        id: 'strategies',
+        question: 'What is the difference between "balanced" and "optimized" strategies?',
         answer:
-          'If you represent a company and want to integrate Forever PTO, contact support or open a proposal for a custom integration.',
+          'Balanced aims to spread time off across the year for steady value, while Optimized focuses on maximizing efficiency (effective days per PTO day) by prioritizing the best ratio combinations.',
+      },
+      {
+        id: 'overlap',
+        question: 'How do you avoid overlapping suggestions?',
+        answer:
+          'We keep a cache of generated combinations and a set of already-selected dates; when producing alternatives we filter out bridges that include used dates to avoid overlaps and ensure variety.',
       },
     ],
   },
@@ -98,9 +74,39 @@ const FAQ: FaqData = [
           'We store only the minimum information required to generate suggestions. We do not share data with third parties without consent. See the privacy policy for full details.',
       },
       {
+        id: 'encryption',
+        question: 'Is my data encrypted?',
+        answer:
+          "Your vacation planning data is stored locally in your browser. We apply XOR cipher obfuscation to make the data unreadable in casual inspection. This is method is designed to prevent accidental exposure, not protect against determined attackers. We don't store sensitive personal information, and you maintain full control of your data on your device.",
+      },
+      {
+        id: 'data-privacy',
+        question: 'What data do you store?',
+        answer:
+          "All your data (PTO days, selected dates, custom holidays, preferences) is stored exclusively in your browser's local storage. We never send this information to our servers. Your vacation planning stays completely private on your device.",
+      },
+      {
         id: 'troubleshooting',
         question: 'Troubleshooting & stale client data',
         answer: <Troubleshooting />,
+      },
+    ],
+  },
+  {
+    id: 'collaborate',
+    title: 'Interested in collaborating?',
+    items: [
+      {
+        id: 'code',
+        question: 'How to contribute code or ideas?',
+        answer:
+          'Open issues or merge requests with proposals. We need help on algorithms, integrations and UX improvements.',
+      },
+      {
+        id: 'business',
+        question: 'Propose integrations or corporate partnerships',
+        answer:
+          'If you represent a company and want to integrate Forever PTO, contact support or open a proposal for a custom integration.',
       },
     ],
   },
