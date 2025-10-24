@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { acceptCategory, getCookie } from 'vanilla-cookieconsent';
 
 const COOKIE_CATEGORY_NECESSARY = 'necessary';
@@ -17,23 +17,23 @@ export const useCookieConsent = () => {
     }
   }, []);
 
-  const handleAcceptAll = () => {
+  const handleAcceptAll = useCallback(() => {
     acceptCategory(COOKIE_CATEGORIES);
     setAnalyticsEnabled(true);
-  };
+  }, []);
 
-  const handleRejectAll = () => {
+  const handleRejectAll = useCallback(() => {
     acceptCategory([COOKIE_CATEGORY_NECESSARY]);
     setAnalyticsEnabled(false);
-  };
+  }, []);
 
-  const handleSavePreferences = () => {
+  const handleSavePreferences = useCallback(() => {
     if (analyticsEnabled) {
       acceptCategory(COOKIE_CATEGORIES);
     } else {
       acceptCategory([COOKIE_CATEGORY_NECESSARY]);
     }
-  };
+  }, [analyticsEnabled]);
 
   return {
     analyticsEnabled,

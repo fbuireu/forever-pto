@@ -2,7 +2,7 @@ import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useLocationStore } from '@application/stores/location';
 import { usePremiumStore } from '@application/stores/premium';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const STORES = [
   { name: 'filters', store: useFiltersStore },
@@ -12,39 +12,30 @@ const STORES = [
 ] as const;
 
 export const useStoresReady = () => {
-  const [hydrationStatus, setHydrationStatus] = useState<Record<string, boolean>>({});
+  const [hydrationStatus, setHydrationStatus] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(STORES.map(({ name, store }) => [name, store.persist.hasHydrated()]))
+  );
 
   useEffect(() => {
-    const initialStatus = Object.fromEntries(
-      STORES.map(({ name, store }) => {
-        const hasHydrated = store.persist.hasHydrated();
-        return [name, hasHydrated];
-      })
-    );
-
-    setHydrationStatus(initialStatus);
-
-    if (Object.values(initialStatus).every(Boolean)) {
+    if (Object.values(hydrationStatus).every(Boolean)) {
       return;
     }
 
-    const unsubscribes = STORES.filter(({ name }) => !initialStatus[name]).map(({ name, store }) => {
-      return store.persist.onFinishHydration(() => {
+    const unsubscribes = STORES.filter(({ name }) => !hydrationStatus[name]).map(({ name, store }) =>
+      store.persist.onFinishHydration(() => {
         setHydrationStatus((prev) => ({
           ...prev,
           [name]: true,
         }));
-      });
-    });
+      })
+    );
 
     return () => {
       unsubscribes.forEach((unsubscribe) => unsubscribe());
     };
   }, []);
 
-  const hasAllStores = STORES.every(({ name }) => name in hydrationStatus);
-  const allStoresHydrated = Object.values(hydrationStatus).every(Boolean);
-  const areStoresReady = hasAllStores && allStoresHydrated;
+  const areStoresReady = useMemo(() => Object.values(hydrationStatus).every(Boolean), [hydrationStatus]);
 
   return {
     areStoresReady,

@@ -1,6 +1,6 @@
 import { Tabs as TabsPrimitive } from '@base-ui-components/react/tabs';
 import { AnimatePresence, motion, type HTMLMotionProps } from 'motion/react';
-import * as React from 'react';
+import { Fragment, type ComponentProps, type ReactNode } from 'react';
 import { getStrictContext } from 'src/lib/get-strict-context';
 import { Highlight, HighlightItem, type HighlightItemProps, type HighlightProps } from '../effects/highlight';
 import { useControlledState } from '@ui/hooks/useControlledState';
@@ -12,7 +12,7 @@ type TabsContextType = {
 
 const [TabsProvider, useTabs] = getStrictContext<TabsContextType>('TabsContext');
 
-type TabsProps = React.ComponentProps<typeof TabsPrimitive.Root>;
+type TabsProps = ComponentProps<typeof TabsPrimitive.Root>;
 
 function Tabs(props: TabsProps) {
   const [value, setValue] = useControlledState({
@@ -45,7 +45,7 @@ function TabsHighlight({ transition = { type: 'spring', stiffness: 200, damping:
   );
 }
 
-type TabsListProps = React.ComponentProps<typeof TabsPrimitive.List>;
+type TabsListProps = ComponentProps<typeof TabsPrimitive.List>;
 
 function TabsList(props: TabsListProps) {
   return <TabsPrimitive.List data-slot='tabs-list' {...props} />;
@@ -59,13 +59,13 @@ function TabsHighlightItem(props: TabsHighlightItemProps) {
   return <HighlightItem data-slot='tabs-highlight-item' {...props} />;
 }
 
-type TabsTabProps = React.ComponentProps<typeof TabsPrimitive.Tab>;
+type TabsTabProps = ComponentProps<typeof TabsPrimitive.Tab>;
 
 function TabsTab(props: TabsTabProps) {
   return <TabsPrimitive.Tab data-slot='tabs-tab' {...props} />;
 }
 
-type TabsPanelProps = React.ComponentProps<typeof TabsPrimitive.Panel> & HTMLMotionProps<'div'>;
+type TabsPanelProps = ComponentProps<typeof TabsPrimitive.Panel> & HTMLMotionProps<'div'>;
 
 function TabsPanel({
   value,
@@ -96,7 +96,7 @@ function TabsPanel({
 }
 
 type TabsPanelsProps = HTMLMotionProps<'div'> & {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 function TabsPanels({
@@ -116,7 +116,7 @@ function TabsPanels({
       style={{ overflow: 'hidden', ...style }}
       {...props}
     >
-      <React.Fragment key={value}>{children}</React.Fragment>
+      <Fragment key={value}>{children}</Fragment>
     </motion.div>
   );
 }

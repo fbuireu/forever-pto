@@ -2,7 +2,17 @@
 
 import { Slot } from '@radix-ui/react-slot';
 import { motion, type HTMLMotionProps, type Transition } from 'motion/react';
-import * as React from 'react';
+import {
+  Children,
+  isValidElement,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { getStrictContext } from 'src/lib/get-strict-context';
 import { Highlight, HighlightItem, type HighlightItemProps, type HighlightProps } from '../effects/highlight';
 import type { WithAsChild } from './slot';
@@ -34,12 +44,12 @@ type ControlledTabsProps = BaseTabsProps & {
 type TabsProps = UnControlledTabsProps | ControlledTabsProps;
 
 function Tabs({ defaultValue, value, onValueChange, children, ...props }: TabsProps) {
-  const [activeValue, setActiveValue] = React.useState<string | undefined>(defaultValue);
-  const triggersRef = React.useRef(new Map<string, HTMLElement>());
-  const initialSet = React.useRef(false);
+  const [activeValue, setActiveValue] = useState<string | undefined>(defaultValue);
+  const triggersRef = useRef(new Map<string, HTMLElement>());
+  const initialSet = useRef(false);
   const isControlled = value !== undefined;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isControlled && activeValue === undefined && triggersRef.current.size > 0 && !initialSet.current) {
       const firstTab = triggersRef.current.keys().next().value;
       if (firstTab !== undefined) {
@@ -49,7 +59,7 @@ function Tabs({ defaultValue, value, onValueChange, children, ...props }: TabsPr
     }
   }, [activeValue, isControlled]);
 
-  const registerTrigger = React.useCallback(
+  const registerTrigger = useCallback(
     (val: string, node: HTMLElement | null) => {
       if (node) {
         triggersRef.current.set(val, node);
@@ -64,7 +74,7 @@ function Tabs({ defaultValue, value, onValueChange, children, ...props }: TabsPr
     [activeValue, isControlled]
   );
 
-  const handleValueChange = React.useCallback(
+  const handleValueChange = useCallback(
     (val: string) => {
       if (!isControlled) setActiveValue(val);
       else onValueChange?.(val);
@@ -72,14 +82,17 @@ function Tabs({ defaultValue, value, onValueChange, children, ...props }: TabsPr
     [isControlled, onValueChange]
   );
 
+  const contextValue = useMemo(
+    () => ({
+      activeValue: (value ?? activeValue) as string,
+      handleValueChange,
+      registerTrigger,
+    }),
+    [value, activeValue, handleValueChange, registerTrigger]
+  );
+
   return (
-    <TabsProvider
-      value={{
-        activeValue: (value ?? activeValue) as string,
-        handleValueChange,
-        registerTrigger,
-      }}
-    >
+    <TabsProvider value={contextValue}>
       <div data-slot='tabs' {...props}>
         {children}
       </div>
@@ -130,10 +143,10 @@ type TabsTriggerProps = WithAsChild<
 function TabsTrigger({ ref, value, asChild = false, ...props }: TabsTriggerProps) {
   const { activeValue, handleValueChange, registerTrigger } = useTabs();
 
-  const localRef = React.useRef<HTMLButtonElement | null>(null);
-  React.useImperativeHandle(ref, () => localRef.current as HTMLButtonElement);
+  const localRef = useRef<HTMLButtonElement | null>(null);
+  useImperativeHandle(ref, () => localRef.current as HTMLButtonElement);
 
-  React.useEffect(() => {
+  useEffect(() => {
     registerTrigger(value, localRef.current);
     return () => registerTrigger(value, null);
   }, [value, registerTrigger]);
@@ -171,22 +184,22 @@ function TabsContents({
   ...props
 }: TabsContentsProps) {
   const { activeValue } = useTabs();
-  const childrenArray = React.Children.toArray(children);
+  const childrenArray = Children.toArray(children);
   const activeIndex = childrenArray.findIndex(
     (child): child is React.ReactElement<{ value: string }> =>
-      React.isValidElement(child) &&
+      isValidElement(child) &&
       typeof child.props === 'object' &&
       child.props !== null &&
       'value' in child.props &&
       child.props.value === activeValue
   );
 
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
-  const itemRefs = React.useRef<Array<HTMLDivElement | null>>([]);
-  const [height, setHeight] = React.useState(0);
-  const roRef = React.useRef<ResizeObserver | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const itemRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const [height, setHeight] = useState(0);
+  const roRef = useRef<ResizeObserver | null>(null);
 
-  const measure = React.useCallback(() => {
+  const measure = useCallback(() => {
     const pane = itemRefs.current[activeIndex];
     const container = containerRef.current;
     if (!pane || !container) return 0;
@@ -206,7 +219,7 @@ function TabsContents({
     return total;
   }, [activeIndex]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (roRef.current) {
       roRef.current.disconnect();
       roRef.current = null;
@@ -233,7 +246,7 @@ function TabsContents({
     };
   }, [activeIndex, childrenArray.length, measure]);
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (height === 0 && activeIndex >= 0) {
       const next = measure();
       if (next !== 0) setHeight(next);

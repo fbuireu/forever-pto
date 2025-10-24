@@ -1,7 +1,7 @@
 'use client';
 
-import * as React from 'react';
 import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from 'motion/react';
+import { useEffect, useState } from 'react';
 
 import { cn } from '@const/lib/utils';
 
@@ -21,13 +21,15 @@ function RotatingText({
   containerClassName,
   ...props
 }: RotatingTextProps) {
-  const [index, setIndex] = React.useState(0);
+  const [index, setIndex] = useState(0);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!Array.isArray(text)) return;
+
     const interval = setInterval(() => {
       setIndex((prevIndex) => (prevIndex + 1) % text.length);
     }, duration);
+
     return () => clearInterval(interval);
   }, [text, duration]);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, type HTMLMotionProps } from 'motion/react';
 import { getStrictContext } from 'src/lib/get-strict-context';
 import { useIsInView, type UseIsInViewOptions } from '@ui/hooks/useIsInView';
@@ -39,11 +39,12 @@ function TypingText({
     inViewMargin,
   });
 
-  const [isTyping, setIsTyping] = React.useState(false);
-  const [started, setStarted] = React.useState(false);
-  const [displayedText, setDisplayedText] = React.useState<string>('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [started, setStarted] = useState(false);
+  const [displayedText, setDisplayedText] = useState<string>('');
+  const timeoutIdsRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isInView) {
       const timeoutId = setTimeout(() => {
         setStarted(true);
@@ -52,13 +53,8 @@ function TypingText({
     }
   }, [isInView, delay]);
 
-  React.useEffect(() => {
-    if (!started) return;
-
-    const timeoutIds: Array<ReturnType<typeof setTimeout>> = [];
-    const texts: string[] = typeof text === 'string' ? [text] : text;
-
-    const typeText = (str: string, onComplete: () => void) => {
+  const typeText = useCallback(
+    (str: string, onComplete: () => void) => {
       setIsTyping(true);
       let currentIndex = 0;
       const type = () => {
@@ -66,16 +62,19 @@ function TypingText({
           setDisplayedText(str.substring(0, currentIndex));
           currentIndex++;
           const id = setTimeout(type, duration);
-          timeoutIds.push(id);
+          timeoutIdsRef.current.push(id);
         } else {
           setIsTyping(false);
           onComplete();
         }
       };
       type();
-    };
+    },
+    [duration]
+  );
 
-    const eraseText = (str: string, onComplete: () => void) => {
+  const eraseText = useCallback(
+    (str: string, onComplete: () => void) => {
       setIsTyping(true);
       let currentIndex = str.length;
       const erase = () => {
@@ -83,14 +82,21 @@ function TypingText({
           setDisplayedText(str.substring(0, currentIndex));
           currentIndex--;
           const id = setTimeout(erase, duration);
-          timeoutIds.push(id);
+          timeoutIdsRef.current.push(id);
         } else {
           setIsTyping(false);
           onComplete();
         }
       };
       erase();
-    };
+    },
+    [duration]
+  );
+
+  useEffect(() => {
+    if (!started) return;
+
+    const texts: string[] = typeof text === 'string' ? [text] : text;
 
     const animateTexts = (index: number) => {
       typeText(texts[index] ?? '', () => {
@@ -104,16 +110,17 @@ function TypingText({
             animateTexts(nextIndex);
           });
         }, holdDelay);
-        timeoutIds.push(id);
+        timeoutIdsRef.current.push(id);
       });
     };
 
     animateTexts(0);
 
     return () => {
-      timeoutIds.forEach(clearTimeout);
+      timeoutIdsRef.current.forEach(clearTimeout);
+      timeoutIdsRef.current = [];
     };
-  }, [text, duration, started, loop, holdDelay]);
+  }, [text, started, loop, holdDelay, typeText, eraseText]);
 
   return (
     <TypingTextProvider value={{ isTyping, setIsTyping }}>

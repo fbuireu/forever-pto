@@ -10,7 +10,6 @@ import dynamic from 'next/dynamic';
 import { type FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { useShallow } from 'zustand/react/shallow';
 import { ExpressCheckoutSkeleton } from '../skeletons/ExpressCheckoutSkeleton';
 
 interface CheckoutFormProps {
@@ -31,14 +30,9 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
-
-  const { getCurrencyFromLocale, currencySymbol, setPremiumStatus } = usePremiumStore(
-    useShallow((state) => ({
-      getCurrencyFromLocale: state.getCurrencyFromLocale,
-      currencySymbol: state.currencySymbol,
-      setPremiumStatus: state.setPremiumStatus,
-    }))
-  );
+  const getCurrencyFromLocale = usePremiumStore((state) => state.getCurrencyFromLocale);
+  const currencySymbol = usePremiumStore((state) => state.currencySymbol);
+  const setPremiumStatus = usePremiumStore((state) => state.setPremiumStatus);
 
   useEffect(() => {
     getCurrencyFromLocale(locale);

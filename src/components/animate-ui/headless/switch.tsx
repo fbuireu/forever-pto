@@ -1,9 +1,8 @@
 'use client';
 
-import * as React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Switch as SwitchPrimitive, type SwitchProps as SwitchPrimitiveProps } from '@headlessui/react';
 import { motion, type HTMLMotionProps } from 'motion/react';
-
 import { cn } from '@const/lib/utils';
 
 type SwitchProps<TTag extends React.ElementType = typeof motion.button> = SwitchPrimitiveProps<TTag> &
@@ -16,14 +15,14 @@ type SwitchProps<TTag extends React.ElementType = typeof motion.button> = Switch
   };
 
 function Switch({ className, leftIcon, rightIcon, thumbIcon, onChange, as = motion.button, ...props }: SwitchProps) {
-  const [isChecked, setIsChecked] = React.useState(props.checked ?? props.defaultChecked ?? false);
-  const [isTapped, setIsTapped] = React.useState(false);
+  const [isChecked, setIsChecked] = useState(props.checked ?? props.defaultChecked ?? false);
+  const [isTapped, setIsTapped] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setIsChecked(props.checked ?? props.defaultChecked ?? false);
   }, [props.checked, props.defaultChecked]);
 
-  const handleChange = React.useCallback(
+  const handleChange = useCallback(
     (checked: boolean) => {
       setIsChecked(checked);
       onChange?.(checked);

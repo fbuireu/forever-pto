@@ -2,8 +2,7 @@
 
 import { Checkbox as CheckboxPrimitive } from '@base-ui-components/react/checkbox';
 import { type HTMLMotionProps, motion } from 'motion/react';
-import * as React from 'react';
-
+import { useCallback, useEffect, useState } from 'react';
 import { cn } from '@const/lib/utils';
 
 type CheckboxProps = Omit<React.ComponentProps<typeof CheckboxPrimitive.Root>, 'render'> & {
@@ -11,13 +10,13 @@ type CheckboxProps = Omit<React.ComponentProps<typeof CheckboxPrimitive.Root>, '
 };
 
 function Checkbox({ className, onCheckedChange, motionProps, ...props }: CheckboxProps) {
-  const [isChecked, setIsChecked] = React.useState(props?.checked ?? props?.defaultChecked ?? false);
+  const [isChecked, setIsChecked] = useState(props?.checked ?? props?.defaultChecked ?? false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (props?.checked !== undefined) setIsChecked(props.checked);
   }, [props?.checked]);
 
-  const handleCheckedChange = React.useCallback(
+  const handleCheckedChange = useCallback(
     (checked: boolean, eventDetails: CheckboxPrimitive.Root.ChangeEventDetails) => {
       setIsChecked(checked);
       onCheckedChange?.(checked, eventDetails);

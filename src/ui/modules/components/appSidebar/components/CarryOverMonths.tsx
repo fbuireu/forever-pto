@@ -1,48 +1,54 @@
 'use client';
 
+import { useFiltersStore } from '@application/stores/filters';
 import { Slider } from '@const/components/ui/slider';
 import { Field, Label } from '@headlessui/react';
 import { InfoIcon } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
+import { SlidersHorizontal } from 'src/components/animate-ui/icons/sliders-horizontal';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { PremiumFeature } from '../../premium/PremiumFeature';
-import { useFiltersStore } from '@application/stores/filters';
-import { useShallow } from 'zustand/react/shallow';
-import { SlidersHorizontal } from 'src/components/animate-ui/icons/sliders-horizontal';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 const MIN_VALUE = 1;
 const MAX_VALUE = 12;
 const DEBOUNCE_DELAY = 300;
 
 export const CarryOverMonths = () => {
-  const { carryOverMonths, setCarryOverMonths } = useFiltersStore(
-    useShallow((state) => ({
-      carryOverMonths: state.carryOverMonths,
-      setCarryOverMonths: state.setCarryOverMonths,
-    }))
-  );
+  const carryOverMonths = useFiltersStore((state) => state.carryOverMonths);
+  const setCarryOverMonths = useFiltersStore((state) => state.setCarryOverMonths);
   const [localValue, setLocalValue] = useState(carryOverMonths);
-  const timeoutRef = useRef<NodeJS.Timeout>(null);
+  const timeoutRef = useRef<NodeJS.Timeout>(undefined);
 
   useEffect(() => {
     setLocalValue(carryOverMonths);
   }, [carryOverMonths]);
 
-  const handleChange = (value: number[]) => {
-    const newValue = value[0];
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
-    setLocalValue(newValue);
+  const handleChange = useCallback(
+    (value: number[]) => {
+      const newValue = value[0];
 
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+      setLocalValue(newValue);
 
-    timeoutRef.current = setTimeout(() => {
-      setCarryOverMonths(newValue);
-    }, DEBOUNCE_DELAY);
-  };
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        setCarryOverMonths(newValue);
+      }, DEBOUNCE_DELAY);
+    },
+    [setCarryOverMonths]
+  );
 
   return (
     <AnimateIcon animateOnHover>

@@ -11,7 +11,7 @@ import {
 } from '@const/components/ui/dialog';
 import { useCookieConsent } from '@ui/hooks/useCookieConsent';
 import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getCookie } from 'vanilla-cookieconsent';
 import { updateDarkMode } from '../footer/components/utils/helpers';
 import { CookieConsentDialog } from './CookieConsentDialog';
@@ -34,23 +34,29 @@ export const CookieConsent = () => {
     }
   }, []);
 
-  const onAcceptAll = () => {
+  const closeModals = useCallback(() => {
+    setShowModal(false);
+    setShowPreferences(false);
+  }, []);
+
+  const onAcceptAll = useCallback(() => {
     handleAcceptAll();
-    setShowModal(false);
-    setShowPreferences(false);
-  };
+    closeModals();
+  }, [handleAcceptAll, closeModals]);
 
-  const onRejectAll = () => {
+  const onRejectAll = useCallback(() => {
     handleRejectAll();
-    setShowModal(false);
-    setShowPreferences(false);
-  };
+    closeModals();
+  }, [handleRejectAll, closeModals]);
 
-  const onSave = () => {
+  const onSave = useCallback(() => {
     handleSavePreferences();
-    setShowModal(false);
-    setShowPreferences(false);
-  };
+    closeModals();
+  }, [handleSavePreferences, closeModals]);
+
+  const openPreferences = useCallback(() => {
+    setShowPreferences(true);
+  }, []);
 
   return (
     <>
@@ -67,7 +73,7 @@ export const CookieConsent = () => {
             <Button variant='outline' onClick={onRejectAll} className='w-full sm:w-auto'>
               Reject all
             </Button>
-            <Button variant='secondary' onClick={() => setShowPreferences(true)} className='w-full sm:w-auto'>
+            <Button variant='secondary' onClick={openPreferences} className='w-full sm:w-auto'>
               Manage preferences
             </Button>
             <Button onClick={onAcceptAll} className='w-full sm:w-auto'>

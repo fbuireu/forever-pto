@@ -46,6 +46,7 @@ const DeleteHolidayModal = dynamic(() =>
 export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   const premiumKey = usePremiumStore((state) => state.premiumKey);
   const holidays = useHolidaysStore((state) => state.holidays);
+
   const locale = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -57,11 +58,13 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
     key: keyof HolidayDTO | null;
     direction: 'asc' | 'desc';
   }>({ key: null, direction: 'asc' });
+
   const [debouncedSearchTerm] = useDebounce({
     value: searchTerm,
     delay: 100,
     callback: () => {},
   });
+
   const prevOpen = useRef(open);
 
   useEffect(() => {
@@ -79,8 +82,8 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   const filteredHolidays = useMemo(() => {
     let filtered = variantHolidays.filter(
       (holiday) =>
-        holiday.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ??
-        holiday.type?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ??
+        holiday.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        holiday.type?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
         holiday.location?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
 
@@ -139,31 +142,35 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   }, [filteredHolidays, selectedHolidays, getHolidayId]);
 
   const toggleSelectAll = useCallback(() => {
-    const newSelected = new Set(selectedHolidays);
+    setSelectedHolidays((prev) => {
+      const newSelected = new Set(prev);
 
-    if (selectionState.type === 'all') {
-      filteredHolidays.forEach((holiday, index) => newSelected.delete(getHolidayId(holiday, index)));
-    } else {
-      filteredHolidays.forEach((holiday, index) => newSelected.add(getHolidayId(holiday, index)));
-    }
+      if (selectionState.type === 'all') {
+        filteredHolidays.forEach((holiday, index) => newSelected.delete(getHolidayId(holiday, index)));
+      } else {
+        filteredHolidays.forEach((holiday, index) => newSelected.add(getHolidayId(holiday, index)));
+      }
 
-    setSelectedHolidays(newSelected);
-  }, [filteredHolidays, selectedHolidays, selectionState.type, getHolidayId]);
+      return newSelected;
+    });
+  }, [filteredHolidays, selectionState.type, getHolidayId]);
 
   const toggleSelectHoliday = useCallback(
     (holiday: HolidayDTO, index: number) => {
-      const holidayId = getHolidayId(holiday, index);
-      const newSelected = new Set(selectedHolidays);
+      setSelectedHolidays((prev) => {
+        const holidayId = getHolidayId(holiday, index);
+        const newSelected = new Set(prev);
 
-      if (newSelected.has(holidayId)) {
-        newSelected.delete(holidayId);
-      } else {
-        newSelected.add(holidayId);
-      }
+        if (newSelected.has(holidayId)) {
+          newSelected.delete(holidayId);
+        } else {
+          newSelected.add(holidayId);
+        }
 
-      setSelectedHolidays(newSelected);
+        return newSelected;
+      });
     },
-    [selectedHolidays, getHolidayId]
+    [getHolidayId]
   );
 
   const handleCloseAddModal = useCallback(() => {
@@ -184,6 +191,8 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   const getSelectedHolidays = useCallback(() => {
     return filteredHolidays.filter((holiday, index) => selectedHolidays.has(getHolidayId(holiday, index)));
   }, [filteredHolidays, selectedHolidays, getHolidayId]);
+
+  const selectedHolidaysList = useMemo(() => getSelectedHolidays(), [getSelectedHolidays]);
 
   const SelectAllButton = useMemo(() => {
     const { type } = selectionState;
@@ -221,9 +230,11 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 
   const selectedCount = selectedHolidays.size;
   const shouldShowLocationColumn = variantHolidays.some((h) => h.location);
+  const weekendCount = variantHolidays.filter((h) => isWeekend(h.date)).length;
+  const workdayCount = variantHolidays.filter((h) => !isWeekend(h.date)).length;
 
   return (
-    <Collapsible open={innerOpen} onOpenChange={setInnerOpen} className={'space-y-4 w-full'}>
+    <Collapsible open={innerOpen} onOpenChange={setInnerOpen} className='space-y-4 w-full'>
       <AnimateIcon animateOnHover>
         <CollapsibleTrigger asChild className='cursor-pointer'>
           <div className='flex items-center justify-between cursor-pointer group hover:bg-muted/50 p-3 rounded-lg border transition-colors'>
@@ -241,9 +252,9 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
               </div>
             </div>
             <div className='flex items-center space-x-2 text-sm text-muted-foreground'>
-              <span>{variantHolidays.filter((h) => !isWeekend(h.date)).length} laborables</span>
+              <span>{workdayCount} laborables</span>
               <span>•</span>
-              <span>{variantHolidays.filter((h) => isWeekend(h.date)).length} fines de semana</span>
+              <span>{weekendCount} fines de semana</span>
             </div>
           </div>
         </CollapsibleTrigger>
@@ -348,8 +359,8 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
         )}
         <div className='flex items-center justify-between text-sm text-muted-foreground'>
           <div className='flex items-center space-x-4'>
-            <span>En fin de semana: {variantHolidays.filter((h) => isWeekend(h.date)).length}</span>
-            <span>En laborables: {variantHolidays.filter((h) => !isWeekend(h.date)).length}</span>
+            <span>En fin de semana: {weekendCount}</span>
+            <span>En laborables: {workdayCount}</span>
           </div>
           <div className='flex items-center space-x-2'>
             <span>
@@ -359,19 +370,19 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
         </div>
       </CollapsibleContent>
       <AddHolidayModal open={showAddModal} onClose={handleCloseAddModal} locale={locale} />
-      {getSelectedHolidays().length === 1 && (
+      {selectedHolidaysList.length === 1 && (
         <EditHolidayModal
           open={showEditModal}
           onClose={handleCloseEditModal}
           locale={locale}
-          holiday={getSelectedHolidays()[0]}
+          holiday={selectedHolidaysList[0]}
         />
       )}
       <DeleteHolidayModal
         open={showDeleteModal}
         onClose={handleCloseDeleteModal}
         locale={locale}
-        holidays={getSelectedHolidays()}
+        holidays={selectedHolidaysList}
       />
     </Collapsible>
   );

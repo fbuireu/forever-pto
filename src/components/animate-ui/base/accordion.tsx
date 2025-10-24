@@ -2,8 +2,7 @@
 
 import { Accordion as AccordionPrimitive } from '@base-ui-components/react/accordion';
 import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from 'motion/react';
-import * as React from 'react';
-
+import { createContext, use, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { cn } from '@const/lib/utils';
 import { ChevronDown } from '../icons/chevron-down';
 import { AnimateIcon } from '../icons/icon';
@@ -13,10 +12,11 @@ type AccordionItemContextType = {
   setIsOpen: (open: boolean) => void;
 };
 
-const AccordionItemContext = React.createContext<AccordionItemContextType | undefined>(undefined);
+const AccordionItemContext = createContext<AccordionItemContextType | undefined>(undefined);
 
+// ✨ USO DE use() PARA CONTEXT - React 19
 const useAccordionItem = (): AccordionItemContextType => {
-  const context = React.useContext(AccordionItemContext);
+  const context = use(AccordionItemContext);
   if (!context) {
     throw new Error('useAccordionItem must be used within an AccordionItem');
   }
@@ -34,10 +34,13 @@ type AccordionItemProps = React.ComponentProps<typeof AccordionPrimitive.Item> &
 };
 
 function AccordionItem({ className, children, ...props }: AccordionItemProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Memoizar el valor del contexto
+  const contextValue = useMemo(() => ({ isOpen, setIsOpen }), [isOpen]);
 
   return (
-    <AccordionItemContext.Provider value={{ isOpen, setIsOpen }}>
+    <AccordionItemContext.Provider value={contextValue}>
       <AccordionPrimitive.Item data-slot='accordion-item' className={cn('border-b', className)} {...props}>
         {children}
       </AccordionPrimitive.Item>
@@ -58,11 +61,11 @@ function AccordionTrigger({
   chevron = true,
   ...props
 }: AccordionTriggerProps) {
-  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
-  React.useImperativeHandle(ref, () => triggerRef.current as HTMLButtonElement);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  useImperativeHandle(ref, () => triggerRef.current as HTMLButtonElement);
   const { isOpen, setIsOpen } = useAccordionItem();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const node = triggerRef.current;
     if (!node) return;
     const observer = new MutationObserver((mutationsList) => {

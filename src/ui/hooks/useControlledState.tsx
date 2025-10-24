@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface CommonControlledStateProps<T> {
   value?: T;
@@ -13,18 +13,20 @@ export function useControlledState<T, Rest extends unknown[] = []>(
   const { value, defaultValue, onChange } = props;
 
   const [state, setInternalState] = useState<T>(value ?? (defaultValue as T));
+  const onChangeRef = useRef(onChange);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
     if (value !== undefined) setInternalState(value);
   }, [value]);
 
-  const setState = useCallback(
-    (next: T, ...args: Rest) => {
-      setInternalState(next);
-      onChange?.(next, ...args);
-    },
-    [onChange]
-  );
+  const setState = useCallback((next: T, ...args: Rest) => {
+    setInternalState(next);
+    onChangeRef.current?.(next, ...args);
+  }, []);
 
   return [state, setState] as const;
 }

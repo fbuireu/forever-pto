@@ -3,7 +3,7 @@
 import { Circle } from 'lucide-react';
 import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from 'motion/react';
 import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui';
-import * as React from 'react';
+import { createContext, use, useCallback, useEffect, useMemo, useState } from 'react';
 import { cn } from '@const/lib/utils';
 import { MotionHighlight, MotionHighlightItem } from '../effects/motion-highlight';
 import { ChevronRight } from '../icons/chevron-right';
@@ -15,10 +15,10 @@ type DropdownMenuContextType = {
   animateOnHover: boolean;
 };
 
-const DropdownMenuContext = React.createContext<DropdownMenuContextType | undefined>(undefined);
+const DropdownMenuContext = createContext<DropdownMenuContextType | undefined>(undefined);
 
 const useDropdownMenu = (): DropdownMenuContextType => {
-  const context = React.useContext(DropdownMenuContext);
+  const context = use(DropdownMenuContext);
   if (!context) {
     throw new Error('useDropdownMenu must be used within a DropdownMenu');
   }
@@ -36,22 +36,27 @@ function DropdownMenu({
   animateOnHover = true,
   ...props
 }: DropdownMenuProps) {
-  const [isOpen, setIsOpen] = React.useState(props?.open ?? props?.defaultOpen ?? false);
+  const [isOpen, setIsOpen] = useState(props?.open ?? props?.defaultOpen ?? false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (props?.open !== undefined) setIsOpen(props.open);
   }, [props?.open]);
 
-  const handleOpenChange = React.useCallback(
+  const handleOpenChange = useCallback(
     (open: boolean) => {
       setIsOpen(open);
       props.onOpenChange?.(open);
     },
-    [props]
+    [props.onOpenChange]
+  );
+
+  const contextValue = useMemo(
+    () => ({ isOpen, highlightTransition: transition, animateOnHover }),
+    [isOpen, transition, animateOnHover]
   );
 
   return (
-    <DropdownMenuContext.Provider value={{ isOpen, highlightTransition: transition, animateOnHover }}>
+    <DropdownMenuContext.Provider value={contextValue}>
       <DropdownMenuPrimitive.Root data-slot='dropdown-menu' {...props} onOpenChange={handleOpenChange}>
         {children}
       </DropdownMenuPrimitive.Root>

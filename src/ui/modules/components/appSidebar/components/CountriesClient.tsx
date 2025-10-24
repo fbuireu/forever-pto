@@ -10,26 +10,16 @@ import { useEffect } from 'react';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { MapPin } from 'src/components/animate-ui/icons/map-pin';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
-import { useShallow } from 'zustand/react/shallow';
 
 interface CountriesClientProps {
   countries: CountryDTO[];
 }
 
 export const CountriesClient = ({ countries }: CountriesClientProps) => {
-  const { country, setCountry } = useFiltersStore(
-    useShallow((state) => ({
-      country: state.country,
-      setCountry: state.setCountry,
-    }))
-  );
-
-  const { countriesLoading, setCountries } = useLocationStore(
-    useShallow((state) => ({
-      countriesLoading: state.countriesLoading,
-      setCountries: state.setCountries,
-    }))
-  );
+  const country = useFiltersStore((state) => state.country);
+  const setCountry = useFiltersStore((state) => state.setCountry);
+  const countriesLoading = useLocationStore((state) => state.countriesLoading);
+  const setCountries = useLocationStore((state) => state.setCountries);
 
   useEffect(() => {
     if (!countries.length) return;
@@ -47,8 +37,8 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
                 <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
               </TooltipTrigger>
               <TooltipContent className='w-50 text-pretty'>
-                This data is inferred from your CDN and your connection. If you feel that it&apos;s not accurate or you want
-                sneak peak into other&apos;s countries holidays, you can select it manually here
+                This data is inferred from your CDN and your connection. If you feel that it&apos;s not accurate or you
+                want a sneak peek into other countries&apos; holidays, you can select it manually here
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

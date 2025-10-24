@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {
   TabsContent as TabsContentPrimitive,
   TabsContents as TabsContentsPrimitive,

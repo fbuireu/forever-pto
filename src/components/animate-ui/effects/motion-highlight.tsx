@@ -1,7 +1,20 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 'use client';
 
-import * as React from 'react';
+import {
+  createContext,
+  use,
+  useCallback,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  Children,
+  isValidElement,
+  cloneElement,
+} from 'react';
 import type { Transition } from 'motion/react';
 import { AnimatePresence, motion } from 'motion/react';
 
@@ -34,13 +47,13 @@ type MotionHighlightContextType<T extends string> = {
   forceUpdateBounds?: boolean;
 };
 
-const MotionHighlightContext = React.createContext<
+const MotionHighlightContext = createContext<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   MotionHighlightContextType<any> | undefined
 >(undefined);
 
 function useMotionHighlight<T extends string>(): MotionHighlightContextType<T> {
-  const context = React.useContext(MotionHighlightContext);
+  const context = use(MotionHighlightContext);
   if (!context) {
     throw new Error('useMotionHighlight must be used within a MotionHighlightProvider');
   }
@@ -118,14 +131,14 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
     mode = 'children',
   } = props;
 
-  const localRef = React.useRef<HTMLDivElement>(null);
-  React.useImperativeHandle(ref, () => localRef.current as HTMLDivElement);
+  const localRef = useRef<HTMLDivElement>(null);
+  useImperativeHandle(ref, () => localRef.current as HTMLDivElement);
 
-  const [activeValue, setActiveValue] = React.useState<T | null>(value ?? defaultValue ?? null);
-  const [boundsState, setBoundsState] = React.useState<Bounds | null>(null);
-  const [activeClassNameState, setActiveClassNameState] = React.useState<string>('');
+  const [activeValue, setActiveValue] = useState<T | null>(value ?? defaultValue ?? null);
+  const [boundsState, setBoundsState] = useState<Bounds | null>(null);
+  const [activeClassNameState, setActiveClassNameState] = useState<string>('');
 
-  const safeSetActiveValue = React.useCallback(
+  const safeSetActiveValue = useCallback(
     (id: T | null) => {
       setActiveValue((prev) => (prev === id ? prev : id));
       if (id !== activeValue) onValueChange?.(id as T);
@@ -133,7 +146,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
     [activeValue, onValueChange]
   );
 
-  const safeSetBounds = React.useCallback(
+  const safeSetBounds = useCallback(
     (bounds: DOMRect) => {
       if (!localRef.current) return;
 
@@ -168,18 +181,18 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
     [props]
   );
 
-  const clearBounds = React.useCallback(() => {
+  const clearBounds = useCallback(() => {
     setBoundsState((prev) => (prev === null ? prev : null));
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (value !== undefined) setActiveValue(value);
     else if (defaultValue !== undefined) setActiveValue(defaultValue);
   }, [value, defaultValue]);
 
-  const id = React.useId();
+  const id = useId();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (mode !== 'parent') return;
     const container = localRef.current;
     if (!container) return;
@@ -194,7 +207,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
     return () => container.removeEventListener('scroll', onScroll);
   }, [mode, activeValue, safeSetBounds]);
 
-  const render = React.useCallback(
+  const render = useCallback(
     (children: React.ReactNode) => {
       if (mode === 'parent') {
         return (
@@ -243,31 +256,49 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
     [mode, props, boundsState, transition, exitDelay, className, activeClassNameState]
   );
 
+  const contextValue = useMemo(
+    () => ({
+      mode,
+      activeValue,
+      setActiveValue: safeSetActiveValue,
+      id,
+      hover,
+      className,
+      transition,
+      disabled,
+      enabled,
+      exitDelay,
+      setBounds: safeSetBounds,
+      clearBounds,
+      activeClassName: activeClassNameState,
+      setActiveClassName: setActiveClassNameState,
+      forceUpdateBounds: (props as ParentModeMotionHighlightProps)?.forceUpdateBounds,
+    }),
+    [
+      mode,
+      activeValue,
+      safeSetActiveValue,
+      id,
+      hover,
+      className,
+      transition,
+      disabled,
+      enabled,
+      exitDelay,
+      safeSetBounds,
+      clearBounds,
+      activeClassNameState,
+      props,
+    ]
+  );
+
   return (
-    <MotionHighlightContext.Provider
-      value={{
-        mode,
-        activeValue,
-        setActiveValue: safeSetActiveValue,
-        id,
-        hover,
-        className,
-        transition,
-        disabled,
-        enabled,
-        exitDelay,
-        setBounds: safeSetBounds,
-        clearBounds,
-        activeClassName: activeClassNameState,
-        setActiveClassName: setActiveClassNameState,
-        forceUpdateBounds: (props as ParentModeMotionHighlightProps)?.forceUpdateBounds,
-      }}
-    >
+    <MotionHighlightContext.Provider value={contextValue}>
       {enabled
         ? controlledItems
           ? render(children)
           : render(
-              React.Children.map(children, (child, index) => (
+              Children.map(children, (child, index) => (
                 <MotionHighlightItem key={index} className={props?.itemsClassName}>
                   {child}
                 </MotionHighlightItem>
@@ -327,7 +358,7 @@ function MotionHighlightItem({
   forceUpdateBounds,
   ...props
 }: MotionHighlightItemProps) {
-  const itemId = React.useId();
+  const itemId = useId();
   const {
     activeValue,
     setActiveValue,
@@ -351,10 +382,10 @@ function MotionHighlightItem({
   const isDisabled = disabled ?? contextDisabled;
   const itemTransition = transition ?? contextTransition;
 
-  const localRef = React.useRef<HTMLDivElement>(null);
-  React.useImperativeHandle(ref, () => localRef.current as HTMLDivElement);
+  const localRef = useRef<HTMLDivElement>(null);
+  useImperativeHandle(ref, () => localRef.current as HTMLDivElement);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (mode !== 'parent') return;
     let rafId: number;
     let previousBounds: Bounds | null = null;
@@ -401,7 +432,7 @@ function MotionHighlightItem({
     contextForceUpdateBounds,
   ]);
 
-  if (!React.isValidElement(children)) return children;
+  if (!isValidElement(children)) return children;
 
   const dataAttributes = {
     'data-active': isActive ? 'true' : 'false',
@@ -431,7 +462,7 @@ function MotionHighlightItem({
 
   if (asChild) {
     if (mode === 'children') {
-      return React.cloneElement(
+      return cloneElement(
         element,
         {
           key: childValue,
@@ -473,7 +504,7 @@ function MotionHighlightItem({
       );
     }
 
-    return React.cloneElement(element, {
+    return cloneElement(element, {
       ref: localRef,
       ...getNonOverridingDataAttributes(element, {
         ...dataAttributes,
@@ -516,7 +547,7 @@ function MotionHighlightItem({
         </AnimatePresence>
       )}
 
-      {React.cloneElement(element, {
+      {cloneElement(element, {
         className: cn('relative z-[1]', element.props.className),
         ...getNonOverridingDataAttributes(element, {
           ...dataAttributes,

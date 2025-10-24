@@ -1,17 +1,24 @@
 'use client';
 
-import * as React from 'react';
+import { cn } from '@const/lib/utils';
 import {
-  useSpring,
-  useTransform,
   motion,
   useInView,
+  useSpring,
+  useTransform,
   type MotionValue,
   type SpringOptions,
   type UseInViewOptions,
 } from 'motion/react';
+import { useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import useMeasure from 'react-use-measure';
-import { cn } from '@const/lib/utils';
+
+type SlidingNumberDisplayProps = {
+  motionValue: MotionValue<number>;
+  number: number;
+  height: number;
+  transition: SpringOptions;
+};
 
 function SlidingNumberDisplay({ motionValue, number, height, transition }: SlidingNumberDisplayProps) {
   const y = useTransform(motionValue, (latest) => {
@@ -51,7 +58,7 @@ function SlidingNumberRoller({ prevValue, value, place, transition }: SlidingNum
   const targetNumber = Math.floor(value / place) % 10;
   const animatedValue = useSpring(startNumber, transition);
 
-  React.useEffect(() => {
+  useEffect(() => {
     animatedValue.set(targetNumber);
   }, [targetNumber, animatedValue]);
 
@@ -70,13 +77,6 @@ function SlidingNumberRoller({ prevValue, value, place, transition }: SlidingNum
     </span>
   );
 }
-
-type SlidingNumberDisplayProps = {
-  motionValue: MotionValue<number>;
-  number: number;
-  height: number;
-  transition: SpringOptions;
-};
 
 type SlidingNumberProps = React.ComponentProps<'span'> & {
   number: number | string;
@@ -106,8 +106,8 @@ function SlidingNumber({
   },
   ...props
 }: SlidingNumberProps) {
-  const localRef = React.useRef<HTMLSpanElement>(null);
-  React.useImperativeHandle(ref, () => localRef.current!);
+  const localRef = useRef<HTMLSpanElement>(null);
+  useImperativeHandle(ref, () => localRef.current!);
 
   const inViewResult = useInView(localRef, {
     once: inViewOnce,
@@ -115,11 +115,11 @@ function SlidingNumber({
   });
   const isInView = !inView || inViewResult;
 
-  const prevNumberRef = React.useRef<number>(0);
+  const prevNumberRef = useRef<number>(0);
 
-  const effectiveNumber = React.useMemo(() => (!isInView ? 0 : Math.abs(Number(number))), [number, isInView]);
+  const effectiveNumber = useMemo(() => (!isInView ? 0 : Math.abs(Number(number))), [number, isInView]);
 
-  const formatNumber = React.useCallback(
+  const formatNumber = useCallback(
     (num: number) => (decimalPlaces != null ? num.toFixed(decimalPlaces) : num.toString()),
     [decimalPlaces]
   );
@@ -132,29 +132,29 @@ function SlidingNumber({
   const [prevIntStrRaw = '', prevDecStrRaw = ''] = prevFormatted.split('.');
   const prevIntStr = padStart && prevIntStrRaw.length === 1 ? '0' + prevIntStrRaw : prevIntStrRaw;
 
-  const adjustedPrevInt = React.useMemo(() => {
+  const adjustedPrevInt = useMemo(() => {
     return prevIntStr.length > (newIntStr?.length ?? 0)
       ? prevIntStr.slice(-(newIntStr?.length ?? 0))
       : prevIntStr.padStart(newIntStr?.length ?? 0, '0');
   }, [prevIntStr, newIntStr]);
 
-  const adjustedPrevDec = React.useMemo(() => {
+  const adjustedPrevDec = useMemo(() => {
     if (!newDecStrRaw) return '';
     return prevDecStrRaw.length > newDecStrRaw.length
       ? prevDecStrRaw.slice(0, newDecStrRaw.length)
       : prevDecStrRaw.padEnd(newDecStrRaw.length, '0');
   }, [prevDecStrRaw, newDecStrRaw]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isInView) prevNumberRef.current = effectiveNumber;
   }, [effectiveNumber, isInView]);
 
   const intDigitCount = newIntStr?.length ?? 0;
-  const intPlaces = React.useMemo(
+  const intPlaces = useMemo(
     () => Array.from({ length: intDigitCount }, (_, i) => Math.pow(10, intDigitCount - i - 1)),
     [intDigitCount]
   );
-  const decPlaces = React.useMemo(
+  const decPlaces = useMemo(
     () =>
       newDecStrRaw
         ? Array.from({ length: newDecStrRaw.length }, (_, i) => Math.pow(10, newDecStrRaw.length - i - 1))

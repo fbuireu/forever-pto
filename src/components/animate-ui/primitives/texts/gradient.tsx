@@ -1,9 +1,9 @@
 'use client';
 
-import * as React from 'react';
+import type { ComponentProps, CSSProperties } from 'react';
 import { motion, type Transition } from 'motion/react';
 
-type GradientTextProps = Omit<React.ComponentProps<'span'>, 'children'> & {
+type GradientTextProps = Omit<ComponentProps<'span'>, 'children'> & {
   text: string;
   gradient?: string;
   neon?: boolean;
@@ -18,7 +18,7 @@ function GradientText({
   transition = { duration: 50, repeat: Infinity, ease: 'linear' },
   ...props
 }: GradientTextProps) {
-  const baseStyle: React.CSSProperties = {
+  const baseStyle: CSSProperties = {
     backgroundImage: gradient,
     margin: 0,
     color: 'transparent',

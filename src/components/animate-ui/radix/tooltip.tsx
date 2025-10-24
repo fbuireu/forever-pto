@@ -1,8 +1,8 @@
 'use client';
 
-import * as React from 'react';
-import { Tooltip as TooltipPrimitive } from 'radix-ui';
 import { AnimatePresence, motion, type Transition } from 'motion/react';
+import { Tooltip as TooltipPrimitive } from 'radix-ui';
+import { createContext, use, useCallback, useEffect, useState } from 'react';
 
 import { cn } from '@const/lib/utils';
 
@@ -10,10 +10,10 @@ type TooltipContextType = {
   isOpen: boolean;
 };
 
-const TooltipContext = React.createContext<TooltipContextType | undefined>(undefined);
+const TooltipContext = createContext<TooltipContextType | undefined>(undefined);
 
 const useTooltip = (): TooltipContextType => {
-  const context = React.useContext(TooltipContext);
+  const context = use(TooltipContext);
   if (!context) {
     throw new Error('useTooltip must be used within a Tooltip');
   }
@@ -44,18 +44,18 @@ function TooltipProvider(props: TooltipProviderProps) {
 type TooltipProps = React.ComponentProps<typeof TooltipPrimitive.Root>;
 
 function Tooltip(props: TooltipProps) {
-  const [isOpen, setIsOpen] = React.useState(props?.open ?? props?.defaultOpen ?? false);
+  const [isOpen, setIsOpen] = useState(props?.open ?? props?.defaultOpen ?? false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (props?.open !== undefined) setIsOpen(props.open);
   }, [props?.open]);
 
-  const handleOpenChange = React.useCallback(
+  const handleOpenChange = useCallback(
     (open: boolean) => {
       setIsOpen(open);
       props.onOpenChange?.(open);
     },
-    [props]
+    [props.onOpenChange]
   );
 
   return (
@@ -123,13 +123,13 @@ function TooltipContent({
 
 export {
   Tooltip,
-  TooltipTrigger,
   TooltipContent,
   TooltipProvider,
+  TooltipTrigger,
   useTooltip,
+  type TooltipContentProps,
   type TooltipContextType,
   type TooltipProps,
-  type TooltipTriggerProps,
-  type TooltipContentProps,
   type TooltipProviderProps,
+  type TooltipTriggerProps,
 };

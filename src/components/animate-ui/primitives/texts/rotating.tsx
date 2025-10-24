@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence, type HTMLMotionProps } from 'motion/react';
 import { getStrictContext } from 'src/lib/get-strict-context';
 import { useIsInView, type UseIsInViewOptions } from '@ui/hooks/useIsInView';
@@ -32,7 +32,7 @@ function RotatingTextContainer({
   inViewOnce = true,
   ...props
 }: RotatingTextContainerProps) {
-  const [index, setIndex] = React.useState(0);
+  const [index, setIndex] = useState(0);
 
   const { ref: localRef, isInView } = useIsInView(ref as React.Ref<HTMLDivElement>, {
     inView,
@@ -40,7 +40,7 @@ function RotatingTextContainer({
     inViewMargin,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!Array.isArray(text)) return;
     if (inView && !isInView) return;
 
@@ -59,8 +59,10 @@ function RotatingTextContainer({
 
   const currentText = Array.isArray(text) ? text[index] : text;
 
+  const contextValue = useMemo(() => ({ currentText, y, isInView }), [currentText, y, isInView]);
+
   return (
-    <RotatingTextProvider value={{ currentText, y, isInView }}>
+    <RotatingTextProvider value={contextValue}>
       <div
         ref={localRef}
         style={{

@@ -1,6 +1,17 @@
 'use client';
 
-import * as React from 'react';
+import {
+  createContext,
+  use,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  Children,
+  isValidElement,
+} from 'react';
 import { motion, type Transition, type HTMLMotionProps } from 'motion/react';
 
 import { cn } from '@const/lib/utils';
@@ -13,10 +24,10 @@ type TabsContextType<T extends string> = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const TabsContext = React.createContext<TabsContextType<any> | undefined>(undefined);
+const TabsContext = createContext<TabsContextType<any> | undefined>(undefined);
 
 function useTabs<T extends string = string>(): TabsContextType<T> {
-  const context = React.useContext(TabsContext);
+  const context = use(TabsContext);
   if (!context) {
     throw new Error('useTabs must be used within a TabsProvider');
   }
@@ -49,12 +60,12 @@ function Tabs<T extends string = string>({
   className,
   ...props
 }: TabsProps<T>) {
-  const [activeValue, setActiveValue] = React.useState<T | undefined>(defaultValue ?? undefined);
-  const triggersRef = React.useRef(new Map<string, HTMLElement>());
-  const initialSet = React.useRef(false);
+  const [activeValue, setActiveValue] = useState<T | undefined>(defaultValue ?? undefined);
+  const triggersRef = useRef(new Map<string, HTMLElement>());
+  const initialSet = useRef(false);
   const isControlled = value !== undefined;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isControlled && activeValue === undefined && triggersRef.current.size > 0 && !initialSet.current) {
       const firstTab = Array.from(triggersRef.current.keys())[0];
       setActiveValue(firstTab as T);
@@ -62,31 +73,40 @@ function Tabs<T extends string = string>({
     }
   }, [activeValue, isControlled]);
 
-  const registerTrigger = (value: string, node: HTMLElement | null) => {
-    if (node) {
-      triggersRef.current.set(value, node);
-      if (!isControlled && activeValue === undefined && !initialSet.current) {
-        setActiveValue(value as T);
-        initialSet.current = true;
+  const registerTrigger = useCallback(
+    (value: string, node: HTMLElement | null) => {
+      if (node) {
+        triggersRef.current.set(value, node);
+        if (!isControlled && activeValue === undefined && !initialSet.current) {
+          setActiveValue(value as T);
+          initialSet.current = true;
+        }
+      } else {
+        triggersRef.current.delete(value);
       }
-    } else {
-      triggersRef.current.delete(value);
-    }
-  };
+    },
+    [activeValue, isControlled]
+  );
 
-  const handleValueChange = (val: T) => {
-    if (!isControlled) setActiveValue(val);
-    else onValueChange?.(val);
-  };
+  const handleValueChange = useCallback(
+    (val: T) => {
+      if (!isControlled) setActiveValue(val);
+      else onValueChange?.(val);
+    },
+    [isControlled, onValueChange]
+  );
+
+  const contextValue = useMemo(
+    () => ({
+      activeValue: (value ?? activeValue)!,
+      handleValueChange,
+      registerTrigger,
+    }),
+    [value, activeValue, handleValueChange, registerTrigger]
+  );
 
   return (
-    <TabsContext.Provider
-      value={{
-        activeValue: (value ?? activeValue)!,
-        handleValueChange,
-        registerTrigger,
-      }}
-    >
+    <TabsContext.Provider value={contextValue}>
       <div data-slot='tabs' className={cn('flex flex-col gap-2', className)} {...props}>
         {children}
       </div>
@@ -143,10 +163,10 @@ type TabsTriggerProps = HTMLMotionProps<'button'> & {
 function TabsTrigger({ ref, value, children, className, ...props }: TabsTriggerProps) {
   const { activeValue, handleValueChange, registerTrigger } = useTabs();
 
-  const localRef = React.useRef<HTMLButtonElement | null>(null);
-  React.useImperativeHandle(ref, () => localRef.current as HTMLButtonElement);
+  const localRef = useRef<HTMLButtonElement | null>(null);
+  useImperativeHandle(ref, () => localRef.current as HTMLButtonElement);
 
-  React.useEffect(() => {
+  useEffect(() => {
     registerTrigger(value, localRef.current);
     return () => registerTrigger(value, null);
   }, [value, registerTrigger]);
@@ -190,10 +210,10 @@ function TabsContents({
   ...props
 }: TabsContentsProps) {
   const { activeValue } = useTabs();
-  const childrenArray = React.Children.toArray(children);
+  const childrenArray = Children.toArray(children);
   const activeIndex = childrenArray.findIndex(
     (child): child is React.ReactElement<{ value: string }> =>
-      React.isValidElement(child) &&
+      isValidElement(child) &&
       typeof child.props === 'object' &&
       child.props !== null &&
       'value' in child.props &&

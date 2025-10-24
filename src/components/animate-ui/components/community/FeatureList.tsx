@@ -2,7 +2,6 @@
 
 import { Badge } from '@const/components/ui/badge';
 import { motion, type Transition } from 'motion/react';
-import * as React from 'react';
 
 interface RoadmapFeature {
   id: string;

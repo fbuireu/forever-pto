@@ -1,9 +1,19 @@
-/* eslint-disable */ 
 'use client';
 
-import * as React from 'react';
+import {
+  createContext,
+  use,
+  useCallback,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { AnimatePresence, type Transition, motion } from 'motion/react';
 import { cn } from '@const/lib/utils';
+import React from 'react';
 
 type HighlightMode = 'children' | 'parent';
 
@@ -35,12 +45,10 @@ type HighlightContextType<T extends string> = {
   forceUpdateBounds?: boolean;
 };
 
-const HighlightContext = React.createContext<
-  HighlightContextType<string> | undefined
->(undefined);
+const HighlightContext = createContext<HighlightContextType<string> | undefined>(undefined);
 
 function useHighlight<T extends string>(): HighlightContextType<T> {
-  const context = React.useContext(HighlightContext);
+  const context = use(HighlightContext);
   if (!context) {
     throw new Error('useHighlight must be used within a HighlightProvider');
   }
@@ -123,14 +131,14 @@ function Highlight<T extends React.ElementType = 'div'>({ ref, ...props }: Highl
     mode = 'children',
   } = props;
 
-  const localRef = React.useRef<HTMLDivElement>(null);
-  React.useImperativeHandle(ref, () => localRef.current as HTMLDivElement);
+  const localRef = useRef<HTMLDivElement>(null);
+  useImperativeHandle(ref, () => localRef.current as HTMLDivElement);
 
-  const [activeValue, setActiveValue] = React.useState<string | null>(value ?? defaultValue ?? null);
-  const [boundsState, setBoundsState] = React.useState<Bounds | null>(null);
-  const [activeClassNameState, setActiveClassNameState] = React.useState<string>('');
+  const [activeValue, setActiveValue] = useState<string | null>(value ?? defaultValue ?? null);
+  const [boundsState, setBoundsState] = useState<Bounds | null>(null);
+  const [activeClassNameState, setActiveClassNameState] = useState<string>('');
 
-  const safeSetActiveValue = React.useCallback(
+  const safeSetActiveValue = useCallback(
     (id: string | null) => {
       setActiveValue((prev) => (prev === id ? prev : id));
       if (id !== activeValue) onValueChange?.(id);
@@ -138,7 +146,7 @@ function Highlight<T extends React.ElementType = 'div'>({ ref, ...props }: Highl
     [activeValue, onValueChange]
   );
 
-  const safeSetBounds = React.useCallback(
+  const safeSetBounds = useCallback(
     (bounds: DOMRect) => {
       if (!localRef.current) return;
 
@@ -173,18 +181,18 @@ function Highlight<T extends React.ElementType = 'div'>({ ref, ...props }: Highl
     [props]
   );
 
-  const clearBounds = React.useCallback(() => {
+  const clearBounds = useCallback(() => {
     setBoundsState((prev) => (prev === null ? prev : null));
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (value !== undefined) setActiveValue(value);
     else if (defaultValue !== undefined) setActiveValue(defaultValue);
   }, [value, defaultValue]);
 
-  const id = React.useId();
+  const id = useId();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (mode !== 'parent') return;
     const container = localRef.current;
     if (!container) return;
@@ -199,7 +207,7 @@ function Highlight<T extends React.ElementType = 'div'>({ ref, ...props }: Highl
     return () => container.removeEventListener('scroll', onScroll);
   }, [mode, activeValue, safeSetBounds]);
 
-  const render = React.useCallback(
+  const render = useCallback(
     (children: React.ReactNode) => {
       if (mode === 'parent') {
         return (
@@ -250,47 +258,82 @@ function Highlight<T extends React.ElementType = 'div'>({ ref, ...props }: Highl
     [mode, Component, props, boundsState, transition, exitDelay, style, className, activeClassNameState]
   );
 
+  const contextValue = useMemo(
+    () => ({
+      mode,
+      activeValue,
+      setActiveValue: safeSetActiveValue,
+      id,
+      hover,
+      click,
+      className,
+      style,
+      transition,
+      disabled,
+      enabled,
+      exitDelay,
+      setBounds: safeSetBounds,
+      clearBounds,
+      activeClassName: activeClassNameState,
+      setActiveClassName: setActiveClassNameState,
+      forceUpdateBounds: (props as ParentModeHighlightProps)?.forceUpdateBounds,
+    }),
+    [
+      mode,
+      activeValue,
+      safeSetActiveValue,
+      id,
+      hover,
+      click,
+      className,
+      style,
+      transition,
+      disabled,
+      enabled,
+      exitDelay,
+      safeSetBounds,
+      clearBounds,
+      activeClassNameState,
+      props,
+    ]
+  );
+
   return (
-    <HighlightContext.Provider
-      value={{
-        mode,
-        activeValue,
-        setActiveValue: safeSetActiveValue,
-        id,
-        hover,
-        click,
-        className,
-        style,
-        transition,
-        disabled,
-        enabled,
-        exitDelay,
-        setBounds: safeSetBounds,
-        clearBounds,
-        activeClassName: activeClassNameState,
-        setActiveClassName: setActiveClassNameState,
-        forceUpdateBounds: (props as ParentModeHighlightProps)?.forceUpdateBounds,
-      }}
-    >
+    <HighlightContext.Provider value={contextValue}>
       {enabled
         ? controlledItems
           ? render(children)
           : render(
-              React.Children.map(children, (child, index) => (
-                <HighlightItem key={index} className={props?.itemsClassName}>
-                  {child}
-                </HighlightItem>
-              ))
+              <HighlightItemsWrapper
+                itemsClassName={(props as UncontrolledParentModeHighlightProps<T>)?.itemsClassName}
+              >
+                {children}
+              </HighlightItemsWrapper>
             )
         : children}
     </HighlightContext.Provider>
   );
 }
 
+type HighlightItemsWrapperProps = {
+  itemsClassName?: string;
+  children: React.ReactElement | React.ReactElement[];
+};
+
+function HighlightItemsWrapper({ itemsClassName, children }: HighlightItemsWrapperProps) {
+  return (
+    <>
+      {(Array.isArray(children) ? children : [children]).map((child) =>
+        child ? <HighlightItem key={child.key} className={itemsClassName} asChild children={child} /> : null
+      )}
+    </>
+  );
+}
+
 function getNonOverridingDataAttributes(
-  element: React.ReactElement,
+  element: React.ReactElement<ExtendedChildProps>,
   dataAttributes: Record<string, unknown>
-): Record<string, unknown> {
+) {
   return Object.keys(dataAttributes).reduce<Record<string, unknown>>((acc, key) => {
     if ((element.props as Record<string, unknown>)[key] === undefined) {
       acc[key] = dataAttributes[key];
@@ -340,7 +383,7 @@ function HighlightItem<T extends React.ElementType>({
   forceUpdateBounds,
   ...props
 }: HighlightItemProps<T>) {
-  const itemId = React.useId();
+  const itemId = useId();
   const {
     activeValue,
     setActiveValue,
@@ -367,10 +410,10 @@ function HighlightItem<T extends React.ElementType>({
   const isDisabled = disabled === undefined ? contextDisabled : disabled;
   const itemTransition = transition ?? contextTransition;
 
-  const localRef = React.useRef<HTMLDivElement>(null);
-  React.useImperativeHandle(ref, () => localRef.current as HTMLDivElement);
+  const localRef = useRef<HTMLDivElement>(null);
+  useImperativeHandle(ref, () => localRef.current as HTMLDivElement);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (mode !== 'parent') return;
     let rafId: number;
     let previousBounds: Bounds | null = null;

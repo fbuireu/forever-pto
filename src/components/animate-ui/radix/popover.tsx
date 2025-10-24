@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from 'motion/react';
 import { Popover as PopoverPrimitive } from 'radix-ui';
-import * as React from 'react';
+import { createContext, use, useCallback, useEffect, useState } from 'react';
 
 import { cn } from '@const/lib/utils';
 
@@ -10,10 +10,10 @@ type PopoverContextType = {
   isOpen: boolean;
 };
 
-const PopoverContext = React.createContext<PopoverContextType | undefined>(undefined);
+const PopoverContext = createContext<PopoverContextType | undefined>(undefined);
 
 const usePopover = (): PopoverContextType => {
-  const context = React.useContext(PopoverContext);
+  const context = use(PopoverContext);
   if (!context) {
     throw new Error('usePopover must be used within a Popover');
   }
@@ -38,18 +38,18 @@ const getInitialPosition = (side: Side) => {
 type PopoverProps = React.ComponentProps<typeof PopoverPrimitive.Root>;
 
 function Popover({ children, ...props }: PopoverProps) {
-  const [isOpen, setIsOpen] = React.useState(props?.open ?? props?.defaultOpen ?? false);
+  const [isOpen, setIsOpen] = useState(props?.open ?? props?.defaultOpen ?? false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (props?.open !== undefined) setIsOpen(props.open);
   }, [props?.open]);
 
-  const handleOpenChange = React.useCallback(
+  const handleOpenChange = useCallback(
     (open: boolean) => {
       setIsOpen(open);
       props.onOpenChange?.(open);
     },
-    [props]
+    [props.onOpenChange]
   );
 
   return (

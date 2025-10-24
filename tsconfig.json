@@ -1,6 +1,15 @@
 {
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": [".next/**/*", "node_modules/**/*"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    ".next/**/*",
+    "node_modules/**/*"
+  ],
   "compilerOptions": {
     "baseUrl": ".",
     "target": "ESNext",
@@ -15,29 +24,61 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@const/*": ["./src/const/*"],
-      "@app/*": ["./src/app/*"],
-      "@infrastructure/*": ["./src/infrastructure/*"],
-      "@domain/*": ["./src/domain/*"],
-      "@ui/*": ["./src/ui/*"],
-      "@application/*": ["./src/application/*"],
-      "@modules/*": ["./src/ui/modules/*"],
-      "@utils/*": ["./src/utils/*"],
-      "@assets/*": ["./src/ui/assets/*"],
-      "@styles/*": ["./src/ui/styles/*"],
-      "@shared/*": ["./src/shared/*"],
-      "@i18n/*": ["./src/ui/i18n/*"],
-      "@mocks/*": ["./src/mocks/*"],
-      "@types/*": ["./src/types/*"]
+      "@const/*": [
+        "./src/const/*"
+      ],
+      "@app/*": [
+        "./src/app/*"
+      ],
+      "@infrastructure/*": [
+        "./src/infrastructure/*"
+      ],
+      "@domain/*": [
+        "./src/domain/*"
+      ],
+      "@ui/*": [
+        "./src/ui/*"
+      ],
+      "@application/*": [
+        "./src/application/*"
+      ],
+      "@modules/*": [
+        "./src/ui/modules/*"
+      ],
+      "@utils/*": [
+        "./src/utils/*"
+      ],
+      "@assets/*": [
+        "./src/ui/assets/*"
+      ],
+      "@styles/*": [
+        "./src/ui/styles/*"
+      ],
+      "@shared/*": [
+        "./src/shared/*"
+      ],
+      "@i18n/*": [
+        "./src/ui/i18n/*"
+      ],
+      "@mocks/*": [
+        "./src/mocks/*"
+      ],
+      "@types/*": [
+        "./src/types/*"
+      ]
     }
   }
 }

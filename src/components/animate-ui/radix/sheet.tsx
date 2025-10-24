@@ -1,10 +1,9 @@
 'use client';
 
-import * as React from 'react';
+import { createContext, use, useCallback, useEffect, useState } from 'react';
 import { Dialog as SheetPrimitive } from 'radix-ui';
 import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from 'motion/react';
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { cn } from '@const/lib/utils';
 import { X } from '../icons/x';
 import { AnimateIcon } from '../icons/icon';
@@ -13,10 +12,10 @@ type SheetContextType = {
   isOpen: boolean;
 };
 
-const SheetContext = React.createContext<SheetContextType | undefined>(undefined);
+const SheetContext = createContext<SheetContextType | undefined>(undefined);
 
 const useSheet = (): SheetContextType => {
-  const context = React.useContext(SheetContext);
+  const context = use(SheetContext);
   if (!context) {
     throw new Error('useSheet must be used within a Sheet');
   }
@@ -26,18 +25,18 @@ const useSheet = (): SheetContextType => {
 type SheetProps = React.ComponentProps<typeof SheetPrimitive.Root>;
 
 function Sheet({ children, ...props }: SheetProps) {
-  const [isOpen, setIsOpen] = React.useState(props?.open ?? props?.defaultOpen ?? false);
+  const [isOpen, setIsOpen] = useState(props?.open ?? props?.defaultOpen ?? false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (props?.open !== undefined) setIsOpen(props.open);
   }, [props?.open]);
 
-  const handleOpenChange = React.useCallback(
+  const handleOpenChange = useCallback(
     (open: boolean) => {
       setIsOpen(open);
       props.onOpenChange?.(open);
     },
-    [props]
+    [props.onOpenChange]
   );
 
   return (

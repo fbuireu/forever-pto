@@ -1,17 +1,17 @@
 'use client';
 
-import * as React from 'react';
-import { Collapsible as CollapsiblePrimitive } from 'radix-ui';
 import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from 'motion/react';
+import { Collapsible as CollapsiblePrimitive } from 'radix-ui';
+import { createContext, use, useCallback, useEffect, useState } from 'react';
 
 type CollapsibleContextType = {
   isOpen: boolean;
 };
 
-const CollapsibleContext = React.createContext<CollapsibleContextType | undefined>(undefined);
+const CollapsibleContext = createContext<CollapsibleContextType | undefined>(undefined);
 
 const useCollapsible = (): CollapsibleContextType => {
-  const context = React.useContext(CollapsibleContext);
+  const context = use(CollapsibleContext);
   if (!context) {
     throw new Error('useCollapsible must be used within a Collapsible');
   }
@@ -21,18 +21,18 @@ const useCollapsible = (): CollapsibleContextType => {
 type CollapsibleProps = React.ComponentProps<typeof CollapsiblePrimitive.Root>;
 
 function Collapsible({ children, ...props }: CollapsibleProps) {
-  const [isOpen, setIsOpen] = React.useState(props?.open ?? props?.defaultOpen ?? false);
+  const [isOpen, setIsOpen] = useState(props?.open ?? props?.defaultOpen ?? false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (props?.open !== undefined) setIsOpen(props.open);
   }, [props?.open]);
 
-  const handleOpenChange = React.useCallback(
+  const handleOpenChange = useCallback(
     (open: boolean) => {
       setIsOpen(open);
       props.onOpenChange?.(open);
     },
-    [props]
+    [props.onOpenChange] 
   );
 
   return (
@@ -87,12 +87,8 @@ function CollapsibleContent({
 }
 
 export {
-  Collapsible,
-  CollapsibleTrigger,
-  CollapsibleContent,
-  useCollapsible,
-  type CollapsibleContextType,
+  Collapsible, CollapsibleContent, CollapsibleTrigger, useCollapsible, type CollapsibleContentProps, type CollapsibleContextType,
   type CollapsibleProps,
-  type CollapsibleTriggerProps,
-  type CollapsibleContentProps,
+  type CollapsibleTriggerProps
 };
+

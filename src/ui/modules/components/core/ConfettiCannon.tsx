@@ -1,13 +1,19 @@
 'use client';
 
 import confetti from 'canvas-confetti';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface ConfettiCannonProps {
   onComplete?: () => void;
 }
 
 export const ConfettiCannon = ({ onComplete }: ConfettiCannonProps) => {
+  const onCompleteRef = useRef(onComplete);
+  
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
   useEffect(() => {
     const count = 200;
     const defaults = {
@@ -55,11 +61,11 @@ export const ConfettiCannon = ({ onComplete }: ConfettiCannonProps) => {
     fireRealisticConfetti();
 
     const timer = setTimeout(() => {
-      onComplete?.();
+      onCompleteRef.current?.();
     }, 4000);
 
     return () => clearTimeout(timer);
-  }, [onComplete]);
+  }, []);
 
   return null;
 };

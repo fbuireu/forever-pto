@@ -25,7 +25,7 @@ export default Home;
 export { generateMetadata };
 
 // todo: simplify (bianca's feedback)
-// todo: migrate to react 19 (use)
+// todo: add react compiler (use memo, etc)
 // todo: WARN Batch upload failed: Please set R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, and CF_ACCOUNT_ID environment variables to enable faster batch upload for remote R2.
 
 // todo: responsive

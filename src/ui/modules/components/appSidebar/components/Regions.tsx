@@ -6,28 +6,18 @@ import { Combobox } from '@const/components/ui/combobox';
 import { Field, Label } from '@headlessui/react';
 import { MapPinned } from 'lucide-react';
 import { useEffect } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 
 export const Regions = () => {
-  const { regions, regionsLoading, fetchRegions } = useLocationStore(
-    useShallow((state) => ({
-      regions: state.regions,
-      regionsLoading: state.regionsLoading,
-      fetchRegions: state.fetchRegions,
-    }))
-  );
+  const regions = useLocationStore((state) => state.regions);
+  const regionsLoading = useLocationStore((state) => state.regionsLoading);
+  const fetchRegions = useLocationStore((state) => state.fetchRegions);
 
-  const { country, region, setRegion } = useFiltersStore(
-    useShallow((state) => ({
-      country: state.country,
-      region: state.region,
-      setRegion: state.setRegion,
-    }))
-  );
+  const country = useFiltersStore((state) => state.country);
+  const region = useFiltersStore((state) => state.region);
+  const setRegion = useFiltersStore((state) => state.setRegion);
 
   useEffect(() => {
     if (!country) return;
-
     fetchRegions(country);
   }, [country, fetchRegions]);
 
@@ -44,7 +34,7 @@ export const Regions = () => {
         onChange={setRegion}
         disabled={!country}
         placeholder={regionsLoading ? 'Loading regions...' : 'Select region...'}
-        searchPlaceholder='Search regions. ..'
+        searchPlaceholder='Search regions...'
       />
     </Field>
   );

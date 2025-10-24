@@ -1,7 +1,7 @@
 'use client';
 
 import { linkedinIcon } from '@ui/assets/icons/linkedin';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { siBluesky as Bluesky, siBuymeacoffee as BuyMeCoffee, siGithub as Github } from 'simple-icons';
 import { RotatingTextContainer } from 'src/components/animate-ui/primitives/texts/rotating';
 import { RotatingText } from 'src/components/animate-ui/text/rotating';
@@ -42,15 +42,22 @@ export const SOCIAL_NETWORKS = {
   },
 } as const;
 
+const getRandomEmoji = () => EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+
 export const DevFooter = () => {
-  const [currentEmoji, setCurrentEmoji] = useState(EMOJIS[0]);
+  const [currentEmoji, setCurrentEmoji] = useState(() => getRandomEmoji());
+  const intervalRef = useRef<NodeJS.Timeout>(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentEmoji(EMOJIS[Math.floor(Math.random() * EMOJIS.length)]);
+    intervalRef.current = setInterval(() => {
+      setCurrentEmoji(getRandomEmoji());
     }, 3000);
 
-    return () => clearInterval(interval);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, []);
 
   return (
@@ -67,12 +74,13 @@ export const DevFooter = () => {
       </div>
       <p className='text-sm text-muted-foreground text-center'>You can also find me</p>
       <div className='flex gap-5 items-center space-x-1 text-xs text-muted-foreground/70'>
-        {Object.values(SOCIAL_NETWORKS).map((network) => (
+        {Object.entries(SOCIAL_NETWORKS).map(([key, network]) => (
           <a
-            key={network.BASE_URL}
+            key={key}
             href={`${network.BASE_URL}/${network.USERNAME}`}
             target='_blank'
             rel='noopener noreferrer'
+            aria-label={`Visit my ${key.toLowerCase().replace('_', ' ')} profile`}
             className='transition-all duration-200 hover:scale-110 hover:text-opacity-100'
             style={{ '--hover-color': network.COLOR } as React.CSSProperties & { '--hover-color': string }}
           >

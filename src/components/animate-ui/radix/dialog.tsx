@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { createContext, use, useCallback, useEffect, useState } from 'react';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from 'motion/react';
 
@@ -11,10 +11,10 @@ type DialogContextType = {
   isOpen: boolean;
 };
 
-const DialogContext = React.createContext<DialogContextType | undefined>(undefined);
+const DialogContext = createContext<DialogContextType | undefined>(undefined);
 
 const useDialog = (): DialogContextType => {
-  const context = React.useContext(DialogContext);
+  const context = use(DialogContext);
   if (!context) {
     throw new Error('useDialog must be used within a Dialog');
   }
@@ -24,18 +24,18 @@ const useDialog = (): DialogContextType => {
 type DialogProps = React.ComponentProps<typeof DialogPrimitive.Root>;
 
 function Dialog({ children, ...props }: DialogProps) {
-  const [isOpen, setIsOpen] = React.useState(props?.open ?? props?.defaultOpen ?? false);
+  const [isOpen, setIsOpen] = useState(props?.open ?? props?.defaultOpen ?? false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (props?.open !== undefined) setIsOpen(props.open);
   }, [props?.open]);
 
-  const handleOpenChange = React.useCallback(
+  const handleOpenChange = useCallback(
     (open: boolean) => {
       setIsOpen(open);
       props.onOpenChange?.(open);
     },
-    [props]
+    [props.onOpenChange]
   );
 
   return (
