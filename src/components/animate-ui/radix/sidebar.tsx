@@ -10,11 +10,11 @@ import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { type Transition } from 'motion/react';
 import { createContext, use, useCallback, useEffect, useMemo, useState } from 'react';
-import { Button } from '../components/buttons/button';
 import { MotionHighlight, MotionHighlightItem } from '../effects/motion-highlight';
 import { PanelLeftIcon } from '../icons/panel-left';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
+import { Button } from '@const/components/ui/button';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
