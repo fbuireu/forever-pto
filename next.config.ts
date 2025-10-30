@@ -8,7 +8,7 @@ const withNextIntl = createNextIntlPlugin('./src/infrastructure/i18n/config.ts')
 const isProd = process.env.NODE_ENV === 'production'
 
 const nextConfig: NextConfig = {
-  cacheComponents: true,
+  // cacheComponents: true, need rootParams to get locale in server to set next-intl (
   compiler: {
     removeConsole: isProd,
   },

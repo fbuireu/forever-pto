@@ -1,28 +1,40 @@
-import { CalendarList } from '@ui/modules/components/home/CalendarList';
-import { Faq } from '@ui/modules/components/home/Faq';
-import { HolidaysList } from '@ui/modules/components/home/HolidaysList';
-import { Legend } from '@ui/modules/components/home/Legend';
-import { ManagementBar } from '@ui/modules/components/home/ManagementBar';
-import { Roadmap } from '@ui/modules/components/home/Roadmap';
-import { Summary } from '@ui/modules/components/home/Summary';
-import { generateMetadata } from './metadata';
+import { CalendarList } from '@ui/modules/components/home/CalendarList'
+import { Faq } from '@ui/modules/components/home/Faq'
+import { HolidaysList } from '@ui/modules/components/home/HolidaysList'
+import { Legend } from '@ui/modules/components/home/Legend'
+import { ManagementBar } from '@ui/modules/components/home/ManagementBar'
+import { Roadmap } from '@ui/modules/components/home/Roadmap'
+import { Summary } from '@ui/modules/components/home/Summary'
+import { generateMetadata } from './metadata'
+import type { Locale } from 'next-intl'
 
-const Home = async () => {
+interface LayoutProps {
+  params: Promise<{ locale: Locale }>;
+}
+
+// part of cacheComponents nextjs feature
+// export function generateStaticParams () {
+//   return LOCALES.map(locale => ({ locale }))
+// }
+
+const Home = async ({ params }: LayoutProps) => {
+  const { locale } = await params
+
   return (
-    <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4 mb-8'>
-      <HolidaysList />
-      <ManagementBar />
-      <CalendarList />
-      <Legend />
-      <Summary />
-      <Faq />
-      <Roadmap />
+    <section className="flex w-full max-w-8xl mx-auto items-start flex-col gap-4 mb-8">
+      <HolidaysList/>
+      <ManagementBar/>
+      <CalendarList/>
+      <Legend/>
+      <Summary/>
+      <Faq/>
+      <Roadmap/>
     </section>
-  );
-};
+  )
+}
 
-export default Home;
-export { generateMetadata };
+export default Home
+export { generateMetadata }
 
 // todo: simplify (bianca's feedback)
 // todo: add react compiler (use memo, etc)
