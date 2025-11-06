@@ -10,8 +10,12 @@ binding = "ASSETS"
 [observability]
 [observability.logs] 
 enabled = true
-head_sampling_rate = 1
+head_sampling_rate = 0.20
 invocation_logs = true
+[observability.traces]
+enabled = true
+head_sampling_rate = 0.20
+persist = true
 
 [[routes]]
 pattern = "forever-pto.com/*"
