@@ -13,5 +13,5 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
 export const config = {
   matcher: ['/', '/(en|es|ca|it)/:path*'],
-  edge: 'runtime'
+  runtime: 'edge',
 };
