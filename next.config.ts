@@ -8,6 +8,7 @@ const withNextIntl = createNextIntlPlugin('./src/infrastructure/i18n/config.ts')
 const isProd = process.env.NODE_ENV === 'production'
 
 const nextConfig: NextConfig = {
+
   // cacheComponents: true, need rootParams to get locale in server to set next-intl (
   compiler: {
     removeConsole: isProd,
@@ -22,7 +23,7 @@ const nextConfig: NextConfig = {
     '@libsql/isomorphic-fetch',
   ],
   experimental: {
-    // turbopackFileSystemCacheForDev: true,
+    turbopackFileSystemCacheForDev: true,
   }
 }
 
