@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
     '@libsql/isomorphic-fetch',
   ],
   experimental: {
-    turbopackFileSystemCacheForDev: true,
+    // turbopackFileSystemCacheForDev: true,
   }
 }
 
