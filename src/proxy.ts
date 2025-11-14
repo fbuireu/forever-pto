@@ -5,7 +5,7 @@ import type { NextRequest, NextResponse } from 'next/server';
 
 const i18nMiddleware = createMiddleware(routing);
 
-export async function middleware(request: NextRequest): Promise<NextResponse> {
+export async function proxy(request: NextRequest): Promise<NextResponse> {
   const i18nResponse = i18nMiddleware(request);
 
   return await locationProxy({ request, response: i18nResponse });
@@ -13,4 +13,5 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 export const config = {
   matcher: ['/', '/(en|es|ca|it)/:path*'],
+  runtime: 'nodejs',
 };
