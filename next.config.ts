@@ -8,10 +8,9 @@ const withNextIntl = createNextIntlPlugin('./src/infrastructure/i18n/config.ts')
 const isProd = process.env.NODE_ENV === 'production';
 
 const nextConfig: NextConfig = {
-  //   compiler: {
-  //     removeConsole: false,
-  //   },
-  productionBrowserSourceMaps: true, // Habilita source maps en producción
+  compiler: {
+    removeConsole: false,
+  },
   images: {
     unoptimized: true,
   },
@@ -23,7 +22,6 @@ const nextConfig: NextConfig = {
   ],
   experimental: {
     turbopackFileSystemCacheForDev: true,
-    turbopackMinify: false,
   },
 };
 

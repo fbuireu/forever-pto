@@ -328,7 +328,22 @@ export const useHolidaysStore = create<HolidaysStore>()(
               }
             : null,
         }),
-        onRehydrateStorage: () => (state) => {
+        onRehydrateStorage: () => (state, error) => {
+          if (error) {
+            logger.logError('Error rehydrating holidays store', error, {
+              storeName: STORAGE_NAME,
+              hasState: !!state,
+            });
+            if (globalThis.window !== undefined) {
+              try {
+                localStorage.removeItem(STORAGE_NAME);
+              } catch (removeError) {
+                logger.logError('Failed to remove corrupted storage', removeError);
+              }
+            }
+            return;
+          }
+
           if (state) {
             if (state.holidays) {
               state.holidays = state.holidays.map((h) => ({

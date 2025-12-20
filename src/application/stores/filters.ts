@@ -1,7 +1,10 @@
 import { FilterStrategy } from '@infrastructure/services/calendar/types';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
+
+const logger = getBetterStackInstance();
 
 export interface FiltersState {
   ptoDays: number;
@@ -57,6 +60,21 @@ export const useFiltersStore = create<FiltersStore>()(
         name: STORAGE_NAME,
         version: STORAGE_VERSION,
         storage: encryptedStorage,
+        onRehydrateStorage: () => (state, error) => {
+          if (error) {
+            logger.logError('Error rehydrating filters store', error, {
+              storeName: STORAGE_NAME,
+              hasState: !!state,
+            });
+            if (globalThis.window !== undefined) {
+              try {
+                localStorage.removeItem(STORAGE_NAME);
+              } catch (removeError) {
+                logger.logError('Failed to remove corrupted storage', removeError);
+              }
+            }
+          }
+        },
       }
     ),
     { name: STORAGE_NAME }

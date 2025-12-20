@@ -120,6 +120,21 @@ export const useLocationStore = create<LocationStore>()(
           countriesLastFetched: state.countriesLastFetched,
           regions: state.regions,
         }),
+        onRehydrateStorage: () => (state, error) => {
+          if (error) {
+            logger.logError('Error rehydrating location store', error, {
+              storeName: STORAGE_NAME,
+              hasState: !!state,
+            });
+            if (globalThis.window !== undefined) {
+              try {
+                localStorage.removeItem(STORAGE_NAME);
+              } catch (removeError) {
+                logger.logError('Failed to remove corrupted storage', removeError);
+              }
+            }
+          }
+        },
       }
     ),
     { name: STORAGE_NAME }
