@@ -1,4 +1,4 @@
-import { createClient, type Client, type InValue } from '@libsql/client';
+import { createClient, type Client, type InValue } from '@libsql/client/web';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 export interface QueryResult<T = unknown> {

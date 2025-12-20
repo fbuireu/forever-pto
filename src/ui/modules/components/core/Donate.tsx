@@ -69,7 +69,6 @@ export const Donate = () => {
             email: data.email,
             promoCode: data.promoCode,
           });
-          console.log('result', result);
           if (result.discountInfo) {
             const message = formatDiscountMessage(result.discountInfo);
             toast.success(message.title, {

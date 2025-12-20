@@ -43,7 +43,7 @@ export async function createPayment(params: CreatePaymentInput): Promise<Payment
       finalAmount = discountInfo.finalAmount;
     }
 
-    const paymentIntent = await createPaymentIntent(stripe, {
+      const paymentIntent = await createPaymentIntent(stripe, {
       amount: finalAmount,
       email: validated.email,
       promoCode: validated.promoCode,
