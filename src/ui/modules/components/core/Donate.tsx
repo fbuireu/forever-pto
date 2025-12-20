@@ -36,7 +36,6 @@ export const Donate = () => {
   const { resolvedTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
-  // Eliminado: const [isInitializing, setIsInitializing] = useState(false);
   const [isPending, startTransition] = useTransition();
   const premiumKey = usePremiumStore((state) => state.premiumKey);
   const userEmail = usePremiumStore((state) => state.userEmail);

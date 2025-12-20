@@ -88,7 +88,7 @@ export const DevFooter = () => {
             <Icon
               icon={network.ICON}
               size={24}
-              className='transition-colors duration-200 hover:[color:var(--hover-color)]'
+              className='transition-colors duration-200 hover:text-(--hover-color)'
             />
           </a>
         ))}

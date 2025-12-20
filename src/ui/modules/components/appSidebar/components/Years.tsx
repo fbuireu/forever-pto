@@ -40,7 +40,7 @@ export const Years = () => {
             </Button>
           </AnimateIcon>
         </PopoverTrigger>
-        <PopoverContent className='w-[200px] p-0'>
+        <PopoverContent className='w-50 p-0'>
           <Command id='years'>
             <CommandList>
               <CommandGroup>
