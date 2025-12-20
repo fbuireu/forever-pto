@@ -45,10 +45,11 @@ export const SOCIAL_NETWORKS = {
 const getRandomEmoji = () => EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
 
 export const DevFooter = () => {
-  const [currentEmoji, setCurrentEmoji] = useState(() => getRandomEmoji());
+  const [currentEmoji, setCurrentEmoji] = useState(EMOJIS[0]);
   const intervalRef = useRef<NodeJS.Timeout>(null);
 
   useEffect(() => {
+    setCurrentEmoji(getRandomEmoji());
     intervalRef.current = setInterval(() => {
       setCurrentEmoji(getRandomEmoji());
     }, 3000);

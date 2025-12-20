@@ -33,6 +33,7 @@ interface PremiumActions {
   setEmail: (email: string) => void;
   setCurrency: (currency: string) => void;
   getCurrencyFromLocale: (locale: Locale) => void;
+  resetPremiumStore: () => void;
 }
 
 type PremiumStore = PremiumState & PremiumActions;
@@ -168,6 +169,10 @@ export const usePremiumStore = create<PremiumStore>()(
           });
         },
 
+        resetPremiumStore: () => {
+          set({ ...premiumInitialState });
+        },
+
         refreshPremiumStatus: async () => {
           const { userEmail } = get();
           if (userEmail) {
@@ -204,6 +209,7 @@ export const usePremiumStore = create<PremiumStore>()(
         onRehydrateStorage: () => (state, error) => {
           if (error) {
             logger.logError('Error rehydrating premium store', error);
+            usePremiumStore.getState().resetPremiumStore();
             return;
           }
 

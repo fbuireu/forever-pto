@@ -7,7 +7,6 @@ import { useShallow } from 'zustand/react/shallow';
 
 function getUserCountryFromCookie(): string | undefined {
   if (typeof document === 'undefined') return undefined;
-  console.log('document', document.cookie);
   const cookie = document.cookie.split('; ').find((row) => row.startsWith('user-country='));
   return cookie?.split('=')[1];
 }
