@@ -9,15 +9,11 @@ directory = ".open-next/assets"
 binding = "ASSETS"
 
 [observability]
-enabled = true
-head_sampling_rate = 1
-
 [observability.logs]
 enabled = true
-head_sampling_rate = 0.2
-persist = true
+head_sampling_rate = 0.002
 invocation_logs = true
-
+persist = true
 [observability.traces]
 enabled = true
 persist = true
