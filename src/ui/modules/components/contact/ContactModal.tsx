@@ -2,7 +2,6 @@
 
 import { type ContactFormData, contactSchema } from '@application/dto/contact/schema';
 import { usePremiumStore } from '@application/stores/premium';
-import { sendContactEmail } from '@application/use-cases/contact';
 import { Button } from '@const/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@const/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
@@ -57,12 +56,24 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
   };
 
   const onSubmit = async (data: ContactFormData) => {
-    const result = await sendContactEmail(data);
-    setEmail(data.email);
-    if (result.success) {
-      setStep(Step.SUCCESS);
-    } else {
-      setErrorMessage(result.error ?? 'Failed to send message');
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      setEmail(data.email);
+
+      if (result.success) {
+        setStep(Step.SUCCESS);
+      } else {
+        setErrorMessage(result.error ?? 'Failed to send message');
+        setStep(Step.ERROR);
+      }
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to send message');
       setStep(Step.ERROR);
     }
   };
