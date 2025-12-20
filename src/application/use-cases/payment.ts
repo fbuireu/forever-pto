@@ -1,6 +1,3 @@
-// @ts-nocheck
-'use server';
-
 import { paymentDTO } from '@application/dto/payment/dto';
 import { createPaymentSchema, type CreatePaymentInput } from '@application/dto/payment/schema';
 import type { DiscountInfo, PaymentDTO } from '@application/dto/payment/types';
@@ -12,7 +9,6 @@ import { createPaymentIntent } from '@infrastructure/services/payments/provider/
 import { validatePromoCode } from '@infrastructure/services/payments/provider/promo-code';
 import { savePayment } from '@infrastructure/services/payments/repository';
 import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
-import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { ZodError } from 'zod';
 
@@ -20,7 +16,7 @@ const stripe = getStripeServerInstance();
 const turso = getTursoClientInstance();
 const logger = getBetterStackInstance();
 
-async function createPaymentCore(
+export async function createPayment(
   params: CreatePaymentInput,
   userAgent: string | null,
   ipAddress: string | null
@@ -138,13 +134,3 @@ async function createPaymentCore(
     });
   }
 }
-
-export async function createPayment(params: CreatePaymentInput): Promise<PaymentDTO> {
-  const headersList = await headers();
-  const userAgent = headersList.get('user-agent') ?? null;
-  const ipAddress = headersList.get('x-forwarded-for') ?? headersList.get('x-real-ip') ?? null;
-
-  return createPaymentCore(params, userAgent, ipAddress);
-}
-
-export { createPaymentCore };

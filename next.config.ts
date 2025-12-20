@@ -24,10 +24,6 @@ const nextConfig: NextConfig = {
   experimental: {
     turbopackFileSystemCacheForDev: true,
     turbopackMinify: false,
-    serverActions: {
-      bodySizeLimit: '2mb',
-      allowedOrigins: ['*'],
-    },
   },
 };
 

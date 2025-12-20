@@ -1,6 +1,6 @@
 export const runtime = 'edge';
 
-import { createPaymentCore } from '@application/use-cases/payment';
+import { createPayment } from '@application/use-cases/payment';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get('user-agent') ?? null;
     const ipAddress = request.headers.get('x-forwarded-for') ?? request.headers.get('x-real-ip') ?? null;
 
-    const result = await createPaymentCore(body, userAgent, ipAddress);
+    const result = await createPayment(body, userAgent, ipAddress);
 
     return NextResponse.json(result);
   } catch (error) {
