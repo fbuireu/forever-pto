@@ -11,10 +11,10 @@ import { SiteTitle } from '@ui/modules/components/core/SiteTitle';
 import { Footer } from '@ui/modules/components/footer/Footer';
 import { StoresInitializer } from '@ui/store/StoresInitializer';
 import { type Locale, NextIntlClientProvider, hasLocale } from 'next-intl';
+import { setRequestLocale } from 'next-intl/server';
 import { ThemeProvider } from 'next-themes';
 import dynamic from 'next/dynamic';
 import { Geist, Geist_Mono } from 'next/font/google';
-import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { SidebarProvider } from 'src/components/animate-ui/radix/sidebar';
 
@@ -37,14 +37,15 @@ const PremiumModal = dynamic(() =>
   import('@ui/modules/components/premium/PremiumModal').then((module) => ({ default: module.PremiumModal }))
 );
 
+export const revalidate = 3600; // ISR: revalidate every hour
+
 const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
   const { locale } = await params;
-  const cookieStore = await cookies();
-  const userCountry = cookieStore.get('user-country')?.value;
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
+  setRequestLocale(locale);
 
   return (
     <html lang={locale}>
@@ -58,7 +59,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
             disableTransitionOnChange
           >
             <SidebarProvider>
-              <StoresInitializer userCountry={userCountry} />
+              <StoresInitializer />
               <AppSidebar locale={locale}>
                 <SiteTitle />
                 <SiteSubtitle />

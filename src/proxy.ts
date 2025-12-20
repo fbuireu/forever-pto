@@ -3,10 +3,10 @@ import { location as locationProxy } from '@infrastructure/proxy/location';
 import createMiddleware from 'next-intl/middleware';
 import type { NextRequest, NextResponse } from 'next/server';
 
-const i18nMiddleware = createMiddleware(routing);
+const i18nProxy = createMiddleware(routing);
 
-export async function middleware(request: NextRequest): Promise<NextResponse> {
-  const i18nResponse = i18nMiddleware(request);
+export async function proxy(request: NextRequest): Promise<NextResponse> {
+  const i18nResponse = i18nProxy(request);
 
   return await locationProxy({ request, response: i18nResponse });
 }

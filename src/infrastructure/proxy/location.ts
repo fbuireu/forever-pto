@@ -10,11 +10,10 @@ const ONE_WEEK = 60 * 60 * 24 * 7;
 
 export async function location({ request, response }: MiddlewareParams): Promise<NextResponse> {
   const userCountry = await detectCountry(request);
-  const userCountryCookie = request.cookies.get('user-country')?.value;
 
-  if (userCountry && userCountry !== userCountryCookie) {
+  if (userCountry) {
     response.cookies.set('user-country', userCountry, {
-      httpOnly: true,
+      httpOnly: false,
       secure: true,
       sameSite: 'strict',
       maxAge: ONE_WEEK,

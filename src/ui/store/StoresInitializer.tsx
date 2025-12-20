@@ -5,12 +5,16 @@ import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-interface StoreInitializerProps {
-  userCountry?: string;
+function getUserCountryFromCookie(): string | undefined {
+  if (typeof document === 'undefined') return undefined;
+  console.log('document', document.cookie);
+  const cookie = document.cookie.split('; ').find((row) => row.startsWith('user-country='));
+  return cookie?.split('=')[1];
 }
 
-export const StoresInitializer = ({ userCountry }: StoreInitializerProps) => {
+export const StoresInitializer = () => {
   const { areStoresReady } = useStoresReady();
+  const userCountry = getUserCountryFromCookie();
   const { country, setCountry } = useFiltersStore(
     useShallow((state) => ({
       country: state.country,
@@ -19,9 +23,11 @@ export const StoresInitializer = ({ userCountry }: StoreInitializerProps) => {
   );
 
   useEffect(() => {
-    if (!areStoresReady || !userCountry || country) return;
-    setCountry(userCountry);
-  }, [areStoresReady, userCountry, country, setCountry]);
+    if (!areStoresReady || country) return;
+    if (userCountry) {
+      setCountry(userCountry);
+    }
+  }, [areStoresReady, country, setCountry, userCountry]);
 
   return null;
 };
