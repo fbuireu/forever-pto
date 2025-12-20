@@ -9,7 +9,7 @@ const isProd = process.env.NODE_ENV === 'production';
 
 const nextConfig: NextConfig = {
   compiler: {
-    removeConsole: isProd,
+    // removeConsole: isProd,
   },
   images: {
     unoptimized: true,
