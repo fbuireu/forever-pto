@@ -3,6 +3,7 @@ main = ".open-next/worker.js"
 compatibility_date = "2025-03-25"
 compatibility_flags = ["nodejs_compat"]
 keep_names=false
+upload_source_maps = true
 
 [assets]
 directory = ".open-next/assets"
