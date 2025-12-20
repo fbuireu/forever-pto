@@ -42,8 +42,7 @@ export async function createPayment(params: CreatePaymentInput): Promise<Payment
       discountInfo = validation.data;
       finalAmount = discountInfo.finalAmount;
     }
-
-      const paymentIntent = await createPaymentIntent(stripe, {
+    const paymentIntent = await createPaymentIntent(stripe, {
       amount: finalAmount,
       email: validated.email,
       promoCode: validated.promoCode,
@@ -52,50 +51,56 @@ export async function createPayment(params: CreatePaymentInput): Promise<Payment
       ipAddress,
     });
 
-    // const saveResult = await savePayment(turso, {
-    //   id: paymentIntent.id,
-    //   stripeCreatedAt: new Date(paymentIntent.created * 1000),
-    //   customerId: extractCustomerId(paymentIntent.customer),
-    //   chargeId: extractChargeId(paymentIntent.latest_charge),
-    //   email: validated.email,
-    //   amount: Math.round(finalAmount * 100),
-    //   currency: paymentIntent.currency,
-    //   status: paymentIntent.status,
-    //   paymentMethodType: paymentIntent.payment_method_types?.[0] ?? null,
-    //   description: paymentIntent.description ?? null,
-    //   promoCode: validated.promoCode ?? null,
-    //   userAgent,
-    //   ipAddress,
-    //   country: null,
-    //   customerName: null,
-    //   postalCode: null,
-    //   city: null,
-    //   state: null,
-    //   paymentBrand: null,
-    //   paymentLast4: null,
-    //   feeAmount: null,
-    //   netAmount: null,
-    //   refundedAt: null,
-    //   refundReason: null,
-    //   disputedAt: null,
-    //   disputeReason: null,
-    //   parentPaymentId: null,
-    // });
-
-    // if (!saveResult.success) {
-    //   logger.warn('Failed to save payment to database, will use webhook fallback', {
-    //     error: saveResult.error,
-    //     paymentIntentId: paymentIntent.id,
-    //     email: validated.email,
-    //   });
-    // }
-
-    return paymentDTO.create({
-      raw: {
-        type: 'success',
-        data: { paymentIntent, discountInfo },
-      },
+    const saveResult = await savePayment(turso, {
+      id: paymentIntent.id,
+      stripeCreatedAt: new Date(paymentIntent.created * 1000),
+      customerId: extractCustomerId(paymentIntent.customer),
+      chargeId: extractChargeId(paymentIntent.latest_charge),
+      email: validated.email,
+      amount: Math.round(finalAmount * 100),
+      currency: paymentIntent.currency,
+      status: paymentIntent.status,
+      paymentMethodType: paymentIntent.payment_method_types?.[0] ?? null,
+      description: paymentIntent.description ?? null,
+      promoCode: validated.promoCode ?? null,
+      userAgent,
+      ipAddress,
+      country: null,
+      customerName: null,
+      postalCode: null,
+      city: null,
+      state: null,
+      paymentBrand: null,
+      paymentLast4: null,
+      feeAmount: null,
+      netAmount: null,
+      refundedAt: null,
+      refundReason: null,
+      disputedAt: null,
+      disputeReason: null,
+      parentPaymentId: null,
     });
+
+    if (!saveResult.success) {
+      logger.warn('Failed to save payment to database, will use webhook fallback', {
+        error: saveResult.error,
+        paymentIntentId: paymentIntent.id,
+        email: validated.email,
+      });
+    }
+
+    return {
+      success: true,
+      clientSecret: 'pi_mock_client_secret_123456',
+      discountInfo: {
+        type: 'percent',
+        value: 20,
+        originalAmount: 10,
+        finalAmount: 8,
+        couponId: 'MOCKCOUPON',
+        couponName: '20% OFF',
+      },
+    };
   } catch (error) {
     if (error instanceof ZodError) {
       const firstError = error.issues[0];
