@@ -16,11 +16,16 @@ const stripe = getStripeServerInstance();
 const turso = getTursoClientInstance();
 const logger = getBetterStackInstance();
 
+interface PaymentContext {
+  userAgent: string | null;
+  ipAddress: string | null;
+}
+
 export async function createPayment(
   params: CreatePaymentInput,
-  userAgent: string | null,
-  ipAddress: string | null
+  context: PaymentContext
 ): Promise<PaymentDTO> {
+  const { userAgent, ipAddress } = context;
   try {
     const validated = createPaymentSchema.parse(params);
 

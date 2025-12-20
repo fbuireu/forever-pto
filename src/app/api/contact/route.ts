@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import { sendContactEmail } from '@application/use-cases/contact';
 import { type NextRequest, NextResponse } from 'next/server';
 
