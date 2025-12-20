@@ -5,7 +5,6 @@ import '@styles/index.css';
 import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { Analytics } from '@ui/modules/components/core/Analytics';
 import { CookieConsent } from '@ui/modules/components/core/CookieConsent';
-import { Donate } from '@ui/modules/components/core/Donate';
 import { SiteSubtitle } from '@ui/modules/components/core/SiteSubtitle';
 import { SiteTitle } from '@ui/modules/components/core/SiteTitle';
 import { Footer } from '@ui/modules/components/footer/Footer';
@@ -37,7 +36,11 @@ const PremiumModal = dynamic(() =>
   import('@ui/modules/components/premium/PremiumModal').then((module) => ({ default: module.PremiumModal }))
 );
 
-export const revalidate = 3600; // ISR: revalidate every hour
+const Donate = dynamic(() =>
+  import('@ui/modules/components/core/Donate').then((module) => ({ default: module.Donate, ssr: false }))
+);
+
+export const revalidate = 3600;
 
 const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
   const { locale } = await params;
