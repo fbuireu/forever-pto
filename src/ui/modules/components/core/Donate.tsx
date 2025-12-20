@@ -32,6 +32,11 @@ const stripePromise = getStripeClientInstance().getStripePromise();
 const logger = getBetterStackInstance();
 
 export const Donate = () => {
+  // Debug: mostrar valor de la variable de entorno en el cliente
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line no-console
+    console.log('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:', process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+  }
   const locale = useLocale();
   const { resolvedTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);

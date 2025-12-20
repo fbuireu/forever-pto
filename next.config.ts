@@ -1,15 +1,14 @@
-import { withBetterStack } from '@logtail/next'
-import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare'
-import type { NextConfig } from 'next'
-import createNextIntlPlugin from 'next-intl/plugin'
+import { withBetterStack } from '@logtail/next';
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
+import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
 
-const withNextIntl = createNextIntlPlugin('./src/infrastructure/i18n/config.ts')
+const withNextIntl = createNextIntlPlugin('./src/infrastructure/i18n/config.ts');
 
-const isProd = process.env.NODE_ENV === 'production'
+const isProd = process.env.NODE_ENV === 'production';
 
 const nextConfig: NextConfig = {
-
-  // cacheComponents: true, need rootParams to get locale in server to set next-intl (
+  cacheComponents: true,
   compiler: {
     removeConsole: isProd,
   },
@@ -24,9 +23,9 @@ const nextConfig: NextConfig = {
   ],
   experimental: {
     turbopackFileSystemCacheForDev: true,
-  }
-}
+  },
+};
 
-export default withBetterStack(withNextIntl(nextConfig))
+export default withBetterStack(withNextIntl(nextConfig));
 
-initOpenNextCloudflareForDev()
+initOpenNextCloudflareForDev();
