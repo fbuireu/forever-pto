@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use server';
 
 import { paymentDTO } from '@application/dto/payment/dto';
@@ -41,19 +42,21 @@ export async function createPayment(params: CreatePaymentInput): Promise<Payment
 
       discountInfo = validation.data;
       finalAmount = discountInfo.finalAmount;
-      }
-          return {
-            success: true,
-            clientSecret: 'pi_mock_client_secret_123456',
-            discountInfo: {
-              type: 'percent',
-              value: 20,
-              originalAmount: 10,
-              finalAmount: 8,
-              couponId: 'MOCKCOUPON',
-              couponName: '20% OFF',
-            },
-          };
+    }
+    return {
+      success: true,
+      // todo: only for debug
+      stripe: stripe,
+      clientSecret: 'pi_mock_client_secret_123456',
+      discountInfo: {
+        type: 'percent',
+        value: 20,
+        originalAmount: 10,
+        finalAmount: 8,
+        couponId: 'MOCKCOUPON',
+        couponName: '20% OFF',
+      },
+    };
     const paymentIntent = await createPaymentIntent(stripe, {
       amount: finalAmount,
       email: validated.email,

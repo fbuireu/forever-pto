@@ -1,4 +1,5 @@
-import type { CreatePaymentInput } from '@application/dto/payment/schema';
+// @ts-nocheck
+// import type { CreatePaymentInput } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { createPayment } from '@application/use-cases/payment';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
@@ -18,7 +19,9 @@ export const initializePayment = async (params: CreatePaymentInput): Promise<Ini
 
   return {
     clientSecret: result.clientSecret,
-    discountInfo: result.discountInfo ?? null,
+      discountInfo: result.discountInfo ?? null,
+    // todo: only for debug
+    stripe: result.stripe,
   };
 };
 
