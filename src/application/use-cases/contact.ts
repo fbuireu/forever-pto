@@ -1,5 +1,7 @@
 'use server';
 
+export const runtime = 'edge';
+
 import { contactSchema } from '@application/dto/contact/schema';
 import type { ContactFormData, ContactResult } from '@application/dto/contact/types';
 import { createContactError } from '@domain/contact/events/factory/errors';

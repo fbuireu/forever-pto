@@ -1,6 +1,8 @@
 // @ts-nocheck
 'use server';
 
+export const runtime = 'edge';
+
 import { paymentDTO } from '@application/dto/payment/dto';
 import { createPaymentSchema, type CreatePaymentInput } from '@application/dto/payment/schema';
 import type { DiscountInfo, PaymentDTO } from '@application/dto/payment/types';
