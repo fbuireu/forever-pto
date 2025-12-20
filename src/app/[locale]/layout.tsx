@@ -5,6 +5,7 @@ import '@styles/index.css';
 import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { Analytics } from '@ui/modules/components/core/Analytics';
 import { CookieConsent } from '@ui/modules/components/core/CookieConsent';
+import { DonateClient } from '@ui/modules/components/core/DonateClient';
 import { SiteSubtitle } from '@ui/modules/components/core/SiteSubtitle';
 import { SiteTitle } from '@ui/modules/components/core/SiteTitle';
 import { Footer } from '@ui/modules/components/footer/Footer';
@@ -37,7 +38,7 @@ const PremiumModal = dynamic(() =>
 );
 
 const Donate = dynamic(() =>
-  import('@ui/modules/components/core/Donate').then((module) => ({ default: module.Donate, ssr: false }))
+  import('@ui/modules/components/core/Donate').then((module) => ({ default: module.Donate }))
 );
 
 export const revalidate = 3600;
@@ -68,7 +69,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
                 <SiteSubtitle />
                 {children}
                 <Toaster />
-                <Donate />
+                <DonateClient />
                 <PremiumModal />
                 <CookieConsent />
               </AppSidebar>
