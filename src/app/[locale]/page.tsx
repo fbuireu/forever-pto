@@ -1,5 +1,3 @@
-'use cache';
-
 import { LOCALES } from '@infrastructure/i18n/config';
 import { CalendarList } from '@ui/modules/components/home/CalendarList';
 import { Faq } from '@ui/modules/components/home/Faq';
