@@ -38,6 +38,7 @@ const Home = async ({ params }: LayoutProps) => {
 export default Home;
 export { generateMetadata };
 
+// todo: fix error cloudflare stripe
 // todo: simplify (bianca's feedback)
 // todo: add react compiler (use memo, etc)
 // todo: WARN Batch upload failed: Please set R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, and CF_ACCOUNT_ID environment variables to enable faster batch upload for remote R2.

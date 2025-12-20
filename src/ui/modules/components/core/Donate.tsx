@@ -13,7 +13,7 @@ import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { initializePayment } from '@ui/adapters/payments/checkout';
 import { useLocale } from 'next-intl';
 import { useTheme } from 'next-themes';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
@@ -36,6 +36,8 @@ export const Donate = () => {
   const { resolvedTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
+  // Eliminado: const [isInitializing, setIsInitializing] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const premiumKey = usePremiumStore((state) => state.premiumKey);
   const userEmail = usePremiumStore((state) => state.userEmail);
   const setEmail = usePremiumStore((state) => state.setEmail);
@@ -59,39 +61,41 @@ export const Donate = () => {
   const currentAmount = form.watch('amount');
 
   const onSubmit = useCallback(
-    async (data: CreatePaymentInput) => {
-      try {
-        setEmail(data.email);
-        const result = await initializePayment({
-          amount: data.amount,
-          email: data.email,
-          promoCode: data.promoCode,
-        });
+    (data: CreatePaymentInput) => {
+      startTransition(async () => {
+        try {
+          setEmail(data.email);
+          const result = await initializePayment({
+            amount: data.amount,
+            email: data.email,
+            promoCode: data.promoCode,
+          });
+          console.log('result', result);
+          if (result.discountInfo) {
+            const message = formatDiscountMessage(result.discountInfo);
+            toast.success(message.title, {
+              description: message.description,
+            });
+          }
 
-        if (result.discountInfo) {
-          const message = formatDiscountMessage(result.discountInfo);
-          toast.success(message.title, {
-            description: message.description,
+          setPaymentState({
+            clientSecret: result.clientSecret,
+            data,
+            discountInfo: result.discountInfo ?? null,
+          });
+        } catch (error) {
+          logger.logError('Payment initialization failed in Donate component', error, {
+            amount: data.amount,
+            hasPromoCode: !!data.promoCode,
+            promoCodeLength: data.promoCode?.length,
+            currency,
+            locale,
+          });
+          toast.error('Payment initialization failed', {
+            description: error instanceof Error ? error.message : 'Please try again.',
           });
         }
-
-        setPaymentState({
-          clientSecret: result.clientSecret,
-          data,
-          discountInfo: result.discountInfo ?? null,
-        });
-      } catch (error) {
-        logger.logError('Payment initialization failed in Donate component', error, {
-          amount: data.amount,
-          hasPromoCode: !!data.promoCode,
-          promoCodeLength: data.promoCode?.length,
-          currency,
-          locale,
-        });
-        toast.error('Payment initialization failed', {
-          description: error instanceof Error ? error.message : 'Please try again.',
-        });
-      }
+      });
     },
     [setEmail, locale, currency]
   );
@@ -288,6 +292,7 @@ export const Donate = () => {
               locale={locale}
               currency={currency}
               currencySymbol={currencySymbol}
+              isPending={isPending}
             />
           ) : (
             elementsOptions && (

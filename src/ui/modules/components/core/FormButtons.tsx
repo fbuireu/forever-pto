@@ -12,6 +12,7 @@ interface FormButtonsProps {
   submitClassName?: string;
   cancelClassName?: string;
   submitVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  pending?: boolean;
 }
 
 export const FormButtons = ({
@@ -23,8 +24,10 @@ export const FormButtons = ({
   submitClassName,
   cancelClassName,
   submitVariant = 'default',
+  pending: pendingProp,
 }: FormButtonsProps) => {
-  const { pending } = useFormStatus();
+  const { pending: pendingStatus } = useFormStatus();
+  const pending = pendingProp ?? pendingStatus;
 
   return (
     <div className='flex gap-2 pt-2'>

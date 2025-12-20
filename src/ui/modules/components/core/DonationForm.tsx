@@ -19,17 +19,27 @@ const PRESET_AMOUNTS = [5, 10, 15] as const;
 
 interface DonationFormProps {
   form: UseFormReturn<CreatePaymentInput>;
-  onSubmit: (data: CreatePaymentInput) => Promise<void>;
+  onSubmit: (data: CreatePaymentInput) => void;
   currentAmount: number;
   locale: string;
   currency: string;
   currencySymbol: string;
+  isPending?: boolean;
 }
 
-export function DonationForm({ form, onSubmit, currentAmount, locale, currency, currencySymbol }: Readonly<DonationFormProps>) {
+export function DonationForm({
+  form,
+  onSubmit,
+  currentAmount,
+  locale,
+  currency,
+  currencySymbol,
+  isPending,
+}: Readonly<DonationFormProps>) {
   const [showPromoCode, setShowPromoCode] = useState(false);
   const { setValue } = form;
   const { pending } = useFormStatus();
+  const loading = pending || isPending;
 
   const amount = useMemo(() => amountFormatter(locale), [locale]);
 
@@ -63,7 +73,6 @@ export function DonationForm({ form, onSubmit, currentAmount, locale, currency, 
             </FormItem>
           )}
         />
-
         <div className='space-y-2'>
           <Label>Quick amounts</Label>
           <div className='flex gap-2'>
@@ -74,7 +83,7 @@ export function DonationForm({ form, onSubmit, currentAmount, locale, currency, 
                 variant={currentAmount === preset ? 'default' : 'outline'}
                 size='sm'
                 onClick={() => handlePresetClick(preset)}
-                disabled={pending}
+                disabled={loading}
                 className='flex-1'
               >
                 {amount.format(preset)}
@@ -100,7 +109,7 @@ export function DonationForm({ form, onSubmit, currentAmount, locale, currency, 
                     step='1'
                     min='1'
                     max='10000'
-                    disabled={pending}
+                    disabled={loading}
                     {...field}
                     value={field.value ?? ''}
                     onChange={(e) => {
@@ -142,7 +151,7 @@ export function DonationForm({ form, onSubmit, currentAmount, locale, currency, 
                       <Input
                         type='text'
                         placeholder='YOU_WISH_IT_WAS_THAT_EASY'
-                        disabled={pending}
+                        disabled={loading}
                         {...field}
                         className='h-10 uppercase'
                       />
@@ -159,6 +168,7 @@ export function DonationForm({ form, onSubmit, currentAmount, locale, currency, 
           loadingText='Processing...'
           hideCancel
           submitClassName='w-full bg-green-600 hover:bg-green-700'
+          pending={loading}
         />
       </form>
     </Form>
