@@ -20,10 +20,11 @@ const stripe = getStripeServerInstance();
 const turso = getTursoClientInstance();
 const logger = getBetterStackInstance();
 
-export async function createPayment(params: CreatePaymentInput): Promise<PaymentDTO> {
-  const headersList = await headers();
-  const userAgent = headersList.get('user-agent') ?? null;
-  const ipAddress = headersList.get('x-forwarded-for') ?? headersList.get('x-real-ip') ?? null;
+async function createPaymentCore(
+  params: CreatePaymentInput,
+  userAgent: string | null,
+  ipAddress: string | null
+): Promise<PaymentDTO> {
   try {
     const validated = createPaymentSchema.parse(params);
 
@@ -137,3 +138,13 @@ export async function createPayment(params: CreatePaymentInput): Promise<Payment
     });
   }
 }
+
+export async function createPayment(params: CreatePaymentInput): Promise<PaymentDTO> {
+  const headersList = await headers();
+  const userAgent = headersList.get('user-agent') ?? null;
+  const ipAddress = headersList.get('x-forwarded-for') ?? headersList.get('x-real-ip') ?? null;
+
+  return createPaymentCore(params, userAgent, ipAddress);
+}
+
+export { createPaymentCore };

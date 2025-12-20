@@ -6,7 +6,7 @@ const logger = getBetterStackInstance();
 
 const SECRET_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY;
 const isDev = process.env.NODE_ENV === 'development';
-const isClient = typeof window !== 'undefined';
+const isClient = globalThis.window !== undefined;
 const hasNodeAPIs = typeof Buffer !== 'undefined';
 
 function base64Encode(str: string): string {
@@ -80,15 +80,40 @@ export const encryptedStorage = createJSONStorage(() => {
   }
   return {
     getItem: (key: string): string | null => {
-      const encryptedValue = localStorage.getItem(key);
-      if (!encryptedValue) return null;
-      const decrypted = decrypt({ text: encryptedValue, key: SECRET_KEY });
-      return decrypted ?? null;
+      try {
+        const encryptedValue = localStorage.getItem(key);
+        if (!encryptedValue) return null;
+        const decrypted = decrypt({ text: encryptedValue, key: SECRET_KEY });
+        if (!decrypted) {
+          logger.warn('Decryption returned empty value, removing corrupted storage', { key });
+          localStorage.removeItem(key);
+          return null;
+        }
+        return decrypted;
+      } catch (error) {
+        logger.logError('Failed to get item from encrypted storage', error, { key });
+        try {
+          localStorage.removeItem(key);
+        } catch (removeError) {
+          logger.logError('Failed to remove corrupted item', removeError);
+        }
+        return null;
+      }
     },
     setItem: (key: string, value: string): void => {
-      const encrypted = encrypt({ text: value, key: SECRET_KEY });
-      localStorage.setItem(key, encrypted);
+      try {
+        const encrypted = encrypt({ text: value, key: SECRET_KEY });
+        localStorage.setItem(key, encrypted);
+      } catch (error) {
+        logger.logError('Failed to set item in encrypted storage', error, { key });
+      }
     },
-    removeItem: (key: string): void => localStorage.removeItem(key),
+    removeItem: (key: string): void => {
+      try {
+        localStorage.removeItem(key);
+      } catch (error) {
+        logger.logError('Failed to remove item from encrypted storage', error, { key });
+      }
+    },
   };
 });

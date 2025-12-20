@@ -208,8 +208,17 @@ export const usePremiumStore = create<PremiumStore>()(
         }),
         onRehydrateStorage: () => (state, error) => {
           if (error) {
-            logger.logError('Error rehydrating premium store', error);
-            usePremiumStore.getState().resetPremiumStore();
+            logger.logError('Error rehydrating premium store', error, {
+              storeName: STORAGE_NAME,
+              hasState: !!state,
+            });
+            if (globalThis.window !== undefined) {
+              try {
+                localStorage.removeItem(STORAGE_NAME);
+              } catch (removeError) {
+                logger.logError('Failed to remove corrupted storage', removeError);
+              }
+            }
             return;
           }
 
