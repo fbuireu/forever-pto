@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
   //   compiler: {
   //     removeConsole: false,
   //   },
+  productionBrowserSourceMaps: true, // Habilita source maps en producción
   images: {
     unoptimized: true,
   },
@@ -22,6 +23,7 @@ const nextConfig: NextConfig = {
   ],
   experimental: {
     turbopackFileSystemCacheForDev: true,
+    turbopackMinify: false,
   },
 };
 
