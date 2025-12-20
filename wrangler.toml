@@ -3,21 +3,25 @@ main = ".open-next/worker.js"
 compatibility_date = "2025-03-25"
 compatibility_flags = ["nodejs_compat"]
 keep_names=false
-upload_source_maps = true
 
 [assets]
 directory = ".open-next/assets"
 binding = "ASSETS"
 
 [observability]
-[observability.logs] 
 enabled = true
-head_sampling_rate = 0.20
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 0.2
+persist = true
 invocation_logs = true
+
 [observability.traces]
 enabled = true
-head_sampling_rate = 0.20
 persist = true
+head_sampling_rate = 0.2
 
 [[routes]]
 pattern = "forever-pto.com/*"
@@ -29,3 +33,15 @@ mode = "smart"
 [[r2_buckets]]
 binding = "NEXT_INC_CACHE_R2_BUCKET"
 bucket_name = "next-inc-cache"
+
+[[services]]
+binding = "WORKER_SELF_REFERENCE"
+service = "forever-pto"
+
+[[durable_objects.bindings]]
+name = "NEXT_CACHE_DO_QUEUE"
+class_name = "DOQueueHandler"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["DOQueueHandler"]
