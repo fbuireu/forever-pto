@@ -14,7 +14,12 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  serverExternalPackages: ['@libsql/isomorphic-ws'],
+  serverExternalPackages: [
+    '@libsql/client',
+    '@libsql/hrana-client',
+    '@libsql/isomorphic-ws',
+    '@libsql/isomorphic-fetch',
+  ],
   experimental: {
     turbopackFileSystemCacheForDev: true,
   },

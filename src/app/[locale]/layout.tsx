@@ -16,7 +16,6 @@ import { ThemeProvider } from 'next-themes';
 import dynamic from 'next/dynamic';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { notFound } from 'next/navigation';
-import { use } from 'react';
 import { SidebarProvider } from 'src/components/animate-ui/radix/sidebar';
 
 const geistSans = Geist({
@@ -38,10 +37,12 @@ const PremiumModal = dynamic(() =>
   import('@ui/modules/components/premium/PremiumModal').then((module) => ({ default: module.PremiumModal }))
 );
 
-export const revalidate = 3600;
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
 
-const Layout = ({ children, params }: Readonly<LayoutProps>) => {
-  const { locale } = use(params);
+const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
+  const { locale } = await params;
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();
