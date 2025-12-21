@@ -9,19 +9,13 @@ import { ContactFormEmail } from '@infrastructure/services/email/templates/Conta
 import { render } from '@react-email/render';
 import { z } from 'zod';
 
-console.log('[contact.ts] Initializing Turso client...');
-const turso = getTursoClientInstance();
-console.log('[contact.ts] ✓ Turso client initialized');
-
-console.log('[contact.ts] Initializing Resend client...');
-const resend = getResendClientInstance();
-console.log('[contact.ts] ✓ Resend client initialized');
-
-console.log('[contact.ts] Initializing Logger client...');
-const logger = getBetterStackInstance();
-console.log('[contact.ts] ✓ Logger client initialized');
-
 export async function sendContactEmail(data: ContactFormData): Promise<ContactResult> {
+  console.log('[contact] Creating clients inside request handler...');
+  const turso = getTursoClientInstance();
+  const resend = getResendClientInstance();
+  const logger = getBetterStackInstance();
+  console.log('[contact] ✓ All clients initialized');
+
   try {
     const validated = contactSchema.parse(data);
 
