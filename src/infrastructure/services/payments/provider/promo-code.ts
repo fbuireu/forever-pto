@@ -2,6 +2,8 @@ import type { DiscountInfo } from '@application/dto/payment/types';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import type Stripe from 'stripe';
 
+const logger = getBetterStackInstance();
+
 const MIN_FINAL_AMOUNT = 0.5;
 
 type PromoValidationResult = { success: true; data: DiscountInfo } | { success: false; error: string };
@@ -28,7 +30,6 @@ export const validatePromoCode = async (
   code: string,
   amount: number
 ): Promise<PromoValidationResult> => {
-  const logger = getBetterStackInstance();
   try {
     const promotionCodes = await stripe.promotionCodes.list({
       code: code.toUpperCase().trim(),

@@ -6,6 +6,8 @@ import type { PaymentRepository } from '../repository/types';
 import type { ChargeService } from '../services/charge';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
+const logger = getBetterStackInstance();
+
 interface HandlePaymentSucceededParams {
   paymentRepository: PaymentRepository;
   chargeService: ChargeService;
@@ -20,7 +22,6 @@ const updateExistingPayment = async (event: PaymentSucceededEvent, repository: P
 };
 
 const createPaymentFromWebhook = async (event: PaymentSucceededEvent, repository: PaymentRepository): Promise<void> => {
-  const logger = getBetterStackInstance();
   logger.warn('Payment not found in DB, creating from webhook', { paymentId: event.paymentId });
 
   const paymentData: PaymentData = {
@@ -64,7 +65,6 @@ const updateChargeDetails = async (
   event: PaymentSucceededEvent,
   params: HandlePaymentSucceededParams
 ): Promise<void> => {
-  const logger = getBetterStackInstance();
   if (!event.paymentIntent.latest_charge) return;
 
   const chargeId =
@@ -108,7 +108,6 @@ export const handlePaymentSucceeded = async (
   event: PaymentSucceededEvent,
   params: HandlePaymentSucceededParams
 ): Promise<void> => {
-  const logger = getBetterStackInstance();
   try {
     const existingPayment = await params.paymentRepository.getById(event.paymentId);
 

@@ -7,8 +7,9 @@ export interface WebhookServiceResult {
   error?: string;
 }
 
+const logger = getBetterStackInstance();
+
 export const handleStripeWebhook = async (body: string, signature: string): Promise<WebhookServiceResult> => {
-  const logger = getBetterStackInstance();
   try {
     const event = constructWebhookEvent(body, signature);
 
