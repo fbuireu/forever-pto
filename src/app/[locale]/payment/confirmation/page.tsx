@@ -9,6 +9,9 @@ import { redirect } from 'next/navigation';
 import type Stripe from 'stripe';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
+const stripe = getStripeServerInstance();
+const logger = getBetterStackInstance();
+
 interface PaymentSuccessParams {
   searchParams: Promise<{
     payment_intent?: string;

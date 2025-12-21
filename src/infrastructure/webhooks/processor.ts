@@ -13,12 +13,11 @@ import { createPaymentRepository } from '@infrastructure/services/payments/repos
 import type Stripe from 'stripe';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
-export const processWebhookEvent = async (event: Stripe.Event): Promise<void> => {
-  // Next.js 16.1+: process.env must be read inside functions, not at module scope
-  const turso = getTursoClientInstance();
-  const stripe = getStripeServerInstance();
-  const logger = getBetterStackInstance();
+const turso = getTursoClientInstance();
+const stripe = getStripeServerInstance();
+const logger = getBetterStackInstance();
 
+export const processWebhookEvent = async (event: Stripe.Event): Promise<void> => {
   const paymentRepository = createPaymentRepository(turso);
   const chargeService = createChargeService(stripe);
 

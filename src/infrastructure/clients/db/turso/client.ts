@@ -114,23 +114,13 @@ let tursoClientInstance: TursoClient | null = null;
 
 export const getTursoClientInstance = (): TursoClient => {
   if (!tursoClientInstance) {
-    let url: string | undefined;
-    let authToken: string | undefined;
-
-    try {
-      url = process.env.TURSO_DATABASE_URL;
-      authToken = process.env.TURSO_AUTH_TOKEN;
-    } catch (error) {
-      console.error('[Turso] Failed to read env vars:', error);
-      throw new Error('Failed to read Turso environment variables');
-    }
+    const url = process.env.TURSO_DATABASE_URL;
+    const authToken = process.env.TURSO_AUTH_TOKEN;
 
     if (!url || !authToken) {
-      console.error('[Turso] Missing env vars:', { hasUrl: !!url, hasToken: !!authToken });
       throw new Error('TURSO_DATABASE_URL and TURSO_AUTH_TOKEN must be defined');
     }
 
-    console.log('[Turso] Creating client instance');
     tursoClientInstance = new TursoClient({ url, authToken });
   }
   return tursoClientInstance;

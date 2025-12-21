@@ -9,12 +9,11 @@ import { ContactFormEmail } from '@infrastructure/services/email/templates/Conta
 import { render } from '@react-email/render';
 import { z } from 'zod';
 
-export async function sendContactEmail(data: ContactFormData): Promise<ContactResult> {
-  // Next.js 16.1+: process.env must be read inside functions, not at module scope
-  const turso = getTursoClientInstance();
-  const resend = getResendClientInstance();
-  const logger = getBetterStackInstance();
+const turso = getTursoClientInstance();
+const resend = getResendClientInstance();
+const logger = getBetterStackInstance();
 
+export async function sendContactEmail(data: ContactFormData): Promise<ContactResult> {
   try {
     const validated = contactSchema.parse(data);
 

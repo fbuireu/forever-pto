@@ -12,6 +12,10 @@ import { extractChargeId, extractCustomerId } from '@infrastructure/services/pay
 import Stripe from 'stripe';
 import { ZodError } from 'zod';
 
+const stripe = getStripeServerInstance();
+const turso = getTursoClientInstance();
+const logger = getBetterStackInstance();
+
 interface PaymentContext {
   userAgent: string | null;
   ipAddress: string | null;
@@ -22,11 +26,6 @@ export async function createPayment(
   context: PaymentContext
 ): Promise<PaymentDTO> {
   const { userAgent, ipAddress } = context;
-
-  // Next.js 16.1+: process.env must be read inside functions, not at module scope
-  const stripe = getStripeServerInstance();
-  const turso = getTursoClientInstance();
-  const logger = getBetterStackInstance();
 
   try {
     const validated = createPaymentSchema.parse(params);
