@@ -10,10 +10,6 @@ import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-const stripe = getStripeServerInstance();
-const turso = getTursoClientInstance();
-const logger = getBetterStackInstance();
-
 const PREMIUM_COOKIE = 'premium-token';
 const THIRTY_DAYS_IN_SECONDS = 30 * 24 * 60 * 60;
 const isProd = process.env.NODE_ENV === 'production';
@@ -38,6 +34,7 @@ async function hashEmail(email: string): Promise<string> {
 }
 
 export async function GET(request: NextRequest) {
+  const logger = getBetterStackInstance();
   const startTime = performance.now();
   const requestId = crypto.randomUUID();
 
@@ -117,6 +114,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const stripe = getStripeServerInstance();
+  const turso = getTursoClientInstance();
+  const logger = getBetterStackInstance();
   const startTime = performance.now();
   const requestId = crypto.randomUUID();
 

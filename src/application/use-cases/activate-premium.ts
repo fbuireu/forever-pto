@@ -7,8 +7,6 @@ import { extractChargeId, extractCustomerId } from '@infrastructure/services/pay
 import type Stripe from 'stripe';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
-const logger = getBetterStackInstance();
-
 interface ActivatePremiumWithPaymentParams {
   email: string;
   paymentIntentId: string;
@@ -60,6 +58,7 @@ export const activateWithPayment = async (
   input: ActivatePremiumWithPaymentParams,
   params: ActivatePremiumParams
 ): Promise<PremiumActivationResult> => {
+  const logger = getBetterStackInstance();
   const { email, paymentIntentId } = input;
 
   const validation = await params.paymentValidator.validatePaymentIntent(paymentIntentId);

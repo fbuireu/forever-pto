@@ -12,10 +12,6 @@ import { extractChargeId, extractCustomerId } from '@infrastructure/services/pay
 import Stripe from 'stripe';
 import { ZodError } from 'zod';
 
-const stripe = getStripeServerInstance();
-const turso = getTursoClientInstance();
-const logger = getBetterStackInstance();
-
 interface PaymentContext {
   userAgent: string | null;
   ipAddress: string | null;
@@ -25,6 +21,9 @@ export async function createPayment(
   params: CreatePaymentInput,
   context: PaymentContext
 ): Promise<PaymentDTO> {
+  const stripe = getStripeServerInstance();
+  const turso = getTursoClientInstance();
+  const logger = getBetterStackInstance();
   const { userAgent, ipAddress } = context;
 
   try {
