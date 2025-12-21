@@ -3,9 +3,9 @@ import { handleStripeWebhook } from '@infrastructure/webhooks/stripe/service';
 import { headers } from 'next/headers';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const logger = getBetterStackInstance();
-
 export async function POST(request: NextRequest) {
+  // Next.js 16.1+: process.env must be read inside functions, not at module scope
+  const logger = getBetterStackInstance();
   const requestId = crypto.randomUUID();
   const webhookLogger = logger.withContext({
     requestId,
