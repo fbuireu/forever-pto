@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  serverExternalPackages: ['@libsql/isomorphic-ws'],
   experimental: {
     turbopackFileSystemCacheForDev: true,
   },

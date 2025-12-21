@@ -3,8 +3,9 @@ import { handleStripeWebhook } from '@infrastructure/webhooks/stripe/service';
 import { headers } from 'next/headers';
 import { NextResponse, type NextRequest } from 'next/server';
 
+const logger = getBetterStackInstance();
+
 export async function POST(request: NextRequest) {
-  const logger = getBetterStackInstance();
   const requestId = crypto.randomUUID();
   const webhookLogger = logger.withContext({
     requestId,
