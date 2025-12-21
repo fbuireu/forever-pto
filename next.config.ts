@@ -8,13 +8,13 @@ const withNextIntl = createNextIntlPlugin('./src/infrastructure/i18n/config.ts')
 const isProd = process.env.NODE_ENV === 'production';
 
 const nextConfig: NextConfig = {
-    // compiler: {
-    //   removeConsole: isProd,
-    // },
+    compiler: {
+      removeConsole: isProd,
+    },
   images: {
     unoptimized: true,
   },
-  serverExternalPackages: ['@libsql/isomorphic-ws'],
+  serverExternalPackages: ['@libsql/client', '@libsql/isomorphic-ws'],
   experimental: {
     turbopackFileSystemCacheForDev: true,
   },

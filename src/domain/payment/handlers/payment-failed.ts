@@ -3,6 +3,8 @@ import type { PaymentFailedEvent } from '../events/types';
 import type { PaymentRepository } from '../repository/types';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
+const logger = getBetterStackInstance();
+
 interface HandlePaymentFailedParams {
   paymentRepository: PaymentRepository;
 }
@@ -18,7 +20,7 @@ export const handlePaymentFailed = async (
       throw createPaymentError.updateStatusFailed(event.paymentId, result.error);
     }
   } catch (error) {
-    getBetterStackInstance().logError('Error handling failed payment', error, { paymentId: event.paymentId });
+    logger.logError('Error handling failed payment', error, { paymentId: event.paymentId });
     throw error;
   }
 };
