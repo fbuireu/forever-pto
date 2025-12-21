@@ -23,11 +23,9 @@ export async function createPayment(
 ): Promise<PaymentDTO> {
   const { userAgent, ipAddress } = context;
 
-  console.log('[payment] Creating clients inside request handler...');
   const stripe = getStripeServerInstance();
   const turso = getTursoClientInstance();
   const logger = getBetterStackInstance();
-  console.log('[payment] ✓ All clients initialized');
 
   try {
     const validated = createPaymentSchema.parse(params);

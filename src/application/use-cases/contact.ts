@@ -10,11 +10,9 @@ import { render } from '@react-email/render';
 import { z } from 'zod';
 
 export async function sendContactEmail(data: ContactFormData): Promise<ContactResult> {
-  console.log('[contact] Creating clients inside request handler...');
   const turso = getTursoClientInstance();
   const resend = getResendClientInstance();
   const logger = getBetterStackInstance();
-  console.log('[contact] ✓ All clients initialized');
 
   try {
     const validated = contactSchema.parse(data);

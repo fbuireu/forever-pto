@@ -9,46 +9,18 @@ interface InitializePaymentResult {
 }
 
 export const initializePayment = async (params: CreatePaymentInput): Promise<InitializePaymentResult> => {
-  console.log('[checkout] Calling /api/payment with params:', {
-    amount: params.amount,
-    email: params.email,
-    hasPromoCode: !!params.promoCode
-  });
-
   const response = await fetch('/api/payment', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params),
   });
 
-  console.log('[checkout] Response received:', {
-    status: response.status,
-    statusText: response.statusText,
-    ok: response.ok,
-    headers: {
-      contentType: response.headers.get('content-type'),
-    }
-  });
-
-  const responseText = await response.text();
-  console.log('[checkout] Response body (raw):', responseText.substring(0, 500));
-
-  let result;
-  try {
-    result = JSON.parse(responseText);
-    console.log('[checkout] Parsed JSON successfully:', { success: result.success });
-  } catch (error) {
-    console.error('[checkout] Failed to parse JSON:', error);
-    console.error('[checkout] Response was:', responseText);
-    throw new Error(`Invalid JSON response from server: ${responseText.substring(0, 200)}`);
-  }
+  const result = await response.json();
 
   if (!result.success) {
-    console.error('[checkout] API returned error:', result.error);
     throw new Error(result.error);
   }
 
-  console.log('[checkout] Payment initialized successfully');
   return {
     clientSecret: result.clientSecret,
     discountInfo: result.discountInfo ?? null,
