@@ -3,9 +3,8 @@ main = ".open-next/worker.js"
 compatibility_date = "2025-11-17"
 compatibility_flags = [
   "nodejs_compat",
-  "enable_nodejs_process_v2",
-  "cache_no_cache_enabled"
-]
+  "enable_nodejs_process_v2"
+  ]
 keep_names=false
 
 [assets]
