@@ -4,8 +4,7 @@ compatibility_date = "2025-11-17"
 compatibility_flags = [
   "nodejs_compat",
   "enable_nodejs_process_v2",
-  "cache_no_cache_enabled",
-  "assets_navigation_prefers_asset_serving"
+  "cache_no_cache_enabled"
 ]
 keep_names=false
 
