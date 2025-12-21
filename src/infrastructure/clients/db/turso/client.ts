@@ -26,7 +26,6 @@ export class TursoClient {
       url: this.config.url,
       authToken: this.config.authToken,
       intMode: 'number',
-      fetch: globalThis.fetch,
     });
     return this.client;
   }
