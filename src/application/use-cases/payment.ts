@@ -17,15 +17,24 @@ interface PaymentContext {
   ipAddress: string | null;
 }
 
+console.log('[payment.ts] Initializing Stripe client...');
+const stripe = getStripeServerInstance();
+console.log('[payment.ts] ✓ Stripe client initialized');
+
+console.log('[payment.ts] Initializing Turso client...');
+const turso = getTursoClientInstance();
+console.log('[payment.ts] ✓ Turso client initialized');
+
+console.log('[payment.ts] Initializing Logger client...');
+const logger = getBetterStackInstance();
+console.log('[payment.ts] ✓ Logger client initialized');
+
 export async function createPayment(
   params: CreatePaymentInput,
   context: PaymentContext
 ): Promise<PaymentDTO> {
   const { userAgent, ipAddress } = context;
 
-  const stripe = getStripeServerInstance();
-  const turso = getTursoClientInstance();
-  const logger = getBetterStackInstance();
   try {
     const validated = createPaymentSchema.parse(params);
 
