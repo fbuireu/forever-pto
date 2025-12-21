@@ -8,13 +8,12 @@ const withNextIntl = createNextIntlPlugin('./src/infrastructure/i18n/config.ts')
 const isProd = process.env.NODE_ENV === 'production';
 
 const nextConfig: NextConfig = {
-  //   compiler: {
-  //     removeConsole: false,
-  //   },
+    // compiler: {
+    //   removeConsole: isProd,
+    // },
   images: {
     unoptimized: true,
   },
-  serverExternalPackages: [],
   experimental: {
     turbopackFileSystemCacheForDev: true,
   },

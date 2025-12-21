@@ -1,5 +1,6 @@
 import type { CreatePaymentInput } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
+import { createPaymentAction } from '@app/actions/payment';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
 
@@ -9,13 +10,7 @@ interface InitializePaymentResult {
 }
 
 export const initializePayment = async (params: CreatePaymentInput): Promise<InitializePaymentResult> => {
-  const response = await fetch('/api/payment', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(params),
-  });
-
-  const result = await response.json();
+  const result = await createPaymentAction(params);
 
   if (!result.success) {
     throw new Error(result.error);

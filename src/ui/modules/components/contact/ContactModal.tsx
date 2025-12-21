@@ -57,13 +57,8 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
   const onSubmit = async (data: ContactFormData) => {
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
+      const { sendContactEmailAction } = await import('@app/actions/contact');
+      const result = await sendContactEmailAction(data);
       setEmail(data.email);
 
       if (result.success) {

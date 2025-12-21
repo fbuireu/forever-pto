@@ -14,9 +14,9 @@ interface LayoutProps {
   params: Promise<{ locale: Locale }>;
 }
 
-// export function generateStaticParams() {
-//   return LOCALES.map((locale) => ({ locale }));
-// }
+export function generateStaticParams() {
+  return LOCALES.map((locale) => ({ locale }));
+}
 
 const Home = async ({ params }: LayoutProps) => {
   const { locale } = await params;
