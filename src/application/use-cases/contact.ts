@@ -9,11 +9,10 @@ import { ContactFormEmail } from '@infrastructure/services/email/templates/Conta
 import { render } from '@react-email/render';
 import { z } from 'zod';
 
-const turso = getTursoClientInstance();
-const resend = getResendClientInstance();
-const logger = getBetterStackInstance();
-
 export async function sendContactEmail(data: ContactFormData): Promise<ContactResult> {
+  const resend = getResendClientInstance();
+  const logger = getBetterStackInstance();
+
   try {
     const validated = contactSchema.parse(data);
 
@@ -49,6 +48,7 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
       return { success: false, error: error.message };
     }
 
+    const turso = getTursoClientInstance();
     const saveResult = await saveContact(turso, {
       email: validated.email,
       name: validated.name,

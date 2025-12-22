@@ -13,11 +13,10 @@ import { createPaymentRepository } from '@infrastructure/services/payments/repos
 import type Stripe from 'stripe';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
-const turso = getTursoClientInstance();
-const stripe = getStripeServerInstance();
-const logger = getBetterStackInstance();
-
 export const processWebhookEvent = async (event: Stripe.Event): Promise<void> => {
+  const turso = getTursoClientInstance();
+  const stripe = getStripeServerInstance();
+  const logger = getBetterStackInstance();
   const paymentRepository = createPaymentRepository(turso);
   const chargeService = createChargeService(stripe);
 

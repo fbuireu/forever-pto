@@ -1,4 +1,5 @@
-import { createClient, type Client, type InValue } from '@libsql/client';
+import { cache } from 'react';
+import { createClient, type Client, type InValue } from '@libsql/client/web';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 export interface QueryResult<T = unknown> {
@@ -13,7 +14,6 @@ export interface TursoConfig {
 }
 
 export class TursoClient {
-  private client: Client | null = null;
   private readonly config: TursoConfig;
   private logger = getBetterStackInstance();
 
@@ -21,19 +21,18 @@ export class TursoClient {
     this.config = config;
   }
 
-  private getClient(): Client {
-    this.client ??= createClient({
+  private createClient(): Client {
+    return createClient({
       url: this.config.url,
       authToken: this.config.authToken,
       intMode: 'number',
       fetch: globalThis.fetch,
     });
-    return this.client;
   }
 
   async execute<T = unknown>(sql: string, args?: InValue[]): Promise<QueryResult<T>> {
     try {
-      const client = this.getClient();
+      const client = this.createClient();
       const result = await client.execute({ sql, args });
 
       return {
@@ -52,7 +51,7 @@ export class TursoClient {
 
   async batch<T = unknown>(statements: Array<{ sql: string; args?: InValue[] }>): Promise<QueryResult<T[]>> {
     try {
-      const client = this.getClient();
+      const client = this.createClient();
       const results = await client.batch(statements);
 
       return {
@@ -70,7 +69,7 @@ export class TursoClient {
 
   async transaction<T = unknown>(callback: (tx: Client) => Promise<T>): Promise<QueryResult<T>> {
     try {
-      const client = this.getClient();
+      const client = this.createClient();
       const result = await callback(client);
 
       return {
@@ -98,31 +97,15 @@ export class TursoClient {
       error: 'An unexpected database error occurred. Please try again.',
     };
   }
-
-  async close(): Promise<void> {
-    if (this.client) {
-      this.client.close();
-      this.client = null;
-    }
-  }
-
-  isConnected(): boolean {
-    return this.client !== null;
-  }
 }
 
-let tursoClientInstance: TursoClient | null = null;
+export const getTursoClientInstance = cache((): TursoClient => {
+  const url = process.env.TURSO_DATABASE_URL;
+  const authToken = process.env.TURSO_AUTH_TOKEN;
 
-export const getTursoClientInstance = (): TursoClient => {
-  if (!tursoClientInstance) {
-    const url = process.env.TURSO_DATABASE_URL;
-    const authToken = process.env.TURSO_AUTH_TOKEN;
-
-    if (!url || !authToken) {
-      throw new Error('TURSO_DATABASE_URL and TURSO_AUTH_TOKEN must be defined');
-    }
-
-    tursoClientInstance = new TursoClient({ url, authToken });
+  if (!url || !authToken) {
+    throw new Error('TURSO_DATABASE_URL and TURSO_AUTH_TOKEN must be defined');
   }
-  return tursoClientInstance;
-};
+
+  return new TursoClient({ url, authToken });
+});

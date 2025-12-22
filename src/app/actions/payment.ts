@@ -9,7 +9,6 @@ export async function createPaymentAction(params: CreatePaymentInput): Promise<P
   const headersList = await headers();
   const userAgent = headersList.get('user-agent');
   const ipAddress = headersList.get('x-forwarded-for') ?? headersList.get('x-real-ip');
-
   return createPayment(params, {
     userAgent,
     ipAddress,
