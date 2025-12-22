@@ -1,5 +1,4 @@
-import { cache } from 'react';
-import { createClient, type Client, type InValue } from '@libsql/client/web';
+import { createClient, type Client, type InValue } from '@tursodatabase/serverless/compat';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 export interface QueryResult<T = unknown> {
@@ -25,8 +24,6 @@ export class TursoClient {
     return createClient({
       url: this.config.url,
       authToken: this.config.authToken,
-      intMode: 'number',
-      fetch: globalThis.fetch,
     });
   }
 
@@ -99,7 +96,13 @@ export class TursoClient {
   }
 }
 
-export const getTursoClientInstance = cache((): TursoClient => {
+let tursoClientInstance: TursoClient | null = null;
+
+export const getTursoClientInstance = (): TursoClient => {
+  if (tursoClientInstance) {
+    return tursoClientInstance;
+  }
+
   const url = process.env.TURSO_DATABASE_URL;
   const authToken = process.env.TURSO_AUTH_TOKEN;
 
@@ -107,5 +110,6 @@ export const getTursoClientInstance = cache((): TursoClient => {
     throw new Error('TURSO_DATABASE_URL and TURSO_AUTH_TOKEN must be defined');
   }
 
-  return new TursoClient({ url, authToken });
-});
+  tursoClientInstance = new TursoClient({ url, authToken });
+  return tursoClientInstance;
+};
