@@ -4,7 +4,7 @@ import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { BarChart3, Calendar, CalendarDays, Sparkles, TrendingUp } from 'lucide-react';
 import { motion, type Transition, type Variants } from 'motion/react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button } from '../components/buttons/button';
 import { ChevronLeft } from '../icons/chevron-left';
 import { ChevronRight } from '../icons/chevron-right';
@@ -17,6 +17,8 @@ interface AlternativeManagerProps {
   onPreviewChange: (params: AlternativeSelectionBaseParams) => void;
   selectedIndex: number;
   currentSelectionIndex: number;
+  manuallySelectedDays: Date[];
+  removedSuggestedDays: Date[];
 }
 
 const STAT_CARD_MOTION_CONFIG = {
@@ -61,6 +63,8 @@ export const AlternativesManager = ({
   onPreviewChange,
   selectedIndex = 0,
   currentSelectionIndex = 0,
+  manuallySelectedDays = [],
+  removedSuggestedDays = [],
 }: AlternativeManagerProps) => {
   const [currentIndex, setCurrentIndex] = useState(selectedIndex);
 
@@ -87,12 +91,22 @@ export const AlternativesManager = ({
     return null;
   }
 
-  const ptoDays = currentSuggestion.days.length;
+  const isCurrentlySelected = currentIndex === currentSelectionIndex;
+  const basePtoDays = currentSuggestion.days.length;
+  const ptoDays = isCurrentlySelected
+    ? basePtoDays - removedSuggestedDays.length + manuallySelectedDays.length
+    : basePtoDays;
+
   const effectiveDays = currentSuggestion.metrics?.totalEffectiveDays;
   const efficiency = (effectiveDays ?? 0) / ptoDays;
   const gainedDays = (effectiveDays ?? 0) - ptoDays;
 
-  const mainEfficiency = (allSuggestions[0]?.metrics?.totalEffectiveDays ?? 0) / (allSuggestions[0]?.days?.length ?? 1);
+  const mainBasePtoDays = allSuggestions[0]?.days?.length ?? 1;
+  const mainPtoDays =
+    currentSelectionIndex === 0
+      ? mainBasePtoDays - removedSuggestedDays.length + manuallySelectedDays.length
+      : mainBasePtoDays;
+  const mainEfficiency = (allSuggestions[0]?.metrics?.totalEffectiveDays ?? 0) / mainPtoDays;
   const efficiencyDiff = efficiency - mainEfficiency;
   const isMainSuggestion = currentIndex === 0;
 

@@ -1,11 +1,14 @@
 'use client';
 
 import { useFiltersStore } from '@application/stores/filters';
+import { useHolidaysStore } from '@application/stores/holidays';
 import { cn } from '@const/lib/utils';
 import { Field, Label } from '@headlessui/react';
 import { useDebounce } from '@ui/hooks/useDebounce';
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, Clock } from 'lucide-react';
 import { Counter } from 'src/components/animate-ui/components/counter';
+import { Button } from 'src/components/animate-ui/components/buttons/button';
+import { usePtoCalculations } from '@ui/hooks/usePtoCalculations';
 import { useShallow } from 'zustand/react/shallow';
 
 const MIN_VALUE = 1;
@@ -18,6 +21,8 @@ export const PtoDays = () => {
       setPtoDays: state.setPtoDays,
     }))
   );
+  const resetManualSelection = useHolidaysStore((state) => state.resetManualSelection);
+  const { activeSuggestedCount, manualSelectedCount, remaining, hasManualChanges } = usePtoCalculations();
   const [localValue, setLocalValue] = useDebounce({ value: ptoDays, delay: 100, callback: setPtoDays });
   const isDecrementDisabled = localValue <= MIN_VALUE;
   const isIncrementDisabled = localValue >= MAX_VALUE;
@@ -48,6 +53,52 @@ export const PtoDays = () => {
           slidingNumberProps={{ className: 'font-normal text-sm' }}
         />
         <p className='font-normal text-sm'>days</p>
+      </div>
+      <div className='space-y-2 mt-4'>
+        <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='remaining-days'>
+          <Clock size={16} /> PTO Days Status
+        </Label>
+        <div className='space-y-2'>
+          <div className='flex items-center justify-between text-sm'>
+            <span className='text-muted-foreground'>Auto-assigned:</span>
+            <span className='font-semibold text-teal-600 dark:text-teal-400'>{activeSuggestedCount}</span>
+          </div>
+          <div className='flex items-center justify-between text-sm'>
+            <span className='text-muted-foreground'>Manually selected:</span>
+            <span className='font-semibold text-blue-600 dark:text-blue-400'>{manualSelectedCount}</span>
+          </div>
+          <div className='h-px bg-border my-2' />
+          <div className='flex items-center justify-between text-sm'>
+            <span className='font-medium'>Remaining:</span>
+            <span
+              className={cn(
+                'font-bold text-lg',
+                remaining > 0 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
+              )}
+            >
+              {remaining}
+            </span>
+          </div>
+          {hasManualChanges && (
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={resetManualSelection}
+              className='w-full mt-2 text-xs'
+              type='button'
+            >
+              Reset Manual Changes
+            </Button>
+          )}
+          {remaining === 0 && !hasManualChanges && (
+            <p className='text-xs text-muted-foreground text-center mt-2'>All days assigned!</p>
+          )}
+          {remaining > 0 && (
+            <p className='text-xs text-muted-foreground text-center mt-2'>
+              Click on days in the calendar to manually assign remaining days
+            </p>
+          )}
+        </div>
       </div>
     </Field>
   );

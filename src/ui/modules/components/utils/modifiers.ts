@@ -20,11 +20,20 @@ export const isPast = (allowPastDays: boolean) => {
 // fixes: https://github.com/date-fns/date-fns/issues/583
 export const isToday = (date: Date) => isSameDay(date, new Date());
 
-export const isSuggestion = (currentSelection: Suggestion | null) => {
+export const isSuggestion = (currentSelection: Suggestion | null, removedSuggestedDays: Date[] = []) => {
   return (date: Date): boolean => {
     if (!currentSelection) return false;
 
+    const wasRemoved = removedSuggestedDays.some((d) => isSameDay(d, date));
+    if (wasRemoved) return false;
+
     return currentSelection.days.some((d) => isSameDay(d, date));
+  };
+};
+
+export const isManuallySelected = (manuallySelectedDays: Date[]) => {
+  return (date: Date): boolean => {
+    return manuallySelectedDays.some((d) => isSameDay(d, date));
   };
 };
 
@@ -79,6 +88,12 @@ export const isRangeEnd =
   (date: Date): boolean => {
     if (!range?.to) return false;
     return isSameDay(date, range.to);
+  };
+
+export const isRangeSelected =
+  (range?: Partial<FromTo>) =>
+  (date: Date): boolean => {
+    return isRangeStart(range)(date) || isRangeEnd(range)(date);
   };
 
 interface GetPreviewRangeParams {

@@ -61,7 +61,7 @@ export const PtoCalculator = () => {
   };
 
   const applyToStore = (days: number) => {
-    setPtoDays(days);
+    setPtoDays(Math.round(days));
   };
 
   const handleMonthChange = (value: string) => {

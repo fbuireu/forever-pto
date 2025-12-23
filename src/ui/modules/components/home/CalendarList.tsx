@@ -4,7 +4,7 @@ import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useLocale } from 'next-intl';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Calendar, CalendarSelectionMode } from '../core/Calendar';
 import { CalendarListSkeleton } from '../skeletons/CalendarListSkeleton';
 import { getTotalMonths } from '../utils/helpers';
@@ -25,11 +25,25 @@ export const CalendarList = () => {
   const alternatives = useHolidaysStore((state) => state.alternatives);
   const suggestion = useHolidaysStore((state) => state.suggestion);
   const currentSelection = useHolidaysStore((state) => state.currentSelection);
+  const manuallySelectedDays = useHolidaysStore((state) => state.manuallySelectedDays);
+  const removedSuggestedDays = useHolidaysStore((state) => state.removedSuggestedDays);
   const fetchHolidays = useHolidaysStore((state) => state.fetchHolidays);
   const generateSuggestions = useHolidaysStore((state) => state.generateSuggestions);
   const previewAlternativeIndex = useHolidaysStore((state) => state.previewAlternativeIndex);
+  const toggleDaySelection = useHolidaysStore((state) => state.toggleDaySelection);
+  const getRemainingDays = useHolidaysStore((state) => state.getRemainingDays);
 
   const months = useMemo(() => getTotalMonths({ carryOverMonths, year }), [carryOverMonths, year]);
+
+  const remainingDays = useMemo(() => getRemainingDays(ptoDays), [getRemainingDays, ptoDays]);
+  const canSelectMoreDays = remainingDays > 0;
+
+  const handleDayToggle = useCallback(
+    (date: Date) => {
+      toggleDaySelection(date, ptoDays);
+    },
+    [toggleDaySelection, ptoDays]
+  );
 
   useEffect(() => {
     if (!country) return;
@@ -69,6 +83,10 @@ export const CalendarList = () => {
           alternatives={alternatives}
           suggestion={suggestion}
           previewAlternativeIndex={previewAlternativeIndex}
+          manuallySelectedDays={manuallySelectedDays}
+          removedSuggestedDays={removedSuggestedDays}
+          onDayToggle={handleDayToggle}
+          canSelectMoreDays={canSelectMoreDays}
           showOutsideDays
           fixedWeeks
         />

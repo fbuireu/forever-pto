@@ -42,7 +42,6 @@ export { generateMetadata };
 // todo: add react compiler (use memo, etc) (23rd dec requires babel plugin)
 
 // todo: responsive
-// todo: day selector (allow to change days on click)
 // todo: add tutorial (driverjs)
 // todo: migrate to base-ui
 // todo: ads?

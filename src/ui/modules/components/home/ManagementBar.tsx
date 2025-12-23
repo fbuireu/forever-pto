@@ -8,6 +8,7 @@ import { AlternativesManager } from 'src/components/animate-ui/ui-elements/Alter
 import { AlternativesManagerSkeleton } from '../skeletons/AlternativesManagerSkeleton';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useShallow } from 'zustand/react/shallow';
+import { PtoStatusBanner } from './PtoStatusBanner';
 
 export const ManagementBar = () => {
   const { areStoresReady } = useStoresReady();
@@ -18,6 +19,8 @@ export const ManagementBar = () => {
     setCurrentAlternativeSelection,
     previewAlternativeIndex,
     currentSelectionIndex,
+    manuallySelectedDays,
+    removedSuggestedDays,
   } = useHolidaysStore(
     useShallow((state) => ({
       alternatives: state.alternatives,
@@ -26,6 +29,8 @@ export const ManagementBar = () => {
       setCurrentAlternativeSelection: state.setCurrentAlternativeSelection,
       previewAlternativeIndex: state.previewAlternativeIndex,
       currentSelectionIndex: state.currentSelectionIndex,
+      manuallySelectedDays: state.manuallySelectedDays,
+      removedSuggestedDays: state.removedSuggestedDays,
     }))
   );
 
@@ -45,14 +50,19 @@ export const ManagementBar = () => {
   );
 
   return areStoresReady ? (
-    <AlternativesManager
-      key={previewAlternativeIndex}
-      currentSelectionIndex={currentSelectionIndex}
-      allSuggestions={[suggestion, ...alternatives]}
-      onSelectionChange={handleSelectionChange}
-      onPreviewChange={handlePreviewChange}
-      selectedIndex={previewAlternativeIndex}
-    />
+    <div className='flex flex-col gap-4 w-full'>
+      <PtoStatusBanner />
+      <AlternativesManager
+        key={previewAlternativeIndex}
+        currentSelectionIndex={currentSelectionIndex}
+        allSuggestions={[suggestion, ...alternatives]}
+        onSelectionChange={handleSelectionChange}
+        onPreviewChange={handlePreviewChange}
+        selectedIndex={previewAlternativeIndex}
+        manuallySelectedDays={manuallySelectedDays}
+        removedSuggestedDays={removedSuggestedDays}
+      />
+    </div>
   ) : (
     <AlternativesManagerSkeleton />
   );

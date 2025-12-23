@@ -5,7 +5,11 @@ import type { Day } from 'date-fns';
 import { addMonths, isSameDay, isSameMonth, isWeekend, subMonths } from 'date-fns';
 import type { Locale } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
+import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
+import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { formatDate } from '../utils/formatters';
 import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
@@ -15,8 +19,10 @@ import {
   isCustom as isCustomFn,
   isHoliday,
   isInRange,
+  isManuallySelected,
   isPast,
   isRangeEnd,
+  isRangeSelected,
   isRangeStart,
   isSelected,
   isSuggestion,
@@ -24,9 +30,6 @@ import {
 } from '../utils/modifiers';
 import { ConditionalWrapper } from './ConditionalWrapper';
 import { getDayClassNames, isFromToObject } from './utils/helpers';
-import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
-import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 export interface FromTo {
   from: Date;
@@ -67,6 +70,10 @@ interface CalendarProps {
   alternatives: HolidaysState['alternatives'];
   suggestion: HolidaysState['suggestion'];
   previewAlternativeIndex?: HolidaysState['previewAlternativeIndex'];
+  manuallySelectedDays?: Date[];
+  removedSuggestedDays?: Date[];
+  onDayToggle?: (date: Date) => void;
+  canSelectMoreDays?: boolean;
 }
 
 interface RangeState {
@@ -93,6 +100,10 @@ export function Calendar({
   alternatives = [],
   suggestion,
   previewAlternativeIndex = -1,
+  manuallySelectedDays = [],
+  removedSuggestedDays = [],
+  onDayToggle,
+  canSelectMoreDays = true,
   ...props
 }: Readonly<CalendarProps>) {
   const [currentMonth, setCurrentMonth] = useState(initialMonth ?? new Date());
@@ -125,12 +136,11 @@ export function Calendar({
     const holidayFn = isHoliday(holidays);
     const customFn = isCustomFn(holidays);
     const isPastFn = isPast(allowPastDays);
-    const isSuggestionFn = isSuggestion(currentSelection);
+    const isSuggestionFn = isSuggestion(currentSelection, removedSuggestedDays);
     const isAlternativeFn = isAlternative({ alternatives, suggestion, previewAlternativeIndex, currentSelection });
+    const isManuallySelectedFn = isManuallySelected(manuallySelectedDays);
     const isSelectedModifier =
-      mode === CalendarSelectionMode.RANGE
-        ? (date: Date) => isRangeStart(rangeSelection)(date) || isRangeEnd(rangeSelection)(date)
-        : isSelected(selectedDates);
+      mode === CalendarSelectionMode.RANGE ? isRangeSelected(rangeSelection) : isSelected(selectedDates);
 
     const baseModifiers = {
       weekend: isWeekend,
@@ -141,6 +151,7 @@ export function Calendar({
       alternative: isAlternativeFn,
       disabled: isPastFn,
       selected: isSelectedModifier,
+      manuallySelected: isManuallySelectedFn,
     };
 
     return {
@@ -167,6 +178,8 @@ export function Calendar({
     mode,
     rangeSelection,
     hoverDate,
+    manuallySelectedDays,
+    removedSuggestedDays,
   ]);
 
   const weekdayNames = useMemo(() => getWeekdayNames({ locale, weekStartsOn }), [locale, weekStartsOn]);
@@ -198,7 +211,37 @@ export function Calendar({
 
   const handleDayClick = useCallback(
     (date: Date) => {
-      if (disabled || mode === CalendarSelectionMode.NONE) return;
+      if (disabled) return;
+
+      if (mode === CalendarSelectionMode.NONE && onDayToggle) {
+        const isPastDay = !allowPastDays && modifiers.disabled(date);
+        const isManual = modifiers.manuallySelected(date);
+        const isSuggested = modifiers.suggested(date);
+
+        if (isPastDay && !isManual && !isSuggested) {
+          toast.warning('Cannot select past days', {
+            description: 'Enable "Allow past days" in settings to select past dates',
+          });
+          return;
+        }
+
+        if (isManual || isSuggested) {
+          onDayToggle(date);
+          return;
+        }
+
+        if (canSelectMoreDays) {
+          onDayToggle(date);
+          return;
+        }
+
+        toast.warning('No remaining PTO days to assign', {
+          description: 'Remove existing days to free up space',
+        });
+        return;
+      }
+
+      if (mode === CalendarSelectionMode.NONE) return;
 
       switch (mode) {
         case CalendarSelectionMode.MULTIPLE: {
@@ -244,7 +287,19 @@ export function Calendar({
         }
       }
     },
-    [disabled, mode, selectedDates, onSelect, rangeSelection]
+    [
+      disabled,
+      mode,
+      selectedDates,
+      onSelect,
+      rangeSelection,
+      onDayToggle,
+      manuallySelectedDays,
+      allowPastDays,
+      modifiers.disabled,
+      modifiers.suggested,
+      canSelectMoreDays,
+    ]
   );
 
   const handleDayHover = useCallback(
@@ -313,7 +368,12 @@ export function Calendar({
 
       <div className='grid grid-cols-7 gap-2'>
         {calendarDays.map((date) => {
-          const isDisabled = disabled ?? modifiers.disabled(date);
+          const isPastDay = modifiers.disabled(date);
+          const isManualDay = modifiers.manuallySelected(date);
+          const isSuggestedDay = modifiers.suggested(date);
+
+          // In manual mode, allow clicking on suggested/manual days even if they're in the past
+          const isDisabled = disabled ?? (isPastDay && !isManualDay && !isSuggestedDay);
           const isOutsideMonth = !isSameMonth(date, currentMonth);
 
           if (!showOutsideDays && isOutsideMonth) {
@@ -326,7 +386,7 @@ export function Calendar({
             date,
             month: currentMonth,
             selectedDates: mode === CalendarSelectionMode.RANGE ? [] : selectedDates,
-            disabled,
+            disabled: isDisabled,
             showOutsideDays,
             allowPastDays,
             modifiers,

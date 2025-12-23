@@ -14,6 +14,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
       closeButton
       position={props.position ?? 'bottom-center'}
       duration={5000}
+      toastOptions={{
+        style: {
+          alignItems: 'start',
+        },
+      }}
       {...props}
     />
   );

@@ -31,6 +31,8 @@ export interface HolidaysState {
   previewAlternativeSelection: Suggestion | null;
   previewAlternativeIndex: number;
   currentSelectionIndex: number;
+  manuallySelectedDays: Date[];
+  removedSuggestedDays: Date[];
 }
 
 interface HolidaysActions {
@@ -44,6 +46,9 @@ interface HolidaysActions {
   addHoliday: (params: AddHolidayParams) => void;
   editHoliday: (params: EditHolidayParams) => void;
   removeHoliday: (holidayId: string) => void;
+  toggleDaySelection: (date: Date, totalPtoDays: number) => boolean;
+  resetManualSelection: () => void;
+  getRemainingDays: (totalPtoDays: number) => number;
 }
 
 type HolidaysStore = HolidaysState & HolidaysActions;
@@ -60,6 +65,8 @@ const holidaysInitialState: HolidaysState = {
   previewAlternativeSelection: null,
   previewAlternativeIndex: 0,
   currentSelectionIndex: 0,
+  manuallySelectedDays: [],
+  removedSuggestedDays: [],
 };
 
 export const useHolidaysStore = create<HolidaysStore>()(
@@ -299,6 +306,76 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
           set({ holidays: updatedHolidays });
         },
+
+        toggleDaySelection: (date: Date, totalPtoDays: number): boolean => {
+          const { manuallySelectedDays, currentSelection, removedSuggestedDays } = get();
+          const dateStr = date.toDateString();
+
+          // Check if day is suggested (auto-assigned)
+          const isSuggested = currentSelection?.days.some((d) => d.toDateString() === dateStr);
+
+          // Check if day is already manually selected
+          const isManuallySelected = manuallySelectedDays.some((d) => d.toDateString() === dateStr);
+
+          // Check if suggested day was previously removed
+          const wasRemoved = removedSuggestedDays.some((d) => d.toDateString() === dateStr);
+
+          // Case 1: Removing a manually selected day
+          if (isManuallySelected) {
+            const updatedManualDays = manuallySelectedDays.filter((d) => d.toDateString() !== dateStr);
+            set({
+              manuallySelectedDays: updatedManualDays,
+            });
+            return true;
+          }
+
+          // Case 2: Removing a suggested day
+          if (isSuggested && !wasRemoved) {
+            const updatedRemovedDays = [...removedSuggestedDays, ensureDate(date)].sort(
+              (a, b) => a.getTime() - b.getTime()
+            );
+            set({
+              removedSuggestedDays: updatedRemovedDays,
+            });
+            return true;
+          }
+
+          // Case 3: Adding a new manual day (including previously removed suggested days)
+          const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
+          const manualSelectedCount = manuallySelectedDays.length;
+          const remaining = totalPtoDays - activeSuggestedCount - manualSelectedCount;
+
+          if (remaining <= 0) {
+            logger.warn('No remaining PTO days to assign', {
+              totalPtoDays,
+              activeSuggestedCount,
+              manualSelectedCount,
+            });
+            return false;
+          }
+
+          const updatedManualDays = [...manuallySelectedDays, ensureDate(date)].sort(
+            (a, b) => a.getTime() - b.getTime()
+          );
+          set({
+            manuallySelectedDays: updatedManualDays,
+          });
+          return true;
+        },
+
+        resetManualSelection: () => {
+          set({
+            manuallySelectedDays: [],
+            removedSuggestedDays: [],
+          });
+        },
+
+        getRemainingDays: (totalPtoDays: number): number => {
+          const { manuallySelectedDays, currentSelection, removedSuggestedDays } = get();
+          const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
+          const manualSelectedCount = manuallySelectedDays.length;
+          return Math.max(0, totalPtoDays - activeSuggestedCount - manualSelectedCount);
+        },
       }),
       {
         name: STORAGE_NAME,
@@ -327,6 +404,10 @@ export const useHolidaysStore = create<HolidaysStore>()(
                 days: state.currentSelection.days.map((d) => d.toISOString()),
               }
             : null,
+          manuallySelectedDays: state.manuallySelectedDays.map((d) => d.toISOString()),
+          removedSuggestedDays: state.removedSuggestedDays.map((d) => d.toISOString()),
+          isManualSelectionMode: state.isManualSelectionMode,
+          remainingPtoDays: state.remainingPtoDays,
         }),
         onRehydrateStorage: () => (state, error) => {
           if (error) {
@@ -371,6 +452,14 @@ export const useHolidaysStore = create<HolidaysStore>()(
                 ...state.currentSelection,
                 days: state.currentSelection.days.map(ensureDate),
               };
+            }
+
+            if (state.manuallySelectedDays) {
+              state.manuallySelectedDays = state.manuallySelectedDays.map(ensureDate);
+            }
+
+            if (state.removedSuggestedDays) {
+              state.removedSuggestedDays = state.removedSuggestedDays.map(ensureDate);
             }
           }
         },
