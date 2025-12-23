@@ -38,11 +38,8 @@ const Home = async ({ params }: LayoutProps) => {
 export default Home;
 export { generateMetadata };
 
-// todo: fix error cloudflare stripe
-// todo: check node_env variables in cloudflare + next.config.ts
 // todo: simplify (bianca's feedback)
-// todo: add react compiler (use memo, etc)
-// todo: WARN Batch upload failed: Please set R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, and CF_ACCOUNT_ID environment variables to enable faster batch upload for remote R2.
+// todo: add react compiler (use memo, etc) (23rd dec requires babel plugin)
 
 // todo: responsive
 // todo: day selector (allow to change days on click)
