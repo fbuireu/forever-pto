@@ -50,7 +50,7 @@ export const ManagementBar = () => {
   );
 
   return areStoresReady ? (
-    <div className='flex flex-col gap-4 w-full'>
+    <div className='flex flex-col gap-4 w-full sticky top-0 z-50'>
       <PtoStatusBanner />
       <AlternativesManager
         key={previewAlternativeIndex}
