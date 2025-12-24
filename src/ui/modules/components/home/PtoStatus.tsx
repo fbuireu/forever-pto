@@ -5,6 +5,7 @@ import { useHolidaysStore } from '@application/stores/holidays';
 import { cn } from '@const/lib/utils';
 import { MousePointerClick } from 'lucide-react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
+import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 
 export const PtoStatus = () => {
@@ -29,26 +30,31 @@ export const PtoStatus = () => {
           <div className='flex items-center gap-1'>
             <div className='h-3 w-3 rounded-full bg-teal-500' />
             <span className='text-sm text-muted-foreground'>Auto-assigned:</span>
-            <span className='font-semibold text-teal-600 dark:text-teal-400'>{activeSuggestedCount}</span>
+            <SlidingNumber
+              number={activeSuggestedCount}
+              className='font-semibold text-teal-600 dark:text-teal-400'
+            />
           </div>
           <div className='flex items-center gap-1'>
             <div className='h-3 w-3 rounded-full bg-blue-500' />
             <span className='text-sm text-muted-foreground'>Manual:</span>
-            <span className='font-semibold text-blue-600 dark:text-blue-400'>{manualSelectedCount}</span>
+            <SlidingNumber
+              number={manualSelectedCount}
+              className='font-semibold text-blue-600 dark:text-blue-400'
+            />
           </div>
           <div className='h-6 w-px bg-border' />
           <div className='flex items-center flex-col relative'>
             <div className='flex flex-row items-baseline gap-x-2'>
               <span className='text-sm font-medium'>
                 Remaining:{' '}
-                <p
+                <SlidingNumber
+                  number={remaining}
                   className={cn(
                     'text-xl font-bold inline',
                     remaining > 0 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
                   )}
-                >
-                  {remaining}
-                </p>
+                />
               </span>
             </div>
 

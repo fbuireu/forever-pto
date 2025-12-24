@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { AlternativesManager } from 'src/components/animate-ui/ui-elements/AlternativesManager';
 import { useShallow } from 'zustand/react/shallow';
 import { AlternativesManagerSkeleton } from '../skeletons/AlternativesManagerSkeleton';
+import { PtoStatusSkeleton } from '../skeletons/PtoStatusSkeleton';
 import { PtoStatus } from './PtoStatus';
 
 export const ManagementBar = () => {
@@ -51,6 +52,8 @@ export const ManagementBar = () => {
 
   const allSuggestions = [suggestion, ...alternatives].filter(Boolean);
 
+  console.log('ManagementBar rendered', areStoresReady);
+
   return areStoresReady ? (
     <div className='flex flex-row justify-between gap-4 w-full sticky top-0 z-50'>
       <AlternativesManager
@@ -66,9 +69,9 @@ export const ManagementBar = () => {
       <PtoStatus />
     </div>
   ) : (
-    <div className='flex flex-row gap-4 w-full sticky top-0 z-50'>
+    <div className='flex flex-row justify-between gap-4 w-full sticky top-0 z-50'>
       <AlternativesManagerSkeleton />
-      {/* add ptostatusbanner skeleton*/}
+      <PtoStatusSkeleton />
     </div>
   );
 };

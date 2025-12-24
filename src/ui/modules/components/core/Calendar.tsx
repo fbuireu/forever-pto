@@ -221,9 +221,9 @@ export function Calendar({
         const isSuggested = modifiers.suggested(date);
         if (!premiumKey) {
           toast.error('Premium feature', {
-            description: `Unlock the ability to select past days by upgrading to premium.`,
-            dismissible: false,
+            description: `Unlock the ability to add/remove suggestions by upgrading to premium.`,
             closeButton: false,
+            duration: 9000,
           });
           return;
         }
