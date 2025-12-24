@@ -5,6 +5,7 @@ import { useHolidaysStore } from '@application/stores/holidays';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { Calendar, CalendarSelectionMode } from '../core/Calendar';
 import { CalendarListSkeleton } from '../skeletons/CalendarListSkeleton';
 import { getTotalMonths } from '../utils/helpers';
@@ -13,29 +14,50 @@ export const CalendarList = () => {
   const locale = useLocale();
   const { areStoresReady } = useStoresReady();
 
-  const carryOverMonths = useFiltersStore((state) => state.carryOverMonths);
-  const year = useFiltersStore((state) => state.year);
-  const allowPastDays = useFiltersStore((state) => state.allowPastDays);
-  const country = useFiltersStore((state) => state.country);
-  const region = useFiltersStore((state) => state.region);
-  const ptoDays = useFiltersStore((state) => state.ptoDays);
-  const strategy = useFiltersStore((state) => state.strategy);
-
-  const holidays = useHolidaysStore((state) => state.holidays);
-  const alternatives = useHolidaysStore((state) => state.alternatives);
-  const suggestion = useHolidaysStore((state) => state.suggestion);
-  const currentSelection = useHolidaysStore((state) => state.currentSelection);
-  const manuallySelectedDays = useHolidaysStore((state) => state.manuallySelectedDays);
-  const removedSuggestedDays = useHolidaysStore((state) => state.removedSuggestedDays);
-  const fetchHolidays = useHolidaysStore((state) => state.fetchHolidays);
-  const generateSuggestions = useHolidaysStore((state) => state.generateSuggestions);
-  const previewAlternativeIndex = useHolidaysStore((state) => state.previewAlternativeIndex);
-  const toggleDaySelection = useHolidaysStore((state) => state.toggleDaySelection);
-  const getRemainingDays = useHolidaysStore((state) => state.getRemainingDays);
+  const { carryOverMonths, year, allowPastDays, country, region, ptoDays, strategy } = useFiltersStore(
+    useShallow((state) => ({
+      carryOverMonths: state.carryOverMonths,
+      year: state.year,
+      allowPastDays: state.allowPastDays,
+      country: state.country,
+      region: state.region,
+      ptoDays: state.ptoDays,
+      strategy: state.strategy,
+    }))
+  );
+  const {
+    holidays,
+    alternatives,
+    suggestion,
+    currentSelection,
+    manuallySelectedDays,
+    removedSuggestedDays,
+    fetchHolidays,
+    generateSuggestions,
+    previewAlternativeIndex,
+    toggleDaySelection,
+  } = useHolidaysStore(
+    useShallow((state) => ({
+      holidays: state.holidays,
+      alternatives: state.alternatives,
+      suggestion: state.suggestion,
+      currentSelection: state.currentSelection,
+      manuallySelectedDays: state.manuallySelectedDays,
+      removedSuggestedDays: state.removedSuggestedDays,
+      fetchHolidays: state.fetchHolidays,
+      generateSuggestions: state.generateSuggestions,
+      previewAlternativeIndex: state.previewAlternativeIndex,
+      toggleDaySelection: state.toggleDaySelection,
+    }))
+  );
 
   const months = useMemo(() => getTotalMonths({ carryOverMonths, year }), [carryOverMonths, year]);
 
-  const remainingDays = useMemo(() => getRemainingDays(ptoDays), [getRemainingDays, ptoDays]);
+  const remainingDays = useMemo(() => {
+    const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
+    const manualSelectedCount = manuallySelectedDays.length;
+    return Math.max(0, ptoDays - activeSuggestedCount - manualSelectedCount);
+  }, [currentSelection, removedSuggestedDays, manuallySelectedDays, ptoDays]);
   const canSelectMoreDays = remainingDays > 0;
 
   const handleDayToggle = useCallback(

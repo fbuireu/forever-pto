@@ -2,9 +2,10 @@
 
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
-import { BarChart3, Calendar, CalendarDays, Sparkles, TrendingUp } from 'lucide-react';
+import { AlternativesManagerSkeleton } from '@ui/modules/components/skeletons/AlternativesManagerSkeleton';
+import { BarChart3, CalendarDays, Sparkles, TrendingUp } from 'lucide-react';
 import { motion, type Transition, type Variants } from 'motion/react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Button } from '../components/buttons/button';
 import { ChevronLeft } from '../icons/chevron-left';
 import { ChevronRight } from '../icons/chevron-right';
@@ -12,7 +13,7 @@ import { AnimateIcon } from '../icons/icon';
 import { SlidingNumber } from '../text/sliding-number';
 
 interface AlternativeManagerProps {
-  allSuggestions: Suggestion[];
+  allSuggestions: (Suggestion | null)[];
   onSelectionChange: (params: AlternativeSelectionBaseParams) => void;
   onPreviewChange: (params: AlternativeSelectionBaseParams) => void;
   selectedIndex: number;
@@ -87,8 +88,8 @@ export const AlternativesManager = ({
     }
   }, [currentIndex, totalOptions, allSuggestions, onPreviewChange]);
 
-  if (!currentSuggestion?.days) {
-    return null;
+  if (!currentSuggestion?.days || currentSuggestion.days.length === 0) {
+    return <AlternativesManagerSkeleton />;
   }
 
   const isCurrentlySelected = currentIndex === currentSelectionIndex;
@@ -156,25 +157,6 @@ export const AlternativesManager = ({
       <div className='mx-3 h-6 w-px bg-border rounded-full' />
 
       <motion.div layout layoutRoot className='mx-auto flex flex-wrap space-x-2 sm:flex-nowrap'>
-        <motion.button
-          {...STAT_CARD_MOTION_CONFIG}
-          className='flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-blue-100/60 px-2.5 py-2 dark:bg-blue-900/30'
-          aria-label='PTO Days'
-        >
-          <Calendar size={20} className='text-blue-600 dark:text-blue-400 shrink-0' />
-          <div className='flex items-center gap-1'>
-            <SlidingNumber className='text-sm font-semibold text-blue-700 dark:text-blue-300' number={ptoDays} />
-            <span className='text-xs text-blue-600 dark:text-blue-400'>days</span>
-          </div>
-          <motion.span
-            variants={LABEL_VARIANTS}
-            transition={LABEL_TRANSITION}
-            className='invisible text-sm text-blue-600 dark:text-blue-400'
-          >
-            PTO Used
-          </motion.span>
-        </motion.button>
-
         <motion.button
           {...STAT_CARD_MOTION_CONFIG}
           className='flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-green-100/60 px-2.5 py-2 dark:bg-green-900/30'

@@ -1,14 +1,14 @@
 'use client';
 
+import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { AlternativesManager } from 'src/components/animate-ui/ui-elements/AlternativesManager';
-import { AlternativesManagerSkeleton } from '../skeletons/AlternativesManagerSkeleton';
-import { useHolidaysStore } from '@application/stores/holidays';
 import { useShallow } from 'zustand/react/shallow';
-import { PtoStatusBanner } from './PtoStatusBanner';
+import { AlternativesManagerSkeleton } from '../skeletons/AlternativesManagerSkeleton';
+import { PtoStatus } from './PtoStatus';
 
 export const ManagementBar = () => {
   const { areStoresReady } = useStoresReady();
@@ -49,21 +49,26 @@ export const ManagementBar = () => {
     [setCurrentAlternativeSelection]
   );
 
+  const allSuggestions = [suggestion, ...alternatives].filter(Boolean);
+
   return areStoresReady ? (
-    <div className='flex flex-col gap-4 w-full sticky top-0 z-50'>
-      <PtoStatusBanner />
+    <div className='flex flex-row justify-between gap-4 w-full sticky top-0 z-50'>
       <AlternativesManager
         key={previewAlternativeIndex}
         currentSelectionIndex={currentSelectionIndex}
-        allSuggestions={[suggestion, ...alternatives]}
+        allSuggestions={allSuggestions}
         onSelectionChange={handleSelectionChange}
         onPreviewChange={handlePreviewChange}
         selectedIndex={previewAlternativeIndex}
         manuallySelectedDays={manuallySelectedDays}
         removedSuggestedDays={removedSuggestedDays}
       />
+      <PtoStatus />
     </div>
   ) : (
-    <AlternativesManagerSkeleton />
+    <div className='flex flex-row gap-4 w-full sticky top-0 z-50'>
+      <AlternativesManagerSkeleton />
+      {/* add ptostatusbanner skeleton*/}
+    </div>
   );
 };

@@ -1,5 +1,6 @@
 import type { FiltersState } from '@application/stores/filters';
 import type { HolidaysState } from '@application/stores/holidays';
+import { usePremiumStore } from '@application/stores/premium';
 import { cn } from '@const/lib/utils';
 import type { Day } from 'date-fns';
 import { addMonths, isSameDay, isSameMonth, isWeekend, subMonths } from 'date-fns';
@@ -106,6 +107,7 @@ export function Calendar({
   canSelectMoreDays = true,
   ...props
 }: Readonly<CalendarProps>) {
+  const premiumKey = usePremiumStore((state) => state.premiumKey);
   const [currentMonth, setCurrentMonth] = useState(initialMonth ?? new Date());
   const [hoverDate, setHoverDate] = useState<Date | undefined>();
   const [rangeSelection, setRangeSelection] = useState<RangeState>(() => {
@@ -217,7 +219,14 @@ export function Calendar({
         const isPastDay = !allowPastDays && modifiers.disabled(date);
         const isManual = modifiers.manuallySelected(date);
         const isSuggested = modifiers.suggested(date);
-
+        if (!premiumKey) {
+          toast.error('Premium feature', {
+            description: `Unlock the ability to select past days by upgrading to premium.`,
+            dismissible: false,
+            closeButton: false,
+          });
+          return;
+        }
         if (isPastDay && !isManual && !isSuggested) {
           toast.warning('Cannot select past days', {
             description: 'Enable "Allow past days" in settings to select past dates',

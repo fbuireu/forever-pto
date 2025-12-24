@@ -6,9 +6,8 @@ import { cn } from '@const/lib/utils';
 import { Field, Label } from '@headlessui/react';
 import { useDebounce } from '@ui/hooks/useDebounce';
 import { CalendarDays, Clock } from 'lucide-react';
-import { Counter } from 'src/components/animate-ui/components/counter';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { usePtoCalculations } from '@ui/hooks/usePtoCalculations';
+import { Counter } from 'src/components/animate-ui/components/counter';
 import { useShallow } from 'zustand/react/shallow';
 
 const MIN_VALUE = 1;
@@ -21,11 +20,21 @@ export const PtoDays = () => {
       setPtoDays: state.setPtoDays,
     }))
   );
-  const resetManualSelection = useHolidaysStore((state) => state.resetManualSelection);
-  const { activeSuggestedCount, manualSelectedCount, remaining, hasManualChanges } = usePtoCalculations();
+  const { currentSelection, removedSuggestedDays, manuallySelectedDays, resetManualSelection } = useHolidaysStore(
+    useShallow((state) => ({
+      currentSelection: state.currentSelection,
+      removedSuggestedDays: state.removedSuggestedDays,
+      manuallySelectedDays: state.manuallySelectedDays,
+      resetManualSelection: state.resetManualSelection,
+    }))
+  );
   const [localValue, setLocalValue] = useDebounce({ value: ptoDays, delay: 100, callback: setPtoDays });
   const isDecrementDisabled = localValue <= MIN_VALUE;
   const isIncrementDisabled = localValue >= MAX_VALUE;
+  const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
+  const manualSelectedCount = manuallySelectedDays.length;
+  const remaining = ptoDays - activeSuggestedCount - manualSelectedCount;
+  const hasManualChanges = manualSelectedCount > 0 || removedSuggestedDays.length > 0;
 
   const handleChange = (value: number) => {
     setLocalValue(Math.max(MIN_VALUE, value));

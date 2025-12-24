@@ -38,9 +38,10 @@ const Home = async ({ params }: LayoutProps) => {
 export default Home;
 export { generateMetadata };
 
+// todo: Make it  premium (toast with button?)
 // todo: simplify (bianca's feedback)
-// todo: add react compiler (use memo, etc) (23rd dec requires babel plugin)
-
+// todo: overflow issue button on accordion
+// todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
 // todo: responsive
 // todo: add tutorial (driverjs)
 // todo: migrate to base-ui
