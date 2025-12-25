@@ -2,7 +2,6 @@
 
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
-import { AlternativesManagerSkeleton } from '@ui/modules/components/skeletons/AlternativesManagerSkeleton';
 import { BarChart3, CalendarDays, Sparkles, TrendingUp } from 'lucide-react';
 import { motion, type Transition, type Variants } from 'motion/react';
 import { useCallback, useState } from 'react';
@@ -13,7 +12,7 @@ import { AnimateIcon } from '../icons/icon';
 import { SlidingNumber } from '../text/sliding-number';
 
 interface AlternativeManagerProps {
-  allSuggestions: (Suggestion | null)[];
+  allSuggestions: Suggestion[];
   onSelectionChange: (params: AlternativeSelectionBaseParams) => void;
   onPreviewChange: (params: AlternativeSelectionBaseParams) => void;
   selectedIndex: number;
@@ -87,10 +86,6 @@ export const AlternativesManager = ({
       onPreviewChange({ suggestion: allSuggestions[newIndex], index: newIndex });
     }
   }, [currentIndex, totalOptions, allSuggestions, onPreviewChange]);
-
-  if (!currentSuggestion?.days || currentSuggestion.days.length === 0) {
-    return <AlternativesManagerSkeleton />;
-  }
 
   const isCurrentlySelected = currentIndex === currentSelectionIndex;
   const basePtoDays = currentSuggestion.days.length;

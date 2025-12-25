@@ -2,23 +2,28 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
+import type { HolidaysState } from '@application/stores/holidays';
 import { cn } from '@const/lib/utils';
 import { MousePointerClick } from 'lucide-react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 
-export const PtoStatus = () => {
+interface PtoStatusProps {
+  currentSelection: NonNullable<HolidaysState['currentSelection']>;
+}
+
+export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
   const resetManualSelection = useHolidaysStore((state) => state.resetManualSelection);
   const ptoDays = useFiltersStore((state) => state.ptoDays);
-  const { currentSelection, removedSuggestedDays, manuallySelectedDays } = useHolidaysStore(
+  const { removedSuggestedDays, manuallySelectedDays } = useHolidaysStore(
     useShallow((state) => ({
-      currentSelection: state.currentSelection,
       removedSuggestedDays: state.removedSuggestedDays,
       manuallySelectedDays: state.manuallySelectedDays,
     }))
   );
-  const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
+
+  const activeSuggestedCount = currentSelection.days.length - removedSuggestedDays.length;
   const manualSelectedCount = manuallySelectedDays.length;
   const remaining = ptoDays - activeSuggestedCount - manualSelectedCount;
   const hasManualChanges = manualSelectedCount > 0 || removedSuggestedDays.length > 0;

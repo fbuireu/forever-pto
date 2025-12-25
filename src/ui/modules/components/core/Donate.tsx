@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Star } from 'src/components/animate-ui/icons/star';
 import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
+import { useShallow } from 'zustand/react/shallow';
 import { CheckoutForm } from './CheckoutForm';
 import { DonationForm } from './DonationForm';
 
@@ -34,15 +35,34 @@ const logger = getBetterStackInstance();
 export const Donate = () => {
   const locale = useLocale();
   const { resolvedTheme } = useTheme();
-  const [isOpen, setIsOpen] = useState(false);
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
   const [isPending, startTransition] = useTransition();
-  const premiumKey = usePremiumStore((state) => state.premiumKey);
-  const userEmail = usePremiumStore((state) => state.userEmail);
-  const setEmail = usePremiumStore((state) => state.setEmail);
-  const getCurrencyFromLocale = usePremiumStore((state) => state.getCurrencyFromLocale);
-  const currency = usePremiumStore((state) => state.currency);
-  const currencySymbol = usePremiumStore((state) => state.currencySymbol);
+
+  const {
+    premiumKey,
+    userEmail,
+    setEmail,
+    getCurrencyFromLocale,
+    currency,
+    currencySymbol,
+    isOpen,
+    isOpening,
+    setDonatePopoverOpen,
+    clearDonatePopoverOpening,
+  } = usePremiumStore(
+    useShallow((state) => ({
+      premiumKey: state.premiumKey,
+      userEmail: state.userEmail,
+      setEmail: state.setEmail,
+      getCurrencyFromLocale: state.getCurrencyFromLocale,
+      currency: state.currency,
+      currencySymbol: state.currencySymbol,
+      isOpen: state.donatePopoverOpen,
+      isOpening: state.donatePopoverIsOpening,
+      setDonatePopoverOpen: state.setDonatePopoverOpen,
+      clearDonatePopoverOpening: state.clearDonatePopoverOpening,
+    }))
+  );
 
   useEffect(() => {
     getCurrencyFromLocale(locale);
@@ -107,8 +127,8 @@ export const Donate = () => {
 
     form.reset();
     setPaymentState(null);
-    setIsOpen(false);
-  }, [form]);
+    setDonatePopoverOpen(false);
+  }, [form, setDonatePopoverOpen]);
 
   const handlePaymentCancel = useCallback(() => {
     setPaymentState(null);
@@ -260,7 +280,7 @@ export const Donate = () => {
   }, [paymentState?.clientSecret, resolvedTheme]);
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <Popover open={isOpen} onOpenChange={setDonatePopoverOpen}>
       <PopoverTrigger asChild>
         <div className='fixed bottom-4 right-4 z-50'>
           <div className='donate-rainbow relative z-0 overflow-hidden p-0.5 flex items-center justify-center rounded-md hover:scale-102 transition duration-200 active:scale-100'>
@@ -268,7 +288,17 @@ export const Donate = () => {
           </div>
         </div>
       </PopoverTrigger>
-      <PopoverContent className='w-96' onOpenAutoFocus={(e) => e.preventDefault()}>
+      <PopoverContent
+        className='w-96'
+        onOpenAutoFocus={() => {
+          clearDonatePopoverOpening(isOpening);
+        }}
+        onInteractOutside={(e) => {
+          if (isOpening) {
+            e.preventDefault();
+          }
+        }}
+      >
         <div className='grid gap-4'>
           <div className='space-y-2'>
             <h4 className='leading-none font-medium'>Support & Unblock</h4>

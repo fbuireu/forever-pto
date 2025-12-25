@@ -16,6 +16,7 @@ export const ManagementBar = () => {
   const {
     alternatives,
     suggestion,
+    currentSelection,
     setPreviewAlternativeSelection,
     setCurrentAlternativeSelection,
     previewAlternativeIndex,
@@ -26,6 +27,7 @@ export const ManagementBar = () => {
     useShallow((state) => ({
       alternatives: state.alternatives,
       suggestion: state.suggestion,
+      currentSelection: state.currentSelection,
       setPreviewAlternativeSelection: state.setPreviewAlternativeSelection,
       setCurrentAlternativeSelection: state.setCurrentAlternativeSelection,
       previewAlternativeIndex: state.previewAlternativeIndex,
@@ -50,11 +52,13 @@ export const ManagementBar = () => {
     [setCurrentAlternativeSelection]
   );
 
-  const allSuggestions = [suggestion, ...alternatives].filter(Boolean);
+  const allSuggestions = [suggestion, ...alternatives].filter(
+    (suggestion): suggestion is NonNullable<typeof suggestion> => Boolean()
+  );
+  const hasValidSuggestions = allSuggestions.length > 0 && allSuggestions[0].days && allSuggestions[0].days.length > 0;
+  const hasValidCurrentSelection = currentSelection?.days && currentSelection.days.length > 0;
 
-  console.log('ManagementBar rendered', areStoresReady);
-
-  return areStoresReady ? (
+  return areStoresReady && hasValidSuggestions && hasValidCurrentSelection ? (
     <div className='flex flex-row justify-between gap-4 w-full sticky top-0 z-50'>
       <AlternativesManager
         key={previewAlternativeIndex}
@@ -66,7 +70,7 @@ export const ManagementBar = () => {
         manuallySelectedDays={manuallySelectedDays}
         removedSuggestedDays={removedSuggestedDays}
       />
-      <PtoStatus />
+      <PtoStatus currentSelection={currentSelection} />
     </div>
   ) : (
     <div className='flex flex-row justify-between gap-4 w-full sticky top-0 z-50'>

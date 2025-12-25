@@ -1,10 +1,9 @@
 'use client';
 
+import { cn } from '@const/lib/utils';
 import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from 'motion/react';
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import { createContext, use, useCallback, useEffect, useState } from 'react';
-
-import { cn } from '@const/lib/utils';
 
 type PopoverContextType = {
   isOpen: boolean;
@@ -82,6 +81,7 @@ function PopoverContent({
   transition = { type: 'spring', stiffness: 300, damping: 25 },
   children,
   onOpenAutoFocus,
+  onInteractOutside,
   ...props
 }: PopoverContentProps) {
   const { isOpen } = usePopover();
@@ -96,8 +96,9 @@ function PopoverContent({
             align={align}
             sideOffset={sideOffset}
             className='z-50'
-            {...props}
             {...(onOpenAutoFocus && { onOpenAutoFocus })}
+            {...(onInteractOutside && { onInteractOutside })}
+            {...props}
           >
             <motion.div
               key='popover-content'

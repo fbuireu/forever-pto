@@ -51,3 +51,4 @@ export { generateMetadata };
 // todo: legal pages and cookies (what info do I need to provide?)
 // todo: setup stripe
 // todo: CI to work on releases
+// todo: track origin of premium key (feature)

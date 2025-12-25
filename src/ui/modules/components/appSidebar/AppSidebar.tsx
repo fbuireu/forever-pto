@@ -29,7 +29,6 @@ import { PtoCalculator } from './components/PtoCalculator';
 import { PtoDays } from './components/PtoDays';
 import { PtoSalaryCalculator } from './components/PtoSalaryCalculator';
 import { Regions } from './components/Regions';
-import { RemainingDays } from './components/RemainingDays';
 import { SidebarFooterButtons } from './components/SidebarFooterButtons';
 import { Strategy } from './components/Strategy';
 import { WorkdayCounter } from './components/WorkdayCounter';

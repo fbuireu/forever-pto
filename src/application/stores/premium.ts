@@ -16,6 +16,8 @@ export interface PremiumState {
   needsSessionCheck: boolean;
   currency: string;
   currencySymbol: string;
+  donatePopoverOpen: boolean;
+  donatePopoverIsOpening: boolean;
 }
 
 interface SetPremiumStatusParams {
@@ -34,6 +36,10 @@ interface PremiumActions {
   setCurrency: (currency: string) => void;
   getCurrencyFromLocale: (locale: Locale) => void;
   resetPremiumStore: () => void;
+  openDonatePopover: () => void;
+  closeDonatePopover: () => void;
+  setDonatePopoverOpen: (isOpen: boolean) => void;
+  clearDonatePopoverOpening: (isOpen: boolean) => void;
 }
 
 type PremiumStore = PremiumState & PremiumActions;
@@ -54,6 +60,8 @@ const premiumInitialState: PremiumState = {
   needsSessionCheck: false,
   currency: DEFAULT_CURRENCY,
   currencySymbol: DEFAULT_CURRENCY_SYMBOL,
+  donatePopoverOpen: false,
+  donatePopoverIsOpening: false,
 };
 
 export const usePremiumStore = create<PremiumStore>()(
@@ -192,6 +200,23 @@ export const usePremiumStore = create<PremiumStore>()(
             modalOpen: false,
             currentFeature: '',
           });
+        },
+
+        openDonatePopover: () => {
+          set({ donatePopoverOpen: true, donatePopoverIsOpening: true });
+          setTimeout(() => set({ donatePopoverIsOpening: false }), 0);
+        },
+
+        closeDonatePopover: () => {
+          set({ donatePopoverOpen: false, donatePopoverIsOpening: false });
+        },
+
+        setDonatePopoverOpen: (isOpen: boolean) => {
+          set({ donatePopoverOpen: isOpen, donatePopoverIsOpening: false });
+        },
+
+        clearDonatePopoverOpening: () => {
+          set({ donatePopoverIsOpening: false });
         },
       }),
       {
