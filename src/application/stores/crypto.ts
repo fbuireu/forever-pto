@@ -80,25 +80,10 @@ export const encryptedStorage = createJSONStorage(() => {
   }
   return {
     getItem: (key: string): string | null => {
-      try {
-        const encryptedValue = localStorage.getItem(key);
-        if (!encryptedValue) return null;
-        const decrypted = decrypt({ text: encryptedValue, key: SECRET_KEY });
-        if (!decrypted) {
-          logger.warn('Decryption returned empty value, removing corrupted storage', { key });
-          localStorage.removeItem(key);
-          return null;
-        }
-        return decrypted;
-      } catch (error) {
-        logger.logError('Failed to get item from encrypted storage', error, { key });
-        try {
-          localStorage.removeItem(key);
-        } catch (removeError) {
-          logger.logError('Failed to remove corrupted item', removeError);
-        }
-        return null;
-      }
+      const encryptedValue = localStorage.getItem(key);
+      if (!encryptedValue) return null;
+
+      return decrypt({ text: encryptedValue, key: SECRET_KEY });
     },
     setItem: (key: string, value: string): void => {
       try {

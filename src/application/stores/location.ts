@@ -126,13 +126,15 @@ export const useLocationStore = create<LocationStore>()(
               storeName: STORAGE_NAME,
               hasState: !!state,
             });
-            if (globalThis.window !== undefined) {
-              try {
-                localStorage.removeItem(STORAGE_NAME);
-              } catch (removeError) {
-                logger.logError('Failed to remove corrupted storage', removeError);
-              }
+            try {
+              localStorage.removeItem(STORAGE_NAME);
+            } catch (removeError) {
+              logger.logError('Failed to remove corrupted storage', removeError, {
+                storeName: STORAGE_NAME,
+              });
             }
+
+            return;
           }
         },
       }

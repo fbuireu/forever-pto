@@ -53,7 +53,7 @@ export const ManagementBar = () => {
   );
 
   const allSuggestions = [suggestion, ...alternatives].filter(
-    (suggestion): suggestion is NonNullable<typeof suggestion> => Boolean()
+    (suggestion): suggestion is NonNullable<typeof suggestion> => !!suggestion
   );
   const hasValidSuggestions = allSuggestions.length > 0 && allSuggestions[0].days && allSuggestions[0].days.length > 0;
   const hasValidCurrentSelection = currentSelection?.days && currentSelection.days.length > 0;

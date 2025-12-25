@@ -222,10 +222,11 @@ export function Calendar({
         const isManual = modifiers.manuallySelected(date);
         const isSuggested = modifiers.suggested(date);
         if (!premiumKey) {
-          toast.error('Premium feature', {
+          toast.info('Premium feature', {
             description: `Unlock the ability to add/remove suggestions by upgrading to premium.`,
             duration: 10000,
             classNames: {
+              icon: 'mt-0.5',
               actionButton:
                 'self-center cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
             },
