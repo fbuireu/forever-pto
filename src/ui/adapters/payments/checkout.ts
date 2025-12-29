@@ -1,6 +1,6 @@
 import type { CreatePaymentInput } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
-import { createPaymentAction } from '@app/actions/payment';
+import { createPaymentAction } from '@infrastructure/actions/payment';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
 

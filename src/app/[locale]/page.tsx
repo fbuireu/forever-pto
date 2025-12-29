@@ -41,6 +41,7 @@ export { generateMetadata };
 // todo: simplify (bianca's feedback)
 // todo: overflow issue button on accordion
 // todo: add tutorial (driverjs)
+// todo: add more faqs, check functionality, webhook, db etc
 // todo: responsive
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
 // todo: migrate to base-ui

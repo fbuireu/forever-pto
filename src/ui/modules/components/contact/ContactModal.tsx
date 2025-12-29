@@ -57,7 +57,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
   const onSubmit = async (data: ContactFormData) => {
     try {
-      const { sendContactEmailAction } = await import('@app/actions/contact');
+      const { sendContactEmailAction } = await import('@infrastructure/actions/contact');
       const result = await sendContactEmailAction(data);
       setEmail(data.email);
 
