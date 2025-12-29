@@ -17,7 +17,7 @@ export const AllowPastDays = () => {
   );
 
   return (
-    <Field className='space-y-2 w-full'>
+    <Field className='space-y-2 w-full' data-tutorial='allow-past-days'>
       <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='allow-past-days'>
         <Undo2 size={16} /> Allow Past Days
         <TooltipProvider delayDuration={200}>

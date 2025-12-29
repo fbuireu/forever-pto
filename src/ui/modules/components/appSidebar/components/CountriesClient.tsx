@@ -28,7 +28,7 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
 
   return (
     <AnimateIcon animateOnHover>
-      <Field className='space-y-2 w-full'>
+      <Field className='space-y-2 w-full' data-tutorial='country'>
         <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='countries'>
           <MapPin size={16} /> Country
           <TooltipProvider delayDuration={200}>

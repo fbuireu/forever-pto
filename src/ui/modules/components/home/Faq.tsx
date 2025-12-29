@@ -2,6 +2,7 @@ import { Troubleshooting } from '@ui/modules/components/faq/Troubleshooting';
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from 'src/components/animate-ui/base/accordion';
 import type { FaqData } from 'src/ui/modules/components/faq/types';
 import { Tutorial } from '../faq/Tutorial';
+import { TutorialTrigger } from '../faq/TutorialTrigger';
 
 const FAQ: FaqData = [
   {
@@ -36,6 +37,11 @@ const FAQ: FaqData = [
         question: 'What is included and what is not?',
         answer:
           'Includes suggestion generation, calendar export and preference customization. Does not include direct management of company permissions or automatic integration with all HR systems.',
+      },
+      {
+        id: 'restart-tutorial',
+        question: 'How can I see the interactive tutorial again?',
+        answer: <TutorialTrigger />,
       },
     ],
   },

@@ -54,7 +54,7 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
           <SidebarGroupLabel>Filters</SidebarGroupLabel>
           <SidebarMenu>
             <AnimateIcon animateOnHover>
-              <Collapsible defaultOpen className='group/collapsible w-[--radix-popper-anchor-width]'>
+              <Collapsible defaultOpen className='group/collapsible w-[--radix-popper-anchor-width]' data-tutorial='sidebar-filters'>
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild className='cursor-pointer'>
                     <SidebarMenuButton variant='outline' tooltip='Filters'>
@@ -104,7 +104,7 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
           <SidebarGroupLabel>Tools</SidebarGroupLabel>
           <SidebarMenu>
             <AnimateIcon animateOnHover>
-              <Collapsible defaultOpen={false} className='group/collapsible w-[--radix-popper-anchor-width]'>
+              <Collapsible defaultOpen={false} className='group/collapsible w-[--radix-popper-anchor-width]' data-tutorial='sidebar-tools'>
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild className='cursor-pointer'>
                     <SidebarMenuButton variant='outline' tooltip='Tools'>

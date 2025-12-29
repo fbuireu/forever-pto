@@ -27,7 +27,7 @@ export const Years = () => {
   const years = Array.from({ length: MAX_YEARS }, (_, index) => new Date().getFullYear() - MAX_YEARS / 2 + index);
 
   return (
-    <Field className='space-y-2 w-full'>
+    <Field className='space-y-2 w-full' data-tutorial='year'>
       <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='years'>
         <Calendar size={16} /> Year
       </Label>
