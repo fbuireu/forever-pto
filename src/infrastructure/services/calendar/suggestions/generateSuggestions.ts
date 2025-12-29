@@ -61,15 +61,17 @@ export function generateSuggestions({
     allowPastDays,
   });
 
-  if (availableWorkdays.length < ptoDays) {
+  if (availableWorkdays.length === 0) {
     return { days: [], strategy };
   }
+
+  const effectivePtoDays = Math.min(availableWorkdays.length, ptoDays);
 
   const bridges = findBridges({ availableWorkdays, holidays: effectiveHolidays });
 
   const selector = STRATEGY_MAP[strategy] ?? DEFAULT_STRATEGY;
 
-  const selection = selector(bridges, ptoDays);
+  const selection = selector(bridges, effectivePtoDays);
 
   return {
     days: selection.days.toSorted((a, b) => a.getTime() - b.getTime()),

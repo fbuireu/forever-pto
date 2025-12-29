@@ -260,7 +260,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
         </CollapsibleTrigger>
       </AnimateIcon>
       {innerOpen && (
-        <div className='flex items-center justify-between'>
+        <div className='flex items-center justify-between mt-4'>
           <div className='flex items-center space-x-2'>
             {variant === HolidayVariant.CUSTOM && (
               <AnimateIcon animateOnHover>

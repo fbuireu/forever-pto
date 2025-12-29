@@ -1,7 +1,7 @@
 'use client';
 
 import { useHolidaysStore } from '@application/stores/holidays';
-import { Label } from '@const/components/ui/label';
+import { Field, Label } from '@headlessui/react';
 import { differenceInCalendarDays } from 'date-fns';
 import { CalendarDays, InfoIcon } from 'lucide-react';
 import { useLocale } from 'next-intl';
@@ -51,10 +51,9 @@ export const WorkdayCounter = () => {
   const holidayDays = selectedRange ? calculateHolidaysInRange(selectedRange, holidays) : 0;
 
   return (
-    <div className='space-y-3 p-2'>
-      <div className='flex items-center gap-2'>
-        <CalendarDays className='w-4 h-4' />
-        <span className='text-sm font-medium'>Workday Counter</span>
+    <Field className='space-y-2 w-full'>
+      <Label className='flex gap-2 my-2 text-sm font-normal'>
+        <CalendarDays size={16} /> Workday Counter
         <TooltipProvider delayDuration={200}>
           <Tooltip>
             <TooltipTrigger asChild className='ml-auto'>
@@ -66,10 +65,10 @@ export const WorkdayCounter = () => {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-      </div>
+      </Label>
 
-      <div className='space-y-2'>
-        <Label className='text-xs'>Select Date Range</Label>
+      <div className='space-y-2 w-full'>
+        <p className='text-xs text-muted-foreground'>Select Date Range</p>
         <CalendarModal
           open={isCalendarOpen}
           setOpen={setIsCalendarOpen}
@@ -87,7 +86,7 @@ export const WorkdayCounter = () => {
       </div>
 
       {selectedRange && (
-        <div className='space-y-3 p-3 bg-muted rounded-md'>
+        <div className='space-y-2 w-full bg-muted rounded-md'>
           <div className='text-xs'>
             <span className='font-medium'>Working Days</span>
             <div className='text-2xl font-bold text-primary'>
@@ -126,6 +125,6 @@ export const WorkdayCounter = () => {
           </div>
         </div>
       )}
-    </div>
+    </Field>
   );
 };

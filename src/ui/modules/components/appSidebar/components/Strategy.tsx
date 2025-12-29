@@ -56,7 +56,7 @@ export const Strategy = () => {
   const currentStrategy = STRATEGIES.find(({ value }) => value === strategy);
 
   return (
-    <Field className='space-y-3 w-full'>
+    <Field className='space-y-2 w-full'>
       <Label className='flex gap-2 text-sm font-medium' htmlFor='strategy'>
         <DicesIcon size={16} /> Strategy
       </Label>
@@ -82,7 +82,7 @@ export const Strategy = () => {
           </>
           <CollapsibleContent>
             <Card className='p-4 bg-muted/50 mt-2 text-xs'>
-              <div className='space-y-3'>
+              <div className='space-y-2'>
                 <div className='flex items-start gap-3'>
                   {(() => {
                     const Icon = currentStrategy.icon;

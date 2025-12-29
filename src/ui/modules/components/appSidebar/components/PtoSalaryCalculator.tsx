@@ -2,7 +2,7 @@
 
 import { usePremiumStore } from '@application/stores/premium';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@const/components/ui/input-group';
-import { Label } from '@const/components/ui/label';
+import { Field, Label } from '@headlessui/react';
 import { Euro, InfoIcon } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { useMemo, useState } from 'react';
@@ -72,10 +72,9 @@ export const PtoSalaryCalculator = () => {
   };
 
   return (
-    <div className='space-y-3 p-2'>
-      <div className='flex items-center gap-2'>
-        <Euro className='w-4 h-4' />
-        <span className='text-sm font-medium'>PTO vs Salary Calculator</span>
+    <Field className='space-y-2 w-full'>
+      <Label className='flex gap-2 my-2 text-sm font-normal'>
+        <Euro size={16} /> PTO vs Salary Calculator
         <TooltipProvider delayDuration={200}>
           <Tooltip>
             <TooltipTrigger asChild className='ml-auto'>
@@ -87,12 +86,10 @@ export const PtoSalaryCalculator = () => {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-      </div>
+      </Label>
 
-      <div className='space-y-2'>
-        <Label htmlFor='annualSalary' className='text-xs'>
-          Annual Salary
-        </Label>
+      <div className='space-y-2 w-full'>
+        <p className='text-xs text-muted-foreground'>Annual Salary</p>
         <InputGroup>
           <InputGroupAddon>
             <InputGroupText>{currencySymbol}</InputGroupText>
@@ -110,10 +107,8 @@ export const PtoSalaryCalculator = () => {
         </InputGroup>
       </div>
 
-      <div className='space-y-2'>
-        <Label htmlFor='unusedPTO' className='text-xs'>
-          Unused PTO Days
-        </Label>
+      <div className='space-y-2 w-full'>
+        <p className='text-xs text-muted-foreground'>Unused PTO Days</p>
         <InputGroup>
           <InputGroupInput
             id='unusedPTO'
@@ -129,8 +124,8 @@ export const PtoSalaryCalculator = () => {
       </div>
 
       {showResults && (
-        <div className='space-y-3 p-2 bg-muted rounded-md'>
-          <div className='space-y-2'>
+        <div className='space-y-2 w-full bg-muted rounded-md'>
+          <div className='space-y-2 w-full'>
             <div className='text-xs'>
               <span className='font-medium text-red-600'>Value of unused PTO:</span>
               <div className='text-lg font-bold text-red-600 flex items-center gap-1'>
@@ -182,6 +177,6 @@ export const PtoSalaryCalculator = () => {
           </div>
         </div>
       )}
-    </div>
+    </Field>
   );
 };

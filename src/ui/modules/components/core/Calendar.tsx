@@ -223,20 +223,26 @@ export function Calendar({
         const isSuggested = modifiers.suggested(date);
         if (!premiumKey) {
           toast.info('Premium feature', {
-            description: `Unlock the ability to add/remove suggestions by upgrading to premium.`,
-            duration: 10000,
+            description: `Unlock the ability to add/remove suggestions and add/remove remaining days by upgrading to premium.`,
+            duration: 15000,
             classNames: {
-              icon: 'mt-0.5',
-              actionButton:
-                'self-center cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+              toast: 'flex flex-row flex-wrap items-center overflow-visible',
+              icon: 'mt-0.5 flex-shrink-0',
+              content: 'flex-1',
             },
             icon: <LockIcon size='16' />,
-            action: {
-              label: 'Upgrade',
-              onClick: () => {
-                openDonatePopover();
-              },
-            },
+            action: (
+              <div className='w-full donate-rainbow relative z-0 overflow-hidden p-0.5 flex items-center justify-center rounded-md hover:scale-102 transition duration-200 active:scale-100'>
+                <Button
+                  className='shadow-lg rounded-md w-full h-full py-1 px-2'
+                  onClick={() => {
+                    openDonatePopover();
+                  }}
+                >
+                  Upgrade
+                </Button>
+              </div>
+            ),
           });
           return;
         }

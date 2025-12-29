@@ -39,7 +39,6 @@ export default Home;
 export { generateMetadata };
 
 // todo: simplify (bianca's feedback)
-// todo: overflow issue button on accordion
 // todo: add tutorial (driverjs)
 // todo: add more faqs, check functionality, webhook, db etc
 // todo: responsive
@@ -49,6 +48,7 @@ export { generateMetadata };
 // todo: toast vs error messages
 // todo: unify component and folder structure (payment/provider should be dto?)
 // todo: locale all
+// todo: add custom weekends
 // todo: legal pages and cookies (what info do I need to provide?)
 // todo: setup stripe
 // todo: CI to work on releases

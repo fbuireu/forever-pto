@@ -63,11 +63,11 @@ export const PtoDays = () => {
         />
         <p className='font-normal text-sm'>days</p>
       </div>
-      <div className='space-y-2 mt-4'>
+      <div className='space-y-2 mt-4 w-full'>
         <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='remaining-days'>
           <Clock size={16} /> PTO Days Status
         </Label>
-        <div className='space-y-2'>
+        <div className='space-y-2 w-full'>
           <div className='flex items-center justify-between text-sm'>
             <span className='text-muted-foreground'>Auto-assigned:</span>
             <span className='font-semibold text-teal-600 dark:text-teal-400'>{activeSuggestedCount}</span>

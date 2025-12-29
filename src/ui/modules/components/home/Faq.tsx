@@ -10,7 +10,7 @@ const FAQ: FaqData = [
     items: [
       {
         id: 'how-works',
-        question: "How does it work?",
+        question: 'How does it work?',
         answer: <Tutorial />,
       },
       {
@@ -114,7 +114,7 @@ const FAQ: FaqData = [
 
 export const Faq = () => {
   return (
-    <section aria-labelledby='faq-title' className='space-y-6 m-auto mt-8 max-w-4xl w-full scroll-mt-[60px]' id='faq'>
+    <section aria-labelledby='faq-title' className='space-y-6 m-auto mt-8 max-w-4xl w-full scroll-mt-15' id='faq'>
       <h2 id='faq-title' className='text-3xl font-semibold'>
         Preguntas frecuentes
       </h2>
@@ -123,7 +123,7 @@ export const Faq = () => {
           <h3 className='text-2xl font-medium mb-4'>{section.title}</h3>
           <Accordion
             multiple
-            className='w-full [mask:none!important] [&_[data-slot="accordion-panel"]]:overflow-visible [&_[data-slot="accordion-panel"]]:[mask:none!important]'
+            className='w-full **:data-[slot="accordion-panel"]:data-open:overflow-visible **:data-[slot="accordion-panel"]:data-open:[mask:none!important] **:data-[slot="accordion-panel"]:data-open:mask-[none!important]'
           >
             {section.items.map((item) => (
               <AccordionItem key={item.id} value={item.id} className='cursor-pointer'>

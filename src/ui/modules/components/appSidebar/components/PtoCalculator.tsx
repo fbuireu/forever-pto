@@ -3,7 +3,7 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { Combobox } from '@const/components/ui/combobox';
 import { Input } from '@const/components/ui/input';
-import { Label } from '@const/components/ui/label';
+import { Field, Label } from '@headlessui/react';
 import { Calculator, InfoIcon } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { useMemo, useRef, useState } from 'react';
@@ -69,10 +69,9 @@ export const PtoCalculator = () => {
   };
 
   return (
-    <div className='space-y-3 p-2'>
-      <div className='flex items-center gap-2'>
-        <Calculator className='w-4 h-4' />
-        <span className='text-sm font-medium'>PTO Accumulator</span>
+    <Field className='space-y-2 w-full'>
+      <Label className='flex gap-2 my-2 text-sm font-normal'>
+        <Calculator size={16} /> PTO Accumulator
         <TooltipProvider delayDuration={200}>
           <Tooltip>
             <TooltipTrigger asChild className='ml-auto'>
@@ -84,12 +83,10 @@ export const PtoCalculator = () => {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-      </div>
+      </Label>
 
-      <div className='space-y-2'>
-        <Label htmlFor='daysPerMonth' className='text-xs'>
-          Days per month
-        </Label>
+      <div className='space-y-2 w-full'>
+        <p className='text-xs text-muted-foreground'>Days per month</p>
         <Input
           id='daysPerMonth'
           type='number'
@@ -102,8 +99,8 @@ export const PtoCalculator = () => {
         />
       </div>
 
-      <div className='space-y-2'>
-        <Label className='text-xs'>Calculate through</Label>
+      <div className='space-y-2 w-full'>
+        <p className='text-xs text-muted-foreground'>Calculate through</p>
         <Combobox
           value={selectedMonth}
           options={monthOptions}
@@ -121,7 +118,7 @@ export const PtoCalculator = () => {
       </Button>
 
       {calculatedDays !== null && calculationSnapshotRef.current && (
-        <div className='space-y-2 p-2 bg-muted rounded-md'>
+        <div className='space-y-2 p-2 bg-muted rounded-md w-full'>
           <div className='text-xs'>
             <span className='font-medium'>Result:</span>
             <div className='text-lg font-bold text-primary flex items-center gap-1'>
@@ -145,6 +142,6 @@ export const PtoCalculator = () => {
           </AnimateIcon>
         </div>
       )}
-    </div>
+    </Field>
   );
 };
