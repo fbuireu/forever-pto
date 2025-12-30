@@ -1,7 +1,9 @@
+@layer base, theme, utilities, tutorial, global;
+
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import './animations/index.css';
-@import './theme/index.css';
-@import './global/index.css';
+@import './vendor/index.css';
 @import './base/index.css';
-@import 'driver.js/dist/driver.css';
+@import './theme/index.css';
+@import './animations/index.css';
+@import './global/index.css';

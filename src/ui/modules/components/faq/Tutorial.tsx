@@ -1,10 +1,10 @@
 'use client';
 
-import { useAppTutorial } from '@ui/hooks/useAppTutorial';
+import { useTutorial } from '@ui/hooks/useTutorial';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 
 export const Tutorial = () => {
-  const { startTutorial } = useAppTutorial();
+  const { startTutorial } = useTutorial();
 
   return (
     <div className='space-y-2'>

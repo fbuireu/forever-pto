@@ -1,0 +1,191 @@
+@import 'driver.js/dist/driver.css' layer(tutorial);
+
+@layer tutorial {
+  :root {
+    --driver-z-index: 10000;
+  }
+
+  .driver-overlay {
+    background: transparent;
+  }
+
+  #driver-highlighted-element-stage,
+  #driver-page-overlay {
+    outline: 5000px solid rgba(0, 0, 0, 0.75);
+    outline-offset: 0;
+  }
+
+  .driver-popover {
+    background-color: var(--popover);
+    color: var(--popover-foreground);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow:
+      0 10px 15px -3px rgb(0 0 0 / 0.1),
+      0 4px 6px -4px rgb(0 0 0 / 0.1);
+    padding: 1.5rem;
+    max-width: 400px;
+    font-family: var(--font-sans), system-ui, sans-serif;
+    animation: popover-fade-in 0.2s ease-out;
+  }
+
+  .driver-popover-arrow {
+    display: none;
+  }
+
+  .driver-popover-arrow-side-left,
+  .driver-popover-arrow-side-right,
+  .driver-popover-arrow-side-top,
+  .driver-popover-arrow-side-bottom {
+    border-color: var(--popover);
+  }
+
+  .driver-popover-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--popover-foreground);
+    margin: 0 0 0.75rem 0;
+    font-family: var(--font-sans), system-ui, sans-serif;
+  }
+
+  .driver-popover-description {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--muted-foreground);
+    margin: 0 0 1rem 0;
+    font-family: var(--font-sans), system-ui, sans-serif;
+  }
+
+  .driver-popover-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+    gap: 0.5rem;
+  }
+
+  .driver-popover-progress-text {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    font-weight: 500;
+    font-family: var(--font-sans), system-ui, sans-serif;
+  }
+
+  .driver-popover-navigation-btns button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: var(--font-sans), system-ui, sans-serif;
+    transition: all 150ms ease-in-out;
+    height: 2.5rem;
+    padding: 0 1rem;
+    border: none;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .driver-popover-navigation-btns button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .driver-popover-next-btn {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    margin-left: 0.5rem;
+  }
+
+  .driver-popover-next-btn:hover {
+    opacity: 0.9;
+  }
+
+  .driver-popover-next-btn:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .driver-popover-prev-btn {
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+  }
+
+  .driver-popover-prev-btn:hover {
+    opacity: 0.8;
+  }
+
+  .driver-popover-prev-btn:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .driver-popover-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: auto;
+    height: auto;
+    padding: 0;
+    border-radius: var(--radius-sm);
+    background: transparent !important;
+    opacity: 0.7;
+    transition: opacity 150ms ease-in-out;
+    border: none;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .driver-popover-close-btn:hover {
+    opacity: 1;
+    background: transparent !important;
+  }
+
+  .driver-popover-close-btn:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .driver-active-element,
+  .driver-active-element * {
+    pointer-events: auto;
+  }
+
+  .driver-highlighted-element {
+    background-color: var(--background);
+    outline: none;
+    box-shadow:
+      0 0 0 4px var(--primary),
+      0 0 20px rgba(0, 0, 0, 0.3);
+    z-index: 10001;
+    position: relative;
+  }
+
+  #driver-highlighted-element-stage {
+    background-color: var(--background);
+    box-shadow:
+      0 0 0 4px var(--primary),
+      0 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  [data-theme='dark'] #driver-highlighted-element-stage,
+  [data-theme='dark'] #driver-page-overlay {
+    outline: 5000px solid rgba(0, 0, 0, 0.85);
+  }
+
+  [data-theme='dark'] .driver-popover {
+    box-shadow:
+      0 10px 15px -3px rgb(0 0 0 / 0.5),
+      0 4px 6px -4px rgb(0 0 0 / 0.3);
+  }
+
+  @media (max-width: 640px) {
+    .driver-popover {
+      max-width: calc(100vw - 2rem);
+    }
+  }
+}

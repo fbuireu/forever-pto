@@ -1,4 +1,15 @@
 @layer utilities {
+  @keyframes popover-fade-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
   @keyframes rotate-glow {
     100% {
       transform: rotate(1turn);

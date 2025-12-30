@@ -29,7 +29,7 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
   const hasManualChanges = manualSelectedCount > 0 || removedSuggestedDays.length > 0;
 
   return (
-    <div className='p-2 rounded-2xl border shadow-sm  bg-background'>
+    <div className='p-2 rounded-2xl border shadow-sm  bg-background' data-tutorial='pto-status'>
       <div className='flex items-center justify-between flex-wrap gap-4'>
         <div className='flex items-center gap-4'>
           <div className='flex items-center gap-1'>
