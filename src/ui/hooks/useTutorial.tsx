@@ -1,45 +1,14 @@
 'use client';
 
-import type { Driver } from 'driver.js';
-import { driver } from 'driver.js';
 import { useCallback } from 'react';
-import { createRoot, type Root } from 'react-dom/client';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { X } from 'src/components/animate-ui/icons/x';
-
-let driverInstance: Driver | null = null;
-let closeButtonRoots: Root[] = [];
+import { getDriverClientInstance } from '@infrastructure/clients/tutorial/driver/client';
+import type { DriveStep } from 'driver.js';
 
 export const useTutorial = () => {
   const startTutorial = useCallback(() => {
-    if (driverInstance) {
-      driverInstance.destroy();
-    }
+    const driverClient = getDriverClientInstance();
 
-    driverInstance = driver({
-      showProgress: true,
-      showButtons: ['next', 'previous', 'close'],
-      smoothScroll: true,
-      stagePadding: 10,
-      stageRadius: 8,
-      onPopoverRender: (popover) => {
-        const closeButton = popover.wrapper.querySelector('.driver-popover-close-btn');
-        if (closeButton) {
-          closeButton.innerHTML = '';
-          const iconContainer = document.createElement('span');
-          iconContainer.style.color = 'var(--foreground)';
-          closeButton.appendChild(iconContainer);
-          const root = createRoot(iconContainer);
-
-          root.render(
-            <AnimateIcon animateOnHover>
-              <X className='h-4 w-4' />
-            </AnimateIcon>
-          );
-          closeButtonRoots.push(root);
-        }
-      },
-      steps: [
+    const steps: DriveStep[] = [
         {
           element: '[data-tutorial="sidebar-filters"]',
           popover: {
@@ -167,19 +136,9 @@ export const useTutorial = () => {
               'Now you know how to use Forever PTO to maximize your time off. Start by configuring your preferences in the sidebar, and let the app suggest the best PTO days for you. Enjoy your well-deserved breaks!',
           },
         },
-      ],
-      onDestroyStarted: () => {
-        closeButtonRoots.forEach((root) => root.unmount());
-        closeButtonRoots = [];
+    ];
 
-        if (driverInstance) {
-          driverInstance.destroy();
-          driverInstance = null;
-        }
-      },
-    });
-
-    driverInstance.drive();
+    driverClient.start(steps);
   }, []);
 
   return { startTutorial };
