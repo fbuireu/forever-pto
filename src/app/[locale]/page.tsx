@@ -29,8 +29,8 @@ const Home = async ({ params }: LayoutProps) => {
       <CalendarList />
       <Legend />
       <Summary />
-      <Faq />
       <Roadmap />
+      <Faq />
     </section>
   );
 };
@@ -38,9 +38,9 @@ const Home = async ({ params }: LayoutProps) => {
 export default Home;
 export { generateMetadata };
 
-// todo: simplify (bianca's feedback)
-// todo: add tutorial (driverjs)
+// todo: workday counter fix + rehydrate tutorial on open/close sidebar elements
 // todo: add more faqs, check functionality, webhook, db etc
+// todo: legal pages and cookies (what info do I need to provide?)
 // todo: responsive
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
 // todo: migrate to base-ui
@@ -48,8 +48,7 @@ export { generateMetadata };
 // todo: toast vs error messages
 // todo: unify component and folder structure (payment/provider should be dto?)
 // todo: locale all
-// todo: add custom weekends
-// todo: legal pages and cookies (what info do I need to provide?)
 // todo: setup stripe
 // todo: CI to work on releases
 // todo: track origin of premium key (feature)
+// todo: add custom weekends

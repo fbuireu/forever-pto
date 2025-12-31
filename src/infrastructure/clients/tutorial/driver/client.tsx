@@ -84,22 +84,11 @@ export class DriverClient {
       this.driver = null;
     }
   }
-
-  isActive(): boolean {
-    return !!this.driver?.isActive();
-  }
 }
 
 let driverClientInstance: DriverClient | null = null;
 
 export const getDriverClientInstance = (): DriverClient => {
-  driverClientInstance ??= new DriverClient({
-      showProgress: true,
-      showButtons: ['next', 'previous', 'close'],
-      smoothScroll: true,
-      stagePadding: 10,
-      stageRadius: 8,
-    });
-
+    driverClientInstance ??= new DriverClient({});
   return driverClientInstance;
 };

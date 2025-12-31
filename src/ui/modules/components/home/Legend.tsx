@@ -1,16 +1,55 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@const/components/ui/card';
 import { cn } from '@const/lib/utils';
+import { useStickyState } from '@ui/hooks/useStickyState';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers';
 
 export const Legend = () => {
+  const [legendRef, isStuck] = useStickyState<HTMLElement>();
+
   return (
-    <section className='mt-8 text-center text-sm w-full max-w-4xl mx-auto'>
-      <Card className='gap-4'>
-        <CardHeader className='text-center'>
-          <CardTitle className='text-3xl font-bold'>Legend</CardTitle>
+    <section
+      ref={legendRef}
+      className={cn(
+        'sticky bottom-0 z-10 text-center w-full max-w-4xl mx-auto',
+        'transition-all duration-300 ease-in-out',
+        isStuck ? 'mt-0 text-xs' : 'mt-8 text-sm'
+      )}
+    >
+      <Card
+        className={cn(
+          'transition-all duration-300 ease-in-out',
+          isStuck ? 'gap-1 py-2 shadow-lg' : 'gap-4'
+        )}
+      >
+        <CardHeader
+          className={cn(
+            'text-center transition-all duration-300 ease-in-out',
+            isStuck ? 'py-1 pb-0' : ''
+          )}
+        >
+          <CardTitle
+            className={cn(
+              'font-bold transition-all duration-300 ease-in-out',
+              isStuck ? 'text-base' : 'text-3xl'
+            )}
+          >
+            Legend
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className='mb-2 flex flex-wrap justify-center gap-4'>
+        <CardContent
+          className={cn(
+            'transition-all duration-300 ease-in-out',
+            isStuck ? 'py-1 pt-0' : ''
+          )}
+        >
+          <div
+            className={cn(
+              'flex flex-wrap justify-center transition-all duration-300 ease-in-out',
+              isStuck ? 'mb-0 gap-2' : 'mb-2 gap-4'
+            )}
+          >
             <div className='flex items-center'>
               <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.today)} />
               <span>Today</span>
