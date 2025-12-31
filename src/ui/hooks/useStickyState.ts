@@ -27,9 +27,9 @@ export const useStickyState = <T extends HTMLElement>(): [
         const viewportHeight = window.innerHeight;
         const bottomValue = Number.parseInt(getComputedStyle(element).bottom || '0');
         const isAtBottom = Math.abs(rect.bottom - viewportHeight + bottomValue) < POSITION_TOLERANCE_PX;
-        const parentHasScrolledContent = parentRect.top < 0;
+        const hasContentAbove = parentRect.top < rect.top - 100;
 
-        setIsStuck(isAtBottom && parentHasScrolledContent);
+        setIsStuck(isAtBottom && hasContentAbove);
       },
       {
         threshold: [0, 0.1, 0.5, 1],
@@ -46,14 +46,15 @@ export const useStickyState = <T extends HTMLElement>(): [
       const parentRect = parent.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       const bottomValue = Number.parseInt(getComputedStyle(element).bottom || '0');
-      const isAtBottom = Math.abs(rect.bottom - viewportHeight + bottomValue) < POSITION_TOLERANCE_PX;
-      const parentHasScrolledContent = parentRect.top < 0;
 
-      setIsStuck(isAtBottom && parentHasScrolledContent);
+      const isAtBottom = Math.abs(rect.bottom - viewportHeight + bottomValue) < POSITION_TOLERANCE_PX;
+      const hasContentAbove = parentRect.top < rect.top - 100;
+
+      setIsStuck(isAtBottom && hasContentAbove);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
+    handleScroll(); 
 
     return () => {
       observer.disconnect();
