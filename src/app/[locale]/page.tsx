@@ -38,7 +38,7 @@ const Home = async ({ params }: LayoutProps) => {
 export default Home;
 export { generateMetadata };
 
-// todo: workday counter fix + rehydrate tutorial on open/close sidebar elements
+// todo: rehydrate tutorial on open/close sidebar elements + fix grafs and text in grafs
 // todo: add more faqs, check functionality, webhook, db etc
 // todo: legal pages and cookies (what info do I need to provide?)
 // todo: responsive

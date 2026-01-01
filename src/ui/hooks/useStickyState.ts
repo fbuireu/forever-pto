@@ -18,34 +18,11 @@ export const useStickyState = <T extends HTMLElement>(): [
     const parent = element.parentElement;
     if (!parent) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.target) return;
-
-        const rect = entry.target.getBoundingClientRect();
-        const parentRect = parent.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        const bottomValue = Number.parseInt(getComputedStyle(element).bottom || '0');
-        const isAtBottom = Math.abs(rect.bottom - viewportHeight + bottomValue) < POSITION_TOLERANCE_PX;
-        const hasContentAbove = parentRect.top < rect.top - 100;
-
-        setIsStuck(isAtBottom && hasContentAbove);
-      },
-      {
-        threshold: [0, 0.1, 0.5, 1],
-        rootMargin: '0px',
-      }
-    );
-
-    observer.observe(element);
-
-    const handleScroll = () => {
-      if (!element || !parent) return;
-
+    const checkSticky = () => {
       const rect = element.getBoundingClientRect();
       const parentRect = parent.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
-      const bottomValue = Number.parseInt(getComputedStyle(element).bottom || '0');
+      const bottomValue = Number.parseInt(getComputedStyle(element).bottom ?? '0');
 
       const isAtBottom = Math.abs(rect.bottom - viewportHeight + bottomValue) < POSITION_TOLERANCE_PX;
       const hasContentAbove = parentRect.top < rect.top - 100;
@@ -53,12 +30,19 @@ export const useStickyState = <T extends HTMLElement>(): [
       setIsStuck(isAtBottom && hasContentAbove);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); 
+    const observer = new IntersectionObserver(checkSticky, {
+      threshold: [0, 0.1, 0.5, 1],
+      rootMargin: '0px',
+    });
+
+    observer.observe(element);
+
+    window.addEventListener('scroll', checkSticky, { passive: true });
+    checkSticky();
 
     return () => {
       observer.disconnect();
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', checkSticky);
     };
   }, []);
 

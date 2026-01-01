@@ -5,9 +5,11 @@ import {
   addDays,
   addMonths,
   eachDayOfInterval,
+  eachWeekendOfInterval,
   endOfMonth,
   endOfWeek,
   format,
+  getWeek,
   isSameDay,
   isWeekend,
   startOfMonth,
@@ -102,11 +104,12 @@ export function calculateWorkdays(range: FromTo, holidays: HolidayDTO[]): number
 }
 
 export function calculateWeekends(range: FromTo): number {
-  const days = eachDayOfInterval({
+  const weekendDays = eachWeekendOfInterval({
     start: range.from,
     end: range.to,
   });
-  return days.filter((day) => isWeekend(day)).length;
+
+  return new Set(weekendDays.map((day) => getWeek(day))).size;
 }
 
 export function calculateHolidaysInRange(range: FromTo, holidays: HolidayDTO[]): number {

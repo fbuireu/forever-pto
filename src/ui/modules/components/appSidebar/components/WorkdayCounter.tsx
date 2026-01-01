@@ -86,7 +86,7 @@ export const WorkdayCounter = () => {
       </div>
 
       {selectedRange && (
-        <div className='space-y-2 w-full bg-muted rounded-md'>
+        <div className='space-y-2 w-full bg-muted rounded-md p-3'>
           <div className='text-xs'>
             <span className='font-medium'>Working Days</span>
             <div className='text-2xl font-bold text-primary'>
