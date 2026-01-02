@@ -8,7 +8,8 @@ import { Roadmap } from '@ui/modules/components/home/Roadmap';
 import { Summary } from '@ui/modules/components/home/Summary';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
-import { generateMetadata } from './metadata';
+
+export { generateMetadata } from './metadata';
 
 interface LayoutProps {
   params: Promise<{ locale: Locale }>;
@@ -36,7 +37,6 @@ const Home = async ({ params }: LayoutProps) => {
 };
 
 export default Home;
-export { generateMetadata };
 
 // todo: rehydrate tutorial on open/close sidebar elements + fix grafs and text in grafs
 // todo: add more faqs, check functionality, webhook, db etc
