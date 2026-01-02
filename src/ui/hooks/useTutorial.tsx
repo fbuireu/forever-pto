@@ -1,145 +1,149 @@
 'use client';
 
-import { useCallback } from 'react';
 import { getDriverClientInstance } from '@infrastructure/clients/tutorial/driver/client';
 import type { DriveStep } from 'driver.js';
+import { useCallback } from 'react';
+import { useSidebar } from 'src/components/animate-ui/radix/sidebar';
 
 export const useTutorial = () => {
+  const { open, toggleSidebar } = useSidebar();
+
   const startTutorial = useCallback(() => {
+    if (!open) toggleSidebar();
     const driverClient = getDriverClientInstance();
 
     const steps: DriveStep[] = [
-        {
-          element: '[data-tutorial="sidebar-filters"]',
-          popover: {
-            title: 'Filters & Configuration',
-            description:
-              'Here you can configure all your PTO preferences. Set your available PTO days, select your country and region to get accurate holidays, choose the year, and customize your optimization strategy.',
-            side: 'right',
-            align: 'start',
-          },
+      {
+        element: '[data-tutorial="sidebar-filters"]',
+        popover: {
+          title: 'Filters & Configuration',
+          description:
+            'Here you can configure all your PTO preferences. Set your available PTO days, select your country and region to get accurate holidays, choose the year, and customize your optimization strategy.',
+          side: 'right',
+          align: 'start',
         },
-        {
-          element: '[data-tutorial="pto-days"]',
-          popover: {
-            title: 'PTO Days',
-            description:
-              'Enter the total number of PTO (Paid Time Off) days you have available for the year. This is the foundation for all calculations and suggestions.',
-            side: 'right',
-            align: 'start',
-          },
+      },
+      {
+        element: '[data-tutorial="pto-days"]',
+        popover: {
+          title: 'PTO Days',
+          description:
+            'Enter the total number of PTO (Paid Time Off) days you have available for the year. This is the foundation for all calculations and suggestions.',
+          side: 'right',
+          align: 'start',
         },
-        {
-          element: '[data-tutorial="country"]',
-          popover: {
-            title: 'Country Selection',
-            description:
-              'Select your country to automatically load national holidays. This ensures your PTO suggestions avoid already-free days and maximize your time off.',
-            side: 'right',
-            align: 'start',
-          },
+      },
+      {
+        element: '[data-tutorial="country"]',
+        popover: {
+          title: 'Country Selection',
+          description:
+            'Select your country to automatically load national holidays. This ensures your PTO suggestions avoid already-free days and maximize your time off.',
+          side: 'right',
+          align: 'start',
         },
-        {
-          element: '[data-tutorial="region"]',
-          popover: {
-            title: 'Region Selection',
-            description:
-              'Some countries have regional holidays. Select your specific region to get the most accurate holiday calendar for your area.',
-            side: 'right',
-            align: 'start',
-          },
+      },
+      {
+        element: '[data-tutorial="region"]',
+        popover: {
+          title: 'Region Selection',
+          description:
+            'Some countries have regional holidays. Select your specific region to get the most accurate holiday calendar for your area.',
+          side: 'right',
+          align: 'start',
         },
-        {
-          element: '[data-tutorial="year"]',
-          popover: {
-            title: 'Year Selection',
-            description:
-              'Choose the year you want to plan for. Holidays and suggestions will be generated for the selected year.',
-            side: 'right',
-            align: 'start',
-          },
+      },
+      {
+        element: '[data-tutorial="year"]',
+        popover: {
+          title: 'Year Selection',
+          description:
+            'Choose the year you want to plan for. Holidays and suggestions will be generated for the selected year.',
+          side: 'right',
+          align: 'start',
         },
-        {
-          element: '[data-tutorial="strategy"]',
-          popover: {
-            title: 'Optimization Strategy',
-            description:
-              'Choose between different strategies: "Balanced" spreads your PTO evenly throughout the year, while "Optimized" maximizes efficiency by creating longer breaks with fewer PTO days.',
-            side: 'right',
-            align: 'start',
-          },
+      },
+      {
+        element: '[data-tutorial="strategy"]',
+        popover: {
+          title: 'Optimization Strategy',
+          description:
+            'Choose between different strategies: "Balanced" spreads your PTO evenly throughout the year, while "Optimized" maximizes efficiency by creating longer breaks with fewer PTO days.',
+          side: 'right',
+          align: 'start',
         },
-        {
-          element: '[data-tutorial="allow-past-days"]',
-          popover: {
-            title: 'Allow Past Days',
-            description:
-              'Toggle this option if you want to include dates that have already passed in the current year. Useful for planning retrospectively or for next year.',
-            side: 'right',
-            align: 'start',
-          },
+      },
+      {
+        element: '[data-tutorial="allow-past-days"]',
+        popover: {
+          title: 'Allow Past Days',
+          description:
+            'Toggle this option if you want to include dates that have already passed in the current year. Useful for planning retrospectively or for next year.',
+          side: 'right',
+          align: 'start',
         },
-        {
-          element: '[data-tutorial="carry-over"]',
-          popover: {
-            title: 'Carry Over Months',
-            description:
-              'If your PTO days carry over into the next year, specify how many months they remain valid. This helps you plan PTO usage across year boundaries.',
-            side: 'right',
-            align: 'start',
-          },
+      },
+      {
+        element: '[data-tutorial="carry-over"]',
+        popover: {
+          title: 'Carry Over Months',
+          description:
+            'If your PTO days carry over into the next year, specify how many months they remain valid. This helps you plan PTO usage across year boundaries.',
+          side: 'right',
+          align: 'start',
         },
-        {
-          element: '[data-tutorial="sidebar-tools"]',
-          popover: {
-            title: 'Calculators & Tools',
-            description:
-              'Access helpful calculators here: estimate your PTO based on work history, calculate the monetary value of unused PTO, or count workdays between dates.',
-            side: 'right',
-            align: 'start',
-          },
+      },
+      {
+        element: '[data-tutorial="sidebar-tools"]',
+        popover: {
+          title: 'Calculators & Tools',
+          description:
+            'Access helpful calculators here: estimate your PTO based on work history, calculate the monetary value of unused PTO, or count workdays between dates.',
+          side: 'right',
+          align: 'start',
         },
-        {
-          element: '[data-tutorial="alternatives-manager"]',
-          popover: {
-            title: 'Alternatives Manager',
-            description:
-              'Navigate through different PTO suggestions generated by our AI. Compare efficiency metrics, total days off, and find the perfect balance. The first option is always our recommended suggestion, marked with a sparkle icon. Use the arrows to explore alternatives and click "Apply Alternative" to use a different suggestion.',
-            side: 'bottom',
-            align: 'start',
-          },
+      },
+      {
+        element: '[data-tutorial="alternatives-manager"]',
+        popover: {
+          title: 'Alternatives Manager',
+          description:
+            'Navigate through different PTO suggestions generated by our AI. Compare efficiency metrics, total days off, and find the perfect balance. The first option is always our recommended suggestion, marked with a sparkle icon. Use the arrows to explore alternatives and click "Apply Alternative" to use a different suggestion.',
+          side: 'bottom',
+          align: 'start',
         },
-        {
-          element: '[data-tutorial="pto-status"]',
-          popover: {
-            title: 'PTO Status Tracker',
-            description:
-              'Monitor your PTO allocation in real-time. See auto-assigned days (suggested by AI), manually selected days, and remaining days available. You can reset manual changes anytime to return to the AI suggestion.',
-            side: 'bottom',
-            align: 'end',
-          },
+      },
+      {
+        element: '[data-tutorial="pto-status"]',
+        popover: {
+          title: 'PTO Status Tracker',
+          description:
+            'Monitor your PTO allocation in real-time. See auto-assigned days (suggested by AI), manually selected days, and remaining days available. You can reset manual changes anytime to return to the AI suggestion.',
+          side: 'bottom',
+          align: 'end',
         },
-        {
-          element: '[data-tutorial="calendar-list"]',
-          popover: {
-            title: 'Your Interactive PTO Calendar',
-            description:
-              'This is your year-at-a-glance calendar. Holidays appear in gray, AI-suggested PTO days in teal, and manually selected days in blue. Click any working day to manually toggle selection. The calendar updates instantly as you explore different alternatives.',
-            side: 'top',
-            align: 'center',
-          },
+      },
+      {
+        element: '[data-tutorial="calendar-list"]',
+        popover: {
+          title: 'Your Interactive PTO Calendar',
+          description:
+            'This is your year-at-a-glance calendar. Holidays appear in gray, AI-suggested PTO days in teal, and manually selected days in blue. Click any working day to manually toggle selection. The calendar updates instantly as you explore different alternatives.',
+          side: 'top',
+          align: 'center',
         },
-        {
-          popover: {
-            title: "You're All Set!",
-            description:
-              'Now you know how to use Forever PTO to maximize your time off. Start by configuring your preferences in the sidebar, and let the app suggest the best PTO days for you. Enjoy your well-deserved breaks!',
-          },
+      },
+      {
+        popover: {
+          title: "You're All Set!",
+          description:
+            'Now you know how to use Forever PTO to maximize your time off. Start by configuring your preferences in the sidebar, and let the app suggest the best PTO days for you. Enjoy your well-deserved breaks!',
         },
+      },
     ];
 
     driverClient.start(steps);
-  }, []);
+  }, [open]);
 
   return { startTutorial };
 };

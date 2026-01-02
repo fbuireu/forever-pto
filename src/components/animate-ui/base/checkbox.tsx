@@ -1,9 +1,9 @@
 'use client';
 
 import { Checkbox as CheckboxPrimitive } from '@base-ui/react/checkbox';
+import { cn } from '@const/lib/utils';
 import { type HTMLMotionProps, motion } from 'motion/react';
 import { useCallback, useEffect, useState } from 'react';
-import { cn } from '@const/lib/utils';
 
 type CheckboxProps = Omit<React.ComponentProps<typeof CheckboxPrimitive.Root>, 'render'> & {
   motionProps?: HTMLMotionProps<'button'>;

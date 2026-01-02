@@ -1,9 +1,9 @@
 'use client';
 
 import { Accordion as AccordionPrimitive } from '@base-ui/react/accordion';
+import { cn } from '@const/lib/utils';
 import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from 'motion/react';
 import { createContext, use, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { cn } from '@const/lib/utils';
 import { ChevronDown } from '../icons/chevron-down';
 import { AnimateIcon } from '../icons/icon';
 

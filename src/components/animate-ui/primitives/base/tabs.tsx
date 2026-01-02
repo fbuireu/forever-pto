@@ -1,9 +1,9 @@
 import { Tabs as TabsPrimitive } from '@base-ui/react/tabs';
+import { useControlledState } from '@ui/hooks/useControlledState';
 import { AnimatePresence, motion, type HTMLMotionProps } from 'motion/react';
 import { Fragment, type ComponentProps, type ReactNode } from 'react';
 import { getStrictContext } from 'src/lib/get-strict-context';
 import { Highlight, HighlightItem, type HighlightItemProps, type HighlightProps } from '../effects/highlight';
-import { useControlledState } from '@ui/hooks/useControlledState';
 
 type TabsContextType = {
   value: string | undefined;

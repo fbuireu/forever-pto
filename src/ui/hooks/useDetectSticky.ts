@@ -4,10 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 const POSITION_TOLERANCE_PX = 2;
 
-export const useStickyState = <T extends HTMLElement>(): [
-  React.RefObject<T | null>,
-  boolean,
-] => {
+export const useDetectSticky = <T extends HTMLElement>(): [React.RefObject<T | null>, boolean] => {
   const [isStuck, setIsStuck] = useState(false);
   const elementRef = useRef<T | null>(null);
 

@@ -38,7 +38,7 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: rehydrate tutorial on open/close sidebar elements + fix grafs and text in grafs
+// todo: fix grafs and text in grafs
 // todo: add more faqs, check functionality, webhook, db etc
 // todo: legal pages and cookies (what info do I need to provide?)
 // todo: responsive

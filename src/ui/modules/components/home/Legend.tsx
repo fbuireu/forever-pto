@@ -2,11 +2,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@const/components/ui/card';
 import { cn } from '@const/lib/utils';
-import { useStickyState } from '@ui/hooks/useStickyState';
+import { useDetectSticky } from '@ui/hooks/useDetectSticky';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers';
 
 export const Legend = () => {
-  const [legendRef, isStuck] = useStickyState<HTMLElement>();
+  const [legendRef, isStuck] = useDetectSticky<HTMLElement>();
 
   return (
     <section
@@ -17,33 +17,15 @@ export const Legend = () => {
         isStuck ? 'mt-0 text-xs' : 'mt-8 text-sm'
       )}
     >
-      <Card
-        className={cn(
-          'transition-all duration-300 ease-in-out',
-          isStuck ? 'gap-1 py-2 shadow-lg' : 'gap-4'
-        )}
-      >
-        <CardHeader
-          className={cn(
-            'text-center transition-all duration-300 ease-in-out',
-            isStuck ? 'py-1 pb-0' : ''
-          )}
-        >
+      <Card className={cn('transition-all duration-300 ease-in-out', isStuck ? 'gap-1 py-2 shadow-lg' : 'gap-4')}>
+        <CardHeader className={cn('text-center transition-all duration-300 ease-in-out', isStuck ? 'py-1 pb-0' : '')}>
           <CardTitle
-            className={cn(
-              'font-bold transition-all duration-300 ease-in-out',
-              isStuck ? 'text-base' : 'text-3xl'
-            )}
+            className={cn('font-bold transition-all duration-300 ease-in-out', isStuck ? 'text-base' : 'text-3xl')}
           >
             Legend
           </CardTitle>
         </CardHeader>
-        <CardContent
-          className={cn(
-            'transition-all duration-300 ease-in-out',
-            isStuck ? 'py-1 pt-0' : ''
-          )}
-        >
+        <CardContent className={cn('transition-all duration-300 ease-in-out', isStuck ? 'py-1 pt-0' : '')}>
           <div
             className={cn(
               'flex flex-wrap justify-center transition-all duration-300 ease-in-out',

@@ -1,5 +1,5 @@
-import { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
@@ -60,6 +60,14 @@ export const useFiltersStore = create<FiltersStore>()(
         name: STORAGE_NAME,
         version: STORAGE_VERSION,
         storage: encryptedStorage,
+        partialize: (state) => ({
+          ptoDays: state.ptoDays,
+          allowPastDays: state.allowPastDays,
+          country: state.country,
+          region: state.region,
+          carryOverMonths: state.carryOverMonths,
+          strategy: state.strategy,
+        }),
         onRehydrateStorage: () => (state, error) => {
           if (error) {
             logger.logError('Error rehydrating filters store', error, {
