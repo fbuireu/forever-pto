@@ -41,7 +41,7 @@ interface AppSidebarProps {
 
 export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
   <SidebarProvider>
-    <Sidebar collapsible='icon' variant='sidebar'>
+    <Sidebar collapsible='icon' variant='inset'>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
