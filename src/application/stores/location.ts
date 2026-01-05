@@ -133,8 +133,6 @@ export const useLocationStore = create<LocationStore>()(
                 storeName: STORAGE_NAME,
               });
             }
-
-            return;
           }
         },
       }

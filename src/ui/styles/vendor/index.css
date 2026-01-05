@@ -3,6 +3,8 @@
 @layer tutorial {
   :root {
     --driver-z-index: 10000;
+    container-type: inline-size;
+    container-name: root;
   }
 
   .driver-overlay {
@@ -183,9 +185,9 @@
       0 4px 6px -4px rgb(0 0 0 / 0.3);
   }
 
-  @media (max-width: 640px) {
+  @container root (max-width: 640px) {
     .driver-popover {
-      max-width: calc(100vw - 2rem);
+      max-width: calc(100cqw - 2rem);
     }
   }
 }

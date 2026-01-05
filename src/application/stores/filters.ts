@@ -81,8 +81,6 @@ export const useFiltersStore = create<FiltersStore>()(
                 storeName: STORAGE_NAME,
               });
             }
-
-            return;
           }
         },
       }
