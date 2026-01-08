@@ -39,6 +39,7 @@ const Home = async ({ params }: LayoutProps) => {
 export default Home;
 
 // todo: fix grafs and text in grafs
+// todo: replace useDetectSticky with css @container scroll-state() (at 8th Jan 2026 not LighntingCSS has the code merged, not released and not adopted by Next)
 // todo: add more faqs, check functionality, webhook, db etc
 // todo: legal pages and cookies (what info do I need to provide?)
 // todo: responsive
