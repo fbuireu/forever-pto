@@ -120,7 +120,7 @@ const FAQ: FaqData = [
 
 export const Faq = () => {
   return (
-    <section aria-labelledby='faq-title' className='space-y-6 m-auto mt-8 max-w-4xl w-full scroll-mt-15' id='faq'>
+    <section aria-labelledby='faq-title' className='space-y-6 m-auto mt-8 max-w-4xl w-full scroll-mt-15 px-4 lg:px-0' id='faq'>
       <h2 id='faq-title' className='text-3xl font-semibold'>
         Preguntas frecuentes
       </h2>

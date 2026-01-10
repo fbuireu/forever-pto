@@ -31,7 +31,7 @@ const STAT_CARD_MOTION_CONFIG = {
       maxWidth: '200px',
       transition: { type: 'spring', stiffness: 200, damping: 35, delay: 0.15 },
     },
-    tap: { scale: 0.95 },
+    tap: { scale: 0.95, maxWidth: '200px' },
   },
   transition: { type: 'spring', stiffness: 250, damping: 25 },
 } as const;
@@ -107,8 +107,11 @@ export const AlternativesManager = ({
   const isMainSuggestion = currentIndex === 0;
 
   return (
-    <div className='sticky top-0 z-[10] flex w-fit flex-wrap items-center gap-y-2 rounded-2xl border border-border bg-background p-2 shadow-sm' data-tutorial='alternatives-manager'>
-      <div className='flex shrink-0 items-center rounded-lg bg-muted/50 px-2 h-full'>
+    <div
+      className='sticky top-0 z-10 flex w-fit flex-wrap items-center gap-2 rounded-2xl border border-border bg-background p-2 shadow-sm'
+      data-tutorial='alternatives-manager'
+    >
+      <div className='flex shrink-0 items-center rounded-lg bg-muted/50 px-2 grow'>
         <AnimateIcon animateOnHover={currentIndex !== 0}>
           <Button
             disabled={currentIndex === 0}
@@ -119,7 +122,7 @@ export const AlternativesManager = ({
             <ChevronLeft size={20} />
           </Button>
         </AnimateIcon>
-        <div className='mx-2 flex flex-col items-center relative w-25 transition-[height,padding] duration-300 ease-out'>
+        <div className='mx-2 flex flex-col items-center relative w-25  grow duration-300 ease-out'>
           <div className='flex items-center space-x-1 text-sm tabular-nums'>
             <span className='text-xs text-muted-foreground'>Option</span>
             <SlidingNumber className='text-base font-semibold text-foreground' padStart number={currentIndex + 1} />
@@ -130,7 +133,7 @@ export const AlternativesManager = ({
               variants={BADGE_VARIANTS}
               initial='initial'
               animate='animate'
-              className='mt-0.5 flex items-center gap-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 px-1.5 py-px text-[10px] font-normal text-amber-700 dark:text-amber-400'
+              className='mt-0.5 flex items-center gap-0.5 rounded-full bg-linear-to-r from-amber-500/20 to-orange-500/20 px-1.5 py-px text-[10px] font-normal text-amber-700 dark:text-amber-400'
             >
               <Sparkles size={8} />
               Recommended
@@ -151,7 +154,7 @@ export const AlternativesManager = ({
 
       <div className='mx-3 h-6 w-px bg-border rounded-full' />
 
-      <motion.div layout layoutRoot className='mx-auto flex flex-wrap space-x-2 sm:flex-nowrap'>
+      <motion.div layout layoutRoot className='flex flex-nowrap space-x-2'>
         <motion.button
           {...STAT_CARD_MOTION_CONFIG}
           className='flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-green-100/60 px-2.5 py-2 dark:bg-green-900/30'
@@ -246,10 +249,9 @@ export const AlternativesManager = ({
           </motion.button>
         )}
       </motion.div>
-      <div className='mx-3 hidden h-6 w-px bg-border sm:block rounded-full' />
       <Button
         disabled={currentSelectionIndex === currentIndex}
-        className='flex w-full h-10 text-sm cursor-pointer items-center justify-center rounded-lg px-3 py-2 font-medium transition-colors duration-300 sm:w-auto'
+        className='flex grow h-10 text-sm cursor-pointer items-center justify-center rounded-lg px-3 py-2 font-medium transition-colors duration-300'
         onClick={() => onSelectionChange({ suggestion: currentSuggestion, index: currentIndex })}
       >
         {currentSelectionIndex === currentIndex ? 'Already Applied' : 'Apply Alternative'}

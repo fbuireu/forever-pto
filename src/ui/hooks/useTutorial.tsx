@@ -38,7 +38,7 @@ export const useTutorial = () => {
         popover: {
           title: 'Country Selection',
           description:
-            'Select your country to automatically load national holidays. This ensures your PTO suggestions avoid already-free days and maximize your time off.',
+            'We infer your country from your CDN by default but can select any desired country. From this value we will fetch the official public holidays to include them in your calendar.',
           side: 'right',
           align: 'start',
         },

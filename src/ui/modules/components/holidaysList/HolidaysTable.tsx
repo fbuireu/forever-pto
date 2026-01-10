@@ -238,7 +238,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
       <AnimateIcon animateOnHover>
         <CollapsibleTrigger asChild className='cursor-pointer'>
           <div className='flex items-center justify-between cursor-pointer group hover:bg-muted/50 p-3 rounded-lg border transition-colors'>
-            <div className='flex items-center space-x-3'>
+            <div className='flex items-center space-x-3 w-full'>
               <div className='flex items-center space-x-2'>
                 {innerOpen ? (
                   <ChevronDown className='h-4 w-4 text-muted-foreground transition-transform' />
@@ -247,14 +247,9 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                 )}
                 <h3 className='text-lg font-semibold'>{title}</h3>
               </div>
-              <div className='flex items-center space-x-2'>
+              <div className='flex items-center space-x-2 ml-auto'>
                 <Badge variant='outline'>{variantHolidays.length} total</Badge>
               </div>
-            </div>
-            <div className='flex items-center space-x-2 text-sm text-muted-foreground'>
-              <span>{workdayCount} laborables</span>
-              <span>•</span>
-              <span>{weekendCount} fines de semana</span>
             </div>
           </div>
         </CollapsibleTrigger>

@@ -5,11 +5,11 @@ const DAYS_PER_WEEK = 7;
 const DAYS_PER_CALENDAR_GRID = 42;
 
 export const CalendarListSkeleton = () => (
-  <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5'>
+  <div className='contents'>
     {Array.from({ length: MONTHS_PER_YEAR }).map(() => (
       <div
         key={crypto.randomUUID()}
-        className='calendar-container p-3 w-fit select-none rounded-xl border bg-card shadow-sm'
+        className='calendar-container p-3 w-fit select-none rounded-lg border bg-card shadow-sm'
       >
         <div className='flex justify-center items-center mb-4'>
           <Skeleton className='h-5 w-28' />

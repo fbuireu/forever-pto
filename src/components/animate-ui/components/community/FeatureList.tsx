@@ -53,6 +53,7 @@ export function FeatureList({ features, categoryLabel }: FeatureListProps) {
       className='bg-card border rounded-xl p-4 w-full space-y-3 shadow-md'
       initial='collapsed'
       whileHover='expanded'
+      whileTap='expanded'
     >
       <div>
         {features.map((feature, i) => (

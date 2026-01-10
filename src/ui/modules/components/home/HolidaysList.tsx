@@ -18,7 +18,7 @@ export const HolidaysList = () => {
   };
 
   return (
-    <div className='rounded-lg w-full'>
+    <div className='rounded-lg w-full col-span-full'>
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className='grid w-full grid-cols-3'>
           <TabsTrigger value={HolidayVariant.NATIONAL}>National</TabsTrigger>

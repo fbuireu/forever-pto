@@ -59,7 +59,7 @@ export const ManagementBar = () => {
   const hasValidCurrentSelection = currentSelection?.days && currentSelection.days.length > 0;
 
   return areStoresReady && hasValidSuggestions && hasValidCurrentSelection ? (
-    <div className='flex flex-row justify-between gap-4 w-full sticky top-0 z-50'>
+    <div className='flex flex-row flex-wrap justify-between gap-4 w-full sticky top-0 z-50 col-span-full'>
       <AlternativesManager
         key={previewAlternativeIndex}
         currentSelectionIndex={currentSelectionIndex}
@@ -73,7 +73,7 @@ export const ManagementBar = () => {
       <PtoStatus currentSelection={currentSelection} />
     </div>
   ) : (
-    <div className='flex flex-row justify-between gap-4 w-full sticky top-0 z-50'>
+    <div className='flex flex-col min-[1300px]:flex-row justify-between gap-4 w-full sticky top-0 z-50 col-span-full'>
       <AlternativesManagerSkeleton />
       <PtoStatusSkeleton />
     </div>

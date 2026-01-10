@@ -4,15 +4,18 @@ import { GradientText } from 'src/components/animate-ui/primitives/texts/gradien
 import { SidebarMenuButton, useSidebar } from 'src/components/animate-ui/radix/sidebar';
 import { OceanSunset } from './OceanSunset';
 import { PalmTree } from './PalmTree';
+import { useIsMobile } from '@const/hooks/use-mobile';
 
 export function Logo() {
-  const { state } = useSidebar();
+    const { state } = useSidebar();
+      const isMobile = useIsMobile();
+    
   const isOpen = state === 'expanded';
 
   return (
     <SidebarMenuButton className={'justify-center h-fit'}>
       <div className='flex items-center'>
-        {isOpen && (
+        {(isOpen || isMobile) && (
           <div className='flex text-center justify-center gap-2'>
             <p className='text-3xl font-bold'>Forever</p>
             <p className='text-3xl font-bold -mr-3'>

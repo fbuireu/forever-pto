@@ -1,7 +1,7 @@
 import { Skeleton } from '@const/components/ui/skeleton';
 
 export const PtoStatusSkeleton = () => (
-  <div className='flex p-2 rounded-2xl border shadow-sm bg-background min-w-fit'>
+  <div className='p-2 rounded-2xl border shadow-sm bg-background'>
     <div className='flex items-center justify-between flex-wrap gap-4'>
       <div className='flex items-center gap-4'>
         <div className='flex items-center gap-1'>

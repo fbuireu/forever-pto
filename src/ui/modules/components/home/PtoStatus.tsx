@@ -1,8 +1,8 @@
 'use client';
 
 import { useFiltersStore } from '@application/stores/filters';
-import { useHolidaysStore } from '@application/stores/holidays';
 import type { HolidaysState } from '@application/stores/holidays';
+import { useHolidaysStore } from '@application/stores/holidays';
 import { cn } from '@const/lib/utils';
 import { MousePointerClick } from 'lucide-react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
@@ -29,24 +29,18 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
   const hasManualChanges = manualSelectedCount > 0 || removedSuggestedDays.length > 0;
 
   return (
-    <div className='p-2 rounded-2xl border shadow-sm  bg-background' data-tutorial='pto-status'>
+    <div className='p-2 rounded-2xl border shadow-sm bg-background' data-tutorial='pto-status'>
       <div className='flex items-center justify-between flex-wrap gap-4'>
         <div className='flex items-center gap-4'>
           <div className='flex items-center gap-1'>
             <div className='h-3 w-3 rounded-full bg-teal-500' />
             <span className='text-sm text-muted-foreground'>Auto-assigned:</span>
-            <SlidingNumber
-              number={activeSuggestedCount}
-              className='font-semibold text-teal-600 dark:text-teal-400'
-            />
+            <SlidingNumber number={activeSuggestedCount} className='font-semibold text-teal-600 dark:text-teal-400' />
           </div>
           <div className='flex items-center gap-1'>
             <div className='h-3 w-3 rounded-full bg-blue-500' />
             <span className='text-sm text-muted-foreground'>Manual:</span>
-            <SlidingNumber
-              number={manualSelectedCount}
-              className='font-semibold text-blue-600 dark:text-blue-400'
-            />
+            <SlidingNumber number={manualSelectedCount} className='font-semibold text-blue-600 dark:text-blue-400' />
           </div>
           <div className='h-6 w-px bg-border' />
           <div className='flex items-center flex-col relative'>
