@@ -1,15 +1,14 @@
 'use client';
 
+import { useIsMobile } from '@const/hooks/use-mobile';
 import { GradientText } from 'src/components/animate-ui/primitives/texts/gradient';
 import { SidebarMenuButton, useSidebar } from 'src/components/animate-ui/radix/sidebar';
 import { OceanSunset } from './OceanSunset';
 import { PalmTree } from './PalmTree';
-import { useIsMobile } from '@const/hooks/use-mobile';
 
 export function Logo() {
-    const { state } = useSidebar();
-      const isMobile = useIsMobile();
-    
+  const { state } = useSidebar();
+  const isMobile = useIsMobile();
   const isOpen = state === 'expanded';
 
   return (

@@ -38,17 +38,15 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: fix grafs and text in grafs
-// todo: replace useDetectSticky with css @container scroll-state() (at 8th Jan 2026 not LighntingCSS has the code merged, not released and not adopted by Next)
+// todo: legal pages and cookies (+cookie management) (what info do I need to provide?)
 // todo: add more faqs, check functionality, webhook, db etc
-// todo: legal pages and cookies (what info do I need to provide?)
-// todo: responsive
+// todo: check texts +  locale all
+// todo: ads?
+// todo: replace useDetectSticky with css @container scroll-state() (at 8th Jan 2026 not LighntingCSS has the code merged, not released and not adopted by Next)
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
 // todo: migrate to base-ui
-// todo: ads?
 // todo: toast vs error messages
 // todo: unify component and folder structure (payment/provider should be dto?)
-// todo: locale all
 // todo: setup stripe
 // todo: CI to work on releases
 // todo: track origin of premium key (feature)

@@ -3,9 +3,9 @@ import { useSyncExternalStore } from 'react';
 const MOBILE_BREAKPOINT = 768;
 
 const subscribe = (callback: () => void) => {
-  const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
-  mql.addEventListener('change', callback);
-  return () => mql.removeEventListener('change', callback);
+  const mediaQueryList = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+  mediaQueryList.addEventListener('change', callback);
+  return () => mediaQueryList.removeEventListener('change', callback);
 };
 
 const getSnapshot = () => {

@@ -175,7 +175,7 @@ export const Summary = () => {
           <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3'>
             <PremiumFeature feature={'Métricas Avanzadas'} iconSize='size-7'>
               <MetricCard
-                label='Fines largos'
+                label='Findes largos'
                 value={metrics.longWeekends}
                 icon={Calendar}
                 colorScheme='emerald'
