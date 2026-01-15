@@ -41,6 +41,7 @@ export default Home;
 // todo: legal pages and cookies (+cookie management) (what info do I need to provide?)
 // todo: add more faqs, check functionality, webhook, db etc
 // todo: check texts +  locale all
+// todo: https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices
 // todo: ads?
 // todo: replace useDetectSticky with css @container scroll-state() (at 8th Jan 2026 not LighntingCSS has the code merged, not released and not adopted by Next)
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
