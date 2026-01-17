@@ -20,6 +20,10 @@ declare global {
       NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: string;
     }
   }
+
+  interface Window {
+    gtag?: (command: string, action: string, params: Record<string, string>) => void;
+  }
 }
 
 declare module 'next-intl' {

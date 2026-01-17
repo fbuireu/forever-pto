@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@cons
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { Award, BarChart3, Calendar, CalendarDays, TrendingUp, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { useMemo } from 'react';
 import { RotatingText } from 'src/components/animate-ui/text/rotating';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
@@ -69,30 +70,56 @@ export const Summary = () => {
 
   const activeSuggestion = currentSelection ?? suggestion;
 
-  if (!activeSuggestion?.metrics) {
-    return null;
-  }
+  const holidayMetrics = useMemo(() => {
+    const regionalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL).length ?? 0;
+    const nationalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.NATIONAL).length ?? 0;
+    const customDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.CUSTOM).length ?? 0;
+    const totalHolidays = nationalDays + regionalDays + customDays;
+    return { regionalDays, nationalDays, customDays, totalHolidays };
+  }, [holidays]);
 
-  const { metrics } = activeSuggestion;
-  const effectiveDays = metrics.totalEffectiveDays;
-  const increment = effectiveDays - ptoDays;
-  const efficiencyPercentage = ptoDays > 0 ? (increment / ptoDays) * 100 : 0;
-  const regionalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL).length ?? 0;
-  const nationalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.NATIONAL).length ?? 0;
-  const customDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.CUSTOM).length ?? 0;
-  const totalHolidays = nationalDays + regionalDays + customDays;
-  const userCountry = countries.find(({ value }) => value.toLowerCase() === country.toLowerCase());
-  const userRegion = regions.find(({ value }) => value.toLowerCase() === region?.toLowerCase());
-  const maxAlternative = Math.max(
-    effectiveDays,
-    ...(alternatives?.map((a) => a?.metrics?.totalEffectiveDays).filter((n): n is number => typeof n === 'number') ??
-      [])
-  );
-  const canImprove = Math.max(0, maxAlternative - effectiveDays);
+  const locationInfo = useMemo(() => {
+    const userCountry = countries.find(({ value }) => value.toLowerCase() === country.toLowerCase());
+    const userRegion = regions.find(({ value }) => value.toLowerCase() === region?.toLowerCase());
+    return { userCountry, userRegion };
+  }, [countries, country, regions, region]);
+
+  const metricsData = useMemo(() => {
+    if (!activeSuggestion?.metrics) {
+      return null;
+    }
+
+    const { metrics } = activeSuggestion;
+    const effectiveDays = metrics.totalEffectiveDays;
+    const increment = effectiveDays - ptoDays;
+    const efficiencyPercentage = ptoDays > 0 ? (increment / ptoDays) * 100 : 0;
+
+    const maxAlternative = Math.max(
+      effectiveDays,
+      ...(alternatives?.map((a) => a?.metrics?.totalEffectiveDays).filter((n): n is number => typeof n === 'number') ??
+        [])
+    );
+    const canImprove = Math.max(0, maxAlternative - effectiveDays);
+
+    return {
+      metrics,
+      effectiveDays,
+      increment,
+      efficiencyPercentage,
+      maxAlternative,
+      canImprove,
+    };
+  }, [activeSuggestion, ptoDays, alternatives]);
 
   if (!areStoresReady) {
     return <SummarySkeleton />;
   }
+
+  if (!metricsData) {
+    return null;
+  }
+
+  const { metrics, effectiveDays, increment, efficiencyPercentage, canImprove } = metricsData;
 
   return (
     <div className='w-full max-w-4xl mx-auto space-y-6'>
@@ -102,12 +129,12 @@ export const Summary = () => {
             Resumen de PTO {year} - {Number(year) + 1}
             <div className='flex flex-wrap items-center gap-2 mt-2 mb-4 justify-center'>
               <Badge variant='outline' className='mx-1'>
-                <span className='mr-2'>{userCountry?.flag}</span>
-                <span>{userCountry?.label}</span>
+                <span className='mr-2'>{locationInfo.userCountry?.flag}</span>
+                <span>{locationInfo.userCountry?.label}</span>
               </Badge>
-              {region && userRegion && (
+              {region && locationInfo.userRegion && (
                 <Badge variant='secondary' className='mx-1'>
-                  <span>{userRegion.label}</span>
+                  <span>{locationInfo.userRegion.label}</span>
                 </Badge>
               )}
               <Badge variant='outline' className='bg-blue-50 dark:bg-blue-900/20'>
@@ -118,7 +145,7 @@ export const Summary = () => {
           <CardDescription className='text-muted-foreground space-y-2'>
             <div className='text-sm'>
               Con <span className='font-semibold text-primary'>{ptoDays}</span> días de PTO y{' '}
-              <span className='font-semibold text-green-700'>{totalHolidays}</span> festivos disponibles, obtienes{' '}
+              <span className='font-semibold text-green-700'>{holidayMetrics.totalHolidays}</span> festivos disponibles, obtienes{' '}
               <span className='font-semibold text-green-700 dark:text-green-300'>{effectiveDays}</span> días libres
               efectivos.
               {increment > 0 && (
@@ -151,9 +178,9 @@ export const Summary = () => {
             <MetricCard label='PTO Base' value={ptoDays} icon={CalendarDays} badge='días' colorScheme='blue' />
             <MetricCard
               label='Festivos'
-              value={totalHolidays}
+              value={holidayMetrics.totalHolidays}
               icon={CalendarDays}
-              badge={`${nationalDays}N + ${regionalDays}R${customDays > 0 ? ` + ${customDays}C` : ''}`}
+              badge={`${holidayMetrics.nationalDays}N + ${holidayMetrics.regionalDays}R${holidayMetrics.customDays > 0 ? ` + ${holidayMetrics.customDays}C` : ''}`}
               colorScheme='green'
             />
             <MetricCard
@@ -278,11 +305,11 @@ export const Summary = () => {
               </>
             </NotificationCard>
           )}
-          {customDays > 0 && (
+          {holidayMetrics.customDays > 0 && (
             <NotificationCard icon={CalendarDays} title='Días personalizados:' colorScheme='blue'>
               Has añadido{' '}
               <strong className='flex gap-1 mx-1'>
-                <SlidingNumber number={customDays} /> día${customDays !== 1 ? 's' : ''}
+                <SlidingNumber number={holidayMetrics.customDays} /> día${holidayMetrics.customDays !== 1 ? 's' : ''}
               </strong>{' '}
               que optimizan tu planificación.
             </NotificationCard>

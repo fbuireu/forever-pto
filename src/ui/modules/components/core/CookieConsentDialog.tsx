@@ -109,13 +109,16 @@ export const CookieConsentDialog = ({
             </Accordion>
           </div>
 
-          {/* Analytics Cookies */}
           <div className='rounded-lg border bg-card p-4 space-y-3'>
             <div className='flex items-start justify-between gap-4'>
               <div className='flex-1'>
                 <Label className='text-base font-semibold'>Analytics cookies</Label>
                 <p className='text-sm text-muted-foreground mt-1'>
                   Help us understand visitor behavior through anonymous data collection.
+                </p>
+                <p className='text-xs text-muted-foreground mt-2'>
+                  We use Google Consent Mode V2. Analytics cookies are only set if you accept. Your choice is applied
+                  immediately without page reload.
                 </p>
               </div>
               <Switch checked={analyticsEnabled} onChange={(checked) => onAnalyticsChange(checked as boolean)} />
@@ -171,6 +174,21 @@ export const CookieConsentDialog = ({
                 </AccordionPanel>
               </AccordionItem>
             </Accordion>
+          </div>
+
+          <div className='rounded-lg border bg-muted/30 p-4 space-y-3'>
+            <div className='flex items-start justify-between gap-4'>
+              <div className='flex-1'>
+                <Label className='text-base font-semibold'>Advertising cookies</Label>
+                <p className='text-sm text-muted-foreground mt-1'>
+                  Forever PTO does not use advertising cookies. These are always disabled.
+                </p>
+                <p className='text-xs text-muted-foreground mt-2'>
+                  Categories: ad_storage, ad_user_data, ad_personalization - Permanently denied.
+                </p>
+              </div>
+              <Switch checked={false} disabled />
+            </div>
           </div>
         </div>
 

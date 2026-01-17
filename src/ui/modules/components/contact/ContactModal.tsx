@@ -40,6 +40,9 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
+    defaultValues: {
+      email: userEmail ?? undefined,
+    },
     values: {
       email: userEmail ?? '',
       name: '',
@@ -113,7 +116,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type='email' placeholder='your@email.com' autoFocus={!userEmail} {...field} />
+                      <Input type='email' placeholder='your@email.com' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -38,7 +38,7 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: legal pages and cookies (+cookie management) (what info do I need to provide?)
+// todo: cookie management
 // todo: add more faqs, check functionality, webhook, db etc
 // todo: check texts +  locale all
 // todo: https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices
@@ -46,6 +46,7 @@ export default Home;
 // todo: replace useDetectSticky with css @container scroll-state() (at 8th Jan 2026 not LighntingCSS has the code merged, not released and not adopted by Next)
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
 // todo: migrate to base-ui
+// todo: performance web workers
 // todo: toast vs error messages
 // todo: unify component and folder structure (payment/provider should be dto?)
 // todo: setup stripe
