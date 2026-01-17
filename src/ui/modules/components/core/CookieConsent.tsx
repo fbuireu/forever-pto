@@ -9,35 +9,33 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@const/components/ui/dialog';
-import { useCookieConsent } from '@ui/hooks/useCookieConsent';
+import { useCookieConsent } from '@ui/context/CookieConsentContext';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useState } from 'react';
-import { getCookie } from 'vanilla-cookieconsent';
 import { updateDarkMode } from '../footer/components/utils/helpers';
 import { CookieConsentDialog } from './CookieConsentDialog';
 
 export const CookieConsent = () => {
   const { resolvedTheme } = useTheme();
-  const [showModal, setShowModal] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
-  const { analyticsEnabled, setAnalyticsEnabled, handleAcceptAll, handleRejectAll, handleSavePreferences } =
-    useCookieConsent();
+  const {
+    showConsentModal,
+    setShowConsentModal,
+    analyticsEnabled,
+    setAnalyticsEnabled,
+    handleAcceptAll,
+    handleRejectAll,
+    handleSavePreferences,
+  } = useCookieConsent();
 
   useEffect(() => {
     updateDarkMode(resolvedTheme);
   }, [resolvedTheme]);
 
-  useEffect(() => {
-    const cookie = getCookie();
-    if (!cookie) {
-      setShowModal(true);
-    }
-  }, []);
-
   const closeModals = useCallback(() => {
-    setShowModal(false);
+    setShowConsentModal(false);
     setShowPreferences(false);
-  }, []);
+  }, [setShowConsentModal]);
 
   const onAcceptAll = useCallback(() => {
     handleAcceptAll();
@@ -60,7 +58,7 @@ export const CookieConsent = () => {
 
   return (
     <>
-      <Dialog open={showModal && !showPreferences} onOpenChange={setShowModal}>
+      <Dialog open={showConsentModal && !showPreferences} onOpenChange={setShowConsentModal}>
         <DialogContent className='sm:max-w-md'>
           <DialogHeader>
             <DialogTitle>We use cookies</DialogTitle>

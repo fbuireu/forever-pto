@@ -1,4 +1,5 @@
 @import 'driver.js/dist/driver.css' layer(tutorial);
+@import './cookie-consent.css';
 
 @layer tutorial {
   :root {

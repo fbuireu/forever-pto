@@ -2,6 +2,7 @@ import { Toaster } from '@const/components/ui/sonner';
 import { cn } from '@const/lib/utils';
 import { routing } from '@infrastructure/i18n/routing';
 import '@styles/index.css';
+import { CookieConsentProvider } from '@ui/context/CookieConsentContext';
 import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { Analytics } from '@ui/modules/components/core/Analytics';
 import { CookieConsent } from '@ui/modules/components/core/CookieConsent';
@@ -69,10 +70,12 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
                 <Toaster />
                 <DonateClient />
                 <PremiumModal />
-                <CookieConsent />
               </AppSidebar>
             </SidebarProvider>
-            <Footer />
+            <CookieConsentProvider>
+              <CookieConsent />
+              <Footer />
+            </CookieConsentProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
         <Analytics />

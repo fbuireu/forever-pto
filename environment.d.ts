@@ -22,7 +22,7 @@ declare global {
   }
 
   interface Window {
-    gtag?: (command: string, action: string, params: Record<string, string>) => void;
+    gtag?: (command: 'config' | 'event' | 'consent' | 'js', ...args: unknown[]) => void;
   }
 }
 
