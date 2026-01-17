@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@const/components/ui/button';
-import { useCookieConsent } from '@ui/context/CookieConsentContext';
+import { useCookieConsent } from '@ui/hooks/useCookieConsent';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 
