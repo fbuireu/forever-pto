@@ -54,9 +54,9 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
       <body className={cn(geistSans.variable, geistMono.variable, 'antialiased')}>
         <NextIntlClientProvider>
           <ThemeProvider
-            attribute='data-theme'
-            defaultTheme='system'
-            storageKey='theme'
+            attribute="data-theme"
+            defaultTheme="system"
+            storageKey="theme"
             enableSystem
             disableTransitionOnChange
           >
@@ -69,10 +69,10 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
                 <Toaster />
                 <DonateClient />
                 <PremiumModal />
-                <CookieConsent />
               </AppSidebar>
             </SidebarProvider>
             <Footer />
+            <CookieConsent />
           </ThemeProvider>
         </NextIntlClientProvider>
         <Analytics />

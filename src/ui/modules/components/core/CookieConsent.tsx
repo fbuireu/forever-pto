@@ -1,97 +1,144 @@
 'use client';
 
-import { Button } from '@const/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@const/components/ui/dialog';
-import { useCookieConsent } from '@ui/hooks/useCookieConsent';
 import { useTheme } from 'next-themes';
-import { useCallback, useEffect, useState } from 'react';
-import { getCookie } from 'vanilla-cookieconsent';
-import { updateDarkMode } from '../footer/components/utils/helpers';
-import { CookieConsentDialog } from './CookieConsentDialog';
+import { useEffect, useRef } from 'react';
+import * as CookieConsentLib from 'vanilla-cookieconsent';
+import 'vanilla-cookieconsent/dist/cookieconsent.css';
+
+const GA_ID = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 
 export const CookieConsent = () => {
   const { resolvedTheme } = useTheme();
-  const [showModal, setShowModal] = useState(false);
-  const [showPreferences, setShowPreferences] = useState(false);
-  const { analyticsEnabled, setAnalyticsEnabled, handleAcceptAll, handleRejectAll, handleSavePreferences } =
-    useCookieConsent();
+  const initRef = useRef(false);
 
   useEffect(() => {
-    updateDarkMode(resolvedTheme);
+    if (initRef.current) return;
+    initRef.current = true;
+
+    CookieConsentLib.run({
+      guiOptions: {
+        consentModal: {
+          layout: 'box inline',
+          position: 'bottom left',
+        },
+        preferencesModal: {
+          layout: 'box',
+        },
+      },
+
+      categories: {
+        necessary: {
+          enabled: true,
+          readOnly: true,
+        },
+        analytics: {
+          autoClear: {
+            cookies: [
+              { name: /^_ga/ },
+              { name: '_gid' },
+            ],
+          },
+        },
+      },
+
+      onFirstConsent: () => {
+        if (CookieConsentLib.acceptedCategory('analytics')) {
+          gtag('consent', 'update', { analytics_storage: 'granted' });
+        }
+      },
+
+      onConsent: () => {
+        if (CookieConsentLib.acceptedCategory('analytics')) {
+          gtag('consent', 'update', { analytics_storage: 'granted' });
+        }
+      },
+
+      onChange: ({ changedCategories }) => {
+        if (changedCategories.includes('analytics')) {
+          const granted = CookieConsentLib.acceptedCategory('analytics');
+          gtag('consent', 'update', {
+            analytics_storage: granted ? 'granted' : 'denied',
+          });
+        }
+      },
+
+      language: {
+        default: 'en',
+        translations: {
+          en: {
+            consentModal: {
+              title: 'We use cookies',
+              description:
+                'We use essential cookies for basic website functionality and analytics cookies to understand how you interact with our site.',
+              acceptAllBtn: 'Accept all',
+              acceptNecessaryBtn: 'Reject all',
+              showPreferencesBtn: 'Manage preferences',
+            },
+            preferencesModal: {
+              title: 'Cookie preferences',
+              acceptAllBtn: 'Accept all',
+              acceptNecessaryBtn: 'Reject all',
+              savePreferencesBtn: 'Save preferences',
+              sections: [
+                {
+                  title: 'Cookie usage',
+                  description:
+                    'We use cookies to improve your browsing experience and analyze site traffic. Choose which cookies you want to accept.',
+                },
+                {
+                  title: 'Necessary cookies',
+                  description:
+                    'Essential for the website to function. These cookies are required for basic features like page navigation and cannot be disabled.',
+                  linkedCategory: 'necessary',
+                },
+                {
+                  title: 'Analytics cookies',
+                  description:
+                    'Help us understand visitor behavior through anonymous data collection. We use Google Analytics with Consent Mode V2.',
+                  linkedCategory: 'analytics',
+                  cookieTable: {
+                    headers: {
+                      name: 'Name',
+                      description: 'Description',
+                      duration: 'Duration',
+                    },
+                    body: [
+                      {
+                        name: '_ga',
+                        description: 'Distinguishes unique users',
+                        duration: '2 years',
+                      },
+                      {
+                        name: '_ga_*',
+                        description: 'Maintains session state',
+                        duration: '2 years',
+                      },
+                      {
+                        name: '_gid',
+                        description: 'Distinguishes users (short-term)',
+                        duration: '24 hours',
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    });
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('cc--darkmode', resolvedTheme === 'dark');
   }, [resolvedTheme]);
 
-  useEffect(() => {
-    const cookie = getCookie();
-    if (!cookie) {
-      setShowModal(true);
-    }
-  }, []);
-
-  const closeModals = useCallback(() => {
-    setShowModal(false);
-    setShowPreferences(false);
-  }, []);
-
-  const onAcceptAll = useCallback(() => {
-    handleAcceptAll();
-    closeModals();
-  }, [handleAcceptAll, closeModals]);
-
-  const onRejectAll = useCallback(() => {
-    handleRejectAll();
-    closeModals();
-  }, [handleRejectAll, closeModals]);
-
-  const onSave = useCallback(() => {
-    handleSavePreferences();
-    closeModals();
-  }, [handleSavePreferences, closeModals]);
-
-  const openPreferences = useCallback(() => {
-    setShowPreferences(true);
-  }, []);
-
-  return (
-    <>
-      <Dialog open={showModal && !showPreferences} onOpenChange={setShowModal}>
-        <DialogContent className='sm:max-w-md'>
-          <DialogHeader>
-            <DialogTitle>We use cookies</DialogTitle>
-            <DialogDescription>
-              We use essential cookies for basic website functionality and analytics cookies to understand how you
-              interact with our site. Analytics cookies will only be set with your consent.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className='flex-col sm:flex-row gap-2'>
-            <Button variant='outline' onClick={onRejectAll} className='w-full sm:w-auto'>
-              Reject all
-            </Button>
-            <Button variant='secondary' onClick={openPreferences} className='w-full sm:w-auto'>
-              Manage preferences
-            </Button>
-            <Button onClick={onAcceptAll} className='w-full sm:w-auto'>
-              Accept all
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <CookieConsentDialog
-        open={showPreferences}
-        onOpenChange={setShowPreferences}
-        analyticsEnabled={analyticsEnabled}
-        onAnalyticsChange={setAnalyticsEnabled}
-        onAcceptAll={onAcceptAll}
-        onRejectAll={onRejectAll}
-        onSave={onSave}
-      />
-    </>
-  );
+  return null;
 };
+
+function gtag(...args: unknown[]) {
+  if (typeof window !== 'undefined') {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(args);
+  }
+}
