@@ -1,97 +1,131 @@
 'use client';
 
-import { Button } from '@const/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@const/components/ui/dialog';
-import { useCookieConsent } from '@ui/hooks/useCookieConsent';
-import { useTheme } from 'next-themes';
-import { useCallback, useEffect, useState } from 'react';
-import { getCookie } from 'vanilla-cookieconsent';
-import { updateDarkMode } from '../footer/components/utils/helpers';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import * as CookieConsentLib from 'vanilla-cookieconsent';
+
 import { CookieConsentDialog } from './CookieConsentDialog';
 
 export const CookieConsent = () => {
-  const { resolvedTheme } = useTheme();
-  const [showModal, setShowModal] = useState(false);
+  const initialized = useRef(false);
+  const [showBanner, setShowBanner] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
-  const { analyticsEnabled, setAnalyticsEnabled, handleAcceptAll, handleRejectAll, handleSavePreferences } =
-    useCookieConsent();
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
 
-  useEffect(() => {
-    updateDarkMode(resolvedTheme);
-  }, [resolvedTheme]);
-
-  useEffect(() => {
-    const cookie = getCookie();
-    if (!cookie) {
-      setShowModal(true);
+  const updateGtagConsent = useCallback((granted: boolean) => {
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+      window.gtag('consent', 'update', { analytics_storage: granted ? 'granted' : 'denied' });
+      if (granted) {
+        window.gtag('event', 'page_view');
+      }
     }
   }, []);
 
-  const closeModals = useCallback(() => {
-    setShowModal(false);
-    setShowPreferences(false);
-  }, []);
+  const saveConsent = useCallback(
+    (analytics: boolean) => {
+      CookieConsentLib.acceptCategory(analytics ? 'analytics' : []);
+      updateGtagConsent(analytics);
+      setShowBanner(false);
+      setShowPreferences(false);
+    },
+    [updateGtagConsent]
+  );
 
-  const onAcceptAll = useCallback(() => {
-    handleAcceptAll();
-    closeModals();
-  }, [handleAcceptAll, closeModals]);
+  const handleAcceptAll = useCallback(() => {
+    setAnalyticsEnabled(true);
+    saveConsent(true);
+  }, [saveConsent]);
 
-  const onRejectAll = useCallback(() => {
-    handleRejectAll();
-    closeModals();
-  }, [handleRejectAll, closeModals]);
+  const handleRejectAll = useCallback(() => {
+    setAnalyticsEnabled(false);
+    saveConsent(false);
+  }, [saveConsent]);
 
-  const onSave = useCallback(() => {
-    handleSavePreferences();
-    closeModals();
-  }, [handleSavePreferences, closeModals]);
+  const handleSave = useCallback(() => {
+    saveConsent(analyticsEnabled);
+  }, [analyticsEnabled, saveConsent]);
 
-  const openPreferences = useCallback(() => {
-    setShowPreferences(true);
-  }, []);
+  useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+
+    CookieConsentLib.run({
+      autoShow: false,
+      categories: {
+        necessary: { enabled: true, readOnly: true },
+        analytics: {
+          autoClear: { cookies: [{ name: /^_ga/ }, { name: '_gid' }] },
+        },
+      },
+      onConsent: () => {
+        const granted = CookieConsentLib.acceptedCategory('analytics');
+        setAnalyticsEnabled(granted);
+        updateGtagConsent(granted);
+      },
+      onChange: ({ changedCategories }) => {
+        if (changedCategories.includes('analytics')) {
+          const granted = CookieConsentLib.acceptedCategory('analytics');
+          setAnalyticsEnabled(granted);
+          updateGtagConsent(granted);
+        }
+      },
+    });
+
+    const existingConsent = CookieConsentLib.getCookie();
+    if (!existingConsent || Object.keys(existingConsent).length === 0) {
+      setShowBanner(true);
+    } else {
+      setAnalyticsEnabled(CookieConsentLib.acceptedCategory('analytics'));
+    }
+
+    const handleShowPreferences = () => setShowPreferences(true);
+    window.addEventListener('cc:showPreferences', handleShowPreferences);
+    return () => window.removeEventListener('cc:showPreferences', handleShowPreferences);
+  }, [updateGtagConsent]);
+
+  if (showBanner) {
+    return (
+      <div className='fixed bottom-4 left-4 z-50 max-w-md rounded-lg border bg-popover p-6 shadow-lg'>
+        <h3 className='text-lg font-semibold'>We use cookies</h3>
+        <p className='mt-2 text-sm text-muted-foreground'>
+          We use essential cookies for basic website functionality and analytics cookies to understand how you interact
+          with our site.
+        </p>
+        <div className='mt-4 flex flex-wrap gap-2'>
+          <button
+            onClick={handleRejectAll}
+            className='rounded-md border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:opacity-90'
+          >
+            Reject all
+          </button>
+          <button
+            onClick={() => {
+              setShowBanner(false);
+              setShowPreferences(true);
+            }}
+            className='rounded-md border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:opacity-90'
+          >
+            Manage preferences
+          </button>
+          <button
+            onClick={handleAcceptAll}
+            className='rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90'
+          >
+            Accept all
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <Dialog open={showModal && !showPreferences} onOpenChange={setShowModal}>
-        <DialogContent className='sm:max-w-md'>
-          <DialogHeader>
-            <DialogTitle>We use cookies</DialogTitle>
-            <DialogDescription>
-              We use essential cookies for basic website functionality and analytics cookies to understand how you
-              interact with our site. Analytics cookies will only be set with your consent.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className='flex-col sm:flex-row gap-2'>
-            <Button variant='outline' onClick={onRejectAll} className='w-full sm:w-auto'>
-              Reject all
-            </Button>
-            <Button variant='secondary' onClick={openPreferences} className='w-full sm:w-auto'>
-              Manage preferences
-            </Button>
-            <Button onClick={onAcceptAll} className='w-full sm:w-auto'>
-              Accept all
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <CookieConsentDialog
-        open={showPreferences}
-        onOpenChange={setShowPreferences}
-        analyticsEnabled={analyticsEnabled}
-        onAnalyticsChange={setAnalyticsEnabled}
-        onAcceptAll={onAcceptAll}
-        onRejectAll={onRejectAll}
-        onSave={onSave}
-      />
-    </>
+    <CookieConsentDialog
+      open={showPreferences}
+      onOpenChange={setShowPreferences}
+      analyticsEnabled={analyticsEnabled}
+      onAnalyticsChange={setAnalyticsEnabled}
+      onAcceptAll={handleAcceptAll}
+      onRejectAll={handleRejectAll}
+      onSave={handleSave}
+    />
   );
 };
