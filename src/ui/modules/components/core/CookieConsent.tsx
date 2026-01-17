@@ -56,7 +56,10 @@ export const CookieConsent = () => {
           autoClear: { cookies: [{ name: /^_ga/ }, { name: '_gid' }] },
         },
       },
-      language: { default: 'en', translations: { en: {} } },
+      language: {
+        default: 'en',
+        translations: { en: { consentModal: {}, preferencesModal: { sections: [] } } },
+      },
       onConsent: () => {
         const granted = CookieConsentLib.acceptedCategory('analytics');
         setAnalyticsEnabled(granted);
