@@ -6,7 +6,7 @@ const CDN_TRACE = 'cdn-cgi/trace';
 
 export async function detectCountryFromCDN(): Promise<string> {
   try {
-    const { env } = getCloudflareContext();
+    const { env } = await getCloudflareContext({ async: true });
     const response = await fetch(`${env.NEXT_PUBLIC_SITE_URL}/${CDN_TRACE}`, {
       cache: 'force-cache',
     });
