@@ -28,23 +28,40 @@ export class TursoClient {
     });
   }
 
-  async execute<T = unknown>(sql: string, args?: InValue[]): Promise<QueryResult<T>> {
+  async query<T = unknown>(sql: string, args?: InValue[]): Promise<QueryResult<T[]>> {
     try {
       const connection = this.createConnection();
       const statement = connection.prepare(sql);
-      const result = await statement.run(args ?? []);
+      const rows = await statement.all(args ?? []);
 
       return {
         success: true,
-        data: result.rows as T,
+        data: rows as T[],
       };
     } catch (error) {
-      this.logger.logError('Turso execute query failed', error, {
+      this.logger.logError('Turso query failed', error, {
         sql: sql.slice(0, 100),
         hasArgs: !!args,
         argsLength: args?.length,
       });
-      return this.handleError<T>(error);
+      return this.handleError<T[]>(error);
+    }
+  }
+
+  async execute(sql: string, args?: InValue[]): Promise<QueryResult<void>> {
+    try {
+      const connection = this.createConnection();
+      const statement = connection.prepare(sql);
+      await statement.run(args ?? []);
+
+      return { success: true };
+    } catch (error) {
+      this.logger.logError('Turso execute failed', error, {
+        sql: sql.slice(0, 100),
+        hasArgs: !!args,
+        argsLength: args?.length,
+      });
+      return this.handleError<void>(error);
     }
   }
 

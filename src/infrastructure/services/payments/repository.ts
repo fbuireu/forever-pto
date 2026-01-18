@@ -132,19 +132,19 @@ export const getPaymentById = async (
   turso: TursoClient,
   paymentIntentId: string
 ): Promise<{ success: boolean; data?: PaymentData; error?: string }> => {
-  const result = await turso.execute(`SELECT * FROM payments WHERE id = ? LIMIT 1`, [paymentIntentId]);
+  const result = await turso.query(`SELECT * FROM payments WHERE id = ? LIMIT 1`, [paymentIntentId]);
 
   if (!result.success) {
     return { success: false, error: result.error };
   }
 
-  if (!result.data || (result.data as unknown[]).length === 0) {
+  if (!result.data || result.data.length === 0) {
     return { success: true, data: undefined };
   }
 
   return {
     success: true,
-    data: (result.data as unknown[])[0] as PaymentData,
+    data: result.data[0] as PaymentData,
   };
 };
 
@@ -152,7 +152,7 @@ export const getPaymentByEmail = async (
   turso: TursoClient,
   email: string
 ): Promise<{ success: boolean; data?: PaymentData; error?: string }> => {
-  const result = await turso.execute(
+  const result = await turso.query(
     `SELECT * FROM payments
      WHERE email = ?
      AND status = 'succeeded'
@@ -165,13 +165,13 @@ export const getPaymentByEmail = async (
     return { success: false, error: result.error };
   }
 
-  if (!result.data || (result.data as unknown[]).length === 0) {
+  if (!result.data || result.data.length === 0) {
     return { success: true, data: undefined };
   }
 
   return {
     success: true,
-    data: (result.data as unknown[])[0] as PaymentData,
+    data: result.data[0] as PaymentData,
   };
 };
 
