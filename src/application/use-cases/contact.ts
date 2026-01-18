@@ -6,6 +6,7 @@ import { getBetterStackInstance } from '@infrastructure/clients/logging/better-s
 import { getResendClientInstance } from '@infrastructure/clients/email/resend/client';
 import { saveContact } from '@infrastructure/services/contact/repository';
 import { ContactFormEmail } from '@infrastructure/services/email/templates/Contact';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { render } from '@react-email/render';
 import { z } from 'zod';
 
@@ -14,11 +15,12 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
   const logger = getBetterStackInstance();
 
   try {
+    const { env } = getCloudflareContext();
     const validated = contactSchema.parse(data);
 
     let emailHtml: string;
     try {
-      emailHtml = await render(ContactFormEmail(validated));
+      emailHtml = await render(ContactFormEmail({ ...validated, baseUrl: env.NEXT_PUBLIC_SITE_URL }));
     } catch (error) {
       logger.logError('Contact email render failed', error, {
         email: validated.email,
@@ -31,7 +33,7 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
 
     const emailResult = await resend.send({
       from: 'Forever PTO <contact@forever-pto.com>',
-      to: process.env.NEXT_PUBLIC_EMAIL_SELF,
+      to: env.NEXT_PUBLIC_EMAIL_SELF,
       subject: `[Forever PTO Contact] ${validated.subject}`,
       html: emailHtml,
       replyTo: validated.email,

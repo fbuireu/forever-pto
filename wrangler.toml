@@ -29,3 +29,7 @@ mode = "smart"
 [[r2_buckets]]
 binding = "NEXT_INC_CACHE_R2_BUCKET"
 bucket_name = "next-inc-cache"
+
+[vars]
+NEXT_PUBLIC_SITE_URL = "https://forever-pto.com"
+NEXT_PUBLIC_EMAIL_SELF = "fbuireu@gmail.com"

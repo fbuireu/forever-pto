@@ -20,11 +20,10 @@ interface ContactFormEmailProps {
   name: string;
   subject: string;
   message: string;
+  baseUrl: string;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
-
-export const ContactFormEmail = ({ email, name, subject, message }: ContactFormEmailProps) => {
+export const ContactFormEmail = ({ email, name, subject, message, baseUrl }: ContactFormEmailProps) => {
   const previewText = `New contact from ${name}: ${subject}`;
 
   return (

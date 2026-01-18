@@ -1,11 +1,13 @@
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 const LOCATION_IDENTIFIER = 'loc=';
 const CDN_TRACE = 'cdn-cgi/trace';
 
 export async function detectCountryFromCDN(): Promise<string> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/${CDN_TRACE}`, {
+    const { env } = getCloudflareContext();
+    const response = await fetch(`${env.NEXT_PUBLIC_SITE_URL}/${CDN_TRACE}`, {
       cache: 'force-cache',
     });
 

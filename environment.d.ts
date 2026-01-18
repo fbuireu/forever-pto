@@ -8,8 +8,6 @@ declare global {
       TURSO_AUTH_TOKEN: string;
       TURSO_DATABASE_URL: string;
       NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: string;
-      NEXT_PUBLIC_EMAIL_SELF: string;
-      NEXT_PUBLIC_SITE_URL: string;
       NEXT_PUBLIC_STORAGE_KEY: string;
       JWT_SECRET: string;
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: string;
@@ -19,6 +17,11 @@ declare global {
       NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: string;
       NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: string;
     }
+  }
+
+  interface CloudflareEnv {
+    NEXT_PUBLIC_SITE_URL: string;
+    NEXT_PUBLIC_EMAIL_SELF: string;
   }
 
   interface Window {

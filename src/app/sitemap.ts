@@ -1,8 +1,10 @@
 import { LOCALES } from '@infrastructure/i18n/config';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const { env } = getCloudflareContext();
+  const baseUrl = env.NEXT_PUBLIC_SITE_URL;
 
   return LOCALES.flatMap((locale) => [
     {

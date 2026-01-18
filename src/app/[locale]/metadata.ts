@@ -1,4 +1,5 @@
 import { LOCALES } from '@infrastructure/i18n/config';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
@@ -9,12 +10,13 @@ interface GenerateMetadataParams {
 
 export async function generateMetadata({ params }: GenerateMetadataParams): Promise<Metadata> {
   const { locale } = await params;
+  const { env } = getCloudflareContext();
   const t = await getTranslations({ locale, namespace: 'metadata' });
 
   return {
     title: t('title'),
     description: t('description'),
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL),
+    metadataBase: new URL(env.NEXT_PUBLIC_SITE_URL),
     keywords: t('keywords')
       .split(',')
       .map((keyword: string) => keyword.trim()),
