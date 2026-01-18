@@ -22,7 +22,7 @@ export const processWebhookEvent = async (event: Stripe.Event): Promise<void> =>
 
   switch (event.type) {
     case 'payment_intent.succeeded': {
-      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      const paymentIntent = event.data.object;
       logger.info('Processing payment_intent.succeeded', {
         paymentIntentId: paymentIntent.id,
         status: paymentIntent.status,

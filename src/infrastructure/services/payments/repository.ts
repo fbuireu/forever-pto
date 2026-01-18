@@ -8,12 +8,61 @@ export const savePayment = async (
   data: PaymentData
 ): Promise<{ success: boolean; error?: string }> => {
   const logger = getBetterStackInstance();
+
+  // Defensive validation
+  if (!data.id || typeof data.id !== 'string' || data.id.length === 0) {
+    logger.error('savePayment: Invalid id', {
+      id: data.id,
+      idType: typeof data.id,
+      idLength: data.id?.length,
+    });
+    return { success: false, error: 'Payment id is required and must be a non-empty string' };
+  }
+
   logger.info('savePayment called', {
     id: data.id,
-    hasId: !!data.id,
+    idType: typeof data.id,
+    idLength: data.id.length,
     email: data.email,
     amount: data.amount,
     status: data.status,
+  });
+
+  const args = [
+    data.id,
+    data.stripeCreatedAt.toISOString(),
+    data.customerId,
+    data.chargeId,
+    data.email,
+    data.amount,
+    data.currency,
+    data.status,
+    data.paymentMethodType,
+    data.description,
+    null,
+    data.promoCode,
+    data.userAgent,
+    data.ipAddress,
+    data.country,
+    data.customerName,
+    data.postalCode,
+    data.city,
+    data.state,
+    data.paymentBrand,
+    data.paymentLast4,
+    data.feeAmount,
+    data.netAmount,
+    data.refundedAt?.toISOString() ?? null,
+    data.refundReason,
+    data.disputedAt?.toISOString() ?? null,
+    data.disputeReason,
+    data.parentPaymentId,
+  ];
+
+  logger.info('savePayment args prepared', {
+    argsLength: args.length,
+    firstArg: args[0],
+    firstArgType: typeof args[0],
   });
 
   const result = await turso.execute(
@@ -28,36 +77,7 @@ export const savePayment = async (
       parent_payment_id,
       created_at, updated_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-    [
-      data.id,
-      data.stripeCreatedAt.toISOString(),
-      data.customerId,
-      data.chargeId,
-      data.email,
-      data.amount,
-      data.currency,
-      data.status,
-      data.paymentMethodType,
-      data.description,
-      null,
-      data.promoCode,
-      data.userAgent,
-      data.ipAddress,
-      data.country,
-      data.customerName,
-      data.postalCode,
-      data.city,
-      data.state,
-      data.paymentBrand,
-      data.paymentLast4,
-      data.feeAmount,
-      data.netAmount,
-      data.refundedAt?.toISOString() ?? null,
-      data.refundReason,
-      data.disputedAt?.toISOString() ?? null,
-      data.disputeReason,
-      data.parentPaymentId,
-    ]
+    args
   );
 
   if (!result.success) {
