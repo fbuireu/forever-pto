@@ -1,8 +1,13 @@
-import { log } from '@logtail/next';
+import { Logtail } from '@logtail/edge';
 
 export interface LogContext {
   [key: string]: unknown;
 }
+
+const sourceToken = process.env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN;
+const ingestingUrl = process.env.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL;
+
+const logtail = sourceToken && ingestingUrl ? new Logtail(sourceToken, { endpoint: ingestingUrl }) : null;
 
 export class BetterStackClient {
   private readonly baseContext: LogContext;
@@ -11,40 +16,35 @@ export class BetterStackClient {
     this.baseContext = {
       environment: process.env.NODE_ENV || 'development',
       service: 'forever-pto',
-      timestamp: new Date().toISOString(),
       ...baseContext,
     };
   }
 
-  private getLogger(context?: LogContext) {
-    const processedContext = this.processContext(context);
-    const fullContext = {
+  private getFullContext(context?: LogContext): LogContext {
+    return {
       ...this.baseContext,
-      ...processedContext,
-      timestamp: new Date().toISOString(),
+      ...context,
     };
-    return Object.keys(fullContext).length > 0 ? log.with(fullContext) : log;
-  }
-
-  private processContext(context?: LogContext): LogContext {
-    if (!context) return {};
-    return context;
   }
 
   debug(message: string, context?: LogContext): void {
-    this.getLogger(context).debug(message);
+    if (!logtail) return;
+    void logtail.debug(message, this.getFullContext(context));
   }
 
   info(message: string, context?: LogContext): void {
-    this.getLogger(context).info(message);
+    if (!logtail) return;
+    void logtail.info(message, this.getFullContext(context));
   }
 
   warn(message: string, context?: LogContext): void {
-    this.getLogger(context).warn(message);
+    if (!logtail) return;
+    void logtail.warn(message, this.getFullContext(context));
   }
 
   error(message: string, context?: LogContext): void {
-    this.getLogger(context).error(message);
+    if (!logtail) return;
+    void logtail.error(message, this.getFullContext(context));
   }
 
   logError(message: string, error: unknown, context?: LogContext): void {
@@ -60,7 +60,7 @@ export class BetterStackClient {
       },
     };
 
-    this.getLogger(errorContext).error(message);
+    this.error(message, errorContext);
   }
 
   logDuration(operation: string, durationMs: number, context?: LogContext): void {
@@ -86,6 +86,12 @@ export class BetterStackClient {
         status: 'error',
       });
       throw error;
+    }
+  }
+
+  async flush(): Promise<void> {
+    if (logtail) {
+      await logtail.flush();
     }
   }
 

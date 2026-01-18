@@ -2,12 +2,11 @@ import { Link } from '@application/i18n/navigtion';
 import { Button } from '@const/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
-import { log } from '@logtail/next';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { redirect } from 'next/navigation';
 import type Stripe from 'stripe';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 const stripe = getStripeServerInstance();
 const logger = getBetterStackInstance();
@@ -30,7 +29,7 @@ const getCurrencySymbol = (locale: string, currency: string): string => {
     });
     return formatter.formatToParts(0).find(({ type }) => type === 'currency')?.value ?? currency;
   } catch (error) {
-    log.warn('Failed to format currency symbol', {
+    logger.warn('Failed to format currency symbol', {
       locale,
       currency,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -77,7 +76,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
   ]);
 
   if (!paymentIntentId) {
-    log.warn('Payment success page accessed without payment_intent, redirecting to home');
+    logger.warn('Payment success page accessed without payment_intent, redirecting to home');
     redirect('/');
   }
 
@@ -94,7 +93,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
   }
 
   if (paymentIntent.status !== 'succeeded') {
-    log.warn('Payment intent not succeeded', {
+    logger.warn('Payment intent not succeeded', {
       paymentIntentId,
       status: paymentIntent.status,
       amount: paymentIntent.amount,
