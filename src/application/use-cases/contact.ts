@@ -31,7 +31,7 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
 
     const emailResult = await resend.send({
       from: 'Forever PTO <contact@forever-pto.com>',
-      to: 'your@email.com',
+      to: process.env.NEXT_PUBLIC_EMAIL_SELF,
       subject: `[Forever PTO Contact] ${validated.subject}`,
       html: emailHtml,
       replyTo: validated.email,

@@ -37,8 +37,8 @@ export const ContactFormEmail = ({ email, name, subject, message }: ContactFormE
       >
         <Body className='mx-auto my-auto bg-white px-2 font-sans'>
           <Preview>{previewText}</Preview>
-          <Container className='mx-auto my-[40px] max-w-[565px] rounded border border-[#eaeaea] border-solid p-[20px]'>
-            <Section className='mt-[32px]'>
+          <Container className='mx-auto my-10 max-w-141.25 rounded border border-[#eaeaea] border-solid p-5'>
+            <Section className='mt-8'>
               <Img
                 src={`${baseUrl}/static/forever-pto-logo.png`}
                 width='40'
@@ -48,35 +48,35 @@ export const ContactFormEmail = ({ email, name, subject, message }: ContactFormE
               />
             </Section>
 
-            <Heading className='mx-0 my-[30px] p-0 text-center font-normal text-[24px] text-black'>
+            <Heading className='mx-0 my-7.5 p-0 text-center font-normal text-[24px] text-black'>
               📧 New Contact Form Submission
             </Heading>
 
-            <Text className='text-[16px] text-black leading-[24px] font-semibold'>
+            <Text className='text-[16px] text-black leading-6 font-semibold'>
               Someone reached out through your Forever PTO contact form:
             </Text>
 
-            <Section className='bg-[#f0fdf4] rounded-[4px] p-[20px] my-[20px] border border-[#dcfce7] border-solid'>
-              <Text className='text-[14px] text-black leading-[20px] margin-0'>
+            <Section className='bg-[#f0fdf4] rounded-lg p-5 my-5 border border-[#dcfce7] border-solid'>
+              <Text className='text-[14px] text-black leading-5 margin-0'>
                 <strong>From:</strong> {name}
               </Text>
-              <Text className='text-[14px] text-black leading-[20px] margin-0'>
+              <Text className='text-[14px] text-black leading-5 margin-0'>
                 <strong>Email:</strong>
                 <Link href={`mailto:${email}`} className='text-[#059669] no-underline font-medium'>
                   {email}
                 </Link>
               </Text>
-              <Text className='text-[14px] text-black leading-[20px] margin-0'>
+              <Text className='text-[14px] text-black leading-5 margin-0'>
                 <strong>Subject:</strong> {subject}
               </Text>
             </Section>
 
-            <Text className='text-[14px] text-black leading-[20px] font-semibold'>Message:</Text>
-            <Section className='bg-[#f9f9f9] rounded-[4px] p-[16px] border-l-[4px] border-[#059669] border-solid'>
-              <Text className='text-[14px] text-black leading-[22px] margin-0 whitespace-pre-wrap'>{message}</Text>
+            <Text className='text-[14px] text-black leading-5 font-semibold'>Message:</Text>
+            <Section className='bg-[#f9f9f9] rounded-lg p-4 border-l-4 border-[#059669] border-solid'>
+              <Text className='text-[14px] text-black leading-5.5 margin-0 whitespace-pre-wrap'>{message}</Text>
             </Section>
 
-            <Section className='mt-[32px] mb-[32px] text-center'>
+            <Section className='mt-8 mb-8 text-center'>
               <Button
                 className='rounded bg-[#059669] px-6 py-3 text-center font-semibold text-[14px] text-white no-underline'
                 href={`mailto:${email}?subject=Re: ${subject}`}
@@ -85,9 +85,9 @@ export const ContactFormEmail = ({ email, name, subject, message }: ContactFormE
               </Button>
             </Section>
 
-            <Hr className='mx-0 my-[26px] w-full border border-[#eaeaea] border-solid' />
+            <Hr className='mx-0 my-6.5 w-full border border-[#eaeaea] border-solid' />
 
-            <Text className='text-[#666666] text-[12px] leading-[20px]'>
+            <Text className='text-[#666666] text-[12px] leading-5'>
               This message was sent through the contact form on{' '}
               <Link href='https://forever-pto.com' className='text-[#059669] no-underline'>
                 forever-pto.com
