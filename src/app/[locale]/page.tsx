@@ -39,7 +39,7 @@ const Home = async ({ params }: LayoutProps) => {
 export default Home;
 
 // todo: add more faqs, check functionality, webhook, db etc
-// todo: error text color on donate, payment apparently no webhook
+// todo: error text color on donate, payment apparently no webhook. Check overall styles in donate flow
 // todo: check texts +  locale all
 // todo: https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices
 // todo: ads?
@@ -52,5 +52,7 @@ export default Home;
 // todo: track origin of premium key (feature)
 // todo: add custom weekends
 
+// PROD
 // todo: cookie management (on PROD)
 // todo: stripe api keys (on PROD) + rest of config
+// todo: observability check (on PROD)
