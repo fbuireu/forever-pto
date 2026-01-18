@@ -30,26 +30,9 @@ export class TursoClient {
 
   async execute<T = unknown>(sql: string, args?: InValue[]): Promise<QueryResult<T>> {
     try {
-      const conn = this.createConnection();
-
-      const isInsertPayments = sql.includes('INSERT') && sql.includes('payments');
-      if (isInsertPayments) {
-        this.logger.info('Turso execute INSERT payments', {
-          sql,
-          args,
-          argsLength: args?.length,
-          firstThreeArgs: args?.slice(0, 3),
-        });
-      }
-
-      const stmt = conn.prepare(sql);
-      const result = await stmt.run(args ?? []);
-
-      if (isInsertPayments) {
-        this.logger.info('Turso INSERT payments success', {
-          rowsAffected: result.rowsAffected,
-        });
-      }
+      const connection = this.createConnection();
+      const statement = connection.prepare(sql);
+      const result = await statement.run(args ?? []);
 
       return {
         success: true,
@@ -57,10 +40,9 @@ export class TursoClient {
       };
     } catch (error) {
       this.logger.logError('Turso execute query failed', error, {
-        sql: sql.slice(0, 200),
+        sql: sql.slice(0, 100),
         hasArgs: !!args,
         argsLength: args?.length,
-        argsPreview: args?.slice(0, 3),
       });
       return this.handleError<T>(error);
     }
@@ -68,9 +50,9 @@ export class TursoClient {
 
   async batch<T = unknown>(statements: Array<{ sql: string; args?: InValue[] }>): Promise<QueryResult<T[]>> {
     try {
-      const conn = this.createConnection();
-      const sqlStrings = statements.map((s) => s.sql);
-      await conn.batch(sqlStrings);
+      const connection = this.createConnection();
+      const queries = statements.map((statement) => statement.sql);
+      await connection.batch(queries);
 
       return {
         success: true,

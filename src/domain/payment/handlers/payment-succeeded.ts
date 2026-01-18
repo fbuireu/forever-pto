@@ -119,7 +119,6 @@ export const handlePaymentSucceeded = async (
 
       await updateExistingPayment(event, params.paymentRepository);
     } else {
-      logger.warn('Payment not found in DB, creating from webhook', { paymentId: event.paymentId });
       await createPaymentFromWebhook(event, params.paymentRepository);
     }
 
