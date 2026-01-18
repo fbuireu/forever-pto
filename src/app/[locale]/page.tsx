@@ -55,4 +55,4 @@ export default Home;
 // PROD
 // todo: cookie management (on PROD)
 // todo: stripe api keys (on PROD) + rest of config
-// todo: observability check (on PROD)
+// todo: create new betterstack + new vars
