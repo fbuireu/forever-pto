@@ -83,7 +83,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-lg' onOpenAutoFocus={(e) => e.preventDefault()}>
+      <DialogContent className='sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Mail className='w-5 h-5 text-primary' />
@@ -146,7 +146,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                     <FormControl>
                       <Textarea
                         placeholder='Tell us what you need...'
-                        className='min-h-[120px] resize-none field-sizing-content'
+                        className='min-h-30 resize-none field-sizing-content'
                         {...field}
                       />
                     </FormControl>
@@ -166,7 +166,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
         {step === Step.SUCCESS && (
           <div className='text-center space-y-4 py-4'>
-            <CircleCheckBig animateOnView loop className='w-12 h-12 text-green-500 mx-auto' />
+            <CircleCheckBig animateOnView loop loopDelay={2000} className='w-12 h-12 text-green-500 mx-auto' />
             <div>
               <h3 className='font-semibold text-green-600'>Message Sent!</h3>
               <p className='text-sm text-muted-foreground mt-1'>We&apos;ll get back to you as soon as possible.</p>

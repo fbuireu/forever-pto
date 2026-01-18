@@ -41,6 +41,7 @@ export default Home;
 // todo: Redo FAQs
 // todo: Check overall styles in donate flow. Manage UI to avoid "processing" stuck?. CHeck send contact form (API Route?)
 // todo: check texts +  locale all
+// todo: style email
 // todo: https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices
 // todo: ads?
 // todo: replace useDetectSticky with css @container scroll-state() (at 8th Jan 2026 not LighntingCSS has the code merged, not released and not adopted by Next)
