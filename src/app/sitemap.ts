@@ -2,7 +2,7 @@ import { LOCALES } from '@infrastructure/i18n/config';
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://forever-pto.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
   return LOCALES.flatMap((locale) => [
     {

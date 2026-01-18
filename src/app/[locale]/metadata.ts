@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
   return {
     title: t('title'),
     description: t('description'),
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? ''),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL),
     keywords: t('keywords')
       .split(',')
       .map((keyword: string) => keyword.trim()),

@@ -157,7 +157,7 @@ export const Donate = () => {
       borderHover: isDark ? 'hsl(240 3.7% 20%)' : 'hsl(214.3 31.8% 85%)',
       accent: isDark ? 'hsl(240 3.7% 15.9%)' : 'hsl(240 4.8% 95.9%)',
       accentHover: isDark ? 'hsl(240 3.7% 18%)' : 'hsl(240 4.8% 95.9%)',
-      destructive: isDark ? 'hsl(0 62.8% 30.6%)' : 'hsl(0 84.2% 60.2%)',
+      destructive: isDark ? 'hsl(0 91% 71%)' : 'hsl(0 84.2% 60.2%)',
       mutedForeground: isDark ? 'hsl(215 20.2% 65.1%)' : 'hsl(215.4 16.3% 46.9%)',
     };
 

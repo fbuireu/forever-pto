@@ -8,10 +8,11 @@ export interface LogContext {
 const sourceToken = process.env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN;
 const ingestingUrl = process.env.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL;
 
-const logtail =
-  sourceToken && ingestingUrl
-    ? new Logtail(sourceToken, { endpoint: ingestingUrl, warnAboutMissingExecutionContext: false })
-    : null;
+if (!sourceToken || !ingestingUrl) {
+  throw new Error('NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN and NEXT_PUBLIC_BETTER_STACK_INGESTING_URL must be defined');
+}
+
+const logtail = new Logtail(sourceToken, { endpoint: ingestingUrl, warnAboutMissingExecutionContext: false });
 
 const getExecutionContext = () => {
   try {
@@ -41,22 +42,18 @@ export class BetterStackClient {
   }
 
   debug(message: string, context?: LogContext): void {
-    if (!logtail) return;
     void logtail.debug(message, this.getFullContext(context), getExecutionContext());
   }
 
   info(message: string, context?: LogContext): void {
-    if (!logtail) return;
     void logtail.info(message, this.getFullContext(context), getExecutionContext());
   }
 
   warn(message: string, context?: LogContext): void {
-    if (!logtail) return;
     void logtail.warn(message, this.getFullContext(context), getExecutionContext());
   }
 
   error(message: string, context?: LogContext): void {
-    if (!logtail) return;
     void logtail.error(message, this.getFullContext(context), getExecutionContext());
   }
 

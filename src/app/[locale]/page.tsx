@@ -39,7 +39,7 @@ const Home = async ({ params }: LayoutProps) => {
 export default Home;
 
 // todo: Redo FAQs
-// todo: error text color on donate, payment apparently no webhook. Check overall styles in donate flow. Manage UI to avoid "processing" stuck
+// todo: Check overall styles in donate flow. Manage UI to avoid "processing" stuck?. CHeck send contact form (API Route?)
 // todo: check texts +  locale all
 // todo: https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices
 // todo: ads?
@@ -55,5 +55,8 @@ export default Home;
 
 // PROD
 // todo: cookie management (on PROD)
-// todo: stripe api keys (on PROD) + rest of config
-// todo: create new betterstack + new vars
+// todo: stripe rest of config
+// todo: move prod env vars to cloudflare secrets
+// todo: add pages to bookmarks (betterstack etc)
+// todo: SEO site validation etc
+

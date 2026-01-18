@@ -22,7 +22,7 @@ interface ContactFormEmailProps {
   message: string;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ? `https://${process.env.NEXT_PUBLIC_SITE_URL}` : '';
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
 export const ContactFormEmail = ({ email, name, subject, message }: ContactFormEmailProps) => {
   const previewText = `New contact from ${name}: ${subject}`;
