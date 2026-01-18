@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     webhookLogger.error('Stripe webhook handling failed', {
       error: result.error,
     });
-    return NextResponse.json({ error: 'Webhook processing failed', details: result.error, requestId }, { status: 400 });
+    return NextResponse.json({ error: 'Webhook processing failed' }, { status: 400 });
   }
 
   webhookLogger.info('Stripe webhook processed successfully');
