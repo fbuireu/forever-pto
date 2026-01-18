@@ -59,8 +59,7 @@ export async function GET(request: NextRequest) {
         outcome: 'no_token',
         statusCode: 200,
       });
-      await requestLogger.flush();
-      return NextResponse.json({ premiumKey: null, email: null });
+            return NextResponse.json({ premiumKey: null, email: null });
     }
 
     requestLogger.info('GET /api/check-session - Token found, verifying session', {
@@ -83,8 +82,7 @@ export async function GET(request: NextRequest) {
         statusCode: 200,
       });
 
-      await requestLogger.flush();
-      const response = NextResponse.json({ premiumKey: null, email: null });
+            const response = NextResponse.json({ premiumKey: null, email: null });
       response.cookies.delete(PREMIUM_COOKIE);
       return response;
     }
@@ -99,8 +97,7 @@ export async function GET(request: NextRequest) {
       statusCode: 200,
     });
 
-    await requestLogger.flush();
-    return NextResponse.json({
+        return NextResponse.json({
       premiumKey: verification.data?.paymentIntentId ?? null,
       email: verification.data?.email ?? null,
     });
@@ -112,8 +109,7 @@ export async function GET(request: NextRequest) {
       statusCode: 500,
     });
 
-    await requestLogger.flush();
-    return NextResponse.json({ error: 'Internal error', premiumKey: null, email: null }, { status: 500 });
+        return NextResponse.json({ error: 'Internal error', premiumKey: null, email: null }, { status: 500 });
   }
 }
 
@@ -145,8 +141,7 @@ export async function POST(request: NextRequest) {
         bodyKeys: Object.keys(body),
         statusCode: 400,
       });
-      await requestLogger.flush();
-      return NextResponse.json({ error: 'Email required' }, { status: 400 });
+            return NextResponse.json({ error: 'Email required' }, { status: 400 });
     }
 
     const emailHash = await hashEmail(email);
@@ -230,8 +225,7 @@ export async function POST(request: NextRequest) {
         statusCode: 400,
       });
 
-      await userLogger.flush();
-      return NextResponse.json(
+            return NextResponse.json(
         {
           error: result.error,
           premiumKey: null,
@@ -251,8 +245,7 @@ export async function POST(request: NextRequest) {
       statusCode: 200,
     });
 
-    await userLogger.flush();
-    const response = NextResponse.json({
+        const response = NextResponse.json({
       success: true,
       premiumKey: result.premiumKey,
       email: result.email,
@@ -275,7 +268,6 @@ export async function POST(request: NextRequest) {
       statusCode: 500,
     });
 
-    await requestLogger.flush();
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+        return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

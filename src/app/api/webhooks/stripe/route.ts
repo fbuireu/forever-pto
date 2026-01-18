@@ -21,7 +21,6 @@ export async function POST(request: NextRequest) {
 
   if (!signature) {
     webhookLogger.error('Missing stripe signature');
-    await webhookLogger.flush();
     return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
   }
 
@@ -36,12 +35,10 @@ export async function POST(request: NextRequest) {
     webhookLogger.error('Stripe webhook handling failed', {
       error: result.error,
     });
-    await webhookLogger.flush();
-    return NextResponse.json({ error: result.error }, { status: 400 });
+    return NextResponse.json({ error: 'Webhook processing failed', details: result.error, requestId }, { status: 400 });
   }
 
   webhookLogger.info('Stripe webhook processed successfully');
-  await webhookLogger.flush();
 
   return NextResponse.json({ received: true });
 }
