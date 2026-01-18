@@ -1,71 +1,13 @@
 import type { PaymentData } from '@application/dto/payment/types';
 import type { PaymentRepository } from '@domain/payment/repository/types';
 import type { TursoClient } from '@infrastructure/clients/db/turso/client';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 export const savePayment = async (
   turso: TursoClient,
   data: PaymentData
 ): Promise<{ success: boolean; error?: string }> => {
-  const logger = getBetterStackInstance();
-
-  // Defensive validation
-  if (!data.id || typeof data.id !== 'string' || data.id.length === 0) {
-    logger.error('savePayment: Invalid id', {
-      id: data.id,
-      idType: typeof data.id,
-      idLength: data.id?.length,
-    });
-    return { success: false, error: 'Payment id is required and must be a non-empty string' };
-  }
-
-  logger.info('savePayment called', {
-    id: data.id,
-    idType: typeof data.id,
-    idLength: data.id.length,
-    email: data.email,
-    amount: data.amount,
-    status: data.status,
-  });
-
-  const args = [
-    data.id,
-    data.stripeCreatedAt.toISOString(),
-    data.customerId,
-    data.chargeId,
-    data.email,
-    data.amount,
-    data.currency,
-    data.status,
-    data.paymentMethodType,
-    data.description,
-    null,
-    data.promoCode,
-    data.userAgent,
-    data.ipAddress,
-    data.country,
-    data.customerName,
-    data.postalCode,
-    data.city,
-    data.state,
-    data.paymentBrand,
-    data.paymentLast4,
-    data.feeAmount,
-    data.netAmount,
-    data.refundedAt?.toISOString() ?? null,
-    data.refundReason,
-    data.disputedAt?.toISOString() ?? null,
-    data.disputeReason,
-    data.parentPaymentId,
-  ];
-
-  logger.info('savePayment args prepared', {
-    argsLength: args.length,
-    payload: args,
-  });
-
   const result = await turso.execute(
-    `INSERT INTO payments (
+    `INSERT OR IGNORE INTO payments (
       id, stripe_created_at, stripe_customer_id, stripe_charge_id,
       email, amount, currency, status, payment_method_type,
       description, receipt_url, promo_code, user_agent, ip_address, country,
@@ -75,8 +17,47 @@ export const savePayment = async (
       refunded_at, refund_reason, disputed_at, dispute_reason,
       parent_payment_id,
       created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-    args
+    ) VALUES (
+      :id, :stripe_created_at, :stripe_customer_id, :stripe_charge_id,
+      :email, :amount, :currency, :status, :payment_method_type,
+      :description, :receipt_url, :promo_code, :user_agent, :ip_address, :country,
+      :customer_name, :postal_code, :city, :state,
+      :payment_brand, :payment_last4,
+      :fee_amount, :net_amount,
+      :refunded_at, :refund_reason, :disputed_at, :dispute_reason,
+      :parent_payment_id,
+      datetime('now'), datetime('now')
+    )`,
+    {
+      ':id': data.id,
+      ':stripe_created_at': data.stripeCreatedAt.toISOString(),
+      ':stripe_customer_id': data.customerId,
+      ':stripe_charge_id': data.chargeId,
+      ':email': data.email,
+      ':amount': data.amount,
+      ':currency': data.currency,
+      ':status': data.status,
+      ':payment_method_type': data.paymentMethodType,
+      ':description': data.description,
+      ':receipt_url': null,
+      ':promo_code': data.promoCode,
+      ':user_agent': data.userAgent,
+      ':ip_address': data.ipAddress,
+      ':country': data.country,
+      ':customer_name': data.customerName,
+      ':postal_code': data.postalCode,
+      ':city': data.city,
+      ':state': data.state,
+      ':payment_brand': data.paymentBrand,
+      ':payment_last4': data.paymentLast4,
+      ':fee_amount': data.feeAmount,
+      ':net_amount': data.netAmount,
+      ':refunded_at': data.refundedAt?.toISOString() ?? null,
+      ':refund_reason': data.refundReason,
+      ':disputed_at': data.disputedAt?.toISOString() ?? null,
+      ':dispute_reason': data.disputeReason,
+      ':parent_payment_id': data.parentPaymentId,
+    }
   );
 
   if (!result.success) {

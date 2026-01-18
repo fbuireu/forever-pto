@@ -1,5 +1,5 @@
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { createClient, type Client, type InValue } from '@tursodatabase/serverless/compat';
+import { createClient, type Client, type InArgs, type InValue } from '@tursodatabase/serverless/compat';
 
 export interface QueryResult<T = unknown> {
   success: boolean;
@@ -27,10 +27,30 @@ export class TursoClient {
     });
   }
 
-  async execute<T = unknown>(sql: string, args?: InValue[]): Promise<QueryResult<T>> {
+  async execute<T = unknown>(sql: string, args?: InArgs): Promise<QueryResult<T>> {
     try {
       const client = this.createClient();
-      const result = await client.execute(sql, args);
+
+      const isInsertPayments = sql.includes('INSERT') && sql.includes('payments');
+      if (isInsertPayments) {
+        const argsObj = args as Record<string, unknown> | undefined;
+        this.logger.info('Turso execute INSERT payments', {
+          sqlPreview: sql.slice(0, 150),
+          argsType: Array.isArray(args) ? 'array' : typeof args,
+          id: argsObj?.[':id'],
+          idType: typeof argsObj?.[':id'],
+          email: argsObj?.[':email'],
+          argsKeys: argsObj ? Object.keys(argsObj).slice(0, 10) : null,
+        });
+      }
+
+      const result = await client.execute({ sql, args });
+
+      if (isInsertPayments) {
+        this.logger.info('Turso INSERT payments success', {
+          rowsAffected: result.rowsAffected,
+        });
+      }
 
       return {
         success: true,
@@ -38,9 +58,10 @@ export class TursoClient {
       };
     } catch (error) {
       this.logger.logError('Turso execute query failed', error, {
-        sql: sql.slice(0, 100),
+        sql: sql.slice(0, 200),
         hasArgs: !!args,
-        argsCount: args?.length,
+        argsType: Array.isArray(args) ? 'array' : typeof args,
+        argsPreview: Array.isArray(args) ? args.slice(0, 3) : args,
       });
       return this.handleError<T>(error);
     }

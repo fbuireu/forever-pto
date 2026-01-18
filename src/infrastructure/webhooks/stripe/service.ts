@@ -17,7 +17,7 @@ export const handleStripeWebhook = async (body: string, signature: string): Prom
     return { success: true };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Webhook processing failed';
-    logger.logError('Stripe webhook processing failed', JSON.stringify(error), {
+    logger.logError('Stripe webhook processing failed', error, {
       hasBody: !!body,
       bodyLength: body.length,
       hasSignature: !!signature,
