@@ -61,8 +61,7 @@ export const savePayment = async (
 
   logger.info('savePayment args prepared', {
     argsLength: args.length,
-    firstArg: args[0],
-    firstArgType: typeof args[0],
+    payload: args,
   });
 
   const result = await turso.execute(

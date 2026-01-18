@@ -1,5 +1,5 @@
-import { createClient, type Client, type InValue } from '@tursodatabase/serverless/compat';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { createClient, type Client, type InValue } from '@tursodatabase/serverless/compat';
 
 export interface QueryResult<T = unknown> {
   success: boolean;
@@ -30,19 +30,7 @@ export class TursoClient {
   async execute<T = unknown>(sql: string, args?: InValue[]): Promise<QueryResult<T>> {
     try {
       const client = this.createClient();
-
-      if (sql.includes('INSERT INTO payments')) {
-        this.logger.info('Turso INSERT payments debug', {
-          sql: sql.slice(0, 200),
-          argsCount: args?.length,
-          firstArg: args?.[0],
-          firstArgType: typeof args?.[0],
-          secondArg: args?.[1],
-          argsSnapshot: args?.slice(0, 5).map((a) => ({ value: a, type: typeof a })),
-        });
-      }
-
-      const result = await client.execute({ sql, args });
+      const result = await client.execute(sql, args);
 
       return {
         success: true,
@@ -50,11 +38,9 @@ export class TursoClient {
       };
     } catch (error) {
       this.logger.logError('Turso execute query failed', error, {
-        sql: sql.slice(0, 200),
+        sql: sql.slice(0, 100),
         hasArgs: !!args,
         argsCount: args?.length,
-        firstArg: args?.[0],
-        firstArgType: typeof args?.[0],
       });
       return this.handleError<T>(error);
     }
