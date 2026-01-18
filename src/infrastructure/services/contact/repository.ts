@@ -6,10 +6,20 @@ export const saveContact = async (
   turso: TursoClient,
   data: ContactData
 ): Promise<{ success: boolean; error?: string }> => {
+  const id = crypto.randomUUID();
+  const args = [
+    id,
+    data.email,
+    data.name,
+    data.subject,
+    data.message,
+    data.messageId ?? null,
+  ];
+
   const result = await turso.execute(
-    `INSERT INTO contacts (email, name, subject, message, message_id, created_date, updated_at)
-     VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-    [data.email, data.name, data.subject, data.message, data.messageId]
+    `INSERT INTO contacts (id, email, name, subject, message, message_id, created_date, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+    args
   );
 
   if (!result.success) {
