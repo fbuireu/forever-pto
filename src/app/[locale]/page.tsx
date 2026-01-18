@@ -38,8 +38,8 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: cookie management
 // todo: add more faqs, check functionality, webhook, db etc
+// todo: error text color on donate, payment apparently no webhook
 // todo: check texts +  locale all
 // todo: https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices
 // todo: ads?
@@ -47,9 +47,10 @@ export default Home;
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
 // todo: migrate to base-ui
 // todo: performance web workers
-// todo: toast vs error messages
 // todo: unify component and folder structure (payment/provider should be dto?)
-// todo: setup stripe
 // todo: CI to work on releases
 // todo: track origin of premium key (feature)
 // todo: add custom weekends
+
+// todo: cookie management (on PROD)
+// todo: stripe api keys (on PROD) + rest of config
