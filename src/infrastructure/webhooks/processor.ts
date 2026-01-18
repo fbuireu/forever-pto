@@ -13,17 +13,22 @@ import { createPaymentRepository } from '@infrastructure/services/payments/repos
 import type Stripe from 'stripe';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
+export const processWebhookEvent = async (event: Stripe.Event): Promise<void> => {
   const turso = getTursoClientInstance();
   const stripe = getStripeServerInstance();
   const logger = getBetterStackInstance();
-
-export const processWebhookEvent = async (event: Stripe.Event): Promise<void> => {
   const paymentRepository = createPaymentRepository(turso);
   const chargeService = createChargeService(stripe);
 
   switch (event.type) {
     case 'payment_intent.succeeded': {
-      const paymentEvent = createPaymentSucceededEvent(event.data.object);
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      logger.info('Processing payment_intent.succeeded', {
+        paymentIntentId: paymentIntent.id,
+        status: paymentIntent.status,
+        hasId: !!paymentIntent.id,
+      });
+      const paymentEvent = createPaymentSucceededEvent(paymentIntent);
       await handlePaymentSucceeded(paymentEvent, { paymentRepository, chargeService });
       break;
     }

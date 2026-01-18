@@ -1,11 +1,21 @@
 import type { PaymentData } from '@application/dto/payment/types';
 import type { PaymentRepository } from '@domain/payment/repository/types';
 import type { TursoClient } from '@infrastructure/clients/db/turso/client';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 export const savePayment = async (
   turso: TursoClient,
   data: PaymentData
 ): Promise<{ success: boolean; error?: string }> => {
+  const logger = getBetterStackInstance();
+  logger.info('savePayment called', {
+    id: data.id,
+    hasId: !!data.id,
+    email: data.email,
+    amount: data.amount,
+    status: data.status,
+  });
+
   const result = await turso.execute(
     `INSERT INTO payments (
       id, stripe_created_at, stripe_customer_id, stripe_charge_id,
