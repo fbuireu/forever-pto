@@ -6,6 +6,37 @@ export const savePayment = async (
   turso: TursoClient,
   data: PaymentData
 ): Promise<{ success: boolean; error?: string }> => {
+  const args = [
+    data.id,
+    data.stripeCreatedAt.toISOString(),
+    data.customerId ?? null,
+    data.chargeId ?? null,
+    data.email,
+    data.amount,
+    data.currency,
+    data.status,
+    data.paymentMethodType ?? null,
+    data.description ?? null,
+    null,
+    data.promoCode ?? null,
+    data.userAgent ?? null,
+    data.ipAddress ?? null,
+    data.country ?? null,
+    data.customerName ?? null,
+    data.postalCode ?? null,
+    data.city ?? null,
+    data.state ?? null,
+    data.paymentBrand ?? null,
+    data.paymentLast4 ?? null,
+    data.feeAmount ?? null,
+    data.netAmount ?? null,
+    data.refundedAt?.toISOString() ?? null,
+    data.refundReason ?? null,
+    data.disputedAt?.toISOString() ?? null,
+    data.disputeReason ?? null,
+    data.parentPaymentId ?? null,
+  ];
+
   const result = await turso.execute(
     `INSERT INTO payments (
       id, stripe_created_at, stripe_customer_id, stripe_charge_id,
@@ -17,47 +48,8 @@ export const savePayment = async (
       refunded_at, refund_reason, disputed_at, dispute_reason,
       parent_payment_id,
       created_at, updated_at
-    ) VALUES (
-      :id, :stripe_created_at, :stripe_customer_id, :stripe_charge_id,
-      :email, :amount, :currency, :status, :payment_method_type,
-      :description, :receipt_url, :promo_code, :user_agent, :ip_address, :country,
-      :customer_name, :postal_code, :city, :state,
-      :payment_brand, :payment_last4,
-      :fee_amount, :net_amount,
-      :refunded_at, :refund_reason, :disputed_at, :dispute_reason,
-      :parent_payment_id,
-      datetime('now'), datetime('now')
-    )`,
-    {
-      ':id': data.id,
-      ':stripe_created_at': data.stripeCreatedAt.toISOString(),
-      ':stripe_customer_id': data.customerId,
-      ':stripe_charge_id': data.chargeId,
-      ':email': data.email,
-      ':amount': data.amount,
-      ':currency': data.currency,
-      ':status': data.status,
-      ':payment_method_type': data.paymentMethodType,
-      ':description': data.description,
-      ':receipt_url': null,
-      ':promo_code': data.promoCode,
-      ':user_agent': data.userAgent,
-      ':ip_address': data.ipAddress,
-      ':country': data.country,
-      ':customer_name': data.customerName,
-      ':postal_code': data.postalCode,
-      ':city': data.city,
-      ':state': data.state,
-      ':payment_brand': data.paymentBrand,
-      ':payment_last4': data.paymentLast4,
-      ':fee_amount': data.feeAmount,
-      ':net_amount': data.netAmount,
-      ':refunded_at': data.refundedAt?.toISOString() ?? null,
-      ':refund_reason': data.refundReason,
-      ':disputed_at': data.disputedAt?.toISOString() ?? null,
-      ':dispute_reason': data.disputeReason,
-      ':parent_payment_id': data.parentPaymentId,
-    }
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+    args
   );
 
   if (!result.success) {

@@ -1,5 +1,6 @@
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { createClient, type Client, type InArgs, type InValue } from '@tursodatabase/serverless/compat';
+import { connect, type Connection } from '@tursodatabase/serverless';
+import { type InValue } from '@tursodatabase/serverless/compat';
 
 export interface QueryResult<T = unknown> {
   success: boolean;
@@ -20,31 +21,29 @@ export class TursoClient {
     this.config = config;
   }
 
-  private createClient(): Client {
-    return createClient({
+  private createConnection(): Connection {
+    return connect({
       url: this.config.url,
       authToken: this.config.authToken,
     });
   }
 
-  async execute<T = unknown>(sql: string, args?: InArgs): Promise<QueryResult<T>> {
+  async execute<T = unknown>(sql: string, args?: InValue[]): Promise<QueryResult<T>> {
     try {
-      const client = this.createClient();
+      const conn = this.createConnection();
 
       const isInsertPayments = sql.includes('INSERT') && sql.includes('payments');
       if (isInsertPayments) {
-        const argsObj = args as Record<string, unknown> | undefined;
         this.logger.info('Turso execute INSERT payments', {
-          sqlPreview: sql.slice(0, 150),
-          argsType: Array.isArray(args) ? 'array' : typeof args,
-          id: argsObj?.[':id'],
-          idType: typeof argsObj?.[':id'],
-          email: argsObj?.[':email'],
-          argsKeys: argsObj ? Object.keys(argsObj).slice(0, 10) : null,
+          sql,
+          args,
+          argsLength: args?.length,
+          firstThreeArgs: args?.slice(0, 3),
         });
       }
 
-      const result = await client.execute({ sql, args });
+      const stmt = conn.prepare(sql);
+      const result = await stmt.run(args ?? []);
 
       if (isInsertPayments) {
         this.logger.info('Turso INSERT payments success', {
@@ -60,8 +59,8 @@ export class TursoClient {
       this.logger.logError('Turso execute query failed', error, {
         sql: sql.slice(0, 200),
         hasArgs: !!args,
-        argsType: Array.isArray(args) ? 'array' : typeof args,
-        argsPreview: Array.isArray(args) ? args.slice(0, 3) : args,
+        argsLength: args?.length,
+        argsPreview: args?.slice(0, 3),
       });
       return this.handleError<T>(error);
     }
@@ -69,12 +68,13 @@ export class TursoClient {
 
   async batch<T = unknown>(statements: Array<{ sql: string; args?: InValue[] }>): Promise<QueryResult<T[]>> {
     try {
-      const client = this.createClient();
-      const results = await client.batch(statements);
+      const conn = this.createConnection();
+      const sqlStrings = statements.map((s) => s.sql);
+      await conn.batch(sqlStrings);
 
       return {
         success: true,
-        data: results.map((r) => r.rows) as T[],
+        data: [] as T[],
       };
     } catch (error) {
       this.logger.logError('Turso batch query failed', error, {
@@ -82,23 +82,6 @@ export class TursoClient {
         firstSql: statements[0]?.sql.slice(0, 100),
       });
       return this.handleError<T[]>(error);
-    }
-  }
-
-  async transaction<T = unknown>(callback: (tx: Client) => Promise<T>): Promise<QueryResult<T>> {
-    try {
-      const client = this.createClient();
-      const result = await callback(client);
-
-      return {
-        success: true,
-        data: result,
-      };
-    } catch (error) {
-      this.logger.logError('Turso transaction failed', error, {
-        callbackName: callback.name || 'anonymous',
-      });
-      return this.handleError<T>(error);
     }
   }
 

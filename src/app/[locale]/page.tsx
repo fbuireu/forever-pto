@@ -51,6 +51,7 @@ export default Home;
 // todo: CI to work on releases
 // todo: track origin of premium key (feature)
 // todo: add custom weekends
+// todo: transformer to make sql ready ':id': data.id',
 
 // PROD
 // todo: cookie management (on PROD)
