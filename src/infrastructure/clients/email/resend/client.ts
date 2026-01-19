@@ -30,7 +30,7 @@ export class ResendClient {
           errorMessage: error.message,
           errorName: error.name,
           from: params.from,
-          to: params.to,
+          toDomain: params.to?.split('@')[1],
           subject: params.subject,
           hasTags: !!params.tags,
         });
@@ -47,7 +47,7 @@ export class ResendClient {
     } catch (error) {
       this.logger.logError('Resend email send failed with exception', error, {
         from: params.from,
-        to: params.to,
+        toDomain: params.to?.split('@')[1],
         subject: params.subject,
         hasTags: !!params.tags,
       });

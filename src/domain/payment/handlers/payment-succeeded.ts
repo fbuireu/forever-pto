@@ -76,7 +76,7 @@ const updateChargeDetails = async (
     const chargeResult = await params.chargeService.retrieveCharge(chargeId);
 
     if (!chargeResult.success || !chargeResult.data) {
-      logger.error('Failed to retrieve charge details', { error: chargeResult.error, chargeId });
+      logger.error('Failed to retrieve charge details', { reason: chargeResult.error, chargeId, paymentId: event.paymentId });
       return;
     }
 
@@ -97,7 +97,7 @@ const updateChargeDetails = async (
     );
 
     if (!result.success) {
-      logger.error('Failed to update charge details', { error: result.error, paymentId: event.paymentId });
+      logger.error('Failed to update charge details', { reason: result.error, paymentId: event.paymentId, chargeId });
     }
   } catch (error) {
     logger.logError('Error fetching charge details', error, { chargeId, paymentId: event.paymentId });

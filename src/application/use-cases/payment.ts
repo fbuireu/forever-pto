@@ -87,9 +87,9 @@ export async function createPayment(
 
     if (!saveResult.success) {
       logger.warn('Failed to save payment to database, will use webhook fallback', {
-        error: saveResult.error,
+        reason: saveResult.error,
         paymentIntentId: paymentIntent.id,
-        email: validated.email,
+        emailDomain: validated.email?.split('@')[1],
       });
     }
 

@@ -39,7 +39,7 @@ export const handleChargeSucceeded = async (
     );
 
     if (!result.success) {
-      logger.error('Failed to update charge info', { error: result.error, chargeId: event.chargeId });
+      logger.error('Failed to update charge info', { reason: result.error, chargeId: event.chargeId, paymentIntentId: event.paymentIntentId });
     } else {
       logger.info('Charge info updated successfully', { chargeId: event.chargeId });
     }

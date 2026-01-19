@@ -82,8 +82,8 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
       const errorData = await sessionResponse.json();
       logger.error('Session activation failed after payment', {
         statusCode: sessionResponse.status,
-        error: errorData.error,
-        email,
+        reason: errorData.error,
+        emailDomain: email?.split('@')[1],
         paymentIntentId: paymentIntent.id,
       });
       return {
@@ -102,7 +102,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
     };
   } catch (error) {
     logger.logError('Payment confirmation error in checkout adapter', error, {
-      email,
+      emailDomain: email?.split('@')[1],
       returnUrl,
     });
     return {

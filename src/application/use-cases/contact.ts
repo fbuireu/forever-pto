@@ -23,7 +23,7 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
       emailHtml = await render(ContactFormEmail({ ...validated, baseUrl: env.NEXT_PUBLIC_SITE_URL }));
     } catch (error) {
       logger.logError('Contact email render failed', error, {
-        email: validated.email,
+        emailDomain: validated.email?.split('@')[1],
         name: validated.name,
         subject: validated.subject,
       });
@@ -61,8 +61,8 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
 
     if (!saveResult.success) {
       logger.error('Failed to save contact to database', {
-        error: saveResult.error,
-        email: validated.email,
+        reason: saveResult.error,
+        emailDomain: validated.email?.split('@')[1],
         messageId: emailResult.messageId,
       });
       const error = createContactError.saveFailed();

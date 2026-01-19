@@ -90,7 +90,7 @@ export const activateWithPayment = async (
         const updateResult = await params.paymentRepository.updateStatus(paymentIntentId, 'succeeded');
 
         if (!updateResult.success) {
-          logger.error('Failed to update payment status', { error: updateResult.error, paymentIntentId });
+          logger.error('Failed to update payment status', { reason: updateResult.error, paymentIntentId, emailDomain: email?.split('@')[1] });
         }
       }
     } else {
@@ -98,7 +98,7 @@ export const activateWithPayment = async (
       const saveResult = await params.paymentRepository.save(paymentData);
 
       if (!saveResult.success) {
-        logger.error('Failed to save payment to DB', { error: saveResult.error, paymentIntentId });
+        logger.error('Failed to save payment to DB', { reason: saveResult.error, paymentIntentId, emailDomain: email?.split('@')[1] });
       } else {
         logger.info('Payment created successfully', { paymentIntentId });
       }

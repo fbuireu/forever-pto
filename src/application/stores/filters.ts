@@ -74,13 +74,7 @@ export const useFiltersStore = create<FiltersStore>()(
               storeName: STORAGE_NAME,
               hasState: !!state,
             });
-            try {
-              localStorage.removeItem(STORAGE_NAME);
-            } catch (removeError) {
-              logger.logError('Failed to remove corrupted storage', removeError, {
-                storeName: STORAGE_NAME,
-              });
-            }
+            localStorage.removeItem(STORAGE_NAME);
           }
         },
       }
