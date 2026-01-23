@@ -1,6 +1,6 @@
 export interface SendEmailParams {
   from: string;
-  to: string | string[];
+  to: string;
   subject: string;
   html: string;
   replyTo?: string;
