@@ -73,7 +73,7 @@ export const ManagementBar = () => {
       <PtoStatus currentSelection={currentSelection} />
     </div>
   ) : (
-    <div className='flex flex-col min-[1300px]:flex-row justify-between gap-4 w-full sticky top-0 z-50 col-span-full'>
+    <div className='flex flex-row flex-wrap  justify-between gap-4 w-full sticky top-0 z-50 col-span-full'>
       <AlternativesManagerSkeleton />
       <PtoStatusSkeleton />
     </div>

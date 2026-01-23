@@ -152,7 +152,7 @@ export const AlternativesManager = ({
         </AnimateIcon>
       </div>
 
-      <div className='mx-3 h-6 w-px bg-border rounded-full' />
+      <div className='hidden lg:block mx-3 h-6 w-px bg-border rounded-full' />
 
       <motion.div layout layoutRoot className='flex flex-nowrap space-x-2'>
         <motion.button

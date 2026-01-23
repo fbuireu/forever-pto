@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@const/components/ui/button';
 import { Input } from '@const/components/ui/input';
 import { Separator } from '@const/components/ui/separator';
 import { Skeleton } from '@const/components/ui/skeleton';
@@ -14,7 +15,6 @@ import { MotionHighlight, MotionHighlightItem } from '../effects/motion-highligh
 import { PanelLeftIcon } from '../icons/panel-left';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
-import { Button } from '@const/components/ui/button';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -277,7 +277,7 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
       }}
       {...props}
     >
-      <PanelLeftIcon />
+      <PanelLeftIcon className='size-full' />
       <span className='sr-only'>Toggle Sidebar</span>
     </Button>
   );

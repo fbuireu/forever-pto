@@ -40,4 +40,5 @@
   --radius-xl: calc(var(--radius) + 4px);
   --container-8xl: calc(var(--container-7xl) + 16rem);
   --max-width-8xl: var(--container-8xl);
+  --breakpoint-8xl: 1800px;
 }

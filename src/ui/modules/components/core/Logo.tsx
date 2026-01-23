@@ -1,11 +1,11 @@
 'use client';
 
+import { Link } from '@application/i18n/navigtion';
 import { useIsMobile } from '@const/hooks/use-mobile';
 import { GradientText } from 'src/components/animate-ui/primitives/texts/gradient';
 import { SidebarMenuButton, useSidebar } from 'src/components/animate-ui/radix/sidebar';
 import { OceanSunset } from './OceanSunset';
 import { PalmTree } from './PalmTree';
-import { Link } from '@application/i18n/navigtion';
 
 export function Logo() {
   const { state } = useSidebar();
@@ -13,7 +13,7 @@ export function Logo() {
   const isOpen = state === 'expanded';
 
   return (
-    <SidebarMenuButton className={'justify-center h-fit'}>
+    <SidebarMenuButton className={'justify-center h-fit w-fit mx-auto'}>
       <Link href='/'>
         <div className='flex items-center'>
           {(isOpen || isMobile) && (

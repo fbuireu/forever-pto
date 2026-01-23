@@ -4,7 +4,7 @@ import { Button } from '@const/components/ui/button';
 
 export const CookieButton = () => {
   const handleClick = () => {
-    window.dispatchEvent(new CustomEvent('cc:showPreferences'));
+    globalThis.dispatchEvent(new CustomEvent('cc:showPreferences'));
   };
 
   return (
