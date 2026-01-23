@@ -5,7 +5,7 @@ import type { NextRequest, NextResponse } from 'next/server';
 
 const i18nProxy = createMiddleware(routing);
 
-export async function proxy(request: NextRequest): Promise<NextResponse> {
+export async function middleware(request: NextRequest): Promise<NextResponse> {
   const i18nResponse = i18nProxy(request);
 
   return await locationProxy({ request, response: i18nResponse });
