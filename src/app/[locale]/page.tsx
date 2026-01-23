@@ -38,10 +38,8 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: check responsive (modals)
-// todo: mgirate and bump (proxy)
 // todo: Redo FAQs
-// todo: Check overall styles in donate flow. Manage UI to avoid "processing" stuck?. CHeck send contact form (API Route?)
+// todo: Check overall styles in donate flow. Manage UI to avoid "processing" stuck?. CHeck send contact form (API Route?/Server action)
 // todo: check texts +  locale all
 // todo: style email
 // todo: improve theme variables and breakpoints
