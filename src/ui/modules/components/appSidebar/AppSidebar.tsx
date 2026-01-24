@@ -51,7 +51,7 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Filters</SidebarGroupLabel>
+          <SidebarGroupLabel>Configuration</SidebarGroupLabel>
           <SidebarMenu>
             <AnimateIcon animateOnHover>
               <Collapsible
@@ -63,7 +63,7 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
                   <CollapsibleTrigger asChild className='cursor-pointer'>
                     <SidebarMenuButton variant='outline' tooltip='Filters'>
                       <Settings className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
-                      <span className='data-[collapsed=true]:hidden'>Filters & Configuration</span>
+                      <span className='data-[collapsed=true]:hidden'>Filters</span>
                       <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>

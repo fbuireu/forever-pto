@@ -54,6 +54,7 @@ export default Home;
 // todo: add custom weekends
 // todo: slider calendar on mobile
 // todo: transformer to make sql data ready ':id': data.id',
+// todo: check session repsitory (missing services? )
 
 // PROD
 // todo: cookie management (on PROD)

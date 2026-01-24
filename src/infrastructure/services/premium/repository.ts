@@ -1,5 +1,5 @@
 import type { PremiumSessionData, SessionVerificationResult } from '@application/dto/premium/types';
-import type { SessionRepository } from '@domain/payment/repository/session';
+import { SessionRepository } from '@domain/session/repository/types';
 import { SignJWT, jwtVerify } from 'jose';
 
 interface SessionRepositoryConfig {

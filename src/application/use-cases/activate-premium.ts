@@ -1,11 +1,11 @@
 import type { PaymentData } from '@application/dto/payment/types';
 import type { PremiumActivationResult } from '@application/dto/premium/types';
-import type { SessionRepository } from '@domain/payment/repository/session';
 import type { PaymentRepository } from '@domain/payment/repository/types';
 import type { PaymentValidator } from '@domain/payment/services/validators';
 import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
 import type Stripe from 'stripe';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { SessionRepository } from '@domain/session/repository/types';
 
 const logger = getBetterStackInstance();
 

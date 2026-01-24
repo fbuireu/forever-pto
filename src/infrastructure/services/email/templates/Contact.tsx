@@ -34,64 +34,87 @@ export const ContactFormEmail = ({ email, name, subject, message, baseUrl }: Con
           presets: [pixelBasedPreset],
         }}
       >
-        <Body className='mx-auto my-auto bg-white px-2 font-sans'>
+        <Body className='mx-auto my-auto bg-gradient-to-br from-gray-50 to-gray-100 px-2 font-sans'>
           <Preview>{previewText}</Preview>
-          <Container className='mx-auto my-10 max-w-141.25 rounded border border-[#eaeaea] border-solid p-5'>
-            <Section className='mt-8'>
+          <Container className='mx-auto my-10 max-w-141.25 rounded-xl border border-gray-200 border-solid bg-white p-8 shadow-lg'>
+            <Section className='mt-2 mb-6'>
               <Img
                 src={`${baseUrl}/static/forever-pto-logo.png`}
-                width='40'
-                height='37'
+                width='48'
+                height='44'
                 alt='Forever PTO Logo'
                 className='mx-auto my-0'
               />
             </Section>
-
-            <Heading className='mx-0 my-7.5 p-0 text-center font-normal text-[24px] text-black'>
-              📧 New Contact Form Submission
+            <Heading className='mx-0 my-0 mb-2 p-0 text-center font-bold text-[28px] text-gray-900 tracking-tight'>
+              New Contact Message
             </Heading>
-
-            <Text className='text-[16px] text-black leading-6 font-semibold'>
-              Someone reached out through your Forever PTO contact form:
+            <Text className='text-center text-[14px] text-gray-500 mt-0 mb-8'>
+              📧 Someone reached out through your Forever PTO website
             </Text>
-
-            <Section className='bg-[#f0fdf4] rounded-lg p-5 my-5 border border-[#dcfce7] border-solid'>
-              <Text className='text-[14px] text-black leading-5 margin-0'>
-                <strong>From:</strong> {name}
-              </Text>
-              <Text className='text-[14px] text-black leading-5 margin-0'>
-                <strong>Email:</strong>
-                <Link href={`mailto:${email}`} className='text-[#059669] no-underline font-medium'>
-                  {email}
-                </Link>
-              </Text>
-              <Text className='text-[14px] text-black leading-5 margin-0'>
-                <strong>Subject:</strong> {subject}
-              </Text>
+            <Section className='bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-6 my-6 border border-emerald-200 border-solid shadow-sm'>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <tr>
+                  <td style={{ padding: '8px 0' }}>
+                    <Text className='text-[14px] text-gray-600 leading-5 margin-0'>
+                      <strong className='text-gray-900'>From:</strong>
+                    </Text>
+                  </td>
+                  <td style={{ padding: '8px 0' }}>
+                    <Text className='text-[14px] text-gray-900 leading-5 margin-0 font-medium'>{name}</Text>
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '8px 0' }}>
+                    <Text className='text-[14px] text-gray-600 leading-5 margin-0'>
+                      <strong className='text-gray-900'>Email:</strong>
+                    </Text>
+                  </td>
+                  <td style={{ padding: '8px 0' }}>
+                    <Link
+                      href={`mailto:${email}`}
+                      className='text-[14px] text-emerald-600 no-underline font-medium hover:text-emerald-700'
+                    >
+                      {email}
+                    </Link>
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '8px 0' }}>
+                    <Text className='text-[14px] text-gray-600 leading-5 margin-0'>
+                      <strong className='text-gray-900'>Subject:</strong>
+                    </Text>
+                  </td>
+                  <td style={{ padding: '8px 0' }}>
+                    <Text className='text-[14px] text-gray-900 leading-5 margin-0 font-medium'>{subject}</Text>
+                  </td>
+                </tr>
+              </table>
             </Section>
-
-            <Text className='text-[14px] text-black leading-5 font-semibold'>Message:</Text>
-            <Section className='bg-[#f9f9f9] rounded-lg p-4 border-l-4 border-[#059669] border-solid'>
-              <Text className='text-[14px] text-black leading-5.5 margin-0 whitespace-pre-wrap'>{message}</Text>
+            <Section className='my-6'>
+              <Text className='text-[14px] text-gray-700 leading-5 font-semibold mb-3 mt-0'>Message:</Text>
+              <Section className='bg-gray-50 rounded-xl p-5 border-l-4 border-emerald-500 border-solid shadow-sm'>
+                <Text className='text-[15px] text-gray-800 leading-6 margin-0 whitespace-pre-wrap font-normal'>
+                  {message}
+                </Text>
+              </Section>
             </Section>
-
             <Section className='mt-8 mb-8 text-center'>
               <Button
-                className='rounded bg-[#059669] px-6 py-3 text-center font-semibold text-[14px] text-white no-underline'
+                className='rounded-lg bg-emerald-600 px-8 py-3.5 text-center font-semibold text-[15px] text-white no-underline shadow-md hover:bg-emerald-700 transition-colors'
                 href={`mailto:${email}?subject=Re: ${subject}`}
               >
-                Reply to {name}
+                ↩️ Reply to {name}
               </Button>
             </Section>
-
-            <Hr className='mx-0 my-6.5 w-full border border-[#eaeaea] border-solid' />
-
-            <Text className='text-[#666666] text-[12px] leading-5'>
+            <Hr className='mx-0 my-8 w-full border border-gray-200 border-solid' />
+            <Text className='text-gray-500 text-[12px] leading-5.5 text-center'>
               This message was sent through the contact form on{' '}
-              <Link href='https://forever-pto.com' className='text-[#059669] no-underline'>
+              <Link href='https://forever-pto.com' className='text-emerald-600 no-underline font-medium'>
                 forever-pto.com
               </Link>
-              . If this looks like spam, you can safely ignore this email.
+              <br />
+              <span className='text-gray-400'>If this looks like spam, you can safely ignore this email.</span>
             </Text>
           </Container>
         </Body>

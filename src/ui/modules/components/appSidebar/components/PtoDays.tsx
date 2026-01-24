@@ -8,6 +8,7 @@ import { useDebounce } from '@ui/hooks/useDebounce';
 import { CalendarDays, Clock } from 'lucide-react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Counter } from 'src/components/animate-ui/components/counter';
+import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 
 const MIN_VALUE = 1;
@@ -70,23 +71,22 @@ export const PtoDays = () => {
         <div className='space-y-2 w-full'>
           <div className='flex items-center justify-between text-sm'>
             <span className='text-muted-foreground'>Auto-assigned:</span>
-            <span className='font-semibold text-teal-600 dark:text-teal-400'>{activeSuggestedCount}</span>
+            <SlidingNumber number={activeSuggestedCount} className='font-semibold text-teal-600 dark:text-teal-400' />
           </div>
           <div className='flex items-center justify-between text-sm'>
             <span className='text-muted-foreground'>Manually selected:</span>
-            <span className='font-semibold text-blue-600 dark:text-blue-400'>{manualSelectedCount}</span>
+            <SlidingNumber number={manualSelectedCount} className='font-semibold text-blue-600 dark:text-blue-400' />
           </div>
           <div className='h-px bg-border my-2' />
           <div className='flex items-center justify-between text-sm'>
             <span className='font-medium'>Remaining:</span>
-            <span
+            <SlidingNumber
+              number={remaining}
               className={cn(
                 'font-bold text-lg',
                 remaining > 0 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
               )}
-            >
-              {remaining}
-            </span>
+            />
           </div>
           {hasManualChanges && (
             <Button

@@ -7,6 +7,7 @@ import { usePremiumStore } from '@application/stores/premium';
 import { Badge } from '@const/components/ui/badge';
 import { Input } from '@const/components/ui/input';
 import { Table, TableBody, TableCell, TableRow } from '@const/components/ui/table';
+import { cn } from '@const/lib/utils';
 import { useDebounce } from '@ui/hooks/useDebounce';
 import { ConditionalWrapper } from '@ui/modules/components/core/ConditionalWrapper';
 import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/components/premium/PremiumFeature';
@@ -42,6 +43,72 @@ const EditHolidayModal = dynamic(() =>
 const DeleteHolidayModal = dynamic(() =>
   import('./components/DeleteHolidayModal').then((module) => ({ default: module.DeleteHolidayModal }))
 );
+
+const HolidayCard = ({
+  holiday,
+  index,
+  isSelected,
+  locale,
+  onToggle,
+  premiumKey,
+}: {
+  holiday: HolidayDTO;
+  index: number;
+  isSelected: boolean;
+  locale: string;
+  onToggle: (holiday: HolidayDTO, index: number) => void;
+  premiumKey: string | null;
+}) => {
+  const dateFormatted = new Intl.DateTimeFormat(locale, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(holiday.date);
+
+  return (
+    <div
+      className={cn('border rounded-lg p-4 space-y-3 transition-colors', isSelected && 'bg-muted/50 border-primary')}
+    >
+      <div className='flex items-start justify-between gap-2'>
+        <div className='flex items-start gap-3 flex-1 min-w-0'>
+          <ConditionalWrapper
+            doWrap={!premiumKey}
+            wrapper={(children) => (
+              <PremiumFeature feature='Select Holiday' variant={PremiumFeatureVariant.STACK} iconSize='size-4'>
+                {children}
+              </PremiumFeature>
+            )}
+          >
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={() => onToggle(holiday, index)}
+              className='mt-1 flex-shrink-0'
+            />
+          </ConditionalWrapper>
+          <div className='flex-1 min-w-0'>
+            <h4 className='font-medium text-sm leading-tight break-words'>{holiday.name}</h4>
+            <p className='text-xs text-muted-foreground mt-1'>{dateFormatted}</p>
+          </div>
+        </div>
+        {holiday.type && (
+          <Badge variant='secondary' className='flex-shrink-0 text-xs self-center'>
+            {holiday.type}
+          </Badge>
+        )}
+      </div>
+
+      <div className='flex flex-wrap items-center gap-2 text-xs text-muted-foreground'>
+        {holiday.location && <span className='flex items-center gap-1'>📍 {holiday.location}</span>}
+        {isWeekend(holiday.date) && (
+          <Badge variant='outline' className='text-xs'>
+            Fin de semana
+          </Badge>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   const premiumKey = usePremiumStore((state) => state.premiumKey);
@@ -245,18 +312,20 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                 ) : (
                   <ChevronRight className='h-4 w-4 text-muted-foreground transition-transform' />
                 )}
-                <h3 className='text-lg font-semibold'>{title}</h3>
+                <h3 className='text-base sm:text-lg font-semibold truncate'>{title}</h3>
               </div>
-              <div className='flex items-center space-x-2 ml-auto'>
-                <Badge variant='outline'>{variantHolidays.length} total</Badge>
+              <div className='flex items-center space-x-2 ml-auto flex-shrink-0'>
+                <Badge variant='outline' className='text-xs sm:text-sm'>
+                  {variantHolidays.length} total
+                </Badge>
               </div>
             </div>
           </div>
         </CollapsibleTrigger>
       </AnimateIcon>
       {innerOpen && (
-        <div className='flex items-center justify-between mt-4'>
-          <div className='flex items-center space-x-2'>
+        <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-4'>
+          <div className='flex flex-wrap items-center gap-2 w-full sm:w-auto'>
             {variant === HolidayVariant.CUSTOM && (
               <AnimateIcon animateOnHover>
                 <Button
@@ -265,100 +334,151 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                   className='bg-green-600 hover:bg-green-700 text-white'
                 >
                   <Plus className='h-4 w-4 mr-1' />
-                  Añadir Festivo
+                  <span className='hidden xs:inline'>Añadir Festivo</span>
+                  <span className='xs:hidden'>Añadir</span>
                 </Button>
               </AnimateIcon>
             )}
             {selectedCount === 1 && (
-              <Button variant='outline' size='sm' onClick={() => setShowEditModal(true)} className='py-4'>
-                <Edit className='h-4 w-4 mr-1' />
-                Editar festivo
-              </Button>
+              <AnimateIcon animateOnHover>
+                <Button variant='outline' size='sm' onClick={() => setShowEditModal(true)} className='py-4'>
+                  <Edit className='h-4 w-4 mr-1' />
+                  <span className='hidden xs:inline'>Editar festivo</span>
+                  <span className='xs:hidden'>Editar</span>
+                </Button>
+              </AnimateIcon>
             )}
             {selectedCount > 0 && (
               <div className='flex items-center space-x-2'>
                 <AnimateIcon animateOnHover>
                   <Button variant='destructive' size='sm' onClick={() => setShowDeleteModal(true)}>
                     <Trash2 className='h-4 w-4 mr-1' />
-                    Eliminar {selectedCount} festivos
+                    <span className='hidden xs:inline'>Eliminar {selectedCount} festivos</span>
+                    <span className='xs:hidden'>Eliminar ({selectedCount})</span>
                   </Button>
                 </AnimateIcon>
               </div>
             )}
           </div>
-          <div className='relative'>
+          <div className='relative w-full sm:w-64'>
             <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
             <Input
               placeholder='Buscar festividad...'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className='pl-8 w-64'
+              className='pl-8 w-full'
             />
           </div>
         </div>
       )}
       <CollapsibleContent className='space-y-4 overflow-hidden'>
         {innerOpen && (
-          <div className='rounded-md border max-h-96 overflow-hidden'>
-            <div className='max-h-96 overflow-y-auto'>
-              <Table className='w-full'>
-                <colgroup>
-                  <col className='w-[50px]' />
-                  <col className='w-[300px]' />
-                  <col className='w-[120px]' />
-                  <col className='w-[100px]' />
-                  <col className='w-[80px]' />
-                  <col className='w-[100px]' />
-                  {shouldShowLocationColumn && <col className='w-[150px]' />}
-                </colgroup>
-                <HolidayTableHeader
-                  selectAllButton={SelectAllButton}
-                  shouldShowLocationColumn={shouldShowLocationColumn}
-                  variant={variant}
-                  sortConfig={sortConfig}
-                  onSort={handleSort}
-                />
-                <TableBody>
-                  {filteredHolidays.length > 0 ? (
-                    filteredHolidays.map((holiday, index) => {
-                      const holidayId = getHolidayId(holiday, index);
-                      const isSelected = selectedHolidays.has(holidayId);
+          <>
+            <div className='hidden lg:block rounded-md border max-h-96 overflow-hidden'>
+              <div className='max-h-96 overflow-y-auto'>
+                <Table className='w-full'>
+                  <colgroup>
+                    <col className='w-[50px]' />
+                    <col className='w-[300px]' />
+                    <col className='w-[120px]' />
+                    <col className='w-[100px]' />
+                    <col className='w-[80px]' />
+                    <col className='w-[100px]' />
+                    {shouldShowLocationColumn && <col className='w-[150px]' />}
+                  </colgroup>
+                  <HolidayTableHeader
+                    selectAllButton={SelectAllButton}
+                    shouldShowLocationColumn={shouldShowLocationColumn}
+                    variant={variant}
+                    sortConfig={sortConfig}
+                    onSort={handleSort}
+                  />
+                  <TableBody>
+                    {filteredHolidays.length > 0 ? (
+                      filteredHolidays.map((holiday, index) => {
+                        const holidayId = getHolidayId(holiday, index);
+                        const isSelected = selectedHolidays.has(holidayId);
 
-                      return (
-                        <HolidayRow
-                          key={holidayId}
-                          holiday={holiday}
-                          index={index}
-                          isSelected={isSelected}
-                          locale={locale}
-                          onToggle={toggleSelectHoliday}
-                        />
-                      );
-                    })
-                  ) : (
-                    <AnimateIcon animateOnView loop loopDelay={1500} asChild>
-                      <TableRow>
-                        <TableCell colSpan={shouldShowLocationColumn ? 7 : 6} className='h-24 text-center'>
-                          <div className='flex flex-col items-center space-y-2 text-muted-foreground'>
-                            <Search className='h-8 w-8' />
-                            {debouncedSearchTerm ? 'No se encontraron festividades' : 'No hay festividades'}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    </AnimateIcon>
-                  )}
-                </TableBody>
-              </Table>
+                        return (
+                          <HolidayRow
+                            key={holidayId}
+                            holiday={holiday}
+                            index={index}
+                            isSelected={isSelected}
+                            locale={locale}
+                            onToggle={toggleSelectHoliday}
+                          />
+                        );
+                      })
+                    ) : (
+                      <AnimateIcon animateOnView loop loopDelay={1500} asChild>
+                        <TableRow>
+                          <TableCell colSpan={shouldShowLocationColumn ? 7 : 6} className='h-24 text-center'>
+                            <div className='flex flex-col items-center space-y-2 text-muted-foreground'>
+                              <Search className='h-8 w-8' />
+                              {debouncedSearchTerm ? 'No se encontraron festividades' : 'No hay festividades'}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      </AnimateIcon>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
-          </div>
+
+            <div className='lg:hidden space-y-3'>
+              <div className='flex items-center justify-between px-2 py-1 bg-muted/30 rounded-md'>
+                <div className='flex items-center gap-2'>
+                  {SelectAllButton}
+                  <span className='text-xs text-muted-foreground'>
+                    {selectionState.type === 'all'
+                      ? 'Todos seleccionados'
+                      : selectionState.type === 'some'
+                        ? `${selectionState.count} seleccionados`
+                        : 'Seleccionar todos'}
+                  </span>
+                </div>
+              </div>
+
+              <div className='space-y-2 max-h-96 overflow-y-auto px-1'>
+                {filteredHolidays.length > 0 ? (
+                  filteredHolidays.map((holiday, index) => {
+                    const holidayId = getHolidayId(holiday, index);
+                    const isSelected = selectedHolidays.has(holidayId);
+
+                    return (
+                      <HolidayCard
+                        key={holidayId}
+                        holiday={holiday}
+                        index={index}
+                        isSelected={isSelected}
+                        locale={locale}
+                        onToggle={toggleSelectHoliday}
+                        premiumKey={premiumKey}
+                      />
+                    );
+                  })
+                ) : (
+                  <div className='flex flex-col items-center justify-center py-12 text-muted-foreground'>
+                    <Search className='h-8 w-8 mb-2' />
+                    <p className='text-sm'>
+                      {debouncedSearchTerm ? 'No se encontraron festividades' : 'No hay festividades'}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
         )}
-        <div className='flex items-center justify-between text-sm text-muted-foreground'>
-          <div className='flex items-center space-x-4'>
-            <span>En fin de semana: {weekendCount}</span>
-            <span>En laborables: {workdayCount}</span>
+
+        <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs sm:text-sm text-muted-foreground px-1'>
+          <div className='flex flex-wrap items-center gap-2 sm:gap-4'>
+            <span className='whitespace-nowrap'>En fin de semana: {weekendCount}</span>
+            <span className='whitespace-nowrap'>En laborables: {workdayCount}</span>
           </div>
           <div className='flex items-center space-x-2'>
-            <span>
+            <span className='whitespace-nowrap'>
               Mostrando {filteredHolidays.length} de {variantHolidays.length}
             </span>
           </div>
