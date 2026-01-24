@@ -15,9 +15,6 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   transpilePackages: ['prettier'],
-  experimental: {
-    turbopackFileSystemCacheForDev: true,
-  },
 };
 
 export default withBetterStack(withNextIntl(nextConfig));

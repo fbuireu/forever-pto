@@ -351,7 +351,7 @@ export function Calendar({
   }, []);
 
   return (
-    <div className={cn('calendar-container p-3 w-fit select-none', className)} {...props}>
+    <div className={cn('calendar-container p-3 w-fit select-none bg-background z-1', className)} {...props}>
       <div className='flex justify-center items-center mb-4'>
         {showNavigation ? (
           <>

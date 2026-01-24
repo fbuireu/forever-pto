@@ -11,6 +11,9 @@ import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { Award, BarChart3, Calendar, CalendarDays, TrendingUp, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useMemo } from 'react';
+import { Clock } from 'src/components/animate-ui/icons/clock';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
+import { Star } from 'src/components/animate-ui/icons/star';
 import { RotatingText } from 'src/components/animate-ui/text/rotating';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
@@ -18,9 +21,6 @@ import { PremiumFeature } from '../premium/PremiumFeature';
 import { SummarySkeleton } from '../skeletons/SummarySkeleton';
 import { MetricCard, MetricCardSize } from '../summary/MetricCard';
 import { NotificationCard } from '../summary/NotificationCard';
-import { Star } from 'src/components/animate-ui/icons/star';
-import { Clock } from 'src/components/animate-ui/icons/clock';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 const HolidaysDistributionChart = dynamic(() =>
   import('../summary/HolidaysDistributionChart').then((module) => ({ default: module.HolidaysDistributionChart }))
@@ -122,7 +122,7 @@ export const Summary = () => {
   const { metrics, effectiveDays, increment, efficiencyPercentage, canImprove } = metricsData;
 
   return (
-    <div className='w-full max-w-4xl mx-auto space-y-6'>
+    <div className='w-full max-w-4xl mx-auto space-y-6 z-1'>
       <Card>
         <CardHeader className='pb-2'>
           <CardTitle className='text-3xl font-bold text-center'>
@@ -145,9 +145,9 @@ export const Summary = () => {
           <CardDescription className='text-muted-foreground space-y-2'>
             <div className='text-sm'>
               Con <span className='font-semibold text-primary'>{ptoDays}</span> días de PTO y{' '}
-              <span className='font-semibold text-green-700'>{holidayMetrics.totalHolidays}</span> festivos disponibles, obtienes{' '}
-              <span className='font-semibold text-green-700 dark:text-green-300'>{effectiveDays}</span> días libres
-              efectivos.
+              <span className='font-semibold text-green-700'>{holidayMetrics.totalHolidays}</span> festivos disponibles,
+              obtienes <span className='font-semibold text-green-700 dark:text-green-300'>{effectiveDays}</span> días
+              libres efectivos.
               {increment > 0 && (
                 <>
                   {' '}

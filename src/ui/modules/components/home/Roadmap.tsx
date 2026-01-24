@@ -173,11 +173,11 @@ export function Roadmap() {
             </div>
           )}
         </div>
-        <div className='flex-1 space-y-4'>
+        <div className='flex-1 space-y-4 z-1'>
           <FeatureList features={features} categoryLabel={selectedNavItem?.label ?? 'Features'} />
         </div>
       </div>
-      <Card className='border-dashed '>
+      <Card className='border-dashed z-1'>
         <CardHeader>
           <CardTitle>Have a suggestion?</CardTitle>
           <CardDescription>We&apos;d love to hear your ideas! Send us feedback or feature requests.</CardDescription>

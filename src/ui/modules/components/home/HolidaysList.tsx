@@ -2,7 +2,6 @@
 
 import { HolidayVariant } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { cn } from '@const/lib/utils';
 import { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger } from 'src/components/animate-ui/components/tabs';
 import { HolidaysTable } from '../holidaysList/HolidaysTable';
@@ -13,26 +12,29 @@ export const HolidaysList = () => {
   const [activeTab, setActiveTab] = useState<HolidayVariant>(HolidayVariant.NATIONAL);
   const regionalHolidays = holidays.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL);
 
-  const handleTabChange = (value: HolidayVariant) => {
-    setActiveTab(value);
+  const handleTabChange = (value: string) => {
+    const variant = value as HolidayVariant;
+
+    if (variant === HolidayVariant.REGIONAL && regionalHolidays.length === 0) {
+      return;
+    }
+
+    setActiveTab(variant);
   };
 
   return (
-    <div className='rounded-lg w-full col-span-full'>
+    <div className='rounded-lg w-full col-span-full z-1 bg-background'>
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className='grid w-full grid-cols-3'>
           <TabsTrigger value={HolidayVariant.NATIONAL}>National</TabsTrigger>
-          <TabsTrigger
-            value={HolidayVariant.REGIONAL}
-            className={cn(!regionalHolidays.length && 'opacity-50 pointer-events-none cursor-not-allowed')}
-          >
-            Regional
-          </TabsTrigger>
-          <PremiumFeature
-            feature='Custom Holidays'
-            description='Allows to add custom holidays. This is useful when the provided data is inaccurate or when you want to add your specific details into account'
-            className='p-0'
-          >
+          {regionalHolidays.length > 0 ? (
+            <TabsTrigger value={HolidayVariant.REGIONAL}>Regional</TabsTrigger>
+          ) : (
+            <div className='inline-flex cursor-not-allowed items-center size-full justify-center whitespace-nowrap rounded-sm px-2 py-1 text-sm font-medium opacity-50'>
+              Regional
+            </div>
+          )}
+          <PremiumFeature feature='Custom Holidays' description='Allows to add custom holidays...' className='p-0'>
             <TabsTrigger value={HolidayVariant.CUSTOM}>Custom</TabsTrigger>
           </PremiumFeature>
         </TabsList>
