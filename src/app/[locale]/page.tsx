@@ -39,6 +39,7 @@ const Home = async ({ params }: LayoutProps) => {
 export default Home;
 
 // todo: Redo FAQs
+// todo: check efficiency calc (is considering manual days?)
 // todo: check all texts +  locale all
 // todo: template issues + link them through contact modal + roadmap
 // todo: check white mode (no hovers?)
