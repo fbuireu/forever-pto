@@ -1,14 +1,20 @@
 'use client';
 
+import { Button } from '@const/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { cn } from '@const/lib/utils';
 import { Circle, Sparkles } from 'lucide-react';
 import type { SVGMotionProps } from 'motion/react';
+import dynamic from 'next/dynamic';
 import { type ComponentType, useState } from 'react';
 import { FeatureList } from 'src/components/animate-ui/components/community/FeatureList';
 import { RadialNav, type RadialNavProps } from 'src/components/animate-ui/components/community/radial-nav';
 import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
 import { Clock } from 'src/components/animate-ui/icons/clock';
+
+const ContactModal = dynamic(() =>
+  import('../contact/ContactModal').then((module) => ({ default: module.ContactModal }))
+);
 
 interface RoadmapFeature {
   id: string;
@@ -60,6 +66,7 @@ const ROADMAP_CATEGORIES = [
     className: 'text-purple-500',
   },
 ];
+
 const ROADMAP_FEATURES: Record<CategoryStatus, RoadmapFeature[]> = {
   [CategoryStatus.COMPLETED]: [
     {
@@ -147,6 +154,8 @@ const ROADMAP_FEATURES: Record<CategoryStatus, RoadmapFeature[]> = {
 
 export function Roadmap() {
   const [selectedCategory, setSelectedCategory] = useState<number>(1);
+  const [contactModalOpen, setContactModalOpen] = useState(false);
+
   const selectedNavItem = ROADMAP_CATEGORIES.find((cat) => cat.id === selectedCategory);
   const selectedStatus = selectedNavItem?.status ?? CategoryStatus.COMPLETED;
   const features = ROADMAP_FEATURES[selectedStatus];
@@ -179,13 +188,34 @@ export function Roadmap() {
       </div>
       <Card className='border-dashed z-1'>
         <CardHeader>
-          <CardTitle>Have a suggestion?</CardTitle>
-          <CardDescription>We&apos;d love to hear your ideas! Send us feedback or feature requests.</CardDescription>
+          <CardTitle className='flex items-center gap-2'>Have a suggestion?</CardTitle>
+          <CardDescription>
+            Your feedback shapes our roadmap. Share your ideas and help us build the perfect vacation planner.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className='text-sm text-muted-foreground'>Have an idea for a new feature? Let us know!</p>
+          <div className='flex flex-wrap items-center gap-2 text-sm text-muted-foreground'>
+            <span>Got an idea that would make your life easier?</span>
+            <Button
+              variant='ghost'
+              onClick={() => setContactModalOpen(true)}
+              className='h-auto px-2 underline hover:decoration-primary underline-offset-4'
+            >
+              Let&apos;s talk
+            </Button>
+            <span>or</span>
+            <a
+              href='https://github.com/tu-usuario/tu-repo/issues/new?template=feature_request.md&title=[Feature Request]&labels=enhancement'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='font-semibold text-foreground hover:text-primary transition-colors underline decoration-primary/30 hover:decoration-primary underline-offset-4'
+            >
+              open an issue on GitHub
+            </a>
+          </div>
         </CardContent>
       </Card>
+      <ContactModal open={contactModalOpen} onClose={() => setContactModalOpen(false)} />
     </div>
   );
 }

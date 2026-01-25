@@ -10,6 +10,12 @@ const FAQ: FaqData = [
     title: 'General',
     items: [
       {
+        id: 'what-is',
+        question: 'What is this?',
+        answer:
+          'Forever PTO is a tool to help you plan and optimize your paid time off (PTO) by suggesting the best dates to take off based on public holidays and your preferences. Given the complexity of holiday planning, Forever PTO aims to simplify the process and maximize your free time. Allowing you to choose different strategies to balance your time off throughout the year to maximize your time off.',
+      },
+      {
         id: 'how-works',
         question: 'How does it work?',
         answer: <Tutorial />,
@@ -21,22 +27,10 @@ const FAQ: FaqData = [
           'For simplicity and performance we use a third-party tool to get the bank holidays for a given country and year. It may happen that your country is not supported or the data is not up to date. You can always get premium by making a donation and add those days as "custom holidays" in our system ',
       },
       {
-        id: 'what',
-        question: 'What is Forever PTO?',
-        answer:
-          'Forever PTO is a tool to plan and optimize your time off. It helps find holiday combinations that leverage public holidays and maximize your free time.',
-      },
-      {
         id: 'pricing',
         question: 'Why is there a paid model?',
         answer:
-          "Maintaining data, infrastructure and continuous improvements requires resources. The paid model funds updates, support and hosting. We also offer a free tier with core features to ensure everyone can benefit from better PTO planning.If you want to go ad free and support the project there's a volunteer donation",
-      },
-      {
-        id: 'scope',
-        question: 'What is included and what is not?',
-        answer:
-          'Includes suggestion generation, calendar export and preference customization. Does not include direct management of company permissions or automatic integration with all HR systems.',
+          "Forever PTO is free. However, we use a paid model to support the costs of maintaining data, infrastructure and continuous improvements. The paid model funds updates, support and hosting. We also offer a free tier with core features to ensure everyone can benefit from better PTO planning.If you want to go ad free and support the project there's a volunteer donation",
       },
       {
         id: 'restart-tutorial',
@@ -120,7 +114,11 @@ const FAQ: FaqData = [
 
 export const Faq = () => {
   return (
-    <section aria-labelledby='faq-title' className='space-y-6 m-auto mt-8 max-w-4xl w-full scroll-mt-15 px-4 lg:px-0' id='faq'>
+    <section
+      aria-labelledby='faq-title'
+      className='space-y-6 m-auto mt-8 max-w-4xl w-full scroll-mt-15 px-4 lg:px-0'
+      id='faq'
+    >
       <h2 id='faq-title' className='text-3xl font-semibold'>
         Preguntas frecuentes
       </h2>

@@ -8,8 +8,8 @@ import {
   Html,
   Img,
   Link,
-  Preview,
   pixelBasedPreset,
+  Preview,
   Section,
   Tailwind,
   Text,
@@ -23,94 +23,95 @@ interface ContactFormEmailProps {
   baseUrl: string;
 }
 
+const BRAND_COLORS = {
+  yellow: '#eab308',
+  teal: '#14b8a6',
+  orange: '#f97316',
+  purple: '#a855f7',
+};
+
 export const ContactFormEmail = ({ email, name, subject, message, baseUrl }: ContactFormEmailProps) => {
   const previewText = `New contact from ${name}: ${subject}`;
 
   return (
     <Html>
-      <Head />
       <Tailwind
         config={{
           presets: [pixelBasedPreset],
+          theme: {
+            extend: {
+              colors: {
+                brand: BRAND_COLORS,
+              },
+            },
+          },
         }}
       >
-        <Body className='mx-auto my-auto bg-gradient-to-br from-gray-50 to-gray-100 px-2 font-sans'>
+        <Head />
+        <Body className='mx-auto my-auto bg-linear-to-br from-gray-50 to-gray-100 px-2 font-sans'>
           <Preview>{previewText}</Preview>
           <Container className='mx-auto my-10 max-w-141.25 rounded-xl border border-gray-200 border-solid bg-white p-8 shadow-lg'>
-            <Section className='mt-2 mb-6'>
+            <Section className='mt-2 mb-6 text-center'>
+              <Heading className='inline-block m-0 mr-2 text-[28px] font-bold align-middle'>Forever</Heading>
               <Img
-                src={`${baseUrl}/static/forever-pto-logo.png`}
+                src={`${baseUrl}/static/logo/forever-pto-logo.png`}
                 width='48'
                 height='44'
                 alt='Forever PTO Logo'
-                className='mx-auto my-0'
+                className='inline-block align-middle m-0'
               />
             </Section>
             <Heading className='mx-0 my-0 mb-2 p-0 text-center font-bold text-[28px] text-gray-900 tracking-tight'>
               New Contact Message
             </Heading>
             <Text className='text-center text-[14px] text-gray-500 mt-0 mb-8'>
-              📧 Someone reached out through your Forever PTO website
+              {name} reached out through your Forever PTO website
             </Text>
-            <Section className='bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-6 my-6 border border-emerald-200 border-solid shadow-sm'>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <tr>
-                  <td style={{ padding: '8px 0' }}>
-                    <Text className='text-[14px] text-gray-600 leading-5 margin-0'>
-                      <strong className='text-gray-900'>From:</strong>
-                    </Text>
-                  </td>
-                  <td style={{ padding: '8px 0' }}>
-                    <Text className='text-[14px] text-gray-900 leading-5 margin-0 font-medium'>{name}</Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ padding: '8px 0' }}>
-                    <Text className='text-[14px] text-gray-600 leading-5 margin-0'>
-                      <strong className='text-gray-900'>Email:</strong>
-                    </Text>
-                  </td>
-                  <td style={{ padding: '8px 0' }}>
-                    <Link
-                      href={`mailto:${email}`}
-                      className='text-[14px] text-emerald-600 no-underline font-medium hover:text-emerald-700'
-                    >
-                      {email}
-                    </Link>
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ padding: '8px 0' }}>
-                    <Text className='text-[14px] text-gray-600 leading-5 margin-0'>
-                      <strong className='text-gray-900'>Subject:</strong>
-                    </Text>
-                  </td>
-                  <td style={{ padding: '8px 0' }}>
-                    <Text className='text-[14px] text-gray-900 leading-5 margin-0 font-medium'>{subject}</Text>
-                  </td>
-                </tr>
-              </table>
+            <Section className='bg-linear-to-br from-teal-50 to-orange-50 rounded-xl p-6 my-6 border border-brand-teal border-solid shadow-sm'>
+              <div className='mb-2'>
+                <Text className='text-[14px] text-gray-600 leading-5 m-0 inline-block mr-2'>
+                  <strong className='text-gray-900'>From:</strong>
+                </Text>
+                <Text className='text-[14px] text-gray-900 leading-5 m-0 inline-block font-medium'>{name}</Text>
+              </div>
+              <div className='mb-2'>
+                <Text className='text-[14px] text-gray-600 leading-5 m-0 inline-block mr-2'>
+                  <strong className='text-gray-900'>Email:</strong>
+                </Text>
+                <Link
+                  href={`mailto:${email}`}
+                  className='text-[14px] text-brand-teal no-underline font-medium inline-block'
+                >
+                  {email}
+                </Link>
+              </div>
+              <div>
+                <Text className='text-[14px] text-gray-600 leading-5 m-0 inline-block mr-2'>
+                  <strong className='text-gray-900'>Subject:</strong>
+                </Text>
+                <Text className='text-[14px] text-gray-900 leading-5 m-0 inline-block font-medium'>{subject}</Text>
+              </div>
             </Section>
             <Section className='my-6'>
               <Text className='text-[14px] text-gray-700 leading-5 font-semibold mb-3 mt-0'>Message:</Text>
-              <Section className='bg-gray-50 rounded-xl p-5 border-l-4 border-emerald-500 border-solid shadow-sm'>
-                <Text className='text-[15px] text-gray-800 leading-6 margin-0 whitespace-pre-wrap font-normal'>
+              <Section className='bg-gray-50 rounded-xl p-5 border-l-4 border-brand-teal border-solid shadow-sm'>
+                <Text className='text-[15px] text-gray-800 leading-6 m-0 whitespace-pre-wrap font-normal'>
                   {message}
                 </Text>
               </Section>
             </Section>
             <Section className='mt-8 mb-8 text-center'>
               <Button
-                className='rounded-lg bg-emerald-600 px-8 py-3.5 text-center font-semibold text-[15px] text-white no-underline shadow-md hover:bg-emerald-700 transition-colors'
+                className='rounded-lg bg-brand-teal px-8 py-3.5 text-center font-semibold text-[15px] text-white no-underline shadow-md'
                 href={`mailto:${email}?subject=Re: ${subject}`}
               >
-                ↩️ Reply to {name}
+                Reply to {name}
               </Button>
             </Section>
             <Hr className='mx-0 my-8 w-full border border-gray-200 border-solid' />
             <Text className='text-gray-500 text-[12px] leading-5.5 text-center'>
               This message was sent through the contact form on{' '}
-              <Link href='https://forever-pto.com' className='text-emerald-600 no-underline font-medium'>
+              <Link href='https://forever-pto.com' className='text-brand-teal no-underline font-medium'>
                 forever-pto.com
               </Link>
               <br />

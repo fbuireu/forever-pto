@@ -149,15 +149,15 @@ export const Donate = () => {
     const isDark = resolvedTheme === 'dark';
 
     const colors = {
-      background: isDark ? 'hsl(240 10% 3.9%)' : 'hsl(0 0% 100%)',
-      foreground: isDark ? 'hsl(210 40% 98%)' : 'hsl(222.2 84% 4.9%)',
+      background: isDark ? 'lab(15.204 0 -0.00000596046);' : 'hsl(0 0% 100%)',
+      foreground: isDark ? 'hsl(0, 0%, 100%)' : 'hsl(222.2 84% 4.9%)',
       primary: isDark ? 'hsl(210 40% 98%)' : 'hsl(222.2 47.4% 11.2%)',
       primaryForeground: isDark ? 'hsl(222.2 47.4% 11.2%)' : 'hsl(210 40% 98%)',
       border: isDark ? 'hsl(240 3.7% 15.9%)' : 'hsl(214.3 31.8% 91.4%)',
       borderHover: isDark ? 'hsl(240 3.7% 20%)' : 'hsl(214.3 31.8% 85%)',
       accent: isDark ? 'hsl(240 3.7% 15.9%)' : 'hsl(240 4.8% 95.9%)',
       accentHover: isDark ? 'hsl(240 3.7% 18%)' : 'hsl(240 4.8% 95.9%)',
-      destructive: isDark ? 'hsl(0 91% 71%)' : 'hsl(0 84.2% 60.2%)',
+      destructive: isDark ? 'lab(63.7053% 60.745 31.3109)' : 'hsl(0 84.2% 60.2%)',
       mutedForeground: isDark ? 'hsl(215 20.2% 65.1%)' : 'hsl(215.4 16.3% 46.9%)',
     };
 
@@ -248,6 +248,11 @@ export const Donate = () => {
           },
           '.TabIcon': {
             fill: 'currentColor',
+          },
+          '.AccordionItem': {
+            boxShadow: 'none',
+            backgroundColor: isDark ? 'lab(15.204 0 0)' : 'hsl(0 0% 100%)',
+            color: colors.foreground,
           },
           '.Block': {
             backgroundColor: colors.background,

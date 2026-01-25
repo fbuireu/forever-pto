@@ -49,12 +49,12 @@ export const Legend = () => {
               <span>Suggested</span>
             </div>
             <div className='flex items-center'>
-              <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.manuallySelected)} />
-              <span>Manual</span>
-            </div>
-            <div className='flex items-center'>
               <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.alternative, 'animate-none')} />
               <span>Alternatives</span>
+            </div>
+            <div className='flex items-center'>
+              <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.manuallySelected)} />
+              <span>Manual</span>
             </div>
             <div className='flex items-center'>
               <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.custom)} />

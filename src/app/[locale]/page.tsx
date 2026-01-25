@@ -39,9 +39,9 @@ const Home = async ({ params }: LayoutProps) => {
 export default Home;
 
 // todo: Redo FAQs
-// todo: Check overall styles in donate flow. Manage UI to avoid "processing" stuck?.
-// todo: check texts +  locale all
-// todo: style email
+// todo: check all texts +  locale all
+// todo: template issues + link them through contact modal + roadmap
+// todo: unify modal styles (footer actions, spacing, etc)
 // todo: https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices
 // todo: ads?
 // todo: replace useDetectSticky with css @container scroll-state() (at 8th Jan 2026 not LighntingCSS has the code merged, not released and not adopted by Next)
@@ -54,11 +54,12 @@ export default Home;
 // todo: add custom weekends
 // todo: slider calendar on mobile
 // todo: transformer to make sql data ready ':id': data.id',
-// todo: check session repsitory (missing services? )
+// todo: fix tab movement (focus)on contact modal 
+// todo: improve error handling in server actions (send whole error type and change icon when "save to db error")
 
 // PROD
 // todo: cookie management (on PROD)
-// todo: stripe rest of config
+// todo: stripe rest of config (check all payment methods)
 // todo: move prod env vars to cloudflare secrets
 // todo: add pages to bookmarks (betterstack, resend)
 // todo: SEO site validation etc

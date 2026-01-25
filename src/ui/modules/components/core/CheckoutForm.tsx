@@ -148,7 +148,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
         </div>
         {errorMessage && (
           <div className='relative overflow-hidden rounded-lg border border-destructive/20 bg-destructive/5 p-4 backdrop-blur-sm'>
-            <div className='absolute inset-0 bg-gradient-to-r from-destructive/10 to-transparent' />
+            <div className='absolute inset-0' />
             <div className='relative flex items-start gap-3'>
               <div className='shrink-0 w-5 h-5 rounded-full bg-destructive/20 flex items-center justify-center mt-0.5'>
                 <AlertCircle className='w-3 h-3 text-destructive' />

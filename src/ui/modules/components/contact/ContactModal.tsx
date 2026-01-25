@@ -3,13 +3,20 @@
 import { type ContactFormData, contactSchema } from '@application/dto/contact/schema';
 import { usePremiumStore } from '@application/stores/premium';
 import { Button } from '@const/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@const/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@const/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
 import { Input } from '@const/components/ui/input';
 import { Textarea } from '@const/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Mail } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
 import { useShallow } from 'zustand/react/shallow';
@@ -30,6 +37,7 @@ type Step = (typeof Step)[keyof typeof Step];
 
 export const ContactModal = ({ open, onClose }: ContactModalProps) => {
   const [step, setStep] = useState<Step>(Step.INPUT);
+  const [isPending, startTransition] = useTransition();
   const { setEmail, userEmail } = usePremiumStore(
     useShallow((state) => ({
       setEmail: state.setEmail,
@@ -58,22 +66,24 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
     setErrorMessage('');
   };
 
-  const onSubmit = async (data: ContactFormData) => {
-    try {
-      const { sendContactEmailAction } = await import('@infrastructure/actions/contact');
-      const result = await sendContactEmailAction(data);
-      setEmail(data.email);
+  const onSubmit = (data: ContactFormData) => {
+    startTransition(async () => {
+      try {
+        const { sendContactEmailAction } = await import('@infrastructure/actions/contact');
+        const result = await sendContactEmailAction(data);
+        setEmail(data.email);
 
-      if (result.success) {
-        setStep(Step.SUCCESS);
-      } else {
-        setErrorMessage(result.error ?? 'Failed to send message');
+        if (result.success) {
+          setStep(Step.SUCCESS);
+        } else {
+          setErrorMessage(result.error ?? 'Failed to send message');
+          setStep(Step.ERROR);
+        }
+      } catch (error) {
+        setErrorMessage(error instanceof Error ? error.message : 'Failed to send message');
         setStep(Step.ERROR);
       }
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to send message');
-      setStep(Step.ERROR);
-    }
+    });
   };
 
   const handleTryAgain = () => {
@@ -91,7 +101,6 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
           </DialogTitle>
           <DialogDescription>Have a question or feedback? We&apos;d love to hear from you!</DialogDescription>
         </DialogHeader>
-
         {step === Step.INPUT && (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4' noValidate>
@@ -159,6 +168,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                 loadingText='Sending...'
                 cancelText='Cancel'
                 onCancel={handleClose}
+                pending={isPending}
               />
             </form>
           </Form>
@@ -175,21 +185,23 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
         )}
 
         {step === Step.ERROR && (
-          <div className='text-center space-y-4 py-4'>
-            <AlertCircle className='w-12 h-12 text-destructive mx-auto' />
-            <div>
-              <h3 className='font-semibold'>Failed to Send</h3>
-              <p className='text-sm text-muted-foreground mt-1'>{errorMessage}</p>
+          <DialogFooter>
+            <div className='text-center space-y-4 py-4'>
+              <AlertCircle className='w-12 h-12 text-destructive mx-auto' />
+              <div>
+                <h3 className='font-semibold'>There's been an error</h3>
+                <p className='text-sm text-muted-foreground mt-1'>{errorMessage}</p>
+              </div>
+              <div className='flex gap-2 pt-2'>
+                <Button onClick={handleTryAgain} variant='outline' className='flex-1'>
+                  Try Again
+                </Button>
+                <Button onClick={handleClose} className='flex-1'>
+                  Close
+                </Button>
+              </div>
             </div>
-            <div className='flex gap-2 pt-2'>
-              <Button onClick={handleTryAgain} variant='outline' className='flex-1'>
-                Try Again
-              </Button>
-              <Button onClick={handleClose} className='flex-1'>
-                Close
-              </Button>
-            </div>
-          </div>
+          </DialogFooter>
         )}
       </DialogContent>
     </Dialog>

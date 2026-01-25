@@ -27,12 +27,12 @@ export const FormButtons = ({
   pending: pendingProp,
 }: FormButtonsProps) => {
   const { pending: pendingStatus } = useFormStatus();
-  const pending = pendingProp ?? pendingStatus;
+  const isPending = pendingProp ?? pendingStatus;
 
   return (
     <div className='flex gap-2 pt-2'>
-      <Button type='submit' disabled={pending} className={cn(submitClassName ?? 'flex-1')} variant={submitVariant}>
-        {pending ? (
+      <Button type='submit' disabled={isPending} className={cn(submitClassName ?? 'flex-1')} variant={submitVariant}>
+        {isPending ? (
           <>
             <Loader2 className='w-4 h-4 mr-2 animate-spin' />
             {loadingText}
@@ -42,7 +42,7 @@ export const FormButtons = ({
         )}
       </Button>
       {!hideCancel && onCancel && (
-        <Button type='button' variant='outline' onClick={onCancel} disabled={pending} className={cancelClassName}>
+        <Button type='button' variant='outline' onClick={onCancel} disabled={isPending} className={cancelClassName}>
           {cancelText}
         </Button>
       )}

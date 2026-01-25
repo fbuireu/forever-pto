@@ -18,7 +18,7 @@ export interface ContactError {
 const DEFAULT_ERROR_MESSAGES: Record<ContactErrorType, string> = {
   [CONTACT_ERROR_TYPES.VALIDATION_ERROR]: 'Invalid input data provided.',
   [CONTACT_ERROR_TYPES.EMAIL_SEND_FAILED]: 'Failed to send email. Please try again.',
-  [CONTACT_ERROR_TYPES.SAVE_FAILED]: 'Something went wrong. Please try again.',
+  [CONTACT_ERROR_TYPES.SAVE_FAILED]: 'We\'ve received your inquiry, though we encountered a minor technical hiccup finishing the logs. No further action is needed on your part.',
   [CONTACT_ERROR_TYPES.RENDER_FAILED]: 'Failed to prepare email. Please try again.',
   [CONTACT_ERROR_TYPES.UNKNOWN]: 'An unexpected error occurred. Please try again.',
 } as const;

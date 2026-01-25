@@ -63,7 +63,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
             <SidebarProvider>
               <StoresInitializer />
               <AppSidebar locale={locale}>
-                <div className='h-full z-1 rounded-lg inset-0 absolute bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:4rem_4rem]' />
+                <div className='pointer-events-none h-full z-1 rounded-lg inset-0 absolute bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:4rem_4rem]' />
                 <SiteTitle />
                 <SiteSubtitle />
                 {children}

@@ -59,7 +59,7 @@ export function FeatureList({ features, categoryLabel }: FeatureListProps) {
         {features.map((feature, i) => (
           <motion.div
             key={feature.id}
-            className='bg-muted rounded-xl px-4 py-3 shadow-sm hover:shadow-lg transition-shadow duration-200 relative'
+            className='border bg-muted rounded-xl px-4 py-3 shadow-sm hover:shadow-lg transition-shadow duration-200 relative'
             variants={getCardVariants(i)}
             transition={transition}
             style={{
