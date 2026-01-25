@@ -11,7 +11,7 @@ import { FeatureList } from 'src/components/animate-ui/components/community/Feat
 import { RadialNav, type RadialNavProps } from 'src/components/animate-ui/components/community/radial-nav';
 import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
 import { Clock } from 'src/components/animate-ui/icons/clock';
-import styles from './roadmap.module.css';
+import './roadmap.css';
 
 const ContactModal = dynamic(() =>
   import('../contact/ContactModal').then((module) => ({ default: module.ContactModal }))
@@ -187,7 +187,7 @@ export function Roadmap() {
           <FeatureList features={features} categoryLabel={selectedNavItem?.label ?? 'Features'} />
         </div>
       </div>
-      <Card className={`${styles.dashed_card} group relative border-none`}>
+      <Card className='dashed-card group relative border-none'>
         <svg className='absolute inset-0 w-full h-full pointer-events-none' xmlns='http://www.w3.org/2000/svg'>
           <rect
             x='0.5'

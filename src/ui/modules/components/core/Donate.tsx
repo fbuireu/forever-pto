@@ -22,6 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-
 import { useShallow } from 'zustand/react/shallow';
 import { CheckoutForm } from './CheckoutForm';
 import { DonationForm } from './DonationForm';
+import './donate.css';
 
 interface PaymentState {
   clientSecret: string;
@@ -287,7 +288,7 @@ export const Donate = () => {
   return (
     <Popover open={isOpen} onOpenChange={setDonatePopoverOpen}>
       <PopoverTrigger asChild>
-        <div className='fixed xl:bottom-4 bottom-25 right-4 z-50 '>
+        <div className='fixed xl:bottom-4 bottom-30 w-full right-0 md:w-auto md:right-4 z-50'>
           <div className='donate-rainbow relative z-0 overflow-hidden p-0.5 flex items-center justify-center rounded-md hover:scale-102 transition duration-200 active:scale-100'>
             <Button className='shadow-lg rounded-md w-full h-full'>Donate & Unblock</Button>
           </div>

@@ -38,7 +38,6 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: fix animations files/imports/layers
 // todo: Redo FAQs
 // todo: check all texts +  locale all
 // todo: template issues + link them through contact modal + roadmap
@@ -56,7 +55,7 @@ export default Home;
 // todo: add custom weekends
 // todo: slider calendar on mobile
 // todo: transformer to make sql data ready ':id': data.id',
-// todo: fix tab movement (focus)on contact modal 
+// todo: fix tab movement (focus)on contact modal
 // todo: improve error handling in server actions (send whole error type and change icon when "save to db error")
 
 // PROD
