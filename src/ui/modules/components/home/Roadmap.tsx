@@ -11,6 +11,7 @@ import { FeatureList } from 'src/components/animate-ui/components/community/Feat
 import { RadialNav, type RadialNavProps } from 'src/components/animate-ui/components/community/radial-nav';
 import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
 import { Clock } from 'src/components/animate-ui/icons/clock';
+import styles from './roadmap.module.css';
 
 const ContactModal = dynamic(() =>
   import('../contact/ContactModal').then((module) => ({ default: module.ContactModal }))
@@ -186,7 +187,20 @@ export function Roadmap() {
           <FeatureList features={features} categoryLabel={selectedNavItem?.label ?? 'Features'} />
         </div>
       </div>
-      <Card className='border-dashed z-1'>
+      <Card className={`${styles.dashed_card} group relative border-none`}>
+        <svg className='absolute inset-0 w-full h-full pointer-events-none' xmlns='http://www.w3.org/2000/svg'>
+          <rect
+            x='0.5'
+            y='0.5'
+            width='calc(100% - 1px)'
+            height='calc(100% - 1px)'
+            fill='none'
+            strokeWidth='2'
+            strokeDasharray='20 12'
+            strokeLinecap='round'
+            rx='8'
+          />
+        </svg>
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>Have a suggestion?</CardTitle>
           <CardDescription>
@@ -199,7 +213,7 @@ export function Roadmap() {
             <Button
               variant='ghost'
               onClick={() => setContactModalOpen(true)}
-              className='h-auto px-2 underline hover:decoration-primary underline-offset-4'
+              className='font-semibold text-foreground hover:text-primary transition-colors underline decoration-primary/30 hover:decoration-primary underline-offset-4'
             >
               Let&apos;s talk
             </Button>

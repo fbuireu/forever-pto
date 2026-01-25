@@ -1,0 +1,11 @@
+.dashed_card svg rect {
+  stroke: var(--foreground);
+  stroke-dasharray: 10;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.5s ease-out;
+}
+
+.dashed_card:hover svg rect {
+  stroke-dashoffset: -100;
+  transition: stroke-dashoffset 5s linear; 
+}

@@ -38,9 +38,11 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
+// todo: fix animations files/imports/layers
 // todo: Redo FAQs
 // todo: check all texts +  locale all
 // todo: template issues + link them through contact modal + roadmap
+// todo: check white mode (no hovers?)
 // todo: unify modal styles (footer actions, spacing, etc)
 // todo: https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices
 // todo: ads?

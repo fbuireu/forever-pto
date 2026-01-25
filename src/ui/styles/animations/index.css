@@ -1,4 +1,4 @@
-@layer utilities {
+@layer animations {
   @keyframes popover-fade-in {
     from {
       opacity: 0;
