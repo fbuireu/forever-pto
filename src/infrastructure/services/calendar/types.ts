@@ -38,7 +38,6 @@ export interface Metrics {
   bridgesUsed: number;
   workingDaysPerMonth: number;
   totalEffectiveDays: number;
-  efficiency?: number;
   monthlyDist: number[];
   longBlocksPerQuarter: number[];
 }

@@ -33,11 +33,31 @@ export function getLongBlocksPerQuarter(days: Date[]): number[] {
   return longBlocksPerQuarter;
 }
 
-export function getTotalEffectiveDays(days: Date[], bridges?: { effectiveDays: number }[]): number {
-  if (bridges) {
-    return bridges.reduce((sum, bridge) => sum + bridge.effectiveDays, 0);
+export function getTotalEffectiveDays(
+  days: Date[],
+  bridges?: { effectiveDays: number; ptoDays: Date[] }[]
+): number {
+  if (!bridges || bridges.length === 0) {
+    return days.length;
   }
-  return days.length;
+
+  const daysSet = new Set(days.map((d) => d.toDateString()));
+
+  const validBridges = bridges.filter((bridge) =>
+    bridge.ptoDays.every((ptoDay) => daysSet.has(ptoDay.toDateString()))
+  );
+
+  const daysInBridges = new Set<string>();
+  validBridges.forEach((bridge) => {
+    bridge.ptoDays.forEach((ptoDay) => {
+      daysInBridges.add(ptoDay.toDateString());
+    });
+  });
+
+  const effectiveDaysFromBridges = validBridges.reduce((sum, bridge) => sum + bridge.effectiveDays, 0);
+  const standaloneDays = days.filter((day) => !daysInBridges.has(day.toDateString())).length;
+
+  return effectiveDaysFromBridges + standaloneDays;
 }
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { formatDate } from '@ui/modules/components/utils/formatters';

@@ -3,11 +3,13 @@ import { isInSelectedRange } from '@application/dto/holiday/utils/helpers';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { generateAlternatives } from '@infrastructure/services/calendar/alternatives/generateAlternatives';
 import { generateSuggestions } from '@infrastructure/services/calendar/suggestions/generateSuggestions';
+import { generateMetrics } from '@infrastructure/services/calendar/metrics/generateMetrics';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
 import { ensureDate } from '@shared/utils/helpers';
 import { formatDate } from '@ui/modules/components/utils/formatters';
 import { addMonths, endOfYear, startOfYear } from 'date-fns';
+import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
@@ -46,7 +48,7 @@ interface HolidaysActions {
   addHoliday: (params: AddHolidayParams) => void;
   editHoliday: (params: EditHolidayParams) => void;
   removeHoliday: (holidayId: string) => void;
-  toggleDaySelection: (date: Date, totalPtoDays: number) => boolean;
+  toggleDaySelection: (params: { date: Date; totalPtoDays: number; locale: Locale; allowPastDays: boolean }) => boolean;
   resetManualSelection: () => void;
   getRemainingDays: (totalPtoDays: number) => number;
 }
@@ -127,27 +129,49 @@ export const useHolidaysStore = create<HolidaysStore>()(
               date: ensureDate(h.date),
             }));
 
-            const suggestion = generateSuggestions({
+            const baseSuggestion = generateSuggestions({
               year,
               ptoDays,
               holidays: holidaysDates,
               allowPastDays,
               months,
               strategy,
-              locale,
             });
 
-            const alternatives = generateAlternatives({
+            const baseAlternatives = generateAlternatives({
               year,
               ptoDays,
               holidays: holidaysDates,
               allowPastDays,
               months,
               maxAlternatives,
-              existingSuggestion: suggestion.days,
+              existingSuggestion: baseSuggestion.days,
               strategy,
-              locale,
             });
+
+            const suggestionMetrics = generateMetrics({
+              suggestion: baseSuggestion,
+              locale,
+              bridges: baseSuggestion.bridges,
+              holidays: holidaysDates,
+              allowPastDays,
+            });
+
+            const suggestion = {
+              ...baseSuggestion,
+              metrics: suggestionMetrics,
+            };
+
+            const alternatives = baseAlternatives.map((alt) => ({
+              ...alt,
+              metrics: generateMetrics({
+                suggestion: alt,
+                locale,
+                bridges: alt.bridges,
+                holidays: holidaysDates,
+                allowPastDays,
+              }),
+            }));
 
             set({
               suggestion,
@@ -200,7 +224,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               date: ensureDate(h.date),
             }));
 
-            const alternatives = generateAlternatives({
+            const baseAlternatives = generateAlternatives({
               year,
               ptoDays,
               holidays: holidaysDates,
@@ -209,8 +233,18 @@ export const useHolidaysStore = create<HolidaysStore>()(
               maxAlternatives: maxToGenerate,
               existingSuggestion: suggestion.days,
               strategy,
-              locale,
             });
+
+            const alternatives = baseAlternatives.map((alt) => ({
+              ...alt,
+              metrics: generateMetrics({
+                suggestion: alt,
+                locale,
+                bridges: alt.bridges,
+                holidays: holidaysDates,
+                allowPastDays,
+              }),
+            }));
 
             set({ alternatives });
           } catch (error) {
@@ -313,66 +347,93 @@ export const useHolidaysStore = create<HolidaysStore>()(
           set({ holidays: updatedHolidays });
         },
 
-        toggleDaySelection: (date: Date, totalPtoDays: number): boolean => {
-          const { manuallySelectedDays, currentSelection, removedSuggestedDays } = get();
+        toggleDaySelection: ({ date, totalPtoDays, locale, allowPastDays }): boolean => {
+          const { manuallySelectedDays, currentSelection, removedSuggestedDays, holidays } = get();
           const dateStr = date.toDateString();
 
-          const isSuggested = currentSelection?.days.some((d) => d.toDateString() === dateStr);
+          if (!currentSelection) return false;
+
+          const isSuggested = currentSelection.days.some((d) => d.toDateString() === dateStr);
           const isManuallySelected = manuallySelectedDays.some((d) => d.toDateString() === dateStr);
           const wasRemoved = removedSuggestedDays.some((d) => d.toDateString() === dateStr);
 
+          let updatedManualDays = manuallySelectedDays;
+          let updatedRemovedDays = removedSuggestedDays;
+
           if (isManuallySelected) {
-            const updatedManualDays = manuallySelectedDays.filter((d) => d.toDateString() !== dateStr);
-            set({
-              manuallySelectedDays: updatedManualDays,
-            });
-            return true;
-          }
-
-          if (isSuggested && wasRemoved) {
-            const updatedRemovedDays = removedSuggestedDays.filter((d) => d.toDateString() !== dateStr);
-            set({
-              removedSuggestedDays: updatedRemovedDays,
-            });
-            return true;
-          }
-
-          if (isSuggested && !wasRemoved) {
-            const updatedRemovedDays = [...removedSuggestedDays, ensureDate(date)].sort(
+            updatedManualDays = manuallySelectedDays.filter((d) => d.toDateString() !== dateStr);
+          } else if (isSuggested && wasRemoved) {
+            updatedRemovedDays = removedSuggestedDays.filter((d) => d.toDateString() !== dateStr);
+          } else if (isSuggested && !wasRemoved) {
+            updatedRemovedDays = [...removedSuggestedDays, ensureDate(date)].sort(
               (a, b) => a.getTime() - b.getTime()
             );
-            set({
-              removedSuggestedDays: updatedRemovedDays,
-            });
-            return true;
-          }
-          const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
-          const manualSelectedCount = manuallySelectedDays.length;
-          const remaining = totalPtoDays - activeSuggestedCount - manualSelectedCount;
+          } else {
+            const activeSuggestedCount = currentSelection.days.length - removedSuggestedDays.length;
+            const manualSelectedCount = manuallySelectedDays.length;
+            const remaining = totalPtoDays - activeSuggestedCount - manualSelectedCount;
 
-          if (remaining <= 0) {
-            logger.warn('No remaining PTO days to assign', {
-              totalPtoDays,
-              activeSuggestedCount,
-              manualSelectedCount,
-            });
-            return false;
+            if (remaining <= 0) {
+              logger.warn('No remaining PTO days to assign', {
+                totalPtoDays,
+                activeSuggestedCount,
+                manualSelectedCount,
+              });
+              return false;
+            }
+
+            updatedManualDays = [...manuallySelectedDays, ensureDate(date)].sort(
+              (a, b) => a.getTime() - b.getTime()
+            );
           }
 
-          const updatedManualDays = [...manuallySelectedDays, ensureDate(date)].sort(
-            (a, b) => a.getTime() - b.getTime()
-          );
+          const updatedMetrics = generateMetrics({
+            suggestion: currentSelection,
+            locale,
+            bridges: currentSelection.bridges,
+            holidays,
+            allowPastDays,
+            manuallySelectedDays: updatedManualDays,
+            removedSuggestedDays: updatedRemovedDays,
+            totalPtoBudget: totalPtoDays,
+          });
+
           set({
             manuallySelectedDays: updatedManualDays,
+            removedSuggestedDays: updatedRemovedDays,
+            currentSelection: {
+              ...currentSelection,
+              metrics: updatedMetrics,
+            },
           });
           return true;
         },
 
         resetManualSelection: () => {
-          set({
-            manuallySelectedDays: [],
-            removedSuggestedDays: [],
-          });
+          const { currentSelection, currentSelectionIndex, suggestion, alternatives } = get();
+
+          if (!currentSelection) {
+            set({
+              manuallySelectedDays: [],
+              removedSuggestedDays: [],
+            });
+            return;
+          }
+
+          const baseSelection = currentSelectionIndex === 0 ? suggestion : alternatives[currentSelectionIndex - 1];
+
+          if (baseSelection) {
+            set({
+              manuallySelectedDays: [],
+              removedSuggestedDays: [],
+              currentSelection: baseSelection,
+            });
+          } else {
+            set({
+              manuallySelectedDays: [],
+              removedSuggestedDays: [],
+            });
+          }
         },
 
         getRemainingDays: (totalPtoDays: number): number => {

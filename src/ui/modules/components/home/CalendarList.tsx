@@ -62,9 +62,9 @@ export const CalendarList = () => {
 
   const handleDayToggle = useCallback(
     (date: Date) => {
-      toggleDaySelection(date, ptoDays);
+      toggleDaySelection({ date, totalPtoDays: ptoDays, locale, allowPastDays });
     },
-    [toggleDaySelection, ptoDays]
+    [toggleDaySelection, ptoDays, locale, allowPastDays]
   );
 
   useEffect(() => {

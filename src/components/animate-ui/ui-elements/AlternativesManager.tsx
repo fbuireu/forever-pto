@@ -17,8 +17,6 @@ interface AlternativeManagerProps {
   onPreviewChange: (params: AlternativeSelectionBaseParams) => void;
   selectedIndex: number;
   currentSelectionIndex: number;
-  manuallySelectedDays: Date[];
-  removedSuggestedDays: Date[];
 }
 
 const STAT_CARD_MOTION_CONFIG = {
@@ -63,8 +61,6 @@ export const AlternativesManager = ({
   onPreviewChange,
   selectedIndex = 0,
   currentSelectionIndex = 0,
-  manuallySelectedDays = [],
-  removedSuggestedDays = [],
 }: AlternativeManagerProps) => {
   const [currentIndex, setCurrentIndex] = useState(selectedIndex);
 
@@ -87,22 +83,11 @@ export const AlternativesManager = ({
     }
   }, [currentIndex, totalOptions, allSuggestions, onPreviewChange]);
 
-  const isCurrentlySelected = currentIndex === currentSelectionIndex;
-  const basePtoDays = currentSuggestion.days.length;
-  const ptoDays = isCurrentlySelected
-    ? basePtoDays - removedSuggestedDays.length + manuallySelectedDays.length
-    : basePtoDays;
+  const effectiveDays = currentSuggestion.metrics?.totalEffectiveDays ?? 0;
+  const efficiency = currentSuggestion.metrics?.averageEfficiency ?? 0;
+  const gainedDays = currentSuggestion.metrics?.bonusDays ?? 0;
 
-  const effectiveDays = currentSuggestion.metrics?.totalEffectiveDays;
-  const efficiency = (effectiveDays ?? 0) / ptoDays;
-  const gainedDays = (effectiveDays ?? 0) - ptoDays;
-
-  const mainBasePtoDays = allSuggestions[0]?.days?.length ?? 1;
-  const mainPtoDays =
-    currentSelectionIndex === 0
-      ? mainBasePtoDays - removedSuggestedDays.length + manuallySelectedDays.length
-      : mainBasePtoDays;
-  const mainEfficiency = (allSuggestions[0]?.metrics?.totalEffectiveDays ?? 0) / mainPtoDays;
+  const mainEfficiency = allSuggestions[0]?.metrics?.averageEfficiency ?? 0;
   const efficiencyDiff = efficiency - mainEfficiency;
   const isMainSuggestion = currentIndex === 0;
 

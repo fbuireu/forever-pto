@@ -5,8 +5,6 @@ import { FilterStrategy } from '../types';
 import { clearDateKeyCache, clearHolidayCache } from '../utils/cache';
 import { findBridges, getAvailableWorkdays } from '../utils/helpers';
 import { selectBridgesForStrategy, selectOptimalDaysFromBridges } from './utils/selectors';
-import type { Locale } from 'next-intl';
-import { generateMetrics } from '../metrics/generateMetrics';
 
 export interface GenerateSuggestionsParams {
   year: number;
@@ -15,7 +13,6 @@ export interface GenerateSuggestionsParams {
   allowPastDays: boolean;
   months: Date[];
   strategy: FilterStrategy;
-  locale: Locale;
 }
 
 const selectGroupedStrategy = (bridges: Bridge[], ptoDays: number) =>
@@ -41,7 +38,6 @@ export function generateSuggestions({
   allowPastDays,
   months,
   strategy,
-  locale,
 }: GenerateSuggestionsParams): Suggestion {
   clearDateKeyCache();
   clearHolidayCache();
@@ -77,12 +73,5 @@ export function generateSuggestions({
     days: selection.days.toSorted((a, b) => a.getTime() - b.getTime()),
     bridges: selection.bridges,
     strategy,
-    metrics: generateMetrics({
-      suggestion: { days: selection.days, bridges: selection.bridges, strategy },
-      allowPastDays,
-      locale,
-      bridges: selection.bridges,
-      holidays,
-    }),
   };
 }

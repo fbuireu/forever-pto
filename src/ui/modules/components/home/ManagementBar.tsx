@@ -52,9 +52,14 @@ export const ManagementBar = () => {
     [setCurrentAlternativeSelection]
   );
 
-  const allSuggestions = [suggestion, ...alternatives].filter(
+  const baseSuggestions = [suggestion, ...alternatives].filter(
     (suggestion): suggestion is NonNullable<typeof suggestion> => !!suggestion
   );
+
+  const allSuggestions = baseSuggestions.map((sug, index) =>
+    index === currentSelectionIndex && currentSelection ? currentSelection : sug
+  );
+
   const hasValidSuggestions = allSuggestions.length > 0 && allSuggestions[0].days && allSuggestions[0].days.length > 0;
   const hasValidCurrentSelection = currentSelection?.days && currentSelection.days.length > 0;
 
@@ -67,8 +72,6 @@ export const ManagementBar = () => {
         onSelectionChange={handleSelectionChange}
         onPreviewChange={handlePreviewChange}
         selectedIndex={previewAlternativeIndex}
-        manuallySelectedDays={manuallySelectedDays}
-        removedSuggestedDays={removedSuggestedDays}
       />
       <PtoStatus currentSelection={currentSelection} />
     </div>

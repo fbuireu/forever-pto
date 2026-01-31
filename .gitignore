@@ -38,3 +38,7 @@ pnpm-debug.log*
 # Cloudflare
 .wrangler/
 .open-next
+
+# AI/Agents
+.claude/
+.agents/

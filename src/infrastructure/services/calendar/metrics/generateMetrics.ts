@@ -19,6 +19,9 @@ interface GenerateMetricsParams {
   bridges?: Bridge[];
   holidays: HolidayDTO[];
   allowPastDays: boolean;
+  manuallySelectedDays?: Date[];
+  removedSuggestedDays?: Date[];
+  totalPtoBudget?: number;
 }
 
 export const generateMetrics = ({
@@ -27,8 +30,18 @@ export const generateMetrics = ({
   bridges,
   holidays,
   allowPastDays,
+  manuallySelectedDays = [],
+  removedSuggestedDays = [],
+  totalPtoBudget,
 }: GenerateMetricsParams): Metrics => {
-  const { days } = suggestion;
+  let days = suggestion.days;
+  const hasManualChanges = manuallySelectedDays.length > 0 || removedSuggestedDays.length > 0;
+
+  if (hasManualChanges) {
+    const removedSet = new Set(removedSuggestedDays.map((d) => d.toDateString()));
+    const filteredSuggested = suggestion.days.filter((d) => !removedSet.has(d.toDateString()));
+    days = [...filteredSuggested, ...manuallySelectedDays].sort((a, b) => a.getTime() - b.getTime());
+  }
 
   if (days.length === 0) {
     return {
@@ -42,7 +55,6 @@ export const generateMetrics = ({
       bridgesUsed: 0,
       workingDaysPerMonth: 0,
       totalEffectiveDays: 0,
-      efficiency: 0,
       monthlyDist: Array(12).fill(0),
       longBlocksPerQuarter: Array(4).fill(0),
     };
@@ -70,7 +82,15 @@ export const generateMetrics = ({
     year: formatDate({ date: days[0], format: 'yyyy', locale }),
   });
   const efficiency = totalEffectiveDays / days.length;
-  const bonusDays = totalEffectiveDays - days.length;
+
+  let bonusDays: number;
+  if (hasManualChanges && totalPtoBudget) {
+    const unusedDays = totalPtoBudget - days.length;
+    const totalDaysOff = totalEffectiveDays + unusedDays;
+    bonusDays = totalDaysOff - totalPtoBudget;
+  } else {
+    bonusDays = totalEffectiveDays - days.length;
+  }
 
   return {
     longWeekends,
@@ -83,7 +103,6 @@ export const generateMetrics = ({
     bridgesUsed: bridges?.length ?? 0,
     workingDaysPerMonth,
     totalEffectiveDays,
-    efficiency,
     monthlyDist,
     longBlocksPerQuarter,
   };
