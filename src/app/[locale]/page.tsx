@@ -41,9 +41,9 @@ export default Home;
 // todo: Redo FAQs
 // todo: check all texts +  locale all
 // todo: template issues + link them through contact modal + roadmap
-// todo: check white mode (no hovers?)
+// todo: check white mode (no hovers?) + input styles in Donate
 // todo: unify modal styles (footer actions, spacing, etc)
-// todo: a11y audit, seo audit, performance audit
+// todo: a11y audit, seo audit, performance audit, react best practices audit
 // todo: ads?
 // todo: replace useDetectSticky with css @container scroll-state() (at 8th Jan 2026 not LighntingCSS has the code merged, not released and not adopted by Next)
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
@@ -57,6 +57,7 @@ export default Home;
 // todo: transformer to make sql data ready ':id': data.id',
 // todo: fix tab movement (focus)on contact modal
 // todo: improve error handling in server actions (send whole error type and change icon when "save to db error")
+// todo: APPLY DDD (CHECK BRANCH)
 
 // PROD
 // todo: cookie management (on PROD)

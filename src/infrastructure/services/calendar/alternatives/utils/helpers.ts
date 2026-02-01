@@ -81,12 +81,23 @@ export function findAlternativeCombinations({
 
   const alternatives = generateGreedyAlternatives(availableBridges, ptoDays, minEfficiency, maxAlternatives);
 
+  const getAverageEfficiency = (suggestion: Suggestion): number => {
+    if (!suggestion.bridges || suggestion.bridges.length === 0) return 0;
+    const totalEfficiency = suggestion.bridges.reduce((sum, b) => sum + b.efficiency, 0);
+    return totalEfficiency / suggestion.bridges.length;
+  };
+
+  const getTotalEffectiveDays = (suggestion: Suggestion): number => {
+    if (!suggestion.bridges) return 0;
+    return suggestion.bridges.reduce((sum, b) => sum + b.effectiveDays, 0);
+  };
+
   return alternatives
     .toSorted((a, b) => {
-      const effDiff = (b.metrics?.efficiency ?? 0) - (a.metrics?.efficiency ?? 0);
+      const effDiff = getAverageEfficiency(b) - getAverageEfficiency(a);
       return Math.abs(effDiff) > EFFICIENCY_COMPARISON_THRESHOLD
         ? effDiff
-        : (b.metrics?.totalEffectiveDays ?? 0) - (a.metrics?.totalEffectiveDays ?? 0);
+        : getTotalEffectiveDays(b) - getTotalEffectiveDays(a);
     })
     .slice(0, maxAlternatives);
 }
