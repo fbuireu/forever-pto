@@ -13,7 +13,7 @@ const FAQ: FaqData = [
         id: 'what-is',
         question: 'What is this?',
         answer:
-          'Forever PTO is a tool to help you plan and optimize your paid time off (PTO) by suggesting the best dates to take off based on public holidays and your preferences. Given the complexity of holiday planning, Forever PTO aims to simplify the process and maximize your free time. Allowing you to choose different strategies to balance your time off throughout the year to maximize your time off.',
+          'Forever PTO is a tool to help you plan and optimize your paid time off (PTO) by suggesting the best dates to take off based on public holidays and your preferences. Given the complexity of holiday planning, Forever PTO aims to simplify the process and maximize your free time. Allowing you to choose different strategies to balance your time off throughout the year to maximize your time off. Allowing you to fully customize the holidays, the names of the festivities and even add custom holidays specific to your company or region.',
       },
       {
         id: 'how-works',
@@ -22,9 +22,9 @@ const FAQ: FaqData = [
       },
       {
         id: 'why',
-        question: "Why I'm not seeing my country holidays correctly?",
+        question: "Why I'm not seeing my country or holidays correctly?",
         answer:
-          'For simplicity and performance we use a third-party tool to get the bank holidays for a given country and year. It may happen that your country is not supported or the data is not up to date. You can always get premium by making a donation and add those days as "custom holidays" in our system ',
+          'For simplicity and performance we use a third-party tool to get the bank holidays for a given country and year. It may happen that your country or region is not supported or the data is not up to date. To fix this you can add custom holidays specific to your needs.',
       },
       {
         id: 'pricing',
@@ -55,12 +55,6 @@ const FAQ: FaqData = [
         answer:
           'Balanced aims to spread time off across the year for steady value, while Optimized focuses on maximizing efficiency (effective days per PTO day) by prioritizing the best ratio combinations.',
       },
-      {
-        id: 'overlap',
-        question: 'How do you avoid overlapping suggestions?',
-        answer:
-          'We keep a cache of generated combinations and a set of already-selected dates; when producing alternatives we filter out bridges that include used dates to avoid overlaps and ensure variety.',
-      },
     ],
   },
   {
@@ -77,13 +71,7 @@ const FAQ: FaqData = [
         id: 'encryption',
         question: 'Is my data encrypted?',
         answer:
-          "Your vacation planning data is stored locally in your browser. We apply XOR cipher obfuscation to make the data unreadable in casual inspection. This is method is designed to prevent accidental exposure, not protect against determined attackers. We don't store sensitive personal information, and you maintain full control of your data on your device.",
-      },
-      {
-        id: 'data-privacy',
-        question: 'What data do you store?',
-        answer:
-          "All your data (PTO days, selected dates, custom holidays, preferences) is stored exclusively in your browser's local storage. We never send this information to our servers. Your vacation planning stays completely private on your device.",
+          "Your vacation planning data is stored locally in your browser. We apply XOR cipher obfuscation to make the data unreadable in casual inspection. This is method is designed to prevent accidental exposure, not protect against determined attackers. We don't store sensitive personal information, and you maintain full control of your data on your device. All your data (PTO days, selected dates, custom holidays, preferences) is stored exclusively in your browser's local storage. We never send this information to our servers. Your vacation planning stays completely private on your device.",
       },
       {
         id: 'troubleshooting',

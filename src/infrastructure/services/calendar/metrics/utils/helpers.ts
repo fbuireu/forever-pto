@@ -162,3 +162,93 @@ export const getWorkingDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkingDa
 
   return parseFloat(avgPerMonth.toFixed(1));
 };
+
+interface CalculateLongestVacationParams {
+  ptoDays: Date[];
+  holidays: HolidayDTO[];
+}
+
+export const calculateLongestVacation = ({ ptoDays, holidays }: CalculateLongestVacationParams): number => {
+  if (ptoDays.length === 0) return 0;
+
+  const freeDays = new Set([
+    ...ptoDays.map((d) => d.toDateString()),
+    ...holidays.map((h) => h.date.toDateString()),
+  ]);
+
+  const allDates = [...ptoDays, ...holidays.map((h) => h.date)].sort((a, b) => a.getTime() - b.getTime());
+  if (allDates.length === 0) return 0;
+
+  const minDate = new Date(allDates[0]);
+  const maxDate = new Date(allDates[allDates.length - 1]);
+  minDate.setDate(minDate.getDate() - 7);
+  maxDate.setDate(maxDate.getDate() + 7);
+
+  let maxStreak = 0;
+  let currentStreak = 0;
+
+  for (const day of eachDayOfInterval({ start: minDate, end: maxDate })) {
+    const isFreeDay = isWeekend(day) || freeDays.has(day.toDateString());
+
+    if (isFreeDay) {
+      currentStreak++;
+      maxStreak = Math.max(maxStreak, currentStreak);
+    } else {
+      currentStreak = 0;
+    }
+  }
+
+  return maxStreak;
+};
+
+interface CalculateLongWeekendsParams {
+  ptoDays: Date[];
+  holidays: HolidayDTO[];
+}
+
+export const calculateLongWeekends = ({ ptoDays, holidays }: CalculateLongWeekendsParams): number => {
+  if (ptoDays.length === 0) return 0;
+
+  const freeDays = new Set([
+    ...ptoDays.map((d) => d.toDateString()),
+    ...holidays.map((h) => h.date.toDateString()),
+  ]);
+
+  let longWeekends = 0;
+  const allDates = [...ptoDays, ...holidays.map((h) => h.date)].sort((a, b) => a.getTime() - b.getTime());
+  if (allDates.length === 0) return 0;
+
+  const minDate = new Date(allDates[0]);
+  const maxDate = new Date(allDates[allDates.length - 1]);
+  minDate.setDate(minDate.getDate() - 7);
+  maxDate.setDate(maxDate.getDate() + 7);
+
+  let currentStreak: Date[] = [];
+
+  for (const day of eachDayOfInterval({ start: minDate, end: maxDate })) {
+    const isFreeDay = isWeekend(day) || freeDays.has(day.toDateString());
+
+    if (isFreeDay) {
+      currentStreak.push(day);
+    } else {
+      if (currentStreak.length >= 3) {
+        const hasWeekend = currentStreak.some((d) => isWeekend(d));
+        const hasPtoOrHoliday = currentStreak.some((d) => freeDays.has(d.toDateString()) && !isWeekend(d));
+        if (hasWeekend && hasPtoOrHoliday) {
+          longWeekends++;
+        }
+      }
+      currentStreak = [];
+    }
+  }
+
+  if (currentStreak.length >= 3) {
+    const hasWeekend = currentStreak.some((d) => isWeekend(d));
+    const hasPtoOrHoliday = currentStreak.some((d) => freeDays.has(d.toDateString()) && !isWeekend(d));
+    if (hasWeekend && hasPtoOrHoliday) {
+      longWeekends++;
+    }
+  }
+
+  return longWeekends;
+};

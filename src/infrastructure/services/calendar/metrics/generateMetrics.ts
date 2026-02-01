@@ -2,6 +2,8 @@ import { formatDate } from '@ui/modules/components/utils/formatters';
 import type { Locale } from 'next-intl';
 import type { Bridge, Metrics, Suggestion } from '../types';
 import {
+  calculateLongestVacation,
+  calculateLongWeekends,
   calculateMaxWorkingPeriod,
   calculateQuarterDistribution,
   calculateRestBlocks,
@@ -57,15 +59,14 @@ export const generateMetrics = ({
       totalEffectiveDays: 0,
       monthlyDist: Array(12).fill(0),
       longBlocksPerQuarter: Array(4).fill(0),
+      longestVacation: 0,
     };
   }
   const monthlyDist = getMonthlyDist(days);
   const longBlocksPerQuarter = getLongBlocksPerQuarter(days);
   const totalEffectiveDays = getTotalEffectiveDays(days, bridges);
-  const longWeekends = days.filter((date) => {
-    const dayOfWeek = date.getDay();
-    return dayOfWeek === 1 || dayOfWeek === 5;
-  }).length;
+  const longWeekends = calculateLongWeekends({ ptoDays: days, holidays });
+  const longestVacation = calculateLongestVacation({ ptoDays: days, holidays });
 
   const restBlocks = calculateRestBlocks(days);
   const maxWorkingPeriod = calculateMaxWorkingPeriod({
@@ -105,5 +106,6 @@ export const generateMetrics = ({
     totalEffectiveDays,
     monthlyDist,
     longBlocksPerQuarter,
+    longestVacation,
   };
 };

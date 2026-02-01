@@ -109,7 +109,7 @@ export function calculateWeekends(range: FromTo): number {
     end: range.to,
   });
 
-  return new Set(weekendDays.map((day) => getWeek(day))).size;
+  return weekendDays.length;
 }
 
 export function calculateHolidaysInRange(range: FromTo, holidays: HolidayDTO[]): number {

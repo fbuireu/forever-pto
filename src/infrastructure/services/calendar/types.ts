@@ -40,4 +40,5 @@ export interface Metrics {
   totalEffectiveDays: number;
   monthlyDist: number[];
   longBlocksPerQuarter: number[];
+  longestVacation: number;
 }

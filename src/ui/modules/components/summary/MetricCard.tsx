@@ -32,52 +32,52 @@ interface MetricCardProps {
 
 const COLOR_SCHEMES = {
   blue: {
-    bg: 'bg-blue-50 dark:bg-blue-900/20',
+    bg: 'bg-blue-100 dark:bg-blue-900/20',
     icon: 'text-blue-500',
     text: 'text-blue-700 dark:text-blue-300',
-    badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30',
+    badge: 'bg-blue-200 text-blue-700 dark:bg-blue-900/30',
   },
   green: {
-    bg: 'bg-green-50 dark:bg-green-900/20',
+    bg: 'bg-green-100 dark:bg-green-900/20',
     icon: 'text-green-500',
     text: 'text-green-700 dark:text-green-300',
-    badge: 'bg-green-100 text-green-700 dark:bg-green-900/30',
+    badge: 'bg-green-200 text-green-700 dark:bg-green-900/30',
   },
   purple: {
-    bg: 'bg-purple-50 dark:bg-purple-900/20',
+    bg: 'bg-purple-100 dark:bg-purple-900/20',
     icon: 'text-purple-500',
     text: 'text-purple-700 dark:text-purple-300',
-    badge: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30',
+    badge: 'bg-purple-200 text-purple-700 dark:bg-purple-900/30',
   },
   amber: {
-    bg: 'bg-amber-50 dark:bg-amber-900/20',
+    bg: 'bg-amber-100 dark:bg-amber-900/20',
     icon: 'text-amber-500',
     text: 'text-amber-700 dark:text-amber-300',
-    badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30',
+    badge: 'bg-amber-200 text-amber-700 dark:bg-amber-900/30',
   },
   emerald: {
-    bg: 'bg-emerald-50 dark:bg-emerald-900/20',
+    bg: 'bg-emerald-100 dark:bg-emerald-900/20',
     icon: 'text-emerald-500',
     text: 'text-emerald-700 dark:text-emerald-300',
-    badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30',
+    badge: 'bg-emerald-200 text-emerald-700 dark:bg-emerald-900/30',
   },
   cyan: {
-    bg: 'bg-cyan-50 dark:bg-cyan-900/20',
+    bg: 'bg-cyan-100 dark:bg-cyan-900/20',
     icon: 'text-cyan-500',
     text: 'text-cyan-700 dark:text-cyan-300',
-    badge: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30',
+    badge: 'bg-cyan-200 text-cyan-700 dark:bg-cyan-900/30',
   },
   violet: {
-    bg: 'bg-violet-50 dark:bg-violet-900/20',
+    bg: 'bg-violet-100 dark:bg-violet-900/20',
     icon: 'text-violet-500',
     text: 'text-violet-700 dark:text-violet-300',
-    badge: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30',
+    badge: 'bg-violet-200 text-violet-700 dark:bg-violet-900/30',
   },
   rose: {
-    bg: 'bg-rose-50 dark:bg-rose-900/20',
+    bg: 'bg-rose-100 dark:bg-rose-900/20',
     icon: 'text-rose-500',
     text: 'text-rose-700 dark:text-rose-300',
-    badge: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30',
+    badge: 'bg-rose-200 text-rose-700 dark:bg-rose-900/30',
   },
 };
 

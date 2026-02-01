@@ -103,7 +103,7 @@ export const WorkdayCounter = () => {
               </div>
             </div>
             <div className='text-left'>
-              <div className='font-medium'>Weekends</div>
+              <div className='font-medium'>Weekend days</div>
               <div className='text-lg font-bold text-muted-foreground'>
                 <SlidingNumber number={weekendDays} decimalPlaces={0} />
               </div>

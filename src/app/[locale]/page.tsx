@@ -4,10 +4,12 @@ import { Faq } from '@ui/modules/components/home/Faq';
 import { HolidaysList } from '@ui/modules/components/home/HolidaysList';
 import { Legend } from '@ui/modules/components/home/Legend';
 import { ManagementBar } from '@ui/modules/components/home/ManagementBar';
-import { Roadmap } from '@ui/modules/components/home/Roadmap';
-import { Summary } from '@ui/modules/components/home/Summary';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
+import dynamic from 'next/dynamic';
+
+const Summary = dynamic(() => import('@ui/modules/components/home/Summary').then((mod) => mod.Summary));
+const Roadmap = dynamic(() => import('@ui/modules/components/home/Roadmap').then((mod) => mod.Roadmap));
 
 export { generateMetadata } from './metadata';
 
@@ -38,10 +40,10 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: Redo FAQs
-// todo: check all texts +  locale all
+// todo: check texts (stats) +  locale all
 // todo: template issues + link them through contact modal + roadmap
 // todo: check white mode (no hovers?) + input styles in Donate
+// todo: don't allow to add custom holiday in bank holidays
 // todo: unify modal styles (footer actions, spacing, etc)
 // todo: a11y audit, seo audit, performance audit, react best practices audit
 // todo: ads?

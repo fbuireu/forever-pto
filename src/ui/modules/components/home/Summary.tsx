@@ -8,12 +8,11 @@ import { usePremiumStore } from '@application/stores/premium';
 import { Badge } from '@const/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
-import { Award, BarChart3, Calendar, CalendarDays, TrendingUp, Zap } from 'lucide-react';
+import { Award, BarChart3, Calendar, CalendarDays, Palmtree, TrendingUp, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useMemo } from 'react';
 import { Clock } from 'src/components/animate-ui/icons/clock';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { Star } from 'src/components/animate-ui/icons/star';
 import { RotatingText } from 'src/components/animate-ui/text/rotating';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
@@ -48,14 +47,17 @@ export const Summary = () => {
       carryOverMonths: state.carryOverMonths ?? 0,
     }))
   );
-  const { suggestion, holidays, alternatives, currentSelection } = useHolidaysStore(
-    useShallow((state) => ({
-      suggestion: state.suggestion,
-      holidays: state.holidays,
-      alternatives: state.alternatives,
-      currentSelection: state.currentSelection,
-    }))
-  );
+  const { suggestion, holidays, alternatives, currentSelection, manuallySelectedDays, removedSuggestedDays } =
+    useHolidaysStore(
+      useShallow((state) => ({
+        suggestion: state.suggestion,
+        holidays: state.holidays,
+        alternatives: state.alternatives,
+        currentSelection: state.currentSelection,
+        manuallySelectedDays: state.manuallySelectedDays,
+        removedSuggestedDays: state.removedSuggestedDays,
+      }))
+    );
   const { countries, regions } = useLocationStore(
     useShallow((state) => ({
       countries: state.countries,
@@ -114,12 +116,12 @@ export const Summary = () => {
   if (!areStoresReady) {
     return <SummarySkeleton />;
   }
-
   if (!metricsData) {
     return null;
   }
 
   const { metrics, effectiveDays, increment, efficiencyPercentage, canImprove } = metricsData;
+  console.log(metrics);
 
   return (
     <div className='w-full max-w-4xl mx-auto space-y-6 z-1'>
@@ -144,19 +146,14 @@ export const Summary = () => {
           </CardTitle>
           <CardDescription className='text-muted-foreground space-y-2'>
             <div className='text-sm'>
-              Con <span className='font-semibold text-primary'>{ptoDays}</span> días de PTO y{' '}
-              <span className='font-semibold text-green-700'>{holidayMetrics.totalHolidays}</span> festivos disponibles,
-              obtienes <span className='font-semibold text-green-700 dark:text-green-300'>{effectiveDays}</span> días
-              libres efectivos.
+              <span className='font-semibold text-primary'>{ptoDays}</span> días de vacaciones +{' '}
+              <span className='font-semibold text-green-700'>{holidayMetrics.totalHolidays}</span> festivos ={' '}
+              <span className='font-semibold text-green-700 dark:text-green-300'>{effectiveDays}</span> días libres
+              reales
               {increment > 0 && (
-                <>
-                  {' '}
-                  Esto es{' '}
-                  <span className='font-semibold text-purple-700 dark:text-purple-300'>
-                    {increment} días más ({efficiencyPercentage.toFixed(0)}% extra)
-                  </span>{' '}
-                  que usar solo tus PTOs.
-                </>
+                <span className='font-semibold text-purple-700 dark:text-purple-300 ml-1'>
+                  (+{efficiencyPercentage.toFixed(0)}% de rendimiento)
+                </span>
               )}
             </div>
           </CardDescription>
@@ -175,34 +172,40 @@ export const Summary = () => {
             />
           </div>
           <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-            <MetricCard label='PTO Base' value={ptoDays} icon={CalendarDays} badge='días' colorScheme='blue' />
+            <MetricCard
+              label='Días de vacaciones'
+              value={ptoDays}
+              icon={CalendarDays}
+              badge='días'
+              colorScheme='blue'
+            />
             <MetricCard
               label='Festivos'
               value={holidayMetrics.totalHolidays}
               icon={CalendarDays}
-              badge={`${holidayMetrics.nationalDays}N + ${holidayMetrics.regionalDays}R${holidayMetrics.customDays > 0 ? ` + ${holidayMetrics.customDays}C` : ''}`}
+              badge={`${holidayMetrics.nationalDays} nac.${holidayMetrics.regionalDays > 0 ? ` + ${holidayMetrics.regionalDays} reg.` : ''}${holidayMetrics.customDays > 0 ? ` + ${holidayMetrics.customDays} prop.` : ''}`}
               colorScheme='green'
             />
             <MetricCard
-              label='Total Efectivo'
+              label='Días libres reales'
               value={effectiveDays}
               icon={TrendingUp}
               badge={increment > 0 ? `+${increment} extra` : '0 extra'}
               colorScheme='purple'
             />
             <MetricCard
-              label='Eficiencia'
+              label='Multiplicador'
               value={efficiencyPercentage.toFixed(0)}
               symbol={'%'}
               icon={Zap}
-              badge='ganancia'
+              badge='rendimiento'
               colorScheme='amber'
             />
           </div>
           <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3'>
             <PremiumFeature feature={'Métricas Avanzadas'} iconSize='size-7'>
               <MetricCard
-                label='Findes largos'
+                label='Puentes de fin de semana'
                 value={metrics.longWeekends}
                 icon={Calendar}
                 colorScheme='emerald'
@@ -211,7 +214,7 @@ export const Summary = () => {
             </PremiumFeature>
             <PremiumFeature feature={'Métricas Avanzadas'} iconSize='size-7'>
               <MetricCard
-                label='Bloques'
+                label='Períodos vacacionales'
                 value={metrics.restBlocks}
                 icon={BarChart3}
                 colorScheme='purple'
@@ -219,7 +222,7 @@ export const Summary = () => {
               />
             </PremiumFeature>
             <MetricCard
-              label='Promedio'
+              label='Ratio día/libre'
               value={metrics.averageEfficiency.toFixed(1)}
               icon={TrendingUp}
               colorScheme='amber'
@@ -235,16 +238,17 @@ export const Summary = () => {
               />
             </PremiumFeature>
             <MetricCard
-              label='Average working days per month'
+              label='Días laborales/mes'
               value={metrics.workingDaysPerMonth}
               icon={Award}
               colorScheme='violet'
               size={MetricCardSize.COMPACT}
             />
             <MetricCard
-              label='Bonus'
-              value={`+${metrics.bonusDays}`}
-              icon={Star}
+              label='Vacaciones más largas'
+              value={metrics.longestVacation}
+              symbol='d'
+              icon={Palmtree}
               colorScheme='rose'
               size={MetricCardSize.COMPACT}
             />
@@ -257,26 +261,26 @@ export const Summary = () => {
                 iconSize='size-7'
                 inlineDescription
               >
-                <div className='p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg'>
+                <div className='p-4 bg-indigo-100 dark:bg-indigo-900/20 rounded-lg'>
                   <div className='flex items-center gap-2 mb-3'>
                     <Clock className='w-4 h-4 text-indigo-500' />
                     <span className='text-sm font-medium text-indigo-700 dark:text-indigo-300'>Resumen del Año</span>
                   </div>
                   <div className='grid grid-cols-3 gap-4 text-center'>
                     <div>
-                      <div className='text-sm text-muted-foreground'>Primer descanso</div>
+                      <div className='text-sm text-muted-foreground'>Primera pausa</div>
                       <div className='text-lg flex justify-center font-bold text-indigo-700 dark:text-indigo-300'>
                         <RotatingText text={metrics.firstLastBreak.first} />
                       </div>
                     </div>
                     <div>
-                      <div className='text-sm text-muted-foreground'>Max trabajo seguido</div>
+                      <div className='text-sm text-muted-foreground'>Racha laboral máxima</div>
                       <div className='text-lg font-bold text-indigo-700 flex justify-center dark:text-indigo-300'>
                         <SlidingNumber number={metrics.maxWorkingPeriod} />d
                       </div>
                     </div>
                     <div>
-                      <div className='text-sm text-muted-foreground'>Último descanso</div>
+                      <div className='text-sm text-muted-foreground'>Última pausa</div>
                       <div className='text-lg font-bold text-indigo-700 dark:text-indigo-300'>
                         <RotatingText text={metrics.firstLastBreak.last} />
                       </div>
@@ -287,31 +291,62 @@ export const Summary = () => {
                     <div className='text-2xl font-bold text-indigo-700 dark:text-indigo-300 flex justify-center'>
                       +<SlidingNumber number={metrics.bonusDays} />
                     </div>
-                    <div className='text-xs text-indigo-600 dark:text-indigo-400'>días gratis obtenidos</div>
+                    <div className='text-xs text-indigo-600 dark:text-indigo-400'>días ganados optimizando</div>
                   </div>
                 </div>
               </PremiumFeature>
             </AnimateIcon>
           )}
           {canImprove > 0 && (
-            <NotificationCard icon={Zap} title='Sugerencia' colorScheme='orange'>
+            <NotificationCard icon={Zap} title='Puedes mejorar' colorScheme='orange'>
               <>
-                Hay alternativas que te darían{' '}
+                Existen alternativas que añaden{' '}
                 <strong className='flex gap-1 mx-1'>
                   <SlidingNumber number={canImprove} />
-                  días más.
-                </strong>
-                {premiumKey ? 'Revisa las opciones disponibles.' : 'Considera Premium para más análisis.'}
+                  días más
+                </strong>{' '}
+                a tu planificación.
+                {premiumKey ? ' Revisa las opciones disponibles.' : ' Considera Premium para más análisis.'}
+              </>
+            </NotificationCard>
+          )}
+          {(manuallySelectedDays.length > 0 || removedSuggestedDays.length > 0) && (
+            <NotificationCard icon={CalendarDays} title='Ajustes manuales' colorScheme='indigo' className='mt-2'>
+              <>
+                {manuallySelectedDays.length > 0 && (
+                  <>
+                    Has añadido{' '}
+                    <strong className='flex gap-1 mx-1'>
+                      <SlidingNumber number={manuallySelectedDays.length} /> día
+                      {manuallySelectedDays.length !== 1 ? 's' : ''}
+                    </strong>
+                  </>
+                )}
+                {manuallySelectedDays.length > 0 && removedSuggestedDays.length > 0 && ' y '}
+                {removedSuggestedDays.length > 0 && (
+                  <>
+                    quitado{' '}
+                    <strong className='flex gap-1 mx-1'>
+                      <SlidingNumber number={removedSuggestedDays.length} /> día
+                      {removedSuggestedDays.length !== 1 ? 's' : ''}
+                    </strong>
+                  </>
+                )}
+                {' de la sugerencia original.'}
               </>
             </NotificationCard>
           )}
           {holidayMetrics.customDays > 0 && (
-            <NotificationCard icon={CalendarDays} title='Días personalizados:' colorScheme='blue'>
-              Has añadido{' '}
-              <strong className='flex gap-1 mx-1'>
-                <SlidingNumber number={holidayMetrics.customDays} /> día${holidayMetrics.customDays !== 1 ? 's' : ''}
-              </strong>{' '}
-              que optimizan tu planificación.
+            <NotificationCard icon={CalendarDays} title='Festivos personalizados' colorScheme='blue'>
+              <>
+                Tienes{' '}
+                <strong className='flex gap-1 mx-1'>
+                  <SlidingNumber number={holidayMetrics.customDays} /> festivo
+                  {holidayMetrics.customDays !== 1 ? 's' : ''} personalizado
+                  {holidayMetrics.customDays !== 1 ? 's' : ''}
+                </strong>{' '}
+                que mejoran tu plan.
+              </>
             </NotificationCard>
           )}
         </CardContent>
