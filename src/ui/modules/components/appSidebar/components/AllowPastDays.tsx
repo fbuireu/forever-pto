@@ -1,6 +1,6 @@
 'use client';
 
-import { useFiltersStore } from '@application/stores/filters';
+import { useFiltersStore } from '@ui/store/filters';
 import { Field, Label } from '@headlessui/react';
 import { InfoIcon, Undo2 } from 'lucide-react';
 import { Switch } from 'src/components/animate-ui/headless/switch';

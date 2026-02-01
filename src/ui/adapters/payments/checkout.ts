@@ -1,5 +1,5 @@
 import type { CreatePaymentInput } from '@application/dto/payment/schema';
-import type { DiscountInfo } from '@application/dto/payment/types';
+import type { DiscountInfo } from '@domain/payment/models/types';
 import { createPaymentAction } from '@infrastructure/actions/payment';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
@@ -38,7 +38,7 @@ interface ConfirmPaymentResult {
   };
 }
 
-const logger = getBetterStackInstance();
+const logger = getBetterStackInstance();  
 
 export const confirmPayment = async (params: ConfirmPaymentParams): Promise<ConfirmPaymentResult> => {
   const { stripe, elements, email, returnUrl } = params;

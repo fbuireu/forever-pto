@@ -1,4 +1,4 @@
-import { Link } from '@application/i18n/navigtion';
+import { Link } from '@infrastructure/i18n/navigation';
 import { Button } from '@const/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';

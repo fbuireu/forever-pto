@@ -1,14 +1,15 @@
 import type { BaseDTO } from '@application/shared/dto/baseDTO';
+import { HolidayVariant, type Holiday } from '@domain/calendar/models/types';
 import { addMonths, compareAsc, endOfYear, isWithinInterval, startOfYear } from 'date-fns';
-import { HolidayVariant, type HolidayDTO, type RawHoliday } from './types';
-import { getRegionName, isInSelectedRange } from './utils/helpers';
+import type { RawHoliday } from './types';
+import { isInSelectedRange } from './utils/helpers';
 
 type HolidayDTOParams = {
   year: number;
   carryOverMonths: number;
 };
 
-export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> = {
+export const holidayDTO: BaseDTO<RawHoliday[], Holiday[], HolidayDTOParams> = {
   create: ({ raw, params }) => {
     if (!params) {
       throw new Error('Configuration is required for holiday DTO');
@@ -49,7 +50,7 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> =
           type: holiday.type,
           variant: holiday.location ? HolidayVariant.REGIONAL : HolidayVariant.NATIONAL,
           ...(holiday.location && {
-            location: getRegionName(holiday.location),
+            location: holiday.location,
           }),
           isInSelectedRange: isInSelectedRange({
             date: new Date(holiday.date),

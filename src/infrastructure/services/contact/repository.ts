@@ -1,4 +1,4 @@
-import type { ContactData } from '@application/dto/contact/types';
+import type { ContactData, ContactRepository } from '@domain/contact/repository/types';
 import type { TursoClient } from '@infrastructure/clients/db/turso/client';
 
 export const saveContact = async (
@@ -27,3 +27,7 @@ export const saveContact = async (
 
   return { success: true };
 };
+
+export const createContactRepository = (turso: TursoClient): ContactRepository => ({
+  save: (data: ContactData) => saveContact(turso, data),
+});

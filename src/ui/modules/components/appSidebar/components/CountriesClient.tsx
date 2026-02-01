@@ -1,8 +1,8 @@
 'use client';
 
 import type { CountryDTO } from '@application/dto/country/types';
-import { useFiltersStore } from '@application/stores/filters';
-import { useLocationStore } from '@application/stores/location';
+import { useFiltersStore } from '@ui/store/filters';
+import { useLocationStore } from '@ui/store/location';
 import { Combobox } from '@const/components/ui/combobox';
 import { Field, Label } from '@headlessui/react';
 import { InfoIcon } from 'lucide-react';

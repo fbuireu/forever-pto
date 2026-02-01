@@ -1,7 +1,7 @@
 'use client';
 
-import type { HolidayDTO } from '@application/dto/holiday/types';
-import { useHolidaysStore } from '@application/stores/holidays';
+import type { Holiday } from '@domain/calendar/models/types';
+import { useHolidaysStore } from '@ui/store/holidays';
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,7 @@ import type { Locale } from 'next-intl';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { formatDate } from '../../utils/formatters';
+import { formatDate } from '@domain/shared/utils/formatters';
 import { Trash2 } from 'src/components/animate-ui/icons/trash-2';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
@@ -24,7 +24,7 @@ interface DeleteHolidayModalProps {
   open: boolean;
   onClose: () => void;
   locale: Locale;
-  holidays: HolidayDTO[];
+  holidays: Holiday[];
 }
 
 export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHolidayModalProps) => {

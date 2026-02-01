@@ -7,11 +7,11 @@ import { handleChargeSucceeded } from '@domain/payment/handlers/charge-succeeded
 import { handlePaymentFailed } from '@domain/payment/handlers/payment-failed';
 import { handlePaymentSucceeded } from '@domain/payment/handlers/payment-succeeded';
 import { getTursoClientInstance } from '@infrastructure/clients/db/turso/client';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
 import { createChargeService } from '@infrastructure/services/payments/provider/charge-service';
 import { createPaymentRepository } from '@infrastructure/services/payments/repository';
 import type Stripe from 'stripe';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 export const processWebhookEvent = async (event: Stripe.Event): Promise<void> => {
   const turso = getTursoClientInstance();
@@ -29,19 +29,19 @@ export const processWebhookEvent = async (event: Stripe.Event): Promise<void> =>
         hasId: !!paymentIntent.id,
       });
       const paymentEvent = createPaymentSucceededEvent(paymentIntent);
-      await handlePaymentSucceeded(paymentEvent, { paymentRepository, chargeService });
+      await handlePaymentSucceeded(paymentEvent, { paymentRepository, chargeService, logger });
       break;
     }
 
     case 'payment_intent.payment_failed': {
       const paymentEvent = createPaymentFailedEvent(event.data.object);
-      await handlePaymentFailed(paymentEvent, { paymentRepository });
+      await handlePaymentFailed(paymentEvent, { paymentRepository, logger });
       break;
     }
 
     case 'charge.succeeded': {
       const chargeEvent = createChargeSucceededEvent(event.data.object);
-      await handleChargeSucceeded(chargeEvent, { paymentRepository });
+      await handleChargeSucceeded(chargeEvent, { paymentRepository, logger });
       break;
     }
 

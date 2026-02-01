@@ -1,6 +1,6 @@
 'use client';
 
-import { useFiltersStore } from '@application/stores/filters';
+import { useFiltersStore } from '@ui/store/filters';
 import { Combobox } from '@const/components/ui/combobox';
 import { Input } from '@const/components/ui/input';
 import { Field, Label } from '@headlessui/react';

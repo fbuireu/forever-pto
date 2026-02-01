@@ -1,6 +1,6 @@
 'use client';
 
-import { useFiltersStore } from '@application/stores/filters';
+import { useFiltersStore } from '@ui/store/filters';
 import { Command, CommandGroup, CommandItem, CommandList } from '@const/components/ui/command';
 import { cn } from '@const/lib/utils';
 import { Field, Label } from '@headlessui/react';

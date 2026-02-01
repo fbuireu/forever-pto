@@ -1,16 +1,14 @@
-import type { PaymentData } from '@application/dto/payment/types';
-import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
+import type { Logger } from '@domain/shared/types';
+import type { PaymentData } from '@domain/payment/models/types';
 import { createPaymentError } from '../events/factory/errors';
 import type { PaymentSucceededEvent } from '../events/types';
 import type { PaymentRepository } from '../repository/types';
 import type { ChargeService } from '../services/charge';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-
-const logger = getBetterStackInstance();
 
 interface HandlePaymentSucceededParams {
   paymentRepository: PaymentRepository;
   chargeService: ChargeService;
+  logger: Logger;
 }
 
 const updateExistingPayment = async (event: PaymentSucceededEvent, repository: PaymentRepository): Promise<void> => {
@@ -21,14 +19,18 @@ const updateExistingPayment = async (event: PaymentSucceededEvent, repository: P
   }
 };
 
-const createPaymentFromWebhook = async (event: PaymentSucceededEvent, repository: PaymentRepository): Promise<void> => {
+const createPaymentFromWebhook = async (
+  event: PaymentSucceededEvent,
+  repository: PaymentRepository,
+  logger: Logger
+): Promise<void> => {
   logger.warn('Payment not found in DB, creating from webhook', { paymentId: event.paymentId });
 
   const paymentData: PaymentData = {
     id: event.paymentIntent.id,
     stripeCreatedAt: new Date(event.paymentIntent.created * 1000),
-    customerId: extractCustomerId(event.paymentIntent.customer),
-    chargeId: extractChargeId(event.paymentIntent.latest_charge),
+    customerId: event.customerId,
+    chargeId: event.chargeId,
     email: event.email,
     amount: event.amount,
     currency: event.paymentIntent.currency,
@@ -76,7 +78,7 @@ const updateChargeDetails = async (
     const chargeResult = await params.chargeService.retrieveCharge(chargeId);
 
     if (!chargeResult.success || !chargeResult.data) {
-      logger.error('Failed to retrieve charge details', { reason: chargeResult.error, chargeId, paymentId: event.paymentId });
+      params.logger.warn('Failed to retrieve charge details', { reason: chargeResult.error, chargeId, paymentId: event.paymentId });
       return;
     }
 
@@ -97,10 +99,10 @@ const updateChargeDetails = async (
     );
 
     if (!result.success) {
-      logger.error('Failed to update charge details', { reason: result.error, paymentId: event.paymentId, chargeId });
+      params.logger.warn('Failed to update charge details', { reason: result.error, paymentId: event.paymentId, chargeId });
     }
   } catch (error) {
-    logger.logError('Error fetching charge details', error, { chargeId, paymentId: event.paymentId });
+    params.logger.logError('Error fetching charge details', error, { chargeId, paymentId: event.paymentId });
   }
 };
 
@@ -119,12 +121,12 @@ export const handlePaymentSucceeded = async (
 
       await updateExistingPayment(event, params.paymentRepository);
     } else {
-      await createPaymentFromWebhook(event, params.paymentRepository);
+      await createPaymentFromWebhook(event, params.paymentRepository, params.logger);
     }
 
     await updateChargeDetails(event, params);
   } catch (error) {
-    logger.logError('Error handling successful payment', error, { paymentId: event.paymentId });
+    params.logger.logError('Error handling successful payment', error, { paymentId: event.paymentId });
     throw error;
   }
 };

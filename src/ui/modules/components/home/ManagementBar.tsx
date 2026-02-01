@@ -1,7 +1,7 @@
 'use client';
 
-import { useHolidaysStore } from '@application/stores/holidays';
-import type { AlternativeSelectionBaseParams } from '@application/stores/types';
+import { useHolidaysStore } from '@ui/store/holidays';
+import type { AlternativeSelectionBaseParams } from '@ui/store/types';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useCallback } from 'react';
 import { toast } from 'sonner';

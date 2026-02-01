@@ -1,4 +1,4 @@
-import { type HolidayDTO } from '@application/dto/holiday/types';
+import { type Holiday } from '@domain/calendar/models/types';
 import { Badge } from '@const/components/ui/badge';
 import { TableCell, TableRow } from '@const/components/ui/table';
 import { cn } from '@const/lib/utils';
@@ -7,14 +7,14 @@ import type { Locale } from 'next-intl';
 import { memo } from 'react';
 import { Checkbox } from 'src/components/animate-ui/base/checkbox';
 import { PremiumFeature, PremiumFeatureVariant } from '../../premium/PremiumFeature';
-import { formatDate } from '../../utils/formatters';
+import { formatDate } from '@domain/shared/utils/formatters';
 
 interface HolidayRowProps {
-  holiday: HolidayDTO;
+  holiday: Holiday;
   index: number;
   isSelected: boolean;
   locale: Locale;
-  onToggle: (holiday: HolidayDTO, index: number) => void;
+  onToggle: (holiday: Holiday, index: number) => void;
 }
 
 export const HolidayRow = memo<HolidayRowProps>(({ holiday, index, isSelected, locale, onToggle }) => {

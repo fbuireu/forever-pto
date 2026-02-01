@@ -1,6 +1,6 @@
-import type { FiltersState } from '@application/stores/filters';
-import type { HolidaysState } from '@application/stores/holidays';
-import { usePremiumStore } from '@application/stores/premium';
+import type { FiltersState } from '@ui/store/filters';
+import type { HolidaysState } from '@ui/store/holidays';
+import { usePremiumStore } from '@ui/store/premium';
 import { cn } from '@const/lib/utils';
 import type { Day } from 'date-fns';
 import { addMonths, isSameDay, isSameMonth, isWeekend, subMonths } from 'date-fns';
@@ -13,7 +13,7 @@ import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
 import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
-import { formatDate } from '../utils/formatters';
+import { formatDate } from '@domain/shared/utils/formatters';
 import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
 import {
   getPreviewRange,

@@ -1,5 +1,5 @@
 import { holidayDTO } from '@application/dto/holiday/dto';
-import type { HolidayDTO } from '@application/dto/holiday/types';
+import type { Holiday } from '@domain/calendar/models/types';
 import type { Locale } from 'next-intl';
 import { getNationalHolidays } from './utils/getNationalHolidays';
 import { getRegionalHolidays } from './utils/getRegionalHolidays';
@@ -19,7 +19,7 @@ export async function getHolidays({
   region,
   locale,
   carryOverMonths,
-}: GetHolidaysParams): Promise<HolidayDTO[]> {
+}: GetHolidaysParams): Promise<Holiday[]> {
   if (!country) {
     return [];
   }

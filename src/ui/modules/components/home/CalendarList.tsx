@@ -1,7 +1,7 @@
 'use client';
 
-import { useFiltersStore } from '@application/stores/filters';
-import { useHolidaysStore } from '@application/stores/holidays';
+import { useFiltersStore } from '@ui/store/filters';
+import { useHolidaysStore } from '@ui/store/holidays';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useMemo } from 'react';

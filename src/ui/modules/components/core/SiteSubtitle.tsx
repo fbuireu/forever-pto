@@ -1,6 +1,6 @@
 'use client';
 
-import { Link } from '@application/i18n/navigtion';
+import { Link } from '@infrastructure/i18n/navigation';
 import { useTutorial } from '@ui/hooks/useTutorial';
 
 export const SiteSubtitle = () => {

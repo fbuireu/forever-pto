@@ -1,4 +1,4 @@
-import type { SendEmailParams, SendEmailResult } from '@application/dto/email/types';
+import type { SendEmailParams, SendEmailResult } from '@domain/contact/services/email';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { Resend } from 'resend';
 

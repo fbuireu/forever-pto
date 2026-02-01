@@ -1,7 +1,7 @@
-import { useFiltersStore } from '@application/stores/filters';
-import { useHolidaysStore } from '@application/stores/holidays';
-import { useLocationStore } from '@application/stores/location';
-import { usePremiumStore } from '@application/stores/premium';
+import { useFiltersStore } from '@ui/store/filters';
+import { useHolidaysStore } from '@ui/store/holidays';
+import { useLocationStore } from '@ui/store/location';
+import { usePremiumStore } from '@ui/store/premium';
 import { useEffect, useMemo, useState } from 'react';
 
 const STORES = [

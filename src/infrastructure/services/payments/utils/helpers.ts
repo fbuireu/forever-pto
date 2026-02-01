@@ -1,4 +1,5 @@
-import type { DiscountInfo } from '@application/dto/payment/types';
+import type { PaymentHelpers } from '@application/interfaces/payment-services';
+import type { DiscountInfo } from '@domain/payment/models/types';
 import type Stripe from 'stripe';
 
 interface CalculateFinalAmount {
@@ -74,3 +75,9 @@ export const calculateDiscountedAmount = (coupon: Stripe.Coupon, amount: number)
 export const isCouponActive = (coupon: Stripe.Coupon): boolean => {
   return coupon.valid && getCouponValidationError(coupon) === null;
 };
+
+export const createPaymentHelpers = (): PaymentHelpers => ({
+  extractCustomerId: (customer: unknown) =>
+    extractCustomerId(customer as string | Stripe.Customer | Stripe.DeletedCustomer | null),
+  extractChargeId: (charge: unknown) => extractChargeId(charge as string | Stripe.Charge | null),
+});

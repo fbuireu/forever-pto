@@ -1,4 +1,4 @@
-import type { PaymentData } from '@application/dto/payment/types';
+import type { PaymentData } from '@domain/payment/models/types';
 import type { PaymentRepository } from '@domain/payment/repository/types';
 import type { TursoClient } from '@infrastructure/clients/db/turso/client';
 

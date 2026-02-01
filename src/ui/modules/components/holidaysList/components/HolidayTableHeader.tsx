@@ -1,4 +1,4 @@
-import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
+import { type Holiday, HolidayVariant } from '@domain/calendar/models/types';
 import { TableHeader as BaseTableHeader, TableHead, TableRow } from '@const/components/ui/table';
 import { cn } from '@const/lib/utils';
 import { ArrowUpDown } from 'lucide-react';
@@ -12,17 +12,17 @@ interface HolidayTableHeaderProps {
   shouldShowLocationColumn: boolean;
   variant: HolidayVariant;
   sortConfig: {
-    key: keyof HolidayDTO | null;
+    key: keyof Holiday | null;
     direction: 'asc' | 'desc';
   };
-  onSort: (key: keyof HolidayDTO) => void;
+  onSort: (key: keyof Holiday) => void;
 }
 
 interface TableHeaderProps {
   children: React.ReactNode;
-  sortKey: keyof HolidayDTO;
-  currentSort: { key: keyof HolidayDTO | null; direction: 'asc' | 'desc' };
-  onSort: (key: keyof HolidayDTO) => void;
+  sortKey: keyof Holiday;
+  currentSort: { key: keyof Holiday | null; direction: 'asc' | 'desc' };
+  onSort: (key: keyof Holiday) => void;
   className?: string;
 }
 

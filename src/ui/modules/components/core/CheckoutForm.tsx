@@ -1,5 +1,5 @@
-import type { DiscountInfo } from '@application/dto/payment/types';
-import { usePremiumStore } from '@application/stores/premium';
+import type { DiscountInfo } from '@domain/payment/models/types';
+import { usePremiumStore } from '@ui/store/premium';
 import { Button } from '@const/components/ui/button';
 import { formatDiscountText } from '@infrastructure/services/payments/utils/formatters';
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';

@@ -1,10 +1,10 @@
-import type { HolidayDTO } from '@application/dto/holiday/types';
+import type { Holiday } from '@domain/calendar/models/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@const/components/ui/dialog';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import type { FromTo } from '../../core/Calendar';
 import { Calendar, CalendarSelectionMode } from '../../core/Calendar';
-import { formatDate } from '../../utils/formatters';
+import { formatDate } from '@domain/shared/utils/formatters';
 
 export interface WorkdayCounterCalendarModalProps {
   open: boolean;
@@ -12,7 +12,7 @@ export interface WorkdayCounterCalendarModalProps {
   selectedRange: FromTo | undefined;
   handleRangeSelect: (date: Date | Date[] | FromTo | undefined) => void;
   locale: string;
-  holidays: HolidayDTO[];
+  holidays: Holiday[];
 }
 
 export const WorkdayCounterCalendarModal = ({

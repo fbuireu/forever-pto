@@ -1,4 +1,4 @@
-import type { PaymentData } from '@application/dto/payment/types';
+import type { PaymentData } from '@domain/payment/models/types';
 
 export interface PaymentRepository {
   getById(paymentId: string): Promise<{ success: boolean; data?: PaymentData; error?: string }>;

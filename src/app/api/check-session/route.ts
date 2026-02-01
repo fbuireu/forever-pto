@@ -1,11 +1,6 @@
 import { activateWithEmail, activateWithPayment } from '@application/use-cases/activate-premium';
 import { verifySession } from '@application/use-cases/verify-session';
-import { getTursoClientInstance } from '@infrastructure/clients/db/turso/client';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
-import { createPaymentValidator } from '@infrastructure/services/payments/provider/validate-payment-intent';
-import { createPaymentRepository } from '@infrastructure/services/payments/repository';
-import { createSessionRepository } from '@infrastructure/services/premium/repository';
+import { createDefaultDependencies } from '@infrastructure/container/create-dependencies';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -13,14 +8,6 @@ import { NextResponse } from 'next/server';
 const PREMIUM_COOKIE = 'premium-token';
 const THIRTY_DAYS_IN_SECONDS = 30 * 24 * 60 * 60;
 const isProd = process.env.NODE_ENV === 'production';
-
-const getJWTSecret = () => {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    throw new Error('JWT_SECRET environment variable is not set');
-  }
-  return secret;
-};
 
 async function hashEmail(email: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -36,9 +23,9 @@ async function hashEmail(email: string): Promise<string> {
 export async function GET(request: NextRequest) {
   const startTime = performance.now();
   const requestId = crypto.randomUUID();
-  const logger = getBetterStackInstance();
+  const deps = createDefaultDependencies();
 
-  const requestLogger = logger.withContext({
+  const requestLogger = deps.logger.withContext({
     requestId,
     method: 'GET',
     path: '/api/check-session',
@@ -59,17 +46,15 @@ export async function GET(request: NextRequest) {
         outcome: 'no_token',
         statusCode: 200,
       });
-            return NextResponse.json({ premiumKey: null, email: null });
+      return NextResponse.json({ premiumKey: null, email: null });
     }
 
     requestLogger.info('GET /api/check-session - Token found, verifying session', {
       tokenPrefix: token.slice(0, 10) + '...',
     });
 
-    const sessionRepository = createSessionRepository({ jwtSecret: getJWTSecret() });
-
     const verifyStart = performance.now();
-    const verification = await verifySession(token, { sessionRepository });
+    const verification = await verifySession(token, { sessionRepository: deps.sessionRepository });
     const verifyDuration = performance.now() - verifyStart;
 
     if (!verification.valid) {
@@ -82,7 +67,7 @@ export async function GET(request: NextRequest) {
         statusCode: 200,
       });
 
-            const response = NextResponse.json({ premiumKey: null, email: null });
+      const response = NextResponse.json({ premiumKey: null, email: null });
       response.cookies.delete(PREMIUM_COOKIE);
       return response;
     }
@@ -97,7 +82,7 @@ export async function GET(request: NextRequest) {
       statusCode: 200,
     });
 
-        return NextResponse.json({
+    return NextResponse.json({
       premiumKey: verification.data?.paymentIntentId ?? null,
       email: verification.data?.email ?? null,
     });
@@ -109,16 +94,16 @@ export async function GET(request: NextRequest) {
       statusCode: 500,
     });
 
-        return NextResponse.json({ error: 'Internal error', premiumKey: null, email: null }, { status: 500 });
+    return NextResponse.json({ error: 'Internal error', premiumKey: null, email: null }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   const startTime = performance.now();
   const requestId = crypto.randomUUID();
-  const logger = getBetterStackInstance();
+  const deps = createDefaultDependencies();
 
-  const requestLogger = logger.withContext({
+  const requestLogger = deps.logger.withContext({
     requestId,
     method: 'POST',
     path: '/api/check-session',
@@ -141,7 +126,7 @@ export async function POST(request: NextRequest) {
         bodyKeys: Object.keys(body),
         statusCode: 400,
       });
-            return NextResponse.json({ error: 'Email required' }, { status: 400 });
+      return NextResponse.json({ error: 'Email required' }, { status: 400 });
     }
 
     const emailHash = await hashEmail(email);
@@ -159,16 +144,12 @@ export async function POST(request: NextRequest) {
       activationType: premiumKey ? 'with_payment_intent' : 'existing_payment',
     });
 
-    const stripe = getStripeServerInstance();
-    const turso = getTursoClientInstance();
-    const sessionRepository = createSessionRepository({ jwtSecret: getJWTSecret() });
-    const paymentValidator = createPaymentValidator(stripe);
-    const paymentRepository = createPaymentRepository(turso);
-
-    const params = {
-      sessionRepository,
-      paymentValidator,
-      paymentRepository,
+    const activationDeps = {
+      logger: userLogger,
+      sessionRepository: deps.sessionRepository,
+      paymentValidator: deps.paymentValidator,
+      paymentRepository: deps.paymentRepository,
+      paymentHelpers: deps.paymentHelpers,
     };
 
     let result;
@@ -181,7 +162,7 @@ export async function POST(request: NextRequest) {
       });
 
       try {
-        result = await activateWithPayment({ email, paymentIntentId: premiumKey }, params);
+        result = await activateWithPayment({ email, paymentIntentId: premiumKey }, activationDeps);
         const activationDuration = performance.now() - activationStart;
 
         userLogger.info('POST /api/check-session - Payment activation completed', {
@@ -200,7 +181,7 @@ export async function POST(request: NextRequest) {
       userLogger.info('POST /api/check-session - Checking existing payment for email');
 
       try {
-        result = await activateWithEmail({ email }, params);
+        result = await activateWithEmail({ email }, activationDeps);
         const activationDuration = performance.now() - activationStart;
 
         userLogger.info('POST /api/check-session - Email activation completed', {
@@ -225,7 +206,7 @@ export async function POST(request: NextRequest) {
         statusCode: 400,
       });
 
-            return NextResponse.json(
+      return NextResponse.json(
         {
           error: result.error,
           premiumKey: null,
@@ -245,7 +226,7 @@ export async function POST(request: NextRequest) {
       statusCode: 200,
     });
 
-        const response = NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       premiumKey: result.premiumKey,
       email: result.email,
@@ -268,6 +249,6 @@ export async function POST(request: NextRequest) {
       statusCode: 500,
     });
 
-        return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

@@ -1,7 +1,7 @@
 'use client';
 
-import { usePathname, useRouter } from '@application/i18n/navigtion';
-import { usePremiumStore } from '@application/stores/premium';
+import { usePathname, useRouter } from '@infrastructure/i18n/navigation';
+import { usePremiumStore } from '@ui/store/premium';
 import { useLanguages } from '@ui/hooks/useLanguages';
 import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useMemo } from 'react';

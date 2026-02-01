@@ -1,14 +1,9 @@
-import type { DiscountInfo } from '@application/dto/payment/types';
+import type {
+  CreatePaymentIntentParams,
+  PaymentIntentResult,
+  PaymentIntentService,
+} from '@application/interfaces/payment-services';
 import type Stripe from 'stripe';
-
-interface CreatePaymentIntentParams {
-  amount: number;
-  email: string;
-  promoCode?: string;
-  discountInfo: DiscountInfo | null;
-  userAgent?: string | null;
-  ipAddress?: string | null;
-}
 
 export const createPaymentIntent = async (
   stripe: Stripe,
@@ -42,3 +37,20 @@ export const createPaymentIntent = async (
     },
   });
 };
+
+export const createPaymentIntentService = (stripe: Stripe): PaymentIntentService => ({
+  create: async (params: CreatePaymentIntentParams): Promise<PaymentIntentResult> => {
+    const intent = await createPaymentIntent(stripe, params);
+    return {
+      id: intent.id,
+      created: intent.created,
+      customer: intent.customer,
+      latest_charge: intent.latest_charge,
+      currency: intent.currency,
+      status: intent.status,
+      payment_method_types: intent.payment_method_types,
+      description: intent.description,
+      client_secret: intent.client_secret,
+    };
+  },
+});

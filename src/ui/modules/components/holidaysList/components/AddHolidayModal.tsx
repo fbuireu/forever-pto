@@ -1,6 +1,6 @@
 'use client';
 
-import { useHolidaysStore } from '@application/stores/holidays';
+import { useHolidaysStore } from '@ui/store/holidays';
 import {
   Dialog,
   DialogContent,
@@ -20,9 +20,9 @@ import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Plus } from 'src/components/animate-ui/icons/plus';
 import { Calendar, CalendarSelectionMode, type FromTo } from '../../core/Calendar';
-import { formatDate } from '../../utils/formatters';
+import { formatDate } from '@domain/shared/utils/formatters';
 import { type HolidayFormData, holidaySchema } from './schema';
-import { useFiltersStore } from '@application/stores/filters';
+import { useFiltersStore } from '@ui/store/filters';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 interface AddHolidayModalProps {

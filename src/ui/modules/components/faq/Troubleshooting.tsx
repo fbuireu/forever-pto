@@ -1,7 +1,7 @@
 'use client';
 
-import { useFiltersStore } from '@application/stores/filters';
-import { useHolidaysStore } from '@application/stores/holidays';
+import { useFiltersStore } from '@ui/store/filters';
+import { useHolidaysStore } from '@ui/store/holidays';
 import { useLocale } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';

@@ -1,6 +1,6 @@
 'use client';
 
-import { usePremiumStore } from '@application/stores/premium';
+import { usePremiumStore } from '@ui/store/premium';
 import { cn } from '@const/lib/utils';
 import { InfoIcon } from 'lucide-react';
 import { useEffect } from 'react';

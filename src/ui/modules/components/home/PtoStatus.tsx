@@ -1,8 +1,8 @@
 'use client';
 
-import { useFiltersStore } from '@application/stores/filters';
-import type { HolidaysState } from '@application/stores/holidays';
-import { useHolidaysStore } from '@application/stores/holidays';
+import { useFiltersStore } from '@ui/store/filters';
+import type { HolidaysState } from '@ui/store/holidays';
+import { useHolidaysStore } from '@ui/store/holidays';
 import { cn } from '@const/lib/utils';
 import { MousePointerClick } from 'lucide-react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
@@ -63,7 +63,7 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
                 <span className='text-[10px]'>Click days to assign/remove</span>
               </div>
             )}
-            {remaining === 0 && !hasManualChanges && (
+            {remaining === 0 && (
               <div className='text-xs text-green-600 dark:text-green-400 font-medium text-[10px]'>
                 ✓ All days assigned!
               </div>

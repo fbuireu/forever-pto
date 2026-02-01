@@ -1,5 +1,4 @@
-import type { SessionVerificationResult } from '@application/dto/premium/types';
-import { SessionRepository } from '@domain/session/repository/types';
+import type { SessionRepository, SessionVerificationResult } from '@domain/session/repository/types';
 
 interface VerifySessionParams {
   sessionRepository: SessionRepository;

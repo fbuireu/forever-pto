@@ -1,6 +1,6 @@
 'use client';
 
-import { useHolidaysStore } from '@application/stores/holidays';
+import { useHolidaysStore } from '@ui/store/holidays';
 import { Field, Label } from '@headlessui/react';
 import { differenceInCalendarDays } from 'date-fns';
 import { CalendarDays, InfoIcon } from 'lucide-react';
@@ -12,7 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/co
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 import type { FromTo } from '../../core/Calendar';
-import { formatDate } from '../../utils/formatters';
+import { formatDate } from '@domain/shared/utils/formatters';
 import { calculateHolidaysInRange, calculateWeekends, calculateWorkdays } from '../../utils/helpers';
 
 const CalendarModal = dynamic(() =>

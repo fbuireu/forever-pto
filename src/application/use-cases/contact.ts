@@ -1,26 +1,33 @@
-import { contactSchema } from '@application/dto/contact/schema';
-import type { ContactFormData, ContactResult } from '@application/dto/contact/types';
+import type { EmailRenderer } from '@application/interfaces/email-renderer';
+import { contactSchema } from '@application/schemas/contact/schema';
+import type { ContactFormData, ContactResult } from '@application/schemas/contact/types';
+import type { ContactRepository } from '@domain/contact/repository/types';
+import type { EmailService } from '@domain/contact/services/email';
 import { createContactError } from '@domain/contact/events/factory/errors';
-import { getTursoClientInstance } from '@infrastructure/clients/db/turso/client';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { getResendClientInstance } from '@infrastructure/clients/email/resend/client';
-import { saveContact } from '@infrastructure/services/contact/repository';
-import { ContactFormEmail } from '@infrastructure/services/email/templates/Contact';
-import { getCloudflareContext } from '@opennextjs/cloudflare';
-import { render } from '@react-email/render';
+import type { Logger } from '@domain/shared/types';
 import { z } from 'zod';
 
-export async function sendContactEmail(data: ContactFormData): Promise<ContactResult> {
-  const resend = getResendClientInstance();
-  const logger = getBetterStackInstance();
+export interface SendContactEmailDependencies {
+  logger: Logger;
+  emailService: EmailService;
+  emailRenderer: EmailRenderer;
+  contactRepository: ContactRepository;
+  siteUrl: string;
+  recipientEmail: string;
+}
+
+export async function sendContactEmail(
+  data: ContactFormData,
+  deps: SendContactEmailDependencies
+): Promise<ContactResult> {
+  const { logger, emailService, emailRenderer, contactRepository, siteUrl, recipientEmail } = deps;
 
   try {
-    const { env } = getCloudflareContext();
     const validated = contactSchema.parse(data);
 
     let emailHtml: string;
     try {
-      emailHtml = await render(ContactFormEmail({ ...validated, baseUrl: env.NEXT_PUBLIC_SITE_URL }));
+      emailHtml = await emailRenderer.renderContactEmail({ ...validated, baseUrl: siteUrl });
     } catch (error) {
       logger.logError('Contact email render failed', error, {
         emailDomain: validated.email?.split('@')[1],
@@ -31,9 +38,9 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
       return { success: false, error: renderError.message };
     }
 
-    const emailResult = await resend.send({
+    const emailResult = await emailService.sendEmail({
       from: 'Forever PTO <contact@forever-pto.com>',
-      to: env.NEXT_PUBLIC_EMAIL_SELF,
+      to: recipientEmail,
       subject: `[Forever PTO Contact] ${validated.subject}`,
       html: emailHtml,
       replyTo: validated.email,
@@ -50,8 +57,7 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
       return { success: false, error: error.message };
     }
 
-    const turso = getTursoClientInstance();
-    const saveResult = await saveContact(turso, {
+    const saveResult = await contactRepository.save({
       email: validated.email,
       name: validated.name,
       subject: validated.subject,

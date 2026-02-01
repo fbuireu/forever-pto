@@ -1,8 +1,8 @@
 'use client';
 
 import { type CreatePaymentInput, createPaymentSchema } from '@application/dto/payment/schema';
-import { type DiscountInfo } from '@application/dto/payment/types';
-import { usePremiumStore } from '@application/stores/premium';
+import type { DiscountInfo } from '@domain/payment/models/types';
+import { usePremiumStore } from '@ui/store/premium';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { getStripeClientInstance } from '@infrastructure/clients/payments/stripe/client';

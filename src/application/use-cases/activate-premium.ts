@@ -1,13 +1,11 @@
-import type { PaymentData } from '@application/dto/payment/types';
-import type { PremiumActivationResult } from '@application/dto/premium/types';
+import type { PaymentHelpers } from '@application/interfaces/payment-services';
+import type { PaymentData } from '@domain/payment/models/types';
+import type { PremiumActivationResult } from '@application/use-cases/premium/types';
 import type { PaymentRepository } from '@domain/payment/repository/types';
 import type { PaymentValidator } from '@domain/payment/services/validators';
-import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
+import type { SessionRepository } from '@domain/session/repository/types';
+import type { Logger } from '@domain/shared/types';
 import type Stripe from 'stripe';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { SessionRepository } from '@domain/session/repository/types';
-
-const logger = getBetterStackInstance();
 
 interface ActivatePremiumWithPaymentParams {
   email: string;
@@ -18,18 +16,24 @@ interface ActivatePremiumWithEmailParams {
   email: string;
 }
 
-interface ActivatePremiumParams {
+export interface ActivatePremiumDependencies {
+  logger: Logger;
   sessionRepository: SessionRepository;
   paymentValidator: PaymentValidator;
   paymentRepository: PaymentRepository;
+  paymentHelpers: PaymentHelpers;
 }
 
-const buildPaymentDataFromIntent = (paymentIntent: Stripe.PaymentIntent, email: string): PaymentData => {
+const buildPaymentDataFromIntent = (
+  paymentIntent: Stripe.PaymentIntent,
+  email: string,
+  helpers: PaymentHelpers
+): PaymentData => {
   return {
     id: paymentIntent.id,
     stripeCreatedAt: new Date(paymentIntent.created * 1000),
-    customerId: extractCustomerId(paymentIntent.customer),
-    chargeId: extractChargeId(paymentIntent.latest_charge),
+    customerId: helpers.extractCustomerId(paymentIntent.customer),
+    chargeId: helpers.extractChargeId(paymentIntent.latest_charge),
     email,
     amount: paymentIntent.amount,
     currency: paymentIntent.currency,
@@ -58,11 +62,12 @@ const buildPaymentDataFromIntent = (paymentIntent: Stripe.PaymentIntent, email: 
 
 export const activateWithPayment = async (
   input: ActivatePremiumWithPaymentParams,
-  params: ActivatePremiumParams
+  deps: ActivatePremiumDependencies
 ): Promise<PremiumActivationResult> => {
   const { email, paymentIntentId } = input;
+  const { logger, paymentValidator, paymentRepository, sessionRepository, paymentHelpers } = deps;
 
-  const validation = await params.paymentValidator.validatePaymentIntent(paymentIntentId);
+  const validation = await paymentValidator.validatePaymentIntent(paymentIntentId);
 
   if (!validation.valid) {
     return {
@@ -83,19 +88,19 @@ export const activateWithPayment = async (
   }
 
   if (validation.paymentIntent) {
-    const existingPayment = await params.paymentRepository.getById(paymentIntentId);
+    const existingPayment = await paymentRepository.getById(paymentIntentId);
 
     if (existingPayment.success && existingPayment.data) {
       if (existingPayment.data.status !== 'succeeded' && validation.paymentIntent.status === 'succeeded') {
-        const updateResult = await params.paymentRepository.updateStatus(paymentIntentId, 'succeeded');
+        const updateResult = await paymentRepository.updateStatus(paymentIntentId, 'succeeded');
 
         if (!updateResult.success) {
           logger.error('Failed to update payment status', { reason: updateResult.error, paymentIntentId, emailDomain: email?.split('@')[1] });
         }
       }
     } else {
-      const paymentData = buildPaymentDataFromIntent(validation.paymentIntent, email);
-      const saveResult = await params.paymentRepository.save(paymentData);
+      const paymentData = buildPaymentDataFromIntent(validation.paymentIntent, email, paymentHelpers);
+      const saveResult = await paymentRepository.save(paymentData);
 
       if (!saveResult.success) {
         logger.error('Failed to save payment to DB', { reason: saveResult.error, paymentIntentId, emailDomain: email?.split('@')[1] });
@@ -105,7 +110,7 @@ export const activateWithPayment = async (
     }
   }
 
-  const token = await params.sessionRepository.create({
+  const token = await sessionRepository.create({
     email,
     paymentIntentId,
   });
@@ -120,11 +125,12 @@ export const activateWithPayment = async (
 
 export const activateWithEmail = async (
   input: ActivatePremiumWithEmailParams,
-  params: ActivatePremiumParams
+  deps: ActivatePremiumDependencies
 ): Promise<PremiumActivationResult> => {
   const { email } = input;
+  const { paymentRepository, sessionRepository } = deps;
 
-  const paymentResult = await params.paymentRepository.getByEmail(email);
+  const paymentResult = await paymentRepository.getByEmail(email);
 
   if (!paymentResult.success || !paymentResult.data) {
     return {
@@ -146,7 +152,7 @@ export const activateWithEmail = async (
     };
   }
 
-  const token = await params.sessionRepository.create({
+  const token = await sessionRepository.create({
     email,
     paymentIntentId: payment.id,
   });

@@ -1,4 +1,4 @@
-import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
+import { type Holiday, HolidayVariant } from '@domain/calendar/models/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@const/components/ui/card';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers';
 import { PieChart } from 'lucide-react';
@@ -9,7 +9,7 @@ import { COLOR_SCHEMES } from './const';
 
 interface HolidaysDistributionChartProps {
   ptoDays: number;
-  holidays: HolidayDTO[];
+  holidays: Holiday[];
 }
 
 interface LegendPayload {

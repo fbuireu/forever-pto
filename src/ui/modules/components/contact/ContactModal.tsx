@@ -1,7 +1,7 @@
 'use client';
 
-import { type ContactFormData, contactSchema } from '@application/dto/contact/schema';
-import { usePremiumStore } from '@application/stores/premium';
+import { type ContactFormData, contactSchema } from '@application/schemas/contact/schema';
+import { usePremiumStore } from '@ui/store/premium';
 import { Button } from '@const/components/ui/button';
 import {
   Dialog,

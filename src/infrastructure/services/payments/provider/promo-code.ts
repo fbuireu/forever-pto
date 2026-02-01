@@ -1,34 +1,20 @@
-import type { DiscountInfo } from '@application/dto/payment/types';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import type { PromoCodeService } from '@application/interfaces/payment-services';
+import {
+  createDiscountInfo,
+  type PromoCodeDiscount,
+  type PromoCodeValidation,
+  type PromoValidationResult,
+  validateMinimumAmount,
+  validatePromoCodeRules,
+} from '@domain/payment/services/promo-code';
+import type { Logger } from '@domain/shared/types';
 import type Stripe from 'stripe';
-
-const logger = getBetterStackInstance();
-
-const MIN_FINAL_AMOUNT = 0.5;
-
-type PromoValidationResult = { success: true; data: DiscountInfo } | { success: false; error: string };
-
-const getCouponValidationError = (coupon: Stripe.Coupon): string | null => {
-  if (!coupon.valid) return 'This promo code is no longer valid';
-  if (coupon.max_redemptions && coupon.times_redeemed >= coupon.max_redemptions) {
-    return 'This promo code has reached its usage limit';
-  }
-  if (coupon.redeem_by && coupon.redeem_by < Math.floor(Date.now() / 1000)) {
-    return 'This promo code has expired';
-  }
-  return null;
-};
-
-const calculateFinalAmount = (coupon: Stripe.Coupon, amount: number): number => {
-  if (coupon.percent_off) return amount * (1 - coupon.percent_off / 100);
-  if (coupon.amount_off) return amount - coupon.amount_off / 100;
-  return amount;
-};
 
 export const validatePromoCode = async (
   stripe: Stripe,
   code: string,
-  amount: number
+  amount: number,
+  logger: Logger
 ): Promise<PromoValidationResult> => {
   try {
     const promotionCodes = await stripe.promotionCodes.list({
@@ -52,30 +38,35 @@ export const validatePromoCode = async (
       return { success: false, error: 'Failed to load coupon details' };
     }
 
-    const validationError = getCouponValidationError(coupon);
+    const validation: PromoCodeValidation = {
+      valid: coupon.valid,
+      maxRedemptions: coupon.max_redemptions ?? undefined,
+      timesRedeemed: coupon.times_redeemed,
+      redeemBy: coupon.redeem_by ?? undefined,
+    };
+
+    const validationError = validatePromoCodeRules(validation);
     if (validationError) {
       return { success: false, error: validationError };
     }
 
-    const finalAmount = calculateFinalAmount(coupon, amount);
+    const discount: PromoCodeDiscount = {
+      percentOff: coupon.percent_off ?? undefined,
+      amountOff: coupon.amount_off ?? undefined,
+      id: coupon.id,
+      name: coupon.name,
+    };
 
-    if (finalAmount < MIN_FINAL_AMOUNT) {
-      return {
-        success: false,
-        error: `Discount cannot reduce amount below ${MIN_FINAL_AMOUNT.toFixed(2)}`,
-      };
+    const discountInfo = createDiscountInfo(discount, amount);
+
+    const minimumAmountError = validateMinimumAmount(discountInfo.finalAmount);
+    if (minimumAmountError) {
+      return { success: false, error: minimumAmountError };
     }
 
     return {
       success: true,
-      data: {
-        type: coupon.percent_off ? 'percent' : 'fixed',
-        value: coupon.percent_off ?? (coupon.amount_off ? coupon.amount_off / 100 : 0),
-        originalAmount: amount,
-        finalAmount,
-        couponId: coupon.id,
-        couponName: coupon.name,
-      },
+      data: discountInfo,
     };
   } catch (error) {
     logger.logError('Promo code validation error in promo-code service', error, {
@@ -85,3 +76,7 @@ export const validatePromoCode = async (
     return { success: false, error: 'Error validating promo code. Please try again.' };
   }
 };
+
+export const createPromoCodeService = (stripe: Stripe, logger: Logger): PromoCodeService => ({
+  validate: (code: string, amount: number) => validatePromoCode(stripe, code, amount, logger),
+});

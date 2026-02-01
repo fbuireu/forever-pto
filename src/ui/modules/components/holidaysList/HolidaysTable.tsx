@@ -1,9 +1,9 @@
 'use client';
 
-import type { HolidayDTO } from '@application/dto/holiday/types';
-import { HolidayVariant } from '@application/dto/holiday/types';
-import { useHolidaysStore } from '@application/stores/holidays';
-import { usePremiumStore } from '@application/stores/premium';
+import type { Holiday } from '@domain/calendar/models/types';
+import { HolidayVariant } from '@domain/calendar/models/types';
+import { useHolidaysStore } from '@ui/store/holidays';
+import { usePremiumStore } from '@ui/store/premium';
 import { Badge } from '@const/components/ui/badge';
 import { Input } from '@const/components/ui/input';
 import { Table, TableBody, TableCell, TableRow } from '@const/components/ui/table';
@@ -52,11 +52,11 @@ const HolidayCard = ({
   onToggle,
   premiumKey,
 }: {
-  holiday: HolidayDTO;
+  holiday: Holiday;
   index: number;
   isSelected: boolean;
   locale: string;
-  onToggle: (holiday: HolidayDTO, index: number) => void;
+  onToggle: (holiday: Holiday, index: number) => void;
   premiumKey: string | null;
 }) => {
   const dateFormatted = new Intl.DateTimeFormat(locale, {
@@ -122,7 +122,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   const [innerOpen, setInnerOpen] = useState(false);
   const [selectedHolidays, setSelectedHolidays] = useState<Set<string>>(new Set());
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof HolidayDTO | null;
+    key: keyof Holiday | null;
     direction: 'asc' | 'desc';
   }>({ key: null, direction: 'asc' });
 
@@ -179,14 +179,14 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
     return filtered;
   }, [variantHolidays, debouncedSearchTerm, sortConfig]);
 
-  const handleSort = useCallback((key: keyof HolidayDTO) => {
+  const handleSort = useCallback((key: keyof Holiday) => {
     setSortConfig((current) => ({
       key,
       direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc',
     }));
   }, []);
 
-  const getHolidayId = useCallback((holiday: HolidayDTO, index: number) => {
+  const getHolidayId = useCallback((holiday: Holiday, index: number) => {
     return `${holiday.name}-${holiday.date.getTime()}-${index}`;
   }, []);
 
@@ -223,7 +223,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   }, [filteredHolidays, selectionState.type, getHolidayId]);
 
   const toggleSelectHoliday = useCallback(
-    (holiday: HolidayDTO, index: number) => {
+    (holiday: Holiday, index: number) => {
       setSelectedHolidays((prev) => {
         const holidayId = getHolidayId(holiday, index);
         const newSelected = new Set(prev);

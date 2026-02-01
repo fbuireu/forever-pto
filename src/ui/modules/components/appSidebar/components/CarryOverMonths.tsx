@@ -1,6 +1,6 @@
 'use client';
 
-import { useFiltersStore } from '@application/stores/filters';
+import { useFiltersStore } from '@ui/store/filters';
 import { Slider } from '@const/components/ui/slider';
 import { Field, Label } from '@headlessui/react';
 import { InfoIcon } from 'lucide-react';

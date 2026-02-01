@@ -1,7 +1,7 @@
 'use client';
 
-import { useFiltersStore } from '@application/stores/filters';
-import { useHolidaysStore } from '@application/stores/holidays';
+import { useFiltersStore } from '@ui/store/filters';
+import { useHolidaysStore } from '@ui/store/holidays';
 import { cn } from '@const/lib/utils';
 import { Field, Label } from '@headlessui/react';
 import { useDebounce } from '@ui/hooks/useDebounce';

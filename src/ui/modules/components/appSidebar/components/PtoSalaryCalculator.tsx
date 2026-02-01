@@ -1,6 +1,6 @@
 'use client';
 
-import { usePremiumStore } from '@application/stores/premium';
+import { usePremiumStore } from '@ui/store/premium';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@const/components/ui/input-group';
 import { Field, Label } from '@headlessui/react';
 import { Euro, InfoIcon } from 'lucide-react';

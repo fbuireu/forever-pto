@@ -1,12 +1,12 @@
 'use client';
 
-import { useFiltersStore } from '@application/stores/filters';
+import { useFiltersStore } from '@ui/store/filters';
 import { Badge } from '@const/components/ui/badge';
 import { Card, CardDescription } from '@const/components/ui/card';
 import { Combobox } from '@const/components/ui/combobox';
 import { cn } from '@const/lib/utils';
+import { FilterStrategy } from '@domain/calendar/models/types';
 import { Field, Label } from '@headlessui/react';
-import { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { AlertCircle, CheckCircle2, DicesIcon, Scale, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import { ChevronDown } from 'src/components/animate-ui/icons/chevron-down';

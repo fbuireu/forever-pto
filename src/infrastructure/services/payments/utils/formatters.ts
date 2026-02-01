@@ -1,4 +1,4 @@
-import type { DiscountInfo } from '@application/dto/payment/types';
+import type { DiscountInfo } from '@domain/payment/models/types';
 
 export const formatDiscountMessage = (discountInfo: DiscountInfo) => {
   const saved = discountInfo.originalAmount - discountInfo.finalAmount;

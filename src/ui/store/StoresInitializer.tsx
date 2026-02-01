@@ -1,6 +1,6 @@
 'use client';
 
-import { useFiltersStore } from '@application/stores/filters';
+import { useFiltersStore } from '@ui/store/filters';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';

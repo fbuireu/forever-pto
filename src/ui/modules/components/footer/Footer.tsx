@@ -1,4 +1,4 @@
-import { Link } from '@application/i18n/navigtion';
+import { Link } from '@infrastructure/i18n/navigation';
 import { ContactButton } from '../contact/ContactButton';
 import { CookieButton } from './components/CookieButton';
 import { DevFooter } from './components/DevFooter';

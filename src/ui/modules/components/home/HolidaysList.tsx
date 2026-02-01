@@ -1,7 +1,7 @@
 'use client';
 
-import { HolidayVariant } from '@application/dto/holiday/types';
-import { useHolidaysStore } from '@application/stores/holidays';
+import { HolidayVariant } from '@domain/calendar/models/types';
+import { useHolidaysStore } from '@ui/store/holidays';
 import { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger } from 'src/components/animate-ui/components/tabs';
 import { HolidaysTable } from '../holidaysList/HolidaysTable';

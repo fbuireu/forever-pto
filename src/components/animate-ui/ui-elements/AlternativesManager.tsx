@@ -1,7 +1,7 @@
 'use client';
 
-import type { AlternativeSelectionBaseParams } from '@application/stores/types';
-import type { Suggestion } from '@infrastructure/services/calendar/types';
+import type { AlternativeSelectionBaseParams } from '@ui/store/types';
+import type { Suggestion } from '@domain/calendar/models/types';
 import { BarChart3, CalendarDays, Sparkles, TrendingUp } from 'lucide-react';
 import { motion, type Transition, type Variants } from 'motion/react';
 import { useCallback, useState } from 'react';

@@ -1,14 +1,11 @@
+import type { PaymentHelpers, PaymentIntentService, PromoCodeService } from '@application/interfaces/payment-services';
 import { paymentDTO } from '@application/dto/payment/dto';
 import { createPaymentSchema, type CreatePaymentInput } from '@application/dto/payment/schema';
-import type { DiscountInfo, PaymentDTO } from '@application/dto/payment/types';
+import type { PaymentDTO } from '@application/dto/payment/types';
+import type { DiscountInfo } from '@domain/payment/models/types';
 import { createPaymentError } from '@domain/payment/events/factory/errors';
-import { getTursoClientInstance } from '@infrastructure/clients/db/turso/client';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
-import { createPaymentIntent } from '@infrastructure/services/payments/provider/payment-intent';
-import { validatePromoCode } from '@infrastructure/services/payments/provider/promo-code';
-import { savePayment } from '@infrastructure/services/payments/repository';
-import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
+import type { PaymentRepository } from '@domain/payment/repository/types';
+import type { Logger } from '@domain/shared/types';
 import Stripe from 'stripe';
 import { ZodError } from 'zod';
 
@@ -17,13 +14,21 @@ interface PaymentContext {
   ipAddress: string | null;
 }
 
+export interface CreatePaymentDependencies {
+  logger: Logger;
+  paymentRepository: PaymentRepository;
+  paymentIntentService: PaymentIntentService;
+  promoCodeService: PromoCodeService;
+  paymentHelpers: PaymentHelpers;
+}
+
 export async function createPayment(
   params: CreatePaymentInput,
-  context: PaymentContext
+  context: PaymentContext,
+  deps: CreatePaymentDependencies
 ): Promise<PaymentDTO> {
   const { userAgent, ipAddress } = context;
-  const stripe = getStripeServerInstance();
-  const logger = getBetterStackInstance();
+  const { logger, paymentRepository, paymentIntentService, promoCodeService, paymentHelpers } = deps;
 
   try {
     const validated = createPaymentSchema.parse(params);
@@ -32,7 +37,7 @@ export async function createPayment(
     let discountInfo: DiscountInfo | null = null;
 
     if (validated.promoCode?.trim()) {
-      const validation = await validatePromoCode(stripe, validated.promoCode, validated.amount);
+      const validation = await promoCodeService.validate(validated.promoCode, validated.amount);
 
       if (!validation.success) {
         const error = createPaymentError.invalidPromoCode(validation.error);
@@ -45,7 +50,7 @@ export async function createPayment(
       finalAmount = discountInfo.finalAmount;
     }
 
-    const paymentIntent = await createPaymentIntent(stripe, {
+    const paymentIntent = await paymentIntentService.create({
       amount: finalAmount,
       email: validated.email,
       promoCode: validated.promoCode,
@@ -54,12 +59,11 @@ export async function createPayment(
       ipAddress,
     });
 
-    const turso = getTursoClientInstance();
-    const saveResult = await savePayment(turso, {
+    const saveResult = await paymentRepository.save({
       id: paymentIntent.id,
       stripeCreatedAt: new Date(paymentIntent.created * 1000),
-      customerId: extractCustomerId(paymentIntent.customer),
-      chargeId: extractChargeId(paymentIntent.latest_charge),
+      customerId: paymentHelpers.extractCustomerId(paymentIntent.customer),
+      chargeId: paymentHelpers.extractChargeId(paymentIntent.latest_charge),
       email: validated.email,
       amount: Math.round(finalAmount * 100),
       currency: paymentIntent.currency,

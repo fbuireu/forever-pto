@@ -7,6 +7,8 @@ export interface PaymentSucceededEvent {
   email: string;
   amount: number;
   status: string;
+  customerId: string | null;
+  chargeId: string | null;
 }
 
 export interface PaymentFailedEvent {

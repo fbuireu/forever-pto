@@ -1,5 +1,5 @@
-import type { HolidayDTO } from '@application/dto/holiday/types';
-import { getLocalizedDateFns } from '@application/i18n/localize';
+import type { Holiday } from '@domain/calendar/models/types';
+import { getLocalizedDateFns } from '@domain/shared/utils/localize';
 import type { Day } from 'date-fns';
 import {
   addDays,
@@ -42,7 +42,7 @@ export const getWeekdayNames = ({ locale, weekStartsOn }: GetWeekdayNamesParams)
 };
 
 interface GetDayLabelParams {
-  holidays: HolidayDTO[];
+  holidays: Holiday[];
   date: Date;
 }
 
@@ -87,7 +87,7 @@ export const getCalendarDays = ({ month, weekStartsOn, fixedWeeks }: GetCalendar
   return days;
 };
 
-export function calculateWorkdays(range: FromTo, holidays: HolidayDTO[]): number {
+export function calculateWorkdays(range: FromTo, holidays: Holiday[]): number {
   const days = eachDayOfInterval({
     start: range.from,
     end: range.to,
@@ -112,7 +112,7 @@ export function calculateWeekends(range: FromTo): number {
   return new Set(weekendDays.map((day) => getWeek(day))).size;
 }
 
-export function calculateHolidaysInRange(range: FromTo, holidays: HolidayDTO[]): number {
+export function calculateHolidaysInRange(range: FromTo, holidays: Holiday[]): number {
   const days = eachDayOfInterval({
     start: range.from,
     end: range.to,

@@ -1,6 +1,6 @@
-import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
-import type { HolidaysState } from '@application/stores/holidays';
-import type { Suggestion } from '@infrastructure/services/calendar/types';
+import { type Holiday, HolidayVariant } from '@domain/calendar/models/types';
+import type { HolidaysState } from '@ui/store/holidays';
+import type { Suggestion } from '@domain/calendar/models/types';
 import { isBefore, isSameDay, startOfToday } from 'date-fns';
 import type { FromTo } from '../core/Calendar';
 
@@ -63,7 +63,7 @@ export const isAlternative = ({
   };
 };
 
-export const isCustom = (holidays: HolidayDTO[]) => (date: Date) => {
+export const isCustom = (holidays: Holiday[]) => (date: Date) => {
   return holidays.some((holiday) => isSameDay(holiday.date, date) && holiday.variant === HolidayVariant.CUSTOM);
 };
 

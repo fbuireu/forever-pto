@@ -1,10 +1,10 @@
 'use client';
 
-import { HolidayVariant } from '@application/dto/holiday/types';
-import { useFiltersStore } from '@application/stores/filters';
-import { useHolidaysStore } from '@application/stores/holidays';
-import { useLocationStore } from '@application/stores/location';
-import { usePremiumStore } from '@application/stores/premium';
+import { HolidayVariant } from '@domain/calendar/models/types';
+import { useFiltersStore } from '@ui/store/filters';
+import { useHolidaysStore } from '@ui/store/holidays';
+import { useLocationStore } from '@ui/store/location';
+import { usePremiumStore } from '@ui/store/premium';
 import { Badge } from '@const/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { useStoresReady } from '@ui/hooks/useStoresReady';

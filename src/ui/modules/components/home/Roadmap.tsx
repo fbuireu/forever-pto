@@ -2,7 +2,6 @@
 
 import { Button } from '@const/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
-import { cn } from '@const/lib/utils';
 import { Circle, Sparkles } from 'lucide-react';
 import type { SVGMotionProps } from 'motion/react';
 import dynamic from 'next/dynamic';
@@ -11,6 +10,8 @@ import { FeatureList } from 'src/components/animate-ui/components/community/Feat
 import { RadialNav, type RadialNavProps } from 'src/components/animate-ui/components/community/radial-nav';
 import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
 import { Clock } from 'src/components/animate-ui/icons/clock';
+import { RotatingTextContainer } from 'src/components/animate-ui/primitives/texts/rotating';
+import { RotatingText } from 'src/components/animate-ui/text/rotating';
 import './roadmap.css';
 
 const ContactModal = dynamic(() =>
@@ -179,7 +180,9 @@ export function Roadmap() {
           {selectedNavItem && (
             <div className='text-center'>
               <p className='text-sm text-muted-foreground'>Selected</p>
-              <p className={cn('text-lg font-semibold', selectedNavItem.className)}>{selectedNavItem.label}</p>
+              <RotatingTextContainer text={selectedNavItem.label}>
+                <RotatingText text={selectedNavItem.label} />
+              </RotatingTextContainer>
             </div>
           )}
         </div>
