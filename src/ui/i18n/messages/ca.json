@@ -305,10 +305,20 @@
     "close": "Tancar",
     "failedToSend": "Error en enviar el missatge"
   },
-  "premium": {
-    "selectHoliday": "Seleccionar Festiu",
-    "selectAllHolidays": "Seleccionar Tots els Festius"
+  "alternativesManager": {
+    "option": "Opció",
+    "recommended": "Recomanat",
+    "totalOff": "Total Lliures",
+    "efficiency": "Eficiència",
+    "vsMain": "vs Principal",
+    "alreadyApplied": "Ja Aplicat",
+    "applyAlternative": "Aplicar Alternativa",
+    "previousSuggestion": "Suggeriment anterior",
+    "nextSuggestion": "Següent suggeriment",
+    "totalDaysOff": "Total Dies Lliures",
+    "comparison": "Comparació"
   },
+
   "toasts": {
     "suggestionApplied": "Suggeriment aplicat correctament",
     "cannotSelectPastDays": "No es poden seleccionar dies passats",
@@ -336,6 +346,7 @@
     "tools": "Eines",
     "calculators": "Calculadores",
     "loading": "Carregant...",
+    "toggleSidebar": "Alternar Barra Lateral",
     "country": {
       "title": "País",
       "tooltip": "Aquesta dada s'infereix del teu CDN i la teva connexió. Si creus que no és precís o vols veure els festius d'altres països, pots seleccionar-lo manualment aquí",
@@ -423,7 +434,9 @@
     "title": "Calculadora PTO vs Salari",
     "tooltip": "Calcula quant temps lliure pagat estàs perdent en no usar els teus dies de PTO. Continues rebent el teu salari complet, però estàs treballant dies que podries haver agafat com a vacances pagades.",
     "annualSalary": "Salari Anual",
+    "annualSalaryPlaceholder": "50000",
     "unusedPtoDays": "Dies PTO No Usats",
+    "unusedPtoDaysPlaceholder": "5",
     "valueOfUnusedPto": "Valor del PTO no usat:",
     "worthOfPaidVacation": "Valor de vacances pagades no agafades",
     "yourDailyRate": "La teva tarifa diària:",
@@ -471,6 +484,7 @@
     "verifyDescription": "No et preocupis, si ja has donat comprovarem el teu email a la nostra llista i et concedirem accés premium. Si tens algun problema no dubtis en contactar-nos.",
     "considerDonating": "Si encara no has donat, considera fer-ho per donar suport al projecte i desbloquejar les funcions premium.",
     "enterPremiumEmail": "Introdueix el teu email premium",
+    "emailPlaceholder": "el-teu@email.com",
     "verifying": "Verificant...",
     "verifyAccess": "Verificar Accés",
     "cancel": "Cancel·lar",
@@ -569,6 +583,10 @@
   "workdayCounterModal": {
     "selectDateRange": "Seleccionar rang de dates"
   },
+  "command": {
+    "commandPalette": "Paleta de Comandes",
+    "searchPlaceholder": "Cercar una comanda per executar..."
+  },
   "common": {
     "loading": "Carregant...",
     "cancel": "Cancel·lar",
@@ -655,6 +673,8 @@
     }
   },
   "premium": {
+    "selectHoliday": "Seleccionar Festiu",
+    "selectAllHolidays": "Seleccionar Tots els Festius",
     "unlockFeature": "Desbloquejar funció premium: {feature}",
     "premiumFeature": "Funció premium",
     "unlockDescription": "Desbloqueja la capacitat d'afegir/eliminar suggeriments i afegir/eliminar dies restants actualitzant a premium.",

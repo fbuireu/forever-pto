@@ -10,46 +10,38 @@ export type ContactErrorType = (typeof CONTACT_ERROR_TYPES)[keyof typeof CONTACT
 
 export interface ContactError {
   type: ContactErrorType;
-  message: string;
+  message?: string;
   code?: string;
   details?: Record<string, unknown>;
 }
 
-const DEFAULT_ERROR_MESSAGES: Record<ContactErrorType, string> = {
-  [CONTACT_ERROR_TYPES.VALIDATION_ERROR]: 'Invalid input data provided.',
-  [CONTACT_ERROR_TYPES.EMAIL_SEND_FAILED]: 'Failed to send email. Please try again.',
-  [CONTACT_ERROR_TYPES.SAVE_FAILED]: 'We\'ve received your inquiry, though we encountered a minor technical hiccup finishing the logs. No further action is needed on your part.',
-  [CONTACT_ERROR_TYPES.RENDER_FAILED]: 'Failed to prepare email. Please try again.',
-  [CONTACT_ERROR_TYPES.UNKNOWN]: 'An unexpected error occurred. Please try again.',
-} as const;
-
 export const createContactError = {
   validation: (message?: string, details?: Record<string, unknown>): ContactError => ({
     type: CONTACT_ERROR_TYPES.VALIDATION_ERROR,
-    message: message ?? DEFAULT_ERROR_MESSAGES[CONTACT_ERROR_TYPES.VALIDATION_ERROR],
+    ...(message && { message }),
     details,
   }),
 
   emailSendFailed: (message?: string, code?: string): ContactError => ({
     type: CONTACT_ERROR_TYPES.EMAIL_SEND_FAILED,
-    message: message ?? DEFAULT_ERROR_MESSAGES[CONTACT_ERROR_TYPES.EMAIL_SEND_FAILED],
+    ...(message && { message }),
     code,
   }),
 
   saveFailed: (message?: string): ContactError => ({
     type: CONTACT_ERROR_TYPES.SAVE_FAILED,
-    message: message ?? DEFAULT_ERROR_MESSAGES[CONTACT_ERROR_TYPES.SAVE_FAILED],
+    ...(message && { message }),
   }),
 
   renderFailed: (message?: string, details?: Record<string, unknown>): ContactError => ({
     type: CONTACT_ERROR_TYPES.RENDER_FAILED,
-    message: message ?? DEFAULT_ERROR_MESSAGES[CONTACT_ERROR_TYPES.RENDER_FAILED],
+    ...(message && { message }),
     details,
   }),
 
   unknown: (message?: string, details?: Record<string, unknown>): ContactError => ({
     type: CONTACT_ERROR_TYPES.UNKNOWN,
-    message: message ?? DEFAULT_ERROR_MESSAGES[CONTACT_ERROR_TYPES.UNKNOWN],
+    ...(message && { message }),
     details,
   }),
 } as const;

@@ -25,7 +25,7 @@ const validatePaymentIntent = async (stripe: Stripe, paymentIntentId: string): P
   } catch (error) {
     return {
       valid: false,
-      error: error instanceof Error ? error.message : 'Failed to validate payment',
+      error: error instanceof Error ? error.message : '',
     };
   }
 };

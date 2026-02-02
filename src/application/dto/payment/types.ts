@@ -32,7 +32,7 @@ export type PaymentDTOSuccess = {
 
 export type PaymentDTOError = {
   success: false;
-  error: string;
+  error?: string;
   stripeError?: Stripe.StripeRawError;
   code?: string;
   type?: string;

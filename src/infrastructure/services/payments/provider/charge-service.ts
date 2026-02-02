@@ -50,7 +50,7 @@ const retrieveCharge = async (
     getBetterStackInstance().logError('Error retrieving charge', error, { chargeId });
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to retrieve charge',
+      error: error instanceof Error ? error.message : '',
     };
   }
 };

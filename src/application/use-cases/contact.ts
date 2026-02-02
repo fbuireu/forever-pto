@@ -78,7 +78,7 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
         message: firstError?.message,
         code: firstError?.code,
       });
-      const validationError = createContactError.validation(firstError?.message ?? 'Invalid form data');
+      const validationError = createContactError.validation(firstError?.message);
       return { success: false, error: validationError.message, errorType: validationError.type };
     }
 

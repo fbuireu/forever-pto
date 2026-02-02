@@ -48,7 +48,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
     if (submitError) {
       return {
         success: false,
-        error: submitError.message ?? 'Payment submission failed',
+        error: submitError.message ?? '',
       };
     }
 
@@ -64,7 +64,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
     if (error) {
       return {
         success: false,
-        error: error.message ?? 'Payment confirmation failed',
+        error: error.message ?? '',
       };
     }
 
@@ -88,7 +88,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
       });
       return {
         success: false,
-        error: errorData.error ?? 'Failed to activate premium access',
+        error: errorData.error ?? '',
       };
     }
     const sessionData = await sessionResponse.json();
@@ -107,7 +107,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
     });
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'An unexpected error occurred',
+      error: error instanceof Error ? error.message : '',
     };
   }
 };

@@ -77,7 +77,11 @@ const HolidayCard = ({
           <ConditionalWrapper
             doWrap={!premiumKey}
             wrapper={(children) => (
-              <PremiumFeature feature='Select Holiday' variant={PremiumFeatureVariant.STACK} iconSize='size-4'>
+              <PremiumFeature
+                feature={tPremium('selectHoliday')}
+                variant={PremiumFeatureVariant.STACK}
+                iconSize='size-4'
+              >
                 {children}
               </PremiumFeature>
             )}
@@ -118,6 +122,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 
   const locale = useLocale();
   const t = useTranslations('holidaysTable');
+  const tPremium = useTranslations('premium');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -282,7 +287,11 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
       <ConditionalWrapper
         doWrap={!premiumKey}
         wrapper={(children) => (
-          <PremiumFeature feature='Select All Holidays' variant={PremiumFeatureVariant.STACK} iconSize='size-4'>
+          <PremiumFeature
+            feature={tPremium('selectAllHolidays')}
+            variant={PremiumFeatureVariant.STACK}
+            iconSize='size-4'
+          >
             {children}
           </PremiumFeature>
         )}
@@ -357,7 +366,9 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                   <Button variant='destructive' size='sm' onClick={() => setShowDeleteModal(true)}>
                     <Trash2 className='h-4 w-4 mr-1' />
                     <span className='hidden xs:inline'>{t('deleteHolidays', { count: selectedCount })}</span>
-                    <span className='xs:hidden'>{t('delete')} ({selectedCount})</span>
+                    <span className='xs:hidden'>
+                      {t('delete')} ({selectedCount})
+                    </span>
                   </Button>
                 </AnimateIcon>
               </div>
@@ -466,9 +477,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                 ) : (
                   <div className='flex flex-col items-center justify-center py-12 text-muted-foreground'>
                     <Search className='h-8 w-8 mb-2' />
-                    <p className='text-sm'>
-                      {debouncedSearchTerm ? t('noHolidaysFound') : t('noHolidays')}
-                    </p>
+                    <p className='text-sm'>{debouncedSearchTerm ? t('noHolidaysFound') : t('noHolidays')}</p>
                   </div>
                 )}
               </div>
@@ -478,8 +487,12 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 
         <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs sm:text-sm text-muted-foreground px-1'>
           <div className='flex flex-wrap items-center gap-2 sm:gap-4'>
-            <span className='whitespace-nowrap'>{t('onWeekends')}: {weekendCount}</span>
-            <span className='whitespace-nowrap'>{t('onWorkdays')}: {workdayCount}</span>
+            <span className='whitespace-nowrap'>
+              {t('onWeekends')}: {weekendCount}
+            </span>
+            <span className='whitespace-nowrap'>
+              {t('onWorkdays')}: {workdayCount}
+            </span>
           </div>
           <div className='flex items-center space-x-2'>
             <span className='whitespace-nowrap'>

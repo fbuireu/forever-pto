@@ -69,7 +69,7 @@ export const activateWithPayment = async (
       success: false,
       premiumKey: null,
       email: null,
-      error: validation.error ?? 'Payment validation failed',
+      error: validation.error,
     };
   }
 

@@ -305,10 +305,20 @@
     "close": "Chiudi",
     "failedToSend": "Impossibile inviare il messaggio"
   },
-  "premium": {
-    "selectHoliday": "Seleziona Festivo",
-    "selectAllHolidays": "Seleziona Tutti i Festivi"
+  "alternativesManager": {
+    "option": "Opzione",
+    "recommended": "Raccomandato",
+    "totalOff": "Totale Liberi",
+    "efficiency": "Efficienza",
+    "vsMain": "vs Principale",
+    "alreadyApplied": "Già Applicato",
+    "applyAlternative": "Applica Alternativa",
+    "previousSuggestion": "Suggerimento precedente",
+    "nextSuggestion": "Prossimo suggerimento",
+    "totalDaysOff": "Totale Giorni Liberi",
+    "comparison": "Confronto"
   },
+
   "toasts": {
     "suggestionApplied": "Suggerimento applicato con successo",
     "cannotSelectPastDays": "Non è possibile selezionare giorni passati",
@@ -336,6 +346,7 @@
     "tools": "Strumenti",
     "calculators": "Calcolatori",
     "loading": "Caricamento...",
+    "toggleSidebar": "Attiva/Disattiva Barra Laterale",
     "country": {
       "title": "Paese",
       "tooltip": "Questo dato è ricavato dal tuo CDN e dalla tua connessione. Se ritieni che non sia accurato o vuoi vedere i festivi di altri paesi, puoi selezionarlo manualmente qui",
@@ -423,7 +434,9 @@
     "title": "Calcolatore PTO vs Stipendio",
     "tooltip": "Calcola quanto tempo libero retribuito stai perdendo non usando i tuoi giorni di PTO. Continui a ricevere lo stipendio completo, ma stai lavorando giorni che avresti potuto prendere come ferie pagate.",
     "annualSalary": "Stipendio Annuale",
+    "annualSalaryPlaceholder": "50000",
     "unusedPtoDays": "Giorni PTO Non Usati",
+    "unusedPtoDaysPlaceholder": "5",
     "valueOfUnusedPto": "Valore del PTO non usato:",
     "worthOfPaidVacation": "Valore delle ferie pagate non prese",
     "yourDailyRate": "La tua tariffa giornaliera:",
@@ -471,6 +484,7 @@
     "verifyDescription": "Non preoccuparti, se hai già donato verificheremo la tua email nella nostra lista e ti concederemo l'accesso premium. Se incontri problemi non esitare a contattarci.",
     "considerDonating": "Se non hai ancora donato, considera di farlo per supportare il progetto e sbloccare le funzioni premium!",
     "enterPremiumEmail": "Inserisci la tua email premium",
+    "emailPlaceholder": "tua@email.com",
     "verifying": "Verificando...",
     "verifyAccess": "Verifica Accesso",
     "cancel": "Annulla",
@@ -569,6 +583,10 @@
   "workdayCounterModal": {
     "selectDateRange": "Seleziona intervallo di date"
   },
+  "command": {
+    "commandPalette": "Tavolozza dei Comandi",
+    "searchPlaceholder": "Cerca un comando da eseguire..."
+  },
   "common": {
     "loading": "Caricamento...",
     "cancel": "Annulla",
@@ -655,6 +673,8 @@
     }
   },
   "premium": {
+    "selectHoliday": "Seleziona Festivo",
+    "selectAllHolidays": "Seleziona Tutti i Festivi",
     "unlockFeature": "Sblocca funzione premium: {feature}",
     "premiumFeature": "Funzione premium",
     "unlockDescription": "Sblocca la possibilità di aggiungere/rimuovere suggerimenti e aggiungere/rimuovere giorni rimanenti passando a premium.",

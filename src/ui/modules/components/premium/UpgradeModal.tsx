@@ -107,7 +107,13 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
                   <FormItem>
                     <FormLabel>{t('enterPremiumEmail')}</FormLabel>
                     <FormControl>
-                      <Input type='email' placeholder='your@email.com' disabled={isLoading} autoFocus {...field} />
+                      <Input
+                        type='email'
+                        placeholder={t('emailPlaceholder')}
+                        disabled={isLoading}
+                        autoFocus
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

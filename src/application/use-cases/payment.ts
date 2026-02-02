@@ -107,7 +107,7 @@ export async function createPayment(
         message: firstError?.message,
         code: firstError?.code,
       });
-      const validationError = createPaymentError.validation(firstError?.message ?? 'Invalid payment data');
+      const validationError = createPaymentError.validation(firstError?.message);
       return paymentDTO.create({
         raw: { type: 'error', error: new Error(validationError.message) },
       });

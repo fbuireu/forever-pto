@@ -87,7 +87,7 @@ export class StripeClient {
     if (this.isErrorResult(result)) {
       return {
         success: false,
-        error: result.error.message ?? 'Payment failed',
+        error: result.error.message ?? '',
       };
     }
 

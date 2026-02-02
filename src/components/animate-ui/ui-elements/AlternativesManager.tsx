@@ -4,6 +4,7 @@ import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { BarChart3, CalendarDays, Sparkles, TrendingUp } from 'lucide-react';
 import { motion, type Transition, type Variants } from 'motion/react';
+import { useTranslations } from 'next-intl';
 import { useCallback, useState } from 'react';
 import { Button } from '../components/buttons/button';
 import { ChevronLeft } from '../icons/chevron-left';
@@ -62,6 +63,7 @@ export const AlternativesManager = ({
   selectedIndex = 0,
   currentSelectionIndex = 0,
 }: AlternativeManagerProps) => {
+  const t = useTranslations('alternativesManager');
   const [currentIndex, setCurrentIndex] = useState(selectedIndex);
 
   const totalOptions = allSuggestions.length;
@@ -102,14 +104,14 @@ export const AlternativesManager = ({
             disabled={currentIndex === 0}
             variant='ghost'
             onClick={handlePrevious}
-            aria-label='Previous suggestion'
+            aria-label={t('previousSuggestion')}
           >
             <ChevronLeft size={20} />
           </Button>
         </AnimateIcon>
         <div className='mx-2 flex flex-col items-center relative w-25  grow duration-300 ease-out'>
           <div className='flex items-center space-x-1 text-sm tabular-nums'>
-            <span className='text-xs text-muted-foreground'>Option</span>
+            <span className='text-xs text-muted-foreground'>{t('option')}</span>
             <SlidingNumber className='text-base font-semibold text-foreground' padStart number={currentIndex + 1} />
             <span className='text-muted-foreground'>/ {totalOptions}</span>
           </div>
@@ -121,7 +123,7 @@ export const AlternativesManager = ({
               className='mt-0.5 flex items-center gap-0.5 rounded-full bg-linear-to-r from-amber-500/20 to-orange-500/20 px-1.5 py-px text-[10px] font-normal text-amber-700 dark:text-amber-400'
             >
               <Sparkles size={8} />
-              Recommended
+              {t('recommended')}
             </motion.span>
           )}
         </div>
@@ -130,7 +132,7 @@ export const AlternativesManager = ({
             disabled={currentIndex === totalOptions - 1}
             variant='ghost'
             onClick={handleNext}
-            aria-label='Next suggestion'
+            aria-label={t('nextSuggestion')}
           >
             <ChevronRight size={20} />
           </Button>
@@ -143,7 +145,7 @@ export const AlternativesManager = ({
         <motion.button
           {...STAT_CARD_MOTION_CONFIG}
           className='flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-green-100/60 px-2.5 py-2 dark:bg-green-900/30'
-          aria-label='Total Days Off'
+          aria-label={t('totalDaysOff')}
         >
           <CalendarDays size={20} className='text-green-600 dark:text-green-400 shrink-0' />
           <div className='flex items-center gap-1'>
@@ -161,14 +163,14 @@ export const AlternativesManager = ({
             transition={LABEL_TRANSITION}
             className='invisible text-sm text-green-600 dark:text-green-400'
           >
-            Total Off
+            {t('totalOff')}
           </motion.span>
         </motion.button>
 
         <motion.button
           {...STAT_CARD_MOTION_CONFIG}
           className='flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-purple-100/60 px-2.5 py-2 dark:bg-purple-900/30'
-          aria-label='Efficiency'
+          aria-label={t('efficiency')}
         >
           <TrendingUp size={20} className='text-purple-600 dark:text-purple-400 shrink-0' />
           <div className='flex items-center gap-1'>
@@ -194,7 +196,7 @@ export const AlternativesManager = ({
             transition={LABEL_TRANSITION}
             className='invisible text-sm text-purple-600 dark:text-purple-400'
           >
-            Efficiency
+            {t('efficiency')}
           </motion.span>
         </motion.button>
 
@@ -202,7 +204,7 @@ export const AlternativesManager = ({
           <motion.button
             {...STAT_CARD_MOTION_CONFIG}
             className='flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-neutral-100/60 px-2.5 py-2 dark:bg-neutral-800/30'
-            aria-label='Comparison'
+            aria-label={t('comparison')}
           >
             <BarChart3 size={20} className='text-neutral-600 dark:text-neutral-400 shrink-0' />
             <div className='flex items-center gap-1'>
@@ -229,7 +231,7 @@ export const AlternativesManager = ({
               transition={LABEL_TRANSITION}
               className='invisible text-sm text-neutral-600 dark:text-neutral-400'
             >
-              vs Main
+              {t('vsMain')}
             </motion.span>
           </motion.button>
         )}
@@ -239,7 +241,7 @@ export const AlternativesManager = ({
         className='flex grow h-10 text-sm cursor-pointer items-center justify-center rounded-lg px-3 py-2 font-medium transition-colors duration-300'
         onClick={() => onSelectionChange({ suggestion: currentSuggestion, index: currentIndex })}
       >
-        {currentSelectionIndex === currentIndex ? 'Already Applied' : 'Apply Alternative'}
+        {currentSelectionIndex === currentIndex ? t('alreadyApplied') : t('applyAlternative')}
       </Button>
     </div>
   );

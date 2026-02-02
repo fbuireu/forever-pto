@@ -100,7 +100,7 @@ export const PtoSalaryCalculator = () => {
             value={annualSalary}
             onChange={(e) => setAnnualSalary(Number(e.target.value))}
             className='h-8 text-xs'
-            placeholder='50000'
+            placeholder={t('annualSalaryPlaceholder')}
           />
         </InputGroup>
       </div>
@@ -116,7 +116,7 @@ export const PtoSalaryCalculator = () => {
             value={unusedPTODays}
             onChange={(e) => setUnusedPTODays(Number(e.target.value))}
             className='h-8 text-xs'
-            placeholder='5'
+            placeholder={t('unusedPtoDaysPlaceholder')}
           />
         </InputGroup>
       </div>

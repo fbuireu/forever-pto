@@ -22,7 +22,7 @@ export const paymentDTO: BaseDTO<RawPayment, PaymentDTO> = {
         };
       }
 
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorMessage = error instanceof Error ? error.message : undefined;
       return {
         success: false,
         error: errorMessage,
