@@ -6,6 +6,7 @@ import { useLocationStore } from '@application/stores/location';
 import { Combobox } from '@const/components/ui/combobox';
 import { Field, Label } from '@headlessui/react';
 import { InfoIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { MapPin } from 'src/components/animate-ui/icons/map-pin';
@@ -16,6 +17,7 @@ interface CountriesClientProps {
 }
 
 export const CountriesClient = ({ countries }: CountriesClientProps) => {
+  const t = useTranslations('sidebar.country');
   const country = useFiltersStore((state) => state.country);
   const setCountry = useFiltersStore((state) => state.setCountry);
   const countriesLoading = useLocationStore((state) => state.countriesLoading);
@@ -30,16 +32,13 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
     <AnimateIcon animateOnHover>
       <Field className='space-y-2 w-full' data-tutorial='country'>
         <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='countries'>
-          <MapPin size={16} /> Country
+          <MapPin size={16} /> {t('title')}
           <TooltipProvider delayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild className='ml-auto'>
                 <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
               </TooltipTrigger>
-              <TooltipContent className='w-50 text-pretty'>
-                This data is inferred from your CDN and your connection. If you feel that it&apos;s not accurate or you
-                want a sneak peek into other countries&apos; holidays, you can select it manually here
-              </TooltipContent>
+              <TooltipContent className='w-50 text-pretty'>{t('tooltip')}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </Label>
@@ -49,8 +48,8 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
           options={countries}
           value={country}
           onChange={setCountry}
-          placeholder={countriesLoading ? 'Loading countries...' : 'Select country...'}
-          searchPlaceholder='Search countries...'
+          placeholder={countriesLoading ? t('loading') : t('placeholder')}
+          searchPlaceholder={t('search')}
         />
       </Field>
     </AnimateIcon>

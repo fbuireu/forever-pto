@@ -4,7 +4,7 @@ import { useHolidaysStore } from '@application/stores/holidays';
 import { Field, Label } from '@headlessui/react';
 import { differenceInCalendarDays } from 'date-fns';
 import { CalendarDays, InfoIcon } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
@@ -21,6 +21,7 @@ const CalendarModal = dynamic(() =>
 
 export const WorkdayCounter = () => {
   const locale = useLocale();
+  const t = useTranslations('workdayCounter');
   const [selectedRange, setSelectedRange] = useState<FromTo | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
@@ -53,22 +54,19 @@ export const WorkdayCounter = () => {
   return (
     <Field className='space-y-2 w-full'>
       <Label className='flex gap-2 my-2 text-sm font-normal'>
-        <CalendarDays size={16} /> Workday Counter
+        <CalendarDays size={16} /> {t('title')}
         <TooltipProvider delayDuration={200}>
           <Tooltip>
             <TooltipTrigger asChild className='ml-auto'>
               <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
             </TooltipTrigger>
-            <TooltipContent className='w-60 text-pretty'>
-              Count working days between two dates, automatically excluding weekends and holidays. Useful for project
-              planning and deadline calculations.
-            </TooltipContent>
+            <TooltipContent className='w-60 text-pretty'>{t('tooltip')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </Label>
 
       <div className='space-y-2 w-full'>
-        <p className='text-xs text-muted-foreground'>Select Date Range</p>
+        <p className='text-xs text-muted-foreground'>{t('selectRange')}</p>
         <CalendarModal
           open={isCalendarOpen}
           setOpen={setIsCalendarOpen}
@@ -80,7 +78,7 @@ export const WorkdayCounter = () => {
 
         {selectedRange && (
           <Button variant='ghost' onClick={clearSelection} className='h-6 text-xs w-full'>
-            Clear selection
+            {t('clearSelection')}
           </Button>
         )}
       </div>
@@ -88,28 +86,28 @@ export const WorkdayCounter = () => {
       {selectedRange && (
         <div className='space-y-2 w-full bg-muted rounded-md p-3'>
           <div className='text-xs'>
-            <span className='font-medium'>Working Days</span>
+            <span className='font-medium'>{t('workingDays')}</span>
             <div className='text-2xl font-bold text-primary'>
               <SlidingNumber number={workdayCount} decimalPlaces={0} />
             </div>
-            <p className='text-muted-foreground'>Business days in selected range</p>
+            <p className='text-muted-foreground'>{t('businessDays')}</p>
           </div>
 
           <div className='flex justify-between items-start text-xs border-t pt-3'>
             <div className='text-left'>
-              <div className='font-medium'>Days</div>
+              <div className='font-medium'>{t('days')}</div>
               <div className='text-lg font-bold'>
                 <SlidingNumber number={totalDays} decimalPlaces={0} />
               </div>
             </div>
             <div className='text-left'>
-              <div className='font-medium'>Weekend days</div>
+              <div className='font-medium'>{t('weekendDays')}</div>
               <div className='text-lg font-bold text-muted-foreground'>
                 <SlidingNumber number={weekendDays} decimalPlaces={0} />
               </div>
             </div>
             <div className='text-left'>
-              <div className='font-medium'>Holidays</div>
+              <div className='font-medium'>{t('holidays')}</div>
               <div className='text-lg font-bold text-muted-foreground'>
                 <SlidingNumber number={holidayDays} decimalPlaces={0} />
               </div>
@@ -117,9 +115,9 @@ export const WorkdayCounter = () => {
           </div>
 
           <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded text-xs'>
-            <p className='text-blue-700 dark:text-blue-400 font-medium'>Date Range</p>
+            <p className='text-blue-700 dark:text-blue-400 font-medium'>{t('dateRange')}</p>
             <p className='text-blue-600 dark:text-blue-300'>
-              From {formatDate({ date: selectedRange.from, locale, format: 'EEEE, MMMM d, yyyy' })} to{' '}
+              {t('from')} {formatDate({ date: selectedRange.from, locale, format: 'EEEE, MMMM d, yyyy' })} {t('to')}{' '}
               {formatDate({ date: selectedRange.to, locale, format: 'EEEE, MMMM d, yyyy' })}
             </p>
           </div>

@@ -2,19 +2,21 @@
 
 import { Link } from '@application/i18n/navigtion';
 import { useTutorial } from '@ui/hooks/useTutorial';
+import { useTranslations } from 'next-intl';
 
 export const SiteSubtitle = () => {
+  const t = useTranslations('home');
   const { startTutorial } = useTutorial();
 
   return (
-    <p className='text-center text-muted-foreground mt-2 mb-16'>
-      Start by adding your days on the left sidebar and the rest of your configurations. Still doubts?{' '}
+    <p className='text-center text-muted-foreground leading-tight mt-2 mb-16'>
+      {t('instructions')}{' '}
       <button onClick={startTutorial} className='hover:underline cursor-pointer text-foreground font-medium'>
-        Take a quick tour
+        {t('quickTour')}
       </button>{' '}
-      or{' '}
+      {t('or')}{' '}
       <Link className='hover:underline text-foreground font-medium' href='#faq'>
-        check our FAQs
+        {t('checkFaqs')}
       </Link>
       .
     </p>

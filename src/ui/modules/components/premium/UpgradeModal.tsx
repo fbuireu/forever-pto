@@ -6,7 +6,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@const/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Crown, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Lock } from 'src/components/animate-ui/icons/lock';
 import { z } from 'zod';
@@ -27,14 +28,21 @@ const Step = {
 
 type Step = (typeof Step)[keyof typeof Step];
 
-const emailSchema = z.object({
-  email: z.email('Please enter a valid email address').min(1, 'Email is required'),
-});
+const createEmailSchema = (getMessage: (key: string) => string) =>
+  z.object({
+    email: z.email(getMessage('invalidEmail')).min(1, getMessage('emailRequired')),
+  });
 
-type EmailFormData = z.infer<typeof emailSchema>;
+type EmailFormData = z.infer<ReturnType<typeof createEmailSchema>>;
 
 export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading }: UpgradeModalProps) => {
+  const t = useTranslations('upgrade');
   const [step, setStep] = useState<Step>(Step.INPUT);
+
+  const emailSchema = useMemo(
+    () => createEmailSchema((key: string) => t(key as 'invalidEmail' | 'emailRequired')),
+    [t]
+  );
 
   const form = useForm<EmailFormData>({
     resolver: zodResolver(emailSchema),
@@ -60,7 +68,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
     } else {
       form.setError('email', {
         type: 'manual',
-        message: 'Email not found in our premium users list',
+        message: t('emailNotFoundError'),
       });
       setStep(Step.ERROR);
     }
@@ -77,21 +85,15 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Crown className='w-5 h-5 text-yellow-500' />
-            Premium Feature Required
+            {t('premiumRequired')}
           </DialogTitle>
           <DialogDescription>
             <span className='block my-2'>
               <Lock className='w-4 h-4 inline mr-1' animateOnView loop />
-              <strong>{feature}</strong> requires premium access
+              <strong>{feature}</strong> {t('featureRequiresPremium')}
             </span>
-            <span className='block text-muted-foreground leading-relaxed'>
-              Don&apos;t worry, if you already donate we will check your email against our list and grant you premium
-              access. If you encounter any trouble please don&apos;t hesitate to contact us.
-            </span>
-            <span className='block text-muted-foreground leading-relaxed my-2'>
-              If you haven&apos;t donated yet, please consider doing so to support the project and unlock premium
-              features!
-            </span>
+            <span className='block text-muted-foreground leading-relaxed'>{t('verifyDescription')}</span>
+            <span className='block text-muted-foreground leading-relaxed my-2'>{t('considerDonating')}</span>
           </DialogDescription>
         </DialogHeader>
 
@@ -103,7 +105,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
                 name='email'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Enter your premium email</FormLabel>
+                    <FormLabel>{t('enterPremiumEmail')}</FormLabel>
                     <FormControl>
                       <Input type='email' placeholder='your@email.com' disabled={isLoading} autoFocus {...field} />
                     </FormControl>
@@ -117,14 +119,14 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
                   {isLoading ? (
                     <>
                       <Loader2 className='w-4 h-4 mr-2 animate-spin' />
-                      Verifying...
+                      {t('verifying')}
                     </>
                   ) : (
-                    'Verify Access'
+                    t('verifyAccess')
                   )}
                 </Button>
                 <Button type='button' variant='outline' onClick={handleClose} disabled={isLoading}>
-                  Cancel
+                  {t('cancel')}
                 </Button>
               </div>
             </form>
@@ -135,10 +137,8 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
           <div className='text-center space-y-4 py-4'>
             <Crown className='w-12 h-12 text-yellow-500 mx-auto animate-pulse' />
             <div>
-              <h3 className='font-semibold text-green-600'>Access Granted!</h3>
-              <p className='text-sm text-muted-foreground mt-1'>
-                Welcome to premium features. You can close this modal or we will do so in 5 seconds.
-              </p>
+              <h3 className='font-semibold text-green-600'>{t('accessGranted')}</h3>
+              <p className='text-sm text-muted-foreground mt-1'>{t('welcomeToPremium')}</p>
             </div>
           </div>
         )}
@@ -147,15 +147,15 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
           <div className='text-center space-y-4'>
             <AlertCircle className='w-12 h-12 text-destructive mx-auto' />
             <div>
-              <h3 className='font-semibold'>Access Denied</h3>
-              <p className='text-sm text-muted-foreground mt-1'>This email is not in our premium users list.</p>
+              <h3 className='font-semibold'>{t('accessDenied')}</h3>
+              <p className='text-sm text-muted-foreground mt-1'>{t('emailNotFound')}</p>
             </div>
             <div className='flex gap-2 pt-2'>
               <Button onClick={handleTryAgain} variant='outline' className='flex-1'>
-                Try Again
+                {t('tryAgain')}
               </Button>
               <Button onClick={handleClose} className='flex-1'>
-                Close
+                {t('close')}
               </Button>
             </div>
           </div>

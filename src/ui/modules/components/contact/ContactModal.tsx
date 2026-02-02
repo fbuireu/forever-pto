@@ -16,6 +16,7 @@ import { Input } from '@const/components/ui/input';
 import { Textarea } from '@const/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Mail } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
@@ -36,6 +37,8 @@ const Step = {
 type Step = (typeof Step)[keyof typeof Step];
 
 export const ContactModal = ({ open, onClose }: ContactModalProps) => {
+  const t = useTranslations('contact');
+  const tErrors = useTranslations('errors.contact');
   const [step, setStep] = useState<Step>(Step.INPUT);
   const [isPending, startTransition] = useTransition();
   const { setEmail, userEmail } = usePremiumStore(
@@ -76,11 +79,14 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
         if (result.success) {
           setStep(Step.SUCCESS);
         } else {
-          setErrorMessage(result.error ?? 'Failed to send message');
+          const translatedError = result.errorType
+            ? tErrors(result.errorType as Parameters<typeof tErrors>[0])
+            : result.error ?? t('failedToSend');
+          setErrorMessage(translatedError);
           setStep(Step.ERROR);
         }
       } catch (error) {
-        setErrorMessage(error instanceof Error ? error.message : 'Failed to send message');
+        setErrorMessage(error instanceof Error ? error.message : t('failedToSend'));
         setStep(Step.ERROR);
       }
     });
@@ -97,9 +103,9 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Mail className='w-5 h-5 text-primary' />
-            Contact Us
+            {t('title')}
           </DialogTitle>
-          <DialogDescription>Have a question or feedback? We&apos;d love to hear from you!</DialogDescription>
+          <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
         {step === Step.INPUT && (
           <Form {...form}>
@@ -109,9 +115,9 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                 name='name'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>{t('name')}</FormLabel>
                     <FormControl>
-                      <Input placeholder='John Doe' {...field} />
+                      <Input placeholder={t('namePlaceholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -123,9 +129,9 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                 name='email'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('email')}</FormLabel>
                     <FormControl>
-                      <Input type='email' placeholder='your@email.com' {...field} />
+                      <Input type='email' placeholder={t('emailPlaceholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -137,9 +143,9 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                 name='subject'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Subject</FormLabel>
+                    <FormLabel>{t('subject')}</FormLabel>
                     <FormControl>
-                      <Input placeholder='What is this about?' {...field} />
+                      <Input placeholder={t('subjectPlaceholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -151,10 +157,10 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                 name='message'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Message</FormLabel>
+                    <FormLabel>{t('message')}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder='Tell us what you need...'
+                        placeholder={t('messagePlaceholder')}
                         className='min-h-30 resize-none field-sizing-content'
                         {...field}
                       />
@@ -164,9 +170,9 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                 )}
               />
               <FormButtons
-                submitText='Send Message'
-                loadingText='Sending...'
-                cancelText='Cancel'
+                submitText={t('sendMessage')}
+                loadingText={t('sending')}
+                cancelText={t('cancel')}
                 onCancel={handleClose}
                 pending={isPending}
               />
@@ -178,8 +184,8 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
           <div className='text-center space-y-4 py-4'>
             <CircleCheckBig animateOnView loop loopDelay={2000} className='w-12 h-12 text-green-500 mx-auto' />
             <div>
-              <h3 className='font-semibold text-green-600'>Message Sent!</h3>
-              <p className='text-sm text-muted-foreground mt-1'>We&apos;ll get back to you as soon as possible.</p>
+              <h3 className='font-semibold text-green-600'>{t('successTitle')}</h3>
+              <p className='text-sm text-muted-foreground mt-1'>{t('successDescription')}</p>
             </div>
           </div>
         )}
@@ -189,15 +195,15 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
             <div className='text-center space-y-4 py-4'>
               <AlertCircle className='w-12 h-12 text-destructive mx-auto' />
               <div>
-                <h3 className='font-semibold'>There's been an error</h3>
+                <h3 className='font-semibold'>{t('errorTitle')}</h3>
                 <p className='text-sm text-muted-foreground mt-1'>{errorMessage}</p>
               </div>
               <div className='flex gap-2 pt-2'>
                 <Button onClick={handleTryAgain} variant='outline' className='flex-1'>
-                  Try Again
+                  {t('tryAgain')}
                 </Button>
                 <Button onClick={handleClose} className='flex-1'>
-                  Close
+                  {t('close')}
                 </Button>
               </div>
             </div>

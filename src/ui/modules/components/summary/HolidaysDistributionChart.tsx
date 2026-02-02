@@ -2,6 +2,7 @@ import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types'
 import { Card, CardContent, CardHeader, CardTitle } from '@const/components/ui/card';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers';
 import { PieChart } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { Cell, Legend, Pie, PieChart as RechartsPieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import { PremiumFeature } from '../premium/PremiumFeature';
@@ -38,26 +39,30 @@ const HolidaysDistributionChartLegend = ({ payload }: { payload?: readonly Legen
 );
 
 export const HolidaysDistributionChart = ({ ptoDays, holidays }: HolidaysDistributionChartProps) => {
+  const t = useTranslations('charts');
+
   const chartData = useMemo(() => {
     const nationalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.NATIONAL).length ?? 0;
     const regionalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL).length ?? 0;
     const customDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.CUSTOM).length ?? 0;
 
     const data = [
-      { name: 'PTO', value: ptoDays, color: COLOR_SCHEMES[0] },
-      { name: 'Nacionales', value: nationalDays, color: COLOR_SCHEMES[3] },
-      { name: 'Regionales', value: regionalDays, color: COLOR_SCHEMES[2] },
-      { name: 'Personalizados', value: customDays, color: COLOR_SCHEMES[1] },
+      { name: t('pto'), value: ptoDays, color: COLOR_SCHEMES[0] },
+      { name: t('national'), value: nationalDays, color: COLOR_SCHEMES[3] },
+      { name: t('regional'), value: regionalDays, color: COLOR_SCHEMES[2] },
+      { name: t('custom'), value: customDays, color: COLOR_SCHEMES[1] },
     ].filter((item) => item.value > 0);
 
-    const description = `Distribución de tus ${ptoDays} días PTO, ${nationalDays} festivos nacionales${regionalDays > 0 ? `, ${regionalDays} regionales` : ''}${customDays > 0 ? ` y ${customDays} personalizados` : ''}.`;
+    const regionalPart = regionalDays > 0 ? t('regionalPart', { regionalDays }) : '';
+    const customPart = customDays > 0 ? t('customPart', { customDays }) : '';
+    const description = t('distributionDescription', { ptoDays, nationalDays, regionalPart, customPart });
 
-    return { data, description };
-  }, [ptoDays, holidays]);
+    return { data, description, nationalDays, regionalDays, customDays };
+  }, [ptoDays, holidays, t]);
 
   return (
     <PremiumFeature
-      feature={'Gráfica de Composición de Días Libres'}
+      feature={t('daysOffCompositionFeature')}
       description={chartData.description}
       iconSize='size-7'
       inlineDescription
@@ -66,7 +71,7 @@ export const HolidaysDistributionChart = ({ ptoDays, holidays }: HolidaysDistrib
         <CardHeader className='pb-3'>
           <CardTitle className='flex items-center gap-2 text-base'>
             <PieChart className='w-5 h-5 text-purple-500' />
-            Composición de Días Libres
+            {t('daysOffComposition')}
           </CardTitle>
           <div className='text-xs text-muted-foreground mt-1'>{chartData.description}</div>
         </CardHeader>
@@ -79,7 +84,7 @@ export const HolidaysDistributionChart = ({ ptoDays, holidays }: HolidaysDistrib
                 ))}
               </Pie>
               <Tooltip
-                formatter={(value, name) => [`${value} días`, name]}
+                formatter={(value, name) => [`${value} ${t('days')}`, name]}
                 contentStyle={{
                   backgroundColor: 'var(--primary)',
                   border: '1px solid var(--primary)',

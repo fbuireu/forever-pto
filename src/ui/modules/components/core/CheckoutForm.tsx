@@ -5,7 +5,7 @@ import { formatDiscountText } from '@infrastructure/services/payments/utils/form
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { confirmPayment } from '@ui/adapters/payments/checkout';
 import { AlertCircle } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { type FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
@@ -26,6 +26,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   const stripe = useStripe();
   const elements = useElements();
   const locale = useLocale();
+  const t = useTranslations('checkout');
   const [isExpressReady, setIsExpressReady] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -54,7 +55,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
     });
 
     if (!result.success) {
-      const errorMsg = result.error ?? 'Payment failed';
+      const errorMsg = result.error ?? t('paymentFailed');
       setErrorMessage(errorMsg);
     } else {
       if (result.sessionData) {
@@ -99,14 +100,14 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
             onClick={onCancel}
             disabled={isPending}
             className='gap-2'
-            aria-label='Go back to donation form'
+            aria-label={t('goBackToDonation')}
           >
             <ChevronLeft className='w-4 h-4' aria-hidden='true' />
-            Back
+            {t('back')}
           </Button>
         </AnimateIcon>
         <div className='text-right'>
-          <p className='text-sm text-muted-foreground'>Total amount</p>
+          <p className='text-sm text-muted-foreground'>{t('totalAmount')}</p>
           <p className='text-2xl font-bold' aria-live='polite'>
             {currencySymbol}
             {formattedAmount}
@@ -125,10 +126,10 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
               <span className='w-full border-t' />
             </div>
             <div className='relative flex justify-center text-xs uppercase'>
-              <span className='bg-popover px-2 text-muted-foreground'>Express checkout</span>
+              <span className='bg-popover px-2 text-muted-foreground'>{t('expressCheckout')}</span>
             </div>
           </div>
-          <div className='relative min-h-[48px]'>
+          <div className='relative min-h-12'>
             {!isExpressReady && <ExpressCheckoutSkeleton />}
             <div className={!isExpressReady ? 'invisible absolute inset-0' : 'visible'}>
               <ExpressCheckoutElement onConfirm={handleExpressCheckout} onReady={() => setIsExpressReady(true)} />
@@ -141,7 +142,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
               <span className='w-full border-t' />
             </div>
             <div className='relative flex justify-center text-xs uppercase'>
-              <span className='bg-popover px-2 text-muted-foreground'>Or pay with card</span>
+              <span className='bg-popover px-2 text-muted-foreground'>{t('orPayWithCard')}</span>
             </div>
           </div>
           <PaymentElement />
@@ -154,7 +155,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
                 <AlertCircle className='w-3 h-3 text-destructive' />
               </div>
               <div className='flex-1'>
-                <h4 className='text-sm font-medium text-destructive mb-1'>Payment Error</h4>
+                <h4 className='text-sm font-medium text-destructive mb-1'>{t('paymentError')}</h4>
                 <p className='text-sm text-destructive/80'>{errorMessage}</p>
               </div>
             </div>
@@ -166,7 +167,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
           className='w-full bg-green-600 hover:bg-green-700'
           aria-busy={isPending}
         >
-          {isPending ? 'Processing...' : `Pay ${currencySymbol}${formattedAmount}`}
+          {isPending ? t('processing') : `${t('pay')} ${currencySymbol}${formattedAmount}`}
         </Button>
       </form>
     </div>

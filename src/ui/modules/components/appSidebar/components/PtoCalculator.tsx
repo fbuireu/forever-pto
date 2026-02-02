@@ -5,7 +5,7 @@ import { Combobox } from '@const/components/ui/combobox';
 import { Input } from '@const/components/ui/input';
 import { Field, Label } from '@headlessui/react';
 import { Calculator, InfoIcon } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useRef, useState } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
@@ -22,6 +22,7 @@ interface MonthOption {
 
 export const PtoCalculator = () => {
   const locale = useLocale();
+  const t = useTranslations('ptoCalculator');
   const [daysPerMonth, setDaysPerMonth] = useState<number>(2.5);
   const [selectedMonth, setSelectedMonth] = useState<string>('1');
   const [calculatedDays, setCalculatedDays] = useState<number | null>(null);
@@ -71,22 +72,19 @@ export const PtoCalculator = () => {
   return (
     <Field className='space-y-2 w-full'>
       <Label className='flex gap-2 my-2 text-sm font-normal'>
-        <Calculator size={16} /> PTO Accumulator
+        <Calculator size={16} /> {t('title')}
         <TooltipProvider delayDuration={200}>
           <Tooltip>
             <TooltipTrigger asChild className='ml-auto'>
               <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
             </TooltipTrigger>
-            <TooltipContent className='w-60 text-pretty'>
-              Calculate your accumulated PTO days based on monthly accrual. Most companies offer 2-3 days per month.
-              Select the target month to see your total available days.
-            </TooltipContent>
+            <TooltipContent className='w-60 text-pretty'>{t('tooltip')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </Label>
 
       <div className='space-y-2 w-full'>
-        <p className='text-xs text-muted-foreground'>Days per month</p>
+        <p className='text-xs text-muted-foreground'>{t('daysPerMonth')}</p>
         <Input
           id='daysPerMonth'
           type='number'
@@ -100,34 +98,34 @@ export const PtoCalculator = () => {
       </div>
 
       <div className='space-y-2 w-full'>
-        <p className='text-xs text-muted-foreground'>Calculate through</p>
+        <p className='text-xs text-muted-foreground'>{t('calculateThrough')}</p>
         <Combobox
           value={selectedMonth}
           options={monthOptions}
           onChange={handleMonthChange}
-          placeholder='Select month'
-          searchPlaceholder='Search month...'
-          notFoundText='Month not found'
+          placeholder={t('selectMonth')}
+          searchPlaceholder={t('searchMonth')}
+          notFoundText={t('monthNotFound')}
           className='w-full h-8 text-xs'
         />
       </div>
 
       <Button onClick={handleCalculate} size='sm' className='w-full h-8 text-xs' variant='outline'>
         <Calculator className='w-3 h-3 mr-1' />
-        Calculate
+        {t('calculate')}
       </Button>
 
       {calculatedDays !== null && calculationSnapshotRef.current && (
         <div className='space-y-2 p-2 bg-muted rounded-md w-full'>
           <div className='text-xs'>
-            <span className='font-medium'>Result:</span>
+            <span className='font-medium'>{t('result')}</span>
             <div className='text-lg font-bold text-primary flex items-center gap-1'>
               <SlidingNumber number={calculatedDays} decimalPlaces={2} />
-              <span>days</span>
+              <span>{t('days')}</span>
             </div>
             <p className='text-muted-foreground flex gap-0.5'>
-              <SlidingNumber number={calculationSnapshotRef.current.days} decimalPlaces={1} /> days/month ×{' '}
-              <SlidingNumber number={calculationSnapshotRef.current.month} decimalPlaces={0} /> months
+              <SlidingNumber number={calculationSnapshotRef.current.days} decimalPlaces={1} /> {t('daysMonth')} ×{' '}
+              <SlidingNumber number={calculationSnapshotRef.current.month} decimalPlaces={0} /> {t('months')}
             </p>
           </div>
           <AnimateIcon animateOnHover>
@@ -137,7 +135,7 @@ export const PtoCalculator = () => {
               className='w-full h-7 text-xs bg-green-600 hover:bg-green-700 justify-start'
             >
               <Plus className='w-3 h-3 mr-1' />
-              Apply to PTO Days
+              {t('applyToPtoDays')}
             </Button>
           </AnimateIcon>
         </div>

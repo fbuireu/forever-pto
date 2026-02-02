@@ -40,7 +40,7 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: check texts (stats) +  locale all
+// todo: check texts (stats) +  locale all (fix duplicated, ts errors, etc)
 // todo: template issues + link them through contact modal + roadmap
 // todo: check white mode (no hovers?) + input styles in Donate
 // todo: don't allow to add custom holiday in bank holidays
@@ -59,7 +59,7 @@ export default Home;
 // todo: transformer to make sql data ready ':id': data.id',
 // todo: fix tab movement (focus)on contact modal
 // todo: improve error handling in server actions (send whole error type and change icon when "save to db error")
-// todo: APPLY DDD (CHECK BRANCH)
+// todo: APPLY DDD (CHECK BRANCH) + check everything (SSR, CSR, etc)
 
 // PROD
 // todo: cookie management (on PROD)

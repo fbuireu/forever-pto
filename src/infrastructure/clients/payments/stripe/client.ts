@@ -195,11 +195,3 @@ export const constructWebhookEvent = (payload: string | Buffer, signature: strin
 
   return stripe.webhooks.constructEvent(payload, signature, webhookSecret);
 };
-
-export const validateStripeConfig = (): { client: boolean; server: boolean; webhook: boolean } => {
-  return {
-    client: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-    server: !!process.env.STRIPE_SECRET_KEY,
-    webhook: !!process.env.STRIPE_WEBHOOK_SECRET,
-  };
-};

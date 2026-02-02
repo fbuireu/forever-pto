@@ -5,6 +5,7 @@ import type { HolidaysState } from '@application/stores/holidays';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { cn } from '@const/lib/utils';
 import { MousePointerClick } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
@@ -14,6 +15,7 @@ interface PtoStatusProps {
 }
 
 export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
+  const t = useTranslations('ptoStatus');
   const resetManualSelection = useHolidaysStore((state) => state.resetManualSelection);
   const ptoDays = useFiltersStore((state) => state.ptoDays);
   const { removedSuggestedDays, manuallySelectedDays } = useHolidaysStore(
@@ -34,19 +36,19 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
         <div className='flex items-center gap-4'>
           <div className='flex items-center gap-1'>
             <div className='h-3 w-3 rounded-full bg-teal-500' />
-            <span className='text-sm text-muted-foreground'>Auto-assigned:</span>
+            <span className='text-sm text-muted-foreground'>{t('autoAssigned')}:</span>
             <SlidingNumber number={activeSuggestedCount} className='font-semibold text-teal-600 dark:text-teal-400' />
           </div>
           <div className='flex items-center gap-1'>
             <div className='h-3 w-3 rounded-full bg-blue-500' />
-            <span className='text-sm text-muted-foreground'>Manual:</span>
+            <span className='text-sm text-muted-foreground'>{t('manual')}:</span>
             <SlidingNumber number={manualSelectedCount} className='font-semibold text-blue-600 dark:text-blue-400' />
           </div>
           <div className='h-6 w-px bg-border' />
           <div className='flex items-center flex-col relative'>
             <div className='flex flex-row items-baseline gap-x-2'>
               <span className='text-sm font-medium'>
-                Remaining:{' '}
+                {t('remaining')}:{' '}
                 <SlidingNumber
                   number={remaining}
                   className={cn(
@@ -60,12 +62,12 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
             {remaining > 0 && (
               <div className='flex items-baseline text-xs text-muted-foreground'>
                 <MousePointerClick className='h-3 w-3' />
-                <span className='text-[10px]'>Click days to assign/remove</span>
+                <span className='text-[10px]'>{t('clickDays')}</span>
               </div>
             )}
             {remaining === 0 && !hasManualChanges && (
               <div className='text-xs text-green-600 dark:text-green-400 font-medium text-[10px]'>
-                ✓ All days assigned!
+                ✓ {t('allAssigned')}
               </div>
             )}
           </div>
@@ -74,7 +76,7 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
         <div className='flex items-center gap-3'>
           {hasManualChanges && (
             <Button variant='outline' size='sm' onClick={resetManualSelection} type='button' className='text-xs'>
-              Reset Manual Changes
+              {t('resetManual')}
             </Button>
           )}
         </div>

@@ -5,6 +5,7 @@ import { Command, CommandGroup, CommandItem, CommandList } from '@const/componen
 import { cn } from '@const/lib/utils';
 import { Field, Label } from '@headlessui/react';
 import { Calendar } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Check } from 'src/components/animate-ui/icons/check';
@@ -16,6 +17,7 @@ import { useShallow } from 'zustand/react/shallow';
 const MAX_YEARS = 10;
 
 export const Years = () => {
+  const t = useTranslations('sidebar.years');
   const [open, setOpen] = useState(false);
   const { year, setYear } = useFiltersStore(
     useShallow((state) => ({
@@ -29,7 +31,7 @@ export const Years = () => {
   return (
     <Field className='space-y-2 w-full' data-tutorial='year'>
       <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='years'>
-        <Calendar size={16} /> Year
+        <Calendar size={16} /> {t('title')}
       </Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>

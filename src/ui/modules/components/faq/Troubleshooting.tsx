@@ -2,16 +2,17 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { useLocale } from 'next-intl';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { useLocale, useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { useShallow } from 'zustand/react/shallow';
 import { getTotalMonths } from '../utils/helpers';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 export const Troubleshooting = () => {
   const locale = useLocale();
+  const t = useTranslations('troubleshooting');
   const { carryOverMonths, country, region, year, allowPastDays, ptoDays, strategy } = useFiltersStore(
     useShallow((state) => ({
       carryOverMonths: state.carryOverMonths,
@@ -56,13 +57,13 @@ export const Troubleshooting = () => {
 
         setCleared(true);
 
-        toast.success('Local storage cleared successfully', {
-          description: 'All data has been reset and refreshed from the server.',
+        toast.success(t('successTitle'), {
+          description: t('successDescription'),
         });
       } catch (error) {
         getBetterStackInstance().logError('Error resetting to defaults', error, { component: 'Troubleshooting' });
-        toast.error('Error clearing local storage', {
-          description: 'Something went wrong while resetting the data. Please try again.',
+        toast.error(t('errorTitle'), {
+          description: t('errorDescription'),
         });
       }
     });
@@ -70,13 +71,9 @@ export const Troubleshooting = () => {
 
   return (
     <div className='space-y-2'>
-      <p className='text-sm text-muted-foreground'>
-        If the app behaves unexpectedly it may be caused by stale local data. When the project evolves some stored
-        objects can change shape, causing the client to reuse incompatible structures and fail to revalidate correctly.
-        Clearing local storage forces a fresh state.
-      </p>
+      <p className='text-sm text-muted-foreground'>{t('description')}</p>
       <Button variant='destructive' onClick={resetToDefaults} disabled={cleared || isPending}>
-        {isPending ? 'Clearing...' : cleared ? 'Cleared' : 'Reset Local Storage'}
+        {isPending ? t('clearing') : cleared ? t('cleared') : t('resetButton')}
       </Button>
     </div>
   );

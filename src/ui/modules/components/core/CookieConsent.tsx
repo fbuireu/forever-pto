@@ -1,11 +1,13 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as CookieConsentLib from 'vanilla-cookieconsent';
 
 import { CookieConsentDialog } from './CookieConsentDialog';
 
 export const CookieConsent = () => {
+  const t = useTranslations('cookies');
   const initialized = useRef(false);
   const [showBanner, setShowBanner] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
@@ -89,17 +91,14 @@ export const CookieConsent = () => {
   if (showBanner) {
     return (
       <div className='fixed bottom-4 left-4 z-50 max-w-md rounded-lg border bg-popover p-6 shadow-lg'>
-        <h3 className='text-lg font-semibold'>We use cookies</h3>
-        <p className='mt-2 text-sm text-muted-foreground'>
-          We use essential cookies for basic website functionality and analytics cookies to understand how you interact
-          with our site.
-        </p>
+        <h3 className='text-lg font-semibold'>{t('title')}</h3>
+        <p className='mt-2 text-sm text-muted-foreground'>{t('description')}</p>
         <div className='mt-4 flex flex-wrap gap-2'>
           <button
             onClick={handleRejectAll}
             className='rounded-md border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:opacity-90'
           >
-            Reject all
+            {t('rejectAll')}
           </button>
           <button
             onClick={() => {
@@ -108,13 +107,13 @@ export const CookieConsent = () => {
             }}
             className='rounded-md border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:opacity-90'
           >
-            Manage preferences
+            {t('managePreferences')}
           </button>
           <button
             onClick={handleAcceptAll}
             className='rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90'
           >
-            Accept all
+            {t('acceptAll')}
           </button>
         </div>
       </div>

@@ -8,44 +8,22 @@ import { cn } from '@const/lib/utils';
 import { Field, Label } from '@headlessui/react';
 import { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { AlertCircle, CheckCircle2, DicesIcon, Scale, TrendingUp } from 'lucide-react';
-import { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { useMemo, useState } from 'react';
 import { ChevronDown } from 'src/components/animate-ui/icons/chevron-down';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { Users } from 'src/components/animate-ui/icons/users';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
 import { useShallow } from 'zustand/react/shallow';
 
-const STRATEGIES = [
-  {
-    value: FilterStrategy.GROUPED,
-    label: 'Grouped',
-    icon: Users,
-    description: 'Prioriza vacaciones largas y continuas',
-    subtitle: 'Agrupa días puentes con festivos consecutivos',
-    pros: ['Simula la selección humana', 'Puentes largos'],
-    cons: ['Menos días totales', 'Menor eficiencia'],
-  },
-  {
-    value: FilterStrategy.OPTIMIZED,
-    label: 'Optimized',
-    icon: TrendingUp,
-    description: 'Maximiza eficiencia de días PTO',
-    subtitle: 'Obtén la mayor cantidad de días libres',
-    pros: ['Máximo rendimiento', 'Más días totales'],
-    cons: ['Puentes cortos', 'Días dispersos'],
-  },
-  {
-    value: FilterStrategy.BALANCED,
-    label: 'Balanced',
-    icon: Scale,
-    description: 'Equilibrio inteligente',
-    subtitle: 'Combina eficiencia con agrupación',
-    pros: ['Flexible', 'Períodos medianos', 'Versátil'],
-    cons: ['No maximiza', 'Solución intermedia'],
-  },
-];
+const STRATEGY_ICONS = {
+  [FilterStrategy.GROUPED]: Users,
+  [FilterStrategy.OPTIMIZED]: TrendingUp,
+  [FilterStrategy.BALANCED]: Scale,
+} as const;
 
 export const Strategy = () => {
+  const t = useTranslations('sidebar.strategy');
   const { strategy, setStrategy } = useFiltersStore(
     useShallow((state) => ({
       strategy: state.strategy,
@@ -53,29 +31,65 @@ export const Strategy = () => {
     }))
   );
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const currentStrategy = STRATEGIES.find(({ value }) => value === strategy);
+
+  const strategies = useMemo(
+    () => [
+      {
+        value: FilterStrategy.GROUPED,
+        label: t('grouped.label'),
+        icon: STRATEGY_ICONS[FilterStrategy.GROUPED],
+        description: t('grouped.description'),
+        subtitle: t('grouped.subtitle'),
+        pros: t.raw('grouped.pros') as string[],
+        cons: t.raw('grouped.cons') as string[],
+      },
+      {
+        value: FilterStrategy.OPTIMIZED,
+        label: t('optimized.label'),
+        icon: STRATEGY_ICONS[FilterStrategy.OPTIMIZED],
+        description: t('optimized.description'),
+        subtitle: t('optimized.subtitle'),
+        pros: t.raw('optimized.pros') as string[],
+        cons: t.raw('optimized.cons') as string[],
+      },
+      {
+        value: FilterStrategy.BALANCED,
+        label: t('balanced.label'),
+        icon: STRATEGY_ICONS[FilterStrategy.BALANCED],
+        description: t('balanced.description'),
+        subtitle: t('balanced.subtitle'),
+        pros: t.raw('balanced.pros') as string[],
+        cons: t.raw('balanced.cons') as string[],
+      },
+    ],
+    [t]
+  );
+
+  const currentStrategy = strategies.find(({ value }) => value === strategy);
 
   return (
     <Field className='space-y-2 w-full' data-tutorial='strategy'>
       <Label className='flex gap-2 text-sm font-medium' htmlFor='strategy'>
-        <DicesIcon size={16} /> Strategy
+        <DicesIcon size={16} /> {t('title')}
       </Label>
       <Combobox
         className='w-full'
         id='strategy'
-        options={STRATEGIES}
+        options={strategies}
         value={strategy}
         onChange={setStrategy}
-        disabled={!STRATEGIES.length}
-        placeholder={'Select strategy...'}
-        searchPlaceholder='Search strategies...'
+        disabled={!strategies.length}
+        placeholder={t('placeholder')}
+        searchPlaceholder={t('search')}
       />
       {currentStrategy && (
         <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
           <>
             <AnimateIcon animateOnHover>
               <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-xs font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors'>
-                <span>{detailsOpen ? 'Hide' : 'Expand'} strategy details</span>
+                <span>
+                  {detailsOpen ? t('hide') : t('expand')} {t('strategyDetails')}
+                </span>
                 <ChevronDown className={cn('h-4 w-4 transition-transform duration-200', detailsOpen && 'rotate-180')} />
               </CollapsibleTrigger>
             </AnimateIcon>

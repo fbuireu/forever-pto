@@ -2,6 +2,7 @@ import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types'
 import { TableHeader as BaseTableHeader, TableHead, TableRow } from '@const/components/ui/table';
 import { cn } from '@const/lib/utils';
 import { ArrowUpDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { memo } from 'react';
 import { ArrowUp } from 'src/components/animate-ui/icons/arrow-up';
 import { ArrowDown } from 'src/components/animate-ui/icons/arrow-down';
@@ -45,30 +46,39 @@ const TableHeader = ({ children, sortKey, currentSort, onSort, className = '' }:
   );
 };
 
-export const HolidayTableHeader = memo<HolidayTableHeaderProps>(
-  ({ selectAllButton, shouldShowLocationColumn, variant, sortConfig, onSort }) => (
+const HolidayTableHeaderComponent = ({
+  selectAllButton,
+  shouldShowLocationColumn,
+  variant,
+  sortConfig,
+  onSort,
+}: HolidayTableHeaderProps) => {
+  const t = useTranslations('holidayTableHeader');
+
+  return (
     <BaseTableHeader className='sticky top-0 bg-background z-10'>
       <TableRow>
         <TableHead>{selectAllButton}</TableHead>
         <TableHeader sortKey='name' currentSort={sortConfig} onSort={onSort}>
-          Festividad
+          {t('holiday')}
         </TableHeader>
         <TableHeader sortKey='date' currentSort={sortConfig} onSort={onSort}>
-          Fecha
+          {t('date')}
         </TableHeader>
-        <TableHead>Día</TableHead>
+        <TableHead>{t('day')}</TableHead>
         <TableHeader sortKey='type' currentSort={sortConfig} onSort={onSort}>
-          Tipo
+          {t('type')}
         </TableHeader>
-        <TableHead>Estado</TableHead>
+        <TableHead>{t('status')}</TableHead>
         {shouldShowLocationColumn && (
           <TableHeader sortKey='location' currentSort={sortConfig} onSort={onSort}>
-            {variant === HolidayVariant.REGIONAL ? 'Región' : 'Ubicación'}
+            {variant === HolidayVariant.REGIONAL ? t('region') : t('location')}
           </TableHeader>
         )}
       </TableRow>
     </BaseTableHeader>
-  )
-);
+  );
+};
 
+export const HolidayTableHeader = memo(HolidayTableHeaderComponent);
 HolidayTableHeader.displayName = 'HolidayTableHeader';

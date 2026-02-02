@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@const/components/ui/card';
 import { TrendingUp } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { PremiumFeature } from '../premium/PremiumFeature';
@@ -15,13 +15,14 @@ interface MonthlyDistributionChartProps {
 
 export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }: MonthlyDistributionChartProps) => {
   const locale = useLocale();
+  const t = useTranslations('charts');
   const { monthNames, timelineData } = useMemo(() => {
     const totalMonths = 12 + carryOverMonths;
     const names = getMonthNames({ locale, monthCount: totalMonths, startYear: year });
     const paddedMonthlyDist = [...monthlyDist, ...Array(Math.max(0, totalMonths - monthlyDist.length)).fill(0)];
     const data = paddedMonthlyDist.map((value, index) => ({
       mes: names[index] || `Month ${index + 1}`,
-      días: value,
+      days: value,
     }));
     return { monthNames: names, timelineData: data };
   }, [locale, carryOverMonths, year, monthlyDist]);
@@ -32,15 +33,15 @@ export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }:
   const peakMonth = monthNames[peakMonthIndex];
   const peakDays = Math.max(...monthlyDist);
 
-  const description = `Evolución mensual de ${totalDays} días libres distribuidos en ${activeMonths} meses. Pico en ${peakMonth} con ${peakDays} días.`;
+  const description = t('timelineDescription', { totalDays, activeMonths, peakMonth, peakDays });
 
   return (
-    <PremiumFeature feature={'Gráfica de Timeline Anual'} description={description} iconSize='size-7' inlineDescription>
+    <PremiumFeature feature={t('annualTimelineFeature')} description={description} iconSize='size-7' inlineDescription>
       <Card className='shadow-md'>
         <CardHeader className='pb-3'>
           <CardTitle className='flex items-center gap-2 text-base'>
             <TrendingUp className='w-5 h-5 text-green-500' />
-            Timeline Anual
+            {t('annualTimeline')}
           </CardTitle>
           <div className='text-xs text-muted-foreground mt-1'>{description}</div>
         </CardHeader>
@@ -52,7 +53,7 @@ export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }:
               <YAxis axisLine={false} tickLine={false} fontSize={14} allowDecimals={false} />
               <Area
                 type={'monotone'}
-                dataKey='días'
+                dataKey='days'
                 stroke={COLOR_SCHEMES[3]}
                 fill={COLOR_SCHEMES[3]}
                 fillOpacity={0.3}
@@ -61,7 +62,7 @@ export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }:
                 activeDot={{ r: 6, stroke: COLOR_SCHEMES[3], strokeWidth: 2 }}
               />
               <Tooltip
-                formatter={(value) => [`${value} días`, 'Días libres']}
+                formatter={(value) => [`${value} ${t('days')}`, t('daysOffLabel')]}
                 contentStyle={{
                   backgroundColor: 'var(--primary)',
                   border: '1px solid var(--primary)',

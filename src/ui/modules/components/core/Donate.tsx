@@ -11,7 +11,7 @@ import { calculateFinalAmount } from '@infrastructure/services/payments/utils/he
 import { Elements } from '@stripe/react-stripe-js';
 import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { initializePayment } from '@ui/adapters/payments/checkout';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
@@ -35,6 +35,8 @@ const logger = getBetterStackInstance();
 
 export const Donate = () => {
   const locale = useLocale();
+  const t = useTranslations('toasts');
+  const tDonate = useTranslations('donate');
   const { resolvedTheme } = useTheme();
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -111,8 +113,8 @@ export const Donate = () => {
             currency,
             locale,
           });
-          toast.error('Payment initialization failed', {
-            description: error instanceof Error ? error.message : 'Please try again.',
+          toast.error(t('paymentFailed'), {
+            description: error instanceof Error ? error.message : t('paymentFailedDescription'),
           });
         }
       });
@@ -121,15 +123,15 @@ export const Donate = () => {
   );
 
   const handlePaymentSuccess = useCallback(() => {
-    toast.success('Payment successful!', {
-      description: 'Thank you for your support! You now have premium access.',
+    toast.success(t('paymentSuccess'), {
+      description: t('paymentSuccessDescription'),
       duration: 8000,
     });
 
     form.reset();
     setPaymentState(null);
     setDonatePopoverOpen(false);
-  }, [form, setDonatePopoverOpen]);
+  }, [form, setDonatePopoverOpen, t]);
 
   const handlePaymentCancel = useCallback(() => {
     setPaymentState(null);
@@ -290,7 +292,7 @@ export const Donate = () => {
       <PopoverTrigger asChild>
         <div className='fixed xl:bottom-4 bottom-30 w-full right-0 md:w-auto md:right-4 z-50'>
           <div className='donate-rainbow relative z-0 overflow-hidden p-0.5 flex items-center justify-center rounded-md hover:scale-102 transition duration-200 active:scale-100'>
-            <Button className='shadow-lg rounded-md w-full h-full'>Donate & Unblock</Button>
+            <Button className='shadow-lg rounded-md w-full h-full'>{tDonate('donateAndUnblock')}</Button>
           </div>
         </div>
       </PopoverTrigger>
@@ -307,13 +309,13 @@ export const Donate = () => {
       >
         <div className='grid gap-4'>
           <div className='space-y-2'>
-            <h4 className='leading-none font-medium'>Support & Unblock</h4>
-            <p className='text-muted-foreground text-sm'>Make a donation to support the content and unblock access.</p>
+            <h4 className='leading-none font-medium'>{tDonate('supportAndUnblock')}</h4>
+            <p className='text-muted-foreground text-sm'>{tDonate('makeDonation')}</p>
             {premiumKey && (
               <div className='flex items-center gap-2 p-2 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700'>
                 <Star className='w-4 h-4 text-green-500' fill='currentColor' aria-hidden='true' animateOnView loop />
                 <span className='text-green-700 dark:text-green-300 font-semibold text-sm'>
-                  You are a premium user already. Thank you for your support!
+                  {tDonate('alreadyPremium')}
                 </span>
               </div>
             )}

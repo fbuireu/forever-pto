@@ -4,8 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@const/components/ui/c
 import { cn } from '@const/lib/utils';
 import { useDetectSticky } from '@ui/hooks/useDetectSticky';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers';
+import { useTranslations } from 'next-intl';
 
 export const Legend = () => {
+  const t = useTranslations('legend');
   const [legendRef, isStuck] = useDetectSticky<HTMLElement>();
 
   return (
@@ -22,7 +24,7 @@ export const Legend = () => {
           <CardTitle
             className={cn('font-bold transition-all duration-300 ease-in-out', isStuck ? 'text-base' : 'text-3xl')}
           >
-            Legend
+            {t('title')}
           </CardTitle>
         </CardHeader>
         <CardContent className={cn('transition-all duration-300 ease-in-out', isStuck ? 'py-1 pt-0' : '')}>
@@ -34,31 +36,31 @@ export const Legend = () => {
           >
             <div className='flex items-center'>
               <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.today)} />
-              <span>Today</span>
+              <span>{t('today')}</span>
             </div>
             <div className='flex items-center'>
               <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.weekend)} />
-              <span>Weekends</span>
+              <span>{t('weekends')}</span>
             </div>
             <div className='flex items-center'>
               <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.holiday)} />
-              <span>Holidays</span>
+              <span>{t('holidays')}</span>
             </div>
             <div className='flex items-center'>
               <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.suggested)} />
-              <span>Suggested</span>
+              <span>{t('suggested')}</span>
             </div>
             <div className='flex items-center'>
               <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.alternative, 'animate-none')} />
-              <span>Alternatives</span>
+              <span>{t('alternatives')}</span>
             </div>
             <div className='flex items-center'>
               <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.manuallySelected)} />
-              <span>Manual</span>
+              <span>{t('manual')}</span>
             </div>
             <div className='flex items-center'>
               <div className={cn('mr-2 h-6 w-6 rounded-sm', MODIFIERS_CLASS_NAMES.custom)} />
-              <span>Custom</span>
+              <span>{t('custom')}</span>
             </div>
           </div>
         </CardContent>

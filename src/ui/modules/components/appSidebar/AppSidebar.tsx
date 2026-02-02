@@ -1,5 +1,6 @@
 import { Calculator } from 'lucide-react';
 import type { Locale } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
@@ -39,7 +40,10 @@ interface AppSidebarProps {
   locale: Locale;
 }
 
-export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
+export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
+  const t = await getTranslations('sidebar');
+
+  return (
   <SidebarProvider>
     <Sidebar collapsible='icon' variant='inset'>
       <SidebarHeader>
@@ -51,7 +55,7 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Configuration</SidebarGroupLabel>
+          <SidebarGroupLabel>{t('configuration')}</SidebarGroupLabel>
           <SidebarMenu>
             <AnimateIcon animateOnHover>
               <Collapsible
@@ -61,9 +65,9 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
               >
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild className='cursor-pointer'>
-                    <SidebarMenuButton variant='outline' tooltip='Filters'>
+                    <SidebarMenuButton variant='outline' tooltip={t('filters')}>
                       <Settings className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
-                      <span className='data-[collapsed=true]:hidden'>Filters</span>
+                      <span className='data-[collapsed=true]:hidden'>{t('filters')}</span>
                       <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
@@ -73,7 +77,7 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
                       <SidebarMenuSubItem />
                     </SidebarMenuSub>
                     <SidebarMenuSub>
-                      <Suspense fallback={'Loading...'}>
+                      <Suspense fallback={t('loading')}>
                         <Countries locale={locale} />
                       </Suspense>
                       <SidebarMenuSubItem />
@@ -105,7 +109,7 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
           </SidebarMenu>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Tools</SidebarGroupLabel>
+          <SidebarGroupLabel>{t('tools')}</SidebarGroupLabel>
           <SidebarMenu>
             <AnimateIcon animateOnHover>
               <Collapsible
@@ -115,9 +119,9 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
               >
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild className='cursor-pointer'>
-                    <SidebarMenuButton variant='outline' tooltip='Tools'>
+                    <SidebarMenuButton variant='outline' tooltip={t('tools')}>
                       <Calculator className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
-                      <span className='data-[collapsed=true]:hidden'>Calculators</span>
+                      <span className='data-[collapsed=true]:hidden'>{t('calculators')}</span>
                       <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
@@ -149,4 +153,5 @@ export const AppSidebar = ({ locale, children }: AppSidebarProps) => (
       {children}
     </SidebarInset>
   </SidebarProvider>
-);
+  );
+};

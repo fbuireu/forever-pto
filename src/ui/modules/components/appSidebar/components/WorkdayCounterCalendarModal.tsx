@@ -1,6 +1,7 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@const/components/ui/dialog';
 import { Calendar as CalendarIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import type { FromTo } from '../../core/Calendar';
 import { Calendar, CalendarSelectionMode } from '../../core/Calendar';
@@ -23,6 +24,8 @@ export const WorkdayCounterCalendarModal = ({
   locale,
   holidays,
 }: WorkdayCounterCalendarModalProps) => {
+  const t = useTranslations('workdayCounterModal');
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -30,12 +33,12 @@ export const WorkdayCounterCalendarModal = ({
           <CalendarIcon className='w-3 h-3 mr-1' />
           {selectedRange
             ? `${formatDate({ date: selectedRange.from, locale, format: 'MMM d' })} - ${formatDate({ date: selectedRange.to, locale, format: 'MMM d' })}`
-            : 'Select date range'}
+            : t('selectDateRange')}
         </Button>
       </DialogTrigger>
       <DialogContent className='sm:max-w-sm'>
         <DialogHeader>
-          <DialogTitle className='text-sm'>Select date range</DialogTitle>
+          <DialogTitle className='text-sm'>{t('selectDateRange')}</DialogTitle>
         </DialogHeader>
         <div className='border rounded-lg p-3'>
           <Calendar

@@ -4,7 +4,7 @@ import { usePremiumStore } from '@application/stores/premium';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@const/components/ui/input-group';
 import { Field, Label } from '@headlessui/react';
 import { Euro, InfoIcon } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
@@ -16,6 +16,7 @@ const HOURS_PER_DAY = 8;
 
 export const PtoSalaryCalculator = () => {
   const locale = useLocale();
+  const t = useTranslations('ptoSalaryCalculator');
   const [annualSalary, setAnnualSalary] = useState<number | undefined>();
   const [unusedPTODays, setUnusedPTODays] = useState<number>(5);
 
@@ -74,22 +75,19 @@ export const PtoSalaryCalculator = () => {
   return (
     <Field className='space-y-2 w-full'>
       <Label className='flex gap-2 my-2 text-sm font-normal'>
-        <Euro size={16} /> PTO vs Salary Calculator
+        <Euro size={16} /> {t('title')}
         <TooltipProvider delayDuration={200}>
           <Tooltip>
             <TooltipTrigger asChild className='ml-auto'>
               <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
             </TooltipTrigger>
-            <TooltipContent className='w-60 text-pretty'>
-              Calculate how much paid time off you&apos;re giving up by not using your PTO days. You still get your full
-              salary, but you&apos;re working days you could have taken as paid vacation.
-            </TooltipContent>
+            <TooltipContent className='w-60 text-pretty'>{t('tooltip')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </Label>
 
       <div className='space-y-2 w-full'>
-        <p className='text-xs text-muted-foreground'>Annual Salary</p>
+        <p className='text-xs text-muted-foreground'>{t('annualSalary')}</p>
         <InputGroup>
           <InputGroupAddon>
             <InputGroupText>{currencySymbol}</InputGroupText>
@@ -108,7 +106,7 @@ export const PtoSalaryCalculator = () => {
       </div>
 
       <div className='space-y-2 w-full'>
-        <p className='text-xs text-muted-foreground'>Unused PTO Days</p>
+        <p className='text-xs text-muted-foreground'>{t('unusedPtoDays')}</p>
         <InputGroup>
           <InputGroupInput
             id='unusedPTO'
@@ -127,49 +125,52 @@ export const PtoSalaryCalculator = () => {
         <div className='space-y-2 w-full bg-muted rounded-md'>
           <div className='space-y-2 w-full'>
             <div className='text-xs'>
-              <span className='font-medium text-red-600'>Value of unused PTO:</span>
+              <span className='font-medium text-red-600'>{t('valueOfUnusedPto')}:</span>
               <div className='text-lg font-bold text-red-600 flex items-center gap-1'>
                 <CurrencyNumber value={unusedPTOValue} decimalPlaces={0} />
               </div>
-              <p className='text-muted-foreground'>Worth of paid vacation not taken</p>
+              <p className='text-muted-foreground'>{t('worthOfPaidVacation')}</p>
             </div>
 
             <div className='text-xs border-t pt-2'>
-              <span className='font-medium'>Your daily rate:</span>
+              <span className='font-medium'>{t('yourDailyRate')}:</span>
               <div className='text-sm font-bold text-primary flex items-center gap-1'>
                 <CurrencyNumber value={dailyRate} decimalPlaces={0} />
-                <span className='text-muted-foreground'>/day</span>
+                <span className='text-muted-foreground'>/{t('perDay')}</span>
               </div>
             </div>
 
             <div className='text-xs'>
-              <span className='font-medium'>Your hourly rate:</span>
+              <span className='font-medium'>{t('yourHourlyRate')}:</span>
               <div className='text-sm font-bold flex items-center gap-1'>
                 <CurrencyNumber value={normalHourlyRate} decimalPlaces={2} />
-                <span className='text-muted-foreground'>/hour</span>
+                <span className='text-muted-foreground'>/{t('perHour')}</span>
               </div>
-              <p className='text-muted-foreground'>Standard working hours</p>
+              <p className='text-muted-foreground'>{t('standardWorkingHours')}</p>
             </div>
 
             {unusedPTODays > 0 && (
               <>
                 <div className='text-xs'>
-                  <span className='font-medium text-orange-600'>Effective hourly rate:</span>
+                  <span className='font-medium text-orange-600'>{t('effectiveHourlyRate')}:</span>
                   <div className='text-sm font-bold text-orange-600 flex items-center gap-1'>
                     <CurrencyNumber value={effectiveHourlyRate} decimalPlaces={2} />
-                    <span className='text-muted-foreground'>/hour</span>
+                    <span className='text-muted-foreground'>/{t('perHour')}</span>
                   </div>
-                  <p className='text-muted-foreground'>When working {unusedPTODays} extra unpaid days</p>
+                  <p className='text-muted-foreground'>{t('whenWorkingExtraDays', { days: unusedPTODays })}</p>
                 </div>
 
                 <div className='bg-amber-50 dark:bg-amber-900/20 p-2 rounded text-xs'>
-                  <p className='text-amber-700 dark:text-amber-400 font-medium'>Opportunity Cost</p>
+                  <p className='text-amber-700 dark:text-amber-400 font-medium'>{t('opportunityCost')}</p>
                   <p className='text-amber-600 dark:text-amber-300'>
-                    You worked {unusedPTODays} days that you could have taken as paid vacation. That&apos;s{' '}
-                    <span className='inline-flex font-semibold'>
-                      <CurrencyNumber value={unusedPTOValue} decimalPlaces={0} />
-                    </span>{' '}
-                    worth of paid time off you gave up. Your salary stays the same, but you worked extra days for free.
+                    {t.rich('opportunityCostDescription', {
+                      days: unusedPTODays,
+                      amount: (chunks) => (
+                        <span className='inline-flex font-semibold'>
+                          <CurrencyNumber value={unusedPTOValue} decimalPlaces={0} />
+                        </span>
+                      ),
+                    })}
                   </p>
                 </div>
               </>

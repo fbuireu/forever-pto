@@ -1,5 +1,6 @@
 import { cn } from '@const/lib/utils';
 import { Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useFormStatus } from 'react-dom';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 
@@ -17,15 +18,19 @@ interface FormButtonsProps {
 
 export const FormButtons = ({
   onCancel,
-  submitText = 'Submit',
-  loadingText = 'Processing...',
-  cancelText = 'Cancel',
+  submitText,
+  loadingText,
+  cancelText,
   hideCancel = false,
   submitClassName,
   cancelClassName,
   submitVariant = 'default',
   pending: pendingProp,
 }: FormButtonsProps) => {
+  const t = useTranslations('formButtons');
+  const resolvedSubmitText = submitText ?? t('submit');
+  const resolvedLoadingText = loadingText ?? t('processing');
+  const resolvedCancelText = cancelText ?? t('cancel');
   const { pending: pendingStatus } = useFormStatus();
   const isPending = pendingProp ?? pendingStatus;
 
@@ -35,15 +40,15 @@ export const FormButtons = ({
         {isPending ? (
           <>
             <Loader2 className='w-4 h-4 mr-2 animate-spin' />
-            {loadingText}
+            {resolvedLoadingText}
           </>
         ) : (
-          submitText
+          resolvedSubmitText
         )}
       </Button>
       {!hideCancel && onCancel && (
         <Button type='button' variant='outline' onClick={onCancel} disabled={isPending} className={cancelClassName}>
-          {cancelText}
+          {resolvedCancelText}
         </Button>
       )}
     </div>

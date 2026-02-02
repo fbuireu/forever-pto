@@ -1,5 +1,6 @@
 import { LegalLayout } from '@ui/modules/components/legal/LegalLayout';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | Forever PTO',
@@ -10,320 +11,269 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage() {
+  const t = await getTranslations('legalPages.privacyPolicy');
+
   return (
-    <LegalLayout title='Privacy Policy' lastUpdated='January 17, 2025'>
+    <LegalLayout title={t('title')} lastUpdated={t('lastUpdated')}>
       <section>
-        <h2 className='text-2xl font-semibold mt-6 mb-4'>1. Introduction</h2>
-        <p>
-          At Forever PTO, we are committed to protecting your privacy and personal data. This Privacy Policy explains
-          how we collect, use, store, and protect your information when you use our web application.
-        </p>
-        <p className='mt-4'>
-          Forever PTO is designed with privacy in mind. All your data is stored locally in your browser, and we do not
-          collect or store personal information on our servers unless explicitly stated in this policy.
-        </p>
+        <h2 className='text-2xl font-semibold mt-6 mb-4'>{t('sections.introduction.title')}</h2>
+        <p>{t('sections.introduction.p1')}</p>
+        <p className='mt-4'>{t('sections.introduction.p2')}</p>
       </section>
 
       <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>2. Data Controller</h2>
-        <p>The data controller responsible for your personal data is:</p>
+        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.dataController.title')}</h2>
+        <p>{t('sections.dataController.description')}</p>
         <ul className='list-disc pl-6 mt-4 space-y-2'>
           <li>
-            <strong>Name:</strong> [YOUR_FULL_NAME or COMPANY_NAME]
+            <strong>{t('sections.dataController.items.name.label')}</strong> {t('sections.dataController.items.name.value')}
           </li>
           <li>
-            <strong>Tax ID:</strong> [YOUR_TAX_ID]
+            <strong>{t('sections.dataController.items.taxId.label')}</strong> {t('sections.dataController.items.taxId.value')}
           </li>
           <li>
-            <strong>Address:</strong> [YOUR_COMPLETE_ADDRESS]
+            <strong>{t('sections.dataController.items.address.label')}</strong> {t('sections.dataController.items.address.value')}
           </li>
           <li>
-            <strong>Email:</strong> [YOUR_EMAIL]
+            <strong>{t('sections.dataController.items.email.label')}</strong> {t('sections.dataController.items.email.value')}
           </li>
           <li>
-            <strong>Website:</strong> https://forever-pto.com
+            <strong>{t('sections.dataController.items.website.label')}</strong> https://forever-pto.com
           </li>
         </ul>
       </section>
 
       <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>3. Data We Collect and How We Use It</h2>
+        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.dataWeCollect.title')}</h2>
 
-        <h3 className='text-xl font-semibold mt-6 mb-3'>3.1 Data Stored Locally in Your Browser</h3>
-        <p>
-          Forever PTO stores all application data locally in your browser using local storage. This data never leaves
-          your device unless you explicitly interact with external services (like payment processors). The data stored
-          includes:
-        </p>
+        <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.dataWeCollect.localStorage.title')}</h3>
+        <p>{t('sections.dataWeCollect.localStorage.description')}</p>
         <ul className='list-disc pl-6 mt-4 space-y-3'>
           <li>
-            <strong>Application Settings:</strong> Your PTO days, selected country, region, year, optimization
-            strategy, and other configuration preferences
+            <strong>{t('sections.dataWeCollect.localStorage.items.settings.label')}</strong>{' '}
+            {t('sections.dataWeCollect.localStorage.items.settings.description')}
           </li>
           <li>
-            <strong>Holiday Data:</strong> Cached information about national and regional holidays for your selected
-            location
+            <strong>{t('sections.dataWeCollect.localStorage.items.holidayData.label')}</strong>{' '}
+            {t('sections.dataWeCollect.localStorage.items.holidayData.description')}
           </li>
           <li>
-            <strong>Custom Holidays:</strong> Any custom holidays you manually add to your calendar
+            <strong>{t('sections.dataWeCollect.localStorage.items.customHolidays.label')}</strong>{' '}
+            {t('sections.dataWeCollect.localStorage.items.customHolidays.description')}
           </li>
           <li>
-            <strong>Calendar State:</strong> Your manual PTO day selections, removed suggestions, and calendar
-            modifications
+            <strong>{t('sections.dataWeCollect.localStorage.items.calendarState.label')}</strong>{' '}
+            {t('sections.dataWeCollect.localStorage.items.calendarState.description')}
           </li>
           <li>
-            <strong>Premium Activation Key:</strong> If you activate premium features, your activation key is stored
-            encrypted in local storage
+            <strong>{t('sections.dataWeCollect.localStorage.items.premiumKey.label')}</strong>{' '}
+            {t('sections.dataWeCollect.localStorage.items.premiumKey.description')}
           </li>
           <li>
-            <strong>Theme Preferences:</strong> Your dark/light mode selection
+            <strong>{t('sections.dataWeCollect.localStorage.items.theme.label')}</strong>{' '}
+            {t('sections.dataWeCollect.localStorage.items.theme.description')}
           </li>
           <li>
-            <strong>Cookie Consent:</strong> Your cookie banner preferences
+            <strong>{t('sections.dataWeCollect.localStorage.items.cookieConsent.label')}</strong>{' '}
+            {t('sections.dataWeCollect.localStorage.items.cookieConsent.description')}
           </li>
         </ul>
         <p className='mt-4'>
-          <strong>Legal Basis:</strong> Legitimate interest (necessary for the application to function) and consent
-          (for optional features).
+          <strong>{t('sections.dataWeCollect.localStorage.legalBasis.label')}</strong>{' '}
+          {t('sections.dataWeCollect.localStorage.legalBasis.description')}
         </p>
         <p className='mt-2'>
-          <strong>Data Retention:</strong> This data persists in your browser until you clear it manually or uninstall
-          the application.
+          <strong>{t('sections.dataWeCollect.localStorage.retention.label')}</strong>{' '}
+          {t('sections.dataWeCollect.localStorage.retention.description')}
         </p>
 
-        <h3 className='text-xl font-semibold mt-6 mb-3'>3.2 Payment Information</h3>
-        <p>
-          When you purchase premium features, payment processing is handled by third-party payment processors. We do
-          not store your credit card information or payment details on our servers.
-        </p>
-        <p className='mt-4'>Information collected during payment includes:</p>
+        <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.dataWeCollect.payment.title')}</h3>
+        <p>{t('sections.dataWeCollect.payment.description')}</p>
+        <p className='mt-4'>{t('sections.dataWeCollect.payment.collectedInfo')}</p>
         <ul className='list-disc pl-6 mt-2 space-y-2'>
-          <li>Transaction ID and payment confirmation</li>
-          <li>Premium activation key generated for your purchase</li>
-          <li>Email address (if provided) for sending the activation key</li>
+          <li>{t('sections.dataWeCollect.payment.items.transactionId')}</li>
+          <li>{t('sections.dataWeCollect.payment.items.activationKey')}</li>
+          <li>{t('sections.dataWeCollect.payment.items.email')}</li>
         </ul>
         <p className='mt-4'>
-          <strong>Legal Basis:</strong> Contract performance (necessary to provide premium features you purchased).
+          <strong>{t('sections.dataWeCollect.payment.legalBasis.label')}</strong>{' '}
+          {t('sections.dataWeCollect.payment.legalBasis.description')}
         </p>
         <p className='mt-2'>
-          <strong>Data Retention:</strong> Payment records are retained for the minimum period required by tax and
-          accounting regulations (typically 6-10 years depending on jurisdiction).
+          <strong>{t('sections.dataWeCollect.payment.retention.label')}</strong>{' '}
+          {t('sections.dataWeCollect.payment.retention.description')}
         </p>
 
-        <h3 className='text-xl font-semibold mt-6 mb-3'>3.3 Analytics and Usage Data (Optional)</h3>
-        <p>
-          If you consent via our cookie banner, we may collect anonymized usage statistics to understand how users
-          interact with Forever PTO and improve the user experience. This includes:
-        </p>
+        <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.dataWeCollect.analytics.title')}</h3>
+        <p>{t('sections.dataWeCollect.analytics.description')}</p>
         <ul className='list-disc pl-6 mt-2 space-y-2'>
-          <li>Pages visited and features used</li>
-          <li>Browser type and device information</li>
-          <li>General geographic location (country/region level, not precise location)</li>
-          <li>Interaction patterns and feature usage frequency</li>
+          <li>{t('sections.dataWeCollect.analytics.items.pagesVisited')}</li>
+          <li>{t('sections.dataWeCollect.analytics.items.browserInfo')}</li>
+          <li>{t('sections.dataWeCollect.analytics.items.location')}</li>
+          <li>{t('sections.dataWeCollect.analytics.items.interactions')}</li>
         </ul>
         <p className='mt-4'>
-          <strong>Legal Basis:</strong> Consent (you can withdraw consent at any time).
+          <strong>{t('sections.dataWeCollect.analytics.legalBasis.label')}</strong>{' '}
+          {t('sections.dataWeCollect.analytics.legalBasis.description')}
         </p>
         <p className='mt-2'>
-          <strong>Data Retention:</strong> Analytics data is typically retained for 14-26 months depending on the
-          service used.
+          <strong>{t('sections.dataWeCollect.analytics.retention.label')}</strong>{' '}
+          {t('sections.dataWeCollect.analytics.retention.description')}
         </p>
 
-        <h3 className='text-xl font-semibold mt-6 mb-3'>3.4 Contact and Support</h3>
-        <p>
-          If you contact us for support or inquiries, we collect the information you provide in your message (email
-          address, name if provided, and message content) solely to respond to your request.
-        </p>
+        <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.dataWeCollect.contact.title')}</h3>
+        <p>{t('sections.dataWeCollect.contact.description')}</p>
         <p className='mt-4'>
-          <strong>Legal Basis:</strong> Legitimate interest (responding to your inquiry).
+          <strong>{t('sections.dataWeCollect.contact.legalBasis.label')}</strong>{' '}
+          {t('sections.dataWeCollect.contact.legalBasis.description')}
         </p>
         <p className='mt-2'>
-          <strong>Data Retention:</strong> Support correspondence is retained for up to 3 years for quality assurance
-          and legal compliance.
+          <strong>{t('sections.dataWeCollect.contact.retention.label')}</strong>{' '}
+          {t('sections.dataWeCollect.contact.retention.description')}
         </p>
       </section>
 
       <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>4. Cookies and Tracking Technologies</h2>
+        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.cookiesAndTracking.title')}</h2>
         <p>
-          Forever PTO uses cookies and browser local storage to provide functionality and, with your consent, to
-          analyze usage patterns. For detailed information about the cookies we use, how we use them, and how to
-          manage your cookie preferences, please see our{' '}
-          <a href='/legal/cookie-policy' className='text-primary hover:underline'>
-            Cookie Policy
-          </a>
-          .
+          {t.rich('sections.cookiesAndTracking.description', {
+            link: (chunks) => (
+              <a href='/legal/cookie-policy' className='text-primary hover:underline'>
+                {chunks}
+              </a>
+            ),
+          })}
         </p>
       </section>
 
       <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>5. Data Sharing and Third Parties</h2>
-        <p>
-          We do not sell, rent, or trade your personal information to third parties. We only share data with trusted
-          service providers in the following limited circumstances:
-        </p>
+        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.dataSharing.title')}</h2>
+        <p>{t('sections.dataSharing.description')}</p>
         <ul className='list-disc pl-6 mt-4 space-y-3'>
           <li>
-            <strong>Payment Processors:</strong> When you purchase premium features, your payment information is
-            processed by third-party payment service providers (e.g., Stripe, PayPal). These services have their own
-            privacy policies.
+            <strong>{t('sections.dataSharing.items.paymentProcessors.label')}</strong>{' '}
+            {t('sections.dataSharing.items.paymentProcessors.description')}
           </li>
           <li>
-            <strong>Holiday Data Providers:</strong> We fetch holiday information from public APIs. Your selected
-            country and region may be sent to these services to retrieve relevant data.
+            <strong>{t('sections.dataSharing.items.holidayProviders.label')}</strong>{' '}
+            {t('sections.dataSharing.items.holidayProviders.description')}
           </li>
           <li>
-            <strong>Analytics Services:</strong> If you consent, anonymized usage data may be shared with analytics
-            providers to help us improve the application.
+            <strong>{t('sections.dataSharing.items.analytics.label')}</strong>{' '}
+            {t('sections.dataSharing.items.analytics.description')}
           </li>
           <li>
-            <strong>Legal Requirements:</strong> We may disclose information if required by law, legal process, or to
-            protect our rights or the rights of others.
+            <strong>{t('sections.dataSharing.items.legal.label')}</strong>{' '}
+            {t('sections.dataSharing.items.legal.description')}
           </li>
         </ul>
       </section>
 
       <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>6. Data Security</h2>
-        <p>We implement appropriate technical and organizational measures to protect your data:</p>
+        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.dataSecurity.title')}</h2>
+        <p>{t('sections.dataSecurity.description')}</p>
         <ul className='list-disc pl-6 mt-4 space-y-3'>
           <li>
-            <strong>Encryption:</strong> Sensitive data stored in browser local storage (like premium activation keys)
-            is encrypted using industry-standard methods
+            <strong>{t('sections.dataSecurity.items.encryption.label')}</strong>{' '}
+            {t('sections.dataSecurity.items.encryption.description')}
           </li>
           <li>
-            <strong>Local Storage:</strong> Most data never leaves your device, reducing exposure to network-based
-            attacks
+            <strong>{t('sections.dataSecurity.items.localStorage.label')}</strong>{' '}
+            {t('sections.dataSecurity.items.localStorage.description')}
           </li>
           <li>
-            <strong>HTTPS:</strong> All communications between your browser and our servers are encrypted using SSL/TLS
+            <strong>{t('sections.dataSecurity.items.https.label')}</strong>{' '}
+            {t('sections.dataSecurity.items.https.description')}
           </li>
           <li>
-            <strong>Minimal Data Collection:</strong> We only collect data that is necessary for functionality
+            <strong>{t('sections.dataSecurity.items.minimalCollection.label')}</strong>{' '}
+            {t('sections.dataSecurity.items.minimalCollection.description')}
           </li>
         </ul>
-        <p className='mt-4'>
-          However, no method of transmission over the internet or electronic storage is 100% secure. While we strive
-          to protect your data, we cannot guarantee absolute security.
-        </p>
+        <p className='mt-4'>{t('sections.dataSecurity.disclaimer')}</p>
       </section>
 
       <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>7. Your Rights Under GDPR and Data Protection Laws</h2>
-        <p>If you are in the European Union or European Economic Area, you have the following rights:</p>
+        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.yourRights.title')}</h2>
+        <p>{t('sections.yourRights.description')}</p>
         <ul className='list-disc pl-6 mt-4 space-y-3'>
           <li>
-            <strong>Right of Access:</strong> You can request access to your personal data. Since most data is stored
-            locally, you can view it directly in your browser&apos;s developer tools.
+            <strong>{t('sections.yourRights.items.access.label')}</strong>{' '}
+            {t('sections.yourRights.items.access.description')}
           </li>
           <li>
-            <strong>Right to Rectification:</strong> You can correct inaccurate data directly in the application
-            settings.
+            <strong>{t('sections.yourRights.items.rectification.label')}</strong>{' '}
+            {t('sections.yourRights.items.rectification.description')}
           </li>
           <li>
-            <strong>Right to Erasure:</strong> You can delete your data at any time by clearing your browser&apos;s
-            local storage or using the in-app reset function.
+            <strong>{t('sections.yourRights.items.erasure.label')}</strong>{' '}
+            {t('sections.yourRights.items.erasure.description')}
           </li>
           <li>
-            <strong>Right to Restrict Processing:</strong> You can limit how we process your data by adjusting cookie
-            preferences and not using optional features.
+            <strong>{t('sections.yourRights.items.restrict.label')}</strong>{' '}
+            {t('sections.yourRights.items.restrict.description')}
           </li>
           <li>
-            <strong>Right to Data Portability:</strong> You can export your application settings and data for use
-            elsewhere.
+            <strong>{t('sections.yourRights.items.portability.label')}</strong>{' '}
+            {t('sections.yourRights.items.portability.description')}
           </li>
           <li>
-            <strong>Right to Object:</strong> You can object to data processing by not using the service or specific
-            features.
+            <strong>{t('sections.yourRights.items.object.label')}</strong>{' '}
+            {t('sections.yourRights.items.object.description')}
           </li>
           <li>
-            <strong>Right to Withdraw Consent:</strong> You can withdraw consent for analytics cookies at any time via
-            the cookie banner or browser settings.
+            <strong>{t('sections.yourRights.items.withdrawConsent.label')}</strong>{' '}
+            {t('sections.yourRights.items.withdrawConsent.description')}
           </li>
           <li>
-            <strong>Right to Lodge a Complaint:</strong> You can file a complaint with your national data protection
-            authority if you believe we have violated data protection laws.
+            <strong>{t('sections.yourRights.items.complaint.label')}</strong>{' '}
+            {t('sections.yourRights.items.complaint.description')}
           </li>
         </ul>
-        <p className='mt-4'>
-          To exercise these rights or if you have questions, please contact us at [YOUR_EMAIL].
-        </p>
+        <p className='mt-4'>{t('sections.yourRights.contact')}</p>
       </section>
 
       <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>8. International Data Transfers</h2>
-        <p>
-          Forever PTO is hosted on servers that may be located in different countries. When you use our service, your
-          data may be transferred to and processed in countries outside your country of residence.
-        </p>
-        <p className='mt-4'>
-          For EU users: If data is transferred outside the European Economic Area, we ensure appropriate safeguards
-          are in place (such as Standard Contractual Clauses or adequacy decisions) to protect your data in accordance
-          with GDPR requirements.
-        </p>
+        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.internationalTransfers.title')}</h2>
+        <p>{t('sections.internationalTransfers.p1')}</p>
+        <p className='mt-4'>{t('sections.internationalTransfers.p2')}</p>
       </section>
 
       <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>9. Children&apos;s Privacy</h2>
-        <p>
-          Forever PTO is not intended for children under 16 years of age. We do not knowingly collect personal
-          information from children under 16. If we become aware that we have collected personal data from a child
-          under 16 without parental consent, we will take steps to delete that information.
-        </p>
-        <p className='mt-4'>
-          If you are a parent or guardian and believe your child has provided us with personal information, please
-          contact us at [YOUR_EMAIL].
-        </p>
+        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.childrensPrivacy.title')}</h2>
+        <p>{t('sections.childrensPrivacy.p1')}</p>
+        <p className='mt-4'>{t('sections.childrensPrivacy.p2')}</p>
       </section>
 
       <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>10. Changes to This Privacy Policy</h2>
-        <p>
-          We may update this Privacy Policy from time to time to reflect changes in our practices, technology, legal
-          requirements, or other factors. When we make changes, we will update the &quot;Last Updated&quot; date at the top of
-          this policy.
-        </p>
-        <p className='mt-4'>
-          For material changes that significantly affect your rights, we will provide notice through the application or
-          via email (if we have your email address).
-        </p>
-        <p className='mt-4'>
-          We encourage you to review this Privacy Policy periodically to stay informed about how we protect your
-          information.
-        </p>
+        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.changes.title')}</h2>
+        <p>{t('sections.changes.p1')}</p>
+        <p className='mt-4'>{t('sections.changes.p2')}</p>
+        <p className='mt-4'>{t('sections.changes.p3')}</p>
       </section>
 
       <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>11. Data Breach Notification</h2>
-        <p>
-          In the unlikely event of a data breach that affects your personal information, we will notify you and
-          relevant authorities as required by applicable data protection laws, typically within 72 hours of becoming
-          aware of the breach.
-        </p>
+        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.dataBreach.title')}</h2>
+        <p>{t('sections.dataBreach.description')}</p>
       </section>
 
       <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>12. Contact Information</h2>
-        <p>
-          If you have any questions, concerns, or requests regarding this Privacy Policy or how we handle your personal
-          data, please contact us:
-        </p>
+        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.contactInfo.title')}</h2>
+        <p>{t('sections.contactInfo.description')}</p>
         <ul className='list-disc pl-6 mt-4 space-y-2'>
           <li>
-            <strong>Email:</strong> [YOUR_EMAIL]
+            <strong>{t('sections.contactInfo.items.email.label')}</strong> {t('sections.contactInfo.items.email.value')}
           </li>
           <li>
-            <strong>Website:</strong> https://forever-pto.com
+            <strong>{t('sections.contactInfo.items.website.label')}</strong> https://forever-pto.com
           </li>
           <li>
-            <strong>Postal Address:</strong> [YOUR_COMPLETE_ADDRESS]
+            <strong>{t('sections.contactInfo.items.postalAddress.label')}</strong>{' '}
+            {t('sections.contactInfo.items.postalAddress.value')}
           </li>
         </ul>
-        <p className='mt-4'>
-          We will respond to your inquiries within 30 days as required by GDPR and other applicable data protection
-          regulations.
-        </p>
+        <p className='mt-4'>{t('sections.contactInfo.responseTime')}</p>
       </section>
     </LegalLayout>
   );

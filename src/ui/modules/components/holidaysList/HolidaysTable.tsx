@@ -13,7 +13,7 @@ import { ConditionalWrapper } from '@ui/modules/components/core/ConditionalWrapp
 import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/components/premium/PremiumFeature';
 import { isWeekend } from 'date-fns/isWeekend';
 import { Edit } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Checkbox } from 'src/components/animate-ui/base/checkbox';
@@ -51,6 +51,7 @@ const HolidayCard = ({
   locale,
   onToggle,
   premiumKey,
+  t,
 }: {
   holiday: HolidayDTO;
   index: number;
@@ -58,6 +59,7 @@ const HolidayCard = ({
   locale: string;
   onToggle: (holiday: HolidayDTO, index: number) => void;
   premiumKey: string | null;
+  t: ReturnType<typeof useTranslations<'holidaysTable'>>;
 }) => {
   const dateFormatted = new Intl.DateTimeFormat(locale, {
     weekday: 'long',
@@ -102,7 +104,7 @@ const HolidayCard = ({
         {holiday.location && <span className='flex items-center gap-1'>📍 {holiday.location}</span>}
         {isWeekend(holiday.date) && (
           <Badge variant='outline' className='text-xs'>
-            Fin de semana
+            {t('weekend')}
           </Badge>
         )}
       </div>
@@ -115,6 +117,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   const holidays = useHolidaysStore((state) => state.holidays);
 
   const locale = useLocale();
+  const t = useTranslations('holidaysTable');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -267,11 +270,11 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
     const getLabel = () => {
       switch (type) {
         case 'none':
-          return 'Seleccionar todos';
+          return t('selectAll');
         case 'some':
-          return 'Selección parcial - click para seleccionar todos';
+          return t('partialSelection');
         case 'all':
-          return 'Deseleccionar todos';
+          return t('deselectAll');
       }
     };
 
@@ -293,7 +296,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
         />
       </ConditionalWrapper>
     );
-  }, [selectionState, toggleSelectAll, premiumKey]);
+  }, [selectionState, toggleSelectAll, premiumKey, t]);
 
   const selectedCount = selectedHolidays.size;
   const shouldShowLocationColumn = variantHolidays.some((h) => h.location);
@@ -334,8 +337,8 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                   className='bg-green-600 hover:bg-green-700 text-white'
                 >
                   <Plus className='h-4 w-4 mr-1' />
-                  <span className='hidden xs:inline'>Añadir Festivo</span>
-                  <span className='xs:hidden'>Añadir</span>
+                  <span className='hidden xs:inline'>{t('addHoliday')}</span>
+                  <span className='xs:hidden'>{t('add')}</span>
                 </Button>
               </AnimateIcon>
             )}
@@ -343,8 +346,8 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
               <AnimateIcon animateOnHover>
                 <Button variant='outline' size='sm' onClick={() => setShowEditModal(true)} className='py-4'>
                   <Edit className='h-4 w-4 mr-1' />
-                  <span className='hidden xs:inline'>Editar festivo</span>
-                  <span className='xs:hidden'>Editar</span>
+                  <span className='hidden xs:inline'>{t('editHoliday')}</span>
+                  <span className='xs:hidden'>{t('edit')}</span>
                 </Button>
               </AnimateIcon>
             )}
@@ -353,8 +356,8 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                 <AnimateIcon animateOnHover>
                   <Button variant='destructive' size='sm' onClick={() => setShowDeleteModal(true)}>
                     <Trash2 className='h-4 w-4 mr-1' />
-                    <span className='hidden xs:inline'>Eliminar {selectedCount} festivos</span>
-                    <span className='xs:hidden'>Eliminar ({selectedCount})</span>
+                    <span className='hidden xs:inline'>{t('deleteHolidays', { count: selectedCount })}</span>
+                    <span className='xs:hidden'>{t('delete')} ({selectedCount})</span>
                   </Button>
                 </AnimateIcon>
               </div>
@@ -363,7 +366,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
           <div className='relative w-full sm:w-64'>
             <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
             <Input
-              placeholder='Buscar festividad...'
+              placeholder={t('searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className='pl-8 w-full'
@@ -416,7 +419,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                           <TableCell colSpan={shouldShowLocationColumn ? 7 : 6} className='h-24 text-center'>
                             <div className='flex flex-col items-center space-y-2 text-muted-foreground'>
                               <Search className='h-8 w-8' />
-                              {debouncedSearchTerm ? 'No se encontraron festividades' : 'No hay festividades'}
+                              {debouncedSearchTerm ? t('noHolidaysFound') : t('noHolidays')}
                             </div>
                           </TableCell>
                         </TableRow>
@@ -433,10 +436,10 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                   {SelectAllButton}
                   <span className='text-xs text-muted-foreground'>
                     {selectionState.type === 'all'
-                      ? 'Todos seleccionados'
+                      ? t('allSelected')
                       : selectionState.type === 'some'
-                        ? `${selectionState.count} seleccionados`
-                        : 'Seleccionar todos'}
+                        ? `${selectionState.count} ${t('selected')}`
+                        : t('selectAll')}
                   </span>
                 </div>
               </div>
@@ -456,6 +459,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                         locale={locale}
                         onToggle={toggleSelectHoliday}
                         premiumKey={premiumKey}
+                        t={t}
                       />
                     );
                   })
@@ -463,7 +467,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                   <div className='flex flex-col items-center justify-center py-12 text-muted-foreground'>
                     <Search className='h-8 w-8 mb-2' />
                     <p className='text-sm'>
-                      {debouncedSearchTerm ? 'No se encontraron festividades' : 'No hay festividades'}
+                      {debouncedSearchTerm ? t('noHolidaysFound') : t('noHolidays')}
                     </p>
                   </div>
                 )}
@@ -474,12 +478,12 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 
         <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs sm:text-sm text-muted-foreground px-1'>
           <div className='flex flex-wrap items-center gap-2 sm:gap-4'>
-            <span className='whitespace-nowrap'>En fin de semana: {weekendCount}</span>
-            <span className='whitespace-nowrap'>En laborables: {workdayCount}</span>
+            <span className='whitespace-nowrap'>{t('onWeekends')}: {weekendCount}</span>
+            <span className='whitespace-nowrap'>{t('onWorkdays')}: {workdayCount}</span>
           </div>
           <div className='flex items-center space-x-2'>
             <span className='whitespace-nowrap'>
-              Mostrando {filteredHolidays.length} de {variantHolidays.length}
+              {t('showing')} {filteredHolidays.length} {t('of')} {variantHolidays.length}
             </span>
           </div>
         </div>

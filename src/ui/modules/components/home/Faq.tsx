@@ -1,106 +1,101 @@
+import { getTranslations } from 'next-intl/server';
+
 import { Troubleshooting } from '@ui/modules/components/faq/Troubleshooting';
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from 'src/components/animate-ui/base/accordion';
 import type { FaqData } from 'src/ui/modules/components/faq/types';
 import { Tutorial } from '../faq/Tutorial';
 import { TutorialTrigger } from '../faq/TutorialTrigger';
 
-const FAQ: FaqData = [
-  {
-    id: 'general',
-    title: 'General',
-    items: [
-      {
-        id: 'what-is',
-        question: 'What is this?',
-        answer:
-          'Forever PTO is a tool to help you plan and optimize your paid time off (PTO) by suggesting the best dates to take off based on public holidays and your preferences. Given the complexity of holiday planning, Forever PTO aims to simplify the process and maximize your free time. Allowing you to choose different strategies to balance your time off throughout the year to maximize your time off. Allowing you to fully customize the holidays, the names of the festivities and even add custom holidays specific to your company or region.',
-      },
-      {
-        id: 'how-works',
-        question: 'How does it work?',
-        answer: <Tutorial />,
-      },
-      {
-        id: 'why',
-        question: "Why I'm not seeing my country or holidays correctly?",
-        answer:
-          'For simplicity and performance we use a third-party tool to get the bank holidays for a given country and year. It may happen that your country or region is not supported or the data is not up to date. To fix this you can add custom holidays specific to your needs.',
-      },
-      {
-        id: 'pricing',
-        question: 'Why is there a paid model?',
-        answer:
-          "Forever PTO is free. However, we use a paid model to support the costs of maintaining data, infrastructure and continuous improvements. The paid model funds updates, support and hosting. We also offer a free tier with core features to ensure everyone can benefit from better PTO planning.If you want to go ad free and support the project there's a volunteer donation",
-      },
-      {
-        id: 'restart-tutorial',
-        question: 'How can I see the interactive tutorial again?',
-        answer: <TutorialTrigger />,
-      },
-    ],
-  },
-  {
-    id: 'technical',
-    title: 'Technical',
-    items: [
-      {
-        id: 'algorithms',
-        question: 'How does the suggestion algorithm work?',
-        answer:
-          'The system analyzes available workdays, holidays and user preferences (e.g. avoiding past days) to produce PTO combinations that maximize effective time off. It applies heuristics based on efficiency and scoring to prioritize bridges and grouped days.',
-      },
-      {
-        id: 'strategies',
-        question: 'What is the difference between "balanced" and "optimized" strategies?',
-        answer:
-          'Balanced aims to spread time off across the year for steady value, while Optimized focuses on maximizing efficiency (effective days per PTO day) by prioritizing the best ratio combinations.',
-      },
-    ],
-  },
-  {
-    id: 'security',
-    title: 'Security & privacy',
-    items: [
-      {
-        id: 'data',
-        question: 'How do you handle my data?',
-        answer:
-          'We store only the minimum information required to generate suggestions. We do not share data with third parties without consent. See the privacy policy for full details.',
-      },
-      {
-        id: 'encryption',
-        question: 'Is my data encrypted?',
-        answer:
-          "Your vacation planning data is stored locally in your browser. We apply XOR cipher obfuscation to make the data unreadable in casual inspection. This is method is designed to prevent accidental exposure, not protect against determined attackers. We don't store sensitive personal information, and you maintain full control of your data on your device. All your data (PTO days, selected dates, custom holidays, preferences) is stored exclusively in your browser's local storage. We never send this information to our servers. Your vacation planning stays completely private on your device.",
-      },
-      {
-        id: 'troubleshooting',
-        question: 'Troubleshooting & stale client data',
-        answer: <Troubleshooting />,
-      },
-    ],
-  },
-  {
-    id: 'collaborate',
-    title: 'Interested in collaborating?',
-    items: [
-      {
-        id: 'code',
-        question: 'How to contribute code or ideas?',
-        answer:
-          'Open issues or merge requests with proposals. We need help on algorithms, integrations and UX improvements.',
-      },
-      {
-        id: 'business',
-        question: 'Propose integrations or corporate partnerships',
-        answer:
-          'If you represent a company and want to integrate Forever PTO, contact support or open a proposal for a custom integration.',
-      },
-    ],
-  },
-];
+export const Faq = async () => {
+  const t = await getTranslations('faq');
 
-export const Faq = () => {
+  const FAQ: FaqData = [
+    {
+      id: 'general',
+      title: t('sections.general.title'),
+      items: [
+        {
+          id: 'what-is',
+          question: t('sections.general.whatIs.question'),
+          answer: t('sections.general.whatIs.answer'),
+        },
+        {
+          id: 'how-works',
+          question: t('sections.general.howWorks.question'),
+          answer: <Tutorial />,
+        },
+        {
+          id: 'why',
+          question: t('sections.general.whyNotSeeingCountry.question'),
+          answer: t('sections.general.whyNotSeeingCountry.answer'),
+        },
+        {
+          id: 'pricing',
+          question: t('sections.general.pricing.question'),
+          answer: t('sections.general.pricing.answer'),
+        },
+        {
+          id: 'restart-tutorial',
+          question: t('sections.general.restartTutorial.question'),
+          answer: <TutorialTrigger />,
+        },
+      ],
+    },
+    {
+      id: 'technical',
+      title: t('sections.technical.title'),
+      items: [
+        {
+          id: 'algorithms',
+          question: t('sections.technical.algorithms.question'),
+          answer: t('sections.technical.algorithms.answer'),
+        },
+        {
+          id: 'strategies',
+          question: t('sections.technical.strategies.question'),
+          answer: t('sections.technical.strategies.answer'),
+        },
+      ],
+    },
+    {
+      id: 'security',
+      title: t('sections.security.title'),
+      items: [
+        {
+          id: 'data',
+          question: t('sections.security.data.question'),
+          answer: t('sections.security.data.answer'),
+        },
+        {
+          id: 'encryption',
+          question: t('sections.security.encryption.question'),
+          answer: t('sections.security.encryption.answer'),
+        },
+        {
+          id: 'troubleshooting',
+          question: t('sections.security.troubleshooting.question'),
+          answer: <Troubleshooting />,
+        },
+      ],
+    },
+    {
+      id: 'collaborate',
+      title: t('sections.collaborate.title'),
+      items: [
+        {
+          id: 'code',
+          question: t('sections.collaborate.code.question'),
+          answer: t('sections.collaborate.code.answer'),
+        },
+        {
+          id: 'business',
+          question: t('sections.collaborate.business.question'),
+          answer: t('sections.collaborate.business.answer'),
+        },
+      ],
+    },
+  ];
+
   return (
     <section
       aria-labelledby='faq-title'
@@ -108,7 +103,7 @@ export const Faq = () => {
       id='faq'
     >
       <h2 id='faq-title' className='text-3xl font-semibold'>
-        Preguntas frecuentes
+        {t('title')}
       </h2>
       {FAQ.map((section) => (
         <div key={section.id}>

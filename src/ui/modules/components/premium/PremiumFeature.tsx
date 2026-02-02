@@ -3,6 +3,7 @@
 import { usePremiumStore } from '@application/stores/premium';
 import { cn } from '@const/lib/utils';
 import { InfoIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { useShallow } from 'zustand/react/shallow';
@@ -43,6 +44,7 @@ export const PremiumFeature = ({
   iconSize = 'w-6 h-6',
   inlineDescription = false,
 }: PremiumFeatureProps) => {
+  const t = useTranslations('premium');
   const { premiumKey, showUpgradeModal, checkExistingSession } = usePremiumStore(
     useShallow((state) => ({
       premiumKey: state.premiumKey,
@@ -64,7 +66,7 @@ export const PremiumFeature = ({
         className={cn('relative m-0 focus:outline-none', getButtonClass(variant), className)}
         role='button'
         tabIndex={0}
-        aria-label={description ?? `Unlock premium feature: ${feature}`}
+        aria-label={description ?? t('unlockFeature', { feature })}
         onClick={() => showUpgradeModal(feature)}
         onKeyDown={(e) => {
           if (e.key === KeyboardKey.ENTER || e.key === KeyboardKey.SPACE) {

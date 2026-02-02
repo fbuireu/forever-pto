@@ -14,12 +14,12 @@ export const SidebarFooterButtons = () => {
         <SidebarMenuItem
           className={cn(
             'transition-[width,flex-grow] duration-300 ease-in-out',
-            sidebarCollapsed ? 'w-full' : 'flex-grow'
+            sidebarCollapsed ? 'w-full' : 'grow'
           )}
         >
           <LanguageSelector />
         </SidebarMenuItem>
-        <SidebarMenuItem className={cn(sidebarCollapsed ? 'w-full' : 'min-w-[48px]')}>
+        <SidebarMenuItem className={cn(sidebarCollapsed ? 'w-full' : 'min-w-12')}>
           <ThemeSelector />
         </SidebarMenuItem>
       </SidebarMenu>

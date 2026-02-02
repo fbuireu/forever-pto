@@ -6,7 +6,12 @@
   },
   "home": {
     "title": "Forever PTO",
-    "description": "This is the home page where you can find the latest updates and features."
+    "description": "This is the home page where you can find the latest updates and features.",
+    "subtitle": "La teva solució definitiva per gestionar els teus dies lliures. No treballis més",
+    "instructions": "Comença afegint els teus dies a la barra lateral esquerra i la resta de configuracions. Encara tens dubtes?",
+    "quickTour": "Fes un tour ràpid",
+    "or": "o",
+    "checkFaqs": "consulta les nostres FAQs"
   },
   "languages": {
     "en": "Anglès",
@@ -17,6 +22,673 @@
   "theme": {
     "light": "Clar",
     "dark": "Fosc",
-    "system": "Sistema"
+    "system": "Sistema",
+    "toggleTheme": "Canviar tema"
+  },
+  "summary": {
+    "title": "Resum de PTO {year} - {nextYear}",
+    "description": "{ptoDays} dies de vacances + {holidays} festius = {effectiveDays} dies lliures reals",
+    "performance": "(+{percentage}% de rendiment)",
+    "metrics": {
+      "vacationDays": "Dies de vacances",
+      "days": "dies",
+      "holidays": "Festius",
+      "national": "nac.",
+      "regional": "reg.",
+      "custom": "prop.",
+      "effectiveDays": "Dies lliures reals",
+      "extra": "extra",
+      "multiplier": "Multiplicador",
+      "performance": "rendiment",
+      "longWeekends": "Ponts de cap de setmana",
+      "vacationPeriods": "Períodes de vacances",
+      "dayOffRatio": "Ràtio dia/lliure",
+      "bridgesUsed": "Ponts usats",
+      "workdaysPerMonth": "Dies laborals/mes",
+      "longestVacation": "Vacances més llargues",
+      "advancedMetrics": "Mètriques Avançades"
+    },
+    "yearSummary": {
+      "feature": "Year Summary",
+      "featureDescription": "Anàlisi detallada dels teus dies lliures.",
+      "title": "Resum de l'Any",
+      "firstBreak": "Primera pausa",
+      "maxWorkStreak": "Ratxa laboral màxima",
+      "lastBreak": "Última pausa",
+      "totalBonusDays": "Dies bonus totals",
+      "daysGained": "dies guanyats optimitzant"
+    },
+    "notifications": {
+      "canImprove": {
+        "title": "Pots millorar",
+        "message": "Hi ha alternatives que afegeixen",
+        "moreDays": "dies més",
+        "toYourPlan": "a la teva planificació.",
+        "reviewOptions": "Revisa les opcions disponibles.",
+        "considerPremium": "Considera Premium per més anàlisi."
+      },
+      "manualAdjustments": {
+        "title": "Ajustos manuals",
+        "added": "Has afegit",
+        "day": "dia",
+        "days": "dies",
+        "and": "i",
+        "removed": "tret",
+        "fromOriginal": "de la suggerència original."
+      },
+      "customHolidays": {
+        "title": "Festius personalitzats",
+        "youHave": "Tens",
+        "holiday": "festiu personalitzat",
+        "holidays": "festius personalitzats",
+        "improvesPlan": "que milloren el teu pla."
+      }
+    }
+  },
+  "faq": {
+    "title": "Preguntes freqüents",
+    "sections": {
+      "general": {
+        "title": "General",
+        "whatIs": {
+          "question": "Què és això?",
+          "answer": "Forever PTO és una eina per ajudar-te a planificar i optimitzar els teus dies lliures (PTO) suggerint les millors dates basant-se en festius i les teves preferències. Donada la complexitat de la planificació de vacances, Forever PTO simplifica el procés i maximitza el teu temps lliure. Et permet triar diferents estratègies per equilibrar el teu temps lliure durant l'any. També pots personalitzar completament els festius, noms de festivitats i fins i tot afegir festius específics de la teva empresa o regió."
+        },
+        "howWorks": {
+          "question": "Com funciona?"
+        },
+        "whyNotSeeingCountry": {
+          "question": "Per què no veig el meu país o festius correctament?",
+          "answer": "Per simplicitat i rendiment usem una eina externa per obtenir els festius de cada país i any. Pot ser que el teu país o regió no estigui suportat o les dades no estiguin actualitzades. Per solucionar-ho pots afegir festius personalitzats segons les teves necessitats."
+        },
+        "pricing": {
+          "question": "Per què hi ha un model de pagament?",
+          "answer": "Forever PTO és gratuït. No obstant, usem un model de pagament per cobrir els costos de mantenir dades, infraestructura i millores contínues. El model de pagament finança actualitzacions, suport i hosting. També oferim un tier gratuït amb funcions principals perquè tothom pugui beneficiar-se d'una millor planificació de PTO. Si vols anar sense anuncis i donar suport al projecte hi ha una donació voluntària."
+        },
+        "restartTutorial": {
+          "question": "Com puc veure el tutorial interactiu de nou?"
+        }
+      },
+      "technical": {
+        "title": "Tècnic",
+        "algorithms": {
+          "question": "Com funciona l'algoritme de suggerències?",
+          "answer": "El sistema analitza dies laborables disponibles, festius i preferències de l'usuari (ex. evitar dies passats) per produir combinacions de PTO que maximitzin el temps lliure efectiu. Aplica heurístiques basades en eficiència i puntuació per prioritzar ponts i dies agrupats."
+        },
+        "strategies": {
+          "question": "Quina és la diferència entre les estratègies \"equilibrada\" i \"optimitzada\"?",
+          "answer": "Equilibrada busca repartir el temps lliure durant l'any per un valor constant, mentre que Optimitzada se centra en maximitzar l'eficiència (dies efectius per dia de PTO) prioritzant les combinacions amb millor ràtio."
+        }
+      },
+      "security": {
+        "title": "Seguretat i privacitat",
+        "data": {
+          "question": "Com gestioneu les meves dades?",
+          "answer": "Només emmagatzemem la informació mínima necessària per generar suggerències. No compartim dades amb tercers sense consentiment. Consulta la política de privacitat per més detalls."
+        },
+        "encryption": {
+          "question": "Estan les meves dades encriptades?",
+          "answer": "Les teves dades de planificació de vacances s'emmagatzemen localment al teu navegador. Apliquem ofuscació amb xifrat XOR per fer les dades il·legibles en inspecció casual. Aquest mètode està dissenyat per prevenir exposició accidental, no per protegir contra atacants determinats. No emmagatzemem informació personal sensible, i mantens el control total de les teves dades al teu dispositiu. Totes les teves dades (dies de PTO, dates seleccionades, festius personalitzats, preferències) s'emmagatzemen exclusivament a l'emmagatzematge local del teu navegador. Mai enviem aquesta informació als nostres servidors. La teva planificació de vacances roman completament privada al teu dispositiu."
+        },
+        "troubleshooting": {
+          "question": "Solució de problemes i dades obsoletes del client"
+        }
+      },
+      "collaborate": {
+        "title": "Interessat en col·laborar?",
+        "code": {
+          "question": "Com contribuir codi o idees?",
+          "answer": "Obre issues o merge requests amb propostes. Necessitem ajuda en algoritmes, integracions i millores de UX."
+        },
+        "business": {
+          "question": "Proposar integracions o associacions corporatives",
+          "answer": "Si representes una empresa i vols integrar Forever PTO, contacta amb suport o obre una proposta per una integració personalitzada."
+        }
+      }
+    }
+  },
+  "workdayCounter": {
+    "title": "Comptador de dies laborables",
+    "tooltip": "Compta dies laborables entre dues dates, excloent automàticament caps de setmana i festius. Útil per planificació de projectes i càlcul de terminis.",
+    "selectRange": "Seleccionar rang de dates",
+    "clearSelection": "Netejar selecció",
+    "workingDays": "Dies laborables",
+    "businessDays": "Dies hàbils en el rang seleccionat",
+    "days": "Dies",
+    "weekendDays": "Caps de setmana",
+    "holidays": "Festius",
+    "dateRange": "Rang de dates",
+    "from": "Des de",
+    "to": "fins"
+  },
+  "holidaysTable": {
+    "nationalTab": "Nacionals",
+    "regionalTab": "Regionals",
+    "customTab": "Personalitzats",
+    "nationalTitle": "Festius Nacionals",
+    "regionalTitle": "Festius Regionals",
+    "customTitle": "Festius Personalitzats",
+    "customHolidaysFeature": "Festius Personalitzats",
+    "customHolidaysDescription": "Permet afegir festius personalitzats",
+    "selectAll": "Seleccionar tots",
+    "partialSelection": "Selecció parcial - clica per seleccionar tots",
+    "deselectAll": "Desseleccionar tots",
+    "searchPlaceholder": "Cercar festivitat...",
+    "noHolidaysFound": "No s'han trobat festivitats",
+    "noHolidays": "No hi ha festivitats",
+    "allSelected": "Tots seleccionats",
+    "selected": "seleccionats",
+    "weekend": "Cap de setmana",
+    "onWeekends": "En cap de setmana",
+    "onWorkdays": "En laborables",
+    "showing": "Mostrant",
+    "of": "de",
+    "total": "total",
+    "addHoliday": "Afegir Festiu",
+    "add": "Afegir",
+    "editHoliday": "Editar festiu",
+    "edit": "Editar",
+    "deleteHolidays": "Eliminar {count} festius",
+    "delete": "Eliminar"
+  },
+  "charts": {
+    "daysOffComposition": "Composició de Dies Lliures",
+    "daysOffCompositionFeature": "Gràfica de Composició de Dies Lliures",
+    "quarterDistribution": "Distribució per Trimestre",
+    "quarterDistributionFeature": "Gràfica de Distribució per Trimestre",
+    "days": "dies",
+    "daysOff": "Dies lliures",
+    "pto": "PTO",
+    "national": "Nacionals",
+    "regional": "Regionals",
+    "custom": "Personalitzats",
+    "distributionDescription": "Distribució dels teus {ptoDays} dies PTO, {nationalDays} festius nacionals{regionalPart}{customPart}.",
+    "regionalPart": ", {regionalDays} regionals",
+    "customPart": " i {customDays} personalitzats",
+    "quarterDescription": "Distribució de {totalDays} dies lliures efectius al llarg de {activeQuarters} trimestre{plural} de l'any.",
+    "annualTimeline": "Timeline Anual",
+    "annualTimelineFeature": "Gràfica de Timeline Anual",
+    "timelineDescription": "Evolució mensual de {totalDays} dies lliures distribuïts en {activeMonths} mesos. Pic a {peakMonth} amb {peakDays} dies.",
+    "daysOffLabel": "Dies lliures",
+    "longBlocksPerQuarter": "Blocs Llargs per Trimestre",
+    "longBlocksFeature": "Gràfica de Blocs Llargs per Trimestre",
+    "blocksDescription": "{totalBlocks} blocs llargs (3+ dies consecutius) ideals per a vacances{bestQuarterPart}.",
+    "bestQuarterPart": ". Millor trimestre: Q{bestQuarter} amb {maxBlocks} bloc{plural}",
+    "blocks": "blocs",
+    "blocksOf3Days": "Blocs de 3+ dies"
+  },
+  "modals": {
+    "addHoliday": {
+      "title": "Afegir Nou Festiu",
+      "description": "Crea un nou festiu seleccionant una data i introduint un nom",
+      "nameLabel": "Nom del Festiu",
+      "namePlaceholder": "ex. El meu aniversari",
+      "dateLabel": "Seleccionar Data",
+      "selected": "Seleccionat",
+      "submit": "Afegir Festiu",
+      "submitting": "Afegint...",
+      "cancel": "Cancel·lar",
+      "successTitle": "Festiu creat correctament",
+      "successDescription": "{name} ha estat afegit el {date}",
+      "errorTitle": "Error en crear festiu",
+      "errorDescription": "Alguna cosa ha anat malament. Si us plau, torna-ho a provar.",
+      "existsTitle": "El festiu ja existeix",
+      "existsDescription": "Ja existeix un festiu el {date}: {name}"
+    },
+    "editHoliday": {
+      "title": "Editar Festiu",
+      "description": "Modifica el festiu seleccionat",
+      "submit": "Desar Canvis",
+      "submitting": "Desant...",
+      "cancel": "Cancel·lar",
+      "successTitle": "Festiu actualitzat correctament",
+      "successDescription": "{name} ha estat actualitzat",
+      "errorTitle": "Error en actualitzar festiu",
+      "errorDescription": "Alguna cosa ha anat malament. Si us plau, torna-ho a provar."
+    },
+    "deleteHoliday": {
+      "title": "Eliminar Festius",
+      "titleSingular": "Eliminar Festiu",
+      "description": "Estàs segur que vols eliminar {count} festius? Aquesta acció no es pot desfer.",
+      "descriptionSingular": "Estàs segur que vols eliminar aquest festiu? Aquesta acció no es pot desfer.",
+      "submit": "Eliminar",
+      "submitting": "Eliminant...",
+      "cancel": "Cancel·lar",
+      "successTitle": "Festius eliminats",
+      "successTitleSingular": "Festiu eliminat",
+      "successDescription": "{count} festius han estat eliminats",
+      "successDescriptionSingular": "El festiu ha estat eliminat",
+      "errorTitle": "Error en eliminar festius",
+      "errorDescription": "Alguna cosa ha anat malament. Si us plau, torna-ho a provar."
+    }
+  },
+  "tutorial": {
+    "description": "Comença introduint els detalls del teu PTO a la barra lateral esquerra: el teu PTO disponible, el teu país i la teva regió. Nosaltres ens encarreguem de la resta. Si encara tens dubtes pots fer clic al següent botó per iniciar un tutorial interactiu.",
+    "startButton": "Iniciar tutorial"
+  },
+  "legend": {
+    "title": "Llegenda",
+    "today": "Avui",
+    "weekends": "Caps de setmana",
+    "holidays": "Festius",
+    "suggested": "Suggerits",
+    "alternatives": "Alternatives",
+    "manual": "Manual",
+    "custom": "Personalitzat"
+  },
+  "ptoStatus": {
+    "autoAssigned": "Auto-assignats",
+    "manual": "Manual",
+    "remaining": "Restants",
+    "clickDays": "Clica els dies per assignar/treure",
+    "allAssigned": "Tots els dies assignats!",
+    "resetManual": "Restablir Canvis Manuals"
+  },
+  "contact": {
+    "title": "Contacta'ns",
+    "description": "Tens alguna pregunta o comentari? Ens encantaria saber de tu!",
+    "name": "Nom",
+    "namePlaceholder": "Joan García",
+    "email": "Email",
+    "emailPlaceholder": "el-teu@email.com",
+    "subject": "Assumpte",
+    "subjectPlaceholder": "De què es tracta?",
+    "message": "Missatge",
+    "messagePlaceholder": "Explica'ns el que necessites...",
+    "sendMessage": "Enviar Missatge",
+    "sending": "Enviant...",
+    "cancel": "Cancel·lar",
+    "successTitle": "Missatge Enviat!",
+    "successDescription": "Et respondrem tan aviat com sigui possible.",
+    "errorTitle": "Hi ha hagut un error",
+    "tryAgain": "Tornar a Provar",
+    "close": "Tancar",
+    "failedToSend": "Error en enviar el missatge"
+  },
+  "premium": {
+    "selectHoliday": "Seleccionar Festiu",
+    "selectAllHolidays": "Seleccionar Tots els Festius"
+  },
+  "toasts": {
+    "suggestionApplied": "Suggeriment aplicat correctament",
+    "cannotSelectPastDays": "No es poden seleccionar dies passats",
+    "enablePastDays": "Habilita \"Permetre dies passats\" a la configuració per seleccionar dates passades",
+    "noPtoDaysRemaining": "No queden dies de PTO per assignar",
+    "removeDaysToFree": "Elimina dies existents per alliberar espai",
+    "paymentFailed": "Error en inicialitzar el pagament",
+    "paymentFailedDescription": "Si us plau, torna-ho a provar més tard",
+    "paymentSuccess": "Pagament exitós!",
+    "paymentSuccessDescription": "Gràcies pel teu suport! Ja tens accés premium."
+  },
+  "troubleshooting": {
+    "description": "Si l'aplicació es comporta de manera inesperada pot ser degut a dades locals obsoletes. Quan el projecte evoluciona, alguns objectes emmagatzemats poden canviar de forma, causant que el client reutilitzi estructures incompatibles i falli en revalidar correctament. Netejar l'emmagatzematge local força un estat nou.",
+    "resetButton": "Restablir Emmagatzematge Local",
+    "clearing": "Netejant...",
+    "cleared": "Netejat",
+    "successTitle": "Emmagatzematge local netejat correctament",
+    "successDescription": "Totes les dades han estat restablertes i actualitzades des del servidor.",
+    "errorTitle": "Error en netejar emmagatzematge local",
+    "errorDescription": "Alguna cosa ha anat malament en restablir les dades. Si us plau, torna-ho a provar."
+  },
+  "sidebar": {
+    "configuration": "Configuració",
+    "filters": "Filtres",
+    "tools": "Eines",
+    "calculators": "Calculadores",
+    "loading": "Carregant...",
+    "country": {
+      "title": "País",
+      "tooltip": "Aquesta dada s'infereix del teu CDN i la teva connexió. Si creus que no és precís o vols veure els festius d'altres països, pots seleccionar-lo manualment aquí",
+      "loading": "Carregant països...",
+      "placeholder": "Seleccionar país...",
+      "search": "Cercar països..."
+    },
+    "region": {
+      "title": "Regió",
+      "loading": "Carregant regions...",
+      "placeholder": "Seleccionar regió...",
+      "search": "Cercar regions..."
+    },
+    "strategy": {
+      "title": "Estratègia",
+      "placeholder": "Seleccionar estratègia...",
+      "search": "Cercar estratègies...",
+      "hide": "Amagar",
+      "expand": "Expandir",
+      "strategyDetails": "detalls d'estratègia",
+      "grouped": {
+        "label": "Agrupada",
+        "description": "Prioritza vacances llargues i contínues",
+        "subtitle": "Agrupa dies pont amb festius consecutius",
+        "pros": ["Simula la selecció humana", "Ponts llargs"],
+        "cons": ["Menys dies totals", "Menor eficiència"]
+      },
+      "optimized": {
+        "label": "Optimitzada",
+        "description": "Maximitza eficiència de dies PTO",
+        "subtitle": "Obté la major quantitat de dies lliures",
+        "pros": ["Màxim rendiment", "Més dies totals"],
+        "cons": ["Ponts curts", "Dies dispersos"]
+      },
+      "balanced": {
+        "label": "Equilibrada",
+        "description": "Equilibri intel·ligent",
+        "subtitle": "Combina eficiència amb agrupació",
+        "pros": ["Flexible", "Períodes mitjans", "Versàtil"],
+        "cons": ["No maximitza", "Solució intermèdia"]
+      }
+    },
+    "allowPastDays": {
+      "title": "Permetre Dies Passats",
+      "tooltip": "Aquest interruptor permet habilitar o deshabilitar el suggeriment de dies festius passats per l'any seleccionat. Això et permet veure oportunitats de PTO que es van perdre en el passat",
+      "enabled": "Habilitat",
+      "disabled": "Deshabilitat"
+    },
+    "carryOverMonths": {
+      "title": "Mesos d'Arrossegament",
+      "tooltip": "Permet afegir mesos a l'any següent per expandir la cerca d'oportunitats"
+    },
+    "years": {
+      "title": "Any"
+    }
+  },
+  "ptoDays": {
+    "title": "Dies de PTO",
+    "iHave": "Tinc",
+    "days": "dies",
+    "status": "Estat de Dies PTO",
+    "autoAssigned": "Auto-assignats:",
+    "manuallySelected": "Seleccionats manualment:",
+    "remaining": "Restants:",
+    "resetManualChanges": "Restablir Canvis Manuals",
+    "allAssigned": "Tots els dies assignats!",
+    "clickToAssign": "Clica als dies del calendari per assignar manualment els dies restants"
+  },
+  "ptoCalculator": {
+    "title": "Acumulador de PTO",
+    "tooltip": "Calcula els teus dies de PTO acumulats segons l'acumulat mensual. La majoria d'empreses ofereixen 2-3 dies per mes. Selecciona el mes objectiu per veure els teus dies totals disponibles.",
+    "daysPerMonth": "Dies per mes",
+    "calculateThrough": "Calcular fins",
+    "selectMonth": "Seleccionar mes",
+    "searchMonth": "Cercar mes...",
+    "monthNotFound": "Mes no trobat",
+    "calculate": "Calcular",
+    "result": "Resultat:",
+    "days": "dies",
+    "daysMonth": "dies/mes",
+    "months": "mesos",
+    "applyToPtoDays": "Aplicar a Dies PTO"
+  },
+  "ptoSalaryCalculator": {
+    "title": "Calculadora PTO vs Salari",
+    "tooltip": "Calcula quant temps lliure pagat estàs perdent en no usar els teus dies de PTO. Continues rebent el teu salari complet, però estàs treballant dies que podries haver agafat com a vacances pagades.",
+    "annualSalary": "Salari Anual",
+    "unusedPtoDays": "Dies PTO No Usats",
+    "valueOfUnusedPto": "Valor del PTO no usat:",
+    "worthOfPaidVacation": "Valor de vacances pagades no agafades",
+    "yourDailyRate": "La teva tarifa diària:",
+    "perDay": "/dia",
+    "yourHourlyRate": "La teva tarifa per hora:",
+    "perHour": "/hora",
+    "standardWorkingHours": "Hores de treball estàndard",
+    "effectiveHourlyRate": "Tarifa per hora efectiva:",
+    "whenWorkingExtraDays": "En treballar {days} dies extra no pagats",
+    "opportunityCost": "Cost d'Oportunitat",
+    "opportunityCostDescription": "Has treballat {days} dies que podries haver agafat com a vacances pagades. Això són <amount>valor</amount> de temps lliure pagat que has cedit. El teu salari segueix igual, però has treballat dies extra gratis."
+  },
+  "checkout": {
+    "back": "Tornar",
+    "goBackToDonation": "Tornar al formulari de donació",
+    "totalAmount": "Import total",
+    "expressCheckout": "Pagament ràpid",
+    "orPayWithCard": "O pagar amb targeta",
+    "paymentError": "Error de Pagament",
+    "paymentFailed": "Pagament fallat",
+    "processing": "Processant...",
+    "pay": "Pagar"
+  },
+  "donate": {
+    "donateAndUnblock": "Donar i Desbloquejar",
+    "supportAndUnblock": "Donar Suport i Desbloquejar",
+    "makeDonation": "Fes una donació per donar suport al contingut i desbloquejar l'accés.",
+    "alreadyPremium": "Ja ets usuari premium. Gràcies pel teu suport!"
+  },
+  "donationForm": {
+    "email": "Email",
+    "emailPlaceholder": "el-teu@email.com",
+    "quickAmounts": "Quantitats ràpides",
+    "donationAmount": "Quantitat de Donació",
+    "enterAmount": "Introduir quantitat",
+    "basePriceNote": "Preu base en {currency}. La quantitat final es convertirà a la teva moneda local segons les taxes de canvi actuals.",
+    "havePromoCode": "Tens codi promocional?",
+    "promoCodePlaceholder": "INTRODUEIX_CODI",
+    "continueToPayment": "Continuar al Pagament",
+    "processing": "Processant..."
+  },
+  "upgrade": {
+    "premiumRequired": "Es Requereix Premium",
+    "featureRequiresPremium": "requereix accés premium",
+    "verifyDescription": "No et preocupis, si ja has donat comprovarem el teu email a la nostra llista i et concedirem accés premium. Si tens algun problema no dubtis en contactar-nos.",
+    "considerDonating": "Si encara no has donat, considera fer-ho per donar suport al projecte i desbloquejar les funcions premium.",
+    "enterPremiumEmail": "Introdueix el teu email premium",
+    "verifying": "Verificant...",
+    "verifyAccess": "Verificar Accés",
+    "cancel": "Cancel·lar",
+    "accessGranted": "Accés Concedit!",
+    "welcomeToPremium": "Benvingut a les funcions premium. Pots tancar aquest modal o ho farem en 5 segons.",
+    "accessDenied": "Accés Denegat",
+    "emailNotFound": "Aquest email no està a la nostra llista d'usuaris premium.",
+    "emailNotFoundError": "Email no trobat a la nostra llista d'usuaris premium",
+    "tryAgain": "Tornar a Provar",
+    "close": "Tancar",
+    "invalidEmail": "Si us plau introdueix un email vàlid",
+    "emailRequired": "L'email és obligatori"
+  },
+  "roadmap": {
+    "title": "Full de Ruta",
+    "subtitle": "Explora el que hem construït i el que ve",
+    "selected": "Seleccionat",
+    "completed": "Completat",
+    "inProgress": "En Progrés",
+    "planned": "Planificat",
+    "future": "Futur",
+    "haveSuggestion": "Tens un suggeriment?",
+    "feedbackShapes": "El teu feedback dóna forma al nostre full de ruta. Comparteix les teves idees i ajuda'ns a construir el planificador de vacances perfecte.",
+    "gotAnIdea": "Tens una idea que faria la teva vida més fàcil?",
+    "letsTalk": "Parlem",
+    "or": "o",
+    "openIssue": "obre un issue a GitHub",
+    "features": {
+      "corePtoCalculator": "Calculadora de PTO Principal",
+      "corePtoCalculatorDesc": "Planificació intel·ligent de vacances amb optimització de festius i detecció de ponts",
+      "multipleCountries": "Suport de Múltiples Països",
+      "multipleCountriesDesc": "Suport per a festius en països europeus amb regles específiques per regió",
+      "premiumFeatures": "Funcions Premium",
+      "premiumFeaturesDesc": "Desbloqueja funcions avançades amb un pagament únic via Stripe",
+      "customHolidays": "Festius Personalitzats",
+      "customHolidaysDesc": "Afegeix, edita i elimina festius personalitzats per a una planificació personalitzada",
+      "alternativeStrategies": "Estratègies Alternatives",
+      "alternativeStrategiesDesc": "Múltiples estratègies de planificació de vacances amb comparació d'eficiència",
+      "analyticsDashboard": "Panell d'Anàlisi",
+      "analyticsDashboardDesc": "Mètriques detallades i informació sobre la teva planificació de vacances",
+      "calendarExport": "Exportar Calendari",
+      "calendarExportDesc": "Exporta el teu pla de vacances a Google Calendar, iCal o Outlook",
+      "teamPlanning": "Planificació d'Equip",
+      "teamPlanningDesc": "Coordina la planificació de vacances amb membres de l'equip per evitar conflictes",
+      "emailNotifications": "Notificacions per Email",
+      "emailNotificationsDesc": "Rep recordatoris sobre pròximes vacances i dates importants",
+      "mobileApp": "App Mòbil",
+      "mobileAppDesc": "Apps natives iOS i Android per planificar vacances en moviment",
+      "aiSuggestions": "Suggeriments IA",
+      "aiSuggestionsDesc": "Recomanacions impulsades per IA basades en les teves preferències i patrons passats",
+      "weatherIntegration": "Integració del Temps",
+      "weatherIntegrationDesc": "Veu pronòstics del temps per les teves dates de vacances planificades",
+      "multiYearPlanning": "Planificació Multi-Any",
+      "multiYearPlanningDesc": "Planifica vacances al llarg de múltiples anys amb suport d'arrossegament"
+    }
+  },
+  "cookies": {
+    "title": "Usem cookies",
+    "description": "Usem cookies essencials per la funcionalitat bàsica del lloc web i cookies d'anàlisi per entendre com interactues amb el nostre lloc.",
+    "rejectAll": "Rebutjar totes",
+    "managePreferences": "Gestionar preferències",
+    "acceptAll": "Acceptar totes",
+    "preferencesTitle": "Preferències de cookies",
+    "preferencesDescription": "Usem cookies per millorar la teva experiència de navegació i analitzar el trànsit del lloc. Tria quines cookies vols acceptar.",
+    "necessaryCookies": "Cookies necessàries",
+    "necessaryDescription": "Essencials perquè el lloc web funcioni. No es poden desactivar.",
+    "cookieDetails": "Detalls de cookies",
+    "analyticsCookies": "Cookies d'anàlisi",
+    "analyticsDescription": "Ens ajuden a entendre el comportament dels visitants mitjançant recopilació anònima de dades.",
+    "savePreferences": "Desar preferències",
+    "session": "Sessió",
+    "months": "mesos",
+    "year": "any",
+    "years": "anys",
+    "minutes": "minuts",
+    "hours": "hores",
+    "userCountryDesc": "Emmagatzema la ubicació del teu país per localització de contingut",
+    "ccCookieDesc": "Emmagatzema les teves preferències de consentiment de cookies",
+    "stripeMidDesc": "Prevenció i detecció de frau. Establerta per Stripe per processament segur de pagaments.",
+    "stripeSidDesc": "Identificador de sessió per prevenció de frau. Requerida per al procés de pagament.",
+    "gaDesc": "Distingeix usuaris únics.",
+    "gaStarDesc": "Manté l'estat de sessió per seguiment analític",
+    "gidDesc": "Distingeix usuaris per anàlisi a curt termini",
+    "learnMore": "Saber més",
+    "provider": "Proveïdor"
+  },
+  "holidayTableHeader": {
+    "holiday": "Festivitat",
+    "date": "Data",
+    "day": "Dia",
+    "type": "Tipus",
+    "status": "Estat",
+    "region": "Regió",
+    "location": "Ubicació"
+  },
+  "workdayCounterModal": {
+    "selectDateRange": "Seleccionar rang de dates"
+  },
+  "common": {
+    "loading": "Carregant...",
+    "cancel": "Cancel·lar",
+    "close": "Tancar",
+    "save": "Desar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Afegir",
+    "submit": "Enviar",
+    "processing": "Processant..."
+  },
+  "errors": {
+    "contact": {
+      "VALIDATION_ERROR": "Dades d'entrada invàlides.",
+      "EMAIL_SEND_FAILED": "Error en enviar el correu. Si us plau, torna-ho a intentar.",
+      "SAVE_FAILED": "Hem rebut la teva consulta, tot i que hem trobat un petit problema tècnic en finalitzar els registres. No cal que facis res més.",
+      "RENDER_FAILED": "Error en preparar el correu. Si us plau, torna-ho a intentar.",
+      "UNKNOWN": "Ha ocorregut un error inesperat. Si us plau, torna-ho a intentar."
+    },
+    "payment": {
+      "VALIDATION_ERROR": "Dades d'entrada invàlides.",
+      "INVALID_PROMO_CODE": "El codi promocional és invàlid o ha expirat.",
+      "PAYMENT_FAILED": "El processament del pagament ha fallat.",
+      "SAVE_FAILED": "S'ha creat la intenció de pagament però ha fallat en desar. Si us plau, contacta amb suport.",
+      "UPDATE_STATUS_FAILED": "Error en actualitzar l'estat del pagament.",
+      "SAVE_FROM_WEBHOOK_FAILED": "Error en desar el pagament des de webhook.",
+      "CHARGE_UPDATE_FAILED": "Error en actualitzar els detalls del càrrec.",
+      "WEBHOOK_PROCESSING_FAILED": "Error en processar l'event webhook.",
+      "UNKNOWN": "Ha ocorregut un error inesperat. Si us plau, torna-ho a intentar."
+    }
+  },
+  "legal": {
+    "lastUpdated": "Última actualització: {date}"
+  },
+  "footer": {
+    "privacyPolicy": "Política de Privadesa",
+    "termsOfService": "Termes de Servei",
+    "cookiePolicy": "Política de Cookies",
+    "legalNotice": "Avís Legal",
+    "manageCookies": "Gestionar cookies",
+    "contactUs": "Contacta'ns"
+  },
+  "formButtons": {
+    "submit": "Enviar",
+    "processing": "Processant...",
+    "cancel": "Cancel·lar"
+  },
+  "devFooter": {
+    "madeWith": "Fet amb",
+    "by": "per",
+    "findMeOn": "També em pots trobar a"
+  },
+  "tutorial": {
+    "description": "Vols veure el tutorial interactiu de nou? Fes clic al botó de sota per reiniciar el tour guiat per totes les funcions i configuracions.",
+    "restartButton": "Reiniciar Tutorial Interactiu",
+    "startButton": "Iniciar Tutorial",
+    "steps": {
+      "filtersTitle": "Filtres i Configuració",
+      "filtersDescription": "Aquí pots configurar totes les teves preferències de PTO. Estableix els teus dies de PTO disponibles, selecciona el teu país i regió per obtenir festius precisos, tria l'any i personalitza la teva estratègia d'optimització.",
+      "ptoDaysTitle": "Dies de PTO",
+      "ptoDaysDescription": "Introdueix el nombre total de dies de PTO (temps lliure remunerat) que tens disponibles per a l'any. Aquesta és la base per a tots els càlculs i suggeriments.",
+      "countryTitle": "Selecció de País",
+      "countryDescription": "Inferim el teu país des del teu CDN per defecte però pots seleccionar qualsevol país desitjat. Amb aquest valor obtindrem els festius públics oficials per incloure'ls al teu calendari.",
+      "regionTitle": "Selecció de Regió",
+      "regionDescription": "Alguns països tenen festius regionals. Selecciona la teva regió específica per obtenir el calendari de festius més precís per a la teva àrea.",
+      "yearTitle": "Selecció d'Any",
+      "yearDescription": "Tria l'any per al qual vols planificar. Els festius i suggeriments es generaran per a l'any seleccionat.",
+      "strategyTitle": "Estratègia d'Optimització",
+      "strategyDescription": "Tria entre diferents estratègies: \"Equilibrada\" distribueix el teu PTO uniformement al llarg de l'any, mentre que \"Optimitzada\" maximitza l'eficiència creant descans més llargs amb menys dies de PTO.",
+      "allowPastDaysTitle": "Permetre Dies Passats",
+      "allowPastDaysDescription": "Activa aquesta opció si vols incloure dates que ja han passat a l'any actual. Útil per planificar retrospectivament o per al proper any.",
+      "carryOverTitle": "Mesos d'Arrossegament",
+      "carryOverDescription": "Si els teus dies de PTO s'arrosseguen al següent any, especifica quants mesos romanen vàlids. Això t'ajuda a planificar l'ús de PTO entre anys.",
+      "toolsTitle": "Calculadores i Eines",
+      "toolsDescription": "Accedeix a calculadores útils aquí: estima el teu PTO basant-te en historial laboral, calcula el valor monetari del PTO no utilitzat, o compta dies laborables entre dates.",
+      "alternativesTitle": "Gestor d'Alternatives",
+      "alternativesDescription": "Navega per diferents suggeriments de PTO generats per la nostra IA. Compara mètriques d'eficiència, total de dies lliures i troba l'equilibri perfecte. La primera opció sempre és el nostre suggeriment recomanat, marcat amb una icona de destell. Usa les fletxes per explorar alternatives i fes clic a \"Aplicar Alternativa\" per usar un suggeriment diferent.",
+      "statusTitle": "Seguiment d'Estat de PTO",
+      "statusDescription": "Monitoritza la teva assignació de PTO en temps real. Veu els dies auto-assignats (suggerits per IA), dies seleccionats manualment i dies restants disponibles. Pots restablir canvis manuals en qualsevol moment per tornar al suggeriment de IA.",
+      "calendarTitle": "El Teu Calendari de PTO Interactiu",
+      "calendarDescription": "Aquest és el teu calendari d'un cop d'ull de l'any. Els festius apareixen en gris, els dies de PTO suggerits per IA en verd blavós, i els dies seleccionats manualment en blau. Fes clic a qualsevol dia laborable per alternar la selecció manualment. El calendari s'actualitza instantàniament mentre explores diferents alternatives.",
+      "finishTitle": "Ja Està Tot Llest!",
+      "finishDescription": "Ara saps com usar Forever PTO per maximitzar el teu temps lliure. Comença configurant les teves preferències a la barra lateral, i deixa que l'app et suggereixi els millors dies de PTO. Gaudeix dels teus merescuts descans!"
+    }
+  },
+  "premium": {
+    "unlockFeature": "Desbloquejar funció premium: {feature}",
+    "premiumFeature": "Funció premium",
+    "unlockDescription": "Desbloqueja la capacitat d'afegir/eliminar suggeriments i afegir/eliminar dies restants actualitzant a premium.",
+    "upgrade": "Millorar"
+  },
+  "calendar": {
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes següent"
+  },
+  "holidayRow": {
+    "weekend": "Cap de setmana",
+    "workday": "Laborable",
+    "select": "Seleccionar {name}",
+    "editHolidays": "Editar Festius"
+  },
+  "paymentConfirmation": {
+    "failed": {
+      "title": "Pagament Fallat",
+      "description": "No hem pogut processar el teu pagament. No se t'ha cobrat.",
+      "whatHappened": "Què ha passat?",
+      "declined": "El teu pagament pot haver estat rebutjat",
+      "authFailed": "L'autenticació pot haver fallat",
+      "sessionExpired": "La sessió pot haver expirat",
+      "returnHome": "Tornar a la pàgina principal"
+    },
+    "success": {
+      "title": "Pagament Exitós!",
+      "thankYou": "Gràcies pel teu suport",
+      "amountPaid": "Quantitat pagada",
+      "status": "Estat",
+      "confirmed": "Confirmat",
+      "paymentId": "ID de Pagament",
+      "premiumActivated": "El teu accés premium ha estat activat. Ja pots gaudir de totes les funcions premium!",
+      "continueHome": "Continuar a la pàgina principal"
+    }
   }
 }

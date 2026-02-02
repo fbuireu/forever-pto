@@ -7,6 +7,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@c
 import { Label } from '@const/components/ui/label';
 import { cn } from '@const/lib/utils';
 import { amountFormatter } from '@shared/utils/helpers';
+import { useTranslations } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import type { UseFormReturn } from 'react-hook-form';
@@ -36,6 +37,7 @@ export function DonationForm({
   currencySymbol,
   isPending,
 }: Readonly<DonationFormProps>) {
+  const t = useTranslations('donationForm');
   const [showPromoCode, setShowPromoCode] = useState(false);
   const { setValue } = form;
   const { pending } = useFormStatus();
@@ -58,11 +60,11 @@ export function DonationForm({
           name='email'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{t('email')}</FormLabel>
               <FormControl>
                 <Input
                   type='email'
-                  placeholder='your@email.com'
+                  placeholder={t('emailPlaceholder')}
                   disabled={pending}
                   {...field}
                   className='h-10'
@@ -74,7 +76,7 @@ export function DonationForm({
           )}
         />
         <div className='space-y-2'>
-          <Label>Quick amounts</Label>
+          <Label>{t('quickAmounts')}</Label>
           <div className='flex gap-2'>
             {PRESET_AMOUNTS.map((preset) => (
               <Button
@@ -97,7 +99,7 @@ export function DonationForm({
           name='amount'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Donation Amount</FormLabel>
+              <FormLabel>{t('donationAmount')}</FormLabel>
               <FormControl>
                 <InputGroup>
                   <InputGroupAddon>
@@ -105,7 +107,7 @@ export function DonationForm({
                   </InputGroupAddon>
                   <InputGroupInput
                     type='number'
-                    placeholder='Enter amount'
+                    placeholder={t('enterAmount')}
                     step='1'
                     min='1'
                     max='10000'
@@ -120,8 +122,7 @@ export function DonationForm({
                 </InputGroup>
               </FormControl>
               <p className='text-xs text-muted-foreground mt-1'>
-                Base price in {currency}. Final amount will be converted to your local currency at current exchange
-                rates.
+                {t('basePriceNote', { currency })}
               </p>
               <FormMessage />
             </FormItem>
@@ -130,7 +131,7 @@ export function DonationForm({
 
         <Collapsible open={showPromoCode} onOpenChange={setShowPromoCode}>
           <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-sm font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors'>
-            <span className='text-muted-foreground'>Have a promo code?</span>
+            <span className='text-muted-foreground'>{t('havePromoCode')}</span>
             <ChevronDown
               animateOnHover
               className={cn(
@@ -150,7 +151,7 @@ export function DonationForm({
                     <FormControl>
                       <Input
                         type='text'
-                        placeholder='YOU_WISH_IT_WAS_THAT_EASY'
+                        placeholder={t('promoCodePlaceholder')}
                         disabled={loading}
                         {...field}
                         className='h-10 uppercase'
@@ -164,8 +165,8 @@ export function DonationForm({
           )}
         </Collapsible>
         <FormButtons
-          submitText='Continue to Payment'
-          loadingText='Processing...'
+          submitText={t('continueToPayment')}
+          loadingText={t('processing')}
           hideCancel
           submitClassName='w-full bg-green-600 hover:bg-green-700'
           pending={loading}

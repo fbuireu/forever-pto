@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '@const/components/ui/dialog';
 import { AlertTriangle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { Locale } from 'next-intl';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
@@ -28,10 +29,10 @@ interface DeleteHolidayModalProps {
 }
 
 export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHolidayModalProps) => {
+  const t = useTranslations('modals.deleteHoliday');
   const { removeHoliday } = useHolidaysStore();
   const [isPending, startTransition] = useTransition();
   const isMultiple = holidays.length > 1;
-  const holidayText = isMultiple ? 'holidays' : 'holiday';
 
   const handleDelete = () => {
     startTransition(() => {
@@ -40,17 +41,17 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
           removeHoliday(holiday.id);
         });
 
-        toast.success(`${isMultiple ? 'Holidays' : 'Holiday'} deleted successfully`, {
+        toast.success(isMultiple ? t('successTitle') : t('successTitleSingular'), {
           description: isMultiple
-            ? `${holidays.length} holidays have been removed`
-            : `${holidays[0].name} has been removed`,
+            ? t('successDescription', { count: holidays.length })
+            : t('successDescriptionSingular'),
         });
 
         onClose();
       } catch (error) {
         getBetterStackInstance().logError('Error deleting holiday', error, { component: 'DeleteHolidayModal' });
-        toast.error('Error deleting holiday', {
-          description: 'Something went wrong. Please try again.',
+        toast.error(t('errorTitle'), {
+          description: t('errorDescription'),
         });
       }
     });
@@ -62,13 +63,12 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2 text-destructive'>
             <AlertTriangle className='w-5 h-5' />
-            Delete {holidayText}
+            {isMultiple ? t('title') : t('titleSingular')}
           </DialogTitle>
           <DialogDescription asChild className='space-y-3'>
             <div>
               <span className='block my-2 '>
-                Are you sure you want to delete {isMultiple ? 'these' : 'this'} {holidayText}? This action cannot be
-                undone.
+                {isMultiple ? t('description', { count: holidays.length }) : t('descriptionSingular')}
               </span>
               <div className='bg-muted rounded-lg p-3 max-h-32 overflow-y-auto'>
                 <div className='space-y-2'>
@@ -90,11 +90,11 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
             <AnimateIcon animateOnHover>
               <Button variant='destructive' onClick={handleDelete} className='flex-1' disabled={isPending}>
                 <Trash2 className='w-4 h-4 mr-2' />
-                {isPending ? 'Deleting...' : `Delete ${holidays.length} ${holidayText}`}
+                {isPending ? t('submitting') : t('submit')}
               </Button>
             </AnimateIcon>
             <Button variant='outline' onClick={onClose} className='flex-1' disabled={isPending}>
-              Cancel
+              {t('cancel')}
             </Button>
           </div>
         </DialogFooter>

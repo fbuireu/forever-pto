@@ -1,8 +1,11 @@
+'use client';
+
 import { type HolidayDTO } from '@application/dto/holiday/types';
 import { Badge } from '@const/components/ui/badge';
 import { TableCell, TableRow } from '@const/components/ui/table';
 import { cn } from '@const/lib/utils';
 import { isWeekend } from 'date-fns/isWeekend';
+import { useTranslations } from 'next-intl';
 import type { Locale } from 'next-intl';
 import { memo } from 'react';
 import { Checkbox } from 'src/components/animate-ui/base/checkbox';
@@ -17,13 +20,14 @@ interface HolidayRowProps {
   onToggle: (holiday: HolidayDTO, index: number) => void;
 }
 
-export const HolidayRow = memo<HolidayRowProps>(({ holiday, index, isSelected, locale, onToggle }) => {
+const HolidayRowComponent = ({ holiday, index, isSelected, locale, onToggle }: HolidayRowProps) => {
+  const t = useTranslations('holidayRow');
+
   const getWorkdayStatus = (date: Date) => {
     const isWeekendDay = isWeekend(date);
     return {
       isWorkday: !isWeekendDay,
       variant: isWeekendDay ? ('destructive' as const) : ('default' as const),
-      text: isWeekendDay ? 'Fin de semana' : 'Laborable',
       className: cn(!isWeekendDay && 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'),
     };
   };
@@ -34,7 +38,7 @@ export const HolidayRow = memo<HolidayRowProps>(({ holiday, index, isSelected, l
     <TableRow className={cn('hover:bg-muted/50', isSelected && 'bg-muted/25')}>
       <TableCell>
         <PremiumFeature
-          feature='Edit Holidays'
+          feature={t('editHolidays')}
           variant={PremiumFeatureVariant.STACK}
           iconSize='h-4 w-4'
           className='bg-none'
@@ -42,7 +46,7 @@ export const HolidayRow = memo<HolidayRowProps>(({ holiday, index, isSelected, l
           <Checkbox
             checked={isSelected}
             onCheckedChange={() => onToggle(holiday, index)}
-            aria-label={`Seleccionar ${holiday.name}`}
+            aria-label={t('select', { name: holiday.name })}
           />
         </PremiumFeature>
       </TableCell>
@@ -66,11 +70,13 @@ export const HolidayRow = memo<HolidayRowProps>(({ holiday, index, isSelected, l
       </TableCell>
       <TableCell>
         <Badge variant={workdayStatus.variant} className={cn('text-xs', workdayStatus.className)}>
-          {workdayStatus.isWorkday ? 'Laborable' : 'Weekend'}
+          {workdayStatus.isWorkday ? t('workday') : t('weekend')}
         </Badge>
       </TableCell>
     </TableRow>
   );
-});
+};
+
+export const HolidayRow = memo(HolidayRowComponent);
 
 HolidayRow.displayName = 'HolidayRow';

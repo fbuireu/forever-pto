@@ -5,6 +5,7 @@ import { cn } from '@const/lib/utils';
 import type { Day } from 'date-fns';
 import { addMonths, isSameDay, isSameMonth, isWeekend, subMonths } from 'date-fns';
 import { LockIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { Locale } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -108,6 +109,9 @@ export function Calendar({
   canSelectMoreDays = true,
   ...props
 }: Readonly<CalendarProps>) {
+  const t = useTranslations('toasts');
+  const tPremium = useTranslations('premium');
+  const tCalendar = useTranslations('calendar');
   const premiumKey = usePremiumStore((state) => state.premiumKey);
   const openDonatePopover = usePremiumStore((state) => state.openDonatePopover);
   const [currentMonth, setCurrentMonth] = useState(initialMonth ?? new Date());
@@ -222,8 +226,8 @@ export function Calendar({
         const isManual = modifiers.manuallySelected(date);
         const isSuggested = modifiers.suggested(date);
         if (!premiumKey) {
-          toast.info('Premium feature', {
-            description: `Unlock the ability to add/remove suggestions and add/remove remaining days by upgrading to premium.`,
+          toast.info(tPremium('premiumFeature'), {
+            description: tPremium('unlockDescription'),
             duration: 15000,
             classNames: {
               toast: 'flex flex-row flex-wrap items-center overflow-visible',
@@ -239,7 +243,7 @@ export function Calendar({
                     openDonatePopover();
                   }}
                 >
-                  Upgrade
+                  {tPremium('upgrade')}
                 </Button>
               </div>
             ),
@@ -247,8 +251,8 @@ export function Calendar({
           return;
         }
         if (isPastDay && !isManual && !isSuggested) {
-          toast.warning('Cannot select past days', {
-            description: 'Enable "Allow past days" in settings to select past dates',
+          toast.warning(t('cannotSelectPastDays'), {
+            description: t('enablePastDays'),
           });
           return;
         }
@@ -263,8 +267,8 @@ export function Calendar({
           return;
         }
 
-        toast.warning('No remaining PTO days to assign', {
-          description: 'Remove existing days to free up space',
+        toast.warning(t('noPtoDaysRemaining'), {
+          description: t('removeDaysToFree'),
         });
         return;
       }
@@ -330,6 +334,8 @@ export function Calendar({
       canSelectMoreDays,
       premiumKey,
       openDonatePopover,
+      t,
+      tPremium,
     ]
   );
 
@@ -362,7 +368,7 @@ export function Calendar({
                 size='sm'
                 onClick={handlePreviousMonth}
                 className='h-8 w-8 p-0 hover:bg-muted'
-                aria-label='Previous month'
+                aria-label={tCalendar('previousMonth')}
               >
                 <ChevronLeft className='h-4 w-4' />
               </Button>
@@ -375,7 +381,7 @@ export function Calendar({
                 size='sm'
                 onClick={handleNextMonth}
                 className='h-8 w-8 p-0 hover:bg-muted'
-                aria-label='Next month'
+                aria-label={tCalendar('nextMonth')}
               >
                 <ChevronRight className='h-4 w-4' />
               </Button>

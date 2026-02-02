@@ -1,6 +1,7 @@
 'use client';
 
 import { linkedinIcon } from '@ui/assets/icons/linkedin';
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { siBluesky as Bluesky, siBuymeacoffee as BuyMeCoffee, siGithub as Github } from 'simple-icons';
 import { RotatingTextContainer } from 'src/components/animate-ui/primitives/texts/rotating';
@@ -43,6 +44,7 @@ export const SOCIAL_NETWORKS = {
 const getRandomEmoji = () => EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
 
 export const DevFooter = () => {
+  const t = useTranslations('devFooter');
   const [currentEmoji, setCurrentEmoji] = useState(EMOJIS[0]);
   const intervalRef = useRef<NodeJS.Timeout>(null);
 
@@ -62,16 +64,16 @@ export const DevFooter = () => {
   return (
     <div className='container max-w-4xl px-4 py-4 flex flex-col items-center justify-center space-y-2 gap-4'>
       <div className='text-sm flex items-baseline gap-1.5 text-muted-foreground text-center'>
-        Made with
+        {t('madeWith')}
         <RotatingTextContainer text={EMOJIS}>
           <RotatingText text={currentEmoji} transition={{ type: 'spring', bounce: 0.5, stiffness: 300, duration: 2 }} />
         </RotatingTextContainer>
-        by
+        {t('by')}
         <span className='font-medium text-foreground hover:text-primary p-0 h-auto min-w-0'>
           {CONTACT_DETAILS.NAME}
         </span>
       </div>
-      <p className='text-sm text-muted-foreground text-center'>You can also find me</p>
+      <p className='text-sm text-muted-foreground text-center'>{t('findMeOn')}</p>
       <div className='flex gap-5 items-center space-x-1 text-xs text-muted-foreground/70'>
         {Object.entries(SOCIAL_NETWORKS).map(([key, network]) => (
           <a

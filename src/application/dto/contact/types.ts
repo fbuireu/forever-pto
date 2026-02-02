@@ -8,6 +8,7 @@ export interface ContactFormData {
 export interface ContactResult {
   success: boolean;
   error?: string;
+  errorType?: string;
 }
 
 export interface ContactData {

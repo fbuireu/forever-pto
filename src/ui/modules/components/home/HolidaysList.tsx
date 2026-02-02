@@ -2,12 +2,14 @@
 
 import { HolidayVariant } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger } from 'src/components/animate-ui/components/tabs';
 import { HolidaysTable } from '../holidaysList/HolidaysTable';
 import { PremiumFeature } from '../premium/PremiumFeature';
 
 export const HolidaysList = () => {
+  const t = useTranslations('holidaysTable');
   const holidays = useHolidaysStore((state) => state.holidays);
   const [activeTab, setActiveTab] = useState<HolidayVariant>(HolidayVariant.NATIONAL);
   const regionalHolidays = holidays.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL);
@@ -26,16 +28,16 @@ export const HolidaysList = () => {
     <div className='rounded-lg w-full col-span-full z-1 bg-background'>
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className='grid w-full grid-cols-3'>
-          <TabsTrigger value={HolidayVariant.NATIONAL}>National</TabsTrigger>
+          <TabsTrigger value={HolidayVariant.NATIONAL}>{t('nationalTab')}</TabsTrigger>
           {regionalHolidays.length > 0 ? (
-            <TabsTrigger value={HolidayVariant.REGIONAL}>Regional</TabsTrigger>
+            <TabsTrigger value={HolidayVariant.REGIONAL}>{t('regionalTab')}</TabsTrigger>
           ) : (
             <div className='inline-flex cursor-not-allowed items-center size-full justify-center whitespace-nowrap rounded-sm px-2 py-1 text-sm font-medium opacity-50'>
-              Regional
+              {t('regionalTab')}
             </div>
           )}
-          <PremiumFeature feature='Custom Holidays' description='Allows to add custom holidays...' className='p-0'>
-            <TabsTrigger value={HolidayVariant.CUSTOM}>Custom</TabsTrigger>
+          <PremiumFeature feature={t('customHolidaysFeature')} description={t('customHolidaysDescription')} className='p-0'>
+            <TabsTrigger value={HolidayVariant.CUSTOM}>{t('customTab')}</TabsTrigger>
           </PremiumFeature>
         </TabsList>
       </Tabs>
@@ -43,21 +45,21 @@ export const HolidaysList = () => {
         {activeTab === HolidayVariant.NATIONAL && (
           <HolidaysTable
             variant={HolidayVariant.NATIONAL}
-            title='Festivos Nacionales'
+            title={t('nationalTitle')}
             open={activeTab === HolidayVariant.NATIONAL}
           />
         )}
         {activeTab === HolidayVariant.REGIONAL && (
           <HolidaysTable
             variant={HolidayVariant.REGIONAL}
-            title='Festivos Regionales'
+            title={t('regionalTitle')}
             open={activeTab === HolidayVariant.REGIONAL}
           />
         )}
         {activeTab === HolidayVariant.CUSTOM && (
           <HolidaysTable
             variant={HolidayVariant.CUSTOM}
-            title='Festivos Personalizados'
+            title={t('customTitle')}
             open={activeTab === HolidayVariant.CUSTOM}
           />
         )}

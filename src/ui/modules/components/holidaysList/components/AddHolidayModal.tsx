@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@const/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarDays, Calendar as CalendarIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { Locale } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
@@ -32,6 +33,7 @@ interface AddHolidayModalProps {
 }
 
 export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps) => {
+  const t = useTranslations('modals.addHoliday');
   const { holidays, addHoliday, currentSelection, alternatives, suggestion } = useHolidaysStore();
   const { carryOverMonths, year } = useFiltersStore();
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -55,33 +57,26 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
     startTransition(() => {
       try {
         const existingHoliday = holidays.find((holiday) => holiday.date.toDateString() === data.date.toDateString());
+        const formattedDate = formatDate({ date: data.date, locale, format: 'MMMM d, yyyy' });
 
         if (existingHoliday) {
-          toast.error('Holiday already exists', {
-            description: `There's already a holiday on ${formatDate({
-              date: data.date,
-              locale,
-              format: 'MMMM d, yyyy',
-            })}: ${existingHoliday.name}`,
+          toast.error(t('existsTitle'), {
+            description: t('existsDescription', { date: formattedDate, name: existingHoliday.name }),
           });
           return;
         }
 
         addHoliday({ holiday: { name: data.name, date: data.date }, locale, carryOverMonths, year });
 
-        toast.success('Holiday created successfully', {
-          description: `${data.name} has been added on ${formatDate({
-            date: data.date,
-            locale,
-            format: 'MMMM d, yyyy',
-          })}`,
+        toast.success(t('successTitle'), {
+          description: t('successDescription', { name: data.name, date: formattedDate }),
         });
 
         handleClose();
       } catch (error) {
         getBetterStackInstance().logError('Error creating holiday', error, { component: 'AddHolidayModal' });
-        toast.error('Error creating holiday', {
-          description: 'Something went wrong. Please try again.',
+        toast.error(t('errorTitle'), {
+          description: t('errorDescription'),
         });
       }
     });
@@ -100,12 +95,12 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Plus className='w-5 h-5 text-green-500' animateOnView loop />
-            Add New Holiday
+            {t('title')}
           </DialogTitle>
           <DialogDescription>
             <span className='block my-2'>
               <CalendarDays className='w-4 h-4 inline mr-1' />
-              Create a new holiday by selecting a date and entering a name
+              {t('description')}
             </span>
           </DialogDescription>
         </DialogHeader>
@@ -116,9 +111,9 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
               name='name'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Holiday Name</FormLabel>
+                  <FormLabel>{t('nameLabel')}</FormLabel>
                   <FormControl>
-                    <Input type='text' placeholder='e.g. My birthday' autoFocus disabled={isPending} {...field} />
+                    <Input type='text' placeholder={t('namePlaceholder')} autoFocus disabled={isPending} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -129,7 +124,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
               name='date'
               render={() => (
                 <FormItem>
-                  <FormLabel>Select Date</FormLabel>
+                  <FormLabel>{t('dateLabel')}</FormLabel>
                   <FormControl>
                     <div className='border rounded-lg p-3'>
                       <Calendar
@@ -149,7 +144,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
                       {selectedDate && (
                         <div className='mt-3 p-2 bg-muted rounded text-sm flex align-items-center'>
                           <CalendarIcon className='w-4 h-4 inline mr-2' />
-                          Selected:{' '}
+                          {t('selected')}:{' '}
                           {formatDate({
                             date: selectedDate,
                             locale,
@@ -167,10 +162,10 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
               <div className='flex gap-2 pt-2'>
                 <Button type='submit' className='flex-1' disabled={isPending}>
                   <Plus className='w-4 h-4 mr-2' />
-                  {isPending ? 'Adding...' : 'Add Holiday'}
+                  {isPending ? t('submitting') : t('submit')}
                 </Button>
                 <Button type='button' variant='outline' onClick={handleClose} disabled={isPending}>
-                  Cancel
+                  {t('cancel')}
                 </Button>
               </div>
             </DialogFooter>

@@ -28,7 +28,7 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
         subject: validated.subject,
       });
       const renderError = createContactError.renderFailed();
-      return { success: false, error: renderError.message };
+      return { success: false, error: renderError.message, errorType: renderError.type };
     }
 
     const emailResult = await resend.send({
@@ -47,7 +47,7 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
 
     if (!emailResult.success) {
       const error = createContactError.emailSendFailed();
-      return { success: false, error: error.message };
+      return { success: false, error: error.message, errorType: error.type };
     }
 
     const turso = getTursoClientInstance();
@@ -66,7 +66,7 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
         messageId: emailResult.messageId,
       });
       const error = createContactError.saveFailed();
-      return { success: false, error: error.message };
+      return { success: false, error: error.message, errorType: error.type };
     }
 
     return { success: true };
@@ -79,7 +79,7 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
         code: firstError?.code,
       });
       const validationError = createContactError.validation(firstError?.message ?? 'Invalid form data');
-      return { success: false, error: validationError.message };
+      return { success: false, error: validationError.message, errorType: validationError.type };
     }
 
     logger.logError('Contact form submission error', error, {
@@ -88,6 +88,6 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
       hasSubject: !!data.subject,
     });
     const unknownError = createContactError.unknown(error instanceof Error ? error.message : undefined);
-    return { success: false, error: unknownError.message };
+    return { success: false, error: unknownError.message, errorType: unknownError.type };
   }
 }

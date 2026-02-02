@@ -4,6 +4,7 @@ import { useFiltersStore } from '@application/stores/filters';
 import { Slider } from '@const/components/ui/slider';
 import { Field, Label } from '@headlessui/react';
 import { InfoIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { SlidersHorizontal } from 'src/components/animate-ui/icons/sliders-horizontal';
@@ -16,6 +17,7 @@ const MAX_VALUE = 12;
 const DEBOUNCE_DELAY = 300;
 
 export const CarryOverMonths = () => {
+  const t = useTranslations('sidebar.carryOverMonths');
   const carryOverMonths = useFiltersStore((state) => state.carryOverMonths);
   const setCarryOverMonths = useFiltersStore((state) => state.setCarryOverMonths);
   const [localValue, setLocalValue] = useState(carryOverMonths);
@@ -54,19 +56,17 @@ export const CarryOverMonths = () => {
     <AnimateIcon animateOnHover>
       <Field className='space-y-2 w-full' data-tutorial='carry-over'>
         <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='carry-over-months'>
-          <SlidersHorizontal size={16} /> Carry Over Months
+          <SlidersHorizontal size={16} /> {t('title')}
           <TooltipProvider delayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild className='ml-auto'>
                 <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
               </TooltipTrigger>
-              <TooltipContent className='w-50 text-pretty'>
-                Allows adding months to the following year to expand opportunity search
-              </TooltipContent>
+              <TooltipContent className='w-50 text-pretty'>{t('tooltip')}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </Label>
-        <PremiumFeature feature='Carry Over Months'>
+        <PremiumFeature feature={t('title')}>
           <div className='flex gap-2 relative w-full'>
             <p className='font-normal text-sm'>{MIN_VALUE}</p>
             <Slider

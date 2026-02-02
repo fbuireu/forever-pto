@@ -3,6 +3,7 @@
 import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
+import { useTranslations } from 'next-intl';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { AlternativesManager } from 'src/components/animate-ui/ui-elements/AlternativesManager';
@@ -12,6 +13,7 @@ import { PtoStatusSkeleton } from '../skeletons/PtoStatusSkeleton';
 import { PtoStatus } from './PtoStatus';
 
 export const ManagementBar = () => {
+  const t = useTranslations('toasts');
   const { areStoresReady } = useStoresReady();
   const {
     alternatives,
@@ -47,9 +49,9 @@ export const ManagementBar = () => {
   const handleSelectionChange = useCallback(
     (params: AlternativeSelectionBaseParams) => {
       setCurrentAlternativeSelection(params);
-      toast.success('Suggestion applied successfully');
+      toast.success(t('suggestionApplied'));
     },
-    [setCurrentAlternativeSelection]
+    [setCurrentAlternativeSelection, t]
   );
 
   const baseSuggestions = [suggestion, ...alternatives].filter(
