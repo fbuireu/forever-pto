@@ -52,6 +52,7 @@ const HolidayCard = ({
   onToggle,
   premiumKey,
   t,
+  tPremium,
 }: {
   holiday: HolidayDTO;
   index: number;
@@ -60,6 +61,7 @@ const HolidayCard = ({
   onToggle: (holiday: HolidayDTO, index: number) => void;
   premiumKey: string | null;
   t: ReturnType<typeof useTranslations<'holidaysTable'>>;
+  tPremium: ReturnType<typeof useTranslations<'premium'>>;
 }) => {
   const dateFormatted = new Intl.DateTimeFormat(locale, {
     weekday: 'long',
@@ -471,6 +473,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                         onToggle={toggleSelectHoliday}
                         premiumKey={premiumKey}
                         t={t}
+                        tPremium={tPremium}
                       />
                     );
                   })
