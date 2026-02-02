@@ -40,7 +40,6 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: check texts (stats) +  locale all (fix duplicated, ts errors, etc)
 // todo: template issues + link them through contact modal + roadmap
 // todo: check white mode (no hovers?) + input styles in Donate
 // todo: don't allow to add custom holiday in bank holidays

@@ -263,8 +263,37 @@
     }
   },
   "tutorial": {
-    "description": "Comença introduint els detalls del teu PTO a la barra lateral esquerra: el teu PTO disponible, el teu país i la teva regió. Nosaltres ens encarreguem de la resta. Si encara tens dubtes pots fer clic al següent botó per iniciar un tutorial interactiu.",
-    "startButton": "Iniciar tutorial"
+    "description": "Vols veure el tutorial interactiu de nou? Fes clic al botó de sota per reiniciar el tour guiat per totes les funcions i configuracions.",
+    "restartButton": "Reiniciar Tutorial Interactiu",
+    "startButton": "Iniciar Tutorial",
+    "steps": {
+      "filtersTitle": "Filtres i Configuració",
+      "filtersDescription": "Aquí pots configurar totes les teves preferències de PTO. Estableix els teus dies de PTO disponibles, selecciona el teu país i regió per obtenir festius precisos, tria l'any i personalitza la teva estratègia d'optimització.",
+      "ptoDaysTitle": "Dies de PTO",
+      "ptoDaysDescription": "Introdueix el nombre total de dies de PTO (temps lliure remunerat) que tens disponibles per a l'any. Aquesta és la base per a tots els càlculs i suggeriments.",
+      "countryTitle": "Selecció de País",
+      "countryDescription": "Inferim el teu país des del teu CDN per defecte però pots seleccionar qualsevol país desitjat. Amb aquest valor obtindrem els festius públics oficials per incloure'ls al teu calendari.",
+      "regionTitle": "Selecció de Regió",
+      "regionDescription": "Alguns països tenen festius regionals. Selecciona la teva regió específica per obtenir el calendari de festius més precís per a la teva àrea.",
+      "yearTitle": "Selecció d'Any",
+      "yearDescription": "Tria l'any per al qual vols planificar. Els festius i suggeriments es generaran per a l'any seleccionat.",
+      "strategyTitle": "Estratègia d'Optimització",
+      "strategyDescription": "Tria entre diferents estratègies: \"Equilibrada\" distribueix el teu PTO uniformement al llarg de l'any, mentre que \"Optimitzada\" maximitza l'eficiència creant descans més llargs amb menys dies de PTO.",
+      "allowPastDaysTitle": "Permetre Dies Passats",
+      "allowPastDaysDescription": "Activa aquesta opció si vols incloure dates que ja han passat a l'any actual. Útil per planificar retrospectivament o per al proper any.",
+      "carryOverTitle": "Mesos d'Arrossegament",
+      "carryOverDescription": "Si els teus dies de PTO s'arrosseguen al següent any, especifica quants mesos romanen vàlids. Això t'ajuda a planificar l'ús de PTO entre anys.",
+      "toolsTitle": "Calculadores i Eines",
+      "toolsDescription": "Accedeix a calculadores útils aquí: estima el teu PTO basant-te en historial laboral, calcula el valor monetari del PTO no utilitzat, o compta dies laborables entre dates.",
+      "alternativesTitle": "Gestor d'Alternatives",
+      "alternativesDescription": "Navega per diferents suggeriments de PTO generats per la nostra IA. Compara mètriques d'eficiència, total de dies lliures i troba l'equilibri perfecte. La primera opció sempre és el nostre suggeriment recomanat, marcat amb una icona de destell. Usa les fletxes per explorar alternatives i fes clic a \"Aplicar Alternativa\" per usar un suggeriment diferent.",
+      "statusTitle": "Seguiment d'Estat de PTO",
+      "statusDescription": "Monitoritza la teva assignació de PTO en temps real. Veu els dies auto-assignats (suggerits per IA), dies seleccionats manualment i dies restants disponibles. Pots restablir canvis manuals en qualsevol moment per tornar al suggeriment de IA.",
+      "calendarTitle": "El Teu Calendari de PTO Interactiu",
+      "calendarDescription": "Aquest és el teu calendari d'un cop d'ull de l'any. Els festius apareixen en gris, els dies de PTO suggerits per IA en verd blavós, i els dies seleccionats manualment en blau. Fes clic a qualsevol dia laborable per alternar la selecció manualment. El calendari s'actualitza instantàniament mentre explores diferents alternatives.",
+      "finishTitle": "Ja Està Tot Llest!",
+      "finishDescription": "Ara saps com usar Forever PTO per maximitzar el teu temps lliure. Comença configurant les teves preferències a la barra lateral, i deixa que l'app et suggereixi els millors dies de PTO. Gaudeix dels teus merescuts descans!"
+    }
   },
   "legend": {
     "title": "Llegenda",
@@ -318,7 +347,6 @@
     "totalDaysOff": "Total Dies Lliures",
     "comparison": "Comparació"
   },
-
   "toasts": {
     "suggestionApplied": "Suggeriment aplicat correctament",
     "cannotSelectPastDays": "No es poden seleccionar dies passats",
@@ -371,22 +399,41 @@
         "label": "Agrupada",
         "description": "Prioritza vacances llargues i contínues",
         "subtitle": "Agrupa dies pont amb festius consecutius",
-        "pros": ["Simula la selecció humana", "Ponts llargs"],
-        "cons": ["Menys dies totals", "Menor eficiència"]
+        "pros": [
+          "Simula la selecció humana",
+          "Ponts llargs"
+        ],
+        "cons": [
+          "Menys dies totals",
+          "Menor eficiència"
+        ]
       },
       "optimized": {
         "label": "Optimitzada",
         "description": "Maximitza eficiència de dies PTO",
         "subtitle": "Obté la major quantitat de dies lliures",
-        "pros": ["Màxim rendiment", "Més dies totals"],
-        "cons": ["Ponts curts", "Dies dispersos"]
+        "pros": [
+          "Màxim rendiment",
+          "Més dies totals"
+        ],
+        "cons": [
+          "Ponts curts",
+          "Dies dispersos"
+        ]
       },
       "balanced": {
         "label": "Equilibrada",
         "description": "Equilibri intel·ligent",
         "subtitle": "Combina eficiència amb agrupació",
-        "pros": ["Flexible", "Períodes mitjans", "Versàtil"],
-        "cons": ["No maximitza", "Solució intermèdia"]
+        "pros": [
+          "Flexible",
+          "Períodes mitjans",
+          "Versàtil"
+        ],
+        "cons": [
+          "No maximitza",
+          "Solució intermèdia"
+        ]
       }
     },
     "allowPastDays": {
@@ -639,39 +686,6 @@
     "by": "per",
     "findMeOn": "També em pots trobar a"
   },
-  "tutorial": {
-    "description": "Vols veure el tutorial interactiu de nou? Fes clic al botó de sota per reiniciar el tour guiat per totes les funcions i configuracions.",
-    "restartButton": "Reiniciar Tutorial Interactiu",
-    "startButton": "Iniciar Tutorial",
-    "steps": {
-      "filtersTitle": "Filtres i Configuració",
-      "filtersDescription": "Aquí pots configurar totes les teves preferències de PTO. Estableix els teus dies de PTO disponibles, selecciona el teu país i regió per obtenir festius precisos, tria l'any i personalitza la teva estratègia d'optimització.",
-      "ptoDaysTitle": "Dies de PTO",
-      "ptoDaysDescription": "Introdueix el nombre total de dies de PTO (temps lliure remunerat) que tens disponibles per a l'any. Aquesta és la base per a tots els càlculs i suggeriments.",
-      "countryTitle": "Selecció de País",
-      "countryDescription": "Inferim el teu país des del teu CDN per defecte però pots seleccionar qualsevol país desitjat. Amb aquest valor obtindrem els festius públics oficials per incloure'ls al teu calendari.",
-      "regionTitle": "Selecció de Regió",
-      "regionDescription": "Alguns països tenen festius regionals. Selecciona la teva regió específica per obtenir el calendari de festius més precís per a la teva àrea.",
-      "yearTitle": "Selecció d'Any",
-      "yearDescription": "Tria l'any per al qual vols planificar. Els festius i suggeriments es generaran per a l'any seleccionat.",
-      "strategyTitle": "Estratègia d'Optimització",
-      "strategyDescription": "Tria entre diferents estratègies: \"Equilibrada\" distribueix el teu PTO uniformement al llarg de l'any, mentre que \"Optimitzada\" maximitza l'eficiència creant descans més llargs amb menys dies de PTO.",
-      "allowPastDaysTitle": "Permetre Dies Passats",
-      "allowPastDaysDescription": "Activa aquesta opció si vols incloure dates que ja han passat a l'any actual. Útil per planificar retrospectivament o per al proper any.",
-      "carryOverTitle": "Mesos d'Arrossegament",
-      "carryOverDescription": "Si els teus dies de PTO s'arrosseguen al següent any, especifica quants mesos romanen vàlids. Això t'ajuda a planificar l'ús de PTO entre anys.",
-      "toolsTitle": "Calculadores i Eines",
-      "toolsDescription": "Accedeix a calculadores útils aquí: estima el teu PTO basant-te en historial laboral, calcula el valor monetari del PTO no utilitzat, o compta dies laborables entre dates.",
-      "alternativesTitle": "Gestor d'Alternatives",
-      "alternativesDescription": "Navega per diferents suggeriments de PTO generats per la nostra IA. Compara mètriques d'eficiència, total de dies lliures i troba l'equilibri perfecte. La primera opció sempre és el nostre suggeriment recomanat, marcat amb una icona de destell. Usa les fletxes per explorar alternatives i fes clic a \"Aplicar Alternativa\" per usar un suggeriment diferent.",
-      "statusTitle": "Seguiment d'Estat de PTO",
-      "statusDescription": "Monitoritza la teva assignació de PTO en temps real. Veu els dies auto-assignats (suggerits per IA), dies seleccionats manualment i dies restants disponibles. Pots restablir canvis manuals en qualsevol moment per tornar al suggeriment de IA.",
-      "calendarTitle": "El Teu Calendari de PTO Interactiu",
-      "calendarDescription": "Aquest és el teu calendari d'un cop d'ull de l'any. Els festius apareixen en gris, els dies de PTO suggerits per IA en verd blavós, i els dies seleccionats manualment en blau. Fes clic a qualsevol dia laborable per alternar la selecció manualment. El calendari s'actualitza instantàniament mentre explores diferents alternatives.",
-      "finishTitle": "Ja Està Tot Llest!",
-      "finishDescription": "Ara saps com usar Forever PTO per maximitzar el teu temps lliure. Comença configurant les teves preferències a la barra lateral, i deixa que l'app et suggereixi els millors dies de PTO. Gaudeix dels teus merescuts descans!"
-    }
-  },
   "premium": {
     "selectHoliday": "Seleccionar Festiu",
     "selectAllHolidays": "Seleccionar Tots els Festius",
@@ -709,6 +723,860 @@
       "paymentId": "ID de Pagament",
       "premiumActivated": "El teu accés premium ha estat activat. Ja pots gaudir de totes les funcions premium!",
       "continueHome": "Continuar a la pàgina principal"
+    }
+  },
+  "legalPages": {
+    "cookiePolicy": {
+      "title": "Cookie Policy",
+      "lastUpdated": "Last updated: February 2, 2026",
+      "sections": {
+        "introduction": {
+          "title": "Introduction",
+          "p1": "This Cookie Policy explains how Forever PTO (<link>https://forever-pto.com</link>) uses cookies and similar technologies. By using our website, you consent to the use of cookies in accordance with this policy.",
+          "p2": "We are committed to transparency about how we collect and use data. This policy provides detailed information about the types of cookies we use, their purpose, and how you can control them."
+        },
+        "whatAreCookies": {
+          "title": "What are Cookies?",
+          "p1": "Cookies are small text files that are placed on your device when you visit a website. They are widely used to make websites work more efficiently and provide information to website owners.",
+          "p2": "Cookies can be 'persistent' cookies or 'session' cookies. Persistent cookies remain on your device for a set period. Session cookies are temporary and are deleted when you close your browser."
+        },
+        "typesOfCookies": {
+          "title": "Types of Cookies We Use",
+          "intro": "Forever PTO does not use:",
+          "notUsed": {
+            "advertising": "Advertising cookies",
+            "tracking": "Third-party tracking cookies",
+            "analytics": "Analytics cookies for user profiling",
+            "socialMedia": "Social media cookies"
+          },
+          "strictlyNecessary": {
+            "title": "Strictly Necessary Cookies (Local Storage)",
+            "description": "We use browser local storage to save your preferences and application state. These are essential for the website to function and cannot be disabled:",
+            "items": {
+              "filters": {
+                "label": "Filters Storage:",
+                "description": "Stores your selected country, region, and year preferences for holiday filtering."
+              },
+              "holidays": {
+                "label": "Holidays Storage:",
+                "description": "Saves your custom holidays and vacation days configuration."
+              },
+              "location": {
+                "label": "Location Storage:",
+                "description": "Stores your selected location (country and region) for accurate holiday information."
+              },
+              "premiumKey": {
+                "label": "Premium Key Storage:",
+                "description": "Securely stores your premium access key when you upgrade to Premium."
+              },
+              "theme": {
+                "label": "Theme Preference:",
+                "description": "Saves your light/dark theme preference."
+              },
+              "calendar": {
+                "label": "Calendar State:",
+                "description": "Stores your calendar view preferences and selected dates."
+              }
+            },
+            "duration": {
+              "label": "Duration:",
+              "description": "These are stored permanently in your browser's local storage until you manually clear them."
+            }
+          }
+        },
+        "cookieBanner": {
+          "title": "Cookie Consent Banner",
+          "description": "When you first visit Forever PTO, you'll see a cookie consent banner. This allows you to choose which types of cookies you want to accept:",
+          "items": {
+            "strictlyNecessary": {
+              "label": "Strictly Necessary:",
+              "description": "These cannot be disabled as they are essential for the site to work."
+            },
+            "analytics": {
+              "label": "Analytics:",
+              "description": "Optional cookies that help us understand how visitors use our site."
+            }
+          },
+          "consentStorage": "Your consent preferences are stored in a cookie called 'cc_cookie' which expires after 6 months."
+        },
+        "googleConsent": {
+          "title": "Google Consent Mode v2",
+          "description": "Forever PTO implements Google Consent Mode v2 to ensure compliance with privacy regulations while maintaining measurement capabilities. This mode allows us to:",
+          "states": {
+            "default": {
+              "label": "Default Consent State:",
+              "description": "Before you make a choice, all non-essential tracking is denied by default."
+            },
+            "grant": {
+              "label": "Consent Grant:",
+              "description": "When you accept analytics cookies, we update consent to allow analytics_storage."
+            },
+            "denial": {
+              "label": "Consent Denial:",
+              "description": "If you reject analytics, only anonymous, aggregated pings are sent to Google without personal data."
+            },
+            "pings": {
+              "label": "Privacy-Safe Pings:",
+              "description": "Even without consent, Google may receive anonymous signals that cannot be used to identify you."
+            }
+          },
+          "categoriesIntro": "Consent Mode v2 controls these categories:",
+          "categories": {
+            "analyticsStorage": "Controls analytics data collection (we set to 'denied' by default until you consent)",
+            "adStorage": "Controls advertising cookies (always 'denied' on Forever PTO)",
+            "adUserData": "Controls sharing user data for advertising (always 'denied')",
+            "adPersonalization": "Controls personalized ads (always 'denied')",
+            "functionalityStorage": "Controls functional cookies (always 'granted' as they're necessary)",
+            "personalizationStorage": "Controls personalization features (always 'granted' for theme/preferences)",
+            "securityStorage": "Controls security-related storage (always 'granted')"
+          },
+          "gdprCompliance": "This implementation ensures full GDPR compliance by respecting your privacy choices while allowing basic anonymous measurements."
+        },
+        "dataSecurity": {
+          "title": "Data Security",
+          "description": "All data stored in local storage:",
+          "items": {
+            "browserSpecific": "Is stored only in your browser and never transmitted to our servers",
+            "notSynced": "Is not synchronized across devices or browsers",
+            "clearingData": "Can be deleted by clearing your browser data",
+            "noAccess": "Cannot be accessed by us or any third party"
+          }
+        },
+        "thirdPartyCookies": {
+          "title": "Third-Party Cookies",
+          "description": "When you use certain features of Forever PTO, third-party services may set their own cookies:",
+          "items": {
+            "payment": {
+              "label": "Stripe (Payment Processing):",
+              "description": "When you purchase Premium, Stripe may set cookies for fraud prevention and payment processing. See Stripe's Cookie Policy."
+            },
+            "holidayApis": {
+              "label": "Holiday APIs:",
+              "description": "We use external APIs to fetch holiday data, but these don't set cookies on our site."
+            }
+          },
+          "disclaimer": "We are not responsible for third-party cookies and recommend reviewing their respective cookie policies."
+        },
+        "managingCookies": {
+          "title": "Managing Cookies",
+          "description": "You have several options to manage cookies and local storage:",
+          "browserSettings": {
+            "title": "Browser Settings",
+            "description": "All modern browsers allow you to:",
+            "items": {
+              "view": "View cookies and local storage currently set",
+              "blockAll": "Block all cookies (may affect functionality)",
+              "blockSpecific": "Block specific cookies from certain sites",
+              "deleteOnClose": "Delete cookies when closing the browser"
+            },
+            "warning": "Note: Blocking or deleting our local storage will reset all your preferences and custom holidays."
+          },
+          "browserInstructions": {
+            "title": "Browser-Specific Instructions",
+            "chrome": "Settings > Privacy and security > Cookies and other site data",
+            "firefox": "Settings > Privacy & Security > Cookies and Site Data",
+            "safari": "Preferences > Privacy > Manage Website Data",
+            "edge": "Settings > Cookies and site permissions > Manage and delete cookies"
+          },
+          "inAppManagement": {
+            "title": "In-App Management",
+            "description": "You can click the cookie icon in the footer at any time to review and modify your cookie preferences."
+          }
+        },
+        "yourRights": {
+          "title": "Your Rights",
+          "description": "Under GDPR and other privacy laws, you have the right to:",
+          "items": {
+            "know": "Know what data is stored (all data is visible in browser DevTools > Application > Local Storage)",
+            "access": "Access your data (it's all stored locally on your device)",
+            "delete": "Delete your data (clear browser data or use our app's reset option)",
+            "withdrawConsent": "Withdraw consent for analytics cookies at any time",
+            "object": "Object to data processing (though we process minimal data locally)"
+          }
+        },
+        "changes": {
+          "title": "Changes to This Policy",
+          "p1": "We may update this Cookie Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons.",
+          "p2": "We will notify users of any material changes by updating the 'Last updated' date at the top of this policy."
+        },
+        "contact": {
+          "title": "Contact Us",
+          "description": "If you have questions about this Cookie Policy, please contact us:",
+          "email": {
+            "label": "Email:",
+            "value": "privacy@forever-pto.com"
+          },
+          "website": {
+            "label": "Website:"
+          }
+        }
+      }
+    },
+    "privacyPolicy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated: February 2, 2026",
+      "sections": {
+        "introduction": {
+          "title": "Introduction",
+          "p1": "Forever PTO is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and protect your personal data when you use our service.",
+          "p2": "Forever PTO operates on a privacy-first model. We minimize data collection and process most information locally in your browser."
+        },
+        "dataController": {
+          "title": "Data Controller",
+          "description": "The data controller responsible for your personal data is:",
+          "items": {
+            "name": {
+              "label": "Name:",
+              "value": "Ferran Buireu"
+            },
+            "taxId": {
+              "label": "Tax ID:",
+              "value": "47805898V"
+            },
+            "address": {
+              "label": "Address:",
+              "value": "Carrer de Sant Pau, 58, 08001 Barcelona, Spain"
+            },
+            "email": {
+              "label": "Email:",
+              "value": "privacy@forever-pto.com"
+            },
+            "website": {
+              "label": "Website:"
+            }
+          }
+        },
+        "dataWeCollect": {
+          "title": "Data We Collect",
+          "localStorage": {
+            "title": "Local Storage Data (Client-Side Only)",
+            "description": "The following data is stored exclusively in your browser's local storage and is never transmitted to our servers:",
+            "items": {
+              "settings": {
+                "label": "Application Settings:",
+                "description": "Your selected country, region, year, PTO days, and filter preferences."
+              },
+              "holidayData": {
+                "label": "Holiday Data:",
+                "description": "Public holidays fetched from external APIs and cached locally."
+              },
+              "customHolidays": {
+                "label": "Custom Holidays:",
+                "description": "Holidays you manually add to the calendar."
+              },
+              "calendarState": {
+                "label": "Calendar State:",
+                "description": "Your selected vacation dates and optimization preferences."
+              },
+              "premiumKey": {
+                "label": "Premium Activation Key:",
+                "description": "If you purchase Premium, your unique activation key is stored locally."
+              },
+              "theme": {
+                "label": "Theme Preference:",
+                "description": "Your light/dark mode preference."
+              },
+              "cookieConsent": {
+                "label": "Cookie Consent:",
+                "description": "Your cookie preferences from the cookie banner."
+              }
+            },
+            "legalBasis": {
+              "label": "Legal Basis:",
+              "description": "Necessary for providing the service (legitimate interest)."
+            },
+            "retention": {
+              "label": "Retention:",
+              "description": "Stored until you clear browser data."
+            }
+          },
+          "payment": {
+            "title": "Payment Information",
+            "description": "When you purchase Premium, we collect minimal payment-related data:",
+            "collectedInfo": "What we collect:",
+            "items": {
+              "transactionId": "Transaction ID from Stripe",
+              "activationKey": "Unique activation key generated for your purchase",
+              "email": "Email address (only if you choose to provide it during checkout)"
+            },
+            "legalBasis": {
+              "label": "Legal Basis:",
+              "description": "Contract performance and legal obligation."
+            },
+            "retention": {
+              "label": "Retention:",
+              "description": "Retained for accounting and legal purposes (7 years as required by Spanish law)."
+            }
+          },
+          "analytics": {
+            "title": "Analytics Data (Optional)",
+            "description": "If you consent to analytics cookies, we may collect:",
+            "items": {
+              "pagesVisited": "Pages visited and features used",
+              "browserInfo": "Browser type, device type, screen resolution",
+              "location": "Approximate geographic location (country-level)",
+              "interactions": "Interactions with the application (anonymized)"
+            },
+            "legalBasis": {
+              "label": "Legal Basis:",
+              "description": "Consent (which you can withdraw at any time)."
+            },
+            "retention": {
+              "label": "Retention:",
+              "description": "Google Analytics retains data for 14 months by default."
+            }
+          },
+          "contact": {
+            "title": "Contact Form Data",
+            "description": "If you contact us via the contact form, we collect your name, email, and message.",
+            "legalBasis": {
+              "label": "Legal Basis:",
+              "description": "Legitimate interest in responding to your inquiry."
+            },
+            "retention": {
+              "label": "Retention:",
+              "description": "Retained for the duration necessary to respond, then deleted."
+            }
+          }
+        },
+        "cookiesAndTracking": {
+          "title": "Cookies and Tracking Technologies",
+          "description": "For detailed information about cookies, please see our <link>Cookie Policy</link>."
+        },
+        "dataSharing": {
+          "title": "Data Sharing",
+          "description": "We do not sell your personal data. We only share data with trusted third parties as necessary:",
+          "items": {
+            "paymentProcessors": {
+              "label": "Stripe (Payment Processing):",
+              "description": "Handles all payment processing securely. See Stripe's Privacy Policy."
+            },
+            "holidayProviders": {
+              "label": "Holiday Data Providers:",
+              "description": "We fetch public holiday data from external APIs but do not share your personal information with them."
+            },
+            "analytics": {
+              "label": "Google Analytics (if consented):",
+              "description": "Processes anonymized usage data. See Google's Privacy Policy."
+            },
+            "legal": {
+              "label": "Legal Compliance:",
+              "description": "If required by law or to protect our legal rights."
+            }
+          }
+        },
+        "dataSecurity": {
+          "title": "Data Security",
+          "description": "We implement appropriate technical and organizational measures to protect your data:",
+          "items": {
+            "encryption": {
+              "label": "Encryption:",
+              "description": "All data transmitted to our servers uses HTTPS/TLS encryption."
+            },
+            "localStorage": {
+              "label": "Local Storage:",
+              "description": "Most data never leaves your device and is stored locally in your browser."
+            },
+            "https": {
+              "label": "Secure Infrastructure:",
+              "description": "Our website is hosted on secure, reputable platforms (Cloudflare)."
+            },
+            "minimalCollection": {
+              "label": "Minimal Data Collection:",
+              "description": "We only collect data that is strictly necessary for the service."
+            }
+          },
+          "disclaimer": "While we strive to protect your data, no method of transmission over the internet is 100% secure."
+        },
+        "yourRights": {
+          "title": "Your Rights",
+          "description": "Under GDPR and other data protection laws, you have the following rights:",
+          "items": {
+            "access": {
+              "label": "Right to Access:",
+              "description": "You can request a copy of the personal data we hold about you."
+            },
+            "rectification": {
+              "label": "Right to Rectification:",
+              "description": "You can request corrections to inaccurate or incomplete data."
+            },
+            "erasure": {
+              "label": "Right to Erasure ('Right to be Forgotten'):",
+              "description": "You can request deletion of your personal data."
+            },
+            "restrict": {
+              "label": "Right to Restrict Processing:",
+              "description": "You can request restriction of processing your data under certain conditions."
+            },
+            "portability": {
+              "label": "Right to Data Portability:",
+              "description": "You can request your data in a structured, machine-readable format."
+            },
+            "object": {
+              "label": "Right to Object:",
+              "description": "You can object to processing based on legitimate interests or for direct marketing."
+            },
+            "withdrawConsent": {
+              "label": "Right to Withdraw Consent:",
+              "description": "You can withdraw consent for analytics cookies at any time."
+            },
+            "complaint": {
+              "label": "Right to Lodge a Complaint:",
+              "description": "You can file a complaint with the Spanish Data Protection Authority (AEPD) or your local supervisory authority."
+            }
+          },
+          "contact": "To exercise these rights, contact us at privacy@forever-pto.com."
+        },
+        "internationalTransfers": {
+          "title": "International Data Transfers",
+          "p1": "Your data may be transferred to and processed in countries outside the European Economic Area (EEA), particularly the United States (Google Analytics, Stripe).",
+          "p2": "We ensure appropriate safeguards are in place, including Standard Contractual Clauses and adherence to the EU-U.S. Data Privacy Framework where applicable."
+        },
+        "childrensPrivacy": {
+          "title": "Children's Privacy",
+          "p1": "Forever PTO is not intended for children under 16 years of age. We do not knowingly collect personal data from children.",
+          "p2": "If we become aware that we have collected data from a child under 16, we will take steps to delete that information promptly."
+        },
+        "changes": {
+          "title": "Changes to This Privacy Policy",
+          "p1": "We may update this Privacy Policy from time to time to reflect changes in our practices, legal requirements, or service features.",
+          "p2": "We will notify users of material changes by updating the 'Last updated' date at the top of this policy.",
+          "p3": "Continued use of Forever PTO after changes constitutes acceptance of the updated policy."
+        },
+        "dataBreach": {
+          "title": "Data Breach Notification",
+          "description": "In the unlikely event of a data breach affecting your personal data, we will notify you and the relevant supervisory authorities within 72 hours as required by GDPR."
+        },
+        "contactInfo": {
+          "title": "Contact Information",
+          "description": "If you have questions about this Privacy Policy or wish to exercise your rights, please contact us:",
+          "items": {
+            "email": {
+              "label": "Email:",
+              "value": "privacy@forever-pto.com"
+            },
+            "website": {
+              "label": "Website:"
+            },
+            "postalAddress": {
+              "label": "Postal Address:",
+              "value": "Ferran Buireu, Carrer de Sant Pau, 58, 08001 Barcelona, Spain"
+            }
+          },
+          "responseTime": "We will respond to your inquiries within 30 days."
+        }
+      }
+    },
+    "termsOfService": {
+      "title": "Terms of Service",
+      "lastUpdated": "Last updated: February 2, 2026",
+      "sections": {
+        "acceptance": {
+          "title": "Acceptance of Terms",
+          "p1": "By accessing or using Forever PTO (the 'Service'), you agree to be bound by these Terms of Service ('Terms'). If you do not agree to these Terms, please do not use the Service.",
+          "p2": "These Terms constitute a legally binding agreement between you and Ferran Buireu, the operator of Forever PTO."
+        },
+        "serviceDescription": {
+          "title": "Service Description",
+          "description": "Forever PTO is a web-based tool that helps users plan and optimize their paid time off (PTO) by suggesting optimal vacation dates based on public holidays. The Service is available in two versions:",
+          "freeVersion": {
+            "title": "Free Version",
+            "description": "The free version provides:",
+            "items": {
+              "optimization": "Basic PTO optimization based on public holidays",
+              "visualization": "Calendar visualization of holidays and vacation days",
+              "customHolidays": "Ability to add custom holidays",
+              "metrics": "Basic metrics and summary statistics",
+              "strategy": "Selection of different optimization strategies"
+            }
+          },
+          "premiumVersion": {
+            "title": "Premium Version",
+            "description": "The Premium version includes all free features plus:",
+            "items": {
+              "advancedMetrics": "Advanced metrics and year summary analysis",
+              "charts": "Visual charts and graphs",
+              "efficiency": "PTO efficiency scoring and insights",
+              "strategies": "Multiple optimization strategies with comparisons",
+              "alternatives": "Alternative vacation planning suggestions",
+              "analysis": "In-depth analysis of vacation patterns",
+              "customization": "Enhanced customization options"
+            }
+          }
+        },
+        "eligibility": {
+          "title": "Eligibility",
+          "p1": "By using Forever PTO, you represent and warrant that:",
+          "p2": "We reserve the right to refuse service to anyone for any reason at any time.",
+          "items": {
+            "age": "You are at least 18 years of age",
+            "legalCapacity": "You have the legal capacity to enter into binding contracts",
+            "compliance": "Your use of the Service will comply with all applicable laws and regulations",
+            "lawfulUse": "You will use the Service for lawful purposes only"
+          }
+        },
+        "premiumPayments": {
+          "title": "Premium Version and Payments",
+          "activation": {
+            "title": "Premium Activation",
+            "description": "The Premium version requires a one-time payment processed securely through Stripe. Upon successful payment:",
+            "characteristics": "Premium access is characterized by:",
+            "items": {
+              "oneTime": "One-time payment (no recurring subscription)",
+              "lifetime": "Lifetime access to Premium features",
+              "personal": "Personal, non-transferable license",
+              "multiDevice": "Can be activated on multiple devices using your unique key"
+            }
+          },
+          "pricing": {
+            "title": "Pricing",
+            "p1": "Pricing for Premium access is displayed at the time of purchase and may vary based on promotions or currency fluctuations.",
+            "p2": "All prices are clearly stated before you complete the payment process."
+          },
+          "processing": {
+            "title": "Payment Processing",
+            "description": "Payments are processed securely by Stripe, a third-party payment processor. We do not store your full credit card information.",
+            "items": {
+              "other": "By making a payment, you agree to Stripe's Terms of Service and Privacy Policy."
+            },
+            "p1": "Upon successful payment, you will receive a unique activation key.",
+            "p2": "It is your responsibility to keep this key secure and not share it with others."
+          },
+          "keySecurity": {
+            "title": "Activation Key Security",
+            "p1": "Your Premium activation key is personal and confidential. Sharing or selling your activation key to others is strictly prohibited and constitutes a breach of these Terms.",
+            "p2": "If we detect unauthorized use or sharing of activation keys, we reserve the right to deactivate the key without refund."
+          }
+        },
+        "refundPolicy": {
+          "title": "Refund Policy",
+          "eligibility": {
+            "title": "Refund Eligibility",
+            "description": "We offer refunds under the following circumstances:",
+            "items": {
+              "technical": "Technical issues preventing you from using Premium features (provided we cannot resolve the issue within a reasonable time)",
+              "notAsDescribed": "Premium features are not as described",
+              "accidental": "Accidental purchase (must be requested within 24 hours)",
+              "notSatisfied": "You are not satisfied with Premium features (within 14 days of purchase, in accordance with EU consumer protection laws)"
+            }
+          },
+          "exclusions": {
+            "title": "Refund Exclusions",
+            "description": "Refunds will NOT be granted in the following cases:",
+            "items": {
+              "timePassed": "More than 14 days have passed since the purchase (unless covered by statutory rights)",
+              "violatedTerms": "You have violated these Terms of Service",
+              "sharedKey": "You have shared or sold your activation key",
+              "fraudulent": "The purchase was made fraudulently"
+            }
+          },
+          "process": {
+            "title": "Refund Process",
+            "description": "To request a refund:",
+            "steps": {
+              "contact": "1. Contact us at support@forever-pto.com with your transaction ID",
+              "include": "2. Include a brief explanation of why you are requesting a refund",
+              "review": "3. We will review your request within 5 business days",
+              "processing": "4. If approved, the refund will be processed to your original payment method within 10 business days"
+            }
+          },
+          "postRefund": {
+            "title": "Post-Refund Access",
+            "description": "Upon issuing a refund, your Premium activation key will be deactivated, and you will lose access to Premium features."
+          },
+          "euRights": {
+            "title": "EU Consumer Rights",
+            "p1": "If you are a consumer based in the European Union, you have the right to withdraw from the purchase within 14 days without giving any reason, in accordance with Directive 2011/83/EU.",
+            "p2": "However, you acknowledge that by activating your Premium key and using Premium features, you waive this right as the digital content has been fully performed."
+          }
+        },
+        "userResponsibilities": {
+          "title": "User Responsibilities",
+          "description": "When using Forever PTO, you agree to:",
+          "items": {
+            "compliance": "Comply with all applicable laws and regulations",
+            "noHarm": "Not use the Service in any way that could harm, disable, or impair the Service",
+            "noUnauthorizedAccess": "Not attempt unauthorized access to any part of the Service, servers, or databases",
+            "noBots": "Not use automated systems (bots, scrapers) to access the Service",
+            "noReverseEngineer": "Not reverse engineer, decompile, or disassemble any part of the Service",
+            "noShare": "Not share your Premium activation key with others",
+            "verifyHolidays": "Verify holiday information with official sources before making important decisions",
+            "noIllegal": "Not use the Service for any unlawful purpose"
+          }
+        },
+        "disclaimer": {
+          "title": "Disclaimers and Limitations",
+          "description": "Forever PTO is provided 'as is' without warranties of any kind. We specifically disclaim:",
+          "items": {
+            "accuracy": {
+              "label": "Accuracy of Holiday Data:",
+              "description": "While we strive for accuracy, holiday data is sourced from third-party APIs and may contain errors. Always verify with official sources."
+            },
+            "availability": {
+              "label": "Service Availability:",
+              "description": "We do not guarantee uninterrupted or error-free operation of the Service."
+            },
+            "fitness": {
+              "label": "Fitness for Purpose:",
+              "description": "We do not guarantee that the Service will meet your specific requirements or expectations."
+            },
+            "dataIntegrity": {
+              "label": "Data Integrity:",
+              "description": "While we implement security measures, we cannot guarantee absolute security of data stored locally in your browser."
+            }
+          },
+          "acknowledgement": "You acknowledge that the Service is a planning tool and should not be relied upon as the sole basis for employment decisions."
+        },
+        "limitationOfLiability": {
+          "title": "Limitation of Liability",
+          "description": "To the fullest extent permitted by law, Ferran Buireu and Forever PTO shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to:",
+          "items": {
+            "profits": "Loss of profits, revenue, or business opportunities",
+            "dataLoss": "Data loss or corruption",
+            "employment": "Employment-related consequences based on incorrect holiday information",
+            "interruptions": "Interruptions or errors in the Service",
+            "unauthorizedAccess": "Unauthorized access to your locally stored data"
+          },
+          "maxLiability": "Our total liability for any claims arising out of or related to these Terms or the Service shall not exceed the amount you paid for Premium access (if applicable) or €50, whichever is greater."
+        },
+        "intellectualProperty": {
+          "title": "Intellectual Property",
+          "description": "Forever PTO and all its content, features, and functionality (including but not limited to code, design, text, graphics, and logos) are owned by Ferran Buireu and are protected by international copyright, trademark, and other intellectual property laws.",
+          "limitedLicense": {
+            "title": "Limited License",
+            "description": "We grant you a limited, non-exclusive, non-transferable license to use Forever PTO for personal, non-commercial purposes. This license does not include any resale or commercial use of the Service or its content."
+          },
+          "openSource": {
+            "title": "Open Source Code",
+            "description": "Parts of Forever PTO may be available as open-source software under specific licenses. See our <link>GitHub repository</link> for details."
+          },
+          "restrictions": {
+            "title": "Restrictions",
+            "description": "You may not:",
+            "items": {
+              "copy": "Copy, modify, or distribute the Service or its content",
+              "derivative": "Create derivative works based on the Service",
+              "remove": "Remove any copyright or proprietary notices",
+              "trademarks": "Use any trademarks, logos, or service marks without permission"
+            }
+          }
+        },
+        "thirdPartyServices": {
+          "title": "Third-Party Services",
+          "description": "Forever PTO integrates with third-party services, including:",
+          "items": {
+            "payment": "Stripe for payment processing",
+            "holidayApis": "External APIs for holiday data",
+            "analytics": "Google Analytics for usage statistics (if consented)",
+            "external": "Links to external websites"
+          },
+          "disclaimer1": "We are not responsible for the content, privacy policies, or practices of third-party services.",
+          "disclaimer2": "Your use of third-party services is subject to their respective terms and conditions."
+        },
+        "modifications": {
+          "title": "Modifications and Termination",
+          "serviceModifications": {
+            "title": "Modifications to the Service",
+            "description": "We reserve the right to:",
+            "items": {
+              "modify": "Modify, suspend, or discontinue any part of the Service at any time",
+              "changeFeatures": "Change features, pricing, or availability of Premium",
+              "updatePricing": "Update pricing for future Premium purchases (existing Premium users are unaffected)",
+              "impose": "Impose limits on certain features"
+            },
+            "notice": "We will make reasonable efforts to notify users of material changes."
+          },
+          "terminationByUs": {
+            "title": "Termination by Us",
+            "description": "We may terminate or suspend your access to the Service immediately, without prior notice or liability, if you:",
+            "items": {
+              "violateTerms": "Violate these Terms",
+              "fraudulent": "Engage in fraudulent activity",
+              "shareKey": "Share your Premium activation key",
+              "requiredByLaw": "If required by law or court order",
+              "discontinue": "If we discontinue the Service"
+            }
+          },
+          "terminationByYou": {
+            "title": "Termination by You",
+            "description": "You may stop using the Service at any time. To delete your locally stored data, clear your browser's local storage."
+          },
+          "effectOfTermination": {
+            "title": "Effect of Termination",
+            "description": "Upon termination:",
+            "items": {
+              "rightsCease": "Your right to use the Service ceases immediately",
+              "keyDeactivated": "Your Premium activation key (if any) may be deactivated",
+              "dataRemains": "Data stored locally in your browser remains until you delete it",
+              "provisions": "Provisions regarding intellectual property, disclaimers, and limitations of liability survive termination"
+            }
+          }
+        },
+        "indemnification": {
+          "title": "Indemnification",
+          "description": "You agree to indemnify, defend, and hold harmless Ferran Buireu and Forever PTO from any claims, damages, losses, liabilities, and expenses (including legal fees) arising out of:",
+          "items": {
+            "misuse": "Your misuse of the Service",
+            "violateTerms": "Your violation of these Terms",
+            "violateRights": "Your violation of any rights of another person or entity",
+            "violateLaws": "Your violation of any applicable laws or regulations"
+          }
+        },
+        "governingLaw": {
+          "title": "Governing Law and Dispute Resolution",
+          "law": {
+            "title": "Governing Law",
+            "description": "These Terms are governed by and construed in accordance with the laws of Spain, without regard to its conflict of law principles."
+          },
+          "jurisdiction": {
+            "title": "Jurisdiction",
+            "description": "Any disputes arising out of or related to these Terms or the Service shall be subject to the exclusive jurisdiction of the courts of Barcelona, Spain."
+          },
+          "disputeResolution": {
+            "title": "Dispute Resolution",
+            "description": "Before initiating any legal proceedings, we encourage you to contact us at support@forever-pto.com to seek an amicable resolution."
+          },
+          "euOdr": {
+            "title": "EU Online Dispute Resolution",
+            "description": "If you are a consumer based in the European Union, you may use the <link>EU Online Dispute Resolution platform</link> to resolve disputes."
+          }
+        },
+        "severability": {
+          "title": "Severability",
+          "description": "If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions will remain in full force and effect."
+        },
+        "entireAgreement": {
+          "title": "Entire Agreement",
+          "description": "These Terms, together with our Privacy Policy and Cookie Policy, constitute the entire agreement between you and Forever PTO regarding the use of the Service."
+        },
+        "waiver": {
+          "title": "Waiver",
+          "description": "Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights."
+        },
+        "changes": {
+          "title": "Changes to These Terms",
+          "p1": "We may update these Terms from time to time to reflect changes in our practices, legal requirements, or service features.",
+          "p2": "We will notify users of material changes by updating the 'Last updated' date at the top of these Terms. Continued use of the Service after changes constitutes acceptance of the updated Terms."
+        },
+        "contactInfo": {
+          "title": "Contact Information",
+          "description": "If you have questions about these Terms of Service, please contact us:",
+          "items": {
+            "email": {
+              "label": "Email:",
+              "value": "support@forever-pto.com"
+            },
+            "website": {
+              "label": "Website:"
+            },
+            "postalAddress": {
+              "label": "Postal Address:",
+              "value": "Ferran Buireu, Carrer de Sant Pau, 58, 08001 Barcelona, Spain"
+            }
+          },
+          "responseTime": "We will respond to your inquiries within 5 business days."
+        }
+      }
+    },
+    "legalNotice": {
+      "title": "Legal Notice",
+      "lastUpdated": "Last updated: February 2, 2026",
+      "sections": {
+        "identification": {
+          "title": "Website Owner Identification",
+          "description": "In compliance with Law 34/2002, of July 11, on Information Society Services and Electronic Commerce (LSSI-CE), the following information is provided:",
+          "items": {
+            "owner": {
+              "label": "Owner:",
+              "value": "Ferran Buireu"
+            },
+            "taxId": {
+              "label": "Tax Identification Number (NIF):",
+              "value": "47805898V"
+            },
+            "address": {
+              "label": "Address:",
+              "value": "Carrer de Sant Pau, 58, 08001 Barcelona, Spain"
+            },
+            "email": {
+              "label": "Email:",
+              "value": "contact@forever-pto.com"
+            },
+            "website": {
+              "label": "Website:"
+            }
+          }
+        },
+        "purpose": {
+          "title": "Purpose of the Website",
+          "description": "Forever PTO (https://forever-pto.com) is a web application designed to help users plan and optimize their paid time off (PTO) by providing holiday information and vacation planning tools.",
+          "offers": "The website offers:",
+          "items": {
+            "freeVersion": {
+              "label": "Free Version:",
+              "description": "Basic PTO optimization, calendar visualization, and holiday information."
+            },
+            "premiumVersion": {
+              "label": "Premium Version:",
+              "description": "Advanced analytics, charts, and enhanced planning features available through a one-time payment."
+            }
+          }
+        },
+        "accessConditions": {
+          "title": "Access and Use Conditions",
+          "description": "Access to and use of this website is subject to the following conditions:",
+          "userAgreement": "By accessing this website, you agree to:",
+          "items": {
+            "correctUse": "Use the website correctly and lawfully",
+            "noIllegal": "Not use it for illegal purposes or activities that violate these terms",
+            "noVirus": "Not introduce or spread viruses or malicious code",
+            "noUnauthorized": "Not attempt unauthorized access to the website's systems",
+            "noShareKey": "Not share Premium activation keys obtained through payment"
+          }
+        },
+        "liability": {
+          "title": "Liability",
+          "description": "Ferran Buireu is not responsible for:",
+          "items": {
+            "accuracy": "The accuracy or completeness of holiday information obtained from third-party sources",
+            "decisions": "Decisions made by users based on information provided by the website",
+            "interruptions": "Temporary interruptions or technical issues affecting the website",
+            "misuse": "Misuse of the website by users",
+            "thirdParty": "The content or privacy practices of third-party websites linked from Forever PTO"
+          },
+          "disclaimer": "The information provided is for planning purposes only. Users should verify holiday information with official sources before making employment-related decisions."
+        },
+        "intellectualProperty": {
+          "title": "Intellectual Property",
+          "p1": "All content on this website, including but not limited to text, graphics, logos, code, and design, is the property of Ferran Buireu and is protected by Spanish and international intellectual property laws.",
+          "p2": "Users are granted a personal, non-exclusive, non-transferable license to use the website for its intended purpose. Reproduction, distribution, modification, or commercial use of the website's content without express permission is prohibited.",
+          "p3": "Some parts of the website may be available as open-source software. For details, please visit our <link>GitHub repository</link>."
+        },
+        "thirdPartyLinks": {
+          "title": "Links to Third-Party Websites",
+          "p1": "This website may contain links to third-party websites. These links are provided for convenience and informational purposes only.",
+          "p2": "Ferran Buireu does not control or endorse the content of third-party websites and is not responsible for their privacy policies or practices."
+        },
+        "modifications": {
+          "title": "Modifications to the Legal Notice",
+          "p1": "Ferran Buireu reserves the right to modify this Legal Notice at any time to adapt to legislative changes or updates to the website.",
+          "p2": "Users are advised to periodically review this Legal Notice to stay informed of any changes."
+        },
+        "applicableLaw": {
+          "title": "Applicable Law and Jurisdiction",
+          "description": "This Legal Notice is governed by Spanish law. For any disputes arising from the use of this website, the parties submit to the jurisdiction of the courts of Barcelona, Spain, waiving any other jurisdiction that may apply."
+        },
+        "contact": {
+          "title": "Contact",
+          "description": "For any questions or clarifications regarding this Legal Notice, please contact us at:",
+          "items": {
+            "email": {
+              "label": "Email:",
+              "value": "contact@forever-pto.com"
+            }
+          }
+        }
+      }
     }
   }
 }
