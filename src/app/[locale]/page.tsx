@@ -41,6 +41,7 @@ const Home = async ({ params }: LayoutProps) => {
 export default Home;
 
 // todo: template issues + link them through contact modal + roadmap
+// todo: legal pages info (email, etc)
 // todo: check white mode (no hovers?) + input styles in Donate
 // todo: don't allow to add custom holiday in bank holidays
 // todo: unify modal styles (footer actions, spacing, etc)
