@@ -401,22 +401,41 @@
         "label": "Grouped",
         "description": "Prioritizes long, continuous vacations",
         "subtitle": "Groups bridge days with consecutive holidays",
-        "pros": ["Simulates human selection", "Long bridges"],
-        "cons": ["Fewer total days", "Lower efficiency"]
+        "pros": {
+          "0": "Simulates human selection",
+          "1": "Long bridges"
+        },
+        "cons": {
+          "0": "Fewer total days",
+          "1": "Lower efficiency"
+        }
       },
       "optimized": {
         "label": "Optimized",
         "description": "Maximizes PTO day efficiency",
         "subtitle": "Get the most days off possible",
-        "pros": ["Maximum performance", "More total days"],
-        "cons": ["Short bridges", "Scattered days"]
+        "pros": {
+          "0": "Maximum performance",
+          "1": "More total days"
+        },
+        "cons": {
+          "0": "Short bridges",
+          "1": "Scattered days"
+        }
       },
       "balanced": {
         "label": "Balanced",
         "description": "Smart balance",
         "subtitle": "Combines efficiency with grouping",
-        "pros": ["Flexible", "Medium periods", "Versatile"],
-        "cons": ["Doesn't maximize", "Intermediate solution"]
+        "pros": {
+          "0": "Flexible",
+          "1": "Medium periods",
+          "2": "Versatile"
+        },
+        "cons": {
+          "0": "Doesn't maximize",
+          "1": "Intermediate solution"
+        }
       }
     },
     "allowPastDays": {

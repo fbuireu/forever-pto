@@ -3,7 +3,14 @@ import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
-const withNextIntl = createNextIntlPlugin('./src/infrastructure/i18n/config.ts');
+const withNextIntl = createNextIntlPlugin('./src/infrastructure/i18n/config.ts', {
+  messages: {
+    path: './src/ui/i18n/messages',
+    locales: 'infer',
+    format: 'json',
+    precompile: true,
+  },
+});
 
 const isProd = process.env.NODE_ENV === 'production';
 

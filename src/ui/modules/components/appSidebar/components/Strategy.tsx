@@ -40,8 +40,8 @@ export const Strategy = () => {
         icon: STRATEGY_ICONS[FilterStrategy.GROUPED],
         description: t('grouped.description'),
         subtitle: t('grouped.subtitle'),
-        pros: t.raw('grouped.pros') as string[],
-        cons: t.raw('grouped.cons') as string[],
+        pros: [t('grouped.pros.0'), t('grouped.pros.1')],
+        cons: [t('grouped.cons.0'), t('grouped.cons.1')],
       },
       {
         value: FilterStrategy.OPTIMIZED,
@@ -49,8 +49,8 @@ export const Strategy = () => {
         icon: STRATEGY_ICONS[FilterStrategy.OPTIMIZED],
         description: t('optimized.description'),
         subtitle: t('optimized.subtitle'),
-        pros: t.raw('optimized.pros') as string[],
-        cons: t.raw('optimized.cons') as string[],
+        pros: [t('optimized.pros.0'), t('optimized.pros.1')],
+        cons: [t('optimized.cons.0'), t('optimized.cons.1')],
       },
       {
         value: FilterStrategy.BALANCED,
@@ -58,8 +58,8 @@ export const Strategy = () => {
         icon: STRATEGY_ICONS[FilterStrategy.BALANCED],
         description: t('balanced.description'),
         subtitle: t('balanced.subtitle'),
-        pros: t.raw('balanced.pros') as string[],
-        cons: t.raw('balanced.cons') as string[],
+        pros: [t('balanced.pros.0'), t('balanced.pros.1'), t('balanced.pros.2')],
+        cons: [t('balanced.cons.0'), t('balanced.cons.1')],
       },
     ],
     [t]
@@ -84,16 +84,14 @@ export const Strategy = () => {
       />
       {currentStrategy && (
         <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
-          <>
-            <AnimateIcon animateOnHover>
-              <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-xs font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors'>
-                <span>
-                  {detailsOpen ? t('hide') : t('expand')} {t('strategyDetails')}
-                </span>
-                <ChevronDown className={cn('h-4 w-4 transition-transform duration-200', detailsOpen && 'rotate-180')} />
-              </CollapsibleTrigger>
-            </AnimateIcon>
-          </>
+          <AnimateIcon animateOnHover>
+            <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-xs font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors'>
+              <span>
+                {detailsOpen ? t('hide') : t('expand')} {t('strategyDetails')}
+              </span>
+              <ChevronDown className={cn('h-4 w-4 transition-transform duration-200', detailsOpen && 'rotate-180')} />
+            </CollapsibleTrigger>
+          </AnimateIcon>
           <CollapsibleContent>
             <Card className='p-4 bg-muted/50 mt-2 text-xs'>
               <div className='space-y-2'>

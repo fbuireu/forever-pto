@@ -399,41 +399,41 @@
         "label": "Agrupada",
         "description": "Prioritza vacances llargues i contínues",
         "subtitle": "Agrupa dies pont amb festius consecutius",
-        "pros": [
-          "Simula la selecció humana",
-          "Ponts llargs"
-        ],
-        "cons": [
-          "Menys dies totals",
-          "Menor eficiència"
-        ]
+        "pros": {
+          "0": "Simula la selecció humana",
+          "1": "Ponts llargs"
+        },
+        "cons": {
+          "0": "Menys dies totals",
+          "1": "Menor eficiència"
+        }
       },
       "optimized": {
         "label": "Optimitzada",
         "description": "Maximitza eficiència de dies PTO",
         "subtitle": "Obté la major quantitat de dies lliures",
-        "pros": [
-          "Màxim rendiment",
-          "Més dies totals"
-        ],
-        "cons": [
-          "Ponts curts",
-          "Dies dispersos"
-        ]
+        "pros": {
+          "0": "Màxim rendiment",
+          "1": "Més dies totals"
+        },
+        "cons": {
+          "0": "Ponts curts",
+          "1": "Dies dispersos"
+        }
       },
       "balanced": {
         "label": "Equilibrada",
         "description": "Equilibri intel·ligent",
         "subtitle": "Combina eficiència amb agrupació",
-        "pros": [
-          "Flexible",
-          "Períodes mitjans",
-          "Versàtil"
-        ],
-        "cons": [
-          "No maximitza",
-          "Solució intermèdia"
-        ]
+        "pros": {
+          "0": "Flexible",
+          "1": "Períodes mitjans",
+          "2": "Versàtil"
+        },
+        "cons": {
+          "0": "No maximitza",
+          "1": "Solució intermèdia"
+        }
       }
     },
     "allowPastDays": {

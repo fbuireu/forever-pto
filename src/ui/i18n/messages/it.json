@@ -399,41 +399,41 @@
         "label": "Raggruppata",
         "description": "Dà priorità a vacanze lunghe e continue",
         "subtitle": "Raggruppa i giorni ponte con i festivi consecutivi",
-        "pros": [
-          "Simula la selezione umana",
-          "Ponti lunghi"
-        ],
-        "cons": [
-          "Meno giorni totali",
-          "Minore efficienza"
-        ]
+        "pros": {
+          "0": "Simula la selezione umana",
+          "1": "Ponti lunghi"
+        },
+        "cons": {
+          "0": "Meno giorni totali",
+          "1": "Minore efficienza"
+        }
       },
       "optimized": {
         "label": "Ottimizzata",
         "description": "Massimizza l'efficienza dei giorni PTO",
         "subtitle": "Ottieni il maggior numero di giorni liberi",
-        "pros": [
-          "Massimo rendimento",
-          "Più giorni totali"
-        ],
-        "cons": [
-          "Ponti corti",
-          "Giorni dispersi"
-        ]
+        "pros": {
+          "0": "Massimo rendimento",
+          "1": "Più giorni totali"
+        },
+        "cons": {
+          "0": "Ponti corti",
+          "1": "Giorni dispersi"
+        }
       },
       "balanced": {
         "label": "Bilanciata",
         "description": "Equilibrio intelligente",
         "subtitle": "Combina efficienza con raggruppamento",
-        "pros": [
-          "Flessibile",
-          "Periodi medi",
-          "Versatile"
-        ],
-        "cons": [
-          "Non massimizza",
-          "Soluzione intermedia"
-        ]
+        "pros": {
+          "0": "Flessibile",
+          "1": "Periodi medi",
+          "2": "Versatile"
+        },
+        "cons": {
+          "0": "Non massimizza",
+          "1": "Soluzione intermedia"
+        }
       }
     },
     "allowPastDays": {
