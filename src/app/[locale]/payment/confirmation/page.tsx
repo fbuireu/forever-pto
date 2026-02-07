@@ -4,10 +4,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@cons
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { CheckCircle2, XCircle } from 'lucide-react';
+import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import type Stripe from 'stripe';
+
+export const metadata: Metadata = {
+  title: 'Payment Confirmation | Forever PTO',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 const stripe = getStripeServerInstance();
 const logger = getBetterStackInstance();

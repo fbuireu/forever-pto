@@ -4,6 +4,7 @@ import { Faq } from '@ui/modules/components/home/Faq';
 import { HolidaysList } from '@ui/modules/components/home/HolidaysList';
 import { Legend } from '@ui/modules/components/home/Legend';
 import { ManagementBar } from '@ui/modules/components/home/ManagementBar';
+import { JsonLd } from '@ui/modules/components/seo/JsonLd';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import dynamic from 'next/dynamic';
@@ -27,25 +28,29 @@ const Home = async ({ params }: LayoutProps) => {
   setRequestLocale(locale);
 
   return (
-    <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4 mb-8'>
-      <HolidaysList />
-      <ManagementBar />
-      <CalendarList />
-      <Legend />
-      <Summary />
-      <Roadmap />
-      <Contact />
-      <Faq />
-    </section>
+    <>
+      <JsonLd locale={locale} />
+      <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4 mb-8'>
+        <HolidaysList />
+        <ManagementBar />
+        <CalendarList />
+        <Legend />
+        <Summary />
+        <Roadmap />
+        <Contact />
+        <Faq />
+      </section>
+    </>
   );
 };
 
 export default Home;
 
-// todo: legal pages info (email, etc)
 // todo: check white mode (no hovers?) + input styles in Donate
+// todo: legal pages info (email, etc)
+// todo: share button with results?
 // todo: unify modal styles (footer actions, spacing, etc)
-// todo: a11y audit, seo audit, performance audit, react best practices audit
+// todo: a11y audit, seo audit (done), performance audit, react best practices audit
 // todo: ads?
 // todo: replace useDetectSticky with css @container scroll-state() (at 8th Jan 2026 not LighntingCSS has the code merged, not released and not adopted by Next)
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
