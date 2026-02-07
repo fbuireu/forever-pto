@@ -67,6 +67,14 @@ export const isCustom = (holidays: HolidayDTO[]) => (date: Date) => {
   return holidays.some((holiday) => isSameDay(holiday.date, date) && holiday.variant === HolidayVariant.CUSTOM);
 };
 
+export const isBankHoliday = (holidays: HolidayDTO[]) => (date: Date) => {
+  return holidays.some(
+    (holiday) =>
+      isSameDay(holiday.date, date) &&
+      (holiday.variant === HolidayVariant.NATIONAL || holiday.variant === HolidayVariant.REGIONAL)
+  );
+};
+
 export const isSelected = (selectedDates: Date[]) => (date: Date) => selectedDates.some((d) => isSameDay(d, date));
 
 export const isInRange =

@@ -355,6 +355,8 @@
     "enablePastDays": "Enable \"Allow past days\" in settings to select past dates",
     "noPtoDaysRemaining": "No remaining PTO days to assign",
     "removeDaysToFree": "Remove existing days to free up space",
+    "cannotSelectBankHoliday": "Cannot select a bank holiday",
+    "bankHolidayDescription": "This day is already a national or regional holiday",
     "paymentFailed": "Payment initialization failed",
     "paymentFailedDescription": "Please try again later",
     "paymentSuccess": "Payment successful!",

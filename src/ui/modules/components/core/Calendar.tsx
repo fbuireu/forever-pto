@@ -19,6 +19,7 @@ import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
 import {
   getPreviewRange,
   isAlternative,
+  isBankHoliday as isBankHolidayFn,
   isCustom as isCustomFn,
   isHoliday,
   isInRange,
@@ -143,6 +144,7 @@ export function Calendar({
   const modifiers = useMemo(() => {
     const holidayFn = isHoliday(holidays);
     const customFn = isCustomFn(holidays);
+    const bankHolidayFn = isBankHolidayFn(holidays);
     const isPastFn = isPast(allowPastDays);
     const isSuggestionFn = isSuggestion(currentSelection, removedSuggestedDays);
     const isAlternativeFn = isAlternative({ alternatives, suggestion, previewAlternativeIndex, currentSelection });
@@ -154,6 +156,7 @@ export function Calendar({
       weekend: isWeekend,
       holiday: holidayFn,
       custom: customFn,
+      bankHoliday: bankHolidayFn,
       today: isToday,
       suggested: isSuggestionFn,
       alternative: isAlternativeFn,
@@ -225,6 +228,7 @@ export function Calendar({
         const isPastDay = !allowPastDays && modifiers.disabled(date);
         const isManual = modifiers.manuallySelected(date);
         const isSuggested = modifiers.suggested(date);
+        const isBankHoliday = modifiers.bankHoliday(date);
         if (!premiumKey) {
           toast.info(tPremium('premiumFeature'), {
             description: tPremium('unlockDescription'),
@@ -253,6 +257,13 @@ export function Calendar({
         if (isPastDay && !isManual && !isSuggested) {
           toast.warning(t('cannotSelectPastDays'), {
             description: t('enablePastDays'),
+          });
+          return;
+        }
+
+        if (isBankHoliday) {
+          toast.warning(t('cannotSelectBankHoliday'), {
+            description: t('bankHolidayDescription'),
           });
           return;
         }

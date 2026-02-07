@@ -353,6 +353,8 @@
     "enablePastDays": "Habilita \"Permetre dies passats\" a la configuració per seleccionar dates passades",
     "noPtoDaysRemaining": "No queden dies de PTO per assignar",
     "removeDaysToFree": "Elimina dies existents per alliberar espai",
+    "cannotSelectBankHoliday": "No es pot seleccionar un dia festiu",
+    "bankHolidayDescription": "Aquest dia ja és un festiu nacional o regional",
     "paymentFailed": "Error en inicialitzar el pagament",
     "paymentFailedDescription": "Si us plau, torna-ho a provar més tard",
     "paymentSuccess": "Pagament exitós!",

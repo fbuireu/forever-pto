@@ -353,6 +353,8 @@
     "enablePastDays": "Habilita \"Permitir días pasados\" en ajustes para seleccionar fechas pasadas",
     "noPtoDaysRemaining": "No quedan días de PTO para asignar",
     "removeDaysToFree": "Elimina días existentes para liberar espacio",
+    "cannotSelectBankHoliday": "No se puede seleccionar un día festivo",
+    "bankHolidayDescription": "Este día ya es un festivo nacional o regional",
     "paymentFailed": "Error al inicializar el pago",
     "paymentFailedDescription": "Por favor, inténtalo de nuevo más tarde",
     "paymentSuccess": "¡Pago exitoso!",

@@ -353,6 +353,8 @@
     "enablePastDays": "Abilita \"Consenti giorni passati\" nelle impostazioni per selezionare date passate",
     "noPtoDaysRemaining": "Nessun giorno di PTO rimanente da assegnare",
     "removeDaysToFree": "Rimuovi giorni esistenti per liberare spazio",
+    "cannotSelectBankHoliday": "Non è possibile selezionare un giorno festivo",
+    "bankHolidayDescription": "Questo giorno è già una festività nazionale o regionale",
     "paymentFailed": "Inizializzazione del pagamento fallita",
     "paymentFailedDescription": "Per favore riprova più tardi",
     "paymentSuccess": "Pagamento riuscito!",
