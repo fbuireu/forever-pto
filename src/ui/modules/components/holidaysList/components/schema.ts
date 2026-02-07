@@ -1,8 +1,15 @@
 import z from 'zod';
 
-export const holidaySchema = z.object({
-  name: z.string().min(1, { message: 'Holiday name is required' }).max(100, { message: 'Holiday name is too long' }),
-  date: z.date({ message: 'Please select a valid date' }),
-});
+export interface HolidaySchemaMessages {
+  nameRequired: string;
+  nameMax: string;
+  invalidDate: string;
+}
 
-export type HolidayFormData = z.infer<typeof holidaySchema>;
+export const createHolidaySchema = (messages: HolidaySchemaMessages) =>
+  z.object({
+    name: z.string().min(1, { message: messages.nameRequired }).max(100, { message: messages.nameMax }),
+    date: z.date({ message: messages.invalidDate }),
+  });
+
+export type HolidayFormData = z.infer<ReturnType<typeof createHolidaySchema>>;

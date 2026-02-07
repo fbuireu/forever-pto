@@ -1,6 +1,6 @@
 'use client';
 
-import { type ContactFormData, contactSchema } from '@application/dto/contact/schema';
+import { type ContactFormData, createContactSchema } from '@application/dto/contact/schema';
 import { usePremiumStore } from '@application/stores/premium';
 import { Button } from '@const/components/ui/button';
 import {
@@ -39,6 +39,7 @@ type Step = (typeof Step)[keyof typeof Step];
 export const ContactModal = ({ open, onClose }: ContactModalProps) => {
   const t = useTranslations('contact');
   const tErrors = useTranslations('errors.contact');
+  const tValidation = useTranslations('validation.contact');
   const [step, setStep] = useState<Step>(Step.INPUT);
   const [isPending, startTransition] = useTransition();
   const { setEmail, userEmail } = usePremiumStore(
@@ -48,6 +49,17 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
     }))
   );
   const [errorMessage, setErrorMessage] = useState<string>('');
+
+  const contactSchema = createContactSchema({
+    invalidEmail: tValidation('invalidEmail'),
+    emailRequired: tValidation('emailRequired'),
+    nameMin: tValidation('nameMin'),
+    nameMax: tValidation('nameMax'),
+    subjectMin: tValidation('subjectMin'),
+    subjectMax: tValidation('subjectMax'),
+    messageMin: tValidation('messageMin'),
+    messageMax: tValidation('messageMax'),
+  });
 
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),

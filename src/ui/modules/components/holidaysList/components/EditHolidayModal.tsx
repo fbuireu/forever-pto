@@ -22,7 +22,7 @@ import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Calendar, CalendarSelectionMode, type FromTo } from '../../core/Calendar';
 import { formatDate } from '../../utils/formatters';
-import { type HolidayFormData, holidaySchema } from './schema';
+import { type HolidayFormData, createHolidaySchema } from './schema';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 interface EditHolidayModalProps {
@@ -35,9 +35,16 @@ interface EditHolidayModalProps {
 export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHolidayModalProps) => {
   const t = useTranslations('modals.editHoliday');
   const tAdd = useTranslations('modals.addHoliday');
+  const tValidation = useTranslations('validation.holiday');
   const { holidays, editHoliday, currentSelection, alternatives, suggestion } = useHolidaysStore();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(holiday.date);
   const [isPending, startTransition] = useTransition();
+
+  const holidaySchema = createHolidaySchema({
+    nameRequired: tValidation('nameRequired'),
+    nameMax: tValidation('nameMax'),
+    invalidDate: tValidation('invalidDate'),
+  });
 
   const form = useForm<HolidayFormData>({
     resolver: zodResolver(holidaySchema),

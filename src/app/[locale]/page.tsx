@@ -10,6 +10,7 @@ import dynamic from 'next/dynamic';
 
 const Summary = dynamic(() => import('@ui/modules/components/home/Summary').then((mod) => mod.Summary));
 const Roadmap = dynamic(() => import('@ui/modules/components/home/Roadmap').then((mod) => mod.Roadmap));
+const Contact = dynamic(() => import('@ui/modules/components/home/Contact').then((mod) => mod.Contact));
 
 export { generateMetadata } from './metadata';
 
@@ -33,6 +34,7 @@ const Home = async ({ params }: LayoutProps) => {
       <Legend />
       <Summary />
       <Roadmap />
+      <Contact />
       <Faq />
     </section>
   );
@@ -40,11 +42,9 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: handle schema localization (modals, donate, etc)
-// todo: template issues + link them through contact modal + roadmap
+// todo: don't allow to add custom holiday in bank holidays
 // todo: legal pages info (email, etc)
 // todo: check white mode (no hovers?) + input styles in Donate
-// todo: don't allow to add custom holiday in bank holidays
 // todo: unify modal styles (footer actions, spacing, etc)
 // todo: a11y audit, seo audit, performance audit, react best practices audit
 // todo: ads?

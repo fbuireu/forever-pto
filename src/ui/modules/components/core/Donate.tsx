@@ -1,6 +1,6 @@
 'use client';
 
-import { type CreatePaymentInput, createPaymentSchema } from '@application/dto/payment/schema';
+import { type CreatePaymentInput, createPaymentSchemaWithMessages } from '@application/dto/payment/schema';
 import { type DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,6 +37,7 @@ export const Donate = () => {
   const locale = useLocale();
   const t = useTranslations('toasts');
   const tDonate = useTranslations('donate');
+  const tValidation = useTranslations('validation.payment');
   const { resolvedTheme } = useTheme();
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -71,8 +72,15 @@ export const Donate = () => {
     getCurrencyFromLocale(locale);
   }, [locale, getCurrencyFromLocale]);
 
+  const paymentSchema = createPaymentSchemaWithMessages({
+    amountMin: tValidation('amountMin'),
+    amountMax: tValidation('amountMax'),
+    invalidEmail: tValidation('invalidEmail'),
+    emailRequired: tValidation('emailRequired'),
+  });
+
   const form = useForm<CreatePaymentInput>({
-    resolver: zodResolver(createPaymentSchema),
+    resolver: zodResolver(paymentSchema),
     values: {
       amount: 5,
       promoCode: '',

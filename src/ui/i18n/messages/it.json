@@ -545,6 +545,29 @@
     "invalidEmail": "Per favore inserisci un'email valida",
     "emailRequired": "L'email è obbligatoria"
   },
+  "validation": {
+    "contact": {
+      "invalidEmail": "Per favore inserisci un'email valida",
+      "emailRequired": "L'email è obbligatoria",
+      "nameMin": "Il nome deve avere almeno 2 caratteri",
+      "nameMax": "Il nome è troppo lungo",
+      "subjectMin": "L'oggetto deve avere almeno 5 caratteri",
+      "subjectMax": "L'oggetto è troppo lungo",
+      "messageMin": "Il messaggio deve avere almeno 10 caratteri",
+      "messageMax": "Il messaggio è troppo lungo"
+    },
+    "payment": {
+      "amountMin": "L'importo minimo è 1",
+      "amountMax": "L'importo massimo è 10.000",
+      "invalidEmail": "È richiesta un'email valida",
+      "emailRequired": "L'email è obbligatoria"
+    },
+    "holiday": {
+      "nameRequired": "Il nome del festivo è obbligatorio",
+      "nameMax": "Il nome del festivo è troppo lungo",
+      "invalidDate": "Per favore seleziona una data valida"
+    }
+  },
   "roadmap": {
     "title": "Roadmap",
     "subtitle": "Esplora cosa abbiamo costruito e cosa arriverà",

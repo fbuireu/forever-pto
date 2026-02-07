@@ -547,6 +547,29 @@
     "invalidEmail": "Please enter a valid email address",
     "emailRequired": "Email is required"
   },
+  "validation": {
+    "contact": {
+      "invalidEmail": "Please enter a valid email address",
+      "emailRequired": "Email is required",
+      "nameMin": "Name must be at least 2 characters",
+      "nameMax": "Name is too long",
+      "subjectMin": "Subject must be at least 5 characters",
+      "subjectMax": "Subject is too long",
+      "messageMin": "Message must be at least 10 characters",
+      "messageMax": "Message is too long"
+    },
+    "payment": {
+      "amountMin": "Minimum amount is 1",
+      "amountMax": "Maximum amount is 10,000",
+      "invalidEmail": "Valid email is required",
+      "emailRequired": "Email is required"
+    },
+    "holiday": {
+      "nameRequired": "Holiday name is required",
+      "nameMax": "Holiday name is too long",
+      "invalidDate": "Please select a valid date"
+    }
+  },
   "roadmap": {
     "title": "Roadmap",
     "subtitle": "Explore what we've built and what's coming next",

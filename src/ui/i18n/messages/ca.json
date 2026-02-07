@@ -545,6 +545,29 @@
     "invalidEmail": "Si us plau introdueix un email vàlid",
     "emailRequired": "L'email és obligatori"
   },
+  "validation": {
+    "contact": {
+      "invalidEmail": "Si us plau introdueix un email vàlid",
+      "emailRequired": "L'email és obligatori",
+      "nameMin": "El nom ha de tenir almenys 2 caràcters",
+      "nameMax": "El nom és massa llarg",
+      "subjectMin": "L'assumpte ha de tenir almenys 5 caràcters",
+      "subjectMax": "L'assumpte és massa llarg",
+      "messageMin": "El missatge ha de tenir almenys 10 caràcters",
+      "messageMax": "El missatge és massa llarg"
+    },
+    "payment": {
+      "amountMin": "La quantitat mínima és 1",
+      "amountMax": "La quantitat màxima és 10.000",
+      "invalidEmail": "Es requereix un email vàlid",
+      "emailRequired": "L'email és obligatori"
+    },
+    "holiday": {
+      "nameRequired": "El nom del festiu és obligatori",
+      "nameMax": "El nom del festiu és massa llarg",
+      "invalidDate": "Si us plau selecciona una data vàlida"
+    }
+  },
   "roadmap": {
     "title": "Full de Ruta",
     "subtitle": "Explora el que hem construït i el que ve",

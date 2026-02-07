@@ -22,7 +22,7 @@ import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Plus } from 'src/components/animate-ui/icons/plus';
 import { Calendar, CalendarSelectionMode, type FromTo } from '../../core/Calendar';
 import { formatDate } from '../../utils/formatters';
-import { type HolidayFormData, holidaySchema } from './schema';
+import { type HolidayFormData, createHolidaySchema } from './schema';
 import { useFiltersStore } from '@application/stores/filters';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
@@ -34,10 +34,17 @@ interface AddHolidayModalProps {
 
 export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps) => {
   const t = useTranslations('modals.addHoliday');
+  const tValidation = useTranslations('validation.holiday');
   const { holidays, addHoliday, currentSelection, alternatives, suggestion } = useHolidaysStore();
   const { carryOverMonths, year } = useFiltersStore();
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [isPending, startTransition] = useTransition();
+
+  const holidaySchema = createHolidaySchema({
+    nameRequired: tValidation('nameRequired'),
+    nameMax: tValidation('nameMax'),
+    invalidDate: tValidation('invalidDate'),
+  });
 
   const form = useForm<HolidayFormData>({
     resolver: zodResolver(holidaySchema),
