@@ -56,7 +56,8 @@
       "maxWorkStreak": "Serie lavorativa massima",
       "lastBreak": "Ultima pausa",
       "totalBonusDays": "Giorni bonus totali",
-      "daysGained": "giorni guadagnati ottimizzando"
+      "daysGained": "giorni guadagnati ottimizzando",
+      "daysCount": "{count, plural, one {giorno} other {giorni}}"
     },
     "notifications": {
       "canImprove": {
@@ -150,6 +151,7 @@
   "workdayCounter": {
     "title": "Contatore giorni lavorativi",
     "tooltip": "Conta i giorni lavorativi tra due date, escludendo automaticamente fine settimana e festivi. Utile per la pianificazione di progetti e il calcolo delle scadenze.",
+    "tooltipLabel": "Maggiori informazioni sul contatore",
     "selectRange": "Seleziona intervallo di date",
     "clearSelection": "Cancella selezione",
     "workingDays": "Giorni lavorativi",
@@ -380,6 +382,7 @@
     "country": {
       "title": "Paese",
       "tooltip": "Questo dato è ricavato dal tuo CDN e dalla tua connessione. Se ritieni che non sia accurato o vuoi vedere i festivi di altri paesi, puoi selezionarlo manualmente qui",
+      "tooltipLabel": "Maggiori informazioni sulla selezione del paese",
       "loading": "Caricamento paesi...",
       "placeholder": "Seleziona paese...",
       "search": "Cerca paesi..."
@@ -441,12 +444,14 @@
     "allowPastDays": {
       "title": "Consenti Giorni Passati",
       "tooltip": "Questo interruttore permette di abilitare o disabilitare il suggerimento di giorni festivi passati per l'anno selezionato. Questo ti permette di vedere opportunità di PTO perse in passato",
+      "tooltipLabel": "Maggiori informazioni sui giorni passati",
       "enabled": "Abilitato",
       "disabled": "Disabilitato"
     },
     "carryOverMonths": {
       "title": "Mesi di Riporto",
-      "tooltip": "Permette di aggiungere mesi all'anno successivo per espandere la ricerca di opportunità"
+      "tooltip": "Permette di aggiungere mesi all'anno successivo per espandere la ricerca di opportunità",
+      "tooltipLabel": "Maggiori informazioni sul riporto"
     },
     "years": {
       "title": "Anno"
@@ -467,6 +472,7 @@
   "ptoCalculator": {
     "title": "Accumulatore di PTO",
     "tooltip": "Calcola i tuoi giorni di PTO accumulati in base all'accumulo mensile. La maggior parte delle aziende offre 2-3 giorni al mese. Seleziona il mese obiettivo per vedere i tuoi giorni totali disponibili.",
+    "tooltipLabel": "Maggiori informazioni sul calcolatore PTO",
     "daysPerMonth": "Giorni per mese",
     "calculateThrough": "Calcola fino a",
     "selectMonth": "Seleziona mese",
@@ -482,6 +488,7 @@
   "ptoSalaryCalculator": {
     "title": "Calcolatore PTO vs Stipendio",
     "tooltip": "Calcola quanto tempo libero retribuito stai perdendo non usando i tuoi giorni di PTO. Continui a ricevere lo stipendio completo, ma stai lavorando giorni che avresti potuto prendere come ferie pagate.",
+    "tooltipLabel": "Maggiori informazioni sul calcolatore",
     "annualSalary": "Stipendio Annuale",
     "annualSalaryPlaceholder": "50000",
     "unusedPtoDays": "Giorni PTO Non Usati",
@@ -699,7 +706,12 @@
     "cookiePolicy": "Politica sui Cookie",
     "legalNotice": "Note Legali",
     "manageCookies": "Gestisci cookie",
-    "contactUs": "Contattaci"
+    "contactUs": "Contattaci",
+    "legalNavigation": "Link legali e policy"
+  },
+  "accessibility": {
+    "selectLanguage": "Seleziona lingua, attuale: {current}",
+    "skipToContent": "Salta al contenuto principale"
   },
   "formButtons": {
     "submit": "Invia",

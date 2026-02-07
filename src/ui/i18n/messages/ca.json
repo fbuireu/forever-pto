@@ -56,7 +56,8 @@
       "maxWorkStreak": "Ratxa laboral màxima",
       "lastBreak": "Última pausa",
       "totalBonusDays": "Dies bonus totals",
-      "daysGained": "dies guanyats optimitzant"
+      "daysGained": "dies guanyats optimitzant",
+      "daysCount": "{count, plural, one {dia} other {dies}}"
     },
     "notifications": {
       "canImprove": {
@@ -150,6 +151,7 @@
   "workdayCounter": {
     "title": "Comptador de dies laborables",
     "tooltip": "Compta dies laborables entre dues dates, excloent automàticament caps de setmana i festius. Útil per planificació de projectes i càlcul de terminis.",
+    "tooltipLabel": "Més informació sobre el comptador",
     "selectRange": "Seleccionar rang de dates",
     "clearSelection": "Netejar selecció",
     "workingDays": "Dies laborables",
@@ -380,6 +382,7 @@
     "country": {
       "title": "País",
       "tooltip": "Aquesta dada s'infereix del teu CDN i la teva connexió. Si creus que no és precís o vols veure els festius d'altres països, pots seleccionar-lo manualment aquí",
+      "tooltipLabel": "Més informació sobre selecció de país",
       "loading": "Carregant països...",
       "placeholder": "Seleccionar país...",
       "search": "Cercar països..."
@@ -441,12 +444,14 @@
     "allowPastDays": {
       "title": "Permetre Dies Passats",
       "tooltip": "Aquest interruptor permet habilitar o deshabilitar el suggeriment de dies festius passats per l'any seleccionat. Això et permet veure oportunitats de PTO que es van perdre en el passat",
+      "tooltipLabel": "Més informació sobre dies passats",
       "enabled": "Habilitat",
       "disabled": "Deshabilitat"
     },
     "carryOverMonths": {
       "title": "Mesos d'Arrossegament",
-      "tooltip": "Permet afegir mesos a l'any següent per expandir la cerca d'oportunitats"
+      "tooltip": "Permet afegir mesos a l'any següent per expandir la cerca d'oportunitats",
+      "tooltipLabel": "Més informació sobre arrossegament"
     },
     "years": {
       "title": "Any"
@@ -467,6 +472,7 @@
   "ptoCalculator": {
     "title": "Acumulador de PTO",
     "tooltip": "Calcula els teus dies de PTO acumulats segons l'acumulat mensual. La majoria d'empreses ofereixen 2-3 dies per mes. Selecciona el mes objectiu per veure els teus dies totals disponibles.",
+    "tooltipLabel": "Més informació sobre la calculadora de PTO",
     "daysPerMonth": "Dies per mes",
     "calculateThrough": "Calcular fins",
     "selectMonth": "Seleccionar mes",
@@ -482,6 +488,7 @@
   "ptoSalaryCalculator": {
     "title": "Calculadora PTO vs Salari",
     "tooltip": "Calcula quant temps lliure pagat estàs perdent en no usar els teus dies de PTO. Continues rebent el teu salari complet, però estàs treballant dies que podries haver agafat com a vacances pagades.",
+    "tooltipLabel": "Més informació sobre la calculadora",
     "annualSalary": "Salari Anual",
     "annualSalaryPlaceholder": "50000",
     "unusedPtoDays": "Dies PTO No Usats",
@@ -699,7 +706,12 @@
     "cookiePolicy": "Política de Cookies",
     "legalNotice": "Avís Legal",
     "manageCookies": "Gestionar cookies",
-    "contactUs": "Contacta'ns"
+    "contactUs": "Contacta'ns",
+    "legalNavigation": "Enllaços legals i de política"
+  },
+  "accessibility": {
+    "selectLanguage": "Seleccionar idioma, actual: {current}",
+    "skipToContent": "Saltar al contingut principal"
   },
   "formButtons": {
     "submit": "Enviar",

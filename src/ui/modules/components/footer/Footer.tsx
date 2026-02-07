@@ -9,9 +9,9 @@ export const Footer = async () => {
 
   return (
     <footer className='mt-8 w-full border-t m-auto flex justify-center z-1 bg-background'>
-      <section className='max-w-4xl w-full'>
+      <div className='max-w-4xl w-full'>
         <DevFooter />
-        <div className='flex flex-col sm:flex-row justify-center items-center gap-4 py-6 px-4 max-w-4xl mx-auto'>
+        <nav aria-label={t('legalNavigation')} className='flex flex-col sm:flex-row justify-center items-center gap-4 py-6 px-4 max-w-4xl mx-auto'>
           <Link href='/legal/privacy-policy' className='text-sm text-muted-foreground hover:underline'>
             {t('privacyPolicy')}
           </Link>
@@ -26,8 +26,8 @@ export const Footer = async () => {
           </Link>
           <CookieButton />
           <ContactButton />
-        </div>
-      </section>
+        </nav>
+      </div>
     </footer>
   );
 };

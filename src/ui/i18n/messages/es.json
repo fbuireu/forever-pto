@@ -56,7 +56,8 @@
       "maxWorkStreak": "Racha laboral máxima",
       "lastBreak": "Última pausa",
       "totalBonusDays": "Días bonus totales",
-      "daysGained": "días ganados optimizando"
+      "daysGained": "días ganados optimizando",
+      "daysCount": "{count, plural, one {día} other {días}}"
     },
     "notifications": {
       "canImprove": {
@@ -150,6 +151,7 @@
   "workdayCounter": {
     "title": "Contador de días laborables",
     "tooltip": "Cuenta días laborables entre dos fechas, excluyendo automáticamente fines de semana y festivos. Útil para planificación de proyectos y cálculo de plazos.",
+    "tooltipLabel": "Más información sobre el contador",
     "selectRange": "Seleccionar rango de fechas",
     "clearSelection": "Limpiar selección",
     "workingDays": "Días laborables",
@@ -380,6 +382,7 @@
     "country": {
       "title": "País",
       "tooltip": "Este dato se infiere de tu CDN y tu conexión. Si crees que no es preciso o quieres ver los festivos de otros países, puedes seleccionarlo manualmente aquí",
+      "tooltipLabel": "Más información sobre selección de país",
       "loading": "Cargando países...",
       "placeholder": "Seleccionar país...",
       "search": "Buscar países..."
@@ -441,12 +444,14 @@
     "allowPastDays": {
       "title": "Permitir Días Pasados",
       "tooltip": "Este interruptor permite habilitar o deshabilitar la sugerencia de días festivos pasados para el año seleccionado. Esto te permite ver oportunidades de PTO que se perdieron en el pasado",
+      "tooltipLabel": "Más información sobre días pasados",
       "enabled": "Habilitado",
       "disabled": "Deshabilitado"
     },
     "carryOverMonths": {
       "title": "Meses de Arrastre",
-      "tooltip": "Permite añadir meses al año siguiente para expandir la búsqueda de oportunidades"
+      "tooltip": "Permite añadir meses al año siguiente para expandir la búsqueda de oportunidades",
+      "tooltipLabel": "Más información sobre arrastre"
     },
     "years": {
       "title": "Año"
@@ -467,6 +472,7 @@
   "ptoCalculator": {
     "title": "Acumulador de PTO",
     "tooltip": "Calcula tus días de PTO acumulados según el acumulado mensual. La mayoría de empresas ofrecen 2-3 días por mes. Selecciona el mes objetivo para ver tus días totales disponibles.",
+    "tooltipLabel": "Más información sobre la calculadora de PTO",
     "daysPerMonth": "Días por mes",
     "calculateThrough": "Calcular hasta",
     "selectMonth": "Seleccionar mes",
@@ -482,6 +488,7 @@
   "ptoSalaryCalculator": {
     "title": "Calculadora PTO vs Salario",
     "tooltip": "Calcula cuánto tiempo libre pagado estás perdiendo al no usar tus días de PTO. Sigues recibiendo tu salario completo, pero estás trabajando días que podrías haber tomado como vacaciones pagadas.",
+    "tooltipLabel": "Más información sobre la calculadora",
     "annualSalary": "Salario Anual",
     "annualSalaryPlaceholder": "50000",
     "unusedPtoDays": "Días de PTO no utilizados",
@@ -699,7 +706,12 @@
     "cookiePolicy": "Política de Cookies",
     "legalNotice": "Aviso Legal",
     "manageCookies": "Gestionar cookies",
-    "contactUs": "Contáctanos"
+    "contactUs": "Contáctanos",
+    "legalNavigation": "Enlaces legales y de política"
+  },
+  "accessibility": {
+    "selectLanguage": "Seleccionar idioma, actual: {current}",
+    "skipToContent": "Saltar al contenido principal"
   },
   "formButtons": {
     "submit": "Enviar",

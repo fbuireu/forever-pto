@@ -59,8 +59,8 @@ export const CarryOverMonths = () => {
           <SlidersHorizontal size={16} /> {t('title')}
           <TooltipProvider delayDuration={200}>
             <Tooltip>
-              <TooltipTrigger asChild className='ml-auto'>
-                <InfoIcon className='h-4 w-4 text-muted-foreground cursor-help' />
+              <TooltipTrigger aria-label={t('tooltipLabel')} className='ml-auto cursor-help'>
+                <InfoIcon className='h-4 w-4 text-muted-foreground' aria-hidden='true' />
               </TooltipTrigger>
               <TooltipContent className='w-50 text-pretty'>{t('tooltip')}</TooltipContent>
             </Tooltip>

@@ -50,7 +50,7 @@ export default Home;
 // todo: legal pages info (email, etc)
 // todo: share button with results?
 // todo: unify modal styles (footer actions, spacing, etc)
-// todo: a11y audit, seo audit (done), performance audit, react best practices audit
+// todo: a11y audit (done), seo audit (done), performance audit, react best practices audit
 // todo: ads?
 // todo: replace useDetectSticky with css @container scroll-state() (at 8th Jan 2026 not LighntingCSS has the code merged, not released and not adopted by Next)
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
@@ -62,7 +62,7 @@ export default Home;
 // todo: add custom weekends
 // todo: slider calendar on mobile
 // todo: transformer to make sql data ready ':id': data.id',
-// todo: fix tab movement (focus)on contact modal
+// todo: fix tab movement (focus) on contact modal
 // todo: improve error handling in server actions (send whole error type and change icon when "save to db error")
 // todo: APPLY DDD (CHECK BRANCH) + check everything (SSR, CSR, etc)
 

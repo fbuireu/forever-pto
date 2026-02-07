@@ -148,8 +148,10 @@ export const Summary = () => {
           <CardDescription className='text-muted-foreground space-y-2'>
             <div className='text-sm'>
               <span className='font-semibold text-primary'>{ptoDays}</span> {t('metrics.vacationDays').toLowerCase()} +{' '}
-              <span className='font-semibold text-green-700'>{holidayMetrics.totalHolidays}</span> {t('metrics.holidays').toLowerCase()} ={' '}
-              <span className='font-semibold text-green-700 dark:text-green-300'>{effectiveDays}</span> {t('metrics.effectiveDays').toLowerCase()}
+              <span className='font-semibold text-green-700'>{holidayMetrics.totalHolidays}</span>{' '}
+              {t('metrics.holidays').toLowerCase()} ={' '}
+              <span className='font-semibold text-green-700 dark:text-green-300'>{effectiveDays}</span>{' '}
+              {t('metrics.effectiveDays').toLowerCase()}
               {increment > 0 && (
                 <span className='font-semibold text-purple-700 dark:text-purple-300 ml-1'>
                   {t('performance', { percentage: efficiencyPercentage.toFixed(0) })}
@@ -247,7 +249,7 @@ export const Summary = () => {
             <MetricCard
               label={t('metrics.longestVacation')}
               value={metrics.longestVacation}
-              symbol='d'
+              symbol={` ${t('yearSummary.daysCount', { count: metrics.longestVacation })}`}
               icon={Palmtree}
               colorScheme='rose'
               size={MetricCardSize.COMPACT}
@@ -264,7 +266,9 @@ export const Summary = () => {
                 <div className='p-4 bg-indigo-100 dark:bg-indigo-900/20 rounded-lg'>
                   <div className='flex items-center gap-2 mb-3'>
                     <Clock className='w-4 h-4 text-indigo-500' />
-                    <span className='text-sm font-medium text-indigo-700 dark:text-indigo-300'>{t('yearSummary.title')}</span>
+                    <span className='text-sm font-medium text-indigo-700 dark:text-indigo-300'>
+                      {t('yearSummary.title')}
+                    </span>
                   </div>
                   <div className='grid grid-cols-3 gap-4 text-center'>
                     <div>
@@ -276,7 +280,8 @@ export const Summary = () => {
                     <div>
                       <div className='text-sm text-muted-foreground'>{t('yearSummary.maxWorkStreak')}</div>
                       <div className='text-lg font-bold text-indigo-700 flex justify-center dark:text-indigo-300'>
-                        <SlidingNumber number={metrics.maxWorkingPeriod} />d
+                        <SlidingNumber number={metrics.maxWorkingPeriod} />{' '}
+                        {t('yearSummary.daysCount', { count: metrics.maxWorkingPeriod })}
                       </div>
                     </div>
                     <div>
@@ -306,27 +311,42 @@ export const Summary = () => {
                   {t('notifications.canImprove.moreDays')}
                 </strong>{' '}
                 {t('notifications.canImprove.toYourPlan')}
-                {premiumKey ? ` ${t('notifications.canImprove.reviewOptions')}` : ` ${t('notifications.canImprove.considerPremium')}`}
+                {premiumKey
+                  ? ` ${t('notifications.canImprove.reviewOptions')}`
+                  : ` ${t('notifications.canImprove.considerPremium')}`}
               </>
             </NotificationCard>
           )}
           {(manuallySelectedDays.length > 0 || removedSuggestedDays.length > 0) && (
-            <NotificationCard icon={CalendarDays} title={t('notifications.manualAdjustments.title')} colorScheme='indigo' className='mt-2'>
+            <NotificationCard
+              icon={CalendarDays}
+              title={t('notifications.manualAdjustments.title')}
+              colorScheme='indigo'
+              className='mt-2'
+            >
               <>
                 {manuallySelectedDays.length > 0 && (
                   <>
                     {t('notifications.manualAdjustments.added')}{' '}
                     <strong className='flex gap-1 mx-1'>
-                      <SlidingNumber number={manuallySelectedDays.length} /> {manuallySelectedDays.length !== 1 ? t('notifications.manualAdjustments.days') : t('notifications.manualAdjustments.day')}
+                      <SlidingNumber number={manuallySelectedDays.length} />{' '}
+                      {manuallySelectedDays.length !== 1
+                        ? t('notifications.manualAdjustments.days')
+                        : t('notifications.manualAdjustments.day')}
                     </strong>
                   </>
                 )}
-                {manuallySelectedDays.length > 0 && removedSuggestedDays.length > 0 && ` ${t('notifications.manualAdjustments.and')} `}
+                {manuallySelectedDays.length > 0 &&
+                  removedSuggestedDays.length > 0 &&
+                  ` ${t('notifications.manualAdjustments.and')} `}
                 {removedSuggestedDays.length > 0 && (
                   <>
                     {t('notifications.manualAdjustments.removed')}{' '}
                     <strong className='flex gap-1 mx-1'>
-                      <SlidingNumber number={removedSuggestedDays.length} /> {removedSuggestedDays.length !== 1 ? t('notifications.manualAdjustments.days') : t('notifications.manualAdjustments.day')}
+                      <SlidingNumber number={removedSuggestedDays.length} />{' '}
+                      {removedSuggestedDays.length !== 1
+                        ? t('notifications.manualAdjustments.days')
+                        : t('notifications.manualAdjustments.day')}
                     </strong>
                   </>
                 )}
@@ -339,7 +359,10 @@ export const Summary = () => {
               <>
                 {t('notifications.customHolidays.youHave')}{' '}
                 <strong className='flex gap-1 mx-1'>
-                  <SlidingNumber number={holidayMetrics.customDays} /> {holidayMetrics.customDays !== 1 ? t('notifications.customHolidays.holidays') : t('notifications.customHolidays.holiday')}
+                  <SlidingNumber number={holidayMetrics.customDays} />{' '}
+                  {holidayMetrics.customDays !== 1
+                    ? t('notifications.customHolidays.holidays')
+                    : t('notifications.customHolidays.holiday')}
                 </strong>{' '}
                 {t('notifications.customHolidays.improvesPlan')}
               </>

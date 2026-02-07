@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@const/components/ui/button';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as CookieConsentLib from 'vanilla-cookieconsent';
@@ -90,31 +91,32 @@ export const CookieConsent = () => {
 
   if (showBanner) {
     return (
-      <div className='fixed bottom-4 left-4 z-50 max-w-md rounded-lg border bg-popover p-6 shadow-lg'>
-        <h3 className='text-lg font-semibold'>{t('title')}</h3>
-        <p className='mt-2 text-sm text-muted-foreground'>{t('description')}</p>
+      <div
+        role='dialog'
+        aria-labelledby='cookie-banner-title'
+        aria-describedby='cookie-banner-description'
+        className='fixed bottom-4 left-4 z-50 max-w-md rounded-lg border bg-popover p-6 shadow-lg'
+      >
+        <h3 id='cookie-banner-title' className='text-lg font-semibold'>
+          {t('title')}
+        </h3>
+        <p id='cookie-banner-description' className='mt-2 text-sm text-muted-foreground'>
+          {t('description')}
+        </p>
         <div className='mt-4 flex flex-wrap gap-2'>
-          <button
-            onClick={handleRejectAll}
-            className='rounded-md border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:opacity-90'
-          >
+          <Button variant='ghost' onClick={handleRejectAll}>
             {t('rejectAll')}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant='ghost'
             onClick={() => {
               setShowBanner(false);
               setShowPreferences(true);
             }}
-            className='rounded-md border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:opacity-90'
           >
             {t('managePreferences')}
-          </button>
-          <button
-            onClick={handleAcceptAll}
-            className='rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90'
-          >
-            {t('acceptAll')}
-          </button>
+          </Button>
+          <Button onClick={handleAcceptAll}>{t('acceptAll')}</Button>
         </div>
       </div>
     );

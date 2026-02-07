@@ -11,7 +11,7 @@ export const SiteSubtitle = () => {
   return (
     <p className='text-center text-muted-foreground leading-tight mt-2 mb-16'>
       {t('instructions')}{' '}
-      <button onClick={startTutorial} className='hover:underline cursor-pointer text-foreground font-medium'>
+      <button type='button' onClick={startTutorial} className='hover:underline cursor-pointer text-foreground font-medium'>
         {t('quickTour')}
       </button>{' '}
       {t('or')}{' '}

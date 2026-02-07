@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from '@application/i18n/navigtion';
 import { usePremiumStore } from '@application/stores/premium';
 import { useLanguages } from '@ui/hooks/useLanguages';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Check } from 'src/components/animate-ui/icons/check';
@@ -22,6 +22,7 @@ export const LanguageSelector = () => {
   const pathname = usePathname();
   const { state } = useSidebar();
   const languages = useLanguages();
+  const t = useTranslations('accessibility');
   const getCurrencyFromLocale = usePremiumStore((state) => state.getCurrencyFromLocale);
 
   const handleLanguageChange = useCallback(
@@ -42,7 +43,12 @@ export const LanguageSelector = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant='outline' size='icon' className='w-full focus-visible:ring-1'>
+        <Button
+          variant='outline'
+          size='icon'
+          className='w-full focus-visible:ring-1'
+          aria-label={t('selectLanguage', { current: currentLanguage?.label ?? locale })}
+        >
           <span className='capitalize'>{displayText}</span>
         </Button>
       </DropdownMenuTrigger>

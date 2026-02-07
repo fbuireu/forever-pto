@@ -56,7 +56,8 @@
       "maxWorkStreak": "Max work streak",
       "lastBreak": "Last break",
       "totalBonusDays": "Total bonus days",
-      "daysGained": "days gained by optimizing"
+      "daysGained": "days gained by optimizing",
+      "daysCount": "{count, plural, one {day} other {days}}"
     },
     "notifications": {
       "canImprove": {
@@ -150,6 +151,7 @@
   "workdayCounter": {
     "title": "Workday Counter",
     "tooltip": "Count working days between two dates, automatically excluding weekends and holidays. Useful for project planning and deadline calculations.",
+    "tooltipLabel": "More information about workday counter",
     "selectRange": "Select Date Range",
     "clearSelection": "Clear selection",
     "workingDays": "Working Days",
@@ -382,6 +384,7 @@
     "country": {
       "title": "Country",
       "tooltip": "This data is inferred from your CDN and your connection. If you feel that it's not accurate or you want a sneak peek into other countries' holidays, you can select it manually here",
+      "tooltipLabel": "More information about country selection",
       "loading": "Loading countries...",
       "placeholder": "Select country...",
       "search": "Search countries..."
@@ -443,12 +446,14 @@
     "allowPastDays": {
       "title": "Allow Past Days",
       "tooltip": "This switch allows you to enable or disable the suggestion of past holidays for the selected year. This lets you see PTO opportunities that were missed in the past",
+      "tooltipLabel": "More information about past days",
       "enabled": "Enabled",
       "disabled": "Disabled"
     },
     "carryOverMonths": {
       "title": "Carry Over Months",
-      "tooltip": "Allows adding months to the following year to expand opportunity search"
+      "tooltip": "Allows adding months to the following year to expand opportunity search",
+      "tooltipLabel": "More information about carry over"
     },
     "years": {
       "title": "Year"
@@ -469,6 +474,7 @@
   "ptoCalculator": {
     "title": "PTO Accumulator",
     "tooltip": "Calculate your accumulated PTO days based on monthly accrual. Most companies offer 2-3 days per month. Select the target month to see your total available days.",
+    "tooltipLabel": "More information about PTO calculator",
     "daysPerMonth": "Days per month",
     "calculateThrough": "Calculate through",
     "selectMonth": "Select month",
@@ -484,6 +490,7 @@
   "ptoSalaryCalculator": {
     "title": "PTO vs Salary Calculator",
     "tooltip": "Calculate how much paid time off you're giving up by not using your PTO days. You still get your full salary, but you're working days you could have taken as paid vacation.",
+    "tooltipLabel": "More information about salary calculator",
     "annualSalary": "Annual Salary",
     "annualSalaryPlaceholder": "50000",
     "unusedPtoDays": "Unused PTO Days",
@@ -701,7 +708,12 @@
     "cookiePolicy": "Cookie Policy",
     "legalNotice": "Legal Notice",
     "manageCookies": "Manage cookies",
-    "contactUs": "Contact Us"
+    "contactUs": "Contact Us",
+    "legalNavigation": "Legal and policy links"
+  },
+  "accessibility": {
+    "selectLanguage": "Select language, current: {current}",
+    "skipToContent": "Skip to main content"
   },
   "formButtons": {
     "submit": "Submit",

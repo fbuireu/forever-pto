@@ -11,7 +11,7 @@ import { SiteTitle } from '@ui/modules/components/core/SiteTitle';
 import { Footer } from '@ui/modules/components/footer/Footer';
 import { StoresInitializer } from '@ui/store/StoresInitializer';
 import { type Locale, NextIntlClientProvider, hasLocale } from 'next-intl';
-import { setRequestLocale } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { ThemeProvider } from 'next-themes';
 import dynamic from 'next/dynamic';
 import { Geist, Geist_Mono } from 'next/font/google';
@@ -49,9 +49,17 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
   }
   setRequestLocale(locale);
 
+  const t = await getTranslations({ locale, namespace: 'accessibility' });
+
   return (
     <html lang={locale}>
       <body className={cn(geistSans.variable, geistMono.variable, 'antialiased')}>
+        <a
+          href='#main-content'
+          className='sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-3 focus:py-1.5 focus:text-sm focus:bg-background focus:text-foreground focus:border focus:rounded-md focus:shadow-sm'
+        >
+          {t('skipToContent')}
+        </a>
         <NextIntlClientProvider>
           <ThemeProvider
             attribute='data-theme'
@@ -64,9 +72,10 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
               <StoresInitializer />
               <AppSidebar locale={locale}>
                 <div
-                  className='pointer-events-none h-full z-1 rounded-lg inset-0 absolute 
-  bg-[linear-gradient(to_right,var(--grid-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid-color)_1px,transparent_1px)] 
+                  className='pointer-events-none h-full z-1 rounded-lg inset-0 absolute
+  bg-[linear-gradient(to_right,var(--grid-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid-color)_1px,transparent_1px)]
   bg-[length:4rem_4rem]'
+                  aria-hidden='true'
                 />
                 <SiteTitle />
                 <SiteSubtitle />
