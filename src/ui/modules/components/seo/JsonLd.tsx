@@ -1,3 +1,4 @@
+import { LOCALES } from '@infrastructure/i18n/config';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
@@ -23,11 +24,39 @@ export async function JsonLd({ locale }: JsonLdProps) {
     url: `${baseUrl}/${locale}`,
     applicationCategory: 'ProductivityApplication',
     operatingSystem: 'Any',
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'EUR',
+    browserRequirements: 'Requires JavaScript. Requires HTML5.',
+    availableLanguage: LOCALES,
+    inLanguage: locale,
+    image: `${baseUrl}/static/images/forever-pto-logo.png`,
+    screenshot: `${baseUrl}/static/images/forever-pto-logo.png`,
+    softwareVersion: '1.0',
+    author: {
+      '@type': 'Organization',
+      name: 'Forever PTO',
+      url: baseUrl,
     },
+    offers: [
+      {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'EUR',
+        description: 'Free version with PTO optimization, calendar visualization, and basic metrics',
+      },
+      {
+        '@type': 'Offer',
+        price: '4.99',
+        priceCurrency: 'EUR',
+        description: 'Premium lifetime access with advanced metrics, charts, and multiple strategies',
+      },
+    ],
+    featureList: [
+      'PTO optimization algorithms',
+      'Interactive calendar visualization',
+      'Public holiday integration',
+      'Multiple optimization strategies',
+      'Advanced metrics and charts',
+      'Multi-language support',
+    ],
   };
 
   const organizationSchema = {

@@ -55,7 +55,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>{t('configuration')}</SidebarGroupLabel>
+          <SidebarGroupLabel role='heading' aria-level={2}>{t('configuration')}</SidebarGroupLabel>
           <SidebarMenu>
             <AnimateIcon animateOnHover>
               <Collapsible
@@ -109,7 +109,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
           </SidebarMenu>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>{t('tools')}</SidebarGroupLabel>
+          <SidebarGroupLabel role='heading' aria-level={2}>{t('tools')}</SidebarGroupLabel>
           <SidebarMenu>
             <AnimateIcon animateOnHover>
               <Collapsible

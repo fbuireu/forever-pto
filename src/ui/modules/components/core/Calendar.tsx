@@ -414,7 +414,7 @@ export function Calendar({
         ))}
       </div>
 
-      <div className='grid grid-cols-7 gap-2'>
+      <div className='grid grid-cols-7 gap-2' role='grid' aria-label={monthYearLabel}>
         {calendarDays.map((date) => {
           const isPastDay = modifiers.disabled(date);
           const isManualDay = modifiers.manuallySelected(date);

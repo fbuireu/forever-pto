@@ -1,15 +1,9 @@
+import { Nif } from '@ui/modules/components/core/Nif';
+import { Me } from '@ui/modules/components/core/me';
 import { LegalLayout } from '@ui/modules/components/legal/LegalLayout';
-import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
-export const metadata: Metadata = {
-  title: 'Privacy Policy | Forever PTO',
-  description: 'Privacy policy and data protection information for Forever PTO',
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+export { generateMetadata } from './metadata';
 
 export default async function PrivacyPolicyPage() {
   const t = await getTranslations('legalPages.privacyPolicy');
@@ -27,13 +21,14 @@ export default async function PrivacyPolicyPage() {
         <p>{t('sections.dataController.description')}</p>
         <ul className='list-disc pl-6 mt-4 space-y-2'>
           <li>
-            <strong>{t('sections.dataController.items.name.label')}</strong> {t('sections.dataController.items.name.value')}
+            <span className='inline-flex items-center gap-1'>
+              <strong>{t('sections.dataController.items.name.label')}</strong> <Me ariaLabel={t('sections.dataController.items.name.label')} />
+            </span>
           </li>
           <li>
-            <strong>{t('sections.dataController.items.taxId.label')}</strong> {t('sections.dataController.items.taxId.value')}
-          </li>
-          <li>
-            <strong>{t('sections.dataController.items.address.label')}</strong> {t('sections.dataController.items.address.value')}
+            <span className='inline-flex items-center gap-1'>
+              <strong>{t('sections.dataController.items.taxId.label')}</strong> <Nif ariaLabel={t('sections.dataController.items.taxId.label')} />
+            </span>
           </li>
           <li>
             <strong>{t('sections.dataController.items.email.label')}</strong> {t('sections.dataController.items.email.value')}
@@ -267,10 +262,6 @@ export default async function PrivacyPolicyPage() {
           </li>
           <li>
             <strong>{t('sections.contactInfo.items.website.label')}</strong> https://forever-pto.com
-          </li>
-          <li>
-            <strong>{t('sections.contactInfo.items.postalAddress.label')}</strong>{' '}
-            {t('sections.contactInfo.items.postalAddress.value')}
           </li>
         </ul>
         <p className='mt-4'>{t('sections.contactInfo.responseTime')}</p>

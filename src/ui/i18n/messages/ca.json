@@ -2,7 +2,26 @@
   "metadata": {
     "title": "Forever PTO - Gestiona les teves vacances",
     "description": "Planifica i optimitza les teves vacances i dies lliures amb Forever PTO. Troba els millors ponts i maximitza el teu temps lliure.",
-    "keywords": "PTO, vacances, dies lliures, ponts, calendari, temps lliure"
+    "keywords": "PTO, vacances, dies lliures, ponts, calendari, temps lliure",
+    "cookiePolicy": {
+      "title": "Política de cookies | Forever PTO",
+      "description": "Informació sobre com Forever PTO utilitza cookies i emmagatzematge local"
+    },
+    "privacyPolicy": {
+      "title": "Política de privacitat | Forever PTO",
+      "description": "Política de privacitat i protecció de dades de Forever PTO"
+    },
+    "termsOfService": {
+      "title": "Termes de servei | Forever PTO",
+      "description": "Termes i condicions d'ús de Forever PTO"
+    },
+    "legalNotice": {
+      "title": "Avís legal | Forever PTO",
+      "description": "Avís legal i informació sobre Forever PTO"
+    },
+    "paymentConfirmation": {
+      "title": "Confirmació de pagament | Forever PTO"
+    }
   },
   "home": {
     "title": "Forever PTO",
@@ -699,6 +718,17 @@
   },
   "legal": {
     "lastUpdated": "Última actualització: {date}"
+  },
+  "notFound": {
+    "title": "Pàgina no trobada",
+    "description": "La pàgina que busques no existeix o ha estat moguda.",
+    "returnHome": "Tornar a l'inici"
+  },
+  "error": {
+    "title": "Alguna cosa ha anat malament",
+    "description": "S'ha produït un error inesperat. Si us plau, torna-ho a provar.",
+    "retry": "Tornar a provar",
+    "returnHome": "Tornar a l'inici"
   },
   "footer": {
     "privacyPolicy": "Política de Privadesa",

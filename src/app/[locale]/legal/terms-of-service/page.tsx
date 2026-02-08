@@ -1,15 +1,8 @@
+import { Me } from '@ui/modules/components/core/me';
 import { LegalLayout } from '@ui/modules/components/legal/LegalLayout';
-import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
-export const metadata: Metadata = {
-  title: 'Terms of Service | Forever PTO',
-  description: 'Terms and conditions for using Forever PTO',
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+export { generateMetadata } from './metadata';
 
 export default async function TermsOfServicePage() {
   const t = await getTranslations('legalPages.termsOfService');
@@ -335,10 +328,6 @@ export default async function TermsOfServicePage() {
           </li>
           <li>
             <strong>{t('sections.contactInfo.items.website.label')}</strong> https://forever-pto.com
-          </li>
-          <li>
-            <strong>{t('sections.contactInfo.items.postalAddress.label')}</strong>{' '}
-            {t('sections.contactInfo.items.postalAddress.value')}
           </li>
         </ul>
         <p className='mt-4'>{t('sections.contactInfo.responseTime')}</p>

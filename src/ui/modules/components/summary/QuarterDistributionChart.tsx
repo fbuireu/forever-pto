@@ -59,8 +59,9 @@ export const QuarterDistributionChart = ({ quarterDist }: QuarterDistributionCha
                   color: 'var(--primary-foreground)',
                   boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                 }}
-                cursor={{ fill: 'rgba(0, 0, 0, 0.5)' }}
+                cursor={{ fill: 'light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5))' }}
                 labelStyle={{ color: 'var(--primary-foreground)' }}
+                itemStyle={{ color: 'var(--primary-foreground)' }}
               />
             </BarChart>
           </ResponsiveContainer>

@@ -1,15 +1,9 @@
+import { Nif } from '@ui/modules/components/core/Nif';
+import { Me } from '@ui/modules/components/core/me';
 import { LegalLayout } from '@ui/modules/components/legal/LegalLayout';
-import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
-export const metadata: Metadata = {
-  title: 'Legal Notice | Forever PTO',
-  description: 'Legal notice and information about Forever PTO',
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+export { generateMetadata } from './metadata';
 
 export default async function LegalNoticePage() {
   const t = await getTranslations('legalPages.legalNotice');
@@ -21,16 +15,16 @@ export default async function LegalNoticePage() {
         <p>{t('sections.identification.description')}</p>
         <ul className='list-disc pl-6 mt-4 space-y-2'>
           <li>
-            <strong>{t('sections.identification.items.owner.label')}</strong>{' '}
-            {t('sections.identification.items.owner.value')}
+            <span className='inline-flex items-center gap-1'>
+              <strong>{t('sections.identification.items.owner.label')}</strong>{' '}
+              <Me ariaLabel={t('sections.identification.items.owner.label')} />
+            </span>
           </li>
           <li>
-            <strong>{t('sections.identification.items.taxId.label')}</strong>{' '}
-            {t('sections.identification.items.taxId.value')}
-          </li>
-          <li>
-            <strong>{t('sections.identification.items.address.label')}</strong>{' '}
-            {t('sections.identification.items.address.value')}
+            <span className='inline-flex items-center gap-1'>
+              <strong>{t('sections.identification.items.taxId.label')}</strong>{' '}
+              <Nif ariaLabel={t('sections.identification.items.taxId.label')} />
+            </span>
           </li>
           <li>
             <strong>{t('sections.identification.items.email.label')}</strong>{' '}

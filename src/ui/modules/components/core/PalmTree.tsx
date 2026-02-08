@@ -57,6 +57,7 @@ export function PalmTree({
         viewBox='133.5 84 29 69'
         preserveAspectRatio='xMidYMid meet'
         className={className}
+        aria-hidden='true'
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{
@@ -77,6 +78,7 @@ export function PalmTree({
       viewBox='133.5 84 29 69'
       preserveAspectRatio='xMidYMid meet'
       className={className}
+      aria-hidden='true'
     >
       {svgContent}
     </svg>

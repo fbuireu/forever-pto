@@ -22,7 +22,8 @@ const nextConfig: NextConfig = {
     removeConsole: isProd,
   },
   images: {
-    unoptimized: true,
+    loader: 'custom',
+    loaderFile: './src/infrastructure/images/loader.ts',
   },
   transpilePackages: ['prettier'],
 };

@@ -2,7 +2,26 @@
   "metadata": {
     "title": "Forever PTO - Gestisci le tue ferie",
     "description": "Pianifica e ottimizza le tue ferie e i tuoi giorni di riposo con Forever PTO. Trova i ponti migliori e massimizza il tempo libero.",
-    "keywords": "PTO, ferie, tempo libero, vacanze, ponte, calendario"
+    "keywords": "PTO, ferie, tempo libero, vacanze, ponte, calendario",
+    "cookiePolicy": {
+      "title": "Politica dei cookie | Forever PTO",
+      "description": "Informazioni su come Forever PTO utilizza i cookie e l'archiviazione locale"
+    },
+    "privacyPolicy": {
+      "title": "Informativa sulla privacy | Forever PTO",
+      "description": "Informativa sulla privacy e protezione dei dati di Forever PTO"
+    },
+    "termsOfService": {
+      "title": "Termini di servizio | Forever PTO",
+      "description": "Termini e condizioni di utilizzo di Forever PTO"
+    },
+    "legalNotice": {
+      "title": "Avviso legale | Forever PTO",
+      "description": "Avviso legale e informazioni su Forever PTO"
+    },
+    "paymentConfirmation": {
+      "title": "Conferma di pagamento | Forever PTO"
+    }
   },
   "home": {
     "title": "Forever PTO",
@@ -699,6 +718,17 @@
   },
   "legal": {
     "lastUpdated": "Ultimo aggiornamento: {date}"
+  },
+  "notFound": {
+    "title": "Pagina non trovata",
+    "description": "La pagina che stai cercando non esiste o è stata spostata.",
+    "returnHome": "Torna alla home"
+  },
+  "error": {
+    "title": "Qualcosa è andato storto",
+    "description": "Si è verificato un errore imprevisto. Per favore, riprova.",
+    "retry": "Riprova",
+    "returnHome": "Torna alla home"
   },
   "footer": {
     "privacyPolicy": "Informativa sulla Privacy",

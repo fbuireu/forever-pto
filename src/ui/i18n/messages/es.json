@@ -2,7 +2,26 @@
   "metadata": {
     "title": "Forever PTO - Gestiona tus días libres",
     "description": "Planifica y optimiza tus vacaciones y días libres con Forever PTO. Encuentra los mejores puentes y maximiza tu tiempo libre.",
-    "keywords": "PTO, vacaciones, días libres, puente, calendario, tiempo libre"
+    "keywords": "PTO, vacaciones, días libres, puente, calendario, tiempo libre",
+    "cookiePolicy": {
+      "title": "Política de cookies | Forever PTO",
+      "description": "Información sobre cómo Forever PTO utiliza cookies y almacenamiento local"
+    },
+    "privacyPolicy": {
+      "title": "Política de privacidad | Forever PTO",
+      "description": "Política de privacidad y protección de datos de Forever PTO"
+    },
+    "termsOfService": {
+      "title": "Términos de servicio | Forever PTO",
+      "description": "Términos y condiciones de uso de Forever PTO"
+    },
+    "legalNotice": {
+      "title": "Aviso legal | Forever PTO",
+      "description": "Aviso legal e información sobre Forever PTO"
+    },
+    "paymentConfirmation": {
+      "title": "Confirmación de pago | Forever PTO"
+    }
   },
   "home": {
     "title": "Forever PTO",
@@ -699,6 +718,17 @@
   },
   "legal": {
     "lastUpdated": "Última actualización: {date}"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "description": "La página que buscas no existe o ha sido movida.",
+    "returnHome": "Volver al inicio"
+  },
+  "error": {
+    "title": "Algo salió mal",
+    "description": "Se ha producido un error inesperado. Por favor, inténtalo de nuevo.",
+    "retry": "Intentar de nuevo",
+    "returnHome": "Volver al inicio"
   },
   "footer": {
     "privacyPolicy": "Política de Privacidad",

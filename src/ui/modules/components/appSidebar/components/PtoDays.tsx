@@ -73,22 +73,29 @@ export const PtoDays = () => {
         <div className='space-y-2 w-full'>
           <div className='flex items-center justify-between text-sm'>
             <span className='text-muted-foreground'>{t('autoAssigned')}</span>
-            <SlidingNumber number={activeSuggestedCount} className='font-semibold text-teal-600 dark:text-teal-400' />
+            <span aria-label={`${t('autoAssigned')}: ${activeSuggestedCount}`}>
+              <SlidingNumber number={activeSuggestedCount} className='font-semibold text-teal-600 dark:text-teal-400' aria-hidden='true' />
+            </span>
           </div>
           <div className='flex items-center justify-between text-sm'>
             <span className='text-muted-foreground'>{t('manuallySelected')}</span>
-            <SlidingNumber number={manualSelectedCount} className='font-semibold text-blue-600 dark:text-blue-400' />
+            <span aria-label={`${t('manuallySelected')}: ${manualSelectedCount}`}>
+              <SlidingNumber number={manualSelectedCount} className='font-semibold text-blue-600 dark:text-blue-400' aria-hidden='true' />
+            </span>
           </div>
           <div className='h-px bg-border my-2' />
           <div className='flex items-center justify-between text-sm'>
             <span className='font-medium'>{t('remaining')}</span>
-            <SlidingNumber
-              number={remaining}
-              className={cn(
-                'font-bold text-lg',
-                remaining > 0 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
-              )}
-            />
+            <span aria-label={`${t('remaining')}: ${remaining}`}>
+              <SlidingNumber
+                number={remaining}
+                className={cn(
+                  'font-bold text-lg',
+                  remaining > 0 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
+                )}
+                aria-hidden='true'
+              />
+            </span>
           </div>
           {hasManualChanges && (
             <Button

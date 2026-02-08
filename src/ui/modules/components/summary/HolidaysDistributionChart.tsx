@@ -95,6 +95,7 @@ export const HolidaysDistributionChart = ({ ptoDays, holidays }: HolidaysDistrib
                 }}
                 cursor={{ fill: 'rgba(0, 0, 0, 0.5)' }}
                 labelStyle={{ color: 'var(--primary-foreground)' }}
+                itemStyle={{ color: 'var(--primary-foreground)' }}
               />
               <Legend
                 verticalAlign='bottom'

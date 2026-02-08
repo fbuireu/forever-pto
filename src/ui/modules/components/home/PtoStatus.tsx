@@ -32,7 +32,7 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
 
   return (
     <div className='p-2 rounded-2xl border shadow-sm bg-background' data-tutorial='pto-status'>
-      <div className='flex items-center justify-between flex-wrap gap-4'>
+      <div className='flex items-center justify-between flex-wrap gap-4 h-full'>
         <div className='flex items-center gap-4'>
           <div className='flex items-center gap-1'>
             <div className='h-3 w-3 rounded-full bg-teal-500' />
@@ -45,35 +45,29 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
             <SlidingNumber number={manualSelectedCount} className='font-semibold text-blue-600 dark:text-blue-400' />
           </div>
           <div className='h-6 w-px bg-border' />
-          <div className='flex items-center flex-col relative'>
-            <div className='flex flex-row items-baseline gap-x-2'>
-              <span className='text-sm font-medium'>
-                {t('remaining')}:{' '}
-                <SlidingNumber
-                  number={remaining}
-                  className={cn(
-                    'text-xl font-bold inline',
-                    remaining > 0 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
-                  )}
-                />
-              </span>
-            </div>
-
+          <div className='flex items-center gap-1'>
+            <span className='text-sm font-medium'>{t('remaining')}:</span>
+            <SlidingNumber
+              number={remaining}
+              className={cn(
+                'text-xl font-bold',
+                remaining > 0 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
+              )}
+            />
             {remaining > 0 && (
-              <div className='flex items-baseline text-xs text-muted-foreground'>
+              <span className='flex items-center text-muted-foreground ml-1'>
                 <MousePointerClick className='h-3 w-3' />
                 <span className='text-[10px]'>{t('clickDays')}</span>
-              </div>
+              </span>
             )}
             {remaining === 0 && !hasManualChanges && (
-              <div className='text-xs text-green-600 dark:text-green-400 font-medium text-[10px]'>
+              <span className='text-[10px] text-green-600 dark:text-green-400 font-medium ml-1'>
                 ✓ {t('allAssigned')}
-              </div>
+              </span>
             )}
           </div>
         </div>
-
-        <div className='flex items-center gap-3'>
+        <div className='flex items-center gap-3 h-full'>
           {hasManualChanges && (
             <Button variant='outline' size='sm' onClick={resetManualSelection} type='button' className='text-xs'>
               {t('resetManual')}

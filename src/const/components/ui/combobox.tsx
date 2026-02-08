@@ -53,6 +53,7 @@ export const Combobox = ({
             variant='outline'
             role='combobox'
             aria-expanded={open}
+            aria-controls='combobox-listbox'
             disabled={disabled}
             className={cn('w-[200px] justify-between', className)}
           >
@@ -68,7 +69,7 @@ export const Combobox = ({
           </Button>
         </AnimateIcon>
       </PopoverTrigger>
-      <PopoverContent className='w-[200px] p-0'>
+      <PopoverContent className='w-[200px] p-0' id='combobox-listbox'>
         <Command>
           <CommandInput placeholder={searchPlaceholder} className='h-9' />
           <CommandList>

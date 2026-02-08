@@ -22,6 +22,7 @@ export function OceanSunset({
         height={height}
         viewBox='147 108 33 40'
         className={cn('absolute right-0.5 transform -translate-y-[30%]', className)}
+        aria-hidden='true'
       >
         <defs>
           <linearGradient id={gradientId} x1='0%' y1='0%' x2='700%' y2='0%'>

@@ -114,7 +114,7 @@ export const Faq = async () => {
           >
             {section.items.map((item) => (
               <AccordionItem key={item.id} value={item.id} className='cursor-pointer'>
-                <AccordionTrigger className='text-left'>{item.question}</AccordionTrigger>
+                <AccordionTrigger className='text-left'><h4 className='font-normal text-base'>{item.question}</h4></AccordionTrigger>
                 <AccordionPanel className='text-muted-foreground'>{item.answer}</AccordionPanel>
               </AccordionItem>
             ))}

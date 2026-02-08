@@ -1,15 +1,7 @@
 import { LegalLayout } from '@ui/modules/components/legal/LegalLayout';
-import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
-export const metadata: Metadata = {
-  title: 'Cookie Policy | Forever PTO',
-  description: 'Information about how Forever PTO uses cookies and local storage',
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+export { generateMetadata } from './metadata';
 
 export default async function CookiePolicyPage() {
   const t = await getTranslations('legalPages.cookiePolicy');
