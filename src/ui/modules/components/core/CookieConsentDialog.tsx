@@ -65,7 +65,7 @@ export const CookieConsentDialog = ({
                     <div className='rounded-md bg-muted/50 p-3 space-y-1'>
                       <div className='flex items-center justify-between'>
                         <span className='font-mono text-sm font-medium'>user-country</span>
-                        <span className='text-xs text-muted-foreground'>{t('session')}</span>
+                        <span className='text-xs text-muted-foreground'>1 {t('week')}</span>
                       </div>
                       <p className='text-sm text-muted-foreground'>{t('userCountryDesc')}</p>
                     </div>

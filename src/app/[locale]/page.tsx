@@ -46,7 +46,7 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: check texts in graphics (main resume) + features text in roadmap + cookies
+// todo: check texts in graphics (main resume) + features text in roadmap
 // todo: share button with results?
 // todo: unify modal styles (footer actions, spacing, etc)
 // todo: performance audit, react best practices audit
