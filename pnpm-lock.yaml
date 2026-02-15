@@ -76,7 +76,7 @@ importers:
         version: 4.1.0
       date-holidays:
         specifier: ^3.24.4
-        version: 3.26.5
+        version: 3.26.8
       i18n-iso-countries:
         specifier: ^7.14.0
         version: 7.14.0
@@ -3342,8 +3342,8 @@ packages:
     resolution: {integrity: sha512-h09ZEtM6u5cYM6m1bX+1Ny9f+nLO9KVZUKNPEnH7lhbXYTfqZogaGTnhONswGeIJFF91UImIftS3CdM9HLW5oQ==}
     engines: {node: '>=12.0.0'}
 
-  date-holidays@3.26.5:
-    resolution: {integrity: sha512-I/nGVQAxBmLFxjwE48vWTOlZa7nKucQifHJHbkfveCco0hwE+3GvvAPYMw4iXBldvDqaruujV5AvrbOjq9UNUg==}
+  date-holidays@3.26.8:
+    resolution: {integrity: sha512-vwCa+2l+TQzB5hjPhle/OcmhU8NrPGuZvmcirm/Hn6aYIrWYatQG+a8GLHDR2MdTxzWWzcz7HXvD6fKtwXOHOQ==}
     engines: {node: '>=12.0.0'}
     hasBin: true
 
@@ -8744,7 +8744,7 @@ snapshots:
       jalaali-js: 1.2.8
       moment-timezone: 0.5.48
 
-  date-holidays@3.26.5:
+  date-holidays@3.26.8:
     dependencies:
       date-holidays-parser: 3.4.7
       js-yaml: 4.1.1
