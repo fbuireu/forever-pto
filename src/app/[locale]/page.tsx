@@ -54,7 +54,7 @@ export default Home;
 // todo: custom 404 and error?
 // todo: replace useDetectSticky with css @container scroll-state() (at 8th Jan 2026 not LighntingCSS has the code merged, not released and not adopted by Next)
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
-// todo: migrate to base-ui
+// todo: migrate to base-ui (https://shadcnspace.com/docs/getting-started/migrate-to-baseui) + use shine component instead of gradient
 // todo: performance web workers
 // todo: unify component and folder structure (payment/provider should be dto?)
 // todo: CI to work on releases
