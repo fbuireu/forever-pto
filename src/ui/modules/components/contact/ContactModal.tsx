@@ -129,7 +129,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                   <FormItem>
                     <FormLabel>{t('name')}</FormLabel>
                     <FormControl>
-                      <Input placeholder={t('namePlaceholder')} {...field} />
+                      <Input placeholder={t('namePlaceholder')} inputMode='text' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -143,7 +143,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                   <FormItem>
                     <FormLabel>{t('email')}</FormLabel>
                     <FormControl>
-                      <Input type='email' placeholder={t('emailPlaceholder')} {...field} />
+                      <Input type='email' inputMode='email' placeholder={t('emailPlaceholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -157,7 +157,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                   <FormItem>
                     <FormLabel>{t('subject')}</FormLabel>
                     <FormControl>
-                      <Input placeholder={t('subjectPlaceholder')} {...field} />
+                      <Input placeholder={t('subjectPlaceholder')} inputMode='text' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -174,6 +174,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                       <Textarea
                         placeholder={t('messagePlaceholder')}
                         className='min-h-30 resize-none field-sizing-content'
+                        inputMode='text'
                         {...field}
                       />
                     </FormControl>

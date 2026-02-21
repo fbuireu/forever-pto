@@ -120,7 +120,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
                 <FormItem>
                   <FormLabel>{t('nameLabel')}</FormLabel>
                   <FormControl>
-                    <Input type='text' placeholder={t('namePlaceholder')} autoFocus disabled={isPending} {...field} />
+                    <Input type='text' inputMode='text' placeholder={t('namePlaceholder')} autoFocus disabled={isPending} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

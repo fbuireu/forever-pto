@@ -109,6 +109,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
                     <FormControl>
                       <Input
                         type='email'
+                        inputMode='email'
                         placeholder={t('emailPlaceholder')}
                         disabled={isLoading}
                         autoFocus

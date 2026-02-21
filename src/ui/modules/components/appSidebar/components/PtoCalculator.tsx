@@ -88,6 +88,7 @@ export const PtoCalculator = () => {
         <Input
           id='daysPerMonth'
           type='number'
+          inputMode='decimal'
           step='0.1'
           min='0'
           max='8'

@@ -106,7 +106,8 @@ export function DonationForm({
                     <InputGroupText>{currencySymbol}</InputGroupText>
                   </InputGroupAddon>
                   <InputGroupInput
-                    type='number'
+                              type='number'
+                              inputMode='numeric'
                     placeholder={t('enterAmount')}
                     step='1'
                     min='1'
