@@ -96,6 +96,7 @@ export const PtoSalaryCalculator = () => {
             id='annualSalary'
             type='number'
             inputMode='numeric'
+            autoComplete='off'
             min='0'
             step='1000'
             value={annualSalary}
@@ -115,6 +116,7 @@ export const PtoSalaryCalculator = () => {
             min='0'
             max='50'
             inputMode='numeric'
+            autoComplete='off'
             value={unusedPTODays}
             onChange={(e) => setUnusedPTODays(Number(e.target.value))}
             className='h-8 text-xs'

@@ -380,8 +380,9 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
             <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
             <Input
               placeholder={t('searchPlaceholder')}
-                          value={searchTerm}
-                          inputMode='text'
+              value={searchTerm}
+              inputMode='text'
+              autoComplete='off'
               onChange={(e) => setSearchTerm(e.target.value)}
               className='pl-8 w-full'
             />

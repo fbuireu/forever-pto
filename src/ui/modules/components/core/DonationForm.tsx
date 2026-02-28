@@ -106,9 +106,10 @@ export function DonationForm({
                     <InputGroupText>{currencySymbol}</InputGroupText>
                   </InputGroupAddon>
                   <InputGroupInput
-                              type='number'
-                              inputMode='numeric'
+                    type='number'
+                    inputMode='numeric'
                     placeholder={t('enterAmount')}
+                    autoComplete='off'
                     step='1'
                     min='1'
                     max='10000'
@@ -122,9 +123,7 @@ export function DonationForm({
                   />
                 </InputGroup>
               </FormControl>
-              <p className='text-xs text-muted-foreground mt-1'>
-                {t('basePriceNote', { currency })}
-              </p>
+              <p className='text-xs text-muted-foreground mt-1'>{t('basePriceNote', { currency })}</p>
               <FormMessage />
             </FormItem>
           )}

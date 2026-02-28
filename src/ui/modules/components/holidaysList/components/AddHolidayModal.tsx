@@ -1,5 +1,6 @@
 'use client';
 
+import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import {
   Dialog,
@@ -12,9 +13,10 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
 import { Input } from '@const/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { CalendarDays, Calendar as CalendarIcon } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import type { Locale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -23,8 +25,6 @@ import { Plus } from 'src/components/animate-ui/icons/plus';
 import { Calendar, CalendarSelectionMode, type FromTo } from '../../core/Calendar';
 import { formatDate } from '../../utils/formatters';
 import { type HolidayFormData, createHolidaySchema } from './schema';
-import { useFiltersStore } from '@application/stores/filters';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 interface AddHolidayModalProps {
   open: boolean;
@@ -120,7 +120,15 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
                 <FormItem>
                   <FormLabel>{t('nameLabel')}</FormLabel>
                   <FormControl>
-                    <Input type='text' inputMode='text' placeholder={t('namePlaceholder')} autoFocus disabled={isPending} {...field} />
+                    <Input
+                      type='text'
+                      inputMode='text'
+                      placeholder={t('namePlaceholder')}
+                      autoFocus
+                      autoComplete='off'
+                      disabled={isPending}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -93,7 +93,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
         } else {
           const translatedError = result.errorType
             ? tErrors(result.errorType as Parameters<typeof tErrors>[0])
-            : result.error ?? t('failedToSend');
+            : (result.error ?? t('failedToSend'));
           setErrorMessage(translatedError);
           setStep(Step.ERROR);
         }
@@ -129,7 +129,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                   <FormItem>
                     <FormLabel>{t('name')}</FormLabel>
                     <FormControl>
-                      <Input placeholder={t('namePlaceholder')} inputMode='text' {...field} />
+                      <Input placeholder={t('namePlaceholder')} inputMode='text' autoComplete='name' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -143,7 +143,13 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                   <FormItem>
                     <FormLabel>{t('email')}</FormLabel>
                     <FormControl>
-                      <Input type='email' inputMode='email' placeholder={t('emailPlaceholder')} {...field} />
+                      <Input
+                        type='email'
+                        inputMode='email'
+                        placeholder={t('emailPlaceholder')}
+                        autoComplete='email'
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -157,7 +163,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                   <FormItem>
                     <FormLabel>{t('subject')}</FormLabel>
                     <FormControl>
-                      <Input placeholder={t('subjectPlaceholder')} inputMode='text' {...field} />
+                      <Input placeholder={t('subjectPlaceholder')} inputMode='text' autoComplete='off' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
