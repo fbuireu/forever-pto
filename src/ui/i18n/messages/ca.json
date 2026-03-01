@@ -78,6 +78,12 @@
       "daysGained": "dies guanyats optimitzant",
       "daysCount": "{count, plural, one {dia} other {dies}}"
     },
+    "summaryParagraph": {
+      "withGain": "Amb els teus {ptoDays} dies de vacances i {totalHolidays} festius, l'estratègia {strategy} els converteix en {effectiveDays} dies lliures efectius — són {increment} dies extra, una millora del +{percentage}% respecte a usar-los sense optimitzar.",
+      "withoutGain": "Amb els teus {ptoDays} dies de vacances i {totalHolidays} festius, obtens {effectiveDays} dies lliures efectius usant l'estratègia {strategy}.",
+      "noRegionHint": "Selecciona la teva regió a la barra lateral per incloure festius regionals i potencialment obtenir més dies lliures.",
+      "withRegion": "{regionalDays} dels teus festius són específics de {region}."
+    },
     "notifications": {
       "canImprove": {
         "title": "Pots millorar",
@@ -635,6 +641,10 @@
       "aiSuggestionsDesc": "Recomanacions impulsades per IA basades en les teves preferències i patrons passats",
       "weatherIntegration": "Integració del Temps",
       "weatherIntegrationDesc": "Veu pronòstics del temps per les teves dates de vacances planificades",
+      "performanceOptimization": "Optimització de Rendiment",
+      "performanceOptimizationDesc": "Càlculs més ràpids i experiència més fluida gràcies als Web Workers",
+      "customWeekends": "Caps de Setmana Personalitzats",
+      "customWeekendsDesc": "Defineix dies no laborables personalitzats més enllà del cap de setmana estàndard dissabte-diumenge",
       "multiYearPlanning": "Planificació Multi-Any",
       "multiYearPlanningDesc": "Planifica vacances al llarg de múltiples anys amb suport d'arrossegament"
     }

@@ -37,6 +37,7 @@ const MonthlyDistributionChart = dynamic(() =>
 
 export const Summary = () => {
   const t = useTranslations('summary');
+  const tSidebar = useTranslations('sidebar');
   const { areStoresReady } = useStoresReady();
 
   const { ptoDays, country, region, strategy, year, carryOverMonths } = useFiltersStore(
@@ -141,23 +142,41 @@ export const Summary = () => {
                 </Badge>
               )}
               <Badge variant='outline' className='bg-blue-50 dark:bg-blue-900/20'>
-                {strategy}
+                {tSidebar(`strategy.${strategy}.label`)}
               </Badge>
             </div>
           </CardTitle>
-          <CardDescription className='text-muted-foreground space-y-2'>
-            <div className='text-sm'>
-              <span className='font-semibold text-primary'>{ptoDays}</span> {t('metrics.vacationDays').toLowerCase()} +{' '}
-              <span className='font-semibold text-green-700'>{holidayMetrics.totalHolidays}</span>{' '}
-              {t('metrics.holidays').toLowerCase()} ={' '}
-              <span className='font-semibold text-green-700 dark:text-green-300'>{effectiveDays}</span>{' '}
-              {t('metrics.effectiveDays').toLowerCase()}
-              {increment > 0 && (
-                <span className='font-semibold text-purple-700 dark:text-purple-300 ml-1'>
-                  {t('performance', { percentage: efficiencyPercentage.toFixed(0) })}
-                </span>
-              )}
-            </div>
+          <CardDescription className='text-muted-foreground space-y-1.5'>
+            <p className='text-sm'>
+              {increment > 0
+                ? t('summaryParagraph.withGain', {
+                    ptoDays,
+                    totalHolidays: holidayMetrics.totalHolidays,
+                    strategy: tSidebar(`strategy.${strategy}.label`).toLowerCase(),
+                    effectiveDays,
+                    increment,
+                    percentage: efficiencyPercentage.toFixed(0),
+                  })
+                : t('summaryParagraph.withoutGain', {
+                    ptoDays,
+                    totalHolidays: holidayMetrics.totalHolidays,
+                    strategy: tSidebar(`strategy.${strategy}.label`).toLowerCase(),
+                    effectiveDays,
+                  })}
+            </p>
+            {holidayMetrics.regionalDays > 0 && locationInfo.userRegion && (
+              <p className='text-sm'>
+                {t('summaryParagraph.withRegion', {
+                  regionalDays: holidayMetrics.regionalDays,
+                  region: locationInfo.userRegion.label,
+                })}
+              </p>
+            )}
+            {!region && (
+              <p className='text-sm text-amber-600 dark:text-amber-400'>
+                {t('summaryParagraph.noRegionHint')}
+              </p>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent className='space-y-6'>

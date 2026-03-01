@@ -78,6 +78,12 @@
       "daysGained": "giorni guadagnati ottimizzando",
       "daysCount": "{count, plural, one {giorno} other {giorni}}"
     },
+    "summaryParagraph": {
+      "withGain": "Con i tuoi {ptoDays} giorni di ferie e {totalHolidays} festivi, la strategia {strategy} li trasforma in {effectiveDays} giorni liberi effettivi — sono {increment} giorni extra, un miglioramento del +{percentage}% rispetto a usarli senza ottimizzare.",
+      "withoutGain": "Con i tuoi {ptoDays} giorni di ferie e {totalHolidays} festivi, ottieni {effectiveDays} giorni liberi effettivi usando la strategia {strategy}.",
+      "noRegionHint": "Seleziona la tua regione nella barra laterale per includere festivi regionali e potenzialmente ottenere più giorni liberi.",
+      "withRegion": "{regionalDays} dei tuoi festivi sono specifici di {region}."
+    },
     "notifications": {
       "canImprove": {
         "title": "Puoi migliorare",
@@ -635,6 +641,10 @@
       "aiSuggestionsDesc": "Raccomandazioni basate sull'IA secondo le tue preferenze e pattern passati",
       "weatherIntegration": "Integrazione Meteo",
       "weatherIntegrationDesc": "Visualizza le previsioni meteo per le tue date di ferie pianificate",
+      "performanceOptimization": "Ottimizzazione delle Prestazioni",
+      "performanceOptimizationDesc": "Calcoli più veloci ed esperienza più fluida grazie ai Web Workers",
+      "customWeekends": "Weekend Personalizzati",
+      "customWeekendsDesc": "Definisci giorni non lavorativi personalizzati oltre al weekend standard sabato-domenica",
       "multiYearPlanning": "Pianificazione Multi-Anno",
       "multiYearPlanningDesc": "Pianifica le ferie su più anni con supporto per il riporto"
     }

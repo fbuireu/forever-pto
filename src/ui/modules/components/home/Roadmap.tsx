@@ -96,8 +96,6 @@ export function Roadmap() {
           description: t('features.customHolidaysDesc'),
           quarter: 'Q1 2025',
         },
-      ],
-      [CategoryStatus.IN_PROGRESS]: [
         {
           id: '5',
           title: t('features.alternativeStrategies'),
@@ -111,21 +109,29 @@ export function Roadmap() {
           quarter: 'Q1 2025',
         },
       ],
-      [CategoryStatus.PLANNED]: [
+      [CategoryStatus.IN_PROGRESS]: [
         {
           id: '7',
+          title: t('features.performanceOptimization'),
+          description: t('features.performanceOptimizationDesc'),
+          quarter: 'Q1 2025',
+        },
+      ],
+      [CategoryStatus.PLANNED]: [
+        {
+          id: '8',
           title: t('features.calendarExport'),
           description: t('features.calendarExportDesc'),
           quarter: 'Q2 2025',
         },
         {
-          id: '8',
+          id: '9',
           title: t('features.teamPlanning'),
           description: t('features.teamPlanningDesc'),
           quarter: 'Q2 2025',
         },
         {
-          id: '9',
+          id: '10',
           title: t('features.emailNotifications'),
           description: t('features.emailNotificationsDesc'),
           quarter: 'Q2 2025',
@@ -133,22 +139,27 @@ export function Roadmap() {
       ],
       [CategoryStatus.FUTURE]: [
         {
-          id: '10',
+          id: '11',
+          title: t('features.customWeekends'),
+          description: t('features.customWeekendsDesc'),
+        },
+        {
+          id: '12',
           title: t('features.mobileApp'),
           description: t('features.mobileAppDesc'),
         },
         {
-          id: '11',
+          id: '13',
           title: t('features.aiSuggestions'),
           description: t('features.aiSuggestionsDesc'),
         },
         {
-          id: '12',
+          id: '14',
           title: t('features.weatherIntegration'),
           description: t('features.weatherIntegrationDesc'),
         },
         {
-          id: '13',
+          id: '15',
           title: t('features.multiYearPlanning'),
           description: t('features.multiYearPlanningDesc'),
         },

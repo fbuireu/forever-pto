@@ -78,6 +78,12 @@
       "daysGained": "days gained by optimizing",
       "daysCount": "{count, plural, one {day} other {days}}"
     },
+    "summaryParagraph": {
+      "withGain": "With your {ptoDays} vacation days and {totalHolidays} public holidays, the {strategy} strategy turns them into {effectiveDays} effective days off — that's {increment} extra days, a +{percentage}% improvement over simply using them as-is.",
+      "withoutGain": "With your {ptoDays} vacation days and {totalHolidays} public holidays, you get {effectiveDays} effective days off using the {strategy} strategy.",
+      "noRegionHint": "Select your region in the sidebar to include regional holidays and potentially get even more days off.",
+      "withRegion": "{regionalDays} of your holidays are specific to {region}."
+    },
     "notifications": {
       "canImprove": {
         "title": "You can improve",
@@ -637,6 +643,10 @@
       "aiSuggestionsDesc": "AI-powered recommendations based on your preferences and past patterns",
       "weatherIntegration": "Weather Integration",
       "weatherIntegrationDesc": "See weather forecasts for your planned vacation dates",
+      "performanceOptimization": "Performance Optimization",
+      "performanceOptimizationDesc": "Faster calculations and smoother experience powered by Web Workers",
+      "customWeekends": "Custom Weekends",
+      "customWeekendsDesc": "Define custom non-working days beyond the standard Saturday-Sunday weekend",
       "multiYearPlanning": "Multi-Year Planning",
       "multiYearPlanningDesc": "Plan vacations across multiple years with carryover support"
     }
