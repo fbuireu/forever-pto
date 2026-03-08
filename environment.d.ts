@@ -22,6 +22,7 @@ declare global {
   interface CloudflareEnv {
     NEXT_PUBLIC_SITE_URL: string;
     NEXT_PUBLIC_EMAIL_SELF: string;
+    RATE_LIMIT_KV: KVNamespace;
   }
 
   interface Window {

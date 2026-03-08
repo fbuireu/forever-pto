@@ -30,6 +30,10 @@ mode = "smart"
 binding = "NEXT_INC_CACHE_R2_BUCKET"
 bucket_name = "next-inc-cache"
 
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "830b55c22c574287acebb51ca89b01f0"
+
 [vars]
 NEXT_PUBLIC_SITE_URL = "https://forever-pto.com"
 NEXT_PUBLIC_EMAIL_SELF = "fbuireu@gmail.com"

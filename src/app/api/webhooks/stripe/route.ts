@@ -32,10 +32,15 @@ export async function POST(request: NextRequest) {
   const result = await handleStripeWebhook(body, signature);
 
   if (!result.success) {
+    const status = result.isSignatureError ? 400 : 500;
     webhookLogger.error('Stripe webhook handling failed', {
       error: result.error,
+      status,
     });
-    return NextResponse.json({ error: 'Webhook processing failed' }, { status: 400 });
+    return NextResponse.json(
+      { error: result.isSignatureError ? 'Invalid signature' : 'Webhook processing failed' },
+      { status }
+    );
   }
 
   webhookLogger.info('Stripe webhook processed successfully');

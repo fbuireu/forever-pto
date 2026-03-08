@@ -1,9 +1,7 @@
 import {
-  createChargeSucceededEvent,
   createPaymentFailedEvent,
   createPaymentSucceededEvent,
 } from '@domain/payment/events/factory/events';
-import { handleChargeSucceeded } from '@domain/payment/handlers/charge-succeeded';
 import { handlePaymentFailed } from '@domain/payment/handlers/payment-failed';
 import { handlePaymentSucceeded } from '@domain/payment/handlers/payment-succeeded';
 import { getTursoClientInstance } from '@infrastructure/clients/db/turso/client';
@@ -36,12 +34,6 @@ export const processWebhookEvent = async (event: Stripe.Event): Promise<void> =>
     case 'payment_intent.payment_failed': {
       const paymentEvent = createPaymentFailedEvent(event.data.object);
       await handlePaymentFailed(paymentEvent, { paymentRepository });
-      break;
-    }
-
-    case 'charge.succeeded': {
-      const chargeEvent = createChargeSucceededEvent(event.data.object);
-      await handleChargeSucceeded(chargeEvent, { paymentRepository });
       break;
     }
 

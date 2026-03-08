@@ -1,10 +1,20 @@
 import { createPayment } from '@application/use-cases/payment';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { checkPaymentRateLimit } from '@infrastructure/services/payments/rate-limit';
 import { type NextRequest, NextResponse } from 'next/server';
 
 const logger = getBetterStackInstance();
 
 export async function POST(request: NextRequest) {
+  const ip =
+    request.headers.get('cf-connecting-ip') ??
+    request.headers.get('x-forwarded-for') ??
+    'unknown';
+
+  if (!(await checkPaymentRateLimit(ip))) {
+    return NextResponse.json({ success: false, error: 'Too many requests' }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
 
