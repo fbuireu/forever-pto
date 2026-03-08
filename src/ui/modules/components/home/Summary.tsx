@@ -137,7 +137,7 @@ export const Summary = () => {
                 <span>{locationInfo.userCountry?.label}</span>
               </Badge>
               {region && locationInfo.userRegion && (
-                <Badge variant='secondary' className='mx-1'>
+                <Badge variant='outline' className='mx-1'>
                   <span>{locationInfo.userRegion.label}</span>
                 </Badge>
               )}

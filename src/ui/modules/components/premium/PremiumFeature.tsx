@@ -98,7 +98,7 @@ export const PremiumFeature = ({
             <div className={'flex flex-col items-center gap-2 text-center px-4'}>
               <Lock className={cn(iconSize, 'text-muted-foreground')} />
               {inlineDescription && (
-                <div className='text-sm text-foreground [text-shadow:0_2px_4px_rgba(0,0,0,1)]'>{description}</div>
+                <div className='text-sm text-foreground dark:[text-shadow:0_2px_4px_rgba(0,0,0,1)]'>{description}</div>
               )}
             </div>
           )}
