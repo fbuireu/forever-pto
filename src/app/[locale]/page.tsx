@@ -48,6 +48,7 @@ export default Home;
 
 // todo: share button with results?
 // todo: unify modal styles (footer actions, spacing, etc)
+// todo: migrate to biome (remove eslint comments)
 // todo: performance audit, react best practices audit
 // todo: ads?
 // todo: custom 404 and error?
