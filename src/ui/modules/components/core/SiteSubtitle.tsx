@@ -11,11 +11,27 @@ export const SiteSubtitle = () => {
   return (
     <p className='text-center text-muted-foreground leading-tight mt-2 mb-16'>
       {t('instructions')}{' '}
-      <button type='button' onClick={startTutorial} className='hover:underline cursor-pointer text-foreground font-medium'>
+      <button
+        type='button'
+        onClick={startTutorial}
+        className='hover:underline cursor-pointer text-foreground font-medium'
+      >
         {t('quickTour')}
       </button>{' '}
       {t('or')}{' '}
-      <Link className='hover:underline text-foreground font-medium' href='#faq'>
+      <Link
+        className='hover:underline text-foreground font-medium'
+        href='/#faq'
+        onClick={(event) => {
+          const faq = document.getElementById('faq');
+
+          if (!faq) {
+            return;
+          }
+          event.preventDefault();
+          faq.scrollIntoView({ behavior: 'smooth' });
+        }}
+      >
         {t('checkFaqs')}
       </Link>
       .
