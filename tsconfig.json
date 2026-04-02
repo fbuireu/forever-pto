@@ -11,15 +11,11 @@
     "node_modules/**/*"
   ],
   "compilerOptions": {
-    "baseUrl": ".",
     "target": "ESNext",
-    "strictNullChecks": true,
-    "allowSyntheticDefaultImports": true,
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
-    "esModuleInterop": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
@@ -28,8 +24,10 @@
     "incremental": true,
     "lib": [
       "dom",
-      "dom.iterable",
       "esnext"
+    ],
+    "types": [
+      "node"
     ],
     "plugins": [
       {

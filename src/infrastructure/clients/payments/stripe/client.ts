@@ -173,7 +173,7 @@ export const getStripeServerInstance = (): StripeNode => {
     }
 
     stripeServerInstance = new StripeNode(secretKey, {
-      apiVersion: '2026-02-25.clover',
+      apiVersion: '2026-03-25.dahlia',
       httpClient: StripeNode.createFetchHttpClient(),
     });
   }

@@ -2,7 +2,7 @@ import { getTranslations } from 'next-intl/server';
 
 import { Troubleshooting } from '@ui/modules/components/faq/Troubleshooting';
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from 'src/components/animate-ui/base/accordion';
-import type { FaqData } from 'src/ui/modules/components/faq/types';
+import type { FaqData } from '@ui/modules/components/faq/types';
 import { Tutorial } from '../faq/Tutorial';
 import { TutorialTrigger } from '../faq/TutorialTrigger';
 

@@ -31,7 +31,7 @@ export class TursoClient {
   async query<T = unknown>(sql: string, args?: InValue[]): Promise<QueryResult<T[]>> {
     try {
       const connection = this.createConnection();
-      const statement = connection.prepare(sql);
+      const statement = await connection.prepare(sql);
       const rows = await statement.all(args ?? []);
 
       return {
@@ -51,7 +51,7 @@ export class TursoClient {
   async execute(sql: string, args?: InValue[]): Promise<QueryResult<void>> {
     try {
       const connection = this.createConnection();
-      const statement = connection.prepare(sql);
+      const statement = await connection.prepare(sql);
       await statement.run(args ?? []);
 
       return { success: true };
