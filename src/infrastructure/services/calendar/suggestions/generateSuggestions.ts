@@ -1,5 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { isWeekend } from 'date-fns';
+import { isWeekend } from '@shared/utils/date';
 import type { Bridge, Suggestion } from '../types';
 import { FilterStrategy } from '../types';
 import { clearDateKeyCache, clearHolidayCache } from '../utils/cache';

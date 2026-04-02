@@ -1,5 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { isWeekend } from 'date-fns';
+import { isWeekend } from '@shared/utils/date';
 
 const DATE_KEY_CACHE = new Map<number, string>();
 const HOLIDAY_CACHE = new Map<string, Set<string>>();

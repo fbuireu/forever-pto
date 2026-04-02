@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import type { FromTo } from '../../core/Calendar';
 import { Calendar, CalendarSelectionMode } from '../../core/Calendar';
-import { formatDate } from '../../utils/formatters';
+import { formatDate } from '@shared/utils/date';
 
 export interface WorkdayCounterCalendarModalProps {
   open: boolean;

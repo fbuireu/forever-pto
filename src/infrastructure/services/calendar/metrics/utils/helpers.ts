@@ -15,7 +15,7 @@ export function getLongBlocksPerQuarter(days: Date[]): number[] {
     const quarter = Math.floor(date.getMonth() / 3);
     if (
       currentBlock.length === 0 ||
-      (date.getTime() - currentBlock[currentBlock.length - 1].getTime()) / (1000 * 60 * 60 * 24) === 1
+      differenceInDays(date, currentBlock[currentBlock.length - 1]) === 1
     ) {
       currentBlock.push(date);
       lastQuarter = quarter;
@@ -60,8 +60,7 @@ export function getTotalEffectiveDays(
   return effectiveDaysFromBridges + standaloneDays;
 }
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { formatDate } from '@ui/modules/components/utils/formatters';
-import { eachDayOfInterval, endOfYear, getMonth, isWeekend, startOfToday, startOfYear } from 'date-fns';
+import { differenceInDays, eachDayOfInterval, endOfYear, formatDate, getMonth, isWeekend, startOfToday, startOfYear } from '@shared/utils/date';
 import type { Locale } from 'next-intl';
 import type { FirstLastBreak } from '../../types';
 
@@ -72,7 +71,7 @@ export const calculateRestBlocks = (dates: Date[]): number => {
   const sorted = [...dates].sort((a, b) => a.getTime() - b.getTime());
 
   for (let i = 1; i < sorted.length; i++) {
-    const daysDiff = (sorted[i].getTime() - sorted[i - 1].getTime()) / (1000 * 60 * 60 * 24);
+    const daysDiff = differenceInDays(sorted[i], sorted[i - 1]);
     if (daysDiff > 7) blocks++;
   }
 

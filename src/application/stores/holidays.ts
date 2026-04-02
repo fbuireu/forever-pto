@@ -7,8 +7,7 @@ import { generateMetrics } from '@infrastructure/services/calendar/metrics/gener
 import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
 import { ensureDate } from '@shared/utils/helpers';
-import { formatDate } from '@ui/modules/components/utils/formatters';
-import { addMonths, endOfYear, startOfYear } from 'date-fns';
+import { addMonths, endOfYear, formatDate, startOfYear } from '@shared/utils/date';
 import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';

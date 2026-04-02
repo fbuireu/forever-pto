@@ -23,7 +23,7 @@ import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Plus } from 'src/components/animate-ui/icons/plus';
 import { Calendar, CalendarSelectionMode, type FromTo } from '../../core/Calendar';
-import { formatDate } from '../../utils/formatters';
+import { formatDate } from '@shared/utils/date';
 import { type HolidayFormData, createHolidaySchema } from './schema';
 
 interface AddHolidayModalProps {

@@ -11,7 +11,7 @@ import { cn } from '@const/lib/utils';
 import { useDebounce } from '@ui/hooks/useDebounce';
 import { ConditionalWrapper } from '@ui/modules/components/core/ConditionalWrapper';
 import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/components/premium/PremiumFeature';
-import { isWeekend } from 'date-fns/isWeekend';
+import { isWeekend } from '@shared/utils/date';
 import { Edit } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';

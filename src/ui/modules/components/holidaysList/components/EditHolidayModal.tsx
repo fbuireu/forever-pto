@@ -22,7 +22,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Calendar, CalendarSelectionMode, type FromTo } from '../../core/Calendar';
-import { formatDate } from '../../utils/formatters';
+import { formatDate } from '@shared/utils/date';
 import { type HolidayFormData, createHolidaySchema } from './schema';
 
 interface EditHolidayModalProps {

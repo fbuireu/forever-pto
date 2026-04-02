@@ -2,8 +2,7 @@ import type { FiltersState } from '@application/stores/filters';
 import type { HolidaysState } from '@application/stores/holidays';
 import { usePremiumStore } from '@application/stores/premium';
 import { cn } from '@const/lib/utils';
-import type { Day } from 'date-fns';
-import { addMonths, isSameDay, isSameMonth, isWeekend, subMonths } from 'date-fns';
+import { addMonths, type Day, isSameDay, isSameMonth, isWeekend, subMonths } from '@shared/utils/date';
 import { LockIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { Locale } from 'next-intl';
@@ -14,7 +13,7 @@ import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
 import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
-import { formatDate } from '../utils/formatters';
+import { formatDate } from '@shared/utils/date';
 import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
 import {
   getPreviewRange,

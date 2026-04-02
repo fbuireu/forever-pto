@@ -1,17 +1,10 @@
 {
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
-  ],
-  "exclude": [
-    ".next/**/*",
-    "node_modules/**/*"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
+  "exclude": [".next/**/*", "node_modules/**/*"],
+
   "compilerOptions": {
     "target": "ESNext",
+    "esModuleInterop": true,
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
@@ -22,61 +15,29 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "lib": [
-      "dom",
-      "esnext"
-    ],
-    "types": [
-      "node"
-    ],
+    "lib": ["dom", "esnext"],
+    "types": ["node"],
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@const/*": [
-        "./src/const/*"
-      ],
-      "@app/*": [
-        "./src/app/*"
-      ],
-      "@infrastructure/*": [
-        "./src/infrastructure/*"
-      ],
-      "@domain/*": [
-        "./src/domain/*"
-      ],
-      "@ui/*": [
-        "./src/ui/*"
-      ],
-      "@application/*": [
-        "./src/application/*"
-      ],
-      "@modules/*": [
-        "./src/ui/modules/*"
-      ],
-      "@utils/*": [
-        "./src/utils/*"
-      ],
-      "@assets/*": [
-        "./src/ui/assets/*"
-      ],
-      "@styles/*": [
-        "./src/ui/styles/*"
-      ],
-      "@shared/*": [
-        "./src/shared/*"
-      ],
-      "@i18n/*": [
-        "./src/ui/i18n/*"
-      ],
-      "@mocks/*": [
-        "./src/mocks/*"
-      ],
-      "@types/*": [
-        "./src/types/*"
-      ]
+      "src/*": ["./src/*"],
+      "@const/*": ["./src/const/*"],
+      "@app/*": ["./src/app/*"],
+      "@infrastructure/*": ["./src/infrastructure/*"],
+      "@domain/*": ["./src/domain/*"],
+      "@ui/*": ["./src/ui/*"],
+      "@application/*": ["./src/application/*"],
+      "@modules/*": ["./src/ui/modules/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@assets/*": ["./src/ui/assets/*"],
+      "@styles/*": ["./src/ui/styles/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@i18n/*": ["./src/ui/i18n/*"],
+      "@mocks/*": ["./src/mocks/*"],
+      "@types/*": ["./src/types/*"]
     }
   }
 }

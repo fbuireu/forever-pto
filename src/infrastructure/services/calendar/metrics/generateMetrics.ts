@@ -1,4 +1,4 @@
-import { formatDate } from '@ui/modules/components/utils/formatters';
+import { formatDate } from '@shared/utils/date';
 import type { Locale } from 'next-intl';
 import type { Bridge, Metrics, Suggestion } from '../types';
 import {

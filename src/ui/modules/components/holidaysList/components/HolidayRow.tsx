@@ -4,13 +4,13 @@ import { type HolidayDTO } from '@application/dto/holiday/types';
 import { Badge } from '@const/components/ui/badge';
 import { TableCell, TableRow } from '@const/components/ui/table';
 import { cn } from '@const/lib/utils';
-import { isWeekend } from 'date-fns/isWeekend';
+import { isWeekend } from '@shared/utils/date';
 import { useTranslations } from 'next-intl';
 import type { Locale } from 'next-intl';
 import { memo } from 'react';
 import { Checkbox } from 'src/components/animate-ui/base/checkbox';
 import { PremiumFeature, PremiumFeatureVariant } from '../../premium/PremiumFeature';
-import { formatDate } from '../../utils/formatters';
+import { formatDate } from '@shared/utils/date';
 
 interface HolidayRowProps {
   holiday: HolidayDTO;

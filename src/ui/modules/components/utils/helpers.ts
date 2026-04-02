@@ -1,20 +1,17 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { getLocalizedDateFns } from '@application/i18n/localize';
-import type { Day } from 'date-fns';
 import {
+  type Day,
   addDays,
   addMonths,
   eachDayOfInterval,
   eachWeekendOfInterval,
   endOfMonth,
   endOfWeek,
-  format,
-  getWeek,
   isSameDay,
   isWeekend,
   startOfMonth,
   startOfWeek,
-} from 'date-fns';
+} from '@shared/utils/date';
 import type { Locale } from 'next-intl';
 import type { FromTo } from '../core/Calendar';
 
@@ -30,15 +27,9 @@ interface GetWeekdayNamesParams {
 export const getWeekdayNames = ({ locale, weekStartsOn }: GetWeekdayNamesParams): string[] => {
   const monday = new Date(2023, 0, 2);
   const weekStart = startOfWeek(monday, { weekStartsOn });
+  const fmt = new Intl.DateTimeFormat(locale as string, { weekday: 'short' });
 
-  const days: string[] = [];
-
-  for (let i = 0; i < DAYS_PER_WEEK; i++) {
-    const day = addDays(weekStart, i);
-    days.push(format(day, 'EE', { locale: getLocalizedDateFns(locale) }));
-  }
-
-  return days;
+  return Array.from({ length: DAYS_PER_WEEK }, (_, i) => fmt.format(addDays(weekStart, i)));
 };
 
 interface GetDayLabelParams {

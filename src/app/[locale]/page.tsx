@@ -48,7 +48,6 @@ export default Home;
 
 // todo: https://neciudan.dev/lets-build-dynamic-shimmer-skeletons
 // todo: share button with results?
-// todo: use Temporal API
 // todo: unify modal styles (footer actions, spacing, etc)
 // todo: migrate to biome (remove eslint comments)
 // todo: performance audit, react best practices audit

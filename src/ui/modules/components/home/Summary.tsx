@@ -12,11 +12,11 @@ import { Award, BarChart3, Calendar, CalendarDays, Palmtree, TrendingUp, Zap } f
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { useMemo } from 'react';
-import { Clock } from 'src/components/animate-ui/icons/clock';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { RotatingText } from 'src/components/animate-ui/text/rotating';
-import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
+import { Clock } from '../../../../components/animate-ui/icons/clock';
+import { AnimateIcon } from '../../../../components/animate-ui/icons/icon';
+import { RotatingText } from '../../../../components/animate-ui/text/rotating';
+import { SlidingNumber } from '../../../../components/animate-ui/text/sliding-number';
 import { PremiumFeature } from '../premium/PremiumFeature';
 import { SummarySkeleton } from '../skeletons/SummarySkeleton';
 import { MetricCard, MetricCardSize } from '../summary/MetricCard';
@@ -173,9 +173,7 @@ export const Summary = () => {
               </p>
             )}
             {!region && (
-              <p className='text-sm text-amber-600 dark:text-amber-400'>
-                {t('summaryParagraph.noRegionHint')}
-              </p>
+              <p className='text-sm text-amber-600 dark:text-amber-400'>{t('summaryParagraph.noRegionHint')}</p>
             )}
           </CardDescription>
         </CardHeader>
