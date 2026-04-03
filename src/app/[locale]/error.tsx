@@ -4,8 +4,8 @@ import { Button } from '@const/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { AlertTriangle } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 
 const logger = getBetterStackInstance();
@@ -15,7 +15,7 @@ interface ErrorProps {
   reset: () => void;
 }
 
-export default function Error({ error, reset }: ErrorProps) {
+export default function ErrorPage({ error, reset }: ErrorProps) {
   const t = useTranslations('error');
 
   useEffect(() => {

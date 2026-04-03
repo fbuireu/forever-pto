@@ -9,10 +9,14 @@ import {
 import { Label } from '@const/components/ui/label';
 import { Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { Switch } from '../../../../components/animate-ui/headless/switch';
-import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '../../../../components/animate-ui/base/accordion';
+import {
+  Accordion,
+  AccordionItem,
+  AccordionPanel,
+  AccordionTrigger,
+} from '../../../../components/animate-ui/base/accordion';
 import { Button } from '../../../../components/animate-ui/components/buttons/button';
-
+import { Switch } from '../../../../components/animate-ui/headless/switch';
 
 interface CookieConsentDialogProps {
   open: boolean;

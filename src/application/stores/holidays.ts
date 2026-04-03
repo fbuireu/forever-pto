@@ -1,13 +1,13 @@
-import { HolidayVariant, type HolidayDTO } from '@application/dto/holiday/types';
+import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import { isInSelectedRange } from '@application/dto/holiday/utils/helpers';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { generateAlternatives } from '@infrastructure/services/calendar/alternatives/generateAlternatives';
-import { generateSuggestions } from '@infrastructure/services/calendar/suggestions/generateSuggestions';
 import { generateMetrics } from '@infrastructure/services/calendar/metrics/generateMetrics';
+import { generateSuggestions } from '@infrastructure/services/calendar/suggestions/generateSuggestions';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
-import { ensureDate } from '@shared/utils/helpers';
 import { addMonths, endOfYear, formatDate, startOfYear } from '@shared/utils/date';
+import { ensureDate } from '@shared/utils/helpers';
 import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -364,9 +364,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           } else if (isSuggested && wasRemoved) {
             updatedRemovedDays = removedSuggestedDays.filter((d) => d.toDateString() !== dateStr);
           } else if (isSuggested && !wasRemoved) {
-            updatedRemovedDays = [...removedSuggestedDays, ensureDate(date)].sort(
-              (a, b) => a.getTime() - b.getTime()
-            );
+            updatedRemovedDays = [...removedSuggestedDays, ensureDate(date)].sort((a, b) => a.getTime() - b.getTime());
           } else {
             const activeSuggestedCount = currentSelection.days.length - removedSuggestedDays.length;
             const manualSelectedCount = manuallySelectedDays.length;
@@ -381,9 +379,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               return false;
             }
 
-            updatedManualDays = [...manuallySelectedDays, ensureDate(date)].sort(
-              (a, b) => a.getTime() - b.getTime()
-            );
+            updatedManualDays = [...manuallySelectedDays, ensureDate(date)].sort((a, b) => a.getTime() - b.getTime());
           }
 
           const updatedMetrics = generateMetrics({

@@ -9,7 +9,7 @@ import { cn } from '@const/lib/utils';
 import { Slot } from '@radix-ui/react-slot';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
-import { type Transition } from 'motion/react';
+import type { Transition } from 'motion/react';
 import { createContext, use, useCallback, useEffect, useMemo, useState } from 'react';
 import { MotionHighlight, MotionHighlightItem } from '../effects/motion-highlight';
 import { PanelLeftIcon } from '../icons/panel-left';
@@ -78,7 +78,7 @@ function SidebarProvider({
 
   const toggleSidebar = useCallback(() => {
     return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
-  }, [isMobile, setOpen, setOpenMobile]);
+  }, [isMobile, setOpen]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -104,7 +104,7 @@ function SidebarProvider({
       setOpenMobile,
       toggleSidebar,
     }),
-    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+    [state, open, setOpen, isMobile, openMobile, toggleSidebar]
   );
 
   return (
@@ -723,49 +723,49 @@ function SidebarMenuSubButton({
 export {
   Sidebar,
   SidebarContent,
+  type SidebarContentProps,
   SidebarFooter,
+  type SidebarFooterProps,
   SidebarGroup,
   SidebarGroupAction,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarInput,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuAction,
-  SidebarMenuBadge,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSkeleton,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarProvider,
-  SidebarRail,
-  SidebarSeparator,
-  SidebarTrigger,
-  useSidebar,
-  type SidebarContentProps,
-  type SidebarFooterProps,
   type SidebarGroupActionProps,
+  SidebarGroupContent,
   type SidebarGroupContentProps,
+  SidebarGroupLabel,
   type SidebarGroupLabelProps,
   type SidebarGroupProps,
+  SidebarHeader,
   type SidebarHeaderProps,
+  SidebarInput,
   type SidebarInputProps,
+  SidebarInset,
   type SidebarInsetProps,
+  SidebarMenu,
+  SidebarMenuAction,
   type SidebarMenuActionProps,
+  SidebarMenuBadge,
   type SidebarMenuBadgeProps,
+  SidebarMenuButton,
   type SidebarMenuButtonProps,
+  SidebarMenuItem,
   type SidebarMenuItemProps,
   type SidebarMenuProps,
+  SidebarMenuSkeleton,
   type SidebarMenuSkeletonProps,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
   type SidebarMenuSubButtonProps,
+  SidebarMenuSubItem,
   type SidebarMenuSubItemProps,
   type SidebarMenuSubProps,
   type SidebarProps,
+  SidebarProvider,
   type SidebarProviderProps,
+  SidebarRail,
   type SidebarRailProps,
+  SidebarSeparator,
   type SidebarSeparatorProps,
+  SidebarTrigger,
   type SidebarTriggerProps,
+  useSidebar,
 };

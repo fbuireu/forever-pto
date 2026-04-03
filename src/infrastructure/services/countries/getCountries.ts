@@ -1,8 +1,8 @@
 import { countryDTO } from '@application/dto/country/dto';
 import type { CountryDTO } from '@application/dto/country/types';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import countries from 'i18n-iso-countries';
 import type { Locale } from 'next-intl';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 export async function getCountries(locale: Locale): Promise<CountryDTO[]> {
   try {

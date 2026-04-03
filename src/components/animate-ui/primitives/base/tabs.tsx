@@ -1,7 +1,7 @@
 import { Tabs as TabsPrimitive } from '@base-ui/react/tabs';
 import { useControlledState } from '@ui/hooks/useControlledState';
-import { AnimatePresence, motion, type HTMLMotionProps } from 'motion/react';
-import { Fragment, type ComponentProps, type ReactNode } from 'react';
+import { AnimatePresence, type HTMLMotionProps, motion } from 'motion/react';
+import { type ComponentProps, Fragment, type ReactNode } from 'react';
 import { getStrictContext } from 'src/lib/get-strict-context';
 import { Highlight, HighlightItem, type HighlightItemProps, type HighlightProps } from '../effects/highlight';
 
@@ -125,15 +125,15 @@ export {
   Tabs,
   TabsHighlight,
   TabsHighlightItem,
-  TabsList,
-  TabsPanel,
-  TabsPanels,
-  TabsTab,
   type TabsHighlightItemProps,
   type TabsHighlightProps,
+  TabsList,
   type TabsListProps,
+  TabsPanel,
   type TabsPanelProps,
+  TabsPanels,
   type TabsPanelsProps,
   type TabsProps,
+  TabsTab,
   type TabsTabProps,
 };

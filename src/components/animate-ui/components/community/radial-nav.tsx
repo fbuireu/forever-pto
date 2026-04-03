@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@const/lib/utils';
-import { MousePointer2, type LucideIcon } from 'lucide-react';
+import { type LucideIcon, MousePointer2 } from 'lucide-react';
 import { motion, type SVGMotionProps, type Transition, type Variants } from 'motion/react';
 import * as React from 'react';
 
@@ -90,7 +90,7 @@ function calculateIconOffset({
   return centerOffset - buttonPadding + bias;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: vendored component
 function withDefaults<T extends Record<string, any>>(defaults: T, overrides?: Partial<T>): T {
   return { ...defaults, ...overrides };
 }
@@ -239,4 +239,4 @@ function RadialNav({ size = 180, items, menuButtonConfig, defaultActiveId, onAct
   );
 }
 
-export { RadialNav, type MenuButtonConfig, type RadialNavItem, type RadialNavProps };
+export { type MenuButtonConfig, RadialNav, type RadialNavItem, type RadialNavProps };

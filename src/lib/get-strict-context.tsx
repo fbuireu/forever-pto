@@ -1,4 +1,4 @@
-import { createContext, useContext, type JSX, type ReactNode } from 'react';
+import { createContext, type JSX, type ReactNode, useContext } from 'react';
 
 function getStrictContext<T>(
   name?: string

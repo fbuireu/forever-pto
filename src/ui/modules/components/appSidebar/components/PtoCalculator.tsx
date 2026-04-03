@@ -8,12 +8,12 @@ import { Calculator, InfoIcon } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useRef, useState } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
+import { Plus } from 'src/components/animate-ui/icons/plus';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 import { getMonthNames } from '../../utils/helpers';
-import { Plus } from 'src/components/animate-ui/icons/plus';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 interface MonthOption {
   value: string;

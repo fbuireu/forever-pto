@@ -78,7 +78,15 @@ export const HolidaysDistributionChart = ({ ptoDays, holidays }: HolidaysDistrib
         <CardContent className='h-64'>
           <ResponsiveContainer width='100%' height='100%'>
             <RechartsPieChart>
-              <Pie data={chartData.data} dataKey='value' nameKey='name' cx='50%' cy='50%' innerRadius={50} outerRadius={85}>
+              <Pie
+                data={chartData.data}
+                dataKey='value'
+                nameKey='name'
+                cx='50%'
+                cy='50%'
+                innerRadius={50}
+                outerRadius={85}
+              >
                 {chartData.data.map((entry) => (
                   <Cell key={entry.name} fill={MODIFIERS_CLASS_NAMES[entry.name] || entry.color} />
                 ))}

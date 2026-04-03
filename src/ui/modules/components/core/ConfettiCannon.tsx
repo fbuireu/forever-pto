@@ -9,7 +9,7 @@ interface ConfettiCannonProps {
 
 export const ConfettiCannon = ({ onComplete }: ConfettiCannonProps) => {
   const onCompleteRef = useRef(onComplete);
-  
+
   useEffect(() => {
     onCompleteRef.current = onComplete;
   }, [onComplete]);

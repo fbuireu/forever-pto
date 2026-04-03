@@ -169,7 +169,7 @@ export const PtoSalaryCalculator = () => {
                   <p className='text-amber-600 dark:text-amber-300'>
                     {t.rich('opportunityCostDescription', {
                       days: unusedPTODays,
-                      amount: (chunks) => (
+                      amount: (_chunks) => (
                         <span className='inline-flex font-semibold'>
                           <CurrencyNumber value={unusedPTOValue} decimalPlaces={0} />
                         </span>

@@ -6,12 +6,12 @@ import { cn } from '@const/lib/utils';
 import type { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { useState } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
+import { Check } from 'src/components/animate-ui/icons/check';
+import { ChevronUpDown } from 'src/components/animate-ui/icons/chevron-up-down';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './command';
 import { hasFlag } from './utils/helpers';
-import { ChevronUpDown } from 'src/components/animate-ui/icons/chevron-up-down';
-import { Check } from 'src/components/animate-ui/icons/check';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 interface ComboboxProps extends Omit<React.HTMLProps<HTMLInputElement>, 'onChange'> {
   searchPlaceholder?: string;

@@ -1,9 +1,9 @@
 'use client';
 
+import { type UseIsInViewOptions, useIsInView } from '@ui/hooks/useIsInView';
+import { AnimatePresence, type HTMLMotionProps, motion } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
-import { motion, AnimatePresence, type HTMLMotionProps } from 'motion/react';
 import { getStrictContext } from 'src/lib/get-strict-context';
-import { useIsInView, type UseIsInViewOptions } from '@ui/hooks/useIsInView';
 
 type RotatingTextContextType = {
   currentText: string;
@@ -100,10 +100,10 @@ function RotatingText({ transition = { duration: 0.3, ease: 'easeOut' }, ...prop
 }
 
 export {
-  RotatingTextContainer,
   RotatingText,
-  useRotatingText,
+  RotatingTextContainer,
   type RotatingTextContainerProps,
-  type RotatingTextProps,
   type RotatingTextContextType,
+  type RotatingTextProps,
+  useRotatingText,
 };

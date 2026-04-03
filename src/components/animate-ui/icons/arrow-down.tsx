@@ -129,9 +129,9 @@ function ArrowDown(props: ArrowDownProps) {
 }
 
 export {
-  animations,
   ArrowDown,
   ArrowDown as ArrowDownIcon,
   type ArrowDownProps as ArrowDownIconProps,
   type ArrowDownProps,
+  animations,
 };

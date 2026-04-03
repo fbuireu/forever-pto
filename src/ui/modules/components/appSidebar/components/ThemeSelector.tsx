@@ -15,6 +15,11 @@ import {
   DropdownMenuTrigger,
 } from 'src/components/animate-ui/radix/dropdown-menu';
 
+const getResolvedTheme = (theme: ReturnType<typeof useTheme>['theme']) => {
+  if (theme !== 'system') return theme;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
+
 export const ThemeSelector = () => {
   const { setTheme, themes, theme: currentTheme, resolvedTheme } = useTheme();
   const t = useTranslations('theme');
@@ -26,11 +31,6 @@ export const ThemeSelector = () => {
       callback();
     }
   }, []);
-
-  const getResolvedTheme = (theme: ReturnType<typeof useTheme>['theme']) => {
-    if (theme !== 'system') return theme;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  };
 
   const changeTheme = useCallback(
     (newTheme: string) => {

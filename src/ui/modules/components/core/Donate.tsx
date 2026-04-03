@@ -1,7 +1,7 @@
 'use client';
 
 import { type CreatePaymentInput, createPaymentSchemaWithMessages } from '@application/dto/payment/schema';
-import { type DiscountInfo } from '@application/dto/payment/types';
+import type { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
@@ -127,7 +127,7 @@ export const Donate = () => {
         }
       });
     },
-    [setEmail, locale, currency]
+    [setEmail, locale, currency, t]
   );
 
   const handlePaymentSuccess = useCallback(() => {

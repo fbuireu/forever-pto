@@ -1,6 +1,6 @@
 import type { ChargeService } from '@domain/payment/services/charge';
-import type Stripe from 'stripe';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import type Stripe from 'stripe';
 
 const retrieveCharge = async (
   stripe: Stripe,

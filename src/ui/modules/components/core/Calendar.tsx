@@ -2,10 +2,10 @@ import type { FiltersState } from '@application/stores/filters';
 import type { HolidaysState } from '@application/stores/holidays';
 import { usePremiumStore } from '@application/stores/premium';
 import { cn } from '@const/lib/utils';
-import { addMonths, type Day, isSameDay, isSameMonth, isWeekend, subMonths } from '@shared/utils/date';
+import { addMonths, type Day, formatDate, isSameDay, isSameMonth, isWeekend, subMonths } from '@shared/utils/date';
 import { LockIcon } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import type { Locale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
@@ -13,7 +13,6 @@ import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
 import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
-import { formatDate } from '@shared/utils/date';
 import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
 import {
   getPreviewRange,
@@ -336,7 +335,6 @@ export function Calendar({
       onSelect,
       rangeSelection,
       onDayToggle,
-      manuallySelectedDays,
       allowPastDays,
       modifiers.disabled,
       modifiers.suggested,
@@ -346,6 +344,7 @@ export function Calendar({
       openDonatePopover,
       t,
       tPremium,
+      modifiers.bankHoliday,
     ]
   );
 
@@ -413,6 +412,7 @@ export function Calendar({
         ))}
       </div>
 
+      {/* biome-ignore lint/a11y/useSemanticElements: role=grid on div is required for calendar ARIA pattern */}
       <div className='grid grid-cols-7 gap-2' role='grid' aria-label={monthYearLabel}>
         {calendarDays.map((date) => {
           const isPastDay = modifiers.disabled(date);

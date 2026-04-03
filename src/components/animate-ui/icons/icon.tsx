@@ -1,32 +1,31 @@
 'use client';
 
+import { cn } from '@const/lib/utils';
+import { useIsInView } from '@ui/hooks/useIsInView';
 import {
-  createContext,
-  useContext,
-  useState,
-  useRef,
-  useCallback,
-  useEffect,
-  isValidElement,
-  type ReactNode,
+  type HTMLMotionProps,
+  motion,
+  type SVGMotionProps,
+  type UseInViewOptions,
+  useAnimation,
+  type Variants,
+} from 'motion/react';
+import {
   type ComponentType,
-  type SyntheticEvent,
+  createContext,
+  isValidElement,
   type MouseEvent,
   type PointerEvent,
   type ReactElement,
+  type ReactNode,
+  type SyntheticEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
-import {
-  motion,
-  useAnimation,
-  type SVGMotionProps,
-  type UseInViewOptions,
-  type Variants,
-  type HTMLMotionProps,
-} from 'motion/react';
-
-import { cn } from '@const/lib/utils';
 import { Slot, type WithAsChild } from '../primitives/animate/slot';
-import { useIsInView } from '@ui/hooks/useIsInView';
 
 const staticAnimations = {
   path: {
@@ -131,7 +130,7 @@ function composeEventHandlers<E extends SyntheticEvent<unknown>>(
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: vendored component
 type AnyProps = Record<string, any>;
 
 function AnimateIcon({
@@ -220,8 +219,8 @@ function AnimateIcon({
     setCurrentAnimation(typeof animate === 'string' ? animate : animation);
     if (animate) startAnimation(animate as TriggerProp);
     else stopAnimation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [animate]);
+    // biome-ignore lint/correctness/useExhaustiveDependencies: vendored component
+  }, [animate, stopAnimation, animation, startAnimation]);
 
   useEffect(() => {
     return () => {
@@ -373,8 +372,8 @@ function AnimateIcon({
         loopDelayRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [localAnimate, controls]);
+    // biome-ignore lint/correctness/useExhaustiveDependencies: vendored component
+  }, [localAnimate, initialOnAnimateEnd, status, loop, startAnim, persistOnAnimateEnd, loopDelay, completeOnStop]);
 
   const childProps = (isValidElement(children) ? (children as ReactElement).props : {}) as AnyProps;
 
@@ -589,7 +588,7 @@ function IconWrapper<T extends string>({
 }
 
 function getVariants<V extends { default: T; [key: string]: T }, T extends Record<string, Variants>>(animations: V): T {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // biome-ignore lint/correctness/useHookAtTopLevel: vendored component
   const { animation: animationType } = useAnimateIconContext();
 
   let result: T;
@@ -609,14 +608,14 @@ function getVariants<V extends { default: T; [key: string]: T }, T extends Recor
 }
 
 export {
-  pathClassName,
-  staticAnimations,
   AnimateIcon,
-  IconWrapper,
-  useAnimateIconContext,
+  type AnimateIconContextValue,
+  type AnimateIconProps,
   getVariants,
   type IconProps,
+  IconWrapper,
   type IconWrapperProps,
-  type AnimateIconProps,
-  type AnimateIconContextValue,
+  pathClassName,
+  staticAnimations,
+  useAnimateIconContext,
 };

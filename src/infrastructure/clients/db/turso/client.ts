@@ -1,6 +1,6 @@
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { connect, type Connection } from '@tursodatabase/serverless';
-import { type InValue } from '@tursodatabase/serverless/compat';
+import { type Connection, connect } from '@tursodatabase/serverless';
+import type { InValue } from '@tursodatabase/serverless/compat';
 
 export interface QueryResult<T = unknown> {
   success: boolean;

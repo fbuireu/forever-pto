@@ -8,13 +8,13 @@ import { Badge } from '@const/components/ui/badge';
 import { Input } from '@const/components/ui/input';
 import { Table, TableBody, TableCell, TableRow } from '@const/components/ui/table';
 import { cn } from '@const/lib/utils';
+import { isWeekend } from '@shared/utils/date';
 import { useDebounce } from '@ui/hooks/useDebounce';
 import { ConditionalWrapper } from '@ui/modules/components/core/ConditionalWrapper';
 import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/components/premium/PremiumFeature';
-import { isWeekend } from '@shared/utils/date';
 import { Edit } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
+import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Checkbox } from 'src/components/animate-ui/base/checkbox';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
@@ -223,9 +223,13 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
       const newSelected = new Set(prev);
 
       if (selectionState.type === 'all') {
-        filteredHolidays.forEach((holiday, index) => newSelected.delete(getHolidayId(holiday, index)));
+        filteredHolidays.forEach((holiday, index) => {
+          newSelected.delete(getHolidayId(holiday, index));
+        });
       } else {
-        filteredHolidays.forEach((holiday, index) => newSelected.add(getHolidayId(holiday, index)));
+        filteredHolidays.forEach((holiday, index) => {
+          newSelected.add(getHolidayId(holiday, index));
+        });
       }
 
       return newSelected;
@@ -307,7 +311,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
         />
       </ConditionalWrapper>
     );
-  }, [selectionState, toggleSelectAll, premiumKey, t]);
+  }, [selectionState, toggleSelectAll, premiumKey, t, tPremium]);
 
   const selectedCount = selectedHolidays.size;
   const shouldShowLocationColumn = variantHolidays.some((h) => h.location);

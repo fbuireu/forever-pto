@@ -6,10 +6,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 const logger = getBetterStackInstance();
 
 export async function POST(request: NextRequest) {
-  const ip =
-    request.headers.get('cf-connecting-ip') ??
-    request.headers.get('x-forwarded-for') ??
-    'unknown';
+  const ip = request.headers.get('cf-connecting-ip') ?? request.headers.get('x-forwarded-for') ?? 'unknown';
 
   if (!(await checkPaymentRateLimit(ip))) {
     return NextResponse.json({ success: false, error: 'Too many requests' }, { status: 429 });

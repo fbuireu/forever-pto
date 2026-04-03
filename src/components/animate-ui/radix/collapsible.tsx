@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from 'motion/react';
+import { AnimatePresence, type HTMLMotionProps, motion, type Transition } from 'motion/react';
 import { Collapsible as CollapsiblePrimitive } from 'radix-ui';
 import { createContext, use, useCallback, useEffect, useState } from 'react';
 
@@ -32,7 +32,7 @@ function Collapsible({ children, ...props }: CollapsibleProps) {
       setIsOpen(open);
       props.onOpenChange?.(open);
     },
-    [props.onOpenChange] 
+    [props.onOpenChange]
   );
 
   return (
@@ -87,8 +87,12 @@ function CollapsibleContent({
 }
 
 export {
-  Collapsible, CollapsibleContent, CollapsibleTrigger, useCollapsible, type CollapsibleContentProps, type CollapsibleContextType,
+  Collapsible,
+  CollapsibleContent,
+  type CollapsibleContentProps,
+  type CollapsibleContextType,
   type CollapsibleProps,
-  type CollapsibleTriggerProps
+  CollapsibleTrigger,
+  type CollapsibleTriggerProps,
+  useCollapsible,
 };
-

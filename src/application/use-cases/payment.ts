@@ -1,5 +1,5 @@
 import { paymentDTO } from '@application/dto/payment/dto';
-import { createPaymentSchema, type CreatePaymentInput } from '@application/dto/payment/schema';
+import { type CreatePaymentInput, createPaymentSchema } from '@application/dto/payment/schema';
 import type { DiscountInfo, PaymentDTO } from '@application/dto/payment/types';
 import { createPaymentError } from '@domain/payment/events/factory/errors';
 import { getTursoClientInstance } from '@infrastructure/clients/db/turso/client';
@@ -17,10 +17,7 @@ interface PaymentContext {
   ipAddress: string | null;
 }
 
-export async function createPayment(
-  params: CreatePaymentInput,
-  context: PaymentContext
-): Promise<PaymentDTO> {
+export async function createPayment(params: CreatePaymentInput, context: PaymentContext): Promise<PaymentDTO> {
   const { userAgent, ipAddress } = context;
   const stripe = getStripeServerInstance();
   const logger = getBetterStackInstance();

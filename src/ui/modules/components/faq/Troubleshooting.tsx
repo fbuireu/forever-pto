@@ -47,7 +47,7 @@ export const Troubleshooting = () => {
         await fetchHolidays({ country, region, year, locale, carryOverMonths });
 
         generateSuggestions({
-          year: parseInt(year),
+          year: parseInt(year, 10),
           ptoDays,
           allowPastDays,
           months: getTotalMonths({ carryOverMonths, year }),

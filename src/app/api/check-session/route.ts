@@ -59,11 +59,11 @@ export async function GET(request: NextRequest) {
         outcome: 'no_token',
         statusCode: 200,
       });
-            return NextResponse.json({ premiumKey: null, email: null });
+      return NextResponse.json({ premiumKey: null, email: null });
     }
 
     requestLogger.info('GET /api/check-session - Token found, verifying session', {
-      tokenPrefix: token.slice(0, 10) + '...',
+      tokenPrefix: `${token.slice(0, 10)}...`,
     });
 
     const sessionRepository = createSessionRepository({ jwtSecret: getJWTSecret() });
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
         statusCode: 200,
       });
 
-            const response = NextResponse.json({ premiumKey: null, email: null });
+      const response = NextResponse.json({ premiumKey: null, email: null });
       response.cookies.delete(PREMIUM_COOKIE);
       return response;
     }
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
       statusCode: 200,
     });
 
-        return NextResponse.json({
+    return NextResponse.json({
       premiumKey: verification.data?.paymentIntentId ?? null,
       email: verification.data?.email ?? null,
     });
@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
       statusCode: 500,
     });
 
-        return NextResponse.json({ error: 'Internal error', premiumKey: null, email: null }, { status: 500 });
+    return NextResponse.json({ error: 'Internal error', premiumKey: null, email: null }, { status: 500 });
   }
 }
 
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
         bodyKeys: Object.keys(body),
         statusCode: 400,
       });
-            return NextResponse.json({ error: 'Email required' }, { status: 400 });
+      return NextResponse.json({ error: 'Email required' }, { status: 400 });
     }
 
     const emailHash = await hashEmail(email);
@@ -171,13 +171,14 @@ export async function POST(request: NextRequest) {
       paymentRepository,
     };
 
+    // biome-ignore lint/suspicious/noImplicitAnyLet: assigned in conditional branches below
     let result;
     const activationStart = performance.now();
 
     if (premiumKey) {
       const premiumKeyPrefix = premiumKey.slice(0, 8);
       userLogger.info('POST /api/check-session - Activating with payment intent', {
-        premiumKeyPrefix: premiumKeyPrefix + '...',
+        premiumKeyPrefix: `${premiumKeyPrefix}...`,
       });
 
       try {
@@ -192,7 +193,7 @@ export async function POST(request: NextRequest) {
         const activationDuration = performance.now() - activationStart;
         userLogger.logError('POST /api/check-session - Payment activation failed', error, {
           activationDuration_ms: activationDuration,
-          premiumKeyPrefix: premiumKeyPrefix + '...',
+          premiumKeyPrefix: `${premiumKeyPrefix}...`,
         });
         throw error;
       }
@@ -225,7 +226,7 @@ export async function POST(request: NextRequest) {
         statusCode: 400,
       });
 
-            return NextResponse.json(
+      return NextResponse.json(
         {
           error: result.error,
           premiumKey: null,
@@ -235,7 +236,7 @@ export async function POST(request: NextRequest) {
     }
 
     const duration = performance.now() - startTime;
-    const resultPremiumKeyPrefix = result.premiumKey ? result.premiumKey.slice(0, 8) + '...' : 'none';
+    const resultPremiumKeyPrefix = result.premiumKey ? `${result.premiumKey.slice(0, 8)}...` : 'none';
 
     userLogger.info('POST /api/check-session - Premium activated successfully', {
       premiumKeyPrefix: resultPremiumKeyPrefix,
@@ -245,12 +246,13 @@ export async function POST(request: NextRequest) {
       statusCode: 200,
     });
 
-        const response = NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       premiumKey: result.premiumKey,
       email: result.email,
     });
 
+    // biome-ignore lint/style/noNonNullAssertion: token is guaranteed when success is true
     response.cookies.set(PREMIUM_COOKIE, result.token!, {
       httpOnly: true,
       secure: isProd,
@@ -268,6 +270,6 @@ export async function POST(request: NextRequest) {
       statusCode: 500,
     });
 
-        return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

@@ -36,7 +36,11 @@ export const HolidaysList = () => {
               {t('regionalTab')}
             </div>
           )}
-          <PremiumFeature feature={t('customHolidaysFeature')} description={t('customHolidaysDescription')} className='p-0'>
+          <PremiumFeature
+            feature={t('customHolidaysFeature')}
+            description={t('customHolidaysDescription')}
+            className='p-0'
+          >
             <TabsTrigger value={HolidayVariant.CUSTOM}>{t('customTab')}</TabsTrigger>
           </PremiumFeature>
         </TabsList>

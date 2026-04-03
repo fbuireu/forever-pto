@@ -22,16 +22,12 @@ export const BlocksPerQuarterChart = ({ blocksPerQuarter }: BlockPerQuarterChart
   const bestQuarterIndex = blocksPerQuarter.indexOf(Math.max(...blocksPerQuarter));
   const bestQuarter = bestQuarterIndex + 1;
   const maxBlocks = Math.max(...blocksPerQuarter);
-  const bestQuarterPart = totalBlocks > 0 ? t('bestQuarterPart', { bestQuarter, maxBlocks, plural: maxBlocks !== 1 ? 's' : '' }) : '';
+  const bestQuarterPart =
+    totalBlocks > 0 ? t('bestQuarterPart', { bestQuarter, maxBlocks, plural: maxBlocks !== 1 ? 's' : '' }) : '';
   const description = t('blocksDescription', { totalBlocks, bestQuarterPart });
 
   return (
-    <PremiumFeature
-      feature={t('longBlocksFeature')}
-      description={description}
-      iconSize='size-7'
-      inlineDescription
-    >
+    <PremiumFeature feature={t('longBlocksFeature')} description={description} iconSize='size-7' inlineDescription>
       <Card className='shadow-md'>
         <CardHeader className='pb-3'>
           <CardTitle className='flex items-center gap-2 text-base'>

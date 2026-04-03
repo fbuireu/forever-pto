@@ -75,7 +75,7 @@ export const CalendarList = () => {
   useEffect(() => {
     if (ptoDays > 0 && holidays.length > 0 && months.length > 0) {
       generateSuggestions({
-        year: parseInt(year),
+        year: parseInt(year, 10),
         ptoDays,
         allowPastDays,
         months,

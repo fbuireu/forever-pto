@@ -1,9 +1,9 @@
 import { holidayDTO } from '@application/dto/holiday/dto';
 import type { HolidayDTO } from '@application/dto/holiday/types';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import type { Locale } from 'next-intl';
 import { getNationalHolidays } from './utils/getNationalHolidays';
 import { getRegionalHolidays } from './utils/getRegionalHolidays';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 interface GetHolidaysParams {
   year: string;

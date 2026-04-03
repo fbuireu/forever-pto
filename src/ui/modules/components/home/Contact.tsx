@@ -2,8 +2,8 @@
 
 import { Button } from '@const/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
-import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import './contact.css';
 
@@ -21,7 +21,11 @@ export function Contact() {
   return (
     <div className='container max-w-4xl m-auto'>
       <Card className='dashed-card group relative border-none'>
-        <svg className='absolute inset-0 w-full h-full pointer-events-none' xmlns='http://www.w3.org/2000/svg'>
+        <svg
+          className='absolute inset-0 w-full h-full pointer-events-none'
+          aria-hidden='true'
+          xmlns='http://www.w3.org/2000/svg'
+        >
           <rect
             x='0.5'
             y='0.5'

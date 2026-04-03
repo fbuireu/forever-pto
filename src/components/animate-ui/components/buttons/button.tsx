@@ -41,4 +41,4 @@ function Button({ className, variant, size, ...props }: ButtonProps) {
   return <ButtonPrimitive className={cn(buttonVariants({ variant, size, className }))} {...props} />;
 }
 
-export { Button, buttonVariants, type ButtonProps };
+export { Button, type ButtonProps, buttonVariants };

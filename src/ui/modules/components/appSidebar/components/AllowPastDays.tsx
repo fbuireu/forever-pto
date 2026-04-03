@@ -6,8 +6,8 @@ import { InfoIcon, Undo2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Switch } from 'src/components/animate-ui/headless/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
-import { PremiumFeature } from '../../premium/PremiumFeature';
 import { useShallow } from 'zustand/react/shallow';
+import { PremiumFeature } from '../../premium/PremiumFeature';
 
 export const AllowPastDays = () => {
   const t = useTranslations('sidebar.allowPastDays');

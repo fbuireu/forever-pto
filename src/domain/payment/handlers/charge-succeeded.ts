@@ -1,6 +1,6 @@
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import type { ChargeSucceededEvent } from '../events/types';
 import type { PaymentRepository } from '../repository/types';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 const logger = getBetterStackInstance();
 
@@ -39,7 +39,11 @@ export const handleChargeSucceeded = async (
     );
 
     if (!result.success) {
-      logger.error('Failed to update charge info', { reason: result.error, chargeId: event.chargeId, paymentIntentId: event.paymentIntentId });
+      logger.error('Failed to update charge info', {
+        reason: result.error,
+        chargeId: event.chargeId,
+        paymentIntentId: event.paymentIntentId,
+      });
     } else {
       logger.info('Charge info updated successfully', { chargeId: event.chargeId });
     }

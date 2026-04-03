@@ -1,6 +1,6 @@
 'use server';
 
-import { type CreatePaymentInput } from '@application/dto/payment/schema';
+import type { CreatePaymentInput } from '@application/dto/payment/schema';
 import type { PaymentDTO } from '@application/dto/payment/types';
 import { createPayment } from '@application/use-cases/payment';
 import { headers } from 'next/headers';

@@ -1,8 +1,13 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 'use client';
 
+import { cn } from '@const/lib/utils';
+import type { Transition } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import {
+  Children,
+  cloneElement,
   createContext,
+  isValidElement,
   use,
   useCallback,
   useEffect,
@@ -11,14 +16,7 @@ import {
   useMemo,
   useRef,
   useState,
-  Children,
-  isValidElement,
-  cloneElement,
 } from 'react';
-import type { Transition } from 'motion/react';
-import { AnimatePresence, motion } from 'motion/react';
-
-import { cn } from '@const/lib/utils';
 
 type MotionHighlightMode = 'children' | 'parent';
 
@@ -47,10 +45,8 @@ type MotionHighlightContextType<T extends string> = {
   forceUpdateBounds?: boolean;
 };
 
-const MotionHighlightContext = createContext<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  MotionHighlightContextType<any> | undefined
->(undefined);
+// biome-ignore lint/suspicious/noExplicitAny: vendored component
+const MotionHighlightContext = createContext<MotionHighlightContextType<any> | undefined>(undefined);
 
 function useMotionHighlight<T extends string>(): MotionHighlightContextType<T> {
   const context = use(MotionHighlightContext);
@@ -563,7 +559,7 @@ function MotionHighlightItem({
 export {
   MotionHighlight,
   MotionHighlightItem,
-  useMotionHighlight,
-  type MotionHighlightProps,
   type MotionHighlightItemProps,
+  type MotionHighlightProps,
+  useMotionHighlight,
 };

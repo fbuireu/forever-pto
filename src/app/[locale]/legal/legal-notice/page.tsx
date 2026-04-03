@@ -1,5 +1,5 @@
-import { Nif } from '@ui/modules/components/core/Nif';
 import { Me } from '@ui/modules/components/core/me';
+import { Nif } from '@ui/modules/components/core/Nif';
 import { LegalLayout } from '@ui/modules/components/legal/LegalLayout';
 import { getTranslations } from 'next-intl/server';
 

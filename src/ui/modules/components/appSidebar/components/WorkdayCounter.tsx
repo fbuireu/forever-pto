@@ -1,19 +1,24 @@
 'use client';
 
 import { useHolidaysStore } from '@application/stores/holidays';
+import { Field } from '@headlessui/react';
 import { differenceInCalendarDays, formatDate } from '@shared/utils/date';
 import { CalendarDays, InfoIcon } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
+import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { useShallow } from 'zustand/react/shallow';
-import { calculateHolidaysInRange, calculateWeekends, calculateWorkdays } from '../../utils/helpers';
-import { TooltipProvider, TooltipTrigger, TooltipContent, Tooltip } from '../../../../../components/animate-ui/radix/tooltip';
-import { SlidingNumber } from '../../../../../components/animate-ui/text/sliding-number';
-import { FromTo } from '../../core/Calendar';
-import { Field } from '@headlessui/react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Label } from 'src/const/components/ui/label';
+import { useShallow } from 'zustand/react/shallow';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../../../../../components/animate-ui/radix/tooltip';
+import { SlidingNumber } from '../../../../../components/animate-ui/text/sliding-number';
+import type { FromTo } from '../../core/Calendar';
+import { calculateHolidaysInRange, calculateWeekends, calculateWorkdays } from '../../utils/helpers';
 
 const CalendarModal = dynamic(() =>
   import('./WorkdayCounterCalendarModal').then((module) => ({ default: module.WorkdayCounterCalendarModal }))

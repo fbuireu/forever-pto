@@ -1,5 +1,5 @@
-import type { NextRequest } from 'next/server';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import type { NextRequest } from 'next/server';
 
 const CLOUDFLARE_COUNTRY_HEADER = 'cf-ipcountry';
 const UNIDENTIFIED_COUNTRY = 'XX';

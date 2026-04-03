@@ -7,8 +7,8 @@ import { cn } from '@const/lib/utils';
 import { MousePointerClick } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useShallow } from 'zustand/react/shallow';
-import { SlidingNumber } from '../../../../components/animate-ui/text/sliding-number';
 import { Button } from '../../../../components/animate-ui/components/buttons/button';
+import { SlidingNumber } from '../../../../components/animate-ui/text/sliding-number';
 
 interface PtoStatusProps {
   currentSelection: NonNullable<HolidaysState['currentSelection']>;

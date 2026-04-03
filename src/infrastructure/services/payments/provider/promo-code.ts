@@ -79,7 +79,7 @@ export const validatePromoCode = async (
     };
   } catch (error) {
     logger.logError('Promo code validation error in promo-code service', error, {
-      promoCode: code?.toUpperCase().trim().slice(0, 5) + '...',
+      promoCode: `${code?.toUpperCase().trim().slice(0, 5)}...`,
       amount,
     });
     return { success: false, error: 'Error validating promo code. Please try again.' };

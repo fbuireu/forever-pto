@@ -1,8 +1,7 @@
-import { getTranslations } from 'next-intl/server';
-
 import { Troubleshooting } from '@ui/modules/components/faq/Troubleshooting';
-import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from 'src/components/animate-ui/base/accordion';
 import type { FaqData } from '@ui/modules/components/faq/types';
+import { getTranslations } from 'next-intl/server';
+import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from 'src/components/animate-ui/base/accordion';
 import { Tutorial } from '../faq/Tutorial';
 import { TutorialTrigger } from '../faq/TutorialTrigger';
 
@@ -114,7 +113,9 @@ export const Faq = async () => {
           >
             {section.items.map((item) => (
               <AccordionItem key={item.id} value={item.id} className='cursor-pointer'>
-                <AccordionTrigger className='text-left'><h4 className='font-normal text-base'>{item.question}</h4></AccordionTrigger>
+                <AccordionTrigger className='text-left'>
+                  <h4 className='font-normal text-base'>{item.question}</h4>
+                </AccordionTrigger>
                 <AccordionPanel className='text-muted-foreground'>{item.answer}</AccordionPanel>
               </AccordionItem>
             ))}

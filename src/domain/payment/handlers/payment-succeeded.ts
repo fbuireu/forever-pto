@@ -1,10 +1,10 @@
 import type { PaymentData } from '@application/dto/payment/types';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
 import { createPaymentError } from '../events/factory/errors';
 import type { PaymentSucceededEvent } from '../events/types';
 import type { PaymentRepository } from '../repository/types';
 import type { ChargeService } from '../services/charge';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 const logger = getBetterStackInstance();
 
@@ -76,7 +76,11 @@ const updateChargeDetails = async (
     const chargeResult = await params.chargeService.retrieveCharge(chargeId);
 
     if (!chargeResult.success || !chargeResult.data) {
-      logger.error('Failed to retrieve charge details', { reason: chargeResult.error, chargeId, paymentId: event.paymentId });
+      logger.error('Failed to retrieve charge details', {
+        reason: chargeResult.error,
+        chargeId,
+        paymentId: event.paymentId,
+      });
       return;
     }
 

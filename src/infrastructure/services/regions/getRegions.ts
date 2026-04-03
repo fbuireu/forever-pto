@@ -1,6 +1,6 @@
 import { regionDTO } from '@application/dto/region/dto';
-import Holidays from 'date-holidays';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import Holidays from 'date-holidays';
 
 export function getRegions(countryCode?: string) {
   try {

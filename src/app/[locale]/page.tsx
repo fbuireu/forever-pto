@@ -5,9 +5,9 @@ import { HolidaysList } from '@ui/modules/components/home/HolidaysList';
 import { Legend } from '@ui/modules/components/home/Legend';
 import { ManagementBar } from '@ui/modules/components/home/ManagementBar';
 import { JsonLd } from '@ui/modules/components/seo/JsonLd';
+import dynamic from 'next/dynamic';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
-import dynamic from 'next/dynamic';
 
 const Summary = dynamic(() => import('@ui/modules/components/home/Summary').then((mod) => mod.Summary));
 const Roadmap = dynamic(() => import('@ui/modules/components/home/Roadmap').then((mod) => mod.Roadmap));
@@ -49,7 +49,6 @@ export default Home;
 // todo: https://neciudan.dev/lets-build-dynamic-shimmer-skeletons
 // todo: share button with results?
 // todo: unify modal styles (footer actions, spacing, etc)
-// todo: migrate to biome (remove eslint comments)
 // todo: performance audit, react best practices audit
 // todo: ads?
 // todo: custom 404 and error?
@@ -62,6 +61,7 @@ export default Home;
 // todo: track origin of premium key (feature)
 // todo: add custom weekends
 // todo: slider calendar on mobile
+// todo: fix biome comments
 // todo: transformer to make sql data ready ':id': data.id',
 // todo: improve error handling in server actions (send whole error type and change icon when "save to db error")
 // todo: APPLY DDD (CHECK BRANCH) + check everything (SSR, CSR, etc)

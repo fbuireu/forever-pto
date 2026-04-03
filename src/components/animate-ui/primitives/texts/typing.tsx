@@ -1,9 +1,9 @@
 'use client';
 
+import { type UseIsInViewOptions, useIsInView } from '@ui/hooks/useIsInView';
+import { type HTMLMotionProps, motion } from 'motion/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { motion, type HTMLMotionProps } from 'motion/react';
 import { getStrictContext } from 'src/lib/get-strict-context';
-import { useIsInView, type UseIsInViewOptions } from '@ui/hooks/useIsInView';
 
 type TypingTextContextType = {
   isTyping: boolean;
@@ -170,4 +170,4 @@ function TypingTextCursor({ style, variants, ...props }: TypingTextCursorProps) 
   );
 }
 
-export { TypingText, TypingTextCursor, type TypingTextProps, type TypingTextCursorProps };
+export { TypingText, TypingTextCursor, type TypingTextCursorProps, type TypingTextProps };

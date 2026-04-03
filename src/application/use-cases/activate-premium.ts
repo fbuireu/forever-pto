@@ -2,10 +2,10 @@ import type { PaymentData } from '@application/dto/payment/types';
 import type { PremiumActivationResult } from '@application/dto/premium/types';
 import type { PaymentRepository } from '@domain/payment/repository/types';
 import type { PaymentValidator } from '@domain/payment/services/validators';
+import type { SessionRepository } from '@domain/session/repository/types';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
 import type Stripe from 'stripe';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { SessionRepository } from '@domain/session/repository/types';
 
 const logger = getBetterStackInstance();
 
@@ -90,7 +90,11 @@ export const activateWithPayment = async (
         const updateResult = await params.paymentRepository.updateStatus(paymentIntentId, 'succeeded');
 
         if (!updateResult.success) {
-          logger.error('Failed to update payment status', { reason: updateResult.error, paymentIntentId, emailDomain: email?.split('@')[1] });
+          logger.error('Failed to update payment status', {
+            reason: updateResult.error,
+            paymentIntentId,
+            emailDomain: email?.split('@')[1],
+          });
         }
       }
     } else {
@@ -98,7 +102,11 @@ export const activateWithPayment = async (
       const saveResult = await params.paymentRepository.save(paymentData);
 
       if (!saveResult.success) {
-        logger.error('Failed to save payment to DB', { reason: saveResult.error, paymentIntentId, emailDomain: email?.split('@')[1] });
+        logger.error('Failed to save payment to DB', {
+          reason: saveResult.error,
+          paymentIntentId,
+          emailDomain: email?.split('@')[1],
+        });
       } else {
         logger.info('Payment created successfully', { paymentIntentId });
       }

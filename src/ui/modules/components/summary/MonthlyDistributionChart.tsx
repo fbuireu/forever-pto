@@ -4,8 +4,8 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { PremiumFeature } from '../premium/PremiumFeature';
-import { COLOR_SCHEMES } from './const';
 import { getMonthNames } from '../utils/helpers';
+import { COLOR_SCHEMES } from './const';
 
 interface MonthlyDistributionChartProps {
   monthlyDist: number[];

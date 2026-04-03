@@ -1,12 +1,12 @@
 import { Link } from '@application/i18n/navigtion';
 import { Button } from '@const/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
-import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
 import { CheckCircle2, XCircle } from 'lucide-react';
+import { redirect } from 'next/navigation';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
-import { redirect } from 'next/navigation';
 import type Stripe from 'stripe';
 
 export { generateMetadata } from './metadata';
@@ -75,10 +75,7 @@ async function PaymentError() {
 }
 
 export default async function PaymentSuccessPage({ searchParams, params }: Readonly<PaymentSuccessParams>) {
-  const [{ payment_intent: paymentIntentId }, { locale }] = await Promise.all([
-    searchParams,
-    params,
-  ]);
+  const [{ payment_intent: paymentIntentId }, { locale }] = await Promise.all([searchParams, params]);
 
   if (!paymentIntentId) {
     logger.warn('Payment success page accessed without payment_intent, redirecting to home');

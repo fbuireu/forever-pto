@@ -23,8 +23,6 @@ export const ManagementBar = () => {
     setCurrentAlternativeSelection,
     previewAlternativeIndex,
     currentSelectionIndex,
-    manuallySelectedDays,
-    removedSuggestedDays,
   } = useHolidaysStore(
     useShallow((state) => ({
       alternatives: state.alternatives,
@@ -34,8 +32,6 @@ export const ManagementBar = () => {
       setCurrentAlternativeSelection: state.setCurrentAlternativeSelection,
       previewAlternativeIndex: state.previewAlternativeIndex,
       currentSelectionIndex: state.currentSelectionIndex,
-      manuallySelectedDays: state.manuallySelectedDays,
-      removedSuggestedDays: state.removedSuggestedDays,
     }))
   );
 

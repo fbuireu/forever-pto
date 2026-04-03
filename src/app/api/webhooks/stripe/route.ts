@@ -1,7 +1,7 @@
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { handleStripeWebhook } from '@infrastructure/webhooks/stripe/service';
 import { headers } from 'next/headers';
-import { NextResponse, type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 const logger = getBetterStackInstance();
 

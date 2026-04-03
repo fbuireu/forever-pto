@@ -4,8 +4,8 @@ import { cn } from '@const/lib/utils';
 import { ArrowUpDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { memo } from 'react';
-import { ArrowUp } from 'src/components/animate-ui/icons/arrow-up';
 import { ArrowDown } from 'src/components/animate-ui/icons/arrow-down';
+import { ArrowUp } from 'src/components/animate-ui/icons/arrow-up';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 interface HolidayTableHeaderProps {

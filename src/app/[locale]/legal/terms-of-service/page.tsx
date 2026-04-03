@@ -1,4 +1,3 @@
-import { Me } from '@ui/modules/components/core/me';
 import { LegalLayout } from '@ui/modules/components/legal/LegalLayout';
 import { getTranslations } from 'next-intl/server';
 

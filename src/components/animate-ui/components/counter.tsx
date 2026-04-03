@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@const/lib/utils';
-import { motion, type HTMLMotionProps, type Transition } from 'motion/react';
+import { type HTMLMotionProps, motion, type Transition } from 'motion/react';
 import type { SlidingNumberProps } from '../text/sliding-number';
 import { SlidingNumber } from '../text/sliding-number';
 import { Button } from './buttons/button';

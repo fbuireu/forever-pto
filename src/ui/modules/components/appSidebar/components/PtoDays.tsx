@@ -73,19 +73,30 @@ export const PtoDays = () => {
         <div className='space-y-2 w-full'>
           <div className='flex items-center justify-between text-sm'>
             <span className='text-muted-foreground'>{t('autoAssigned')}</span>
+            {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-label on span with hidden child is valid ARIA 1.2 pattern */}
             <span aria-label={`${t('autoAssigned')}: ${activeSuggestedCount}`}>
-              <SlidingNumber number={activeSuggestedCount} className='font-semibold text-teal-600 dark:text-teal-400' aria-hidden='true' />
+              <SlidingNumber
+                number={activeSuggestedCount}
+                className='font-semibold text-teal-600 dark:text-teal-400'
+                aria-hidden='true'
+              />
             </span>
           </div>
           <div className='flex items-center justify-between text-sm'>
             <span className='text-muted-foreground'>{t('manuallySelected')}</span>
+            {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-label on span with hidden child is valid ARIA 1.2 pattern */}
             <span aria-label={`${t('manuallySelected')}: ${manualSelectedCount}`}>
-              <SlidingNumber number={manualSelectedCount} className='font-semibold text-blue-600 dark:text-blue-400' aria-hidden='true' />
+              <SlidingNumber
+                number={manualSelectedCount}
+                className='font-semibold text-blue-600 dark:text-blue-400'
+                aria-hidden='true'
+              />
             </span>
           </div>
           <div className='h-px bg-border my-2' />
           <div className='flex items-center justify-between text-sm'>
             <span className='font-medium'>{t('remaining')}</span>
+            {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-label on span with hidden child is valid ARIA 1.2 pattern */}
             <span aria-label={`${t('remaining')}: ${remaining}`}>
               <SlidingNumber
                 number={remaining}
@@ -111,9 +122,7 @@ export const PtoDays = () => {
           {remaining === 0 && !hasManualChanges && (
             <p className='text-xs text-muted-foreground text-center mt-2'>{t('allAssigned')}</p>
           )}
-          {remaining > 0 && (
-            <p className='text-xs text-muted-foreground text-center mt-2'>{t('clickToAssign')}</p>
-          )}
+          {remaining > 0 && <p className='text-xs text-muted-foreground text-center mt-2'>{t('clickToAssign')}</p>}
         </div>
       </div>
     </Field>

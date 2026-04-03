@@ -1,16 +1,16 @@
 import { cn } from '@const/lib/utils';
 import {
   TabsContent as TabsContentPrimitive,
+  type TabsContentProps as TabsContentPrimitiveProps,
   TabsContents as TabsContentsPrimitive,
+  type TabsContentsProps as TabsContentsPrimitiveProps,
   TabsHighlightItem as TabsHighlightItemPrimitive,
   TabsHighlight as TabsHighlightPrimitive,
   TabsList as TabsListPrimitive,
-  Tabs as TabsPrimitive,
-  TabsTrigger as TabsTriggerPrimitive,
-  type TabsContentProps as TabsContentPrimitiveProps,
-  type TabsContentsProps as TabsContentsPrimitiveProps,
   type TabsListProps as TabsListPrimitiveProps,
+  Tabs as TabsPrimitive,
   type TabsProps as TabsPrimitiveProps,
+  TabsTrigger as TabsTriggerPrimitive,
   type TabsTriggerProps as TabsTriggerPrimitiveProps,
 } from 'src/components/animate-ui/primitives/animate/tabs';
 
@@ -67,12 +67,12 @@ function TabsContent({ className, ...props }: TabsContentProps) {
 export {
   Tabs,
   TabsContent,
-  TabsContents,
-  TabsList,
-  TabsTrigger,
   type TabsContentProps,
+  TabsContents,
   type TabsContentsProps,
+  TabsList,
   type TabsListProps,
   type TabsProps,
+  TabsTrigger,
   type TabsTriggerProps,
 };

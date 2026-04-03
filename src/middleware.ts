@@ -1,7 +1,7 @@
 import { routing } from '@infrastructure/i18n/routing';
 import { location as locationProxy } from '@infrastructure/proxy/location';
-import createMiddleware from 'next-intl/middleware';
 import type { NextRequest, NextResponse } from 'next/server';
+import createMiddleware from 'next-intl/middleware';
 
 const i18nProxy = createMiddleware(routing);
 

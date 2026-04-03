@@ -1,6 +1,8 @@
 'use client';
 
-import {
+import { cn } from '@const/lib/utils';
+import { AnimatePresence, motion, type Transition } from 'motion/react';
+import React, {
   createContext,
   use,
   useCallback,
@@ -11,9 +13,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { AnimatePresence, type Transition, motion } from 'motion/react';
-import { cn } from '@const/lib/utils';
-import React from 'react';
 
 type HighlightMode = 'children' | 'parent';
 
@@ -608,4 +607,4 @@ function HighlightItem<T extends React.ElementType>({
   );
 }
 
-export { Highlight, HighlightItem, useHighlight, type HighlightProps, type HighlightItemProps };
+export { Highlight, HighlightItem, type HighlightItemProps, type HighlightProps, useHighlight };

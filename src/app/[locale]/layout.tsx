@@ -10,12 +10,12 @@ import { SiteSubtitle } from '@ui/modules/components/core/SiteSubtitle';
 import { SiteTitle } from '@ui/modules/components/core/SiteTitle';
 import { Footer } from '@ui/modules/components/footer/Footer';
 import { StoresInitializer } from '@ui/store/StoresInitializer';
-import { type Locale, NextIntlClientProvider, hasLocale } from 'next-intl';
-import { setRequestLocale } from 'next-intl/server';
-import { ThemeProvider } from 'next-themes';
 import dynamic from 'next/dynamic';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { notFound } from 'next/navigation';
+import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';
+import { setRequestLocale } from 'next-intl/server';
+import { ThemeProvider } from 'next-themes';
 import { SidebarProvider } from 'src/components/animate-ui/radix/sidebar';
 
 const geistSans = Geist({

@@ -2,13 +2,13 @@
 
 import { cn } from '@const/lib/utils';
 import {
+  type MotionValue,
   motion,
+  type SpringOptions,
+  type UseInViewOptions,
   useInView,
   useSpring,
   useTransform,
-  type MotionValue,
-  type SpringOptions,
-  type UseInViewOptions,
 } from 'motion/react';
 import { useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import useMeasure from 'react-use-measure';
@@ -126,11 +126,11 @@ function SlidingNumber({
 
   const numberStr = formatNumber(effectiveNumber);
   const [newIntStrRaw, newDecStrRaw = ''] = numberStr.split('.');
-  const newIntStr = padStart && newIntStrRaw?.length === 1 ? '0' + newIntStrRaw : newIntStrRaw;
+  const newIntStr = padStart && newIntStrRaw?.length === 1 ? `0${newIntStrRaw}` : newIntStrRaw;
 
   const prevFormatted = formatNumber(prevNumberRef.current);
   const [prevIntStrRaw = '', prevDecStrRaw = ''] = prevFormatted.split('.');
-  const prevIntStr = padStart && prevIntStrRaw.length === 1 ? '0' + prevIntStrRaw : prevIntStrRaw;
+  const prevIntStr = padStart && prevIntStrRaw.length === 1 ? `0${prevIntStrRaw}` : prevIntStrRaw;
 
   const adjustedPrevInt = useMemo(() => {
     return prevIntStr.length > (newIntStr?.length ?? 0)
@@ -151,14 +151,12 @@ function SlidingNumber({
 
   const intDigitCount = newIntStr?.length ?? 0;
   const intPlaces = useMemo(
-    () => Array.from({ length: intDigitCount }, (_, i) => Math.pow(10, intDigitCount - i - 1)),
+    () => Array.from({ length: intDigitCount }, (_, i) => 10 ** (intDigitCount - i - 1)),
     [intDigitCount]
   );
   const decPlaces = useMemo(
     () =>
-      newDecStrRaw
-        ? Array.from({ length: newDecStrRaw.length }, (_, i) => Math.pow(10, newDecStrRaw.length - i - 1))
-        : [],
+      newDecStrRaw ? Array.from({ length: newDecStrRaw.length }, (_, i) => 10 ** (newDecStrRaw.length - i - 1)) : [],
     [newDecStrRaw]
   );
 

@@ -1,7 +1,7 @@
 'use client';
 
-import type { ComponentProps, CSSProperties } from 'react';
 import { motion, type Transition } from 'motion/react';
+import type { ComponentProps, CSSProperties } from 'react';
 
 type GradientTextProps = Omit<ComponentProps<'span'>, 'children'> & {
   text: string;

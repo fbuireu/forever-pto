@@ -18,8 +18,8 @@ interface IsInSelectedRangeParams {
 }
 
 export const isInSelectedRange = ({ date, rangeStart, rangeEnd }: IsInSelectedRangeParams) => {
-return isWithinInterval(date, {
-  start: rangeStart,
-  end: rangeEnd,
-});
+  return isWithinInterval(date, {
+    start: rangeStart,
+    end: rangeEnd,
+  });
 };

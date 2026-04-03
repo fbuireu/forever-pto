@@ -26,7 +26,6 @@ const CategoryStatus = {
 
 type CategoryStatus = (typeof CategoryStatus)[keyof typeof CategoryStatus];
 
-
 export function Roadmap() {
   const t = useTranslations('roadmap');
   const [selectedCategory, setSelectedCategory] = useState<number>(1);

@@ -1,6 +1,6 @@
 import { LOCALES } from '@infrastructure/i18n/config';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
-import { MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { env } = await getCloudflareContext({ async: true });

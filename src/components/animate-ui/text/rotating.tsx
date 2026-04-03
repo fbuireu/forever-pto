@@ -1,9 +1,8 @@
 'use client';
 
-import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from 'motion/react';
-import { useEffect, useState } from 'react';
-
 import { cn } from '@const/lib/utils';
+import { AnimatePresence, type HTMLMotionProps, motion, type Transition } from 'motion/react';
+import { useEffect, useState } from 'react';
 
 type RotatingTextProps = {
   text: string | string[];

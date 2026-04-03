@@ -1,11 +1,10 @@
 'use client';
 
+import { cn } from '@const/lib/utils';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import type { ComponentProps } from 'react';
-
-import { cn } from '@const/lib/utils';
-import { X } from 'src/components/animate-ui/icons/x';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
+import { X } from 'src/components/animate-ui/icons/x';
 
 function Dialog({ ...props }: ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot='dialog' {...props} />;

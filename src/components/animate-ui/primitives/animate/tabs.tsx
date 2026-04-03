@@ -1,7 +1,7 @@
 'use client';
 
 import { Slot } from '@radix-ui/react-slot';
-import { motion, type HTMLMotionProps, type Transition } from 'motion/react';
+import { type HTMLMotionProps, motion, type Transition } from 'motion/react';
 import {
   Children,
   isValidElement,
@@ -244,7 +244,7 @@ function TabsContents({
       ro.disconnect();
       roRef.current = null;
     };
-  }, [activeIndex, childrenArray.length, measure]);
+  }, [activeIndex, measure]);
 
   useLayoutEffect(() => {
     if (height === 0 && activeIndex >= 0) {
@@ -262,7 +262,7 @@ function TabsContents({
       transition={transition}
       {...props}
     >
-      <motion.div className='flex -mx-2' animate={{ x: activeIndex * -100 + '%' }} transition={transition}>
+      <motion.div className='flex -mx-2' animate={{ x: `${activeIndex * -100}%` }} transition={transition}>
         {childrenArray.map((child, index) => (
           <div
             key={String(child)}
@@ -315,18 +315,18 @@ function TabsContent({ value, style, asChild = false, ...props }: TabsContentPro
 export {
   Tabs,
   TabsContent,
-  TabsContents,
-  TabsHighlight,
-  TabsHighlightItem,
-  TabsList,
-  TabsTrigger,
-  useTabs,
   type TabsContentProps,
+  TabsContents,
   type TabsContentsProps,
   type TabsContextType,
+  TabsHighlight,
+  TabsHighlightItem,
   type TabsHighlightItemProps,
   type TabsHighlightProps,
+  TabsList,
   type TabsListProps,
   type TabsProps,
+  TabsTrigger,
   type TabsTriggerProps,
+  useTabs,
 };

@@ -1,3 +1,4 @@
+import type { HolidayDTO } from '@application/dto/holiday/types';
 import { formatDate } from '@shared/utils/date';
 import type { Locale } from 'next-intl';
 import type { Bridge, Metrics, Suggestion } from '../types';
@@ -13,7 +14,6 @@ import {
   getTotalEffectiveDays,
   getWorkingDaysPerMonth,
 } from './utils/helpers';
-import type { HolidayDTO } from '@application/dto/holiday/types';
 
 interface GenerateMetricsParams {
   suggestion: Omit<Suggestion, 'metrics'>;

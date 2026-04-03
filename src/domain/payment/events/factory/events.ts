@@ -1,5 +1,5 @@
 import type Stripe from 'stripe';
-import type { PaymentSucceededEvent, PaymentFailedEvent, ChargeSucceededEvent } from '../types';
+import type { ChargeSucceededEvent, PaymentFailedEvent, PaymentSucceededEvent } from '../types';
 
 export const createPaymentSucceededEvent = (paymentIntent: Stripe.PaymentIntent): PaymentSucceededEvent => ({
   type: 'payment_succeeded',
@@ -22,5 +22,5 @@ export const createChargeSucceededEvent = (charge: Stripe.Charge): ChargeSucceed
   charge,
   chargeId: charge.id,
   paymentIntentId:
-    typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent?.id ?? null,
+    typeof charge.payment_intent === 'string' ? charge.payment_intent : (charge.payment_intent?.id ?? null),
 });

@@ -1,5 +1,5 @@
-import { Nif } from '@ui/modules/components/core/Nif';
 import { Me } from '@ui/modules/components/core/me';
+import { Nif } from '@ui/modules/components/core/Nif';
 import { LegalLayout } from '@ui/modules/components/legal/LegalLayout';
 import { getTranslations } from 'next-intl/server';
 
@@ -22,16 +22,19 @@ export default async function PrivacyPolicyPage() {
         <ul className='list-disc pl-6 mt-4 space-y-2'>
           <li>
             <span className='inline-flex items-center gap-1'>
-              <strong>{t('sections.dataController.items.name.label')}</strong> <Me ariaLabel={t('sections.dataController.items.name.label')} />
+              <strong>{t('sections.dataController.items.name.label')}</strong>{' '}
+              <Me ariaLabel={t('sections.dataController.items.name.label')} />
             </span>
           </li>
           <li>
             <span className='inline-flex items-center gap-1'>
-              <strong>{t('sections.dataController.items.taxId.label')}</strong> <Nif ariaLabel={t('sections.dataController.items.taxId.label')} />
+              <strong>{t('sections.dataController.items.taxId.label')}</strong>{' '}
+              <Nif ariaLabel={t('sections.dataController.items.taxId.label')} />
             </span>
           </li>
           <li>
-            <strong>{t('sections.dataController.items.email.label')}</strong> {t('sections.dataController.items.email.value')}
+            <strong>{t('sections.dataController.items.email.label')}</strong>{' '}
+            {t('sections.dataController.items.email.value')}
           </li>
           <li>
             <strong>{t('sections.dataController.items.website.label')}</strong> https://forever-pto.com

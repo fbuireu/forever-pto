@@ -2,7 +2,7 @@
 
 import { Accordion as AccordionPrimitive } from '@base-ui/react/accordion';
 import { cn } from '@const/lib/utils';
-import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from 'motion/react';
+import { AnimatePresence, type HTMLMotionProps, motion, type Transition } from 'motion/react';
 import { createContext, use, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { ChevronDown } from '../icons/chevron-down';
 import { AnimateIcon } from '../icons/icon';
@@ -162,12 +162,12 @@ function AccordionPanel({
 export {
   Accordion,
   AccordionItem,
-  AccordionPanel,
-  AccordionTrigger,
-  useAccordionItem,
   type AccordionItemContextType,
   type AccordionItemProps,
+  AccordionPanel,
   type AccordionPanelProps,
   type AccordionProps,
+  AccordionTrigger,
   type AccordionTriggerProps,
+  useAccordionItem,
 };

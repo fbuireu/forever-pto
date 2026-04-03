@@ -1,7 +1,11 @@
 'use client';
 
+import { cn } from '@const/lib/utils';
+import { type HTMLMotionProps, motion, type Transition } from 'motion/react';
 import {
+  Children,
   createContext,
+  isValidElement,
   use,
   useCallback,
   useEffect,
@@ -9,12 +13,7 @@ import {
   useMemo,
   useRef,
   useState,
-  Children,
-  isValidElement,
 } from 'react';
-import { motion, type Transition, type HTMLMotionProps } from 'motion/react';
-
-import { cn } from '@const/lib/utils';
 import { MotionHighlight, MotionHighlightItem } from '../effects/motion-highlight';
 
 type TabsContextType<T extends string> = {
@@ -23,7 +22,7 @@ type TabsContextType<T extends string> = {
   registerTrigger: (value: T, node: HTMLElement | null) => void;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: vendored component
 const TabsContext = createContext<TabsContextType<any> | undefined>(undefined);
 
 function useTabs<T extends string = string>(): TabsContextType<T> {
@@ -222,7 +221,7 @@ function TabsContents({
 
   return (
     <div data-slot='tabs-contents' className={cn('overflow-hidden', className)} {...props}>
-      <motion.div className='flex -mx-2' animate={{ x: activeIndex * -100 + '%' }} transition={transition}>
+      <motion.div className='flex -mx-2' animate={{ x: `${activeIndex * -100}%` }} transition={transition}>
         {childrenArray.map((child, index) => (
           <div key={index} className='w-full shrink-0 px-2'>
             {child}
@@ -259,15 +258,15 @@ function TabsContent({ children, value, className, ...props }: TabsContentProps)
 
 export {
   Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContents,
   TabsContent,
-  useTabs,
-  type TabsContextType,
-  type TabsProps,
-  type TabsListProps,
-  type TabsTriggerProps,
-  type TabsContentsProps,
   type TabsContentProps,
+  TabsContents,
+  type TabsContentsProps,
+  type TabsContextType,
+  TabsList,
+  type TabsListProps,
+  type TabsProps,
+  TabsTrigger,
+  type TabsTriggerProps,
+  useTabs,
 };

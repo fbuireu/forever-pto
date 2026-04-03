@@ -1,15 +1,15 @@
 'use client';
 
-import type { ComponentProps } from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-
-import { cn } from '@const/lib/utils';
 import { Button } from '@const/components/ui/button';
 import { Input } from '@const/components/ui/input';
 import { Textarea } from '@const/components/ui/textarea';
+import { cn } from '@const/lib/utils';
+import { cva, type VariantProps } from 'class-variance-authority';
+import type { ComponentProps } from 'react';
 
 function InputGroup({ className, ...props }: ComponentProps<'div'>) {
   return (
+    // biome-ignore lint/a11y/useSemanticElements: UI library component, role=group on div is intentional
     <div
       data-slot='input-group'
       role='group'
@@ -60,6 +60,8 @@ function InputGroupAddon({
   ...props
 }: ComponentProps<'div'> & VariantProps<typeof inputGroupAddonVariants>) {
   return (
+    // biome-ignore lint/a11y/useSemanticElements: UI library component, role=group on div is intentional
+    // biome-ignore lint/a11y/useKeyWithClickEvents: click on addon focuses input, keyboard access handled by inner input
     <div
       role='group'
       data-slot='input-group-addon'
@@ -146,4 +148,4 @@ function InputGroupTextarea({ className, ...props }: ComponentProps<'textarea'>)
   );
 }
 
-export { InputGroup, InputGroupAddon, InputGroupButton, InputGroupText, InputGroupInput, InputGroupTextarea };
+export { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput, InputGroupText, InputGroupTextarea };

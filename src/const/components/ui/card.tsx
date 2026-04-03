@@ -1,6 +1,5 @@
-import type { ComponentProps } from 'react';
-
 import { cn } from '@const/lib/utils';
+import type { ComponentProps } from 'react';
 
 function Card({ className, ...props }: ComponentProps<'div'>) {
   return (
@@ -53,4 +52,4 @@ function CardFooter({ className, ...props }: ComponentProps<'div'>) {
   );
 }
 
-export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent };
+export { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle };

@@ -31,9 +31,11 @@ export const useStoresReady = () => {
     );
 
     return () => {
-      unsubscribes.forEach((unsubscribe) => unsubscribe());
+      unsubscribes.forEach((unsubscribe) => {
+        unsubscribe();
+      });
     };
-  }, []);
+  }, [hydrationStatus]);
 
   const areStoresReady = useMemo(() => Object.values(hydrationStatus).every(Boolean), [hydrationStatus]);
 

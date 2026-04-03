@@ -5,8 +5,8 @@ import { formatDiscountText } from '@infrastructure/services/payments/utils/form
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { confirmPayment } from '@ui/adapters/payments/checkout';
 import { AlertCircle } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
+import { useLocale, useTranslations } from 'next-intl';
 import { type FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
@@ -70,7 +70,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
         onSuccess();
       }, 1000);
     }
-  }, [stripe, elements, email, onSuccess, setPremiumStatus]);
+  }, [stripe, elements, email, onSuccess, setPremiumStatus, t]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {

@@ -1,20 +1,19 @@
 'use client';
 
+import { Label } from '@const/components/ui/label';
+import { cn } from '@const/lib/utils';
 import type * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
-import { createContext, useContext, useId, type ComponentProps } from 'react';
+import { type ComponentProps, createContext, useContext, useId } from 'react';
 import {
   Controller,
-  FormProvider,
-  useFormContext,
-  useFormState,
   type ControllerProps,
   type FieldPath,
   type FieldValues,
+  FormProvider,
+  useFormContext,
+  useFormState,
 } from 'react-hook-form';
-
-import { Label } from '@const/components/ui/label';
-import { cn } from '@const/lib/utils';
 
 const Form = FormProvider;
 
@@ -129,7 +128,13 @@ function FormMessage({ className, ...props }: ComponentProps<'p'>) {
   }
 
   return (
-    <p data-slot='form-message' id={formMessageId} role='alert' className={cn('text-destructive text-sm', className)} {...props}>
+    <p
+      data-slot='form-message'
+      id={formMessageId}
+      role='alert'
+      className={cn('text-destructive text-sm', className)}
+      {...props}
+    >
       {body}
     </p>
   );

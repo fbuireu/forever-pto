@@ -1,15 +1,12 @@
-import {
-  createPaymentFailedEvent,
-  createPaymentSucceededEvent,
-} from '@domain/payment/events/factory/events';
+import { createPaymentFailedEvent, createPaymentSucceededEvent } from '@domain/payment/events/factory/events';
 import { handlePaymentFailed } from '@domain/payment/handlers/payment-failed';
 import { handlePaymentSucceeded } from '@domain/payment/handlers/payment-succeeded';
 import { getTursoClientInstance } from '@infrastructure/clients/db/turso/client';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
 import { createChargeService } from '@infrastructure/services/payments/provider/charge-service';
 import { createPaymentRepository } from '@infrastructure/services/payments/repository';
 import type Stripe from 'stripe';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 export const processWebhookEvent = async (event: Stripe.Event): Promise<void> => {
   const turso = getTursoClientInstance();

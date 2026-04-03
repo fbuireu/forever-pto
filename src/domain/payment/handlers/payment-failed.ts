@@ -1,7 +1,7 @@
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { createPaymentError } from '../events/factory/errors';
 import type { PaymentFailedEvent } from '../events/types';
 import type { PaymentRepository } from '../repository/types';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 const logger = getBetterStackInstance();
 

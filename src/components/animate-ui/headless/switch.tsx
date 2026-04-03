@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { Switch as SwitchPrimitive, type SwitchProps as SwitchPrimitiveProps } from '@headlessui/react';
-import { motion, type HTMLMotionProps } from 'motion/react';
 import { cn } from '@const/lib/utils';
+import { Switch as SwitchPrimitive, type SwitchProps as SwitchPrimitiveProps } from '@headlessui/react';
+import { type HTMLMotionProps, motion } from 'motion/react';
+import { useCallback, useEffect, useState } from 'react';
 
 type SwitchProps<TTag extends React.ElementType = typeof motion.button> = SwitchPrimitiveProps<TTag> &
   Omit<HTMLMotionProps<'button'>, 'children'> & {

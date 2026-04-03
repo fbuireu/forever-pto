@@ -35,7 +35,9 @@ function selectOptimalCombination({ bridges, targetPtoDays }: SelectOptimalCombi
 
     if (!hasConflict) {
       selectedBridges.push(bridge);
-      bridge.ptoDays.forEach((day) => usedDates.add(getKey(day)));
+      bridge.ptoDays.forEach((day) => {
+        usedDates.add(getKey(day));
+      });
       totalPtoDays += bridge.ptoDaysNeeded;
 
       if (totalPtoDays >= targetPtoDays) break;
@@ -52,7 +54,9 @@ function selectOptimalCombination({ bridges, targetPtoDays }: SelectOptimalCombi
 
       if (!hasConflict && totalPtoDays + bridge.ptoDaysNeeded <= targetPtoDays) {
         selectedBridges.push(bridge);
-        bridge.ptoDays.forEach((day) => usedDates.add(getKey(day)));
+        bridge.ptoDays.forEach((day) => {
+          usedDates.add(getKey(day));
+        });
         totalPtoDays += bridge.ptoDaysNeeded;
       }
     }
@@ -150,8 +154,6 @@ export const selectBridgesForStrategy = ({
         return b.effectiveDays - a.effectiveDays;
       });
       break;
-
-    case FilterStrategy.BALANCED:
     default:
       return selectOptimalDaysFromBridges({ bridges, targetPtoDays });
   }
@@ -168,7 +170,9 @@ export const selectBridgesForStrategy = ({
 
     if (!hasConflict && totalPtoDays + bridge.ptoDaysNeeded <= targetPtoDays) {
       selectedBridges.push(bridge);
-      bridge.ptoDays.forEach((day) => usedDates.add(getKey(day)));
+      bridge.ptoDays.forEach((day) => {
+        usedDates.add(getKey(day));
+      });
       totalPtoDays += bridge.ptoDaysNeeded;
       totalEffectiveDays += bridge.effectiveDays;
     }

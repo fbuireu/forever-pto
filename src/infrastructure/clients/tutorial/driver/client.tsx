@@ -1,7 +1,7 @@
 'use client';
 
+import { type Config, type Driver, type DriveStep, driver } from 'driver.js';
 import { createRoot, type Root } from 'react-dom/client';
-import { driver, type Config, type Driver, type DriveStep } from 'driver.js';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { X } from 'src/components/animate-ui/icons/x';
 
@@ -20,43 +20,45 @@ export class DriverClient {
 
   private getDriver(): Driver {
     this.driver ??= driver({
-        showProgress: true,
-        showButtons: ['next', 'previous', 'close'],
-        smoothScroll: true,
-        stagePadding: 10,
-        stageRadius: 8,
-        ...this.config,
-        onPopoverRender: (popover, options) => {
-          this.config.onPopoverRender?.(popover, options);
+      showProgress: true,
+      showButtons: ['next', 'previous', 'close'],
+      smoothScroll: true,
+      stagePadding: 10,
+      stageRadius: 8,
+      ...this.config,
+      onPopoverRender: (popover, options) => {
+        this.config.onPopoverRender?.(popover, options);
 
-          const closeButton = popover.wrapper.querySelector('.driver-popover-close-btn');
-          if (closeButton) {
-            closeButton.innerHTML = '';
-            const iconContainer = document.createElement('span');
-            iconContainer.style.color = 'var(--foreground)';
-            closeButton.appendChild(iconContainer);
-            const root = createRoot(iconContainer);
+        const closeButton = popover.wrapper.querySelector('.driver-popover-close-btn');
+        if (closeButton) {
+          closeButton.innerHTML = '';
+          const iconContainer = document.createElement('span');
+          iconContainer.style.color = 'var(--foreground)';
+          closeButton.appendChild(iconContainer);
+          const root = createRoot(iconContainer);
 
-            root.render(
-              <AnimateIcon animateOnHover>
-                <X className='h-4 w-4' />
-              </AnimateIcon>
-            );
-            this.closeButtonRoots.push(root);
-          }
-        },
-        onDestroyStarted: (element, step, options) => {
-          this.config.onDestroyStarted?.(element, step, options);
+          root.render(
+            <AnimateIcon animateOnHover>
+              <X className='h-4 w-4' />
+            </AnimateIcon>
+          );
+          this.closeButtonRoots.push(root);
+        }
+      },
+      onDestroyStarted: (element, step, options) => {
+        this.config.onDestroyStarted?.(element, step, options);
 
-          this.closeButtonRoots.forEach((root) => root.unmount());
-          this.closeButtonRoots = [];
+        this.closeButtonRoots.forEach((root) => {
+          root.unmount();
+        });
+        this.closeButtonRoots = [];
 
-          if (this.driver) {
-            this.driver.destroy();
-            this.driver = null;
-          }
-        },
-      });
+        if (this.driver) {
+          this.driver.destroy();
+          this.driver = null;
+        }
+      },
+    });
     return this.driver;
   }
 
@@ -89,6 +91,6 @@ export class DriverClient {
 let driverClientInstance: DriverClient | null = null;
 
 export const getDriverClientInstance = (): DriverClient => {
-    driverClientInstance ??= new DriverClient({});
+  driverClientInstance ??= new DriverClient({});
   return driverClientInstance;
 };

@@ -9,8 +9,8 @@ import { Badge } from '@const/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { Award, BarChart3, Calendar, CalendarDays, Palmtree, TrendingUp, Zap } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { Clock } from '../../../../components/animate-ui/icons/clock';
@@ -321,17 +321,15 @@ export const Summary = () => {
           )}
           {canImprove > 0 && (
             <NotificationCard icon={Zap} title={t('notifications.canImprove.title')} colorScheme='orange'>
-              <>
-                {t('notifications.canImprove.message')}{' '}
-                <strong className='flex gap-1 mx-1'>
-                  <SlidingNumber number={canImprove} />
-                  {t('notifications.canImprove.moreDays')}
-                </strong>{' '}
-                {t('notifications.canImprove.toYourPlan')}
-                {premiumKey
-                  ? ` ${t('notifications.canImprove.reviewOptions')}`
-                  : ` ${t('notifications.canImprove.considerPremium')}`}
-              </>
+              {t('notifications.canImprove.message')}{' '}
+              <strong className='flex gap-1 mx-1'>
+                <SlidingNumber number={canImprove} />
+                {t('notifications.canImprove.moreDays')}
+              </strong>{' '}
+              {t('notifications.canImprove.toYourPlan')}
+              {premiumKey
+                ? ` ${t('notifications.canImprove.reviewOptions')}`
+                : ` ${t('notifications.canImprove.considerPremium')}`}
             </NotificationCard>
           )}
           {(manuallySelectedDays.length > 0 || removedSuggestedDays.length > 0) && (
@@ -341,48 +339,44 @@ export const Summary = () => {
               colorScheme='indigo'
               className='mt-2'
             >
-              <>
-                {manuallySelectedDays.length > 0 && (
-                  <>
-                    {t('notifications.manualAdjustments.added')}{' '}
-                    <strong className='flex gap-1 mx-1'>
-                      <SlidingNumber number={manuallySelectedDays.length} />{' '}
-                      {manuallySelectedDays.length !== 1
-                        ? t('notifications.manualAdjustments.days')
-                        : t('notifications.manualAdjustments.day')}
-                    </strong>
-                  </>
-                )}
-                {manuallySelectedDays.length > 0 &&
-                  removedSuggestedDays.length > 0 &&
-                  ` ${t('notifications.manualAdjustments.and')} `}
-                {removedSuggestedDays.length > 0 && (
-                  <>
-                    {t('notifications.manualAdjustments.removed')}{' '}
-                    <strong className='flex gap-1 mx-1'>
-                      <SlidingNumber number={removedSuggestedDays.length} />{' '}
-                      {removedSuggestedDays.length !== 1
-                        ? t('notifications.manualAdjustments.days')
-                        : t('notifications.manualAdjustments.day')}
-                    </strong>
-                  </>
-                )}
-                {` ${t('notifications.manualAdjustments.fromOriginal')}`}
-              </>
+              {manuallySelectedDays.length > 0 && (
+                <>
+                  {t('notifications.manualAdjustments.added')}{' '}
+                  <strong className='flex gap-1 mx-1'>
+                    <SlidingNumber number={manuallySelectedDays.length} />{' '}
+                    {manuallySelectedDays.length !== 1
+                      ? t('notifications.manualAdjustments.days')
+                      : t('notifications.manualAdjustments.day')}
+                  </strong>
+                </>
+              )}
+              {manuallySelectedDays.length > 0 &&
+                removedSuggestedDays.length > 0 &&
+                ` ${t('notifications.manualAdjustments.and')} `}
+              {removedSuggestedDays.length > 0 && (
+                <>
+                  {t('notifications.manualAdjustments.removed')}{' '}
+                  <strong className='flex gap-1 mx-1'>
+                    <SlidingNumber number={removedSuggestedDays.length} />{' '}
+                    {removedSuggestedDays.length !== 1
+                      ? t('notifications.manualAdjustments.days')
+                      : t('notifications.manualAdjustments.day')}
+                  </strong>
+                </>
+              )}
+              {` ${t('notifications.manualAdjustments.fromOriginal')}`}
             </NotificationCard>
           )}
           {holidayMetrics.customDays > 0 && (
             <NotificationCard icon={CalendarDays} title={t('notifications.customHolidays.title')} colorScheme='blue'>
-              <>
-                {t('notifications.customHolidays.youHave')}{' '}
-                <strong className='flex gap-1 mx-1'>
-                  <SlidingNumber number={holidayMetrics.customDays} />{' '}
-                  {holidayMetrics.customDays !== 1
-                    ? t('notifications.customHolidays.holidays')
-                    : t('notifications.customHolidays.holiday')}
-                </strong>{' '}
-                {t('notifications.customHolidays.improvesPlan')}
-              </>
+              {t('notifications.customHolidays.youHave')}{' '}
+              <strong className='flex gap-1 mx-1'>
+                <SlidingNumber number={holidayMetrics.customDays} />{' '}
+                {holidayMetrics.customDays !== 1
+                  ? t('notifications.customHolidays.holidays')
+                  : t('notifications.customHolidays.holiday')}
+              </strong>{' '}
+              {t('notifications.customHolidays.improvesPlan')}
             </NotificationCard>
           )}
         </CardContent>

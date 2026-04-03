@@ -37,7 +37,9 @@ function generateGreedyAlternatives(
       if (hasConflict) continue;
 
       selected.push(bridge);
-      bridge.ptoDays.forEach((day) => usedDates.add(getKey(day)));
+      bridge.ptoDays.forEach((day) => {
+        usedDates.add(getKey(day));
+      });
       remainingDays -= bridge.ptoDaysNeeded;
     }
 

@@ -3,15 +3,12 @@ export type Day = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 const MS_PER_DAY = 86_400_000;
 
 export const isSameDay = (a: Date, b: Date): boolean =>
-  a.getFullYear() === b.getFullYear() &&
-  a.getMonth() === b.getMonth() &&
-  a.getDate() === b.getDate();
+  a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 
 export const isSameMonth = (a: Date, b: Date): boolean =>
   a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
 
-export const isBefore = (date: Date, dateToCompare: Date): boolean =>
-  date.getTime() < dateToCompare.getTime();
+export const isBefore = (date: Date, dateToCompare: Date): boolean => date.getTime() < dateToCompare.getTime();
 
 export const compareAsc = (a: Date, b: Date): number => a.getTime() - b.getTime();
 
@@ -100,8 +97,7 @@ export const getMonth = (date: Date): number => date.getMonth();
 
 const pad = (n: number, len = 2): string => String(n).padStart(len, '0');
 
-const isoDate = (date: Date): string =>
-  `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+const isoDate = (date: Date): string => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 
 const isoDateTime = (date: Date): string =>
   `${isoDate(date)} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;

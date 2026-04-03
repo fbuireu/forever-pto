@@ -1,11 +1,10 @@
 'use client';
 
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@const/components/ui/dialog';
+import { cn } from '@const/lib/utils';
 import { Command as CommandPrimitive } from 'cmdk';
 import { useTranslations } from 'next-intl';
 import type { ComponentProps } from 'react';
-
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@const/components/ui/dialog';
-import { cn } from '@const/lib/utils';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { SearchIcon } from 'src/components/animate-ui/icons/search';
 

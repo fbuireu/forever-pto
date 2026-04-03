@@ -13,10 +13,7 @@ export function getLongBlocksPerQuarter(days: Date[]): number[] {
   let lastQuarter = null;
   for (const date of sorted) {
     const quarter = Math.floor(date.getMonth() / 3);
-    if (
-      currentBlock.length === 0 ||
-      differenceInDays(date, currentBlock[currentBlock.length - 1]) === 1
-    ) {
+    if (currentBlock.length === 0 || differenceInDays(date, currentBlock[currentBlock.length - 1]) === 1) {
       currentBlock.push(date);
       lastQuarter = quarter;
     } else {
@@ -33,19 +30,14 @@ export function getLongBlocksPerQuarter(days: Date[]): number[] {
   return longBlocksPerQuarter;
 }
 
-export function getTotalEffectiveDays(
-  days: Date[],
-  bridges?: { effectiveDays: number; ptoDays: Date[] }[]
-): number {
+export function getTotalEffectiveDays(days: Date[], bridges?: { effectiveDays: number; ptoDays: Date[] }[]): number {
   if (!bridges || bridges.length === 0) {
     return days.length;
   }
 
   const daysSet = new Set(days.map((d) => d.toDateString()));
 
-  const validBridges = bridges.filter((bridge) =>
-    bridge.ptoDays.every((ptoDay) => daysSet.has(ptoDay.toDateString()))
-  );
+  const validBridges = bridges.filter((bridge) => bridge.ptoDays.every((ptoDay) => daysSet.has(ptoDay.toDateString())));
 
   const daysInBridges = new Set<string>();
   validBridges.forEach((bridge) => {
@@ -59,8 +51,18 @@ export function getTotalEffectiveDays(
 
   return effectiveDaysFromBridges + standaloneDays;
 }
+
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { differenceInDays, eachDayOfInterval, endOfYear, formatDate, getMonth, isWeekend, startOfToday, startOfYear } from '@shared/utils/date';
+import {
+  differenceInDays,
+  eachDayOfInterval,
+  endOfYear,
+  formatDate,
+  getMonth,
+  isWeekend,
+  startOfToday,
+  startOfYear,
+} from '@shared/utils/date';
 import type { Locale } from 'next-intl';
 import type { FirstLastBreak } from '../../types';
 
@@ -91,7 +93,7 @@ export const calculateMaxWorkingPeriod = ({
   year,
   allowPastDays,
 }: CalculateMaxWorkingPeriodParams): number => {
-  const yearNum = parseInt(year);
+  const yearNum = parseInt(year, 10);
   const yearStart = allowPastDays ? startOfYear(new Date(yearNum, 0, 1)) : startOfToday();
   const yearEnd = endOfYear(new Date(yearNum, 11, 31));
   if (yearStart > yearEnd) return 0;
@@ -149,7 +151,7 @@ interface GetWorkingDaysPerWeekParams {
 }
 
 export const getWorkingDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkingDaysPerWeekParams): number => {
-  const yearNum = parseInt(year);
+  const yearNum = parseInt(year, 10);
   const yearStart = startOfYear(new Date(yearNum, 0, 1));
   const yearEnd = endOfYear(new Date(yearNum, 11, 31));
   const allDaysInYear = eachDayOfInterval({ start: yearStart, end: yearEnd });
@@ -170,10 +172,7 @@ interface CalculateLongestVacationParams {
 export const calculateLongestVacation = ({ ptoDays, holidays }: CalculateLongestVacationParams): number => {
   if (ptoDays.length === 0) return 0;
 
-  const freeDays = new Set([
-    ...ptoDays.map((d) => d.toDateString()),
-    ...holidays.map((h) => h.date.toDateString()),
-  ]);
+  const freeDays = new Set([...ptoDays.map((d) => d.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
 
   const allDates = [...ptoDays, ...holidays.map((h) => h.date)].sort((a, b) => a.getTime() - b.getTime());
   if (allDates.length === 0) return 0;
@@ -208,10 +207,7 @@ interface CalculateLongWeekendsParams {
 export const calculateLongWeekends = ({ ptoDays, holidays }: CalculateLongWeekendsParams): number => {
   if (ptoDays.length === 0) return 0;
 
-  const freeDays = new Set([
-    ...ptoDays.map((d) => d.toDateString()),
-    ...holidays.map((h) => h.date.toDateString()),
-  ]);
+  const freeDays = new Set([...ptoDays.map((d) => d.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
 
   let longWeekends = 0;
   const allDates = [...ptoDays, ...holidays.map((h) => h.date)].sort((a, b) => a.getTime() - b.getTime());

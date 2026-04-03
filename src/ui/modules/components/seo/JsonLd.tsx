@@ -148,18 +148,12 @@ export async function JsonLd({ locale }: JsonLdProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
+      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: required for JSON-LD structured data scripts */}
+      <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationSchema) }} />
+      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: required for JSON-LD structured data scripts */}
+      <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: required for JSON-LD structured data scripts */}
+      <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
     </>
   );
 }

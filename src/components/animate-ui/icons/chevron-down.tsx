@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, type Variants } from 'motion/react';
-import { type IconProps, useAnimateIconContext, getVariants, IconWrapper } from './icon';
+import { getVariants, type IconProps, IconWrapper, useAnimateIconContext } from './icon';
 
 type ChevronDownProps = IconProps<keyof typeof animations>;
 

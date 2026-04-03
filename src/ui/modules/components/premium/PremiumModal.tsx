@@ -1,8 +1,8 @@
 'use client';
 
 import { usePremiumStore } from '@application/stores/premium';
-import { useShallow } from 'zustand/react/shallow';
 import dynamic from 'next/dynamic';
+import { useShallow } from 'zustand/react/shallow';
 
 const UpgradeModal = dynamic(() => import('./UpgradeModal').then((module) => ({ default: module.UpgradeModal })));
 

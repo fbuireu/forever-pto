@@ -5,11 +5,11 @@ import { cn } from '@const/lib/utils';
 import { InfoIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
+import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
+import { Lock } from 'src/components/animate-ui/icons/lock';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
 import { useShallow } from 'zustand/react/shallow';
 import { getButtonClass } from './utils/helpers';
-import { Lock } from 'src/components/animate-ui/icons/lock';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 export const PremiumFeatureVariant = {
   DEFAULT: 'default',
@@ -17,13 +17,6 @@ export const PremiumFeatureVariant = {
 } as const;
 
 export type PremiumFeatureVariant = (typeof PremiumFeatureVariant)[keyof typeof PremiumFeatureVariant];
-
-const KeyboardKey = {
-  ENTER: 'Enter',
-  SPACE: ' ',
-} as const;
-
-type KeyboardKey = (typeof KeyboardKey)[keyof typeof KeyboardKey];
 
 interface PremiumFeatureProps {
   feature: string;
@@ -62,18 +55,11 @@ export const PremiumFeature = ({
 
   return (
     <AnimateIcon animateOnHover>
-      <div
+      <button
+        type='button'
         className={cn('relative m-0 focus:outline-none', getButtonClass(variant), className)}
-        role='button'
-        tabIndex={0}
         aria-label={description ?? t('unlockFeature', { feature })}
         onClick={() => showUpgradeModal(feature)}
-        onKeyDown={(e) => {
-          if (e.key === KeyboardKey.ENTER || e.key === KeyboardKey.SPACE) {
-            e.preventDefault();
-            showUpgradeModal(feature);
-          }
-        }}
       >
         <div className='blur-sm pointer-events-none'>{children}</div>
         <div
@@ -103,7 +89,7 @@ export const PremiumFeature = ({
             </div>
           )}
         </div>
-      </div>
+      </button>
     </AnimateIcon>
   );
 };

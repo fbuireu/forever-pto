@@ -44,114 +44,118 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
   const t = await getTranslations('sidebar');
 
   return (
-  <SidebarProvider>
-    <Sidebar collapsible='icon' variant='inset'>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <Logo />
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel role='heading' aria-level={2}>{t('configuration')}</SidebarGroupLabel>
+    <SidebarProvider>
+      <Sidebar collapsible='icon' variant='inset'>
+        <SidebarHeader>
           <SidebarMenu>
-            <AnimateIcon animateOnHover>
-              <Collapsible
-                defaultOpen
-                className='group/collapsible w-[--radix-popper-anchor-width]'
-                data-tutorial='sidebar-filters'
-              >
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild className='cursor-pointer'>
-                    <SidebarMenuButton variant='outline' tooltip={t('filters')}>
-                      <Settings className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
-                      <span className='data-[collapsed=true]:hidden'>{t('filters')}</span>
-                      <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      <PtoDays />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <Suspense fallback={t('loading')}>
-                        <Countries locale={locale} />
-                      </Suspense>
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <Regions />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <Years />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <Strategy />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <AllowPastDays />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <CarryOverMonths />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
-            </AnimateIcon>
+            <SidebarMenuItem>
+              <Logo />
+            </SidebarMenuItem>
           </SidebarMenu>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel role='heading' aria-level={2}>{t('tools')}</SidebarGroupLabel>
-          <SidebarMenu>
-            <AnimateIcon animateOnHover>
-              <Collapsible
-                defaultOpen={false}
-                className='group/collapsible w-[--radix-popper-anchor-width]'
-                data-tutorial='sidebar-tools'
-              >
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild className='cursor-pointer'>
-                    <SidebarMenuButton variant='outline' tooltip={t('tools')}>
-                      <Calculator className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
-                      <span className='data-[collapsed=true]:hidden'>{t('calculators')}</span>
-                      <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      <PtoCalculator />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <PtoSalaryCalculator />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <WorkdayCounter />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
-            </AnimateIcon>
-          </SidebarMenu>
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooterButtons />
-      <SidebarRail />
-    </Sidebar>
-    <SidebarInset id='main-content' tabIndex={-1} className='outline-none'>
-      <SidebarTrigger className={'cursor-pointer size-8 fixed m-3 bg-background z-51'} />
-      {children}
-    </SidebarInset>
-  </SidebarProvider>
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel role='heading' aria-level={2}>
+              {t('configuration')}
+            </SidebarGroupLabel>
+            <SidebarMenu>
+              <AnimateIcon animateOnHover>
+                <Collapsible
+                  defaultOpen
+                  className='group/collapsible w-[--radix-popper-anchor-width]'
+                  data-tutorial='sidebar-filters'
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild className='cursor-pointer'>
+                      <SidebarMenuButton variant='outline' tooltip={t('filters')}>
+                        <Settings className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
+                        <span className='data-[collapsed=true]:hidden'>{t('filters')}</span>
+                        <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        <PtoDays />
+                        <SidebarMenuSubItem />
+                      </SidebarMenuSub>
+                      <SidebarMenuSub>
+                        <Suspense fallback={t('loading')}>
+                          <Countries locale={locale} />
+                        </Suspense>
+                        <SidebarMenuSubItem />
+                      </SidebarMenuSub>
+                      <SidebarMenuSub>
+                        <Regions />
+                        <SidebarMenuSubItem />
+                      </SidebarMenuSub>
+                      <SidebarMenuSub>
+                        <Years />
+                        <SidebarMenuSubItem />
+                      </SidebarMenuSub>
+                      <SidebarMenuSub>
+                        <Strategy />
+                        <SidebarMenuSubItem />
+                      </SidebarMenuSub>
+                      <SidebarMenuSub>
+                        <AllowPastDays />
+                        <SidebarMenuSubItem />
+                      </SidebarMenuSub>
+                      <SidebarMenuSub>
+                        <CarryOverMonths />
+                        <SidebarMenuSubItem />
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              </AnimateIcon>
+            </SidebarMenu>
+          </SidebarGroup>
+          <SidebarGroup>
+            <SidebarGroupLabel role='heading' aria-level={2}>
+              {t('tools')}
+            </SidebarGroupLabel>
+            <SidebarMenu>
+              <AnimateIcon animateOnHover>
+                <Collapsible
+                  defaultOpen={false}
+                  className='group/collapsible w-[--radix-popper-anchor-width]'
+                  data-tutorial='sidebar-tools'
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild className='cursor-pointer'>
+                      <SidebarMenuButton variant='outline' tooltip={t('tools')}>
+                        <Calculator className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
+                        <span className='data-[collapsed=true]:hidden'>{t('calculators')}</span>
+                        <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        <PtoCalculator />
+                        <SidebarMenuSubItem />
+                      </SidebarMenuSub>
+                      <SidebarMenuSub>
+                        <PtoSalaryCalculator />
+                        <SidebarMenuSubItem />
+                      </SidebarMenuSub>
+                      <SidebarMenuSub>
+                        <WorkdayCounter />
+                        <SidebarMenuSubItem />
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              </AnimateIcon>
+            </SidebarMenu>
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarFooterButtons />
+        <SidebarRail />
+      </Sidebar>
+      <SidebarInset id='main-content' tabIndex={-1} className='outline-none'>
+        <SidebarTrigger className={'cursor-pointer size-8 fixed m-3 bg-background z-51'} />
+        {children}
+      </SidebarInset>
+    </SidebarProvider>
   );
 };
