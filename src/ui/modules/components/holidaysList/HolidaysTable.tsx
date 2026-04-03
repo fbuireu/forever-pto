@@ -88,19 +88,15 @@ const HolidayCard = ({
               </PremiumFeature>
             )}
           >
-            <Checkbox
-              checked={isSelected}
-              onCheckedChange={() => onToggle(holiday, index)}
-              className='mt-1 flex-shrink-0'
-            />
+            <Checkbox checked={isSelected} onCheckedChange={() => onToggle(holiday, index)} className='mt-1 shrink-0' />
           </ConditionalWrapper>
           <div className='flex-1 min-w-0'>
-            <h4 className='font-medium text-sm leading-tight break-words'>{holiday.name}</h4>
+            <h4 className='font-medium text-sm leading-tight wrap-break-word'>{holiday.name}</h4>
             <p className='text-xs text-muted-foreground mt-1'>{dateFormatted}</p>
           </div>
         </div>
         {holiday.type && (
-          <Badge variant='secondary' className='flex-shrink-0 text-xs self-center'>
+          <Badge variant='secondary' className='shrink-0 text-xs self-center'>
             {holiday.type}
           </Badge>
         )}
@@ -314,7 +310,6 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   }, [selectionState, toggleSelectAll, premiumKey, t, tPremium]);
 
   const selectedCount = selectedHolidays.size;
-  const shouldShowLocationColumn = variantHolidays.some((h) => h.location);
   const weekendCount = variantHolidays.filter((h) => isWeekend(h.date)).length;
   const workdayCount = variantHolidays.filter((h) => !isWeekend(h.date)).length;
 
@@ -332,7 +327,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                 )}
                 <h3 className='text-base sm:text-lg font-semibold truncate'>{title}</h3>
               </div>
-              <div className='flex items-center space-x-2 ml-auto flex-shrink-0'>
+              <div className='flex items-center space-x-2 ml-auto shrink-0'>
                 <Badge variant='outline' className='text-xs sm:text-sm'>
                   {variantHolidays.length} total
                 </Badge>
@@ -400,17 +395,15 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
               <div className='max-h-96 overflow-y-auto'>
                 <Table className='w-full'>
                   <colgroup>
-                    <col className='w-[50px]' />
-                    <col className='w-[300px]' />
-                    <col className='w-[120px]' />
-                    <col className='w-[100px]' />
-                    <col className='w-[80px]' />
-                    <col className='w-[100px]' />
-                    {shouldShowLocationColumn && <col className='w-[150px]' />}
+                    <col className='w-12.5' />
+                    <col className='w-75' />
+                    <col className='w-30' />
+                    <col className='w-25' />
+                    <col className='w-20' />
+                    <col className='w-25' />
                   </colgroup>
                   <HolidayTableHeader
                     selectAllButton={SelectAllButton}
-                    shouldShowLocationColumn={shouldShowLocationColumn}
                     variant={variant}
                     sortConfig={sortConfig}
                     onSort={handleSort}

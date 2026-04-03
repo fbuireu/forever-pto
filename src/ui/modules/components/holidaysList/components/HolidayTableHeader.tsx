@@ -1,4 +1,4 @@
-import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
+import type { HolidayDTO } from '@application/dto/holiday/types';
 import { TableHeader as BaseTableHeader, TableHead, TableRow } from '@const/components/ui/table';
 import { cn } from '@const/lib/utils';
 import { ArrowUpDown } from 'lucide-react';
@@ -10,8 +10,6 @@ import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 
 interface HolidayTableHeaderProps {
   selectAllButton: React.ReactNode;
-  shouldShowLocationColumn: boolean;
-  variant: HolidayVariant;
   sortConfig: {
     key: keyof HolidayDTO | null;
     direction: 'asc' | 'desc';
@@ -46,13 +44,7 @@ const TableHeader = ({ children, sortKey, currentSort, onSort, className = '' }:
   );
 };
 
-const HolidayTableHeaderComponent = ({
-  selectAllButton,
-  shouldShowLocationColumn,
-  variant,
-  sortConfig,
-  onSort,
-}: HolidayTableHeaderProps) => {
+const HolidayTableHeaderComponent = ({ selectAllButton, sortConfig, onSort }: HolidayTableHeaderProps) => {
   const t = useTranslations('holidayTableHeader');
 
   return (
@@ -70,11 +62,6 @@ const HolidayTableHeaderComponent = ({
           {t('type')}
         </TableHeader>
         <TableHead>{t('status')}</TableHead>
-        {shouldShowLocationColumn && (
-          <TableHeader sortKey='location' currentSort={sortConfig} onSort={onSort}>
-            {variant === HolidayVariant.REGIONAL ? t('region') : t('location')}
-          </TableHeader>
-        )}
       </TableRow>
     </BaseTableHeader>
   );

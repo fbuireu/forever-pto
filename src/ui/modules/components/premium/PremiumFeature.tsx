@@ -54,14 +54,24 @@ export const PremiumFeature = ({
   }
 
   return (
-    <AnimateIcon animateOnHover>
-      <button
-        type='button'
+    <AnimateIcon animateOnHover asChild>
+      {/* biome-ignore lint/a11y/useSemanticElements: children may render as <button>, avoiding invalid nested button HTML */}
+      <div
+        role='button'
+        tabIndex={0}
         className={cn('relative m-0 focus:outline-none', getButtonClass(variant), className)}
         aria-label={description ?? t('unlockFeature', { feature })}
         onClick={() => showUpgradeModal(feature)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            showUpgradeModal(feature);
+          }
+        }}
       >
-        <div className='blur-sm pointer-events-none'>{children}</div>
+        <div className='blur-sm pointer-events-none' aria-hidden='true'>
+          {children}
+        </div>
         <div
           className={cn(
             'absolute inset-0 flex items-center',
@@ -89,7 +99,7 @@ export const PremiumFeature = ({
             </div>
           )}
         </div>
-      </button>
+      </div>
     </AnimateIcon>
   );
 };

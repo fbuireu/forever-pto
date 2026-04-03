@@ -58,13 +58,14 @@ export default Home;
 // todo: performance web workers
 // todo: unify component and folder structure (payment/provider should be dto?)
 // todo: CI to work on releases
+// todo: Increase test coverage
 // todo: track origin of premium key (feature)
 // todo: add custom weekends
 // todo: slider calendar on mobile
 // todo: fix biome comments
 // todo: transformer to make sql data ready ':id': data.id',
 // todo: improve error handling in server actions (send whole error type and change icon when "save to db error")
-// todo: APPLY DDD (CHECK BRANCH) + check everything (SSR, CSR, etc)
+// todo: APPLY DDD + check everything (SSR, CSR, etc)
 
 // PROD
 // todo: stripe rest of config (check all payment methods)

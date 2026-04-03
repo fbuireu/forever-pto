@@ -50,7 +50,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
   setRequestLocale(locale);
 
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
       <body className={cn(geistSans.variable, geistMono.variable, 'font-sans antialiased')}>
         <a
           href='#main-content'
@@ -72,7 +72,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
                 <div
                   className='pointer-events-none h-full z-1 rounded-lg inset-0 absolute
   bg-[linear-gradient(to_right,var(--grid-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid-color)_1px,transparent_1px)]
-  bg-[length:4rem_4rem]'
+  bg-size-[4rem_4rem]'
                   aria-hidden='true'
                 />
                 <SiteTitle />
