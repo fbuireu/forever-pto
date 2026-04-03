@@ -46,8 +46,8 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: https://neciudan.dev/lets-build-dynamic-shimmer-skeletons
 // todo: share button with results?
+// todo: docs with mintlify
 // todo: unify modal styles (footer actions, spacing, etc)
 // todo: performance audit, react best practices audit
 // todo: ads?
@@ -67,8 +67,8 @@ export default Home;
 // todo: APPLY DDD (CHECK BRANCH) + check everything (SSR, CSR, etc)
 
 // PROD
-// todo: cookie management (on PROD)
 // todo: stripe rest of config (check all payment methods)
 // todo: move prod env vars to cloudflare secrets
 // todo: add pages to bookmarks (betterstack, resend)
+// todo: cookie management (on PROD)
 // todo: SEO site validation etc
