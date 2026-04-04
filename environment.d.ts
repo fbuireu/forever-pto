@@ -4,7 +4,6 @@ import type { routing } from '@infrastructure/i18n/routing';
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      NEXTJS_ENV: string;
       TURSO_AUTH_TOKEN: string;
       TURSO_DATABASE_URL: string;
       NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: string;
@@ -19,6 +18,7 @@ declare global {
       CF_ACCESS_TEAM_DOMAIN: string;
       CF_ACCESS_WORKERS_AUD: string;
       CF_ACCESS_PREVIEW_AUD: string;
+      NEXT_PUBLIC_EMAIL_SELF: string;
     }
   }
 
