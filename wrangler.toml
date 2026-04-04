@@ -2,21 +2,21 @@ name = "forever-pto"
 main = ".open-next/worker.js"
 compatibility_date = "2025-11-25"
 compatibility_flags = ["nodejs_compat", "enable_nodejs_process_v2"]
-keep_names=false
+keep_names = false
 
 [assets]
 directory = ".open-next/assets"
 binding = "ASSETS"
 
 [observability]
-[observability.logs]
 enabled = true
-head_sampling_rate = 0.2
+
+[observability.logs]
 invocation_logs = true
-persist = true
+head_sampling_rate = 0.2
+
 [observability.traces]
 enabled = true
-persist = true
 head_sampling_rate = 0.2
 
 [[routes]]
