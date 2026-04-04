@@ -16,6 +16,9 @@ declare global {
       RESEND_API_KEY: string;
       NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: string;
       NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: string;
+      CF_ACCESS_TEAM_DOMAIN: string;
+      CF_ACCESS_WORKERS_AUD: string;
+      CF_ACCESS_PREVIEW_AUD: string;
     }
   }
 
