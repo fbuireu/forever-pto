@@ -4,7 +4,7 @@ import { Button } from '@const/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './contact.css';
 
 const ContactModal = dynamic(() =>
@@ -18,8 +18,14 @@ export function Contact() {
   const t = useTranslations('roadmap');
   const [contactModalOpen, setContactModalOpen] = useState(false);
 
+  useEffect(() => {
+    if (window.location.hash === '#contact') {
+      setContactModalOpen(true);
+    }
+  }, []);
+
   return (
-    <div className='container max-w-4xl m-auto'>
+    <div id='contact' className='container max-w-4xl m-auto'>
       <Card className='dashed-card group relative border-none'>
         <svg
           className='absolute inset-0 w-full h-full pointer-events-none'

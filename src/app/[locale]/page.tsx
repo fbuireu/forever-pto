@@ -47,7 +47,7 @@ const Home = async ({ params }: LayoutProps) => {
 export default Home;
 
 // todo: share button with results?
-// todo: docs with mintlify
+// todo: docs with mintlifyy
 // todo: unify modal styles (footer actions, spacing, etc)
 // todo: performance audit, react best practices audit
 // todo: ads?
@@ -62,7 +62,7 @@ export default Home;
 // todo: track origin of premium key (feature)
 // todo: add custom weekends
 // todo: slider calendar on mobile
-// todo: fix biome comments
+// todo: fix biome comments (careful with button nesting etc)
 // todo: transformer to make sql data ready ':id': data.id',
 // todo: improve error handling in server actions (send whole error type and change icon when "save to db error")
 // todo: APPLY DDD + check everything (SSR, CSR, etc)

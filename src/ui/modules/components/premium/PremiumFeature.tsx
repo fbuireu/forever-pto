@@ -69,7 +69,8 @@ export const PremiumFeature = ({
           }
         }}
       >
-        <div className='blur-sm pointer-events-none' aria-hidden='true'>
+        {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: inert handles non-interactivity */}
+        <div className='pointer-events-none select-none' style={{ filter: 'blur(4px)' }} aria-hidden='true' inert>
           {children}
         </div>
         <div
