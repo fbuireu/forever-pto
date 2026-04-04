@@ -72,6 +72,24 @@ export const Donate = () => {
     getCurrencyFromLocale(locale);
   }, [locale, getCurrencyFromLocale]);
 
+  useEffect(() => {
+    const legend = document.getElementById('legend-sticky');
+    if (!legend) return;
+
+    const update = () => {
+      const { bottom } = legend.getBoundingClientRect();
+      document.documentElement.toggleAttribute('data-legend-stuck', Math.round(bottom) < window.innerHeight - 1);
+    };
+
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+
+    return () => {
+      window.removeEventListener('scroll', update);
+      document.documentElement.removeAttribute('data-legend-stuck');
+    };
+  }, []);
+
   const paymentSchema = createPaymentSchemaWithMessages({
     amountMin: tValidation('amountMin'),
     amountMax: tValidation('amountMax'),
@@ -298,7 +316,7 @@ export const Donate = () => {
   return (
     <Popover open={isOpen} onOpenChange={setDonatePopoverOpen}>
       <PopoverTrigger asChild>
-        <div className='fixed xl:bottom-4 bottom-30 w-full right-0 md:w-auto md:right-4 z-50'>
+        <div className='donate-trigger fixed xl:bottom-4 bottom-30 w-full right-0 md:w-auto md:right-4 z-50'>
           <div className='donate-rainbow relative z-0 overflow-hidden p-0.5 flex items-center justify-center rounded-md hover:scale-102 transition duration-200 active:scale-100'>
             <Button className='shadow-lg rounded-md w-full h-full'>{tDonate('donateAndUnblock')}</Button>
           </div>

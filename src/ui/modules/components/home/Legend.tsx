@@ -8,7 +8,7 @@ export const Legend = () => {
   const t = useTranslations('legend');
 
   return (
-    <div className={styles.stickyContainer}>
+    <div id='legend-sticky' className={styles.stickyContainer}>
       <section className={styles.section}>
         <Card className={styles.card}>
           <CardHeader className={styles.cardHeader}>

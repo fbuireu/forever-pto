@@ -97,7 +97,7 @@ export function DonationForm({
         <FormField
           control={form.control}
           name='amount'
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>{t('donationAmount')}</FormLabel>
               <FormControl>
@@ -114,11 +114,12 @@ export function DonationForm({
                     min='1'
                     max='10000'
                     disabled={loading}
+                    aria-invalid={!!fieldState.error}
                     {...field}
                     value={field.value ?? ''}
                     onChange={(e) => {
                       const value = e.target.value;
-                      field.onChange(value === '' ? undefined : parseFloat(value));
+                      field.onChange(value === '' ? '' : parseFloat(value));
                     }}
                   />
                 </InputGroup>

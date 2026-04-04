@@ -1,3 +1,10 @@
+@media (max-width: 1279px) {
+  [data-legend-stuck] .donate-trigger {
+    bottom: 1rem;
+    transition: bottom 300ms ease-in-out;
+  }
+}
+
 .donate-rainbow::before {
   content: "";
   position: absolute;

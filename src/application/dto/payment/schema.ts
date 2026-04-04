@@ -9,7 +9,7 @@ export interface PaymentSchemaMessages {
 
 export const createPaymentSchemaWithMessages = (messages: PaymentSchemaMessages) =>
   z.object({
-    amount: z.number().min(1, { message: messages.amountMin }).max(10000, { message: messages.amountMax }),
+    amount: z.coerce.number().min(1, { message: messages.amountMin }).max(10000, { message: messages.amountMax }),
     email: z.email({ message: messages.invalidEmail }).min(1, { message: messages.emailRequired }),
     promoCode: z.string().optional(),
   });
