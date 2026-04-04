@@ -271,7 +271,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 
   const selectedHolidaysList = useMemo(() => getSelectedHolidays(), [getSelectedHolidays]);
 
-  const SelectAllButton = useMemo(() => {
+  const selectAllButton = useMemo(() => {
     const { type } = selectionState;
 
     const getLabel = () => {
@@ -402,12 +402,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                     <col className='w-20' />
                     <col className='w-25' />
                   </colgroup>
-                  <HolidayTableHeader
-                    selectAllButton={SelectAllButton}
-                    variant={variant}
-                    sortConfig={sortConfig}
-                    onSort={handleSort}
-                  />
+                  <HolidayTableHeader selectAllButton={selectAllButton} sortConfig={sortConfig} onSort={handleSort} />
                   <TableBody>
                     {filteredHolidays.length > 0 ? (
                       filteredHolidays.map((holiday, index) => {
@@ -428,7 +423,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                     ) : (
                       <AnimateIcon animateOnView loop loopDelay={1500} asChild>
                         <TableRow>
-                          <TableCell colSpan={shouldShowLocationColumn ? 7 : 6} className='h-24 text-center'>
+                          <TableCell colSpan={6} className='h-24 text-center'>
                             <div className='flex flex-col items-center space-y-2 text-muted-foreground'>
                               <Search className='h-8 w-8' />
                               {debouncedSearchTerm ? t('noHolidaysFound') : t('noHolidays')}
@@ -445,7 +440,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
             <div className='lg:hidden space-y-3'>
               <div className='flex items-center justify-between px-2 py-1 bg-muted/30 rounded-md'>
                 <div className='flex items-center gap-2'>
-                  {SelectAllButton}
+                  {selectAllButton}
                   <span className='text-xs text-muted-foreground'>
                     {selectionState.type === 'all'
                       ? t('allSelected')
