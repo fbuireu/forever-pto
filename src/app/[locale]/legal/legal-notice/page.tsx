@@ -13,7 +13,8 @@ interface LegalNoticePageProps {
 export default async function LegalNoticePage({ params }: LegalNoticePageProps) {
   const { locale } = await params;
   const t = await getTranslations('legalPages.legalNotice');
-  const lastUpdatedDate = Temporal.Now.plainDateISO().subtract({ weeks: 1 }).toLocaleString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+  const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+  const lastUpdatedDate = new Date(Date.now() - ONE_WEEK_MS).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
     <LegalLayout title={t('title')} lastUpdated={t('lastUpdated', { date: lastUpdatedDate })}>

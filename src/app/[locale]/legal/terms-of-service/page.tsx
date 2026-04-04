@@ -11,7 +11,8 @@ interface TermsOfServicePageProps {
 export default async function TermsOfServicePage({ params }: TermsOfServicePageProps) {
   const { locale } = await params;
   const t = await getTranslations('legalPages.termsOfService');
-  const lastUpdatedDate = Temporal.Now.plainDateISO().subtract({ weeks: 1 }).toLocaleString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+  const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+  const lastUpdatedDate = new Date(Date.now() - ONE_WEEK_MS).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
     <LegalLayout title={t('title')} lastUpdated={t('lastUpdated', { date: lastUpdatedDate })}>
