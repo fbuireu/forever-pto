@@ -4,10 +4,7 @@ import { routing } from '@infrastructure/i18n/routing';
 import '@styles/index.css';
 import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { Analytics } from '@ui/modules/components/core/Analytics';
-const CookieConsent = dynamic(() =>
-  import('@ui/modules/components/core/CookieConsent').then((m) => ({ default: m.CookieConsent })),
-  { ssr: false }
-);
+import { CookieConsentClient } from '@ui/modules/components/core/CookieConsentClient';
 import { DonateClient } from '@ui/modules/components/core/DonateClient';
 import { SiteSubtitle } from '@ui/modules/components/core/SiteSubtitle';
 import { SiteTitle } from '@ui/modules/components/core/SiteTitle';
@@ -84,7 +81,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
                 <Toaster />
                 <DonateClient />
                 <PremiumModal />
-                <CookieConsent />
+                <CookieConsentClient />
                 <Footer />
               </AppSidebar>
             </SidebarProvider>
