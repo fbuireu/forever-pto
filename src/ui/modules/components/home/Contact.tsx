@@ -12,7 +12,7 @@ const ContactModal = dynamic(() =>
 );
 
 const GITHUB_ISSUE_URL =
-  'https://github.com/fbuireu/forever-pto/issues/new?template=feature_request.md&labels=enhancement';
+  'https://github.com/fbuireu/forever-pto/issues/new?template=feature_request.yml&labels=enhancement';
 
 export function Contact() {
   const t = useTranslations('roadmap');

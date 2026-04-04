@@ -1,36 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Forever PTO
 
-## Getting Started
+**Maximize your time off.** Forever PTO helps you strategically combine vacation days with public holidays to get the most out of every PTO day you have.
 
-First, run the development server:
+→ **[forever-pto.com](https://forever-pto.com)**
+
+---
+
+## What it does
+
+Given your country, region, year, and number of PTO days, Forever PTO suggests the optimal way to place your vacation days so you get the longest possible stretches of time off — automatically accounting for weekends and public holidays.
+
+**Three strategies:**
+- **Grouped** — consolidate days into a few long vacations
+- **Optimized** — maximize the total number of days off
+- **Balanced** — a mix of both
+
+**Beyond scheduling:**
+- Edit, delete, or add custom holidays
+- See efficiency stats (performance gain, long weekends, work streaks)
+- PTO accrual calculator, PTO vs salary calculator, workday counter
+- Charts and yearly summary
+- Premium features for advanced analysis
+
+---
+
+## Stack
+
+| Layer | Tech |
+|---|---|
+| Framework | Next.js 16 (App Router) + React 19 |
+| Language | TypeScript 6 |
+| Styling | Tailwind CSS v4 + shadcn/ui |
+| State | Zustand |
+| i18n | next-intl — en, es, ca, it |
+| Database | Turso (serverless SQLite) |
+| Payments | Stripe |
+| Email | Resend |
+| Auth | Cloudflare Access + jose |
+| Deployment | Cloudflare Workers via OpenNextJS |
+| Monitoring | BetterStack |
+| Testing | Vitest + Playwright |
+| Linting | Biome |
+
+---
+
+## Getting started
+
+**Requirements:** Node.js ≥ 24, pnpm 10
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Install dependencies
+pnpm install
+
+# Copy env file and fill in values
+cp .env.example .env.development
+
+# Start dev server
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm dev              # Dev server (Turbopack)
+pnpm build            # Production build
+pnpm deploy           # Build + deploy to Cloudflare Workers
+pnpm preview          # Local Cloudflare Workers preview
 
-## Learn More
+pnpm test:ut          # Unit tests
+pnpm test:e2e         # E2E tests (Playwright)
 
-To learn more about Next.js, take a look at the following resources:
+pnpm lint:all:fix     # Fix all lint issues
+pnpm format:all       # Format all files
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Environment variables
 
-## Deploy on Vercel
+See [`.env.example`](.env.example) for the full list. Key variables:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Variable | Description |
+|---|---|
+| `TURSO_DATABASE_URL` | Turso database URL |
+| `TURSO_AUTH_TOKEN` | Turso auth token |
+| `STRIPE_SECRET_KEY` | Stripe secret key |
+| `RESEND_API_KEY` | Resend API key |
+| `JWT_SECRET` | JWT signing secret |
+| `CF_ACCESS_TEAM_DOMAIN` | Cloudflare Access team domain |
+| `CF_ACCESS_WORKERS_AUD` | CF Access AUD for workers.dev |
+| `CF_ACCESS_PREVIEW_AUD` | CF Access AUD for preview URLs |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Contributing
+
+- [Open a feature request](https://github.com/fbuireu/forever-pto/issues/new?template=feature_request.yml&labels=enhancement)
+- [Report a bug](https://github.com/fbuireu/forever-pto/issues/new?template=bug_report.yml)
+- [Start a discussion](https://github.com/fbuireu/forever-pto/discussions)
+
+Conventional commits required. Run `pnpm prepare` to set up git hooks.
+
+---
+
+## License
+
+Private — © Ferran Buireu
