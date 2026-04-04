@@ -1,5 +1,3 @@
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-
 const IP_SERVICE = 'https://api.ipify.org';
 const GEO_SERVICE = 'https://ipinfo.io';
 const FORMAT = 'json';
@@ -34,9 +32,7 @@ export async function detectCountryFromIP() {
     const geoData = await geoResponse.json();
 
     return geoData.country?.toLowerCase() ?? '';
-  } catch (error) {
-    getBetterStackInstance().warn('Error while detecting country from IP', { error });
-
+  } catch {
     return '';
   }
 }
