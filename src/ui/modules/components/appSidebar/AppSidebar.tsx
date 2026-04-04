@@ -59,13 +59,13 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
               {t('configuration')}
             </SidebarGroupLabel>
             <SidebarMenu>
-              <AnimateIcon animateOnHover>
+              <SidebarMenuItem>
                 <Collapsible
                   defaultOpen
                   className='group/collapsible w-[--radix-popper-anchor-width]'
                   data-tutorial='sidebar-filters'
                 >
-                  <SidebarMenuItem>
+                  <AnimateIcon animateOnHover>
                     <CollapsibleTrigger asChild className='cursor-pointer'>
                       <SidebarMenuButton variant='outline' tooltip={t('filters')}>
                         <Settings className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
@@ -105,9 +105,9 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                         <SidebarMenuSubItem />
                       </SidebarMenuSub>
                     </CollapsibleContent>
-                  </SidebarMenuItem>
+                  </AnimateIcon>
                 </Collapsible>
-              </AnimateIcon>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
           <SidebarGroup>
@@ -115,13 +115,13 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
               {t('tools')}
             </SidebarGroupLabel>
             <SidebarMenu>
-              <AnimateIcon animateOnHover>
+              <SidebarMenuItem>
                 <Collapsible
                   defaultOpen={false}
                   className='group/collapsible w-[--radix-popper-anchor-width]'
                   data-tutorial='sidebar-tools'
                 >
-                  <SidebarMenuItem>
+                  <AnimateIcon animateOnHover>
                     <CollapsibleTrigger asChild className='cursor-pointer'>
                       <SidebarMenuButton variant='outline' tooltip={t('tools')}>
                         <Calculator className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
@@ -143,9 +143,9 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                         <SidebarMenuSubItem />
                       </SidebarMenuSub>
                     </CollapsibleContent>
-                  </SidebarMenuItem>
+                  </AnimateIcon>
                 </Collapsible>
-              </AnimateIcon>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>

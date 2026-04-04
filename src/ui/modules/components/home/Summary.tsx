@@ -173,7 +173,7 @@ export const Summary = () => {
               </p>
             )}
             {!region && (
-              <p className='text-sm text-amber-600 dark:text-amber-400'>{t('summaryParagraph.noRegionHint')}</p>
+              <p className='text-sm text-amber-700 dark:text-amber-400'>{t('summaryParagraph.noRegionHint')}</p>
             )}
           </CardDescription>
         </CardHeader>

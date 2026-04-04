@@ -61,7 +61,7 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
               </span>
             )}
             {remaining === 0 && !hasManualChanges && (
-              <span className='text-[10px] text-green-600 dark:text-green-400 font-medium ml-1'>
+              <span className='text-[10px] text-green-700 dark:text-green-400 font-medium ml-1'>
                 ✓ {t('allAssigned')}
               </span>
             )}

@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
     description: t('description'),
     metadataBase: new URL(baseUrl),
     alternates: {
-      canonical: '/',
+      canonical: `/${locale}`,
       languages: Object.fromEntries(LOCALES.map((lang) => [lang, `/${lang}`])),
     },
     openGraph: {

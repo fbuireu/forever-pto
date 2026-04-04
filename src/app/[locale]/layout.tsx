@@ -4,7 +4,10 @@ import { routing } from '@infrastructure/i18n/routing';
 import '@styles/index.css';
 import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { Analytics } from '@ui/modules/components/core/Analytics';
-import { CookieConsent } from '@ui/modules/components/core/CookieConsent';
+const CookieConsent = dynamic(() =>
+  import('@ui/modules/components/core/CookieConsent').then((m) => ({ default: m.CookieConsent })),
+  { ssr: false }
+);
 import { DonateClient } from '@ui/modules/components/core/DonateClient';
 import { SiteSubtitle } from '@ui/modules/components/core/SiteSubtitle';
 import { SiteTitle } from '@ui/modules/components/core/SiteTitle';
