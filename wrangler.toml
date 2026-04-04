@@ -23,6 +23,9 @@ head_sampling_rate = 0.2
 pattern = "forever-pto.com/*"
 zone_name = "forever-pto.com"
 
+[[tail_consumers]]
+service = "forever-pto-tail"
+
 [placement]
 mode = "smart"
 
