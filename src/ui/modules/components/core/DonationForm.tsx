@@ -119,7 +119,7 @@ export function DonationForm({
                     value={field.value ?? ''}
                     onChange={(e) => {
                       const value = e.target.value;
-                      field.onChange(value === '' ? '' : parseFloat(value));
+                      field.onChange(value === '' ? 0 : parseFloat(value));
                     }}
                   />
                 </InputGroup>
