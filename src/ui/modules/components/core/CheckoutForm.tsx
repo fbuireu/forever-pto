@@ -28,6 +28,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   const locale = useLocale();
   const t = useTranslations('checkout');
   const [isExpressReady, setIsExpressReady] = useState(false);
+  const [hasExpressOptions, setHasExpressOptions] = useState<boolean | null>(null);
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -120,22 +121,30 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
         </div>
       </div>
       <form onSubmit={handleSubmit} className='space-y-4'>
-        <div className='space-y-3'>
-          <div className='relative'>
-            <div className='absolute inset-0 flex items-center'>
-              <span className='w-full border-t' />
+        {hasExpressOptions !== false && (
+          <div className='space-y-3'>
+            <div className='relative'>
+              <div className='absolute inset-0 flex items-center'>
+                <span className='w-full border-t' />
+              </div>
+              <div className='relative flex justify-center text-xs uppercase'>
+                <span className='bg-popover px-2 text-muted-foreground'>{t('expressCheckout')}</span>
+              </div>
             </div>
-            <div className='relative flex justify-center text-xs uppercase'>
-              <span className='bg-popover px-2 text-muted-foreground'>{t('expressCheckout')}</span>
+            <div className='relative min-h-12'>
+              {!isExpressReady && <ExpressCheckoutSkeleton />}
+              <div className={!isExpressReady ? 'invisible absolute inset-0' : 'visible'}>
+                <ExpressCheckoutElement
+                  onConfirm={handleExpressCheckout}
+                  onReady={(event) => {
+                    setIsExpressReady(true);
+                    setHasExpressOptions(!!event.availablePaymentMethods);
+                  }}
+                />
+              </div>
             </div>
           </div>
-          <div className='relative min-h-12'>
-            {!isExpressReady && <ExpressCheckoutSkeleton />}
-            <div className={!isExpressReady ? 'invisible absolute inset-0' : 'visible'}>
-              <ExpressCheckoutElement onConfirm={handleExpressCheckout} onReady={() => setIsExpressReady(true)} />
-            </div>
-          </div>
-        </div>
+        )}
         <div className='space-y-3'>
           <div className='relative'>
             <div className='absolute inset-0 flex items-center'>
