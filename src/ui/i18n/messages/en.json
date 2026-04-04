@@ -807,7 +807,7 @@
   "legalPages": {
     "cookiePolicy": {
       "title": "Cookie Policy",
-      "lastUpdated": "Last updated: February 2, 2026",
+      "lastUpdated": "Last updated: {date}",
       "sections": {
         "introduction": {
           "title": "Introduction",
@@ -983,7 +983,7 @@
           "description": "If you have questions about this Cookie Policy, please contact us:",
           "email": {
             "label": "Email:",
-            "value": "privacy@forever-pto.com"
+            "value": "{supportEmail}"
           },
           "website": {
             "label": "Website:"
@@ -993,7 +993,7 @@
     },
     "privacyPolicy": {
       "title": "Privacy Policy",
-      "lastUpdated": "Last updated: February 2, 2026",
+      "lastUpdated": "Last updated: {date}",
       "sections": {
         "introduction": {
           "title": "Introduction",
@@ -1014,11 +1014,11 @@
             },
             "address": {
               "label": "Address:",
-              "value": "Carrer de Sant Pau, 58, 08001 Barcelona, Spain"
+              "value": "Carrer de Loreto 36, 5B, 08029, Barcelona, Spain"
             },
             "email": {
               "label": "Email:",
-              "value": "privacy@forever-pto.com"
+              "value": "{supportEmail}"
             },
             "website": {
               "label": "Website:"
@@ -1204,7 +1204,7 @@
               "description": "You can file a complaint with the Spanish Data Protection Authority (AEPD) or your local supervisory authority."
             }
           },
-          "contact": "To exercise these rights, contact us at privacy@forever-pto.com."
+          "contact": "To exercise these rights, contact us at {supportEmail}."
         },
         "internationalTransfers": {
           "title": "International Data Transfers",
@@ -1232,14 +1232,14 @@
           "items": {
             "email": {
               "label": "Email:",
-              "value": "privacy@forever-pto.com"
+              "value": "{supportEmail}"
             },
             "website": {
               "label": "Website:"
             },
             "postalAddress": {
               "label": "Postal Address:",
-              "value": "Ferran Buireu, Carrer de Sant Pau, 58, 08001 Barcelona, Spain"
+              "value": "Ferran Buireu, Carrer de Loreto 36, 5B, 08029, Barcelona, Spain"
             }
           },
           "responseTime": "We will respond to your inquiries within 30 days."
@@ -1248,7 +1248,7 @@
     },
     "termsOfService": {
       "title": "Terms of Service",
-      "lastUpdated": "Last updated: February 2, 2026",
+      "lastUpdated": "Last updated: {date}",
       "sections": {
         "acceptance": {
           "title": "Acceptance of Terms",
@@ -1353,7 +1353,7 @@
             "title": "Refund Process",
             "description": "To request a refund:",
             "steps": {
-              "contact": "1. Contact us at support@forever-pto.com with your transaction ID",
+              "contact": "1. Contact us at {supportEmail} with your transaction ID",
               "include": "2. Include a brief explanation of why you are requesting a refund",
               "review": "3. We will review your request within 5 business days",
               "processing": "4. If approved, the refund will be processed to your original payment method within 10 business days"
@@ -1513,7 +1513,7 @@
           },
           "disputeResolution": {
             "title": "Dispute Resolution",
-            "description": "Before initiating any legal proceedings, we encourage you to contact us at support@forever-pto.com to seek an amicable resolution."
+            "description": "Before initiating any legal proceedings, we encourage you to contact us at {supportEmail} to seek an amicable resolution."
           },
           "euOdr": {
             "title": "EU Online Dispute Resolution",
@@ -1543,14 +1543,14 @@
           "items": {
             "email": {
               "label": "Email:",
-              "value": "support@forever-pto.com"
+              "value": "{supportEmail}"
             },
             "website": {
               "label": "Website:"
             },
             "postalAddress": {
               "label": "Postal Address:",
-              "value": "Ferran Buireu, Carrer de Sant Pau, 58, 08001 Barcelona, Spain"
+              "value": "Ferran Buireu, Carrer de Loreto 36, 5B, 08029, Barcelona, Spain"
             }
           },
           "responseTime": "We will respond to your inquiries within 5 business days."
@@ -1559,7 +1559,7 @@
     },
     "legalNotice": {
       "title": "Legal Notice",
-      "lastUpdated": "Last updated: February 2, 2026",
+      "lastUpdated": "Last updated: {date}",
       "sections": {
         "identification": {
           "title": "Website Owner Identification",
@@ -1575,7 +1575,7 @@
             },
             "address": {
               "label": "Address:",
-              "value": "Carrer de Sant Pau, 58, 08001 Barcelona, Spain"
+              "value": "Carrer de Loreto 36, 5B, 08029, Barcelona, Spain"
             },
             "email": {
               "label": "Email:",

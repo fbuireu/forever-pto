@@ -1,13 +1,20 @@
 import { LegalLayout } from '@ui/modules/components/legal/LegalLayout';
+import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 
 export { generateMetadata } from './metadata';
 
-export default async function CookiePolicyPage() {
+interface CookiePolicyPageProps {
+  params: Promise<{ locale: Locale }>;
+}
+
+export default async function CookiePolicyPage({ params }: CookiePolicyPageProps) {
+  const { locale } = await params;
   const t = await getTranslations('legalPages.cookiePolicy');
+  const lastUpdatedDate = Temporal.Now.plainDateISO().subtract({ weeks: 1 }).toLocaleString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
-    <LegalLayout title={t('title')} lastUpdated={t('lastUpdated')}>
+    <LegalLayout title={t('title')} lastUpdated={t('lastUpdated', { date: lastUpdatedDate })}>
       <section>
         <h2 className='text-2xl font-semibold mt-6 mb-4'>{t('sections.introduction.title')}</h2>
         <p>
@@ -220,7 +227,7 @@ export default async function CookiePolicyPage() {
         <p>{t('sections.contact.description')}</p>
         <ul className='list-disc pl-6 mt-2 space-y-2'>
           <li>
-            <strong>{t('sections.contact.email.label')}</strong> {t('sections.contact.email.value')}
+            <strong>{t('sections.contact.email.label')}</strong> {t('sections.contact.email.value', { supportEmail: process.env.NEXT_PUBLIC_EMAIL_SELF })}
           </li>
           <li>
             <strong>{t('sections.contact.website.label')}</strong> https://forever-pto.com

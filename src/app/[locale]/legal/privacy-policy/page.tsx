@@ -1,15 +1,22 @@
 import { Me } from '@ui/modules/components/core/me';
 import { Nif } from '@ui/modules/components/core/Nif';
 import { LegalLayout } from '@ui/modules/components/legal/LegalLayout';
+import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 
 export { generateMetadata } from './metadata';
 
-export default async function PrivacyPolicyPage() {
+interface PrivacyPolicyPageProps {
+  params: Promise<{ locale: Locale }>;
+}
+
+export default async function PrivacyPolicyPage({ params }: PrivacyPolicyPageProps) {
+  const { locale } = await params;
   const t = await getTranslations('legalPages.privacyPolicy');
+  const lastUpdatedDate = Temporal.Now.plainDateISO().subtract({ weeks: 1 }).toLocaleString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
-    <LegalLayout title={t('title')} lastUpdated={t('lastUpdated')}>
+    <LegalLayout title={t('title')} lastUpdated={t('lastUpdated', { date: lastUpdatedDate })}>
       <section>
         <h2 className='text-2xl font-semibold mt-6 mb-4'>{t('sections.introduction.title')}</h2>
         <p>{t('sections.introduction.p1')}</p>
@@ -34,7 +41,7 @@ export default async function PrivacyPolicyPage() {
           </li>
           <li>
             <strong>{t('sections.dataController.items.email.label')}</strong>{' '}
-            {t('sections.dataController.items.email.value')}
+            {t('sections.dataController.items.email.value', { supportEmail: process.env.NEXT_PUBLIC_EMAIL_SELF })}
           </li>
           <li>
             <strong>{t('sections.dataController.items.website.label')}</strong> https://forever-pto.com
@@ -229,7 +236,7 @@ export default async function PrivacyPolicyPage() {
             {t('sections.yourRights.items.complaint.description')}
           </li>
         </ul>
-        <p className='mt-4'>{t('sections.yourRights.contact')}</p>
+        <p className='mt-4'>{t('sections.yourRights.contact', { supportEmail: process.env.NEXT_PUBLIC_EMAIL_SELF })}</p>
       </section>
 
       <section>
@@ -261,7 +268,7 @@ export default async function PrivacyPolicyPage() {
         <p>{t('sections.contactInfo.description')}</p>
         <ul className='list-disc pl-6 mt-4 space-y-2'>
           <li>
-            <strong>{t('sections.contactInfo.items.email.label')}</strong> {t('sections.contactInfo.items.email.value')}
+            <strong>{t('sections.contactInfo.items.email.label')}</strong> {t('sections.contactInfo.items.email.value', { supportEmail: process.env.NEXT_PUBLIC_EMAIL_SELF })}
           </li>
           <li>
             <strong>{t('sections.contactInfo.items.website.label')}</strong> https://forever-pto.com

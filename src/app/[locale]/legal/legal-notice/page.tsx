@@ -1,15 +1,22 @@
 import { Me } from '@ui/modules/components/core/me';
 import { Nif } from '@ui/modules/components/core/Nif';
 import { LegalLayout } from '@ui/modules/components/legal/LegalLayout';
+import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 
 export { generateMetadata } from './metadata';
 
-export default async function LegalNoticePage() {
+interface LegalNoticePageProps {
+  params: Promise<{ locale: Locale }>;
+}
+
+export default async function LegalNoticePage({ params }: LegalNoticePageProps) {
+  const { locale } = await params;
   const t = await getTranslations('legalPages.legalNotice');
+  const lastUpdatedDate = Temporal.Now.plainDateISO().subtract({ weeks: 1 }).toLocaleString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
-    <LegalLayout title={t('title')} lastUpdated={t('lastUpdated')}>
+    <LegalLayout title={t('title')} lastUpdated={t('lastUpdated', { date: lastUpdatedDate })}>
       <section>
         <h2 className='text-2xl font-semibold mt-6 mb-4'>{t('sections.identification.title')}</h2>
         <p>{t('sections.identification.description')}</p>

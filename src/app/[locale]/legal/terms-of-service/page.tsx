@@ -1,13 +1,20 @@
 import { LegalLayout } from '@ui/modules/components/legal/LegalLayout';
+import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 
 export { generateMetadata } from './metadata';
 
-export default async function TermsOfServicePage() {
+interface TermsOfServicePageProps {
+  params: Promise<{ locale: Locale }>;
+}
+
+export default async function TermsOfServicePage({ params }: TermsOfServicePageProps) {
+  const { locale } = await params;
   const t = await getTranslations('legalPages.termsOfService');
+  const lastUpdatedDate = Temporal.Now.plainDateISO().subtract({ weeks: 1 }).toLocaleString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
-    <LegalLayout title={t('title')} lastUpdated={t('lastUpdated')}>
+    <LegalLayout title={t('title')} lastUpdated={t('lastUpdated', { date: lastUpdatedDate })}>
       <section>
         <h2 className='text-2xl font-semibold mt-6 mb-4'>{t('sections.acceptance.title')}</h2>
         <p>{t('sections.acceptance.p1')}</p>
@@ -109,7 +116,7 @@ export default async function TermsOfServicePage() {
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.refundPolicy.process.title')}</h3>
         <p>{t('sections.refundPolicy.process.description')}</p>
         <ol className='list-decimal pl-6 mt-2 space-y-2'>
-          <li>{t('sections.refundPolicy.process.steps.contact')}</li>
+          <li>{t('sections.refundPolicy.process.steps.contact', { supportEmail: process.env.NEXT_PUBLIC_EMAIL_SELF })}</li>
           <li>{t('sections.refundPolicy.process.steps.include')}</li>
           <li>{t('sections.refundPolicy.process.steps.review')}</li>
           <li>{t('sections.refundPolicy.process.steps.processing')}</li>
@@ -278,7 +285,7 @@ export default async function TermsOfServicePage() {
         <p>{t('sections.governingLaw.jurisdiction.description')}</p>
 
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.governingLaw.disputeResolution.title')}</h3>
-        <p>{t('sections.governingLaw.disputeResolution.description')}</p>
+        <p>{t('sections.governingLaw.disputeResolution.description', { supportEmail: process.env.NEXT_PUBLIC_EMAIL_SELF })}</p>
 
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.governingLaw.euOdr.title')}</h3>
         <p>
@@ -323,7 +330,7 @@ export default async function TermsOfServicePage() {
         <p>{t('sections.contactInfo.description')}</p>
         <ul className='list-disc pl-6 mt-4 space-y-2'>
           <li>
-            <strong>{t('sections.contactInfo.items.email.label')}</strong> {t('sections.contactInfo.items.email.value')}
+            <strong>{t('sections.contactInfo.items.email.label')}</strong> {t('sections.contactInfo.items.email.value', { supportEmail: process.env.NEXT_PUBLIC_EMAIL_SELF })}
           </li>
           <li>
             <strong>{t('sections.contactInfo.items.website.label')}</strong> https://forever-pto.com
