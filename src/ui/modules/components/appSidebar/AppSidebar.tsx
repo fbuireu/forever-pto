@@ -75,34 +75,41 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub>
-                        <PtoDays />
-                        <SidebarMenuSubItem />
+                        <SidebarMenuSubItem>
+                          <PtoDays />
+                        </SidebarMenuSubItem>
                       </SidebarMenuSub>
                       <SidebarMenuSub>
-                        <Suspense fallback={t('loading')}>
-                          <Countries locale={locale} />
-                        </Suspense>
-                        <SidebarMenuSubItem />
+                        <SidebarMenuSubItem>
+                          <Suspense fallback={t('loading')}>
+                            <Countries locale={locale} />
+                          </Suspense>
+                        </SidebarMenuSubItem>
                       </SidebarMenuSub>
                       <SidebarMenuSub>
-                        <Regions />
-                        <SidebarMenuSubItem />
+                        <SidebarMenuSubItem>
+                          <Regions />
+                        </SidebarMenuSubItem>
                       </SidebarMenuSub>
                       <SidebarMenuSub>
-                        <Years />
-                        <SidebarMenuSubItem />
+                        <SidebarMenuSubItem>
+                          <Years />
+                        </SidebarMenuSubItem>
                       </SidebarMenuSub>
                       <SidebarMenuSub>
-                        <Strategy />
-                        <SidebarMenuSubItem />
+                        <SidebarMenuSubItem>
+                          <Strategy />
+                        </SidebarMenuSubItem>
                       </SidebarMenuSub>
                       <SidebarMenuSub>
-                        <AllowPastDays />
-                        <SidebarMenuSubItem />
+                        <SidebarMenuSubItem>
+                          <AllowPastDays />
+                        </SidebarMenuSubItem>
                       </SidebarMenuSub>
                       <SidebarMenuSub>
-                        <CarryOverMonths />
-                        <SidebarMenuSubItem />
+                        <SidebarMenuSubItem>
+                          <CarryOverMonths />
+                        </SidebarMenuSubItem>
                       </SidebarMenuSub>
                     </CollapsibleContent>
                   </AnimateIcon>

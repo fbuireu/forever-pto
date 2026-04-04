@@ -73,8 +73,7 @@ export const PtoDays = () => {
         <div className='space-y-2 w-full'>
           <div className='flex items-center justify-between text-sm'>
             <span className='text-muted-foreground'>{t('autoAssigned')}</span>
-            {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-label on span with hidden child is valid ARIA 1.2 pattern */}
-            <span aria-label={`${t('autoAssigned')}: ${activeSuggestedCount}`}>
+            <span role="img" aria-label={`${t('autoAssigned')}: ${activeSuggestedCount}`}>
               <SlidingNumber
                 number={activeSuggestedCount}
                 className='font-semibold text-teal-600 dark:text-teal-400'
@@ -84,8 +83,7 @@ export const PtoDays = () => {
           </div>
           <div className='flex items-center justify-between text-sm'>
             <span className='text-muted-foreground'>{t('manuallySelected')}</span>
-            {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-label on span with hidden child is valid ARIA 1.2 pattern */}
-            <span aria-label={`${t('manuallySelected')}: ${manualSelectedCount}`}>
+            <span role="img" aria-label={`${t('manuallySelected')}: ${manualSelectedCount}`}>
               <SlidingNumber
                 number={manualSelectedCount}
                 className='font-semibold text-blue-600 dark:text-blue-400'
@@ -96,8 +94,7 @@ export const PtoDays = () => {
           <div className='h-px bg-border my-2' />
           <div className='flex items-center justify-between text-sm'>
             <span className='font-medium'>{t('remaining')}</span>
-            {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-label on span with hidden child is valid ARIA 1.2 pattern */}
-            <span aria-label={`${t('remaining')}: ${remaining}`}>
+            <span role="img" aria-label={`${t('remaining')}: ${remaining}`}>
               <SlidingNumber
                 number={remaining}
                 className={cn(

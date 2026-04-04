@@ -462,6 +462,9 @@ export function Calendar({
                   onMouseEnter={() => handleDayHover(date)}
                   onMouseLeave={handleDayLeave}
                   disabled={isDisabled}
+                  aria-label={holidayName
+                    ? `${formatDate({ date, locale, format: 'EEEE, MMMM d, yyyy' })}, ${holidayName}`
+                    : formatDate({ date, locale, format: 'EEEE, MMMM d, yyyy' })}
                   {...(mode === CalendarSelectionMode.NONE && {
                     tapScale: 1,
                     hoverScale: 1,

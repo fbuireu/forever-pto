@@ -35,8 +35,8 @@ export const Years = () => {
       </Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <AnimateIcon animateOnHover>
-            <Button variant='outline' role='combobox' aria-expanded={open} className={cn('w-full justify-between')}>
+          <AnimateIcon animateOnHover asChild>
+            <Button id='years' variant='outline' role='combobox' aria-expanded={open} className={cn('w-full justify-between')}>
               {year}
               <ChevronDown className={cn('opacity-50 transition-transform duration-200', open && 'rotate-180')} />
             </Button>

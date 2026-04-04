@@ -463,7 +463,7 @@ function HighlightItem<T extends React.ElementType>({
 
   const dataAttributes = {
     'data-active': isActive ? 'true' : 'false',
-    'aria-selected': isActive,
+    'data-selected': isActive ? 'true' : 'false',
     'data-disabled': isDisabled,
     'data-value': childValue,
     'data-highlight': true,

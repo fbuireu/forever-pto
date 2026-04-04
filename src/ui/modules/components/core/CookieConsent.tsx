@@ -61,7 +61,7 @@ export const CookieConsent = () => {
       },
       language: {
         default: 'en',
-        translations: { en: { consentModal: {}, preferencesModal: { sections: [] } } },
+        translations: { en: { consentModal: { title: t('title') }, preferencesModal: { sections: [] } } },
       },
       onConsent: () => {
         const granted = CookieConsentLib.acceptedCategory('analytics');

@@ -29,6 +29,7 @@ export const Combobox = ({
   notFoundText,
   className,
   disabled,
+  id,
   onChange,
 }: ComboboxProps) => {
   const [open, setOpen] = useState(false);
@@ -48,12 +49,13 @@ export const Combobox = ({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <AnimateIcon animateOnHover>
+        <AnimateIcon animateOnHover asChild>
           <Button
             variant='outline'
             role='combobox'
             aria-expanded={open}
             aria-controls='combobox-listbox'
+            id={id}
             disabled={disabled}
             className={cn('w-[200px] justify-between', className)}
           >
