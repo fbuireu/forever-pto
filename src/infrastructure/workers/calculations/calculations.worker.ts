@@ -1,8 +1,8 @@
+import { HolidayVariant } from '../../../application/dto/holiday/types';
 import { generateAlternatives } from '../../services/calendar/alternatives/generateAlternatives';
 import { generateMetrics } from '../../services/calendar/metrics/generateMetrics';
 import { generateSuggestions } from '../../services/calendar/suggestions/generateSuggestions';
 import type { FilterStrategy } from '../../services/calendar/types';
-import { HolidayVariant } from '../../../application/dto/holiday/types';
 import type { CalculateSuggestionsRequest, WorkerResponse } from './calculations.types';
 import { deserializeHolidays, deserializeMonths, serializeSuggestionResult } from './serializers';
 
@@ -11,8 +11,17 @@ self.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
 
   if (type !== 'CALCULATE_SUGGESTIONS') return;
 
-  const { year, ptoDays, holidays: rawHolidays, allowPastDays, months: rawMonths, strategy, locale, maxAlternatives, manualDays = [] } =
-    payload;
+  const {
+    year,
+    ptoDays,
+    holidays: rawHolidays,
+    allowPastDays,
+    months: rawMonths,
+    strategy,
+    locale,
+    maxAlternatives,
+    manualDays = [],
+  } = payload;
 
   try {
     const holidays = deserializeHolidays(rawHolidays);
@@ -43,7 +52,14 @@ self.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
 
     const typedStrategy = strategy as FilterStrategy;
 
-    const baseSuggestion = generateSuggestions({ year, ptoDays: effectivePtoDays, holidays: holidaysWithManual, allowPastDays, months, strategy: typedStrategy });
+    const baseSuggestion = generateSuggestions({
+      year,
+      ptoDays: effectivePtoDays,
+      holidays: holidaysWithManual,
+      allowPastDays,
+      months,
+      strategy: typedStrategy,
+    });
 
     const baseAlternatives = generateAlternatives({
       year,
@@ -58,12 +74,24 @@ self.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
 
     const suggestion = {
       ...baseSuggestion,
-      metrics: generateMetrics({ suggestion: baseSuggestion, locale, bridges: baseSuggestion.bridges, holidays: holidaysWithManual, allowPastDays }),
+      metrics: generateMetrics({
+        suggestion: baseSuggestion,
+        locale,
+        bridges: baseSuggestion.bridges,
+        holidays: holidaysWithManual,
+        allowPastDays,
+      }),
     };
 
     const alternatives = baseAlternatives.map((alt) => ({
       ...alt,
-      metrics: generateMetrics({ suggestion: alt, locale, bridges: alt.bridges, holidays: holidaysWithManual, allowPastDays }),
+      metrics: generateMetrics({
+        suggestion: alt,
+        locale,
+        bridges: alt.bridges,
+        holidays: holidaysWithManual,
+        allowPastDays,
+      }),
     }));
 
     const response: WorkerResponse = {

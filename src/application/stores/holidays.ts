@@ -268,7 +268,13 @@ export const useHolidaysStore = create<HolidaysStore>()(
           set({ isCalculating: v });
         },
 
-        setCalculationResult: ({ suggestion, alternatives }: { suggestion: Suggestion; alternatives: Suggestion[] }) => {
+        setCalculationResult: ({
+          suggestion,
+          alternatives,
+        }: {
+          suggestion: Suggestion;
+          alternatives: Suggestion[];
+        }) => {
           set({
             suggestion,
             alternatives,

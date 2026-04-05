@@ -2,7 +2,10 @@
 
 import { useHolidaysStore } from '@application/stores/holidays';
 import type { GenerateSuggestionsParams } from '@application/stores/types';
-import type { CalculateSuggestionsRequest, WorkerResponse } from '@infrastructure/workers/calculations/calculations.types';
+import type {
+  CalculateSuggestionsRequest,
+  WorkerResponse,
+} from '@infrastructure/workers/calculations/calculations.types';
 import {
   deserializeSuggestion,
   serializeHolidays,

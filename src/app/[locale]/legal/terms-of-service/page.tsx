@@ -10,10 +10,14 @@ interface TermsOfServicePageProps {
 }
 
 export default async function TermsOfServicePage({ params }: Readonly<TermsOfServicePageProps>) {
-const [{ locale }, { env }] = await Promise.all([params, getCloudflareContext({ async: true })]);
+  const [{ locale }, { env }] = await Promise.all([params, getCloudflareContext({ async: true })]);
   const t = await getTranslations('legalPages.termsOfService');
   const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-  const lastUpdatedDate = new Date(Date.now() - ONE_WEEK_MS).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+  const lastUpdatedDate = new Date(Date.now() - ONE_WEEK_MS).toLocaleDateString(locale, {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 
   return (
     <LegalLayout title={t('title')} lastUpdated={t('lastUpdated', { date: lastUpdatedDate })}>
@@ -332,10 +336,12 @@ const [{ locale }, { env }] = await Promise.all([params, getCloudflareContext({ 
         <p>{t('sections.contactInfo.description')}</p>
         <ul className='list-disc pl-6 mt-4 space-y-2'>
           <li>
-            <strong>{t('sections.contactInfo.items.email.label')}</strong> {t('sections.contactInfo.items.email.value', { supportEmail: env.NEXT_PUBLIC_EMAIL_SELF })}
+            <strong>{t('sections.contactInfo.items.email.label')}</strong>{' '}
+            {t('sections.contactInfo.items.email.value', { supportEmail: env.NEXT_PUBLIC_EMAIL_SELF })}
           </li>
           <li>
-            <strong>{t('sections.contactInfo.items.website.label')}</strong> {t('sections.contactInfo.items.website.value', { siteUrl: env.NEXT_PUBLIC_SITE_URL })}
+            <strong>{t('sections.contactInfo.items.website.label')}</strong>{' '}
+            {t('sections.contactInfo.items.website.value', { siteUrl: env.NEXT_PUBLIC_SITE_URL })}
           </li>
         </ul>
         <p className='mt-4'>{t('sections.contactInfo.responseTime')}</p>
