@@ -19,7 +19,7 @@ export function Contact() {
   const [contactModalOpen, setContactModalOpen] = useState(false);
 
   useEffect(() => {
-    if (window.location.hash === '#contact') {
+    if (globalThis.location.hash === '#contact') {
       setContactModalOpen(true);
     }
   }, []);

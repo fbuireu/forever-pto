@@ -240,7 +240,7 @@ export function Calendar({
             action: (
               <div className='w-full donate-rainbow relative z-0 overflow-hidden p-0.5 flex items-center justify-center rounded-md hover:scale-102 transition duration-200 active:scale-100'>
                 <Button
-                  className='shadow-lg rounded-md w-full h-full py-1 px-2'
+                  className='shadow-lg rounded-md w-full h-full py-3 px-2'
                   onClick={() => {
                     openDonatePopover();
                   }}

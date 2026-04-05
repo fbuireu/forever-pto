@@ -319,7 +319,9 @@
       "calendarTitle": "Tu Calendario de PTO Interactivo",
       "calendarDescription": "Este es tu calendario de un vistazo del año. Los festivos aparecen en gris, los días de PTO sugeridos por IA en verde azulado, y los días seleccionados manualmente en azul. Haz clic en cualquier día laborable para alternar la selección manualmente. El calendario se actualiza instantáneamente mientras exploras diferentes alternativas.",
       "finishTitle": "¡Ya Está Todo Listo!",
-      "finishDescription": "Ahora sabes cómo usar Forever PTO para maximizar tu tiempo libre. Empieza configurando tus preferencias en la barra lateral, y deja que la app te sugiera los mejores días de PTO. ¡Disfruta de tus merecidos descansos!"
+      "finishDescription": "Ahora sabes cómo usar Forever PTO para maximizar tu tiempo libre. Empieza configurando tus preferencias en la barra lateral, y deja que la app te sugiera los mejores días de PTO. ¡Disfruta de tus merecidos descansos!",
+      "holidaysListTitle": "Personaliza tus festivos",
+      "holidaysListDescription": "Aquí puedes ajustar los datos de festivos para que se adapten exactamente a tu situación. Edita o elimina cualquier festivo nacional o regional, y añade tus propios días personalizados: festivos de empresa, celebraciones locales o cualquier fecha que sea relevante para ti. Cuanto más precisos sean los datos, mejores serán las sugerencias."
     }
   },
   "legend": {
@@ -677,7 +679,7 @@
     "gaStarDesc": "Mantiene el estado de sesión para seguimiento analítico",
     "gidDesc": "Distingue usuarios para análisis a corto plazo",
     "learnMore": "Saber más",
-    "provider": "Proveedor"
+    "provider": "Proveedor: {name}"
   },
   "holidayTableHeader": {
     "holiday": "Festividad",
@@ -984,7 +986,8 @@
             "value": "{supportEmail}"
           },
           "website": {
-            "label": "Website:"
+            "label": "Website:",
+            "value": "{siteUrl}"
           }
         }
       }
@@ -1019,7 +1022,8 @@
               "value": "{supportEmail}"
             },
             "website": {
-              "label": "Website:"
+              "label": "Website:",
+              "value": "{siteUrl}"
             }
           }
         },
@@ -1233,7 +1237,8 @@
               "value": "{supportEmail}"
             },
             "website": {
-              "label": "Website:"
+              "label": "Website:",
+              "value": "{siteUrl}"
             },
             "postalAddress": {
               "label": "Postal Address:",
@@ -1544,7 +1549,8 @@
               "value": "{supportEmail}"
             },
             "website": {
-              "label": "Website:"
+              "label": "Website:",
+              "value": "{siteUrl}"
             },
             "postalAddress": {
               "label": "Postal Address:",
@@ -1580,7 +1586,8 @@
               "value": "contact@forever-pto.com"
             },
             "website": {
-              "label": "Website:"
+              "label": "Website:",
+              "value": "{siteUrl}"
             }
           }
         },

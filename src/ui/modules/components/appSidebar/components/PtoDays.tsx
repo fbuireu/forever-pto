@@ -23,12 +23,13 @@ export const PtoDays = () => {
       setPtoDays: state.setPtoDays,
     }))
   );
-  const { currentSelection, removedSuggestedDays, manuallySelectedDays, resetManualSelection } = useHolidaysStore(
+  const { currentSelection, removedSuggestedDays, manuallySelectedDays, resetManualSelection, trimManualDays } = useHolidaysStore(
     useShallow((state) => ({
       currentSelection: state.currentSelection,
       removedSuggestedDays: state.removedSuggestedDays,
       manuallySelectedDays: state.manuallySelectedDays,
       resetManualSelection: state.resetManualSelection,
+      trimManualDays: state.trimManualDays,
     }))
   );
   const [localValue, setLocalValue] = useDebounce({ value: ptoDays, delay: 100, callback: setPtoDays });
@@ -40,7 +41,9 @@ export const PtoDays = () => {
   const hasManualChanges = manualSelectedCount > 0 || removedSuggestedDays.length > 0;
 
   const handleChange = (value: number) => {
-    setLocalValue(Math.max(MIN_VALUE, value));
+    const newValue = Math.max(MIN_VALUE, value);
+    setLocalValue(newValue);
+    trimManualDays(newValue);
   };
 
   return (

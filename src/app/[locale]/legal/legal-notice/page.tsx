@@ -1,3 +1,4 @@
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { Me } from '@ui/modules/components/core/me';
 import { Nif } from '@ui/modules/components/core/Nif';
 import { LegalLayout } from '@ui/modules/components/legal/LegalLayout';
@@ -11,10 +12,14 @@ interface LegalNoticePageProps {
 }
 
 export default async function LegalNoticePage({ params }: LegalNoticePageProps) {
-  const { locale } = await params;
+  const [{ locale }, { env }] = await Promise.all([params, getCloudflareContext({ async: true })]);
   const t = await getTranslations('legalPages.legalNotice');
   const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-  const lastUpdatedDate = new Date(Date.now() - ONE_WEEK_MS).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+  const lastUpdatedDate = new Date(Date.now() - ONE_WEEK_MS).toLocaleDateString(locale, {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 
   return (
     <LegalLayout title={t('title')} lastUpdated={t('lastUpdated', { date: lastUpdatedDate })}>
@@ -39,7 +44,8 @@ export default async function LegalNoticePage({ params }: LegalNoticePageProps) 
             {t('sections.identification.items.email.value')}
           </li>
           <li>
-            <strong>{t('sections.identification.items.website.label')}</strong> https://forever-pto.com
+            <strong>{t('sections.identification.items.website.label')}</strong>{' '}
+            {t('sections.identification.items.website.value', { siteUrl: env.NEXT_PUBLIC_SITE_URL })}
           </li>
         </ul>
       </section>

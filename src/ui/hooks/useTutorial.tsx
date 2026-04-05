@@ -115,6 +115,15 @@ export const useTutorial = () => {
         },
       },
       {
+        element: '[data-tutorial="holidays-list"]',
+        popover: {
+          title: t('holidaysListTitle'),
+          description: t('holidaysListDescription'),
+          side: 'bottom',
+          align: 'start',
+        },
+      },
+      {
         element: '[data-tutorial="calendar-list"]',
         popover: {
           title: t('calendarTitle'),

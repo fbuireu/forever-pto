@@ -2,6 +2,8 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
+import { cn } from '@const/lib/utils';
+import { useCalculationsWorker } from '@ui/hooks/useCalculationsWorker';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -30,10 +32,10 @@ export const CalendarList = () => {
     alternatives,
     suggestion,
     currentSelection,
+    isCalculating,
     manuallySelectedDays,
     removedSuggestedDays,
     fetchHolidays,
-    generateSuggestions,
     previewAlternativeIndex,
     toggleDaySelection,
   } = useHolidaysStore(
@@ -42,14 +44,16 @@ export const CalendarList = () => {
       alternatives: state.alternatives,
       suggestion: state.suggestion,
       currentSelection: state.currentSelection,
+      isCalculating: state.isCalculating,
       manuallySelectedDays: state.manuallySelectedDays,
       removedSuggestedDays: state.removedSuggestedDays,
       fetchHolidays: state.fetchHolidays,
-      generateSuggestions: state.generateSuggestions,
       previewAlternativeIndex: state.previewAlternativeIndex,
       toggleDaySelection: state.toggleDaySelection,
     }))
   );
+
+  const { triggerCalculation } = useCalculationsWorker();
 
   const months = useMemo(() => getTotalMonths({ carryOverMonths, year }), [carryOverMonths, year]);
 
@@ -74,7 +78,7 @@ export const CalendarList = () => {
 
   useEffect(() => {
     if (ptoDays > 0 && holidays.length > 0 && months.length > 0) {
-      generateSuggestions({
+      triggerCalculation({
         year: parseInt(year, 10),
         ptoDays,
         allowPastDays,
@@ -83,7 +87,7 @@ export const CalendarList = () => {
         locale,
       });
     }
-  }, [generateSuggestions, year, ptoDays, allowPastDays, holidays, months, strategy, locale]);
+  }, [triggerCalculation, year, ptoDays, allowPastDays, holidays, months, strategy, locale]);
 
   if (!areStoresReady) {
     return <CalendarListSkeleton />;
@@ -91,7 +95,10 @@ export const CalendarList = () => {
 
   return (
     <div
-      className='grid grid-cols-1 gap-4 mx-auto sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
+      className={cn(
+        'grid grid-cols-1 gap-4 mx-auto sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5',
+        isCalculating && 'opacity-60 pointer-events-none transition-opacity'
+      )}
       data-tutorial='calendar-list'
     >
       {months.map((month) => (

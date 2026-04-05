@@ -1,3 +1,4 @@
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { LegalLayout } from '@ui/modules/components/legal/LegalLayout';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
@@ -8,11 +9,15 @@ interface CookiePolicyPageProps {
   params: Promise<{ locale: Locale }>;
 }
 
-export default async function CookiePolicyPage({ params }: CookiePolicyPageProps) {
-  const { locale } = await params;
+export default async function CookiePolicyPage({ params }: Readonly<CookiePolicyPageProps>) {
+  const [{ locale }, { env }] = await Promise.all([params, getCloudflareContext({ async: true })]);
   const t = await getTranslations('legalPages.cookiePolicy');
   const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-  const lastUpdatedDate = new Date(Date.now() - ONE_WEEK_MS).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+  const lastUpdatedDate = new Date(Date.now() - ONE_WEEK_MS).toLocaleDateString(locale, {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 
   return (
     <LegalLayout title={t('title')} lastUpdated={t('lastUpdated', { date: lastUpdatedDate })}>
@@ -21,7 +26,7 @@ export default async function CookiePolicyPage({ params }: CookiePolicyPageProps
         <p>
           {t.rich('sections.introduction.p1', {
             link: (chunks) => (
-              <a href='https://forever-pto.com' className='text-primary hover:underline'>
+              <a href={env.NEXT_PUBLIC_SITE_URL} className='text-primary hover:underline'>
                 {chunks}
               </a>
             ),
@@ -228,10 +233,12 @@ export default async function CookiePolicyPage({ params }: CookiePolicyPageProps
         <p>{t('sections.contact.description')}</p>
         <ul className='list-disc pl-6 mt-2 space-y-2'>
           <li>
-            <strong>{t('sections.contact.email.label')}</strong> {t('sections.contact.email.value', { supportEmail: process.env.NEXT_PUBLIC_EMAIL_SELF })}
+            <strong>{t('sections.contact.email.label')}</strong>{' '}
+            {t('sections.contact.email.value', { supportEmail: env.NEXT_PUBLIC_EMAIL_SELF })}
           </li>
           <li>
-            <strong>{t('sections.contact.website.label')}</strong> https://forever-pto.com
+            <strong>{t('sections.contact.website.label')}</strong>{' '}
+            {t('sections.contact.website.value', { siteUrl: env.NEXT_PUBLIC_SITE_URL })}
           </li>
         </ul>
       </section>

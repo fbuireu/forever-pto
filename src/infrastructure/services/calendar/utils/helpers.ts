@@ -26,8 +26,8 @@ function analyzePotentialBridge({ ptoDays, holidaySet }: AnalyzePotentialBridges
     const prevDay = addDays(day, -1);
     const nextDay = addDays(day, 1);
 
-    const prevIsFree = isWeekend(prevDay) ?? holidaySet.has(getKey(prevDay));
-    const nextIsFree = isWeekend(nextDay) ?? holidaySet.has(getKey(nextDay));
+    const prevIsFree = isWeekend(prevDay) || holidaySet.has(getKey(prevDay));
+    const nextIsFree = isWeekend(nextDay) || holidaySet.has(getKey(nextDay));
 
     if (prevIsFree || nextIsFree) {
       hasAdjacentFreeDay = true;
@@ -141,6 +141,7 @@ export const findBridges = ({ availableWorkdays, holidays }: FindBridgesParams):
   const bridges: Bridge[] = [];
 
   const sortedWorkdays = [...availableWorkdays].sort((a, b) => a.getTime() - b.getTime());
+  const workdaySet = new Set(sortedWorkdays.map((d) => d.getTime()));
 
   for (const workday of sortedWorkdays) {
     const singleBridge = analyzePotentialBridge({ ptoDays: [workday], holidaySet });
@@ -153,7 +154,7 @@ export const findBridges = ({ availableWorkdays, holidays }: FindBridgesParams):
 
       for (let i = 1; i < size; i++) {
         const nextDay = addDays(workday, i);
-        if (sortedWorkdays.some((d) => d.getTime() === nextDay.getTime())) {
+        if (workdaySet.has(nextDay.getTime())) {
           multiDays.push(nextDay);
         } else {
           break;
