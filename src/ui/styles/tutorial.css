@@ -1,11 +1,12 @@
 @import "driver.js/dist/driver.css" layer(tutorial);
 
+:root {
+  --driver-z-index: 10000;
+  container-type: inline-size;
+  container-name: root;
+}
+
 @layer tutorial {
-  :root {
-    --driver-z-index: 10000;
-    container-type: inline-size;
-    container-name: root;
-  }
 
   .driver-overlay {
     background: transparent;
@@ -18,6 +19,7 @@
   }
 
   .driver-popover {
+    z-index: 10001;
     background-color: var(--popover);
     color: var(--popover-foreground);
     border: 1px solid var(--border);

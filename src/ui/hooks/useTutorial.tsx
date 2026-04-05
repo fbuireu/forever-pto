@@ -6,12 +6,13 @@ import { useTranslations } from 'next-intl';
 import { useCallback } from 'react';
 import { useSidebar } from 'src/components/animate-ui/base/sidebar';
 
+const SIDEBAR_CONTAINER_SELECTOR = '[data-slot="sidebar-container"]';
+
 export const useTutorial = () => {
   const { open, toggleSidebar } = useSidebar();
   const t = useTranslations('tutorial.steps');
 
   const startTutorial = useCallback(() => {
-    if (!open) toggleSidebar();
     const driverClient = getDriverClientInstance();
 
     const steps: DriveStep[] = [
@@ -140,7 +141,17 @@ export const useTutorial = () => {
       },
     ];
 
-    driverClient.start(steps);
+    if (!open) {
+      toggleSidebar();
+      const el = document.querySelector(SIDEBAR_CONTAINER_SELECTOR);
+      if (el) {
+        el.addEventListener('transitionend', () => driverClient.start(steps), { once: true });
+      } else {
+        driverClient.start(steps);
+      }
+    } else {
+      driverClient.start(steps);
+    }
   }, [open, t, toggleSidebar]);
 
   return { startTutorial };
