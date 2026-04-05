@@ -54,11 +54,11 @@ export function generateAlternatives(params: GenerateAlternativesParams): Sugges
     (a: Bridge, b: Bridge) => Math.sin(a.efficiency * 1000) - Math.sin(b.efficiency * 1000),
   ];
   const maxAttempts = Math.max(maxAlternatives * 3, 15);
+  const sortedVariants = sortingStrategies.map((fn) => [...availableBridges].sort(fn));
 
   for (let attempt = 0; attempt < maxAttempts && alternatives.length < maxAlternatives; attempt++) {
-    const shuffledBridges = [...availableBridges];
     const strategyIndex = attempt % sortingStrategies.length;
-    shuffledBridges.sort(sortingStrategies[strategyIndex]);
+    const shuffledBridges = [...sortedVariants[strategyIndex]];
     if (attempt >= sortingStrategies.length) {
       const rotateBy = attempt - sortingStrategies.length;
       shuffledBridges.push(...shuffledBridges.splice(0, rotateBy % Math.max(shuffledBridges.length, 1)));

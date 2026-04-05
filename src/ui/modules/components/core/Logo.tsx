@@ -8,13 +8,13 @@ import { OceanSunset } from './OceanSunset';
 import { PalmTree } from './PalmTree';
 
 export function Logo() {
-  const { state } = useSidebar();
+  const { state, setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
   const isOpen = state === 'expanded';
 
   return (
     <SidebarMenuButton className={'justify-center h-fit w-fit mx-auto'}>
-      <Link href='/'>
+      <Link href='/' onClick={() => isMobile && setOpenMobile(false)}>
         <div className='flex items-center'>
           {(isOpen || isMobile) && (
             <div className='flex text-center justify-center gap-2'>

@@ -46,8 +46,12 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: share button with results?
+// translate donate fuera de la home al bottom y más grande en todas
+// todo: bug aras (afegir molts manual i l'algoritme hauria de comptarlos coma festius)
+// todo: improve responsive
 // todo: docs with mintlifyy
+// todo: share button with results?
+// todo: migrate temporal API when available in Node
 // todo: unify modal styles (footer actions, spacing, etc)
 // todo: performance audit, react best practices audit
 // todo: ads?
@@ -72,4 +76,3 @@ export default Home;
 // todo: move prod env vars to cloudflare secrets
 // todo: add pages to bookmarks (betterstack, resend)
 // todo: cookie management (on PROD)
-// todo: SEO site validation etc

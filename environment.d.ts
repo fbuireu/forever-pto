@@ -18,7 +18,6 @@ declare global {
       CF_ACCESS_TEAM_DOMAIN: string;
       CF_ACCESS_WORKERS_AUD: string;
       CF_ACCESS_PREVIEW_AUD: string;
-      NEXT_PUBLIC_EMAIL_SELF: string;
     }
   }
 

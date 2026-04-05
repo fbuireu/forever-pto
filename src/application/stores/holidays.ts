@@ -34,12 +34,15 @@ export interface HolidaysState {
   currentSelectionIndex: number;
   manuallySelectedDays: Date[];
   removedSuggestedDays: Date[];
+  isCalculating: boolean;
 }
 
 interface HolidaysActions {
   fetchHolidays: (params: FetchHolidaysParams) => Promise<void>;
   generateSuggestions: (params: GenerateSuggestionsParams) => void;
   generateAlternatives: (params: GenerateAlternativesParams) => void;
+  setCalculating: (v: boolean) => void;
+  setCalculationResult: (result: { suggestion: Suggestion; alternatives: Suggestion[] }) => void;
   setMaxAlternatives: (max: number) => void;
   setCurrentAlternativeSelection: (params: AlternativeSelectionBaseParams) => void;
   setPreviewAlternativeSelection: (params: AlternativeSelectionBaseParams) => void;
@@ -68,6 +71,7 @@ const holidaysInitialState: HolidaysState = {
   currentSelectionIndex: 0,
   manuallySelectedDays: [],
   removedSuggestedDays: [],
+  isCalculating: false,
 };
 
 export const useHolidaysStore = create<HolidaysStore>()(
@@ -258,6 +262,21 @@ export const useHolidaysStore = create<HolidaysStore>()(
             });
             set({ alternatives: [] });
           }
+        },
+
+        setCalculating: (v: boolean) => {
+          set({ isCalculating: v });
+        },
+
+        setCalculationResult: ({ suggestion, alternatives }: { suggestion: Suggestion; alternatives: Suggestion[] }) => {
+          set({
+            suggestion,
+            alternatives,
+            currentSelection: suggestion,
+            previewAlternativeSelection: suggestion,
+            previewAlternativeIndex: 0,
+            currentSelectionIndex: 0,
+          });
         },
 
         setMaxAlternatives: (max: number) => {

@@ -73,6 +73,7 @@ export const CookieConsentDialog = ({
                         <span className='text-xs text-muted-foreground'>1 {t('week')}</span>
                       </div>
                       <p className='text-sm text-muted-foreground'>{t('userCountryDesc')}</p>
+                      <p className='text-xs text-muted-foreground'>{t('provider', { name: 'Forever PTO' })}</p>
                     </div>
 
                     <div className='rounded-md bg-muted/50 p-3 space-y-1'>
@@ -81,6 +82,7 @@ export const CookieConsentDialog = ({
                         <span className='text-xs text-muted-foreground'>{t('months', { count: 6 })}</span>
                       </div>
                       <p className='text-sm text-muted-foreground'>{t('ccCookieDesc')}</p>
+                      <p className='text-xs text-muted-foreground'>{t('provider', { name: 'Forever PTO' })}</p>
                     </div>
 
                     <div className='rounded-md bg-muted/50 p-3 space-y-1'>
