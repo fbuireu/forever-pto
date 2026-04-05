@@ -5,7 +5,7 @@ const GA_ID = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 export const Analytics = () => {
   return (
     <>
-      <Script id='gtag-consent' strategy='beforeInteractive'>
+      <Script id='gtag-consent' strategy='afterInteractive'>
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}

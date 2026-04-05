@@ -26,6 +26,9 @@ const nextConfig: NextConfig = {
     loaderFile: './src/infrastructure/images/loader.ts',
   },
   transpilePackages: ['prettier'],
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'recharts', '@radix-ui/react-icons'],
+  },
 };
 
 export default withBetterStack(withNextIntl(nextConfig));

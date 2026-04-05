@@ -1,9 +1,11 @@
 'use client';
 
+import { blueskyIcon } from '@ui/assets/icons/bluesky';
+import { buyMeACoffeeIcon } from '@ui/assets/icons/buymeacoffee';
+import { githubIcon } from '@ui/assets/icons/github';
 import { linkedinIcon } from '@ui/assets/icons/linkedin';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
-import { siBluesky as Bluesky, siBuymeacoffee as BuyMeCoffee, siGithub as Github } from 'simple-icons';
 import { RotatingTextContainer } from 'src/components/animate-ui/primitives/texts/rotating';
 import { RotatingText } from 'src/components/animate-ui/text/rotating';
 import { Icon } from '../../core/Icon';
@@ -18,7 +20,7 @@ export const SOCIAL_NETWORKS = {
   GITHUB: {
     USERNAME: 'fbuireu',
     BASE_URL: 'https://github.com',
-    ICON: Github,
+    ICON: githubIcon,
     COLOR: 'light-dark(#24292f, #f0f6fc)',
   },
   LINKEDIN: {
@@ -30,13 +32,13 @@ export const SOCIAL_NETWORKS = {
   BLUESKY: {
     USERNAME: 'fbuireu.bsky.social',
     BASE_URL: 'https://bsky.app/profile',
-    ICON: Bluesky,
+    ICON: blueskyIcon,
     COLOR: '#0085FF',
   },
   BUY_ME_A_COFFEE: {
     USERNAME: 'ferranbuireu',
     BASE_URL: 'https://www.buymeacoffee.com',
-    ICON: BuyMeCoffee,
+    ICON: buyMeACoffeeIcon,
     COLOR: '#FFDD00',
   },
 } as const;

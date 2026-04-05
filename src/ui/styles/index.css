@@ -2,7 +2,6 @@
 
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "./vendor/index.css";
 @import "./base/index.css";
 @import "./theme/index.css";
 @import "./animations/index.css";

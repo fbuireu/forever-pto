@@ -1,6 +1,5 @@
 'use client';
 
-import confetti from 'canvas-confetti';
 import { useEffect, useRef } from 'react';
 
 interface ConfettiCannonProps {
@@ -21,7 +20,8 @@ export const ConfettiCannon = ({ onComplete }: ConfettiCannonProps) => {
       colors: ['#10b981', '#059669', '#047857', '#065f46', '#fbbf24', '#f59e0b', '#d97706', '#b45309'],
     };
 
-    function fire(particleRatio: number, opts: Partial<confetti.Options>) {
+    async function fire(particleRatio: number, opts: Record<string, unknown>) {
+      const confetti = (await import('canvas-confetti')).default;
       confetti({
         ...defaults,
         ...opts,
