@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@const/lib/utils';
-import { SidebarFooter, SidebarMenu, SidebarMenuItem, useSidebar } from 'src/components/animate-ui/radix/sidebar';
+import { SidebarFooter, SidebarMenu, SidebarMenuItem, useSidebar } from 'src/components/animate-ui/base/sidebar';
 import { LanguageSelector } from './LanguageSelector';
 import { ThemeSelector } from './ThemeSelector';
 

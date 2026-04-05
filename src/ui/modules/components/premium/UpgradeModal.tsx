@@ -81,7 +81,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-md' onOpenAutoFocus={(e) => e.preventDefault()}>
+      <DialogContent className='sm:max-w-md' initialFocus={false}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Crown className='w-5 h-5 text-yellow-500' />

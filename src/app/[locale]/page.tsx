@@ -46,6 +46,9 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
+// todo: better with webworker?
+// todo: brutalist design
+// todo: getComponents again animate ui (use base ui) (https://animate-ui.com/docs/components/base/switch)
 // todo: improve responsive
 // todo: docs with mintlifyy
 // todo: share button with results?

@@ -2,11 +2,10 @@
 
 import { usePremiumStore } from '@application/stores/premium';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@const/components/ui/input-group';
-import { Field, Label } from '@headlessui/react';
 import { Euro, InfoIcon } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/base/tooltip';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 import { ConditionalWrapper } from '../../core/ConditionalWrapper';
@@ -73,8 +72,8 @@ export const PtoSalaryCalculator = () => {
   };
 
   return (
-    <Field className='space-y-2 w-full'>
-      <Label className='flex gap-2 my-2 text-sm font-normal'>
+    <div className='space-y-2 w-full'>
+      <label className='flex gap-2 my-2 text-sm font-normal'>
         <Euro size={16} /> {t('title')}
         <TooltipProvider delayDuration={200}>
           <Tooltip>
@@ -84,7 +83,7 @@ export const PtoSalaryCalculator = () => {
             <TooltipContent className='w-60 text-pretty'>{t('tooltip')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
-      </Label>
+      </label>
 
       <div className='space-y-2 w-full'>
         <p className='text-xs text-muted-foreground'>{t('annualSalary')}</p>
@@ -182,6 +181,6 @@ export const PtoSalaryCalculator = () => {
           </div>
         </div>
       )}
-    </Field>
+    </div>
   );
 };

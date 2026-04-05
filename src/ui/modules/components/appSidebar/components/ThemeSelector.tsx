@@ -13,7 +13,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from 'src/components/animate-ui/radix/dropdown-menu';
+} from 'src/components/animate-ui/base/dropdown-menu';
 
 const getResolvedTheme = (theme: ReturnType<typeof useTheme>['theme']) => {
   if (theme !== 'system') return theme;

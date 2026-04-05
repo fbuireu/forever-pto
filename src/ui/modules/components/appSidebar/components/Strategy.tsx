@@ -5,7 +5,6 @@ import { Badge } from '@const/components/ui/badge';
 import { Card, CardDescription } from '@const/components/ui/card';
 import { Combobox } from '@const/components/ui/combobox';
 import { cn } from '@const/lib/utils';
-import { Field, Label } from '@headlessui/react';
 import { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { AlertCircle, CheckCircle2, DicesIcon, Scale, TrendingUp } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -13,7 +12,7 @@ import { useMemo, useState } from 'react';
 import { ChevronDown } from 'src/components/animate-ui/icons/chevron-down';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { Users } from 'src/components/animate-ui/icons/users';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/base/collapsible';
 import { useShallow } from 'zustand/react/shallow';
 
 const STRATEGY_ICONS = {
@@ -68,10 +67,10 @@ export const Strategy = () => {
   const currentStrategy = strategies.find(({ value }) => value === strategy);
 
   return (
-    <Field className='space-y-2 w-full' data-tutorial='strategy'>
-      <Label className='flex gap-2 text-sm font-medium' htmlFor='strategy'>
+    <div className='space-y-2 w-full' data-tutorial='strategy'>
+      <label className='flex gap-2 text-sm font-medium' htmlFor='strategy'>
         <DicesIcon size={16} /> {t('title')}
-      </Label>
+      </label>
       <Combobox
         className='w-full'
         id='strategy'
@@ -128,6 +127,6 @@ export const Strategy = () => {
           </CollapsibleContent>
         </Collapsible>
       )}
-    </Field>
+    </div>
   );
 };

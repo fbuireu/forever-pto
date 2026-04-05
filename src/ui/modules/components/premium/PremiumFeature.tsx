@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { Lock } from 'src/components/animate-ui/icons/lock';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/base/tooltip';
 import { useShallow } from 'zustand/react/shallow';
 import { getButtonClass } from './utils/helpers';
 

@@ -18,7 +18,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Star } from 'src/components/animate-ui/icons/star';
-import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
+import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/base/popover';
 import { useShallow } from 'zustand/react/shallow';
 import { CheckoutForm } from './CheckoutForm';
 import { DonationForm } from './DonationForm';
@@ -161,6 +161,10 @@ export const Donate = () => {
     setPaymentState(null);
     setDonatePopoverOpen(false);
   }, [form, setDonatePopoverOpen, t]);
+
+  useEffect(() => {
+    if (isOpen && isOpening) clearDonatePopoverOpening(isOpening);
+  }, [isOpen, isOpening, clearDonatePopoverOpening]);
 
   const handlePaymentCancel = useCallback(() => {
     setPaymentState(null);
@@ -327,14 +331,6 @@ export const Donate = () => {
       </div>
       <PopoverContent
         className='w-96'
-        onOpenAutoFocus={() => {
-          clearDonatePopoverOpening(isOpening);
-        }}
-        onInteractOutside={(e) => {
-          if (isOpening) {
-            e.preventDefault();
-          }
-        }}
       >
         <div className='grid gap-4'>
           <div className='space-y-2'>

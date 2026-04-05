@@ -1,91 +1,76 @@
 'use client';
 
 import { cn } from '@const/lib/utils';
-import { Switch as SwitchPrimitive, type SwitchProps as SwitchPrimitiveProps } from '@headlessui/react';
+import {
+  Switch as BaseSwitchPrimitive,
+  SwitchThumb as BaseSwitchThumb,
+  SwitchIcon as BaseSwitchIcon,
+  type SwitchProps as BaseSwitchPrimitiveProps,
+} from '../primitives/base/switch';
 import { type HTMLMotionProps, motion } from 'motion/react';
 import { useCallback, useEffect, useState } from 'react';
 
-type SwitchProps<TTag extends React.ElementType = typeof motion.button> = SwitchPrimitiveProps<TTag> &
-  Omit<HTMLMotionProps<'button'>, 'children'> & {
-    leftIcon?: React.ReactNode;
-    rightIcon?: React.ReactNode;
-    thumbIcon?: React.ReactNode;
-    onCheckedChange?: (checked: boolean) => void;
-    as?: TTag;
-  };
+type SwitchProps = Omit<BaseSwitchPrimitiveProps, 'onCheckedChange'> & {
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+  thumbIcon?: React.ReactNode;
+  onChange?: (checked: boolean) => void;
+  onCheckedChange?: (checked: boolean) => void;
+};
 
-function Switch({ className, leftIcon, rightIcon, thumbIcon, onChange, as = motion.button, ...props }: SwitchProps) {
-  const [isChecked, setIsChecked] = useState(props.checked ?? props.defaultChecked ?? false);
-  const [isTapped, setIsTapped] = useState(false);
-
-  useEffect(() => {
-    setIsChecked(props.checked ?? props.defaultChecked ?? false);
-  }, [props.checked, props.defaultChecked]);
-
-  const handleChange = useCallback(
-    (checked: boolean) => {
-      setIsChecked(checked);
-      onChange?.(checked);
+function Switch({ className, leftIcon, rightIcon, thumbIcon, onChange, onCheckedChange, checked, defaultChecked, ...props }: SwitchProps) {
+  const handleCheckedChange = useCallback(
+    (value: boolean) => {
+      onChange?.(value);
+      onCheckedChange?.(value);
     },
-    [onChange]
+    [onChange, onCheckedChange]
   );
 
   return (
-    <SwitchPrimitive
+    <BaseSwitchPrimitive
       data-slot='switch'
-      checked={isChecked}
-      onChange={handleChange}
+      checked={checked}
+      defaultChecked={defaultChecked}
+      onCheckedChange={handleCheckedChange}
       className={cn(
         'relative flex p-[3px] h-6 w-10 shrink-0 cursor-pointer items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[checked]:bg-primary bg-input data-[checked]:justify-end justify-start',
         className
       )}
-      as={as}
-      whileTap='tap'
-      initial={false}
-      onTapStart={() => setIsTapped(true)}
-      onTapCancel={() => setIsTapped(false)}
-      onTap={() => setIsTapped(false)}
       {...props}
     >
       {leftIcon && (
-        <motion.div
-          data-slot='switch-left-icon'
-          animate={isChecked ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
-          transition={{ type: 'spring', bounce: 0 }}
+        <BaseSwitchIcon
+          position='left'
           className='absolute [&_svg]:size-3 left-1 top-1/2 -translate-y-1/2 dark:text-neutral-500 text-neutral-400'
         >
           {typeof leftIcon !== 'string' ? leftIcon : null}
-        </motion.div>
+        </BaseSwitchIcon>
       )}
 
       {rightIcon && (
-        <motion.div
-          data-slot='switch-right-icon'
-          animate={isChecked ? { scale: 0, opacity: 0 } : { scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', bounce: 0 }}
+        <BaseSwitchIcon
+          position='right'
           className='absolute [&_svg]:size-3 right-1 top-1/2 -translate-y-1/2 dark:text-neutral-400 text-neutral-500'
         >
           {typeof rightIcon !== 'string' ? rightIcon : null}
-        </motion.div>
+        </BaseSwitchIcon>
       )}
 
-      <motion.span
-        data-slot='switch-thumb'
-        whileTap='tab'
+      <BaseSwitchThumb
         className={cn(
           'relative z-[1] [&_svg]:size-3 flex items-center justify-center rounded-full bg-background shadow-lg ring-0 dark:text-neutral-400 text-neutral-500'
         )}
-        layout
-        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        style={{
-          width: 18,
-          height: 18,
-        }}
-        animate={isTapped ? { width: 21, transition: { duration: 0.1 } } : { width: 18, transition: { duration: 0.1 } }}
+        pressedAnimation={{ width: 21 }}
+        style={{ width: 18, height: 18 }}
       >
-        {thumbIcon && typeof thumbIcon !== 'string' ? thumbIcon : null}
-      </motion.span>
-    </SwitchPrimitive>
+        {thumbIcon && typeof thumbIcon !== 'string' ? (
+          <BaseSwitchIcon position='thumb' className='absolute inset-0 flex items-center justify-center'>
+            {thumbIcon}
+          </BaseSwitchIcon>
+        ) : null}
+      </BaseSwitchThumb>
+    </BaseSwitchPrimitive>
   );
 }
 

@@ -1,11 +1,10 @@
 'use client';
 
 import { useFiltersStore } from '@application/stores/filters';
-import { Field, Label } from '@headlessui/react';
 import { InfoIcon, Undo2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Switch } from 'src/components/animate-ui/headless/switch';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/base/tooltip';
 import { useShallow } from 'zustand/react/shallow';
 import { PremiumFeature } from '../../premium/PremiumFeature';
 
@@ -19,8 +18,8 @@ export const AllowPastDays = () => {
   );
 
   return (
-    <Field className='space-y-2 w-full' data-tutorial='allow-past-days'>
-      <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='allow-past-days'>
+    <div className='space-y-2 w-full' data-tutorial='allow-past-days'>
+      <label className='flex gap-2 my-2 text-sm font-normal' htmlFor='allow-past-days'>
         <Undo2 size={16} /> {t('title')}
         <TooltipProvider delayDuration={200}>
           <Tooltip>
@@ -30,7 +29,7 @@ export const AllowPastDays = () => {
             <TooltipContent className='w-50 text-pretty'>{t('tooltip')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
-      </Label>
+      </label>
       <PremiumFeature feature={t('title')}>
         <div className='flex gap-2 w-full'>
           <Switch
@@ -41,6 +40,6 @@ export const AllowPastDays = () => {
           <p className='font-normal text-sm'>{allowPastDays ? t('enabled') : t('disabled')}</p>
         </div>
       </PremiumFeature>
-    </Field>
+    </div>
   );
 };

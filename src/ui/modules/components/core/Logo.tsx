@@ -3,7 +3,7 @@
 import { Link } from '@application/i18n/navigtion';
 import { useIsMobile } from '@const/hooks/use-mobile';
 import { GradientText } from 'src/components/animate-ui/primitives/texts/gradient';
-import { SidebarMenuButton, useSidebar } from 'src/components/animate-ui/radix/sidebar';
+import { SidebarMenuButton, useSidebar } from 'src/components/animate-ui/base/sidebar';
 import { OceanSunset } from './OceanSunset';
 import { PalmTree } from './PalmTree';
 

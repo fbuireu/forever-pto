@@ -3,14 +3,13 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { Combobox } from '@const/components/ui/combobox';
 import { Input } from '@const/components/ui/input';
-import { Field, Label } from '@headlessui/react';
 import { Calculator, InfoIcon } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useRef, useState } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { Plus } from 'src/components/animate-ui/icons/plus';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/base/tooltip';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 import { getMonthNames } from '../../utils/helpers';
@@ -70,8 +69,8 @@ export const PtoCalculator = () => {
   };
 
   return (
-    <Field className='space-y-2 w-full'>
-      <Label className='flex gap-2 my-2 text-sm font-normal'>
+    <div className='space-y-2 w-full'>
+      <label className='flex gap-2 my-2 text-sm font-normal'>
         <Calculator size={16} /> {t('title')}
         <TooltipProvider delayDuration={200}>
           <Tooltip>
@@ -81,7 +80,7 @@ export const PtoCalculator = () => {
             <TooltipContent className='w-60 text-pretty'>{t('tooltip')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
-      </Label>
+      </label>
 
       <div className='space-y-2 w-full'>
         <p className='text-xs text-muted-foreground'>{t('daysPerMonth')}</p>
@@ -141,6 +140,6 @@ export const PtoCalculator = () => {
           </AnimateIcon>
         </div>
       )}
-    </Field>
+    </div>
   );
 };

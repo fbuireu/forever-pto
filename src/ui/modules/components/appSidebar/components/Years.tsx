@@ -3,7 +3,6 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { Command, CommandGroup, CommandItem, CommandList } from '@const/components/ui/command';
 import { cn } from '@const/lib/utils';
-import { Field, Label } from '@headlessui/react';
 import { Calendar } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -11,7 +10,7 @@ import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Check } from 'src/components/animate-ui/icons/check';
 import { ChevronDown } from 'src/components/animate-ui/icons/chevron-down';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
+import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/base/popover';
 import { useShallow } from 'zustand/react/shallow';
 
 const MAX_YEARS = 10;
@@ -29,10 +28,10 @@ export const Years = () => {
   const years = Array.from({ length: MAX_YEARS }, (_, index) => new Date().getFullYear() - MAX_YEARS / 2 + index);
 
   return (
-    <Field className='space-y-2 w-full' data-tutorial='year'>
-      <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='years'>
+    <div className='space-y-2 w-full' data-tutorial='year'>
+      <label className='flex gap-2 my-2 text-sm font-normal' htmlFor='years'>
         <Calendar size={16} /> {t('title')}
-      </Label>
+      </label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <AnimateIcon animateOnHover asChild>
@@ -69,6 +68,6 @@ export const Years = () => {
           </Command>
         </PopoverContent>
       </Popover>
-    </Field>
+    </div>
   );
 };

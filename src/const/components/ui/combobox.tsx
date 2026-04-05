@@ -9,7 +9,7 @@ import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Check } from 'src/components/animate-ui/icons/check';
 import { ChevronUpDown } from 'src/components/animate-ui/icons/chevron-up-down';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/radix/popover';
+import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/base/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './command';
 import { hasFlag } from './utils/helpers';
 

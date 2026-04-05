@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { cn } from '@const/lib/utils';
 import { Command as CommandPrimitive } from 'cmdk';
 import { useTranslations } from 'next-intl';
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { SearchIcon } from 'src/components/animate-ui/icons/search';
 
@@ -28,11 +28,12 @@ function CommandDialog({
   className,
   showCloseButton = true,
   ...props
-}: ComponentProps<typeof Dialog> & {
+}: Omit<ComponentProps<typeof Dialog>, 'children'> & {
   title?: string;
   description?: string;
   className?: string;
   showCloseButton?: boolean;
+  children?: React.ReactNode;
 }) {
   const t = useTranslations('command');
   const finalTitle = title ?? t('commandPalette');

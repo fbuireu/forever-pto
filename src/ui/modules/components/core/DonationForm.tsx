@@ -13,7 +13,7 @@ import { useFormStatus } from 'react-dom';
 import type { UseFormReturn } from 'react-hook-form';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { ChevronDown } from 'src/components/animate-ui/icons/chevron-down';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/base/collapsible';
 import { FormButtons } from './FormButtons';
 
 const PRESET_AMOUNTS = [5, 10, 15] as const;

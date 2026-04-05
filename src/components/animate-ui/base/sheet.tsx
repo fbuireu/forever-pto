@@ -3,8 +3,9 @@
 import { cn } from '@const/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { AnimatePresence, type HTMLMotionProps, motion, type Transition } from 'motion/react';
-import { Dialog as SheetPrimitive } from 'radix-ui';
+import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
 import { createContext, use, useCallback, useEffect, useState } from 'react';
+import * as React from 'react';
 import { AnimateIcon } from '../icons/icon';
 import { X } from '../icons/x';
 
@@ -32,9 +33,9 @@ function Sheet({ children, ...props }: SheetProps) {
   }, [props?.open]);
 
   const handleOpenChange = useCallback(
-    (open: boolean) => {
-      setIsOpen(open);
-      props.onOpenChange?.(open);
+    (...args: Parameters<NonNullable<SheetProps['onOpenChange']>>) => {
+      setIsOpen(args[0]);
+      props.onOpenChange?.(...args);
     },
     [props.onOpenChange]
   );
@@ -48,10 +49,17 @@ function Sheet({ children, ...props }: SheetProps) {
   );
 }
 
-type SheetTriggerProps = React.ComponentProps<typeof SheetPrimitive.Trigger>;
+type SheetTriggerProps = React.ComponentProps<typeof SheetPrimitive.Trigger> & { asChild?: boolean };
 
-function SheetTrigger(props: SheetTriggerProps) {
-  return <SheetPrimitive.Trigger data-slot='sheet-trigger' {...props} />;
+function SheetTrigger({ asChild, children, ...props }: SheetTriggerProps) {
+  if (asChild && React.isValidElement(children)) {
+    return <SheetPrimitive.Trigger data-slot='sheet-trigger' render={children as React.ReactElement} {...props} />;
+  }
+  return (
+    <SheetPrimitive.Trigger data-slot='sheet-trigger' {...props}>
+      {children}
+    </SheetPrimitive.Trigger>
+  );
 }
 
 type SheetCloseProps = React.ComponentProps<typeof SheetPrimitive.Close>;
@@ -66,11 +74,11 @@ function SheetPortal(props: SheetPortalProps) {
   return <SheetPrimitive.Portal data-slot='sheet-portal' {...props} />;
 }
 
-type SheetOverlayProps = React.ComponentProps<typeof SheetPrimitive.Overlay>;
+type SheetOverlayProps = React.ComponentProps<typeof SheetPrimitive.Backdrop>;
 
 function SheetOverlay({ className, ...props }: SheetOverlayProps) {
   return (
-    <SheetPrimitive.Overlay
+    <SheetPrimitive.Backdrop
       data-slot='sheet-overlay'
       className={cn('fixed inset-0 z-50 bg-black/80', className)}
       {...props}
@@ -92,7 +100,7 @@ const sheetVariants = cva('fixed z-50 gap-4 bg-background p-6 shadow-lg', {
   },
 });
 
-type SheetContentProps = React.ComponentProps<typeof SheetPrimitive.Content> &
+type SheetContentProps = Omit<React.ComponentProps<typeof SheetPrimitive.Popup>, 'render'> &
   VariantProps<typeof sheetVariants> &
   HTMLMotionProps<'div'> & {
     transition?: Transition;
@@ -112,58 +120,64 @@ function SheetContent({
   return (
     <AnimatePresence>
       {isOpen && (
-        <SheetPortal forceMount data-slot='sheet-portal'>
+        <SheetPortal keepMounted data-slot='sheet-portal'>
           {overlay && (
-            <SheetOverlay asChild forceMount>
-              <motion.div
-                key='sheet-overlay'
-                data-slot='sheet-overlay'
-                initial={{ opacity: 0, filter: 'blur(4px)' }}
-                animate={{ opacity: 1, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, filter: 'blur(4px)' }}
-                transition={{ duration: 0.2, ease: 'easeInOut' }}
-              />
-            </SheetOverlay>
+            <SheetPrimitive.Backdrop
+              data-slot='sheet-overlay'
+              render={
+                <motion.div
+                  key='sheet-overlay'
+                  data-slot='sheet-overlay'
+                  className='fixed inset-0 z-50 bg-black/80'
+                  initial={{ opacity: 0, filter: 'blur(4px)' }}
+                  animate={{ opacity: 1, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, filter: 'blur(4px)' }}
+                  transition={{ duration: 0.2, ease: 'easeInOut' }}
+                />
+              }
+            />
           )}
-          <SheetPrimitive.Content asChild forceMount {...props}>
-            <motion.div
-              key='sheet-content'
-              data-slot='sheet-content'
-              initial={
-                side === 'right'
-                  ? { x: '100%', opacity: 0 }
-                  : side === 'left'
-                    ? { x: '-100%', opacity: 0 }
-                    : side === 'top'
-                      ? { y: '-100%', opacity: 0 }
-                      : { y: '100%', opacity: 0 }
-              }
-              animate={{ x: 0, y: 0, opacity: 1 }}
-              exit={
-                side === 'right'
-                  ? { x: '100%', opacity: 0 }
-                  : side === 'left'
-                    ? { x: '-100%', opacity: 0 }
-                    : side === 'top'
-                      ? { y: '-100%', opacity: 0 }
-                      : { y: '100%', opacity: 0 }
-              }
-              transition={transition}
-              className={cn(sheetVariants({ side }), className)}
-              {...props}
-            >
-              {children}
-              <AnimateIcon animateOnHover>
-                <SheetPrimitive.Close
-                  data-slot='sheet-close'
-                  className='absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary'
-                >
-                  <X className='h-4 w-4' animateOnHover />
-                  <span className='sr-only'>Close</span>
-                </SheetPrimitive.Close>
-              </AnimateIcon>
-            </motion.div>
-          </SheetPrimitive.Content>
+          <SheetPrimitive.Popup
+            render={
+              <motion.div
+                key='sheet-content'
+                data-slot='sheet-content'
+                initial={
+                  side === 'right'
+                    ? { x: '100%', opacity: 0 }
+                    : side === 'left'
+                      ? { x: '-100%', opacity: 0 }
+                      : side === 'top'
+                        ? { y: '-100%', opacity: 0 }
+                        : { y: '100%', opacity: 0 }
+                }
+                animate={{ x: 0, y: 0, opacity: 1 }}
+                exit={
+                  side === 'right'
+                    ? { x: '100%', opacity: 0 }
+                    : side === 'left'
+                      ? { x: '-100%', opacity: 0 }
+                      : side === 'top'
+                        ? { y: '-100%', opacity: 0 }
+                        : { y: '100%', opacity: 0 }
+                }
+                transition={transition}
+                className={cn(sheetVariants({ side }), className)}
+                {...(props as HTMLMotionProps<'div'>)}
+              />
+            }
+          >
+            {children}
+            <AnimateIcon animateOnHover>
+              <SheetPrimitive.Close
+                data-slot='sheet-close'
+                className='absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[open]:bg-secondary'
+              >
+                <X className='h-4 w-4' animateOnHover />
+                <span className='sr-only'>Close</span>
+              </SheetPrimitive.Close>
+            </AnimateIcon>
+          </SheetPrimitive.Popup>
         </SheetPortal>
       )}
     </AnimatePresence>

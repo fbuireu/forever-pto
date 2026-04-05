@@ -6,7 +6,7 @@ import { Separator } from '@const/components/ui/separator';
 import { Skeleton } from '@const/components/ui/skeleton';
 import { useIsMobile } from '@const/hooks/use-mobile';
 import { cn } from '@const/lib/utils';
-import { Slot } from '@radix-ui/react-slot';
+import { Slot } from '@const/lib/slot';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import type { Transition } from 'motion/react';

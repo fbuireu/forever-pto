@@ -65,25 +65,26 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
             <AlertTriangle className='w-5 h-5' />
             {isMultiple ? t('title') : t('titleSingular')}
           </DialogTitle>
-          <DialogDescription asChild className='space-y-3'>
-            <div>
-              <span className='block my-2 '>
-                {isMultiple ? t('description', { count: holidays.length }) : t('descriptionSingular')}
-              </span>
-              <div className='bg-muted rounded-lg p-3 max-h-32 overflow-y-auto'>
-                <div className='space-y-2'>
-                  {holidays.map((holiday) => (
-                    <div key={holiday.id} className='flex items-center justify-between text-sm'>
-                      <span className='font-medium'>{holiday.name}</span>
-                      <span className='text-muted-foreground'>
-                        {formatDate({ date: holiday.date, locale, format: 'MMM d, yyyy' })}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+          <DialogDescription className='sr-only'>
+            {isMultiple ? t('description', { count: holidays.length }) : t('descriptionSingular')}
+          </DialogDescription>
+          <div className='space-y-3'>
+            <span className='block my-2 text-sm text-muted-foreground'>
+              {isMultiple ? t('description', { count: holidays.length }) : t('descriptionSingular')}
+            </span>
+            <div className='bg-muted rounded-lg p-3 max-h-32 overflow-y-auto'>
+              <div className='space-y-2'>
+                {holidays.map((holiday) => (
+                  <div key={holiday.id} className='flex items-center justify-between text-sm'>
+                    <span className='font-medium'>{holiday.name}</span>
+                    <span className='text-muted-foreground'>
+                      {formatDate({ date: holiday.date, locale, format: 'MMM d, yyyy' })}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
-          </DialogDescription>
+          </div>
         </DialogHeader>
         <DialogFooter>
           <div className='flex gap-2 pt-4'>

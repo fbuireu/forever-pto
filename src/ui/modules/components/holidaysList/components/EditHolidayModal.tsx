@@ -118,7 +118,7 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-sm' onOpenAutoFocus={(e) => e.preventDefault()}>
+      <DialogContent className='sm:max-w-sm' initialFocus={false}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Edit className='w-5 h-5 text-blue-500' />

@@ -3,7 +3,6 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { cn } from '@const/lib/utils';
-import { Field, Label } from '@headlessui/react';
 import { useDebounce } from '@ui/hooks/useDebounce';
 import { CalendarDays, Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -47,10 +46,10 @@ export const PtoDays = () => {
   };
 
   return (
-    <Field className='space-y-2 w-full' data-tutorial='pto-days'>
-      <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='pto-days'>
+    <div className='space-y-2 w-full' data-tutorial='pto-days'>
+      <label className='flex gap-2 my-2 text-sm font-normal' htmlFor='pto-days'>
         <CalendarDays size={16} /> {t('title')}
-      </Label>
+      </label>
       <div className='flex items-center font-normal gap-2 justify-between'>
         <p className='font-normal text-sm'>{t('iHave')}</p>
         <Counter
@@ -70,9 +69,9 @@ export const PtoDays = () => {
         <p className='font-normal text-sm'>{t('days')}</p>
       </div>
       <div className='space-y-2 mt-4 w-full'>
-        <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='remaining-days'>
+        <label className='flex gap-2 my-2 text-sm font-normal' htmlFor='remaining-days'>
           <Clock size={16} /> {t('status')}
-        </Label>
+        </label>
         <div className='space-y-2 w-full'>
           <div className='flex items-center justify-between text-sm'>
             <span className='text-muted-foreground'>{t('autoAssigned')}</span>
@@ -125,6 +124,6 @@ export const PtoDays = () => {
           {remaining > 0 && <p className='text-xs text-muted-foreground text-center mt-2'>{t('clickToAssign')}</p>}
         </div>
       </div>
-    </Field>
+    </div>
   );
 };

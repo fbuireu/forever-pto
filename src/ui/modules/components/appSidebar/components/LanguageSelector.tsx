@@ -13,8 +13,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from 'src/components/animate-ui/radix/dropdown-menu';
-import { useSidebar } from 'src/components/animate-ui/radix/sidebar';
+} from 'src/components/animate-ui/base/dropdown-menu';
+import { useSidebar } from 'src/components/animate-ui/base/sidebar';
 
 export const LanguageSelector = () => {
   const locale = useLocale();

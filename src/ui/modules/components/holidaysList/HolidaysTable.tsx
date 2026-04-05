@@ -24,7 +24,7 @@ import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { Plus } from 'src/components/animate-ui/icons/plus';
 import { Search } from 'src/components/animate-ui/icons/search';
 import { Trash2 } from 'src/components/animate-ui/icons/trash-2';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/base/collapsible';
 import { HolidayRow } from './components/HolidayRow';
 import { HolidayTableHeader } from './components/HolidayTableHeader';
 

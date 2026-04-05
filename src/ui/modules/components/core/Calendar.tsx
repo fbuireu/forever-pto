@@ -12,7 +12,7 @@ import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
 import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/base/tooltip';
 import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
 import {
   getPreviewRange,

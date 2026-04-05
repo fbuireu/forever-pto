@@ -2,13 +2,12 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { Slider } from '@const/components/ui/slider';
-import { Field, Label } from '@headlessui/react';
 import { InfoIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { SlidersHorizontal } from 'src/components/animate-ui/icons/sliders-horizontal';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/radix/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/base/tooltip';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { PremiumFeature } from '../../premium/PremiumFeature';
 
@@ -54,8 +53,8 @@ export const CarryOverMonths = () => {
 
   return (
     <AnimateIcon animateOnHover>
-      <Field className='space-y-2 w-full' data-tutorial='carry-over'>
-        <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='carry-over-months'>
+      <div className='space-y-2 w-full' data-tutorial='carry-over'>
+        <label className='flex gap-2 my-2 text-sm font-normal' htmlFor='carry-over-months'>
           <SlidersHorizontal size={16} /> {t('title')}
           <TooltipProvider delayDuration={200}>
             <Tooltip>
@@ -65,7 +64,7 @@ export const CarryOverMonths = () => {
               <TooltipContent className='w-50 text-pretty'>{t('tooltip')}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        </Label>
+        </label>
         <PremiumFeature feature={t('title')}>
           <div className='flex gap-2 relative w-full'>
             <p className='font-normal text-sm'>{MIN_VALUE}</p>
@@ -85,7 +84,7 @@ export const CarryOverMonths = () => {
             <p className='font-normal text-sm'>{MAX_VALUE}</p>
           </div>
         </PremiumFeature>
-      </Field>
+      </div>
     </AnimateIcon>
   );
 };

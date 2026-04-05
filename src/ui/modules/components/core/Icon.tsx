@@ -1,8 +1,8 @@
-import type { SimpleIcon } from 'simple-icons';
+import type { SvgIcon } from '@ui/assets/icons/types';
 import { getViewBoxFromSvg } from './utils/helpers';
 
 interface IconProps {
-  icon: SimpleIcon;
+  icon: SvgIcon;
   size?: number;
   className?: string;
 }

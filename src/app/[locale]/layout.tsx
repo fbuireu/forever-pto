@@ -16,7 +16,7 @@ import { notFound } from 'next/navigation';
 import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { ThemeProvider } from 'next-themes';
-import { SidebarProvider } from 'src/components/animate-ui/radix/sidebar';
+import { SidebarProvider } from 'src/components/animate-ui/base/sidebar';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

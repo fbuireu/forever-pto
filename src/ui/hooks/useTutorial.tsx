@@ -4,7 +4,7 @@ import { getDriverClientInstance } from '@infrastructure/clients/tutorial/driver
 import type { DriveStep } from 'driver.js';
 import { useTranslations } from 'next-intl';
 import { useCallback } from 'react';
-import { useSidebar } from 'src/components/animate-ui/radix/sidebar';
+import { useSidebar } from 'src/components/animate-ui/base/sidebar';
 
 export const useTutorial = () => {
   const { open, toggleSidebar } = useSidebar();

@@ -1,7 +1,6 @@
 'use client';
 
 import { useHolidaysStore } from '@application/stores/holidays';
-import { Field } from '@headlessui/react';
 import { differenceInCalendarDays, formatDate } from '@shared/utils/date';
 import { CalendarDays, InfoIcon } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -15,7 +14,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '../../../../../components/animate-ui/radix/tooltip';
+} from '../../../../../components/animate-ui/base/tooltip';
 import { SlidingNumber } from '../../../../../components/animate-ui/text/sliding-number';
 import type { FromTo } from '../../core/Calendar';
 import { calculateHolidaysInRange, calculateWeekends, calculateWorkdays } from '../../utils/helpers';
@@ -57,7 +56,7 @@ export const WorkdayCounter = () => {
   const holidayDays = selectedRange ? calculateHolidaysInRange(selectedRange, holidays) : 0;
 
   return (
-    <Field className='space-y-2 w-full'>
+    <div className='space-y-2 w-full'>
       <Label className='flex gap-2 my-2 text-sm font-normal'>
         <CalendarDays size={16} /> {t('title')}
         <TooltipProvider delayDuration={200}>
@@ -128,6 +127,6 @@ export const WorkdayCounter = () => {
           </div>
         </div>
       )}
-    </Field>
+    </div>
   );
 };

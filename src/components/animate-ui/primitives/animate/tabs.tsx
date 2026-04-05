@@ -1,6 +1,6 @@
 'use client';
 
-import { Slot } from '@radix-ui/react-slot';
+import { Slot } from '@const/lib/slot';
 import { type HTMLMotionProps, motion, type Transition } from 'motion/react';
 import {
   Children,

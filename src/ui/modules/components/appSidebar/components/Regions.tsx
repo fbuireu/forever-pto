@@ -3,7 +3,6 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { useLocationStore } from '@application/stores/location';
 import { Combobox } from '@const/components/ui/combobox';
-import { Field, Label } from '@headlessui/react';
 import { MapPinned } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
@@ -24,10 +23,10 @@ export const Regions = () => {
   }, [country, fetchRegions]);
 
   return (
-    <Field className='space-y-2 w-full' data-tutorial='region'>
-      <Label className='flex gap-2 my-2 text-sm font-normal' htmlFor='regions'>
+    <div className='space-y-2 w-full' data-tutorial='region'>
+      <label className='flex gap-2 my-2 text-sm font-normal' htmlFor='regions'>
         <MapPinned size={16} /> {t('title')}
-      </Label>
+      </label>
       <Combobox
         className='w-full'
         id='regions'
@@ -38,6 +37,6 @@ export const Regions = () => {
         placeholder={regionsLoading ? t('loading') : t('placeholder')}
         searchPlaceholder={t('search')}
       />
-    </Field>
+    </div>
   );
 };

@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { Settings } from 'src/components/animate-ui/icons/settings';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/radix/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/base/collapsible';
 import {
   Sidebar,
   SidebarContent,
@@ -21,7 +21,7 @@ import {
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
-} from 'src/components/animate-ui/radix/sidebar';
+} from 'src/components/animate-ui/base/sidebar';
 import { Logo } from '../core/Logo';
 import { AllowPastDays } from './components/AllowPastDays';
 import { CarryOverMonths } from './components/CarryOverMonths';

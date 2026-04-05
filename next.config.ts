@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
   },
   transpilePackages: ['prettier'],
   experimental: {
-    optimizePackageImports: ['lucide-react', 'recharts', '@radix-ui/react-icons'],
+    optimizePackageImports: ['lucide-react', 'recharts'],
   },
 };
 
