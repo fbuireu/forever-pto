@@ -9,11 +9,11 @@ import { getStripeClientInstance } from '@infrastructure/clients/payments/stripe
 import { formatDiscountMessage } from '@infrastructure/services/payments/utils/formatters';
 import { calculateFinalAmount } from '@infrastructure/services/payments/utils/helpers';
 import { Elements } from '@stripe/react-stripe-js';
-import type { StripeElementsOptions } from '@stripe/stripe-js';
+import type { Stripe, StripeElementsOptions } from '@stripe/stripe-js';
 import { initializePayment } from '@ui/adapters/payments/checkout';
 import { useLocale, useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
-import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
@@ -30,7 +30,6 @@ interface PaymentState {
   discountInfo: DiscountInfo | null;
 }
 
-const stripePromise = getStripeClientInstance().getStripePromise();
 const logger = getBetterStackInstance();
 
 export const Donate = () => {
@@ -39,6 +38,7 @@ export const Donate = () => {
   const tDonate = useTranslations('donate');
   const tValidation = useTranslations('validation.payment');
   const { resolvedTheme } = useTheme();
+  const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -71,6 +71,12 @@ export const Donate = () => {
   useEffect(() => {
     getCurrencyFromLocale(locale);
   }, [locale, getCurrencyFromLocale]);
+
+  useEffect(() => {
+    if (isOpen) {
+      stripePromiseRef.current ??= getStripeClientInstance().getStripePromise();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const legend = document.getElementById('legend-sticky');
@@ -359,7 +365,7 @@ export const Donate = () => {
             />
           ) : (
             elementsOptions && (
-              <Elements stripe={stripePromise} options={elementsOptions}>
+              <Elements stripe={stripePromiseRef.current} options={elementsOptions}>
                 <CheckoutForm
                   amount={finalAmount}
                   email={paymentState.data.email}
