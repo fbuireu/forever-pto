@@ -1,11 +1,8 @@
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import { isInSelectedRange } from '@application/dto/holiday/utils/helpers';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { generateAlternatives } from '@infrastructure/services/calendar/alternatives/generateAlternatives';
 import { generateMetrics } from '@infrastructure/services/calendar/metrics/generateMetrics';
-import { generateSuggestions } from '@infrastructure/services/calendar/suggestions/generateSuggestions';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
-import { getHolidays } from '@infrastructure/services/holidays/getHolidays';
 import { addMonths, endOfYear, formatDate, startOfYear } from '@shared/utils/date';
 import { ensureDate } from '@shared/utils/helpers';
 import type { Locale } from 'next-intl';
@@ -39,8 +36,8 @@ export interface HolidaysState {
 
 interface HolidaysActions {
   fetchHolidays: (params: FetchHolidaysParams) => Promise<void>;
-  generateSuggestions: (params: GenerateSuggestionsParams) => void;
-  generateAlternatives: (params: GenerateAlternativesParams) => void;
+  generateSuggestions: (params: GenerateSuggestionsParams) => Promise<void>;
+  generateAlternatives: (params: GenerateAlternativesParams) => Promise<void>;
   setCalculating: (v: boolean) => void;
   setCalculationResult: (result: { suggestion: Suggestion; alternatives: Suggestion[] }) => void;
   setMaxAlternatives: (max: number) => void;
@@ -85,6 +82,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           try {
             const { holidays: currentHolidays } = get();
             const customHolidays = currentHolidays.filter((h) => h.variant === HolidayVariant.CUSTOM);
+            const { getHolidays } = await import('@infrastructure/services/holidays/getHolidays');
             const holidays = await getHolidays(params);
             const filteredHolidays = holidays.filter((fetchedHoliday) => {
               const hasCustomOnSameDate = customHolidays.some(
@@ -105,7 +103,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
         },
 
-        generateSuggestions: ({
+        generateSuggestions: async ({
           year,
           ptoDays,
           allowPastDays,
@@ -128,6 +126,16 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
 
           try {
+            const [
+              { generateSuggestions },
+              { generateAlternatives },
+              { generateMetrics },
+            ] = await Promise.all([
+              import('@infrastructure/services/calendar/suggestions/generateSuggestions'),
+              import('@infrastructure/services/calendar/alternatives/generateAlternatives'),
+              import('@infrastructure/services/calendar/metrics/generateMetrics'),
+            ]);
+
             const holidaysDates = holidays.map((h) => ({
               ...h,
               date: ensureDate(h.date),
@@ -205,7 +213,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
         },
 
-        generateAlternatives: ({
+        generateAlternatives: async ({
           year,
           ptoDays,
           allowPastDays,
@@ -223,6 +231,11 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
 
           try {
+            const [{ generateAlternatives }, { generateMetrics }] = await Promise.all([
+              import('@infrastructure/services/calendar/alternatives/generateAlternatives'),
+              import('@infrastructure/services/calendar/metrics/generateMetrics'),
+            ]);
+
             const holidaysDates = holidays.map((h) => ({
               ...h,
               date: ensureDate(h.date),

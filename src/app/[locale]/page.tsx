@@ -1,14 +1,14 @@
 import { LOCALES } from '@infrastructure/i18n/config';
 import { CalendarList } from '@ui/modules/components/home/CalendarList';
 import { Faq } from '@ui/modules/components/home/Faq';
-import { HolidaysList } from '@ui/modules/components/home/HolidaysList';
-import { Legend } from '@ui/modules/components/home/Legend';
 import { ManagementBar } from '@ui/modules/components/home/ManagementBar';
 import { JsonLd } from '@ui/modules/components/seo/JsonLd';
 import dynamic from 'next/dynamic';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 
+const HolidaysList = dynamic(() => import('@ui/modules/components/home/HolidaysList').then((mod) => mod.HolidaysList));
+const Legend = dynamic(() => import('@ui/modules/components/home/Legend').then((mod) => mod.Legend));
 const Summary = dynamic(() => import('@ui/modules/components/home/Summary').then((mod) => mod.Summary));
 const Roadmap = dynamic(() => import('@ui/modules/components/home/Roadmap').then((mod) => mod.Roadmap));
 const Contact = dynamic(() => import('@ui/modules/components/home/Contact').then((mod) => mod.Contact));

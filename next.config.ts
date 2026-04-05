@@ -27,7 +27,16 @@ const nextConfig: NextConfig = {
   },
   transpilePackages: ['prettier'],
   experimental: {
-    optimizePackageImports: ['lucide-react', 'recharts'],
+    optimizePackageImports: [
+      'lucide-react',
+      'recharts',
+      'motion',
+      '@base-ui/react',
+      'cmdk',
+      '@tanstack/react-table',
+      'sonner',
+      'canvas-confetti',
+    ],
   },
 };
 
