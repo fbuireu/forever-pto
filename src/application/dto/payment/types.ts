@@ -19,7 +19,7 @@ export type RawPaymentSuccess = {
 
 export type RawPaymentError = {
   type: 'error';
-  error: Error | Stripe.errors.StripeError;
+  error: Error | InstanceType<typeof Stripe.errors.StripeError>;
 };
 
 export type RawPayment = RawPaymentSuccess | RawPaymentError;
