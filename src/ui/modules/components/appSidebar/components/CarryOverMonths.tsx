@@ -66,7 +66,7 @@ export const CarryOverMonths = () => {
           </TooltipProvider>
         </label>
         <PremiumFeature feature={t('title')}>
-          <div className='flex gap-2 relative w-full'>
+          <div className='flex gap-2 relative w-full pb-5'>
             <p className='font-normal text-sm'>{MIN_VALUE}</p>
             <Slider
               id='carry-over-months'

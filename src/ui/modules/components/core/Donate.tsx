@@ -102,6 +102,7 @@ export const Donate = () => {
 
   const form = useForm<CreatePaymentInput>({
     resolver: zodResolver(paymentSchema),
+    resetOptions: { keepDirtyValues: true },
     values: {
       amount: 5,
       promoCode: '',
