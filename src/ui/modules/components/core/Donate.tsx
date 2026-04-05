@@ -74,7 +74,10 @@ export const Donate = () => {
 
   useEffect(() => {
     const legend = document.getElementById('legend-sticky');
-    if (!legend) return;
+    if (!legend) {
+      document.documentElement.setAttribute('data-legend-stuck', '');
+      return () => document.documentElement.removeAttribute('data-legend-stuck');
+    }
 
     const update = () => {
       const { bottom } = legend.getBoundingClientRect();
@@ -318,7 +321,7 @@ export const Donate = () => {
       <div className='donate-trigger fixed xl:bottom-4 bottom-30 w-full right-0 md:w-auto md:right-4 z-50'>
         <div className='donate-rainbow relative z-0 overflow-hidden p-0.5 flex items-center justify-center rounded-md hover:scale-102 transition duration-200 active:scale-100'>
           <PopoverTrigger asChild>
-            <Button className='shadow-lg rounded-md w-full h-full py-3 xl:py-2'>{tDonate('donateAndUnblock')}</Button>
+            <Button className='shadow-lg rounded-md w-full h-full py-3'>{tDonate('donateAndUnblock')}</Button>
           </PopoverTrigger>
         </div>
       </div>

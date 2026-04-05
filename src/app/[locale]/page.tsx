@@ -46,8 +46,6 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// translate donate fuera de la home al bottom y más grande en todas
-// todo: bug aras (afegir molts manual i l'algoritme hauria de comptarlos coma festius)
 // todo: improve responsive
 // todo: docs with mintlifyy
 // todo: share button with results?

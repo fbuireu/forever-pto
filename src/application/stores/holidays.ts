@@ -52,6 +52,7 @@ interface HolidaysActions {
   removeHoliday: (holidayId: string) => void;
   toggleDaySelection: (params: { date: Date; totalPtoDays: number; locale: Locale; allowPastDays: boolean }) => boolean;
   resetManualSelection: () => void;
+  trimManualDays: (maxPtoDays: number) => void;
   getRemainingDays: (totalPtoDays: number) => number;
 }
 
@@ -453,6 +454,13 @@ export const useHolidaysStore = create<HolidaysStore>()(
               manuallySelectedDays: [],
               removedSuggestedDays: [],
             });
+          }
+        },
+
+        trimManualDays: (maxPtoDays: number): void => {
+          const { manuallySelectedDays } = get();
+          if (manuallySelectedDays.length > maxPtoDays) {
+            set({ manuallySelectedDays: manuallySelectedDays.slice(0, maxPtoDays) });
           }
         },
 
