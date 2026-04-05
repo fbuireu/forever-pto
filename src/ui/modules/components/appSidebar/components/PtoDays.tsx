@@ -6,6 +6,7 @@ import { cn } from '@const/lib/utils';
 import { useDebounce } from '@ui/hooks/useDebounce';
 import { CalendarDays, Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useEffect, useRef } from 'react';
 import { Button } from 'src/components/animate-ui/components/buttons/button';
 import { Counter } from 'src/components/animate-ui/components/counter';
 import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
@@ -22,13 +23,15 @@ export const PtoDays = () => {
       setPtoDays: state.setPtoDays,
     }))
   );
-  const { currentSelection, removedSuggestedDays, manuallySelectedDays, resetManualSelection, trimManualDays } = useHolidaysStore(
+  const { currentSelection, removedSuggestedDays, manuallySelectedDays, resetManualSelection, trimManualDays, isCalculating, setCalculating } = useHolidaysStore(
     useShallow((state) => ({
       currentSelection: state.currentSelection,
       removedSuggestedDays: state.removedSuggestedDays,
       manuallySelectedDays: state.manuallySelectedDays,
       resetManualSelection: state.resetManualSelection,
       trimManualDays: state.trimManualDays,
+      isCalculating: state.isCalculating,
+      setCalculating: state.setCalculating,
     }))
   );
   const [localValue, setLocalValue] = useDebounce({ value: ptoDays, delay: 100, callback: setPtoDays });
@@ -36,11 +39,19 @@ export const PtoDays = () => {
   const isIncrementDisabled = localValue >= MAX_VALUE;
   const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
   const manualSelectedCount = manuallySelectedDays.length;
-  const remaining = ptoDays - activeSuggestedCount - manualSelectedCount;
+
+  const rawRemaining = Math.max(0, ptoDays - activeSuggestedCount - manualSelectedCount);
+  const lastSettledRemaining = useRef(rawRemaining);
+  useEffect(() => {
+    if (!isCalculating) lastSettledRemaining.current = rawRemaining;
+  });
+  const remaining = isCalculating ? lastSettledRemaining.current : rawRemaining;
+
   const hasManualChanges = manualSelectedCount > 0 || removedSuggestedDays.length > 0;
 
   const handleChange = (value: number) => {
     const newValue = Math.max(MIN_VALUE, value);
+    setCalculating(true);
     setLocalValue(newValue);
     trimManualDays(newValue);
   };

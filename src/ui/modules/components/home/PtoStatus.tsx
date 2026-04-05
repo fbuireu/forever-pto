@@ -6,6 +6,7 @@ import { useHolidaysStore } from '@application/stores/holidays';
 import { cn } from '@const/lib/utils';
 import { MousePointerClick } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { Button } from '../../../../components/animate-ui/components/buttons/button';
 import { SlidingNumber } from '../../../../components/animate-ui/text/sliding-number';
@@ -18,16 +19,24 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
   const t = useTranslations('ptoStatus');
   const resetManualSelection = useHolidaysStore((state) => state.resetManualSelection);
   const ptoDays = useFiltersStore((state) => state.ptoDays);
-  const { removedSuggestedDays, manuallySelectedDays } = useHolidaysStore(
+  const { removedSuggestedDays, manuallySelectedDays, isCalculating } = useHolidaysStore(
     useShallow((state) => ({
       removedSuggestedDays: state.removedSuggestedDays,
       manuallySelectedDays: state.manuallySelectedDays,
+      isCalculating: state.isCalculating,
     }))
   );
 
   const activeSuggestedCount = currentSelection.days.length - removedSuggestedDays.length;
   const manualSelectedCount = manuallySelectedDays.length;
-  const remaining = ptoDays - activeSuggestedCount - manualSelectedCount;
+
+  const rawRemaining = Math.max(0, ptoDays - activeSuggestedCount - manualSelectedCount);
+  const lastSettledRemaining = useRef(rawRemaining);
+  useEffect(() => {
+    if (!isCalculating) lastSettledRemaining.current = rawRemaining;
+  });
+  const remaining = isCalculating ? lastSettledRemaining.current : rawRemaining;
+
   const hasManualChanges = manualSelectedCount > 0 || removedSuggestedDays.length > 0;
 
   return (

@@ -46,9 +46,7 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: better with webworker?
 // todo: brutalist design
-// todo: getComponents again animate ui (use base ui) (https://animate-ui.com/docs/components/base/switch)
 // todo: improve responsive
 // todo: docs with mintlifyy
 // todo: share button with results?
@@ -59,8 +57,6 @@ export default Home;
 // todo: custom 404 and error?
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
 // todo: use grid one-liner for layout calendar https://www.youtube.com/watch?v=Ix_LAId0obw
-// todo: migrate to base-ui (https://shadcnspace.com/docs/getting-started/migrate-to-baseui) + use shine component instead of gradient
-// todo: performance web workers
 // todo: unify component and folder structure (payment/provider should be dto?)
 // todo: CI to work on releases
 // todo: Increase test coverage
