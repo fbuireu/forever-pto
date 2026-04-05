@@ -1,6 +1,5 @@
 'use client';
 
-import { getDriverClientInstance } from '@infrastructure/clients/tutorial/driver/client';
 import type { DriveStep } from 'driver.js';
 import { useTranslations } from 'next-intl';
 import { useCallback } from 'react';
@@ -12,7 +11,11 @@ export const useTutorial = () => {
   const { open, toggleSidebar } = useSidebar();
   const t = useTranslations('tutorial.steps');
 
-  const startTutorial = useCallback(() => {
+  const startTutorial = useCallback(async () => {
+    const [{ getDriverClientInstance }] = await Promise.all([
+      import('@infrastructure/clients/tutorial/driver/client'),
+      import('@ui/modules/components/core/DriverStyles'),
+    ]);
     const driverClient = getDriverClientInstance();
 
     const steps: DriveStep[] = [
@@ -143,15 +146,17 @@ export const useTutorial = () => {
 
     if (!open) {
       toggleSidebar();
-      const el = document.querySelector(SIDEBAR_CONTAINER_SELECTOR);
-      if (el) {
-        el.addEventListener('transitionend', () => driverClient.start(steps), { once: true });
-      } else {
-        driverClient.start(steps);
-      }
-    } else {
-      driverClient.start(steps);
+      await new Promise<void>((resolve) => {
+        const el = document.querySelector(SIDEBAR_CONTAINER_SELECTOR);
+        if (el) {
+          el.addEventListener('transitionend', () => resolve(), { once: true });
+        } else {
+          resolve();
+        }
+      });
     }
+
+    driverClient.start(steps);
   }, [open, t, toggleSidebar]);
 
   return { startTutorial };

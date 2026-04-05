@@ -68,7 +68,7 @@ function SlidingNumberRoller({ prevValue, value, place, transition }: SlidingNum
     <span
       ref={measureRef}
       data-slot='sliding-number-roller'
-      className='relative inline-block w-[1ch] overflow-x-visible overflow-y-clip leading-none tabular-nums'
+      className='relative inline-block w-[1ch] overflow-hidden leading-none tabular-nums'
     >
       <span className='invisible'>0</span>
       {Array.from({ length: 10 }, (_, i) => (
