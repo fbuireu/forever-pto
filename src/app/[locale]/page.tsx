@@ -71,6 +71,5 @@ export default Home;
 
 // PROD
 // todo: stripe rest of config (check all payment methods)
-// todo: move prod env vars to cloudflare secrets
 // todo: add pages to bookmarks (betterstack, resend)
 // todo: cookie management (on PROD)

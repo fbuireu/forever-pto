@@ -37,7 +37,7 @@ export const PtoDays = () => {
   const isIncrementDisabled = localValue >= MAX_VALUE;
   const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
   const manualSelectedCount = manuallySelectedDays.length;
-  const remaining = ptoDays - activeSuggestedCount - manualSelectedCount;
+  const remaining = localValue - activeSuggestedCount - manualSelectedCount;
   const hasManualChanges = manualSelectedCount > 0 || removedSuggestedDays.length > 0;
 
   const handleChange = (value: number) => {
