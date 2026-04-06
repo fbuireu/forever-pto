@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, type Variants } from 'motion/react';
+import { m, type Variants } from 'motion/react';
 import { getVariants, type IconProps, IconWrapper, useAnimateIconContext } from './icon';
 
 type CheckProps = IconProps<keyof typeof animations>;
@@ -31,7 +31,7 @@ function IconComponent({ size, ...props }: CheckProps) {
   const variants = getVariants(animations);
 
   return (
-    <motion.svg
+    <m.svg
       xmlns='http://www.w3.org/2000/svg'
       width={size}
       height={size}
@@ -45,8 +45,8 @@ function IconComponent({ size, ...props }: CheckProps) {
       animate={controls}
       {...props}
     >
-      <motion.path d='m4 12 5 5L20 6' variants={variants.path} initial='initial' animate={controls} />
-    </motion.svg>
+      <m.path d='m4 12 5 5L20 6' variants={variants.path} initial='initial' animate={controls} />
+    </m.svg>
   );
 }
 

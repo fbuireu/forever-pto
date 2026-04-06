@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, type Variants } from 'motion/react';
+import { m, type Variants } from 'motion/react';
 import { getVariants, type IconProps, IconWrapper, useAnimateIconContext } from './icon';
 
 type ClockProps = IconProps<keyof typeof animations>;
@@ -38,7 +38,7 @@ function IconComponent({ size, ...props }: ClockProps) {
   const variants = getVariants(animations);
 
   return (
-    <motion.svg
+    <m.svg
       xmlns='http://www.w3.org/2000/svg'
       width={size}
       height={size}
@@ -50,10 +50,10 @@ function IconComponent({ size, ...props }: ClockProps) {
       strokeLinejoin='round'
       {...props}
     >
-      <motion.circle cx={12} cy={12} r={10} variants={variants.circle} initial='initial' animate={controls} />
-      <motion.line x1={12} y1={12} x2={16} y2={14} variants={variants.line1} initial='initial' animate={controls} />
-      <motion.line x1={12} y1={6} x2={12} y2={12} variants={variants.line2} initial='initial' animate={controls} />
-    </motion.svg>
+      <m.circle cx={12} cy={12} r={10} variants={variants.circle} initial='initial' animate={controls} />
+      <m.line x1={12} y1={12} x2={16} y2={14} variants={variants.line1} initial='initial' animate={controls} />
+      <m.line x1={12} y1={6} x2={12} y2={12} variants={variants.line2} initial='initial' animate={controls} />
+    </m.svg>
   );
 }
 

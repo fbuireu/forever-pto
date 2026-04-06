@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, type Variants } from 'motion/react';
+import { m, type Variants } from 'motion/react';
 import { getVariants, type IconProps, IconWrapper, useAnimateIconContext } from './icon';
 
 type ArrowRightProps = IconProps<keyof typeof animations>;
@@ -104,7 +104,7 @@ function IconComponent({ size, ...props }: ArrowRightProps) {
   const variants = getVariants(animations);
 
   return (
-    <motion.svg
+    <m.svg
       xmlns='http://www.w3.org/2000/svg'
       width={size}
       height={size}
@@ -116,11 +116,11 @@ function IconComponent({ size, ...props }: ArrowRightProps) {
       strokeLinejoin='round'
       {...props}
     >
-      <motion.g variants={variants.group} initial='initial' animate={controls}>
-        <motion.path d='M5 12h14' variants={variants.path1} initial='initial' animate={controls} />
-        <motion.path d='m12 5 7 7-7 7' variants={variants.path2} initial='initial' animate={controls} />
-      </motion.g>
-    </motion.svg>
+      <m.g variants={variants.group} initial='initial' animate={controls}>
+        <m.path d='M5 12h14' variants={variants.path1} initial='initial' animate={controls} />
+        <m.path d='m12 5 7 7-7 7' variants={variants.path2} initial='initial' animate={controls} />
+      </m.g>
+    </m.svg>
   );
 }
 

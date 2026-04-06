@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Popover as PopoverPrimitive } from '@base-ui/react/popover';
-import { AnimatePresence, motion, type HTMLMotionProps } from 'motion/react';
+import { AnimatePresence, m, type HTMLMotionProps } from 'motion/react';
 
 import { getStrictContext } from '../../../lib/get-strict-context';
 import { useControlledState } from '../../../hooks/use-controlled-state';
@@ -38,7 +38,7 @@ function PopoverPopup({ initialFocus, finalFocus, transition = { type: 'spring',
   return (
     <PopoverPrimitive.Popup
       initialFocus={initialFocus} finalFocus={finalFocus}
-      render={<motion.div key="popover-popup" data-slot="popover-popup" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} transition={transition} {...props} />}
+      render={<m.div key="popover-popup" data-slot="popover-popup" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} transition={transition} {...props} />}
     />
   );
 }

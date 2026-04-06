@@ -1,6 +1,6 @@
 import { Tabs as TabsPrimitive } from '@base-ui/react/tabs';
 import { useControlledState } from '@ui/hooks/useControlledState';
-import { AnimatePresence, type HTMLMotionProps, motion } from 'motion/react';
+import { AnimatePresence, type HTMLMotionProps, m } from 'motion/react';
 import { type ComponentProps, Fragment, type ReactNode } from 'react';
 import { getStrictContext } from 'src/lib/get-strict-context';
 import { Highlight, HighlightItem, type HighlightItemProps, type HighlightProps } from '../effects/highlight';
@@ -77,7 +77,7 @@ function TabsPanel({
     <AnimatePresence mode='wait'>
       <TabsPrimitive.Panel
         render={
-          <motion.div
+          <m.div
             data-slot='tabs-panel'
             layout
             layoutDependency={value}
@@ -108,7 +108,7 @@ function TabsPanels({
   const { value } = useTabs();
 
   return (
-    <motion.div
+    <m.div
       data-slot='tabs-panels'
       layout='size'
       layoutDependency={value}
@@ -117,7 +117,7 @@ function TabsPanels({
       {...props}
     >
       <Fragment key={value}>{children}</Fragment>
-    </motion.div>
+    </m.div>
   );
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, type Variants } from 'motion/react';
+import { m, type Variants } from 'motion/react';
 import { getVariants, type IconProps, IconWrapper, useAnimateIconContext } from './icon';
 
 type SearchProps = IconProps<keyof typeof animations>;
@@ -42,7 +42,7 @@ function IconComponent({ size, ...props }: SearchProps) {
   const variants = getVariants(animations);
 
   return (
-    <motion.svg
+    <m.svg
       xmlns='http://www.w3.org/2000/svg'
       width={size}
       height={size}
@@ -57,9 +57,9 @@ function IconComponent({ size, ...props }: SearchProps) {
       animate={controls}
       {...props}
     >
-      <motion.path d='m21 21-4.34-4.34' variants={variants.path} initial='initial' animate={controls} />
-      <motion.circle cx={11} cy={11} r={8} variants={variants.circle} initial='initial' animate={controls} />
-    </motion.svg>
+      <m.path d='m21 21-4.34-4.34' variants={variants.path} initial='initial' animate={controls} />
+      <m.circle cx={11} cy={11} r={8} variants={variants.circle} initial='initial' animate={controls} />
+    </m.svg>
   );
 }
 

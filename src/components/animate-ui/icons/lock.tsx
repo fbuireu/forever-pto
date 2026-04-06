@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, type Variants } from 'motion/react';
+import { m, type Variants } from 'motion/react';
 import { getVariants, type IconProps, IconWrapper, useAnimateIconContext } from './icon';
 
 type LockProps = IconProps<keyof typeof animations>;
@@ -100,7 +100,7 @@ function IconComponent({ size, ...props }: LockProps) {
   const variants = getVariants(animations);
 
   return (
-    <motion.svg
+    <m.svg
       xmlns='http://www.w3.org/2000/svg'
       width={size}
       height={size}
@@ -114,8 +114,8 @@ function IconComponent({ size, ...props }: LockProps) {
       animate={controls}
       {...props}
     >
-      <motion.g variants={variants.group} initial='initial' animate={controls}>
-        <motion.rect
+      <m.g variants={variants.group} initial='initial' animate={controls}>
+        <m.rect
           width='18'
           height='11'
           x='3'
@@ -126,9 +126,9 @@ function IconComponent({ size, ...props }: LockProps) {
           initial='initial'
           animate={controls}
         />
-        <motion.path d='M7 11V7a5 5 0 0 1 10 0v4' variants={variants.path} initial='initial' animate={controls} />
-      </motion.g>
-    </motion.svg>
+        <m.path d='M7 11V7a5 5 0 0 1 10 0v4' variants={variants.path} initial='initial' animate={controls} />
+      </m.g>
+    </m.svg>
   );
 }
 

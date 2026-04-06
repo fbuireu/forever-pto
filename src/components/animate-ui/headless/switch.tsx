@@ -7,7 +7,7 @@ import {
   SwitchIcon as BaseSwitchIcon,
   type SwitchProps as BaseSwitchPrimitiveProps,
 } from '../primitives/base/switch';
-import { type HTMLMotionProps, motion } from 'motion/react';
+import { type HTMLMotionProps, m } from 'motion/react';
 import { useCallback, useEffect, useState } from 'react';
 
 type SwitchProps = Omit<BaseSwitchPrimitiveProps, 'onCheckedChange'> & {

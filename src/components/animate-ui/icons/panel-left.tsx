@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, type Variants } from 'motion/react';
+import { m, type Variants } from 'motion/react';
 import { getVariants, type IconProps, IconWrapper, useAnimateIconContext } from './icon';
 
 type PanelLeftProps = IconProps<keyof typeof animations>;
@@ -26,7 +26,7 @@ function IconComponent({ size, ...props }: PanelLeftProps) {
   const variants = getVariants(animations);
 
   return (
-    <motion.svg
+    <m.svg
       xmlns='http://www.w3.org/2000/svg'
       width={size}
       height={size}
@@ -38,7 +38,7 @@ function IconComponent({ size, ...props }: PanelLeftProps) {
       strokeLinejoin='round'
       {...props}
     >
-      <motion.rect
+      <m.rect
         width={18}
         height={18}
         x={3}
@@ -49,8 +49,8 @@ function IconComponent({ size, ...props }: PanelLeftProps) {
         initial='initial'
         animate={controls}
       />
-      <motion.line x1={9} y1={3} x2={9} y2={21} variants={variants.line} initial='initial' animate={controls} />
-    </motion.svg>
+      <m.line x1={9} y1={3} x2={9} y2={21} variants={variants.line} initial='initial' animate={controls} />
+    </m.svg>
   );
 }
 

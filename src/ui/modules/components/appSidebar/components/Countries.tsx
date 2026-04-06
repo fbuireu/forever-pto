@@ -1,6 +1,8 @@
 import { getCountries } from '@infrastructure/services/countries/getCountries';
 import type { Locale } from 'next-intl';
-import { CountriesClient } from './CountriesClient';
+import dynamic from 'next/dynamic';
+
+const CountriesClient = dynamic(() => import('./CountriesClient').then((m) => m.CountriesClient));
 
 interface CountriesProps {
   locale: Locale;

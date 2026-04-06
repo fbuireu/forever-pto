@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, type Variants } from 'motion/react';
+import { m, type Variants } from 'motion/react';
 import { getVariants, type IconProps, IconWrapper, useAnimateIconContext } from './icon';
 
 type SlidersHorizontalProps = IconProps<keyof typeof animations>;
@@ -131,7 +131,7 @@ function IconComponent({ size, ...props }: SlidersHorizontalProps) {
   const variants = getVariants(animations);
 
   return (
-    <motion.svg
+    <m.svg
       xmlns='http://www.w3.org/2000/svg'
       width={size}
       height={size}
@@ -143,16 +143,16 @@ function IconComponent({ size, ...props }: SlidersHorizontalProps) {
       strokeLinejoin='round'
       {...props}
     >
-      <motion.line x1='3' y1='5' x2='10' y2='5' variants={variants.line1} initial='initial' animate={controls} />
-      <motion.line x1='14' y1='3' x2='14' y2='7' variants={variants.line2} initial='initial' animate={controls} />
-      <motion.line x1='14' y1='5' x2='21' y2='5' variants={variants.line3} initial='initial' animate={controls} />
-      <motion.line x1='3' y1='12' x2='8' y2='12' variants={variants.line4} initial='initial' animate={controls} />
-      <motion.line x1='8' y1='10' x2='8' y2='14' variants={variants.line5} initial='initial' animate={controls} />
-      <motion.line x1='12' y1='12' x2='21' y2='12' variants={variants.line6} initial='initial' animate={controls} />
-      <motion.line x1='3' y1='19' x2='12' y2='19' variants={variants.line7} initial='initial' animate={controls} />
-      <motion.line x1='16' y1='17' x2='16' y2='21' variants={variants.line8} initial='initial' animate={controls} />
-      <motion.line x1='16' y1='19' x2='21' y2='19' variants={variants.line9} initial='initial' animate={controls} />
-    </motion.svg>
+      <m.line x1='3' y1='5' x2='10' y2='5' variants={variants.line1} initial='initial' animate={controls} />
+      <m.line x1='14' y1='3' x2='14' y2='7' variants={variants.line2} initial='initial' animate={controls} />
+      <m.line x1='14' y1='5' x2='21' y2='5' variants={variants.line3} initial='initial' animate={controls} />
+      <m.line x1='3' y1='12' x2='8' y2='12' variants={variants.line4} initial='initial' animate={controls} />
+      <m.line x1='8' y1='10' x2='8' y2='14' variants={variants.line5} initial='initial' animate={controls} />
+      <m.line x1='12' y1='12' x2='21' y2='12' variants={variants.line6} initial='initial' animate={controls} />
+      <m.line x1='3' y1='19' x2='12' y2='19' variants={variants.line7} initial='initial' animate={controls} />
+      <m.line x1='16' y1='17' x2='16' y2='21' variants={variants.line8} initial='initial' animate={controls} />
+      <m.line x1='16' y1='19' x2='21' y2='19' variants={variants.line9} initial='initial' animate={controls} />
+    </m.svg>
   );
 }
 

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
-import { AnimatePresence, motion, type HTMLMotionProps } from 'motion/react';
+import { AnimatePresence, m, type HTMLMotionProps } from 'motion/react';
 
 import { useControlledState } from '../../../hooks/use-controlled-state';
 import { getStrictContext } from '../../../lib/get-strict-context';
@@ -53,7 +53,7 @@ function DialogBackdrop({ transition = { duration: 0.2, ease: 'easeInOut' }, ...
     <DialogPrimitive.Backdrop
       data-slot="dialog-backdrop"
       render={
-        <motion.div
+        <m.div
           key="dialog-backdrop"
           initial={{ opacity: 0, filter: 'blur(4px)' }}
           animate={{ opacity: 1, filter: 'blur(0px)' }}
@@ -78,7 +78,7 @@ function DialogPopup({ from = 'top', initialFocus, finalFocus, transition = { ty
       initialFocus={initialFocus}
       finalFocus={finalFocus}
       render={
-        <motion.div
+        <m.div
           key="dialog-popup"
           data-slot="dialog-popup"
           initial={{ opacity: 0, filter: 'blur(4px)', transform: `perspective(500px) ${rotateAxis}(${initialRotation}) scale(0.8)` }}

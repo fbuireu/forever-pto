@@ -2,7 +2,7 @@
 
 import { cn } from '@const/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { AnimatePresence, type HTMLMotionProps, motion, type Transition } from 'motion/react';
+import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
 import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
 import { createContext, use, useCallback, useEffect, useState } from 'react';
 import * as React from 'react';
@@ -125,7 +125,7 @@ function SheetContent({
             <SheetPrimitive.Backdrop
               data-slot='sheet-overlay'
               render={
-                <motion.div
+                <m.div
                   key='sheet-overlay'
                   data-slot='sheet-overlay'
                   className='fixed inset-0 z-50 bg-black/80'
@@ -139,7 +139,7 @@ function SheetContent({
           )}
           <SheetPrimitive.Popup
             render={
-              <motion.div
+              <m.div
                 key='sheet-content'
                 data-slot='sheet-content'
                 initial={

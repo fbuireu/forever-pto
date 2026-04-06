@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, type Variants } from 'motion/react';
+import { m, type Variants } from 'motion/react';
 import { getVariants, type IconProps, IconWrapper, useAnimateIconContext } from './icon';
 
 type XProps = IconProps<keyof typeof animations>;
@@ -73,7 +73,7 @@ function IconComponent({ size, ...props }: XProps) {
   const variants = getVariants(animations);
 
   return (
-    <motion.svg
+    <m.svg
       xmlns='http://www.w3.org/2000/svg'
       width={size}
       height={size}
@@ -85,9 +85,9 @@ function IconComponent({ size, ...props }: XProps) {
       strokeLinejoin='round'
       {...props}
     >
-      <motion.line x1={6} y1={18} x2={18} y2={6} variants={variants.line1} initial='initial' animate={controls} />
-      <motion.line x1={6} y1={6} x2={18} y2={18} variants={variants.line2} initial='initial' animate={controls} />
-    </motion.svg>
+      <m.line x1={6} y1={18} x2={18} y2={6} variants={variants.line1} initial='initial' animate={controls} />
+      <m.line x1={6} y1={6} x2={18} y2={18} variants={variants.line2} initial='initial' animate={controls} />
+    </m.svg>
   );
 }
 

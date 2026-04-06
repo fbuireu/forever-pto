@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@const/lib/utils';
-import { type HTMLMotionProps, motion, type Transition } from 'motion/react';
+import { type HTMLMotionProps, m, type Transition } from 'motion/react';
 import type { SlidingNumberProps } from '../text/sliding-number';
 import { SlidingNumber } from '../text/sliding-number';
 import { Button } from './buttons/button';
@@ -28,17 +28,18 @@ function Counter({
   ...props
 }: CounterProps) {
   return (
-    <motion.div
+    <m.div
       data-slot='counter'
       layout
       transition={transition}
       className={cn('flex items-center gap-x-2 p-1 rounded-xl bg-neutral-100 dark:bg-neutral-800', className)}
       {...props}
     >
-      <motion.div
+      <m.div
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className={cn(decrementButtonProps?.className)}
+        aria-disabled={decrementButtonProps?.disabled ?? false}
       >
         <Button
           size='icon'
@@ -53,14 +54,15 @@ function Counter({
         >
           -
         </Button>
-      </motion.div>
+      </m.div>
 
       <SlidingNumber number={number} {...slidingNumberProps} className={cn('text-lg', slidingNumberProps?.className)} />
 
-      <motion.div
+      <m.div
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className={cn(incrementButtonProps?.className)}
+        aria-disabled={incrementButtonProps?.disabled ?? false}
       >
         <Button
           size='icon'
@@ -75,8 +77,8 @@ function Counter({
         >
           +
         </Button>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }
 

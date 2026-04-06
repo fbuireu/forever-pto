@@ -16,6 +16,7 @@ import { notFound } from 'next/navigation';
 import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { ThemeProvider } from 'next-themes';
+import { LazyMotionProvider } from 'src/components/animate-ui/LazyMotionProvider';
 import { SidebarProvider } from 'src/components/animate-ui/base/sidebar';
 
 const geistSans = Geist({
@@ -68,6 +69,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
             enableSystem
             disableTransitionOnChange
           >
+            <LazyMotionProvider>
             <SidebarProvider>
               <StoresInitializer />
               <AppSidebar locale={locale}>
@@ -87,6 +89,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
                 <Footer />
               </AppSidebar>
             </SidebarProvider>
+            </LazyMotionProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
         <Analytics />

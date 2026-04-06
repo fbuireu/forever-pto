@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, type Transition } from 'motion/react';
+import { m, type Transition } from 'motion/react';
 import type { ComponentProps, CSSProperties } from 'react';
 
 type GradientTextProps = Omit<ComponentProps<'span'>, 'children'> & {
@@ -29,17 +29,17 @@ function GradientText({
 
   return (
     <span data-slot='gradient-text' style={{ position: 'relative', display: 'inline-block', ...style }} {...props}>
-      <motion.span
+      <m.span
         style={baseStyle}
         initial={{ backgroundPosition: '0% 0%' }}
         animate={{ backgroundPosition: '500% 100%' }}
         transition={transition}
       >
         {text}
-      </motion.span>
+      </m.span>
 
       {neon && (
-        <motion.span
+        <m.span
           style={{
             position: 'absolute',
             top: 0,
@@ -53,7 +53,7 @@ function GradientText({
           transition={transition}
         >
           {text}
-        </motion.span>
+        </m.span>
       )}
     </span>
   );

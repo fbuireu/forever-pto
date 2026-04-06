@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@const/lib/utils';
-import { AnimatePresence, motion, type Transition } from 'motion/react';
+import { AnimatePresence, m, type Transition } from 'motion/react';
 import React, {
   createContext,
   use,
@@ -218,7 +218,7 @@ function Highlight<T extends React.ElementType = 'div'>({ ref, ...props }: Highl
           >
             <AnimatePresence initial={false} mode='wait'>
               {boundsState && (
-                <motion.div
+                <m.div
                   data-slot='motion-highlight'
                   animate={{
                     top: boundsState.top,
@@ -507,7 +507,7 @@ function HighlightItem<T extends React.ElementType>({
         <>
           <AnimatePresence initial={false} mode='wait'>
             {isActive && !isDisabled && (
-              <motion.div
+              <m.div
                 layoutId={`transition-background-${contextId}`}
                 data-slot='motion-highlight'
                 style={{
@@ -567,7 +567,7 @@ function HighlightItem<T extends React.ElementType>({
       {mode === 'children' && (
         <AnimatePresence initial={false} mode='wait'>
           {isActive && !isDisabled && (
-            <motion.div
+            <m.div
               layoutId={`transition-background-${contextId}`}
               data-slot='motion-highlight'
               style={{

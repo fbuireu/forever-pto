@@ -1,6 +1,6 @@
 'use client';
 
-import { type HTMLMotionProps, motion } from 'motion/react';
+import { type HTMLMotionProps, m } from 'motion/react';
 import { Slot, type WithAsChild } from '../animate/slot';
 
 type ButtonProps = WithAsChild<
@@ -11,7 +11,7 @@ type ButtonProps = WithAsChild<
 >;
 
 function Button({ hoverScale = 1.05, tapScale = 1, asChild = false, ...props }: ButtonProps) {
-  const Component = asChild ? Slot : motion.button;
+  const Component = asChild ? Slot : m.button;
 
   return (
     <Component

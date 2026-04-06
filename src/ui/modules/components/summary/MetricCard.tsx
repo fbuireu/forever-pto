@@ -103,7 +103,7 @@ export const MetricCard = ({
           <SlidingNumber number={value} className={cn('text-lg font-bold', colors.text)} decimalPlaces={0} />
           {symbol}
         </div>
-        <div className={cn('text-xs text-muted-foreground')}>{label}</div>
+        <div className={cn('text-xs', colors.text)}>{label}</div>
       </div>
     );
   }
@@ -112,7 +112,7 @@ export const MetricCard = ({
     <div
       className={cn('items-center p-4', colors.bg, 'rounded-lg flex flex-col justify-between items-center', className)}
     >
-      <span className={cn('text-xs text-muted-foreground mb-1')}>{label}</span>
+      <span className={cn('text-xs mb-1', colors.text)}>{label}</span>
       <div className={cn('flex items-center gap-2')}>
         <Icon className={cn('w-4 h-4', colors.icon)} />
         <span className={cn('text-xl font-bold flex', colors.text)}>

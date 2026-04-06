@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Tooltip as TooltipPrimitive } from '@base-ui/react/tooltip';
-import { AnimatePresence, motion, useMotionValue, useSpring, type HTMLMotionProps, type MotionValue, type SpringOptions } from 'motion/react';
+import { AnimatePresence, m, useMotionValue, useSpring, type HTMLMotionProps, type MotionValue, type SpringOptions } from 'motion/react';
 
 import { getStrictContext } from '../../../lib/get-strict-context';
 import { useControlledState } from '../../../hooks/use-controlled-state';
@@ -56,7 +56,7 @@ function TooltipPopup({ transition = { type: 'spring', stiffness: 300, damping: 
   const translateY = useSpring(y, followCursorSpringOptions);
   return (
     <TooltipPrimitive.Popup
-      render={<motion.div key="tooltip-popup" data-slot="tooltip-popup" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} transition={transition} style={{ x: followCursor === 'x' || followCursor === true ? translateX : undefined, y: followCursor === 'y' || followCursor === true ? translateY : undefined, ...style }} {...props} />}
+      render={<m.div key="tooltip-popup" data-slot="tooltip-popup" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} transition={transition} style={{ x: followCursor === 'x' || followCursor === true ? translateX : undefined, y: followCursor === 'y' || followCursor === true ? translateY : undefined, ...style }} {...props} />}
     />
   );
 }

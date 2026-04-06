@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Switch as SwitchPrimitives } from '@base-ui/react/switch';
-import { motion, type TargetAndTransition, type VariantLabels, type HTMLMotionProps, type LegacyAnimationControls } from 'motion/react';
+import { m, type TargetAndTransition, type VariantLabels, type HTMLMotionProps, type LegacyAnimationControls } from 'motion/react';
 
 import { getStrictContext } from '../../../lib/get-strict-context';
 import { useControlledState } from '../../../hooks/use-controlled-state';
@@ -26,7 +26,7 @@ function Switch({ name, defaultChecked, checked, onCheckedChange, nativeButton, 
       <SwitchPrimitives.Root
         name={name} defaultChecked={defaultChecked} checked={checked} onCheckedChange={setIsChecked}
         nativeButton={nativeButton} disabled={disabled} readOnly={readOnly} required={required} inputRef={inputRef} id={id}
-        render={<motion.button data-slot="switch" whileTap="tap" initial={false} onTapStart={() => setIsPressed(true)} onTapCancel={() => setIsPressed(false)} onTap={() => setIsPressed(false)} {...props} />}
+        render={<m.button data-slot="switch" whileTap="tap" initial={false} onTapStart={() => setIsPressed(true)} onTapCancel={() => setIsPressed(false)} onTap={() => setIsPressed(false)} {...props} />}
       />
     </SwitchProvider>
   );
@@ -40,7 +40,7 @@ function SwitchThumb({ pressedAnimation, transition = { type: 'spring', stiffnes
   const { isPressed } = useSwitch();
   return (
     <SwitchPrimitives.Thumb
-      render={<motion.div data-slot="switch-thumb" whileTap="tab" layout transition={transition} animate={isPressed ? pressedAnimation : undefined} {...props} />}
+      render={<m.div data-slot="switch-thumb" whileTap="tab" layout transition={transition} animate={isPressed ? pressedAnimation : undefined} {...props} />}
     />
   );
 }
@@ -57,7 +57,7 @@ function SwitchIcon({ position, transition = { type: 'spring', bounce: 0 }, ...p
     return false;
   }, [position, isChecked]);
   return (
-    <motion.div
+    <m.div
       data-slot={`switch-${position}-icon`}
       animate={isAnimated ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
       transition={transition}

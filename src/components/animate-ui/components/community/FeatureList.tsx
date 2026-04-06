@@ -1,7 +1,7 @@
 'use client';
 
 import { Badge } from '@const/components/ui/badge';
-import { motion, type Transition } from 'motion/react';
+import { m, type Transition } from 'motion/react';
 
 interface RoadmapFeature {
   id: string;
@@ -49,7 +49,7 @@ const viewAllTextVariants = {
 
 export function FeatureList({ features, categoryLabel }: FeatureListProps) {
   return (
-    <motion.div
+    <m.div
       className='bg-card border rounded-xl p-4 w-full space-y-3 shadow-md'
       initial='collapsed'
       whileHover='expanded'
@@ -57,7 +57,7 @@ export function FeatureList({ features, categoryLabel }: FeatureListProps) {
     >
       <div>
         {features.map((feature, i) => (
-          <motion.div
+          <m.div
             key={feature.id}
             className='border bg-muted rounded-xl px-4 py-3 shadow-sm hover:shadow-lg transition-shadow duration-200 relative'
             variants={getCardVariants(i)}
@@ -77,7 +77,7 @@ export function FeatureList({ features, categoryLabel }: FeatureListProps) {
                 </Badge>
               )}
             </div>
-          </motion.div>
+          </m.div>
         ))}
       </div>
 
@@ -86,22 +86,22 @@ export function FeatureList({ features, categoryLabel }: FeatureListProps) {
           {features.length}
         </div>
         <span className='grid'>
-          <motion.span
+          <m.span
             className='text-sm font-medium text-foreground row-start-1 col-start-1'
             variants={categoryTextVariants}
             transition={textSwitchTransition}
           >
             {categoryLabel}
-          </motion.span>
-          <motion.span
+          </m.span>
+          <m.span
             className='text-sm font-medium text-foreground flex items-center gap-1 cursor-pointer select-none row-start-1 col-start-1'
             variants={viewAllTextVariants}
             transition={textSwitchTransition}
           >
             Detailed view
-          </motion.span>
+          </m.span>
         </span>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible';
-import { type HTMLMotionProps, motion, type Transition } from 'motion/react';
+import { type HTMLMotionProps, m, type Transition } from 'motion/react';
 import { createContext, use, useCallback, useState } from 'react';
 
 type CollapsibleContextType = {
@@ -81,7 +81,7 @@ function CollapsibleContent({
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { hidden, style, className: panelClassName, ...restProps } = panelProps;
         return (
-          <motion.div
+          <m.div
             {...restProps}
             layout
             animate={state.open ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
@@ -92,7 +92,7 @@ function CollapsibleContent({
             style={{ overflow: 'hidden', display: 'block', ...style }}
           >
             {children}
-          </motion.div>
+          </m.div>
         );
       }}
       {...(props as React.ComponentProps<typeof CollapsiblePrimitive.Panel>)}

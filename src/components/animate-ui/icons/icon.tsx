@@ -3,8 +3,7 @@
 import { cn } from '@const/lib/utils';
 import { useIsInView } from '@ui/hooks/useIsInView';
 import {
-  type HTMLMotionProps,
-  motion,
+  type HTMLMotionProps, m,
   type SVGMotionProps,
   type UseInViewOptions,
   useAnimation,
@@ -405,7 +404,7 @@ function AnimateIcon({
       {children}
     </Slot>
   ) : (
-    <motion.span
+    <m.span
       ref={inViewRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -414,7 +413,7 @@ function AnimateIcon({
       {...props}
     >
       {children}
-    </motion.span>
+    </m.span>
   );
 
   return (

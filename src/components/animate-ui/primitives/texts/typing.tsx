@@ -1,7 +1,7 @@
 'use client';
 
 import { type UseIsInViewOptions, useIsInView } from '@ui/hooks/useIsInView';
-import { type HTMLMotionProps, motion } from 'motion/react';
+import { type HTMLMotionProps, m } from 'motion/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getStrictContext } from 'src/lib/get-strict-context';
 
@@ -125,7 +125,7 @@ function TypingText({
   return (
     <TypingTextProvider value={{ isTyping, setIsTyping }}>
       <span ref={localRef} data-slot='typing-text' {...props}>
-        <motion.span>{displayedText}</motion.span>
+        <m.span>{displayedText}</m.span>
         {children}
       </span>
     </TypingTextProvider>
@@ -138,7 +138,7 @@ function TypingTextCursor({ style, variants, ...props }: TypingTextCursorProps) 
   const { isTyping } = useTypingText();
 
   return (
-    <motion.span
+    <m.span
       data-slot='typing-text-cursor'
       variants={{
         blinking: {

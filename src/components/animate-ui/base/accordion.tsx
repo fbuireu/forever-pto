@@ -2,7 +2,7 @@
 
 import { Accordion as AccordionPrimitive } from '@base-ui/react/accordion';
 import { cn } from '@const/lib/utils';
-import { AnimatePresence, type HTMLMotionProps, motion, type Transition } from 'motion/react';
+import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
 import { createContext, use, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { ChevronDown } from '../icons/chevron-down';
 import { AnimateIcon } from '../icons/icon';
@@ -100,13 +100,13 @@ function AccordionTrigger({
           {children}
 
           {chevron && (
-            <motion.div
+            <m.div
               data-slot='accordion-trigger-chevron'
               animate={{ rotate: isOpen ? 180 : 0 }}
               transition={transition}
             >
               <ChevronDown className='size-5 shrink-0' />
-            </motion.div>
+            </m.div>
           )}
         </AccordionPrimitive.Trigger>
       </AnimateIcon>
@@ -135,7 +135,7 @@ function AccordionPanel({
           hidden={false}
           keepMounted
           render={
-            <motion.div
+            <m.div
               key='accordion-panel'
               data-slot='accordion-panel'
               initial={{ height: 0, opacity: 0, '--mask-stop': '0%' }}
@@ -150,7 +150,7 @@ function AccordionPanel({
               {...motionProps}
             >
               <div className={cn('pb-4 pt-0 text-sm', className)}>{children}</div>
-            </motion.div>
+            </m.div>
           }
           {...props}
         />

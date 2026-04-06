@@ -52,11 +52,11 @@ export const Combobox = ({
         <AnimateIcon animateOnHover asChild>
           <Button
             variant='outline'
-            role='combobox'
             aria-expanded={open}
-            aria-controls='combobox-listbox'
+            aria-haspopup='listbox'
             id={id}
             disabled={disabled}
+            aria-disabled={disabled ?? false}
             className={cn('w-[200px] justify-between', className)}
           >
             {selectedOption ? (

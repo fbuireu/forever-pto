@@ -2,7 +2,7 @@
 
 import { cn } from '@const/lib/utils';
 import { type LucideIcon, MousePointer2 } from 'lucide-react';
-import { motion, type SVGMotionProps, type Transition, type Variants } from 'motion/react';
+import { m, type SVGMotionProps, type Transition, type Variants } from 'motion/react';
 import * as React from 'react';
 
 type RadialNavProps = {
@@ -135,7 +135,7 @@ function MenuButton({
   });
 
   return (
-    <motion.button
+    <m.button
       {...BUTTON_MOTION_CONFIG}
       initial={false}
       animate={isActive ? 'hover' : 'rest'}
@@ -165,10 +165,10 @@ function MenuButton({
         }}
         {...('animateOnHover' in Icon ? { animateOnHover: true } : {})}
       />
-      <motion.span variants={LABEL_VARIANTS} transition={LABEL_TRANSITION} className='invisible text-sm w-0'>
+      <m.span variants={LABEL_VARIANTS} transition={LABEL_TRANSITION} className='invisible text-sm w-0'>
         {label}
-      </motion.span>
-    </motion.button>
+      </m.span>
+    </m.button>
   );
 }
 
@@ -200,7 +200,7 @@ function RadialNav({ size = 180, items, menuButtonConfig, defaultActiveId, onAct
       role='menu'
       aria-label='Radial navigation'
     >
-      <motion.div
+      <m.div
         initial={false}
         className={cn(
           'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
@@ -212,7 +212,7 @@ function RadialNav({ size = 180, items, menuButtonConfig, defaultActiveId, onAct
         aria-hidden='true'
       >
         <MousePointer2 className='size-5 text-current' />
-      </motion.div>
+      </m.div>
       {items.map((item) => {
         const { id, angle } = item;
         const { x, y } = getPolarCoordinates(angle, orbitRadius);

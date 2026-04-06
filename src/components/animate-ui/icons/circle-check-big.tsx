@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, type Variants } from 'motion/react';
+import { m, type Variants } from 'motion/react';
 import { getVariants, type IconProps, IconWrapper, useAnimateIconContext } from './icon';
 
 type CircleCheckBigProps = IconProps<keyof typeof animations>;
@@ -32,7 +32,7 @@ function IconComponent({ size, ...props }: CircleCheckBigProps) {
   const variants = getVariants(animations);
 
   return (
-    <motion.svg
+    <m.svg
       xmlns='http://www.w3.org/2000/svg'
       width={size}
       height={size}
@@ -44,9 +44,9 @@ function IconComponent({ size, ...props }: CircleCheckBigProps) {
       strokeLinejoin='round'
       {...props}
     >
-      <motion.path d='M21.801 10A10 10 0 1 1 17 3.335' variants={variants.path1} initial='initial' animate={controls} />
-      <motion.path d='m9 11 3 3L22 4' variants={variants.path2} initial='initial' animate={controls} />
-    </motion.svg>
+      <m.path d='M21.801 10A10 10 0 1 1 17 3.335' variants={variants.path1} initial='initial' animate={controls} />
+      <m.path d='m9 11 3 3L22 4' variants={variants.path2} initial='initial' animate={controls} />
+    </m.svg>
   );
 }
 

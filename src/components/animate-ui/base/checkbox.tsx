@@ -2,7 +2,7 @@
 
 import { Checkbox as CheckboxPrimitive } from '@base-ui/react/checkbox';
 import { cn } from '@const/lib/utils';
-import { type HTMLMotionProps, motion } from 'motion/react';
+import { type HTMLMotionProps, m } from 'motion/react';
 import { useCallback, useEffect, useState } from 'react';
 
 type CheckboxProps = Omit<React.ComponentProps<typeof CheckboxPrimitive.Root>, 'render'> & {
@@ -34,14 +34,14 @@ function Checkbox({ className, onCheckedChange, motionProps, ...props }: Checkbo
       )}
       {...props}
       onCheckedChange={handleCheckedChange}
-      render={<motion.button whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.05 }} {...motionProps} />}
+      render={<m.button whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.05 }} {...motionProps} />}
     >
       <CheckboxPrimitive.Indicator
         keepMounted
         data-slot='checkbox-indicator'
         className='flex items-center justify-center text-current transition-none'
       >
-        <motion.svg
+        <m.svg
           xmlns='http://www.w3.org/2000/svg'
           fill='none'
           viewBox='0 0 24 24'
@@ -51,7 +51,7 @@ function Checkbox({ className, onCheckedChange, motionProps, ...props }: Checkbo
           initial='unchecked'
           animate={isChecked ? 'checked' : 'unchecked'}
         >
-          <motion.path
+          <m.path
             strokeLinecap='round'
             strokeLinejoin='round'
             d='M4.5 12.75l6 6 9-13.5'
@@ -73,7 +73,7 @@ function Checkbox({ className, onCheckedChange, motionProps, ...props }: Checkbo
               },
             }}
           />
-        </motion.svg>
+        </m.svg>
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   );

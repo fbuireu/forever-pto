@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@const/lib/utils';
-import { AnimatePresence, type HTMLMotionProps, motion, type Transition } from 'motion/react';
+import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
 import { useEffect, useState } from 'react';
 
 type RotatingTextProps = {
@@ -37,7 +37,7 @@ function RotatingText({
   return (
     <div className={cn('overflow-hidden py-1', containerClassName)}>
       <AnimatePresence mode='wait'>
-        <motion.div
+        <m.div
           key={currentText}
           transition={transition}
           initial={{ opacity: 0, y: -y }}
@@ -46,7 +46,7 @@ function RotatingText({
           {...props}
         >
           {currentText}
-        </motion.div>
+        </m.div>
       </AnimatePresence>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { cn } from '@const/lib/utils';
 import type { Transition } from 'motion/react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m } from 'motion/react';
 import {
   Children,
   cloneElement,
@@ -214,7 +214,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
           >
             <AnimatePresence initial={false}>
               {boundsState && (
-                <motion.div
+                <m.div
                   data-slot='motion-highlight'
                   animate={{
                     top: boundsState.top,
@@ -474,7 +474,7 @@ function MotionHighlightItem({
         <>
           <AnimatePresence initial={false}>
             {isActive && !isDisabled && (
-              <motion.div
+              <m.div
                 layoutId={`transition-background-${contextId}`}
                 data-slot='motion-highlight'
                 className={cn('absolute inset-0 bg-muted z-0 rounded-md', contextClassName, activeClassName)}
@@ -523,7 +523,7 @@ function MotionHighlightItem({
       {mode === 'children' && (
         <AnimatePresence initial={false}>
           {isActive && !isDisabled && (
-            <motion.div
+            <m.div
               layoutId={`transition-background-${contextId}`}
               data-slot='motion-highlight'
               className={cn('absolute inset-0 bg-muted z-0 rounded-md', contextClassName, activeClassName)}

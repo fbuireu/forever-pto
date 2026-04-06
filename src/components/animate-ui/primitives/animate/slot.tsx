@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@const/lib/utils';
-import { type HTMLMotionProps, isMotionComponent, motion } from 'motion/react';
+import { type HTMLMotionProps, isMotionComponent, m } from 'motion/react';
 import * as React from 'react';
 
 type AnyProps = Record<string, unknown>;
@@ -54,7 +54,7 @@ function Slot<T extends HTMLElement = HTMLElement>({ children, ref, ...props }: 
     typeof children.type === 'object' && children.type !== null && isMotionComponent(children.type);
 
   const Base = React.useMemo(
-    () => (isAlreadyMotion ? (children.type as React.ElementType) : motion.create(children.type as React.ElementType)),
+    () => (isAlreadyMotion ? (children.type as React.ElementType) : m.create(children.type as React.ElementType)),
     [isAlreadyMotion, children.type]
   );
 

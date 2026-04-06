@@ -2,7 +2,7 @@
 
 import { cn } from '@const/lib/utils';
 import { Circle } from 'lucide-react';
-import { AnimatePresence, type HTMLMotionProps, motion, type Transition } from 'motion/react';
+import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
 import { Menu as DropdownMenuPrimitive } from '@base-ui/react/menu';
 import * as React from 'react';
 import { createContext, use, useCallback, useEffect, useMemo, useState } from 'react';
@@ -120,7 +120,7 @@ function DropdownMenuSubTrigger({ className, children, inset, disabled, ...props
         {...(props as React.ComponentProps<typeof DropdownMenuPrimitive.SubmenuTrigger>)}
         disabled={disabled}
         render={
-          <motion.div
+          <m.div
             data-slot='dropdown-menu-sub-trigger'
             data-inset={inset}
             data-disabled={disabled}
@@ -181,7 +181,7 @@ function DropdownMenuContent({
           <DropdownMenuPrimitive.Positioner sideOffset={sideOffset} align={align}>
             <DropdownMenuPrimitive.Popup
               render={
-                <motion.div
+                <m.div
                   key='dropdown-menu-content'
                   data-slot='dropdown-menu-content'
                   className={cn(
@@ -240,7 +240,7 @@ function DropdownMenuItem({
         {...(props as React.ComponentProps<typeof DropdownMenuPrimitive.Item>)}
         disabled={disabled}
         render={
-          <motion.div
+          <m.div
             data-slot='dropdown-menu-item'
             data-inset={inset}
             data-variant={variant}
@@ -277,7 +277,7 @@ function DropdownMenuCheckboxItem({
         checked={checked}
         disabled={disabled}
         render={
-          <motion.div
+          <m.div
             data-slot='dropdown-menu-checkbox-item'
             data-disabled={disabled}
             whileTap={{ scale: 0.95 }}
@@ -309,7 +309,7 @@ function DropdownMenuRadioItem({ className, children, disabled, ...props }: Drop
         {...(props as React.ComponentProps<typeof DropdownMenuPrimitive.RadioItem>)}
         disabled={disabled}
         render={
-          <motion.div
+          <m.div
             data-slot='dropdown-menu-radio-item'
             data-disabled={disabled}
             whileTap={{ scale: 0.95 }}

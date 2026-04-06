@@ -1,7 +1,7 @@
 'use client';
 
 import { Slot } from '@const/lib/slot';
-import { type HTMLMotionProps, motion, type Transition } from 'motion/react';
+import { type HTMLMotionProps, m, type Transition } from 'motion/react';
 import {
   Children,
   isValidElement,
@@ -164,7 +164,7 @@ function TabsTrigger({ ref, value, asChild = false, ...props }: TabsTriggerProps
     return <Slot {...commonProps} {...(slotProps as React.ComponentPropsWithRef<'button'>)} />;
   }
 
-  return <motion.button {...commonProps} {...props} />;
+  return <m.button {...commonProps} {...props} />;
 }
 
 type TabsContentsProps = HTMLMotionProps<'div'> & {
@@ -254,7 +254,7 @@ function TabsContents({
   }, [activeIndex, height, measure]);
 
   return (
-    <motion.div
+    <m.div
       ref={containerRef}
       data-slot='tabs-contents'
       style={{ overflow: 'hidden' }}
@@ -262,7 +262,7 @@ function TabsContents({
       transition={transition}
       {...props}
     >
-      <motion.div className='flex -mx-2' animate={{ x: `${activeIndex * -100}%` }} transition={transition}>
+      <m.div className='flex -mx-2' animate={{ x: `${activeIndex * -100}%` }} transition={transition}>
         {childrenArray.map((child, index) => (
           <div
             key={String(child)}
@@ -274,8 +274,8 @@ function TabsContents({
             {child}
           </div>
         ))}
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }
 
@@ -309,7 +309,7 @@ function TabsContent({ value, style, asChild = false, ...props }: TabsContentPro
     return <Slot {...commonProps} {...(slotProps as React.ComponentPropsWithRef<'div'>)} />;
   }
 
-  return <motion.div {...commonProps} {...motionProps} {...props} />;
+  return <m.div {...commonProps} {...motionProps} {...props} />;
 }
 
 export {

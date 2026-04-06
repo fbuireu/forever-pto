@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, type Variants } from 'motion/react';
+import { m, type Variants } from 'motion/react';
 import { getVariants, type IconProps, IconWrapper, useAnimateIconContext } from './icon';
 
 type ChevronLeftProps = IconProps<keyof typeof animations>;
@@ -36,7 +36,7 @@ function IconComponent({ size, ...props }: ChevronLeftProps) {
   const variants = getVariants(animations);
 
   return (
-    <motion.svg
+    <m.svg
       xmlns='http://www.w3.org/2000/svg'
       width={size}
       height={size}
@@ -48,8 +48,8 @@ function IconComponent({ size, ...props }: ChevronLeftProps) {
       strokeLinejoin='round'
       {...props}
     >
-      <motion.path d='m15 18-6-6 6-6' variants={variants.path} initial='initial' animate={controls} />
-    </motion.svg>
+      <m.path d='m15 18-6-6 6-6' variants={variants.path} initial='initial' animate={controls} />
+    </m.svg>
   );
 }
 

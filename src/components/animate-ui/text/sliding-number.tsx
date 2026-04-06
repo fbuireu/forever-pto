@@ -2,8 +2,7 @@
 
 import { cn } from '@const/lib/utils';
 import {
-  type MotionValue,
-  motion,
+  type MotionValue, m,
   type SpringOptions,
   type UseInViewOptions,
   useInView,
@@ -35,14 +34,14 @@ function SlidingNumberDisplay({ motionValue, number, height, transition }: Slidi
   }
 
   return (
-    <motion.span
+    <m.span
       data-slot='sliding-number-display'
       style={{ y }}
       className='absolute inset-0 flex items-center justify-center'
       transition={{ ...transition, type: 'spring' }}
     >
       {number}
-    </motion.span>
+    </m.span>
   );
 }
 

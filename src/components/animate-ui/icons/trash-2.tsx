@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, type Variants } from 'motion/react';
+import { m, type Variants } from 'motion/react';
 import { getVariants, type IconProps, IconWrapper, useAnimateIconContext } from './icon';
 
 type Trash2Props = IconProps<keyof typeof animations>;
@@ -67,7 +67,7 @@ function IconComponent({ size, ...props }: Trash2Props) {
   const variants = getVariants(animations);
 
   return (
-    <motion.svg
+    <m.svg
       xmlns='http://www.w3.org/2000/svg'
       width={size}
       height={size}
@@ -79,24 +79,24 @@ function IconComponent({ size, ...props }: Trash2Props) {
       strokeLinejoin='round'
       {...props}
     >
-      <motion.g variants={variants.group} initial='initial' animate={controls}>
-        <motion.path
+      <m.g variants={variants.group} initial='initial' animate={controls}>
+        <m.path
           d='M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2'
           variants={variants.path1}
           initial='initial'
           animate={controls}
         />
-        <motion.path d='M3 6h18' variants={variants.path2} initial='initial' animate={controls} />
-      </motion.g>
-      <motion.path
+        <m.path d='M3 6h18' variants={variants.path2} initial='initial' animate={controls} />
+      </m.g>
+      <m.path
         d='M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6'
         variants={variants.path3}
         initial='initial'
         animate={controls}
       />
-      <motion.line x1={10} x2={10} y1={11} y2={17} variants={variants.line1} initial='initial' animate={controls} />
-      <motion.line x1={14} x2={14} y1={11} y2={17} variants={variants.line2} initial='initial' animate={controls} />
-    </motion.svg>
+      <m.line x1={10} x2={10} y1={11} y2={17} variants={variants.line1} initial='initial' animate={controls} />
+      <m.line x1={14} x2={14} y1={11} y2={17} variants={variants.line2} initial='initial' animate={controls} />
+    </m.svg>
   );
 }
 

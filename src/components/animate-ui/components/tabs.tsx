@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@const/lib/utils';
-import { type HTMLMotionProps, motion, type Transition } from 'motion/react';
+import { type HTMLMotionProps, m, type Transition } from 'motion/react';
 import {
   Children,
   createContext,
@@ -143,7 +143,7 @@ function TabsList({
         role='tablist'
         data-slot='tabs-list'
         className={cn(
-          'bg-muted text-muted-foreground inline-flex h-10 w-fit items-center justify-center rounded-lg p-[4px]',
+          'bg-muted text-slate-600 dark:text-slate-400 inline-flex h-10 w-fit items-center justify-center rounded-lg p-[4px]',
           className
         )}
         {...props}
@@ -172,7 +172,7 @@ function TabsTrigger({ ref, value, children, className, ...props }: TabsTriggerP
 
   return (
     <MotionHighlightItem value={value} className='size-full'>
-      <motion.button
+      <m.button
         ref={localRef}
         data-slot='tabs-trigger'
         role='tab'
@@ -186,7 +186,7 @@ function TabsTrigger({ ref, value, children, className, ...props }: TabsTriggerP
         {...props}
       >
         {children}
-      </motion.button>
+      </m.button>
     </MotionHighlightItem>
   );
 }
@@ -221,13 +221,13 @@ function TabsContents({
 
   return (
     <div data-slot='tabs-contents' className={cn('overflow-hidden', className)} {...props}>
-      <motion.div className='flex -mx-2' animate={{ x: `${activeIndex * -100}%` }} transition={transition}>
+      <m.div className='flex -mx-2' animate={{ x: `${activeIndex * -100}%` }} transition={transition}>
         {childrenArray.map((child, index) => (
           <div key={index} className='w-full shrink-0 px-2'>
             {child}
           </div>
         ))}
-      </motion.div>
+      </m.div>
     </div>
   );
 }
@@ -241,7 +241,7 @@ function TabsContent({ children, value, className, ...props }: TabsContentProps)
   const { activeValue } = useTabs();
   const isActive = activeValue === value;
   return (
-    <motion.div
+    <m.div
       role='tabpanel'
       data-slot='tabs-content'
       className={cn('overflow-hidden', className)}
@@ -252,7 +252,7 @@ function TabsContent({ children, value, className, ...props }: TabsContentProps)
       {...props}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 

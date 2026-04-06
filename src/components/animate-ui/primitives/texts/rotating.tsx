@@ -1,7 +1,7 @@
 'use client';
 
 import { type UseIsInViewOptions, useIsInView } from '@ui/hooks/useIsInView';
-import { AnimatePresence, type HTMLMotionProps, motion } from 'motion/react';
+import { AnimatePresence, type HTMLMotionProps, m } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
 import { getStrictContext } from 'src/lib/get-strict-context';
 
@@ -84,7 +84,7 @@ function RotatingText({ transition = { duration: 0.3, ease: 'easeOut' }, ...prop
   return (
     <AnimatePresence mode='wait'>
       {isInView && (
-        <motion.div
+        <m.div
           key={currentText}
           transition={transition}
           initial={{ opacity: 0, y: -y }}
@@ -93,7 +93,7 @@ function RotatingText({ transition = { duration: 0.3, ease: 'easeOut' }, ...prop
           {...props}
         >
           {currentText}
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

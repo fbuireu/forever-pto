@@ -3,7 +3,7 @@
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { BarChart3, CalendarDays, Sparkles, TrendingUp } from 'lucide-react';
-import { motion, type Transition, type Variants } from 'motion/react';
+import { m, type Transition, type Variants } from 'motion/react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useState } from 'react';
 import { Button } from '../components/buttons/button';
@@ -116,7 +116,7 @@ export const AlternativesManager = ({
             <span className='text-muted-foreground'>/ {totalOptions}</span>
           </div>
           {isMainSuggestion && (
-            <motion.span
+            <m.span
               variants={BADGE_VARIANTS}
               initial='initial'
               animate='animate'
@@ -124,7 +124,7 @@ export const AlternativesManager = ({
             >
               <Sparkles size={8} />
               {t('recommended')}
-            </motion.span>
+            </m.span>
           )}
         </div>
         <AnimateIcon animateOnHover={currentIndex !== totalOptions - 1}>
@@ -141,8 +141,8 @@ export const AlternativesManager = ({
 
       <div className='hidden lg:block mx-3 h-6 w-px bg-border rounded-full' />
 
-      <motion.div layout layoutRoot className='flex flex-nowrap space-x-2'>
-        <motion.button
+      <m.div layout layoutRoot className='flex flex-nowrap space-x-2'>
+        <m.button
           {...STAT_CARD_MOTION_CONFIG}
           className='flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-green-100/60 px-2.5 py-2 dark:bg-green-900/30'
           aria-label={t('totalDaysOff')}
@@ -158,16 +158,16 @@ export const AlternativesManager = ({
               <SlidingNumber number={gainedDays} />)
             </span>
           </div>
-          <motion.span
+          <m.span
             variants={LABEL_VARIANTS}
             transition={LABEL_TRANSITION}
             className='invisible text-sm text-green-600 dark:text-green-400'
           >
             {t('totalOff')}
-          </motion.span>
-        </motion.button>
+          </m.span>
+        </m.button>
 
-        <motion.button
+        <m.button
           {...STAT_CARD_MOTION_CONFIG}
           className='flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-purple-100/60 px-2.5 py-2 dark:bg-purple-900/30'
           aria-label={t('efficiency')}
@@ -191,17 +191,17 @@ export const AlternativesManager = ({
               </span>
             )}
           </div>
-          <motion.span
+          <m.span
             variants={LABEL_VARIANTS}
             transition={LABEL_TRANSITION}
             className='invisible text-sm text-purple-600 dark:text-purple-400'
           >
             {t('efficiency')}
-          </motion.span>
-        </motion.button>
+          </m.span>
+        </m.button>
 
         {!isMainSuggestion && (
-          <motion.button
+          <m.button
             {...STAT_CARD_MOTION_CONFIG}
             className='flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-neutral-100/60 px-2.5 py-2 dark:bg-neutral-800/30'
             aria-label={t('comparison')}
@@ -226,16 +226,16 @@ export const AlternativesManager = ({
                 %
               </span>
             </div>
-            <motion.span
+            <m.span
               variants={LABEL_VARIANTS}
               transition={LABEL_TRANSITION}
               className='invisible text-sm text-neutral-600 dark:text-neutral-400'
             >
               {t('vsMain')}
-            </motion.span>
-          </motion.button>
+            </m.span>
+          </m.button>
         )}
-      </motion.div>
+      </m.div>
       <Button
         disabled={currentSelectionIndex === currentIndex}
         className='flex grow h-10 text-sm cursor-pointer items-center justify-center rounded-lg px-3 py-2 font-medium transition-colors duration-300'
