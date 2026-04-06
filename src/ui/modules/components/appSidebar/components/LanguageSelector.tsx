@@ -43,14 +43,16 @@ export const LanguageSelector = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant='outline'
-          size='icon'
-          className='w-full !h-11 focus-visible:ring-1'
-          aria-label={t('selectLanguage', { current: currentLanguage?.label ?? locale })}
-        >
-          <span className='capitalize'>{displayText}</span>
-        </Button>
+        <AnimateIcon animateOnHover>
+          <Button
+            variant='outline'
+            size='icon'
+            className='w-full !h-11 focus-visible:ring-1'
+            aria-label={t('selectLanguage', { current: currentLanguage?.label ?? locale })}
+          >
+            <span className='capitalize'>{displayText}</span>
+          </Button>
+        </AnimateIcon>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         {languages.map((language) => (

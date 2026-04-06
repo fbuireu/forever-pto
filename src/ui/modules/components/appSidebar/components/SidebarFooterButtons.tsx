@@ -9,20 +9,12 @@ export const SidebarFooterButtons = () => {
   const { state } = useSidebar();
   const sidebarCollapsed = state === 'collapsed';
   return (
-    <SidebarFooter>
+    <SidebarFooter className='group-data-[collapsible=icon]:px-0'>
       <SidebarMenu className={cn('gap-2', sidebarCollapsed ? 'flex-col' : 'flex-row items-center')}>
-        <SidebarMenuItem
-          className={cn(
-            'transition-[width,flex-grow] duration-300 ease-in-out size-11',
-            sidebarCollapsed ? 'w-full' : 'grow',
-          )}>
+        <SidebarMenuItem className={cn(sidebarCollapsed ? 'w-full' : 'grow')}>
           <LanguageSelector />
         </SidebarMenuItem>
-        <SidebarMenuItem
-          className={cn(
-            sidebarCollapsed ? 'w-full' : 'min-w-12',
-            'transition-[width,flex-grow] duration-300 ease-in-out size-11',
-          )}>
+        <SidebarMenuItem className={cn(sidebarCollapsed ? 'w-full' : 'min-w-12')}>
           <ThemeSelector />
         </SidebarMenuItem>
       </SidebarMenu>
