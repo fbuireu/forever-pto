@@ -169,3 +169,4 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
     </SidebarProvider>
   );
 };
+
