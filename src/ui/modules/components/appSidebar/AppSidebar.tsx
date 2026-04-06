@@ -163,7 +163,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
         <SidebarRail />
       </Sidebar>
       <SidebarInset id='main-content' tabIndex={-1} className='outline-none'>
-        <SidebarTrigger className={'cursor-pointer size-11 fixed m-3 bg-background z-51'} />
+        <SidebarTrigger className={'cursor-pointer size-8 fixed m-3 bg-background z-51'} />
         {children}
       </SidebarInset>
     </SidebarProvider>
