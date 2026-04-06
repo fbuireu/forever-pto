@@ -69,10 +69,7 @@ function DialogBackdrop({ transition = { duration: 0.2, ease: 'easeInOut' }, ...
 type DialogFlipDirection = 'top' | 'bottom' | 'left' | 'right';
 type DialogPopupProps = Omit<React.ComponentProps<typeof DialogPrimitive.Popup>, 'render'> & HTMLMotionProps<'div'> & { from?: DialogFlipDirection };
 
-function DialogPopup({ from = 'top', initialFocus, finalFocus, transition = { type: 'spring', stiffness: 150, damping: 25 }, ...props }: DialogPopupProps) {
-  const initialRotation = from === 'bottom' || from === 'left' ? '20deg' : '-20deg';
-  const isVertical = from === 'top' || from === 'bottom';
-  const rotateAxis = isVertical ? 'rotateX' : 'rotateY';
+function DialogPopup({ from = 'top', initialFocus, finalFocus, transition = { duration: 0.2, ease: 'easeInOut' }, ...props }: DialogPopupProps) {
   return (
     <DialogPrimitive.Popup
       initialFocus={initialFocus}
@@ -81,9 +78,9 @@ function DialogPopup({ from = 'top', initialFocus, finalFocus, transition = { ty
         <m.div
           key="dialog-popup"
           data-slot="dialog-popup"
-          initial={{ opacity: 0, filter: 'blur(4px)', transform: `perspective(500px) ${rotateAxis}(${initialRotation}) scale(0.8)` }}
-          animate={{ opacity: 1, filter: 'blur(0px)', transform: `perspective(500px) ${rotateAxis}(0deg) scale(1)` }}
-          exit={{ opacity: 0, filter: 'blur(4px)', transform: `perspective(500px) ${rotateAxis}(${initialRotation}) scale(0.8)` }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
           transition={transition}
           {...props}
         />
