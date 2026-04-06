@@ -142,13 +142,13 @@ function DropdownMenuSubTrigger({ className, children, inset, disabled, ...props
 
 type DropdownMenuSubContentProps = Omit<React.ComponentProps<typeof DropdownMenuPrimitive.Popup>, 'render'>;
 
-function DropdownMenuSubContent({ className, ...props }: DropdownMenuSubContentProps) {
+function DropdownMenuSubContent({ className, ...props }: Readonly<DropdownMenuSubContentProps>) {
   return (
-    <DropdownMenuPrimitive.Positioner className="z-50">
+    <DropdownMenuPrimitive.Positioner positionMethod='fixed'>
       <DropdownMenuPrimitive.Popup
         data-slot='dropdown-menu-sub-content'
         className={cn(
-          'z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg',
+          'z-50 min-w-32 overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg',
           className
         )}
         {...props}
@@ -178,14 +178,14 @@ function DropdownMenuContent({
     <AnimatePresence>
       {isOpen && (
         <DropdownMenuPrimitive.Portal data-slot='dropdown-menu-portal'>
-          <DropdownMenuPrimitive.Positioner sideOffset={sideOffset} align={align} className="z-50">
+          <DropdownMenuPrimitive.Positioner sideOffset={sideOffset} align={align} positionMethod='fixed'>
             <DropdownMenuPrimitive.Popup
               render={
                 <m.div
                   key='dropdown-menu-content'
                   data-slot='dropdown-menu-content'
                   className={cn(
-                    'z-50 max-h-(--available-height) min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md origin-(--transform-origin)',
+                    'z-50 max-h-(--available-height) min-w-32 overflow-y-auto overflow-x-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md origin-(--transform-origin)',
                     className
                   )}
                   initial={{ opacity: 0, scale: 0.95 }}
