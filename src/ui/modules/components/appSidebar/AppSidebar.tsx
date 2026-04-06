@@ -71,9 +71,9 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                   <AnimateIcon animateOnHover>
                     <CollapsibleTrigger asChild className='cursor-pointer'>
                       <SidebarMenuButton variant='outline' tooltip={t('filters')}>
-                        <Settings className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
-                        <span className='data-[collapsed=true]:hidden'>{t('filters')}</span>
-                        <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
+                        <Settings className='h-5 w-5 shrink-0' />
+                        <span className='group-data-[collapsible=icon]:hidden'>{t('filters')}</span>
+                        <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 group-data-[collapsible=icon]:hidden' />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                   </AnimateIcon>
@@ -134,9 +134,9 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                   <AnimateIcon animateOnHover>
                     <CollapsibleTrigger asChild className='cursor-pointer'>
                       <SidebarMenuButton variant='outline' tooltip={t('tools')}>
-                        <Calculator className='h-5 w-5 shrink-0 data-[collapsed=true]:mr-0 data-[collapsed=false]:mr-2' />
-                        <span className='data-[collapsed=true]:hidden'>{t('calculators')}</span>
-                        <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 data-[collapsed=true]:hidden' />
+                        <Calculator className='h-5 w-5 shrink-0' />
+                        <span className='group-data-[collapsible=icon]:hidden'>{t('calculators')}</span>
+                        <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 group-data-[collapsible=icon]:hidden' />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                   </AnimateIcon>
@@ -163,7 +163,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
         <SidebarRail />
       </Sidebar>
       <SidebarInset id='main-content' tabIndex={-1} className='outline-none'>
-        <SidebarTrigger className={'cursor-pointer size-8 fixed m-3 bg-background z-51'} />
+        <SidebarTrigger className={'cursor-pointer size-11 fixed m-3 bg-background z-51'} />
         {children}
       </SidebarInset>
     </SidebarProvider>

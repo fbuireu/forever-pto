@@ -46,7 +46,7 @@ export const LanguageSelector = () => {
         <Button
           variant='outline'
           size='icon'
-          className='w-full focus-visible:ring-1'
+          className='w-full h-11 focus-visible:ring-1'
           aria-label={t('selectLanguage', { current: currentLanguage?.label ?? locale })}
         >
           <span className='capitalize'>{displayText}</span>
