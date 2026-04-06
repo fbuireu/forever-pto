@@ -13,8 +13,8 @@ export const SidebarFooterButtons = () => {
       <SidebarMenu className={cn('gap-2', sidebarCollapsed ? 'flex-col' : 'flex-row items-center')}>
         <SidebarMenuItem
           className={cn(
-            sidebarCollapsed ? 'w-full' : 'min-w-12',
             'transition-[width,flex-grow] duration-300 ease-in-out size-11',
+            sidebarCollapsed ? 'w-full' : 'grow',
           )}>
           <LanguageSelector />
         </SidebarMenuItem>
