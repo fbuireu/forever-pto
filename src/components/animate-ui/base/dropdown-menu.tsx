@@ -144,7 +144,7 @@ type DropdownMenuSubContentProps = Omit<React.ComponentProps<typeof DropdownMenu
 
 function DropdownMenuSubContent({ className, ...props }: Readonly<DropdownMenuSubContentProps>) {
   return (
-    <DropdownMenuPrimitive.Positioner positionMethod='fixed'>
+    <DropdownMenuPrimitive.Positioner positionMethod='fixed' className='z-50'>
       <DropdownMenuPrimitive.Popup
         data-slot='dropdown-menu-sub-content'
         className={cn(
@@ -177,8 +177,8 @@ function DropdownMenuContent({
   return (
     <AnimatePresence>
       {isOpen && (
-        <DropdownMenuPrimitive.Portal data-slot='dropdown-menu-portal'>
-          <DropdownMenuPrimitive.Positioner sideOffset={sideOffset} align={align} positionMethod='fixed'>
+        <DropdownMenuPrimitive.Portal keepMounted data-slot='dropdown-menu-portal'>
+          <DropdownMenuPrimitive.Positioner sideOffset={sideOffset} align={align} positionMethod='fixed' className='z-50'>
             <DropdownMenuPrimitive.Popup
               render={
                 <m.div

@@ -39,7 +39,7 @@ type TooltipContentProps = TooltipPositionerPrimitiveProps & TooltipPopupPrimiti
 function TooltipContent({ className, sideOffset = 4, children, style, ...props }: TooltipContentProps) {
   return (
     <TooltipPortalPrimitive>
-      <TooltipPositionerPrimitive sideOffset={sideOffset} {...props}>
+      <TooltipPositionerPrimitive sideOffset={sideOffset} className='z-50' {...props}>
         <TooltipPopupPrimitive
           className={cn(
             'bg-primary text-primary-foreground w-fit origin-(--transform-origin) rounded-md px-3 py-1.5 text-xs text-balance',

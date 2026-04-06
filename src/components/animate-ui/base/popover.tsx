@@ -30,7 +30,7 @@ type PopoverContentProps = PopoverPositionerPrimitiveProps & PopoverPopupPrimiti
 function PopoverContent({ className, align = 'center', sideOffset = 4, initialFocus, finalFocus, style, children, ...props }: PopoverContentProps) {
   return (
     <PopoverPortalPrimitive>
-      <PopoverPositionerPrimitive align={align} sideOffset={sideOffset} {...props}>
+      <PopoverPositionerPrimitive align={align} sideOffset={sideOffset} className='z-50' {...props}>
         <PopoverPopupPrimitive
           initialFocus={initialFocus} finalFocus={finalFocus}
           className={cn('bg-popover text-popover-foreground w-72 rounded-md border p-4 shadow-md outline-hidden origin-(--transform-origin)', className)}
