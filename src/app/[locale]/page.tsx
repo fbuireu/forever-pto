@@ -48,6 +48,14 @@ export default Home;
 
 // todo: brutalist design
 // todo: improve responsive
+<<<<<<< Updated upstream
+=======
+// todo: https://effect.website/
+// todo: add boneyard skeleton
+// todo: add ubiquitous language
+// todo: feedback web-check-results.json
+// todo: migrate from tailwind to css modules
+>>>>>>> Stashed changes
 // todo: docs with mintlifyy
 // todo: share button with results?
 // todo: migrate temporal API when available in Node

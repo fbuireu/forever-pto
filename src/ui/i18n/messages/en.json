@@ -1010,14 +1010,6 @@
               "label": "Name:",
               "value": "Ferran Buireu"
             },
-            "taxId": {
-              "label": "Tax ID:",
-              "value": "47805898V"
-            },
-            "address": {
-              "label": "Address:",
-              "value": "Carrer de Loreto 36, 5B, 08029, Barcelona, Spain"
-            },
             "email": {
               "label": "Email:",
               "value": "{supportEmail}"
@@ -1241,10 +1233,6 @@
               "label": "Website:",
               "value": "{siteUrl}"
             },
-            "postalAddress": {
-              "label": "Postal Address:",
-              "value": "Ferran Buireu, Carrer de Loreto 36, 5B, 08029, Barcelona, Spain"
-            }
           },
           "responseTime": "We will respond to your inquiries within 30 days."
         }
@@ -1553,10 +1541,6 @@
               "label": "Website:",
               "value": "{siteUrl}"
             },
-            "postalAddress": {
-              "label": "Postal Address:",
-              "value": "Ferran Buireu, Carrer de Loreto 36, 5B, 08029, Barcelona, Spain"
-            }
           },
           "responseTime": "We will respond to your inquiries within 5 business days."
         }
@@ -1574,17 +1558,9 @@
               "label": "Owner:",
               "value": "Ferran Buireu"
             },
-            "taxId": {
-              "label": "Tax Identification Number (NIF):",
-              "value": "47805898V"
-            },
-            "address": {
-              "label": "Address:",
-              "value": "Carrer de Loreto 36, 5B, 08029, Barcelona, Spain"
-            },
             "email": {
               "label": "Email:",
-              "value": "contact@forever-pto.com"
+              "value": "{supportEmail}"
             },
             "website": {
               "label": "Website:",
@@ -1657,7 +1633,7 @@
           "items": {
             "email": {
               "label": "Email:",
-              "value": "contact@forever-pto.com"
+              "value": "{supportEmail}"
             }
           }
         }
