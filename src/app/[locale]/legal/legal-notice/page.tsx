@@ -34,7 +34,7 @@ export default async function LegalNoticePage({ params }: LegalNoticePageProps) 
           </li>
           <li>
             <strong>{t('sections.identification.items.email.label')}</strong>{' '}
-            {t('sections.identification.items.email.value')}
+            {t('sections.identification.items.email.value', { supportEmail: env.NEXT_PUBLIC_EMAIL_SELF })}
           </li>
           <li>
             <strong>{t('sections.identification.items.website.label')}</strong>{' '}
@@ -127,7 +127,7 @@ export default async function LegalNoticePage({ params }: LegalNoticePageProps) 
         <p>{t('sections.contact.description')}</p>
         <ul className='list-disc pl-6 mt-2 space-y-2'>
           <li>
-            <strong>{t('sections.contact.items.email.label')}</strong> {t('sections.contact.items.email.value')}
+            <strong>{t('sections.contact.items.email.label')}</strong> {t('sections.contact.items.email.value', { supportEmail: env.NEXT_PUBLIC_EMAIL_SELF })}
           </li>
         </ul>
       </section>
