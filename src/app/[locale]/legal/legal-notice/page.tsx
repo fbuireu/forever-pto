@@ -1,6 +1,5 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { Me } from '@ui/modules/components/core/me';
-import { Nif } from '@ui/modules/components/core/Nif';
 import { LegalLayout } from '@ui/modules/components/legal/LegalLayout';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
@@ -31,12 +30,6 @@ export default async function LegalNoticePage({ params }: LegalNoticePageProps) 
             <span className='inline-flex items-center gap-1'>
               <strong>{t('sections.identification.items.owner.label')}</strong>{' '}
               <Me ariaLabel={t('sections.identification.items.owner.label')} />
-            </span>
-          </li>
-          <li>
-            <span className='inline-flex items-center gap-1'>
-              <strong>{t('sections.identification.items.taxId.label')}</strong>{' '}
-              <Nif ariaLabel={t('sections.identification.items.taxId.label')} />
             </span>
           </li>
           <li>
