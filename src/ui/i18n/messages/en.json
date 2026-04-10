@@ -1232,7 +1232,7 @@
             "website": {
               "label": "Website:",
               "value": "{siteUrl}"
-            },
+            }
           },
           "responseTime": "We will respond to your inquiries within 30 days."
         }
@@ -1540,7 +1540,7 @@
             "website": {
               "label": "Website:",
               "value": "{siteUrl}"
-            },
+            }
           },
           "responseTime": "We will respond to your inquiries within 5 business days."
         }
