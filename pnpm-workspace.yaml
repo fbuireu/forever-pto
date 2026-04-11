@@ -1,13 +1,4 @@
 packages:
   - ./
-minimumReleaseAge: 1440
+minimumReleaseAge: 4320 #3 days
 ignoreScripts: true
-onlyBuiltDependencies:
-  - '@parcel/watcher'
-  - '@swc/core'
-  - '@tailwindcss/oxide'
-  - esbuild
-  - rclone.js
-  - sharp
-  - unrs-resolver
-  - workerd
