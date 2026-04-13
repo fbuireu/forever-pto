@@ -37,6 +37,7 @@ export interface CalculateSuggestionsPayload {
   maxAlternatives: number;
   manualDays: string[];
   excludedDays?: string[];
+  autoSuggestCount?: number;
 }
 
 export interface CalculateSuggestionsRequest {

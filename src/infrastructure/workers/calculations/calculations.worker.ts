@@ -22,6 +22,7 @@ self.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
     maxAlternatives,
     manualDays = [],
     excludedDays = [],
+    autoSuggestCount,
   } = payload;
 
   try {
@@ -43,8 +44,7 @@ self.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
       isInSelectedRange: true,
     }));
     const holidaysWithManual = [...holidays, ...manualPseudoHolidays, ...excludedPseudoHolidays];
-    const netFreed = Math.max(0, excludedDays.length - manualDays.length);
-    const effectivePtoDays = Math.max(0, ptoDays - manualDays.length - netFreed);
+    const effectivePtoDays = Math.max(0, autoSuggestCount ?? ptoDays - manualDays.length);
 
     if (effectivePtoDays <= 0 || holidaysWithManual.length === 0) {
       const response: WorkerResponse = {
