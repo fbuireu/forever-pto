@@ -73,7 +73,7 @@ export function useCalculationsWorker() {
           locale: params.locale,
           maxAlternatives,
           manualDays: manuallySelectedDays.map((d) => d.toISOString()),
-          removedDaysCount: useHolidaysStore.getState().removedSuggestedDays.length,
+          excludedDays: useHolidaysStore.getState().removedSuggestedDays.map((d) => d.toISOString()),
         },
       };
 

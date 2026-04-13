@@ -21,7 +21,7 @@ self.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
     locale,
     maxAlternatives,
     manualDays = [],
-    removedDaysCount = 0,
+    excludedDays = [],
   } = payload;
 
   try {
@@ -35,8 +35,15 @@ self.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
       variant: HolidayVariant.CUSTOM,
       isInSelectedRange: true,
     }));
-    const holidaysWithManual = [...holidays, ...manualPseudoHolidays];
-    const netFreed = Math.max(0, removedDaysCount - manualDays.length);
+    const excludedPseudoHolidays = excludedDays.map((isoDate, i) => ({
+      id: `excluded-${i}`,
+      date: new Date(isoDate),
+      name: 'Excluded day',
+      variant: HolidayVariant.CUSTOM,
+      isInSelectedRange: true,
+    }));
+    const holidaysWithManual = [...holidays, ...manualPseudoHolidays, ...excludedPseudoHolidays];
+    const netFreed = Math.max(0, excludedDays.length - manualDays.length);
     const effectivePtoDays = Math.max(0, ptoDays - manualDays.length - netFreed);
 
     if (effectivePtoDays <= 0 || holidaysWithManual.length === 0) {
