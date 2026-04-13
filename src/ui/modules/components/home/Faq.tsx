@@ -1,4 +1,5 @@
 import { Troubleshooting } from '@ui/modules/components/faq/Troubleshooting';
+import { FaqTabs } from '@ui/modules/components/faq/FaqTabs';
 import type { FaqData } from '@ui/modules/components/faq/types';
 import { getTranslations } from 'next-intl/server';
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from 'src/components/animate-ui/base/accordion';
@@ -95,33 +96,33 @@ export const Faq = async () => {
     },
   ];
 
+  const tabs = FAQ.map((section) => ({
+    id: section.id,
+    title: section.title,
+    content: (
+      <Accordion
+        multiple
+        className='w-full **:data-[slot="accordion-panel"]:data-open:overflow-visible **:data-[slot="accordion-panel"]:data-open:[mask:none!important] **:data-[slot="accordion-panel"]:data-open:mask-[none!important]'
+      >
+        {section.items.map((item) => (
+          <AccordionItem key={item.id} value={item.id} className='cursor-pointer'>
+            <AccordionTrigger className='text-left'>
+              <h3 className='font-normal text-base'>{item.question}</h3>
+            </AccordionTrigger>
+            <AccordionPanel className='text-muted-foreground'>{item.answer}</AccordionPanel>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    ),
+  }));
+
   return (
     <section
       aria-labelledby='faq-title'
       className='space-y-6 m-auto mt-8 max-w-4xl w-full scroll-mt-15 px-4 lg:px-0'
       id='faq'
     >
-      <h2 id='faq-title' className='text-3xl font-semibold'>
-        {t('title')}
-      </h2>
-      {FAQ.map((section) => (
-        <div key={section.id}>
-          <h3 className='text-2xl font-medium mb-4'>{section.title}</h3>
-          <Accordion
-            multiple
-            className='w-full **:data-[slot="accordion-panel"]:data-open:overflow-visible **:data-[slot="accordion-panel"]:data-open:[mask:none!important] **:data-[slot="accordion-panel"]:data-open:mask-[none!important]'
-          >
-            {section.items.map((item) => (
-              <AccordionItem key={item.id} value={item.id} className='cursor-pointer'>
-                <AccordionTrigger className='text-left'>
-                  <h4 className='font-normal text-base'>{item.question}</h4>
-                </AccordionTrigger>
-                <AccordionPanel className='text-muted-foreground'>{item.answer}</AccordionPanel>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
-      ))}
+      <FaqTabs tabs={tabs} title={t('title')} />
     </section>
   );
 };

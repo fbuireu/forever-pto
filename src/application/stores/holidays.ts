@@ -296,6 +296,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
             previewAlternativeSelection: suggestion,
             previewAlternativeIndex: 0,
             currentSelectionIndex: 0,
+            removedSuggestedDays: [],
           });
         },
 

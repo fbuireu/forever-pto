@@ -17,7 +17,24 @@ const withNextIntl = createNextIntlPlugin({
 
 const isProd = process.env.NODE_ENV === 'production';
 
-const SECURITY_HEADERS    = [
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com",
+  "font-src 'self'",
+  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://www.googletagmanager.com",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "object-src 'none'",
+].join('; ');
+
+const SECURITY_HEADERS = [
+  {
+    key: 'Content-Security-Policy',
+    value: CSP,
+  },
   {
     key: 'Strict-Transport-Security',
     value: 'max-age=31536000; includeSubDomains; preload',
@@ -29,6 +46,10 @@ const SECURITY_HEADERS    = [
   {
     key: 'X-Frame-Options',
     value: 'SAMEORIGIN',
+  },
+  {
+    key: 'X-XSS-Protection',
+    value: '1; mode=block',
   },
   {
     key: 'Referrer-Policy',
