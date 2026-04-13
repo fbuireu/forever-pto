@@ -21,15 +21,13 @@ self.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
     locale,
     maxAlternatives,
     manualDays = [],
+    removedDaysCount = 0,
   } = payload;
 
   try {
     const holidays = deserializeHolidays(rawHolidays);
     const months = deserializeMonths(rawMonths);
 
-    // Treat manually selected days as pseudo-holidays so the algorithm:
-    // 1. Excludes them from the available workday pool
-    // 2. Extends bridges through/adjacent to the manual block
     const manualPseudoHolidays = manualDays.map((isoDate, i) => ({
       id: `manual-${i}`,
       date: new Date(isoDate),
@@ -38,7 +36,8 @@ self.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
       isInSelectedRange: true,
     }));
     const holidaysWithManual = [...holidays, ...manualPseudoHolidays];
-    const effectivePtoDays = Math.max(0, ptoDays - manualDays.length);
+    const netFreed = Math.max(0, removedDaysCount - manualDays.length);
+    const effectivePtoDays = Math.max(0, ptoDays - manualDays.length - netFreed);
 
     if (effectivePtoDays <= 0 || holidaysWithManual.length === 0) {
       const response: WorkerResponse = {

@@ -35,7 +35,8 @@ export interface CalculateSuggestionsPayload {
   strategy: string;
   locale: string;
   maxAlternatives: number;
-  manualDays: string[]; // ISO[] — days already manually selected by the user
+  manualDays: string[];
+  removedDaysCount?: number;
 }
 
 export interface CalculateSuggestionsRequest {
