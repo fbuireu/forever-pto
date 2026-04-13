@@ -46,7 +46,6 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: bug manual days not counting down
 // todo: brutalist design
 // todo: improve responsive
 // todo: https://effect.website/
