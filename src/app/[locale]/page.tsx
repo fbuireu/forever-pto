@@ -49,9 +49,10 @@ export default Home;
 // todo: brutalist design
 // todo: improve responsive
 // todo: https://effect.website/
+// todo: https://csswizardry.com/2026/04/what-is-css-containment-and-how-can-i-use-it/
 // todo: add boneyard skeleton
 // todo: add ubiquitous language
-// todo: feedback web-check-results.json
+// todo: feedback web-check.xyz
 // todo: migrate from tailwind to css modules
 // todo: docs with mintlifyy
 // todo: share button with results?
@@ -59,6 +60,7 @@ export default Home;
 // todo: unify modal styles (footer actions, spacing, etc)
 // todo: performance audit, react best practices audit
 // todo: ads?
+// todo: add LICENCE, SECURITY, DOCS, WIKI, etc
 // todo: custom 404 and error?
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
 // todo: use grid one-liner for layout calendar https://www.youtube.com/watch?v=Ix_LAId0obw
