@@ -46,6 +46,9 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
+// todo: add funding
+// todo: fix auth in Renovate PRs in CF
+// todo: fix "we use cookies"
 // todo: brutalist design
 // todo: improve responsive
 // todo: https://effect.website/
