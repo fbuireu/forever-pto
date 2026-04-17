@@ -39,7 +39,7 @@
     "lint:all:fix": "pnpm lint:all --fix",
     "lint:changed": "pnpm lint --write --changed",
     "lint:ts:typecheck": "tsc --project . --noEmit",
-    "test:ut": "vitest run --passWithNoTests --logHeapUsage",
+    "test:ut": "vitest run --logHeapUsage",
     "test:ut:changed": "pnpm test:ut --bail 1",
     "test:e2e": "playwright test --pass-with-no-tests",
     "test:e2e:ui": "pnpm run test:e2e -- --ui",
