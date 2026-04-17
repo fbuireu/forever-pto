@@ -10,6 +10,12 @@ export default defineConfig({
   use: {
     baseURL: process.env.BASE_URL ?? 'http://localhost:3000',
     trace: 'on-first-retry',
+    extraHTTPHeaders: {
+      ...(process.env.CF_ACCESS_CLIENT_ID && {
+        'CF-Access-Client-Id': process.env.CF_ACCESS_CLIENT_ID,
+        'CF-Access-Client-Secret': process.env.CF_ACCESS_CLIENT_SECRET ?? '',
+      }),
+    },
   },
   projects: process.env.CI
     ? [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }]

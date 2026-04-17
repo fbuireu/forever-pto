@@ -58,6 +58,11 @@ head_sampling_rate = 0.2
 [env.development.vars]
 NEXT_PUBLIC_SITE_URL = "https://forever-pto-development.workers.dev"
 NEXT_PUBLIC_CONTACT_EMAIL = "contact@forever-pto.com"
+NEXTJS_ENV = "development"
+TURSO_DATABASE_URL = "libsql://forever-pto-development-fbuireu.aws-eu-west-1.turso.io"
+CF_ACCESS_TEAM_DOMAIN = "https://fbuireu.cloudflareaccess.com"
+CF_ACCESS_WORKERS_AUD = "a25b2ba0cd7b8ac4718cce10ba07ffa2a37301b2fe79cc00468f1606d5c15a26"
+CF_ACCESS_PREVIEW_AUD = "66a0553e04ed5f8d2f4b6d48e73b11e671c912aa645ebf1b2dce04437e71c089"
 
 [[env.development.r2_buckets]]
 binding = "NEXT_INC_CACHE_R2_BUCKET"
@@ -87,6 +92,9 @@ service = "forever-pto-tail"
 [env.production.vars]
 NEXT_PUBLIC_SITE_URL = "https://forever-pto.com"
 NEXT_PUBLIC_CONTACT_EMAIL = "contact@forever-pto.com"
+NEXTJS_ENV = "production"
+TURSO_DATABASE_URL = "libsql://forever-pto-fbuireu.aws-eu-west-1.turso.io"
+CF_ACCESS_TEAM_DOMAIN = "https://fbuireu.cloudflareaccess.com"
 
 [[env.production.routes]]
 pattern = "forever-pto.com/*"

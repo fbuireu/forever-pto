@@ -34,3 +34,5 @@ jobs:
       - run: pnpm test:e2e
         env:
           BASE_URL: https://forever-pto-development.workers.dev
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}

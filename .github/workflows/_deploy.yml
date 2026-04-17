@@ -32,5 +32,24 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm run cf:build
+        env:
+          NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: ${{ vars.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN }}
+          NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: ${{ vars.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: ${{ vars.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID }}
+          NEXT_PUBLIC_STORAGE_KEY: ${{ vars.NEXT_PUBLIC_STORAGE_KEY }}
       - name: Deploy to Cloudflare Workers
         run: pnpm dlx wrangler deploy --env ${{ inputs.wrangler_env }}
+      - name: Set Worker secrets
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: |
+          node -e "
+          const keys = ['JWT_SECRET','STRIPE_SECRET_KEY','STRIPE_WEBHOOK_SECRET','RESEND_API_KEY','TURSO_AUTH_TOKEN'];
+          const obj = Object.fromEntries(keys.map(k => [k, process.env[k]]).filter(([,v]) => v));
+          process.stdout.write(JSON.stringify(obj));
+          " | pnpm dlx wrangler secret bulk --env ${{ inputs.wrangler_env }}
