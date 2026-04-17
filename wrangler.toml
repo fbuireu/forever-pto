@@ -41,6 +41,9 @@ NEXT_PUBLIC_CONTACT_EMAIL = "contact@forever-pto.com"
 [env.development]
 name = "forever-pto-development"
 
+[[env.development.tail_consumers]]
+service = "forever-pto-tail"
+
 [env.development.observability]
 enabled = true
 
