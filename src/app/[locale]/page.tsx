@@ -48,7 +48,7 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: add funding 2
+// todo: add funding 2!
 // todo: fix auth in Renovate PRs in CF
 // todo: fix "we use cookies"
 // todo: bug apply alternatives
