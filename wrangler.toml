@@ -19,10 +19,6 @@ head_sampling_rate = 0.2
 enabled = true
 head_sampling_rate = 0.2
 
-[[routes]]
-pattern = "forever-pto.com/*"
-zone_name = "forever-pto.com"
-
 [[tail_consumers]]
 service = "forever-pto-tail"
 
@@ -45,6 +41,17 @@ NEXT_PUBLIC_CONTACT_EMAIL = "contact@forever-pto.com"
 [env.development]
 name = "forever-pto-development"
 
+[env.development.observability]
+enabled = true
+
+[env.development.observability.logs]
+invocation_logs = true
+head_sampling_rate = 0.2
+
+[env.development.observability.traces]
+enabled = true
+head_sampling_rate = 0.2
+
 [env.development.vars]
 NEXT_PUBLIC_SITE_URL = "https://forever-pto-development.workers.dev"
 NEXT_PUBLIC_CONTACT_EMAIL = "contact@forever-pto.com"
@@ -59,6 +66,17 @@ id = "deae751b22674c0695fc1581161193dd"
 
 [env.production]
 name = "forever-pto"
+
+[env.production.observability]
+enabled = true
+
+[env.production.observability.logs]
+invocation_logs = true
+head_sampling_rate = 0.2
+
+[env.production.observability.traces]
+enabled = true
+head_sampling_rate = 0.2
 
 [[env.production.tail_consumers]]
 service = "forever-pto-tail"
