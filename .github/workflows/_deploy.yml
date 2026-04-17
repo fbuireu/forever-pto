@@ -28,7 +28,7 @@ jobs:
           node-version: '24.14.1'
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build
+      - run: pnpm run cf:build
       - name: Deploy to Cloudflare Workers
         run: pnpm dlx wrangler deploy --env ${{ inputs.wrangler_env }}
         env:
