@@ -27,7 +27,7 @@ mode = "smart"
 
 [[r2_buckets]]
 binding = "NEXT_INC_CACHE_R2_BUCKET"
-bucket_name = "next-inc-cache"
+bucket_name = "forever-pto-next-inc-cache"
 
 [[kv_namespaces]]
 binding = "RATE_LIMIT_KV"
@@ -58,7 +58,7 @@ NEXT_PUBLIC_CONTACT_EMAIL = "contact@forever-pto.com"
 
 [[env.development.r2_buckets]]
 binding = "NEXT_INC_CACHE_R2_BUCKET"
-bucket_name = "next-inc-cache-dev"
+bucket_name = "forever-pto-next-inc-cache-dev"
 
 [[env.development.kv_namespaces]]
 binding = "RATE_LIMIT_KV"
@@ -91,7 +91,7 @@ zone_name = "forever-pto.com"
 
 [[env.production.r2_buckets]]
 binding = "NEXT_INC_CACHE_R2_BUCKET"
-bucket_name = "next-inc-cache"
+bucket_name = "forever-pto-next-inc-cache"
 
 [[env.production.kv_namespaces]]
 binding = "RATE_LIMIT_KV"
