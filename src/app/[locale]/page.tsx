@@ -1,13 +1,13 @@
 import { LOCALES } from '@infrastructure/i18n/config';
 import { Faq } from '@ui/modules/components/home/Faq';
 import { JsonLd } from '@ui/modules/components/seo/JsonLd';
+import dynamic from 'next/dynamic';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
-import dynamic from 'next/dynamic';
 
 const HolidaysList = dynamic(() => import('@ui/modules/components/home/HolidaysList').then((mod) => mod.HolidaysList));
 const ManagementBar = dynamic(() =>
-  import('@ui/modules/components/home/ManagementBar').then((mod) => mod.ManagementBar),
+  import('@ui/modules/components/home/ManagementBar').then((mod) => mod.ManagementBar)
 );
 const CalendarList = dynamic(() => import('@ui/modules/components/home/CalendarList').then((mod) => mod.CalendarList));
 const Legend = dynamic(() => import('@ui/modules/components/home/Legend').then((mod) => mod.Legend));
@@ -48,7 +48,7 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: add fundin g
+// todo: add funding 2
 // todo: fix auth in Renovate PRs in CF
 // todo: fix "we use cookies"
 // todo: bug apply alternatives
