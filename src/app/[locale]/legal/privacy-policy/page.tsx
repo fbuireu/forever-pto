@@ -40,7 +40,7 @@ export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPoli
           </li>
           <li>
             <strong>{t('sections.dataController.items.email.label')}</strong>{' '}
-            {t('sections.dataController.items.email.value', { supportEmail: env.NEXT_PUBLIC_EMAIL_SELF })}
+            {t('sections.dataController.items.email.value', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}
           </li>
           <li>
             <strong>{t('sections.dataController.items.website.label')}</strong>{' '}
@@ -236,7 +236,7 @@ export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPoli
             {t('sections.yourRights.items.complaint.description')}
           </li>
         </ul>
-        <p className='mt-4'>{t('sections.yourRights.contact', { supportEmail: env.NEXT_PUBLIC_EMAIL_SELF })}</p>
+        <p className='mt-4'>{t('sections.yourRights.contact', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}</p>
       </section>
 
       <section>
@@ -269,7 +269,7 @@ export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPoli
         <ul className='list-disc pl-6 mt-4 space-y-2'>
           <li>
             <strong>{t('sections.contactInfo.items.email.label')}</strong>{' '}
-            {t('sections.contactInfo.items.email.value', { supportEmail: env.NEXT_PUBLIC_EMAIL_SELF })}
+            {t('sections.contactInfo.items.email.value', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}
           </li>
           <li>
             <strong>{t('sections.contactInfo.items.website.label')}</strong>{' '}

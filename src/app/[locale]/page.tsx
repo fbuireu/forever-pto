@@ -1,12 +1,14 @@
 import { LOCALES } from '@infrastructure/i18n/config';
 import { Faq } from '@ui/modules/components/home/Faq';
 import { JsonLd } from '@ui/modules/components/seo/JsonLd';
-import dynamic from 'next/dynamic';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
+import dynamic from 'next/dynamic';
 
 const HolidaysList = dynamic(() => import('@ui/modules/components/home/HolidaysList').then((mod) => mod.HolidaysList));
-const ManagementBar = dynamic(() => import('@ui/modules/components/home/ManagementBar').then((mod) => mod.ManagementBar));
+const ManagementBar = dynamic(() =>
+  import('@ui/modules/components/home/ManagementBar').then((mod) => mod.ManagementBar),
+);
 const CalendarList = dynamic(() => import('@ui/modules/components/home/CalendarList').then((mod) => mod.CalendarList));
 const Legend = dynamic(() => import('@ui/modules/components/home/Legend').then((mod) => mod.Legend));
 const Summary = dynamic(() => import('@ui/modules/components/home/Summary').then((mod) => mod.Summary));
@@ -49,6 +51,12 @@ export default Home;
 // todo: add funding
 // todo: fix auth in Renovate PRs in CF
 // todo: fix "we use cookies"
+// todo: bug apply alternatives
+// todo: faq with title center + styling
+// todo: sidebar with carryover w/ more padding
+// todo: bug apply alternatives
+// todo: faq with title center
+// todo: sidebar with carryover w/ more padding
 // todo: brutalist design
 // todo: improve responsive
 // todo: https://effect.website/

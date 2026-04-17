@@ -122,7 +122,7 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.refundPolicy.process.title')}</h3>
         <p>{t('sections.refundPolicy.process.description')}</p>
         <ol className='list-decimal pl-6 mt-2 space-y-2'>
-          <li>{t('sections.refundPolicy.process.steps.contact', { supportEmail: env.NEXT_PUBLIC_EMAIL_SELF })}</li>
+          <li>{t('sections.refundPolicy.process.steps.contact', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}</li>
           <li>{t('sections.refundPolicy.process.steps.include')}</li>
           <li>{t('sections.refundPolicy.process.steps.review')}</li>
           <li>{t('sections.refundPolicy.process.steps.processing')}</li>
@@ -291,7 +291,7 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
         <p>{t('sections.governingLaw.jurisdiction.description')}</p>
 
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.governingLaw.disputeResolution.title')}</h3>
-        <p>{t('sections.governingLaw.disputeResolution.description', { supportEmail: env.NEXT_PUBLIC_EMAIL_SELF })}</p>
+        <p>{t('sections.governingLaw.disputeResolution.description', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}</p>
 
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.governingLaw.euOdr.title')}</h3>
         <p>
@@ -337,7 +337,7 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
         <ul className='list-disc pl-6 mt-4 space-y-2'>
           <li>
             <strong>{t('sections.contactInfo.items.email.label')}</strong>{' '}
-            {t('sections.contactInfo.items.email.value', { supportEmail: env.NEXT_PUBLIC_EMAIL_SELF })}
+            {t('sections.contactInfo.items.email.value', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}
           </li>
           <li>
             <strong>{t('sections.contactInfo.items.website.label')}</strong>{' '}

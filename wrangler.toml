@@ -39,4 +39,39 @@ id = "830b55c22c574287acebb51ca89b01f0"
 
 [vars]
 NEXT_PUBLIC_SITE_URL = "https://forever-pto.com"
-NEXT_PUBLIC_EMAIL_SELF = "contact@forever-pto.com"
+NEXT_PUBLIC_CONTACT_EMAIL = "contact@forever-pto.com"
+
+
+[env.development]
+name = "forever-pto-development"
+
+[env.development.vars]
+NEXT_PUBLIC_SITE_URL = "https://forever-pto-development.workers.dev"
+NEXT_PUBLIC_CONTACT_EMAIL = "contact@forever-pto.com"
+
+[[env.development.r2_buckets]]
+binding = "NEXT_INC_CACHE_R2_BUCKET"
+bucket_name = "next-inc-cache-dev"
+
+[[env.development.kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "deae751b22674c0695fc1581161193dd"
+
+[env.production]
+name = "forever-pto"
+
+[env.production.vars]
+NEXT_PUBLIC_SITE_URL = "https://forever-pto.com"
+NEXT_PUBLIC_CONTACT_EMAIL = "contact@forever-pto.com"
+
+[[env.production.routes]]
+pattern = "forever-pto.com/*"
+zone_name = "forever-pto.com"
+
+[[env.production.r2_buckets]]
+binding = "NEXT_INC_CACHE_R2_BUCKET"
+bucket_name = "next-inc-cache"
+
+[[env.production.kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "830b55c22c574287acebb51ca89b01f0"

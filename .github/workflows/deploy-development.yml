@@ -1,0 +1,19 @@
+name: Deploy — Development
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: deploy-development-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/_deploy.yml
+    with:
+      environment: development
+      wrangler_env: development
+    secrets:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

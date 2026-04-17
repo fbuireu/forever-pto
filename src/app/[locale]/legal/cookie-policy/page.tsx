@@ -234,7 +234,7 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
         <ul className='list-disc pl-6 mt-2 space-y-2'>
           <li>
             <strong>{t('sections.contact.email.label')}</strong>{' '}
-            {t('sections.contact.email.value', { supportEmail: env.NEXT_PUBLIC_EMAIL_SELF })}
+            {t('sections.contact.email.value', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}
           </li>
           <li>
             <strong>{t('sections.contact.website.label')}</strong>{' '}
