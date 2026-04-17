@@ -11,6 +11,7 @@ import type Stripe from 'stripe';
 
 export { generateMetadata } from './metadata';
 
+export const dynamic = 'force-dynamic';
 
 interface PaymentSuccessParams {
   searchParams: Promise<{
