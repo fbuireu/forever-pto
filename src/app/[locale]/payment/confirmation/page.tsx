@@ -11,8 +11,6 @@ import type Stripe from 'stripe';
 
 export { generateMetadata } from './metadata';
 
-const stripe = getStripeServerInstance();
-const logger = getBetterStackInstance();
 
 interface PaymentSuccessParams {
   searchParams: Promise<{
@@ -22,7 +20,7 @@ interface PaymentSuccessParams {
   params: Promise<{ locale: Locale }>;
 }
 
-const getCurrencySymbol = (locale: string, currency: string): string => {
+const getCurrencySymbol = (locale: string, currency: string, logger: ReturnType<typeof getBetterStackInstance>): string => {
   try {
     const formatter = new Intl.NumberFormat(locale, {
       style: 'currency',
@@ -75,6 +73,8 @@ async function PaymentError() {
 }
 
 export default async function PaymentSuccessPage({ searchParams, params }: Readonly<PaymentSuccessParams>) {
+  const stripe = getStripeServerInstance();
+  const logger = getBetterStackInstance();
   const [{ payment_intent: paymentIntentId }, { locale }] = await Promise.all([searchParams, params]);
 
   if (!paymentIntentId) {
@@ -107,7 +107,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
   const t = await getTranslations('paymentConfirmation.success');
   const amount = paymentIntent.amount / 100;
   const currency = paymentIntent.currency.toUpperCase();
-  const currencySymbol = getCurrencySymbol(locale, currency);
+  const currencySymbol = getCurrencySymbol(locale, currency, logger);
 
   return (
     <div className='min-h-screen flex items-center justify-center p-4 bg-background m-auto'>
