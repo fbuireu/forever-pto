@@ -87,7 +87,7 @@ export const CookieConsent = () => {
     const handleShowPreferences = () => setShowPreferences(true);
     window.addEventListener('cc:showPreferences', handleShowPreferences);
     return () => window.removeEventListener('cc:showPreferences', handleShowPreferences);
-  }, [updateGtagConsent]);
+  }, [updateGtagConsent, t]);
 
   if (showBanner) {
     return (

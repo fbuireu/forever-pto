@@ -70,7 +70,7 @@ export const PtoCalculator = () => {
 
   return (
     <div className='space-y-2 w-full'>
-      <label className='flex gap-2 my-2 text-sm font-normal'>
+      <div className='flex gap-2 my-2 text-sm font-normal'>
         <Calculator size={16} /> {t('title')}
         <TooltipProvider delayDuration={200}>
           <Tooltip>
@@ -80,7 +80,7 @@ export const PtoCalculator = () => {
             <TooltipContent className='w-60 text-pretty'>{t('tooltip')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
-      </label>
+      </div>
 
       <div className='space-y-2 w-full'>
         <p className='text-xs text-muted-foreground'>{t('daysPerMonth')}</p>

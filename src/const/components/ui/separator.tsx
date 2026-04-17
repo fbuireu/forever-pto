@@ -8,6 +8,7 @@ interface SeparatorProps extends React.ComponentProps<'div'> {
 
 function Separator({ className, orientation = 'horizontal', decorative = true, ...props }: SeparatorProps) {
   return (
+    {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-orientation is valid for role=separator; conditionally omitted when decorative */}
     <div
       role={decorative ? 'none' : 'separator'}
       aria-orientation={decorative ? undefined : orientation}
