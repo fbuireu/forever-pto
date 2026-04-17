@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { cn } from '@const/lib/utils';
 import { Command as CommandPrimitive } from 'cmdk';
 import { useTranslations } from 'next-intl';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps } from 'react';
 import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { SearchIcon } from 'src/components/animate-ui/icons/search';
 

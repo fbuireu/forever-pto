@@ -23,8 +23,7 @@ const Slot = React.forwardRef<HTMLElement, SlotProps>(({ children, ...slotProps 
         }
       : (childRef ?? forwardedRef ?? undefined);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return React.cloneElement(children as React.ReactElement<any>, { ...merged, ref: composedRef });
+  return React.cloneElement(children as React.ReactElement<Record<string, unknown>>, { ...merged, ref: composedRef });
 });
 Slot.displayName = 'Slot';
 
