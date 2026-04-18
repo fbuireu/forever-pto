@@ -71,8 +71,9 @@ function SidebarProvider({
       } else {
         _setOpen(openState);
       }
+      const secureAttribute = window.location.protocol === 'https:' ? '; Secure' : '';
       // biome-ignore lint/suspicious/noDocumentCookie: server-readable sidebar state
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}; SameSite=Lax${secureAttribute}`;
     },
     [setOpenProp, open]
   );
