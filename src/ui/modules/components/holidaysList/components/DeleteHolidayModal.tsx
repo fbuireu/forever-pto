@@ -9,17 +9,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@const/components/ui/dialog';
+} from '@ui/components/primitives/dialog';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { formatDate } from '@shared/utils/date';
+import { formatDate } from '@ui/lib/date';
 import { AlertTriangle } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { Trash2 } from 'src/components/animate-ui/icons/trash-2';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { Trash2 } from '@ui/components/animate/icons/trash-2';
 
 interface DeleteHolidayModalProps {
   open: boolean;

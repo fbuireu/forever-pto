@@ -1,13 +1,13 @@
 'use client';
 
 import { usePremiumStore } from '@application/stores/premium';
-import { cn } from '@const/lib/utils';
+import { cn } from '@ui/lib/utils';
 import { InfoIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { Lock } from 'src/components/animate-ui/icons/lock';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/base/tooltip';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { Lock } from '@ui/components/animate/icons/lock';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/components/animate/base/tooltip';
 import { useShallow } from 'zustand/react/shallow';
 import { getButtonClass } from './utils/helpers';
 

@@ -3,7 +3,7 @@
 import type { DriveStep } from 'driver.js';
 import { useTranslations } from 'next-intl';
 import { useCallback } from 'react';
-import { useSidebar } from 'src/components/animate-ui/base/sidebar';
+import { useSidebar } from '@ui/components/animate/base/sidebar';
 
 const SIDEBAR_CONTAINER_SELECTOR = '[data-slot="sidebar-container"]';
 

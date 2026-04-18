@@ -1,12 +1,12 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { TableHeader as BaseTableHeader, TableHead, TableRow } from '@const/components/ui/table';
-import { cn } from '@const/lib/utils';
+import { TableHeader as BaseTableHeader, TableHead, TableRow } from '@ui/components/primitives/table';
+import { cn } from '@ui/lib/utils';
 import { ArrowUpDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { memo } from 'react';
-import { ArrowDown } from 'src/components/animate-ui/icons/arrow-down';
-import { ArrowUp } from 'src/components/animate-ui/icons/arrow-up';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
+import { ArrowDown } from '@ui/components/animate/icons/arrow-down';
+import { ArrowUp } from '@ui/components/animate/icons/arrow-up';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
 
 interface HolidayTableHeaderProps {
   selectAllButton: React.ReactNode;

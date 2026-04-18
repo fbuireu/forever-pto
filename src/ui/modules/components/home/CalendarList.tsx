@@ -2,7 +2,7 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { cn } from '@const/lib/utils';
+import { cn } from '@ui/lib/utils';
 import { useCalculationsWorker } from '@ui/hooks/useCalculationsWorker';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useLocale } from 'next-intl';

@@ -2,14 +2,14 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { cn } from '@const/lib/utils';
+import { cn } from '@ui/lib/utils';
 import { useDebounce } from '@ui/hooks/useDebounce';
 import { CalendarDays, Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { Counter } from 'src/components/animate-ui/components/counter';
-import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { Counter } from '@ui/components/animate/components/counter';
+import { SlidingNumber } from '@ui/components/animate/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 
 const MIN_VALUE = 1;

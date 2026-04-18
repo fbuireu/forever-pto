@@ -1,6 +1,7 @@
 {
   "name": "forever-pto",
   "description": "The all-in-one tool to squish your valuable PTO days",
+  "version": "1.0.3",
   "keywords": [
     "nextjs",
     "typescript",
@@ -20,7 +21,6 @@
   "engines": {
     "node": "v24.14.1"
   },
-  "version": "1.0.1",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",

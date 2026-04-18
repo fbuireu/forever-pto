@@ -3,8 +3,8 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { InfoIcon, Undo2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { Switch } from 'src/components/animate-ui/headless/switch';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/base/tooltip';
+import { Switch } from '@ui/components/animate/headless/switch';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/components/animate/base/tooltip';
 import { useShallow } from 'zustand/react/shallow';
 import { PremiumFeature } from '../../premium/PremiumFeature';
 

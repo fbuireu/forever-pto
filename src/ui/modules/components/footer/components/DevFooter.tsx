@@ -6,8 +6,8 @@ import { githubIcon } from '@ui/assets/icons/github';
 import { linkedinIcon } from '@ui/assets/icons/linkedin';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
-import { RotatingTextContainer } from 'src/components/animate-ui/primitives/texts/rotating';
-import { RotatingText } from 'src/components/animate-ui/text/rotating';
+import { RotatingTextContainer } from '@ui/components/animate/primitives/texts/rotating';
+import { RotatingText } from '@ui/components/animate/text/rotating';
 import { Icon } from '../../core/Icon';
 
 export const CONTACT_DETAILS = {

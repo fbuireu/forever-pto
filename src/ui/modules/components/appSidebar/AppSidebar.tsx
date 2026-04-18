@@ -3,10 +3,10 @@ import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
-import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { Settings } from 'src/components/animate-ui/icons/settings';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/base/collapsible';
+import { ChevronRight } from '@ui/components/animate/icons/chevron-right';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { Settings } from '@ui/components/animate/icons/settings';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/components/animate/base/collapsible';
 import {
   Sidebar,
   SidebarContent,
@@ -22,7 +22,7 @@ import {
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
-} from 'src/components/animate-ui/base/sidebar';
+} from '@ui/components/animate/base/sidebar';
 import { Logo } from '../core/Logo';
 import { AllowPastDays } from './components/AllowPastDays';
 import { CarryOverMonths } from './components/CarryOverMonths';

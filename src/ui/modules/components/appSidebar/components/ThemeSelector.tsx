@@ -3,17 +3,17 @@
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import { useCallback } from 'react';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { Check } from 'src/components/animate-ui/icons/check';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { Moon } from 'src/components/animate-ui/icons/moon';
-import { Sun } from 'src/components/animate-ui/icons/sun';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { Check } from '@ui/components/animate/icons/check';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { Moon } from '@ui/components/animate/icons/moon';
+import { Sun } from '@ui/components/animate/icons/sun';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from 'src/components/animate-ui/base/dropdown-menu';
+} from '@ui/components/animate/base/dropdown-menu';
 
 const getResolvedTheme = (theme: ReturnType<typeof useTheme>['theme']) => {
   if (theme !== 'system') return theme;

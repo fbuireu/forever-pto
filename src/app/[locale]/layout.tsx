@@ -1,5 +1,5 @@
-import { Toaster } from '@const/components/ui/sonner';
-import { cn } from '@const/lib/utils';
+import { Toaster } from '@ui/components/primitives/sonner';
+import { cn } from '@ui/lib/utils';
 import { routing } from '@infrastructure/i18n/routing';
 import '@styles/index.css';
 import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
@@ -16,8 +16,8 @@ import { notFound } from 'next/navigation';
 import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { ThemeProvider } from 'next-themes';
-import { LazyMotionProvider } from 'src/components/animate-ui/LazyMotionProvider';
-import { SidebarProvider } from 'src/components/animate-ui/base/sidebar';
+import { LazyMotionProvider } from '@ui/components/animate/LazyMotionProvider';
+import { SidebarProvider } from '@ui/components/animate/base/sidebar';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

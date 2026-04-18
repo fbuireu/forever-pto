@@ -1,6 +1,6 @@
 import { Link } from '@application/i18n/navigtion';
-import { Button } from '@const/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
+import { Button } from '@ui/components/primitives/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/components/primitives/card';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
 import { CheckCircle2, XCircle } from 'lucide-react';

@@ -2,7 +2,7 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { useLocationStore } from '@application/stores/location';
-import { Combobox } from '@const/components/ui/combobox';
+import { Combobox } from '@ui/components/primitives/combobox';
 import { MapPinned } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';

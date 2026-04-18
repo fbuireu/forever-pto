@@ -1,14 +1,14 @@
 'use client';
 
-import { cn } from '@const/lib/utils';
+import { cn } from '@ui/lib/utils';
 import { Circle, Sparkles } from 'lucide-react';
 import type { SVGMotionProps } from 'motion/react';
 import { useTranslations } from 'next-intl';
 import { type ComponentType, useMemo, useState } from 'react';
-import { FeatureList } from 'src/components/animate-ui/components/community/FeatureList';
-import { RadialNav, type RadialNavProps } from 'src/components/animate-ui/components/community/radial-nav';
-import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
-import { Clock } from 'src/components/animate-ui/icons/clock';
+import { FeatureList } from '@ui/components/animate/components/community/FeatureList';
+import { RadialNav, type RadialNavProps } from '@ui/components/animate/components/community/radial-nav';
+import { CircleCheckBig } from '@ui/components/animate/icons/circle-check-big';
+import { Clock } from '@ui/components/animate/icons/clock';
 
 interface RoadmapFeature {
   id: string;

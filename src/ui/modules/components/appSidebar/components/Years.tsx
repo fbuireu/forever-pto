@@ -1,16 +1,16 @@
 'use client';
 
 import { useFiltersStore } from '@application/stores/filters';
-import { Command, CommandGroup, CommandItem, CommandList } from '@const/components/ui/command';
-import { cn } from '@const/lib/utils';
+import { Command, CommandGroup, CommandItem, CommandList } from '@ui/components/primitives/command';
+import { cn } from '@ui/lib/utils';
 import { Calendar } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { Check } from 'src/components/animate-ui/icons/check';
-import { ChevronDown } from 'src/components/animate-ui/icons/chevron-down';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/base/popover';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { Check } from '@ui/components/animate/icons/check';
+import { ChevronDown } from '@ui/components/animate/icons/chevron-down';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/animate/base/popover';
 import { useShallow } from 'zustand/react/shallow';
 
 const MAX_YEARS = 10;

@@ -1,5 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { isWeekend } from '@shared/utils/date';
+import { isWeekend } from '@ui/lib/date';
 import { selectBridgesForStrategy, selectOptimalDaysFromBridges } from '../suggestions/utils/selectors';
 import type { Bridge, Suggestion } from '../types';
 import { FilterStrategy } from '../types';

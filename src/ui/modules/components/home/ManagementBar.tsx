@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
-import { AlternativesManager } from '../../../../components/animate-ui/ui-elements/AlternativesManager';
+import { AlternativesManager } from '@ui/components/animate/ui-elements/AlternativesManager';
 import { AlternativesManagerSkeleton } from '../skeletons/AlternativesManagerSkeleton';
 import { PtoStatusSkeleton } from '../skeletons/PtoStatusSkeleton';
 import { PtoStatus } from './PtoStatus';

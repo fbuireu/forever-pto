@@ -62,7 +62,7 @@ import {
   isWeekend,
   startOfToday,
   startOfYear,
-} from '@shared/utils/date';
+} from '@ui/lib/date';
 import type { Locale } from 'next-intl';
 import type { FirstLastBreak } from '../../types';
 

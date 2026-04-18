@@ -11,7 +11,7 @@ import {
   isWeekend,
   startOfMonth,
   startOfWeek,
-} from '@shared/utils/date';
+} from '@ui/lib/date';
 import type { Locale } from 'next-intl';
 import type { FromTo } from '../core/Calendar';
 

@@ -6,7 +6,7 @@ import { getBetterStackInstance } from '@infrastructure/clients/logging/better-s
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
+import { Button } from '@ui/components/animate/components/buttons/button';
 import { useShallow } from 'zustand/react/shallow';
 import { getTotalMonths } from '../utils/helpers';
 

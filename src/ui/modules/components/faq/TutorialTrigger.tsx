@@ -2,7 +2,7 @@
 
 import { useTutorial } from '@ui/hooks/useTutorial';
 import { useTranslations } from 'next-intl';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
+import { Button } from '@ui/components/animate/components/buttons/button';
 
 export const TutorialTrigger = () => {
   const t = useTranslations('tutorial');

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Tabs, TabsList, TabsTrigger } from 'src/components/animate-ui/components/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@ui/components/animate/components/tabs';
 
 type TabSection = {
   id: string;

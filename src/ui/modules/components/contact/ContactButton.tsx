@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@const/components/ui/button';
+import { Button } from '@ui/components/primitives/button';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
