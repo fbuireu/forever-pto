@@ -296,8 +296,11 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
         ? controlledItems
           ? render(children)
           : render(
-              Children.toArray(children).map((child) => (
-                <MotionHighlightItem key={(child as ReactElement).key ?? undefined} className={itemsClassName}>
+              Children.toArray(children).map((child, index) => (
+                <MotionHighlightItem
+                  key={isValidElement(child) && child.key != null ? child.key : index}
+                  className={itemsClassName}
+                >
                   {child}
                 </MotionHighlightItem>
               ))
