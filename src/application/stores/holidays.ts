@@ -289,13 +289,18 @@ export const useHolidaysStore = create<HolidaysStore>()(
           suggestion: Suggestion;
           alternatives: Suggestion[];
         }) => {
+          const { currentSelectionIndex } = get();
+          const allSuggestions = [suggestion, ...alternatives];
+          const preservedIndex = currentSelectionIndex < allSuggestions.length ? currentSelectionIndex : 0;
+          const preservedSelection = allSuggestions[preservedIndex] ?? suggestion;
+
           set({
             suggestion,
             alternatives,
-            currentSelection: suggestion,
-            previewAlternativeSelection: suggestion,
-            previewAlternativeIndex: 0,
-            currentSelectionIndex: 0,
+            currentSelection: preservedSelection,
+            previewAlternativeSelection: preservedSelection,
+            previewAlternativeIndex: preservedIndex,
+            currentSelectionIndex: preservedIndex,
             removedSuggestedDays: [],
           });
         },

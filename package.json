@@ -16,7 +16,7 @@
     "pnpm"
   ],
   "author": "Ferran Buireu <fbuireu@gmail.com>",
-  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319",
+  "packageManager": "pnpm@10.33.0",
   "engines": {
     "node": "v24.14.1"
   },
@@ -41,7 +41,7 @@
     "lint:ts:typecheck": "tsc --project . --noEmit",
     "test:ut": "vitest run --logHeapUsage",
     "test:ut:changed": "pnpm test:ut --bail 1",
-    "test:e2e": "playwright test --pass-with-no-tests",
+    "test:e2e": "playwright test",
     "test:e2e:ui": "pnpm run test:e2e -- --ui",
     "test:e2e:changed": "pnpm run test:e2e -- --only-changed",
     "prepare": "husky"

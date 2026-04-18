@@ -48,14 +48,6 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: add funding
-// todo: fix auth in Renovate PRs in CF
-// todo: fix "we use cookies"
-// todo: bug apply alternatives
-// todo: faq with title center + styling
-// todo: sidebar with carryover w/ more padding
-// todo: bug apply alternatives
-// todo: faq with title center
 // todo: sidebar with carryover w/ more padding
 // todo: brutalist design
 // todo: improve responsive

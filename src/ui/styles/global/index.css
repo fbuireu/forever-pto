@@ -1,3 +1,7 @@
+#cc-main {
+  display: none !important;
+}
+
 :root {
   --color-brand-yellow: #eab308;
   --color-brand-teal: #14b8a6;

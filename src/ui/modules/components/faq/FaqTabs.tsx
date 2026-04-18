@@ -19,14 +19,11 @@ export const FaqTabs = ({ tabs, title }: FaqTabsProps) => {
 
   return (
     <>
-      <h2 id='faq-title' className='text-3xl font-semibold'>
+      <h2 id='faq-title' className='text-3xl font-semibold text-center'>
         {title}
       </h2>
       <Tabs value={active} onValueChange={setActive}>
-        <TabsList
-          className='grid w-full'
-          style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}
-        >
+        <TabsList className='grid w-full grid-cols-4'>
           {tabs.map((tab) => (
             <TabsTrigger key={tab.id} value={tab.id}>
               {tab.title}
