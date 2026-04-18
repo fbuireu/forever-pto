@@ -74,9 +74,17 @@ export function useCalculationsWorker() {
           maxAlternatives,
           manualDays: manuallySelectedDays.map((d) => d.toISOString()),
           ...(() => {
-            const { removedSuggestedDays } = useHolidaysStore.getState();
+            const { currentSelection, removedSuggestedDays } = useHolidaysStore.getState();
+            const activeSuggestedDays = currentSelection
+              ? Math.max(0, currentSelection.days.length - removedSuggestedDays.length)
+              : undefined;
+            const budgetForAutoSuggest = params.ptoDays - manuallySelectedDays.length;
             return {
               excludedDays: removedSuggestedDays.map((d) => d.toISOString()),
+              autoSuggestCount:
+                activeSuggestedDays !== undefined
+                  ? Math.min(budgetForAutoSuggest, activeSuggestedDays)
+                  : undefined,
             };
           })(),
         },
