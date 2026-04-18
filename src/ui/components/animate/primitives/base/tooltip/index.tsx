@@ -47,7 +47,7 @@ function Tooltip({
   const y = useMotionValue(0);
   const tooltipContextValue = React.useMemo(
     () => ({ isOpen, setIsOpen, x, y, followCursor, followCursorSpringOptions }),
-    [isOpen, setIsOpen, x, y, followCursor, followCursorSpringOptions],
+    [isOpen, setIsOpen, x, y, followCursor, followCursorSpringOptions]
   );
   return (
     <LocalTooltipProvider value={tooltipContextValue}>
