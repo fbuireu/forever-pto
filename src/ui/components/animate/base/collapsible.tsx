@@ -80,7 +80,20 @@ function CollapsibleContent({
       keepMounted
       data-slot='collapsible-content'
       render={(panelProps: React.ComponentPropsWithoutRef<'div'> & { hidden?: boolean }, state: { open: boolean }) => {
-        const { hidden: _hidden, style, className: panelClassName, ...restProps } = panelProps;
+        const {
+          hidden: _hidden,
+          style,
+          className: panelClassName,
+          onDrag: _onDrag,
+          onDragEnd: _onDragEnd,
+          onDragStart: _onDragStart,
+          onDragEnter: _onDragEnter,
+          onDragLeave: _onDragLeave,
+          onDragOver: _onDragOver,
+          onDrop: _onDrop,
+          onAnimationStart: _onAnimationStart,
+          ...restProps
+        } = panelProps;
         return (
           <m.div
             {...restProps}
