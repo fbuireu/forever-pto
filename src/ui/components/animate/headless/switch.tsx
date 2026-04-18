@@ -1,24 +1,33 @@
 'use client';
 
 import { cn } from '@ui/lib/utils';
+import { type ReactNode, useCallback } from 'react';
 import {
-  Switch as BaseSwitchPrimitive,
-  SwitchThumb as BaseSwitchThumb,
   SwitchIcon as BaseSwitchIcon,
+  Switch as BaseSwitchPrimitive,
   type SwitchProps as BaseSwitchPrimitiveProps,
+  SwitchThumb as BaseSwitchThumb,
 } from '../primitives/base/switch';
-import { type HTMLMotionProps, m } from 'motion/react';
-import { useCallback, useEffect, useState } from 'react';
 
 type SwitchProps = Omit<BaseSwitchPrimitiveProps, 'onCheckedChange'> & {
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  thumbIcon?: React.ReactNode;
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
+  thumbIcon?: ReactNode;
   onChange?: (checked: boolean) => void;
   onCheckedChange?: (checked: boolean) => void;
 };
 
-function Switch({ className, leftIcon, rightIcon, thumbIcon, onChange, onCheckedChange, checked, defaultChecked, ...props }: SwitchProps) {
+function Switch({
+  className,
+  leftIcon,
+  rightIcon,
+  thumbIcon,
+  onChange,
+  onCheckedChange,
+  checked,
+  defaultChecked,
+  ...props
+}: SwitchProps) {
   const handleCheckedChange = useCallback(
     (value: boolean) => {
       onChange?.(value);

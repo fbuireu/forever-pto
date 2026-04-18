@@ -10,12 +10,13 @@ export default defineConfig({
   use: {
     baseURL: process.env.BASE_URL ?? 'http://localhost:3000',
     trace: 'on-first-retry',
-    extraHTTPHeaders: {
-      ...(process.env.CF_ACCESS_CLIENT_ID && {
-        'CF-Access-Client-Id': process.env.CF_ACCESS_CLIENT_ID,
-        'CF-Access-Client-Secret': process.env.CF_ACCESS_CLIENT_SECRET ?? '',
-      }),
-    },
+    extraHTTPHeaders: (() => {
+      const id = process.env.CF_ACCESS_CLIENT_ID;
+      const secret = process.env.CF_ACCESS_CLIENT_SECRET;
+      if (!id && !secret) return {};
+      if (!id || !secret) throw new Error(`CF Access misconfigured: ${!id ? 'CF_ACCESS_CLIENT_ID' : 'CF_ACCESS_CLIENT_SECRET'} is missing`);
+      return { 'CF-Access-Client-Id': id, 'CF-Access-Client-Secret': secret };
+    })(),
   },
   projects: process.env.CI
     ? [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }]

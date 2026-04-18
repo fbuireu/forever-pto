@@ -130,6 +130,9 @@ function Highlight<T extends React.ElementType = 'div'>({ ref, ...props }: Highl
     mode = 'children',
   } = props;
 
+  const containerClassName = (props as ParentModeHighlightProps)?.containerClassName;
+  const propForceUpdateBounds = (props as ParentModeHighlightProps)?.forceUpdateBounds;
+
   const localRef = useRef<HTMLDivElement>(null);
   useImperativeHandle(ref, () => localRef.current as HTMLDivElement);
 
@@ -177,6 +180,7 @@ function Highlight<T extends React.ElementType = 'div'>({ ref, ...props }: Highl
         return newBounds;
       });
     },
+    // biome-ignore lint/correctness/useExhaustiveDependencies: props intentionally omitted to avoid stale closure on every render
     [props]
   );
 
@@ -214,7 +218,7 @@ function Highlight<T extends React.ElementType = 'div'>({ ref, ...props }: Highl
             ref={localRef}
             data-slot='motion-highlight-container'
             style={{ position: 'relative', zIndex: 1 }}
-            className={(props as ParentModeHighlightProps)?.containerClassName}
+            className={containerClassName}
           >
             <AnimatePresence initial={false} mode='wait'>
               {boundsState && (
@@ -254,7 +258,7 @@ function Highlight<T extends React.ElementType = 'div'>({ ref, ...props }: Highl
 
       return children;
     },
-    [mode, Component, props, boundsState, transition, exitDelay, style, className, activeClassNameState]
+    [mode, Component, containerClassName, boundsState, transition, exitDelay, style, className, activeClassNameState]
   );
 
   const contextValue = useMemo(
@@ -275,7 +279,7 @@ function Highlight<T extends React.ElementType = 'div'>({ ref, ...props }: Highl
       clearBounds,
       activeClassName: activeClassNameState,
       setActiveClassName: setActiveClassNameState,
-      forceUpdateBounds: (props as ParentModeHighlightProps)?.forceUpdateBounds,
+      forceUpdateBounds: propForceUpdateBounds,
     }),
     [
       mode,
@@ -293,7 +297,7 @@ function Highlight<T extends React.ElementType = 'div'>({ ref, ...props }: Highl
       safeSetBounds,
       clearBounds,
       activeClassNameState,
-      props,
+      propForceUpdateBounds,
     ]
   );
 
@@ -323,7 +327,11 @@ function HighlightItemsWrapper({ itemsClassName, children }: HighlightItemsWrapp
   return (
     <>
       {(Array.isArray(children) ? children : [children]).map((child) =>
-        child ? <HighlightItem key={child.key} className={itemsClassName} asChild children={child} /> : null
+        child ? (
+          <HighlightItem key={child.key} className={itemsClassName} asChild>
+            {child}
+          </HighlightItem>
+        ) : null
       )}
     </>
   );

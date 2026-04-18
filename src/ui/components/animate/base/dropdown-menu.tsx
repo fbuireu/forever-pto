@@ -1,9 +1,9 @@
 'use client';
 
+import { Menu as DropdownMenuPrimitive } from '@base-ui/react/menu';
 import { cn } from '@ui/lib/utils';
 import { Circle } from 'lucide-react';
 import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
-import { Menu as DropdownMenuPrimitive } from '@base-ui/react/menu';
 import * as React from 'react';
 import { createContext, use, useCallback, useEffect, useMemo, useState } from 'react';
 import { MotionHighlight, MotionHighlightItem } from '../effects/motion-highlight';
@@ -178,7 +178,12 @@ function DropdownMenuContent({
     <AnimatePresence>
       {isOpen && (
         <DropdownMenuPrimitive.Portal keepMounted data-slot='dropdown-menu-portal'>
-          <DropdownMenuPrimitive.Positioner sideOffset={sideOffset} align={align} positionMethod='fixed' className='z-50'>
+          <DropdownMenuPrimitive.Positioner
+            sideOffset={sideOffset}
+            align={align}
+            positionMethod='fixed'
+            className='z-50'
+          >
             <DropdownMenuPrimitive.Popup
               render={
                 <m.div
@@ -263,13 +268,7 @@ function DropdownMenuItem({
 type DropdownMenuCheckboxItemProps = Omit<React.ComponentProps<typeof DropdownMenuPrimitive.CheckboxItem>, 'render'> &
   HTMLMotionProps<'div'>;
 
-function DropdownMenuCheckboxItem({
-  className,
-  children,
-  checked,
-  disabled,
-  ...props
-}: DropdownMenuCheckboxItemProps) {
+function DropdownMenuCheckboxItem({ className, children, checked, disabled, ...props }: DropdownMenuCheckboxItemProps) {
   return (
     <MotionHighlightItem disabled={disabled}>
       <DropdownMenuPrimitive.CheckboxItem

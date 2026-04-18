@@ -1,8 +1,8 @@
 'use client';
 
-import * as React from 'react';
 import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible';
 import { type HTMLMotionProps, m, type Transition } from 'motion/react';
+import * as React from 'react';
 import { createContext, use, useCallback, useState } from 'react';
 
 type CollapsibleContextType = {
@@ -50,7 +50,11 @@ type CollapsibleTriggerProps = React.ComponentProps<typeof CollapsiblePrimitive.
 function CollapsibleTrigger({ asChild, children, ...props }: CollapsibleTriggerProps) {
   if (asChild && React.isValidElement(children)) {
     return (
-      <CollapsiblePrimitive.Trigger data-slot='collapsible-trigger' render={children as React.ReactElement} {...props} />
+      <CollapsiblePrimitive.Trigger
+        data-slot='collapsible-trigger'
+        render={children as React.ReactElement}
+        {...props}
+      />
     );
   }
   return (
@@ -75,11 +79,8 @@ function CollapsibleContent({
     <CollapsiblePrimitive.Panel
       keepMounted
       data-slot='collapsible-content'
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      render={(panelProps: any, state: { open: boolean }) => {
-        // Destructure hidden so we control visibility via framer-motion instead
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { hidden, style, className: panelClassName, ...restProps } = panelProps;
+      render={(panelProps: React.ComponentPropsWithoutRef<'div'> & { hidden?: boolean }, state: { open: boolean }) => {
+        const { hidden: _hidden, style, className: panelClassName, ...restProps } = panelProps;
         return (
           <m.div
             {...restProps}

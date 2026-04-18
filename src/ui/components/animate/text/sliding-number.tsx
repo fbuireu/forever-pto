@@ -2,7 +2,8 @@
 
 import { cn } from '@ui/lib/utils';
 import {
-  type MotionValue, m,
+  type MotionValue,
+  m,
   type SpringOptions,
   type UseInViewOptions,
   useInView,
@@ -19,7 +20,7 @@ type SlidingNumberDisplayProps = {
   transition: SpringOptions;
 };
 
-function SlidingNumberDisplay({ motionValue, number, height, transition }: SlidingNumberDisplayProps) {
+function SlidingNumberDisplay({ motionValue, number, height, transition }: Readonly<SlidingNumberDisplayProps>) {
   const y = useTransform(motionValue, (latest) => {
     if (!height) return 0;
     const currentNumber = latest % 10;
@@ -52,7 +53,7 @@ type SlidingNumberRollerProps = {
   transition: SpringOptions;
 };
 
-function SlidingNumberRoller({ prevValue, value, place, transition }: SlidingNumberRollerProps) {
+function SlidingNumberRoller({ prevValue, value, place, transition }: Readonly<SlidingNumberRollerProps>) {
   const startNumber = Math.floor(prevValue / place) % 10;
   const targetNumber = Math.floor(value / place) % 10;
   const animatedValue = useSpring(startNumber, transition);
@@ -70,8 +71,14 @@ function SlidingNumberRoller({ prevValue, value, place, transition }: SlidingNum
       className='relative inline-block w-[1ch] overflow-hidden leading-none tabular-nums'
     >
       <span className='invisible'>0</span>
-      {Array.from({ length: 10 }, (_, i) => (
-        <SlidingNumberDisplay key={i} motionValue={animatedValue} number={i} height={height} transition={transition} />
+      {([0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as const).map((digit) => (
+        <SlidingNumberDisplay
+          key={digit}
+          motionValue={animatedValue}
+          number={digit}
+          height={height}
+          transition={transition}
+        />
       ))}
     </span>
   );
@@ -106,7 +113,10 @@ function SlidingNumber({
   ...props
 }: SlidingNumberProps) {
   const localRef = useRef<HTMLSpanElement>(null);
-  useImperativeHandle(ref, () => localRef.current!);
+  useImperativeHandle(ref, () => {
+    if (!localRef.current) throw new Error('SlidingNumber ref not mounted');
+    return localRef.current;
+  });
 
   const inViewResult = useInView(localRef, {
     once: inViewOnce,
@@ -159,8 +169,8 @@ function SlidingNumber({
     [newDecStrRaw]
   );
 
-  const newDecValue = newDecStrRaw ? parseInt(newDecStrRaw, 10) : 0;
-  const prevDecValue = adjustedPrevDec ? parseInt(adjustedPrevDec, 10) : 0;
+  const newDecValue = newDecStrRaw ? Number.parseInt(newDecStrRaw, 10) : 0;
+  const prevDecValue = adjustedPrevDec ? Number.parseInt(adjustedPrevDec, 10) : 0;
 
   return (
     <span ref={localRef} data-slot='sliding-number' className={cn('flex items-center', className)} {...props}>
@@ -169,8 +179,8 @@ function SlidingNumber({
       {intPlaces.map((place) => (
         <SlidingNumberRoller
           key={`int-${place}`}
-          prevValue={parseInt(adjustedPrevInt, 10)}
-          value={parseInt(newIntStr ?? '0', 10)}
+          prevValue={Number.parseInt(adjustedPrevInt, 10)}
+          value={Number.parseInt(newIntStr ?? '0', 10)}
           place={place}
           transition={transition}
         />

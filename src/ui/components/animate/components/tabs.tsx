@@ -97,7 +97,7 @@ function Tabs<T extends string = string>({
 
   const contextValue = useMemo(
     () => ({
-      activeValue: (value ?? activeValue)!,
+      activeValue: (value ?? activeValue) as T,
       handleValueChange,
       registerTrigger,
     }),
@@ -223,6 +223,7 @@ function TabsContents({
     <div data-slot='tabs-contents' className={cn('overflow-hidden', className)} {...props}>
       <m.div className='flex -mx-2' animate={{ x: `${activeIndex * -100}%` }} transition={transition}>
         {childrenArray.map((child, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: tab panels are positionally indexed by design
           <div key={index} className='w-full shrink-0 px-2'>
             {child}
           </div>

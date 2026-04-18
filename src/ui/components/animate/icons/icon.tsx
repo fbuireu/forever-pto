@@ -1,9 +1,10 @@
 'use client';
 
-import { cn } from '@ui/lib/utils';
 import { useIsInView } from '@ui/hooks/useIsInView';
+import { cn } from '@ui/lib/utils';
 import {
-  type HTMLMotionProps, m,
+  type HTMLMotionProps,
+  m,
   type SVGMotionProps,
   type UseInViewOptions,
   useAnimation,
@@ -218,7 +219,6 @@ function AnimateIcon({
     setCurrentAnimation(typeof animate === 'string' ? animate : animation);
     if (animate) startAnimation(animate as TriggerProp);
     else stopAnimation();
-    // biome-ignore lint/correctness/useExhaustiveDependencies: vendored component
   }, [animate, stopAnimation, animation, startAnimation]);
 
   useEffect(() => {
@@ -371,7 +371,6 @@ function AnimateIcon({
         loopDelayRef.current = null;
       }
     };
-    // biome-ignore lint/correctness/useExhaustiveDependencies: vendored component
   }, [localAnimate, initialOnAnimateEnd, status, loop, startAnim, persistOnAnimateEnd, loopDelay, completeOnStop]);
 
   const childProps = (isValidElement(children) ? (children as ReactElement).props : {}) as AnyProps;

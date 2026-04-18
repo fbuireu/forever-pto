@@ -14,9 +14,8 @@ type WithAsChild<Base extends object> =
   | (Base & { asChild: true; children: React.ReactElement })
   | (Base & { asChild?: false | undefined });
 
-// biome-ignore lint/suspicious/noExplicitAny: vendored component
 type SlotProps<T extends HTMLElement = HTMLElement> = {
-  children?: any;
+  children?: React.ReactNode;
 } & DOMMotionProps<T>;
 
 function mergeRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCallback<T> {

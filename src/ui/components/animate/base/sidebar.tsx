@@ -5,8 +5,8 @@ import { Input } from '@ui/components/primitives/input';
 import { Separator } from '@ui/components/primitives/separator';
 import { Skeleton } from '@ui/components/primitives/skeleton';
 import { useIsMobile } from '@ui/hooks/use-mobile';
-import { cn } from '@ui/lib/utils';
 import { Slot } from '@ui/lib/slot';
+import { cn } from '@ui/lib/utils';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import type { Transition } from 'motion/react';
@@ -71,6 +71,7 @@ function SidebarProvider({
       } else {
         _setOpen(openState);
       }
+      // biome-ignore lint/suspicious/noDocumentCookie: server-readable sidebar state
       document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
     },
     [setOpenProp, open]

@@ -51,35 +51,11 @@ function IconComponent({ size, ...props }: SunProps) {
     >
       <m.circle cx='12' cy='12' r='4' variants={variants.circle} initial='initial' animate={controls} />
       <m.line x1='12' y1='4' x2='12' y2='2' variants={variants.line1} initial='initial' animate={controls} />
-      <m.line
-        x1='17.7'
-        y1='6.3'
-        x2='19.1'
-        y2='4.9'
-        variants={variants.line2}
-        initial='initial'
-        animate={controls}
-      />
+      <m.line x1='17.7' y1='6.3' x2='19.1' y2='4.9' variants={variants.line2} initial='initial' animate={controls} />
       <m.line x1='20' y1='12' x2='22' y2='12' variants={variants.line3} initial='initial' animate={controls} />
-      <m.line
-        x1='17.7'
-        y1='17.7'
-        x2='19.1'
-        y2='19.1'
-        variants={variants.line4}
-        initial='initial'
-        animate={controls}
-      />
+      <m.line x1='17.7' y1='17.7' x2='19.1' y2='19.1' variants={variants.line4} initial='initial' animate={controls} />
       <m.line x1='12' y1='20' x2='12' y2='22' variants={variants.line5} initial='initial' animate={controls} />
-      <m.line
-        x1='6.3'
-        y1='17.7'
-        x2='4.9'
-        y2='19.1'
-        variants={variants.line6}
-        initial='initial'
-        animate={controls}
-      />
+      <m.line x1='6.3' y1='17.7' x2='4.9' y2='19.1' variants={variants.line6} initial='initial' animate={controls} />
       <m.line x1='4' y1='12' x2='2' y2='12' variants={variants.line7} initial='initial' animate={controls} />
       <m.line x1='6.3' y1='6.3' x2='4.9' y2='4.9' variants={variants.line8} initial='initial' animate={controls} />
     </m.svg>

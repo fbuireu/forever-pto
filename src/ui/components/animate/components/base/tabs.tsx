@@ -1,4 +1,3 @@
-import { cn } from '@ui/lib/utils';
 import {
   TabsContent as TabsContentPrimitive,
   type TabsContentProps as TabsContentPrimitiveProps,
@@ -13,6 +12,7 @@ import {
   TabsTrigger as TabsTriggerPrimitive,
   type TabsTriggerProps as TabsTriggerPrimitiveProps,
 } from '@ui/components/animate/primitives/animate/tabs';
+import { cn } from '@ui/lib/utils';
 
 type TabsProps = TabsPrimitiveProps;
 

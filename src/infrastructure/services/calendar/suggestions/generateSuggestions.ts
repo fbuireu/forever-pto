@@ -65,7 +65,9 @@ export function generateSuggestions({
 
   const bridges = findBridges({ availableWorkdays, holidays: effectiveHolidays });
 
-  const selector = STRATEGY_MAP[strategy] ?? DEFAULT_STRATEGY;
+  const selector = Object.hasOwn(STRATEGY_MAP, strategy)
+    ? STRATEGY_MAP[strategy as keyof typeof STRATEGY_MAP]
+    : DEFAULT_STRATEGY;
 
   const selection = selector(bridges, effectivePtoDays);
 

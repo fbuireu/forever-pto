@@ -8,6 +8,7 @@ import {
   cloneElement,
   createContext,
   isValidElement,
+  type ReactElement,
   use,
   useCallback,
   useEffect,
@@ -127,6 +128,10 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
     mode = 'children',
   } = props;
 
+  const containerClassName = (props as ParentModeMotionHighlightProps)?.containerClassName;
+  const propForceUpdateBounds = (props as ParentModeMotionHighlightProps)?.forceUpdateBounds;
+  const itemsClassName = (props as UncontrolledChildrenModeMotionHighlightProps<T>)?.itemsClassName;
+
   const localRef = useRef<HTMLDivElement>(null);
   useImperativeHandle(ref, () => localRef.current as HTMLDivElement);
 
@@ -174,6 +179,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
         return newBounds;
       });
     },
+    // biome-ignore lint/correctness/useExhaustiveDependencies: props intentionally omitted to avoid stale closure on every render
     [props]
   );
 
@@ -207,11 +213,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
     (children: React.ReactNode) => {
       if (mode === 'parent') {
         return (
-          <div
-            ref={localRef}
-            data-slot='motion-highlight-container'
-            className={cn('relative', (props as ParentModeMotionHighlightProps)?.containerClassName)}
-          >
+          <div ref={localRef} data-slot='motion-highlight-container' className={cn('relative', containerClassName)}>
             <AnimatePresence initial={false}>
               {boundsState && (
                 <m.div
@@ -249,7 +251,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
 
       return children;
     },
-    [mode, props, boundsState, transition, exitDelay, className, activeClassNameState]
+    [mode, containerClassName, boundsState, transition, exitDelay, className, activeClassNameState]
   );
 
   const contextValue = useMemo(
@@ -268,7 +270,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
       clearBounds,
       activeClassName: activeClassNameState,
       setActiveClassName: setActiveClassNameState,
-      forceUpdateBounds: (props as ParentModeMotionHighlightProps)?.forceUpdateBounds,
+      forceUpdateBounds: propForceUpdateBounds,
     }),
     [
       mode,
@@ -284,7 +286,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
       safeSetBounds,
       clearBounds,
       activeClassNameState,
-      props,
+      propForceUpdateBounds,
     ]
   );
 
@@ -294,8 +296,8 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
         ? controlledItems
           ? render(children)
           : render(
-              Children.map(children, (child, index) => (
-                <MotionHighlightItem key={index} className={props?.itemsClassName}>
+              Children.toArray(children).map((child) => (
+                <MotionHighlightItem key={(child as ReactElement).key ?? undefined} className={itemsClassName}>
                   {child}
                 </MotionHighlightItem>
               ))

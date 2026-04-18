@@ -100,11 +100,7 @@ function AccordionTrigger({
           {children}
 
           {chevron && (
-            <m.div
-              data-slot='accordion-trigger-chevron'
-              animate={{ rotate: isOpen ? 180 : 0 }}
-              transition={transition}
-            >
+            <m.div data-slot='accordion-trigger-chevron' animate={{ rotate: isOpen ? 180 : 0 }} transition={transition}>
               <ChevronDown className='size-5 shrink-0' />
             </m.div>
           )}

@@ -1,5 +1,6 @@
 'use client';
 
+import { getStrictContext } from '@ui/lib/get-strict-context';
 import { Slot } from '@ui/lib/slot';
 import { type HTMLMotionProps, m, type Transition } from 'motion/react';
 import {
@@ -13,7 +14,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { getStrictContext } from '@ui/lib/get-strict-context';
 import { Highlight, HighlightItem, type HighlightItemProps, type HighlightProps } from '../effects/highlight';
 import type { WithAsChild } from './slot';
 

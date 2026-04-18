@@ -1,11 +1,11 @@
 'use client';
 
+import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
 import { cn } from '@ui/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
-import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
-import { createContext, use, useCallback, useEffect, useState } from 'react';
 import * as React from 'react';
+import { createContext, use, useCallback, useEffect, useState } from 'react';
 import { AnimateIcon } from '../icons/icon';
 import { X } from '../icons/x';
 

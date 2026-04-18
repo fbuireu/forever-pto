@@ -2,15 +2,15 @@ import { cn } from '@ui/lib/utils';
 import {
   TooltipArrow as TooltipArrowPrimitive,
   TooltipPopup as TooltipPopupPrimitive,
+  type TooltipPopupProps as TooltipPopupPrimitiveProps,
   TooltipPortal as TooltipPortalPrimitive,
   TooltipPositioner as TooltipPositionerPrimitive,
-  Tooltip as TooltipPrimitive,
-  TooltipProvider as TooltipProviderPrimitive,
-  TooltipTrigger as TooltipTriggerPrimitive,
-  type TooltipPopupProps as TooltipPopupPrimitiveProps,
   type TooltipPositionerProps as TooltipPositionerPrimitiveProps,
+  Tooltip as TooltipPrimitive,
   type TooltipProps as TooltipPrimitiveProps,
+  TooltipProvider as TooltipProviderPrimitive,
   type TooltipProviderProps as TooltipProviderPrimitiveProps,
+  TooltipTrigger as TooltipTriggerPrimitive,
   type TooltipTriggerProps as TooltipTriggerPrimitiveProps,
 } from '../primitives/base/tooltip';
 
@@ -43,9 +43,10 @@ function TooltipContent({ className, sideOffset = 4, children, style, ...props }
         <TooltipPopupPrimitive
           className={cn(
             'bg-primary text-primary-foreground w-fit origin-(--transform-origin) rounded-md px-3 py-1.5 text-xs text-balance',
-            className,
+            className
           )}
-          style={style}>
+          style={style}
+        >
           {children}
           <TooltipArrowPrimitive className="bg-primary fill-primary z-50 size-2.5 data-[side='bottom']:-top-[4px] data-[side='right']:-left-[4px] data-[side='left']:-right-[4px] data-[side='inline-start']:-right-[4px] data-[side='inline-end']:-left-[4px] rotate-45 rounded-[2px]" />
         </TooltipPopupPrimitive>
@@ -61,12 +62,12 @@ type TooltipPanelProps = TooltipContentProps;
 export {
   Tooltip,
   TooltipContent,
-  TooltipPanel,
-  TooltipProvider,
-  TooltipTrigger,
   type TooltipContentProps,
+  TooltipPanel,
   type TooltipPanelProps,
   type TooltipProps,
+  TooltipProvider,
   type TooltipProviderProps,
+  TooltipTrigger,
   type TooltipTriggerProps,
 };
