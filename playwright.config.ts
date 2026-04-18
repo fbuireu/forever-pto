@@ -10,7 +10,7 @@ export default defineConfig({
   use: {
     baseURL: process.env.BASE_URL ?? 'http://localhost:3000',
     trace: 'on-first-retry',
-    extraHTTPHeaders: (() => {
+    extraHTTPHeaders: ((): Record<string, string> => {
       const id = process.env.CF_ACCESS_CLIENT_ID;
       const secret = process.env.CF_ACCESS_CLIENT_SECRET;
       if (!id && !secret) return {};

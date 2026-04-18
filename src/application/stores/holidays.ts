@@ -3,8 +3,8 @@ import { isInSelectedRange } from '@application/dto/holiday/utils/helpers';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { generateMetrics } from '@infrastructure/services/calendar/metrics/generateMetrics';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
-import { addMonths, endOfYear, formatDate, startOfYear } from '@ui/lib/date';
-import { ensureDate } from '@ui/lib/helpers';
+import { addMonths, endOfYear, formatDate, startOfYear } from '@shared/utils/date';
+import { ensureDate } from '@shared/utils/helpers';
 import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -285,13 +285,18 @@ export const useHolidaysStore = create<HolidaysStore>()(
           suggestion: Suggestion;
           alternatives: Suggestion[];
         }) => {
+          const { currentSelectionIndex } = get();
+          const allSuggestions = [suggestion, ...alternatives];
+          const preservedIndex = currentSelectionIndex < allSuggestions.length ? currentSelectionIndex : 0;
+          const preservedSelection = allSuggestions[preservedIndex] ?? suggestion;
+
           set({
             suggestion,
             alternatives,
-            currentSelection: suggestion,
-            previewAlternativeSelection: suggestion,
-            previewAlternativeIndex: 0,
-            currentSelectionIndex: 0,
+            currentSelection: preservedSelection,
+            previewAlternativeSelection: preservedSelection,
+            previewAlternativeIndex: preservedIndex,
+            currentSelectionIndex: preservedIndex,
             removedSuggestedDays: [],
           });
         },

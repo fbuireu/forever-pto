@@ -1,3 +1,17 @@
+## [1.0.3](https://github.com/fbuireu/forever-pto/compare/v1.0.2...v1.0.3) (2026-04-18)
+
+
+### Bug Fixes
+
+* minor styling ([b7464e8](https://github.com/fbuireu/forever-pto/commit/b7464e81f09e6389f6ae27b88a4e5fdc19b35213))
+
+## [1.0.2](https://github.com/fbuireu/forever-pto/compare/v1.0.1...v1.0.2) (2026-04-17)
+
+
+### Bug Fixes
+
+* ci vars ([8e2b4dd](https://github.com/fbuireu/forever-pto/commit/8e2b4dd54d968ad5b746c3e35e2cc2b4c44b785b))
+
 ## [1.0.1](https://github.com/fbuireu/forever-pto/compare/v1.0.0...v1.0.1) (2026-04-17)
 
 
