@@ -1,7 +1,7 @@
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import type { HolidaysState } from '@application/stores/holidays';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
-import { isBefore, isSameDay, startOfToday } from '@shared/utils/date';
+import { isBefore, isSameDay, startOfToday } from '@ui/lib/date';
 import type { FromTo } from '../core/Calendar';
 
 export const isHoliday = (holidays: HolidaysState['holidays']) => (date: Date) =>

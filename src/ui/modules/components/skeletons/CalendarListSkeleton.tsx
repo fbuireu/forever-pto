@@ -1,4 +1,4 @@
-import { Skeleton } from '@const/components/ui/skeleton';
+import { Skeleton } from '@ui/components/primitives/skeleton';
 
 const MONTHS_PER_YEAR = 12;
 const DAYS_PER_WEEK = 7;

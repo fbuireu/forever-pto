@@ -1,4 +1,4 @@
-import { Skeleton } from '@const/components/ui/skeleton';
+import { Skeleton } from '@ui/components/primitives/skeleton';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const AlternativesManagerSkeleton = () => (

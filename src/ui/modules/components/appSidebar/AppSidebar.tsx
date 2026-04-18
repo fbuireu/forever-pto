@@ -1,12 +1,4 @@
-import { Calculator } from 'lucide-react';
-import type { Locale } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
-import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
-import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { Settings } from 'src/components/animate-ui/icons/settings';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/base/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/components/animate/base/collapsible';
 import {
   Sidebar,
   SidebarContent,
@@ -22,7 +14,15 @@ import {
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
-} from 'src/components/animate-ui/base/sidebar';
+} from '@ui/components/animate/base/sidebar';
+import { ChevronRight } from '@ui/components/animate/icons/chevron-right';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { Settings } from '@ui/components/animate/icons/settings';
+import { Calculator } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import type { Locale } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
+import { Suspense } from 'react';
 import { Logo } from '../core/Logo';
 import { AllowPastDays } from './components/AllowPastDays';
 import { CarryOverMonths } from './components/CarryOverMonths';
@@ -35,7 +35,9 @@ const Regions = dynamic(() => import('./components/Regions').then((m) => m.Regio
 const Years = dynamic(() => import('./components/Years').then((m) => m.Years));
 const Strategy = dynamic(() => import('./components/Strategy').then((m) => m.Strategy));
 const PtoCalculator = dynamic(() => import('./components/PtoCalculator').then((m) => m.PtoCalculator));
-const PtoSalaryCalculator = dynamic(() => import('./components/PtoSalaryCalculator').then((m) => m.PtoSalaryCalculator));
+const PtoSalaryCalculator = dynamic(() =>
+  import('./components/PtoSalaryCalculator').then((m) => m.PtoSalaryCalculator)
+);
 const WorkdayCounter = dynamic(() => import('./components/WorkdayCounter').then((m) => m.WorkdayCounter));
 
 interface AppSidebarProps {
@@ -169,4 +171,3 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
     </SidebarProvider>
   );
 };
-

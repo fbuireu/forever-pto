@@ -1,8 +1,8 @@
-import { Troubleshooting } from '@ui/modules/components/faq/Troubleshooting';
+import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '@ui/components/animate/base/accordion';
 import { FaqTabs } from '@ui/modules/components/faq/FaqTabs';
+import { Troubleshooting } from '@ui/modules/components/faq/Troubleshooting';
 import type { FaqData } from '@ui/modules/components/faq/types';
 import { getTranslations } from 'next-intl/server';
-import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from 'src/components/animate-ui/base/accordion';
 import { Tutorial } from '../faq/Tutorial';
 import { TutorialTrigger } from '../faq/TutorialTrigger';
 

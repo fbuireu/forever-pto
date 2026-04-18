@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@const/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/components/primitives/card';
 import { TrendingUp } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo } from 'react';

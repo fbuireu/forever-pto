@@ -11,14 +11,14 @@ import { calculateFinalAmount } from '@infrastructure/services/payments/utils/he
 import { Elements } from '@stripe/react-stripe-js';
 import type { Stripe, StripeElementsOptions } from '@stripe/stripe-js';
 import { initializePayment } from '@ui/adapters/payments/checkout';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/animate/base/popover';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { Star } from '@ui/components/animate/icons/star';
 import { useLocale, useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { Star } from 'src/components/animate-ui/icons/star';
-import { Popover, PopoverContent, PopoverTrigger } from 'src/components/animate-ui/base/popover';
 import { useShallow } from 'zustand/react/shallow';
 import { CheckoutForm } from './CheckoutForm';
 import { DonationForm } from './DonationForm';
@@ -336,9 +336,7 @@ export const Donate = () => {
           </PopoverTrigger>
         </div>
       </div>
-      <PopoverContent
-        className='w-96'
-      >
+      <PopoverContent className='w-96'>
         <div className='grid gap-4'>
           <div className='space-y-2'>
             <h4 className='leading-none font-medium'>{tDonate('supportAndUnblock')}</h4>

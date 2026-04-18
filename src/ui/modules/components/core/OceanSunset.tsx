@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@const/lib/utils';
+import { cn } from '@ui/lib/utils';
 
 type OceanSunsetProps = {
   width?: number;

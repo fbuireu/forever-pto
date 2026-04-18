@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@const/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/components/primitives/card';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers';
 import { Calendar } from 'lucide-react';
 import { useTranslations } from 'next-intl';

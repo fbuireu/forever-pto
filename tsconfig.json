@@ -24,17 +24,14 @@
     ],
     "paths": {
       "src/*": ["./src/*"],
-      "@const/*": ["./src/const/*"],
       "@app/*": ["./src/app/*"],
       "@infrastructure/*": ["./src/infrastructure/*"],
       "@domain/*": ["./src/domain/*"],
       "@ui/*": ["./src/ui/*"],
       "@application/*": ["./src/application/*"],
       "@modules/*": ["./src/ui/modules/*"],
-      "@utils/*": ["./src/utils/*"],
       "@assets/*": ["./src/ui/assets/*"],
       "@styles/*": ["./src/ui/styles/*"],
-      "@shared/*": ["./src/shared/*"],
       "@i18n/*": ["./src/ui/i18n/*"],
       "@mocks/*": ["./src/mocks/*"],
       "@types/*": ["./src/types/*"]

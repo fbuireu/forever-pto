@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@const/components/ui/card';
-import { cn } from '@const/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/components/primitives/card';
+import { cn } from '@ui/lib/utils';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers';
 import { useTranslations } from 'next-intl';
 import styles from './legend.module.css';

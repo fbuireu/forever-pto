@@ -1,0 +1,85 @@
+'use client';
+
+import { cn } from '@ui/lib/utils';
+import { type HTMLMotionProps, m, type Transition } from 'motion/react';
+import type { SlidingNumberProps } from '../text/sliding-number';
+import { SlidingNumber } from '../text/sliding-number';
+import { Button } from './buttons/button';
+
+type CounterProps = HTMLMotionProps<'div'> & {
+  number: number;
+  setNumber: (number: number) => void;
+  slidingNumberProps?: Omit<SlidingNumberProps, 'number'>;
+  buttonProps?: Omit<React.ComponentProps<typeof Button>, 'onClick' | 'asChild'>;
+  decrementButtonProps?: Omit<React.ComponentProps<typeof Button>, 'onClick' | 'asChild'>;
+  incrementButtonProps?: Omit<React.ComponentProps<typeof Button>, 'onClick' | 'asChild'>;
+  transition?: Transition;
+};
+
+function Counter({
+  number,
+  setNumber,
+  className,
+  slidingNumberProps,
+  buttonProps,
+  decrementButtonProps,
+  incrementButtonProps,
+  transition = { type: 'spring', bounce: 0, stiffness: 300, damping: 30 },
+  ...props
+}: CounterProps) {
+  return (
+    <m.div
+      data-slot='counter'
+      layout
+      transition={transition}
+      className={cn('flex items-center gap-x-2 p-1 rounded-xl bg-neutral-100 dark:bg-neutral-800', className)}
+      {...props}
+    >
+      <m.div
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className={cn(decrementButtonProps?.className)}
+        aria-disabled={decrementButtonProps?.disabled ?? false}
+      >
+        <Button
+          size='icon'
+          {...buttonProps}
+          {...decrementButtonProps}
+          onClick={() => setNumber(number - 1)}
+          className={cn(
+            'bg-white dark:bg-neutral-950 hover:bg-white/70 dark:hover:bg-neutral-950/70 text-neutral-950 dark:text-white text-2xl font-light pb-[3px]',
+            buttonProps?.className,
+            decrementButtonProps?.className
+          )}
+        >
+          -
+        </Button>
+      </m.div>
+
+      <SlidingNumber number={number} {...slidingNumberProps} className={cn('text-lg', slidingNumberProps?.className)} />
+
+      <m.div
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className={cn(incrementButtonProps?.className)}
+        aria-disabled={incrementButtonProps?.disabled ?? false}
+      >
+        <Button
+          size='icon'
+          {...buttonProps}
+          {...incrementButtonProps}
+          onClick={() => setNumber(number + 1)}
+          className={cn(
+            'bg-white dark:bg-neutral-950 hover:bg-white/70 dark:hover:bg-neutral-950/70 text-neutral-950 dark:text-white text-2xl font-light pb-[3px]',
+            buttonProps?.className,
+            incrementButtonProps?.className
+          )}
+        >
+          +
+        </Button>
+      </m.div>
+    </m.div>
+  );
+}
+
+export { Counter, type CounterProps };

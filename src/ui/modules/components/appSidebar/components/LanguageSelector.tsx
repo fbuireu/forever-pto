@@ -2,19 +2,19 @@
 
 import { usePathname, useRouter } from '@application/i18n/navigtion';
 import { usePremiumStore } from '@application/stores/premium';
-import { useLanguages } from '@ui/hooks/useLanguages';
-import { useLocale, useTranslations } from 'next-intl';
-import { useCallback, useEffect, useMemo } from 'react';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { Check } from 'src/components/animate-ui/icons/check';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from 'src/components/animate-ui/base/dropdown-menu';
-import { useSidebar } from 'src/components/animate-ui/base/sidebar';
+} from '@ui/components/animate/base/dropdown-menu';
+import { useSidebar } from '@ui/components/animate/base/sidebar';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { Check } from '@ui/components/animate/icons/check';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { useLanguages } from '@ui/hooks/useLanguages';
+import { useLocale, useTranslations } from 'next-intl';
+import { useCallback, useEffect, useMemo } from 'react';
 
 export const LanguageSelector = () => {
   const locale = useLocale();

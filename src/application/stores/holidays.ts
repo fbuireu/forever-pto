@@ -3,8 +3,8 @@ import { isInSelectedRange } from '@application/dto/holiday/utils/helpers';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { generateMetrics } from '@infrastructure/services/calendar/metrics/generateMetrics';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
-import { addMonths, endOfYear, formatDate, startOfYear } from '@shared/utils/date';
-import { ensureDate } from '@shared/utils/helpers';
+import { addMonths, endOfYear, formatDate, startOfYear } from '@ui/lib/date';
+import { ensureDate } from '@ui/lib/helpers';
 import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -126,11 +126,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
 
           try {
-            const [
-              { generateSuggestions },
-              { generateAlternatives },
-              { generateMetrics },
-            ] = await Promise.all([
+            const [{ generateSuggestions }, { generateAlternatives }, { generateMetrics }] = await Promise.all([
               import('@infrastructure/services/calendar/suggestions/generateSuggestions'),
               import('@infrastructure/services/calendar/alternatives/generateAlternatives'),
               import('@infrastructure/services/calendar/metrics/generateMetrics'),

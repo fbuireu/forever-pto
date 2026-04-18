@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@const/components/ui/button';
+import { Button } from '@ui/components/primitives/button';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as CookieConsentLib from 'vanilla-cookieconsent';

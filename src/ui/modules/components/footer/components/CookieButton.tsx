@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@const/components/ui/button';
+import { Button } from '@ui/components/primitives/button';
 import { useTranslations } from 'next-intl';
 
 export const CookieButton = () => {

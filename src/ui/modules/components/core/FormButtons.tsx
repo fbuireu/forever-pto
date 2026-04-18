@@ -1,8 +1,8 @@
-import { cn } from '@const/lib/utils';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { cn } from '@ui/lib/utils';
 import { Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useFormStatus } from 'react-dom';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
 
 interface FormButtonsProps {
   onCancel?: () => void;

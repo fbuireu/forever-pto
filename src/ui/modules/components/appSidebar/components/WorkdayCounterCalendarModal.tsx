@@ -1,9 +1,9 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@const/components/ui/dialog';
-import { formatDate } from '@shared/utils/date';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/components/primitives/dialog';
+import { formatDate } from '@ui/lib/date';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
 import type { FromTo } from '../../core/Calendar';
 import { Calendar, CalendarSelectionMode } from '../../core/Calendar';
 

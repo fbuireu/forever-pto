@@ -48,7 +48,6 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: sidebar with carryover w/ more padding
 // todo: brutalist design
 // todo: improve responsive
 // todo: https://effect.website/
@@ -56,10 +55,10 @@ export default Home;
 // todo: add boneyard skeleton
 // todo: add ubiquitous language
 // todo: feedback web-check.xyz
-// todo: migrate from tailwind to css modules
 // todo: docs with mintlifyy
 // todo: share button with results?
 // todo: migrate temporal API when available in Node
+// todo: sponsor the project (reddit, producthunt)
 // todo: unify modal styles (footer actions, spacing, etc)
 // todo: performance audit, react best practices audit
 // todo: ads?
@@ -68,7 +67,6 @@ export default Home;
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
 // todo: use grid one-liner for layout calendar https://www.youtube.com/watch?v=Ix_LAId0obw
 // todo: unify component and folder structure (payment/provider should be dto?)
-// todo: CI to work on releases
 // todo: Increase test coverage
 // todo: track origin of premium key (feature)
 // todo: add custom weekends
@@ -77,8 +75,3 @@ export default Home;
 // todo: transformer to make sql data ready ':id': data.id',
 // todo: improve error handling in server actions (send whole error type and change icon when "save to db error")
 // todo: APPLY DDD + check everything (SSR, CSR, etc)
-
-// PROD
-// todo: stripe rest of config (check all payment methods)
-// todo: add pages to bookmarks (betterstack, resend)
-// todo: cookie management (on PROD)

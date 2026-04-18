@@ -1,4 +1,4 @@
-import { Skeleton } from '@const/components/ui/skeleton';
+import { Skeleton } from '@ui/components/primitives/skeleton';
 
 export const PtoStatusSkeleton = () => (
   <div className='p-2 rounded-2xl border shadow-sm bg-background'>

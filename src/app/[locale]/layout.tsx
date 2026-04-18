@@ -1,7 +1,9 @@
-import { Toaster } from '@const/components/ui/sonner';
-import { cn } from '@const/lib/utils';
 import { routing } from '@infrastructure/i18n/routing';
+import { Toaster } from '@ui/components/primitives/sonner';
+import { cn } from '@ui/lib/utils';
 import '@styles/index.css';
+import { SidebarProvider } from '@ui/components/animate/base/sidebar';
+import { LazyMotionProvider } from '@ui/components/animate/LazyMotionProvider';
 import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
 import { Analytics } from '@ui/modules/components/core/Analytics';
 import { CookieConsentClient } from '@ui/modules/components/core/CookieConsentClient';
@@ -16,8 +18,6 @@ import { notFound } from 'next/navigation';
 import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { ThemeProvider } from 'next-themes';
-import { LazyMotionProvider } from 'src/components/animate-ui/LazyMotionProvider';
-import { SidebarProvider } from 'src/components/animate-ui/base/sidebar';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -70,25 +70,25 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
             disableTransitionOnChange
           >
             <LazyMotionProvider>
-            <SidebarProvider>
-              <StoresInitializer />
-              <AppSidebar locale={locale}>
-                <div
-                  className='pointer-events-none h-full z-1 rounded-lg inset-0 absolute
+              <SidebarProvider>
+                <StoresInitializer />
+                <AppSidebar locale={locale}>
+                  <div
+                    className='pointer-events-none h-full z-1 rounded-lg inset-0 absolute
   bg-[linear-gradient(to_right,var(--grid-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid-color)_1px,transparent_1px)]
   bg-size-[4rem_4rem]'
-                  aria-hidden='true'
-                />
-                <SiteTitle />
-                <SiteSubtitle />
-                {children}
-                <Toaster />
-                <DonateClient />
-                <PremiumModal />
-                <CookieConsentClient />
-                <Footer />
-              </AppSidebar>
-            </SidebarProvider>
+                    aria-hidden='true'
+                  />
+                  <SiteTitle />
+                  <SiteSubtitle />
+                  {children}
+                  <Toaster />
+                  <DonateClient />
+                  <PremiumModal />
+                  <CookieConsentClient />
+                  <Footer />
+                </AppSidebar>
+              </SidebarProvider>
             </LazyMotionProvider>
           </ThemeProvider>
         </NextIntlClientProvider>

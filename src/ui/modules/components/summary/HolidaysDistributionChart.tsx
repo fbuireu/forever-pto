@@ -1,5 +1,5 @@
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@const/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/components/primitives/card';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/components/core/utils/helpers';
 import { PieChart } from 'lucide-react';
 import { useTranslations } from 'next-intl';

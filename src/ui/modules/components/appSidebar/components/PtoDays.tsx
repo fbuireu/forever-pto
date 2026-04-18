@@ -2,14 +2,14 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { cn } from '@const/lib/utils';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { Counter } from '@ui/components/animate/components/counter';
+import { SlidingNumber } from '@ui/components/animate/text/sliding-number';
 import { useDebounce } from '@ui/hooks/useDebounce';
+import { cn } from '@ui/lib/utils';
 import { CalendarDays, Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { Counter } from 'src/components/animate-ui/components/counter';
-import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 
 const MIN_VALUE = 1;
@@ -23,7 +23,15 @@ export const PtoDays = () => {
       setPtoDays: state.setPtoDays,
     }))
   );
-  const { currentSelection, removedSuggestedDays, manuallySelectedDays, resetManualSelection, trimManualDays, isCalculating, setCalculating } = useHolidaysStore(
+  const {
+    currentSelection,
+    removedSuggestedDays,
+    manuallySelectedDays,
+    resetManualSelection,
+    trimManualDays,
+    isCalculating,
+    setCalculating,
+  } = useHolidaysStore(
     useShallow((state) => ({
       currentSelection: state.currentSelection,
       removedSuggestedDays: state.removedSuggestedDays,
@@ -86,7 +94,7 @@ export const PtoDays = () => {
         <div className='space-y-2 w-full'>
           <div className='flex items-center justify-between text-sm'>
             <span className='text-muted-foreground'>{t('autoAssigned')}</span>
-            <span role="img" aria-label={`${t('autoAssigned')}: ${activeSuggestedCount}`}>
+            <span role='img' aria-label={`${t('autoAssigned')}: ${activeSuggestedCount}`}>
               <SlidingNumber
                 number={activeSuggestedCount}
                 className='font-semibold text-teal-600 dark:text-teal-400'
@@ -96,7 +104,7 @@ export const PtoDays = () => {
           </div>
           <div className='flex items-center justify-between text-sm'>
             <span className='text-muted-foreground'>{t('manuallySelected')}</span>
-            <span role="img" aria-label={`${t('manuallySelected')}: ${manualSelectedCount}`}>
+            <span role='img' aria-label={`${t('manuallySelected')}: ${manualSelectedCount}`}>
               <SlidingNumber
                 number={manualSelectedCount}
                 className='font-semibold text-blue-600 dark:text-blue-400'
@@ -107,7 +115,7 @@ export const PtoDays = () => {
           <div className='h-px bg-border my-2' />
           <div className='flex items-center justify-between text-sm'>
             <span className='font-medium'>{t('remaining')}</span>
-            <span role="img" aria-label={`${t('remaining')}: ${remaining}`}>
+            <span role='img' aria-label={`${t('remaining')}: ${remaining}`}>
               <SlidingNumber
                 number={remaining}
                 className={cn(

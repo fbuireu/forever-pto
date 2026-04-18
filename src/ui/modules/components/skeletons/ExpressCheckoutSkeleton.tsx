@@ -1,4 +1,4 @@
-import { Skeleton } from '@const/components/ui/skeleton';
+import { Skeleton } from '@ui/components/primitives/skeleton';
 
 export const ExpressCheckoutSkeleton = () => (
   <div className='gap-2 flex'>

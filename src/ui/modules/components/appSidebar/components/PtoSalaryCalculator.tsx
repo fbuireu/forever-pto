@@ -1,12 +1,12 @@
 'use client';
 
 import { usePremiumStore } from '@application/stores/premium';
-import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@const/components/ui/input-group';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/components/animate/base/tooltip';
+import { SlidingNumber } from '@ui/components/animate/text/sliding-number';
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@ui/components/primitives/input-group';
 import { Euro, InfoIcon } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/base/tooltip';
-import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 import { ConditionalWrapper } from '../../core/ConditionalWrapper';
 
