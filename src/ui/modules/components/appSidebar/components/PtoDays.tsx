@@ -5,11 +5,10 @@ import { useHolidaysStore } from '@application/stores/holidays';
 import { Button } from '@ui/components/animate/components/buttons/button';
 import { Counter } from '@ui/components/animate/components/counter';
 import { SlidingNumber } from '@ui/components/animate/text/sliding-number';
-import { useDebounce } from '@ui/hooks/useDebounce';
 import { cn } from '@ui/lib/utils';
 import { CalendarDays, Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 const MIN_VALUE = 1;
@@ -42,9 +41,8 @@ export const PtoDays = () => {
       setCalculating: state.setCalculating,
     }))
   );
-  const [localValue, setLocalValue] = useDebounce({ value: ptoDays, delay: 100, callback: setPtoDays });
-  const isDecrementDisabled = localValue <= MIN_VALUE;
-  const isIncrementDisabled = localValue >= MAX_VALUE;
+  const isDecrementDisabled = ptoDays <= MIN_VALUE;
+  const isIncrementDisabled = ptoDays >= MAX_VALUE;
   const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
   const manualSelectedCount = manuallySelectedDays.length;
 
@@ -57,12 +55,15 @@ export const PtoDays = () => {
 
   const hasManualChanges = manualSelectedCount > 0 || removedSuggestedDays.length > 0;
 
-  const handleChange = (value: number) => {
-    const newValue = Math.max(MIN_VALUE, value);
-    setCalculating(true);
-    setLocalValue(newValue);
-    trimManualDays(newValue);
-  };
+  const handleChange = useCallback(
+    (value: number) => {
+      const newValue = Math.max(MIN_VALUE, value);
+      setCalculating(true);
+      setPtoDays(newValue);
+      trimManualDays(newValue);
+    },
+    [setCalculating, setPtoDays, trimManualDays]
+  );
 
   return (
     <div className='space-y-2 w-full' data-tutorial='pto-days'>
@@ -73,14 +74,14 @@ export const PtoDays = () => {
         <p className='font-normal text-sm'>{t('iHave')}</p>
         <Counter
           id='pto-days'
-          number={localValue}
+          number={ptoDays}
           setNumber={handleChange}
           decrementButtonProps={{
-            disabled: localValue <= MIN_VALUE,
+            disabled: ptoDays <= MIN_VALUE,
             className: cn(isDecrementDisabled && 'cursor-not-allowed opacity-50'),
           }}
           incrementButtonProps={{
-            disabled: localValue >= MAX_VALUE,
+            disabled: ptoDays >= MAX_VALUE,
             className: cn(isIncrementDisabled && 'cursor-not-allowed opacity-50'),
           }}
           slidingNumberProps={{ className: 'font-normal text-sm' }}
