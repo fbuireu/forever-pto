@@ -45,8 +45,12 @@ function Tooltip({
   });
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const tooltipContextValue = React.useMemo(
+    () => ({ isOpen, setIsOpen, x, y, followCursor, followCursorSpringOptions }),
+    [isOpen, setIsOpen, x, y, followCursor, followCursorSpringOptions],
+  );
   return (
-    <LocalTooltipProvider value={{ isOpen, setIsOpen, x, y, followCursor, followCursorSpringOptions }}>
+    <LocalTooltipProvider value={tooltipContextValue}>
       <TooltipPrimitive.Root data-slot='tooltip' {...props} onOpenChange={setIsOpen} />
     </LocalTooltipProvider>
   );
