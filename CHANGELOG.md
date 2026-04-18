@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/fbuireu/forever-pto/compare/v1.0.3...v1.0.4) (2026-04-18)
+
+
+### Bug Fixes
+
+* pto days count ([a2e046b](https://github.com/fbuireu/forever-pto/commit/a2e046bf096f9f38a4462f644a1119e3459cbf97))
+
 ## [1.0.3](https://github.com/fbuireu/forever-pto/compare/v1.0.2...v1.0.3) (2026-04-18)
 
 
