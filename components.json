@@ -12,11 +12,11 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@const/components",
-    "utils": "@const/lib/utils",
-    "ui": "@const/components/ui",
-    "lib": "@const/lib",
-    "hooks": "@const/hooks"
+    "components": "@ui/components",
+    "utils": "@ui/lib/utils",
+    "ui": "@ui/components/primitives",
+    "lib": "@ui/lib",
+    "hooks": "@ui/hooks"
   },
   "registries": {
     "@animate-ui": "https://animate-ui.com/r/{name}.json"

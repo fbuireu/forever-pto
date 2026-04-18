@@ -1,5 +1,5 @@
 import { useLocationStore } from '@application/stores/location';
-import { isWithinInterval } from '@shared/utils/date';
+import { isWithinInterval } from '@ui/lib/date';
 
 export function getRegionName(regionCode: string): string {
   if (!regionCode) return '';

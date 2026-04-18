@@ -1,18 +1,18 @@
 import type { FiltersState } from '@application/stores/filters';
 import type { HolidaysState } from '@application/stores/holidays';
 import { usePremiumStore } from '@application/stores/premium';
-import { cn } from '@const/lib/utils';
-import { addMonths, type Day, formatDate, isSameDay, isSameMonth, isWeekend, subMonths } from '@shared/utils/date';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/components/animate/base/tooltip';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { ChevronLeft } from '@ui/components/animate/icons/chevron-left';
+import { ChevronRight } from '@ui/components/animate/icons/chevron-right';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { addMonths, type Day, formatDate, isSameDay, isSameMonth, isWeekend, subMonths } from '@ui/lib/date';
+import { cn } from '@ui/lib/utils';
 import { LockIcon } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
-import { ChevronRight } from 'src/components/animate-ui/icons/chevron-right';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/base/tooltip';
 import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
 import {
   getPreviewRange,
@@ -462,9 +462,11 @@ export function Calendar({
                   onMouseEnter={() => handleDayHover(date)}
                   onMouseLeave={handleDayLeave}
                   disabled={isDisabled}
-                  aria-label={holidayName
-                    ? `${formatDate({ date, locale, format: 'EEEE, MMMM d, yyyy' })}, ${holidayName}`
-                    : formatDate({ date, locale, format: 'EEEE, MMMM d, yyyy' })}
+                  aria-label={
+                    holidayName
+                      ? `${formatDate({ date, locale, format: 'EEEE, MMMM d, yyyy' })}, ${holidayName}`
+                      : formatDate({ date, locale, format: 'EEEE, MMMM d, yyyy' })
+                  }
                   {...(mode === CalendarSelectionMode.NONE && {
                     tapScale: 1,
                     hoverScale: 1,

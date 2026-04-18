@@ -2,7 +2,9 @@
 
 import { type ContactFormData, createContactSchema } from '@application/dto/contact/schema';
 import { usePremiumStore } from '@application/stores/premium';
-import { Button } from '@const/components/ui/button';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CircleCheckBig } from '@ui/components/animate/icons/circle-check-big';
+import { Button } from '@ui/components/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -10,16 +12,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@const/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
-import { Input } from '@const/components/ui/input';
-import { Textarea } from '@const/components/ui/textarea';
-import { zodResolver } from '@hookform/resolvers/zod';
+} from '@ui/components/primitives/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/components/primitives/form';
+import { Input } from '@ui/components/primitives/input';
+import { Textarea } from '@ui/components/primitives/textarea';
 import { AlertCircle, Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import { CircleCheckBig } from 'src/components/animate-ui/icons/circle-check-big';
 import { useShallow } from 'zustand/react/shallow';
 import { FormButtons } from '../core/FormButtons';
 

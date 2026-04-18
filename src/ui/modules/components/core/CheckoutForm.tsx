@@ -1,15 +1,15 @@
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
-import { Button } from '@const/components/ui/button';
 import { formatDiscountText } from '@infrastructure/services/payments/utils/formatters';
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { confirmPayment } from '@ui/adapters/payments/checkout';
+import { ChevronLeft } from '@ui/components/animate/icons/chevron-left';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { Button } from '@ui/components/primitives/button';
 import { AlertCircle } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
 import { type FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
-import { ChevronLeft } from 'src/components/animate-ui/icons/chevron-left';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
 import { ExpressCheckoutSkeleton } from '../skeletons/ExpressCheckoutSkeleton';
 
 interface CheckoutFormProps {

@@ -1,4 +1,4 @@
-import { differenceInDays } from '@shared/utils/date';
+import { differenceInDays } from '@ui/lib/date';
 import { PTO_CONSTANTS } from '../../const';
 
 interface StartEndDate {

@@ -1,19 +1,19 @@
 'use client';
 
 import type { CreatePaymentInput } from '@application/dto/payment/schema';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@const/components/ui/form';
-import { Input } from '@const/components/ui/input';
-import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@const/components/ui/input-group';
-import { Label } from '@const/components/ui/label';
-import { cn } from '@const/lib/utils';
-import { amountFormatter } from '@shared/utils/helpers';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/components/animate/base/collapsible';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { ChevronDown } from '@ui/components/animate/icons/chevron-down';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/components/primitives/form';
+import { Input } from '@ui/components/primitives/input';
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@ui/components/primitives/input-group';
+import { Label } from '@ui/components/primitives/label';
+import { amountFormatter } from '@ui/lib/helpers';
+import { cn } from '@ui/lib/utils';
 import { useTranslations } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import type { UseFormReturn } from 'react-hook-form';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { ChevronDown } from 'src/components/animate-ui/icons/chevron-down';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'src/components/animate-ui/base/collapsible';
 import { FormButtons } from './FormButtons';
 
 const PRESET_AMOUNTS = [5, 10, 15] as const;

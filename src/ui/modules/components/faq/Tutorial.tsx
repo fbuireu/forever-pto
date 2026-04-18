@@ -1,8 +1,8 @@
 'use client';
 
+import { Button } from '@ui/components/animate/components/buttons/button';
 import { useTutorial } from '@ui/hooks/useTutorial';
 import { useTranslations } from 'next-intl';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
 
 export const Tutorial = () => {
   const t = useTranslations('tutorial');

@@ -1,14 +1,14 @@
 'use client';
 
 import { useFiltersStore } from '@application/stores/filters';
-import { Slider } from '@const/components/ui/slider';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/components/animate/base/tooltip';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { SlidersHorizontal } from '@ui/components/animate/icons/sliders-horizontal';
+import { SlidingNumber } from '@ui/components/animate/text/sliding-number';
+import { Slider } from '@ui/components/primitives/slider';
 import { InfoIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { SlidersHorizontal } from 'src/components/animate-ui/icons/sliders-horizontal';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'src/components/animate-ui/base/tooltip';
-import { SlidingNumber } from 'src/components/animate-ui/text/sliding-number';
 import { PremiumFeature } from '../../premium/PremiumFeature';
 
 const MIN_VALUE = 1;
@@ -67,7 +67,7 @@ export const CarryOverMonths = () => {
         </label>
         <PremiumFeature feature={t('title')}>
           <div className='flex gap-2 relative w-full'>
-            <p className='font-normal text-sm'>{MIN_VALUE}</p>
+            <p className='font-normal text-sm mr-0.5'>{MIN_VALUE}</p>
             <Slider
               id='carry-over-months'
               value={[localValue]}

@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@const/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
+import { Button } from '@ui/components/primitives/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/components/primitives/card';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';

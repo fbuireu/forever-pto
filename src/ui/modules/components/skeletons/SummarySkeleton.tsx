@@ -1,5 +1,5 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@const/components/ui/card';
-import { Skeleton } from '@const/components/ui/skeleton';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/components/primitives/card';
+import { Skeleton } from '@ui/components/primitives/skeleton';
 
 export const SummarySkeleton = () => {
   return (

@@ -2,6 +2,10 @@
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { Trash2 } from '@ui/components/animate/icons/trash-2';
 import {
   Dialog,
   DialogContent,
@@ -9,17 +13,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@const/components/ui/dialog';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { formatDate } from '@shared/utils/date';
+} from '@ui/components/primitives/dialog';
+import { formatDate } from '@ui/lib/date';
 import { AlertTriangle } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
-import { Button } from 'src/components/animate-ui/components/buttons/button';
-import { AnimateIcon } from 'src/components/animate-ui/icons/icon';
-import { Trash2 } from 'src/components/animate-ui/icons/trash-2';
 
 interface DeleteHolidayModalProps {
   open: boolean;

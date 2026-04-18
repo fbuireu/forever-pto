@@ -1,5 +1,5 @@
+import { GradientText } from '@ui/components/animate/primitives/texts/gradient';
 import { getTranslations } from 'next-intl/server';
-import { GradientText } from 'src/components/animate-ui/primitives/texts/gradient';
 import { OceanSunset } from './OceanSunset';
 import { PalmTree } from './PalmTree';
 

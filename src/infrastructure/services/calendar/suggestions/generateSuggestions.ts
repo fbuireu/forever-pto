@@ -1,5 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { isWeekend } from '@shared/utils/date';
+import { isWeekend } from '@ui/lib/date';
 import type { Bridge, Suggestion } from '../types';
 import { FilterStrategy } from '../types';
 import { clearDateKeyCache, clearHolidayCache } from '../utils/cache';
@@ -65,7 +65,9 @@ export function generateSuggestions({
 
   const bridges = findBridges({ availableWorkdays, holidays: effectiveHolidays });
 
-  const selector = STRATEGY_MAP[strategy] ?? DEFAULT_STRATEGY;
+  const selector = Object.hasOwn(STRATEGY_MAP, strategy)
+    ? STRATEGY_MAP[strategy as keyof typeof STRATEGY_MAP]
+    : DEFAULT_STRATEGY;
 
   const selection = selector(bridges, effectivePtoDays);
 

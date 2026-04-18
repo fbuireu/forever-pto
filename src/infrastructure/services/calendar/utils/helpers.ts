@@ -1,5 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { addDays, differenceInDays, isWeekend } from '@shared/utils/date';
+import { addDays, differenceInDays, isWeekend } from '@ui/lib/date';
 import { PTO_CONSTANTS } from '../const';
 import type { Bridge } from '../types';
 import { createHolidaySet, getKey } from './cache';
