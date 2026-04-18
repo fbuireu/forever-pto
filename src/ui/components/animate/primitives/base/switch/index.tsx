@@ -87,7 +87,7 @@ function SwitchThumb({
       render={
         <m.div
           data-slot='switch-thumb'
-          whileTap='tab'
+          whileTap='tap'
           layout
           transition={transition}
           animate={isPressed ? pressedAnimation : undefined}
