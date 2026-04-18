@@ -14,7 +14,10 @@ export default defineConfig({
       const id = process.env.CF_ACCESS_CLIENT_ID;
       const secret = process.env.CF_ACCESS_CLIENT_SECRET;
       if (!id && !secret) return {};
-      if (!id || !secret) throw new Error(`CF Access misconfigured: ${!id ? 'CF_ACCESS_CLIENT_ID' : 'CF_ACCESS_CLIENT_SECRET'} is missing`);
+      if (!id || !secret)
+        throw new Error(
+          `CF Access misconfigured: ${!id ? 'CF_ACCESS_CLIENT_ID' : 'CF_ACCESS_CLIENT_SECRET'} is missing`
+        );
       return { 'CF-Access-Client-Id': id, 'CF-Access-Client-Secret': secret };
     })(),
   },

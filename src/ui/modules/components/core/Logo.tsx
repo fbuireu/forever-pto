@@ -1,9 +1,9 @@
 'use client';
 
 import { Link } from '@application/i18n/navigtion';
-import { useIsMobile } from '@ui/hooks/use-mobile';
-import { GradientText } from '@ui/components/animate/primitives/texts/gradient';
 import { SidebarMenuButton, useSidebar } from '@ui/components/animate/base/sidebar';
+import { GradientText } from '@ui/components/animate/primitives/texts/gradient';
+import { useIsMobile } from '@ui/hooks/use-mobile';
 import { OceanSunset } from './OceanSunset';
 import { PalmTree } from './PalmTree';
 

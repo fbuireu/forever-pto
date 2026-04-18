@@ -1,5 +1,5 @@
-import type * as React from 'react';
 import { cn } from '@ui/lib/utils';
+import type * as React from 'react';
 
 interface SeparatorProps extends React.ComponentProps<'div'> {
   orientation?: 'horizontal' | 'vertical';
@@ -11,11 +11,7 @@ function Separator({ className, orientation = 'horizontal', decorative = true, .
     <div
       role={decorative ? 'none' : 'separator'}
       {...(!decorative && { 'aria-orientation': orientation })}
-      className={cn(
-        'shrink-0 bg-border',
-        orientation === 'horizontal' ? 'h-px w-full' : 'h-full w-px',
-        className,
-      )}
+      className={cn('shrink-0 bg-border', orientation === 'horizontal' ? 'h-px w-full' : 'h-full w-px', className)}
       {...props}
     />
   );

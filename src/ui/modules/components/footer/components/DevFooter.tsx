@@ -4,10 +4,10 @@ import { blueskyIcon } from '@ui/assets/icons/bluesky';
 import { buyMeACoffeeIcon } from '@ui/assets/icons/buymeacoffee';
 import { githubIcon } from '@ui/assets/icons/github';
 import { linkedinIcon } from '@ui/assets/icons/linkedin';
-import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useState } from 'react';
 import { RotatingTextContainer } from '@ui/components/animate/primitives/texts/rotating';
 import { RotatingText } from '@ui/components/animate/text/rotating';
+import { useTranslations } from 'next-intl';
+import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../../core/Icon';
 
 export const CONTACT_DETAILS = {

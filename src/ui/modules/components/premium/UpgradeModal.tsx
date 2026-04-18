@@ -1,15 +1,15 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Lock } from '@ui/components/animate/icons/lock';
 import { Button } from '@ui/components/primitives/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@ui/components/primitives/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/components/primitives/form';
 import { Input } from '@ui/components/primitives/input';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Crown, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Lock } from '@ui/components/animate/icons/lock';
 import { z } from 'zod';
 
 interface UpgradeModalProps {

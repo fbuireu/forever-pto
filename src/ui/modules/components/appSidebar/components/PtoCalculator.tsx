@@ -1,16 +1,16 @@
 'use client';
 
 import { useFiltersStore } from '@application/stores/filters';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/components/animate/base/tooltip';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { Plus } from '@ui/components/animate/icons/plus';
+import { SlidingNumber } from '@ui/components/animate/text/sliding-number';
 import { Combobox } from '@ui/components/primitives/combobox';
 import { Input } from '@ui/components/primitives/input';
 import { Calculator, InfoIcon } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useRef, useState } from 'react';
-import { Button } from '@ui/components/animate/components/buttons/button';
-import { AnimateIcon } from '@ui/components/animate/icons/icon';
-import { Plus } from '@ui/components/animate/icons/plus';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/components/animate/base/tooltip';
-import { SlidingNumber } from '@ui/components/animate/text/sliding-number';
 import { useShallow } from 'zustand/react/shallow';
 import { getMonthNames } from '../../utils/helpers';
 

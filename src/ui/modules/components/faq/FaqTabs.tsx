@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@ui/components/animate/components/tabs';
+import { useState } from 'react';
 
 type TabSection = {
   id: string;
@@ -23,10 +23,7 @@ export const FaqTabs = ({ tabs, title }: FaqTabsProps) => {
         {title}
       </h2>
       <Tabs value={active} onValueChange={setActive}>
-        <TabsList
-          className='grid w-full'
-          style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}
-        >
+        <TabsList className='grid w-full' style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
           {tabs.map((tab) => (
             <TabsTrigger key={tab.id} value={tab.id}>
               {tab.title}

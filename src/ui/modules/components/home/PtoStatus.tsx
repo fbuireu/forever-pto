@@ -3,13 +3,13 @@
 import { useFiltersStore } from '@application/stores/filters';
 import type { HolidaysState } from '@application/stores/holidays';
 import { useHolidaysStore } from '@application/stores/holidays';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { SlidingNumber } from '@ui/components/animate/text/sliding-number';
 import { cn } from '@ui/lib/utils';
 import { MousePointerClick } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { Button } from '@ui/components/animate/components/buttons/button';
-import { SlidingNumber } from '@ui/components/animate/text/sliding-number';
 
 interface PtoStatusProps {
   currentSelection: NonNullable<HolidaysState['currentSelection']>;

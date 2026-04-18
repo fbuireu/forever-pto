@@ -1,9 +1,9 @@
+import { SlidingNumber } from '@ui/components/animate/text/sliding-number';
 import { Badge } from '@ui/components/primitives/badge';
 import { cn } from '@ui/lib/utils';
 import type { LucideIcon } from 'lucide-react';
 import type { SVGMotionProps } from 'motion/react';
 import type { ReactNode } from 'react';
-import { SlidingNumber } from '@ui/components/animate/text/sliding-number';
 
 export const MetricCardSize = {
   DEFAULT: 'default',

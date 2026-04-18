@@ -1,14 +1,14 @@
 'use client';
 
 import { useFiltersStore } from '@application/stores/filters';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/components/animate/base/tooltip';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { SlidersHorizontal } from '@ui/components/animate/icons/sliders-horizontal';
+import { SlidingNumber } from '@ui/components/animate/text/sliding-number';
 import { Slider } from '@ui/components/primitives/slider';
 import { InfoIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AnimateIcon } from '@ui/components/animate/icons/icon';
-import { SlidersHorizontal } from '@ui/components/animate/icons/sliders-horizontal';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/components/animate/base/tooltip';
-import { SlidingNumber } from '@ui/components/animate/text/sliding-number';
 import { PremiumFeature } from '../../premium/PremiumFeature';
 
 const MIN_VALUE = 1;

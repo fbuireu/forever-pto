@@ -1,21 +1,16 @@
 'use client';
 
 import { useHolidaysStore } from '@application/stores/holidays';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/components/animate/base/tooltip';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { SlidingNumber } from '@ui/components/animate/text/sliding-number';
+import { Label } from '@ui/components/primitives/label';
 import { differenceInCalendarDays, formatDate } from '@ui/lib/date';
 import { CalendarDays, InfoIcon } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { Button } from '@ui/components/animate/components/buttons/button';
-import { Label } from '@ui/components/primitives/label';
 import { useShallow } from 'zustand/react/shallow';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@ui/components/animate/base/tooltip';
-import { SlidingNumber } from '@ui/components/animate/text/sliding-number';
 import type { FromTo } from '../../core/Calendar';
 import { calculateHolidaysInRange, calculateWeekends, calculateWorkdays } from '../../utils/helpers';
 

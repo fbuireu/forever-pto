@@ -1,3 +1,6 @@
+import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '@ui/components/animate/base/accordion';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { Switch } from '@ui/components/animate/headless/switch';
 import {
   Dialog,
   DialogContent,
@@ -9,14 +12,6 @@ import {
 import { Label } from '@ui/components/primitives/label';
 import { Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import {
-  Accordion,
-  AccordionItem,
-  AccordionPanel,
-  AccordionTrigger,
-} from '@ui/components/animate/base/accordion';
-import { Button } from '@ui/components/animate/components/buttons/button';
-import { Switch } from '@ui/components/animate/headless/switch';
 
 interface CookieConsentDialogProps {
   open: boolean;

@@ -1,19 +1,19 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-import { useTheme } from 'next-themes';
-import { useCallback } from 'react';
-import { Button } from '@ui/components/animate/components/buttons/button';
-import { Check } from '@ui/components/animate/icons/check';
-import { AnimateIcon } from '@ui/components/animate/icons/icon';
-import { Moon } from '@ui/components/animate/icons/moon';
-import { Sun } from '@ui/components/animate/icons/sun';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@ui/components/animate/base/dropdown-menu';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { Check } from '@ui/components/animate/icons/check';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { Moon } from '@ui/components/animate/icons/moon';
+import { Sun } from '@ui/components/animate/icons/sun';
+import { useTranslations } from 'next-intl';
+import { useTheme } from 'next-themes';
+import { useCallback } from 'react';
 
 const getResolvedTheme = (theme: ReturnType<typeof useTheme>['theme']) => {
   if (theme !== 'system') return theme;

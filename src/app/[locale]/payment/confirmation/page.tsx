@@ -1,8 +1,8 @@
 import { Link } from '@application/i18n/navigtion';
-import { Button } from '@ui/components/primitives/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/components/primitives/card';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
+import { Button } from '@ui/components/primitives/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/components/primitives/card';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import type { Locale } from 'next-intl';
@@ -21,7 +21,11 @@ interface PaymentSuccessParams {
   params: Promise<{ locale: Locale }>;
 }
 
-const getCurrencySymbol = (locale: string, currency: string, logger: ReturnType<typeof getBetterStackInstance>): string => {
+const getCurrencySymbol = (
+  locale: string,
+  currency: string,
+  logger: ReturnType<typeof getBetterStackInstance>
+): string => {
   try {
     const formatter = new Intl.NumberFormat(locale, {
       style: 'currency',

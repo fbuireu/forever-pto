@@ -1,14 +1,14 @@
 'use client';
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
+import { Checkbox } from '@ui/components/animate/base/checkbox';
 import { Badge } from '@ui/components/primitives/badge';
 import { TableCell, TableRow } from '@ui/components/primitives/table';
-import { cn } from '@ui/lib/utils';
 import { formatDate, isWeekend } from '@ui/lib/date';
+import { cn } from '@ui/lib/utils';
 import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';
 import { memo } from 'react';
-import { Checkbox } from '@ui/components/animate/base/checkbox';
 import { PremiumFeature, PremiumFeatureVariant } from '../../premium/PremiumFeature';
 
 interface HolidayRowProps {

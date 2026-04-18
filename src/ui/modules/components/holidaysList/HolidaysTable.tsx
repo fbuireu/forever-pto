@@ -4,19 +4,8 @@ import type { HolidayDTO } from '@application/dto/holiday/types';
 import { HolidayVariant } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { usePremiumStore } from '@application/stores/premium';
-import { Badge } from '@ui/components/primitives/badge';
-import { Input } from '@ui/components/primitives/input';
-import { Table, TableBody, TableCell, TableRow } from '@ui/components/primitives/table';
-import { cn } from '@ui/lib/utils';
-import { isWeekend } from '@ui/lib/date';
-import { useDebounce } from '@ui/hooks/useDebounce';
-import { ConditionalWrapper } from '@ui/modules/components/core/ConditionalWrapper';
-import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/components/premium/PremiumFeature';
-import { Edit } from 'lucide-react';
-import dynamic from 'next/dynamic';
-import { useLocale, useTranslations } from 'next-intl';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Checkbox } from '@ui/components/animate/base/checkbox';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/components/animate/base/collapsible';
 import { Button } from '@ui/components/animate/components/buttons/button';
 import { ChevronDown } from '@ui/components/animate/icons/chevron-down';
 import { ChevronRight } from '@ui/components/animate/icons/chevron-right';
@@ -24,7 +13,18 @@ import { AnimateIcon } from '@ui/components/animate/icons/icon';
 import { Plus } from '@ui/components/animate/icons/plus';
 import { Search } from '@ui/components/animate/icons/search';
 import { Trash2 } from '@ui/components/animate/icons/trash-2';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/components/animate/base/collapsible';
+import { Badge } from '@ui/components/primitives/badge';
+import { Input } from '@ui/components/primitives/input';
+import { Table, TableBody, TableCell, TableRow } from '@ui/components/primitives/table';
+import { useDebounce } from '@ui/hooks/useDebounce';
+import { isWeekend } from '@ui/lib/date';
+import { cn } from '@ui/lib/utils';
+import { ConditionalWrapper } from '@ui/modules/components/core/ConditionalWrapper';
+import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/components/premium/PremiumFeature';
+import { Edit } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { useLocale, useTranslations } from 'next-intl';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { HolidayRow } from './components/HolidayRow';
 import { HolidayTableHeader } from './components/HolidayTableHeader';
 
@@ -317,21 +317,21 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
     <Collapsible open={innerOpen} onOpenChange={setInnerOpen} className='space-y-4 w-full'>
       <AnimateIcon animateOnHover>
         <CollapsibleTrigger className='flex items-center justify-between cursor-pointer group hover:bg-muted/50 p-3 rounded-lg border transition-colors w-full text-left'>
-            <div className='flex items-center space-x-3 w-full'>
-              <div className='flex items-center space-x-2'>
-                {innerOpen ? (
-                  <ChevronDown className='h-4 w-4 text-muted-foreground transition-transform' />
-                ) : (
-                  <ChevronRight className='h-4 w-4 text-muted-foreground transition-transform' />
-                )}
-                <h2 className='text-base sm:text-lg font-semibold truncate'>{title}</h2>
-              </div>
-              <div className='flex items-center space-x-2 ml-auto shrink-0'>
-                <Badge variant='outline' className='text-xs sm:text-sm'>
-                  {variantHolidays.length} total
-                </Badge>
-              </div>
+          <div className='flex items-center space-x-3 w-full'>
+            <div className='flex items-center space-x-2'>
+              {innerOpen ? (
+                <ChevronDown className='h-4 w-4 text-muted-foreground transition-transform' />
+              ) : (
+                <ChevronRight className='h-4 w-4 text-muted-foreground transition-transform' />
+              )}
+              <h2 className='text-base sm:text-lg font-semibold truncate'>{title}</h2>
             </div>
+            <div className='flex items-center space-x-2 ml-auto shrink-0'>
+              <Badge variant='outline' className='text-xs sm:text-sm'>
+                {variantHolidays.length} total
+              </Badge>
+            </div>
+          </div>
         </CollapsibleTrigger>
       </AnimateIcon>
       {innerOpen && (

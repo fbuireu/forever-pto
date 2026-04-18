@@ -1,18 +1,18 @@
 'use client';
 
 import { useFiltersStore } from '@application/stores/filters';
+import { FilterStrategy } from '@infrastructure/services/calendar/types';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/components/animate/base/collapsible';
+import { ChevronDown } from '@ui/components/animate/icons/chevron-down';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { Users } from '@ui/components/animate/icons/users';
 import { Badge } from '@ui/components/primitives/badge';
 import { Card, CardDescription } from '@ui/components/primitives/card';
 import { Combobox } from '@ui/components/primitives/combobox';
 import { cn } from '@ui/lib/utils';
-import { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { AlertCircle, CheckCircle2, DicesIcon, Scale, TrendingUp } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
-import { ChevronDown } from '@ui/components/animate/icons/chevron-down';
-import { AnimateIcon } from '@ui/components/animate/icons/icon';
-import { Users } from '@ui/components/animate/icons/users';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/components/animate/base/collapsible';
 import { useShallow } from 'zustand/react/shallow';
 
 const STRATEGY_ICONS = {

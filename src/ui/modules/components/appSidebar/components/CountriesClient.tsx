@@ -3,13 +3,13 @@
 import type { CountryDTO } from '@application/dto/country/types';
 import { useFiltersStore } from '@application/stores/filters';
 import { useLocationStore } from '@application/stores/location';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/components/animate/base/tooltip';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { MapPin } from '@ui/components/animate/icons/map-pin';
 import { Combobox } from '@ui/components/primitives/combobox';
 import { InfoIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
-import { AnimateIcon } from '@ui/components/animate/icons/icon';
-import { MapPin } from '@ui/components/animate/icons/map-pin';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/components/animate/base/tooltip';
 
 interface CountriesClientProps {
   countries: CountryDTO[];

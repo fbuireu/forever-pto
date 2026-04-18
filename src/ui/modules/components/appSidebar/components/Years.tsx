@@ -1,16 +1,16 @@
 'use client';
 
 import { useFiltersStore } from '@application/stores/filters';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/animate/base/popover';
+import { Button } from '@ui/components/animate/components/buttons/button';
+import { Check } from '@ui/components/animate/icons/check';
+import { ChevronDown } from '@ui/components/animate/icons/chevron-down';
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
 import { Command, CommandGroup, CommandItem, CommandList } from '@ui/components/primitives/command';
 import { cn } from '@ui/lib/utils';
 import { Calendar } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { Button } from '@ui/components/animate/components/buttons/button';
-import { Check } from '@ui/components/animate/icons/check';
-import { ChevronDown } from '@ui/components/animate/icons/chevron-down';
-import { AnimateIcon } from '@ui/components/animate/icons/icon';
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/animate/base/popover';
 import { useShallow } from 'zustand/react/shallow';
 
 const MAX_YEARS = 10;
@@ -35,7 +35,13 @@ export const Years = () => {
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <AnimateIcon animateOnHover asChild>
-            <Button id='years' variant='outline' aria-expanded={open} aria-haspopup='listbox' className={cn('w-full justify-between')}>
+            <Button
+              id='years'
+              variant='outline'
+              aria-expanded={open}
+              aria-haspopup='listbox'
+              className={cn('w-full justify-between')}
+            >
               {year}
               <ChevronDown className={cn('opacity-50 transition-transform duration-200', open && 'rotate-180')} />
             </Button>

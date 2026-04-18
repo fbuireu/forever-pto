@@ -2,12 +2,12 @@
 
 import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
+import { AlternativesManager } from '@ui/components/animate/ui-elements/AlternativesManager';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useTranslations } from 'next-intl';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
-import { AlternativesManager } from '@ui/components/animate/ui-elements/AlternativesManager';
 import { AlternativesManagerSkeleton } from '../skeletons/AlternativesManagerSkeleton';
 import { PtoStatusSkeleton } from '../skeletons/PtoStatusSkeleton';
 import { PtoStatus } from './PtoStatus';

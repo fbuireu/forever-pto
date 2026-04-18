@@ -2,9 +2,9 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { cn } from '@ui/lib/utils';
 import { useCalculationsWorker } from '@ui/hooks/useCalculationsWorker';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
+import { cn } from '@ui/lib/utils';
 import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';

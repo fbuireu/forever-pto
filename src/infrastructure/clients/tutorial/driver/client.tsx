@@ -1,9 +1,9 @@
 'use client';
 
-import { type Config, type Driver, type DriveStep, driver } from 'driver.js';
-import { createRoot, type Root } from 'react-dom/client';
 import { AnimateIcon } from '@ui/components/animate/icons/icon';
 import { X } from '@ui/components/animate/icons/x';
+import { type Config, type Driver, type DriveStep, driver } from 'driver.js';
+import { createRoot, type Root } from 'react-dom/client';
 
 export interface DriverConfig extends Omit<Config, 'steps'> {
   steps?: DriveStep[];

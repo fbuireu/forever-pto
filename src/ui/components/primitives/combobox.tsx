@@ -2,14 +2,14 @@
 
 import type { CountryDTO } from '@application/dto/country/types';
 import type { RegionDTO } from '@application/dto/region/types';
-import { cn } from '@ui/lib/utils';
 import type { FilterStrategy } from '@infrastructure/services/calendar/types';
-import { useState } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/animate/base/popover';
 import { Button } from '@ui/components/animate/components/buttons/button';
 import { Check } from '@ui/components/animate/icons/check';
 import { ChevronUpDown } from '@ui/components/animate/icons/chevron-up-down';
 import { AnimateIcon } from '@ui/components/animate/icons/icon';
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/animate/base/popover';
+import { cn } from '@ui/lib/utils';
+import { useState } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './command';
 import { hasFlag } from './utils/helpers';
 

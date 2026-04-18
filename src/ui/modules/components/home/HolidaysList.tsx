@@ -2,9 +2,9 @@
 
 import { HolidayVariant } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
+import { Tabs, TabsList, TabsTrigger } from '@ui/components/animate/components/tabs';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { Tabs, TabsList, TabsTrigger } from '@ui/components/animate/components/tabs';
 import { HolidaysTable } from '../holidaysList/HolidaysTable';
 import { PremiumFeature } from '../premium/PremiumFeature';
 

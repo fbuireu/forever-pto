@@ -126,11 +126,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
 
           try {
-            const [
-              { generateSuggestions },
-              { generateAlternatives },
-              { generateMetrics },
-            ] = await Promise.all([
+            const [{ generateSuggestions }, { generateAlternatives }, { generateMetrics }] = await Promise.all([
               import('@infrastructure/services/calendar/suggestions/generateSuggestions'),
               import('@infrastructure/services/calendar/alternatives/generateAlternatives'),
               import('@infrastructure/services/calendar/metrics/generateMetrics'),

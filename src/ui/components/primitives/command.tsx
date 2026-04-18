@@ -1,12 +1,12 @@
 'use client';
 
+import { AnimateIcon } from '@ui/components/animate/icons/icon';
+import { SearchIcon } from '@ui/components/animate/icons/search';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@ui/components/primitives/dialog';
 import { cn } from '@ui/lib/utils';
 import { Command as CommandPrimitive } from 'cmdk';
 import { useTranslations } from 'next-intl';
 import type { ComponentProps } from 'react';
-import { AnimateIcon } from '@ui/components/animate/icons/icon';
-import { SearchIcon } from '@ui/components/animate/icons/search';
 
 function Command({ className, ...props }: ComponentProps<typeof CommandPrimitive>) {
   return (

@@ -1,8 +1,8 @@
 'use client';
 
 import { Label } from '@ui/components/primitives/label';
-import { cn } from '@ui/lib/utils';
 import { Slot } from '@ui/lib/slot';
+import { cn } from '@ui/lib/utils';
 import { type ComponentProps, createContext, useContext, useId } from 'react';
 import {
   Controller,
