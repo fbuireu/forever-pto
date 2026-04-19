@@ -43,7 +43,7 @@ function Switch({
       defaultChecked={defaultChecked}
       onCheckedChange={handleCheckedChange}
       className={cn(
-        'relative flex p-[3px] h-6 w-10 shrink-0 cursor-pointer items-center rounded-full border-[3px] border-[var(--frame)] transition-all duration-75 ease-linear focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[checked]:bg-primary bg-[var(--surface-panel-soft)] shadow-[var(--shadow-brutal-xs)] data-[checked]:justify-end justify-start',
+        'group relative flex p-0 h-6 w-10 shrink-0 cursor-pointer items-center rounded-full border-[3px] border-[var(--frame)] transition-all duration-75 ease-linear focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 bg-[var(--surface-panel-soft)] shadow-[var(--shadow-brutal-xs)] data-[checked]:justify-end justify-start',
         className
       )}
       {...props}
@@ -68,7 +68,7 @@ function Switch({
 
       <BaseSwitchThumb
         className={cn(
-          'relative z-[1] [&_svg]:size-3 flex items-center justify-center rounded-full bg-[var(--color-brand-paper)] shadow-[1px_1px_0_0_var(--frame)] ring-0 text-foreground'
+          'relative z-[1] [&_svg]:size-3 flex items-center justify-center rounded-full bg-[var(--color-brand-paper)] shadow-[1px_1px_0_0_var(--frame)] ring-0 text-foreground group-data-[checked]:bg-[var(--accent)]'
         )}
         pressedAnimation={{ width: 21 }}
         style={{ width: 18, height: 18 }}

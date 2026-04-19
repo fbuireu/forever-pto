@@ -66,7 +66,7 @@ export const CarryOverMonths = () => {
           </TooltipProvider>
         </label>
         <PremiumFeature feature={t('title')}>
-          <div className='flex gap-2 items-center w-full'>
+          <div className='flex gap-4 items-center w-full'>
             <p className='font-normal text-sm'>{MIN_VALUE}</p>
             <div className='relative flex-1'>
               <Slider
@@ -78,7 +78,7 @@ export const CarryOverMonths = () => {
                 onValueChange={handleChange}
               />
               <SlidingNumber
-                className='absolute -bottom-4 left-0 right-0 mx-auto justify-center font-normal text-sm'
+                className='absolute -bottom-4 left-0 w-full flex justify-center font-normal text-sm'
                 number={localValue}
                 padStart
               />

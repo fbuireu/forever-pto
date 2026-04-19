@@ -50,7 +50,7 @@ const viewAllTextVariants = {
 export function FeatureList({ features, categoryLabel }: FeatureListProps) {
   return (
     <m.div
-      className='bg-card border rounded-xl p-4 w-full space-y-3 shadow-md'
+      className='bg-card border-[3px] border-[var(--frame)] rounded-[14px] p-4 w-full space-y-3 shadow-[var(--shadow-brutal-md)]'
       initial='collapsed'
       whileHover='expanded'
       whileTap='expanded'
@@ -59,7 +59,7 @@ export function FeatureList({ features, categoryLabel }: FeatureListProps) {
         {features.map((feature, i) => (
           <m.div
             key={feature.id}
-            className='border bg-muted rounded-xl px-4 py-3 shadow-sm hover:shadow-lg transition-shadow duration-200 relative'
+            className='border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] rounded-[10px] px-4 py-3 relative'
             variants={getCardVariants(i)}
             transition={transition}
             style={{
@@ -82,7 +82,7 @@ export function FeatureList({ features, categoryLabel }: FeatureListProps) {
       </div>
 
       <div className='flex items-center gap-2'>
-        <div className='size-6 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-medium'>
+        <div className='size-6 rounded-full border-[2px] border-[var(--frame)] bg-[var(--accent)] text-foreground text-xs flex items-center justify-center font-black'>
           {features.length}
         </div>
         <span className='grid'>

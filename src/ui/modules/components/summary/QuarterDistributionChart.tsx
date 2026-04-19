@@ -53,14 +53,14 @@ export const QuarterDistributionChart = ({ quarterDist }: QuarterDistributionCha
                 formatter={(value) => [`${value} ${t('days')}`, t('daysOff')]}
                 contentStyle={{
                   backgroundColor: 'var(--primary)',
-                  border: '1px solid var(--primary)',
+                  border: '3px solid var(--frame)',
                   borderRadius: '8px',
                   fontSize: '14px',
                   color: 'var(--primary-foreground)',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  boxShadow: '3px 3px 0 0 var(--accent)',
                 }}
                 cursor={{ fill: 'light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5))' }}
-                labelStyle={{ color: 'var(--primary-foreground)' }}
+                labelStyle={{ color: 'var(--primary-foreground)', fontWeight: 700 }}
                 itemStyle={{ color: 'var(--primary-foreground)' }}
               />
             </BarChart>

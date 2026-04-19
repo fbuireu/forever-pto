@@ -4,21 +4,24 @@ import { cn } from '@ui/lib/utils';
 import { type HTMLMotionProps, m, type Transition } from 'motion/react';
 import type { SlidingNumberProps } from '../text/sliding-number';
 import { SlidingNumber } from '../text/sliding-number';
-import { Button } from './buttons/button';
 
-type CounterProps = HTMLMotionProps<'div'> & {
+type CounterButtonProps = Omit<React.ComponentProps<'button'>, 'onClick' | 'children'>;
+
+type CounterProps = Omit<HTMLMotionProps<'div'>, 'children'> & {
   number: number;
   setNumber: (number: number) => void;
+  label?: string;
   slidingNumberProps?: Omit<SlidingNumberProps, 'number'>;
-  buttonProps?: Omit<React.ComponentProps<typeof Button>, 'onClick' | 'asChild'>;
-  decrementButtonProps?: Omit<React.ComponentProps<typeof Button>, 'onClick' | 'asChild'>;
-  incrementButtonProps?: Omit<React.ComponentProps<typeof Button>, 'onClick' | 'asChild'>;
+  buttonProps?: CounterButtonProps;
+  decrementButtonProps?: CounterButtonProps;
+  incrementButtonProps?: CounterButtonProps;
   transition?: Transition;
 };
 
 function Counter({
   number,
   setNumber,
+  label,
   className,
   slidingNumberProps,
   buttonProps,
@@ -27,60 +30,54 @@ function Counter({
   transition = { type: 'spring', bounce: 0, stiffness: 300, damping: 30 },
   ...props
 }: CounterProps) {
+  const btnBase =
+    'w-11 flex items-center justify-center bg-[var(--surface-panel-soft)] font-display font-black text-[22px] leading-none hover:bg-[var(--accent)] transition-colors duration-75 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 select-none';
+
   return (
     <m.div
       data-slot='counter'
       layout
       transition={transition}
       className={cn(
-        'flex items-center gap-x-2 p-1 rounded-[12px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-xs)]',
+        'inline-flex items-stretch overflow-hidden rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] shadow-[4px_4px_0_0_var(--frame)]',
         className
       )}
       {...props}
     >
-      <m.div
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className={cn(decrementButtonProps?.className)}
-        aria-disabled={decrementButtonProps?.disabled ?? false}
+      <m.button
+        type='button'
+        whileTap={{ filter: 'brightness(0.85)' }}
+        {...(buttonProps as object)}
+        {...(decrementButtonProps as object)}
+        onClick={() => setNumber(number - 1)}
+        className={cn(btnBase, 'border-r-[3px] border-[var(--frame)]', decrementButtonProps?.className)}
       >
-        <Button
-          size='icon'
-          {...buttonProps}
-          {...decrementButtonProps}
-          onClick={() => setNumber(number - 1)}
-          className={cn(
-            'bg-white dark:bg-neutral-950 hover:bg-white/70 dark:hover:bg-neutral-950/70 text-neutral-950 dark:text-white text-2xl font-light pb-[3px]',
-            buttonProps?.className,
-            decrementButtonProps?.className
-          )}
-        >
-          -
-        </Button>
-      </m.div>
+        −
+      </m.button>
 
-      <SlidingNumber number={number} {...slidingNumberProps} className={cn('text-lg', slidingNumberProps?.className)} />
+      <div className='w-20 grid place-items-center py-2 leading-none'>
+        <SlidingNumber
+          number={number}
+          {...slidingNumberProps}
+          className={cn('font-display font-black text-[22px] leading-none', slidingNumberProps?.className)}
+        />
+        {label && (
+          <small className='font-mono text-[10px] font-semibold text-muted-foreground mt-[-1px] tracking-[0.06em]'>
+            {label}
+          </small>
+        )}
+      </div>
 
-      <m.div
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className={cn(incrementButtonProps?.className)}
-        aria-disabled={incrementButtonProps?.disabled ?? false}
+      <m.button
+        type='button'
+        whileTap={{ filter: 'brightness(0.85)' }}
+        {...(buttonProps as object)}
+        {...(incrementButtonProps as object)}
+        onClick={() => setNumber(number + 1)}
+        className={cn(btnBase, 'border-l-[3px] border-[var(--frame)]', incrementButtonProps?.className)}
       >
-        <Button
-          size='icon'
-          {...buttonProps}
-          {...incrementButtonProps}
-          onClick={() => setNumber(number + 1)}
-          className={cn(
-            'bg-white dark:bg-neutral-950 hover:bg-white/70 dark:hover:bg-neutral-950/70 text-neutral-950 dark:text-white text-2xl font-light pb-[3px]',
-            buttonProps?.className,
-            incrementButtonProps?.className
-          )}
-        >
-          +
-        </Button>
-      </m.div>
+        +
+      </m.button>
     </m.div>
   );
 }

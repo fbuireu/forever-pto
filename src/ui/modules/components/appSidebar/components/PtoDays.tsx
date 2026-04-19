@@ -70,23 +70,20 @@ export const PtoDays = () => {
       <label className='flex gap-2 my-2 text-sm font-normal' htmlFor='pto-days'>
         <CalendarDays size={16} /> {t('title')}
       </label>
-      <div className='flex items-center font-normal gap-2 justify-between'>
-        <p className='font-normal text-sm'>{t('iHave')}</p>
+      <div className='flex items-center gap-3 justify-between'>
+        <p className='text-sm text-muted-foreground'>{t('iHave')}</p>
         <Counter
           id='pto-days'
           number={ptoDays}
           setNumber={handleChange}
+          label={t('days').toUpperCase()}
           decrementButtonProps={{
             disabled: ptoDays <= MIN_VALUE,
-            className: cn(isDecrementDisabled && 'cursor-not-allowed opacity-50'),
           }}
           incrementButtonProps={{
             disabled: ptoDays >= MAX_VALUE,
-            className: cn(isIncrementDisabled && 'cursor-not-allowed opacity-50'),
           }}
-          slidingNumberProps={{ className: 'font-normal text-sm' }}
         />
-        <p className='font-normal text-sm'>{t('days')}</p>
       </div>
       <div className='space-y-2 mt-4 w-full'>
         <label className='flex gap-2 my-2 text-sm font-normal' htmlFor='remaining-days'>

@@ -46,6 +46,8 @@ export default LandingPage;
 
 // todo: brutalist design (show legend in button, remove old brand, redo logo)
 // todo: 400 and 500 page
+// todo: check SEO again
+// todo: check translations
 // todo: unify styles and check everything
 // todo: html issues (button desc button)
 // todo: improve responsive

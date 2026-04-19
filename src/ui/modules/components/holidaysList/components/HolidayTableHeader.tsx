@@ -48,7 +48,7 @@ const HolidayTableHeaderComponent = ({ selectAllButton, sortConfig, onSort }: Ho
   const t = useTranslations('holidayTableHeader');
 
   return (
-    <BaseTableHeader className='sticky top-0 bg-background z-10'>
+    <BaseTableHeader className='sticky top-0 z-10'>
       <TableRow>
         <TableHead>{selectAllButton}</TableHead>
         <TableHeader sortKey='name' currentSort={sortConfig} onSort={onSort}>

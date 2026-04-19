@@ -29,7 +29,7 @@ function Checkbox({ className, onCheckedChange, motionProps, ...props }: Checkbo
       data-slot='checkbox'
       className={cn(
         'peer shrink-0 flex items-center justify-center outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-500',
-        'size-5 rounded-[4px] border-[3px] border-[var(--frame)] bg-background shadow-[var(--shadow-brutal-xs)] focus-visible:ring-offset-2 data-[checked]:bg-primary data-[checked]:text-primary-foreground cursor-pointer',
+        'size-5 rounded-[4px] border-[3px] border-[var(--frame)] bg-background shadow-[var(--shadow-brutal-xs)] focus-visible:ring-offset-2 data-[checked]:bg-[var(--accent)] data-[checked]:text-foreground cursor-pointer',
         className
       )}
       {...props}

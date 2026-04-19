@@ -19,7 +19,7 @@ const buttonVariants = cva(
         secondary:
           'bg-secondary text-secondary-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[color-mix(in_srgb,var(--secondary)_85%,white_15%)] hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]',
         ghost:
-          'border-transparent bg-transparent shadow-none hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[var(--surface-panel-alt)] hover:text-foreground active:translate-x-0 active:translate-y-0 active:bg-[var(--surface-panel-inset)]',
+          'border-transparent bg-transparent shadow-none hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-foreground active:translate-x-0 active:translate-y-0 active:bg-[var(--accent)]',
         link: 'border-transparent text-primary underline-offset-4 hover:underline',
       },
       size: {

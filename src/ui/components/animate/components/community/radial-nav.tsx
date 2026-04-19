@@ -18,6 +18,7 @@ type RadialNavItem = {
   icon: LucideIcon | React.ComponentType<SVGMotionProps<SVGSVGElement>>;
   label: string;
   angle: number;
+  badgeClass?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 type MenuButtonConfig = {
@@ -126,12 +127,12 @@ function MenuButton({
   onActivate?: () => void;
   menuButtonConfig: Required<MenuButtonConfig>;
 }) {
-  const { icon: Icon, label } = item;
+  const { icon: Icon, label, badgeClass } = item;
   const { iconSize, buttonSize, buttonPadding } = menuButtonConfig;
 
   const translateX = calculateIconOffset({
     ...menuButtonConfig,
-    bias: -1,
+    bias: -3,
   });
 
   return (
@@ -140,16 +141,13 @@ function MenuButton({
       initial={false}
       animate={isActive ? 'hover' : 'rest'}
       className={cn(
-        'relative flex space-x-1 items-center overflow-hidden whitespace-nowrap rounded-full cursor-pointer border border-neutral-800 dark:border-neutral-200 bg-background text-foreground font-medium transition-transform duration-200',
-        !isActive && 'hover:transform-[scale(1.05)]'
+        'relative flex items-center gap-1.5 overflow-hidden whitespace-nowrap rounded-full cursor-pointer border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] font-black transition-[box-shadow,transform] duration-75 ease-linear shadow-[var(--shadow-brutal-xs)]',
+        isActive && (badgeClass ?? 'bg-[var(--accent)]')
       )}
       style={{
         height: buttonSize,
         minWidth: buttonSize,
         padding: buttonPadding,
-        borderColor: isActive ? 'currentColor' : undefined,
-        color: 'currentColor',
-        borderWidth: isActive ? 2 : undefined,
       }}
       onClick={onActivate}
       type='button'
@@ -165,7 +163,7 @@ function MenuButton({
         }}
         {...('animateOnHover' in Icon ? { animateOnHover: true } : {})}
       />
-      <m.span variants={LABEL_VARIANTS} transition={LABEL_TRANSITION} className='invisible text-sm w-0'>
+      <m.span variants={LABEL_VARIANTS} transition={LABEL_TRANSITION} className='invisible text-[0.7rem] font-black uppercase tracking-[0.08em] w-0'>
         {label}
       </m.span>
     </m.button>
@@ -195,7 +193,7 @@ function RadialNav({ size = 180, items, menuButtonConfig, defaultActiveId, onAct
 
   return (
     <div
-      className='relative flex items-center justify-center rounded-full border border-neutral-800 dark:border-neutral-200'
+      className='relative flex items-center justify-center rounded-full border-[3px] border-[var(--frame)]'
       style={{ width: size, height: size }}
       role='menu'
       aria-label='Radial navigation'

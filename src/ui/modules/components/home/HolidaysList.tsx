@@ -27,7 +27,10 @@ export const HolidaysList = () => {
   return (
     <div className='rounded-lg w-full col-span-full z-1 bg-background' data-tutorial='holidays-list'>
       <Tabs value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className='grid w-full grid-cols-3'>
+        <TabsList
+          className='grid w-full grid-cols-3'
+          activeClassName='bg-[var(--accent)] border-[2px] border-[var(--frame)] rounded-[6px] shadow-[var(--shadow-brutal-xs)]'
+        >
           <TabsTrigger value={HolidayVariant.NATIONAL}>{t('nationalTab')}</TabsTrigger>
           {regionalHolidays.length > 0 ? (
             <TabsTrigger value={HolidayVariant.REGIONAL}>{t('regionalTab')}</TabsTrigger>

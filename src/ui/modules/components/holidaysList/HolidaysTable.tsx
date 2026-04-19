@@ -392,7 +392,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
       <CollapsibleContent className='space-y-4 overflow-hidden'>
         {innerOpen && (
           <>
-            <div className='hidden lg:block max-h-96 overflow-hidden'>
+            <div className='hidden lg:block'>
               <div className='max-h-96 overflow-y-auto'>
                 <Table className='w-full'>
                   <colgroup>

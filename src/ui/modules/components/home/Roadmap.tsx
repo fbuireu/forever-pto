@@ -4,6 +4,7 @@ import { FeatureList } from '@ui/components/animate/components/community/Feature
 import { RadialNav, type RadialNavProps } from '@ui/components/animate/components/community/radial-nav';
 import { CircleCheckBig } from '@ui/components/animate/icons/circle-check-big';
 import { Clock } from '@ui/components/animate/icons/clock';
+import { Badge } from '@ui/components/primitives/badge';
 import { cn } from '@ui/lib/utils';
 import { Circle, Sparkles } from 'lucide-react';
 import type { SVGMotionProps } from 'motion/react';
@@ -39,6 +40,7 @@ export function Roadmap() {
         angle: 0,
         status: CategoryStatus.COMPLETED,
         className: 'text-green-500',
+        badgeClass: 'bg-[var(--color-brand-green)] text-[var(--frame)] border-[var(--frame)]',
       },
       {
         id: 2,
@@ -47,6 +49,7 @@ export function Roadmap() {
         angle: 90,
         status: CategoryStatus.IN_PROGRESS,
         className: 'text-blue-500',
+        badgeClass: 'bg-[var(--color-brand-sky)] text-[var(--frame)] border-[var(--frame)]',
       },
       {
         id: 3,
@@ -55,6 +58,7 @@ export function Roadmap() {
         angle: 180,
         status: CategoryStatus.PLANNED,
         className: 'text-orange-500',
+        badgeClass: 'bg-[var(--color-brand-orange)] text-white border-[var(--frame)]',
       },
       {
         id: 4,
@@ -63,6 +67,7 @@ export function Roadmap() {
         angle: 270,
         status: CategoryStatus.FUTURE,
         className: 'text-purple-500',
+        badgeClass: 'bg-[var(--color-brand-purple)] text-white border-[var(--frame)]',
       },
     ],
     [t]
@@ -174,8 +179,10 @@ export function Roadmap() {
   return (
     <div className='container max-w-4xl py-8 space-y-8 m-auto'>
       <div className='space-y-2 text-center mb-0'>
-        <h3 className='text-3xl font-bold tracking-tight'>{t('title')}</h3>
-        <p className='text-muted-foreground'>{t('subtitle')}</p>
+        <h3 className='font-display font-extrabold text-[clamp(28px,4vw,40px)] leading-none tracking-[-0.03em]'>
+          {t('title')}
+        </h3>
+        <p className='text-muted-foreground text-[17px]'>{t('subtitle')}</p>
       </div>
       <div className='flex flex-col lg:flex-row gap-8 items-center mt-4'>
         <div className='lg:sticky lg:top-8 flex flex-col items-center w-full lg:w-auto'>
@@ -187,9 +194,9 @@ export function Roadmap() {
             />
           </div>
           {selectedNavItem && (
-            <div className='text-center'>
-              <p className='text-sm text-muted-foreground'>{t('selected')}</p>
-              <p className={cn('text-lg font-semibold', selectedNavItem.className)}>{selectedNavItem.label}</p>
+            <div className='text-center flex flex-col items-center gap-1.5 mt-2'>
+              <p className='text-xs text-muted-foreground uppercase tracking-[0.08em] font-black'>{t('selected')}</p>
+              <Badge className={cn(selectedNavItem.badgeClass)}>{selectedNavItem.label}</Badge>
             </div>
           )}
         </div>

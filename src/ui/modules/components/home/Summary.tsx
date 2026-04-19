@@ -141,12 +141,7 @@ export const Summary = () => {
                   <span>{locationInfo.userRegion.label}</span>
                 </Badge>
               )}
-              <Badge
-                variant='outline'
-                className='bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,white_84%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,black_82%)]'
-              >
-                {tSidebar(`strategy.${strategy}.label`)}
-              </Badge>
+              <Badge variant='outline'>{tSidebar(`strategy.${strategy}.label`)}</Badge>
             </div>
           </CardTitle>
           <CardDescription className='space-y-2 rounded-[10px] border-[3px] border-[var(--frame)]/15 bg-[var(--surface-panel-soft)] p-4 text-muted-foreground'>

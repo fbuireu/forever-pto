@@ -4,7 +4,6 @@ import { Accordion as AccordionPrimitive } from '@base-ui/react/accordion';
 import { cn } from '@ui/lib/utils';
 import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
 import { createContext, use, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { ChevronDown } from '../icons/chevron-down';
 import { AnimateIcon } from '../icons/icon';
 
 type AccordionItemContextType = {
@@ -104,8 +103,16 @@ function AccordionTrigger({
           {children}
 
           {chevron && (
-            <m.div data-slot='accordion-trigger-chevron' animate={{ rotate: isOpen ? 180 : 0 }} transition={transition}>
-              <ChevronDown className='size-5 shrink-0' />
+            <m.div
+              data-slot='accordion-trigger-chevron'
+              animate={{ rotate: isOpen ? 45 : 0 }}
+              transition={transition}
+              className={cn(
+                'size-7 flex items-center justify-center shrink-0 rounded-[6px] border-[2.5px] border-[var(--frame)] font-black text-lg leading-none select-none transition-colors duration-150',
+                isOpen ? 'bg-[var(--frame)] text-[var(--background)]' : 'bg-[var(--accent)] text-[var(--frame)]'
+              )}
+            >
+              +
             </m.div>
           )}
         </AccordionPrimitive.Trigger>

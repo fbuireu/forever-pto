@@ -65,15 +65,15 @@ export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }:
                 formatter={(value) => [`${value} ${t('days')}`, t('daysOffLabel')]}
                 contentStyle={{
                   backgroundColor: 'var(--primary)',
-                  border: '1px solid var(--primary)',
+                  border: '3px solid var(--frame)',
                   borderRadius: '8px',
                   fontSize: '14px',
                   color: 'var(--primary-foreground)',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  boxShadow: '3px 3px 0 0 var(--accent)',
                 }}
                 itemStyle={{ color: 'var(--primary-foreground)' }}
                 cursor={{ fill: 'rgba(0, 0, 0, 0.5)' }}
-                labelStyle={{ color: 'var(--primary-foreground)' }}
+                labelStyle={{ color: 'var(--primary-foreground)', fontWeight: 700 }}
                 labelFormatter={(label) => {
                   const date = new Date(year, monthNames.indexOf(label), 1);
                   return date.toLocaleDateString(locale, {

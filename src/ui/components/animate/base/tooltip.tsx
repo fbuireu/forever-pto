@@ -42,7 +42,7 @@ function TooltipContent({ className, sideOffset = 4, children, style, ...props }
       <TooltipPositionerPrimitive sideOffset={sideOffset} className='z-50' {...props}>
         <TooltipPopupPrimitive
           className={cn(
-            'bg-primary text-primary-foreground w-fit origin-(--transform-origin) rounded-[8px] border-[3px] border-[var(--frame)] px-3 py-2 text-xs font-bold text-balance shadow-[var(--shadow-brutal-sm)]',
+            'bg-primary text-primary-foreground w-fit origin-(--transform-origin) rounded-[8px] border-[3px] border-[var(--frame)] px-3 py-2 text-xs font-bold text-balance shadow-[3px_3px_0_0_var(--accent)]',
             className
           )}
           style={style}

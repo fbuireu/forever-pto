@@ -14,8 +14,9 @@ function InputGroup({ className, ...props }: ComponentProps<'div'>) {
       data-slot='input-group'
       role='group'
       className={cn(
-        'group/input-group border-input dark:bg-input/30 relative flex w-full items-center rounded-md border shadow-xs transition-[color,box-shadow] outline-none',
-        'h-9 has-[>textarea]:h-auto',
+        'group/input-group relative flex w-full items-center rounded-[8px] border-[3px] border-[var(--frame)] bg-input transition-[box-shadow,transform] duration-75 ease-linear outline-none',
+        'h-11 has-[>textarea]:h-auto',
+        'hover:shadow-[var(--shadow-brutal-xs)]',
 
         // Variants based on alignment.
         'has-[>[data-align=inline-start]]:[&>input]:pl-2',
@@ -24,10 +25,10 @@ function InputGroup({ className, ...props }: ComponentProps<'div'>) {
         'has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3',
 
         // Focus state.
-        'has-[[data-slot=input-group-control]:focus-visible]:-translate-x-0.5 has-[[data-slot=input-group-control]:focus-visible]:-translate-y-0.5 has-[[data-slot=input-group-control]:focus-visible]:shadow-[var(--shadow-brutal-sm)]',
+        'has-[[data-slot=input-group-control]:focus-visible]:shadow-[var(--shadow-brutal-sm)]',
 
         // Error state.
-        'has-[[data-slot][aria-invalid=true]]:border-destructive has-[[data-slot][aria-invalid=true]]:shadow-[2px_2px_0_0_var(--destructive)] has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:shadow-[4px_4px_0_0_var(--destructive)]',
+        'has-[[data-slot][aria-invalid=true]]:border-destructive has-[[data-slot][aria-invalid=true]]:shadow-none has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:shadow-[4px_4px_0_0_var(--destructive)]',
 
         className
       )}
