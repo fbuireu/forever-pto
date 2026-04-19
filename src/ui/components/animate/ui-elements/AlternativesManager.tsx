@@ -95,10 +95,10 @@ export const AlternativesManager = ({
 
   return (
     <div
-      className='sticky top-0 z-10 flex w-fit flex-wrap items-center gap-3 rounded-[1.35rem] border-[2.5px] border-[var(--frame)] bg-card p-3 shadow-[var(--shadow-brutal-lg)]'
+      className='sticky top-0 z-10 flex w-fit flex-wrap items-center gap-3 rounded-[14px] border-[3px] border-[var(--frame)] bg-card p-3 shadow-[var(--shadow-brutal-lg)]'
       data-tutorial='alternatives-manager'
     >
-      <div className='flex shrink-0 grow items-center rounded-[1rem] border-[2px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-2 shadow-[var(--shadow-brutal-xs)]'>
+      <div className='flex shrink-0 grow items-center rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-2 shadow-[var(--shadow-brutal-xs)]'>
         <AnimateIcon animateOnHover={currentIndex !== 0}>
           <Button
             disabled={currentIndex === 0}
@@ -120,7 +120,7 @@ export const AlternativesManager = ({
               variants={BADGE_VARIANTS}
               initial='initial'
               animate='animate'
-              className='mt-1 flex items-center gap-1 rounded-full border-[2px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-yellow)_28%,white_72%)] px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-[var(--color-brand-orange-deep)] shadow-[var(--shadow-brutal-xs)]'
+              className='mt-1 flex items-center gap-1 rounded-full border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-yellow)_28%,white_72%)] px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-[var(--color-brand-orange-deep)] shadow-[var(--shadow-brutal-xs)]'
             >
               <Sparkles size={8} />
               {t('recommended')}
@@ -144,7 +144,7 @@ export const AlternativesManager = ({
       <m.div layout layoutRoot className='flex flex-nowrap space-x-2'>
         <m.button
           {...STAT_CARD_MOTION_CONFIG}
-          className='flex h-11 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-[1rem] border-[2px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,black_84%)]'
+          className='flex h-11 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,black_84%)]'
           aria-label={t('totalDaysOff')}
         >
           <CalendarDays size={20} className='text-green-600 dark:text-green-400 shrink-0' />
@@ -169,7 +169,7 @@ export const AlternativesManager = ({
 
         <m.button
           {...STAT_CARD_MOTION_CONFIG}
-          className='flex h-11 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-[1rem] border-[2px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_20%,white_80%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]'
+          className='flex h-11 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_20%,white_80%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]'
           aria-label={t('efficiency')}
         >
           <TrendingUp size={20} className='text-purple-600 dark:text-purple-400 shrink-0' />
@@ -203,7 +203,7 @@ export const AlternativesManager = ({
         {!isMainSuggestion && (
           <m.button
             {...STAT_CARD_MOTION_CONFIG}
-            className='flex h-11 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-[1rem] border-[2px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[var(--surface-panel-soft)]'
+            className='flex h-11 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[var(--surface-panel-soft)]'
             aria-label={t('comparison')}
           >
             <BarChart3 size={20} className='text-neutral-600 dark:text-neutral-400 shrink-0' />
@@ -238,7 +238,7 @@ export const AlternativesManager = ({
       </m.div>
       <Button
         disabled={currentSelectionIndex === currentIndex}
-        className='flex grow h-11 text-sm cursor-pointer items-center justify-center rounded-[1rem] px-4 py-2 font-black transition-colors duration-300'
+        className='flex grow h-11 text-sm cursor-pointer items-center justify-center rounded-[10px] px-4 py-2 font-black transition-colors duration-300'
         onClick={() => onSelectionChange({ suggestion: currentSuggestion, index: currentIndex })}
       >
         {currentSelectionIndex === currentIndex ? t('alreadyApplied') : t('applyAlternative')}

@@ -7,7 +7,7 @@ function Table({ className, ...props }: ComponentProps<'table'>) {
   return (
     <div
       data-slot='table-container'
-      className='relative w-full overflow-x-auto rounded-[1.2rem] border-[2.5px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-md)]'
+      className='relative w-full overflow-x-auto rounded-[10px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-md)]'
     >
       <table data-slot='table' className={cn('w-full caption-bottom text-sm', className)} {...props} />
     </div>

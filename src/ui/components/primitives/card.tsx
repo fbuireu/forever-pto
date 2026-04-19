@@ -6,7 +6,7 @@ function Card({ className, ...props }: ComponentProps<'div'>) {
     <div
       data-slot='card'
       className={cn(
-        'bg-card text-card-foreground flex flex-col gap-6 rounded-[1.4rem] border-[2.5px] border-[var(--frame)] py-6 shadow-[var(--shadow-brutal-md)]',
+        'bg-card text-card-foreground flex flex-col gap-6 rounded-[14px] border-[3px] border-[var(--frame)] py-6 shadow-[var(--shadow-brutal-md)]',
         className
       )}
       {...props}
@@ -56,7 +56,7 @@ function CardFooter({ className, ...props }: ComponentProps<'div'>) {
     <div
       data-slot='card-footer'
       className={cn(
-        'flex items-center px-6 [.border-t]:border-t-[2.5px] [.border-t]:border-[var(--frame)] [.border-t]:pt-6',
+        'flex items-center px-6 [.border-t]:border-t-[3px] [.border-t]:border-[var(--frame)] [.border-t]:pt-6',
         className
       )}
       {...props}

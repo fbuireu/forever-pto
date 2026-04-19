@@ -1,23 +1,20 @@
 import { LOCALES } from '@infrastructure/i18n/config';
-import { Faq } from '@ui/modules/components/home/Faq';
-import { JsonLd } from '@ui/modules/components/seo/JsonLd';
-import dynamic from 'next/dynamic';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
+import { LandingComparison } from './_components/LandingComparison';
+import { LandingFaq } from './_components/LandingFaq';
+import { LandingFinalCta } from './_components/LandingFinalCta';
+import { LandingFeatures } from './_components/LandingFeatures';
+import { LandingHero } from './_components/LandingHero';
+import { LandingHowItWorks } from './_components/LandingHowItWorks';
+import { LandingMarquee } from './_components/LandingMarquee';
+import { LandingPricing } from './_components/LandingPricing';
+import { LandingStats } from './_components/LandingStats';
+import { LandingTestimonials } from './_components/LandingTestimonials';
 
-const HolidaysList = dynamic(() => import('@ui/modules/components/home/HolidaysList').then((mod) => mod.HolidaysList));
-const ManagementBar = dynamic(() =>
-  import('@ui/modules/components/home/ManagementBar').then((mod) => mod.ManagementBar)
-);
-const CalendarList = dynamic(() => import('@ui/modules/components/home/CalendarList').then((mod) => mod.CalendarList));
-const Legend = dynamic(() => import('@ui/modules/components/home/Legend').then((mod) => mod.Legend));
-const Summary = dynamic(() => import('@ui/modules/components/home/Summary').then((mod) => mod.Summary));
-const Roadmap = dynamic(() => import('@ui/modules/components/home/Roadmap').then((mod) => mod.Roadmap));
-const Contact = dynamic(() => import('@ui/modules/components/home/Contact').then((mod) => mod.Contact));
+export { generateMetadata } from '../metadata';
 
-export { generateMetadata } from './metadata';
-
-interface LayoutProps {
+interface PageProps {
   params: Promise<{ locale: Locale }>;
 }
 
@@ -25,30 +22,33 @@ export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
 }
 
-const Home = async ({ params }: LayoutProps) => {
+const LandingPage = async ({ params }: PageProps) => {
   const { locale } = await params;
   setRequestLocale(locale);
 
   return (
     <>
-      <JsonLd locale={locale} />
-      <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4 mb-8'>
-        <HolidaysList />
-        <ManagementBar />
-        <CalendarList />
-        <Legend />
-        <Summary />
-        <Roadmap />
-        <Contact />
-        <Faq />
-      </section>
+      <LandingHero />
+      <LandingMarquee />
+      <LandingHowItWorks />
+      <LandingStats />
+      <LandingFeatures />
+      <LandingComparison />
+      <LandingTestimonials />
+      <LandingPricing />
+      <LandingFaq />
+      <LandingFinalCta />
     </>
   );
 };
 
-export default Home;
+export default LandingPage;
 
 // todo: brutalist design (show legend in button, remove old brand, redo logo)
+// todo: 400 and 500 page
+// todo: box shadow on error (include donate)
+// todo: with-in color not teal but black
+// todo: unify styles and check everything
 // todo: html issues (button desc button)
 // todo: improve responsive
 // todo: https://effect.website/

@@ -72,10 +72,10 @@ function Slider({
       {...props}
     >
       <SliderPrimitive.Control className='relative flex w-full touch-none items-center'>
-        <SliderPrimitive.Track className='relative h-2 w-full grow overflow-hidden rounded-none bg-primary/20 border border-black dark:border-white'>
-          <SliderPrimitive.Indicator className='absolute h-full bg-primary' />
+        <SliderPrimitive.Track className='relative h-4 w-full grow overflow-hidden rounded-full bg-[var(--surface-panel-alt)] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xs)]'>
+          <SliderPrimitive.Indicator className='absolute h-full bg-[var(--frame)]' />
         </SliderPrimitive.Track>
-        <SliderPrimitive.Thumb className='block h-4 w-4 rounded-none border-2 border-black dark:border-white bg-background shadow-[2px_2px_0_0_black] dark:shadow-[2px_2px_0_0_white] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white disabled:pointer-events-none disabled:opacity-50' />
+        <SliderPrimitive.Thumb className='block h-7 w-7 rounded-full border-[3px] border-[var(--frame)] bg-accent shadow-[var(--shadow-brutal-xs)] transition-all duration-75 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] disabled:pointer-events-none disabled:opacity-50' />
       </SliderPrimitive.Control>
     </SliderPrimitive.Root>
   );

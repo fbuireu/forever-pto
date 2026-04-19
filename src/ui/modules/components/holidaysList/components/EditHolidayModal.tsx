@@ -161,7 +161,7 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
                 <FormItem>
                   <FormLabel>{tAdd('dateLabel')}</FormLabel>
                   <FormControl>
-                    <div className='border rounded-lg p-3'>
+                    <div className='border-[3px] border-[var(--frame)] rounded-[10px] p-3 shadow-[var(--shadow-brutal-xs)]'>
                       <Calendar
                         mode={CalendarSelectionMode.SINGLE}
                         month={holiday.date}

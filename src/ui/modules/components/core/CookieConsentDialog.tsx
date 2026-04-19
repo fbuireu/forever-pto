@@ -43,7 +43,7 @@ export const CookieConsentDialog = ({
         </DialogHeader>
 
         <div className='space-y-6 py-4'>
-          <div className='rounded-lg border bg-card p-4 space-y-3'>
+          <div className='rounded-[12px] border-[3px] border-[var(--frame)] bg-card p-4 space-y-3 shadow-[var(--shadow-brutal-xs)]'>
             <div className='flex items-start justify-between gap-4'>
               <div className='flex-1'>
                 <Label className='text-base font-semibold'>{t('necessaryCookies')}</Label>
@@ -103,7 +103,7 @@ export const CookieConsentDialog = ({
             </Accordion>
           </div>
 
-          <div className='rounded-lg border bg-card p-4 space-y-3'>
+          <div className='rounded-[12px] border-[3px] border-[var(--frame)] bg-card p-4 space-y-3 shadow-[var(--shadow-brutal-xs)]'>
             <div className='flex items-start justify-between gap-4'>
               <div className='flex-1'>
                 <Label className='text-base font-semibold'>{t('analyticsCookies')}</Label>

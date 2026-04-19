@@ -13,7 +13,7 @@ export function Logo() {
   const isOpen = state === 'expanded';
 
   return (
-    <SidebarMenuButton className='justify-center h-fit w-fit mx-auto rounded-[1.2rem] bg-[var(--surface-panel)] px-3 py-3 shadow-[var(--shadow-brutal-sm)]'>
+    <SidebarMenuButton className='justify-center h-fit w-fit mx-auto rounded-[10px] bg-[var(--surface-panel)] px-3 py-3 shadow-[var(--shadow-brutal-sm)]'>
       <Link href='/' onClick={() => isMobile && setOpenMobile(false)}>
         <div className='flex items-center'>
           {(isOpen || isMobile) && (

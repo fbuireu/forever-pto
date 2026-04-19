@@ -166,7 +166,7 @@ function Sidebar({
         <div
           data-slot='sidebar'
           className={cn(
-            'bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col rounded-[1.35rem] border-[2.5px] border-[var(--frame)] shadow-[var(--shadow-brutal-lg)]',
+            'bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col rounded-[14px] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-lg)]',
             className
           )}
           {...props}
@@ -254,7 +254,7 @@ function Sidebar({
         >
           <div
             data-slot='sidebar-content'
-            className='bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col rounded-[1.35rem] border-[2.5px] border-[var(--frame)] shadow-[var(--shadow-brutal-lg)]'
+            className='bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col rounded-[14px] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-lg)]'
           >
             {children}
           </div>
@@ -275,7 +275,7 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
       data-sidebar='trigger'
       variant='ghost'
       size='icon'
-      className={cn('h-11 w-11 rounded-[1rem] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-sm)]', className)}
+      className={cn('h-11 w-11 rounded-[10px] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-sm)]', className)}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();
@@ -323,7 +323,7 @@ function SidebarInset({ className, ...props }: SidebarInsetProps) {
       data-slot='sidebar-inset'
       className={cn(
         'bg-background relative flex min-h-svh flex-1 flex-col',
-        'peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4)))] md:peer-data-[variant=inset]:m-3 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-3 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-[1.6rem] md:peer-data-[variant=inset]:border-[2.5px] md:peer-data-[variant=inset]:border-[var(--frame)] md:peer-data-[variant=inset]:shadow-[var(--shadow-brutal-lg)]',
+        'peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4)))] md:peer-data-[variant=inset]:m-3 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-3 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-[14px] md:peer-data-[variant=inset]:border-[3px] md:peer-data-[variant=inset]:border-[var(--frame)] md:peer-data-[variant=inset]:shadow-[var(--shadow-brutal-lg)]',
         className
       )}
       {...props}
@@ -410,7 +410,7 @@ function SidebarGroup({ className, ...props }: SidebarGroupProps) {
       data-slot='sidebar-group'
       data-sidebar='group'
       className={cn(
-        'relative flex w-full min-w-0 flex-col rounded-[1.05rem] bg-[var(--surface-panel-inset)] p-2.5',
+        'relative flex w-full min-w-0 flex-col rounded-[10px] bg-[var(--surface-panel-inset)] p-2.5',
         className
       )}
       {...props}
@@ -430,7 +430,7 @@ function SidebarGroupLabel({ className, asChild = false, ...props }: SidebarGrou
       data-slot='sidebar-group-label'
       data-sidebar='group-label'
       className={cn(
-        'text-sidebar-foreground/75 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-[0.8rem] px-2 text-[0.68rem] font-black uppercase tracking-[0.1em] outline-hidden transition-[margin,opa] duration-200 ease-linear focus-visible:ring-[3px] [&>svg]:size-4 [&>svg]:shrink-0',
+        'text-sidebar-foreground/75 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-[8px] px-2 text-[0.68rem] font-black uppercase tracking-[0.1em] outline-hidden transition-[margin,opa] duration-200 ease-linear focus-visible:ring-[3px] [&>svg]:size-4 [&>svg]:shrink-0',
         'group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0',
         className
       )}
@@ -501,7 +501,7 @@ function SidebarMenuItem({ className, ...props }: SidebarMenuItemProps) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-[1rem] border-[2px] border-transparent p-2.5 text-left text-sm font-medium outline-hidden ring-sidebar-ring transition-[width,height,padding,transform,box-shadow] hover:-translate-y-0.5 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[var(--shadow-brutal-xs)] focus-visible:ring-[3px] active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-black data-[active=true]:text-sidebar-accent-foreground data-[active=true]:border-[var(--frame)] data-[active=true]:shadow-[var(--shadow-brutal-xs)] data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-11 group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:[&>span]:!hidden [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0',
+  'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-[10px] border-[3px] border-transparent p-2.5 text-left text-sm font-medium outline-hidden ring-sidebar-ring transition-[width,height,padding,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[var(--shadow-brutal-xs)] focus-visible:ring-[3px] active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-black data-[active=true]:text-sidebar-accent-foreground data-[active=true]:border-[var(--frame)] data-[active=true]:shadow-[var(--shadow-brutal-xs)] data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-11 group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:[&>span]:!hidden [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0',
   {
     variants: {
       variant: {

@@ -149,7 +149,7 @@ export const Summary = () => {
               </Badge>
             </div>
           </CardTitle>
-          <CardDescription className='space-y-2 rounded-[1.1rem] border-[2px] border-[var(--frame)]/15 bg-[var(--surface-panel-soft)] p-4 text-muted-foreground'>
+          <CardDescription className='space-y-2 rounded-[10px] border-[3px] border-[var(--frame)]/15 bg-[var(--surface-panel-soft)] p-4 text-muted-foreground'>
             <p className='text-sm'>
               {increment > 0
                 ? t('summaryParagraph.withGain', {
@@ -283,7 +283,7 @@ export const Summary = () => {
                 iconSize='size-7'
                 inlineDescription
               >
-                <div className='rounded-[1.2rem] border-[2.5px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] p-4 shadow-[var(--shadow-brutal-sm)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]'>
+                <div className='rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] p-4 shadow-[var(--shadow-brutal-sm)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]'>
                   <div className='flex items-center gap-2 mb-3'>
                     <Clock className='w-4 h-4 text-indigo-500' />
                     <span className='text-sm font-medium text-indigo-700 dark:text-indigo-300'>

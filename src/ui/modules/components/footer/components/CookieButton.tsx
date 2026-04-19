@@ -11,7 +11,7 @@ export const CookieButton = () => {
   };
 
   return (
-    <Button variant='ghost' className='text-muted-foreground -ml-2 font-normal' onClick={handleClick}>
+    <Button variant='ghost' className='text-sm font-medium px-1.5 py-0.5 h-auto border-[2px] border-transparent rounded-[4px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-foreground transition-all duration-75' onClick={handleClick}>
       {t('manageCookies')}
     </Button>
   );

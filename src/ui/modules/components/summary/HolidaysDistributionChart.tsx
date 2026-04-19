@@ -67,7 +67,7 @@ export const HolidaysDistributionChart = ({ ptoDays, holidays }: HolidaysDistrib
       iconSize='size-7'
       inlineDescription
     >
-      <Card className='shadow-md'>
+      <Card className='shadow-[var(--shadow-brutal-md)]'>
         <CardHeader className='pb-3'>
           <CardTitle className='flex items-center gap-2 text-base'>
             <PieChart className='w-5 h-5 text-purple-500' />

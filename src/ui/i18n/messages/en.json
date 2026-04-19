@@ -36,7 +36,9 @@
     "en": "English",
     "es": "Spanish",
     "ca": "Catalan",
-    "it": "Italian"
+    "it": "Italian",
+    "fr": "French",
+    "de": "German"
   },
   "theme": {
     "light": "Light",
@@ -750,7 +752,11 @@
     "legalNotice": "Legal Notice",
     "manageCookies": "Manage cookies",
     "contactUs": "Contact Us",
-    "legalNavigation": "Legal and policy links"
+    "legalNavigation": "Legal and policy links",
+    "copyright": "© 2026 Forever PTO · Made with love from a hammock.",
+    "version": "v2.0 · status: on vacation ●",
+    "planner": "Planner",
+    "statusLine": "status: on vacation ●"
   },
   "accessibility": {
     "selectLanguage": "Select language, current: {current}",
@@ -1638,6 +1644,185 @@
           }
         }
       }
+    }
+  },
+  "landing": {
+    "nav": {
+      "how": "How it works",
+      "features": "Features",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "login": "Log in",
+      "cta": "Try for free →"
+    },
+    "hero": {
+      "badge1": "🇬🇧 EN · 🇪🇸 ES · 🇮🇹 IT · 🇩🇪 DE · 🇫🇷 FR · 🇺🇸 US",
+      "badge2": "v2.0 available",
+      "h1Line1": "Work less.",
+      "h1Verb": "Travel",
+      "h1Word": "more",
+      "p": "Forever PTO calculates <em>exactly</em> which days to request off so your 22 vacation days become <strong>47+ days out of the office</strong>. No spreadsheets. No math. No guilt.",
+      "pEm": "exactly",
+      "pStrong": "47+ days out of the office",
+      "cta1": "Calculate my days →",
+      "cta2": "See how it works (30s)",
+      "stars": "4.9 · used by {users} rebel employees",
+      "mockupLabel": "Real days off in 2026",
+      "mockupRatio": "days · ratio 2.14×",
+      "mockupQuote": "\"That's 9 long weekends, captain.\"",
+      "mockupLegendPto": "PTO",
+      "mockupLegendHoliday": "Holiday",
+      "mockupLegendWeekend": "Weekend",
+      "sticker1": "+47 free days ✦",
+      "sticker2": "only in {year} →",
+      "sticker3": "★ zero code needed",
+      "mockupFieldPto": "PTO Days",
+      "mockupFieldPtoUnit": "days/yr",
+      "mockupFieldCountry": "Country",
+      "mockupFieldHolidays": "14 holidays"
+    },
+    "marquee": {
+      "items": "EASTER BREAK · BANK HOLIDAY WEEKEND · SUMMER STRETCH · THANKSGIVING BRIDGE · CHRISTMAS STRETCH · NOVEMBER BRIDGE · WHIT MONDAY BRIDGE · MAY DAY LONG WEEKEND · AUGUST BANK HOLIDAY · NEW YEAR STRETCH"
+    },
+    "how": {
+      "badge": "HOW IT WORKS · 3 STEPS",
+      "h2Start": "From",
+      "h2Mid": "to",
+      "h2Q1": "what do I do",
+      "h2Q2": "trip is booked",
+      "h2End": "in 60 seconds.",
+      "p": "No install. No credit card. No newsletter. Just tell us how many days you have and where you live.",
+      "step1Title": "Enter your days.",
+      "step1Desc": "How many PTO days you have, which country (or region) you work in, and which months you prefer to block. That's it.",
+      "step2Title": "The engine does the magic.",
+      "step2Desc": "It crosses your days with official holidays and regional bridges. Finds all possible combos and ranks them by \"rest ratio\".",
+      "step3Title": "Request your days off.",
+      "step3Desc": "Export to Google Calendar, Outlook, or a PDF you paste into the HR form and forget. No more guessing."
+    },
+    "stats": {
+      "multiplierLabel": "Average multiplier",
+      "daysLabel": "Days off with 22 PTO",
+      "countriesLabel": "Supported countries",
+      "plansLabel": "Plans generated"
+    },
+    "features": {
+      "badge": "ENGINE TRICKS",
+      "h2Start": "Not a calendar. An",
+      "h2Em": "ally",
+      "h2End": "against Mondays.",
+      "p": "These are the moves Forever PTO makes for you automatically.",
+      "bridgeTag": "SMART BRIDGES",
+      "bridgeH3": "Turn 1 PTO day into 4 days off.",
+      "bridgeP": "Detects holidays on Tuesdays and Thursdays and suggests minimal bridges. One strategic day = a 4-day weekend.",
+      "ratioTag": "MAX RATIO",
+      "ratioP": "Best multiplier: 8 PTO days turned into 28 free days (ES, April '26).",
+      "syncTag": "SYNC IN 1 CLICK",
+      "syncH3": "Google · Outlook · iCal",
+      "syncP": "Export your plan to the calendar you already use. No hassle.",
+      "conflictsTag": "ANTI-CONFLICTS",
+      "conflictsH3": "Warns you before your boss does.",
+      "conflictsP": "Mark company \"no-fly\" periods.",
+      "countriesTag": "14 COUNTRIES",
+      "countriesH3": "Real local holidays.",
+      "countriesP": "Official calendars updated every year. Even regional ones.",
+      "privacyTag": "100% LOCAL",
+      "privacyH3": "Your data never leaves your browser.",
+      "privacyP": "No login, no cookies, no servers. Forever PTO is a static calculator that runs 100% on your machine."
+    },
+    "comparison": {
+      "badge": "BEFORE · AFTER",
+      "h2": "Before vs. after Forever PTO.",
+      "withoutTitle": "😩 Without Forever PTO",
+      "withoutItems": {
+        "0": "You open a spreadsheet and get stuck on cell C7.",
+        "1": "You ask for the Monday after a holiday and nobody tells you it was redundant.",
+        "2": "You find out in September that you have no days left.",
+        "3": "A colleague books your week first. Again.",
+        "4": "You end December with 4 unused days."
+      },
+      "withTitle": "😎 With Forever PTO",
+      "withItems": {
+        "0": "You plan everything in January, while waiting for your coffee.",
+        "1": "Each PTO day gives you back 2.1 free days on average.",
+        "2": "You visualize the whole year in a clear calendar.",
+        "3": "You book first, guilt-free, with data.",
+        "4": "You burn 100% of your days. As it should be."
+      }
+    },
+    "testimonials": {
+      "badge": "PEOPLE ARE SAYING",
+      "h2Start": "People who already reclaimed",
+      "h2Em": "weeks",
+      "h2End": "of their lives.",
+      "items": {
+        "0": {
+          "text": "I went from taking random days off to having 6 trips planned. My partner thinks I've become organised. I haven't told her it's a website.",
+          "name": "Marta R.",
+          "role": "designer · Madrid"
+        },
+        "1": {
+          "text": "I had 4 years of unused days. This time I used every single one. Came back tanned and almost motivated to work.",
+          "name": "Diego A.",
+          "role": "backend dev · Barcelona"
+        },
+        "2": {
+          "text": "I opened it \"just to see\" and 90 seconds later had a PDF ready to send HR with the whole year sorted. Ridiculously good.",
+          "name": "Sara V.",
+          "role": "product manager · Berlin"
+        }
+      }
+    },
+    "pricing": {
+      "badge": "HONEST PRICING",
+      "h2Start": "Pay once.",
+      "h2Em": "Forever.",
+      "p": "No SaaS. No subscription. No \"7-day trial that auto-renews\".",
+      "freeName": "Free Forever",
+      "freeTagline": "Try it. It will convince you.",
+      "freePrice": "€0",
+      "freePer": "/always",
+      "freeNote": "No credit card. No email. Nothing.",
+      "freeFeatures": {
+        "0": "Auto-optimised vacation plan",
+        "1": "Country & region holidays",
+        "2": "3 strategies (Grouped, Optimised, Balanced)",
+        "3": "Basic efficiency stats & calculators"
+      },
+      "freeCta": "Start for free",
+      "lifetimeName": "Supporter Pass",
+      "lifetimeTagline": "Minimum donation of €1. Use it forever.",
+      "lifetimePrice": "From €1",
+      "lifetimePer": " one time",
+      "lifetimeNote": "100% optional. Keeps the project alive.",
+      "lifetimeFeatures": {
+        "0": "Manual calendar editing",
+        "1": "Export to Google · Outlook · Apple · PDF",
+        "2": "Custom & company holidays",
+        "3": "Allow past days · carry-over months",
+        "4": "Edit & delete any holiday",
+        "5": "Full analytics & visual charts"
+      },
+      "lifetimeCta": "Support the project →",
+      "popularBadge": "MOST POPULAR 🔥"
+    },
+    "faq": {
+      "badge": "FAQ",
+      "h2": "Questions? We got answers."
+    },
+    "finalCta": {
+      "h2Start": "Your next",
+      "h2Em": "free",
+      "h2End": "year starts today.",
+      "p": "22 days can become 47. You just need to know where to place them. That's what we do.",
+      "cta": "Calculate my free days →"
+    },
+    "footer": {
+      "planner": "Planner",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "cookies": "Cookies",
+      "copyright": "© 2026 Forever PTO · Made with love from a hammock.",
+      "version": "v2.0 · status: on vacation ●"
     }
   }
 }

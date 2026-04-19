@@ -9,7 +9,7 @@ export const CalendarListSkeleton = () => (
     {Array.from({ length: MONTHS_PER_YEAR }).map(() => (
       <div
         key={crypto.randomUUID()}
-        className='calendar-container p-3 w-fit select-none rounded-lg border bg-card shadow-sm'
+        className='calendar-container p-3 w-fit select-none rounded-[14px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-md)]'
       >
         <div className='flex justify-center items-center mb-4'>
           <Skeleton className='h-5 w-28' />

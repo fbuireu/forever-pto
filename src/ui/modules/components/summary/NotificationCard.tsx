@@ -42,7 +42,7 @@ export const NotificationCard = ({
   return (
     <div
       className={cn(
-        'rounded-[1.2rem] border-[2.5px] border-[var(--frame)] p-4 shadow-[var(--shadow-brutal-sm)]',
+        'rounded-[10px] border-[3px] border-[var(--frame)] p-4 shadow-[var(--shadow-brutal-sm)]',
         colors.bg,
         className
       )}

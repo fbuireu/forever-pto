@@ -126,7 +126,7 @@ function DropdownMenuSubTrigger({ className, children, inset, disabled, ...props
             data-disabled={disabled}
             whileTap={{ scale: 0.97 }}
             className={cn(
-              "[&:not([data-highlight])]:focus:bg-accent focus:text-accent-foreground [&:not([data-highlight])]:data-[open]:bg-accent data-[open]:text-accent-foreground data-[open]:[&_[data-chevron]]:rotate-90 [&_[data-chevron]]:transition-transform [&_[data-chevron]]:duration-150 [&_[data-chevron]]:ease-in-out [&_svg:not([class*='text-'])]:text-muted-foreground relative z-[1] flex cursor-default select-none items-center gap-2 rounded-[0.9rem] border border-transparent px-3 py-2 text-sm font-medium outline-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+              "[&:not([data-highlight])]:focus:bg-accent focus:text-accent-foreground [&:not([data-highlight])]:data-[open]:bg-accent data-[open]:text-accent-foreground data-[open]:[&_[data-chevron]]:rotate-90 [&_[data-chevron]]:transition-transform [&_[data-chevron]]:duration-150 [&_[data-chevron]]:ease-in-out [&_svg:not([class*='text-'])]:text-muted-foreground relative z-[1] flex cursor-default select-none items-center gap-2 rounded-[8px] border border-transparent px-3 py-2 text-sm font-medium outline-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
               inset && 'pl-8',
               className
             )}
@@ -148,7 +148,7 @@ function DropdownMenuSubContent({ className, ...props }: Readonly<DropdownMenuSu
       <DropdownMenuPrimitive.Popup
         data-slot='dropdown-menu-sub-content'
         className={cn(
-          'z-50 min-w-32 overflow-hidden rounded-[1.1rem] border-[2.5px] border-[var(--frame)] bg-popover p-1.5 text-popover-foreground shadow-[var(--shadow-brutal-md)]',
+          'z-50 min-w-32 overflow-hidden rounded-[10px] border-[3px] border-[var(--frame)] bg-popover p-1.5 text-popover-foreground shadow-[var(--shadow-brutal-md)]',
           className
         )}
         {...props}
@@ -190,7 +190,7 @@ function DropdownMenuContent({
                   key='dropdown-menu-content'
                   data-slot='dropdown-menu-content'
                   className={cn(
-                    'z-50 max-h-(--available-height) min-w-32 overflow-y-auto overflow-x-hidden rounded-[1.1rem] border-[2.5px] border-[var(--frame)] bg-popover p-1.5 text-popover-foreground shadow-[var(--shadow-brutal-md)] origin-(--transform-origin)',
+                    'z-50 max-h-(--available-height) min-w-32 overflow-y-auto overflow-x-hidden rounded-[10px] border-[3px] border-[var(--frame)] bg-popover p-1.5 text-popover-foreground shadow-[var(--shadow-brutal-md)] origin-(--transform-origin)',
                     className
                   )}
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -204,7 +204,7 @@ function DropdownMenuContent({
             >
               <MotionHighlight
                 hover
-                className='rounded-[0.95rem]'
+                className='rounded-[8px]'
                 controlledItems
                 transition={highlightTransition}
                 enabled={animateOnHover}
@@ -252,7 +252,7 @@ function DropdownMenuItem({
             data-disabled={disabled}
             whileTap={{ scale: 0.97 }}
             className={cn(
-              "[&:not([data-highlight])]:focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive [&:not([data-highlight])]:data-[variant=destructive]:focus:bg-destructive/10 dark:[&:not([data-highlight])]:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative z-[1] flex cursor-default select-none items-center gap-2 rounded-[0.9rem] border border-transparent px-3 py-2 text-sm font-medium outline-none transition-colors focus-visible:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+              "[&:not([data-highlight])]:focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive [&:not([data-highlight])]:data-[variant=destructive]:focus:bg-destructive/10 dark:[&:not([data-highlight])]:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative z-[1] flex cursor-default select-none items-center gap-2 rounded-[8px] border border-transparent px-3 py-2 text-sm font-medium outline-none transition-colors focus-visible:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
               inset && 'pl-8',
               className
             )}
@@ -281,7 +281,7 @@ function DropdownMenuCheckboxItem({ className, children, checked, disabled, ...p
             data-disabled={disabled}
             whileTap={{ scale: 0.97 }}
             className={cn(
-              "[&:not([data-highlight])]:focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-[0.9rem] border border-transparent py-2 pr-3 pl-9 text-sm font-medium outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+              "[&:not([data-highlight])]:focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-[8px] border border-transparent py-2 pr-3 pl-9 text-sm font-medium outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
               className
             )}
           />
@@ -313,7 +313,7 @@ function DropdownMenuRadioItem({ className, children, disabled, ...props }: Drop
             data-disabled={disabled}
             whileTap={{ scale: 0.97 }}
             className={cn(
-              "[&:not([data-highlight])]:focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-[0.9rem] border border-transparent py-2 pr-3 pl-9 text-sm font-medium outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+              "[&:not([data-highlight])]:focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-[8px] border border-transparent py-2 pr-3 pl-9 text-sm font-medium outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
               className
             )}
           />

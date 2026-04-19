@@ -9,7 +9,7 @@ export const SiteSubtitle = () => {
   const { startTutorial } = useTutorial();
 
   return (
-    <p className='mx-auto mt-2 mb-16 max-w-4xl rounded-[1.3rem] border-[2.5px] border-[var(--frame)] bg-card px-5 py-4 text-center leading-relaxed text-muted-foreground shadow-[var(--shadow-brutal-md)]'>
+    <p className='mx-auto mt-2 mb-16 max-w-4xl rounded-[10px] border-[3px] border-[var(--frame)] bg-card px-5 py-4 text-center leading-relaxed text-muted-foreground shadow-[var(--shadow-brutal-sm)]'>
       {t('instructions')}{' '}
       <button
         type='button'

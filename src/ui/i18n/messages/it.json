@@ -36,7 +36,9 @@
     "en": "Inglese",
     "es": "Spagnolo",
     "ca": "Catalano",
-    "it": "Italiano"
+    "it": "Italiano",
+    "fr": "Francese",
+    "de": "Tedesco"
   },
   "theme": {
     "light": "Chiaro",
@@ -749,7 +751,11 @@
     "legalNotice": "Note Legali",
     "manageCookies": "Gestisci cookie",
     "contactUs": "Contattaci",
-    "legalNavigation": "Link legali e policy"
+    "legalNavigation": "Link legali e policy",
+    "copyright": "© 2026 Forever PTO · Fatto con amore da un amaca.",
+    "version": "v2.0 · status: in vacanza ●",
+    "planner": "Pianificatore",
+    "statusLine": "stato: in vacanza ●"
   },
   "accessibility": {
     "selectLanguage": "Seleziona lingua, attuale: {current}",
@@ -1637,6 +1643,185 @@
           }
         }
       }
+    }
+  },
+  "landing": {
+    "nav": {
+      "how": "Come funziona",
+      "features": "Funzioni",
+      "pricing": "Prezzi",
+      "faq": "FAQ",
+      "login": "Entra",
+      "cta": "Prova gratis →"
+    },
+    "hero": {
+      "badge1": "🇮🇹 IT · 🇪🇸 ES · 🇩🇪 DE · 🇫🇷 FR · 🇬🇧 UK · 🇺🇸 US",
+      "badge2": "v2.0 disponibile",
+      "h1Line1": "Lavora meno.",
+      "h1Verb": "Viaggia",
+      "h1Word": "di più",
+      "p": "Forever PTO calcola <em>esattamente</em> quali giorni richiedere per trasformare i tuoi 22 giorni di ferie in <strong>47+ giorni fuori dall'ufficio</strong>. Senza fogli Excel. Senza matematica. Senza sensi di colpa.",
+      "pEm": "esattamente",
+      "pStrong": "47+ giorni fuori dall'ufficio",
+      "cta1": "Calcola i miei giorni →",
+      "cta2": "Scopri come funziona (30s)",
+      "stars": "4.9 · usato da {users} dipendenti ribelli",
+      "mockupLabel": "Giorni liberi reali nel 2026",
+      "mockupRatio": "giorni · ratio 2.14×",
+      "mockupQuote": "\"Sono 9 weekend lunghi, capitano.\"",
+      "mockupLegendPto": "PTO",
+      "mockupLegendHoliday": "Festivo",
+      "mockupLegendWeekend": "Weekend",
+      "sticker1": "+47 giorni liberi ✦",
+      "sticker2": "solo nel {year} →",
+      "sticker3": "★ zero codice",
+      "mockupFieldPto": "Giorni PTO",
+      "mockupFieldPtoUnit": "giorni/anno",
+      "mockupFieldCountry": "Paese",
+      "mockupFieldHolidays": "14 festività"
+    },
+    "marquee": {
+      "items": "PONTE DI PASQUA · PONTE DEL PRIMO MAGGIO · ESTATE INFINITA · PONTE DI FERRAGOSTO · STRETCH DI NATALE · PONTE DI NOVEMBRE · PONTE DEL 25 APRILE · PONTE DEL 2 GIUGNO · PONTE DI OTTOBRE · CAPODANNO STRETCH"
+    },
+    "how": {
+      "badge": "COME FUNZIONA · 3 PASSI",
+      "h2Start": "Da",
+      "h2Mid": "a",
+      "h2Q1": "cosa faccio",
+      "h2Q2": "ho già il viaggio",
+      "h2End": "in 60 secondi.",
+      "p": "Senza installare nulla. Senza carta di credito. Senza newsletter. Dimmi quanti giorni hai e dove vivi.",
+      "step1Title": "Inserisci i tuoi giorni.",
+      "step1Desc": "Quanti giorni di PTO hai, in quale paese (o regione) lavori, e quali mesi preferisci bloccare. Tutto qui.",
+      "step2Title": "Il motore fa la magia.",
+      "step2Desc": "Incrocia i tuoi giorni con i festivi ufficiali e i ponti regionali. Trova tutte le combinazioni possibili e le ordina per \"ratio di riposo\".",
+      "step3Title": "Richiedi i giorni liberi.",
+      "step3Desc": "Esporta su Google Calendar, Outlook o un PDF da inviare all'HR e dimenticartene. Addio dubbi."
+    },
+    "stats": {
+      "multiplierLabel": "Moltiplicatore medio",
+      "daysLabel": "Giorni liberi con 22 PTO",
+      "countriesLabel": "Paesi supportati",
+      "plansLabel": "Piani generati"
+    },
+    "features": {
+      "badge": "TRUCCHI DEL MOTORE",
+      "h2Start": "Non è un calendario. È un",
+      "h2Em": "alleato",
+      "h2End": "contro il lunedì.",
+      "p": "Questi sono i movimenti che Forever PTO fa per te automaticamente.",
+      "bridgeTag": "PONTI INTELLIGENTI",
+      "bridgeH3": "Trasforma 1 giorno di PTO in 4 giorni liberi.",
+      "bridgeP": "Rileva festivi di martedì e giovedì e suggerisce ponti minimi. Un giorno strategico = un weekend di 4 giorni.",
+      "ratioTag": "RATIO MAX",
+      "ratioP": "Miglior moltiplicatore: 8 giorni PTO trasformati in 28 liberi (IT, aprile '26).",
+      "syncTag": "SYNC IN 1 CLICK",
+      "syncH3": "Google · Outlook · iCal",
+      "syncP": "Esporta il tuo piano nel calendario che già usi. Senza complicazioni.",
+      "conflictsTag": "ANTI-CONFLITTI",
+      "conflictsH3": "Avvisa prima del tuo capo.",
+      "conflictsP": "Segna i periodi \"tabù\" della tua azienda.",
+      "countriesTag": "14 PAESI",
+      "countriesH3": "Festivi locali reali.",
+      "countriesP": "Calendari ufficiali aggiornati ogni anno. Anche quelli regionali.",
+      "privacyTag": "100% LOCALE",
+      "privacyH3": "I tuoi dati non escono dal tuo browser.",
+      "privacyP": "Senza login, senza cookie, senza server. Forever PTO è una calcolatrice statica che gira 100% sulla tua macchina."
+    },
+    "comparison": {
+      "badge": "CON · SENZA",
+      "h2": "Prima vs. dopo Forever PTO.",
+      "withoutTitle": "😩 Senza Forever PTO",
+      "withoutItems": {
+        "0": "Apri un foglio Excel e ti blocchi alla cella C7.",
+        "1": "Chiedi il lunedì dopo il festivo e nessuno ti avvisa che era ridondante.",
+        "2": "Scopri a settembre che non hai più giorni.",
+        "3": "Un collega prenota la tua settimana per primo. Di nuovo.",
+        "4": "Finisci dicembre con 4 giorni non utilizzati."
+      },
+      "withTitle": "😎 Con Forever PTO",
+      "withItems": {
+        "0": "Pianifichi tutto a gennaio, mentre aspetti il caffè.",
+        "1": "Ogni giorno PTO ti restituisce 2,1 giorni liberi in media.",
+        "2": "Visualizzi l'intero anno in un calendario chiaro.",
+        "3": "Prenoti per primo, senza sensi di colpa, con dati.",
+        "4": "Usi il 100% dei tuoi giorni. Come si deve."
+      }
+    },
+    "testimonials": {
+      "badge": "DICONO DI NOI",
+      "h2Start": "Persone che hanno già recuperato",
+      "h2Em": "settimane",
+      "h2End": "della loro vita.",
+      "items": {
+        "0": {
+          "text": "Sono passata dal chiedere giorni a caso ad avere 6 viaggi pianificati. Il mio partner pensa che sia diventata organizzata. Non gli ho detto che è un sito.",
+          "name": "Marta R.",
+          "role": "designer · Madrid"
+        },
+        "1": {
+          "text": "Per 4 anni non ho mai usato tutti i miei giorni. Questa volta li ho usati fino all'ultimo. Sono tornato abbronzato e quasi motivato.",
+          "name": "Diego A.",
+          "role": "backend dev · Barcellona"
+        },
+        "2": {
+          "text": "L'ho aperto \"per vedere\" e dopo 90 secondi avevo già un PDF da mandare all'HR con tutto l'anno quadrato. Ridicolmente efficace.",
+          "name": "Sara V.",
+          "role": "product manager · Berlino"
+        }
+      }
+    },
+    "pricing": {
+      "badge": "PREZZO ONESTO",
+      "h2Start": "Paghi una volta.",
+      "h2Em": "Per sempre.",
+      "p": "Niente SaaS. Niente abbonamento. Niente \"prova gratuita che si rinnova da sola\".",
+      "freeName": "Gratis per Sempre",
+      "freeTagline": "Provalo. Ti convincerà.",
+      "freePrice": "€0",
+      "freePer": "/sempre",
+      "freeNote": "Niente carta. Niente email. Niente.",
+      "freeFeatures": {
+        "0": "Piano vacanze auto-ottimizzato",
+        "1": "Festività del tuo paese e regione",
+        "2": "3 strategie (Raggruppata, Ottimizzata, Bilanciata)",
+        "3": "Statistiche di base e calcolatrici"
+      },
+      "freeCta": "Inizia gratis",
+      "lifetimeName": "Abbonamento Sostenitore",
+      "lifetimeTagline": "Donazione minima di €1. Usalo per sempre.",
+      "lifetimePrice": "Da €1",
+      "lifetimePer": " una tantum",
+      "lifetimeNote": "100% facoltativo. Mantiene il progetto in vita.",
+      "lifetimeFeatures": {
+        "0": "Modifica manuale del calendario",
+        "1": "Esporta su Google · Outlook · Apple · PDF",
+        "2": "Festività personalizzate e aziendali",
+        "3": "Permetti giorni passati · mesi di riporto",
+        "4": "Modifica ed elimina qualsiasi festività",
+        "5": "Analisi completa e grafici visivi"
+      },
+      "lifetimeCta": "Sostieni il progetto →",
+      "popularBadge": "PIÙ POPOLARE 🔥"
+    },
+    "faq": {
+      "badge": "FAQ",
+      "h2": "Domande? Abbiamo risposte."
+    },
+    "finalCta": {
+      "h2Start": "Il tuo prossimo anno",
+      "h2Em": "libero",
+      "h2End": "inizia oggi.",
+      "p": "22 giorni possono diventare 47. Devi solo sapere dove metterli. Lo facciamo noi.",
+      "cta": "Calcola i miei giorni gratis →"
+    },
+    "footer": {
+      "planner": "Pianificatore",
+      "privacy": "Privacy",
+      "terms": "Termini",
+      "cookies": "Cookie",
+      "copyright": "© 2026 Forever PTO · Fatto con amore da un'amaca.",
+      "version": "v2.0 · status: in vacanza ●"
     }
   }
 }

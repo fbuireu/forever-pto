@@ -57,14 +57,14 @@ function DialogPopup({ className, children, showCloseButton = true, ...props }: 
       <DialogBackdrop />
       <DialogPopupPrimitive
         className={cn(
-          'bg-card fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-[1.4rem] border-[2.5px] border-[var(--frame)] p-6 shadow-[var(--shadow-brutal-lg)] sm:max-w-lg',
+          'bg-card fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-[14px] border-[3px] border-[var(--frame)] p-6 shadow-[var(--shadow-brutal-xl)] sm:max-w-lg',
           className
         )}
         {...props}
       >
         {children}
         {showCloseButton && (
-          <DialogClosePrimitive className="ring-offset-background focus:ring-ring absolute top-4 right-4 rounded-[0.8rem] border-[2px] border-[var(--frame)] bg-[var(--surface-panel)] p-1.5 opacity-100 shadow-[var(--shadow-brutal-xs)] transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 focus:ring-[3px] focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+          <DialogClosePrimitive className="ring-offset-background focus:ring-ring absolute top-4 right-4 cursor-pointer rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] p-1.5 opacity-100 shadow-[var(--shadow-brutal-xs)] transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] focus:ring-[3px] focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
             <XIcon />
             <span className='sr-only'>Close</span>
           </DialogClosePrimitive>

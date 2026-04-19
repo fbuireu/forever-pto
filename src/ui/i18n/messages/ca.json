@@ -36,7 +36,9 @@
     "en": "Anglès",
     "es": "Espanyol",
     "ca": "Català",
-    "it": "Italià"
+    "it": "Italià",
+    "fr": "Francès",
+    "de": "Alemany"
   },
   "theme": {
     "light": "Clar",
@@ -749,7 +751,11 @@
     "legalNotice": "Avís Legal",
     "manageCookies": "Gestionar cookies",
     "contactUs": "Contacta'ns",
-    "legalNavigation": "Enllaços legals i de política"
+    "legalNavigation": "Enllaços legals i de política",
+    "copyright": "© 2026 Forever PTO · Fet amb estima des d una hamaca.",
+    "version": "v2.0 · status: vacacional ●",
+    "planner": "Calculadora",
+    "statusLine": "estat: vacacional ●"
   },
   "accessibility": {
     "selectLanguage": "Seleccionar idioma, actual: {current}",
@@ -1637,6 +1643,185 @@
           }
         }
       }
+    }
+  },
+  "landing": {
+    "nav": {
+      "how": "Com funciona",
+      "features": "Trucs",
+      "pricing": "Preu",
+      "faq": "FAQ",
+      "login": "Entrar",
+      "cta": "Provar gratis →"
+    },
+    "hero": {
+      "badge1": "🇪🇸 ES · 🇮🇹 IT · 🇩🇪 DE · 🇫🇷 FR · 🇬🇧 UK · 🇺🇸 US",
+      "badge2": "v2.0 disponible",
+      "h1Line1": "Treballa menys.",
+      "h1Verb": "Viatja",
+      "h1Word": "més",
+      "p": "Forever PTO calcula <em>exactament</em> quins dies demanar lliure perquè els teus 22 dies de vacances es converteixin en <strong>47+ dies fora de l'oficina</strong>. Sense excels. Sense matemàtiques. Sense remordiment.",
+      "pEm": "exactament",
+      "pStrong": "47+ dies fora de l'oficina",
+      "cta1": "Calcular els meus dies →",
+      "cta2": "Veure com va (30s)",
+      "stars": "4.9 · usat per {users} empleats rebels",
+      "mockupLabel": "Dies lliures reals el 2026",
+      "mockupRatio": "dies · ràtio 2.14×",
+      "mockupQuote": "\"Això són 9 escapades llargues, capità.\"",
+      "mockupLegendPto": "PTO",
+      "mockupLegendHoliday": "Festiu",
+      "mockupLegendWeekend": "Cap de setmana",
+      "sticker1": "+47 dies lliures ✦",
+      "sticker2": "només el {year} →",
+      "sticker3": "★ sense codi",
+      "mockupFieldPto": "Dies PTO",
+      "mockupFieldPtoUnit": "dies/any",
+      "mockupFieldCountry": "País",
+      "mockupFieldHolidays": "14 festius"
+    },
+    "marquee": {
+      "items": "SETMANA SANTA · PONT DE MAIG · ESTIU INFINIT · PONT DE LA MERCE · NADAL STRETCH · PONT DE NOVEMBRE · PONT DE JUNY · PONT DE L AGOST · PONT D OCTUBRE · CAP D ANY STRETCH"
+    },
+    "how": {
+      "badge": "COM VA · 3 PASSOS",
+      "h2Start": "De",
+      "h2Mid": "a",
+      "h2Q1": "què faig",
+      "h2Q2": "ja tinc el viatge",
+      "h2End": "en 60 segons.",
+      "p": "Sense instal·lar res. Sense targeta. Sense newsletter. Digues-nos quants dies tens i on vius.",
+      "step1Title": "Posa els teus dies.",
+      "step1Desc": "Quants dies de PTO tens, en quin país (o regió) treballes, i quins mesos prefereixes bloquejar. Això és tot.",
+      "step2Title": "El motor fa màgia.",
+      "step2Desc": "Creua els teus dies amb els festius oficials i els ponts regionals. Troba totes les combinacions possibles i les ordena per \"ràtio de descàns\".",
+      "step3Title": "Demanes els dies.",
+      "step3Desc": "Exporta a Google Calendar, Outlook o un PDF que enganxes al formulari de RRHH i t'oblides. Adéu dubtes."
+    },
+    "stats": {
+      "multiplierLabel": "Multiplicador mitjà",
+      "daysLabel": "Dies lliures amb 22 PTO",
+      "countriesLabel": "Països suportats",
+      "plansLabel": "Plans generats"
+    },
+    "features": {
+      "badge": "TRUCS DEL MOTOR",
+      "h2Start": "No és un calendari. És un",
+      "h2Em": "aliat",
+      "h2End": "contra el dilluns.",
+      "p": "Aquests són els moviments que Forever PTO fa per tu automàticament.",
+      "bridgeTag": "PONTS INT·LIGENTS",
+      "bridgeH3": "Converteix 1 dia de PTO en 4 lliures.",
+      "bridgeP": "Detecta festius en dimarts i dijous i et suggereix construir ponts mínims. Un dia estratègic = un cap de setmana de 4 dies.",
+      "ratioTag": "RÀTIO MAX",
+      "ratioP": "Millor multiplicador: 8 dies de PTO convertits en 28 lliures (ES, abril '26).",
+      "syncTag": "SYNC EN 1 CLIC",
+      "syncH3": "Google · Outlook · iCal",
+      "syncP": "Exporta el teu pla al calendari que ja uses. Sense embolicar-te.",
+      "conflictsTag": "ANTI-CONFLICTES",
+      "conflictsH3": "Avisa abans que el teu cap.",
+      "conflictsP": "Marca els períodes \"tabú\" de la teva empresa.",
+      "countriesTag": "14 PAÏSOS",
+      "countriesH3": "Festius locals reals.",
+      "countriesP": "Calendaris oficials actualitzats cada any. Fins i tot els regionals.",
+      "privacyTag": "100% LOCAL",
+      "privacyH3": "Les teves dades no surten del teu navegador.",
+      "privacyP": "Sense login, sense cookies, sense servidors. Forever PTO és una calculadora estàtica que corre 100% a la teva màquina."
+    },
+    "comparison": {
+      "badge": "AMB · SENSE",
+      "h2": "Abans vs. després de Forever PTO.",
+      "withoutTitle": "😩 Sense Forever PTO",
+      "withoutItems": {
+        "0": "Obres un Excel i et bloqueges a C7.",
+        "1": "Demanes el dilluns després del festiu i ningú t'avisa que era redundant.",
+        "2": "T'assabentes al setembre que ja no queden dies.",
+        "3": "Un company demana la teva setmana primer. Una altra vegada.",
+        "4": "Acabes el desembre amb 4 dies sense fer servir."
+      },
+      "withTitle": "😎 Amb Forever PTO",
+      "withItems": {
+        "0": "Ho planifiques tot al gener, mentre esperes el cafè.",
+        "1": "Cada dia de PTO et retorna 2,1 dies lliures de mitjana.",
+        "2": "Visualitzes l'any sencer en un calendari clar.",
+        "3": "Demanes primer, sense remordiment, amb dades.",
+        "4": "Gastes el 100% dels teus dies. Com ha de ser."
+      }
+    },
+    "testimonials": {
+      "badge": "LA GENT DIU",
+      "h2Start": "Gent que ja ha recuperat",
+      "h2Em": "setmanes",
+      "h2End": "de la seva vida.",
+      "items": {
+        "0": {
+          "text": "Vaig passar de demanar dies solts a tenir 6 escapades planificades. La meva parella creu que m'he tornat organitzat. No li he dit que és una web.",
+          "name": "Marta R.",
+          "role": "dissenyadora · Madrid"
+        },
+        "1": {
+          "text": "Feia 4 anys que no feia servir tots els meus dies. Aquest cop els vaig gastar fins l'últim. Vaig tornar bronzejat i amb ganes de treballar. Quasi.",
+          "name": "Diego A.",
+          "role": "backend dev · Barcelona"
+        },
+        "2": {
+          "text": "Ho vaig obrir \"per veure\" i als 90 segons ja tenia un PDF per enviar a RRHH amb tot l'any quadrat. Ridícul de bé que va.",
+          "name": "Sara V.",
+          "role": "product manager · Berlín"
+        }
+      }
+    },
+    "pricing": {
+      "badge": "PREU HONEST",
+      "h2Start": "Paga una vegada.",
+      "h2Em": "Per sempre.",
+      "p": "Sense SaaS. Sense subscripció. Sense \"prova gratuïta que es renova sola\".",
+      "freeName": "Gratuït Sempre",
+      "freeTagline": "Prova-ho. Et convencerà.",
+      "freePrice": "€0",
+      "freePer": "/sempre",
+      "freeNote": "Sense targeta. Sense correu. Res.",
+      "freeFeatures": {
+        "0": "Pla de vacances auto-optimitzat",
+        "1": "Festius del teu país i regió",
+        "2": "3 estratègies (Agrupada, Optimitzada, Equilibrada)",
+        "3": "Estadístiques bàsiques i calculadores"
+      },
+      "freeCta": "Comença gratis",
+      "lifetimeName": "Passi de Suport",
+      "lifetimeTagline": "Donació mínima d'1€. Usa'l per sempre.",
+      "lifetimePrice": "Des d'€1",
+      "lifetimePer": " una vegada",
+      "lifetimeNote": "100% opcional. Manté el projecte viu.",
+      "lifetimeFeatures": {
+        "0": "Edició manual del calendari",
+        "1": "Exportar a Google · Outlook · Apple · PDF",
+        "2": "Festius personalitzats i d'empresa",
+        "3": "Permetre dies passats · mesos d'arrossegament",
+        "4": "Editar i eliminar qualsevol festiu",
+        "5": "Analítica completa i gràfics visuals"
+      },
+      "lifetimeCta": "Dóna suport al projecte →",
+      "popularBadge": "MÉS POPULAR 🔥"
+    },
+    "faq": {
+      "badge": "FAQ",
+      "h2": "Preguntes? Tenim respostes."
+    },
+    "finalCta": {
+      "h2Start": "El teu pròxim any",
+      "h2Em": "lliure",
+      "h2End": "comença avui.",
+      "p": "22 dies poden ser 47. Només cal saber on col·locar-los. Això ho fem nosaltres.",
+      "cta": "Calcular els meus dies gratis →"
+    },
+    "footer": {
+      "planner": "Calculadora",
+      "privacy": "Privacitat",
+      "terms": "Termes",
+      "cookies": "Cookies",
+      "copyright": "© 2026 Forever PTO · Fet amb estima des d'una hamaca.",
+      "version": "v2.0 · status: de vacances ●"
     }
   }
 }

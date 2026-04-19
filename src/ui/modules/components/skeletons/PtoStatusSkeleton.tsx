@@ -1,7 +1,7 @@
 import { Skeleton } from '@ui/components/primitives/skeleton';
 
 export const PtoStatusSkeleton = () => (
-  <div className='p-2 rounded-2xl border shadow-sm bg-background'>
+  <div className='p-2 rounded-[14px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-md)]'>
     <div className='flex items-center justify-between flex-wrap gap-4 h-full'>
       <div className='flex items-center gap-4'>
         <div className='flex items-center gap-1'>

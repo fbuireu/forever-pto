@@ -27,29 +27,29 @@ export const SummarySkeleton = () => {
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
             <div className='space-y-2'>
               <Skeleton className='h-6 w-32' />
-              <Skeleton className='h-64 w-full rounded-lg' />
+              <Skeleton className='h-64 w-full rounded-[10px]' />
             </div>
             <div className='space-y-2'>
               <Skeleton className='h-6 w-32' />
-              <Skeleton className='h-64 w-full rounded-lg' />
+              <Skeleton className='h-64 w-full rounded-[10px]' />
             </div>
           </div>
 
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
             <div className='space-y-2'>
               <Skeleton className='h-6 w-32' />
-              <Skeleton className='h-64 w-full rounded-lg' />
+              <Skeleton className='h-64 w-full rounded-[10px]' />
             </div>
             <div className='space-y-2'>
               <Skeleton className='h-6 w-32' />
-              <Skeleton className='h-64 w-full rounded-lg' />
+              <Skeleton className='h-64 w-full rounded-[10px]' />
             </div>
           </div>
           <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
             {Array.from({ length: 4 }).map(() => (
               <div
                 key={crypto.randomUUID()}
-                className='flex flex-col items-center p-4 bg-muted/30 rounded-lg space-y-2'
+                className='flex flex-col items-center p-4 bg-[var(--surface-panel-soft)] rounded-[10px] space-y-2'
               >
                 <Skeleton className='h-3 w-16' />
                 <div className='flex items-center gap-2'>
@@ -62,14 +62,14 @@ export const SummarySkeleton = () => {
           </div>
           <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3'>
             {Array.from({ length: 6 }).map(() => (
-              <div key={crypto.randomUUID()} className='p-3 bg-muted/30 rounded-lg text-center space-y-1'>
+              <div key={crypto.randomUUID()} className='p-3 bg-[var(--surface-panel-soft)] rounded-[10px] text-center space-y-1'>
                 <Skeleton className='w-4 h-4 mx-auto rounded-sm' />
                 <Skeleton className='h-5 w-8 mx-auto' />
                 <Skeleton className='h-3 w-12 mx-auto' />
               </div>
             ))}
           </div>
-          <div className='p-4 bg-muted/20 rounded-lg space-y-3'>
+          <div className='p-4 bg-[var(--surface-panel-inset)] rounded-[10px] space-y-3'>
             <div className='flex items-center gap-2'>
               <Skeleton className='w-4 h-4 rounded-sm' />
               <Skeleton className='h-4 w-32' />
@@ -89,7 +89,7 @@ export const SummarySkeleton = () => {
             </div>
           </div>
           <div className='space-y-4'>
-            <div className='p-4 bg-muted/20 rounded-lg border space-y-2'>
+            <div className='p-4 bg-[var(--surface-panel-inset)] rounded-[10px] border-[3px] border-[var(--frame)] space-y-2'>
               <div className='flex items-center gap-2'>
                 <Skeleton className='w-4 h-4 rounded-sm' />
                 <Skeleton className='h-4 w-20' />
@@ -99,7 +99,7 @@ export const SummarySkeleton = () => {
                 <Skeleton className='h-3 w-2/3' />
               </div>
             </div>
-            <div className='p-3 bg-muted/20 rounded-lg border space-y-2'>
+            <div className='p-3 bg-[var(--surface-panel-inset)] rounded-[10px] border-[3px] border-[var(--frame)] space-y-2'>
               <Skeleton className='h-3 w-full' />
             </div>
           </div>

@@ -2,8 +2,8 @@ import { Skeleton } from '@ui/components/primitives/skeleton';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const AlternativesManagerSkeleton = () => (
-  <div className='sticky top-0 z-10 flex w-fit flex-wrap items-center gap-2 rounded-2xl border border-border bg-background p-2 shadow-sm'>
-    <div className='flex shrink-0 items-center rounded-lg bg-muted/50 px-2 grow'>
+  <div className='sticky top-0 z-10 flex w-fit flex-wrap items-center gap-2 rounded-[14px] border-[3px] border-[var(--frame)] bg-card p-2 shadow-[var(--shadow-brutal-md)]'>
+    <div className='flex shrink-0 items-center rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-2 grow'>
       <button type='button' className='p-2 rounded-md disabled:opacity-50' disabled>
         <ChevronLeft size={20} />
       </button>
@@ -17,10 +17,10 @@ export const AlternativesManagerSkeleton = () => (
     </div>
 
     <div className='flex flex-nowrap space-x-2'>
-      <Skeleton className='h-10 w-[120px] rounded-lg' />
-      <Skeleton className='h-10 w-[120px] rounded-lg' />
+      <Skeleton className='h-10 w-[120px] rounded-[8px]' />
+      <Skeleton className='h-10 w-[120px] rounded-[8px]' />
     </div>
 
-    <Skeleton className='flex grow h-10 w-32 rounded-lg' />
+    <Skeleton className='flex grow h-10 w-32 rounded-[10px]' />
   </div>
 );

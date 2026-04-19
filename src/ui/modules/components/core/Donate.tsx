@@ -191,136 +191,172 @@ export const Donate = () => {
 
     const isDark = resolvedTheme === 'dark';
 
-    const colors = {
-      background: isDark ? 'lab(15.204 0 -0.00000596046);' : 'hsl(0 0% 100%)',
-      foreground: isDark ? 'hsl(0, 0%, 100%)' : 'hsl(222.2 84% 4.9%)',
-      primary: isDark ? 'hsl(210 40% 98%)' : 'hsl(222.2 47.4% 11.2%)',
-      primaryForeground: isDark ? 'hsl(222.2 47.4% 11.2%)' : 'hsl(210 40% 98%)',
-      border: isDark ? 'hsl(240 3.7% 15.9%)' : 'hsl(214.3 31.8% 91.4%)',
-      borderHover: isDark ? 'hsl(240 3.7% 20%)' : 'hsl(214.3 31.8% 85%)',
-      accent: isDark ? 'hsl(240 3.7% 15.9%)' : 'hsl(240 4.8% 95.9%)',
-      accentHover: isDark ? 'hsl(240 3.7% 18%)' : 'hsl(240 4.8% 95.9%)',
-      destructive: isDark ? 'lab(63.7053% 60.745 31.3109)' : 'hsl(0 84.2% 60.2%)',
-      mutedForeground: isDark ? 'hsl(215 20.2% 65.1%)' : 'hsl(215.4 16.3% 46.9%)',
-    };
+    // Neobrutalism DSM — hex only (Stripe rejects rgba/var())
+    // All values mirror src/ui/styles/global/index.css
+    const t = isDark
+      ? {
+          bg: '#1A1612',     // --card
+          bgInput: '#181410',// --input
+          fg: '#FFF5E1',     // --foreground
+          frame: '#FFF5E1',  // --frame
+          accent: '#FFD93D', // --accent (same in both modes)
+          accentText: '#0E0E0E',
+          hover: '#2B241E',  // --secondary
+          destructive: '#FF5A5F',
+          muted: '#C6B8A5',  // --muted-foreground
+        }
+      : {
+          bg: '#FFFDF8',     // --card
+          bgInput: '#FFFAF0',// --input
+          fg: '#0E0E0E',     // --foreground
+          frame: '#0E0E0E',  // --frame
+          accent: '#FFD93D', // --accent
+          accentText: '#0E0E0E',
+          hover: '#FFF0C6',  // --secondary
+          destructive: '#FF5A5F',
+          muted: '#6B5E4E',  // --muted-foreground
+        };
 
     return {
       clientSecret: paymentState.clientSecret,
       loader: 'always',
       appearance: {
-        theme: isDark ? 'night' : 'stripe',
+        // Use 'none' so we own every pixel — no Stripe preset overrides
+        theme: 'none',
+        labels: 'above',
         variables: {
-          colorBackground: colors.background,
-          colorText: colors.foreground,
-          colorPrimary: colors.primary,
-          colorDanger: colors.destructive,
-          colorTextSecondary: colors.mutedForeground,
-          colorTextPlaceholder: colors.mutedForeground,
+          colorBackground: t.bg,
+          colorText: t.fg,
+          colorPrimary: t.frame,
+          colorDanger: t.destructive,
+          colorTextSecondary: t.muted,
+          colorTextPlaceholder: t.muted,
+          accessibleColorOnColorPrimary: t.fg,
           fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
           fontSizeBase: '14px',
           fontWeightNormal: '400',
           fontWeightMedium: '500',
-          fontWeightBold: '600',
+          fontWeightBold: '700',
           spacingUnit: '4px',
-          borderRadius: '10px',
+          borderRadius: '8px',
+          // Brutal focus ring
+          focusBoxShadow: `3px 3px 0 0 ${t.frame}`,
+          focusOutline: `2px solid ${t.frame}`,
         },
         rules: {
           '.Input': {
-            backgroundColor: colors.background,
-            border: `1px solid ${colors.border}`,
+            backgroundColor: t.bgInput,
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            borderColor: t.frame,
             padding: '10px 12px',
             fontSize: '14px',
-            color: colors.foreground,
-            boxShadow: isDark ? '0 1px 2px 0 rgba(0, 0, 0, 0.3)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-            transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-            borderRadius: '10px',
+            color: t.fg,
+            boxShadow: 'none',
+            borderRadius: '8px',
+            transition: 'box-shadow 80ms linear',
           },
           '.Input:hover': {
-            borderColor: colors.borderHover,
+            boxShadow: `3px 3px 0 0 ${t.frame}`,
           },
           '.Input:focus': {
-            borderColor: isDark ? colors.border : colors.primary,
-            boxShadow: isDark ? `0 0 0 3px ${colors.border}` : `0 0 0 2px ${colors.primary.replace(')', ' / 0.2)')}`,
-            outline: 'none',
+            boxShadow: `4px 4px 0 0 ${t.frame}`,
           },
           '.Input--invalid': {
-            borderColor: colors.destructive,
+            borderColor: t.destructive,
+            boxShadow: 'none',
           },
           '.Input--invalid:focus': {
-            borderColor: colors.destructive,
-            boxShadow: isDark
-              ? `0 0 0 3px ${colors.destructive.replace(')', ' / 0.3)')}`
-              : `0 0 0 2px ${colors.destructive.replace(')', ' / 0.2)')}`,
+            boxShadow: `4px 4px 0 0 ${t.destructive}`,
           },
           '.Input::placeholder': {
-            color: colors.mutedForeground,
+            color: t.muted,
           },
           '.Label': {
-            fontSize: '14px',
-            fontWeight: '500',
-            color: colors.foreground,
-            marginBottom: '6px',
+            fontSize: '11px',
+            fontWeight: '700',
+            color: t.fg,
+            letterSpacing: '0.07em',
+            textTransform: 'uppercase',
           },
           '.Error': {
-            fontSize: '13px',
-            color: colors.destructive,
-            marginTop: '6px',
-            fontWeight: '400',
+            fontSize: '12px',
+            color: t.destructive,
+            fontWeight: '500',
           },
           '.Tab': {
-            backgroundColor: colors.background,
-            border: `1px solid ${colors.border}`,
-            boxShadow: isDark ? '0 1px 2px 0 rgba(0, 0, 0, 0.3)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-            color: colors.foreground,
-            borderRadius: '10px',
+            backgroundColor: t.bg,
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            borderColor: t.frame,
+            boxShadow: 'none',
+            color: t.fg,
+            borderRadius: '8px',
             padding: '10px 16px',
-            transition: 'all 0.15s ease',
+            transition: 'box-shadow 80ms linear',
           },
           '.Tab:hover': {
-            backgroundColor: colors.accent,
-            borderColor: colors.borderHover,
+            backgroundColor: t.hover,
+            boxShadow: `3px 3px 0 0 ${t.frame}`,
           },
           '.Tab--selected': {
-            backgroundColor: colors.primary,
-            color: colors.primaryForeground,
-            borderColor: colors.primary,
-            boxShadow: 'none',
+            backgroundColor: t.accent,
+            color: t.accentText,
+            borderColor: t.frame,
+            boxShadow: `4px 4px 0 0 ${t.frame}`,
           },
           '.Tab--selected:hover': {
-            backgroundColor: isDark ? 'hsl(210 40% 95%)' : 'hsl(222.2 47.4% 9%)',
-          },
-          '.TabIcon': {
-            fill: 'currentColor',
-          },
-          '.AccordionItem': {
-            boxShadow: 'none',
-            backgroundColor: isDark ? 'lab(15.204 0 0)' : 'hsl(0 0% 100%)',
-            color: colors.foreground,
+            boxShadow: `5px 5px 0 0 ${t.frame}`,
           },
           '.Block': {
-            backgroundColor: colors.background,
-            border: `1px solid ${colors.border}`,
-            borderRadius: '10px',
-            boxShadow: isDark ? '0 1px 3px 0 rgba(0, 0, 0, 0.3)' : '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+            backgroundColor: t.bg,
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            borderColor: t.frame,
+            borderRadius: '8px',
+            boxShadow: 'none',
           },
           '.PickerItem': {
-            backgroundColor: colors.background,
-            border: `1px solid ${colors.border}`,
-            borderRadius: '10px',
-            padding: '12px',
-            transition: 'all 0.15s ease',
+            backgroundColor: t.bg,
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            borderColor: t.frame,
+            borderRadius: '8px',
+            boxShadow: 'none',
+            transition: 'box-shadow 80ms linear',
           },
           '.PickerItem:hover': {
-            backgroundColor: colors.accent,
-            borderColor: colors.borderHover,
+            backgroundColor: t.hover,
+            boxShadow: `3px 3px 0 0 ${t.frame}`,
           },
           '.PickerItem--selected': {
-            borderColor: colors.primary,
-            backgroundColor: colors.accent,
-            boxShadow: `0 0 0 1px ${colors.primary}`,
+            backgroundColor: t.accent,
+            borderColor: t.frame,
+            color: t.accentText,
+            boxShadow: `4px 4px 0 0 ${t.frame}`,
           },
           '.PickerItem--selected:hover': {
-            backgroundColor: colors.accentHover,
+            boxShadow: `5px 5px 0 0 ${t.frame}`,
+          },
+          '.AccordionItem': {
+            backgroundColor: t.bg,
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            borderColor: t.frame,
+            borderRadius: '8px',
+            boxShadow: 'none',
+          },
+          '.AccordionItem:focus-within': {
+            boxShadow: `4px 4px 0 0 ${t.frame}`,
+          },
+          '.CheckboxInput': {
+            border: `2px solid ${t.frame}`,
+            borderRadius: '4px',
+            backgroundColor: t.bgInput,
+          },
+          '.CheckboxInput--checked': {
+            backgroundColor: t.accent,
+            borderColor: t.frame,
           },
         },
       },
@@ -332,7 +368,7 @@ export const Donate = () => {
       <div className='donate-trigger fixed xl:bottom-4 bottom-30 w-full right-0 md:w-auto md:right-4 z-50'>
         <div className='donate-rainbow relative z-0 overflow-hidden p-0.5 flex items-center justify-center rounded-md hover:scale-102 transition duration-200 active:scale-100'>
           <PopoverTrigger asChild>
-            <Button className='shadow-lg rounded-md w-full h-full py-3'>{tDonate('donateAndUnblock')}</Button>
+            <Button className='rounded-[8px] w-full h-full py-3'>{tDonate('donateAndUnblock')}</Button>
           </PopoverTrigger>
         </div>
       </div>

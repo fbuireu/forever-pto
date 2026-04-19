@@ -72,7 +72,7 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
             <span className='block my-2 text-sm text-muted-foreground'>
               {isMultiple ? t('description', { count: holidays.length }) : t('descriptionSingular')}
             </span>
-            <div className='bg-muted rounded-lg p-3 max-h-32 overflow-y-auto'>
+            <div className='bg-[var(--surface-panel-soft)] rounded-[10px] border-[3px] border-[var(--frame)] p-3 max-h-32 overflow-y-auto shadow-[var(--shadow-brutal-xs)]'>
               <div className='space-y-2'>
                 {holidays.map((holiday) => (
                   <div key={holiday.id} className='flex items-center justify-between text-sm'>

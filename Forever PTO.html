@@ -1,0 +1,1543 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Forever PTO — Trabaja menos, viaja más</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Archivo+Black&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,600&display=swap" rel="stylesheet">
+
+<script>
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "bg": "#FFF5E1",
+  "accent": "#FFD93D",
+  "fontPair": "grotesk-serif"
+}/*EDITMODE-END*/;
+</script>
+
+<style>
+  :root {
+    /* core neobrutalist tokens */
+    --ink: #0E0E0E;
+    --paper: #FFF5E1;
+    --paper-2: #FFFAF0;
+    --border: 3px;
+    --border-thick: 4px;
+    --shadow-x: 6px;
+    --shadow-y: 6px;
+
+    /* palette — saturated neobrutalist take */
+    --yellow: #FFD93D;
+    --teal: #4ECDC4;
+    --orange: #FF7A45;
+    --purple: #B388FF;
+    --pink: #FF8FB1;
+    --green: #A6E368;
+    --sky: #8ECAE6;
+    --red: #FF5A5F;
+
+    --accent: var(--yellow);
+
+    /* type */
+    --font-display: 'Bricolage Grotesque', 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'Space Grotesk', system-ui, sans-serif;
+    --font-serif: 'Instrument Serif', 'Fraunces', Georgia, serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  /* font pair variants */
+  body[data-fontpair="grotesk-serif"] {
+    --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+    --font-body: 'Space Grotesk', system-ui, sans-serif;
+    --font-serif: 'Instrument Serif', Georgia, serif;
+  }
+  body[data-fontpair="archivo-mono"] {
+    --font-display: 'Archivo Black', system-ui, sans-serif;
+    --font-body: 'Space Grotesk', system-ui, sans-serif;
+    --font-serif: 'JetBrains Mono', monospace;
+  }
+  body[data-fontpair="serif-led"] {
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Space Grotesk', system-ui, sans-serif;
+    --font-serif: 'Instrument Serif', Georgia, serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--paper); color: var(--ink); }
+  body {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+  /* ====== Reusable atoms ====== */
+  .nb-card {
+    background: #fff;
+    border: var(--border-thick) solid var(--ink);
+    box-shadow: var(--shadow-x) var(--shadow-y) 0 0 var(--ink);
+    border-radius: 8px;
+  }
+  .nb-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    background: var(--accent);
+    color: var(--ink);
+    border: var(--border-thick) solid var(--ink);
+    border-radius: 8px;
+    box-shadow: 5px 5px 0 0 var(--ink);
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 16px;
+    transition: transform .08s ease, box-shadow .08s ease, background .15s ease;
+    white-space: nowrap;
+  }
+  .nb-btn:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 0 var(--ink); }
+  .nb-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 0 var(--ink); }
+  .nb-btn--ghost { background: #fff; }
+  .nb-btn--ink { background: var(--ink); color: var(--paper-2); }
+  .nb-btn--lg { padding: 18px 28px; font-size: 18px; }
+
+  .nb-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-weight: 700;
+    font-size: 13px;
+    box-shadow: 3px 3px 0 0 var(--ink);
+    font-family: var(--font-body);
+  }
+  .nb-pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border: 2.5px solid var(--ink);
+    border-radius: 6px;
+    background: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .container { max-width: 1240px; margin: 0 auto; padding: 0 28px; }
+
+  /* ====== NAV ====== */
+  nav.topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--paper);
+    border-bottom: var(--border-thick) solid var(--ink);
+  }
+  .topbar-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 28px;
+    max-width: 1320px; margin: 0 auto;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+  }
+  .logo-mark {
+    width: 38px; height: 38px;
+    background: var(--accent);
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    box-shadow: 3px 3px 0 0 var(--ink);
+    display: grid; place-items: center;
+    font-size: 22px;
+    transform: rotate(-4deg);
+  }
+  .nav-links {
+    display: flex; gap: 28px; align-items: center;
+    font-weight: 600; font-size: 15px;
+  }
+  .nav-links a:hover { background: var(--accent); padding: 4px 8px; border: 2px solid var(--ink); border-radius: 6px; }
+  .nav-cta { display: flex; gap: 12px; align-items: center; }
+  .nav-cta .nb-btn { padding: 10px 16px; font-size: 14px; box-shadow: 3px 3px 0 0 var(--ink); }
+
+  @media (max-width: 800px) {
+    .nav-links { display: none; }
+  }
+
+  /* ====== HERO ====== */
+  .hero {
+    position: relative;
+    padding: 80px 28px 100px;
+    overflow: hidden;
+  }
+  .hero-grid {
+    max-width: 1240px; margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  @media (max-width: 960px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+  }
+
+  .hero-eyebrow {
+    display: inline-flex; gap: 10px; align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(48px, 7vw, 92px);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    margin-bottom: 28px;
+  }
+  .hero h1 .scribble {
+    position: relative;
+    display: inline-block;
+    color: var(--ink);
+    background: var(--accent);
+    padding: 0 12px 4px;
+    border: 4px solid var(--ink);
+    border-radius: 10px;
+    box-shadow: 5px 5px 0 0 var(--ink);
+    transform: rotate(-2deg);
+    margin: 0 4px;
+  }
+  .hero h1 .underline {
+    background-image: linear-gradient(transparent 70%, var(--teal) 70%, var(--teal) 95%, transparent 95%);
+    padding: 0 4px;
+  }
+  .hero h1 .palm {
+    display: inline-block;
+    transform: rotate(15deg);
+    font-size: 0.75em;
+  }
+
+  .hero p.lead {
+    font-family: var(--font-body);
+    font-size: 21px;
+    line-height: 1.45;
+    max-width: 540px;
+    margin-bottom: 32px;
+    color: #2a2a2a;
+  }
+  .hero p.lead em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.08em;
+  }
+
+  .hero-ctas { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin-bottom: 28px; }
+
+  .hero-trust {
+    display: flex; gap: 10px; align-items: center;
+    font-size: 14px; font-family: var(--font-mono);
+  }
+  .stars { color: #FFB800; letter-spacing: 2px; font-size: 18px; }
+
+  /* hero floating stickers */
+  .sticker {
+    position: absolute;
+    background: #fff;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 0 var(--ink);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 12px;
+    z-index: 5;
+  }
+  .sticker--1 { top: 70px; left: 5%; transform: rotate(-7deg); background: var(--pink); }
+  .sticker--2 { top: 130px; right: 4%; transform: rotate(8deg); background: var(--green); }
+  .sticker--3 { bottom: 80px; left: 8%; transform: rotate(5deg); background: var(--sky); }
+  @media (max-width: 960px) { .sticker { display: none; } }
+
+  /* ====== CALCULATOR PREVIEW ====== */
+  .calc {
+    background: #fff;
+    border: 5px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 10px 10px 0 0 var(--ink);
+    overflow: hidden;
+    transform: rotate(1.2deg);
+    position: relative;
+  }
+  .calc:hover { transform: rotate(0); transition: transform .25s ease; }
+
+  .calc-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    background: var(--ink);
+    color: #fff;
+    border-bottom: 4px solid var(--ink);
+  }
+  .calc-bar .dot { width: 12px; height: 12px; border-radius: 50%; background: #555; border: 1.5px solid #000; }
+  .calc-bar .dot.r { background: var(--red); }
+  .calc-bar .dot.y { background: var(--yellow); }
+  .calc-bar .dot.g { background: var(--green); }
+  .calc-bar .title {
+    margin-left: auto; margin-right: auto;
+    font-family: var(--font-mono); font-size: 12px; opacity: .75;
+  }
+
+  .calc-body { padding: 22px; background: #fff; }
+
+  .calc-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    margin-bottom: 18px;
+  }
+  .calc-field {
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: var(--paper-2);
+  }
+  .calc-field label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
+    margin-bottom: 4px; color: #555;
+  }
+  .calc-field .val {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 28px;
+    line-height: 1;
+  }
+  .calc-field .val .unit { font-size: 14px; font-weight: 600; color: #777; margin-left: 4px; }
+
+  .calc-result {
+    margin-top: 18px;
+    padding: 18px 18px 16px;
+    background: var(--accent);
+    border: 4px solid var(--ink);
+    border-radius: 10px;
+    position: relative;
+  }
+  .calc-result-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    margin-bottom: 4px;
+  }
+  .calc-result-big {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 56px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .calc-result-big .small { font-size: 18px; font-weight: 600; opacity: .7; }
+  .calc-result-sub {
+    margin-top: 8px;
+    font-family: var(--font-serif); font-style: italic;
+    font-size: 18px;
+  }
+
+  .calc-mini-cal {
+    margin-top: 18px;
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .calc-mini-cal .day {
+    aspect-ratio: 1;
+    border: 2px solid var(--ink);
+    border-radius: 5px;
+    background: #fff;
+    display: grid; place-items: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .calc-mini-cal .day.work { background: #fff; }
+  .calc-mini-cal .day.pto { background: var(--teal); color: #fff; }
+  .calc-mini-cal .day.holiday { background: var(--orange); color: #fff; }
+  .calc-mini-cal .day.weekend { background: var(--paper); color: #999; }
+
+  .calc-legend {
+    display: flex; gap: 14px; margin-top: 12px; flex-wrap: wrap;
+    font-family: var(--font-mono); font-size: 11px;
+  }
+  .calc-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .calc-legend span::before {
+    content: ''; width: 12px; height: 12px; border: 2px solid var(--ink); border-radius: 3px;
+  }
+  .lg-pto::before { background: var(--teal); }
+  .lg-hol::before { background: var(--orange); }
+  .lg-wknd::before { background: var(--paper); }
+
+  /* ====== MARQUEE ====== */
+  .marquee-strip {
+    background: var(--ink);
+    color: var(--paper-2);
+    border-top: var(--border-thick) solid var(--ink);
+    border-bottom: var(--border-thick) solid var(--ink);
+    overflow: hidden;
+    padding: 14px 0;
+  }
+  .marquee-track {
+    display: flex; gap: 40px;
+    white-space: nowrap;
+    animation: marquee 30s linear infinite;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+  }
+  .marquee-track span { display: inline-flex; align-items: center; gap: 14px; }
+  .marquee-track .star {
+    color: var(--accent); font-size: 14px;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ====== HOW IT WORKS ====== */
+  .section { padding: 100px 28px; }
+  .section-head { max-width: 900px; margin: 0 auto 60px; text-align: center; }
+  .section-head .nb-tag { margin-bottom: 18px; }
+  .section-head h2 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+    text-wrap: balance;
+  }
+  .section-head h2 em { font-family: var(--font-serif); font-style: italic; font-weight: 600; }
+  .section-head p { font-size: 19px; color: #444; max-width: 640px; margin: 0 auto; text-wrap: pretty; }
+
+  .steps {
+    max-width: 1240px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+  @media (max-width: 900px) { .steps { grid-template-columns: 1fr; } }
+
+  .step {
+    background: #fff;
+    border: 4px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 8px 8px 0 0 var(--ink);
+    padding: 32px 28px 28px;
+    position: relative;
+    transition: transform .15s ease;
+  }
+  .step:hover { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 0 var(--ink); }
+  .step .num {
+    position: absolute;
+    top: -22px; left: 22px;
+    width: 56px; height: 56px;
+    background: var(--ink);
+    color: var(--paper);
+    border: 4px solid var(--ink);
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 26px;
+    box-shadow: 4px 4px 0 0 var(--ink);
+  }
+  .step:nth-child(1) .num-bg { background: var(--yellow); }
+  .step:nth-child(2) .num-bg { background: var(--teal); color: #fff; }
+  .step:nth-child(3) .num-bg { background: var(--purple); color: #fff; }
+  .step .num-bg {
+    position: absolute;
+    top: -22px; left: 22px;
+    width: 56px; height: 56px;
+    border: 4px solid var(--ink);
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 26px;
+    box-shadow: 4px 4px 0 0 var(--ink);
+  }
+  .step .icon-box {
+    width: 64px; height: 64px;
+    border: 3px solid var(--ink);
+    border-radius: 10px;
+    display: grid; place-items: center;
+    font-size: 32px;
+    margin: 16px 0 18px;
+    box-shadow: 3px 3px 0 0 var(--ink);
+  }
+  .step:nth-child(1) .icon-box { background: var(--orange); }
+  .step:nth-child(2) .icon-box { background: var(--sky); }
+  .step:nth-child(3) .icon-box { background: var(--pink); }
+  .step h3 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 26px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+  .step p { color: #333; font-size: 16px; }
+
+  /* ====== BIG STAT ROW ====== */
+  .stats-row {
+    max-width: 1240px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 4px solid var(--ink);
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 10px 10px 0 0 var(--ink);
+  }
+  @media (max-width: 800px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+  .stat {
+    padding: 32px 24px;
+    border-right: 4px solid var(--ink);
+    text-align: left;
+  }
+  .stat:last-child { border-right: none; }
+  @media (max-width: 800px) {
+    .stat:nth-child(2n) { border-right: none; }
+    .stat:nth-child(1), .stat:nth-child(2) { border-bottom: 4px solid var(--ink); }
+  }
+  .stat:nth-child(1) { background: var(--yellow); }
+  .stat:nth-child(2) { background: var(--teal); }
+  .stat:nth-child(3) { background: var(--orange); }
+  .stat:nth-child(4) { background: var(--purple); }
+  .stat .num {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 56px;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin-bottom: 6px;
+  }
+  .stat .label { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+
+  /* ====== FEATURES (Bento-ish) ====== */
+  .bento {
+    max-width: 1240px; margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: minmax(200px, auto);
+    gap: 24px;
+  }
+  .bento-cell {
+    background: #fff;
+    border: 4px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 6px 6px 0 0 var(--ink);
+    padding: 28px;
+    overflow: hidden;
+    position: relative;
+    transition: transform .12s ease;
+  }
+  .bento-cell:hover { transform: translate(-2px, -2px); box-shadow: 9px 9px 0 0 var(--ink); }
+  .bento-cell h3 {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: 26px; line-height: 1.05; letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .bento-cell p { color: #333; font-size: 15px; line-height: 1.5; }
+
+  .b-1 { grid-column: span 4; background: var(--yellow); }
+  .b-2 { grid-column: span 2; background: #fff; }
+  .b-3 { grid-column: span 2; background: var(--teal); }
+  .b-4 { grid-column: span 2; background: #fff; }
+  .b-5 { grid-column: span 2; background: var(--orange); color: #fff; }
+  .b-6 { grid-column: span 6; background: var(--ink); color: var(--paper-2); }
+
+  .b-5 p { color: rgba(255,255,255,.92); }
+  .b-6 p { color: rgba(255,245,225,.85); }
+  @media (max-width: 900px) {
+    .bento { grid-template-columns: 1fr; }
+    .bento-cell { grid-column: 1; }
+  }
+
+  /* visual: bridge week diagram */
+  .bridge-viz {
+    margin-top: 18px;
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .bridge-viz .d {
+    aspect-ratio: 1;
+    border: 2.5px solid var(--ink);
+    border-radius: 6px;
+    background: #fff;
+    display: grid; place-items: center;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .bridge-viz .d.h { background: var(--orange); color: #fff; }
+  .bridge-viz .d.p { background: var(--teal); color: #fff; }
+  .bridge-viz .d.w { background: var(--paper); color: #888; }
+
+  /* country flags / emojis as visual */
+  .country-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .country-pill {
+    background: #fff;
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: 600; font-size: 13px;
+    box-shadow: 2px 2px 0 0 var(--ink);
+  }
+
+  /* big number visual */
+  .b-2 .vis { font-family: var(--font-display); font-weight: 800; font-size: 100px; line-height: 1; letter-spacing: -0.05em; margin-bottom: 8px; }
+  .b-2 .vis .small { font-size: 32px; }
+  .b-4 .stack { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .b-4 .stack .chip {
+    border: 2.5px solid var(--ink);
+    border-radius: 6px;
+    padding: 4px 8px;
+    background: var(--paper-2);
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  }
+  .b-4 .stack .chip.alert { background: var(--red); color: #fff; }
+
+  /* ====== COMPARISON ====== */
+  .compare {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 60px 1fr;
+    gap: 0;
+    align-items: stretch;
+  }
+  @media (max-width: 800px) {
+    .compare { grid-template-columns: 1fr; gap: 24px; }
+    .compare .vs { transform: none; }
+  }
+  .compare .col {
+    border: 4px solid var(--ink);
+    border-radius: 14px;
+    padding: 28px;
+    box-shadow: 6px 6px 0 0 var(--ink);
+  }
+  .compare .col.before { background: #fff; transform: rotate(-1deg); }
+  .compare .col.after { background: var(--green); transform: rotate(1deg); }
+  .compare .col h4 {
+    font-family: var(--font-display);
+    font-weight: 800; font-size: 22px;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .compare ul { list-style: none; }
+  .compare li {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 2px dashed rgba(0,0,0,.15);
+    font-size: 15px;
+  }
+  .compare li:last-child { border-bottom: none; }
+  .compare li::before {
+    content: '✗';
+    font-weight: 800;
+    color: #999;
+    flex-shrink: 0;
+    width: 22px;
+    text-align: center;
+  }
+  .compare .after li::before { content: '✓'; color: var(--ink); }
+
+  .vs {
+    display: grid; place-items: center;
+  }
+  .vs-badge {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 4px solid var(--ink);
+    box-shadow: 4px 4px 0 0 var(--ink);
+    display: grid; place-items: center;
+    font-family: var(--font-display);
+    font-weight: 800; font-size: 18px;
+    transform: rotate(-8deg);
+  }
+
+  /* ====== TESTIMONIALS ====== */
+  .testimonials {
+    max-width: 1240px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 900px) { .testimonials { grid-template-columns: 1fr; } }
+
+  .quote {
+    background: #fff;
+    border: 4px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 6px 6px 0 0 var(--ink);
+    padding: 26px;
+    position: relative;
+  }
+  .quote:nth-child(1) { background: var(--paper-2); transform: rotate(-1deg); }
+  .quote:nth-child(2) { background: #fff; transform: rotate(1deg); }
+  .quote:nth-child(3) { background: var(--paper-2); transform: rotate(-0.5deg); }
+  .quote .qmark {
+    position: absolute; top: -14px; left: 18px;
+    background: var(--accent);
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    padding: 0 10px;
+    font-family: var(--font-serif);
+    font-size: 36px;
+    line-height: 1;
+    box-shadow: 3px 3px 0 0 var(--ink);
+    transform: rotate(-5deg);
+  }
+  .quote .stars { font-size: 14px; margin-bottom: 10px; margin-top: 8px; }
+  .quote p {
+    font-family: var(--font-serif); font-size: 22px; line-height: 1.3;
+    margin-bottom: 18px;
+  }
+  .quote .who { display: flex; gap: 12px; align-items: center; padding-top: 14px; border-top: 2.5px solid var(--ink); }
+  .quote .avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: 3px solid var(--ink);
+    background: var(--teal);
+    display: grid; place-items: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+  }
+  .quote:nth-child(2) .avatar { background: var(--orange); }
+  .quote:nth-child(3) .avatar { background: var(--purple); color: #fff; }
+  .quote .who .meta strong { display: block; font-weight: 700; font-size: 15px; }
+  .quote .who .meta small { font-family: var(--font-mono); font-size: 11px; color: #555; }
+
+  /* ====== PRICING ====== */
+  .pricing-wrap {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+  @media (max-width: 800px) { .pricing-wrap { grid-template-columns: 1fr; } }
+
+  .price {
+    background: #fff;
+    border: 4px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 8px 8px 0 0 var(--ink);
+    padding: 32px;
+    position: relative;
+  }
+  .price.featured { background: var(--accent); transform: rotate(-1deg); }
+  .price.featured::before {
+    content: 'POPULAR 🔥';
+    position: absolute;
+    top: -16px; right: 22px;
+    background: var(--ink);
+    color: var(--paper-2);
+    font-family: var(--font-mono);
+    font-weight: 700; font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transform: rotate(4deg);
+  }
+  .price h3 {
+    font-family: var(--font-display);
+    font-weight: 800; font-size: 28px;
+    letter-spacing: -0.02em; margin-bottom: 8px;
+  }
+  .price .desc { font-size: 14px; color: #444; margin-bottom: 18px; }
+  .price .amount {
+    font-family: var(--font-display);
+    font-weight: 800; font-size: 64px;
+    line-height: 1; letter-spacing: -0.04em;
+    margin-bottom: 6px;
+  }
+  .price .amount .per { font-size: 18px; color: #555; font-weight: 600; }
+  .price .billing { font-family: var(--font-mono); font-size: 12px; margin-bottom: 22px; color: #444; }
+  .price ul { list-style: none; margin-bottom: 26px; }
+  .price li {
+    padding: 8px 0;
+    display: flex; gap: 10px;
+    font-size: 15px;
+    border-bottom: 2px dashed rgba(0,0,0,.15);
+  }
+  .price li:last-child { border-bottom: none; }
+  .price li::before {
+    content: '✓';
+    font-weight: 800;
+    width: 22px;
+    flex-shrink: 0;
+  }
+  .price .nb-btn { width: 100%; justify-content: center; }
+
+  /* ====== FAQ ====== */
+  .faq-list { max-width: 820px; margin: 0 auto; }
+  .faq-item {
+    background: #fff;
+    border: 3.5px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: 5px 5px 0 0 var(--ink);
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: transform .12s ease;
+  }
+  .faq-item:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 0 var(--ink); }
+  .faq-q {
+    width: 100%;
+    padding: 20px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    text-align: left;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 19px;
+    line-height: 1.3;
+    cursor: pointer;
+  }
+  .faq-q .plus {
+    flex-shrink: 0;
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    display: grid; place-items: center;
+    font-size: 22px; font-weight: 800;
+    transition: transform .15s ease;
+  }
+  .faq-item.open .faq-q .plus { transform: rotate(45deg); background: var(--ink); color: var(--paper-2); }
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 24px;
+    transition: max-height .25s ease, padding .25s ease;
+    color: #333;
+    font-size: 16px;
+  }
+  .faq-item.open .faq-a {
+    max-height: 400px;
+    padding: 0 24px 22px;
+  }
+
+  /* ====== FINAL CTA ====== */
+  .final-cta {
+    background: var(--ink);
+    color: var(--paper-2);
+    padding: 100px 28px;
+    border-top: 4px solid var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+  .final-cta-inner {
+    max-width: 900px; margin: 0 auto; text-align: center;
+    position: relative; z-index: 2;
+  }
+  .final-cta h2 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(40px, 6vw, 80px);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin-bottom: 22px;
+    text-wrap: balance;
+  }
+  .final-cta h2 em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--accent);
+  }
+  .final-cta p { font-size: 19px; opacity: .85; margin-bottom: 34px; }
+
+  .final-cta .bg-shapes {
+    position: absolute; inset: 0;
+    pointer-events: none;
+  }
+  .final-cta .shape {
+    position: absolute;
+    border: 4px solid var(--paper-2);
+    border-radius: 12px;
+    box-shadow: 6px 6px 0 0 var(--paper-2);
+  }
+  .final-cta .shape.s1 { width: 80px; height: 80px; top: 60px; left: 8%; background: var(--yellow); transform: rotate(-12deg); }
+  .final-cta .shape.s2 { width: 60px; height: 60px; bottom: 80px; left: 14%; background: var(--teal); transform: rotate(15deg); border-radius: 50%; }
+  .final-cta .shape.s3 { width: 70px; height: 70px; top: 100px; right: 10%; background: var(--orange); transform: rotate(8deg); }
+  .final-cta .shape.s4 { width: 90px; height: 50px; bottom: 60px; right: 7%; background: var(--purple); transform: rotate(-6deg); }
+  @media (max-width: 700px) { .final-cta .shape { display: none; } }
+
+  /* ====== FOOTER ====== */
+  footer {
+    background: var(--paper);
+    padding: 50px 28px 30px;
+    border-top: 4px solid var(--ink);
+  }
+  .foot-inner {
+    max-width: 1240px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 20px;
+  }
+  .foot-inner .links { display: flex; gap: 24px; flex-wrap: wrap; font-weight: 600; font-size: 14px; }
+  .foot-inner .links a:hover { background: var(--accent); padding: 2px 6px; border: 2px solid var(--ink); border-radius: 4px; }
+  .foot-meta {
+    max-width: 1240px; margin: 30px auto 0;
+    padding-top: 22px;
+    border-top: 2.5px dashed var(--ink);
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    font-family: var(--font-mono); font-size: 12px; color: #555;
+  }
+
+  /* ====== TWEAKS PANEL ====== */
+  #tweaks-panel {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    width: 280px;
+    background: #fff;
+    border: 4px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: 8px 8px 0 0 var(--ink);
+    z-index: 100;
+    font-family: var(--font-body);
+    display: none;
+  }
+  #tweaks-panel.open { display: block; }
+  #tweaks-panel header {
+    padding: 12px 16px;
+    background: var(--accent);
+    border-bottom: 4px solid var(--ink);
+    border-radius: 6px 6px 0 0;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 16px;
+  }
+  #tweaks-panel .body { padding: 14px 16px 16px; }
+  #tweaks-panel .group { margin-bottom: 14px; }
+  #tweaks-panel .group:last-child { margin-bottom: 0; }
+  #tweaks-panel label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11px; text-transform: uppercase;
+    letter-spacing: .08em; margin-bottom: 6px; font-weight: 600;
+  }
+  .swatch-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .swatch {
+    width: 28px; height: 28px;
+    border: 2.5px solid var(--ink);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform .1s;
+  }
+  .swatch:hover { transform: scale(1.1); }
+  .swatch.active { box-shadow: 0 0 0 2px var(--accent), 0 0 0 4px var(--ink); }
+  .font-row { display: flex; flex-direction: column; gap: 6px; }
+  .font-opt {
+    text-align: left;
+    padding: 8px 10px;
+    background: var(--paper-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 6px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+  }
+  .font-opt.active { background: var(--accent); }
+
+  /* small touches */
+  ::selection { background: var(--accent); color: var(--ink); }
+</style>
+</head>
+<body data-fontpair="grotesk-serif">
+
+<!-- ========== NAV ========== -->
+<nav class="topbar" data-screen-label="00 Nav">
+  <div class="topbar-inner">
+    <div class="logo">
+      <div class="logo-mark">🌴</div>
+      <span>Forever PTO</span>
+    </div>
+    <div class="nav-links">
+      <a href="#how">Cómo va</a>
+      <a href="#features">Trucos</a>
+      <a href="#pricing">Precio</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#login" class="nb-btn nb-btn--ghost">Entrar</a>
+      <a href="#calc" class="nb-btn">Probar gratis →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ========== HERO ========== -->
+<header class="hero" data-screen-label="01 Hero">
+  <div class="sticker sticker--1">+47 días libres ✦</div>
+  <div class="sticker sticker--2">solo en 2026 →</div>
+  <div class="sticker sticker--3">★ usa cero código</div>
+
+  <div class="hero-grid">
+    <div>
+      <div class="hero-eyebrow">
+        <span class="nb-tag">🇪🇸 ES · IT · DE · FR · UK · US</span>
+        <span class="nb-tag">v2.0 disponible</span>
+      </div>
+
+      <h1>
+        Trabaja menos.<br>
+        Viaja <span class="scribble">más</span>
+        <span class="palm">🌴</span>
+      </h1>
+
+      <p class="lead">
+        Forever PTO calcula <em>exactamente</em> qué días pedir libre para que tus 22 días de vacaciones se conviertan en <strong>47+ días fuera de la oficina</strong>. Sin excels. Sin matemáticas. Sin remordimiento.
+      </p>
+
+      <div class="hero-ctas">
+        <a href="#calc" class="nb-btn nb-btn--lg">
+          Calcular mis días →
+        </a>
+        <a href="#demo" class="nb-btn nb-btn--ghost nb-btn--lg">
+          Ver demo (30s)
+        </a>
+      </div>
+
+      <div class="hero-trust">
+        <span class="stars">★★★★★</span>
+        <span>4.9 · usado por <strong>12.847</strong> empleados rebeldes</span>
+      </div>
+    </div>
+
+    <!-- CALCULATOR PREVIEW -->
+    <div class="calc" id="calc-preview">
+      <div class="calc-bar">
+        <div class="dot r"></div>
+        <div class="dot y"></div>
+        <div class="dot g"></div>
+        <div class="title">forever-pto.com / planner</div>
+      </div>
+      <div class="calc-body">
+        <div class="calc-row">
+          <div class="calc-field">
+            <label>Días PTO</label>
+            <div class="val">22<span class="unit">días/año</span></div>
+          </div>
+          <div class="calc-field">
+            <label>País</label>
+            <div class="val">🇪🇸 ES<span class="unit">14 festivos</span></div>
+          </div>
+        </div>
+
+        <div class="calc-result">
+          <div class="calc-result-label">Días libres reales en 2026</div>
+          <div class="calc-result-big">
+            47<span class="small">días · ratio 2.14×</span>
+          </div>
+          <div class="calc-result-sub">"Eso son 9 escapadas largas, capitán."</div>
+        </div>
+
+        <div class="calc-mini-cal" id="mini-cal"></div>
+        <div class="calc-legend">
+          <span class="lg-pto">PTO</span>
+          <span class="lg-hol">Festivo</span>
+          <span class="lg-wknd">Finde</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ========== MARQUEE ========== -->
+<div class="marquee-strip" aria-hidden="true">
+  <div class="marquee-track">
+    <span>SEMANA SANTA<span class="star">★</span></span>
+    <span>PUENTE DE MAYO<span class="star">★</span></span>
+    <span>VERANO INFINITO<span class="star">★</span></span>
+    <span>PILAR LARGO<span class="star">★</span></span>
+    <span>NAVIDAD STRETCH<span class="star">★</span></span>
+    <span>PUENTE NOV.<span class="star">★</span></span>
+    <span>SEMANA SANTA<span class="star">★</span></span>
+    <span>PUENTE DE MAYO<span class="star">★</span></span>
+    <span>VERANO INFINITO<span class="star">★</span></span>
+    <span>PILAR LARGO<span class="star">★</span></span>
+    <span>NAVIDAD STRETCH<span class="star">★</span></span>
+    <span>PUENTE NOV.<span class="star">★</span></span>
+  </div>
+</div>
+
+<!-- ========== HOW IT WORKS ========== -->
+<section class="section" id="how" data-screen-label="02 How it works">
+  <div class="section-head">
+    <span class="nb-tag">CÓMO VA · 3 PASOS</span>
+    <h2>De <em>"qué hago"</em> a <em>"ya tengo el viaje"</em> en 60 segundos.</h2>
+    <p>Sin instalar nada. Sin tarjeta. Sin newsletter. Solo dinos cuántos días tienes y dónde vives.</p>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="num-bg">1</div>
+      <div class="icon-box">📥</div>
+      <h3>Mete tus días.</h3>
+      <p>Cuántos días de PTO tienes, en qué país (o región) trabajas, y qué meses prefieres bloquear. Eso es todo.</p>
+    </div>
+    <div class="step">
+      <div class="num-bg">2</div>
+      <div class="icon-box">🧮</div>
+      <h3>El motor hace magia.</h3>
+      <p>Cruza tus días con los festivos oficiales y los puentes regionales. Encuentra todas las combinaciones posibles y las ordena por "ratio de descanso".</p>
+    </div>
+    <div class="step">
+      <div class="num-bg">3</div>
+      <div class="icon-box">📤</div>
+      <h3>Pides los días.</h3>
+      <p>Exporta a Google Calendar, Outlook o un PDF que pegas en el form de RR.HH. y te olvidas. Adiós dudas.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== STATS ========== -->
+<section class="section" style="padding-top: 0;">
+  <div class="stats-row">
+    <div class="stat">
+      <div class="num">2.14×</div>
+      <div class="label">Multiplicador medio</div>
+    </div>
+    <div class="stat">
+      <div class="num">47</div>
+      <div class="label">Días libres con 22 PTO</div>
+    </div>
+    <div class="stat">
+      <div class="num">14</div>
+      <div class="label">Países soportados</div>
+    </div>
+    <div class="stat">
+      <div class="num">12k+</div>
+      <div class="label">Planes generados</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FEATURES BENTO ========== -->
+<section class="section" id="features" data-screen-label="03 Features">
+  <div class="section-head">
+    <span class="nb-tag">TRUCOS DEL MOTOR</span>
+    <h2>No es un calendario. Es un <em>aliado</em> contra el lunes.</h2>
+    <p>Estos son los movimientos que Forever PTO hace por ti automáticamente.</p>
+  </div>
+
+  <div class="bento">
+    <!-- big bridge feature -->
+    <div class="bento-cell b-1">
+      <span class="nb-pill" style="background:#fff">PUENTES INTELIGENTES</span>
+      <h3 style="margin-top:14px">Convierte 1 día de PTO en 4 libres.</h3>
+      <p>Detecta festivos en martes y jueves y te sugiere "construir" puentes mínimos. Un día estratégico = un fin de semana de 4 días.</p>
+      <div class="bridge-viz">
+        <div class="d w">L</div>
+        <div class="d p">M</div>
+        <div class="d h">M</div>
+        <div class="d w">J</div>
+        <div class="d w">V</div>
+        <div class="d w">S</div>
+        <div class="d w">D</div>
+      </div>
+    </div>
+
+    <!-- ratio -->
+    <div class="bento-cell b-2">
+      <span class="nb-pill">RATIO MAX</span>
+      <div class="vis" style="margin-top:10px">3.5<span class="small">×</span></div>
+      <p>Mejor multiplicador que hemos visto: 8 días de PTO convertidos en 28 libres (ES, abril '26).</p>
+    </div>
+
+    <!-- calendar sync -->
+    <div class="bento-cell b-3">
+      <span class="nb-pill" style="background:#fff">SYNC EN 1 CLIC</span>
+      <h3 style="margin-top:14px">Google · Outlook · iCal</h3>
+      <p>Exporta tu plan al calendario que ya usas. Se actualiza si cambias de opinión. Sin liarte.</p>
+      <div class="country-pills" style="margin-top:14px">
+        <span class="country-pill">📅 Google</span>
+        <span class="country-pill">📨 Outlook</span>
+        <span class="country-pill">🍎 Apple</span>
+      </div>
+    </div>
+
+    <!-- conflicts -->
+    <div class="bento-cell b-4">
+      <span class="nb-pill">ANTI-CONFLICTOS</span>
+      <h3 style="margin-top:14px">Avisa antes que tu jefe.</h3>
+      <div class="stack">
+        <span class="chip">All-hands trim.</span>
+        <span class="chip alert">Q3 closing</span>
+        <span class="chip">Lanzamiento</span>
+      </div>
+      <p>Marca los periodos "tabú" de tu empresa y no te sugerirá pedir libre ahí.</p>
+    </div>
+
+    <!-- countries -->
+    <div class="bento-cell b-5">
+      <span class="nb-pill" style="background:#fff;color:var(--ink)">14 PAÍSES</span>
+      <h3 style="margin-top:14px;color:#fff">Festivos locales reales.</h3>
+      <p>Calendarios oficiales actualizados cada año. Incluso los regionales (sí, también el de tu CCAA).</p>
+      <div class="country-pills" style="margin-top:14px">
+        <span class="country-pill">🇪🇸</span>
+        <span class="country-pill">🇮🇹</span>
+        <span class="country-pill">🇩🇪</span>
+        <span class="country-pill">🇫🇷</span>
+        <span class="country-pill">🇬🇧</span>
+        <span class="country-pill">🇺🇸</span>
+        <span class="country-pill">🇲🇽</span>
+        <span class="country-pill">+8</span>
+      </div>
+    </div>
+
+    <!-- privacy big -->
+    <div class="bento-cell b-6">
+      <span class="nb-pill" style="background:var(--accent)">100% LOCAL</span>
+      <h3 style="margin-top:14px;color:var(--paper-2)">Tus datos no se mueven de tu navegador.</h3>
+      <p>Sin login, sin cookies, sin servidores. Forever PTO es una calculadora estática que corre 100% en tu máquina. Lo único que sabemos de ti es que eres listo por usarlo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== COMPARISON ========== -->
+<section class="section" style="background:var(--paper-2); border-top:4px solid var(--ink); border-bottom:4px solid var(--ink);" data-screen-label="04 Comparison">
+  <div class="section-head">
+    <span class="nb-tag">CON · SIN</span>
+    <h2>Antes vs. después de Forever PTO.</h2>
+  </div>
+
+  <div class="compare">
+    <div class="col before">
+      <h4>😩 Sin Forever PTO</h4>
+      <ul>
+        <li>Abres un Excel y te bloqueas en C7.</li>
+        <li>Pides el lunes después del puente y nadie te avisa que era pleonasmo.</li>
+        <li>Te enteras en septiembre que ya no quedan días.</li>
+        <li>Compañero pide tu semana primero. Otra vez.</li>
+        <li>Te quedas con 4 días sin usar a 31 de diciembre.</li>
+      </ul>
+    </div>
+    <div class="vs">
+      <div class="vs-badge">VS</div>
+    </div>
+    <div class="col after">
+      <h4>😎 Con Forever PTO</h4>
+      <ul>
+        <li>Lo planificas todo en enero, mientras esperas el café.</li>
+        <li>Cada día de PTO te devuelve 2,1 días libres de media.</li>
+        <li>Visualizas el año entero en un calendario claro.</li>
+        <li>Pides primero, sin remordimiento, con datos.</li>
+        <li>Quemas el 100% de tus días. Como debe ser.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ========== TESTIMONIALS ========== -->
+<section class="section" data-screen-label="05 Testimonials">
+  <div class="section-head">
+    <span class="nb-tag">DICEN POR AHÍ</span>
+    <h2>Gente que ya recuperó <em>semanas</em> de su vida.</h2>
+  </div>
+
+  <div class="testimonials">
+    <div class="quote">
+      <span class="qmark">"</span>
+      <div class="stars">★★★★★</div>
+      <p>Pasé de pedir días sueltos a tener 6 escapadas planificadas. Mi pareja cree que me he vuelto organizado. No le he dicho que es una web.</p>
+      <div class="who">
+        <div class="avatar">M</div>
+        <div class="meta">
+          <strong>Marta R.</strong>
+          <small>diseñadora · Madrid</small>
+        </div>
+      </div>
+    </div>
+    <div class="quote">
+      <span class="qmark">"</span>
+      <div class="stars">★★★★★</div>
+      <p>Llevaba 4 años sin usar todos mis días. Esta vez los gasté hasta el último. Volví bronceado y con ganas de trabajar. Casi.</p>
+      <div class="who">
+        <div class="avatar">D</div>
+        <div class="meta">
+          <strong>Diego A.</strong>
+          <small>backend dev · Barcelona</small>
+        </div>
+      </div>
+    </div>
+    <div class="quote">
+      <span class="qmark">"</span>
+      <div class="stars">★★★★★</div>
+      <p>Lo abrí "para ver" y a los 90 segundos ya tenía un PDF para mandarle a RR.HH. con todo el año cuadrado. Ridículo lo bien que va.</p>
+      <div class="who">
+        <div class="avatar">S</div>
+        <div class="meta">
+          <strong>Sara V.</strong>
+          <small>product manager · Berlín</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== PRICING ========== -->
+<section class="section" id="pricing" style="background:var(--paper-2); border-top:4px solid var(--ink); border-bottom:4px solid var(--ink);" data-screen-label="06 Pricing">
+  <div class="section-head">
+    <span class="nb-tag">PRECIO HONESTO</span>
+    <h2>Pagas una vez. <em>Para siempre.</em></h2>
+    <p>Sin SaaS. Sin suscripción. Sin "trial de 7 días que se renueva solo". Estamos hartos. Tú también.</p>
+  </div>
+
+  <div class="pricing-wrap">
+    <div class="price">
+      <h3>Free Forever</h3>
+      <p class="desc">Para probar y ver si te convence. Que sí.</p>
+      <div class="amount">€0<span class="per">/siempre</span></div>
+      <div class="billing">No hace falta tarjeta. Ni email. Ni nada.</div>
+      <ul>
+        <li>1 país · 1 plan al mes</li>
+        <li>Calendario interactivo</li>
+        <li>Export a iCal</li>
+        <li>Ratio máximo de optimización</li>
+      </ul>
+      <a href="#" class="nb-btn nb-btn--ghost">Empezar gratis</a>
+    </div>
+
+    <div class="price featured">
+      <h3>Lifetime Pass</h3>
+      <p class="desc">Compra una vez y úsalo hasta que te jubiles.</p>
+      <div class="amount">€19<span class="per">una vez</span></div>
+      <div class="billing">Garantía 30 días, sin preguntas raras.</div>
+      <ul>
+        <li>Todos los países (14 ahora · más cada año)</li>
+        <li>Planes ilimitados</li>
+        <li>Sync con Google · Outlook · Apple</li>
+        <li>Periodos tabú de empresa</li>
+        <li>Modo "compañero": no choquéis días</li>
+        <li>Updates anuales con nuevos festivos</li>
+      </ul>
+      <a href="#" class="nb-btn nb-btn--ink">Comprar Lifetime →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FAQ ========== -->
+<section class="section" id="faq" data-screen-label="07 FAQ">
+  <div class="section-head">
+    <span class="nb-tag">PREGUNTAS LÓGICAS</span>
+    <h2>Lo que <em>siempre</em> nos preguntan.</h2>
+  </div>
+
+  <div class="faq-list">
+    <div class="faq-item">
+      <button class="faq-q">
+        ¿Funciona si trabajo en remoto desde otro país?
+        <span class="plus">+</span>
+      </button>
+      <div class="faq-a"><p style="padding-top:6px">Sí. Puedes elegir el país de tu contrato (festivos oficiales) y opcionalmente el país desde el que trabajas (para evitar pedir libre en días no laborables locales). Doble cobertura.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">
+        ¿Mis datos de PTO se guardan en algún sitio?
+        <span class="plus">+</span>
+      </button>
+      <div class="faq-a"><p style="padding-top:6px">No. Forever PTO es una calculadora 100% del lado del cliente. Tu plan se queda en localStorage de tu navegador. No hay servidores, no hay base de datos, no hay nada que filtrar.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">
+        ¿Qué países están soportados ahora mismo?
+        <span class="plus">+</span>
+      </button>
+      <div class="faq-a"><p style="padding-top:6px">España (con CCAA), Italia, Alemania, Francia, Reino Unido, Irlanda, Portugal, Países Bajos, Bélgica, EE.UU., México, Argentina, Brasil y Canadá. Añadimos 2 países nuevos cada trimestre — vota el siguiente en GitHub.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">
+        ¿Y si mi empresa tiene festivos propios o "días puente" no oficiales?
+        <span class="plus">+</span>
+      </button>
+      <div class="faq-a"><p style="padding-top:6px">Los puedes añadir como festivos personalizados. El motor los trata exactamente igual que los oficiales — incluso los usa para sugerirte puentes alrededor.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">
+        ¿Por qué pagar €19 si puedo planificar a mano?
+        <span class="plus">+</span>
+      </button>
+      <div class="faq-a"><p style="padding-top:6px">Si tienes 22 días de PTO y 47 son los días "óptimos" que te puede dar Forever PTO, recuperas €19 con el primer puente que te ahorras pedir mal. Y luego, cada año que sigas trabajando, lo usas otra vez. Las cuentas salen.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FINAL CTA ========== -->
+<section class="final-cta" data-screen-label="08 Final CTA">
+  <div class="bg-shapes">
+    <div class="shape s1"></div>
+    <div class="shape s2"></div>
+    <div class="shape s3"></div>
+    <div class="shape s4"></div>
+  </div>
+  <div class="final-cta-inner">
+    <h2>Tu próximo año <em>libre</em><br>empieza hoy.</h2>
+    <p>22 días pueden ser 47. Solo hay que saber dónde colocarlos. Eso lo hacemos nosotros.</p>
+    <a href="#" class="nb-btn nb-btn--lg" style="background:var(--accent);">
+      Calcular mis días gratis →
+    </a>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer data-screen-label="09 Footer">
+  <div class="foot-inner">
+    <div class="logo">
+      <div class="logo-mark">🌴</div>
+      <span>Forever PTO</span>
+    </div>
+    <div class="links">
+      <a href="#">Calculadora</a>
+      <a href="#">Países</a>
+      <a href="#">Pricing</a>
+      <a href="#">Changelog</a>
+      <a href="#">GitHub</a>
+      <a href="#">Twitter / X</a>
+    </div>
+  </div>
+  <div class="foot-meta">
+    <span>© 2026 Forever PTO · Hecho con cariño y desde una hamaca.</span>
+    <span>v2.0.4 · status: vacacional ●</span>
+  </div>
+</footer>
+
+<!-- ========== TWEAKS PANEL ========== -->
+<div id="tweaks-panel">
+  <header>
+    Tweaks
+    <button onclick="closeTweaks()" style="background:#fff;border:2.5px solid var(--ink);border-radius:6px;padding:2px 8px;font-weight:800;cursor:pointer;">×</button>
+  </header>
+  <div class="body">
+    <div class="group">
+      <label>Color de fondo</label>
+      <div class="swatch-row" id="bg-swatches">
+        <div class="swatch" data-bg="#FFF5E1" style="background:#FFF5E1" title="Crema"></div>
+        <div class="swatch" data-bg="#FFFFFF" style="background:#FFFFFF" title="Blanco"></div>
+        <div class="swatch" data-bg="#FEF9C3" style="background:#FEF9C3" title="Amarillo claro"></div>
+        <div class="swatch" data-bg="#A7F3D0" style="background:#A7F3D0" title="Menta"></div>
+        <div class="swatch" data-bg="#FBCFE8" style="background:#FBCFE8" title="Rosa"></div>
+        <div class="swatch" data-bg="#DBEAFE" style="background:#DBEAFE" title="Cielo"></div>
+      </div>
+    </div>
+    <div class="group">
+      <label>Color de acento</label>
+      <div class="swatch-row" id="accent-swatches">
+        <div class="swatch" data-accent="#FFD93D" style="background:#FFD93D" title="Amarillo"></div>
+        <div class="swatch" data-accent="#4ECDC4" style="background:#4ECDC4" title="Teal"></div>
+        <div class="swatch" data-accent="#FF7A45" style="background:#FF7A45" title="Naranja"></div>
+        <div class="swatch" data-accent="#B388FF" style="background:#B388FF" title="Morado"></div>
+        <div class="swatch" data-accent="#A6E368" style="background:#A6E368" title="Verde"></div>
+        <div class="swatch" data-accent="#FF8FB1" style="background:#FF8FB1" title="Rosa"></div>
+      </div>
+    </div>
+    <div class="group">
+      <label>Tipografía</label>
+      <div class="font-row" id="font-row">
+        <button class="font-opt" data-font="grotesk-serif" style="font-family:'Bricolage Grotesque'">Bricolage + Instrument</button>
+        <button class="font-opt" data-font="archivo-mono" style="font-family:'Archivo Black'">Archivo Black + Mono</button>
+        <button class="font-opt" data-font="serif-led" style="font-family:'Fraunces'">Fraunces + Space</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== Mini calendar (visual filler) =====
+  const cal = document.getElementById('mini-cal');
+  const days = ['L','M','X','J','V','S','D'];
+  // header
+  days.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'day weekend';
+    el.style.background = 'transparent';
+    el.style.border = 'none';
+    el.style.boxShadow = 'none';
+    el.textContent = d;
+    cal.appendChild(el);
+  });
+  // schedule: 28 days = 4 weeks. mark some as PTO/HOL/WKND
+  const pattern = [
+    'w','w','w','h','p','x','x', // w1
+    'w','w','w','w','w','x','x', // w2
+    'h','p','w','w','w','x','x', // w3
+    'w','w','w','p','h','x','x'  // w4
+  ];
+  pattern.forEach((p,i) => {
+    const el = document.createElement('div');
+    el.className = 'day';
+    if (p === 'p') { el.classList.add('pto'); el.textContent = '✈'; }
+    else if (p === 'h') { el.classList.add('holiday'); el.textContent = '★'; }
+    else if (p === 'x') { el.classList.add('weekend'); el.textContent = ''; }
+    else { el.classList.add('work'); el.textContent = (i % 7) + 1 + Math.floor(i/7)*7; el.textContent = ''; }
+    cal.appendChild(el);
+  });
+
+  // ===== FAQ accordion =====
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.parentElement.classList.toggle('open');
+    });
+  });
+  // open the first one
+  document.querySelector('.faq-item').classList.add('open');
+
+  // ===== TWEAKS =====
+  const state = { ...TWEAK_DEFAULTS };
+
+  function applyTweaks() {
+    document.documentElement.style.setProperty('--paper', state.bg);
+    // generate paper-2 by lightening (just bump alpha or use white as fallback)
+    document.documentElement.style.setProperty('--paper-2', state.bg === '#FFFFFF' ? '#FAFAFA' : '#FFFFFF');
+    document.documentElement.style.setProperty('--accent', state.accent);
+    document.body.dataset.fontpair = state.fontPair;
+
+    // sync swatches active state
+    document.querySelectorAll('#bg-swatches .swatch').forEach(s => {
+      s.classList.toggle('active', s.dataset.bg.toUpperCase() === state.bg.toUpperCase());
+    });
+    document.querySelectorAll('#accent-swatches .swatch').forEach(s => {
+      s.classList.toggle('active', s.dataset.accent.toUpperCase() === state.accent.toUpperCase());
+    });
+    document.querySelectorAll('#font-row .font-opt').forEach(b => {
+      b.classList.toggle('active', b.dataset.font === state.fontPair);
+    });
+  }
+
+  function persist(edits) {
+    Object.assign(state, edits);
+    applyTweaks();
+    try {
+      window.parent.postMessage({type: '__edit_mode_set_keys', edits }, '*');
+    } catch (e) {}
+  }
+
+  document.querySelectorAll('#bg-swatches .swatch').forEach(s => {
+    s.addEventListener('click', () => persist({ bg: s.dataset.bg }));
+  });
+  document.querySelectorAll('#accent-swatches .swatch').forEach(s => {
+    s.addEventListener('click', () => persist({ accent: s.dataset.accent }));
+  });
+  document.querySelectorAll('#font-row .font-opt').forEach(b => {
+    b.addEventListener('click', () => persist({ fontPair: b.dataset.font }));
+  });
+
+  function openTweaks() { document.getElementById('tweaks-panel').classList.add('open'); }
+  function closeTweaks() { document.getElementById('tweaks-panel').classList.remove('open'); }
+  window.closeTweaks = closeTweaks;
+
+  // edit mode hookup
+  window.addEventListener('message', (e) => {
+    if (!e.data || typeof e.data !== 'object') return;
+    if (e.data.type === '__activate_edit_mode') openTweaks();
+    if (e.data.type === '__deactivate_edit_mode') closeTweaks();
+  });
+  try { window.parent.postMessage({type: '__edit_mode_available'}, '*'); } catch (e) {}
+
+  applyTweaks();
+</script>
+</body>
+</html>

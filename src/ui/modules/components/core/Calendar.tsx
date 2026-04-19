@@ -240,7 +240,7 @@ export function Calendar({
             action: (
               <div className='w-full donate-rainbow relative z-0 overflow-hidden p-0.5 flex items-center justify-center rounded-md hover:scale-102 transition duration-200 active:scale-100'>
                 <Button
-                  className='shadow-lg rounded-md w-full h-full py-3 px-2'
+                  className='rounded-[8px] border-[3px] border-[var(--frame)] w-full h-full py-3 px-2 shadow-[var(--shadow-brutal-xs)]'
                   onClick={() => {
                     openDonatePopover();
                   }}
@@ -367,7 +367,7 @@ export function Calendar({
 
   return (
     <div className={cn('calendar-container p-4 w-fit select-none bg-card z-1', className)} {...props}>
-      <div className='flex justify-center items-center mb-4 rounded-[1rem] border-[2px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-2 py-2 shadow-[var(--shadow-brutal-xs)]'>
+      <div className='flex justify-center items-center mb-4 rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-2 py-2 shadow-[var(--shadow-brutal-xs)]'>
         {showNavigation ? (
           <>
             <AnimateIcon animateOnHover>

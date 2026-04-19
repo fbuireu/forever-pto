@@ -43,7 +43,7 @@ function AccordionItem({ className, children, ...props }: AccordionItemProps) {
     <AccordionItemContext.Provider value={contextValue}>
       <AccordionPrimitive.Item
         data-slot='accordion-item'
-        className={cn('border-b-2 border-black dark:border-white', className)}
+        className={cn('border-b-[2px] border-[var(--frame)]/18', className)}
         {...props}
       >
         {children}
@@ -96,7 +96,7 @@ function AccordionTrigger({
           ref={triggerRef}
           data-slot='accordion-trigger'
           className={cn(
-            'flex flex-1 text-start items-center justify-between py-4 font-medium hover:underline cursor-pointer',
+            'flex flex-1 text-start items-center justify-between py-4 font-semibold cursor-pointer outline-none',
             className
           )}
           {...props}

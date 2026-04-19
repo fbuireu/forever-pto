@@ -40,7 +40,7 @@ export const WorkdayCounterCalendarModal = ({
         <DialogHeader>
           <DialogTitle className='text-sm'>{t('selectDateRange')}</DialogTitle>
         </DialogHeader>
-        <div className='border rounded-lg p-3'>
+        <div className='border-[3px] border-[var(--frame)] rounded-[10px] p-3 shadow-[var(--shadow-brutal-xs)]'>
           <Calendar
             mode={CalendarSelectionMode.RANGE}
             selected={selectedRange}

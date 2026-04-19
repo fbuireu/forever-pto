@@ -6,7 +6,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/compone
 import { ChevronDown } from '@ui/components/animate/icons/chevron-down';
 import { AnimateIcon } from '@ui/components/animate/icons/icon';
 import { Users } from '@ui/components/animate/icons/users';
-import { Badge } from '@ui/components/primitives/badge';
 import { Card, CardDescription } from '@ui/components/primitives/card';
 import { Combobox } from '@ui/components/primitives/combobox';
 import { cn } from '@ui/lib/utils';
@@ -100,25 +99,25 @@ export const Strategy = () => {
                     return <Icon className='w-6 h-6 text-primary' />;
                   })()}
                   <div className='flex-1'>
-                    <h4 className='font-semibold'>{currentStrategy.description}</h4>
+                    <h4 className='font-semibold text-xs'>{currentStrategy.description}</h4>
                     <CardDescription className='text-xs'>{currentStrategy.subtitle}</CardDescription>
                   </div>
                 </div>
-                <div className='grid gap-2'>
-                  <div className='flex flex-wrap gap-1.5'>
+                <div className='grid gap-1.5'>
+                  <div className='flex flex-wrap gap-1'>
                     {currentStrategy.pros.map((pro) => (
-                      <Badge key={pro} variant='outline' className='text-xs border-green-500/30 bg-green-500/10'>
-                        <CheckCircle2 className='w-3 h-3 mr-1' />
+                      <span key={pro} className='inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded border border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400'>
+                        <CheckCircle2 className='w-2.5 h-2.5 shrink-0' />
                         {pro}
-                      </Badge>
+                      </span>
                     ))}
                   </div>
-                  <div className='flex flex-wrap gap-1.5'>
+                  <div className='flex flex-wrap gap-1'>
                     {currentStrategy.cons.map((con) => (
-                      <Badge key={con} variant='outline' className='text-xs border-orange-500/30 bg-orange-500/10'>
-                        <AlertCircle className='w-3 h-3 mr-1' />
+                      <span key={con} className='inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded border border-orange-500/30 bg-orange-500/10 text-orange-700 dark:text-orange-400'>
+                        <AlertCircle className='w-2.5 h-2.5 shrink-0' />
                         {con}
-                      </Badge>
+                      </span>
                     ))}
                   </div>
                 </div>

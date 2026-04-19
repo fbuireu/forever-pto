@@ -131,9 +131,13 @@ export const formatDate = ({ date, locale, format }: FormatDateParams): string =
   return date.toLocaleDateString(locale);
 };
 
-export const getWeekdayNames = (locale: string, weekStartsOn: Day = 0): string[] => {
+export const getWeekdayNames = (
+  locale: string,
+  weekStartsOn: Day = 0,
+  format: 'narrow' | 'short' | 'long' = 'short'
+): string[] => {
   const anchor = new Date(2023, 0, 2);
   const weekStart = startOfWeek(anchor, { weekStartsOn });
-  const fmt = new Intl.DateTimeFormat(locale, { weekday: 'short' });
+  const fmt = new Intl.DateTimeFormat(locale, { weekday: format });
   return Array.from({ length: 7 }, (_, i) => fmt.format(addDays(weekStart, i)));
 };

@@ -20,7 +20,7 @@ const getResolvedTheme = (theme: ReturnType<typeof useTheme>['theme']) => {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };
 
-export const ThemeSelector = () => {
+export const ThemeSelector = ({ buttonClassName }: { buttonClassName?: string }) => {
   const { setTheme, themes, theme: currentTheme, resolvedTheme } = useTheme();
   const t = useTranslations('theme');
 
@@ -50,7 +50,7 @@ export const ThemeSelector = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <AnimateIcon animateOnHover>
-          <Button variant='outline' size='icon' className='w-full !h-11 focus-visible:ring-1'>
+          <Button variant='outline' size='icon' className={buttonClassName ?? 'w-full !h-11 focus-visible:ring-1'}>
             <Sun className='h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0' />
             <Moon className='absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100' />
             <span className='sr-only'>{t('toggleTheme')}</span>

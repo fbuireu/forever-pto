@@ -73,7 +73,7 @@ const HolidayCard = ({
   return (
     <div
       className={cn(
-        'rounded-[1.15rem] border-[2.5px] border-[var(--frame)] bg-card p-4 space-y-3 shadow-[var(--shadow-brutal-sm)] transition-colors',
+        'rounded-[12px] border-[3px] border-[var(--frame)] bg-card p-4 space-y-3 shadow-[var(--shadow-brutal-sm)] transition-colors',
         isSelected && 'bg-[var(--surface-panel-alt)]'
       )}
     >
@@ -319,7 +319,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   return (
     <Collapsible open={innerOpen} onOpenChange={setInnerOpen} className='space-y-4 w-full'>
       <AnimateIcon animateOnHover>
-        <CollapsibleTrigger className='flex items-center justify-between cursor-pointer group p-4 rounded-[1.25rem] border-[2.5px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-sm)] transition-colors w-full text-left hover:bg-[var(--surface-panel-alt)]'>
+        <CollapsibleTrigger className='flex items-center justify-between cursor-pointer group p-4 rounded-[12px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-sm)] transition-colors w-full text-left hover:bg-[var(--surface-panel-alt)]'>
           <div className='flex items-center space-x-3 w-full'>
             <div className='flex items-center space-x-2'>
               {innerOpen ? (
@@ -439,7 +439,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
             </div>
 
             <div className='lg:hidden space-y-3'>
-              <div className='flex items-center justify-between rounded-[1rem] border-[2px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-3 py-2 shadow-[var(--shadow-brutal-xs)]'>
+              <div className='flex items-center justify-between rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-3 py-2 shadow-[var(--shadow-brutal-xs)]'>
                 <div className='flex items-center gap-2'>
                   {selectAllButton}
                   <span className='text-xs text-muted-foreground'>

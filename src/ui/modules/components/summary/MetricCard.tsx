@@ -103,7 +103,7 @@ export const MetricCard = ({
         className={cn(
           'p-3',
           colors.bg,
-          'rounded-[1.1rem] border-[2.5px] border-[var(--frame)] text-center flex flex-col justify-between items-center shadow-[var(--shadow-brutal-sm)]',
+          'rounded-[10px] border-[3px] border-[var(--frame)] text-center flex flex-col justify-between items-center shadow-[var(--shadow-brutal-sm)]',
           className
         )}
       >
@@ -122,7 +122,7 @@ export const MetricCard = ({
       className={cn(
         'items-center p-4',
         colors.bg,
-        'rounded-[1.2rem] border-[2.5px] border-[var(--frame)] flex flex-col justify-between items-center shadow-[var(--shadow-brutal-sm)]',
+        'rounded-[10px] border-[3px] border-[var(--frame)] flex flex-col justify-between items-center shadow-[var(--shadow-brutal-sm)]',
         className
       )}
     >

@@ -4,20 +4,22 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import type { ComponentProps } from 'react';
 
 const buttonVariants = cva(
-  "cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[0.95rem] text-sm font-black tracking-[0.01em] transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-invalid:border-destructive border-[2.5px] border-[var(--frame)]",
+  "cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[8px] text-sm font-black tracking-[0.01em] transition-all duration-75 ease-linear disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-invalid:border-destructive border-[3px] border-[var(--frame)]",
   {
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground shadow-[var(--shadow-brutal-sm)] hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-[var(--shadow-brutal-md)] active:translate-y-1 active:translate-x-1 active:shadow-none',
+          'bg-primary text-primary-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]',
+        accent:
+          'bg-accent text-accent-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]',
         destructive:
-          'bg-destructive text-[var(--color-brand-paper)] shadow-[var(--shadow-brutal-sm)] hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-[var(--shadow-brutal-md)] active:translate-y-1 active:translate-x-1 active:shadow-none',
+          'bg-destructive text-white shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]',
         outline:
-          'bg-[var(--surface-panel)] text-foreground shadow-[var(--shadow-brutal-sm)] hover:-translate-y-0.5 hover:translate-x-0.5 hover:bg-[var(--surface-panel-alt)] hover:shadow-[var(--shadow-brutal-md)] active:translate-y-1 active:translate-x-1 active:shadow-none',
+          'bg-[var(--surface-panel)] text-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[var(--surface-panel-alt)] hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]',
         secondary:
-          'bg-secondary text-secondary-foreground shadow-[var(--shadow-brutal-sm)] hover:-translate-y-0.5 hover:translate-x-0.5 hover:bg-[color-mix(in_srgb,var(--secondary)_82%,white_18%)] hover:shadow-[var(--shadow-brutal-md)] active:translate-y-1 active:translate-x-1 active:shadow-none',
+          'bg-secondary text-secondary-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[color-mix(in_srgb,var(--secondary)_85%,white_15%)] hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]',
         ghost:
-          'border-transparent bg-transparent shadow-none hover:-translate-y-0.5 hover:bg-[var(--surface-panel-alt)] hover:text-foreground active:translate-y-0 active:translate-x-0 active:bg-[var(--surface-panel-inset)]',
+          'border-transparent bg-transparent shadow-none hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[var(--surface-panel-alt)] hover:text-foreground active:translate-x-0 active:translate-y-0 active:bg-[var(--surface-panel-inset)]',
         link: 'border-transparent text-primary underline-offset-4 hover:underline',
       },
       size: {

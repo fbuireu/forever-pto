@@ -135,7 +135,7 @@ function TabsList({
   return (
     <MotionHighlight
       controlledItems
-      className={cn('rounded-sm bg-background shadow-sm', activeClassName)}
+      className={cn('rounded-[6px] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-xs)]', activeClassName)}
       value={activeValue}
       transition={transition}
     >
@@ -143,7 +143,7 @@ function TabsList({
         role='tablist'
         data-slot='tabs-list'
         className={cn(
-          'bg-muted text-slate-600 dark:text-slate-400 inline-flex h-10 w-fit items-center justify-center rounded-lg p-[4px]',
+          'bg-[var(--surface-panel-soft)] text-muted-foreground inline-flex h-10 w-fit items-center justify-center rounded-[10px] border-[3px] border-[var(--frame)] p-[3px] shadow-[var(--shadow-brutal-xs)]',
           className
         )}
         {...props}
@@ -180,7 +180,7 @@ function TabsTrigger({ ref, value, children, className, ...props }: TabsTriggerP
         onClick={() => handleValueChange(value)}
         data-state={activeValue === value ? 'active' : 'inactive'}
         className={cn(
-          'inline-flex cursor-pointer items-center size-full justify-center whitespace-nowrap rounded-sm px-2 py-1 text-sm font-medium ring-offset-background transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-foreground z-[1]',
+          'inline-flex cursor-pointer items-center size-full justify-center whitespace-nowrap rounded-sm px-2 py-1 text-sm font-medium ring-offset-background transition-all duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-foreground data-[state=inactive]:hover:bg-[var(--surface-panel-alt)] data-[state=inactive]:hover:text-foreground z-[1]',
           className
         )}
         {...props}
