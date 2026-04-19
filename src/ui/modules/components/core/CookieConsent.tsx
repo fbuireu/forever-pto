@@ -116,7 +116,9 @@ export const CookieConsent = () => {
           >
             {t('managePreferences')}
           </Button>
-          <Button onClick={handleAcceptAll}>{t('acceptAll')}</Button>
+          <Button className='bg-green-600 hover:bg-green-700' onClick={handleAcceptAll}>
+            {t('acceptAll')}
+          </Button>
         </div>
       </div>
     );

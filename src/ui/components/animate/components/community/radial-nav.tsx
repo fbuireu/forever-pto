@@ -163,7 +163,11 @@ function MenuButton({
         }}
         {...('animateOnHover' in Icon ? { animateOnHover: true } : {})}
       />
-      <m.span variants={LABEL_VARIANTS} transition={LABEL_TRANSITION} className='invisible text-[0.7rem] font-black uppercase tracking-[0.08em] w-0'>
+      <m.span
+        variants={LABEL_VARIANTS}
+        transition={LABEL_TRANSITION}
+        className='invisible text-[0.7rem] font-black uppercase tracking-[0.08em] w-0'
+      >
         {label}
       </m.span>
     </m.button>
