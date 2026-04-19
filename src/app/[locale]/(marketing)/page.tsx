@@ -45,7 +45,7 @@ const LandingPage = async ({ params }: PageProps) => {
 export default LandingPage;
 
 // todo: brutalist design (show legend in button, remove old brand, redo logo)
-// todo: Check DSM
+// todo: Check DSM (motion?)
 // todo: 400 and 500 page
 // todo: check SEO again
 // todo: check translations
