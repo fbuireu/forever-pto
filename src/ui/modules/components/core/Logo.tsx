@@ -13,13 +13,13 @@ export function Logo() {
   const isOpen = state === 'expanded';
 
   return (
-    <SidebarMenuButton className={'justify-center h-fit w-fit mx-auto'}>
+    <SidebarMenuButton className='justify-center h-fit w-fit mx-auto rounded-[1.2rem] bg-[var(--surface-panel)] px-3 py-3 shadow-[var(--shadow-brutal-sm)]'>
       <Link href='/' onClick={() => isMobile && setOpenMobile(false)}>
         <div className='flex items-center'>
           {(isOpen || isMobile) && (
             <div className='flex text-center justify-center gap-2'>
-              <p className='text-3xl font-bold'>Forever</p>
-              <p className='text-3xl font-bold -mr-3'>
+              <p className='text-3xl font-black tracking-[-0.05em]'>Forever</p>
+              <p className='text-3xl font-black -mr-3 tracking-[-0.05em]'>
                 <GradientText text='P' gradient='var(--brand-gradient)' />
               </p>
             </div>

@@ -366,8 +366,8 @@ export function Calendar({
   }, []);
 
   return (
-    <div className={cn('calendar-container p-3 w-fit select-none bg-background z-1', className)} {...props}>
-      <div className='flex justify-center items-center mb-4'>
+    <div className={cn('calendar-container p-4 w-fit select-none bg-card z-1', className)} {...props}>
+      <div className='flex justify-center items-center mb-4 rounded-[1rem] border-[2px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-2 py-2 shadow-[var(--shadow-brutal-xs)]'>
         {showNavigation ? (
           <>
             <AnimateIcon animateOnHover>
@@ -382,7 +382,7 @@ export function Calendar({
                 <ChevronLeft className='h-4 w-4' />
               </Button>
             </AnimateIcon>
-            <h3 className='text-sm font-medium flex-1 text-center'>{monthYearLabel}</h3>
+            <h3 className='text-sm font-black uppercase tracking-[0.08em] flex-1 text-center'>{monthYearLabel}</h3>
             <AnimateIcon animateOnHover>
               <Button
                 variant='ghost'
@@ -397,15 +397,15 @@ export function Calendar({
             </AnimateIcon>
           </>
         ) : (
-          <h3 className='text-sm font-medium'>{monthYearLabel}</h3>
+          <h3 className='text-sm font-black uppercase tracking-[0.08em]'>{monthYearLabel}</h3>
         )}
       </div>
 
-      <div className='grid grid-cols-7 gap-1 mb-2'>
+      <div className='grid grid-cols-7 gap-1 mb-3'>
         {weekdayNames.map((day) => (
           <div
             key={day}
-            className='h-8 w-8 flex items-center justify-center text-[0.8rem] font-medium text-muted-foreground'
+            className='h-8 w-8 flex items-center justify-center text-[0.68rem] font-black uppercase tracking-[0.08em] text-muted-foreground'
           >
             {day}
           </div>
@@ -442,7 +442,7 @@ export function Calendar({
           const classes = cn(baseClasses, 'calendar-day-button');
 
           return (
-            <div key={date.toISOString()} className='calendar-day rounded-md relative h-8 w-8 p-0'>
+            <div key={date.toISOString()} className='calendar-day relative h-8 w-8 p-0'>
               <ConditionalWrapper
                 doWrap={!!holidayName}
                 wrapper={(children) => (

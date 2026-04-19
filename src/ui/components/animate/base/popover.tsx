@@ -47,7 +47,7 @@ function PopoverContent({
           initialFocus={initialFocus}
           finalFocus={finalFocus}
           className={cn(
-            'bg-popover text-popover-foreground w-72 rounded-md border p-4 shadow-md outline-hidden origin-(--transform-origin)',
+            'bg-popover text-popover-foreground w-72 rounded-[1.15rem] border-[2.5px] border-[var(--frame)] p-4 shadow-[var(--shadow-brutal-md)] outline-hidden origin-(--transform-origin)',
             className
           )}
           style={style}

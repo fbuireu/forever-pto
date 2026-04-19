@@ -12,25 +12,26 @@ interface GetDayClassNamesParams {
 }
 
 export const MODIFIERS_CLASS_NAMES: Record<string, string> = {
-  weekend: 'text-muted-foreground bg-muted/50 hover:bg-muted transition-colors ring-2 ring-border',
+  weekend:
+    'text-muted-foreground bg-[var(--surface-panel-soft)] hover:bg-[var(--surface-panel-alt)] transition-colors border-[2px] border-[var(--frame)]/15 shadow-[var(--shadow-brutal-xs)]',
   holiday:
-    'bg-gradient-to-br from-yellow-400 to-yellow-500 text-yellow-900 hover:from-yellow-500 hover:to-yellow-600 font-semibold shadow-sm transition-[background-color,box-shadow] duration-200 ring-2 ring-yellow-200 dark:ring-yellow-300',
+    'bg-[linear-gradient(135deg,var(--color-brand-yellow),#facc15)] text-[var(--color-brand-ink)] hover:brightness-105 font-black transition-[background-color,box-shadow] duration-200 border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)]',
   suggested:
-    'bg-teal-400 dark:bg-teal-600 hover:bg-teal-500 dark:hover:bg-teal-700 ring-2 ring-teal-300 dark:ring-teal-400 text-white font-semibold transition-[background-color,box-shadow] duration-200 shadow-md',
+    'bg-[var(--color-brand-teal)] hover:brightness-105 text-[var(--color-brand-ink)] font-black transition-[background-color,box-shadow] duration-200 border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)]',
   alternative:
-    'bg-orange-100 dark:bg-orange-900/30 text-white font-semibold animate-pulse shadow-md ring-2 ring-orange-300 dark:ring-orange-400 transition-[background-color,box-shadow,opacity] duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(255,165,0,0.8)_2px,rgba(255,165,0,0.8)_4px)]',
+    'bg-[color-mix(in_srgb,var(--color-brand-orange)_32%,white_68%)] text-[var(--color-brand-ink)] font-black animate-pulse border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow,opacity] duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_4px,rgba(249,115,22,0.65)_4px,rgba(249,115,22,0.65)_8px)]',
   custom:
-    'bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 font-semibold shadow-md ring-2 ring-purple-300 dark:ring-purple-400 transition-[background-color,box-shadow,opacity] duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(147,51,234,0.8)_2px,rgba(147,51,234,0.8)_4px)]',
+    'bg-[color-mix(in_srgb,var(--color-brand-purple)_28%,white_72%)] text-[var(--color-brand-ink)] font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow,opacity] duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_4px,rgba(168,85,247,0.62)_4px,rgba(168,85,247,0.62)_8px)]',
   manuallySelected:
-    'bg-blue-100 dark:bg-blue-900/30 text-white font-semibold shadow-md ring-2 ring-blue-300 dark:ring-blue-400 transition-[background-color,box-shadow,opacity] duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_2px,rgba(59,130,246,0.8)_2px,rgba(59,130,246,0.8)_4px)]',
+    'bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--color-brand-teal)_82%)] text-[var(--color-brand-paper)] font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow,opacity] duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_4px,rgba(255,255,255,0.24)_4px,rgba(255,255,255,0.24)_8px)]',
   selected:
-    'bg-primary text-primary-foreground hover:bg-primary/90 ring-2 ring-primary font-semibold shadow-md transition-[background-color,box-shadow] duration-200',
+    'bg-primary text-primary-foreground hover:bg-primary/90 font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow] duration-200',
   today:
-    'bg-slate-400 dark:bg-slate-500 hover:bg-slate-500 dark:hover:bg-slate-700 text-white font-semibold shadow-md ring-2 ring-slate-300 dark:ring-slate-400 ring-offset-1 ring-offset-background transition-[background-color,box-shadow] duration-200',
-  inRange: 'bg-primary/20',
-  rangeStart: 'bg-primary text-primary-foreground hover:bg-primary/90 font-semibold rounded-l-md',
-  rangeEnd: 'bg-primary text-primary-foreground hover:bg-primary/90 font-semibold rounded-r-md',
-  previewRange: 'bg-primary/15',
+    'bg-[var(--color-brand-ink)] hover:brightness-105 text-[var(--color-brand-paper)] font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] ring-offset-1 ring-offset-background transition-[background-color,box-shadow] duration-200',
+  inRange: 'bg-primary/12',
+  rangeStart: 'bg-primary text-primary-foreground hover:bg-primary/90 font-black rounded-[0.8rem]',
+  rangeEnd: 'bg-primary text-primary-foreground hover:bg-primary/90 font-black rounded-[0.8rem]',
+  previewRange: 'bg-primary/10',
 } as const;
 
 export const getDayClassNames = ({
@@ -51,8 +52,8 @@ export const getDayClassNames = ({
   const shouldShowAsPast = isPastDay && !allowPastDays;
 
   classes.push(
-    'h-8 w-8 p-0 font-normal text-sm',
-    'focus-visible:ring-1 focus-visible:ring focus-visible:ring-offset-2 transition-colors'
+    'h-8 w-8 rounded-[0.8rem] p-0 font-medium text-sm',
+    'focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors'
   );
 
   const isTodayActive = modifiers.today?.(date);
@@ -100,11 +101,13 @@ export const getDayClassNames = ({
     if (isOutsideMonth) {
       classes.push(outsideMonthClass);
     } else if (shouldShowAsPast) {
-      classes.push('text-muted-foreground opacity-50');
+      classes.push('text-muted-foreground opacity-60');
     }
 
     if (!isSelected && !modifiers.today?.(date) && !isRangeStartDay && !isRangeEndDay) {
-      classes.push('hover:bg-accent hover:text-accent-foreground');
+      classes.push(
+        'hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground hover:shadow-[var(--shadow-brutal-xs)]'
+      );
     }
   }
 

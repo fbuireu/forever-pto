@@ -72,7 +72,10 @@ const HolidayCard = ({
 
   return (
     <div
-      className={cn('border rounded-lg p-4 space-y-3 transition-colors', isSelected && 'bg-muted/50 border-primary')}
+      className={cn(
+        'rounded-[1.15rem] border-[2.5px] border-[var(--frame)] bg-card p-4 space-y-3 shadow-[var(--shadow-brutal-sm)] transition-colors',
+        isSelected && 'bg-[var(--surface-panel-alt)]'
+      )}
     >
       <div className='flex items-start justify-between gap-2'>
         <div className='flex items-start gap-3 flex-1 min-w-0'>
@@ -316,7 +319,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   return (
     <Collapsible open={innerOpen} onOpenChange={setInnerOpen} className='space-y-4 w-full'>
       <AnimateIcon animateOnHover>
-        <CollapsibleTrigger className='flex items-center justify-between cursor-pointer group hover:bg-muted/50 p-3 rounded-lg border transition-colors w-full text-left'>
+        <CollapsibleTrigger className='flex items-center justify-between cursor-pointer group p-4 rounded-[1.25rem] border-[2.5px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-sm)] transition-colors w-full text-left hover:bg-[var(--surface-panel-alt)]'>
           <div className='flex items-center space-x-3 w-full'>
             <div className='flex items-center space-x-2'>
               {innerOpen ? (
@@ -342,7 +345,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                 <Button
                   size='sm'
                   onClick={() => setShowAddModal(true)}
-                  className='bg-green-600 hover:bg-green-700 text-white'
+                  className='bg-[var(--color-brand-teal)] text-[var(--color-brand-ink)]'
                 >
                   <Plus className='h-4 w-4 mr-1' />
                   <span className='hidden xs:inline'>{t('addHoliday')}</span>
@@ -389,7 +392,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
       <CollapsibleContent className='space-y-4 overflow-hidden'>
         {innerOpen && (
           <>
-            <div className='hidden lg:block rounded-md border max-h-96 overflow-hidden'>
+            <div className='hidden lg:block max-h-96 overflow-hidden'>
               <div className='max-h-96 overflow-y-auto'>
                 <Table className='w-full'>
                   <colgroup>
@@ -436,7 +439,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
             </div>
 
             <div className='lg:hidden space-y-3'>
-              <div className='flex items-center justify-between px-2 py-1 bg-muted/30 rounded-md'>
+              <div className='flex items-center justify-between rounded-[1rem] border-[2px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-3 py-2 shadow-[var(--shadow-brutal-xs)]'>
                 <div className='flex items-center gap-2'>
                   {selectAllButton}
                   <span className='text-xs text-muted-foreground'>
@@ -449,7 +452,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                 </div>
               </div>
 
-              <div className='space-y-2 max-h-96 overflow-y-auto px-1'>
+              <div className='space-y-3 max-h-96 overflow-y-auto px-1'>
                 {filteredHolidays.length > 0 ? (
                   filteredHolidays.map((holiday, index) => {
                     const holidayId = getHolidayId(holiday, index);

@@ -48,7 +48,8 @@ const Home = async ({ params }: LayoutProps) => {
 
 export default Home;
 
-// todo: brutalist design
+// todo: brutalist design (show legend in button, remove old brand, redo logo)
+// todo: html issues (button desc button)
 // todo: improve responsive
 // todo: https://effect.website/
 // todo: https://csswizardry.com/2026/04/what-is-css-containment-and-how-can-i-use-it/

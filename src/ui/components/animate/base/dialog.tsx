@@ -39,7 +39,15 @@ function DialogClose(props: DialogCloseProps) {
 
 type DialogBackdropProps = DialogBackdropPrimitiveProps;
 function DialogBackdrop({ className, ...props }: DialogBackdropProps) {
-  return <DialogBackdropPrimitive className={cn('fixed inset-0 z-50 bg-black/50', className)} {...props} />;
+  return (
+    <DialogBackdropPrimitive
+      className={cn(
+        'fixed inset-0 z-50 bg-[linear-gradient(180deg,rgba(20,17,15,0.66),rgba(20,17,15,0.82))] backdrop-blur-[2px]',
+        className
+      )}
+      {...props}
+    />
+  );
 }
 
 type DialogPopupProps = DialogPopupPrimitiveProps & { showCloseButton?: boolean };
@@ -49,14 +57,14 @@ function DialogPopup({ className, children, showCloseButton = true, ...props }: 
       <DialogBackdrop />
       <DialogPopupPrimitive
         className={cn(
-          'bg-background fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-none border-2 border-black dark:border-white p-6 shadow-[8px_8px_0_0_black] dark:shadow-[8px_8px_0_0_white] sm:max-w-lg',
+          'bg-card fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-[1.4rem] border-[2.5px] border-[var(--frame)] p-6 shadow-[var(--shadow-brutal-lg)] sm:max-w-lg',
           className
         )}
         {...props}
       >
         {children}
         {showCloseButton && (
-          <DialogClosePrimitive className="ring-offset-background focus:ring-ring data-[open]:bg-accent data-[open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+          <DialogClosePrimitive className="ring-offset-background focus:ring-ring absolute top-4 right-4 rounded-[0.8rem] border-[2px] border-[var(--frame)] bg-[var(--surface-panel)] p-1.5 opacity-100 shadow-[var(--shadow-brutal-xs)] transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 focus:ring-[3px] focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
             <XIcon />
             <span className='sr-only'>Close</span>
           </DialogClosePrimitive>
@@ -72,7 +80,15 @@ type DialogContentProps = DialogPopupProps;
 
 type DialogHeaderProps = DialogHeaderPrimitiveProps;
 function DialogHeader({ className, ...props }: DialogHeaderProps) {
-  return <DialogHeaderPrimitive className={cn('flex flex-col gap-2 text-center sm:text-left', className)} {...props} />;
+  return (
+    <DialogHeaderPrimitive
+      className={cn(
+        'flex flex-col gap-3 border-b-[2px] border-[var(--frame)]/18 pb-4 text-center sm:text-left',
+        className
+      )}
+      {...props}
+    />
+  );
 }
 
 type DialogFooterProps = DialogFooterPrimitiveProps;
@@ -87,7 +103,9 @@ function DialogFooter({ className, ...props }: DialogFooterProps) {
 
 type DialogTitleProps = DialogTitlePrimitiveProps;
 function DialogTitle({ className, ...props }: DialogTitleProps) {
-  return <DialogTitlePrimitive className={cn('text-lg leading-none font-semibold', className)} {...props} />;
+  return (
+    <DialogTitlePrimitive className={cn('text-xl leading-none font-black tracking-[-0.03em]', className)} {...props} />
+  );
 }
 
 type DialogDescriptionProps = DialogDescriptionPrimitiveProps;

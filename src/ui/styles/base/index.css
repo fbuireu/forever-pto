@@ -2,11 +2,35 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     scroll-behavior: smooth;
     scrollbar-gutter: stable;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image: var(--page-glow);
+    background-attachment: fixed;
+    line-height: 1.5;
+    text-rendering: geometricPrecision;
+  }
+  a,
+  button,
+  input,
+  textarea,
+  [role='button'] {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button,
+  [data-slot='button'],
+  [data-slot='badge'],
+  [data-slot='input'],
+  [data-slot='textarea'],
+  [data-slot='card'] {
+    transition:
+      transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+      color 180ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 }

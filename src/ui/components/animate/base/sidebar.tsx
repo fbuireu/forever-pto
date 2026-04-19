@@ -165,7 +165,10 @@ function Sidebar({
       >
         <div
           data-slot='sidebar'
-          className={cn('bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col', className)}
+          className={cn(
+            'bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col rounded-[1.35rem] border-[2.5px] border-[var(--frame)] shadow-[var(--shadow-brutal-lg)]',
+            className
+          )}
           {...props}
         >
           {children}
@@ -251,7 +254,7 @@ function Sidebar({
         >
           <div
             data-slot='sidebar-content'
-            className='bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow'
+            className='bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col rounded-[1.35rem] border-[2.5px] border-[var(--frame)] shadow-[var(--shadow-brutal-lg)]'
           >
             {children}
           </div>
@@ -272,7 +275,7 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
       data-sidebar='trigger'
       variant='ghost'
       size='icon'
-      className={cn('h-7 w-7', className)}
+      className={cn('h-11 w-11 rounded-[1rem] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-sm)]', className)}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();
@@ -320,7 +323,7 @@ function SidebarInset({ className, ...props }: SidebarInsetProps) {
       data-slot='sidebar-inset'
       className={cn(
         'bg-background relative flex min-h-svh flex-1 flex-col',
-        'peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4)))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow',
+        'peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4)))] md:peer-data-[variant=inset]:m-3 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-3 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-[1.6rem] md:peer-data-[variant=inset]:border-[2.5px] md:peer-data-[variant=inset]:border-[var(--frame)] md:peer-data-[variant=inset]:shadow-[var(--shadow-brutal-lg)]',
         className
       )}
       {...props}
@@ -336,7 +339,7 @@ function SidebarInput({ className, ...props }: SidebarInputProps) {
       data-slot='sidebar-input'
       data-sidebar='input'
       className={cn(
-        'focus-visible:ring-sidebar-ring bg-background h-8 w-full shadow-none focus-visible:ring-2',
+        'focus-visible:ring-sidebar-ring bg-input h-11 w-full shadow-[var(--shadow-brutal-xs)] focus-visible:ring-[3px]',
         className
       )}
       {...props}
@@ -351,7 +354,7 @@ function SidebarHeader({ className, ...props }: SidebarHeaderProps) {
     <div
       data-slot='sidebar-header'
       data-sidebar='header'
-      className={cn('flex flex-col gap-2 p-2', className)}
+      className={cn('flex flex-col gap-3 p-3', className)}
       {...props}
     />
   );
@@ -364,7 +367,7 @@ function SidebarFooter({ className, ...props }: SidebarFooterProps) {
     <div
       data-slot='sidebar-footer'
       data-sidebar='footer'
-      className={cn('flex flex-col gap-2 p-2', className)}
+      className={cn('flex flex-col gap-3 p-3', className)}
       {...props}
     />
   );
@@ -377,7 +380,7 @@ function SidebarSeparator({ className, ...props }: SidebarSeparatorProps) {
     <Separator
       data-slot='sidebar-separator'
       data-sidebar='separator'
-      className={cn('bg-sidebar-border mx-2 w-auto', className)}
+      className={cn('bg-[var(--frame)]/15 mx-3 h-[2px] w-auto', className)}
       {...props}
     />
   );
@@ -391,7 +394,7 @@ function SidebarContent({ className, ...props }: SidebarContentProps) {
       data-slot='sidebar-content'
       data-sidebar='content'
       className={cn(
-        'flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden',
+        'flex min-h-0 flex-1 flex-col gap-3 overflow-auto px-1 pb-2 group-data-[collapsible=icon]:overflow-hidden',
         className
       )}
       {...props}
@@ -406,7 +409,10 @@ function SidebarGroup({ className, ...props }: SidebarGroupProps) {
     <div
       data-slot='sidebar-group'
       data-sidebar='group'
-      className={cn('relative flex w-full min-w-0 flex-col p-2', className)}
+      className={cn(
+        'relative flex w-full min-w-0 flex-col rounded-[1.05rem] bg-[var(--surface-panel-inset)] p-2.5',
+        className
+      )}
       {...props}
     />
   );
@@ -424,7 +430,7 @@ function SidebarGroupLabel({ className, asChild = false, ...props }: SidebarGrou
       data-slot='sidebar-group-label'
       data-sidebar='group-label'
       className={cn(
-        'text-sidebar-foreground/70 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-hidden transition-[margin,opa] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
+        'text-sidebar-foreground/75 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-[0.8rem] px-2 text-[0.68rem] font-black uppercase tracking-[0.1em] outline-hidden transition-[margin,opa] duration-200 ease-linear focus-visible:ring-[3px] [&>svg]:size-4 [&>svg]:shrink-0',
         'group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0',
         className
       )}
@@ -475,7 +481,7 @@ function SidebarMenu({ className, ...props }: SidebarMenuProps) {
     <ul
       data-slot='sidebar-menu'
       data-sidebar='menu'
-      className={cn('flex w-full min-w-0 flex-col gap-1', className)}
+      className={cn('flex w-full min-w-0 flex-col gap-2', className)}
       {...props}
     />
   );
@@ -495,13 +501,13 @@ function SidebarMenuItem({ className, ...props }: SidebarMenuItemProps) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-11 group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:[&>span]:!hidden [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0',
+  'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-[1rem] border-[2px] border-transparent p-2.5 text-left text-sm font-medium outline-hidden ring-sidebar-ring transition-[width,height,padding,transform,box-shadow] hover:-translate-y-0.5 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[var(--shadow-brutal-xs)] focus-visible:ring-[3px] active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-black data-[active=true]:text-sidebar-accent-foreground data-[active=true]:border-[var(--frame)] data-[active=true]:shadow-[var(--shadow-brutal-xs)] data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-11 group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:[&>span]:!hidden [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0',
   {
     variants: {
       variant: {
         default: 'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
         outline:
-          'bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]',
+          'bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-xs)] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[var(--shadow-brutal-sm)]',
       },
       size: {
         default: 'h-8 text-sm',
@@ -519,8 +525,10 @@ const sidebarMenuButtonVariants = cva(
 const sidebarMenuButtonActiveVariants = cva('', {
   variants: {
     variant: {
-      default: 'bg-sidebar-accent text-sidebar-accent-foreground',
-      outline: 'bg-sidebar-accent text-sidebar-accent-foreground shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]',
+      default:
+        'bg-sidebar-accent text-sidebar-accent-foreground border-[var(--frame)] shadow-[var(--shadow-brutal-xs)]',
+      outline:
+        'bg-sidebar-accent text-sidebar-accent-foreground border-[var(--frame)] shadow-[var(--shadow-brutal-xs)]',
     },
   },
   defaultVariants: {
@@ -664,7 +672,7 @@ function SidebarMenuSub({ className, ...props }: SidebarMenuSubProps) {
       data-slot='sidebar-menu-sub'
       data-sidebar='menu-sub'
       className={cn(
-        'border-sidebar-border flex min-w-0 translate-x-px flex-col gap-1 border-l px-2.5 py-1.5',
+        'border-sidebar-border flex min-w-0 translate-x-px flex-col gap-2 border-l-[2px] border-[var(--frame)]/15 px-3 py-2',
         'group-data-[collapsible=icon]:hidden',
         className
       )}

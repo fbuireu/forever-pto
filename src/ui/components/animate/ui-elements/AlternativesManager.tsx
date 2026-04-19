@@ -95,10 +95,10 @@ export const AlternativesManager = ({
 
   return (
     <div
-      className='sticky top-0 z-10 flex w-fit flex-wrap items-center gap-2 rounded-2xl border border-border bg-background p-2 shadow-sm'
+      className='sticky top-0 z-10 flex w-fit flex-wrap items-center gap-3 rounded-[1.35rem] border-[2.5px] border-[var(--frame)] bg-card p-3 shadow-[var(--shadow-brutal-lg)]'
       data-tutorial='alternatives-manager'
     >
-      <div className='flex shrink-0 items-center rounded-lg bg-muted/50 px-2 grow'>
+      <div className='flex shrink-0 grow items-center rounded-[1rem] border-[2px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-2 shadow-[var(--shadow-brutal-xs)]'>
         <AnimateIcon animateOnHover={currentIndex !== 0}>
           <Button
             disabled={currentIndex === 0}
@@ -109,7 +109,7 @@ export const AlternativesManager = ({
             <ChevronLeft size={20} />
           </Button>
         </AnimateIcon>
-        <div className='mx-2 flex flex-col items-center relative w-25  grow duration-300 ease-out'>
+        <div className='mx-2 flex w-25 grow flex-col items-center relative duration-300 ease-out'>
           <div className='flex items-center space-x-1 text-sm tabular-nums'>
             <span className='text-xs text-muted-foreground'>{t('option')}</span>
             <SlidingNumber className='text-base font-semibold text-foreground' padStart number={currentIndex + 1} />
@@ -120,7 +120,7 @@ export const AlternativesManager = ({
               variants={BADGE_VARIANTS}
               initial='initial'
               animate='animate'
-              className='mt-0.5 flex items-center gap-0.5 rounded-full bg-linear-to-r from-amber-500/20 to-orange-500/20 px-1.5 py-px text-[10px] font-normal text-amber-700 dark:text-amber-400'
+              className='mt-1 flex items-center gap-1 rounded-full border-[2px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-yellow)_28%,white_72%)] px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-[var(--color-brand-orange-deep)] shadow-[var(--shadow-brutal-xs)]'
             >
               <Sparkles size={8} />
               {t('recommended')}
@@ -139,12 +139,12 @@ export const AlternativesManager = ({
         </AnimateIcon>
       </div>
 
-      <div className='hidden lg:block mx-3 h-6 w-px bg-border rounded-full' />
+      <div className='hidden lg:block mx-1 h-9 w-[2px] bg-[var(--frame)]/15 rounded-full' />
 
       <m.div layout layoutRoot className='flex flex-nowrap space-x-2'>
         <m.button
           {...STAT_CARD_MOTION_CONFIG}
-          className='flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-green-100/60 px-2.5 py-2 dark:bg-green-900/30'
+          className='flex h-11 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-[1rem] border-[2px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,black_84%)]'
           aria-label={t('totalDaysOff')}
         >
           <CalendarDays size={20} className='text-green-600 dark:text-green-400 shrink-0' />
@@ -169,7 +169,7 @@ export const AlternativesManager = ({
 
         <m.button
           {...STAT_CARD_MOTION_CONFIG}
-          className='flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-purple-100/60 px-2.5 py-2 dark:bg-purple-900/30'
+          className='flex h-11 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-[1rem] border-[2px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_20%,white_80%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]'
           aria-label={t('efficiency')}
         >
           <TrendingUp size={20} className='text-purple-600 dark:text-purple-400 shrink-0' />
@@ -203,7 +203,7 @@ export const AlternativesManager = ({
         {!isMainSuggestion && (
           <m.button
             {...STAT_CARD_MOTION_CONFIG}
-            className='flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-neutral-100/60 px-2.5 py-2 dark:bg-neutral-800/30'
+            className='flex h-11 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-[1rem] border-[2px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[var(--surface-panel-soft)]'
             aria-label={t('comparison')}
           >
             <BarChart3 size={20} className='text-neutral-600 dark:text-neutral-400 shrink-0' />
@@ -238,7 +238,7 @@ export const AlternativesManager = ({
       </m.div>
       <Button
         disabled={currentSelectionIndex === currentIndex}
-        className='flex grow h-10 text-sm cursor-pointer items-center justify-center rounded-lg px-3 py-2 font-medium transition-colors duration-300'
+        className='flex grow h-11 text-sm cursor-pointer items-center justify-center rounded-[1rem] px-4 py-2 font-black transition-colors duration-300'
         onClick={() => onSelectionChange({ suggestion: currentSuggestion, index: currentIndex })}
       >
         {currentSelectionIndex === currentIndex ? t('alreadyApplied') : t('applyAlternative')}

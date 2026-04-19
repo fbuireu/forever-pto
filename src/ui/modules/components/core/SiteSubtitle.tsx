@@ -9,18 +9,18 @@ export const SiteSubtitle = () => {
   const { startTutorial } = useTutorial();
 
   return (
-    <p className='text-center text-muted-foreground leading-tight mt-2 mb-16'>
+    <p className='mx-auto mt-2 mb-16 max-w-4xl rounded-[1.3rem] border-[2.5px] border-[var(--frame)] bg-card px-5 py-4 text-center leading-relaxed text-muted-foreground shadow-[var(--shadow-brutal-md)]'>
       {t('instructions')}{' '}
       <button
         type='button'
         onClick={startTutorial}
-        className='hover:underline cursor-pointer text-foreground font-medium'
+        className='cursor-pointer font-black text-foreground underline decoration-[2px] underline-offset-4 transition-colors hover:text-[var(--color-brand-purple-deep)]'
       >
         {t('quickTour')}
       </button>{' '}
       {t('or')}{' '}
       <Link
-        className='hover:underline text-foreground font-medium'
+        className='font-black text-foreground underline decoration-[2px] underline-offset-4 transition-colors hover:text-[var(--color-brand-orange-deep)]'
         href='/#faq'
         onClick={(event) => {
           const faq = document.getElementById('faq');

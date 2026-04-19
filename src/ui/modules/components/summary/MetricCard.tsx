@@ -32,28 +32,32 @@ interface MetricCardProps {
 
 const COLOR_SCHEMES = {
   blue: {
-    bg: 'bg-blue-100 dark:bg-blue-900/20',
-    icon: 'text-blue-500',
-    text: 'text-blue-700 dark:text-blue-300',
-    badge: 'bg-blue-200 text-blue-700 dark:bg-blue-900/30',
+    bg: 'bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,black_84%)]',
+    icon: 'text-[var(--color-brand-teal-deep)] dark:text-teal-300',
+    text: 'text-[var(--color-brand-teal-deep)] dark:text-teal-200',
+    badge:
+      'bg-[color-mix(in_srgb,var(--color-brand-teal)_30%,white_70%)] text-[var(--color-brand-teal-deep)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_22%,black_78%)]',
   },
   green: {
-    bg: 'bg-green-100 dark:bg-green-900/20',
-    icon: 'text-green-500',
-    text: 'text-green-700 dark:text-green-300',
-    badge: 'bg-green-200 text-green-700 dark:bg-green-900/30',
+    bg: 'bg-[color-mix(in_srgb,var(--color-brand-yellow)_26%,white_74%)] dark:bg-[color-mix(in_srgb,var(--color-brand-yellow)_18%,black_82%)]',
+    icon: 'text-[var(--color-brand-yellow-deep)] dark:text-yellow-300',
+    text: 'text-[var(--color-brand-yellow-deep)] dark:text-yellow-200',
+    badge:
+      'bg-[color-mix(in_srgb,var(--color-brand-yellow)_40%,white_60%)] text-[var(--color-brand-yellow-deep)] dark:bg-[color-mix(in_srgb,var(--color-brand-yellow)_22%,black_78%)]',
   },
   purple: {
-    bg: 'bg-purple-100 dark:bg-purple-900/20',
-    icon: 'text-purple-500',
-    text: 'text-purple-700 dark:text-purple-300',
-    badge: 'bg-purple-200 text-purple-700 dark:bg-purple-900/30',
+    bg: 'bg-[color-mix(in_srgb,var(--color-brand-purple)_20%,white_80%)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]',
+    icon: 'text-[var(--color-brand-purple-deep)] dark:text-purple-300',
+    text: 'text-[var(--color-brand-purple-deep)] dark:text-purple-200',
+    badge:
+      'bg-[color-mix(in_srgb,var(--color-brand-purple)_32%,white_68%)] text-[var(--color-brand-purple-deep)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_22%,black_78%)]',
   },
   amber: {
-    bg: 'bg-amber-100 dark:bg-amber-900/20',
-    icon: 'text-amber-500',
-    text: 'text-amber-700 dark:text-amber-300',
-    badge: 'bg-amber-200 text-amber-700 dark:bg-amber-900/30',
+    bg: 'bg-[color-mix(in_srgb,var(--color-brand-orange)_20%,white_80%)] dark:bg-[color-mix(in_srgb,var(--color-brand-orange)_18%,black_82%)]',
+    icon: 'text-[var(--color-brand-orange-deep)] dark:text-orange-300',
+    text: 'text-[var(--color-brand-orange-deep)] dark:text-orange-200',
+    badge:
+      'bg-[color-mix(in_srgb,var(--color-brand-orange)_32%,white_68%)] text-[var(--color-brand-orange-deep)] dark:bg-[color-mix(in_srgb,var(--color-brand-orange)_22%,black_78%)]',
   },
   emerald: {
     bg: 'bg-emerald-100 dark:bg-emerald-900/20',
@@ -96,7 +100,12 @@ export const MetricCard = ({
   if (size === MetricCardSize.COMPACT) {
     return (
       <div
-        className={cn('p-3', colors.bg, 'rounded-lg text-center flex flex-col justify-between items-center', className)}
+        className={cn(
+          'p-3',
+          colors.bg,
+          'rounded-[1.1rem] border-[2.5px] border-[var(--frame)] text-center flex flex-col justify-between items-center shadow-[var(--shadow-brutal-sm)]',
+          className
+        )}
       >
         <Icon className={cn('w-4 h-4', colors.icon, 'mx-auto mb-1')} />
         <div className={cn('text-lg font-bold flex justify-center', colors.text)}>
@@ -110,9 +119,14 @@ export const MetricCard = ({
 
   return (
     <div
-      className={cn('items-center p-4', colors.bg, 'rounded-lg flex flex-col justify-between items-center', className)}
+      className={cn(
+        'items-center p-4',
+        colors.bg,
+        'rounded-[1.2rem] border-[2.5px] border-[var(--frame)] flex flex-col justify-between items-center shadow-[var(--shadow-brutal-sm)]',
+        className
+      )}
     >
-      <span className={cn('text-xs mb-1', colors.text)}>{label}</span>
+      <span className={cn('mb-1 text-[0.72rem] font-black uppercase tracking-[0.08em]', colors.text)}>{label}</span>
       <div className={cn('flex items-center gap-2')}>
         <Icon className={cn('w-4 h-4', colors.icon)} />
         <span className={cn('text-xl font-bold flex', colors.text)}>
@@ -121,7 +135,7 @@ export const MetricCard = ({
         </span>
       </div>
       {badge && (
-        <Badge variant='outline' className={cn('text-xs mt-1', colors.badge)}>
+        <Badge variant='outline' className={cn('text-xs mt-2', colors.badge)}>
           {badge}
         </Badge>
       )}

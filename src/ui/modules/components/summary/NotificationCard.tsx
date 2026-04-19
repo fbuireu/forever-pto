@@ -11,22 +11,22 @@ interface NotificationCardProps {
 
 const COLOR_SCHEMES = {
   orange: {
-    bg: 'bg-orange-100 dark:bg-orange-900/20',
-    icon: 'text-orange-500',
-    title: 'text-orange-700 dark:text-orange-300',
-    message: 'text-orange-800 dark:text-orange-200',
+    bg: 'bg-[color-mix(in_srgb,var(--color-brand-orange)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-orange)_16%,black_84%)]',
+    icon: 'text-[var(--color-brand-orange-deep)] dark:text-orange-300',
+    title: 'text-[var(--color-brand-orange-deep)] dark:text-orange-200',
+    message: 'text-[var(--color-brand-ink)] dark:text-orange-100',
   },
   blue: {
-    bg: 'bg-blue-100 dark:bg-blue-900/20',
-    icon: 'text-blue-500',
-    title: 'text-blue-700 dark:text-blue-300',
-    message: 'text-blue-800 dark:text-blue-200',
+    bg: 'bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,black_84%)]',
+    icon: 'text-[var(--color-brand-teal-deep)] dark:text-teal-300',
+    title: 'text-[var(--color-brand-teal-deep)] dark:text-teal-200',
+    message: 'text-[var(--color-brand-ink)] dark:text-teal-100',
   },
   indigo: {
-    bg: 'bg-indigo-100 dark:bg-indigo-900/20',
-    icon: 'text-indigo-500',
-    title: 'text-indigo-700 dark:text-indigo-300',
-    message: 'text-indigo-800 dark:text-indigo-200',
+    bg: 'bg-[color-mix(in_srgb,var(--color-brand-purple)_20%,white_80%)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]',
+    icon: 'text-[var(--color-brand-purple-deep)] dark:text-purple-300',
+    title: 'text-[var(--color-brand-purple-deep)] dark:text-purple-200',
+    message: 'text-[var(--color-brand-ink)] dark:text-purple-100',
   },
 };
 
@@ -40,12 +40,18 @@ export const NotificationCard = ({
   const colors = COLOR_SCHEMES[colorScheme];
 
   return (
-    <div className={cn('p-4', colors.bg, 'rounded-lg', className)}>
-      <div className={cn('flex items-center gap-2 mb-2')}>
+    <div
+      className={cn(
+        'rounded-[1.2rem] border-[2.5px] border-[var(--frame)] p-4 shadow-[var(--shadow-brutal-sm)]',
+        colors.bg,
+        className
+      )}
+    >
+      <div className={cn('flex items-center gap-2 mb-3')}>
         <Icon className={cn('w-4 h-4', colors.icon)} />
-        <span className={cn('text-sm font-medium', colors.title)}>{title}</span>
+        <span className={cn('text-[0.72rem] font-black uppercase tracking-[0.08em]', colors.title)}>{title}</span>
       </div>
-      <div className={cn('text-sm flex justify-start', colors.message)}>{children}</div>
+      <div className={cn('text-sm flex justify-start font-medium', colors.message)}>{children}</div>
     </div>
   );
 };

@@ -129,9 +129,9 @@ export const Summary = () => {
     <div className='w-full max-w-4xl mx-auto space-y-6 z-1'>
       <Card>
         <CardHeader className='pb-2'>
-          <CardTitle className='text-3xl font-bold text-center'>
+          <CardTitle className='text-3xl sm:text-4xl font-black text-center tracking-[-0.05em]'>
             {t('title', { year, nextYear: Number(year) + 1 })}
-            <div className='flex flex-wrap items-center gap-2 mt-2 mb-4 justify-center'>
+            <div className='flex flex-wrap items-center gap-2 mt-3 mb-5 justify-center'>
               <Badge variant='outline' className='mx-1'>
                 <span className='mr-2'>{locationInfo.userCountry?.flag}</span>
                 <span>{locationInfo.userCountry?.label}</span>
@@ -141,12 +141,15 @@ export const Summary = () => {
                   <span>{locationInfo.userRegion.label}</span>
                 </Badge>
               )}
-              <Badge variant='outline' className='bg-blue-50 dark:bg-blue-900/20'>
+              <Badge
+                variant='outline'
+                className='bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,white_84%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,black_82%)]'
+              >
                 {tSidebar(`strategy.${strategy}.label`)}
               </Badge>
             </div>
           </CardTitle>
-          <CardDescription className='text-muted-foreground space-y-1.5'>
+          <CardDescription className='space-y-2 rounded-[1.1rem] border-[2px] border-[var(--frame)]/15 bg-[var(--surface-panel-soft)] p-4 text-muted-foreground'>
             <p className='text-sm'>
               {increment > 0
                 ? t('summaryParagraph.withGain', {
@@ -280,7 +283,7 @@ export const Summary = () => {
                 iconSize='size-7'
                 inlineDescription
               >
-                <div className='p-4 bg-indigo-100 dark:bg-indigo-900/20 rounded-lg'>
+                <div className='rounded-[1.2rem] border-[2.5px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] p-4 shadow-[var(--shadow-brutal-sm)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]'>
                   <div className='flex items-center gap-2 mb-3'>
                     <Clock className='w-4 h-4 text-indigo-500' />
                     <span className='text-sm font-medium text-indigo-700 dark:text-indigo-300'>
