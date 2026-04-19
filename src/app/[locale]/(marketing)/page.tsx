@@ -48,7 +48,9 @@ export default LandingPage;
 // todo: 400 and 500 page
 // todo: box shadow on error (include donate)
 // todo: with-in color not teal but black
+// todo: precommit not adding changes when biome it's applied
 // todo: unify styles and check everything
+// todo: each branch to create its own URL in preview
 // todo: html issues (button desc button)
 // todo: improve responsive
 // todo: https://effect.website/

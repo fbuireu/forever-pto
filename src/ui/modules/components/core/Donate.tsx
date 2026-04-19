@@ -186,13 +186,11 @@ export const Donate = () => {
     [currentAmount, paymentState?.discountInfo]
   );
 
-  const elementsOptions = useMemo<StripeElementsOptions | null>(() => {
-    if (!paymentState?.clientSecret) return null;
-
+  const elementsOptions = useMemo<StripeElementsOptions | undefined>(() => {
+    if (!paymentState?.clientSecret) return undefined;
+ 
     const isDark = resolvedTheme === 'dark';
 
-    // Neobrutalism DSM — hex only (Stripe rejects rgba/var())
-    // All values mirror src/ui/styles/global/index.css
     const t = isDark
       ? {
           bg: '#1A1612',     // --card
@@ -221,8 +219,7 @@ export const Donate = () => {
       clientSecret: paymentState.clientSecret,
       loader: 'always',
       appearance: {
-        // Use 'none' so we own every pixel — no Stripe preset overrides
-        theme: 'none',
+        theme: undefined,
         labels: 'above',
         variables: {
           colorBackground: t.bg,
