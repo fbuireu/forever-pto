@@ -49,7 +49,7 @@ function DialogPopup({ className, children, showCloseButton = true, ...props }: 
       <DialogBackdrop />
       <DialogPopupPrimitive
         className={cn(
-          'bg-background fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg sm:max-w-lg',
+          'bg-background fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-none border-2 border-black dark:border-white p-6 shadow-[8px_8px_0_0_black] dark:shadow-[8px_8px_0_0_white] sm:max-w-lg',
           className
         )}
         {...props}

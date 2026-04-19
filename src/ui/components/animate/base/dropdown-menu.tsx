@@ -126,7 +126,7 @@ function DropdownMenuSubTrigger({ className, children, inset, disabled, ...props
             data-disabled={disabled}
             whileTap={{ scale: 0.95 }}
             className={cn(
-              "[&:not([data-highlight])]:focus:bg-accent focus:text-accent-foreground [&:not([data-highlight])]:data-[open]:bg-accent data-[open]:text-accent-foreground data-[open]:[&_[data-chevron]]:rotate-90 [&_[data-chevron]]:transition-transform [&_[data-chevron]]:duration-150 [&_[data-chevron]]:ease-in-out [&_svg:not([class*='text-'])]:text-muted-foreground relative z-[1] flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+              "[&:not([data-highlight])]:focus:bg-accent focus:text-accent-foreground [&:not([data-highlight])]:data-[open]:bg-accent data-[open]:text-accent-foreground data-[open]:[&_[data-chevron]]:rotate-90 [&_[data-chevron]]:transition-transform [&_[data-chevron]]:duration-150 [&_[data-chevron]]:ease-in-out [&_svg:not([class*='text-'])]:text-muted-foreground relative z-[1] flex cursor-default select-none items-center gap-2 rounded-none px-2 py-1.5 text-sm outline-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
               inset && 'pl-8',
               className
             )}
@@ -148,7 +148,7 @@ function DropdownMenuSubContent({ className, ...props }: Readonly<DropdownMenuSu
       <DropdownMenuPrimitive.Popup
         data-slot='dropdown-menu-sub-content'
         className={cn(
-          'z-50 min-w-32 overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg',
+          'z-50 min-w-32 overflow-hidden rounded-none border-2 border-black dark:border-white bg-popover p-1 text-popover-foreground shadow-[4px_4px_0_0_black] dark:shadow-[4px_4px_0_0_white]',
           className
         )}
         {...props}
@@ -190,7 +190,7 @@ function DropdownMenuContent({
                   key='dropdown-menu-content'
                   data-slot='dropdown-menu-content'
                   className={cn(
-                    'z-50 max-h-(--available-height) min-w-32 overflow-y-auto overflow-x-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md origin-(--transform-origin)',
+                    'z-50 max-h-(--available-height) min-w-32 overflow-y-auto overflow-x-hidden rounded-none border-2 border-black dark:border-white bg-popover p-1 text-popover-foreground shadow-[4px_4px_0_0_black] dark:shadow-[4px_4px_0_0_white] origin-(--transform-origin)',
                     className
                   )}
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -204,7 +204,7 @@ function DropdownMenuContent({
             >
               <MotionHighlight
                 hover
-                className='rounded-sm'
+                className='rounded-none'
                 controlledItems
                 transition={highlightTransition}
                 enabled={animateOnHover}

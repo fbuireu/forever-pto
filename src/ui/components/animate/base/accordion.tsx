@@ -41,7 +41,7 @@ function AccordionItem({ className, children, ...props }: AccordionItemProps) {
 
   return (
     <AccordionItemContext.Provider value={contextValue}>
-      <AccordionPrimitive.Item data-slot='accordion-item' className={cn('border-b', className)} {...props}>
+      <AccordionPrimitive.Item data-slot='accordion-item' className={cn('border-b-2 border-black dark:border-white', className)} {...props}>
         {children}
       </AccordionPrimitive.Item>
     </AccordionItemContext.Provider>
