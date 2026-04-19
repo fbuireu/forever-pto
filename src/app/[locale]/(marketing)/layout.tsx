@@ -1,3 +1,4 @@
+import { DonateClient } from '@ui/modules/components/core/DonateClient';
 import { Footer } from '@ui/modules/components/footer/Footer';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
@@ -17,6 +18,7 @@ const MarketingLayout = async ({ children, params }: Readonly<MarketingLayoutPro
       <MarketingNav />
       <main id='main-content' className='flex-1'>
         {children}
+        <DonateClient />
       </main>
       <div className='px-7 py-8 bg-[var(--background)] border-t-[4px] border-[var(--frame)]'>
         <div className='max-w-[1240px] mx-auto'>

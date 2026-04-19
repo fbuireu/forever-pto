@@ -20,12 +20,17 @@ export const LandingComparison = async () => {
         <div className={`${brutCard} p-7 rotate-[-1deg]`}>
           <h3 className='font-display font-extrabold text-[22px] mb-4'>{t('comparison.withoutTitle')}</h3>
           <ul className='list-none'>
-            {Array.from({ length: 5 }, (_, i) => t(`comparison.withoutItems.${i}` as Parameters<typeof t>[0])).map((item) => (
-              <li key={item} className='flex gap-2.5 items-start py-2.5 border-b-[2px] border-dashed border-black/15 last:border-b-0 text-[15px]'>
-                <span className='font-black text-muted-foreground w-[22px] text-center shrink-0'>✗</span>
-                {item}
-              </li>
-            ))}
+            {Array.from({ length: 5 }, (_, i) => t(`comparison.withoutItems.${i}` as Parameters<typeof t>[0])).map(
+              (item) => (
+                <li
+                  key={item}
+                  className='flex gap-2.5 items-start py-2.5 border-b-[2px] border-dashed border-black/15 last:border-b-0 text-[15px]'
+                >
+                  <span className='font-black text-muted-foreground w-[22px] text-center shrink-0'>✗</span>
+                  {item}
+                </li>
+              )
+            )}
           </ul>
         </div>
         <div className='grid place-items-center'>
@@ -36,12 +41,17 @@ export const LandingComparison = async () => {
         <div className={`${brutCard} p-7 rotate-[1deg]`} style={{ background: 'var(--color-brand-green)' }}>
           <h3 className='font-display font-extrabold text-[22px] mb-4'>{t('comparison.withTitle')}</h3>
           <ul className='list-none'>
-            {Array.from({ length: 5 }, (_, i) => t(`comparison.withItems.${i}` as Parameters<typeof t>[0])).map((item) => (
-              <li key={item} className='flex gap-2.5 items-start py-2.5 border-b-[2px] border-dashed border-black/15 last:border-b-0 text-[15px]'>
-                <span className='font-black w-[22px] text-center shrink-0'>✓</span>
-                {item}
-              </li>
-            ))}
+            {Array.from({ length: 5 }, (_, i) => t(`comparison.withItems.${i}` as Parameters<typeof t>[0])).map(
+              (item) => (
+                <li
+                  key={item}
+                  className='flex gap-2.5 items-start py-2.5 border-b-[2px] border-dashed border-black/15 last:border-b-0 text-[15px]'
+                >
+                  <span className='font-black w-[22px] text-center shrink-0'>✓</span>
+                  {item}
+                </li>
+              )
+            )}
           </ul>
         </div>
       </div>

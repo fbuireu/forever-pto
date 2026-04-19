@@ -24,10 +24,10 @@ function InputGroup({ className, ...props }: ComponentProps<'div'>) {
         'has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3',
 
         // Focus state.
-        'has-[[data-slot=input-group-control]:focus-visible]:border-ring has-[[data-slot=input-group-control]:focus-visible]:ring-ring/50 has-[[data-slot=input-group-control]:focus-visible]:ring-[3px]',
+        'has-[[data-slot=input-group-control]:focus-visible]:-translate-x-0.5 has-[[data-slot=input-group-control]:focus-visible]:-translate-y-0.5 has-[[data-slot=input-group-control]:focus-visible]:shadow-[var(--shadow-brutal-sm)]',
 
         // Error state.
-        'has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[[data-slot][aria-invalid=true]]:border-destructive dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40',
+        'has-[[data-slot][aria-invalid=true]]:border-destructive has-[[data-slot][aria-invalid=true]]:shadow-[2px_2px_0_0_var(--destructive)] has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:shadow-[4px_4px_0_0_var(--destructive)]',
 
         className
       )}

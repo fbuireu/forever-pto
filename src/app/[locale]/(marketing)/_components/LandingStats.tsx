@@ -12,7 +12,11 @@ export const LandingStats = async () => {
           { num: '14', label: t('stats.countriesLabel'), bg: 'var(--color-brand-orange)' },
           { num: '12k+', label: t('stats.plansLabel'), bg: 'var(--color-brand-purple)' },
         ].map(({ num, label, bg }) => (
-          <div key={num} className='px-6 py-8 border-r-[4px] border-[var(--frame)] last:border-r-0' style={{ background: bg }}>
+          <div
+            key={num}
+            className='px-6 py-8 border-r-[4px] border-[var(--frame)] last:border-r-0'
+            style={{ background: bg }}
+          >
             <div className='font-display font-extrabold text-[56px] leading-none tracking-[-0.04em] mb-1.5'>{num}</div>
             <div className='text-[13px] font-semibold'>{label}</div>
           </div>

@@ -12,31 +12,36 @@ export const LandingHowItWorks = async () => {
           <Badge variant='outline'>{t('how.badge')}</Badge>
         </div>
         <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] mb-4 text-[clamp(36px,5vw,64px)]'>
-          {t('how.h2Start')}{' '}
-          <em className='font-serif italic font-semibold'>&ldquo;{t('how.h2Q1')}&rdquo;</em>{' '}
-          {t('how.h2Mid')}{' '}
-          <em className='font-serif italic font-semibold'>&ldquo;{t('how.h2Q2')}&rdquo;</em>{' '}
+          {t('how.h2Start')} <em className='font-serif italic font-semibold'>&ldquo;{t('how.h2Q1')}&rdquo;</em>{' '}
+          {t('how.h2Mid')} <em className='font-serif italic font-semibold'>&ldquo;{t('how.h2Q2')}&rdquo;</em>{' '}
           {t('how.h2End')}
         </h2>
-        <p className='text-[19px] text-muted-foreground max-w-[640px] mx-auto'>
-          {t('how.p')}
-        </p>
+        <p className='text-[19px] text-muted-foreground max-w-[640px] mx-auto'>{t('how.p')}</p>
       </div>
 
       <div className='max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-7'>
         {[
           {
-            num: '1', bg: 'var(--color-brand-yellow)', iconBg: 'var(--color-brand-orange)', icon: '📥',
+            num: '1',
+            bg: 'var(--color-brand-yellow)',
+            iconBg: 'var(--color-brand-orange)',
+            icon: '📥',
             title: t('how.step1Title'),
             desc: t('how.step1Desc'),
           },
           {
-            num: '2', bg: 'var(--color-brand-teal)', iconBg: 'var(--color-brand-sky)', icon: '🧮',
+            num: '2',
+            bg: 'var(--color-brand-teal)',
+            iconBg: 'var(--color-brand-sky)',
+            icon: '🧮',
             title: t('how.step2Title'),
             desc: t('how.step2Desc'),
           },
           {
-            num: '3', bg: 'var(--color-brand-purple)', iconBg: 'var(--color-brand-pink)', icon: '📤',
+            num: '3',
+            bg: 'var(--color-brand-purple)',
+            iconBg: 'var(--color-brand-pink)',
+            icon: '📤',
             title: t('how.step3Title'),
             desc: t('how.step3Desc'),
           },
@@ -57,7 +62,9 @@ export const LandingHowItWorks = async () => {
             >
               {icon}
             </div>
-            <h3 className='font-display font-extrabold text-[26px] leading-[1.05] tracking-[-0.02em] mb-2.5'>{title}</h3>
+            <h3 className='font-display font-extrabold text-[26px] leading-[1.05] tracking-[-0.02em] mb-2.5'>
+              {title}
+            </h3>
             <p className='text-foreground text-[16px]'>{desc}</p>
           </div>
         ))}

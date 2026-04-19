@@ -86,19 +86,22 @@ function SheetOverlay({ className, ...props }: SheetOverlayProps) {
   );
 }
 
-const sheetVariants = cva('fixed z-50 gap-4 bg-card p-6 border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xl)]', {
-  variants: {
-    side: {
-      top: 'inset-x-0 top-0 rounded-b-[14px]',
-      bottom: 'inset-x-0 bottom-0 rounded-t-[14px]',
-      left: 'inset-y-0 left-0 h-full w-3/4 rounded-r-[14px] sm:max-w-sm',
-      right: 'inset-y-0 right-0 h-full w-3/4 rounded-l-[14px] sm:max-w-sm',
+const sheetVariants = cva(
+  'fixed z-50 gap-4 bg-card p-6 border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xl)]',
+  {
+    variants: {
+      side: {
+        top: 'inset-x-0 top-0 rounded-b-[14px]',
+        bottom: 'inset-x-0 bottom-0 rounded-t-[14px]',
+        left: 'inset-y-0 left-0 h-full w-3/4 rounded-r-[14px] sm:max-w-sm',
+        right: 'inset-y-0 right-0 h-full w-3/4 rounded-l-[14px] sm:max-w-sm',
+      },
     },
-  },
-  defaultVariants: {
-    side: 'right',
-  },
-});
+    defaultVariants: {
+      side: 'right',
+    },
+  }
+);
 
 type SheetContentProps = Omit<React.ComponentProps<typeof SheetPrimitive.Popup>, 'render'> &
   VariantProps<typeof sheetVariants> &
@@ -190,7 +193,10 @@ function SheetHeader({ className, ...props }: SheetHeaderProps) {
   return (
     <div
       data-slot='sheet-header'
-      className={cn('flex flex-col gap-3 border-b-[2px] border-[var(--frame)]/18 pb-4 text-center sm:text-left', className)}
+      className={cn(
+        'flex flex-col gap-3 border-b-[2px] border-[var(--frame)]/18 pb-4 text-center sm:text-left',
+        className
+      )}
       {...props}
     />
   );

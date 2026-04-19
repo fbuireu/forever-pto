@@ -32,7 +32,10 @@ function Counter({
       data-slot='counter'
       layout
       transition={transition}
-      className={cn('flex items-center gap-x-2 p-1 rounded-[12px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-xs)]', className)}
+      className={cn(
+        'flex items-center gap-x-2 p-1 rounded-[12px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-xs)]',
+        className
+      )}
       {...props}
     >
       <m.div

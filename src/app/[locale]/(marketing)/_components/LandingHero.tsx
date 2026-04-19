@@ -1,10 +1,10 @@
 import { Link } from '@application/i18n/navigtion';
-import { version } from '../../../../../package.json';
-import { getWeekdayNames } from '@ui/lib/date';
 import { Badge } from '@ui/components/primitives/badge';
 import { Button } from '@ui/components/primitives/button';
+import { getWeekdayNames } from '@ui/lib/date';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { CAL_PATTERN, type DayType, dayCell } from './landing-shared';
+import { version } from '../../../../../package.json';
+import { CAL_ENTRIES, type DayType, dayCell } from './landing-shared';
 
 export const LandingHero = async () => {
   const t = await getTranslations('landing');
@@ -42,26 +42,20 @@ export const LandingHero = async () => {
             <Badge variant='outline'>v{version}</Badge>
           </div>
 
-          <h1
-            className='font-display font-extrabold leading-[0.95] tracking-[-0.035em] mb-7 text-[clamp(48px,7vw,92px)]'
-          >
+          <h1 className='font-display font-extrabold leading-[0.95] tracking-[-0.035em] mb-7 text-[clamp(48px,7vw,92px)]'>
             {t('hero.h1Line1')}
             <br />
             {t('hero.h1Verb')}{' '}
-            <span
-              className='relative inline-block bg-[var(--accent)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[5px_5px_0_0_var(--frame)] rotate-[-2deg] mx-1'
-            >
+            <span className='relative inline-block bg-[var(--accent)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[5px_5px_0_0_var(--frame)] rotate-[-2deg] mx-1'>
               {t('hero.h1Word')}
             </span>
-            <span className='inline-block text-[0.75em] rotate-[15deg]'>
-              🌴
-            </span>
+            <span className='inline-block text-[0.75em] rotate-[15deg]'>🌴</span>
           </h1>
 
           <p className='text-[21px] leading-[1.45] max-w-[540px] mb-8 text-foreground'>
             {t.rich('hero.p', {
               em: (chunks) => <em className='font-serif font-normal italic text-[1.08em]'>{chunks}</em>,
-              strong: (chunks) => <strong>{chunks}</strong>
+              strong: (chunks) => <strong>{chunks}</strong>,
             })}
           </p>
 
@@ -100,7 +94,9 @@ export const LandingHero = async () => {
                   key={label}
                   className='border-[3px] border-[var(--frame)] rounded-[8px] px-3 py-2.5 bg-[var(--background)]'
                 >
-                  <div className='font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1'>{label}</div>
+                  <div className='font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1'>
+                    {label}
+                  </div>
                   <div className='font-display font-extrabold text-[28px] leading-none'>
                     {value}
                     <span className='text-[14px] font-semibold text-muted-foreground ml-1'>{unit}</span>
@@ -122,10 +118,15 @@ export const LandingHero = async () => {
             {/* Mini calendar */}
             <div className='mt-4 grid grid-cols-7 gap-1'>
               {DAY_HEADERS.map((d) => (
-                <div key={d} className='text-center font-mono text-[10px] font-bold py-1 text-muted-foreground'>{d}</div>
+                <div key={d} className='text-center font-mono text-[10px] font-bold py-1 text-muted-foreground'>
+                  {d}
+                </div>
               ))}
-              {CAL_PATTERN.map((type, i) => (
-                <div key={i} className={`${dayCell[type]} aspect-square grid place-items-center font-mono text-[11px] font-semibold`}>
+              {CAL_ENTRIES.map(({ id, type }) => (
+                <div
+                  key={id}
+                  className={`${dayCell[type]} aspect-square grid place-items-center font-mono text-[11px] font-semibold`}
+                >
                   {type === 'pto' ? '✈' : type === 'holiday' ? '★' : ''}
                 </div>
               ))}
@@ -133,11 +134,13 @@ export const LandingHero = async () => {
 
             {/* Legend */}
             <div className='flex gap-3.5 mt-3 flex-wrap text-[11px]'>
-              {([
-                { type: 'pto' as DayType, label: t('hero.mockupLegendPto') },
-                { type: 'holiday' as DayType, label: t('hero.mockupLegendHoliday') },
-                { type: 'weekend' as DayType, label: t('hero.mockupLegendWeekend') },
-              ] as const).map(({ type, label }) => (
+              {(
+                [
+                  { type: 'pto' as DayType, label: t('hero.mockupLegendPto') },
+                  { type: 'holiday' as DayType, label: t('hero.mockupLegendHoliday') },
+                  { type: 'weekend' as DayType, label: t('hero.mockupLegendWeekend') },
+                ] as const
+              ).map(({ type, label }) => (
                 <span key={label} className='inline-flex items-center gap-1.5'>
                   <span className={`${dayCell[type]} w-4 h-4 inline-block`} />
                   {label}

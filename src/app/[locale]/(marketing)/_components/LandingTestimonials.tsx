@@ -2,7 +2,11 @@ import { Badge } from '@ui/components/primitives/badge';
 import { getTranslations } from 'next-intl/server';
 import { brutCard } from './landing-shared';
 
-const AVATAR_BG = ['bg-[var(--color-brand-teal)]', 'bg-[var(--color-brand-orange)]', 'bg-[var(--color-brand-purple)]'] as const;
+const AVATAR_BG = [
+  'bg-[var(--color-brand-teal)]',
+  'bg-[var(--color-brand-orange)]',
+  'bg-[var(--color-brand-purple)]',
+] as const;
 const ROTATES = ['rotate-[-1deg]', 'rotate-[1deg]', 'rotate-[-0.5deg]'] as const;
 
 export const LandingTestimonials = async () => {
@@ -15,7 +19,8 @@ export const LandingTestimonials = async () => {
           <Badge variant='outline'>{t('testimonials.badge')}</Badge>
         </div>
         <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] text-[clamp(36px,5vw,64px)]'>
-          {t('testimonials.h2Start')} <em className='font-serif italic font-semibold'>{t('testimonials.h2Em')}</em> {t('testimonials.h2End')}
+          {t('testimonials.h2Start')} <em className='font-serif italic font-semibold'>{t('testimonials.h2Em')}</em>{' '}
+          {t('testimonials.h2End')}
         </h2>
       </div>
 
@@ -33,7 +38,9 @@ export const LandingTestimonials = async () => {
               <span
                 className='absolute -top-3.5 left-[18px] bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] px-2.5 font-serif text-[36px] leading-none shadow-[3px_3px_0_0_var(--frame)] rotate-[-5deg]'
                 aria-hidden='true'
-              >&quot;</span>
+              >
+                &quot;
+              </span>
               <div className='text-[#FFB800] tracking-[2px] text-sm mt-2 mb-2.5'>★★★★★</div>
               <p className='font-serif text-[22px] leading-[1.3] mb-4'>{text}</p>
               <div className='flex gap-3 items-center pt-3.5 border-t-[2.5px] border-[var(--frame)]'>

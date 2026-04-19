@@ -559,7 +559,7 @@
     "enterAmount": "Inserisci importo",
     "basePriceNote": "Prezzo base in {currency}. L'importo finale sarà convertito nella tua valuta locale ai tassi di cambio correnti.",
     "havePromoCode": "Hai un codice promozionale?",
-    "promoCodePlaceholder": "INSERISCI_CODICE",
+    "promoCodePlaceholder": "MAGARI_FOSSE_COSÌ_FACILE",
     "continueToPayment": "Continua al Pagamento",
     "processing": "Elaborando..."
   },

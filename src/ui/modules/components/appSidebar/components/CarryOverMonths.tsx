@@ -66,21 +66,23 @@ export const CarryOverMonths = () => {
           </TooltipProvider>
         </label>
         <PremiumFeature feature={t('title')}>
-          <div className='flex gap-2 relative w-full'>
-            <p className='font-normal text-sm mr-0.5'>{MIN_VALUE}</p>
-            <Slider
-              id='carry-over-months'
-              value={[localValue]}
-              max={MAX_VALUE}
-              min={MIN_VALUE}
-              step={1}
-              onValueChange={handleChange}
-            />
-            <SlidingNumber
-              className='absolute -bottom-4 left-0 right-0 mx-auto justify-center font-normal text-sm'
-              number={localValue}
-              padStart
-            />
+          <div className='flex gap-2 items-center w-full'>
+            <p className='font-normal text-sm'>{MIN_VALUE}</p>
+            <div className='relative flex-1'>
+              <Slider
+                id='carry-over-months'
+                value={[localValue]}
+                max={MAX_VALUE}
+                min={MIN_VALUE}
+                step={1}
+                onValueChange={handleChange}
+              />
+              <SlidingNumber
+                className='absolute -bottom-4 left-0 right-0 mx-auto justify-center font-normal text-sm'
+                number={localValue}
+                padStart
+              />
+            </div>
             <p className='font-normal text-sm'>{MAX_VALUE}</p>
           </div>
         </PremiumFeature>

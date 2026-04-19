@@ -77,7 +77,7 @@
   --destructive: #ff5a5f;
   --border: #0e0e0e;
   --input: #fffaf0;
-  --ring: #4ecdc4;
+  --ring: #0e0e0e;
   --chart-1: #4ecdc4;
   --chart-2: #ff7a45;
   --chart-3: #b388ff;
@@ -90,7 +90,7 @@
   --sidebar-accent: #fff0c6;
   --sidebar-accent-foreground: #0e0e0e;
   --sidebar-border: #0e0e0e;
-  --sidebar-ring: #4ecdc4;
+  --sidebar-ring: #0e0e0e;
 }
 
 [data-theme="dark"] {
@@ -131,7 +131,7 @@
   --destructive: #ff5a5f;
   --border: #fff5e1;
   --input: #181410;
-  --ring: #4ecdc4;
+  --ring: #0e0e0e;
   --chart-1: #4ecdc4;
   --chart-2: #ff7a45;
   --chart-3: #b388ff;
@@ -144,7 +144,7 @@
   --sidebar-accent: #2b241e;
   --sidebar-accent-foreground: #fff5e1;
   --sidebar-border: #fff5e1;
-  --sidebar-ring: #4ecdc4;
+  --sidebar-ring: #0e0e0e;
 }
 
 ::selection {

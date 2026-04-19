@@ -1,11 +1,37 @@
 export type DayType = 'work' | 'holiday' | 'pto' | 'weekend';
 
-export const CAL_PATTERN: DayType[] = [
-  'work', 'work', 'work', 'holiday', 'pto', 'weekend', 'weekend',
-  'work', 'work', 'work', 'work', 'work', 'weekend', 'weekend',
-  'holiday', 'pto', 'work', 'work', 'work', 'weekend', 'weekend',
-  'work', 'work', 'work', 'pto', 'holiday', 'weekend', 'weekend',
+const CAL_PATTERN: DayType[] = [
+  'work',
+  'work',
+  'work',
+  'holiday',
+  'pto',
+  'weekend',
+  'weekend',
+  'work',
+  'work',
+  'work',
+  'work',
+  'work',
+  'weekend',
+  'weekend',
+  'holiday',
+  'pto',
+  'work',
+  'work',
+  'work',
+  'weekend',
+  'weekend',
+  'work',
+  'work',
+  'work',
+  'pto',
+  'holiday',
+  'weekend',
+  'weekend',
 ];
+
+export const CAL_ENTRIES = CAL_PATTERN.map((type, i) => ({ id: `d${i + 1}`, type }));
 
 export const DAY_HEADERS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 

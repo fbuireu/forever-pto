@@ -13,7 +13,11 @@ export function ContactButton() {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)} variant='ghost' className='text-sm font-medium px-1.5 py-0.5 h-auto border-[2px] border-transparent rounded-[4px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-foreground transition-all duration-75'>
+      <Button
+        onClick={() => setOpen(true)}
+        variant='ghost'
+        className='text-sm font-medium px-1.5 py-0.5 h-auto border-[2px] border-transparent rounded-[4px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-foreground transition-all duration-75'
+      >
         {t('contactUs')}
       </Button>
       <ContactModal open={open} onClose={() => setOpen(false)} />

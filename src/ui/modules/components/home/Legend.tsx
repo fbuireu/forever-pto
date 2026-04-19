@@ -33,7 +33,9 @@ export const Legend = () => {
                 <span>{t('suggested')}</span>
               </div>
               <div className='flex items-center'>
-                <div className={cn('mr-2 h-8 w-8 rounded-[0.8rem]', MODIFIERS_CLASS_NAMES.alternative, 'animate-none')} />
+                <div
+                  className={cn('mr-2 h-8 w-8 rounded-[0.8rem]', MODIFIERS_CLASS_NAMES.alternative, 'animate-none')}
+                />
                 <span>{t('alternatives')}</span>
               </div>
               <div className='flex items-center'>

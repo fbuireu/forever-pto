@@ -62,7 +62,10 @@ export const SummarySkeleton = () => {
           </div>
           <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3'>
             {Array.from({ length: 6 }).map(() => (
-              <div key={crypto.randomUUID()} className='p-3 bg-[var(--surface-panel-soft)] rounded-[10px] text-center space-y-1'>
+              <div
+                key={crypto.randomUUID()}
+                className='p-3 bg-[var(--surface-panel-soft)] rounded-[10px] text-center space-y-1'
+              >
                 <Skeleton className='w-4 h-4 mx-auto rounded-sm' />
                 <Skeleton className='h-5 w-8 mx-auto' />
                 <Skeleton className='h-3 w-12 mx-auto' />

@@ -127,7 +127,8 @@ export default async function LegalNoticePage({ params }: LegalNoticePageProps) 
         <p>{t('sections.contact.description')}</p>
         <ul className='list-disc pl-6 mt-2 space-y-2'>
           <li>
-            <strong>{t('sections.contact.items.email.label')}</strong> {t('sections.contact.items.email.value', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}
+            <strong>{t('sections.contact.items.email.label')}</strong>{' '}
+            {t('sections.contact.items.email.value', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}
           </li>
         </ul>
       </section>

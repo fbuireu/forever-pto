@@ -291,7 +291,9 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
         <p>{t('sections.governingLaw.jurisdiction.description')}</p>
 
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.governingLaw.disputeResolution.title')}</h3>
-        <p>{t('sections.governingLaw.disputeResolution.description', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}</p>
+        <p>
+          {t('sections.governingLaw.disputeResolution.description', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}
+        </p>
 
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.governingLaw.euOdr.title')}</h3>
         <p>

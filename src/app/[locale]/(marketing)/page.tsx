@@ -3,8 +3,8 @@ import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { LandingComparison } from './_components/LandingComparison';
 import { LandingFaq } from './_components/LandingFaq';
-import { LandingFinalCta } from './_components/LandingFinalCta';
 import { LandingFeatures } from './_components/LandingFeatures';
+import { LandingFinalCta } from './_components/LandingFinalCta';
 import { LandingHero } from './_components/LandingHero';
 import { LandingHowItWorks } from './_components/LandingHowItWorks';
 import { LandingMarquee } from './_components/LandingMarquee';
@@ -46,11 +46,7 @@ export default LandingPage;
 
 // todo: brutalist design (show legend in button, remove old brand, redo logo)
 // todo: 400 and 500 page
-// todo: box shadow on error (include donate)
-// todo: with-in color not teal but black
-// todo: precommit not adding changes when biome it's applied
 // todo: unify styles and check everything
-// todo: each branch to create its own URL in preview
 // todo: html issues (button desc button)
 // todo: improve responsive
 // todo: https://effect.website/

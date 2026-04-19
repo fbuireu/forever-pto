@@ -559,7 +559,7 @@
     "enterAmount": "Introduir quantitat",
     "basePriceNote": "Preu base en {currency}. La quantitat final es convertirà a la teva moneda local segons les taxes de canvi actuals.",
     "havePromoCode": "Tens codi promocional?",
-    "promoCodePlaceholder": "INTRODUEIX_CODI",
+    "promoCodePlaceholder": "JA_T'AGRADARIA",
     "continueToPayment": "Continuar al Pagament",
     "processing": "Processant..."
   },

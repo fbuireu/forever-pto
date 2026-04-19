@@ -560,7 +560,7 @@
     "enterAmount": "Enter amount",
     "basePriceNote": "Base price in {currency}. Final amount will be converted to your local currency at current exchange rates.",
     "havePromoCode": "Have a promo code?",
-    "promoCodePlaceholder": "ENTER_CODE",
+    "promoCodePlaceholder": "YOU_WISH_IT_WAS_THAT_EASY",
     "continueToPayment": "Continue to Payment",
     "processing": "Processing..."
   },

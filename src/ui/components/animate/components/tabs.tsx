@@ -143,7 +143,7 @@ function TabsList({
         role='tablist'
         data-slot='tabs-list'
         className={cn(
-          'bg-[var(--surface-panel-soft)] text-muted-foreground inline-flex h-10 w-fit items-center justify-center rounded-[10px] border-[3px] border-[var(--frame)] p-[3px] shadow-[var(--shadow-brutal-xs)]',
+          'bg-[var(--surface-panel-soft)] gap-1 text-muted-foreground inline-flex h-10 w-fit items-center justify-center rounded-[10px] border-[3px] border-[var(--frame)] p-[3px] shadow-[var(--shadow-brutal-xs)]',
           className
         )}
         {...props}

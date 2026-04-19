@@ -14,16 +14,32 @@ export const LandingFaq = async () => {
       title: t('sections.general.title'),
       items: [
         { id: 'what-is', question: t('sections.general.whatIs.question'), answer: t('sections.general.whatIs.answer') },
-        { id: 'why', question: t('sections.general.whyNotSeeingCountry.question'), answer: t('sections.general.whyNotSeeingCountry.answer') },
-        { id: 'pricing', question: t('sections.general.pricing.question'), answer: t('sections.general.pricing.answer') },
+        {
+          id: 'why',
+          question: t('sections.general.whyNotSeeingCountry.question'),
+          answer: t('sections.general.whyNotSeeingCountry.answer'),
+        },
+        {
+          id: 'pricing',
+          question: t('sections.general.pricing.question'),
+          answer: t('sections.general.pricing.answer'),
+        },
       ],
     },
     {
       id: 'technical',
       title: t('sections.technical.title'),
       items: [
-        { id: 'algorithms', question: t('sections.technical.algorithms.question'), answer: t('sections.technical.algorithms.answer') },
-        { id: 'strategies', question: t('sections.technical.strategies.question'), answer: t('sections.technical.strategies.answer') },
+        {
+          id: 'algorithms',
+          question: t('sections.technical.algorithms.question'),
+          answer: t('sections.technical.algorithms.answer'),
+        },
+        {
+          id: 'strategies',
+          question: t('sections.technical.strategies.question'),
+          answer: t('sections.technical.strategies.answer'),
+        },
       ],
     },
     {
@@ -31,15 +47,27 @@ export const LandingFaq = async () => {
       title: t('sections.security.title'),
       items: [
         { id: 'data', question: t('sections.security.data.question'), answer: t('sections.security.data.answer') },
-        { id: 'encryption', question: t('sections.security.encryption.question'), answer: t('sections.security.encryption.answer') },
+        {
+          id: 'encryption',
+          question: t('sections.security.encryption.question'),
+          answer: t('sections.security.encryption.answer'),
+        },
       ],
     },
     {
       id: 'collaborate',
       title: t('sections.collaborate.title'),
       items: [
-        { id: 'code', question: t('sections.collaborate.code.question'), answer: t('sections.collaborate.code.answer') },
-        { id: 'business', question: t('sections.collaborate.business.question'), answer: t('sections.collaborate.business.answer') },
+        {
+          id: 'code',
+          question: t('sections.collaborate.code.question'),
+          answer: t('sections.collaborate.code.answer'),
+        },
+        {
+          id: 'business',
+          question: t('sections.collaborate.business.question'),
+          answer: t('sections.collaborate.business.answer'),
+        },
       ],
     },
   ];

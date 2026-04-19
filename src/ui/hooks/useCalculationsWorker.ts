@@ -73,8 +73,7 @@ export function useCalculationsWorker() {
       // If ptoDays increased we want the full new budget; otherwise we respect
       // how many days the user has left active (honoring their removals).
       const ptoDaysChanged =
-        lastCalculatedPtoDaysRef.current !== null &&
-        lastCalculatedPtoDaysRef.current !== params.ptoDays;
+        lastCalculatedPtoDaysRef.current !== null && lastCalculatedPtoDaysRef.current !== params.ptoDays;
       const autoSuggestCount =
         !ptoDaysChanged && activeSuggestedDays !== undefined
           ? Math.min(budgetForAutoSuggest, activeSuggestedDays)

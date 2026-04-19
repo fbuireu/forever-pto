@@ -143,7 +143,7 @@ export function DonationForm({
             />
           </CollapsibleTrigger>
           {showPromoCode && (
-            <CollapsibleContent className='pt-2 min-h-15'>
+            <CollapsibleContent className='pt-2 min-h-15 pb-1 px-0.5'>
               <FormField
                 control={form.control}
                 name='promoCode'

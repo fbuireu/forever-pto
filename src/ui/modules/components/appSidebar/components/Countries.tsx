@@ -1,6 +1,6 @@
 import { getCountries } from '@infrastructure/services/countries/getCountries';
-import type { Locale } from 'next-intl';
 import dynamic from 'next/dynamic';
+import type { Locale } from 'next-intl';
 
 const CountriesClient = dynamic(() => import('./CountriesClient').then((m) => m.CountriesClient));
 

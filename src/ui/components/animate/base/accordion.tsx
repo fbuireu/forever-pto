@@ -91,7 +91,7 @@ function AccordionTrigger({
 
   return (
     <AccordionPrimitive.Header data-slot='accordion-header' className='flex'>
-      <AnimateIcon animateOnHover>
+      <AnimateIcon animateOnHover className='flex flex-1'>
         <AccordionPrimitive.Trigger
           ref={triggerRef}
           data-slot='accordion-trigger'

@@ -24,7 +24,7 @@ const CSP = [
   "img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com https://*.stripe.com",
   "font-src 'self'",
   "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://www.googletagmanager.com https://api.stripe.com",
-  "frame-src https://js.stripe.com",
+  'frame-src https://js.stripe.com',
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

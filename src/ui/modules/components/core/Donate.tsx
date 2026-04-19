@@ -188,31 +188,31 @@ export const Donate = () => {
 
   const elementsOptions = useMemo<StripeElementsOptions | undefined>(() => {
     if (!paymentState?.clientSecret) return undefined;
- 
+
     const isDark = resolvedTheme === 'dark';
 
     const t = isDark
       ? {
-          bg: '#1A1612',     // --card
-          bgInput: '#181410',// --input
-          fg: '#FFF5E1',     // --foreground
-          frame: '#FFF5E1',  // --frame
+          bg: '#1A1612', // --card
+          bgInput: '#181410', // --input
+          fg: '#FFF5E1', // --foreground
+          frame: '#FFF5E1', // --frame
           accent: '#FFD93D', // --accent (same in both modes)
           accentText: '#0E0E0E',
-          hover: '#2B241E',  // --secondary
+          hover: '#2B241E', // --secondary
           destructive: '#FF5A5F',
-          muted: '#C6B8A5',  // --muted-foreground
+          muted: '#C6B8A5', // --muted-foreground
         }
       : {
-          bg: '#FFFDF8',     // --card
-          bgInput: '#FFFAF0',// --input
-          fg: '#0E0E0E',     // --foreground
-          frame: '#0E0E0E',  // --frame
+          bg: '#FFFDF8', // --card
+          bgInput: '#FFFAF0', // --input
+          fg: '#0E0E0E', // --foreground
+          frame: '#0E0E0E', // --frame
           accent: '#FFD93D', // --accent
           accentText: '#0E0E0E',
-          hover: '#FFF0C6',  // --secondary
+          hover: '#FFF0C6', // --secondary
           destructive: '#FF5A5F',
-          muted: '#6B5E4E',  // --muted-foreground
+          muted: '#6B5E4E', // --muted-foreground
         };
 
     return {

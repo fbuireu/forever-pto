@@ -51,12 +51,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={cn(
-          bricolage.variable,
-          spaceGrotesk.variable,
-          instrumentSerif.variable,
-          'font-sans antialiased'
-        )}
+        className={cn(bricolage.variable, spaceGrotesk.variable, instrumentSerif.variable, 'font-sans antialiased')}
       >
         <a
           href='#main-content'
