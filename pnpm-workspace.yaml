@@ -2,4 +2,7 @@ packages:
   - ./
 minimumReleaseAge: 4320 #3 days
 onlyBuiltDependencies:
-  - "@biomejs/biome"
+  - '@biomejs/biome'
+  - esbuild
+  - sharp
+  - workerd
