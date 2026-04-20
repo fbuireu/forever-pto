@@ -468,8 +468,7 @@ export function Calendar({
                       : formatDate({ date, locale, format: 'EEEE, MMMM d, yyyy' })
                   }
                   {...(mode === CalendarSelectionMode.NONE && {
-                    tapScale: 1,
-                    hoverScale: 1,
+                    animated: false,
                   })}
                 >
                   {formatDate({ date, locale, format: 'd' })}

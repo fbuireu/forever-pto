@@ -6,17 +6,18 @@ import { Slot, type WithAsChild } from '../animate/slot';
 
 type ButtonProps = WithAsChild<
   HTMLMotionProps<'button'> & {
-    hoverScale?: number;
-    tapScale?: number;
+    animated?: boolean;
   }
 >;
 
-function Button({ hoverScale = 1.05, tapScale = 1, asChild = false, children, ...props }: ButtonProps) {
-  const motionProps = {
-    whileTap: { scale: tapScale },
-    whileHover: { scale: hoverScale },
-    transition: { type: 'spring', stiffness: 400, damping: 30, mass: 0.8 },
-  } as const;
+function Button({ animated = true, asChild = false, children, ...props }: ButtonProps) {
+  const motionProps = animated
+    ? ({
+        whileHover: { x: -2, y: -2, boxShadow: '7px 7px 0 0 var(--frame)' },
+        whileTap: { x: 2, y: 2, boxShadow: '1px 1px 0 0 var(--frame)' },
+        transition: { type: 'spring', stiffness: 500, damping: 25 },
+      } as const)
+    : {};
 
   if (asChild) {
     return (

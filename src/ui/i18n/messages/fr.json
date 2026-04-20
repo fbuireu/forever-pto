@@ -1,1644 +1,1644 @@
 {
   "metadata": {
-    "title": "Forever PTO - Manage your paid time off",
-    "description": "Plan and optimize your holidays and PTO with Forever PTO. Find the best long weekends and maximized time off.",
-    "keywords": "PTO, holidays, time off, vacation, long weekend, paid time off, calendar",
+    "title": "Forever PTO - Gère tes jours de congé",
+    "description": "Planifie et optimise tes vacances et jours de congé avec Forever PTO. Trouve les meilleurs ponts et maximise ton temps libre.",
+    "keywords": "congés, jours fériés, vacances, pont, jours de congé, RTT, calendrier",
     "cookiePolicy": {
-      "title": "Cookie Policy | Forever PTO",
-      "description": "Information about how Forever PTO uses cookies and local storage"
+      "title": "Politique de cookies | Forever PTO",
+      "description": "Informations sur l'utilisation des cookies et du stockage local par Forever PTO"
     },
     "privacyPolicy": {
-      "title": "Privacy Policy | Forever PTO",
-      "description": "Privacy policy and data protection information for Forever PTO"
+      "title": "Politique de confidentialité | Forever PTO",
+      "description": "Politique de confidentialité et protection des données pour Forever PTO"
     },
     "termsOfService": {
-      "title": "Terms of Service | Forever PTO",
-      "description": "Terms and conditions for using Forever PTO"
+      "title": "Conditions d'utilisation | Forever PTO",
+      "description": "Conditions générales d'utilisation de Forever PTO"
     },
     "legalNotice": {
-      "title": "Legal Notice | Forever PTO",
-      "description": "Legal notice and information about Forever PTO"
+      "title": "Mentions légales | Forever PTO",
+      "description": "Mentions légales et informations sur Forever PTO"
     },
     "paymentConfirmation": {
-      "title": "Payment Confirmation | Forever PTO"
+      "title": "Confirmation de paiement | Forever PTO"
     }
   },
   "home": {
     "title": "Forever PTO",
-    "description": "This is the home page where you can find the latest updates and features.",
-    "subtitle": "Your ultimate solution for managing paid time off. Don't work anymore",
-    "instructions": "Start by adding your days on the left sidebar and the rest of your configurations. Still doubts?",
-    "quickTour": "Take a quick tour",
-    "or": "or",
-    "checkFaqs": "check our FAQs"
+    "description": "C'est la page d'accueil où tu peux trouver les dernières mises à jour et fonctionnalités.",
+    "subtitle": "Ta solution ultime pour gérer tes jours de congé. Ne travaille plus",
+    "instructions": "Commence par ajouter tes jours dans la barre latérale gauche et le reste de ta configuration. Encore des doutes ?",
+    "quickTour": "Faire un tour rapide",
+    "or": "ou",
+    "checkFaqs": "consulte notre FAQ"
   },
   "languages": {
-    "en": "English",
-    "es": "Spanish",
+    "en": "Anglais",
+    "es": "Espagnol",
     "ca": "Catalan",
-    "it": "Italian",
+    "it": "Italien",
     "fr": "Français",
     "de": "Allemand"
   },
   "theme": {
-    "light": "Light",
-    "dark": "Dark",
-    "system": "System",
-    "toggleTheme": "Toggle theme"
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système",
+    "toggleTheme": "Changer de thème"
   },
   "summary": {
-    "title": "PTO Summary {year} - {nextYear}",
-    "description": "{ptoDays} vacation days + {holidays} holidays = {effectiveDays} actual days off",
-    "performance": "(+{percentage}% gain)",
+    "title": "Récapitulatif congés {year} - {nextYear}",
+    "description": "{ptoDays} jours de vacances + {holidays} jours fériés = {effectiveDays} jours de repos effectifs",
+    "performance": "(+{percentage}% de gain)",
     "metrics": {
-      "vacationDays": "Vacation days",
-      "days": "days",
-      "holidays": "Holidays",
+      "vacationDays": "Jours de vacances",
+      "days": "jours",
+      "holidays": "Jours fériés",
       "national": "nat.",
-      "regional": "reg.",
-      "custom": "cust.",
-      "effectiveDays": "Actual days off",
-      "extra": "extra",
-      "multiplier": "Multiplier",
+      "regional": "rég.",
+      "custom": "perso.",
+      "effectiveDays": "Jours de repos effectifs",
+      "extra": "supplémentaires",
+      "multiplier": "Multiplicateur",
       "performance": "gain",
-      "longWeekends": "Long weekends",
-      "vacationPeriods": "Vacation periods",
-      "dayOffRatio": "Day/off ratio",
-      "bridgesUsed": "Bridges used",
-      "workdaysPerMonth": "Workdays/month",
-      "longestVacation": "Longest vacation",
-      "advancedMetrics": "Advanced Metrics"
+      "longWeekends": "Longs week-ends",
+      "vacationPeriods": "Périodes de vacances",
+      "dayOffRatio": "Ratio jour/repos",
+      "bridgesUsed": "Ponts utilisés",
+      "workdaysPerMonth": "Jours ouvrés/mois",
+      "longestVacation": "Plus longues vacances",
+      "advancedMetrics": "Métriques avancées"
     },
     "yearSummary": {
-      "feature": "Year Summary",
-      "featureDescription": "Detailed analysis of your days off.",
-      "title": "Year Summary",
-      "firstBreak": "First break",
-      "maxWorkStreak": "Max work streak",
-      "lastBreak": "Last break",
-      "totalBonusDays": "Total bonus days",
-      "daysGained": "days gained by optimizing",
-      "daysCount": "{count, plural, one {day} other {days}}"
+      "feature": "Résumé de l'année",
+      "featureDescription": "Analyse détaillée de tes jours de repos.",
+      "title": "Résumé de l'année",
+      "firstBreak": "Première pause",
+      "maxWorkStreak": "Plus longue série de travail",
+      "lastBreak": "Dernière pause",
+      "totalBonusDays": "Total jours bonus",
+      "daysGained": "jours gagnés grâce à l'optimisation",
+      "daysCount": "{count, plural, one {jour} other {jours}}"
     },
     "summaryParagraph": {
-      "withGain": "With your {ptoDays} vacation days and {totalHolidays} public holidays, the {strategy} strategy turns them into {effectiveDays} effective days off — that's {increment} extra days, a +{percentage}% improvement over simply using them as-is.",
-      "withoutGain": "With your {ptoDays} vacation days and {totalHolidays} public holidays, you get {effectiveDays} effective days off using the {strategy} strategy.",
-      "noRegionHint": "Select your region in the sidebar to include regional holidays and potentially get even more days off.",
-      "withRegion": "{regionalDays} of your holidays are specific to {region}."
+      "withGain": "Avec tes {ptoDays} jours de vacances et {totalHolidays} jours fériés, la stratégie {strategy} les transforme en {effectiveDays} jours de repos effectifs — soit {increment} jours supplémentaires, une amélioration de +{percentage}% par rapport à une utilisation classique.",
+      "withoutGain": "Avec tes {ptoDays} jours de vacances et {totalHolidays} jours fériés, tu obtiens {effectiveDays} jours de repos effectifs avec la stratégie {strategy}.",
+      "noRegionHint": "Sélectionne ta région dans la barre latérale pour inclure les jours fériés régionaux et potentiellement obtenir encore plus de jours de repos.",
+      "withRegion": "{regionalDays} de tes jours fériés sont spécifiques à {region}."
     },
     "notifications": {
       "canImprove": {
-        "title": "You can improve",
-        "message": "There are alternatives that add",
-        "moreDays": "more days",
-        "toYourPlan": "to your plan.",
-        "reviewOptions": "Review available options.",
-        "considerPremium": "Consider Premium for more analysis."
+        "title": "Tu peux améliorer",
+        "message": "Il existe des alternatives qui ajoutent",
+        "moreDays": "jours supplémentaires",
+        "toYourPlan": "à ton planning.",
+        "reviewOptions": "Consulte les options disponibles.",
+        "considerPremium": "Envisage Premium pour plus d'analyses."
       },
       "manualAdjustments": {
-        "title": "Manual adjustments",
-        "added": "You added",
-        "day": "day",
-        "days": "days",
-        "and": "and",
-        "removed": "removed",
-        "fromOriginal": "from the original suggestion."
+        "title": "Ajustements manuels",
+        "added": "Tu as ajouté",
+        "day": "jour",
+        "days": "jours",
+        "and": "et",
+        "removed": "supprimé",
+        "fromOriginal": "de la suggestion d'origine."
       },
       "customHolidays": {
-        "title": "Custom holidays",
-        "youHave": "You have",
-        "holiday": "custom holiday",
-        "holidays": "custom holidays",
-        "improvesPlan": "that improve your plan."
+        "title": "Jours fériés personnalisés",
+        "youHave": "Tu as",
+        "holiday": "jour férié personnalisé",
+        "holidays": "jours fériés personnalisés",
+        "improvesPlan": "qui améliorent ton planning."
       }
     }
   },
   "faq": {
-    "title": "Frequently asked questions",
+    "title": "Questions fréquemment posées",
     "sections": {
       "general": {
-        "title": "General",
+        "title": "Général",
         "whatIs": {
-          "question": "What is this?",
-          "answer": "Forever PTO is a tool to help you plan and optimize your paid time off (PTO) by suggesting the best dates to take off based on public holidays and your preferences. Given the complexity of holiday planning, Forever PTO aims to simplify the process and maximize your free time. Allowing you to choose different strategies to balance your time off throughout the year to maximize your time off. Allowing you to fully customize the holidays, the names of the festivities and even add custom holidays specific to your company or region."
+          "question": "Qu'est-ce que c'est ?",
+          "answer": "Forever PTO est un outil pour t'aider à planifier et optimiser tes jours de congé en suggérant les meilleures dates à poser en fonction des jours fériés et de tes préférences. Vu la complexité de la planification des vacances, Forever PTO vise à simplifier le processus et maximiser ton temps libre. Tu peux choisir différentes stratégies pour équilibrer tes jours de repos tout au long de l'année afin de maximiser ton temps libre. Tu peux aussi personnaliser entièrement les jours fériés, les noms des fêtes et même ajouter des jours fériés spécifiques à ton entreprise ou ta région."
         },
         "howWorks": {
-          "question": "How does it work?"
+          "question": "Comment ça marche ?"
         },
         "whyNotSeeingCountry": {
-          "question": "Why am I not seeing my country or holidays correctly?",
-          "answer": "For simplicity and performance we use a third-party tool to get the bank holidays for a given country and year. It may happen that your country or region is not supported or the data is not up to date. To fix this you can add custom holidays specific to your needs."
+          "question": "Pourquoi je ne vois pas mon pays ou mes jours fériés correctement ?",
+          "answer": "Par souci de simplicité et de performance, nous utilisons un outil tiers pour récupérer les jours fériés d'un pays et d'une année donnés. Il se peut que ton pays ou ta région ne soit pas pris en charge ou que les données ne soient pas à jour. Pour corriger cela, tu peux ajouter des jours fériés personnalisés selon tes besoins."
         },
         "pricing": {
-          "question": "Why is there a paid model?",
-          "answer": "Forever PTO is free. However, we use a paid model to support the costs of maintaining data, infrastructure and continuous improvements. The paid model funds updates, support and hosting. We also offer a free tier with core features to ensure everyone can benefit from better PTO planning. If you want to go ad free and support the project there's a volunteer donation."
+          "question": "Pourquoi y a-t-il un modèle payant ?",
+          "answer": "Forever PTO est gratuit. Cependant, nous utilisons un modèle payant pour couvrir les coûts de maintenance des données, de l'infrastructure et des améliorations continues. Le modèle payant finance les mises à jour, le support et l'hébergement. Nous proposons également un niveau gratuit avec les fonctionnalités essentielles pour que tout le monde puisse bénéficier d'une meilleure planification de ses congés. Si tu veux une version sans publicité et soutenir le projet, il y a un don volontaire."
         },
         "restartTutorial": {
-          "question": "How can I see the interactive tutorial again?"
+          "question": "Comment revoir le tutoriel interactif ?"
         }
       },
       "technical": {
-        "title": "Technical",
+        "title": "Technique",
         "algorithms": {
-          "question": "How does the suggestion algorithm work?",
-          "answer": "The system analyzes available workdays, holidays and user preferences (e.g. avoiding past days) to produce PTO combinations that maximize effective time off. It applies heuristics based on efficiency and scoring to prioritize bridges and grouped days."
+          "question": "Comment fonctionne l'algorithme de suggestion ?",
+          "answer": "Le système analyse les jours ouvrés disponibles, les jours fériés et les préférences de l'utilisateur (par ex. éviter les jours passés) pour produire des combinaisons de congés qui maximisent le temps de repos effectif. Il applique des heuristiques basées sur l'efficacité et un score pour prioriser les ponts et les jours groupés."
         },
         "strategies": {
-          "question": "What is the difference between \"balanced\" and \"optimized\" strategies?",
-          "answer": "Balanced aims to spread time off across the year for steady value, while Optimized focuses on maximizing efficiency (effective days per PTO day) by prioritizing the best ratio combinations."
+          "question": "Quelle est la différence entre les stratégies \"\u00e9quilibrée\" et \"optimisée\" ?",
+          "answer": "\u00c9quilibrée vise à répartir les jours de repos sur toute l'année pour une valeur régulière, tandis qu'Optimisée se concentre sur la maximisation de l'efficacité (jours effectifs par jour de congé) en priorisant les meilleures combinaisons en termes de ratio."
         }
       },
       "security": {
-        "title": "Security & privacy",
+        "title": "Sécurité et confidentialité",
         "data": {
-          "question": "How do you handle my data?",
-          "answer": "We store only the minimum information required to generate suggestions. We do not share data with third parties without consent. See the privacy policy for full details."
+          "question": "Comment gérez-vous mes données ?",
+          "answer": "Nous ne stockons que le minimum d'informations nécessaires pour générer des suggestions. Nous ne partageons pas les données avec des tiers sans consentement. Consulte la politique de confidentialité pour tous les détails."
         },
         "encryption": {
-          "question": "Is my data encrypted?",
-          "answer": "Your vacation planning data is stored locally in your browser. We apply XOR cipher obfuscation to make the data unreadable in casual inspection. This method is designed to prevent accidental exposure, not protect against determined attackers. We don't store sensitive personal information, and you maintain full control of your data on your device. All your data (PTO days, selected dates, custom holidays, preferences) is stored exclusively in your browser's local storage. We never send this information to our servers. Your vacation planning stays completely private on your device."
+          "question": "Mes données sont-elles chiffrées ?",
+          "answer": "Tes données de planification de vacances sont stockées localement dans ton navigateur. Nous appliquons un chiffrement par obfuscation XOR pour rendre les données illisibles lors d'une inspection rapide. Cette méthode est conçue pour éviter une exposition accidentelle, pas pour protéger contre des attaquants déterminés. Nous ne stockons pas d'informations personnelles sensibles, et tu gardes le contrôle total de tes données sur ton appareil. Toutes tes données (jours de congé, dates sélectionnées, jours fériés personnalisés, préférences) sont stockées exclusivement dans le stockage local de ton navigateur. Nous n'envoyons jamais ces informations à nos serveurs. Ta planification de vacances reste entièrement privée sur ton appareil."
         },
         "troubleshooting": {
-          "question": "Troubleshooting & stale client data"
+          "question": "Dépannage et données client obsolètes"
         }
       },
       "collaborate": {
-        "title": "Interested in collaborating?",
+        "title": "Intéressé par une collaboration ?",
         "code": {
-          "question": "How to contribute code or ideas?",
-          "answer": "Open issues or merge requests with proposals. We need help on algorithms, integrations and UX improvements."
+          "question": "Comment contribuer au code ou proposer des idées ?",
+          "answer": "Ouvre des issues ou des merge requests avec tes propositions. Nous avons besoin d'aide sur les algorithmes, les intégrations et les améliorations UX."
         },
         "business": {
-          "question": "Propose integrations or corporate partnerships",
-          "answer": "If you represent a company and want to integrate Forever PTO, contact support or open a proposal for a custom integration."
+          "question": "Proposer des intégrations ou des partenariats d'entreprise",
+          "answer": "Si tu représentes une entreprise et souhaites intégrer Forever PTO, contacte le support ou ouvre une proposition pour une intégration personnalisée."
         }
       }
     }
   },
   "workdayCounter": {
-    "title": "Workday Counter",
-    "tooltip": "Count working days between two dates, automatically excluding weekends and holidays. Useful for project planning and deadline calculations.",
-    "tooltipLabel": "More information about workday counter",
-    "selectRange": "Select Date Range",
-    "clearSelection": "Clear selection",
-    "workingDays": "Working Days",
-    "businessDays": "Business days in selected range",
-    "days": "Days",
-    "weekendDays": "Weekend days",
-    "holidays": "Holidays",
-    "dateRange": "Date Range",
-    "from": "From",
-    "to": "to"
+    "title": "Compteur de jours ouvrés",
+    "tooltip": "Compte les jours ouvrés entre deux dates, en excluant automatiquement les week-ends et jours fériés. Utile pour la planification de projets et le calcul de délais.",
+    "tooltipLabel": "Plus d'informations sur le compteur de jours ouvrés",
+    "selectRange": "Sélectionner une plage de dates",
+    "clearSelection": "Effacer la sélection",
+    "workingDays": "Jours ouvrés",
+    "businessDays": "Jours ouvrés dans la plage sélectionnée",
+    "days": "Jours",
+    "weekendDays": "Jours de week-end",
+    "holidays": "Jours fériés",
+    "dateRange": "Plage de dates",
+    "from": "Du",
+    "to": "au"
   },
   "holidaysTable": {
-    "nationalTab": "National",
-    "regionalTab": "Regional",
-    "customTab": "Custom",
-    "nationalTitle": "National Holidays",
-    "regionalTitle": "Regional Holidays",
-    "customTitle": "Custom Holidays",
-    "customHolidaysFeature": "Custom Holidays",
-    "customHolidaysDescription": "Allows to add custom holidays",
-    "selectAll": "Select all",
-    "partialSelection": "Partial selection - click to select all",
-    "deselectAll": "Deselect all",
-    "searchPlaceholder": "Search holiday...",
-    "noHolidaysFound": "No holidays found",
-    "noHolidays": "No holidays",
-    "allSelected": "All selected",
-    "selected": "selected",
-    "weekend": "Weekend",
-    "onWeekends": "On weekends",
-    "onWorkdays": "On workdays",
-    "showing": "Showing",
-    "of": "of",
-    "total": "total",
-    "addHoliday": "Add Holiday",
-    "add": "Add",
-    "editHoliday": "Edit holiday",
-    "edit": "Edit",
-    "deleteHolidays": "Delete {count} holidays",
-    "delete": "Delete"
+    "nationalTab": "Nationaux",
+    "regionalTab": "Régionaux",
+    "customTab": "Personnalisés",
+    "nationalTitle": "Jours fériés nationaux",
+    "regionalTitle": "Jours fériés régionaux",
+    "customTitle": "Jours fériés personnalisés",
+    "customHolidaysFeature": "Jours fériés personnalisés",
+    "customHolidaysDescription": "Permet d'ajouter des jours fériés personnalisés",
+    "selectAll": "Tout sélectionner",
+    "partialSelection": "Sélection partielle - clique pour tout sélectionner",
+    "deselectAll": "Tout désélectionner",
+    "searchPlaceholder": "Rechercher un jour férié...",
+    "noHolidaysFound": "Aucun jour férié trouvé",
+    "noHolidays": "Aucun jour férié",
+    "allSelected": "Tous sélectionnés",
+    "selected": "sélectionnés",
+    "weekend": "Week-end",
+    "onWeekends": "Les week-ends",
+    "onWorkdays": "Les jours ouvrés",
+    "showing": "Affichage de",
+    "of": "sur",
+    "total": "au total",
+    "addHoliday": "Ajouter un jour férié",
+    "add": "Ajouter",
+    "editHoliday": "Modifier le jour férié",
+    "edit": "Modifier",
+    "deleteHolidays": "Supprimer {count} jours fériés",
+    "delete": "Supprimer"
   },
   "charts": {
-    "daysOffComposition": "Days Off Composition",
-    "daysOffCompositionFeature": "Days Off Composition Chart",
-    "quarterDistribution": "Quarter Distribution",
-    "quarterDistributionFeature": "Quarter Distribution Chart",
-    "days": "days",
-    "daysOff": "Days off",
-    "pto": "PTO",
-    "national": "National",
-    "regional": "Regional",
-    "custom": "Custom",
-    "distributionDescription": "Distribution of your {ptoDays} PTO days, {nationalDays} national holidays{regionalPart}{customPart}.",
-    "regionalPart": ", {regionalDays} regional",
-    "customPart": " and {customDays} custom",
-    "quarterDescription": "Distribution of {totalDays} effective days off across {activeQuarters} quarter{plural} of the year.",
-    "annualTimeline": "Annual Timeline",
-    "annualTimelineFeature": "Annual Timeline Chart",
-    "timelineDescription": "Monthly evolution of {totalDays} days off distributed across {activeMonths} months. Peak in {peakMonth} with {peakDays} days.",
-    "daysOffLabel": "Days off",
-    "longBlocksPerQuarter": "Long Blocks per Quarter",
-    "longBlocksFeature": "Long Blocks per Quarter Chart",
-    "blocksDescription": "{totalBlocks} long blocks (3+ consecutive days) ideal for vacation{bestQuarterPart}.",
-    "bestQuarterPart": ". Best quarter: Q{bestQuarter} with {maxBlocks} block{plural}",
-    "blocks": "blocks",
-    "blocksOf3Days": "Blocks of 3+ days"
+    "daysOffComposition": "Composition des jours de repos",
+    "daysOffCompositionFeature": "Graphique de composition des jours de repos",
+    "quarterDistribution": "Répartition par trimestre",
+    "quarterDistributionFeature": "Graphique de répartition par trimestre",
+    "days": "jours",
+    "daysOff": "Jours de repos",
+    "pto": "Congés",
+    "national": "Nationaux",
+    "regional": "Régionaux",
+    "custom": "Personnalisés",
+    "distributionDescription": "Répartition de tes {ptoDays} jours de congé, {nationalDays} jours fériés nationaux{regionalPart}{customPart}.",
+    "regionalPart": ", {regionalDays} régionaux",
+    "customPart": " et {customDays} personnalisés",
+    "quarterDescription": "Répartition de {totalDays} jours de repos effectifs sur {activeQuarters} trimestre{plural} de l'année.",
+    "annualTimeline": "Chronologie annuelle",
+    "annualTimelineFeature": "Graphique de chronologie annuelle",
+    "timelineDescription": "Évolution mensuelle de {totalDays} jours de repos répartis sur {activeMonths} mois. Pic en {peakMonth} avec {peakDays} jours.",
+    "daysOffLabel": "Jours de repos",
+    "longBlocksPerQuarter": "Blocs longs par trimestre",
+    "longBlocksFeature": "Graphique des blocs longs par trimestre",
+    "blocksDescription": "{totalBlocks} blocs longs (3+ jours consécutifs) idéaux pour les vacances{bestQuarterPart}.",
+    "bestQuarterPart": ". Meilleur trimestre : T{bestQuarter} avec {maxBlocks} bloc{plural}",
+    "blocks": "blocs",
+    "blocksOf3Days": "Blocs de 3+ jours"
   },
   "modals": {
     "addHoliday": {
-      "title": "Add New Holiday",
-      "description": "Create a new holiday by selecting a date and entering a name",
-      "nameLabel": "Holiday Name",
-      "namePlaceholder": "e.g. My birthday",
-      "dateLabel": "Select Date",
-      "selected": "Selected",
-      "submit": "Add Holiday",
-      "submitting": "Adding...",
-      "cancel": "Cancel",
-      "successTitle": "Holiday created successfully",
-      "successDescription": "{name} has been added on {date}",
-      "errorTitle": "Error creating holiday",
-      "errorDescription": "Something went wrong. Please try again.",
-      "existsTitle": "Holiday already exists",
-      "existsDescription": "There's already a holiday on {date}: {name}"
+      "title": "Ajouter un nouveau jour férié",
+      "description": "Crée un nouveau jour férié en sélectionnant une date et en entrant un nom",
+      "nameLabel": "Nom du jour férié",
+      "namePlaceholder": "ex. Mon anniversaire",
+      "dateLabel": "Sélectionner une date",
+      "selected": "Sélectionné",
+      "submit": "Ajouter le jour férié",
+      "submitting": "Ajout en cours...",
+      "cancel": "Annuler",
+      "successTitle": "Jour férié créé avec succès",
+      "successDescription": "{name} a été ajouté le {date}",
+      "errorTitle": "Erreur lors de la création du jour férié",
+      "errorDescription": "Quelque chose s'est mal passé. Veuillez réessayer.",
+      "existsTitle": "Le jour férié existe déjà",
+      "existsDescription": "Il y a déjà un jour férié le {date} : {name}"
     },
     "editHoliday": {
-      "title": "Edit Holiday",
-      "description": "Modify the selected holiday",
-      "submit": "Save Changes",
-      "submitting": "Saving...",
-      "cancel": "Cancel",
-      "successTitle": "Holiday updated successfully",
-      "successDescription": "{name} has been updated",
-      "errorTitle": "Error updating holiday",
-      "errorDescription": "Something went wrong. Please try again."
+      "title": "Modifier le jour férié",
+      "description": "Modifier le jour férié sélectionné",
+      "submit": "Enregistrer les modifications",
+      "submitting": "Enregistrement...",
+      "cancel": "Annuler",
+      "successTitle": "Jour férié mis à jour avec succès",
+      "successDescription": "{name} a été mis à jour",
+      "errorTitle": "Erreur lors de la mise à jour du jour férié",
+      "errorDescription": "Quelque chose s'est mal passé. Veuillez réessayer."
     },
     "deleteHoliday": {
-      "title": "Delete Holidays",
-      "titleSingular": "Delete Holiday",
-      "description": "Are you sure you want to delete {count} holidays? This action cannot be undone.",
-      "descriptionSingular": "Are you sure you want to delete this holiday? This action cannot be undone.",
-      "submit": "Delete",
-      "submitting": "Deleting...",
-      "cancel": "Cancel",
-      "successTitle": "Holidays deleted",
-      "successTitleSingular": "Holiday deleted",
-      "successDescription": "{count} holidays have been removed",
-      "successDescriptionSingular": "The holiday has been removed",
-      "errorTitle": "Error deleting holidays",
-      "errorDescription": "Something went wrong. Please try again."
+      "title": "Supprimer les jours fériés",
+      "titleSingular": "Supprimer le jour férié",
+      "description": "Es-tu sûr de vouloir supprimer {count} jours fériés ? Cette action est irréversible.",
+      "descriptionSingular": "Es-tu sûr de vouloir supprimer ce jour férié ? Cette action est irréversible.",
+      "submit": "Supprimer",
+      "submitting": "Suppression...",
+      "cancel": "Annuler",
+      "successTitle": "Jours fériés supprimés",
+      "successTitleSingular": "Jour férié supprimé",
+      "successDescription": "{count} jours fériés ont été supprimés",
+      "successDescriptionSingular": "Le jour férié a été supprimé",
+      "errorTitle": "Erreur lors de la suppression des jours fériés",
+      "errorDescription": "Quelque chose s'est mal passé. Veuillez réessayer."
     }
   },
   "tutorial": {
-    "description": "Start by entering your PTO details in the left sidebar: your PTO available, your country and your region. We will handle the rest for you. If you still have doubts you can click the following button to start an interactive tutorial.",
-    "startButton": "Start tutorial",
-    "restartButton": "Restart Interactive Tutorial",
-    "restartDescription": "Want to see the interactive tutorial again? Click the button below to restart the guided tour through all the features and settings.",
+    "description": "Commence par entrer tes informations de congés dans la barre latérale gauche : tes jours de congé disponibles, ton pays et ta région. On s'occupe du reste. Si tu as encore des doutes, tu peux cliquer sur le bouton suivant pour lancer un tutoriel interactif.",
+    "startButton": "Démarrer le tutoriel",
+    "restartButton": "Relancer le tutoriel interactif",
+    "restartDescription": "Tu veux revoir le tutoriel interactif ? Clique sur le bouton ci-dessous pour relancer la visite guidée de toutes les fonctionnalités et paramètres.",
     "steps": {
-      "filtersTitle": "Filters & Configuration",
-      "filtersDescription": "Here you can configure all your PTO preferences. Set your available PTO days, select your country and region to get accurate holidays, choose the year, and customize your optimization strategy.",
-      "ptoDaysTitle": "PTO Days",
-      "ptoDaysDescription": "Enter the total number of PTO (Paid Time Off) days you have available for the year. This is the foundation for all calculations and suggestions.",
-      "countryTitle": "Country Selection",
-      "countryDescription": "We infer your country from your CDN by default but can select any desired country. From this value we will fetch the official public holidays to include them in your calendar.",
-      "regionTitle": "Region Selection",
-      "regionDescription": "Some countries have regional holidays. Select your specific region to get the most accurate holiday calendar for your area.",
-      "yearTitle": "Year Selection",
-      "yearDescription": "Choose the year you want to plan for. Holidays and suggestions will be generated for the selected year.",
-      "strategyTitle": "Optimization Strategy",
-      "strategyDescription": "Choose between different strategies to optimize your PTO. Each strategy has a different approach to grouping and maximizing your days off. You can expand the strategy details to learn more about each option.",
-      "allowPastDaysTitle": "Allow Past Days",
-      "allowPastDaysDescription": "Toggle this option if you want to include dates that have already passed in the current year. Useful for planning retrospectively or for next year.",
-      "carryOverTitle": "Carry Over Months",
-      "carryOverDescription": "If your PTO days carry over into the next year, specify how many months they remain valid. This helps you plan PTO usage across year boundaries.",
-      "toolsTitle": "Calculators & Tools",
-      "toolsDescription": "Access helpful calculators here: estimate your PTO based on work history, calculate the monetary value of unused PTO, or count workdays between dates.",
-      "alternativesTitle": "Alternatives Manager",
-      "alternativesDescription": "Navigate through different PTO suggestions generated by us Compare efficiency metrics, total days off, and find the perfect balance. The first option is always our recommended suggestion, marked with a sparkle icon. Use the arrows to explore alternatives and click \"Apply Alternative\" to use a different suggestion.",
-      "statusTitle": "PTO Status Tracker",
-      "statusDescription": "Monitor your PTO allocation in real-time. See auto-assigned days (suggested by our system), manually selected days, and remaining days available. You can reset manual changes anytime to return to the AI suggestion.",
-      "calendarTitle": "Your Interactive PTO Calendar",
-      "calendarDescription": "This is your year-at-a-glance calendar. Holidays appear in gray, AI-suggested PTO days in teal, and manually selected days in blue. Click any working day to manually toggle selection. The calendar updates instantly as you explore different alternatives.",
-      "finishTitle": "You're All Set!",
-      "finishDescription": "Now you know how to use Forever PTO to maximize your time off. Start by configuring your preferences in the sidebar, and let the app suggest the best PTO days for you. Enjoy your well-deserved breaks!",
-      "holidaysListTitle": "Customize Your Holidays",
-      "holidaysListDescription": "Here you can fine-tune the holiday data to match your exact situation. Edit or delete any national or regional holiday, and add your own custom days off — company holidays, local observances, or any date that matters to you. The more accurate the data, the better the suggestions."
+      "filtersTitle": "Filtres et configuration",
+      "filtersDescription": "Ici tu peux configurer toutes tes préférences de congés. Définis tes jours de congé disponibles, sélectionne ton pays et ta région pour obtenir les jours fériés exacts, choisis l'année et personnalise ta stratégie d'optimisation.",
+      "ptoDaysTitle": "Jours de congé",
+      "ptoDaysDescription": "Entre le nombre total de jours de congé dont tu disposes pour l'année. C'est la base de tous les calculs et suggestions.",
+      "countryTitle": "Sélection du pays",
+      "countryDescription": "Nous déduisons ton pays à partir de ton CDN par défaut, mais tu peux sélectionner n'importe quel pays. À partir de cette valeur, nous récupérons les jours fériés officiels pour les inclure dans ton calendrier.",
+      "regionTitle": "Sélection de la région",
+      "regionDescription": "Certains pays ont des jours fériés régionaux. Sélectionne ta région spécifique pour obtenir le calendrier de jours fériés le plus précis pour ta zone.",
+      "yearTitle": "Sélection de l'année",
+      "yearDescription": "Choisis l'année pour laquelle tu veux planifier. Les jours fériés et suggestions seront générés pour l'année sélectionnée.",
+      "strategyTitle": "Stratégie d'optimisation",
+      "strategyDescription": "Choisis entre différentes stratégies pour optimiser tes congés. Chaque stratégie a une approche différente pour regrouper et maximiser tes jours de repos. Tu peux déplier les détails de chaque stratégie pour en savoir plus.",
+      "allowPastDaysTitle": "Autoriser les jours passés",
+      "allowPastDaysDescription": "Active cette option si tu veux inclure les dates déjà passées dans l'année en cours. Utile pour planifier rétrospectivement ou pour l'année prochaine.",
+      "carryOverTitle": "Mois de report",
+      "carryOverDescription": "Si tes jours de congé sont reportés sur l'année suivante, indique combien de mois ils restent valides. Cela t'aide à planifier l'utilisation de tes congés à cheval sur deux années.",
+      "toolsTitle": "Calculateurs et outils",
+      "toolsDescription": "Accède à des calculateurs utiles ici : estime tes congés selon ton historique professionnel, calcule la valeur monétaire de tes congés non utilisés, ou compte les jours ouvrés entre deux dates.",
+      "alternativesTitle": "Gestionnaire d'alternatives",
+      "alternativesDescription": "Navigue parmi différentes suggestions de congés générées par nos soins. Compare les métriques d'efficacité, le total de jours de repos et trouve l'équilibre parfait. La première option est toujours notre suggestion recommandée, marquée d'une icône étoile. Utilise les flèches pour explorer les alternatives et clique sur \"Appliquer l'alternative\" pour utiliser une suggestion différente.",
+      "statusTitle": "Suivi du statut des congés",
+      "statusDescription": "Suis l'allocation de tes congés en temps réel. Vois les jours attribués automatiquement (suggérés par notre système), les jours sélectionnés manuellement et les jours restants. Tu peux réinitialiser les modifications manuelles à tout moment pour revenir à la suggestion IA.",
+      "calendarTitle": "Ton calendrier interactif de congés",
+      "calendarDescription": "Voici ton calendrier annuel en un coup d'œil. Les jours fériés apparaissent en gris, les jours de congé suggérés par l'IA en sarcelle, et les jours sélectionnés manuellement en bleu. Clique sur n'importe quel jour ouvré pour basculer la sélection manuelle. Le calendrier se met à jour instantanément lorsque tu explores différentes alternatives.",
+      "finishTitle": "C'est tout bon !",
+      "finishDescription": "Maintenant tu sais comment utiliser Forever PTO pour maximiser ton temps libre. Commence par configurer tes préférences dans la barre latérale et laisse l'application te suggérer les meilleurs jours de congé. Profite bien de tes pauses méritées !",
+      "holidaysListTitle": "Personnalise tes jours fériés",
+      "holidaysListDescription": "Ici tu peux affiner les données des jours fériés pour qu'elles correspondent exactement à ta situation. Modifie ou supprime n'importe quel jour férié national ou régional, et ajoute tes propres jours de repos — jours fériés d'entreprise, fêtes locales, ou toute date qui compte pour toi. Plus les données sont précises, meilleures sont les suggestions."
     }
   },
   "legend": {
-    "title": "Legend",
-    "today": "Today",
-    "weekends": "Weekends",
-    "holidays": "Holidays",
-    "suggested": "Suggested",
+    "title": "Légende",
+    "today": "Aujourd'hui",
+    "weekends": "Week-ends",
+    "holidays": "Jours fériés",
+    "suggested": "Suggérés",
     "alternatives": "Alternatives",
-    "manual": "Manual",
-    "custom": "Custom"
+    "manual": "Manuel",
+    "custom": "Personnalisés"
   },
   "ptoStatus": {
-    "autoAssigned": "Auto-assigned",
-    "manual": "Manual",
-    "remaining": "Remaining",
-    "clickDays": "Click days to assign/remove",
-    "allAssigned": "All days assigned!",
-    "resetManual": "Reset Manual Changes"
+    "autoAssigned": "Attribués automatiquement",
+    "manual": "Manuel",
+    "remaining": "Restants",
+    "clickDays": "Clique sur les jours pour assigner/retirer",
+    "allAssigned": "Tous les jours sont assignés !",
+    "resetManual": "Réinitialiser les modifications manuelles"
   },
   "contact": {
-    "title": "Contact Us",
-    "description": "Have a question or feedback? We'd love to hear from you!",
-    "name": "Name",
-    "namePlaceholder": "John Doe",
-    "email": "Email",
-    "emailPlaceholder": "your@email.com",
-    "subject": "Subject",
-    "subjectPlaceholder": "What is this about?",
+    "title": "Nous contacter",
+    "description": "Tu as une question ou un retour ? On serait ravis de t'entendre !",
+    "name": "Nom",
+    "namePlaceholder": "Jean Dupont",
+    "email": "E-mail",
+    "emailPlaceholder": "ton@email.com",
+    "subject": "Sujet",
+    "subjectPlaceholder": "De quoi s'agit-il ?",
     "message": "Message",
-    "messagePlaceholder": "Tell us what you need...",
-    "sendMessage": "Send Message",
-    "sending": "Sending...",
-    "cancel": "Cancel",
-    "successTitle": "Message Sent!",
-    "successDescription": "We'll get back to you as soon as possible.",
-    "errorTitle": "There's been an error",
-    "tryAgain": "Try Again",
-    "close": "Close",
-    "failedToSend": "Failed to send message"
+    "messagePlaceholder": "Dis-nous ce dont tu as besoin...",
+    "sendMessage": "Envoyer le message",
+    "sending": "Envoi en cours...",
+    "cancel": "Annuler",
+    "successTitle": "Message envoyé !",
+    "successDescription": "Nous te répondrons dès que possible.",
+    "errorTitle": "Une erreur est survenue",
+    "tryAgain": "Réessayer",
+    "close": "Fermer",
+    "failedToSend": "Échec de l'envoi du message"
   },
   "alternativesManager": {
     "option": "Option",
-    "recommended": "Recommended",
-    "totalOff": "Total Off",
-    "efficiency": "Efficiency",
-    "vsMain": "vs Main",
-    "alreadyApplied": "Already Applied",
-    "applyAlternative": "Apply Alternative",
-    "previousSuggestion": "Previous suggestion",
-    "nextSuggestion": "Next suggestion",
-    "totalDaysOff": "Total Days Off",
-    "comparison": "Comparison"
+    "recommended": "Recommandée",
+    "totalOff": "Total repos",
+    "efficiency": "Efficacité",
+    "vsMain": "vs Principal",
+    "alreadyApplied": "Déjà appliquée",
+    "applyAlternative": "Appliquer l'alternative",
+    "previousSuggestion": "Suggestion précédente",
+    "nextSuggestion": "Suggestion suivante",
+    "totalDaysOff": "Total jours de repos",
+    "comparison": "Comparaison"
   },
   "toasts": {
-    "suggestionApplied": "Suggestion applied successfully",
-    "cannotSelectPastDays": "Cannot select past days",
-    "enablePastDays": "Enable \"Allow past days\" in settings to select past dates",
-    "noPtoDaysRemaining": "No remaining PTO days to assign",
-    "removeDaysToFree": "Remove existing days to free up space",
-    "cannotSelectBankHoliday": "Cannot select a bank holiday",
-    "bankHolidayDescription": "This day is already a national or regional holiday",
-    "paymentFailed": "Payment initialization failed",
-    "paymentFailedDescription": "Please try again later",
-    "paymentSuccess": "Payment successful!",
-    "paymentSuccessDescription": "Thank you for your support! You now have premium access."
+    "suggestionApplied": "Suggestion appliquée avec succès",
+    "cannotSelectPastDays": "Impossible de sélectionner des jours passés",
+    "enablePastDays": "Active \"Autoriser les jours passés\" dans les paramètres pour sélectionner des dates passées",
+    "noPtoDaysRemaining": "Plus de jours de congé restants à assigner",
+    "removeDaysToFree": "Supprime des jours existants pour libérer de la place",
+    "cannotSelectBankHoliday": "Impossible de sélectionner un jour férié",
+    "bankHolidayDescription": "Ce jour est déjà un jour férié national ou régional",
+    "paymentFailed": "Échec de l'initialisation du paiement",
+    "paymentFailedDescription": "Veuillez réessayer plus tard",
+    "paymentSuccess": "Paiement réussi !",
+    "paymentSuccessDescription": "Merci pour ton soutien ! Tu as maintenant un accès premium."
   },
   "troubleshooting": {
-    "description": "If the app behaves unexpectedly it may be caused by stale local data. When the project evolves some stored objects can change shape, causing the client to reuse incompatible structures and fail to revalidate correctly. Clearing local storage forces a fresh state.",
-    "resetButton": "Reset Local Storage",
-    "clearing": "Clearing...",
-    "cleared": "Cleared",
-    "successTitle": "Local storage cleared successfully",
-    "successDescription": "All data has been reset and refreshed from the server.",
-    "errorTitle": "Error clearing local storage",
-    "errorDescription": "Something went wrong while resetting the data. Please try again."
+    "description": "Si l'application se comporte de manière inattendue, cela peut être causé par des données locales obsolètes. Quand le projet évolue, certains objets stockés peuvent changer de structure, ce qui amène le client à réutiliser des structures incompatibles et à ne pas revalider correctement. Vider le stockage local force un état neuf.",
+    "resetButton": "Réinitialiser le stockage local",
+    "clearing": "Nettoyage...",
+    "cleared": "Nettoyé",
+    "successTitle": "Stockage local vidé avec succès",
+    "successDescription": "Toutes les données ont été réinitialisées et rafraîchies depuis le serveur.",
+    "errorTitle": "Erreur lors du nettoyage du stockage local",
+    "errorDescription": "Quelque chose s'est mal passé lors de la réinitialisation des données. Veuillez réessayer."
   },
   "sidebar": {
     "configuration": "Configuration",
-    "filters": "Filters",
-    "tools": "Tools",
-    "calculators": "Calculators",
-    "loading": "Loading...",
-    "toggleSidebar": "Toggle Sidebar",
+    "filters": "Filtres",
+    "tools": "Outils",
+    "calculators": "Calculateurs",
+    "loading": "Chargement...",
+    "toggleSidebar": "Afficher/Masquer la barre latérale",
     "country": {
-      "title": "Country",
-      "tooltip": "This data is inferred from your CDN and your connection. If you feel that it's not accurate or you want a sneak peek into other countries' holidays, you can select it manually here",
-      "tooltipLabel": "More information about country selection",
-      "loading": "Loading countries...",
-      "placeholder": "Select country...",
-      "search": "Search countries..."
+      "title": "Pays",
+      "tooltip": "Cette donnée est déduite de ton CDN et de ta connexion. Si tu trouves que ce n'est pas correct ou si tu veux jeter un œil aux jours fériés d'autres pays, tu peux le sélectionner manuellement ici",
+      "tooltipLabel": "Plus d'informations sur la sélection du pays",
+      "loading": "Chargement des pays...",
+      "placeholder": "Sélectionner un pays...",
+      "search": "Rechercher des pays..."
     },
     "region": {
-      "title": "Region",
-      "loading": "Loading regions...",
-      "placeholder": "Select region...",
-      "search": "Search regions..."
+      "title": "Région",
+      "loading": "Chargement des régions...",
+      "placeholder": "Sélectionner une région...",
+      "search": "Rechercher des régions..."
     },
     "strategy": {
-      "title": "Strategy",
-      "placeholder": "Select strategy...",
-      "search": "Search strategies...",
-      "hide": "Hide",
-      "expand": "Expand",
-      "strategyDetails": "strategy details",
+      "title": "Stratégie",
+      "placeholder": "Sélectionner une stratégie...",
+      "search": "Rechercher des stratégies...",
+      "hide": "Masquer",
+      "expand": "Déplier",
+      "strategyDetails": "détails de la stratégie",
       "grouped": {
-        "label": "Grouped",
-        "description": "Prioritizes long, continuous vacations",
-        "subtitle": "Groups bridge days with consecutive holidays",
+        "label": "Groupée",
+        "description": "Priorise les longues vacances continues",
+        "subtitle": "Regroupe les ponts avec les jours fériés consécutifs",
         "pros": {
-          "0": "Simulates human selection",
-          "1": "Long bridges"
+          "0": "Simule une sélection humaine",
+          "1": "Ponts longs"
         },
         "cons": {
-          "0": "Fewer total days",
-          "1": "Lower efficiency"
+          "0": "Moins de jours au total",
+          "1": "Efficacité plus faible"
         }
       },
       "optimized": {
-        "label": "Optimized",
-        "description": "Maximizes PTO day efficiency",
-        "subtitle": "Get the most days off possible",
+        "label": "Optimisée",
+        "description": "Maximise l'efficacité des jours de congé",
+        "subtitle": "Obtiens le maximum de jours de repos possible",
         "pros": {
-          "0": "Maximum performance",
-          "1": "More total days"
+          "0": "Performance maximale",
+          "1": "Plus de jours au total"
         },
         "cons": {
-          "0": "Short bridges",
-          "1": "Scattered days"
+          "0": "Ponts courts",
+          "1": "Jours éparpillés"
         }
       },
       "balanced": {
-        "label": "Balanced",
-        "description": "Smart balance",
-        "subtitle": "Combines efficiency with grouping",
+        "label": "Équilibrée",
+        "description": "Équilibre intelligent",
+        "subtitle": "Combine efficacité et regroupement",
         "pros": {
           "0": "Flexible",
-          "1": "Medium periods",
-          "2": "Versatile"
+          "1": "Périodes moyennes",
+          "2": "Polyvalente"
         },
         "cons": {
-          "0": "Doesn't maximize",
-          "1": "Intermediate solution"
+          "0": "Ne maximise pas",
+          "1": "Solution intermédiaire"
         }
       }
     },
     "allowPastDays": {
-      "title": "Allow Past Days",
-      "tooltip": "This switch allows you to enable or disable the suggestion of past holidays for the selected year. This lets you see PTO opportunities that were missed in the past",
-      "tooltipLabel": "More information about past days",
-      "enabled": "Enabled",
-      "disabled": "Disabled"
+      "title": "Autoriser les jours passés",
+      "tooltip": "Ce commutateur te permet d'activer ou désactiver la suggestion de jours fériés passés pour l'année sélectionnée. Cela te permet de voir les opportunités de congés manquées par le passé",
+      "tooltipLabel": "Plus d'informations sur les jours passés",
+      "enabled": "Activé",
+      "disabled": "Désactivé"
     },
     "carryOverMonths": {
-      "title": "Carry Over Months",
-      "tooltip": "Allows adding months to the following year to expand opportunity search",
-      "tooltipLabel": "More information about carry over"
+      "title": "Mois de report",
+      "tooltip": "Permet d'ajouter des mois à l'année suivante pour élargir la recherche d'opportunités",
+      "tooltipLabel": "Plus d'informations sur le report"
     },
     "years": {
-      "title": "Year"
+      "title": "Année"
     }
   },
   "ptoDays": {
-    "title": "PTO Days",
-    "iHave": "I have",
-    "days": "days",
-    "status": "PTO Days Status",
-    "autoAssigned": "Auto-assigned:",
-    "manuallySelected": "Manually selected:",
-    "remaining": "Remaining:",
-    "resetManualChanges": "Reset Manual Changes",
-    "allAssigned": "All days assigned!",
-    "clickToAssign": "Click on days in the calendar to manually assign remaining days"
+    "title": "Jours de congé",
+    "iHave": "J'ai",
+    "days": "jours",
+    "status": "Statut des jours de congé",
+    "autoAssigned": "Attribués automatiquement :",
+    "manuallySelected": "Sélectionnés manuellement :",
+    "remaining": "Restants :",
+    "resetManualChanges": "Réinitialiser les modifications manuelles",
+    "allAssigned": "Tous les jours sont assignés !",
+    "clickToAssign": "Clique sur les jours du calendrier pour assigner manuellement les jours restants"
   },
   "ptoCalculator": {
-    "title": "PTO Accumulator",
-    "tooltip": "Calculate your accumulated PTO days based on monthly accrual. Most companies offer 2-3 days per month. Select the target month to see your total available days.",
-    "tooltipLabel": "More information about PTO calculator",
-    "daysPerMonth": "Days per month",
-    "calculateThrough": "Calculate through",
-    "selectMonth": "Select month",
-    "searchMonth": "Search month...",
-    "monthNotFound": "Month not found",
-    "calculate": "Calculate",
-    "result": "Result:",
-    "days": "days",
-    "daysMonth": "days/month",
-    "months": "months",
-    "applyToPtoDays": "Apply to PTO Days"
+    "title": "Cumul de PTO",
+    "tooltip": "Calcule tes jours de congé cumulés en fonction de l'acquisition mensuelle. La plupart des entreprises offrent 2 à 3 jours par mois. Sélectionne le mois cible pour voir le total de jours disponibles.",
+    "tooltipLabel": "Plus d'informations sur le calculateur de PTO",
+    "daysPerMonth": "Jours par mois",
+    "calculateThrough": "Calculer jusqu'à",
+    "selectMonth": "Sélectionner un mois",
+    "searchMonth": "Rechercher un mois...",
+    "monthNotFound": "Mois introuvable",
+    "calculate": "Calculer",
+    "result": "Résultat :",
+    "days": "jours",
+    "daysMonth": "jours/mois",
+    "months": "mois",
+    "applyToPtoDays": "Appliquer aux jours de congé"
   },
   "ptoSalaryCalculator": {
-    "title": "PTO vs Salary Calculator",
-    "tooltip": "Calculate how much paid time off you're giving up by not using your PTO days. You still get your full salary, but you're working days you could have taken as paid vacation.",
-    "tooltipLabel": "More information about salary calculator",
-    "annualSalary": "Annual Salary",
+    "title": "PTO vs Salaire",
+    "tooltip": "Calcule combien de congés payés tu perds en n'utilisant pas tes jours de PTO. Tu reçois toujours ton salaire complet, mais tu travailles des jours que tu aurais pu prendre en vacances payées.",
+    "tooltipLabel": "Plus d'informations sur le calculateur de salaire",
+    "annualSalary": "Salaire annuel",
     "annualSalaryPlaceholder": "50000",
-    "unusedPtoDays": "Unused PTO Days",
+    "unusedPtoDays": "Jours de PTO non utilisés",
     "unusedPtoDaysPlaceholder": "5",
-    "valueOfUnusedPto": "Value of unused PTO:",
-    "worthOfPaidVacation": "Worth of paid vacation not taken",
-    "yourDailyRate": "Your daily rate:",
-    "perDay": "/day",
-    "yourHourlyRate": "Your hourly rate:",
-    "perHour": "/hour",
-    "standardWorkingHours": "Standard working hours",
-    "effectiveHourlyRate": "Effective hourly rate:",
-    "whenWorkingExtraDays": "When working {days} extra unpaid days",
-    "opportunityCost": "Opportunity Cost",
-    "opportunityCostDescription": "You worked {days} days that you could have taken as paid vacation. That's <amount>value</amount> worth of paid time off you gave up. Your salary stays the same, but you worked extra days for free."
+    "valueOfUnusedPto": "Valeur des PTO non utilisés :",
+    "worthOfPaidVacation": "Valeur des congés payés non pris",
+    "yourDailyRate": "Ton taux journalier :",
+    "perDay": "/jour",
+    "yourHourlyRate": "Ton taux horaire :",
+    "perHour": "/heure",
+    "standardWorkingHours": "Heures de travail standard",
+    "effectiveHourlyRate": "Taux horaire effectif :",
+    "whenWorkingExtraDays": "En travaillant {days} jours supplémentaires non payés",
+    "opportunityCost": "Coût d'opportunité",
+    "opportunityCostDescription": "Tu as travaillé {days} jours que tu aurais pu prendre en congés payés. Ça représente <amount>value</amount> de congés payés auxquels tu as renoncé. Ton salaire reste le même, mais tu as travaillé des jours supplémentaires gratuitement."
   },
   "checkout": {
-    "back": "Back",
-    "goBackToDonation": "Go back to donation form",
-    "totalAmount": "Total amount",
-    "expressCheckout": "Express checkout",
-    "orPayWithCard": "Or pay with card",
-    "paymentError": "Payment Error",
-    "paymentFailed": "Payment failed",
-    "processing": "Processing...",
-    "pay": "Pay"
+    "back": "Retour",
+    "goBackToDonation": "Revenir au formulaire de don",
+    "totalAmount": "Montant total",
+    "expressCheckout": "Paiement express",
+    "orPayWithCard": "Ou payer par carte",
+    "paymentError": "Erreur de paiement",
+    "paymentFailed": "Le paiement a échoué",
+    "processing": "Traitement en cours...",
+    "pay": "Payer"
   },
   "donate": {
-    "donateAndUnblock": "Donate & Unblock",
-    "supportAndUnblock": "Support & Unblock",
-    "makeDonation": "Make a donation to support the content and unblock access.",
-    "alreadyPremium": "You are a premium user already. Thank you for your support!"
+    "donateAndUnblock": "Donner et débloquer",
+    "supportAndUnblock": "Soutenir et débloquer",
+    "makeDonation": "Fais un don pour soutenir le contenu et débloquer l'accès.",
+    "alreadyPremium": "Tu es déjà un utilisateur premium. Merci pour ton soutien !"
   },
   "donationForm": {
-    "email": "Email",
-    "emailPlaceholder": "your@email.com",
-    "quickAmounts": "Quick amounts",
-    "donationAmount": "Donation Amount",
-    "enterAmount": "Enter amount",
-    "basePriceNote": "Base price in {currency}. Final amount will be converted to your local currency at current exchange rates.",
-    "havePromoCode": "Have a promo code?",
+    "email": "E-mail",
+    "emailPlaceholder": "ton@email.com",
+    "quickAmounts": "Montants rapides",
+    "donationAmount": "Montant du don",
+    "enterAmount": "Saisir un montant",
+    "basePriceNote": "Prix de base en {currency}. Le montant final sera converti dans ta devise locale au taux de change actuel.",
+    "havePromoCode": "Tu as un code promo ?",
     "promoCodePlaceholder": "SI_SEULEMENT_C'ÉTAIT_SI_SIMPLE",
-    "continueToPayment": "Continue to Payment",
-    "processing": "Processing..."
+    "continueToPayment": "Continuer vers le paiement",
+    "processing": "Traitement en cours..."
   },
   "upgrade": {
-    "premiumRequired": "Premium Feature Required",
-    "featureRequiresPremium": "requires premium access",
-    "verifyDescription": "Don't worry, if you already donate we will check your email against our list and grant you premium access. If you encounter any trouble please don't hesitate to contact us.",
-    "considerDonating": "If you haven't donated yet, please consider doing so to support the project and unlock premium features!",
-    "enterPremiumEmail": "Enter your premium email",
-    "emailPlaceholder": "your@email.com",
-    "verifying": "Verifying...",
-    "verifyAccess": "Verify Access",
-    "cancel": "Cancel",
-    "accessGranted": "Access Granted!",
-    "welcomeToPremium": "Welcome to premium features. You can close this modal or we will do so in 5 seconds.",
-    "accessDenied": "Access Denied",
-    "emailNotFound": "This email is not in our premium users list.",
-    "emailNotFoundError": "Email not found in our premium users list",
-    "tryAgain": "Try Again",
-    "close": "Close",
-    "invalidEmail": "Please enter a valid email address",
-    "emailRequired": "Email is required"
+    "premiumRequired": "Fonctionnalité premium requise",
+    "featureRequiresPremium": "nécessite un accès premium",
+    "verifyDescription": "Pas d'inquiétude, si tu as déjà fait un don, nous vérifierons ton e-mail dans notre liste et t'accorderons l'accès premium. Si tu rencontres un problème, n'hésite pas à nous contacter.",
+    "considerDonating": "Si tu n'as pas encore fait de don, pense à le faire pour soutenir le projet et débloquer les fonctionnalités premium !",
+    "enterPremiumEmail": "Saisis ton e-mail premium",
+    "emailPlaceholder": "ton@email.com",
+    "verifying": "Vérification...",
+    "verifyAccess": "Vérifier l'accès",
+    "cancel": "Annuler",
+    "accessGranted": "Accès accordé !",
+    "welcomeToPremium": "Bienvenue parmi les fonctionnalités premium. Tu peux fermer cette fenêtre ou nous le ferons dans 5 secondes.",
+    "accessDenied": "Accès refusé",
+    "emailNotFound": "Cet e-mail ne figure pas dans notre liste d'utilisateurs premium.",
+    "emailNotFoundError": "E-mail introuvable dans notre liste d'utilisateurs premium",
+    "tryAgain": "Réessayer",
+    "close": "Fermer",
+    "invalidEmail": "Saisis une adresse e-mail valide",
+    "emailRequired": "L'e-mail est requis"
   },
   "validation": {
     "contact": {
-      "invalidEmail": "Please enter a valid email address",
-      "emailRequired": "Email is required",
-      "nameMin": "Name must be at least 2 characters",
-      "nameMax": "Name is too long",
-      "subjectMin": "Subject must be at least 5 characters",
-      "subjectMax": "Subject is too long",
-      "messageMin": "Message must be at least 10 characters",
-      "messageMax": "Message is too long"
+      "invalidEmail": "Saisis une adresse e-mail valide",
+      "emailRequired": "L'e-mail est requis",
+      "nameMin": "Le nom doit contenir au moins 2 caractères",
+      "nameMax": "Le nom est trop long",
+      "subjectMin": "Le sujet doit contenir au moins 5 caractères",
+      "subjectMax": "Le sujet est trop long",
+      "messageMin": "Le message doit contenir au moins 10 caractères",
+      "messageMax": "Le message est trop long"
     },
     "payment": {
-      "amountMin": "Minimum amount is 1",
-      "amountMax": "Maximum amount is 10,000",
-      "invalidEmail": "Valid email is required",
-      "emailRequired": "Email is required"
+      "amountMin": "Le montant minimum est de 1",
+      "amountMax": "Le montant maximum est de 10 000",
+      "invalidEmail": "Un e-mail valide est requis",
+      "emailRequired": "L'e-mail est requis"
     },
     "holiday": {
-      "nameRequired": "Holiday name is required",
-      "nameMax": "Holiday name is too long",
-      "invalidDate": "Please select a valid date"
+      "nameRequired": "Le nom du jour férié est requis",
+      "nameMax": "Le nom du jour férié est trop long",
+      "invalidDate": "Sélectionne une date valide"
     }
   },
   "roadmap": {
-    "title": "Roadmap",
-    "subtitle": "Explore what we've built and what's coming next",
-    "selected": "Selected",
-    "completed": "Completed",
-    "inProgress": "In Progress",
-    "planned": "Planned",
-    "future": "Future",
-    "haveSuggestion": "Have a suggestion?",
-    "feedbackShapes": "Your feedback shapes our roadmap. Share your ideas and help us build the perfect vacation planner.",
-    "gotAnIdea": "Got an idea that would make your life easier?",
-    "letsTalk": "Let's talk",
-    "or": "or",
-    "openIssue": "open an issue on GitHub",
+    "title": "Feuille de route",
+    "subtitle": "Découvre ce que nous avons construit et ce qui arrive bientôt",
+    "selected": "Sélectionné",
+    "completed": "Terminé",
+    "inProgress": "En cours",
+    "planned": "Planifié",
+    "future": "Futur",
+    "haveSuggestion": "Tu as une suggestion ?",
+    "feedbackShapes": "Tes retours façonnent notre feuille de route. Partage tes idées et aide-nous à construire le planificateur de vacances parfait.",
+    "gotAnIdea": "Tu as une idée qui te faciliterait la vie ?",
+    "letsTalk": "Parlons-en",
+    "or": "ou",
+    "openIssue": "ouvre un ticket sur GitHub",
     "features": {
-      "corePtoCalculator": "Core PTO Calculator",
-      "corePtoCalculatorDesc": "Smart vacation planning with holiday optimization and bridge detection",
-      "multipleCountries": "Multiple Countries Support",
-      "multipleCountriesDesc": "Support for holidays across European countries with region-specific rules",
-      "premiumFeatures": "Premium Features",
-      "premiumFeaturesDesc": "Unlock advanced features with one-time payment via Stripe",
-      "customHolidays": "Custom Holidays",
-      "customHolidaysDesc": "Add, edit, and remove custom holidays for personalized planning",
-      "alternativeStrategies": "Alternative Strategies",
-      "alternativeStrategiesDesc": "Multiple vacation planning strategies with efficiency comparison",
-      "analyticsDashboard": "Analytics Dashboard",
-      "analyticsDashboardDesc": "Detailed metrics and insights about your vacation planning",
-      "calendarExport": "Calendar Export",
-      "calendarExportDesc": "Export your vacation plan to Google Calendar, iCal, or Outlook",
-      "teamPlanning": "Team Planning",
-      "teamPlanningDesc": "Coordinate vacation planning with team members to avoid conflicts",
-      "emailNotifications": "Email Notifications",
-      "emailNotificationsDesc": "Get reminders about upcoming vacations and important dates",
-      "mobileApp": "Mobile App",
-      "mobileAppDesc": "Native iOS and Android apps for vacation planning on the go",
-      "aiSuggestions": "AI Suggestions",
-      "aiSuggestionsDesc": "AI-powered recommendations based on your preferences and past patterns",
-      "weatherIntegration": "Weather Integration",
-      "weatherIntegrationDesc": "See weather forecasts for your planned vacation dates",
-      "performanceOptimization": "Performance Optimization",
-      "performanceOptimizationDesc": "Faster calculations and smoother experience powered by Web Workers",
-      "customWeekends": "Custom Weekends",
-      "customWeekendsDesc": "Define custom non-working days beyond the standard Saturday-Sunday weekend",
-      "multiYearPlanning": "Multi-Year Planning",
-      "multiYearPlanningDesc": "Plan vacations across multiple years with carryover support"
+      "corePtoCalculator": "Calculateur PTO principal",
+      "corePtoCalculatorDesc": "Planification intelligente des vacances avec optimisation des jours fériés et détection des ponts",
+      "multipleCountries": "Support multi-pays",
+      "multipleCountriesDesc": "Support des jours fériés dans les pays européens avec des règles spécifiques par région",
+      "premiumFeatures": "Fonctionnalités premium",
+      "premiumFeaturesDesc": "Débloque des fonctionnalités avancées avec un paiement unique via Stripe",
+      "customHolidays": "Jours fériés personnalisés",
+      "customHolidaysDesc": "Ajoute, modifie et supprime des jours fériés personnalisés pour une planification sur mesure",
+      "alternativeStrategies": "Stratégies alternatives",
+      "alternativeStrategiesDesc": "Plusieurs stratégies de planification de vacances avec comparaison d'efficacité",
+      "analyticsDashboard": "Tableau de bord analytique",
+      "analyticsDashboardDesc": "Métriques détaillées et analyses de ta planification de vacances",
+      "calendarExport": "Export calendrier",
+      "calendarExportDesc": "Exporte ton plan de vacances vers Google Calendar, iCal ou Outlook",
+      "teamPlanning": "Planification d'équipe",
+      "teamPlanningDesc": "Coordonne la planification des vacances avec les membres de ton équipe pour éviter les conflits",
+      "emailNotifications": "Notifications par e-mail",
+      "emailNotificationsDesc": "Reçois des rappels pour tes prochaines vacances et dates importantes",
+      "mobileApp": "Application mobile",
+      "mobileAppDesc": "Applications iOS et Android natives pour planifier tes vacances en déplacement",
+      "aiSuggestions": "Suggestions IA",
+      "aiSuggestionsDesc": "Recommandations basées sur l'IA selon tes préférences et habitudes passées",
+      "weatherIntegration": "Intégration météo",
+      "weatherIntegrationDesc": "Consulte les prévisions météo pour tes dates de vacances planifiées",
+      "performanceOptimization": "Optimisation des performances",
+      "performanceOptimizationDesc": "Calculs plus rapides et expérience plus fluide grâce aux Web Workers",
+      "customWeekends": "Week-ends personnalisés",
+      "customWeekendsDesc": "Définis des jours chômés personnalisés au-delà du week-end standard samedi-dimanche",
+      "multiYearPlanning": "Planification pluriannuelle",
+      "multiYearPlanningDesc": "Planifie tes vacances sur plusieurs années avec le support du report"
     }
   },
   "cookies": {
-    "title": "We use cookies",
-    "description": "We use essential cookies for basic website functionality and analytics cookies to understand how you interact with our site.",
-    "rejectAll": "Reject all",
-    "managePreferences": "Manage preferences",
-    "acceptAll": "Accept all",
-    "preferencesTitle": "Cookie preferences",
-    "preferencesDescription": "We use cookies to improve your browsing experience and analyze site traffic. Choose which cookies you want to accept.",
-    "necessaryCookies": "Necessary cookies",
-    "necessaryDescription": "Essential for the website to function. Cannot be disabled.",
-    "cookieDetails": "Cookie details",
-    "analyticsCookies": "Analytics cookies",
-    "analyticsDescription": "Help us understand visitor behavior through anonymous data collection.",
-    "savePreferences": "Save preferences",
-    "months": "months",
-    "year": "year",
-    "years": "years",
+    "title": "Nous utilisons des cookies",
+    "description": "Nous utilisons des cookies essentiels pour le fonctionnement de base du site et des cookies analytiques pour comprendre comment tu interagis avec notre site.",
+    "rejectAll": "Tout refuser",
+    "managePreferences": "Gérer les préférences",
+    "acceptAll": "Tout accepter",
+    "preferencesTitle": "Préférences de cookies",
+    "preferencesDescription": "Nous utilisons des cookies pour améliorer ton expérience de navigation et analyser le trafic du site. Choisis les cookies que tu souhaites accepter.",
+    "necessaryCookies": "Cookies nécessaires",
+    "necessaryDescription": "Essentiels au fonctionnement du site. Ne peuvent pas être désactivés.",
+    "cookieDetails": "Détails des cookies",
+    "analyticsCookies": "Cookies analytiques",
+    "analyticsDescription": "Nous aident à comprendre le comportement des visiteurs grâce à une collecte de données anonyme.",
+    "savePreferences": "Enregistrer les préférences",
+    "months": "mois",
+    "year": "an",
+    "years": "ans",
     "minutes": "minutes",
-    "hours": "hours",
-    "week": "week",
-    "userCountryDesc": "Stores your CDN country location for the initial holiday suggestion.",
-    "ccCookieDesc": "Stores your cookie consent preferences",
-    "stripeMidDesc": "Fraud prevention and detection. Set by Stripe for secure payment processing.",
-    "stripeSidDesc": "Session identifier for fraud prevention. Required for checkout process.",
-    "gaDesc": "Distinguishes unique users.",
-    "gaStarDesc": "Maintains session state for analytics tracking",
-    "gidDesc": "Distinguishes users for short-term analytics",
-    "learnMore": "Learn more",
-    "provider": "Provider: {name}"
+    "hours": "heures",
+    "week": "semaine",
+    "userCountryDesc": "Stocke ta localisation CDN pour la suggestion initiale de jours fériés.",
+    "ccCookieDesc": "Stocke tes préférences de consentement aux cookies",
+    "stripeMidDesc": "Prévention et détection de fraude. Défini par Stripe pour un traitement sécurisé des paiements.",
+    "stripeSidDesc": "Identifiant de session pour la prévention de fraude. Requis pour le processus de paiement.",
+    "gaDesc": "Distingue les utilisateurs uniques.",
+    "gaStarDesc": "Maintient l'état de session pour le suivi analytique",
+    "gidDesc": "Distingue les utilisateurs pour les analyses à court terme",
+    "learnMore": "En savoir plus",
+    "provider": "Fournisseur : {name}"
   },
   "holidayTableHeader": {
-    "holiday": "Holiday",
+    "holiday": "Jour férié",
     "date": "Date",
-    "day": "Day",
+    "day": "Jour",
     "type": "Type",
-    "status": "Status",
-    "region": "Region",
-    "location": "Location"
+    "status": "Statut",
+    "region": "Région",
+    "location": "Localisation"
   },
   "workdayCounterModal": {
-    "selectDateRange": "Select date range"
+    "selectDateRange": "Sélectionner une période"
   },
   "command": {
-    "commandPalette": "Command Palette",
-    "searchPlaceholder": "Search for a command to run..."
+    "commandPalette": "Palette de commandes",
+    "searchPlaceholder": "Rechercher une commande à exécuter..."
   },
   "common": {
-    "loading": "Loading...",
-    "cancel": "Cancel",
-    "close": "Close",
-    "save": "Save",
-    "delete": "Delete",
-    "edit": "Edit",
-    "add": "Add",
-    "submit": "Submit",
-    "processing": "Processing..."
+    "loading": "Chargement...",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "submit": "Envoyer",
+    "processing": "Traitement en cours..."
   },
   "errors": {
     "contact": {
-      "VALIDATION_ERROR": "Invalid input data provided.",
-      "EMAIL_SEND_FAILED": "Failed to send email. Please try again.",
-      "SAVE_FAILED": "We've received your inquiry, though we encountered a minor technical hiccup finishing the logs. No further action is needed on your part.",
-      "RENDER_FAILED": "Failed to prepare email. Please try again.",
-      "UNKNOWN": "An unexpected error occurred. Please try again."
+      "VALIDATION_ERROR": "Données saisies invalides.",
+      "EMAIL_SEND_FAILED": "L'envoi de l'e-mail a échoué. Réessaie.",
+      "SAVE_FAILED": "Nous avons bien reçu ta demande, même si nous avons rencontré un petit problème technique lors de la finalisation des logs. Aucune action supplémentaire n'est nécessaire de ta part.",
+      "RENDER_FAILED": "La préparation de l'e-mail a échoué. Réessaie.",
+      "UNKNOWN": "Une erreur inattendue s'est produite. Réessaie."
     },
     "payment": {
-      "VALIDATION_ERROR": "Invalid input data provided.",
-      "INVALID_PROMO_CODE": "The promotional code is invalid or expired.",
-      "PAYMENT_FAILED": "Payment processing failed.",
-      "SAVE_FAILED": "Payment intent created but failed to save. Please contact support.",
-      "UPDATE_STATUS_FAILED": "Failed to update payment status.",
-      "SAVE_FROM_WEBHOOK_FAILED": "Failed to save payment from webhook.",
-      "CHARGE_UPDATE_FAILED": "Failed to update charge details.",
-      "WEBHOOK_PROCESSING_FAILED": "Failed to process webhook event.",
-      "UNKNOWN": "An unexpected error occurred. Please try again."
+      "VALIDATION_ERROR": "Données saisies invalides.",
+      "INVALID_PROMO_CODE": "Le code promotionnel est invalide ou expiré.",
+      "PAYMENT_FAILED": "Le traitement du paiement a échoué.",
+      "SAVE_FAILED": "L'intention de paiement a été créée mais la sauvegarde a échoué. Contacte le support.",
+      "UPDATE_STATUS_FAILED": "La mise à jour du statut de paiement a échoué.",
+      "SAVE_FROM_WEBHOOK_FAILED": "La sauvegarde du paiement depuis le webhook a échoué.",
+      "CHARGE_UPDATE_FAILED": "La mise à jour des détails du paiement a échoué.",
+      "WEBHOOK_PROCESSING_FAILED": "Le traitement de l'événement webhook a échoué.",
+      "UNKNOWN": "Une erreur inattendue s'est produite. Réessaie."
     }
   },
   "legal": {
-    "lastUpdated": "Last updated: {date}"
+    "lastUpdated": "Dernière mise à jour : {date}"
   },
   "notFound": {
-    "title": "Page not found",
-    "description": "The page you're looking for doesn't exist or has been moved.",
-    "returnHome": "Return to homepage"
+    "title": "Page introuvable",
+    "description": "La page que tu cherches n'existe pas ou a été déplacée.",
+    "returnHome": "Retour à l'accueil"
   },
   "error": {
-    "title": "Something went wrong",
-    "description": "An unexpected error occurred. Please try again.",
-    "retry": "Try again",
-    "returnHome": "Return to homepage"
+    "title": "Quelque chose s'est mal passé",
+    "description": "Une erreur inattendue s'est produite. Réessaie.",
+    "retry": "Réessayer",
+    "returnHome": "Retour à l'accueil"
   },
   "footer": {
-    "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service",
-    "cookiePolicy": "Cookie Policy",
-    "legalNotice": "Legal Notice",
-    "manageCookies": "Manage cookies",
-    "contactUs": "Contact Us",
-    "legalNavigation": "Legal and policy links",
+    "privacyPolicy": "Politique de confidentialité",
+    "termsOfService": "Conditions d'utilisation",
+    "cookiePolicy": "Politique de cookies",
+    "legalNotice": "Mentions légales",
+    "manageCookies": "Gérer les cookies",
+    "contactUs": "Nous contacter",
+    "legalNavigation": "Liens légaux et politiques",
     "copyright": "© 2026 Forever PTO · Fait avec amour depuis un hamac.",
-    "version": "v2.0 · statut: en vacances ●",
+    "version": "v2.0 · statut : en vacances ●",
     "planner": "Planificateur",
-    "statusLine": "statut: en vacances ●"
+    "statusLine": "statut : en vacances ●"
   },
   "accessibility": {
-    "selectLanguage": "Select language, current: {current}",
-    "skipToContent": "Skip to main content"
+    "selectLanguage": "Sélectionner la langue, actuelle : {current}",
+    "skipToContent": "Aller au contenu principal"
   },
   "formButtons": {
-    "submit": "Submit",
-    "processing": "Processing...",
-    "cancel": "Cancel"
+    "submit": "Envoyer",
+    "processing": "Traitement en cours...",
+    "cancel": "Annuler"
   },
   "devFooter": {
-    "madeWith": "Made with",
-    "by": "by",
-    "findMeOn": "You can also find me"
+    "madeWith": "Fait avec",
+    "by": "par",
+    "findMeOn": "Tu peux aussi me trouver"
   },
   "premium": {
-    "selectHoliday": "Select Holiday",
-    "selectAllHolidays": "Select All Holidays",
-    "unlockFeature": "Unlock premium feature: {feature}",
-    "premiumFeature": "Premium feature",
-    "unlockDescription": "Unlock the ability to add/remove suggestions and add/remove remaining days by upgrading to premium.",
-    "upgrade": "Upgrade"
+    "selectHoliday": "Sélectionner un jour férié",
+    "selectAllHolidays": "Sélectionner tous les jours fériés",
+    "unlockFeature": "Débloquer la fonctionnalité premium : {feature}",
+    "premiumFeature": "Fonctionnalité premium",
+    "unlockDescription": "Débloque la possibilité d'ajouter/supprimer des suggestions et d'ajouter/supprimer les jours restants en passant à la version premium.",
+    "upgrade": "Passer à premium"
   },
   "calendar": {
-    "previousMonth": "Previous month",
-    "nextMonth": "Next month"
+    "previousMonth": "Mois précédent",
+    "nextMonth": "Mois suivant"
   },
   "holidayRow": {
-    "weekend": "Weekend",
-    "workday": "Working day",
-    "select": "Select {name}",
-    "editHolidays": "Edit Holidays"
+    "weekend": "Week-end",
+    "workday": "Jour ouvré",
+    "select": "Sélectionner {name}",
+    "editHolidays": "Modifier les jours fériés"
   },
   "paymentConfirmation": {
     "failed": {
-      "title": "Payment Failed",
-      "description": "We couldn't process your payment. You have not been charged.",
-      "whatHappened": "What happened?",
-      "declined": "Your payment may have been declined",
-      "authFailed": "Authentication may have failed",
-      "sessionExpired": "The session may have expired",
-      "returnHome": "Return to homepage"
+      "title": "Paiement échoué",
+      "description": "Nous n'avons pas pu traiter ton paiement. Tu n'as pas été débité.",
+      "whatHappened": "Que s'est-il passé ?",
+      "declined": "Ton paiement a peut-être été refusé",
+      "authFailed": "L'authentification a peut-être échoué",
+      "sessionExpired": "La session a peut-être expiré",
+      "returnHome": "Retour à l'accueil"
     },
     "success": {
-      "title": "Payment Successful!",
-      "thankYou": "Thank you for your support",
-      "amountPaid": "Amount paid",
-      "status": "Status",
-      "confirmed": "Confirmed",
-      "paymentId": "Payment ID",
-      "premiumActivated": "Your premium access has been activated. You can now enjoy all premium features!",
-      "continueHome": "Continue to homepage"
+      "title": "Paiement réussi !",
+      "thankYou": "Merci pour ton soutien",
+      "amountPaid": "Montant payé",
+      "status": "Statut",
+      "confirmed": "Confirmé",
+      "paymentId": "Identifiant de paiement",
+      "premiumActivated": "Ton accès premium a été activé. Tu peux désormais profiter de toutes les fonctionnalités premium !",
+      "continueHome": "Continuer vers l'accueil"
     }
   },
   "legalPages": {
     "cookiePolicy": {
-      "title": "Cookie Policy",
-      "lastUpdated": "Last updated: {date}",
+      "title": "Politique de cookies",
+      "lastUpdated": "Dernière mise à jour : {date}",
       "sections": {
         "introduction": {
           "title": "Introduction",
-          "p1": "This Cookie Policy explains how Forever PTO (<link>https://forever-pto.com</link>) uses cookies and similar technologies. By using our website, you consent to the use of cookies in accordance with this policy.",
-          "p2": "We are committed to transparency about how we collect and use data. This policy provides detailed information about the types of cookies we use, their purpose, and how you can control them."
+          "p1": "Cette Politique de cookies explique comment Forever PTO (<link>https://forever-pto.com</link>) utilise les cookies et technologies similaires. En utilisant notre site, tu consens à l'utilisation de cookies conformément à cette politique.",
+          "p2": "Nous nous engageons à être transparents sur la manière dont nous collectons et utilisons les données. Cette politique fournit des informations détaillées sur les types de cookies que nous utilisons, leur finalité et comment tu peux les contrôler."
         },
         "whatAreCookies": {
-          "title": "What are Cookies?",
-          "p1": "Cookies are small text files that are placed on your device when you visit a website. They are widely used to make websites work more efficiently and provide information to website owners.",
-          "p2": "Cookies can be 'persistent' cookies or 'session' cookies. Persistent cookies remain on your device for a set period. Session cookies are temporary and are deleted when you close your browser."
+          "title": "Que sont les cookies ?",
+          "p1": "Les cookies sont de petits fichiers texte placés sur ton appareil lorsque tu visites un site web. Ils sont largement utilisés pour faire fonctionner les sites plus efficacement et fournir des informations aux propriétaires de sites.",
+          "p2": "Les cookies peuvent être « persistants » ou « de session ». Les cookies persistants restent sur ton appareil pendant une durée définie. Les cookies de session sont temporaires et supprimés lorsque tu fermes ton navigateur."
         },
         "typesOfCookies": {
-          "title": "Types of Cookies We Use",
-          "intro": "Forever PTO does not use:",
+          "title": "Types de cookies que nous utilisons",
+          "intro": "Forever PTO n'utilise pas :",
           "notUsed": {
-            "advertising": "Advertising cookies",
-            "tracking": "Third-party tracking cookies",
-            "analytics": "Analytics cookies for user profiling",
-            "socialMedia": "Social media cookies"
+            "advertising": "Cookies publicitaires",
+            "tracking": "Cookies de suivi tiers",
+            "analytics": "Cookies analytiques pour le profilage des utilisateurs",
+            "socialMedia": "Cookies de réseaux sociaux"
           },
           "strictlyNecessary": {
-            "title": "Strictly Necessary Cookies (Local Storage)",
-            "description": "We use browser local storage to save your preferences and application state. These are essential for the website to function and cannot be disabled:",
+            "title": "Cookies strictement nécessaires (stockage local)",
+            "description": "Nous utilisons le stockage local du navigateur pour enregistrer tes préférences et l'état de l'application. Ceux-ci sont essentiels au fonctionnement du site et ne peuvent pas être désactivés :",
             "items": {
               "filters": {
-                "label": "Filters Storage:",
-                "description": "Stores your selected country, region, and year preferences for holiday filtering."
+                "label": "Stockage des filtres :",
+                "description": "Enregistre tes préférences de pays, région et année pour le filtrage des jours fériés."
               },
               "holidays": {
-                "label": "Holidays Storage:",
-                "description": "Saves your custom holidays and vacation days configuration."
+                "label": "Stockage des jours fériés :",
+                "description": "Sauvegarde ta configuration de jours fériés personnalisés et de jours de congés."
               },
               "location": {
-                "label": "Location Storage:",
-                "description": "Stores your selected location (country and region) for accurate holiday information."
+                "label": "Stockage de la localisation :",
+                "description": "Enregistre ta localisation sélectionnée (pays et région) pour des informations précises sur les jours fériés."
               },
               "premiumKey": {
-                "label": "Premium Key Storage:",
-                "description": "Securely stores your premium access key when you upgrade to Premium."
+                "label": "Stockage de la clé Premium :",
+                "description": "Stocke de manière sécurisée ta clé d'accès premium lorsque tu passes à Premium."
               },
               "theme": {
-                "label": "Theme Preference:",
-                "description": "Saves your light/dark theme preference."
+                "label": "Préférence de thème :",
+                "description": "Sauvegarde ta préférence de thème clair/sombre."
               },
               "calendar": {
-                "label": "Calendar State:",
-                "description": "Stores your calendar view preferences and selected dates."
+                "label": "État du calendrier :",
+                "description": "Enregistre tes préférences d'affichage du calendrier et les dates sélectionnées."
               }
             },
             "duration": {
-              "label": "Duration:",
-              "description": "These are stored permanently in your browser's local storage until you manually clear them."
+              "label": "Durée :",
+              "description": "Ces données sont stockées de façon permanente dans le stockage local de ton navigateur jusqu'à ce que tu les supprimes manuellement."
             }
           }
         },
         "cookieBanner": {
-          "title": "Cookie Consent Banner",
-          "description": "When you first visit Forever PTO, you'll see a cookie consent banner. This allows you to choose which types of cookies you want to accept:",
+          "title": "Bannière de consentement aux cookies",
+          "description": "Lors de ta première visite sur Forever PTO, tu verras une bannière de consentement aux cookies. Elle te permet de choisir quels types de cookies tu souhaites accepter :",
           "items": {
             "strictlyNecessary": {
-              "label": "Strictly Necessary:",
-              "description": "These cannot be disabled as they are essential for the site to work."
+              "label": "Strictement nécessaires :",
+              "description": "Ceux-ci ne peuvent pas être désactivés car ils sont essentiels au fonctionnement du site."
             },
             "analytics": {
-              "label": "Analytics:",
-              "description": "Optional cookies that help us understand how visitors use our site."
+              "label": "Analytiques :",
+              "description": "Cookies optionnels qui nous aident à comprendre comment les visiteurs utilisent notre site."
             }
           },
-          "consentStorage": "Your consent preferences are stored in a cookie called 'cc_cookie' which expires after 6 months."
+          "consentStorage": "Tes préférences de consentement sont stockées dans un cookie appelé « cc_cookie » qui expire au bout de 6 mois."
         },
         "googleConsent": {
           "title": "Google Consent Mode v2",
-          "description": "Forever PTO implements Google Consent Mode v2 to ensure compliance with privacy regulations while maintaining measurement capabilities. This mode allows us to:",
+          "description": "Forever PTO implémente le Google Consent Mode v2 pour assurer la conformité avec les réglementations sur la vie privée tout en maintenant les capacités de mesure. Ce mode nous permet de :",
           "states": {
             "default": {
-              "label": "Default Consent State:",
-              "description": "Before you make a choice, all non-essential tracking is denied by default."
+              "label": "État de consentement par défaut :",
+              "description": "Avant que tu fasses un choix, tout suivi non essentiel est refusé par défaut."
             },
             "grant": {
-              "label": "Consent Grant:",
-              "description": "When you accept analytics cookies, we update consent to allow analytics_storage."
+              "label": "Accord de consentement :",
+              "description": "Lorsque tu acceptes les cookies analytiques, nous mettons à jour le consentement pour autoriser analytics_storage."
             },
             "denial": {
-              "label": "Consent Denial:",
-              "description": "If you reject analytics, only anonymous, aggregated pings are sent to Google without personal data."
+              "label": "Refus de consentement :",
+              "description": "Si tu refuses les analytiques, seuls des pings anonymes et agrégés sont envoyés à Google sans données personnelles."
             },
             "pings": {
-              "label": "Privacy-Safe Pings:",
-              "description": "Even without consent, Google may receive anonymous signals that cannot be used to identify you."
+              "label": "Pings respectueux de la vie privée :",
+              "description": "Même sans consentement, Google peut recevoir des signaux anonymes qui ne peuvent pas être utilisés pour t'identifier."
             }
           },
-          "categoriesIntro": "Consent Mode v2 controls these categories:",
+          "categoriesIntro": "Le Consent Mode v2 contrôle ces catégories :",
           "categories": {
-            "analyticsStorage": "Controls analytics data collection (we set to 'denied' by default until you consent)",
-            "adStorage": "Controls advertising cookies (always 'denied' on Forever PTO)",
-            "adUserData": "Controls sharing user data for advertising (always 'denied')",
-            "adPersonalization": "Controls personalized ads (always 'denied')",
-            "functionalityStorage": "Controls functional cookies (always 'granted' as they're necessary)",
-            "personalizationStorage": "Controls personalization features (always 'granted' for theme/preferences)",
-            "securityStorage": "Controls security-related storage (always 'granted')"
+            "analyticsStorage": "Contrôle la collecte de données analytiques (défini sur « denied » par défaut jusqu'à ton consentement)",
+            "adStorage": "Contrôle les cookies publicitaires (toujours « denied » sur Forever PTO)",
+            "adUserData": "Contrôle le partage de données utilisateur à des fins publicitaires (toujours « denied »)",
+            "adPersonalization": "Contrôle les publicités personnalisées (toujours « denied »)",
+            "functionalityStorage": "Contrôle les cookies fonctionnels (toujours « granted » car nécessaires)",
+            "personalizationStorage": "Contrôle les fonctionnalités de personnalisation (toujours « granted » pour le thème/préférences)",
+            "securityStorage": "Contrôle le stockage lié à la sécurité (toujours « granted »)"
           },
-          "gdprCompliance": "This implementation ensures full GDPR compliance by respecting your privacy choices while allowing basic anonymous measurements."
+          "gdprCompliance": "Cette implémentation assure une conformité totale au RGPD en respectant tes choix de confidentialité tout en permettant des mesures anonymes de base."
         },
         "dataSecurity": {
-          "title": "Data Security",
-          "description": "All data stored in local storage:",
+          "title": "Sécurité des données",
+          "description": "Toutes les données stockées dans le stockage local :",
           "items": {
-            "browserSpecific": "Is stored only in your browser and never transmitted to our servers",
-            "notSynced": "Is not synchronized across devices or browsers",
-            "clearingData": "Can be deleted by clearing your browser data",
-            "noAccess": "Cannot be accessed by us or any third party"
+            "browserSpecific": "Sont stockées uniquement dans ton navigateur et jamais transmises à nos serveurs",
+            "notSynced": "Ne sont pas synchronisées entre les appareils ou navigateurs",
+            "clearingData": "Peuvent être supprimées en effaçant les données de ton navigateur",
+            "noAccess": "Ne sont accessibles ni par nous ni par un tiers"
           }
         },
         "thirdPartyCookies": {
-          "title": "Third-Party Cookies",
-          "description": "When you use certain features of Forever PTO, third-party services may set their own cookies:",
+          "title": "Cookies tiers",
+          "description": "Lorsque tu utilises certaines fonctionnalités de Forever PTO, des services tiers peuvent déposer leurs propres cookies :",
           "items": {
             "payment": {
-              "label": "Stripe (Payment Processing):",
-              "description": "When you purchase Premium, Stripe may set cookies for fraud prevention and payment processing. See Stripe's Cookie Policy."
+              "label": "Stripe (traitement des paiements) :",
+              "description": "Lorsque tu achètes Premium, Stripe peut déposer des cookies pour la prévention de la fraude et le traitement des paiements. Consulte la Politique de cookies de Stripe."
             },
             "holidayApis": {
-              "label": "Holiday APIs:",
-              "description": "We use external APIs to fetch holiday data, but these don't set cookies on our site."
+              "label": "API de jours fériés :",
+              "description": "Nous utilisons des API externes pour récupérer les données de jours fériés, mais celles-ci ne déposent pas de cookies sur notre site."
             }
           },
-          "disclaimer": "We are not responsible for third-party cookies and recommend reviewing their respective cookie policies."
+          "disclaimer": "Nous ne sommes pas responsables des cookies tiers et recommandons de consulter leurs politiques de cookies respectives."
         },
         "managingCookies": {
-          "title": "Managing Cookies",
-          "description": "You have several options to manage cookies and local storage:",
+          "title": "Gestion des cookies",
+          "description": "Tu disposes de plusieurs options pour gérer les cookies et le stockage local :",
           "browserSettings": {
-            "title": "Browser Settings",
-            "description": "All modern browsers allow you to:",
+            "title": "Paramètres du navigateur",
+            "description": "Tous les navigateurs modernes te permettent de :",
             "items": {
-              "view": "View cookies and local storage currently set",
-              "blockAll": "Block all cookies (may affect functionality)",
-              "blockSpecific": "Block specific cookies from certain sites",
-              "deleteOnClose": "Delete cookies when closing the browser"
+              "view": "Voir les cookies et le stockage local actuellement définis",
+              "blockAll": "Bloquer tous les cookies (peut affecter le fonctionnement)",
+              "blockSpecific": "Bloquer des cookies spécifiques de certains sites",
+              "deleteOnClose": "Supprimer les cookies à la fermeture du navigateur"
             },
-            "warning": "Note: Blocking or deleting our local storage will reset all your preferences and custom holidays."
+            "warning": "Remarque : bloquer ou supprimer notre stockage local réinitialisera toutes tes préférences et jours fériés personnalisés."
           },
           "browserInstructions": {
-            "title": "Browser-Specific Instructions",
-            "chrome": "Settings > Privacy and security > Cookies and other site data",
-            "firefox": "Settings > Privacy & Security > Cookies and Site Data",
-            "safari": "Preferences > Privacy > Manage Website Data",
-            "edge": "Settings > Cookies and site permissions > Manage and delete cookies"
+            "title": "Instructions par navigateur",
+            "chrome": "Paramètres > Confidentialité et sécurité > Cookies et autres données de site",
+            "firefox": "Paramètres > Vie privée et sécurité > Cookies et données de sites",
+            "safari": "Préférences > Confidentialité > Gérer les données de sites web",
+            "edge": "Paramètres > Cookies et autorisations de sites > Gérer et supprimer les cookies"
           },
           "inAppManagement": {
-            "title": "In-App Management",
-            "description": "You can click the cookie icon in the footer at any time to review and modify your cookie preferences."
+            "title": "Gestion dans l'application",
+            "description": "Tu peux cliquer sur l'icône de cookie dans le pied de page à tout moment pour consulter et modifier tes préférences de cookies."
           }
         },
         "yourRights": {
-          "title": "Your Rights",
-          "description": "Under GDPR and other privacy laws, you have the right to:",
+          "title": "Tes droits",
+          "description": "En vertu du RGPD et d'autres lois sur la vie privée, tu as le droit de :",
           "items": {
-            "know": "Know what data is stored (all data is visible in browser DevTools > Application > Local Storage)",
-            "access": "Access your data (it's all stored locally on your device)",
-            "delete": "Delete your data (clear browser data or use our app's reset option)",
-            "withdrawConsent": "Withdraw consent for analytics cookies at any time",
-            "object": "Object to data processing (though we process minimal data locally)"
+            "know": "Savoir quelles données sont stockées (toutes les données sont visibles dans les DevTools du navigateur > Application > Stockage local)",
+            "access": "Accéder à tes données (elles sont toutes stockées localement sur ton appareil)",
+            "delete": "Supprimer tes données (effacer les données du navigateur ou utiliser l'option de réinitialisation de l'application)",
+            "withdrawConsent": "Retirer ton consentement pour les cookies analytiques à tout moment",
+            "object": "T'opposer au traitement des données (bien que nous traitions un minimum de données localement)"
           }
         },
         "changes": {
-          "title": "Changes to This Policy",
-          "p1": "We may update this Cookie Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons.",
-          "p2": "We will notify users of any material changes by updating the 'Last updated' date at the top of this policy."
+          "title": "Modifications de cette politique",
+          "p1": "Nous pouvons mettre à jour cette Politique de cookies de temps en temps pour refléter des changements dans nos pratiques ou pour d'autres raisons opérationnelles, juridiques ou réglementaires.",
+          "p2": "Nous informerons les utilisateurs de tout changement important en mettant à jour la date de « Dernière mise à jour » en haut de cette politique."
         },
         "contact": {
-          "title": "Contact Us",
-          "description": "If you have questions about this Cookie Policy, please contact us:",
+          "title": "Nous contacter",
+          "description": "Si tu as des questions sur cette Politique de cookies, contacte-nous :",
           "email": {
-            "label": "Email:",
+            "label": "E-mail :",
             "value": "{supportEmail}"
           },
           "website": {
-            "label": "Website:",
+            "label": "Site web :",
             "value": "{siteUrl}"
           }
         }
       }
     },
     "privacyPolicy": {
-      "title": "Privacy Policy",
-      "lastUpdated": "Last updated: {date}",
+      "title": "Politique de confidentialité",
+      "lastUpdated": "Dernière mise à jour : {date}",
       "sections": {
         "introduction": {
           "title": "Introduction",
-          "p1": "Forever PTO is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and protect your personal data when you use our service.",
-          "p2": "Forever PTO operates on a privacy-first model. We minimize data collection and process most information locally in your browser."
+          "p1": "Forever PTO s'engage à protéger ta vie privée. Cette Politique de confidentialité explique comment nous collectons, utilisons et protégeons tes données personnelles lorsque tu utilises notre service.",
+          "p2": "Forever PTO fonctionne selon un modèle « vie privée d'abord ». Nous minimisons la collecte de données et traitons la plupart des informations localement dans ton navigateur."
         },
         "dataController": {
-          "title": "Data Controller",
-          "description": "The data controller responsible for your personal data is:",
+          "title": "Responsable du traitement",
+          "description": "Le responsable du traitement de tes données personnelles est :",
           "items": {
             "name": {
-              "label": "Name:",
+              "label": "Nom :",
               "value": "Ferran Buireu"
             },
             "email": {
-              "label": "Email:",
+              "label": "E-mail :",
               "value": "{supportEmail}"
             },
             "website": {
-              "label": "Website:",
+              "label": "Site web :",
               "value": "{siteUrl}"
             }
           }
         },
         "dataWeCollect": {
-          "title": "Data We Collect",
+          "title": "Données que nous collectons",
           "localStorage": {
-            "title": "Local Storage Data (Client-Side Only)",
-            "description": "The following data is stored exclusively in your browser's local storage and is never transmitted to our servers:",
+            "title": "Données du stockage local (côté client uniquement)",
+            "description": "Les données suivantes sont stockées exclusivement dans le stockage local de ton navigateur et ne sont jamais transmises à nos serveurs :",
             "items": {
               "settings": {
-                "label": "Application Settings:",
-                "description": "Your selected country, region, year, PTO days, and filter preferences."
+                "label": "Paramètres de l'application :",
+                "description": "Ton pays, ta région, l'année, les jours de congés et tes préférences de filtrage sélectionnés."
               },
               "holidayData": {
-                "label": "Holiday Data:",
-                "description": "Public holidays fetched from external APIs and cached locally."
+                "label": "Données des jours fériés :",
+                "description": "Les jours fériés récupérés depuis des API externes et mis en cache localement."
               },
               "customHolidays": {
-                "label": "Custom Holidays:",
-                "description": "Holidays you manually add to the calendar."
+                "label": "Jours fériés personnalisés :",
+                "description": "Les jours fériés que tu ajoutes manuellement au calendrier."
               },
               "calendarState": {
-                "label": "Calendar State:",
-                "description": "Your selected vacation dates and optimization preferences."
+                "label": "État du calendrier :",
+                "description": "Tes dates de vacances sélectionnées et tes préférences d'optimisation."
               },
               "premiumKey": {
-                "label": "Premium Activation Key:",
-                "description": "If you purchase Premium, your unique activation key is stored locally."
+                "label": "Clé d'activation Premium :",
+                "description": "Si tu achètes Premium, ta clé d'activation unique est stockée localement."
               },
               "theme": {
-                "label": "Theme Preference:",
-                "description": "Your light/dark mode preference."
+                "label": "Préférence de thème :",
+                "description": "Ta préférence de mode clair/sombre."
               },
               "cookieConsent": {
-                "label": "Cookie Consent:",
-                "description": "Your cookie preferences from the cookie banner."
+                "label": "Consentement aux cookies :",
+                "description": "Tes préférences de cookies issues de la bannière de consentement."
               }
             },
             "legalBasis": {
-              "label": "Legal Basis:",
-              "description": "Necessary for providing the service (legitimate interest)."
+              "label": "Base juridique :",
+              "description": "Nécessaire à la fourniture du service (intérêt légitime)."
             },
             "retention": {
-              "label": "Retention:",
-              "description": "Stored until you clear browser data."
+              "label": "Conservation :",
+              "description": "Stockées jusqu'à ce que tu effaces les données du navigateur."
             }
           },
           "payment": {
-            "title": "Payment Information",
-            "description": "When you purchase Premium, we collect minimal payment-related data:",
-            "collectedInfo": "What we collect:",
+            "title": "Informations de paiement",
+            "description": "Lorsque tu achètes Premium, nous collectons un minimum de données liées au paiement :",
+            "collectedInfo": "Ce que nous collectons :",
             "items": {
-              "transactionId": "Transaction ID from Stripe",
-              "activationKey": "Unique activation key generated for your purchase",
-              "email": "Email address (only if you choose to provide it during checkout)"
+              "transactionId": "Identifiant de transaction Stripe",
+              "activationKey": "Clé d'activation unique générée pour ton achat",
+              "email": "Adresse e-mail (uniquement si tu choisis de la fournir lors du paiement)"
             },
             "legalBasis": {
-              "label": "Legal Basis:",
-              "description": "Contract performance and legal obligation."
+              "label": "Base juridique :",
+              "description": "Exécution du contrat et obligation légale."
             },
             "retention": {
-              "label": "Retention:",
-              "description": "Retained for accounting and legal purposes (7 years as required by Spanish law)."
+              "label": "Conservation :",
+              "description": "Conservées à des fins comptables et juridiques (7 ans conformément à la loi espagnole)."
             }
           },
           "analytics": {
-            "title": "Analytics Data (Optional)",
-            "description": "If you consent to analytics cookies, we may collect:",
+            "title": "Données analytiques (optionnel)",
+            "description": "Si tu consens aux cookies analytiques, nous pouvons collecter :",
             "items": {
-              "pagesVisited": "Pages visited and features used",
-              "browserInfo": "Browser type, device type, screen resolution",
-              "location": "Approximate geographic location (country-level)",
-              "interactions": "Interactions with the application (anonymized)"
+              "pagesVisited": "Pages visitées et fonctionnalités utilisées",
+              "browserInfo": "Type de navigateur, type d'appareil, résolution d'écran",
+              "location": "Localisation géographique approximative (niveau pays)",
+              "interactions": "Interactions avec l'application (anonymisées)"
             },
             "legalBasis": {
-              "label": "Legal Basis:",
-              "description": "Consent (which you can withdraw at any time)."
+              "label": "Base juridique :",
+              "description": "Consentement (que tu peux retirer à tout moment)."
             },
             "retention": {
-              "label": "Retention:",
-              "description": "Google Analytics retains data for 14 months by default."
+              "label": "Conservation :",
+              "description": "Google Analytics conserve les données pendant 14 mois par défaut."
             }
           },
           "contact": {
-            "title": "Contact Form Data",
-            "description": "If you contact us via the contact form, we collect your name, email, and message.",
+            "title": "Données du formulaire de contact",
+            "description": "Si tu nous contactes via le formulaire de contact, nous collectons ton nom, ton e-mail et ton message.",
             "legalBasis": {
-              "label": "Legal Basis:",
-              "description": "Legitimate interest in responding to your inquiry."
+              "label": "Base juridique :",
+              "description": "Intérêt légitime à répondre à ta demande."
             },
             "retention": {
-              "label": "Retention:",
-              "description": "Retained for the duration necessary to respond, then deleted."
+              "label": "Conservation :",
+              "description": "Conservées le temps nécessaire pour répondre, puis supprimées."
             }
           }
         },
         "cookiesAndTracking": {
-          "title": "Cookies and Tracking Technologies",
-          "description": "For detailed information about cookies, please see our <link>Cookie Policy</link>."
+          "title": "Cookies et technologies de suivi",
+          "description": "Pour des informations détaillées sur les cookies, consulte notre <link>Politique de cookies</link>."
         },
         "dataSharing": {
-          "title": "Data Sharing",
-          "description": "We do not sell your personal data. We only share data with trusted third parties as necessary:",
+          "title": "Partage des données",
+          "description": "Nous ne vendons pas tes données personnelles. Nous ne partageons des données qu'avec des tiers de confiance lorsque c'est nécessaire :",
           "items": {
             "paymentProcessors": {
-              "label": "Stripe (Payment Processing):",
-              "description": "Handles all payment processing securely. See Stripe's Privacy Policy."
+              "label": "Stripe (traitement des paiements) :",
+              "description": "Gère l'ensemble du traitement des paiements de manière sécurisée. Consulte la Politique de confidentialité de Stripe."
             },
             "holidayProviders": {
-              "label": "Holiday Data Providers:",
-              "description": "We fetch public holiday data from external APIs but do not share your personal information with them."
+              "label": "Fournisseurs de données de jours fériés :",
+              "description": "Nous récupérons les données de jours fériés depuis des API externes mais ne partageons pas tes informations personnelles avec eux."
             },
             "analytics": {
-              "label": "Google Analytics (if consented):",
-              "description": "Processes anonymized usage data. See Google's Privacy Policy."
+              "label": "Google Analytics (si consenti) :",
+              "description": "Traite des données d'utilisation anonymisées. Consulte la Politique de confidentialité de Google."
             },
             "legal": {
-              "label": "Legal Compliance:",
-              "description": "If required by law or to protect our legal rights."
+              "label": "Conformité juridique :",
+              "description": "Si requis par la loi ou pour protéger nos droits légaux."
             }
           }
         },
         "dataSecurity": {
-          "title": "Data Security",
-          "description": "We implement appropriate technical and organizational measures to protect your data:",
+          "title": "Sécurité des données",
+          "description": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger tes données :",
           "items": {
             "encryption": {
-              "label": "Encryption:",
-              "description": "All data transmitted to our servers uses HTTPS/TLS encryption."
+              "label": "Chiffrement :",
+              "description": "Toutes les données transmises à nos serveurs utilisent le chiffrement HTTPS/TLS."
             },
             "localStorage": {
-              "label": "Local Storage:",
-              "description": "Most data never leaves your device and is stored locally in your browser."
+              "label": "Stockage local :",
+              "description": "La plupart des données ne quittent jamais ton appareil et sont stockées localement dans ton navigateur."
             },
             "https": {
-              "label": "Secure Infrastructure:",
-              "description": "Our website is hosted on secure, reputable platforms (Cloudflare)."
+              "label": "Infrastructure sécurisée :",
+              "description": "Notre site web est hébergé sur des plateformes sécurisées et réputées (Cloudflare)."
             },
             "minimalCollection": {
-              "label": "Minimal Data Collection:",
-              "description": "We only collect data that is strictly necessary for the service."
+              "label": "Collecte minimale de données :",
+              "description": "Nous ne collectons que les données strictement nécessaires au service."
             }
           },
-          "disclaimer": "While we strive to protect your data, no method of transmission over the internet is 100% secure."
+          "disclaimer": "Bien que nous nous efforcions de protéger tes données, aucune méthode de transmission sur Internet n'est sécurisée à 100 %."
         },
         "yourRights": {
-          "title": "Your Rights",
-          "description": "Under GDPR and other data protection laws, you have the following rights:",
+          "title": "Tes droits",
+          "description": "En vertu du RGPD et d'autres lois sur la protection des données, tu disposes des droits suivants :",
           "items": {
             "access": {
-              "label": "Right to Access:",
-              "description": "You can request a copy of the personal data we hold about you."
+              "label": "Droit d'accès :",
+              "description": "Tu peux demander une copie des données personnelles que nous détenons te concernant."
             },
             "rectification": {
-              "label": "Right to Rectification:",
-              "description": "You can request corrections to inaccurate or incomplete data."
+              "label": "Droit de rectification :",
+              "description": "Tu peux demander la correction de données inexactes ou incomplètes."
             },
             "erasure": {
-              "label": "Right to Erasure ('Right to be Forgotten'):",
-              "description": "You can request deletion of your personal data."
+              "label": "Droit à l'effacement (« droit à l'oubli ») :",
+              "description": "Tu peux demander la suppression de tes données personnelles."
             },
             "restrict": {
-              "label": "Right to Restrict Processing:",
-              "description": "You can request restriction of processing your data under certain conditions."
+              "label": "Droit à la limitation du traitement :",
+              "description": "Tu peux demander la limitation du traitement de tes données sous certaines conditions."
             },
             "portability": {
-              "label": "Right to Data Portability:",
-              "description": "You can request your data in a structured, machine-readable format."
+              "label": "Droit à la portabilité des données :",
+              "description": "Tu peux demander tes données dans un format structuré et lisible par machine."
             },
             "object": {
-              "label": "Right to Object:",
-              "description": "You can object to processing based on legitimate interests or for direct marketing."
+              "label": "Droit d'opposition :",
+              "description": "Tu peux t'opposer au traitement fondé sur l'intérêt légitime ou à des fins de prospection commerciale."
             },
             "withdrawConsent": {
-              "label": "Right to Withdraw Consent:",
-              "description": "You can withdraw consent for analytics cookies at any time."
+              "label": "Droit de retrait du consentement :",
+              "description": "Tu peux retirer ton consentement aux cookies analytiques à tout moment."
             },
             "complaint": {
-              "label": "Right to Lodge a Complaint:",
-              "description": "You can file a complaint with the Spanish Data Protection Authority (AEPD) or your local supervisory authority."
+              "label": "Droit d'introduire une réclamation :",
+              "description": "Tu peux déposer une réclamation auprès de la CNIL (Commission nationale de l'informatique et des libertés) en France, de l'AEPD (Agencia Española de Protección de Datos) en Espagne, ou de toute autorité de contrôle compétente."
             }
           },
-          "contact": "To exercise these rights, contact us at {supportEmail}."
+          "contact": "Pour exercer ces droits, contacte-nous à {supportEmail}."
         },
         "internationalTransfers": {
-          "title": "International Data Transfers",
-          "p1": "Your data may be transferred to and processed in countries outside the European Economic Area (EEA), particularly the United States (Google Analytics, Stripe).",
-          "p2": "We ensure appropriate safeguards are in place, including Standard Contractual Clauses and adherence to the EU-U.S. Data Privacy Framework where applicable."
+          "title": "Transferts internationaux de données",
+          "p1": "Tes données peuvent être transférées et traitées dans des pays situés en dehors de l'Espace économique européen (EEE), notamment les États-Unis (Google Analytics, Stripe).",
+          "p2": "Nous veillons à ce que des garanties appropriées soient en place, y compris les clauses contractuelles types et le respect du cadre de protection des données UE–États-Unis le cas échéant."
         },
         "childrensPrivacy": {
-          "title": "Children's Privacy",
-          "p1": "Forever PTO is not intended for children under 16 years of age. We do not knowingly collect personal data from children.",
-          "p2": "If we become aware that we have collected data from a child under 16, we will take steps to delete that information promptly."
+          "title": "Protection des mineurs",
+          "p1": "Forever PTO n'est pas destiné aux enfants de moins de 16 ans. Nous ne collectons pas sciemment de données personnelles auprès d'enfants.",
+          "p2": "Si nous apprenons que nous avons collecté des données d'un enfant de moins de 16 ans, nous prendrons des mesures pour supprimer ces informations rapidement."
         },
         "changes": {
-          "title": "Changes to This Privacy Policy",
-          "p1": "We may update this Privacy Policy from time to time to reflect changes in our practices, legal requirements, or service features.",
-          "p2": "We will notify users of material changes by updating the 'Last updated' date at the top of this policy.",
-          "p3": "Continued use of Forever PTO after changes constitutes acceptance of the updated policy."
+          "title": "Modifications de cette politique de confidentialité",
+          "p1": "Nous pouvons mettre à jour cette Politique de confidentialité de temps en temps pour refléter des changements dans nos pratiques, exigences légales ou fonctionnalités du service.",
+          "p2": "Nous informerons les utilisateurs des changements importants en mettant à jour la date de « Dernière mise à jour » en haut de cette politique.",
+          "p3": "L'utilisation continue de Forever PTO après les modifications vaut acceptation de la politique mise à jour."
         },
         "dataBreach": {
-          "title": "Data Breach Notification",
-          "description": "In the unlikely event of a data breach affecting your personal data, we will notify you and the relevant supervisory authorities within 72 hours as required by GDPR."
+          "title": "Notification de violation de données",
+          "description": "Dans le cas peu probable d'une violation de données affectant tes données personnelles, nous te notifierons ainsi que les autorités de contrôle compétentes dans les 72 heures, conformément au RGPD."
         },
         "contactInfo": {
-          "title": "Contact Information",
-          "description": "If you have questions about this Privacy Policy or wish to exercise your rights, please contact us:",
+          "title": "Informations de contact",
+          "description": "Si tu as des questions sur cette Politique de confidentialité ou souhaites exercer tes droits, contacte-nous :",
           "items": {
             "email": {
-              "label": "Email:",
+              "label": "E-mail :",
               "value": "{supportEmail}"
             },
             "website": {
-              "label": "Website:",
+              "label": "Site web :",
               "value": "{siteUrl}"
             }
           },
-          "responseTime": "We will respond to your inquiries within 30 days."
+          "responseTime": "Nous répondrons à tes demandes dans un délai de 30 jours."
         }
       }
     },
     "termsOfService": {
-      "title": "Terms of Service",
-      "lastUpdated": "Last updated: {date}",
+      "title": "Conditions générales d'utilisation",
+      "lastUpdated": "Dernière mise à jour : {date}",
       "sections": {
         "acceptance": {
-          "title": "Acceptance of Terms",
-          "p1": "By accessing or using Forever PTO (the 'Service'), you agree to be bound by these Terms of Service ('Terms'). If you do not agree to these Terms, please do not use the Service.",
-          "p2": "These Terms constitute a legally binding agreement between you and Ferran Buireu, the operator of Forever PTO."
+          "title": "Acceptation des conditions",
+          "p1": "En accédant ou en utilisant Forever PTO (le « Service »), tu acceptes d'être lié par ces Conditions générales d'utilisation (« Conditions »). Si tu n'acceptes pas ces Conditions, merci de ne pas utiliser le Service.",
+          "p2": "Ces Conditions constituent un accord juridiquement contraignant entre toi et Ferran Buireu, l'exploitant de Forever PTO."
         },
         "serviceDescription": {
-          "title": "Service Description",
-          "description": "Forever PTO is a web-based tool that helps users plan and optimize their paid time off (PTO) by suggesting optimal vacation dates based on public holidays. The Service is available in two versions:",
+          "title": "Description du service",
+          "description": "Forever PTO est un outil web qui aide les utilisateurs à planifier et optimiser leurs congés payés en suggérant des dates de vacances optimales basées sur les jours fériés. Le Service est disponible en deux versions :",
           "freeVersion": {
-            "title": "Free Version",
-            "description": "The free version provides:",
+            "title": "Version gratuite",
+            "description": "La version gratuite propose :",
             "items": {
-              "optimization": "Basic PTO optimization based on public holidays",
-              "visualization": "Calendar visualization of holidays and vacation days",
-              "customHolidays": "Ability to add custom holidays",
-              "metrics": "Basic metrics and summary statistics",
-              "strategy": "Selection of different optimization strategies"
+              "optimization": "Optimisation de base des congés basée sur les jours fériés",
+              "visualization": "Visualisation calendaire des jours fériés et des jours de congés",
+              "customHolidays": "Possibilité d'ajouter des jours fériés personnalisés",
+              "metrics": "Statistiques et indicateurs de base",
+              "strategy": "Sélection de différentes stratégies d'optimisation"
             }
           },
           "premiumVersion": {
-            "title": "Premium Version",
-            "description": "The Premium version includes all free features plus:",
+            "title": "Version Premium",
+            "description": "La version Premium inclut toutes les fonctionnalités gratuites plus :",
             "items": {
-              "advancedMetrics": "Advanced metrics and year summary analysis",
-              "charts": "Visual charts and graphs",
-              "efficiency": "PTO efficiency scoring and insights",
-              "strategies": "Multiple optimization strategies with comparisons",
-              "alternatives": "Alternative vacation planning suggestions",
-              "analysis": "In-depth analysis of vacation patterns",
-              "customization": "Enhanced customization options"
+              "advancedMetrics": "Indicateurs avancés et analyse du bilan annuel",
+              "charts": "Graphiques et diagrammes visuels",
+              "efficiency": "Score d'efficacité des congés et analyses",
+              "strategies": "Multiples stratégies d'optimisation avec comparaisons",
+              "alternatives": "Suggestions alternatives de planification de vacances",
+              "analysis": "Analyse approfondie des schémas de vacances",
+              "customization": "Options de personnalisation avancées"
             }
           }
         },
         "eligibility": {
-          "title": "Eligibility",
-          "p1": "By using Forever PTO, you represent and warrant that:",
-          "p2": "We reserve the right to refuse service to anyone for any reason at any time.",
+          "title": "Éligibilité",
+          "p1": "En utilisant Forever PTO, tu déclares et garantis que :",
+          "p2": "Nous nous réservons le droit de refuser le service à quiconque, pour quelque raison que ce soit, à tout moment.",
           "items": {
-            "age": "You are at least 18 years of age",
-            "legalCapacity": "You have the legal capacity to enter into binding contracts",
-            "compliance": "Your use of the Service will comply with all applicable laws and regulations",
-            "lawfulUse": "You will use the Service for lawful purposes only"
+            "age": "Tu as au moins 18 ans",
+            "legalCapacity": "Tu as la capacité juridique de conclure des contrats contraignants",
+            "compliance": "Ton utilisation du Service sera conforme à toutes les lois et réglementations applicables",
+            "lawfulUse": "Tu utiliseras le Service uniquement à des fins légales"
           }
         },
         "premiumPayments": {
-          "title": "Premium Version and Payments",
+          "title": "Version Premium et paiements",
           "activation": {
-            "title": "Premium Activation",
-            "description": "The Premium version requires a one-time payment processed securely through Stripe. Upon successful payment:",
-            "characteristics": "Premium access is characterized by:",
+            "title": "Activation Premium",
+            "description": "La version Premium nécessite un paiement unique traité de manière sécurisée via Stripe. Après un paiement réussi :",
+            "characteristics": "L'accès Premium se caractérise par :",
             "items": {
-              "oneTime": "One-time payment (no recurring subscription)",
-              "lifetime": "Lifetime access to Premium features",
-              "personal": "Personal, non-transferable license",
-              "multiDevice": "Can be activated on multiple devices using your unique key"
+              "oneTime": "Paiement unique (pas d'abonnement récurrent)",
+              "lifetime": "Accès à vie aux fonctionnalités Premium",
+              "personal": "Licence personnelle et non transférable",
+              "multiDevice": "Peut être activé sur plusieurs appareils avec ta clé unique"
             }
           },
           "pricing": {
-            "title": "Pricing",
-            "p1": "Pricing for Premium access is displayed at the time of purchase and may vary based on promotions or currency fluctuations.",
-            "p2": "All prices are clearly stated before you complete the payment process."
+            "title": "Tarification",
+            "p1": "Le prix de l'accès Premium est affiché au moment de l'achat et peut varier en fonction des promotions ou des fluctuations de devises.",
+            "p2": "Tous les prix sont clairement indiqués avant de finaliser le paiement."
           },
           "processing": {
-            "title": "Payment Processing",
-            "description": "Payments are processed securely by Stripe, a third-party payment processor. We do not store your full credit card information.",
+            "title": "Traitement des paiements",
+            "description": "Les paiements sont traités de manière sécurisée par Stripe, un prestataire de paiement tiers. Nous ne stockons pas tes informations complètes de carte bancaire.",
             "items": {
-              "other": "By making a payment, you agree to Stripe's Terms of Service and Privacy Policy."
+              "other": "En effectuant un paiement, tu acceptes les Conditions d'utilisation et la Politique de confidentialité de Stripe."
             },
-            "p1": "Upon successful payment, you will receive a unique activation key.",
-            "p2": "It is your responsibility to keep this key secure and not share it with others."
+            "p1": "Après un paiement réussi, tu recevras une clé d'activation unique.",
+            "p2": "Il est de ta responsabilité de conserver cette clé en sécurité et de ne pas la partager avec d'autres."
           },
           "keySecurity": {
-            "title": "Activation Key Security",
-            "p1": "Your Premium activation key is personal and confidential. Sharing or selling your activation key to others is strictly prohibited and constitutes a breach of these Terms.",
-            "p2": "If we detect unauthorized use or sharing of activation keys, we reserve the right to deactivate the key without refund."
+            "title": "Sécurité de la clé d'activation",
+            "p1": "Ta clé d'activation Premium est personnelle et confidentielle. Le partage ou la vente de ta clé d'activation à des tiers est strictement interdit et constitue une violation de ces Conditions.",
+            "p2": "Si nous détectons une utilisation non autorisée ou un partage de clés d'activation, nous nous réservons le droit de désactiver la clé sans remboursement."
           }
         },
         "refundPolicy": {
-          "title": "Refund Policy",
+          "title": "Politique de remboursement",
           "eligibility": {
-            "title": "Refund Eligibility",
-            "description": "We offer refunds under the following circumstances:",
+            "title": "Éligibilité au remboursement",
+            "description": "Nous proposons des remboursements dans les cas suivants :",
             "items": {
-              "technical": "Technical issues preventing you from using Premium features (provided we cannot resolve the issue within a reasonable time)",
-              "notAsDescribed": "Premium features are not as described",
-              "accidental": "Accidental purchase (must be requested within 24 hours)",
-              "notSatisfied": "You are not satisfied with Premium features (within 14 days of purchase, in accordance with EU consumer protection laws)"
+              "technical": "Problèmes techniques t'empêchant d'utiliser les fonctionnalités Premium (à condition que nous ne puissions pas résoudre le problème dans un délai raisonnable)",
+              "notAsDescribed": "Les fonctionnalités Premium ne correspondent pas à leur description",
+              "accidental": "Achat accidentel (la demande doit être faite dans les 24 heures)",
+              "notSatisfied": "Tu n'es pas satisfait des fonctionnalités Premium (dans les 14 jours suivant l'achat, conformément aux lois européennes de protection des consommateurs)"
             }
           },
           "exclusions": {
-            "title": "Refund Exclusions",
-            "description": "Refunds will NOT be granted in the following cases:",
+            "title": "Exclusions de remboursement",
+            "description": "Les remboursements NE seront PAS accordés dans les cas suivants :",
             "items": {
-              "timePassed": "More than 14 days have passed since the purchase (unless covered by statutory rights)",
-              "violatedTerms": "You have violated these Terms of Service",
-              "sharedKey": "You have shared or sold your activation key",
-              "fraudulent": "The purchase was made fraudulently"
+              "timePassed": "Plus de 14 jours se sont écoulés depuis l'achat (sauf droits légaux applicables)",
+              "violatedTerms": "Tu as violé ces Conditions générales d'utilisation",
+              "sharedKey": "Tu as partagé ou vendu ta clé d'activation",
+              "fraudulent": "L'achat a été effectué de manière frauduleuse"
             }
           },
           "process": {
-            "title": "Refund Process",
-            "description": "To request a refund:",
+            "title": "Procédure de remboursement",
+            "description": "Pour demander un remboursement :",
             "steps": {
-              "contact": "1. Contact us at {supportEmail} with your transaction ID",
-              "include": "2. Include a brief explanation of why you are requesting a refund",
-              "review": "3. We will review your request within 5 business days",
-              "processing": "4. If approved, the refund will be processed to your original payment method within 10 business days"
+              "contact": "1. Contacte-nous à {supportEmail} avec ton identifiant de transaction",
+              "include": "2. Inclus une brève explication de la raison de ta demande de remboursement",
+              "review": "3. Nous examinerons ta demande dans un délai de 5 jours ouvrables",
+              "processing": "4. Si approuvé, le remboursement sera traité sur ton moyen de paiement d'origine dans un délai de 10 jours ouvrables"
             }
           },
           "postRefund": {
-            "title": "Post-Refund Access",
-            "description": "Upon issuing a refund, your Premium activation key will be deactivated, and you will lose access to Premium features."
+            "title": "Accès après remboursement",
+            "description": "Après l'émission d'un remboursement, ta clé d'activation Premium sera désactivée et tu perdras l'accès aux fonctionnalités Premium."
           },
           "euRights": {
-            "title": "EU Consumer Rights",
-            "p1": "If you are a consumer based in the European Union, you have the right to withdraw from the purchase within 14 days without giving any reason, in accordance with Directive 2011/83/EU.",
-            "p2": "However, you acknowledge that by activating your Premium key and using Premium features, you waive this right as the digital content has been fully performed."
+            "title": "Droits des consommateurs européens",
+            "p1": "Si tu es un consommateur basé dans l'Union européenne, tu as le droit de te rétracter de l'achat dans les 14 jours sans avoir à donner de motif, conformément à la directive 2011/83/UE.",
+            "p2": "Cependant, tu reconnais qu'en activant ta clé Premium et en utilisant les fonctionnalités Premium, tu renonces à ce droit car le contenu numérique a été entièrement fourni."
           }
         },
         "userResponsibilities": {
-          "title": "User Responsibilities",
-          "description": "When using Forever PTO, you agree to:",
+          "title": "Responsabilités de l'utilisateur",
+          "description": "En utilisant Forever PTO, tu t'engages à :",
           "items": {
-            "compliance": "Comply with all applicable laws and regulations",
-            "noHarm": "Not use the Service in any way that could harm, disable, or impair the Service",
-            "noUnauthorizedAccess": "Not attempt unauthorized access to any part of the Service, servers, or databases",
-            "noBots": "Not use automated systems (bots, scrapers) to access the Service",
-            "noReverseEngineer": "Not reverse engineer, decompile, or disassemble any part of the Service",
-            "noShare": "Not share your Premium activation key with others",
-            "verifyHolidays": "Verify holiday information with official sources before making important decisions",
-            "noIllegal": "Not use the Service for any unlawful purpose"
+            "compliance": "Respecter toutes les lois et réglementations applicables",
+            "noHarm": "Ne pas utiliser le Service d'une manière qui pourrait endommager, désactiver ou altérer le Service",
+            "noUnauthorizedAccess": "Ne pas tenter d'accéder de manière non autorisée à toute partie du Service, des serveurs ou des bases de données",
+            "noBots": "Ne pas utiliser de systèmes automatisés (bots, scrapers) pour accéder au Service",
+            "noReverseEngineer": "Ne pas effectuer de rétro-ingénierie, décompiler ou désassembler toute partie du Service",
+            "noShare": "Ne pas partager ta clé d'activation Premium avec d'autres",
+            "verifyHolidays": "Vérifier les informations sur les jours fériés auprès de sources officielles avant de prendre des décisions importantes",
+            "noIllegal": "Ne pas utiliser le Service à des fins illégales"
           }
         },
         "disclaimer": {
-          "title": "Disclaimers and Limitations",
-          "description": "Forever PTO is provided 'as is' without warranties of any kind. We specifically disclaim:",
+          "title": "Avertissements et limitations",
+          "description": "Forever PTO est fourni « en l'état » sans garantie d'aucune sorte. Nous déclinons spécifiquement :",
           "items": {
             "accuracy": {
-              "label": "Accuracy of Holiday Data:",
-              "description": "While we strive for accuracy, holiday data is sourced from third-party APIs and may contain errors. Always verify with official sources."
+              "label": "Exactitude des données de jours fériés :",
+              "description": "Bien que nous nous efforcions d'être précis, les données de jours fériés proviennent d'API tierces et peuvent contenir des erreurs. Vérifie toujours auprès de sources officielles."
             },
             "availability": {
-              "label": "Service Availability:",
-              "description": "We do not guarantee uninterrupted or error-free operation of the Service."
+              "label": "Disponibilité du service :",
+              "description": "Nous ne garantissons pas un fonctionnement ininterrompu ou sans erreur du Service."
             },
             "fitness": {
-              "label": "Fitness for Purpose:",
-              "description": "We do not guarantee that the Service will meet your specific requirements or expectations."
+              "label": "Adéquation à l'usage :",
+              "description": "Nous ne garantissons pas que le Service répondra à tes exigences ou attentes spécifiques."
             },
             "dataIntegrity": {
-              "label": "Data Integrity:",
-              "description": "While we implement security measures, we cannot guarantee absolute security of data stored locally in your browser."
+              "label": "Intégrité des données :",
+              "description": "Bien que nous mettions en œuvre des mesures de sécurité, nous ne pouvons pas garantir la sécurité absolue des données stockées localement dans ton navigateur."
             }
           },
-          "acknowledgement": "You acknowledge that the Service is a planning tool and should not be relied upon as the sole basis for employment decisions."
+          "acknowledgement": "Tu reconnais que le Service est un outil de planification et ne doit pas être utilisé comme seule base pour des décisions liées à l'emploi."
         },
         "limitationOfLiability": {
-          "title": "Limitation of Liability",
-          "description": "To the fullest extent permitted by law, Ferran Buireu and Forever PTO shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to:",
+          "title": "Limitation de responsabilité",
+          "description": "Dans toute la mesure permise par la loi, Ferran Buireu et Forever PTO ne sauraient être tenus responsables de tout dommage indirect, accessoire, spécial, consécutif ou punitif, y compris mais sans s'y limiter :",
           "items": {
-            "profits": "Loss of profits, revenue, or business opportunities",
-            "dataLoss": "Data loss or corruption",
-            "employment": "Employment-related consequences based on incorrect holiday information",
-            "interruptions": "Interruptions or errors in the Service",
-            "unauthorizedAccess": "Unauthorized access to your locally stored data"
+            "profits": "Perte de profits, revenus ou opportunités commerciales",
+            "dataLoss": "Perte ou corruption de données",
+            "employment": "Conséquences liées à l'emploi basées sur des informations incorrectes de jours fériés",
+            "interruptions": "Interruptions ou erreurs du Service",
+            "unauthorizedAccess": "Accès non autorisé à tes données stockées localement"
           },
-          "maxLiability": "Our total liability for any claims arising out of or related to these Terms or the Service shall not exceed the amount you paid for Premium access (if applicable) or €50, whichever is greater."
+          "maxLiability": "Notre responsabilité totale pour toute réclamation découlant de ou liée à ces Conditions ou au Service ne pourra excéder le montant que tu as payé pour l'accès Premium (le cas échéant) ou 50 €, le montant le plus élevé étant retenu."
         },
         "intellectualProperty": {
-          "title": "Intellectual Property",
-          "description": "Forever PTO and all its content, features, and functionality (including but not limited to code, design, text, graphics, and logos) are owned by Ferran Buireu and are protected by international copyright, trademark, and other intellectual property laws.",
+          "title": "Propriété intellectuelle",
+          "description": "Forever PTO et tout son contenu, ses fonctionnalités et ses fonctions (y compris, mais sans s'y limiter, le code, le design, les textes, les graphiques et les logos) sont la propriété de Ferran Buireu et sont protégés par les lois internationales sur le droit d'auteur, les marques et autres droits de propriété intellectuelle.",
           "limitedLicense": {
-            "title": "Limited License",
-            "description": "We grant you a limited, non-exclusive, non-transferable license to use Forever PTO for personal, non-commercial purposes. This license does not include any resale or commercial use of the Service or its content."
+            "title": "Licence limitée",
+            "description": "Nous t'accordons une licence limitée, non exclusive et non transférable pour utiliser Forever PTO à des fins personnelles et non commerciales. Cette licence n'inclut pas la revente ou l'utilisation commerciale du Service ou de son contenu."
           },
           "openSource": {
-            "title": "Open Source Code",
-            "description": "Parts of Forever PTO may be available as open-source software under specific licenses. See our <link>GitHub repository</link> for details."
+            "title": "Code open source",
+            "description": "Certaines parties de Forever PTO peuvent être disponibles en tant que logiciel open source sous des licences spécifiques. Consulte notre <link>dépôt GitHub</link> pour plus de détails."
           },
           "restrictions": {
             "title": "Restrictions",
-            "description": "You may not:",
+            "description": "Tu ne peux pas :",
             "items": {
-              "copy": "Copy, modify, or distribute the Service or its content",
-              "derivative": "Create derivative works based on the Service",
-              "remove": "Remove any copyright or proprietary notices",
-              "trademarks": "Use any trademarks, logos, or service marks without permission"
+              "copy": "Copier, modifier ou distribuer le Service ou son contenu",
+              "derivative": "Créer des œuvres dérivées basées sur le Service",
+              "remove": "Supprimer tout avis de droit d'auteur ou de propriété",
+              "trademarks": "Utiliser des marques, logos ou marques de service sans autorisation"
             }
           }
         },
         "thirdPartyServices": {
-          "title": "Third-Party Services",
-          "description": "Forever PTO integrates with third-party services, including:",
+          "title": "Services tiers",
+          "description": "Forever PTO s'intègre à des services tiers, notamment :",
           "items": {
-            "payment": "Stripe for payment processing",
-            "holidayApis": "External APIs for holiday data",
-            "analytics": "Google Analytics for usage statistics (if consented)",
-            "external": "Links to external websites"
+            "payment": "Stripe pour le traitement des paiements",
+            "holidayApis": "API externes pour les données de jours fériés",
+            "analytics": "Google Analytics pour les statistiques d'utilisation (si consenti)",
+            "external": "Liens vers des sites web externes"
           },
-          "disclaimer1": "We are not responsible for the content, privacy policies, or practices of third-party services.",
-          "disclaimer2": "Your use of third-party services is subject to their respective terms and conditions."
+          "disclaimer1": "Nous ne sommes pas responsables du contenu, des politiques de confidentialité ou des pratiques des services tiers.",
+          "disclaimer2": "Ton utilisation des services tiers est soumise à leurs conditions générales respectives."
         },
         "modifications": {
-          "title": "Modifications and Termination",
+          "title": "Modifications et résiliation",
           "serviceModifications": {
-            "title": "Modifications to the Service",
-            "description": "We reserve the right to:",
+            "title": "Modifications du service",
+            "description": "Nous nous réservons le droit de :",
             "items": {
-              "modify": "Modify, suspend, or discontinue any part of the Service at any time",
-              "changeFeatures": "Change features, pricing, or availability of Premium",
-              "updatePricing": "Update pricing for future Premium purchases (existing Premium users are unaffected)",
-              "impose": "Impose limits on certain features"
+              "modify": "Modifier, suspendre ou interrompre toute partie du Service à tout moment",
+              "changeFeatures": "Modifier les fonctionnalités, tarifs ou disponibilité de Premium",
+              "updatePricing": "Mettre à jour les tarifs pour les futurs achats Premium (les utilisateurs Premium existants ne sont pas affectés)",
+              "impose": "Imposer des limites sur certaines fonctionnalités"
             },
-            "notice": "We will make reasonable efforts to notify users of material changes."
+            "notice": "Nous ferons des efforts raisonnables pour informer les utilisateurs des changements importants."
           },
           "terminationByUs": {
-            "title": "Termination by Us",
-            "description": "We may terminate or suspend your access to the Service immediately, without prior notice or liability, if you:",
+            "title": "Résiliation par nous",
+            "description": "Nous pouvons résilier ou suspendre ton accès au Service immédiatement, sans préavis ni responsabilité, si tu :",
             "items": {
-              "violateTerms": "Violate these Terms",
-              "fraudulent": "Engage in fraudulent activity",
-              "shareKey": "Share your Premium activation key",
-              "requiredByLaw": "If required by law or court order",
-              "discontinue": "If we discontinue the Service"
+              "violateTerms": "Violes ces Conditions",
+              "fraudulent": "Te livres à une activité frauduleuse",
+              "shareKey": "Partages ta clé d'activation Premium",
+              "requiredByLaw": "Si requis par la loi ou une décision de justice",
+              "discontinue": "Si nous interrompons le Service"
             }
           },
           "terminationByYou": {
-            "title": "Termination by You",
-            "description": "You may stop using the Service at any time. To delete your locally stored data, clear your browser's local storage."
+            "title": "Résiliation par toi",
+            "description": "Tu peux cesser d'utiliser le Service à tout moment. Pour supprimer tes données stockées localement, efface le stockage local de ton navigateur."
           },
           "effectOfTermination": {
-            "title": "Effect of Termination",
-            "description": "Upon termination:",
+            "title": "Effet de la résiliation",
+            "description": "En cas de résiliation :",
             "items": {
-              "rightsCease": "Your right to use the Service ceases immediately",
-              "keyDeactivated": "Your Premium activation key (if any) may be deactivated",
-              "dataRemains": "Data stored locally in your browser remains until you delete it",
-              "provisions": "Provisions regarding intellectual property, disclaimers, and limitations of liability survive termination"
+              "rightsCease": "Ton droit d'utiliser le Service cesse immédiatement",
+              "keyDeactivated": "Ta clé d'activation Premium (le cas échéant) peut être désactivée",
+              "dataRemains": "Les données stockées localement dans ton navigateur restent jusqu'à ce que tu les supprimes",
+              "provisions": "Les dispositions relatives à la propriété intellectuelle, aux avertissements et aux limitations de responsabilité survivent à la résiliation"
             }
           }
         },
         "indemnification": {
-          "title": "Indemnification",
-          "description": "You agree to indemnify, defend, and hold harmless Ferran Buireu and Forever PTO from any claims, damages, losses, liabilities, and expenses (including legal fees) arising out of:",
+          "title": "Indemnisation",
+          "description": "Tu acceptes d'indemniser, défendre et dégager de toute responsabilité Ferran Buireu et Forever PTO de toute réclamation, dommage, perte, responsabilité et dépense (y compris les frais juridiques) découlant de :",
           "items": {
-            "misuse": "Your misuse of the Service",
-            "violateTerms": "Your violation of these Terms",
-            "violateRights": "Your violation of any rights of another person or entity",
-            "violateLaws": "Your violation of any applicable laws or regulations"
+            "misuse": "Ton utilisation abusive du Service",
+            "violateTerms": "Ta violation de ces Conditions",
+            "violateRights": "Ta violation des droits d'une autre personne ou entité",
+            "violateLaws": "Ta violation de toute loi ou réglementation applicable"
           }
         },
         "governingLaw": {
-          "title": "Governing Law and Dispute Resolution",
+          "title": "Droit applicable et résolution des litiges",
           "law": {
-            "title": "Governing Law",
-            "description": "These Terms are governed by and construed in accordance with the laws of Spain, without regard to its conflict of law principles."
+            "title": "Droit applicable",
+            "description": "Ces Conditions sont régies et interprétées conformément aux lois espagnoles, sans égard aux principes de conflit de lois."
           },
           "jurisdiction": {
-            "title": "Jurisdiction",
-            "description": "Any disputes arising out of or related to these Terms or the Service shall be subject to the exclusive jurisdiction of the courts of Barcelona, Spain."
+            "title": "Juridiction",
+            "description": "Tout litige découlant de ou lié à ces Conditions ou au Service sera soumis à la compétence exclusive des tribunaux de Barcelone, Espagne."
           },
           "disputeResolution": {
-            "title": "Dispute Resolution",
-            "description": "Before initiating any legal proceedings, we encourage you to contact us at {supportEmail} to seek an amicable resolution."
+            "title": "Résolution des litiges",
+            "description": "Avant d'engager toute procédure judiciaire, nous t'encourageons à nous contacter à {supportEmail} pour rechercher une résolution amiable."
           },
           "euOdr": {
-            "title": "EU Online Dispute Resolution",
-            "description": "If you are a consumer based in the European Union, you may use the <link>EU Online Dispute Resolution platform</link> to resolve disputes."
+            "title": "Résolution des litiges en ligne de l'UE",
+            "description": "Si tu es un consommateur basé dans l'Union européenne, tu peux utiliser la <link>plateforme de résolution des litiges en ligne de l'UE</link> pour résoudre les litiges."
           }
         },
         "severability": {
-          "title": "Severability",
-          "description": "If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions will remain in full force and effect."
+          "title": "Divisibilité",
+          "description": "Si une disposition de ces Conditions est jugée invalide ou inapplicable, les dispositions restantes resteront pleinement en vigueur."
         },
         "entireAgreement": {
-          "title": "Entire Agreement",
-          "description": "These Terms, together with our Privacy Policy and Cookie Policy, constitute the entire agreement between you and Forever PTO regarding the use of the Service."
+          "title": "Intégralité de l'accord",
+          "description": "Ces Conditions, ainsi que notre Politique de confidentialité et notre Politique de cookies, constituent l'intégralité de l'accord entre toi et Forever PTO concernant l'utilisation du Service."
         },
         "waiver": {
-          "title": "Waiver",
-          "description": "Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights."
+          "title": "Renonciation",
+          "description": "Notre manquement à faire respecter un droit ou une disposition de ces Conditions ne sera pas considéré comme une renonciation à ces droits."
         },
         "changes": {
-          "title": "Changes to These Terms",
-          "p1": "We may update these Terms from time to time to reflect changes in our practices, legal requirements, or service features.",
-          "p2": "We will notify users of material changes by updating the 'Last updated' date at the top of these Terms. Continued use of the Service after changes constitutes acceptance of the updated Terms."
+          "title": "Modifications de ces conditions",
+          "p1": "Nous pouvons mettre à jour ces Conditions de temps en temps pour refléter des changements dans nos pratiques, exigences légales ou fonctionnalités du service.",
+          "p2": "Nous informerons les utilisateurs des changements importants en mettant à jour la date de « Dernière mise à jour » en haut de ces Conditions. L'utilisation continue du Service après les modifications vaut acceptation des Conditions mises à jour."
         },
         "contactInfo": {
-          "title": "Contact Information",
-          "description": "If you have questions about these Terms of Service, please contact us:",
+          "title": "Informations de contact",
+          "description": "Si tu as des questions sur ces Conditions générales d'utilisation, contacte-nous :",
           "items": {
             "email": {
-              "label": "Email:",
+              "label": "E-mail :",
               "value": "{supportEmail}"
             },
             "website": {
-              "label": "Website:",
+              "label": "Site web :",
               "value": "{siteUrl}"
             }
           },
-          "responseTime": "We will respond to your inquiries within 5 business days."
+          "responseTime": "Nous répondrons à tes demandes dans un délai de 5 jours ouvrables."
         }
       }
     },
     "legalNotice": {
-      "title": "Legal Notice",
-      "lastUpdated": "Last updated: {date}",
+      "title": "Mentions légales",
+      "lastUpdated": "Dernière mise à jour : {date}",
       "sections": {
         "identification": {
-          "title": "Website Owner Identification",
-          "description": "In compliance with Law 34/2002, of July 11, on Information Society Services and Electronic Commerce (LSSI-CE), the following information is provided:",
+          "title": "Identification du propriétaire du site",
+          "description": "Conformément à la loi 34/2002 du 11 juillet relative aux services de la société de l'information et du commerce électronique (LSSI-CE), les informations suivantes sont fournies :",
           "items": {
             "owner": {
-              "label": "Owner:",
+              "label": "Propriétaire :",
               "value": "Ferran Buireu"
             },
             "email": {
-              "label": "Email:",
+              "label": "E-mail :",
               "value": "{supportEmail}"
             },
             "website": {
-              "label": "Website:",
+              "label": "Site web :",
               "value": "{siteUrl}"
             }
           }
         },
         "purpose": {
-          "title": "Purpose of the Website",
-          "description": "Forever PTO (https://forever-pto.com) is a web application designed to help users plan and optimize their paid time off (PTO) by providing holiday information and vacation planning tools.",
-          "offers": "The website offers:",
+          "title": "Objet du site web",
+          "description": "Forever PTO (https://forever-pto.com) est une application web conçue pour aider les utilisateurs à planifier et optimiser leurs congés payés en fournissant des informations sur les jours fériés et des outils de planification de vacances.",
+          "offers": "Le site propose :",
           "items": {
             "freeVersion": {
-              "label": "Free Version:",
-              "description": "Basic PTO optimization, calendar visualization, and holiday information."
+              "label": "Version gratuite :",
+              "description": "Optimisation de base des congés, visualisation calendaire et informations sur les jours fériés."
             },
             "premiumVersion": {
-              "label": "Premium Version:",
-              "description": "Advanced analytics, charts, and enhanced planning features available through a one-time payment."
+              "label": "Version Premium :",
+              "description": "Analyses avancées, graphiques et fonctionnalités de planification améliorées disponibles via un paiement unique."
             }
           }
         },
         "accessConditions": {
-          "title": "Access and Use Conditions",
-          "description": "Access to and use of this website is subject to the following conditions:",
-          "userAgreement": "By accessing this website, you agree to:",
+          "title": "Conditions d'accès et d'utilisation",
+          "description": "L'accès et l'utilisation de ce site web sont soumis aux conditions suivantes :",
+          "userAgreement": "En accédant à ce site, tu t'engages à :",
           "items": {
-            "correctUse": "Use the website correctly and lawfully",
-            "noIllegal": "Not use it for illegal purposes or activities that violate these terms",
-            "noVirus": "Not introduce or spread viruses or malicious code",
-            "noUnauthorized": "Not attempt unauthorized access to the website's systems",
-            "noShareKey": "Not share Premium activation keys obtained through payment"
+            "correctUse": "Utiliser le site de manière correcte et légale",
+            "noIllegal": "Ne pas l'utiliser à des fins illégales ou pour des activités contraires à ces conditions",
+            "noVirus": "Ne pas introduire ou propager de virus ou de code malveillant",
+            "noUnauthorized": "Ne pas tenter d'accéder de manière non autorisée aux systèmes du site",
+            "noShareKey": "Ne pas partager les clés d'activation Premium obtenues par paiement"
           }
         },
         "liability": {
-          "title": "Liability",
-          "description": "Ferran Buireu is not responsible for:",
+          "title": "Responsabilité",
+          "description": "Ferran Buireu n'est pas responsable de :",
           "items": {
-            "accuracy": "The accuracy or completeness of holiday information obtained from third-party sources",
-            "decisions": "Decisions made by users based on information provided by the website",
-            "interruptions": "Temporary interruptions or technical issues affecting the website",
-            "misuse": "Misuse of the website by users",
-            "thirdParty": "The content or privacy practices of third-party websites linked from Forever PTO"
+            "accuracy": "L'exactitude ou l'exhaustivité des informations sur les jours fériés provenant de sources tierces",
+            "decisions": "Les décisions prises par les utilisateurs sur la base des informations fournies par le site",
+            "interruptions": "Les interruptions temporaires ou les problèmes techniques affectant le site",
+            "misuse": "L'utilisation abusive du site par les utilisateurs",
+            "thirdParty": "Le contenu ou les pratiques de confidentialité des sites web tiers liés depuis Forever PTO"
           },
-          "disclaimer": "The information provided is for planning purposes only. Users should verify holiday information with official sources before making employment-related decisions."
+          "disclaimer": "Les informations fournies sont uniquement à des fins de planification. Les utilisateurs doivent vérifier les informations sur les jours fériés auprès de sources officielles avant de prendre des décisions liées à l'emploi."
         },
         "intellectualProperty": {
-          "title": "Intellectual Property",
-          "p1": "All content on this website, including but not limited to text, graphics, logos, code, and design, is the property of Ferran Buireu and is protected by Spanish and international intellectual property laws.",
-          "p2": "Users are granted a personal, non-exclusive, non-transferable license to use the website for its intended purpose. Reproduction, distribution, modification, or commercial use of the website's content without express permission is prohibited.",
-          "p3": "Some parts of the website may be available as open-source software. For details, please visit our <link>GitHub repository</link>."
+          "title": "Propriété intellectuelle",
+          "p1": "Tout le contenu de ce site, y compris mais sans s'y limiter les textes, graphiques, logos, code et design, est la propriété de Ferran Buireu et est protégé par les lois espagnoles et internationales sur la propriété intellectuelle.",
+          "p2": "Les utilisateurs bénéficient d'une licence personnelle, non exclusive et non transférable pour utiliser le site conformément à son objet. La reproduction, la distribution, la modification ou l'utilisation commerciale du contenu du site sans autorisation expresse est interdite.",
+          "p3": "Certaines parties du site peuvent être disponibles en tant que logiciel open source. Pour plus de détails, consulte notre <link>dépôt GitHub</link>."
         },
         "thirdPartyLinks": {
-          "title": "Links to Third-Party Websites",
-          "p1": "This website may contain links to third-party websites. These links are provided for convenience and informational purposes only.",
-          "p2": "Ferran Buireu does not control or endorse the content of third-party websites and is not responsible for their privacy policies or practices."
+          "title": "Liens vers des sites tiers",
+          "p1": "Ce site peut contenir des liens vers des sites web tiers. Ces liens sont fournis à titre de commodité et d'information uniquement.",
+          "p2": "Ferran Buireu ne contrôle ni n'approuve le contenu des sites web tiers et n'est pas responsable de leurs politiques de confidentialité ou de leurs pratiques."
         },
         "modifications": {
-          "title": "Modifications to the Legal Notice",
-          "p1": "Ferran Buireu reserves the right to modify this Legal Notice at any time to adapt to legislative changes or updates to the website.",
-          "p2": "Users are advised to periodically review this Legal Notice to stay informed of any changes."
+          "title": "Modifications des mentions légales",
+          "p1": "Ferran Buireu se réserve le droit de modifier ces Mentions légales à tout moment pour s'adapter aux évolutions législatives ou aux mises à jour du site.",
+          "p2": "Les utilisateurs sont invités à consulter régulièrement ces Mentions légales pour rester informés de tout changement."
         },
         "applicableLaw": {
-          "title": "Applicable Law and Jurisdiction",
-          "description": "This Legal Notice is governed by Spanish law. For any disputes arising from the use of this website, the parties submit to the jurisdiction of the courts of Barcelona, Spain, waiving any other jurisdiction that may apply."
+          "title": "Droit applicable et juridiction",
+          "description": "Ces Mentions légales sont régies par le droit espagnol. Pour tout litige découlant de l'utilisation de ce site, les parties se soumettent à la juridiction des tribunaux de Barcelone, Espagne, en renonçant à toute autre juridiction qui pourrait s'appliquer."
         },
         "contact": {
           "title": "Contact",
-          "description": "For any questions or clarifications regarding this Legal Notice, please contact us at:",
+          "description": "Pour toute question ou clarification concernant ces Mentions légales, contacte-nous à :",
           "items": {
             "email": {
-              "label": "Email:",
+              "label": "E-mail :",
               "value": "{supportEmail}"
             }
           }
@@ -1648,12 +1648,12 @@
   },
   "landing": {
     "nav": {
-      "how": "Comment ca marche",
-      "features": "Fonctionnalites",
+      "how": "Comment ça marche",
+      "features": "Fonctionnalités",
       "pricing": "Tarifs",
       "faq": "FAQ",
       "login": "Se connecter",
-      "cta": "Essayer gratuitement ->"
+      "cta": "Essayer gratuitement →"
     },
     "hero": {
       "badge1": "🇬🇧 EN · 🇪🇸 ES · 🇮🇹 IT · 🇩🇪 DE · 🇫🇷 FR · 🇺🇸 US",
@@ -1661,17 +1661,17 @@
       "h1Line1": "Travaillez moins.",
       "h1Verb": "Voyagez",
       "h1Word": "plus",
-      "p": "Forever PTO calcule <em>exactement</em> quels jours demander pour transformer vos 22 jours de conges en <strong>47+ jours hors du bureau</strong>. Sans tableurs. Sans calculs.",
+      "p": "Forever PTO calcule <em>exactement</em> quels jours demander pour transformer vos 22 jours de congés en <strong>47+ jours hors du bureau</strong>. Sans tableurs. Sans calculs.",
       "pEm": "exactement",
       "pStrong": "47+ jours hors du bureau",
-      "cta1": "Calculer mes jours ->",
-      "cta2": "Voir comment ca marche (30s)",
-      "stars": "4.9 · utilise par {users} employes rebelles",
+      "cta1": "Calculer mes jours →",
+      "cta2": "Voir comment ça marche (30s)",
+      "stars": "4.9 · utilisé par {users} employés rebelles",
       "mockupLabel": "Vrais jours off en 2026",
-      "mockupRatio": "jours · ratio 2.14x",
-      "mockupQuote": "\"C est 9 longs week-ends, capitaine.\"",
-      "mockupLegendPto": "Conges",
-      "mockupLegendHoliday": "Ferie",
+      "mockupRatio": "jours · ratio 2.14×",
+      "mockupQuote": "\"C'est 9 longs week-ends, capitaine.\"",
+      "mockupLegendPto": "Congés",
+      "mockupLegendHoliday": "Férié",
       "mockupLegendWeekend": "Week-end",
       "sticker1": "+47 jours libres ✦",
       "sticker2": "seulement en {year} →",
@@ -1682,91 +1682,91 @@
       "mockupFieldHolidays": "14 jours fériés"
     },
     "marquee": {
-      "items": "PONTS DE PAQUES · WEEK-END FERIE · ETE PROLONGE · PONT TOUSSAINT · SEMAINE DE NOEL · PONT NOVEMBRE · LUNDI DE PENTECOTE · PONT ASCENSION · PONT 14 JUILLET · PONT 11 NOVEMBRE"
+      "items": "PONTS DE PÂQUES · WEEK-END FÉRIÉ · ÉTÉ PROLONGÉ · PONT TOUSSAINT · SEMAINE DE NOËL · PONT NOVEMBRE · LUNDI DE PENTECÔTE · PONT ASCENSION · PONT 14 JUILLET · PONT 11 NOVEMBRE"
     },
     "how": {
-      "badge": "COMMENT CA MARCHE · 3 ETAPES",
+      "badge": "COMMENT ÇA MARCHE · 3 ÉTAPES",
       "h2Start": "De",
-      "h2Mid": "a",
+      "h2Mid": "à",
       "h2Q1": "que faire",
-      "h2Q2": "voyage reserve",
+      "h2Q2": "voyage réservé",
       "h2End": "en 60 secondes.",
-      "p": "Sans installation. Sans carte bancaire. Sans newsletter. Dites-nous combien de jours vous avez et ou vous vivez.",
+      "p": "Sans installation. Sans carte bancaire. Sans newsletter. Dites-nous combien de jours vous avez et où vous vivez.",
       "step1Title": "Entrez vos jours.",
-      "step1Desc": "Combien de jours de conges vous avez, dans quel pays vous travaillez, et quels mois vous preferez bloquer.",
+      "step1Desc": "Combien de jours de congés vous avez, dans quel pays vous travaillez, et quels mois vous préférez bloquer.",
       "step2Title": "Le moteur fait la magie.",
-      "step2Desc": "Il croise vos jours avec les jours feries officiels. Trouve toutes les combinaisons et les classe par ratio de repos.",
+      "step2Desc": "Il croise vos jours avec les jours fériés officiels. Trouve toutes les combinaisons et les classe par ratio de repos.",
       "step3Title": "Demandez vos jours.",
-      "step3Desc": "Exportez vers Google Agenda, Outlook, ou un PDF a coller dans le formulaire RH."
+      "step3Desc": "Exportez vers Google Agenda, Outlook, ou un PDF à coller dans le formulaire RH."
     },
     "stats": {
       "multiplierLabel": "Multiplicateur moyen",
-      "daysLabel": "Jours off avec 22 conges",
-      "countriesLabel": "Pays supportes",
-      "plansLabel": "Plans generes"
+      "daysLabel": "Jours off avec 22 congés",
+      "countriesLabel": "Pays supportés",
+      "plansLabel": "Plans générés"
     },
     "features": {
       "badge": "ASTUCES DU MOTEUR",
       "h2Start": "Pas un calendrier. Un",
-      "h2Em": "allie",
+      "h2Em": "allié",
       "h2End": "contre les lundis.",
       "p": "Voici les coups que Forever PTO joue pour vous automatiquement.",
       "bridgeTag": "PONTS INTELLIGENTS",
-      "bridgeH3": "Transformez 1 conge en 4 jours off.",
-      "bridgeP": "Detecte les jours feries les mardis et jeudis et suggere des ponts minimaux.",
+      "bridgeH3": "Transformez 1 congé en 4 jours off.",
+      "bridgeP": "Détecte les jours fériés les mardis et jeudis et suggère des ponts minimaux.",
       "ratioTag": "RATIO MAX",
-      "ratioP": "Meilleur multiplicateur: 8 jours de conges en 28 jours libres (ES, avril 26).",
+      "ratioP": "Meilleur multiplicateur : 8 jours de congés en 28 jours libres (ES, avril 26).",
       "syncTag": "SYNC EN 1 CLIC",
       "syncH3": "Google · Outlook · iCal",
-      "syncP": "Exportez votre plan vers le calendrier que vous utilisez deja.",
+      "syncP": "Exportez votre plan vers le calendrier que vous utilisez déjà.",
       "conflictsTag": "ANTI-CONFLITS",
-      "conflictsH3": "Vous previent avant votre patron.",
-      "conflictsP": "Marquez les periodes interdites de votre entreprise.",
+      "conflictsH3": "Vous prévient avant votre patron.",
+      "conflictsP": "Marquez les périodes interdites de votre entreprise.",
       "countriesTag": "14 PAYS",
-      "countriesH3": "Jours feries locaux reels.",
-      "countriesP": "Calendriers officiels mis a jour chaque annee. Meme les regionaux.",
+      "countriesH3": "Jours fériés locaux réels.",
+      "countriesP": "Calendriers officiels mis à jour chaque année. Même les régionaux.",
       "privacyTag": "100% LOCAL",
-      "privacyH3": "Vos donnees ne quittent jamais votre navigateur.",
+      "privacyH3": "Vos données ne quittent jamais votre navigateur.",
       "privacyP": "Sans connexion, sans cookies, sans serveurs. Forever PTO tourne 100% sur votre machine."
     },
     "comparison": {
-      "badge": "AVANT · APRES",
-      "h2": "Avant vs. apres Forever PTO.",
+      "badge": "AVANT · APRÈS",
+      "h2": "Avant vs. après Forever PTO.",
       "withoutTitle": "😩 Sans Forever PTO",
       "withoutItems": {
         "0": "Vous ouvrez un tableur et bloquez sur la cellule C7.",
-        "1": "Vous demandez le lundi apres un ferie et personne ne vous previent.",
-        "2": "Vous decouvrez en septembre qu il ne reste plus de jours.",
-        "3": "Un collegue reserve votre semaine en premier. Encore.",
-        "4": "Vous finissez decembre avec 4 jours non utilises."
+        "1": "Vous demandez le lundi après un férié et personne ne vous prévient.",
+        "2": "Vous découvrez en septembre qu'il ne reste plus de jours.",
+        "3": "Un collègue réserve votre semaine en premier. Encore.",
+        "4": "Vous finissez décembre avec 4 jours non utilisés."
       },
       "withTitle": "😎 Avec Forever PTO",
       "withItems": {
-        "0": "Vous planifiez tout en janvier, en attendant votre cafe.",
-        "1": "Chaque jour de conge vous rend 2,1 jours libres en moyenne.",
-        "2": "Vous visualisez toute l annee dans un calendrier clair.",
-        "3": "Vous reservez en premier, sans culpabilite, avec des donnees.",
+        "0": "Vous planifiez tout en janvier, en attendant votre café.",
+        "1": "Chaque jour de congé vous rend 2,1 jours libres en moyenne.",
+        "2": "Vous visualisez toute l'année dans un calendrier clair.",
+        "3": "Vous réservez en premier, sans culpabilité, avec des données.",
         "4": "Vous utilisez 100% de vos jours. Comme il se doit."
       }
     },
     "testimonials": {
       "badge": "ON EN PARLE",
-      "h2Start": "Des gens qui ont recupere des",
+      "h2Start": "Des gens qui ont récupéré des",
       "h2Em": "semaines",
       "h2End": "de leur vie.",
       "items": {
         "0": {
-          "text": "Je suis passe de prendre des jours au hasard a avoir 6 voyages planifies. Mon partenaire pense que je suis devenu organise.",
+          "text": "Je suis passé de prendre des jours au hasard à avoir 6 voyages planifiés. Mon partenaire pense que je suis devenu organisé.",
           "name": "Marta R.",
           "role": "designer · Madrid"
         },
         "1": {
-          "text": "J avais 4 ans de jours non utilises. Cette fois j ai tout utilise. Je suis revenu bronze et presque motive a travailler.",
+          "text": "J'avais 4 ans de jours non utilisés. Cette fois j'ai tout utilisé. Je suis revenu bronzé et presque motivé à travailler.",
           "name": "Diego A.",
           "role": "backend dev · Barcelone"
         },
         "2": {
-          "text": "Je l ai ouvert pour voir et 90 secondes plus tard j avais un PDF pret a envoyer aux RH avec toute l annee organisee.",
+          "text": "Je l'ai ouvert pour voir et 90 secondes plus tard j'avais un PDF prêt à envoyer aux RH avec toute l'année organisée.",
           "name": "Sara V.",
           "role": "product manager · Berlin"
         }
@@ -1810,19 +1810,19 @@
       "h2": "Des questions ? On a des réponses."
     },
     "finalCta": {
-      "h2Start": "Votre prochaine annee",
+      "h2Start": "Votre prochaine année",
       "h2Em": "libre",
-      "h2End": "commence aujourd hui.",
-      "p": "22 jours peuvent devenir 47. Il suffit de savoir ou les placer. C est ce qu on fait.",
-      "cta": "Calculer mes jours gratuits ->"
+      "h2End": "commence aujourd'hui.",
+      "p": "22 jours peuvent devenir 47. Il suffit de savoir où les placer. C'est ce qu'on fait.",
+      "cta": "Calculer mes jours gratuits →"
     },
     "footer": {
       "planner": "Planificateur",
-      "privacy": "Confidentialite",
+      "privacy": "Confidentialité",
       "terms": "Conditions",
       "cookies": "Cookies",
       "copyright": "© 2026 Forever PTO · Fait avec amour depuis un hamac.",
-      "version": "v2.0 · statut: en vacances ●"
+      "version": "v2.0 · statut : en vacances ●"
     }
   }
 }
