@@ -328,6 +328,8 @@
   },
   "legend": {
     "title": "Llegenda",
+    "showLegend": "Veure llegenda",
+    "hideLegend": "Amagar llegenda",
     "today": "Avui",
     "weekends": "Caps de setmana",
     "holidays": "Festius",

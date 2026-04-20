@@ -328,6 +328,8 @@
   },
   "legend": {
     "title": "Leyenda",
+    "showLegend": "Ver leyenda",
+    "hideLegend": "Ocultar leyenda",
     "today": "Hoy",
     "weekends": "Fines de semana",
     "holidays": "Festivos",

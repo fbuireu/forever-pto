@@ -237,8 +237,8 @@ export const Donate = () => {
           spacingUnit: '4px',
           borderRadius: '8px',
           // Brutal focus ring
-          focusBoxShadow: `3px 3px 0 0 ${t.frame}`,
-          focusOutline: `2px solid ${t.frame}`,
+          focusBoxShadow: `4px 4px 0 0 ${t.frame}`,
+          focusOutline: 'none',
         },
         rules: {
           '.Input': {
@@ -253,12 +253,14 @@ export const Donate = () => {
             borderRadius: '8px',
             transition: 'box-shadow 80ms linear',
           },
-          '.Input:hover': {
-            boxShadow: `3px 3px 0 0 ${t.frame}`,
-          },
           '.Input:focus': {
-            boxShadow: `4px 4px 0 0 ${t.frame}`,
+            boxShadow: `4px 4px 0 0 ${t.frame} !important`,
+            outline: 'none',
           },
+          '.Input:hover': {
+            boxShadow: `2px 2px 0 0 ${t.frame}`,
+          },
+
           '.Input--invalid': {
             borderColor: t.destructive,
             boxShadow: 'none',

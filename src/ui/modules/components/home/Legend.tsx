@@ -9,40 +9,45 @@ export const Legend = () => {
 
   return (
     <div id='legend-sticky' className={styles.stickyContainer}>
+      <input type='checkbox' id='legend-toggle' className={styles.toggle} />
       <section className={styles.section}>
         <Card className={styles.card}>
           <CardHeader className={styles.cardHeader}>
             <CardTitle className={styles.cardTitle}>{t('title')}</CardTitle>
+            <label htmlFor='legend-toggle' className={styles.toggleLabel}>
+              <span className={styles.showLabel}>{t('showLegend')}</span>
+              <span className={styles.hideLabel}>{t('hideLegend')}</span>
+            </label>
           </CardHeader>
           <CardContent className={styles.cardContent}>
             <div className={styles.items}>
-              <div className='flex items-center'>
+              <div className={cn('flex items-center', styles.item)}>
                 <div className={cn('mr-2 h-8 w-8 rounded-[0.8rem]', MODIFIERS_CLASS_NAMES.today)} />
                 <span>{t('today')}</span>
               </div>
-              <div className='flex items-center'>
+              <div className={cn('flex items-center', styles.item)}>
                 <div className={cn('mr-2 h-8 w-8 rounded-[0.8rem]', MODIFIERS_CLASS_NAMES.weekend)} />
                 <span>{t('weekends')}</span>
               </div>
-              <div className='flex items-center'>
+              <div className={cn('flex items-center', styles.item)}>
                 <div className={cn('mr-2 h-8 w-8 rounded-[0.8rem]', MODIFIERS_CLASS_NAMES.holiday)} />
                 <span>{t('holidays')}</span>
               </div>
-              <div className='flex items-center'>
+              <div className={cn('flex items-center', styles.item)}>
                 <div className={cn('mr-2 h-8 w-8 rounded-[0.8rem]', MODIFIERS_CLASS_NAMES.suggested)} />
                 <span>{t('suggested')}</span>
               </div>
-              <div className='flex items-center'>
+              <div className={cn('flex items-center', styles.item)}>
                 <div
                   className={cn('mr-2 h-8 w-8 rounded-[0.8rem]', MODIFIERS_CLASS_NAMES.alternative, 'animate-none')}
                 />
                 <span>{t('alternatives')}</span>
               </div>
-              <div className='flex items-center'>
+              <div className={cn('flex items-center', styles.item)}>
                 <div className={cn('mr-2 h-8 w-8 rounded-[0.8rem]', MODIFIERS_CLASS_NAMES.manuallySelected)} />
                 <span>{t('manual')}</span>
               </div>
-              <div className='flex items-center'>
+              <div className={cn('flex items-center', styles.item)}>
                 <div className={cn('mr-2 h-8 w-8 rounded-[0.8rem]', MODIFIERS_CLASS_NAMES.custom)} />
                 <span>{t('custom')}</span>
               </div>

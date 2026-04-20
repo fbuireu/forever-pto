@@ -329,6 +329,8 @@
   },
   "legend": {
     "title": "Légende",
+    "showLegend": "Voir la légende",
+    "hideLegend": "Masquer la légende",
     "today": "Aujourd'hui",
     "weekends": "Week-ends",
     "holidays": "Jours fériés",

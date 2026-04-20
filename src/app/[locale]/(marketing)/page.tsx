@@ -48,6 +48,7 @@ export default LandingPage;
 // todo: Check DSM
 // todo: 400 and 500 page
 // todo: check SEO again
+// todo: focus input order in stripe
 // todo: metadata in translate (separate in home, not landing VS planner)
 // todo: check translations
 // todo: unify styles and check everything

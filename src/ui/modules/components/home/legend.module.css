@@ -7,6 +7,45 @@
   width: 100%;
 }
 
+.toggle {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggleLabel {
+  display: none;
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--primary);
+  padding: calc(var(--spacing) * 1) calc(var(--spacing) * 3);
+  border: 2.5px solid var(--frame);
+  border-radius: 8px;
+  background: var(--accent);
+  box-shadow: var(--shadow-brutal-xs);
+  transition: all 150ms ease-in-out;
+  user-select: none;
+}
+
+.toggleLabel:hover {
+  box-shadow: var(--shadow-brutal-sm);
+  transform: translate(-1px, -1px);
+}
+
+.toggleLabel:active {
+  box-shadow: none;
+  transform: translate(1px, 1px);
+}
+
+.showLabel {
+  display: inline;
+}
+
+.hideLabel {
+  display: none;
+}
+
 .section {
   text-align: center;
   width: 100%;
@@ -63,6 +102,23 @@
     gap 300ms ease-in-out;
 }
 
+.item {
+  transition:
+    opacity 120ms ease-out,
+    transform 120ms ease-out;
+}
+
+@keyframes legendItemIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @supports (container-type: scroll-state) {
   @container pto-legend scroll-state(stuck: bottom) {
     .section {
@@ -73,30 +129,91 @@
     }
 
     .card {
-      gap: calc(var(--spacing) * 1);
+      gap: 0;
       padding-top: calc(var(--spacing) * 2);
       padding-bottom: calc(var(--spacing) * 2);
       box-shadow: var(--shadow-lg);
     }
 
     .cardHeader {
-      padding-top: calc(var(--spacing) * 1);
-      padding-bottom: 0;
+      padding-block: 0;
     }
 
     .cardTitle {
-      font-size: var(--text-base);
-      line-height: calc(var(--spacing) * 6);
+      font-size: 0;
+      line-height: 0;
+      overflow: hidden;
+      height: 0;
+    }
+
+    .toggleLabel {
+      display: inline-block;
     }
 
     .cardContent {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 200ms ease-in-out;
       padding-top: 0;
-      padding-bottom: calc(var(--spacing) * 1);
+      padding-bottom: 0;
+      overflow: hidden;
     }
 
     .items {
+      min-height: 0;
       margin-bottom: 0;
       gap: calc(var(--spacing) * 2);
+    }
+
+    .item {
+      opacity: 0;
+      transform: translateY(6px) scale(0.95);
+    }
+  }
+
+  /* When checked while stuck: expand + stagger items */
+  .toggle:checked ~ .section {
+    @container pto-legend scroll-state(stuck: bottom) {
+      .cardContent {
+        grid-template-rows: 1fr;
+        padding-top: calc(var(--spacing) * 2);
+        padding-bottom: calc(var(--spacing) * 2);
+        overflow: visible;
+      }
+
+      .showLabel {
+        display: none;
+      }
+
+      .hideLabel {
+        display: inline;
+      }
+
+      .item {
+        animation: legendItemIn 120ms ease-out forwards;
+      }
+
+      .item:nth-child(1) {
+        animation-delay: 0ms;
+      }
+      .item:nth-child(2) {
+        animation-delay: 30ms;
+      }
+      .item:nth-child(3) {
+        animation-delay: 60ms;
+      }
+      .item:nth-child(4) {
+        animation-delay: 90ms;
+      }
+      .item:nth-child(5) {
+        animation-delay: 120ms;
+      }
+      .item:nth-child(6) {
+        animation-delay: 150ms;
+      }
+      .item:nth-child(7) {
+        animation-delay: 180ms;
+      }
     }
   }
 }

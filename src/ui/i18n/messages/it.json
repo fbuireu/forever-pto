@@ -328,6 +328,8 @@
   },
   "legend": {
     "title": "Legenda",
+    "showLegend": "Mostra legenda",
+    "hideLegend": "Nascondi legenda",
     "today": "Oggi",
     "weekends": "Fine settimana",
     "holidays": "Festivi",
