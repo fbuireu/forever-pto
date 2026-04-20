@@ -24,7 +24,7 @@ export class DriverClient {
       showButtons: ['next', 'previous', 'close'],
       smoothScroll: true,
       stagePadding: 10,
-      stageRadius: 8,
+      stageRadius: 12,
       ...this.config,
       onPopoverRender: (popover, options) => {
         this.config.onPopoverRender?.(popover, options);

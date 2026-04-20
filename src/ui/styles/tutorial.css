@@ -20,11 +20,9 @@
   .driver-popover {
     background-color: var(--popover);
     color: var(--popover-foreground);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow:
-      0 10px 15px -3px rgb(0 0 0 / 0.1),
-      0 4px 6px -4px rgb(0 0 0 / 0.1);
+    border: 3px solid var(--frame);
+    border-radius: 12px;
+    box-shadow: var(--shadow-brutal-md);
     padding: 1.5rem;
     max-width: 400px;
     font-family: var(--font-sans), system-ui, sans-serif;
@@ -79,14 +77,14 @@
     align-items: center;
     justify-content: center;
     white-space: nowrap;
-    border-radius: var(--radius-md);
+    border-radius: 8px;
+    border: 3px solid var(--frame);
     font-size: 0.875rem;
     font-weight: 500;
     font-family: var(--font-sans), system-ui, sans-serif;
     transition: all 150ms ease-in-out;
     height: 2.5rem;
     padding: 0 1rem;
-    border: none;
     cursor: pointer;
     outline: none;
   }
@@ -99,12 +97,18 @@
   .driver-popover-next-btn {
     background-color: var(--primary);
     color: var(--primary-foreground);
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    box-shadow: var(--shadow-brutal-btn);
     margin-left: 0.5rem;
   }
 
   .driver-popover-next-btn:hover {
-    opacity: 0.9;
+    box-shadow: var(--shadow-brutal-btn-hover);
+    transform: translate(-1px, -1px);
+  }
+
+  .driver-popover-next-btn:active {
+    box-shadow: var(--shadow-brutal-btn-active);
+    transform: translate(2px, 2px);
   }
 
   .driver-popover-next-btn:focus-visible {
@@ -115,10 +119,17 @@
   .driver-popover-prev-btn {
     background-color: var(--secondary);
     color: var(--secondary-foreground);
+    box-shadow: var(--shadow-brutal-btn);
   }
 
   .driver-popover-prev-btn:hover {
-    opacity: 0.8;
+    box-shadow: var(--shadow-brutal-btn-hover);
+    transform: translate(-1px, -1px);
+  }
+
+  .driver-popover-prev-btn:active {
+    box-shadow: var(--shadow-brutal-btn-active);
+    transform: translate(2px, 2px);
   }
 
   .driver-popover-prev-btn:focus-visible {
@@ -159,19 +170,18 @@
 
   .driver-highlighted-element {
     background-color: var(--background);
-    outline: none;
-    box-shadow:
-      0 0 0 4px var(--primary),
-      0 0 20px rgba(0, 0, 0, 0.3);
+    outline: 3px solid var(--frame);
+    outline-offset: 4px;
+    box-shadow: var(--shadow-brutal-sm);
     z-index: 10001;
     position: relative;
   }
 
   #driver-highlighted-element-stage {
     background-color: var(--background);
-    box-shadow:
-      0 0 0 4px var(--primary),
-      0 0 20px rgba(0, 0, 0, 0.5);
+    outline: 3px solid var(--frame);
+    outline-offset: 4px;
+    box-shadow: var(--shadow-brutal-sm);
   }
 
   [data-theme="dark"] #driver-highlighted-element-stage,
@@ -180,9 +190,7 @@
   }
 
   [data-theme="dark"] .driver-popover {
-    box-shadow:
-      0 10px 15px -3px rgb(0 0 0 / 0.5),
-      0 4px 6px -4px rgb(0 0 0 / 0.3);
+    box-shadow: var(--shadow-brutal-md);
   }
 
   @container root (max-width: 640px) {
