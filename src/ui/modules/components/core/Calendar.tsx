@@ -236,7 +236,7 @@ export function Calendar({
               icon: 'mt-0.5 flex-shrink-0',
               content: 'flex-1',
             },
-            icon: <LockIcon size='16' className='!m-auto' />,
+            icon: <LockIcon size='16' />,
             action: (
               <div className='w-full donate-rainbow relative z-0 overflow-hidden p-0.5 flex items-center justify-center rounded-md hover:scale-102 transition duration-200 active:scale-100'>
                 <Button
