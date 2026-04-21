@@ -47,7 +47,10 @@ export default LandingPage;
 // todo: brutalist design (show legend in button, remove old brand, redo logo)
 // todo: Check DSM
 // todo: 400 and 500 page
+// todo: use of fonts
+// todo: check all buttons
 // todo: check SEO again
+// todo: check lang strings
 // todo: focus input order in stripe
 // todo: metadata in translate (separate in home, not landing VS planner)
 // todo: check translations
@@ -57,7 +60,6 @@ export default LandingPage;
 // todo: https://effect.website/
 // todo: https://csswizardry.com/2026/04/what-is-css-containment-and-how-can-i-use-it/
 // todo: add boneyard skeleton
-// todo: add ubiquitous language
 // todo: feedback web-check.xyz
 // todo: docs with mintlifyy
 // todo: share button with results?
@@ -67,7 +69,6 @@ export default LandingPage;
 // todo: performance audit, react best practices audit
 // todo: ads?
 // todo: add LICENCE, SECURITY, DOCS, WIKI, etc
-// todo: custom 404 and error?
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
 // todo: use grid one-liner for layout calendar https://www.youtube.com/watch?v=Ix_LAId0obw
 // todo: unify component and folder structure (payment/provider should be dto?)

@@ -22,9 +22,7 @@ export const Footer = async () => {
             </div>
             <span>Forever PTO</span>
           </div>
-          <span className='font-mono text-[11px] text-muted-foreground'>
-            v{version} · {t('statusLine')}
-          </span>
+          <span className='font-mono text-[11px] text-muted-foreground'>{t('version', { version })}</span>
         </div>
 
         <DevFooter />
@@ -67,7 +65,9 @@ export const Footer = async () => {
         </nav>
 
         <div className='px-6 py-3 border-t-[2px] border-dashed border-[var(--frame)]/18 flex justify-center'>
-          <span className='font-mono text-[11px] text-muted-foreground text-center'>{t('copyright')}</span>
+          <span className='font-mono text-[11px] text-muted-foreground text-center'>
+            {t('copyright', { year: new Date().getFullYear() })}
+          </span>
         </div>
       </div>
     </footer>

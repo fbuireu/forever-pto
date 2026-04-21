@@ -7,35 +7,12 @@ import { version } from '../../../../../package.json';
 import { CAL_ENTRIES, type DayType, dayCell } from './landing-shared';
 
 export const LandingHero = async () => {
-  const t = await getTranslations('landing');
-  const locale = await getLocale();
-  const year = new Date().getFullYear();
+  const [t, locale] = await Promise.all([getTranslations('landing'), getLocale()]);
   const DAY_HEADERS = getWeekdayNames(locale, 1, 'narrow');
 
   return (
     <header className='relative px-7 pt-20 pb-24 overflow-hidden' id='hero'>
-      {/* Floating stickers */}
-      <div
-        className='hidden lg:block absolute top-[70px] left-[5%] bg-[var(--color-brand-pink)] border-[3px] border-[var(--frame)] shadow-[4px_4px_0_0_var(--frame)] px-3 py-1.5 rounded-[6px] font-mono font-semibold text-xs z-[5] rotate-[-7deg]'
-        aria-hidden='true'
-      >
-        {t('hero.sticker1')}
-      </div>
-      <div
-        className='hidden lg:block absolute top-[130px] right-[4%] bg-[var(--color-brand-green)] border-[3px] border-[var(--frame)] shadow-[4px_4px_0_0_var(--frame)] px-3 py-1.5 rounded-[6px] font-mono font-semibold text-xs z-[5] rotate-[8deg]'
-        aria-hidden='true'
-      >
-        {t('hero.sticker2', { year })}
-      </div>
-      <div
-        className='hidden lg:block absolute bottom-20 left-[8%] bg-[var(--color-brand-sky)] border-[3px] border-[var(--frame)] shadow-[4px_4px_0_0_var(--frame)] px-3 py-1.5 rounded-[6px] font-mono font-semibold text-xs z-[5] rotate-[5deg]'
-        aria-hidden='true'
-      >
-        {t('hero.sticker3')}
-      </div>
-
       <div className='max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-14 items-center'>
-        {/* Left: headline + CTA */}
         <div>
           <div className='flex gap-2.5 items-center mb-6 flex-wrap'>
             <Badge variant='outline'>{t('hero.badge1')}</Badge>
@@ -74,16 +51,13 @@ export const LandingHero = async () => {
           </div>
         </div>
 
-        {/* Right: calculator preview mockup */}
         <div className='bg-card border-[5px] border-[var(--frame)] rounded-[14px] shadow-[10px_10px_0_0_var(--frame)] overflow-hidden rotate-[1.2deg] hover:rotate-0 transition-transform duration-[250ms] ease-out'>
-          {/* Title bar */}
           <div className='flex items-center gap-2.5 px-4 py-[10px] bg-[var(--frame)]'>
             <div className='w-3 h-3 rounded-full bg-[var(--color-brand-red)] border-[1.5px] border-black' />
             <div className='w-3 h-3 rounded-full bg-[var(--color-brand-yellow)] border-[1.5px] border-black' />
             <div className='w-3 h-3 rounded-full bg-[var(--color-brand-green)] border-[1.5px] border-black' />
             <span className='ml-auto mr-auto font-mono text-[12px] text-white/75'>forever-pto.com / planner</span>
           </div>
-          {/* Body */}
           <div className='p-[22px] bg-card'>
             <div className='grid grid-cols-2 gap-3.5 mb-4'>
               {[
@@ -104,8 +78,6 @@ export const LandingHero = async () => {
                 </div>
               ))}
             </div>
-
-            {/* Result box */}
             <div className='px-[18px] pt-[18px] pb-4 bg-[var(--accent)] border-[4px] border-[var(--frame)] rounded-[10px]'>
               <div className='text-[12px] uppercase tracking-[0.1em] mb-1'>{t('hero.mockupLabel')}</div>
               <div className='font-display font-extrabold text-[56px] leading-none tracking-[-0.03em] flex items-baseline gap-2.5'>
@@ -115,7 +87,6 @@ export const LandingHero = async () => {
               <div className='mt-2 font-serif italic text-[18px]'>{t('hero.mockupQuote')}</div>
             </div>
 
-            {/* Mini calendar */}
             <div className='mt-4 grid grid-cols-7 gap-1'>
               {DAY_HEADERS.map((d) => (
                 <div key={d} className='text-center font-mono text-[10px] font-bold py-1 text-muted-foreground'>
@@ -131,8 +102,6 @@ export const LandingHero = async () => {
                 </div>
               ))}
             </div>
-
-            {/* Legend */}
             <div className='flex gap-3.5 mt-3 flex-wrap text-[11px]'>
               {(
                 [

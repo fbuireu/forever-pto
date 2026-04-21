@@ -1,4 +1,4 @@
-@import 'driver.js/dist/driver.css' layer(tutorial);
+@import "driver.js/dist/driver.css" layer(tutorial);
 
 :root {
   --driver-z-index: 10000;
@@ -184,12 +184,12 @@
     box-shadow: var(--shadow-brutal-sm);
   }
 
-  [data-theme='dark'] #driver-highlighted-element-stage,
-  [data-theme='dark'] #driver-page-overlay {
+  [data-theme="dark"] #driver-highlighted-element-stage,
+  [data-theme="dark"] #driver-page-overlay {
     outline: 5000px solid rgba(0, 0, 0, 0.85);
   }
 
-  [data-theme='dark'] .driver-popover {
+  [data-theme="dark"] .driver-popover {
     box-shadow: var(--shadow-brutal-md);
   }
 

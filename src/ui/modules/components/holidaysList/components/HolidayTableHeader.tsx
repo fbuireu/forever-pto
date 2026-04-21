@@ -35,7 +35,7 @@ const TableHeader = ({ children, sortKey, currentSort, onSort, className = '' }:
       onClick={() => onSort(sortKey)}
     >
       <AnimateIcon animateOnHover>
-        <div className='flex items-center space-x-1'>
+        <div className='flex items-center space-x-1 text-foreground'>
           <span>{children}</span>
           <Icon className='h-4 w-4' />
         </div>
@@ -57,11 +57,11 @@ const HolidayTableHeaderComponent = ({ selectAllButton, sortConfig, onSort }: Ho
         <TableHeader sortKey='date' currentSort={sortConfig} onSort={onSort}>
           {t('date')}
         </TableHeader>
-        <TableHead>{t('day')}</TableHead>
+        <TableHead className='text-foreground'>{t('day')}</TableHead>
         <TableHeader sortKey='type' currentSort={sortConfig} onSort={onSort}>
           {t('type')}
         </TableHeader>
-        <TableHead>{t('status')}</TableHead>
+        <TableHead className='text-foreground'>{t('status')}</TableHead>
       </TableRow>
     </BaseTableHeader>
   );
