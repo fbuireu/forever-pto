@@ -230,7 +230,7 @@ export function Calendar({
         if (!premiumKey) {
           toast.info(tPremium('premiumFeature'), {
             description: tPremium('unlockDescription'),
-            duration: 10_000,
+            duration: 7_500,
             classNames: {
               toast: 'flex flex-row flex-wrap items-center overflow-visible',
               icon: 'mt-0.5 flex-shrink-0',
