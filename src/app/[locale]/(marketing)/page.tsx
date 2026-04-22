@@ -50,6 +50,7 @@ export default LandingPage;
 // todo: use of fonts
 // todo: check all buttons
 // todo: check SEO again
+// todo: https://isitagentready.com/forever-pto.com
 // todo: check lang strings
 // todo: focus input order in stripe
 // todo: metadata in translate (separate in home, not landing VS planner)

@@ -39,8 +39,8 @@ importers:
         specifier: 8.21.3
         version: 8.21.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@tursodatabase/serverless':
-        specifier: 1.0.0
-        version: 1.0.0
+        specifier: 1.1.0
+        version: 1.1.0
       canvas-confetti:
         specifier: 1.9.4
         version: 1.9.4
@@ -2515,8 +2515,8 @@ packages:
   '@tsconfig/node18@1.0.3':
     resolution: {integrity: sha512-RbwvSJQsuN9TB04AQbGULYfOGE/RnSFk/FLQ5b0NmDf5Kx2q/lABZbHQPKCO1vZ6Fiwkplu+yb9pGdLy1iGseQ==}
 
-  '@tursodatabase/serverless@1.0.0':
-    resolution: {integrity: sha512-zZwsSIsdAaQ99RtyAl87j8laWe/l0uNoJIpDtXToBFty/48KaA2W/GZRq6zyrAUh8innwy758TEoFVbCWFHgkw==}
+  '@tursodatabase/serverless@1.1.0':
+    resolution: {integrity: sha512-A3YfAmXX5n3BLrND8k2p8UIu7NKOsszUkevjACUOEFAi3TD0nq7eTi3bEJcet2LUY5uBN/eKabxZUm637DBapQ==}
 
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
@@ -7889,7 +7889,7 @@ snapshots:
 
   '@tsconfig/node18@1.0.3': {}
 
-  '@tursodatabase/serverless@1.0.0': {}
+  '@tursodatabase/serverless@1.1.0': {}
 
   '@tybys/wasm-util@0.10.1':
     dependencies:
