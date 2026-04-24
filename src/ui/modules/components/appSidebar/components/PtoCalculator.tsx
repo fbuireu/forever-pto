@@ -118,8 +118,8 @@ export const PtoCalculator = () => {
       {calculatedDays !== null && calculationSnapshotRef.current && (
         <div className='space-y-2 p-2 bg-muted rounded-md w-full'>
           <div className='text-xs'>
-            <span className='font-medium'>{t('result')}</span>
-            <div className='text-lg font-bold text-primary flex items-center gap-1'>
+            <span className='font-display font-medium'>{t('result')}</span>
+            <div className='text-lg font-display font-bold text-primary flex items-center gap-1'>
               <SlidingNumber number={calculatedDays} decimalPlaces={2} />
               <span>{t('days')}</span>
             </div>

@@ -18,8 +18,8 @@ export function Logo() {
         <div className='flex items-center'>
           {(isOpen || isMobile) && (
             <div className='flex text-center justify-center gap-2'>
-              <p className='text-3xl font-black tracking-[-0.05em]'>Forever</p>
-              <p className='text-3xl font-black -mr-3 tracking-[-0.05em]'>
+              <p className='text-3xl font-display font-black tracking-[-0.05em]'>Forever</p>
+              <p className='text-3xl font-display font-black -mr-3 tracking-[-0.05em]'>
                 <GradientText text='P' gradient='var(--brand-gradient)' />
               </p>
             </div>

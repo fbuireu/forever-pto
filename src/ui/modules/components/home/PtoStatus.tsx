@@ -49,20 +49,26 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
           <div className='flex items-center gap-2 rounded-full border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>
             <div className='h-3 w-3 rounded-full bg-teal-500' />
             <span className='text-sm text-muted-foreground'>{t('autoAssigned')}:</span>
-            <SlidingNumber number={activeSuggestedCount} className='font-black text-teal-700 dark:text-teal-300' />
+            <SlidingNumber
+              number={activeSuggestedCount}
+              className='font-display font-black text-teal-700 dark:text-teal-300'
+            />
           </div>
           <div className='flex items-center gap-2 rounded-full border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>
             <div className='h-3 w-3 rounded-full bg-blue-500' />
             <span className='text-sm text-muted-foreground'>{t('manual')}:</span>
-            <SlidingNumber number={manualSelectedCount} className='font-black text-blue-700 dark:text-blue-300' />
+            <SlidingNumber
+              number={manualSelectedCount}
+              className='font-display font-black text-blue-700 dark:text-blue-300'
+            />
           </div>
           <div className='h-8 w-[2px] bg-[var(--frame)]/15' />
           <div className='flex items-center gap-2 rounded-full border-[3px] border-[var(--frame)] bg-[var(--surface-panel-alt)] px-3 py-1.5 shadow-[var(--shadow-brutal-xs)]'>
-            <span className='text-sm font-black uppercase tracking-[0.08em]'>{t('remaining')}:</span>
+            <span className='text-sm font-display font-black uppercase tracking-[0.08em]'>{t('remaining')}:</span>
             <SlidingNumber
               number={remaining}
               className={cn(
-                'text-xl font-black',
+                'text-xl font-display font-black',
                 remaining > 0 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
               )}
             />

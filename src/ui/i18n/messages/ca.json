@@ -307,7 +307,7 @@
       "yearTitle": "Selecció d'Any",
       "yearDescription": "Tria l'any per al qual vols planificar. Els festius i suggeriments es generaran per a l'any seleccionat.",
       "strategyTitle": "Estratègia d'Optimització",
-      "strategyDescription": "Tria entre diferents estratègies per optimitzar el teu PTO. Cada estratègia té un enfoc diferent per agrupar i maximitzar els teus dies lliures. Pots expandir els detalls de l'estratègia per saber-ne més sobre cada opció.",
+      "strategyDescription": "Tria entre diferents estratègies per optimitzar el teu PTO. Cada estratègia té un enfocament diferent per agrupar i maximitzar els teus dies lliures. Pots expandir els detalls de l'estratègia per saber-ne més sobre cada opció.",
       "allowPastDaysTitle": "Permetre Dies Passats",
       "allowPastDaysDescription": "Activa aquesta opció si vols incloure dates que ja han passat a l'any actual. Útil per planificar retrospectivament o per al proper any.",
       "carryOverTitle": "Mesos d'Arrossegament",
@@ -321,7 +321,7 @@
       "calendarTitle": "El Teu Calendari de PTO Interactiu",
       "calendarDescription": "Aquest és el teu calendari d'un cop d'ull de l'any. Els festius apareixen en gris, els dies de PTO suggerits per IA en verd blavós, i els dies seleccionats manualment en blau. Fes clic a qualsevol dia laborable per alternar la selecció manualment. El calendari s'actualitza instantàniament mentre explores diferents alternatives.",
       "finishTitle": "Ja Està Tot Llest!",
-      "finishDescription": "Ara saps com usar Forever PTO per maximitzar el teu temps lliure. Comença configurant les teves preferències a la barra lateral, i deixa que l'app et suggereixi els millors dies de PTO. Gaudeix dels teus merescuts descans!",
+      "finishDescription": "Ara saps com usar Forever PTO per maximitzar el teu temps lliure. Comença configurant les teves preferències a la barra lateral, i deixa que l'app et suggereixi els millors dies de PTO. Gaudeix dels teus merescuts descansos!",
       "holidaysListTitle": "Personalitza els teus festius",
       "holidaysListDescription": "Aquí pots ajustar les dades de festius perquè s'adaptin exactament a la teva situació. Edita o elimina qualsevol festiu nacional o regional, i afegeix els teus propis dies personalitzats: festius d'empresa, celebracions locals o qualsevol data que sigui rellevant per a tu. Com més precisos siguin les dades, millors seran els suggeriments."
     }
@@ -779,7 +779,7 @@
     "unlockFeature": "Desbloquejar funció premium: {feature}",
     "premiumFeature": "Funció premium",
     "unlockDescription": "Desbloqueja la capacitat d'afegir/eliminar suggeriments i afegir/eliminar dies restants actualitzant a premium.",
-    "upgrade": "Millorar"
+    "upgrade": "Actualitzar a premium"
   },
   "calendar": {
     "previousMonth": "Mes anterior",
@@ -1693,7 +1693,7 @@
       "step1Title": "Posa els teus dies.",
       "step1Desc": "Quants dies de PTO tens, en quin país (o regió) treballes, i quins mesos prefereixes bloquejar. Això és tot.",
       "step2Title": "El motor fa màgia.",
-      "step2Desc": "Creua els teus dies amb els festius oficials i els ponts regionals. Troba totes les combinacions possibles i les ordena per \"ràtio de descàns\".",
+      "step2Desc": "Creua els teus dies amb els festius oficials i els ponts regionals. Troba totes les combinacions possibles i les ordena per \"ràtio de descans\".",
       "step3Title": "Demanes els dies.",
       "step3Desc": "Exporta a Google Calendar, Outlook o un PDF que enganxes al formulari de RRHH i t'oblides. Adéu dubtes."
     },

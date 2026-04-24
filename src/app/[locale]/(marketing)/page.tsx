@@ -45,15 +45,13 @@ const LandingPage = async ({ params }: PageProps) => {
 export default LandingPage;
 
 // todo: brutalist design (show legend in button, remove old brand, redo logo)
-// todo: Check DSM
+// todo: Check DSM (dark mode)
 // todo: 400 and 500 page
-// todo: use of fonts
 // todo: check all buttons
 // todo: check SEO again
 // todo: https://isitagentready.com/forever-pto.com
 // todo: check lang strings
 // todo: focus input order in stripe
-// todo: metadata in translate (separate in home, not landing VS planner)
 // todo: check translations
 // todo: unify styles and check everything
 // todo: html issues (button desc button)

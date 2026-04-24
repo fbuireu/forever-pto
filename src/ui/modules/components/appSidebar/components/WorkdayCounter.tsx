@@ -85,8 +85,8 @@ export const WorkdayCounter = () => {
       {selectedRange && (
         <div className='space-y-2 w-full bg-muted rounded-md p-3'>
           <div className='text-xs'>
-            <span className='font-medium'>{t('workingDays')}</span>
-            <div className='text-2xl font-bold text-primary'>
+            <span className='font-display font-medium'>{t('workingDays')}</span>
+            <div className='text-2xl font-display font-bold text-primary'>
               <SlidingNumber number={workdayCount} decimalPlaces={0} />
             </div>
             <p className='text-muted-foreground'>{t('businessDays')}</p>
@@ -94,27 +94,27 @@ export const WorkdayCounter = () => {
 
           <div className='flex justify-between items-start text-xs border-t pt-3'>
             <div className='text-left'>
-              <div className='font-medium'>{t('days')}</div>
-              <div className='text-lg font-bold'>
+              <div className='font-display font-medium'>{t('days')}</div>
+              <div className='text-lg font-display font-bold'>
                 <SlidingNumber number={totalDays} decimalPlaces={0} />
               </div>
             </div>
             <div className='text-left'>
-              <div className='font-medium'>{t('weekendDays')}</div>
-              <div className='text-lg font-bold text-muted-foreground'>
+              <div className='font-display font-medium'>{t('weekendDays')}</div>
+              <div className='text-lg font-display font-bold text-muted-foreground'>
                 <SlidingNumber number={weekendDays} decimalPlaces={0} />
               </div>
             </div>
             <div className='text-left'>
-              <div className='font-medium'>{t('holidays')}</div>
-              <div className='text-lg font-bold text-muted-foreground'>
+              <div className='font-display font-medium'>{t('holidays')}</div>
+              <div className='text-lg font-display font-bold text-muted-foreground'>
                 <SlidingNumber number={holidayDays} decimalPlaces={0} />
               </div>
             </div>
           </div>
 
           <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded text-xs'>
-            <p className='text-blue-700 dark:text-blue-400 font-medium'>{t('dateRange')}</p>
+            <p className='text-blue-700 dark:text-blue-400 font-display font-medium'>{t('dateRange')}</p>
             <p className='text-blue-600 dark:text-blue-300'>
               {t('from')} {formatDate({ date: selectedRange.from, locale, format: 'EEEE, MMMM d, yyyy' })} {t('to')}{' '}
               {formatDate({ date: selectedRange.to, locale, format: 'EEEE, MMMM d, yyyy' })}

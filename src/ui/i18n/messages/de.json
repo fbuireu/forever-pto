@@ -1663,7 +1663,7 @@
       "h1Line1": "Weniger arbeiten.",
       "h1Verb": "Mehr",
       "h1Word": "reisen",
-      "p": "Forever PTO berechnet <em>genau</em>, welche Tage du beantragen musst, damit aus deinen 22 Urlaubstagen <strong>47+ Tage außer Haus</strong> werden. Keine Tabellen. Keine Berechnungen.",
+      "p": "Forever PTO berechnet <em>genau</em>, welche Tage du beantragen musst, damit aus deinen 22 Urlaubstagen <strong>47+ Tage außer Haus</strong> werden. Keine Tabellen. Kein Kopfzerbrechen. Kein schlechtes Gewissen.",
       "pEm": "genau",
       "pStrong": "47+ Tage außer Haus",
       "cta1": "Meine Tage berechnen →",
@@ -1690,13 +1690,13 @@
       "h2Q1": "was soll ich tun",
       "h2Q2": "Reise gebucht",
       "h2End": "in 60 Sekunden.",
-      "p": "Keine Installation. Keine Kreditkarte. Kein Newsletter.",
+      "p": "Keine Installation. Keine Kreditkarte. Kein Newsletter. Sag uns einfach, wie viele Tage du hast und wo du wohnst.",
       "step1Title": "Tage eingeben.",
-      "step1Desc": "Wie viele Urlaubstage du hast, in welchem Land du arbeitest, und welche Monate du bevorzugst.",
+      "step1Desc": "Wie viele Urlaubstage du hast, in welchem Land (oder welcher Region) du arbeitest, und welche Monate du bevorzugst. Das war's.",
       "step2Title": "Die Engine macht die Magie.",
-      "step2Desc": "Sie kreuzt deine Tage mit offiziellen Feiertagen. Findet alle Kombinationen und ordnet sie nach Ruheverhältnis.",
+      "step2Desc": "Sie kreuzt deine Tage mit offiziellen Feiertagen und regionalen Brückentagen. Findet alle möglichen Kombinationen und ordnet sie nach dem Ruheverhältnis.",
       "step3Title": "Urlaubstage beantragen.",
-      "step3Desc": "In Google Kalender, Outlook oder als PDF exportieren."
+      "step3Desc": "Exportiere den Plan nach Google Kalender, Outlook oder als PDF — einfach ins HR-Formular einfügen und fertig. Kein Rätselraten mehr."
     },
     "stats": {
       "multiplierLabel": "Durchschnittlicher Multiplikator",
@@ -1723,7 +1723,7 @@
       "conflictsP": "Markiere die Tabu-Zeiten deines Unternehmens.",
       "countriesTag": "14 LÄNDER",
       "countriesH3": "Echte lokale Feiertage.",
-      "countriesP": "Offizielle Kalender jedes Jahr aktualisiert.",
+      "countriesP": "Offizielle Kalender jedes Jahr aktualisiert. Auch die regionalen.",
       "privacyTag": "100% LOKAL",
       "privacyH3": "Deine Daten verlassen nie deinen Browser.",
       "privacyP": "Kein Login, keine Cookies, keine Server. Forever PTO läuft 100% auf deinem Gerät."

@@ -779,7 +779,7 @@
     "unlockFeature": "Desbloquear función premium: {feature}",
     "premiumFeature": "Función premium",
     "unlockDescription": "Desbloquea la capacidad de añadir/eliminar sugerencias y añadir/eliminar días restantes actualizando a premium.",
-    "upgrade": "Mejorar"
+    "upgrade": "Actualizar a premium"
   },
   "calendar": {
     "previousMonth": "Mes anterior",

@@ -39,7 +39,7 @@ export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }:
     <PremiumFeature feature={t('annualTimelineFeature')} description={description} iconSize='size-7' inlineDescription>
       <Card className='shadow-[var(--shadow-brutal-md)]'>
         <CardHeader className='pb-3'>
-          <CardTitle className='flex items-center gap-2 text-base'>
+          <CardTitle className='flex items-center gap-2 text-base font-display font-semibold'>
             <TrendingUp className='w-5 h-5 text-green-500' />
             {t('annualTimeline')}
           </CardTitle>

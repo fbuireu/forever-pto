@@ -32,7 +32,7 @@ export const QuarterDistributionChart = ({ quarterDist }: QuarterDistributionCha
     >
       <Card className='shadow-[var(--shadow-brutal-md)]'>
         <CardHeader className='pb-3'>
-          <CardTitle className='flex items-center gap-2 text-base'>
+          <CardTitle className='flex items-center gap-2 text-base font-display font-semibold'>
             <BarChart3 className='w-5 h-5 text-blue-500' />
             {t('quarterDistribution')}
           </CardTitle>

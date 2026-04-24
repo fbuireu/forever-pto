@@ -128,24 +128,24 @@ export const PtoSalaryCalculator = () => {
         <div className='space-y-2 w-full bg-muted rounded-md'>
           <div className='space-y-2 w-full'>
             <div className='text-xs'>
-              <span className='font-medium text-red-600'>{t('valueOfUnusedPto')}:</span>
-              <div className='text-lg font-bold text-red-600 flex items-center gap-1'>
+              <span className='font-display font-medium text-red-600'>{t('valueOfUnusedPto')}:</span>
+              <div className='text-lg font-display font-bold text-red-600 flex items-center gap-1'>
                 <CurrencyNumber value={unusedPTOValue} decimalPlaces={0} />
               </div>
               <p className='text-muted-foreground'>{t('worthOfPaidVacation')}</p>
             </div>
 
             <div className='text-xs border-t pt-2'>
-              <span className='font-medium'>{t('yourDailyRate')}:</span>
-              <div className='text-sm font-bold text-primary flex items-center gap-1'>
+              <span className='font-display font-medium'>{t('yourDailyRate')}:</span>
+              <div className='text-sm font-display font-bold text-primary flex items-center gap-1'>
                 <CurrencyNumber value={dailyRate} decimalPlaces={0} />
                 <span className='text-muted-foreground'>/{t('perDay')}</span>
               </div>
             </div>
 
             <div className='text-xs'>
-              <span className='font-medium'>{t('yourHourlyRate')}:</span>
-              <div className='text-sm font-bold flex items-center gap-1'>
+              <span className='font-display font-medium'>{t('yourHourlyRate')}:</span>
+              <div className='text-sm font-display font-bold flex items-center gap-1'>
                 <CurrencyNumber value={normalHourlyRate} decimalPlaces={2} />
                 <span className='text-muted-foreground'>/{t('perHour')}</span>
               </div>
@@ -155,8 +155,8 @@ export const PtoSalaryCalculator = () => {
             {unusedPTODays > 0 && (
               <>
                 <div className='text-xs'>
-                  <span className='font-medium text-orange-600'>{t('effectiveHourlyRate')}:</span>
-                  <div className='text-sm font-bold text-orange-600 flex items-center gap-1'>
+                  <span className='font-display font-medium text-orange-600'>{t('effectiveHourlyRate')}:</span>
+                  <div className='text-sm font-display font-bold text-orange-600 flex items-center gap-1'>
                     <CurrencyNumber value={effectiveHourlyRate} decimalPlaces={2} />
                     <span className='text-muted-foreground'>/{t('perHour')}</span>
                   </div>
@@ -164,7 +164,7 @@ export const PtoSalaryCalculator = () => {
                 </div>
 
                 <div className='bg-amber-50 dark:bg-amber-900/20 p-2 rounded text-xs'>
-                  <p className='text-amber-700 dark:text-amber-400 font-medium'>{t('opportunityCost')}</p>
+                  <p className='text-amber-700 dark:text-amber-400 font-display font-medium'>{t('opportunityCost')}</p>
                   <p className='text-amber-600 dark:text-amber-300'>
                     {t.rich('opportunityCostDescription', {
                       days: unusedPTODays,

@@ -141,11 +141,11 @@
         "title": "Tecnico",
         "algorithms": {
           "question": "Come funziona l'algoritmo dei suggerimenti?",
-          "answer": "Il sistema analizza giorni lavorativi disponibili, festivi e preferenze dell'utente (es. evitare giorni passati) per produrre combinazioni di PTO che massimizzino il tempo libero effettivo. Applica euristiche basate su efficienza e punteggio per prioritizzare ponti e giorni raggruppati."
+          "answer": "Il sistema analizza giorni lavorativi disponibili, festivi e preferenze dell'utente (es. evitare giorni passati) per produrre combinazioni di PTO che massimizzino il tempo libero effettivo. Applica euristiche basate su efficienza e punteggio per dare priorità ai ponti e ai giorni raggruppati."
         },
         "strategies": {
           "question": "Qual è la differenza tra le strategie \"bilanciata\" e \"ottimizzata\"?",
-          "answer": "Bilanciata cerca di distribuire il tempo libero durante l'anno per un valore costante, mentre Ottimizzata si concentra sul massimizzare l'efficienza (giorni effettivi per giorno di PTO) prioritizzando le combinazioni con il miglior rapporto."
+          "answer": "Bilanciata cerca di distribuire il tempo libero durante l'anno per un valore costante, mentre Ottimizzata si concentra sul massimizzare l'efficienza (giorni effettivi per giorno di PTO) dando priorità alle combinazioni con il miglior rapporto."
         }
       },
       "security": {
@@ -779,7 +779,7 @@
     "unlockFeature": "Sblocca funzione premium: {feature}",
     "premiumFeature": "Funzione premium",
     "unlockDescription": "Sblocca la possibilità di aggiungere/rimuovere suggerimenti e aggiungere/rimuovere giorni rimanenti passando a premium.",
-    "upgrade": "Aggiorna"
+    "upgrade": "Passa a premium"
   },
   "calendar": {
     "previousMonth": "Mese precedente",

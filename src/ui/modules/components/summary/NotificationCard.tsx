@@ -49,7 +49,9 @@ export const NotificationCard = ({
     >
       <div className={cn('flex items-center gap-2 mb-3')}>
         <Icon className={cn('w-4 h-4', colors.icon)} />
-        <span className={cn('text-[0.72rem] font-black uppercase tracking-[0.08em]', colors.title)}>{title}</span>
+        <span className={cn('text-[0.72rem] font-display font-black uppercase tracking-[0.08em]', colors.title)}>
+          {title}
+        </span>
       </div>
       <div className={cn('text-sm flex justify-start font-medium', colors.message)}>{children}</div>
     </div>
