@@ -1,8 +1,8 @@
 'use client';
 
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { Button } from '@ui/components/primitives/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/components/primitives/card';
+import { Button } from '@ui/modules/core/primitives/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';

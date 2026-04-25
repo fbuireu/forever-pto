@@ -1,8 +1,8 @@
 import { Link } from '@application/i18n/navigtion';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
-import { Button } from '@ui/components/primitives/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/components/primitives/card';
+import { Button } from '@ui/modules/core/primitives/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import type { Locale } from 'next-intl';

@@ -1,8 +1,8 @@
 import { routing } from '@infrastructure/i18n/routing';
-import { cn } from '@ui/lib/utils';
+import { cn } from '@ui/utils/utils';
 import '@styles/index.css';
-import { LazyMotionProvider } from '@ui/components/animate/LazyMotionProvider';
-import { Analytics } from '@ui/modules/components/core/Analytics';
+import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
+import { Analytics } from '@ui/modules/tutorial/Analytics';
 import { Bricolage_Grotesque, Instrument_Serif, Space_Grotesk } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';

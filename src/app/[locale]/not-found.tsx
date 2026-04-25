@@ -1,6 +1,6 @@
 import { Link } from '@application/i18n/navigtion';
-import { Button } from '@ui/components/primitives/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/components/primitives/card';
+import { Button } from '@ui/modules/core/primitives/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { FileQuestion } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 

@@ -1,18 +1,18 @@
-import { SidebarProvider } from '@ui/components/animate/base/sidebar';
-import { Toaster } from '@ui/components/primitives/sonner';
-import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
-import { CookieConsentClient } from '@ui/modules/components/core/CookieConsentClient';
-import { DonateClient } from '@ui/modules/components/core/DonateClient';
-import { SiteSubtitle } from '@ui/modules/components/core/SiteSubtitle';
-import { SiteTitle } from '@ui/modules/components/core/SiteTitle';
-import { Footer } from '@ui/modules/components/footer/Footer';
-import { StoresInitializer } from '@ui/store/StoresInitializer';
+﻿import { SidebarProvider } from '@ui/modules/core/animate/base/Sidebar';
+import { Toaster } from '@ui/modules/core/primitives/Sonner';
+import { SiteSubtitle } from '@ui/modules/pages/planner/SiteSubtitle';
+import { SiteTitle } from '@ui/modules/pages/planner/SiteTitle';
+import { CookieConsentClient } from '@ui/modules/shared/cookie-consent/CookieConsentClient';
+import { DonateClient } from '@ui/modules/shared/donate/DonateClient';
+import { Footer } from '@ui/modules/shared/footer/Footer';
+import { AppSidebar } from '@ui/modules/sidebar/AppSidebar';
+import { StoresInitializer } from '@ui/modules/stores/StoresInitializer';
 import dynamic from 'next/dynamic';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 
 const PremiumModal = dynamic(() =>
-  import('@ui/modules/components/premium/PremiumModal').then((module) => ({ default: module.PremiumModal }))
+  import('@ui/modules/premium/PremiumModal').then((module) => ({ default: module.PremiumModal }))
 );
 
 interface AppLayoutProps {

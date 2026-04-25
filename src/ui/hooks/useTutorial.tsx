@@ -1,6 +1,6 @@
 'use client';
 
-import { useSidebar } from '@ui/components/animate/base/sidebar';
+import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
 import type { DriveStep } from 'driver.js';
 import { useTranslations } from 'next-intl';
 import { useCallback } from 'react';
@@ -14,7 +14,7 @@ export const useTutorial = () => {
   const startTutorial = useCallback(async () => {
     const [{ getDriverClientInstance }] = await Promise.all([
       import('@infrastructure/clients/tutorial/driver/client'),
-      import('@ui/modules/components/core/DriverStyles'),
+      import('@ui/modules/tutorial/DriverStyles'),
     ]);
     const driverClient = getDriverClientInstance();
 
