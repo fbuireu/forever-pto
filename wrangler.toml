@@ -41,6 +41,10 @@ NEXT_PUBLIC_CONTACT_EMAIL = "contact@forever-pto.com"
 [env.development]
 name = "forever-pto-development"
 
+[[env.development.routes]]
+pattern = "development.forever-pto.com"
+custom_domain = true
+
 [[env.development.tail_consumers]]
 service = "forever-pto-tail"
 
