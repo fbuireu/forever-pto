@@ -1,8 +1,8 @@
 'use client';
 
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { Button } from '@ui/components/primitives/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/components/primitives/card';
+import { Button } from '@ui/modules/core/primitives/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -27,7 +27,7 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
 
   return (
     <div className='min-h-screen flex items-center justify-center p-4 bg-background m-auto'>
-      <Card className='w-full max-w-md border-destructive/50'>
+      <Card className='w-full max-w-md border-destructive/50 shadow-[6px_6px_0_0_color-mix(in_srgb,var(--destructive)_50%,transparent)]'>
         <CardHeader className='text-center'>
           <div className='mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10'>
             <AlertTriangle className='h-6 w-6 text-destructive' />

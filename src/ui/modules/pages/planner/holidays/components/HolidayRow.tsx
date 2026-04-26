@@ -1,0 +1,81 @@
+'use client';
+
+import type { HolidayDTO } from '@application/dto/holiday/types';
+import { Checkbox } from '@ui/modules/core/animate/base/Checkbox';
+import { Badge } from '@ui/modules/core/primitives/Badge';
+import { TableCell, TableRow } from '@ui/modules/core/primitives/Table';
+import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/premium/PremiumFeature';
+import { formatDate, isWeekend } from '@ui/utils/dates';
+import { cn } from '@ui/utils/utils';
+import type { Locale } from 'next-intl';
+import { useTranslations } from 'next-intl';
+import { memo } from 'react';
+
+interface HolidayRowProps {
+  holiday: HolidayDTO;
+  index: number;
+  isSelected: boolean;
+  locale: Locale;
+  onToggle: (holiday: HolidayDTO, index: number) => void;
+}
+
+const HolidayRowComponent = ({ holiday, index, isSelected, locale, onToggle }: HolidayRowProps) => {
+  const t = useTranslations('holidayRow');
+
+  const getWorkdayStatus = (date: Date) => {
+    const isWeekendDay = isWeekend(date);
+    return {
+      isWorkday: !isWeekendDay,
+      variant: isWeekendDay ? ('destructive' as const) : ('default' as const),
+      className: cn(!isWeekendDay && 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'),
+    };
+  };
+
+  const workdayStatus = getWorkdayStatus(holiday.date);
+
+  return (
+    <TableRow className={cn('hover:bg-muted/50', isSelected && 'bg-muted/25')}>
+      <TableCell>
+        <PremiumFeature
+          feature={t('editHolidays')}
+          variant={PremiumFeatureVariant.STACK}
+          iconSize='h-4 w-4'
+          className='bg-none'
+        >
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={() => onToggle(holiday, index)}
+            aria-label={t('select', { name: holiday.name })}
+          />
+        </PremiumFeature>
+      </TableCell>
+      <TableCell className='font-medium'>
+        <div className='flex items-center space-x-2'>
+          <span className='truncate'>{holiday.name}</span>
+        </div>
+      </TableCell>
+      <TableCell>
+        <span className='font-mono text-sm'>{formatDate({ date: holiday.date, locale, format: 'yyyy-MM-dd' })}</span>
+      </TableCell>
+      <TableCell>
+        <span className='capitalize text-sm text-muted-foreground truncate'>
+          {formatDate({ date: holiday.date, locale, format: 'EEEE' })}
+        </span>
+      </TableCell>
+      <TableCell>
+        <Badge variant='outline' className='capitalize text-xs'>
+          {holiday.type ?? holiday.variant}
+        </Badge>
+      </TableCell>
+      <TableCell>
+        <Badge variant={workdayStatus.variant} className={cn('text-xs', workdayStatus.className)}>
+          {workdayStatus.isWorkday ? t('workday') : t('weekend')}
+        </Badge>
+      </TableCell>
+    </TableRow>
+  );
+};
+
+export const HolidayRow = memo(HolidayRowComponent);
+
+HolidayRow.displayName = 'HolidayRow';

@@ -1,5 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { formatDate } from '@ui/lib/date';
+import { formatDate } from '@ui/utils/dates';
 import type { Locale } from 'next-intl';
 import type { Bridge, Metrics, Suggestion } from '../types';
 import {

@@ -1,7 +1,7 @@
 'use client';
 
-import { AnimateIcon } from '@ui/components/animate/icons/icon';
-import { X } from '@ui/components/animate/icons/x';
+import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
+import { X } from '@ui/modules/core/animate/icons/X';
 import { type Config, type Driver, type DriveStep, driver } from 'driver.js';
 import { createRoot, type Root } from 'react-dom/client';
 
@@ -24,7 +24,7 @@ export class DriverClient {
       showButtons: ['next', 'previous', 'close'],
       smoothScroll: true,
       stagePadding: 10,
-      stageRadius: 8,
+      stageRadius: 12,
       ...this.config,
       onPopoverRender: (popover, options) => {
         this.config.onPopoverRender?.(popover, options);

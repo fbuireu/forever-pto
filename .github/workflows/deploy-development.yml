@@ -2,13 +2,14 @@ name: Deploy - Development
 
 on:
   pull_request:
-    branches: [main]
+    types: [opened, reopened, synchronize]
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
-  group: deploy-development-${{ github.ref }}
+  group: deploy-preview-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
@@ -17,19 +18,49 @@ jobs:
     with:
       environment: development
       wrangler_env: development
-      url: https://forever-pto-development.ferran-buireu.workers.dev
+      worker_name: pr-${{ github.event.pull_request.number }}-forever-pto-development
+      url: https://pr-${{ github.event.pull_request.number }}-forever-pto-development.forever-pto.workers.dev
     secrets:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  comment:
+    name: Post preview URL
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find existing comment
+        uses: peter-evans/find-comment@v4
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: github-actions[bot]
+          body-includes: '<!-- preview-deployment -->'
+
+      - name: Upsert preview comment
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            <!-- preview-deployment -->
+            ### Preview deployment
+
+            | | |
+            |---|---|
+            | **URL** | https://pr-${{ github.event.pull_request.number }}-forever-pto-development.forever-pto.workers.dev |
+            | **Branch** | `${{ github.head_ref }}` |
+            | **Commit** | `${{ github.event.pull_request.head.sha }}` |
 
   e2e:
     name: E2E tests
     needs: [deploy]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -37,6 +68,6 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
         env:
-          BASE_URL: https://forever-pto-development.ferran-buireu.workers.dev
+          BASE_URL: https://pr-${{ github.event.pull_request.number }}-forever-pto-development.forever-pto.workers.dev
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}

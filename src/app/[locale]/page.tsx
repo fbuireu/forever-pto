@@ -1,23 +1,23 @@
 import { LOCALES } from '@infrastructure/i18n/config';
-import { Faq } from '@ui/modules/components/home/Faq';
-import { JsonLd } from '@ui/modules/components/seo/JsonLd';
-import dynamic from 'next/dynamic';
+import { Comparison } from '@ui/modules/pages/homepage/sections/Comparison';
+import { Faq } from '@ui/modules/pages/homepage/sections/Faq';
+import { Features } from '@ui/modules/pages/homepage/sections/Features';
+import { FinalCta } from '@ui/modules/pages/homepage/sections/FinalCta';
+import { Hero } from '@ui/modules/pages/homepage/sections/Hero';
+import { HowItWorks } from '@ui/modules/pages/homepage/sections/HowItWorks';
+import { Marquee } from '@ui/modules/pages/homepage/sections/Marquee';
+import { Pricing } from '@ui/modules/pages/homepage/sections/Pricing';
+import { Stats } from '@ui/modules/pages/homepage/sections/Stats';
+import { Testimonials } from '@ui/modules/pages/homepage/sections/Testimonials';
+import { DonateClient } from '@ui/modules/shared/donate/DonateClient';
+import { Footer } from '@ui/modules/shared/footer/Footer';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
-
-const HolidaysList = dynamic(() => import('@ui/modules/components/home/HolidaysList').then((mod) => mod.HolidaysList));
-const ManagementBar = dynamic(() =>
-  import('@ui/modules/components/home/ManagementBar').then((mod) => mod.ManagementBar)
-);
-const CalendarList = dynamic(() => import('@ui/modules/components/home/CalendarList').then((mod) => mod.CalendarList));
-const Legend = dynamic(() => import('@ui/modules/components/home/Legend').then((mod) => mod.Legend));
-const Summary = dynamic(() => import('@ui/modules/components/home/Summary').then((mod) => mod.Summary));
-const Roadmap = dynamic(() => import('@ui/modules/components/home/Roadmap').then((mod) => mod.Roadmap));
-const Contact = dynamic(() => import('@ui/modules/components/home/Contact').then((mod) => mod.Contact));
+import { Navigation } from 'src/ui/modules/pages/homepage/navigation/Navigation';
 
 export { generateMetadata } from './metadata';
 
-interface LayoutProps {
+interface PageProps {
   params: Promise<{ locale: Locale }>;
 }
 
@@ -25,35 +25,53 @@ export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
 }
 
-const Home = async ({ params }: LayoutProps) => {
+const HomePage = async ({ params }: PageProps) => {
   const { locale } = await params;
   setRequestLocale(locale);
 
   return (
-    <>
-      <JsonLd locale={locale} />
-      <section className='flex w-full max-w-8xl mx-auto items-start flex-col gap-4 mb-8'>
-        <HolidaysList />
-        <ManagementBar />
-        <CalendarList />
-        <Legend />
-        <Summary />
-        <Roadmap />
-        <Contact />
+    <div className='min-h-screen bg-background text-foreground flex flex-col'>
+      <Navigation />
+      <main id='main-content' className='flex-1'>
+        <Hero />
+        <Marquee />
+        <HowItWorks />
+        <Stats />
+        <Features />
+        <Comparison />
+        <Testimonials />
+        <Pricing />
         <Faq />
-      </section>
-    </>
+        <FinalCta />
+        <DonateClient />
+      </main>
+      <div className='px-7 py-8 bg-background border-t-4 border-(--frame)'>
+        <div className='max-w-310 mx-auto'>
+          <Footer />
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default Home;
+export default HomePage;
 
-// todo: brutalist design
+// todo: brutalist design (show legend in button, remove old brand, redo logo)
+// todo: Check DSM (dark mode, tipografies, colors, etc)
+// todo: more testimonials + randomize them
+// todo: 400 and 500 page
+// todo: check all buttons
+// todo: check all skeletons
+// todo: https://isitagentready.com/forever-pto.com
+// todo: check lang strings (rename landing for home, no use finalCta or strings like that, etc)
+// todo: focus input order in stripe
+// todo: check translations
+// todo: unify styles and check everything
+// todo: html issues (button desc button)
 // todo: improve responsive
 // todo: https://effect.website/
 // todo: https://csswizardry.com/2026/04/what-is-css-containment-and-how-can-i-use-it/
 // todo: add boneyard skeleton
-// todo: add ubiquitous language
 // todo: feedback web-check.xyz
 // todo: docs with mintlifyy
 // todo: share button with results?
@@ -63,7 +81,6 @@ export default Home;
 // todo: performance audit, react best practices audit
 // todo: ads?
 // todo: add LICENCE, SECURITY, DOCS, WIKI, etc
-// todo: custom 404 and error?
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
 // todo: use grid one-liner for layout calendar https://www.youtube.com/watch?v=Ix_LAId0obw
 // todo: unify component and folder structure (payment/provider should be dto?)
