@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { brutCard, type DayType, dayCell } from './shared';
 
 export const Features = async () => {
-  const t = await getTranslations('landing');
+  const t = await getTranslations('homepage');
 
   return (
     <section className='px-7 py-24' id='features'>
@@ -12,14 +12,13 @@ export const Features = async () => {
           <Badge variant='outline'>{t('features.badge')}</Badge>
         </div>
         <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] mb-4 text-[clamp(36px,5vw,64px)]'>
-          {t('features.h2Start')} <em className='font-serif italic font-semibold'>{t('features.h2Em')}</em>{' '}
-          {t('features.h2End')}
+          {t('features.titleStart')} <em className='font-serif italic font-semibold'>{t('features.titleEmphasis')}</em>{' '}
+          {t('features.titleEnd')}
         </h2>
-        <p className='text-[19px] text-muted-foreground'>{t('features.p')}</p>
+        <p className='text-[19px] text-muted-foreground'>{t('features.description')}</p>
       </div>
 
       <div className='max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-6 gap-6'>
-        {/* Big bridge feature */}
         <div
           className={`${brutCard} md:col-span-4 p-7 bg-[var(--accent)] transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
         >
@@ -27,9 +26,9 @@ export const Features = async () => {
             {t('features.bridgeTag')}
           </span>
           <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em]'>
-            {t('features.bridgeH3')}
+            {t('features.bridgeTitle')}
           </h3>
-          <p className='text-foreground text-[15px] leading-relaxed mb-4'>{t('features.bridgeP')}</p>
+          <p className='text-foreground text-[15px] leading-relaxed mb-4'>{t('features.bridgeDescription')}</p>
           <div className='grid grid-cols-7 gap-1 max-w-[280px]'>
             {(['weekend', 'pto', 'holiday', 'work', 'work', 'work', 'work'] as DayType[]).map((dt, i) => {
               const label = ['L', 'M', 'X', 'J', 'V', 'S', 'D'][i];
@@ -44,8 +43,6 @@ export const Features = async () => {
             })}
           </div>
         </div>
-
-        {/* Ratio max */}
         <div
           className={`${brutCard} md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
         >
@@ -55,10 +52,8 @@ export const Features = async () => {
           <div className='font-display font-extrabold text-[100px] leading-none tracking-[-0.05em] mt-2.5 mb-2'>
             3.5<span className='text-[32px]'>×</span>
           </div>
-          <p className='text-foreground text-[15px]'>{t('features.ratioP')}</p>
+          <p className='text-foreground text-[15px]'>{t('features.ratioDescription')}</p>
         </div>
-
-        {/* Calendar sync */}
         <div
           className={`${brutCard} md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
           style={{ background: 'var(--color-brand-teal)' }}
@@ -67,9 +62,9 @@ export const Features = async () => {
             {t('features.syncTag')}
           </span>
           <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em]'>
-            {t('features.syncH3')}
+            {t('features.syncTitle')}
           </h3>
-          <p className='text-[15px] leading-relaxed'>{t('features.syncP')}</p>
+          <p className='text-[15px] leading-relaxed'>{t('features.syncDescription')}</p>
           <div className='flex flex-wrap gap-2 mt-3.5'>
             {['📅 Google', '📨 Outlook', '🍎 Apple'].map((s) => (
               <span
@@ -81,8 +76,6 @@ export const Features = async () => {
             ))}
           </div>
         </div>
-
-        {/* Anti-conflicts */}
         <div
           className={`${brutCard} md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
         >
@@ -90,30 +83,28 @@ export const Features = async () => {
             {t('features.conflictsTag')}
           </span>
           <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em]'>
-            {t('features.conflictsH3')}
+            {t('features.conflictsTitle')}
           </h3>
           <div className='flex flex-wrap gap-1.5 mb-3.5'>
             {[
-              { text: 'All-hands trim.', alert: false },
-              { text: 'Q3 closing', alert: true },
-              { text: 'Lanzamiento', alert: false },
-            ].map(({ text, alert }) => (
+              { key: 'features.conflictItems.0' as const, alert: false },
+              { key: 'features.conflictItems.1' as const, alert: true },
+              { key: 'features.conflictItems.2' as const, alert: false },
+            ].map(({ key, alert }) => (
               <span
-                key={text}
+                key={key}
                 className='border-[2.5px] border-[var(--frame)] rounded-[6px] px-2 py-1 font-mono text-[12px] font-semibold'
                 style={{
                   background: alert ? 'var(--color-brand-red)' : 'var(--background)',
                   color: alert ? 'white' : 'inherit',
                 }}
               >
-                {text}
+                {t(key)}
               </span>
             ))}
           </div>
-          <p className='text-foreground text-[15px]'>{t('features.conflictsP')}</p>
+          <p className='text-foreground text-[15px]'>{t('features.conflictsDescription')}</p>
         </div>
-
-        {/* Countries */}
         <div
           className={`${brutCard} md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
           style={{ background: 'var(--color-brand-orange)' }}
@@ -122,9 +113,9 @@ export const Features = async () => {
             {t('features.countriesTag')}
           </span>
           <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em] text-white'>
-            {t('features.countriesH3')}
+            {t('features.countriesTitle')}
           </h3>
-          <p className='text-white/90 text-[15px] leading-relaxed mb-3'>{t('features.countriesP')}</p>
+          <p className='text-white/90 text-[15px] leading-relaxed mb-3'>{t('features.countriesDescription')}</p>
           <div className='flex flex-wrap gap-2'>
             {['🇪🇸', '🇮🇹', '🇩🇪', '🇫🇷', '🇬🇧', '🇺🇸', '+8'].map((flag) => (
               <span
@@ -136,8 +127,6 @@ export const Features = async () => {
             ))}
           </div>
         </div>
-
-        {/* Privacy */}
         <div
           className={`${brutCard} md:col-span-6 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
           style={{ background: 'var(--frame)', color: 'var(--background)' }}
@@ -146,10 +135,10 @@ export const Features = async () => {
             {t('features.privacyTag')}
           </span>
           <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em] text-[var(--background)]'>
-            {t('features.privacyH3')}
+            {t('features.privacyTitle')}
           </h3>
           <p className='text-[var(--background)]/85 text-[15px] leading-relaxed max-w-[700px]'>
-            {t('features.privacyP')}
+            {t('features.privacyDescription')}
           </p>
         </div>
       </div>

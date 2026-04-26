@@ -3,7 +3,6 @@
 }
 
 :root {
-  /* === DSM Brand Colors === */
   --color-brand-yellow: #ffd93d;
   --color-brand-teal: #4ecdc4;
   --color-brand-orange: #ff7a45;
@@ -17,7 +16,6 @@
   --color-brand-vanilla: #fffaf0;
   --color-brand-paper: #fffdf8;
 
-  /* Deep variants for text/emphasis */
   --color-brand-teal-deep: #0c9e97;
   --color-brand-orange-deep: #c2410c;
   --color-brand-purple-deep: #7c3aed;

@@ -1,108 +1,49 @@
 'use client';
 
+import { AutoHeight } from '@ui/modules/core/animate/effects/AutoHeight';
 import { cn } from '@ui/utils/utils';
-import { type HTMLMotionProps, m, type Transition } from 'motion/react';
-import {
-  Children,
-  createContext,
-  isValidElement,
-  use,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
+import * as React from 'react';
+import { createContext, use, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { MotionHighlight, MotionHighlightItem } from '../effects/MotionHighlight';
 
-type TabsContextType<T extends string> = {
-  activeValue: T;
-  handleValueChange: (value: T) => void;
-  registerTrigger: (value: T, node: HTMLElement | null) => void;
+// --- Context ---
+
+type TabsContextType = {
+  activeValue: string;
+  handleValueChange: (value: string) => void;
 };
 
-// biome-ignore lint/suspicious/noExplicitAny: vendored component
-const TabsContext = createContext<TabsContextType<any> | undefined>(undefined);
+const TabsContext = createContext<TabsContextType | undefined>(undefined);
 
-function useTabs<T extends string = string>(): TabsContextType<T> {
-  const context = use(TabsContext);
-  if (!context) {
-    throw new Error('useTabs must be used within a TabsProvider');
-  }
-  return context;
+function useTabs(): TabsContextType {
+  const ctx = use(TabsContext);
+  if (!ctx) throw new Error('useTabs must be used within a Tabs');
+  return ctx;
 }
 
-type BaseTabsProps = React.ComponentProps<'div'> & {
-  children: React.ReactNode;
+// --- Tabs ---
+
+type TabsProps = React.ComponentProps<'div'> & {
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
 };
 
-type UnControlledTabsProps<T extends string = string> = BaseTabsProps & {
-  defaultValue?: T;
-  value?: never;
-  onValueChange?: never;
-};
-
-type ControlledTabsProps<T extends string = string> = BaseTabsProps & {
-  value: T;
-  onValueChange?: (value: T) => void;
-  defaultValue?: never;
-};
-
-type TabsProps<T extends string = string> = UnControlledTabsProps<T> | ControlledTabsProps<T>;
-
-function Tabs<T extends string = string>({
-  defaultValue,
-  value,
-  onValueChange,
-  children,
-  className,
-  ...props
-}: TabsProps<T>) {
-  const [activeValue, setActiveValue] = useState<T | undefined>(defaultValue ?? undefined);
-  const triggersRef = useRef(new Map<string, HTMLElement>());
-  const initialSet = useRef(false);
+function Tabs({ defaultValue, value, onValueChange, children, className, ...props }: TabsProps) {
+  const [internalValue, setInternalValue] = useState(defaultValue ?? '');
   const isControlled = value !== undefined;
-
-  useEffect(() => {
-    if (!isControlled && activeValue === undefined && triggersRef.current.size > 0 && !initialSet.current) {
-      const firstTab = Array.from(triggersRef.current.keys())[0];
-      setActiveValue(firstTab as T);
-      initialSet.current = true;
-    }
-  }, [activeValue, isControlled]);
-
-  const registerTrigger = useCallback(
-    (value: string, node: HTMLElement | null) => {
-      if (node) {
-        triggersRef.current.set(value, node);
-        if (!isControlled && activeValue === undefined && !initialSet.current) {
-          setActiveValue(value as T);
-          initialSet.current = true;
-        }
-      } else {
-        triggersRef.current.delete(value);
-      }
-    },
-    [activeValue, isControlled]
-  );
+  const activeValue = isControlled ? value : internalValue;
 
   const handleValueChange = useCallback(
-    (val: T) => {
-      if (!isControlled) setActiveValue(val);
-      else onValueChange?.(val);
+    (val: string) => {
+      if (!isControlled) setInternalValue(val);
+      onValueChange?.(val);
     },
     [isControlled, onValueChange]
   );
 
-  const contextValue = useMemo(
-    () => ({
-      activeValue: (value ?? activeValue) as T,
-      handleValueChange,
-      registerTrigger,
-    }),
-    [value, activeValue, handleValueChange, registerTrigger]
-  );
+  const contextValue = useMemo(() => ({ activeValue, handleValueChange }), [activeValue, handleValueChange]);
 
   return (
     <TabsContext.Provider value={contextValue}>
@@ -113,143 +54,175 @@ function Tabs<T extends string = string>({
   );
 }
 
-type TabsListProps = React.ComponentProps<'div'> & {
+// --- TabsHighlight ---
+// Wraps TabsList with the sliding highlight indicator.
+// activeClassName controls the highlight pill appearance (default: yellow accent).
+
+type TabsHighlightProps = {
   children: React.ReactNode;
   activeClassName?: string;
   transition?: Transition;
 };
 
-function TabsList({
+function TabsHighlight({
   children,
-  className,
   activeClassName,
-  transition = {
-    type: 'spring',
-    stiffness: 200,
-    damping: 25,
-  },
-  ...props
-}: TabsListProps) {
+  transition = { type: 'spring', stiffness: 200, damping: 25 },
+}: TabsHighlightProps) {
   const { activeValue } = useTabs();
 
   return (
     <MotionHighlight
       controlledItems
-      className={cn('rounded-[6px] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-xs)]', activeClassName)}
+      className={cn(
+        'rounded-[6px] bg-[var(--accent)] border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-xs)]',
+        activeClassName
+      )}
       value={activeValue}
       transition={transition}
     >
-      <div
-        role='tablist'
-        data-slot='tabs-list'
-        className={cn(
-          'bg-[var(--surface-panel-soft)] gap-1 text-muted-foreground inline-flex h-10 w-fit items-center justify-center rounded-[10px] border-[3px] border-[var(--frame)] p-[3px] shadow-[var(--shadow-brutal-xs)]',
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </div>
+      {children}
     </MotionHighlight>
   );
 }
 
-type TabsTriggerProps = HTMLMotionProps<'button'> & {
+// --- TabsList ---
+
+type TabsListProps = React.ComponentProps<'div'>;
+
+function TabsList({ children, className, ...props }: TabsListProps) {
+  return (
+    <div
+      role='tablist'
+      data-slot='tabs-list'
+      className={cn(
+        'bg-[var(--surface-panel-soft)] gap-1 text-muted-foreground inline-flex h-10 w-fit items-center justify-center rounded-[10px] border-[3px] border-[var(--frame)] p-[3px] shadow-[var(--shadow-brutal-xs)]',
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
+
+// --- TabsHighlightItem ---
+
+type TabsHighlightItemProps = {
   value: string;
-  children: React.ReactNode;
+  children: React.ReactElement;
+  className?: string;
 };
 
-function TabsTrigger({ ref, value, children, className, ...props }: TabsTriggerProps) {
-  const { activeValue, handleValueChange, registerTrigger } = useTabs();
-
-  const localRef = useRef<HTMLButtonElement | null>(null);
-  useImperativeHandle(ref, () => localRef.current as HTMLButtonElement);
-
-  useEffect(() => {
-    registerTrigger(value, localRef.current);
-    return () => registerTrigger(value, null);
-  }, [value, registerTrigger]);
-
+function TabsHighlightItem({ value, children, className }: TabsHighlightItemProps) {
   return (
-    <MotionHighlightItem value={value} className='size-full'>
-      <m.button
-        ref={localRef}
-        data-slot='tabs-trigger'
-        role='tab'
-        whileTap={{ scale: 0.95 }}
-        onClick={() => handleValueChange(value)}
-        data-state={activeValue === value ? 'active' : 'inactive'}
-        className={cn(
-          'inline-flex cursor-pointer items-center size-full justify-center whitespace-nowrap rounded-sm px-2 py-1 text-sm font-medium ring-offset-background transition-all duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-foreground data-[state=inactive]:hover:bg-[var(--surface-panel-alt)] data-[state=inactive]:hover:text-foreground z-[1]',
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </m.button>
+    <MotionHighlightItem value={value} className={cn('size-full', className)}>
+      {children}
     </MotionHighlightItem>
   );
 }
 
+// --- TabsTrigger ---
+
+type TabsTriggerProps = HTMLMotionProps<'button'> & { value: string };
+
+function TabsTrigger({ ref, value, children, className, ...props }: TabsTriggerProps) {
+  const { activeValue, handleValueChange } = useTabs();
+  const localRef = useRef<HTMLButtonElement>(null);
+  useImperativeHandle(ref, () => localRef.current as HTMLButtonElement);
+
+  return (
+    <m.button
+      ref={localRef}
+      data-slot='tabs-trigger'
+      role='tab'
+      whileTap={{ scale: 0.95 }}
+      onClick={() => handleValueChange(value)}
+      data-state={activeValue === value ? 'active' : 'inactive'}
+      className={cn(
+        'inline-flex cursor-pointer items-center size-full justify-center whitespace-nowrap rounded-sm px-2 py-1 text-sm font-medium transition-all duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground z-[1]',
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </m.button>
+  );
+}
+
+// --- TabsContents ---
+
 type TabsContentsProps = React.ComponentProps<'div'> & {
-  children: React.ReactNode;
+  mode?: 'auto-height' | 'layout';
   transition?: Transition;
 };
 
 function TabsContents({
   children,
   className,
-  transition = {
-    type: 'spring',
-    stiffness: 300,
-    damping: 30,
-    bounce: 0,
-    restDelta: 0.01,
-  },
+  mode = 'auto-height',
+  transition = { type: 'spring', stiffness: 200, damping: 25 },
   ...props
 }: TabsContentsProps) {
   const { activeValue } = useTabs();
-  const childrenArray = Children.toArray(children);
-  const activeIndex = childrenArray.findIndex(
-    (child): child is React.ReactElement<{ value: string }> =>
-      isValidElement(child) &&
+  const activeChild = React.Children.toArray(children).find(
+    (child): child is React.ReactElement<TabsContentProps> =>
+      React.isValidElement(child) &&
       typeof child.props === 'object' &&
       child.props !== null &&
-      'value' in child.props &&
       child.props.value === activeValue
   );
 
-  return (
-    <div data-slot='tabs-contents' className={cn('overflow-hidden', className)} {...props}>
-      <m.div className='flex -mx-2' animate={{ x: `${activeIndex * -100}%` }} transition={transition}>
-        {childrenArray.map((child, index) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: tab panels are positionally indexed by design
-          <div key={index} className='w-full shrink-0 px-2'>
-            {child}
-          </div>
-        ))}
+  const content = (
+    <AnimatePresence initial={false} mode='wait'>
+      {activeChild ? React.cloneElement(activeChild, { key: activeValue }) : null}
+    </AnimatePresence>
+  );
+
+  if (mode === 'layout') {
+    return (
+      <m.div data-slot='tabs-contents' layout className={cn(className)} transition={transition} {...props}>
+        {content}
       </m.div>
-    </div>
+    );
+  }
+
+  return (
+    <AutoHeight
+      data-slot='tabs-contents'
+      className={cn(className)}
+      deps={[activeValue]}
+      transition={transition}
+      {...props}
+    >
+      {content}
+    </AutoHeight>
   );
 }
 
-type TabsContentProps = HTMLMotionProps<'div'> & {
+// --- TabsContent ---
+
+type TabsContentProps = Omit<HTMLMotionProps<'div'>, 'value'> & {
   value: string;
-  children: React.ReactNode;
+  transition?: Transition;
 };
 
-function TabsContent({ children, value, className, ...props }: TabsContentProps) {
-  const { activeValue } = useTabs();
-  const isActive = activeValue === value;
+function TabsContent({
+  value: _value,
+  children,
+  className,
+  transition = { duration: 0.22, ease: 'easeOut' },
+  ...props
+}: TabsContentProps) {
   return (
     <m.div
       role='tabpanel'
       data-slot='tabs-content'
-      className={cn('overflow-hidden', className)}
-      initial={{ filter: 'blur(0px)' }}
-      animate={{ filter: isActive ? 'blur(0px)' : 'blur(4px)' }}
-      exit={{ filter: 'blur(0px)' }}
-      transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+      initial={{ opacity: 0, filter: 'blur(4px)' }}
+      animate={{ opacity: 1, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, filter: 'blur(4px)' }}
+      transition={transition}
+      className={cn('outline-none', className)}
       {...props}
     >
       {children}
@@ -264,6 +237,10 @@ export {
   TabsContents,
   type TabsContentsProps,
   type TabsContextType,
+  TabsHighlight,
+  TabsHighlightItem,
+  type TabsHighlightItemProps,
+  type TabsHighlightProps,
   TabsList,
   type TabsListProps,
   type TabsProps,

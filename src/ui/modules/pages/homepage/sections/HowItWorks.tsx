@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { brutCard } from './shared';
 
 export const HowItWorks = async () => {
-  const t = await getTranslations('landing');
+  const t = await getTranslations('homepage');
 
   return (
     <section className='px-7 py-24' id='how'>
@@ -12,11 +12,11 @@ export const HowItWorks = async () => {
           <Badge variant='outline'>{t('how.badge')}</Badge>
         </div>
         <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] mb-4 text-[clamp(36px,5vw,64px)]'>
-          {t('how.h2Start')} <em className='font-serif italic font-semibold'>&ldquo;{t('how.h2Q1')}&rdquo;</em>{' '}
-          {t('how.h2Mid')} <em className='font-serif italic font-semibold'>&ldquo;{t('how.h2Q2')}&rdquo;</em>{' '}
-          {t('how.h2End')}
+          {t('how.titleStart')} <em className='font-serif italic font-semibold'>&ldquo;{t('how.question1')}&rdquo;</em>{' '}
+          {t('how.titleMid')} <em className='font-serif italic font-semibold'>&ldquo;{t('how.question2')}&rdquo;</em>{' '}
+          {t('how.titleEnd')}
         </h2>
-        <p className='text-[19px] text-muted-foreground max-w-[640px] mx-auto'>{t('how.p')}</p>
+        <p className='text-[19px] text-muted-foreground max-w-[640px] mx-auto'>{t('how.description')}</p>
       </div>
 
       <div className='max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-7'>

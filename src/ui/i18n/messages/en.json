@@ -23,7 +23,7 @@
       "title": "Payment Confirmation | Forever PTO"
     }
   },
-  "home": {
+  "planner": {
     "title": "Forever PTO",
     "description": "This is the home page where you can find the latest updates and features.",
     "subtitle": "Your ultimate solution for managing paid time off. Don't work anymore",
@@ -146,6 +146,10 @@
         "strategies": {
           "question": "What is the difference between \"balanced\" and \"optimized\" strategies?",
           "answer": "Balanced aims to spread time off across the year for steady value, while Optimized focuses on maximizing efficiency (effective days per PTO day) by prioritizing the best ratio combinations."
+        },
+        "results": {
+          "question": "Why do recommendations change when I update preferences or holidays?",
+          "answer": "Suggestions are recalculated in real time from your PTO budget, selected year, holiday set, custom holidays and strategy. Small changes can reshuffle rankings because the engine re-scores every possible bridge and block."
         }
       },
       "security": {
@@ -157,6 +161,10 @@
         "encryption": {
           "question": "Is my data encrypted?",
           "answer": "Your vacation planning data is stored locally in your browser. We apply XOR cipher obfuscation to make the data unreadable in casual inspection. This method is designed to prevent accidental exposure, not protect against determined attackers. We don't store sensitive personal information, and you maintain full control of your data on your device. All your data (PTO days, selected dates, custom holidays, preferences) is stored exclusively in your browser's local storage. We never send this information to our servers. Your vacation planning stays completely private on your device."
+        },
+        "tracking": {
+          "question": "Do you sell my data or track my vacation plans?",
+          "answer": "No. Your planning data stays in your browser and is not sold to advertisers or data brokers. If analytics are enabled, they are limited to product measurement and never used to profile your vacation plans."
         },
         "troubleshooting": {
           "question": "Troubleshooting & stale client data"
@@ -171,6 +179,10 @@
         "business": {
           "question": "Propose integrations or corporate partnerships",
           "answer": "If you represent a company and want to integrate Forever PTO, contact support or open a proposal for a custom integration."
+        },
+        "nonCode": {
+          "question": "Can I collaborate if I'm not a developer?",
+          "answer": "Yes. Feedback on UX, copy, translations, holiday accuracy, testing and partnership ideas is useful. If you spot friction or have a market-specific need, reach out and we can shape it together."
         }
       }
     }
@@ -1016,7 +1028,7 @@
           "items": {
             "name": {
               "label": "Name:",
-              "value": "Ferran Buireu"
+              "value": "{author}"
             },
             "email": {
               "label": "Email:",
@@ -1253,7 +1265,7 @@
         "acceptance": {
           "title": "Acceptance of Terms",
           "p1": "By accessing or using Forever PTO (the 'Service'), you agree to be bound by these Terms of Service ('Terms'). If you do not agree to these Terms, please do not use the Service.",
-          "p2": "These Terms constitute a legally binding agreement between you and Ferran Buireu, the operator of Forever PTO."
+          "p2": "These Terms constitute a legally binding agreement between you and {author}, the operator of Forever PTO."
         },
         "serviceDescription": {
           "title": "Service Description",
@@ -1408,7 +1420,7 @@
         },
         "limitationOfLiability": {
           "title": "Limitation of Liability",
-          "description": "To the fullest extent permitted by law, Ferran Buireu and Forever PTO shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to:",
+          "description": "To the fullest extent permitted by law, {author} and Forever PTO shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to:",
           "items": {
             "profits": "Loss of profits, revenue, or business opportunities",
             "dataLoss": "Data loss or corruption",
@@ -1420,7 +1432,7 @@
         },
         "intellectualProperty": {
           "title": "Intellectual Property",
-          "description": "Forever PTO and all its content, features, and functionality (including but not limited to code, design, text, graphics, and logos) are owned by Ferran Buireu and are protected by international copyright, trademark, and other intellectual property laws.",
+          "description": "Forever PTO and all its content, features, and functionality (including but not limited to code, design, text, graphics, and logos) are owned by {author} and are protected by international copyright, trademark, and other intellectual property laws.",
           "limitedLicense": {
             "title": "Limited License",
             "description": "We grant you a limited, non-exclusive, non-transferable license to use Forever PTO for personal, non-commercial purposes. This license does not include any resale or commercial use of the Service or its content."
@@ -1493,7 +1505,7 @@
         },
         "indemnification": {
           "title": "Indemnification",
-          "description": "You agree to indemnify, defend, and hold harmless Ferran Buireu and Forever PTO from any claims, damages, losses, liabilities, and expenses (including legal fees) arising out of:",
+          "description": "You agree to indemnify, defend, and hold harmless {author} and Forever PTO from any claims, damages, losses, liabilities, and expenses (including legal fees) arising out of:",
           "items": {
             "misuse": "Your misuse of the Service",
             "violateTerms": "Your violation of these Terms",
@@ -1564,7 +1576,7 @@
           "items": {
             "owner": {
               "label": "Owner:",
-              "value": "Ferran Buireu"
+              "value": "{author}"
             },
             "email": {
               "label": "Email:",
@@ -1605,7 +1617,7 @@
         },
         "liability": {
           "title": "Liability",
-          "description": "Ferran Buireu is not responsible for:",
+          "description": "{author} is not responsible for:",
           "items": {
             "accuracy": "The accuracy or completeness of holiday information obtained from third-party sources",
             "decisions": "Decisions made by users based on information provided by the website",
@@ -1617,18 +1629,18 @@
         },
         "intellectualProperty": {
           "title": "Intellectual Property",
-          "p1": "All content on this website, including but not limited to text, graphics, logos, code, and design, is the property of Ferran Buireu and is protected by Spanish and international intellectual property laws.",
+          "p1": "All content on this website, including but not limited to text, graphics, logos, code, and design, is the property of {author} and is protected by Spanish and international intellectual property laws.",
           "p2": "Users are granted a personal, non-exclusive, non-transferable license to use the website for its intended purpose. Reproduction, distribution, modification, or commercial use of the website's content without express permission is prohibited.",
           "p3": "Some parts of the website may be available as open-source software. For details, please visit our <link>GitHub repository</link>."
         },
         "thirdPartyLinks": {
           "title": "Links to Third-Party Websites",
           "p1": "This website may contain links to third-party websites. These links are provided for convenience and informational purposes only.",
-          "p2": "Ferran Buireu does not control or endorse the content of third-party websites and is not responsible for their privacy policies or practices."
+          "p2": "{author} does not control or endorse the content of third-party websites and is not responsible for their privacy policies or practices."
         },
         "modifications": {
           "title": "Modifications to the Legal Notice",
-          "p1": "Ferran Buireu reserves the right to modify this Legal Notice at any time to adapt to legislative changes or updates to the website.",
+          "p1": "{author} reserves the right to modify this Legal Notice at any time to adapt to legislative changes or updates to the website.",
           "p2": "Users are advised to periodically review this Legal Notice to stay informed of any changes."
         },
         "applicableLaw": {
@@ -1648,7 +1660,7 @@
       }
     }
   },
-  "landing": {
+  "homepage": {
     "nav": {
       "how": "How it works",
       "features": "Features",
@@ -1659,17 +1671,17 @@
     },
     "hero": {
       "badge1": "🇬🇧 EN · 🇪🇸 ES · 🇮🇹 IT · 🇩🇪 DE · 🇫🇷 FR · 🇺🇸 US",
-      "badge2": "v2.0 available",
-      "h1Line1": "Work less.",
-      "h1Verb": "Travel",
-      "h1Word": "more",
-      "p": "Forever PTO calculates <em>exactly</em> which days to request off so your 22 vacation days become <strong>47+ days out of the office</strong>. No spreadsheets. No math. No guilt.",
-      "pEm": "exactly",
-      "pStrong": "47+ days out of the office",
+      "badge2": "v{version} available",
+      "line1": "Work less.",
+      "verb": "Travel",
+      "highlight": "more",
+      "description": "Forever PTO calculates <em>exactly</em> which days to request off so your 22 vacation days become <strong>47+ days out of the office</strong>. No spreadsheets. No math. No guilt.",
+      "descriptionEm": "exactly",
+      "descriptionStrong": "47+ days out of the office",
       "cta1": "Calculate my days →",
       "cta2": "See how it works (30s)",
       "stars": "4.9 · used by {users} rebel employees",
-      "mockupLabel": "Real days off in 2026",
+      "mockupLabel": "Real days off in {year}",
       "mockupRatio": "days · ratio 2.14×",
       "mockupQuote": "\"That's 9 long weekends, captain.\"",
       "mockupLegendPto": "PTO",
@@ -1685,12 +1697,12 @@
     },
     "how": {
       "badge": "HOW IT WORKS · 3 STEPS",
-      "h2Start": "From",
-      "h2Mid": "to",
-      "h2Q1": "what do I do",
-      "h2Q2": "trip is booked",
-      "h2End": "in 60 seconds.",
-      "p": "No install. No credit card. No newsletter. Just tell us how many days you have and where you live.",
+      "titleStart": "From",
+      "titleMid": "to",
+      "question1": "what do I do",
+      "question2": "trip is booked",
+      "titleEnd": "in 60 seconds.",
+      "description": "No install. No credit card. No newsletter. Just tell us how many days you have and where you live.",
       "step1Title": "Enter your days.",
       "step1Desc": "How many PTO days you have, which country (or region) you work in, and which months you prefer to block. That's it.",
       "step2Title": "The engine does the magic.",
@@ -1706,31 +1718,36 @@
     },
     "features": {
       "badge": "ENGINE TRICKS",
-      "h2Start": "Not a calendar. An",
-      "h2Em": "ally",
-      "h2End": "against Mondays.",
-      "p": "These are the moves Forever PTO makes for you automatically.",
+      "titleStart": "Not a calendar. An",
+      "titleEmphasis": "ally",
+      "titleEnd": "against Mondays.",
+      "description": "These are the moves Forever PTO makes for you automatically.",
       "bridgeTag": "SMART BRIDGES",
-      "bridgeH3": "Turn 1 PTO day into 4 days off.",
-      "bridgeP": "Detects holidays on Tuesdays and Thursdays and suggests minimal bridges. One strategic day = a 4-day weekend.",
+      "bridgeTitle": "Turn 1 PTO day into 4 days off.",
+      "bridgeDescription": "Detects holidays on Tuesdays and Thursdays and suggests minimal bridges. One strategic day = a 4-day weekend.",
       "ratioTag": "MAX RATIO",
-      "ratioP": "Best multiplier: 8 PTO days turned into 28 free days (ES, April '26).",
+      "ratioDescription": "Best multiplier: 8 PTO days turned into 28 free days (ES, April '26).",
       "syncTag": "SYNC IN 1 CLICK",
-      "syncH3": "Google · Outlook · iCal",
-      "syncP": "Export your plan to the calendar you already use. No hassle.",
+      "syncTitle": "Google · Outlook · iCal",
+      "syncDescription": "Export your plan to the calendar you already use. No hassle.",
       "conflictsTag": "ANTI-CONFLICTS",
-      "conflictsH3": "Warns you before your boss does.",
-      "conflictsP": "Mark company \"no-fly\" periods.",
+      "conflictsTitle": "Warns you before your boss does.",
+      "conflictsDescription": "Mark company \"no-fly\" periods.",
+      "conflictItems": {
+        "0": "All-hands mtg.",
+        "1": "Q3 closing",
+        "2": "Product launch"
+      },
       "countriesTag": "14 COUNTRIES",
-      "countriesH3": "Real local holidays.",
-      "countriesP": "Official calendars updated every year. Even regional ones.",
+      "countriesTitle": "Real local holidays.",
+      "countriesDescription": "Official calendars updated every year. Even regional ones.",
       "privacyTag": "100% LOCAL",
-      "privacyH3": "Your data never leaves your browser.",
-      "privacyP": "No login, no cookies, no servers. Forever PTO is a static calculator that runs 100% on your machine."
+      "privacyTitle": "Your data never leaves your browser.",
+      "privacyDescription": "No login, no cookies, no servers. Forever PTO is a static calculator that runs 100% on your machine."
     },
     "comparison": {
       "badge": "BEFORE · AFTER",
-      "h2": "Before vs. after Forever PTO.",
+      "title": "Before vs. after Forever PTO.",
       "withoutTitle": "😩 Without Forever PTO",
       "withoutItems": {
         "0": "You open a spreadsheet and get stuck on cell C7.",
@@ -1750,9 +1767,9 @@
     },
     "testimonials": {
       "badge": "PEOPLE ARE SAYING",
-      "h2Start": "People who already reclaimed",
-      "h2Em": "weeks",
-      "h2End": "of their lives.",
+      "titleStart": "People who already reclaimed",
+      "titleEmphasis": "weeks",
+      "titleEnd": "of their lives.",
       "items": {
         "0": {
           "text": "I went from taking random days off to having 6 trips planned. My partner thinks I've become organised. I haven't told her it's a website.",
@@ -1773,9 +1790,9 @@
     },
     "pricing": {
       "badge": "HONEST PRICING",
-      "h2Start": "Pay once.",
-      "h2Em": "Forever.",
-      "p": "No SaaS. No subscription. No \"7-day trial that auto-renews\".",
+      "titleStart": "Pay once.",
+      "titleEmphasis": "Forever.",
+      "description": "No SaaS. No subscription. No \"7-day trial that auto-renews\".",
       "freeName": "Free Forever",
       "freeTagline": "Try it. It will convince you.",
       "freePrice": "€0",
@@ -1806,22 +1823,14 @@
     },
     "faq": {
       "badge": "FAQ",
-      "h2": "Questions? We got answers."
+      "title": "Questions? We got answers."
     },
-    "finalCta": {
-      "h2Start": "Your next",
-      "h2Em": "free",
-      "h2End": "year starts today.",
-      "p": "22 days can become 47. You just need to know where to place them. That's what we do.",
+    "closing": {
+      "titleStart": "Your next",
+      "titleEmphasis": "free",
+      "titleEnd": "year starts today.",
+      "description": "22 days can become 47. You just need to know where to place them. That's what we do.",
       "cta": "Calculate my free days →"
-    },
-    "footer": {
-      "planner": "Planner",
-      "privacy": "Privacy",
-      "terms": "Terms",
-      "cookies": "Cookies",
-      "copyright": "© 2026 Forever PTO · Made with love from a hammock.",
-      "version": "v2.0 · status: on vacation ●"
     }
   }
 }

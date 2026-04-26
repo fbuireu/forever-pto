@@ -1,7 +1,6 @@
 'use client';
 
 import { Label } from '@ui/modules/core/primitives/Label';
-import { Slot } from '@ui/lib/slot';
 import { cn } from '@ui/utils/utils';
 import { type ComponentProps, createContext, useContext, useId } from 'react';
 import {
@@ -13,6 +12,7 @@ import {
   useFormContext,
   useFormState,
 } from 'react-hook-form';
+import { Slot } from '../animate/base/Slot';
 
 const Form = FormProvider;
 

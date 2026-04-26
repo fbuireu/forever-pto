@@ -7,7 +7,7 @@ import { version } from '../../../../../../package.json';
 import { CAL_ENTRIES, type DayType, dayCell } from './shared';
 
 export const Hero = async () => {
-  const [t, locale] = await Promise.all([getTranslations('landing'), getLocale()]);
+  const [t, locale] = await Promise.all([getTranslations('homepage'), getLocale()]);
   const DAY_HEADERS = getWeekdayNames({ locale, weekStartsOn: 1, format: 'narrow' });
 
   return (
@@ -20,17 +20,17 @@ export const Hero = async () => {
           </div>
 
           <h1 className='font-display font-extrabold leading-[0.95] tracking-[-0.035em] mb-7 text-[clamp(48px,7vw,92px)]'>
-            {t('hero.h1Line1')}
+            {t('hero.line1')}
             <br />
-            {t('hero.h1Verb')}{' '}
+            {t('hero.verb')}{' '}
             <span className='relative inline-block bg-[var(--accent)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[5px_5px_0_0_var(--frame)] rotate-[-2deg] mx-1'>
-              {t('hero.h1Word')}
+              {t('hero.highlight')}
             </span>
             <span className='inline-block text-[0.75em] rotate-[15deg]'>🌴</span>
           </h1>
 
           <p className='text-[21px] leading-[1.45] max-w-[540px] mb-8 text-foreground'>
-            {t.rich('hero.p', {
+            {t.rich('hero.description', {
               em: (chunks) => <em className='font-serif font-normal italic text-[1.08em]'>{chunks}</em>,
               strong: (chunks) => <strong>{chunks}</strong>,
             })}
@@ -79,7 +79,9 @@ export const Hero = async () => {
               ))}
             </div>
             <div className='px-[18px] pt-[18px] pb-4 bg-[var(--accent)] border-[4px] border-[var(--frame)] rounded-[10px]'>
-              <div className='text-[12px] uppercase tracking-[0.1em] mb-1'>{t('hero.mockupLabel')}</div>
+              <div className='text-[12px] uppercase tracking-[0.1em] mb-1'>
+                {t('hero.mockupLabel', { year: new Date().getFullYear() })}
+              </div>
               <div className='font-display font-extrabold text-[56px] leading-none tracking-[-0.03em] flex items-baseline gap-2.5'>
                 47
                 <span className='text-[18px] font-semibold opacity-70'>{t('hero.mockupRatio')}</span>

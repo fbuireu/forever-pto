@@ -113,6 +113,14 @@ export async function JsonLd({ locale }: JsonLdProps) {
       },
       {
         '@type': 'Question',
+        name: tFaq('sections.technical.results.question'),
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: tFaq('sections.technical.results.answer'),
+        },
+      },
+      {
+        '@type': 'Question',
         name: tFaq('sections.security.data.question'),
         acceptedAnswer: {
           '@type': 'Answer',
@@ -129,6 +137,14 @@ export async function JsonLd({ locale }: JsonLdProps) {
       },
       {
         '@type': 'Question',
+        name: tFaq('sections.security.tracking.question'),
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: tFaq('sections.security.tracking.answer'),
+        },
+      },
+      {
+        '@type': 'Question',
         name: tFaq('sections.collaborate.code.question'),
         acceptedAnswer: {
           '@type': 'Answer',
@@ -141,6 +157,14 @@ export async function JsonLd({ locale }: JsonLdProps) {
         acceptedAnswer: {
           '@type': 'Answer',
           text: tFaq('sections.collaborate.business.answer'),
+        },
+      },
+      {
+        '@type': 'Question',
+        name: tFaq('sections.collaborate.nonCode.question'),
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: tFaq('sections.collaborate.nonCode.answer'),
         },
       },
     ],

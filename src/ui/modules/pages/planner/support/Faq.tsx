@@ -55,6 +55,11 @@ export const Faq = async () => {
           question: t('sections.technical.strategies.question'),
           answer: t('sections.technical.strategies.answer'),
         },
+        {
+          id: 'results',
+          question: t('sections.technical.results.question'),
+          answer: t('sections.technical.results.answer'),
+        },
       ],
     },
     {
@@ -70,6 +75,11 @@ export const Faq = async () => {
           id: 'encryption',
           question: t('sections.security.encryption.question'),
           answer: t('sections.security.encryption.answer'),
+        },
+        {
+          id: 'tracking',
+          question: t('sections.security.tracking.question'),
+          answer: t('sections.security.tracking.answer'),
         },
         {
           id: 'troubleshooting',
@@ -91,6 +101,11 @@ export const Faq = async () => {
           id: 'business',
           question: t('sections.collaborate.business.question'),
           answer: t('sections.collaborate.business.answer'),
+        },
+        {
+          id: 'non-code',
+          question: t('sections.collaborate.nonCode.question'),
+          answer: t('sections.collaborate.nonCode.answer'),
         },
       ],
     },

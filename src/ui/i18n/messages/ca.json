@@ -23,7 +23,7 @@
       "title": "Confirmació de pagament | Forever PTO"
     }
   },
-  "home": {
+  "planner": {
     "title": "Forever PTO",
     "description": "Aquesta és la pàgina d'inici on pots trobar les últimes novetats i funcions.",
     "subtitle": "La teva solució definitiva per gestionar els teus dies lliures. No treballis més",
@@ -146,6 +146,10 @@
         "strategies": {
           "question": "Quina és la diferència entre les estratègies \"equilibrada\" i \"optimitzada\"?",
           "answer": "Equilibrada busca repartir el temps lliure durant l'any per un valor constant, mentre que Optimitzada se centra en maximitzar l'eficiència (dies efectius per dia de PTO) prioritzant les combinacions amb millor ràtio."
+        },
+        "results": {
+          "question": "Per què canvien les recomanacions quan actualitzo preferències o festius?",
+          "answer": "Les suggerències es recalculen en temps real segons els teus dies de PTO, l'any seleccionat, el conjunt de festius, els festius personalitzats i l'estratègia. Canvis petits poden reordenar el rànquing perquè el motor torna a puntuar cada pont i bloc possible."
         }
       },
       "security": {
@@ -157,6 +161,10 @@
         "encryption": {
           "question": "Estan les meves dades encriptades?",
           "answer": "Les teves dades de planificació de vacances s'emmagatzemen localment al teu navegador. Apliquem ofuscació amb xifrat XOR per fer les dades il·legibles en inspecció casual. Aquest mètode està dissenyat per prevenir exposició accidental, no per protegir contra atacants determinats. No emmagatzemem informació personal sensible, i mantens el control total de les teves dades al teu dispositiu. Totes les teves dades (dies de PTO, dates seleccionades, festius personalitzats, preferències) s'emmagatzemen exclusivament a l'emmagatzematge local del teu navegador. Mai enviem aquesta informació als nostres servidors. La teva planificació de vacances roman completament privada al teu dispositiu."
+        },
+        "tracking": {
+          "question": "Veneu les meves dades o seguiu els meus plans de vacances?",
+          "answer": "No. Les teves dades de planificació romanen al teu navegador i no es venen a anunciants ni a brokers de dades. Si acceptes analítica, es limita a mesurar el producte i mai s'utilitza per perfilar les teves vacances."
         },
         "troubleshooting": {
           "question": "Solució de problemes i dades obsoletes del client"
@@ -171,6 +179,10 @@
         "business": {
           "question": "Proposar integracions o associacions corporatives",
           "answer": "Si representes una empresa i vols integrar Forever PTO, contacta amb suport o obre una proposta per una integració personalitzada."
+        },
+        "nonCode": {
+          "question": "Puc col·laborar si no soc desenvolupador/a?",
+          "answer": "Sí. El feedback sobre UX, copy, traduccions, exactitud dels festius, testing i idees de partnership és molt útil. Si detectes fricció o tens una necessitat específica del teu mercat, escriu-me i ho veiem."
         }
       }
     }
@@ -1015,7 +1027,7 @@
           "items": {
             "name": {
               "label": "Nom:",
-              "value": "Ferran Buireu"
+              "value": "{author}"
             },
             "email": {
               "label": "Email:",
@@ -1252,7 +1264,7 @@
         "acceptance": {
           "title": "Acceptació de les condicions",
           "p1": "En accedir o utilitzar Forever PTO (el 'Servei'), acceptes quedar vinculat per aquestes Condicions del servei ('Condicions'). Si no estàs d'acord amb aquestes Condicions, si us plau no utilitzis el Servei.",
-          "p2": "Aquestes Condicions constitueixen un acord legalment vinculant entre tu i Ferran Buireu, l'operador de Forever PTO."
+          "p2": "Aquestes Condicions constitueixen un acord legalment vinculant entre tu i {author}, l'operador de Forever PTO."
         },
         "serviceDescription": {
           "title": "Descripció del servei",
@@ -1407,7 +1419,7 @@
         },
         "limitationOfLiability": {
           "title": "Limitació de responsabilitat",
-          "description": "En la màxima mesura permesa per la llei, Ferran Buireu i Forever PTO no seran responsables de cap dany indirecte, incidental, especial, conseqüent o punitiu, incloent-hi però sense limitar-se a:",
+          "description": "En la màxima mesura permesa per la llei, {author} i Forever PTO no seran responsables de cap dany indirecte, incidental, especial, conseqüent o punitiu, incloent-hi però sense limitar-se a:",
           "items": {
             "profits": "Pèrdua de beneficis, ingressos o oportunitats de negoci",
             "dataLoss": "Pèrdua o corrupció de dades",
@@ -1419,7 +1431,7 @@
         },
         "intellectualProperty": {
           "title": "Propietat intel·lectual",
-          "description": "Forever PTO i tot el seu contingut, funcions i funcionalitats (incloent-hi, entre d'altres, codi, disseny, text, gràfics i logotips) són propietat de Ferran Buireu i estan protegits per les lleis internacionals de drets d'autor, marques registrades i altres lleis de propietat intel·lectual.",
+          "description": "Forever PTO i tot el seu contingut, funcions i funcionalitats (incloent-hi, entre d'altres, codi, disseny, text, gràfics i logotips) són propietat de {author} i estan protegits per les lleis internacionals de drets d'autor, marques registrades i altres lleis de propietat intel·lectual.",
           "limitedLicense": {
             "title": "Llicència limitada",
             "description": "Et concedim una llicència limitada, no exclusiva i intransferible per utilitzar Forever PTO amb finalitats personals i no comercials. Aquesta llicència no inclou la revenda ni l'ús comercial del Servei o el seu contingut."
@@ -1492,7 +1504,7 @@
         },
         "indemnification": {
           "title": "Indemnització",
-          "description": "Acceptes indemnitzar, defensar i mantenir indemne Ferran Buireu i Forever PTO davant de qualsevol reclamació, dany, pèrdua, responsabilitat i despesa (inclosos honoraris legals) derivats de:",
+          "description": "Acceptes indemnitzar, defensar i mantenir indemne {author} i Forever PTO davant de qualsevol reclamació, dany, pèrdua, responsabilitat i despesa (inclosos honoraris legals) derivats de:",
           "items": {
             "misuse": "El teu ús indegut del Servei",
             "violateTerms": "El teu incompliment d'aquestes Condicions",
@@ -1563,7 +1575,7 @@
           "items": {
             "owner": {
               "label": "Titular:",
-              "value": "Ferran Buireu"
+              "value": "{author}"
             },
             "email": {
               "label": "Email:",
@@ -1604,7 +1616,7 @@
         },
         "liability": {
           "title": "Responsabilitat",
-          "description": "Ferran Buireu no és responsable de:",
+          "description": "{author} no és responsable de:",
           "items": {
             "accuracy": "L'exactitud o integritat de la informació sobre festius obtinguda de fonts de tercers",
             "decisions": "Les decisions preses pels usuaris basant-se en la informació proporcionada pel lloc web",
@@ -1616,18 +1628,18 @@
         },
         "intellectualProperty": {
           "title": "Propietat intel·lectual",
-          "p1": "Tot el contingut d'aquest lloc web, incloent-hi, entre d'altres, textos, gràfics, logotips, codi i disseny, és propietat de Ferran Buireu i està protegit per les lleis de propietat intel·lectual espanyoles i internacionals.",
+          "p1": "Tot el contingut d'aquest lloc web, incloent-hi, entre d'altres, textos, gràfics, logotips, codi i disseny, és propietat de {author} i està protegit per les lleis de propietat intel·lectual espanyoles i internacionals.",
           "p2": "Es concedeix als usuaris una llicència personal, no exclusiva i intransferible per utilitzar el lloc web amb la seva finalitat prevista. Queda prohibida la reproducció, distribució, modificació o ús comercial del contingut del lloc web sense permís exprés.",
           "p3": "Algunes parts del lloc web poden estar disponibles com a programari de codi obert. Per a més detalls, visita el nostre <link>repositori de GitHub</link>."
         },
         "thirdPartyLinks": {
           "title": "Enllaços a llocs web de tercers",
           "p1": "Aquest lloc web pot contenir enllaços a llocs web de tercers. Aquests enllaços es proporcionen únicament per comoditat i amb finalitats informatives.",
-          "p2": "Ferran Buireu no controla ni avala el contingut de llocs web de tercers i no és responsable de les seves polítiques de privadesa o pràctiques."
+          "p2": "{author} no controla ni avala el contingut de llocs web de tercers i no és responsable de les seves polítiques de privadesa o pràctiques."
         },
         "modifications": {
           "title": "Modificacions de l'avís legal",
-          "p1": "Ferran Buireu es reserva el dret de modificar aquest Avís legal en qualsevol moment per adaptar-lo a canvis legislatius o actualitzacions del lloc web.",
+          "p1": "{author} es reserva el dret de modificar aquest Avís legal en qualsevol moment per adaptar-lo a canvis legislatius o actualitzacions del lloc web.",
           "p2": "S'aconsella als usuaris revisar periòdicament aquest Avís legal per mantenir-se informats de qualsevol canvi."
         },
         "applicableLaw": {
@@ -1647,7 +1659,7 @@
       }
     }
   },
-  "landing": {
+  "homepage": {
     "nav": {
       "how": "Com funciona",
       "features": "Trucs",
@@ -1658,17 +1670,17 @@
     },
     "hero": {
       "badge1": "🇪🇸 ES · 🇮🇹 IT · 🇩🇪 DE · 🇫🇷 FR · 🇬🇧 UK · 🇺🇸 US",
-      "badge2": "v2.0 disponible",
-      "h1Line1": "Treballa menys.",
-      "h1Verb": "Viatja",
-      "h1Word": "més",
-      "p": "Forever PTO calcula <em>exactament</em> quins dies demanar lliure perquè els teus 22 dies de vacances es converteixin en <strong>47+ dies fora de l'oficina</strong>. Sense excels. Sense matemàtiques. Sense remordiment.",
-      "pEm": "exactament",
-      "pStrong": "47+ dies fora de l'oficina",
+      "badge2": "v{version} disponible",
+      "line1": "Treballa menys.",
+      "verb": "Viatja",
+      "highlight": "més",
+      "description": "Forever PTO calcula <em>exactament</em> quins dies demanar lliure perquè els teus 22 dies de vacances es converteixin en <strong>47+ dies fora de l'oficina</strong>. Sense excels. Sense matemàtiques. Sense remordiment.",
+      "descriptionEm": "exactament",
+      "descriptionStrong": "47+ dies fora de l'oficina",
       "cta1": "Calcular els meus dies →",
       "cta2": "Veure com va (30s)",
       "stars": "4.9 · usat per {users} empleats rebels",
-      "mockupLabel": "Dies lliures reals el 2026",
+      "mockupLabel": "Dies lliures reals el {year}",
       "mockupRatio": "dies · ràtio 2.14×",
       "mockupQuote": "\"Això són 9 escapades llargues, capità.\"",
       "mockupLegendPto": "PTO",
@@ -1684,12 +1696,12 @@
     },
     "how": {
       "badge": "COM VA · 3 PASSOS",
-      "h2Start": "De",
-      "h2Mid": "a",
-      "h2Q1": "què faig",
-      "h2Q2": "ja tinc el viatge",
-      "h2End": "en 60 segons.",
-      "p": "Sense instal·lar res. Sense targeta. Sense newsletter. Digues-nos quants dies tens i on vius.",
+      "titleStart": "De",
+      "titleMid": "a",
+      "question1": "què faig",
+      "question2": "ja tinc el viatge",
+      "titleEnd": "en 60 segons.",
+      "description": "Sense instal·lar res. Sense targeta. Sense newsletter. Digues-nos quants dies tens i on vius.",
       "step1Title": "Posa els teus dies.",
       "step1Desc": "Quants dies de PTO tens, en quin país (o regió) treballes, i quins mesos prefereixes bloquejar. Això és tot.",
       "step2Title": "El motor fa màgia.",
@@ -1705,31 +1717,36 @@
     },
     "features": {
       "badge": "TRUCS DEL MOTOR",
-      "h2Start": "No és un calendari. És un",
-      "h2Em": "aliat",
-      "h2End": "contra el dilluns.",
-      "p": "Aquests són els moviments que Forever PTO fa per tu automàticament.",
+      "titleStart": "No és un calendari. És un",
+      "titleEmphasis": "aliat",
+      "titleEnd": "contra el dilluns.",
+      "description": "Aquests són els moviments que Forever PTO fa per tu automàticament.",
       "bridgeTag": "PONTS INTEL·LIGENTS",
-      "bridgeH3": "Converteix 1 dia de PTO en 4 lliures.",
-      "bridgeP": "Detecta festius en dimarts i dijous i et suggereix construir ponts mínims. Un dia estratègic = un cap de setmana de 4 dies.",
+      "bridgeTitle": "Converteix 1 dia de PTO en 4 lliures.",
+      "bridgeDescription": "Detecta festius en dimarts i dijous i et suggereix construir ponts mínims. Un dia estratègic = un cap de setmana de 4 dies.",
       "ratioTag": "RÀTIO MAX",
-      "ratioP": "Millor multiplicador: 8 dies de PTO convertits en 28 lliures (ES, abril '26).",
+      "ratioDescription": "Millor multiplicador: 8 dies de PTO convertits en 28 lliures (ES, abril '26).",
       "syncTag": "SYNC EN 1 CLIC",
-      "syncH3": "Google · Outlook · iCal",
-      "syncP": "Exporta el teu pla al calendari que ja uses. Sense embolicar-te.",
+      "syncTitle": "Google · Outlook · iCal",
+      "syncDescription": "Exporta el teu pla al calendari que ja uses. Sense embolicar-te.",
       "conflictsTag": "ANTI-CONFLICTES",
-      "conflictsH3": "Avisa abans que el teu cap.",
-      "conflictsP": "Marca els períodes \"tabú\" de la teva empresa.",
+      "conflictsTitle": "Avisa abans que el teu cap.",
+      "conflictsDescription": "Marca els períodes \"tabú\" de la teva empresa.",
+      "conflictItems": {
+        "0": "Reunió all-hands",
+        "1": "Tancament Q3",
+        "2": "Llançament"
+      },
       "countriesTag": "14 PAÏSOS",
-      "countriesH3": "Festius locals reals.",
-      "countriesP": "Calendaris oficials actualitzats cada any. Fins i tot els regionals.",
+      "countriesTitle": "Festius locals reals.",
+      "countriesDescription": "Calendaris oficials actualitzats cada any. Fins i tot els regionals.",
       "privacyTag": "100% LOCAL",
-      "privacyH3": "Les teves dades no surten del teu navegador.",
-      "privacyP": "Sense login, sense cookies, sense servidors. Forever PTO és una calculadora estàtica que corre 100% a la teva màquina."
+      "privacyTitle": "Les teves dades no surten del teu navegador.",
+      "privacyDescription": "Sense login, sense cookies, sense servidors. Forever PTO és una calculadora estàtica que corre 100% a la teva màquina."
     },
     "comparison": {
       "badge": "AMB · SENSE",
-      "h2": "Abans vs. després de Forever PTO.",
+      "title": "Abans vs. després de Forever PTO.",
       "withoutTitle": "😩 Sense Forever PTO",
       "withoutItems": {
         "0": "Obres un Excel i et bloqueges a C7.",
@@ -1749,9 +1766,9 @@
     },
     "testimonials": {
       "badge": "LA GENT DIU",
-      "h2Start": "Gent que ja ha recuperat",
-      "h2Em": "setmanes",
-      "h2End": "de la seva vida.",
+      "titleStart": "Gent que ja ha recuperat",
+      "titleEmphasis": "setmanes",
+      "titleEnd": "de la seva vida.",
       "items": {
         "0": {
           "text": "Vaig passar de demanar dies solts a tenir 6 escapades planificades. La meva parella creu que m'he tornat organitzat. No li he dit que és una web.",
@@ -1772,9 +1789,9 @@
     },
     "pricing": {
       "badge": "PREU HONEST",
-      "h2Start": "Paga una vegada.",
-      "h2Em": "Per sempre.",
-      "p": "Sense SaaS. Sense subscripció. Sense \"prova gratuïta que es renova sola\".",
+      "titleStart": "Paga una vegada.",
+      "titleEmphasis": "Per sempre.",
+      "description": "Sense SaaS. Sense subscripció. Sense \"prova gratuïta que es renova sola\".",
       "freeName": "Gratuït Sempre",
       "freeTagline": "Prova-ho. Et convencerà.",
       "freePrice": "€0",
@@ -1805,22 +1822,14 @@
     },
     "faq": {
       "badge": "FAQ",
-      "h2": "Preguntes? Tenim respostes."
+      "title": "Preguntes? Tenim respostes."
     },
-    "finalCta": {
-      "h2Start": "El teu pròxim any",
-      "h2Em": "lliure",
-      "h2End": "comença avui.",
-      "p": "22 dies poden ser 47. Només cal saber on col·locar-los. Això ho fem nosaltres.",
+    "closing": {
+      "titleStart": "El teu pròxim any",
+      "titleEmphasis": "lliure",
+      "titleEnd": "comença avui.",
+      "description": "22 dies poden ser 47. Només cal saber on col·locar-los. Això ho fem nosaltres.",
       "cta": "Calcular els meus dies gratis →"
-    },
-    "footer": {
-      "planner": "Calculadora",
-      "privacy": "Privacitat",
-      "terms": "Termes",
-      "cookies": "Cookies",
-      "copyright": "© 2026 Forever PTO · Fet amb estima des d'una hamaca.",
-      "version": "v2.0 · status: de vacances ●"
     }
   }
 }

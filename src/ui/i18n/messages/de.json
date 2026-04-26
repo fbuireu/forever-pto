@@ -23,7 +23,7 @@
       "title": "Zahlungsbestätigung | Forever PTO"
     }
   },
-  "home": {
+  "planner": {
     "title": "Forever PTO",
     "description": "Hier findest du die neuesten Updates und Funktionen.",
     "subtitle": "Deine ultimative Lösung für die Verwaltung deiner Urlaubstage. Hör auf zu arbeiten",
@@ -146,6 +146,10 @@
         "strategies": {
           "question": "Was ist der Unterschied zwischen \"ausgewogen\" und \"optimiert\"?",
           "answer": "Ausgewogen verteilt die freien Tage gleichmäßig über das Jahr für konstanten Wert, während Optimiert die Effizienz maximiert (effektive Tage pro Urlaubstag), indem die besten Verhältniskombinationen priorisiert werden."
+        },
+        "results": {
+          "question": "Warum ändern sich meine Empfehlungen, wenn ich Einstellungen oder Feiertage anpasse?",
+          "answer": "Die Vorschläge werden in Echtzeit anhand deines PTO-Budgets, des ausgewählten Jahres, des Feiertagssatzes, eigener Feiertage und der Strategie neu berechnet. Schon kleine Änderungen können das Ranking verschieben, weil die Engine jede mögliche Brücke und jeden Block neu bewertet."
         }
       },
       "security": {
@@ -157,6 +161,10 @@
         "encryption": {
           "question": "Sind meine Daten verschlüsselt?",
           "answer": "Deine Urlaubsplanungsdaten werden lokal in deinem Browser gespeichert. Wir verwenden eine XOR-Verschleierung, um die Daten bei flüchtiger Einsicht unlesbar zu machen. Diese Methode soll eine versehentliche Offenlegung verhindern, nicht vor entschlossenen Angreifern schützen. Wir speichern keine sensiblen persönlichen Daten, und du behältst die volle Kontrolle über deine Daten auf deinem Gerät. Alle deine Daten (Urlaubstage, ausgewählte Termine, eigene Feiertage, Einstellungen) werden ausschließlich im lokalen Speicher deines Browsers gespeichert. Wir senden diese Informationen niemals an unsere Server. Deine Urlaubsplanung bleibt vollständig privat auf deinem Gerät."
+        },
+        "tracking": {
+          "question": "Verkauft ihr meine Daten oder verfolgt ihr meine Urlaubsplanung?",
+          "answer": "Nein. Deine Planungsdaten bleiben in deinem Browser und werden weder an Werbetreibende noch an Datenhändler verkauft. Wenn Analytics aktiviert sind, dienen sie nur der Produktmessung und werden niemals genutzt, um deine Urlaubsplanung zu profilieren."
         },
         "troubleshooting": {
           "question": "Fehlerbehebung & veraltete Client-Daten"
@@ -171,6 +179,10 @@
         "business": {
           "question": "Integrationen oder Unternehmenspartnerschaften vorschlagen",
           "answer": "Wenn du ein Unternehmen vertrittst und Forever PTO integrieren möchtest, kontaktiere den Support oder eröffne einen Vorschlag für eine individuelle Integration."
+        },
+        "nonCode": {
+          "question": "Kann ich auch mitarbeiten, wenn ich kein Entwickler bin?",
+          "answer": "Ja. Feedback zu UX, Texten, Übersetzungen, Feiertagsgenauigkeit, Tests und Partnerschaftsideen ist sehr hilfreich. Wenn dir Reibung auffällt oder du einen marktspezifischen Bedarf hast, melde dich und wir schauen es uns gemeinsam an."
         }
       }
     }
@@ -1016,7 +1028,7 @@
           "items": {
             "name": {
               "label": "Name:",
-              "value": "Ferran Buireu"
+              "value": "{author}"
             },
             "email": {
               "label": "E-Mail:",
@@ -1253,7 +1265,7 @@
         "acceptance": {
           "title": "Annahme der Bedingungen",
           "p1": "Durch den Zugriff auf oder die Nutzung von Forever PTO (dem ‘Dienst’) erklärst du dich mit diesen Nutzungsbedingungen (‘Bedingungen’) einverstanden. Wenn du diesen Bedingungen nicht zustimmst, nutze den Dienst bitte nicht.",
-          "p2": "Diese Bedingungen stellen eine rechtsverbindliche Vereinbarung zwischen dir und Ferran Buireu, dem Betreiber von Forever PTO, dar."
+          "p2": "Diese Bedingungen stellen eine rechtsverbindliche Vereinbarung zwischen dir und {author}, dem Betreiber von Forever PTO, dar."
         },
         "serviceDescription": {
           "title": "Dienstbeschreibung",
@@ -1408,7 +1420,7 @@
         },
         "limitationOfLiability": {
           "title": "Haftungsbeschränkung",
-          "description": "Im größtmöglichen gesetzlich zulässigen Umfang haften Ferran Buireu und Forever PTO nicht für indirekte, zufällige, besondere, Folge- oder Strafschäden, einschließlich, aber nicht beschränkt auf:",
+          "description": "Im größtmöglichen gesetzlich zulässigen Umfang haften {author} und Forever PTO nicht für indirekte, zufällige, besondere, Folge- oder Strafschäden, einschließlich, aber nicht beschränkt auf:",
           "items": {
             "profits": "Entgangene Gewinne, Einnahmen oder Geschäftsmöglichkeiten",
             "dataLoss": "Datenverlust oder -beschädigung",
@@ -1420,7 +1432,7 @@
         },
         "intellectualProperty": {
           "title": "Geistiges Eigentum",
-          "description": "Forever PTO und alle seine Inhalte, Funktionen und Funktionalitäten (einschließlich, aber nicht beschränkt auf Code, Design, Text, Grafiken und Logos) sind Eigentum von Ferran Buireu und durch internationale Urheber-, Marken- und andere geistige Eigentumsrechte geschützt.",
+          "description": "Forever PTO und alle seine Inhalte, Funktionen und Funktionalitäten (einschließlich, aber nicht beschränkt auf Code, Design, Text, Grafiken und Logos) sind Eigentum von {author} und durch internationale Urheber-, Marken- und andere geistige Eigentumsrechte geschützt.",
           "limitedLicense": {
             "title": "Eingeschränkte Lizenz",
             "description": "Wir gewähren dir eine beschränkte, nicht-exklusive, nicht übertragbare Lizenz zur Nutzung von Forever PTO für persönliche, nicht-kommerzielle Zwecke. Diese Lizenz umfasst keinen Weiterverkauf oder kommerzielle Nutzung des Dienstes oder seiner Inhalte."
@@ -1493,7 +1505,7 @@
         },
         "indemnification": {
           "title": "Freistellung",
-          "description": "Du erklärst dich bereit, Ferran Buireu und Forever PTO von allen Ansprüchen, Schäden, Verlusten, Verbindlichkeiten und Kosten (einschließlich Anwaltsgebühren) freizustellen, die sich ergeben aus:",
+          "description": "Du erklärst dich bereit, {author} und Forever PTO von allen Ansprüchen, Schäden, Verlusten, Verbindlichkeiten und Kosten (einschließlich Anwaltsgebühren) freizustellen, die sich ergeben aus:",
           "items": {
             "misuse": "Deiner missbräuchlichen Nutzung des Dienstes",
             "violateTerms": "Deinem Verstoß gegen diese Bedingungen",
@@ -1564,7 +1576,7 @@
           "items": {
             "owner": {
               "label": "Betreiber:",
-              "value": "Ferran Buireu"
+              "value": "{author}"
             },
             "email": {
               "label": "E-Mail:",
@@ -1605,7 +1617,7 @@
         },
         "liability": {
           "title": "Haftung",
-          "description": "Ferran Buireu haftet nicht für:",
+          "description": "{author} haftet nicht für:",
           "items": {
             "accuracy": "Die Genauigkeit oder Vollständigkeit von Feiertagsinformationen aus Drittquellen",
             "decisions": "Entscheidungen, die Nutzer aufgrund der von der Website bereitgestellten Informationen treffen",
@@ -1617,18 +1629,18 @@
         },
         "intellectualProperty": {
           "title": "Geistiges Eigentum",
-          "p1": "Alle Inhalte dieser Website, einschließlich, aber nicht beschränkt auf Texte, Grafiken, Logos, Code und Design, sind Eigentum von Ferran Buireu und durch spanisches und internationales Recht zum Schutz geistigen Eigentums geschützt.",
+          "p1": "Alle Inhalte dieser Website, einschließlich, aber nicht beschränkt auf Texte, Grafiken, Logos, Code und Design, sind Eigentum von {author} und durch spanisches und internationales Recht zum Schutz geistigen Eigentums geschützt.",
           "p2": "Nutzern wird eine persönliche, nicht-exklusive, nicht übertragbare Lizenz zur Nutzung der Website für ihren bestimmungsgemäßen Zweck gewährt. Die Vervielfältigung, Verbreitung, Änderung oder kommerzielle Nutzung der Inhalte der Website ohne ausdrückliche Genehmigung ist untersagt.",
           "p3": "Einige Teile der Website können als Open-Source-Software verfügbar sein. Für Details besuche bitte unser <link>GitHub-Repository</link>."
         },
         "thirdPartyLinks": {
           "title": "Links zu Drittanbieter-Websites",
           "p1": "Diese Website kann Links zu Drittanbieter-Websites enthalten. Diese Links dienen ausschließlich der Bequemlichkeit und Information.",
-          "p2": "Ferran Buireu kontrolliert oder unterstützt die Inhalte von Drittanbieter-Websites nicht und ist nicht für deren Datenschutzrichtlinien oder Praktiken verantwortlich."
+          "p2": "{author} kontrolliert oder unterstützt die Inhalte von Drittanbieter-Websites nicht und ist nicht für deren Datenschutzrichtlinien oder Praktiken verantwortlich."
         },
         "modifications": {
           "title": "Änderungen des Impressums",
-          "p1": "Ferran Buireu behält sich das Recht vor, dieses Impressum jederzeit anzupassen, um es an Gesetzesänderungen oder Aktualisierungen der Website anzupassen.",
+          "p1": "{author} behält sich das Recht vor, dieses Impressum jederzeit anzupassen, um es an Gesetzesänderungen oder Aktualisierungen der Website anzupassen.",
           "p2": "Nutzern wird empfohlen, dieses Impressum regelmäßig zu überprüfen, um über Änderungen informiert zu bleiben."
         },
         "applicableLaw": {
@@ -1648,7 +1660,7 @@
       }
     }
   },
-  "landing": {
+  "homepage": {
     "nav": {
       "how": "Wie es funktioniert",
       "features": "Funktionen",
@@ -1659,17 +1671,17 @@
     },
     "hero": {
       "badge1": "🇬🇧 EN · 🇪🇸 ES · 🇮🇹 IT · 🇩🇪 DE · 🇫🇷 FR · 🇺🇸 US",
-      "badge2": "v2.0 verfügbar",
-      "h1Line1": "Weniger arbeiten.",
-      "h1Verb": "Mehr",
-      "h1Word": "reisen",
-      "p": "Forever PTO berechnet <em>genau</em>, welche Tage du beantragen musst, damit aus deinen 22 Urlaubstagen <strong>47+ Tage außer Haus</strong> werden. Keine Tabellen. Kein Kopfzerbrechen. Kein schlechtes Gewissen.",
-      "pEm": "genau",
-      "pStrong": "47+ Tage außer Haus",
+      "badge2": "v{version} verfügbar",
+      "line1": "Weniger arbeiten.",
+      "verb": "Mehr",
+      "highlight": "reisen",
+      "description": "Forever PTO berechnet <em>genau</em>, welche Tage du beantragen musst, damit aus deinen 22 Urlaubstagen <strong>47+ Tage außer Haus</strong> werden. Keine Tabellen. Kein Kopfzerbrechen. Kein schlechtes Gewissen.",
+      "descriptionEm": "genau",
+      "descriptionStrong": "47+ Tage außer Haus",
       "cta1": "Meine Tage berechnen →",
       "cta2": "Wie es funktioniert (30s)",
       "stars": "4.9 · genutzt von {users} rebellischen Mitarbeitern",
-      "mockupLabel": "Echte freie Tage 2026",
+      "mockupLabel": "Echte freie Tage {year}",
       "mockupRatio": "Tage · Verhältnis 2.14×",
       "mockupQuote": "\"Das sind 9 lange Wochenenden, Kapitän.\"",
       "mockupLegendPto": "Urlaub",
@@ -1685,12 +1697,12 @@
     },
     "how": {
       "badge": "WIE ES FUNKTIONIERT · 3 SCHRITTE",
-      "h2Start": "Von",
-      "h2Mid": "zu",
-      "h2Q1": "was soll ich tun",
-      "h2Q2": "Reise gebucht",
-      "h2End": "in 60 Sekunden.",
-      "p": "Keine Installation. Keine Kreditkarte. Kein Newsletter. Sag uns einfach, wie viele Tage du hast und wo du wohnst.",
+      "titleStart": "Von",
+      "titleMid": "zu",
+      "question1": "was soll ich tun",
+      "question2": "Reise gebucht",
+      "titleEnd": "in 60 Sekunden.",
+      "description": "Keine Installation. Keine Kreditkarte. Kein Newsletter. Sag uns einfach, wie viele Tage du hast und wo du wohnst.",
       "step1Title": "Tage eingeben.",
       "step1Desc": "Wie viele Urlaubstage du hast, in welchem Land (oder welcher Region) du arbeitest, und welche Monate du bevorzugst. Das war's.",
       "step2Title": "Die Engine macht die Magie.",
@@ -1706,31 +1718,36 @@
     },
     "features": {
       "badge": "ENGINE-TRICKS",
-      "h2Start": "Kein Kalender. Ein",
-      "h2Em": "Verbündeter",
-      "h2End": "gegen Montage.",
-      "p": "Das sind die Züge, die Forever PTO automatisch für dich macht.",
+      "titleStart": "Kein Kalender. Ein",
+      "titleEmphasis": "Verbündeter",
+      "titleEnd": "gegen Montage.",
+      "description": "Das sind die Züge, die Forever PTO automatisch für dich macht.",
       "bridgeTag": "CLEVERE BRÜCKEN",
-      "bridgeH3": "1 Urlaubstag in 4 freie Tage verwandeln.",
-      "bridgeP": "Erkennt Feiertage an Dienstagen und Donnerstagen und schlägt minimale Brücken vor.",
+      "bridgeTitle": "1 Urlaubstag in 4 freie Tage verwandeln.",
+      "bridgeDescription": "Erkennt Feiertage an Dienstagen und Donnerstagen und schlägt minimale Brücken vor.",
       "ratioTag": "MAX-VERHÄLTNIS",
-      "ratioP": "Bestes Verhältnis: 8 Urlaubstage zu 28 freien Tagen (ES, April 26).",
+      "ratioDescription": "Bestes Verhältnis: 8 Urlaubstage zu 28 freien Tagen (ES, April 26).",
       "syncTag": "SYNC IN 1 KLICK",
-      "syncH3": "Google · Outlook · iCal",
-      "syncP": "Exportiere deinen Plan in den Kalender, den du bereits nutzt.",
+      "syncTitle": "Google · Outlook · iCal",
+      "syncDescription": "Exportiere deinen Plan in den Kalender, den du bereits nutzt.",
       "conflictsTag": "ANTI-KONFLIKTE",
-      "conflictsH3": "Warnt dich, bevor dein Chef es tut.",
-      "conflictsP": "Markiere die Tabu-Zeiten deines Unternehmens.",
+      "conflictsTitle": "Warnt dich, bevor dein Chef es tut.",
+      "conflictsDescription": "Markiere die Tabu-Zeiten deines Unternehmens.",
+      "conflictItems": {
+        "0": "All-hands Meeting",
+        "1": "Q3-Abschluss",
+        "2": "Produktstart"
+      },
       "countriesTag": "14 LÄNDER",
-      "countriesH3": "Echte lokale Feiertage.",
-      "countriesP": "Offizielle Kalender jedes Jahr aktualisiert. Auch die regionalen.",
+      "countriesTitle": "Echte lokale Feiertage.",
+      "countriesDescription": "Offizielle Kalender jedes Jahr aktualisiert. Auch die regionalen.",
       "privacyTag": "100% LOKAL",
-      "privacyH3": "Deine Daten verlassen nie deinen Browser.",
-      "privacyP": "Kein Login, keine Cookies, keine Server. Forever PTO läuft 100% auf deinem Gerät."
+      "privacyTitle": "Deine Daten verlassen nie deinen Browser.",
+      "privacyDescription": "Kein Login, keine Cookies, keine Server. Forever PTO läuft 100% auf deinem Gerät."
     },
     "comparison": {
       "badge": "VORHER · NACHHER",
-      "h2": "Vor vs. nach Forever PTO.",
+      "title": "Vor vs. nach Forever PTO.",
       "withoutTitle": "😩 Ohne Forever PTO",
       "withoutItems": {
         "0": "Du öffnest eine Tabelle und steckst bei Zelle C7 fest.",
@@ -1750,9 +1767,9 @@
     },
     "testimonials": {
       "badge": "DAS SAGEN ANDERE",
-      "h2Start": "Menschen, die sich schon",
-      "h2Em": "Wochen",
-      "h2End": "ihres Lebens zurückgeholt haben.",
+      "titleStart": "Menschen, die sich schon",
+      "titleEmphasis": "Wochen",
+      "titleEnd": "ihres Lebens zurückgeholt haben.",
       "items": {
         "0": {
           "text": "Ich bin von einzelnen freien Tagen zu 6 geplanten Reisen übergegangen. Mein Partner denkt, ich bin organisiert geworden.",
@@ -1773,9 +1790,9 @@
     },
     "pricing": {
       "badge": "EHRLICHE PREISE",
-      "h2Start": "Einmal bezahlen.",
-      "h2Em": "Für immer.",
-      "p": "Kein SaaS. Kein Abo. Kein \"7-Tage-Test, der sich automatisch verlängert\".",
+      "titleStart": "Einmal bezahlen.",
+      "titleEmphasis": "Für immer.",
+      "description": "Kein SaaS. Kein Abo. Kein \"7-Tage-Test, der sich automatisch verlängert\".",
       "freeName": "Kostenlos für immer",
       "freeTagline": "Probier es aus. Es wird dich überzeugen.",
       "freePrice": "€0",
@@ -1806,22 +1823,14 @@
     },
     "faq": {
       "badge": "FAQ",
-      "h2": "Fragen? Wir haben Antworten."
+      "title": "Fragen? Wir haben Antworten."
     },
-    "finalCta": {
-      "h2Start": "Dein nächstes",
-      "h2Em": "freies",
-      "h2End": "Jahr beginnt heute.",
-      "p": "22 Tage können 47 werden. Du musst nur wissen, wo du sie platzierst. Das machen wir.",
+    "closing": {
+      "titleStart": "Dein nächstes",
+      "titleEmphasis": "freies",
+      "titleEnd": "Jahr beginnt heute.",
+      "description": "22 Tage können 47 werden. Du musst nur wissen, wo du sie platzierst. Das machen wir.",
       "cta": "Meine freien Tage berechnen →"
-    },
-    "footer": {
-      "planner": "Planer",
-      "privacy": "Datenschutz",
-      "terms": "Bedingungen",
-      "cookies": "Cookies",
-      "copyright": "© 2026 Forever PTO · Mit Liebe von einer Hängematte aus gemacht.",
-      "version": "v2.0 · Status: im Urlaub ●"
     }
   }
 }

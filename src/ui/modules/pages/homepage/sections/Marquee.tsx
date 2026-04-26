@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 
 export const Marquee = async () => {
-  const t = await getTranslations('landing');
+  const t = await getTranslations('homepage');
 
   return (
     <div

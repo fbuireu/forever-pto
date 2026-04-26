@@ -5,7 +5,7 @@ import { useTutorial } from '@ui/hooks/useTutorial';
 import { useTranslations } from 'next-intl';
 
 export const SiteSubtitle = () => {
-  const t = useTranslations('home');
+  const t = useTranslations('planner');
   const { startTutorial } = useTutorial();
 
   return (

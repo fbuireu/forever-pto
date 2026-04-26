@@ -10,7 +10,7 @@ const AVATAR_BG = [
 const ROTATES = ['rotate-[-1deg]', 'rotate-[1deg]', 'rotate-[-0.5deg]'] as const;
 
 export const Testimonials = async () => {
-  const t = await getTranslations('landing');
+  const t = await getTranslations('homepage');
 
   return (
     <section className='px-7 py-24' id='testimonials'>
@@ -19,8 +19,9 @@ export const Testimonials = async () => {
           <Badge variant='outline'>{t('testimonials.badge')}</Badge>
         </div>
         <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] text-[clamp(36px,5vw,64px)]'>
-          {t('testimonials.h2Start')} <em className='font-serif italic font-semibold'>{t('testimonials.h2Em')}</em>{' '}
-          {t('testimonials.h2End')}
+          {t('testimonials.titleStart')}{' '}
+          <em className='font-serif italic font-semibold'>{t('testimonials.titleEmphasis')}</em>{' '}
+          {t('testimonials.titleEnd')}
         </h2>
       </div>
 

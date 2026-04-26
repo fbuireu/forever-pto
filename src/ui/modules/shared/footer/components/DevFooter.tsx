@@ -6,13 +6,10 @@ import { githubIcon } from '@ui/assets/icons/github';
 import { linkedinIcon } from '@ui/assets/icons/linkedin';
 import { RotatingTextContainer } from '@ui/modules/core/animate/primitives/texts/Rotating';
 import { RotatingText } from '@ui/modules/core/animate/text/Rotating';
+import { Me } from '@ui/modules/pages/legal/Me';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../../Icon';
-
-export const CONTACT_DETAILS = {
-  NAME: 'Ferran Buireu',
-} as const;
 
 export const EMOJIS: string[] = ['☕', '🍺', '❤️', '🚀', '⚡', '🔥', '💻', '🌮', '🍕', '🎵', '🎮', '😴', '🤯', '💡'];
 
@@ -72,7 +69,7 @@ export const DevFooter = () => {
         </RotatingTextContainer>
         {t('by')}
         <span className='font-medium text-foreground hover:text-primary p-0 h-auto min-w-0'>
-          {CONTACT_DETAILS.NAME}
+          <Me ariaLabel='Ferran Buireu' />
         </span>
       </div>
       <p className='text-sm text-muted-foreground text-center'>{t('findMeOn')}</p>

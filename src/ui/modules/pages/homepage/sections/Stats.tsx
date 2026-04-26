@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 
 export const Stats = async () => {
-  const t = await getTranslations('landing');
+  const t = await getTranslations('homepage');
 
   return (
     <section className='px-7 pb-24'>

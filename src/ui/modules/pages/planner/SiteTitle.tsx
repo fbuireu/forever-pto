@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 
 export const SiteTitle = async () => {
-  const t = await getTranslations('home');
+  const t = await getTranslations('planner');
 
   return (
     <div className='flex items-center flex-col justify-center mt-8 gap-4'>

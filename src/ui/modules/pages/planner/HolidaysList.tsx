@@ -2,11 +2,19 @@
 
 import { HolidayVariant } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { Tabs, TabsList, TabsTrigger } from '@ui/modules/core/animate/components/Tabs';
+import {
+  Tabs,
+  TabsContent,
+  TabsContents,
+  TabsHighlight,
+  TabsHighlightItem,
+  TabsList,
+  TabsTrigger,
+} from '@ui/modules/core/animate/components/Tabs';
+import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { HolidaysTable } from './holidays/HolidaysTable';
-import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 
 export const HolidaysList = () => {
   const t = useTranslations('holidaysTable');
@@ -16,61 +24,50 @@ export const HolidaysList = () => {
 
   const handleTabChange = (value: string) => {
     const variant = value as HolidayVariant;
-
-    if (variant === HolidayVariant.REGIONAL && regionalHolidays.length === 0) {
-      return;
-    }
-
+    if (variant === HolidayVariant.REGIONAL && regionalHolidays.length === 0) return;
     setActiveTab(variant);
   };
 
   return (
     <div className='rounded-lg w-full col-span-full z-1 bg-background' data-tutorial='holidays-list'>
       <Tabs value={activeTab} onValueChange={handleTabChange}>
-        <TabsList
-          className='grid w-full grid-cols-3'
-          activeClassName='bg-[var(--accent)] border-[2px] border-[var(--frame)] rounded-[6px] shadow-[var(--shadow-brutal-xs)]'
-        >
-          <TabsTrigger value={HolidayVariant.NATIONAL}>{t('nationalTab')}</TabsTrigger>
-          {regionalHolidays.length > 0 ? (
-            <TabsTrigger value={HolidayVariant.REGIONAL}>{t('regionalTab')}</TabsTrigger>
-          ) : (
-            <div className='inline-flex cursor-not-allowed items-center size-full justify-center whitespace-nowrap rounded-sm px-2 py-1 text-sm font-medium opacity-50'>
-              {t('regionalTab')}
-            </div>
-          )}
-          <PremiumFeature
-            feature={t('customHolidaysFeature')}
-            description={t('customHolidaysDescription')}
-            className='p-0'
-          >
-            <TabsTrigger value={HolidayVariant.CUSTOM}>{t('customTab')}</TabsTrigger>
-          </PremiumFeature>
-        </TabsList>
+        <TabsHighlight>
+          <TabsList className='grid w-full grid-cols-3'>
+            <TabsHighlightItem value={HolidayVariant.NATIONAL}>
+              <TabsTrigger value={HolidayVariant.NATIONAL}>{t('nationalTab')}</TabsTrigger>
+            </TabsHighlightItem>
+            {regionalHolidays.length > 0 ? (
+              <TabsHighlightItem value={HolidayVariant.REGIONAL}>
+                <TabsTrigger value={HolidayVariant.REGIONAL}>{t('regionalTab')}</TabsTrigger>
+              </TabsHighlightItem>
+            ) : (
+              <div className='inline-flex cursor-not-allowed items-center size-full justify-center whitespace-nowrap rounded-sm px-2 py-1 text-sm font-medium opacity-50'>
+                {t('regionalTab')}
+              </div>
+            )}
+            <PremiumFeature
+              feature={t('customHolidaysFeature')}
+              description={t('customHolidaysDescription')}
+              className='p-0'
+            >
+              <TabsHighlightItem value={HolidayVariant.CUSTOM}>
+                <TabsTrigger value={HolidayVariant.CUSTOM}>{t('customTab')}</TabsTrigger>
+              </TabsHighlightItem>
+            </PremiumFeature>
+          </TabsList>
+        </TabsHighlight>
+        <TabsContents className='mx-1 mb-1 rounded-sm bg-background py-4'>
+          <TabsContent value={HolidayVariant.NATIONAL}>
+            <HolidaysTable variant={HolidayVariant.NATIONAL} title={t('nationalTitle')} open />
+          </TabsContent>
+          <TabsContent value={HolidayVariant.REGIONAL}>
+            <HolidaysTable variant={HolidayVariant.REGIONAL} title={t('regionalTitle')} open />
+          </TabsContent>
+          <TabsContent value={HolidayVariant.CUSTOM}>
+            <HolidaysTable variant={HolidayVariant.CUSTOM} title={t('customTitle')} open />
+          </TabsContent>
+        </TabsContents>
       </Tabs>
-      <div className='mx-1 mb-1 rounded-sm h-full bg-background space-y-6 py-4'>
-        {activeTab === HolidayVariant.NATIONAL && (
-          <HolidaysTable
-            variant={HolidayVariant.NATIONAL}
-            title={t('nationalTitle')}
-            open={activeTab === HolidayVariant.NATIONAL}
-          />
-        )}
-        {activeTab === HolidayVariant.REGIONAL && (
-          <HolidaysTable
-            variant={HolidayVariant.REGIONAL}
-            title={t('regionalTitle')}
-            open={activeTab === HolidayVariant.REGIONAL}
-          />
-        )}
-        {activeTab === HolidayVariant.CUSTOM && (
-          <HolidaysTable
-            variant={HolidayVariant.CUSTOM}
-            title={t('customTitle')}
-            open={activeTab === HolidayVariant.CUSTOM}
-          />
-        )}
-      </div>
     </div>
   );
 };

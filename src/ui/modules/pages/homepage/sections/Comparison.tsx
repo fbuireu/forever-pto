@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { brutCard } from './shared';
 
 export const Comparison = async () => {
-  const t = await getTranslations('landing');
+  const t = await getTranslations('homepage');
 
   return (
     <section className='px-7 py-24 bg-[var(--surface-panel-alt)] border-y-[4px] border-[var(--frame)]' id='compare'>
@@ -12,7 +12,7 @@ export const Comparison = async () => {
           <Badge variant='outline'>{t('comparison.badge')}</Badge>
         </div>
         <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] text-[clamp(36px,5vw,64px)]'>
-          {t('comparison.h2')}
+          {t('comparison.title')}
         </h2>
       </div>
 

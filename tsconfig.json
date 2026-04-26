@@ -29,7 +29,7 @@
       "@domain/*": ["./src/domain/*"],
       "@ui/*": ["./src/ui/*"],
       "@application/*": ["./src/application/*"],
-"@assets/*": ["./src/ui/assets/*"],
+      "@assets/*": ["./src/ui/assets/*"],
       "@styles/*": ["./src/ui/styles/*"],
       "@i18n/*": ["./src/ui/i18n/*"],
       "@mocks/*": ["./src/mocks/*"],

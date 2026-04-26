@@ -30,7 +30,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           cancelButton:
             '!rounded-[8px] !border-[3px] !border-[var(--frame)] !bg-[var(--surface-panel-alt)] !text-foreground !shadow-[var(--shadow-brutal-xs)]',
           closeButton:
-            '!rounded-[8px] !border-[3px] !border-[var(--frame)] !bg-[var(--surface-panel)] !text-foreground !opacity-100 !size-7 [&_svg]:!size-4 shadow-[var(--shadow-brutal-xs)]',
+            '!rounded-[8px] !border-[3px] !border-[var(--frame)] !bg-[var(--surface-panel)] !text-foreground !opacity-100 !size-7 [&_svg]:!size-4 !shadow-[var(--shadow-brutal-xs)] !transition-all !duration-75 hover:!-translate-x-0.5 hover:!-translate-y-0.5 hover:!shadow-[var(--shadow-brutal-sm)]',
         },
       }}
       {...props}

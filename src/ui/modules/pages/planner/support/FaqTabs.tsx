@@ -1,6 +1,14 @@
 'use client';
 
-import { Tabs, TabsList, TabsTrigger } from '@ui/modules/core/animate/components/Tabs';
+import {
+  Tabs,
+  TabsContent,
+  TabsContents,
+  TabsHighlight,
+  TabsHighlightItem,
+  TabsList,
+  TabsTrigger,
+} from '@ui/modules/core/animate/components/Tabs';
 import { useState } from 'react';
 
 type TabSection = {
@@ -25,23 +33,23 @@ export const FaqTabs = ({ tabs, title }: FaqTabsProps) => {
         </h2>
       )}
       <Tabs value={active} onValueChange={setActive}>
-        <TabsList
-          className='grid w-full'
-          activeClassName='bg-[var(--accent)] border-[2px] border-[var(--frame)] rounded-[6px] shadow-[var(--shadow-brutal-xs)]'
-          style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}
-        >
+        <TabsHighlight>
+          <TabsList className='grid w-full' style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
+            {tabs.map((tab) => (
+              <TabsHighlightItem key={tab.id} value={tab.id}>
+                <TabsTrigger value={tab.id}>{tab.title}</TabsTrigger>
+              </TabsHighlightItem>
+            ))}
+          </TabsList>
+        </TabsHighlight>
+        <TabsContents>
           {tabs.map((tab) => (
-            <TabsTrigger key={tab.id} value={tab.id}>
-              {tab.title}
-            </TabsTrigger>
+            <TabsContent key={tab.id} value={tab.id}>
+              {tab.content}
+            </TabsContent>
           ))}
-        </TabsList>
+        </TabsContents>
       </Tabs>
-      {tabs.map((tab) => (
-        <div key={tab.id} role='tabpanel' hidden={tab.id !== active}>
-          {tab.content}
-        </div>
-      ))}
     </>
   );
 };
