@@ -74,7 +74,8 @@ function IconComponent({ size, ...props }: MapPinProps) {
       strokeWidth={2}
       strokeLinecap='round'
       strokeLinejoin='round'
-      {...props}>
+      {...props}
+    >
       <m.g variants={variants.group} initial='initial' animate={controls}>
         <m.circle cx={12} cy={10} r={3} variants={variants.circle} initial='initial' animate={controls} />
         <m.path

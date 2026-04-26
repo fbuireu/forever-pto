@@ -14,8 +14,8 @@ import { Badge } from '@ui/modules/core/primitives/Badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { Award, BarChart3, Calendar, CalendarDays, Palmtree, TrendingUp, Zap } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { MetricCard, MetricCardSize } from './summary/MetricCard';
@@ -25,22 +25,22 @@ import { SummarySkeleton } from './summary/SummarySkeleton';
 const HolidaysDistributionChart = dynamic(() =>
   import('src/ui/modules/pages/planner/summary/HolidaysDistributionChart').then((module) => ({
     default: module.HolidaysDistributionChart,
-  })),
+  }))
 );
 const QuarterDistributionChart = dynamic(() =>
   import('src/ui/modules/pages/planner/summary/QuarterDistributionChart').then((module) => ({
     default: module.QuarterDistributionChart,
-  })),
+  }))
 );
 const BlocksPerQuarterChart = dynamic(() =>
   import('src/ui/modules/pages/planner/summary/BlocksPerQuarterChart').then((module) => ({
     default: module.BlocksPerQuarterChart,
-  })),
+  }))
 );
 const MonthlyDistributionChart = dynamic(() =>
   import('src/ui/modules/pages/planner/summary/MonthlyDistributionChart').then((module) => ({
     default: module.MonthlyDistributionChart,
-  })),
+  }))
 );
 
 export const Summary = () => {
@@ -56,7 +56,7 @@ export const Summary = () => {
       strategy: state.strategy,
       year: state.year,
       carryOverMonths: state.carryOverMonths ?? 0,
-    })),
+    }))
   );
   const { suggestion, holidays, alternatives, currentSelection, manuallySelectedDays, removedSuggestedDays } =
     useHolidaysStore(
@@ -67,18 +67,18 @@ export const Summary = () => {
         currentSelection: state.currentSelection,
         manuallySelectedDays: state.manuallySelectedDays,
         removedSuggestedDays: state.removedSuggestedDays,
-      })),
+      }))
     );
   const { countries, regions } = useLocationStore(
     useShallow((state) => ({
       countries: state.countries,
       regions: state.regions,
-    })),
+    }))
   );
   const { premiumKey } = usePremiumStore(
     useShallow((state) => ({
       premiumKey: state.premiumKey,
-    })),
+    }))
   );
 
   const activeSuggestion = currentSelection ?? suggestion;
@@ -110,7 +110,7 @@ export const Summary = () => {
     const maxAlternative = Math.max(
       effectiveDays,
       ...(alternatives?.map((a) => a?.metrics?.totalEffectiveDays).filter((n): n is number => typeof n === 'number') ??
-        []),
+        [])
     );
     const canImprove = Math.max(0, maxAlternative - effectiveDays);
 
@@ -284,7 +284,8 @@ export const Summary = () => {
                 feature={t('yearSummary.feature')}
                 description={t('yearSummary.featureDescription')}
                 iconSize='size-7'
-                inlineDescription>
+                inlineDescription
+              >
                 <div className='rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] p-4 shadow-[var(--shadow-brutal-sm)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]'>
                   <div className='flex items-center gap-2 mb-3'>
                     <Clock className='w-4 h-4 text-indigo-500' />
@@ -342,7 +343,8 @@ export const Summary = () => {
               icon={CalendarDays}
               title={t('notifications.manualAdjustments.title')}
               colorScheme='indigo'
-              className='mt-2'>
+              className='mt-2'
+            >
               {manuallySelectedDays.length > 0 && (
                 <>
                   {t('notifications.manualAdjustments.added')}{' '}

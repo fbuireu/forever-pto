@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';
+import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { BarChart3 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { COLOR_SCHEMES } from './const';
 
 interface QuarterDistributionChartChartProps {

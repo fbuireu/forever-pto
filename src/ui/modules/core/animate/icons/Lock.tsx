@@ -112,7 +112,8 @@ function IconComponent({ size, ...props }: LockProps) {
       strokeLinejoin='round'
       initial='initial'
       animate={controls}
-      {...props}>
+      {...props}
+    >
       <m.g variants={variants.group} initial='initial' animate={controls}>
         <m.rect
           width='18'

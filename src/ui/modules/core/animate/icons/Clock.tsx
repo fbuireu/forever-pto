@@ -48,7 +48,8 @@ function IconComponent({ size, ...props }: ClockProps) {
       strokeWidth={2}
       strokeLinecap='round'
       strokeLinejoin='round'
-      {...props}>
+      {...props}
+    >
       <m.circle cx={12} cy={12} r={10} variants={variants.circle} initial='initial' animate={controls} />
       <m.line x1={12} y1={12} x2={16} y2={14} variants={variants.line1} initial='initial' animate={controls} />
       <m.line x1={12} y1={6} x2={12} y2={12} variants={variants.line2} initial='initial' animate={controls} />

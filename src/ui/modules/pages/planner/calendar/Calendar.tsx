@@ -6,6 +6,7 @@ import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
 import { ChevronRight } from '@ui/modules/core/animate/icons/ChevronRight';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
+import { ConditionalWrapper } from '@ui/modules/shared/ConditionalWrapper';
 import { addMonths, type Day, formatDate, isSameDay, isSameMonth, isWeekend, subMonths } from '@ui/utils/dates';
 import { cn } from '@ui/utils/utils';
 import { LockIcon } from 'lucide-react';
@@ -30,7 +31,6 @@ import {
   isSuggestion,
   isToday,
 } from '../utils/modifiers';
-import { ConditionalWrapper } from '@ui/modules/shared/ConditionalWrapper';
 import { getDayClassNames, isFromToObject } from './utils/helpers';
 
 export interface FromTo {
@@ -439,10 +439,8 @@ export function Calendar({
             modifiers,
           });
 
-          const classes = cn(baseClasses, 'calendar-day-button');
-
           return (
-            <div key={date.toISOString()} className='calendar-day relative h-8 w-8 p-0'>
+            <div key={date.toISOString()} className='relative h-8 w-8 p-0'>
               <ConditionalWrapper
                 doWrap={!!holidayName}
                 wrapper={(children) => (
@@ -456,7 +454,7 @@ export function Calendar({
               >
                 <Button
                   type='button'
-                  className={cn(classes)}
+                  className={cn(baseClasses)}
                   variant='ghost'
                   onClick={() => handleDayClick(date)}
                   onMouseEnter={() => handleDayHover(date)}

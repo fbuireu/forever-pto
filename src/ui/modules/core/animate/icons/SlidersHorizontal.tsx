@@ -141,7 +141,8 @@ function IconComponent({ size, ...props }: SlidersHorizontalProps) {
       strokeWidth={2}
       strokeLinecap='round'
       strokeLinejoin='round'
-      {...props}>
+      {...props}
+    >
       <m.line x1='3' y1='5' x2='10' y2='5' variants={variants.line1} initial='initial' animate={controls} />
       <m.line x1='14' y1='3' x2='14' y2='7' variants={variants.line2} initial='initial' animate={controls} />
       <m.line x1='14' y1='5' x2='21' y2='5' variants={variants.line3} initial='initial' animate={controls} />

@@ -55,7 +55,8 @@ function IconComponent({ size, ...props }: SearchProps) {
       variants={variants.group}
       initial='initial'
       animate={controls}
-      {...props}>
+      {...props}
+    >
       <m.path d='m21 21-4.34-4.34' variants={variants.path} initial='initial' animate={controls} />
       <m.circle cx={11} cy={11} r={8} variants={variants.circle} initial='initial' animate={controls} />
     </m.svg>

@@ -30,7 +30,7 @@ const HomePage = async ({ params }: PageProps) => {
   setRequestLocale(locale);
 
   return (
-    <div className='min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col'>
+    <div className='min-h-screen bg-background text-foreground flex flex-col'>
       <Navigation />
       <main id='main-content' className='flex-1'>
         <Hero />
@@ -45,8 +45,8 @@ const HomePage = async ({ params }: PageProps) => {
         <FinalCta />
         <DonateClient />
       </main>
-      <div className='px-7 py-8 bg-[var(--background)] border-t-[4px] border-[var(--frame)]'>
-        <div className='max-w-[1240px] mx-auto'>
+      <div className='px-7 py-8 bg-background border-t-4 border-(--frame)'>
+        <div className='max-w-310 mx-auto'>
           <Footer />
         </div>
       </div>
@@ -61,6 +61,7 @@ export default HomePage;
 // todo: Check DSM (dark mode, tipografies, colors, etc)
 // todo: 400 and 500 page
 // todo: check all buttons
+// todo: check all skeletons
 // todo: check SEO again (canonical issue on planner?)
 // todo: https://isitagentready.com/forever-pto.com
 // todo: check lang strings (rename landing for home, no use finalCta or strings like that, etc)

@@ -47,7 +47,8 @@ function IconComponent({ size, ...props }: SunProps) {
       strokeLinejoin='round'
       initial='initial'
       animate={controls}
-      {...props}>
+      {...props}
+    >
       <m.circle cx='12' cy='12' r='4' variants={variants.circle} initial='initial' animate={controls} />
       <m.line x1='12' y1='4' x2='12' y2='2' variants={variants.line1} initial='initial' animate={controls} />
       <m.line x1='17.7' y1='6.3' x2='19.1' y2='4.9' variants={variants.line2} initial='initial' animate={controls} />

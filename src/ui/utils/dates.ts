@@ -142,11 +142,7 @@ export interface GetWeekdayNamesParams {
   format?: 'narrow' | 'short' | 'long';
 }
 
-export const getWeekdayNames = ({
-  locale,
-  weekStartsOn = 0,
-  format = 'short',
-}: GetWeekdayNamesParams): string[] => {
+export const getWeekdayNames = ({ locale, weekStartsOn = 0, format = 'short' }: GetWeekdayNamesParams): string[] => {
   const anchor = new Date(2023, 0, 2);
   const weekStart = startOfWeek(anchor, { weekStartsOn });
   const fmt = new Intl.DateTimeFormat(locale, { weekday: format });

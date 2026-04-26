@@ -43,7 +43,8 @@ function IconComponent({ size, ...props }: CheckProps) {
       strokeLinejoin='round'
       initial='initial'
       animate={controls}
-      {...props}>
+      {...props}
+    >
       <m.path d='m4 12 5 5L20 6' variants={variants.path} initial='initial' animate={controls} />
     </m.svg>
   );

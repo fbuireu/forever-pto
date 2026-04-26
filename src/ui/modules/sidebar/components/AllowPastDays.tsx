@@ -2,11 +2,11 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/modules/core/animate/base/Tooltip';
+import { Switch } from '@ui/modules/core/animate/primitives/base/Switch';
 import { InfoIcon, Undo2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useShallow } from 'zustand/react/shallow';
 import { PremiumFeature } from '../../premium/PremiumFeature';
-import { Switch } from '@ui/modules/core/animate/primitives/base/Switch';
 
 export const AllowPastDays = () => {
   const t = useTranslations('sidebar.allowPastDays');
@@ -31,12 +31,8 @@ export const AllowPastDays = () => {
         </TooltipProvider>
       </label>
       <PremiumFeature feature={t('title')}>
-        <div className='flex gap-2 w-full'>
-          <Switch
-            checked={allowPastDays}
-            id='allow-past-days'
-            onChange={(checked) => setAllowPastDays(checked as boolean)}
-          />
+        <div className='flex gap-2 w-full items-center'>
+          <Switch checked={allowPastDays} id='allow-past-days' onCheckedChange={setAllowPastDays} />
           <p className='font-normal text-sm'>{allowPastDays ? t('enabled') : t('disabled')}</p>
         </div>
       </PremiumFeature>

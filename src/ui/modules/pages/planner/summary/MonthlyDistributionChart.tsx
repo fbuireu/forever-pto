@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
+import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { TrendingUp } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { getMonthNames } from '../utils/helpers';
 import { COLOR_SCHEMES } from './const';
 

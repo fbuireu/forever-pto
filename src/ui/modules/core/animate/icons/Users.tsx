@@ -109,7 +109,8 @@ function IconComponent({ size, ...props }: UsersProps) {
       strokeWidth={2}
       strokeLinecap='round'
       strokeLinejoin='round'
-      {...props}>
+      {...props}
+    >
       <m.path
         d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'
         variants={variants.path1}

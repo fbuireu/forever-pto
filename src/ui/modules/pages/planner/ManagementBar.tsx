@@ -2,15 +2,15 @@
 
 import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
-import { AlternativesManager } from '@ui/modules/core/animate/ui-elements/AlternativesManager';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
+import { AlternativesManager } from '@ui/modules/core/animate/ui-elements/AlternativesManager';
 import { useTranslations } from 'next-intl';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
 import { AlternativesManagerSkeleton } from './calendar/AlternativesManagerSkeleton';
-import { PtoStatusSkeleton } from './PtoStatusSkeleton';
 import { PtoStatus } from './PtoStatus';
+import { PtoStatusSkeleton } from './PtoStatusSkeleton';
 
 export const ManagementBar = () => {
   const t = useTranslations('toasts');

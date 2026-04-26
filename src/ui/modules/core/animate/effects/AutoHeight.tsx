@@ -1,25 +1,21 @@
 'use client';
 
-import {
-  motion,
-  type HTMLMotionProps,
-  type LegacyAnimationControls,
-  type TargetAndTransition,
-  type Transition,
-} from 'motion/react';
-import * as React from 'react';
+import { cn } from '@ui/utils/utils';
+import { type HTMLMotionProps, motion, type TargetAndTransition } from 'motion/react';
+import type * as React from 'react';
 import { useAutoHeight } from 'src/ui/hooks/useAutoHeight';
-import { Slot } from '../base/Slot';
-import { WithAsChild } from '../primitives/animate/MotionSlot';
+import { MotionSlot, type WithAsChild } from '../primitives/animate/MotionSlot';
 
 type AutoHeightProps = WithAsChild<
   {
     children: React.ReactNode;
     deps?: React.DependencyList;
-    animate?: TargetAndTransition | LegacyAnimationControls;
-    transition?: Transition;
-  } & Omit<HTMLMotionProps<'div'>, 'animate'>
+  } & Omit<HTMLMotionProps<'div'>, 'children'>
 >;
+
+function isTargetAnimation(animate: HTMLMotionProps<'div'>['animate']): animate is TargetAndTransition {
+  return typeof animate === 'object' && animate !== null && !Array.isArray(animate) && !('start' in animate);
+}
 
 function AutoHeight({
   children,
@@ -31,19 +27,41 @@ function AutoHeight({
     bounce: 0,
     restDelta: 0.01,
   },
+  className,
   style,
   animate,
   asChild = false,
   ...props
 }: AutoHeightProps) {
   const { ref, height } = useAutoHeight<HTMLDivElement>(deps);
+  const mergedAnimate = isTargetAnimation(animate) ? { height, ...animate } : { height };
 
-  const Component = asChild ? Slot : motion.div;
+  const content = <div ref={ref}>{children}</div>;
+
+  if (asChild) {
+    return (
+      <MotionSlot
+        className={cn('overflow-hidden', className)}
+        style={style}
+        animate={mergedAnimate}
+        transition={transition}
+        {...props}
+      >
+        {content}
+      </MotionSlot>
+    );
+  }
 
   return (
-    <Component style={{ overflow: 'hidden', ...style }} animate={{ height, ...animate }} transition={transition} {...props}>
-      <div ref={ref}>{children}</div>
-    </Component>
+    <motion.div
+      className={cn('overflow-hidden', className)}
+      style={style}
+      animate={mergedAnimate}
+      transition={transition}
+      {...props}
+    >
+      {content}
+    </motion.div>
   );
 }
 

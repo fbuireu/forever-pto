@@ -78,10 +78,10 @@ export const PtoDays = () => {
           setNumber={handleChange}
           label={t('days').toUpperCase()}
           decrementButtonProps={{
-            disabled: ptoDays <= MIN_VALUE,
+            disabled: isDecrementDisabled,
           }}
           incrementButtonProps={{
-            disabled: ptoDays >= MAX_VALUE,
+            disabled: isIncrementDisabled,
           }}
         />
       </div>

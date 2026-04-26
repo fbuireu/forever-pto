@@ -77,7 +77,8 @@ function IconComponent({ size, ...props }: Trash2Props) {
       strokeWidth={2}
       strokeLinecap='round'
       strokeLinejoin='round'
-      {...props}>
+      {...props}
+    >
       <m.g variants={variants.group} initial='initial' animate={controls}>
         <m.path d='M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2' variants={variants.path1} initial='initial' animate={controls} />
         <m.path d='M3 6h18' variants={variants.path2} initial='initial' animate={controls} />

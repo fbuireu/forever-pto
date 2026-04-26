@@ -23,7 +23,7 @@ export const CalendarListSkeleton = () => (
         </div>
         <div className='grid grid-cols-7 gap-2'>
           {Array.from({ length: DAYS_PER_CALENDAR_GRID }).map(() => (
-            <div key={crypto.randomUUID()} className='calendar-day rounded-md relative h-8 w-8 p-0'>
+            <div key={crypto.randomUUID()} className='rounded-md relative h-8 w-8 p-0'>
               <Skeleton className='h-8 w-8 rounded-md' />
             </div>
           ))}

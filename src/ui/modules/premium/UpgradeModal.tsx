@@ -3,7 +3,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Lock } from '@ui/modules/core/animate/icons/Lock';
 import { Button } from '@ui/modules/core/primitives/Button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@ui/modules/core/primitives/Dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@ui/modules/core/primitives/Dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { AlertCircle, Crown, Loader2 } from 'lucide-react';

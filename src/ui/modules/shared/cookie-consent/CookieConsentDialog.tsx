@@ -1,5 +1,6 @@
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '@ui/modules/core/animate/base/Accordion';
 import { Button } from '@ui/modules/core/animate/components/buttons/Button';
+import { Switch } from '@ui/modules/core/animate/primitives/base/Switch';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,6 @@ import {
 import { Label } from '@ui/modules/core/primitives/Label';
 import { Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { Switch } from '@ui/modules/core/animate/primitives/base/Switch';
 
 interface CookieConsentDialogProps {
   open: boolean;
@@ -109,7 +109,7 @@ export const CookieConsentDialog = ({
                 <Label className='text-base font-semibold'>{t('analyticsCookies')}</Label>
                 <p className='text-sm text-muted-foreground mt-1'>{t('analyticsDescription')}</p>
               </div>
-              <Switch checked={analyticsEnabled} onChange={(checked) => onAnalyticsChange(checked as boolean)} />
+              <Switch checked={analyticsEnabled} onCheckedChange={onAnalyticsChange} />
             </div>
 
             <Accordion>
@@ -169,7 +169,7 @@ export const CookieConsentDialog = ({
           <Button variant='outline' onClick={onRejectAll} className='w-full sm:w-auto'>
             {t('rejectAll')}
           </Button>
-          <div className='flex gap-2 w-full sm:w-auto'>
+          <div className='flex gap-2 w-full items-center sm:w-auto'>
             <Button variant='secondary' onClick={onSave} className='flex-1 sm:flex-initial'>
               {t('savePreferences')}
             </Button>

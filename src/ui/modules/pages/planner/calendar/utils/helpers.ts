@@ -29,8 +29,8 @@ export const MODIFIERS_CLASS_NAMES: Record<string, string> = {
   today:
     'rounded-lg bg-[var(--color-brand-ink)] hover:brightness-105 text-[var(--color-brand-paper)] font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] ring-offset-1 ring-offset-background transition-[background-color,box-shadow] duration-200',
   inRange: 'rounded-lg bg-primary/12',
-  rangeStart: 'rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-black rounded-[0.8rem]',
-  rangeEnd: 'rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-black rounded-[0.8rem]',
+  rangeStart: 'rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-black',
+  rangeEnd: 'rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-black',
   previewRange: 'rounded-lg bg-primary/10',
 } as const;
 
@@ -46,18 +46,16 @@ export const getDayClassNames = ({
   const classes: string[] = [];
   const isOutsideMonth = !isSameMonth(date, month);
   const isSelected = selectedDates.some((d) => isSameDay(d, date));
-
   const today = startOfDay(new Date());
   const isPastDay = isBefore(startOfDay(date), today);
   const shouldShowAsPast = isPastDay && !allowPastDays;
 
   classes.push(
-    'h-8 w-8 rounded-[0.8rem] p-0 font-medium text-sm',
+    'h-8 w-8 rounded-lg p-0 font-medium text-sm',
     'focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors'
   );
 
   const isTodayActive = modifiers.today?.(date);
-
   const isInRangeDay = modifiers.inRange?.(date);
   const isRangeStartDay = modifiers.rangeStart?.(date);
   const isRangeEndDay = modifiers.rangeEnd?.(date);

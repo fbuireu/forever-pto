@@ -83,7 +83,8 @@ function IconComponent({ size, ...props }: XProps) {
       strokeWidth={2}
       strokeLinecap='round'
       strokeLinejoin='round'
-      {...props}>
+      {...props}
+    >
       <m.line x1={6} y1={18} x2={18} y2={6} variants={variants.line1} initial='initial' animate={controls} />
       <m.line x1={6} y1={6} x2={18} y2={18} variants={variants.line2} initial='initial' animate={controls} />
     </m.svg>

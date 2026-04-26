@@ -114,7 +114,8 @@ function IconComponent({ size, ...props }: ArrowDownProps) {
       strokeWidth={2}
       strokeLinecap='round'
       strokeLinejoin='round'
-      {...props}>
+      {...props}
+    >
       <m.g variants={variants.group} initial='initial' animate={controls}>
         <m.path d='M12 5v14' variants={variants.path1} initial='initial' animate={controls} />
         <m.path d='m19 12-7 7-7-7' variants={variants.path2} initial='initial' animate={controls} />
@@ -128,9 +129,9 @@ function ArrowDown(props: ArrowDownProps) {
 }
 
 export {
-  animations,
   ArrowDown,
   ArrowDown as ArrowDownIcon,
   type ArrowDownProps as ArrowDownIconProps,
   type ArrowDownProps,
+  animations,
 };

@@ -36,7 +36,8 @@ function IconComponent({ size, ...props }: PanelLeftProps) {
       strokeWidth={2}
       strokeLinecap='round'
       strokeLinejoin='round'
-      {...props}>
+      {...props}
+    >
       <m.rect
         width={18}
         height={18}

@@ -65,7 +65,8 @@ function IconComponent({ size, ...props }: ChevronUpDownProps) {
       strokeWidth={2}
       strokeLinecap='round'
       strokeLinejoin='round'
-      {...props}>
+      {...props}
+    >
       <m.path d='m7 15 5 5 5-5' variants={variants.path1} initial='initial' animate={controls} />
       <m.path d='m7 9 5-5 5 5' variants={variants.path2} initial='initial' animate={controls} />
     </m.svg>

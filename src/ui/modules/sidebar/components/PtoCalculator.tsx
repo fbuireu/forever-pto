@@ -8,11 +8,11 @@ import { Plus } from '@ui/modules/core/animate/icons/Plus';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Combobox } from '@ui/modules/core/primitives/Combobox';
 import { Input } from '@ui/modules/core/primitives/Input';
+import { getMonthNames } from '@ui/modules/pages/planner/utils/helpers';
 import { Calculator, InfoIcon } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { getMonthNames } from '@ui/modules/pages/planner/utils/helpers';
 
 interface MonthOption {
   value: string;

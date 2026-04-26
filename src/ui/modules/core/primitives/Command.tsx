@@ -2,7 +2,13 @@
 
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { SearchIcon } from '@ui/modules/core/animate/icons/Search';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@ui/modules/core/primitives/Dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@ui/modules/core/primitives/Dialog';
 import { cn } from '@ui/utils/utils';
 import { Command as CommandPrimitive } from 'cmdk';
 import { useTranslations } from 'next-intl';

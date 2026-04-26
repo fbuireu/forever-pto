@@ -1,11 +1,11 @@
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';
+import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { PieChart } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { Cell, Legend, Pie, PieChart as RechartsPieChart, ResponsiveContainer, Tooltip } from 'recharts';
-import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { COLOR_SCHEMES } from './const';
 
 interface HolidaysDistributionChartProps {

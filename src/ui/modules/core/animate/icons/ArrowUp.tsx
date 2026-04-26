@@ -114,7 +114,8 @@ function IconComponent({ size, ...props }: ArrowUpProps) {
       strokeWidth={2}
       strokeLinecap='round'
       strokeLinejoin='round'
-      {...props}>
+      {...props}
+    >
       <m.g variants={variants.group} initial='initial' animate={controls}>
         <m.path d='M12 19V5' variants={variants.path1} initial='initial' animate={controls} />
         <m.path d='m5 12 7-7 7 7' variants={variants.path2} initial='initial' animate={controls} />
@@ -127,4 +128,4 @@ function ArrowUp(props: ArrowUpProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export { animations, ArrowUp, ArrowUp as ArrowUpIcon, type ArrowUpProps as ArrowUpIconProps, type ArrowUpProps };
+export { ArrowUp, ArrowUp as ArrowUpIcon, type ArrowUpProps as ArrowUpIconProps, type ArrowUpProps, animations };

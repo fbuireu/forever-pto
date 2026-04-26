@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from '@application/i18n/navigtion';
 import { usePremiumStore } from '@application/stores/premium';
+import { useLanguages } from '@ui/hooks/useLanguages';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +13,6 @@ import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
 import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { Check } from '@ui/modules/core/animate/icons/Check';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
-import { useLanguages } from '@ui/hooks/useLanguages';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo } from 'react';
 

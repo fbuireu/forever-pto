@@ -7,8 +7,6 @@ import * as React from 'react';
 import { createContext, use, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { MotionHighlight, MotionHighlightItem } from '../effects/MotionHighlight';
 
-// --- Context ---
-
 type TabsContextType = {
   activeValue: string;
   handleValueChange: (value: string) => void;
@@ -21,8 +19,6 @@ function useTabs(): TabsContextType {
   if (!ctx) throw new Error('useTabs must be used within a Tabs');
   return ctx;
 }
-
-// --- Tabs ---
 
 type TabsProps = React.ComponentProps<'div'> & {
   value?: string;
@@ -54,10 +50,6 @@ function Tabs({ defaultValue, value, onValueChange, children, className, ...prop
   );
 }
 
-// --- TabsHighlight ---
-// Wraps TabsList with the sliding highlight indicator.
-// activeClassName controls the highlight pill appearance (default: yellow accent).
-
 type TabsHighlightProps = {
   children: React.ReactNode;
   activeClassName?: string;
@@ -86,8 +78,6 @@ function TabsHighlight({
   );
 }
 
-// --- TabsList ---
-
 type TabsListProps = React.ComponentProps<'div'>;
 
 function TabsList({ children, className, ...props }: TabsListProps) {
@@ -106,8 +96,6 @@ function TabsList({ children, className, ...props }: TabsListProps) {
   );
 }
 
-// --- TabsHighlightItem ---
-
 type TabsHighlightItemProps = {
   value: string;
   children: React.ReactElement;
@@ -121,8 +109,6 @@ function TabsHighlightItem({ value, children, className }: TabsHighlightItemProp
     </MotionHighlightItem>
   );
 }
-
-// --- TabsTrigger ---
 
 type TabsTriggerProps = HTMLMotionProps<'button'> & { value: string };
 
@@ -150,9 +136,8 @@ function TabsTrigger({ ref, value, children, className, ...props }: TabsTriggerP
   );
 }
 
-// --- TabsContents ---
-
-type TabsContentsProps = React.ComponentProps<'div'> & {
+type TabsContentsProps = Omit<HTMLMotionProps<'div'>, 'children' | 'transition'> & {
+  children?: React.ReactNode;
   mode?: 'auto-height' | 'layout';
   transition?: Transition;
 };
@@ -167,10 +152,7 @@ function TabsContents({
   const { activeValue } = useTabs();
   const activeChild = React.Children.toArray(children).find(
     (child): child is React.ReactElement<TabsContentProps> =>
-      React.isValidElement(child) &&
-      typeof child.props === 'object' &&
-      child.props !== null &&
-      child.props.value === activeValue
+      React.isValidElement<TabsContentProps>(child) && child.props.value === activeValue
   );
 
   const content = (
@@ -199,8 +181,6 @@ function TabsContents({
     </AutoHeight>
   );
 }
-
-// --- TabsContent ---
 
 type TabsContentProps = Omit<HTMLMotionProps<'div'>, 'value'> & {
   value: string;

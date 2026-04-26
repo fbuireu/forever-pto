@@ -46,7 +46,8 @@ function IconComponent({ size, ...props }: ChevronLeftProps) {
       strokeWidth={2}
       strokeLinecap='round'
       strokeLinejoin='round'
-      {...props}>
+      {...props}
+    >
       <m.path d='m15 18-6-6 6-6' variants={variants.path} initial='initial' animate={controls} />
     </m.svg>
   );

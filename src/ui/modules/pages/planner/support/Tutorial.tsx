@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { useTutorial } from '@ui/hooks/useTutorial';
+import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { useTranslations } from 'next-intl';
 
 export const Tutorial = () => {
