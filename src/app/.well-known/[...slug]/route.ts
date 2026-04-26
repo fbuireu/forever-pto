@@ -1,27 +1,23 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { NextResponse } from 'next/server';
-import { getTranslations } from 'next-intl/server';
 import pkg from '../../../../package.json';
+
+export const dynamic = 'force-dynamic';
 
 interface RouteContext {
   params: Promise<{ slug: string[] }>;
 }
 
-async function apiCatalog(baseUrl: string) {
-  const t = await getTranslations({ locale: 'en', namespace: 'metadata' });
-
+function apiCatalog(baseUrl: string) {
   return NextResponse.json(
     {
       linkset: [
         {
           anchor: baseUrl,
-          description: t('description'),
           'https://www.iana.org/assignments/link-relations/service-doc': [
             { href: `${baseUrl}/api/health`, type: 'application/json' },
           ],
-          'https://www.iana.org/assignments/link-relations/status': [
-            { href: `${baseUrl}/api/health` },
-          ],
+          'https://www.iana.org/assignments/link-relations/status': [{ href: `${baseUrl}/api/health` }],
         },
       ],
     },
@@ -34,16 +30,15 @@ async function apiCatalog(baseUrl: string) {
   );
 }
 
-async function mcpServerCard(baseUrl: string) {
-  const t = await getTranslations({ locale: 'en', namespace: 'metadata' });
-
+function mcpServerCard(baseUrl: string) {
   return NextResponse.json(
     {
       schema_version: 'v1',
       server_info: {
         name: 'Forever PTO',
         version: pkg.version,
-        description: t('description'),
+        description:
+          'PTO optimization tool — maximize vacation days by combining PTO with public holidays and bridge days.',
         url: baseUrl,
       },
       capabilities: {
@@ -61,21 +56,19 @@ async function mcpServerCard(baseUrl: string) {
   );
 }
 
-async function agentSkillsIndex(baseUrl: string) {
-  const t = await getTranslations({ locale: 'en', namespace: 'metadata' });
-
+function agentSkillsIndex(baseUrl: string) {
   return NextResponse.json(
     {
       $schema: 'https://agentskills.io/schema/v0.2.0/index.json',
       name: 'Forever PTO',
       version: pkg.version,
-      description: t('description'),
+      description:
+        'PTO optimization tool — maximize vacation days by combining PTO with public holidays and bridge days.',
       skills: [
         {
           name: 'markdown-negotiation',
           type: 'skill',
-          description:
-            'Returns page content as Markdown when requested with Accept: text/markdown header.',
+          description: 'Returns page content as Markdown when requested with Accept: text/markdown header.',
           url: `${baseUrl}/.well-known/agent-skills/markdown-negotiation/SKILL.md`,
           sha256: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
         },
@@ -96,8 +89,7 @@ async function agentSkillsIndex(baseUrl: string) {
         {
           name: 'webmcp',
           type: 'skill',
-          description:
-            'Exposes site tools to AI agents via navigator.modelContext.provideContext().',
+          description: 'Exposes site tools to AI agents via navigator.modelContext.provideContext().',
           url: `${baseUrl}/.well-known/agent-skills/webmcp/SKILL.md`,
           sha256: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
         },

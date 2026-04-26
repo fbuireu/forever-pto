@@ -1,11 +1,13 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
-import { LOCALES } from '@infrastructure/i18n/config';
 import { getTranslations } from 'next-intl/server';
 import pkg from '../../../../package.json';
 
-function extractLocale(pathname: string): string {
+const SUPPORTED_LOCALES = ['en', 'es', 'ca', 'it', 'fr', 'de'] as const;
+type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
+
+function extractLocale(pathname: string): SupportedLocale {
   const segment = pathname.split('/')[1];
-  return (LOCALES as readonly string[]).includes(segment) ? segment : 'en';
+  return (SUPPORTED_LOCALES as readonly string[]).includes(segment) ? (segment as SupportedLocale) : 'en';
 }
 
 async function buildMarkdown(baseUrl: string, pathname: string): Promise<string> {
