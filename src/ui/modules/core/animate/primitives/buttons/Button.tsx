@@ -13,8 +13,8 @@ type ButtonProps = WithAsChild<
 function Button({ animated = true, asChild = false, children, ...props }: ButtonProps) {
   const motionProps = animated
     ? ({
-        whileHover: { x: -2, y: -2, boxShadow: '7px 7px 0 0 var(--frame)' },
-        whileTap: { x: 2, y: 2, boxShadow: '1px 1px 0 0 var(--frame)' },
+        whileHover: { x: -2, y: -2 },
+        whileTap: { x: 2, y: 2 },
         transition: { type: 'spring', stiffness: 500, damping: 25 },
       } as const)
     : {};

@@ -9,9 +9,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@ui/modules/core/animate/base/DropdownMenu';
+import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { Check } from '@ui/modules/core/animate/icons/Check';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
-import { Button } from '@ui/modules/core/primitives/Button';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo } from 'react';
 
@@ -40,14 +40,16 @@ export const HomepageLanguageSwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant='outline'
-          size='sm'
-          className='focus-visible:ring-1'
-          aria-label={t('selectLanguage', { current: currentLanguage?.label ?? locale })}
-        >
-          <span className='capitalize'>{currentLanguage?.label}</span>
-        </Button>
+        <AnimateIcon animateOnHover>
+          <Button
+            variant='outline'
+            size='sm'
+            className='focus-visible:ring-1'
+            aria-label={t('selectLanguage', { current: currentLanguage?.label ?? locale })}
+          >
+            <span className='capitalize'>{currentLanguage?.label}</span>
+          </Button>
+        </AnimateIcon>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         {languages.map((language) => (
