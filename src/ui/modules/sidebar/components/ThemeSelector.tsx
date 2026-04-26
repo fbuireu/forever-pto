@@ -17,7 +17,7 @@ import { useCallback } from 'react';
 
 const getResolvedTheme = (theme: ReturnType<typeof useTheme>['theme']) => {
   if (theme !== 'system') return theme;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return globalThis.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };
 
 export const ThemeSelector = ({ buttonClassName }: { buttonClassName?: string }) => {

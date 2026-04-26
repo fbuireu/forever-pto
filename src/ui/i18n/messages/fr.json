@@ -21,11 +21,15 @@
     },
     "paymentConfirmation": {
       "title": "Confirmation de paiement | Forever PTO"
+    },
+    "planner": {
+      "title": "Planificateur | Forever PTO",
+      "description": "Planifie et optimise tes jours de congés. Calendrier PTO intelligent avec détection des jours fériés, optimisateur de ponts et export vers Google Agenda, Outlook et Apple."
     }
   },
   "planner": {
     "title": "Forever PTO",
-    "description": "C'est la page d'accueil où tu peux trouver les dernières mises à jour et fonctionnalités.",
+    "description": "Ton planificateur PTO intelligent. Configure tes jours de congés, pays et stratégie pour profiter au maximum de chaque jour férié.",
     "subtitle": "Ta solution ultime pour gérer tes jours de congé. Ne travaille plus",
     "instructions": "Commence par ajouter tes jours dans la barre latérale gauche et le reste de ta configuration. Encore des doutes ?",
     "quickTour": "Faire un tour rapide",
@@ -1826,7 +1830,7 @@
       "title": "Des questions ? On a des réponses."
     },
     "closing": {
-      "titleStart": "Votre prochaine année",
+      "titleStart": "Ta prochaine année",
       "titleEmphasis": "libre",
       "titleEnd": "commence aujourd'hui.",
       "description": "22 jours peuvent devenir 47. Il suffit de savoir où les placer. C'est ce qu'on fait.",

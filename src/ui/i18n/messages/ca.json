@@ -21,11 +21,15 @@
     },
     "paymentConfirmation": {
       "title": "Confirmació de pagament | Forever PTO"
+    },
+    "planner": {
+      "title": "Planificador | Forever PTO",
+      "description": "Planifica i optimitza els teus dies de vacances. Calendari intel·ligent de PTO amb detecció de festius, optimitzador de ponts i exportació a Google Calendar, Outlook i Apple."
     }
   },
   "planner": {
     "title": "Forever PTO",
-    "description": "Aquesta és la pàgina d'inici on pots trobar les últimes novetats i funcions.",
+    "description": "El teu planificador de PTO intel·ligent. Configura els teus dies de vacances, país i estratègia per aprofitar al màxim cada festiu.",
     "subtitle": "La teva solució definitiva per gestionar els teus dies lliures. No treballis més",
     "instructions": "Comença afegint els teus dies a la barra lateral esquerra i la resta de configuracions. Encara tens dubtes?",
     "quickTour": "Fes un tour ràpid",

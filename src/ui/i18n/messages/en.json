@@ -21,11 +21,15 @@
     },
     "paymentConfirmation": {
       "title": "Payment Confirmation | Forever PTO"
+    },
+    "planner": {
+      "title": "Planner | Forever PTO",
+      "description": "Plan and optimize your vacation days. Smart PTO calendar with holiday detection, bridge day optimizer, and export to Google Calendar, Outlook and Apple."
     }
   },
   "planner": {
     "title": "Forever PTO",
-    "description": "This is the home page where you can find the latest updates and features.",
+    "description": "Your smart PTO planner. Configure your vacation days, country and strategy to get the most out of every public holiday.",
     "subtitle": "Your ultimate solution for managing paid time off. Don't work anymore",
     "instructions": "Start by adding your days on the left sidebar and the rest of your configurations. Still doubts?",
     "quickTour": "Take a quick tour",

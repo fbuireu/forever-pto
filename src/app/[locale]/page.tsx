@@ -56,14 +56,12 @@ const HomePage = async ({ params }: PageProps) => {
 
 export default HomePage;
 
-// todo: FIX WORKERS
 // todo: brutalist design (show legend in button, remove old brand, redo logo)
 // todo: tabs
 // todo: Check DSM (dark mode, tipografies, colors, etc)
 // todo: 400 and 500 page
 // todo: check all buttons
 // todo: check all skeletons
-// todo: check SEO again (canonical issue on planner?)
 // todo: https://isitagentready.com/forever-pto.com
 // todo: check lang strings (rename landing for home, no use finalCta or strings like that, etc)
 // todo: focus input order in stripe

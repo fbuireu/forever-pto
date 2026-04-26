@@ -21,11 +21,15 @@
     },
     "paymentConfirmation": {
       "title": "Zahlungsbestätigung | Forever PTO"
+    },
+    "planner": {
+      "title": "Planer | Forever PTO",
+      "description": "Plane und optimiere deine Urlaubstage. Intelligenter PTO-Kalender mit Feiertagserkennung, Brückentagsoptimierung und Export nach Google Kalender, Outlook und Apple."
     }
   },
   "planner": {
     "title": "Forever PTO",
-    "description": "Hier findest du die neuesten Updates und Funktionen.",
+    "description": "Dein intelligenter PTO-Planer. Konfiguriere deine Urlaubstage, dein Land und deine Strategie, um jeden Feiertag optimal zu nutzen.",
     "subtitle": "Deine ultimative Lösung für die Verwaltung deiner Urlaubstage. Hör auf zu arbeiten",
     "instructions": "Beginne damit, deine Tage in der linken Seitenleiste und den Rest deiner Einstellungen hinzuzufügen. Noch Fragen?",
     "quickTour": "Kurze Tour starten",
@@ -1673,8 +1677,8 @@
       "badge1": "🇬🇧 EN · 🇪🇸 ES · 🇮🇹 IT · 🇩🇪 DE · 🇫🇷 FR · 🇺🇸 US",
       "badge2": "v{version} verfügbar",
       "line1": "Weniger arbeiten.",
-      "verb": "Mehr",
-      "highlight": "reisen",
+      "verb": "Reise",
+      "highlight": "mehr",
       "description": "Forever PTO berechnet <em>genau</em>, welche Tage du beantragen musst, damit aus deinen 22 Urlaubstagen <strong>47+ Tage außer Haus</strong> werden. Keine Tabellen. Kein Kopfzerbrechen. Kein schlechtes Gewissen.",
       "descriptionEm": "genau",
       "descriptionStrong": "47+ Tage außer Haus",
@@ -1724,7 +1728,7 @@
       "description": "Das sind die Züge, die Forever PTO automatisch für dich macht.",
       "bridgeTag": "CLEVERE BRÜCKEN",
       "bridgeTitle": "1 Urlaubstag in 4 freie Tage verwandeln.",
-      "bridgeDescription": "Erkennt Feiertage an Dienstagen und Donnerstagen und schlägt minimale Brücken vor.",
+      "bridgeDescription": "Erkennt Feiertage an Dienstagen und Donnerstagen und schlägt minimale Brücken vor. Ein strategischer Tag = ein 4-Tage-Wochenende.",
       "ratioTag": "MAX-VERHÄLTNIS",
       "ratioDescription": "Bestes Verhältnis: 8 Urlaubstage zu 28 freien Tagen (ES, April 26).",
       "syncTag": "SYNC IN 1 KLICK",

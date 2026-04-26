@@ -12,7 +12,7 @@ const Summary = dynamic(() => import('@ui/modules/pages/planner/Summary').then((
 const Roadmap = dynamic(() => import('@ui/modules/pages/planner/Roadmap').then((mod) => mod.Roadmap));
 const Contact = dynamic(() => import('@ui/modules/pages/planner/Contact').then((mod) => mod.Contact));
 
-export { generateMetadata } from '../metadata';
+export { generateMetadata } from './metadata';
 
 interface PageProps {
   params: Promise<{ locale: Locale }>;

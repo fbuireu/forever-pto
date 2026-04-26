@@ -21,11 +21,15 @@
     },
     "paymentConfirmation": {
       "title": "Confirmación de pago | Forever PTO"
+    },
+    "planner": {
+      "title": "Planificador | Forever PTO",
+      "description": "Planifica y optimiza tus días de vacaciones. Calendario inteligente de PTO con detección de festivos, optimizador de puentes y exportación a Google Calendar, Outlook y Apple."
     }
   },
   "planner": {
     "title": "Forever PTO",
-    "description": "Esta es la página de inicio donde puedes encontrar las últimas novedades y funciones.",
+    "description": "Tu planificador de PTO inteligente. Configura tus días de vacaciones, país y estrategia para aprovechar al máximo cada festivo.",
     "subtitle": "Tu solución definitiva para gestionar tus días libres. No trabajes más",
     "instructions": "Empieza añadiendo tus días en la barra lateral izquierda y el resto de configuraciones. ¿Aún tienes dudas?",
     "quickTour": "Haz un tour rápido",

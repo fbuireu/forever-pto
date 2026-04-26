@@ -1,6 +1,5 @@
 'use client';
 
-import { cn } from '@ui/utils/utils';
 import { type HTMLMotionProps, motion, type TargetAndTransition } from 'motion/react';
 import type * as React from 'react';
 import { useAutoHeight } from 'src/ui/hooks/useAutoHeight';
@@ -40,26 +39,14 @@ function AutoHeight({
 
   if (asChild) {
     return (
-      <MotionSlot
-        className={cn('overflow-hidden', className)}
-        style={style}
-        animate={mergedAnimate}
-        transition={transition}
-        {...props}
-      >
+      <MotionSlot className={className} style={style} animate={mergedAnimate} transition={transition} {...props}>
         {content}
       </MotionSlot>
     );
   }
 
   return (
-    <motion.div
-      className={cn('overflow-hidden', className)}
-      style={style}
-      animate={mergedAnimate}
-      transition={transition}
-      {...props}
-    >
+    <motion.div className={className} style={style} animate={mergedAnimate} transition={transition} {...props}>
       {content}
     </motion.div>
   );
