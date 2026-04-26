@@ -1,4 +1,4 @@
-name: Deploy - Preview
+name: Deploy - Development
 
 on:
   pull_request:
@@ -19,7 +19,7 @@ jobs:
       environment: development
       wrangler_env: development
       worker_name: development-pr-${{ github.event.pull_request.number }}
-      url: https://development-pr-${{ github.event.pull_request.number }}.forever-pto.com
+      url: https://development-pr-${{ github.event.pull_request.number }}.forever-pto.workers.dev
     secrets:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -49,7 +49,7 @@ jobs:
 
             | | |
             |---|---|
-            | **URL** | https://development-pr-${{ github.event.pull_request.number }}.forever-pto.com |
+            | **URL** | https://development-pr-${{ github.event.pull_request.number }}.forever-pto.workers.dev |
             | **Branch** | `${{ github.head_ref }}` |
             | **Commit** | `${{ github.event.pull_request.head.sha }}` |
 
@@ -68,6 +68,6 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
         env:
-          BASE_URL: https://development-pr-${{ github.event.pull_request.number }}.forever-pto.com
+          BASE_URL: https://development-pr-${{ github.event.pull_request.number }}.forever-pto.workers.dev
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}

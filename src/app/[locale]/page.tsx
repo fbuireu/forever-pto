@@ -56,6 +56,7 @@ const HomePage = async ({ params }: PageProps) => {
 
 export default HomePage;
 
+// todo: FIX WORKERS
 // todo: brutalist design (show legend in button, remove old brand, redo logo)
 // todo: tabs
 // todo: Check DSM (dark mode, tipografies, colors, etc)
