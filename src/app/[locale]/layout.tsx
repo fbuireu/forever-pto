@@ -1,4 +1,5 @@
 import { routing } from '@infrastructure/i18n/routing';
+import { WebMCP } from '@ui/modules/shared/WebMCP';
 import { cn } from '@ui/utils/utils';
 import '@styles/index.css';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
@@ -70,6 +71,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
             <LazyMotionProvider>{children}</LazyMotionProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
+        <WebMCP />
         <Analytics />
       </body>
     </html>
