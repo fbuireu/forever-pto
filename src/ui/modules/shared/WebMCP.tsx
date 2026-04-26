@@ -1,6 +1,6 @@
 'use client';
 
-import { LOCALES } from '@infrastructure/i18n/config';
+import { LOCALES } from '@infrastructure/i18n/locales';
 import { useEffect } from 'react';
 
 declare global {

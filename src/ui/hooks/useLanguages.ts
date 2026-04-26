@@ -1,3 +1,4 @@
+import { LOCALES } from '@infrastructure/i18n/locales';
 import { type AppConfig, useTranslations } from 'next-intl';
 
 interface UseLanguagesReturn {
@@ -5,13 +6,11 @@ interface UseLanguagesReturn {
   label: string;
 }
 
-const LOCALES = ['en', 'es', 'ca', 'it', 'fr', 'de'] as const;
-
 export function useLanguages(): UseLanguagesReturn[] {
   const t = useTranslations('languages');
 
   return LOCALES.map((code) => ({
     code,
-    label: t(code),
+    label: t(code as Parameters<typeof t>[0]),
   }));
 }
