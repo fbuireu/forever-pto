@@ -2,6 +2,8 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getTranslations } from 'next-intl/server';
 import pkg from '../../../../package.json';
 
+export const dynamic = 'force-dynamic';
+
 const SUPPORTED_LOCALES = ['en', 'es', 'ca', 'it', 'fr', 'de'] as const;
 type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
