@@ -9,16 +9,28 @@ interface GenerateMetadataParams {
 }
 
 export async function generateMetadata({ params }: GenerateMetadataParams): Promise<Metadata> {
-  const [{ locale }, { env }] = await Promise.all([params, getCloudflareContext({ async: true })]);
-  const t = await getTranslations({ locale, namespace: 'metadata.paymentConfirmation' });
+  const { locale } = await params;
+  const [{ env }, t] = await Promise.all([
+    getCloudflareContext({ async: true }),
+    getTranslations({ locale, namespace: 'metadata.privacyPolicy' }),
+  ]);
   const baseUrl = env.NEXT_PUBLIC_SITE_URL;
 
   return {
     title: t('title'),
+    description: t('description'),
     metadataBase: new URL(baseUrl),
     alternates: {
-      canonical: '/payment/confirmation',
-      languages: Object.fromEntries(LOCALES.map((lang) => [lang, `/${lang}/payment/confirmation`])),
+      canonical: `/${locale}/legal/privacy-policy`,
+      languages: Object.fromEntries(LOCALES.map((lang) => [lang, `/${lang}/legal/privacy-policy`])),
+    },
+    openGraph: {
+      title: t('title'),
+      description: t('description'),
+      url: `/${locale}/legal/privacy-policy`,
+      siteName: 'Forever PTO',
+      locale,
+      type: 'website',
     },
     robots: {
       index: false,

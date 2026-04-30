@@ -61,9 +61,7 @@ export default HomePage;
 // todo: more testimonials + randomize them
 // todo: 400 and 500 page
 // todo: check all buttons
-// todo: check all skeletons
-// todo: https://isitagentready.com/forever-pto.com
-// todo: check lang strings (rename landing for home, no use finalCta or strings like that, etc)
+// todo: check all// todo: check lang strings (rename landing for home, no use fi// todo: check lang strings (rename landing for home, no use finalCta or strings like that, etc)
 // todo: focus input order in stripe
 // todo: check translations
 // todo: unify styles and check everything

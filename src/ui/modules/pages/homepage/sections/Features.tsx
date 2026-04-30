@@ -87,9 +87,9 @@ export const Features = async () => {
           </h3>
           <div className='flex flex-wrap gap-1.5 mb-3.5'>
             {[
-              { key: 'features.conflictItems.0' as const, alert: false },
-              { key: 'features.conflictItems.1' as const, alert: true },
-              { key: 'features.conflictItems.2' as const, alert: false },
+              { key: 'features.conflictItems.allHandsMeeting' as const, alert: false },
+              { key: 'features.conflictItems.quarterClose' as const, alert: true },
+              { key: 'features.conflictItems.productLaunch' as const, alert: false },
             ].map(({ key, alert }) => (
               <span
                 key={key}

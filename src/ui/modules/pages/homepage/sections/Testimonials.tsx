@@ -2,12 +2,18 @@ import { Badge } from '@ui/modules/core/primitives/Badge';
 import { getTranslations } from 'next-intl/server';
 import { brutCard } from './shared';
 
-const AVATAR_BG = [
-  'bg-[var(--color-brand-teal)]',
-  'bg-[var(--color-brand-orange)]',
-  'bg-[var(--color-brand-purple)]',
+const CARD_STYLES = [
+  { avatarBg: 'bg-[var(--color-brand-teal)]', rotate: 'rotate-[-1deg]', hoverRotate: 'hover:rotate-0' },
+  { avatarBg: 'bg-[var(--color-brand-orange)]', rotate: 'rotate-[1.2deg]', hoverRotate: 'hover:rotate-0' },
+  { avatarBg: 'bg-[var(--color-brand-purple)]', rotate: 'rotate-[-0.5deg]', hoverRotate: 'hover:rotate-0' },
+  { avatarBg: 'bg-[var(--color-brand-sky)]', rotate: 'rotate-[0.8deg]', hoverRotate: 'hover:rotate-0' },
+  { avatarBg: 'bg-[var(--color-brand-pink)]', rotate: 'rotate-[-1.5deg]', hoverRotate: 'hover:rotate-0' },
+  { avatarBg: 'bg-[var(--color-brand-green)]', rotate: 'rotate-[0.3deg]', hoverRotate: 'hover:rotate-0' },
 ] as const;
-const ROTATES = ['rotate-[-1deg]', 'rotate-[1deg]', 'rotate-[-0.5deg]'] as const;
+
+type TestimonialKey = 'martaR' | 'diegoA' | 'saraV' | 'carlosM' | 'lauraT' | 'thomasK';
+
+const TESTIMONIAL_KEYS: TestimonialKey[] = ['martaR', 'diegoA', 'saraV', 'carlosM', 'lauraT', 'thomasK'];
 
 export const Testimonials = async () => {
   const t = await getTranslations('homepage');
@@ -26,15 +32,16 @@ export const Testimonials = async () => {
       </div>
 
       <div className='max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6'>
-        {([0, 1, 2] as const).map((idx) => {
-          const text = t(`testimonials.items.${idx}.text` as Parameters<typeof t>[0]);
-          const name = t(`testimonials.items.${idx}.name` as Parameters<typeof t>[0]);
-          const role = t(`testimonials.items.${idx}.role` as Parameters<typeof t>[0]);
+        {TESTIMONIAL_KEYS.map((key, idx) => {
+          const text = t(`testimonials.items.${key}.text` as Parameters<typeof t>[0]);
+          const name = t(`testimonials.items.${key}.name` as Parameters<typeof t>[0]);
+          const role = t(`testimonials.items.${key}.role` as Parameters<typeof t>[0]);
+          const { avatarBg, rotate, hoverRotate } = CARD_STYLES[idx];
 
           return (
             <div
-              key={idx}
-              className={`${brutCard} p-6 relative ${ROTATES[idx]} hover:rotate-0 transition-transform duration-200`}
+              key={key}
+              className={`${brutCard} p-6 relative ${rotate} ${hoverRotate} transition-transform duration-200`}
             >
               <span
                 className='absolute -top-3.5 left-[18px] bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] px-2.5 font-serif text-[36px] leading-none shadow-[3px_3px_0_0_var(--frame)] rotate-[-5deg]'
@@ -46,7 +53,7 @@ export const Testimonials = async () => {
               <p className='font-serif text-[22px] leading-[1.3] mb-4'>{text}</p>
               <div className='flex gap-3 items-center pt-3.5 border-t-[2.5px] border-[var(--frame)]'>
                 <div
-                  className={`w-[42px] h-[42px] rounded-full border-[3px] border-[var(--frame)] grid place-items-center font-display font-extrabold text-white shrink-0 ${AVATAR_BG[idx]}`}
+                  className={`w-[42px] h-[42px] rounded-full border-[3px] border-[var(--frame)] grid place-items-center font-display font-extrabold text-white shrink-0 ${avatarBg}`}
                 >
                   {name[0]}
                 </div>

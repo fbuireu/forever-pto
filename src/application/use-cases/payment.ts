@@ -80,6 +80,7 @@ export async function createPayment(params: CreatePaymentInput, context: Payment
       disputedAt: null,
       disputeReason: null,
       parentPaymentId: null,
+      origin: null,
     });
 
     if (!saveResult.success) {

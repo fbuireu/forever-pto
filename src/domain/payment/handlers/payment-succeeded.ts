@@ -52,6 +52,7 @@ const createPaymentFromWebhook = async (event: PaymentSucceededEvent, repository
     disputedAt: null,
     disputeReason: null,
     parentPaymentId: null,
+    origin: null,
   };
 
   const result = await repository.save(paymentData);

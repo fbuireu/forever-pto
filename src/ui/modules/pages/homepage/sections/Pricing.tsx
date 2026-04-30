@@ -32,12 +32,19 @@ export const Pricing = async () => {
           </div>
           <p className='font-mono text-[12px] text-muted-foreground mb-5'>{t('pricing.freeNote')}</p>
           <ul className='list-none mb-6'>
-            {Array.from({ length: 4 }, (_, i) => t(`pricing.freeFeatures.${i}` as Parameters<typeof t>[0])).map((f) => (
+            {(
+              [
+                'pricing.freeFeatures.optimizedPlan',
+                'pricing.freeFeatures.countryHolidays',
+                'pricing.freeFeatures.threeStrategies',
+                'pricing.freeFeatures.basicStats',
+              ] as const
+            ).map((key) => (
               <li
-                key={f}
+                key={key}
                 className='flex gap-2.5 py-2 border-b-[2px] border-dashed border-black/15 last:border-b-0 text-[15px]'
               >
-                <span className='font-black'>✓</span> {f}
+                <span className='font-black'>✓</span> {t(key)}
               </li>
             ))}
           </ul>
@@ -62,16 +69,23 @@ export const Pricing = async () => {
           </div>
           <p className='font-mono text-[12px] text-muted-foreground mb-5'>{t('pricing.lifetimeNote')}</p>
           <ul className='list-none mb-6'>
-            {Array.from({ length: 6 }, (_, i) => t(`pricing.lifetimeFeatures.${i}` as Parameters<typeof t>[0])).map(
-              (f) => (
-                <li
-                  key={f}
-                  className='flex gap-2.5 py-2 border-b-[2px] border-dashed border-black/15 last:border-b-0 text-[15px]'
-                >
-                  <span className='font-black'>✓</span> {f}
-                </li>
-              )
-            )}
+            {(
+              [
+                'pricing.lifetimeFeatures.manualEditing',
+                'pricing.lifetimeFeatures.calendarExport',
+                'pricing.lifetimeFeatures.customHolidays',
+                'pricing.lifetimeFeatures.pastDaysAndCarryover',
+                'pricing.lifetimeFeatures.holidayManagement',
+                'pricing.lifetimeFeatures.fullAnalytics',
+              ] as const
+            ).map((key) => (
+              <li
+                key={key}
+                className='flex gap-2.5 py-2 border-b-[2px] border-dashed border-black/15 last:border-b-0 text-[15px]'
+              >
+                <span className='font-black'>✓</span> {t(key)}
+              </li>
+            ))}
           </ul>
           <SupportButton label={t('pricing.lifetimeCta')} className='w-full justify-center' />
         </div>

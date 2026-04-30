@@ -84,7 +84,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
 
   if (!paymentIntentId) {
     logger.warn('Payment success page accessed without payment_intent, redirecting to home');
-    redirect('/');
+    redirect(`/${locale}`);
   }
 
   let paymentIntent: Stripe.PaymentIntent;

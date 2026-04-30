@@ -9,8 +9,11 @@ interface GenerateMetadataParams {
 }
 
 export async function generateMetadata({ params }: GenerateMetadataParams): Promise<Metadata> {
-  const [{ locale }, { env }] = await Promise.all([params, getCloudflareContext({ async: true })]);
-  const t = await getTranslations({ locale, namespace: 'metadata' });
+  const { locale } = await params;
+  const [{ env }, t] = await Promise.all([
+    getCloudflareContext({ async: true }),
+    getTranslations({ locale, namespace: 'metadata' }),
+  ]);
   const baseUrl = env.NEXT_PUBLIC_SITE_URL;
 
   return {

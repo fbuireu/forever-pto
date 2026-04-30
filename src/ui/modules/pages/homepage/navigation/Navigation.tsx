@@ -44,7 +44,7 @@ export const Navigation = async () => {
           <ThemeSelector buttonClassName='h-9 w-9 px-0 focus-visible:ring-1' />
           <HomepageLanguageSwitcher />
           <Button variant='accent' size='sm' asChild>
-            <Link href='/planner'>{t('nav.cta')}</Link>
+            <Link href='/planner'>{t('nav.trialAction')}</Link>
           </Button>
         </div>
       </div>

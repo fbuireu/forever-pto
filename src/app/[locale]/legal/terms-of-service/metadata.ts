@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
   const { locale } = await params;
   const [{ env }, t] = await Promise.all([
     getCloudflareContext({ async: true }),
-    getTranslations({ locale, namespace: 'metadata' }),
+    getTranslations({ locale, namespace: 'metadata.termsOfService' }),
   ]);
   const baseUrl = env.NEXT_PUBLIC_SITE_URL;
 
@@ -21,38 +21,20 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
     description: t('description'),
     metadataBase: new URL(baseUrl),
     alternates: {
-      canonical: `/${locale}`,
-      languages: Object.fromEntries(LOCALES.map((lang) => [lang, `/${lang}`])),
+      canonical: `/${locale}/legal/terms-of-service`,
+      languages: Object.fromEntries(LOCALES.map((lang) => [lang, `/${lang}/legal/terms-of-service`])),
     },
     openGraph: {
       title: t('title'),
       description: t('description'),
-      url: '/',
-      siteName: t('title'),
+      url: `/${locale}/legal/terms-of-service`,
+      siteName: 'Forever PTO',
       locale,
       type: 'website',
-      images: [
-        {
-          url: '/static/images/forever-pto-logo.png',
-          width: 1200,
-          height: 630,
-          alt: t('title'),
-        },
-      ],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: t('title'),
-      description: t('description'),
-      images: ['/static/images/forever-pto-logo.png'],
     },
     robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-      },
+      index: false,
+      follow: false,
     },
   };
 }

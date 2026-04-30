@@ -57,6 +57,7 @@ export async function sendContactEmail(data: ContactFormData): Promise<ContactRe
       subject: validated.subject,
       message: validated.message,
       messageId: emailResult.messageId ?? null,
+      origin: null,
     });
 
     if (!saveResult.success) {

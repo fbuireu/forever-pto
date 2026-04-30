@@ -15,12 +15,12 @@ export const Hero = async () => {
       <div className='max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-14 items-center'>
         <div>
           <div className='flex gap-2.5 items-center mb-6 flex-wrap'>
-            <Badge variant='outline'>{t('hero.badge1')}</Badge>
+            <Badge variant='outline'>{t('hero.localeBadge')}</Badge>
             <Badge variant='outline'>v{version}</Badge>
           </div>
 
           <h1 className='font-display font-extrabold leading-[0.95] tracking-[-0.035em] mb-7 text-[clamp(48px,7vw,92px)]'>
-            {t('hero.line1')}
+            {t('hero.command')}
             <br />
             {t('hero.verb')}{' '}
             <span className='relative inline-block bg-[var(--accent)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[5px_5px_0_0_var(--frame)] rotate-[-2deg] mx-1'>
@@ -38,10 +38,10 @@ export const Hero = async () => {
 
           <div className='flex gap-4 flex-wrap items-center mb-7'>
             <Button variant='accent' size='lg' asChild>
-              <Link href='/planner'>{t('hero.cta1')}</Link>
+              <Link href='/planner'>{t('hero.plannerCta')}</Link>
             </Button>
             <Button variant='outline' size='lg' asChild>
-              <a href='#how'>{t('hero.cta2')}</a>
+              <a href='#how'>{t('hero.demoLink')}</a>
             </Button>
           </div>
 

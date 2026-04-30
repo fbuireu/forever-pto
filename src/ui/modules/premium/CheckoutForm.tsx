@@ -52,7 +52,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
       stripe,
       elements,
       email,
-      returnUrl: `${globalThis.location.origin}/payment/confirmation`,
+      returnUrl: `${globalThis.location.origin}/${locale}/payment/confirmation`,
     });
 
     if (!result.success) {
@@ -71,7 +71,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
         onSuccess();
       }, 1000);
     }
-  }, [stripe, elements, email, onSuccess, setPremiumStatus, t]);
+  }, [stripe, elements, email, onSuccess, setPremiumStatus, t, locale]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {

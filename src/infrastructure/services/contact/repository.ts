@@ -6,11 +6,11 @@ export const saveContact = async (
   data: ContactData
 ): Promise<{ success: boolean; error?: string }> => {
   const id = crypto.randomUUID();
-  const args = [id, data.email, data.name, data.subject, data.message, data.messageId ?? null];
+  const args = [id, data.email, data.name, data.subject, data.message, data.messageId ?? null, data.origin ?? null];
 
   const result = await turso.execute(
-    `INSERT INTO contacts (id, email, name, subject, message, message_id, created_date, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+    `INSERT INTO contacts (id, email, name, subject, message, message_id, origin, created_date, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
     args
   );
 

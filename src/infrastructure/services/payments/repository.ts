@@ -35,6 +35,7 @@ export const savePayment = async (
     data.disputedAt?.toISOString() ?? null,
     data.disputeReason ?? null,
     data.parentPaymentId ?? null,
+    data.origin ?? null,
   ];
 
   const result = await turso.execute(
@@ -46,9 +47,9 @@ export const savePayment = async (
       payment_brand, payment_last4,
       fee_amount, net_amount,
       refunded_at, refund_reason, disputed_at, dispute_reason,
-      parent_payment_id,
+      parent_payment_id, origin,
       created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
     args
   );
 

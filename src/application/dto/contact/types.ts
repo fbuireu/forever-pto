@@ -17,4 +17,5 @@ export interface ContactData {
   subject: string;
   message: string;
   messageId: string | null;
+  origin: string | null;
 }

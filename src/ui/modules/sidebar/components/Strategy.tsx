@@ -38,8 +38,8 @@ export const Strategy = () => {
         icon: STRATEGY_ICONS[FilterStrategy.GROUPED],
         description: t('grouped.description'),
         subtitle: t('grouped.subtitle'),
-        pros: [t('grouped.pros.0'), t('grouped.pros.1')],
-        cons: [t('grouped.cons.0'), t('grouped.cons.1')],
+        pros: [t('grouped.pros.simulatesHumanSelection'), t('grouped.pros.longBridges')],
+        cons: [t('grouped.cons.fewerDays'), t('grouped.cons.lowerEfficiency')],
       },
       {
         value: FilterStrategy.OPTIMIZED,
@@ -47,8 +47,8 @@ export const Strategy = () => {
         icon: STRATEGY_ICONS[FilterStrategy.OPTIMIZED],
         description: t('optimized.description'),
         subtitle: t('optimized.subtitle'),
-        pros: [t('optimized.pros.0'), t('optimized.pros.1')],
-        cons: [t('optimized.cons.0'), t('optimized.cons.1')],
+        pros: [t('optimized.pros.maximumPerformance'), t('optimized.pros.moreDays')],
+        cons: [t('optimized.cons.shortBridges'), t('optimized.cons.scatteredDays')],
       },
       {
         value: FilterStrategy.BALANCED,
@@ -56,8 +56,8 @@ export const Strategy = () => {
         icon: STRATEGY_ICONS[FilterStrategy.BALANCED],
         description: t('balanced.description'),
         subtitle: t('balanced.subtitle'),
-        pros: [t('balanced.pros.0'), t('balanced.pros.1'), t('balanced.pros.2')],
-        cons: [t('balanced.cons.0'), t('balanced.cons.1')],
+        pros: [t('balanced.pros.flexible'), t('balanced.pros.mediumPeriods'), t('balanced.pros.versatile')],
+        cons: [t('balanced.cons.noMaximization'), t('balanced.cons.intermediateSolution')],
       },
     ],
     [t]

@@ -53,6 +53,7 @@ const buildPaymentDataFromIntent = (paymentIntent: Stripe.PaymentIntent, email: 
     disputedAt: null,
     disputeReason: null,
     parentPaymentId: null,
+    origin: null,
   };
 };
 
