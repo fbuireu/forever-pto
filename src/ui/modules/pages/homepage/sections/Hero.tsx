@@ -8,7 +8,10 @@ import { CAL_ENTRIES, type DayType, dayCell } from './shared';
 
 export const Hero = async () => {
   const [t, locale] = await Promise.all([getTranslations('homepage'), getLocale()]);
-  const DAY_HEADERS = getWeekdayNames({ locale, weekStartsOn: 1, format: 'narrow' });
+  const DAY_HEADERS = getWeekdayNames({ locale, weekStartsOn: 1, format: 'narrow' }).map((label) => ({
+    id: crypto.randomUUID(),
+    label,
+  }));
 
   return (
     <header className='relative px-7 pt-20 pb-24 overflow-hidden' id='hero'>
@@ -90,9 +93,9 @@ export const Hero = async () => {
             </div>
 
             <div className='mt-4 grid grid-cols-7 gap-1'>
-              {DAY_HEADERS.map((d) => (
-                <div key={d} className='text-center font-mono text-[10px] font-bold py-1 text-muted-foreground'>
-                  {d}
+              {DAY_HEADERS.map(({ id, label }) => (
+                <div key={id} className='text-center font-mono text-[10px] font-bold py-1 text-muted-foreground'>
+                  {label}
                 </div>
               ))}
               {CAL_ENTRIES.map(({ id, type }) => (

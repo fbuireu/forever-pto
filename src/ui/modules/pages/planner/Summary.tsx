@@ -279,13 +279,13 @@ export const Summary = () => {
             />
           </div>
           {metrics.firstLastBreak && (
-            <AnimateIcon animateOnHover>
-              <PremiumFeature
-                feature={t('yearSummary.feature')}
-                description={t('yearSummary.featureDescription')}
-                iconSize='size-7'
-                inlineDescription
-              >
+            <PremiumFeature
+              feature={t('yearSummary.feature')}
+              description={t('yearSummary.featureDescription')}
+              iconSize='size-7'
+              inlineDescription
+            >
+              <AnimateIcon animateOnHover asChild>
                 <div className='rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] p-4 shadow-[var(--shadow-brutal-sm)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]'>
                   <div className='flex items-center gap-2 mb-3'>
                     <Clock className='w-4 h-4 text-indigo-500' />
@@ -322,8 +322,8 @@ export const Summary = () => {
                     <div className='text-xs text-indigo-600 dark:text-indigo-400'>{t('yearSummary.daysGained')}</div>
                   </div>
                 </div>
-              </PremiumFeature>
-            </AnimateIcon>
+              </AnimateIcon>
+            </PremiumFeature>
           )}
           {canImprove > 0 && (
             <NotificationCard icon={Zap} title={t('notifications.canImprove.title')} colorScheme='orange'>

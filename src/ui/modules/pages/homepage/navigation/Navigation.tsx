@@ -30,13 +30,13 @@ export const Navigation = async () => {
             { href: '/#features', label: t('nav.features') },
             { href: '/#pricing', label: t('nav.pricing') },
           ].map(({ href, label }) => (
-            <a
+            <Link
               key={href}
               href={href}
               className='px-2 py-1 border-[2px] border-transparent rounded-[6px] hover:bg-[var(--accent)] hover:border-[var(--frame)] transition-all duration-75'
             >
               {label}
-            </a>
+            </Link>
           ))}
         </div>
 

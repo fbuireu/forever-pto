@@ -18,6 +18,8 @@ const TESTIMONIAL_KEYS: TestimonialKey[] = ['martaR', 'diegoA', 'saraV', 'carlos
 export const Testimonials = async () => {
   const t = await getTranslations('homepage');
 
+  const shuffledKeys = [...TESTIMONIAL_KEYS].sort(() => Math.random() - 0.5);
+
   return (
     <section className='px-7 py-24' id='testimonials'>
       <div className='max-w-[900px] mx-auto mb-14 text-center'>
@@ -32,7 +34,7 @@ export const Testimonials = async () => {
       </div>
 
       <div className='max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6'>
-        {TESTIMONIAL_KEYS.map((key, idx) => {
+        {shuffledKeys.map((key, idx) => {
           const text = t(`testimonials.items.${key}.text` as Parameters<typeof t>[0]);
           const name = t(`testimonials.items.${key}.name` as Parameters<typeof t>[0]);
           const role = t(`testimonials.items.${key}.role` as Parameters<typeof t>[0]);

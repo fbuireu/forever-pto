@@ -30,7 +30,6 @@ import { Countries } from './components/Countries';
 import { PtoDays } from './components/PtoDays';
 import { SidebarFooterButtons } from './components/SidebarFooterButtons';
 
-// Lazy-load components that pull in cmdk
 const Regions = dynamic(() => import('./components/Regions').then((m) => m.Regions));
 const Years = dynamic(() => import('./components/Years').then((m) => m.Years));
 const Strategy = dynamic(() => import('./components/Strategy').then((m) => m.Strategy));

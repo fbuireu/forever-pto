@@ -320,21 +320,21 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
     <Collapsible open={innerOpen} onOpenChange={setInnerOpen} className='space-y-4 w-full'>
       <AnimateIcon animateOnHover>
         <CollapsibleTrigger className='flex items-center justify-between cursor-pointer group p-4 rounded-[12px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-sm)] transition-colors w-full text-left hover:bg-[var(--surface-panel-alt)]'>
-          <div className='flex items-center space-x-3 w-full'>
-            <div className='flex items-center space-x-2'>
+          <span className='flex items-center space-x-3 w-full'>
+            <span className='flex items-center space-x-2'>
               {innerOpen ? (
                 <ChevronDown className='h-4 w-4 text-muted-foreground transition-transform' />
               ) : (
                 <ChevronRight className='h-4 w-4 text-muted-foreground transition-transform' />
               )}
-              <h2 className='text-base sm:text-lg font-semibold truncate'>{title}</h2>
-            </div>
-            <div className='flex items-center space-x-2 ml-auto shrink-0'>
+              <span className='text-base sm:text-lg font-semibold truncate'>{title}</span>
+            </span>
+            <span className='flex items-center space-x-2 ml-auto shrink-0'>
               <Badge variant='outline' className='text-xs sm:text-sm'>
                 {variantHolidays.length} total
               </Badge>
-            </div>
-          </div>
+            </span>
+          </span>
         </CollapsibleTrigger>
       </AnimateIcon>
       {innerOpen && (
