@@ -54,7 +54,7 @@ export const CarryOverMonths = () => {
   return (
     <AnimateIcon animateOnHover>
       <div className='space-y-2 w-full pb-4' data-tutorial='carry-over'>
-        <label className='flex gap-2 my-2 text-sm font-normal' htmlFor='carry-over-months'>
+        <label className='flex gap-2 my-2 text-sm font-mono font-normal' htmlFor='carry-over-months'>
           <SlidersHorizontal size={16} /> {t('title')}
           <TooltipProvider delayDuration={200}>
             <Tooltip>

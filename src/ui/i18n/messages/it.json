@@ -31,6 +31,8 @@
     "title": "Forever PTO",
     "description": "Il tuo pianificatore PTO intelligente. Configura i tuoi giorni di ferie, paese e strategia per sfruttare al massimo ogni festività.",
     "subtitle": "Il tuo ottimizzatore di ferie intelligente. Smetti di sprecare giorni.",
+    "titleHighlight1": "Il tuo anno",
+    "titleHighlight2": "libero",
     "instructions": "Inizia aggiungendo i tuoi giorni nella barra laterale sinistra e il resto delle configurazioni. Hai ancora dubbi?",
     "quickTour": "Fai un tour veloce",
     "or": "o",
@@ -781,7 +783,8 @@
   },
   "calendar": {
     "previousMonth": "Mese precedente",
-    "nextMonth": "Mese successivo"
+    "nextMonth": "Mese successivo",
+    "daysOff": "giorni liberi"
   },
   "holidayRow": {
     "weekend": "Fine settimana",

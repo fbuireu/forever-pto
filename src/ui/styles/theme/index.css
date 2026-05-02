@@ -6,7 +6,7 @@
 
   /* DSM font stack */
   --font-sans: var(--font-space-grotesk);
-  --font-mono: var(--font-sans);
+  --font-mono: var(--font-jetbrains-mono);
   --font-display: var(--font-bricolage);
   --font-serif: var(--font-instrument-serif);
 

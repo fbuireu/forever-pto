@@ -24,7 +24,7 @@ export const Regions = () => {
 
   return (
     <div className='space-y-2 w-full' data-tutorial='region'>
-      <label className='flex gap-2 my-2 text-sm font-normal' htmlFor='regions'>
+      <label className='flex gap-2 my-2 text-sm font-mono font-normal' htmlFor='regions'>
         <MapPinned size={16} /> {t('title')}
       </label>
       <Combobox

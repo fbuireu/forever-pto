@@ -38,7 +38,7 @@ export const Features = async () => {
               return (
                 <div
                   key={label}
-                  className={`${dayCell[dt]} aspect-square grid place-items-center text-[12px] font-bold`}
+                  className={`${dayCell[dt]} aspect-square grid place-items-center font-mono text-[11px] font-bold`}
                 >
                   {label}
                 </div>

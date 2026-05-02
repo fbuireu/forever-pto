@@ -67,7 +67,7 @@ export const PtoDays = () => {
 
   return (
     <div className='space-y-2 w-full' data-tutorial='pto-days'>
-      <label className='flex gap-2 my-2 text-sm font-normal' htmlFor='pto-days'>
+      <label className='flex gap-2 my-2 text-sm font-mono font-normal' htmlFor='pto-days'>
         <CalendarDays size={16} /> {t('title')}
       </label>
       <div className='flex items-center gap-3 justify-between'>
@@ -86,7 +86,7 @@ export const PtoDays = () => {
         />
       </div>
       <div className='space-y-2 mt-4 w-full'>
-        <label className='flex gap-2 my-2 text-sm font-normal' htmlFor='remaining-days'>
+        <label className='flex gap-2 my-2 text-sm font-mono font-normal' htmlFor='remaining-days'>
           <Clock size={16} /> {t('status')}
         </label>
         <div className='space-y-2 w-full'>

@@ -4,7 +4,7 @@ import { cn } from '@ui/utils/utils';
 import '@styles/index.css';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { Analytics } from '@ui/modules/tutorial/Analytics';
-import { Bricolage_Grotesque, Instrument_Serif, Space_Grotesk } from 'next/font/google';
+import { Bricolage_Grotesque, Instrument_Serif, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
@@ -32,6 +32,13 @@ const instrumentSerif = Instrument_Serif({
   display: 'swap',
 });
 
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-jetbrains-mono',
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
+});
+
 interface LayoutProps {
   children: React.ReactNode;
   params: Promise<{ locale: Locale }>;
@@ -52,7 +59,13 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={cn(bricolage.variable, spaceGrotesk.variable, instrumentSerif.variable, 'font-sans antialiased')}
+        className={cn(
+          bricolage.variable,
+          spaceGrotesk.variable,
+          instrumentSerif.variable,
+          jetbrainsMono.variable,
+          'font-sans antialiased'
+        )}
       >
         <a
           href='#main-content'

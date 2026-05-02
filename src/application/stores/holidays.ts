@@ -3,7 +3,7 @@ import { isInSelectedRange } from '@application/dto/holiday/utils/helpers';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { generateMetrics } from '@infrastructure/services/calendar/metrics/generateMetrics';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
-import { addMonths, endOfYear, ensureDate, formatDate, startOfYear } from '@ui/utils/dates';
+import { addMonths, endOfYear, ensureDate, formatDate, isSameMonth, startOfYear } from '@ui/utils/dates';
 import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -50,6 +50,7 @@ interface HolidaysActions {
   resetManualSelection: () => void;
   trimManualDays: (maxPtoDays: number) => void;
   getRemainingDays: (totalPtoDays: number) => number;
+  getFreeDaysForMonth: (month: Date) => number;
 }
 
 type HolidaysStore = HolidaysState & HolidaysActions;
@@ -483,6 +484,11 @@ export const useHolidaysStore = create<HolidaysStore>()(
           const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
           const manualSelectedCount = manuallySelectedDays.length;
           return Math.max(0, totalPtoDays - activeSuggestedCount - manualSelectedCount);
+        },
+
+        getFreeDaysForMonth: (month: Date): number => {
+          const { holidays } = get();
+          return holidays.filter((h) => isSameMonth(h.date, month) && h.isInSelectedRange).length;
         },
       }),
       {

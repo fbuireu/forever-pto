@@ -1,7 +1,7 @@
 'use client';
 
 import { Link } from '@application/i18n/navigtion';
-import { SidebarMenuButton, useSidebar } from '@ui/modules/core/animate/base/Sidebar';
+import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
 import { GradientText } from '@ui/modules/core/animate/primitives/texts/Gradient';
 import { useIsMobile } from 'src/ui/hooks/useMobile';
 import { OceanSunset } from './OceanSunset';
@@ -13,8 +13,8 @@ export function Logo() {
   const isOpen = state === 'expanded';
 
   return (
-    <SidebarMenuButton className='justify-center h-fit w-fit mx-auto rounded-[10px] bg-[var(--surface-panel)] px-3 py-3 shadow-[var(--shadow-brutal-sm)]'>
-      <Link href='/' onClick={() => isMobile && setOpenMobile(false)}>
+    <div className='flex justify-center mx-auto px-3 py-3 rounded-[10px] border-[3px] border-transparent transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:border-[var(--frame)] hover:shadow-[var(--shadow-brutal-xs)]'>
+      <Link href='/' onClick={() => isMobile && setOpenMobile(false)} className='no-underline outline-none'>
         <div className='flex items-center'>
           {(isOpen || isMobile) && (
             <div className='flex text-center justify-center gap-2'>
@@ -33,6 +33,6 @@ export function Logo() {
           />
         </div>
       </Link>
-    </SidebarMenuButton>
+    </div>
   );
 }

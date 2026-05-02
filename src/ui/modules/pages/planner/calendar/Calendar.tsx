@@ -196,6 +196,12 @@ export function Calendar({
     () => formatDate({ date: currentMonth, locale, format: 'LLLL yyyy' }),
     [currentMonth, locale]
   );
+  const monthLabel = useMemo(() => formatDate({ date: currentMonth, locale, format: 'MMMM' }), [currentMonth, locale]);
+  const yearLabel = useMemo(() => formatDate({ date: currentMonth, locale, format: 'yyyy' }), [currentMonth, locale]);
+  const monthFreeDays = useMemo(
+    () => holidays.filter((h) => isSameMonth(h.date, currentMonth) && h.isInSelectedRange).length,
+    [holidays, currentMonth]
+  );
   const calendarDays = useMemo(
     () => getCalendarDays({ month: currentMonth, weekStartsOn, fixedWeeks }),
     [currentMonth, weekStartsOn, fixedWeeks]
@@ -366,42 +372,68 @@ export function Calendar({
   }, []);
 
   return (
-    <div className={cn('calendar-container p-4 w-fit select-none bg-card z-1', className)} {...props}>
-      <div className='flex justify-center items-center mb-4 rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-2 py-2 shadow-[var(--shadow-brutal-xs)]'>
+    <div
+      className={cn(
+        'calendar-container w-fit select-none bg-card z-1 rounded-[14px] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-md)] overflow-hidden [content-visibility:auto] [contain-intrinsic-block-size:340px]',
+        className
+      )}
+      {...props}
+    >
+      <div className='flex items-center justify-between border-b-[3px] border-[var(--frame)] bg-[var(--surface-panel-alt)] px-3 py-2'>
         {showNavigation ? (
           <>
-            <AnimateIcon animateOnHover>
-              <Button
-                variant='ghost'
-                type='button'
-                size='sm'
-                onClick={handlePreviousMonth}
-                className='h-8 w-8 p-0 hover:bg-muted'
-                aria-label={tCalendar('previousMonth')}
-              >
-                <ChevronLeft className='h-4 w-4' />
-              </Button>
-            </AnimateIcon>
-            <h3 className='text-sm font-black uppercase tracking-[0.08em] flex-1 text-center'>{monthYearLabel}</h3>
-            <AnimateIcon animateOnHover>
-              <Button
-                variant='ghost'
-                type='button'
-                size='sm'
-                onClick={handleNextMonth}
-                className='h-8 w-8 p-0 hover:bg-muted'
-                aria-label={tCalendar('nextMonth')}
-              >
-                <ChevronRight className='h-4 w-4' />
-              </Button>
-            </AnimateIcon>
+            <div className='flex items-center gap-1'>
+              <AnimateIcon animateOnHover>
+                <Button
+                  variant='ghost'
+                  type='button'
+                  size='sm'
+                  onClick={handlePreviousMonth}
+                  className='h-8 w-8 p-0 hover:bg-muted'
+                  aria-label={tCalendar('previousMonth')}
+                >
+                  <ChevronLeft className='h-4 w-4' />
+                </Button>
+              </AnimateIcon>
+              <h3 className='text-sm font-black'>
+                {monthLabel} <span className='font-serif'>{yearLabel}</span>
+              </h3>
+            </div>
+            <div className='flex items-center gap-2'>
+              {monthFreeDays > 0 && (
+                <span className='text-xs font-black text-muted-foreground tabular-nums'>
+                  {monthFreeDays} {tCalendar('daysOff')}
+                </span>
+              )}
+              <AnimateIcon animateOnHover>
+                <Button
+                  variant='ghost'
+                  type='button'
+                  size='sm'
+                  onClick={handleNextMonth}
+                  className='h-8 w-8 p-0 hover:bg-muted'
+                  aria-label={tCalendar('nextMonth')}
+                >
+                  <ChevronRight className='h-4 w-4' />
+                </Button>
+              </AnimateIcon>
+            </div>
           </>
         ) : (
-          <h3 className='text-sm font-black uppercase tracking-[0.08em]'>{monthYearLabel}</h3>
+          <div className='flex items-center justify-between w-full'>
+            <h3 className='text-sm font-black'>
+              {monthLabel} <span className='font-serif'>{yearLabel}</span>
+            </h3>
+            {monthFreeDays > 0 && (
+              <span className='text-xs font-black text-muted-foreground tabular-nums'>
+                {monthFreeDays} {tCalendar('daysOff')}
+              </span>
+            )}
+          </div>
         )}
       </div>
 
-      <div className='grid grid-cols-7 gap-1 mb-3'>
+      <div className='grid grid-cols-7 gap-1 mb-3 px-4 pt-3'>
         {weekdayNames.map((day) => (
           <div
             key={day}
@@ -413,7 +445,7 @@ export function Calendar({
       </div>
 
       {/* biome-ignore lint/a11y/useSemanticElements: role=grid on div is required for calendar ARIA pattern */}
-      <div className='grid grid-cols-7 gap-2' role='grid' aria-label={monthYearLabel}>
+      <div className='grid grid-cols-7 gap-2 px-4 pb-4' role='grid' aria-label={monthYearLabel}>
         {calendarDays.map((date) => {
           const isPastDay = modifiers.disabled(date);
           const isManualDay = modifiers.manuallySelected(date);

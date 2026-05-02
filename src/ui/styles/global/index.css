@@ -81,7 +81,7 @@
   --chart-3: #b388ff;
   --chart-4: #ffd93d;
   --chart-5: #ff8fb1;
-  --sidebar: #fff9ee;
+  --sidebar: var(--color-brand-cream);
   --sidebar-foreground: #0e0e0e;
   --sidebar-primary: #0e0e0e;
   --sidebar-primary-foreground: #fffaf0;

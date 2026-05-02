@@ -1,22 +1,27 @@
 import { getTranslations } from 'next-intl/server';
+import { SiteTitleYear } from './SiteTitleYear';
 
 export const SiteTitle = async () => {
   const t = await getTranslations('planner');
-
   return (
-    <div className='flex items-center flex-col justify-center mt-8 gap-4'>
-      <h1 className='font-display font-extrabold text-[clamp(42px,6vw,72px)] leading-none tracking-[-0.04em] text-center flex items-center gap-3 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[12px] px-5 py-4 shadow-[var(--shadow-brutal-md)]'>
-        <span
-          className='w-[48px] h-[48px] bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] grid place-items-center text-[28px] shrink-0'
-          style={{ transform: 'rotate(-4deg)' }}
-          aria-hidden='true'
-        >
-          🌴
-        </span>
-        <span>Forever PTO</span>
+    <div className='flex items-center flex-col justify-center mt-8 gap-5'>
+      <h1 className='font-display font-extrabold text-[clamp(42px,6vw,72px)] leading-none tracking-[-0.04em] flex items-baseline gap-3'>
+        <span>Planner</span>
+        <SiteTitleYear />
       </h1>
-      <p className='max-w-3xl rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-5 py-3.5 text-center text-sm font-medium text-muted-foreground shadow-[var(--shadow-brutal-sm)] sm:text-base'>
-        {t('subtitle')}
+      <p className='font-display font-extrabold text-[clamp(28px,4vw,52px)] leading-none tracking-[-0.03em] flex items-center gap-4 flex-wrap justify-center'>
+        <span
+          className='inline-block bg-[var(--accent)] text-[var(--color-brand-ink)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[5px_5px_0_0_var(--frame)]'
+          style={{ transform: 'rotate(-4deg)' }}
+        >
+          {t('titleHighlight1')}
+        </span>
+        <span
+          className='inline-block bg-[var(--color-brand-sky)] text-[var(--color-brand-ink)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[5px_5px_0_0_var(--frame)]'
+          style={{ transform: 'rotate(4deg)' }}
+        >
+          {t('titleHighlight2')}
+        </span>
       </p>
     </div>
   );

@@ -67,7 +67,7 @@ export const Strategy = () => {
 
   return (
     <div className='space-y-2 w-full' data-tutorial='strategy'>
-      <label className='flex gap-2 text-sm font-medium' htmlFor='strategy'>
+      <label className='flex gap-2 text-sm font-mono font-medium' htmlFor='strategy'>
         <DicesIcon size={16} /> {t('title')}
       </label>
       <Combobox

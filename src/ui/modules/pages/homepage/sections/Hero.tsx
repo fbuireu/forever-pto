@@ -82,7 +82,7 @@ export const Hero = async () => {
               ))}
             </div>
             <div className='px-[18px] pt-[18px] pb-4 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[4px] border-[var(--frame)] rounded-[10px]'>
-              <div className='text-[12px] uppercase tracking-[0.1em] mb-1'>
+              <div className='font-mono text-[12px] uppercase tracking-[0.1em] mb-1'>
                 {t('hero.mockupLabel', { year: new Date().getFullYear() })}
               </div>
               <div className='font-display font-extrabold text-[56px] leading-none tracking-[-0.03em] flex items-baseline gap-2.5'>
@@ -101,7 +101,7 @@ export const Hero = async () => {
               {CAL_ENTRIES.map(({ id, type }) => (
                 <div
                   key={id}
-                  className={`${dayCell[type]} aspect-square grid place-items-center font-mono text-[11px] font-semibold`}
+                  className={`${dayCell[type]} aspect-square grid place-items-center font-mono text-[11px] font-bold`}
                 >
                   {type === 'pto' ? '✈' : type === 'holiday' ? '★' : ''}
                 </div>

@@ -31,6 +31,8 @@
     "title": "Forever PTO",
     "description": "El teu planificador de PTO intel·ligent. Configura els teus dies de vacances, país i estratègia per aprofitar al màxim cada festiu.",
     "subtitle": "El teu optimitzador de vacances intel·ligent. Deixa de perdre dies.",
+    "titleHighlight1": "El teu any",
+    "titleHighlight2": "lliure",
     "instructions": "Comença afegint els teus dies a la barra lateral esquerra i la resta de configuracions. Encara tens dubtes?",
     "quickTour": "Fes un tour ràpid",
     "or": "o",
@@ -781,7 +783,8 @@
   },
   "calendar": {
     "previousMonth": "Mes anterior",
-    "nextMonth": "Mes següent"
+    "nextMonth": "Mes següent",
+    "daysOff": "dies lliures"
   },
   "holidayRow": {
     "weekend": "Cap de setmana",

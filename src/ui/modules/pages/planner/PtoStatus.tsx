@@ -73,13 +73,13 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
                   remaining > 0 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
                 )}
               />
-              {remaining > 0 && (
-                <span className='flex items-center text-muted-foreground'>
-                  <MousePointerClick className='h-3 w-3' />
-                  <span className='text-[10px]'>{t('clickDays')}</span>
-                </span>
-              )}
             </div>
+            {remaining > 0 && (
+              <span className='flex items-center gap-0.5 text-muted-foreground'>
+                <MousePointerClick className='h-3 w-3' />
+                <span className='text-[10px]'>{t('clickDays')}</span>
+              </span>
+            )}
             {remaining === 0 && !hasManualChanges && (
               <span className='text-[10px] text-green-700 dark:text-green-400 font-medium'>✓ {t('allAssigned')}</span>
             )}

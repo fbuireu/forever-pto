@@ -18,7 +18,7 @@ export const Stats = async () => {
             style={{ background: bg }}
           >
             <div className='font-display font-extrabold text-[56px] leading-none tracking-[-0.04em] mb-1.5'>{num}</div>
-            <div className='text-[13px] font-semibold'>{label}</div>
+            <div className='font-mono text-[13px] font-semibold'>{label}</div>
           </div>
         ))}
       </div>

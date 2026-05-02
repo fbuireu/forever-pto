@@ -29,7 +29,7 @@ export const Years = () => {
 
   return (
     <div className='space-y-2 w-full' data-tutorial='year'>
-      <label className='flex gap-2 my-2 text-sm font-normal' htmlFor='years'>
+      <label className='flex gap-2 my-2 text-sm font-mono font-normal' htmlFor='years'>
         <Calendar size={16} /> {t('title')}
       </label>
       <Popover open={open} onOpenChange={setOpen}>
