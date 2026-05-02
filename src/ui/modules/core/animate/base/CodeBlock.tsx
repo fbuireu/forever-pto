@@ -1,9 +1,9 @@
 'use client';
 
-import { useIsInView, type UseIsInViewOptions } from '@ui/hooks/useIsInView';
-import * as React from 'react';
+import { type UseIsInViewOptions, useIsInView } from '@ui/hooks/useIsInView';
+import { type ComponentProps, type Ref, type RefObject, useEffect, useState } from 'react';
 
-type CodeBlockProps = React.ComponentProps<'div'> & {
+type CodeBlockProps = ComponentProps<'div'> & {
   code: string;
   lang: string;
   theme?: 'light' | 'dark';
@@ -13,7 +13,7 @@ type CodeBlockProps = React.ComponentProps<'div'> & {
   delay?: number;
   onDone?: () => void;
   onWrite?: (info: { index: number; length: number; done: boolean }) => void;
-  scrollContainerRef?: React.RefObject<HTMLElement | null>;
+  scrollContainerRef?: RefObject<HTMLElement | null>;
 } & UseIsInViewOptions;
 
 function CodeBlock({
@@ -36,17 +36,17 @@ function CodeBlock({
   inViewMargin = '0px',
   ...props
 }: CodeBlockProps) {
-  const { ref: localRef, isInView } = useIsInView(ref as React.Ref<HTMLDivElement>, {
+  const { ref: localRef, isInView } = useIsInView(ref as Ref<HTMLDivElement>, {
     inView,
     inViewOnce,
     inViewMargin,
   });
 
-  const [visibleCode, setVisibleCode] = React.useState('');
-  const [highlightedCode, setHighlightedCode] = React.useState('');
-  const [isDone, setIsDone] = React.useState(false);
+  const [visibleCode, setVisibleCode] = useState('');
+  const [highlightedCode, setHighlightedCode] = useState('');
+  const [isDone, setIsDone] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!visibleCode.length || !isInView) return;
 
     const loadHighlightedCode = async () => {
@@ -64,9 +64,9 @@ function CodeBlock({
     };
 
     loadHighlightedCode();
-  }, [lang, themes, writing, isInView, duration, delay, visibleCode, theme]);
+  }, [lang, themes, isInView, visibleCode, theme]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!writing) {
       setVisibleCode(code);
       onDone?.();
@@ -107,7 +107,7 @@ function CodeBlock({
     };
   }, [code, duration, delay, isInView, writing, onDone, onWrite, localRef]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!writing || !isInView) return;
 
     const el =
@@ -120,7 +120,7 @@ function CodeBlock({
     requestAnimationFrame(() => {
       el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     });
-  }, [highlightedCode, writing, isInView, scrollContainerRef, localRef]);
+  }, [writing, isInView, scrollContainerRef, localRef]);
 
   return (
     <div
@@ -128,6 +128,7 @@ function CodeBlock({
       data-slot='code-block'
       data-writing={writing}
       data-done={isDone}
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: shiki output is sanitized HTML generated from code strings, not user input
       dangerouslySetInnerHTML={{ __html: highlightedCode }}
       {...props}
     />

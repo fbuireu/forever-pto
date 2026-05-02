@@ -127,14 +127,14 @@ export default async function NotFound() {
             <span className='col-span-2 font-mono text-[11px] font-bold text-muted-foreground tracking-[0.12em] uppercase mb-1'>
               {t('suggestLabel')}
             </span>
-            {suggestLinks.map(({ href, emoji, bg, color, label }) => (
+            {suggestLinks.map(({ href, emoji, bg, label }) => (
               <Link
                 key={href}
                 href={href}
                 className='flex items-center gap-2.5 px-3 py-2.5 bg-card border-[2px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] no-underline text-foreground text-[13px] font-semibold transition-[transform,box-shadow] hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)]'
               >
                 <span
-                  className={`shrink-0 w-6 h-6 ${bg} ${color ?? 'text-[var(--color-brand-ink)]'} border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold`}
+                  className={`shrink-0 w-6 h-6 ${bg} text-[var(--color-brand-ink)] border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold`}
                 >
                   {emoji}
                 </span>
