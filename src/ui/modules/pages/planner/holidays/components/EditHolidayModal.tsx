@@ -4,7 +4,6 @@ import type { HolidayDTO } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import {
   Dialog,
   DialogContent,
@@ -22,6 +21,7 @@ import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { Button } from 'src/ui/modules/core/primitives/Button';
 import { Calendar, CalendarSelectionMode, type FromTo } from '../../calendar/Calendar';
 import { createHolidaySchema, type HolidayFormData } from './schema';
 

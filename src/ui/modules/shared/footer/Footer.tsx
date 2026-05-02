@@ -9,8 +9,8 @@ export const Footer = async () => {
   const t = await getTranslations('footer');
 
   return (
-    <footer className='mt-10 w-full m-auto flex justify-center z-1 bg-transparent'>
-      <div className='max-w-4xl w-full rounded-[14px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-md)] overflow-hidden'>
+    <footer className='w-full bg-card border-t-[3px] border-[var(--frame)]'>
+      <div className='max-w-4xl mx-auto'>
         <div className='flex items-center justify-between flex-wrap gap-3 px-6 pt-5 pb-4 border-b-[2px] border-[var(--frame)]/18'>
           <div className='flex items-center gap-2 font-display font-extrabold text-[18px] tracking-[-0.02em]'>
             <div
@@ -35,31 +35,31 @@ export const Footer = async () => {
         >
           <Link
             href='/planner'
-            className='text-sm font-semibold px-1.5 py-0.5 border-[2px] border-transparent rounded-[4px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-all duration-75'
+            className='text-sm font-semibold px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-all duration-75'
           >
             {t('planner')}
           </Link>
           <Link
             href='/legal/privacy-policy'
-            className='text-sm font-medium px-1.5 py-0.5 border-[2px] border-transparent rounded-[4px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-all duration-75'
+            className='text-sm font-medium px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-all duration-75'
           >
             {t('privacyPolicy')}
           </Link>
           <Link
             href='/legal/terms-of-service'
-            className='text-sm font-medium px-1.5 py-0.5 border-[2px] border-transparent rounded-[4px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-all duration-75'
+            className='text-sm font-medium px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-all duration-75'
           >
             {t('termsOfService')}
           </Link>
           <Link
             href='/legal/cookie-policy'
-            className='text-sm font-medium px-1.5 py-0.5 border-[2px] border-transparent rounded-[4px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-all duration-75'
+            className='text-sm font-medium px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-all duration-75'
           >
             {t('cookiePolicy')}
           </Link>
           <Link
             href='/legal/legal-notice'
-            className='text-sm font-medium px-1.5 py-0.5 border-[2px] border-transparent rounded-[4px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-all duration-75'
+            className='text-sm font-medium px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-all duration-75'
           >
             {t('legalNotice')}
           </Link>

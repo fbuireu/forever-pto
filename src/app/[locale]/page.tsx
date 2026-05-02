@@ -45,8 +45,8 @@ const HomePage = async ({ params }: PageProps) => {
         <HomepageCta />
         <DonateClient />
       </main>
-      <div className='px-7 py-8 bg-background border-t-4 border-(--frame)'>
-        <div className='max-w-310 mx-auto'>
+      <div className='bg-background border-t-4 border-(--frame)'>
+        <div className='mx-auto'>
           <Footer />
         </div>
       </div>

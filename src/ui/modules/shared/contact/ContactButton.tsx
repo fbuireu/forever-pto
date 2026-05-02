@@ -16,7 +16,7 @@ export function ContactButton() {
       <Button
         onClick={() => setOpen(true)}
         variant='ghost'
-        className='text-sm font-medium px-1.5 py-0.5 h-auto border-[2px] border-transparent rounded-[4px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-all duration-75'
+        className='text-sm font-medium px-1.5 py-0.5 h-auto border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-all duration-75'
       >
         {t('contactUs')}
       </Button>

@@ -18,8 +18,8 @@ const LegalLayout = async ({ children, params }: Readonly<LegalLayoutProps>) => 
       <main id='main-content' className='flex-1'>
         {children}
       </main>
-      <div className='px-7 py-8 bg-background border-t-4 border-(--frame)'>
-        <div className='max-w-310 mx-auto'>
+      <div className='py-8 bg-background border-t-4 border-(--frame)'>
+        <div className='mx-auto'>
           <Footer />
         </div>
       </div>
