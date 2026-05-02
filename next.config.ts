@@ -86,7 +86,6 @@ const nextConfig: NextConfig = {
       'motion',
       '@base-ui/react',
       'cmdk',
-      '@tanstack/react-table',
       'sonner',
       'canvas-confetti',
     ],
