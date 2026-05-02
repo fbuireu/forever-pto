@@ -402,7 +402,7 @@ export function Calendar({
             <div className='flex items-center gap-2'>
               {monthFreeDays > 0 && (
                 <span className='text-xs font-black text-muted-foreground tabular-nums'>
-                  {monthFreeDays} {tCalendar('daysOff')}
+                  {tCalendar('daysOff', { count: monthFreeDays })}
                 </span>
               )}
               <AnimateIcon animateOnHover>

@@ -493,12 +493,12 @@
     "step1": {
       "titleStart": "Il tuo ",
       "titleEmphasis": "contesto",
-      "badge": "PASSO 1"
+      "badge": "passo 1"
     },
     "step2": {
       "titleStart": "I tuoi ",
       "titleEmphasis": "giorni",
-      "badge": "PASSO 2"
+      "badge": "passo 2"
     },
     "steps": "Passaggi"
   },
@@ -737,9 +737,19 @@
     "lastUpdated": "Ultimo aggiornamento: {date}"
   },
   "notFound": {
-    "title": "Pagina non trovata",
-    "description": "La pagina che stai cercando non esiste o è stata spostata.",
-    "returnHome": "Torna alla home"
+    "kicker": "errore 404 · percorso perso",
+    "title": "Questa pagina è andata in",
+    "titleHighlight": "vacanza",
+    "titleEmphasis": "senza avvisare.",
+    "lede": "Abbiamo cercato in spiaggia, guardato sotto l'ombrellone, chiesto al chiosco… niente. L'URL che cerchi non esiste (o si è persa tra 2 ponti).",
+    "ctaPrimary": "Torna alla home",
+    "ctaPlanner": "Apri il Pianificatore",
+    "suggestLabel": "Cercavi qualcosa del genere?",
+    "link1": "Come funziona",
+    "link2": "Funzionalità",
+    "link3": "Piani e prezzi",
+    "link4": "FAQ e supporto",
+    "footerStatus": "stato: ok · uptime: 99.98%"
   },
   "error": {
     "title": "Qualcosa è andato storto",
@@ -783,7 +793,7 @@
   "calendar": {
     "previousMonth": "Mese precedente",
     "nextMonth": "Mese successivo",
-    "daysOff": "giorni liberi"
+    "daysOff": "{count, plural, one {# giorno libero} other {# giorni liberi}}"
   },
   "holidayRow": {
     "weekend": "Fine settimana",
@@ -840,10 +850,10 @@
       "mockupFieldHolidays": "14 festività"
     },
     "marquee": {
-      "items": "PONTE DI PASQUA · PONTE DEL PRIMO MAGGIO · ESTATE INFINITA · PONTE DI FERRAGOSTO · NATALE PROLUNGATO · PONTE DI NOVEMBRE · PONTE DEL 25 APRILE · PONTE DEL 2 GIUGNO · PONTE DI OTTOBRE · CAPODANNO PROLUNGATO"
+      "items": "ponte di pasqua · ponte del primo maggio · estate infinita · ponte di ferragosto · natale prolungato · ponte di novembre · ponte del 25 aprile · ponte del 2 giugno · ponte di ottobre · capodanno prolungato"
     },
     "how": {
-      "badge": "COME FUNZIONA · 3 PASSI",
+      "badge": "come funziona · 3 passi",
       "titleStart": "Da",
       "titleMid": "a",
       "question1": "cosa faccio",
@@ -864,20 +874,20 @@
       "plansLabel": "Piani generati"
     },
     "features": {
-      "badge": "TRUCCHI DEL MOTORE",
+      "badge": "trucchi del motore",
       "titleStart": "Non è un calendario. È un",
       "titleEmphasis": "alleato",
       "titleEnd": "contro il lunedì.",
       "description": "Questi sono i movimenti che Forever PTO fa per te automaticamente.",
-      "bridgeTag": "PONTI INTELLIGENTI",
+      "bridgeTag": "ponti intelligenti",
       "bridgeTitle": "Trasforma 1 giorno di PTO in 4 giorni liberi.",
       "bridgeDescription": "Rileva festivi di martedì e giovedì e suggerisce ponti minimi. Un giorno strategico = un weekend di 4 giorni.",
-      "ratioTag": "RATIO MAX",
+      "ratioTag": "ratio max",
       "ratioDescription": "Miglior moltiplicatore: 8 giorni PTO trasformati in 28 liberi (IT, aprile '26).",
-      "syncTag": "SYNC IN 1 CLICK",
+      "syncTag": "sync in 1 click",
       "syncTitle": "Google · Outlook · iCal",
       "syncDescription": "Esporta il tuo piano nel calendario che già usi. Senza complicazioni.",
-      "conflictsTag": "ANTI-CONFLITTI",
+      "conflictsTag": "anti-conflitti",
       "conflictsTitle": "Avvisa prima del tuo capo.",
       "conflictsDescription": "Segna i periodi \"tabù\" della tua azienda.",
       "conflictItems": {
@@ -885,15 +895,15 @@
         "quarterClose": "Chiusura Q3",
         "productLaunch": "Lancio prodotto"
       },
-      "countriesTag": "14 PAESI",
+      "countriesTag": "14 paesi",
       "countriesTitle": "Festivi locali reali.",
       "countriesDescription": "Calendari ufficiali aggiornati ogni anno. Anche quelli regionali.",
-      "privacyTag": "100% LOCALE",
+      "privacyTag": "100% locale",
       "privacyTitle": "I tuoi dati non escono dal tuo browser.",
       "privacyDescription": "Nessun accesso. Nessun account. I tuoi dati di ferie sono salvati esclusivamente nel tuo browser — non li vediamo mai."
     },
     "comparison": {
-      "badge": "CON · SENZA",
+      "badge": "con · senza",
       "title": "Prima vs. dopo Forever PTO.",
       "withoutTitle": "😩 Senza Forever PTO",
       "withoutItems": {
@@ -913,7 +923,7 @@
       }
     },
     "testimonials": {
-      "badge": "DICONO DI NOI",
+      "badge": "dicono di noi",
       "titleStart": "Persone che hanno già recuperato",
       "titleEmphasis": "settimane",
       "titleEnd": "della loro vita.",
@@ -951,7 +961,7 @@
       }
     },
     "pricing": {
-      "badge": "PREZZO ONESTO",
+      "badge": "prezzo onesto",
       "titleStart": "Paghi una volta.",
       "titleEmphasis": "Per sempre.",
       "description": "Niente SaaS. Niente abbonamento. Niente \"prova gratuita che si rinnova da sola\".",
@@ -981,7 +991,7 @@
         "fullAnalytics": "Analisi completa e grafici visivi"
       },
       "lifetimeCta": "Sostieni il progetto →",
-      "popularBadge": "PIÙ POPOLARE 🔥"
+      "popularBadge": "più popolare 🔥"
     },
     "faq": {
       "badge": "FAQ",

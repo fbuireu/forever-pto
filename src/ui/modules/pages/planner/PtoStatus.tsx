@@ -41,12 +41,12 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
 
   return (
     <div
-      className='rounded-[14px] border-[3px] border-[var(--frame)] bg-card px-4 py-3 shadow-[var(--shadow-brutal-lg)]'
+      className='rounded-[10px] border-[3px] border-[var(--frame)] bg-card px-4 py-3 shadow-[var(--shadow-brutal-lg)]'
       data-tutorial='pto-status'
     >
       <div className='flex items-center justify-between flex-wrap gap-4 h-full'>
         <div className='flex items-center gap-4'>
-          <div className='flex items-center gap-2 rounded-[8px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>
+          <div className='flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>
             <div className='h-3 w-3 rounded-full bg-teal-500' />
             <span className='text-sm text-muted-foreground'>{t('autoAssigned')}:</span>
             <SlidingNumber
@@ -54,7 +54,7 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
               className='font-display font-black text-teal-700 dark:text-teal-300'
             />
           </div>
-          <div className='flex items-center gap-2 rounded-[8px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>
+          <div className='flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>
             <div className='h-3 w-3 rounded-full bg-blue-500' />
             <span className='text-sm text-muted-foreground'>{t('manual')}:</span>
             <SlidingNumber
@@ -63,7 +63,7 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
             />
           </div>
           <div className='h-8 w-[2px] bg-[var(--frame)]/15' />
-          <div className='flex flex-col items-center rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-alt)] px-3 py-1.5 shadow-[var(--shadow-brutal-xs)]'>
+          <div className='flex flex-col items-center rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-alt)] px-3 py-1.5 shadow-[var(--shadow-brutal-xs)]'>
             <div className='flex items-center gap-2'>
               <span className='text-sm font-display font-black uppercase tracking-[0.08em]'>{t('remaining')}:</span>
               <SlidingNumber

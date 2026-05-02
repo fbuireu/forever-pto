@@ -491,12 +491,12 @@
     "step1": {
       "titleStart": "Ton ",
       "titleEmphasis": "contexte",
-      "badge": "ÉTAPE 1"
+      "badge": "étape 1"
     },
     "step2": {
       "titleStart": "Tes ",
       "titleEmphasis": "jours",
-      "badge": "ÉTAPE 2"
+      "badge": "étape 2"
     },
     "steps": "Étapes"
   },
@@ -780,7 +780,8 @@
   },
   "calendar": {
     "previousMonth": "Mois précédent",
-    "nextMonth": "Mois suivant"
+    "nextMonth": "Mois suivant",
+    "daysOff": "{count, plural, one {# jour off} other {# jours off}}"
   },
   "holidayRow": {
     "weekend": "Week-end",
@@ -837,10 +838,10 @@
       "mockupFieldHolidays": "14 jours fériés"
     },
     "marquee": {
-      "items": "PONTS DE PÂQUES · WEEK-END FÉRIÉ · ÉTÉ PROLONGÉ · PONT TOUSSAINT · SEMAINE DE NOËL · PONT NOVEMBRE · LUNDI DE PENTECÔTE · PONT ASCENSION · PONT 14 JUILLET · PONT 11 NOVEMBRE"
+      "items": "ponts de pâques · week-end férié · été prolongé · pont toussaint · semaine de noël · pont novembre · lundi de pentecôte · pont ascension · pont 14 juillet · pont 11 novembre"
     },
     "how": {
-      "badge": "COMMENT ÇA MARCHE · 3 ÉTAPES",
+      "badge": "comment ça marche · 3 étapes",
       "titleStart": "De",
       "titleMid": "à",
       "question1": "que faire",
@@ -861,20 +862,20 @@
       "plansLabel": "Plans générés"
     },
     "features": {
-      "badge": "ASTUCES DU MOTEUR",
+      "badge": "astuces du moteur",
       "titleStart": "Pas un calendrier. Un",
       "titleEmphasis": "allié",
       "titleEnd": "contre les lundis.",
       "description": "Voici les coups que Forever PTO joue pour toi automatiquement.",
-      "bridgeTag": "PONTS INTELLIGENTS",
+      "bridgeTag": "ponts intelligents",
       "bridgeTitle": "Transforme 1 congé en 4 jours off.",
       "bridgeDescription": "Détecte les jours fériés les mardis et jeudis et suggère des ponts minimaux. Un jour stratégique = un week-end de 4 jours.",
-      "ratioTag": "RATIO MAX",
+      "ratioTag": "ratio max",
       "ratioDescription": "Meilleur multiplicateur : 8 jours de congés en 28 jours libres (FR, avril 26).",
-      "syncTag": "SYNC EN 1 CLIC",
+      "syncTag": "sync en 1 clic",
       "syncTitle": "Google · Outlook · iCal",
       "syncDescription": "Exporte ton plan vers le calendrier que tu utilises déjà. Sans prise de tête.",
-      "conflictsTag": "ANTI-CONFLITS",
+      "conflictsTag": "anti-conflits",
       "conflictsTitle": "Te prévient avant ton patron.",
       "conflictsDescription": "Marque les périodes interdites de ton entreprise.",
       "conflictItems": {
@@ -882,15 +883,15 @@
         "quarterClose": "Clôture Q3",
         "productLaunch": "Lancement produit"
       },
-      "countriesTag": "14 PAYS",
+      "countriesTag": "14 pays",
       "countriesTitle": "Jours fériés locaux réels.",
       "countriesDescription": "Calendriers officiels mis à jour chaque année. Même les régionaux.",
-      "privacyTag": "100% LOCAL",
+      "privacyTag": "100% local",
       "privacyTitle": "Tes données ne quittent jamais ton navigateur.",
       "privacyDescription": "Pas de connexion. Pas de compte. Vos données de congés sont stockées exclusivement dans votre navigateur — nous ne les voyons jamais."
     },
     "comparison": {
-      "badge": "AVANT · APRÈS",
+      "badge": "avant · après",
       "title": "Avant vs. après Forever PTO.",
       "withoutTitle": "😩 Sans Forever PTO",
       "withoutItems": {
@@ -910,7 +911,7 @@
       }
     },
     "testimonials": {
-      "badge": "ON EN PARLE",
+      "badge": "on en parle",
       "titleStart": "Des gens qui ont récupéré des",
       "titleEmphasis": "semaines",
       "titleEnd": "de leur vie.",
@@ -948,7 +949,7 @@
       }
     },
     "pricing": {
-      "badge": "PRIX HONNÊTE",
+      "badge": "prix honnête",
       "titleStart": "Paie une fois.",
       "titleEmphasis": "Pour toujours.",
       "description": "Pas de SaaS. Pas d'abonnement. Pas d'\"essai gratuit qui se renouvelle automatiquement\".",
@@ -978,7 +979,7 @@
         "fullAnalytics": "Analyses complètes et graphiques visuels"
       },
       "lifetimeCta": "Soutenir le projet →",
-      "popularBadge": "LE PLUS POPULAIRE 🔥"
+      "popularBadge": "le plus populaire 🔥"
     },
     "faq": {
       "badge": "FAQ",

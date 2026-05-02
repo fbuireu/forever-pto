@@ -56,7 +56,7 @@ const HomePage = async ({ params }: PageProps) => {
 
 export default HomePage;
 
-// todo: brutalist design (footer 100%, logo, border to highlight shadow on white and dark mde)
+// todo: brutalist design (logo, border to highlight shadow on white and dark mde, skeletons)
 // todo: 400 and 500 page
 // todo: check all
 // todo: focus input order in stripe

@@ -493,12 +493,12 @@
     "step1": {
       "titleStart": "Tu ",
       "titleEmphasis": "contexto",
-      "badge": "PASO 1"
+      "badge": "paso 1"
     },
     "step2": {
       "titleStart": "Días ",
       "titleEmphasis": "disponibles",
-      "badge": "PASO 2"
+      "badge": "paso 2"
     },
     "steps": "Pasos"
   },
@@ -737,9 +737,19 @@
     "lastUpdated": "Última actualización: {date}"
   },
   "notFound": {
-    "title": "Página no encontrada",
-    "description": "La página que buscas no existe o ha sido movida.",
-    "returnHome": "Volver al inicio"
+    "kicker": "error 404 · ruta perdida",
+    "title": "Esta página se fue de",
+    "titleHighlight": "vacaciones",
+    "titleEmphasis": "sin avisar.",
+    "lede": "Buscamos en la playa, miramos debajo de la sombrilla, preguntamos al chiringuito… nada. La URL que quieres no existe (o se perdió entre 2 puentes).",
+    "ctaPrimary": "Volver al inicio",
+    "ctaPlanner": "Abrir el Planificador",
+    "suggestLabel": "¿Buscabas algo así?",
+    "link1": "Cómo funciona",
+    "link2": "Funcionalidades",
+    "link3": "Planes y precio",
+    "link4": "FAQ y soporte",
+    "footerStatus": "estado: ok · uptime: 99.98%"
   },
   "error": {
     "title": "Algo salió mal",
@@ -783,7 +793,7 @@
   "calendar": {
     "previousMonth": "Mes anterior",
     "nextMonth": "Mes siguiente",
-    "daysOff": "días libres"
+    "daysOff": "{count, plural, one {# día libre} other {# días libres}}"
   },
   "holidayRow": {
     "weekend": "Fin de semana",
@@ -840,10 +850,10 @@
       "mockupFieldHolidays": "14 festivos"
     },
     "marquee": {
-      "items": "PUENTE DE SEMANA SANTA · PUENTE DE MAYO · VERANO INFINITO · PUENTE DEL PILAR · PUENTE DE DICIEMBRE · PUENTE DE NOVIEMBRE · PUENTE DE JUNIO · PUENTE DE AGOSTO · PUENTE DE OCTUBRE · NOCHEVIEJA EXTENDIDA"
+      "items": "puente de semana santa · puente de mayo · verano infinito · puente del pilar · puente de diciembre · puente de noviembre · puente de junio · puente de agosto · puente de octubre · nochevieja extendida"
     },
     "how": {
-      "badge": "CÓMO VA · 3 PASOS",
+      "badge": "cómo va · 3 pasos",
       "titleStart": "De",
       "titleMid": "a",
       "question1": "qué hago",
@@ -864,20 +874,20 @@
       "plansLabel": "Planes generados"
     },
     "features": {
-      "badge": "TRUCOS DEL MOTOR",
+      "badge": "trucos del motor",
       "titleStart": "No es un calendario. Es un",
       "titleEmphasis": "aliado",
       "titleEnd": "contra el lunes.",
       "description": "Estos son los movimientos que Forever PTO hace por ti automáticamente.",
-      "bridgeTag": "PUENTES INTELIGENTES",
+      "bridgeTag": "puentes inteligentes",
       "bridgeTitle": "Convierte 1 día de PTO en 4 libres.",
       "bridgeDescription": "Detecta festivos en martes y jueves y te sugiere construir puentes mínimos. Un día estratégico = un fin de semana de 4 días.",
-      "ratioTag": "RATIO MAX",
+      "ratioTag": "ratio max",
       "ratioDescription": "Mejor multiplicador: 8 días de PTO convertidos en 28 libres (ES, abril '26).",
-      "syncTag": "SYNC EN 1 CLIC",
+      "syncTag": "sync en 1 clic",
       "syncTitle": "Google · Outlook · iCal",
       "syncDescription": "Exporta tu plan al calendario que ya usas. Sin liarte.",
-      "conflictsTag": "ANTI-CONFLICTOS",
+      "conflictsTag": "anti-conflictos",
       "conflictsTitle": "Avisa antes que tu jefe.",
       "conflictsDescription": "Marca los periodos \"tabú\" de tu empresa.",
       "conflictItems": {
@@ -885,15 +895,15 @@
         "quarterClose": "Cierre Q3",
         "productLaunch": "Lanzamiento"
       },
-      "countriesTag": "14 PAÍSES",
+      "countriesTag": "14 países",
       "countriesTitle": "Festivos locales reales.",
       "countriesDescription": "Calendarios oficiales actualizados cada año. Incluso los regionales.",
-      "privacyTag": "100% LOCAL",
+      "privacyTag": "100% local",
       "privacyTitle": "Tus datos no se mueven de tu navegador.",
       "privacyDescription": "Sin registro. Sin cuenta. Tus datos de vacaciones se guardan exclusivamente en tu navegador, nunca los vemos."
     },
     "comparison": {
-      "badge": "CON · SIN",
+      "badge": "con · sin",
       "title": "Antes vs. después de Forever PTO.",
       "withoutTitle": "😩 Sin Forever PTO",
       "withoutItems": {
@@ -913,7 +923,7 @@
       }
     },
     "testimonials": {
-      "badge": "DICEN POR AHÍ",
+      "badge": "dicen por ahí",
       "titleStart": "Gente que ya recuperó",
       "titleEmphasis": "semanas",
       "titleEnd": "de su vida.",
@@ -951,7 +961,7 @@
       }
     },
     "pricing": {
-      "badge": "PRECIO HONESTO",
+      "badge": "precio honesto",
       "titleStart": "Paga una vez.",
       "titleEmphasis": "Para siempre.",
       "description": "Sin SaaS. Sin suscripción. Sin \"prueba gratuita que se renueva sola\".",
@@ -981,7 +991,7 @@
         "fullAnalytics": "Analítica completa y gráficos visuales"
       },
       "lifetimeCta": "Apoya el proyecto →",
-      "popularBadge": "MÁS POPULAR 🔥"
+      "popularBadge": "más popular 🔥"
     },
     "faq": {
       "badge": "FAQ",

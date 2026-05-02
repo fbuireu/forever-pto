@@ -491,12 +491,12 @@
     "step1": {
       "titleStart": "Dein ",
       "titleEmphasis": "Kontext",
-      "badge": "SCHRITT 1"
+      "badge": "schritt 1"
     },
     "step2": {
       "titleStart": "Deine ",
       "titleEmphasis": "Tage",
-      "badge": "SCHRITT 2"
+      "badge": "schritt 2"
     },
     "steps": "Schritte"
   },
@@ -780,7 +780,8 @@
   },
   "calendar": {
     "previousMonth": "Vorheriger Monat",
-    "nextMonth": "Nächster Monat"
+    "nextMonth": "Nächster Monat",
+    "daysOff": "{count, plural, one {# freier Tag} other {# freie Tage}}"
   },
   "holidayRow": {
     "weekend": "Wochenende",
@@ -837,10 +838,10 @@
       "mockupFieldHolidays": "14 Feiertage"
     },
     "marquee": {
-      "items": "OSTERBRÜCKE · FEIERTAGS-WOCHENENDE · SOMMER-STRETCH · HERBST-BRÜCKE · WEIHNACHTS-STRETCH · NOVEMBER-BRÜCKE · PFINGSTBRÜCKE · HIMMELFAHRT-BRÜCKE · TAG DER EINHEIT · SILVESTER-STRETCH"
+      "items": "osterbrücke · feiertags-wochenende · sommer-stretch · herbst-brücke · weihnachts-stretch · november-brücke · pfingstbrücke · himmelfahrt-brücke · tag der einheit · silvester-stretch"
     },
     "how": {
-      "badge": "WIE ES FUNKTIONIERT · 3 SCHRITTE",
+      "badge": "wie es funktioniert · 3 schritte",
       "titleStart": "Von",
       "titleMid": "zu",
       "question1": "was soll ich tun",
@@ -861,20 +862,20 @@
       "plansLabel": "Generierte Pläne"
     },
     "features": {
-      "badge": "ENGINE-TRICKS",
+      "badge": "engine-tricks",
       "titleStart": "Kein Kalender. Ein",
       "titleEmphasis": "Verbündeter",
       "titleEnd": "gegen Montage.",
       "description": "Das sind die Züge, die Forever PTO automatisch für dich macht.",
-      "bridgeTag": "CLEVERE BRÜCKEN",
+      "bridgeTag": "clevere brücken",
       "bridgeTitle": "1 Urlaubstag in 4 freie Tage verwandeln.",
       "bridgeDescription": "Erkennt Feiertage an Dienstagen und Donnerstagen und schlägt minimale Brücken vor. Ein strategischer Tag = ein 4-Tage-Wochenende.",
-      "ratioTag": "MAX-VERHÄLTNIS",
+      "ratioTag": "max-verhältnis",
       "ratioDescription": "Bestes Verhältnis: 8 Urlaubstage zu 28 freien Tagen (ES, April 26).",
-      "syncTag": "SYNC IN 1 KLICK",
+      "syncTag": "sync in 1 klick",
       "syncTitle": "Google · Outlook · iCal",
       "syncDescription": "Exportiere deinen Plan in den Kalender, den du bereits nutzt.",
-      "conflictsTag": "ANTI-KONFLIKTE",
+      "conflictsTag": "anti-konflikte",
       "conflictsTitle": "Warnt dich, bevor dein Chef es tut.",
       "conflictsDescription": "Markiere die Tabu-Zeiten deines Unternehmens.",
       "conflictItems": {
@@ -882,15 +883,15 @@
         "quarterClose": "Q3-Abschluss",
         "productLaunch": "Produktstart"
       },
-      "countriesTag": "14 LÄNDER",
+      "countriesTag": "14 länder",
       "countriesTitle": "Echte lokale Feiertage.",
       "countriesDescription": "Offizielle Kalender jedes Jahr aktualisiert. Auch die regionalen.",
-      "privacyTag": "100% LOKAL",
+      "privacyTag": "100% lokal",
       "privacyTitle": "Deine Daten verlassen nie deinen Browser.",
       "privacyDescription": "Keine Anmeldung. Kein Konto. Deine Urlaubsdaten werden ausschließlich in deinem Browser gespeichert — wir sehen sie nie."
     },
     "comparison": {
-      "badge": "VORHER · NACHHER",
+      "badge": "vorher · nachher",
       "title": "Vor vs. nach Forever PTO.",
       "withoutTitle": "😩 Ohne Forever PTO",
       "withoutItems": {
@@ -910,7 +911,7 @@
       }
     },
     "testimonials": {
-      "badge": "DAS SAGEN ANDERE",
+      "badge": "das sagen andere",
       "titleStart": "Menschen, die sich schon",
       "titleEmphasis": "Wochen",
       "titleEnd": "ihres Lebens zurückgeholt haben.",
@@ -948,7 +949,7 @@
       }
     },
     "pricing": {
-      "badge": "EHRLICHE PREISE",
+      "badge": "ehrliche preise",
       "titleStart": "Einmal bezahlen.",
       "titleEmphasis": "Für immer.",
       "description": "Kein SaaS. Kein Abo. Kein \"7-Tage-Test, der sich automatisch verlängert\".",
@@ -978,7 +979,7 @@
         "fullAnalytics": "Vollständige Analysen & visuelle Diagramme"
       },
       "lifetimeCta": "Projekt unterstützen →",
-      "popularBadge": "AM BELIEBTESTEN 🔥"
+      "popularBadge": "am beliebtesten 🔥"
     },
     "faq": {
       "badge": "FAQ",

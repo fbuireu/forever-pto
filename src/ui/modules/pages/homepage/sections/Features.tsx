@@ -23,7 +23,7 @@ export const Features = async () => {
           className={`${brutCard} md:col-span-4 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
           style={{ background: 'var(--accent)', color: 'var(--color-brand-ink)' }}
         >
-          <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] text-foreground border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold shadow-[var(--shadow-brutal-xs)]'>
+          <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] text-foreground border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]'>
             {t('features.bridgeTag')}
           </span>
           <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em]'>
@@ -49,7 +49,7 @@ export const Features = async () => {
         <div
           className={`${brutCard} md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
         >
-          <span className='inline-block px-2.5 py-1 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold shadow-[var(--shadow-brutal-xs)]'>
+          <span className='inline-block px-2.5 py-1 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]'>
             {t('features.ratioTag')}
           </span>
           <div className='font-display font-extrabold text-[100px] leading-none tracking-[-0.05em] mt-2.5 mb-2'>
@@ -61,7 +61,7 @@ export const Features = async () => {
           className={`${brutCard} md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
           style={{ background: 'var(--color-brand-teal)' }}
         >
-          <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold shadow-[var(--shadow-brutal-xs)]'>
+          <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]'>
             {t('features.syncTag')}
           </span>
           <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em]'>
@@ -82,7 +82,7 @@ export const Features = async () => {
         <div
           className={`${brutCard} md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
         >
-          <span className='inline-block px-2.5 py-1 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold shadow-[var(--shadow-brutal-xs)]'>
+          <span className='inline-block px-2.5 py-1 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]'>
             {t('features.conflictsTag')}
           </span>
           <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em]'>
@@ -112,7 +112,7 @@ export const Features = async () => {
           className={`${brutCard} md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
           style={{ background: 'var(--color-brand-orange)' }}
         >
-          <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[6px] font-mono text-[12px] font-semibold text-[var(--frame)] shadow-[var(--shadow-brutal-xs)]'>
+          <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[6px] font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--frame)] shadow-[var(--shadow-brutal-xs)]'>
             {t('features.countriesTag')}
           </span>
           <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em] text-white'>
@@ -134,7 +134,7 @@ export const Features = async () => {
           className={`${brutCard} md:col-span-6 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
           style={{ background: 'var(--frame)', color: 'var(--background)' }}
         >
-          <span className='inline-block px-2.5 py-1 bg-[var(--accent)] border-[2.5px] border-[var(--background)] rounded-[6px] font-mono text-[12px] font-semibold text-[var(--color-brand-ink)] shadow-[2px_2px_0_0_var(--background)]'>
+          <span className='inline-block px-2.5 py-1 bg-[var(--accent)] border-[2.5px] border-[var(--background)] rounded-[6px] font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--color-brand-ink)] shadow-[2px_2px_0_0_var(--background)]'>
             {t('features.privacyTag')}
           </span>
           <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em] text-[var(--background)]'>

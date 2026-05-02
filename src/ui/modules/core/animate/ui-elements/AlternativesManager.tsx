@@ -92,7 +92,7 @@ export const AlternativesManager = ({
 
   return (
     <div
-      className='sticky top-0 z-10 flex w-fit flex-wrap items-center gap-3 rounded-[14px] border-[3px] border-[var(--frame)] bg-card p-3 shadow-[var(--shadow-brutal-lg)]'
+      className='sticky top-0 z-10 flex w-fit flex-wrap items-center gap-3 rounded-[10px] border-[3px] border-[var(--frame)] bg-card p-3 shadow-[var(--shadow-brutal-lg)]'
       data-tutorial='alternatives-manager'
     >
       <div className='flex shrink-0 grow items-stretch overflow-hidden rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-xs)]'>

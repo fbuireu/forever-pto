@@ -493,12 +493,12 @@
     "step1": {
       "titleStart": "Your ",
       "titleEmphasis": "context",
-      "badge": "STEP 1"
+      "badge": "step 1"
     },
     "step2": {
       "titleStart": "Your ",
       "titleEmphasis": "days",
-      "badge": "STEP 2"
+      "badge": "step 2"
     },
     "steps": "Steps"
   },
@@ -737,9 +737,19 @@
     "lastUpdated": "Last updated: {date}"
   },
   "notFound": {
-    "title": "Page not found",
-    "description": "The page you're looking for doesn't exist or has been moved.",
-    "returnHome": "Return to homepage"
+    "kicker": "error 404 · route lost",
+    "title": "This page went on",
+    "titleHighlight": "vacation",
+    "titleEmphasis": "without notice.",
+    "lede": "We searched the beach, checked under the umbrella, asked the beach bar… nothing. The URL you want doesn't exist (or got lost between two long weekends).",
+    "ctaPrimary": "Back to home",
+    "ctaPlanner": "Open the Planner",
+    "suggestLabel": "Looking for something like this?",
+    "link1": "How it works",
+    "link2": "Features",
+    "link3": "Pricing",
+    "link4": "FAQ & Support",
+    "footerStatus": "status: ok · uptime: 99.98%"
   },
   "error": {
     "title": "Something went wrong",
@@ -783,7 +793,7 @@
   "calendar": {
     "previousMonth": "Previous month",
     "nextMonth": "Next month",
-    "daysOff": "days off"
+    "daysOff": "{count, plural, one {# day off} other {# days off}}"
   },
   "holidayRow": {
     "weekend": "Weekend",
@@ -840,10 +850,10 @@
       "mockupFieldHolidays": "14 holidays"
     },
     "marquee": {
-      "items": "EASTER BREAK · BANK HOLIDAY WEEKEND · SUMMER STRETCH · THANKSGIVING BRIDGE · CHRISTMAS STRETCH · NOVEMBER BRIDGE · WHIT MONDAY BRIDGE · MAY DAY LONG WEEKEND · AUGUST BANK HOLIDAY · NEW YEAR STRETCH"
+      "items": "easter break · bank holiday weekend · summer stretch · thanksgiving bridge · christmas stretch · november bridge · whit monday bridge · may day long weekend · august bank holiday · new year stretch"
     },
     "how": {
-      "badge": "HOW IT WORKS · 3 STEPS",
+      "badge": "how it works · 3 steps",
       "titleStart": "From",
       "titleMid": "to",
       "question1": "what do I do",
@@ -864,20 +874,20 @@
       "plansLabel": "Plans generated"
     },
     "features": {
-      "badge": "ENGINE TRICKS",
+      "badge": "engine tricks",
       "titleStart": "Not a calendar. An",
       "titleEmphasis": "ally",
       "titleEnd": "against Mondays.",
       "description": "These are the moves Forever PTO makes for you automatically.",
-      "bridgeTag": "SMART BRIDGES",
+      "bridgeTag": "smart bridges",
       "bridgeTitle": "Turn 1 PTO day into 4 days off.",
       "bridgeDescription": "Detects holidays on Tuesdays and Thursdays and suggests minimal bridges. One strategic day = a 4-day weekend.",
-      "ratioTag": "MAX RATIO",
+      "ratioTag": "max ratio",
       "ratioDescription": "Best multiplier: 8 PTO days turned into 28 free days (ES, April '26).",
-      "syncTag": "SYNC IN 1 CLICK",
+      "syncTag": "sync in 1 click",
       "syncTitle": "Google · Outlook · iCal",
       "syncDescription": "Export your plan to the calendar you already use. No hassle.",
-      "conflictsTag": "ANTI-CONFLICTS",
+      "conflictsTag": "anti-conflicts",
       "conflictsTitle": "Warns you before your boss does.",
       "conflictsDescription": "Mark company \"no-fly\" periods.",
       "conflictItems": {
@@ -885,15 +895,15 @@
         "quarterClose": "Q3 closing",
         "productLaunch": "Product launch"
       },
-      "countriesTag": "14 COUNTRIES",
+      "countriesTag": "14 countries",
       "countriesTitle": "Real local holidays.",
       "countriesDescription": "Official calendars updated every year. Even regional ones.",
-      "privacyTag": "100% LOCAL",
+      "privacyTag": "100% local",
       "privacyTitle": "Your data never leaves your browser.",
       "privacyDescription": "No login. No account. Your PTO data is stored exclusively in your browser — we never see it."
     },
     "comparison": {
-      "badge": "BEFORE · AFTER",
+      "badge": "before · after",
       "title": "Before vs. after Forever PTO.",
       "withoutTitle": "😩 Without Forever PTO",
       "withoutItems": {
@@ -913,7 +923,7 @@
       }
     },
     "testimonials": {
-      "badge": "PEOPLE ARE SAYING",
+      "badge": "people are saying",
       "titleStart": "People who already reclaimed",
       "titleEmphasis": "weeks",
       "titleEnd": "of their lives.",
@@ -951,7 +961,7 @@
       }
     },
     "pricing": {
-      "badge": "HONEST PRICING",
+      "badge": "honest pricing",
       "titleStart": "Pay once.",
       "titleEmphasis": "Forever.",
       "description": "No SaaS. No subscription. No \"7-day trial that auto-renews\".",
@@ -981,7 +991,7 @@
         "fullAnalytics": "Full analytics & visual charts"
       },
       "lifetimeCta": "Support the project →",
-      "popularBadge": "MOST POPULAR 🔥"
+      "popularBadge": "most popular 🔥"
     },
     "faq": {
       "badge": "FAQ",

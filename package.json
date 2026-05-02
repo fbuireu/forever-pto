@@ -75,6 +75,7 @@
     "react-use-measure": "2.1.7",
     "recharts": "3.8.1",
     "resend": "6.12.2",
+    "shiki": "^4.0.2",
     "sonner": "2.0.7",
     "stripe": "22.1.0",
     "tailwind-merge": "3.5.0",

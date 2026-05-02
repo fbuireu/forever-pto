@@ -9,7 +9,7 @@ export const Marquee = async () => {
       aria-hidden='true'
     >
       <div
-        className='flex gap-10 whitespace-nowrap font-display font-bold text-[22px] tracking-[-0.01em]'
+        className='flex gap-10 whitespace-nowrap font-display font-bold text-[22px] uppercase tracking-[0.06em]'
         style={{ animation: 'marquee 30s linear infinite' }}
       >
         {[0, 1].flatMap((rep) =>

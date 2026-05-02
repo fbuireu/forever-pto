@@ -493,12 +493,12 @@
     "step1": {
       "titleStart": "El teu ",
       "titleEmphasis": "context",
-      "badge": "PAS 1"
+      "badge": "pas 1"
     },
     "step2": {
       "titleStart": "Els teus ",
       "titleEmphasis": "dies",
-      "badge": "PAS 2"
+      "badge": "pas 2"
     },
     "steps": "Passos"
   },
@@ -737,9 +737,19 @@
     "lastUpdated": "Última actualització: {date}"
   },
   "notFound": {
-    "title": "Pàgina no trobada",
-    "description": "La pàgina que busques no existeix o ha estat moguda.",
-    "returnHome": "Tornar a l'inici"
+    "kicker": "error 404 · ruta perduda",
+    "title": "Aquesta pàgina se n'ha anat de",
+    "titleHighlight": "vacances",
+    "titleEmphasis": "sense avisar.",
+    "lede": "Hem buscat a la platja, hem mirat sota el parasol, hem preguntat al xiringuito… res. L'URL que vols no existeix (o es va perdre entre 2 ponts).",
+    "ctaPrimary": "Tornar a l'inici",
+    "ctaPlanner": "Obrir el Planificador",
+    "suggestLabel": "Buscaves alguna cosa com aquesta?",
+    "link1": "Com funciona",
+    "link2": "Funcionalitats",
+    "link3": "Plans i preu",
+    "link4": "FAQ i suport",
+    "footerStatus": "estat: ok · uptime: 99.98%"
   },
   "error": {
     "title": "Alguna cosa ha anat malament",
@@ -783,7 +793,7 @@
   "calendar": {
     "previousMonth": "Mes anterior",
     "nextMonth": "Mes següent",
-    "daysOff": "dies lliures"
+    "daysOff": "{count, plural, one {# dia lliure} other {# dies lliures}}"
   },
   "holidayRow": {
     "weekend": "Cap de setmana",
@@ -840,10 +850,10 @@
       "mockupFieldHolidays": "14 festius"
     },
     "marquee": {
-      "items": "SETMANA SANTA · PONT DE MAIG · ESTIU INFINIT · PONT DE LA MERCÈ · NADAL PROLONGAT · PONT DE NOVEMBRE · PONT DE JUNY · PONT DE L'AGOST · PONT D'OCTUBRE · CAP D'ANY PROLONGAT"
+      "items": "setmana santa · pont de maig · estiu infinit · pont de la mercè · nadal prolongat · pont de novembre · pont de juny · pont de l'agost · pont d'octubre · cap d'any prolongat"
     },
     "how": {
-      "badge": "COM VA · 3 PASSOS",
+      "badge": "com va · 3 passos",
       "titleStart": "De",
       "titleMid": "a",
       "question1": "què faig",
@@ -864,20 +874,20 @@
       "plansLabel": "Plans generats"
     },
     "features": {
-      "badge": "TRUCS DEL MOTOR",
+      "badge": "trucs del motor",
       "titleStart": "No és un calendari. És un",
       "titleEmphasis": "aliat",
       "titleEnd": "contra el dilluns.",
       "description": "Aquests són els moviments que Forever PTO fa per tu automàticament.",
-      "bridgeTag": "PONTS INTEL·LIGENTS",
+      "bridgeTag": "ponts intel·ligents",
       "bridgeTitle": "Converteix 1 dia de PTO en 4 lliures.",
       "bridgeDescription": "Detecta festius en dimarts i dijous i et suggereix construir ponts mínims. Un dia estratègic = un cap de setmana de 4 dies.",
-      "ratioTag": "RÀTIO MAX",
+      "ratioTag": "ràtio max",
       "ratioDescription": "Millor multiplicador: 8 dies de PTO convertits en 28 lliures (ES, abril '26).",
-      "syncTag": "SYNC EN 1 CLIC",
+      "syncTag": "sync en 1 clic",
       "syncTitle": "Google · Outlook · iCal",
       "syncDescription": "Exporta el teu pla al calendari que ja uses. Sense embolicar-te.",
-      "conflictsTag": "ANTI-CONFLICTES",
+      "conflictsTag": "anti-conflictes",
       "conflictsTitle": "Avisa abans que el teu cap.",
       "conflictsDescription": "Marca els períodes \"tabú\" de la teva empresa.",
       "conflictItems": {
@@ -885,15 +895,15 @@
         "quarterClose": "Tancament Q3",
         "productLaunch": "Llançament"
       },
-      "countriesTag": "14 PAÏSOS",
+      "countriesTag": "14 països",
       "countriesTitle": "Festius locals reals.",
       "countriesDescription": "Calendaris oficials actualitzats cada any. Fins i tot els regionals.",
-      "privacyTag": "100% LOCAL",
+      "privacyTag": "100% local",
       "privacyTitle": "Les teves dades no surten del teu navegador.",
       "privacyDescription": "Sense registre. Sense compte. Les teves dades de vacances es guarden exclusivament al teu navegador, mai no les veiem."
     },
     "comparison": {
-      "badge": "AMB · SENSE",
+      "badge": "amb · sense",
       "title": "Abans vs. després de Forever PTO.",
       "withoutTitle": "😩 Sense Forever PTO",
       "withoutItems": {
@@ -913,7 +923,7 @@
       }
     },
     "testimonials": {
-      "badge": "LA GENT DIU",
+      "badge": "la gent diu",
       "titleStart": "Gent que ja ha recuperat",
       "titleEmphasis": "setmanes",
       "titleEnd": "de la seva vida.",
@@ -951,7 +961,7 @@
       }
     },
     "pricing": {
-      "badge": "PREU HONEST",
+      "badge": "preu honest",
       "titleStart": "Paga una vegada.",
       "titleEmphasis": "Per sempre.",
       "description": "Sense SaaS. Sense subscripció. Sense \"prova gratuïta que es renova sola\".",
@@ -981,7 +991,7 @@
         "fullAnalytics": "Analítica completa i gràfics visuals"
       },
       "lifetimeCta": "Dóna suport al projecte →",
-      "popularBadge": "MÉS POPULAR 🔥"
+      "popularBadge": "més popular 🔥"
     },
     "faq": {
       "badge": "FAQ",
