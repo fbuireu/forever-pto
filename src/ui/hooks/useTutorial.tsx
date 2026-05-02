@@ -20,73 +20,19 @@ export const useTutorial = () => {
 
     const steps: DriveStep[] = [
       {
-        element: '[data-tutorial="sidebar-filters"]',
+        element: '[data-tutorial="sidebar-step-1"]',
         popover: {
-          title: t('filtersTitle'),
-          description: t('filtersDescription'),
+          title: t('step1Title'),
+          description: t('step1Description'),
           side: 'right',
           align: 'start',
         },
       },
       {
-        element: '[data-tutorial="pto-days"]',
+        element: '[data-tutorial="sidebar-step-2"]',
         popover: {
-          title: t('ptoDaysTitle'),
-          description: t('ptoDaysDescription'),
-          side: 'right',
-          align: 'start',
-        },
-      },
-      {
-        element: '[data-tutorial="country"]',
-        popover: {
-          title: t('countryTitle'),
-          description: t('countryDescription'),
-          side: 'right',
-          align: 'start',
-        },
-      },
-      {
-        element: '[data-tutorial="region"]',
-        popover: {
-          title: t('regionTitle'),
-          description: t('regionDescription'),
-          side: 'right',
-          align: 'start',
-        },
-      },
-      {
-        element: '[data-tutorial="year"]',
-        popover: {
-          title: t('yearTitle'),
-          description: t('yearDescription'),
-          side: 'right',
-          align: 'start',
-        },
-      },
-      {
-        element: '[data-tutorial="strategy"]',
-        popover: {
-          title: t('strategyTitle'),
-          description: t('strategyDescription'),
-          side: 'right',
-          align: 'start',
-        },
-      },
-      {
-        element: '[data-tutorial="allow-past-days"]',
-        popover: {
-          title: t('allowPastDaysTitle'),
-          description: t('allowPastDaysDescription'),
-          side: 'right',
-          align: 'start',
-        },
-      },
-      {
-        element: '[data-tutorial="carry-over"]',
-        popover: {
-          title: t('carryOverTitle'),
-          description: t('carryOverDescription'),
+          title: t('step2Title'),
+          description: t('step2Description'),
           side: 'right',
           align: 'start',
         },

@@ -306,26 +306,10 @@
     }
   },
   "tutorial": {
-    "description": "Beginne damit, deine Urlaubsdetails in der linken Seitenleiste einzugeben: deine verfügbaren Urlaubstage, dein Land und deine Region. Wir übernehmen den Rest für dich. Wenn du noch Fragen hast, kannst du auf die folgende Schaltfläche klicken, um ein interaktives Tutorial zu starten.",
+    "description": "Richte deinen Plan in 2 Schritten ein: zuerst deinen Standort, dann deine Tage und Strategie. Klicke den Button für ein interaktives Tutorial.",
     "startButton": "Tutorial starten",
     "restartButton": "Interaktives Tutorial neu starten",
     "steps": {
-      "filtersTitle": "Filter & Konfiguration",
-      "filtersDescription": "Hier kannst du alle deine Urlaubseinstellungen konfigurieren. Lege deine verfügbaren Urlaubstage fest, wähle dein Land und deine Region für genaue Feiertage, wähle das Jahr und passe deine Optimierungsstrategie an.",
-      "ptoDaysTitle": "Urlaubstage",
-      "ptoDaysDescription": "Gib die Gesamtzahl deiner verfügbaren Urlaubstage für das Jahr ein. Dies ist die Grundlage für alle Berechnungen und Vorschläge.",
-      "countryTitle": "Landesauswahl",
-      "countryDescription": "Wir leiten dein Land standardmäßig aus deinem CDN ab, aber du kannst jedes gewünschte Land auswählen. Basierend auf diesem Wert rufen wir die offiziellen Feiertage ab, um sie in deinen Kalender aufzunehmen.",
-      "regionTitle": "Regionsauswahl",
-      "regionDescription": "Einige Länder haben regionale Feiertage. Wähle deine spezifische Region, um den genauesten Feiertagskalender für dein Gebiet zu erhalten.",
-      "yearTitle": "Jahresauswahl",
-      "yearDescription": "Wähle das Jahr, für das du planen möchtest. Feiertage und Vorschläge werden für das ausgewählte Jahr generiert.",
-      "strategyTitle": "Optimierungsstrategie",
-      "strategyDescription": "Wähle zwischen verschiedenen Strategien, um deine Urlaubstage zu optimieren. Jede Strategie hat einen anderen Ansatz zur Gruppierung und Maximierung deiner freien Tage. Du kannst die Strategiedetails erweitern, um mehr über jede Option zu erfahren.",
-      "allowPastDaysTitle": "Vergangene Tage erlauben",
-      "allowPastDaysDescription": "Aktiviere diese Option, wenn du bereits vergangene Daten im aktuellen Jahr einbeziehen möchtest. Nützlich für rückblickende Planung oder für das nächste Jahr.",
-      "carryOverTitle": "Übertragsmonate",
-      "carryOverDescription": "Wenn deine Urlaubstage ins nächste Jahr übertragen werden, gib an, wie viele Monate sie gültig bleiben. Dies hilft dir, die Nutzung der Urlaubstage über Jahresgrenzen hinweg zu planen.",
       "toolsTitle": "Rechner & Werkzeuge",
       "toolsDescription": "Greife hier auf hilfreiche Rechner zu: Schätze deine Urlaubstage basierend auf deiner Berufserfahrung, berechne den Geldwert ungenutzter Urlaubstage oder zähle Arbeitstage zwischen zwei Daten.",
       "alternativesTitle": "Alternativen-Manager",
@@ -337,7 +321,11 @@
       "finishTitle": "Du bist startklar!",
       "finishDescription": "Jetzt weißt du, wie du Forever PTO nutzen kannst, um deine Freizeit zu maximieren. Beginne damit, deine Einstellungen in der Seitenleiste zu konfigurieren, und lass die App dir die besten Urlaubstage vorschlagen. Genieße deine wohlverdienten Pausen!",
       "holidaysListTitle": "Passe deine Feiertage an",
-      "holidaysListDescription": "Hier kannst du die Feiertagsdaten an deine genaue Situation anpassen. Bearbeite oder lösche nationale oder regionale Feiertage und füge eigene freie Tage hinzu – Firmenfeiertage, lokale Bräuche oder jedes Datum, das dir wichtig ist. Je genauer die Daten, desto besser die Vorschläge."
+      "holidaysListDescription": "Hier kannst du die Feiertagsdaten an deine genaue Situation anpassen. Bearbeite oder lösche nationale oder regionale Feiertage und füge eigene freie Tage hinzu – Firmenfeiertage, lokale Bräuche oder jedes Datum, das dir wichtig ist. Je genauer die Daten, desto besser die Vorschläge.",
+      "step1Title": "Schritt 1 — Dein Kontext",
+      "step1Description": "Wähle dein Land, deine Region und das Jahr, für das du planen möchtest. Dies konfiguriert deinen Feiertagskalender, damit wir die besten Brückentage finden.",
+      "step2Title": "Schritt 2 — Deine verfügbaren Tage",
+      "step2Description": "Gib an, wie viele Urlaubstage du hast, und wähle deine Optimierungsstrategie. Die Strategie bestimmt, wie wir deine freien Tage gruppieren."
     }
   },
   "legend": {
@@ -499,7 +487,18 @@
     },
     "years": {
       "title": "Jahr"
-    }
+    },
+    "step1": {
+      "titleStart": "Dein ",
+      "titleEmphasis": "Kontext",
+      "badge": "SCHRITT 1"
+    },
+    "step2": {
+      "titleStart": "Deine ",
+      "titleEmphasis": "Tage",
+      "badge": "SCHRITT 2"
+    },
+    "steps": "Schritte"
   },
   "ptoDays": {
     "title": "PTO-Tage",

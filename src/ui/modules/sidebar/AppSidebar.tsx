@@ -9,13 +9,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
 } from '@ui/modules/core/animate/base/Sidebar';
-import { ChevronRight } from '@ui/modules/core/animate/icons/ChevronRight';
+import { ChevronDown } from '@ui/modules/core/animate/icons/ChevronDown';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Settings } from '@ui/modules/core/animate/icons/Settings';
 import { Calculator } from 'lucide-react';
@@ -24,8 +22,6 @@ import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 import { Logo } from '../shared/Logo';
-import { AllowPastDays } from './components/AllowPastDays';
-import { CarryOverMonths } from './components/CarryOverMonths';
 import { Countries } from './components/Countries';
 import { PtoDays } from './components/PtoDays';
 import { SidebarFooterButtons } from './components/SidebarFooterButtons';
@@ -38,6 +34,9 @@ const PtoSalaryCalculator = dynamic(() =>
   import('./components/PtoSalaryCalculator').then((m) => m.PtoSalaryCalculator)
 );
 const WorkdayCounter = dynamic(() => import('./components/WorkdayCounter').then((m) => m.WorkdayCounter));
+
+const STEP_CARD_CLASS =
+  'bg-card border-[3px] border-[var(--frame)] rounded-[14px] shadow-[6px_6px_0_0_var(--frame)] p-[18px]';
 
 interface AppSidebarProps {
   children: React.ReactNode;
@@ -69,58 +68,58 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                   className='group/collapsible w-[--radix-popper-anchor-width]'
                   data-tutorial='sidebar-filters'
                 >
-                  <AnimateIcon animateOnHover>
-                    <CollapsibleTrigger asChild className='cursor-pointer'>
-                      <SidebarMenuButton variant='outline' tooltip={t('filters')}>
+                  <CollapsibleTrigger asChild className='cursor-pointer w-full'>
+                    <SidebarMenuButton variant='outline' tooltip={t('steps')}>
+                      <AnimateIcon animateOnHover>
                         <Settings className='h-5 w-5 shrink-0' />
-                        <span className='group-data-[collapsible=icon]:hidden'>{t('filters')}</span>
-                        <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 group-data-[collapsible=icon]:hidden' />
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                  </AnimateIcon>
+                      </AnimateIcon>
+                      <span className='group-data-[collapsible=icon]:hidden'>{t('steps')}</span>
+                      <ChevronDown className='ml-auto -rotate-90 transition-transform group-data-[state=open]/collapsible:rotate-0 group-data-[collapsible=icon]:hidden' />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
                   <CollapsibleContent>
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem>
-                        <PtoDays />
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem>
-                        <Suspense fallback={t('loading')}>
-                          <Countries locale={locale} />
-                        </Suspense>
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem>
-                        <Regions />
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem>
-                        <Years />
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem>
-                        <Strategy />
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem>
-                        <AllowPastDays />
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem>
-                        <CarryOverMonths />
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
+                    <div className='px-1 pt-2 pb-1 space-y-[18px]'>
+                      <div data-tutorial='sidebar-step-1' className={STEP_CARD_CLASS}>
+                        <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
+                          <span>
+                            {t('step1.titleStart')}
+                            <em className='font-serif italic font-normal'>{t('step1.titleEmphasis')}</em>
+                          </span>
+                          <span className='ml-auto shrink-0 font-mono text-[10px] font-bold bg-[var(--frame)] text-[var(--color-brand-yellow)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]'>
+                            {t('step1.badge')}
+                          </span>
+                        </h3>
+                        <div className='space-y-5'>
+                          <Suspense fallback={t('loading')}>
+                            <Countries locale={locale} />
+                          </Suspense>
+                          <Regions />
+                          <Years />
+                        </div>
+                      </div>
+
+                      <div data-tutorial='sidebar-step-2' className={STEP_CARD_CLASS}>
+                        <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
+                          <span>
+                            {t('step2.titleStart')}
+                            <em className='font-serif italic font-normal'>{t('step2.titleEmphasis')}</em>
+                          </span>
+                          <span className='ml-auto shrink-0 font-mono text-[10px] font-bold bg-[var(--frame)] text-[var(--color-brand-yellow)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]'>
+                            {t('step2.badge')}
+                          </span>
+                        </h3>
+                        <div className='space-y-3'>
+                          <PtoDays />
+                          <Strategy />
+                        </div>
+                      </div>
+                    </div>
                   </CollapsibleContent>
                 </Collapsible>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
+
           <SidebarGroup>
             <SidebarGroupLabel role='heading' aria-level={2}>
               {t('tools')}
@@ -132,28 +131,27 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                   className='group/collapsible w-[--radix-popper-anchor-width]'
                   data-tutorial='sidebar-tools'
                 >
-                  <AnimateIcon animateOnHover>
-                    <CollapsibleTrigger asChild className='cursor-pointer'>
-                      <SidebarMenuButton variant='outline' tooltip={t('tools')}>
+                  <CollapsibleTrigger asChild className='cursor-pointer w-full'>
+                    <SidebarMenuButton variant='outline' tooltip={t('tools')}>
+                      <AnimateIcon animateOnHover>
                         <Calculator className='h-5 w-5 shrink-0' />
-                        <span className='group-data-[collapsible=icon]:hidden'>{t('calculators')}</span>
-                        <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 group-data-[collapsible=icon]:hidden' />
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                  </AnimateIcon>
+                      </AnimateIcon>
+                      <span className='group-data-[collapsible=icon]:hidden'>{t('calculators')}</span>
+                      <ChevronDown className='ml-auto -rotate-90 transition-transform group-data-[state=open]/collapsible:rotate-0 group-data-[collapsible=icon]:hidden' />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
                   <CollapsibleContent>
-                    <SidebarMenuSub>
-                      <PtoCalculator />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <PtoSalaryCalculator />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
-                    <SidebarMenuSub>
-                      <WorkdayCounter />
-                      <SidebarMenuSubItem />
-                    </SidebarMenuSub>
+                    <div className='px-1 pt-2 pb-1 space-y-[18px]'>
+                      <div className={STEP_CARD_CLASS}>
+                        <PtoCalculator />
+                      </div>
+                      <div className={STEP_CARD_CLASS}>
+                        <PtoSalaryCalculator />
+                      </div>
+                      <div className={STEP_CARD_CLASS}>
+                        <WorkdayCounter />
+                      </div>
+                    </div>
                   </CollapsibleContent>
                 </Collapsible>
               </SidebarMenuItem>

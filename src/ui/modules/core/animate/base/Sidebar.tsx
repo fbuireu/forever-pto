@@ -18,8 +18,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tool
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const SIDEBAR_WIDTH = '18rem';
-const SIDEBAR_WIDTH_MOBILE = '18rem';
+const SIDEBAR_WIDTH = '20rem';
+const SIDEBAR_WIDTH_MOBILE = '20rem';
 const SIDEBAR_WIDTH_ICON = '3rem';
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 
@@ -274,7 +274,10 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
       data-sidebar='trigger'
       variant='ghost'
       size='icon'
-      className={cn('h-11 w-11 rounded-[10px] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-sm)]', className)}
+      className={cn(
+        'h-11 w-11 rounded-[10px] bg-[var(--accent)] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xs)] transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)]',
+        className
+      )}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();

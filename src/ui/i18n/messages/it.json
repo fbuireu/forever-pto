@@ -308,26 +308,10 @@
     }
   },
   "tutorial": {
-    "description": "Vuoi rivedere il tutorial interattivo? Clicca il pulsante qui sotto per riavviare il tour guidato di tutte le funzioni e impostazioni.",
+    "description": "Configura il tuo piano in 2 passi: prima la tua posizione, poi i tuoi giorni e la strategia. Clicca il pulsante per un tutorial interattivo.",
     "restartButton": "Riavvia Tutorial Interattivo",
     "startButton": "Inizia Tutorial",
     "steps": {
-      "filtersTitle": "Filtri e Configurazione",
-      "filtersDescription": "Qui puoi configurare tutte le tue preferenze PTO. Imposta i tuoi giorni PTO disponibili, seleziona il tuo paese e regione per ottenere festività accurate, scegli l'anno e personalizza la tua strategia di ottimizzazione.",
-      "ptoDaysTitle": "Giorni PTO",
-      "ptoDaysDescription": "Inserisci il numero totale di giorni PTO (ferie retribuite) che hai disponibili per l'anno. Questa è la base per tutti i calcoli e suggerimenti.",
-      "countryTitle": "Selezione Paese",
-      "countryDescription": "Inferiamo il tuo paese dal tuo CDN per default ma puoi selezionare qualsiasi paese desiderato. Con questo valore otterremo le festività pubbliche ufficiali da includere nel tuo calendario.",
-      "regionTitle": "Selezione Regione",
-      "regionDescription": "Alcuni paesi hanno festività regionali. Seleziona la tua regione specifica per ottenere il calendario delle festività più accurato per la tua area.",
-      "yearTitle": "Selezione Anno",
-      "yearDescription": "Scegli l'anno per cui vuoi pianificare. Le festività e i suggerimenti saranno generati per l'anno selezionato.",
-      "strategyTitle": "Strategia di Ottimizzazione",
-      "strategyDescription": "Scegli tra diverse strategie per ottimizzare il tuo PTO. Ogni strategia ha un approccio diverso per raggruppare e massimizzare i tuoi giorni liberi. Puoi espandere i dettagli della strategia per saperne di più su ciascuna opzione.",
-      "allowPastDaysTitle": "Permetti Giorni Passati",
-      "allowPastDaysDescription": "Attiva questa opzione se vuoi includere date già passate nell'anno corrente. Utile per pianificare retrospettivamente o per l'anno prossimo.",
-      "carryOverTitle": "Mesi di Riporto",
-      "carryOverDescription": "Se i tuoi giorni PTO si riportano all'anno successivo, specifica per quanti mesi rimangono validi. Questo ti aiuta a pianificare l'uso del PTO tra anni diversi.",
       "toolsTitle": "Calcolatori e Strumenti",
       "toolsDescription": "Accedi a calcolatori utili qui: stima il tuo PTO basandoti sulla storia lavorativa, calcola il valore monetario del PTO non utilizzato, o conta i giorni lavorativi tra date.",
       "alternativesTitle": "Gestore Alternative",
@@ -339,7 +323,11 @@
       "finishTitle": "Tutto Pronto!",
       "finishDescription": "Ora sai come usare Forever PTO per massimizzare il tuo tempo libero. Inizia configurando le tue preferenze nella barra laterale, e lascia che l'app ti suggerisca i migliori giorni PTO. Goditi le tue meritate pause!",
       "holidaysListTitle": "Personalizza le tue festività",
-      "holidaysListDescription": "Qui puoi perfezionare i dati sulle festività per adattarli alla tua situazione. Modifica o elimina qualsiasi festività nazionale o regionale e aggiungi i tuoi giorni personalizzati: festività aziendali, celebrazioni locali o qualsiasi data che conti per te. Più accurati sono i dati, migliori saranno i suggerimenti."
+      "holidaysListDescription": "Qui puoi perfezionare i dati sulle festività per adattarli alla tua situazione. Modifica o elimina qualsiasi festività nazionale o regionale e aggiungi i tuoi giorni personalizzati: festività aziendali, celebrazioni locali o qualsiasi data che conti per te. Più accurati sono i dati, migliori saranno i suggerimenti.",
+      "step1Title": "Passo 1 — Il tuo contesto",
+      "step1Description": "Seleziona il tuo paese, regione e l'anno che vuoi pianificare. Questo configura il tuo calendario delle festività per trovare i migliori ponti.",
+      "step2Title": "Passo 2 — I tuoi giorni disponibili",
+      "step2Description": "Indica quanti giorni di ferie hai e scegli la tua strategia di ottimizzazione. La strategia determina come raggruppiamo i tuoi giorni liberi."
     }
   },
   "legend": {
@@ -501,7 +489,18 @@
     },
     "years": {
       "title": "Anno"
-    }
+    },
+    "step1": {
+      "titleStart": "Il tuo ",
+      "titleEmphasis": "contesto",
+      "badge": "PASSO 1"
+    },
+    "step2": {
+      "titleStart": "I tuoi ",
+      "titleEmphasis": "giorni",
+      "badge": "PASSO 2"
+    },
+    "steps": "Passaggi"
   },
   "ptoDays": {
     "title": "Giorni di PTO",

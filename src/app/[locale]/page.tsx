@@ -56,10 +56,9 @@ const HomePage = async ({ params }: PageProps) => {
 
 export default HomePage;
 
-// todo: brutalist design (show legend in button, remove old brand, redo logo)
-// todo: Check DSM (dark mode, tipografies, colors, etc)
+// todo: brutalist design (footer 100%, logo, border to highlight shadow on white and dark mde)
 // todo: 400 and 500 page
-// todo: check all// todo: check lang strings (rename landing for home, no use fi
+// todo: check all
 // todo: focus input order in stripe
 // todo: unify styles and check everything
 // todo: improve responsive

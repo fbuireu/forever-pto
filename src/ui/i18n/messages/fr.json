@@ -306,26 +306,10 @@
     }
   },
   "tutorial": {
-    "description": "Commence par entrer tes informations de congés dans la barre latérale gauche : tes jours de congé disponibles, ton pays et ta région. On s'occupe du reste. Si tu as encore des doutes, tu peux cliquer sur le bouton suivant pour lancer un tutoriel interactif.",
+    "description": "Configure ton plan en 2 étapes : d'abord ta localisation, puis tes jours et ta stratégie. Clique le bouton pour un tutoriel interactif.",
     "startButton": "Démarrer le tutoriel",
     "restartButton": "Relancer le tutoriel interactif",
     "steps": {
-      "filtersTitle": "Filtres et configuration",
-      "filtersDescription": "Ici tu peux configurer toutes tes préférences de congés. Définis tes jours de congé disponibles, sélectionne ton pays et ta région pour obtenir les jours fériés exacts, choisis l'année et personnalise ta stratégie d'optimisation.",
-      "ptoDaysTitle": "Jours de congé",
-      "ptoDaysDescription": "Entre le nombre total de jours de congé dont tu disposes pour l'année. C'est la base de tous les calculs et suggestions.",
-      "countryTitle": "Sélection du pays",
-      "countryDescription": "Nous déduisons ton pays à partir de ton CDN par défaut, mais tu peux sélectionner n'importe quel pays. À partir de cette valeur, nous récupérons les jours fériés officiels pour les inclure dans ton calendrier.",
-      "regionTitle": "Sélection de la région",
-      "regionDescription": "Certains pays ont des jours fériés régionaux. Sélectionne ta région spécifique pour obtenir le calendrier de jours fériés le plus précis pour ta zone.",
-      "yearTitle": "Sélection de l'année",
-      "yearDescription": "Choisis l'année pour laquelle tu veux planifier. Les jours fériés et suggestions seront générés pour l'année sélectionnée.",
-      "strategyTitle": "Stratégie d'optimisation",
-      "strategyDescription": "Choisis entre différentes stratégies pour optimiser tes congés. Chaque stratégie a une approche différente pour regrouper et maximiser tes jours de repos. Tu peux déplier les détails de chaque stratégie pour en savoir plus.",
-      "allowPastDaysTitle": "Autoriser les jours passés",
-      "allowPastDaysDescription": "Active cette option si tu veux inclure les dates déjà passées dans l'année en cours. Utile pour planifier rétrospectivement ou pour l'année prochaine.",
-      "carryOverTitle": "Mois de report",
-      "carryOverDescription": "Si tes jours de congé sont reportés sur l'année suivante, indique combien de mois ils restent valides. Cela t'aide à planifier l'utilisation de tes congés à cheval sur deux années.",
       "toolsTitle": "Calculateurs et outils",
       "toolsDescription": "Accède à des calculateurs utiles ici : estime tes congés selon ton historique professionnel, calcule la valeur monétaire de tes congés non utilisés, ou compte les jours ouvrés entre deux dates.",
       "alternativesTitle": "Gestionnaire d'alternatives",
@@ -337,7 +321,11 @@
       "finishTitle": "C'est tout bon !",
       "finishDescription": "Maintenant tu sais comment utiliser Forever PTO pour maximiser ton temps libre. Commence par configurer tes préférences dans la barre latérale et laisse l'application te suggérer les meilleurs jours de congé. Profite bien de tes pauses méritées !",
       "holidaysListTitle": "Personnalise tes jours fériés",
-      "holidaysListDescription": "Ici tu peux affiner les données des jours fériés pour qu'elles correspondent exactement à ta situation. Modifie ou supprime n'importe quel jour férié national ou régional, et ajoute tes propres jours de repos — jours fériés d'entreprise, fêtes locales, ou toute date qui compte pour toi. Plus les données sont précises, meilleures sont les suggestions."
+      "holidaysListDescription": "Ici tu peux affiner les données des jours fériés pour qu'elles correspondent exactement à ta situation. Modifie ou supprime n'importe quel jour férié national ou régional, et ajoute tes propres jours de repos — jours fériés d'entreprise, fêtes locales, ou toute date qui compte pour toi. Plus les données sont précises, meilleures sont les suggestions.",
+      "step1Title": "Étape 1 — Ton contexte",
+      "step1Description": "Sélectionne ton pays, ta région et l'année que tu veux planifier. Cela configure ton calendrier de jours fériés pour trouver les meilleurs ponts.",
+      "step2Title": "Étape 2 — Tes jours disponibles",
+      "step2Description": "Indique combien de jours de congé tu as et choisis ta stratégie d'optimisation. La stratégie détermine comment nous regroupons tes jours de repos."
     }
   },
   "legend": {
@@ -499,7 +487,18 @@
     },
     "years": {
       "title": "Année"
-    }
+    },
+    "step1": {
+      "titleStart": "Ton ",
+      "titleEmphasis": "contexte",
+      "badge": "ÉTAPE 1"
+    },
+    "step2": {
+      "titleStart": "Tes ",
+      "titleEmphasis": "jours",
+      "badge": "ÉTAPE 2"
+    },
+    "steps": "Étapes"
   },
   "ptoDays": {
     "title": "Jours de congé",

@@ -1,10 +1,19 @@
 import { Link } from '@application/i18n/navigtion';
 import { Badge } from '@ui/modules/core/primitives/Badge';
 import { Button } from '@ui/modules/core/primitives/Button';
+import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';
 import { getWeekdayNames } from '@ui/utils/dates';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { version } from '../../../../../../package.json';
-import { CAL_ENTRIES, type DayType, dayCell } from './shared';
+import { CAL_ENTRIES, type DayType } from './shared';
+
+const HERO_DAY_CLASS: Record<DayType, string> = {
+  work: 'bg-card border-[2px] border-[var(--frame)]/15 rounded-lg',
+  pto: MODIFIERS_CLASS_NAMES.suggested,
+  holiday: MODIFIERS_CLASS_NAMES.holiday,
+  weekend:
+    'rounded-lg bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--card)_82%)] text-muted-foreground border-[2px] border-[var(--frame)]/20',
+};
 
 export const Hero = async () => {
   const [t, locale] = await Promise.all([getTranslations('homepage'), getLocale()]);
@@ -101,13 +110,13 @@ export const Hero = async () => {
               {CAL_ENTRIES.map(({ id, type }) => (
                 <div
                   key={id}
-                  className={`${dayCell[type]} aspect-square grid place-items-center font-mono text-[11px] font-bold`}
+                  className={`${HERO_DAY_CLASS[type]} aspect-square flex items-center justify-center font-mono text-[11px] font-bold shadow-none`}
                 >
                   {type === 'pto' ? '✈' : type === 'holiday' ? '★' : ''}
                 </div>
               ))}
             </div>
-            <div className='flex gap-3.5 mt-3 flex-wrap text-[11px]'>
+            <div className='flex gap-x-4 gap-y-2 mt-3 flex-wrap'>
               {(
                 [
                   { type: 'pto' as DayType, label: t('hero.mockupLegendPto') },
@@ -115,10 +124,10 @@ export const Hero = async () => {
                   { type: 'weekend' as DayType, label: t('hero.mockupLegendWeekend') },
                 ] as const
               ).map(({ type, label }) => (
-                <span key={label} className='inline-flex items-center gap-1.5'>
-                  <span className={`${dayCell[type]} w-4 h-4 inline-block`} />
-                  {label}
-                </span>
+                <div key={label} className='flex items-center gap-2 text-[11px]'>
+                  <div className={`${HERO_DAY_CLASS[type]} h-8 w-8 shrink-0`} />
+                  <span>{label}</span>
+                </div>
               ))}
             </div>
           </div>

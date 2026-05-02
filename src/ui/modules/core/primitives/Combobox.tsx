@@ -48,8 +48,8 @@ export const Combobox = ({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <AnimateIcon animateOnHover>
+      <AnimateIcon animateOnHover>
+        <PopoverTrigger asChild>
           <Button
             variant='outline'
             aria-expanded={open}
@@ -70,8 +70,8 @@ export const Combobox = ({
             )}
             <ChevronUpDown className='opacity-50' />
           </Button>
-        </AnimateIcon>
-      </PopoverTrigger>
+        </PopoverTrigger>
+      </AnimateIcon>
       <PopoverContent className='w-[200px] p-0' id='combobox-listbox'>
         <Command>
           <CommandInput placeholder={searchPlaceholder} className='h-9' />

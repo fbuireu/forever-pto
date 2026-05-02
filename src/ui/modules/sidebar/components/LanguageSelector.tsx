@@ -45,7 +45,7 @@ export const LanguageSelector = () => {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <AnimateIcon animateOnHover>
+        <AnimateIcon animateOnHover asChild>
           <Button
             variant='outline'
             size='icon'

@@ -308,26 +308,10 @@
     }
   },
   "tutorial": {
-    "description": "Start by entering your PTO details in the left sidebar: your PTO available, your country and your region. We will handle the rest for you. If you still have doubts you can click the following button to start an interactive tutorial.",
+    "description": "Set up your plan in 2 steps: your location first, then your days and strategy. Click below for an interactive walkthrough.",
     "startButton": "Start tutorial",
     "restartButton": "Restart Interactive Tutorial",
     "steps": {
-      "filtersTitle": "Filters & Configuration",
-      "filtersDescription": "Here you can configure all your PTO preferences. Set your available PTO days, select your country and region to get accurate holidays, choose the year, and customize your optimization strategy.",
-      "ptoDaysTitle": "PTO Days",
-      "ptoDaysDescription": "Enter the total number of PTO (Paid Time Off) days you have available for the year. This is the foundation for all calculations and suggestions.",
-      "countryTitle": "Country Selection",
-      "countryDescription": "We infer your country from your CDN by default but can select any desired country. From this value we will fetch the official public holidays to include them in your calendar.",
-      "regionTitle": "Region Selection",
-      "regionDescription": "Some countries have regional holidays. Select your specific region to get the most accurate holiday calendar for your area.",
-      "yearTitle": "Year Selection",
-      "yearDescription": "Choose the year you want to plan for. Holidays and suggestions will be generated for the selected year.",
-      "strategyTitle": "Optimization Strategy",
-      "strategyDescription": "Choose between different strategies to optimize your PTO. Each strategy has a different approach to grouping and maximizing your days off. You can expand the strategy details to learn more about each option.",
-      "allowPastDaysTitle": "Allow Past Days",
-      "allowPastDaysDescription": "Toggle this option if you want to include dates that have already passed in the current year. Useful for planning retrospectively or for next year.",
-      "carryOverTitle": "Carry Over Months",
-      "carryOverDescription": "If your PTO days carry over into the next year, specify how many months they remain valid. This helps you plan PTO usage across year boundaries.",
       "toolsTitle": "Calculators & Tools",
       "toolsDescription": "Access helpful calculators here: estimate your PTO based on work history, calculate the monetary value of unused PTO, or count workdays between dates.",
       "alternativesTitle": "Alternatives Manager",
@@ -339,7 +323,11 @@
       "finishTitle": "You're All Set!",
       "finishDescription": "Now you know how to use Forever PTO to maximize your time off. Start by configuring your preferences in the sidebar, and let the app suggest the best PTO days for you. Enjoy your well-deserved breaks!",
       "holidaysListTitle": "Customize Your Holidays",
-      "holidaysListDescription": "Here you can fine-tune the holiday data to match your exact situation. Edit or delete any national or regional holiday, and add your own custom days off — company holidays, local observances, or any date that matters to you. The more accurate the data, the better the suggestions."
+      "holidaysListDescription": "Here you can fine-tune the holiday data to match your exact situation. Edit or delete any national or regional holiday, and add your own custom days off — company holidays, local observances, or any date that matters to you. The more accurate the data, the better the suggestions.",
+      "step1Title": "Step 1 — Your context",
+      "step1Description": "Select your country, region, and the year you want to plan. This sets up your holiday calendar so we can find the best bridges.",
+      "step2Title": "Step 2 — Your available days",
+      "step2Description": "Enter how many PTO days you have and choose your optimization strategy. The strategy shapes how we group your days off."
     }
   },
   "legend": {
@@ -501,7 +489,18 @@
     },
     "years": {
       "title": "Year"
-    }
+    },
+    "step1": {
+      "titleStart": "Your ",
+      "titleEmphasis": "context",
+      "badge": "STEP 1"
+    },
+    "step2": {
+      "titleStart": "Your ",
+      "titleEmphasis": "days",
+      "badge": "STEP 2"
+    },
+    "steps": "Steps"
   },
   "ptoDays": {
     "title": "PTO Days",

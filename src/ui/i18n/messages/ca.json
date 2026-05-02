@@ -308,26 +308,10 @@
     }
   },
   "tutorial": {
-    "description": "Vols veure el tutorial interactiu de nou? Fes clic al botó de sota per reiniciar el tour guiat per totes les funcions i configuracions.",
+    "description": "Configura el teu pla en 2 passos: primer la teva ubicació, després els teus dies i estratègia. Prem el botó per a un tutorial interactiu.",
     "restartButton": "Reiniciar Tutorial Interactiu",
     "startButton": "Iniciar Tutorial",
     "steps": {
-      "filtersTitle": "Filtres i Configuració",
-      "filtersDescription": "Aquí pots configurar totes les teves preferències de PTO. Estableix els teus dies de PTO disponibles, selecciona el teu país i regió per obtenir festius precisos, tria l'any i personalitza la teva estratègia d'optimització.",
-      "ptoDaysTitle": "Dies de PTO",
-      "ptoDaysDescription": "Introdueix el nombre total de dies de PTO (temps lliure remunerat) que tens disponibles per a l'any. Aquesta és la base per a tots els càlculs i suggeriments.",
-      "countryTitle": "Selecció de País",
-      "countryDescription": "Inferim el teu país des del teu CDN per defecte però pots seleccionar qualsevol país desitjat. Amb aquest valor obtindrem els festius públics oficials per incloure'ls al teu calendari.",
-      "regionTitle": "Selecció de Regió",
-      "regionDescription": "Alguns països tenen festius regionals. Selecciona la teva regió específica per obtenir el calendari de festius més precís per a la teva àrea.",
-      "yearTitle": "Selecció d'Any",
-      "yearDescription": "Tria l'any per al qual vols planificar. Els festius i suggeriments es generaran per a l'any seleccionat.",
-      "strategyTitle": "Estratègia d'Optimització",
-      "strategyDescription": "Tria entre diferents estratègies per optimitzar el teu PTO. Cada estratègia té un enfocament diferent per agrupar i maximitzar els teus dies lliures. Pots expandir els detalls de l'estratègia per saber-ne més sobre cada opció.",
-      "allowPastDaysTitle": "Permetre Dies Passats",
-      "allowPastDaysDescription": "Activa aquesta opció si vols incloure dates que ja han passat a l'any actual. Útil per planificar retrospectivament o per al proper any.",
-      "carryOverTitle": "Mesos d'Arrossegament",
-      "carryOverDescription": "Si els teus dies de PTO s'arrosseguen al següent any, especifica quants mesos romanen vàlids. Això t'ajuda a planificar l'ús de PTO entre anys.",
       "toolsTitle": "Calculadores i Eines",
       "toolsDescription": "Accedeix a calculadores útils aquí: estima el teu PTO basant-te en historial laboral, calcula el valor monetari del PTO no utilitzat, o compta dies laborables entre dates.",
       "alternativesTitle": "Gestor d'Alternatives",
@@ -339,7 +323,11 @@
       "finishTitle": "Ja Està Tot Llest!",
       "finishDescription": "Ara saps com usar Forever PTO per maximitzar el teu temps lliure. Comença configurant les teves preferències a la barra lateral, i deixa que l'app et suggereixi els millors dies de PTO. Gaudeix dels teus merescuts descansos!",
       "holidaysListTitle": "Personalitza els teus festius",
-      "holidaysListDescription": "Aquí pots ajustar les dades de festius perquè s'adaptin exactament a la teva situació. Edita o elimina qualsevol festiu nacional o regional, i afegeix els teus propis dies personalitzats: festius d'empresa, celebracions locals o qualsevol data que sigui rellevant per a tu. Com més precisos siguin les dades, millors seran els suggeriments."
+      "holidaysListDescription": "Aquí pots ajustar les dades de festius perquè s'adaptin exactament a la teva situació. Edita o elimina qualsevol festiu nacional o regional, i afegeix els teus propis dies personalitzats: festius d'empresa, celebracions locals o qualsevol data que sigui rellevant per a tu. Com més precisos siguin les dades, millors seran els suggeriments.",
+      "step1Title": "Pas 1 — El teu context",
+      "step1Description": "Selecciona el teu país, regió i l'any que vols planificar. Això configura el teu calendari de festius per trobar els millors ponts.",
+      "step2Title": "Pas 2 — Els teus dies disponibles",
+      "step2Description": "Indica quants dies de vacances tens i tria la teva estratègia d'optimització. L'estratègia determina com agrupem els teus dies lliures."
     }
   },
   "legend": {
@@ -501,7 +489,18 @@
     },
     "years": {
       "title": "Any"
-    }
+    },
+    "step1": {
+      "titleStart": "El teu ",
+      "titleEmphasis": "context",
+      "badge": "PAS 1"
+    },
+    "step2": {
+      "titleStart": "Els teus ",
+      "titleEmphasis": "dies",
+      "badge": "PAS 2"
+    },
+    "steps": "Passos"
   },
   "ptoDays": {
     "title": "Dies de PTO",
