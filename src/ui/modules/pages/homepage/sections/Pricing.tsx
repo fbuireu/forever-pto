@@ -15,7 +15,7 @@ export const Pricing = async () => {
           <Badge variant='outline'>{t('pricing.badge')}</Badge>
         </div>
         <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] mb-4 text-[clamp(36px,5vw,64px)]'>
-          {t('pricing.titleStart')} <em className='font-serif italic font-semibold'>{t('pricing.titleEmphasis')}</em>
+          {t('pricing.titleStart')} <em className='font-serif italic'>{t('pricing.titleEmphasis')}</em>
         </h2>
         <p className='text-[19px] text-muted-foreground max-w-[640px] mx-auto'>{t('pricing.description')}</p>
       </div>

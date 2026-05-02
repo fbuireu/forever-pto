@@ -27,8 +27,7 @@ export const Testimonials = async () => {
           <Badge variant='outline'>{t('testimonials.badge')}</Badge>
         </div>
         <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] text-[clamp(36px,5vw,64px)]'>
-          {t('testimonials.titleStart')}{' '}
-          <em className='font-serif italic font-semibold'>{t('testimonials.titleEmphasis')}</em>{' '}
+          {t('testimonials.titleStart')} <em className='font-serif italic'>{t('testimonials.titleEmphasis')}</em>{' '}
           {t('testimonials.titleEnd')}
         </h2>
       </div>

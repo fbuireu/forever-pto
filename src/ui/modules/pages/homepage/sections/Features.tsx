@@ -12,7 +12,7 @@ export const Features = async () => {
           <Badge variant='outline'>{t('features.badge')}</Badge>
         </div>
         <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] mb-4 text-[clamp(36px,5vw,64px)]'>
-          {t('features.titleStart')} <em className='font-serif italic font-semibold'>{t('features.titleEmphasis')}</em>{' '}
+          {t('features.titleStart')} <em className='font-serif italic'>{t('features.titleEmphasis')}</em>{' '}
           {t('features.titleEnd')}
         </h2>
         <p className='text-[19px] text-muted-foreground'>{t('features.description')}</p>

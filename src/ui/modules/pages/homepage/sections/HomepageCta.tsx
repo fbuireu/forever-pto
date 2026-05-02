@@ -2,7 +2,7 @@ import { Link } from '@application/i18n/navigtion';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { getTranslations } from 'next-intl/server';
 
-export const FinalCta = async () => {
+export const HomepageCta = async () => {
   const t = await getTranslations('homepage');
 
   return (

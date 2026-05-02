@@ -12,8 +12,8 @@ export const HowItWorks = async () => {
           <Badge variant='outline'>{t('how.badge')}</Badge>
         </div>
         <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] mb-4 text-[clamp(36px,5vw,64px)]'>
-          {t('how.titleStart')} <em className='font-serif italic font-semibold'>&ldquo;{t('how.question1')}&rdquo;</em>{' '}
-          {t('how.titleMid')} <em className='font-serif italic font-semibold'>&ldquo;{t('how.question2')}&rdquo;</em>{' '}
+          {t('how.titleStart')} <em className='font-serif italic'>&ldquo;{t('how.question1')}&rdquo;</em>{' '}
+          {t('how.titleMid')} <em className='font-serif italic'>&ldquo;{t('how.question2')}&rdquo;</em>{' '}
           {t('how.titleEnd')}
         </h2>
         <p className='text-[19px] text-muted-foreground max-w-[640px] mx-auto'>{t('how.description')}</p>

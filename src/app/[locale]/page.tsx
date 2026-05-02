@@ -2,8 +2,8 @@ import { LOCALES } from '@infrastructure/i18n/config';
 import { Comparison } from '@ui/modules/pages/homepage/sections/Comparison';
 import { Faq } from '@ui/modules/pages/homepage/sections/Faq';
 import { Features } from '@ui/modules/pages/homepage/sections/Features';
-import { FinalCta } from '@ui/modules/pages/homepage/sections/FinalCta';
 import { Hero } from '@ui/modules/pages/homepage/sections/Hero';
+import { HomepageCta } from '@ui/modules/pages/homepage/sections/HomepageCta';
 import { HowItWorks } from '@ui/modules/pages/homepage/sections/HowItWorks';
 import { Marquee } from '@ui/modules/pages/homepage/sections/Marquee';
 import { Pricing } from '@ui/modules/pages/homepage/sections/Pricing';
@@ -42,7 +42,7 @@ const HomePage = async ({ params }: PageProps) => {
         <Testimonials />
         <Pricing />
         <Faq />
-        <FinalCta />
+        <HomepageCta />
         <DonateClient />
       </main>
       <div className='px-7 py-8 bg-background border-t-4 border-(--frame)'>
@@ -59,11 +59,9 @@ export default HomePage;
 // todo: brutalist design (show legend in button, remove old brand, redo logo)
 // todo: Check DSM (dark mode, tipografies, colors, etc)
 // todo: 400 and 500 page
-// todo: check all buttons
-// todo: check all// todo: check lang strings (rename landing for home, no use fi// todo: check lang strings (rename landing for home, no use finalCta or strings like that, etc)
+// todo: check all// todo: check lang strings (rename landing for home, no use fi
 // todo: focus input order in stripe
 // todo: unify styles and check everything
-// todo: html issues (button desc button)
 // todo: improve responsive
 // todo: https://effect.website/
 // todo: https://csswizardry.com/2026/04/what-is-css-containment-and-how-can-i-use-it/
