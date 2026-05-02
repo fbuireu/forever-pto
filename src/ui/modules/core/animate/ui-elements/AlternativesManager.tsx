@@ -9,7 +9,6 @@ import { useCallback, useState } from 'react';
 import { Button } from '../components/buttons/Button';
 import { ChevronLeft } from '../icons/ChevronLeft';
 import { ChevronRight } from '../icons/ChevronRight';
-import { AnimateIcon } from '../icons/Icon';
 import { SlidingNumber } from '../text/SlidingNumber';
 
 interface AlternativeManagerProps {
@@ -65,7 +64,6 @@ export const AlternativesManager = ({
 }: AlternativeManagerProps) => {
   const t = useTranslations('alternativesManager');
   const [currentIndex, setCurrentIndex] = useState(selectedIndex);
-
   const totalOptions = allSuggestions.length;
   const currentSuggestion = allSuggestions[currentIndex];
 
@@ -88,7 +86,6 @@ export const AlternativesManager = ({
   const effectiveDays = currentSuggestion.metrics?.totalEffectiveDays ?? 0;
   const efficiency = currentSuggestion.metrics?.averageEfficiency ?? 0;
   const gainedDays = currentSuggestion.metrics?.bonusDays ?? 0;
-
   const mainEfficiency = allSuggestions[0]?.metrics?.averageEfficiency ?? 0;
   const efficiencyDiff = efficiency - mainEfficiency;
   const isMainSuggestion = currentIndex === 0;
@@ -98,18 +95,18 @@ export const AlternativesManager = ({
       className='sticky top-0 z-10 flex w-fit flex-wrap items-center gap-3 rounded-[14px] border-[3px] border-[var(--frame)] bg-card p-3 shadow-[var(--shadow-brutal-lg)]'
       data-tutorial='alternatives-manager'
     >
-      <div className='flex shrink-0 grow items-center rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-2 shadow-[var(--shadow-brutal-xs)]'>
-        <AnimateIcon animateOnHover={currentIndex !== 0}>
-          <Button
-            disabled={currentIndex === 0}
-            variant='ghost'
-            onClick={handlePrevious}
-            aria-label={t('previousSuggestion')}
-          >
-            <ChevronLeft size={20} />
-          </Button>
-        </AnimateIcon>
-        <div className='mx-2 flex w-25 grow flex-col items-center relative duration-300 ease-out'>
+      <div className='flex shrink-0 grow items-stretch overflow-hidden rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-xs)]'>
+        <m.button
+          type='button'
+          whileTap={{ filter: 'brightness(0.85)' }}
+          disabled={currentIndex === 0}
+          onClick={handlePrevious}
+          aria-label={t('previousSuggestion')}
+          className='w-11 flex items-center justify-center bg-[var(--surface-panel-soft)] hover:bg-[var(--accent)] transition-colors duration-75 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 select-none border-r-[3px] border-[var(--frame)]'
+        >
+          <ChevronLeft size={20} />
+        </m.button>
+        <div className='mx-2 flex grow flex-col items-center justify-center relative duration-300 ease-out py-2'>
           <div className='flex items-center space-x-1 text-sm tabular-nums'>
             <span className='text-xs text-muted-foreground'>{t('option')}</span>
             <SlidingNumber className='text-base font-semibold text-foreground' padStart number={currentIndex + 1} />
@@ -127,16 +124,16 @@ export const AlternativesManager = ({
             </m.span>
           )}
         </div>
-        <AnimateIcon animateOnHover={currentIndex !== totalOptions - 1}>
-          <Button
-            disabled={currentIndex === totalOptions - 1}
-            variant='ghost'
-            onClick={handleNext}
-            aria-label={t('nextSuggestion')}
-          >
-            <ChevronRight size={20} />
-          </Button>
-        </AnimateIcon>
+        <m.button
+          type='button'
+          whileTap={{ filter: 'brightness(0.85)' }}
+          disabled={currentIndex === totalOptions - 1}
+          onClick={handleNext}
+          aria-label={t('nextSuggestion')}
+          className='w-11 flex items-center justify-center bg-[var(--surface-panel-soft)] hover:bg-[var(--accent)] transition-colors duration-75 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 select-none border-l-[3px] border-[var(--frame)]'
+        >
+          <ChevronRight size={20} />
+        </m.button>
       </div>
 
       <div className='hidden lg:block mx-1 h-9 w-[2px] bg-[var(--frame)]/15 rounded-full' />

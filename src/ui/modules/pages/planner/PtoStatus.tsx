@@ -63,25 +63,25 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
             />
           </div>
           <div className='h-8 w-[2px] bg-[var(--frame)]/15' />
-          <div className='flex items-center gap-2 rounded-full border-[3px] border-[var(--frame)] bg-[var(--surface-panel-alt)] px-3 py-1.5 shadow-[var(--shadow-brutal-xs)]'>
-            <span className='text-sm font-display font-black uppercase tracking-[0.08em]'>{t('remaining')}:</span>
-            <SlidingNumber
-              number={remaining}
-              className={cn(
-                'text-xl font-display font-black',
-                remaining > 0 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
+          <div className='flex flex-col items-center rounded-full border-[3px] border-[var(--frame)] bg-[var(--surface-panel-alt)] px-3 py-1.5 shadow-[var(--shadow-brutal-xs)]'>
+            <div className='flex items-center gap-2'>
+              <span className='text-sm font-display font-black uppercase tracking-[0.08em]'>{t('remaining')}:</span>
+              <SlidingNumber
+                number={remaining}
+                className={cn(
+                  'text-xl font-display font-black',
+                  remaining > 0 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
+                )}
+              />
+              {remaining > 0 && (
+                <span className='flex items-center text-muted-foreground'>
+                  <MousePointerClick className='h-3 w-3' />
+                  <span className='text-[10px]'>{t('clickDays')}</span>
+                </span>
               )}
-            />
-            {remaining > 0 && (
-              <span className='flex items-center text-muted-foreground ml-1'>
-                <MousePointerClick className='h-3 w-3' />
-                <span className='text-[10px]'>{t('clickDays')}</span>
-              </span>
-            )}
+            </div>
             {remaining === 0 && !hasManualChanges && (
-              <span className='text-[10px] text-green-700 dark:text-green-400 font-medium ml-1'>
-                ✓ {t('allAssigned')}
-              </span>
+              <span className='text-[10px] text-green-700 dark:text-green-400 font-medium'>✓ {t('allAssigned')}</span>
             )}
           </div>
         </div>
