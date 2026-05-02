@@ -752,10 +752,19 @@
     "footerStatus": "stato: ok · uptime: 99.98%"
   },
   "error": {
-    "title": "Qualcosa è andato storto",
-    "description": "Si è verificato un errore imprevisto. Per favore, riprova.",
     "retry": "Riprova",
-    "returnHome": "Torna alla home"
+    "kicker": "Internal server error · v{version} · {time} UTC",
+    "title": "Il server si è preso un",
+    "titleHighlight": "giorno libero",
+    "titleEmphasis": "senza permesso.",
+    "lede": "Qualcosa è esploso dalla nostra parte. Non è colpa tua (questa volta). Il nostro team lo sa già — i log stanno fumando e ci stiamo lavorando. Riprova tra qualche minuto, o controlla lo stato in tempo reale.",
+    "statusPage": "Vedi stato",
+    "meanwhile": "Nel frattempo:",
+    "contact": "Segnala un problema",
+    "changelog": "Guarda le modifiche",
+    "support": "Apri un report di bug",
+    "terminalPrompt": "lo-stiamo-sistemando _",
+    "internalServerError": "errore interno del server"
   },
   "footer": {
     "privacyPolicy": "Informativa sulla Privacy",

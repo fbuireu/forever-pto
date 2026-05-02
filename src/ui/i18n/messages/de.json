@@ -740,10 +740,19 @@
     "returnHome": "Zurück zur Startseite"
   },
   "error": {
-    "title": "Etwas ist schiefgelaufen",
-    "description": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.",
     "retry": "Erneut versuchen",
-    "returnHome": "Zurück zur Startseite"
+    "kicker": "Internal server error · v{version} · {time} UTC",
+    "title": "Der Server hat sich einen",
+    "titleHighlight": "freien Tag",
+    "titleEmphasis": "ohne Erlaubnis genommen.",
+    "lede": "Auf unserer Seite ist etwas explodiert. Nicht deine Schuld (dieses Mal). Unser Team weiß davon — die Logs rauchen und wir sind dabei. Versuche es in einigen Minuten erneut, oder prüfe den Live-Status.",
+    "statusPage": "Status ansehen",
+    "meanwhile": "In der Zwischenzeit:",
+    "contact": "Problem melden",
+    "changelog": "Änderungen ansehen",
+    "support": "Bug-Report öffnen",
+    "terminalPrompt": "wird-behoben _",
+    "internalServerError": "interner Serverfehler"
   },
   "footer": {
     "privacyPolicy": "Datenschutzerklärung",

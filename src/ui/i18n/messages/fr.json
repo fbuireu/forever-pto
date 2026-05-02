@@ -740,10 +740,19 @@
     "returnHome": "Retour à l'accueil"
   },
   "error": {
-    "title": "Quelque chose s'est mal passé",
-    "description": "Une erreur inattendue s'est produite. Réessaie.",
     "retry": "Réessayer",
-    "returnHome": "Retour à l'accueil"
+    "kicker": "Internal server error · v{version} · {time} UTC",
+    "title": "Le serveur a pris un",
+    "titleHighlight": "jour de congé",
+    "titleEmphasis": "sans permission.",
+    "lede": "Quelque chose a explosé de notre côté. Ce n'est pas ta faute (cette fois). Notre équipe est déjà dessus — les logs fument et on s'en occupe. Reviens dans quelques minutes, ou consulte le statut en direct.",
+    "statusPage": "Voir le statut",
+    "meanwhile": "En attendant :",
+    "contact": "Signaler un problème",
+    "changelog": "Voir les changements",
+    "support": "Ouvrir un rapport de bug",
+    "terminalPrompt": "on-répare-ça _",
+    "internalServerError": "erreur interne du serveur"
   },
   "footer": {
     "privacyPolicy": "Politique de confidentialité",

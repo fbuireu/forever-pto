@@ -752,10 +752,19 @@
     "footerStatus": "status: ok · uptime: 99.98%"
   },
   "error": {
-    "title": "Something went wrong",
-    "description": "An unexpected error occurred. Please try again.",
     "retry": "Try again",
-    "returnHome": "Return to homepage"
+    "kicker": "Internal server error · v{version} · {time} UTC",
+    "title": "The server took a",
+    "titleHighlight": "day off",
+    "titleEmphasis": "without asking.",
+    "lede": "Something exploded on our end. Not your fault (this time). Our team is already on it — logs are smoking and we are on it. Try again in a few minutes, or check the live status.",
+    "statusPage": "View status",
+    "meanwhile": "Meanwhile:",
+    "contact": "Report an issue",
+    "changelog": "Check what changed",
+    "support": "Open a bug report",
+    "terminalPrompt": "fixing-it-now _",
+    "internalServerError": "internal server error"
   },
   "footer": {
     "privacyPolicy": "Privacy Policy",

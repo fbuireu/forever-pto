@@ -9,7 +9,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@ui/modules/core/primitives/Dialog';
@@ -113,12 +112,15 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className='sm:max-w-lg'>
         <DialogHeader>
-          <DialogTitle className='flex items-center gap-2'>
-            <Mail className='w-5 h-5 text-primary' />
+          <DialogTitle className='flex items-center gap-3'>
+            <span className='w-9 h-9 bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] grid place-items-center shrink-0'>
+              <Mail className='w-4 h-4' />
+            </span>
             {t('title')}
           </DialogTitle>
           <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
+
         {step === Step.INPUT && (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4' noValidate>
@@ -127,7 +129,9 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                 name='name'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('name')}</FormLabel>
+                    <FormLabel className='font-mono text-[11px] font-bold tracking-[0.1em] uppercase'>
+                      {t('name')}
+                    </FormLabel>
                     <FormControl>
                       <Input placeholder={t('namePlaceholder')} inputMode='text' autoComplete='name' {...field} />
                     </FormControl>
@@ -141,7 +145,9 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                 name='email'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('email')}</FormLabel>
+                    <FormLabel className='font-mono text-[11px] font-bold tracking-[0.1em] uppercase'>
+                      {t('email')}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type='email'
@@ -161,7 +167,9 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                 name='subject'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('subject')}</FormLabel>
+                    <FormLabel className='font-mono text-[11px] font-bold tracking-[0.1em] uppercase'>
+                      {t('subject')}
+                    </FormLabel>
                     <FormControl>
                       <Input placeholder={t('subjectPlaceholder')} inputMode='text' autoComplete='off' {...field} />
                     </FormControl>
@@ -175,7 +183,9 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
                 name='message'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('message')}</FormLabel>
+                    <FormLabel className='font-mono text-[11px] font-bold tracking-[0.1em] uppercase'>
+                      {t('message')}
+                    </FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder={t('messagePlaceholder')}
@@ -200,33 +210,44 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
         )}
 
         {step === Step.SUCCESS && (
-          <div className='text-center space-y-4 py-4'>
-            <CircleCheckBig animateOnView loop loopDelay={2000} className='w-12 h-12 text-green-500 mx-auto' />
-            <div>
-              <h3 className='font-semibold text-green-600'>{t('successTitle')}</h3>
-              <p className='text-sm text-muted-foreground mt-1'>{t('successDescription')}</p>
+          <div className='flex flex-col items-center gap-5 py-4'>
+            <div className='w-16 h-16 bg-[var(--color-brand-teal)] border-[3px] border-[var(--frame)] rounded-[14px] shadow-[5px_5px_0_0_var(--frame)] grid place-items-center'>
+              <CircleCheckBig animateOnView className='w-8 h-8 text-[var(--color-brand-ink)]' />
             </div>
+            <div className='text-center'>
+              <span className='inline-flex items-center gap-2 bg-[var(--color-brand-teal)] border-[2px] border-[var(--frame)] rounded-[6px] px-3 py-1 font-mono text-[11px] font-bold tracking-[0.12em] uppercase mb-3'>
+                <span className='w-1.5 h-1.5 rounded-full bg-[var(--color-brand-ink)]' />
+                {t('successTitle')}
+              </span>
+              <p className='text-sm text-muted-foreground'>{t('successDescription')}</p>
+            </div>
+            <Button variant='outline' size='sm' onClick={handleClose}>
+              {t('close')}
+            </Button>
           </div>
         )}
 
         {step === Step.ERROR && (
-          <DialogFooter>
-            <div className='text-center space-y-4 py-4'>
-              <AlertCircle className='w-12 h-12 text-destructive mx-auto' />
-              <div>
-                <h3 className='font-semibold'>{t('errorTitle')}</h3>
-                <p className='text-sm text-muted-foreground mt-1'>{errorMessage}</p>
-              </div>
-              <div className='flex gap-2 pt-2'>
-                <Button onClick={handleTryAgain} variant='outline' className='flex-1'>
-                  {t('tryAgain')}
-                </Button>
-                <Button onClick={handleClose} className='flex-1'>
-                  {t('close')}
-                </Button>
-              </div>
+          <div className='flex flex-col items-center gap-5 py-4'>
+            <div className='w-16 h-16 bg-destructive border-[3px] border-[var(--frame)] rounded-[14px] shadow-[5px_5px_0_0_var(--frame)] grid place-items-center'>
+              <AlertCircle className='w-8 h-8 text-white' />
             </div>
-          </DialogFooter>
+            <div className='text-center'>
+              <span className='inline-flex items-center gap-2 bg-destructive text-white border-[2px] border-[var(--frame)] rounded-[6px] px-3 py-1 font-mono text-[11px] font-bold tracking-[0.12em] uppercase mb-3'>
+                <span className='w-1.5 h-1.5 rounded-full bg-white' />
+                {t('errorTitle')}
+              </span>
+              <p className='text-sm text-muted-foreground'>{errorMessage}</p>
+            </div>
+            <div className='flex gap-2 w-full'>
+              <Button variant='outline' onClick={handleTryAgain} className='flex-1'>
+                {t('tryAgain')}
+              </Button>
+              <Button onClick={handleClose} className='flex-1'>
+                {t('close')}
+              </Button>
+            </div>
+          </div>
         )}
       </DialogContent>
     </Dialog>

@@ -752,10 +752,19 @@
     "footerStatus": "estat: ok · uptime: 99.98%"
   },
   "error": {
-    "title": "Alguna cosa ha anat malament",
-    "description": "S'ha produït un error inesperat. Si us plau, torna-ho a provar.",
     "retry": "Tornar a provar",
-    "returnHome": "Tornar a l'inici"
+    "kicker": "Internal server error · v{version} · {time} UTC",
+    "title": "El servidor s'ha agafat un",
+    "titleHighlight": "dia lliure",
+    "titleEmphasis": "sense demanar.",
+    "lede": "Alguna cosa ha explotat al nostre costat. No és culpa teva (aquesta vegada). El nostre equip ja ho ha vist — els logs estan fumejant i hi estem. Torna en uns minuts, o mira l'estat en viu.",
+    "statusPage": "Veure estat",
+    "meanwhile": "Mentrestant:",
+    "contact": "Reportar un problema",
+    "changelog": "Veure els canvis",
+    "support": "Obrir un informe d'error",
+    "terminalPrompt": "anem-a-arreglar-ho _",
+    "internalServerError": "error intern del servidor"
   },
   "footer": {
     "privacyPolicy": "Política de Privadesa",

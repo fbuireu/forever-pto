@@ -752,10 +752,19 @@
     "footerStatus": "estado: ok · uptime: 99.98%"
   },
   "error": {
-    "title": "Algo salió mal",
-    "description": "Se ha producido un error inesperado. Por favor, inténtalo de nuevo.",
     "retry": "Intentar de nuevo",
-    "returnHome": "Volver al inicio"
+    "kicker": "Internal server error · v{version} · {time} UTC",
+    "title": "El servidor se tomó un",
+    "titleHighlight": "día libre",
+    "titleEmphasis": "sin permiso.",
+    "lede": "Algo explotó en nuestro lado. No es culpa tuya (esta vez). Nuestro equipo ya lo vio — los logs están humeando y estamos en ello. Vuelve en unos minutos, o mira el estado en vivo.",
+    "statusPage": "Ver estado",
+    "meanwhile": "Mientras tanto:",
+    "contact": "Reportar un problema",
+    "changelog": "Ver qué ha cambiado",
+    "support": "Abrir un informe de error",
+    "terminalPrompt": "vamos-a-arreglarlo _",
+    "internalServerError": "error interno del servidor"
   },
   "footer": {
     "privacyPolicy": "Política de Privacidad",

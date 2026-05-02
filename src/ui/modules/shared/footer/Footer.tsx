@@ -1,18 +1,23 @@
+'use client';
+
 import { Link } from '@application/i18n/navigtion';
-import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 import { version } from '../../../../../package.json';
 import { ContactButton } from '../contact/ContactButton';
 import { CookieButton } from './components/CookieButton';
 import { DevFooter } from './components/DevFooter';
 
-export const Footer = async () => {
-  const t = await getTranslations('footer');
+export const Footer = () => {
+  const t = useTranslations('footer');
 
   return (
     <footer className='w-full bg-card border-t-[3px] border-[var(--frame)]'>
       <div className='max-w-4xl mx-auto'>
         <div className='flex items-center justify-between flex-wrap gap-3 px-6 pt-5 pb-4 border-b-[2px] border-[var(--frame)]/18'>
-          <div className='flex items-center gap-2 font-display font-extrabold text-[18px] tracking-[-0.02em]'>
+          <Link
+            href='/'
+            className='flex items-center gap-2 font-display font-extrabold text-[18px] tracking-[-0.02em] hover:opacity-80 transition-opacity'
+          >
             <div
               className='w-[30px] h-[30px] bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[2px_2px_0_0_var(--frame)] grid place-items-center text-[16px] shrink-0'
               style={{ transform: 'rotate(-4deg)' }}
@@ -21,7 +26,7 @@ export const Footer = async () => {
               🌴
             </div>
             <span>Forever PTO</span>
-          </div>
+          </Link>
           <span className='font-mono text-[11px] text-muted-foreground'>
             {t('version', { version }).replace('●', '')}
             <span className='text-red-500 animate-pulse'>●</span>
