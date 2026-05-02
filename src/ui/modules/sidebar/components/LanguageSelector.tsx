@@ -14,7 +14,7 @@ import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { Check } from '@ui/modules/core/animate/icons/Check';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { useLocale, useTranslations } from 'next-intl';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export const LanguageSelector = () => {
   const locale = useLocale();
@@ -40,15 +40,18 @@ export const LanguageSelector = () => {
   const currentLanguage = useMemo(() => languages.find(({ code }) => code === locale), [languages, locale]);
   const displayText = state === 'collapsed' ? currentLanguage?.code : currentLanguage?.label;
 
+  const [open, setOpen] = useState(false);
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <AnimateIcon animateOnHover asChild>
+        <AnimateIcon animateOnHover>
           <Button
             variant='outline'
             size='icon'
             className='w-full h-11! focus-visible:ring-1'
             aria-label={t('selectLanguage', { current: currentLanguage?.label ?? locale })}
+            animate={{ x: open ? -2 : 0, y: open ? -2 : 0 }}
           >
             <span className='capitalize'>{displayText}</span>
           </Button>

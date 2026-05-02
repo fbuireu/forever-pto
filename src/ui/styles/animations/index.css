@@ -35,12 +35,26 @@
   }
 
   @keyframes highlight-shake {
-    0%, 75%, 100% { transform: rotate(-2deg); }
-    77%  { transform: rotate(-2deg) translateX(-3px); }
-    80%  { transform: rotate(-2deg) translateX(3px); }
-    83%  { transform: rotate(-2deg) translateX(-2px); }
-    86%  { transform: rotate(-2deg) translateX(1px); }
-    89%  { transform: rotate(-2deg) translateX(0); }
+    0%,
+    75%,
+    100% {
+      transform: rotate(-2deg);
+    }
+    77% {
+      transform: rotate(-2deg) translateX(-3px);
+    }
+    80% {
+      transform: rotate(-2deg) translateX(3px);
+    }
+    83% {
+      transform: rotate(-2deg) translateX(-2px);
+    }
+    86% {
+      transform: rotate(-2deg) translateX(1px);
+    }
+    89% {
+      transform: rotate(-2deg) translateX(0);
+    }
   }
 
   @supports (view-transition-name: root) {
@@ -51,12 +65,20 @@
       animation: theme-fade-in 0.2s ease-out;
     }
     @keyframes theme-fade-out {
-      from { opacity: 1; }
-      to   { opacity: 0; }
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
     }
     @keyframes theme-fade-in {
-      from { opacity: 0; }
-      to   { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
     }
   }
 

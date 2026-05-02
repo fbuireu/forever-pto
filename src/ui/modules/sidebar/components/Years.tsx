@@ -34,13 +34,14 @@ export const Years = () => {
       </label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <AnimateIcon animateOnHover asChild>
+          <AnimateIcon animateOnHover>
             <Button
               id='years'
               variant='outline'
               aria-expanded={open}
               aria-haspopup='listbox'
               className={cn('w-full justify-between')}
+              animate={{ x: open ? -2 : 0, y: open ? -2 : 0 }}
             >
               {year}
               <ChevronDown className={cn('opacity-50 transition-transform duration-200', open && 'rotate-180')} />
