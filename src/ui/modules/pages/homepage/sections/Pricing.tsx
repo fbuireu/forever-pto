@@ -54,7 +54,7 @@ export const Pricing = async () => {
         </div>
         <div
           className={`${brutCard} p-8 relative rotate-[-1deg] transition-all duration-75 hover:rotate-0 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
-          style={{ background: 'var(--accent)' }}
+          style={{ background: 'var(--accent)', color: 'var(--color-brand-ink)' }}
         >
           <div className='absolute -top-4 right-[22px] bg-[var(--frame)] text-[var(--background)] font-mono font-bold text-[12px] px-3 py-1.5 rounded-[6px] rotate-[4deg]'>
             {t('pricing.popularBadge')}
@@ -62,12 +62,14 @@ export const Pricing = async () => {
           <h3 className='font-display font-extrabold text-[28px] tracking-[-0.02em] mb-2'>
             {t('pricing.lifetimeName')}
           </h3>
-          <p className='text-[14px] text-muted-foreground mb-4'>{t('pricing.lifetimeTagline')}</p>
+          <p className='text-[14px] text-[var(--color-brand-ink)]/60 mb-4'>{t('pricing.lifetimeTagline')}</p>
           <div className='font-display font-extrabold text-[64px] leading-none tracking-[-0.04em] mb-1.5'>
             {t('pricing.lifetimePrice')}
-            <span className='text-[18px] text-muted-foreground font-semibold'>{t('pricing.lifetimePer')}</span>
+            <span className='text-[18px] text-[var(--color-brand-ink)]/60 font-semibold'>
+              {t('pricing.lifetimePer')}
+            </span>
           </div>
-          <p className='font-mono text-[12px] text-muted-foreground mb-5'>{t('pricing.lifetimeNote')}</p>
+          <p className='font-mono text-[12px] text-[var(--color-brand-ink)]/60 mb-5'>{t('pricing.lifetimeNote')}</p>
           <ul className='list-none mb-6'>
             {(
               [

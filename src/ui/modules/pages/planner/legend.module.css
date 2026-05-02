@@ -18,7 +18,7 @@
   cursor: pointer;
   font-size: var(--text-sm);
   font-weight: 600;
-  color: var(--primary);
+  color: var(--color-brand-ink);
   padding: calc(var(--spacing) * 1) calc(var(--spacing) * 3);
   border: 2.5px solid var(--frame);
   border-radius: 8px;

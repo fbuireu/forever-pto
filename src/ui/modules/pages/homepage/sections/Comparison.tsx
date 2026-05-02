@@ -40,11 +40,14 @@ export const Comparison = async () => {
           </ul>
         </div>
         <div className='grid place-items-center'>
-          <div className='w-16 h-16 rounded-full bg-[var(--accent)] border-[4px] border-[var(--frame)] shadow-[4px_4px_0_0_var(--frame)] grid place-items-center font-display font-extrabold text-[18px] rotate-[-8deg]'>
+          <div className='w-16 h-16 rounded-full bg-[var(--accent)] text-[var(--color-brand-ink)] border-[4px] border-[var(--frame)] shadow-[4px_4px_0_0_var(--frame)] grid place-items-center font-display font-extrabold text-[18px] rotate-[-8deg]'>
             VS
           </div>
         </div>
-        <div className={`${brutCard} p-7 rotate-[1deg]`} style={{ background: 'var(--color-brand-green)' }}>
+        <div
+          className={`${brutCard} p-7 rotate-[1deg] text-[var(--color-brand-ink)]`}
+          style={{ background: 'var(--color-brand-green)' }}
+        >
           <h3 className='font-display font-extrabold text-[22px] mb-4'>{t('comparison.withTitle')}</h3>
           <ul className='list-none'>
             {(

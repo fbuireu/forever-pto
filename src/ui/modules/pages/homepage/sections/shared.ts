@@ -36,7 +36,7 @@ export const CAL_ENTRIES = CAL_PATTERN.map((type, i) => ({ id: `d${i + 1}`, type
 export const DAY_HEADERS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
 export const dayCell: Record<DayType, string> = {
-  work: 'bg-card border-[2px] border-[var(--frame)] rounded-[5px]',
+  work: 'bg-card text-foreground border-[2px] border-[var(--frame)] rounded-[5px]',
   holiday: 'bg-[var(--color-brand-orange)] text-white border-[2px] border-[var(--frame)] rounded-[5px]',
   pto: 'bg-[var(--color-brand-teal)] text-white border-[2px] border-[var(--frame)] rounded-lg',
   weekend: 'bg-[var(--surface-panel-soft)] text-muted-foreground border-[2px] border-[var(--frame)] rounded-[5px]',

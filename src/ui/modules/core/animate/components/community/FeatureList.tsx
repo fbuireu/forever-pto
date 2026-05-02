@@ -82,7 +82,7 @@ export function FeatureList({ features, categoryLabel }: FeatureListProps) {
       </div>
 
       <div className='flex items-center gap-2'>
-        <div className='size-6 rounded-full border-[2px] border-[var(--frame)] bg-[var(--accent)] text-foreground text-xs flex items-center justify-center font-black'>
+        <div className='size-6 rounded-full border-[2px] border-[var(--frame)] bg-[var(--accent)] text-[var(--color-brand-ink)] text-xs flex items-center justify-center font-black'>
           {features.length}
         </div>
         <span className='grid'>

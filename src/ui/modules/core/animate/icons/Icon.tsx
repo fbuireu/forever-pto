@@ -12,6 +12,7 @@ import {
 } from 'motion/react';
 import {
   type ComponentType,
+  cloneElement,
   createContext,
   isValidElement,
   type MouseEvent,
@@ -391,6 +392,15 @@ function AnimateIcon({
     if (animateOnTap) stopAnimation();
   });
 
+  const dataProps = Object.fromEntries(
+    Object.entries(props as Record<string, unknown>).filter(([key]) => key.startsWith('data-'))
+  );
+
+  const childrenWithData =
+    !asChild && isValidElement(children) && Object.keys(dataProps).length > 0
+      ? cloneElement(children as ReactElement, dataProps)
+      : children;
+
   const content = asChild ? (
     <MotionSlot
       ref={inViewRef}
@@ -411,7 +421,7 @@ function AnimateIcon({
       onPointerUp={handlePointerUp}
       {...props}
     >
-      {children}
+      {childrenWithData}
     </m.span>
   );
 

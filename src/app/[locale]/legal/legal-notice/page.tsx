@@ -1,6 +1,6 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
-import { Me } from '@ui/modules/pages/legal/Me';
 import { LegalLayout } from '@ui/modules/layout/LegalLayout';
+import { Me } from '@ui/modules/pages/legal/Me';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 

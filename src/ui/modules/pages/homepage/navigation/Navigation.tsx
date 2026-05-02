@@ -33,7 +33,7 @@ export const Navigation = async () => {
             <Link
               key={href}
               href={href}
-              className='px-2 py-1 border-[2px] border-transparent rounded-[6px] hover:bg-[var(--accent)] hover:border-[var(--frame)] transition-all duration-75'
+              className='px-2 py-1 border-[2px] border-transparent rounded-[6px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-all duration-75'
             >
               {label}
             </Link>

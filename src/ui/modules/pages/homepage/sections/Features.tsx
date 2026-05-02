@@ -20,15 +20,18 @@ export const Features = async () => {
 
       <div className='max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-6 gap-6'>
         <div
-          className={`${brutCard} md:col-span-4 p-7 bg-[var(--accent)] transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
+          className={`${brutCard} md:col-span-4 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
+          style={{ background: 'var(--accent)', color: 'var(--color-brand-ink)' }}
         >
-          <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold shadow-[var(--shadow-brutal-xs)]'>
+          <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] text-foreground border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold shadow-[var(--shadow-brutal-xs)]'>
             {t('features.bridgeTag')}
           </span>
           <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em]'>
             {t('features.bridgeTitle')}
           </h3>
-          <p className='text-foreground text-[15px] leading-relaxed mb-4'>{t('features.bridgeDescription')}</p>
+          <p className='text-[var(--color-brand-ink)] text-[15px] leading-relaxed mb-4'>
+            {t('features.bridgeDescription')}
+          </p>
           <div className='grid grid-cols-7 gap-1 max-w-[280px]'>
             {(['weekend', 'pto', 'holiday', 'work', 'work', 'work', 'work'] as DayType[]).map((dt, i) => {
               const label = ['L', 'M', 'X', 'J', 'V', 'S', 'D'][i];
@@ -46,7 +49,7 @@ export const Features = async () => {
         <div
           className={`${brutCard} md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
         >
-          <span className='inline-block px-2.5 py-1 bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold shadow-[var(--shadow-brutal-xs)]'>
+          <span className='inline-block px-2.5 py-1 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold shadow-[var(--shadow-brutal-xs)]'>
             {t('features.ratioTag')}
           </span>
           <div className='font-display font-extrabold text-[100px] leading-none tracking-[-0.05em] mt-2.5 mb-2'>
@@ -79,7 +82,7 @@ export const Features = async () => {
         <div
           className={`${brutCard} md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
         >
-          <span className='inline-block px-2.5 py-1 bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold shadow-[var(--shadow-brutal-xs)]'>
+          <span className='inline-block px-2.5 py-1 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold shadow-[var(--shadow-brutal-xs)]'>
             {t('features.conflictsTag')}
           </span>
           <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em]'>
@@ -131,7 +134,7 @@ export const Features = async () => {
           className={`${brutCard} md:col-span-6 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
           style={{ background: 'var(--frame)', color: 'var(--background)' }}
         >
-          <span className='inline-block px-2.5 py-1 bg-[var(--accent)] border-[2.5px] border-[var(--background)] rounded-[6px] font-mono text-[12px] font-semibold text-[var(--frame)] shadow-[2px_2px_0_0_var(--background)]'>
+          <span className='inline-block px-2.5 py-1 bg-[var(--accent)] border-[2.5px] border-[var(--background)] rounded-[6px] font-mono text-[12px] font-semibold text-[var(--color-brand-ink)] shadow-[2px_2px_0_0_var(--background)]'>
             {t('features.privacyTag')}
           </span>
           <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em] text-[var(--background)]'>

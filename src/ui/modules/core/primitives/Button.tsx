@@ -9,17 +9,17 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]',
+          'bg-primary text-primary-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)] data-[popup-open]:-translate-x-0.5 data-[popup-open]:-translate-y-0.5 data-[popup-open]:shadow-[var(--shadow-brutal-btn-hover)]',
         accent:
-          'bg-accent text-accent-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]',
+          'bg-accent text-accent-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)] data-[popup-open]:-translate-x-0.5 data-[popup-open]:-translate-y-0.5 data-[popup-open]:shadow-[var(--shadow-brutal-btn-hover)]',
         destructive:
-          'bg-destructive text-white shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]',
+          'bg-destructive text-white shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)] data-[popup-open]:-translate-x-0.5 data-[popup-open]:-translate-y-0.5 data-[popup-open]:shadow-[var(--shadow-brutal-btn-hover)]',
         outline:
-          'bg-[var(--surface-panel)] text-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[var(--surface-panel-alt)] hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]',
+          'bg-[var(--surface-panel)] text-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[var(--surface-panel-alt)] hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)] data-[popup-open]:-translate-x-0.5 data-[popup-open]:-translate-y-0.5 data-[popup-open]:shadow-[var(--shadow-brutal-btn-hover)]',
         secondary:
-          'bg-secondary text-secondary-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[color-mix(in_srgb,var(--secondary)_85%,white_15%)] hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]',
+          'bg-secondary text-secondary-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[color-mix(in_srgb,var(--secondary)_85%,white_15%)] hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)] data-[popup-open]:-translate-x-0.5 data-[popup-open]:-translate-y-0.5 data-[popup-open]:shadow-[var(--shadow-brutal-btn-hover)]',
         ghost:
-          'border-transparent bg-transparent shadow-none hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-foreground active:translate-x-0 active:translate-y-0 active:bg-[var(--accent)]',
+          'border-transparent bg-transparent shadow-none hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground active:translate-x-0 active:translate-y-0 active:bg-[var(--accent)] active:text-accent-foreground',
         link: 'border-transparent text-primary underline-offset-4 hover:underline',
       },
       size: {

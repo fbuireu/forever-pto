@@ -63,7 +63,7 @@ export function Contact() {
               href={GITHUB_ISSUE_URL}
               target='_blank'
               rel='noopener noreferrer'
-              className='text-sm font-semibold px-1.5 py-0.5 border-[2px] border-transparent rounded-[4px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-foreground transition-all duration-75'
+              className='text-sm font-semibold px-1.5 py-0.5 border-[2px] border-transparent rounded-[4px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-all duration-75'
             >
               {t('openIssue')}
             </a>
