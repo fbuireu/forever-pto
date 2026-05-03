@@ -1,5 +1,6 @@
 import '@styles/index.css';
 
+import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { NotFoundContent } from '@ui/modules/pages/not-found/NotFoundContent';
 import { cn } from '@ui/utils/utils';
 import { Bricolage_Grotesque, Instrument_Serif, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
@@ -73,7 +74,9 @@ export default async function GlobalNotFound() {
             enableSystem
             disableTransitionOnChange
           >
-            <NotFoundContent locale={locale} />
+            <LazyMotionProvider>
+              <NotFoundContent locale={locale} />
+            </LazyMotionProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

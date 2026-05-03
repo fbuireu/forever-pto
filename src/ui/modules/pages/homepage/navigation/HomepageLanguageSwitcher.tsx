@@ -26,7 +26,7 @@ export const HomepageLanguageSwitcher = () => {
   const handleLanguageChange = useCallback(
     (newLocale: string) => {
       const newPathname = pathname.replace(`/${locale}`, `/${newLocale}`);
-      router.push(newPathname, { locale: newLocale });
+      router.push(newPathname, { locale: newLocale, scroll: false });
     },
     [pathname, locale, router]
   );

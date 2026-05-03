@@ -1,6 +1,6 @@
+import { Link } from '@application/i18n/navigtion';
 import { Navigation } from '@ui/modules/pages/homepage/navigation/Navigation';
 import { Footer } from '@ui/modules/shared/footer/Footer';
-import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 
 interface NotFoundContentProps {
@@ -11,10 +11,10 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
   const t = await getTranslations({ locale, namespace: 'notFound' });
 
   const suggestLinks = [
-    { href: `/${locale}/#how`, emoji: '⚡', bg: 'bg-[var(--color-brand-teal)]', label: t('link1') },
-    { href: `/${locale}/#features`, emoji: '🌴', bg: 'bg-[var(--accent)]', label: t('link2') },
-    { href: `/${locale}/#pricing`, emoji: '€', bg: 'bg-[var(--color-brand-orange)]', label: t('link3') },
-    { href: `/${locale}/#faq`, emoji: '?', bg: 'bg-[var(--color-brand-pink)]', label: t('link4') },
+    { href: '/#how', emoji: '⚡', bg: 'bg-[var(--color-brand-teal)]', label: t('link1') },
+    { href: '/#features', emoji: '🌴', bg: 'bg-[var(--accent)]', label: t('link2') },
+    { href: '/#pricing', emoji: '€', bg: 'bg-[var(--color-brand-orange)]', label: t('link3') },
+    { href: '/#faq', emoji: '?', bg: 'bg-[var(--color-brand-pink)]', label: t('link4') },
   ] as const;
 
   return (
@@ -55,13 +55,13 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
 
             <div className='flex flex-wrap gap-[14px] mb-9'>
               <Link
-                href={`/${locale}`}
+                href='/'
                 className='inline-flex items-center gap-2 px-[22px] py-[14px] font-sans font-bold text-[15px] tracking-[-0.01em] border-[3px] border-[var(--frame)] rounded-[10px] no-underline bg-[var(--frame)] text-[var(--accent)] shadow-[5px_5px_0_0_var(--frame)] transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[7px_7px_0_0_var(--frame)]'
               >
                 ← {t('ctaPrimary')}
               </Link>
               <Link
-                href={`/${locale}/planner`}
+                href='/planner'
                 className='inline-flex items-center gap-2 px-[22px] py-[14px] font-sans font-bold text-[15px] tracking-[-0.01em] border-[3px] border-[var(--frame)] rounded-[10px] no-underline bg-card text-foreground shadow-[5px_5px_0_0_var(--frame)] transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[7px_7px_0_0_var(--frame)]'
               >
                 {t('ctaPlanner')} →
