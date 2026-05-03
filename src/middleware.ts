@@ -21,5 +21,5 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  matcher: ['/', '/(en|es|ca|it|fr|de)/:path*', '/legal/:path*', '/payment/:path*'],
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)', '/legal/:path*', '/payment/:path*'],
 };

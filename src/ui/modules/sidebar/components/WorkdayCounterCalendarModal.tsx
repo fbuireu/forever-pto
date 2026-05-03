@@ -29,7 +29,7 @@ export const WorkdayCounterCalendarModal = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant='outline' className='w-full h-8 text-xs justify-start'>
+        <Button variant='outline' className='w-full justify-start'>
           <CalendarIcon className='w-3 h-3 mr-1' />
           {selectedRange
             ? `${formatDate({ date: selectedRange.from, locale, format: 'MMM d' })} - ${formatDate({ date: selectedRange.to, locale, format: 'MMM d' })}`

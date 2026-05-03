@@ -96,7 +96,7 @@ export const CalendarList = () => {
   return (
     <div
       className={cn(
-        'grid [grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr))] gap-5 mx-auto w-full',
+        'grid [grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-5 mx-auto w-full',
         isCalculating && 'pointer-events-none'
       )}
       data-tutorial='calendar-list'

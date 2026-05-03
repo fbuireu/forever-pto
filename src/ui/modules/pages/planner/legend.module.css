@@ -5,7 +5,6 @@
   bottom: 0;
   z-index: 10;
   width: 100%;
-  will-change: transform;
 }
 
 .toggle {
@@ -51,7 +50,7 @@
   text-align: center;
   width: 100%;
   max-width: 56rem;
-  margin: calc(var(--spacing) * 8) auto 0;
+  margin: 0 auto;
   font-size: var(--text-sm);
   line-height: calc(var(--spacing) * 5);
   transition:
@@ -122,7 +121,6 @@
 @supports (container-type: scroll-state) {
   @container pto-legend scroll-state(stuck: bottom) {
     .section {
-      margin-top: 0;
       font-size: var(--text-xs);
       line-height: calc(var(--spacing) * 4);
       width: fit-content;

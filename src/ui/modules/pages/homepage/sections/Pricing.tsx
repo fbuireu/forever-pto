@@ -92,7 +92,7 @@ export const Pricing = async () => {
           </ul>
           <SupportButton
             label={t('pricing.lifetimeCta')}
-            className='w-full justify-center !bg-[var(--color-brand-ink)] !text-white'
+            className='w-full justify-center !bg-[var(--color-brand-ink)] !text-white !shadow-[5px_5px_0_0_var(--color-brand-orange)] hover:!shadow-[7px_7px_0_0_var(--color-brand-orange)] active:!shadow-[1px_1px_0_0_var(--color-brand-orange)]'
           />
         </div>
       </div>

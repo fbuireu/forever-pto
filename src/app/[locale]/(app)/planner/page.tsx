@@ -33,7 +33,9 @@ const AppPage = async ({ params }: PageProps) => {
         <HolidaysList />
         <ManagementBar />
         <CalendarList />
-        <Legend />
+        <div className='mt-8 w-full'>
+          <Legend />
+        </div>
         <Summary />
         <Roadmap />
         <Contact />

@@ -93,7 +93,6 @@ export const PtoCalculator = () => {
           max='8'
           value={daysPerMonth}
           onChange={(e) => setDaysPerMonth(Number(e.target.value))}
-          className='h-8 text-xs'
         />
       </div>
 
@@ -106,11 +105,11 @@ export const PtoCalculator = () => {
           placeholder={t('selectMonth')}
           searchPlaceholder={t('searchMonth')}
           notFoundText={t('monthNotFound')}
-          className='w-full h-8 text-xs'
+          className='w-full'
         />
       </div>
 
-      <Button onClick={handleCalculate} size='sm' className='w-full h-8 text-xs' variant='outline'>
+      <Button onClick={handleCalculate} className='w-full' variant='outline'>
         <Calculator className='w-3 h-3 mr-1' />
         {t('calculate')}
       </Button>
@@ -132,7 +131,8 @@ export const PtoCalculator = () => {
             <Button
               onClick={() => applyToStore(calculatedDays)}
               size='sm'
-              className='w-full h-7 text-xs bg-green-600 hover:bg-green-700 justify-start'
+              variant='success'
+              className='w-full justify-start'
             >
               <Plus className='w-3 h-3 mr-1' />
               {t('applyToPtoDays')}

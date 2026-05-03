@@ -80,7 +80,7 @@ export const WorkdayCounter = () => {
         />
 
         {selectedRange && (
-          <Button variant='ghost' onClick={clearSelection} className='h-6 text-xs w-full'>
+          <Button variant='outline' size='sm' onClick={clearSelection} className='w-full'>
             {t('clearSelection')}
           </Button>
         )}

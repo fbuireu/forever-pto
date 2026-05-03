@@ -177,7 +177,12 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
             <p className='text-[18px] leading-[1.55] text-muted-foreground max-w-[46ch] mb-8'>{t('lede')}</p>
 
             <div className='flex flex-wrap gap-[14px] mb-9'>
-              <Button variant='default' size='lg' onClick={reset}>
+              <Button
+                variant='default'
+                size='lg'
+                onClick={reset}
+                className='shadow-[5px_5px_0_0_var(--accent)] hover:shadow-[7px_7px_0_0_var(--accent)] active:shadow-[1px_1px_0_0_var(--accent)]'
+              >
                 <RotateCcw className='h-4 w-4' />
                 {t('retry')}
               </Button>

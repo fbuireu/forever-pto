@@ -11,7 +11,7 @@ export const Footer = async () => {
   return (
     <footer className='w-full bg-background border-t-[3px] border-[var(--frame)]'>
       <div className='max-w-[1320px] mx-auto'>
-        <div className='flex items-center justify-between flex-wrap gap-3 px-6 pt-5 pb-4 border-b-[2px] border-[var(--frame)]/18'>
+        <div className='flex items-center justify-between flex-wrap gap-3 px-7 pt-5 pb-4 border-b-[2px] border-[var(--frame)]/18'>
           <Link
             href='/'
             className='flex items-center gap-2 font-display font-extrabold text-[18px] tracking-[-0.02em] hover:opacity-80 transition-opacity'
@@ -34,7 +34,7 @@ export const Footer = async () => {
         <DevFooter />
         <nav
           aria-label={t('legalNavigation')}
-          className='flex flex-col sm:flex-row justify-center items-center gap-3 py-5 px-4 border-t-[2px] border-dashed border-[var(--frame)]/18'
+          className='flex flex-col sm:flex-row justify-center items-center gap-3 py-5 px-7 border-t-[2px] border-dashed border-[var(--frame)]/18'
         >
           <Link
             href='/planner'
@@ -70,7 +70,7 @@ export const Footer = async () => {
           <ContactButton />
         </nav>
 
-        <div className='px-6 py-3 border-t-[2px] border-dashed border-[var(--frame)]/18 flex justify-center'>
+        <div className='px-7 py-3 border-t-[2px] border-dashed border-[var(--frame)]/18 flex justify-center'>
           <span className='font-mono text-[11px] text-muted-foreground text-center'>
             {t('copyright', { year: new Date().getFullYear() })}
           </span>

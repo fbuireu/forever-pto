@@ -56,7 +56,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
             <div className='flex flex-wrap gap-[14px] mb-9'>
               <Link
                 href='/'
-                className='inline-flex items-center gap-2 px-[22px] py-[14px] font-sans font-bold text-[15px] tracking-[-0.01em] border-[3px] border-[var(--color-brand-ink)] rounded-[10px] no-underline bg-[var(--color-brand-ink)] text-[var(--accent)] shadow-[5px_5px_0_0_var(--frame)] transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[7px_7px_0_0_var(--frame)]'
+                className='inline-flex items-center gap-2 px-[22px] py-[14px] font-sans font-bold text-[15px] tracking-[-0.01em] border-[3px] border-[var(--color-brand-ink)] rounded-[10px] no-underline bg-[var(--color-brand-ink)] text-[var(--accent)] shadow-[5px_5px_0_0_var(--accent)] transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[7px_7px_0_0_var(--accent)] active:shadow-[1px_1px_0_0_var(--accent)]'
               >
                 ← {t('ctaPrimary')}
               </Link>
