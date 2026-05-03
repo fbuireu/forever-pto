@@ -260,14 +260,14 @@ export const Donate = () => {
             color: t.fg,
             boxShadow: 'none',
             borderRadius: '8px',
-            transition: 'box-shadow 80ms linear',
-          },
-          '.Input:focus': {
-            boxShadow: `4px 4px 0 0 ${t.frame} !important`,
-            outline: 'none',
+            transition: 'box-shadow 75ms linear',
           },
           '.Input:hover': {
             boxShadow: `2px 2px 0 0 ${t.frame}`,
+          },
+          '.Input:focus': {
+            boxShadow: `4px 4px 0 0 ${t.frame}`,
+            outline: 'none',
           },
 
           '.Input--invalid': {
