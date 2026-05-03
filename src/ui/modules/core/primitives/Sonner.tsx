@@ -26,7 +26,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           error:
             '![--toast-bg:var(--color-brand-red)] !text-white [&_[data-title]]:!text-white [&_[data-description]]:!text-white/80',
           info: '![--toast-bg:var(--color-brand-sky)] !text-[var(--color-brand-ink)] [&_[data-title]]:!text-[var(--color-brand-ink)] [&_[data-description]]:!text-[var(--color-brand-ink)]/70',
-          icon: '!size-8 !rounded-[6px] !border-[2.5px] !border-[var(--frame)] !bg-white !text-[var(--color-brand-ink)] !font-black !flex !items-center [&_svg]:!m-auto !justify-center',
+          icon: '!size-8 !rounded-[6px] !border-[2.5px] !border-[var(--color-brand-ink)] !bg-white !text-[var(--color-brand-ink)] !font-black !flex !items-center [&_svg]:!m-auto !justify-center',
           actionButton:
             '!rounded-[8px] !border-[3px] !border-[var(--frame)] !bg-[var(--color-brand-teal)] !text-[var(--color-brand-ink)] !shadow-[var(--shadow-brutal-xs)]',
           cancelButton:

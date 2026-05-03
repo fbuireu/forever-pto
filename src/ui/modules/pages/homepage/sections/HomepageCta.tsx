@@ -9,19 +9,19 @@ export const HomepageCta = async () => {
     <section className='px-7 py-24 bg-[var(--frame)] text-[var(--background)] border-t-[4px] border-[var(--frame)] relative overflow-hidden'>
       {/* Decorative shapes */}
       <div
-        className='hidden md:block absolute w-20 h-20 top-14 left-[8%] bg-[var(--color-brand-yellow)] border-[4px] border-[var(--background)] rounded-[12px] shadow-[6px_6px_0_0_var(--background)] rotate-[-12deg]'
+        className='hidden md:block absolute w-20 h-20 top-14 left-[8%] bg-[var(--color-brand-yellow)] border-[4px] border-[#fff5e1] dark:border-[#0e0e0e] rounded-[12px] shadow-[6px_6px_0_0_#fff5e1] dark:shadow-[6px_6px_0_0_#0e0e0e] rotate-[-12deg]'
         aria-hidden='true'
       />
       <div
-        className='hidden md:block absolute w-14 h-14 bottom-20 left-[14%] bg-[var(--color-brand-teal)] border-[4px] border-[var(--background)] rounded-full shadow-[6px_6px_0_0_var(--background)] rotate-[15deg]'
+        className='hidden md:block absolute w-14 h-14 bottom-20 left-[14%] bg-[var(--color-brand-teal)] border-[4px] border-[#fff5e1] dark:border-[#0e0e0e] rounded-full shadow-[6px_6px_0_0_#fff5e1] dark:shadow-[6px_6px_0_0_#0e0e0e] rotate-[15deg]'
         aria-hidden='true'
       />
       <div
-        className='hidden md:block absolute w-[70px] h-[70px] top-24 right-[10%] bg-[var(--color-brand-orange)] border-[4px] border-[var(--background)] rounded-[12px] shadow-[6px_6px_0_0_var(--background)] rotate-[8deg]'
+        className='hidden md:block absolute w-[70px] h-[70px] top-24 right-[10%] bg-[var(--color-brand-orange)] border-[4px] border-[#fff5e1] dark:border-[#0e0e0e] rounded-[12px] shadow-[6px_6px_0_0_#fff5e1] dark:shadow-[6px_6px_0_0_#0e0e0e] rotate-[8deg]'
         aria-hidden='true'
       />
       <div
-        className='hidden md:block absolute w-24 h-14 bottom-16 right-[7%] bg-[var(--color-brand-purple)] border-[4px] border-[var(--background)] rounded-[12px] shadow-[6px_6px_0_0_var(--background)] rotate-[-6deg]'
+        className='hidden md:block absolute w-24 h-14 bottom-16 right-[7%] bg-[var(--color-brand-purple)] border-[4px] border-[#fff5e1] dark:border-[#0e0e0e] rounded-[12px] shadow-[6px_6px_0_0_#fff5e1] dark:shadow-[6px_6px_0_0_#0e0e0e] rotate-[-6deg]'
         aria-hidden='true'
       />
 

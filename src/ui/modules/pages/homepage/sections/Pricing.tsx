@@ -90,7 +90,10 @@ export const Pricing = async () => {
               </li>
             ))}
           </ul>
-          <SupportButton label={t('pricing.lifetimeCta')} className='w-full justify-center' />
+          <SupportButton
+            label={t('pricing.lifetimeCta')}
+            className='w-full justify-center !bg-[var(--color-brand-ink)] !text-white'
+          />
         </div>
       </div>
     </section>

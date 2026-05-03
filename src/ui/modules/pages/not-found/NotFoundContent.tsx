@@ -38,7 +38,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
           </div>
 
           <div className='flex flex-col'>
-            <span className='inline-flex items-center gap-2 self-start bg-[var(--frame)] text-[var(--accent)] px-3 py-1.5 rounded-[6px] font-mono text-[11px] font-bold tracking-[0.12em] uppercase mb-[22px]'>
+            <span className='inline-flex items-center gap-2 self-start bg-[var(--color-brand-ink)] text-[var(--accent)] px-3 py-1.5 rounded-[6px] font-mono text-[11px] font-bold tracking-[0.12em] uppercase mb-[22px]'>
               <span className='w-2 h-2 rounded-full bg-[var(--color-brand-orange)]' />
               {t('kicker')}
             </span>
@@ -56,7 +56,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
             <div className='flex flex-wrap gap-[14px] mb-9'>
               <Link
                 href='/'
-                className='inline-flex items-center gap-2 px-[22px] py-[14px] font-sans font-bold text-[15px] tracking-[-0.01em] border-[3px] border-[var(--frame)] rounded-[10px] no-underline bg-[var(--frame)] text-[var(--accent)] shadow-[5px_5px_0_0_var(--frame)] transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[7px_7px_0_0_var(--frame)]'
+                className='inline-flex items-center gap-2 px-[22px] py-[14px] font-sans font-bold text-[15px] tracking-[-0.01em] border-[3px] border-[var(--color-brand-ink)] rounded-[10px] no-underline bg-[var(--color-brand-ink)] text-[var(--accent)] shadow-[5px_5px_0_0_var(--frame)] transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[7px_7px_0_0_var(--frame)]'
               >
                 ← {t('ctaPrimary')}
               </Link>

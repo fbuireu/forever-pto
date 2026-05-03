@@ -5,6 +5,7 @@
   bottom: 0;
   z-index: 10;
   width: 100%;
+  will-change: transform;
 }
 
 .toggle {
@@ -54,7 +55,6 @@
   font-size: var(--text-sm);
   line-height: calc(var(--spacing) * 5);
   transition:
-    margin-top 300ms ease-in-out,
     font-size 300ms ease-in-out,
     line-height 300ms ease-in-out;
 }
