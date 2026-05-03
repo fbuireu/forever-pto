@@ -1,5 +1,6 @@
 import { Navigation } from '@ui/modules/pages/homepage/navigation/Navigation';
 import { Footer } from '@ui/modules/shared/footer/Footer';
+import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 
 interface NotFoundContentProps {
@@ -53,18 +54,18 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
             <p className='text-[18px] leading-[1.55] text-muted-foreground max-w-[46ch] mb-8'>{t('lede')}</p>
 
             <div className='flex flex-wrap gap-[14px] mb-9'>
-              <a
+              <Link
                 href={`/${locale}`}
                 className='inline-flex items-center gap-2 px-[22px] py-[14px] font-sans font-bold text-[15px] tracking-[-0.01em] border-[3px] border-[var(--frame)] rounded-[10px] no-underline bg-[var(--frame)] text-[var(--accent)] shadow-[5px_5px_0_0_var(--frame)] transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[7px_7px_0_0_var(--frame)]'
               >
                 ← {t('ctaPrimary')}
-              </a>
-              <a
+              </Link>
+              <Link
                 href={`/${locale}/planner`}
                 className='inline-flex items-center gap-2 px-[22px] py-[14px] font-sans font-bold text-[15px] tracking-[-0.01em] border-[3px] border-[var(--frame)] rounded-[10px] no-underline bg-card text-foreground shadow-[5px_5px_0_0_var(--frame)] transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[7px_7px_0_0_var(--frame)]'
               >
                 {t('ctaPlanner')} →
-              </a>
+              </Link>
             </div>
 
             <div className='border-t-2 border-dashed border-[var(--frame)] pt-[22px] grid grid-cols-2 gap-[10px] max-w-[520px]'>
@@ -72,7 +73,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
                 {t('suggestLabel')}
               </span>
               {suggestLinks.map(({ href, emoji, bg, label }) => (
-                <a
+                <Link
                   key={href}
                   href={href}
                   className='flex items-center gap-2.5 px-3 py-2.5 bg-card border-[2px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] no-underline text-foreground text-[13px] font-semibold transition-[transform,box-shadow] hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)]'
@@ -83,7 +84,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
                     {emoji}
                   </span>
                   {label}
-                </a>
+                </Link>
               ))}
             </div>
           </div>

@@ -84,7 +84,10 @@
     font-weight: 900;
     letter-spacing: 0.01em;
     font-family: var(--font-sans), system-ui, sans-serif;
-    transition: background-color 75ms linear, box-shadow 75ms linear, transform 75ms linear;
+    transition:
+      background-color 75ms linear,
+      box-shadow 75ms linear,
+      transform 75ms linear;
     height: 2.5rem;
     padding: 0 1rem;
     cursor: pointer;
@@ -169,7 +172,9 @@
     border: 3px solid var(--frame);
     box-shadow: var(--shadow-brutal-xs);
     opacity: 1;
-    transition: transform 75ms linear, box-shadow 75ms linear;
+    transition:
+      transform 75ms linear,
+      box-shadow 75ms linear;
     cursor: pointer;
     outline: none;
   }
