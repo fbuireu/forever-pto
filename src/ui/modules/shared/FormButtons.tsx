@@ -12,7 +12,7 @@ interface FormButtonsProps {
   hideCancel?: boolean;
   submitClassName?: string;
   cancelClassName?: string;
-  submitVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  submitVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'success';
   pending?: boolean;
 }
 

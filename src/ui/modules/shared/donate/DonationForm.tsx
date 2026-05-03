@@ -169,7 +169,8 @@ export function DonationForm({
           submitText={t('continueToPayment')}
           loadingText={t('processing')}
           hideCancel
-          submitClassName='w-full bg-green-600 hover:bg-green-700'
+          submitVariant='success'
+          submitClassName='w-full'
           pending={loading}
         />
       </form>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@ui/modules/core/primitives/Button';
+import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as CookieConsentLib from 'vanilla-cookieconsent';
@@ -95,7 +95,7 @@ export const CookieConsent = () => {
         role='dialog'
         aria-labelledby='cookie-banner-title'
         aria-describedby='cookie-banner-description'
-        className='fixed bottom-4 left-4 z-50 max-w-lg rounded-[14px] border-[3px] border-[var(--frame)] bg-card p-6 shadow-[var(--shadow-brutal-lg)]'
+        className='fixed bottom-4 left-4 z-50 max-w-xl rounded-[14px] border-[3px] border-[var(--frame)] bg-card p-8 shadow-[var(--shadow-brutal-lg)]'
       >
         <h3 id='cookie-banner-title' className='text-xl font-black tracking-[-0.03em]'>
           {t('title')}
@@ -116,7 +116,7 @@ export const CookieConsent = () => {
           >
             {t('managePreferences')}
           </Button>
-          <Button className='bg-green-600 hover:bg-green-700' onClick={handleAcceptAll}>
+          <Button variant='success' onClick={handleAcceptAll}>
             {t('acceptAll')}
           </Button>
         </div>

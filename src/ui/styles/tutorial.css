@@ -102,18 +102,18 @@
   .driver-popover-next-btn {
     background-color: var(--primary);
     color: var(--primary-foreground);
-    box-shadow: 5px 5px 0 0 var(--primary-foreground);
+    box-shadow: var(--shadow-brutal-btn);
     margin-left: 0.5rem;
   }
 
   .driver-popover-next-btn:hover {
     background-color: color-mix(in srgb, var(--primary) 90%, transparent);
-    box-shadow: 7px 7px 0 0 var(--primary-foreground);
+    box-shadow: var(--shadow-brutal-btn-hover);
     transform: translate(-2px, -2px);
   }
 
   .driver-popover-next-btn:active {
-    box-shadow: 1px 1px 0 0 var(--primary-foreground);
+    box-shadow: var(--shadow-brutal-btn-active);
     transform: translate(2px, 2px);
   }
 
@@ -125,18 +125,18 @@
   .driver-popover-done-btn {
     background-color: #16a34a !important;
     color: white !important;
-    font-weight: 700 !important;
-    box-shadow: 5px 5px 0 0 var(--frame) !important;
+    font-weight: 900 !important;
+    box-shadow: var(--shadow-brutal-btn) !important;
   }
 
   .driver-popover-done-btn:hover {
     background-color: #15803d !important;
-    box-shadow: 7px 7px 0 0 var(--frame) !important;
+    box-shadow: var(--shadow-brutal-btn-hover) !important;
     transform: translate(-2px, -2px);
   }
 
   .driver-popover-done-btn:active {
-    box-shadow: 1px 1px 0 0 var(--frame) !important;
+    box-shadow: var(--shadow-brutal-btn-active) !important;
     transform: translate(2px, 2px);
   }
 

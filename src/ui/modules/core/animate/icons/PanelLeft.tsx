@@ -1,7 +1,7 @@
 'use client';
 
 import { m, type Variants } from 'motion/react';
-import { getVariants, type IconProps, IconWrapper, useAnimateIconContext } from './Icon';
+import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from './Icon';
 
 type PanelLeftProps = IconProps<keyof typeof animations>;
 
@@ -23,7 +23,7 @@ const animations = {
 
 function IconComponent({ size, ...props }: PanelLeftProps) {
   const { controls } = useAnimateIconContext();
-  const variants = getVariants(animations);
+  const variants = useVariants(animations);
 
   return (
     <m.svg

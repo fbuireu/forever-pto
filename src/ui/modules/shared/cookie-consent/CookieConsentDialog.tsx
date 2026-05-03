@@ -184,14 +184,14 @@ export const CookieConsentDialog = ({
         </div>
 
         <DialogFooter className='flex-col-reverse sm:flex-row gap-2 pt-4 border-t'>
-          <Button variant='outline' onClick={onRejectAll} className='w-full sm:w-auto'>
+          <Button variant='destructive' onClick={onRejectAll} className='w-full sm:w-auto'>
             {t('rejectAll')}
           </Button>
           <div className='flex gap-2 w-full items-center sm:w-auto'>
             <Button variant='secondary' onClick={onSave} className='flex-1 sm:flex-initial'>
               {t('savePreferences')}
             </Button>
-            <Button onClick={onAcceptAll} className='flex-1 sm:flex-initial'>
+            <Button variant='success' onClick={onAcceptAll} className='flex-1 sm:flex-initial'>
               {t('acceptAll')}
             </Button>
           </div>

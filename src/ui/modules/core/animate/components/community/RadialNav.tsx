@@ -91,8 +91,7 @@ function calculateIconOffset({
   return centerOffset - buttonPadding + bias;
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: vendored component
-function withDefaults<T extends Record<string, any>>(defaults: T, overrides?: Partial<T>): T {
+function withDefaults<T extends Record<string, unknown>>(defaults: T, overrides?: Partial<T>): T {
   return { ...defaults, ...overrides };
 }
 

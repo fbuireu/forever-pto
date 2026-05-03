@@ -45,8 +45,7 @@ type MotionHighlightContextType<T extends string> = {
   forceUpdateBounds?: boolean;
 };
 
-// biome-ignore lint/suspicious/noExplicitAny: vendored component
-const MotionHighlightContext = createContext<MotionHighlightContextType<any> | undefined>(undefined);
+const MotionHighlightContext = createContext<MotionHighlightContextType<string> | undefined>(undefined);
 
 function useMotionHighlight<T extends string>(): MotionHighlightContextType<T> {
   const context = use(MotionHighlightContext);
