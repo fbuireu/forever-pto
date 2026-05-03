@@ -311,6 +311,10 @@
     "description": "Configure ton plan en 2 étapes : d'abord ta localisation, puis tes jours et ta stratégie. Clique le bouton pour un tutoriel interactif.",
     "startButton": "Démarrer le tutoriel",
     "restartButton": "Relancer le tutoriel interactif",
+    "nextBtn": "Suivant →",
+    "prevBtn": "← Précédent",
+    "doneBtn": "Terminé",
+    "progressTextConnector": "sur",
     "steps": {
       "toolsTitle": "Calculateurs et outils",
       "toolsDescription": "Accède à des calculateurs utiles ici : estime tes congés selon ton historique professionnel, calcule la valeur monétaire de tes congés non utilisés, ou compte les jours ouvrés entre deux dates.",

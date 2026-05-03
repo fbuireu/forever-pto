@@ -311,6 +311,10 @@
     "description": "Configura tu plan en 2 pasos: primero tu ubicación, luego tus días y estrategia. Pulsa el botón para un tutorial interactivo.",
     "restartButton": "Reiniciar Tutorial Interactivo",
     "startButton": "Iniciar Tutorial",
+    "nextBtn": "Siguiente →",
+    "prevBtn": "← Anterior",
+    "doneBtn": "Listo",
+    "progressTextConnector": "de",
     "steps": {
       "toolsTitle": "Calculadoras y Herramientas",
       "toolsDescription": "Accede a calculadoras útiles aquí: estima tu PTO basándote en historial laboral, calcula el valor monetario del PTO no utilizado, o cuenta días laborables entre fechas.",

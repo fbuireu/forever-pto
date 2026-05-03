@@ -10,6 +10,7 @@ const SIDEBAR_CONTAINER_SELECTOR = '[data-slot="sidebar-container"]';
 export const useTutorial = () => {
   const { open, toggleSidebar } = useSidebar();
   const t = useTranslations('tutorial.steps');
+  const tUi = useTranslations('tutorial');
 
   const startTutorial = useCallback(async () => {
     const [{ getDriverClientInstance }] = await Promise.all([
@@ -102,8 +103,13 @@ export const useTutorial = () => {
       });
     }
 
-    driverClient.start(steps);
-  }, [open, t, toggleSidebar]);
+    driverClient.start(steps, {
+      nextBtnText: tUi('nextBtn'),
+      prevBtnText: tUi('prevBtn'),
+      doneBtnText: tUi('doneBtn'),
+      progressText: `{current} ${tUi('progressTextConnector')} {total}`,
+    });
+  }, [open, t, tUi, toggleSidebar]);
 
   return { startTutorial };
 };

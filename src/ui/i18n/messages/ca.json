@@ -311,6 +311,10 @@
     "description": "Configura el teu pla en 2 passos: primer la teva ubicació, després els teus dies i estratègia. Prem el botó per a un tutorial interactiu.",
     "restartButton": "Reiniciar Tutorial Interactiu",
     "startButton": "Iniciar Tutorial",
+    "nextBtn": "Següent →",
+    "prevBtn": "← Anterior",
+    "doneBtn": "Fet",
+    "progressTextConnector": "de",
     "steps": {
       "toolsTitle": "Calculadores i Eines",
       "toolsDescription": "Accedeix a calculadores útils aquí: estima el teu PTO basant-te en historial laboral, calcula el valor monetari del PTO no utilitzat, o compta dies laborables entre dates.",

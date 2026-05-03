@@ -51,9 +51,9 @@
   --shadow-brutal-md: 6px 6px 0 0 var(--frame);
   --shadow-brutal-lg: 8px 8px 0 0 var(--frame);
   --shadow-brutal-xl: 10px 10px 0 0 var(--frame);
-  --shadow-brutal-btn: 5px 5px 0 0 var(--accent);
-  --shadow-brutal-btn-hover: 7px 7px 0 0 var(--accent);
-  --shadow-brutal-btn-active: 1px 1px 0 0 var(--accent);
+  --shadow-brutal-btn: 5px 5px 0 0 var(--frame);
+  --shadow-brutal-btn-hover: 7px 7px 0 0 var(--frame);
+  --shadow-brutal-btn-active: 1px 1px 0 0 var(--frame);
 
   --radius: 0.5rem;
 

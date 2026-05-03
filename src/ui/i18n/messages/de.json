@@ -311,6 +311,10 @@
     "description": "Richte deinen Plan in 2 Schritten ein: zuerst deinen Standort, dann deine Tage und Strategie. Klicke den Button für ein interaktives Tutorial.",
     "startButton": "Tutorial starten",
     "restartButton": "Interaktives Tutorial neu starten",
+    "nextBtn": "Weiter →",
+    "prevBtn": "← Zurück",
+    "doneBtn": "Fertig",
+    "progressTextConnector": "von",
     "steps": {
       "toolsTitle": "Rechner & Werkzeuge",
       "toolsDescription": "Greife hier auf hilfreiche Rechner zu: Schätze deine Urlaubstage basierend auf deiner Berufserfahrung, berechne den Geldwert ungenutzter Urlaubstage oder zähle Arbeitstage zwischen zwei Daten.",

@@ -69,9 +69,12 @@ export class DriverClient {
     return this.driver;
   }
 
-  start(steps?: DriveStep[]): void {
+  start(steps?: DriveStep[], overrides?: Partial<DriverConfig>): void {
     if (steps) {
       this.config.steps = steps;
+    }
+    if (overrides) {
+      Object.assign(this.config, overrides);
     }
 
     if (this.driver) {
