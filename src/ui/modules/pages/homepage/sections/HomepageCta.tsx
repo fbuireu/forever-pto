@@ -37,7 +37,7 @@ export const HomepageCta = async () => {
           variant='accent'
           size='lg'
           asChild
-          className='dark:border-transparent shadow-[var(--shadow-brutal-btn-inverted)] hover:shadow-[var(--shadow-brutal-btn-inverted-hover)] active:shadow-[var(--shadow-brutal-btn-inverted-active)]'
+          className='shadow-[var(--shadow-brutal-btn-inverted)] hover:shadow-[var(--shadow-brutal-btn-inverted-hover)] active:shadow-[var(--shadow-brutal-btn-inverted-active)]'
         >
           <Link href='/planner'>{t('closing.cta')}</Link>
         </Button>

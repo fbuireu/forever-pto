@@ -38,6 +38,10 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
 
-  --radius-lg: var(--radius);             
+  --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 6px);
+
+  --container-8xl: calc(var(--container-7xl) + 16rem);
+  --max-width-8xl: var(--container-8xl);
+  --breakpoint-8xl: 1800px;
 }
