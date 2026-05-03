@@ -16,12 +16,6 @@ on:
         required: false
         type: string
         description: Override the worker name (for per-PR preview deployments)
-    secrets:
-      CLOUDFLARE_API_TOKEN:
-        required: true
-      CLOUDFLARE_ACCOUNT_ID:
-        required: true
-
 permissions:
   contents: read
 
