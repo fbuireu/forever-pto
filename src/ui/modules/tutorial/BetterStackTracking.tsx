@@ -1,11 +1,11 @@
 'use client';
 
-import { identifyUser } from '@infrastructure/clients/logging/better-stack/tracking';
 import { usePremiumStore } from '@application/stores/premium';
+import { identifyUser } from '@infrastructure/clients/logging/better-stack/tracking';
 import Script from 'next/script';
 import { useEffect, useState } from 'react';
-import { useShallow } from 'zustand/shallow';
 import * as CookieConsentLib from 'vanilla-cookieconsent';
+import { useShallow } from 'zustand/shallow';
 
 const TRACKING_TOKEN = process.env.NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN;
 const ENV = process.env.NODE_ENV;

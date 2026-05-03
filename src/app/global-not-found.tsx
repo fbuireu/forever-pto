@@ -113,10 +113,30 @@ export default async function GlobalNotFound() {
                 Forever <em className='font-serif italic font-normal'>PTO</em>
               </a>
               <nav className='hidden md:flex gap-6 font-mono text-[12px] font-bold tracking-[0.08em] uppercase'>
-                <a href={`/${locale}/#how`} className='text-foreground no-underline border-b-2 border-transparent hover:border-[var(--frame)] pb-0.5 transition-colors'>{t('link1')}</a>
-                <a href={`/${locale}/#features`} className='text-foreground no-underline border-b-2 border-transparent hover:border-[var(--frame)] pb-0.5 transition-colors'>{t('link2')}</a>
-                <a href={`/${locale}/#pricing`} className='text-foreground no-underline border-b-2 border-transparent hover:border-[var(--frame)] pb-0.5 transition-colors'>{t('link3')}</a>
-                <a href={`/${locale}/#faq`} className='text-foreground no-underline border-b-2 border-transparent hover:border-[var(--frame)] pb-0.5 transition-colors'>{t('link4')}</a>
+                <a
+                  href={`/${locale}/#how`}
+                  className='text-foreground no-underline border-b-2 border-transparent hover:border-[var(--frame)] pb-0.5 transition-colors'
+                >
+                  {t('link1')}
+                </a>
+                <a
+                  href={`/${locale}/#features`}
+                  className='text-foreground no-underline border-b-2 border-transparent hover:border-[var(--frame)] pb-0.5 transition-colors'
+                >
+                  {t('link2')}
+                </a>
+                <a
+                  href={`/${locale}/#pricing`}
+                  className='text-foreground no-underline border-b-2 border-transparent hover:border-[var(--frame)] pb-0.5 transition-colors'
+                >
+                  {t('link3')}
+                </a>
+                <a
+                  href={`/${locale}/#faq`}
+                  className='text-foreground no-underline border-b-2 border-transparent hover:border-[var(--frame)] pb-0.5 transition-colors'
+                >
+                  {t('link4')}
+                </a>
               </nav>
             </div>
           </header>
@@ -130,13 +150,50 @@ export default async function GlobalNotFound() {
                   </span>
                   <span className='inline-block bg-[var(--color-brand-teal)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[10px_10px_0_0_var(--frame)] leading-[0.85] relative'>
                     0
-                    <svg viewBox='0 0 80 80' className='w-[58%] h-[58%] absolute top-[22%] left-[22%]' aria-hidden='true'>
-                      <path d='M40 72 Q36 50 42 20' stroke='var(--color-brand-ink)' strokeWidth='4' fill='none' strokeLinecap='round' />
-                      <path d='M42 20 Q24 8 6 10 Q22 14 38 24' fill='var(--color-brand-green)' stroke='var(--color-brand-ink)' strokeWidth='3' />
-                      <path d='M42 20 Q60 8 78 10 Q62 14 46 24' fill='var(--color-brand-green)' stroke='var(--color-brand-ink)' strokeWidth='3' />
-                      <path d='M42 20 Q32 4 26 -2 Q38 6 44 20' fill='var(--color-brand-green)' stroke='var(--color-brand-ink)' strokeWidth='3' />
-                      <path d='M42 20 Q52 4 58 -2 Q46 6 40 20' fill='var(--color-brand-green)' stroke='var(--color-brand-ink)' strokeWidth='3' />
-                      <circle cx='62' cy='6' r='5' fill='var(--color-brand-orange)' stroke='var(--color-brand-ink)' strokeWidth='2' />
+                    <svg
+                      viewBox='0 0 80 80'
+                      className='w-[58%] h-[58%] absolute top-[22%] left-[22%]'
+                      aria-hidden='true'
+                    >
+                      <path
+                        d='M40 72 Q36 50 42 20'
+                        stroke='var(--color-brand-ink)'
+                        strokeWidth='4'
+                        fill='none'
+                        strokeLinecap='round'
+                      />
+                      <path
+                        d='M42 20 Q24 8 6 10 Q22 14 38 24'
+                        fill='var(--color-brand-green)'
+                        stroke='var(--color-brand-ink)'
+                        strokeWidth='3'
+                      />
+                      <path
+                        d='M42 20 Q60 8 78 10 Q62 14 46 24'
+                        fill='var(--color-brand-green)'
+                        stroke='var(--color-brand-ink)'
+                        strokeWidth='3'
+                      />
+                      <path
+                        d='M42 20 Q32 4 26 -2 Q38 6 44 20'
+                        fill='var(--color-brand-green)'
+                        stroke='var(--color-brand-ink)'
+                        strokeWidth='3'
+                      />
+                      <path
+                        d='M42 20 Q52 4 58 -2 Q46 6 40 20'
+                        fill='var(--color-brand-green)'
+                        stroke='var(--color-brand-ink)'
+                        strokeWidth='3'
+                      />
+                      <circle
+                        cx='62'
+                        cy='6'
+                        r='5'
+                        fill='var(--color-brand-orange)'
+                        stroke='var(--color-brand-ink)'
+                        strokeWidth='2'
+                      />
                     </svg>
                   </span>
                   <span className='inline-block bg-[var(--color-brand-orange)] text-white border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[10px_10px_0_0_var(--frame)] leading-[0.85]'>
@@ -186,7 +243,9 @@ export default async function GlobalNotFound() {
                       href={href}
                       className='flex items-center gap-2.5 px-3 py-2.5 bg-card border-[2px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] no-underline text-foreground text-[13px] font-semibold transition-[transform,box-shadow] hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)]'
                     >
-                      <span className={`shrink-0 w-6 h-6 ${bg} text-[var(--color-brand-ink)] border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold`}>
+                      <span
+                        className={`shrink-0 w-6 h-6 ${bg} text-[var(--color-brand-ink)] border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold`}
+                      >
                         {emoji}
                       </span>
                       {label}
