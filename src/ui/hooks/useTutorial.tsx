@@ -107,7 +107,7 @@ export const useTutorial = () => {
       nextBtnText: tUi('nextBtn'),
       prevBtnText: tUi('prevBtn'),
       doneBtnText: tUi('doneBtn'),
-      progressText: `{current} ${tUi('progressTextConnector')} {total}`,
+      progressText: `{{current}} ${tUi('progressTextConnector')} {{total}}`,
     });
   }, [open, t, tUi, toggleSidebar]);
 
