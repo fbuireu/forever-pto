@@ -48,7 +48,7 @@ export const Combobox = ({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <AnimateIcon animateOnHover>
+      <AnimateIcon animateOnHover={!open} animate={open}>
         <PopoverTrigger asChild>
           <Button
             variant='outline'
@@ -59,6 +59,7 @@ export const Combobox = ({
             aria-disabled={disabled ?? false}
             className={cn('w-[200px] justify-between', className)}
             animate={{ x: open ? -2 : 0, y: open ? -2 : 0 }}
+            data-popup-open={open || undefined}
           >
             {selectedOption ? (
               <div className='flex items-center gap-2 min-w-0 flex-1'>

@@ -199,38 +199,41 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
                 {t('meanwhile')}
               </span>
               <div className='flex flex-col gap-2'>
-                <button
+                <Button
                   type='button'
+                  variant='outline'
                   onClick={() => setContactOpen(true)}
-                  className='flex items-center gap-2.5 px-3 py-2.5 bg-card border-[2px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] text-foreground text-[13px] font-semibold transition-[transform,box-shadow] hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)] cursor-pointer'
+                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[3px_3px_0_0_var(--frame)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)]'
                 >
                   <span className='shrink-0 w-6 h-6 bg-[var(--color-brand-purple)] text-white border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
                     @
                   </span>
                   {t('contact')}
-                </button>
-                <a
-                  href={CHANGELOG_URL}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='flex items-center gap-2.5 px-3 py-2.5 bg-card border-[2px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] no-underline text-foreground text-[13px] font-semibold transition-[transform,box-shadow] hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)]'
+                </Button>
+                <Button
+                  variant='outline'
+                  asChild
+                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[3px_3px_0_0_var(--frame)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)]'
                 >
-                  <span className='shrink-0 w-6 h-6 bg-[var(--color-brand-teal)] border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
-                    ∿
-                  </span>
-                  {t('changelog')}
-                </a>
-                <a
-                  href={SUPPORT_URL}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='flex items-center gap-2.5 px-3 py-2.5 bg-card border-[2px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] no-underline text-foreground text-[13px] font-semibold transition-[transform,box-shadow] hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)]'
+                  <a href={CHANGELOG_URL} target='_blank' rel='noopener noreferrer'>
+                    <span className='shrink-0 w-6 h-6 bg-[var(--color-brand-teal)] border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
+                      ∿
+                    </span>
+                    {t('changelog')}
+                  </a>
+                </Button>
+                <Button
+                  variant='outline'
+                  asChild
+                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[3px_3px_0_0_var(--frame)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)]'
                 >
-                  <span className='shrink-0 w-6 h-6 bg-[var(--color-brand-orange)] text-white border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
-                    !
-                  </span>
-                  {t('support')}
-                </a>
+                  <a href={SUPPORT_URL} target='_blank' rel='noopener noreferrer'>
+                    <span className='shrink-0 w-6 h-6 bg-[var(--color-brand-orange)] text-white border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
+                      !
+                    </span>
+                    {t('support')}
+                  </a>
+                </Button>
               </div>
             </div>
           </div>

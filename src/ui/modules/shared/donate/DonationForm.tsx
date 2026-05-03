@@ -86,7 +86,7 @@ export function DonationForm({
                 size='sm'
                 onClick={() => handlePresetClick(preset)}
                 disabled={loading}
-                className='flex-1'
+                className='flex-1 shadow-none hover:shadow-[var(--shadow-brutal-btn)]'
               >
                 {amount.format(preset)}
               </Button>
@@ -131,7 +131,7 @@ export function DonationForm({
         />
 
         <Collapsible open={showPromoCode} onOpenChange={setShowPromoCode}>
-          <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-sm font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors'>
+          <CollapsibleTrigger className='font-medium'>
             <span className='text-muted-foreground'>{t('havePromoCode')}</span>
             <ChevronDown
               animateOnHover

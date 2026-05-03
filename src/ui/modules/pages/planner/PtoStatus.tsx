@@ -41,7 +41,7 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
 
   return (
     <div
-      className='rounded-[10px] border-[3px] border-[var(--frame)] bg-card px-4 py-3 shadow-[var(--shadow-brutal-lg)]'
+      className='rounded-[10px] border-[3px] border-[var(--frame)] bg-card px-4 py-3 shadow-[var(--shadow-brutal-md)]'
       data-tutorial='pto-status'
     >
       <div className='flex items-center justify-between flex-wrap gap-4 h-full'>
