@@ -10,7 +10,7 @@ export const Footer = async () => {
 
   return (
     <footer className='w-full bg-background border-t-[3px] border-[var(--frame)]'>
-      <div className='max-w-4xl mx-auto'>
+      <div className='max-w-[1320px] mx-auto'>
         <div className='flex items-center justify-between flex-wrap gap-3 px-6 pt-5 pb-4 border-b-[2px] border-[var(--frame)]/18'>
           <Link
             href='/'
@@ -34,7 +34,7 @@ export const Footer = async () => {
         <DevFooter />
         <nav
           aria-label={t('legalNavigation')}
-          className='flex flex-col sm:flex-row justify-center items-center gap-3 py-5 px-4 max-w-4xl mx-auto border-t-[2px] border-dashed border-[var(--frame)]/18'
+          className='flex flex-col sm:flex-row justify-center items-center gap-3 py-5 px-4 border-t-[2px] border-dashed border-[var(--frame)]/18'
         >
           <Link
             href='/planner'

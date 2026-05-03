@@ -96,7 +96,7 @@ export const CalendarList = () => {
   return (
     <div
       className={cn(
-        'grid [grid-template-columns:repeat(auto-fit,minmax(min(100%,350px),1fr))] gap-5 mx-auto',
+        'grid [grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr))] gap-5 mx-auto w-full',
         isCalculating && 'pointer-events-none'
       )}
       data-tutorial='calendar-list'
@@ -105,7 +105,7 @@ export const CalendarList = () => {
         <Calendar
           key={month.toISOString()}
           mode={CalendarSelectionMode.NONE}
-          className='rounded-[14px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-md)] [content-visibility:auto] [contain-intrinsic-block-size:340px]'
+          className='rounded-[14px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-md)] [content-visibility:auto] [contain-intrinsic-block-size:310px]'
           month={month}
           weekStartsOn={1}
           locale={locale}

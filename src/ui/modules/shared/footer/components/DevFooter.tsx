@@ -61,7 +61,7 @@ export const DevFooter = () => {
   }, []);
 
   return (
-    <div className='container max-w-4xl px-4 py-4 flex flex-col items-center justify-center space-y-2 gap-4'>
+    <div className='px-4 py-4 flex flex-col items-center justify-center space-y-2 gap-4'>
       <div className='text-sm flex items-baseline gap-1.5 text-muted-foreground text-center'>
         {t('madeWith')}
         <RotatingTextContainer text={EMOJIS}>
