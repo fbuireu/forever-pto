@@ -9,7 +9,7 @@ export const Footer = async () => {
   const t = await getTranslations('footer');
 
   return (
-    <footer className='w-full bg-card border-t-[3px] border-[var(--frame)]'>
+    <footer className='w-full bg-background border-t-[3px] border-[var(--frame)]'>
       <div className='max-w-4xl mx-auto'>
         <div className='flex items-center justify-between flex-wrap gap-3 px-6 pt-5 pb-4 border-b-[2px] border-[var(--frame)]/18'>
           <Link

@@ -19,11 +19,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
             'group toast !rounded-[10px] !border-[3px] !border-[var(--frame)] ![background:var(--toast-bg,var(--surface-panel))] !text-foreground !shadow-[5px_5px_0_0_var(--frame)]',
           title: '!font-black !font-display !tracking-[-0.02em] !text-[15px]',
           description: '!text-[13px] !leading-[1.4]',
-          success: '![--toast-bg:var(--color-brand-green)]',
-          warning: '![--toast-bg:var(--accent)]',
+          success:
+            '![--toast-bg:var(--color-brand-green)] !text-[var(--color-brand-ink)] [&_[data-title]]:!text-[var(--color-brand-ink)] [&_[data-description]]:!text-[var(--color-brand-ink)]/70',
+          warning:
+            '![--toast-bg:var(--accent)] !text-[var(--color-brand-ink)] [&_[data-title]]:!text-[var(--color-brand-ink)] [&_[data-description]]:!text-[var(--color-brand-ink)]/70',
           error:
             '![--toast-bg:var(--color-brand-red)] !text-white [&_[data-title]]:!text-white [&_[data-description]]:!text-white/80',
-          info: '![--toast-bg:var(--color-brand-sky)]',
+          info: '![--toast-bg:var(--color-brand-sky)] !text-[var(--color-brand-ink)] [&_[data-title]]:!text-[var(--color-brand-ink)] [&_[data-description]]:!text-[var(--color-brand-ink)]/70',
           icon: '!size-8 !rounded-[6px] !border-[2.5px] !border-[var(--frame)] !bg-white !text-[var(--color-brand-ink)] !font-black !flex !items-center [&_svg]:!m-auto !justify-center',
           actionButton:
             '!rounded-[8px] !border-[3px] !border-[var(--frame)] !bg-[var(--color-brand-teal)] !text-[var(--color-brand-ink)] !shadow-[var(--shadow-brutal-xs)]',

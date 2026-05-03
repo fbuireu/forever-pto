@@ -426,7 +426,7 @@ export function Calendar({
             </h3>
             {monthFreeDays > 0 && (
               <span className='text-xs font-black text-muted-foreground tabular-nums'>
-                {monthFreeDays} {tCalendar('daysOff')}
+                {tCalendar('daysOff', { count: monthFreeDays })}
               </span>
             )}
           </div>

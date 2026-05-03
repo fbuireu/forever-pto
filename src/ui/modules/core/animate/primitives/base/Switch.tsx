@@ -84,7 +84,7 @@ function Switch({
               onTap?.(event, info);
             }}
             className={cn(
-              'group/switch relative inline-flex h-8 w-[60px] shrink-0 cursor-pointer items-center justify-start overflow-hidden rounded-full border-[3px] border-[var(--frame)] bg-white p-0 shadow-[3px_3px_0_0_var(--frame)] outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:border-[color-mix(in_srgb,var(--frame)_65%,white_35%)] disabled:bg-[color-mix(in_srgb,white_92%,var(--surface-panel-soft)_8%)] disabled:shadow-[3px_3px_0_0_color-mix(in_srgb,var(--frame)_45%,transparent)]',
+              'group/switch relative inline-flex h-8 w-[60px] shrink-0 cursor-pointer items-center justify-start overflow-hidden rounded-full border-[3px] border-[var(--frame)] bg-[var(--input)] p-0 shadow-[3px_3px_0_0_var(--frame)] outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:border-[color-mix(in_srgb,var(--frame)_65%,transparent_35%)] disabled:bg-[var(--muted)] disabled:shadow-[3px_3px_0_0_color-mix(in_srgb,var(--frame)_45%,transparent)]',
               className
             )}
             {...props}
