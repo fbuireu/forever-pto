@@ -54,6 +54,7 @@
   --shadow-brutal-btn: 5px 5px 0 0 var(--frame);
   --shadow-brutal-btn-hover: 7px 7px 0 0 var(--frame);
   --shadow-brutal-btn-active: 1px 1px 0 0 var(--frame);
+  --shadow-primary-btn-color: rgba(14, 14, 14, 0.4);
 
   --radius: 0.5rem;
 
@@ -106,6 +107,7 @@
   --shadow-brutal-md: 6px 6px 0 0 var(--frame);
   --shadow-brutal-lg: 8px 8px 0 0 var(--frame);
   --shadow-brutal-xl: 10px 10px 0 0 var(--frame);
+  --shadow-primary-btn-color: #ffffff;
   --background: #121008;
   --foreground: #fff5e1;
   --card: #1a1612;

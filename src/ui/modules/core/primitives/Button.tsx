@@ -9,7 +9,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)] data-[popup-open]:-translate-x-0.5 data-[popup-open]:-translate-y-0.5 data-[popup-open]:shadow-[var(--shadow-brutal-btn-hover)]',
+          'bg-primary text-primary-foreground shadow-[5px_5px_0_0_var(--shadow-primary-btn-color)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[7px_7px_0_0_var(--shadow-primary-btn-color)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_var(--shadow-primary-btn-color)] data-[popup-open]:-translate-x-0.5 data-[popup-open]:-translate-y-0.5 data-[popup-open]:shadow-[7px_7px_0_0_var(--shadow-primary-btn-color)]',
         accent:
           'bg-accent text-accent-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-accent/90 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)] data-[popup-open]:-translate-x-0.5 data-[popup-open]:-translate-y-0.5 data-[popup-open]:shadow-[var(--shadow-brutal-btn-hover)]',
         destructive:

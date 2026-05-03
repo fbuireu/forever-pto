@@ -52,7 +52,7 @@ export function Contact() {
           <div className='flex flex-wrap items-center gap-2 text-sm text-muted-foreground px-3 py-2'>
             <span>{t('gotAnIdea')}</span>
             <Button
-              variant='ghost'
+              variant='accent'
               className='px-1.5 py-0.5 h-auto text-sm font-semibold'
               onClick={() => setContactModalOpen(true)}
             >
