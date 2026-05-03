@@ -1,13 +1,11 @@
-'use client';
-
 import { Link } from '@application/i18n/navigtion';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { ThemeSelector } from '@ui/modules/sidebar/components/ThemeSelector';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { HomepageLanguageSwitcher } from './HomepageLanguageSwitcher';
 
-export const Navigation = () => {
-  const t = useTranslations('homepage');
+export const Navigation = async () => {
+  const t = await getTranslations('homepage');
 
   return (
     <nav className='sticky top-0 z-50 bg-[var(--background)] border-b-[4px] border-[var(--frame)]'>

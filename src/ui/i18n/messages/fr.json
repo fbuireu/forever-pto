@@ -25,6 +25,10 @@
     "planner": {
       "title": "Planificateur | Forever PTO",
       "description": "Planifie et optimise tes jours de congés. Calendrier PTO intelligent avec détection des jours fériés, optimisateur de ponts et export vers Google Agenda, Outlook et Apple."
+    },
+    "notFound": {
+      "title": "Page introuvable | Forever PTO",
+      "description": "La page que vous recherchez n'existe pas ou a été déplacée."
     }
   },
   "planner": {

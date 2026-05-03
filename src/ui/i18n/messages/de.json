@@ -25,6 +25,10 @@
     "planner": {
       "title": "Planer | Forever PTO",
       "description": "Plane und optimiere deine Urlaubstage. Intelligenter PTO-Kalender mit Feiertagserkennung, Brückentagsoptimierung und Export nach Google Kalender, Outlook und Apple."
+    },
+    "notFound": {
+      "title": "Seite nicht gefunden | Forever PTO",
+      "description": "Die gesuchte Seite existiert nicht oder wurde verschoben."
     }
   },
   "planner": {

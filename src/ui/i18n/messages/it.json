@@ -25,6 +25,10 @@
     "planner": {
       "title": "Pianificatore | Forever PTO",
       "description": "Pianifica e ottimizza i tuoi giorni di ferie. Calendario PTO intelligente con rilevamento festivi, ottimizzatore ponti ed esportazione su Google Calendar, Outlook e Apple."
+    },
+    "notFound": {
+      "title": "Pagina non trovata | Forever PTO",
+      "description": "La pagina che stai cercando non esiste o è stata spostata."
     }
   },
   "planner": {

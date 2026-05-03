@@ -25,6 +25,10 @@
     "planner": {
       "title": "Planner | Forever PTO",
       "description": "Plan and optimize your vacation days. Smart PTO calendar with holiday detection, bridge day optimizer, and export to Google Calendar, Outlook and Apple."
+    },
+    "notFound": {
+      "title": "Page not found | Forever PTO",
+      "description": "The page you're looking for doesn't exist or has been moved."
     }
   },
   "planner": {

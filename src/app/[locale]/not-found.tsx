@@ -1,5 +1,20 @@
 import { Link } from '@application/i18n/navigtion';
+import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('metadata.notFound');
+
+  return {
+    title: t('title'),
+    description: t('description'),
+    robots: {
+      index: false,
+      follow: false,
+      googleBot: { index: false, follow: false },
+    },
+  };
+}
 
 export default async function NotFound() {
   const t = await getTranslations('notFound');
@@ -84,20 +99,13 @@ export default async function NotFound() {
       <div className='flex-1 py-[60px]'>
         <div className='max-w-[1320px] mx-auto grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-[60px] px-7 items-center'>
           <div className='flex items-start justify-center'>
-            <div
-              className='flex items-start gap-[10px] font-display font-extrabold tracking-[-0.06em] leading-[0.82]'
-              style={{ fontSize: 'clamp(120px, 18vw, 280px)' }}
-            >
+            <div className='flex items-start gap-[10px] font-display font-extrabold tracking-[-0.06em] leading-[0.82] text-[clamp(120px,18vw,280px)]'>
               <span className='inline-block bg-[var(--accent)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[10px_10px_0_0_var(--frame)] leading-[0.85]'>
                 4
               </span>
               <span className='inline-block bg-[var(--color-brand-teal)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[10px_10px_0_0_var(--frame)] leading-[0.85] relative'>
                 0
-                <svg
-                  viewBox='0 0 80 80'
-                  style={{ width: '58%', height: '58%', position: 'absolute', top: '22%', left: '22%' }}
-                  aria-hidden='true'
-                >
+                <svg viewBox='0 0 80 80' className='w-[58%] h-[58%] absolute top-[22%] left-[22%]' aria-hidden='true'>
                   <path
                     d='M40 72 Q36 50 42 20'
                     stroke='var(--color-brand-ink)'
@@ -151,15 +159,9 @@ export default async function NotFound() {
               {t('kicker')}
             </span>
 
-            <h1
-              className='font-display font-extrabold leading-none tracking-[-0.035em] mb-[18px] text-wrap-pretty'
-              style={{ fontSize: 'clamp(34px, 4.4vw, 56px)' }}
-            >
+            <h1 className='font-display font-extrabold leading-none tracking-[-0.035em] mb-[18px] text-wrap-pretty text-[clamp(34px,4.4vw,56px)]'>
               {t('title')}{' '}
-              <span
-                className='inline-block bg-[var(--accent)] px-2 border-[3px] border-[var(--frame)] rounded-[6px] mx-0.5'
-                style={{ transform: 'rotate(-1.5deg)' }}
-              >
+              <span className='inline-block bg-[var(--accent)] px-2 border-[3px] border-[var(--frame)] rounded-[6px] mx-0.5 rotate-[-1.5deg]'>
                 {t('titleHighlight')}
               </span>{' '}
               <em className='font-serif italic font-normal'>{t('titleEmphasis')}</em>

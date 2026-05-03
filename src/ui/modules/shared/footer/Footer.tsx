@@ -1,14 +1,12 @@
-'use client';
-
 import { Link } from '@application/i18n/navigtion';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { version } from '../../../../../package.json';
 import { ContactButton } from '../contact/ContactButton';
 import { CookieButton } from './components/CookieButton';
 import { DevFooter } from './components/DevFooter';
 
-export const Footer = () => {
-  const t = useTranslations('footer');
+export const Footer = async () => {
+  const t = await getTranslations('footer');
 
   return (
     <footer className='w-full bg-card border-t-[3px] border-[var(--frame)]'>
