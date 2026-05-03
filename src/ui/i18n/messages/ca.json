@@ -697,7 +697,10 @@
     "gaStarDesc": "Manté l'estat de sessió per seguiment analític",
     "gidDesc": "Distingeix usuaris per anàlisi a curt termini",
     "learnMore": "Saber més",
-    "provider": "Proveïdor: {name}"
+    "provider": "Proveïdor: {name}",
+    "bsUidDesc": "Identificador únic de visitant per al seguiment analític de Better Stack",
+    "bsSidDesc": "Identificador de sessió per al seguiment analític de Better Stack",
+    "session": "Sessió"
   },
   "holidayTableHeader": {
     "holiday": "Festivitat",
@@ -1141,6 +1144,10 @@
           "holidayApis": {
             "label": "APIs de festius:",
             "description": "Utilitzem APIs externes per obtenir dades de festius, però aquestes no estableixen cookies al nostre lloc."
+          },
+          "analytics": {
+            "label": "Better Stack (Analítica):",
+            "description": "Quan accepteu les galetes analítiques, Better Stack pot establir galetes per fer un seguiment de les interaccions dels usuaris i mesurar l'ús del producte."
           }
         },
         "disclaimer": "No som responsables de les cookies de tercers i recomanem revisar les seves respectives polítiques de cookies."
@@ -1344,6 +1351,10 @@
           "legal": {
             "label": "Compliment legal:",
             "description": "Si ho exigeix la llei o per protegir els nostres drets legals."
+          },
+          "betterStack": {
+            "label": "Better Stack (Analítica, si s'ha donat el consentiment):",
+            "description": "Processa dades d'ús anonimitzades i fa un seguiment de les interaccions dels usuaris per millorar el producte. Consulteu la Política de Privadesa de Better Stack."
           }
         }
       },

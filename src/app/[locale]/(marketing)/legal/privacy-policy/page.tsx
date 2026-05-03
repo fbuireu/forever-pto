@@ -172,6 +172,10 @@ export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPoli
             {t('sections.dataSharing.items.analytics.description')}
           </li>
           <li>
+            <strong>{t('sections.dataSharing.items.betterStack.label')}</strong>{' '}
+            {t('sections.dataSharing.items.betterStack.description')}
+          </li>
+          <li>
             <strong>{t('sections.dataSharing.items.legal.label')}</strong>{' '}
             {t('sections.dataSharing.items.legal.description')}
           </li>

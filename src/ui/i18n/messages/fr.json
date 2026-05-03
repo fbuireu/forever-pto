@@ -697,7 +697,10 @@
     "gaStarDesc": "Maintient l'état de session pour le suivi analytique",
     "gidDesc": "Distingue les utilisateurs pour les analyses à court terme",
     "learnMore": "En savoir plus",
-    "provider": "Fournisseur : {name}"
+    "provider": "Fournisseur : {name}",
+    "bsUidDesc": "Identifiant unique du visiteur pour le suivi analytique de Better Stack",
+    "bsSidDesc": "Identifiant de session pour le suivi analytique de Better Stack",
+    "session": "Session"
   },
   "holidayTableHeader": {
     "holiday": "Jour férié",
@@ -1141,6 +1144,10 @@
           "holidayApis": {
             "label": "API de jours fériés :",
             "description": "Nous utilisons des API externes pour récupérer les données de jours fériés, mais celles-ci ne déposent pas de cookies sur notre site."
+          },
+          "analytics": {
+            "label": "Better Stack (Analytique):",
+            "description": "Lorsque vous acceptez les cookies analytiques, Better Stack peut définir des cookies pour suivre les interactions des utilisateurs et mesurer l'utilisation du produit."
           }
         },
         "disclaimer": "Nous ne sommes pas responsables des cookies tiers et recommandons de consulter leurs politiques de cookies respectives."
@@ -1344,6 +1351,10 @@
           "legal": {
             "label": "Conformité juridique :",
             "description": "Si requis par la loi ou pour protéger nos droits légaux."
+          },
+          "betterStack": {
+            "label": "Better Stack (Analytique, si consenti):",
+            "description": "Traite les données d'utilisation anonymisées et suit les interactions des utilisateurs pour améliorer le produit. Voir la Politique de confidentialité de Better Stack."
           }
         }
       },

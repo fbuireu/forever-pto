@@ -158,6 +158,24 @@ export const CookieConsentDialog = ({
                       <p className='text-sm text-muted-foreground'>{t('gidDesc')}</p>
                       <p className='text-xs text-muted-foreground'>{t('provider', { name: 'Google Analytics' })}</p>
                     </div>
+
+                    <div className='rounded-md bg-muted/50 p-3 space-y-1'>
+                      <div className='flex items-center justify-between'>
+                        <span className='font-mono text-sm font-medium'>_bs_uid</span>
+                        <span className='text-xs text-muted-foreground'>{t('year', { count: 1 })}</span>
+                      </div>
+                      <p className='text-sm text-muted-foreground'>{t('bsUidDesc')}</p>
+                      <p className='text-xs text-muted-foreground'>{t('provider', { name: 'Better Stack' })}</p>
+                    </div>
+
+                    <div className='rounded-md bg-muted/50 p-3 space-y-1'>
+                      <div className='flex items-center justify-between'>
+                        <span className='font-mono text-sm font-medium'>_bs_sid</span>
+                        <span className='text-xs text-muted-foreground'>{t('session')}</span>
+                      </div>
+                      <p className='text-sm text-muted-foreground'>{t('bsSidDesc')}</p>
+                      <p className='text-xs text-muted-foreground'>{t('provider', { name: 'Better Stack' })}</p>
+                    </div>
                   </div>
                 </AccordionPanel>
               </AccordionItem>

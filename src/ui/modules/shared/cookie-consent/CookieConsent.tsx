@@ -56,7 +56,7 @@ export const CookieConsent = () => {
       categories: {
         necessary: { enabled: true, readOnly: true },
         analytics: {
-          autoClear: { cookies: [{ name: /^_ga/ }, { name: '_gid' }] },
+          autoClear: { cookies: [{ name: /^_ga/ }, { name: '_gid' }, { name: /^_bs/ }] },
         },
       },
       language: {

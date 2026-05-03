@@ -172,6 +172,10 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
             {t('sections.thirdPartyCookies.items.payment.description')}
           </li>
           <li>
+            <strong>{t('sections.thirdPartyCookies.items.analytics.label')}</strong>{' '}
+            {t('sections.thirdPartyCookies.items.analytics.description')}
+          </li>
+          <li>
             <strong>{t('sections.thirdPartyCookies.items.holidayApis.label')}</strong>{' '}
             {t('sections.thirdPartyCookies.items.holidayApis.description')}
           </li>
