@@ -33,7 +33,12 @@ export const HomepageCta = async () => {
           {t('closing.titleEnd')}
         </h2>
         <p className='text-[19px] opacity-85 mb-8'>{t('closing.description')}</p>
-        <Button variant='accent' size='lg' asChild>
+        <Button
+          variant='accent'
+          size='lg'
+          asChild
+          className='shadow-[5px_5px_0_0_var(--background)] hover:shadow-[7px_7px_0_0_var(--background)] active:shadow-[1px_1px_0_0_var(--background)]'
+        >
           <Link href='/planner'>{t('closing.cta')}</Link>
         </Button>
       </div>

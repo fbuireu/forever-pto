@@ -52,8 +52,8 @@ export function Contact() {
           <div className='flex flex-wrap items-center gap-2 text-sm text-muted-foreground px-3 py-2'>
             <span>{t('gotAnIdea')}</span>
             <Button
-              variant='accent'
-              className='px-1.5 py-0.5 h-auto text-sm font-semibold'
+              variant='ghost'
+              className='px-1.5 py-0.5 h-auto text-sm font-semibold hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground'
               onClick={() => setContactModalOpen(true)}
             >
               {t('letsTalk')}

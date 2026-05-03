@@ -246,7 +246,7 @@ export function Calendar({
             action: (
               <div className='w-full donate-rainbow relative z-0 overflow-hidden p-0.5 flex items-center justify-center rounded-md hover:scale-102 transition duration-200 active:scale-100'>
                 <Button
-                  className='rounded-[8px] border-[3px] border-[var(--frame)] w-full h-full py-3 px-2 shadow-[var(--shadow-brutal-xs)]'
+                  className='rounded-[8px] border-[3px] border-[var(--frame)] w-full h-full py-3 px-2 shadow-none hover:shadow-none active:shadow-none hover:translate-x-0 hover:translate-y-0 active:translate-x-0 active:translate-y-0 hover:bg-primary'
                   onClick={() => {
                     openDonatePopover();
                   }}
