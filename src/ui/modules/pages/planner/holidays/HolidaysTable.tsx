@@ -319,7 +319,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   return (
     <Collapsible open={innerOpen} onOpenChange={setInnerOpen} className='space-y-4 w-full'>
       <AnimateIcon animateOnHover>
-        <CollapsibleTrigger className='group rounded-[12px] bg-card p-4 shadow-[var(--shadow-brutal-sm)] hover:shadow-[var(--shadow-brutal-md)] active:shadow-[var(--shadow-brutal-xs)]'>
+        <CollapsibleTrigger className='flex items-center justify-between cursor-pointer group p-4 rounded-[12px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-sm)] transition-colors w-full text-left hover:bg-[var(--surface-panel-alt)]'>
           <span className='flex items-center space-x-3 w-full'>
             <span className='flex items-center space-x-2'>
               {innerOpen ? (

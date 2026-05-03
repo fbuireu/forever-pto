@@ -59,7 +59,7 @@ export function FeatureList({ features, categoryLabel }: FeatureListProps) {
         {features.map((feature, i) => (
           <m.div
             key={feature.id}
-            className='border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] rounded-[10px] px-4 py-3 relative'
+            className='border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] rounded-[10px] px-4 py-3 relative shadow-[var(--shadow-brutal-xs)]'
             variants={getCardVariants(i)}
             transition={transition}
             style={{
