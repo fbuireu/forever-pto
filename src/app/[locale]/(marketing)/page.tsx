@@ -62,7 +62,6 @@ export default HomePage;
 // todo: ads?
 // todo: add LICENCE, SECURITY, DOCS, WIKI, etc
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
-// todo: use grid one-liner for layout calendar https://www.youtube.com/watch?v=Ix_LAId0obw
 // todo: unify component and folder structure (payment/provider should be dto?)
 // todo: Increase test coverage
 // todo: track origin of premium key (feature)
