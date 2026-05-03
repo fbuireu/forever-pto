@@ -95,7 +95,7 @@ export const CookieConsent = () => {
         role='dialog'
         aria-labelledby='cookie-banner-title'
         aria-describedby='cookie-banner-description'
-        className='fixed bottom-4 left-4 z-50 max-w-xl rounded-[14px] border-[3px] border-[var(--frame)] bg-card p-8 shadow-[var(--shadow-brutal-lg)]'
+        className='fixed bottom-4 left-4 z-50 max-w-2xl rounded-[14px] border-[3px] border-[var(--frame)] bg-card p-8 shadow-[var(--shadow-brutal-lg)]'
       >
         <h3 id='cookie-banner-title' className='text-xl font-black tracking-[-0.03em]'>
           {t('title')}
@@ -108,7 +108,7 @@ export const CookieConsent = () => {
             {t('rejectAll')}
           </Button>
           <Button
-            variant='ghost'
+            variant='secondary'
             onClick={() => {
               setShowBanner(false);
               setShowPreferences(true);
