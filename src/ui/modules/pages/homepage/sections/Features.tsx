@@ -113,7 +113,7 @@ export const Features = async () => {
           style={{ background: 'var(--color-brand-orange)' }}
         >
           <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[6px] font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--frame)] shadow-[var(--shadow-brutal-xs)]'>
-            {t('features.countriesTag')}
+            {t('features.countriesTag', { count: 14 })}
           </span>
           <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em] text-white'>
             {t('features.countriesTitle')}

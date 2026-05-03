@@ -324,9 +324,9 @@
       "finishDescription": "Ora sai come usare Forever PTO per massimizzare il tuo tempo libero. Inizia configurando le tue preferenze nella barra laterale, e lascia che l'app ti suggerisca i migliori giorni PTO. Goditi le tue meritate pause!",
       "holidaysListTitle": "Personalizza le tue festività",
       "holidaysListDescription": "Qui puoi perfezionare i dati sulle festività per adattarli alla tua situazione. Modifica o elimina qualsiasi festività nazionale o regionale e aggiungi i tuoi giorni personalizzati: festività aziendali, celebrazioni locali o qualsiasi data che conti per te. Più accurati sono i dati, migliori saranno i suggerimenti.",
-      "step1Title": "Passo 1 — Il tuo contesto",
+      "step1Title": "Passo {step} — Il tuo contesto",
       "step1Description": "Seleziona il tuo paese, regione e l'anno che vuoi pianificare. Questo configura il tuo calendario delle festività per trovare i migliori ponti.",
-      "step2Title": "Passo 2 — I tuoi giorni disponibili",
+      "step2Title": "Passo {step} — I tuoi giorni disponibili",
       "step2Description": "Indica quanti giorni di ferie hai e scegli la tua strategia di ottimizzazione. La strategia determina come raggruppiamo i tuoi giorni liberi."
     }
   },
@@ -493,12 +493,12 @@
     "step1": {
       "titleStart": "Il tuo ",
       "titleEmphasis": "contesto",
-      "badge": "passo 1"
+      "badge": "passo {step}"
     },
     "step2": {
       "titleStart": "I tuoi ",
       "titleEmphasis": "giorni",
-      "badge": "passo 2"
+      "badge": "passo {step}"
     },
     "steps": "Passaggi"
   },
@@ -535,9 +535,9 @@
     "tooltip": "Calcola quanto tempo libero retribuito stai perdendo non usando i tuoi giorni di PTO. Continui a ricevere lo stipendio completo, ma stai lavorando giorni che avresti potuto prendere come ferie pagate.",
     "tooltipLabel": "Maggiori informazioni sul calcolatore",
     "annualSalary": "Stipendio Annuale",
-    "annualSalaryPlaceholder": "50000",
+    "annualSalaryPlaceholder": "{amount}",
     "unusedPtoDays": "Giorni PTO Non Usati",
-    "unusedPtoDaysPlaceholder": "5",
+    "unusedPtoDaysPlaceholder": "{days}",
     "valueOfUnusedPto": "Valore del PTO non usato:",
     "worthOfPaidVacation": "Valore delle ferie pagate non prese",
     "yourDailyRate": "La tua tariffa giornaliera:",
@@ -590,7 +590,7 @@
     "verifyAccess": "Verifica Accesso",
     "cancel": "Annulla",
     "accessGranted": "Accesso Concesso!",
-    "welcomeToPremium": "Benvenuto alle funzioni premium. Puoi chiudere questo modal o lo faremo in 5 secondi.",
+    "welcomeToPremium": "Benvenuto alle funzioni premium. Puoi chiudere questo modal o lo faremo in {seconds} secondi.",
     "accessDenied": "Accesso Negato",
     "emailNotFound": "Questa email non è nella nostra lista di utenti premium.",
     "emailNotFoundError": "Email non trovata nella nostra lista di utenti premium",
@@ -603,11 +603,11 @@
     "contact": {
       "invalidEmail": "Per favore inserisci un'email valida",
       "emailRequired": "L'email è obbligatoria",
-      "nameMin": "Il nome deve avere almeno 2 caratteri",
+      "nameMin": "Il nome deve avere almeno {min} caratteri",
       "nameMax": "Il nome è troppo lungo",
-      "subjectMin": "L'oggetto deve avere almeno 5 caratteri",
+      "subjectMin": "L'oggetto deve avere almeno {min} caratteri",
       "subjectMax": "L'oggetto è troppo lungo",
-      "messageMin": "Il messaggio deve avere almeno 10 caratteri",
+      "messageMin": "Il messaggio deve avere almeno {min} caratteri",
       "messageMax": "Il messaggio è troppo lungo"
     },
     "payment": {
@@ -865,7 +865,7 @@
       "items": "ponte di pasqua · ponte del primo maggio · estate infinita · ponte di ferragosto · natale prolungato · ponte di novembre · ponte del 25 aprile · ponte del 2 giugno · ponte di ottobre · capodanno prolungato"
     },
     "how": {
-      "badge": "come funziona · 3 passi",
+      "badge": "come funziona · {steps} passi",
       "titleStart": "Da",
       "titleMid": "a",
       "question1": "cosa faccio",
@@ -881,7 +881,7 @@
     },
     "stats": {
       "multiplierLabel": "Moltiplicatore medio",
-      "daysLabel": "Giorni liberi con 22 PTO",
+      "daysLabel": "Giorni liberi con {days} PTO",
       "countriesLabel": "Paesi supportati",
       "plansLabel": "Piani generati"
     },
@@ -907,7 +907,7 @@
         "quarterClose": "Chiusura Q3",
         "productLaunch": "Lancio prodotto"
       },
-      "countriesTag": "14 paesi",
+      "countriesTag": "{count} paesi",
       "countriesTitle": "Festivi locali reali.",
       "countriesDescription": "Calendari ufficiali aggiornati ogni anno. Anche quelli regionali.",
       "privacyTag": "100% locale",
@@ -985,7 +985,7 @@
       "freeFeatures": {
         "optimizedPlan": "Piano vacanze auto-ottimizzato",
         "countryHolidays": "Festività del tuo paese e regione",
-        "threeStrategies": "3 strategie (Raggruppata, Ottimizzata, Bilanciata)",
+        "threeStrategies": "{count} strategie (Raggruppata, Ottimizzata, Bilanciata)",
         "basicStats": "Statistiche di base e calcolatrici"
       },
       "freeCta": "Inizia gratis",

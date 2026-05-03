@@ -324,9 +324,9 @@
       "finishDescription": "Jetzt weißt du, wie du Forever PTO nutzen kannst, um deine Freizeit zu maximieren. Beginne damit, deine Einstellungen in der Seitenleiste zu konfigurieren, und lass die App dir die besten Urlaubstage vorschlagen. Genieße deine wohlverdienten Pausen!",
       "holidaysListTitle": "Passe deine Feiertage an",
       "holidaysListDescription": "Hier kannst du die Feiertagsdaten an deine genaue Situation anpassen. Bearbeite oder lösche nationale oder regionale Feiertage und füge eigene freie Tage hinzu – Firmenfeiertage, lokale Bräuche oder jedes Datum, das dir wichtig ist. Je genauer die Daten, desto besser die Vorschläge.",
-      "step1Title": "Schritt 1 — Dein Kontext",
+      "step1Title": "Schritt {step} — Dein Kontext",
       "step1Description": "Wähle dein Land, deine Region und das Jahr, für das du planen möchtest. Dies konfiguriert deinen Feiertagskalender, damit wir die besten Brückentage finden.",
-      "step2Title": "Schritt 2 — Deine verfügbaren Tage",
+      "step2Title": "Schritt {step} — Deine verfügbaren Tage",
       "step2Description": "Gib an, wie viele Urlaubstage du hast, und wähle deine Optimierungsstrategie. Die Strategie bestimmt, wie wir deine freien Tage gruppieren."
     }
   },
@@ -493,12 +493,12 @@
     "step1": {
       "titleStart": "Dein ",
       "titleEmphasis": "Kontext",
-      "badge": "schritt 1"
+      "badge": "schritt {step}"
     },
     "step2": {
       "titleStart": "Deine ",
       "titleEmphasis": "Tage",
-      "badge": "schritt 2"
+      "badge": "schritt {step}"
     },
     "steps": "Schritte"
   },
@@ -535,9 +535,9 @@
     "tooltip": "Berechne, wie viel bezahlte Freizeit du aufgibst, wenn du deine PTO-Tage nicht nutzt. Du erhältst weiterhin dein volles Gehalt, aber du arbeitest Tage, die du als bezahlten Urlaub hättest nehmen können.",
     "tooltipLabel": "Mehr Informationen über den Gehaltsrechner",
     "annualSalary": "Jahresgehalt",
-    "annualSalaryPlaceholder": "50000",
+    "annualSalaryPlaceholder": "{amount}",
     "unusedPtoDays": "Ungenutzte PTO-Tage",
-    "unusedPtoDaysPlaceholder": "5",
+    "unusedPtoDaysPlaceholder": "{days}",
     "valueOfUnusedPto": "Wert ungenutzter PTO:",
     "worthOfPaidVacation": "Wert des nicht genommenen bezahlten Urlaubs",
     "yourDailyRate": "Dein Tagessatz:",
@@ -590,7 +590,7 @@
     "verifyAccess": "Zugang überprüfen",
     "cancel": "Abbrechen",
     "accessGranted": "Zugang gewährt!",
-    "welcomeToPremium": "Willkommen bei den Premium-Funktionen. Du kannst dieses Fenster schließen oder wir tun es in 5 Sekunden.",
+    "welcomeToPremium": "Willkommen bei den Premium-Funktionen. Du kannst dieses Fenster schließen oder wir tun es in {seconds} Sekunden.",
     "accessDenied": "Zugang verweigert",
     "emailNotFound": "Diese E-Mail ist nicht in unserer Premium-Nutzerliste.",
     "emailNotFoundError": "E-Mail nicht in unserer Premium-Nutzerliste gefunden",
@@ -603,11 +603,11 @@
     "contact": {
       "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein",
       "emailRequired": "E-Mail ist erforderlich",
-      "nameMin": "Der Name muss mindestens 2 Zeichen lang sein",
+      "nameMin": "Der Name muss mindestens {min} Zeichen lang sein",
       "nameMax": "Der Name ist zu lang",
-      "subjectMin": "Der Betreff muss mindestens 5 Zeichen lang sein",
+      "subjectMin": "Der Betreff muss mindestens {min} Zeichen lang sein",
       "subjectMax": "Der Betreff ist zu lang",
-      "messageMin": "Die Nachricht muss mindestens 10 Zeichen lang sein",
+      "messageMin": "Die Nachricht muss mindestens {min} Zeichen lang sein",
       "messageMax": "Die Nachricht ist zu lang"
     },
     "payment": {
@@ -865,7 +865,7 @@
       "items": "osterbrücke · feiertags-wochenende · sommer-stretch · herbst-brücke · weihnachts-stretch · november-brücke · pfingstbrücke · himmelfahrt-brücke · tag der einheit · silvester-stretch"
     },
     "how": {
-      "badge": "wie es funktioniert · 3 schritte",
+      "badge": "wie es funktioniert · {steps} schritte",
       "titleStart": "Von",
       "titleMid": "zu",
       "question1": "was soll ich tun",
@@ -881,7 +881,7 @@
     },
     "stats": {
       "multiplierLabel": "Durchschnittlicher Multiplikator",
-      "daysLabel": "Freie Tage mit 22 Urlaubstagen",
+      "daysLabel": "Freie Tage mit {days} Urlaubstagen",
       "countriesLabel": "Unterstützte Länder",
       "plansLabel": "Generierte Pläne"
     },
@@ -907,7 +907,7 @@
         "quarterClose": "Q3-Abschluss",
         "productLaunch": "Produktstart"
       },
-      "countriesTag": "14 länder",
+      "countriesTag": "{count} länder",
       "countriesTitle": "Echte lokale Feiertage.",
       "countriesDescription": "Offizielle Kalender jedes Jahr aktualisiert. Auch die regionalen.",
       "privacyTag": "100% lokal",
@@ -985,7 +985,7 @@
       "freeFeatures": {
         "optimizedPlan": "Auto-optimierter Urlaubsplan",
         "countryHolidays": "Feiertage deines Landes und deiner Region",
-        "threeStrategies": "3 Strategien (Gruppiert, Optimiert, Ausgewogen)",
+        "threeStrategies": "{count} Strategien (Gruppiert, Optimiert, Ausgewogen)",
         "basicStats": "Grundlegende Statistiken & Rechner"
       },
       "freeCta": "Kostenlos starten",

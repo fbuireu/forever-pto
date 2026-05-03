@@ -44,7 +44,8 @@ export const Pricing = async () => {
                 key={key}
                 className='flex gap-2.5 py-2 border-b-[2px] border-dashed border-black/15 last:border-b-0 text-[15px]'
               >
-                <span className='font-black'>✓</span> {t(key)}
+                <span className='font-black'>✓</span>{' '}
+                {key === 'pricing.freeFeatures.threeStrategies' ? t(key, { count: 3 }) : t(key)}
               </li>
             ))}
           </ul>

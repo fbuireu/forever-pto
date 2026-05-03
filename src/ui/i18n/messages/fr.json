@@ -324,9 +324,9 @@
       "finishDescription": "Maintenant tu sais comment utiliser Forever PTO pour maximiser ton temps libre. Commence par configurer tes préférences dans la barre latérale et laisse l'application te suggérer les meilleurs jours de congé. Profite bien de tes pauses méritées !",
       "holidaysListTitle": "Personnalise tes jours fériés",
       "holidaysListDescription": "Ici tu peux affiner les données des jours fériés pour qu'elles correspondent exactement à ta situation. Modifie ou supprime n'importe quel jour férié national ou régional, et ajoute tes propres jours de repos — jours fériés d'entreprise, fêtes locales, ou toute date qui compte pour toi. Plus les données sont précises, meilleures sont les suggestions.",
-      "step1Title": "Étape 1 — Ton contexte",
+      "step1Title": "Étape {step} — Ton contexte",
       "step1Description": "Sélectionne ton pays, ta région et l'année que tu veux planifier. Cela configure ton calendrier de jours fériés pour trouver les meilleurs ponts.",
-      "step2Title": "Étape 2 — Tes jours disponibles",
+      "step2Title": "Étape {step} — Tes jours disponibles",
       "step2Description": "Indique combien de jours de congé tu as et choisis ta stratégie d'optimisation. La stratégie détermine comment nous regroupons tes jours de repos."
     }
   },
@@ -493,12 +493,12 @@
     "step1": {
       "titleStart": "Ton ",
       "titleEmphasis": "contexte",
-      "badge": "étape 1"
+      "badge": "étape {step}"
     },
     "step2": {
       "titleStart": "Tes ",
       "titleEmphasis": "jours",
-      "badge": "étape 2"
+      "badge": "étape {step}"
     },
     "steps": "Étapes"
   },
@@ -535,9 +535,9 @@
     "tooltip": "Calcule combien de congés payés tu perds en n'utilisant pas tes jours de PTO. Tu reçois toujours ton salaire complet, mais tu travailles des jours que tu aurais pu prendre en vacances payées.",
     "tooltipLabel": "Plus d'informations sur le calculateur de salaire",
     "annualSalary": "Salaire annuel",
-    "annualSalaryPlaceholder": "50000",
+    "annualSalaryPlaceholder": "{amount}",
     "unusedPtoDays": "Jours de PTO non utilisés",
-    "unusedPtoDaysPlaceholder": "5",
+    "unusedPtoDaysPlaceholder": "{days}",
     "valueOfUnusedPto": "Valeur des PTO non utilisés :",
     "worthOfPaidVacation": "Valeur des congés payés non pris",
     "yourDailyRate": "Ton taux journalier :",
@@ -590,7 +590,7 @@
     "verifyAccess": "Vérifier l'accès",
     "cancel": "Annuler",
     "accessGranted": "Accès accordé !",
-    "welcomeToPremium": "Bienvenue parmi les fonctionnalités premium. Tu peux fermer cette fenêtre ou nous le ferons dans 5 secondes.",
+    "welcomeToPremium": "Bienvenue parmi les fonctionnalités premium. Tu peux fermer cette fenêtre ou nous le ferons dans {seconds} secondes.",
     "accessDenied": "Accès refusé",
     "emailNotFound": "Cet e-mail ne figure pas dans notre liste d'utilisateurs premium.",
     "emailNotFoundError": "E-mail introuvable dans notre liste d'utilisateurs premium",
@@ -603,11 +603,11 @@
     "contact": {
       "invalidEmail": "Saisis une adresse e-mail valide",
       "emailRequired": "L'e-mail est requis",
-      "nameMin": "Le nom doit contenir au moins 2 caractères",
+      "nameMin": "Le nom doit contenir au moins {min} caractères",
       "nameMax": "Le nom est trop long",
-      "subjectMin": "Le sujet doit contenir au moins 5 caractères",
+      "subjectMin": "Le sujet doit contenir au moins {min} caractères",
       "subjectMax": "Le sujet est trop long",
-      "messageMin": "Le message doit contenir au moins 10 caractères",
+      "messageMin": "Le message doit contenir au moins {min} caractères",
       "messageMax": "Le message est trop long"
     },
     "payment": {
@@ -865,7 +865,7 @@
       "items": "ponts de pâques · week-end férié · été prolongé · pont toussaint · semaine de noël · pont novembre · lundi de pentecôte · pont ascension · pont 14 juillet · pont 11 novembre"
     },
     "how": {
-      "badge": "comment ça marche · 3 étapes",
+      "badge": "comment ça marche · {steps} étapes",
       "titleStart": "De",
       "titleMid": "à",
       "question1": "que faire",
@@ -881,7 +881,7 @@
     },
     "stats": {
       "multiplierLabel": "Multiplicateur moyen",
-      "daysLabel": "Jours off avec 22 congés",
+      "daysLabel": "Jours off avec {days} congés",
       "countriesLabel": "Pays supportés",
       "plansLabel": "Plans générés"
     },
@@ -907,7 +907,7 @@
         "quarterClose": "Clôture Q3",
         "productLaunch": "Lancement produit"
       },
-      "countriesTag": "14 pays",
+      "countriesTag": "{count} pays",
       "countriesTitle": "Jours fériés locaux réels.",
       "countriesDescription": "Calendriers officiels mis à jour chaque année. Même les régionaux.",
       "privacyTag": "100% local",
@@ -985,7 +985,7 @@
       "freeFeatures": {
         "optimizedPlan": "Plan de vacances auto-optimisé",
         "countryHolidays": "Jours fériés de ton pays et région",
-        "threeStrategies": "3 stratégies (Groupée, Optimisée, Équilibrée)",
+        "threeStrategies": "{count} stratégies (Groupée, Optimisée, Équilibrée)",
         "basicStats": "Statistiques de base et calculateurs"
       },
       "freeCta": "Commencer gratuitement",

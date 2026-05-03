@@ -152,7 +152,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
             <Crown className='w-12 h-12 text-yellow-500 mx-auto animate-pulse' />
             <div>
               <h3 className='font-semibold text-green-600'>{t('accessGranted')}</h3>
-              <p className='text-sm text-muted-foreground mt-1'>{t('welcomeToPremium')}</p>
+              <p className='text-sm text-muted-foreground mt-1'>{t('welcomeToPremium', { seconds: 5 })}</p>
             </div>
           </div>
         )}

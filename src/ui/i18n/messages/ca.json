@@ -324,9 +324,9 @@
       "finishDescription": "Ara saps com usar Forever PTO per maximitzar el teu temps lliure. Comença configurant les teves preferències a la barra lateral, i deixa que l'app et suggereixi els millors dies de PTO. Gaudeix dels teus merescuts descansos!",
       "holidaysListTitle": "Personalitza els teus festius",
       "holidaysListDescription": "Aquí pots ajustar les dades de festius perquè s'adaptin exactament a la teva situació. Edita o elimina qualsevol festiu nacional o regional, i afegeix els teus propis dies personalitzats: festius d'empresa, celebracions locals o qualsevol data que sigui rellevant per a tu. Com més precisos siguin les dades, millors seran els suggeriments.",
-      "step1Title": "Pas 1 — El teu context",
+      "step1Title": "Pas {step} — El teu context",
       "step1Description": "Selecciona el teu país, regió i l'any que vols planificar. Això configura el teu calendari de festius per trobar els millors ponts.",
-      "step2Title": "Pas 2 — Els teus dies disponibles",
+      "step2Title": "Pas {step} — Els teus dies disponibles",
       "step2Description": "Indica quants dies de vacances tens i tria la teva estratègia d'optimització. L'estratègia determina com agrupem els teus dies lliures."
     }
   },
@@ -493,12 +493,12 @@
     "step1": {
       "titleStart": "El teu ",
       "titleEmphasis": "context",
-      "badge": "pas 1"
+      "badge": "pas {step}"
     },
     "step2": {
       "titleStart": "Els teus ",
       "titleEmphasis": "dies",
-      "badge": "pas 2"
+      "badge": "pas {step}"
     },
     "steps": "Passos"
   },
@@ -535,9 +535,9 @@
     "tooltip": "Calcula quant temps lliure pagat estàs perdent en no usar els teus dies de PTO. Continues rebent el teu salari complet, però estàs treballant dies que podries haver agafat com a vacances pagades.",
     "tooltipLabel": "Més informació sobre la calculadora",
     "annualSalary": "Salari Anual",
-    "annualSalaryPlaceholder": "50000",
+    "annualSalaryPlaceholder": "{amount}",
     "unusedPtoDays": "Dies PTO No Usats",
-    "unusedPtoDaysPlaceholder": "5",
+    "unusedPtoDaysPlaceholder": "{days}",
     "valueOfUnusedPto": "Valor del PTO no usat:",
     "worthOfPaidVacation": "Valor de vacances pagades no agafades",
     "yourDailyRate": "La teva tarifa diària:",
@@ -590,7 +590,7 @@
     "verifyAccess": "Verificar Accés",
     "cancel": "Cancel·lar",
     "accessGranted": "Accés Concedit!",
-    "welcomeToPremium": "Benvingut a les funcions premium. Pots tancar aquest modal o ho farem en 5 segons.",
+    "welcomeToPremium": "Benvingut a les funcions premium. Pots tancar aquest modal o ho farem en {seconds} segons.",
     "accessDenied": "Accés Denegat",
     "emailNotFound": "Aquest email no està a la nostra llista d'usuaris premium.",
     "emailNotFoundError": "Email no trobat a la nostra llista d'usuaris premium",
@@ -603,11 +603,11 @@
     "contact": {
       "invalidEmail": "Si us plau introdueix un email vàlid",
       "emailRequired": "L'email és obligatori",
-      "nameMin": "El nom ha de tenir almenys 2 caràcters",
+      "nameMin": "El nom ha de tenir almenys {min} caràcters",
       "nameMax": "El nom és massa llarg",
-      "subjectMin": "L'assumpte ha de tenir almenys 5 caràcters",
+      "subjectMin": "L'assumpte ha de tenir almenys {min} caràcters",
       "subjectMax": "L'assumpte és massa llarg",
-      "messageMin": "El missatge ha de tenir almenys 10 caràcters",
+      "messageMin": "El missatge ha de tenir almenys {min} caràcters",
       "messageMax": "El missatge és massa llarg"
     },
     "payment": {
@@ -865,7 +865,7 @@
       "items": "setmana santa · pont de maig · estiu infinit · pont de la mercè · nadal prolongat · pont de novembre · pont de juny · pont de l'agost · pont d'octubre · cap d'any prolongat"
     },
     "how": {
-      "badge": "com va · 3 passos",
+      "badge": "com va · {steps} passos",
       "titleStart": "De",
       "titleMid": "a",
       "question1": "què faig",
@@ -881,7 +881,7 @@
     },
     "stats": {
       "multiplierLabel": "Multiplicador mitjà",
-      "daysLabel": "Dies lliures amb 22 PTO",
+      "daysLabel": "Dies lliures amb {days} PTO",
       "countriesLabel": "Països suportats",
       "plansLabel": "Plans generats"
     },
@@ -907,7 +907,7 @@
         "quarterClose": "Tancament Q3",
         "productLaunch": "Llançament"
       },
-      "countriesTag": "14 països",
+      "countriesTag": "{count} països",
       "countriesTitle": "Festius locals reals.",
       "countriesDescription": "Calendaris oficials actualitzats cada any. Fins i tot els regionals.",
       "privacyTag": "100% local",
@@ -985,7 +985,7 @@
       "freeFeatures": {
         "optimizedPlan": "Pla de vacances auto-optimitzat",
         "countryHolidays": "Festius del teu país i regió",
-        "threeStrategies": "3 estratègies (Agrupada, Optimitzada, Equilibrada)",
+        "threeStrategies": "{count} estratègies (Agrupada, Optimitzada, Equilibrada)",
         "basicStats": "Estadístiques bàsiques i calculadores"
       },
       "freeCta": "Comença gratis",

@@ -9,7 +9,7 @@ export const HowItWorks = async () => {
     <section className='px-7 py-24' id='how'>
       <div className='max-w-[900px] mx-auto mb-14 text-center'>
         <div className='flex justify-center mb-4'>
-          <Badge variant='outline'>{t('how.badge')}</Badge>
+          <Badge variant='outline'>{t('how.badge', { steps: 3 })}</Badge>
         </div>
         <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] mb-4 text-[clamp(36px,5vw,64px)]'>
           {t('how.titleStart')} <em className='font-serif italic'>&ldquo;{t('how.question1')}&rdquo;</em>{' '}

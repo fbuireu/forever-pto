@@ -53,11 +53,11 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
   const contactSchema = createContactSchema({
     invalidEmail: tValidation('invalidEmail'),
     emailRequired: tValidation('emailRequired'),
-    nameMin: tValidation('nameMin'),
+    nameMin: tValidation('nameMin', { min: 2 }),
     nameMax: tValidation('nameMax'),
-    subjectMin: tValidation('subjectMin'),
+    subjectMin: tValidation('subjectMin', { min: 5 }),
     subjectMax: tValidation('subjectMax'),
-    messageMin: tValidation('messageMin'),
+    messageMin: tValidation('messageMin', { min: 10 }),
     messageMax: tValidation('messageMax'),
   });
 

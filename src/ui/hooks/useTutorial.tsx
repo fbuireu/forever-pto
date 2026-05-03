@@ -22,7 +22,7 @@ export const useTutorial = () => {
       {
         element: '[data-tutorial="sidebar-step-1"]',
         popover: {
-          title: t('step1Title'),
+          title: t('step1Title', { step: 1 }),
           description: t('step1Description'),
           side: 'right',
           align: 'start',
@@ -31,7 +31,7 @@ export const useTutorial = () => {
       {
         element: '[data-tutorial="sidebar-step-2"]',
         popover: {
-          title: t('step2Title'),
+          title: t('step2Title', { step: 2 }),
           description: t('step2Description'),
           side: 'right',
           align: 'start',

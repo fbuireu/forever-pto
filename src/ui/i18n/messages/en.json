@@ -324,9 +324,9 @@
       "finishDescription": "Now you know how to use Forever PTO to maximize your time off. Start by configuring your preferences in the sidebar, and let the app suggest the best PTO days for you. Enjoy your well-deserved breaks!",
       "holidaysListTitle": "Customize Your Holidays",
       "holidaysListDescription": "Here you can fine-tune the holiday data to match your exact situation. Edit or delete any national or regional holiday, and add your own custom days off — company holidays, local observances, or any date that matters to you. The more accurate the data, the better the suggestions.",
-      "step1Title": "Step 1 — Your context",
+      "step1Title": "Step {step} — Your context",
       "step1Description": "Select your country, region, and the year you want to plan. This sets up your holiday calendar so we can find the best bridges.",
-      "step2Title": "Step 2 — Your available days",
+      "step2Title": "Step {step} — Your available days",
       "step2Description": "Enter how many PTO days you have and choose your optimization strategy. The strategy shapes how we group your days off."
     }
   },
@@ -493,12 +493,12 @@
     "step1": {
       "titleStart": "Your ",
       "titleEmphasis": "context",
-      "badge": "step 1"
+      "badge": "step {step}"
     },
     "step2": {
       "titleStart": "Your ",
       "titleEmphasis": "days",
-      "badge": "step 2"
+      "badge": "step {step}"
     },
     "steps": "Steps"
   },
@@ -535,9 +535,9 @@
     "tooltip": "Calculate how much paid time off you're giving up by not using your PTO days. You still get your full salary, but you're working days you could have taken as paid vacation.",
     "tooltipLabel": "More information about salary calculator",
     "annualSalary": "Annual Salary",
-    "annualSalaryPlaceholder": "50000",
+    "annualSalaryPlaceholder": "{amount}",
     "unusedPtoDays": "Unused PTO Days",
-    "unusedPtoDaysPlaceholder": "5",
+    "unusedPtoDaysPlaceholder": "{days}",
     "valueOfUnusedPto": "Value of unused PTO:",
     "worthOfPaidVacation": "Worth of paid vacation not taken",
     "yourDailyRate": "Your daily rate:",
@@ -590,7 +590,7 @@
     "verifyAccess": "Verify Access",
     "cancel": "Cancel",
     "accessGranted": "Access Granted!",
-    "welcomeToPremium": "Welcome to premium features. You can close this modal or we will do so in 5 seconds.",
+    "welcomeToPremium": "Welcome to premium features. You can close this modal or we will do so in {seconds} seconds.",
     "accessDenied": "Access Denied",
     "emailNotFound": "This email is not in our premium users list.",
     "emailNotFoundError": "Email not found in our premium users list",
@@ -603,11 +603,11 @@
     "contact": {
       "invalidEmail": "Please enter a valid email address",
       "emailRequired": "Email is required",
-      "nameMin": "Name must be at least 2 characters",
+      "nameMin": "Name must be at least {min} characters",
       "nameMax": "Name is too long",
-      "subjectMin": "Subject must be at least 5 characters",
+      "subjectMin": "Subject must be at least {min} characters",
       "subjectMax": "Subject is too long",
-      "messageMin": "Message must be at least 10 characters",
+      "messageMin": "Message must be at least {min} characters",
       "messageMax": "Message is too long"
     },
     "payment": {
@@ -865,7 +865,7 @@
       "items": "easter break · bank holiday weekend · summer stretch · thanksgiving bridge · christmas stretch · november bridge · whit monday bridge · may day long weekend · august bank holiday · new year stretch"
     },
     "how": {
-      "badge": "how it works · 3 steps",
+      "badge": "how it works · {steps} steps",
       "titleStart": "From",
       "titleMid": "to",
       "question1": "what do I do",
@@ -881,7 +881,7 @@
     },
     "stats": {
       "multiplierLabel": "Average multiplier",
-      "daysLabel": "Days off with 22 PTO",
+      "daysLabel": "Days off with {days} PTO",
       "countriesLabel": "Supported countries",
       "plansLabel": "Plans generated"
     },
@@ -907,7 +907,7 @@
         "quarterClose": "Q3 closing",
         "productLaunch": "Product launch"
       },
-      "countriesTag": "14 countries",
+      "countriesTag": "{count} countries",
       "countriesTitle": "Real local holidays.",
       "countriesDescription": "Official calendars updated every year. Even regional ones.",
       "privacyTag": "100% local",
@@ -985,7 +985,7 @@
       "freeFeatures": {
         "optimizedPlan": "Auto-optimised vacation plan",
         "countryHolidays": "Country & region holidays",
-        "threeStrategies": "3 strategies (Grouped, Optimised, Balanced)",
+        "threeStrategies": "{count} strategies (Grouped, Optimised, Balanced)",
         "basicStats": "Basic efficiency stats & calculators"
       },
       "freeCta": "Start for free",

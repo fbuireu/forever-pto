@@ -86,7 +86,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                             <em className='font-serif italic font-normal'>{t('step1.titleEmphasis')}</em>
                           </span>
                           <span className='ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]'>
-                            {t('step1.badge')}
+                            {t('step1.badge', { step: 1 })}
                           </span>
                         </h3>
                         <div className='space-y-5'>
@@ -105,7 +105,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                             <em className='font-serif italic font-normal'>{t('step2.titleEmphasis')}</em>
                           </span>
                           <span className='ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]'>
-                            {t('step2.badge')}
+                            {t('step2.badge', { step: 2 })}
                           </span>
                         </h3>
                         <div className='space-y-3'>

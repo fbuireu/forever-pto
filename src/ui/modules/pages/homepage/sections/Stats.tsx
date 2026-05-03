@@ -8,7 +8,7 @@ export const Stats = async () => {
       <div className='max-w-[1240px] mx-auto grid grid-cols-2 md:grid-cols-4 border-[4px] border-[var(--frame)] rounded-[14px] overflow-hidden bg-card shadow-[10px_10px_0_0_var(--frame)]'>
         {[
           { num: '2.14×', label: t('stats.multiplierLabel'), bg: 'var(--color-brand-yellow)' },
-          { num: '47', label: t('stats.daysLabel'), bg: 'var(--color-brand-teal)' },
+          { num: '47', label: t('stats.daysLabel', { days: 22 }), bg: 'var(--color-brand-teal)' },
           { num: '14', label: t('stats.countriesLabel'), bg: 'var(--color-brand-orange)' },
           { num: '12k+', label: t('stats.plansLabel'), bg: 'var(--color-brand-purple)' },
         ].map(({ num, label, bg }) => (

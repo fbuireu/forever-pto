@@ -30,7 +30,9 @@
     var(--color-brand-yellow) 100%
   );
 
-  /* === Surfaces & Frame === */
+  --accent: #ffd93d;
+  --accent-foreground: #0e0e0e;
+
   --grid-color: rgba(14, 14, 14, 0.06);
   --frame: #0e0e0e;
   --frame-soft: rgba(14, 14, 14, 0.2);
@@ -44,20 +46,17 @@
     radial-gradient(circle at top right, rgba(255, 122, 69, 0.08), transparent 30%),
     radial-gradient(circle at bottom left, rgba(179, 136, 255, 0.1), transparent 30%);
 
-  /* === Diagonal Brutal Shadows (DSM v2) === */
   --shadow-brutal-xs: 2px 2px 0 0 var(--frame);
   --shadow-brutal-sm: 4px 4px 0 0 var(--frame);
   --shadow-brutal-md: 6px 6px 0 0 var(--frame);
   --shadow-brutal-lg: 8px 8px 0 0 var(--frame);
   --shadow-brutal-xl: 10px 10px 0 0 var(--frame);
-  --shadow-brutal-btn: 5px 5px 0 0 var(--frame);
-  --shadow-brutal-btn-hover: 7px 7px 0 0 var(--frame);
-  --shadow-brutal-btn-active: 1px 1px 0 0 var(--frame);
+  --shadow-brutal-btn: 5px 5px 0 0 var(--accent);
+  --shadow-brutal-btn-hover: 7px 7px 0 0 var(--accent);
+  --shadow-brutal-btn-active: 1px 1px 0 0 var(--accent);
 
-  /* === Radius === */
-  --radius: 0.5rem; /* 8px base */
+  --radius: 0.5rem;
 
-  /* === Semantic Colors (Light) === */
   --background: #fff5e1;
   --foreground: #0e0e0e;
   --card: #fffdf8;
@@ -70,8 +69,6 @@
   --secondary-foreground: #0e0e0e;
   --muted: #f0e2be;
   --muted-foreground: #6b5e4e;
-  --accent: #ffd93d;
-  --accent-foreground: #0e0e0e;
   --destructive: #ff5a5f;
   --border: #0e0e0e;
   --input: #fffaf0;
@@ -109,9 +106,6 @@
   --shadow-brutal-md: 6px 6px 0 0 var(--frame);
   --shadow-brutal-lg: 8px 8px 0 0 var(--frame);
   --shadow-brutal-xl: 10px 10px 0 0 var(--frame);
-  --shadow-brutal-btn: 5px 5px 0 0 var(--frame);
-  --shadow-brutal-btn-hover: 7px 7px 0 0 var(--frame);
-  --shadow-brutal-btn-active: 1px 1px 0 0 var(--frame);
   --background: #121008;
   --foreground: #fff5e1;
   --card: #1a1612;
