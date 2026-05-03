@@ -45,7 +45,8 @@ type MotionHighlightContextType<T extends string> = {
   forceUpdateBounds?: boolean;
 };
 
-const MotionHighlightContext = createContext<MotionHighlightContextType<string> | undefined>(undefined);
+// biome-ignore lint/suspicious/noExplicitAny: generic context — T is contravariant in setActiveValue, string does not satisfy all subtypes of T
+const MotionHighlightContext = createContext<MotionHighlightContextType<any> | undefined>(undefined);
 
 function useMotionHighlight<T extends string>(): MotionHighlightContextType<T> {
   const context = use(MotionHighlightContext);
