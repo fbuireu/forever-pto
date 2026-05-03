@@ -44,6 +44,13 @@ export class DriverClient {
           );
           this.closeButtonRoots.push(root);
         }
+
+        const { state, config } = options;
+        const isLastStep =
+          typeof state.activeIndex === 'number' && state.activeIndex === (config.steps?.length ?? 0) - 1;
+        if (isLastStep) {
+          popover.nextButton?.classList.add('driver-popover-done-btn');
+        }
       },
       onDestroyStarted: (element, step, options) => {
         this.config.onDestroyStarted?.(element, step, options);

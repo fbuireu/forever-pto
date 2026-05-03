@@ -40,7 +40,7 @@ export function Roadmap() {
         angle: 0,
         status: CategoryStatus.COMPLETED,
         className: 'text-green-500',
-        badgeClass: 'bg-[var(--color-brand-green)] text-[var(--frame)] border-[var(--frame)]',
+        badgeClass: 'bg-[var(--color-brand-green)] text-[var(--color-brand-ink)] border-[var(--frame)]',
       },
       {
         id: 2,
@@ -49,7 +49,7 @@ export function Roadmap() {
         angle: 90,
         status: CategoryStatus.IN_PROGRESS,
         className: 'text-blue-500',
-        badgeClass: 'bg-[var(--color-brand-sky)] text-[var(--frame)] border-[var(--frame)]',
+        badgeClass: 'bg-[var(--color-brand-sky)] text-[var(--color-brand-ink)] border-[var(--frame)]',
       },
       {
         id: 3,
@@ -58,7 +58,7 @@ export function Roadmap() {
         angle: 180,
         status: CategoryStatus.PLANNED,
         className: 'text-orange-500',
-        badgeClass: 'bg-[var(--color-brand-orange)] text-white border-[var(--frame)]',
+        badgeClass: 'bg-[var(--color-brand-orange)] text-[var(--color-brand-ink)] border-[var(--frame)]',
       },
       {
         id: 4,

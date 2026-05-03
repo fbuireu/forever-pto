@@ -141,7 +141,7 @@ function MenuButton({
       initial={false}
       animate={isActive ? 'hover' : 'rest'}
       className={cn(
-        'relative flex items-center gap-1.5 overflow-hidden whitespace-nowrap rounded-full cursor-pointer border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] font-black transition-[box-shadow,transform] duration-75 ease-linear shadow-[var(--shadow-brutal-xs)]',
+        'relative flex items-center gap-1.5 overflow-hidden whitespace-nowrap rounded-full cursor-pointer border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] text-[var(--color-brand-ink)] font-black transition-[box-shadow,transform] duration-75 ease-linear shadow-[var(--shadow-brutal-xs)]',
         isActive && (badgeClass ?? 'bg-[var(--accent)]')
       )}
       style={{
