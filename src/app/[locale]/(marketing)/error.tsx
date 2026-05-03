@@ -40,10 +40,7 @@ function TerminalLine({ line }: { line: string }) {
     return (
       <div>
         <span className='text-[#666]'>{ts} </span>
-        <span
-          className='font-bold inline-block min-w-[3.5em]'
-          style={{ color: LEVEL_COLORS[level as LogLevel] }}
-        >
+        <span className='font-bold inline-block min-w-[3.5em]' style={{ color: LEVEL_COLORS[level as LogLevel] }}>
           {level}
         </span>
         {rest}
@@ -157,9 +154,7 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
       >
         <div className='max-w-[1320px] mx-auto grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-[60px] px-7 items-center'>
           <div className='flex flex-col'>
-            <div
-              className='flex items-start gap-[10px] mb-[26px] font-display font-extrabold tracking-[-0.06em] leading-[0.82] text-[clamp(90px,13vw,200px)]'
-            >
+            <div className='flex items-start gap-[10px] mb-[26px] font-display font-extrabold tracking-[-0.06em] leading-[0.82] text-[clamp(90px,13vw,200px)]'>
               <span className='inline-block bg-[var(--color-brand-orange)] text-white border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[10px_10px_0_0_var(--frame)] leading-[0.85]'>
                 5
               </span>
@@ -176,9 +171,7 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
               {t('kicker', { version, time: ts })}
             </span>
 
-            <h1
-              className='font-display font-extrabold leading-none tracking-[-0.035em] mb-[18px] text-wrap-pretty text-[clamp(28px,3.8vw,48px)]'
-            >
+            <h1 className='font-display font-extrabold leading-none tracking-[-0.035em] mb-[18px] text-wrap-pretty text-[clamp(28px,3.8vw,48px)]'>
               {t('title')}{' '}
               <span className='relative inline-block bg-[var(--color-brand-orange)] text-white px-2 border-[3px] border-[var(--frame)] rounded-[6px] mx-0.5 [animation:highlight-shake_4s_ease-in-out_infinite_1.5s]'>
                 {t('titleHighlight')}
@@ -243,9 +236,7 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
           </div>
 
           <div className='flex items-center justify-center'>
-            <div
-              className='w-full max-w-[520px] rounded-[14px] overflow-hidden border-[4px] border-[var(--frame)] [box-shadow:10px_10px_0_var(--color-brand-orange),10px_10px_0_4px_var(--frame)]'
-            >
+            <div className='w-full max-w-[520px] rounded-[14px] overflow-hidden border-[4px] border-[var(--frame)] [box-shadow:10px_10px_0_var(--color-brand-orange),10px_10px_0_4px_var(--frame)]'>
               <div className='flex items-center gap-2 bg-[#1a1a1a] border-b-2 border-black/80 px-3.5 py-2.5'>
                 <span className='w-3 h-3 rounded-full bg-[var(--color-brand-red)] border border-black/20' />
                 <span className='w-3 h-3 rounded-full bg-[var(--color-brand-yellow)] border border-black/20' />

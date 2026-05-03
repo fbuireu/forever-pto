@@ -108,3 +108,5 @@ Conventional commits required. Run `pnpm prepare` to set up git hooks.
 ## License
 
 Private — © Ferran Buireu
+
+[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/272ww.svg)](https://uptime.betterstack.com/?utm_source=status_badge)

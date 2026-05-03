@@ -1,26 +1,20 @@
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { createPaymentError } from '../events/factory/errors';
+import type { TursoService } from '@infrastructure/clients/db/turso/service';
+import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
+import type { DatabaseError } from '@infrastructure/errors';
+import { updatePaymentStatus } from '@infrastructure/services/payments/repository';
+import { Effect } from 'effect';
 import type { PaymentFailedEvent } from '../events/types';
-import type { PaymentRepository } from '../repository/types';
 
-const logger = getBetterStackInstance();
-
-interface HandlePaymentFailedParams {
-  paymentRepository: PaymentRepository;
-}
-
-export const handlePaymentFailed = async (
-  event: PaymentFailedEvent,
-  params: HandlePaymentFailedParams
-): Promise<void> => {
-  try {
-    const result = await params.paymentRepository.updateStatus(event.paymentId, event.paymentIntent.status);
-
-    if (!result.success) {
-      throw createPaymentError.updateStatusFailed(event.paymentId, result.error);
-    }
-  } catch (error) {
-    logger.logError('Error handling failed payment', error, { paymentId: event.paymentId });
-    throw error;
-  }
-};
+export const handlePaymentFailed = (
+  event: PaymentFailedEvent
+): Effect.Effect<void, DatabaseError, TursoService | LoggerService> =>
+  Effect.gen(function* () {
+    const logger = yield* LoggerService;
+    yield* updatePaymentStatus(event.paymentId, event.paymentIntent.status).pipe(
+      Effect.tapError((e) =>
+        Effect.sync(() => {
+          logger.logError('Error handling failed payment', e, { paymentId: event.paymentId });
+        })
+      )
+    );
+  });

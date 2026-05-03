@@ -1,94 +1,93 @@
 import { contactSchema } from '@application/dto/contact/schema';
-import type { ContactFormData, ContactResult } from '@application/dto/contact/types';
-import { createContactError } from '@domain/contact/events/factory/errors';
-import { getTursoClientInstance } from '@infrastructure/clients/db/turso/client';
-import { getResendClientInstance } from '@infrastructure/clients/email/resend/client';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import type { ContactFormData } from '@application/dto/contact/types';
+import type { TursoService } from '@infrastructure/clients/db/turso/service';
+import { ResendService } from '@infrastructure/clients/email/resend/service';
+import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
+import { EmailError, ValidationError } from '@infrastructure/errors';
 import { saveContact } from '@infrastructure/services/contact/repository';
 import { ContactFormEmail } from '@infrastructure/services/email/templates/Contact';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { render } from '@react-email/render';
+import { Effect } from 'effect';
 import { z } from 'zod';
 
-export async function sendContactEmail(data: ContactFormData): Promise<ContactResult> {
-  const resend = getResendClientInstance();
-  const logger = getBetterStackInstance();
+export const sendContactEmail = (
+  data: ContactFormData
+): Effect.Effect<void, ValidationError | EmailError, TursoService | ResendService | LoggerService> =>
+  Effect.gen(function* () {
+    const logger = yield* LoggerService;
 
-  try {
-    const { env } = getCloudflareContext();
-    const validated = contactSchema.parse(data);
+    const validated = yield* Effect.try({
+      try: () => contactSchema.parse(data),
+      catch: (error) => {
+        if (error instanceof z.ZodError) {
+          const firstError = error.issues[0];
+          logger.warn('Contact form validation error', {
+            field: firstError?.path.join('.'),
+            message: firstError?.message,
+            code: firstError?.code,
+          });
+          return new ValidationError({ message: firstError?.message ?? 'Validation failed' });
+        }
+        logger.logError('Contact form submission error', error, {
+          hasEmail: !!data.email,
+          hasName: !!data.name,
+          hasSubject: !!data.subject,
+        });
+        return new ValidationError({ message: error instanceof Error ? error.message : String(error) });
+      },
+    });
 
-    let emailHtml: string;
-    try {
-      emailHtml = await render(ContactFormEmail({ ...validated, baseUrl: env.NEXT_PUBLIC_SITE_URL }));
-    } catch (error) {
-      logger.logError('Contact email render failed', error, {
-        emailDomain: validated.email?.split('@')[1],
-        name: validated.name,
-        subject: validated.subject,
-      });
-      const renderError = createContactError.renderFailed();
-      return { success: false, error: renderError.message, errorType: renderError.type };
-    }
+    const { env } = yield* Effect.try({
+      try: () => getCloudflareContext(),
+      catch: (error) => {
+        logger.logError('Contact form submission error', error, {
+          hasEmail: !!data.email,
+          hasName: !!data.name,
+          hasSubject: !!data.subject,
+        });
+        return new EmailError({ message: error instanceof Error ? error.message : String(error), cause: error });
+      },
+    });
 
-    const emailResult = await resend.send({
+    const emailHtml = yield* Effect.tryPromise({
+      try: () => render(ContactFormEmail({ ...validated, baseUrl: env.NEXT_PUBLIC_SITE_URL })),
+      catch: (error) => {
+        logger.logError('Contact email render failed', error, {
+          emailDomain: validated.email?.split('@')[1],
+          name: validated.name,
+          subject: validated.subject,
+        });
+        return new EmailError({ message: 'Email render failed', cause: error });
+      },
+    });
+
+    const resend = yield* ResendService;
+    const { messageId } = yield* resend.send({
       from: `Forever PTO <${env.NEXT_PUBLIC_CONTACT_EMAIL}>`,
       to: env.NEXT_PUBLIC_CONTACT_EMAIL,
       subject: `[Forever PTO Contact] ${validated.subject}`,
       html: emailHtml,
       replyTo: validated.email,
-      tags: [
-        {
-          name: 'category',
-          value: 'web_contact_form',
-        },
-      ],
+      tags: [{ name: 'category', value: 'web_contact_form' }],
     });
 
-    if (!emailResult.success) {
-      const error = createContactError.emailSendFailed();
-      return { success: false, error: error.message, errorType: error.type };
-    }
-
-    const turso = getTursoClientInstance();
-    const saveResult = await saveContact(turso, {
+    yield* saveContact({
       email: validated.email,
       name: validated.name,
       subject: validated.subject,
       message: validated.message,
-      messageId: emailResult.messageId ?? null,
+      messageId: messageId ?? null,
       origin: null,
-    });
-
-    if (!saveResult.success) {
-      logger.error('Failed to save contact to database', {
-        reason: saveResult.error,
-        emailDomain: validated.email?.split('@')[1],
-        messageId: emailResult.messageId,
-      });
-      const error = createContactError.saveFailed();
-      return { success: false, error: error.message, errorType: error.type };
-    }
-
-    return { success: true };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const firstError = error.issues[0];
-      logger.warn('Contact form validation error', {
-        field: firstError?.path.join('.'),
-        message: firstError?.message,
-        code: firstError?.code,
-      });
-      const validationError = createContactError.validation(firstError?.message);
-      return { success: false, error: validationError.message, errorType: validationError.type };
-    }
-
-    logger.logError('Contact form submission error', error, {
-      hasEmail: !!data.email,
-      hasName: !!data.name,
-      hasSubject: !!data.subject,
-    });
-    const unknownError = createContactError.unknown(error instanceof Error ? error.message : undefined);
-    return { success: false, error: unknownError.message, errorType: unknownError.type };
-  }
-}
+    }).pipe(
+      Effect.catchAll((e) =>
+        Effect.sync(() => {
+          logger.error('Failed to save contact to database', {
+            reason: e.message,
+            emailDomain: validated.email?.split('@')[1],
+            messageId: messageId ?? undefined,
+          });
+        })
+      )
+    );
+  });

@@ -1,169 +1,133 @@
 import type { PaymentData } from '@application/dto/payment/types';
-import type { PremiumActivationResult } from '@application/dto/premium/types';
-import type { PaymentRepository } from '@domain/payment/repository/types';
-import type { PaymentValidator } from '@domain/payment/services/validators';
-import type { SessionRepository } from '@domain/session/repository/types';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import type { TursoService } from '@infrastructure/clients/db/turso/service';
+import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
+import { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
+import { type DatabaseError, type SessionError, ValidationError } from '@infrastructure/errors';
+import {
+  getPaymentByEmail,
+  getPaymentById,
+  savePayment,
+  updatePaymentStatus,
+} from '@infrastructure/services/payments/repository';
 import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
+import { createSession } from '@infrastructure/services/premium/session';
+import { Effect } from 'effect';
 import type Stripe from 'stripe';
 
-const logger = getBetterStackInstance();
+const buildPaymentDataFromIntent = (paymentIntent: Stripe.PaymentIntent, email: string): PaymentData => ({
+  id: paymentIntent.id,
+  stripeCreatedAt: new Date(paymentIntent.created * 1000),
+  customerId: extractCustomerId(paymentIntent.customer),
+  chargeId: extractChargeId(paymentIntent.latest_charge),
+  email,
+  amount: paymentIntent.amount,
+  currency: paymentIntent.currency,
+  status: paymentIntent.status,
+  paymentMethodType: paymentIntent.payment_method_types?.[0] ?? null,
+  description: paymentIntent.description ?? null,
+  promoCode: paymentIntent.metadata.promoCode ?? null,
+  userAgent: paymentIntent.metadata.userAgent ?? null,
+  ipAddress: paymentIntent.metadata.ipAddress ?? null,
+  country: null,
+  customerName: null,
+  postalCode: null,
+  city: null,
+  state: null,
+  paymentBrand: null,
+  paymentLast4: null,
+  feeAmount: null,
+  netAmount: null,
+  refundedAt: null,
+  refundReason: null,
+  disputedAt: null,
+  disputeReason: null,
+  parentPaymentId: null,
+  origin: null,
+});
 
-interface ActivatePremiumWithPaymentParams {
-  email: string;
-  paymentIntentId: string;
-}
+export const activateWithPayment = (
+  email: string,
+  paymentIntentId: string
+): Effect.Effect<
+  { email: string; premiumKey: string; token: string },
+  ValidationError | SessionError | DatabaseError,
+  TursoService | StripeServerService | LoggerService
+> =>
+  Effect.gen(function* () {
+    const logger = yield* LoggerService;
+    const stripe = yield* StripeServerService;
 
-interface ActivatePremiumWithEmailParams {
-  email: string;
-}
+    const paymentIntent = yield* stripe.paymentIntents
+      .retrieve(paymentIntentId)
+      .pipe(Effect.mapError((e) => new ValidationError({ message: e.message })));
 
-interface ActivatePremiumParams {
-  sessionRepository: SessionRepository;
-  paymentValidator: PaymentValidator;
-  paymentRepository: PaymentRepository;
-}
+    if (paymentIntent.status !== 'succeeded') {
+      return yield* Effect.fail(new ValidationError({ message: 'Payment not completed' }));
+    }
 
-const buildPaymentDataFromIntent = (paymentIntent: Stripe.PaymentIntent, email: string): PaymentData => {
-  return {
-    id: paymentIntent.id,
-    stripeCreatedAt: new Date(paymentIntent.created * 1000),
-    customerId: extractCustomerId(paymentIntent.customer),
-    chargeId: extractChargeId(paymentIntent.latest_charge),
-    email,
-    amount: paymentIntent.amount,
-    currency: paymentIntent.currency,
-    status: paymentIntent.status,
-    paymentMethodType: paymentIntent.payment_method_types?.[0] ?? null,
-    description: paymentIntent.description ?? null,
-    promoCode: paymentIntent.metadata.promoCode ?? null,
-    userAgent: paymentIntent.metadata.userAgent ?? null,
-    ipAddress: paymentIntent.metadata.ipAddress ?? null,
-    country: null,
-    customerName: null,
-    postalCode: null,
-    city: null,
-    state: null,
-    paymentBrand: null,
-    paymentLast4: null,
-    feeAmount: null,
-    netAmount: null,
-    refundedAt: null,
-    refundReason: null,
-    disputedAt: null,
-    disputeReason: null,
-    parentPaymentId: null,
-    origin: null,
-  };
-};
+    const paymentEmail = paymentIntent.metadata.email ?? paymentIntent.receipt_email ?? undefined;
+    if (paymentEmail && paymentEmail !== email) {
+      return yield* Effect.fail(new ValidationError({ message: 'Email mismatch' }));
+    }
 
-export const activateWithPayment = async (
-  input: ActivatePremiumWithPaymentParams,
-  params: ActivatePremiumParams
-): Promise<PremiumActivationResult> => {
-  const { email, paymentIntentId } = input;
+    const existingPayment = yield* getPaymentById(paymentIntentId).pipe(
+      Effect.catchAll(() => Effect.succeed(undefined))
+    );
 
-  const validation = await params.paymentValidator.validatePaymentIntent(paymentIntentId);
-
-  if (!validation.valid) {
-    return {
-      success: false,
-      premiumKey: null,
-      email: null,
-      error: validation.error,
-    };
-  }
-
-  if (validation.paymentEmail && validation.paymentEmail !== email) {
-    return {
-      success: false,
-      premiumKey: null,
-      email: null,
-      error: 'Email mismatch',
-    };
-  }
-
-  if (validation.paymentIntent) {
-    const existingPayment = await params.paymentRepository.getById(paymentIntentId);
-
-    if (existingPayment.success && existingPayment.data) {
-      if (existingPayment.data.status !== 'succeeded' && validation.paymentIntent.status === 'succeeded') {
-        const updateResult = await params.paymentRepository.updateStatus(paymentIntentId, 'succeeded');
-
-        if (!updateResult.success) {
-          logger.error('Failed to update payment status', {
-            reason: updateResult.error,
-            paymentIntentId,
-            emailDomain: email?.split('@')[1],
-          });
-        }
+    if (existingPayment) {
+      if (existingPayment.status !== 'succeeded') {
+        yield* updatePaymentStatus(paymentIntentId, 'succeeded').pipe(
+          Effect.catchAll((e) =>
+            Effect.sync(() => {
+              logger.error('Failed to update payment status', {
+                reason: e.message,
+                paymentIntentId,
+                emailDomain: email?.split('@')[1],
+              });
+            })
+          )
+        );
       }
     } else {
-      const paymentData = buildPaymentDataFromIntent(validation.paymentIntent, email);
-      const saveResult = await params.paymentRepository.save(paymentData);
-
-      if (!saveResult.success) {
-        logger.error('Failed to save payment to DB', {
-          reason: saveResult.error,
-          paymentIntentId,
-          emailDomain: email?.split('@')[1],
-        });
-      } else {
-        logger.info('Payment created successfully', { paymentIntentId });
-      }
+      yield* savePayment(buildPaymentDataFromIntent(paymentIntent, email)).pipe(
+        Effect.tap(() => Effect.sync(() => logger.info('Payment created successfully', { paymentIntentId }))),
+        Effect.tapError((e) =>
+          Effect.sync(() => {
+            logger.error('Failed to save payment to DB', {
+              reason: e.message,
+              paymentIntentId,
+              emailDomain: email?.split('@')[1],
+            });
+          })
+        ),
+        Effect.catchAll(() => Effect.void)
+      );
     }
-  }
 
-  const token = await params.sessionRepository.create({
-    email,
-    paymentIntentId,
+    const token = yield* createSession({ email, paymentIntentId });
+
+    return { email, premiumKey: paymentIntentId, token };
   });
 
-  return {
-    success: true,
-    premiumKey: paymentIntentId,
-    email,
-    token,
-  };
-};
+export const activateWithEmail = (
+  email: string
+): Effect.Effect<
+  { email: string; premiumKey: string; token: string },
+  ValidationError | SessionError | DatabaseError,
+  TursoService | LoggerService
+> =>
+  Effect.gen(function* () {
+    const payment = yield* getPaymentByEmail(email);
 
-export const activateWithEmail = async (
-  input: ActivatePremiumWithEmailParams,
-  params: ActivatePremiumParams
-): Promise<PremiumActivationResult> => {
-  const { email } = input;
+    if (!payment) {
+      return yield* Effect.fail(new ValidationError({ message: 'No payment found' }));
+    }
 
-  const paymentResult = await params.paymentRepository.getByEmail(email);
+    if (payment.status !== 'succeeded') {
+      return yield* Effect.fail(new ValidationError({ message: `Payment status is ${payment.status}` }));
+    }
 
-  if (!paymentResult.success || !paymentResult.data) {
-    return {
-      success: false,
-      premiumKey: null,
-      email: null,
-      error: 'No payment found',
-    };
-  }
+    const token = yield* createSession({ email, paymentIntentId: payment.id });
 
-  const payment = paymentResult.data;
-
-  if (payment.status !== 'succeeded') {
-    return {
-      success: false,
-      premiumKey: null,
-      email: null,
-      error: `Payment status is ${payment.status}`,
-    };
-  }
-
-  const token = await params.sessionRepository.create({
-    email,
-    paymentIntentId: payment.id,
+    return { email, premiumKey: payment.id, token };
   });
-
-  return {
-    success: true,
-    premiumKey: payment.id,
-    email,
-    token,
-  };
-};

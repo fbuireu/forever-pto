@@ -1,58 +1,101 @@
-import { paymentDTO } from '@application/dto/payment/dto';
 import { type CreatePaymentInput, createPaymentSchema } from '@application/dto/payment/schema';
-import type { DiscountInfo, PaymentDTO } from '@application/dto/payment/types';
-import { createPaymentError } from '@domain/payment/events/factory/errors';
-import { getTursoClientInstance } from '@infrastructure/clients/db/turso/client';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
-import { createPaymentIntent } from '@infrastructure/services/payments/provider/payment-intent';
+import type { DiscountInfo } from '@application/dto/payment/types';
+import type { TursoService } from '@infrastructure/clients/db/turso/service';
+import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
+import type { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
+import { PaymentError, type PromoCodeError, ValidationError } from '@infrastructure/errors';
+import { createPaymentIntent } from '@infrastructure/services/payments/provider/intent';
 import { validatePromoCode } from '@infrastructure/services/payments/provider/promo-code';
 import { savePayment } from '@infrastructure/services/payments/repository';
 import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
+import { Effect } from 'effect';
 import Stripe from 'stripe';
-import { ZodError } from 'zod';
+import { z } from 'zod';
 
 interface PaymentContext {
   userAgent: string | null;
   ipAddress: string | null;
 }
 
-export async function createPayment(params: CreatePaymentInput, context: PaymentContext): Promise<PaymentDTO> {
-  const { userAgent, ipAddress } = context;
-  const stripe = getStripeServerInstance();
-  const logger = getBetterStackInstance();
+export interface PaymentResult {
+  clientSecret: string;
+  discountInfo: DiscountInfo | null;
+}
 
-  try {
-    const validated = createPaymentSchema.parse(params);
+export const createPayment = (
+  params: CreatePaymentInput,
+  context: PaymentContext
+): Effect.Effect<
+  PaymentResult,
+  ValidationError | PaymentError | PromoCodeError,
+  TursoService | StripeServerService | LoggerService
+> =>
+  Effect.gen(function* () {
+    const { userAgent, ipAddress } = context;
+    const logger = yield* LoggerService;
+
+    const validated = yield* Effect.try({
+      try: () => createPaymentSchema.parse(params),
+      catch: (error) => {
+        if (error instanceof z.ZodError) {
+          const firstError = error.issues[0];
+          logger.warn('Payment validation error', {
+            field: firstError?.path.join('.'),
+            message: firstError?.message,
+            code: firstError?.code,
+          });
+          return new ValidationError({ message: firstError?.message ?? 'Validation failed' });
+        }
+        logger.logError('Unknown payment creation error', error, {
+          amount: params.amount,
+          hasPromoCode: !!params.promoCode,
+          userAgent,
+          ipAddress,
+        });
+        return new ValidationError({ message: error instanceof Error ? error.message : String(error) });
+      },
+    });
 
     let finalAmount = validated.amount;
     let discountInfo: DiscountInfo | null = null;
 
     if (validated.promoCode?.trim()) {
-      const validation = await validatePromoCode(stripe, validated.promoCode, validated.amount);
-
-      if (!validation.success) {
-        const error = createPaymentError.invalidPromoCode(validation.error);
-        return paymentDTO.create({
-          raw: { type: 'error', error: new Error(error.message) },
-        });
-      }
-
-      discountInfo = validation.data;
+      discountInfo = yield* validatePromoCode(validated.promoCode, validated.amount);
       finalAmount = discountInfo.finalAmount;
     }
 
-    const paymentIntent = await createPaymentIntent(stripe, {
+    const paymentIntent = yield* createPaymentIntent({
       amount: finalAmount,
       email: validated.email,
       promoCode: validated.promoCode,
       discountInfo,
       userAgent,
       ipAddress,
-    });
+    }).pipe(
+      Effect.tapError((e) =>
+        Effect.sync(() => {
+          if (e.cause instanceof Stripe.errors.StripeError) {
+            logger.logError('Stripe payment creation error', e.cause, {
+              stripeErrorType: e.cause.type,
+              stripeErrorCode: e.cause.code,
+              amount: params.amount,
+              hasPromoCode: !!params.promoCode,
+              userAgent,
+              ipAddress,
+            });
+          } else {
+            logger.logError('Unknown payment creation error', e.cause ?? e, {
+              amount: params.amount,
+              hasPromoCode: !!params.promoCode,
+              userAgent,
+              ipAddress,
+            });
+          }
+        })
+      )
+    );
 
-    const turso = getTursoClientInstance();
-    const saveResult = await savePayment(turso, {
+    yield* savePayment({
       id: paymentIntent.id,
       stripeCreatedAt: new Date(paymentIntent.created * 1000),
       customerId: extractCustomerId(paymentIntent.customer),
@@ -81,59 +124,21 @@ export async function createPayment(params: CreatePaymentInput, context: Payment
       disputeReason: null,
       parentPaymentId: null,
       origin: null,
-    });
+    }).pipe(
+      Effect.catchAll((e) =>
+        Effect.sync(() => {
+          logger.warn('Failed to save payment to database, will use webhook fallback', {
+            reason: e.message,
+            paymentIntentId: paymentIntent.id,
+            emailDomain: validated.email?.split('@')[1],
+          });
+        })
+      )
+    );
 
-    if (!saveResult.success) {
-      logger.warn('Failed to save payment to database, will use webhook fallback', {
-        reason: saveResult.error,
-        paymentIntentId: paymentIntent.id,
-        emailDomain: validated.email?.split('@')[1],
-      });
+    if (!paymentIntent.client_secret) {
+      return yield* Effect.fail(new PaymentError({ message: 'PaymentIntent missing client_secret' }));
     }
 
-    return paymentDTO.create({
-      raw: {
-        type: 'success',
-        data: { paymentIntent, discountInfo },
-      },
-    });
-  } catch (error) {
-    if (error instanceof ZodError) {
-      const firstError = error.issues[0];
-      logger.warn('Payment validation error', {
-        field: firstError?.path.join('.'),
-        message: firstError?.message,
-        code: firstError?.code,
-      });
-      const validationError = createPaymentError.validation(firstError?.message);
-      return paymentDTO.create({
-        raw: { type: 'error', error: new Error(validationError.message) },
-      });
-    }
-
-    if (error instanceof Stripe.errors.StripeError) {
-      logger.logError('Stripe payment creation error', error, {
-        stripeErrorType: error.type,
-        stripeErrorCode: error.code,
-        amount: params.amount,
-        hasPromoCode: !!params.promoCode,
-        userAgent,
-        ipAddress,
-      });
-      return paymentDTO.create({
-        raw: { type: 'error', error },
-      });
-    }
-
-    logger.logError('Unknown payment creation error', error, {
-      amount: params.amount,
-      hasPromoCode: !!params.promoCode,
-      userAgent,
-      ipAddress,
-    });
-    const unknownError = createPaymentError.unknown(error instanceof Error ? error.message : undefined);
-    return paymentDTO.create({
-      raw: { type: 'error', error: new Error(unknownError.message) },
-    });
-  }
-}
+    return { clientSecret: paymentIntent.client_secret, discountInfo };
+  });

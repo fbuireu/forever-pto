@@ -1,135 +1,123 @@
 import type { PaymentData } from '@application/dto/payment/types';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import type { TursoService } from '@infrastructure/clients/db/turso/service';
+import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
+import type { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
+import type { DatabaseError } from '@infrastructure/errors';
+import { retrieveCharge } from '@infrastructure/services/payments/provider/charge';
+import {
+  getPaymentById,
+  savePayment,
+  updatePaymentCharge,
+  updatePaymentStatus,
+} from '@infrastructure/services/payments/repository';
 import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
-import { createPaymentError } from '../events/factory/errors';
+import { Effect } from 'effect';
 import type { PaymentSucceededEvent } from '../events/types';
-import type { PaymentRepository } from '../repository/types';
-import type { ChargeService } from '../services/charge';
 
-const logger = getBetterStackInstance();
+const buildPaymentData = (event: PaymentSucceededEvent): PaymentData => ({
+  id: event.paymentIntent.id,
+  stripeCreatedAt: new Date(event.paymentIntent.created * 1000),
+  customerId: extractCustomerId(event.paymentIntent.customer),
+  chargeId: extractChargeId(event.paymentIntent.latest_charge),
+  email: event.email,
+  amount: event.amount,
+  currency: event.paymentIntent.currency,
+  status: event.status,
+  paymentMethodType: event.paymentIntent.payment_method_types?.[0] ?? null,
+  description: event.paymentIntent.description ?? null,
+  promoCode: event.paymentIntent.metadata.promoCode ?? null,
+  userAgent: event.paymentIntent.metadata.userAgent ?? null,
+  ipAddress: event.paymentIntent.metadata.ipAddress ?? null,
+  country: null,
+  customerName: null,
+  postalCode: null,
+  city: null,
+  state: null,
+  paymentBrand: null,
+  paymentLast4: null,
+  feeAmount: null,
+  netAmount: null,
+  refundedAt: null,
+  refundReason: null,
+  disputedAt: null,
+  disputeReason: null,
+  parentPaymentId: null,
+  origin: null,
+});
 
-interface HandlePaymentSucceededParams {
-  paymentRepository: PaymentRepository;
-  chargeService: ChargeService;
-}
-
-const updateExistingPayment = async (event: PaymentSucceededEvent, repository: PaymentRepository): Promise<void> => {
-  const result = await repository.updateStatus(event.paymentId, event.status);
-
-  if (!result.success) {
-    throw createPaymentError.updateStatusFailed(event.paymentId, result.error);
-  }
-};
-
-const createPaymentFromWebhook = async (event: PaymentSucceededEvent, repository: PaymentRepository): Promise<void> => {
-  logger.warn('Payment not found in DB, creating from webhook', { paymentId: event.paymentId });
-
-  const paymentData: PaymentData = {
-    id: event.paymentIntent.id,
-    stripeCreatedAt: new Date(event.paymentIntent.created * 1000),
-    customerId: extractCustomerId(event.paymentIntent.customer),
-    chargeId: extractChargeId(event.paymentIntent.latest_charge),
-    email: event.email,
-    amount: event.amount,
-    currency: event.paymentIntent.currency,
-    status: event.status,
-    paymentMethodType: event.paymentIntent.payment_method_types?.[0] ?? null,
-    description: event.paymentIntent.description ?? null,
-    promoCode: event.paymentIntent.metadata.promoCode ?? null,
-    userAgent: event.paymentIntent.metadata.userAgent ?? null,
-    ipAddress: event.paymentIntent.metadata.ipAddress ?? null,
-    country: null,
-    customerName: null,
-    postalCode: null,
-    city: null,
-    state: null,
-    paymentBrand: null,
-    paymentLast4: null,
-    feeAmount: null,
-    netAmount: null,
-    refundedAt: null,
-    refundReason: null,
-    disputedAt: null,
-    disputeReason: null,
-    parentPaymentId: null,
-    origin: null,
-  };
-
-  const result = await repository.save(paymentData);
-
-  if (!result.success) {
-    throw createPaymentError.saveFromWebhookFailed(event.paymentId, result.error);
-  }
-};
-
-const updateChargeDetails = async (
-  event: PaymentSucceededEvent,
-  params: HandlePaymentSucceededParams
-): Promise<void> => {
-  if (!event.paymentIntent.latest_charge) return;
+const updateCharge = (
+  event: PaymentSucceededEvent
+): Effect.Effect<void, never, TursoService | StripeServerService | LoggerService> => {
+  if (!event.paymentIntent.latest_charge) return Effect.void;
 
   const chargeId =
     typeof event.paymentIntent.latest_charge === 'string'
       ? event.paymentIntent.latest_charge
       : event.paymentIntent.latest_charge.id;
 
-  try {
-    const chargeResult = await params.chargeService.retrieveCharge(chargeId);
+  return Effect.gen(function* () {
+    const logger = yield* LoggerService;
 
-    if (!chargeResult.success || !chargeResult.data) {
-      logger.error('Failed to retrieve charge details', {
-        reason: chargeResult.error,
-        chargeId,
-        paymentId: event.paymentId,
-      });
-      return;
-    }
-
-    const result = await params.paymentRepository.updateCharge(
-      event.paymentId,
-      chargeResult.data.id,
-      chargeResult.data.receiptUrl,
-      chargeResult.data.paymentMethodType,
-      chargeResult.data.country,
-      chargeResult.data.customerName,
-      chargeResult.data.postalCode,
-      chargeResult.data.city,
-      chargeResult.data.state,
-      chargeResult.data.paymentBrand,
-      chargeResult.data.paymentLast4,
-      chargeResult.data.feeAmount,
-      chargeResult.data.netAmount
+    yield* retrieveCharge(chargeId).pipe(
+      Effect.flatMap((charge) =>
+        updatePaymentCharge(
+          event.paymentId,
+          charge.id,
+          charge.receiptUrl,
+          charge.paymentMethodType,
+          charge.country,
+          charge.customerName,
+          charge.postalCode,
+          charge.city,
+          charge.state,
+          charge.paymentBrand,
+          charge.paymentLast4,
+          charge.feeAmount,
+          charge.netAmount
+        ).pipe(
+          Effect.tapError((e) =>
+            Effect.sync(() => {
+              logger.error('Failed to update charge details', {
+                reason: e.message,
+                paymentId: event.paymentId,
+                chargeId,
+              });
+            })
+          )
+        )
+      ),
+      Effect.tapError((e) =>
+        Effect.sync(() => {
+          logger.error('Failed to retrieve charge details', {
+            reason: e.message,
+            chargeId,
+            paymentId: event.paymentId,
+          });
+        })
+      ),
+      Effect.catchAll(() => Effect.void)
     );
-
-    if (!result.success) {
-      logger.error('Failed to update charge details', { reason: result.error, paymentId: event.paymentId, chargeId });
-    }
-  } catch (error) {
-    logger.logError('Error fetching charge details', error, { chargeId, paymentId: event.paymentId });
-  }
+  });
 };
 
-export const handlePaymentSucceeded = async (
-  event: PaymentSucceededEvent,
-  params: HandlePaymentSucceededParams
-): Promise<void> => {
-  try {
-    const existingPayment = await params.paymentRepository.getById(event.paymentId);
+export const handlePaymentSucceeded = (
+  event: PaymentSucceededEvent
+): Effect.Effect<void, DatabaseError, TursoService | StripeServerService | LoggerService> =>
+  Effect.gen(function* () {
+    const logger = yield* LoggerService;
 
-    if (existingPayment.success && existingPayment.data) {
-      if (existingPayment.data.status === 'succeeded') {
-        await updateChargeDetails(event, params);
+    const existing = yield* getPaymentById(event.paymentId).pipe(Effect.catchAll(() => Effect.succeed(undefined)));
+
+    if (existing) {
+      if (existing.status === 'succeeded') {
+        yield* updateCharge(event);
         return;
       }
-
-      await updateExistingPayment(event, params.paymentRepository);
+      yield* updatePaymentStatus(event.paymentId, event.status);
     } else {
-      await createPaymentFromWebhook(event, params.paymentRepository);
+      logger.warn('Payment not found in DB, creating from webhook', { paymentId: event.paymentId });
+      yield* savePayment(buildPaymentData(event));
     }
 
-    await updateChargeDetails(event, params);
-  } catch (error) {
-    logger.logError('Error handling successful payment', error, { paymentId: event.paymentId });
-    throw error;
-  }
-};
+    yield* updateCharge(event);
+  });

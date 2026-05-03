@@ -1,49 +1,36 @@
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { handleStripeWebhook } from '@infrastructure/webhooks/stripe/service';
+import { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
+import { AppLayer } from '@infrastructure/layers';
+import { processWebhookEvent } from '@infrastructure/webhooks/processor';
+import { Effect } from 'effect';
 import { headers } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
 
-const logger = getBetterStackInstance();
-
 export async function POST(request: NextRequest) {
-  const requestId = crypto.randomUUID();
-  const webhookLogger = logger.withContext({
-    requestId,
-    webhook: 'stripe',
-    path: '/api/webhooks/stripe',
-  });
-
-  webhookLogger.info('Stripe webhook received');
-
   const body = await request.text();
   const headersList = await headers();
   const signature = headersList.get('stripe-signature');
 
   if (!signature) {
-    webhookLogger.error('Missing stripe signature');
     return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
   }
 
-  webhookLogger.info('Processing Stripe webhook', {
-    hasSignature: true,
-    bodyLength: body.length,
-  });
-
-  const result = await handleStripeWebhook(body, signature);
-
-  if (!result.success) {
-    const status = result.isSignatureError ? 400 : 500;
-    webhookLogger.error('Stripe webhook handling failed', {
-      error: result.error,
-      status,
-    });
-    return NextResponse.json(
-      { error: result.isSignatureError ? 'Invalid signature' : 'Webhook processing failed' },
-      { status }
-    );
-  }
-
-  webhookLogger.info('Stripe webhook processed successfully');
-
-  return NextResponse.json({ received: true });
+  return Effect.runPromise(
+    Effect.gen(function* () {
+      const stripe = yield* StripeServerService;
+      const event = yield* stripe.webhooks.constructEvent(body, signature);
+      yield* processWebhookEvent(event);
+      return NextResponse.json({ received: true });
+    }).pipe(
+      Effect.provide(AppLayer),
+      Effect.catchTag('WebhookError', (e) =>
+        Effect.succeed(
+          NextResponse.json(
+            { error: e.isSignatureError ? 'Invalid signature' : 'Webhook processing failed' },
+            { status: e.isSignatureError ? 400 : 500 }
+          )
+        )
+      ),
+      Effect.catchAll(() => Effect.succeed(NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 })))
+    )
+  );
 }

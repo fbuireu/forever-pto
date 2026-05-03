@@ -1,21 +1,16 @@
 import type { DiscountInfo } from '@application/dto/payment/types';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
+import { PromoCodeError } from '@infrastructure/errors';
+import { Effect } from 'effect';
 import type Stripe from 'stripe';
-
-const logger = getBetterStackInstance();
 
 const MIN_FINAL_AMOUNT = 0.5;
 
-type PromoValidationResult = { success: true; data: DiscountInfo } | { success: false; error: string };
-
 const getCouponValidationError = (coupon: Stripe.Coupon): string | null => {
   if (!coupon.valid) return 'This promo code is no longer valid';
-  if (coupon.max_redemptions && coupon.times_redeemed >= coupon.max_redemptions) {
+  if (coupon.max_redemptions && coupon.times_redeemed >= coupon.max_redemptions)
     return 'This promo code has reached its usage limit';
-  }
-  if (coupon.redeem_by && coupon.redeem_by < Math.floor(Date.now() / 1000)) {
-    return 'This promo code has expired';
-  }
+  if (coupon.redeem_by && coupon.redeem_by < Math.floor(Date.now() / 1000)) return 'This promo code has expired';
   return null;
 };
 
@@ -25,63 +20,45 @@ const calculateFinalAmount = (coupon: Stripe.Coupon, amount: number): number => 
   return amount;
 };
 
-export const validatePromoCode = async (
-  stripe: Stripe,
+export const validatePromoCode = (
   code: string,
   amount: number
-): Promise<PromoValidationResult> => {
-  try {
-    const promotionCodes = await stripe.promotionCodes.list({
-      code: code.toUpperCase().trim(),
-      active: true,
-      limit: 1,
-    });
+): Effect.Effect<DiscountInfo, PromoCodeError, StripeServerService> =>
+  Effect.gen(function* () {
+    const stripe = yield* StripeServerService;
+
+    const promotionCodes = yield* stripe.promotionCodes
+      .list({ code: code.toUpperCase().trim(), active: true, limit: 1 })
+      .pipe(Effect.mapError((e) => new PromoCodeError({ message: e.message })));
 
     if (promotionCodes.data.length === 0) {
-      return { success: false, error: 'Invalid or expired promo code' };
+      return yield* Effect.fail(new PromoCodeError({ message: 'Invalid or expired promo code' }));
     }
 
-    const promotionCode = promotionCodes.data[0];
-    const couponData = await stripe.promotionCodes.retrieve(promotionCode.id, {
-      expand: ['coupon'],
-    });
+    const [promotionCode] = promotionCodes.data;
+    const couponData = yield* stripe.promotionCodes
+      .retrieve(promotionCode.id, { expand: ['coupon'] })
+      .pipe(Effect.mapError((e) => new PromoCodeError({ message: e.message })));
 
     const coupon = (couponData as unknown as { coupon: Stripe.Coupon }).coupon;
-
-    if (!coupon) {
-      return { success: false, error: 'Failed to load coupon details' };
-    }
+    if (!coupon) return yield* Effect.fail(new PromoCodeError({ message: 'Failed to load coupon details' }));
 
     const validationError = getCouponValidationError(coupon);
-    if (validationError) {
-      return { success: false, error: validationError };
-    }
+    if (validationError) return yield* Effect.fail(new PromoCodeError({ message: validationError }));
 
     const finalAmount = calculateFinalAmount(coupon, amount);
-
     if (finalAmount < MIN_FINAL_AMOUNT) {
-      return {
-        success: false,
-        error: `Discount cannot reduce amount below ${MIN_FINAL_AMOUNT.toFixed(2)}`,
-      };
+      return yield* Effect.fail(
+        new PromoCodeError({ message: `Discount cannot reduce amount below ${MIN_FINAL_AMOUNT.toFixed(2)}` })
+      );
     }
 
     return {
-      success: true,
-      data: {
-        type: coupon.percent_off ? 'percent' : 'fixed',
-        value: coupon.percent_off ?? (coupon.amount_off ? coupon.amount_off / 100 : 0),
-        originalAmount: amount,
-        finalAmount,
-        couponId: coupon.id,
-        couponName: coupon.name,
-      },
-    };
-  } catch (error) {
-    logger.logError('Promo code validation error in promo-code service', error, {
-      promoCode: `${code?.toUpperCase().trim().slice(0, 5)}...`,
-      amount,
-    });
-    return { success: false, error: 'Error validating promo code. Please try again.' };
-  }
-};
+      type: coupon.percent_off ? 'percent' : 'fixed',
+      value: coupon.percent_off ?? (coupon.amount_off ? coupon.amount_off / 100 : 0),
+      originalAmount: amount,
+      finalAmount,
+      couponId: coupon.id,
+      couponName: coupon.name,
+    } satisfies DiscountInfo;
+  });

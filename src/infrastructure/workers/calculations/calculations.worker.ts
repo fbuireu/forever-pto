@@ -6,7 +6,7 @@ import type { FilterStrategy } from '../../services/calendar/types';
 import type { CalculateSuggestionsRequest, WorkerResponse } from './calculations.types';
 import { deserializeHolidays, deserializeMonths, serializeSuggestionResult } from './serializers';
 
-self.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
+globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
   const { type, requestId, payload } = e.data;
 
   if (type !== 'CALCULATE_SUGGESTIONS') return;
