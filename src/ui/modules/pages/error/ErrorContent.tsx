@@ -140,8 +140,8 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
         className='flex-1 py-[60px]'
         style={{
           background: [
-            'linear-gradient(0deg, transparent 95%, rgba(0,0,0,.04) 95%)',
-            'linear-gradient(90deg, transparent 95%, rgba(0,0,0,.04) 95%)',
+            'linear-gradient(0deg, transparent 95%, var(--grid-color) 95%)',
+            'linear-gradient(90deg, transparent 95%, var(--grid-color) 95%)',
             'var(--background)',
           ].join(', '),
           backgroundSize: '32px 32px',

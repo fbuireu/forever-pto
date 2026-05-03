@@ -39,7 +39,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
           </div>
 
           <div className='flex flex-col'>
-            <span className='inline-flex items-center gap-2 self-start bg-[var(--color-brand-ink)] text-[var(--accent)] px-3 py-1.5 rounded-[6px] font-mono text-[11px] font-bold tracking-[0.12em] uppercase mb-[22px]'>
+            <span className='inline-flex items-center gap-2 self-start bg-[var(--color-brand-ink)] dark:bg-foreground text-[var(--accent)] dark:text-background px-3 py-1.5 rounded-[6px] font-mono text-[11px] font-bold tracking-[0.12em] uppercase mb-[22px]'>
               <span className='w-2 h-2 rounded-full bg-[var(--color-brand-orange)]' />
               {t('kicker')}
             </span>
@@ -59,7 +59,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
                 variant='default'
                 size='lg'
                 asChild
-                className='text-[var(--accent)] shadow-[5px_5px_0_0_var(--accent)] hover:shadow-[7px_7px_0_0_var(--accent)] active:shadow-[1px_1px_0_0_var(--accent)]'
+                className='text-[var(--accent)] dark:text-primary-foreground shadow-[5px_5px_0_0_var(--accent)] hover:shadow-[7px_7px_0_0_var(--accent)] active:shadow-[1px_1px_0_0_var(--accent)]'
               >
                 <Link href='/'>← {t('ctaPrimary')}</Link>
               </Button>

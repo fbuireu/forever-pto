@@ -49,7 +49,7 @@ export const Hero = async () => {
           </p>
 
           <div className='flex gap-4 flex-wrap items-center mb-7'>
-            <Button variant='accent' size='lg' asChild>
+            <Button variant='accent' size='lg' asChild className='dark:border-transparent'>
               <Link href='/planner'>{t('hero.plannerCta')}</Link>
             </Button>
             <Button variant='outline' size='lg' asChild>

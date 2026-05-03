@@ -131,7 +131,7 @@ export function DonationForm({
         />
 
         <Collapsible open={showPromoCode} onOpenChange={setShowPromoCode}>
-          <CollapsibleTrigger className='font-medium'>
+          <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-sm font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors'>
             <span className='text-muted-foreground'>{t('havePromoCode')}</span>
             <ChevronDown
               animateOnHover
