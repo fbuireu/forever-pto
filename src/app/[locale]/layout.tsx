@@ -4,6 +4,7 @@ import { cn } from '@ui/utils/utils';
 import '@styles/index.css';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { Analytics } from '@ui/modules/tutorial/Analytics';
+import { BetterStackTracking } from '@ui/modules/tutorial/BetterStackTracking';
 import { Bricolage_Grotesque, Instrument_Serif, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';
@@ -83,6 +84,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
         </NextIntlClientProvider>
         <WebMCP />
         <Analytics />
+        <BetterStackTracking />
       </body>
     </html>
   );

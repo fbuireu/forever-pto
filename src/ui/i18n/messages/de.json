@@ -25,16 +25,14 @@
     "planner": {
       "title": "Planer | Forever PTO",
       "description": "Plane und optimiere deine Urlaubstage. Intelligenter PTO-Kalender mit Feiertagserkennung, Brückentagsoptimierung und Export nach Google Kalender, Outlook und Apple."
-    },
-    "notFound": {
-      "title": "Seite nicht gefunden | Forever PTO",
-      "description": "Die gesuchte Seite existiert nicht oder wurde verschoben."
     }
   },
   "planner": {
     "title": "Forever PTO",
     "description": "Dein intelligenter PTO-Planer. Konfiguriere deine Urlaubstage, dein Land und deine Strategie, um jeden Feiertag optimal zu nutzen.",
     "subtitle": "Dein intelligenter Urlaubsoptimierer. Hör auf, Tage zu verschwenden.",
+    "titleHighlight1": "Dein Jahr",
+    "titleHighlight2": "frei",
     "instructions": "Beginne damit, deine Tage in der linken Seitenleiste und den Rest deiner Einstellungen hinzuzufügen. Noch Fragen?",
     "quickTour": "Kurze Tour starten",
     "or": "oder",
@@ -739,9 +737,19 @@
     "lastUpdated": "Zuletzt aktualisiert: {date}"
   },
   "notFound": {
-    "title": "Seite nicht gefunden",
-    "description": "Die gesuchte Seite existiert nicht oder wurde verschoben.",
-    "returnHome": "Zurück zur Startseite"
+    "kicker": "fehler 404 · route verloren",
+    "title": "Diese Seite ist in den",
+    "titleHighlight": "Urlaub",
+    "titleEmphasis": "gefahren ohne Bescheid.",
+    "lede": "Wir haben am Strand gesucht, unter dem Sonnenschirm nachgeschaut, an der Strandbar gefragt… nichts. Die URL, die du suchst, existiert nicht (oder hat sich zwischen zwei langen Wochenenden verirrt).",
+    "ctaPrimary": "Zurück zur Startseite",
+    "ctaPlanner": "Planer öffnen",
+    "suggestLabel": "Suchtest du sowas?",
+    "link1": "Wie es funktioniert",
+    "link2": "Funktionen",
+    "link3": "Preise",
+    "link4": "FAQ & Support",
+    "footerStatus": "status: ok · uptime: 99.98%"
   },
   "error": {
     "retry": "Erneut versuchen",

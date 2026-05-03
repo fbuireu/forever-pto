@@ -46,9 +46,8 @@ const HomePage = async ({ params }: PageProps) => {
 
 export default HomePage;
 
-// better stack not working properly (+ add beta FE)
+// better stack not working properly
 // todo: brutalist design (logo, border to highlight shadow on white and dark mde, skeletons, status page)
-// todo: check all
 // todo: focus input order in stripe
 // todo: improve responsive
 // todo: https://csswizardry.com/2026/04/what-is-css-containment-and-how-can-i-use-it/

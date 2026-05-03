@@ -25,16 +25,14 @@
     "planner": {
       "title": "Planificateur | Forever PTO",
       "description": "Planifie et optimise tes jours de congés. Calendrier PTO intelligent avec détection des jours fériés, optimisateur de ponts et export vers Google Agenda, Outlook et Apple."
-    },
-    "notFound": {
-      "title": "Page introuvable | Forever PTO",
-      "description": "La page que vous recherchez n'existe pas ou a été déplacée."
     }
   },
   "planner": {
     "title": "Forever PTO",
     "description": "Ton planificateur PTO intelligent. Configure tes jours de congés, pays et stratégie pour profiter au maximum de chaque jour férié.",
     "subtitle": "Votre optimiseur de congés intelligent. Arrêtez de perdre des jours.",
+    "titleHighlight1": "Ton année",
+    "titleHighlight2": "libre",
     "instructions": "Commence par ajouter tes jours dans la barre latérale gauche et le reste de ta configuration. Encore des doutes ?",
     "quickTour": "Faire un tour rapide",
     "or": "ou",
@@ -739,9 +737,19 @@
     "lastUpdated": "Dernière mise à jour : {date}"
   },
   "notFound": {
-    "title": "Page introuvable",
-    "description": "La page que tu cherches n'existe pas ou a été déplacée.",
-    "returnHome": "Retour à l'accueil"
+    "kicker": "erreur 404 · route perdue",
+    "title": "Cette page est partie en",
+    "titleHighlight": "vacances",
+    "titleEmphasis": "sans prévenir.",
+    "lede": "On a cherché sur la plage, regardé sous le parasol, demandé au bar de la plage… rien. L'URL que tu cherches n'existe pas (ou s'est perdue entre deux longs week-ends).",
+    "ctaPrimary": "Retour à l'accueil",
+    "ctaPlanner": "Ouvrir le Planificateur",
+    "suggestLabel": "Tu cherchais quelque chose comme ça ?",
+    "link1": "Comment ça marche",
+    "link2": "Fonctionnalités",
+    "link3": "Tarifs",
+    "link4": "FAQ et support",
+    "footerStatus": "statut : ok · uptime : 99.98%"
   },
   "error": {
     "retry": "Réessayer",

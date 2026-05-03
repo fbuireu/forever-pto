@@ -25,10 +25,6 @@
     "planner": {
       "title": "Planificador | Forever PTO",
       "description": "Planifica i optimitza els teus dies de vacances. Calendari intel·ligent de PTO amb detecció de festius, optimitzador de ponts i exportació a Google Calendar, Outlook i Apple."
-    },
-    "notFound": {
-      "title": "Pàgina no trobada | Forever PTO",
-      "description": "La pàgina que busques no existeix o ha estat moguda."
     }
   },
   "planner": {

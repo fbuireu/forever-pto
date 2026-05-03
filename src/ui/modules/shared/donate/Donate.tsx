@@ -5,6 +5,7 @@ import type { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { track } from '@infrastructure/clients/logging/better-stack/tracking';
 import { getStripeClientInstance } from '@infrastructure/clients/payments/stripe/client';
 import { formatDiscountMessage } from '@infrastructure/services/payments/utils/formatters';
 import { calculateFinalAmount } from '@infrastructure/services/payments/utils/helpers';
@@ -134,7 +135,15 @@ export const Donate = () => {
             toast.success(message.title, {
               description: message.description,
             });
+            track('promo_code_applied', {
+              discountType: result.discountInfo.type,
+              discountValue: result.discountInfo.value,
+              originalAmount: result.discountInfo.originalAmount,
+              finalAmount: result.discountInfo.finalAmount,
+            });
           }
+
+          track('payment_started', { amount: data.amount, currency, hasPromoCode: !!data.promoCode });
 
           setPaymentState({
             clientSecret: result.clientSecret,

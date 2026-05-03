@@ -80,6 +80,7 @@ const nextConfig: NextConfig = {
   },
   transpilePackages: ['prettier'],
   experimental: {
+    globalNotFound: true,
     optimizePackageImports: [
       'lucide-react',
       'recharts',

@@ -3,6 +3,7 @@
 import { type ContactFormData, createContactSchema } from '@application/dto/contact/schema';
 import { usePremiumStore } from '@application/stores/premium';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { track } from '@infrastructure/clients/logging/better-stack/tracking';
 import { CircleCheckBig } from '@ui/modules/core/animate/icons/CircleCheckBig';
 import { Button } from '@ui/modules/core/primitives/Button';
 import {
@@ -88,6 +89,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
         setEmail(data.email);
 
         if (result.success) {
+          track('contact_form_submitted');
           setStep(Step.SUCCESS);
         } else {
           const translatedError = result.errorType

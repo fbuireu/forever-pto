@@ -1,5 +1,6 @@
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
+import { track } from '@infrastructure/clients/logging/better-stack/tracking';
 import { formatDiscountText } from '@infrastructure/services/payments/utils/formatters';
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { confirmPayment } from '@ui/adapters/payments/checkout';
@@ -58,6 +59,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
     if (!result.success) {
       const errorMsg = result.error ?? t('paymentFailed');
       setErrorMessage(errorMsg);
+      track('payment_failed', { error: errorMsg });
     } else {
       if (result.sessionData) {
         setPremiumStatus({
@@ -66,12 +68,13 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
         });
       }
 
+      track('payment_completed', { amount });
       setShowConfetti(true);
       setTimeout(() => {
         onSuccess();
       }, 1000);
     }
-  }, [stripe, elements, email, onSuccess, setPremiumStatus, t, locale]);
+  }, [stripe, elements, email, onSuccess, setPremiumStatus, t, locale, amount]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
