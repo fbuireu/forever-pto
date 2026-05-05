@@ -27,6 +27,8 @@ jobs:
     name: Post preview URL
     needs: [deploy]
     runs-on: ubuntu-latest
+    env:
+      PREVIEW_MARKER: '<!-- preview-deployment -->'
     steps:
       - name: Find existing comment
         uses: peter-evans/find-comment@v4
@@ -34,7 +36,7 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: github-actions[bot]
-          body-includes: '<!-- preview-deployment -->'
+          body-includes: ${{ env.PREVIEW_MARKER }}
 
       - name: Upsert preview comment
         uses: peter-evans/create-or-update-comment@v5
@@ -43,7 +45,7 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           edit-mode: replace
           body: |
-            <!-- preview-deployment -->
+            ${{ env.PREVIEW_MARKER }}
             ### Preview deployment
 
             | | |
