@@ -131,7 +131,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
                 <span className='w-full border-t' />
               </div>
               <div className='relative flex justify-center text-xs uppercase'>
-                <span className='bg-popover px-2 text-muted-foreground'>{t('expressCheckout')}</span>
+                <span className='bg-card px-2 text-muted-foreground'>{t('expressCheckout')}</span>
               </div>
             </div>
             <div className='relative min-h-12'>
@@ -154,7 +154,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
               <span className='w-full border-t' />
             </div>
             <div className='relative flex justify-center text-xs uppercase'>
-              <span className='bg-popover px-2 text-muted-foreground'>{t('orPayWithCard')}</span>
+              <span className='bg-card px-2 text-muted-foreground'>{t('orPayWithCard')}</span>
             </div>
           </div>
           <PaymentElement />
