@@ -57,7 +57,6 @@ export default HomePage;
 // todo: share button with results?
 // todo: migrate temporal API when available in Node
 // todo: sponsor the project (reddit, producthunt)
-// todo: unify modal styles (footer actions, spacing, etc)
 // todo: performance audit, react best practices audit
 // todo: ads?
 // todo: add LICENCE, SECURITY, DOCS, WIKI, etc
