@@ -1,6 +1,4 @@
-const Bone = ({ className }: { className: string }) => (
-  <div className={`bg-[var(--muted)] ${className}`} />
-);
+const Bone = ({ className }: { className: string }) => <div className={`bg-[var(--muted)] ${className}`} />;
 
 export const PtoStatusFixture = () => (
   <div className='rounded-[14px] border-[3px] border-[var(--frame)] bg-card px-4 py-3 shadow-[var(--shadow-brutal-lg)]'>
