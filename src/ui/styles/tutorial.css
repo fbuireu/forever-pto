@@ -47,7 +47,6 @@
     letter-spacing: -0.03em;
     color: var(--popover-foreground);
     margin: 0 0 0.75rem 0;
-    font-family: var(--font-sans), system-ui, sans-serif;
   }
 
   .driver-popover-description {
@@ -55,7 +54,6 @@
     line-height: 1.6;
     color: var(--muted-foreground);
     margin: 0 0 1rem 0;
-    font-family: var(--font-sans), system-ui, sans-serif;
   }
 
   .driver-popover-footer {
@@ -70,7 +68,6 @@
     font-size: 0.75rem;
     color: var(--muted-foreground);
     font-weight: 500;
-    font-family: var(--font-sans), system-ui, sans-serif;
   }
 
   .driver-popover-navigation-btns button {
@@ -83,7 +80,6 @@
     font-size: 0.875rem;
     font-weight: 900;
     letter-spacing: 0.01em;
-    font-family: var(--font-sans), system-ui, sans-serif;
     transition:
       background-color 75ms linear,
       box-shadow 75ms linear,
@@ -183,7 +179,6 @@
   .driver-popover-close-btn:hover {
     transform: translate(-2px, -2px);
     box-shadow: var(--shadow-brutal-sm);
-    background-color: var(--surface-panel) !important;
   }
 
   .driver-popover-close-btn:active {
@@ -201,15 +196,7 @@
     pointer-events: auto;
   }
 
-  .driver-highlighted-element {
-    background-color: var(--background);
-    outline: 3px solid var(--frame);
-    outline-offset: 4px;
-    box-shadow: var(--shadow-brutal-sm);
-    z-index: 10001;
-    position: relative;
-  }
-
+  .driver-highlighted-element,
   #driver-highlighted-element-stage {
     background-color: var(--background);
     outline: 3px solid var(--frame);
@@ -217,13 +204,14 @@
     box-shadow: var(--shadow-brutal-sm);
   }
 
+  .driver-highlighted-element {
+    z-index: 10001;
+    position: relative;
+  }
+
   [data-theme="dark"] #driver-highlighted-element-stage,
   [data-theme="dark"] #driver-page-overlay {
     outline: 5000px solid rgba(0, 0, 0, 0.85);
-  }
-
-  [data-theme="dark"] .driver-popover {
-    box-shadow: var(--shadow-brutal-xl);
   }
 
   @container root (max-width: 640px) {

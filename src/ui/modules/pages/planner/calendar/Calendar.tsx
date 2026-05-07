@@ -238,8 +238,8 @@ export function Calendar({
             description: tPremium('unlockDescription'),
             duration: 7_500,
             classNames: {
-              toast: 'flex flex-row flex-wrap items-center overflow-visible',
-              icon: 'mt-0.5 flex-shrink-0',
+              toast: 'flex flex-wrap items-center overflow-visible',
+              icon: 'mt-0.5 shrink-0',
               content: 'flex-1',
             },
             icon: <LockIcon size='16' />,

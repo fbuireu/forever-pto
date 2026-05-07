@@ -81,7 +81,7 @@ export const DevFooter = () => {
             target='_blank'
             rel='noopener noreferrer'
             aria-label={`Visit my ${key.toLowerCase().replace('_', ' ')} profile`}
-            className='inline-flex items-center justify-center min-w-11 min-h-11 transition-all duration-200 hover:scale-110 hover:text-opacity-100'
+            className='inline-flex items-center justify-center min-w-11 min-h-11 transition-transform duration-200 hover:scale-110'
             style={{ '--hover-color': network.COLOR } as React.CSSProperties & { '--hover-color': string }}
           >
             <Icon icon={network.ICON} size={24} className='transition-colors duration-200 hover:text-(--hover-color)' />

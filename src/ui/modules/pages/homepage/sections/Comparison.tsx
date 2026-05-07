@@ -1,4 +1,5 @@
 import { Badge } from '@ui/modules/core/primitives/Badge';
+import { cn } from '@ui/utils/utils';
 import { getTranslations } from 'next-intl/server';
 import { brutCard } from './shared';
 
@@ -17,7 +18,7 @@ export const Comparison = async () => {
       </div>
 
       <div className='max-w-[1100px] mx-auto grid grid-cols-1 md:grid-cols-[1fr_60px_1fr] items-stretch gap-0'>
-        <div className={`${brutCard} p-7 rotate-[-1deg]`}>
+        <div className={cn(brutCard, 'p-7 rotate-[-1deg]')}>
           <h3 className='font-display font-extrabold text-[22px] mb-4'>{t('comparison.withoutTitle')}</h3>
           <ul className='list-none'>
             {(
@@ -45,7 +46,7 @@ export const Comparison = async () => {
           </div>
         </div>
         <div
-          className={`${brutCard} p-7 rotate-[1deg] text-[var(--color-brand-ink)]`}
+          className={cn(brutCard, 'p-7 rotate-[1deg] text-[var(--color-brand-ink)]')}
           style={{ background: 'var(--color-brand-green)' }}
         >
           <h3 className='font-display font-extrabold text-[22px] mb-4'>{t('comparison.withTitle')}</h3>

@@ -3,6 +3,7 @@ import { Badge } from '@ui/modules/core/primitives/Badge';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';
 import { getWeekdayNames } from '@ui/utils/dates';
+import { cn } from '@ui/utils/utils';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { version } from '../../../../../../package.json';
 import { CAL_ENTRIES, type DayType } from './shared';
@@ -110,7 +111,10 @@ export const Hero = async () => {
               {CAL_ENTRIES.map(({ id, type }) => (
                 <div
                   key={id}
-                  className={`${HERO_DAY_CLASS[type]} aspect-square flex items-center justify-center font-mono text-[11px] font-bold shadow-none`}
+                  className={cn(
+                    HERO_DAY_CLASS[type],
+                    'aspect-square flex items-center justify-center font-mono text-[11px] font-bold shadow-none'
+                  )}
                 >
                   {type === 'pto' ? '✈' : type === 'holiday' ? '★' : ''}
                 </div>
@@ -125,7 +129,7 @@ export const Hero = async () => {
                 ] as const
               ).map(({ type, label }) => (
                 <div key={label} className='flex items-center gap-2 text-[11px]'>
-                  <div className={`${HERO_DAY_CLASS[type]} h-8 w-8 shrink-0`} />
+                  <div className={cn(HERO_DAY_CLASS[type], 'h-8 w-8 shrink-0')} />
                   <span>{label}</span>
                 </div>
               ))}

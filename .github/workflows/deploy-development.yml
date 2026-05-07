@@ -58,6 +58,7 @@ jobs:
     name: E2E tests
     needs: [deploy]
     runs-on: ubuntu-latest
+    environment: development
     steps:
       - name: Checkout
         uses: actions/checkout@v6

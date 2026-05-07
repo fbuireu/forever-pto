@@ -63,7 +63,7 @@ export const Combobox = ({
           >
             {selectedOption ? (
               <div className='flex items-center gap-2 min-w-0 flex-1'>
-                {hasFlag(selectedOption) && <span className='flex-shrink-0'>{selectedOption.flag}</span>}
+                {hasFlag(selectedOption) && <span className='shrink-0'>{selectedOption.flag}</span>}
                 <span className='truncate'>{selectedOption.label}</span>
               </div>
             ) : (

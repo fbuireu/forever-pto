@@ -1,4 +1,5 @@
 import { Badge } from '@ui/modules/core/primitives/Badge';
+import { cn } from '@ui/utils/utils';
 import { getTranslations } from 'next-intl/server';
 import { brutCard } from './shared';
 
@@ -42,7 +43,7 @@ export const Testimonials = async () => {
           return (
             <div
               key={key}
-              className={`${brutCard} p-6 relative ${rotate} ${hoverRotate} transition-transform duration-200`}
+              className={cn(brutCard, 'p-6 relative transition-transform duration-200', rotate, hoverRotate)}
             >
               <span
                 className='absolute -top-3.5 left-[18px] bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[8px] px-2.5 font-serif text-[36px] leading-none shadow-[3px_3px_0_0_var(--frame)] rotate-[-5deg]'
@@ -54,7 +55,10 @@ export const Testimonials = async () => {
               <p className='font-serif text-[22px] leading-[1.3] mb-4'>{text}</p>
               <div className='flex gap-3 items-center pt-3.5 border-t-[2.5px] border-[var(--frame)]'>
                 <div
-                  className={`w-[42px] h-[42px] rounded-full border-[3px] border-[var(--frame)] grid place-items-center font-display font-extrabold text-white shrink-0 ${avatarBg}`}
+                  className={cn(
+                    'w-[42px] h-[42px] rounded-full border-[3px] border-[var(--frame)] grid place-items-center font-display font-extrabold text-white shrink-0',
+                    avatarBg
+                  )}
                 >
                   {name[0]}
                 </div>

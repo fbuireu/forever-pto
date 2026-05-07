@@ -2,6 +2,7 @@ import { Link } from '@application/i18n/navigtion';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Navigation } from '@ui/modules/pages/homepage/navigation/Navigation';
 import { Footer } from '@ui/modules/shared/footer/Footer';
+import { cn } from '@ui/utils/utils';
 import { getTranslations } from 'next-intl/server';
 
 interface NotFoundContentProps {
@@ -81,7 +82,10 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
                 >
                   <Link href={href}>
                     <span
-                      className={`shrink-0 w-6 h-6 ${bg} text-[var(--color-brand-ink)] border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold`}
+                      className={cn(
+                        'shrink-0 w-6 h-6 text-[var(--color-brand-ink)] border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold',
+                        bg
+                      )}
                     >
                       {emoji}
                     </span>

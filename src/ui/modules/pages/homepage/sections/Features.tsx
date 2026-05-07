@@ -1,4 +1,5 @@
 import { Badge } from '@ui/modules/core/primitives/Badge';
+import { cn } from '@ui/utils/utils';
 import { getTranslations } from 'next-intl/server';
 import { brutCard, type DayType, dayCell } from './shared';
 
@@ -20,7 +21,10 @@ export const Features = async () => {
 
       <div className='max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-6 gap-6'>
         <div
-          className={`${brutCard} md:col-span-4 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
+          className={cn(
+            brutCard,
+            'md:col-span-4 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+          )}
           style={{ background: 'var(--accent)', color: 'var(--color-brand-ink)' }}
         >
           <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] text-foreground border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]'>
@@ -38,7 +42,7 @@ export const Features = async () => {
               return (
                 <div
                   key={label}
-                  className={`${dayCell[dt]} aspect-square grid place-items-center font-mono text-[11px] font-bold`}
+                  className={cn(dayCell[dt], 'aspect-square grid place-items-center font-mono text-[11px] font-bold')}
                 >
                   {label}
                 </div>
@@ -47,7 +51,10 @@ export const Features = async () => {
           </div>
         </div>
         <div
-          className={`${brutCard} md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
+          className={cn(
+            brutCard,
+            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+          )}
         >
           <span className='inline-block px-2.5 py-1 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]'>
             {t('features.ratioTag')}
@@ -58,7 +65,10 @@ export const Features = async () => {
           <p className='text-foreground text-[15px]'>{t('features.ratioDescription')}</p>
         </div>
         <div
-          className={`${brutCard} md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
+          className={cn(
+            brutCard,
+            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+          )}
           style={{ background: 'var(--color-brand-teal)' }}
         >
           <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]'>
@@ -80,7 +90,10 @@ export const Features = async () => {
           </div>
         </div>
         <div
-          className={`${brutCard} md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
+          className={cn(
+            brutCard,
+            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+          )}
         >
           <span className='inline-block px-2.5 py-1 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]'>
             {t('features.conflictsTag')}
@@ -109,7 +122,10 @@ export const Features = async () => {
           <p className='text-foreground text-[15px]'>{t('features.conflictsDescription')}</p>
         </div>
         <div
-          className={`${brutCard} md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
+          className={cn(
+            brutCard,
+            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+          )}
           style={{ background: 'var(--color-brand-orange)' }}
         >
           <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[6px] font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--frame)] shadow-[var(--shadow-brutal-xs)]'>
@@ -131,7 +147,10 @@ export const Features = async () => {
           </div>
         </div>
         <div
-          className={`${brutCard} md:col-span-6 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
+          className={cn(
+            brutCard,
+            'md:col-span-6 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+          )}
           style={{ background: 'var(--frame)', color: 'var(--background)' }}
         >
           <span className='inline-block px-2.5 py-1 bg-[var(--accent)] border-[2.5px] border-[var(--background)] rounded-[6px] font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--color-brand-ink)] shadow-[2px_2px_0_0_var(--background)]'>

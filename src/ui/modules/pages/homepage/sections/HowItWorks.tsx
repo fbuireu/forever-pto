@@ -1,4 +1,5 @@
 import { Badge } from '@ui/modules/core/primitives/Badge';
+import { cn } from '@ui/utils/utils';
 import { getTranslations } from 'next-intl/server';
 import { brutCard } from './shared';
 
@@ -48,7 +49,10 @@ export const HowItWorks = async () => {
         ].map(({ num, bg, iconBg, icon, title, desc }) => (
           <div
             key={num}
-            className={`${brutCard} px-7 pt-14 pb-7 relative transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[11px_11px_0_0_var(--frame)]`}
+            className={cn(
+              brutCard,
+              'px-7 pt-14 pb-7 relative transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[11px_11px_0_0_var(--frame)]'
+            )}
           >
             <div
               className='absolute -top-7 left-[22px] w-14 h-14 border-[4px] border-[var(--frame)] rounded-full grid place-items-center font-display font-extrabold text-[26px] shadow-[4px_4px_0_0_var(--frame)] text-[var(--color-brand-ink)]'

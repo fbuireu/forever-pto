@@ -12,10 +12,6 @@
     scrollbar-color: var(--foreground) var(--muted);
     scrollbar-width: thin;
   }
-  [data-slot='command-list'] {
-    scrollbar-color: var(--foreground) var(--muted);
-    scrollbar-width: thin;
-  }
   body {
     @apply bg-background text-foreground;
     background-image: var(--page-glow);

@@ -69,7 +69,7 @@ export const PremiumFeature = ({
           }
         }}
       >
-        <div className='pointer-events-none select-none' style={{ filter: 'blur(4px)' }} aria-hidden='true' inert>
+        <div style={{ filter: 'blur(4px)' }} aria-hidden='true' inert>
           {children}
         </div>
         <div

@@ -25,7 +25,10 @@
   border-radius: 8px;
   background: var(--accent);
   box-shadow: var(--shadow-brutal-xs);
-  transition: all 150ms ease-in-out;
+  transition:
+    box-shadow 150ms ease-in-out,
+    transform 150ms ease-in-out,
+    background-color 150ms ease-in-out;
   user-select: none;
 }
 

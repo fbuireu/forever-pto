@@ -2,6 +2,7 @@
 
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
+import { cn } from '@ui/utils/utils';
 import { BarChart3, CalendarDays, Sparkles, TrendingUp } from 'lucide-react';
 import { m, type Transition, type Variants } from 'motion/react';
 import { useTranslations } from 'next-intl';
@@ -179,9 +180,10 @@ export const AlternativesManager = ({
             <span className='text-sm font-semibold text-purple-700 dark:text-purple-300'>x</span>
             {!isMainSuggestion && (
               <span
-                className={`text-xs flex ${
+                className={cn(
+                  'text-xs flex',
                   efficiencyDiff >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                }`}
+                )}
               >
                 {efficiencyDiff >= 0 ? '+' : ''}
                 <SlidingNumber number={parseFloat(efficiencyDiff.toFixed(1))} decimalPlaces={1} />
@@ -200,25 +202,27 @@ export const AlternativesManager = ({
         {!isMainSuggestion && (
           <m.button
             {...STAT_CARD_MOTION_CONFIG}
-            className='flex h-11 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[var(--surface-panel-soft)]'
+            className='flex h-11 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-3 py-2 shadow-[var(--shadow-brutal-xs)]'
             aria-label={t('comparison')}
           >
             <BarChart3 size={20} className='text-neutral-600 dark:text-neutral-400 shrink-0' />
             <div className='flex items-center gap-1'>
               <SlidingNumber
-                className={`text-sm font-semibold ${
+                className={cn(
+                  'text-sm font-semibold',
                   efficiencyDiff >= -0.5
                     ? 'text-amber-600 dark:text-amber-400'
                     : 'text-neutral-600 dark:text-neutral-400'
-                }`}
+                )}
                 number={Math.round((efficiency / mainEfficiency) * 100)}
               />
               <span
-                className={`text-sm font-semibold ${
+                className={cn(
+                  'text-sm font-semibold',
                   efficiencyDiff >= -0.5
                     ? 'text-amber-600 dark:text-amber-400'
                     : 'text-neutral-600 dark:text-neutral-400'
-                }`}
+                )}
               >
                 %
               </span>

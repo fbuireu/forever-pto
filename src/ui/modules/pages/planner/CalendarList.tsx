@@ -5,11 +5,12 @@ import { useHolidaysStore } from '@application/stores/holidays';
 import { useCalculationsWorker } from '@ui/hooks/useCalculationsWorker';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { cn } from '@ui/utils/utils';
+import { Skeleton } from 'boneyard-js/react';
 import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { Calendar, CalendarSelectionMode } from './calendar/Calendar';
-import { CalendarListSkeleton } from './calendar/CalendarListSkeleton';
+import { CalendarListFixture } from './calendar/CalendarListFixture';
 import { getTotalMonths } from './utils/helpers';
 
 export const CalendarList = () => {
@@ -89,40 +90,38 @@ export const CalendarList = () => {
     }
   }, [triggerCalculation, year, ptoDays, allowPastDays, holidays, months, strategy, locale]);
 
-  if (!areStoresReady) {
-    return <CalendarListSkeleton />;
-  }
-
   return (
-    <div
-      className={cn(
-        'grid [grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-5 mx-auto w-full',
-        isCalculating && 'pointer-events-none'
-      )}
-      data-tutorial='calendar-list'
-    >
-      {months.map((month) => (
-        <Calendar
-          key={month.toISOString()}
-          mode={CalendarSelectionMode.NONE}
-          className='rounded-[14px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-md)] [content-visibility:auto] [contain-intrinsic-block-size:310px]'
-          month={month}
-          weekStartsOn={1}
-          locale={locale}
-          holidays={holidays}
-          allowPastDays={allowPastDays}
-          currentSelection={currentSelection}
-          alternatives={alternatives}
-          suggestion={suggestion}
-          previewAlternativeIndex={previewAlternativeIndex}
-          manuallySelectedDays={manuallySelectedDays}
-          removedSuggestedDays={removedSuggestedDays}
-          onDayToggle={handleDayToggle}
-          canSelectMoreDays={canSelectMoreDays}
-          showOutsideDays
-          fixedWeeks
-        />
-      ))}
-    </div>
+    <Skeleton name='calendar-list' loading={!areStoresReady} fixture={<CalendarListFixture />}>
+      <div
+        className={cn(
+          'grid [grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-5 mx-auto w-full',
+          isCalculating && 'pointer-events-none'
+        )}
+        data-tutorial='calendar-list'
+      >
+        {months.map((month) => (
+          <Calendar
+            key={month.toISOString()}
+            mode={CalendarSelectionMode.NONE}
+            className='rounded-[14px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-md)] [content-visibility:auto] [contain-intrinsic-block-size:310px]'
+            month={month}
+            weekStartsOn={1}
+            locale={locale}
+            holidays={holidays}
+            allowPastDays={allowPastDays}
+            currentSelection={currentSelection}
+            alternatives={alternatives}
+            suggestion={suggestion}
+            previewAlternativeIndex={previewAlternativeIndex}
+            manuallySelectedDays={manuallySelectedDays}
+            removedSuggestedDays={removedSuggestedDays}
+            onDayToggle={handleDayToggle}
+            canSelectMoreDays={canSelectMoreDays}
+            showOutsideDays
+            fixedWeeks
+          />
+        ))}
+      </div>
+    </Skeleton>
   );
 };

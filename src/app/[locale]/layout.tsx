@@ -1,4 +1,5 @@
 import { routing } from '@infrastructure/i18n/routing';
+import { BonesProvider } from '@ui/modules/providers/BonesProvider';
 import { WebMCP } from '@ui/modules/shared/WebMCP';
 import { cn } from '@ui/utils/utils';
 import '@styles/index.css';
@@ -71,6 +72,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
         >
           Skip to main content
         </a>
+        <BonesProvider />
         <NextIntlClientProvider>
           <ThemeProvider
             attribute='data-theme'

@@ -19,7 +19,7 @@ interface LegendPayload {
 }
 
 const HolidaysDistributionChartLegend = ({ payload }: { payload?: readonly LegendPayload[] }) => (
-  <ul className='flex flex-row gap-4 justify-center mt-2'>
+  <ul className='flex gap-4 justify-center mt-2'>
     {payload?.map((entry) => (
       <li key={entry.value} className='flex items-center gap-2'>
         <span

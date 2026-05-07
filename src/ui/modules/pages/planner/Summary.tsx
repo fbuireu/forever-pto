@@ -13,6 +13,7 @@ import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Badge } from '@ui/modules/core/primitives/Badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
+import { Skeleton } from 'boneyard-js/react';
 import { Award, BarChart3, Calendar, CalendarDays, Palmtree, TrendingUp, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
@@ -20,7 +21,7 @@ import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { MetricCard, MetricCardSize } from './summary/MetricCard';
 import { NotificationCard } from './summary/NotificationCard';
-import { SummarySkeleton } from './summary/SummarySkeleton';
+import { SummaryFixture } from './summary/SummaryFixture';
 
 const HolidaysDistributionChart = dynamic(() =>
   import('src/ui/modules/pages/planner/summary/HolidaysDistributionChart').then((module) => ({
@@ -124,269 +125,276 @@ export const Summary = () => {
     };
   }, [activeSuggestion, ptoDays, alternatives]);
 
-  if (!areStoresReady) {
-    return <SummarySkeleton />;
-  }
-  if (!metricsData) {
-    return null;
-  }
-
-  const { metrics, effectiveDays, increment, efficiencyPercentage, canImprove } = metricsData;
+  const metrics = metricsData?.metrics;
+  const effectiveDays = metricsData?.effectiveDays;
+  const increment = metricsData?.increment;
+  const efficiencyPercentage = metricsData?.efficiencyPercentage;
+  const canImprove = metricsData?.canImprove;
 
   return (
-    <div className='w-full max-w-4xl mx-auto space-y-6 z-1'>
-      <Card>
-        <CardHeader className='pb-2'>
-          <CardTitle className='text-3xl sm:text-4xl font-display font-black text-center tracking-[-0.05em]'>
-            {t('title', { year, nextYear: Number(year) + 1 })}
-            <div className='flex flex-wrap items-center gap-2 mt-3 mb-5 justify-center'>
-              <Badge variant='outline' className='mx-1'>
-                <span className='mr-2'>{locationInfo.userCountry?.flag}</span>
-                <span>{locationInfo.userCountry?.label}</span>
-              </Badge>
-              {region && locationInfo.userRegion && (
-                <Badge variant='outline' className='mx-1'>
-                  <span>{locationInfo.userRegion.label}</span>
-                </Badge>
-              )}
-              <Badge variant='outline'>{tSidebar(`strategy.${strategy}.label`)}</Badge>
-            </div>
-          </CardTitle>
-          <CardDescription className='space-y-2 rounded-[10px] border-[3px] border-[var(--frame)]/15 bg-[var(--surface-panel-soft)] p-4 text-muted-foreground'>
-            <p className='text-sm'>
-              {increment > 0
-                ? t('summaryParagraph.withGain', {
-                    ptoDays,
-                    totalHolidays: holidayMetrics.totalHolidays,
-                    strategy: tSidebar(`strategy.${strategy}.label`).toLowerCase(),
-                    effectiveDays,
-                    increment,
-                    percentage: efficiencyPercentage.toFixed(0),
-                  })
-                : t('summaryParagraph.withoutGain', {
-                    ptoDays,
-                    totalHolidays: holidayMetrics.totalHolidays,
-                    strategy: tSidebar(`strategy.${strategy}.label`).toLowerCase(),
-                    effectiveDays,
-                  })}
-            </p>
-            {holidayMetrics.regionalDays > 0 && locationInfo.userRegion && (
-              <p className='text-sm'>
-                {t('summaryParagraph.withRegion', {
-                  regionalDays: holidayMetrics.regionalDays,
-                  region: locationInfo.userRegion.label,
-                })}
-              </p>
-            )}
-            {!region && (
-              <p className='text-sm text-amber-700 dark:text-amber-400'>{t('summaryParagraph.noRegionHint')}</p>
-            )}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className='space-y-6'>
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
-            <HolidaysDistributionChart ptoDays={ptoDays} holidays={holidays ?? []} />
-            <QuarterDistributionChart quarterDist={metrics.quarterDist} />
-          </div>
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
-            <BlocksPerQuarterChart blocksPerQuarter={metrics.longBlocksPerQuarter} />
-            <MonthlyDistributionChart
-              monthlyDist={metrics.monthlyDist}
-              year={Number(year)}
-              carryOverMonths={carryOverMonths}
-            />
-          </div>
-          <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-            <MetricCard
-              label={t('metrics.vacationDays')}
-              value={ptoDays}
-              icon={CalendarDays}
-              badge={t('metrics.days')}
-              colorScheme='blue'
-            />
-            <MetricCard
-              label={t('metrics.holidays')}
-              value={holidayMetrics.totalHolidays}
-              icon={CalendarDays}
-              badge={`${holidayMetrics.nationalDays} ${t('metrics.national')}${holidayMetrics.regionalDays > 0 ? ` + ${holidayMetrics.regionalDays} ${t('metrics.regional')}` : ''}${holidayMetrics.customDays > 0 ? ` + ${holidayMetrics.customDays} ${t('metrics.custom')}` : ''}`}
-              colorScheme='green'
-            />
-            <MetricCard
-              label={t('metrics.effectiveDays')}
-              value={effectiveDays}
-              icon={TrendingUp}
-              badge={increment > 0 ? `+${increment} ${t('metrics.extra')}` : `0 ${t('metrics.extra')}`}
-              colorScheme='purple'
-            />
-            <MetricCard
-              label={t('metrics.multiplier')}
-              value={efficiencyPercentage.toFixed(0)}
-              symbol={'%'}
-              icon={Zap}
-              badge={t('metrics.performance')}
-              colorScheme='amber'
-            />
-          </div>
-          <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3'>
-            <PremiumFeature feature={t('metrics.advancedMetrics')} iconSize='size-7'>
-              <MetricCard
-                label={t('metrics.longWeekends')}
-                value={metrics.longWeekends}
-                icon={Calendar}
-                colorScheme='emerald'
-                size={MetricCardSize.COMPACT}
-              />
-            </PremiumFeature>
-            <PremiumFeature feature={t('metrics.advancedMetrics')} iconSize='size-7'>
-              <MetricCard
-                label={t('metrics.vacationPeriods')}
-                value={metrics.restBlocks}
-                icon={BarChart3}
-                colorScheme='purple'
-                size={MetricCardSize.COMPACT}
-              />
-            </PremiumFeature>
-            <MetricCard
-              label={t('metrics.dayOffRatio')}
-              value={metrics.averageEfficiency.toFixed(1)}
-              icon={TrendingUp}
-              colorScheme='amber'
-              size={MetricCardSize.COMPACT}
-            />
-            <PremiumFeature feature={t('metrics.advancedMetrics')} iconSize='size-7'>
-              <MetricCard
-                label={t('metrics.bridgesUsed')}
-                value={metrics.bridgesUsed}
-                icon={BarChart3}
-                colorScheme='cyan'
-                size={MetricCardSize.COMPACT}
-              />
-            </PremiumFeature>
-            <MetricCard
-              label={t('metrics.workdaysPerMonth')}
-              value={metrics.workingDaysPerMonth}
-              icon={Award}
-              colorScheme='violet'
-              size={MetricCardSize.COMPACT}
-            />
-            <MetricCard
-              label={t('metrics.longestVacation')}
-              value={metrics.longestVacation}
-              symbol={` ${t('yearSummary.daysCount', { count: metrics.longestVacation })}`}
-              icon={Palmtree}
-              colorScheme='rose'
-              size={MetricCardSize.COMPACT}
-            />
-          </div>
-          {metrics.firstLastBreak && (
-            <PremiumFeature
-              feature={t('yearSummary.feature')}
-              description={t('yearSummary.featureDescription')}
-              iconSize='size-7'
-              inlineDescription
-            >
-              <AnimateIcon animateOnHover asChild>
-                <div className='rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] p-4 shadow-[var(--shadow-brutal-sm)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]'>
-                  <div className='flex items-center gap-2 mb-3'>
-                    <Clock className='w-4 h-4 text-indigo-500' />
-                    <span className='text-sm font-display font-medium text-indigo-700 dark:text-indigo-300'>
-                      {t('yearSummary.title')}
-                    </span>
-                  </div>
-                  <div className='grid grid-cols-3 gap-4 text-center'>
-                    <div>
-                      <div className='text-sm text-muted-foreground'>{t('yearSummary.firstBreak')}</div>
-                      <div className='text-lg flex justify-center font-display font-bold text-indigo-700 dark:text-indigo-300'>
-                        <RotatingText text={metrics.firstLastBreak.first} />
-                      </div>
-                    </div>
-                    <div>
-                      <div className='text-sm text-muted-foreground'>{t('yearSummary.maxWorkStreak')}</div>
-                      <div className='text-lg font-display font-bold text-indigo-700 flex justify-center dark:text-indigo-300'>
-                        <SlidingNumber number={metrics.maxWorkingPeriod} />{' '}
-                        {t('yearSummary.daysCount', { count: metrics.maxWorkingPeriod })}
-                      </div>
-                    </div>
-                    <div>
-                      <div className='text-sm text-muted-foreground'>{t('yearSummary.lastBreak')}</div>
-                      <div className='text-lg font-display font-bold text-indigo-700 dark:text-indigo-300'>
-                        <RotatingText text={metrics.firstLastBreak.last} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className='mt-3 text-center'>
-                    <div className='text-xs text-muted-foreground mb-1'>{t('yearSummary.totalBonusDays')}</div>
-                    <div className='text-2xl font-display font-bold text-indigo-700 dark:text-indigo-300 flex justify-center'>
-                      +<SlidingNumber number={metrics.bonusDays} />
-                    </div>
-                    <div className='text-xs text-indigo-600 dark:text-indigo-400'>{t('yearSummary.daysGained')}</div>
-                  </div>
+    <Skeleton name='summary' loading={!areStoresReady} fixture={<SummaryFixture />}>
+      {!metricsData ? null : (
+        <div className='w-full max-w-4xl mx-auto space-y-6 z-1'>
+          <Card>
+            <CardHeader className='pb-2'>
+              <CardTitle className='text-3xl sm:text-4xl font-display font-black text-center tracking-[-0.05em]'>
+                {t('title', { year, nextYear: Number(year) + 1 })}
+                <div className='flex flex-wrap items-center gap-2 mt-3 mb-5 justify-center'>
+                  <Badge variant='outline' className='mx-1'>
+                    <span className='mr-2'>{locationInfo.userCountry?.flag}</span>
+                    <span>{locationInfo.userCountry?.label}</span>
+                  </Badge>
+                  {region && locationInfo.userRegion && (
+                    <Badge variant='outline' className='mx-1'>
+                      <span>{locationInfo.userRegion.label}</span>
+                    </Badge>
+                  )}
+                  <Badge variant='outline'>{tSidebar(`strategy.${strategy}.label`)}</Badge>
                 </div>
-              </AnimateIcon>
-            </PremiumFeature>
-          )}
-          {canImprove > 0 && (
-            <NotificationCard icon={Zap} title={t('notifications.canImprove.title')} colorScheme='orange'>
-              {t('notifications.canImprove.message')}{' '}
-              <strong className='flex gap-1 mx-1'>
-                <SlidingNumber number={canImprove} />
-                {t('notifications.canImprove.moreDays')}
-              </strong>{' '}
-              {t('notifications.canImprove.toYourPlan')}
-              {premiumKey
-                ? ` ${t('notifications.canImprove.reviewOptions')}`
-                : ` ${t('notifications.canImprove.considerPremium')}`}
-            </NotificationCard>
-          )}
-          {(manuallySelectedDays.length > 0 || removedSuggestedDays.length > 0) && (
-            <NotificationCard
-              icon={CalendarDays}
-              title={t('notifications.manualAdjustments.title')}
-              colorScheme='indigo'
-              className='mt-2'
-            >
-              {manuallySelectedDays.length > 0 && (
-                <>
-                  {t('notifications.manualAdjustments.added')}{' '}
-                  <strong className='flex gap-1 mx-1'>
-                    <SlidingNumber number={manuallySelectedDays.length} />{' '}
-                    {manuallySelectedDays.length !== 1
-                      ? t('notifications.manualAdjustments.days')
-                      : t('notifications.manualAdjustments.day')}
-                  </strong>
-                </>
+              </CardTitle>
+              <CardDescription className='space-y-2 rounded-[10px] border-[3px] border-[var(--frame)]/15 bg-[var(--surface-panel-soft)] p-4 text-muted-foreground'>
+                <p className='text-sm'>
+                  {increment > 0
+                    ? t('summaryParagraph.withGain', {
+                        ptoDays,
+                        totalHolidays: holidayMetrics.totalHolidays,
+                        strategy: tSidebar(`strategy.${strategy}.label`).toLowerCase(),
+                        effectiveDays,
+                        increment,
+                        percentage: efficiencyPercentage.toFixed(0),
+                      })
+                    : t('summaryParagraph.withoutGain', {
+                        ptoDays,
+                        totalHolidays: holidayMetrics.totalHolidays,
+                        strategy: tSidebar(`strategy.${strategy}.label`).toLowerCase(),
+                        effectiveDays,
+                      })}
+                </p>
+                {holidayMetrics.regionalDays > 0 && locationInfo.userRegion && (
+                  <p className='text-sm'>
+                    {t('summaryParagraph.withRegion', {
+                      regionalDays: holidayMetrics.regionalDays,
+                      region: locationInfo.userRegion.label,
+                    })}
+                  </p>
+                )}
+                {!region && (
+                  <p className='text-sm text-amber-700 dark:text-amber-400'>{t('summaryParagraph.noRegionHint')}</p>
+                )}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='space-y-6'>
+              <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
+                <HolidaysDistributionChart ptoDays={ptoDays} holidays={holidays ?? []} />
+                <QuarterDistributionChart quarterDist={metrics.quarterDist} />
+              </div>
+              <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
+                <BlocksPerQuarterChart blocksPerQuarter={metrics.longBlocksPerQuarter} />
+                <MonthlyDistributionChart
+                  monthlyDist={metrics.monthlyDist}
+                  year={Number(year)}
+                  carryOverMonths={carryOverMonths}
+                />
+              </div>
+              <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+                <MetricCard
+                  label={t('metrics.vacationDays')}
+                  value={ptoDays}
+                  icon={CalendarDays}
+                  badge={t('metrics.days')}
+                  colorScheme='blue'
+                />
+                <MetricCard
+                  label={t('metrics.holidays')}
+                  value={holidayMetrics.totalHolidays}
+                  icon={CalendarDays}
+                  badge={`${holidayMetrics.nationalDays} ${t('metrics.national')}${holidayMetrics.regionalDays > 0 ? ` + ${holidayMetrics.regionalDays} ${t('metrics.regional')}` : ''}${holidayMetrics.customDays > 0 ? ` + ${holidayMetrics.customDays} ${t('metrics.custom')}` : ''}`}
+                  colorScheme='green'
+                />
+                <MetricCard
+                  label={t('metrics.effectiveDays')}
+                  value={effectiveDays}
+                  icon={TrendingUp}
+                  badge={increment > 0 ? `+${increment} ${t('metrics.extra')}` : `0 ${t('metrics.extra')}`}
+                  colorScheme='purple'
+                />
+                <MetricCard
+                  label={t('metrics.multiplier')}
+                  value={efficiencyPercentage.toFixed(0)}
+                  symbol={'%'}
+                  icon={Zap}
+                  badge={t('metrics.performance')}
+                  colorScheme='amber'
+                />
+              </div>
+              <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3'>
+                <PremiumFeature feature={t('metrics.advancedMetrics')} iconSize='size-7'>
+                  <MetricCard
+                    label={t('metrics.longWeekends')}
+                    value={metrics.longWeekends}
+                    icon={Calendar}
+                    colorScheme='emerald'
+                    size={MetricCardSize.COMPACT}
+                  />
+                </PremiumFeature>
+                <PremiumFeature feature={t('metrics.advancedMetrics')} iconSize='size-7'>
+                  <MetricCard
+                    label={t('metrics.vacationPeriods')}
+                    value={metrics.restBlocks}
+                    icon={BarChart3}
+                    colorScheme='purple'
+                    size={MetricCardSize.COMPACT}
+                  />
+                </PremiumFeature>
+                <MetricCard
+                  label={t('metrics.dayOffRatio')}
+                  value={metrics.averageEfficiency.toFixed(1)}
+                  icon={TrendingUp}
+                  colorScheme='amber'
+                  size={MetricCardSize.COMPACT}
+                />
+                <PremiumFeature feature={t('metrics.advancedMetrics')} iconSize='size-7'>
+                  <MetricCard
+                    label={t('metrics.bridgesUsed')}
+                    value={metrics.bridgesUsed}
+                    icon={BarChart3}
+                    colorScheme='cyan'
+                    size={MetricCardSize.COMPACT}
+                  />
+                </PremiumFeature>
+                <MetricCard
+                  label={t('metrics.workdaysPerMonth')}
+                  value={metrics.workingDaysPerMonth}
+                  icon={Award}
+                  colorScheme='violet'
+                  size={MetricCardSize.COMPACT}
+                />
+                <MetricCard
+                  label={t('metrics.longestVacation')}
+                  value={metrics.longestVacation}
+                  symbol={` ${t('yearSummary.daysCount', { count: metrics.longestVacation })}`}
+                  icon={Palmtree}
+                  colorScheme='rose'
+                  size={MetricCardSize.COMPACT}
+                />
+              </div>
+              {metrics.firstLastBreak && (
+                <PremiumFeature
+                  feature={t('yearSummary.feature')}
+                  description={t('yearSummary.featureDescription')}
+                  iconSize='size-7'
+                  inlineDescription
+                >
+                  <AnimateIcon animateOnHover asChild>
+                    <div className='rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] p-4 shadow-[var(--shadow-brutal-sm)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]'>
+                      <div className='flex items-center gap-2 mb-3'>
+                        <Clock className='w-4 h-4 text-indigo-500' />
+                        <span className='text-sm font-display font-medium text-indigo-700 dark:text-indigo-300'>
+                          {t('yearSummary.title')}
+                        </span>
+                      </div>
+                      <div className='grid grid-cols-3 gap-4 text-center'>
+                        <div>
+                          <div className='text-sm text-muted-foreground'>{t('yearSummary.firstBreak')}</div>
+                          <div className='text-lg flex justify-center font-display font-bold text-indigo-700 dark:text-indigo-300'>
+                            <RotatingText text={metrics.firstLastBreak.first} />
+                          </div>
+                        </div>
+                        <div>
+                          <div className='text-sm text-muted-foreground'>{t('yearSummary.maxWorkStreak')}</div>
+                          <div className='text-lg font-display font-bold text-indigo-700 flex justify-center dark:text-indigo-300'>
+                            <SlidingNumber number={metrics.maxWorkingPeriod} />{' '}
+                            {t('yearSummary.daysCount', { count: metrics.maxWorkingPeriod })}
+                          </div>
+                        </div>
+                        <div>
+                          <div className='text-sm text-muted-foreground'>{t('yearSummary.lastBreak')}</div>
+                          <div className='text-lg font-display font-bold text-indigo-700 dark:text-indigo-300'>
+                            <RotatingText text={metrics.firstLastBreak.last} />
+                          </div>
+                        </div>
+                      </div>
+                      <div className='mt-3 text-center'>
+                        <div className='text-xs text-muted-foreground mb-1'>{t('yearSummary.totalBonusDays')}</div>
+                        <div className='text-2xl font-display font-bold text-indigo-700 dark:text-indigo-300 flex justify-center'>
+                          +<SlidingNumber number={metrics.bonusDays} />
+                        </div>
+                        <div className='text-xs text-indigo-600 dark:text-indigo-400'>
+                          {t('yearSummary.daysGained')}
+                        </div>
+                      </div>
+                    </div>
+                  </AnimateIcon>
+                </PremiumFeature>
               )}
-              {manuallySelectedDays.length > 0 &&
-                removedSuggestedDays.length > 0 &&
-                ` ${t('notifications.manualAdjustments.and')} `}
-              {removedSuggestedDays.length > 0 && (
-                <>
-                  {t('notifications.manualAdjustments.removed')}{' '}
+              {canImprove > 0 && (
+                <NotificationCard icon={Zap} title={t('notifications.canImprove.title')} colorScheme='orange'>
+                  {t('notifications.canImprove.message')}{' '}
                   <strong className='flex gap-1 mx-1'>
-                    <SlidingNumber number={removedSuggestedDays.length} />{' '}
-                    {removedSuggestedDays.length !== 1
-                      ? t('notifications.manualAdjustments.days')
-                      : t('notifications.manualAdjustments.day')}
-                  </strong>
-                </>
+                    <SlidingNumber number={canImprove} />
+                    {t('notifications.canImprove.moreDays')}
+                  </strong>{' '}
+                  {t('notifications.canImprove.toYourPlan')}
+                  {premiumKey
+                    ? ` ${t('notifications.canImprove.reviewOptions')}`
+                    : ` ${t('notifications.canImprove.considerPremium')}`}
+                </NotificationCard>
               )}
-              {` ${t('notifications.manualAdjustments.fromOriginal')}`}
-            </NotificationCard>
-          )}
-          {holidayMetrics.customDays > 0 && (
-            <NotificationCard icon={CalendarDays} title={t('notifications.customHolidays.title')} colorScheme='blue'>
-              {t('notifications.customHolidays.youHave')}{' '}
-              <strong className='flex gap-1 mx-1'>
-                <SlidingNumber number={holidayMetrics.customDays} />{' '}
-                {holidayMetrics.customDays !== 1
-                  ? t('notifications.customHolidays.holidays')
-                  : t('notifications.customHolidays.holiday')}
-              </strong>{' '}
-              {t('notifications.customHolidays.improvesPlan')}
-            </NotificationCard>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+              {(manuallySelectedDays.length > 0 || removedSuggestedDays.length > 0) && (
+                <NotificationCard
+                  icon={CalendarDays}
+                  title={t('notifications.manualAdjustments.title')}
+                  colorScheme='indigo'
+                  className='mt-2'
+                >
+                  {manuallySelectedDays.length > 0 && (
+                    <>
+                      {t('notifications.manualAdjustments.added')}{' '}
+                      <strong className='flex gap-1 mx-1'>
+                        <SlidingNumber number={manuallySelectedDays.length} />{' '}
+                        {manuallySelectedDays.length !== 1
+                          ? t('notifications.manualAdjustments.days')
+                          : t('notifications.manualAdjustments.day')}
+                      </strong>
+                    </>
+                  )}
+                  {manuallySelectedDays.length > 0 &&
+                    removedSuggestedDays.length > 0 &&
+                    ` ${t('notifications.manualAdjustments.and')} `}
+                  {removedSuggestedDays.length > 0 && (
+                    <>
+                      {t('notifications.manualAdjustments.removed')}{' '}
+                      <strong className='flex gap-1 mx-1'>
+                        <SlidingNumber number={removedSuggestedDays.length} />{' '}
+                        {removedSuggestedDays.length !== 1
+                          ? t('notifications.manualAdjustments.days')
+                          : t('notifications.manualAdjustments.day')}
+                      </strong>
+                    </>
+                  )}
+                  {` ${t('notifications.manualAdjustments.fromOriginal')}`}
+                </NotificationCard>
+              )}
+              {holidayMetrics.customDays > 0 && (
+                <NotificationCard
+                  icon={CalendarDays}
+                  title={t('notifications.customHolidays.title')}
+                  colorScheme='blue'
+                >
+                  {t('notifications.customHolidays.youHave')}{' '}
+                  <strong className='flex gap-1 mx-1'>
+                    <SlidingNumber number={holidayMetrics.customDays} />{' '}
+                    {holidayMetrics.customDays !== 1
+                      ? t('notifications.customHolidays.holidays')
+                      : t('notifications.customHolidays.holiday')}
+                  </strong>{' '}
+                  {t('notifications.customHolidays.improvesPlan')}
+                </NotificationCard>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </Skeleton>
   );
 };

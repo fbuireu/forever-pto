@@ -7,11 +7,12 @@ import { confirmPayment } from '@ui/adapters/payments/checkout';
 import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
+import { Skeleton } from 'boneyard-js/react';
 import { AlertCircle } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
 import { type FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
-import { ExpressCheckoutSkeleton } from './ExpressCheckoutSkeleton';
+import { ExpressCheckoutFixture } from './ExpressCheckoutFixture';
 
 interface CheckoutFormProps {
   amount: number;
@@ -135,7 +136,9 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
               </div>
             </div>
             <div className='relative min-h-12'>
-              {!isExpressReady && <ExpressCheckoutSkeleton />}
+              <Skeleton name='express-checkout' loading={!isExpressReady} fixture={<ExpressCheckoutFixture />}>
+                <div />
+              </Skeleton>
               <div className={!isExpressReady ? 'invisible absolute inset-0' : 'visible'}>
                 <ExpressCheckoutElement
                   onConfirm={handleExpressCheckout}

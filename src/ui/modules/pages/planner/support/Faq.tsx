@@ -117,7 +117,7 @@ export const Faq = async () => {
     content: (
       <Accordion
         multiple
-        className='w-full **:data-[slot="accordion-panel"]:data-open:overflow-visible **:data-[slot="accordion-panel"]:data-open:[mask:none!important] **:data-[slot="accordion-panel"]:data-open:mask-[none!important]'
+        className='w-full **:data-[slot="accordion-panel"]:data-open:overflow-visible **:data-[slot="accordion-panel"]:data-open:[mask:none!important]'
       >
         {section.items.map((item) => (
           <AccordionItem key={item.id} value={item.id} className='cursor-pointer'>

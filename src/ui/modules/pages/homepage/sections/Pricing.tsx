@@ -1,6 +1,7 @@
 import { Link } from '@application/i18n/navigtion';
 import { Badge } from '@ui/modules/core/primitives/Badge';
 import { Button } from '@ui/modules/core/primitives/Button';
+import { cn } from '@ui/utils/utils';
 import { getTranslations } from 'next-intl/server';
 import { SupportButton } from '../navigation/SupportButton';
 import { brutCard } from './shared';
@@ -22,7 +23,10 @@ export const Pricing = async () => {
 
       <div className='max-w-[1100px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-7'>
         <div
-          className={`${brutCard} p-8 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
+          className={cn(
+            brutCard,
+            'p-8 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+          )}
         >
           <h3 className='font-display font-extrabold text-[28px] tracking-[-0.02em] mb-2'>{t('pricing.freeName')}</h3>
           <p className='text-[14px] text-muted-foreground mb-4'>{t('pricing.freeTagline')}</p>
@@ -54,7 +58,10 @@ export const Pricing = async () => {
           </Button>
         </div>
         <div
-          className={`${brutCard} p-8 relative rotate-[-1deg] transition-all duration-75 hover:rotate-0 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]`}
+          className={cn(
+            brutCard,
+            'p-8 relative rotate-[-1deg] transition-all duration-75 hover:rotate-0 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+          )}
           style={{ background: 'var(--accent)', color: 'var(--color-brand-ink)' }}
         >
           <div className='absolute -top-4 right-[22px] bg-[var(--frame)] text-[var(--background)] font-mono font-bold text-[12px] uppercase tracking-[0.08em] px-3 py-1.5 rounded-[6px] rotate-[4deg]'>
