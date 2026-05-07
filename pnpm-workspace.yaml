@@ -3,3 +3,6 @@ packages:
 minimumReleaseAge: 4320 #3 days
 onlyBuiltDependencies:
   - "@biomejs/biome"
+minimumReleaseAgeExclude:
+  # Renovate security update: next-intl@4.9.2
+  - next-intl@4.9.2
