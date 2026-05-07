@@ -3,7 +3,6 @@
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { Separator } from '@ui/modules/core/primitives/Separator';
-import { Skeleton } from '@ui/modules/core/primitives/Skeleton';
 import { cn } from '@ui/utils/utils';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
@@ -652,9 +651,9 @@ function SidebarMenuSkeleton({ className, showIcon = false, ...props }: SidebarM
       className={cn('flex h-8 items-center gap-2 rounded-md px-2', className)}
       {...props}
     >
-      {showIcon && <Skeleton className='size-4 rounded-md' data-sidebar='menu-skeleton-icon' />}
-      <Skeleton
-        className='h-4 max-w-(--skeleton-width) flex-1'
+      {showIcon && <div className='size-4 rounded-md bg-muted animate-pulse' data-sidebar='menu-skeleton-icon' />}
+      <div
+        className='h-4 max-w-(--skeleton-width) flex-1 rounded-md bg-muted animate-pulse'
         data-sidebar='menu-skeleton-text'
         style={
           {

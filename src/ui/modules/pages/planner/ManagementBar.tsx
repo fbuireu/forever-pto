@@ -79,7 +79,7 @@ export const ManagementBar = () => {
         )}
       </Skeleton>
       <Skeleton name='pto-status' loading={!isReady} fixture={<PtoStatusFixture />}>
-        {isReady && <PtoStatus currentSelection={currentSelection!} />}
+        {isReady && currentSelection && <PtoStatus currentSelection={currentSelection} />}
       </Skeleton>
     </div>
   );

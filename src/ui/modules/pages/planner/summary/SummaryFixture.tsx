@@ -4,6 +4,19 @@ const Bone = ({ className }: { className: string }) => (
   <div className={`rounded-[8px] bg-[var(--muted)] ${className}`} />
 );
 
+const CHART_KEYS_A = ['holidays-dist', 'quarter-dist'];
+const CHART_KEYS_B = ['blocks-quarter', 'monthly-dist'];
+const METRIC_KEYS = ['vacation-days', 'holidays', 'effective-days', 'multiplier'];
+const COMPACT_KEYS = [
+  'long-weekends',
+  'vacation-periods',
+  'day-off-ratio',
+  'bridges-used',
+  'workdays-month',
+  'longest-vacation',
+];
+const YEAR_SUMMARY_KEYS = ['first-break', 'max-streak', 'last-break'];
+
 export const SummaryFixture = () => (
   <div className='w-full max-w-4xl mx-auto space-y-6 z-1'>
     <Card>
@@ -27,25 +40,25 @@ export const SummaryFixture = () => (
       </CardHeader>
       <CardContent className='space-y-6'>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-          {Array.from({ length: 2 }, (_, i) => (
-            <div key={i} className='space-y-2'>
+          {CHART_KEYS_A.map((key) => (
+            <div key={key} className='space-y-2'>
               <Bone className='h-6 w-32' />
               <Bone className='h-64 w-full rounded-[10px]' />
             </div>
           ))}
         </div>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-          {Array.from({ length: 2 }, (_, i) => (
-            <div key={i} className='space-y-2'>
+          {CHART_KEYS_B.map((key) => (
+            <div key={key} className='space-y-2'>
               <Bone className='h-6 w-32' />
               <Bone className='h-64 w-full rounded-[10px]' />
             </div>
           ))}
         </div>
         <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-          {Array.from({ length: 4 }, (_, i) => (
+          {METRIC_KEYS.map((key) => (
             <div
-              key={i}
+              key={key}
               className='flex flex-col items-center p-4 bg-[var(--surface-panel-soft)] rounded-[10px] space-y-2'
             >
               <Bone className='h-3 w-16' />
@@ -58,11 +71,8 @@ export const SummaryFixture = () => (
           ))}
         </div>
         <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3'>
-          {Array.from({ length: 6 }, (_, i) => (
-            <div
-              key={i}
-              className='p-3 bg-[var(--surface-panel-soft)] rounded-[10px] text-center space-y-1'
-            >
+          {COMPACT_KEYS.map((key) => (
+            <div key={key} className='p-3 bg-[var(--surface-panel-soft)] rounded-[10px] text-center space-y-1'>
               <Bone className='w-4 h-4 mx-auto rounded-sm' />
               <Bone className='h-5 w-8 mx-auto' />
               <Bone className='h-3 w-12 mx-auto' />
@@ -75,8 +85,8 @@ export const SummaryFixture = () => (
             <Bone className='h-4 w-32' />
           </div>
           <div className='grid grid-cols-3 gap-4 text-center'>
-            {Array.from({ length: 3 }, (_, i) => (
-              <div key={i} className='space-y-1'>
+            {YEAR_SUMMARY_KEYS.map((key) => (
+              <div key={key} className='space-y-1'>
                 <Bone className='h-3 w-20 mx-auto' />
                 <Bone className='h-5 w-12 mx-auto' />
               </div>
