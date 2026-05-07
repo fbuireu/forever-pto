@@ -43,4 +43,5 @@ export const dayCell: Record<DayType, string> = {
   weekend: 'rounded-lg bg-[var(--surface-panel-soft)] text-muted-foreground border-[2px] border-[var(--frame)]/15',
 };
 
-export const brutCard = 'bg-card border-[4px] border-[var(--frame)] rounded-[14px] shadow-[var(--shadow-brutal-md)]';
+export const brutCard =
+  'bg-card border-[4px] border-[var(--frame)] rounded-[14px] shadow-[var(--shadow-brutal-md)] [contain:layout]';

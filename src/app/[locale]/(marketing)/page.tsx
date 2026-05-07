@@ -50,7 +50,6 @@ export default HomePage;
 // todo: brutalist design (logo, border to highlight shadow on white and dark mde, skeletons, status page in all locales, premium icon in neotbrutalism, all butons, dark mode c.design)
 // todo: focus input order in stripe
 // todo: improve responsive
-// todo: https://csswizardry.com/2026/04/what-is-css-containment-and-how-can-i-use-it/
 // todo: add boneyard skeleton
 // todo: feedback web-check.xyz
 // todo: docs with mintlifyy
@@ -66,7 +65,6 @@ export default HomePage;
 // todo: track origin of premium key (feature)
 // todo: add custom weekends
 // todo: slider calendar on mobile
-// todo: fix biome comments (careful with button nesting etc)
 // todo: transformer to make sql data ready ':id': data.id',
 // todo: improve error handling in server actions (send whole error type and change icon when "save to db error")
 // todo: APPLY DDD + check everything (SSR, CSR, etc)

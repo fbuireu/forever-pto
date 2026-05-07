@@ -2,6 +2,7 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { LegalLayout } from '@ui/modules/layout/LegalLayout';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
+import { Link } from 'src/application/i18n/navigtion';
 
 export { generateMetadata } from './metadata';
 
@@ -29,21 +30,19 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
         <p>
           {t.rich('sections.introduction.p1', {
             link: (chunks) => (
-              <a href={env.NEXT_PUBLIC_SITE_URL} className='text-primary hover:underline'>
+              <Link href={env.NEXT_PUBLIC_SITE_URL} className='text-primary hover:underline'>
                 {chunks}
-              </a>
+              </Link>
             ),
           })}
         </p>
         <p className='mt-4'>{t('sections.introduction.p2')}</p>
       </section>
-
       <section>
         <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.whatAreCookies.title')}</h2>
         <p>{t('sections.whatAreCookies.p1')}</p>
         <p className='mt-4'>{t('sections.whatAreCookies.p2')}</p>
       </section>
-
       <section>
         <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.typesOfCookies.title')}</h2>
         <p>{t('sections.typesOfCookies.intro')}</p>
@@ -53,7 +52,6 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
           <li>{t('sections.typesOfCookies.notUsed.analytics')}</li>
           <li>{t('sections.typesOfCookies.notUsed.socialMedia')}</li>
         </ul>
-
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.typesOfCookies.strictlyNecessary.title')}</h3>
         <p>{t('sections.typesOfCookies.strictlyNecessary.description')}</p>
         <ul className='list-disc pl-6 mt-4 space-y-3'>
@@ -151,7 +149,6 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
         </ul>
         <p className='mt-4'>{t('sections.googleConsent.gdprCompliance')}</p>
       </section>
-
       <section>
         <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.dataSecurity.title')}</h2>
         <p>{t('sections.dataSecurity.description')}</p>
@@ -162,7 +159,6 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
           <li>{t('sections.dataSecurity.items.noAccess')}</li>
         </ul>
       </section>
-
       <section>
         <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.thirdPartyCookies.title')}</h2>
         <p>{t('sections.thirdPartyCookies.description')}</p>
@@ -182,7 +178,6 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
         </ul>
         <p className='mt-4'>{t('sections.thirdPartyCookies.disclaimer')}</p>
       </section>
-
       <section>
         <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.managingCookies.title')}</h2>
         <p>{t('sections.managingCookies.description')}</p>
@@ -196,7 +191,6 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
           <li>{t('sections.managingCookies.browserSettings.items.deleteOnClose')}</li>
         </ul>
         <p className='mt-4'>{t('sections.managingCookies.browserSettings.warning')}</p>
-
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.managingCookies.browserInstructions.title')}</h3>
         <ul className='list-disc pl-6 mt-2 space-y-2'>
           <li>
@@ -216,7 +210,6 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.managingCookies.inAppManagement.title')}</h3>
         <p>{t('sections.managingCookies.inAppManagement.description')}</p>
       </section>
-
       <section>
         <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.yourRights.title')}</h2>
         <p>{t('sections.yourRights.description')}</p>
@@ -228,13 +221,11 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
           <li>{t('sections.yourRights.items.object')}</li>
         </ul>
       </section>
-
       <section>
         <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.changes.title')}</h2>
         <p>{t('sections.changes.p1')}</p>
         <p className='mt-4'>{t('sections.changes.p2')}</p>
       </section>
-
       <section>
         <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.contact.title')}</h2>
         <p>{t('sections.contact.description')}</p>

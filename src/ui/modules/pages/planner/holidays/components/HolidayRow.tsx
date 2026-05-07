@@ -34,7 +34,7 @@ const HolidayRowComponent = ({ holiday, index, isSelected, locale, onToggle }: H
   const workdayStatus = getWorkdayStatus(holiday.date);
 
   return (
-    <TableRow className={cn('hover:bg-muted/50', isSelected && 'bg-muted/25')}>
+    <TableRow className={cn('hover:bg-muted/50 [contain:layout]', isSelected && 'bg-muted/25')}>
       <TableCell>
         <PremiumFeature
           feature={t('editHolidays')}

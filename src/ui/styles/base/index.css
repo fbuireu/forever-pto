@@ -2,6 +2,10 @@
   * {
     @apply border-border outline-ring/50;
   }
+  section[id] {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 800px;
+  }
   html {
     scroll-behavior: smooth;
     scrollbar-gutter: stable;
