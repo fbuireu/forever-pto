@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 
 const Bone = ({ className }: { className: string }) => (
-  <div className={`rounded-[8px] bg-[var(--muted)] ${className}`} />
+  <div className={`rounded-[8px] border-[2px] border-[var(--frame)]/30 bg-[var(--surface-panel-soft)] ${className}`} />
 );
 
 const CHART_KEYS_A = ['holidays-dist', 'quarter-dist'];
@@ -59,7 +59,7 @@ export const SummaryFixture = () => (
           {METRIC_KEYS.map((key) => (
             <div
               key={key}
-              className='flex flex-col items-center p-4 bg-[var(--surface-panel-soft)] rounded-[10px] space-y-2'
+              className='flex flex-col items-center p-4 rounded-[10px] border-[2px] border-[var(--frame)]/15 space-y-2'
             >
               <Bone className='h-3 w-16' />
               <div className='flex items-center gap-2'>
@@ -72,14 +72,14 @@ export const SummaryFixture = () => (
         </div>
         <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3'>
           {COMPACT_KEYS.map((key) => (
-            <div key={key} className='p-3 bg-[var(--surface-panel-soft)] rounded-[10px] text-center space-y-1'>
+            <div key={key} className='p-3 rounded-[10px] border-[2px] border-[var(--frame)]/15 text-center space-y-1'>
               <Bone className='w-4 h-4 mx-auto rounded-sm' />
               <Bone className='h-5 w-8 mx-auto' />
               <Bone className='h-3 w-12 mx-auto' />
             </div>
           ))}
         </div>
-        <div className='p-4 bg-[var(--surface-panel-inset)] rounded-[10px] space-y-3'>
+        <div className='p-4 rounded-[10px] border-[2px] border-[var(--frame)]/15 space-y-3'>
           <div className='flex items-center gap-2'>
             <Bone className='w-4 h-4 rounded-sm' />
             <Bone className='h-4 w-32' />

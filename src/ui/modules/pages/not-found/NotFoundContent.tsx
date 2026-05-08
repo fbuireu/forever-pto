@@ -78,7 +78,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
                   key={href}
                   variant='outline'
                   asChild
-                  className='justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[3px_3px_0_0_var(--frame)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)]'
+                  className='justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] [filter:drop-shadow(3px_3px_0_var(--frame))] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:[filter:drop-shadow(4px_4px_0_var(--frame))] active:translate-x-px active:translate-y-px active:[filter:drop-shadow(1px_1px_0_var(--frame))]'
                 >
                   <Link href={href}>
                     <span

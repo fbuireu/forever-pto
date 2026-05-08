@@ -115,6 +115,17 @@
         "holidays": "jours fériés personnalisés",
         "improvesPlan": "qui améliorent ton planning."
       }
+    },
+    "yearTimeline": {
+      "title": "Vue annuelle condensée",
+      "rows": {
+        "national": "National",
+        "regional": "Régional",
+        "custom": "Personnalisé",
+        "pto": "PTO",
+        "bridges": "Ponts",
+        "manual": "Manuel"
+      }
     }
   },
   "faq": {

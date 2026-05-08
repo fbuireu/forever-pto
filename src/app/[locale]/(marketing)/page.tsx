@@ -50,9 +50,11 @@ export default HomePage;
 // todo: brutalist design (logo, border to highlight shadow on white and dark mde, skeletons, status page in all locales, premium icon in neotbrutalism, all butons, dark mode c.design)
 // todo: focus input order in stripe
 // todo: improve responsive
+// todo: recreate bones
 // todo: feedback web-check.xyz
 // todo: docs with mintlifyy
 // todo: share button with results?
+// todo: recreate bones
 // todo: migrate temporal API when available in Node
 // todo: sponsor the project (reddit, producthunt)
 // todo: performance audit, react best practices audit

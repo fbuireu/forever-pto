@@ -43,6 +43,11 @@ const MonthlyDistributionChart = dynamic(() =>
     default: module.MonthlyDistributionChart,
   }))
 );
+const YearTimelineChart = dynamic(() =>
+  import('src/ui/modules/pages/planner/summary/YearTimelineChart').then((module) => ({
+    default: module.YearTimelineChart,
+  }))
+);
 
 export const Summary = () => {
   const t = useTranslations('summary');
@@ -179,6 +184,12 @@ export const Summary = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className='space-y-6'>
+            <YearTimelineChart
+              year={Number(year)}
+              holidays={holidays ?? []}
+              suggestion={activeSuggestion}
+              manuallySelectedDays={manuallySelectedDays}
+            />
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
               <HolidaysDistributionChart ptoDays={ptoDays} holidays={holidays ?? []} />
               <QuarterDistributionChart quarterDist={metrics.quarterDist} />

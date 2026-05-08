@@ -124,7 +124,7 @@ function SwitchThumb({
           transition={transition}
           animate={thumbAnimation}
           className={cn(
-            'pointer-events-none absolute left-px top-px flex size-[22px] shrink-0 items-center justify-center rounded-full border-[3px] border-[var(--frame)] bg-[var(--frame)] text-white [--switch-thumb-shadow:var(--accent)] shadow-[2px_1px_0_0_var(--switch-thumb-shadow)] transition-all duration-75 ease-linear group-hover/switch:shadow-[3px_2px_0_0_var(--switch-thumb-shadow)] group-disabled/switch:opacity-50 data-[checked]:translate-x-[28px] data-[checked]:bg-[var(--accent)] data-[checked]:text-[var(--frame)] data-[checked]:[--switch-thumb-shadow:var(--frame)]',
+            'pointer-events-none absolute left-px top-px flex size-[24px] shrink-0 items-center justify-center rounded-full border-[3px] border-[var(--frame)] bg-[var(--frame)] text-white transition-all duration-75 ease-linear group-disabled/switch:opacity-50 data-[checked]:translate-x-[28px] data-[checked]:bg-[var(--accent)] data-[checked]:text-[var(--frame)]',
             className
           )}
           {...props}

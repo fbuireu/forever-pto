@@ -7,7 +7,7 @@ const WEEKDAY_KEYS = getWeekdayNames({ locale: 'en', weekStartsOn: 1 });
 const DAY_KEYS = Array.from({ length: 42 }, (_, i) => `d${i + 1}`);
 
 const Bone = ({ className }: { className: string }) => (
-  <div className={`rounded-[8px] bg-[var(--muted)] ${className}`} />
+  <div className={`rounded-[8px] border-[2px] border-[var(--frame)]/30 bg-[var(--surface-panel-soft)] ${className}`} />
 );
 
 export const CalendarListFixture = () => (

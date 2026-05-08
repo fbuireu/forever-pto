@@ -115,6 +115,17 @@
         "holidays": "festivos personalizados",
         "improvesPlan": "que mejoran tu plan."
       }
+    },
+    "yearTimeline": {
+      "title": "Vista anual condensada",
+      "rows": {
+        "national": "Nacional",
+        "regional": "Regional",
+        "custom": "Prop.",
+        "pto": "PTO",
+        "bridges": "Puentes",
+        "manual": "Manual"
+      }
     }
   },
   "faq": {

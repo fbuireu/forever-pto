@@ -274,7 +274,7 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
       variant='ghost'
       size='icon'
       className={cn(
-        'h-11 w-11 rounded-[10px] bg-[var(--accent)] text-[var(--accent-foreground)] border-[3px] border-[var(--color-brand-ink)] shadow-[var(--shadow-brutal-xs)] transition-[transform,box-shadow] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] cursor-pointer',
+        'h-11 w-11 rounded-[10px] bg-[var(--accent)] text-[var(--accent-foreground)] border-[3px] border-[var(--color-brand-ink)] [filter:var(--drop-shadow-brutal-xs)] transition-[transform,filter] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:[filter:var(--drop-shadow-brutal-sm)] cursor-pointer',
         className
       )}
       onClick={(event) => {
@@ -502,13 +502,13 @@ function SidebarMenuItem({ className, ...props }: SidebarMenuItemProps) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-[8px] border-[3px] border-[var(--frame)] p-2.5 text-left text-sm font-medium outline-hidden ring-sidebar-ring transition-[width,height,padding,transform,box-shadow] shadow-[var(--shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[var(--shadow-brutal-sm)] focus-visible:ring-[3px] active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-black data-[active=true]:text-sidebar-accent-foreground data-[active=true]:border-[var(--frame)] data-[active=true]:shadow-[var(--shadow-brutal-xs)] data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-11 group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:[&>span]:!hidden [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0',
+  'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-[8px] border-[3px] border-[var(--frame)] p-2.5 text-left text-sm font-medium outline-hidden ring-sidebar-ring transition-[width,height,padding,transform,filter] [filter:var(--drop-shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:[filter:var(--drop-shadow-brutal-sm)] focus-visible:ring-[3px] active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-black data-[active=true]:text-sidebar-accent-foreground data-[active=true]:border-[var(--frame)] data-[active=true]:[filter:var(--drop-shadow-brutal-xs)] data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-11 group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:[&>span]:!hidden [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0',
   {
     variants: {
       variant: {
         default: 'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
         outline:
-          'bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-xs)] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[var(--shadow-brutal-sm)]',
+          'bg-[var(--surface-panel)] [filter:var(--drop-shadow-brutal-xs)] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:[filter:var(--drop-shadow-brutal-sm)]',
       },
       size: {
         default: 'h-8 text-sm',
@@ -651,9 +651,14 @@ function SidebarMenuSkeleton({ className, showIcon = false, ...props }: SidebarM
       className={cn('flex h-8 items-center gap-2 rounded-md px-2', className)}
       {...props}
     >
-      {showIcon && <div className='size-4 rounded-md bg-muted animate-pulse' data-sidebar='menu-skeleton-icon' />}
+      {showIcon && (
+        <div
+          className='size-4 rounded-md border-[2px] border-[var(--frame)]/30 bg-[var(--surface-panel-soft)] animate-pulse'
+          data-sidebar='menu-skeleton-icon'
+        />
+      )}
       <div
-        className='h-4 max-w-(--skeleton-width) flex-1 rounded-md bg-muted animate-pulse'
+        className='h-4 max-w-(--skeleton-width) flex-1 rounded-md border-[2px] border-[var(--frame)]/30 bg-[var(--surface-panel-soft)] animate-pulse'
         data-sidebar='menu-skeleton-text'
         style={
           {

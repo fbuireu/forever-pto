@@ -174,7 +174,7 @@ function SheetContent({
             <AnimateIcon animateOnHover>
               <SheetPrimitive.Close
                 data-slot='sheet-close'
-                className='absolute right-4 top-4 cursor-pointer rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] p-1.5 shadow-[var(--shadow-brutal-xs)] transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] focus:outline-none focus:ring-[3px] focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none'
+                className='absolute right-4 top-4 cursor-pointer rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] p-1.5 [filter:var(--drop-shadow-brutal-xs)] transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:[filter:var(--drop-shadow-brutal-sm)] focus:outline-none focus:ring-[3px] focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none'
               >
                 <X className='h-4 w-4' animateOnHover />
                 <span className='sr-only'>Close</span>

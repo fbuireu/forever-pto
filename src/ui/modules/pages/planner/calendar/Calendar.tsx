@@ -389,7 +389,7 @@ export function Calendar({
                   type='button'
                   size='sm'
                   onClick={handlePreviousMonth}
-                  className='h-8 w-8 p-0 bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none'
+                  className='h-8 w-8 p-0 bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] [filter:var(--drop-shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:[filter:var(--drop-shadow-brutal-sm)] active:translate-x-0.5 active:translate-y-0.5 active:[filter:none]'
                   aria-label={tCalendar('previousMonth')}
                 >
                   <ChevronLeft className='h-4 w-4' />
@@ -411,7 +411,7 @@ export function Calendar({
                   type='button'
                   size='sm'
                   onClick={handleNextMonth}
-                  className='h-8 w-8 p-0 bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none'
+                  className='h-8 w-8 p-0 bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] [filter:var(--drop-shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:[filter:var(--drop-shadow-brutal-sm)] active:translate-x-0.5 active:translate-y-0.5 active:[filter:none]'
                   aria-label={tCalendar('nextMonth')}
                 >
                   <ChevronRight className='h-4 w-4' />

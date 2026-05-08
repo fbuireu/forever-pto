@@ -82,17 +82,19 @@ export const PremiumFeature = ({
             <TooltipProvider delayDuration={200}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className='relative flex items-center'>
-                    <Lock className={cn(iconSize, 'text-muted-foreground')} />
-                    <InfoIcon className='absolute -top-2 -right-2 size-4 text-muted-foreground' />
-                  </span>
+                  <div className='relative inline-flex items-center justify-center rounded-[8px] border-[3px] border-black bg-white p-2 rotate-[-4deg] dark:border-white dark:bg-black'>
+                    <Lock className={cn(iconSize, 'text-black dark:text-white')} />
+                    <InfoIcon className='absolute -top-2.5 -right-2.5 size-4 text-black dark:text-white' />
+                  </div>
                 </TooltipTrigger>
                 <TooltipContent className='w-50 text-pretty'>{description}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           ) : (
-            <div className={'flex flex-col items-center gap-2 text-center px-4'}>
-              <Lock className={cn(iconSize, 'text-muted-foreground')} />
+            <div className='flex flex-col items-center gap-2 text-center px-4'>
+              <div className='inline-flex items-center justify-center rounded-[8px] border-[3px] border-black bg-white p-2 rotate-[-4deg] dark:border-white dark:bg-black'>
+                <Lock className={cn(iconSize, 'text-black dark:text-white')} />
+              </div>
               {inlineDescription && (
                 <div className='text-sm text-foreground dark:[text-shadow:0_2px_4px_rgba(0,0,0,1)]'>{description}</div>
               )}

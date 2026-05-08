@@ -34,6 +34,7 @@
   [data-slot='card'] {
     transition:
       transform 80ms linear,
+      filter 80ms linear,
       box-shadow 80ms linear,
       background-color 120ms ease,
       border-color 120ms ease,

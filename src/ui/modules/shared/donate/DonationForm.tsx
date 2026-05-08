@@ -86,7 +86,7 @@ export function DonationForm({
                 size='sm'
                 onClick={() => handlePresetClick(preset)}
                 disabled={loading}
-                className='flex-1 shadow-none hover:shadow-[var(--shadow-brutal-btn)]'
+                className='flex-1 [filter:none]'
               >
                 {amount.format(preset)}
               </Button>

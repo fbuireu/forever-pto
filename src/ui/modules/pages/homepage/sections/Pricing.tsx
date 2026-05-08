@@ -25,7 +25,7 @@ export const Pricing = async () => {
         <div
           className={cn(
             brutCard,
-            'p-8 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+            'p-8 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:[filter:drop-shadow(9px_9px_0_var(--frame))]'
           )}
         >
           <h3 className='font-display font-extrabold text-[28px] tracking-[-0.02em] mb-2'>{t('pricing.freeName')}</h3>
@@ -60,7 +60,7 @@ export const Pricing = async () => {
         <div
           className={cn(
             brutCard,
-            'p-8 relative rotate-[-1deg] transition-all duration-75 hover:rotate-0 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+            'p-8 relative rotate-[-1deg] transition-all duration-75 hover:rotate-0 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:[filter:drop-shadow(9px_9px_0_var(--frame))]'
           )}
           style={{ background: 'var(--accent)', color: 'var(--color-brand-ink)' }}
         >

@@ -106,7 +106,7 @@ function AccordionTrigger({
               animate={{ rotate: isOpen ? 45 : 0 }}
               transition={transition}
               className={cn(
-                'size-7 flex items-center justify-center shrink-0 rounded-[6px] border-[2.5px] border-[var(--frame)] font-black text-lg leading-none select-none transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)]',
+                'size-7 flex items-center justify-center shrink-0 rounded-[6px] border-[2.5px] border-[var(--frame)] font-black text-lg leading-none select-none transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:[filter:var(--drop-shadow-brutal-sm)]',
                 isOpen
                   ? 'bg-[var(--frame)] text-[var(--background)]'
                   : 'bg-[var(--accent)] text-[var(--color-brand-ink)]'
