@@ -846,6 +846,7 @@
   "calendar": {
     "previousMonth": "Mese precedente",
     "nextMonth": "Mese successivo",
+    "today": "Oggi",
     "daysOff": "{count, plural, one {# giorno libero} other {# giorni liberi}}"
   },
   "holidayRow": {

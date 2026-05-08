@@ -364,6 +364,15 @@ export function Calendar({
     setHoverDate(undefined);
   }, []);
 
+  const handleGoToToday = useCallback(() => {
+    const today = new Date();
+    setCurrentMonth(today);
+    if (mode === CalendarSelectionMode.SINGLE) {
+      setSelectedDates([today]);
+      onSelect?.(today);
+    }
+  }, [mode, onSelect]);
+
   return (
     <div
       className={cn(
@@ -398,6 +407,17 @@ export function Calendar({
                   {tCalendar('daysOff', { count: monthFreeDays })}
                 </span>
               )}
+              <Button
+                variant='ghost'
+                type='button'
+                size='sm'
+                onClick={handleGoToToday}
+                animated={false}
+                className='h-7 px-2 text-[10px] font-mono font-black uppercase tracking-[0.06em] border-[2px] border-[var(--frame)]/40 shadow-none hover:border-[var(--frame)] hover:bg-[var(--color-brand-yellow)] hover:text-[var(--color-brand-ink)]'
+                aria-label={tCalendar('today')}
+              >
+                {tCalendar('today')}
+              </Button>
               <AnimateIcon animateOnHover>
                 <Button
                   variant='ghost'
@@ -485,14 +505,12 @@ export function Calendar({
                   onMouseEnter={() => handleDayHover(date)}
                   onMouseLeave={handleDayLeave}
                   disabled={isDisabled}
+                  animated={false}
                   aria-label={
                     holidayName
                       ? `${formatDate({ date, locale, format: 'EEEE, MMMM d, yyyy' })}, ${holidayName}`
                       : formatDate({ date, locale, format: 'EEEE, MMMM d, yyyy' })
                   }
-                  {...(mode === CalendarSelectionMode.NONE && {
-                    animated: false,
-                  })}
                 >
                   {formatDate({ date, locale, format: 'd' })}
                 </Button>

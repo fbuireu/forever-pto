@@ -79,15 +79,23 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
                 )}
               />
             </div>
-            {remaining > 0 && (
-              <span className='flex items-center gap-0.5 text-muted-foreground'>
-                <MousePointerClick className='h-3 w-3' />
-                <span className='text-[10px]'>{t('clickDays')}</span>
-              </span>
-            )}
-            {remaining === 0 && !hasManualChanges && (
-              <span className='text-[10px] text-green-700 dark:text-green-400 font-medium'>✓ {t('allAssigned')}</span>
-            )}
+            <span
+              className={cn(
+                'flex items-center gap-0.5 text-[10px]',
+                remaining > 0 ? 'text-muted-foreground' : 'text-green-700 dark:text-green-400 font-medium'
+              )}
+            >
+              {remaining > 0 ? (
+                <>
+                  <MousePointerClick className='h-3 w-3' />
+                  {t('clickDays')}
+                </>
+              ) : !hasManualChanges ? (
+                <>✓ {t('allAssigned')}</>
+              ) : (
+                <>&nbsp;</>
+              )}
+            </span>
           </div>
         </div>
         <div className='flex items-center gap-3 h-full'>
@@ -99,11 +107,12 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
         </div>
       </div>
       <div className='mt-3 pt-3 border-t-[2px] border-[var(--frame)]/15 space-y-2'>
-        <Progress value={usedPct}>
+        <Progress value={usedPct === 100 ? 101 : usedPct}>
           <div className='relative'>
             <ProgressTrack
-              className='h-[22px] rounded-full bg-background shadow-[3px_3px_0_0_var(--frame)]'
-              indicatorClassName='rounded-r-full border-r-[3px] border-[var(--frame)]'
+              className='h-[22px] rounded-full bg-background shadow-[3px_3px_0_0_var(--frame)] flex items-center'
+              indicatorClassName='!h-[calc(100%-4px)] rounded-full border-r-[3px] border-[var(--frame)]'
+              transition={{ type: 'tween', duration: 0.15, ease: 'easeOut' }}
             />
             <span className='pointer-events-none absolute inset-0 grid place-items-center font-mono text-[11px] font-bold uppercase text-foreground'>
               {t('usedDays', { used: usedDays, total: ptoDays, pct: usedPct })}
@@ -113,8 +122,9 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
         <Progress value={remainingPct}>
           <div className='relative'>
             <ProgressTrack
-              className='h-[22px] rounded-full bg-background shadow-[3px_3px_0_0_var(--frame)]'
-              indicatorClassName='rounded-r-full border-r-[3px] border-[var(--frame)] bg-[var(--color-brand-teal)]'
+              className='h-[22px] rounded-full bg-background shadow-[3px_3px_0_0_var(--frame)] flex items-center'
+              indicatorClassName='!h-[calc(100%-4px)] rounded-full border-r-[3px] border-[var(--frame)] bg-[var(--color-brand-teal)]'
+              transition={{ type: 'tween', duration: 0.15, ease: 'easeOut' }}
             />
             <span className='pointer-events-none absolute inset-0 grid place-items-center font-mono text-[11px] font-bold uppercase text-foreground'>
               {t('remainingDays', { remaining, pct: remainingPct })}

@@ -3,7 +3,6 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { Button } from '@ui/modules/core/animate/components/buttons/Button';
-import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { downloadIcs, generateIcs } from '@ui/utils/generateIcs';
 import { Download } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -25,8 +24,7 @@ export const CalendarExport = () => {
   );
 
   const activeSuggestion = currentSelection ?? suggestion;
-  const hasData =
-    (includeHolidays && (holidays?.length ?? 0) > 0) || (includePto && !!activeSuggestion?.days?.length);
+  const hasData = (includeHolidays && (holidays?.length ?? 0) > 0) || (includePto && !!activeSuggestion?.days?.length);
 
   const handleDownload = () => {
     const content = generateIcs({
@@ -67,12 +65,10 @@ export const CalendarExport = () => {
           {t('includePto')}
         </Button>
       </div>
-      <AnimateIcon animateOnHover>
-        <Button onClick={handleDownload} disabled={!hasData} className='w-full' variant='outline'>
-          <Download className='w-3 h-3' />
-          {t('download')}
-        </Button>
-      </AnimateIcon>
+      <Button onClick={handleDownload} disabled={!hasData} className='w-full' variant='outline'>
+        <Download className='w-3 h-3' />
+        {t('download')}
+      </Button>
       <p className='text-[10px] text-muted-foreground leading-relaxed'>{t('compatible')}</p>
     </div>
   );

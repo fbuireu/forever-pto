@@ -341,11 +341,11 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
         <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-4'>
           <div className='flex flex-wrap items-center gap-2 w-full sm:w-auto'>
             {variant === HolidayVariant.CUSTOM && (
-              <AnimateIcon animateOnHover>
+              <AnimateIcon animateOnTap>
                 <Button
                   size='sm'
                   onClick={() => setShowAddModal(true)}
-                  className='bg-[var(--color-brand-teal)] text-[var(--color-brand-ink)]'
+                  className='bg-[var(--color-brand-teal)] text-[var(--color-brand-ink)] hover:bg-[var(--color-brand-teal)] hover:text-[var(--color-brand-ink)]'
                 >
                   <Plus className='h-4 w-4 mr-1' />
                   <span className='hidden xs:inline'>{t('addHoliday')}</span>
@@ -422,7 +422,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                         );
                       })
                     ) : (
-                      <AnimateIcon animateOnView loop loopDelay={1500} asChild>
+                      <AnimateIcon animateOnView loop loopDelay={5000} asChild>
                         <TableRow>
                           <TableCell colSpan={6} className='h-24 text-center'>
                             <div className='flex flex-col items-center space-y-2 text-muted-foreground'>

@@ -374,7 +374,7 @@ export const Donate = () => {
   return (
     <Popover open={isOpen} onOpenChange={setDonatePopoverOpen}>
       <div className='donate-trigger fixed xl:bottom-4 bottom-30 w-full right-0 md:w-auto md:right-4 z-50'>
-        <div className='donate-brutal'>
+        <div className='donate-brutal' style={{ animationPlayState: isOpen ? 'paused' : 'running' }}>
           <PopoverTrigger asChild>
             <Button className='donate-brutal-btn w-full py-3'>{tDonate('donateAndUnblock')}</Button>
           </PopoverTrigger>

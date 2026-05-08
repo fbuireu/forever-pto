@@ -5,38 +5,15 @@
   }
 }
 
-@keyframes brutal-nudge {
-  0%, 88% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  90% {
-    transform: translate(-3px, 0) rotate(-1deg);
-  }
-  92% {
-    transform: translate(3px, 0) rotate(1deg);
-  }
-  94% {
-    transform: translate(-2px, 1px) rotate(0deg);
-  }
-  96% {
-    transform: translate(2px, -1px) rotate(0.5deg);
-  }
-  98% {
-    transform: translate(-1px, 0) rotate(0deg);
-  }
-  100% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-}
 
 .donate-brutal {
   position: relative;
   border-radius: 10px;
-  animation: brutal-nudge 4s ease-in-out infinite;
+  animation: nudge 4s ease-in-out infinite;
 }
 
 .donate-brutal::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   border-radius: 10px;
@@ -58,7 +35,9 @@
   color: var(--color-brand-ink);
   filter: none;
   transform: translate(0, 0);
-  transition: transform 75ms linear, box-shadow 75ms linear;
+  transition:
+    transform 75ms linear,
+    box-shadow 75ms linear;
 }
 
 .donate-brutal .donate-brutal-btn:hover {

@@ -846,6 +846,7 @@
   "calendar": {
     "previousMonth": "Previous month",
     "nextMonth": "Next month",
+    "today": "Today",
     "daysOff": "{count, plural, one {# day off} other {# days off}}"
   },
   "holidayRow": {
