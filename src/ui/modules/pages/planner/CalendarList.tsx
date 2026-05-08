@@ -91,7 +91,13 @@ export const CalendarList = () => {
   }, [triggerCalculation, year, ptoDays, allowPastDays, holidays, months, strategy, locale]);
 
   return (
-    <Skeleton name='calendar-list' loading={!areStoresReady} fixture={<CalendarListFixture />}>
+    <Skeleton
+      name='calendar-list'
+      loading={!areStoresReady}
+      fixture={<CalendarListFixture />}
+      fallback={<CalendarListFixture />}
+      className='w-full'
+    >
       <div
         className={cn(
           'grid [grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-5 mx-auto w-full',

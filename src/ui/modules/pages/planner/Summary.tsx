@@ -398,7 +398,13 @@ export const Summary = () => {
   };
 
   return (
-    <Skeleton name='summary' loading={!areStoresReady} fixture={<SummaryFixture />}>
+    <Skeleton
+      name='summary'
+      loading={!areStoresReady}
+      fixture={<SummaryFixture />}
+      fallback={<SummaryFixture />}
+      className='w-full'
+    >
       {renderContent()}
     </Skeleton>
   );

@@ -60,7 +60,7 @@ function TooltipInfoTrigger({ className, ...props }: TooltipInfoTriggerProps) {
   return (
     <TooltipTriggerPrimitive
       className={cn(
-        'ml-auto cursor-help shrink-0 size-5 grid place-items-center rounded-[5px] border-[2px] border-[var(--frame)] text-muted-foreground shadow-[2px_2px_0_0_var(--frame)] hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)] transition-[transform,box-shadow] duration-75',
+        'ml-auto cursor-help shrink-0 size-5 grid place-items-center rounded-[5px] border-[2px] border-[var(--frame)] bg-[var(--accent)] text-[var(--color-brand-ink)] shadow-[2px_2px_0_0_var(--frame)] hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)] transition-[transform,box-shadow] duration-75',
         className
       )}
       {...props}

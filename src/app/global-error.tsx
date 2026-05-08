@@ -2,10 +2,10 @@
 
 import '@styles/index.css';
 
+import enMessages from '@i18n/messages/en.json';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { ErrorContent } from '@ui/modules/pages/error/ErrorContent';
 import { cn } from '@ui/utils/utils';
-import enMessages from '@i18n/messages/en.json';
 import { Bricolage_Grotesque, Instrument_Serif, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { ThemeProvider } from 'next-themes';
@@ -34,7 +34,13 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
         )}
       >
         <NextIntlClientProvider locale='en' messages={enMessages}>
-          <ThemeProvider attribute='data-theme' defaultTheme='system' storageKey='theme' enableSystem disableTransitionOnChange>
+          <ThemeProvider
+            attribute='data-theme'
+            defaultTheme='system'
+            storageKey='theme'
+            enableSystem
+            disableTransitionOnChange
+          >
             <LazyMotionProvider>
               <div className='min-h-screen flex flex-col text-foreground bg-background'>
                 <ErrorContent error={error} reset={reset} />
