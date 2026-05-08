@@ -64,7 +64,7 @@ function DialogPopup({ className, children, showCloseButton = true, ...props }: 
       >
         {children}
         {showCloseButton && (
-          <DialogClosePrimitive className="ring-offset-background focus:ring-ring absolute top-4 right-4 cursor-pointer rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] p-1.5 opacity-100 shadow-[var(--shadow-brutal-xs)] transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] focus:ring-[3px] focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 before:content-[''] before:absolute before:-inset-[3px]">
+          <DialogClosePrimitive className="ring-offset-background focus:ring-ring absolute top-4 right-4 cursor-pointer rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] p-1.5 opacity-100 shadow-[var(--shadow-brutal-xs)] transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] focus:ring-[3px] focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 before:content-[''] before:absolute before:-inset-[5px]">
             <XIcon />
             <span className='sr-only'>Close</span>
           </DialogClosePrimitive>

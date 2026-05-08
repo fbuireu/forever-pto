@@ -1,5 +1,4 @@
 import { cn } from '@ui/utils/utils';
-import { Info } from 'lucide-react';
 import {
   TooltipArrow as TooltipArrowPrimitive,
   TooltipPopup as TooltipPopupPrimitive,
@@ -66,7 +65,9 @@ function TooltipInfoTrigger({ className, ...props }: TooltipInfoTriggerProps) {
       )}
       {...props}
     >
-      <Info className='h-3 w-3' aria-hidden='true' />
+      <span className='text-[11px] font-black font-mono leading-none' aria-hidden='true'>
+        i
+      </span>
     </TooltipTriggerPrimitive>
   );
 }
