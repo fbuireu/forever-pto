@@ -1,14 +1,12 @@
 'use client';
 
-import { HolidayVariant, type HolidayDTO } from '@application/dto/holiday/types';
+import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { cn } from '@ui/utils/utils';
 import { CalendarRange } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo } from 'react';
-
-// ─── helpers ────────────────────────────────────────────────────────────────
 
 const DAY_MS = 86_400_000;
 
@@ -53,8 +51,6 @@ function groupDates(dates: Date[], maxGapDays: number): Seg[] {
   return out;
 }
 
-// ─── component ──────────────────────────────────────────────────────────────
-
 interface YearTimelineChartProps {
   year: number;
   holidays: HolidayDTO[];
@@ -63,20 +59,15 @@ interface YearTimelineChartProps {
 }
 
 const ROW_COLOR: Record<string, string> = {
-  national:  'bg-[var(--color-brand-yellow)]',
-  regional:  'bg-[var(--color-brand-yellow)]',
-  custom:    'bg-[var(--color-brand-purple)]',
-  pto:       'bg-[var(--color-brand-teal)]',
-  bridges:   'bg-[var(--color-brand-orange)]',
-  manual:    'bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--color-brand-teal)_82%)]',
+  national: 'bg-[var(--color-brand-yellow)]',
+  regional: 'bg-[var(--color-brand-yellow)]',
+  custom: 'bg-[var(--color-brand-purple)]',
+  pto: 'bg-[var(--color-brand-teal)]',
+  bridges: 'bg-[var(--color-brand-orange)]',
+  manual: 'bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--color-brand-teal)_82%)]',
 };
 
-export const YearTimelineChart = ({
-  year,
-  holidays,
-  suggestion,
-  manuallySelectedDays,
-}: YearTimelineChartProps) => {
+export const YearTimelineChart = ({ year, holidays, suggestion, manuallySelectedDays }: YearTimelineChartProps) => {
   const t = useTranslations('summary');
   const locale = useLocale();
 
@@ -130,7 +121,6 @@ export const YearTimelineChart = ({
       </CardHeader>
       <CardContent className='px-4 pb-4'>
         <div className='rounded-[10px] border-[3px] border-[var(--frame)] overflow-hidden'>
-          {/* Month header */}
           <div className='flex bg-card dark:bg-[var(--color-brand-ink)] border-b-[2px] border-[var(--frame)]/30'>
             <div className='w-[72px] shrink-0 border-r-[2px] border-[var(--frame)]/30' />
             {monthNames.map((name, i) => (
@@ -146,7 +136,6 @@ export const YearTimelineChart = ({
             ))}
           </div>
 
-          {/* Data rows */}
           {rows.map(({ key, label, segs }, rowIdx) => (
             <div
               key={key}
@@ -162,24 +151,18 @@ export const YearTimelineChart = ({
               </div>
 
               <div className='flex-1 relative h-full'>
-                {/* Month dividers */}
-                {Array.from({ length: 11 }, (_, i) => (
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((month) => (
                   <div
-                    key={i}
+                    key={month}
                     className='absolute inset-y-0 w-px bg-[var(--frame)]/10'
-                    style={{ left: `${((i + 1) / 12) * 100}%` }}
+                    style={{ left: `${(month / 12) * 100}%` }}
                   />
                 ))}
-                {/* Track */}
                 <div className='absolute top-1/2 -translate-y-1/2 inset-x-0 h-px bg-[var(--frame)]/10' />
-                {/* Pills */}
-                {segs.map((seg, si) => (
+                {segs.map((seg) => (
                   <div
-                    key={si}
-                    className={cn(
-                      'absolute top-1/2 -translate-y-1/2 h-[10px] rounded-full',
-                      ROW_COLOR[key]
-                    )}
+                    key={seg.start.toISOString()}
+                    className={cn('absolute top-1/2 -translate-y-1/2 h-[10px] rounded-full', ROW_COLOR[key])}
                     style={{
                       left: `${segPos(seg.start, year) * 100}%`,
                       width: `max(6px, ${segWidth(seg.start, seg.end, year) * 100}%)`,

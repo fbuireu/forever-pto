@@ -5,33 +5,22 @@ import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { getStrictContext } from '@ui/utils/context';
 import { cn } from '@ui/utils/utils';
 import { type HTMLMotionProps, m, motion } from 'motion/react';
-import { type ComponentProps } from 'react';
-
-// ─── context ────────────────────────────────────────────────────────────────
+import type { ComponentProps } from 'react';
 
 type ProgressContextType = { value: number };
-const [ProgressProvider, useProgressContext] =
-  getStrictContext<ProgressContextType>('ProgressContext');
-
-// ─── Root ───────────────────────────────────────────────────────────────────
+const [ProgressProvider, useProgressContext] = getStrictContext<ProgressContextType>('ProgressContext');
 
 type ProgressProps = ComponentProps<typeof ProgressPrimitive.Root>;
 
 function Progress({ value, children, ...props }: ProgressProps) {
   return (
     <ProgressProvider value={{ value: value ?? 0 }}>
-      <ProgressPrimitive.Root
-        data-slot='progress'
-        value={value}
-        {...props}
-      >
+      <ProgressPrimitive.Root data-slot='progress' value={value} {...props}>
         {children}
       </ProgressPrimitive.Root>
     </ProgressProvider>
   );
 }
-
-// ─── Track + Indicator ──────────────────────────────────────────────────────
 
 const MotionIndicator = motion.create(ProgressPrimitive.Indicator);
 
@@ -59,10 +48,7 @@ function ProgressTrack({
     >
       <MotionIndicator
         data-slot='progress-indicator'
-        className={cn(
-          'h-full rounded-[3px] bg-[var(--accent)]',
-          indicatorClassName
-        )}
+        className={cn('h-full rounded-[3px] bg-[var(--accent)]', indicatorClassName)}
         initial={{ width: '0%' }}
         animate={{ width: `${value}%` }}
         transition={transition}
@@ -71,29 +57,19 @@ function ProgressTrack({
   );
 }
 
-// ─── Label ──────────────────────────────────────────────────────────────────
-
 type ProgressLabelProps = ComponentProps<typeof ProgressPrimitive.Label>;
 
 function ProgressLabel({ className, ...props }: ProgressLabelProps) {
   return (
     <ProgressPrimitive.Label
       data-slot='progress-label'
-      className={cn(
-        'text-sm font-mono font-black uppercase tracking-[0.06em] text-foreground',
-        className
-      )}
+      className={cn('text-sm font-mono font-black uppercase tracking-[0.06em] text-foreground', className)}
       {...props}
     />
   );
 }
 
-// ─── Value ──────────────────────────────────────────────────────────────────
-
-type ProgressValueProps = Omit<
-  ComponentProps<typeof ProgressPrimitive.Value>,
-  'render'
-> & {
+type ProgressValueProps = Omit<ComponentProps<typeof ProgressPrimitive.Value>, 'render'> & {
   className?: string;
   suffix?: string;
 };
@@ -123,11 +99,11 @@ function ProgressValue({ className, suffix = '%', ...props }: ProgressValueProps
 export {
   Progress,
   ProgressLabel,
-  ProgressTrack,
-  ProgressValue,
-  useProgressContext,
-  type ProgressProps,
   type ProgressLabelProps,
+  type ProgressProps,
+  ProgressTrack,
   type ProgressTrackProps,
+  ProgressValue,
   type ProgressValueProps,
+  useProgressContext,
 };
