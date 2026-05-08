@@ -150,25 +150,26 @@ export const YearTimelineChart = ({ year, holidays, suggestion, manuallySelected
                 </span>
               </div>
 
-              <div className='flex-1 relative h-full'>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((month) => (
-                  <div
-                    key={month}
-                    className='absolute inset-y-0 w-px bg-[var(--frame)]/10'
-                    style={{ left: `${(month / 12) * 100}%` }}
-                  />
-                ))}
-                <div className='absolute top-1/2 -translate-y-1/2 inset-x-0 h-px bg-[var(--frame)]/10' />
-                {segs.map((seg) => (
-                  <div
-                    key={seg.start.toISOString()}
-                    className={cn('absolute top-1/2 -translate-y-1/2 h-[10px] rounded-full', ROW_COLOR[key])}
-                    style={{
-                      left: `${segPos(seg.start, year) * 100}%`,
-                      width: `max(6px, ${segWidth(seg.start, seg.end, year) * 100}%)`,
-                    }}
-                  />
-                ))}
+              <div className='flex-1 flex items-center px-2 py-1.5'>
+                <div className='relative flex-1 h-[18px] rounded-full border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] overflow-hidden'>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((month) => (
+                    <div
+                      key={month}
+                      className='absolute inset-y-0 w-px bg-[var(--frame)]/10 z-10'
+                      style={{ left: `${(month / 12) * 100}%` }}
+                    />
+                  ))}
+                  {segs.map((seg) => (
+                    <div
+                      key={seg.start.toISOString()}
+                      className={cn('absolute inset-y-0 border-r-[3px] border-[var(--frame)]', ROW_COLOR[key])}
+                      style={{
+                        left: `${segPos(seg.start, year) * 100}%`,
+                        width: `max(6px, ${segWidth(seg.start, seg.end, year) * 100}%)`,
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           ))}
