@@ -79,20 +79,11 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
                 )}
               />
             </div>
-            <span
-              className={cn(
-                'flex items-center gap-0.5 text-[10px]',
-                remaining > 0 ? 'text-muted-foreground' : 'text-green-700 dark:text-green-400 font-medium'
-              )}
-            >
-              {remaining > 0 ? (
-                <MousePointerClick className='h-3 w-3' />
-              ) : !hasManualChanges ? (
-                <>✓ {t('allAssigned')}</>
-              ) : (
-                <>&nbsp;</>
-              )}
-            </span>
+            {remaining > 0 ? (
+              <MousePointerClick className='h-3 w-3 text-muted-foreground' />
+            ) : !hasManualChanges ? (
+              <span className='text-[10px] text-green-700 dark:text-green-400 font-medium'>✓ {t('allAssigned')}</span>
+            ) : null}
           </div>
         </div>
         <div className='flex items-center gap-3 h-full'>

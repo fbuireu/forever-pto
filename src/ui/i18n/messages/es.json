@@ -346,7 +346,7 @@
       "step3Title": "Paso {step} — Tu configuración",
       "step3Description": "Elige tu estrategia de optimización y configura los días pasados y los meses de traslado para afinar tu plan.",
       "step4Title": "Paso {step} — Exporta tu calendario",
-      "step4Description": "Descarga tus festivos y días de PTO planificados como archivo .ics e impórtalo en Google Calendar, Apple Calendar, Outlook o cualquier otra app de calendario."
+      "step4Description": "Descarga tus festivos y días de vacaciones planificados como archivo .ics para importarlos en Google Calendar, Apple Calendar u Outlook, o como PDF para imprimir o compartir."
     }
   },
   "legend": {
@@ -828,7 +828,7 @@
     "manageCookies": "Gestionar cookies",
     "contactUs": "Contáctanos",
     "legalNavigation": "Enlaces legales y de política",
-    "copyright": "© {year} Forever PTO · Hecho con cariño y desde una hamaca.",
+    "copyright": "© {year} Forever PTO · Hecho desde una hamaca.",
     "version": "v{version} · status: vacacional ●",
     "planner": "Calculadora"
   },

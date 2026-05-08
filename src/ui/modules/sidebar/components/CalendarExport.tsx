@@ -100,14 +100,14 @@ export const CalendarExport = () => {
         </Button>
       </div>
       <PremiumFeature feature={t('title')}>
-        <div className='flex gap-2'>
-          <Button onClick={handleDownloadIcs} disabled={!hasData} className='flex-1' variant='outline'>
-            <Download className='w-3 h-3' />
-            {t('download')}
-          </Button>
-          <Button onClick={handleDownloadPdf} disabled={!hasData || isPdfPending} className='flex-1' variant='outline'>
+        <div className='flex flex-col gap-2'>
+          <Button onClick={handleDownloadPdf} disabled={!hasData || isPdfPending} className='w-full' variant='outline'>
             <FileText className='w-3 h-3' />
             {isPdfPending ? '…' : t('downloadPdf')}
+          </Button>
+          <Button onClick={handleDownloadIcs} disabled={!hasData} className='w-full' variant='outline'>
+            <Download className='w-3 h-3' />
+            {t('download')}
           </Button>
         </div>
       </PremiumFeature>

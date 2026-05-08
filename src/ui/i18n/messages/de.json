@@ -346,7 +346,7 @@
       "step3Title": "Schritt {step} — Deine Konfiguration",
       "step3Description": "Wähle deine Optimierungsstrategie und konfiguriere vergangene Tage und Übertragsmonate, um deinen Plan zu verfeinern.",
       "step4Title": "Schritt {step} — Kalender exportieren",
-      "step4Description": "Lade deine Feiertage und geplanten PTO-Tage als .ics-Datei herunter und importiere sie in Google Calendar, Apple Calendar, Outlook oder eine andere Kalender-App."
+      "step4Description": "Lade deine Feiertage und geplanten Urlaubstage als .ics-Datei herunter, um sie in Google Calendar, Apple Calendar oder Outlook zu importieren, oder als PDF zum Drucken oder Teilen."
     }
   },
   "legend": {
@@ -828,7 +828,7 @@
     "manageCookies": "Cookies verwalten",
     "contactUs": "Kontakt",
     "legalNavigation": "Rechtliche Hinweise und Richtlinien",
-    "copyright": "© {year} Forever PTO · Mit Liebe von einer Hängematte aus gemacht.",
+    "copyright": "© {year} Forever PTO · Von einer Hängematte aus gemacht.",
     "version": "v{version} · Status: im Urlaub ●",
     "planner": "Planer"
   },

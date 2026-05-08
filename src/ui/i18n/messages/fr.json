@@ -346,7 +346,7 @@
       "step3Title": "Étape {step} — Ta configuration",
       "step3Description": "Choisis ta stratégie d'optimisation et configure les jours passés et les mois de report pour affiner ton plan.",
       "step4Title": "Étape {step} — Exporter ton calendrier",
-      "step4Description": "Télécharge tes jours fériés et jours de congé planifiés en fichier .ics et importe-le dans Google Calendar, Apple Calendar, Outlook ou toute autre application de calendrier."
+      "step4Description": "Télécharge tes jours fériés et jours de congé planifiés en fichier .ics pour l'importer dans Google Calendar, Apple Calendar ou Outlook, ou en PDF pour imprimer ou partager."
     }
   },
   "legend": {
@@ -828,7 +828,7 @@
     "manageCookies": "Gérer les cookies",
     "contactUs": "Nous contacter",
     "legalNavigation": "Liens légaux et politiques",
-    "copyright": "© {year} Forever PTO · Fait avec amour depuis un hamac.",
+    "copyright": "© {year} Forever PTO · Fait depuis un hamac.",
     "version": "v{version} · statut : en vacances ●",
     "planner": "Planificateur"
   },

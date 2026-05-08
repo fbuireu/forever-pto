@@ -83,7 +83,7 @@ export const Strategy = () => {
       {currentStrategy && (
         <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
           <AnimateIcon animateOnHover>
-            <CollapsibleTrigger className='flex items-center justify-between w-full mt-2 p-2 text-xs font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors shadow-none'>
+            <CollapsibleTrigger className='flex items-center justify-between w-full mt-2 px-2 py-1 text-xs font-medium hover:bg-muted/50 cursor-pointer rounded-md transition-colors shadow-[var(--shadow-brutal-xs)]'>
               <span>
                 {detailsOpen ? t('hide') : t('expand')} {t('strategyDetails')}
               </span>

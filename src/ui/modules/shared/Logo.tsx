@@ -13,7 +13,7 @@ export function Logo() {
   const isOpen = state === 'expanded';
 
   return (
-    <div className='flex justify-center mx-auto px-3 py-3 rounded-[10px] border-[3px] border-transparent transition-[transform,filter] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:border-[var(--frame)] hover:[filter:var(--drop-shadow-brutal-xs)]'>
+    <div className='flex justify-center mx-auto px-3 py-3 rounded-[10px] border-[3px] border-transparent transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:border-[var(--frame)] hover:shadow-[var(--shadow-brutal-xs)]'>
       <Link href='/' onClick={() => isMobile && setOpenMobile(false)} className='no-underline outline-none'>
         <div className='flex items-center'>
           {(isOpen || isMobile) && (

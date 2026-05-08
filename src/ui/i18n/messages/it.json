@@ -346,7 +346,7 @@
       "step3Title": "Passo {step} — La tua configurazione",
       "step3Description": "Scegli la tua strategia di ottimizzazione e configura i giorni passati e i mesi di riporto per affinare il tuo piano.",
       "step4Title": "Passo {step} — Esporta il tuo calendario",
-      "step4Description": "Scarica i tuoi giorni festivi e i giorni di ferie pianificati come file .ics e importalo in Google Calendar, Apple Calendar, Outlook o qualsiasi altra app di calendario."
+      "step4Description": "Scarica i tuoi giorni festivi e le ferie pianificate come file .ics da importare in Google Calendar, Apple Calendar o Outlook, o come PDF da stampare o condividere."
     }
   },
   "legend": {
@@ -828,7 +828,7 @@
     "manageCookies": "Gestisci cookie",
     "contactUs": "Contattaci",
     "legalNavigation": "Link legali e policy",
-    "copyright": "© {year} Forever PTO · Fatto con amore da un'amaca.",
+    "copyright": "© {year} Forever PTO · Fatto da un'amaca.",
     "version": "v{version} · status: in vacanza ●",
     "planner": "Pianificatore"
   },

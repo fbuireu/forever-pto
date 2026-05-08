@@ -106,7 +106,7 @@ export const getDayClassNames = ({
 
     if (!isSelected && !modifiers.today?.(date) && !isRangeStartDay && !isRangeEndDay) {
       classes.push(
-        'hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground hover:[filter:var(--drop-shadow-brutal-xs)]'
+        'hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground hover:shadow-[var(--shadow-brutal-xs)]'
       );
     }
   }
