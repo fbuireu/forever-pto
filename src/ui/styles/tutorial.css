@@ -49,8 +49,8 @@
     line-height: 1;
     letter-spacing: -0.03em;
     color: var(--card-foreground);
-    margin: 0;
-    padding-bottom: 1rem;
+    margin: 0 -1.5rem;
+    padding: 0 1.5rem 1rem;
     border-bottom: 2px solid color-mix(in srgb, var(--frame) 18%, transparent);
   }
 

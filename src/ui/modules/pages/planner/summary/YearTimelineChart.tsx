@@ -57,12 +57,12 @@ interface YearTimelineChartProps {
 }
 
 const ROW_COLOR: Record<string, string> = {
-  national: 'bg-[var(--color-brand-orange)]',
-  regional: 'bg-[var(--color-brand-orange)]',
-  custom: 'bg-[var(--color-brand-purple)]',
+  national: 'bg-[var(--color-brand-yellow)]',
+  regional: 'bg-[var(--color-brand-yellow)]',
+  custom: 'bg-[color-mix(in_srgb,var(--color-brand-purple)_28%,white_72%)]',
   pto: 'bg-[var(--color-brand-teal)]',
-  bridges: 'bg-[var(--color-brand-yellow)]',
-  manual: 'bg-[var(--color-brand-purple)]',
+  bridges: 'bg-[var(--color-brand-orange)]',
+  manual: 'bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--color-brand-teal)_82%)]',
 };
 
 export const YearTimelineChart = ({ year, holidays, suggestion, manuallySelectedDays }: YearTimelineChartProps) => {
