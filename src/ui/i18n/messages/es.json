@@ -244,7 +244,7 @@
     "add": "Añadir",
     "editHoliday": "Editar festivo",
     "edit": "Editar",
-    "deleteHolidays": "Eliminar {count} festivos",
+    "deleteHolidays": "{count, plural, one {Eliminar {count} festivo} other {Eliminar {count} festivos}}",
     "delete": "Eliminar"
   },
   "charts": {
@@ -363,7 +363,7 @@
   },
   "calendarExport": {
     "title": "Exportar calendario",
-    "description": "Descarga tus festivos y días de PTO como archivo de calendario.",
+    "description": "{count, plural, one {Descarga tu <b>{count}</b> festivo como archivo de calendario.} other {Descarga tus <b>{count}</b> festivos como archivo de calendario.}}",
     "includeHolidays": "Festivos",
     "includePto": "Días de PTO",
     "download": "Descargar .ics",
@@ -671,6 +671,7 @@
     "inProgress": "En Progreso",
     "planned": "Planificado",
     "future": "Futuro",
+    "detailedView": "Vista detallada",
     "haveSuggestion": "¿Tienes una sugerencia?",
     "feedbackShapes": "Tu feedback da forma a nuestra hoja de ruta. Comparte tus ideas y ayúdanos a construir el planificador de vacaciones perfecto.",
     "gotAnIdea": "¿Tienes una idea que haría tu vida más fácil?",
@@ -702,6 +703,8 @@
       "aiSuggestionsDescription": "Recomendaciones impulsadas por IA basadas en tus preferencias y patrones pasados",
       "weatherIntegration": "Integración del Tiempo",
       "weatherIntegrationDescription": "Ve pronósticos del tiempo para tus fechas de vacaciones planificadas",
+      "blockedPeriods": "Períodos Bloqueados",
+      "blockedPeriodsDescription": "Marca rangos de fechas donde no quieres ninguna sugerencia de PTO — conferencias, viajes, bajas médicas o cualquier momento en el que sepas que estarás ocupado",
       "performanceOptimization": "Optimización de Rendimiento",
       "performanceOptimizationDescription": "Cálculos más rápidos y experiencia más fluida gracias a Web Workers",
       "customWeekends": "Fines de Semana Personalizados",
@@ -915,7 +918,7 @@
       "titleEnd": "en 60 segundos.",
       "description": "Sin instalar nada. Sin tarjeta. Sin newsletter. Solo dinos cuántos días tienes y dónde vives.",
       "inputDaysTitle": "Mete tus días.",
-      "inputDaysDescription": "Cuántos días de PTO tienes, en qué país (o región) trabajas, y qué meses prefieres bloquear. Eso es todo.",
+      "inputDaysDescription": "Cuántos días de vacaciones tienes, en qué país o región trabajas. Eso es todo.",
       "engineTitle": "El motor hace magia.",
       "engineDescription": "Cruza tus días con los festivos oficiales y los puentes regionales. Encuentra todas las combinaciones posibles y las ordena por \"ratio de descanso\".",
       "exportTitle": "Pides los días.",

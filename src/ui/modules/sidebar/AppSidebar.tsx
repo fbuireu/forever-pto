@@ -77,7 +77,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                         <Settings className='h-5 w-5 shrink-0' />
                       </AnimateIcon>
                       <span className='group-data-[collapsible=icon]:hidden'>{t('steps')}</span>
-                      <ChevronDown className='ml-auto -rotate-90 transition-transform group-data-[state=open]/collapsible:rotate-0 group-data-[collapsible=icon]:hidden' />
+                      <ChevronDown className='ml-auto -rotate-90 transition-transform group-data-[open]/collapsible:rotate-0 group-data-[collapsible=icon]:hidden' />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
@@ -169,7 +169,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                         <Calculator className='h-5 w-5 shrink-0' />
                       </AnimateIcon>
                       <span className='group-data-[collapsible=icon]:hidden'>{t('calculators')}</span>
-                      <ChevronDown className='ml-auto -rotate-90 transition-transform group-data-[state=open]/collapsible:rotate-0 group-data-[collapsible=icon]:hidden' />
+                      <ChevronDown className='ml-auto -rotate-90 transition-transform group-data-[open]/collapsible:rotate-0 group-data-[collapsible=icon]:hidden' />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
                   <CollapsibleContent>

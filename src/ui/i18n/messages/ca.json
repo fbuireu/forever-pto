@@ -244,7 +244,7 @@
     "add": "Afegir",
     "editHoliday": "Editar festiu",
     "edit": "Editar",
-    "deleteHolidays": "Eliminar {count} festius",
+    "deleteHolidays": "{count, plural, one {Eliminar {count} festiu} other {Eliminar {count} festius}}",
     "delete": "Eliminar"
   },
   "charts": {
@@ -363,7 +363,7 @@
   },
   "calendarExport": {
     "title": "Exportar calendari",
-    "description": "Descarrega els teus festius i dies de PTO com a fitxer de calendari.",
+    "description": "{count, plural, one {Descarrega el teu <b>{count}</b> festiu com a fitxer de calendari.} other {Descarrega els teus <b>{count}</b> festius com a fitxer de calendari.}}",
     "includeHolidays": "Festius",
     "includePto": "Dies de PTO",
     "download": "Descarregar .ics",
@@ -671,6 +671,7 @@
     "inProgress": "En Progrés",
     "planned": "Planificat",
     "future": "Futur",
+    "detailedView": "Vista detallada",
     "haveSuggestion": "Tens un suggeriment?",
     "feedbackShapes": "El teu feedback dóna forma al nostre full de ruta. Comparteix les teves idees i ajuda'ns a construir el planificador de vacances perfecte.",
     "gotAnIdea": "Tens una idea que faria la teva vida més fàcil?",
@@ -702,6 +703,8 @@
       "aiSuggestionsDescription": "Recomanacions impulsades per IA basades en les teves preferències i patrons passats",
       "weatherIntegration": "Integració del Temps",
       "weatherIntegrationDescription": "Veu pronòstics del temps per les teves dates de vacances planificades",
+      "blockedPeriods": "Períodes Bloquejats",
+      "blockedPeriodsDescription": "Marca rangs de dates on no vols cap suggeriment de PTO — conferències, viatges, baixes mèdiques o qualsevol moment que sàpigues que estaràs ocupat",
       "performanceOptimization": "Optimització de Rendiment",
       "performanceOptimizationDescription": "Càlculs més ràpids i experiència més fluida gràcies als Web Workers",
       "customWeekends": "Caps de Setmana Personalitzats",
@@ -915,7 +918,7 @@
       "titleEnd": "en 60 segons.",
       "description": "Sense instal·lar res. Sense targeta. Sense newsletter. Digues-nos quants dies tens i on vius.",
       "inputDaysTitle": "Posa els teus dies.",
-      "inputDaysDescription": "Quants dies de PTO tens, en quin país (o regió) treballes, i quins mesos prefereixes bloquejar. Això és tot.",
+      "inputDaysDescription": "Quants dies de vacances tens, a quin país o regió treballes. Això és tot.",
       "engineTitle": "El motor fa màgia.",
       "engineDescription": "Creua els teus dies amb els festius oficials i els ponts regionals. Troba totes les combinacions possibles i les ordena per \"ràtio de descans\".",
       "exportTitle": "Demanes els dies.",

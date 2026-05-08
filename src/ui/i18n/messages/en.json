@@ -244,7 +244,7 @@
     "add": "Add",
     "editHoliday": "Edit holiday",
     "edit": "Edit",
-    "deleteHolidays": "Delete {count} holidays",
+    "deleteHolidays": "{count, plural, one {Delete {count} holiday} other {Delete {count} holidays}}",
     "delete": "Delete"
   },
   "charts": {
@@ -363,7 +363,7 @@
   },
   "calendarExport": {
     "title": "Export calendar",
-    "description": "Download your holidays and PTO days as a calendar file.",
+    "description": "{count, plural, one {Download your <b>{count}</b> holiday as a calendar file.} other {Download your <b>{count}</b> holidays as a calendar file.}}",
     "includeHolidays": "Holidays",
     "includePto": "PTO days",
     "download": "Download .ics",
@@ -671,6 +671,7 @@
     "inProgress": "In Progress",
     "planned": "Planned",
     "future": "Future",
+    "detailedView": "Detailed view",
     "haveSuggestion": "Have a suggestion?",
     "feedbackShapes": "Your feedback shapes our roadmap. Share your ideas and help us build the perfect vacation planner.",
     "gotAnIdea": "Got an idea that would make your life easier?",
@@ -702,6 +703,8 @@
       "aiSuggestionsDescription": "AI-powered recommendations based on your preferences and past patterns",
       "weatherIntegration": "Weather Integration",
       "weatherIntegrationDescription": "See weather forecasts for your planned vacation dates",
+      "blockedPeriods": "Blocked Periods",
+      "blockedPeriodsDescription": "Mark date ranges where you don't want any PTO suggestions — conferences, trips, medical leave, or any time you know you'll be busy",
       "performanceOptimization": "Performance Optimization",
       "performanceOptimizationDescription": "Faster calculations and smoother experience powered by Web Workers",
       "customWeekends": "Custom Weekends",
@@ -915,7 +918,7 @@
       "titleEnd": "in 60 seconds.",
       "description": "No install. No credit card. No newsletter. Just tell us how many days you have and where you live.",
       "inputDaysTitle": "Enter your days.",
-      "inputDaysDescription": "How many PTO days you have, which country (or region) you work in, and which months you prefer to block. That's it.",
+      "inputDaysDescription": "How many vacation days you have and which country or region you work in. That's it.",
       "engineTitle": "The engine does the magic.",
       "engineDescription": "It crosses your days with official holidays and regional bridges. Finds all possible combos and ranks them by \"rest ratio\".",
       "exportTitle": "Request your days off.",

@@ -3,6 +3,7 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { Button } from '@ui/modules/core/animate/components/buttons/Button';
+import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { downloadIcs, generateIcs } from '@ui/utils/generateIcs';
 import { Download } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -44,7 +45,12 @@ export const CalendarExport = () => {
       <div className='flex gap-2 my-2 text-sm font-normal'>
         <Download size={16} /> {t('title')}
       </div>
-      <p className='text-xs text-muted-foreground'>{t('description')}</p>
+      <p className='text-xs text-muted-foreground'>
+        {t.rich('description', {
+          count: holidays?.length ?? 0,
+          b: (chunks) => <strong className='font-black text-foreground'>{chunks}</strong>,
+        })}
+      </p>
       <div className='flex gap-2'>
         <Button
           type='button'
@@ -65,10 +71,12 @@ export const CalendarExport = () => {
           {t('includePto')}
         </Button>
       </div>
-      <Button onClick={handleDownload} disabled={!hasData} className='w-full' variant='outline'>
-        <Download className='w-3 h-3' />
-        {t('download')}
-      </Button>
+      <PremiumFeature feature={t('title')}>
+        <Button onClick={handleDownload} disabled={!hasData} className='w-full' variant='outline'>
+          <Download className='w-3 h-3' />
+          {t('download')}
+        </Button>
+      </PremiumFeature>
       <p className='text-[10px] text-muted-foreground leading-relaxed'>{t('compatible')}</p>
     </div>
   );

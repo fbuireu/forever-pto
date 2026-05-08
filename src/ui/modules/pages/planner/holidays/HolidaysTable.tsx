@@ -422,7 +422,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                         );
                       })
                     ) : (
-                      <AnimateIcon animateOnView loop loopDelay={5000} asChild>
+                      <AnimateIcon animateOnView animateOnViewOnce asChild>
                         <TableRow>
                           <TableCell colSpan={6} className='h-24 text-center'>
                             <div className='flex flex-col items-center space-y-2 text-muted-foreground'>

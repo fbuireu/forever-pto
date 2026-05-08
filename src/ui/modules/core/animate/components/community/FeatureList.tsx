@@ -13,6 +13,7 @@ interface RoadmapFeature {
 interface FeatureListProps {
   features: RoadmapFeature[];
   categoryLabel: string;
+  detailedViewLabel: string;
 }
 
 const transition: Transition = {
@@ -47,7 +48,7 @@ const viewAllTextVariants = {
   expanded: { opacity: 1, y: 0, pointerEvents: 'auto' },
 };
 
-export function FeatureList({ features, categoryLabel }: FeatureListProps) {
+export function FeatureList({ features, categoryLabel, detailedViewLabel }: FeatureListProps) {
   return (
     <m.div
       className='bg-card border-[3px] border-[var(--frame)] rounded-[14px] p-4 w-full space-y-3 shadow-[var(--shadow-brutal-md)]'
@@ -98,7 +99,7 @@ export function FeatureList({ features, categoryLabel }: FeatureListProps) {
             variants={viewAllTextVariants}
             transition={textSwitchTransition}
           >
-            Detailed view
+            {detailedViewLabel}
           </m.span>
         </span>
       </div>

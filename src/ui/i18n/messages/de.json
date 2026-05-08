@@ -244,7 +244,7 @@
     "add": "Hinzufügen",
     "editHoliday": "Feiertag bearbeiten",
     "edit": "Bearbeiten",
-    "deleteHolidays": "{count} Feiertage löschen",
+    "deleteHolidays": "{count, plural, one {{count} Feiertag löschen} other {{count} Feiertage löschen}}",
     "delete": "Löschen"
   },
   "charts": {
@@ -363,7 +363,7 @@
   },
   "calendarExport": {
     "title": "Kalender exportieren",
-    "description": "Lade deine Feiertage und PTO-Tage als Kalenderdatei herunter.",
+    "description": "{count, plural, one {Lade deinen <b>{count}</b> Feiertag als Kalenderdatei herunter.} other {Lade deine <b>{count}</b> Feiertage als Kalenderdatei herunter.}}",
     "includeHolidays": "Feiertage",
     "includePto": "PTO-Tage",
     "download": "Als .ics herunterladen",
@@ -671,6 +671,7 @@
     "inProgress": "In Bearbeitung",
     "planned": "Geplant",
     "future": "Zukunft",
+    "detailedView": "Detailansicht",
     "haveSuggestion": "Hast du einen Vorschlag?",
     "feedbackShapes": "Dein Feedback gestaltet unsere Roadmap. Teile deine Ideen und hilf uns, den perfekten Urlaubsplaner zu bauen.",
     "gotAnIdea": "Hast du eine Idee, die dein Leben einfacher machen würde?",
@@ -702,6 +703,8 @@
       "aiSuggestionsDescription": "KI-gestützte Empfehlungen basierend auf deinen Präferenzen und bisherigen Mustern",
       "weatherIntegration": "Wetter-Integration",
       "weatherIntegrationDescription": "Wettervorhersagen für deine geplanten Urlaubstage anzeigen",
+      "blockedPeriods": "Gesperrte Zeiträume",
+      "blockedPeriodsDescription": "Markiere Datumsbereiche, in denen du keine PTO-Vorschläge möchtest — Konferenzen, Reisen, Krankschreibungen oder Zeiten, von denen du weißt, dass du beschäftigt sein wirst",
       "performanceOptimization": "Performance-Optimierung",
       "performanceOptimizationDescription": "Schnellere Berechnungen und flüssigeres Erlebnis dank Web Workers",
       "customWeekends": "Individuelle Wochenenden",
@@ -915,7 +918,7 @@
       "titleEnd": "in 60 Sekunden.",
       "description": "Keine Installation. Keine Kreditkarte. Kein Newsletter. Sag uns einfach, wie viele Tage du hast und wo du wohnst.",
       "inputDaysTitle": "Tage eingeben.",
-      "inputDaysDescription": "Wie viele Urlaubstage du hast, in welchem Land (oder welcher Region) du arbeitest, und welche Monate du bevorzugst. Das war's.",
+      "inputDaysDescription": "Wie viele Urlaubstage du hast und in welchem Land oder welcher Region du arbeitest. Das war's.",
       "engineTitle": "Die Engine macht die Magie.",
       "engineDescription": "Sie kreuzt deine Tage mit offiziellen Feiertagen und regionalen Brückentagen. Findet alle möglichen Kombinationen und ordnet sie nach dem Ruheverhältnis.",
       "exportTitle": "Urlaubstage beantragen.",

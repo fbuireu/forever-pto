@@ -112,6 +112,12 @@ export function Roadmap() {
           description: t('features.analyticsDashboardDescription'),
           quarter: 'Q1 2026',
         },
+        {
+          id: '8',
+          title: t('features.calendarExport'),
+          description: t('features.calendarExportDescription'),
+          quarter: 'Q2 2026',
+        },
       ],
       [CategoryStatus.IN_PROGRESS]: [
         {
@@ -120,14 +126,14 @@ export function Roadmap() {
           description: t('features.performanceOptimizationDescription'),
           quarter: 'Q3 2026',
         },
+        {
+          id: '16',
+          title: t('features.blockedPeriods'),
+          description: t('features.blockedPeriodsDescription'),
+          quarter: 'Q3 2026',
+        },
       ],
       [CategoryStatus.PLANNED]: [
-        {
-          id: '8',
-          title: t('features.calendarExport'),
-          description: t('features.calendarExportDescription'),
-          quarter: 'Q4 2026',
-        },
         {
           id: '9',
           title: t('features.teamPlanning'),
@@ -201,7 +207,11 @@ export function Roadmap() {
           )}
         </div>
         <div className='flex-1 space-y-4 z-1'>
-          <FeatureList features={features} categoryLabel={selectedNavItem?.label ?? 'Features'} />
+          <FeatureList
+            features={features}
+            categoryLabel={selectedNavItem?.label ?? 'Features'}
+            detailedViewLabel={t('detailedView')}
+          />
         </div>
       </div>
     </div>

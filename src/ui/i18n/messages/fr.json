@@ -244,7 +244,7 @@
     "add": "Ajouter",
     "editHoliday": "Modifier le jour férié",
     "edit": "Modifier",
-    "deleteHolidays": "Supprimer {count} jours fériés",
+    "deleteHolidays": "{count, plural, one {Supprimer {count} jour férié} other {Supprimer {count} jours fériés}}",
     "delete": "Supprimer"
   },
   "charts": {
@@ -363,7 +363,7 @@
   },
   "calendarExport": {
     "title": "Exporter le calendrier",
-    "description": "Télécharge tes jours fériés et jours de congé en fichier de calendrier.",
+    "description": "{count, plural, one {Télécharge ton <b>{count}</b> jour férié en fichier de calendrier.} other {Télécharge tes <b>{count}</b> jours fériés en fichier de calendrier.}}",
     "includeHolidays": "Jours fériés",
     "includePto": "Jours de congé",
     "download": "Télécharger .ics",
@@ -671,6 +671,7 @@
     "inProgress": "En cours",
     "planned": "Planifié",
     "future": "Futur",
+    "detailedView": "Vue détaillée",
     "haveSuggestion": "Tu as une suggestion ?",
     "feedbackShapes": "Tes retours façonnent notre feuille de route. Partage tes idées et aide-nous à construire le planificateur de vacances parfait.",
     "gotAnIdea": "Tu as une idée qui te faciliterait la vie ?",
@@ -702,6 +703,8 @@
       "aiSuggestionsDescription": "Recommandations basées sur l'IA selon tes préférences et habitudes passées",
       "weatherIntegration": "Intégration météo",
       "weatherIntegrationDescription": "Consulte les prévisions météo pour tes dates de vacances planifiées",
+      "blockedPeriods": "Périodes bloquées",
+      "blockedPeriodsDescription": "Marque des plages de dates où tu ne veux aucune suggestion de PTO — conférences, voyages, arrêts maladie ou tout moment où tu sais que tu seras occupé",
       "performanceOptimization": "Optimisation des performances",
       "performanceOptimizationDescription": "Calculs plus rapides et expérience plus fluide grâce aux Web Workers",
       "customWeekends": "Week-ends personnalisés",
@@ -915,7 +918,7 @@
       "titleEnd": "en 60 secondes.",
       "description": "Sans installation. Sans carte bancaire. Sans newsletter. Dis-nous combien de jours tu as et où tu vis.",
       "inputDaysTitle": "Entre tes jours.",
-      "inputDaysDescription": "Combien de jours de congés tu as, dans quel pays tu travailles, et quels mois tu préfères bloquer. C'est tout.",
+      "inputDaysDescription": "Combien de jours de congés tu as et dans quel pays ou région tu travailles. C'est tout.",
       "engineTitle": "Le moteur fait la magie.",
       "engineDescription": "Il croise tes jours avec les jours fériés officiels et les ponts régionaux. Trouve toutes les combinaisons possibles et les classe par ratio de repos.",
       "exportTitle": "Demande tes jours.",

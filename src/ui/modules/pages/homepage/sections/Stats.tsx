@@ -9,7 +9,7 @@ export const Stats = async () => {
         {[
           { num: '2.14×', label: t('stats.multiplierLabel'), bg: 'var(--color-brand-yellow)' },
           { num: '47', label: t('stats.daysLabel', { days: 22 }), bg: 'var(--color-brand-teal)' },
-          { num: '14', label: t('stats.countriesLabel'), bg: 'var(--color-brand-orange)' },
+          { num: '203', label: t('stats.countriesLabel'), bg: 'var(--color-brand-orange)' },
           { num: '12k+', label: t('stats.plansLabel'), bg: 'var(--color-brand-purple)' },
         ].map(({ num, label, bg }) => (
           <div

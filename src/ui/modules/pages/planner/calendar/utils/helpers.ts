@@ -25,12 +25,14 @@ export const MODIFIERS_CLASS_NAMES: Record<string, string> = {
   manuallySelected:
     'rounded-lg bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--color-brand-teal)_82%)] text-[var(--color-brand-paper)] font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow,opacity] duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_4px,rgba(255,255,255,0.24)_4px,rgba(255,255,255,0.24)_8px)]',
   selected:
-    'rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow] duration-200',
+    'rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow] duration-200',
   today:
-    'rounded-lg bg-[var(--color-brand-ink)] hover:brightness-105 text-[var(--color-brand-paper)] font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] ring-offset-1 ring-offset-background transition-[background-color,box-shadow] duration-200',
+    'rounded-lg bg-[var(--color-brand-ink)] hover:brightness-105 text-[var(--color-brand-paper)] hover:text-[var(--color-brand-paper)] font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] ring-offset-1 ring-offset-background transition-[background-color,box-shadow] duration-200',
   inRange: 'rounded-lg bg-primary/12',
-  rangeStart: 'rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-black',
-  rangeEnd: 'rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-black',
+  rangeStart:
+    'rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground font-black',
+  rangeEnd:
+    'rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground font-black',
   previewRange: 'rounded-lg bg-primary/10',
 } as const;
 
