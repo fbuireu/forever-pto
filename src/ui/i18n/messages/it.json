@@ -369,7 +369,14 @@
     "download": "Scarica .ics",
     "compatible": "Compatibile con Google Calendar, Apple Calendar, Outlook e qualsiasi app di calendario.",
     "calendarName": "Forever PTO",
-    "ptoDayLabel": "Giorno di ferie"
+    "ptoDayLabel": "Giorno di ferie",
+    "downloadPdf": "Scarica .pdf",
+    "pdf": {
+      "holidays": "Festivi",
+      "vacationDays": "Giorni di ferie",
+      "dayOff": "Giorno di ferie",
+      "generatedOn": "Generato il"
+    }
   },
   "ptoStatus": {
     "autoAssigned": "Auto-assegnati",

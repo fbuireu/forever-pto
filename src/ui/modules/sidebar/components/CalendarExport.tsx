@@ -2,18 +2,21 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
+import { downloadIcs, generateIcs } from '@infrastructure/services/export/generateIcs';
+import type { GeneratePdfOptions } from '@infrastructure/services/export/generatePdf';
 import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
-import { downloadIcs, generateIcs } from '@ui/utils/generateIcs';
-import { Download } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { Download, FileText } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import { useState, useTransition } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 export const CalendarExport = () => {
   const t = useTranslations('calendarExport');
+  const locale = useLocale();
   const [includeHolidays, setIncludeHolidays] = useState(true);
   const [includePto, setIncludePto] = useState(true);
+  const [isPdfPending, startPdfTransition] = useTransition();
 
   const { year } = useFiltersStore(useShallow((s) => ({ year: s.year })));
   const { holidays, suggestion, currentSelection } = useHolidaysStore(
@@ -25,9 +28,10 @@ export const CalendarExport = () => {
   );
 
   const activeSuggestion = currentSelection ?? suggestion;
-  const hasData = (includeHolidays && (holidays?.length ?? 0) > 0) || (includePto && !!activeSuggestion?.days?.length);
+  const ptoDays = activeSuggestion?.days ?? [];
+  const hasData = (includeHolidays && (holidays?.length ?? 0) > 0) || (includePto && ptoDays.length > 0);
 
-  const handleDownload = () => {
+  const handleDownloadIcs = () => {
     const content = generateIcs({
       year: Number(year),
       calendarName: t('calendarName'),
@@ -38,6 +42,30 @@ export const CalendarExport = () => {
       includePto,
     });
     downloadIcs(content, `forever-pto-${year}.ics`);
+  };
+
+  const handleDownloadPdf = () => {
+    startPdfTransition(async () => {
+      const { generatePdfBlob, downloadPdf } = await import('@infrastructure/services/export/generatePdf');
+
+      const options: GeneratePdfOptions = {
+        year: Number(year),
+        holidays: includeHolidays ? (holidays ?? []) : [],
+        ptoDays: includePto ? ptoDays : [],
+        includeHolidays,
+        includePto,
+        locale,
+        labels: {
+          holidays: t('pdf.holidays'),
+          vacationDays: t('pdf.vacationDays'),
+          dayOff: t('pdf.dayOff'),
+          generatedOn: t('pdf.generatedOn'),
+        },
+      };
+
+      const blob = await generatePdfBlob(options);
+      downloadPdf(blob, `forever-pto-${year}.pdf`);
+    });
   };
 
   return (
@@ -72,10 +100,16 @@ export const CalendarExport = () => {
         </Button>
       </div>
       <PremiumFeature feature={t('title')}>
-        <Button onClick={handleDownload} disabled={!hasData} className='w-full' variant='outline'>
-          <Download className='w-3 h-3' />
-          {t('download')}
-        </Button>
+        <div className='flex gap-2'>
+          <Button onClick={handleDownloadIcs} disabled={!hasData} className='flex-1' variant='outline'>
+            <Download className='w-3 h-3' />
+            {t('download')}
+          </Button>
+          <Button onClick={handleDownloadPdf} disabled={!hasData || isPdfPending} className='flex-1' variant='outline'>
+            <FileText className='w-3 h-3' />
+            {isPdfPending ? '…' : t('downloadPdf')}
+          </Button>
+        </div>
       </PremiumFeature>
       <p className='text-[10px] text-muted-foreground leading-relaxed'>{t('compatible')}</p>
     </div>

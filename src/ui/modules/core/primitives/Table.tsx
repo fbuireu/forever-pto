@@ -3,11 +3,14 @@
 import { cn } from '@ui/utils/utils';
 import type { ComponentProps } from 'react';
 
-function Table({ className, ...props }: ComponentProps<'table'>) {
+function Table({ className, containerClassName, ...props }: ComponentProps<'table'> & { containerClassName?: string }) {
   return (
     <div
       data-slot='table-container'
-      className='relative w-full overflow-x-auto rounded-[10px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-md)]'
+      className={cn(
+        'relative w-full overflow-x-auto rounded-[10px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-md)]',
+        containerClassName
+      )}
     >
       <table data-slot='table' className={cn('w-full caption-bottom text-sm', className)} {...props} />
     </div>

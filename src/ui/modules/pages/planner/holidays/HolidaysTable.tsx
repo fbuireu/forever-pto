@@ -393,49 +393,47 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
         {innerOpen && (
           <>
             <div className='hidden lg:block'>
-              <div className='max-h-96 overflow-y-auto'>
-                <Table className='w-full'>
-                  <colgroup>
-                    <col className='w-12.5' />
-                    <col className='w-75' />
-                    <col className='w-30' />
-                    <col className='w-25' />
-                    <col className='w-20' />
-                    <col className='w-25' />
-                  </colgroup>
-                  <HolidayTableHeader selectAllButton={selectAllButton} sortConfig={sortConfig} onSort={handleSort} />
-                  <TableBody>
-                    {filteredHolidays.length > 0 ? (
-                      filteredHolidays.map((holiday, index) => {
-                        const holidayId = getHolidayId(holiday, index);
-                        const isSelected = selectedHolidays.has(holidayId);
+              <Table className='w-full' containerClassName='max-h-96 overflow-auto'>
+                <colgroup>
+                  <col className='w-12.5' />
+                  <col className='w-75' />
+                  <col className='w-30' />
+                  <col className='w-25' />
+                  <col className='w-20' />
+                  <col className='w-25' />
+                </colgroup>
+                <HolidayTableHeader selectAllButton={selectAllButton} sortConfig={sortConfig} onSort={handleSort} />
+                <TableBody>
+                  {filteredHolidays.length > 0 ? (
+                    filteredHolidays.map((holiday, index) => {
+                      const holidayId = getHolidayId(holiday, index);
+                      const isSelected = selectedHolidays.has(holidayId);
 
-                        return (
-                          <HolidayRow
-                            key={holidayId}
-                            holiday={holiday}
-                            index={index}
-                            isSelected={isSelected}
-                            locale={locale}
-                            onToggle={toggleSelectHoliday}
-                          />
-                        );
-                      })
-                    ) : (
-                      <AnimateIcon animateOnView animateOnViewOnce asChild>
-                        <TableRow>
-                          <TableCell colSpan={6} className='h-24 text-center'>
-                            <div className='flex flex-col items-center space-y-2 text-muted-foreground'>
-                              <Search className='h-8 w-8' />
-                              {debouncedSearchTerm ? t('noHolidaysFound') : t('noHolidays')}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      </AnimateIcon>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
+                      return (
+                        <HolidayRow
+                          key={holidayId}
+                          holiday={holiday}
+                          index={index}
+                          isSelected={isSelected}
+                          locale={locale}
+                          onToggle={toggleSelectHoliday}
+                        />
+                      );
+                    })
+                  ) : (
+                    <AnimateIcon animateOnView animateOnViewOnce asChild>
+                      <TableRow>
+                        <TableCell colSpan={6} className='h-24 text-center'>
+                          <div className='flex flex-col items-center space-y-2 text-muted-foreground'>
+                            <Search className='h-8 w-8' />
+                            {debouncedSearchTerm ? t('noHolidaysFound') : t('noHolidays')}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    </AnimateIcon>
+                  )}
+                </TableBody>
+              </Table>
             </div>
 
             <div className='lg:hidden space-y-3'>

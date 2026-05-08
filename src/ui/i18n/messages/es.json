@@ -369,7 +369,14 @@
     "download": "Descargar .ics",
     "compatible": "Compatible con Google Calendar, Apple Calendar, Outlook y cualquier app de calendario.",
     "calendarName": "Forever PTO",
-    "ptoDayLabel": "Día de PTO"
+    "ptoDayLabel": "Día de PTO",
+    "downloadPdf": "Descargar .pdf",
+    "pdf": {
+      "holidays": "Festivos",
+      "vacationDays": "Días de vacaciones",
+      "dayOff": "Día de vacaciones",
+      "generatedOn": "Generado el"
+    }
   },
   "ptoStatus": {
     "autoAssigned": "Auto-asignados",

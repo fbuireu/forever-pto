@@ -9,10 +9,25 @@ import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Skeleton } from 'boneyard-js/react';
 import { AlertCircle } from 'lucide-react';
-import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
 import { type FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { ExpressCheckoutFixture } from './ExpressCheckoutFixture';
+
+async function fireConfetti() {
+  const confetti = (await import('canvas-confetti')).default;
+  const count = 200;
+  const defaults = {
+    origin: { y: 0.7 },
+    colors: ['#10b981', '#059669', '#047857', '#065f46', '#fbbf24', '#f59e0b', '#d97706', '#b45309'],
+  };
+  const fire = (particleRatio: number, opts: Record<string, unknown>) =>
+    confetti({ ...defaults, ...opts, particleCount: Math.floor(count * particleRatio) });
+  fire(0.25, { spread: 26, startVelocity: 55 });
+  fire(0.2, { spread: 60 });
+  fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+  fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+  fire(0.1, { spread: 120, startVelocity: 45 });
+}
 
 interface CheckoutFormProps {
   amount: number;
@@ -21,8 +36,6 @@ interface CheckoutFormProps {
   onSuccess: () => void;
   onCancel: () => void;
 }
-
-const ConfettiCannon = dynamic(() => import('./ConfettiCannon').then((module) => ({ default: module.ConfettiCannon })));
 
 export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel }: Readonly<CheckoutFormProps>) {
   const stripe = useStripe();
@@ -33,7 +46,6 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   const [hasExpressOptions, setHasExpressOptions] = useState<boolean | null>(null);
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [showConfetti, setShowConfetti] = useState(false);
   const getCurrencyFromLocale = usePremiumStore((state) => state.getCurrencyFromLocale);
   const currencySymbol = usePremiumStore((state) => state.currencySymbol);
   const setPremiumStatus = usePremiumStore((state) => state.setPremiumStatus);
@@ -41,6 +53,10 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   useEffect(() => {
     getCurrencyFromLocale(locale);
   }, [locale, getCurrencyFromLocale]);
+
+  useEffect(() => {
+    void import('canvas-confetti');
+  }, []);
 
   const formattedAmount = useMemo(() => amount.toFixed(2), [amount]);
   const discountText = useMemo(() => formatDiscountText(discountInfo), [discountInfo]);
@@ -70,7 +86,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
       }
 
       track('payment_completed', { amount });
-      setShowConfetti(true);
+      void fireConfetti();
       setTimeout(() => {
         onSuccess();
       }, 1000);
@@ -95,7 +111,6 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 
   return (
     <div className='space-y-4'>
-      {showConfetti && <ConfettiCannon onComplete={() => setShowConfetti(false)} />}
       <div className='flex items-center justify-between'>
         <AnimateIcon animateOnHover>
           <Button
