@@ -36,6 +36,7 @@ const PtoSalaryCalculator = dynamic(() =>
   import('./components/PtoSalaryCalculator').then((m) => m.PtoSalaryCalculator)
 );
 const WorkdayCounter = dynamic(() => import('./components/WorkdayCounter').then((m) => m.WorkdayCounter));
+const CalendarExport = dynamic(() => import('./components/CalendarExport').then((m) => m.CalendarExport));
 
 const STEP_CARD_CLASS =
   'bg-sidebar border-[3px] border-[var(--frame)] rounded-[14px] shadow-[6px_6px_0_0_var(--frame)] p-[18px]';
@@ -130,6 +131,19 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                           <AllowPastDays />
                           <CarryOverMonths />
                         </div>
+                      </div>
+
+                      <div data-tutorial='sidebar-step-4' className={STEP_CARD_CLASS}>
+                        <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
+                          <span>
+                            {t('step4.titleStart')}
+                            <em className='font-serif italic font-normal'>{t('step4.titleEmphasis')}</em>
+                          </span>
+                          <span className='ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]'>
+                            {t('step4.badge', { step: 4 })}
+                          </span>
+                        </h3>
+                        <CalendarExport />
                       </div>
                     </div>
                   </CollapsibleContent>

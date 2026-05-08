@@ -6,6 +6,7 @@ import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
 import { ChevronRight } from '@ui/modules/core/animate/icons/ChevronRight';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
+import { SupportButton } from '@ui/modules/pages/homepage/navigation/SupportButton';
 import { ConditionalWrapper } from '@ui/modules/shared/ConditionalWrapper';
 import { addMonths, type Day, formatDate, isSameDay, isSameMonth, isWeekend, subMonths } from '@ui/utils/dates';
 import { cn } from '@ui/utils/utils';
@@ -112,7 +113,6 @@ export function Calendar({
   const tPremium = useTranslations('premium');
   const tCalendar = useTranslations('calendar');
   const premiumKey = usePremiumStore((state) => state.premiumKey);
-  const openDonatePopover = usePremiumStore((state) => state.openDonatePopover);
   const [currentMonth, setCurrentMonth] = useState(initialMonth ?? new Date());
   const [hoverDate, setHoverDate] = useState<Date | undefined>();
   const [rangeSelection, setRangeSelection] = useState<RangeState>(() => {
@@ -244,16 +244,10 @@ export function Calendar({
             },
             icon: <LockIcon size='16' />,
             action: (
-              <div className='w-full donate-rainbow relative z-0 overflow-hidden p-0.5 flex items-center justify-center rounded-md hover:scale-102 transition duration-200 active:scale-100'>
-                <Button
-                  className='rounded-[8px] border-[3px] border-[var(--frame)] w-full h-full py-3 px-2 shadow-none hover:shadow-none active:shadow-none hover:translate-x-0 hover:translate-y-0 active:translate-x-0 active:translate-y-0 hover:bg-primary'
-                  onClick={() => {
-                    openDonatePopover();
-                  }}
-                >
-                  {tPremium('upgrade')}
-                </Button>
-              </div>
+              <SupportButton
+                label={tPremium('upgrade')}
+                className='w-full py-3 px-2 !bg-[var(--color-brand-ink)] !text-white !border-transparent !shadow-[5px_5px_0_0_var(--color-brand-orange)] hover:!shadow-[7px_7px_0_0_var(--color-brand-orange)] active:!shadow-[1px_1px_0_0_var(--color-brand-orange)]'
+              />
             ),
           });
           return;
@@ -347,7 +341,6 @@ export function Calendar({
       modifiers.manuallySelected,
       canSelectMoreDays,
       premiumKey,
-      openDonatePopover,
       t,
       tPremium,
       modifiers.bankHoliday,

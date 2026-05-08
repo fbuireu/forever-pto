@@ -119,8 +119,8 @@ export const YearTimelineChart = ({ year, holidays, suggestion, manuallySelected
           {t('yearTimeline.title')}
         </CardTitle>
       </CardHeader>
-      <CardContent className='px-4 pb-4'>
-        <div className='rounded-[10px] border-[3px] border-[var(--frame)] overflow-hidden'>
+      <CardContent className='p-0 overflow-hidden rounded-b-[calc(var(--radius)-3px)]'>
+        <div className='overflow-hidden'>
           <div className='flex bg-card dark:bg-[var(--color-brand-ink)] border-b-[2px] border-[var(--frame)]/30'>
             <div className='w-[72px] shrink-0 border-r-[2px] border-[var(--frame)]/30' />
             {monthNames.map((name, i) => (
@@ -162,7 +162,7 @@ export const YearTimelineChart = ({ year, holidays, suggestion, manuallySelected
                   {segs.map((seg) => (
                     <div
                       key={seg.start.toISOString()}
-                      className={cn('absolute inset-y-0 border-r-[3px] border-[var(--frame)]', ROW_COLOR[key])}
+                      className={cn('absolute inset-y-0', ROW_COLOR[key])}
                       style={{
                         left: `${segPos(seg.start, year) * 100}%`,
                         width: `max(6px, ${segWidth(seg.start, seg.end, year) * 100}%)`,

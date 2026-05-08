@@ -206,7 +206,7 @@
     "title": "Contador de días laborables",
     "tooltip": "Cuenta días laborables entre dos fechas, excluyendo automáticamente fines de semana y festivos. Útil para planificación de proyectos y cálculo de plazos.",
     "tooltipLabel": "Más información sobre el contador",
-    "selectRange": "Seleccionar rango de fechas",
+    "selectRange": "Seleccionar fechas",
     "clearSelection": "Limpiar selección",
     "workingDays": "Días laborables",
     "businessDays": "Días hábiles en el rango seleccionado",
@@ -322,8 +322,8 @@
     "description": "Configura tu plan en 2 pasos: primero tu ubicación, luego tus días y estrategia. Pulsa el botón para un tutorial interactivo.",
     "restartButton": "Reiniciar Tutorial Interactivo",
     "startButton": "Iniciar Tutorial",
-    "nextBtn": "Siguiente →",
-    "prevBtn": "← Anterior",
+    "nextBtn": "Siguiente",
+    "prevBtn": "Anterior",
     "doneBtn": "Listo",
     "progressTextConnector": "de",
     "steps": {
@@ -344,7 +344,9 @@
       "step2Title": "Paso {step} — Días disponibles",
       "step2Description": "Indica cuántos días de vacaciones tienes. Esta es la base para todos los cálculos.",
       "step3Title": "Paso {step} — Tu configuración",
-      "step3Description": "Elige tu estrategia de optimización y configura los días pasados y los meses de traslado para afinar tu plan."
+      "step3Description": "Elige tu estrategia de optimización y configura los días pasados y los meses de traslado para afinar tu plan.",
+      "step4Title": "Paso {step} — Exporta tu calendario",
+      "step4Description": "Descarga tus festivos y días de PTO planificados como archivo .ics e impórtalo en Google Calendar, Apple Calendar, Outlook o cualquier otra app de calendario."
     }
   },
   "legend": {
@@ -359,13 +361,25 @@
     "manual": "Manual",
     "custom": "Personalizado"
   },
+  "calendarExport": {
+    "title": "Exportar calendario",
+    "description": "Descarga tus festivos y días de PTO como archivo de calendario.",
+    "includeHolidays": "Festivos",
+    "includePto": "Días de PTO",
+    "download": "Descargar .ics",
+    "compatible": "Compatible con Google Calendar, Apple Calendar, Outlook y cualquier app de calendario.",
+    "calendarName": "Forever PTO",
+    "ptoDayLabel": "Día de PTO"
+  },
   "ptoStatus": {
     "autoAssigned": "Auto-asignados",
     "manual": "Manual",
     "remaining": "Restantes",
     "clickDays": "Haz clic en los días para asignar/quitar",
     "allAssigned": "¡Todos los días asignados!",
-    "resetManual": "Restablecer Cambios Manuales"
+    "resetManual": "Restablecer Cambios Manuales",
+    "usedDays": "{used} / {total} días usados · {pct}%",
+    "remainingDays": "{remaining} restantes · {pct}%"
   },
   "contact": {
     "title": "Contáctanos",
@@ -450,7 +464,7 @@
       "search": "Buscar estrategias...",
       "hide": "Ocultar",
       "expand": "Expandir",
-      "strategyDetails": "detalles de estrategia",
+      "strategyDetails": "detalles",
       "grouped": {
         "label": "Agrupada",
         "description": "Prioriza vacaciones largas y continuas",
@@ -520,6 +534,11 @@
     "step3": {
       "titleStart": "Tu ",
       "titleEmphasis": "configuración",
+      "badge": "paso {step}"
+    },
+    "step4": {
+      "titleStart": "Tu ",
+      "titleEmphasis": "exportación",
       "badge": "paso {step}"
     },
     "steps": "Pasos"
@@ -732,7 +751,7 @@
     "status": "Estado"
   },
   "workdayCounterModal": {
-    "selectDateRange": "Seleccionar rango de fechas"
+    "selectDateRange": "Seleccionar fechas"
   },
   "command": {
     "commandPalette": "Paleta de Comandos",
@@ -945,7 +964,7 @@
         "missedBridge": "Pides el lunes después del puente y nadie te avisa que era pleonasmo.",
         "daysRunOut": "Te enteras en septiembre que ya no quedan días.",
         "colleagueConflict": "Compañero pide tu semana primero. Otra vez.",
-        "unusedDays": "Te quedas con 4 días sin usar a 31 de diciembre."
+        "unusedDays": "Acabas el año con 4 días sin usar."
       },
       "withTitle": "😎 Con Forever PTO",
       "withItems": {

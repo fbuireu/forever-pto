@@ -17,8 +17,10 @@ export const Stats = async () => {
             className='px-6 py-8 border-r-[4px] border-[var(--frame)] last:border-r-0 [contain:layout]'
             style={{ background: bg }}
           >
-            <div className='font-display font-extrabold text-[56px] leading-none tracking-[-0.04em] mb-1.5'>{num}</div>
-            <div className='font-mono text-[13px] font-semibold'>{label}</div>
+            <div className='font-display font-extrabold text-[56px] leading-none tracking-[-0.04em] mb-1.5 text-[var(--color-brand-ink)]'>
+              {num}
+            </div>
+            <div className='font-mono text-[13px] font-semibold text-[var(--color-brand-ink)]'>{label}</div>
           </div>
         ))}
       </div>

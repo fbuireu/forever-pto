@@ -152,7 +152,7 @@ export const Summary = () => {
                 <Badge variant='outline'>{tSidebar(`strategy.${strategy}.label`)}</Badge>
               </div>
             </CardTitle>
-            <CardDescription className='space-y-2 rounded-[10px] border-[3px] border-[var(--frame)]/15 bg-[var(--surface-panel-soft)] p-4 text-muted-foreground'>
+            <CardDescription className='space-y-2'>
               <p className='text-sm'>
                 {increment > 0
                   ? t('summaryParagraph.withGain', {

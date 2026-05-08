@@ -206,7 +206,7 @@
     "title": "Workday Counter",
     "tooltip": "Count working days between two dates, automatically excluding weekends and holidays. Useful for project planning and deadline calculations.",
     "tooltipLabel": "More information about workday counter",
-    "selectRange": "Select Date Range",
+    "selectRange": "Select dates",
     "clearSelection": "Clear selection",
     "workingDays": "Working Days",
     "businessDays": "Business days in selected range",
@@ -322,8 +322,8 @@
     "description": "Set up your plan in 2 steps: your location first, then your days and strategy. Click below for an interactive walkthrough.",
     "startButton": "Start tutorial",
     "restartButton": "Restart Interactive Tutorial",
-    "nextBtn": "Next →",
-    "prevBtn": "← Previous",
+    "nextBtn": "Next",
+    "prevBtn": "Previous",
     "doneBtn": "Done",
     "progressTextConnector": "of",
     "steps": {
@@ -344,7 +344,9 @@
       "step2Title": "Step {step} — Your available days",
       "step2Description": "Enter how many PTO days you have. This is the base for all calculations.",
       "step3Title": "Step {step} — Your configuration",
-      "step3Description": "Choose your optimization strategy and configure past days and carryover months to fine-tune your plan."
+      "step3Description": "Choose your optimization strategy and configure past days and carryover months to fine-tune your plan.",
+      "step4Title": "Step {step} — Export your calendar",
+      "step4Description": "Download your holidays and planned PTO days as a .ics file and import it into Google Calendar, Apple Calendar, Outlook or any other calendar app."
     }
   },
   "legend": {
@@ -359,13 +361,25 @@
     "manual": "Manual",
     "custom": "Custom"
   },
+  "calendarExport": {
+    "title": "Export calendar",
+    "description": "Download your holidays and PTO days as a calendar file.",
+    "includeHolidays": "Holidays",
+    "includePto": "PTO days",
+    "download": "Download .ics",
+    "compatible": "Compatible with Google Calendar, Apple Calendar, Outlook and any calendar app.",
+    "calendarName": "Forever PTO",
+    "ptoDayLabel": "PTO Day"
+  },
   "ptoStatus": {
     "autoAssigned": "Auto-assigned",
     "manual": "Manual",
     "remaining": "Remaining",
     "clickDays": "Click days to assign/remove",
     "allAssigned": "All days assigned!",
-    "resetManual": "Reset Manual Changes"
+    "resetManual": "Reset Manual Changes",
+    "usedDays": "{used} / {total} days used · {pct}%",
+    "remainingDays": "{remaining} remaining · {pct}%"
   },
   "contact": {
     "title": "Contact Us",
@@ -450,7 +464,7 @@
       "search": "Search strategies...",
       "hide": "Hide",
       "expand": "Expand",
-      "strategyDetails": "strategy details",
+      "strategyDetails": "details",
       "grouped": {
         "label": "Grouped",
         "description": "Prioritizes long, continuous vacations",
@@ -520,6 +534,11 @@
     "step3": {
       "titleStart": "Your ",
       "titleEmphasis": "configuration",
+      "badge": "step {step}"
+    },
+    "step4": {
+      "titleStart": "Your ",
+      "titleEmphasis": "export",
       "badge": "step {step}"
     },
     "steps": "Steps"
@@ -732,7 +751,7 @@
     "status": "Status"
   },
   "workdayCounterModal": {
-    "selectDateRange": "Select date range"
+    "selectDateRange": "Select dates"
   },
   "command": {
     "commandPalette": "Command Palette",
@@ -945,7 +964,7 @@
         "missedBridge": "You ask for the Monday after a holiday and nobody tells you it was redundant.",
         "daysRunOut": "You find out in September that you have no days left.",
         "colleagueConflict": "A colleague books your week first. Again.",
-        "unusedDays": "You end December with 4 unused days."
+        "unusedDays": "You end the year with 4 unused days."
       },
       "withTitle": "😎 With Forever PTO",
       "withItems": {

@@ -5,6 +5,7 @@ import type { HolidaysState } from '@application/stores/holidays';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
+import { Progress, ProgressTrack } from '@ui/modules/core/primitives/Progress';
 import { cn } from '@ui/utils/utils';
 import { MousePointerClick } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -29,6 +30,7 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
 
   const activeSuggestedCount = currentSelection.days.length - removedSuggestedDays.length;
   const manualSelectedCount = manuallySelectedDays.length;
+  const usedDays = activeSuggestedCount + manualSelectedCount;
 
   const rawRemaining = Math.max(0, ptoDays - activeSuggestedCount - manualSelectedCount);
   const lastSettledRemaining = useRef(rawRemaining);
@@ -39,6 +41,9 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
 
   const hasManualChanges = manualSelectedCount > 0 || removedSuggestedDays.length > 0;
 
+  const usedPct = ptoDays > 0 ? Math.min(100, Math.round((usedDays / ptoDays) * 100)) : 0;
+  const remainingPct = Math.max(0, 100 - usedPct);
+
   return (
     <div
       className='rounded-[10px] border-[3px] border-[var(--frame)] bg-card px-4 py-3 shadow-[var(--shadow-brutal-md)]'
@@ -46,7 +51,7 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
     >
       <div className='flex items-center justify-between flex-wrap gap-4 h-full'>
         <div className='flex items-center gap-4'>
-          <div className='flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>
+          <div className='flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_25%,black_75%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>
             <div className='h-3 w-3 rounded-full bg-teal-500' />
             <span className='text-sm text-muted-foreground'>{t('autoAssigned')}:</span>
             <SlidingNumber
@@ -54,7 +59,7 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
               className='font-display font-black text-teal-700 dark:text-teal-300'
             />
           </div>
-          <div className='flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>
+          <div className='flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_25%,black_75%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>
             <div className='h-3 w-3 rounded-full bg-blue-500' />
             <span className='text-sm text-muted-foreground'>{t('manual')}:</span>
             <SlidingNumber
@@ -92,6 +97,30 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
             </Button>
           )}
         </div>
+      </div>
+      <div className='mt-3 pt-3 border-t-[2px] border-[var(--frame)]/15 space-y-2'>
+        <Progress value={usedPct}>
+          <div className='relative'>
+            <ProgressTrack
+              className='h-[22px] rounded-full bg-background shadow-[3px_3px_0_0_var(--frame)]'
+              indicatorClassName='rounded-r-full border-r-[3px] border-[var(--frame)]'
+            />
+            <span className='pointer-events-none absolute inset-0 grid place-items-center font-mono text-[11px] font-bold uppercase text-foreground'>
+              {t('usedDays', { used: usedDays, total: ptoDays, pct: usedPct })}
+            </span>
+          </div>
+        </Progress>
+        <Progress value={remainingPct}>
+          <div className='relative'>
+            <ProgressTrack
+              className='h-[22px] rounded-full bg-background shadow-[3px_3px_0_0_var(--frame)]'
+              indicatorClassName='rounded-r-full border-r-[3px] border-[var(--frame)] bg-[var(--color-brand-teal)]'
+            />
+            <span className='pointer-events-none absolute inset-0 grid place-items-center font-mono text-[11px] font-bold uppercase text-foreground'>
+              {t('remainingDays', { remaining, pct: remainingPct })}
+            </span>
+          </div>
+        </Progress>
       </div>
     </div>
   );

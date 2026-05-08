@@ -48,6 +48,15 @@ export const useTutorial = () => {
         },
       },
       {
+        element: '[data-tutorial="sidebar-step-4"]',
+        popover: {
+          title: t('step4Title', { step: 4 }),
+          description: t('step4Description'),
+          side: 'right',
+          align: 'start',
+        },
+      },
+      {
         element: '[data-tutorial="sidebar-tools"]',
         popover: {
           title: t('toolsTitle'),

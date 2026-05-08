@@ -31,7 +31,7 @@ function Counter({
   ...props
 }: CounterProps) {
   const btnBase =
-    'w-11 flex items-center justify-center bg-[var(--surface-panel-soft)] font-display font-black text-[22px] leading-none hover:bg-[var(--accent)] transition-colors duration-75 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 select-none';
+    'w-11 flex items-center justify-center bg-[var(--surface-panel-soft)] font-display font-black text-[22px] leading-none hover:bg-[var(--accent)] hover:text-[var(--color-brand-ink)] transition-colors duration-75 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 select-none';
 
   return (
     <m.div

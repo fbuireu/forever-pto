@@ -103,7 +103,7 @@ export const AlternativesManager = ({
           disabled={currentIndex === 0}
           onClick={handlePrevious}
           aria-label={t('previousSuggestion')}
-          className='w-11 flex items-center justify-center bg-[var(--surface-panel-soft)] hover:bg-[var(--accent)] transition-colors duration-75 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 select-none border-r-[3px] border-[var(--frame)]'
+          className='w-11 flex items-center justify-center bg-[var(--surface-panel-soft)] hover:bg-[var(--accent)] hover:text-[var(--color-brand-ink)] transition-colors duration-75 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 select-none border-r-[3px] border-[var(--frame)]'
         >
           <ChevronLeft size={20} />
         </m.button>
@@ -131,7 +131,7 @@ export const AlternativesManager = ({
           disabled={currentIndex === totalOptions - 1}
           onClick={handleNext}
           aria-label={t('nextSuggestion')}
-          className='w-11 flex items-center justify-center bg-[var(--surface-panel-soft)] hover:bg-[var(--accent)] transition-colors duration-75 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 select-none border-l-[3px] border-[var(--frame)]'
+          className='w-11 flex items-center justify-center bg-[var(--surface-panel-soft)] hover:bg-[var(--accent)] hover:text-[var(--color-brand-ink)] transition-colors duration-75 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 select-none border-l-[3px] border-[var(--frame)]'
         >
           <ChevronRight size={20} />
         </m.button>

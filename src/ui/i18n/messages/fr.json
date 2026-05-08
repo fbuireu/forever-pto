@@ -206,7 +206,7 @@
     "title": "Compteur de jours ouvrés",
     "tooltip": "Compte les jours ouvrés entre deux dates, en excluant automatiquement les week-ends et jours fériés. Utile pour la planification de projets et le calcul de délais.",
     "tooltipLabel": "Plus d'informations sur le compteur de jours ouvrés",
-    "selectRange": "Sélectionner une plage de dates",
+    "selectRange": "Sélectionner des dates",
     "clearSelection": "Effacer la sélection",
     "workingDays": "Jours ouvrés",
     "businessDays": "Jours ouvrés dans la plage sélectionnée",
@@ -322,8 +322,8 @@
     "description": "Configure ton plan en 2 étapes : d'abord ta localisation, puis tes jours et ta stratégie. Clique le bouton pour un tutoriel interactif.",
     "startButton": "Démarrer le tutoriel",
     "restartButton": "Relancer le tutoriel interactif",
-    "nextBtn": "Suivant →",
-    "prevBtn": "← Précédent",
+    "nextBtn": "Suivant",
+    "prevBtn": "Précédent",
     "doneBtn": "Terminé",
     "progressTextConnector": "sur",
     "steps": {
@@ -344,7 +344,9 @@
       "step2Title": "Étape {step} — Tes jours disponibles",
       "step2Description": "Indique combien de jours de congé tu as. C'est la base de tous les calculs.",
       "step3Title": "Étape {step} — Ta configuration",
-      "step3Description": "Choisis ta stratégie d'optimisation et configure les jours passés et les mois de report pour affiner ton plan."
+      "step3Description": "Choisis ta stratégie d'optimisation et configure les jours passés et les mois de report pour affiner ton plan.",
+      "step4Title": "Étape {step} — Exporter ton calendrier",
+      "step4Description": "Télécharge tes jours fériés et jours de congé planifiés en fichier .ics et importe-le dans Google Calendar, Apple Calendar, Outlook ou toute autre application de calendrier."
     }
   },
   "legend": {
@@ -359,13 +361,25 @@
     "manual": "Manuel",
     "custom": "Personnalisés"
   },
+  "calendarExport": {
+    "title": "Exporter le calendrier",
+    "description": "Télécharge tes jours fériés et jours de congé en fichier de calendrier.",
+    "includeHolidays": "Jours fériés",
+    "includePto": "Jours de congé",
+    "download": "Télécharger .ics",
+    "compatible": "Compatible avec Google Calendar, Apple Calendar, Outlook et toute app de calendrier.",
+    "calendarName": "Forever PTO",
+    "ptoDayLabel": "Jour de congé"
+  },
   "ptoStatus": {
     "autoAssigned": "Attribués automatiquement",
     "manual": "Manuel",
     "remaining": "Restants",
     "clickDays": "Clique sur les jours pour assigner/retirer",
     "allAssigned": "Tous les jours sont assignés !",
-    "resetManual": "Réinitialiser les modifications manuelles"
+    "resetManual": "Réinitialiser les modifications manuelles",
+    "usedDays": "{used} / {total} jours utilisés · {pct}%",
+    "remainingDays": "{remaining} restants · {pct}%"
   },
   "contact": {
     "title": "Nous contacter",
@@ -450,7 +464,7 @@
       "search": "Rechercher des stratégies...",
       "hide": "Masquer",
       "expand": "Déplier",
-      "strategyDetails": "détails de la stratégie",
+      "strategyDetails": "détails",
       "grouped": {
         "label": "Groupée",
         "description": "Priorise les longues vacances continues",
@@ -520,6 +534,11 @@
     "step3": {
       "titleStart": "Ta ",
       "titleEmphasis": "configuration",
+      "badge": "étape {step}"
+    },
+    "step4": {
+      "titleStart": "Ton ",
+      "titleEmphasis": "export",
       "badge": "étape {step}"
     },
     "steps": "Étapes"
@@ -732,7 +751,7 @@
     "status": "Statut"
   },
   "workdayCounterModal": {
-    "selectDateRange": "Sélectionner une période"
+    "selectDateRange": "Sélectionner des dates"
   },
   "command": {
     "commandPalette": "Palette de commandes",
@@ -945,7 +964,7 @@
         "missedBridge": "Tu demandes le lundi après un férié et personne ne te prévient.",
         "daysRunOut": "Tu découvres en septembre qu'il ne reste plus de jours.",
         "colleagueConflict": "Un collègue réserve ta semaine en premier. Encore.",
-        "unusedDays": "Tu finis décembre avec 4 jours non utilisés."
+        "unusedDays": "Tu finis l'année avec 4 jours non utilisés."
       },
       "withTitle": "😎 Avec Forever PTO",
       "withItems": {

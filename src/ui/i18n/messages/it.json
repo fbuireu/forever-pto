@@ -206,7 +206,7 @@
     "title": "Contatore giorni lavorativi",
     "tooltip": "Conta i giorni lavorativi tra due date, escludendo automaticamente fine settimana e festivi. Utile per la pianificazione di progetti e il calcolo delle scadenze.",
     "tooltipLabel": "Maggiori informazioni sul contatore",
-    "selectRange": "Seleziona intervallo di date",
+    "selectRange": "Seleziona date",
     "clearSelection": "Cancella selezione",
     "workingDays": "Giorni lavorativi",
     "businessDays": "Giorni lavorativi nell'intervallo selezionato",
@@ -322,8 +322,8 @@
     "description": "Configura il tuo piano in 2 passi: prima la tua posizione, poi i tuoi giorni e la strategia. Clicca il pulsante per un tutorial interattivo.",
     "restartButton": "Riavvia Tutorial Interattivo",
     "startButton": "Inizia Tutorial",
-    "nextBtn": "Avanti →",
-    "prevBtn": "← Indietro",
+    "nextBtn": "Avanti",
+    "prevBtn": "Indietro",
     "doneBtn": "Fatto",
     "progressTextConnector": "di",
     "steps": {
@@ -344,7 +344,9 @@
       "step2Title": "Passo {step} — I tuoi giorni disponibili",
       "step2Description": "Indica quanti giorni di ferie hai. Questa è la base per tutti i calcoli.",
       "step3Title": "Passo {step} — La tua configurazione",
-      "step3Description": "Scegli la tua strategia di ottimizzazione e configura i giorni passati e i mesi di riporto per affinare il tuo piano."
+      "step3Description": "Scegli la tua strategia di ottimizzazione e configura i giorni passati e i mesi di riporto per affinare il tuo piano.",
+      "step4Title": "Passo {step} — Esporta il tuo calendario",
+      "step4Description": "Scarica i tuoi giorni festivi e i giorni di ferie pianificati come file .ics e importalo in Google Calendar, Apple Calendar, Outlook o qualsiasi altra app di calendario."
     }
   },
   "legend": {
@@ -359,13 +361,25 @@
     "manual": "Manuale",
     "custom": "Personalizzato"
   },
+  "calendarExport": {
+    "title": "Esporta calendario",
+    "description": "Scarica i tuoi festivi e giorni di ferie come file di calendario.",
+    "includeHolidays": "Festivi",
+    "includePto": "Giorni di ferie",
+    "download": "Scarica .ics",
+    "compatible": "Compatibile con Google Calendar, Apple Calendar, Outlook e qualsiasi app di calendario.",
+    "calendarName": "Forever PTO",
+    "ptoDayLabel": "Giorno di ferie"
+  },
   "ptoStatus": {
     "autoAssigned": "Auto-assegnati",
     "manual": "Manuale",
     "remaining": "Rimanenti",
     "clickDays": "Clicca i giorni per assegnare/rimuovere",
     "allAssigned": "Tutti i giorni assegnati!",
-    "resetManual": "Ripristina Modifiche Manuali"
+    "resetManual": "Ripristina Modifiche Manuali",
+    "usedDays": "{used} / {total} giorni usati · {pct}%",
+    "remainingDays": "{remaining} rimanenti · {pct}%"
   },
   "contact": {
     "title": "Contattaci",
@@ -450,7 +464,7 @@
       "search": "Cerca strategie...",
       "hide": "Nascondi",
       "expand": "Espandi",
-      "strategyDetails": "dettagli strategia",
+      "strategyDetails": "dettagli",
       "grouped": {
         "label": "Raggruppata",
         "description": "Dà priorità a vacanze lunghe e continue",
@@ -520,6 +534,11 @@
     "step3": {
       "titleStart": "La tua ",
       "titleEmphasis": "configurazione",
+      "badge": "passo {step}"
+    },
+    "step4": {
+      "titleStart": "Il tuo ",
+      "titleEmphasis": "export",
       "badge": "passo {step}"
     },
     "steps": "Passaggi"
@@ -732,7 +751,7 @@
     "status": "Stato"
   },
   "workdayCounterModal": {
-    "selectDateRange": "Seleziona intervallo di date"
+    "selectDateRange": "Seleziona date"
   },
   "command": {
     "commandPalette": "Tavolozza dei Comandi",
@@ -945,7 +964,7 @@
         "missedBridge": "Chiedi il lunedì dopo il festivo e nessuno ti avvisa che era ridondante.",
         "daysRunOut": "Scopri a settembre che non hai più giorni.",
         "colleagueConflict": "Un collega prenota la tua settimana per primo. Di nuovo.",
-        "unusedDays": "Finisci dicembre con 4 giorni non utilizzati."
+        "unusedDays": "Finisci l'anno con 4 giorni non utilizzati."
       },
       "withTitle": "😎 Con Forever PTO",
       "withItems": {

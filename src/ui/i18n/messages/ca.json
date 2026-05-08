@@ -206,7 +206,7 @@
     "title": "Comptador de dies laborables",
     "tooltip": "Compta dies laborables entre dues dates, excloent automàticament caps de setmana i festius. Útil per planificació de projectes i càlcul de terminis.",
     "tooltipLabel": "Més informació sobre el comptador",
-    "selectRange": "Seleccionar rang de dates",
+    "selectRange": "Seleccionar dates",
     "clearSelection": "Netejar selecció",
     "workingDays": "Dies laborables",
     "businessDays": "Dies hàbils en el rang seleccionat",
@@ -322,8 +322,8 @@
     "description": "Configura el teu pla en 2 passos: primer la teva ubicació, després els teus dies i estratègia. Prem el botó per a un tutorial interactiu.",
     "restartButton": "Reiniciar Tutorial Interactiu",
     "startButton": "Iniciar Tutorial",
-    "nextBtn": "Següent →",
-    "prevBtn": "← Anterior",
+    "nextBtn": "Següent",
+    "prevBtn": "Anterior",
     "doneBtn": "Fet",
     "progressTextConnector": "de",
     "steps": {
@@ -344,7 +344,9 @@
       "step2Title": "Pas {step} — Els teus dies disponibles",
       "step2Description": "Indica quants dies de vacances tens. Aquesta és la base per a tots els càlculs.",
       "step3Title": "Pas {step} — La teva configuració",
-      "step3Description": "Tria la teva estratègia d'optimització i configura els dies passats i els mesos de trasllat per ajustar el teu pla."
+      "step3Description": "Tria la teva estratègia d'optimització i configura els dies passats i els mesos de trasllat per ajustar el teu pla.",
+      "step4Title": "Pas {step} — Exporta el teu calendari",
+      "step4Description": "Descarrega els teus festius i dies de PTO planificats com a fitxer .ics i importa'l a Google Calendar, Apple Calendar, Outlook o qualsevol altra app de calendari."
     }
   },
   "legend": {
@@ -359,13 +361,25 @@
     "manual": "Manual",
     "custom": "Personalitzat"
   },
+  "calendarExport": {
+    "title": "Exportar calendari",
+    "description": "Descarrega els teus festius i dies de PTO com a fitxer de calendari.",
+    "includeHolidays": "Festius",
+    "includePto": "Dies de PTO",
+    "download": "Descarregar .ics",
+    "compatible": "Compatible amb Google Calendar, Apple Calendar, Outlook i qualsevol app de calendari.",
+    "calendarName": "Forever PTO",
+    "ptoDayLabel": "Dia de PTO"
+  },
   "ptoStatus": {
     "autoAssigned": "Auto-assignats",
     "manual": "Manual",
     "remaining": "Restants",
     "clickDays": "Clica els dies per assignar/treure",
     "allAssigned": "Tots els dies assignats!",
-    "resetManual": "Restablir Canvis Manuals"
+    "resetManual": "Restablir Canvis Manuals",
+    "usedDays": "{used} / {total} dies usats · {pct}%",
+    "remainingDays": "{remaining} restants · {pct}%"
   },
   "contact": {
     "title": "Contacta'ns",
@@ -450,7 +464,7 @@
       "search": "Cercar estratègies...",
       "hide": "Amagar",
       "expand": "Expandir",
-      "strategyDetails": "detalls d'estratègia",
+      "strategyDetails": "detalls",
       "grouped": {
         "label": "Agrupada",
         "description": "Prioritza vacances llargues i contínues",
@@ -520,6 +534,11 @@
     "step3": {
       "titleStart": "La teva ",
       "titleEmphasis": "configuració",
+      "badge": "pas {step}"
+    },
+    "step4": {
+      "titleStart": "La teva ",
+      "titleEmphasis": "exportació",
       "badge": "pas {step}"
     },
     "steps": "Passos"
@@ -732,7 +751,7 @@
     "status": "Estat"
   },
   "workdayCounterModal": {
-    "selectDateRange": "Seleccionar rang de dates"
+    "selectDateRange": "Seleccionar dates"
   },
   "command": {
     "commandPalette": "Paleta de Comandes",
@@ -945,7 +964,7 @@
         "missedBridge": "Demanes el dilluns després del festiu i ningú t'avisa que era redundant.",
         "daysRunOut": "T'assabentes al setembre que ja no queden dies.",
         "colleagueConflict": "Un company demana la teva setmana primer. Una altra vegada.",
-        "unusedDays": "Acabes el desembre amb 4 dies sense fer servir."
+        "unusedDays": "Acabes l'any amb 4 dies sense fer servir."
       },
       "withTitle": "😎 Amb Forever PTO",
       "withItems": {

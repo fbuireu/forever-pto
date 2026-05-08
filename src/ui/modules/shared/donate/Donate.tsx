@@ -374,11 +374,9 @@ export const Donate = () => {
   return (
     <Popover open={isOpen} onOpenChange={setDonatePopoverOpen}>
       <div className='donate-trigger fixed xl:bottom-4 bottom-30 w-full right-0 md:w-auto md:right-4 z-50'>
-        <div className='donate-rainbow relative z-0 overflow-hidden p-0.5 flex items-center justify-center rounded-md hover:scale-102 transition duration-200 active:scale-100'>
+        <div className='donate-brutal'>
           <PopoverTrigger asChild>
-            <Button className='rounded-[8px] w-full h-full py-3 shadow-none hover:shadow-none active:shadow-none hover:translate-x-0 hover:translate-y-0 active:translate-x-0 active:translate-y-0 hover:bg-primary'>
-              {tDonate('donateAndUnblock')}
-            </Button>
+            <Button className='donate-brutal-btn w-full py-3'>{tDonate('donateAndUnblock')}</Button>
           </PopoverTrigger>
         </div>
       </div>

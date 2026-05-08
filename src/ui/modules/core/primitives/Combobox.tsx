@@ -64,7 +64,7 @@ export const Combobox = ({
             {selectedOption ? (
               <div className='flex items-center gap-2 min-w-0 flex-1'>
                 {hasFlag(selectedOption) && <span className='shrink-0'>{selectedOption.flag}</span>}
-                <span className='truncate'>{selectedOption.label}</span>
+                <span className='truncate capitalize'>{selectedOption.label}</span>
               </div>
             ) : (
               placeholder
@@ -83,7 +83,7 @@ export const Combobox = ({
                 <CommandItem key={option.value} value={option.label} onSelect={handleSelect}>
                   <div className='flex items-center gap-2'>
                     {hasFlag(option) && <span>{option.flag}</span>}
-                    <span>{option.label}</span>
+                    <span className='capitalize'>{option.label}</span>
                   </div>
                   <Check
                     className={cn(

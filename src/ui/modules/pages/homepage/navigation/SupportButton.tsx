@@ -9,10 +9,10 @@ interface SupportButtonProps {
 }
 
 export function SupportButton({ label, className }: Readonly<SupportButtonProps>) {
-  const setDonatePopoverOpen = usePremiumStore((s) => s.setDonatePopoverOpen);
+  const openDonatePopover = usePremiumStore((s) => s.openDonatePopover);
 
   return (
-    <Button className={className} variant='outline' onClick={() => setDonatePopoverOpen(true)}>
+    <Button className={className} variant='outline' onClick={openDonatePopover}>
       {label}
     </Button>
   );

@@ -206,7 +206,7 @@
     "title": "Arbeitstage-Zähler",
     "tooltip": "Zähle Arbeitstage zwischen zwei Daten, Wochenenden und Feiertage werden automatisch ausgeschlossen. Nützlich für Projektplanung und Terminberechnungen.",
     "tooltipLabel": "Mehr Informationen zum Arbeitstage-Zähler",
-    "selectRange": "Datumsbereich auswählen",
+    "selectRange": "Daten auswählen",
     "clearSelection": "Auswahl löschen",
     "workingDays": "Arbeitstage",
     "businessDays": "Geschäftstage im ausgewählten Zeitraum",
@@ -322,8 +322,8 @@
     "description": "Richte deinen Plan in 2 Schritten ein: zuerst deinen Standort, dann deine Tage und Strategie. Klicke den Button für ein interaktives Tutorial.",
     "startButton": "Tutorial starten",
     "restartButton": "Interaktives Tutorial neu starten",
-    "nextBtn": "Weiter →",
-    "prevBtn": "← Zurück",
+    "nextBtn": "Weiter",
+    "prevBtn": "Zurück",
     "doneBtn": "Fertig",
     "progressTextConnector": "von",
     "steps": {
@@ -344,7 +344,9 @@
       "step2Title": "Schritt {step} — Deine verfügbaren Tage",
       "step2Description": "Gib an, wie viele Urlaubstage du hast. Dies ist die Grundlage für alle Berechnungen.",
       "step3Title": "Schritt {step} — Deine Konfiguration",
-      "step3Description": "Wähle deine Optimierungsstrategie und konfiguriere vergangene Tage und Übertragsmonate, um deinen Plan zu verfeinern."
+      "step3Description": "Wähle deine Optimierungsstrategie und konfiguriere vergangene Tage und Übertragsmonate, um deinen Plan zu verfeinern.",
+      "step4Title": "Schritt {step} — Kalender exportieren",
+      "step4Description": "Lade deine Feiertage und geplanten PTO-Tage als .ics-Datei herunter und importiere sie in Google Calendar, Apple Calendar, Outlook oder eine andere Kalender-App."
     }
   },
   "legend": {
@@ -359,13 +361,25 @@
     "manual": "Manuell",
     "custom": "Eigene"
   },
+  "calendarExport": {
+    "title": "Kalender exportieren",
+    "description": "Lade deine Feiertage und PTO-Tage als Kalenderdatei herunter.",
+    "includeHolidays": "Feiertage",
+    "includePto": "PTO-Tage",
+    "download": "Als .ics herunterladen",
+    "compatible": "Kompatibel mit Google Calendar, Apple Calendar, Outlook und jeder Kalender-App.",
+    "calendarName": "Forever PTO",
+    "ptoDayLabel": "PTO-Tag"
+  },
   "ptoStatus": {
     "autoAssigned": "Automatisch zugewiesen",
     "manual": "Manuell",
     "remaining": "Verbleibend",
     "clickDays": "Klicke auf Tage zum Zuweisen/Entfernen",
     "allAssigned": "Alle Tage zugewiesen!",
-    "resetManual": "Manuelle Änderungen zurücksetzen"
+    "resetManual": "Manuelle Änderungen zurücksetzen",
+    "usedDays": "{used} / {total} Tage genutzt · {pct}%",
+    "remainingDays": "{remaining} verbleibend · {pct}%"
   },
   "contact": {
     "title": "Kontakt",
@@ -450,7 +464,7 @@
       "search": "Strategien suchen...",
       "hide": "Ausblenden",
       "expand": "Erweitern",
-      "strategyDetails": "Strategiedetails",
+      "strategyDetails": "details",
       "grouped": {
         "label": "Gruppiert",
         "description": "Priorisiert lange, zusammenhängende Urlaube",
@@ -520,6 +534,11 @@
     "step3": {
       "titleStart": "Deine ",
       "titleEmphasis": "Konfiguration",
+      "badge": "schritt {step}"
+    },
+    "step4": {
+      "titleStart": "Dein ",
+      "titleEmphasis": "Export",
       "badge": "schritt {step}"
     },
     "steps": "Schritte"
@@ -732,7 +751,7 @@
     "status": "Status"
   },
   "workdayCounterModal": {
-    "selectDateRange": "Datumsbereich auswählen"
+    "selectDateRange": "Daten auswählen"
   },
   "command": {
     "commandPalette": "Befehlspalette",
@@ -945,7 +964,7 @@
         "missedBridge": "Du beantragst den Montag nach einem Feiertag und niemand warnt dich.",
         "daysRunOut": "Du merkst im September, dass keine Tage mehr übrig sind.",
         "colleagueConflict": "Ein Kollege bucht deine Woche zuerst. Schon wieder.",
-        "unusedDays": "Du beendest den Dezember mit 4 ungenutzten Tagen."
+        "unusedDays": "Du beendest das Jahr mit 4 ungenutzten Tagen."
       },
       "withTitle": "😎 Mit Forever PTO",
       "withItems": {
