@@ -504,17 +504,35 @@ export const useHolidaysStore = create<HolidaysStore>()(
             ? {
                 ...state.suggestion,
                 days: state.suggestion.days.map((d) => d.toISOString()),
+                bridges: state.suggestion.bridges?.map((b) => ({
+                  ...b,
+                  startDate: b.startDate.toISOString(),
+                  endDate: b.endDate.toISOString(),
+                  ptoDays: b.ptoDays.map((d) => d.toISOString()),
+                })),
               }
             : null,
           maxAlternatives: state.maxAlternatives,
           alternatives: state.alternatives.map((alt) => ({
             ...alt,
             days: alt.days.map((d) => d.toISOString()),
+            bridges: alt.bridges?.map((b) => ({
+              ...b,
+              startDate: b.startDate.toISOString(),
+              endDate: b.endDate.toISOString(),
+              ptoDays: b.ptoDays.map((d) => d.toISOString()),
+            })),
           })),
           currentSelection: state.currentSelection
             ? {
                 ...state.currentSelection,
                 days: state.currentSelection.days.map((d) => d.toISOString()),
+                bridges: state.currentSelection.bridges?.map((b) => ({
+                  ...b,
+                  startDate: b.startDate.toISOString(),
+                  endDate: b.endDate.toISOString(),
+                  ptoDays: b.ptoDays.map((d) => d.toISOString()),
+                })),
               }
             : null,
           manuallySelectedDays: state.manuallySelectedDays.map((d) => d.toISOString()),
@@ -531,6 +549,20 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
 
           if (state) {
+            const reviveSuggestion = (s: Suggestion | null): Suggestion | null => {
+              if (!s) return null;
+              return {
+                ...s,
+                days: s.days.map(ensureDate),
+                bridges: s.bridges?.map((b) => ({
+                  ...b,
+                  startDate: ensureDate(b.startDate),
+                  endDate: ensureDate(b.endDate),
+                  ptoDays: b.ptoDays.map(ensureDate),
+                })),
+              };
+            };
+
             if (state.holidays) {
               state.holidays = state.holidays.map((h) => ({
                 ...h,
@@ -538,25 +570,16 @@ export const useHolidaysStore = create<HolidaysStore>()(
               }));
             }
 
-            if (state.suggestion?.days) {
-              state.suggestion = {
-                ...state.suggestion,
-                days: state.suggestion.days.map(ensureDate),
-              };
+            if (state.suggestion) {
+              state.suggestion = reviveSuggestion(state.suggestion);
             }
 
             if (state.alternatives) {
-              state.alternatives = state.alternatives.map((alt) => ({
-                ...alt,
-                days: alt.days.map(ensureDate),
-              }));
+              state.alternatives = state.alternatives.map((alt) => reviveSuggestion(alt) as Suggestion);
             }
 
             if (state.currentSelection) {
-              state.currentSelection = {
-                ...state.currentSelection,
-                days: state.currentSelection.days.map(ensureDate),
-              };
+              state.currentSelection = reviveSuggestion(state.currentSelection);
             }
 
             if (state.manuallySelectedDays) {
