@@ -18,8 +18,8 @@
   }
 
   .driver-popover {
-    background-color: var(--popover);
-    color: var(--popover-foreground);
+    background-color: var(--card);
+    color: var(--card-foreground);
     border: 3px solid var(--frame);
     border-radius: 14px;
     box-shadow: var(--shadow-brutal-xl);
@@ -29,15 +29,12 @@
     animation: popover-fade-in 0.2s ease-out;
   }
 
-  .driver-popover-arrow {
-    display: none;
-  }
-
+  .driver-popover-arrow,
   .driver-popover-arrow-side-left,
   .driver-popover-arrow-side-right,
   .driver-popover-arrow-side-top,
   .driver-popover-arrow-side-bottom {
-    border-color: var(--popover);
+    display: none;
   }
 
   .driver-popover-title {
@@ -45,29 +42,37 @@
     font-weight: 900;
     line-height: 1;
     letter-spacing: -0.03em;
-    color: var(--popover-foreground);
-    margin: 0 0 0.75rem 0;
+    color: var(--card-foreground);
+    margin: 0;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid color-mix(in srgb, var(--frame) 18%, transparent);
   }
 
   .driver-popover-description {
     font-size: 0.875rem;
-    line-height: 1.6;
+    line-height: 1.5;
     color: var(--muted-foreground);
-    margin: 0 0 1rem 0;
+    margin: 1rem 0 0 0;
   }
 
   .driver-popover-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 1rem;
     gap: 0.5rem;
+    margin-top: 1rem;
   }
 
   .driver-popover-progress-text {
     font-size: 0.75rem;
     color: var(--muted-foreground);
     font-weight: 500;
+  }
+
+  .driver-popover-navigation-btns {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .driver-popover-navigation-btns button {
@@ -81,40 +86,44 @@
     font-weight: 900;
     letter-spacing: 0.01em;
     transition:
+      color 75ms linear,
       background-color 75ms linear,
+      border-color 75ms linear,
       box-shadow 75ms linear,
       transform 75ms linear;
     height: 2.75rem;
     padding: 0 1.25rem;
     cursor: pointer;
     outline: none;
+    margin: 0;
   }
 
   .driver-popover-navigation-btns button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    box-shadow: none !important;
+    transform: none !important;
   }
 
   .driver-popover-next-btn {
     background-color: var(--primary) !important;
     color: var(--primary-foreground) !important;
     box-shadow: var(--shadow-brutal-btn) !important;
-    margin-left: 0.5rem;
   }
 
-  .driver-popover-next-btn:hover {
+  .driver-popover-next-btn:not(:disabled):hover {
     background-color: color-mix(in srgb, var(--primary) 90%, transparent) !important;
     box-shadow: var(--shadow-brutal-btn-hover) !important;
     transform: translate(-2px, -2px) !important;
   }
 
-  .driver-popover-next-btn:active {
+  .driver-popover-next-btn:not(:disabled):active {
     box-shadow: var(--shadow-brutal-btn-active) !important;
     transform: translate(2px, 2px) !important;
   }
 
   .driver-popover-next-btn:focus-visible {
-    outline: 2px solid var(--ring);
+    outline: 3px solid var(--ring);
     outline-offset: 2px;
   }
 
@@ -124,13 +133,13 @@
     box-shadow: var(--shadow-brutal-btn) !important;
   }
 
-  .driver-popover-done-btn:hover {
+  .driver-popover-done-btn:not(:disabled):hover {
     background-color: #15803d !important;
     box-shadow: var(--shadow-brutal-btn-hover) !important;
     transform: translate(-2px, -2px) !important;
   }
 
-  .driver-popover-done-btn:active {
+  .driver-popover-done-btn:not(:disabled):active {
     box-shadow: var(--shadow-brutal-btn-active) !important;
     transform: translate(2px, 2px) !important;
   }
@@ -141,19 +150,19 @@
     box-shadow: var(--shadow-brutal-btn) !important;
   }
 
-  .driver-popover-prev-btn:hover {
+  .driver-popover-prev-btn:not(:disabled):hover {
     background-color: var(--surface-panel-alt) !important;
     box-shadow: var(--shadow-brutal-btn-hover) !important;
     transform: translate(-2px, -2px) !important;
   }
 
-  .driver-popover-prev-btn:active {
+  .driver-popover-prev-btn:not(:disabled):active {
     box-shadow: var(--shadow-brutal-btn-active) !important;
     transform: translate(2px, 2px) !important;
   }
 
   .driver-popover-prev-btn:focus-visible {
-    outline: 2px solid var(--ring);
+    outline: 3px solid var(--ring);
     outline-offset: 2px;
   }
 
@@ -169,6 +178,8 @@
     border: 3px solid var(--frame);
     box-shadow: var(--shadow-brutal-xs);
     opacity: 1;
+    font-size: 0;
+    line-height: 0;
     transition:
       transform 75ms linear,
       box-shadow 75ms linear;
@@ -187,7 +198,7 @@
   }
 
   .driver-popover-close-btn:focus-visible {
-    outline: 2px solid var(--ring);
+    outline: 3px solid var(--ring);
     outline-offset: 2px;
   }
 

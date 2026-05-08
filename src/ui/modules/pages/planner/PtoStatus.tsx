@@ -7,7 +7,6 @@ import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Progress, ProgressTrack } from '@ui/modules/core/primitives/Progress';
 import { cn } from '@ui/utils/utils';
-import { MousePointerClick } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
@@ -74,16 +73,14 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
               <SlidingNumber
                 number={remaining}
                 className={cn(
-                  'text-xl font-display font-black',
+                  'font-display font-black',
                   remaining > 0 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
                 )}
               />
             </div>
-            {remaining > 0 ? (
-              <MousePointerClick className='h-3 w-3 text-muted-foreground' />
-            ) : !hasManualChanges ? (
+            {remaining === 0 && !hasManualChanges && (
               <span className='text-[10px] text-green-700 dark:text-green-400 font-medium'>✓ {t('allAssigned')}</span>
-            ) : null}
+            )}
           </div>
         </div>
         <div className='flex items-center gap-3 h-full'>
@@ -106,7 +103,7 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
               indicatorClassName='rounded-full border-r-[3px] border-[var(--frame)]'
               transition={{ type: 'tween', duration: 0.15, ease: 'easeOut' }}
             />
-            <span className='pointer-events-none absolute inset-0 grid place-items-center font-mono text-[11px] font-bold uppercase text-foreground'>
+            <span className='pointer-events-none absolute inset-0 grid place-items-center font-mono text-[11px] font-bold uppercase text-white mix-blend-difference'>
               {t('usedDays', { used: usedDays, total: ptoDays, pct: usedPct })}
             </span>
           </div>
@@ -118,7 +115,7 @@ export const PtoStatus = ({ currentSelection }: PtoStatusProps) => {
               indicatorClassName='rounded-full border-r-[3px] border-[var(--frame)] bg-[var(--color-brand-teal)]'
               transition={{ type: 'tween', duration: 0.15, ease: 'easeOut' }}
             />
-            <span className='pointer-events-none absolute inset-0 grid place-items-center font-mono text-[11px] font-bold uppercase text-foreground'>
+            <span className='pointer-events-none absolute inset-0 grid place-items-center font-mono text-[11px] font-bold uppercase text-white mix-blend-difference'>
               {t('remainingDays', { remaining, pct: remainingPct })}
             </span>
           </div>

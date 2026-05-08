@@ -60,7 +60,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarGroup>
+          <SidebarGroup className='rounded-[12px] bg-[var(--surface-panel-soft)]'>
             <SidebarGroupLabel role='heading' aria-level={2}>
               {t('configuration')}
             </SidebarGroupLabel>
@@ -152,7 +152,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
             </SidebarMenu>
           </SidebarGroup>
 
-          <SidebarGroup>
+          <SidebarGroup className='rounded-[12px] bg-[var(--surface-panel-soft)]'>
             <SidebarGroupLabel role='heading' aria-level={2}>
               {t('tools')}
             </SidebarGroupLabel>

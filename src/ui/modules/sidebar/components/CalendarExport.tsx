@@ -3,7 +3,6 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { downloadIcs, generateIcs } from '@infrastructure/services/export/generateIcs';
-import type { GeneratePdfOptions } from '@infrastructure/services/export/generatePdf';
 import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { Download, FileText } from 'lucide-react';
@@ -46,25 +45,34 @@ export const CalendarExport = () => {
 
   const handleDownloadPdf = () => {
     startPdfTransition(async () => {
-      const { generatePdfBlob, downloadPdf } = await import('@infrastructure/services/export/generatePdf');
+      const response = await fetch('/api/pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          year: Number(year),
+          holidays: includeHolidays ? (holidays ?? []) : [],
+          ptoDays: includePto ? ptoDays : [],
+          includeHolidays,
+          includePto,
+          locale,
+          labels: {
+            holidays: t('pdf.holidays'),
+            vacationDays: t('pdf.vacationDays'),
+            dayOff: t('pdf.dayOff'),
+            generatedOn: t('pdf.generatedOn'),
+          },
+        }),
+      });
 
-      const options: GeneratePdfOptions = {
-        year: Number(year),
-        holidays: includeHolidays ? (holidays ?? []) : [],
-        ptoDays: includePto ? ptoDays : [],
-        includeHolidays,
-        includePto,
-        locale,
-        labels: {
-          holidays: t('pdf.holidays'),
-          vacationDays: t('pdf.vacationDays'),
-          dayOff: t('pdf.dayOff'),
-          generatedOn: t('pdf.generatedOn'),
-        },
-      };
-
-      const blob = await generatePdfBlob(options);
-      downloadPdf(blob, `forever-pto-${year}.pdf`);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `forever-pto-${year}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     });
   };
 

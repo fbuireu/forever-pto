@@ -203,7 +203,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
                   type='button'
                   variant='outline'
                   onClick={() => setContactOpen(true)}
-                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] [filter:drop-shadow(3px_3px_0_var(--frame))] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:[filter:drop-shadow(4px_4px_0_var(--frame))] active:translate-x-px active:translate-y-px active:[filter:drop-shadow(1px_1px_0_var(--frame))]'
+                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[3px_3px_0_0_var(--frame)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)]'
                 >
                   <span className='shrink-0 w-6 h-6 bg-[var(--color-brand-purple)] text-white border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
                     @
@@ -213,7 +213,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
                 <Button
                   variant='outline'
                   asChild
-                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] [filter:drop-shadow(3px_3px_0_var(--frame))] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:[filter:drop-shadow(4px_4px_0_var(--frame))] active:translate-x-px active:translate-y-px active:[filter:drop-shadow(1px_1px_0_var(--frame))]'
+                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[3px_3px_0_0_var(--frame)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)]'
                 >
                   <a href={CHANGELOG_URL} target='_blank' rel='noopener noreferrer'>
                     <span className='shrink-0 w-6 h-6 bg-[var(--color-brand-teal)] border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
@@ -225,7 +225,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
                 <Button
                   variant='outline'
                   asChild
-                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] [filter:drop-shadow(3px_3px_0_var(--frame))] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:[filter:drop-shadow(4px_4px_0_var(--frame))] active:translate-x-px active:translate-y-px active:[filter:drop-shadow(1px_1px_0_var(--frame))]'
+                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[3px_3px_0_0_var(--frame)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)]'
                 >
                   <a href={SUPPORT_URL} target='_blank' rel='noopener noreferrer'>
                     <span className='shrink-0 w-6 h-6 bg-[var(--color-brand-orange)] text-white border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>

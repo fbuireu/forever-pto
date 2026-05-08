@@ -1,6 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import type { Suggestion } from '@infrastructure/services/calendar/types';
-import { Document, Page, StyleSheet, Text, View, pdf } from '@react-pdf/renderer';
+import { Document, Page, pdf, StyleSheet, Text, View } from '@react-pdf/renderer';
 
 const C = {
   orange: '#f97316',
@@ -153,7 +152,7 @@ function groupByMonth<T>(items: T[], getDate: (item: T) => Date, locale: string)
     const d = getDate(item);
     const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`;
     if (!map.has(key)) map.set(key, { month: fmtMonth(d, locale), items: [] });
-    map.get(key)!.items.push(item);
+    map.get(key)?.items.push(item);
   }
 
   return [...map.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([, g]) => g);
@@ -242,17 +241,6 @@ function HolidayDocument({ year, holidays, ptoDays, includeHolidays, includePto,
   );
 }
 
-export async function generatePdfBlob(options: GeneratePdfOptions): Promise<Blob> {
-  return pdf(<HolidayDocument {...options} />).toBlob();
-}
-
-export function downloadPdf(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+export async function generatePdfBuffer(options: GeneratePdfOptions): Promise<Buffer> {
+  return pdf(<HolidayDocument {...options} />).toBuffer();
 }

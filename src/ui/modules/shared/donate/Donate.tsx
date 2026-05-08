@@ -380,7 +380,7 @@ export const Donate = () => {
           </PopoverTrigger>
         </div>
       </div>
-      <PopoverContent className='w-96'>
+      <PopoverContent className='w-96 bg-card text-card-foreground'>
         <div className='grid gap-4'>
           <div className='space-y-2'>
             <h4 className='leading-none font-medium'>{tDonate('supportAndUnblock')}</h4>

@@ -51,7 +51,7 @@ export const HowItWorks = async () => {
             key={num}
             className={cn(
               brutCard,
-              'px-7 pt-14 pb-7 relative transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:[filter:drop-shadow(11px_11px_0_var(--frame))]'
+              'px-7 pt-14 pb-7 relative transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[11px_11px_0_0_var(--frame)]'
             )}
           >
             <div
