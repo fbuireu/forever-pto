@@ -342,7 +342,9 @@
       "step1Title": "Passo {step} — Il tuo contesto",
       "step1Description": "Seleziona il tuo paese, regione e l'anno che vuoi pianificare. Questo configura il tuo calendario delle festività per trovare i migliori ponti.",
       "step2Title": "Passo {step} — I tuoi giorni disponibili",
-      "step2Description": "Indica quanti giorni di ferie hai e scegli la tua strategia di ottimizzazione. La strategia determina come raggruppiamo i tuoi giorni liberi."
+      "step2Description": "Indica quanti giorni di ferie hai. Questa è la base per tutti i calcoli.",
+      "step3Title": "Passo {step} — La tua configurazione",
+      "step3Description": "Scegli la tua strategia di ottimizzazione e configura i giorni passati e i mesi di riporto per affinare il tuo piano."
     }
   },
   "legend": {
@@ -513,6 +515,11 @@
     "step2": {
       "titleStart": "I tuoi ",
       "titleEmphasis": "giorni",
+      "badge": "passo {step}"
+    },
+    "step3": {
+      "titleStart": "La tua ",
+      "titleEmphasis": "configurazione",
       "badge": "passo {step}"
     },
     "steps": "Passaggi"

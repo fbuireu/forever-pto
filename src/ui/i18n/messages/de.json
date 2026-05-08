@@ -342,7 +342,9 @@
       "step1Title": "Schritt {step} — Dein Kontext",
       "step1Description": "Wähle dein Land, deine Region und das Jahr, für das du planen möchtest. Dies konfiguriert deinen Feiertagskalender, damit wir die besten Brückentage finden.",
       "step2Title": "Schritt {step} — Deine verfügbaren Tage",
-      "step2Description": "Gib an, wie viele Urlaubstage du hast, und wähle deine Optimierungsstrategie. Die Strategie bestimmt, wie wir deine freien Tage gruppieren."
+      "step2Description": "Gib an, wie viele Urlaubstage du hast. Dies ist die Grundlage für alle Berechnungen.",
+      "step3Title": "Schritt {step} — Deine Konfiguration",
+      "step3Description": "Wähle deine Optimierungsstrategie und konfiguriere vergangene Tage und Übertragsmonate, um deinen Plan zu verfeinern."
     }
   },
   "legend": {
@@ -513,6 +515,11 @@
     "step2": {
       "titleStart": "Deine ",
       "titleEmphasis": "Tage",
+      "badge": "schritt {step}"
+    },
+    "step3": {
+      "titleStart": "Deine ",
+      "titleEmphasis": "Konfiguration",
       "badge": "schritt {step}"
     },
     "steps": "Schritte"

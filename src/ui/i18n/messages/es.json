@@ -342,7 +342,9 @@
       "step1Title": "Paso {step} — Tu contexto",
       "step1Description": "Selecciona tu país, región y el año que quieres planificar. Esto configura tu calendario de festivos para encontrar los mejores puentes.",
       "step2Title": "Paso {step} — Días disponibles",
-      "step2Description": "Indica cuántos días de vacaciones tienes y elige tu estrategia de optimización. La estrategia determina cómo agrupamos tus días libres."
+      "step2Description": "Indica cuántos días de vacaciones tienes. Esta es la base para todos los cálculos.",
+      "step3Title": "Paso {step} — Tu configuración",
+      "step3Description": "Elige tu estrategia de optimización y configura los días pasados y los meses de traslado para afinar tu plan."
     }
   },
   "legend": {
@@ -513,6 +515,11 @@
     "step2": {
       "titleStart": "Días ",
       "titleEmphasis": "disponibles",
+      "badge": "paso {step}"
+    },
+    "step3": {
+      "titleStart": "Tu ",
+      "titleEmphasis": "configuración",
       "badge": "paso {step}"
     },
     "steps": "Pasos"

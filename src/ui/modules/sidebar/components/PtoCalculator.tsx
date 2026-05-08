@@ -1,7 +1,7 @@
 'use client';
 
 import { useFiltersStore } from '@application/stores/filters';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/modules/core/animate/base/Tooltip';
+import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Plus } from '@ui/modules/core/animate/icons/Plus';
@@ -9,7 +9,7 @@ import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Combobox } from '@ui/modules/core/primitives/Combobox';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { getMonthNames } from '@ui/modules/pages/planner/utils/helpers';
-import { Calculator, InfoIcon } from 'lucide-react';
+import { Calculator } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
@@ -74,9 +74,7 @@ export const PtoCalculator = () => {
         <Calculator size={16} /> {t('title')}
         <TooltipProvider delayDuration={200}>
           <Tooltip>
-            <TooltipTrigger aria-label={t('tooltipLabel')} className='ml-auto cursor-help'>
-              <InfoIcon className='h-4 w-4 text-muted-foreground' aria-hidden='true' />
-            </TooltipTrigger>
+            <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
             <TooltipContent className='w-60 text-pretty'>{t('tooltip')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>

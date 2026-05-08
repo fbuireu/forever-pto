@@ -29,6 +29,8 @@ import { SidebarFooterButtons } from './components/SidebarFooterButtons';
 const Regions = dynamic(() => import('./components/Regions').then((m) => m.Regions));
 const Years = dynamic(() => import('./components/Years').then((m) => m.Years));
 const Strategy = dynamic(() => import('./components/Strategy').then((m) => m.Strategy));
+const AllowPastDays = dynamic(() => import('./components/AllowPastDays').then((m) => m.AllowPastDays));
+const CarryOverMonths = dynamic(() => import('./components/CarryOverMonths').then((m) => m.CarryOverMonths));
 const PtoCalculator = dynamic(() => import('./components/PtoCalculator').then((m) => m.PtoCalculator));
 const PtoSalaryCalculator = dynamic(() =>
   import('./components/PtoSalaryCalculator').then((m) => m.PtoSalaryCalculator)
@@ -110,7 +112,23 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                         </h3>
                         <div className='space-y-3'>
                           <PtoDays />
+                        </div>
+                      </div>
+
+                      <div data-tutorial='sidebar-step-3' className={STEP_CARD_CLASS}>
+                        <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
+                          <span>
+                            {t('step3.titleStart')}
+                            <em className='font-serif italic font-normal'>{t('step3.titleEmphasis')}</em>
+                          </span>
+                          <span className='ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]'>
+                            {t('step3.badge', { step: 3 })}
+                          </span>
+                        </h3>
+                        <div className='space-y-5'>
                           <Strategy />
+                          <AllowPastDays />
+                          <CarryOverMonths />
                         </div>
                       </div>
                     </div>

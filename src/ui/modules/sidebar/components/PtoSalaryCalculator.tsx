@@ -1,10 +1,10 @@
 'use client';
 
 import { usePremiumStore } from '@application/stores/premium';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/modules/core/animate/base/Tooltip';
+import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@ui/modules/core/primitives/InputGroup';
-import { Euro, InfoIcon } from 'lucide-react';
+import { Euro } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
@@ -77,9 +77,7 @@ export const PtoSalaryCalculator = () => {
         <Euro size={16} /> {t('title')}
         <TooltipProvider delayDuration={200}>
           <Tooltip>
-            <TooltipTrigger aria-label={t('tooltipLabel')} className='ml-auto cursor-help'>
-              <InfoIcon className='h-4 w-4 text-muted-foreground' aria-hidden='true' />
-            </TooltipTrigger>
+            <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
             <TooltipContent className='w-60 text-pretty'>{t('tooltip')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>

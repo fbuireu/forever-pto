@@ -3,11 +3,10 @@
 import type { CountryDTO } from '@application/dto/country/types';
 import { useFiltersStore } from '@application/stores/filters';
 import { useLocationStore } from '@application/stores/location';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/modules/core/animate/base/Tooltip';
+import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { MapPin } from '@ui/modules/core/animate/icons/MapPin';
 import { Combobox } from '@ui/modules/core/primitives/Combobox';
-import { InfoIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 
@@ -34,9 +33,7 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
           <MapPin size={16} /> {t('title')}
           <TooltipProvider delayDuration={200}>
             <Tooltip>
-              <TooltipTrigger aria-label={t('tooltipLabel')} className='ml-auto cursor-help'>
-                <InfoIcon className='h-4 w-4 text-muted-foreground' aria-hidden='true' />
-              </TooltipTrigger>
+              <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
               <TooltipContent className='w-50 text-pretty'>{t('tooltip')}</TooltipContent>
             </Tooltip>
           </TooltipProvider>

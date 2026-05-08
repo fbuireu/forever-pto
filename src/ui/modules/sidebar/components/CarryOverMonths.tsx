@@ -1,12 +1,11 @@
 'use client';
 
 import { useFiltersStore } from '@application/stores/filters';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/modules/core/animate/base/Tooltip';
+import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { SlidersHorizontal } from '@ui/modules/core/animate/icons/SlidersHorizontal';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Slider } from '@ui/modules/core/primitives/Slider';
-import { InfoIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { PremiumFeature } from '../../premium/PremiumFeature';
@@ -58,9 +57,7 @@ export const CarryOverMonths = () => {
           <SlidersHorizontal size={16} /> {t('title')}
           <TooltipProvider delayDuration={200}>
             <Tooltip>
-              <TooltipTrigger aria-label={t('tooltipLabel')} className='ml-auto cursor-help'>
-                <InfoIcon className='h-4 w-4 text-muted-foreground' aria-hidden='true' />
-              </TooltipTrigger>
+              <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
               <TooltipContent className='w-50 text-pretty'>{t('tooltip')}</TooltipContent>
             </Tooltip>
           </TooltipProvider>

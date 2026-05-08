@@ -60,7 +60,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
                 variant='default'
                 size='lg'
                 asChild
-                className='text-[var(--accent)] dark:text-primary-foreground shadow-[5px_5px_0_0_var(--accent)] hover:shadow-[7px_7px_0_0_var(--accent)] active:shadow-[1px_1px_0_0_var(--accent)]'
+                className='text-[var(--accent)] dark:text-primary-foreground [filter:none] hover:[filter:none] active:[filter:none] shadow-[5px_5px_0_0_var(--accent)] hover:shadow-[7px_7px_0_0_var(--accent)] active:shadow-[1px_1px_0_0_var(--accent)]'
               >
                 <Link href='/'>← {t('ctaPrimary')}</Link>
               </Button>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useHolidaysStore } from '@application/stores/holidays';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/modules/core/animate/base/Tooltip';
+import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Label } from '@ui/modules/core/primitives/Label';
@@ -12,7 +12,7 @@ import {
   calculateWorkdays,
 } from '@ui/modules/pages/planner/utils/helpers';
 import { differenceInCalendarDays, formatDate } from '@ui/utils/dates';
-import { CalendarDays, InfoIcon } from 'lucide-react';
+import { CalendarDays } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -60,9 +60,7 @@ export const WorkdayCounter = () => {
         <CalendarDays size={16} /> {t('title')}
         <TooltipProvider delayDuration={200}>
           <Tooltip>
-            <TooltipTrigger aria-label={t('tooltipLabel')} className='ml-auto cursor-help'>
-              <InfoIcon className='h-4 w-4 text-muted-foreground' aria-hidden='true' />
-            </TooltipTrigger>
+            <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
             <TooltipContent className='w-60 text-pretty'>{t('tooltip')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>

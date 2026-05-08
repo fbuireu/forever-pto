@@ -181,7 +181,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
                 variant='default'
                 size='lg'
                 onClick={reset}
-                className='shadow-[5px_5px_0_0_var(--accent)] hover:shadow-[7px_7px_0_0_var(--accent)] active:shadow-[1px_1px_0_0_var(--accent)]'
+                className='[filter:none] hover:[filter:none] active:[filter:none] shadow-[5px_5px_0_0_var(--accent)] hover:shadow-[7px_7px_0_0_var(--accent)] active:shadow-[1px_1px_0_0_var(--accent)]'
               >
                 <RotateCcw className='h-4 w-4' />
                 {t('retry')}

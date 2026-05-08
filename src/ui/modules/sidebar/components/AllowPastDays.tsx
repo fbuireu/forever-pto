@@ -1,9 +1,9 @@
 'use client';
 
 import { useFiltersStore } from '@application/stores/filters';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/modules/core/animate/base/Tooltip';
+import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { Switch } from '@ui/modules/core/animate/primitives/base/Switch';
-import { InfoIcon, Undo2 } from 'lucide-react';
+import { Undo2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useShallow } from 'zustand/react/shallow';
 import { PremiumFeature } from '../../premium/PremiumFeature';
@@ -23,9 +23,7 @@ export const AllowPastDays = () => {
         <Undo2 size={16} /> {t('title')}
         <TooltipProvider delayDuration={200}>
           <Tooltip>
-            <TooltipTrigger aria-label={t('tooltipLabel')} className='ml-auto cursor-help'>
-              <InfoIcon className='h-4 w-4 text-muted-foreground' aria-hidden='true' />
-            </TooltipTrigger>
+            <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
             <TooltipContent className='w-50 text-pretty'>{t('tooltip')}</TooltipContent>
           </Tooltip>
         </TooltipProvider>

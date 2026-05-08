@@ -2,6 +2,10 @@
   display: none !important;
 }
 
+[data-boneyard] > div:not([data-boneyard-overlay]) {
+  display: contents;
+}
+
 :root {
   --color-brand-yellow: #ffd93d;
   --color-brand-teal: #4ecdc4;
@@ -54,14 +58,6 @@
   --shadow-brutal-btn-inverted: 5px 5px 0 0 var(--background);
   --shadow-brutal-btn-inverted-hover: 7px 7px 0 0 var(--background);
   --shadow-brutal-btn-inverted-active: 1px 1px 0 0 var(--background);
-  --drop-shadow-brutal-btn: drop-shadow(5px 5px 0 var(--frame));
-  --drop-shadow-brutal-btn-hover: drop-shadow(7px 7px 0 var(--frame));
-  --drop-shadow-brutal-btn-active: drop-shadow(1px 1px 0 var(--frame));
-  --drop-shadow-brutal-btn-inverted: drop-shadow(5px 5px 0 var(--background));
-  --drop-shadow-brutal-btn-inverted-hover: drop-shadow(7px 7px 0 var(--background));
-  --drop-shadow-brutal-btn-inverted-active: drop-shadow(1px 1px 0 var(--background));
-  --drop-shadow-brutal-xs: drop-shadow(2px 2px 0 var(--frame));
-  --drop-shadow-brutal-sm: drop-shadow(4px 4px 0 var(--frame));
 
   --radius: 0.5rem;
 

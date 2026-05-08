@@ -1,14 +1,10 @@
 packages:
   - ./
 allowBuilds:
+  '@biomejs/biome': true
   '@parcel/watcher': true
   '@swc/core': true
   esbuild: true
   sharp: true
   workerd: true
 minimumReleaseAge: 4320 #3 days
-onlyBuiltDependencies:
-  - '@biomejs/biome'
-  - esbuild
-  - sharp
-  - workerd

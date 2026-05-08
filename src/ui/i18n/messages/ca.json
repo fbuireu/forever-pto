@@ -342,7 +342,9 @@
       "step1Title": "Pas {step} — El teu context",
       "step1Description": "Selecciona el teu país, regió i l'any que vols planificar. Això configura el teu calendari de festius per trobar els millors ponts.",
       "step2Title": "Pas {step} — Els teus dies disponibles",
-      "step2Description": "Indica quants dies de vacances tens i tria la teva estratègia d'optimització. L'estratègia determina com agrupem els teus dies lliures."
+      "step2Description": "Indica quants dies de vacances tens. Aquesta és la base per a tots els càlculs.",
+      "step3Title": "Pas {step} — La teva configuració",
+      "step3Description": "Tria la teva estratègia d'optimització i configura els dies passats i els mesos de trasllat per ajustar el teu pla."
     }
   },
   "legend": {
@@ -513,6 +515,11 @@
     "step2": {
       "titleStart": "Els teus ",
       "titleEmphasis": "dies",
+      "badge": "pas {step}"
+    },
+    "step3": {
+      "titleStart": "La teva ",
+      "titleEmphasis": "configuració",
       "badge": "pas {step}"
     },
     "steps": "Passos"

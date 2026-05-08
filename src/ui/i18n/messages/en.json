@@ -342,7 +342,9 @@
       "step1Title": "Step {step} — Your context",
       "step1Description": "Select your country, region, and the year you want to plan. This sets up your holiday calendar so we can find the best bridges.",
       "step2Title": "Step {step} — Your available days",
-      "step2Description": "Enter how many PTO days you have and choose your optimization strategy. The strategy shapes how we group your days off."
+      "step2Description": "Enter how many PTO days you have. This is the base for all calculations.",
+      "step3Title": "Step {step} — Your configuration",
+      "step3Description": "Choose your optimization strategy and configure past days and carryover months to fine-tune your plan."
     }
   },
   "legend": {
@@ -513,6 +515,11 @@
     "step2": {
       "titleStart": "Your ",
       "titleEmphasis": "days",
+      "badge": "step {step}"
+    },
+    "step3": {
+      "titleStart": "Your ",
+      "titleEmphasis": "configuration",
       "badge": "step {step}"
     },
     "steps": "Steps"

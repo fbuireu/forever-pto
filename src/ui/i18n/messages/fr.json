@@ -342,7 +342,9 @@
       "step1Title": "Étape {step} — Ton contexte",
       "step1Description": "Sélectionne ton pays, ta région et l'année que tu veux planifier. Cela configure ton calendrier de jours fériés pour trouver les meilleurs ponts.",
       "step2Title": "Étape {step} — Tes jours disponibles",
-      "step2Description": "Indique combien de jours de congé tu as et choisis ta stratégie d'optimisation. La stratégie détermine comment nous regroupons tes jours de repos."
+      "step2Description": "Indique combien de jours de congé tu as. C'est la base de tous les calculs.",
+      "step3Title": "Étape {step} — Ta configuration",
+      "step3Description": "Choisis ta stratégie d'optimisation et configure les jours passés et les mois de report pour affiner ton plan."
     }
   },
   "legend": {
@@ -513,6 +515,11 @@
     "step2": {
       "titleStart": "Tes ",
       "titleEmphasis": "jours",
+      "badge": "étape {step}"
+    },
+    "step3": {
+      "titleStart": "Ta ",
+      "titleEmphasis": "configuration",
       "badge": "étape {step}"
     },
     "steps": "Étapes"
