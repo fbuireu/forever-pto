@@ -1,5 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { Document, Page, pdf, StyleSheet, Text, View } from '@react-pdf/renderer';
+import { Document, Page, renderToBuffer, StyleSheet, Text, View } from '@react-pdf/renderer';
 
 const C = {
   orange: '#f97316',
@@ -242,5 +242,5 @@ function HolidayDocument({ year, holidays, ptoDays, includeHolidays, includePto,
 }
 
 export async function generatePdfBuffer(options: GeneratePdfOptions): Promise<Buffer> {
-  return pdf(<HolidayDocument {...options} />).toBuffer();
+  return renderToBuffer(<HolidayDocument {...options} />);
 }

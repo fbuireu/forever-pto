@@ -2,9 +2,7 @@
 
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { cn } from '@ui/utils/utils';
-import { CalendarRange } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 
@@ -59,12 +57,12 @@ interface YearTimelineChartProps {
 }
 
 const ROW_COLOR: Record<string, string> = {
-  national: 'bg-[var(--color-brand-yellow)]',
-  regional: 'bg-[var(--color-brand-yellow)]',
+  national: 'bg-[var(--color-brand-orange)]',
+  regional: 'bg-[var(--color-brand-orange)]',
   custom: 'bg-[var(--color-brand-purple)]',
   pto: 'bg-[var(--color-brand-teal)]',
-  bridges: 'bg-[var(--color-brand-orange)]',
-  manual: 'bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--color-brand-teal)_82%)]',
+  bridges: 'bg-[var(--color-brand-yellow)]',
+  manual: 'bg-[var(--color-brand-purple)]',
 };
 
 export const YearTimelineChart = ({ year, holidays, suggestion, manuallySelectedDays }: YearTimelineChartProps) => {
@@ -112,69 +110,42 @@ export const YearTimelineChart = ({ year, holidays, suggestion, manuallySelected
   }, [holidays, suggestion, manuallySelectedDays, t]);
 
   return (
-    <Card className='shadow-[var(--shadow-brutal-md)] [contain:layout]'>
-      <CardHeader className='pb-3'>
-        <CardTitle className='flex items-center gap-2 text-base font-display font-semibold'>
-          <CalendarRange className='w-5 h-5 text-muted-foreground' />
-          {t('yearTimeline.title')}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className='p-0 overflow-hidden rounded-b-[calc(var(--radius)-3px)]'>
-        <div className='overflow-hidden'>
-          <div className='flex bg-card dark:bg-[var(--color-brand-ink)] border-b-[2px] border-[var(--frame)]/30'>
-            <div className='w-[72px] shrink-0 border-r-[2px] border-[var(--frame)]/30' />
-            {monthNames.map((name, i) => (
-              <div
-                key={name}
-                className={cn(
-                  'flex-1 text-center py-2 text-[9px] font-mono font-black tracking-[0.08em] text-foreground dark:text-[var(--accent)]',
-                  i < 11 && 'border-r-[1px] border-[var(--frame)]/20'
-                )}
-              >
-                {name}
-              </div>
-            ))}
+    <div className='w-full border-[3px] border-[var(--frame)] rounded-[10px] shadow-[4px_4px_0_0_var(--frame)] overflow-hidden bg-card'>
+      <div className='grid grid-cols-12 border-b-[3px] border-[var(--frame)]'>
+        {monthNames.map((name, i) => (
+          <div
+            key={name}
+            className={cn(
+              'py-2 px-1 text-center text-[11px] font-mono font-bold tracking-[0.05em]',
+              i < 11 && 'border-r-[2px] border-[var(--frame)]'
+            )}
+          >
+            {name}
           </div>
+        ))}
+      </div>
 
-          {rows.map(({ key, label, segs }, rowIdx) => (
-            <div
-              key={key}
-              className={cn(
-                'flex items-center h-9 bg-card dark:bg-[var(--color-brand-ink)]',
-                rowIdx < rows.length - 1 && 'border-b-[1px] border-[var(--frame)]/15'
-              )}
-            >
-              <div className='w-[72px] shrink-0 px-2.5 border-r-[2px] border-[var(--frame)]/30 h-full flex items-center'>
-                <span className='text-[8px] font-mono font-black uppercase tracking-[0.1em] text-muted-foreground leading-none'>
-                  {label}
-                </span>
-              </div>
-
-              <div className='flex-1 flex items-center px-2 py-1.5'>
-                <div className='relative flex-1 h-[18px] rounded-full border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] overflow-hidden'>
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((month) => (
-                    <div
-                      key={month}
-                      className='absolute inset-y-0 w-px bg-[var(--frame)]/10 z-10'
-                      style={{ left: `${(month / 12) * 100}%` }}
-                    />
-                  ))}
-                  {segs.map((seg) => (
-                    <div
-                      key={seg.start.toISOString()}
-                      className={cn('absolute inset-y-0', ROW_COLOR[key])}
-                      style={{
-                        left: `${segPos(seg.start, year) * 100}%`,
-                        width: `max(6px, ${segWidth(seg.start, seg.end, year) * 100}%)`,
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
+      <div className='p-3 flex flex-col gap-2'>
+        {rows.map(({ key, label, segs }) => (
+          <div key={key} className='flex items-center gap-2.5'>
+            <div className='w-[70px] shrink-0 text-[10px] font-mono font-bold uppercase tracking-[0.08em] text-muted-foreground leading-none'>
+              {label}
             </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+            <div className='flex-1 h-4 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-full relative overflow-hidden'>
+              {segs.map((seg) => (
+                <div
+                  key={seg.start.toISOString()}
+                  className={cn('absolute inset-y-0 rounded-full border-[2px] border-[var(--frame)]', ROW_COLOR[key])}
+                  style={{
+                    left: `${segPos(seg.start, year) * 100}%`,
+                    width: `max(8px, ${segWidth(seg.start, seg.end, year) * 100}%)`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };

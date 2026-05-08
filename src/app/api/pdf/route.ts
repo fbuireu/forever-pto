@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
   const buffer = await generatePdfBuffer(options);
 
-  return new Response(buffer, {
+  return new Response(new Uint8Array(buffer), {
     headers: {
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="forever-pto-${options.year}.pdf"`,
