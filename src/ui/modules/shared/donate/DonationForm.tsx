@@ -3,6 +3,7 @@
 import type { CreatePaymentInput } from '@application/dto/payment/schema';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/modules/core/animate/base/Collapsible';
 import { ChevronDown } from '@ui/modules/core/animate/icons/ChevronDown';
+import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
@@ -131,17 +132,18 @@ export function DonationForm({
         />
 
         <Collapsible open={showPromoCode} onOpenChange={setShowPromoCode}>
-          <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-sm font-medium cursor-pointer rounded-md transition-colors border-0 shadow-none'>
-            <span className='text-muted-foreground'>{t('havePromoCode')}</span>
-            <ChevronDown
-              animateOnHover
-              className={cn(
-                'h-4 w-4 text-muted-foreground transition-transform duration-200',
-                showPromoCode && 'rotate-180'
-              )}
-              aria-hidden='true'
-            />
-          </CollapsibleTrigger>
+          <AnimateIcon animateOnHover>
+            <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-sm font-medium cursor-pointer rounded-md transition-colors border-0 shadow-none'>
+              <span className='text-muted-foreground'>{t('havePromoCode')}</span>
+              <ChevronDown
+                className={cn(
+                  'h-4 w-4 text-muted-foreground transition-transform duration-200',
+                  showPromoCode && 'rotate-180'
+                )}
+                aria-hidden='true'
+              />
+            </CollapsibleTrigger>
+          </AnimateIcon>
           {showPromoCode && (
             <CollapsibleContent className='pt-2 min-h-15 pb-1 px-0.5'>
               <FormField
