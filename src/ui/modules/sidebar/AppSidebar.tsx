@@ -1,4 +1,5 @@
 import {
+  SIDEBAR_COOKIE_NAME,
   Sidebar,
   SidebarContent,
   SidebarGroup,
@@ -17,6 +18,7 @@ import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Settings } from '@ui/modules/core/animate/icons/Settings';
 import { Calculator } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { cookies } from 'next/headers';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
@@ -48,11 +50,13 @@ interface AppSidebarProps {
 
 export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
   const t = await getTranslations('sidebar');
+  const cookieStore = await cookies();
+  const sidebarOpen = cookieStore.get(SIDEBAR_COOKIE_NAME)?.value !== 'false';
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={sidebarOpen}>
       <Sidebar collapsible='icon' variant='inset'>
-        <SidebarHeader className='group-data-[collapsible=icon]:p-0'>
+        <SidebarHeader className='group-data-[collapsible=icon]:p-0 mb-2.5'>
           <SidebarMenu>
             <SidebarMenuItem>
               <Logo />

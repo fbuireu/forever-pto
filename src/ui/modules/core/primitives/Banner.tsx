@@ -1,8 +1,9 @@
+import type { IconProps } from '@ui/modules/core/animate/icons/Icon';
 import { cn } from '@ui/utils/utils';
 import type { LucideIcon } from 'lucide-react';
 
 interface BannerProps {
-  icon: LucideIcon;
+  icon: LucideIcon | React.ComponentType<IconProps<never>>;
   title: string;
   children: React.ReactNode;
   action?: React.ReactNode;

@@ -15,7 +15,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { Slot } from './Slot';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tooltip';
 
-const SIDEBAR_COOKIE_NAME = 'sidebar_state';
+export const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = '20rem';
 const SIDEBAR_WIDTH_MOBILE = '20rem';
@@ -395,7 +395,7 @@ function SidebarContent({ className, ...props }: SidebarContentProps) {
       data-slot='sidebar-content'
       data-sidebar='content'
       className={cn(
-        'flex min-h-0 flex-1 flex-col gap-3 overflow-auto px-1 pb-2 group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:gap-2',
+        'flex min-h-0 flex-1 flex-col gap-3 px-1 pb-2 group-data-[collapsible=icon]:overflow-hidden overflow-visible group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:gap-2',
         className
       )}
       {...props}

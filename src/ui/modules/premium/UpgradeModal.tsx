@@ -13,7 +13,7 @@ import {
 } from '@ui/modules/core/primitives/Dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
-import { AlertCircle, Crown, Loader2, Lock as LockIcon } from 'lucide-react';
+import { AlertCircle, Crown, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -94,7 +94,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
             <Crown className='w-5 h-5 text-yellow-500' />
             {t('premiumRequired')}
           </DialogTitle>
-          <Banner icon={LockIcon} title={t('premiumRequired')} colorScheme='indigo'>
+          <Banner icon={Lock} title={t('premiumRequired')} colorScheme='indigo'>
             <span>
               <strong>{feature}</strong> {t('featureRequiresPremium')}
             </span>

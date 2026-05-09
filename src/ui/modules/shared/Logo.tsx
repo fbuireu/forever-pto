@@ -13,7 +13,7 @@ export function Logo() {
   const logoSize = isOpen || isMobile ? 40 : 36;
 
   return (
-    <div className='group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:h-11 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center px-3 py-3 group-data-[collapsible=icon]:p-0 rounded-[10px] border-[3px] border-transparent transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:border-[var(--frame)] hover:shadow-[var(--shadow-brutal-xs)]'>
+    <div className='w-full flex items-center justify-center group-data-[collapsible=icon]:h-11 px-3 py-3 group-data-[collapsible=icon]:p-0 rounded-[10px] border-[3px] border-transparent transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:border-[var(--frame)] hover:shadow-[var(--shadow-brutal-xs)]'>
       <Link
         href='/'
         onClick={() => isMobile && setOpenMobile(false)}
