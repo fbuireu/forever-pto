@@ -29,9 +29,11 @@ function PopoverTrigger(props: PopoverTriggerProps) {
   return <PopoverTriggerPrimitive {...props} />;
 }
 
-type PopoverContentProps = PopoverPositionerPrimitiveProps & PopoverPopupPrimitiveProps;
+type PopoverContentProps = PopoverPositionerPrimitiveProps &
+  PopoverPopupPrimitiveProps & { positionerClassName?: string };
 function PopoverContent({
   className,
+  positionerClassName,
   align = 'center',
   sideOffset = 4,
   initialFocus,
@@ -42,7 +44,12 @@ function PopoverContent({
 }: PopoverContentProps) {
   return (
     <PopoverPortalPrimitive>
-      <PopoverPositionerPrimitive align={align} sideOffset={sideOffset} className='z-50' {...props}>
+      <PopoverPositionerPrimitive
+        align={align}
+        sideOffset={sideOffset}
+        className={cn('z-50', positionerClassName)}
+        {...props}
+      >
         <PopoverPopupPrimitive
           initialFocus={initialFocus}
           finalFocus={finalFocus}

@@ -1,7 +1,10 @@
 @media (max-width: 1279px) {
-  [data-legend-stuck] .donate-trigger {
-    bottom: 1rem;
+  .donate-trigger {
     transition: bottom 300ms ease-in-out;
+  }
+
+  body:has(#legend-toggle:checked) .donate-trigger {
+    bottom: 200px;
   }
 }
 

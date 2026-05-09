@@ -373,14 +373,14 @@ export const Donate = () => {
 
   return (
     <Popover open={isOpen} onOpenChange={setDonatePopoverOpen}>
-      <div className='donate-trigger fixed xl:bottom-4 bottom-30 w-full right-0 md:w-auto md:right-4 z-50'>
+      <div className='donate-trigger fixed xl:bottom-4 bottom-[65px] w-full right-0 md:w-auto md:right-4 z-50'>
         <div className='donate-brutal' style={{ animationPlayState: isOpen ? 'paused' : 'running' }}>
           <PopoverTrigger asChild>
             <Button className='donate-brutal-btn w-full py-3'>{tDonate('donateAndUnblock')}</Button>
           </PopoverTrigger>
         </div>
       </div>
-      <PopoverContent className='w-96 bg-card text-card-foreground'>
+      <PopoverContent className='w-96 bg-card text-card-foreground' positionerClassName='z-[51]'>
         <div className='grid gap-4'>
           <div className='space-y-2'>
             <h4 className='leading-none font-medium'>{tDonate('supportAndUnblock')}</h4>

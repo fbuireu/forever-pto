@@ -89,7 +89,6 @@ export const ManagementBar = () => {
 
   return (
     <div className='col-span-full sticky top-3 z-10'>
-      {/* Desktop */}
       {!isMobile && (
         <Skeleton name='planner-panel' loading={!isReady} fixture={<PlannerPanelFixture />}>
           {isReady && currentSelection && <PlannerPanel key={previewAlternativeIndex} {...plannerPanelProps} />}
@@ -97,7 +96,14 @@ export const ManagementBar = () => {
       )}
 
       {isMobile && (
-        <Drawer snapPoints={[0.15, 1]} activeSnapPoint={snap} setActiveSnapPoint={setSnap} modal={false}>
+        <Drawer
+          snapPoints={[0.15, 1]}
+          activeSnapPoint={snap}
+          setActiveSnapPoint={setSnap}
+          modal={false}
+          defaultOpen
+          dismissible={false}
+        >
           <DrawerContent overlay={false}>
             <div data-tutorial='planner-drawer' className='px-4 pt-2 pb-3'>
               {isReady ? (
@@ -121,7 +127,7 @@ export const ManagementBar = () => {
             </div>
 
             <div className='border-t-[2px] border-[var(--frame)]/15 mx-4' />
-            <div data-vaul-no-drag className='overflow-y-auto px-3 pb-6 pt-3'>
+            <div data-vaul-no-drag className='overflow-y-auto px-3 pb-6 pt-3 select-text'>
               {isReady && currentSelection && <PlannerPanel key={previewAlternativeIndex} {...plannerPanelProps} />}
             </div>
           </DrawerContent>

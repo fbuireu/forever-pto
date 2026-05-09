@@ -60,15 +60,17 @@ export const Combobox = ({
             className={cn('w-[200px] justify-between', className)}
             data-popup-open={open || undefined}
           >
-            {selectedOption ? (
-              <div className='flex items-center gap-2 min-w-0 flex-1'>
-                {hasFlag(selectedOption) && <span className='shrink-0'>{selectedOption.flag}</span>}
-                <span className='truncate capitalize'>{selectedOption.label}</span>
-              </div>
-            ) : (
-              placeholder
-            )}
-            <ChevronUpDown className='opacity-50' />
+            <span className='truncate min-w-0 flex-1 text-left'>
+              {selectedOption ? (
+                <span className='flex items-center gap-2'>
+                  {hasFlag(selectedOption) && <span className='shrink-0'>{selectedOption.flag}</span>}
+                  <span className='truncate capitalize'>{selectedOption.label}</span>
+                </span>
+              ) : (
+                placeholder
+              )}
+            </span>
+            <ChevronUpDown className='opacity-50 shrink-0' />
           </Button>
         </PopoverTrigger>
       </AnimateIcon>

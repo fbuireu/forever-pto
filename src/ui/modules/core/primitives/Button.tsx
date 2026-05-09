@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react';
 import { Slot } from '../animate/base/Slot';
 
 const buttonVariants = cva(
-  "relative cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[8px] text-sm font-black tracking-[0.01em] transition-[color,background-color,border-color,box-shadow,transform] duration-75 ease-linear disabled:pointer-events-none disabled:opacity-50 disabled:cursor-default disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-invalid:ring-destructive/20 aria-invalid:border-destructive border-[3px] border-[var(--frame)]",
+  "relative cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[8px] text-sm font-black tracking-[0.01em] transition-[color,background-color,border-color,box-shadow,transform] duration-75 ease-linear disabled:pointer-events-none disabled:opacity-50 disabled:cursor-default disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-invalid:ring-destructive/20 aria-invalid:border-destructive border-[3px] border-[var(--frame)] before:content-[''] before:absolute before:inset-0 before:-bottom-2 before:-right-2",
   {
     variants: {
       variant: {
