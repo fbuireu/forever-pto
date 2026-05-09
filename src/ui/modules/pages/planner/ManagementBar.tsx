@@ -108,12 +108,12 @@ export const ManagementBar = () => {
           <DrawerContent overlay={false} className='h-[100dvh] max-h-none'>
             <div data-tutorial='planner-drawer' className='px-4 pt-2 pb-3 shrink-0'>
               {isReady ? (
-                <div className='flex items-center justify-between gap-3'>
-                  <span className='text-sm font-black'>
+                <div className='flex items-center justify-between gap-2 flex-wrap'>
+                  <span className='text-sm font-black shrink-0'>
                     {tAlt('option')} {currentSelectionIndex + 1}
                     <span className='font-normal text-muted-foreground'> / {allSuggestions.length}</span>
                   </span>
-                  <div className='flex items-center gap-3'>
+                  <div className='flex items-center gap-2 shrink-0'>
                     <span className='font-mono text-sm font-semibold text-green-600 dark:text-green-400'>
                       {effectiveDays} {tAlt('daysUnit')}
                     </span>
