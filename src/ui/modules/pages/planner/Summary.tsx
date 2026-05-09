@@ -350,11 +350,12 @@ export const Summary = () => {
                   </Link>
                 }
               >
-                {t('notifications.canImprove.message')}{' '}
-                <strong>
-                  <SlidingNumber number={canImprove} /> {t('notifications.canImprove.moreDays')}
-                </strong>{' '}
-                {t('notifications.canImprove.toYourPlan')}
+                <span>{t('notifications.canImprove.message')}</span>
+                <strong className='inline-flex items-baseline gap-x-1'>
+                  <SlidingNumber number={canImprove} />
+                  <span>{t('notifications.canImprove.moreDays')}</span>
+                </strong>
+                <span>{t('notifications.canImprove.toYourPlan')}</span>
               </InfoBanner>
             )}
             {(manuallySelectedDays.length > 0 || removedSuggestedDays.length > 0) && (

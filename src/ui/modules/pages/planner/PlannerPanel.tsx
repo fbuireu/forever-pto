@@ -283,7 +283,7 @@ function Status({ currentSelection }: StatusProps) {
   return (
     <div className='pt-3' data-tutorial='pto-status'>
       <div className='flex items-center justify-between flex-wrap gap-4'>
-        <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-4 flex-wrap gap-y-2'>
           <div className='flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_25%,black_75%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>
             <div className='h-3 w-3 rounded-full bg-teal-500' />
             <span className='text-sm text-muted-foreground'>{t('autoAssigned')}:</span>
@@ -300,7 +300,7 @@ function Status({ currentSelection }: StatusProps) {
               className='font-display font-black text-blue-700 dark:text-blue-300'
             />
           </div>
-          <div className='h-8 w-[2px] bg-[var(--frame)]/15' />
+          <div className='h-8 w-[2px] bg-[var(--frame)]/15 hidden sm:block' />
           <div className='flex flex-col items-center rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-alt)] px-3 py-1.5 shadow-[var(--shadow-brutal-xs)]'>
             <div className='flex items-center gap-2'>
               <span className='text-sm font-display font-black uppercase tracking-[0.08em]'>{t('remaining')}:</span>

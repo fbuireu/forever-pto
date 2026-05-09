@@ -48,7 +48,9 @@ export const InfoBanner = ({ icon: Icon, title, children, action, colorScheme, c
           {title}
         </span>
       </div>
-      <p className={cn('text-sm font-medium leading-snug', colors.message)}>{children}</p>
+      <div className={cn('flex flex-wrap items-baseline gap-x-1 text-sm font-medium leading-snug', colors.message)}>
+        {children}
+      </div>
       {action && <div className='mt-3'>{action}</div>}
     </div>
   );
