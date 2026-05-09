@@ -330,7 +330,7 @@ function Status({ currentSelection }: StatusProps) {
         </div>
       </div>
       <div className='mt-3 space-y-2'>
-        <Progress value={usedPct === 100 ? 101 : usedPct}>
+        <Progress value={usedPct === 100 ? 100 : usedPct}>
           <div className='relative h-[22px]'>
             <ProgressTrack
               className='h-[22px] rounded-full bg-background shadow-[3px_3px_0_0_var(--frame)] flex items-center'
