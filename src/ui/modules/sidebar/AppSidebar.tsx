@@ -60,7 +60,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarGroup className='rounded-[12px] bg-[var(--surface-panel-soft)]'>
+          <SidebarGroup className='rounded-[12px] bg-[var(--surface-panel-soft)] group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0'>
             <SidebarGroupLabel role='heading' aria-level={2}>
               {t('configuration')}
             </SidebarGroupLabel>
@@ -152,7 +152,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
             </SidebarMenu>
           </SidebarGroup>
 
-          <SidebarGroup className='rounded-[12px] bg-[var(--surface-panel-soft)]'>
+          <SidebarGroup className='rounded-[12px] bg-[var(--surface-panel-soft)] group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0'>
             <SidebarGroupLabel role='heading' aria-level={2}>
               {t('tools')}
             </SidebarGroupLabel>
