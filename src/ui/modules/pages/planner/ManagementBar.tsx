@@ -5,6 +5,7 @@ import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import { useIsMobile } from '@ui/hooks/useMobile';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { Drawer, DrawerContent } from '@ui/modules/core/animate/base/Drawer';
+import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
 import { Skeleton } from 'boneyard-js/react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
@@ -19,6 +20,7 @@ export const ManagementBar = () => {
   const tAlt = useTranslations('alternativesManager');
   const { areStoresReady } = useStoresReady();
   const isMobile = useIsMobile();
+  const { openMobile } = useSidebar();
   const [snap, setSnap] = useState<number | string | null>(0.15);
   const {
     alternatives,
@@ -102,7 +104,7 @@ export const ManagementBar = () => {
           activeSnapPoint={snap}
           setActiveSnapPoint={setSnap}
           modal={false}
-          open={true}
+          open={!openMobile}
           dismissible={false}
         >
           <DrawerContent overlay={false} className='h-[100dvh] max-h-none'>
