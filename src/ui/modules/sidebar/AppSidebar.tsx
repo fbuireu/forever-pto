@@ -1,4 +1,3 @@
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/modules/core/animate/base/Collapsible';
 import {
   Sidebar,
   SidebarContent,
@@ -24,6 +23,7 @@ import { Suspense } from 'react';
 import { Logo } from '../shared/Logo';
 import { Countries } from './components/Countries';
 import { PtoDays } from './components/PtoDays';
+import { SidebarCollapsibleGroup } from './components/SidebarCollapsibleGroup';
 import { SidebarFooterButtons } from './components/SidebarFooterButtons';
 
 const Regions = dynamic(() => import('./components/Regions').then((m) => m.Regions));
@@ -66,12 +66,10 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
             </SidebarGroupLabel>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Collapsible
+                <SidebarCollapsibleGroup
                   defaultOpen
-                  className='group/collapsible w-[--radix-popper-anchor-width]'
                   data-tutorial='sidebar-filters'
-                >
-                  <CollapsibleTrigger asChild className='cursor-pointer w-full'>
+                  trigger={
                     <SidebarMenuButton variant='outline' tooltip={t('steps')}>
                       <AnimateIcon animateOnHover>
                         <Settings className='h-5 w-5 shrink-0' />
@@ -79,75 +77,74 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                       <span className='group-data-[collapsible=icon]:hidden'>{t('steps')}</span>
                       <ChevronDown className='ml-auto -rotate-90 transition-transform group-data-[open]/collapsible:rotate-0 group-data-[collapsible=icon]:hidden' />
                     </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className='px-1 pt-2 pb-1 space-y-[18px]'>
-                      <div data-tutorial='sidebar-step-1' className={STEP_CARD_CLASS}>
-                        <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
-                          <span>
-                            {t('step1.titleStart')}
-                            <em className='font-serif italic font-normal'>{t('step1.titleEmphasis')}</em>
-                          </span>
-                          <span className='ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]'>
-                            {t('step1.badge', { step: 1 })}
-                          </span>
-                        </h3>
-                        <div className='space-y-5'>
-                          <Suspense fallback={t('loading')}>
-                            <Countries locale={locale} />
-                          </Suspense>
-                          <Regions />
-                          <Years />
-                        </div>
-                      </div>
-
-                      <div data-tutorial='sidebar-step-2' className={STEP_CARD_CLASS}>
-                        <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
-                          <span>
-                            {t('step2.titleStart')}
-                            <em className='font-serif italic font-normal'>{t('step2.titleEmphasis')}</em>
-                          </span>
-                          <span className='ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]'>
-                            {t('step2.badge', { step: 2 })}
-                          </span>
-                        </h3>
-                        <div className='space-y-3'>
-                          <PtoDays />
-                        </div>
-                      </div>
-
-                      <div data-tutorial='sidebar-step-3' className={STEP_CARD_CLASS}>
-                        <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
-                          <span>
-                            {t('step3.titleStart')}
-                            <em className='font-serif italic font-normal'>{t('step3.titleEmphasis')}</em>
-                          </span>
-                          <span className='ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]'>
-                            {t('step3.badge', { step: 3 })}
-                          </span>
-                        </h3>
-                        <div className='space-y-5'>
-                          <Strategy />
-                          <AllowPastDays />
-                          <CarryOverMonths />
-                        </div>
-                      </div>
-
-                      <div data-tutorial='sidebar-step-4' className={STEP_CARD_CLASS}>
-                        <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
-                          <span>
-                            {t('step4.titleStart')}
-                            <em className='font-serif italic font-normal'>{t('step4.titleEmphasis')}</em>
-                          </span>
-                          <span className='ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]'>
-                            {t('step4.badge', { step: 4 })}
-                          </span>
-                        </h3>
-                        <CalendarExport />
+                  }
+                >
+                  <div className='px-1 pt-2 pb-1 space-y-[18px]'>
+                    <div data-tutorial='sidebar-step-1' className={STEP_CARD_CLASS}>
+                      <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
+                        <span>
+                          {t('step1.titleStart')}
+                          <em className='font-serif italic font-normal'>{t('step1.titleEmphasis')}</em>
+                        </span>
+                        <span className='ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]'>
+                          {t('step1.badge', { step: 1 })}
+                        </span>
+                      </h3>
+                      <div className='space-y-5'>
+                        <Suspense fallback={t('loading')}>
+                          <Countries locale={locale} />
+                        </Suspense>
+                        <Regions />
+                        <Years />
                       </div>
                     </div>
-                  </CollapsibleContent>
-                </Collapsible>
+
+                    <div data-tutorial='sidebar-step-2' className={STEP_CARD_CLASS}>
+                      <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
+                        <span>
+                          {t('step2.titleStart')}
+                          <em className='font-serif italic font-normal'>{t('step2.titleEmphasis')}</em>
+                        </span>
+                        <span className='ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]'>
+                          {t('step2.badge', { step: 2 })}
+                        </span>
+                      </h3>
+                      <div className='space-y-3'>
+                        <PtoDays />
+                      </div>
+                    </div>
+
+                    <div data-tutorial='sidebar-step-3' className={STEP_CARD_CLASS}>
+                      <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
+                        <span>
+                          {t('step3.titleStart')}
+                          <em className='font-serif italic font-normal'>{t('step3.titleEmphasis')}</em>
+                        </span>
+                        <span className='ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]'>
+                          {t('step3.badge', { step: 3 })}
+                        </span>
+                      </h3>
+                      <div className='space-y-5'>
+                        <Strategy />
+                        <AllowPastDays />
+                        <CarryOverMonths />
+                      </div>
+                    </div>
+
+                    <div data-tutorial='sidebar-step-4' className={STEP_CARD_CLASS}>
+                      <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
+                        <span>
+                          {t('step4.titleStart')}
+                          <em className='font-serif italic font-normal'>{t('step4.titleEmphasis')}</em>
+                        </span>
+                        <span className='ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]'>
+                          {t('step4.badge', { step: 4 })}
+                        </span>
+                      </h3>
+                      <CalendarExport />
+                    </div>
+                  </div>
+                </SidebarCollapsibleGroup>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
@@ -158,12 +155,9 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
             </SidebarGroupLabel>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Collapsible
-                  defaultOpen={false}
-                  className='group/collapsible w-[--radix-popper-anchor-width]'
+                <SidebarCollapsibleGroup
                   data-tutorial='sidebar-tools'
-                >
-                  <CollapsibleTrigger asChild className='cursor-pointer w-full'>
+                  trigger={
                     <SidebarMenuButton variant='outline' tooltip={t('tools')}>
                       <AnimateIcon animateOnHover>
                         <Calculator className='h-5 w-5 shrink-0' />
@@ -171,21 +165,20 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                       <span className='group-data-[collapsible=icon]:hidden'>{t('calculators')}</span>
                       <ChevronDown className='ml-auto -rotate-90 transition-transform group-data-[open]/collapsible:rotate-0 group-data-[collapsible=icon]:hidden' />
                     </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className='px-1 pt-2 pb-1 space-y-[18px]'>
-                      <div className={STEP_CARD_CLASS}>
-                        <PtoCalculator />
-                      </div>
-                      <div className={STEP_CARD_CLASS}>
-                        <PtoSalaryCalculator />
-                      </div>
-                      <div className={STEP_CARD_CLASS}>
-                        <WorkdayCounter />
-                      </div>
+                  }
+                >
+                  <div className='px-1 pt-2 pb-1 space-y-[18px]'>
+                    <div className={STEP_CARD_CLASS}>
+                      <PtoCalculator />
                     </div>
-                  </CollapsibleContent>
-                </Collapsible>
+                    <div className={STEP_CARD_CLASS}>
+                      <PtoSalaryCalculator />
+                    </div>
+                    <div className={STEP_CARD_CLASS}>
+                      <WorkdayCounter />
+                    </div>
+                  </div>
+                </SidebarCollapsibleGroup>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
