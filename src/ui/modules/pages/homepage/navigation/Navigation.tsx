@@ -20,7 +20,7 @@ export const Navigation = async () => {
             style={{ transform: 'rotate(-4deg)' }}
             aria-hidden
           >
-            <Image src='/static/images/forever-pto-logo.png' alt='' width={38} height={38} />
+            <Image src='/static/images/forever-pto-logo.png' alt='' width={38} height={38} unoptimized />
           </div>
           <span>Forever PTO</span>
         </Link>

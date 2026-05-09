@@ -29,6 +29,7 @@ export function Logo() {
               width={isOpen || isMobile ? 40 : 32}
               height={isOpen || isMobile ? 40 : 32}
               priority
+              unoptimized
             />
           </div>
         </div>

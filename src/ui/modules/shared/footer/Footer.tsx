@@ -22,7 +22,7 @@ export const Footer = async () => {
               style={{ transform: 'rotate(-4deg)' }}
               aria-hidden
             >
-              <Image src='/static/images/forever-pto-logo.png' alt='' width={30} height={30} />
+              <Image src='/static/images/forever-pto-logo.png' alt='' width={30} height={30} unoptimized />
             </div>
             <span>Forever PTO</span>
           </Link>
