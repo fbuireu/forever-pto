@@ -24,7 +24,7 @@ export function Logo() {
               </p>
             </div>
           )}
-          <PalmTree width={isOpen ? 40 : 30} height={isOpen ? 40 : 30} gradientId='flowGradientLogo' />
+          <PalmTree width={isOpen ? 40 : 30} height={isOpen ? 40 : 30} />
           <OceanSunset
             width={isOpen ? 20 : 15}
             height={isOpen ? 20 : 15}
