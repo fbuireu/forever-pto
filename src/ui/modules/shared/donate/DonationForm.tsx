@@ -2,8 +2,8 @@
 
 import type { CreatePaymentInput } from '@application/dto/payment/schema';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/modules/core/animate/base/Collapsible';
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { ChevronDown } from '@ui/modules/core/animate/icons/ChevronDown';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@ui/modules/core/primitives/InputGroup';

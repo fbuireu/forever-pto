@@ -339,13 +339,13 @@
       "finishDescription": "Ahora sabes cómo usar Forever PTO para maximizar tu tiempo libre. Empieza configurando tus preferencias en la barra lateral, y deja que la app te sugiera los mejores días de PTO. ¡Disfruta de tus merecidos descansos!",
       "holidaysListTitle": "Personaliza tus festivos",
       "holidaysListDescription": "Aquí puedes ajustar los datos de festivos para que se adapten exactamente a tu situación. Edita o elimina cualquier festivo nacional o regional, y añade tus propios días personalizados: festivos de empresa, celebraciones locales o cualquier fecha que sea relevante para ti. Cuanto más precisos sean los datos, mejores serán las sugerencias.",
-      "step1Title": "Paso {step} — Tu contexto",
+      "step1Title": "Tu contexto",
       "step1Description": "Selecciona tu país, región y el año que quieres planificar. Esto configura tu calendario de festivos para encontrar los mejores puentes.",
-      "step2Title": "Paso {step} — Días disponibles",
+      "step2Title": "Días disponibles",
       "step2Description": "Indica cuántos días de vacaciones tienes. Esta es la base para todos los cálculos.",
-      "step3Title": "Paso {step} — Tu configuración",
+      "step3Title": "Tu configuración",
       "step3Description": "Elige tu estrategia de optimización y configura los días pasados y los meses de traslado para afinar tu plan.",
-      "step4Title": "Paso {step} — Exporta tu calendario",
+      "step4Title": "Exporta tu calendario",
       "step4Description": "Descarga tus festivos y días de vacaciones planificados como archivo .ics para importarlos en Google Calendar, Apple Calendar u Outlook, o como PDF para imprimir o compartir.",
       "drawerTitle": "Tu panel de planificación",
       "drawerDescription": "Esta barra siempre muestra un resumen de tu plan. Deslízala hacia arriba —o arrastra el tirador— para explorar alternativas y ver cómo se distribuyen tus días."
@@ -425,7 +425,8 @@
     "previousSuggestion": "Sugerencia anterior",
     "nextSuggestion": "Siguiente sugerencia",
     "totalDaysOff": "Total Días Libres",
-    "comparison": "Comparación"
+    "comparison": "Comparación",
+    "daysUnit": "días"
   },
   "toasts": {
     "suggestionApplied": "Sugerencia aplicada correctamente",

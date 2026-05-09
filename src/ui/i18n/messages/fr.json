@@ -339,13 +339,13 @@
       "finishDescription": "Maintenant tu sais comment utiliser Forever PTO pour maximiser ton temps libre. Commence par configurer tes préférences dans la barre latérale et laisse l'application te suggérer les meilleurs jours de congé. Profite bien de tes pauses méritées !",
       "holidaysListTitle": "Personnalise tes jours fériés",
       "holidaysListDescription": "Ici tu peux affiner les données des jours fériés pour qu'elles correspondent exactement à ta situation. Modifie ou supprime n'importe quel jour férié national ou régional, et ajoute tes propres jours de repos — jours fériés d'entreprise, fêtes locales, ou toute date qui compte pour toi. Plus les données sont précises, meilleures sont les suggestions.",
-      "step1Title": "Étape {step} — Ton contexte",
+      "step1Title": "Ton contexte",
       "step1Description": "Sélectionne ton pays, ta région et l'année que tu veux planifier. Cela configure ton calendrier de jours fériés pour trouver les meilleurs ponts.",
-      "step2Title": "Étape {step} — Tes jours disponibles",
+      "step2Title": "Tes jours disponibles",
       "step2Description": "Indique combien de jours de congé tu as. C'est la base de tous les calculs.",
-      "step3Title": "Étape {step} — Ta configuration",
+      "step3Title": "Ta configuration",
       "step3Description": "Choisis ta stratégie d'optimisation et configure les jours passés et les mois de report pour affiner ton plan.",
-      "step4Title": "Étape {step} — Exporter ton calendrier",
+      "step4Title": "Exporter ton calendrier",
       "step4Description": "Télécharge tes jours fériés et jours de congé planifiés en fichier .ics pour l'importer dans Google Calendar, Apple Calendar ou Outlook, ou en PDF pour imprimer ou partager.",
       "drawerTitle": "Votre panneau de planification",
       "drawerDescription": "Cette barre affiche toujours un résumé de votre plan. Faites-la glisser vers le haut —ou faites glisser la poignée— pour explorer des alternatives et voir comment vos jours sont répartis."
@@ -425,7 +425,8 @@
     "previousSuggestion": "Suggestion précédente",
     "nextSuggestion": "Suggestion suivante",
     "totalDaysOff": "Total jours de repos",
-    "comparison": "Comparaison"
+    "comparison": "Comparaison",
+    "daysUnit": "jours"
   },
   "toasts": {
     "suggestionApplied": "Suggestion appliquée avec succès",

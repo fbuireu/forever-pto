@@ -1,4 +1,4 @@
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { cn } from '@ui/utils/utils';
 import { Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';

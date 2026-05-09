@@ -2,10 +2,10 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/modules/core/animate/base/Popover';
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { Check } from '@ui/modules/core/animate/icons/Check';
 import { ChevronDown } from '@ui/modules/core/animate/icons/ChevronDown';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { Command, CommandGroup, CommandItem, CommandList } from '@ui/modules/core/primitives/Command';
 import { cn } from '@ui/utils/utils';
 import { Calendar } from 'lucide-react';
@@ -41,7 +41,6 @@ export const Years = () => {
               aria-expanded={open}
               aria-haspopup='listbox'
               className={cn('w-full justify-between')}
-              animate={{ x: open ? -2 : 0, y: open ? -2 : 0 }}
             >
               {year}
               <ChevronDown className={cn('opacity-50 transition-transform duration-200', open && 'rotate-180')} />

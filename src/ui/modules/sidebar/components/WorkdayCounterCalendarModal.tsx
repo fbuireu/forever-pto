@@ -1,5 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/modules/core/primitives/Dialog';
 import type { FromTo } from '@ui/modules/pages/planner/calendar/Calendar';
 import { Calendar, CalendarSelectionMode } from '@ui/modules/pages/planner/calendar/Calendar';

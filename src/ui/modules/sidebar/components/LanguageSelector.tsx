@@ -10,9 +10,9 @@ import {
   DropdownMenuTrigger,
 } from '@ui/modules/core/animate/base/DropdownMenu';
 import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { Check } from '@ui/modules/core/animate/icons/Check';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -51,7 +51,6 @@ export const LanguageSelector = () => {
             size='icon'
             className='w-full h-11! focus-visible:ring-1'
             aria-label={t('selectLanguage', { current: currentLanguage?.label ?? locale })}
-            animate={{ x: open ? -2 : 0, y: open ? -2 : 0 }}
           >
             <span className='capitalize'>{displayText}</span>
           </Button>

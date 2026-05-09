@@ -4,8 +4,8 @@ import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { Plus } from '@ui/modules/core/animate/icons/Plus';
+import { Button } from '@ui/modules/core/primitives/Button';
 import {
   Dialog,
   DialogContent,

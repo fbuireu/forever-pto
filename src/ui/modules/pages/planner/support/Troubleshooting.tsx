@@ -3,7 +3,7 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';

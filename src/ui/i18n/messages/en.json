@@ -339,13 +339,13 @@
       "finishDescription": "Now you know how to use Forever PTO to maximize your time off. Start by configuring your preferences in the sidebar, and let the app suggest the best PTO days for you. Enjoy your well-deserved breaks!",
       "holidaysListTitle": "Customize Your Holidays",
       "holidaysListDescription": "Here you can fine-tune the holiday data to match your exact situation. Edit or delete any national or regional holiday, and add your own custom days off — company holidays, local observances, or any date that matters to you. The more accurate the data, the better the suggestions.",
-      "step1Title": "Step {step} — Your context",
+      "step1Title": "Your context",
       "step1Description": "Select your country, region, and the year you want to plan. This sets up your holiday calendar so we can find the best bridges.",
-      "step2Title": "Step {step} — Your available days",
+      "step2Title": "Your available days",
       "step2Description": "Enter how many PTO days you have. This is the base for all calculations.",
-      "step3Title": "Step {step} — Your configuration",
+      "step3Title": "Your configuration",
       "step3Description": "Choose your optimization strategy and configure past days and carryover months to fine-tune your plan.",
-      "step4Title": "Step {step} — Export your calendar",
+      "step4Title": "Export your calendar",
       "step4Description": "Download your holidays and planned vacation days as a .ics file to import into Google Calendar, Apple Calendar or Outlook, or as a PDF to print or share.",
       "drawerTitle": "Your Planner Panel",
       "drawerDescription": "This bar always shows your current plan summary. Swipe it up — or drag the handle — to explore alternatives and see how your days are distributed."
@@ -425,7 +425,8 @@
     "previousSuggestion": "Previous suggestion",
     "nextSuggestion": "Next suggestion",
     "totalDaysOff": "Total Days Off",
-    "comparison": "Comparison"
+    "comparison": "Comparison",
+    "daysUnit": "days"
   },
   "toasts": {
     "suggestionApplied": "Suggestion applied successfully",

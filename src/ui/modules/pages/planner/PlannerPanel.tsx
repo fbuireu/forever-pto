@@ -5,10 +5,10 @@ import type { HolidaysState } from '@application/stores/holidays';
 import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
 import { ChevronRight } from '@ui/modules/core/animate/icons/ChevronRight';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { Progress, ProgressOverlayLabel, ProgressTrack } from '@ui/modules/core/primitives/Progress';
 import { cn } from '@ui/utils/utils';
 import { BarChart3, CalendarDays, Sparkles, TrendingUp } from 'lucide-react';
@@ -337,7 +337,10 @@ function Status({ currentSelection }: StatusProps) {
               indicatorClassName='rounded-full border-r-[3px] border-[var(--frame)]'
               transition={{ type: 'tween', duration: 0.15, ease: 'easeOut' }}
             />
-            <ProgressOverlayLabel transition={{ type: 'tween', duration: 0.15, ease: 'easeOut' }}>
+            <ProgressOverlayLabel
+              overlayClassName='text-[var(--color-brand-ink)]'
+              transition={{ type: 'tween', duration: 0.15, ease: 'easeOut' }}
+            >
               {t('usedDays', { used: usedDays, total: ptoDays, pct: usedPct })}
             </ProgressOverlayLabel>
           </div>

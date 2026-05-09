@@ -4,10 +4,10 @@ import type { CountryDTO } from '@application/dto/country/types';
 import type { RegionDTO } from '@application/dto/region/types';
 import type { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/modules/core/animate/base/Popover';
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { Check } from '@ui/modules/core/animate/icons/Check';
 import { ChevronUpDown } from '@ui/modules/core/animate/icons/ChevronUpDown';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { cn } from '@ui/utils/utils';
 import { useState } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './Command';
@@ -58,7 +58,6 @@ export const Combobox = ({
             disabled={disabled}
             aria-disabled={disabled ?? false}
             className={cn('w-[200px] justify-between', className)}
-            animate={{ x: open ? -2 : 0, y: open ? -2 : 0 }}
             data-popup-open={open || undefined}
           >
             {selectedOption ? (

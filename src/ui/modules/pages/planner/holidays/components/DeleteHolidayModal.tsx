@@ -3,9 +3,9 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Trash2 } from '@ui/modules/core/animate/icons/Trash2';
+import { Button } from '@ui/modules/core/primitives/Button';
 import {
   Dialog,
   DialogContent,

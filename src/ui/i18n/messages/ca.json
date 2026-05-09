@@ -339,13 +339,13 @@
       "finishDescription": "Ara saps com usar Forever PTO per maximitzar el teu temps lliure. Comença configurant les teves preferències a la barra lateral, i deixa que l'app et suggereixi els millors dies de PTO. Gaudeix dels teus merescuts descansos!",
       "holidaysListTitle": "Personalitza els teus festius",
       "holidaysListDescription": "Aquí pots ajustar les dades de festius perquè s'adaptin exactament a la teva situació. Edita o elimina qualsevol festiu nacional o regional, i afegeix els teus propis dies personalitzats: festius d'empresa, celebracions locals o qualsevol data que sigui rellevant per a tu. Com més precisos siguin les dades, millors seran els suggeriments.",
-      "step1Title": "Pas {step} — El teu context",
+      "step1Title": "El teu context",
       "step1Description": "Selecciona el teu país, regió i l'any que vols planificar. Això configura el teu calendari de festius per trobar els millors ponts.",
-      "step2Title": "Pas {step} — Els teus dies disponibles",
+      "step2Title": "Els teus dies disponibles",
       "step2Description": "Indica quants dies de vacances tens. Aquesta és la base per a tots els càlculs.",
-      "step3Title": "Pas {step} — La teva configuració",
+      "step3Title": "La teva configuració",
       "step3Description": "Tria la teva estratègia d'optimització i configura els dies passats i els mesos de trasllat per ajustar el teu pla.",
-      "step4Title": "Pas {step} — Exporta el teu calendari",
+      "step4Title": "Exporta el teu calendari",
       "step4Description": "Descarrega els teus festius i dies de vacances planificats com a fitxer .ics per importar-lo a Google Calendar, Apple Calendar o Outlook, o com a PDF per imprimir o compartir.",
       "drawerTitle": "El teu panell de planificació",
       "drawerDescription": "Aquesta barra sempre mostra un resum del teu pla. Llisca-la cap amunt —o arrossega el tirador— per explorar alternatives i veure com es distribueixen els teus dies."
@@ -425,7 +425,8 @@
     "previousSuggestion": "Suggeriment anterior",
     "nextSuggestion": "Següent suggeriment",
     "totalDaysOff": "Total Dies Lliures",
-    "comparison": "Comparació"
+    "comparison": "Comparació",
+    "daysUnit": "dies"
   },
   "toasts": {
     "suggestionApplied": "Suggeriment aplicat correctament",

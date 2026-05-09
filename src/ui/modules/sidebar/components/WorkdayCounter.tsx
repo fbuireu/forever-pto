@@ -2,8 +2,8 @@
 
 import { useHolidaysStore } from '@application/stores/holidays';
 import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { Label } from '@ui/modules/core/primitives/Label';
 import type { FromTo } from '@ui/modules/pages/planner/calendar/Calendar';
 import {

@@ -4,7 +4,7 @@ import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { downloadIcs, generateIcs } from '@infrastructure/services/export/generateIcs';
 import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { Download, FileText } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';

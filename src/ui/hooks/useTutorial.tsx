@@ -27,7 +27,7 @@ export const useTutorial = () => {
       {
         element: '[data-tutorial="sidebar-step-1"]',
         popover: {
-          title: t('step1Title', { step: 1 }),
+          title: t('step1Title'),
           description: t('step1Description'),
           side: 'right',
           align: 'start',
@@ -36,7 +36,7 @@ export const useTutorial = () => {
       {
         element: '[data-tutorial="sidebar-step-2"]',
         popover: {
-          title: t('step2Title', { step: 2 }),
+          title: t('step2Title'),
           description: t('step2Description'),
           side: 'right',
           align: 'start',
@@ -45,7 +45,7 @@ export const useTutorial = () => {
       {
         element: '[data-tutorial="sidebar-step-3"]',
         popover: {
-          title: t('step3Title', { step: 3 }),
+          title: t('step3Title'),
           description: t('step3Description'),
           side: 'right',
           align: 'start',
@@ -54,7 +54,7 @@ export const useTutorial = () => {
       {
         element: '[data-tutorial="sidebar-step-4"]',
         popover: {
-          title: t('step4Title', { step: 4 }),
+          title: t('step4Title'),
           description: t('step4Description'),
           side: 'right',
           align: 'start',

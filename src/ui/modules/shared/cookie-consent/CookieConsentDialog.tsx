@@ -1,6 +1,6 @@
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '@ui/modules/core/animate/base/Accordion';
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { Switch } from '@ui/modules/core/animate/primitives/base/Switch';
+import { Button } from '@ui/modules/core/primitives/Button';
 import {
   Dialog,
   DialogContent,

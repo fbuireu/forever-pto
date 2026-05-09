@@ -2,10 +2,10 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Plus } from '@ui/modules/core/animate/icons/Plus';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { Combobox } from '@ui/modules/core/primitives/Combobox';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { getMonthNames } from '@ui/modules/pages/planner/utils/helpers';

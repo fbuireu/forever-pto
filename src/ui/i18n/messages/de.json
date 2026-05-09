@@ -339,13 +339,13 @@
       "finishDescription": "Jetzt weißt du, wie du Forever PTO nutzen kannst, um deine Freizeit zu maximieren. Beginne damit, deine Einstellungen in der Seitenleiste zu konfigurieren, und lass die App dir die besten Urlaubstage vorschlagen. Genieße deine wohlverdienten Pausen!",
       "holidaysListTitle": "Passe deine Feiertage an",
       "holidaysListDescription": "Hier kannst du die Feiertagsdaten an deine genaue Situation anpassen. Bearbeite oder lösche nationale oder regionale Feiertage und füge eigene freie Tage hinzu – Firmenfeiertage, lokale Bräuche oder jedes Datum, das dir wichtig ist. Je genauer die Daten, desto besser die Vorschläge.",
-      "step1Title": "Schritt {step} — Dein Kontext",
+      "step1Title": "Dein Kontext",
       "step1Description": "Wähle dein Land, deine Region und das Jahr, für das du planen möchtest. Dies konfiguriert deinen Feiertagskalender, damit wir die besten Brückentage finden.",
-      "step2Title": "Schritt {step} — Deine verfügbaren Tage",
+      "step2Title": "Deine verfügbaren Tage",
       "step2Description": "Gib an, wie viele Urlaubstage du hast. Dies ist die Grundlage für alle Berechnungen.",
-      "step3Title": "Schritt {step} — Deine Konfiguration",
+      "step3Title": "Deine Konfiguration",
       "step3Description": "Wähle deine Optimierungsstrategie und konfiguriere vergangene Tage und Übertragsmonate, um deinen Plan zu verfeinern.",
-      "step4Title": "Schritt {step} — Kalender exportieren",
+      "step4Title": "Kalender exportieren",
       "step4Description": "Lade deine Feiertage und geplanten Urlaubstage als .ics-Datei herunter, um sie in Google Calendar, Apple Calendar oder Outlook zu importieren, oder als PDF zum Drucken oder Teilen.",
       "drawerTitle": "Dein Planungspanel",
       "drawerDescription": "Diese Leiste zeigt immer eine Zusammenfassung deines Plans. Wische nach oben —oder ziehe den Griff— um Alternativen zu erkunden und zu sehen, wie deine Tage verteilt sind."
@@ -425,7 +425,8 @@
     "previousSuggestion": "Vorheriger Vorschlag",
     "nextSuggestion": "Nächster Vorschlag",
     "totalDaysOff": "Freie Tage gesamt",
-    "comparison": "Vergleich"
+    "comparison": "Vergleich",
+    "daysUnit": "Tage"
   },
   "toasts": {
     "suggestionApplied": "Vorschlag erfolgreich angewendet",

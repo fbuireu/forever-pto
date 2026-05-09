@@ -2,6 +2,7 @@
 
 import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
+import { useIsMobile } from '@ui/hooks/useMobile';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { Drawer, DrawerContent } from '@ui/modules/core/animate/base/Drawer';
 import { Skeleton } from 'boneyard-js/react';
@@ -16,6 +17,7 @@ export const ManagementBar = () => {
   const t = useTranslations('toasts');
   const tAlt = useTranslations('alternativesManager');
   const { areStoresReady } = useStoresReady();
+  const isMobile = useIsMobile();
   const [snap, setSnap] = useState<number | string | null>(0.15);
   const {
     alternatives,
@@ -86,26 +88,17 @@ export const ManagementBar = () => {
   const efficiency = previewSuggestion?.metrics?.averageEfficiency ?? 0;
 
   return (
-    <div className='col-span-full'>
+    <div className='col-span-full sticky top-3 z-10'>
       {/* Desktop */}
-      <div className='hidden md:block w-full sticky top-3 z-50'>
+      {!isMobile && (
         <Skeleton name='planner-panel' loading={!isReady} fixture={<PlannerPanelFixture />}>
           {isReady && currentSelection && <PlannerPanel key={previewAlternativeIndex} {...plannerPanelProps} />}
         </Skeleton>
-      </div>
+      )}
 
-      {/* Mobile: persistent bottom drawer with snap points */}
-      <div className='md:hidden'>
-        <Drawer
-          snapPoints={[0.15, 1]}
-          activeSnapPoint={snap}
-          setActiveSnapPoint={setSnap}
-          modal={false}
-          open
-          dismissible={false}
-        >
+      {isMobile && (
+        <Drawer snapPoints={[0.15, 1]} activeSnapPoint={snap} setActiveSnapPoint={setSnap} modal={false}>
           <DrawerContent overlay={false}>
-            {/* Compact area — always visible at 0.15 snap */}
             <div data-tutorial='planner-drawer' className='px-4 pt-2 pb-3'>
               {isReady ? (
                 <div className='flex items-center justify-between gap-3'>
@@ -115,7 +108,7 @@ export const ManagementBar = () => {
                   </span>
                   <div className='flex items-center gap-3'>
                     <span className='font-mono text-sm font-semibold text-green-600 dark:text-green-400'>
-                      {effectiveDays}d
+                      {effectiveDays} {tAlt('daysUnit')}
                     </span>
                     <span className='font-mono text-sm font-semibold text-purple-600 dark:text-purple-400'>
                       {efficiency.toFixed(1)}x
@@ -128,14 +121,12 @@ export const ManagementBar = () => {
             </div>
 
             <div className='border-t-[2px] border-[var(--frame)]/15 mx-4' />
-
-            {/* Full content — visible when fully expanded */}
             <div data-vaul-no-drag className='overflow-y-auto px-3 pb-6 pt-3'>
               {isReady && currentSelection && <PlannerPanel key={previewAlternativeIndex} {...plannerPanelProps} />}
             </div>
           </DrawerContent>
         </Drawer>
-      </div>
+      )}
     </div>
   );
 };

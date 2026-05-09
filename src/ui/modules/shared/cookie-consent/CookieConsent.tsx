@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as CookieConsentLib from 'vanilla-cookieconsent';

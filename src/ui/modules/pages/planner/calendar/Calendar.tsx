@@ -2,10 +2,10 @@ import type { FiltersState } from '@application/stores/filters';
 import type { HolidaysState } from '@application/stores/holidays';
 import { usePremiumStore } from '@application/stores/premium';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/modules/core/animate/base/Tooltip';
-import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
 import { ChevronRight } from '@ui/modules/core/animate/icons/ChevronRight';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { SupportButton } from '@ui/modules/pages/homepage/navigation/SupportButton';
 import { ConditionalWrapper } from '@ui/modules/shared/ConditionalWrapper';
 import { addMonths, type Day, formatDate, isSameDay, isSameMonth, isWeekend, subMonths } from '@ui/utils/dates';
@@ -412,7 +412,6 @@ export function Calendar({
                 type='button'
                 size='sm'
                 onClick={handleGoToToday}
-                animated={false}
                 className='h-7 px-2 text-[10px] font-mono font-black uppercase tracking-[0.06em] border-[2px] border-[var(--frame)]/40 shadow-none hover:border-[var(--frame)] hover:bg-[var(--color-brand-yellow)] hover:text-[var(--color-brand-ink)]'
                 aria-label={tCalendar('today')}
               >
@@ -505,7 +504,6 @@ export function Calendar({
                   onMouseEnter={() => handleDayHover(date)}
                   onMouseLeave={handleDayLeave}
                   disabled={isDisabled}
-                  animated={false}
                   aria-label={
                     holidayName
                       ? `${formatDate({ date, locale, format: 'EEEE, MMMM d, yyyy' })}, ${holidayName}`
