@@ -86,8 +86,8 @@
   --foreground: #fff5e1;
   --card: #1a1612;
   --card-foreground: #fff5e1;
-  --popover: var(--color-brand-paper);
-  --popover-foreground: var(--color-brand-ink);
+  --popover: var(--surface-panel-alt);
+  --popover-foreground: #fff5e1;
   --primary: #fff5e1;
   --primary-foreground: #0e0e0e;
   --secondary: #2b241e;

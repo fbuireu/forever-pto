@@ -15,15 +15,13 @@ export const Navigation = async () => {
           href='/'
           className='flex items-center gap-2.5 font-display font-extrabold text-[22px] tracking-[-0.02em] hover:opacity-85 transition-opacity'
         >
-          <Image
-            src='/static/images/forever-pto-logo.png'
-            alt=''
-            width={38}
-            height={38}
-            className='shrink-0 rounded-[8px]'
+          <div
+            className='w-[38px] h-[38px] bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] overflow-hidden shrink-0'
             style={{ transform: 'rotate(-4deg)' }}
             aria-hidden
-          />
+          >
+            <Image src='/static/images/forever-pto-logo.png' alt='' width={38} height={38} />
+          </div>
           <span>Forever PTO</span>
         </Link>
 

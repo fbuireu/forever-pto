@@ -15,14 +15,22 @@ export function Logo() {
       <Link href='/' onClick={() => isMobile && setOpenMobile(false)} className='no-underline outline-none'>
         <div className='flex items-center gap-2'>
           {(isOpen || isMobile) && <p className='text-3xl font-display font-black tracking-[-0.05em]'>Forever</p>}
-          <Image
-            src='/static/images/forever-pto-logo.png'
-            alt='Forever PTO logo'
-            width={isOpen || isMobile ? 40 : 32}
-            height={isOpen || isMobile ? 40 : 32}
-            className='shrink-0'
-            priority
-          />
+          <div
+            className='bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[var(--shadow-brutal-xs)] overflow-hidden shrink-0'
+            style={{
+              width: isOpen || isMobile ? 40 : 32,
+              height: isOpen || isMobile ? 40 : 32,
+            }}
+            aria-hidden
+          >
+            <Image
+              src='/static/images/forever-pto-logo.png'
+              alt=''
+              width={isOpen || isMobile ? 40 : 32}
+              height={isOpen || isMobile ? 40 : 32}
+              priority
+            />
+          </div>
         </div>
       </Link>
     </div>
