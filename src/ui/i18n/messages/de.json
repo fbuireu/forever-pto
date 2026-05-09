@@ -1074,7 +1074,13 @@
       "titleEmphasis": "freies",
       "titleEnd": "Jahr beginnt heute.",
       "description": "22 Tage können 47 werden. Du musst nur wissen, wo du sie platzierst. Das machen wir.",
-      "cta": "Meine freien Tage berechnen →"
+      "cta": "Meine freien Tage berechnen →",
+      "shapes": {
+        "byeMonday": "tschüss, montag",
+        "doNotDisturb": "nicht stören",
+        "bossOff": "boss off",
+        "zeroRegrets": "0 Reue"
+      }
     }
   },
   "cookiePolicy": {

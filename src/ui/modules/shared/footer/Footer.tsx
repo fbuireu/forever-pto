@@ -1,4 +1,5 @@
 import { Link } from '@application/i18n/navigation';
+import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { version } from '../../../../../package.json';
 import { ContactButton } from '../contact/ContactButton';
@@ -16,13 +17,15 @@ export const Footer = async () => {
             href='/'
             className='flex items-center gap-2 font-display font-extrabold text-[18px] tracking-[-0.02em] hover:opacity-80 transition-opacity'
           >
-            <div
-              className='w-[30px] h-[30px] bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[2px_2px_0_0_var(--frame)] grid place-items-center text-[16px] shrink-0'
+            <Image
+              src='/static/images/forever-pto-logo.png'
+              alt=''
+              width={30}
+              height={30}
+              className='shrink-0 rounded-[8px]'
               style={{ transform: 'rotate(-4deg)' }}
-              aria-hidden='true'
-            >
-              🌴
-            </div>
+              aria-hidden
+            />
             <span>Forever PTO</span>
           </Link>
           <span className='font-mono text-[11px] text-muted-foreground'>

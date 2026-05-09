@@ -2,10 +2,8 @@
 
 import { Link } from '@application/i18n/navigation';
 import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
-import { GradientText } from '@ui/modules/core/animate/primitives/texts/Gradient';
+import Image from 'next/image';
 import { useIsMobile } from 'src/ui/hooks/useMobile';
-import { OceanSunset } from './OceanSunset';
-import { PalmTree } from './PalmTree';
 
 export function Logo() {
   const { state, setOpenMobile } = useSidebar();
@@ -15,21 +13,15 @@ export function Logo() {
   return (
     <div className='flex justify-center mx-auto px-3 py-3 rounded-[10px] border-[3px] border-transparent transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:border-[var(--frame)] hover:shadow-[var(--shadow-brutal-xs)]'>
       <Link href='/' onClick={() => isMobile && setOpenMobile(false)} className='no-underline outline-none'>
-        <div className='flex items-center'>
-          {(isOpen || isMobile) && (
-            <div className='flex text-center justify-center gap-2'>
-              <p className='text-3xl font-display font-black tracking-[-0.05em]'>Forever</p>
-              <p className='text-3xl font-display font-black -mr-3 tracking-[-0.05em]'>
-                <GradientText text='P' gradient='var(--brand-gradient)' />
-              </p>
-            </div>
-          )}
-          <PalmTree width={isOpen ? 40 : 30} height={isOpen ? 40 : 30} />
-          <OceanSunset
-            width={isOpen ? 20 : 15}
-            height={isOpen ? 20 : 15}
-            gradientId='flowGradientTitle'
-            className={'inline-block right-0'}
+        <div className='flex items-center gap-2'>
+          {(isOpen || isMobile) && <p className='text-3xl font-display font-black tracking-[-0.05em]'>Forever</p>}
+          <Image
+            src='/static/images/forever-pto-logo.png'
+            alt='Forever PTO logo'
+            width={isOpen || isMobile ? 40 : 32}
+            height={isOpen || isMobile ? 40 : 32}
+            className='shrink-0'
+            priority
           />
         </div>
       </Link>

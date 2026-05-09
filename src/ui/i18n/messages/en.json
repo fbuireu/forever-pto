@@ -1074,7 +1074,13 @@
       "titleEmphasis": "free",
       "titleEnd": "year starts today.",
       "description": "22 days can become 47. You just need to know where to place them. That's what we do.",
-      "cta": "Calculate my free days →"
+      "cta": "Calculate my free days →",
+      "shapes": {
+        "byeMonday": "bye, monday",
+        "doNotDisturb": "do not disturb",
+        "bossOff": "boss off",
+        "zeroRegrets": "0 regrets"
+      }
     }
   },
   "cookiePolicy": {

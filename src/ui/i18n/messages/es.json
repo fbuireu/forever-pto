@@ -1074,7 +1074,13 @@
       "titleEmphasis": "libre",
       "titleEnd": "empieza hoy.",
       "description": "22 días pueden ser 47. Solo hay que saber dónde colocarlos. Eso lo hacemos nosotros.",
-      "cta": "Calcular mis días gratis →"
+      "cta": "Calcular mis días gratis →",
+      "shapes": {
+        "byeMonday": "adiós, lunes",
+        "doNotDisturb": "no molestar",
+        "bossOff": "boss off",
+        "zeroRegrets": "0 arrepentimientos"
+      }
     }
   },
   "cookiePolicy": {

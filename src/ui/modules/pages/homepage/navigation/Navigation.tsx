@@ -1,6 +1,7 @@
 import { Link } from '@application/i18n/navigation';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { ThemeSelector } from '@ui/modules/sidebar/components/ThemeSelector';
+import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { HomepageLanguageSwitcher } from './HomepageLanguageSwitcher';
 
@@ -14,13 +15,15 @@ export const Navigation = async () => {
           href='/'
           className='flex items-center gap-2.5 font-display font-extrabold text-[22px] tracking-[-0.02em] hover:opacity-85 transition-opacity'
         >
-          <div
-            className='w-[38px] h-[38px] bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] grid place-items-center text-[22px] shrink-0'
+          <Image
+            src='/static/images/forever-pto-logo.png'
+            alt=''
+            width={38}
+            height={38}
+            className='shrink-0 rounded-[8px]'
             style={{ transform: 'rotate(-4deg)' }}
-            aria-hidden='true'
-          >
-            🌴
-          </div>
+            aria-hidden
+          />
           <span>Forever PTO</span>
         </Link>
 

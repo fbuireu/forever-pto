@@ -1074,7 +1074,13 @@
       "titleEmphasis": "libre",
       "titleEnd": "commence aujourd'hui.",
       "description": "22 jours peuvent devenir 47. Il suffit de savoir où les placer. C'est ce qu'on fait.",
-      "cta": "Calculer mes jours gratuits →"
+      "cta": "Calculer mes jours gratuits →",
+      "shapes": {
+        "byeMonday": "bye, lundi",
+        "doNotDisturb": "ne pas déranger",
+        "bossOff": "boss off",
+        "zeroRegrets": "0 regrets"
+      }
     }
   },
   "cookiePolicy": {

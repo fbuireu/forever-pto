@@ -1074,7 +1074,13 @@
       "titleEmphasis": "lliure",
       "titleEnd": "comença avui.",
       "description": "22 dies poden ser 47. Només cal saber on col·locar-los. Això ho fem nosaltres.",
-      "cta": "Calcular els meus dies gratis →"
+      "cta": "Calcular els meus dies gratis →",
+      "shapes": {
+        "byeMonday": "adéu, dilluns",
+        "doNotDisturb": "no molestar",
+        "bossOff": "boss off",
+        "zeroRegrets": "0 penediments"
+      }
     }
   },
   "cookiePolicy": {
