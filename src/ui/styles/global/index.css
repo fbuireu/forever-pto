@@ -82,6 +82,7 @@
     radial-gradient(circle at top left, rgba(78, 205, 196, 0.14), transparent 30%),
     radial-gradient(circle at top right, rgba(255, 122, 69, 0.1), transparent 30%),
     radial-gradient(circle at bottom left, rgba(179, 136, 255, 0.1), transparent 32%);
+  --accent-foreground: var(--color-brand-ink);
   --background: #121008;
   --foreground: #fff5e1;
   --card: #1a1612;

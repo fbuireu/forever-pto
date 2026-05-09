@@ -52,7 +52,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
   return (
     <SidebarProvider>
       <Sidebar collapsible='icon' variant='inset'>
-        <SidebarHeader>
+        <SidebarHeader className='group-data-[collapsible=icon]:p-0'>
           <SidebarMenu>
             <SidebarMenuItem>
               <Logo />
