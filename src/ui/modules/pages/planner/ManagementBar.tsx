@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
+import { LegendItems } from './Legend';
 import { PlannerPanel } from './PlannerPanel';
 import { PlannerPanelFixture } from './PlannerPanelFixture';
 
@@ -105,12 +106,7 @@ export const ManagementBar = () => {
           dismissible={false}
         >
           <DrawerContent overlay={false} className='h-[100dvh] max-h-none'>
-            <div data-vaul-no-drag className='flex-1 overflow-y-auto px-3 pt-3 pb-3 select-text'>
-              {isReady && currentSelection && <PlannerPanel key={previewAlternativeIndex} {...plannerPanelProps} />}
-            </div>
-
-            <div className='border-t-[2px] border-[var(--frame)]/15 mx-4' />
-            <div data-tutorial='planner-drawer' className='px-4 pt-2 pb-3'>
+            <div data-tutorial='planner-drawer' className='px-4 pt-2 pb-3 shrink-0'>
               {isReady ? (
                 <div className='flex items-center justify-between gap-3'>
                   <span className='text-sm font-black'>
@@ -129,6 +125,13 @@ export const ManagementBar = () => {
               ) : (
                 <div className='h-8 animate-pulse rounded-[8px] bg-[var(--surface-panel-soft)]' />
               )}
+            </div>
+
+            <div className='border-t-[2px] border-[var(--frame)]/15 mx-4 shrink-0' />
+            <div data-vaul-no-drag className='flex-1 overflow-y-auto px-3 pt-3 pb-6 select-text'>
+              {isReady && currentSelection && <PlannerPanel key={previewAlternativeIndex} {...plannerPanelProps} />}
+              <div className='border-t-[2px] border-[var(--frame)]/15 my-4' />
+              <LegendItems />
             </div>
           </DrawerContent>
         </Drawer>

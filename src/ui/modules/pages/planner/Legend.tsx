@@ -4,11 +4,53 @@ import { cn } from '@ui/utils/utils';
 import { useTranslations } from 'next-intl';
 import styles from './legend.module.css';
 
+interface LegendItemsProps {
+  className?: string;
+  itemClassName?: string;
+}
+
+export const LegendItems = ({ className, itemClassName }: LegendItemsProps) => {
+  const t = useTranslations('legend');
+
+  return (
+    <div className={cn('flex flex-wrap justify-center gap-4 text-sm', className)}>
+      <div className={cn('flex items-center', itemClassName)}>
+        <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.today)} />
+        <span>{t('today')}</span>
+      </div>
+      <div className={cn('flex items-center', itemClassName)}>
+        <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.weekend)} />
+        <span>{t('weekends')}</span>
+      </div>
+      <div className={cn('flex items-center', itemClassName)}>
+        <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.holiday)} />
+        <span>{t('holidays')}</span>
+      </div>
+      <div className={cn('flex items-center', itemClassName)}>
+        <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.suggested)} />
+        <span>{t('suggested')}</span>
+      </div>
+      <div className={cn('flex items-center', itemClassName)}>
+        <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.alternative, 'animate-none')} />
+        <span>{t('alternatives')}</span>
+      </div>
+      <div className={cn('flex items-center', itemClassName)}>
+        <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.manuallySelected)} />
+        <span>{t('manual')}</span>
+      </div>
+      <div className={cn('flex items-center', itemClassName)}>
+        <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.custom)} />
+        <span>{t('custom')}</span>
+      </div>
+    </div>
+  );
+};
+
 export const Legend = () => {
   const t = useTranslations('legend');
 
   return (
-    <div id='legend-sticky' className={styles.stickyContainer}>
+    <div id='legend-sticky' className={cn(styles.stickyContainer, 'hidden md:block')}>
       <input type='checkbox' id='legend-toggle' className={styles.toggle} />
       <section className={styles.section}>
         <Card className={styles.card}>
@@ -20,36 +62,7 @@ export const Legend = () => {
             </label>
           </CardHeader>
           <CardContent className={styles.cardContent}>
-            <div className={styles.items}>
-              <div className={cn('flex items-center', styles.item)}>
-                <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.today)} />
-                <span>{t('today')}</span>
-              </div>
-              <div className={cn('flex items-center', styles.item)}>
-                <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.weekend)} />
-                <span>{t('weekends')}</span>
-              </div>
-              <div className={cn('flex items-center', styles.item)}>
-                <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.holiday)} />
-                <span>{t('holidays')}</span>
-              </div>
-              <div className={cn('flex items-center', styles.item)}>
-                <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.suggested)} />
-                <span>{t('suggested')}</span>
-              </div>
-              <div className={cn('flex items-center', styles.item)}>
-                <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.alternative, 'animate-none')} />
-                <span>{t('alternatives')}</span>
-              </div>
-              <div className={cn('flex items-center', styles.item)}>
-                <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.manuallySelected)} />
-                <span>{t('manual')}</span>
-              </div>
-              <div className={cn('flex items-center', styles.item)}>
-                <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.custom)} />
-                <span>{t('custom')}</span>
-              </div>
-            </div>
+            <LegendItems className={styles.items} itemClassName={styles.item} />
           </CardContent>
         </Card>
       </section>

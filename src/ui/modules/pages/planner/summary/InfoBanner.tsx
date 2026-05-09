@@ -5,6 +5,7 @@ interface InfoBannerProps {
   icon: LucideIcon;
   title: string;
   children: React.ReactNode;
+  action?: React.ReactNode;
   colorScheme: keyof typeof COLOR_SCHEMES;
   className?: string;
 }
@@ -30,7 +31,7 @@ const COLOR_SCHEMES = {
   },
 };
 
-export const InfoBanner = ({ icon: Icon, title, children, colorScheme, className = '' }: InfoBannerProps) => {
+export const InfoBanner = ({ icon: Icon, title, children, action, colorScheme, className = '' }: InfoBannerProps) => {
   const colors = COLOR_SCHEMES[colorScheme];
 
   return (
@@ -41,13 +42,14 @@ export const InfoBanner = ({ icon: Icon, title, children, colorScheme, className
         className
       )}
     >
-      <div className={cn('flex items-center gap-2 mb-3')}>
-        <Icon className={cn('w-4 h-4', colors.icon)} />
+      <div className='flex items-center gap-2 mb-2'>
+        <Icon className={cn('w-4 h-4 shrink-0', colors.icon)} />
         <span className={cn('text-[0.72rem] font-display font-black uppercase tracking-[0.08em]', colors.title)}>
           {title}
         </span>
       </div>
-      <div className={cn('text-sm flex justify-start font-medium', colors.message)}>{children}</div>
+      <p className={cn('text-sm font-medium leading-snug', colors.message)}>{children}</p>
+      {action && <div className='mt-3'>{action}</div>}
     </div>
   );
 };

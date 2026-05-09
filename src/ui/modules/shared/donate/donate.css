@@ -1,13 +1,3 @@
-@media (max-width: 1279px) {
-  .donate-trigger {
-    transition: bottom 300ms ease-in-out;
-  }
-
-  body:has(#legend-toggle:checked) .donate-trigger {
-    bottom: 200px;
-  }
-}
-
 .donate-brutal {
   position: relative;
   border-radius: 10px;
