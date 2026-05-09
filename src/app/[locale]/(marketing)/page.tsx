@@ -48,7 +48,6 @@ export default HomePage;
 
 // better stack not working properly
 // todo: brutalist design (logo, border to highlight shadow on white and dark mde, status page in all locales, all butons (border color to show shadow?))
-// todo: colores de los grafocps
 // todo: focus input order in stripe
 // todo: improve responsive
 // todo: recreate bones

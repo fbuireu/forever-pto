@@ -3,15 +3,13 @@
 import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
-import { AlternativesManager } from '@ui/modules/core/animate/ui-elements/AlternativesManager';
 import { Skeleton } from 'boneyard-js/react';
 import { useTranslations } from 'next-intl';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
-import { AlternativesManagerFixture } from './calendar/AlternativesManagerFixture';
-import { PtoStatus } from './PtoStatus';
-import { PtoStatusFixture } from './PtoStatusFixture';
+import { PlannerPanel } from './PlannerPanel';
+import { PlannerPanelFixture } from './PlannerPanelFixture';
 
 export const ManagementBar = () => {
   const t = useTranslations('toasts');
@@ -65,21 +63,19 @@ export const ManagementBar = () => {
   const isReady = areStoresReady && hasValidSuggestions && hasValidCurrentSelection;
 
   return (
-    <div className='flex flex-wrap justify-between gap-4 w-full sticky top-3 z-50 col-span-full'>
-      <Skeleton name='alternatives-manager' loading={!isReady} fixture={<AlternativesManagerFixture />}>
-        {isReady && (
-          <AlternativesManager
+    <div className='w-full sticky top-3 z-50 col-span-full'>
+      <Skeleton name='planner-panel' loading={!isReady} fixture={<PlannerPanelFixture />}>
+        {isReady && currentSelection && (
+          <PlannerPanel
             key={previewAlternativeIndex}
             currentSelectionIndex={currentSelectionIndex}
             allSuggestions={allSuggestions}
             onSelectionChange={handleSelectionChange}
             onPreviewChange={handlePreviewChange}
             selectedIndex={previewAlternativeIndex}
+            currentSelection={currentSelection}
           />
         )}
-      </Skeleton>
-      <Skeleton name='pto-status' loading={!isReady} fixture={<PtoStatusFixture />}>
-        {isReady && currentSelection && <PtoStatus currentSelection={currentSelection} />}
       </Skeleton>
     </div>
   );

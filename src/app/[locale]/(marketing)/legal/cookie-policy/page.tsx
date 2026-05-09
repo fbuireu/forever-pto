@@ -2,7 +2,7 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { LegalLayout } from '@ui/modules/layout/LegalLayout';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
-import { Link } from 'src/application/i18n/navigtion';
+import { Link } from 'src/application/i18n/navigation';
 
 export { generateMetadata } from './metadata';
 

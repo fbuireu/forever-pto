@@ -1,6 +1,6 @@
 'use client';
 
-import { Link } from '@application/i18n/navigtion';
+import { Link } from '@application/i18n/navigation';
 import { useTutorial } from '@ui/hooks/useTutorial';
 import { useTranslations } from 'next-intl';
 

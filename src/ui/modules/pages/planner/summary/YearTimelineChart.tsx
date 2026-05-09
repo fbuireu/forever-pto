@@ -111,18 +111,21 @@ export const YearTimelineChart = ({ year, holidays, suggestion, manuallySelected
 
   return (
     <div className='w-full border-[3px] border-[var(--frame)] rounded-[10px] shadow-[4px_4px_0_0_var(--frame)] overflow-hidden bg-card'>
-      <div className='grid grid-cols-12 border-b-[3px] border-[var(--frame)]'>
-        {monthNames.map((name, i) => (
-          <div
-            key={name}
-            className={cn(
-              'py-2 px-1 text-center text-[11px] font-mono font-bold tracking-[0.05em]',
-              i < 11 && 'border-r-[2px] border-[var(--frame)]'
-            )}
-          >
-            {name}
-          </div>
-        ))}
+      <div className='flex gap-2.5 px-3 border-b-[3px] border-[var(--frame)]'>
+        <div className='w-[70px] shrink-0' />
+        <div className='flex-1 grid grid-cols-12'>
+          {monthNames.map((name, i) => (
+            <div
+              key={name}
+              className={cn(
+                'py-2 px-1 text-center text-[11px] font-mono font-bold tracking-[0.05em]',
+                i < 11 && 'border-r-[2px] border-[var(--frame)]'
+              )}
+            >
+              {name}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className='p-3 flex flex-col gap-2'>

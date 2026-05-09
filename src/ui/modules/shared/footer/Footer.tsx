@@ -1,4 +1,4 @@
-import { Link } from '@application/i18n/navigtion';
+import { Link } from '@application/i18n/navigation';
 import { getTranslations } from 'next-intl/server';
 import { version } from '../../../../../package.json';
 import { ContactButton } from '../contact/ContactButton';

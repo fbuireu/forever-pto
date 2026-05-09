@@ -69,6 +69,48 @@ function ProgressLabel({ className, ...props }: ProgressLabelProps) {
   );
 }
 
+type ProgressOverlayLabelProps = {
+  children: React.ReactNode;
+  className?: string;
+  overlayClassName?: string;
+  transition?: HTMLMotionProps<'div'>['transition'];
+};
+
+function ProgressOverlayLabel({
+  children,
+  className,
+  overlayClassName,
+  transition = { type: 'tween', duration: 0.15, ease: 'easeOut' },
+}: ProgressOverlayLabelProps) {
+  const { value } = useProgressContext();
+  const clipped = Math.max(0, 100 - Math.min(value, 100));
+
+  return (
+    <>
+      <span
+        className={cn(
+          'pointer-events-none absolute inset-0 grid place-items-center font-mono text-[11px] font-bold uppercase text-foreground',
+          className
+        )}
+      >
+        {children}
+      </span>
+      <m.span
+        className={cn(
+          'pointer-events-none absolute inset-0 grid place-items-center font-mono text-[11px] font-bold uppercase text-primary-foreground',
+          overlayClassName
+        )}
+        initial={{ clipPath: 'inset(0 100% 0 0)' }}
+        animate={{ clipPath: `inset(0 ${clipped}% 0 0)` }}
+        transition={transition}
+        aria-hidden
+      >
+        {children}
+      </m.span>
+    </>
+  );
+}
+
 type ProgressValueProps = Omit<ComponentProps<typeof ProgressPrimitive.Value>, 'render'> & {
   className?: string;
   suffix?: string;
@@ -100,6 +142,8 @@ export {
   Progress,
   ProgressLabel,
   type ProgressLabelProps,
+  ProgressOverlayLabel,
+  type ProgressOverlayLabelProps,
   type ProgressProps,
   ProgressTrack,
   type ProgressTrackProps,

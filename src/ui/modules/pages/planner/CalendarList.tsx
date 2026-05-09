@@ -103,6 +103,7 @@ export const CalendarList = () => {
           'grid [grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-5 mx-auto w-full',
           isCalculating && 'pointer-events-none'
         )}
+        id='calendar'
         data-tutorial='calendar-list'
       >
         {months.map((month) => (

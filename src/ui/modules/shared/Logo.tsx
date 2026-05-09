@@ -1,6 +1,6 @@
 'use client';
 
-import { Link } from '@application/i18n/navigtion';
+import { Link } from '@application/i18n/navigation';
 import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
 import { GradientText } from '@ui/modules/core/animate/primitives/texts/Gradient';
 import { useIsMobile } from 'src/ui/hooks/useMobile';

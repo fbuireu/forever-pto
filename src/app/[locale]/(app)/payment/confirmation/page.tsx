@@ -1,4 +1,4 @@
-import { Link } from '@application/i18n/navigtion';
+import { Link } from '@application/i18n/navigation';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
 import { Button } from '@ui/modules/core/primitives/Button';

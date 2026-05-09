@@ -1,6 +1,7 @@
 'use client';
 
 import { HolidayVariant } from '@application/dto/holiday/types';
+import { Link } from '@application/i18n/navigation';
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useLocationStore } from '@application/stores/location';
@@ -19,8 +20,8 @@ import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { InfoBanner } from './summary/InfoBanner';
 import { MetricCard, MetricCardSize } from './summary/MetricCard';
-import { NotificationCard } from './summary/NotificationCard';
 import { SummaryFixture } from './summary/SummaryFixture';
 
 const HolidaysDistributionChart = dynamic(() =>
@@ -332,20 +333,25 @@ export const Summary = () => {
               </PremiumFeature>
             )}
             {canImprove > 0 && (
-              <NotificationCard icon={Zap} title={t('notifications.canImprove.title')} colorScheme='orange'>
+              <InfoBanner icon={Zap} title={t('notifications.canImprove.title')} colorScheme='orange'>
                 {t('notifications.canImprove.message')}{' '}
                 <strong className='flex gap-1 mx-1'>
                   <SlidingNumber number={canImprove} />
                   {t('notifications.canImprove.moreDays')}
                 </strong>{' '}
-                {t('notifications.canImprove.toYourPlan')}
-                {premiumKey
-                  ? ` ${t('notifications.canImprove.reviewOptions')}`
-                  : ` ${t('notifications.canImprove.considerPremium')}`}
-              </NotificationCard>
+                {t('notifications.canImprove.toYourPlan')}{' '}
+                <Link
+                  href='#calendar'
+                  className='underline underline-offset-2 font-semibold hover:opacity-70 transition-opacity'
+                >
+                  {premiumKey
+                    ? t('notifications.canImprove.reviewOptions')
+                    : t('notifications.canImprove.considerPremium')}
+                </Link>
+              </InfoBanner>
             )}
             {(manuallySelectedDays.length > 0 || removedSuggestedDays.length > 0) && (
-              <NotificationCard
+              <InfoBanner
                 icon={CalendarDays}
                 title={t('notifications.manualAdjustments.title')}
                 colorScheme='indigo'
@@ -377,10 +383,10 @@ export const Summary = () => {
                   </>
                 )}
                 {` ${t('notifications.manualAdjustments.fromOriginal')}`}
-              </NotificationCard>
+              </InfoBanner>
             )}
             {holidayMetrics.customDays > 0 && (
-              <NotificationCard icon={CalendarDays} title={t('notifications.customHolidays.title')} colorScheme='blue'>
+              <InfoBanner icon={CalendarDays} title={t('notifications.customHolidays.title')} colorScheme='blue'>
                 {t('notifications.customHolidays.youHave')}{' '}
                 <strong className='flex gap-1 mx-1'>
                   <SlidingNumber number={holidayMetrics.customDays} />{' '}
@@ -389,7 +395,7 @@ export const Summary = () => {
                     : t('notifications.customHolidays.holiday')}
                 </strong>{' '}
                 {t('notifications.customHolidays.improvesPlan')}
-              </NotificationCard>
+              </InfoBanner>
             )}
           </CardContent>
         </Card>

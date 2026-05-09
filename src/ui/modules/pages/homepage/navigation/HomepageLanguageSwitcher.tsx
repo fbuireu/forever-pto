@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useRouter } from '@application/i18n/navigtion';
+import { usePathname, useRouter } from '@application/i18n/navigation';
 import { usePremiumStore } from '@application/stores/premium';
 import { useLanguages } from '@ui/hooks/useLanguages';
 import {

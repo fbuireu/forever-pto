@@ -274,7 +274,7 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
       variant='ghost'
       size='icon'
       className={cn(
-        'relative z-50 h-11 w-11 rounded-[10px] bg-[var(--accent)] text-[var(--accent-foreground)] border-[3px] border-[var(--color-brand-ink)] shadow-[var(--shadow-brutal-xs)] transition-[transform,box-shadow] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] active:bg-[var(--accent)] active:text-[var(--accent-foreground)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)] cursor-pointer before:content-[""] before:absolute before:-inset-[8px]',
+        'relative z-50 h-11 w-11 rounded-[10px] bg-[var(--accent)] text-[var(--accent-foreground)] border-[3px] border-[var(--color-brand-ink)] shadow-[var(--shadow-brutal-xs)] transition-[transform,box-shadow] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] active:bg-[var(--accent)] active:text-[var(--accent-foreground)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)] cursor-pointer',
         className
       )}
       onClick={(event) => {

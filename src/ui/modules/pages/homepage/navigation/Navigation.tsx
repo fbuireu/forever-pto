@@ -1,4 +1,4 @@
-import { Link } from '@application/i18n/navigtion';
+import { Link } from '@application/i18n/navigation';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { ThemeSelector } from '@ui/modules/sidebar/components/ThemeSelector';
 import { getTranslations } from 'next-intl/server';

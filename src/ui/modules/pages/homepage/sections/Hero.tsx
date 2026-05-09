@@ -1,4 +1,4 @@
-import { Link } from '@application/i18n/navigtion';
+import { Link } from '@application/i18n/navigation';
 import { Badge } from '@ui/modules/core/primitives/Badge';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';

@@ -32,7 +32,7 @@ const HolidaysDistributionChartLegend = ({ payload }: { payload?: readonly Legen
                 : entry.color,
           }}
         />
-        <span className='text-sm text-gray-800 dark:text-gray-200'>{entry.value}</span>
+        <span className='text-sm text-foreground'>{entry.value}</span>
       </li>
     ))}
   </ul>
@@ -70,7 +70,7 @@ export const HolidaysDistributionChart = ({ ptoDays, holidays }: HolidaysDistrib
       <Card className='shadow-[var(--shadow-brutal-md)] [contain:layout]'>
         <CardHeader className='pb-3'>
           <CardTitle className='flex items-center gap-2 text-base font-display font-semibold'>
-            <PieChart className='w-5 h-5 text-purple-500' />
+            <PieChart className='w-5 h-5 text-[var(--color-brand-purple)]' />
             {t('daysOffComposition')}
           </CardTitle>
           <div className='text-xs text-muted-foreground mt-1'>{chartData.description}</div>
@@ -101,7 +101,7 @@ export const HolidaysDistributionChart = ({ ptoDays, holidays }: HolidaysDistrib
                   color: 'var(--primary-foreground)',
                   boxShadow: '3px 3px 0 0 var(--accent)',
                 }}
-                cursor={{ fill: 'rgba(0, 0, 0, 0.5)' }}
+                cursor={{ fill: 'color-mix(in srgb, var(--frame) 8%, transparent)' }}
                 labelStyle={{ color: 'var(--primary-foreground)', fontWeight: 700 }}
                 itemStyle={{ color: 'var(--primary-foreground)' }}
               />

@@ -31,7 +31,7 @@ export const BlocksPerQuarterChart = ({ blocksPerQuarter }: BlockPerQuarterChart
       <Card className='shadow-[var(--shadow-brutal-md)] [contain:layout]'>
         <CardHeader className='pb-3'>
           <CardTitle className='flex items-center gap-2 text-base font-display font-semibold'>
-            <Calendar className='w-5 h-5 text-cyan-500' />
+            <Calendar className='w-5 h-5 text-[var(--color-brand-teal)]' />
             {t('longBlocksPerQuarter')}
           </CardTitle>
           <div className='text-xs text-muted-foreground mt-1'>{description}</div>
@@ -39,7 +39,7 @@ export const BlocksPerQuarterChart = ({ blocksPerQuarter }: BlockPerQuarterChart
         <CardContent className='h-64'>
           <ResponsiveContainer width='100%' height='100%'>
             <BarChart data={data} margin={{ top: 20, right: 20, left: 10, bottom: 30 }}>
-              <CartesianGrid strokeDasharray='3 3' stroke='#d1d5db' opacity={0.8} />
+              <CartesianGrid strokeDasharray='3 3' stroke='color-mix(in srgb, var(--frame) 20%, transparent)' />
               <XAxis dataKey='name' axisLine={false} tickLine={false} fontSize={14} />
               <YAxis axisLine={false} tickLine={false} fontSize={14} allowDecimals={false} />
               <Bar dataKey='blocks' radius={[6, 6, 0, 0]} maxBarSize={60} cursor={''}>
@@ -57,7 +57,7 @@ export const BlocksPerQuarterChart = ({ blocksPerQuarter }: BlockPerQuarterChart
                   color: 'var(--primary-foreground)',
                   boxShadow: '3px 3px 0 0 var(--accent)',
                 }}
-                cursor={{ fill: 'light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5))' }}
+                cursor={{ fill: 'color-mix(in srgb, var(--frame) 8%, transparent)' }}
                 labelStyle={{ color: 'var(--primary-foreground)', fontWeight: 700 }}
                 itemStyle={{ color: 'var(--primary-foreground)' }}
               />

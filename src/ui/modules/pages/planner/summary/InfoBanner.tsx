@@ -1,7 +1,7 @@
 import { cn } from '@ui/utils/utils';
 import type { LucideIcon } from 'lucide-react';
 
-interface NotificationCardProps {
+interface InfoBannerProps {
   icon: LucideIcon;
   title: string;
   children: React.ReactNode;
@@ -30,13 +30,13 @@ const COLOR_SCHEMES = {
   },
 };
 
-export const NotificationCard = ({
+export const InfoBanner = ({
   icon: Icon,
   title,
   children,
   colorScheme,
   className = '',
-}: NotificationCardProps) => {
+}: InfoBannerProps) => {
   const colors = COLOR_SCHEMES[colorScheme];
 
   return (
