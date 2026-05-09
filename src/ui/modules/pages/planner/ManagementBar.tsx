@@ -101,10 +101,15 @@ export const ManagementBar = () => {
           activeSnapPoint={snap}
           setActiveSnapPoint={setSnap}
           modal={false}
-          defaultOpen
+          open={true}
           dismissible={false}
         >
-          <DrawerContent overlay={false}>
+          <DrawerContent overlay={false} className='h-[100dvh] max-h-none'>
+            <div data-vaul-no-drag className='flex-1 overflow-y-auto px-3 pt-3 pb-3 select-text'>
+              {isReady && currentSelection && <PlannerPanel key={previewAlternativeIndex} {...plannerPanelProps} />}
+            </div>
+
+            <div className='border-t-[2px] border-[var(--frame)]/15 mx-4' />
             <div data-tutorial='planner-drawer' className='px-4 pt-2 pb-3'>
               {isReady ? (
                 <div className='flex items-center justify-between gap-3'>
@@ -124,11 +129,6 @@ export const ManagementBar = () => {
               ) : (
                 <div className='h-8 animate-pulse rounded-[8px] bg-[var(--surface-panel-soft)]' />
               )}
-            </div>
-
-            <div className='border-t-[2px] border-[var(--frame)]/15 mx-4' />
-            <div data-vaul-no-drag className='overflow-y-auto px-3 pb-6 pt-3 select-text'>
-              {isReady && currentSelection && <PlannerPanel key={previewAlternativeIndex} {...plannerPanelProps} />}
             </div>
           </DrawerContent>
         </Drawer>

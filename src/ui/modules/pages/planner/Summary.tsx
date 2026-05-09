@@ -185,12 +185,14 @@ export const Summary = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className='space-y-6'>
-            <YearTimelineChart
-              year={Number(year)}
-              holidays={holidays ?? []}
-              suggestion={activeSuggestion}
-              manuallySelectedDays={manuallySelectedDays}
-            />
+            <div className='hidden sm:block'>
+              <YearTimelineChart
+                year={Number(year)}
+                holidays={holidays ?? []}
+                suggestion={activeSuggestion}
+                manuallySelectedDays={manuallySelectedDays}
+              />
+            </div>
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
               <HolidaysDistributionChart ptoDays={ptoDays} holidays={holidays ?? []} />
               <QuarterDistributionChart quarterDist={metrics.quarterDist} />

@@ -131,7 +131,7 @@ export const YearTimelineChart = ({ year, holidays, suggestion, manuallySelected
       <div className='p-3 flex flex-col gap-2'>
         {rows.map(({ key, label, segs }) => (
           <div key={key} className='flex items-center gap-2.5'>
-            <div className='w-[70px] shrink-0 text-[10px] font-mono font-bold uppercase tracking-[0.08em] text-muted-foreground leading-none'>
+            <div className='w-[70px] shrink-0 overflow-hidden text-[10px] font-mono font-bold uppercase tracking-[0.08em] text-muted-foreground leading-none'>
               {label}
             </div>
             <div className='flex-1 h-4 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-full relative overflow-hidden'>
