@@ -1,7 +1,7 @@
 import { cn } from '@ui/utils/utils';
 import type { LucideIcon } from 'lucide-react';
 
-interface InfoBannerProps {
+interface BannerProps {
   icon: LucideIcon;
   title: string;
   children: React.ReactNode;
@@ -29,13 +29,21 @@ const COLOR_SCHEMES = {
     title: 'text-[var(--color-brand-purple-deep)] dark:text-purple-200',
     message: 'text-[var(--color-brand-ink)] dark:text-purple-100',
   },
+  green: {
+    bg: 'bg-[color-mix(in_srgb,var(--color-brand-green)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-green)_16%,black_84%)]',
+    icon: 'text-[#3f6212] dark:text-[var(--color-brand-green)]',
+    title: 'text-[#3f6212] dark:text-[var(--color-brand-green)]',
+    message: 'text-[var(--color-brand-ink)] dark:text-green-100',
+  },
 };
 
-export const InfoBanner = ({ icon: Icon, title, children, action, colorScheme, className = '' }: InfoBannerProps) => {
+export const Banner = ({ icon: Icon, title, children, action, colorScheme, className = '' }: BannerProps) => {
   const colors = COLOR_SCHEMES[colorScheme];
 
   return (
     <div
+      role='note'
+      aria-label={title}
       className={cn(
         'rounded-[10px] border-[3px] border-[var(--frame)] p-4 shadow-[var(--shadow-brutal-sm)]',
         colors.bg,
@@ -43,7 +51,7 @@ export const InfoBanner = ({ icon: Icon, title, children, action, colorScheme, c
       )}
     >
       <div className='flex items-center gap-2 mb-2'>
-        <Icon className={cn('w-4 h-4 shrink-0', colors.icon)} />
+        <Icon aria-hidden='true' className={cn('w-4 h-4 shrink-0', colors.icon)} />
         <span className={cn('text-[0.72rem] font-display font-black uppercase tracking-[0.08em]', colors.title)}>
           {title}
         </span>

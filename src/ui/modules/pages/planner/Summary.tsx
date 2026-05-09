@@ -12,6 +12,7 @@ import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { RotatingText } from '@ui/modules/core/animate/text/Rotating';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Badge } from '@ui/modules/core/primitives/Badge';
+import { Banner } from '@ui/modules/core/primitives/Banner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { Skeleton } from 'boneyard-js/react';
@@ -20,7 +21,6 @@ import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { InfoBanner } from './summary/InfoBanner';
 import { MetricCard, MetricCardSize } from './summary/MetricCard';
 import { SummaryFixture } from './summary/SummaryFixture';
 
@@ -335,7 +335,7 @@ export const Summary = () => {
               </PremiumFeature>
             )}
             {canImprove > 0 && (
-              <InfoBanner
+              <Banner
                 icon={Zap}
                 title={t('notifications.canImprove.title')}
                 colorScheme='orange'
@@ -356,10 +356,10 @@ export const Summary = () => {
                   <span>{t('notifications.canImprove.moreDays')}</span>
                 </strong>
                 <span>{t('notifications.canImprove.toYourPlan')}</span>
-              </InfoBanner>
+              </Banner>
             )}
             {(manuallySelectedDays.length > 0 || removedSuggestedDays.length > 0) && (
-              <InfoBanner
+              <Banner
                 icon={CalendarDays}
                 title={t('notifications.manualAdjustments.title')}
                 colorScheme='indigo'
@@ -391,10 +391,10 @@ export const Summary = () => {
                   </>
                 )}
                 {` ${t('notifications.manualAdjustments.fromOriginal')}`}
-              </InfoBanner>
+              </Banner>
             )}
             {holidayMetrics.customDays > 0 && (
-              <InfoBanner icon={CalendarDays} title={t('notifications.customHolidays.title')} colorScheme='blue'>
+              <Banner icon={CalendarDays} title={t('notifications.customHolidays.title')} colorScheme='blue'>
                 {t('notifications.customHolidays.youHave')}{' '}
                 <strong className='flex gap-1 mx-1'>
                   <SlidingNumber number={holidayMetrics.customDays} />{' '}
@@ -403,7 +403,7 @@ export const Summary = () => {
                     : t('notifications.customHolidays.holiday')}
                 </strong>{' '}
                 {t('notifications.customHolidays.improvesPlan')}
-              </InfoBanner>
+              </Banner>
             )}
           </CardContent>
         </Card>

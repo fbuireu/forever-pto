@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Lock } from '@ui/modules/core/animate/icons/Lock';
+import { Banner } from '@ui/modules/core/primitives/Banner';
 import { Button } from '@ui/modules/core/primitives/Button';
 import {
   Dialog,
@@ -12,7 +13,7 @@ import {
 } from '@ui/modules/core/primitives/Dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
-import { AlertCircle, Crown, Loader2 } from 'lucide-react';
+import { AlertCircle, Crown, Loader2, Lock as LockIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -93,13 +94,15 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
             <Crown className='w-5 h-5 text-yellow-500' />
             {t('premiumRequired')}
           </DialogTitle>
-          <DialogDescription>
-            <span className='block my-2'>
-              <Lock className='w-4 h-4 inline mr-1' animateOnView loop />
-              <strong>{feature}</strong> {t('featureRequiresPremium')}
-            </span>
-            <span className='block text-muted-foreground leading-relaxed'>{t('verifyDescription')}</span>
-            <span className='block text-muted-foreground leading-relaxed my-2'>{t('considerDonating')}</span>
+          <DialogDescription asChild>
+            <div>
+              <Banner icon={LockIcon} title={t('premiumRequired')} colorScheme='indigo' className='my-3'>
+                <strong>{feature}</strong>
+                <span>{t('featureRequiresPremium')}</span>
+              </Banner>
+              <span className='block text-muted-foreground leading-relaxed'>{t('verifyDescription')}</span>
+              <span className='block text-muted-foreground leading-relaxed my-2'>{t('considerDonating')}</span>
+            </div>
           </DialogDescription>
         </DialogHeader>
 
