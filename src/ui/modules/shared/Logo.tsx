@@ -10,24 +10,28 @@ export function Logo() {
   const isMobile = useIsMobile();
   const isOpen = state === 'expanded';
 
+  const logoSize = isOpen || isMobile ? 40 : 36;
+
   return (
-    <div className='flex justify-center mx-auto px-3 py-3 group-data-[collapsible=icon]:p-1.5 rounded-[10px] border-[3px] border-transparent transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:border-[var(--frame)] hover:shadow-[var(--shadow-brutal-xs)]'>
-      <Link href='/' onClick={() => isMobile && setOpenMobile(false)} className='no-underline outline-none'>
+    <div className='group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:h-11 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center px-3 py-3 group-data-[collapsible=icon]:p-0 rounded-[10px] border-[3px] border-transparent transition-[transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:border-[var(--frame)] hover:shadow-[var(--shadow-brutal-xs)]'>
+      <Link
+        href='/'
+        onClick={() => isMobile && setOpenMobile(false)}
+        className='no-underline outline-none'
+        aria-label='Forever PTO'
+      >
         <div className='flex items-center gap-2'>
           {(isOpen || isMobile) && <p className='text-3xl font-display font-black tracking-[-0.05em]'>Forever</p>}
           <div
             className='bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[var(--shadow-brutal-xs)] overflow-hidden shrink-0'
-            style={{
-              width: isOpen || isMobile ? 40 : 32,
-              height: isOpen || isMobile ? 40 : 32,
-            }}
-            aria-hidden
+            style={{ width: logoSize, height: logoSize }}
+            aria-hidden='true'
           >
             <Image
               src='/static/images/forever-pto-logo.png'
               alt=''
-              width={isOpen || isMobile ? 40 : 32}
-              height={isOpen || isMobile ? 40 : 32}
+              width={logoSize}
+              height={logoSize}
               priority
               unoptimized
             />
