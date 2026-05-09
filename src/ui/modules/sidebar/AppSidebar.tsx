@@ -10,7 +10,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarRail,
   SidebarTrigger,
 } from '@ui/modules/core/animate/base/Sidebar';
 import { ChevronDown } from '@ui/modules/core/animate/icons/ChevronDown';
@@ -64,7 +63,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarGroup className='rounded-[12px] bg-[var(--surface-panel-soft)] group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0'>
+          <SidebarGroup className='rounded-[12px] mt-2 bg-[var(--surface-panel-soft)] group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0'>
             <SidebarGroupLabel role='heading' aria-level={2}>
               {t('configuration')}
             </SidebarGroupLabel>
@@ -188,7 +187,6 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooterButtons />
-        <SidebarRail />
       </Sidebar>
       <SidebarInset id='main-content' tabIndex={-1} className='outline-none'>
         <SidebarTrigger className={'cursor-pointer size-11 fixed m-3 z-51 p-1'} />

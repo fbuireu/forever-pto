@@ -9,7 +9,6 @@ export function Logo() {
   const { state, setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
   const isOpen = state === 'expanded';
-
   const logoSize = isOpen || isMobile ? 40 : 36;
 
   return (
@@ -17,7 +16,7 @@ export function Logo() {
       <Link
         href='/'
         onClick={() => isMobile && setOpenMobile(false)}
-        className='no-underline outline-none'
+        className='no-underline outline-none w-full flex justify-center'
         aria-label='Forever PTO'
       >
         <div className='flex items-center gap-2'>
