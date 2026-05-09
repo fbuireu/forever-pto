@@ -94,7 +94,7 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
                 {isPending ? t('submitting') : t('submit')}
               </Button>
             </AnimateIcon>
-            <Button variant='outline' onClick={onClose} className='flex-1' disabled={isPending}>
+            <Button variant='destructive' onClick={onClose} className='flex-1' disabled={isPending}>
               {t('cancel')}
             </Button>
           </div>

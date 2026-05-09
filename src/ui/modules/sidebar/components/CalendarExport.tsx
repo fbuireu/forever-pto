@@ -3,6 +3,7 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { downloadIcs, generateIcs } from '@infrastructure/services/export/generateIcs';
+import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { Button } from '@ui/modules/core/animate/components/buttons/Button';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { Download, FileText } from 'lucide-react';
@@ -87,7 +88,7 @@ export const CalendarExport = () => {
           b: (chunks) => <strong className='font-black text-foreground'>{chunks}</strong>,
         })}
       </p>
-      <div className='flex gap-2'>
+      <div className='flex gap-2 items-center'>
         <Button
           type='button'
           size='sm'
@@ -106,12 +107,18 @@ export const CalendarExport = () => {
         >
           {t('includePto')}
         </Button>
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
+            <TooltipContent className='w-50 text-pretty'>{t('tooltip')}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       <PremiumFeature feature={t('title')}>
         <div className='flex flex-col gap-2'>
           <Button onClick={handleDownloadPdf} disabled={!hasData || isPdfPending} className='w-full' variant='outline'>
             <FileText className='w-3 h-3' />
-            {isPdfPending ? '…' : t('downloadPdf')}
+            {isPdfPending ? t('downloadingPdf') : t('downloadPdf')}
           </Button>
           <Button onClick={handleDownloadIcs} disabled={!hasData} className='w-full' variant='outline'>
             <Download className='w-3 h-3' />

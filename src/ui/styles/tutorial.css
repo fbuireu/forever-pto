@@ -49,8 +49,8 @@
     line-height: 1;
     letter-spacing: -0.03em;
     color: var(--card-foreground);
-    margin: 0 -1.5rem;
-    padding: 0 1.5rem 1rem;
+    margin: 0;
+    padding: 0 0 1rem;
     border-bottom: 2px solid color-mix(in srgb, var(--frame) 18%, transparent);
   }
 
@@ -91,6 +91,9 @@
     font-size: 0.875rem;
     font-weight: 900;
     letter-spacing: 0.01em;
+    text-shadow: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     transition:
       color 75ms linear,
       background-color 75ms linear,
@@ -175,7 +178,7 @@
   .driver-popover-close-btn {
     position: absolute;
     top: 1rem;
-    right: 1rem;
+    right: 1.5rem;
     width: auto;
     height: auto;
     padding: 0.375rem;

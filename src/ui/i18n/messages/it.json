@@ -371,6 +371,9 @@
     "calendarName": "Forever PTO",
     "ptoDayLabel": "Giorno di ferie",
     "downloadPdf": "Scarica .pdf",
+    "downloadingPdf": "Scaricando",
+    "tooltip": "Scegli cosa includere nell'esportazione: festivi, i tuoi giorni di ferie o entrambi.",
+    "tooltipLabel": "Info opzioni di esportazione",
     "pdf": {
       "holidays": "Festivi",
       "vacationDays": "Giorni di ferie",
@@ -717,7 +720,9 @@
       "customWeekends": "Weekend Personalizzati",
       "customWeekendsDescription": "Definisci giorni non lavorativi personalizzati oltre al weekend standard sabato-domenica",
       "multiYearPlanning": "Pianificazione Multi-Anno",
-      "multiYearPlanningDescription": "Pianifica le ferie su più anni con supporto per il riporto"
+      "multiYearPlanningDescription": "Pianifica le ferie su più anni con supporto per il riporto",
+      "calendarSubscription": "Abbonamento Calendario in Tempo Reale",
+      "calendarSubscriptionDescription": "Abbonati direttamente da Google Calendar, Apple Calendar o Outlook tramite un URL webcal:// — il tuo piano rimane sincronizzato automaticamente"
     }
   },
   "cookies": {

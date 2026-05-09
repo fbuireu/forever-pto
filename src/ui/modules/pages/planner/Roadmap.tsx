@@ -173,6 +173,11 @@ export function Roadmap() {
           title: t('features.multiYearPlanning'),
           description: t('features.multiYearPlanningDescription'),
         },
+        {
+          id: '17',
+          title: t('features.calendarSubscription'),
+          description: t('features.calendarSubscriptionDescription'),
+        },
       ],
     }),
     [t]

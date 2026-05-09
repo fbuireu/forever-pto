@@ -223,7 +223,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
               </span>
               <p className='text-sm text-muted-foreground'>{t('successDescription')}</p>
             </div>
-            <Button variant='outline' size='sm' onClick={handleClose}>
+            <Button variant='destructive' size='sm' onClick={handleClose}>
               {t('close')}
             </Button>
           </div>
@@ -245,7 +245,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
               <Button variant='outline' onClick={handleTryAgain} className='flex-1'>
                 {t('tryAgain')}
               </Button>
-              <Button onClick={handleClose} className='flex-1'>
+              <Button onClick={handleClose} variant='destructive' className='flex-1'>
                 {t('close')}
               </Button>
             </div>

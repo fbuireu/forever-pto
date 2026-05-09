@@ -129,7 +129,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
               />
 
               <div className='flex gap-2'>
-                <Button type='submit' disabled={isLoading} className='flex-1'>
+                <Button type='submit' variant='success' disabled={isLoading} className='flex-1'>
                   {isLoading ? (
                     <>
                       <Loader2 className='w-4 h-4 mr-2 animate-spin' />
@@ -139,7 +139,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
                     t('verifyAccess')
                   )}
                 </Button>
-                <Button type='button' variant='outline' onClick={handleClose} disabled={isLoading}>
+                <Button type='button' variant='destructive' onClick={handleClose} disabled={isLoading}>
                   {t('cancel')}
                 </Button>
               </div>
@@ -168,7 +168,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
               <Button onClick={handleTryAgain} variant='outline' className='flex-1'>
                 {t('tryAgain')}
               </Button>
-              <Button onClick={handleClose} className='flex-1'>
+              <Button onClick={handleClose} variant='destructive' className='flex-1'>
                 {t('close')}
               </Button>
             </div>

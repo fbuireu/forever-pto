@@ -24,7 +24,7 @@ export const FormButtons = ({
   hideCancel = false,
   submitClassName,
   cancelClassName,
-  submitVariant = 'default',
+  submitVariant = 'success',
   pending: pendingProp,
 }: FormButtonsProps) => {
   const t = useTranslations('formButtons');
@@ -47,7 +47,7 @@ export const FormButtons = ({
         )}
       </Button>
       {!hideCancel && onCancel && (
-        <Button type='button' variant='outline' onClick={onCancel} disabled={isPending} className={cancelClassName}>
+        <Button type='button' variant='destructive' onClick={onCancel} disabled={isPending} className={cancelClassName}>
           {resolvedCancelText}
         </Button>
       )}

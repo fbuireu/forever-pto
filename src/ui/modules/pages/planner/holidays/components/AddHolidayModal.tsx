@@ -175,11 +175,11 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
             />
             <DialogFooter>
               <div className='flex gap-2 pt-2'>
-                <Button type='submit' className='flex-1' disabled={isPending}>
+                <Button type='submit' variant='success' className='flex-1' disabled={isPending}>
                   <Plus className='w-4 h-4 mr-2' />
                   {isPending ? t('submitting') : t('submit')}
                 </Button>
-                <Button type='button' variant='outline' onClick={handleClose} disabled={isPending}>
+                <Button type='button' variant='destructive' onClick={handleClose} disabled={isPending}>
                   {t('cancel')}
                 </Button>
               </div>

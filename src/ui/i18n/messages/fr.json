@@ -371,6 +371,9 @@
     "calendarName": "Forever PTO",
     "ptoDayLabel": "Jour de congé",
     "downloadPdf": "Télécharger .pdf",
+    "downloadingPdf": "Téléchargement",
+    "tooltip": "Choisis ce que tu veux inclure dans l'export : jours fériés, tes jours de congé ou les deux.",
+    "tooltipLabel": "Info options d'export",
     "pdf": {
       "holidays": "Jours fériés",
       "vacationDays": "Jours de vacances",
@@ -717,7 +720,9 @@
       "customWeekends": "Week-ends personnalisés",
       "customWeekendsDescription": "Définis des jours chômés personnalisés au-delà du week-end standard samedi-dimanche",
       "multiYearPlanning": "Planification pluriannuelle",
-      "multiYearPlanningDescription": "Planifie tes vacances sur plusieurs années avec le support du report"
+      "multiYearPlanningDescription": "Planifie tes vacances sur plusieurs années avec le support du report",
+      "calendarSubscription": "Abonnement calendrier en direct",
+      "calendarSubscriptionDescription": "Abonne-toi directement depuis Google Calendar, Apple Calendar ou Outlook via une URL webcal:// — ton plan se synchronise automatiquement"
     }
   },
   "cookies": {

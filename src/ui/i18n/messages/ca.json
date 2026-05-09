@@ -371,6 +371,9 @@
     "calendarName": "Forever PTO",
     "ptoDayLabel": "Dia de PTO",
     "downloadPdf": "Descarregar .pdf",
+    "downloadingPdf": "Descarregant",
+    "tooltip": "Tria què incloure a l'exportació: festius, els teus dies de vacances o tots dos.",
+    "tooltipLabel": "Info opcions d'exportació",
     "pdf": {
       "holidays": "Festius",
       "vacationDays": "Dies de vacances",
@@ -717,7 +720,9 @@
       "customWeekends": "Caps de Setmana Personalitzats",
       "customWeekendsDescription": "Defineix dies no laborables personalitzats més enllà del cap de setmana estàndard dissabte-diumenge",
       "multiYearPlanning": "Planificació Multi-Any",
-      "multiYearPlanningDescription": "Planifica vacances al llarg de múltiples anys amb suport d'arrossegament"
+      "multiYearPlanningDescription": "Planifica vacances al llarg de múltiples anys amb suport d'arrossegament",
+      "calendarSubscription": "Subscripció de Calendari en Viu",
+      "calendarSubscriptionDescription": "Subscriu-te directament des de Google Calendar, Apple Calendar o Outlook mitjançant una URL webcal:// — el teu pla es sincronitza automàticament"
     }
   },
   "cookies": {
