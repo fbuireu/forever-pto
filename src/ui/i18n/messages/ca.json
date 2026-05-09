@@ -346,7 +346,9 @@
       "step3Title": "Pas {step} — La teva configuració",
       "step3Description": "Tria la teva estratègia d'optimització i configura els dies passats i els mesos de trasllat per ajustar el teu pla.",
       "step4Title": "Pas {step} — Exporta el teu calendari",
-      "step4Description": "Descarrega els teus festius i dies de vacances planificats com a fitxer .ics per importar-lo a Google Calendar, Apple Calendar o Outlook, o com a PDF per imprimir o compartir."
+      "step4Description": "Descarrega els teus festius i dies de vacances planificats com a fitxer .ics per importar-lo a Google Calendar, Apple Calendar o Outlook, o com a PDF per imprimir o compartir.",
+      "drawerTitle": "El teu panell de planificació",
+      "drawerDescription": "Aquesta barra sempre mostra un resum del teu pla. Llisca-la cap amunt —o arrossega el tirador— per explorar alternatives i veure com es distribueixen els teus dies."
     }
   },
   "legend": {

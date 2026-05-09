@@ -346,7 +346,9 @@
       "step3Title": "Step {step} — Your configuration",
       "step3Description": "Choose your optimization strategy and configure past days and carryover months to fine-tune your plan.",
       "step4Title": "Step {step} — Export your calendar",
-      "step4Description": "Download your holidays and planned vacation days as a .ics file to import into Google Calendar, Apple Calendar or Outlook, or as a PDF to print or share."
+      "step4Description": "Download your holidays and planned vacation days as a .ics file to import into Google Calendar, Apple Calendar or Outlook, or as a PDF to print or share.",
+      "drawerTitle": "Your Planner Panel",
+      "drawerDescription": "This bar always shows your current plan summary. Swipe it up — or drag the handle — to explore alternatives and see how your days are distributed."
     }
   },
   "legend": {

@@ -1,5 +1,6 @@
 'use client';
 
+import { useIsMobile } from '@ui/hooks/useMobile';
 import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
 import type { DriveStep } from 'driver.js';
 import { useTranslations } from 'next-intl';
@@ -9,6 +10,7 @@ const SIDEBAR_CONTAINER_SELECTOR = '[data-slot="sidebar-container"]';
 
 export const useTutorial = () => {
   const { open, toggleSidebar } = useSidebar();
+  const isMobile = useIsMobile();
   const t = useTranslations('tutorial.steps');
   const tUi = useTranslations('tutorial');
 
@@ -18,6 +20,8 @@ export const useTutorial = () => {
       import('@ui/modules/tutorial/DriverStyles'),
     ]);
     const driverClient = getDriverClientInstance();
+
+    const expandDrawer = () => window.dispatchEvent(new CustomEvent('tutorial:expand-drawer'));
 
     const steps: DriveStep[] = [
       {
@@ -65,6 +69,19 @@ export const useTutorial = () => {
           align: 'start',
         },
       },
+      ...(isMobile
+        ? [
+            {
+              element: '[data-tutorial="planner-drawer"]',
+              popover: {
+                title: t('drawerTitle'),
+                description: t('drawerDescription'),
+                side: 'top' as const,
+                align: 'center' as const,
+              },
+            },
+          ]
+        : []),
       {
         element: '[data-tutorial="alternatives-manager"]',
         popover: {
@@ -73,6 +90,7 @@ export const useTutorial = () => {
           side: 'bottom',
           align: 'start',
         },
+        onHighlightStarted: isMobile ? expandDrawer : undefined,
       },
       {
         element: '[data-tutorial="pto-status"]',
@@ -127,7 +145,7 @@ export const useTutorial = () => {
       doneBtnText: tUi('doneBtn'),
       progressText: `{{current}} ${tUi('progressTextConnector')} {{total}}`,
     });
-  }, [open, t, tUi, toggleSidebar]);
+  }, [open, isMobile, t, tUi, toggleSidebar]);
 
   return { startTutorial };
 };

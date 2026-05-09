@@ -30,13 +30,7 @@ const COLOR_SCHEMES = {
   },
 };
 
-export const InfoBanner = ({
-  icon: Icon,
-  title,
-  children,
-  colorScheme,
-  className = '',
-}: InfoBannerProps) => {
+export const InfoBanner = ({ icon: Icon, title, children, colorScheme, className = '' }: InfoBannerProps) => {
   const colors = COLOR_SCHEMES[colorScheme];
 
   return (

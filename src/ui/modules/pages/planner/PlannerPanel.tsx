@@ -61,7 +61,13 @@ interface AlternativesProps {
   currentSelectionIndex: number;
 }
 
-function Alternatives({ allSuggestions, onSelectionChange, onPreviewChange, selectedIndex = 0, currentSelectionIndex = 0 }: AlternativesProps) {
+function Alternatives({
+  allSuggestions,
+  onSelectionChange,
+  onPreviewChange,
+  selectedIndex = 0,
+  currentSelectionIndex = 0,
+}: AlternativesProps) {
   const t = useTranslations('alternativesManager');
   const [currentIndex, setCurrentIndex] = useState(selectedIndex);
   const totalOptions = allSuggestions.length;
@@ -143,12 +149,20 @@ function Alternatives({ allSuggestions, onSelectionChange, onPreviewChange, sele
         >
           <CalendarDays size={20} className='text-green-600 dark:text-green-400 shrink-0' />
           <div className='flex items-center gap-1'>
-            <SlidingNumber className='text-sm font-semibold text-green-700 dark:text-green-300' number={effectiveDays ?? 0} />
+            <SlidingNumber
+              className='text-sm font-semibold text-green-700 dark:text-green-300'
+              number={effectiveDays ?? 0}
+            />
             <span className='text-xs text-green-600 dark:text-green-400 flex'>
-              (+<SlidingNumber number={gainedDays} />)
+              (+
+              <SlidingNumber number={gainedDays} />)
             </span>
           </div>
-          <m.span variants={LABEL_VARIANTS} transition={LABEL_TRANSITION} className='invisible text-sm text-green-600 dark:text-green-400'>
+          <m.span
+            variants={LABEL_VARIANTS}
+            transition={LABEL_TRANSITION}
+            className='invisible text-sm text-green-600 dark:text-green-400'
+          >
             {t('totalOff')}
           </m.span>
         </m.button>
@@ -160,16 +174,29 @@ function Alternatives({ allSuggestions, onSelectionChange, onPreviewChange, sele
         >
           <TrendingUp size={20} className='text-purple-600 dark:text-purple-400 shrink-0' />
           <div className='flex items-center gap-1'>
-            <SlidingNumber className='text-sm font-semibold text-purple-700 dark:text-purple-300' number={parseFloat(efficiency.toFixed(1))} decimalPlaces={1} />
+            <SlidingNumber
+              className='text-sm font-semibold text-purple-700 dark:text-purple-300'
+              number={parseFloat(efficiency.toFixed(1))}
+              decimalPlaces={1}
+            />
             <span className='text-sm font-semibold text-purple-700 dark:text-purple-300'>x</span>
             {!isMainSuggestion && (
-              <span className={cn('text-xs flex', efficiencyDiff >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400')}>
+              <span
+                className={cn(
+                  'text-xs flex',
+                  efficiencyDiff >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                )}
+              >
                 {efficiencyDiff >= 0 ? '+' : ''}
                 <SlidingNumber number={parseFloat(efficiencyDiff.toFixed(1))} decimalPlaces={1} />
               </span>
             )}
           </div>
-          <m.span variants={LABEL_VARIANTS} transition={LABEL_TRANSITION} className='invisible text-sm text-purple-600 dark:text-purple-400'>
+          <m.span
+            variants={LABEL_VARIANTS}
+            transition={LABEL_TRANSITION}
+            className='invisible text-sm text-purple-600 dark:text-purple-400'
+          >
             {t('efficiency')}
           </m.span>
         </m.button>
@@ -183,12 +210,30 @@ function Alternatives({ allSuggestions, onSelectionChange, onPreviewChange, sele
             <BarChart3 size={20} className='text-neutral-600 dark:text-neutral-400 shrink-0' />
             <div className='flex items-center gap-1'>
               <SlidingNumber
-                className={cn('text-sm font-semibold', efficiencyDiff >= -0.5 ? 'text-amber-600 dark:text-amber-400' : 'text-neutral-600 dark:text-neutral-400')}
+                className={cn(
+                  'text-sm font-semibold',
+                  efficiencyDiff >= -0.5
+                    ? 'text-amber-600 dark:text-amber-400'
+                    : 'text-neutral-600 dark:text-neutral-400'
+                )}
                 number={Math.round((efficiency / mainEfficiency) * 100)}
               />
-              <span className={cn('text-sm font-semibold', efficiencyDiff >= -0.5 ? 'text-amber-600 dark:text-amber-400' : 'text-neutral-600 dark:text-neutral-400')}>%</span>
+              <span
+                className={cn(
+                  'text-sm font-semibold',
+                  efficiencyDiff >= -0.5
+                    ? 'text-amber-600 dark:text-amber-400'
+                    : 'text-neutral-600 dark:text-neutral-400'
+                )}
+              >
+                %
+              </span>
             </div>
-            <m.span variants={LABEL_VARIANTS} transition={LABEL_TRANSITION} className='invisible text-sm text-neutral-600 dark:text-neutral-400'>
+            <m.span
+              variants={LABEL_VARIANTS}
+              transition={LABEL_TRANSITION}
+              className='invisible text-sm text-neutral-600 dark:text-neutral-400'
+            >
               {t('vsMain')}
             </m.span>
           </m.button>
@@ -242,12 +287,18 @@ function Status({ currentSelection }: StatusProps) {
           <div className='flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_25%,black_75%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>
             <div className='h-3 w-3 rounded-full bg-teal-500' />
             <span className='text-sm text-muted-foreground'>{t('autoAssigned')}:</span>
-            <SlidingNumber number={activeSuggestedCount} className='font-display font-black text-teal-700 dark:text-teal-300' />
+            <SlidingNumber
+              number={activeSuggestedCount}
+              className='font-display font-black text-teal-700 dark:text-teal-300'
+            />
           </div>
           <div className='flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_25%,black_75%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>
             <div className='h-3 w-3 rounded-full bg-blue-500' />
             <span className='text-sm text-muted-foreground'>{t('manual')}:</span>
-            <SlidingNumber number={manualSelectedCount} className='font-display font-black text-blue-700 dark:text-blue-300' />
+            <SlidingNumber
+              number={manualSelectedCount}
+              className='font-display font-black text-blue-700 dark:text-blue-300'
+            />
           </div>
           <div className='h-8 w-[2px] bg-[var(--frame)]/15' />
           <div className='flex flex-col items-center rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-alt)] px-3 py-1.5 shadow-[var(--shadow-brutal-xs)]'>
@@ -255,7 +306,10 @@ function Status({ currentSelection }: StatusProps) {
               <span className='text-sm font-display font-black uppercase tracking-[0.08em]'>{t('remaining')}:</span>
               <SlidingNumber
                 number={remaining}
-                className={cn('font-display font-black', remaining > 0 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground')}
+                className={cn(
+                  'font-display font-black',
+                  remaining > 0 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
+                )}
               />
             </div>
             {remaining === 0 && !hasManualChanges && (

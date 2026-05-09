@@ -346,7 +346,9 @@
       "step3Title": "Schritt {step} — Deine Konfiguration",
       "step3Description": "Wähle deine Optimierungsstrategie und konfiguriere vergangene Tage und Übertragsmonate, um deinen Plan zu verfeinern.",
       "step4Title": "Schritt {step} — Kalender exportieren",
-      "step4Description": "Lade deine Feiertage und geplanten Urlaubstage als .ics-Datei herunter, um sie in Google Calendar, Apple Calendar oder Outlook zu importieren, oder als PDF zum Drucken oder Teilen."
+      "step4Description": "Lade deine Feiertage und geplanten Urlaubstage als .ics-Datei herunter, um sie in Google Calendar, Apple Calendar oder Outlook zu importieren, oder als PDF zum Drucken oder Teilen.",
+      "drawerTitle": "Dein Planungspanel",
+      "drawerDescription": "Diese Leiste zeigt immer eine Zusammenfassung deines Plans. Wische nach oben —oder ziehe den Griff— um Alternativen zu erkunden und zu sehen, wie deine Tage verteilt sind."
     }
   },
   "legend": {

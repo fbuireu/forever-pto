@@ -346,7 +346,9 @@
       "step3Title": "Paso {step} — Tu configuración",
       "step3Description": "Elige tu estrategia de optimización y configura los días pasados y los meses de traslado para afinar tu plan.",
       "step4Title": "Paso {step} — Exporta tu calendario",
-      "step4Description": "Descarga tus festivos y días de vacaciones planificados como archivo .ics para importarlos en Google Calendar, Apple Calendar u Outlook, o como PDF para imprimir o compartir."
+      "step4Description": "Descarga tus festivos y días de vacaciones planificados como archivo .ics para importarlos en Google Calendar, Apple Calendar u Outlook, o como PDF para imprimir o compartir.",
+      "drawerTitle": "Tu panel de planificación",
+      "drawerDescription": "Esta barra siempre muestra un resumen de tu plan. Deslízala hacia arriba —o arrastra el tirador— para explorar alternativas y ver cómo se distribuyen tus días."
     }
   },
   "legend": {

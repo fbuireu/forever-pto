@@ -3,9 +3,10 @@
 import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
+import { Drawer, DrawerContent } from '@ui/modules/core/animate/base/Drawer';
 import { Skeleton } from 'boneyard-js/react';
 import { useTranslations } from 'next-intl';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
 import { PlannerPanel } from './PlannerPanel';
@@ -13,7 +14,9 @@ import { PlannerPanelFixture } from './PlannerPanelFixture';
 
 export const ManagementBar = () => {
   const t = useTranslations('toasts');
+  const tAlt = useTranslations('alternativesManager');
   const { areStoresReady } = useStoresReady();
+  const [snap, setSnap] = useState<number | string | null>(0.15);
   const {
     alternatives,
     suggestion,
@@ -34,6 +37,12 @@ export const ManagementBar = () => {
     }))
   );
 
+  useEffect(() => {
+    const expand = () => setSnap(1);
+    window.addEventListener('tutorial:expand-drawer', expand);
+    return () => window.removeEventListener('tutorial:expand-drawer', expand);
+  }, []);
+
   const handlePreviewChange = useCallback(
     (params: AlternativeSelectionBaseParams) => {
       setPreviewAlternativeSelection(params);
@@ -45,6 +54,7 @@ export const ManagementBar = () => {
     (params: AlternativeSelectionBaseParams) => {
       setCurrentAlternativeSelection(params);
       toast.success(t('suggestionApplied'));
+      setSnap(0.15);
     },
     [setCurrentAlternativeSelection, t]
   );
@@ -62,21 +72,70 @@ export const ManagementBar = () => {
 
   const isReady = areStoresReady && hasValidSuggestions && hasValidCurrentSelection;
 
+  const plannerPanelProps = {
+    currentSelectionIndex,
+    allSuggestions,
+    onSelectionChange: handleSelectionChange,
+    onPreviewChange: handlePreviewChange,
+    selectedIndex: previewAlternativeIndex,
+    currentSelection: currentSelection!,
+  };
+
+  const previewSuggestion = allSuggestions[previewAlternativeIndex] ?? allSuggestions[0];
+  const effectiveDays = previewSuggestion?.metrics?.totalEffectiveDays ?? 0;
+  const efficiency = previewSuggestion?.metrics?.averageEfficiency ?? 0;
+
   return (
-    <div className='w-full sticky top-3 z-50 col-span-full'>
-      <Skeleton name='planner-panel' loading={!isReady} fixture={<PlannerPanelFixture />}>
-        {isReady && currentSelection && (
-          <PlannerPanel
-            key={previewAlternativeIndex}
-            currentSelectionIndex={currentSelectionIndex}
-            allSuggestions={allSuggestions}
-            onSelectionChange={handleSelectionChange}
-            onPreviewChange={handlePreviewChange}
-            selectedIndex={previewAlternativeIndex}
-            currentSelection={currentSelection}
-          />
-        )}
-      </Skeleton>
+    <div className='col-span-full'>
+      {/* Desktop */}
+      <div className='hidden md:block w-full sticky top-3 z-50'>
+        <Skeleton name='planner-panel' loading={!isReady} fixture={<PlannerPanelFixture />}>
+          {isReady && currentSelection && <PlannerPanel key={previewAlternativeIndex} {...plannerPanelProps} />}
+        </Skeleton>
+      </div>
+
+      {/* Mobile: persistent bottom drawer with snap points */}
+      <div className='md:hidden'>
+        <Drawer
+          snapPoints={[0.15, 1]}
+          activeSnapPoint={snap}
+          setActiveSnapPoint={setSnap}
+          modal={false}
+          open
+          dismissible={false}
+        >
+          <DrawerContent overlay={false}>
+            {/* Compact area — always visible at 0.15 snap */}
+            <div data-tutorial='planner-drawer' className='px-4 pt-2 pb-3'>
+              {isReady ? (
+                <div className='flex items-center justify-between gap-3'>
+                  <span className='text-sm font-black'>
+                    {tAlt('option')} {currentSelectionIndex + 1}
+                    <span className='font-normal text-muted-foreground'> / {allSuggestions.length}</span>
+                  </span>
+                  <div className='flex items-center gap-3'>
+                    <span className='font-mono text-sm font-semibold text-green-600 dark:text-green-400'>
+                      {effectiveDays}d
+                    </span>
+                    <span className='font-mono text-sm font-semibold text-purple-600 dark:text-purple-400'>
+                      {efficiency.toFixed(1)}x
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className='h-8 animate-pulse rounded-[8px] bg-[var(--surface-panel-soft)]' />
+              )}
+            </div>
+
+            <div className='border-t-[2px] border-[var(--frame)]/15 mx-4' />
+
+            {/* Full content — visible when fully expanded */}
+            <div data-vaul-no-drag className='overflow-y-auto px-3 pb-6 pt-3'>
+              {isReady && currentSelection && <PlannerPanel key={previewAlternativeIndex} {...plannerPanelProps} />}
+            </div>
+          </DrawerContent>
+        </Drawer>
+      </div>
     </div>
   );
 };
