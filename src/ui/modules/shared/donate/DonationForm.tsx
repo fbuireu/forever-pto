@@ -133,7 +133,7 @@ export function DonationForm({
 
         <Collapsible open={showPromoCode} onOpenChange={setShowPromoCode}>
           <AnimateIcon animateOnHover>
-            <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-sm font-medium cursor-pointer rounded-md transition-colors border-0 shadow-none'>
+            <CollapsibleTrigger className='flex items-center justify-between w-full p-2 text-sm font-medium cursor-pointer rounded-md border-0 shadow-none bg-transparent hover:bg-transparent hover:shadow-none hover:translate-x-0 hover:translate-y-0 active:shadow-none active:translate-x-0 active:translate-y-0 aria-expanded:shadow-none aria-expanded:translate-x-0 aria-expanded:translate-y-0 before:hidden'>
               <span className='text-muted-foreground'>{t('havePromoCode')}</span>
               <ChevronDown
                 className={cn(

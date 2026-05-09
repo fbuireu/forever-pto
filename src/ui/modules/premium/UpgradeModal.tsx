@@ -94,12 +94,13 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
             <Crown className='w-5 h-5 text-yellow-500' />
             {t('premiumRequired')}
           </DialogTitle>
+          <Banner icon={LockIcon} title={t('premiumRequired')} colorScheme='indigo'>
+            <span>
+              <strong>{feature}</strong> {t('featureRequiresPremium')}
+            </span>
+          </Banner>
           <DialogDescription>{t('verifyDescription')}</DialogDescription>
         </DialogHeader>
-        <Banner icon={LockIcon} title={t('premiumRequired')} colorScheme='indigo'>
-          <strong>{feature}</strong>
-          <span>{t('featureRequiresPremium')}</span>
-        </Banner>
         <p className='text-sm text-muted-foreground'>{t('considerDonating')}</p>
 
         {step === Step.INPUT && (
