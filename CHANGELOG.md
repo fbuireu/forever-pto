@@ -1,3 +1,11 @@
+## [1.1.1](https://github.com/fbuireu/forever-pto/compare/v1.1.0...v1.1.1) (2026-05-10)
+
+
+### Bug Fixes
+
+* add Toaster to marketing layout and simplify payment error message ([1ad8c8b](https://github.com/fbuireu/forever-pto/commit/1ad8c8b6be7538ebd42e2e66d5678f2c4638eafe))
+* remove invalid opt ([257f0f5](https://github.com/fbuireu/forever-pto/commit/257f0f558b353dd137e10f07075e3ba1cbcb845e))
+
 # [1.1.0](https://github.com/fbuireu/forever-pto/compare/v1.0.6...v1.1.0) (2026-05-10)
 
 
