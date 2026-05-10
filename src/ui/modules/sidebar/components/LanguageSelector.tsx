@@ -58,10 +58,12 @@ export const LanguageSelector = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         {languages.map((language) => (
-          <DropdownMenuItem key={language.code} className='flex justify-between' onClick={() => handleLanguageChange(language.code)}>
-            <span>{language.label}</span>
-            {language.code === locale && <Check className='h-4 w-4' />}
-          </DropdownMenuItem>
+          <AnimateIcon animateOnHover asChild key={language.code}>
+            <DropdownMenuItem className='flex justify-between' onClick={() => handleLanguageChange(language.code)}>
+              <span>{language.label}</span>
+              {language.code === locale && <Check className='h-4 w-4' />}
+            </DropdownMenuItem>
+          </AnimateIcon>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>

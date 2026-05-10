@@ -31,10 +31,12 @@ export const ThemeSelector = ({ buttonClassName }: { buttonClassName?: string })
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         {themes.map((theme) => (
-          <DropdownMenuItem key={theme} className='flex justify-between' onClick={() => setTheme(theme)}>
-            {t(theme as Parameters<typeof t>[0])}
-            {currentTheme === theme && <Check className='h-4 w-4' />}
-          </DropdownMenuItem>
+          <AnimateIcon animateOnHover asChild key={theme}>
+            <DropdownMenuItem className='flex justify-between' onClick={() => setTheme(theme)}>
+              {t(theme as Parameters<typeof t>[0])}
+              {currentTheme === theme && <Check className='h-4 w-4' />}
+            </DropdownMenuItem>
+          </AnimateIcon>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
