@@ -159,7 +159,7 @@ export const Donate = () => {
             locale,
           });
           toast.error(t('paymentFailed'), {
-            description: error instanceof Error ? error.message : t('paymentFailedDescription'),
+            description: t('paymentFailedDescription'),
           });
         }
       });
