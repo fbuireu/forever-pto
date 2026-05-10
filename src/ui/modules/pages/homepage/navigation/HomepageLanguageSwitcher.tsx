@@ -10,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from '@ui/modules/core/animate/base/DropdownMenu';
 import { Check } from '@ui/modules/core/animate/icons/Check';
-import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -51,12 +50,10 @@ export const HomepageLanguageSwitcher = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         {languages.map((language) => (
-          <AnimateIcon animateOnHover asChild key={language.code}>
-            <DropdownMenuItem className='flex justify-between' onClick={() => handleLanguageChange(language.code)}>
-              <span>{language.label}</span>
-              {language.code === locale && <Check className='h-4 w-4' />}
-            </DropdownMenuItem>
-          </AnimateIcon>
+          <DropdownMenuItem key={language.code} className='flex justify-between' onClick={() => handleLanguageChange(language.code)}>
+            <span>{language.label}</span>
+            {language.code === locale && <Check className='h-4 w-4' />}
+          </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>

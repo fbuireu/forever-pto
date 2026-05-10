@@ -39,7 +39,7 @@ const HomePage = async ({ params }: PageProps) => {
       <Pricing />
       <Faq />
       <HomepageCta />
-      <DonateClient />
+      <DonateClient bottomClassName='bottom-3 md:bottom-4' />
     </main>
   );
 };
@@ -55,7 +55,6 @@ export default HomePage;
 // todo: improve responsive
 // todo: recreate bones
 // todo: feedback web-check.xyz
-// todo: docs with mintlifyy
 // todo: share button with results?
 // todo: recreate bones
 // todo: migrate temporal API when available in Node

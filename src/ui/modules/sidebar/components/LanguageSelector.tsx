@@ -27,10 +27,11 @@ export const LanguageSelector = () => {
 
   const handleLanguageChange = useCallback(
     (newLocale: string) => {
+      setOpenMobile(false);
       const newPathname = pathname.replace(`/${locale}`, `/${newLocale}`);
       router.push(newPathname, { locale: newLocale, scroll: false });
     },
-    [pathname, locale, router]
+    [pathname, locale, router, setOpenMobile]
   );
 
   useEffect(() => {

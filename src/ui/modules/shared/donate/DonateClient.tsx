@@ -9,6 +9,6 @@ const Donate = dynamic(
   }
 );
 
-export function DonateClient() {
-  return <Donate />;
+export function DonateClient({ bottomClassName }: { bottomClassName?: string }) {
+  return <Donate bottomClassName={bottomClassName} />;
 }

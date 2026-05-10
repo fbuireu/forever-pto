@@ -17,7 +17,7 @@ export const Footer = async () => {
             href='/'
             className='flex items-center gap-2 font-display font-extrabold text-[18px] tracking-[-0.02em] hover:opacity-80 transition-opacity'
           >
-            <span>Forever</span>
+            <span className='hidden sm:inline'>Forever</span>
             <div
               className='w-[30px] h-[30px] bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[2px_2px_0_0_var(--frame)] overflow-hidden shrink-0 -rotate-[4deg]'
               aria-hidden
