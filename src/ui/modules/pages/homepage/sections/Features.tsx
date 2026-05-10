@@ -131,12 +131,14 @@ export const Features = async () => {
           <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[6px] font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--frame)] shadow-[var(--shadow-brutal-xs)]'>
             {t('features.countriesTag', { count: 203 })}
           </span>
-          <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em] text-white'>
+          <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em] text-[var(--color-brand-ink)]'>
             {t('features.countriesTitle')}
           </h3>
-          <p className='text-white/90 text-[15px] leading-relaxed mb-3'>{t('features.countriesDescription')}</p>
+          <p className='text-[var(--color-brand-ink)]/90 text-[15px] leading-relaxed mb-3'>
+            {t('features.countriesDescription')}
+          </p>
           <div className='flex flex-wrap gap-2'>
-            {['🇪🇸', '🇮🇹', '🇩🇪', '🇫🇷', '🇬🇧', '🇺🇸', '+8'].map((flag) => (
+            {['🇪🇸', '🇮🇹', '🇩🇪', '🇫🇷', '🇬🇧', '🇺🇸', '+197'].map((flag) => (
               <span
                 key={flag}
                 className='bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[8px] px-2.5 py-1.5 text-[13px] font-semibold shadow-[var(--shadow-brutal-xs)]'

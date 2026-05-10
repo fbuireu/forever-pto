@@ -33,7 +33,7 @@
     "subtitle": "Dein intelligenter Urlaubsoptimierer. Hör auf, Tage zu verschwenden.",
     "titleHighlight1": "Dein Jahr",
     "titleHighlight2": "frei",
-    "instructions": "Beginne damit, deine Tage in der linken Seitenleiste und den Rest deiner Einstellungen hinzuzufügen. Noch Fragen?",
+    "instructions": "Trag deine Tage in der Seitenleiste ein und passe deine Einstellungen an. Noch Fragen?",
     "quickTour": "Kurze Tour starten",
     "or": "oder",
     "checkFaqs": "schau dir unsere FAQs an"
@@ -85,7 +85,7 @@
       "daysCount": "{count, plural, one {Tag} other {Tage}}"
     },
     "summaryParagraph": {
-      "withGain": "Mit deinen {ptoDays} Urlaubstagen und {totalHolidays} Feiertagen verwandelt die {strategy}-Strategie diese in {effectiveDays} effektive freie Tage – das sind {increment} zusätzliche Tage, eine Verbesserung von +{percentage}% gegenüber der einfachen Nutzung.",
+      "withGain": "Mit deinen {ptoDays} Urlaubstagen und {totalHolidays} Feiertagen verwandelt die {strategy}-Strategie deine Tage in {effectiveDays} effektive freie Tage – das sind {increment} mehr als ohne Optimierung (+{percentage}%).",
       "withoutGain": "Mit deinen {ptoDays} Urlaubstagen und {totalHolidays} Feiertagen erhältst du {effectiveDays} effektive freie Tage mit der {strategy}-Strategie.",
       "noRegionHintTitle": "Region hinzufügen",
       "noRegionHint": "Wähle deine Region in der Seitenleiste aus, um regionale Feiertage einzubeziehen und möglicherweise noch mehr freie Tage zu erhalten.",
@@ -98,7 +98,7 @@
         "moreDays": "mehr Tage",
         "toYourPlan": "zu deinem Plan hinzufügen.",
         "reviewOptions": "Verfügbare Optionen prüfen.",
-        "considerPremium": "Erwäge Premium für mehr Analysen."
+        "considerPremium": "Hol dir Premium für tiefere Einblicke."
       },
       "manualAdjustments": {
         "title": "Manuelle Anpassungen",
@@ -134,9 +134,13 @@
     "sections": {
       "general": {
         "title": "Allgemein",
+        "whatIsPto": {
+          "question": "Was ist PTO?",
+          "answer": "PTO steht für Paid Time Off (bezahlter Urlaub) — die Anzahl der Urlaubstage, die dein Arbeitgeber dir jedes Jahr gibt, um sie nach Belieben zu nutzen. Im Gegensatz zu Krankentagen oder gesetzlichen Feiertagen kannst du PTO-Tage frei einplanen. Das Problem ist, dass die meisten Menschen sie zufällig nutzen und viel Erholungspotenzial verschenken. Forever PTO hilft dir, diese Tage strategisch rund um Feiertage zu platzieren, um beispielsweise 5 PTO-Tage in 12 aufeinanderfolgende freie Tage zu verwandeln."
+        },
         "whatIs": {
           "question": "Was ist das?",
-          "answer": "Forever PTO ist ein Tool, das dir hilft, deine Urlaubstage zu planen und zu optimieren, indem es dir basierend auf Feiertagen und deinen Präferenzen die besten freien Tage vorschlägt. Angesichts der Komplexität der Urlaubsplanung zielt Forever PTO darauf ab, den Prozess zu vereinfachen und deine Freizeit zu maximieren. Du kannst verschiedene Strategien wählen, um deine freien Tage über das Jahr zu verteilen und zu maximieren. Du kannst die Feiertage, die Namen der Festtage und sogar eigene Feiertage für dein Unternehmen oder deine Region vollständig anpassen."
+          "answer": "Forever PTO ist ein Tool, das dir hilft, deine Urlaubstage optimal zu planen. Es schlägt dir basierend auf Feiertagen und deinen Präferenzen die besten freien Tage vor. Du kannst verschiedene Strategien wählen und Feiertage – inklusive eigener Firmen- oder Regionsfeiertage – vollständig anpassen."
         },
         "howWorks": {
           "question": "Wie funktioniert es?"
@@ -147,7 +151,7 @@
         },
         "pricing": {
           "question": "Warum gibt es ein kostenpflichtiges Modell?",
-          "answer": "Forever PTO ist kostenlos. Allerdings nutzen wir ein kostenpflichtiges Modell, um die Kosten für Datenpflege, Infrastruktur und kontinuierliche Verbesserungen zu decken. Das kostenpflichtige Modell finanziert Updates, Support und Hosting. Wir bieten auch eine kostenlose Version mit den wichtigsten Funktionen an, damit jeder von einer besseren Urlaubsplanung profitieren kann. Wenn du werbefrei arbeiten und das Projekt unterstützen möchtest, gibt es eine freiwillige Spende."
+          "answer": "Forever PTO ist kostenlos. Allerdings nutzen wir ein kostenpflichtiges Modell, um die Kosten für Datenpflege, Infrastruktur und kontinuierliche Verbesserungen zu decken. Das kostenpflichtige Modell finanziert Updates, Support und Hosting. Wir bieten auch eine kostenlose Version mit den wichtigsten Funktionen an, damit jeder von einer besseren Urlaubsplanung profitieren kann."
         },
         "restartTutorial": {
           "question": "Wie kann ich das interaktive Tutorial erneut sehen?"
@@ -161,7 +165,7 @@
         },
         "strategies": {
           "question": "Was ist der Unterschied zwischen \"ausgewogen\" und \"optimiert\"?",
-          "answer": "Ausgewogen verteilt die freien Tage gleichmäßig über das Jahr für konstanten Wert, während Optimiert die Effizienz maximiert (effektive Tage pro Urlaubstag), indem die besten Verhältniskombinationen priorisiert werden."
+          "answer": "Ausgewogen verteilt freie Tage gleichmäßig über das Jahr. Optimiert maximiert dagegen die Effizienz – also möglichst viele freie Tage pro eingesetztem Urlaubstag."
         },
         "results": {
           "question": "Warum ändern sich meine Empfehlungen, wenn ich Einstellungen oder Feiertage anpasse?",
@@ -172,11 +176,11 @@
         "title": "Sicherheit & Datenschutz",
         "data": {
           "question": "Wie geht ihr mit meinen Daten um?",
-          "answer": "Wir speichern nur die minimal erforderlichen Informationen, um Vorschläge zu erstellen. Wir geben keine Daten ohne Einwilligung an Dritte weiter. Weitere Details findest du in der Datenschutzrichtlinie."
+          "answer": "Wir speichern nur die minimal erforderlichen Informationen, um Vorschläge zu erstellen. Wir geben keine Daten ohne Einwilligung an Dritte weiter. Weitere Details findest du in der <privacyLink>Datenschutzrichtlinie</privacyLink>."
         },
         "encryption": {
           "question": "Sind meine Daten verschlüsselt?",
-          "answer": "Deine Urlaubsplanungsdaten werden lokal in deinem Browser gespeichert. Wir verwenden eine XOR-Verschleierung, um die Daten bei flüchtiger Einsicht unlesbar zu machen. Diese Methode soll eine versehentliche Offenlegung verhindern, nicht vor entschlossenen Angreifern schützen. Wir speichern keine sensiblen persönlichen Daten, und du behältst die volle Kontrolle über deine Daten auf deinem Gerät. Alle deine Daten (Urlaubstage, ausgewählte Termine, eigene Feiertage, Einstellungen) werden ausschließlich im lokalen Speicher deines Browsers gespeichert. Wir senden diese Informationen niemals an unsere Server. Deine Urlaubsplanung bleibt vollständig privat auf deinem Gerät."
+          "answer": "Deine Urlaubsplanungsdaten werden ausschließlich lokal in deinem Browser gespeichert. Wir verwenden eine XOR-Verschleierung, um die Daten bei flüchtiger Einsicht unlesbar zu machen – nicht zum Schutz vor gezielten Angriffen. Wir sehen diese Daten nie; du behältst die volle Kontrolle."
         },
         "tracking": {
           "question": "Verkauft ihr meine Daten oder verfolgt ihr meine Urlaubsplanung?",
@@ -190,7 +194,7 @@
         "title": "Interesse an einer Zusammenarbeit?",
         "code": {
           "question": "Wie kann man Code oder Ideen beitragen?",
-          "answer": "Eröffne Issues oder Merge Requests mit Vorschlägen. Wir brauchen Hilfe bei Algorithmen, Integrationen und UX-Verbesserungen."
+          "answer": "<link>Eröffne Issues oder Merge Requests</link> mit Vorschlägen. Wir brauchen Hilfe bei Algorithmen, Integrationen und UX-Verbesserungen."
         },
         "business": {
           "question": "Integrationen oder Unternehmenspartnerschaften vorschlagen",
@@ -333,11 +337,11 @@
       "alternativesTitle": "Alternativen-Manager",
       "alternativesDescription": "Navigiere durch verschiedene von uns generierte Urlaubsvorschläge. Vergleiche Effizienzkennzahlen, Gesamttage frei und finde die perfekte Balance. Die erste Option ist immer unser empfohlener Vorschlag, markiert mit einem Funkelsymbol. Benutze die Pfeile, um Alternativen zu erkunden, und klicke auf \"Alternative anwenden\", um einen anderen Vorschlag zu verwenden.",
       "statusTitle": "Urlaubsstatus-Tracker",
-      "statusDescription": "Verfolge deine Urlaubszuweisung in Echtzeit. Sieh automatisch zugewiesene Tage (von unserem System vorgeschlagen), manuell ausgewählte Tage und verbleibende verfügbare Tage. Du kannst manuelle Änderungen jederzeit zurücksetzen, um zum KI-Vorschlag zurückzukehren.",
+      "statusDescription": "Verfolge deine Urlaubszuweisung in Echtzeit. Sieh automatisch zugewiesene Tage (von unserem System vorgeschlagen), manuell ausgewählte Tage und verbleibende verfügbare Tage. Du kannst manuelle Änderungen jederzeit zurücksetzen, um zum automatischen Vorschlag zurückzukehren.",
       "calendarTitle": "Dein interaktiver Urlaubskalender",
-      "calendarDescription": "Dies ist dein Jahresübersichtskalender. Feiertage erscheinen in Grau, KI-vorgeschlagene Urlaubstage in Türkis und manuell ausgewählte Tage in Blau. Klicke auf einen beliebigen Arbeitstag, um die Auswahl manuell umzuschalten. Der Kalender aktualisiert sich sofort, wenn du verschiedene Alternativen erkundest.",
+      "calendarDescription": "Dies ist dein Jahresübersichtskalender. Feiertage erscheinen in Grau, vorgeschlagene Urlaubstage in Türkis und manuell ausgewählte Tage in Blau. Klicke auf einen beliebigen Arbeitstag, um die Auswahl manuell umzuschalten. Der Kalender aktualisiert sich sofort, wenn du verschiedene Alternativen erkundest.",
       "finishTitle": "Du bist startklar!",
-      "finishDescription": "Jetzt weißt du, wie du Forever PTO nutzen kannst, um deine Freizeit zu maximieren. Beginne damit, deine Einstellungen in der Seitenleiste zu konfigurieren, und lass die App dir die besten Urlaubstage vorschlagen. Genieße deine wohlverdienten Pausen!",
+      "finishDescription": "Du kennst jetzt die wichtigsten Funktionen. Stell deine Einstellungen in der Seitenleiste ein – die App erledigt den Rest. Viel Spaß beim freien Sein!",
       "holidaysListTitle": "Passe deine Feiertage an",
       "holidaysListDescription": "Hier kannst du die Feiertagsdaten an deine genaue Situation anpassen. Bearbeite oder lösche nationale oder regionale Feiertage und füge eigene freie Tage hinzu – Firmenfeiertage, lokale Bräuche oder jedes Datum, das dir wichtig ist. Je genauer die Daten, desto besser die Vorschläge.",
       "step1Title": "Dein Kontext",
@@ -388,7 +392,7 @@
     "autoAssigned": "Automatisch zugewiesen",
     "manual": "Manuell",
     "remaining": "Verbleibend",
-    "clickDays": "Klicke auf Tage zum Zuweisen/Entfernen",
+    "clickDays": "Klicke auf einen Tag, um ihn hinzuzufügen oder zu entfernen",
     "allAssigned": "Alle Tage zugewiesen!",
     "resetManual": "Manuelle Änderungen zurücksetzen",
     "usedDays": "{used} / {total} Tage genutzt · {pct}%",
@@ -443,7 +447,7 @@
     "paymentSuccessDescription": "Vielen Dank für deine Unterstützung! Du hast jetzt Premium-Zugang."
   },
   "troubleshooting": {
-    "description": "Wenn die App sich unerwartet verhält, kann dies an veralteten lokalen Daten liegen. Wenn das Projekt weiterentwickelt wird, können sich gespeicherte Objekte ändern, was dazu führt, dass der Client inkompatible Strukturen wiederverwendet und die Revalidierung fehlschlägt. Das Löschen des lokalen Speichers erzwingt einen frischen Zustand.",
+    "description": "Wenn die App sich unerwartet verhält, kann das an veralteten lokalen Daten liegen. Bei App-Updates können gespeicherte Daten mit der neuen Version inkompatibel werden. Den lokalen Speicher zu löschen setzt alles auf einen sauberen Stand zurück.",
     "resetButton": "Lokalen Speicher zurücksetzen",
     "clearing": "Wird gelöscht...",
     "cleared": "Gelöscht",
@@ -460,7 +464,7 @@
     "loading": "Wird geladen...",
     "country": {
       "title": "Land",
-      "tooltip": "Diese Daten werden aus deinem CDN und deiner Verbindung abgeleitet. Wenn du das Gefühl hast, dass sie nicht korrekt sind oder du einen Einblick in die Feiertage anderer Länder erhalten möchtest, kannst du es hier manuell auswählen",
+      "tooltip": "Dein Land wird automatisch anhand deiner Verbindung erkannt. Wenn es nicht stimmt oder du Feiertage eines anderen Landes sehen möchtest, kannst du es hier manuell ändern.",
       "tooltipLabel": "Mehr Informationen zur Landesauswahl",
       "loading": "Länder werden geladen...",
       "placeholder": "Land auswählen...",
@@ -529,7 +533,7 @@
     },
     "carryOverMonths": {
       "title": "Übertragsmonate",
-      "tooltip": "Ermöglicht das Hinzufügen von Monaten zum folgenden Jahr, um die Suche nach Möglichkeiten zu erweitern",
+      "tooltip": "Damit kannst du Monate aus dem Folgejahr einbeziehen und so noch mehr Möglichkeiten für lange freie Zeiträume finden.",
       "tooltipLabel": "Mehr Informationen über den Übertrag"
     },
     "years": {
@@ -603,7 +607,7 @@
     "effectiveHourlyRate": "Effektiver Stundensatz:",
     "whenWorkingExtraDays": "Bei {days} zusätzlichen unbezahlten Arbeitstagen",
     "opportunityCost": "Opportunitätskosten",
-    "opportunityCostDescription": "Du hast {days} Tage gearbeitet, die du als bezahlten Urlaub hättest nehmen können. Das sind <amount>value</amount> an bezahlter Freizeit, die du aufgegeben hast. Dein Gehalt bleibt gleich, aber du hast zusätzliche Tage umsonst gearbeitet."
+    "opportunityCostDescription": "Du hast {days} Tage gearbeitet, die du als bezahlten Urlaub hättest nehmen können. Das entspricht <amount>value</amount> an bezahlter Freizeit, die du nicht genutzt hast. Dein Gehalt bleibt gleich – aber du hast Tage gearbeitet, die du hättest freinehmen können."
   },
   "checkout": {
     "back": "Zurück",
@@ -620,7 +624,7 @@
     "donateAndUnblock": "Spenden & Freischalten",
     "supportAndUnblock": "Unterstützen & Freischalten",
     "makeDonation": "Spende, um den Inhalt zu unterstützen und den Zugang freizuschalten.",
-    "alreadyPremium": "Du bist bereits ein Premium-Nutzer. Danke für deine Unterstützung!"
+    "alreadyPremium": "Du hast bereits Premium-Zugang – danke für deine Unterstützung!"
   },
   "donationForm": {
     "email": "E-Mail",
@@ -637,7 +641,7 @@
   "upgrade": {
     "premiumRequired": "Premium-Funktion erforderlich",
     "featureRequiresPremium": "erfordert Premium-Zugang",
-    "verifyDescription": "Keine Sorge, wenn du bereits gespendet oder bezahlt hast, prüfen wir deine E-Mail gegen unsere Liste und gewähren dir Premium-Zugang. Solltest du Probleme haben, zögere nicht, uns zu kontaktieren.",
+    "verifyDescription": "Wenn du bereits gespendet oder bezahlt hast, gleichen wir deine E-Mail mit unserer Liste ab und schalten deinen Zugang frei. Bei Problemen meld dich einfach bei uns.",
     "considerDonating": "Wenn du noch nicht gespendet hast, erwäge bitte eine Spende, um das Projekt zu unterstützen und Premium-Funktionen freizuschalten!",
     "enterPremiumEmail": "Gib deine Premium-E-Mail ein",
     "emailPlaceholder": "deine@email.com",
@@ -647,17 +651,17 @@
     "accessGranted": "Zugang gewährt!",
     "welcomeToPremium": "Willkommen bei den Premium-Funktionen. Du kannst dieses Fenster schließen oder wir tun es in {seconds} Sekunden.",
     "accessDenied": "Zugang verweigert",
-    "emailNotFound": "Diese E-Mail ist nicht in unserer Premium-Nutzerliste.",
-    "emailNotFoundError": "E-Mail nicht in unserer Premium-Nutzerliste gefunden",
+    "emailNotFound": "Diese E-Mail-Adresse ist nicht als Premium-Nutzer:in registriert.",
+    "emailNotFoundError": "E-Mail-Adresse nicht gefunden",
     "tryAgain": "Erneut versuchen",
     "close": "Schließen",
     "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein",
-    "emailRequired": "E-Mail ist erforderlich"
+    "emailRequired": "Bitte gib deine E-Mail-Adresse ein"
   },
   "validation": {
     "contact": {
       "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein",
-      "emailRequired": "E-Mail ist erforderlich",
+      "emailRequired": "Bitte gib deine E-Mail-Adresse ein",
       "nameMin": "Der Name muss mindestens {min} Zeichen lang sein",
       "nameMax": "Der Name ist zu lang",
       "subjectMin": "Der Betreff muss mindestens {min} Zeichen lang sein",
@@ -669,7 +673,7 @@
       "amountMin": "Mindestbetrag ist 1",
       "amountMax": "Höchstbetrag ist 10.000",
       "invalidEmail": "Eine gültige E-Mail ist erforderlich",
-      "emailRequired": "E-Mail ist erforderlich"
+      "emailRequired": "Bitte gib deine E-Mail-Adresse ein"
     },
     "holiday": {
       "nameRequired": "Feiertagsname ist erforderlich",
@@ -778,17 +782,17 @@
   },
   "errors": {
     "contact": {
-      "VALIDATION_ERROR": "Ungültige Eingabedaten angegeben.",
+      "VALIDATION_ERROR": "Bitte überprüfe deine Eingaben.",
       "EMAIL_SEND_FAILED": "E-Mail konnte nicht gesendet werden. Bitte versuche es erneut.",
       "SAVE_FAILED": "Wir haben deine Anfrage erhalten, allerdings gab es ein kleines technisches Problem beim Abschließen der Protokolle. Es ist keine weitere Aktion deinerseits erforderlich.",
       "RENDER_FAILED": "E-Mail konnte nicht vorbereitet werden. Bitte versuche es erneut.",
       "UNKNOWN": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut."
     },
     "payment": {
-      "VALIDATION_ERROR": "Ungültige Eingabedaten angegeben.",
+      "VALIDATION_ERROR": "Bitte überprüfe deine Eingaben.",
       "INVALID_PROMO_CODE": "Der Promo-Code ist ungültig oder abgelaufen.",
       "PAYMENT_FAILED": "Zahlungsverarbeitung fehlgeschlagen.",
-      "SAVE_FAILED": "Zahlungsabsicht erstellt, aber Speichern fehlgeschlagen. Bitte kontaktiere den Support.",
+      "SAVE_FAILED": "Zahlung eingeleitet, aber etwas ist beim Speichern schiefgelaufen. Bitte wende dich an den Support.",
       "UPDATE_STATUS_FAILED": "Zahlungsstatus konnte nicht aktualisiert werden.",
       "SAVE_FROM_WEBHOOK_FAILED": "Zahlung vom Webhook konnte nicht gespeichert werden.",
       "CHARGE_UPDATE_FAILED": "Belastungsdetails konnten nicht aktualisiert werden.",
@@ -859,7 +863,7 @@
     "selectAllHolidays": "Alle Feiertage auswählen",
     "unlockFeature": "Premium-Funktion freischalten: {feature}",
     "premiumFeature": "Premium-Funktion",
-    "unlockDescription": "Schalte die Möglichkeit frei, Vorschläge hinzuzufügen/zu entfernen und verbleibende Tage hinzuzufügen/zu entfernen, indem du auf Premium upgradest.",
+    "unlockDescription": "Mit Premium kannst du Vorschläge manuell anpassen und verbleibende Tage frei vergeben oder entfernen.",
     "upgrade": "Upgraden"
   },
   "calendar": {
@@ -936,7 +940,7 @@
       "inputDaysTitle": "Tage eingeben.",
       "inputDaysDescription": "Wie viele Urlaubstage du hast und in welchem Land oder welcher Region du arbeitest. Das war's.",
       "engineTitle": "Die Engine macht die Magie.",
-      "engineDescription": "Sie kreuzt deine Tage mit offiziellen Feiertagen und regionalen Brückentagen. Findet alle möglichen Kombinationen und ordnet sie nach dem Ruheverhältnis.",
+      "engineDescription": "Die Engine gleicht deine Tage mit offiziellen Feiertagen und regionalen Brückentagen ab, findet alle möglichen Kombinationen und sortiert sie nach dem Verhältnis freie Tage zu eingesetzten Urlaubstagen.",
       "exportTitle": "Urlaubstage beantragen.",
       "exportDescription": "Exportiere den Plan nach Google Kalender, Outlook oder als PDF — einfach ins HR-Formular einfügen und fertig. Kein Rätselraten mehr."
     },
@@ -1080,7 +1084,7 @@
         "byeMonday": "tschüss, montag",
         "doNotDisturb": "nicht stören",
         "bossOff": "boss off",
-        "zeroRegrets": "0 Reue"
+        "zeroRegrets": "keine Reue"
       }
     }
   },
@@ -1214,7 +1218,7 @@
           },
           "analytics": {
             "label": "Better Stack (Analyse):",
-            "description": "Wenn Sie Analyse-Cookies akzeptieren, kann Better Stack Cookies setzen, um Benutzerinteraktionen zu verfolgen und die Produktnutzung zu messen."
+            "description": "Wenn du Analyse-Cookies akzeptierst, kann Better Stack Cookies setzen, um Nutzerinteraktionen zu verfolgen und die Produktnutzung zu messen."
           }
         },
         "disclaimer": "Wir sind nicht für Cookies von Drittanbietern verantwortlich und empfehlen, deren jeweilige Cookie-Richtlinien zu lesen."

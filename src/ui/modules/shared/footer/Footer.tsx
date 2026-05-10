@@ -24,7 +24,7 @@ export const Footer = async () => {
             >
               <Image src='/static/images/forever-pto-logo.png' alt='' width={30} height={30} unoptimized />
             </div>
-            <span>Forever PTO</span>
+            <span>Forever</span>
           </Link>
           <span className='font-mono text-[11px] text-muted-foreground'>
             {t('version', { version }).replace('●', '')}

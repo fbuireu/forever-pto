@@ -1,8 +1,13 @@
+import { Link } from '@application/i18n/navigation';
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '@ui/modules/core/animate/base/Accordion';
 import { Badge } from '@ui/modules/core/primitives/Badge';
 import { FaqTabs } from '@ui/modules/pages/planner/support/FaqTabs';
+import { Troubleshooting } from '@ui/modules/pages/planner/support/Troubleshooting';
 import type { FaqData } from '@ui/modules/pages/planner/support/types';
 import { getTranslations } from 'next-intl/server';
+
+const GITHUB_ISSUE_URL =
+  'https://github.com/fbuireu/forever-pto/issues/new?template=feature_request.yml&labels=enhancement';
 
 export const Faq = async () => {
   const t = await getTranslations('faq');
@@ -51,7 +56,20 @@ export const Faq = async () => {
       id: 'security',
       title: t('sections.security.title'),
       items: [
-        { id: 'data', question: t('sections.security.data.question'), answer: t('sections.security.data.answer') },
+        {
+          id: 'data',
+          question: t('sections.security.data.question'),
+          answer: t.rich('sections.security.data.answer', {
+            privacyLink: (chunks) => (
+              <Link
+                href='/legal/privacy-policy'
+                className='underline underline-offset-2 hover:opacity-70 transition-opacity'
+              >
+                {chunks}
+              </Link>
+            ),
+          }),
+        },
         {
           id: 'encryption',
           question: t('sections.security.encryption.question'),
@@ -62,6 +80,11 @@ export const Faq = async () => {
           question: t('sections.security.tracking.question'),
           answer: t('sections.security.tracking.answer'),
         },
+        {
+          id: 'troubleshooting',
+          question: t('sections.security.troubleshooting.question'),
+          answer: <Troubleshooting />,
+        },
       ],
     },
     {
@@ -71,7 +94,18 @@ export const Faq = async () => {
         {
           id: 'code',
           question: t('sections.collaborate.code.question'),
-          answer: t('sections.collaborate.code.answer'),
+          answer: t.rich('sections.collaborate.code.answer', {
+            link: (chunks) => (
+              <a
+                href={GITHUB_ISSUE_URL}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-sm font-semibold px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75'
+              >
+                {chunks}
+              </a>
+            ),
+          }),
         },
         {
           id: 'business',

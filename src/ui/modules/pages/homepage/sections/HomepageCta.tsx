@@ -1,45 +1,21 @@
 import { Link } from '@application/i18n/navigation';
 import { Button } from '@ui/modules/core/primitives/Button';
+import dynamic from 'next/dynamic';
 import { getTranslations } from 'next-intl/server';
+
+const CtaShapes = dynamic(() => import('./CtaShapes').then((m) => ({ default: m.CtaShapes })), { ssr: false });
 
 export const HomepageCta = async () => {
   const t = await getTranslations('homepage');
 
   return (
     <section className='px-7 py-24 bg-[var(--frame)] text-[var(--background)] border-t-[4px] border-[var(--frame)] relative overflow-hidden'>
-      {/* Decorative shapes */}
-      <div
-        aria-hidden='true'
-        className='hidden md:flex items-center justify-center absolute w-20 h-20 top-14 left-[8%] bg-[var(--color-brand-yellow)] border-[4px] border-[#fff5e1] dark:border-[#0e0e0e] rounded-[12px] shadow-[6px_6px_0_0_#fff5e1] dark:shadow-[6px_6px_0_0_#0e0e0e] rotate-[-12deg]'
-      >
-        <span className='font-display font-black text-[#0e0e0e] text-[10px] leading-tight text-center px-1'>
-          {t('closing.shapes.byeMonday')}
-        </span>
-      </div>
-      <div
-        aria-hidden='true'
-        className='hidden md:flex items-center justify-center absolute w-14 h-14 bottom-20 left-[14%] bg-[var(--color-brand-teal)] border-[4px] border-[#fff5e1] dark:border-[#0e0e0e] rounded-full shadow-[6px_6px_0_0_#fff5e1] dark:shadow-[6px_6px_0_0_#0e0e0e] rotate-[15deg]'
-      >
-        <span className='font-display font-black text-[#0e0e0e] text-[9px] leading-tight text-center px-1'>
-          {t('closing.shapes.bossOff')}
-        </span>
-      </div>
-      <div
-        aria-hidden='true'
-        className='hidden md:flex items-center justify-center absolute w-[70px] h-[70px] top-24 right-[10%] bg-[var(--color-brand-orange)] border-[4px] border-[#fff5e1] dark:border-[#0e0e0e] rounded-[12px] shadow-[6px_6px_0_0_#fff5e1] dark:shadow-[6px_6px_0_0_#0e0e0e] rotate-[8deg]'
-      >
-        <span className='font-display font-black text-[#0e0e0e] text-[9px] leading-tight text-center px-1'>
-          {t('closing.shapes.doNotDisturb')}
-        </span>
-      </div>
-      <div
-        aria-hidden='true'
-        className='hidden md:flex items-center justify-center absolute w-24 h-14 bottom-16 right-[7%] bg-[var(--color-brand-purple)] border-[4px] border-[#fff5e1] dark:border-[#0e0e0e] rounded-[12px] shadow-[6px_6px_0_0_#fff5e1] dark:shadow-[6px_6px_0_0_#0e0e0e] rotate-[-6deg]'
-      >
-        <span className='font-display font-black text-[#0e0e0e] text-[10px] leading-tight text-center px-1'>
-          {t('closing.shapes.zeroRegrets')}
-        </span>
-      </div>
+      <CtaShapes
+        byeMonday={t('closing.shapes.byeMonday')}
+        bossOff={t('closing.shapes.bossOff')}
+        doNotDisturb={t('closing.shapes.doNotDisturb')}
+        zeroRegrets={t('closing.shapes.zeroRegrets')}
+      />
 
       <div className='max-w-[900px] mx-auto text-center relative z-[2]'>
         <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] mb-5 text-[clamp(40px,6vw,80px)]'>

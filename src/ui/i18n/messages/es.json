@@ -33,7 +33,7 @@
     "subtitle": "Tu optimizador de vacaciones inteligente. Deja de perder días.",
     "titleHighlight1": "Tu año",
     "titleHighlight2": "libre",
-    "instructions": "Empieza añadiendo tus días en la barra lateral izquierda y el resto de configuraciones. ¿Aún tienes dudas?",
+    "instructions": "Empieza añadiendo tus días en la barra lateral y ajusta el resto. ¿Aún tienes dudas?",
     "quickTour": "Haz un tour rápido",
     "or": "o",
     "checkFaqs": "consulta nuestras FAQs"
@@ -71,12 +71,12 @@
       "bridgesUsed": "Puentes usados",
       "workdaysPerMonth": "Días laborales/mes",
       "longestVacation": "Vacaciones más largas",
-      "advancedMetrics": "Métricas Avanzadas"
+      "advancedMetrics": "métricas avanzadas"
     },
     "yearSummary": {
-      "feature": "Resumen Anual",
-      "featureDescription": "Análisis detallado de tus días libres.",
-      "title": "Resumen del Año",
+      "feature": "resumen anual",
+      "featureDescription": "análisis detallado de tus días libres",
+      "title": "resumen del año",
       "firstBreak": "Primera pausa",
       "maxWorkStreak": "Racha laboral máxima",
       "lastBreak": "Última pausa",
@@ -97,8 +97,8 @@
         "message": "Existen alternativas que añaden",
         "moreDays": "días más",
         "toYourPlan": "a tu planificación.",
-        "reviewOptions": "Revisa las opciones disponibles.",
-        "considerPremium": "Considera Premium para más análisis."
+        "reviewOptions": "mira las opciones disponibles.",
+        "considerPremium": "con premium tienes más análisis."
       },
       "manualAdjustments": {
         "title": "Ajustes manuales",
@@ -134,6 +134,10 @@
     "sections": {
       "general": {
         "title": "General",
+        "whatIsPto": {
+          "question": "¿Qué es el PTO?",
+          "answer": "PTO son las siglas de Paid Time Off (días de vacaciones pagadas) — el número de días de vacaciones que tu empresa te da cada año para usar como quieras. A diferencia de la baja por enfermedad o los festivos, los días de PTO son tuyos para programar libremente. El problema es que la mayoría de la gente los usa al azar y desaprovecha mucho descanso potencial. Forever PTO te ayuda a colocar esos días estratégicamente alrededor de los festivos para convertir, por ejemplo, 5 días de PTO en 12 días consecutivos libres."
+        },
         "whatIs": {
           "question": "¿Qué es esto?",
           "answer": "Forever PTO es una herramienta para ayudarte a planificar y optimizar tus días libres (PTO) sugiriendo las mejores fechas basándose en festivos y tus preferencias. Dada la complejidad de la planificación de vacaciones, Forever PTO simplifica el proceso y maximiza tu tiempo libre. Te permite elegir diferentes estrategias para equilibrar tu tiempo libre durante el año. También puedes personalizar completamente los festivos, nombres de festividades e incluso añadir festivos específicos de tu empresa o región."
@@ -147,7 +151,7 @@
         },
         "pricing": {
           "question": "¿Por qué hay un modelo de pago?",
-          "answer": "Forever PTO es gratuito. Sin embargo, usamos un modelo de pago para cubrir los costes de mantener datos, infraestructura y mejoras continuas. El modelo de pago financia actualizaciones, soporte y hosting. También ofrecemos un tier gratuito con funciones principales para que todos puedan beneficiarse de una mejor planificación de PTO. Si quieres ir sin anuncios y apoyar el proyecto hay una donación voluntaria."
+          "answer": "Forever PTO es gratuito. Sin embargo, usamos un modelo de pago para cubrir los costes de mantener datos, infraestructura y mejoras continuas. El modelo de pago financia actualizaciones, soporte y hosting. También ofrecemos un tier gratuito con funciones principales para que todos puedan beneficiarse de una mejor planificación de PTO."
         },
         "restartTutorial": {
           "question": "¿Cómo puedo ver el tutorial interactivo de nuevo?"
@@ -172,7 +176,7 @@
         "title": "Seguridad y privacidad",
         "data": {
           "question": "¿Cómo manejáis mis datos?",
-          "answer": "Solo almacenamos la información mínima necesaria para generar sugerencias. No compartimos datos con terceros sin consentimiento. Consulta la política de privacidad para más detalles."
+          "answer": "Solo almacenamos la información mínima necesaria para generar sugerencias. No compartimos datos con terceros sin consentimiento. Consulta la <privacyLink>política de privacidad</privacyLink> para más detalles."
         },
         "encryption": {
           "question": "¿Están mis datos encriptados?",
@@ -190,7 +194,7 @@
         "title": "¿Interesado en colaborar?",
         "code": {
           "question": "¿Cómo contribuir código o ideas?",
-          "answer": "Abre issues o merge requests con propuestas. Necesitamos ayuda en algoritmos, integraciones y mejoras de UX."
+          "answer": "<link>Abre issues o merge requests</link> con propuestas. Necesitamos ayuda en algoritmos, integraciones y mejoras de UX."
         },
         "business": {
           "question": "Proponer integraciones o asociaciones corporativas",
@@ -198,7 +202,7 @@
         },
         "nonCode": {
           "question": "¿Puedo colaborar si no soy desarrollador/a?",
-          "answer": "Sí. El feedback sobre UX, copy, traducciones, exactitud de festivos, testing e ideas de partnership es muy útil. Si detectas fricción o tienes una necesidad específica de tu mercado, escríbeme y lo vemos."
+          "answer": "Sí. El feedback sobre UX, copy, traducciones, exactitud de festivos, testing e ideas de partnership es muy útil. Si detectas fricción o tienes una necesidad específica de tu mercado, escríbenos y lo vemos."
         }
       }
     }
@@ -222,11 +226,11 @@
     "nationalTab": "Nacionales",
     "regionalTab": "Regionales",
     "customTab": "Personalizados",
-    "nationalTitle": "Festivos Nacionales",
-    "regionalTitle": "Festivos Regionales",
-    "customTitle": "Festivos Personalizados",
-    "customHolidaysFeature": "Festivos Personalizados",
-    "customHolidaysDescription": "Permite añadir festivos personalizados",
+    "nationalTitle": "festivos nacionales",
+    "regionalTitle": "festivos regionales",
+    "customTitle": "festivos personalizados",
+    "customHolidaysFeature": "festivos personalizados",
+    "customHolidaysDescription": "añade tus propios festivos",
     "selectAll": "Seleccionar todos",
     "partialSelection": "Selección parcial - click para seleccionar todos",
     "deselectAll": "Deseleccionar todos",
@@ -241,7 +245,7 @@
     "showing": "Mostrando",
     "of": "de",
     "total": "total",
-    "addHoliday": "Añadir Festivo",
+    "addHoliday": "añadir festivo",
     "add": "Añadir",
     "editHoliday": "Editar festivo",
     "edit": "Editar",
@@ -249,10 +253,10 @@
     "delete": "Eliminar"
   },
   "charts": {
-    "daysOffComposition": "Composición de Días Libres",
-    "daysOffCompositionFeature": "Gráfica de Composición de Días Libres",
-    "quarterDistribution": "Distribución por Trimestre",
-    "quarterDistributionFeature": "Gráfica de Distribución por Trimestre",
+    "daysOffComposition": "composición de días libres",
+    "daysOffCompositionFeature": "gráfica de composición de días libres",
+    "quarterDistribution": "distribución por trimestre",
+    "quarterDistributionFeature": "gráfica de distribución por trimestre",
     "days": "días",
     "daysOff": "Días libres",
     "pto": "PTO",
@@ -263,12 +267,12 @@
     "regionalPart": ", {regionalDays} regionales",
     "customPart": " y {customDays} personalizados",
     "quarterDescription": "Distribución de {totalDays} días libres efectivos a lo largo de {activeQuarters} trimestre{plural} del año.",
-    "annualTimeline": "Línea Temporal Anual",
-    "annualTimelineFeature": "Gráfica de Línea Temporal Anual",
+    "annualTimeline": "línea temporal anual",
+    "annualTimelineFeature": "gráfica de línea temporal anual",
     "timelineDescription": "Evolución mensual de {totalDays} días libres distribuidos en {activeMonths} meses. Pico en {peakMonth} con {peakDays} días.",
     "daysOffLabel": "Días libres",
-    "longBlocksPerQuarter": "Bloques Largos por Trimestre",
-    "longBlocksFeature": "Gráfica de Bloques Largos por Trimestre",
+    "longBlocksPerQuarter": "bloques largos por trimestre",
+    "longBlocksFeature": "gráfica de bloques largos por trimestre",
     "blocksDescription": "{totalBlocks} bloques largos (3+ días consecutivos) ideales para vacaciones{bestQuarterPart}.",
     "bestQuarterPart": ". Mejor trimestre: Q{bestQuarter} con {maxBlocks} bloque{plural}",
     "blocks": "bloques",
@@ -276,36 +280,36 @@
   },
   "modals": {
     "addHoliday": {
-      "title": "Añadir Nuevo Festivo",
-      "description": "Crea un nuevo festivo seleccionando una fecha e introduciendo un nombre",
-      "nameLabel": "Nombre del Festivo",
+      "title": "añadir nuevo festivo",
+      "description": "elige una fecha y ponle un nombre",
+      "nameLabel": "nombre del festivo",
       "namePlaceholder": "ej. Mi cumpleaños",
-      "dateLabel": "Seleccionar Fecha",
+      "dateLabel": "seleccionar fecha",
       "selected": "Seleccionado",
-      "submit": "Añadir Festivo",
+      "submit": "añadir festivo",
       "submitting": "Añadiendo...",
       "cancel": "Cancelar",
       "successTitle": "Festivo creado correctamente",
       "successDescription": "{name} ha sido añadido el {date}",
       "errorTitle": "Error al crear festivo",
-      "errorDescription": "Algo salió mal. Por favor, inténtalo de nuevo.",
+      "errorDescription": "algo ha fallado. inténtalo de nuevo.",
       "existsTitle": "El festivo ya existe",
       "existsDescription": "Ya existe un festivo el {date}: {name}"
     },
     "editHoliday": {
-      "title": "Editar Festivo",
-      "description": "Modifica el festivo seleccionado",
-      "submit": "Guardar Cambios",
+      "title": "editar festivo",
+      "description": "cambia el nombre o la fecha del festivo",
+      "submit": "guardar cambios",
       "submitting": "Guardando...",
       "cancel": "Cancelar",
       "successTitle": "Festivo actualizado correctamente",
       "successDescription": "{name} ha sido actualizado",
       "errorTitle": "Error al actualizar festivo",
-      "errorDescription": "Algo salió mal. Por favor, inténtalo de nuevo."
+      "errorDescription": "algo ha fallado. inténtalo de nuevo."
     },
     "deleteHoliday": {
-      "title": "Eliminar Festivos",
-      "titleSingular": "Eliminar Festivo",
+      "title": "eliminar festivos",
+      "titleSingular": "eliminar festivo",
       "description": "¿Estás seguro de que quieres eliminar {count} festivos? Esta acción no se puede deshacer.",
       "descriptionSingular": "¿Estás seguro de que quieres eliminar este festivo? Esta acción no se puede deshacer.",
       "submit": "Eliminar",
@@ -316,28 +320,28 @@
       "successDescription": "{count} festivos han sido eliminados",
       "successDescriptionSingular": "El festivo ha sido eliminado",
       "errorTitle": "Error al eliminar festivos",
-      "errorDescription": "Algo salió mal. Por favor, inténtalo de nuevo."
+      "errorDescription": "algo ha fallado. inténtalo de nuevo."
     }
   },
   "tutorial": {
     "description": "Configura tu plan en 2 pasos: primero tu ubicación, luego tus días y estrategia. Pulsa el botón para un tutorial interactivo.",
-    "restartButton": "Reiniciar Tutorial Interactivo",
-    "startButton": "Iniciar Tutorial",
+    "restartButton": "reiniciar tutorial interactivo",
+    "startButton": "iniciar tutorial",
     "nextBtn": "Siguiente",
     "prevBtn": "Anterior",
     "doneBtn": "Listo",
     "progressTextConnector": "de",
     "steps": {
-      "toolsTitle": "Calculadoras y Herramientas",
-      "toolsDescription": "Accede a calculadoras útiles aquí: estima tu PTO basándote en historial laboral, calcula el valor monetario del PTO no utilizado, o cuenta días laborables entre fechas.",
-      "alternativesTitle": "Gestor de Alternativas",
-      "alternativesDescription": "Navega por diferentes sugerencias de PTO generadas por nosotros. Compara métricas de eficiencia, total de días libres y encuentra el equilibrio perfecto. La primera opción siempre es nuestra sugerencia recomendada, marcada con un icono de destello. Usa las flechas para explorar alternativas y haz clic en \"Aplicar Alternativa\" para usar una sugerencia diferente.",
-      "statusTitle": "Seguimiento de Estado de PTO",
-      "statusDescription": "Monitoriza tu asignación de PTO en tiempo real. Ve los días auto-asignados (sugeridos por nuestro sistema), días seleccionados manualmente y días restantes disponibles. Puedes restablecer cambios manuales en cualquier momento para volver a la sugerencia automática.",
-      "calendarTitle": "Tu Calendario de PTO Interactivo",
-      "calendarDescription": "Este es tu calendario de un vistazo del año. Los festivos aparecen en gris, los días de PTO sugeridos por IA en verde azulado, y los días seleccionados manualmente en azul. Haz clic en cualquier día laborable para alternar la selección manualmente. El calendario se actualiza instantáneamente mientras exploras diferentes alternativas.",
-      "finishTitle": "¡Ya Está Todo Listo!",
-      "finishDescription": "Ahora sabes cómo usar Forever PTO para maximizar tu tiempo libre. Empieza configurando tus preferencias en la barra lateral, y deja que la app te sugiera los mejores días de PTO. ¡Disfruta de tus merecidos descansos!",
+      "toolsTitle": "calculadoras y herramientas",
+      "toolsDescription": "desde aquí puedes estimar tu PTO por historial laboral, calcular el valor económico de los días no usados o contar días laborables entre fechas.",
+      "alternativesTitle": "gestor de alternativas",
+      "alternativesDescription": "explora las sugerencias de PTO generadas. compara eficiencia y días libres. la primera siempre es la recomendada (icono de destello). usa las flechas para ver otras opciones y 'aplicar alternativa' para activarla.",
+      "statusTitle": "seguimiento de estado de PTO",
+      "statusDescription": "Consulta tu asignación de PTO en tiempo real. Ve los días auto-asignados (sugeridos por nuestro sistema), días seleccionados manualmente y días restantes disponibles. Puedes restablecer cambios manuales en cualquier momento para volver a la sugerencia.",
+      "calendarTitle": "tu calendario de PTO interactivo",
+      "calendarDescription": "Este es tu calendario de un vistazo del año. Los festivos aparecen en gris, los días de PTO sugeridos en verde azulado, y los días seleccionados manualmente en azul. Haz clic en cualquier día laborable para alternar la selección manualmente. El calendario se actualiza instantáneamente mientras exploras diferentes alternativas.",
+      "finishTitle": "¡ya está todo listo!",
+      "finishDescription": "ya sabes cómo sacarle partido a Forever PTO. configura tus preferencias en la barra lateral y la app se encarga del resto.",
       "holidaysListTitle": "Personaliza tus festivos",
       "holidaysListDescription": "Aquí puedes ajustar los datos de festivos para que se adapten exactamente a tu situación. Edita o elimina cualquier festivo nacional o regional, y añade tus propios días personalizados: festivos de empresa, celebraciones locales o cualquier fecha que sea relevante para ti. Cuanto más precisos sean los datos, mejores serán las sugerencias.",
       "step1Title": "Tu contexto",
@@ -390,13 +394,13 @@
     "remaining": "Restantes",
     "clickDays": "Haz clic en los días para asignar/quitar",
     "allAssigned": "¡Todos los días asignados!",
-    "resetManual": "Restablecer Cambios Manuales",
+    "resetManual": "restablecer cambios manuales",
     "usedDays": "{used} / {total} días usados · {pct}%",
     "remainingDays": "{remaining} restantes · {pct}%"
   },
   "contact": {
-    "title": "Contáctanos",
-    "description": "¿Tienes alguna pregunta o comentario? ¡Nos encantaría saber de ti!",
+    "title": "contáctanos",
+    "description": "¿tienes alguna pregunta o sugerencia? escríbenos.",
     "name": "Nombre",
     "namePlaceholder": "Juan García",
     "email": "Email",
@@ -405,51 +409,51 @@
     "subjectPlaceholder": "¿De qué se trata?",
     "message": "Mensaje",
     "messagePlaceholder": "Cuéntanos lo que necesitas...",
-    "sendMessage": "Enviar Mensaje",
+    "sendMessage": "enviar mensaje",
     "sending": "Enviando...",
     "cancel": "Cancelar",
-    "successTitle": "¡Mensaje Enviado!",
+    "successTitle": "¡mensaje enviado!",
     "successDescription": "Te responderemos lo antes posible.",
-    "errorTitle": "Ha ocurrido un error",
-    "tryAgain": "Intentar de Nuevo",
+    "errorTitle": "ha ocurrido un error",
+    "tryAgain": "intentar de nuevo",
     "close": "Cerrar",
     "failedToSend": "Error al enviar el mensaje"
   },
   "alternativesManager": {
     "option": "Opción",
     "recommended": "Recomendado",
-    "totalOff": "Total Libres",
-    "efficiency": "Eficiencia",
-    "vsMain": "vs Principal",
-    "alreadyApplied": "Ya Aplicado",
-    "applyAlternative": "Aplicar Alternativa",
+    "totalOff": "total libres",
+    "efficiency": "eficiencia",
+    "vsMain": "vs principal",
+    "alreadyApplied": "ya aplicado",
+    "applyAlternative": "aplicar alternativa",
     "previousSuggestion": "Sugerencia anterior",
     "nextSuggestion": "Siguiente sugerencia",
-    "totalDaysOff": "Total Días Libres",
-    "comparison": "Comparación",
+    "totalDaysOff": "total días libres",
+    "comparison": "comparación",
     "daysUnit": "días"
   },
   "toasts": {
     "suggestionApplied": "Sugerencia aplicada correctamente",
     "cannotSelectPastDays": "No se pueden seleccionar días pasados",
-    "enablePastDays": "Habilita \"Permitir días pasados\" en ajustes para seleccionar fechas pasadas",
+    "enablePastDays": "habilita 'permitir días pasados' en ajustes para seleccionar fechas pasadas",
     "noPtoDaysRemaining": "No quedan días de PTO para asignar",
-    "removeDaysToFree": "Elimina días existentes para liberar espacio",
+    "removeDaysToFree": "quita algún día para poder añadir más",
     "cannotSelectBankHoliday": "No se puede seleccionar un día festivo",
     "bankHolidayDescription": "Este día ya es un festivo nacional o regional",
     "paymentFailed": "Error al inicializar el pago",
     "paymentFailedDescription": "Por favor, inténtalo de nuevo más tarde",
-    "paymentSuccess": "¡Pago exitoso!",
-    "paymentSuccessDescription": "¡Gracias por tu apoyo! Ya tienes acceso premium."
+    "paymentSuccess": "¡pago completado!",
+    "paymentSuccessDescription": "¡gracias por tu apoyo! ya tienes acceso premium."
   },
   "troubleshooting": {
-    "description": "Si la aplicación se comporta de forma inesperada puede ser debido a datos locales obsoletos. Cuando el proyecto evoluciona, algunos objetos almacenados pueden cambiar de forma, causando que el cliente reutilice estructuras incompatibles y falle al revalidar correctamente. Limpiar el almacenamiento local fuerza un estado nuevo.",
-    "resetButton": "Restablecer Almacenamiento Local",
+    "description": "si la app se comporta raro, puede ser por datos locales desactualizados. limpiar el almacenamiento fuerza un estado nuevo y suele resolverlo.",
+    "resetButton": "restablecer almacenamiento local",
     "clearing": "Limpiando...",
     "cleared": "Limpiado",
-    "successTitle": "Almacenamiento local limpiado correctamente",
-    "successDescription": "Todos los datos han sido restablecidos y actualizados desde el servidor.",
-    "errorTitle": "Error al limpiar almacenamiento local",
+    "successTitle": "almacenamiento local limpiado",
+    "successDescription": "todos tus datos han sido restablecidos.",
+    "errorTitle": "error al limpiar almacenamiento local",
     "errorDescription": "Algo salió mal al restablecer los datos. Por favor, inténtalo de nuevo."
   },
   "sidebar": {
@@ -460,7 +464,7 @@
     "loading": "Cargando...",
     "country": {
       "title": "País",
-      "tooltip": "Este dato se infiere de tu CDN y tu conexión. Si crees que no es preciso o quieres ver los festivos de otros países, puedes seleccionarlo manualmente aquí",
+      "tooltip": "lo detectamos automáticamente por tu conexión. si no es correcto, cámbialo aquí.",
       "tooltipLabel": "Más información sobre selección de país",
       "loading": "Cargando países...",
       "placeholder": "Seleccionar país...",
@@ -521,14 +525,14 @@
       }
     },
     "allowPastDays": {
-      "title": "Permitir Días Pasados",
-      "tooltip": "Este interruptor permite habilitar o deshabilitar la sugerencia de días festivos pasados para el año seleccionado. Esto te permite ver oportunidades de PTO que se perdieron en el pasado",
+      "title": "permitir días pasados",
+      "tooltip": "activa esto para incluir en las sugerencias fechas que ya han pasado en el año seleccionado.",
       "tooltipLabel": "Más información sobre días pasados",
       "enabled": "Habilitado",
       "disabled": "Deshabilitado"
     },
     "carryOverMonths": {
-      "title": "Meses de Arrastre",
+      "title": "meses de arrastre",
       "tooltip": "Permite añadir meses al año siguiente para expandir la búsqueda de oportunidades",
       "tooltipLabel": "Más información sobre arrastre"
     },
@@ -561,17 +565,17 @@
     "title": "Días de PTO",
     "iHave": "Tengo",
     "days": "días",
-    "status": "Estado de Días PTO",
+    "status": "estado de días PTO",
     "autoAssigned": "Auto-asignados:",
     "manuallySelected": "Seleccionados manualmente:",
     "remaining": "Restantes:",
-    "resetManualChanges": "Restablecer Cambios Manuales",
+    "resetManualChanges": "restablecer cambios manuales",
     "allAssigned": "¡Todos los días asignados!",
     "clickToAssign": "Haz clic en los días del calendario para asignar manualmente los días restantes"
   },
   "ptoCalculator": {
-    "title": "Acumulador de PTO",
-    "tooltip": "Calcula tus días de PTO acumulados según el acumulado mensual. La mayoría de empresas ofrecen 2-3 días por mes. Selecciona el mes objetivo para ver tus días totales disponibles.",
+    "title": "calculadora de acumulación de PTO",
+    "tooltip": "calcula tus días de PTO acumulados según el ritmo mensual de tu empresa. elige el mes objetivo para ver cuántos días tendrás disponibles.",
     "tooltipLabel": "Más información sobre la calculadora de PTO",
     "daysPerMonth": "Días por mes",
     "calculateThrough": "Calcular hasta",
@@ -583,15 +587,15 @@
     "days": "días",
     "daysMonth": "días/mes",
     "months": "meses",
-    "applyToPtoDays": "Aplicar a Días PTO"
+    "applyToPtoDays": "aplicar a días PTO"
   },
   "ptoSalaryCalculator": {
-    "title": "Calculadora PTO vs Salario",
+    "title": "calculadora PTO vs salario",
     "tooltip": "Calcula cuánto tiempo libre pagado estás perdiendo al no usar tus días de PTO. Sigues recibiendo tu salario completo, pero estás trabajando días que podrías haber tomado como vacaciones pagadas.",
     "tooltipLabel": "Más información sobre la calculadora",
-    "annualSalary": "Salario Anual",
+    "annualSalary": "salario anual",
     "annualSalaryPlaceholder": "{amount}",
-    "unusedPtoDays": "Días de PTO no utilizados",
+    "unusedPtoDays": "días de PTO no utilizados",
     "unusedPtoDaysPlaceholder": "{days}",
     "valueOfUnusedPto": "Valor del PTO no usado:",
     "worthOfPaidVacation": "Valor de vacaciones pagadas no tomadas",
@@ -602,7 +606,7 @@
     "standardWorkingHours": "Horas de trabajo estándar",
     "effectiveHourlyRate": "Tarifa por hora efectiva:",
     "whenWorkingExtraDays": "Al trabajar {days} días extra no pagados",
-    "opportunityCost": "Coste de Oportunidad",
+    "opportunityCost": "coste de oportunidad",
     "opportunityCostDescription": "Trabajaste {days} días que podrías haber tomado como vacaciones pagadas. Eso son <amount>valor</amount> de tiempo libre pagado que cediste. Tu salario sigue igual, pero trabajaste días extra gratis."
   },
   "checkout": {
@@ -611,45 +615,45 @@
     "totalAmount": "Importe total",
     "expressCheckout": "Pago rápido",
     "orPayWithCard": "O pagar con tarjeta",
-    "paymentError": "Error de Pago",
-    "paymentFailed": "Pago fallido",
+    "paymentError": "error de pago",
+    "paymentFailed": "pago no completado",
     "processing": "Procesando...",
     "pay": "Pagar"
   },
   "donate": {
-    "donateAndUnblock": "Donar y Desbloquear",
-    "supportAndUnblock": "Apoyar y Desbloquear",
-    "makeDonation": "Haz una donación para apoyar el contenido y desbloquear el acceso.",
+    "donateAndUnblock": "donar y desbloquear",
+    "supportAndUnblock": "apoyar y desbloquear",
+    "makeDonation": "haz una donación para apoyar el proyecto y desbloquear el acceso.",
     "alreadyPremium": "Ya eres usuario premium. ¡Gracias por tu apoyo!"
   },
   "donationForm": {
     "email": "Email",
     "emailPlaceholder": "tu@email.com",
     "quickAmounts": "Cantidades rápidas",
-    "donationAmount": "Cantidad de Donación",
+    "donationAmount": "cantidad de donación",
     "enterAmount": "Introducir cantidad",
-    "basePriceNote": "Precio base en {currency}. La cantidad final se convertirá a tu moneda local según las tasas de cambio actuales.",
+    "basePriceNote": "precio base en {currency}. se convierte a tu moneda según el tipo de cambio actual.",
     "havePromoCode": "¿Tienes código promocional?",
     "promoCodePlaceholder": "OJALÁ_FUERA_TAN_FÁCIL",
-    "continueToPayment": "Continuar al Pago",
+    "continueToPayment": "continuar al pago",
     "processing": "Procesando..."
   },
   "upgrade": {
-    "premiumRequired": "Se Requiere Premium",
+    "premiumRequired": "se requiere premium",
     "featureRequiresPremium": "requiere acceso premium",
-    "verifyDescription": "No te preocupes, si ya has donado o pagado comprobaremos tu email en nuestra lista y te concederemos acceso premium. Si tienes algún problema no dudes en contactarnos.",
-    "considerDonating": "Si aún no has donado, considera hacerlo para apoyar el proyecto y desbloquear las funciones premium.",
-    "enterPremiumEmail": "Introduce tu email premium",
+    "verifyDescription": "si ya has donado, comprobamos tu email y te damos acceso enseguida. si hay algún problema, escríbenos.",
+    "considerDonating": "si aún no has donado, apoya el proyecto para desbloquear las funciones premium.",
+    "enterPremiumEmail": "introduce tu email premium",
     "emailPlaceholder": "tu@email.com",
     "verifying": "Verificando...",
-    "verifyAccess": "Verificar Acceso",
+    "verifyAccess": "verificar acceso",
     "cancel": "Cancelar",
-    "accessGranted": "¡Acceso Concedido!",
-    "welcomeToPremium": "Bienvenido a las funciones premium. Puedes cerrar este modal o lo haremos en {seconds} segundos.",
-    "accessDenied": "Acceso Denegado",
+    "accessGranted": "¡acceso concedido!",
+    "welcomeToPremium": "ya tienes acceso a todas las funciones premium. cerramos esto en {seconds} segundos.",
+    "accessDenied": "acceso denegado",
     "emailNotFound": "Este email no está en nuestra lista de usuarios premium.",
     "emailNotFoundError": "Email no encontrado en nuestra lista de usuarios premium",
-    "tryAgain": "Intentar de Nuevo",
+    "tryAgain": "intentar de nuevo",
     "close": "Cerrar",
     "invalidEmail": "Por favor introduce un email válido",
     "emailRequired": "El email es obligatorio"
@@ -668,7 +672,7 @@
     "payment": {
       "amountMin": "La cantidad mínima es 1",
       "amountMax": "La cantidad máxima es 10.000",
-      "invalidEmail": "Se requiere un email válido",
+      "invalidEmail": "introduce un email válido",
       "emailRequired": "El email es obligatorio"
     },
     "holiday": {
@@ -678,54 +682,54 @@
     }
   },
   "roadmap": {
-    "title": "Hoja de Ruta",
-    "subtitle": "Explora lo que hemos construido y lo que viene",
+    "title": "hoja de ruta",
+    "subtitle": "explora lo que hemos construido y lo que viene",
     "selected": "Seleccionado",
     "completed": "Completado",
-    "inProgress": "En Progreso",
-    "planned": "Planificado",
-    "future": "Futuro",
-    "detailedView": "Vista detallada",
-    "haveSuggestion": "¿Tienes una sugerencia?",
-    "feedbackShapes": "Tu feedback da forma a nuestra hoja de ruta. Comparte tus ideas y ayúdanos a construir el planificador de vacaciones perfecto.",
-    "gotAnIdea": "¿Tienes una idea que haría tu vida más fácil?",
-    "letsTalk": "Hablemos",
+    "inProgress": "en progreso",
+    "planned": "planificado",
+    "future": "futuro",
+    "detailedView": "vista detallada",
+    "haveSuggestion": "¿tienes una sugerencia?",
+    "feedbackShapes": "tus ideas dan forma a la hoja de ruta. cuéntanos lo que necesitas y ayúdanos a construir el mejor planificador de vacaciones.",
+    "gotAnIdea": "¿tienes una idea que haría tu vida más fácil?",
+    "letsTalk": "hablemos",
     "or": "o",
     "openIssue": "abre un issue en GitHub",
     "features": {
-      "corePtoCalculator": "Calculadora de PTO Principal",
+      "corePtoCalculator": "calculadora de PTO principal",
       "corePtoCalculatorDescription": "Planificación inteligente de vacaciones con optimización de festivos y detección de puentes",
-      "multipleCountries": "Soporte de Múltiples Países",
+      "multipleCountries": "soporte de múltiples países",
       "multipleCountriesDescription": "Soporte para festivos en países europeos con reglas específicas por región",
-      "premiumFeatures": "Funciones Premium",
+      "premiumFeatures": "funciones premium",
       "premiumFeaturesDescription": "Desbloquea funciones avanzadas con un pago único vía Stripe",
-      "customHolidays": "Festivos Personalizados",
-      "customHolidaysDescription": "Añade, edita y elimina festivos personalizados para una planificación personalizada",
-      "alternativeStrategies": "Estrategias Alternativas",
+      "customHolidays": "festivos personalizados",
+      "customHolidaysDescription": "añade, edita y elimina festivos según tu situación real",
+      "alternativeStrategies": "estrategias alternativas",
       "alternativeStrategiesDescription": "Múltiples estrategias de planificación de vacaciones con comparación de eficiencia",
-      "analyticsDashboard": "Panel de Análisis",
-      "analyticsDashboardDescription": "Métricas detalladas e información sobre tu planificación de vacaciones",
-      "calendarExport": "Exportar Calendario",
+      "analyticsDashboard": "panel de análisis",
+      "analyticsDashboardDescription": "métricas detalladas y visualizaciones sobre tu plan de vacaciones",
+      "calendarExport": "exportar calendario",
       "calendarExportDescription": "Exporta tu plan de vacaciones a Google Calendar, iCal u Outlook",
-      "teamPlanning": "Planificación de Equipo",
+      "teamPlanning": "planificación de equipo",
       "teamPlanningDescription": "Coordina la planificación de vacaciones con miembros del equipo para evitar conflictos",
-      "emailNotifications": "Notificaciones por Email",
+      "emailNotifications": "notificaciones por email",
       "emailNotificationsDescription": "Recibe recordatorios sobre próximas vacaciones y fechas importantes",
-      "mobileApp": "App Móvil",
-      "mobileAppDescription": "Apps nativas iOS y Android para planificar vacaciones en movimiento",
-      "aiSuggestions": "Sugerencias IA",
-      "aiSuggestionsDescription": "Recomendaciones impulsadas por IA basadas en tus preferencias y patrones pasados",
-      "weatherIntegration": "Integración del Tiempo",
-      "weatherIntegrationDescription": "Ve pronósticos del tiempo para tus fechas de vacaciones planificadas",
-      "blockedPeriods": "Períodos Bloqueados",
+      "mobileApp": "app móvil",
+      "mobileAppDescription": "apps nativas iOS y Android",
+      "aiSuggestions": "sugerencias IA",
+      "aiSuggestionsDescription": "recomendaciones basadas en tus preferencias e historial",
+      "weatherIntegration": "integración del tiempo",
+      "weatherIntegrationDescription": "consulta el pronóstico para tus fechas de vacaciones",
+      "blockedPeriods": "períodos bloqueados",
       "blockedPeriodsDescription": "Marca rangos de fechas donde no quieres ninguna sugerencia de PTO — conferencias, viajes, bajas médicas o cualquier momento en el que sepas que estarás ocupado",
-      "performanceOptimization": "Optimización de Rendimiento",
+      "performanceOptimization": "optimización de rendimiento",
       "performanceOptimizationDescription": "Cálculos más rápidos y experiencia más fluida gracias a Web Workers",
-      "customWeekends": "Fines de Semana Personalizados",
-      "customWeekendsDescription": "Define días no laborables personalizados más allá del fin de semana estándar sábado-domingo",
-      "multiYearPlanning": "Planificación Multi-Año",
+      "customWeekends": "fines de semana personalizados",
+      "customWeekendsDescription": "define tus propios días no laborables más allá del sábado y domingo",
+      "multiYearPlanning": "planificación multi-año",
       "multiYearPlanningDescription": "Planifica vacaciones a lo largo de múltiples años con soporte de arrastre",
-      "calendarSubscription": "Suscripción de Calendario en Vivo",
+      "calendarSubscription": "suscripción de calendario en vivo",
       "calendarSubscriptionDescription": "Suscríbete directamente desde Google Calendar, Apple Calendar u Outlook mediante una URL webcal:// — tu plan se sincroniza automáticamente"
     }
   },
@@ -773,26 +777,26 @@
     "selectDateRange": "Seleccionar fechas"
   },
   "command": {
-    "commandPalette": "Paleta de Comandos",
+    "commandPalette": "paleta de comandos",
     "searchPlaceholder": "Buscar un comando para ejecutar..."
   },
   "errors": {
     "contact": {
-      "VALIDATION_ERROR": "Datos de entrada inválidos.",
+      "VALIDATION_ERROR": "hay campos con errores. revísalos e inténtalo de nuevo.",
       "EMAIL_SEND_FAILED": "Error al enviar el correo. Por favor, inténtalo de nuevo.",
       "SAVE_FAILED": "Hemos recibido tu consulta, aunque encontramos un pequeño problema técnico al finalizar los registros. No necesitas hacer nada más.",
       "RENDER_FAILED": "Error al preparar el correo. Por favor, inténtalo de nuevo.",
       "UNKNOWN": "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo."
     },
     "payment": {
-      "VALIDATION_ERROR": "Datos de entrada inválidos.",
-      "INVALID_PROMO_CODE": "El código promocional es inválido o ha expirado.",
-      "PAYMENT_FAILED": "El procesamiento del pago ha fallado.",
-      "SAVE_FAILED": "Se creó la intención de pago pero falló al guardar. Por favor, contacta con soporte.",
-      "UPDATE_STATUS_FAILED": "Error al actualizar el estado del pago.",
+      "VALIDATION_ERROR": "hay campos con errores. revísalos e inténtalo de nuevo.",
+      "INVALID_PROMO_CODE": "el código promocional no es válido o ha caducado.",
+      "PAYMENT_FAILED": "no hemos podido procesar el pago. inténtalo de nuevo.",
+      "SAVE_FAILED": "el pago se procesó, pero hubo un problema al registrarlo. contacta con soporte con tu ID de transacción.",
+      "UPDATE_STATUS_FAILED": "error al actualizar el estado del pago. contacta con soporte si el problema persiste.",
       "SAVE_FROM_WEBHOOK_FAILED": "Error al guardar el pago desde webhook.",
       "CHARGE_UPDATE_FAILED": "Error al actualizar los detalles del cargo.",
-      "WEBHOOK_PROCESSING_FAILED": "Error al procesar el evento webhook.",
+      "WEBHOOK_PROCESSING_FAILED": "error al procesar la confirmación del pago.",
       "UNKNOWN": "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo."
     }
   },
@@ -806,7 +810,7 @@
     "titleEmphasis": "sin avisar.",
     "lede": "Buscamos en la playa, miramos debajo de la sombrilla, preguntamos al chiringuito… nada. La URL que quieres no existe (o se perdió entre 2 puentes).",
     "ctaPrimary": "Volver al inicio",
-    "ctaPlanner": "Abrir el Planificador",
+    "ctaPlanner": "abrir el planificador",
     "suggestLabel": "¿Buscabas algo así?",
     "link1": "Cómo funciona",
     "link2": "Funcionalidades",
@@ -830,10 +834,10 @@
     "internalServerError": "error interno del servidor"
   },
   "footer": {
-    "privacyPolicy": "Política de Privacidad",
-    "termsOfService": "Términos de Servicio",
-    "cookiePolicy": "Política de Cookies",
-    "legalNotice": "Aviso Legal",
+    "privacyPolicy": "política de privacidad",
+    "termsOfService": "términos de servicio",
+    "cookiePolicy": "política de cookies",
+    "legalNotice": "aviso legal",
     "manageCookies": "Gestionar cookies",
     "contactUs": "Contáctanos",
     "legalNavigation": "Enlaces legales y de política",
@@ -855,12 +859,12 @@
     "findMeOn": "También puedes encontrarme en"
   },
   "premium": {
-    "selectHoliday": "Seleccionar Festivo",
-    "selectAllHolidays": "Seleccionar Todos los Festivos",
+    "selectHoliday": "seleccionar festivo",
+    "selectAllHolidays": "seleccionar todos los festivos",
     "unlockFeature": "Desbloquear función premium: {feature}",
     "premiumFeature": "Función premium",
-    "unlockDescription": "Desbloquea la capacidad de añadir/eliminar sugerencias y añadir/eliminar días restantes actualizando a premium.",
-    "upgrade": "Actualizar a premium"
+    "unlockDescription": "hazte premium para editar las sugerencias y gestionar los días restantes manualmente.",
+    "upgrade": "hazte premium"
   },
   "calendar": {
     "previousMonth": "Mes anterior",
@@ -876,23 +880,23 @@
   },
   "paymentConfirmation": {
     "failed": {
-      "title": "Pago Fallido",
+      "title": "pago no completado",
       "description": "No pudimos procesar tu pago. No se te ha cobrado.",
-      "whatHappened": "¿Qué ha pasado?",
+      "whatHappened": "¿qué ha pasado?",
       "declined": "Tu pago puede haber sido rechazado",
       "authFailed": "La autenticación puede haber fallado",
       "sessionExpired": "La sesión puede haber expirado",
-      "returnHome": "Volver a la página principal"
+      "returnHome": "volver a la página principal"
     },
     "success": {
-      "title": "¡Pago Exitoso!",
-      "thankYou": "Gracias por tu apoyo",
-      "amountPaid": "Cantidad pagada",
-      "status": "Estado",
-      "confirmed": "Confirmado",
-      "paymentId": "ID de Pago",
-      "premiumActivated": "Tu acceso premium ha sido activado. ¡Ya puedes disfrutar de todas las funciones premium!",
-      "continueHome": "Continuar a la página principal"
+      "title": "¡pago completado!",
+      "thankYou": "gracias por tu apoyo",
+      "amountPaid": "cantidad pagada",
+      "status": "estado",
+      "confirmed": "confirmado",
+      "paymentId": "ID de pago",
+      "premiumActivated": "tu acceso premium ya está activo.",
+      "continueHome": "ir a la página principal"
     }
   },
   "homepage": {

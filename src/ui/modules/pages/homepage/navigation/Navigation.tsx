@@ -22,7 +22,7 @@ export const Navigation = async () => {
           >
             <Image src='/static/images/forever-pto-logo.png' alt='' width={38} height={38} unoptimized />
           </div>
-          <span>Forever PTO</span>
+          <span>Forever</span>
         </Link>
 
         <div className='hidden md:flex gap-7 items-center font-semibold text-[15px]'>
