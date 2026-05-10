@@ -49,7 +49,7 @@ export default HomePage;
 // better stack not working properly
 // todo: focus input order in stripe
 // todo: new logo stripe
-// todo: implement animateIcon
+// todo: implement animateIcon (check 4-6 components todo)
 // todo: status pages localized
 // todo: all butons (border color to show shadow?)
 // todo: improve responsive
