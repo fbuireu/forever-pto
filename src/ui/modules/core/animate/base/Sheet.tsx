@@ -131,7 +131,7 @@ function SheetContent({
                 <m.div
                   key='sheet-overlay'
                   data-slot='sheet-overlay'
-                  className='fixed inset-0 z-[51] bg-black/80'
+                  className='fixed inset-0 z-[51] bg-black/80 touch-none'
                   initial={{ opacity: 0, filter: 'blur(4px)' }}
                   animate={{ opacity: 1, filter: 'blur(0px)' }}
                   exit={{ opacity: 0, filter: 'blur(4px)' }}
