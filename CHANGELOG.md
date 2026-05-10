@@ -1,3 +1,12 @@
+## [1.1.2](https://github.com/fbuireu/forever-pto/compare/v1.1.1...v1.1.2) (2026-05-10)
+
+
+### Bug Fixes
+
+* freeze ([7028df0](https://github.com/fbuireu/forever-pto/commit/7028df0f5c80c8627f803741ab665aa605da6347))
+* freeze ([5cadbe6](https://github.com/fbuireu/forever-pto/commit/5cadbe66e87692c865a8353aaf19ec732fe64685))
+* freeze ([6cee03b](https://github.com/fbuireu/forever-pto/commit/6cee03b6e985e78e72f088cd72dfb1e9fae24fb9))
+
 ## [1.1.1](https://github.com/fbuireu/forever-pto/compare/v1.1.0...v1.1.1) (2026-05-10)
 
 
