@@ -51,11 +51,9 @@ export default HomePage;
 // todo: new logo stripe
 // todo: implement animateIcon
 // todo: status pages localized
-// todo: memory leak on dropdown?
 // todo: all butons (border color to show shadow?)
 // todo: improve responsive
 // todo: recreate bones
-// todo: feedback web-check.xyz
 // todo: share button with results?
 // todo: recreate bones
 // todo: migrate temporal API when available in Node
