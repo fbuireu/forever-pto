@@ -1,3 +1,10 @@
+## [1.1.6](https://github.com/fbuireu/forever-pto/compare/v1.1.5...v1.1.6) (2026-05-10)
+
+
+### Bug Fixes
+
+* span animate propagation ([49cb914](https://github.com/fbuireu/forever-pto/commit/49cb914200e657f519bd2c08018b541b9cc0760f))
+
 ## [1.1.5](https://github.com/fbuireu/forever-pto/compare/v1.1.4...v1.1.5) (2026-05-10)
 
 
