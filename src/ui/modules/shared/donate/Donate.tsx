@@ -381,7 +381,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
           </PopoverTrigger>
         </div>
       </div>
-      <PopoverContent className='w-96 bg-card text-card-foreground' positionerClassName='z-[51]'>
+      <PopoverContent className='w-96 bg-card text-card-foreground' positionerClassName='z-[53]'>
         <div className='grid gap-4'>
           <div className='space-y-2'>
             <h4 className='leading-none font-medium'>{tDonate('supportAndUnblock')}</h4>

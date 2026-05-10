@@ -47,7 +47,7 @@ function PopoverContent({
       <PopoverPositionerPrimitive
         align={align}
         sideOffset={sideOffset}
-        className={cn('z-50', positionerClassName)}
+        className={cn('z-[52]', positionerClassName)}
         {...props}
       >
         <PopoverPopupPrimitive
