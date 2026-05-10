@@ -1,32 +1,39 @@
 import { routing } from '@infrastructure/i18n/routing';
-import { Toaster } from '@ui/components/primitives/sonner';
-import { cn } from '@ui/lib/utils';
+import { BonesProvider } from '@ui/modules/providers/BonesProvider';
+import { WebMCP } from '@ui/modules/shared/WebMCP';
+import { cn } from '@ui/utils/utils';
 import '@styles/index.css';
-import { SidebarProvider } from '@ui/components/animate/base/sidebar';
-import { LazyMotionProvider } from '@ui/components/animate/LazyMotionProvider';
-import { AppSidebar } from '@ui/modules/components/appSidebar/AppSidebar';
-import { Analytics } from '@ui/modules/components/core/Analytics';
-import { CookieConsentClient } from '@ui/modules/components/core/CookieConsentClient';
-import { DonateClient } from '@ui/modules/components/core/DonateClient';
-import { SiteSubtitle } from '@ui/modules/components/core/SiteSubtitle';
-import { SiteTitle } from '@ui/modules/components/core/SiteTitle';
-import { Footer } from '@ui/modules/components/footer/Footer';
-import { StoresInitializer } from '@ui/store/StoresInitializer';
-import dynamic from 'next/dynamic';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
+import { Analytics } from '@ui/modules/tutorial/Analytics';
+import { BetterStackTracking } from '@ui/modules/tutorial/BetterStackTracking';
+import { Bricolage_Grotesque, Instrument_Serif, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { ThemeProvider } from 'next-themes';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const bricolage = Bricolage_Grotesque({
+  variable: '--font-bricolage',
   subsets: ['latin'],
   display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const spaceGrotesk = Space_Grotesk({
+  variable: '--font-space-grotesk',
+  subsets: ['latin'],
+  display: 'swap',
+});
+
+const instrumentSerif = Instrument_Serif({
+  variable: '--font-instrument-serif',
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-jetbrains-mono',
   subsets: ['latin'],
   display: 'swap',
 });
@@ -35,10 +42,6 @@ interface LayoutProps {
   children: React.ReactNode;
   params: Promise<{ locale: Locale }>;
 }
-
-const PremiumModal = dynamic(() =>
-  import('@ui/modules/components/premium/PremiumModal').then((module) => ({ default: module.PremiumModal }))
-);
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -54,13 +57,22 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={cn(geistSans.variable, geistMono.variable, 'font-sans antialiased')}>
+      <body
+        className={cn(
+          bricolage.variable,
+          spaceGrotesk.variable,
+          instrumentSerif.variable,
+          jetbrainsMono.variable,
+          'font-sans antialiased'
+        )}
+      >
         <a
           href='#main-content'
           className='sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-3 focus:py-1.5 focus:text-sm focus:bg-background focus:text-foreground focus:border focus:rounded-md focus:shadow-sm'
         >
           Skip to main content
         </a>
+        <BonesProvider />
         <NextIntlClientProvider>
           <ThemeProvider
             attribute='data-theme'
@@ -69,30 +81,12 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
             enableSystem
             disableTransitionOnChange
           >
-            <LazyMotionProvider>
-              <SidebarProvider>
-                <StoresInitializer />
-                <AppSidebar locale={locale}>
-                  <div
-                    className='pointer-events-none h-full z-1 rounded-lg inset-0 absolute
-  bg-[linear-gradient(to_right,var(--grid-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid-color)_1px,transparent_1px)]
-  bg-size-[4rem_4rem]'
-                    aria-hidden='true'
-                  />
-                  <SiteTitle />
-                  <SiteSubtitle />
-                  {children}
-                  <Toaster />
-                  <DonateClient />
-                  <PremiumModal />
-                  <CookieConsentClient />
-                  <Footer />
-                </AppSidebar>
-              </SidebarProvider>
-            </LazyMotionProvider>
+            <LazyMotionProvider>{children}</LazyMotionProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
+        <WebMCP />
         <Analytics />
+        <BetterStackTracking />
       </body>
     </html>
   );

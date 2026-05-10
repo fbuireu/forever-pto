@@ -68,4 +68,5 @@ export interface PaymentData {
   disputedAt: Date | null;
   disputeReason: string | null;
   parentPaymentId: string | null;
+  origin: string | null;
 }

@@ -16,23 +16,104 @@
     }
   }
 
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+
+  @keyframes term-blink {
+    0%,
+    49% {
+      opacity: 1;
+    }
+    50%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes nudge {
+    0%,
+    88% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+    90% {
+      transform: translate(-3px, 0) rotate(-1deg);
+    }
+    92% {
+      transform: translate(3px, 0) rotate(1deg);
+    }
+    94% {
+      transform: translate(-2px, 1px) rotate(0deg);
+    }
+    96% {
+      transform: translate(2px, -1px) rotate(0.5deg);
+    }
+    98% {
+      transform: translate(-1px, 0) rotate(0deg);
+    }
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+  }
+
+  @keyframes highlight-shake {
+    0%,
+    75%,
+    100% {
+      transform: rotate(-2deg);
+    }
+    77% {
+      transform: rotate(-2deg) translateX(-3px);
+    }
+    80% {
+      transform: rotate(-2deg) translateX(3px);
+    }
+    83% {
+      transform: rotate(-2deg) translateX(-2px);
+    }
+    86% {
+      transform: rotate(-2deg) translateX(1px);
+    }
+    89% {
+      transform: rotate(-2deg) translateX(0);
+    }
+  }
+
   @supports (view-transition-name: root) {
     ::view-transition-old(root) {
-      animation: none;
+      animation: theme-fade-out 0.2s ease-out;
     }
     ::view-transition-new(root) {
-      animation: circle-blur-expand 0.5s ease-out;
-      transform-origin: bottom left;
-      filter: blur(0);
+      animation: theme-fade-in 0.2s ease-out;
     }
-    @keyframes circle-blur-expand {
+    @keyframes theme-fade-out {
       from {
-        clip-path: circle(0% at 0% 100%);
-        filter: blur(4px);
+        opacity: 1;
       }
       to {
-        clip-path: circle(150% at 0% 100%);
-        filter: blur(0);
+        opacity: 0;
+      }
+    }
+    @keyframes theme-fade-in {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
       }
     }
   }

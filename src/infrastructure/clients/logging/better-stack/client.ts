@@ -13,7 +13,9 @@ const getLogtail = (): Logtail => {
     const ingestingUrl = process.env.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL;
 
     if (!sourceToken || !ingestingUrl) {
-      throw new Error('NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN and NEXT_PUBLIC_BETTER_STACK_INGESTING_URL must be defined');
+      throw new Error(
+        'NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN and NEXT_PUBLIC_BETTER_STACK_INGESTING_URL must be defined'
+      );
     }
 
     logtail = new Logtail(sourceToken, { endpoint: ingestingUrl, warnAboutMissingExecutionContext: false });

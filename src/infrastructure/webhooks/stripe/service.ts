@@ -1,7 +1,7 @@
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { constructWebhookEvent } from '@infrastructure/clients/payments/stripe/client';
+import { AppLayer } from '@infrastructure/layers';
+import { processWebhookEvent } from '@infrastructure/webhooks/processor';
+import { Effect } from 'effect';
 import StripeNode from 'stripe';
-import { processWebhookEvent } from '../processor';
 
 export interface WebhookServiceResult {
   success: boolean;
@@ -9,25 +9,29 @@ export interface WebhookServiceResult {
   isSignatureError?: boolean;
 }
 
-const logger = getBetterStackInstance();
-
 export const handleStripeWebhook = async (body: string, signature: string): Promise<WebhookServiceResult> => {
+  let event: StripeNode.Event;
   try {
-    const event = constructWebhookEvent(body, signature);
-
-    await processWebhookEvent(event);
-    return { success: true };
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    if (!webhookSecret) throw new Error('STRIPE_WEBHOOK_SECRET is not defined');
+    const stripe = new StripeNode(process.env.STRIPE_SECRET_KEY ?? '', {
+      apiVersion: '2026-04-22.dahlia',
+    });
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (error) {
     const isSignatureError = error instanceof StripeNode.errors.StripeSignatureVerificationError;
-    const errorMessage = error instanceof Error ? error.message : 'Webhook processing failed';
-    logger.logError('Stripe webhook processing failed', error, {
-      hasBody: !!body,
-      bodyLength: body.length,
-      hasSignature: !!signature,
-      signaturePrefix: signature?.slice(0, 10),
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Webhook processing failed',
       isSignatureError,
-    });
-
-    return { success: false, error: errorMessage, isSignatureError };
+    };
   }
+
+  return Effect.runPromise(
+    processWebhookEvent(event).pipe(
+      Effect.map(() => ({ success: true }) as WebhookServiceResult),
+      Effect.provide(AppLayer),
+      Effect.catchAll(() => Effect.succeed({ success: false, error: 'Webhook processing failed' }))
+    )
+  );
 };

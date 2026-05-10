@@ -17,6 +17,7 @@ import { useShallow } from 'zustand/react/shallow';
 export function useCalculationsWorker() {
   const workerRef = useRef<Worker | null>(null);
   const currentRequestIdRef = useRef<string>('');
+  const lastCalculatedPtoDaysRef = useRef<number | null>(null);
 
   const { setCalculating, setCalculationResult, holidays, maxAlternatives, manuallySelectedDays } = useHolidaysStore(
     useShallow((state) => ({
@@ -46,6 +47,7 @@ export function useCalculationsWorker() {
         if (e.data.requestId !== currentRequestIdRef.current) return;
         setCalculating(false);
         if (e.data.type === 'CALCULATE_SUGGESTIONS_RESULT') {
+          lastCalculatedPtoDaysRef.current = params.ptoDays;
           const { suggestion, alternatives } = e.data.payload;
           setCalculationResult({
             suggestion: deserializeSuggestion(suggestion),
@@ -60,6 +62,23 @@ export function useCalculationsWorker() {
         }
       };
 
+      const { removedSuggestedDays, currentSelection } = useHolidaysStore.getState();
+
+      const budgetForAutoSuggest = params.ptoDays - manuallySelectedDays.length;
+      const activeSuggestedDays = currentSelection
+        ? Math.max(0, currentSelection.days.length - removedSuggestedDays.length)
+        : undefined;
+
+      // Only cap suggestions when ptoDays hasn't changed since last result.
+      // If ptoDays increased we want the full new budget; otherwise we respect
+      // how many days the user has left active (honoring their removals).
+      const ptoDaysChanged =
+        lastCalculatedPtoDaysRef.current !== null && lastCalculatedPtoDaysRef.current !== params.ptoDays;
+      const autoSuggestCount =
+        !ptoDaysChanged && activeSuggestedDays !== undefined
+          ? Math.min(budgetForAutoSuggest, activeSuggestedDays)
+          : undefined;
+
       const request: CalculateSuggestionsRequest = {
         type: 'CALCULATE_SUGGESTIONS',
         requestId,
@@ -73,20 +92,8 @@ export function useCalculationsWorker() {
           locale: params.locale,
           maxAlternatives,
           manualDays: manuallySelectedDays.map((d) => d.toISOString()),
-          ...(() => {
-            const { currentSelection, removedSuggestedDays } = useHolidaysStore.getState();
-            const activeSuggestedDays = currentSelection
-              ? Math.max(0, currentSelection.days.length - removedSuggestedDays.length)
-              : undefined;
-            const budgetForAutoSuggest = params.ptoDays - manuallySelectedDays.length;
-            return {
-              excludedDays: removedSuggestedDays.map((d) => d.toISOString()),
-              autoSuggestCount:
-                activeSuggestedDays !== undefined
-                  ? Math.min(budgetForAutoSuggest, activeSuggestedDays)
-                  : undefined,
-            };
-          })(),
+          excludedDays: removedSuggestedDays.map((d) => d.toISOString()),
+          autoSuggestCount,
         },
       };
 

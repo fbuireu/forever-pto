@@ -1,4 +1,4 @@
-@layer base, theme, animations, tutorial, global;
+@layer base, theme, animations, tutorial, global, vendor;
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -6,3 +6,4 @@
 @import "./theme/index.css";
 @import "./animations/index.css";
 @import "./global/index.css";
+@import "./vendor/index.css";

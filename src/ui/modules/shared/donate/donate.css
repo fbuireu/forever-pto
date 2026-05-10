@@ -1,0 +1,46 @@
+.donate-brutal {
+  position: relative;
+  border-radius: 10px;
+  animation: nudge 4s ease-in-out infinite;
+}
+
+.donate-brutal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: var(--color-brand-ink);
+  border: 3px solid var(--frame);
+  transform: translate(6px, 6px);
+  z-index: -1;
+}
+
+.donate-brutal:hover {
+  animation-play-state: paused;
+}
+
+.donate-brutal .donate-brutal-btn {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--color-brand-orange) 100%);
+  border: 3px solid var(--frame);
+  border-radius: 8px;
+  box-shadow: 5px 5px 0 0 var(--frame);
+  color: var(--color-brand-ink);
+  filter: none;
+  transform: translate(0, 0);
+  transition:
+    transform 75ms linear,
+    box-shadow 75ms linear;
+}
+
+.donate-brutal .donate-brutal-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 0 var(--frame);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--color-brand-orange) 100%);
+  filter: none;
+}
+
+.donate-brutal .donate-brutal-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 0 var(--frame);
+  filter: none;
+}

@@ -21,33 +21,39 @@
     },
     "paymentConfirmation": {
       "title": "Confirmació de pagament | Forever PTO"
+    },
+    "planner": {
+      "title": "Planificador | Forever PTO",
+      "description": "Planifica i optimitza els teus dies de vacances. Calendari intel·ligent de PTO amb detecció de festius, optimitzador de ponts i exportació a Google Calendar, Outlook i Apple."
     }
   },
-  "home": {
+  "planner": {
     "title": "Forever PTO",
-    "description": "This is the home page where you can find the latest updates and features.",
-    "subtitle": "La teva solució definitiva per gestionar els teus dies lliures. No treballis més",
-    "instructions": "Comença afegint els teus dies a la barra lateral esquerra i la resta de configuracions. Encara tens dubtes?",
+    "description": "El teu planificador de PTO intel·ligent. Configura els teus dies de vacances, país i estratègia per aprofitar al màxim cada festiu.",
+    "subtitle": "El teu optimitzador de vacances intel·ligent. Deixa de perdre dies.",
+    "titleHighlight1": "El teu any",
+    "titleHighlight2": "lliure",
+    "instructions": "Comença afegint els teus dies a la barra lateral i la resta de preferències. Tens dubtes?",
     "quickTour": "Fes un tour ràpid",
     "or": "o",
-    "checkFaqs": "consulta les nostres FAQs"
+    "checkFaqs": "Consulta les preguntes freqüents"
   },
   "languages": {
     "en": "Anglès",
     "es": "Espanyol",
     "ca": "Català",
-    "it": "Italià"
+    "it": "Italià",
+    "fr": "Francès",
+    "de": "Alemany"
   },
   "theme": {
     "light": "Clar",
     "dark": "Fosc",
     "system": "Sistema",
-    "toggleTheme": "Canviar tema"
+    "toggleTheme": "Canvia el tema"
   },
   "summary": {
     "title": "Resum de PTO {year} - {nextYear}",
-    "description": "{ptoDays} dies de vacances + {holidays} festius = {effectiveDays} dies lliures reals",
-    "performance": "(+{percentage}% de rendiment)",
     "metrics": {
       "vacationDays": "Dies de vacances",
       "days": "dies",
@@ -65,22 +71,23 @@
       "bridgesUsed": "Ponts usats",
       "workdaysPerMonth": "Dies laborals/mes",
       "longestVacation": "Vacances més llargues",
-      "advancedMetrics": "Mètriques Avançades"
+      "advancedMetrics": "Mètriques avançades"
     },
     "yearSummary": {
-      "feature": "Year Summary",
+      "feature": "Resum anual",
       "featureDescription": "Anàlisi detallada dels teus dies lliures.",
-      "title": "Resum de l'Any",
+      "title": "Resum de l'any",
       "firstBreak": "Primera pausa",
       "maxWorkStreak": "Ratxa laboral màxima",
-      "lastBreak": "Última pausa",
+      "lastBreak": "Darrera pausa",
       "totalBonusDays": "Dies bonus totals",
-      "daysGained": "dies guanyats optimitzant",
+      "daysGained": "Dies guanyats optimitzant",
       "daysCount": "{count, plural, one {dia} other {dies}}"
     },
     "summaryParagraph": {
-      "withGain": "Amb els teus {ptoDays} dies de vacances i {totalHolidays} festius, l'estratègia {strategy} els converteix en {effectiveDays} dies lliures efectius — són {increment} dies extra, una millora del +{percentage}% respecte a usar-los sense optimitzar.",
+      "withGain": "Amb els teus {ptoDays} dies de vacances i {totalHolidays} festius, l'estratègia {strategy} els converteix en {effectiveDays} dies lliures efectius, és a dir, {increment} dies extra, una millora del +{percentage}% respecte a usar-los sense optimitzar.",
       "withoutGain": "Amb els teus {ptoDays} dies de vacances i {totalHolidays} festius, obtens {effectiveDays} dies lliures efectius usant l'estratègia {strategy}.",
+      "noRegionHintTitle": "Afegeix la teva regió",
       "noRegionHint": "Selecciona la teva regió a la barra lateral per incloure festius regionals i potencialment obtenir més dies lliures.",
       "withRegion": "{regionalDays} dels teus festius són específics de {region}."
     },
@@ -91,7 +98,7 @@
         "moreDays": "dies més",
         "toYourPlan": "a la teva planificació.",
         "reviewOptions": "Revisa les opcions disponibles.",
-        "considerPremium": "Considera Premium per més anàlisi."
+        "considerPremium": "Amb premium tens anàlisi detallada."
       },
       "manualAdjustments": {
         "title": "Ajustos manuals",
@@ -100,7 +107,7 @@
         "days": "dies",
         "and": "i",
         "removed": "tret",
-        "fromOriginal": "de la suggerència original."
+        "fromOriginal": "del suggeriment original."
       },
       "customHolidays": {
         "title": "Festius personalitzats",
@@ -109,6 +116,17 @@
         "holidays": "festius personalitzats",
         "improvesPlan": "que milloren el teu pla."
       }
+    },
+    "yearTimeline": {
+      "title": "Vista anual condensada",
+      "rows": {
+        "national": "Nacional",
+        "regional": "Regional",
+        "custom": "Prop.",
+        "pto": "PTO",
+        "bridges": "Ponts",
+        "manual": "Manual"
+      }
     }
   },
   "faq": {
@@ -116,9 +134,13 @@
     "sections": {
       "general": {
         "title": "General",
+        "whatIsPto": {
+          "question": "Què és el PTO?",
+          "answer": "PTO són les sigles de Paid Time Off (dies de vacances pagades): el nombre de dies de vacances que la teva empresa et dona cada any per usar-los com vulguis. A diferència de la baixa per malaltia o els festius, els dies de PTO són teus per programar lliurement. El problema és que la majoria de la gent els usa a l'atzar i desaprofita molt descans potencial. Forever PTO t'ajuda a col·locar aquests dies estratègicament al voltant dels festius per convertir, per exemple, 5 dies de PTO en 12 dies consecutius lliures."
+        },
         "whatIs": {
           "question": "Què és això?",
-          "answer": "Forever PTO és una eina per ajudar-te a planificar i optimitzar els teus dies lliures (PTO) suggerint les millors dates basant-se en festius i les teves preferències. Donada la complexitat de la planificació de vacances, Forever PTO simplifica el procés i maximitza el teu temps lliure. Et permet triar diferents estratègies per equilibrar el teu temps lliure durant l'any. També pots personalitzar completament els festius, noms de festivitats i fins i tot afegir festius específics de la teva empresa o regió."
+          "answer": "Forever PTO és una eina per ajudar-te a planificar i optimitzar els teus dies lliures (PTO) suggerint les millors dates basant-se en festius i les teves preferències. Simplifica tot el procés i maximitza el teu temps lliure. Tries estratègia, personalitzes festius i fins i tot afegeixes dies específics de la teva empresa."
         },
         "howWorks": {
           "question": "Com funciona?"
@@ -129,7 +151,7 @@
         },
         "pricing": {
           "question": "Per què hi ha un model de pagament?",
-          "answer": "Forever PTO és gratuït. No obstant, usem un model de pagament per cobrir els costos de mantenir dades, infraestructura i millores contínues. El model de pagament finança actualitzacions, suport i hosting. També oferim un tier gratuït amb funcions principals perquè tothom pugui beneficiar-se d'una millor planificació de PTO. Si vols anar sense anuncis i donar suport al projecte hi ha una donació voluntària."
+          "answer": "Forever PTO és gratuït. No obstant això, usem un model de pagament per cobrir els costos de mantenir dades, infraestructura i millores contínues. El model de pagament finança actualitzacions, suport i hosting. Si vols anar sense anuncis i donar suport al projecte, hi ha una donació voluntària."
         },
         "restartTutorial": {
           "question": "Com puc veure el tutorial interactiu de nou?"
@@ -138,23 +160,31 @@
       "technical": {
         "title": "Tècnic",
         "algorithms": {
-          "question": "Com funciona l'algoritme de suggerències?",
-          "answer": "El sistema analitza dies laborables disponibles, festius i preferències de l'usuari (ex. evitar dies passats) per produir combinacions de PTO que maximitzin el temps lliure efectiu. Aplica heurístiques basades en eficiència i puntuació per prioritzar ponts i dies agrupats."
+          "question": "Com funciona l'algoritme de suggeriments?",
+          "answer": "El sistema analitza dies laborables, festius i preferències (com ara evitar dates passades) per trobar combinacions de PTO que maximitzin el temps lliure. Prioritza ponts i blocs agrupats basant-se en eficiència i puntuació."
         },
         "strategies": {
           "question": "Quina és la diferència entre les estratègies \"equilibrada\" i \"optimitzada\"?",
-          "answer": "Equilibrada busca repartir el temps lliure durant l'any per un valor constant, mentre que Optimitzada se centra en maximitzar l'eficiència (dies efectius per dia de PTO) prioritzant les combinacions amb millor ràtio."
+          "answer": "L'estratègia Equilibrada distribueix el temps lliure al llarg de l'any de manera constant, mentre que l'Optimitzada maximitza l'eficiència (dies lliures efectius per dia de PTO) prioritzant les combinacions amb millor ràtio."
+        },
+        "results": {
+          "question": "Per què canvien les recomanacions quan actualitzo preferències o festius?",
+          "answer": "Fins i tot canvis petits poden reordenar els resultats, ja que el motor recalcula i puntua de nou totes les combinacions possibles."
         }
       },
       "security": {
         "title": "Seguretat i privacitat",
         "data": {
           "question": "Com gestioneu les meves dades?",
-          "answer": "Només emmagatzemem la informació mínima necessària per generar suggerències. No compartim dades amb tercers sense consentiment. Consulta la política de privacitat per més detalls."
+          "answer": "Només emmagatzemem la informació mínima necessària per generar suggeriments. No compartim dades amb tercers sense consentiment. Consulta la <privacyLink>política de privacitat</privacyLink> per a més detalls."
         },
         "encryption": {
           "question": "Estan les meves dades encriptades?",
-          "answer": "Les teves dades de planificació de vacances s'emmagatzemen localment al teu navegador. Apliquem ofuscació amb xifrat XOR per fer les dades il·legibles en inspecció casual. Aquest mètode està dissenyat per prevenir exposició accidental, no per protegir contra atacants determinats. No emmagatzemem informació personal sensible, i mantens el control total de les teves dades al teu dispositiu. Totes les teves dades (dies de PTO, dates seleccionades, festius personalitzats, preferències) s'emmagatzemen exclusivament a l'emmagatzematge local del teu navegador. Mai enviem aquesta informació als nostres servidors. La teva planificació de vacances roman completament privada al teu dispositiu."
+          "answer": "Les teves dades de planificació es guarden localment al teu navegador. Apliquem ofuscació amb XOR per fer-les il·legibles en inspeccions casuals. No és xifratge fort, però prevé exposició accidental. Cap dada de PTO no arriba als nostres servidors."
+        },
+        "tracking": {
+          "question": "Veneu les meves dades o seguiu els meus plans de vacances?",
+          "answer": "No. Les teves dades de planificació romanen al teu navegador i no es venen a anunciants ni a brokers de dades. Si acceptes analítica, serveix únicament per mesurar l'ús del producte i mai per crear un perfil de les teves vacances."
         },
         "troubleshooting": {
           "question": "Solució de problemes i dades obsoletes del client"
@@ -164,11 +194,15 @@
         "title": "Interessat en col·laborar?",
         "code": {
           "question": "Com contribuir codi o idees?",
-          "answer": "Obre issues o merge requests amb propostes. Necessitem ajuda en algoritmes, integracions i millores de UX."
+          "answer": "<link>Obre issues o merge requests</link> amb propostes. Necessitem ajuda en algoritmes, integracions i millores de UX."
         },
         "business": {
-          "question": "Proposar integracions o associacions corporatives",
-          "answer": "Si representes una empresa i vols integrar Forever PTO, contacta amb suport o obre una proposta per una integració personalitzada."
+          "question": "Vols proposar integracions o associacions corporatives?",
+          "answer": "Si representes una empresa i vols integrar Forever PTO, contacta'ns o obre una proposta per a una integració personalitzada."
+        },
+        "nonCode": {
+          "question": "Puc col·laborar si no soc desenvolupador/a?",
+          "answer": "Sí. El feedback sobre UX, copy, traduccions, exactitud dels festius, testing i idees de partnership és molt útil. Si detectes fricció o tens una necessitat específica del teu mercat, escriu-nos i ho veiem."
         }
       }
     }
@@ -177,10 +211,10 @@
     "title": "Comptador de dies laborables",
     "tooltip": "Compta dies laborables entre dues dates, excloent automàticament caps de setmana i festius. Útil per planificació de projectes i càlcul de terminis.",
     "tooltipLabel": "Més informació sobre el comptador",
-    "selectRange": "Seleccionar rang de dates",
-    "clearSelection": "Netejar selecció",
+    "selectRange": "Selecciona les dates",
+    "clearSelection": "Neteja la selecció",
     "workingDays": "Dies laborables",
-    "businessDays": "Dies hàbils en el rang seleccionat",
+    "businessDays": "Dies hàbils de l'interval seleccionat",
     "days": "Dies",
     "weekendDays": "Caps de setmana",
     "holidays": "Festius",
@@ -192,16 +226,16 @@
     "nationalTab": "Nacionals",
     "regionalTab": "Regionals",
     "customTab": "Personalitzats",
-    "nationalTitle": "Festius Nacionals",
-    "regionalTitle": "Festius Regionals",
-    "customTitle": "Festius Personalitzats",
-    "customHolidaysFeature": "Festius Personalitzats",
-    "customHolidaysDescription": "Permet afegir festius personalitzats",
-    "selectAll": "Seleccionar tots",
-    "partialSelection": "Selecció parcial - clica per seleccionar tots",
-    "deselectAll": "Desseleccionar tots",
+    "nationalTitle": "Festius nacionals",
+    "regionalTitle": "Festius regionals",
+    "customTitle": "Festius personalitzats",
+    "customHolidaysFeature": "Festius personalitzats",
+    "customHolidaysDescription": "Afegeix dies festius propis al teu calendari",
+    "selectAll": "Selecciona-ho tot",
+    "partialSelection": "Selecció parcial — clica per seleccionar-ho tot",
+    "deselectAll": "Desselecciona-ho tot",
     "searchPlaceholder": "Cercar festivitat...",
-    "noHolidaysFound": "No s'han trobat festivitats",
+    "noHolidaysFound": "No s'ha trobat cap festivitat",
     "noHolidays": "No hi ha festivitats",
     "allSelected": "Tots seleccionats",
     "selected": "seleccionats",
@@ -211,18 +245,18 @@
     "showing": "Mostrant",
     "of": "de",
     "total": "total",
-    "addHoliday": "Afegir Festiu",
-    "add": "Afegir",
+    "addHoliday": "Afegir festiu",
+    "add": "Afegeix",
     "editHoliday": "Editar festiu",
-    "edit": "Editar",
-    "deleteHolidays": "Eliminar {count} festius",
-    "delete": "Eliminar"
+    "edit": "Edita",
+    "deleteHolidays": "{count, plural, one {Elimina {count} festiu} other {Elimina {count} festius}}",
+    "delete": "Elimina"
   },
   "charts": {
-    "daysOffComposition": "Composició de Dies Lliures",
-    "daysOffCompositionFeature": "Gràfica de Composició de Dies Lliures",
-    "quarterDistribution": "Distribució per Trimestre",
-    "quarterDistributionFeature": "Gràfica de Distribució per Trimestre",
+    "daysOffComposition": "Composició de dies lliures",
+    "daysOffCompositionFeature": "Gràfica de composició de dies lliures",
+    "quarterDistribution": "Distribució per trimestre",
+    "quarterDistributionFeature": "Gràfica de distribució per trimestre",
     "days": "dies",
     "daysOff": "Dies lliures",
     "pto": "PTO",
@@ -233,99 +267,99 @@
     "regionalPart": ", {regionalDays} regionals",
     "customPart": " i {customDays} personalitzats",
     "quarterDescription": "Distribució de {totalDays} dies lliures efectius al llarg de {activeQuarters} trimestre{plural} de l'any.",
-    "annualTimeline": "Timeline Anual",
-    "annualTimelineFeature": "Gràfica de Timeline Anual",
-    "timelineDescription": "Evolució mensual de {totalDays} dies lliures distribuïts en {activeMonths} mesos. Pic a {peakMonth} amb {peakDays} dies.",
+    "annualTimeline": "Cronologia anual",
+    "annualTimelineFeature": "Gràfica de cronologia anual",
+    "timelineDescription": "Evolució mensual de {totalDays} dies lliures distribuïts en {activeMonths} mesos. Màxim a {peakMonth} amb {peakDays} dies.",
     "daysOffLabel": "Dies lliures",
-    "longBlocksPerQuarter": "Blocs Llargs per Trimestre",
-    "longBlocksFeature": "Gràfica de Blocs Llargs per Trimestre",
-    "blocksDescription": "{totalBlocks} blocs llargs (3+ dies consecutius) ideals per a vacances{bestQuarterPart}.",
+    "longBlocksPerQuarter": "Blocs llargs per trimestre",
+    "longBlocksFeature": "Gràfica de blocs llargs per trimestre",
+    "blocksDescription": "{totalBlocks} blocs de 3 o més dies consecutius, ideals per a escapades{bestQuarterPart}.",
     "bestQuarterPart": ". Millor trimestre: Q{bestQuarter} amb {maxBlocks} bloc{plural}",
     "blocks": "blocs",
     "blocksOf3Days": "Blocs de 3+ dies"
   },
   "modals": {
     "addHoliday": {
-      "title": "Afegir Nou Festiu",
-      "description": "Crea un nou festiu seleccionant una data i introduint un nom",
-      "nameLabel": "Nom del Festiu",
+      "title": "Afegir nou festiu",
+      "description": "Crea un nou festiu seleccionant una data i posant-hi un nom",
+      "nameLabel": "Nom del festiu",
       "namePlaceholder": "ex. El meu aniversari",
-      "dateLabel": "Seleccionar Data",
+      "dateLabel": "Seleccionar data",
       "selected": "Seleccionat",
-      "submit": "Afegir Festiu",
+      "submit": "Afegir festiu",
       "submitting": "Afegint...",
-      "cancel": "Cancel·lar",
+      "cancel": "Cancel·la",
       "successTitle": "Festiu creat correctament",
       "successDescription": "{name} ha estat afegit el {date}",
       "errorTitle": "Error en crear festiu",
-      "errorDescription": "Alguna cosa ha anat malament. Si us plau, torna-ho a provar.",
+      "errorDescription": "Alguna cosa ha anat malament. Torna-ho a provar.",
       "existsTitle": "El festiu ja existeix",
       "existsDescription": "Ja existeix un festiu el {date}: {name}"
     },
     "editHoliday": {
-      "title": "Editar Festiu",
+      "title": "Editar festiu",
       "description": "Modifica el festiu seleccionat",
-      "submit": "Desar Canvis",
+      "submit": "Desar canvis",
       "submitting": "Desant...",
-      "cancel": "Cancel·lar",
+      "cancel": "Cancel·la",
       "successTitle": "Festiu actualitzat correctament",
       "successDescription": "{name} ha estat actualitzat",
       "errorTitle": "Error en actualitzar festiu",
-      "errorDescription": "Alguna cosa ha anat malament. Si us plau, torna-ho a provar."
+      "errorDescription": "Alguna cosa ha anat malament. Torna-ho a provar."
     },
     "deleteHoliday": {
-      "title": "Eliminar Festius",
-      "titleSingular": "Eliminar Festiu",
-      "description": "Estàs segur que vols eliminar {count} festius? Aquesta acció no es pot desfer.",
-      "descriptionSingular": "Estàs segur que vols eliminar aquest festiu? Aquesta acció no es pot desfer.",
-      "submit": "Eliminar",
+      "title": "Eliminar festius",
+      "titleSingular": "Eliminar festiu",
+      "description": "Vols eliminar {count} festius? Aquesta acció no es pot desfer.",
+      "descriptionSingular": "Vols eliminar aquest festiu? Aquesta acció no es pot desfer.",
+      "submit": "Elimina",
       "submitting": "Eliminant...",
-      "cancel": "Cancel·lar",
+      "cancel": "Cancel·la",
       "successTitle": "Festius eliminats",
       "successTitleSingular": "Festiu eliminat",
-      "successDescription": "{count} festius han estat eliminats",
-      "successDescriptionSingular": "El festiu ha estat eliminat",
+      "successDescription": "{count} festius eliminats",
+      "successDescriptionSingular": "Festiu eliminat",
       "errorTitle": "Error en eliminar festius",
-      "errorDescription": "Alguna cosa ha anat malament. Si us plau, torna-ho a provar."
+      "errorDescription": "Alguna cosa ha anat malament. Torna-ho a provar."
     }
   },
   "tutorial": {
-    "description": "Vols veure el tutorial interactiu de nou? Fes clic al botó de sota per reiniciar el tour guiat per totes les funcions i configuracions.",
-    "restartButton": "Reiniciar Tutorial Interactiu",
-    "startButton": "Iniciar Tutorial",
+    "description": "Configura el teu pla en 2 passos: primer la ubicació, després els dies i l'estratègia. Clica el botó per fer el tutorial interactiu.",
+    "restartButton": "Reiniciar el tutorial",
+    "startButton": "Iniciar el tutorial",
+    "nextBtn": "Següent",
+    "prevBtn": "Anterior",
+    "doneBtn": "Fet",
+    "progressTextConnector": "de",
     "steps": {
-      "filtersTitle": "Filtres i Configuració",
-      "filtersDescription": "Aquí pots configurar totes les teves preferències de PTO. Estableix els teus dies de PTO disponibles, selecciona el teu país i regió per obtenir festius precisos, tria l'any i personalitza la teva estratègia d'optimització.",
-      "ptoDaysTitle": "Dies de PTO",
-      "ptoDaysDescription": "Introdueix el nombre total de dies de PTO (temps lliure remunerat) que tens disponibles per a l'any. Aquesta és la base per a tots els càlculs i suggeriments.",
-      "countryTitle": "Selecció de País",
-      "countryDescription": "Inferim el teu país des del teu CDN per defecte però pots seleccionar qualsevol país desitjat. Amb aquest valor obtindrem els festius públics oficials per incloure'ls al teu calendari.",
-      "regionTitle": "Selecció de Regió",
-      "regionDescription": "Alguns països tenen festius regionals. Selecciona la teva regió específica per obtenir el calendari de festius més precís per a la teva àrea.",
-      "yearTitle": "Selecció d'Any",
-      "yearDescription": "Tria l'any per al qual vols planificar. Els festius i suggeriments es generaran per a l'any seleccionat.",
-      "strategyTitle": "Estratègia d'Optimització",
-      "strategyDescription": "Tria entre diferents estratègies per optimitzar el teu PTO. Cada estratègia té un enfoc diferent per agrupar i maximitzar els teus dies lliures. Pots expandir els detalls de l'estratègia per saber-ne més sobre cada opció.",
-      "allowPastDaysTitle": "Permetre Dies Passats",
-      "allowPastDaysDescription": "Activa aquesta opció si vols incloure dates que ja han passat a l'any actual. Útil per planificar retrospectivament o per al proper any.",
-      "carryOverTitle": "Mesos d'Arrossegament",
-      "carryOverDescription": "Si els teus dies de PTO s'arrosseguen al següent any, especifica quants mesos romanen vàlids. Això t'ajuda a planificar l'ús de PTO entre anys.",
-      "toolsTitle": "Calculadores i Eines",
-      "toolsDescription": "Accedeix a calculadores útils aquí: estima el teu PTO basant-te en historial laboral, calcula el valor monetari del PTO no utilitzat, o compta dies laborables entre dates.",
-      "alternativesTitle": "Gestor d'Alternatives",
-      "alternativesDescription": "Navega per diferents suggeriments de PTO generats per nosaltres. Compara mètriques d'eficiència, total de dies lliures i troba l'equilibri perfecte. La primera opció sempre és el nostre suggeriment recomanat, marcat amb una icona de destell. Usa les fletxes per explorar alternatives i fes clic a \"Aplicar Alternativa\" per usar un suggeriment diferent.",
-      "statusTitle": "Seguiment d'Estat de PTO",
-      "statusDescription": "Monitoritza la teva assignació de PTO en temps real. Veu els dies auto-assignats (suggerits pel nostre sistema), dies seleccionats manualment i dies restants disponibles. Pots restablir canvis manuals en qualsevol moment per tornar a la suggerència automàtica.",
-      "calendarTitle": "El Teu Calendari de PTO Interactiu",
-      "calendarDescription": "Aquest és el teu calendari d'un cop d'ull de l'any. Els festius apareixen en gris, els dies de PTO suggerits per IA en verd blavós, i els dies seleccionats manualment en blau. Fes clic a qualsevol dia laborable per alternar la selecció manualment. El calendari s'actualitza instantàniament mentre explores diferents alternatives.",
-      "finishTitle": "Ja Està Tot Llest!",
-      "finishDescription": "Ara saps com usar Forever PTO per maximitzar el teu temps lliure. Comença configurant les teves preferències a la barra lateral, i deixa que l'app et suggereixi els millors dies de PTO. Gaudeix dels teus merescuts descans!",
+      "toolsTitle": "Calculadores i eines",
+      "toolsDescription": "Des d'aquí pots accedir a les calculadores: estima el PTO acumulat segons el teu historial, calcula el valor econòmic dels dies no usats o compta dies laborables entre dates.",
+      "alternativesTitle": "Gestor d'alternatives",
+      "alternativesDescription": "Navega pels suggeriments de PTO que hem generat per a tu. Compara eficiència i dies lliures totals. La primera opció és la recomanada (marcada amb un llamp ⚡). Usa les fletxes per explorar alternatives i clica 'Aplicar alternativa' per canviar.",
+      "statusTitle": "Seguiment d'estat de PTO",
+      "statusDescription": "Consulta la teva assignació de PTO en temps real. Veu els dies auto-assignats (suggerits pel nostre sistema), dies seleccionats manualment i dies restants disponibles. Pots restablir canvis manuals en qualsevol moment per tornar al suggeriment automàtic.",
+      "calendarTitle": "El teu calendari de PTO interactiu",
+      "calendarDescription": "Aquest és el teu calendari d'un cop d'ull de l'any. Els festius apareixen en gris, els dies de PTO suggerits en verd blavós, i els dies seleccionats manualment en blau. Fes clic a qualsevol dia laborable per alternar la selecció manualment. El calendari s'actualitza instantàniament mentre explores diferents alternatives.",
+      "finishTitle": "Ja està tot llest!",
+      "finishDescription": "Ara ja saps com funciona. Configura les preferències a la barra lateral i l'app et suggerirà els millors dies. Bon profit dels dies lliures!",
       "holidaysListTitle": "Personalitza els teus festius",
-      "holidaysListDescription": "Aquí pots ajustar les dades de festius perquè s'adaptin exactament a la teva situació. Edita o elimina qualsevol festiu nacional o regional, i afegeix els teus propis dies personalitzats: festius d'empresa, celebracions locals o qualsevol data que sigui rellevant per a tu. Com més precisos siguin les dades, millors seran els suggeriments."
+      "holidaysListDescription": "Aquí pots ajustar les dades de festius perquè s'adaptin exactament a la teva situació. Edita o elimina qualsevol festiu nacional o regional, i afegeix els teus propis dies personalitzats: festius d'empresa, celebracions locals o qualsevol data que sigui rellevant per a tu. Com més precises siguin les dades, millors seran els suggeriments.",
+      "step1Title": "El teu context",
+      "step1Description": "Selecciona el teu país, regió i l'any que vols planificar. Això configura el teu calendari de festius per trobar els millors ponts.",
+      "step2Title": "Els teus dies disponibles",
+      "step2Description": "Indica quants dies de vacances tens. Aquesta és la base per a tots els càlculs.",
+      "step3Title": "La teva configuració",
+      "step3Description": "Tria la teva estratègia d'optimització i configura els dies passats i els mesos d'arrossegament per ajustar el teu pla.",
+      "step4Title": "Exporta el teu calendari",
+      "step4Description": "Descarrega els teus festius i dies de vacances planificats com a fitxer .ics per importar-lo a Google Calendar, Apple Calendar o Outlook, o com a PDF per imprimir o compartir.",
+      "drawerTitle": "El teu panell de planificació",
+      "drawerDescription": "Aquesta barra sempre mostra un resum del teu pla. Llisca-la cap amunt (o arrossega el tirador) per explorar alternatives i veure com es distribueixen els teus dies."
     }
   },
   "legend": {
     "title": "Llegenda",
+    "showLegend": "Veure llegenda",
+    "hideLegend": "Amagar llegenda",
     "today": "Avui",
     "weekends": "Caps de setmana",
     "holidays": "Festius",
@@ -334,17 +368,39 @@
     "manual": "Manual",
     "custom": "Personalitzat"
   },
+  "calendarExport": {
+    "title": "Exportar calendari",
+    "description": "{count, plural, one {Descarrega el teu <b>{count}</b> festiu com a fitxer de calendari.} other {Descarrega els teus <b>{count}</b> festius com a fitxer de calendari.}}",
+    "includeHolidays": "Festius",
+    "includePto": "Dies de PTO",
+    "download": "Descarrega .ics",
+    "compatible": "Compatible amb Google Calendar, Apple Calendar, Outlook i qualsevol app de calendari.",
+    "calendarName": "Forever PTO",
+    "ptoDayLabel": "Dia de PTO",
+    "downloadPdf": "Descarrega .pdf",
+    "downloadingPdf": "Descarregant",
+    "tooltip": "Tria què incloure a l'exportació: festius, els teus dies de vacances o tots dos.",
+    "tooltipLabel": "Info opcions d'exportació",
+    "pdf": {
+      "holidays": "Festius",
+      "vacationDays": "Dies de vacances",
+      "dayOff": "Dia de vacances",
+      "generatedOn": "Generat el"
+    }
+  },
   "ptoStatus": {
     "autoAssigned": "Auto-assignats",
     "manual": "Manual",
     "remaining": "Restants",
-    "clickDays": "Clica els dies per assignar/treure",
+    "clickDays": "Clica un dia per assignar-lo o treure'l",
     "allAssigned": "Tots els dies assignats!",
-    "resetManual": "Restablir Canvis Manuals"
+    "resetManual": "Restablir canvis manuals",
+    "usedDays": "{used} / {total} dies usats · {pct}%",
+    "remainingDays": "{remaining} restants · {pct}%"
   },
   "contact": {
     "title": "Contacta'ns",
-    "description": "Tens alguna pregunta o comentari? Ens encantaria saber de tu!",
+    "description": "Tens alguna pregunta o comentari? Escriu-nos!",
     "name": "Nom",
     "namePlaceholder": "Joan García",
     "email": "Email",
@@ -353,28 +409,29 @@
     "subjectPlaceholder": "De què es tracta?",
     "message": "Missatge",
     "messagePlaceholder": "Explica'ns el que necessites...",
-    "sendMessage": "Enviar Missatge",
+    "sendMessage": "Enviar missatge",
     "sending": "Enviant...",
-    "cancel": "Cancel·lar",
-    "successTitle": "Missatge Enviat!",
-    "successDescription": "Et respondrem tan aviat com sigui possible.",
-    "errorTitle": "Hi ha hagut un error",
-    "tryAgain": "Tornar a Provar",
-    "close": "Tancar",
+    "cancel": "Cancel·la",
+    "successTitle": "Missatge enviat!",
+    "successDescription": "T'escrivim de seguida.",
+    "errorTitle": "Alguna cosa ha fallat",
+    "tryAgain": "Tornar a provar",
+    "close": "Tanca",
     "failedToSend": "Error en enviar el missatge"
   },
   "alternativesManager": {
     "option": "Opció",
     "recommended": "Recomanat",
-    "totalOff": "Total Lliures",
+    "totalOff": "Total lliures",
     "efficiency": "Eficiència",
-    "vsMain": "vs Principal",
-    "alreadyApplied": "Ja Aplicat",
-    "applyAlternative": "Aplicar Alternativa",
+    "vsMain": "vs principal",
+    "alreadyApplied": "Ja aplicat",
+    "applyAlternative": "Aplicar alternativa",
     "previousSuggestion": "Suggeriment anterior",
     "nextSuggestion": "Següent suggeriment",
-    "totalDaysOff": "Total Dies Lliures",
-    "comparison": "Comparació"
+    "totalDaysOff": "Total dies lliures",
+    "comparison": "Comparació",
+    "daysUnit": "dies"
   },
   "toasts": {
     "suggestionApplied": "Suggeriment aplicat correctament",
@@ -382,22 +439,22 @@
     "enablePastDays": "Habilita \"Permetre dies passats\" a la configuració per seleccionar dates passades",
     "noPtoDaysRemaining": "No queden dies de PTO per assignar",
     "removeDaysToFree": "Elimina dies existents per alliberar espai",
-    "cannotSelectBankHoliday": "No es pot seleccionar un dia festiu",
+    "cannotSelectBankHoliday": "Aquest dia ja és festiu",
     "bankHolidayDescription": "Aquest dia ja és un festiu nacional o regional",
     "paymentFailed": "Error en inicialitzar el pagament",
-    "paymentFailedDescription": "Si us plau, torna-ho a provar més tard",
-    "paymentSuccess": "Pagament exitós!",
+    "paymentFailedDescription": "Torna-ho a provar més tard",
+    "paymentSuccess": "Pagament realitzat!",
     "paymentSuccessDescription": "Gràcies pel teu suport! Ja tens accés premium."
   },
   "troubleshooting": {
-    "description": "Si l'aplicació es comporta de manera inesperada pot ser degut a dades locals obsoletes. Quan el projecte evoluciona, alguns objectes emmagatzemats poden canviar de forma, causant que el client reutilitzi estructures incompatibles i falli en revalidar correctament. Netejar l'emmagatzematge local força un estat nou.",
-    "resetButton": "Restablir Emmagatzematge Local",
+    "description": "Si l'app es comporta de manera inesperada, pot ser degut a dades locals obsoletes. Quan s'actualitza el projecte, algunes dades emmagatzemades al teu navegador poden quedar desactualitzades. Netejar l'emmagatzematge força un estat nou.",
+    "resetButton": "Restablir emmagatzematge local",
     "clearing": "Netejant...",
     "cleared": "Netejat",
-    "successTitle": "Emmagatzematge local netejat correctament",
-    "successDescription": "Totes les dades han estat restablertes i actualitzades des del servidor.",
+    "successTitle": "Emmagatzematge local netejat",
+    "successDescription": "Totes les dades locals s'han eliminat. L'app es carregarà amb l'estat per defecte.",
     "errorTitle": "Error en netejar emmagatzematge local",
-    "errorDescription": "Alguna cosa ha anat malament en restablir les dades. Si us plau, torna-ho a provar."
+    "errorDescription": "Alguna cosa ha anat malament en restablir les dades. Torna-ho a provar."
   },
   "sidebar": {
     "configuration": "Configuració",
@@ -405,10 +462,9 @@
     "tools": "Eines",
     "calculators": "Calculadores",
     "loading": "Carregant...",
-    "toggleSidebar": "Alternar Barra Lateral",
     "country": {
       "title": "País",
-      "tooltip": "Aquesta dada s'infereix del teu CDN i la teva connexió. Si creus que no és precís o vols veure els festius d'altres països, pots seleccionar-lo manualment aquí",
+      "tooltip": "Aquesta dada s'infereix del teu CDN i la teva connexió. Si creus que no és precisa o vols veure els festius d'altres països, selecciona'l manualment aquí.",
       "tooltipLabel": "Més informació sobre selecció de país",
       "loading": "Carregant països...",
       "placeholder": "Seleccionar país...",
@@ -422,104 +478,125 @@
     },
     "strategy": {
       "title": "Estratègia",
-      "placeholder": "Seleccionar estratègia...",
+      "placeholder": "Selecciona una estratègia...",
       "search": "Cercar estratègies...",
       "hide": "Amagar",
       "expand": "Expandir",
-      "strategyDetails": "detalls d'estratègia",
+      "strategyDetails": "Detalls",
       "grouped": {
         "label": "Agrupada",
         "description": "Prioritza vacances llargues i contínues",
         "subtitle": "Agrupa dies pont amb festius consecutius",
         "pros": {
-          "0": "Simula la selecció humana",
-          "1": "Ponts llargs"
+          "simulatesHumanSelection": "Simula la selecció humana",
+          "longBridges": "Ponts llargs"
         },
         "cons": {
-          "0": "Menys dies totals",
-          "1": "Menor eficiència"
+          "fewerDays": "Menys dies totals",
+          "lowerEfficiency": "Menor eficiència"
         }
       },
       "optimized": {
         "label": "Optimitzada",
-        "description": "Maximitza eficiència de dies PTO",
+        "description": "Maximitza l'eficiència dels dies PTO",
         "subtitle": "Obté la major quantitat de dies lliures",
         "pros": {
-          "0": "Màxim rendiment",
-          "1": "Més dies totals"
+          "maximumPerformance": "Màxim rendiment",
+          "moreDays": "Més dies totals"
         },
         "cons": {
-          "0": "Ponts curts",
-          "1": "Dies dispersos"
+          "shortBridges": "Ponts curts",
+          "scatteredDays": "Dies dispersos"
         }
       },
       "balanced": {
         "label": "Equilibrada",
-        "description": "Equilibri intel·ligent",
+        "description": "Combina eficiència i agrupació",
         "subtitle": "Combina eficiència amb agrupació",
         "pros": {
-          "0": "Flexible",
-          "1": "Períodes mitjans",
-          "2": "Versàtil"
+          "flexible": "Flexible",
+          "mediumPeriods": "Períodes mitjans",
+          "versatile": "Versàtil"
         },
         "cons": {
-          "0": "No maximitza",
-          "1": "Solució intermèdia"
+          "noMaximization": "No maximitza",
+          "intermediateSolution": "Solució intermèdia"
         }
       }
     },
     "allowPastDays": {
-      "title": "Permetre Dies Passats",
-      "tooltip": "Aquest interruptor permet habilitar o deshabilitar el suggeriment de dies festius passats per l'any seleccionat. Això et permet veure oportunitats de PTO que es van perdre en el passat",
+      "title": "Permetre dies passats",
+      "tooltip": "Activa aquesta opció per incloure dates passades de l'any seleccionat. Útil si vols revisar oportunitats de PTO que es van perdre.",
       "tooltipLabel": "Més informació sobre dies passats",
       "enabled": "Habilitat",
       "disabled": "Deshabilitat"
     },
     "carryOverMonths": {
-      "title": "Mesos d'Arrossegament",
-      "tooltip": "Permet afegir mesos a l'any següent per expandir la cerca d'oportunitats",
+      "title": "Mesos d'arrossegament",
+      "tooltip": "Afegeix mesos de l'any següent per trobar ponts que travessen el canvi d'any.",
       "tooltipLabel": "Més informació sobre arrossegament"
     },
     "years": {
       "title": "Any"
-    }
+    },
+    "step1": {
+      "titleStart": "El teu ",
+      "titleEmphasis": "context",
+      "badge": "pas {step}"
+    },
+    "step2": {
+      "titleStart": "Els teus ",
+      "titleEmphasis": "dies",
+      "badge": "pas {step}"
+    },
+    "step3": {
+      "titleStart": "La teva ",
+      "titleEmphasis": "configuració",
+      "badge": "pas {step}"
+    },
+    "step4": {
+      "titleStart": "La teva ",
+      "titleEmphasis": "exportació",
+      "badge": "pas {step}"
+    },
+    "steps": "Passos"
   },
   "ptoDays": {
     "title": "Dies de PTO",
     "iHave": "Tinc",
     "days": "dies",
-    "status": "Estat de Dies PTO",
+    "status": "Estat de dies PTO",
     "autoAssigned": "Auto-assignats:",
     "manuallySelected": "Seleccionats manualment:",
     "remaining": "Restants:",
-    "resetManualChanges": "Restablir Canvis Manuals",
+    "resetManualChanges": "Restablir canvis manuals",
     "allAssigned": "Tots els dies assignats!",
-    "clickToAssign": "Clica als dies del calendari per assignar manualment els dies restants"
+    "clickToAssign": "Clica un dia del calendari per assignar-lo manualment"
   },
   "ptoCalculator": {
-    "title": "Acumulador de PTO",
+    "title": "Calculadora d'acumulació de PTO",
     "tooltip": "Calcula els teus dies de PTO acumulats segons l'acumulat mensual. La majoria d'empreses ofereixen 2-3 dies per mes. Selecciona el mes objectiu per veure els teus dies totals disponibles.",
     "tooltipLabel": "Més informació sobre la calculadora de PTO",
     "daysPerMonth": "Dies per mes",
-    "calculateThrough": "Calcular fins",
+    "calculateThrough": "Calcular fins a",
     "selectMonth": "Seleccionar mes",
     "searchMonth": "Cercar mes...",
     "monthNotFound": "Mes no trobat",
-    "calculate": "Calcular",
+    "calculate": "Calcula",
     "result": "Resultat:",
     "days": "dies",
     "daysMonth": "dies/mes",
     "months": "mesos",
-    "applyToPtoDays": "Aplicar a Dies PTO"
+    "applyToPtoDays": "Aplicar als dies de PTO"
   },
   "ptoSalaryCalculator": {
-    "title": "Calculadora PTO vs Salari",
+    "title": "Calculadora PTO vs. salari",
     "tooltip": "Calcula quant temps lliure pagat estàs perdent en no usar els teus dies de PTO. Continues rebent el teu salari complet, però estàs treballant dies que podries haver agafat com a vacances pagades.",
     "tooltipLabel": "Més informació sobre la calculadora",
-    "annualSalary": "Salari Anual",
-    "annualSalaryPlaceholder": "50000",
-    "unusedPtoDays": "Dies PTO No Usats",
-    "unusedPtoDaysPlaceholder": "5",
+    "annualSalary": "Salari anual",
+    "annualSalaryPlaceholder": "{amount}",
+    "unusedPtoDays": "Dies PTO no usats",
+    "unusedPtoDaysPlaceholder": "{days}",
     "valueOfUnusedPto": "Valor del PTO no usat:",
     "worthOfPaidVacation": "Valor de vacances pagades no agafades",
     "yourDailyRate": "La teva tarifa diària:",
@@ -529,67 +606,67 @@
     "standardWorkingHours": "Hores de treball estàndard",
     "effectiveHourlyRate": "Tarifa per hora efectiva:",
     "whenWorkingExtraDays": "En treballar {days} dies extra no pagats",
-    "opportunityCost": "Cost d'Oportunitat",
-    "opportunityCostDescription": "Has treballat {days} dies que podries haver agafat com a vacances pagades. Això són <amount>valor</amount> de temps lliure pagat que has cedit. El teu salari segueix igual, però has treballat dies extra gratis."
+    "opportunityCost": "Cost d'oportunitat",
+    "opportunityCostDescription": "Has treballat {days} dies que podries haver agafat com a vacances pagades. Això són <amount>valor</amount> de temps lliure pagat que has cedit. El teu salari segueix igual, però has treballat dies extra sense cap benefici addicional."
   },
   "checkout": {
-    "back": "Tornar",
-    "goBackToDonation": "Tornar al formulari de donació",
+    "back": "Torna",
+    "goBackToDonation": "Torna al formulari de donació",
     "totalAmount": "Import total",
     "expressCheckout": "Pagament ràpid",
-    "orPayWithCard": "O pagar amb targeta",
-    "paymentError": "Error de Pagament",
+    "orPayWithCard": "O paga amb targeta",
+    "paymentError": "Error de pagament",
     "paymentFailed": "Pagament fallat",
     "processing": "Processant...",
-    "pay": "Pagar"
+    "pay": "Paga"
   },
   "donate": {
-    "donateAndUnblock": "Donar i Desbloquejar",
-    "supportAndUnblock": "Donar Suport i Desbloquejar",
-    "makeDonation": "Fes una donació per donar suport al contingut i desbloquejar l'accés.",
+    "donateAndUnblock": "Donar i desbloquejar",
+    "supportAndUnblock": "Donar suport i desbloquejar",
+    "makeDonation": "Fes una donació per donar suport al projecte i desbloquejar les funcions premium.",
     "alreadyPremium": "Ja ets usuari premium. Gràcies pel teu suport!"
   },
   "donationForm": {
     "email": "Email",
     "emailPlaceholder": "el-teu@email.com",
     "quickAmounts": "Quantitats ràpides",
-    "donationAmount": "Quantitat de Donació",
+    "donationAmount": "Quantitat de donació",
     "enterAmount": "Introduir quantitat",
     "basePriceNote": "Preu base en {currency}. La quantitat final es convertirà a la teva moneda local segons les taxes de canvi actuals.",
     "havePromoCode": "Tens codi promocional?",
-    "promoCodePlaceholder": "INTRODUEIX_CODI",
-    "continueToPayment": "Continuar al Pagament",
+    "promoCodePlaceholder": "JA_T'AGRADARIA",
+    "continueToPayment": "Continuar al pagament",
     "processing": "Processant..."
   },
   "upgrade": {
-    "premiumRequired": "Es Requereix Premium",
-    "featureRequiresPremium": "requereix accés premium",
-    "verifyDescription": "No et preocupis, si ja has donat comprovarem el teu email a la nostra llista i et concedirem accés premium. Si tens algun problema no dubtis en contactar-nos.",
+    "premiumRequired": "Es requereix premium",
+    "featureRequiresPremium": "Requereix accés premium",
+    "verifyDescription": "No et preocupis, si ja has donat o pagat comprovarem el teu email a la nostra llista i et concedirem accés premium. Si tens algun problema no dubtis en contactar-nos.",
     "considerDonating": "Si encara no has donat, considera fer-ho per donar suport al projecte i desbloquejar les funcions premium.",
     "enterPremiumEmail": "Introdueix el teu email premium",
     "emailPlaceholder": "el-teu@email.com",
     "verifying": "Verificant...",
-    "verifyAccess": "Verificar Accés",
-    "cancel": "Cancel·lar",
-    "accessGranted": "Accés Concedit!",
-    "welcomeToPremium": "Benvingut a les funcions premium. Pots tancar aquest modal o ho farem en 5 segons.",
-    "accessDenied": "Accés Denegat",
+    "verifyAccess": "Verificar accés",
+    "cancel": "Cancel·la",
+    "accessGranted": "Accés concedit!",
+    "welcomeToPremium": "Ja tens accés a les funcions premium. Pots tancar aquest modal o ho farem en {seconds} s.",
+    "accessDenied": "Accés denegat",
     "emailNotFound": "Aquest email no està a la nostra llista d'usuaris premium.",
     "emailNotFoundError": "Email no trobat a la nostra llista d'usuaris premium",
-    "tryAgain": "Tornar a Provar",
-    "close": "Tancar",
-    "invalidEmail": "Si us plau introdueix un email vàlid",
+    "tryAgain": "Tornar a provar",
+    "close": "Tanca",
+    "invalidEmail": "Introdueix un email vàlid",
     "emailRequired": "L'email és obligatori"
   },
   "validation": {
     "contact": {
-      "invalidEmail": "Si us plau introdueix un email vàlid",
+      "invalidEmail": "Introdueix un email vàlid",
       "emailRequired": "L'email és obligatori",
-      "nameMin": "El nom ha de tenir almenys 2 caràcters",
+      "nameMin": "El nom ha de tenir almenys {min} caràcters",
       "nameMax": "El nom és massa llarg",
-      "subjectMin": "L'assumpte ha de tenir almenys 5 caràcters",
+      "subjectMin": "L'assumpte ha de tenir almenys {min} caràcters",
       "subjectMax": "L'assumpte és massa llarg",
-      "messageMin": "El missatge ha de tenir almenys 10 caràcters",
+      "messageMin": "El missatge ha de tenir almenys {min} caràcters",
       "messageMax": "El missatge és massa llarg"
     },
     "payment": {
@@ -601,62 +678,67 @@
     "holiday": {
       "nameRequired": "El nom del festiu és obligatori",
       "nameMax": "El nom del festiu és massa llarg",
-      "invalidDate": "Si us plau selecciona una data vàlida"
+      "invalidDate": "Selecciona una data vàlida"
     }
   },
   "roadmap": {
-    "title": "Full de Ruta",
+    "title": "Full de ruta",
     "subtitle": "Explora el que hem construït i el que ve",
     "selected": "Seleccionat",
     "completed": "Completat",
-    "inProgress": "En Progrés",
+    "inProgress": "En progrés",
     "planned": "Planificat",
     "future": "Futur",
+    "detailedView": "Vista detallada",
     "haveSuggestion": "Tens un suggeriment?",
     "feedbackShapes": "El teu feedback dóna forma al nostre full de ruta. Comparteix les teves idees i ajuda'ns a construir el planificador de vacances perfecte.",
     "gotAnIdea": "Tens una idea que faria la teva vida més fàcil?",
     "letsTalk": "Parlem",
     "or": "o",
-    "openIssue": "obre un issue a GitHub",
+    "openIssue": "Obre un issue a GitHub",
     "features": {
-      "corePtoCalculator": "Calculadora de PTO Principal",
-      "corePtoCalculatorDesc": "Planificació intel·ligent de vacances amb optimització de festius i detecció de ponts",
-      "multipleCountries": "Suport de Múltiples Països",
-      "multipleCountriesDesc": "Suport per a festius en països europeus amb regles específiques per regió",
-      "premiumFeatures": "Funcions Premium",
-      "premiumFeaturesDesc": "Desbloqueja funcions avançades amb un pagament únic via Stripe",
-      "customHolidays": "Festius Personalitzats",
-      "customHolidaysDesc": "Afegeix, edita i elimina festius personalitzats per a una planificació personalitzada",
-      "alternativeStrategies": "Estratègies Alternatives",
-      "alternativeStrategiesDesc": "Múltiples estratègies de planificació de vacances amb comparació d'eficiència",
-      "analyticsDashboard": "Panell d'Anàlisi",
-      "analyticsDashboardDesc": "Mètriques detallades i informació sobre la teva planificació de vacances",
-      "calendarExport": "Exportar Calendari",
-      "calendarExportDesc": "Exporta el teu pla de vacances a Google Calendar, iCal o Outlook",
-      "teamPlanning": "Planificació d'Equip",
-      "teamPlanningDesc": "Coordina la planificació de vacances amb membres de l'equip per evitar conflictes",
-      "emailNotifications": "Notificacions per Email",
-      "emailNotificationsDesc": "Rep recordatoris sobre pròximes vacances i dates importants",
-      "mobileApp": "App Mòbil",
-      "mobileAppDesc": "Apps natives iOS i Android per planificar vacances en moviment",
+      "corePtoCalculator": "Calculadora de PTO principal",
+      "corePtoCalculatorDescription": "Planificació intel·ligent de vacances amb optimització de festius i detecció de ponts",
+      "multipleCountries": "Suport de múltiples països",
+      "multipleCountriesDescription": "Suport per a festius en països europeus amb regles específiques per regió",
+      "premiumFeatures": "Funcions premium",
+      "premiumFeaturesDescription": "Desbloqueja funcions avançades amb un pagament únic via Stripe",
+      "customHolidays": "Festius personalitzats",
+      "customHolidaysDescription": "Afegeix, edita i elimina festius personalitzats per ajustar el calendari a la teva situació",
+      "alternativeStrategies": "Estratègies alternatives",
+      "alternativeStrategiesDescription": "Múltiples estratègies de planificació de vacances amb comparació d'eficiència",
+      "analyticsDashboard": "Panell d'anàlisi",
+      "analyticsDashboardDescription": "Mètriques detallades i informació sobre la teva planificació de vacances",
+      "calendarExport": "Exportar calendari",
+      "calendarExportDescription": "Exporta el teu pla de vacances a Google Calendar, iCal o Outlook",
+      "teamPlanning": "Planificació d'equip",
+      "teamPlanningDescription": "Coordina la planificació de vacances amb membres de l'equip per evitar conflictes",
+      "emailNotifications": "Notificacions per email",
+      "emailNotificationsDescription": "Rep recordatoris sobre pròximes vacances i dates importants",
+      "mobileApp": "App mòbil",
+      "mobileAppDescription": "Apps natives iOS i Android per planificar vacances en moviment",
       "aiSuggestions": "Suggeriments IA",
-      "aiSuggestionsDesc": "Recomanacions impulsades per IA basades en les teves preferències i patrons passats",
-      "weatherIntegration": "Integració del Temps",
-      "weatherIntegrationDesc": "Veu pronòstics del temps per les teves dates de vacances planificades",
-      "performanceOptimization": "Optimització de Rendiment",
-      "performanceOptimizationDesc": "Càlculs més ràpids i experiència més fluida gràcies als Web Workers",
-      "customWeekends": "Caps de Setmana Personalitzats",
-      "customWeekendsDesc": "Defineix dies no laborables personalitzats més enllà del cap de setmana estàndard dissabte-diumenge",
-      "multiYearPlanning": "Planificació Multi-Any",
-      "multiYearPlanningDesc": "Planifica vacances al llarg de múltiples anys amb suport d'arrossegament"
+      "aiSuggestionsDescription": "Recomanacions personalitzades basades en les teves preferències i historial",
+      "weatherIntegration": "Integració del temps",
+      "weatherIntegrationDescription": "Consulta els pronòstics del temps per a les teves dates de vacances planificades",
+      "blockedPeriods": "Períodes bloquejats",
+      "blockedPeriodsDescription": "Marca rangs de dates on no vols cap suggeriment de PTO: conferències, viatges, baixes mèdiques o qualsevol moment que sàpigues que estaràs ocupat",
+      "performanceOptimization": "Optimització de rendiment",
+      "performanceOptimizationDescription": "Càlculs més ràpids i experiència més fluida gràcies als Web Workers",
+      "customWeekends": "Caps de setmana personalitzats",
+      "customWeekendsDescription": "Defineix dies no laborables personalitzats més enllà del cap de setmana estàndard dissabte-diumenge",
+      "multiYearPlanning": "Planificació multi-any",
+      "multiYearPlanningDescription": "Planifica vacances al llarg de múltiples anys amb suport d'arrossegament",
+      "calendarSubscription": "Subscripció de calendari en viu",
+      "calendarSubscriptionDescription": "Subscriu-te directament des de Google Calendar, Apple Calendar o Outlook mitjançant una URL webcal://; el teu pla es sincronitza automàticament"
     }
   },
   "cookies": {
     "title": "Usem cookies",
-    "description": "Usem cookies essencials per la funcionalitat bàsica del lloc web i cookies d'anàlisi per entendre com interactues amb el nostre lloc.",
-    "rejectAll": "Rebutjar totes",
-    "managePreferences": "Gestionar preferències",
-    "acceptAll": "Acceptar totes",
+    "description": "Usem cookies essencials per a la funcionalitat bàsica del lloc web i cookies d'anàlisi per entendre com interactues amb el nostre lloc.",
+    "rejectAll": "Rebutja-les totes",
+    "managePreferences": "Gestiona les preferències",
+    "acceptAll": "Accepta-les totes",
     "preferencesTitle": "Preferències de cookies",
     "preferencesDescription": "Usem cookies per millorar la teva experiència de navegació i analitzar el trànsit del lloc. Tria quines cookies vols acceptar.",
     "necessaryCookies": "Cookies necessàries",
@@ -664,101 +746,112 @@
     "cookieDetails": "Detalls de cookies",
     "analyticsCookies": "Cookies d'anàlisi",
     "analyticsDescription": "Ens ajuden a entendre el comportament dels visitants mitjançant recopilació anònima de dades.",
-    "savePreferences": "Desar preferències",
+    "savePreferences": "Desa les preferències",
     "months": "mesos",
     "year": "any",
     "years": "anys",
     "minutes": "minuts",
     "hours": "hores",
     "week": "setmana",
-    "userCountryDesc": "Emmagatzema el teu país detectat pel CDN per a la suggerència inicial de festius.",
+    "userCountryDesc": "Emmagatzema el país detectat per mostrar els festius inicials.",
     "ccCookieDesc": "Emmagatzema les teves preferències de consentiment de cookies",
     "stripeMidDesc": "Prevenció i detecció de frau. Establerta per Stripe per processament segur de pagaments.",
     "stripeSidDesc": "Identificador de sessió per prevenció de frau. Requerida per al procés de pagament.",
     "gaDesc": "Distingeix usuaris únics.",
-    "gaStarDesc": "Manté l'estat de sessió per seguiment analític",
+    "gaStarDesc": "Manté l'estat de sessió per al seguiment analític",
     "gidDesc": "Distingeix usuaris per anàlisi a curt termini",
-    "learnMore": "Saber més",
-    "provider": "Proveïdor: {name}"
+    "learnMore": "Saber-ne més",
+    "provider": "Proveïdor: {name}",
+    "bsUidDesc": "Identificador únic de visitant per al seguiment analític de Better Stack",
+    "bsSidDesc": "Identificador de sessió per al seguiment analític de Better Stack",
+    "session": "Sessió"
   },
   "holidayTableHeader": {
     "holiday": "Festivitat",
     "date": "Data",
     "day": "Dia",
     "type": "Tipus",
-    "status": "Estat",
-    "region": "Regió",
-    "location": "Ubicació"
+    "status": "Estat"
   },
   "workdayCounterModal": {
-    "selectDateRange": "Seleccionar rang de dates"
+    "selectDateRange": "Selecciona les dates"
   },
   "command": {
-    "commandPalette": "Paleta de Comandes",
+    "commandPalette": "Paleta de comandes",
     "searchPlaceholder": "Cercar una comanda per executar..."
-  },
-  "common": {
-    "loading": "Carregant...",
-    "cancel": "Cancel·lar",
-    "close": "Tancar",
-    "save": "Desar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "add": "Afegir",
-    "submit": "Enviar",
-    "processing": "Processant..."
   },
   "errors": {
     "contact": {
       "VALIDATION_ERROR": "Dades d'entrada invàlides.",
-      "EMAIL_SEND_FAILED": "Error en enviar el correu. Si us plau, torna-ho a intentar.",
+      "EMAIL_SEND_FAILED": "Error en enviar el correu. Torna-ho a intentar.",
       "SAVE_FAILED": "Hem rebut la teva consulta, tot i que hem trobat un petit problema tècnic en finalitzar els registres. No cal que facis res més.",
-      "RENDER_FAILED": "Error en preparar el correu. Si us plau, torna-ho a intentar.",
-      "UNKNOWN": "Ha ocorregut un error inesperat. Si us plau, torna-ho a intentar."
+      "RENDER_FAILED": "Error en preparar el correu. Torna-ho a intentar.",
+      "UNKNOWN": "Hi ha hagut un error inesperat. Torna-ho a intentar."
     },
     "payment": {
       "VALIDATION_ERROR": "Dades d'entrada invàlides.",
       "INVALID_PROMO_CODE": "El codi promocional és invàlid o ha expirat.",
       "PAYMENT_FAILED": "El processament del pagament ha fallat.",
-      "SAVE_FAILED": "S'ha creat la intenció de pagament però ha fallat en desar. Si us plau, contacta amb suport.",
+      "SAVE_FAILED": "El pagament s'ha processat però hi ha hagut un error en guardar-lo. Contacta amb suport amb el teu ID de transacció.",
       "UPDATE_STATUS_FAILED": "Error en actualitzar l'estat del pagament.",
       "SAVE_FROM_WEBHOOK_FAILED": "Error en desar el pagament des de webhook.",
       "CHARGE_UPDATE_FAILED": "Error en actualitzar els detalls del càrrec.",
-      "WEBHOOK_PROCESSING_FAILED": "Error en processar l'event webhook.",
-      "UNKNOWN": "Ha ocorregut un error inesperat. Si us plau, torna-ho a intentar."
+      "WEBHOOK_PROCESSING_FAILED": "Error en processar la notificació de pagament",
+      "UNKNOWN": "Hi ha hagut un error inesperat. Torna-ho a intentar."
     }
   },
   "legal": {
-    "lastUpdated": "Última actualització: {date}"
+    "lastUpdated": "Darrera actualització: {date}"
   },
   "notFound": {
-    "title": "Pàgina no trobada",
-    "description": "La pàgina que busques no existeix o ha estat moguda.",
-    "returnHome": "Tornar a l'inici"
+    "kicker": "error 404 · ruta perduda",
+    "title": "Aquesta pàgina se n'ha anat de",
+    "titleHighlight": "vacances",
+    "titleEmphasis": "sense avisar.",
+    "lede": "Hem buscat a la platja, hem mirat sota el parasol, hem preguntat al xiringuito… res. L'URL que vols no existeix (o es va perdre entre 2 ponts).",
+    "ctaPrimary": "Torna a l'inici",
+    "ctaPlanner": "Obrir el planificador",
+    "suggestLabel": "Buscaves alguna cosa com aquesta?",
+    "link1": "Com funciona",
+    "link2": "Funcionalitats",
+    "link3": "Plans i preu",
+    "link4": "FAQ i suport",
+    "footerStatus": "estat: ok · uptime: 99.98%"
   },
   "error": {
-    "title": "Alguna cosa ha anat malament",
-    "description": "S'ha produït un error inesperat. Si us plau, torna-ho a provar.",
-    "retry": "Tornar a provar",
-    "returnHome": "Tornar a l'inici"
+    "retry": "Torna-ho a provar",
+    "kicker": "Internal server error · v{version} · {time} UTC",
+    "title": "El servidor s'ha agafat un",
+    "titleHighlight": "dia lliure",
+    "titleEmphasis": "sense demanar.",
+    "lede": "Alguna cosa ha explotat al nostre costat. No és culpa teva (aquesta vegada). El nostre equip ja ho ha vist: els logs estan fumejant i hi estem. Torna en uns minuts, o mira l'estat en viu.",
+    "statusPage": "Veure l'estat",
+    "meanwhile": "Mentrestant:",
+    "contact": "Reporta un problema",
+    "changelog": "Veure els canvis",
+    "support": "Obre un informe d'error",
+    "terminalPrompt": "anem-a-arreglar-ho _",
+    "internalServerError": "Error intern del servidor"
   },
   "footer": {
-    "privacyPolicy": "Política de Privadesa",
-    "termsOfService": "Termes de Servei",
-    "cookiePolicy": "Política de Cookies",
-    "legalNotice": "Avís Legal",
+    "privacyPolicy": "Política de privadesa",
+    "termsOfService": "Termes de servei",
+    "cookiePolicy": "Política de cookies",
+    "legalNotice": "Avís legal",
     "manageCookies": "Gestionar cookies",
     "contactUs": "Contacta'ns",
-    "legalNavigation": "Enllaços legals i de política"
+    "legalNavigation": "Enllaços legals i de política",
+    "copyright": "© {year} Forever PTO · Fet des d'una hamaca.",
+    "version": "v{version} · estat: vacacional ●",
+    "planner": "Calculadora"
   },
   "accessibility": {
-    "selectLanguage": "Seleccionar idioma, actual: {current}",
-    "skipToContent": "Saltar al contingut principal"
+    "selectLanguage": "Seleccionar idioma, actual: {current}"
   },
   "formButtons": {
-    "submit": "Enviar",
+    "submit": "Envia",
     "processing": "Processant...",
-    "cancel": "Cancel·lar"
+    "cancel": "Cancel·la"
   },
   "devFooter": {
     "madeWith": "Fet amb",
@@ -766,874 +859,1071 @@
     "findMeOn": "També em pots trobar a"
   },
   "premium": {
-    "selectHoliday": "Seleccionar Festiu",
-    "selectAllHolidays": "Seleccionar Tots els Festius",
+    "selectHoliday": "Seleccionar festiu",
+    "selectAllHolidays": "Seleccionar tots els festius",
     "unlockFeature": "Desbloquejar funció premium: {feature}",
     "premiumFeature": "Funció premium",
-    "unlockDescription": "Desbloqueja la capacitat d'afegir/eliminar suggeriments i afegir/eliminar dies restants actualitzant a premium.",
-    "upgrade": "Millorar"
+    "unlockDescription": "Passa a premium per editar els suggeriments i gestionar els dies restants manualment.",
+    "upgrade": "Actualitzar a premium"
   },
   "calendar": {
     "previousMonth": "Mes anterior",
-    "nextMonth": "Mes següent"
+    "nextMonth": "Mes següent",
+    "today": "Avui",
+    "daysOff": "{count, plural, one {# dia lliure} other {# dies lliures}}"
   },
   "holidayRow": {
     "weekend": "Cap de setmana",
     "workday": "Laborable",
     "select": "Seleccionar {name}",
-    "editHolidays": "Editar Festius"
+    "editHolidays": "Editar festius"
   },
   "paymentConfirmation": {
     "failed": {
-      "title": "Pagament Fallat",
+      "title": "Pagament fallat",
       "description": "No hem pogut processar el teu pagament. No se t'ha cobrat.",
       "whatHappened": "Què ha passat?",
       "declined": "El teu pagament pot haver estat rebutjat",
       "authFailed": "L'autenticació pot haver fallat",
       "sessionExpired": "La sessió pot haver expirat",
-      "returnHome": "Tornar a la pàgina principal"
+      "returnHome": "Torna a la pàgina principal"
     },
     "success": {
-      "title": "Pagament Exitós!",
+      "title": "Pagament completat!",
       "thankYou": "Gràcies pel teu suport",
       "amountPaid": "Quantitat pagada",
       "status": "Estat",
       "confirmed": "Confirmat",
-      "paymentId": "ID de Pagament",
-      "premiumActivated": "El teu accés premium ha estat activat. Ja pots gaudir de totes les funcions premium!",
-      "continueHome": "Continuar a la pàgina principal"
+      "paymentId": "ID de pagament",
+      "premiumActivated": "Ja tens accés a totes les funcions premium. Gràcies pel suport!",
+      "continueHome": "Continua a la pàgina principal"
     }
   },
-  "legalPages": {
-    "cookiePolicy": {
-      "title": "Cookie Policy",
-      "lastUpdated": "Last updated: {date}",
-      "sections": {
-        "introduction": {
-          "title": "Introduction",
-          "p1": "This Cookie Policy explains how Forever PTO (<link>https://forever-pto.com</link>) uses cookies and similar technologies. By using our website, you consent to the use of cookies in accordance with this policy.",
-          "p2": "We are committed to transparency about how we collect and use data. This policy provides detailed information about the types of cookies we use, their purpose, and how you can control them."
+  "homepage": {
+    "nav": {
+      "how": "Com funciona",
+      "features": "Trucs",
+      "pricing": "Preu",
+      "trialAction": "Prova-ho gratis →"
+    },
+    "hero": {
+      "localeBadge": "🇪🇸 ES · 🇮🇹 IT · 🇩🇪 DE · 🇫🇷 FR · 🇬🇧 UK · 🇺🇸 US",
+      "command": "Treballa menys.",
+      "verb": "Viatja",
+      "highlight": "més",
+      "description": "Forever PTO calcula <em>exactament</em> quins dies demanar lliure perquè els teus 22 dies de vacances es converteixin en <strong>47+ dies fora de l'oficina</strong>. Sense excels. Sense matemàtiques. Sense remordiment.",
+      "plannerCta": "Calcula els meus dies →",
+      "demoLink": "Veure com va (30s)",
+      "stars": "4.9 · usat per {users} empleats rebels",
+      "mockupLabel": "Dies lliures reals el {year}",
+      "mockupRatio": "dies · ràtio 2.14×",
+      "mockupQuote": "\"Això són 9 escapades llargues, capità.\"",
+      "mockupLegendPto": "PTO",
+      "mockupLegendHoliday": "Festiu",
+      "mockupLegendWeekend": "Cap de setmana",
+      "mockupFieldPto": "Dies PTO",
+      "mockupFieldPtoUnit": "dies/any",
+      "mockupFieldCountry": "País",
+      "mockupFieldHolidays": "14 festius"
+    },
+    "marquee": {
+      "items": "setmana santa · pont de maig · estiu infinit · pont de la mercè · nadal prolongat · pont de novembre · pont de juny · pont de l'agost · pont d'octubre · cap d'any prolongat"
+    },
+    "how": {
+      "badge": "com va · {steps} passos",
+      "titleStart": "De",
+      "titleMid": "a",
+      "question1": "què faig",
+      "question2": "ja tinc el viatge",
+      "titleEnd": "en 60 segons.",
+      "description": "Sense instal·lar res. Sense targeta. Sense newsletter. Digues-nos quants dies tens i on vius.",
+      "inputDaysTitle": "Posa els teus dies.",
+      "inputDaysDescription": "Quants dies de vacances tens, a quin país o regió treballes. Això és tot.",
+      "engineTitle": "El motor fa màgia.",
+      "engineDescription": "Creua els teus dies amb els festius oficials i els ponts regionals. Troba totes les combinacions possibles i les ordena per \"ràtio de descans\".",
+      "exportTitle": "Demanes els dies.",
+      "exportDescription": "Exporta a Google Calendar, Outlook o un PDF que enganxes al formulari de RRHH i t'oblides. Adéu dubtes."
+    },
+    "stats": {
+      "multiplierLabel": "Multiplicador mitjà",
+      "daysLabel": "Dies lliures amb {days} PTO",
+      "countriesLabel": "Països suportats",
+      "plansLabel": "Plans generats"
+    },
+    "features": {
+      "badge": "trucs del motor",
+      "titleStart": "No és un calendari. És un",
+      "titleEmphasis": "aliat",
+      "titleEnd": "contra el dilluns.",
+      "description": "Aquests són els moviments que Forever PTO fa per tu automàticament.",
+      "bridgeTag": "ponts intel·ligents",
+      "bridgeTitle": "Converteix 1 dia de PTO en 4 lliures.",
+      "bridgeDescription": "Detecta festius en dimarts i dijous i et suggereix construir ponts mínims. Un dia estratègic = un cap de setmana de 4 dies.",
+      "ratioTag": "ràtio max",
+      "ratioDescription": "Millor multiplicador: 8 dies de PTO convertits en 28 lliures (ES, abril '26).",
+      "syncTag": "sync en 1 clic",
+      "syncTitle": "Google · Outlook · iCal",
+      "syncDescription": "Exporta el teu pla al calendari que ja uses. Sense embolicar-te.",
+      "conflictsTag": "anti-conflictes",
+      "conflictsTitle": "Avisa abans que el teu cap.",
+      "conflictsDescription": "Marca els períodes \"tabú\" de la teva empresa.",
+      "conflictItems": {
+        "allHandsMeeting": "Reunió all-hands",
+        "quarterClose": "Tancament Q3",
+        "productLaunch": "Llançament"
+      },
+      "countriesTag": "{count} països",
+      "countriesTitle": "Festius locals reals.",
+      "countriesDescription": "Calendaris oficials actualitzats cada any. Fins i tot els regionals.",
+      "privacyTag": "100% local",
+      "privacyTitle": "Les teves dades no surten del teu navegador.",
+      "privacyDescription": "Sense registre. Sense compte. Les teves dades de vacances es guarden exclusivament al teu navegador, mai no les veiem."
+    },
+    "comparison": {
+      "badge": "amb · sense",
+      "title": "Abans vs. després de Forever PTO.",
+      "withoutTitle": "😩 Sense Forever PTO",
+      "withoutItems": {
+        "spreadsheetFrustration": "Obres un Excel i et bloqueges a C7.",
+        "missedBridge": "Demanes el dilluns després del festiu i ningú t'avisa que era redundant.",
+        "daysRunOut": "T'assabentes al setembre que ja no queden dies.",
+        "colleagueConflict": "Un company demana la teva setmana primer. Una altra vegada.",
+        "unusedDays": "Acabes l'any amb 4 dies sense fer servir."
+      },
+      "withTitle": "😎 Amb Forever PTO",
+      "withItems": {
+        "planInJanuary": "Ho planifiques tot al gener, mentre esperes el cafè.",
+        "dayMultiplier": "Cada dia de PTO et retorna 2,1 dies lliures de mitjana.",
+        "visualCalendar": "Visualitzes l'any sencer en un calendari clar.",
+        "bookFirst": "Demanes primer, sense remordiment, amb dades.",
+        "burnAllDays": "Gastes el 100% dels teus dies. Com ha de ser."
+      }
+    },
+    "testimonials": {
+      "badge": "la gent diu",
+      "titleStart": "Gent que ja ha recuperat",
+      "titleEmphasis": "setmanes",
+      "titleEnd": "de la seva vida.",
+      "items": {
+        "martaR": {
+          "text": "Vaig passar de demanar dies solts a tenir 6 escapades planificades. La meva parella creu que m'he tornat organitzat. No li he dit que és una web.",
+          "name": "Marta R.",
+          "role": "dissenyadora · Madrid"
         },
-        "whatAreCookies": {
-          "title": "What are Cookies?",
-          "p1": "Cookies are small text files that are placed on your device when you visit a website. They are widely used to make websites work more efficiently and provide information to website owners.",
-          "p2": "Cookies can be 'persistent' cookies or 'session' cookies. Persistent cookies remain on your device for a set period. Session cookies are temporary and are deleted when you close your browser."
+        "diegoA": {
+          "text": "Feia 4 anys que no feia servir tots els meus dies. Aquest cop els vaig gastar fins l'últim. Vaig tornar bronzejat i amb ganes de treballar. Quasi.",
+          "name": "Diego A.",
+          "role": "backend dev · Barcelona"
         },
-        "typesOfCookies": {
-          "title": "Types of Cookies We Use",
-          "intro": "Forever PTO does not use:",
-          "notUsed": {
-            "advertising": "Advertising cookies",
-            "tracking": "Third-party tracking cookies",
-            "analytics": "Analytics cookies for user profiling",
-            "socialMedia": "Social media cookies"
+        "saraV": {
+          "text": "Ho vaig obrir \"per veure\" i als 90 segons ja tenia un PDF per enviar a RRHH amb tot l'any quadrat. Ridícul de bé que va.",
+          "name": "Sara V.",
+          "role": "product manager · Berlín"
+        },
+        "carlosM": {
+          "text": "Vaig passar 20 minuts discutint amb un company sobre qui havia reservat primer la mateixa setmana. L'app ho va resoldre en 3 segons. Vaig guanyar jo.",
+          "name": "Carlos M.",
+          "role": "QA engineer · Lisboa"
+        },
+        "lauraT": {
+          "text": "La meva cap em va preguntar com havia aconseguit 34 dies lliures amb només 22 dies de vacances. Li vaig dir \"estratègia\". No vaig esmentar l'app.",
+          "name": "Laura T.",
+          "role": "marketing manager · París"
+        },
+        "thomasK": {
+          "text": "ROI: 22 dies de vacances d'entrada, 47 dies lliures de sortida. Això és un multiplicador de 2,1×. He llançat pitjors funcionalitats a la feina.",
+          "name": "Thomas K.",
+          "role": "software architect · Amsterdam"
+        }
+      }
+    },
+    "pricing": {
+      "badge": "preu honest",
+      "titleStart": "Paga una vegada.",
+      "titleEmphasis": "Per sempre.",
+      "description": "Sense SaaS. Sense subscripció. Sense \"prova gratuïta que es renova sola\".",
+      "freeName": "Gratuït sempre",
+      "freeTagline": "Prova-ho. Et convencerà.",
+      "freePrice": "€0",
+      "freePer": "/sempre",
+      "freeNote": "Sense targeta. Sense correu. Res.",
+      "freeFeatures": {
+        "optimizedPlan": "Pla de vacances auto-optimitzat",
+        "countryHolidays": "Festius del teu país i regió",
+        "threeStrategies": "{count} estratègies (Agrupada, Optimitzada, Equilibrada)",
+        "basicStats": "Estadístiques bàsiques i calculadores"
+      },
+      "freeCta": "Comença gratis",
+      "lifetimeName": "Passi de Suport",
+      "lifetimeTagline": "Donació mínima d'1€. Usa'l per sempre.",
+      "lifetimePrice": "Des d'€1",
+      "lifetimePer": " una vegada",
+      "lifetimeNote": "100% opcional. Manté el projecte viu.",
+      "lifetimeFeatures": {
+        "manualEditing": "Edició manual del calendari",
+        "calendarExport": "Exportar a Google · Outlook · Apple · PDF",
+        "customHolidays": "Festius personalitzats i d'empresa",
+        "pastDaysAndCarryover": "Permetre dies passats · mesos d'arrossegament",
+        "holidayManagement": "Editar i eliminar qualsevol festiu",
+        "fullAnalytics": "Analítica completa i gràfics visuals"
+      },
+      "lifetimeCta": "Dóna suport al projecte →",
+      "popularBadge": "Més popular 🔥"
+    },
+    "faq": {
+      "badge": "FAQ",
+      "title": "Preguntes? Tenim respostes."
+    },
+    "closing": {
+      "titleStart": "El teu pròxim any",
+      "titleEmphasis": "lliure",
+      "titleEnd": "comença avui.",
+      "description": "22 dies poden ser 47. Només cal saber on col·locar-los. Això ho fem nosaltres.",
+      "cta": "Calcula els meus dies gratis →",
+      "shapes": {
+        "byeMonday": "adéu, dilluns",
+        "doNotDisturb": "no molestar",
+        "bossOff": "boss off",
+        "zeroRegrets": "0 penediments"
+      }
+    }
+  },
+  "cookiePolicy": {
+    "title": "Política de cookies",
+    "lastUpdated": "Darrera actualització: {date}",
+    "sections": {
+      "introduction": {
+        "title": "Introducció",
+        "p1": "Aquesta Política de cookies explica com Forever PTO (<link>https://forever-pto.com</link>) utilitza cookies i tecnologies similars. En utilitzar el nostre lloc web, consents l'ús de cookies d'acord amb aquesta política.",
+        "p2": "Ens comprometem a ser transparents sobre com recopilem i utilitzem les dades. Aquesta política proporciona informació detallada sobre els tipus de cookies que utilitzem, la seva finalitat i com pots controlar-les."
+      },
+      "whatAreCookies": {
+        "title": "Què són les cookies?",
+        "p1": "Les cookies són petits fitxers de text que s'emmagatzemen al teu dispositiu quan visites un lloc web. S'utilitzen àmpliament perquè els llocs web funcionin de manera més eficient i per proporcionar informació als propietaris del lloc.",
+        "p2": "Les cookies poden ser 'persistents' o 'de sessió'. Les cookies persistents romanen al teu dispositiu durant un període determinat. Les cookies de sessió són temporals i s'eliminen quan tanques el navegador."
+      },
+      "typesOfCookies": {
+        "title": "Tipus de cookies que utilitzem",
+        "intro": "Forever PTO no utilitza:",
+        "notUsed": {
+          "advertising": "Cookies publicitàries",
+          "tracking": "Cookies de seguiment de tercers",
+          "analytics": "Cookies analítiques per a l'elaboració de perfils d'usuari",
+          "socialMedia": "Cookies de xarxes socials"
+        },
+        "strictlyNecessary": {
+          "title": "Cookies estrictament necessàries (emmagatzematge local)",
+          "description": "Utilitzem l'emmagatzematge local del navegador per guardar les teves preferències i l'estat de l'aplicació. Són essencials per al funcionament del lloc web i no es poden desactivar:",
+          "items": {
+            "filters": {
+              "label": "Emmagatzematge de filtres:",
+              "description": "Guarda les teves preferències de país, regió i any seleccionats per filtrar els festius."
+            },
+            "holidays": {
+              "label": "Emmagatzematge de festius:",
+              "description": "Guarda la configuració dels teus festius personalitzats i dies de vacances."
+            },
+            "location": {
+              "label": "Emmagatzematge d'ubicació:",
+              "description": "Guarda la teva ubicació seleccionada (país i regió) per mostrar informació precisa sobre festius."
+            },
+            "premiumKey": {
+              "label": "Emmagatzematge de clau Premium:",
+              "description": "Emmagatzema de manera segura la teva clau d'accés Premium quan et passes a Premium."
+            },
+            "theme": {
+              "label": "Preferència de tema:",
+              "description": "Guarda la teva preferència de tema clar/fosc."
+            },
+            "calendar": {
+              "label": "Estat del calendari:",
+              "description": "Guarda les teves preferències de vista del calendari i les dates seleccionades."
+            }
           },
+          "duration": {
+            "label": "Durada:",
+            "description": "Aquestes dades s'emmagatzemen de manera permanent a l'emmagatzematge local del teu navegador fins que les eliminis manualment."
+          }
+        }
+      },
+      "cookieBanner": {
+        "title": "Bàner de consentiment de cookies",
+        "description": "Quan visites Forever PTO per primera vegada, veuràs un bàner de consentiment de cookies. Això et permet triar quins tipus de cookies vols acceptar:",
+        "items": {
           "strictlyNecessary": {
-            "title": "Strictly Necessary Cookies (Local Storage)",
-            "description": "We use browser local storage to save your preferences and application state. These are essential for the website to function and cannot be disabled:",
-            "items": {
-              "filters": {
-                "label": "Filters Storage:",
-                "description": "Stores your selected country, region, and year preferences for holiday filtering."
-              },
-              "holidays": {
-                "label": "Holidays Storage:",
-                "description": "Saves your custom holidays and vacation days configuration."
-              },
-              "location": {
-                "label": "Location Storage:",
-                "description": "Stores your selected location (country and region) for accurate holiday information."
-              },
-              "premiumKey": {
-                "label": "Premium Key Storage:",
-                "description": "Securely stores your premium access key when you upgrade to Premium."
-              },
-              "theme": {
-                "label": "Theme Preference:",
-                "description": "Saves your light/dark theme preference."
-              },
-              "calendar": {
-                "label": "Calendar State:",
-                "description": "Stores your calendar view preferences and selected dates."
-              }
-            },
-            "duration": {
-              "label": "Duration:",
-              "description": "These are stored permanently in your browser's local storage until you manually clear them."
-            }
+            "label": "Estrictament necessàries:",
+            "description": "No es poden desactivar ja que són essencials per al funcionament del lloc."
+          },
+          "analytics": {
+            "label": "Analítiques:",
+            "description": "Cookies opcionals que ens ajuden a entendre com els visitants utilitzen el nostre lloc."
           }
         },
-        "cookieBanner": {
-          "title": "Cookie Consent Banner",
-          "description": "When you first visit Forever PTO, you'll see a cookie consent banner. This allows you to choose which types of cookies you want to accept:",
-          "items": {
-            "strictlyNecessary": {
-              "label": "Strictly Necessary:",
-              "description": "These cannot be disabled as they are essential for the site to work."
-            },
-            "analytics": {
-              "label": "Analytics:",
-              "description": "Optional cookies that help us understand how visitors use our site."
-            }
+        "consentStorage": "Les teves preferències de consentiment s'emmagatzemen en una cookie anomenada 'cc_cookie' que caduca als 6 mesos."
+      },
+      "googleConsent": {
+        "title": "Google Consent Mode v2",
+        "description": "Forever PTO implementa Google Consent Mode v2 per garantir el compliment de les normatives de privadesa mantenint les capacitats de mesura. Aquest mode ens permet:",
+        "states": {
+          "default": {
+            "label": "Estat de consentiment predeterminat:",
+            "description": "Abans que prenguis una decisió, tot el seguiment no essencial es denega per defecte."
           },
-          "consentStorage": "Your consent preferences are stored in a cookie called 'cc_cookie' which expires after 6 months."
-        },
-        "googleConsent": {
-          "title": "Google Consent Mode v2",
-          "description": "Forever PTO implements Google Consent Mode v2 to ensure compliance with privacy regulations while maintaining measurement capabilities. This mode allows us to:",
-          "states": {
-            "default": {
-              "label": "Default Consent State:",
-              "description": "Before you make a choice, all non-essential tracking is denied by default."
-            },
-            "grant": {
-              "label": "Consent Grant:",
-              "description": "When you accept analytics cookies, we update consent to allow analytics_storage."
-            },
-            "denial": {
-              "label": "Consent Denial:",
-              "description": "If you reject analytics, only anonymous, aggregated pings are sent to Google without personal data."
-            },
-            "pings": {
-              "label": "Privacy-Safe Pings:",
-              "description": "Even without consent, Google may receive anonymous signals that cannot be used to identify you."
-            }
+          "grant": {
+            "label": "Concessió de consentiment:",
+            "description": "Quan acceptes les cookies analítiques, actualitzem el consentiment per permetre analytics_storage."
           },
-          "categoriesIntro": "Consent Mode v2 controls these categories:",
-          "categories": {
-            "analyticsStorage": "Controls analytics data collection (we set to 'denied' by default until you consent)",
-            "adStorage": "Controls advertising cookies (always 'denied' on Forever PTO)",
-            "adUserData": "Controls sharing user data for advertising (always 'denied')",
-            "adPersonalization": "Controls personalized ads (always 'denied')",
-            "functionalityStorage": "Controls functional cookies (always 'granted' as they're necessary)",
-            "personalizationStorage": "Controls personalization features (always 'granted' for theme/preferences)",
-            "securityStorage": "Controls security-related storage (always 'granted')"
+          "denial": {
+            "label": "Denegació de consentiment:",
+            "description": "Si rebutges les analítiques, només s'envien pings anònims i agregats a Google sense dades personals."
           },
-          "gdprCompliance": "This implementation ensures full GDPR compliance by respecting your privacy choices while allowing basic anonymous measurements."
-        },
-        "dataSecurity": {
-          "title": "Data Security",
-          "description": "All data stored in local storage:",
-          "items": {
-            "browserSpecific": "Is stored only in your browser and never transmitted to our servers",
-            "notSynced": "Is not synchronized across devices or browsers",
-            "clearingData": "Can be deleted by clearing your browser data",
-            "noAccess": "Cannot be accessed by us or any third party"
+          "pings": {
+            "label": "Pings segurs per a la privadesa:",
+            "description": "Fins i tot sense consentiment, Google pot rebre senyals anònims que no es poden utilitzar per identificar-te."
           }
         },
-        "thirdPartyCookies": {
-          "title": "Third-Party Cookies",
-          "description": "When you use certain features of Forever PTO, third-party services may set their own cookies:",
-          "items": {
-            "payment": {
-              "label": "Stripe (Payment Processing):",
-              "description": "When you purchase Premium, Stripe may set cookies for fraud prevention and payment processing. See Stripe's Cookie Policy."
-            },
-            "holidayApis": {
-              "label": "Holiday APIs:",
-              "description": "We use external APIs to fetch holiday data, but these don't set cookies on our site."
-            }
-          },
-          "disclaimer": "We are not responsible for third-party cookies and recommend reviewing their respective cookie policies."
+        "categoriesIntro": "Consent Mode v2 controla aquestes categories:",
+        "categories": {
+          "analyticsStorage": "Controla la recol·lecció de dades analítiques (el configurem com a 'denied' per defecte fins que donis el teu consentiment)",
+          "adStorage": "Controla les cookies publicitàries (sempre 'denied' a Forever PTO)",
+          "adUserData": "Controla la compartició de dades d'usuari per a publicitat (sempre 'denied')",
+          "adPersonalization": "Controla els anuncis personalitzats (sempre 'denied')",
+          "functionalityStorage": "Controla les cookies funcionals (sempre 'granted' ja que són necessàries)",
+          "personalizationStorage": "Controla les funcions de personalització (sempre 'granted' per a tema/preferències)",
+          "securityStorage": "Controla l'emmagatzematge relacionat amb la seguretat (sempre 'granted')"
         },
-        "managingCookies": {
-          "title": "Managing Cookies",
-          "description": "You have several options to manage cookies and local storage:",
-          "browserSettings": {
-            "title": "Browser Settings",
-            "description": "All modern browsers allow you to:",
-            "items": {
-              "view": "View cookies and local storage currently set",
-              "blockAll": "Block all cookies (may affect functionality)",
-              "blockSpecific": "Block specific cookies from certain sites",
-              "deleteOnClose": "Delete cookies when closing the browser"
-            },
-            "warning": "Note: Blocking or deleting our local storage will reset all your preferences and custom holidays."
+        "gdprCompliance": "Aquesta implementació garanteix el ple compliment del RGPD en respectar les teves opcions de privadesa alhora que permet mesures anònimes bàsiques."
+      },
+      "dataSecurity": {
+        "title": "Seguretat de les dades",
+        "description": "Totes les dades emmagatzemades a l'emmagatzematge local:",
+        "items": {
+          "browserSpecific": "S'emmagatzemen únicament al teu navegador i mai es transmeten als nostres servidors",
+          "notSynced": "No se sincronitzen entre dispositius ni navegadors",
+          "clearingData": "Es poden eliminar esborrant les dades del teu navegador",
+          "noAccess": "No hi poden accedir ni nosaltres ni tercers"
+        }
+      },
+      "thirdPartyCookies": {
+        "title": "Cookies de tercers",
+        "description": "Quan utilitzes determinades funcions de Forever PTO, els serveis de tercers poden establir les seves pròpies cookies:",
+        "items": {
+          "payment": {
+            "label": "Stripe (processament de pagaments):",
+            "description": "Quan compres Premium, Stripe pot establir cookies per a la prevenció del frau i el processament de pagaments. Consulta la Política de cookies de Stripe."
           },
-          "browserInstructions": {
-            "title": "Browser-Specific Instructions",
-            "chrome": "Settings > Privacy and security > Cookies and other site data",
-            "firefox": "Settings > Privacy & Security > Cookies and Site Data",
-            "safari": "Preferences > Privacy > Manage Website Data",
-            "edge": "Settings > Cookies and site permissions > Manage and delete cookies"
+          "holidayApis": {
+            "label": "APIs de festius:",
+            "description": "Utilitzem APIs externes per obtenir dades de festius, però aquestes no estableixen cookies al nostre lloc."
           },
-          "inAppManagement": {
-            "title": "In-App Management",
-            "description": "You can click the cookie icon in the footer at any time to review and modify your cookie preferences."
+          "analytics": {
+            "label": "Better Stack (Analítica):",
+            "description": "Quan acceptes les cookies analítiques, Better Stack pot establir cookies per fer un seguiment de les interaccions i mesurar l'ús del producte."
           }
         },
-        "yourRights": {
-          "title": "Your Rights",
-          "description": "Under GDPR and other privacy laws, you have the right to:",
+        "disclaimer": "No som responsables de les cookies de tercers i recomanem revisar les seves respectives polítiques de cookies."
+      },
+      "managingCookies": {
+        "title": "Gestió de cookies",
+        "description": "Tens diverses opcions per gestionar les cookies i l'emmagatzematge local:",
+        "browserSettings": {
+          "title": "Configuració del navegador",
+          "description": "Tots els navegadors moderns et permeten:",
           "items": {
-            "know": "Know what data is stored (all data is visible in browser DevTools > Application > Local Storage)",
-            "access": "Access your data (it's all stored locally on your device)",
-            "delete": "Delete your data (clear browser data or use our app's reset option)",
-            "withdrawConsent": "Withdraw consent for analytics cookies at any time",
-            "object": "Object to data processing (though we process minimal data locally)"
-          }
+            "view": "Veure les cookies i l'emmagatzematge local configurats actualment",
+            "blockAll": "Bloquejar totes les cookies (pot afectar la funcionalitat)",
+            "blockSpecific": "Bloquejar cookies específiques de determinats llocs",
+            "deleteOnClose": "Eliminar les cookies en tancar el navegador"
+          },
+          "warning": "Nota: Bloquejar o eliminar el nostre emmagatzematge local restablirà totes les teves preferències i festius personalitzats."
         },
-        "changes": {
-          "title": "Changes to This Policy",
-          "p1": "We may update this Cookie Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons.",
-          "p2": "We will notify users of any material changes by updating the 'Last updated' date at the top of this policy."
+        "browserInstructions": {
+          "title": "Instruccions específiques per navegador",
+          "chrome": "Configuració > Privadesa i seguretat > Cookies i altres dades de llocs",
+          "firefox": "Configuració > Privadesa i seguretat > Cookies i dades del lloc",
+          "safari": "Preferències > Privadesa > Gestionar dades de llocs web",
+          "edge": "Configuració > Cookies i permisos del lloc > Gestionar i eliminar cookies"
         },
-        "contact": {
-          "title": "Contact Us",
-          "description": "If you have questions about this Cookie Policy, please contact us:",
+        "inAppManagement": {
+          "title": "Gestió dins l'aplicació",
+          "description": "Pots fer clic a la icona de cookie al peu de pàgina en qualsevol moment per revisar i modificar les teves preferències de cookies."
+        }
+      },
+      "yourRights": {
+        "title": "Els teus drets",
+        "description": "Segons el RGPD i altres lleis de privadesa, tens dret a:",
+        "items": {
+          "know": "Saber quines dades s'emmagatzemen (totes les dades són visibles a Eines de desenvolupament del navegador > Aplicació > Emmagatzematge local)",
+          "access": "Accedir a les teves dades (estan totes emmagatzemades localment al teu dispositiu)",
+          "delete": "Eliminar les teves dades (esborra les dades del navegador o utilitza l'opció de restabliment de la nostra aplicació)",
+          "withdrawConsent": "Retirar el consentiment per a les cookies analítiques en qualsevol moment",
+          "object": "Oposar-te al tractament de dades (tot i que processem dades mínimes localment)"
+        }
+      },
+      "changes": {
+        "title": "Canvis en aquesta política",
+        "p1": "Podem actualitzar aquesta Política de cookies de tant en tant per reflectir canvis en les nostres pràctiques o per altres motius operatius, legals o reglamentaris.",
+        "p2": "Notificarem als usuaris de qualsevol canvi significatiu actualitzant la data d''Darrera actualització' a la part superior d'aquesta política."
+      },
+      "contact": {
+        "title": "Contacte",
+        "description": "Si tens preguntes sobre aquesta Política de cookies, contacta amb nosaltres:",
+        "email": {
+          "label": "Email:",
+          "value": "{supportEmail}"
+        },
+        "website": {
+          "label": "Lloc web:",
+          "value": "{siteUrl}"
+        }
+      }
+    }
+  },
+  "privacyPolicy": {
+    "title": "Política de privadesa",
+    "lastUpdated": "Darrera actualització: {date}",
+    "sections": {
+      "introduction": {
+        "title": "Introducció",
+        "p1": "Forever PTO es compromet a protegir la teva privadesa. Aquesta Política de privadesa explica com recopilem, utilitzem i protegim les teves dades personals quan fas servir el nostre servei.",
+        "p2": "Forever PTO opera amb un model de privadesa per sobre de tot. Minimitzem la recol·lecció de dades i processem la major part de la informació localment al teu navegador."
+      },
+      "dataController": {
+        "title": "Responsable del tractament",
+        "description": "El responsable del tractament de les teves dades personals és:",
+        "items": {
+          "name": {
+            "label": "Nom:",
+            "value": "{author}"
+          },
           "email": {
             "label": "Email:",
             "value": "{supportEmail}"
           },
           "website": {
-            "label": "Website:",
+            "label": "Lloc web:",
             "value": "{siteUrl}"
           }
         }
-      }
-    },
-    "privacyPolicy": {
-      "title": "Privacy Policy",
-      "lastUpdated": "Last updated: {date}",
-      "sections": {
-        "introduction": {
-          "title": "Introduction",
-          "p1": "Forever PTO is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and protect your personal data when you use our service.",
-          "p2": "Forever PTO operates on a privacy-first model. We minimize data collection and process most information locally in your browser."
-        },
-        "dataController": {
-          "title": "Data Controller",
-          "description": "The data controller responsible for your personal data is:",
+      },
+      "dataWeCollect": {
+        "title": "Dades que recopilem",
+        "localStorage": {
+          "title": "Dades d'emmagatzematge local (només del costat del client)",
+          "description": "Les dades següents s'emmagatzemen exclusivament a l'emmagatzematge local del teu navegador i mai es transmeten als nostres servidors:",
           "items": {
-            "name": {
-              "label": "Name:",
-              "value": "Ferran Buireu"
+            "settings": {
+              "label": "Configuració de l'aplicació:",
+              "description": "El teu país, regió, any, dies de PTO i preferències de filtres seleccionats."
             },
-            "email": {
-              "label": "Email:",
-              "value": "{supportEmail}"
+            "holidayData": {
+              "label": "Dades de festius:",
+              "description": "Festius públics obtinguts d'APIs externes i emmagatzemats en memòria cau localment."
             },
-            "website": {
-              "label": "Website:",
-              "value": "{siteUrl}"
+            "customHolidays": {
+              "label": "Festius personalitzats:",
+              "description": "Festius que afegeixes manualment al calendari."
+            },
+            "calendarState": {
+              "label": "Estat del calendari:",
+              "description": "Les teves dates de vacances seleccionades i preferències d'optimització."
+            },
+            "premiumKey": {
+              "label": "Clau d'activació Premium:",
+              "description": "Si compres Premium, la teva clau d'activació única s'emmagatzema localment."
+            },
+            "theme": {
+              "label": "Preferència de tema:",
+              "description": "La teva preferència de mode clar/fosc."
+            },
+            "cookieConsent": {
+              "label": "Consentiment de cookies:",
+              "description": "Les teves preferències de cookies del bàner de consentiment."
             }
+          },
+          "legalBasis": {
+            "label": "Base legal:",
+            "description": "Necessari per a la prestació del servei (interès legítim)."
+          },
+          "retention": {
+            "label": "Conservació:",
+            "description": "S'emmagatzemen fins que esborris les dades del navegador."
           }
         },
-        "dataWeCollect": {
-          "title": "Data We Collect",
-          "localStorage": {
-            "title": "Local Storage Data (Client-Side Only)",
-            "description": "The following data is stored exclusively in your browser's local storage and is never transmitted to our servers:",
-            "items": {
-              "settings": {
-                "label": "Application Settings:",
-                "description": "Your selected country, region, year, PTO days, and filter preferences."
-              },
-              "holidayData": {
-                "label": "Holiday Data:",
-                "description": "Public holidays fetched from external APIs and cached locally."
-              },
-              "customHolidays": {
-                "label": "Custom Holidays:",
-                "description": "Holidays you manually add to the calendar."
-              },
-              "calendarState": {
-                "label": "Calendar State:",
-                "description": "Your selected vacation dates and optimization preferences."
-              },
-              "premiumKey": {
-                "label": "Premium Activation Key:",
-                "description": "If you purchase Premium, your unique activation key is stored locally."
-              },
-              "theme": {
-                "label": "Theme Preference:",
-                "description": "Your light/dark mode preference."
-              },
-              "cookieConsent": {
-                "label": "Cookie Consent:",
-                "description": "Your cookie preferences from the cookie banner."
-              }
-            },
-            "legalBasis": {
-              "label": "Legal Basis:",
-              "description": "Necessary for providing the service (legitimate interest)."
-            },
-            "retention": {
-              "label": "Retention:",
-              "description": "Stored until you clear browser data."
-            }
+        "payment": {
+          "title": "Informació de pagament",
+          "description": "Quan compres Premium, recopilem dades mínimes relacionades amb el pagament:",
+          "collectedInfo": "El que recopilem:",
+          "items": {
+            "transactionId": "ID de transacció de Stripe",
+            "activationKey": "Clau d'activació única generada per a la teva compra",
+            "email": "Adreça d'email (només si decideixes proporcionar-la durant el procés de pagament)"
           },
-          "payment": {
-            "title": "Payment Information",
-            "description": "When you purchase Premium, we collect minimal payment-related data:",
-            "collectedInfo": "What we collect:",
-            "items": {
-              "transactionId": "Transaction ID from Stripe",
-              "activationKey": "Unique activation key generated for your purchase",
-              "email": "Email address (only if you choose to provide it during checkout)"
-            },
-            "legalBasis": {
-              "label": "Legal Basis:",
-              "description": "Contract performance and legal obligation."
-            },
-            "retention": {
-              "label": "Retention:",
-              "description": "Retained for accounting and legal purposes (7 years as required by Spanish law)."
-            }
+          "legalBasis": {
+            "label": "Base legal:",
+            "description": "Execució del contracte i obligació legal."
           },
-          "analytics": {
-            "title": "Analytics Data (Optional)",
-            "description": "If you consent to analytics cookies, we may collect:",
-            "items": {
-              "pagesVisited": "Pages visited and features used",
-              "browserInfo": "Browser type, device type, screen resolution",
-              "location": "Approximate geographic location (country-level)",
-              "interactions": "Interactions with the application (anonymized)"
-            },
-            "legalBasis": {
-              "label": "Legal Basis:",
-              "description": "Consent (which you can withdraw at any time)."
-            },
-            "retention": {
-              "label": "Retention:",
-              "description": "Google Analytics retains data for 14 months by default."
-            }
-          },
-          "contact": {
-            "title": "Contact Form Data",
-            "description": "If you contact us via the contact form, we collect your name, email, and message.",
-            "legalBasis": {
-              "label": "Legal Basis:",
-              "description": "Legitimate interest in responding to your inquiry."
-            },
-            "retention": {
-              "label": "Retention:",
-              "description": "Retained for the duration necessary to respond, then deleted."
-            }
+          "retention": {
+            "label": "Conservació:",
+            "description": "Es conserven amb finalitats comptables i legals (7 anys segons exigeix la legislació espanyola)."
           }
         },
-        "cookiesAndTracking": {
-          "title": "Cookies and Tracking Technologies",
-          "description": "For detailed information about cookies, please see our <link>Cookie Policy</link>."
-        },
-        "dataSharing": {
-          "title": "Data Sharing",
-          "description": "We do not sell your personal data. We only share data with trusted third parties as necessary:",
+        "analytics": {
+          "title": "Dades analítiques (opcional)",
+          "description": "Si dones el teu consentiment per a les cookies analítiques, podem recopilar:",
           "items": {
-            "paymentProcessors": {
-              "label": "Stripe (Payment Processing):",
-              "description": "Handles all payment processing securely. See Stripe's Privacy Policy."
-            },
-            "holidayProviders": {
-              "label": "Holiday Data Providers:",
-              "description": "We fetch public holiday data from external APIs but do not share your personal information with them."
-            },
-            "analytics": {
-              "label": "Google Analytics (if consented):",
-              "description": "Processes anonymized usage data. See Google's Privacy Policy."
-            },
-            "legal": {
-              "label": "Legal Compliance:",
-              "description": "If required by law or to protect our legal rights."
-            }
+            "pagesVisited": "Pàgines visitades i funcions utilitzades",
+            "browserInfo": "Tipus de navegador, tipus de dispositiu, resolució de pantalla",
+            "location": "Ubicació geogràfica aproximada (a nivell de país)",
+            "interactions": "Interaccions amb l'aplicació (anonimitzades)"
+          },
+          "legalBasis": {
+            "label": "Base legal:",
+            "description": "Consentiment (que pots retirar en qualsevol moment)."
+          },
+          "retention": {
+            "label": "Conservació:",
+            "description": "Google Analytics conserva les dades durant 14 mesos per defecte."
           }
-        },
-        "dataSecurity": {
-          "title": "Data Security",
-          "description": "We implement appropriate technical and organizational measures to protect your data:",
-          "items": {
-            "encryption": {
-              "label": "Encryption:",
-              "description": "All data transmitted to our servers uses HTTPS/TLS encryption."
-            },
-            "localStorage": {
-              "label": "Local Storage:",
-              "description": "Most data never leaves your device and is stored locally in your browser."
-            },
-            "https": {
-              "label": "Secure Infrastructure:",
-              "description": "Our website is hosted on secure, reputable platforms (Cloudflare)."
-            },
-            "minimalCollection": {
-              "label": "Minimal Data Collection:",
-              "description": "We only collect data that is strictly necessary for the service."
-            }
-          },
-          "disclaimer": "While we strive to protect your data, no method of transmission over the internet is 100% secure."
-        },
-        "yourRights": {
-          "title": "Your Rights",
-          "description": "Under GDPR and other data protection laws, you have the following rights:",
-          "items": {
-            "access": {
-              "label": "Right to Access:",
-              "description": "You can request a copy of the personal data we hold about you."
-            },
-            "rectification": {
-              "label": "Right to Rectification:",
-              "description": "You can request corrections to inaccurate or incomplete data."
-            },
-            "erasure": {
-              "label": "Right to Erasure ('Right to be Forgotten'):",
-              "description": "You can request deletion of your personal data."
-            },
-            "restrict": {
-              "label": "Right to Restrict Processing:",
-              "description": "You can request restriction of processing your data under certain conditions."
-            },
-            "portability": {
-              "label": "Right to Data Portability:",
-              "description": "You can request your data in a structured, machine-readable format."
-            },
-            "object": {
-              "label": "Right to Object:",
-              "description": "You can object to processing based on legitimate interests or for direct marketing."
-            },
-            "withdrawConsent": {
-              "label": "Right to Withdraw Consent:",
-              "description": "You can withdraw consent for analytics cookies at any time."
-            },
-            "complaint": {
-              "label": "Right to Lodge a Complaint:",
-              "description": "You can file a complaint with the Spanish Data Protection Authority (AEPD) or your local supervisory authority."
-            }
-          },
-          "contact": "To exercise these rights, contact us at {supportEmail}."
-        },
-        "internationalTransfers": {
-          "title": "International Data Transfers",
-          "p1": "Your data may be transferred to and processed in countries outside the European Economic Area (EEA), particularly the United States (Google Analytics, Stripe).",
-          "p2": "We ensure appropriate safeguards are in place, including Standard Contractual Clauses and adherence to the EU-U.S. Data Privacy Framework where applicable."
-        },
-        "childrensPrivacy": {
-          "title": "Children's Privacy",
-          "p1": "Forever PTO is not intended for children under 16 years of age. We do not knowingly collect personal data from children.",
-          "p2": "If we become aware that we have collected data from a child under 16, we will take steps to delete that information promptly."
-        },
-        "changes": {
-          "title": "Changes to This Privacy Policy",
-          "p1": "We may update this Privacy Policy from time to time to reflect changes in our practices, legal requirements, or service features.",
-          "p2": "We will notify users of material changes by updating the 'Last updated' date at the top of this policy.",
-          "p3": "Continued use of Forever PTO after changes constitutes acceptance of the updated policy."
-        },
-        "dataBreach": {
-          "title": "Data Breach Notification",
-          "description": "In the unlikely event of a data breach affecting your personal data, we will notify you and the relevant supervisory authorities within 72 hours as required by GDPR."
-        },
-        "contactInfo": {
-          "title": "Contact Information",
-          "description": "If you have questions about this Privacy Policy or wish to exercise your rights, please contact us:",
-          "items": {
-            "email": {
-              "label": "Email:",
-              "value": "{supportEmail}"
-            },
-            "website": {
-              "label": "Website:",
-              "value": "{siteUrl}"
-            }
-          },
-          "responseTime": "We will respond to your inquiries within 30 days."
-        }
-      }
-    },
-    "termsOfService": {
-      "title": "Terms of Service",
-      "lastUpdated": "Last updated: {date}",
-      "sections": {
-        "acceptance": {
-          "title": "Acceptance of Terms",
-          "p1": "By accessing or using Forever PTO (the 'Service'), you agree to be bound by these Terms of Service ('Terms'). If you do not agree to these Terms, please do not use the Service.",
-          "p2": "These Terms constitute a legally binding agreement between you and Ferran Buireu, the operator of Forever PTO."
-        },
-        "serviceDescription": {
-          "title": "Service Description",
-          "description": "Forever PTO is a web-based tool that helps users plan and optimize their paid time off (PTO) by suggesting optimal vacation dates based on public holidays. The Service is available in two versions:",
-          "freeVersion": {
-            "title": "Free Version",
-            "description": "The free version provides:",
-            "items": {
-              "optimization": "Basic PTO optimization based on public holidays",
-              "visualization": "Calendar visualization of holidays and vacation days",
-              "customHolidays": "Ability to add custom holidays",
-              "metrics": "Basic metrics and summary statistics",
-              "strategy": "Selection of different optimization strategies"
-            }
-          },
-          "premiumVersion": {
-            "title": "Premium Version",
-            "description": "The Premium version includes all free features plus:",
-            "items": {
-              "advancedMetrics": "Advanced metrics and year summary analysis",
-              "charts": "Visual charts and graphs",
-              "efficiency": "PTO efficiency scoring and insights",
-              "strategies": "Multiple optimization strategies with comparisons",
-              "alternatives": "Alternative vacation planning suggestions",
-              "analysis": "In-depth analysis of vacation patterns",
-              "customization": "Enhanced customization options"
-            }
-          }
-        },
-        "eligibility": {
-          "title": "Eligibility",
-          "p1": "By using Forever PTO, you represent and warrant that:",
-          "p2": "We reserve the right to refuse service to anyone for any reason at any time.",
-          "items": {
-            "age": "You are at least 18 years of age",
-            "legalCapacity": "You have the legal capacity to enter into binding contracts",
-            "compliance": "Your use of the Service will comply with all applicable laws and regulations",
-            "lawfulUse": "You will use the Service for lawful purposes only"
-          }
-        },
-        "premiumPayments": {
-          "title": "Premium Version and Payments",
-          "activation": {
-            "title": "Premium Activation",
-            "description": "The Premium version requires a one-time payment processed securely through Stripe. Upon successful payment:",
-            "characteristics": "Premium access is characterized by:",
-            "items": {
-              "oneTime": "One-time payment (no recurring subscription)",
-              "lifetime": "Lifetime access to Premium features",
-              "personal": "Personal, non-transferable license",
-              "multiDevice": "Can be activated on multiple devices using your unique key"
-            }
-          },
-          "pricing": {
-            "title": "Pricing",
-            "p1": "Pricing for Premium access is displayed at the time of purchase and may vary based on promotions or currency fluctuations.",
-            "p2": "All prices are clearly stated before you complete the payment process."
-          },
-          "processing": {
-            "title": "Payment Processing",
-            "description": "Payments are processed securely by Stripe, a third-party payment processor. We do not store your full credit card information.",
-            "items": {
-              "other": "By making a payment, you agree to Stripe's Terms of Service and Privacy Policy."
-            },
-            "p1": "Upon successful payment, you will receive a unique activation key.",
-            "p2": "It is your responsibility to keep this key secure and not share it with others."
-          },
-          "keySecurity": {
-            "title": "Activation Key Security",
-            "p1": "Your Premium activation key is personal and confidential. Sharing or selling your activation key to others is strictly prohibited and constitutes a breach of these Terms.",
-            "p2": "If we detect unauthorized use or sharing of activation keys, we reserve the right to deactivate the key without refund."
-          }
-        },
-        "refundPolicy": {
-          "title": "Refund Policy",
-          "eligibility": {
-            "title": "Refund Eligibility",
-            "description": "We offer refunds under the following circumstances:",
-            "items": {
-              "technical": "Technical issues preventing you from using Premium features (provided we cannot resolve the issue within a reasonable time)",
-              "notAsDescribed": "Premium features are not as described",
-              "accidental": "Accidental purchase (must be requested within 24 hours)",
-              "notSatisfied": "You are not satisfied with Premium features (within 14 days of purchase, in accordance with EU consumer protection laws)"
-            }
-          },
-          "exclusions": {
-            "title": "Refund Exclusions",
-            "description": "Refunds will NOT be granted in the following cases:",
-            "items": {
-              "timePassed": "More than 14 days have passed since the purchase (unless covered by statutory rights)",
-              "violatedTerms": "You have violated these Terms of Service",
-              "sharedKey": "You have shared or sold your activation key",
-              "fraudulent": "The purchase was made fraudulently"
-            }
-          },
-          "process": {
-            "title": "Refund Process",
-            "description": "To request a refund:",
-            "steps": {
-              "contact": "1. Contact us at {supportEmail} with your transaction ID",
-              "include": "2. Include a brief explanation of why you are requesting a refund",
-              "review": "3. We will review your request within 5 business days",
-              "processing": "4. If approved, the refund will be processed to your original payment method within 10 business days"
-            }
-          },
-          "postRefund": {
-            "title": "Post-Refund Access",
-            "description": "Upon issuing a refund, your Premium activation key will be deactivated, and you will lose access to Premium features."
-          },
-          "euRights": {
-            "title": "EU Consumer Rights",
-            "p1": "If you are a consumer based in the European Union, you have the right to withdraw from the purchase within 14 days without giving any reason, in accordance with Directive 2011/83/EU.",
-            "p2": "However, you acknowledge that by activating your Premium key and using Premium features, you waive this right as the digital content has been fully performed."
-          }
-        },
-        "userResponsibilities": {
-          "title": "User Responsibilities",
-          "description": "When using Forever PTO, you agree to:",
-          "items": {
-            "compliance": "Comply with all applicable laws and regulations",
-            "noHarm": "Not use the Service in any way that could harm, disable, or impair the Service",
-            "noUnauthorizedAccess": "Not attempt unauthorized access to any part of the Service, servers, or databases",
-            "noBots": "Not use automated systems (bots, scrapers) to access the Service",
-            "noReverseEngineer": "Not reverse engineer, decompile, or disassemble any part of the Service",
-            "noShare": "Not share your Premium activation key with others",
-            "verifyHolidays": "Verify holiday information with official sources before making important decisions",
-            "noIllegal": "Not use the Service for any unlawful purpose"
-          }
-        },
-        "disclaimer": {
-          "title": "Disclaimers and Limitations",
-          "description": "Forever PTO is provided 'as is' without warranties of any kind. We specifically disclaim:",
-          "items": {
-            "accuracy": {
-              "label": "Accuracy of Holiday Data:",
-              "description": "While we strive for accuracy, holiday data is sourced from third-party APIs and may contain errors. Always verify with official sources."
-            },
-            "availability": {
-              "label": "Service Availability:",
-              "description": "We do not guarantee uninterrupted or error-free operation of the Service."
-            },
-            "fitness": {
-              "label": "Fitness for Purpose:",
-              "description": "We do not guarantee that the Service will meet your specific requirements or expectations."
-            },
-            "dataIntegrity": {
-              "label": "Data Integrity:",
-              "description": "While we implement security measures, we cannot guarantee absolute security of data stored locally in your browser."
-            }
-          },
-          "acknowledgement": "You acknowledge that the Service is a planning tool and should not be relied upon as the sole basis for employment decisions."
-        },
-        "limitationOfLiability": {
-          "title": "Limitation of Liability",
-          "description": "To the fullest extent permitted by law, Ferran Buireu and Forever PTO shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to:",
-          "items": {
-            "profits": "Loss of profits, revenue, or business opportunities",
-            "dataLoss": "Data loss or corruption",
-            "employment": "Employment-related consequences based on incorrect holiday information",
-            "interruptions": "Interruptions or errors in the Service",
-            "unauthorizedAccess": "Unauthorized access to your locally stored data"
-          },
-          "maxLiability": "Our total liability for any claims arising out of or related to these Terms or the Service shall not exceed the amount you paid for Premium access (if applicable) or €50, whichever is greater."
-        },
-        "intellectualProperty": {
-          "title": "Intellectual Property",
-          "description": "Forever PTO and all its content, features, and functionality (including but not limited to code, design, text, graphics, and logos) are owned by Ferran Buireu and are protected by international copyright, trademark, and other intellectual property laws.",
-          "limitedLicense": {
-            "title": "Limited License",
-            "description": "We grant you a limited, non-exclusive, non-transferable license to use Forever PTO for personal, non-commercial purposes. This license does not include any resale or commercial use of the Service or its content."
-          },
-          "openSource": {
-            "title": "Open Source Code",
-            "description": "Parts of Forever PTO may be available as open-source software under specific licenses. See our <link>GitHub repository</link> for details."
-          },
-          "restrictions": {
-            "title": "Restrictions",
-            "description": "You may not:",
-            "items": {
-              "copy": "Copy, modify, or distribute the Service or its content",
-              "derivative": "Create derivative works based on the Service",
-              "remove": "Remove any copyright or proprietary notices",
-              "trademarks": "Use any trademarks, logos, or service marks without permission"
-            }
-          }
-        },
-        "thirdPartyServices": {
-          "title": "Third-Party Services",
-          "description": "Forever PTO integrates with third-party services, including:",
-          "items": {
-            "payment": "Stripe for payment processing",
-            "holidayApis": "External APIs for holiday data",
-            "analytics": "Google Analytics for usage statistics (if consented)",
-            "external": "Links to external websites"
-          },
-          "disclaimer1": "We are not responsible for the content, privacy policies, or practices of third-party services.",
-          "disclaimer2": "Your use of third-party services is subject to their respective terms and conditions."
-        },
-        "modifications": {
-          "title": "Modifications and Termination",
-          "serviceModifications": {
-            "title": "Modifications to the Service",
-            "description": "We reserve the right to:",
-            "items": {
-              "modify": "Modify, suspend, or discontinue any part of the Service at any time",
-              "changeFeatures": "Change features, pricing, or availability of Premium",
-              "updatePricing": "Update pricing for future Premium purchases (existing Premium users are unaffected)",
-              "impose": "Impose limits on certain features"
-            },
-            "notice": "We will make reasonable efforts to notify users of material changes."
-          },
-          "terminationByUs": {
-            "title": "Termination by Us",
-            "description": "We may terminate or suspend your access to the Service immediately, without prior notice or liability, if you:",
-            "items": {
-              "violateTerms": "Violate these Terms",
-              "fraudulent": "Engage in fraudulent activity",
-              "shareKey": "Share your Premium activation key",
-              "requiredByLaw": "If required by law or court order",
-              "discontinue": "If we discontinue the Service"
-            }
-          },
-          "terminationByYou": {
-            "title": "Termination by You",
-            "description": "You may stop using the Service at any time. To delete your locally stored data, clear your browser's local storage."
-          },
-          "effectOfTermination": {
-            "title": "Effect of Termination",
-            "description": "Upon termination:",
-            "items": {
-              "rightsCease": "Your right to use the Service ceases immediately",
-              "keyDeactivated": "Your Premium activation key (if any) may be deactivated",
-              "dataRemains": "Data stored locally in your browser remains until you delete it",
-              "provisions": "Provisions regarding intellectual property, disclaimers, and limitations of liability survive termination"
-            }
-          }
-        },
-        "indemnification": {
-          "title": "Indemnification",
-          "description": "You agree to indemnify, defend, and hold harmless Ferran Buireu and Forever PTO from any claims, damages, losses, liabilities, and expenses (including legal fees) arising out of:",
-          "items": {
-            "misuse": "Your misuse of the Service",
-            "violateTerms": "Your violation of these Terms",
-            "violateRights": "Your violation of any rights of another person or entity",
-            "violateLaws": "Your violation of any applicable laws or regulations"
-          }
-        },
-        "governingLaw": {
-          "title": "Governing Law and Dispute Resolution",
-          "law": {
-            "title": "Governing Law",
-            "description": "These Terms are governed by and construed in accordance with the laws of Spain, without regard to its conflict of law principles."
-          },
-          "jurisdiction": {
-            "title": "Jurisdiction",
-            "description": "Any disputes arising out of or related to these Terms or the Service shall be subject to the exclusive jurisdiction of the courts of Barcelona, Spain."
-          },
-          "disputeResolution": {
-            "title": "Dispute Resolution",
-            "description": "Before initiating any legal proceedings, we encourage you to contact us at {supportEmail} to seek an amicable resolution."
-          },
-          "euOdr": {
-            "title": "EU Online Dispute Resolution",
-            "description": "If you are a consumer based in the European Union, you may use the <link>EU Online Dispute Resolution platform</link> to resolve disputes."
-          }
-        },
-        "severability": {
-          "title": "Severability",
-          "description": "If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions will remain in full force and effect."
-        },
-        "entireAgreement": {
-          "title": "Entire Agreement",
-          "description": "These Terms, together with our Privacy Policy and Cookie Policy, constitute the entire agreement between you and Forever PTO regarding the use of the Service."
-        },
-        "waiver": {
-          "title": "Waiver",
-          "description": "Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights."
-        },
-        "changes": {
-          "title": "Changes to These Terms",
-          "p1": "We may update these Terms from time to time to reflect changes in our practices, legal requirements, or service features.",
-          "p2": "We will notify users of material changes by updating the 'Last updated' date at the top of these Terms. Continued use of the Service after changes constitutes acceptance of the updated Terms."
-        },
-        "contactInfo": {
-          "title": "Contact Information",
-          "description": "If you have questions about these Terms of Service, please contact us:",
-          "items": {
-            "email": {
-              "label": "Email:",
-              "value": "{supportEmail}"
-            },
-            "website": {
-              "label": "Website:",
-              "value": "{siteUrl}"
-            }
-          },
-          "responseTime": "We will respond to your inquiries within 5 business days."
-        }
-      }
-    },
-    "legalNotice": {
-      "title": "Legal Notice",
-      "lastUpdated": "Last updated: {date}",
-      "sections": {
-        "identification": {
-          "title": "Website Owner Identification",
-          "description": "In compliance with Law 34/2002, of July 11, on Information Society Services and Electronic Commerce (LSSI-CE), the following information is provided:",
-          "items": {
-            "owner": {
-              "label": "Owner:",
-              "value": "Ferran Buireu"
-            },
-            "email": {
-              "label": "Email:",
-              "value": "{supportEmail}"
-            },
-            "website": {
-              "label": "Website:",
-              "value": "{siteUrl}"
-            }
-          }
-        },
-        "purpose": {
-          "title": "Purpose of the Website",
-          "description": "Forever PTO (https://forever-pto.com) is a web application designed to help users plan and optimize their paid time off (PTO) by providing holiday information and vacation planning tools.",
-          "offers": "The website offers:",
-          "items": {
-            "freeVersion": {
-              "label": "Free Version:",
-              "description": "Basic PTO optimization, calendar visualization, and holiday information."
-            },
-            "premiumVersion": {
-              "label": "Premium Version:",
-              "description": "Advanced analytics, charts, and enhanced planning features available through a one-time payment."
-            }
-          }
-        },
-        "accessConditions": {
-          "title": "Access and Use Conditions",
-          "description": "Access to and use of this website is subject to the following conditions:",
-          "userAgreement": "By accessing this website, you agree to:",
-          "items": {
-            "correctUse": "Use the website correctly and lawfully",
-            "noIllegal": "Not use it for illegal purposes or activities that violate these terms",
-            "noVirus": "Not introduce or spread viruses or malicious code",
-            "noUnauthorized": "Not attempt unauthorized access to the website's systems",
-            "noShareKey": "Not share Premium activation keys obtained through payment"
-          }
-        },
-        "liability": {
-          "title": "Liability",
-          "description": "Ferran Buireu is not responsible for:",
-          "items": {
-            "accuracy": "The accuracy or completeness of holiday information obtained from third-party sources",
-            "decisions": "Decisions made by users based on information provided by the website",
-            "interruptions": "Temporary interruptions or technical issues affecting the website",
-            "misuse": "Misuse of the website by users",
-            "thirdParty": "The content or privacy practices of third-party websites linked from Forever PTO"
-          },
-          "disclaimer": "The information provided is for planning purposes only. Users should verify holiday information with official sources before making employment-related decisions."
-        },
-        "intellectualProperty": {
-          "title": "Intellectual Property",
-          "p1": "All content on this website, including but not limited to text, graphics, logos, code, and design, is the property of Ferran Buireu and is protected by Spanish and international intellectual property laws.",
-          "p2": "Users are granted a personal, non-exclusive, non-transferable license to use the website for its intended purpose. Reproduction, distribution, modification, or commercial use of the website's content without express permission is prohibited.",
-          "p3": "Some parts of the website may be available as open-source software. For details, please visit our <link>GitHub repository</link>."
-        },
-        "thirdPartyLinks": {
-          "title": "Links to Third-Party Websites",
-          "p1": "This website may contain links to third-party websites. These links are provided for convenience and informational purposes only.",
-          "p2": "Ferran Buireu does not control or endorse the content of third-party websites and is not responsible for their privacy policies or practices."
-        },
-        "modifications": {
-          "title": "Modifications to the Legal Notice",
-          "p1": "Ferran Buireu reserves the right to modify this Legal Notice at any time to adapt to legislative changes or updates to the website.",
-          "p2": "Users are advised to periodically review this Legal Notice to stay informed of any changes."
-        },
-        "applicableLaw": {
-          "title": "Applicable Law and Jurisdiction",
-          "description": "This Legal Notice is governed by Spanish law. For any disputes arising from the use of this website, the parties submit to the jurisdiction of the courts of Barcelona, Spain, waiving any other jurisdiction that may apply."
         },
         "contact": {
-          "title": "Contact",
-          "description": "For any questions or clarifications regarding this Legal Notice, please contact us at:",
+          "title": "Dades del formulari de contacte",
+          "description": "Si ens contactes a través del formulari de contacte, recopilem el teu nom, email i missatge.",
+          "legalBasis": {
+            "label": "Base legal:",
+            "description": "Interès legítim en respondre a la teva consulta."
+          },
+          "retention": {
+            "label": "Conservació:",
+            "description": "Es conserven durant el temps necessari per respondre i després s'eliminen."
+          }
+        }
+      },
+      "cookiesAndTracking": {
+        "title": "Cookies i tecnologies de seguiment",
+        "description": "Per a informació detallada sobre cookies, consulta la nostra <link>Política de cookies</link>."
+      },
+      "dataSharing": {
+        "title": "Compartició de dades",
+        "description": "No venem les teves dades personals. Només compartim dades amb tercers de confiança quan és necessari:",
+        "items": {
+          "paymentProcessors": {
+            "label": "Stripe (processament de pagaments):",
+            "description": "Gestiona tot el processament de pagaments de manera segura. Consulta la Política de privadesa de Stripe."
+          },
+          "holidayProviders": {
+            "label": "Proveïdors de dades de festius:",
+            "description": "Obtenim dades de festius públics d'APIs externes, però no compartim la teva informació personal amb ells."
+          },
+          "analytics": {
+            "label": "Google Analytics (si hi consents):",
+            "description": "Processa dades d'ús anonimitzades. Consulta la Política de privadesa de Google."
+          },
+          "legal": {
+            "label": "Compliment legal:",
+            "description": "Si ho exigeix la llei o per protegir els nostres drets legals."
+          },
+          "betterStack": {
+            "label": "Better Stack (Analítica, si s'ha donat el consentiment):",
+            "description": "Processa dades d'ús anonimitzades i fa un seguiment de les interaccions dels usuaris per millorar el producte. Consulta la política de privadesa de Better Stack."
+          }
+        }
+      },
+      "dataSecurity": {
+        "title": "Seguretat de les dades",
+        "description": "Implementem mesures tècniques i organitzatives adequades per protegir les teves dades:",
+        "items": {
+          "encryption": {
+            "label": "Xifratge:",
+            "description": "Totes les dades transmeses als nostres servidors utilitzen xifratge HTTPS/TLS."
+          },
+          "localStorage": {
+            "label": "Emmagatzematge local:",
+            "description": "La majoria de les dades mai surten del teu dispositiu i s'emmagatzemen localment al teu navegador."
+          },
+          "https": {
+            "label": "Infraestructura segura:",
+            "description": "El nostre lloc web està allotjat en plataformes segures i reconegudes (Cloudflare)."
+          },
+          "minimalCollection": {
+            "label": "Recol·lecció mínima de dades:",
+            "description": "Només recopilem les dades estrictament necessàries per al servei."
+          }
+        },
+        "disclaimer": "Tot i que ens esforcem per protegir les teves dades, cap mètode de transmissió per internet és 100% segur."
+      },
+      "yourRights": {
+        "title": "Els teus drets",
+        "description": "Segons el RGPD i altres lleis de protecció de dades, tens els drets següents:",
+        "items": {
+          "access": {
+            "label": "Dret d'accés:",
+            "description": "Pots sol·licitar una còpia de les dades personals que tenim sobre tu."
+          },
+          "rectification": {
+            "label": "Dret de rectificació:",
+            "description": "Pots sol·licitar la correcció de dades inexactes o incompletes."
+          },
+          "erasure": {
+            "label": "Dret de supressió ('dret a l'oblit'):",
+            "description": "Pots sol·licitar l'eliminació de les teves dades personals."
+          },
+          "restrict": {
+            "label": "Dret a la limitació del tractament:",
+            "description": "Pots sol·licitar la limitació del tractament de les teves dades en determinades circumstàncies."
+          },
+          "portability": {
+            "label": "Dret a la portabilitat de dades:",
+            "description": "Pots sol·licitar les teves dades en un format estructurat i llegible per màquina."
+          },
+          "object": {
+            "label": "Dret d'oposició:",
+            "description": "Pots oposar-te al tractament basat en interessos legítims o amb finalitats de màrqueting directe."
+          },
+          "withdrawConsent": {
+            "label": "Dret a retirar el consentiment:",
+            "description": "Pots retirar el consentiment per a les cookies analítiques en qualsevol moment."
+          },
+          "complaint": {
+            "label": "Dret a presentar una reclamació:",
+            "description": "Pots presentar una reclamació davant l'Autoritat Catalana de Protecció de Dades (APDCAT), l'Agència Espanyola de Protecció de Dades (AEPD) o la teva autoritat de control local."
+          }
+        },
+        "contact": "Per exercir aquests drets, contacta amb nosaltres a {supportEmail}."
+      },
+      "internationalTransfers": {
+        "title": "Transferències internacionals de dades",
+        "p1": "Les teves dades poden ser transferides i processades en països fora de l'Espai Econòmic Europeu (EEE), particularment als Estats Units (Google Analytics, Stripe).",
+        "p2": "Ens assegurem que hi hagi les garanties adequades, incloent-hi Clàusules Contractuals Tipus i l'adhesió al Marc de Privadesa de Dades UE-EUA quan correspongui."
+      },
+      "childrensPrivacy": {
+        "title": "Privadesa de menors",
+        "p1": "Forever PTO no està dirigit a menors de 16 anys. No recopilem conscientment dades personals de menors.",
+        "p2": "Si tenim coneixement que hem recopilat dades d'un menor de 16 anys, prendrem mesures per eliminar aquesta informació de manera immediata."
+      },
+      "changes": {
+        "title": "Canvis en aquesta Política de privadesa",
+        "p1": "Podem actualitzar aquesta Política de privadesa de tant en tant per reflectir canvis en les nostres pràctiques, requisits legals o funcions del servei.",
+        "p2": "Notificarem als usuaris de canvis significatius actualitzant la data d''Darrera actualització' a la part superior d'aquesta política.",
+        "p3": "L'ús continuat de Forever PTO després dels canvis implica l'acceptació de la política actualitzada."
+      },
+      "dataBreach": {
+        "title": "Notificació de bretxes de seguretat",
+        "description": "En el cas improbable d'una bretxa de seguretat que afecti les teves dades personals, et notificarem a tu i a les autoritats de control competents en un termini de 72 hores, tal com exigeix el RGPD."
+      },
+      "contactInfo": {
+        "title": "Informació de contacte",
+        "description": "Si tens preguntes sobre aquesta Política de privadesa o vols exercir els teus drets, contacta amb nosaltres:",
+        "items": {
+          "email": {
+            "label": "Email:",
+            "value": "{supportEmail}"
+          },
+          "website": {
+            "label": "Lloc web:",
+            "value": "{siteUrl}"
+          }
+        },
+        "responseTime": "Respondrem a les teves consultes en un termini de 30 dies."
+      }
+    }
+  },
+  "termsOfService": {
+    "title": "Condicions del servei",
+    "lastUpdated": "Darrera actualització: {date}",
+    "sections": {
+      "acceptance": {
+        "title": "Acceptació de les condicions",
+        "p1": "En accedir o utilitzar Forever PTO (el 'Servei'), acceptes quedar vinculat per aquestes Condicions del servei ('Condicions'). Si no estàs d'acord amb aquestes Condicions, no utilitzis el Servei.",
+        "p2": "Aquestes Condicions constitueixen un acord legalment vinculant entre tu i {author}, l'operador de Forever PTO."
+      },
+      "serviceDescription": {
+        "title": "Descripció del servei",
+        "description": "Forever PTO és una eina web que ajuda els usuaris a planificar i optimitzar els seus dies lliures remunerats (PTO) suggerint dates de vacances òptimes basades en els festius públics. El Servei està disponible en dues versions:",
+        "freeVersion": {
+          "title": "Versió gratuïta",
+          "description": "La versió gratuïta inclou:",
           "items": {
-            "email": {
-              "label": "Email:",
-              "value": "{supportEmail}"
-            }
+            "optimization": "Optimització bàsica de PTO basada en festius públics",
+            "visualization": "Visualització del calendari amb festius i dies de vacances",
+            "customHolidays": "Possibilitat d'afegir festius personalitzats",
+            "metrics": "Mètriques bàsiques i estadístiques resumides",
+            "strategy": "Selecció de diferents estratègies d'optimització"
+          }
+        },
+        "premiumVersion": {
+          "title": "Versió Premium",
+          "description": "La versió Premium inclou totes les funcions gratuïtes més:",
+          "items": {
+            "advancedMetrics": "Mètriques avançades i anàlisi del resum anual",
+            "charts": "Gràfics i diagrames visuals",
+            "efficiency": "Puntuació d'eficiència del PTO i insights",
+            "strategies": "Múltiples estratègies d'optimització amb comparacions",
+            "alternatives": "Suggeriments alternatius de planificació de vacances",
+            "analysis": "Anàlisi en profunditat de patrons vacancionals",
+            "customization": "Opcions de personalització millorades"
+          }
+        }
+      },
+      "eligibility": {
+        "title": "Requisits",
+        "p1": "En utilitzar Forever PTO, declares i garanteixes que:",
+        "p2": "Ens reservem el dret de denegar el servei a qualsevol persona per qualsevol motiu en qualsevol moment.",
+        "items": {
+          "age": "Tens almenys 18 anys d'edat",
+          "legalCapacity": "Tens la capacitat legal per celebrar contractes vinculants",
+          "compliance": "El teu ús del Servei complirà totes les lleis i normatives aplicables",
+          "lawfulUse": "Utilitzaràs el Servei únicament amb finalitats legals"
+        }
+      },
+      "premiumPayments": {
+        "title": "Versió Premium i pagaments",
+        "activation": {
+          "title": "Activació Premium",
+          "description": "La versió Premium requereix un pagament únic processat de manera segura a través de Stripe. Després del pagament correcte:",
+          "characteristics": "L'accés Premium es caracteritza per:",
+          "items": {
+            "oneTime": "Pagament únic (sense subscripció recurrent)",
+            "lifetime": "Accés de per vida a les funcions Premium",
+            "personal": "Llicència personal i intransferible",
+            "multiDevice": "Es pot activar en múltiples dispositius utilitzant la teva clau única"
+          }
+        },
+        "pricing": {
+          "title": "Preus",
+          "p1": "El preu de l'accés Premium es mostra en el moment de la compra i pot variar segons promocions o fluctuacions de divises.",
+          "p2": "Tots els preus s'indiquen clarament abans de completar el procés de pagament."
+        },
+        "processing": {
+          "title": "Processament de pagaments",
+          "description": "Els pagaments es processen de manera segura per Stripe, un processador de pagaments de tercers. No emmagatzemem la informació completa de la teva targeta de crèdit.",
+          "items": {
+            "other": "En realitzar un pagament, acceptes les Condicions del servei i la Política de privadesa de Stripe."
+          },
+          "p1": "Després del pagament correcte, rebràs una clau d'activació única.",
+          "p2": "És la teva responsabilitat mantenir aquesta clau segura i no compartir-la amb altres."
+        },
+        "keySecurity": {
+          "title": "Seguretat de la clau d'activació",
+          "p1": "La teva clau d'activació Premium és personal i confidencial. Compartir o vendre la teva clau d'activació a altres està estrictament prohibit i constitueix un incompliment d'aquestes Condicions.",
+          "p2": "Si detectem un ús no autoritzat o la compartició de claus d'activació, ens reservem el dret de desactivar la clau sense reemborsament."
+        }
+      },
+      "refundPolicy": {
+        "title": "Política de reemborsament",
+        "eligibility": {
+          "title": "Elegibilitat per al reemborsament",
+          "description": "Oferim reemborsaments en les circumstàncies següents:",
+          "items": {
+            "technical": "Problemes tècnics que t'impedeixin utilitzar les funcions Premium (sempre que no puguem resoldre el problema en un termini raonable)",
+            "notAsDescribed": "Les funcions Premium no es corresponen amb el que s'ha descrit",
+            "accidental": "Compra accidental (s'ha de sol·licitar dins les 24 hores següents)",
+            "notSatisfied": "No estàs satisfet amb les funcions Premium (dins dels 14 dies posteriors a la compra, d'acord amb les lleis de protecció del consumidor de la UE)"
+          }
+        },
+        "exclusions": {
+          "title": "Exclusions del reemborsament",
+          "description": "NO es concediran reemborsaments en els casos següents:",
+          "items": {
+            "timePassed": "Han passat més de 14 dies des de la compra (tret que estigui cobert per drets legals)",
+            "violatedTerms": "Has incomplert aquestes Condicions del servei",
+            "sharedKey": "Has compartit o venut la teva clau d'activació",
+            "fraudulent": "La compra es va realitzar de manera fraudulenta"
+          }
+        },
+        "process": {
+          "title": "Procés de reemborsament",
+          "description": "Per sol·licitar un reemborsament:",
+          "steps": {
+            "contact": "1. Contacta amb nosaltres a {supportEmail} amb el teu ID de transacció",
+            "include": "2. Inclou una breu explicació del motiu de la teva sol·licitud de reemborsament",
+            "review": "3. Revisarem la teva sol·licitud en un termini de 5 dies laborables",
+            "processing": "4. Si s'aprova, el reemborsament es processarà al teu mètode de pagament original en un termini de 10 dies laborables"
+          }
+        },
+        "postRefund": {
+          "title": "Accés després del reemborsament",
+          "description": "Després d'emetre un reemborsament, la teva clau d'activació Premium es desactivarà i perdràs l'accés a les funcions Premium."
+        },
+        "euRights": {
+          "title": "Drets del consumidor de la UE",
+          "p1": "Si ets consumidor de la Unió Europea, tens dret a desistir de la compra en un termini de 14 dies sense necessitat de justificació, d'acord amb la Directiva 2011/83/UE.",
+          "p2": "No obstant això, reconeixes que en activar la teva clau Premium i utilitzar les funcions Premium, renuncies a aquest dret ja que el contingut digital ha estat completament subministrat."
+        }
+      },
+      "userResponsibilities": {
+        "title": "Responsabilitats de l'usuari",
+        "description": "En utilitzar Forever PTO, acceptes:",
+        "items": {
+          "compliance": "Complir totes les lleis i normatives aplicables",
+          "noHarm": "No utilitzar el Servei de cap manera que pugui danyar, deshabilitar o perjudicar el Servei",
+          "noUnauthorizedAccess": "No intentar accedir de manera no autoritzada a cap part del Servei, servidors o bases de dades",
+          "noBots": "No utilitzar sistemes automatitzats (bots, scrapers) per accedir al Servei",
+          "noReverseEngineer": "No fer enginyeria inversa, descompilar ni desensamblar cap part del Servei",
+          "noShare": "No compartir la teva clau d'activació Premium amb altres",
+          "verifyHolidays": "Verificar la informació de festius amb fonts oficials abans de prendre decisions importants",
+          "noIllegal": "No utilitzar el Servei amb finalitats il·lícites"
+        }
+      },
+      "disclaimer": {
+        "title": "Exempcions de responsabilitat i limitacions",
+        "description": "Forever PTO es proporciona 'tal qual' sense garanties de cap tipus. Específicament renunciem a:",
+        "items": {
+          "accuracy": {
+            "label": "Exactitud de les dades de festius:",
+            "description": "Tot i que ens esforcem per la precisió, les dades de festius provenen d'APIs de tercers i poden contenir errors. Verifica sempre amb fonts oficials."
+          },
+          "availability": {
+            "label": "Disponibilitat del servei:",
+            "description": "No garantim un funcionament ininterromput ni lliure d'errors del Servei."
+          },
+          "fitness": {
+            "label": "Adequació al propòsit:",
+            "description": "No garantim que el Servei compleixi els teus requisits o expectatives específiques."
+          },
+          "dataIntegrity": {
+            "label": "Integritat de les dades:",
+            "description": "Tot i que implementem mesures de seguretat, no podem garantir la seguretat absoluta de les dades emmagatzemades localment al teu navegador."
+          }
+        },
+        "acknowledgement": "Reconeixes que el Servei és una eina de planificació i no s'ha d'utilitzar com a única base per a decisions laborals."
+      },
+      "limitationOfLiability": {
+        "title": "Limitació de responsabilitat",
+        "description": "En la màxima mesura permesa per la llei, {author} i Forever PTO no seran responsables de cap dany indirecte, incidental, especial, conseqüent o punitiu, incloent-hi però sense limitar-se a:",
+        "items": {
+          "profits": "Pèrdua de beneficis, ingressos o oportunitats de negoci",
+          "dataLoss": "Pèrdua o corrupció de dades",
+          "employment": "Conseqüències laborals derivades d'informació incorrecta sobre festius",
+          "interruptions": "Interrupcions o errors en el Servei",
+          "unauthorizedAccess": "Accés no autoritzat a les teves dades emmagatzemades localment"
+        },
+        "maxLiability": "La nostra responsabilitat total per qualsevol reclamació derivada de o relacionada amb aquestes Condicions o el Servei no excedirà l'import pagat per l'accés Premium (si correspon) o 50 €, el que sigui més gran."
+      },
+      "intellectualProperty": {
+        "title": "Propietat intel·lectual",
+        "description": "Forever PTO i tot el seu contingut, funcions i funcionalitats (incloent-hi, entre d'altres, codi, disseny, text, gràfics i logotips) són propietat de {author} i estan protegits per les lleis internacionals de drets d'autor, marques registrades i altres lleis de propietat intel·lectual.",
+        "limitedLicense": {
+          "title": "Llicència limitada",
+          "description": "Et concedim una llicència limitada, no exclusiva i intransferible per utilitzar Forever PTO amb finalitats personals i no comercials. Aquesta llicència no inclou la revenda ni l'ús comercial del Servei o el seu contingut."
+        },
+        "openSource": {
+          "title": "Codi obert",
+          "description": "Parts de Forever PTO poden estar disponibles com a programari de codi obert sota llicències específiques. Consulta el nostre <link>repositori de GitHub</link> per a més detalls."
+        },
+        "restrictions": {
+          "title": "Restriccions",
+          "description": "No pots:",
+          "items": {
+            "copy": "Copiar, modificar o distribuir el Servei o el seu contingut",
+            "derivative": "Crear obres derivades basades en el Servei",
+            "remove": "Eliminar avisos de drets d'autor o de propietat",
+            "trademarks": "Utilitzar marques comercials, logotips o marques de servei sense permís"
+          }
+        }
+      },
+      "thirdPartyServices": {
+        "title": "Serveis de tercers",
+        "description": "Forever PTO s'integra amb serveis de tercers, incloent-hi:",
+        "items": {
+          "payment": "Stripe per al processament de pagaments",
+          "holidayApis": "APIs externes per a dades de festius",
+          "analytics": "Google Analytics per a estadístiques d'ús (si hi consents)",
+          "external": "Enllaços a llocs web externs"
+        },
+        "disclaimer1": "No som responsables del contingut, polítiques de privadesa o pràctiques dels serveis de tercers.",
+        "disclaimer2": "El teu ús dels serveis de tercers està subjecte als seus respectius termes i condicions."
+      },
+      "modifications": {
+        "title": "Modificacions i rescissió",
+        "serviceModifications": {
+          "title": "Modificacions del servei",
+          "description": "Ens reservem el dret de:",
+          "items": {
+            "modify": "Modificar, suspendre o interrompre qualsevol part del Servei en qualsevol moment",
+            "changeFeatures": "Canviar funcions, preus o disponibilitat de Premium",
+            "updatePricing": "Actualitzar preus per a futures compres de Premium (els usuaris Premium existents no es veuen afectats)",
+            "impose": "Imposar límits en determinades funcions"
+          },
+          "notice": "Farem esforços raonables per notificar als usuaris de canvis significatius."
+        },
+        "terminationByUs": {
+          "title": "Rescissió per part nostra",
+          "description": "Podem rescindir o suspendre el teu accés al Servei de manera immediata, sense previ avís ni responsabilitat, si:",
+          "items": {
+            "violateTerms": "Incompleixes aquestes Condicions",
+            "fraudulent": "Realitzes activitats fraudulentes",
+            "shareKey": "Comparteixes la teva clau d'activació Premium",
+            "requiredByLaw": "Ho exigeix la llei o una ordre judicial",
+            "discontinue": "Deixem d'oferir el Servei"
+          }
+        },
+        "terminationByYou": {
+          "title": "Rescissió per part teva",
+          "description": "Pots deixar d'utilitzar el Servei en qualsevol moment. Per eliminar les teves dades emmagatzemades localment, esborra l'emmagatzematge local del teu navegador."
+        },
+        "effectOfTermination": {
+          "title": "Efectes de la rescissió",
+          "description": "Després de la rescissió:",
+          "items": {
+            "rightsCease": "El teu dret a utilitzar el Servei cessa immediatament",
+            "keyDeactivated": "La teva clau d'activació Premium (si n'hi ha) pot ser desactivada",
+            "dataRemains": "Les dades emmagatzemades localment al teu navegador romanen fins que les eliminis",
+            "provisions": "Les disposicions relatives a propietat intel·lectual, exempcions de responsabilitat i limitacions de responsabilitat sobreviuen a la rescissió"
+          }
+        }
+      },
+      "indemnification": {
+        "title": "Indemnització",
+        "description": "Acceptes indemnitzar, defensar i mantenir indemne {author} i Forever PTO davant de qualsevol reclamació, dany, pèrdua, responsabilitat i despesa (inclosos honoraris legals) derivats de:",
+        "items": {
+          "misuse": "El teu ús indegut del Servei",
+          "violateTerms": "El teu incompliment d'aquestes Condicions",
+          "violateRights": "La teva vulneració dels drets de qualsevol altra persona o entitat",
+          "violateLaws": "El teu incompliment de qualsevol llei o normativa aplicable"
+        }
+      },
+      "governingLaw": {
+        "title": "Llei aplicable i resolució de disputes",
+        "law": {
+          "title": "Llei aplicable",
+          "description": "Aquestes Condicions es regeixen i s'interpreten d'acord amb les lleis d'Espanya, sense tenir en compte els seus principis de conflicte de lleis."
+        },
+        "jurisdiction": {
+          "title": "Jurisdicció",
+          "description": "Qualsevol disputa derivada de o relacionada amb aquestes Condicions o el Servei estarà subjecta a la jurisdicció exclusiva dels tribunals de Barcelona, Espanya."
+        },
+        "disputeResolution": {
+          "title": "Resolució de disputes",
+          "description": "Abans d'iniciar qualsevol procediment legal, t'animem a contactar-nos a {supportEmail} per buscar una resolució amistosa."
+        },
+        "euOdr": {
+          "title": "Resolució de litigis en línia de la UE",
+          "description": "Si ets consumidor de la Unió Europea, pots utilitzar la <link>plataforma de resolució de litigis en línia de la UE</link> per resoldre disputes."
+        }
+      },
+      "severability": {
+        "title": "Divisibilitat",
+        "description": "Si alguna disposició d'aquestes Condicions es considera invàlida o inaplicable, les disposicions restants seguiran plenament vigents."
+      },
+      "entireAgreement": {
+        "title": "Acord complet",
+        "description": "Aquestes Condicions, juntament amb la nostra Política de privadesa i Política de cookies, constitueixen l'acord complet entre tu i Forever PTO respecte a l'ús del Servei."
+      },
+      "waiver": {
+        "title": "Renúncia",
+        "description": "El fet que no exercim algun dret o disposició d'aquestes Condicions no es considerarà una renúncia a aquests drets."
+      },
+      "changes": {
+        "title": "Canvis en aquestes Condicions",
+        "p1": "Podem actualitzar aquestes Condicions de tant en tant per reflectir canvis en les nostres pràctiques, requisits legals o funcions del servei.",
+        "p2": "Notificarem als usuaris de canvis significatius actualitzant la data d''Darrera actualització' a la part superior d'aquestes Condicions. L'ús continuat del Servei després dels canvis implica l'acceptació de les Condicions actualitzades."
+      },
+      "contactInfo": {
+        "title": "Informació de contacte",
+        "description": "Si tens preguntes sobre aquestes Condicions del servei, contacta amb nosaltres:",
+        "items": {
+          "email": {
+            "label": "Email:",
+            "value": "{supportEmail}"
+          },
+          "website": {
+            "label": "Lloc web:",
+            "value": "{siteUrl}"
+          }
+        },
+        "responseTime": "Respondrem a les teves consultes en un termini de 5 dies laborables."
+      }
+    }
+  },
+  "legalNotice": {
+    "title": "Avís legal",
+    "lastUpdated": "Darrera actualització: {date}",
+    "sections": {
+      "identification": {
+        "title": "Identificació del titular del lloc web",
+        "description": "En compliment de la Llei 34/2002, d'11 de juliol, de Serveis de la Societat de la Informació i de Comerç Electrònic (LSSI-CE), es facilita la informació següent:",
+        "items": {
+          "owner": {
+            "label": "Titular:",
+            "value": "{author}"
+          },
+          "email": {
+            "label": "Email:",
+            "value": "{supportEmail}"
+          },
+          "website": {
+            "label": "Lloc web:",
+            "value": "{siteUrl}"
+          }
+        }
+      },
+      "purpose": {
+        "title": "Finalitat del lloc web",
+        "description": "Forever PTO (https://forever-pto.com) és una aplicació web dissenyada per ajudar els usuaris a planificar i optimitzar els seus dies lliures remunerats (PTO) proporcionant informació sobre festius i eines de planificació vacacional.",
+        "offers": "El lloc web ofereix:",
+        "items": {
+          "freeVersion": {
+            "label": "Versió gratuïta:",
+            "description": "Optimització bàsica de PTO, visualització del calendari i informació sobre festius."
+          },
+          "premiumVersion": {
+            "label": "Versió Premium:",
+            "description": "Analítiques avançades, gràfics i funcions de planificació millorades disponibles mitjançant un pagament únic."
+          }
+        }
+      },
+      "accessConditions": {
+        "title": "Condicions d'accés i ús",
+        "description": "L'accés i ús d'aquest lloc web està subjecte a les condicions següents:",
+        "userAgreement": "En accedir a aquest lloc web, acceptes:",
+        "items": {
+          "correctUse": "Utilitzar el lloc web de manera correcta i legal",
+          "noIllegal": "No utilitzar-lo amb finalitats il·legals o activitats que vulnerin aquestes condicions",
+          "noVirus": "No introduir ni difondre virus o codi maliciós",
+          "noUnauthorized": "No intentar accedir de manera no autoritzada als sistemes del lloc web",
+          "noShareKey": "No compartir claus d'activació Premium obtingudes mitjançant pagament"
+        }
+      },
+      "liability": {
+        "title": "Responsabilitat",
+        "description": "{author} no és responsable de:",
+        "items": {
+          "accuracy": "L'exactitud o integritat de la informació sobre festius obtinguda de fonts de tercers",
+          "decisions": "Les decisions preses pels usuaris basant-se en la informació proporcionada pel lloc web",
+          "interruptions": "Interrupcions temporals o problemes tècnics que afectin el lloc web",
+          "misuse": "L'ús indegut del lloc web per part dels usuaris",
+          "thirdParty": "El contingut o les pràctiques de privadesa de llocs web de tercers enllaçats des de Forever PTO"
+        },
+        "disclaimer": "La informació proporcionada té únicament finalitats de planificació. Els usuaris han de verificar la informació sobre festius amb fonts oficials abans de prendre decisions laborals."
+      },
+      "intellectualProperty": {
+        "title": "Propietat intel·lectual",
+        "p1": "Tot el contingut d'aquest lloc web, incloent-hi, entre d'altres, textos, gràfics, logotips, codi i disseny, és propietat de {author} i està protegit per les lleis de propietat intel·lectual espanyoles i internacionals.",
+        "p2": "Es concedeix als usuaris una llicència personal, no exclusiva i intransferible per utilitzar el lloc web amb la seva finalitat prevista. Queda prohibida la reproducció, distribució, modificació o ús comercial del contingut del lloc web sense permís exprés.",
+        "p3": "Algunes parts del lloc web poden estar disponibles com a programari de codi obert. Per a més detalls, visita el nostre <link>repositori de GitHub</link>."
+      },
+      "thirdPartyLinks": {
+        "title": "Enllaços a llocs web de tercers",
+        "p1": "Aquest lloc web pot contenir enllaços a llocs web de tercers. Aquests enllaços es proporcionen únicament per comoditat i amb finalitats informatives.",
+        "p2": "{author} no controla ni avala el contingut de llocs web de tercers i no és responsable de les seves polítiques de privadesa o pràctiques."
+      },
+      "modifications": {
+        "title": "Modificacions de l'avís legal",
+        "p1": "{author} es reserva el dret de modificar aquest Avís legal en qualsevol moment per adaptar-lo a canvis legislatius o actualitzacions del lloc web.",
+        "p2": "Et recomanem revisar periòdicament aquest avís legal per estar al dia de qualsevol canvi."
+      },
+      "applicableLaw": {
+        "title": "Llei aplicable i jurisdicció",
+        "description": "Aquest Avís legal es regeix per la legislació espanyola. Per a qualsevol disputa derivada de l'ús d'aquest lloc web, les parts se sotmeten a la jurisdicció dels tribunals de Barcelona, Espanya, amb renúncia a qualsevol altre fur que pogués correspondre."
+      },
+      "contact": {
+        "title": "Contacte",
+        "description": "Per a qualsevol pregunta o aclariment sobre aquest Avís legal, contacta amb nosaltres a:",
+        "items": {
+          "email": {
+            "label": "Email:",
+            "value": "{supportEmail}"
           }
         }
       }
