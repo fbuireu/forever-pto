@@ -123,7 +123,7 @@ function SheetContent({
   return (
     <AnimatePresence>
       {isOpen && (
-        <SheetPortal data-slot='sheet-portal'>
+        <SheetPortal keepMounted data-slot='sheet-portal'>
           {overlay && (
             <SheetPrimitive.Backdrop
               data-slot='sheet-overlay'
@@ -174,9 +174,10 @@ function SheetContent({
             {/* TODO: implement animateIcon — AnimateIcon.onMouseEnter fires setLocalAnimate → React re-render mid touch-event chain → base-ui loses internal state → freeze. Fix: use onPointerEnter + pointerType==='mouse' guard in AnimateIcon so touch never triggers the re-render */}
             <SheetPrimitive.Close
               data-slot='sheet-close'
-              className='absolute right-4 top-4 cursor-pointer rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] p-1.5 shadow-[var(--shadow-brutal-xs)] transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] focus:outline-none focus:ring-[3px] focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none'
+              className='absolute right-4 top-4 z-10 cursor-pointer rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] p-1.5 shadow-[var(--shadow-brutal-xs)] transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] focus:outline-none focus:ring-[3px] focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none'
             >
-              <X className='h-4 w-4' animateOnHover />
+              {/* TODO: implement animateIcon — same freeze pattern as DropdownMenuItems */}
+              <X className='h-4 w-4' />
               <span className='sr-only'>Close</span>
             </SheetPrimitive.Close>
           </SheetPrimitive.Popup>

@@ -34,7 +34,7 @@ export const FaqTabs = ({ tabs, title }: FaqTabsProps) => {
       )}
       <Tabs value={active} onValueChange={setActive}>
         <TabsHighlight>
-          <TabsList className='flex w-full overflow-x-auto justify-start'>
+          <TabsList className='flex w-full overflow-x-auto justify-start sm:justify-center'>
             {tabs.map((tab) => (
               <TabsHighlightItem key={tab.id} value={tab.id} className='shrink-0 w-auto h-full'>
                 <TabsTrigger value={tab.id}>{tab.title}</TabsTrigger>
