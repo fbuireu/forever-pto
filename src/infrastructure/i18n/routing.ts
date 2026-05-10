@@ -6,7 +6,6 @@ export const routing = defineRouting({
   defaultLocale: 'en',
   localeCookie: {
     secure: true,
-    httpOnly: false,
     sameSite: 'lax',
   },
 });

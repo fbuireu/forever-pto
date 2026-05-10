@@ -11,7 +11,7 @@ import { formatDiscountMessage } from '@infrastructure/services/payments/utils/f
 import { calculateFinalAmount } from '@infrastructure/services/payments/utils/helpers';
 import { Elements } from '@stripe/react-stripe-js';
 import type { Stripe, StripeElementsOptions } from '@stripe/stripe-js';
-import { cn } from '@ui/lib/utils';
+import { cn } from '@ui/utils/utils';
 import { initializePayment } from '@ui/adapters/payments/checkout';
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/modules/core/animate/base/Popover';
 import { Star } from '@ui/modules/core/animate/icons/Star';
