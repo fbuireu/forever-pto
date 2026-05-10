@@ -19,8 +19,7 @@ export const Footer = async () => {
           >
             <span>Forever</span>
             <div
-              className='w-[30px] h-[30px] bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[2px_2px_0_0_var(--frame)] overflow-hidden shrink-0'
-              style={{ transform: 'rotate(-4deg)' }}
+              className='w-[30px] h-[30px] bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[2px_2px_0_0_var(--frame)] overflow-hidden shrink-0 -rotate-[4deg]'
               aria-hidden
             >
               <Image src='/static/images/forever-pto-logo.png' alt='' width={30} height={30} unoptimized />

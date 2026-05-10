@@ -17,8 +17,7 @@ export const Navigation = async () => {
         >
           <span>Forever</span>
           <div
-            className='w-[38px] h-[38px] bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] overflow-hidden shrink-0'
-            style={{ transform: 'rotate(-4deg)' }}
+            className='w-[38px] h-[38px] bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] overflow-hidden shrink-0 -rotate-[4deg]'
             aria-hidden
           >
             <Image src='/static/images/forever-pto-logo.png' alt='' width={38} height={38} unoptimized />
