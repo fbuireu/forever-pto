@@ -1,7 +1,7 @@
 import { Link } from '@application/i18n/navigation';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { getTranslations } from 'next-intl/server';
-import { CtaShapes } from './CtaShapes.client';
+import { CtaShapes } from './CtaShapesClient';
 
 export const HomepageCta = async () => {
   const t = await getTranslations('homepage');

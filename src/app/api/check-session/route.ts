@@ -15,19 +15,21 @@ export async function GET(_request: NextRequest) {
   const token = cookieStore.get(PREMIUM_COOKIE)?.value;
 
   if (!token) {
-    return NextResponse.json({ premiumKey: null, email: null });
+    return NextResponse.json({ premiumKey: null, email: null }, { headers: { 'Cache-Control': 'no-store' } });
   }
 
-  return Effect.runPromise(
+  const response = await Effect.runPromise(
     verifySessionEffect(token).pipe(
       Effect.map((data) => NextResponse.json({ premiumKey: data.paymentIntentId, email: data.email })),
       Effect.catchTag('SessionError', () => {
-        const response = NextResponse.json({ premiumKey: null, email: null });
-        response.cookies.delete(PREMIUM_COOKIE);
-        return Effect.succeed(response);
+        const res = NextResponse.json({ premiumKey: null, email: null });
+        res.cookies.delete(PREMIUM_COOKIE);
+        return Effect.succeed(res);
       })
     )
   );
+  response.headers.set('Cache-Control', 'no-store');
+  return response;
 }
 
 export async function POST(request: NextRequest) {

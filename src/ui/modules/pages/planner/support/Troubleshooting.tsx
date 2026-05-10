@@ -72,7 +72,7 @@ export const Troubleshooting = () => {
   return (
     <div className='space-y-2'>
       <p className='text-sm text-muted-foreground'>{t('description')}</p>
-      <Button variant='destructive' onClick={resetToDefaults} disabled={cleared || isPending}>
+      <Button variant='destructive' onClick={resetToDefaults} disabled={cleared || isPending} className='flex mx-auto'>
         {isPending ? t('clearing') : cleared ? t('cleared') : t('resetButton')}
       </Button>
     </div>

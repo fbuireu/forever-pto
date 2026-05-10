@@ -85,7 +85,7 @@
       "daysCount": "{count, plural, one {giorno} other {giorni}}"
     },
     "summaryParagraph": {
-      "withGain": "Con i tuoi {ptoDays} giorni di ferie e {totalHolidays} festivi, la strategia {strategy} li trasforma in {effectiveDays} giorni liberi effettivi — sono {increment} giorni extra, un miglioramento del +{percentage}% rispetto a usarli senza ottimizzare.",
+      "withGain": "Con i tuoi {ptoDays} giorni di ferie e {totalHolidays} festivi, la strategia {strategy} li trasforma in {effectiveDays} giorni liberi effettivi, ovvero {increment} giorni extra, un miglioramento del +{percentage}% rispetto a usarli senza ottimizzare.",
       "withoutGain": "Con i tuoi {ptoDays} giorni di ferie e {totalHolidays} festivi, ottieni {effectiveDays} giorni liberi effettivi usando la strategia {strategy}.",
       "noRegionHintTitle": "Aggiungi la tua regione",
       "noRegionHint": "Seleziona la tua regione nella barra laterale per includere festivi regionali e potenzialmente ottenere più giorni liberi.",
@@ -136,7 +136,7 @@
         "title": "Generale",
         "whatIsPto": {
           "question": "Cos'è il PTO?",
-          "answer": "PTO sta per Paid Time Off (ferie retribuite) — il numero di giorni di ferie che il tuo datore di lavoro ti assegna ogni anno da usare come preferisci. A differenza della malattia o dei giorni festivi, i giorni di PTO sono tuoi da programmare liberamente. Il problema è che la maggior parte delle persone li usa in modo casuale e spreca molto riposo potenziale. Forever PTO ti aiuta a posizionare quei giorni strategicamente intorno ai giorni festivi per trasformare, ad esempio, 5 giorni di PTO in 12 giorni consecutivi liberi."
+          "answer": "PTO sta per Paid Time Off (ferie retribuite): il numero di giorni di ferie che il tuo datore di lavoro ti assegna ogni anno da usare come preferisci. A differenza della malattia o dei giorni festivi, i giorni di PTO sono tuoi da programmare liberamente. Il problema è che la maggior parte delle persone li usa in modo casuale e spreca molto riposo potenziale. Forever PTO ti aiuta a posizionare quei giorni strategicamente intorno ai giorni festivi per trasformare, ad esempio, 5 giorni di PTO in 12 giorni consecutivi liberi."
         },
         "whatIs": {
           "question": "Cos'è questo?",
@@ -151,7 +151,7 @@
         },
         "pricing": {
           "question": "Perché c'è un modello a pagamento?",
-          "answer": "Forever PTO è gratuito. Tuttavia, utilizziamo un modello a pagamento per coprire i costi di mantenimento dei dati, infrastruttura e miglioramenti continui. Il modello a pagamento finanzia aggiornamenti, supporto e hosting. Se vuoi togliere la pubblicità e supportare il progetto, puoi fare una donazione volontaria. Offriamo anche un tier gratuito con funzioni principali affinché tutti possano beneficiare di una migliore pianificazione del PTO."
+          "answer": "Forever PTO è gratuito. Tuttavia, utilizziamo un modello a pagamento per coprire i costi di mantenimento dei dati, infrastruttura e miglioramenti continui. Il modello a pagamento finanzia aggiornamenti, supporto e hosting. Se vuoi togliere la pubblicità e sostenere il progetto, puoi fare una donazione volontaria. Offriamo anche un piano gratuito con le funzioni principali affinché tutti possano pianificare meglio il proprio PTO."
         },
         "restartTutorial": {
           "question": "Come posso vedere di nuovo il tutorial interattivo?"
@@ -282,11 +282,11 @@
     "addHoliday": {
       "title": "aggiungi nuovo festivo",
       "description": "Crea un nuovo festivo selezionando una data e inserendo un nome",
-      "nameLabel": "Nome del Festivo",
+      "nameLabel": "Nome del festivo",
       "namePlaceholder": "es. Il mio compleanno",
-      "dateLabel": "Seleziona Data",
+      "dateLabel": "Seleziona data",
       "selected": "Selezionato",
-      "submit": "Aggiungi Festivo",
+      "submit": "Aggiungi festivo",
       "submitting": "Aggiungendo...",
       "cancel": "Annulla",
       "successTitle": "Festivo creato con successo",
@@ -299,7 +299,7 @@
     "editHoliday": {
       "title": "modifica festivo",
       "description": "Modifica il festivo selezionato",
-      "submit": "Salva Modifiche",
+      "submit": "Salva modifiche",
       "submitting": "Salvando...",
       "cancel": "Annulla",
       "successTitle": "Festivo aggiornato con successo",
@@ -332,15 +332,15 @@
     "doneBtn": "Fatto",
     "progressTextConnector": "di",
     "steps": {
-      "toolsTitle": "Calcolatori e Strumenti",
+      "toolsTitle": "Calcolatori e strumenti",
       "toolsDescription": "Qui trovi calcolatori utili: stima i tuoi giorni PTO in base all'anzianità lavorativa, calcola il valore economico del PTO non usato o conta i giorni lavorativi tra due date.",
-      "alternativesTitle": "Gestore Alternative",
+      "alternativesTitle": "Gestore alternative",
       "alternativesDescription": "Naviga tra i suggerimenti PTO generati. Confronta efficienza, totale giorni liberi e trova l'equilibrio che preferisci. La prima opzione è quella consigliata (con icona stellata). Usa le frecce per esplorare le alternative e clicca 'Applica alternativa' per usarla.",
-      "statusTitle": "Tracker Stato PTO",
-      "statusDescription": "Monitora la tua allocazione PTO in tempo reale. Vedi i giorni auto-assegnati (suggeriti dal nostro sistema), giorni selezionati manualmente e giorni rimanenti disponibili. Puoi ripristinare le modifiche manuali in qualsiasi momento per tornare al suggerimento automatico.",
-      "calendarTitle": "Il Tuo Calendario PTO Interattivo",
+      "statusTitle": "Stato PTO",
+      "statusDescription": "Monitora il tuo utilizzo PTO in tempo reale. Vedi i giorni auto-assegnati (suggeriti dal nostro sistema), i giorni selezionati manualmente e quelli rimanenti. Puoi ripristinare le modifiche manuali in qualsiasi momento per tornare al suggerimento automatico.",
+      "calendarTitle": "Il tuo calendario PTO interattivo",
       "calendarDescription": "È la panoramica dell'anno. I festivi appaiono in grigio, i giorni PTO suggeriti in turchese e quelli selezionati manualmente in blu. Clicca su qualsiasi giorno lavorativo per modificare la selezione manualmente. Il calendario si aggiorna in tempo reale.",
-      "finishTitle": "Tutto Pronto!",
+      "finishTitle": "Tutto pronto!",
       "finishDescription": "Ora sai come usare Forever PTO. Configura le tue preferenze nella barra laterale e lascia che l'app trovi i migliori giorni per te.",
       "holidaysListTitle": "Personalizza le tue festività",
       "holidaysListDescription": "Qui puoi perfezionare i dati sulle festività per adattarli alla tua situazione. Modifica o elimina qualsiasi festività nazionale o regionale e aggiungi i tuoi giorni personalizzati: festività aziendali, celebrazioni locali o qualsiasi data che conti per te. Più accurati sono i dati, migliori saranno i suggerimenti.",
@@ -400,7 +400,7 @@
   },
   "contact": {
     "title": "Contattaci",
-    "description": "Hai una domanda o un feedback? Ci piacerebbe sentirti!",
+    "description": "Hai una domanda o un feedback? Scrivici pure!",
     "name": "Nome",
     "namePlaceholder": "Mario Rossi",
     "email": "Email",
@@ -427,8 +427,8 @@
     "vsMain": "vs principale",
     "alreadyApplied": "già applicato",
     "applyAlternative": "applica alternativa",
-    "previousSuggestion": "Suggerimento precedente",
-    "nextSuggestion": "Prossimo suggerimento",
+    "previousSuggestion": "suggerimento precedente",
+    "nextSuggestion": "prossimo suggerimento",
     "totalDaysOff": "totale giorni liberi",
     "comparison": "confronto",
     "daysUnit": "giorni"
@@ -448,13 +448,13 @@
   },
   "troubleshooting": {
     "description": "Se l'app si comporta in modo strano, potrebbe dipendere da dati salvati nel browser che non sono più compatibili con la versione attuale. Svuotare la memoria locale ripristina uno stato pulito.",
-    "resetButton": "Ripristina Memoria Locale",
+    "resetButton": "Ripristina memoria locale",
     "clearing": "Svuotando...",
     "cleared": "Svuotato",
     "successTitle": "Memoria locale svuotata con successo",
     "successDescription": "La memoria locale è stata svuotata. Al prossimo caricamento ripartirai da zero.",
     "errorTitle": "Errore nello svuotamento della memoria locale",
-    "errorDescription": "Qualcosa è andato storto durante il ripristino dei dati. Per favore riprova."
+    "errorDescription": "Qualcosa è andato storto durante il ripristino dei dati. Riprova."
   },
   "sidebar": {
     "configuration": "Configurazione",
@@ -575,7 +575,7 @@
   },
   "ptoCalculator": {
     "title": "calcolatore accumulo PTO",
-    "tooltip": "Calcola i tuoi giorni di PTO accumulati in base all'accumulo mensile. La maggior parte delle aziende offre 2-3 giorni al mese. Seleziona il mese obiettivo per vedere i tuoi giorni totali disponibili.",
+    "tooltip": "Calcola i tuoi giorni di PTO accumulati in base all'accumulo mensile. La maggior parte delle aziende offre 2-3 giorni al mese. Seleziona il mese di riferimento per vedere i tuoi giorni totali disponibili.",
     "tooltipLabel": "Maggiori informazioni sul calcolatore PTO",
     "daysPerMonth": "Giorni per mese",
     "calculateThrough": "Calcola fino a",
@@ -615,34 +615,34 @@
     "totalAmount": "Importo totale",
     "expressCheckout": "Pagamento rapido",
     "orPayWithCard": "O paga con carta",
-    "paymentError": "Errore di Pagamento",
+    "paymentError": "Errore di pagamento",
     "paymentFailed": "Pagamento fallito",
     "processing": "Elaborando...",
     "pay": "Paga"
   },
   "donate": {
-    "donateAndUnblock": "Dona e Sblocca",
-    "supportAndUnblock": "Supporta e Sblocca",
-    "makeDonation": "Fai una donazione per supportare il contenuto e sbloccare l'accesso.",
+    "donateAndUnblock": "Dona e sblocca",
+    "supportAndUnblock": "Sostieni e sblocca",
+    "makeDonation": "Fai una donazione per sostenere il progetto e sbloccare l'accesso.",
     "alreadyPremium": "Sei già un utente premium. Grazie per il tuo supporto!"
   },
   "donationForm": {
     "email": "Email",
     "emailPlaceholder": "tua@email.com",
     "quickAmounts": "Importi rapidi",
-    "donationAmount": "Importo Donazione",
+    "donationAmount": "Importo donazione",
     "enterAmount": "Inserisci importo",
     "basePriceNote": "Prezzo base in {currency}. L'importo finale sarà convertito nella tua valuta locale ai tassi di cambio correnti.",
     "havePromoCode": "Hai un codice promozionale?",
     "promoCodePlaceholder": "MAGARI_FOSSE_COSÌ_FACILE",
-    "continueToPayment": "Continua al Pagamento",
+    "continueToPayment": "Continua al pagamento",
     "processing": "Elaborando..."
   },
   "upgrade": {
-    "premiumRequired": "Richiesto Premium",
+    "premiumRequired": "funzione premium richiesta",
     "featureRequiresPremium": "richiede accesso premium",
-    "verifyDescription": "Non preoccuparti, se hai già donato o pagato verificheremo la tua email nella nostra lista e ti concederemo l'accesso premium. Se incontri problemi non esitare a contattarci.",
-    "considerDonating": "Se non hai ancora donato, considera di farlo per supportare il progetto e sbloccare le funzioni premium!",
+    "verifyDescription": "Se hai già donato o pagato, verifichiamo la tua email nella nostra lista e ti concediamo l'accesso premium. Se hai problemi, scrivici.",
+    "considerDonating": "Se non hai ancora donato, considera di farlo per sostenere il progetto e sbloccare le funzioni premium!",
     "enterPremiumEmail": "Inserisci la tua email premium",
     "emailPlaceholder": "tua@email.com",
     "verifying": "Verificando...",
@@ -655,12 +655,12 @@
     "emailNotFoundError": "Email non trovata nella nostra lista di utenti premium",
     "tryAgain": "Riprova",
     "close": "Chiudi",
-    "invalidEmail": "Per favore inserisci un'email valida",
+    "invalidEmail": "Inserisci un'email valida",
     "emailRequired": "L'email è obbligatoria"
   },
   "validation": {
     "contact": {
-      "invalidEmail": "Per favore inserisci un'email valida",
+      "invalidEmail": "Inserisci un'email valida",
       "emailRequired": "L'email è obbligatoria",
       "nameMin": "Il nome deve avere almeno {min} caratteri",
       "nameMax": "Il nome è troppo lungo",
@@ -678,7 +678,7 @@
     "holiday": {
       "nameRequired": "Il nome del festivo è obbligatorio",
       "nameMax": "Il nome del festivo è troppo lungo",
-      "invalidDate": "Per favore seleziona una data valida"
+      "invalidDate": "Seleziona una data valida"
     }
   },
   "roadmap": {
@@ -722,7 +722,7 @@
       "weatherIntegration": "integrazione meteo",
       "weatherIntegrationDescription": "Visualizza le previsioni meteo per le tue date di ferie pianificate",
       "blockedPeriods": "periodi bloccati",
-      "blockedPeriodsDescription": "Segna intervalli di date in cui non vuoi suggerimenti di PTO — conferenze, viaggi, malattie o qualsiasi momento in cui sai che sarai impegnato",
+      "blockedPeriodsDescription": "Segna intervalli di date in cui non vuoi suggerimenti di PTO: conferenze, viaggi, malattie o qualsiasi momento in cui sai che sarai impegnato",
       "performanceOptimization": "ottimizzazione delle prestazioni",
       "performanceOptimizationDescription": "Calcoli più veloci ed esperienza più fluida grazie ai Web Workers",
       "customWeekends": "weekend personalizzati",
@@ -730,7 +730,7 @@
       "multiYearPlanning": "pianificazione multi-anno",
       "multiYearPlanningDescription": "Pianifica le ferie su più anni con supporto per il riporto",
       "calendarSubscription": "abbonamento calendario in tempo reale",
-      "calendarSubscriptionDescription": "Abbonati direttamente da Google Calendar, Apple Calendar o Outlook tramite un URL webcal:// — il tuo piano rimane sincronizzato automaticamente"
+      "calendarSubscriptionDescription": "Abbonati direttamente da Google Calendar, Apple Calendar o Outlook tramite un URL webcal://; il tuo piano rimane sincronizzato automaticamente"
     }
   },
   "cookies": {
@@ -758,7 +758,7 @@
     "stripeMidDesc": "Prevenzione e rilevamento frodi. Impostato da Stripe per l'elaborazione sicura dei pagamenti.",
     "stripeSidDesc": "Identificatore di sessione per la prevenzione delle frodi. Richiesto per il processo di checkout.",
     "gaDesc": "Distingue utenti unici.",
-    "gaStarDesc": "mantiene lo stato della sessione per l'analisi del comportamento",
+    "gaStarDesc": "Mantiene lo stato della sessione per l'analisi del comportamento",
     "gidDesc": "Distingue gli utenti per analisi a breve termine",
     "learnMore": "Scopri di più",
     "provider": "Fornitore: {name}",
@@ -783,21 +783,21 @@
   "errors": {
     "contact": {
       "VALIDATION_ERROR": "Dati di input non validi.",
-      "EMAIL_SEND_FAILED": "Invio email fallito. Per favore riprova.",
+      "EMAIL_SEND_FAILED": "Invio email fallito. Riprova.",
       "SAVE_FAILED": "Abbiamo ricevuto la tua richiesta, anche se abbiamo riscontrato un piccolo problema tecnico nel finalizzare i registri. Non è necessaria alcuna azione da parte tua.",
-      "RENDER_FAILED": "Preparazione email fallita. Per favore riprova.",
-      "UNKNOWN": "Si è verificato un errore imprevisto. Per favore riprova."
+      "RENDER_FAILED": "Preparazione email fallita. Riprova.",
+      "UNKNOWN": "Qualcosa è andato storto. Riprova."
     },
     "payment": {
       "VALIDATION_ERROR": "Dati di input non validi.",
       "INVALID_PROMO_CODE": "Il codice promozionale non è valido o è scaduto.",
-      "PAYMENT_FAILED": "Elaborazione del pagamento fallita.",
+      "PAYMENT_FAILED": "Il pagamento non è andato a buon fine.",
       "SAVE_FAILED": "il pagamento è stato avviato ma non è stato possibile salvarlo. Contatta il supporto.",
-      "UPDATE_STATUS_FAILED": "Si è verificato un errore durante il pagamento. Contatta il supporto con il tuo ID transazione.",
-      "SAVE_FROM_WEBHOOK_FAILED": "Si è verificato un errore durante il pagamento. Contatta il supporto con il tuo ID transazione.",
-      "CHARGE_UPDATE_FAILED": "Si è verificato un errore durante il pagamento. Contatta il supporto con il tuo ID transazione.",
-      "WEBHOOK_PROCESSING_FAILED": "Si è verificato un errore durante il pagamento. Contatta il supporto con il tuo ID transazione.",
-      "UNKNOWN": "Si è verificato un errore imprevisto. Per favore riprova."
+      "UPDATE_STATUS_FAILED": "Qualcosa è andato storto durante il pagamento. Contatta il supporto con il tuo ID transazione.",
+      "SAVE_FROM_WEBHOOK_FAILED": "Qualcosa è andato storto durante il pagamento. Contatta il supporto con il tuo ID transazione.",
+      "CHARGE_UPDATE_FAILED": "Qualcosa è andato storto durante il pagamento. Contatta il supporto con il tuo ID transazione.",
+      "WEBHOOK_PROCESSING_FAILED": "Qualcosa è andato storto durante il pagamento. Contatta il supporto con il tuo ID transazione.",
+      "UNKNOWN": "Qualcosa è andato storto. Riprova."
     }
   },
   "legal": {
@@ -824,7 +824,7 @@
     "title": "Il server si è preso un",
     "titleHighlight": "giorno libero",
     "titleEmphasis": "senza permesso.",
-    "lede": "Qualcosa è esploso dalla nostra parte. Non è colpa tua (questa volta). Il nostro team lo sa già — i log stanno fumando e ci stiamo lavorando. Riprova tra qualche minuto, o controlla lo stato in tempo reale.",
+    "lede": "Qualcosa è esploso dalla nostra parte. Non è colpa tua (questa volta). Il nostro team lo sa già: i log stanno fumando e ci stiamo lavorando. Riprova tra qualche minuto, o controlla lo stato in tempo reale.",
     "statusPage": "Vedi stato",
     "meanwhile": "Nel frattempo:",
     "contact": "Segnala un problema",
@@ -836,8 +836,8 @@
   "footer": {
     "privacyPolicy": "informativa sulla privacy",
     "termsOfService": "termini di servizio",
-    "cookiePolicy": "Politica sui Cookie",
-    "legalNotice": "Note Legali",
+    "cookiePolicy": "Politica sui cookie",
+    "legalNotice": "Note legali",
     "manageCookies": "Gestisci cookie",
     "contactUs": "Contattaci",
     "legalNavigation": "Link legali e policy",
@@ -940,7 +940,7 @@
       "inputDaysTitle": "Inserisci i tuoi giorni.",
       "inputDaysDescription": "Quanti giorni di ferie hai e in quale paese o regione lavori. Tutto qui.",
       "engineTitle": "Il motore fa la magia.",
-      "engineDescription": "Trova tutte le combinazioni possibili e le ordina per efficienza — quanti giorni liberi ottieni per ogni giorno di PTO usato.",
+      "engineDescription": "Trova tutte le combinazioni possibili e le ordina per efficienza: quanti giorni liberi ottieni per ogni giorno di PTO usato.",
       "exportTitle": "Richiedi i giorni liberi.",
       "exportDescription": "Esporta su Google Calendar, Outlook o un PDF da inviare all'HR e dimenticartene. Addio dubbi."
     },
@@ -977,7 +977,7 @@
       "countriesDescription": "Calendari ufficiali aggiornati ogni anno. Anche quelli regionali.",
       "privacyTag": "100% locale",
       "privacyTitle": "I tuoi dati non escono dal tuo browser.",
-      "privacyDescription": "Nessun accesso. Nessun account. I tuoi dati di ferie sono salvati esclusivamente nel tuo browser — non li vediamo mai."
+      "privacyDescription": "Nessun accesso. Nessun account. I tuoi dati di ferie sono salvati esclusivamente nel tuo browser; non li vediamo mai."
     },
     "comparison": {
       "badge": "con · senza",
@@ -1042,7 +1042,7 @@
       "titleStart": "Paghi una volta.",
       "titleEmphasis": "Per sempre.",
       "description": "Niente SaaS. Niente abbonamento. Niente \"prova gratuita che si rinnova da sola\".",
-      "freeName": "Gratis per Sempre",
+      "freeName": "Gratis per sempre",
       "freeTagline": "Provalo. Ti convincerà.",
       "freePrice": "€0",
       "freePer": "/sempre",

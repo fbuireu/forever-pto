@@ -1,5 +1,3 @@
-'use client';
-
 import { cn } from '@ui/utils/utils';
 
 type OceanSunsetProps = {

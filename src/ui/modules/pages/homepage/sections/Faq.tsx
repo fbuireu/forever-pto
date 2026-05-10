@@ -63,7 +63,7 @@ export const Faq = async () => {
             privacyLink: (chunks) => (
               <Link
                 href='/legal/privacy-policy'
-                className='underline underline-offset-2 hover:opacity-70 transition-opacity'
+                className='text-sm font-medium px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75'
               >
                 {chunks}
               </Link>
@@ -134,7 +134,7 @@ export const Faq = async () => {
             <AccordionTrigger className='text-left'>
               <span className='font-normal text-base'>{item.question}</span>
             </AccordionTrigger>
-            <AccordionPanel className='text-muted-foreground'>{item.answer}</AccordionPanel>
+            <AccordionPanel className='text-muted-foreground pt-1'>{item.answer}</AccordionPanel>
           </AccordionItem>
         ))}
       </Accordion>

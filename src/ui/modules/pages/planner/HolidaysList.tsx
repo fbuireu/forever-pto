@@ -13,14 +13,17 @@ import {
 } from '@ui/modules/core/animate/components/Tabs';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { HolidaysTable } from './holidays/HolidaysTable';
 
 export const HolidaysList = () => {
   const t = useTranslations('holidaysTable');
   const holidays = useHolidaysStore((state) => state.holidays);
   const [activeTab, setActiveTab] = useState<HolidayVariant>(HolidayVariant.NATIONAL);
-  const regionalHolidays = holidays.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL);
+  const regionalHolidays = useMemo(
+    () => holidays.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL),
+    [holidays]
+  );
 
   const handleTabChange = (value: string) => {
     const variant = value as HolidayVariant;

@@ -5,7 +5,7 @@
     "keywords": "Urlaubstage, Feiertage, freie Tage, Urlaub, langes Wochenende, bezahlter Urlaub, Kalender",
     "cookiePolicy": {
       "title": "Cookie-Richtlinie | Forever PTO",
-      "description": "Informationen darüber, wie Forever PTO Cookies und lokalen Speicher verwendet"
+      "description": "Informationen darüber, wie Forever PTO Cookies und lokalen Speicher verwendet."
     },
     "privacyPolicy": {
       "title": "Datenschutzrichtlinie | Forever PTO",
@@ -136,7 +136,7 @@
         "title": "Allgemein",
         "whatIsPto": {
           "question": "Was ist PTO?",
-          "answer": "PTO steht für Paid Time Off (bezahlter Urlaub) — die Anzahl der Urlaubstage, die dein Arbeitgeber dir jedes Jahr gibt, um sie nach Belieben zu nutzen. Im Gegensatz zu Krankentagen oder gesetzlichen Feiertagen kannst du PTO-Tage frei einplanen. Das Problem ist, dass die meisten Menschen sie zufällig nutzen und viel Erholungspotenzial verschenken. Forever PTO hilft dir, diese Tage strategisch rund um Feiertage zu platzieren, um beispielsweise 5 PTO-Tage in 12 aufeinanderfolgende freie Tage zu verwandeln."
+          "answer": "PTO steht für Paid Time Off (bezahlter Urlaub): die Anzahl der Urlaubstage, die dein Arbeitgeber dir jedes Jahr gibt, um sie nach Belieben zu nutzen. Im Gegensatz zu Krankentagen oder gesetzlichen Feiertagen kannst du PTO-Tage frei einplanen. Das Problem ist, dass die meisten Menschen sie zufällig nutzen und viel Erholungspotenzial verschenken. Forever PTO hilft dir, diese Tage strategisch rund um Feiertage zu platzieren, um beispielsweise 5 PTO-Tage in 12 aufeinanderfolgende freie Tage zu verwandeln."
         },
         "whatIs": {
           "question": "Was ist das?",
@@ -194,11 +194,11 @@
         "title": "Interesse an einer Zusammenarbeit?",
         "code": {
           "question": "Wie kann man Code oder Ideen beitragen?",
-          "answer": "<link>Eröffne Issues oder Merge Requests</link> mit Vorschlägen. Wir brauchen Hilfe bei Algorithmen, Integrationen und UX-Verbesserungen."
+          "answer": "<link>Öffne Issues oder Merge Requests</link> mit Vorschlägen. Wir freuen uns über Hilfe bei Algorithmen, Integrationen und UX-Verbesserungen."
         },
         "business": {
-          "question": "Integrationen oder Unternehmenspartnerschaften vorschlagen",
-          "answer": "Wenn du ein Unternehmen vertrittst und Forever PTO integrieren möchtest, kontaktiere den Support oder eröffne einen Vorschlag für eine individuelle Integration."
+          "question": "Integrationen oder Unternehmenspartnerschaften",
+          "answer": "Wenn du ein Unternehmen vertrittst und Forever PTO integrieren möchtest, meld dich beim Support oder öffne einen Vorschlag für eine individuelle Integration."
         },
         "nonCode": {
           "question": "Kann ich auch mitarbeiten, wenn ich kein Entwickler bin?",
@@ -209,7 +209,7 @@
   },
   "workdayCounter": {
     "title": "Arbeitstage-Zähler",
-    "tooltip": "Zähle Arbeitstage zwischen zwei Daten, Wochenenden und Feiertage werden automatisch ausgeschlossen. Nützlich für Projektplanung und Terminberechnungen.",
+    "tooltip": "Zähle Arbeitstage zwischen zwei Daten – Wochenenden und Feiertage werden automatisch ausgeschlossen. Nützlich für Projektplanung und Terminberechnungen.",
     "tooltipLabel": "Mehr Informationen zum Arbeitstage-Zähler",
     "selectRange": "Daten auswählen",
     "clearSelection": "Auswahl löschen",
@@ -281,7 +281,7 @@
   "modals": {
     "addHoliday": {
       "title": "Neuen Feiertag hinzufügen",
-      "description": "Erstelle einen neuen Feiertag, indem du ein Datum auswählst und einen Namen eingibst",
+      "description": "Erstelle einen neuen Feiertag, indem du ein Datum auswählst und einen Namen eingibst.",
       "nameLabel": "Name des Feiertags",
       "namePlaceholder": "z. B. Mein Geburtstag",
       "dateLabel": "Datum auswählen",
@@ -292,7 +292,7 @@
       "successTitle": "Feiertag erfolgreich erstellt",
       "successDescription": "{name} wurde am {date} hinzugefügt",
       "errorTitle": "Fehler beim Erstellen des Feiertags",
-      "errorDescription": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+      "errorDescription": "Etwas ist schiefgelaufen. Versuch es nochmal.",
       "existsTitle": "Feiertag existiert bereits",
       "existsDescription": "Am {date} gibt es bereits einen Feiertag: {name}"
     },
@@ -305,13 +305,13 @@
       "successTitle": "Feiertag erfolgreich aktualisiert",
       "successDescription": "{name} wurde aktualisiert",
       "errorTitle": "Fehler beim Aktualisieren des Feiertags",
-      "errorDescription": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+      "errorDescription": "Etwas ist schiefgelaufen. Versuch es nochmal."
     },
     "deleteHoliday": {
       "title": "Feiertage löschen",
       "titleSingular": "Feiertag löschen",
-      "description": "Bist du sicher, dass du {count} Feiertage löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
-      "descriptionSingular": "Bist du sicher, dass du diesen Feiertag löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "description": "Bist du sicher, dass du {count} Feiertage löschen möchtest? Das lässt sich nicht rückgängig machen.",
+      "descriptionSingular": "Bist du sicher, dass du diesen Feiertag löschen möchtest? Das lässt sich nicht rückgängig machen.",
       "submit": "Löschen",
       "submitting": "Wird gelöscht...",
       "cancel": "Abbrechen",
@@ -320,7 +320,7 @@
       "successDescription": "{count} Feiertage wurden entfernt",
       "successDescriptionSingular": "Der Feiertag wurde entfernt",
       "errorTitle": "Fehler beim Löschen der Feiertage",
-      "errorDescription": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+      "errorDescription": "Etwas ist schiefgelaufen. Versuch es nochmal."
     }
   },
   "tutorial": {
@@ -335,7 +335,7 @@
       "toolsTitle": "Rechner & Werkzeuge",
       "toolsDescription": "Greife hier auf hilfreiche Rechner zu: Schätze deine Urlaubstage basierend auf deiner Berufserfahrung, berechne den Geldwert ungenutzter Urlaubstage oder zähle Arbeitstage zwischen zwei Daten.",
       "alternativesTitle": "Alternativen-Manager",
-      "alternativesDescription": "Navigiere durch verschiedene von uns generierte Urlaubsvorschläge. Vergleiche Effizienzkennzahlen, Gesamttage frei und finde die perfekte Balance. Die erste Option ist immer unser empfohlener Vorschlag, markiert mit einem Funkelsymbol. Benutze die Pfeile, um Alternativen zu erkunden, und klicke auf \"Alternative anwenden\", um einen anderen Vorschlag zu verwenden.",
+      "alternativesDescription": "Sieh dir verschiedene Urlaubsvorschläge an, die wir für dich berechnet haben. Vergleiche Effizienzkennzahlen, Gesamttage frei und finde die perfekte Balance. Die erste Option ist immer unser Empfehlungsvorschlag, markiert mit einem Funkelsymbol. Nutze die Pfeile, um Alternativen zu erkunden, und klicke auf \"Alternative anwenden\", um einen anderen Vorschlag zu übernehmen.",
       "statusTitle": "Urlaubsstatus-Tracker",
       "statusDescription": "Verfolge deine Urlaubszuweisung in Echtzeit. Sieh automatisch zugewiesene Tage (von unserem System vorgeschlagen), manuell ausgewählte Tage und verbleibende verfügbare Tage. Du kannst manuelle Änderungen jederzeit zurücksetzen, um zum automatischen Vorschlag zurückzukehren.",
       "calendarTitle": "Dein interaktiver Urlaubskalender",
@@ -353,7 +353,7 @@
       "step4Title": "Kalender exportieren",
       "step4Description": "Lade deine Feiertage und geplanten Urlaubstage als .ics-Datei herunter, um sie in Google Calendar, Apple Calendar oder Outlook zu importieren, oder als PDF zum Drucken oder Teilen.",
       "drawerTitle": "Dein Planungspanel",
-      "drawerDescription": "Diese Leiste zeigt immer eine Zusammenfassung deines Plans. Wische nach oben —oder ziehe den Griff— um Alternativen zu erkunden und zu sehen, wie deine Tage verteilt sind."
+      "drawerDescription": "Diese Leiste zeigt immer eine Zusammenfassung deines Plans. Wische nach oben (oder ziehe den Griff) um Alternativen zu erkunden und zu sehen, wie deine Tage verteilt sind."
     }
   },
   "legend": {
@@ -400,7 +400,7 @@
   },
   "contact": {
     "title": "Kontakt",
-    "description": "Hast du eine Frage oder Feedback? Wir freuen uns, von dir zu hören!",
+    "description": "Hast du eine Frage oder Feedback? Meld dich gerne!",
     "name": "Name",
     "namePlaceholder": "Max Mustermann",
     "email": "E-Mail",
@@ -414,7 +414,7 @@
     "cancel": "Abbrechen",
     "successTitle": "Nachricht gesendet!",
     "successDescription": "Wir melden uns so schnell wie möglich bei dir.",
-    "errorTitle": "Es ist ein Fehler aufgetreten",
+    "errorTitle": "Ein Fehler ist aufgetreten",
     "tryAgain": "Erneut versuchen",
     "close": "Schließen",
     "failedToSend": "Nachricht konnte nicht gesendet werden"
@@ -436,25 +436,25 @@
   "toasts": {
     "suggestionApplied": "Vorschlag erfolgreich angewendet",
     "cannotSelectPastDays": "Vergangene Tage können nicht ausgewählt werden",
-    "enablePastDays": "Aktiviere \"Vergangene Tage erlauben\" in den Einstellungen, um vergangene Daten auszuwählen",
+    "enablePastDays": "Aktiviere \"Vergangene Tage erlauben\" in den Einstellungen, um vergangene Daten auszuwählen.",
     "noPtoDaysRemaining": "Keine verbleibenden Urlaubstage zum Zuweisen",
     "removeDaysToFree": "Entferne bestehende Tage, um Platz freizugeben",
     "cannotSelectBankHoliday": "Ein gesetzlicher Feiertag kann nicht ausgewählt werden",
     "bankHolidayDescription": "Dieser Tag ist bereits ein nationaler oder regionaler Feiertag",
-    "paymentFailed": "Zahlungsinitialisierung fehlgeschlagen",
-    "paymentFailedDescription": "Bitte versuche es später erneut",
+    "paymentFailed": "Zahlung konnte nicht gestartet werden",
+    "paymentFailedDescription": "Versuch es gleich nochmal.",
     "paymentSuccess": "Zahlung erfolgreich!",
     "paymentSuccessDescription": "Vielen Dank für deine Unterstützung! Du hast jetzt Premium-Zugang."
   },
   "troubleshooting": {
-    "description": "Wenn die App sich unerwartet verhält, kann das an veralteten lokalen Daten liegen. Bei App-Updates können gespeicherte Daten mit der neuen Version inkompatibel werden. Den lokalen Speicher zu löschen setzt alles auf einen sauberen Stand zurück.",
+    "description": "Wenn sich die App seltsam verhält, können veraltete lokale Daten die Ursache sein. Bei App-Updates können gespeicherte Daten mit der neuen Version inkompatibel werden. Wenn du den lokalen Speicher löschst, fängst du mit einem sauberen Stand an.",
     "resetButton": "Lokalen Speicher zurücksetzen",
     "clearing": "Wird gelöscht...",
     "cleared": "Gelöscht",
     "successTitle": "Lokaler Speicher erfolgreich gelöscht",
-    "successDescription": "Alle Daten wurden zurückgesetzt und vom Server aktualisiert.",
+    "successDescription": "Alle Daten wurden zurückgesetzt und neu geladen.",
     "errorTitle": "Fehler beim Löschen des lokalen Speichers",
-    "errorDescription": "Beim Zurücksetzen der Daten ist etwas schiefgelaufen. Bitte versuche es erneut."
+    "errorDescription": "Beim Zurücksetzen ist etwas schiefgelaufen. Versuch es nochmal."
   },
   "sidebar": {
     "configuration": "Konfiguration",
@@ -542,22 +542,22 @@
     "step1": {
       "titleStart": "Dein ",
       "titleEmphasis": "Kontext",
-      "badge": "schritt {step}"
+      "badge": "Schritt {step}"
     },
     "step2": {
       "titleStart": "Deine ",
       "titleEmphasis": "Tage",
-      "badge": "schritt {step}"
+      "badge": "Schritt {step}"
     },
     "step3": {
       "titleStart": "Deine ",
       "titleEmphasis": "Konfiguration",
-      "badge": "schritt {step}"
+      "badge": "Schritt {step}"
     },
     "step4": {
       "titleStart": "Dein ",
       "titleEmphasis": "Export",
-      "badge": "schritt {step}"
+      "badge": "Schritt {step}"
     },
     "steps": "Schritte"
   },
@@ -571,11 +571,11 @@
     "remaining": "Verbleibend:",
     "resetManualChanges": "Manuelle Änderungen zurücksetzen",
     "allAssigned": "Alle Tage zugewiesen!",
-    "clickToAssign": "Klicke auf Tage im Kalender, um verbleibende Tage manuell zuzuweisen"
+    "clickToAssign": "Klicke auf Tage im Kalender, um verbleibende Tage manuell zuzuweisen."
   },
   "ptoCalculator": {
     "title": "PTO-Rechner",
-    "tooltip": "Berechne deine angesammelten PTO-Tage basierend auf monatlichem Aufbau. Die meisten Unternehmen bieten 2-3 Tage pro Monat. Wähle den Zielmonat, um deine verfügbaren Gesamttage zu sehen.",
+    "tooltip": "Berechne deine PTO-Tage anhand monatlicher Ansammlung. Die meisten Unternehmen bieten 2–3 Tage pro Monat. Wähle den Zielmonat, um deine verfügbaren Tage zu sehen.",
     "tooltipLabel": "Mehr Informationen über den PTO-Rechner",
     "daysPerMonth": "Tage pro Monat",
     "calculateThrough": "Berechnen bis",
@@ -598,16 +598,16 @@
     "unusedPtoDays": "Ungenutzte PTO-Tage",
     "unusedPtoDaysPlaceholder": "{days}",
     "valueOfUnusedPto": "Wert ungenutzter PTO:",
-    "worthOfPaidVacation": "Wert des nicht genommenen bezahlten Urlaubs",
+    "worthOfPaidVacation": "Wert des nicht genutzten bezahlten Urlaubs",
     "yourDailyRate": "Dein Tagessatz:",
     "perDay": "/Tag",
     "yourHourlyRate": "Dein Stundensatz:",
     "perHour": "/Stunde",
     "standardWorkingHours": "Standard-Arbeitsstunden",
     "effectiveHourlyRate": "Effektiver Stundensatz:",
-    "whenWorkingExtraDays": "Bei {days} zusätzlichen unbezahlten Arbeitstagen",
+    "whenWorkingExtraDays": "Bei {days} zusätzlichen unbezahlten Arbeitstagen.",
     "opportunityCost": "Opportunitätskosten",
-    "opportunityCostDescription": "Du hast {days} Tage gearbeitet, die du als bezahlten Urlaub hättest nehmen können. Das entspricht <amount>value</amount> an bezahlter Freizeit, die du nicht genutzt hast. Dein Gehalt bleibt gleich – aber du hast Tage gearbeitet, die du hättest freinehmen können."
+    "opportunityCostDescription": "Du hast {days} Tage gearbeitet, die du als bezahlten Urlaub hättest nehmen können. Das entspricht <amount>value</amount> an bezahlter Freizeit, die ungenutzt blieb. Dein Gehalt bleibt gleich – aber die Tage sind weg."
   },
   "checkout": {
     "back": "Zurück",
@@ -642,26 +642,26 @@
     "premiumRequired": "Premium-Funktion erforderlich",
     "featureRequiresPremium": "erfordert Premium-Zugang",
     "verifyDescription": "Wenn du bereits gespendet oder bezahlt hast, gleichen wir deine E-Mail mit unserer Liste ab und schalten deinen Zugang frei. Bei Problemen meld dich einfach bei uns.",
-    "considerDonating": "Wenn du noch nicht gespendet hast, erwäge bitte eine Spende, um das Projekt zu unterstützen und Premium-Funktionen freizuschalten!",
+    "considerDonating": "Falls du noch nicht gespendet hast, würden wir uns über eine Spende freuen – sie hält das Projekt am Leben und schaltet Premium-Funktionen frei.",
     "enterPremiumEmail": "Gib deine Premium-E-Mail ein",
     "emailPlaceholder": "deine@email.com",
     "verifying": "Überprüfung...",
     "verifyAccess": "Zugang überprüfen",
     "cancel": "Abbrechen",
     "accessGranted": "Zugang gewährt!",
-    "welcomeToPremium": "Willkommen bei den Premium-Funktionen. Du kannst dieses Fenster schließen oder wir tun es in {seconds} Sekunden.",
+    "welcomeToPremium": "Willkommen bei Premium! Du kannst dieses Fenster schließen – es schließt sich in {seconds} Sekunden von selbst.",
     "accessDenied": "Zugang verweigert",
     "emailNotFound": "Diese E-Mail-Adresse ist nicht als Premium-Nutzer:in registriert.",
     "emailNotFoundError": "E-Mail-Adresse nicht gefunden",
     "tryAgain": "Erneut versuchen",
     "close": "Schließen",
-    "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein",
-    "emailRequired": "Bitte gib deine E-Mail-Adresse ein"
+    "invalidEmail": "Gib eine gültige E-Mail-Adresse ein.",
+    "emailRequired": "Gib deine E-Mail-Adresse ein."
   },
   "validation": {
     "contact": {
-      "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein",
-      "emailRequired": "Bitte gib deine E-Mail-Adresse ein",
+      "invalidEmail": "Gib eine gültige E-Mail-Adresse ein.",
+      "emailRequired": "Gib deine E-Mail-Adresse ein.",
       "nameMin": "Der Name muss mindestens {min} Zeichen lang sein",
       "nameMax": "Der Name ist zu lang",
       "subjectMin": "Der Betreff muss mindestens {min} Zeichen lang sein",
@@ -672,13 +672,13 @@
     "payment": {
       "amountMin": "Mindestbetrag ist 1",
       "amountMax": "Höchstbetrag ist 10.000",
-      "invalidEmail": "Eine gültige E-Mail ist erforderlich",
-      "emailRequired": "Bitte gib deine E-Mail-Adresse ein"
+      "invalidEmail": "Gib eine gültige E-Mail-Adresse ein.",
+      "emailRequired": "Gib deine E-Mail-Adresse ein."
     },
     "holiday": {
-      "nameRequired": "Feiertagsname ist erforderlich",
-      "nameMax": "Feiertagsname ist zu lang",
-      "invalidDate": "Bitte wähle ein gültiges Datum"
+      "nameRequired": "Name des Feiertags fehlt.",
+      "nameMax": "Name des Feiertags ist zu lang.",
+      "invalidDate": "Wähle ein gültiges Datum."
     }
   },
   "roadmap": {
@@ -698,49 +698,49 @@
     "openIssue": "erstelle ein Issue auf GitHub",
     "features": {
       "corePtoCalculator": "PTO-Kernrechner",
-      "corePtoCalculatorDescription": "Intelligente Urlaubsplanung mit Feiertagsoptimierung und Brückentag-Erkennung",
+      "corePtoCalculatorDescription": "Intelligente Urlaubsplanung mit Feiertagsoptimierung und Brückentag-Erkennung.",
       "multipleCountries": "Unterstützung mehrerer Länder",
-      "multipleCountriesDescription": "Unterstützung für Feiertage in europäischen Ländern mit regionsspezifischen Regeln",
+      "multipleCountriesDescription": "Feiertage für europäische Länder mit regionsspezifischen Regeln.",
       "premiumFeatures": "Premium-Funktionen",
-      "premiumFeaturesDescription": "Erweiterte Funktionen mit einmaliger Zahlung über Stripe freischalten",
+      "premiumFeaturesDescription": "Erweiterte Funktionen per Einmalzahlung über Stripe freischalten.",
       "customHolidays": "Eigene Feiertage",
-      "customHolidaysDescription": "Eigene Feiertage hinzufügen, bearbeiten und entfernen für personalisierte Planung",
+      "customHolidaysDescription": "Eigene Feiertage hinzufügen, bearbeiten und entfernen – für einen Plan, der genau zu dir passt.",
       "alternativeStrategies": "Alternative Strategien",
-      "alternativeStrategiesDescription": "Mehrere Urlaubsplanungsstrategien mit Effizienzvergleich",
+      "alternativeStrategiesDescription": "Mehrere Urlaubsplanungsstrategien mit Effizienzvergleich.",
       "analyticsDashboard": "Analyse-Dashboard",
-      "analyticsDashboardDescription": "Detaillierte Kennzahlen und Einblicke in deine Urlaubsplanung",
+      "analyticsDashboardDescription": "Detaillierte Kennzahlen und Einblicke in deine Urlaubsplanung.",
       "calendarExport": "Kalender-Export",
-      "calendarExportDescription": "Exportiere deinen Urlaubsplan nach Google Calendar, iCal oder Outlook",
+      "calendarExportDescription": "Exportiere deinen Urlaubsplan nach Google Calendar, iCal oder Outlook.",
       "teamPlanning": "Teamplanung",
-      "teamPlanningDescription": "Koordiniere die Urlaubsplanung mit Teammitgliedern, um Konflikte zu vermeiden",
+      "teamPlanningDescription": "Koordiniere die Urlaubsplanung mit dem Team, um Überschneidungen zu vermeiden.",
       "emailNotifications": "E-Mail-Benachrichtigungen",
-      "emailNotificationsDescription": "Erhalte Erinnerungen über bevorstehende Urlaube und wichtige Termine",
+      "emailNotificationsDescription": "Erinnerungen für bevorstehende Urlaube und wichtige Termine.",
       "mobileApp": "Mobile App",
-      "mobileAppDescription": "Native iOS- und Android-Apps für Urlaubsplanung unterwegs",
+      "mobileAppDescription": "Native iOS- und Android-Apps für Urlaubsplanung unterwegs.",
       "aiSuggestions": "KI-Vorschläge",
-      "aiSuggestionsDescription": "KI-gestützte Empfehlungen basierend auf deinen Präferenzen und bisherigen Mustern",
+      "aiSuggestionsDescription": "KI-gestützte Empfehlungen basierend auf deinen Präferenzen und bisherigen Mustern.",
       "weatherIntegration": "Wetter-Integration",
-      "weatherIntegrationDescription": "Wettervorhersagen für deine geplanten Urlaubstage anzeigen",
+      "weatherIntegrationDescription": "Wettervorhersagen für deine geplanten Urlaubstage.",
       "blockedPeriods": "Gesperrte Zeiträume",
-      "blockedPeriodsDescription": "Markiere Datumsbereiche, in denen du keine PTO-Vorschläge möchtest — Konferenzen, Reisen, Krankschreibungen oder Zeiten, von denen du weißt, dass du beschäftigt sein wirst",
+      "blockedPeriodsDescription": "Markiere Datumsbereiche, in denen du keine PTO-Vorschläge möchtest: Konferenzen, Reisen, Krankschreibungen oder Zeiten, von denen du weißt, dass du beschäftigt sein wirst.",
       "performanceOptimization": "Performance-Optimierung",
-      "performanceOptimizationDescription": "Schnellere Berechnungen und flüssigeres Erlebnis dank Web Workers",
+      "performanceOptimizationDescription": "Schnellere Berechnungen und flüssigeres Erlebnis dank Web Workers.",
       "customWeekends": "Individuelle Wochenenden",
-      "customWeekendsDescription": "Definiere eigene arbeitsfreie Tage über das Standard-Samstag-Sonntag-Wochenende hinaus",
+      "customWeekendsDescription": "Definiere eigene arbeitsfreie Tage über das Standard-Samstag-Sonntag-Wochenende hinaus.",
       "multiYearPlanning": "Mehrjahresplanung",
-      "multiYearPlanningDescription": "Plane Urlaube über mehrere Jahre mit Übertragsunterstützung",
+      "multiYearPlanningDescription": "Plane Urlaube über mehrere Jahre mit Übertragsunterstützung.",
       "calendarSubscription": "Live-Kalenderabonnement",
-      "calendarSubscriptionDescription": "Abonniere direkt aus Google Calendar, Apple Calendar oder Outlook über eine webcal://-URL — dein Plan bleibt automatisch synchronisiert"
+      "calendarSubscriptionDescription": "Abonniere direkt aus Google Calendar, Apple Calendar oder Outlook über eine webcal://-URL; dein Plan bleibt automatisch synchronisiert."
     }
   },
   "cookies": {
     "title": "Wir verwenden Cookies",
-    "description": "Wir verwenden essenzielle Cookies für grundlegende Website-Funktionalität und Analyse-Cookies, um zu verstehen, wie du mit unserer Seite interagierst.",
+    "description": "Wir verwenden notwendige Cookies für den Betrieb der Seite und optionale Analyse-Cookies, um zu verstehen, wie du unsere Seite nutzt.",
     "rejectAll": "Alle ablehnen",
     "managePreferences": "Einstellungen verwalten",
     "acceptAll": "Alle akzeptieren",
     "preferencesTitle": "Cookie-Einstellungen",
-    "preferencesDescription": "Wir verwenden Cookies, um dein Surferlebnis zu verbessern und den Website-Traffic zu analysieren. Wähle aus, welche Cookies du akzeptieren möchtest.",
+    "preferencesDescription": "Wir verwenden Cookies, um die App zu verbessern und zu verstehen, wie sie genutzt wird. Wähle, welche du akzeptierst.",
     "necessaryCookies": "Notwendige Cookies",
     "necessaryDescription": "Essenziell für die Funktion der Website. Kann nicht deaktiviert werden.",
     "cookieDetails": "Cookie-Details",
@@ -782,22 +782,22 @@
   },
   "errors": {
     "contact": {
-      "VALIDATION_ERROR": "Bitte überprüfe deine Eingaben.",
-      "EMAIL_SEND_FAILED": "E-Mail konnte nicht gesendet werden. Bitte versuche es erneut.",
-      "SAVE_FAILED": "Wir haben deine Anfrage erhalten, allerdings gab es ein kleines technisches Problem beim Abschließen der Protokolle. Es ist keine weitere Aktion deinerseits erforderlich.",
-      "RENDER_FAILED": "E-Mail konnte nicht vorbereitet werden. Bitte versuche es erneut.",
-      "UNKNOWN": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut."
+      "VALIDATION_ERROR": "Überprüf deine Eingaben.",
+      "EMAIL_SEND_FAILED": "E-Mail konnte nicht gesendet werden. Versuch es nochmal.",
+      "SAVE_FAILED": "Deine Anfrage ist angekommen, aber beim Abschließen lief technisch etwas schief. Du musst nichts weiter tun.",
+      "RENDER_FAILED": "E-Mail konnte nicht vorbereitet werden. Versuch es nochmal.",
+      "UNKNOWN": "Ein unerwarteter Fehler ist aufgetreten. Versuch es nochmal."
     },
     "payment": {
-      "VALIDATION_ERROR": "Bitte überprüfe deine Eingaben.",
+      "VALIDATION_ERROR": "Überprüf deine Eingaben.",
       "INVALID_PROMO_CODE": "Der Promo-Code ist ungültig oder abgelaufen.",
-      "PAYMENT_FAILED": "Zahlungsverarbeitung fehlgeschlagen.",
-      "SAVE_FAILED": "Zahlung eingeleitet, aber etwas ist beim Speichern schiefgelaufen. Bitte wende dich an den Support.",
+      "PAYMENT_FAILED": "Zahlung fehlgeschlagen.",
+      "SAVE_FAILED": "Zahlung eingeleitet, aber beim Speichern ist etwas schiefgelaufen. Meld dich beim Support.",
       "UPDATE_STATUS_FAILED": "Zahlungsstatus konnte nicht aktualisiert werden.",
       "SAVE_FROM_WEBHOOK_FAILED": "Zahlung vom Webhook konnte nicht gespeichert werden.",
       "CHARGE_UPDATE_FAILED": "Belastungsdetails konnten nicht aktualisiert werden.",
       "WEBHOOK_PROCESSING_FAILED": "Webhook-Ereignis konnte nicht verarbeitet werden.",
-      "UNKNOWN": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut."
+      "UNKNOWN": "Ein unerwarteter Fehler ist aufgetreten. Versuch es nochmal."
     }
   },
   "legal": {
@@ -811,7 +811,7 @@
     "lede": "Wir haben am Strand gesucht, unter dem Sonnenschirm nachgeschaut, an der Strandbar gefragt… nichts. Die URL, die du suchst, existiert nicht (oder hat sich zwischen zwei langen Wochenenden verirrt).",
     "ctaPrimary": "Zurück zur Startseite",
     "ctaPlanner": "Planer öffnen",
-    "suggestLabel": "Suchtest du sowas?",
+    "suggestLabel": "Meintest du das?",
     "link1": "Wie es funktioniert",
     "link2": "Funktionen",
     "link3": "Preise",
@@ -824,7 +824,7 @@
     "title": "Der Server hat sich einen",
     "titleHighlight": "freien Tag",
     "titleEmphasis": "ohne Erlaubnis genommen.",
-    "lede": "Auf unserer Seite ist etwas explodiert. Nicht deine Schuld (dieses Mal). Unser Team weiß davon — die Logs rauchen und wir sind dabei. Versuche es in einigen Minuten erneut, oder prüfe den Live-Status.",
+    "lede": "Auf unserer Seite ist etwas explodiert. Nicht deine Schuld (dieses Mal). Unser Team weiß davon: die Logs rauchen und wir sind dabei. Versuche es in einigen Minuten erneut, oder prüfe den Live-Status.",
     "statusPage": "Status ansehen",
     "meanwhile": "In der Zwischenzeit:",
     "contact": "Problem melden",
@@ -895,7 +895,7 @@
       "status": "Status",
       "confirmed": "Bestätigt",
       "paymentId": "Zahlungs-ID",
-      "premiumActivated": "Dein Premium-Zugang wurde aktiviert. Du kannst jetzt alle Premium-Funktionen genießen!",
+      "premiumActivated": "Dein Premium ist jetzt aktiv. Viel Spaß mit allen Features!",
       "continueHome": "Weiter zur Startseite"
     }
   },
@@ -942,7 +942,7 @@
       "engineTitle": "Die Engine macht die Magie.",
       "engineDescription": "Die Engine gleicht deine Tage mit offiziellen Feiertagen und regionalen Brückentagen ab, findet alle möglichen Kombinationen und sortiert sie nach dem Verhältnis freie Tage zu eingesetzten Urlaubstagen.",
       "exportTitle": "Urlaubstage beantragen.",
-      "exportDescription": "Exportiere den Plan nach Google Kalender, Outlook oder als PDF — einfach ins HR-Formular einfügen und fertig. Kein Rätselraten mehr."
+      "exportDescription": "Exportiere den Plan nach Google Kalender, Outlook oder als PDF – einfach ins HR-Formular einfügen und fertig. Kein Rätselraten mehr."
     },
     "stats": {
       "multiplierLabel": "Durchschnittlicher Multiplikator",
@@ -977,7 +977,7 @@
       "countriesDescription": "Offizielle Kalender jedes Jahr aktualisiert. Auch die regionalen.",
       "privacyTag": "100% lokal",
       "privacyTitle": "Deine Daten verlassen nie deinen Browser.",
-      "privacyDescription": "Keine Anmeldung. Kein Konto. Deine Urlaubsdaten werden ausschließlich in deinem Browser gespeichert — wir sehen sie nie."
+      "privacyDescription": "Keine Anmeldung. Kein Konto. Deine Urlaubsdaten werden ausschließlich in deinem Browser gespeichert; wir sehen sie nie."
     },
     "comparison": {
       "badge": "vorher · nachher",
@@ -1062,7 +1062,7 @@
       "lifetimeFeatures": {
         "manualEditing": "Manuelle Kalenderbearbeitung",
         "calendarExport": "Exportieren nach Google · Outlook · Apple · PDF",
-        "customHolidays": "Benutzerdefinierte & Unternehmens-Feiertage",
+        "customHolidays": "Eigene & Unternehmens-Feiertage",
         "pastDaysAndCarryover": "Vergangene Tage erlauben · Übertragsmonate",
         "holidayManagement": "Beliebige Feiertage bearbeiten & löschen",
         "fullAnalytics": "Vollständige Analysen & visuelle Diagramme"

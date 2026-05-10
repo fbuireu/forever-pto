@@ -437,10 +437,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           set({
             manuallySelectedDays: updatedManualDays,
             removedSuggestedDays: updatedRemovedDays,
-            currentSelection: {
-              ...currentSelection,
-              metrics: updatedMetrics,
-            },
+            currentSelection: { ...currentSelection, metrics: updatedMetrics },
           });
           return true;
         },

@@ -85,10 +85,10 @@
       "daysCount": "{count, plural, one {day} other {days}}"
     },
     "summaryParagraph": {
-      "withGain": "With your {ptoDays} vacation days and {totalHolidays} public holidays, the {strategy} strategy turns them into {effectiveDays} effective days off — that's {increment} extra days, a +{percentage}% improvement over simply using them as-is.",
+      "withGain": "With your {ptoDays} vacation days and {totalHolidays} public holidays, the {strategy} strategy turns them into {effectiveDays} effective days off, that's {increment} extra days, a +{percentage}% improvement over simply using them as-is.",
       "withoutGain": "With your {ptoDays} vacation days and {totalHolidays} public holidays, you get {effectiveDays} effective days off using the {strategy} strategy.",
       "noRegionHintTitle": "Add your region",
-      "noRegionHint": "Select your region in the sidebar to include regional holidays and potentially get even more days off.",
+      "noRegionHint": "Select your region in the sidebar to include regional holidays and squeeze out even more days off.",
       "withRegion": "{regionalDays} of your holidays are specific to {region}."
     },
     "notifications": {
@@ -98,7 +98,7 @@
         "moreDays": "more days",
         "toYourPlan": "to your plan.",
         "reviewOptions": "Review available options.",
-        "considerPremium": "Consider Premium for more analysis."
+        "considerPremium": "Get premium for deeper analysis."
       },
       "manualAdjustments": {
         "title": "Manual adjustments",
@@ -136,11 +136,11 @@
         "title": "General",
         "whatIsPto": {
           "question": "What is PTO?",
-          "answer": "PTO stands for Paid Time Off — the number of vacation days your employer gives you each year to use however you want. Unlike sick leave or public holidays, PTO days are yours to schedule freely. The challenge is that most people use them randomly and leave a lot of potential rest on the table. Forever PTO helps you place those days strategically around public holidays to turn, say, 5 PTO days into 12 consecutive days off."
+          "answer": "PTO stands for Paid Time Off: the number of vacation days your employer gives you each year to use however you want. Unlike sick leave or public holidays, PTO days are yours to schedule freely. The challenge is that most people use them randomly and leave a lot of potential rest on the table. Forever PTO helps you place those days strategically around public holidays to turn, say, 5 PTO days into 12 consecutive days off."
         },
         "whatIs": {
           "question": "What is this?",
-          "answer": "Forever PTO is a tool to help you plan and optimize your paid time off (PTO) by suggesting the best dates to take off based on public holidays and your preferences. Given the complexity of holiday planning, Forever PTO aims to simplify the process and maximize your free time. You can choose different strategies to balance your time off throughout the year, and fully customize holidays, festivity names, and even add custom holidays specific to your company or region."
+          "answer": "Forever PTO helps you plan and optimize your paid time off by suggesting the best dates to request based on public holidays and your preferences. Holiday planning can get complicated — Forever PTO simplifies it so you get the most out of every day. You can choose different strategies to spread time off across the year, customize holiday names, and add company-specific or regional holidays."
         },
         "howWorks": {
           "question": "How does it work?"
@@ -151,7 +151,7 @@
         },
         "pricing": {
           "question": "Why is there a paid model?",
-          "answer": "Forever PTO is free. However, we use a paid model to support the costs of maintaining data, infrastructure and continuous improvements. The paid model funds updates, support and hosting. We also offer a free tier with core features to ensure everyone can benefit from better PTO planning."
+          "answer": "Forever PTO is free. The paid model covers the cost of data, hosting, and ongoing improvements. It funds updates, support, and infrastructure. Core features remain free so anyone can plan smarter without paying."
         },
         "restartTutorial": {
           "question": "How can I see the interactive tutorial again?"
@@ -161,7 +161,7 @@
         "title": "Technical",
         "algorithms": {
           "question": "How does the suggestion algorithm work?",
-          "answer": "The system analyzes available workdays, holidays and user preferences (e.g. avoiding past days) to produce PTO combinations that maximize effective time off. It applies heuristics based on efficiency and scoring to prioritize bridges and grouped days."
+          "answer": "The system looks at your available workdays, holidays, and preferences (like skipping past dates) to find PTO combinations that maximize your total time off. It scores every possible bridge and block by efficiency, then surfaces the best ones."
         },
         "strategies": {
           "question": "What is the difference between \"balanced\" and \"optimized\" strategies?",
@@ -169,7 +169,7 @@
         },
         "results": {
           "question": "Why do recommendations change when I update preferences or holidays?",
-          "answer": "Suggestions are recalculated in real time from your PTO budget, selected year, holiday set, custom holidays and strategy. Small changes can reshuffle rankings because the engine re-scores every possible bridge and block."
+          "answer": "Suggestions are recalculated in real time whenever your PTO budget, year, holidays, or strategy changes. Even small tweaks can reshuffle the rankings because the engine re-scores every possible bridge and block."
         }
       },
       "security": {
@@ -180,14 +180,14 @@
         },
         "encryption": {
           "question": "Is my data encrypted?",
-          "answer": "Your vacation planning data is stored locally in your browser. We apply XOR cipher obfuscation to make the data unreadable in casual inspection. This method is designed to prevent accidental exposure, not protect against determined attackers. We don't store sensitive personal information, and you maintain full control of your data on your device. All your data (PTO days, selected dates, custom holidays, preferences) is stored exclusively in your browser's local storage. We never send this information to our servers. Your vacation planning stays completely private on your device."
+          "answer": "Everything is stored locally in your browser — PTO days, selected dates, custom holidays, preferences. We apply light obfuscation so the data isn't readable at a glance, but the real protection is that we never send it to our servers. Your vacation planning never leaves your device."
         },
         "tracking": {
           "question": "Do you sell my data or track my vacation plans?",
           "answer": "No. Your planning data stays in your browser and is not sold to advertisers or data brokers. If analytics are enabled, they are limited to product measurement and never used to profile your vacation plans."
         },
         "troubleshooting": {
-          "question": "Troubleshooting & stale client data"
+          "question": "Troubleshooting & outdated browser data"
         }
       },
       "collaborate": {
@@ -198,17 +198,17 @@
         },
         "business": {
           "question": "Propose integrations or corporate partnerships",
-          "answer": "If you represent a company and want to integrate Forever PTO, contact support or open a proposal for a custom integration."
+          "answer": "If you represent a company and want to integrate Forever PTO, reach out directly or open a GitHub issue with your proposal."
         },
         "nonCode": {
           "question": "Can I collaborate if I'm not a developer?",
-          "answer": "Yes. Feedback on UX, copy, translations, holiday accuracy, testing and partnership ideas is useful. If you spot friction or have a market-specific need, reach out and we can shape it together."
+          "answer": "Yes. Feedback on UX, copy, translations, holiday accuracy, testing, and ideas is always useful. If you spot friction or have a specific need, just reach out."
         }
       }
     }
   },
   "workdayCounter": {
-    "title": "Workday Counter",
+    "title": "Workday counter",
     "tooltip": "Count working days between two dates, automatically excluding weekends and holidays. Useful for project planning and deadline calculations.",
     "tooltipLabel": "More information about workday counter",
     "selectRange": "Select dates",
@@ -218,7 +218,7 @@
     "days": "Days",
     "weekendDays": "Weekend days",
     "holidays": "Holidays",
-    "dateRange": "Date Range",
+    "dateRange": "Date range",
     "from": "From",
     "to": "to"
   },
@@ -226,10 +226,10 @@
     "nationalTab": "National",
     "regionalTab": "Regional",
     "customTab": "Custom",
-    "nationalTitle": "National Holidays",
-    "regionalTitle": "Regional Holidays",
-    "customTitle": "Custom Holidays",
-    "customHolidaysFeature": "Custom Holidays",
+    "nationalTitle": "National holidays",
+    "regionalTitle": "Regional holidays",
+    "customTitle": "Custom holidays",
+    "customHolidaysFeature": "Custom holidays",
     "customHolidaysDescription": "Lets you add custom holidays",
     "selectAll": "Select all",
     "partialSelection": "Partial selection - click to select all",
@@ -282,30 +282,30 @@
     "addHoliday": {
       "title": "Add new holiday",
       "description": "Create a new holiday by selecting a date and entering a name",
-      "nameLabel": "Holiday Name",
+      "nameLabel": "Holiday name",
       "namePlaceholder": "e.g. My birthday",
-      "dateLabel": "Select Date",
+      "dateLabel": "Select date",
       "selected": "Selected",
       "submit": "Add holiday",
       "submitting": "Adding...",
       "cancel": "Cancel",
-      "successTitle": "Holiday created successfully",
+      "successTitle": "Holiday added",
       "successDescription": "{name} has been added on {date}",
-      "errorTitle": "Error creating holiday",
-      "errorDescription": "Something went wrong. Please try again.",
+      "errorTitle": "Couldn't add holiday",
+      "errorDescription": "Something went wrong. Try again.",
       "existsTitle": "Holiday already exists",
       "existsDescription": "There's already a holiday on {date}: {name}"
     },
     "editHoliday": {
       "title": "Edit holiday",
       "description": "Modify the selected holiday",
-      "submit": "Save Changes",
+      "submit": "Save changes",
       "submitting": "Saving...",
       "cancel": "Cancel",
-      "successTitle": "Holiday updated successfully",
+      "successTitle": "Holiday updated",
       "successDescription": "{name} has been updated",
-      "errorTitle": "Error updating holiday",
-      "errorDescription": "Something went wrong. Please try again."
+      "errorTitle": "Couldn't update holiday",
+      "errorDescription": "Something went wrong. Try again."
     },
     "deleteHoliday": {
       "title": "Delete holidays",
@@ -319,8 +319,8 @@
       "successTitleSingular": "Holiday deleted",
       "successDescription": "{count} holidays have been removed",
       "successDescriptionSingular": "The holiday has been removed",
-      "errorTitle": "Error deleting holidays",
-      "errorDescription": "Something went wrong. Please try again."
+      "errorTitle": "Couldn't delete holidays",
+      "errorDescription": "Something went wrong. Try again."
     }
   },
   "tutorial": {
@@ -333,17 +333,17 @@
     "progressTextConnector": "of",
     "steps": {
       "toolsTitle": "Calculators & tools",
-      "toolsDescription": "Access helpful calculators here: estimate your PTO based on work history, calculate the monetary value of unused PTO, or count workdays between dates.",
+      "toolsDescription": "Calculators live here: estimate how many PTO days you've accrued, see what unused days cost you in salary, or count workdays between two dates.",
       "alternativesTitle": "Alternatives manager",
-      "alternativesDescription": "Navigate through different PTO suggestions generated by us. Compare efficiency metrics, total days off, and find the perfect balance. The first option is always our recommended suggestion, marked with a sparkle icon. Use the arrows to explore alternatives and click \"Apply alternative\" to use a different suggestion.",
+      "alternativesDescription": "Browse the different plans we generated. Compare efficiency and total days off to find your ideal balance. The first option is always our top pick, marked with a sparkle. Use the arrows to explore, then click \"Apply alternative\" to switch.",
       "statusTitle": "PTO status tracker",
-      "statusDescription": "Monitor your PTO allocation in real-time. See auto-assigned days (suggested by our system), manually selected days, and remaining days available. You can reset manual changes anytime to return to the suggested plan.",
+      "statusDescription": "Track your PTO at a glance: auto-assigned days, manually selected days, and how many are left. Reset manual changes anytime to go back to the suggested plan.",
       "calendarTitle": "Your interactive PTO calendar",
       "calendarDescription": "This is your year-at-a-glance calendar. Holidays appear in gray, suggested PTO days in teal, and manually selected days in blue. Click any working day to manually toggle selection. The calendar updates instantly as you explore different alternatives.",
       "finishTitle": "You're all set!",
-      "finishDescription": "Now you know how to use Forever PTO to maximize your time off. Start by configuring your preferences in the sidebar, and let the app suggest the best PTO days for you.",
+      "finishDescription": "You're set. Configure your preferences in the sidebar and we'll suggest the best PTO days to take.",
       "holidaysListTitle": "Customize your holidays",
-      "holidaysListDescription": "Here you can fine-tune the holiday data to match your exact situation. Edit or delete any national or regional holiday, and add your own custom days off — company holidays, local observances, or any date that matters to you. The more accurate the data, the better the suggestions.",
+      "holidaysListDescription": "Here you can fine-tune the holiday data to match your exact situation. Edit or delete any national or regional holiday, and add your own custom days off: company holidays, local observances, or any date that matters to you. The more accurate the data, the better the suggestions.",
       "step1Title": "Your context",
       "step1Description": "Select your country, region, and the year you want to plan. This sets up your holiday calendar so we can find the best bridges.",
       "step2Title": "Your available days",
@@ -353,7 +353,7 @@
       "step4Title": "Export your calendar",
       "step4Description": "Download your holidays and planned vacation days as a .ics file to import into Google Calendar, Apple Calendar or Outlook, or as a PDF to print or share.",
       "drawerTitle": "Your planner panel",
-      "drawerDescription": "This bar always shows your current plan summary. Swipe it up — or drag the handle — to explore alternatives and see how your days are distributed."
+      "drawerDescription": "This bar always shows your current plan summary. Swipe it up (or drag the handle) to explore alternatives and see how your days are distributed."
     }
   },
   "legend": {
@@ -400,7 +400,7 @@
   },
   "contact": {
     "title": "Contact us",
-    "description": "Have a question or feedback? We'd love to hear from you!",
+    "description": "Have a question or feedback? We'd love to hear from you.",
     "name": "Name",
     "namePlaceholder": "John Doe",
     "email": "Email",
@@ -409,13 +409,13 @@
     "subjectPlaceholder": "What is this about?",
     "message": "Message",
     "messagePlaceholder": "Tell us what you need...",
-    "sendMessage": "Send Message",
+    "sendMessage": "Send message",
     "sending": "Sending...",
     "cancel": "Cancel",
     "successTitle": "Message sent!",
-    "successDescription": "We'll get back to you as soon as possible.",
-    "errorTitle": "There's been an error",
-    "tryAgain": "Try Again",
+    "successDescription": "We'll get back to you shortly.",
+    "errorTitle": "Something went wrong",
+    "tryAgain": "Try again",
     "close": "Close",
     "failedToSend": "Failed to send message"
   },
@@ -434,27 +434,27 @@
     "daysUnit": "days"
   },
   "toasts": {
-    "suggestionApplied": "Suggestion applied successfully",
+    "suggestionApplied": "Suggestion applied",
     "cannotSelectPastDays": "Cannot select past days",
     "enablePastDays": "Enable \"Allow past days\" in settings to select past dates",
     "noPtoDaysRemaining": "No remaining PTO days to assign",
     "removeDaysToFree": "Remove existing days to free up space",
     "cannotSelectBankHoliday": "Cannot select a bank holiday",
     "bankHolidayDescription": "This day is already a national or regional holiday",
-    "paymentFailed": "Payment initialization failed",
-    "paymentFailedDescription": "Please try again later",
+    "paymentFailed": "Couldn't start payment",
+    "paymentFailedDescription": "Try again later",
     "paymentSuccess": "Payment successful!",
-    "paymentSuccessDescription": "Thank you for your support! You now have premium access."
+    "paymentSuccessDescription": "Premium access is now active."
   },
   "troubleshooting": {
-    "description": "If the app behaves unexpectedly, it may be due to outdated data stored in your browser. Clearing local storage resets everything to a clean state.",
-    "resetButton": "Reset Local Storage",
+    "description": "If the app is behaving oddly, it's usually due to outdated data in your browser. Clearing local storage resets everything back to defaults.",
+    "resetButton": "Reset local storage",
     "clearing": "Clearing...",
     "cleared": "Cleared",
-    "successTitle": "Local storage cleared successfully",
-    "successDescription": "All data has been reset and refreshed from the server.",
-    "errorTitle": "Error clearing local storage",
-    "errorDescription": "Something went wrong while resetting the data. Please try again."
+    "successTitle": "Local storage cleared",
+    "successDescription": "All data has been reset.",
+    "errorTitle": "Couldn't clear local storage",
+    "errorDescription": "Something went wrong. Try again."
   },
   "sidebar": {
     "configuration": "Configuration",
@@ -464,7 +464,7 @@
     "loading": "Loading...",
     "country": {
       "title": "Country",
-      "tooltip": "This data is inferred from your connection. If it's not accurate or you want to browse other countries' holidays, you can select it manually here",
+      "tooltip": "Detected from your connection. If it's wrong or you want to check another country's holidays, you can change it here.",
       "tooltipLabel": "More information about country selection",
       "loading": "Loading countries...",
       "placeholder": "Select country...",
@@ -520,20 +520,20 @@
         },
         "cons": {
           "noMaximization": "Doesn't maximize",
-          "intermediateSolution": "Intermediate solution"
+          "intermediateSolution": "Middle-of-the-road"
         }
       }
     },
     "allowPastDays": {
-      "title": "Allow Past Days",
-      "tooltip": "This switch allows you to enable or disable the suggestion of past holidays for the selected year. This lets you see PTO opportunities that were missed in the past",
+      "title": "Allow past days",
+      "tooltip": "Enable this to include past dates in suggestions for the selected year. Useful for reviewing PTO opportunities you may have missed.",
       "tooltipLabel": "More information about past days",
       "enabled": "Enabled",
       "disabled": "Disabled"
     },
     "carryOverMonths": {
-      "title": "Carry Over Months",
-      "tooltip": "Lets you add months from the following year to expand the opportunity search",
+      "title": "Carry-over months",
+      "tooltip": "Extend the planning window into the following year to find more bridge opportunities.",
       "tooltipLabel": "More information about carry over"
     },
     "years": {
@@ -562,10 +562,10 @@
     "steps": "Steps"
   },
   "ptoDays": {
-    "title": "PTO Days",
+    "title": "PTO days",
     "iHave": "I have",
     "days": "days",
-    "status": "PTO Days Status",
+    "status": "PTO days status",
     "autoAssigned": "Auto-assigned:",
     "manuallySelected": "Manually selected:",
     "remaining": "Remaining:",
@@ -574,10 +574,10 @@
     "clickToAssign": "Click on days in the calendar to manually assign remaining days"
   },
   "ptoCalculator": {
-    "title": "PTO Accrual Calculator",
-    "tooltip": "Calculate your accumulated PTO days based on monthly accrual. Most companies offer 2-3 days per month. Select the target month to see your total available days.",
+    "title": "PTO accrual calculator",
+    "tooltip": "Calculate how many PTO days you've accrued based on a monthly rate. Most companies give 2–3 days per month. Pick a target month to see your total.",
     "tooltipLabel": "More information about PTO calculator",
-    "daysPerMonth": "Days per month",
+    "daysPerMonth": "Days/month",
     "calculateThrough": "Calculate through",
     "selectMonth": "Select month",
     "searchMonth": "Search month...",
@@ -587,15 +587,15 @@
     "days": "days",
     "daysMonth": "days/month",
     "months": "months",
-    "applyToPtoDays": "Apply to PTO Days"
+    "applyToPtoDays": "Apply to PTO days"
   },
   "ptoSalaryCalculator": {
-    "title": "PTO vs Salary Calculator",
-    "tooltip": "Calculate how much paid time off you're giving up by not using your PTO days. You still get your full salary, but you're working days you could have taken as paid vacation.",
+    "title": "PTO vs. salary calculator",
+    "tooltip": "See how much paid vacation you're leaving on the table by not using your PTO days. You're still getting paid — you're just working days you didn't have to.",
     "tooltipLabel": "More information about salary calculator",
-    "annualSalary": "Annual Salary",
+    "annualSalary": "Annual salary",
     "annualSalaryPlaceholder": "{amount}",
-    "unusedPtoDays": "Unused PTO Days",
+    "unusedPtoDays": "Unused PTO days",
     "unusedPtoDaysPlaceholder": "{days}",
     "valueOfUnusedPto": "Value of unused PTO:",
     "worthOfPaidVacation": "Worth of paid vacation not taken",
@@ -606,7 +606,7 @@
     "standardWorkingHours": "Standard working hours",
     "effectiveHourlyRate": "Effective hourly rate:",
     "whenWorkingExtraDays": "When working {days} extra unpaid days",
-    "opportunityCost": "Opportunity Cost",
+    "opportunityCost": "Opportunity cost",
     "opportunityCostDescription": "You worked {days} days that you could have taken as paid vacation. That's <amount>value</amount> worth of paid time off you gave up. Your salary stays the same, but you worked extra days for free."
   },
   "checkout": {
@@ -623,44 +623,44 @@
   "donate": {
     "donateAndUnblock": "Donate & Unblock",
     "supportAndUnblock": "Support & Unblock",
-    "makeDonation": "Make a donation to support the project and unblock access.",
-    "alreadyPremium": "You are a premium user already. Thank you for your support!"
+    "makeDonation": "Support the project with a donation to unlock access.",
+    "alreadyPremium": "You're already a premium user. Thank you!"
   },
   "donationForm": {
     "email": "Email",
     "emailPlaceholder": "your@email.com",
     "quickAmounts": "Quick amounts",
-    "donationAmount": "Donation Amount",
+    "donationAmount": "Donation amount",
     "enterAmount": "Enter amount",
-    "basePriceNote": "Base price in {currency}. Final amount will be converted to your local currency at current exchange rates.",
+    "basePriceNote": "Base price in {currency}. The final amount will be converted to your local currency at current exchange rates.",
     "havePromoCode": "Have a promo code?",
     "promoCodePlaceholder": "YOU_WISH_IT_WAS_THAT_EASY",
-    "continueToPayment": "Continue to Payment",
+    "continueToPayment": "Continue to payment",
     "processing": "Processing..."
   },
   "upgrade": {
     "premiumRequired": "Premium feature required",
     "featureRequiresPremium": "requires premium access",
-    "verifyDescription": "If you've already donated or paid, we'll check your email and grant you access right away. If you run into any trouble, don't hesitate to contact us.",
-    "considerDonating": "If you haven't donated yet, please consider doing so to support the project and unlock premium features!",
-    "enterPremiumEmail": "Enter your premium email",
+    "verifyDescription": "If you've already donated or paid, we'll check your email and grant access right away. If you run into any trouble, reach out and we'll sort it.",
+    "considerDonating": "Haven't donated yet? Consider supporting the project to unlock premium features.",
+    "enterPremiumEmail": "Enter your email",
     "emailPlaceholder": "your@email.com",
     "verifying": "Verifying...",
-    "verifyAccess": "Verify Access",
+    "verifyAccess": "Verify access",
     "cancel": "Cancel",
     "accessGranted": "Access granted!",
-    "welcomeToPremium": "Welcome to premium features. You can close this modal or we will do so in {seconds} seconds.",
+    "welcomeToPremium": "Welcome to premium. You can close this or it will close in {seconds} seconds.",
     "accessDenied": "Access denied",
-    "emailNotFound": "This email is not in our premium users list.",
+    "emailNotFound": "That email isn't in our premium users list.",
     "emailNotFoundError": "Email not found in our premium users list",
-    "tryAgain": "Try Again",
+    "tryAgain": "Try again",
     "close": "Close",
-    "invalidEmail": "Please enter a valid email address",
+    "invalidEmail": "Enter a valid email address",
     "emailRequired": "Email is required"
   },
   "validation": {
     "contact": {
-      "invalidEmail": "Please enter a valid email address",
+      "invalidEmail": "Enter a valid email address",
       "emailRequired": "Email is required",
       "nameMin": "Name must be at least {min} characters",
       "nameMax": "Name is too long",
@@ -672,13 +672,13 @@
     "payment": {
       "amountMin": "Minimum amount is 1",
       "amountMax": "Maximum amount is 10,000",
-      "invalidEmail": "Valid email is required",
+      "invalidEmail": "Enter a valid email address",
       "emailRequired": "Email is required"
     },
     "holiday": {
       "nameRequired": "Holiday name is required",
       "nameMax": "Holiday name is too long",
-      "invalidDate": "Please select a valid date"
+      "invalidDate": "Select a valid date"
     }
   },
   "roadmap": {
@@ -691,7 +691,7 @@
     "future": "Future",
     "detailedView": "Detailed view",
     "haveSuggestion": "Have a suggestion?",
-    "feedbackShapes": "Your feedback shapes our roadmap. Share your ideas and help us build the perfect vacation planner.",
+    "feedbackShapes": "Your feedback shapes what gets built next. Share ideas, report gaps, or vote with your voice.",
     "gotAnIdea": "Got an idea that would make your life easier?",
     "letsTalk": "Let's talk",
     "or": "or",
@@ -722,7 +722,7 @@
       "weatherIntegration": "Weather Integration",
       "weatherIntegrationDescription": "See weather forecasts for your planned vacation dates",
       "blockedPeriods": "Blocked Periods",
-      "blockedPeriodsDescription": "Mark date ranges where you don't want any PTO suggestions — conferences, trips, medical leave, or any time you know you'll be busy",
+      "blockedPeriodsDescription": "Mark date ranges where you don't want any PTO suggestions: conferences, trips, medical leave, or any time you know you'll be busy",
       "performanceOptimization": "Performance Optimization",
       "performanceOptimizationDescription": "Faster calculations and smoother experience powered by Web Workers",
       "customWeekends": "Custom Weekends",
@@ -730,7 +730,7 @@
       "multiYearPlanning": "Multi-Year Planning",
       "multiYearPlanningDescription": "Plan vacations across multiple years with carryover support",
       "calendarSubscription": "Live Calendar Subscription",
-      "calendarSubscriptionDescription": "Subscribe directly from Google Calendar, Apple Calendar or Outlook via a webcal:// URL — your plan stays in sync automatically"
+      "calendarSubscriptionDescription": "Subscribe directly from Google Calendar, Apple Calendar or Outlook via a webcal:// URL; your plan stays in sync automatically"
     }
   },
   "cookies": {
@@ -754,11 +754,11 @@
     "hours": "hours",
     "week": "week",
     "userCountryDesc": "Stores your detected country for the initial holiday suggestion.",
-    "ccCookieDesc": "Stores your cookie consent preferences",
+    "ccCookieDesc": "Stores your cookie consent preferences.",
     "stripeMidDesc": "Fraud prevention and detection. Set by Stripe for secure payment processing.",
     "stripeSidDesc": "Session identifier for fraud prevention. Required for checkout process.",
     "gaDesc": "Distinguishes unique users.",
-    "gaStarDesc": "Maintains session state for analytics tracking",
+    "gaStarDesc": "Maintains session state for analytics tracking.",
     "gidDesc": "Distinguishes users for short-term analytics",
     "learnMore": "Learn more",
     "provider": "Provider: {name}",
@@ -777,27 +777,27 @@
     "selectDateRange": "Select dates"
   },
   "command": {
-    "commandPalette": "Command Palette",
+    "commandPalette": "Command palette",
     "searchPlaceholder": "Search for a command to run..."
   },
   "errors": {
     "contact": {
-      "VALIDATION_ERROR": "Invalid input data provided.",
-      "EMAIL_SEND_FAILED": "Failed to send email. Please try again.",
-      "SAVE_FAILED": "We've received your inquiry, though we encountered a minor technical hiccup finishing the logs. No further action is needed on your part.",
-      "RENDER_FAILED": "Failed to prepare email. Please try again.",
-      "UNKNOWN": "An unexpected error occurred. Please try again."
+      "VALIDATION_ERROR": "Some fields look invalid. Check them and try again.",
+      "EMAIL_SEND_FAILED": "Couldn't send your message. Try again.",
+      "SAVE_FAILED": "We got your message, though a minor logging issue occurred on our end. No action needed from you.",
+      "RENDER_FAILED": "Couldn't prepare your message. Try again.",
+      "UNKNOWN": "Something went wrong. Try again."
     },
     "payment": {
-      "VALIDATION_ERROR": "Invalid input data provided.",
-      "INVALID_PROMO_CODE": "The promotional code is invalid or expired.",
-      "PAYMENT_FAILED": "Payment processing failed.",
-      "SAVE_FAILED": "Payment processed but failed to save. Please contact support with your transaction ID.",
-      "UPDATE_STATUS_FAILED": "Error updating payment status. Contact support if the issue persists.",
-      "SAVE_FROM_WEBHOOK_FAILED": "Error saving payment confirmation. Please contact support.",
-      "CHARGE_UPDATE_FAILED": "Failed to update charge details.",
-      "WEBHOOK_PROCESSING_FAILED": "Error processing payment confirmation.",
-      "UNKNOWN": "An unexpected error occurred. Please try again."
+      "VALIDATION_ERROR": "Some fields look invalid. Check them and try again.",
+      "INVALID_PROMO_CODE": "That promo code is invalid or expired.",
+      "PAYMENT_FAILED": "Payment didn't go through.",
+      "SAVE_FAILED": "Payment went through but we couldn't save it. Contact support with your transaction ID.",
+      "UPDATE_STATUS_FAILED": "Couldn't update your payment status. Contact support if this keeps happening.",
+      "SAVE_FROM_WEBHOOK_FAILED": "Couldn't save your payment confirmation. Contact support.",
+      "CHARGE_UPDATE_FAILED": "Couldn't update the charge details.",
+      "WEBHOOK_PROCESSING_FAILED": "Couldn't process your payment confirmation.",
+      "UNKNOWN": "Something went wrong. Try again."
     }
   },
   "legal": {
@@ -824,7 +824,7 @@
     "title": "The server took a",
     "titleHighlight": "day off",
     "titleEmphasis": "without asking.",
-    "lede": "Something exploded on our end. Not your fault (this time). Our team is already on it — logs are smoking and we are on it. Try again in a few minutes, or check the live status.",
+    "lede": "Something broke on our end. Not your fault (this time). The logs are smoking and we're already on it. Try again in a few minutes, or check the live status.",
     "statusPage": "View status",
     "meanwhile": "Meanwhile:",
     "contact": "Report an issue",
@@ -839,7 +839,7 @@
     "cookiePolicy": "Cookie Policy",
     "legalNotice": "Legal Notice",
     "manageCookies": "Manage cookies",
-    "contactUs": "Contact Us",
+    "contactUs": "Contact us",
     "legalNavigation": "Legal and policy links",
     "copyright": "© {year} Forever PTO · Made from a hammock.",
     "version": "v{version} · status: on vacation ●",
@@ -863,7 +863,7 @@
     "selectAllHolidays": "Select all holidays",
     "unlockFeature": "Unlock premium feature: {feature}",
     "premiumFeature": "Premium feature",
-    "unlockDescription": "Unlock the ability to add or remove suggestions and add or remove remaining days by upgrading to premium.",
+    "unlockDescription": "Upgrade to premium to manually add or remove suggestions and manage your remaining days.",
     "upgrade": "Upgrade"
   },
   "calendar": {
@@ -895,7 +895,7 @@
       "status": "Status",
       "confirmed": "Confirmed",
       "paymentId": "Payment ID",
-      "premiumActivated": "Your premium access has been activated. You can now enjoy all premium features!",
+      "premiumActivated": "Premium access is active. All premium features are now unlocked.",
       "continueHome": "Continue to homepage"
     }
   },
@@ -977,7 +977,7 @@
       "countriesDescription": "Official calendars updated every year. Even regional ones.",
       "privacyTag": "100% local",
       "privacyTitle": "Your data never leaves your browser.",
-      "privacyDescription": "No login. No account. Your PTO data is stored exclusively in your browser — we never see it."
+      "privacyDescription": "No login. No account. Your PTO data is stored exclusively in your browser; we never see it."
     },
     "comparison": {
       "badge": "before · after",
@@ -985,7 +985,7 @@
       "withoutTitle": "😩 Without Forever PTO",
       "withoutItems": {
         "spreadsheetFrustration": "You open a spreadsheet and get stuck on cell C7.",
-        "missedBridge": "You ask for the Monday after a holiday and nobody tells you it was redundant.",
+        "missedBridge": "You take the Monday after a holiday without realizing Tuesday was also a holiday.",
         "daysRunOut": "You find out in September that you have no days left.",
         "colleagueConflict": "A colleague books your week first. Again.",
         "unusedDays": "You end the year with 4 unused days."

@@ -96,7 +96,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
           </DialogTitle>
           <Banner icon={Lock} title={t('premiumRequired')} colorScheme='indigo'>
             <span>
-              <strong>{feature}</strong> {t('featureRequiresPremium')}
+              <strong className='capitalize'>{feature}</strong> {t('featureRequiresPremium')}
             </span>
           </Banner>
           <DialogDescription>{t('verifyDescription')}</DialogDescription>
