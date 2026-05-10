@@ -144,7 +144,7 @@ type DropdownMenuSubContentProps = Omit<React.ComponentProps<typeof DropdownMenu
 
 function DropdownMenuSubContent({ className, ...props }: Readonly<DropdownMenuSubContentProps>) {
   return (
-    <DropdownMenuPrimitive.Positioner positionMethod='fixed' className='z-50'>
+    <DropdownMenuPrimitive.Positioner positionMethod='fixed' className='z-[52]'>
       <DropdownMenuPrimitive.Popup
         data-slot='dropdown-menu-sub-content'
         className={cn(
@@ -182,7 +182,7 @@ function DropdownMenuContent({
             sideOffset={sideOffset}
             align={align}
             positionMethod='fixed'
-            className='z-50'
+            className='z-[52]'
           >
             <DropdownMenuPrimitive.Popup
               render={

@@ -152,6 +152,15 @@ function Sidebar({
 }: SidebarProps) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 
+  useEffect(() => {
+    if (!isMobile || !openMobile) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isMobile, openMobile]);
+
   if (collapsible === 'none') {
     return (
       <MotionHighlight
@@ -178,7 +187,7 @@ function Sidebar({
 
   if (isMobile) {
     return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+      <Sheet open={openMobile} onOpenChange={setOpenMobile} modal={false} {...props}>
         <SheetContent
           data-sidebar='sidebar'
           data-slot='sidebar'
