@@ -19,11 +19,11 @@ const isProd = process.env.NODE_ENV === 'production';
 
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com https://betterstack.net",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com https://betterstack.net https://static.cloudflareinsights.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com https://*.stripe.com",
   "font-src 'self'",
-  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://www.googletagmanager.com https://api.stripe.com https://betterstack.net https://in.logtail.com https://telemetry.betterstack.com",
+  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://www.googletagmanager.com https://api.stripe.com https://betterstack.net https://in.logtail.com https://telemetry.betterstack.com https://*.betterstackdata.com",
   'frame-src https://js.stripe.com',
   "frame-ancestors 'none'",
   "base-uri 'self'",
