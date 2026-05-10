@@ -57,6 +57,7 @@ export const LanguageSelector = () => {
         </AnimateIcon>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
+        {/* TODO: implement animateIcon — AnimateIcon.onMouseEnter fires setLocalAnimate → React re-render mid touch-event chain → base-ui loses internal state → freeze. Fix: use onPointerEnter + pointerType==='mouse' guard in AnimateIcon so touch never triggers the re-render */}
         {languages.map((language) => (
           <DropdownMenuItem key={language.code} className='flex justify-between' onClick={() => handleLanguageChange(language.code)}>
             <span>{language.label}</span>
