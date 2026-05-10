@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/fbuireu/forever-pto/compare/v1.0.6...v1.1.0) (2026-05-10)
+
+
+### Features
+
+* add v1 neobrutalism ([#278](https://github.com/fbuireu/forever-pto/issues/278)) ([02caa8e](https://github.com/fbuireu/forever-pto/commit/02caa8e712e258aa0df8c18b81bb58b634d5c403))
+
 ## [1.0.6](https://github.com/fbuireu/forever-pto/compare/v1.0.5...v1.0.6) (2026-04-18)
 
 
