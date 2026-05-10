@@ -29,6 +29,8 @@
     "cf:build": "opennextjs-cloudflare build",
     "deploy": "pnpm run cf:build && opennextjs-cloudflare deploy",
     "upload": "pnpm run cf:build && opennextjs-cloudflare upload",
+    "bones:build": "boneyard-js build",
+    "bones:watch": "boneyard-js build --watch",
     "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "format": "biome check --write --no-errors-on-unmatched",
     "format:changed": "pnpm format --changed",
@@ -44,8 +46,6 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "pnpm run test:e2e -- --ui",
     "test:e2e:changed": "pnpm run test:e2e -- --only-changed",
-    "bones:build": "boneyard-js build",
-    "bones:watch": "boneyard-js build --watch",
     "prepare": "husky"
   },
   "dependencies": {
