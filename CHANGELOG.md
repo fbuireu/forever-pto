@@ -1,3 +1,10 @@
+## [1.1.5](https://github.com/fbuireu/forever-pto/compare/v1.1.4...v1.1.5) (2026-05-10)
+
+
+### Bug Fixes
+
+* resize logo ([b648315](https://github.com/fbuireu/forever-pto/commit/b6483151f69b8a0f2a790832f22302f24532eff8))
+
 ## [1.1.4](https://github.com/fbuireu/forever-pto/compare/v1.1.3...v1.1.4) (2026-05-10)
 
 
