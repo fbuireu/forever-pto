@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   cleanup:
+    name: Delete preview Worker
     runs-on: ubuntu-latest
     steps:
       - name: Delete preview Worker
@@ -16,4 +17,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: workers delete pr-${{ github.event.pull_request.number }}-forever-pto-development --force
+          command: delete pr-${{ github.event.pull_request.number }}-forever-pto-development --force
