@@ -382,8 +382,8 @@
     "tooltip": "Choose what to include in the export: public holidays, your vacation days, or both.",
     "tooltipLabel": "Export options info",
     "pdf": {
-      "holidays": "Public Holidays",
-      "vacationDays": "Vacation Days",
+      "holidays": "Public holidays",
+      "vacationDays": "Vacation days",
       "dayOff": "Vacation day",
       "generatedOn": "Generated on"
     }
@@ -686,7 +686,7 @@
     "subtitle": "Explore what we've built and what's coming next",
     "selected": "Selected",
     "completed": "Completed",
-    "inProgress": "In Progress",
+    "inProgress": "In progress",
     "planned": "Planned",
     "future": "Future",
     "detailedView": "Detailed view",
@@ -695,41 +695,41 @@
     "gotAnIdea": "Got an idea that would make your life easier?",
     "letsTalk": "Let's talk",
     "or": "or",
-    "openIssue": "open an issue on GitHub",
+    "openIssue": "Open an issue on GitHub",
     "features": {
-      "corePtoCalculator": "Core PTO Calculator",
+      "corePtoCalculator": "Core PTO calculator",
       "corePtoCalculatorDescription": "Smart vacation planning with holiday optimization and bridge detection",
-      "multipleCountries": "Multiple Countries Support",
+      "multipleCountries": "Multiple countries support",
       "multipleCountriesDescription": "Support for holidays across European countries with region-specific rules",
-      "premiumFeatures": "Premium Features",
+      "premiumFeatures": "Premium features",
       "premiumFeaturesDescription": "Unlock advanced features with one-time payment via Stripe",
-      "customHolidays": "Custom Holidays",
+      "customHolidays": "Custom holidays",
       "customHolidaysDescription": "Add, edit, and remove custom holidays for personalized planning",
-      "alternativeStrategies": "Alternative Strategies",
+      "alternativeStrategies": "Alternative strategies",
       "alternativeStrategiesDescription": "Multiple vacation planning strategies with efficiency comparison",
-      "analyticsDashboard": "Analytics Dashboard",
+      "analyticsDashboard": "Analytics dashboard",
       "analyticsDashboardDescription": "Detailed metrics and insights about your vacation planning",
-      "calendarExport": "Calendar Export",
+      "calendarExport": "Calendar export",
       "calendarExportDescription": "Export your vacation plan to Google Calendar, iCal, or Outlook",
-      "teamPlanning": "Team Planning",
+      "teamPlanning": "Team planning",
       "teamPlanningDescription": "Coordinate vacation planning with team members to avoid conflicts",
-      "emailNotifications": "Email Notifications",
+      "emailNotifications": "Email notifications",
       "emailNotificationsDescription": "Get reminders about upcoming vacations and important dates",
-      "mobileApp": "Mobile App",
+      "mobileApp": "Mobile app",
       "mobileAppDescription": "Native iOS and Android apps for vacation planning on the go",
-      "aiSuggestions": "AI Suggestions",
+      "aiSuggestions": "AI suggestions",
       "aiSuggestionsDescription": "AI-powered recommendations based on your preferences and past patterns",
-      "weatherIntegration": "Weather Integration",
+      "weatherIntegration": "Weather integration",
       "weatherIntegrationDescription": "See weather forecasts for your planned vacation dates",
-      "blockedPeriods": "Blocked Periods",
+      "blockedPeriods": "Blocked periods",
       "blockedPeriodsDescription": "Mark date ranges where you don't want any PTO suggestions: conferences, trips, medical leave, or any time you know you'll be busy",
-      "performanceOptimization": "Performance Optimization",
+      "performanceOptimization": "Performance optimization",
       "performanceOptimizationDescription": "Faster calculations and smoother experience powered by Web Workers",
-      "customWeekends": "Custom Weekends",
+      "customWeekends": "Custom weekends",
       "customWeekendsDescription": "Define custom non-working days beyond the standard Saturday-Sunday weekend",
-      "multiYearPlanning": "Multi-Year Planning",
+      "multiYearPlanning": "Multi-year planning",
       "multiYearPlanningDescription": "Plan vacations across multiple years with carryover support",
-      "calendarSubscription": "Live Calendar Subscription",
+      "calendarSubscription": "Live calendar subscription",
       "calendarSubscriptionDescription": "Subscribe directly from Google Calendar, Apple Calendar or Outlook via a webcal:// URL; your plan stays in sync automatically"
     }
   },
@@ -921,7 +921,7 @@
       "mockupLegendPto": "PTO",
       "mockupLegendHoliday": "Holiday",
       "mockupLegendWeekend": "Weekend",
-      "mockupFieldPto": "PTO Days",
+      "mockupFieldPto": "PTO days",
       "mockupFieldPtoUnit": "days/yr",
       "mockupFieldCountry": "Country",
       "mockupFieldHolidays": "14 holidays"
@@ -1098,12 +1098,12 @@
         "p2": "We are committed to transparency about how we collect and use data. This policy provides detailed information about the types of cookies we use, their purpose, and how you can control them."
       },
       "whatAreCookies": {
-        "title": "What are Cookies?",
+        "title": "What are cookies?",
         "p1": "Cookies are small text files that are placed on your device when you visit a website. They are widely used to make websites work more efficiently and provide information to website owners.",
         "p2": "Cookies can be 'persistent' cookies or 'session' cookies. Persistent cookies remain on your device for a set period. Session cookies are temporary and are deleted when you close your browser."
       },
       "typesOfCookies": {
-        "title": "Types of Cookies We Use",
+        "title": "Types of cookies we use",
         "intro": "Forever PTO does not use:",
         "notUsed": {
           "advertising": "Advertising cookies",
@@ -1112,31 +1112,31 @@
           "socialMedia": "Social media cookies"
         },
         "strictlyNecessary": {
-          "title": "Strictly Necessary Cookies (Local Storage)",
+          "title": "Strictly necessary cookies (local storage)",
           "description": "We use browser local storage to save your preferences and application state. These are essential for the website to function and cannot be disabled:",
           "items": {
             "filters": {
-              "label": "Filters Storage:",
+              "label": "Filters storage:",
               "description": "Stores your selected country, region, and year preferences for holiday filtering."
             },
             "holidays": {
-              "label": "Holidays Storage:",
+              "label": "Holidays storage:",
               "description": "Saves your custom holidays and vacation days configuration."
             },
             "location": {
-              "label": "Location Storage:",
+              "label": "Location storage:",
               "description": "Stores your selected location (country and region) for accurate holiday information."
             },
             "premiumKey": {
-              "label": "Premium Key Storage:",
+              "label": "Premium key storage:",
               "description": "Securely stores your premium access key when you upgrade to Premium."
             },
             "theme": {
-              "label": "Theme Preference:",
+              "label": "Theme preference:",
               "description": "Saves your light/dark theme preference."
             },
             "calendar": {
-              "label": "Calendar State:",
+              "label": "Calendar state:",
               "description": "Stores your calendar view preferences and selected dates."
             }
           },
@@ -1147,11 +1147,11 @@
         }
       },
       "cookieBanner": {
-        "title": "Cookie Consent Banner",
+        "title": "Cookie consent banner",
         "description": "When you first visit Forever PTO, you'll see a cookie consent banner. This allows you to choose which types of cookies you want to accept:",
         "items": {
           "strictlyNecessary": {
-            "label": "Strictly Necessary:",
+            "label": "Strictly necessary:",
             "description": "These cannot be disabled as they are essential for the site to work."
           },
           "analytics": {
@@ -1166,19 +1166,19 @@
         "description": "Forever PTO implements Google Consent Mode v2 to ensure compliance with privacy regulations while maintaining measurement capabilities. This mode allows us to:",
         "states": {
           "default": {
-            "label": "Default Consent State:",
+            "label": "Default consent state:",
             "description": "Before you make a choice, all non-essential tracking is denied by default."
           },
           "grant": {
-            "label": "Consent Grant:",
+            "label": "Consent grant:",
             "description": "When you accept analytics cookies, we update consent to allow analytics_storage."
           },
           "denial": {
-            "label": "Consent Denial:",
+            "label": "Consent denial:",
             "description": "If you reject analytics, only anonymous, aggregated pings are sent to Google without personal data."
           },
           "pings": {
-            "label": "Privacy-Safe Pings:",
+            "label": "Privacy-safe pings:",
             "description": "Even without consent, Google may receive anonymous signals that cannot be used to identify you."
           }
         },
@@ -1195,7 +1195,7 @@
         "gdprCompliance": "This implementation ensures full GDPR compliance by respecting your privacy choices while allowing basic anonymous measurements."
       },
       "dataSecurity": {
-        "title": "Data Security",
+        "title": "Data security",
         "description": "All data stored in local storage:",
         "items": {
           "browserSpecific": "Is stored only in your browser and never transmitted to our servers",
@@ -1205,11 +1205,11 @@
         }
       },
       "thirdPartyCookies": {
-        "title": "Third-Party Cookies",
+        "title": "Third-party cookies",
         "description": "When you use certain features of Forever PTO, third-party services may set their own cookies:",
         "items": {
           "payment": {
-            "label": "Stripe (Payment Processing):",
+            "label": "Stripe (payment processing):",
             "description": "When you purchase Premium, Stripe may set cookies for fraud prevention and payment processing. See Stripe's Cookie Policy."
           },
           "holidayApis": {
@@ -1217,17 +1217,17 @@
             "description": "We use external APIs to fetch holiday data, but these don't set cookies on our site."
           },
           "analytics": {
-            "label": "Better Stack (Analytics):",
+            "label": "Better Stack (analytics):",
             "description": "When you accept analytics cookies, Better Stack may set cookies to track user interactions and measure product usage."
           }
         },
         "disclaimer": "We are not responsible for third-party cookies and recommend reviewing their respective cookie policies."
       },
       "managingCookies": {
-        "title": "Managing Cookies",
+        "title": "Managing cookies",
         "description": "You have several options to manage cookies and local storage:",
         "browserSettings": {
-          "title": "Browser Settings",
+          "title": "Browser settings",
           "description": "All modern browsers allow you to:",
           "items": {
             "view": "View cookies and local storage currently set",
@@ -1238,19 +1238,19 @@
           "warning": "Note: Blocking or deleting our local storage will reset all your preferences and custom holidays."
         },
         "browserInstructions": {
-          "title": "Browser-Specific Instructions",
+          "title": "Browser-specific instructions",
           "chrome": "Settings > Privacy and security > Cookies and other site data",
           "firefox": "Settings > Privacy & Security > Cookies and Site Data",
           "safari": "Preferences > Privacy > Manage Website Data",
           "edge": "Settings > Cookies and site permissions > Manage and delete cookies"
         },
         "inAppManagement": {
-          "title": "In-App Management",
+          "title": "In-app management",
           "description": "You can click the cookie icon in the footer at any time to review and modify your cookie preferences."
         }
       },
       "yourRights": {
-        "title": "Your Rights",
+        "title": "Your rights",
         "description": "Under GDPR and other privacy laws, you have the right to:",
         "items": {
           "know": "Know what data is stored (all data is visible in browser DevTools > Application > Local Storage)",
@@ -1261,12 +1261,12 @@
         }
       },
       "changes": {
-        "title": "Changes to This Policy",
+        "title": "Changes to this policy",
         "p1": "We may update this Cookie Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons.",
         "p2": "We will notify users of any material changes by updating the 'Last updated' date at the top of this policy."
       },
       "contact": {
-        "title": "Contact Us",
+        "title": "Contact us",
         "description": "If you have questions about this Cookie Policy, please contact us:",
         "email": {
           "label": "Email:",
@@ -1289,7 +1289,7 @@
         "p2": "Forever PTO operates on a privacy-first model. We minimize data collection and process most information locally in your browser."
       },
       "dataController": {
-        "title": "Data Controller",
+        "title": "Data controller",
         "description": "The data controller responsible for your personal data is:",
         "items": {
           "name": {
@@ -1307,42 +1307,42 @@
         }
       },
       "dataWeCollect": {
-        "title": "Data We Collect",
+        "title": "Data we collect",
         "localStorage": {
-          "title": "Local Storage Data (Client-Side Only)",
+          "title": "Local storage data (client-side only)",
           "description": "The following data is stored exclusively in your browser's local storage and is never transmitted to our servers:",
           "items": {
             "settings": {
-              "label": "Application Settings:",
+              "label": "Application settings:",
               "description": "Your selected country, region, year, PTO days, and filter preferences."
             },
             "holidayData": {
-              "label": "Holiday Data:",
+              "label": "Holiday data:",
               "description": "Public holidays fetched from external APIs and cached locally."
             },
             "customHolidays": {
-              "label": "Custom Holidays:",
+              "label": "Custom holidays:",
               "description": "Holidays you manually add to the calendar."
             },
             "calendarState": {
-              "label": "Calendar State:",
+              "label": "Calendar state:",
               "description": "Your selected vacation dates and optimization preferences."
             },
             "premiumKey": {
-              "label": "Premium Activation Key:",
+              "label": "Premium activation key:",
               "description": "If you purchase Premium, your unique activation key is stored locally."
             },
             "theme": {
-              "label": "Theme Preference:",
+              "label": "Theme preference:",
               "description": "Your light/dark mode preference."
             },
             "cookieConsent": {
-              "label": "Cookie Consent:",
+              "label": "Cookie consent:",
               "description": "Your cookie preferences from the cookie banner."
             }
           },
           "legalBasis": {
-            "label": "Legal Basis:",
+            "label": "Legal basis:",
             "description": "Necessary for providing the service (legitimate interest)."
           },
           "retention": {
@@ -1351,7 +1351,7 @@
           }
         },
         "payment": {
-          "title": "Payment Information",
+          "title": "Payment information",
           "description": "When you purchase Premium, we collect minimal payment-related data:",
           "collectedInfo": "What we collect:",
           "items": {
@@ -1360,7 +1360,7 @@
             "email": "Email address (only if you choose to provide it during checkout)"
           },
           "legalBasis": {
-            "label": "Legal Basis:",
+            "label": "Legal basis:",
             "description": "Contract performance and legal obligation."
           },
           "retention": {
@@ -1369,7 +1369,7 @@
           }
         },
         "analytics": {
-          "title": "Analytics Data (Optional)",
+          "title": "Analytics data (optional)",
           "description": "If you consent to analytics cookies, we may collect:",
           "items": {
             "pagesVisited": "Pages visited and features used",
@@ -1378,7 +1378,7 @@
             "interactions": "Interactions with the application (anonymized)"
           },
           "legalBasis": {
-            "label": "Legal Basis:",
+            "label": "Legal basis:",
             "description": "Consent (which you can withdraw at any time)."
           },
           "retention": {
@@ -1387,10 +1387,10 @@
           }
         },
         "contact": {
-          "title": "Contact Form Data",
+          "title": "Contact form data",
           "description": "If you contact us via the contact form, we collect your name, email, and message.",
           "legalBasis": {
-            "label": "Legal Basis:",
+            "label": "Legal basis:",
             "description": "Legitimate interest in responding to your inquiry."
           },
           "retention": {
@@ -1400,19 +1400,19 @@
         }
       },
       "cookiesAndTracking": {
-        "title": "Cookies and Tracking Technologies",
+        "title": "Cookies and tracking technologies",
         "description": "For detailed information about cookies, please see our <link>Cookie Policy</link>."
       },
       "dataSharing": {
-        "title": "Data Sharing",
+        "title": "Data sharing",
         "description": "We do not sell your personal data. We only share data with trusted third parties as necessary:",
         "items": {
           "paymentProcessors": {
-            "label": "Stripe (Payment Processing):",
+            "label": "Stripe (payment processing):",
             "description": "Handles all payment processing securely. See Stripe's Privacy Policy."
           },
           "holidayProviders": {
-            "label": "Holiday Data Providers:",
+            "label": "Holiday data providers:",
             "description": "We fetch public holiday data from external APIs but do not share your personal information with them."
           },
           "analytics": {
@@ -1420,17 +1420,17 @@
             "description": "Processes anonymized usage data. See Google's Privacy Policy."
           },
           "legal": {
-            "label": "Legal Compliance:",
+            "label": "Legal compliance:",
             "description": "If required by law or to protect our legal rights."
           },
           "betterStack": {
-            "label": "Better Stack (Analytics, if consented):",
+            "label": "Better Stack (analytics, if consented):",
             "description": "Processes anonymized usage data and tracks user interactions for product improvement. See Better Stack's Privacy Policy."
           }
         }
       },
       "dataSecurity": {
-        "title": "Data Security",
+        "title": "Data security",
         "description": "We implement appropriate technical and organizational measures to protect your data:",
         "items": {
           "encryption": {
@@ -1438,81 +1438,81 @@
             "description": "All data transmitted to our servers uses HTTPS/TLS encryption."
           },
           "localStorage": {
-            "label": "Local Storage:",
+            "label": "Local storage:",
             "description": "Most data never leaves your device and is stored locally in your browser."
           },
           "https": {
-            "label": "Secure Infrastructure:",
+            "label": "Secure infrastructure:",
             "description": "Our website is hosted on secure, reputable platforms (Cloudflare)."
           },
           "minimalCollection": {
-            "label": "Minimal Data Collection:",
+            "label": "Minimal data collection:",
             "description": "We only collect data that is strictly necessary for the service."
           }
         },
         "disclaimer": "While we strive to protect your data, no method of transmission over the internet is 100% secure."
       },
       "yourRights": {
-        "title": "Your Rights",
+        "title": "Your rights",
         "description": "Under GDPR and other data protection laws, you have the following rights:",
         "items": {
           "access": {
-            "label": "Right to Access:",
+            "label": "Right to access:",
             "description": "You can request a copy of the personal data we hold about you."
           },
           "rectification": {
-            "label": "Right to Rectification:",
+            "label": "Right to rectification:",
             "description": "You can request corrections to inaccurate or incomplete data."
           },
           "erasure": {
-            "label": "Right to Erasure ('Right to be Forgotten'):",
+            "label": "Right to erasure ('right to be forgotten'):",
             "description": "You can request deletion of your personal data."
           },
           "restrict": {
-            "label": "Right to Restrict Processing:",
+            "label": "Right to restrict processing:",
             "description": "You can request restriction of processing your data under certain conditions."
           },
           "portability": {
-            "label": "Right to Data Portability:",
+            "label": "Right to data portability:",
             "description": "You can request your data in a structured, machine-readable format."
           },
           "object": {
-            "label": "Right to Object:",
+            "label": "Right to object:",
             "description": "You can object to processing based on legitimate interests or for direct marketing."
           },
           "withdrawConsent": {
-            "label": "Right to Withdraw Consent:",
+            "label": "Right to withdraw consent:",
             "description": "You can withdraw consent for analytics cookies at any time."
           },
           "complaint": {
-            "label": "Right to Lodge a Complaint:",
+            "label": "Right to lodge a complaint:",
             "description": "You can file a complaint with the Spanish Data Protection Authority (AEPD) or your local supervisory authority."
           }
         },
         "contact": "To exercise these rights, contact us at {supportEmail}."
       },
       "internationalTransfers": {
-        "title": "International Data Transfers",
+        "title": "International data transfers",
         "p1": "Your data may be transferred to and processed in countries outside the European Economic Area (EEA), particularly the United States (Google Analytics, Stripe).",
         "p2": "We ensure appropriate safeguards are in place, including Standard Contractual Clauses and adherence to the EU-U.S. Data Privacy Framework where applicable."
       },
       "childrensPrivacy": {
-        "title": "Children's Privacy",
+        "title": "Children's privacy",
         "p1": "Forever PTO is not intended for children under 16 years of age. We do not knowingly collect personal data from children.",
         "p2": "If we become aware that we have collected data from a child under 16, we will take steps to delete that information promptly."
       },
       "changes": {
-        "title": "Changes to This Privacy Policy",
+        "title": "Changes to this privacy policy",
         "p1": "We may update this Privacy Policy from time to time to reflect changes in our practices, legal requirements, or service features.",
         "p2": "We will notify users of material changes by updating the 'Last updated' date at the top of this policy.",
         "p3": "Continued use of Forever PTO after changes constitutes acceptance of the updated policy."
       },
       "dataBreach": {
-        "title": "Data Breach Notification",
+        "title": "Data breach notification",
         "description": "In the unlikely event of a data breach affecting your personal data, we will notify you and the relevant supervisory authorities within 72 hours as required by GDPR."
       },
       "contactInfo": {
-        "title": "Contact Information",
+        "title": "Contact information",
         "description": "If you have questions about this Privacy Policy or wish to exercise your rights, please contact us:",
         "items": {
           "email": {
@@ -1533,15 +1533,15 @@
     "lastUpdated": "Last updated: {date}",
     "sections": {
       "acceptance": {
-        "title": "Acceptance of Terms",
+        "title": "Acceptance of terms",
         "p1": "By accessing or using Forever PTO (the 'Service'), you agree to be bound by these Terms of Service ('Terms'). If you do not agree to these Terms, please do not use the Service.",
         "p2": "These Terms constitute a legally binding agreement between you and {author}, the operator of Forever PTO."
       },
       "serviceDescription": {
-        "title": "Service Description",
+        "title": "Service description",
         "description": "Forever PTO is a web-based tool that helps users plan and optimize their paid time off (PTO) by suggesting optimal vacation dates based on public holidays. The Service is available in two versions:",
         "freeVersion": {
-          "title": "Free Version",
+          "title": "Free version",
           "description": "The free version provides:",
           "items": {
             "optimization": "Basic PTO optimization based on public holidays",
@@ -1552,7 +1552,7 @@
           }
         },
         "premiumVersion": {
-          "title": "Premium Version",
+          "title": "Premium version",
           "description": "The Premium version includes all free features plus:",
           "items": {
             "advancedMetrics": "Advanced metrics and year summary analysis",
@@ -1577,9 +1577,9 @@
         }
       },
       "premiumPayments": {
-        "title": "Premium Version and Payments",
+        "title": "Premium version and payments",
         "activation": {
-          "title": "Premium Activation",
+          "title": "Premium activation",
           "description": "The Premium version requires a one-time payment processed securely through Stripe. Upon successful payment:",
           "characteristics": "Premium access is characterized by:",
           "items": {
@@ -1595,7 +1595,7 @@
           "p2": "All prices are clearly stated before you complete the payment process."
         },
         "processing": {
-          "title": "Payment Processing",
+          "title": "Payment processing",
           "description": "Payments are processed securely by Stripe, a third-party payment processor. We do not store your full credit card information.",
           "items": {
             "other": "By making a payment, you agree to Stripe's Terms of Service and Privacy Policy."
@@ -1604,15 +1604,15 @@
           "p2": "It is your responsibility to keep this key secure and not share it with others."
         },
         "keySecurity": {
-          "title": "Activation Key Security",
+          "title": "Activation key security",
           "p1": "Your Premium activation key is personal and confidential. Sharing or selling your activation key to others is strictly prohibited and constitutes a breach of these Terms.",
           "p2": "If we detect unauthorized use or sharing of activation keys, we reserve the right to deactivate the key without refund."
         }
       },
       "refundPolicy": {
-        "title": "Refund Policy",
+        "title": "Refund policy",
         "eligibility": {
-          "title": "Refund Eligibility",
+          "title": "Refund eligibility",
           "description": "We offer refunds under the following circumstances:",
           "items": {
             "technical": "Technical issues preventing you from using Premium features (provided we cannot resolve the issue within a reasonable time)",
@@ -1622,7 +1622,7 @@
           }
         },
         "exclusions": {
-          "title": "Refund Exclusions",
+          "title": "Refund exclusions",
           "description": "Refunds will NOT be granted in the following cases:",
           "items": {
             "timePassed": "More than 14 days have passed since the purchase (unless covered by statutory rights)",
@@ -1632,7 +1632,7 @@
           }
         },
         "process": {
-          "title": "Refund Process",
+          "title": "Refund process",
           "description": "To request a refund:",
           "steps": {
             "contact": "1. Contact us at {supportEmail} with your transaction ID",
@@ -1642,17 +1642,17 @@
           }
         },
         "postRefund": {
-          "title": "Post-Refund Access",
+          "title": "Post-refund access",
           "description": "Upon issuing a refund, your Premium activation key will be deactivated, and you will lose access to Premium features."
         },
         "euRights": {
-          "title": "EU Consumer Rights",
+          "title": "EU consumer rights",
           "p1": "If you are a consumer based in the European Union, you have the right to withdraw from the purchase within 14 days without giving any reason, in accordance with Directive 2011/83/EU.",
           "p2": "However, you acknowledge that by activating your Premium key and using Premium features, you waive this right as the digital content has been fully performed."
         }
       },
       "userResponsibilities": {
-        "title": "User Responsibilities",
+        "title": "User responsibilities",
         "description": "When using Forever PTO, you agree to:",
         "items": {
           "compliance": "Comply with all applicable laws and regulations",
@@ -1666,30 +1666,30 @@
         }
       },
       "disclaimer": {
-        "title": "Disclaimers and Limitations",
+        "title": "Disclaimers and limitations",
         "description": "Forever PTO is provided 'as is' without warranties of any kind. We specifically disclaim:",
         "items": {
           "accuracy": {
-            "label": "Accuracy of Holiday Data:",
+            "label": "Accuracy of holiday data:",
             "description": "While we strive for accuracy, holiday data is sourced from third-party APIs and may contain errors. Always verify with official sources."
           },
           "availability": {
-            "label": "Service Availability:",
+            "label": "Service availability:",
             "description": "We do not guarantee uninterrupted or error-free operation of the Service."
           },
           "fitness": {
-            "label": "Fitness for Purpose:",
+            "label": "Fitness for purpose:",
             "description": "We do not guarantee that the Service will meet your specific requirements or expectations."
           },
           "dataIntegrity": {
-            "label": "Data Integrity:",
+            "label": "Data integrity:",
             "description": "While we implement security measures, we cannot guarantee absolute security of data stored locally in your browser."
           }
         },
         "acknowledgement": "You acknowledge that the Service is a planning tool and should not be relied upon as the sole basis for employment decisions."
       },
       "limitationOfLiability": {
-        "title": "Limitation of Liability",
+        "title": "Limitation of liability",
         "description": "To the fullest extent permitted by law, {author} and Forever PTO shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to:",
         "items": {
           "profits": "Loss of profits, revenue, or business opportunities",
@@ -1701,14 +1701,14 @@
         "maxLiability": "Our total liability for any claims arising out of or related to these Terms or the Service shall not exceed the amount you paid for Premium access (if applicable) or €50, whichever is greater."
       },
       "intellectualProperty": {
-        "title": "Intellectual Property",
+        "title": "Intellectual property",
         "description": "Forever PTO and all its content, features, and functionality (including but not limited to code, design, text, graphics, and logos) are owned by {author} and are protected by international copyright, trademark, and other intellectual property laws.",
         "limitedLicense": {
-          "title": "Limited License",
+          "title": "Limited license",
           "description": "We grant you a limited, non-exclusive, non-transferable license to use Forever PTO for personal, non-commercial purposes. This license does not include any resale or commercial use of the Service or its content."
         },
         "openSource": {
-          "title": "Open Source Code",
+          "title": "Open source code",
           "description": "Parts of Forever PTO may be available as open-source software under specific licenses. See our <link>GitHub repository</link> for details."
         },
         "restrictions": {
@@ -1723,7 +1723,7 @@
         }
       },
       "thirdPartyServices": {
-        "title": "Third-Party Services",
+        "title": "Third-party services",
         "description": "Forever PTO integrates with third-party services, including:",
         "items": {
           "payment": "Stripe for payment processing",
@@ -1735,9 +1735,9 @@
         "disclaimer2": "Your use of third-party services is subject to their respective terms and conditions."
       },
       "modifications": {
-        "title": "Modifications and Termination",
+        "title": "Modifications and termination",
         "serviceModifications": {
-          "title": "Modifications to the Service",
+          "title": "Modifications to the service",
           "description": "We reserve the right to:",
           "items": {
             "modify": "Modify, suspend, or discontinue any part of the Service at any time",
@@ -1748,7 +1748,7 @@
           "notice": "We will make reasonable efforts to notify users of material changes."
         },
         "terminationByUs": {
-          "title": "Termination by Us",
+          "title": "Termination by us",
           "description": "We may terminate or suspend your access to the Service immediately, without prior notice or liability, if you:",
           "items": {
             "violateTerms": "Violate these Terms",
@@ -1759,11 +1759,11 @@
           }
         },
         "terminationByYou": {
-          "title": "Termination by You",
+          "title": "Termination by you",
           "description": "You may stop using the Service at any time. To delete your locally stored data, clear your browser's local storage."
         },
         "effectOfTermination": {
-          "title": "Effect of Termination",
+          "title": "Effect of termination",
           "description": "Upon termination:",
           "items": {
             "rightsCease": "Your right to use the Service ceases immediately",
@@ -1784,9 +1784,9 @@
         }
       },
       "governingLaw": {
-        "title": "Governing Law and Dispute Resolution",
+        "title": "Governing law and dispute resolution",
         "law": {
-          "title": "Governing Law",
+          "title": "Governing law",
           "description": "These Terms are governed by and construed in accordance with the laws of Spain, without regard to its conflict of law principles."
         },
         "jurisdiction": {
@@ -1794,11 +1794,11 @@
           "description": "Any disputes arising out of or related to these Terms or the Service shall be subject to the exclusive jurisdiction of the courts of Barcelona, Spain."
         },
         "disputeResolution": {
-          "title": "Dispute Resolution",
+          "title": "Dispute resolution",
           "description": "Before initiating any legal proceedings, we encourage you to contact us at {supportEmail} to seek an amicable resolution."
         },
         "euOdr": {
-          "title": "EU Online Dispute Resolution",
+          "title": "EU online dispute resolution",
           "description": "If you are a consumer based in the European Union, you may use the <link>EU Online Dispute Resolution platform</link> to resolve disputes."
         }
       },
@@ -1807,7 +1807,7 @@
         "description": "If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions will remain in full force and effect."
       },
       "entireAgreement": {
-        "title": "Entire Agreement",
+        "title": "Entire agreement",
         "description": "These Terms, together with our Privacy Policy and Cookie Policy, constitute the entire agreement between you and Forever PTO regarding the use of the Service."
       },
       "waiver": {
@@ -1815,12 +1815,12 @@
         "description": "Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights."
       },
       "changes": {
-        "title": "Changes to These Terms",
+        "title": "Changes to these terms",
         "p1": "We may update these Terms from time to time to reflect changes in our practices, legal requirements, or service features.",
         "p2": "We will notify users of material changes by updating the 'Last updated' date at the top of these Terms. Continued use of the Service after changes constitutes acceptance of the updated Terms."
       },
       "contactInfo": {
-        "title": "Contact Information",
+        "title": "Contact information",
         "description": "If you have questions about these Terms of Service, please contact us:",
         "items": {
           "email": {
@@ -1841,7 +1841,7 @@
     "lastUpdated": "Last updated: {date}",
     "sections": {
       "identification": {
-        "title": "Website Owner Identification",
+        "title": "Website owner identification",
         "description": "In compliance with Law 34/2002, of July 11, on Information Society Services and Electronic Commerce (LSSI-CE), the following information is provided:",
         "items": {
           "owner": {
@@ -1859,22 +1859,22 @@
         }
       },
       "purpose": {
-        "title": "Purpose of the Website",
+        "title": "Purpose of the website",
         "description": "Forever PTO (https://forever-pto.com) is a web application designed to help users plan and optimize their paid time off (PTO) by providing holiday information and vacation planning tools.",
         "offers": "The website offers:",
         "items": {
           "freeVersion": {
-            "label": "Free Version:",
+            "label": "Free version:",
             "description": "Basic PTO optimization, calendar visualization, and holiday information."
           },
           "premiumVersion": {
-            "label": "Premium Version:",
+            "label": "Premium version:",
             "description": "Advanced analytics, charts, and enhanced planning features available through a one-time payment."
           }
         }
       },
       "accessConditions": {
-        "title": "Access and Use Conditions",
+        "title": "Access and use conditions",
         "description": "Access to and use of this website is subject to the following conditions:",
         "userAgreement": "By accessing this website, you agree to:",
         "items": {
@@ -1898,23 +1898,23 @@
         "disclaimer": "The information provided is for planning purposes only. Users should verify holiday information with official sources before making employment-related decisions."
       },
       "intellectualProperty": {
-        "title": "Intellectual Property",
+        "title": "Intellectual property",
         "p1": "All content on this website, including but not limited to text, graphics, logos, code, and design, is the property of {author} and is protected by Spanish and international intellectual property laws.",
         "p2": "Users are granted a personal, non-exclusive, non-transferable license to use the website for its intended purpose. Reproduction, distribution, modification, or commercial use of the website's content without express permission is prohibited.",
         "p3": "Some parts of the website may be available as open-source software. For details, please visit our <link>GitHub repository</link>."
       },
       "thirdPartyLinks": {
-        "title": "Links to Third-Party Websites",
+        "title": "Links to third-party websites",
         "p1": "This website may contain links to third-party websites. These links are provided for convenience and informational purposes only.",
         "p2": "{author} does not control or endorse the content of third-party websites and is not responsible for their privacy policies or practices."
       },
       "modifications": {
-        "title": "Modifications to the Legal Notice",
+        "title": "Modifications to the legal notice",
         "p1": "{author} reserves the right to modify this Legal Notice at any time to adapt to legislative changes or updates to the website.",
         "p2": "Users are advised to periodically review this Legal Notice to stay informed of any changes."
       },
       "applicableLaw": {
-        "title": "Applicable Law and Jurisdiction",
+        "title": "Applicable law and jurisdiction",
         "description": "This Legal Notice is governed by Spanish law. For any disputes arising from the use of this website, the parties submit to the jurisdiction of the courts of Barcelona, Spain, waiving any other jurisdiction that may apply."
       },
       "contact": {

@@ -114,8 +114,8 @@ function CollapsibleContent({
             initial={false}
             transition={transition}
             aria-hidden={!state.open || undefined}
-            className={panelClassName ?? className}
-            style={{ overflow: 'hidden', display: 'block', ...style }}
+            className={cn('overflow-hidden', panelClassName, className)}
+            style={{ display: 'block', ...style }}
           >
             {children}
           </m.div>

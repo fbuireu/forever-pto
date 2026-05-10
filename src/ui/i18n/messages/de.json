@@ -930,7 +930,7 @@
       "items": "osterbrücke · feiertags-wochenende · sommer-stretch · herbst-brücke · weihnachts-stretch · november-brücke · pfingstbrücke · himmelfahrt-brücke · tag der einheit · silvester-stretch"
     },
     "how": {
-      "badge": "wie es funktioniert · {steps} schritte",
+      "badge": "wie es funktioniert · {steps} Schritte",
       "titleStart": "Von",
       "titleMid": "zu",
       "question1": "was soll ich tun",
@@ -972,7 +972,7 @@
         "quarterClose": "Q3-Abschluss",
         "productLaunch": "Produktstart"
       },
-      "countriesTag": "{count} länder",
+      "countriesTag": "{count} Länder",
       "countriesTitle": "Echte lokale Feiertage.",
       "countriesDescription": "Offizielle Kalender jedes Jahr aktualisiert. Auch die regionalen.",
       "privacyTag": "100% lokal",
@@ -1081,7 +1081,7 @@
       "description": "22 Tage können 47 werden. Du musst nur wissen, wo du sie platzierst. Das machen wir.",
       "cta": "Meine freien Tage berechnen →",
       "shapes": {
-        "byeMonday": "tschüss, montag",
+        "byeMonday": "tschüss, Montag",
         "doNotDisturb": "nicht stören",
         "bossOff": "boss off",
         "zeroRegrets": "keine Reue"
