@@ -11,6 +11,7 @@ import {
 } from '@ui/modules/core/animate/base/DropdownMenu';
 import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
 import { Check } from '@ui/modules/core/animate/icons/Check';
+import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useState } from 'react';
