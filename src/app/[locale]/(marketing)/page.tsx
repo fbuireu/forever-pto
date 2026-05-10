@@ -48,6 +48,9 @@ export default HomePage;
 
 // better stack not working properly
 // todo: focus input order in stripe
+// todo: new logo stripe
+// todo: status pages localized
+// todo: memory leak on dropdown?
 // todo: all butons (border color to show shadow?)
 // todo: improve responsive
 // todo: recreate bones

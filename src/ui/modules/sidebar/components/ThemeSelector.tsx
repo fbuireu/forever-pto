@@ -13,38 +13,10 @@ import { Sun } from '@ui/modules/core/animate/icons/Sun';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
-import { useCallback } from 'react';
-
-const getResolvedTheme = (theme: ReturnType<typeof useTheme>['theme']) => {
-  if (theme !== 'system') return theme;
-  return globalThis.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-};
 
 export const ThemeSelector = ({ buttonClassName }: { buttonClassName?: string }) => {
-  const { setTheme, themes, theme: currentTheme, resolvedTheme } = useTheme();
+  const { setTheme, themes, theme: currentTheme } = useTheme();
   const t = useTranslations('theme');
-
-  const startViewTransition = useCallback((callback: () => void) => {
-    if ('startViewTransition' in document) {
-      document.startViewTransition(callback);
-    } else {
-      callback();
-    }
-  }, []);
-
-  const changeTheme = useCallback(
-    (newTheme: string) => {
-      const newResolvedTheme = getResolvedTheme(newTheme);
-
-      if (newResolvedTheme === resolvedTheme) {
-        setTheme(newTheme);
-        return;
-      }
-
-      startViewTransition(() => setTheme(newTheme));
-    },
-    [setTheme, startViewTransition, resolvedTheme]
-  );
 
   return (
     <DropdownMenu>
@@ -59,12 +31,10 @@ export const ThemeSelector = ({ buttonClassName }: { buttonClassName?: string })
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         {themes.map((theme) => (
-          <AnimateIcon animateOnHover asChild key={theme}>
-            <DropdownMenuItem className={'flex justify-between'} onClick={() => changeTheme(theme)}>
-              {t(theme as Parameters<typeof t>[0])}
-              {currentTheme === theme && <Check className='h-4 w-4' />}
-            </DropdownMenuItem>
-          </AnimateIcon>
+          <DropdownMenuItem key={theme} className='flex justify-between' onClick={() => setTheme(theme)}>
+            {t(theme as Parameters<typeof t>[0])}
+            {currentTheme === theme && <Check className='h-4 w-4' />}
+          </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
