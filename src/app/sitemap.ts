@@ -5,7 +5,7 @@ import type { MetadataRoute } from 'next';
 const ROUTES = [
   { path: '', changeFrequency: 'monthly', priority: 1 },
   { path: '/planner', changeFrequency: 'weekly', priority: 0.9 },
-];
+] as const;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { env } = await getCloudflareContext({ async: true });
