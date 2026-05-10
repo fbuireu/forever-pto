@@ -1,3 +1,15 @@
+## [1.2.1](https://github.com/fbuireu/forever-pto/compare/v1.2.0...v1.2.1) (2026-05-10)
+
+
+### Bug Fixes
+
+* revert ([b9370f3](https://github.com/fbuireu/forever-pto/commit/b9370f3e45178ea537effcdb52ed9bf2382e1a34))
+
+
+### Reverts
+
+* Revert "feat: restore animate" ([1fbbdbe](https://github.com/fbuireu/forever-pto/commit/1fbbdbe1986e02adc3868f96e117081d4e9fa3e5))
+
 # [1.2.0](https://github.com/fbuireu/forever-pto/compare/v1.1.6...v1.2.0) (2026-05-10)
 
 
