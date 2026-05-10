@@ -152,15 +152,6 @@ function Sidebar({
 }: SidebarProps) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 
-  useEffect(() => {
-    if (!isMobile || !openMobile) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [isMobile, openMobile]);
-
   if (collapsible === 'none') {
     return (
       <MotionHighlight
