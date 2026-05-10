@@ -86,12 +86,9 @@ export const Combobox = ({
                     {hasFlag(option) && <span>{option.flag}</span>}
                     <span className='capitalize'>{option.label}</span>
                   </div>
-                  <Check
-                    className={cn(
-                      'ml-auto',
-                      value.toLowerCase() === option.value.toLowerCase() ? 'opacity-100' : 'opacity-0'
-                    )}
-                  />
+                  {value.toLowerCase() === option.value.toLowerCase() && (
+                    <Check className='ml-auto' />
+                  )}
                 </CommandItem>
               ))}
             </CommandGroup>
