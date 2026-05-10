@@ -1,3 +1,12 @@
+## [1.1.3](https://github.com/fbuireu/forever-pto/compare/v1.1.2...v1.1.3) (2026-05-10)
+
+
+### Bug Fixes
+
+* frozen animate asChild ([e5cc6bf](https://github.com/fbuireu/forever-pto/commit/e5cc6bff6a1eb62bacb3509274198a4240a4f268))
+* frozen animate asChild ([8ef6130](https://github.com/fbuireu/forever-pto/commit/8ef6130349318905a522d52e11e063468ff4f724))
+* frozen animate asChild ([2431a13](https://github.com/fbuireu/forever-pto/commit/2431a13d8b7c2fbb2739f0f3edd24912df300fd2))
+
 ## [1.1.2](https://github.com/fbuireu/forever-pto/compare/v1.1.1...v1.1.2) (2026-05-10)
 
 
