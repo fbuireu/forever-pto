@@ -47,12 +47,7 @@ export function CtaShapes({ byeMonday, bossOff, doNotDisturb, zeroRegrets }: Rea
   };
 
   return (
-    <div
-      className='absolute inset-0'
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      aria-hidden='true'
-    >
+    <div className='absolute inset-0' onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} aria-hidden='true'>
       <m.div
         style={{ x: x1, y: y1 }}
         className={`${SHAPE_BASE} w-20 h-20 top-14 left-[8%] bg-[var(--color-brand-yellow)] rounded-[12px] rotate-[-12deg]`}

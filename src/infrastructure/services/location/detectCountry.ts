@@ -9,10 +9,7 @@ export async function detectCountry(request: NextRequest): Promise<string> {
     if (cdnLocation) return cdnLocation;
   } catch {}
 
-  const results = await Promise.allSettled([
-    detectCountryFromHeaders(request),
-    detectCountryFromIP(),
-  ]);
+  const results = await Promise.allSettled([detectCountryFromHeaders(request), detectCountryFromIP()]);
 
   const found = results.find((r): r is PromiseFulfilledResult<string> => r.status === 'fulfilled' && !!r.value);
   return found?.value ?? '';
