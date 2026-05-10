@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/fbuireu/forever-pto/compare/v1.1.6...v1.2.0) (2026-05-10)
+
+
+### Features
+
+* restore animate ([5d1d451](https://github.com/fbuireu/forever-pto/commit/5d1d45164cde738dc3d68654fb0fa496ac9173b4))
+
 ## [1.1.6](https://github.com/fbuireu/forever-pto/compare/v1.1.5...v1.1.6) (2026-05-10)
 
 
