@@ -34,9 +34,9 @@ export const FaqTabs = ({ tabs, title }: FaqTabsProps) => {
       )}
       <Tabs value={active} onValueChange={setActive}>
         <TabsHighlight>
-          <TabsList className='flex w-full overflow-x-auto'>
+          <TabsList className='grid w-full' style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
             {tabs.map((tab) => (
-              <TabsHighlightItem key={tab.id} value={tab.id} className='shrink-0 w-auto h-full'>
+              <TabsHighlightItem key={tab.id} value={tab.id}>
                 <TabsTrigger value={tab.id}>{tab.title}</TabsTrigger>
               </TabsHighlightItem>
             ))}
