@@ -87,6 +87,7 @@
     "summaryParagraph": {
       "withGain": "Amb els teus {ptoDays} dies de vacances i {totalHolidays} festius, l'estratègia {strategy} els converteix en {effectiveDays} dies lliures efectius — són {increment} dies extra, una millora del +{percentage}% respecte a usar-los sense optimitzar.",
       "withoutGain": "Amb els teus {ptoDays} dies de vacances i {totalHolidays} festius, obtens {effectiveDays} dies lliures efectius usant l'estratègia {strategy}.",
+      "noRegionHintTitle": "Afegeix la teva regió",
       "noRegionHint": "Selecciona la teva regió a la barra lateral per incloure festius regionals i potencialment obtenir més dies lliures.",
       "withRegion": "{regionalDays} dels teus festius són específics de {region}."
     },
@@ -636,7 +637,7 @@
   "upgrade": {
     "premiumRequired": "Es Requereix Premium",
     "featureRequiresPremium": "requereix accés premium",
-    "verifyDescription": "No et preocupis, si ja has donat comprovarem el teu email a la nostra llista i et concedirem accés premium. Si tens algun problema no dubtis en contactar-nos.",
+    "verifyDescription": "No et preocupis, si ja has donat o pagat comprovarem el teu email a la nostra llista i et concedirem accés premium. Si tens algun problema no dubtis en contactar-nos.",
     "considerDonating": "Si encara no has donat, considera fer-ho per donar suport al projecte i desbloquejar les funcions premium.",
     "enterPremiumEmail": "Introdueix el teu email premium",
     "emailPlaceholder": "el-teu@email.com",

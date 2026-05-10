@@ -87,6 +87,7 @@
     "summaryParagraph": {
       "withGain": "Con tus {ptoDays} días de vacaciones y {totalHolidays} festivos, la estrategia {strategy} los convierte en {effectiveDays} días libres efectivos — son {increment} días extra, una mejora del +{percentage}% respecto a usarlos sin optimizar.",
       "withoutGain": "Con tus {ptoDays} días de vacaciones y {totalHolidays} festivos, obtienes {effectiveDays} días libres efectivos usando la estrategia {strategy}.",
+      "noRegionHintTitle": "Añade tu región",
       "noRegionHint": "Selecciona tu región en la barra lateral para incluir festivos regionales y potencialmente obtener más días libres.",
       "withRegion": "{regionalDays} de tus festivos son específicos de {region}."
     },
@@ -636,7 +637,7 @@
   "upgrade": {
     "premiumRequired": "Se Requiere Premium",
     "featureRequiresPremium": "requiere acceso premium",
-    "verifyDescription": "No te preocupes, si ya has donado comprobaremos tu email en nuestra lista y te concederemos acceso premium. Si tienes algún problema no dudes en contactarnos.",
+    "verifyDescription": "No te preocupes, si ya has donado o pagado comprobaremos tu email en nuestra lista y te concederemos acceso premium. Si tienes algún problema no dudes en contactarnos.",
     "considerDonating": "Si aún no has donado, considera hacerlo para apoyar el proyecto y desbloquear las funciones premium.",
     "enterPremiumEmail": "Introduce tu email premium",
     "emailPlaceholder": "tu@email.com",

@@ -87,6 +87,7 @@
     "summaryParagraph": {
       "withGain": "Mit deinen {ptoDays} Urlaubstagen und {totalHolidays} Feiertagen verwandelt die {strategy}-Strategie diese in {effectiveDays} effektive freie Tage – das sind {increment} zusätzliche Tage, eine Verbesserung von +{percentage}% gegenüber der einfachen Nutzung.",
       "withoutGain": "Mit deinen {ptoDays} Urlaubstagen und {totalHolidays} Feiertagen erhältst du {effectiveDays} effektive freie Tage mit der {strategy}-Strategie.",
+      "noRegionHintTitle": "Region hinzufügen",
       "noRegionHint": "Wähle deine Region in der Seitenleiste aus, um regionale Feiertage einzubeziehen und möglicherweise noch mehr freie Tage zu erhalten.",
       "withRegion": "{regionalDays} deiner Feiertage sind spezifisch für {region}."
     },
@@ -636,7 +637,7 @@
   "upgrade": {
     "premiumRequired": "Premium-Funktion erforderlich",
     "featureRequiresPremium": "erfordert Premium-Zugang",
-    "verifyDescription": "Keine Sorge, wenn du bereits gespendet hast, prüfen wir deine E-Mail gegen unsere Liste und gewähren dir Premium-Zugang. Solltest du Probleme haben, zögere nicht, uns zu kontaktieren.",
+    "verifyDescription": "Keine Sorge, wenn du bereits gespendet oder bezahlt hast, prüfen wir deine E-Mail gegen unsere Liste und gewähren dir Premium-Zugang. Solltest du Probleme haben, zögere nicht, uns zu kontaktieren.",
     "considerDonating": "Wenn du noch nicht gespendet hast, erwäge bitte eine Spende, um das Projekt zu unterstützen und Premium-Funktionen freizuschalten!",
     "enterPremiumEmail": "Gib deine Premium-E-Mail ein",
     "emailPlaceholder": "deine@email.com",

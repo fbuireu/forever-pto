@@ -87,6 +87,7 @@
     "summaryParagraph": {
       "withGain": "With your {ptoDays} vacation days and {totalHolidays} public holidays, the {strategy} strategy turns them into {effectiveDays} effective days off — that's {increment} extra days, a +{percentage}% improvement over simply using them as-is.",
       "withoutGain": "With your {ptoDays} vacation days and {totalHolidays} public holidays, you get {effectiveDays} effective days off using the {strategy} strategy.",
+      "noRegionHintTitle": "Add your region",
       "noRegionHint": "Select your region in the sidebar to include regional holidays and potentially get even more days off.",
       "withRegion": "{regionalDays} of your holidays are specific to {region}."
     },
@@ -636,7 +637,7 @@
   "upgrade": {
     "premiumRequired": "Premium Feature Required",
     "featureRequiresPremium": "requires premium access",
-    "verifyDescription": "Don't worry, if you already donate we will check your email against our list and grant you premium access. If you encounter any trouble please don't hesitate to contact us.",
+    "verifyDescription": "Don't worry, if you have already donated or paid we will check your email against our list and grant you premium access. If you encounter any trouble please don't hesitate to contact us.",
     "considerDonating": "If you haven't donated yet, please consider doing so to support the project and unlock premium features!",
     "enterPremiumEmail": "Enter your premium email",
     "emailPlaceholder": "your@email.com",

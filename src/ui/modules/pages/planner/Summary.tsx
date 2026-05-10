@@ -21,6 +21,7 @@ import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { MapPin } from '../../core/animate/icons/MapPin';
 import { MetricCard, MetricCardSize } from './summary/MetricCard';
 import { SummaryFixture } from './summary/SummaryFixture';
 
@@ -180,7 +181,9 @@ export const Summary = () => {
                 </p>
               )}
               {!region && (
-                <p className='text-sm text-amber-700 dark:text-amber-400'>{t('summaryParagraph.noRegionHint')}</p>
+                <Banner icon={MapPin} title={t('summaryParagraph.noRegionHintTitle')} colorScheme='blue'>
+                  {t('summaryParagraph.noRegionHint')}
+                </Banner>
               )}
             </CardDescription>
           </CardHeader>

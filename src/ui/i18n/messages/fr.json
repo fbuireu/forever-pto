@@ -87,6 +87,7 @@
     "summaryParagraph": {
       "withGain": "Avec tes {ptoDays} jours de vacances et {totalHolidays} jours fériés, la stratégie {strategy} les transforme en {effectiveDays} jours de repos effectifs — soit {increment} jours supplémentaires, une amélioration de +{percentage}% par rapport à une utilisation classique.",
       "withoutGain": "Avec tes {ptoDays} jours de vacances et {totalHolidays} jours fériés, tu obtiens {effectiveDays} jours de repos effectifs avec la stratégie {strategy}.",
+      "noRegionHintTitle": "Ajoute ta région",
       "noRegionHint": "Sélectionne ta région dans la barre latérale pour inclure les jours fériés régionaux et potentiellement obtenir encore plus de jours de repos.",
       "withRegion": "{regionalDays} de tes jours fériés sont spécifiques à {region}."
     },
@@ -636,7 +637,7 @@
   "upgrade": {
     "premiumRequired": "Fonctionnalité premium requise",
     "featureRequiresPremium": "nécessite un accès premium",
-    "verifyDescription": "Pas d'inquiétude, si tu as déjà fait un don, nous vérifierons ton e-mail dans notre liste et t'accorderons l'accès premium. Si tu rencontres un problème, n'hésite pas à nous contacter.",
+    "verifyDescription": "Pas d'inquiétude, si tu as déjà fait un don ou payé, nous vérifierons ton e-mail dans notre liste et t'accorderons l'accès premium. Si tu rencontres un problème, n'hésite pas à nous contacter.",
     "considerDonating": "Si tu n'as pas encore fait de don, pense à le faire pour soutenir le projet et débloquer les fonctionnalités premium !",
     "enterPremiumEmail": "Saisis ton e-mail premium",
     "emailPlaceholder": "ton@email.com",
