@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/fbuireu/forever-pto/compare/v1.2.2...v1.2.3) (2026-05-10)
+
+
+### Bug Fixes
+
+* freeze sidebar ([42acb05](https://github.com/fbuireu/forever-pto/commit/42acb0525098366beec219410aa7336e144a4609))
+
 ## [1.2.2](https://github.com/fbuireu/forever-pto/compare/v1.2.1...v1.2.2) (2026-05-10)
 
 
