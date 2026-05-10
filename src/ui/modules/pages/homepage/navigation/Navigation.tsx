@@ -13,6 +13,7 @@ export const Navigation = async () => {
       <div className='max-w-[1320px] mx-auto flex items-center justify-between px-7 py-[14px]'>
         <Link
           href='/'
+          aria-label='Forever PTO'
           className='flex items-center gap-2.5 font-display font-extrabold text-[22px] tracking-[-0.02em] hover:opacity-85 transition-opacity'
         >
           <span className='hidden sm:inline'>Forever</span>
