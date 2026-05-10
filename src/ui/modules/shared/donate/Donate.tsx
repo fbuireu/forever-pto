@@ -33,7 +33,7 @@ interface PaymentState {
 
 const logger = getBetterStackInstance();
 
-export const Donate = () => {
+export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
   const locale = useLocale();
   const t = useTranslations('toasts');
   const tDonate = useTranslations('donate');
@@ -373,7 +373,7 @@ export const Donate = () => {
 
   return (
     <Popover open={isOpen} onOpenChange={setDonatePopoverOpen}>
-      <div className='donate-trigger fixed bottom-[calc(15dvh+8px)] md:bottom-4 w-full right-0 md:w-auto md:right-4 z-50'>
+      <div className={cn('donate-trigger fixed w-full right-0 md:w-auto md:right-4 z-50', bottomClassName ?? 'bottom-[calc(15dvh+8px)] md:bottom-4')}>
         <div className='donate-brutal' style={{ animationPlayState: isOpen ? 'paused' : 'running' }}>
           <PopoverTrigger asChild>
             <Button className='donate-brutal-btn w-full py-3'>{tDonate('donateAndUnblock')}</Button>

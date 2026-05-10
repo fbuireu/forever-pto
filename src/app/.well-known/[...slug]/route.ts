@@ -33,8 +33,8 @@ function apiCatalog(baseUrl: string) {
 function mcpServerCard(baseUrl: string) {
   return NextResponse.json(
     {
-      schema_version: 'v1',
-      server_info: {
+      schemaVersion: 'v1',
+      serverInfo: {
         name: 'Forever PTO',
         version: pkg.version,
         description:

@@ -15,7 +15,7 @@ export const Navigation = async () => {
           href='/'
           className='flex items-center gap-2.5 font-display font-extrabold text-[22px] tracking-[-0.02em] hover:opacity-85 transition-opacity'
         >
-          <span>Forever</span>
+          <span className='hidden sm:inline'>Forever</span>
           <div
             className='w-[38px] h-[38px] bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] overflow-hidden shrink-0 -rotate-[4deg]'
             aria-hidden

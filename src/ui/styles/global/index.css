@@ -57,7 +57,7 @@
   --secondary-foreground: #0e0e0e;
   --muted: #f0e2be;
   --muted-foreground: #6b5e4e;
-  --destructive: #ff5a5f;
+  --destructive: #d32f2f;
   --border: #0e0e0e;
   --input: #fffaf0;
   --ring: var(--color-brand-orange);
