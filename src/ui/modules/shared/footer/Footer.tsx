@@ -15,6 +15,7 @@ export const Footer = async () => {
         <div className='flex items-center justify-between flex-wrap gap-3 px-7 pt-5 pb-4 border-b-[2px] border-[var(--frame)]/18'>
           <Link
             href='/'
+            aria-label='Forever PTO'
             className='flex items-center gap-2 font-display font-extrabold text-[18px] tracking-[-0.02em] hover:opacity-80 transition-opacity'
           >
             <span className='hidden sm:inline'>Forever</span>
