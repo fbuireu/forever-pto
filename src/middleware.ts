@@ -17,6 +17,18 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   const i18nResponse = i18nProxy(request);
 
+  const localeCookie = i18nResponse.cookies.get('NEXT_LOCALE');
+  if (localeCookie) {
+    i18nResponse.cookies.set({
+      name: 'NEXT_LOCALE',
+      value: localeCookie.value,
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+    });
+  }
+
   return await locationProxy({ request, response: i18nResponse });
 }
 
