@@ -4,17 +4,19 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 concurrency:
   group: deploy-production
   cancel-in-progress: false
 
 jobs:
   deploy:
+    name: Deploy
     uses: ./.github/workflows/_deploy.yml
     with:
       environment: production
       wrangler_env: production
       url: https://forever-pto.com
-    secrets:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    secrets: inherit

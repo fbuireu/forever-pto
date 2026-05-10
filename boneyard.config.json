@@ -1,0 +1,10 @@
+{
+  "out": "./src/ui/modules/bones",
+  "animate": "shimmer",
+  "color": "#fff8ee",
+  "darkColor": "#1e1914",
+  "shimmerColor": "#fffdf8",
+  "darkShimmerColor": "#241e18",
+  "transition": true,
+  "wait": 1000
+}

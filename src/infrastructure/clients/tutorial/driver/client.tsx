@@ -1,7 +1,7 @@
 'use client';
 
-import { AnimateIcon } from '@ui/components/animate/icons/icon';
-import { X } from '@ui/components/animate/icons/x';
+import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
+import { X } from '@ui/modules/core/animate/icons/X';
 import { type Config, type Driver, type DriveStep, driver } from 'driver.js';
 import { createRoot, type Root } from 'react-dom/client';
 
@@ -24,7 +24,7 @@ export class DriverClient {
       showButtons: ['next', 'previous', 'close'],
       smoothScroll: true,
       stagePadding: 10,
-      stageRadius: 8,
+      stageRadius: 12,
       ...this.config,
       onPopoverRender: (popover, options) => {
         this.config.onPopoverRender?.(popover, options);
@@ -44,6 +44,13 @@ export class DriverClient {
           );
           this.closeButtonRoots.push(root);
         }
+
+        const { state, config } = options;
+        const isLastStep =
+          typeof state.activeIndex === 'number' && state.activeIndex === (config.steps?.length ?? 0) - 1;
+        if (isLastStep) {
+          popover.nextButton?.classList.add('driver-popover-done-btn');
+        }
       },
       onDestroyStarted: (element, step, options) => {
         this.config.onDestroyStarted?.(element, step, options);
@@ -62,9 +69,12 @@ export class DriverClient {
     return this.driver;
   }
 
-  start(steps?: DriveStep[]): void {
+  start(steps?: DriveStep[], overrides?: Partial<DriverConfig>): void {
     if (steps) {
       this.config.steps = steps;
+    }
+    if (overrides) {
+      Object.assign(this.config, overrides);
     }
 
     if (this.driver) {

@@ -1,0 +1,108 @@
+'use client';
+
+import { usePremiumStore } from '@application/stores/premium';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/modules/core/animate/base/Tooltip';
+import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
+import { Lock } from '@ui/modules/core/animate/icons/Lock';
+import { cn } from '@ui/utils/utils';
+import { useTranslations } from 'next-intl';
+import { useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+import { getButtonClass } from './utils/helpers';
+
+export const PremiumFeatureVariant = {
+  DEFAULT: 'default',
+  STACK: 'stack',
+} as const;
+
+export type PremiumFeatureVariant = (typeof PremiumFeatureVariant)[keyof typeof PremiumFeatureVariant];
+
+interface PremiumFeatureProps {
+  feature: string;
+  children: React.ReactNode;
+  className?: string;
+  description?: string;
+  variant?: PremiumFeatureVariant;
+  iconSize?: string;
+  inlineDescription?: boolean;
+}
+
+export const PremiumFeature = ({
+  feature,
+  children,
+  className,
+  description,
+  variant = PremiumFeatureVariant.DEFAULT,
+  iconSize = 'w-6 h-6',
+  inlineDescription = false,
+}: PremiumFeatureProps) => {
+  const t = useTranslations('premium');
+  const { premiumKey, showUpgradeModal, checkExistingSession } = usePremiumStore(
+    useShallow((state) => ({
+      premiumKey: state.premiumKey,
+      showUpgradeModal: state.showUpgradeModal,
+      checkExistingSession: state.checkExistingSession,
+    }))
+  );
+  useEffect(() => {
+    checkExistingSession();
+  }, [checkExistingSession]);
+
+  if (premiumKey) {
+    return <>{children}</>;
+  }
+
+  return (
+    <AnimateIcon animateOnHover asChild>
+      {/* biome-ignore lint/a11y/useSemanticElements: children may render as <button>, avoiding invalid nested button HTML */}
+      <div
+        role='button'
+        tabIndex={0}
+        className={cn('relative m-0 focus:outline-none', getButtonClass(variant), className)}
+        aria-label={description ?? t('unlockFeature', { feature })}
+        onClick={() => showUpgradeModal(feature)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            showUpgradeModal(feature);
+          }
+        }}
+      >
+        <div style={{ filter: 'blur(4px)' }} aria-hidden='true' inert>
+          {children}
+        </div>
+        <div
+          className={cn(
+            'absolute inset-0 flex items-center',
+            variant === PremiumFeatureVariant.STACK ? 'justify-start -translate-x-1' : 'justify-center'
+          )}
+        >
+          {description && !inlineDescription ? (
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className='relative inline-flex items-center justify-center rounded-[8px] border-[3px] border-[var(--frame)] bg-background p-2 rotate-[-4deg] shadow-[3px_3px_0_0_var(--frame)]'>
+                    <Lock className={cn(iconSize, 'text-foreground')} />
+                    <span className='absolute -top-2.5 -right-2.5 size-4 inline-flex items-center justify-center rounded-[4px] border-[2px] border-[var(--frame)] bg-[var(--accent)] text-[var(--color-brand-ink)] font-mono font-black text-[10px] leading-none'>
+                      i
+                    </span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className='w-50 text-pretty'>{description}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ) : (
+            <div className='flex flex-col items-center gap-2 text-center px-4'>
+              <div className='inline-flex items-center justify-center rounded-[8px] border-[3px] border-[var(--frame)] bg-background p-2 rotate-[-4deg] shadow-[3px_3px_0_0_var(--frame)]'>
+                <Lock className={cn(iconSize, 'text-foreground')} />
+              </div>
+              {inlineDescription && (
+                <div className='text-sm text-foreground dark:[text-shadow:0_2px_4px_rgba(0,0,0,1)]'>{description}</div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </AnimateIcon>
+  );
+};

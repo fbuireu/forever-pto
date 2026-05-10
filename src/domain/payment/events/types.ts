@@ -16,11 +16,4 @@ export interface PaymentFailedEvent {
   errorMessage: string;
 }
 
-export interface ChargeSucceededEvent {
-  type: 'charge_succeeded';
-  charge: Stripe.Charge;
-  chargeId: string;
-  paymentIntentId: string | null;
-}
-
-export type PaymentEvent = PaymentSucceededEvent | PaymentFailedEvent | ChargeSucceededEvent;
+export type PaymentEvent = PaymentSucceededEvent | PaymentFailedEvent;

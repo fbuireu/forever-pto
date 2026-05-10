@@ -1,0 +1,76 @@
+import { Badge } from '@ui/modules/core/primitives/Badge';
+import { cn } from '@ui/utils/utils';
+import { getTranslations } from 'next-intl/server';
+import { brutCard } from './shared';
+
+const CARD_STYLES = [
+  { avatarBg: 'bg-[var(--color-brand-teal)]', rotate: 'rotate-[-1deg]', hoverRotate: 'hover:rotate-0' },
+  { avatarBg: 'bg-[var(--color-brand-orange)]', rotate: 'rotate-[1.2deg]', hoverRotate: 'hover:rotate-0' },
+  { avatarBg: 'bg-[var(--color-brand-purple)]', rotate: 'rotate-[-0.5deg]', hoverRotate: 'hover:rotate-0' },
+  { avatarBg: 'bg-[var(--color-brand-sky)]', rotate: 'rotate-[0.8deg]', hoverRotate: 'hover:rotate-0' },
+  { avatarBg: 'bg-[var(--color-brand-pink)]', rotate: 'rotate-[-1.5deg]', hoverRotate: 'hover:rotate-0' },
+  { avatarBg: 'bg-[var(--color-brand-green)]', rotate: 'rotate-[0.3deg]', hoverRotate: 'hover:rotate-0' },
+] as const;
+
+type TestimonialKey = 'martaR' | 'diegoA' | 'saraV' | 'carlosM' | 'lauraT' | 'thomasK';
+
+const TESTIMONIAL_KEYS: TestimonialKey[] = ['martaR', 'diegoA', 'saraV', 'carlosM', 'lauraT', 'thomasK'];
+
+export const Testimonials = async () => {
+  const t = await getTranslations('homepage');
+
+  const shuffledKeys = [...TESTIMONIAL_KEYS].sort(() => Math.random() - 0.5);
+
+  return (
+    <section className='px-7 py-24' id='testimonials'>
+      <div className='max-w-[900px] mx-auto mb-14 text-center'>
+        <div className='flex justify-center mb-4'>
+          <Badge variant='outline'>{t('testimonials.badge')}</Badge>
+        </div>
+        <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] text-[clamp(36px,5vw,64px)]'>
+          {t('testimonials.titleStart')} <em className='font-serif italic'>{t('testimonials.titleEmphasis')}</em>{' '}
+          {t('testimonials.titleEnd')}
+        </h2>
+      </div>
+
+      <div className='max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6'>
+        {shuffledKeys.map((key, idx) => {
+          const text = t(`testimonials.items.${key}.text` as Parameters<typeof t>[0]);
+          const name = t(`testimonials.items.${key}.name` as Parameters<typeof t>[0]);
+          const role = t(`testimonials.items.${key}.role` as Parameters<typeof t>[0]);
+          const { avatarBg, rotate, hoverRotate } = CARD_STYLES[idx];
+
+          return (
+            <div
+              key={key}
+              className={cn(brutCard, 'p-6 relative transition-transform duration-200', rotate, hoverRotate)}
+            >
+              <span
+                className='absolute -top-3.5 left-[18px] bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[8px] px-2.5 font-serif text-[36px] leading-none shadow-[3px_3px_0_0_var(--frame)] rotate-[-5deg]'
+                aria-hidden='true'
+              >
+                &quot;
+              </span>
+              <div className='text-[#FFB800] tracking-[2px] text-sm mt-2 mb-2.5'>★★★★★</div>
+              <p className='font-serif text-[22px] leading-[1.3] mb-4'>{text}</p>
+              <div className='flex gap-3 items-center pt-3.5 border-t-[2.5px] border-[var(--frame)]'>
+                <div
+                  className={cn(
+                    'w-[42px] h-[42px] rounded-full border-[3px] border-[var(--frame)] grid place-items-center font-display font-extrabold text-white shrink-0',
+                    avatarBg
+                  )}
+                >
+                  {name[0]}
+                </div>
+                <div>
+                  <strong className='block font-bold text-[15px]'>{name}</strong>
+                  <span className='font-mono text-[11px] text-muted-foreground'>{role}</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+};

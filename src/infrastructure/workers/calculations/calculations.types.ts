@@ -2,7 +2,7 @@ import type { Metrics } from '../../services/calendar/types';
 
 export interface SerializedHolidayDTO {
   id: string;
-  date: string; // ISO
+  date: string;
   name: string;
   type?: string;
   location?: string;
@@ -11,16 +11,16 @@ export interface SerializedHolidayDTO {
 }
 
 export interface SerializedBridge {
-  startDate: string; // ISO
-  endDate: string; // ISO
+  startDate: string;
+  endDate: string;
   ptoDaysNeeded: number;
   effectiveDays: number;
   efficiency: number;
-  ptoDays: string[]; // ISO[]
+  ptoDays: string[];
 }
 
 export interface SerializedSuggestion {
-  days: string[]; // ISO[]
+  days: string[];
   bridges?: SerializedBridge[];
   strategy?: string;
   metrics?: Metrics;
@@ -31,7 +31,7 @@ export interface CalculateSuggestionsPayload {
   ptoDays: number;
   holidays: SerializedHolidayDTO[];
   allowPastDays: boolean;
-  months: string[]; // ISO[]
+  months: string[];
   strategy: string;
   locale: string;
   maxAlternatives: number;

@@ -12,12 +12,10 @@ on:
       url:
         required: false
         type: string
-    secrets:
-      CLOUDFLARE_API_TOKEN:
-        required: true
-      CLOUDFLARE_ACCOUNT_ID:
-        required: true
-
+      worker_name:
+        required: false
+        type: string
+        description: Override the worker name (for per-PR preview deployments)
 permissions:
   contents: read
 
@@ -32,9 +30,9 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -43,11 +41,17 @@ jobs:
         env:
           NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: ${{ vars.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN }}
           NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: ${{ vars.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL }}
+          NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN: ${{ vars.NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN }}
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
           NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: ${{ vars.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID }}
           NEXT_PUBLIC_STORAGE_KEY: ${{ vars.NEXT_PUBLIC_STORAGE_KEY }}
       - name: Deploy to Cloudflare Workers
-        run: pnpm dlx wrangler deploy --env ${{ inputs.wrangler_env }}
+        run: |
+          NAME_FLAG=""
+          if [ -n "${{ inputs.worker_name }}" ]; then
+            NAME_FLAG="--name ${{ inputs.worker_name }}"
+          fi
+          pnpm exec wrangler deploy --env ${{ inputs.wrangler_env }} $NAME_FLAG
       - name: Set Worker secrets
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
@@ -56,9 +60,14 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: |
+          if [ -n "${{ inputs.worker_name }}" ]; then
+            TARGET_FLAG="--name ${{ inputs.worker_name }}"
+          else
+            TARGET_FLAG="--env ${{ inputs.wrangler_env }}"
+          fi
           node -e "
           const required = ['JWT_SECRET','STRIPE_SECRET_KEY','STRIPE_WEBHOOK_SECRET','RESEND_API_KEY','TURSO_AUTH_TOKEN'];
           const missing = required.filter(k => !process.env[k]);
           if (missing.length) { console.error('Missing required secrets: ' + missing.join(', ')); process.exit(1); }
           process.stdout.write(JSON.stringify(Object.fromEntries(required.map(k => [k, process.env[k]]))));
-          " | pnpm dlx wrangler secret bulk --env ${{ inputs.wrangler_env }}
+          " | pnpm exec wrangler secret bulk $TARGET_FLAG

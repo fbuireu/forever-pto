@@ -32,7 +32,7 @@ export function serializeSuggestionResult(
   };
 }
 
-function serializeSuggestion(s: Suggestion): SerializedSuggestion {
+export function serializeSuggestion(s: Suggestion): SerializedSuggestion {
   return {
     ...s,
     days: s.days.map((d) => d.toISOString()),

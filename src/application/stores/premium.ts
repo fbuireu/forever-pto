@@ -1,4 +1,5 @@
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { track } from '@infrastructure/clients/logging/better-stack/tracking';
 import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -92,6 +93,7 @@ export const usePremiumStore = create<PremiumStore>()(
                   isLoading: false,
                   needsSessionCheck: false,
                 });
+                track('premium_activated', { plan: 'premium' });
                 return true;
               }
             }
@@ -175,6 +177,7 @@ export const usePremiumStore = create<PremiumStore>()(
             lastVerified: Date.now(),
             needsSessionCheck: false,
           });
+          track('premium_activated', { plan: 'premium' });
         },
 
         resetPremiumStore: () => {
@@ -193,6 +196,7 @@ export const usePremiumStore = create<PremiumStore>()(
             currentFeature: feature,
             modalOpen: true,
           });
+          track('upgrade_modal_opened', { feature });
         },
 
         closeModal: () => {

@@ -29,7 +29,6 @@
       "@domain/*": ["./src/domain/*"],
       "@ui/*": ["./src/ui/*"],
       "@application/*": ["./src/application/*"],
-      "@modules/*": ["./src/ui/modules/*"],
       "@assets/*": ["./src/ui/assets/*"],
       "@styles/*": ["./src/ui/styles/*"],
       "@i18n/*": ["./src/ui/i18n/*"],

@@ -1,6 +1,7 @@
 'use client';
 
-import { useSidebar } from '@ui/components/animate/base/sidebar';
+import { useIsMobile } from '@ui/hooks/useMobile';
+import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
 import type { DriveStep } from 'driver.js';
 import { useTranslations } from 'next-intl';
 import { useCallback } from 'react';
@@ -9,84 +10,52 @@ const SIDEBAR_CONTAINER_SELECTOR = '[data-slot="sidebar-container"]';
 
 export const useTutorial = () => {
   const { open, toggleSidebar } = useSidebar();
+  const isMobile = useIsMobile();
   const t = useTranslations('tutorial.steps');
+  const tUi = useTranslations('tutorial');
 
   const startTutorial = useCallback(async () => {
     const [{ getDriverClientInstance }] = await Promise.all([
       import('@infrastructure/clients/tutorial/driver/client'),
-      import('@ui/modules/components/core/DriverStyles'),
+      import('@ui/modules/tutorial/DriverStyles'),
     ]);
     const driverClient = getDriverClientInstance();
 
+    const expandDrawer = () => window.dispatchEvent(new CustomEvent('tutorial:expand-drawer'));
+
     const steps: DriveStep[] = [
       {
-        element: '[data-tutorial="sidebar-filters"]',
+        element: '[data-tutorial="sidebar-step-1"]',
         popover: {
-          title: t('filtersTitle'),
-          description: t('filtersDescription'),
+          title: t('step1Title'),
+          description: t('step1Description'),
           side: 'right',
           align: 'start',
         },
       },
       {
-        element: '[data-tutorial="pto-days"]',
+        element: '[data-tutorial="sidebar-step-2"]',
         popover: {
-          title: t('ptoDaysTitle'),
-          description: t('ptoDaysDescription'),
+          title: t('step2Title'),
+          description: t('step2Description'),
           side: 'right',
           align: 'start',
         },
       },
       {
-        element: '[data-tutorial="country"]',
+        element: '[data-tutorial="sidebar-step-3"]',
         popover: {
-          title: t('countryTitle'),
-          description: t('countryDescription'),
+          title: t('step3Title'),
+          description: t('step3Description'),
           side: 'right',
           align: 'start',
         },
       },
       {
-        element: '[data-tutorial="region"]',
+        element: '[data-tutorial="sidebar-step-4"]',
         popover: {
-          title: t('regionTitle'),
-          description: t('regionDescription'),
-          side: 'right',
-          align: 'start',
-        },
-      },
-      {
-        element: '[data-tutorial="year"]',
-        popover: {
-          title: t('yearTitle'),
-          description: t('yearDescription'),
-          side: 'right',
-          align: 'start',
-        },
-      },
-      {
-        element: '[data-tutorial="strategy"]',
-        popover: {
-          title: t('strategyTitle'),
-          description: t('strategyDescription'),
-          side: 'right',
-          align: 'start',
-        },
-      },
-      {
-        element: '[data-tutorial="allow-past-days"]',
-        popover: {
-          title: t('allowPastDaysTitle'),
-          description: t('allowPastDaysDescription'),
-          side: 'right',
-          align: 'start',
-        },
-      },
-      {
-        element: '[data-tutorial="carry-over"]',
-        popover: {
-          title: t('carryOverTitle'),
-          description: t('carryOverDescription'),
+          title: t('step4Title'),
+          description: t('step4Description'),
           side: 'right',
           align: 'start',
         },
@@ -100,6 +69,19 @@ export const useTutorial = () => {
           align: 'start',
         },
       },
+      ...(isMobile
+        ? [
+            {
+              element: '[data-tutorial="planner-drawer"]',
+              popover: {
+                title: t('drawerTitle'),
+                description: t('drawerDescription'),
+                side: 'top' as const,
+                align: 'center' as const,
+              },
+            },
+          ]
+        : []),
       {
         element: '[data-tutorial="alternatives-manager"]',
         popover: {
@@ -108,6 +90,7 @@ export const useTutorial = () => {
           side: 'bottom',
           align: 'start',
         },
+        onHighlightStarted: isMobile ? expandDrawer : undefined,
       },
       {
         element: '[data-tutorial="pto-status"]',
@@ -156,8 +139,13 @@ export const useTutorial = () => {
       });
     }
 
-    driverClient.start(steps);
-  }, [open, t, toggleSidebar]);
+    driverClient.start(steps, {
+      nextBtnText: tUi('nextBtn'),
+      prevBtnText: tUi('prevBtn'),
+      doneBtnText: tUi('doneBtn'),
+      progressText: `{{current}} ${tUi('progressTextConnector')} {{total}}`,
+    });
+  }, [open, isMobile, t, tUi, toggleSidebar]);
 
   return { startTutorial };
 };
