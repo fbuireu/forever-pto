@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/fbuireu/forever-pto/compare/v1.2.1...v1.2.2) (2026-05-10)
+
+
+### Bug Fixes
+
+* overflow faqs ([407f14c](https://github.com/fbuireu/forever-pto/commit/407f14c1d482b61ae12a96013a1f86f6254d9f25))
+
 ## [1.2.1](https://github.com/fbuireu/forever-pto/compare/v1.2.0...v1.2.1) (2026-05-10)
 
 
