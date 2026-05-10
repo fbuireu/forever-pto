@@ -1,3 +1,11 @@
+## [1.1.4](https://github.com/fbuireu/forever-pto/compare/v1.1.3...v1.1.4) (2026-05-10)
+
+
+### Bug Fixes
+
+* freeze portal ([131ad7b](https://github.com/fbuireu/forever-pto/commit/131ad7b6558b16cc641f35bcd37c167979c33c0b))
+* freeze portal ([d6e96d0](https://github.com/fbuireu/forever-pto/commit/d6e96d09e5589fde414db942bfe51c70ab49db22))
+
 ## [1.1.3](https://github.com/fbuireu/forever-pto/compare/v1.1.2...v1.1.3) (2026-05-10)
 
 
