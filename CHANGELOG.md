@@ -1,3 +1,10 @@
+## [1.2.9](https://github.com/fbuireu/forever-pto/compare/v1.2.8...v1.2.9) (2026-05-11)
+
+
+### Bug Fixes
+
+* modal false ([b62cb4f](https://github.com/fbuireu/forever-pto/commit/b62cb4fa567bdc65b3243a7e2eced666e2efd13a))
+
 ## [1.2.8](https://github.com/fbuireu/forever-pto/compare/v1.2.7...v1.2.8) (2026-05-11)
 
 
