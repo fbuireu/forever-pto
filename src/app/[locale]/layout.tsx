@@ -82,9 +82,11 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
             enableSystem
             disableTransitionOnChange
           >
-            <LazyMotionProvider>{children}</LazyMotionProvider>
+            <LazyMotionProvider>
+              {children}
+              <CookieConsentClient />
+            </LazyMotionProvider>
           </ThemeProvider>
-          <CookieConsentClient />
         </NextIntlClientProvider>
         <WebMCP />
         <Analytics />

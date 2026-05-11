@@ -26,7 +26,7 @@ function Popover(props: PopoverProps) {
 type PopoverTriggerProps = React.ComponentProps<typeof PopoverPrimitive.Trigger> & { asChild?: boolean };
 function PopoverTrigger({ asChild, children, ...props }: PopoverTriggerProps) {
   if (asChild && React.isValidElement(children)) {
-    return <PopoverPrimitive.Trigger data-slot='popover-trigger' render={children} {...props} />;
+    return <PopoverPrimitive.Trigger data-slot='popover-trigger' nativeButton={false} render={children} {...props} />;
   }
   return (
     <PopoverPrimitive.Trigger data-slot='popover-trigger' {...props}>
