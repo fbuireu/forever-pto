@@ -3,10 +3,9 @@
 import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
 import { cn } from '@ui/utils/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
+import { type HTMLMotionProps, m, type Transition } from 'motion/react';
 import * as React from 'react';
-import { createContext, use, useCallback, useEffect, useState } from 'react';
-import { AnimateIcon } from '../icons/Icon';
+import { createContext, use, useCallback, useState } from 'react';
 import { X } from '../icons/X';
 
 type SheetContextType = {
@@ -26,15 +25,14 @@ const useSheet = (): SheetContextType => {
 type SheetProps = React.ComponentProps<typeof SheetPrimitive.Root>;
 
 function Sheet({ children, ...props }: SheetProps) {
-  const [isOpen, setIsOpen] = useState(props?.open ?? props?.defaultOpen ?? false);
-
-  useEffect(() => {
-    if (props?.open !== undefined) setIsOpen(props.open);
-  }, [props?.open]);
+  const [localIsOpen, setLocalIsOpen] = useState(props?.defaultOpen ?? false);
+  // Derive isOpen synchronously so SheetContent portal renders in the same cycle
+  // that base-ui receives open=true — prevents base-ui state corruption on re-open.
+  const isOpen = props?.open ?? localIsOpen;
 
   const handleOpenChange = useCallback(
     (...args: Parameters<NonNullable<SheetProps['onOpenChange']>>) => {
-      setIsOpen(args[0]);
+      setLocalIsOpen(args[0]);
       props.onOpenChange?.(...args);
     },
     [props.onOpenChange]
@@ -120,68 +118,72 @@ function SheetContent({
 }: SheetContentProps) {
   const { isOpen } = useSheet();
 
+  const closedPosition =
+    side === 'right'
+      ? { x: '100%', opacity: 0 }
+      : side === 'left'
+        ? { x: '-100%', opacity: 0 }
+        : side === 'top'
+          ? { y: '-100%', opacity: 0 }
+          : { y: '100%', opacity: 0 };
+
+  const { style: propsStyle, ...restProps } = props as HTMLMotionProps<'div'>;
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <SheetPortal keepMounted data-slot='sheet-portal'>
-          {overlay && (
-            <SheetPrimitive.Backdrop
+    // Portal always rendered — base-ui controls Popup lifecycle via keepMounted.
+    // AnimatePresence is intentionally absent: it fights base-ui's own cleanup,
+    // leaving the touch-none overlay in the DOM and freezing the UI on mobile.
+    <SheetPortal data-slot='sheet-portal'>
+      {/* Overlay: plain conditional — removed immediately on close so touch-none
+          never blocks the UI after the sheet is dismissed. */}
+      {overlay && isOpen && (
+        <SheetPrimitive.Backdrop
+          data-slot='sheet-overlay'
+          render={
+            <m.div
+              key='sheet-overlay'
               data-slot='sheet-overlay'
-              render={
-                <m.div
-                  key='sheet-overlay'
-                  data-slot='sheet-overlay'
-                  className='fixed inset-0 z-[51] bg-black/80 touch-none'
-                  initial={{ opacity: 0, filter: 'blur(4px)' }}
-                  animate={{ opacity: 1, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, filter: 'blur(4px)' }}
-                  transition={{ duration: 0.2, ease: 'easeInOut' }}
-                />
-              }
+              className='fixed inset-0 z-[51] bg-black/80 touch-none'
+              initial={{ opacity: 0, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, filter: 'blur(0px)' }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
             />
-          )}
-          <SheetPrimitive.Popup
-            render={
-              <m.div
-                key='sheet-content'
-                data-slot='sheet-content'
-                initial={
-                  side === 'right'
-                    ? { x: '100%', opacity: 0 }
-                    : side === 'left'
-                      ? { x: '-100%', opacity: 0 }
-                      : side === 'top'
-                        ? { y: '-100%', opacity: 0 }
-                        : { y: '100%', opacity: 0 }
-                }
-                animate={{ x: 0, y: 0, opacity: 1 }}
-                exit={
-                  side === 'right'
-                    ? { x: '100%', opacity: 0 }
-                    : side === 'left'
-                      ? { x: '-100%', opacity: 0 }
-                      : side === 'top'
-                        ? { y: '-100%', opacity: 0 }
-                        : { y: '100%', opacity: 0 }
-                }
-                transition={transition}
-                className={cn(sheetVariants({ side }), className)}
-                {...(props as HTMLMotionProps<'div'>)}
-              />
-            }
-          >
-            {children}
-            <SheetPrimitive.Close
-              data-slot='sheet-close'
-              className='absolute right-4 top-4 z-10 cursor-pointer rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] p-1.5 shadow-[var(--shadow-brutal-xs)] transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] focus:outline-none focus:ring-[3px] focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none'
-            >
-              <X className='h-4 w-4' />
-              <span className='sr-only'>Close</span>
-            </SheetPrimitive.Close>
-          </SheetPrimitive.Popup>
-        </SheetPortal>
+          }
+        />
       )}
-    </AnimatePresence>
+      {/* Popup: keepMounted keeps it in the DOM so motion can animate the
+          exit (slide off-screen). pointerEvents:none when closed prevents
+          the off-screen panel from capturing touch events. */}
+      <SheetPrimitive.Popup
+        keepMounted
+        render={
+          <m.div
+            key='sheet-content'
+            data-slot='sheet-content'
+            animate={isOpen ? { x: 0, y: 0, opacity: 1 } : closedPosition}
+            initial={closedPosition}
+            transition={transition}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              ...propsStyle,
+              pointerEvents: isOpen ? 'auto' : 'none',
+            }}
+            className={cn(sheetVariants({ side }), className)}
+            {...restProps}
+          />
+        }
+      >
+        {children}
+        <SheetPrimitive.Close
+          data-slot='sheet-close'
+          className='absolute right-4 top-4 z-10 cursor-pointer rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] p-1.5 shadow-[var(--shadow-brutal-xs)] transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] focus:outline-none focus:ring-[3px] focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none'
+        >
+          <X className='h-4 w-4' />
+          <span className='sr-only'>Close</span>
+        </SheetPrimitive.Close>
+      </SheetPrimitive.Popup>
+    </SheetPortal>
   );
 }
 
