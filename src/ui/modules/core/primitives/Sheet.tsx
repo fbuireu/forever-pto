@@ -168,7 +168,6 @@ export {
   SheetHeader,
   type SheetOverlayProps,
   SheetOverlay,
-  type SheetPortalProps,
   SheetPortal,
   type SheetContentProps as SheetProps,
   type SheetTitleProps,
