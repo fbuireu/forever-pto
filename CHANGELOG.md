@@ -1,3 +1,10 @@
+## [1.2.8](https://github.com/fbuireu/forever-pto/compare/v1.2.7...v1.2.8) (2026-05-11)
+
+
+### Bug Fixes
+
+* wrap cookie lazyload provider ([2afb345](https://github.com/fbuireu/forever-pto/commit/2afb345ea2a46f0e75e117ba762fc7d9710e33df))
+
 ## [1.2.7](https://github.com/fbuireu/forever-pto/compare/v1.2.6...v1.2.7) (2026-05-11)
 
 
