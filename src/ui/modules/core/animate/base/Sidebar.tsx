@@ -99,7 +99,7 @@ function SidebarProvider({
     };
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [openMobile, setOpenMobile]);
+  }, [openMobile]);
 
   const state = open ? 'expanded' : 'collapsed';
 

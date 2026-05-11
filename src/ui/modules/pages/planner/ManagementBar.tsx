@@ -83,7 +83,7 @@ export const ManagementBar = () => {
     onSelectionChange: handleSelectionChange,
     onPreviewChange: handlePreviewChange,
     selectedIndex: previewAlternativeIndex,
-    currentSelection: currentSelection!,
+    currentSelection: currentSelection ?? allSuggestions[currentSelectionIndex],
   };
 
   const previewSuggestion = allSuggestions[previewAlternativeIndex] ?? allSuggestions[0];
