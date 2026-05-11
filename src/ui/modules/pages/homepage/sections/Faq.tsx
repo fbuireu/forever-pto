@@ -152,7 +152,7 @@ export const Faq = async () => {
         </h2>
       </div>
 
-      <div className='max-w-4xl mx-auto space-y-6'>
+      <div className='max-w-[1240px] mx-auto w-full space-y-6'>
         <FaqTabs tabs={tabs} />
       </div>
     </section>
