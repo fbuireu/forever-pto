@@ -1,3 +1,10 @@
+## [1.2.11](https://github.com/fbuireu/forever-pto/compare/v1.2.10...v1.2.11) (2026-05-11)
+
+
+### Bug Fixes
+
+* minor style fixes ([fb50e6a](https://github.com/fbuireu/forever-pto/commit/fb50e6a379b0f2b642eb3e16befdff3fb8aee000))
+
 ## [1.2.10](https://github.com/fbuireu/forever-pto/compare/v1.2.9...v1.2.10) (2026-05-11)
 
 
