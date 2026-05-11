@@ -1,3 +1,10 @@
+## [1.2.10](https://github.com/fbuireu/forever-pto/compare/v1.2.9...v1.2.10) (2026-05-11)
+
+
+### Bug Fixes
+
+* remove pointer-events ([3a93c2b](https://github.com/fbuireu/forever-pto/commit/3a93c2bc7be7100a7fa62061406e151558eaff21))
+
 ## [1.2.9](https://github.com/fbuireu/forever-pto/compare/v1.2.8...v1.2.9) (2026-05-11)
 
 
