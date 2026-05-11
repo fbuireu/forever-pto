@@ -30,7 +30,6 @@ export const ThemeSelector = ({ buttonClassName }: { buttonClassName?: string })
         </AnimateIcon>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
-        {/* TODO: implement animateIcon — AnimateIcon.onMouseEnter fires setLocalAnimate → React re-render mid touch-event chain → base-ui loses internal state → freeze. Fix: use onPointerEnter + pointerType==='mouse' guard in AnimateIcon so touch never triggers the re-render */}
         {themes.map((theme) => (
           <DropdownMenuItem key={theme} className='flex justify-between' onClick={() => setTheme(theme)}>
             {t(theme as Parameters<typeof t>[0])}
