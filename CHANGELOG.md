@@ -1,3 +1,11 @@
+## [1.2.7](https://github.com/fbuireu/forever-pto/compare/v1.2.6...v1.2.7) (2026-05-11)
+
+
+### Bug Fixes
+
+* replace sheet ([52f29fd](https://github.com/fbuireu/forever-pto/commit/52f29fd0d00ae3a3a7f0ff899542ccefa4b715b2))
+* replace sheet ([7289009](https://github.com/fbuireu/forever-pto/commit/7289009d07f030de980138e37fbe0883b8ad11ce))
+
 ## [1.2.6](https://github.com/fbuireu/forever-pto/compare/v1.2.5...v1.2.6) (2026-05-11)
 
 
