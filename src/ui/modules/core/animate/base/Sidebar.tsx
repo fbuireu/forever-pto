@@ -11,7 +11,7 @@ import { createContext, use, useCallback, useEffect, useMemo, useState } from 'r
 import { useIsMobile } from 'src/ui/hooks/useMobile';
 import { MotionHighlight, MotionHighlightItem } from '../effects/MotionHighlight';
 import { PanelLeftIcon } from '../icons/PanelLeft';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './Sheet';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@ui/modules/core/primitives/Sheet';
 import { Slot } from './Slot';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tooltip';
 
