@@ -3,7 +3,7 @@
 import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
 import { cn } from '@ui/utils/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
-import * as React from 'react';
+import type * as React from 'react';
 import { X } from '../animate/icons/X';
 
 function Sheet(props: Readonly<SheetPrimitive.Root.Props>) {
