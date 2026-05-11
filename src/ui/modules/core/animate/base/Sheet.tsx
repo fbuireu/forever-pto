@@ -133,7 +133,7 @@ function SheetContent({
     // Portal always rendered — base-ui controls Popup lifecycle via keepMounted.
     // AnimatePresence is intentionally absent: it fights base-ui's own cleanup,
     // leaving the touch-none overlay in the DOM and freezing the UI on mobile.
-    <SheetPortal data-slot='sheet-portal'>
+    <SheetPortal keepMounted data-slot='sheet-portal'>
       {/* Overlay: always in the DOM, animated via CSS transitions.
           SheetPrimitive.Backdrop has no keepMounted, so base-ui unmounts it
           on close — preventing any exit animation. A plain div driven by
@@ -154,7 +154,6 @@ function SheetContent({
           exit (slide off-screen). pointerEvents:none when closed prevents
           the off-screen panel from capturing touch events. */}
       <SheetPrimitive.Popup
-        keepMounted
         render={
           <m.div
             key='sheet-content'
