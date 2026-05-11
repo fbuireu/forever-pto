@@ -27,7 +27,7 @@ export const MODIFIERS_CLASS_NAMES: Record<string, string> = {
   selected:
     'rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow] duration-200',
   today:
-    'rounded-lg bg-[var(--color-brand-ink)] hover:brightness-105 text-[var(--color-brand-paper)] hover:text-[var(--color-brand-paper)] font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] ring-offset-1 ring-offset-background transition-[background-color,box-shadow] duration-200',
+    'rounded-lg bg-[var(--color-brand-ink)] hover:bg-[var(--color-brand-yellow)] text-white hover:text-[var(--color-brand-ink)] font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] ring-offset-1 ring-offset-background transition-[background-color,box-shadow] duration-200',
   inRange: 'rounded-lg bg-primary/12',
   rangeStart:
     'rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground font-black',
