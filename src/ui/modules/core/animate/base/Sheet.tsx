@@ -134,21 +134,20 @@ function SheetContent({
     // AnimatePresence is intentionally absent: it fights base-ui's own cleanup,
     // leaving the touch-none overlay in the DOM and freezing the UI on mobile.
     <SheetPortal data-slot='sheet-portal'>
-      {/* Overlay: plain conditional — removed immediately on close so touch-none
-          never blocks the UI after the sheet is dismissed. */}
-      {overlay && isOpen && (
-        <SheetPrimitive.Backdrop
+      {/* Overlay: always in the DOM, animated via CSS transitions.
+          SheetPrimitive.Backdrop has no keepMounted, so base-ui unmounts it
+          on close — preventing any exit animation. A plain div driven by
+          isOpen avoids that while keeping touchAction safe. */}
+      {overlay && (
+        <div
           data-slot='sheet-overlay'
-          render={
-            <m.div
-              key='sheet-overlay'
-              data-slot='sheet-overlay'
-              className='fixed inset-0 z-[51] bg-black/80 touch-none'
-              initial={{ opacity: 0, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, filter: 'blur(0px)' }}
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
-            />
-          }
+          className='fixed inset-0 z-[51] bg-black/80 transition-[opacity,filter] duration-200 ease-in-out'
+          style={{
+            opacity: isOpen ? 1 : 0,
+            filter: isOpen ? 'blur(0px)' : 'blur(4px)',
+            pointerEvents: isOpen ? 'auto' : 'none',
+            touchAction: isOpen ? 'none' : 'auto',
+          }}
         />
       )}
       {/* Popup: keepMounted keeps it in the DOM so motion can animate the
