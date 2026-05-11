@@ -1,5 +1,6 @@
 import { routing } from '@infrastructure/i18n/routing';
 import { BonesProvider } from '@ui/modules/providers/BonesProvider';
+import { CookieConsentClient } from '@ui/modules/shared/cookie-consent/CookieConsentClient';
 import { WebMCP } from '@ui/modules/shared/WebMCP';
 import { cn } from '@ui/utils/utils';
 import '@styles/index.css';
@@ -83,6 +84,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
           >
             <LazyMotionProvider>{children}</LazyMotionProvider>
           </ThemeProvider>
+          <CookieConsentClient />
         </NextIntlClientProvider>
         <WebMCP />
         <Analytics />

@@ -2,7 +2,6 @@
 import { Toaster } from '@ui/modules/core/primitives/Sonner';
 import { SiteSubtitle } from '@ui/modules/pages/planner/SiteSubtitle';
 import { SiteTitle } from '@ui/modules/pages/planner/SiteTitle';
-import { CookieConsentClient } from '@ui/modules/shared/cookie-consent/CookieConsentClient';
 import { DonateClient } from '@ui/modules/shared/donate/DonateClient';
 import { Footer } from '@ui/modules/shared/footer/Footer';
 import { AppSidebar } from '@ui/modules/sidebar/AppSidebar';
@@ -40,7 +39,6 @@ bg-size-[4rem_4rem]'
         <Toaster />
         <DonateClient />
         <PremiumModal />
-        <CookieConsentClient />
         <Footer />
       </AppSidebar>
     </SidebarProvider>
