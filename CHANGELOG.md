@@ -1,3 +1,12 @@
+## [1.2.6](https://github.com/fbuireu/forever-pto/compare/v1.2.5...v1.2.6) (2026-05-11)
+
+
+### Bug Fixes
+
+* race condition open pin ([d25b314](https://github.com/fbuireu/forever-pto/commit/d25b314c03fda68e97ee63a158852706c9c4b1fc))
+* race condition open pin ([8c1ef29](https://github.com/fbuireu/forever-pto/commit/8c1ef296bb649936c9dafa337bbba41a73fc8e45))
+* race condition open pin ([a9fa72a](https://github.com/fbuireu/forever-pto/commit/a9fa72a8fc0bbcb8178cbfa742b6f8bc8aafc37d))
+
 ## [1.2.5](https://github.com/fbuireu/forever-pto/compare/v1.2.4...v1.2.5) (2026-05-11)
 
 
