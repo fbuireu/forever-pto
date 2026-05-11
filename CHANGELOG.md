@@ -1,3 +1,10 @@
+## [1.2.5](https://github.com/fbuireu/forever-pto/compare/v1.2.4...v1.2.5) (2026-05-11)
+
+
+### Bug Fixes
+
+* root pin api ([a02fd2e](https://github.com/fbuireu/forever-pto/commit/a02fd2e1b62efbc4efe9b12c2361dc833c1d945a))
+
 ## [1.2.4](https://github.com/fbuireu/forever-pto/compare/v1.2.3...v1.2.4) (2026-05-10)
 
 
