@@ -4,7 +4,7 @@ import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import { useIsMobile } from '@ui/hooks/useMobile';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
-import { Drawer, DrawerContent } from '@ui/modules/core/animate/base/Drawer';
+import { Drawer, DrawerContent, DrawerTitle } from '@ui/modules/core/animate/base/Drawer';
 import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
 import { Skeleton } from 'boneyard-js/react';
 import { useTranslations } from 'next-intl';
@@ -108,6 +108,7 @@ export const ManagementBar = () => {
           dismissible={false}
         >
           <DrawerContent overlay={false} className='h-[100dvh] max-h-none'>
+            <DrawerTitle>Planner</DrawerTitle>
             <div data-tutorial='planner-drawer' className='px-4 pt-2 pb-3 shrink-0'>
               {isReady ? (
                 <div className='flex items-center justify-between gap-2 flex-wrap'>
