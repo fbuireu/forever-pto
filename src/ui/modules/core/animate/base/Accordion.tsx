@@ -87,7 +87,6 @@ function AccordionTrigger({
 
   return (
     <AccordionPrimitive.Header data-slot='accordion-header' className='flex'>
-      {/* TODO: implement animateIcon — AnimateIcon.onMouseEnter fires setLocalAnimate → React re-render mid touch-event chain → base-ui loses internal state → freeze. Fix: use onPointerEnter + pointerType==='mouse' guard in AnimateIcon so touch never triggers the re-render */}
       <AccordionPrimitive.Trigger
         ref={triggerRef}
         data-slot='accordion-trigger'

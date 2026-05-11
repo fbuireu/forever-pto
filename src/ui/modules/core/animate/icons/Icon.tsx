@@ -15,7 +15,6 @@ import {
   cloneElement,
   createContext,
   isValidElement,
-  type MouseEvent,
   type PointerEvent,
   type ReactElement,
   type ReactNode,
@@ -376,11 +375,13 @@ function AnimateIcon({
 
   const childProps = (isValidElement(children) ? (children as ReactElement).props : {}) as AnyProps;
 
-  const handleMouseEnter = composeEventHandlers<MouseEvent<HTMLElement>>(childProps.onMouseEnter, () => {
+  const handlePointerEnter = composeEventHandlers<PointerEvent<HTMLElement>>(childProps.onPointerEnter, (event) => {
+    if (event.pointerType !== 'mouse') return;
     if (animateOnHover) startAnimation(animateOnHover);
   });
 
-  const handleMouseLeave = composeEventHandlers<MouseEvent<HTMLElement>>(childProps.onMouseLeave, () => {
+  const handlePointerLeave = composeEventHandlers<PointerEvent<HTMLElement>>(childProps.onPointerLeave, (event) => {
+    if (event.pointerType !== 'mouse') return;
     if (animateOnHover || animateOnTap) stopAnimation();
   });
 
@@ -404,8 +405,8 @@ function AnimateIcon({
   const content = asChild ? (
     <MotionSlot
       ref={inViewRef}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       {...props}
@@ -415,8 +416,8 @@ function AnimateIcon({
   ) : (
     <m.span
       ref={inViewRef}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       {...props}
