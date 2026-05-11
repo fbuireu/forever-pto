@@ -30,8 +30,8 @@ function SheetOverlay({ className, ...props }: Readonly<SheetOverlayProps>) {
       data-slot='sheet-overlay'
       className={cn(
         'fixed inset-0 z-[51] bg-black/80 transition-[opacity,filter] duration-200 ease-in-out',
-        'data-starting-style:opacity-0 data-starting-style:[filter:blur(4px)]',
-        'data-ending-style:opacity-0 data-ending-style:[filter:blur(4px)]',
+        'data-[starting-style]:opacity-0 data-[starting-style]:[filter:blur(4px)]',
+        'data-[ending-style]:opacity-0 data-[ending-style]:[filter:blur(4px)] data-[ending-style]:pointer-events-none',
         className
       )}
       {...props}
@@ -40,29 +40,29 @@ function SheetOverlay({ className, ...props }: Readonly<SheetOverlayProps>) {
 }
 
 const sheetVariants = cva(
-  'fixed z-[51] flex flex-col gap-4 bg-card p-6 border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xl)] transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
+  'fixed z-[51] flex flex-col gap-4 bg-card p-6 border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xl)] transition-[translate,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
   {
     variants: {
       side: {
         top: [
           'inset-x-0 top-0 rounded-b-[14px]',
-          'data-starting-style:-translate-y-full data-starting-style:opacity-0',
-          'data-ending-style:-translate-y-full data-ending-style:opacity-0',
+          'data-[starting-style]:-translate-y-full data-[starting-style]:opacity-0',
+          'data-[ending-style]:-translate-y-full data-[ending-style]:opacity-0',
         ],
         bottom: [
           'inset-x-0 bottom-0 rounded-t-[14px]',
-          'data-starting-style:translate-y-full data-starting-style:opacity-0',
-          'data-ending-style:translate-y-full data-ending-style:opacity-0',
+          'data-[starting-style]:translate-y-full data-[starting-style]:opacity-0',
+          'data-[ending-style]:translate-y-full data-[ending-style]:opacity-0',
         ],
         left: [
           'inset-y-0 left-0 h-full w-3/4 rounded-r-[14px] sm:max-w-sm',
-          'data-starting-style:-translate-x-full data-starting-style:opacity-0',
-          'data-ending-style:-translate-x-full data-ending-style:opacity-0',
+          'data-[starting-style]:-translate-x-full data-[starting-style]:opacity-0',
+          'data-[ending-style]:-translate-x-full data-[ending-style]:opacity-0',
         ],
         right: [
           'inset-y-0 right-0 h-full w-3/4 rounded-l-[14px] sm:max-w-sm',
-          'data-starting-style:translate-x-full data-starting-style:opacity-0',
-          'data-ending-style:translate-x-full data-ending-style:opacity-0',
+          'data-[starting-style]:translate-x-full data-[starting-style]:opacity-0',
+          'data-[ending-style]:translate-x-full data-[ending-style]:opacity-0',
         ],
       },
     },

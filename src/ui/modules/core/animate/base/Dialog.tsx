@@ -42,7 +42,7 @@ function DialogBackdrop({ className, ...props }: DialogBackdropProps) {
   return (
     <DialogBackdropPrimitive
       className={cn(
-        'fixed inset-0 z-50 bg-[linear-gradient(180deg,rgba(20,17,15,0.66),rgba(20,17,15,0.82))] backdrop-blur-[2px]',
+        'fixed inset-0 z-[200] bg-[linear-gradient(180deg,rgba(20,17,15,0.66),rgba(20,17,15,0.82))] backdrop-blur-[2px]',
         className
       )}
       {...props}
@@ -57,7 +57,7 @@ function DialogPopup({ className, children, showCloseButton = true, ...props }: 
       <DialogBackdrop />
       <DialogPopupPrimitive
         className={cn(
-          'bg-card fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-[14px] border-[3px] border-[var(--frame)] p-6 shadow-[var(--shadow-brutal-xl)] sm:max-w-lg',
+          'bg-card fixed top-[50%] left-[50%] z-[200] grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-[14px] border-[3px] border-[var(--frame)] p-6 shadow-[var(--shadow-brutal-xl)] sm:max-w-lg',
           className
         )}
         {...props}
