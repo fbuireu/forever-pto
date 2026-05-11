@@ -26,7 +26,7 @@ function Popover(props: PopoverProps) {
 type PopoverTriggerProps = React.ComponentProps<typeof PopoverPrimitive.Trigger> & { asChild?: boolean };
 function PopoverTrigger({ asChild, children, ...props }: PopoverTriggerProps) {
   if (asChild && React.isValidElement(children)) {
-    return <PopoverPrimitive.Trigger data-slot='popover-trigger' nativeButton={false} render={children} {...props} />;
+    return <PopoverPrimitive.Trigger data-slot='popover-trigger' render={children} {...props} />;
   }
   return (
     <PopoverPrimitive.Trigger data-slot='popover-trigger' {...props}>
@@ -104,24 +104,24 @@ function PopoverClose(props: PopoverCloseProps) {
 export {
   Popover,
   PopoverArrow,
-  type PopoverArrowProps,
   PopoverBackdrop,
-  type PopoverBackdropProps,
   PopoverClose,
+  PopoverDescription,
+  PopoverPopup,
+  PopoverPortal,
+  PopoverPositioner,
+  PopoverTitle,
+  PopoverTrigger,
+  usePopover,
+  type PopoverArrowProps,
+  type PopoverBackdropProps,
   type PopoverCloseProps,
   type PopoverContextType,
-  PopoverDescription,
   type PopoverDescriptionProps,
-  PopoverPopup,
   type PopoverPopupProps,
-  PopoverPortal,
   type PopoverPortalProps,
-  PopoverPositioner,
   type PopoverPositionerProps,
   type PopoverProps,
-  PopoverTitle,
   type PopoverTitleProps,
-  PopoverTrigger,
   type PopoverTriggerProps,
-  usePopover,
 };

@@ -6,12 +6,11 @@ import { Separator } from '@ui/modules/core/primitives/Separator';
 import { cn } from '@ui/utils/utils';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
-import type { Transition } from 'motion/react';
+import { AnimatePresence, m, type Transition } from 'motion/react';
 import { createContext, use, useCallback, useEffect, useMemo, useState } from 'react';
 import { useIsMobile } from 'src/ui/hooks/useMobile';
 import { MotionHighlight, MotionHighlightItem } from '../effects/MotionHighlight';
 import { PanelLeftIcon } from '../icons/PanelLeft';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@ui/modules/core/primitives/Sheet';
 import { Slot } from './Slot';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tooltip';
 
@@ -92,6 +91,15 @@ function SidebarProvider({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [toggleSidebar]);
+
+  useEffect(() => {
+    if (!openMobile) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpenMobile(false);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [openMobile, setOpenMobile]);
 
   const state = open ? 'expanded' : 'collapsed';
 
@@ -178,35 +186,51 @@ function Sidebar({
 
   if (isMobile) {
     return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
-        <SheetContent
-          data-sidebar='sidebar'
-          data-slot='sidebar'
-          data-mobile='true'
-          className='bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden'
-          style={
-            {
-              '--sidebar-width': SIDEBAR_WIDTH_MOBILE,
-            } as React.CSSProperties
-          }
-          side={side}
-        >
-          <SheetHeader className='sr-only'>
-            <SheetTitle>Sidebar</SheetTitle>
-            <SheetDescription>Displays the mobile sidebar.</SheetDescription>
-          </SheetHeader>
-          <MotionHighlight
-            enabled={animateOnHover}
-            hover
-            controlledItems
-            mode='parent'
-            containerClassName={cn('h-full', containerClassName)}
-            transition={transition}
-          >
-            <div className='flex h-full w-full flex-col'>{children}</div>
-          </MotionHighlight>
-        </SheetContent>
-      </Sheet>
+      <AnimatePresence onExitComplete={() => { document.body.style.pointerEvents = ''; }}>
+        {openMobile && (
+          <>
+            <m.div
+              key='sidebar-backdrop'
+              className='fixed inset-0 z-[51] bg-black/80'
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setOpenMobile(false)}
+              aria-hidden='true'
+            />
+            <m.div
+              key='sidebar-drawer'
+              role='dialog'
+              aria-modal='false'
+              aria-label='Sidebar'
+              data-sidebar='sidebar'
+              data-slot='sidebar'
+              data-mobile='true'
+              className={cn(
+                'bg-sidebar text-sidebar-foreground fixed inset-y-0 z-[51] flex h-full flex-col border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xl)]',
+                side === 'right' ? 'right-0 rounded-l-[14px]' : 'left-0 rounded-r-[14px]'
+              )}
+              style={{ '--sidebar-width': SIDEBAR_WIDTH_MOBILE, width: 'var(--sidebar-width)' } as React.CSSProperties}
+              initial={{ x: side === 'right' ? '100%' : '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: side === 'right' ? '100%' : '-100%' }}
+              transition={{ type: 'spring', stiffness: 350, damping: 35 }}
+            >
+              <MotionHighlight
+                enabled={animateOnHover}
+                hover
+                controlledItems
+                mode='parent'
+                containerClassName={cn('h-full', containerClassName)}
+                transition={transition}
+              >
+                <div className='flex h-full w-full flex-col'>{children}</div>
+              </MotionHighlight>
+            </m.div>
+          </>
+        )}
+      </AnimatePresence>
     );
   }
 
@@ -578,6 +602,10 @@ function SidebarMenuButton({
     return button;
   }
 
+  if (isMobile || state !== 'collapsed') {
+    return button;
+  }
+
   if (typeof tooltip === 'string') {
     tooltip = {
       children: tooltip,
@@ -587,7 +615,7 @@ function SidebarMenuButton({
   return (
     <Tooltip>
       <TooltipTrigger asChild>{button}</TooltipTrigger>
-      <TooltipContent side='right' align='center' hidden={state !== 'collapsed' || isMobile} {...tooltip} />
+      <TooltipContent side='right' align='center' {...tooltip} />
     </Tooltip>
   );
 }

@@ -124,7 +124,7 @@ export async function JsonLd({ locale }: JsonLdProps) {
         name: tFaq('sections.security.data.question'),
         acceptedAnswer: {
           '@type': 'Answer',
-          text: tFaq('sections.security.data.answer'),
+          text: tFaq.markup('sections.security.data.answer', { privacyLink: (chunks) => chunks }),
         },
       },
       {
@@ -148,7 +148,7 @@ export async function JsonLd({ locale }: JsonLdProps) {
         name: tFaq('sections.collaborate.code.question'),
         acceptedAnswer: {
           '@type': 'Answer',
-          text: tFaq('sections.collaborate.code.answer'),
+          text: tFaq.markup('sections.collaborate.code.answer', { link: (chunks) => chunks }),
         },
       },
       {
