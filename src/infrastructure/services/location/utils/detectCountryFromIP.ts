@@ -16,7 +16,7 @@ const detectCountryFromIPEffect = Effect.gen(function* () {
     fetch(`${GEO_SERVICE}/${ip}/${FORMAT}`, {
       headers: { Accept: 'application/json' },
       cache: 'force-cache',
-    }),
+    })
   );
 
   if (!geoResponse.ok) return '';
