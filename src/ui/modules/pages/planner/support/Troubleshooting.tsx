@@ -3,6 +3,8 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+
+const logger = getBetterStackInstance();
 import { Button } from '@ui/modules/core/primitives/Button';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
@@ -61,7 +63,7 @@ export const Troubleshooting = () => {
           description: t('successDescription'),
         });
       } catch (error) {
-        getBetterStackInstance().logError('Error resetting to defaults', error, { component: 'Troubleshooting' });
+        logger.logError('Error resetting to defaults', error, { component: 'Troubleshooting' });
         toast.error(t('errorTitle'), {
           description: t('errorDescription'),
         });

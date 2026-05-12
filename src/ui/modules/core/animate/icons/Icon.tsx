@@ -237,12 +237,8 @@ function AnimateIcon({
 
   const startAnim = useCallback(
     async (anim: 'initial' | 'animate', method: 'start' | 'set' = 'start') => {
-      try {
-        await controls[method](anim);
-        statusRef.current = anim;
-      } catch {
-        return;
-      }
+      await Promise.resolve(controls[method](anim)).catch(() => {});
+      statusRef.current = anim;
     },
     [controls]
   );
@@ -265,11 +261,7 @@ function AnimateIcon({
 
       if (!localAnimate) {
         if (completeOnStop && isAnimateInProgressRef.current && animateEndPromiseRef.current) {
-          try {
-            await animateEndPromiseRef.current;
-          } catch {
-            // noop
-          }
+          await animateEndPromiseRef.current.catch(() => {});
         }
         if (!persistOnAnimateEnd) {
           if (cancelledRef.current || gen !== runGenRef.current) {
