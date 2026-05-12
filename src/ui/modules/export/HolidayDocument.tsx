@@ -188,7 +188,15 @@ export interface HolidayDocumentProps {
   labels: PdfLabels;
 }
 
-export function HolidayDocument({ year, holidays, ptoDays, includeHolidays, includePto, locale, labels }: HolidayDocumentProps) {
+export function HolidayDocument({
+  year,
+  holidays,
+  ptoDays,
+  includeHolidays,
+  includePto,
+  locale,
+  labels,
+}: HolidayDocumentProps) {
   const holidayGroups = includeHolidays ? groupByMonth(holidays, (h) => h.date, locale) : [];
   const ptoGroups = includePto ? groupByMonth(ptoDays, (d) => d, locale) : [];
   const today = new Date();

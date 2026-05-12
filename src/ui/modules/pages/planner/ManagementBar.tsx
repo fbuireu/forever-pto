@@ -39,7 +39,7 @@ export const ManagementBar = () => {
       setCurrentAlternativeSelection: state.setCurrentAlternativeSelection,
       previewAlternativeIndex: state.previewAlternativeIndex,
       currentSelectionIndex: state.currentSelectionIndex,
-    }))
+    })),
   );
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export const ManagementBar = () => {
     (params: AlternativeSelectionBaseParams) => {
       setPreviewAlternativeSelection(params);
     },
-    [setPreviewAlternativeSelection]
+    [setPreviewAlternativeSelection],
   );
 
   const handleSelectionChange = useCallback(
@@ -61,15 +61,15 @@ export const ManagementBar = () => {
       toast.success(t('suggestionApplied'));
       setSnap(0.15);
     },
-    [setCurrentAlternativeSelection, t]
+    [setCurrentAlternativeSelection, t],
   );
 
   const baseSuggestions = [suggestion, ...alternatives].filter(
-    (suggestion): suggestion is NonNullable<typeof suggestion> => !!suggestion
+    (suggestion): suggestion is NonNullable<typeof suggestion> => !!suggestion,
   );
 
   const allSuggestions = baseSuggestions.map((sug, index) =>
-    index === currentSelectionIndex && currentSelection ? currentSelection : sug
+    index === currentSelectionIndex && currentSelection ? currentSelection : sug,
   );
 
   const hasValidSuggestions = allSuggestions.length > 0 && allSuggestions[0].days && allSuggestions[0].days.length > 0;
@@ -105,8 +105,7 @@ export const ManagementBar = () => {
           setActiveSnapPoint={setSnap}
           modal={false}
           open={!openMobile}
-          dismissible={false}
-        >
+          dismissible={false}>
           <DrawerContent overlay={false} className='h-[100dvh] max-h-none'>
             <DrawerTitle>Planner</DrawerTitle>
             <div data-tutorial='planner-drawer' className='px-4 pt-2 pb-3 shrink-0'>

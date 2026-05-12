@@ -3,6 +3,7 @@ import type { DiscountInfo } from '@application/dto/payment/types';
 import { createPaymentAction } from '@infrastructure/actions/payment';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
+import { Effect } from 'effect';
 
 interface InitializePaymentResult {
   clientSecret: string;
@@ -43,71 +44,60 @@ const logger = getBetterStackInstance();
 export const confirmPayment = async (params: ConfirmPaymentParams): Promise<ConfirmPaymentResult> => {
   const { stripe, elements, email, returnUrl } = params;
 
-  try {
-    const { error: submitError } = await elements.submit();
-    if (submitError) {
-      return {
-        success: false,
-        error: submitError.message ?? '',
-      };
-    }
+  const program = Effect.gen(function* () {
+    const { error: submitError } = yield* Effect.tryPromise(() => elements.submit());
+    if (submitError) return { success: false, error: submitError.message ?? '' } as ConfirmPaymentResult;
 
-    const { error, paymentIntent } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: returnUrl,
-        receipt_email: email,
-      },
-      redirect: 'if_required',
-    });
+    const { error, paymentIntent } = yield* Effect.tryPromise(() =>
+      stripe.confirmPayment({
+        elements,
+        confirmParams: { return_url: returnUrl, receipt_email: email },
+        redirect: 'if_required',
+      })
+    );
 
-    if (error) {
-      return {
-        success: false,
-        error: error.message ?? '',
-      };
-    }
+    if (error) return { success: false, error: error.message ?? '' } as ConfirmPaymentResult;
 
-    const sessionResponse = await fetch('/api/check-session', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email,
-        premiumKey: paymentIntent.id,
-      }),
-    });
+    const sessionResponse = yield* Effect.tryPromise(() =>
+      fetch('/api/check-session', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, premiumKey: paymentIntent.id }),
+      })
+    );
 
     if (!sessionResponse.ok) {
-      const errorData = await sessionResponse.json();
+      const errorData = yield* Effect.tryPromise(() => sessionResponse.json() as Promise<{ error?: string }>);
       logger.error('Session activation failed after payment', {
         statusCode: sessionResponse.status,
         reason: errorData.error,
         emailDomain: email?.split('@')[1],
         paymentIntentId: paymentIntent.id,
       });
-      return {
-        success: false,
-        error: errorData.error ?? '',
-      };
+      return { success: false, error: errorData.error ?? '' } as ConfirmPaymentResult;
     }
-    const sessionData = await sessionResponse.json();
+
+    const sessionData = yield* Effect.tryPromise(
+      () => sessionResponse.json() as Promise<{ premiumKey: string; email: string }>
+    );
 
     return {
       success: true,
-      sessionData: {
-        premiumKey: sessionData.premiumKey,
-        email: sessionData.email,
-      },
-    };
-  } catch (error) {
-    logger.logError('Payment confirmation error in checkout adapter', error, {
-      emailDomain: email?.split('@')[1],
-      returnUrl,
-    });
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : '',
-    };
-  }
+      sessionData: { premiumKey: sessionData.premiumKey, email: sessionData.email },
+    } as ConfirmPaymentResult;
+  }).pipe(
+    Effect.catchAll((error) => {
+      logger.logError('Payment confirmation error in checkout adapter', error, {
+        emailDomain: email?.split('@')[1],
+        returnUrl,
+      });
+      return Effect.succeed({
+        success: false,
+        error: error instanceof Error ? error.message : '',
+      } as ConfirmPaymentResult);
+    })
+  );
+
+  return Effect.runPromise(program);
 };

@@ -1,11 +1,12 @@
 import { holidayDTO } from '@application/dto/holiday/dto';
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { Effect } from 'effect';
 import type { Locale } from 'next-intl';
-
-const logger = getBetterStackInstance();
 import { getNationalHolidays } from './utils/getNationalHolidays';
 import { getRegionalHolidays } from './utils/getRegionalHolidays';
+
+const logger = getBetterStackInstance();
 
 interface GetHolidaysParams {
   year: string;
@@ -26,15 +27,9 @@ export async function getHolidays({
     return [];
   }
 
-  try {
-    const configuration = {
-      languages: [locale],
-    };
-    const params = {
-      country,
-      configuration,
-      year: Number(year),
-    };
+  const program = Effect.try(() => {
+    const configuration = { languages: [locale] };
+    const params = { country, configuration, year: Number(year) };
     const nationalHolidays = getNationalHolidays(params);
     const regionalHolidays = getRegionalHolidays({ ...params, region });
 
@@ -44,8 +39,12 @@ export async function getHolidays({
         params: { year: Number(year), carryOverMonths },
       })
       .sort((a, b) => a.date.getTime() - b.date.getTime());
-  } catch (error) {
-    logger.logError('Error in getHolidays', error, { country, region, year });
-    return [];
-  }
+  }).pipe(
+    Effect.catchAll((error) => {
+      logger.logError('Error in getHolidays', error, { country, region, year });
+      return Effect.succeed([] as HolidayDTO[]);
+    })
+  );
+
+  return Effect.runPromise(program);
 }

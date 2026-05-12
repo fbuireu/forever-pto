@@ -5,12 +5,45 @@ import { useHolidaysStore } from '@application/stores/holidays';
 import { downloadIcs, generateIcs } from '@infrastructure/services/export/generateIcs';
 import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { Button } from '@ui/modules/core/primitives/Button';
+import type { HolidayDocumentProps } from '@ui/modules/export/HolidayDocument';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
+import { Effect } from 'effect';
 import { Download, FileText } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
+
+interface PdfExportParams extends HolidayDocumentProps {
+  filename: string;
+}
+
+function makeObjectUrl(blob: Blob) {
+  return Effect.acquireRelease(
+    Effect.sync(() => URL.createObjectURL(blob)),
+    (url) => Effect.sync(() => URL.revokeObjectURL(url))
+  );
+}
+
+function pdfExportEffect({ filename, ...docProps }: PdfExportParams) {
+  return Effect.gen(function* () {
+    const [renderer, { HolidayDocument }] = yield* Effect.tryPromise(() =>
+      Promise.all([import('@react-pdf/renderer'), import('@ui/modules/export/HolidayDocument')])
+    );
+    const blob = yield* Effect.tryPromise(() => renderer.pdf(<HolidayDocument {...docProps} />).toBlob());
+    const url = yield* makeObjectUrl(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }).pipe(Effect.scoped);
+}
+
+function BoldText({ children }: Readonly<{ children: React.ReactNode }>) {
+  return <strong className='font-black text-foreground'>{children}</strong>;
+}
 
 export const CalendarExport = () => {
   const t = useTranslations('calendarExport');
@@ -48,33 +81,23 @@ export const CalendarExport = () => {
   const handleDownloadPdf = () => {
     startPdfTransition(async () => {
       try {
-        const [renderer, { HolidayDocument }] = await Promise.all([
-          import('@react-pdf/renderer'),
-          import('@ui/modules/export/HolidayDocument'),
-        ]);
-        const props = {
-          year: Number(year),
-          holidays: includeHolidays ? (holidays ?? []) : [],
-          ptoDays: includePto ? ptoDays : [],
-          includeHolidays,
-          includePto,
-          locale,
-          labels: {
-            holidays: t('pdf.holidays'),
-            vacationDays: t('pdf.vacationDays'),
-            dayOff: t('pdf.dayOff'),
-            generatedOn: t('pdf.generatedOn'),
-          },
-        };
-        const blob = await renderer.pdf(<HolidayDocument {...props} />).toBlob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `forever-pto-${year}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        await Effect.runPromise(
+          pdfExportEffect({
+            year: Number(year),
+            holidays: includeHolidays ? (holidays ?? []) : [],
+            ptoDays: includePto ? ptoDays : [],
+            includeHolidays,
+            includePto,
+            locale,
+            labels: {
+              holidays: t('pdf.holidays'),
+              vacationDays: t('pdf.vacationDays'),
+              dayOff: t('pdf.dayOff'),
+              generatedOn: t('pdf.generatedOn'),
+            },
+            filename: `forever-pto-${year}.pdf`,
+          })
+        );
         toast.success(t('pdf.successTitle'), { description: t('pdf.successDescription') });
       } catch {
         toast.error(t('pdf.errorTitle'), { description: t('pdf.errorDescription') });
@@ -90,7 +113,7 @@ export const CalendarExport = () => {
       <p className='text-xs text-muted-foreground'>
         {t.rich('description', {
           count: holidays?.length ?? 0,
-          b: (chunks) => <strong className='font-black text-foreground'>{chunks}</strong>,
+          b: BoldText,
         })}
       </p>
       <div className='flex gap-2 items-center'>
