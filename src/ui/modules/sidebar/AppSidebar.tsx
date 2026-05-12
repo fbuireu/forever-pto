@@ -48,8 +48,7 @@ interface AppSidebarProps {
 }
 
 export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
-  const t = await getTranslations('sidebar');
-  const cookieStore = await cookies();
+  const [t, cookieStore] = await Promise.all([getTranslations('sidebar'), cookies()]);
   const sidebarOpen = cookieStore.get(SIDEBAR_COOKIE_NAME)?.value !== 'false';
 
   return (
@@ -75,7 +74,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                   trigger={
                     <SidebarMenuButton variant='outline' tooltip={t('steps')}>
                       <AnimateIcon animateOnHover>
-                        <Settings className='h-5 w-5 shrink-0' />
+                        <Settings className='size-5 shrink-0' />
                       </AnimateIcon>
                       <span className='group-data-[collapsible=icon]:hidden'>{t('steps')}</span>
                       <ChevronDown className='ml-auto -rotate-90 transition-transform group-data-[open]/collapsible:rotate-0 group-data-[collapsible=icon]:hidden' />
@@ -84,7 +83,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                 >
                   <div className='px-1 pt-2 pb-1 space-y-[18px]'>
                     <div data-tutorial='sidebar-step-1' className={STEP_CARD_CLASS}>
-                      <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
+                      <h3 className='font-display font-semibold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
                         <span>
                           {t('step1.titleStart')}
                           <em className='font-serif italic font-normal'>{t('step1.titleEmphasis')}</em>
@@ -103,7 +102,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                     </div>
 
                     <div data-tutorial='sidebar-step-2' className={STEP_CARD_CLASS}>
-                      <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
+                      <h3 className='font-display font-semibold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
                         <span>
                           {t('step2.titleStart')}
                           <em className='font-serif italic font-normal'>{t('step2.titleEmphasis')}</em>
@@ -118,7 +117,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                     </div>
 
                     <div data-tutorial='sidebar-step-3' className={STEP_CARD_CLASS}>
-                      <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
+                      <h3 className='font-display font-semibold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
                         <span>
                           {t('step3.titleStart')}
                           <em className='font-serif italic font-normal'>{t('step3.titleEmphasis')}</em>
@@ -135,7 +134,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                     </div>
 
                     <div data-tutorial='sidebar-step-4' className={STEP_CARD_CLASS}>
-                      <h3 className='font-display font-extrabold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
+                      <h3 className='font-display font-semibold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
                         <span>
                           {t('step4.titleStart')}
                           <em className='font-serif italic font-normal'>{t('step4.titleEmphasis')}</em>
@@ -163,7 +162,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                   trigger={
                     <SidebarMenuButton variant='outline' tooltip={t('tools')}>
                       <AnimateIcon animateOnHover>
-                        <Calculator className='h-5 w-5 shrink-0' />
+                        <Calculator className='size-5 shrink-0' />
                       </AnimateIcon>
                       <span className='group-data-[collapsible=icon]:hidden'>{t('calculators')}</span>
                       <ChevronDown className='ml-auto -rotate-90 transition-transform group-data-[open]/collapsible:rotate-0 group-data-[collapsible=icon]:hidden' />

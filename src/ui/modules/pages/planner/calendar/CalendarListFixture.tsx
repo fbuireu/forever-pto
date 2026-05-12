@@ -22,14 +22,14 @@ export const CalendarListFixture = () => (
         </div>
         <div className='grid grid-cols-7 gap-1 mb-2'>
           {WEEKDAY_KEYS.map((day) => (
-            <div key={day} className='h-8 w-8 flex items-center justify-center'>
+            <div key={day} className='size-8 flex items-center justify-center'>
               <Bone className='h-4 w-6' />
             </div>
           ))}
         </div>
         <div className='grid grid-cols-7 gap-2'>
           {DAY_KEYS.map((day) => (
-            <Bone key={`${month}-${day}`} className='h-8 w-8 rounded-md' />
+            <Bone key={`${month}-${day}`} className='size-8 rounded-md' />
           ))}
         </div>
       </div>

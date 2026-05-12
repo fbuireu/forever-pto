@@ -58,10 +58,4 @@ function PanelLeft(props: PanelLeftProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export {
-  animations,
-  PanelLeft,
-  PanelLeft as PanelLeftIcon,
-  type PanelLeftProps as PanelLeftIconProps,
-  type PanelLeftProps,
-};
+export { PanelLeft as PanelLeftIcon };

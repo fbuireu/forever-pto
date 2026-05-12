@@ -1,3 +1,4 @@
+import { Link } from '@application/i18n/navigation';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { LegalLayout } from '@ui/modules/layout/LegalLayout';
 import { Me } from '@ui/modules/pages/legal/Me';
@@ -147,9 +148,9 @@ export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPoli
         <p>
           {t.rich('sections.cookiesAndTracking.description', {
             link: (chunks) => (
-              <a href='/legal/cookie-policy' className='text-primary hover:underline'>
+              <Link href='/legal/cookie-policy' className='text-primary hover:underline'>
                 {chunks}
-              </a>
+              </Link>
             ),
           })}
         </p>

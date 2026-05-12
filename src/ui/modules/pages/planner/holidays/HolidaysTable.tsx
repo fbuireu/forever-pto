@@ -44,6 +44,8 @@ const DeleteHolidayModal = dynamic(() =>
   import('./components/DeleteHolidayModal').then((module) => ({ default: module.DeleteHolidayModal }))
 );
 
+const holidayDateFmtCache = new Map<string, Intl.DateTimeFormat>();
+
 const HolidayCard = ({
   holiday,
   index,
@@ -63,12 +65,13 @@ const HolidayCard = ({
   t: ReturnType<typeof useTranslations<'holidaysTable'>>;
   tPremium: ReturnType<typeof useTranslations<'premium'>>;
 }) => {
-  const dateFormatted = new Intl.DateTimeFormat(locale, {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(holiday.date);
+  if (!holidayDateFmtCache.has(locale)) {
+    holidayDateFmtCache.set(
+      locale,
+      new Intl.DateTimeFormat(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    );
+  }
+  const dateFormatted = holidayDateFmtCache.get(locale)?.format(holiday.date);
 
   return (
     <div
@@ -165,7 +168,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 
     if (sortConfig.key) {
       const sortKey = sortConfig.key;
-      filtered = [...filtered].sort((a, b) => {
+      filtered = filtered.toSorted((a, b) => {
         const aValue = a[sortKey];
         const bValue = b[sortKey];
 
@@ -320,16 +323,16 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
     <Collapsible open={innerOpen} onOpenChange={setInnerOpen} className='space-y-4 w-full'>
       <AnimateIcon animateOnHover>
         <CollapsibleTrigger className='flex items-center justify-between cursor-pointer group p-4 rounded-[12px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-sm)] transition-colors w-full text-left hover:bg-[var(--surface-panel-alt)]'>
-          <span className='flex items-center space-x-3 w-full'>
-            <span className='flex items-center space-x-2'>
+          <span className='flex items-center gap-x-3 w-full'>
+            <span className='flex items-center gap-x-2'>
               {innerOpen ? (
-                <ChevronDown className='h-4 w-4 text-muted-foreground transition-transform' />
+                <ChevronDown className='size-4 text-muted-foreground transition-transform' />
               ) : (
-                <ChevronRight className='h-4 w-4 text-muted-foreground transition-transform' />
+                <ChevronRight className='size-4 text-muted-foreground transition-transform' />
               )}
               <span className='text-base sm:text-lg font-semibold truncate'>{title}</span>
             </span>
-            <span className='flex items-center space-x-2 ml-auto shrink-0'>
+            <span className='flex items-center gap-x-2 ml-auto shrink-0'>
               <Badge variant='outline' className='text-xs sm:text-sm'>
                 {variantHolidays.length} total
               </Badge>
@@ -347,7 +350,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                   onClick={() => setShowAddModal(true)}
                   className='bg-[var(--color-brand-teal)] text-[var(--color-brand-ink)] hover:bg-[var(--color-brand-teal)] hover:text-[var(--color-brand-ink)]'
                 >
-                  <Plus className='h-4 w-4 mr-1' />
+                  <Plus className='size-4 mr-1' />
                   <span className='hidden xs:inline'>{t('addHoliday')}</span>
                   <span className='xs:hidden'>{t('add')}</span>
                 </Button>
@@ -356,17 +359,17 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
             {selectedCount === 1 && (
               <AnimateIcon animateOnHover>
                 <Button variant='outline' size='sm' onClick={() => setShowEditModal(true)} className='py-4'>
-                  <Edit className='h-4 w-4 mr-1' />
+                  <Edit className='size-4 mr-1' />
                   <span className='hidden xs:inline'>{t('editHoliday')}</span>
                   <span className='xs:hidden'>{t('edit')}</span>
                 </Button>
               </AnimateIcon>
             )}
             {selectedCount > 0 && (
-              <div className='flex items-center space-x-2'>
+              <div className='flex items-center gap-x-2'>
                 <AnimateIcon animateOnHover>
                   <Button variant='destructive' size='sm' onClick={() => setShowDeleteModal(true)}>
-                    <Trash2 className='h-4 w-4 mr-1' />
+                    <Trash2 className='size-4 mr-1' />
                     <span className='hidden xs:inline'>{t('deleteHolidays', { count: selectedCount })}</span>
                     <span className='xs:hidden'>
                       {t('delete')} ({selectedCount})
@@ -377,7 +380,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
             )}
           </div>
           <div className='relative w-full sm:w-64'>
-            <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
+            <Search className='absolute left-2 top-2.5 size-4 text-muted-foreground' />
             <Input
               placeholder={t('searchPlaceholder')}
               value={searchTerm}
@@ -424,8 +427,8 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                     <AnimateIcon animateOnView animateOnViewOnce asChild>
                       <TableRow>
                         <TableCell colSpan={6} className='h-24 text-center'>
-                          <div className='flex flex-col items-center space-y-2 text-muted-foreground'>
-                            <Search className='h-8 w-8' />
+                          <div className='flex flex-col items-center gap-y-2 text-muted-foreground'>
+                            <Search className='size-8' />
                             {debouncedSearchTerm ? t('noHolidaysFound') : t('noHolidays')}
                           </div>
                         </TableCell>
@@ -472,7 +475,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                   })
                 ) : (
                   <div className='flex flex-col items-center justify-center py-12 text-muted-foreground'>
-                    <Search className='h-8 w-8 mb-2' />
+                    <Search className='size-8 mb-2' />
                     <p className='text-sm'>{debouncedSearchTerm ? t('noHolidaysFound') : t('noHolidays')}</p>
                   </div>
                 )}
@@ -490,7 +493,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
               {t('onWorkdays')}: {workdayCount}
             </span>
           </div>
-          <div className='flex items-center space-x-2'>
+          <div className='flex items-center gap-x-2'>
             <span className='whitespace-nowrap'>
               {t('showing')} {filteredHolidays.length} {t('of')} {variantHolidays.length}
             </span>

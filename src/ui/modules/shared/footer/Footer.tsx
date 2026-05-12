@@ -20,7 +20,7 @@ export const Footer = async () => {
           >
             <span className='hidden sm:inline'>Forever</span>
             <div
-              className='w-[30px] h-[30px] bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[2px_2px_0_0_var(--frame)] overflow-hidden shrink-0 -rotate-[4deg]'
+              className='size-[30px] bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[2px_2px_0_0_var(--frame)] overflow-hidden shrink-0 -rotate-[4deg]'
               aria-hidden
             >
               <Image src='/static/images/forever-pto-logo.png' alt='' width={30} height={30} unoptimized />
@@ -72,7 +72,7 @@ export const Footer = async () => {
         </nav>
 
         <div className='px-7 py-3 border-t-[2px] border-dashed border-[var(--frame)]/18 flex justify-center'>
-          <span className='font-mono text-[11px] text-muted-foreground text-center'>
+          <span className='font-mono text-[11px] text-muted-foreground text-center' suppressHydrationWarning>
             {t('copyright', { year: new Date().getFullYear() })}
           </span>
         </div>

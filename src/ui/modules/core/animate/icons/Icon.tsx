@@ -19,8 +19,8 @@ import {
   type ReactElement,
   type ReactNode,
   type SyntheticEvent,
+  use,
   useCallback,
-  useContext,
   useEffect,
   useRef,
   useState,
@@ -103,7 +103,7 @@ type IconWrapperProps<T> = IconProps<T> & {
 const AnimateIconContext = createContext<AnimateIconContextValue | null>(null);
 
 function useAnimateIconContext() {
-  const context = useContext(AnimateIconContext);
+  const context = use(AnimateIconContext);
   if (!context)
     return {
       controls: undefined,
@@ -160,7 +160,7 @@ function AnimateIcon({
   const [currentAnimation, setCurrentAnimation] = useState<string | StaticAnimations>(
     typeof animate === 'string' ? animate : animation
   );
-  const [status, setStatus] = useState<'initial' | 'animate'>('initial');
+  const statusRef = useRef<'initial' | 'animate'>('initial');
 
   const delayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const loopDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -239,7 +239,7 @@ function AnimateIcon({
     async (anim: 'initial' | 'animate', method: 'start' | 'set' = 'start') => {
       try {
         await controls[method](anim);
-        setStatus(anim);
+        statusRef.current = anim;
       } catch {
         return;
       }
@@ -341,12 +341,12 @@ function AnimateIcon({
             return;
           }
           if (!activeRef.current) {
-            if (status !== 'initial' && !persistOnAnimateEnd) await startAnim('initial');
+            if (statusRef.current !== 'initial' && !persistOnAnimateEnd) await startAnim('initial');
             return;
           }
         } else {
           if (!activeRef.current) {
-            if (status !== 'initial' && !persistOnAnimateEnd) await startAnim('initial');
+            if (statusRef.current !== 'initial' && !persistOnAnimateEnd) await startAnim('initial');
             return;
           }
         }
@@ -371,7 +371,7 @@ function AnimateIcon({
         loopDelayRef.current = null;
       }
     };
-  }, [localAnimate, initialOnAnimateEnd, status, loop, startAnim, persistOnAnimateEnd, loopDelay, completeOnStop]);
+  }, [localAnimate, initialOnAnimateEnd, loop, startAnim, persistOnAnimateEnd, loopDelay, completeOnStop]);
 
   const childProps = (isValidElement(children) ? (children as ReactElement).props : {}) as AnyProps;
 
@@ -466,7 +466,7 @@ function IconWrapper<T extends string>({
   className,
   ...props
 }: IconWrapperProps<T>) {
-  const context = useContext(AnimateIconContext);
+  const context = use(AnimateIconContext);
 
   if (context) {
     const {
@@ -615,15 +615,4 @@ function useVariants<V extends { default: T; [key: string]: T }, T extends Recor
   return result;
 }
 
-export {
-  AnimateIcon,
-  type AnimateIconContextValue,
-  type AnimateIconProps,
-  type IconProps,
-  IconWrapper,
-  type IconWrapperProps,
-  pathClassName,
-  staticAnimations,
-  useAnimateIconContext,
-  useVariants,
-};
+export { AnimateIcon, type IconProps, IconWrapper, useAnimateIconContext, useVariants };

@@ -31,7 +31,7 @@ export const BlocksPerQuarterChart = ({ blocksPerQuarter }: BlockPerQuarterChart
       <Card className='shadow-[var(--shadow-brutal-md)] [contain:layout]'>
         <CardHeader className='pb-3'>
           <CardTitle className='flex items-center gap-2 text-base font-display font-semibold'>
-            <Calendar className='w-5 h-5 text-[var(--color-brand-teal)]' />
+            <Calendar className='size-5 text-[var(--color-brand-teal)]' />
             {t('longBlocksPerQuarter')}
           </CardTitle>
           <div className='text-xs text-muted-foreground mt-1'>{description}</div>

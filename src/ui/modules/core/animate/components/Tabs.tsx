@@ -210,21 +210,4 @@ function TabsContent({
   );
 }
 
-export {
-  Tabs,
-  TabsContent,
-  type TabsContentProps,
-  TabsContents,
-  type TabsContentsProps,
-  type TabsContextType,
-  TabsHighlight,
-  TabsHighlightItem,
-  type TabsHighlightItemProps,
-  type TabsHighlightProps,
-  TabsList,
-  type TabsListProps,
-  type TabsProps,
-  TabsTrigger,
-  type TabsTriggerProps,
-  useTabs,
-};
+export { Tabs, TabsContent, TabsContents, TabsHighlight, TabsHighlightItem, TabsList, TabsTrigger };

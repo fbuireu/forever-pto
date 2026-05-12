@@ -6,8 +6,9 @@ import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
 
 const logger = getBetterStackInstance();
+const localeFormatterCache = new Map<string, Intl.NumberFormat>();
 
-export interface PremiumState {
+interface PremiumState {
   premiumKey: string | null;
   userEmail: string | null;
   lastVerified: number | null;
@@ -156,10 +157,13 @@ export const usePremiumStore = create<PremiumStore>()(
 
         getCurrencyFromLocale: (locale: Locale) => {
           try {
-            const formatter = new Intl.NumberFormat(locale, {
-              style: 'currency',
-              currency: DEFAULT_CURRENCY,
-            });
+            if (!localeFormatterCache.has(locale)) {
+              localeFormatterCache.set(
+                locale,
+                new Intl.NumberFormat(locale, { style: 'currency', currency: DEFAULT_CURRENCY })
+              );
+            }
+            const formatter = localeFormatterCache.get(locale)!;
             const resolvedCurrency = formatter.resolvedOptions().currency;
             const currency = resolvedCurrency ?? DEFAULT_CURRENCY;
             const symbol = formatter.formatToParts(0).find(({ type }) => type === 'currency')?.value ?? currency;

@@ -67,4 +67,4 @@ function Search(props: SearchProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export { animations, Search, Search as SearchIcon, type SearchProps as SearchIconProps, type SearchProps };
+export { Search, Search as SearchIcon };

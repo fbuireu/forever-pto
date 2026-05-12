@@ -7,7 +7,7 @@ import { formatDate } from '@ui/utils/dates';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-export interface WorkdayCounterCalendarModalProps {
+interface WorkdayCounterCalendarModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   selectedRange: FromTo | undefined;
@@ -30,7 +30,7 @@ export const WorkdayCounterCalendarModal = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant='outline' className='w-full justify-start'>
-          <CalendarIcon className='w-3 h-3 mr-1' />
+          <CalendarIcon className='size-3 mr-1' />
           {selectedRange
             ? `${formatDate({ date: selectedRange.from, locale, format: 'MMM d' })} - ${formatDate({ date: selectedRange.to, locale, format: 'MMM d' })}`
             : t('selectDateRange')}

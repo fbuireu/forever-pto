@@ -6,8 +6,7 @@ import { headers } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  const body = await request.text();
-  const headersList = await headers();
+  const [body, headersList] = await Promise.all([request.text(), headers()]);
   const signature = headersList.get('stripe-signature');
 
   if (!signature) {

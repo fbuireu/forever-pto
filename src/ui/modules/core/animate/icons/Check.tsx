@@ -54,4 +54,4 @@ function Check(props: CheckProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export { animations, Check, Check as CheckIcon, type CheckProps as CheckIconProps, type CheckProps };
+export { Check };

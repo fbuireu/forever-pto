@@ -5,7 +5,7 @@ import { X } from '@ui/modules/core/animate/icons/X';
 import { type Config, type Driver, type DriveStep, driver } from 'driver.js';
 import { createRoot, type Root } from 'react-dom/client';
 
-export interface DriverConfig extends Omit<Config, 'steps'> {
+interface DriverConfig extends Omit<Config, 'steps'> {
   steps?: DriveStep[];
 }
 
@@ -39,7 +39,7 @@ export class DriverClient {
 
           root.render(
             <AnimateIcon animateOnHover>
-              <X className='h-4 w-4' />
+              <X className='size-4' />
             </AnimateIcon>
           );
           this.closeButtonRoots.push(root);

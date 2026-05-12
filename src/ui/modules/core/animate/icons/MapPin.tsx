@@ -93,4 +93,4 @@ function MapPin(props: MapPinProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export { animations, MapPin, MapPin as MapPinIcon, type MapPinProps as MapPinIconProps, type MapPinProps };
+export { MapPin };

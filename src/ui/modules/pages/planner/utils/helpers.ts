@@ -7,7 +7,6 @@ import {
   eachWeekendOfInterval,
   endOfMonth,
   endOfWeek,
-  isSameDay,
   isWeekend,
   startOfMonth,
   startOfWeek,
@@ -24,21 +23,18 @@ interface GetWeekdayNamesParams {
   weekStartsOn: Day;
 }
 
+const weekdayFmtCache = new Map<string, Intl.DateTimeFormat>();
+
 export const getWeekdayNames = ({ locale, weekStartsOn }: GetWeekdayNamesParams): string[] => {
   const monday = new Date(2023, 0, 2);
   const weekStart = startOfWeek(monday, { weekStartsOn });
-  const fmt = new Intl.DateTimeFormat(locale as string, { weekday: 'short' });
-
+  const cacheKey = `${locale}-${weekStartsOn}`;
+  if (!weekdayFmtCache.has(cacheKey)) {
+    weekdayFmtCache.set(cacheKey, new Intl.DateTimeFormat(locale as string, { weekday: 'short' }));
+  }
+  const fmt = weekdayFmtCache.get(cacheKey)!;
   return Array.from({ length: DAYS_PER_WEEK }, (_, i) => fmt.format(addDays(weekStart, i)));
 };
-
-interface GetDayLabelParams {
-  holidays: HolidayDTO[];
-  date: Date;
-}
-
-export const getDayLabel = ({ holidays, date }: GetDayLabelParams): string | undefined =>
-  holidays.find((holiday) => isSameDay(date, holiday.date))?.name;
 
 interface GetTotalMonthsParams {
   carryOverMonths: number;
@@ -122,6 +118,8 @@ interface GetMonthsParamsNames {
   monthOutputFormat?: 'short' | 'long';
 }
 
+const monthNameFmtCache = new Map<string, Intl.DateTimeFormat>();
+
 export const getMonthNames = ({
   locale,
   monthCount,
@@ -129,16 +127,18 @@ export const getMonthNames = ({
   monthOutputFormat = 'short',
 }: GetMonthsParamsNames): string[] => {
   const monthNames: string[] = [];
+  const cacheKey = `${locale}-${monthOutputFormat}`;
+  if (!monthNameFmtCache.has(cacheKey)) {
+    monthNameFmtCache.set(cacheKey, new Intl.DateTimeFormat(locale, { month: monthOutputFormat }));
+  }
+  const fmt = monthNameFmtCache.get(cacheKey)!;
   for (let i = 0; i < monthCount; i++) {
     const year = startYear + Math.floor(i / 12);
     const month = i % 12;
     const date = new Date(year, month, 1);
-
-    const monthName = date.toLocaleDateString(locale, { month: monthOutputFormat });
+    const monthName = fmt.format(date);
     const yearSuffix = i >= 12 ? ` '${year.toString().slice(-2)}` : '';
-
     monthNames.push(`${monthName}${yearSuffix}`);
   }
-
   return monthNames;
 };

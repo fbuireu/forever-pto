@@ -91,7 +91,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
       <DialogContent className='sm:max-w-md' initialFocus={false}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
-            <Crown className='w-5 h-5 text-yellow-500' />
+            <Crown className='size-5 text-yellow-500' />
             {t('premiumRequired')}
           </DialogTitle>
           <Banner icon={Lock} title={t('premiumRequired')} colorScheme='indigo'>
@@ -119,7 +119,6 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
                         autoComplete='email'
                         placeholder={t('emailPlaceholder')}
                         disabled={isLoading}
-                        autoFocus
                         {...field}
                       />
                     </FormControl>
@@ -132,7 +131,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
                 <Button type='submit' variant='success' disabled={isLoading} className='flex-1'>
                   {isLoading ? (
                     <>
-                      <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                      <Loader2 className='size-4 mr-2 animate-spin' />
                       {t('verifying')}
                     </>
                   ) : (
@@ -149,7 +148,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
 
         {step === Step.SUCCESS && (
           <div className='text-center space-y-4 py-4'>
-            <Crown className='w-12 h-12 text-yellow-500 mx-auto animate-pulse' />
+            <Crown className='size-12 text-yellow-500 mx-auto animate-pulse' />
             <div>
               <h3 className='font-semibold text-green-600'>{t('accessGranted')}</h3>
               <p className='text-sm text-muted-foreground mt-1'>{t('welcomeToPremium', { seconds: 5 })}</p>
@@ -159,7 +158,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
 
         {step === Step.ERROR && (
           <div className='text-center space-y-4'>
-            <AlertCircle className='w-12 h-12 text-destructive mx-auto' />
+            <AlertCircle className='size-12 text-destructive mx-auto' />
             <div>
               <h3 className='font-semibold'>{t('accessDenied')}</h3>
               <p className='text-sm text-muted-foreground mt-1'>{t('emailNotFound')}</p>

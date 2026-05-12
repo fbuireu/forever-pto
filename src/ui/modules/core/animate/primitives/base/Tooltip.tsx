@@ -136,12 +136,9 @@ function TooltipArrow(props: TooltipArrowProps) {
 export {
   Tooltip,
   TooltipArrow,
-  type TooltipArrowProps,
-  type TooltipContextType,
   TooltipPopup,
   type TooltipPopupProps,
   TooltipPortal,
-  type TooltipPortalProps,
   TooltipPositioner,
   type TooltipPositionerProps,
   type TooltipProps,
@@ -149,5 +146,4 @@ export {
   type TooltipProviderProps,
   TooltipTrigger,
   type TooltipTriggerProps,
-  useTooltip,
 };

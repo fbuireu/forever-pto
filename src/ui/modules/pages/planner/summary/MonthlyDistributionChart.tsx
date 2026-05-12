@@ -1,3 +1,5 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { TrendingUp } from 'lucide-react';
@@ -16,7 +18,7 @@ interface MonthlyDistributionChartProps {
 export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }: MonthlyDistributionChartProps) => {
   const locale = useLocale();
   const t = useTranslations('charts');
-  const { monthNames, timelineData } = useMemo(() => {
+  const { monthNames, timelineData, monthLabelMap } = useMemo(() => {
     const totalMonths = 12 + carryOverMonths;
     const names = getMonthNames({ locale, monthCount: totalMonths, startYear: year });
     const paddedMonthlyDist = [...monthlyDist, ...Array(Math.max(0, totalMonths - monthlyDist.length)).fill(0)];
@@ -24,7 +26,13 @@ export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }:
       mes: names[index] || `Month ${index + 1}`,
       days: value,
     }));
-    return { monthNames: names, timelineData: data };
+    const labelMap = new Map(
+      names.map((name, idx) => [
+        name,
+        new Date(year, idx, 1).toLocaleDateString(locale, { month: 'long', year: 'numeric' }),
+      ])
+    );
+    return { monthNames: names, timelineData: data, monthLabelMap: labelMap };
   }, [locale, carryOverMonths, year, monthlyDist]);
 
   const totalDays = monthlyDist.reduce((sum, days) => sum + days, 0);
@@ -40,7 +48,7 @@ export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }:
       <Card className='shadow-[var(--shadow-brutal-md)] [contain:layout]'>
         <CardHeader className='pb-3'>
           <CardTitle className='flex items-center gap-2 text-base font-display font-semibold'>
-            <TrendingUp className='w-5 h-5 text-[var(--color-brand-green)]' />
+            <TrendingUp className='size-5 text-[var(--color-brand-green)]' />
             {t('annualTimeline')}
           </CardTitle>
           <div className='text-xs text-muted-foreground mt-1'>{description}</div>
@@ -74,13 +82,7 @@ export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }:
                 itemStyle={{ color: 'var(--primary-foreground)' }}
                 cursor={{ fill: 'color-mix(in srgb, var(--frame) 8%, transparent)' }}
                 labelStyle={{ color: 'var(--primary-foreground)', fontWeight: 700 }}
-                labelFormatter={(label) => {
-                  const date = new Date(year, monthNames.indexOf(label), 1);
-                  return date.toLocaleDateString(locale, {
-                    month: 'long',
-                    year: 'numeric',
-                  });
-                }}
+                labelFormatter={(label) => monthLabelMap.get(label as string) ?? (label as string)}
               />
             </AreaChart>
           </ResponsiveContainer>

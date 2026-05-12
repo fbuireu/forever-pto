@@ -21,14 +21,16 @@ export const useStoresReady = () => {
       return;
     }
 
-    const unsubscribes = STORES.filter(({ name }) => !hydrationStatus[name]).map(({ name, store }) =>
-      store.persist.onFinishHydration(() => {
-        setHydrationStatus((prev) => ({
-          ...prev,
-          [name]: true,
-        }));
-      })
-    );
+    const unsubscribes = STORES.reduce<(() => void)[]>((acc, { name, store }) => {
+      if (!hydrationStatus[name]) {
+        acc.push(
+          store.persist.onFinishHydration(() => {
+            setHydrationStatus((prev) => ({ ...prev, [name]: true }));
+          })
+        );
+      }
+      return acc;
+    }, []);
 
     return () => {
       unsubscribes.forEach((unsubscribe) => {

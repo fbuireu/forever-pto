@@ -6,9 +6,3 @@ export interface SendEmailParams {
   replyTo?: string;
   tags?: Array<{ name: string; value: string }>;
 }
-
-export interface SendEmailResult {
-  success: boolean;
-  messageId?: string;
-  error?: string;
-}

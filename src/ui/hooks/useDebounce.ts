@@ -10,14 +10,16 @@ export const useDebounce = <T>({ value, delay, callback }: UseDebounceParams<T>)
   const [localValue, setLocalValue] = useState(value);
   const timeoutRef = useRef<NodeJS.Timeout>(undefined);
   const callbackRef = useRef(callback);
+  const prevValueRef = useRef(value);
+
+  if (prevValueRef.current !== value) {
+    prevValueRef.current = value;
+    setLocalValue(value);
+  }
 
   useEffect(() => {
     callbackRef.current = callback;
   }, [callback]);
-
-  useEffect(() => {
-    setLocalValue(value);
-  }, [value]);
 
   useEffect(() => {
     return () => {

@@ -72,21 +72,4 @@ function TooltipInfoTrigger({ className, ...props }: TooltipInfoTriggerProps) {
   );
 }
 
-// Also export as TooltipPanel for new-style usage
-const TooltipPanel = TooltipContent;
-type TooltipPanelProps = TooltipContentProps;
-
-export {
-  Tooltip,
-  TooltipContent,
-  type TooltipContentProps,
-  TooltipInfoTrigger,
-  type TooltipInfoTriggerProps,
-  TooltipPanel,
-  type TooltipPanelProps,
-  type TooltipProps,
-  TooltipProvider,
-  type TooltipProviderProps,
-  TooltipTrigger,
-  type TooltipTriggerProps,
-};
+export { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider, TooltipTrigger };

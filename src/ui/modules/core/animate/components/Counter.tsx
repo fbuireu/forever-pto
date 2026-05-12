@@ -82,4 +82,4 @@ function Counter({
   );
 }
 
-export { Counter, type CounterProps };
+export { Counter };

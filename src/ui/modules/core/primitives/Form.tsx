@@ -2,7 +2,7 @@
 
 import { Label } from '@ui/modules/core/primitives/Label';
 import { cn } from '@ui/utils/utils';
-import { type ComponentProps, createContext, useContext, useId } from 'react';
+import { type ComponentProps, createContext, use, useId } from 'react';
 import {
   Controller,
   type ControllerProps,
@@ -45,8 +45,8 @@ const FormField = <
 };
 
 const useFormField = () => {
-  const fieldContext = useContext(FormFieldContext);
-  const itemContext = useContext(FormItemContext);
+  const fieldContext = use(FormFieldContext);
+  const itemContext = use(FormItemContext);
   const { getFieldState } = useFormContext();
   const formState = useFormState({ name: fieldContext.name });
   const fieldState = getFieldState(fieldContext.name, formState);
@@ -105,19 +105,6 @@ function FormControl({ ...props }: ComponentProps<typeof Slot>) {
   );
 }
 
-function FormDescription({ className, ...props }: ComponentProps<'p'>) {
-  const { formDescriptionId } = useFormField();
-
-  return (
-    <p
-      data-slot='form-description'
-      id={formDescriptionId}
-      className={cn('text-muted-foreground text-sm', className)}
-      {...props}
-    />
-  );
-}
-
 function FormMessage({ className, ...props }: ComponentProps<'p'>) {
   const { error, formMessageId } = useFormField();
   const body = error ? String(error?.message ?? '') : props.children;
@@ -139,4 +126,4 @@ function FormMessage({ className, ...props }: ComponentProps<'p'>) {
   );
 }
 
-export { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage, useFormField };
+export { Form, FormControl, FormField, FormItem, FormLabel, FormMessage };

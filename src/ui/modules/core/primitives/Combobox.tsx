@@ -5,10 +5,10 @@ import type { RegionDTO } from '@application/dto/region/types';
 import type { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/modules/core/animate/base/Popover';
 import { ChevronUpDown } from '@ui/modules/core/animate/icons/ChevronUpDown';
-import { Check } from 'lucide-react';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { cn } from '@ui/utils/utils';
+import { Check } from 'lucide-react';
 import { useState } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './Command';
 import { hasFlag } from './utils/helpers';
@@ -21,9 +21,11 @@ interface ComboboxProps extends Omit<React.HTMLProps<HTMLInputElement>, 'onChang
   onChange: (value: FilterStrategy) => void;
 }
 
+const EMPTY_OPTIONS: CountryDTO[] | RegionDTO[] = [];
+
 export const Combobox = ({
   value = '',
-  options = [],
+  options = EMPTY_OPTIONS,
   placeholder,
   searchPlaceholder,
   notFoundText,
@@ -86,9 +88,7 @@ export const Combobox = ({
                     {hasFlag(option) && <span>{option.flag}</span>}
                     <span className='capitalize'>{option.label}</span>
                   </div>
-                  {value.toLowerCase() === option.value.toLowerCase() && (
-                    <Check className='ml-auto' />
-                  )}
+                  {value.toLowerCase() === option.value.toLowerCase() && <Check className='ml-auto' />}
                 </CommandItem>
               ))}
             </CommandGroup>

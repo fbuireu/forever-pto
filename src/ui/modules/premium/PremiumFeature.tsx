@@ -33,7 +33,7 @@ export const PremiumFeature = ({
   className,
   description,
   variant = PremiumFeatureVariant.DEFAULT,
-  iconSize = 'w-6 h-6',
+  iconSize = 'size-6',
   inlineDescription = false,
 }: PremiumFeatureProps) => {
   const t = useTranslations('premium');

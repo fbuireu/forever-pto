@@ -91,7 +91,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
               return !hasCustomOnSameDate;
             });
             set({
-              holidays: [...customHolidays, ...filteredHolidays].sort((a, b) => a.date.getTime() - b.date.getTime()),
+              holidays: [...customHolidays, ...filteredHolidays].toSorted(
+                (a, b) => a.date.getTime() - b.date.getTime()
+              ),
             });
           } catch (error) {
             logger.logError('Error fetching holidays in holidays store', error, {
@@ -351,7 +353,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           };
 
           set({
-            holidays: [...holidays, newHoliday].sort((a, b) => a.date.getTime() - b.date.getTime()),
+            holidays: [...holidays, newHoliday].toSorted((a, b) => a.date.getTime() - b.date.getTime()),
           });
         },
 
@@ -405,7 +407,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
           } else if (isSuggested && wasRemoved) {
             updatedRemovedDays = removedSuggestedDays.filter((d) => d.toDateString() !== dateStr);
           } else if (isSuggested && !wasRemoved) {
-            updatedRemovedDays = [...removedSuggestedDays, ensureDate(date)].sort((a, b) => a.getTime() - b.getTime());
+            updatedRemovedDays = [...removedSuggestedDays, ensureDate(date)].toSorted(
+              (a, b) => a.getTime() - b.getTime()
+            );
           } else {
             const activeSuggestedCount = currentSelection.days.length - removedSuggestedDays.length;
             const manualSelectedCount = manuallySelectedDays.length;
@@ -420,7 +424,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
               return false;
             }
 
-            updatedManualDays = [...manuallySelectedDays, ensureDate(date)].sort((a, b) => a.getTime() - b.getTime());
+            updatedManualDays = [...manuallySelectedDays, ensureDate(date)].toSorted(
+              (a, b) => a.getTime() - b.getTime()
+            );
           }
 
           const updatedMetrics = generateMetrics({

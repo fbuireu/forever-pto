@@ -41,11 +41,11 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
 
           <div className='flex flex-col'>
             <span className='inline-flex items-center gap-2 self-start bg-[var(--color-brand-ink)] dark:bg-foreground text-[var(--accent)] dark:text-background px-3 py-1.5 rounded-[6px] font-mono text-[11px] font-bold tracking-[0.12em] uppercase mb-[22px]'>
-              <span className='w-2 h-2 rounded-full bg-[var(--color-brand-orange)]' />
+              <span className='size-2 rounded-full bg-[var(--color-brand-orange)]' />
               {t('kicker')}
             </span>
 
-            <h1 className='font-display font-extrabold leading-none tracking-[-0.035em] mb-[18px] text-wrap-pretty text-[clamp(34px,4.4vw,56px)]'>
+            <h1 className='font-display font-semibold leading-none tracking-[-0.035em] mb-[18px] text-wrap-pretty text-[clamp(34px,4.4vw,56px)]'>
               {t('title')}{' '}
               <span className='inline-block bg-[var(--accent)] px-2 border-[3px] border-[var(--frame)] rounded-[6px] mx-0.5 rotate-[-1.5deg]'>
                 {t('titleHighlight')}
@@ -83,7 +83,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
                   <Link href={href}>
                     <span
                       className={cn(
-                        'shrink-0 w-6 h-6 text-[var(--color-brand-ink)] border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold',
+                        'shrink-0 size-6 text-[var(--color-brand-ink)] border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold',
                         bg
                       )}
                     >

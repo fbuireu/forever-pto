@@ -1,6 +1,6 @@
 import z from 'zod';
 
-export interface ContactSchemaMessages {
+interface ContactSchemaMessages {
   invalidEmail: string;
   emailRequired: string;
   nameMin: string;

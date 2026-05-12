@@ -97,7 +97,7 @@ const inputGroupButtonVariants = cva('text-sm shadow-none flex gap-2 items-cente
   },
 });
 
-function InputGroupButton({
+function _InputGroupButton({
   className,
   type = 'button',
   variant = 'ghost',
@@ -137,7 +137,7 @@ function InputGroupInput({ className, ...props }: ComponentProps<'input'>) {
   );
 }
 
-function InputGroupTextarea({ className, ...props }: ComponentProps<'textarea'>) {
+function _InputGroupTextarea({ className, ...props }: ComponentProps<'textarea'>) {
   return (
     <Textarea
       data-slot='input-group-control'
@@ -150,4 +150,4 @@ function InputGroupTextarea({ className, ...props }: ComponentProps<'textarea'>)
   );
 }
 
-export { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput, InputGroupText, InputGroupTextarea };
+export { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText };

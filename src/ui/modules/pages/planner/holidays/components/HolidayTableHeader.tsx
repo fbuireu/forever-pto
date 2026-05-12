@@ -35,9 +35,9 @@ const TableHeader = ({ children, sortKey, currentSort, onSort, className = '' }:
       onClick={() => onSort(sortKey)}
     >
       <AnimateIcon animateOnHover asChild>
-        <div className='flex items-center space-x-1 text-foreground'>
+        <div className='flex items-center gap-x-1 text-foreground'>
           <span>{children}</span>
-          <Icon className='h-4 w-4' />
+          <Icon className='size-4' />
         </div>
       </AnimateIcon>
     </TableHead>

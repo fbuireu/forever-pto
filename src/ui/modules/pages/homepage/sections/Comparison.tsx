@@ -12,14 +12,14 @@ export const Comparison = async () => {
         <div className='flex justify-center mb-4'>
           <Badge variant='outline'>{t('comparison.badge')}</Badge>
         </div>
-        <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] text-[clamp(36px,5vw,64px)]'>
+        <h2 className='font-display font-semibold leading-none tracking-[-0.03em] text-[clamp(36px,5vw,64px)]'>
           {t('comparison.title')}
         </h2>
       </div>
 
       <div className='max-w-[1100px] mx-auto grid grid-cols-1 md:grid-cols-[1fr_60px_1fr] items-stretch gap-0'>
         <div className={cn(brutCard, 'p-7 rotate-[-1deg]')}>
-          <h3 className='font-display font-extrabold text-[22px] mb-4'>{t('comparison.withoutTitle')}</h3>
+          <h3 className='font-display font-semibold text-[22px] mb-4'>{t('comparison.withoutTitle')}</h3>
           <ul className='list-none'>
             {(
               [
@@ -41,7 +41,7 @@ export const Comparison = async () => {
           </ul>
         </div>
         <div className='grid place-items-center'>
-          <div className='w-16 h-16 rounded-full bg-[var(--accent)] text-[var(--color-brand-ink)] border-[4px] border-[var(--frame)] shadow-[4px_4px_0_0_var(--frame)] grid place-items-center font-display font-extrabold text-[18px] rotate-[-8deg]'>
+          <div className='size-16 rounded-full bg-[var(--accent)] text-[var(--color-brand-ink)] border-[4px] border-[var(--frame)] shadow-[4px_4px_0_0_var(--frame)] grid place-items-center font-display font-extrabold text-[18px] rotate-[-8deg]'>
             VS
           </div>
         </div>
@@ -49,7 +49,7 @@ export const Comparison = async () => {
           className={cn(brutCard, 'p-7 rotate-[1deg] text-[var(--color-brand-ink)]')}
           style={{ background: 'var(--color-brand-green)' }}
         >
-          <h3 className='font-display font-extrabold text-[22px] mb-4'>{t('comparison.withTitle')}</h3>
+          <h3 className='font-display font-semibold text-[22px] mb-4'>{t('comparison.withTitle')}</h3>
           <ul className='list-none'>
             {(
               [

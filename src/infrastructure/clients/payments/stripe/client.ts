@@ -1,20 +1,21 @@
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { loadStripe, type PaymentIntent, type Stripe, type StripeError } from '@stripe/stripe-js';
+import { Effect } from 'effect';
 import StripeNode from 'stripe';
 
-export interface PaymentResult {
+interface PaymentResult {
   success: boolean;
   paymentIntentId?: string;
   error?: string;
 }
 
-export interface PaymentParams {
+interface PaymentParams {
   clientSecret: string;
   returnUrl?: string;
   alwaysRedirect?: boolean;
 }
 
-export class StripeClient {
+class StripeClient {
   private stripePromise: Promise<Stripe | null> | null = null;
   private stripe: Stripe | null = null;
   private readonly publishableKey: string;
@@ -43,40 +44,42 @@ export class StripeClient {
   }
 
   async confirmPayment(params: PaymentParams): Promise<PaymentResult> {
-    try {
-      const stripe = await this.getStripe();
-
-      const result = await stripe.confirmPayment({
-        clientSecret: params.clientSecret,
-        confirmParams: {
-          return_url: params.returnUrl ?? window.location.href,
-        },
-        redirect: params.alwaysRedirect ? 'always' : undefined,
-      });
-
-      return this.handlePaymentResult(result);
-    } catch (error) {
-      this.logger.logError('Stripe confirmPayment failed', error, {
-        hasClientSecret: !!params.clientSecret,
-        hasReturnUrl: !!params.returnUrl,
-        alwaysRedirect: params.alwaysRedirect,
-        location: window.location.href,
-      });
-      return this.handleError(error);
-    }
+    return Effect.runPromise(
+      Effect.tryPromise(() => this.getStripe()).pipe(
+        Effect.andThen((stripe) =>
+          Effect.tryPromise(() =>
+            stripe.confirmPayment({
+              clientSecret: params.clientSecret,
+              confirmParams: { return_url: params.returnUrl ?? globalThis.location.href },
+              redirect: params.alwaysRedirect ? 'always' : undefined,
+            })
+          )
+        ),
+        Effect.andThen((result) => Effect.sync(() => this.handlePaymentResult(result))),
+        Effect.catchAll((error) => {
+          this.logger.logError('Stripe confirmPayment failed', error, {
+            hasClientSecret: !!params.clientSecret,
+            hasReturnUrl: !!params.returnUrl,
+            alwaysRedirect: params.alwaysRedirect,
+            location: globalThis.location.href,
+          });
+          return Effect.succeed(this.handleError(error));
+        })
+      )
+    );
   }
 
   async confirmCardPayment(clientSecret: string): Promise<PaymentResult> {
-    try {
-      const stripe = await this.getStripe();
-      const result = await stripe.confirmCardPayment(clientSecret);
-      return this.handlePaymentResult(result);
-    } catch (error) {
-      this.logger.logError('Stripe confirmCardPayment failed', error, {
-        hasClientSecret: !!clientSecret,
-      });
-      return this.handleError(error);
-    }
+    return Effect.runPromise(
+      Effect.tryPromise(() => this.getStripe()).pipe(
+        Effect.andThen((stripe) => Effect.tryPromise(() => stripe.confirmCardPayment(clientSecret))),
+        Effect.andThen((result) => Effect.sync(() => this.handlePaymentResult(result))),
+        Effect.catchAll((error) => {
+          this.logger.logError('Stripe confirmCardPayment failed', error, { hasClientSecret: !!clientSecret });
+          return Effect.succeed(this.handleError(error));
+        })
+      )
+    );
   }
 
   isLoaded(): boolean {
@@ -158,7 +161,7 @@ export const getStripeClientInstance = (): StripeClient => {
   return stripeClientInstance;
 };
 
-export const resetStripeClient = (): void => {
+const _resetStripeClient = (): void => {
   stripeClientInstance = null;
 };
 
@@ -181,11 +184,11 @@ export const getStripeServerInstance = (): StripeNode => {
   return stripeServerInstance;
 };
 
-export const resetStripeServerClient = (): void => {
+const _resetStripeServerClient = (): void => {
   stripeServerInstance = null;
 };
 
-export const constructWebhookEvent = (payload: string | Buffer, signature: string): StripeNode.Event => {
+const _constructWebhookEvent = (payload: string | Buffer, signature: string): StripeNode.Event => {
   const stripe = getStripeServerInstance();
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 

@@ -11,7 +11,7 @@ import type { GetRegionParams } from './types';
 
 const logger = getBetterStackInstance();
 
-export interface LocationState {
+interface LocationState {
   countries: CountryDTO[];
   countriesLoading: boolean;
   countriesLastFetched: number;

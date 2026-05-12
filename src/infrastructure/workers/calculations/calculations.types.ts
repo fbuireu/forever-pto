@@ -26,7 +26,7 @@ export interface SerializedSuggestion {
   metrics?: Metrics;
 }
 
-export interface CalculateSuggestionsPayload {
+interface CalculateSuggestionsPayload {
   year: number;
   ptoDays: number;
   holidays: SerializedHolidayDTO[];
@@ -46,18 +46,18 @@ export interface CalculateSuggestionsRequest {
   payload: CalculateSuggestionsPayload;
 }
 
-export interface CalculateSuggestionsResultPayload {
+interface CalculateSuggestionsResultPayload {
   suggestion: SerializedSuggestion;
   alternatives: SerializedSuggestion[];
 }
 
-export interface CalculateSuggestionsResponse {
+interface CalculateSuggestionsResponse {
   type: 'CALCULATE_SUGGESTIONS_RESULT';
   requestId: string;
   payload: CalculateSuggestionsResultPayload;
 }
 
-export interface WorkerErrorResponse {
+interface WorkerErrorResponse {
   type: 'WORKER_ERROR';
   requestId: string;
   error: string;
