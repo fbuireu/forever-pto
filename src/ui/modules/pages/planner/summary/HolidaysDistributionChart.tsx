@@ -23,7 +23,7 @@ const HolidaysDistributionChartLegend = ({ payload }: { payload?: readonly Legen
     {payload?.map((entry) => (
       <li key={entry.value} className='flex items-center gap-2'>
         <span
-          className='inline-block w-3 h-3 rounded-sm'
+          className='inline-block size-3 rounded-sm'
           style={{
             backgroundColor:
               typeof entry.value === 'string' &&
@@ -70,7 +70,7 @@ export const HolidaysDistributionChart = ({ ptoDays, holidays }: HolidaysDistrib
       <Card className='shadow-[var(--shadow-brutal-md)] [contain:layout]'>
         <CardHeader className='pb-3'>
           <CardTitle className='flex items-center gap-2 text-base font-display font-semibold'>
-            <PieChart className='w-5 h-5 text-[var(--color-brand-purple)]' />
+            <PieChart className='size-5 text-[var(--color-brand-purple)]' />
             {t('daysOffComposition')}
           </CardTitle>
           <div className='text-xs text-muted-foreground mt-1'>{chartData.description}</div>

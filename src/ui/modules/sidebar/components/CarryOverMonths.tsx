@@ -20,10 +20,12 @@ export const CarryOverMonths = () => {
   const setCarryOverMonths = useFiltersStore((state) => state.setCarryOverMonths);
   const [localValue, setLocalValue] = useState(carryOverMonths);
   const timeoutRef = useRef<NodeJS.Timeout>(undefined);
+  const prevCarryOverRef = useRef(carryOverMonths);
 
-  useEffect(() => {
+  if (prevCarryOverRef.current !== carryOverMonths) {
+    prevCarryOverRef.current = carryOverMonths;
     setLocalValue(carryOverMonths);
-  }, [carryOverMonths]);
+  }
 
   useEffect(() => {
     return () => {

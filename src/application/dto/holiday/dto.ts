@@ -23,41 +23,27 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> =
 
     return raw
       .toSorted((a, _) => (a.location ? 1 : -1))
-      .filter((holiday) => {
+      .reduce<HolidayDTO[]>((acc, holiday) => {
         const holidayDate = new Date(holiday.date);
-
-        return isWithinInterval(holidayDate, {
-          start: yearStart,
-          end: nextYearEnd,
-        });
-      })
-      .filter((holiday) => {
+        if (!isWithinInterval(holidayDate, { start: yearStart, end: nextYearEnd })) return acc;
         const dateKey = holiday.date;
-
-        if (processedDates.has(dateKey)) return false;
+        if (processedDates.has(dateKey)) return acc;
         processedDates.add(dateKey);
-
-        return true;
-      })
-      .map((holiday) => {
-        const holidayDate = new Date(holiday.date);
-
-        return {
+        acc.push({
           id: `${holiday.location ? 'regional' : 'national'}-${holiday.date}`,
           date: holidayDate,
           name: holiday.name,
           type: holiday.type,
           variant: holiday.location ? HolidayVariant.REGIONAL : HolidayVariant.NATIONAL,
-          ...(holiday.location && {
-            location: getRegionName(holiday.location),
-          }),
+          ...(holiday.location && { location: getRegionName(holiday.location) }),
           isInSelectedRange: isInSelectedRange({
-            date: new Date(holiday.date),
+            date: holidayDate,
             rangeStart: yearStart,
             rangeEnd: selectedRangeEnd,
           }),
-        };
-      })
+        });
+        return acc;
+      }, [])
       .toSorted((a, b) => compareAsc(a.date, b.date));
   },
 };

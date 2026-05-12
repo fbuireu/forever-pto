@@ -6,7 +6,7 @@ type SlotProps = React.HTMLAttributes<HTMLElement> & {
   ref?: React.Ref<HTMLElement>;
 };
 
-const Slot = React.forwardRef<HTMLElement, SlotProps>(({ children, ...slotProps }, forwardedRef) => {
+function Slot({ children, ref: forwardedRef, ...slotProps }: SlotProps) {
   if (!React.isValidElement(children)) return null;
 
   const { ref: childRef, ...childProps } = children.props as Record<string, unknown> & { ref?: React.Ref<HTMLElement> };
@@ -24,7 +24,6 @@ const Slot = React.forwardRef<HTMLElement, SlotProps>(({ children, ...slotProps 
       : (childRef ?? forwardedRef ?? undefined);
 
   return React.cloneElement(children as React.ReactElement<Record<string, unknown>>, { ...merged, ref: composedRef });
-});
-Slot.displayName = 'Slot';
+}
 
 export { Slot };

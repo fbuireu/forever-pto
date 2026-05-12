@@ -66,4 +66,4 @@ function MotionSlot<T extends HTMLElement = HTMLElement>({ children, ref, ...pro
   return <Base {...mergedProps} ref={mergeRefs(childRef as React.Ref<T>, ref)} />;
 }
 
-export { type AnyProps, type DOMMotionProps, MotionSlot, type MotionSlotProps, type WithAsChild };
+export { MotionSlot, type WithAsChild };

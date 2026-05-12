@@ -11,9 +11,9 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../../Icon';
 
-export const EMOJIS: string[] = ['☕', '🍺', '❤️', '🚀', '⚡', '🔥', '💻', '🌮', '🍕', '🎵', '🎮', '😴', '🤯', '💡'];
+const EMOJIS: string[] = ['☕', '🍺', '❤️', '🚀', '⚡', '🔥', '💻', '🌮', '🍕', '🎵', '🎮', '😴', '🤯', '💡'];
 
-export const SOCIAL_NETWORKS = {
+const SOCIAL_NETWORKS = {
   GITHUB: {
     USERNAME: 'fbuireu',
     BASE_URL: 'https://github.com',
@@ -44,11 +44,10 @@ const getRandomEmoji = () => EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
 
 export const DevFooter = () => {
   const t = useTranslations('devFooter');
-  const [currentEmoji, setCurrentEmoji] = useState(EMOJIS[0]);
+  const [currentEmoji, setCurrentEmoji] = useState(getRandomEmoji);
   const intervalRef = useRef<NodeJS.Timeout>(null);
 
   useEffect(() => {
-    setCurrentEmoji(getRandomEmoji());
     intervalRef.current = setInterval(() => {
       setCurrentEmoji(getRandomEmoji());
     }, 3000);
@@ -61,7 +60,7 @@ export const DevFooter = () => {
   }, []);
 
   return (
-    <div className='px-4 py-4 flex flex-col items-center justify-center space-y-2 gap-4'>
+    <div className='p-4 flex flex-col items-center justify-center gap-4'>
       <div className='text-sm flex items-baseline gap-1.5 text-muted-foreground text-center'>
         {t('madeWith')}
         <RotatingTextContainer text={EMOJIS}>
@@ -73,7 +72,7 @@ export const DevFooter = () => {
         </span>
       </div>
       <p className='text-sm text-muted-foreground text-center'>{t('findMeOn')}</p>
-      <div className='flex gap-5 items-center space-x-1 text-xs text-muted-foreground/70'>
+      <div className='flex gap-5 items-center gap-x-1 text-xs text-muted-foreground/70'>
         {Object.entries(SOCIAL_NETWORKS).map(([key, network]) => (
           <a
             key={key}

@@ -128,4 +128,4 @@ function Users(props: UsersProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export { animations, Users, Users as UsersIcon, type UsersProps as UsersIconProps, type UsersProps };
+export { Users };

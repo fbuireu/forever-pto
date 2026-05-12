@@ -52,7 +52,7 @@ export const Banner = ({ icon: Icon, title, children, action, colorScheme, class
       )}
     >
       <div className='flex items-center gap-2 mb-2'>
-        <Icon aria-hidden='true' className={cn('w-4 h-4 shrink-0', colors.icon)} />
+        <Icon aria-hidden='true' className={cn('size-4 shrink-0', colors.icon)} />
         <span className={cn('text-[0.72rem] font-display font-black uppercase tracking-[0.08em]', colors.title)}>
           {title}
         </span>

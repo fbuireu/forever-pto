@@ -115,8 +115,8 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
       <DialogContent className='sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-3'>
-            <span className='w-9 h-9 bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] grid place-items-center shrink-0'>
-              <Mail className='w-4 h-4' />
+            <span className='size-9 bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] grid place-items-center shrink-0'>
+              <Mail className='size-4' />
             </span>
             {t('title')}
           </DialogTitle>
@@ -213,12 +213,12 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
         {step === Step.SUCCESS && (
           <div className='flex flex-col items-center gap-5 py-4'>
-            <div className='w-16 h-16 bg-[var(--color-brand-teal)] border-[3px] border-[var(--frame)] rounded-[14px] shadow-[5px_5px_0_0_var(--frame)] grid place-items-center'>
-              <CircleCheckBig animateOnView className='w-8 h-8 text-[var(--color-brand-ink)]' />
+            <div className='size-16 bg-[var(--color-brand-teal)] border-[3px] border-[var(--frame)] rounded-[14px] shadow-[5px_5px_0_0_var(--frame)] grid place-items-center'>
+              <CircleCheckBig animateOnView className='size-8 text-[var(--color-brand-ink)]' />
             </div>
             <div className='text-center'>
               <span className='inline-flex items-center gap-2 bg-[var(--color-brand-teal)] border-[2px] border-[var(--frame)] rounded-[6px] px-3 py-1 font-mono text-[11px] font-bold tracking-[0.12em] uppercase mb-3'>
-                <span className='w-1.5 h-1.5 rounded-full bg-[var(--color-brand-ink)]' />
+                <span className='size-1.5 rounded-full bg-[var(--color-brand-ink)]' />
                 {t('successTitle')}
               </span>
               <p className='text-sm text-muted-foreground'>{t('successDescription')}</p>
@@ -231,12 +231,12 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
         {step === Step.ERROR && (
           <div className='flex flex-col items-center gap-5 py-4'>
-            <div className='w-16 h-16 bg-destructive border-[3px] border-[var(--frame)] rounded-[14px] shadow-[5px_5px_0_0_var(--frame)] grid place-items-center'>
-              <AlertCircle className='w-8 h-8 text-white' />
+            <div className='size-16 bg-destructive border-[3px] border-[var(--frame)] rounded-[14px] shadow-[5px_5px_0_0_var(--frame)] grid place-items-center'>
+              <AlertCircle className='size-8 text-white' />
             </div>
             <div className='text-center'>
               <span className='inline-flex items-center gap-2 bg-destructive text-white border-[2px] border-[var(--frame)] rounded-[6px] px-3 py-1 font-mono text-[11px] font-bold tracking-[0.12em] uppercase mb-3'>
-                <span className='w-1.5 h-1.5 rounded-full bg-white' />
+                <span className='size-1.5 rounded-full bg-white' />
                 {t('errorTitle')}
               </span>
               <p className='text-sm text-muted-foreground'>{errorMessage}</p>

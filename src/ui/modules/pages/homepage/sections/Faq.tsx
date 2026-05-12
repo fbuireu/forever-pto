@@ -10,8 +10,7 @@ const GITHUB_ISSUE_URL =
   'https://github.com/fbuireu/forever-pto/issues/new?template=feature_request.yml&labels=enhancement';
 
 export const Faq = async () => {
-  const t = await getTranslations('faq');
-  const tLanding = await getTranslations('homepage');
+  const [t, tLanding] = await Promise.all([getTranslations('faq'), getTranslations('homepage')]);
 
   const FAQ: FaqData = [
     {
@@ -147,7 +146,7 @@ export const Faq = async () => {
         <div className='flex justify-center mb-4'>
           <Badge variant='outline'>{tLanding('faq.badge')}</Badge>
         </div>
-        <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] text-[clamp(36px,5vw,64px)]'>
+        <h2 className='font-display font-semibold leading-none tracking-[-0.03em] text-[clamp(36px,5vw,64px)]'>
           {tLanding('faq.title')}
         </h2>
       </div>

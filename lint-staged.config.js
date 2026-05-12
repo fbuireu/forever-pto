@@ -1,0 +1,4 @@
+module.exports = {
+  'src/**/*.{ts,tsx,js,jsx}': () => ['pnpm format:changed', 'pnpm lint:changed'],
+  'src/**/*.{test,spec}.{ts,tsx,js,jsx}': () => ['pnpm test:ut:changed'],
+};

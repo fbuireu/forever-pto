@@ -133,16 +133,29 @@ const s = StyleSheet.create({
   },
 });
 
+const fmtDayCache = new Map<string, Intl.DateTimeFormat>();
+const fmtMonthCache = new Map<string, Intl.DateTimeFormat>();
+const fmtDateCache = new Map<string, Intl.DateTimeFormat>();
+
 function fmtDay(date: Date, locale: string): string {
-  return new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' }).format(date);
+  if (!fmtDayCache.has(locale)) {
+    fmtDayCache.set(locale, new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' }));
+  }
+  return fmtDayCache.get(locale)!.format(date);
 }
 
 function fmtMonth(date: Date, locale: string): string {
-  return new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(date);
+  if (!fmtMonthCache.has(locale)) {
+    fmtMonthCache.set(locale, new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }));
+  }
+  return fmtMonthCache.get(locale)!.format(date);
 }
 
 function fmtDate(date: Date, locale: string): string {
-  return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
+  if (!fmtDateCache.has(locale)) {
+    fmtDateCache.set(locale, new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }));
+  }
+  return fmtDateCache.get(locale)!.format(date);
 }
 
 function groupByMonth<T>(items: T[], getDate: (item: T) => Date, locale: string): Array<{ month: string; items: T[] }> {
@@ -155,10 +168,10 @@ function groupByMonth<T>(items: T[], getDate: (item: T) => Date, locale: string)
     map.get(key)?.items.push(item);
   }
 
-  return [...map.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([, g]) => g);
+  return [...map.entries()].toSorted(([a], [b]) => a.localeCompare(b)).map(([, g]) => g);
 }
 
-export interface PdfLabels {
+interface PdfLabels {
   holidays: string;
   vacationDays: string;
   dayOff: string;

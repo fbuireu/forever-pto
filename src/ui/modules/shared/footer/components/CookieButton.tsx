@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 export const CookieButton = () => {
   const t = useTranslations('footer');
 
-  const handleClick = () => {
+  const showCookiePreferences = () => {
     globalThis.dispatchEvent(new CustomEvent('cc:showPreferences'));
   };
 
@@ -14,7 +14,7 @@ export const CookieButton = () => {
     <Button
       variant='ghost'
       className='text-sm font-medium px-1.5 py-0.5 h-auto border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75'
-      onClick={handleClick}
+      onClick={showCookiePreferences}
     >
       {t('manageCookies')}
     </Button>

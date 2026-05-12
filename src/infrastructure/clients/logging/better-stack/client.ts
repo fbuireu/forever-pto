@@ -1,7 +1,7 @@
 import { Logtail } from '@logtail/edge';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 
-export interface LogContext {
+interface LogContext {
   [key: string]: unknown;
 }
 

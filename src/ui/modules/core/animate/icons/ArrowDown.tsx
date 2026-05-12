@@ -128,10 +128,4 @@ function ArrowDown(props: ArrowDownProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export {
-  ArrowDown,
-  ArrowDown as ArrowDownIcon,
-  type ArrowDownProps as ArrowDownIconProps,
-  type ArrowDownProps,
-  animations,
-};
+export { ArrowDown };

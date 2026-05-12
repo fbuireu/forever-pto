@@ -51,8 +51,8 @@ async function PaymentError() {
     <div className='min-h-screen flex items-center justify-center p-4 bg-background'>
       <Card className='w-full max-w-md border-destructive/50'>
         <CardHeader className='text-center'>
-          <div className='mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10'>
-            <XCircle className='h-6 w-6 text-destructive' />
+          <div className='mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-destructive/10'>
+            <XCircle className='size-6 text-destructive' />
           </div>
           <CardTitle className='text-destructive'>{t('title')}</CardTitle>
           <CardDescription>{t('description')}</CardDescription>
@@ -118,8 +118,8 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
     <div className='min-h-screen flex items-center justify-center p-4 bg-background m-auto'>
       <Card className='w-full max-w-md border-green-500/50'>
         <CardHeader className='text-center'>
-          <div className='mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10'>
-            <CheckCircle2 className='h-6 w-6 text-green-500' />
+          <div className='mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-green-500/10'>
+            <CheckCircle2 className='size-6 text-green-500' />
           </div>
           <CardTitle className='text-green-600 dark:text-green-400'>{t('title')}</CardTitle>
           <CardDescription>{t('thankYou')}</CardDescription>

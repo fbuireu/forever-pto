@@ -193,6 +193,9 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
 
   const id = useId();
 
+  const safeSetBoundsRef = useRef(safeSetBounds);
+  safeSetBoundsRef.current = safeSetBounds;
+
   useEffect(() => {
     if (mode !== 'parent') return;
     const container = localRef.current;
@@ -201,12 +204,12 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
     const onScroll = () => {
       if (!activeValue) return;
       const activeEl = container.querySelector<HTMLElement>(`[data-value="${activeValue}"][data-highlight="true"]`);
-      if (activeEl) safeSetBounds(activeEl.getBoundingClientRect());
+      if (activeEl) safeSetBoundsRef.current(activeEl.getBoundingClientRect());
     };
 
     container.addEventListener('scroll', onScroll, { passive: true });
     return () => container.removeEventListener('scroll', onScroll);
-  }, [mode, activeValue, safeSetBounds]);
+  }, [mode, activeValue]);
 
   const render = useCallback(
     (children: React.ReactNode) => {
@@ -295,13 +298,16 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
         ? controlledItems
           ? render(children)
           : render(
-              Children.toArray(children)
-                .filter(isValidElement)
-                .map((child) => (
-                  <MotionHighlightItem key={child.key ?? undefined} className={itemsClassName}>
-                    {child}
-                  </MotionHighlightItem>
-                ))
+              Children.toArray(children).reduce<React.ReactElement[]>((acc, child) => {
+                if (isValidElement(child)) {
+                  acc.push(
+                    <MotionHighlightItem key={child.key ?? undefined} className={itemsClassName}>
+                      {child}
+                    </MotionHighlightItem>
+                  );
+                }
+                return acc;
+              }, [])
             )
         : children}
     </MotionHighlightContext.Provider>
@@ -559,10 +565,4 @@ function MotionHighlightItem({
   );
 }
 
-export {
-  MotionHighlight,
-  MotionHighlightItem,
-  type MotionHighlightItemProps,
-  type MotionHighlightProps,
-  useMotionHighlight,
-};
+export { MotionHighlight, MotionHighlightItem };

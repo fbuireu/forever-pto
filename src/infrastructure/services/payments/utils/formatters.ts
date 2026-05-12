@@ -15,10 +15,3 @@ export const formatDiscountText = (discountInfo: DiscountInfo | null): string | 
   const saved = discountInfo.originalAmount - discountInfo.finalAmount;
   return `You saved €${saved.toFixed(2)}!`;
 };
-
-export const formatAmount = (amount: number, locale: string, currency: string): string => {
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-  }).format(amount);
-};

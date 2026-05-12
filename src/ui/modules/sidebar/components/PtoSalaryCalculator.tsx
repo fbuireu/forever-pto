@@ -13,6 +13,37 @@ import { ConditionalWrapper } from '../../shared/ConditionalWrapper';
 const WORKING_DAYS_PER_YEAR = 252;
 const HOURS_PER_DAY = 8;
 
+interface CurrencyNumberProps {
+  value: number;
+  decimalPlaces?: number;
+  currencyPosition: 'before' | 'after';
+  currencySymbol: string;
+}
+
+const CurrencyNumber = ({ value, decimalPlaces = 0, currencyPosition, currencySymbol }: CurrencyNumberProps) => (
+  <ConditionalWrapper
+    doWrap={currencyPosition === 'after'}
+    wrapper={(children) => (
+      <>
+        {children}
+        {currencySymbol}
+      </>
+    )}
+  >
+    <ConditionalWrapper
+      doWrap={currencyPosition === 'before'}
+      wrapper={(children) => (
+        <>
+          {currencySymbol}
+          {children}
+        </>
+      )}
+    >
+      <SlidingNumber number={value} decimalPlaces={decimalPlaces} />
+    </ConditionalWrapper>
+  </ConditionalWrapper>
+);
+
 export const PtoSalaryCalculator = () => {
   const locale = useLocale();
   const t = useTranslations('ptoSalaryCalculator');
@@ -32,9 +63,9 @@ export const PtoSalaryCalculator = () => {
         style: 'currency',
         currency: currency,
       }).format(0);
-      return formatted.startsWith(currencySymbol) ? 'before' : 'after';
+      return formatted.startsWith(currencySymbol) ? ('before' as const) : ('after' as const);
     } catch {
-      return 'before';
+      return 'before' as const;
     }
   }, [locale, currency, currencySymbol]);
 
@@ -44,32 +75,6 @@ export const PtoSalaryCalculator = () => {
   const actualWorkingDays = WORKING_DAYS_PER_YEAR + unusedPTODays;
   const effectiveHourlyRate = annualSalary ? annualSalary / actualWorkingDays / HOURS_PER_DAY : 0;
   const showResults = annualSalary ? annualSalary > 0 && unusedPTODays >= 0 : false;
-
-  const CurrencyNumber = ({ value, decimalPlaces = 0 }: { value: number; decimalPlaces?: number }) => {
-    return (
-      <ConditionalWrapper
-        doWrap={currencyPosition === 'after'}
-        wrapper={(children) => (
-          <>
-            {children}
-            {currencySymbol}
-          </>
-        )}
-      >
-        <ConditionalWrapper
-          doWrap={currencyPosition === 'before'}
-          wrapper={(children) => (
-            <>
-              {currencySymbol}
-              {children}
-            </>
-          )}
-        >
-          <SlidingNumber number={value} decimalPlaces={decimalPlaces} />
-        </ConditionalWrapper>
-      </ConditionalWrapper>
-    );
-  };
 
   return (
     <div className='space-y-2 w-full'>
@@ -126,7 +131,12 @@ export const PtoSalaryCalculator = () => {
             <div className='text-xs'>
               <span className='font-display font-medium text-red-600'>{t('valueOfUnusedPto')}</span>
               <div className='text-lg font-display font-bold text-red-600 flex items-center gap-1'>
-                <CurrencyNumber value={unusedPTOValue} decimalPlaces={0} />
+                <CurrencyNumber
+                  value={unusedPTOValue}
+                  decimalPlaces={0}
+                  currencyPosition={currencyPosition}
+                  currencySymbol={currencySymbol}
+                />
               </div>
               <p className='text-muted-foreground'>{t('worthOfPaidVacation')}</p>
             </div>
@@ -134,7 +144,12 @@ export const PtoSalaryCalculator = () => {
             <div className='text-xs border-t pt-2'>
               <span className='font-display font-medium'>{t('yourDailyRate')}</span>
               <div className='text-sm font-display font-bold text-primary flex items-center gap-1'>
-                <CurrencyNumber value={dailyRate} decimalPlaces={0} />
+                <CurrencyNumber
+                  value={dailyRate}
+                  decimalPlaces={0}
+                  currencyPosition={currencyPosition}
+                  currencySymbol={currencySymbol}
+                />
                 <span className='text-muted-foreground'>{t('perDay')}</span>
               </div>
             </div>
@@ -142,7 +157,12 @@ export const PtoSalaryCalculator = () => {
             <div className='text-xs'>
               <span className='font-display font-medium'>{t('yourHourlyRate')}</span>
               <div className='text-sm font-display font-bold flex items-center gap-1'>
-                <CurrencyNumber value={normalHourlyRate} decimalPlaces={2} />
+                <CurrencyNumber
+                  value={normalHourlyRate}
+                  decimalPlaces={2}
+                  currencyPosition={currencyPosition}
+                  currencySymbol={currencySymbol}
+                />
                 <span className='text-muted-foreground'>{t('perHour')}</span>
               </div>
               <p className='text-muted-foreground'>{t('standardWorkingHours')}</p>
@@ -153,7 +173,12 @@ export const PtoSalaryCalculator = () => {
                 <div className='text-xs'>
                   <span className='font-display font-medium text-orange-600'>{t('effectiveHourlyRate')}</span>
                   <div className='text-sm font-display font-bold text-orange-600 flex items-center gap-1'>
-                    <CurrencyNumber value={effectiveHourlyRate} decimalPlaces={2} />
+                    <CurrencyNumber
+                      value={effectiveHourlyRate}
+                      decimalPlaces={2}
+                      currencyPosition={currencyPosition}
+                      currencySymbol={currencySymbol}
+                    />
                     <span className='text-muted-foreground'>{t('perHour')}</span>
                   </div>
                   <p className='text-muted-foreground'>{t('whenWorkingExtraDays', { days: unusedPTODays })}</p>
@@ -166,7 +191,12 @@ export const PtoSalaryCalculator = () => {
                       days: unusedPTODays,
                       amount: (_chunks) => (
                         <span className='inline-flex font-semibold'>
-                          <CurrencyNumber value={unusedPTOValue} decimalPlaces={0} />
+                          <CurrencyNumber
+                            value={unusedPTOValue}
+                            decimalPlaces={0}
+                            currencyPosition={currencyPosition}
+                            currencySymbol={currencySymbol}
+                          />
                         </span>
                       ),
                     })}

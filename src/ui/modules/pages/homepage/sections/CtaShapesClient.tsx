@@ -50,19 +50,19 @@ export function CtaShapes({ byeMonday, bossOff, doNotDisturb, zeroRegrets }: Rea
     <div className='absolute inset-0' onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} aria-hidden='true'>
       <m.div
         style={{ x: x1, y: y1 }}
-        className={`${SHAPE_BASE} w-20 h-20 top-14 left-[8%] bg-[var(--color-brand-yellow)] rounded-[12px] rotate-[-12deg]`}
+        className={`${SHAPE_BASE} size-20 top-14 left-[8%] bg-[var(--color-brand-yellow)] rounded-[12px] rotate-[-12deg]`}
       >
         <span className={`${SHAPE_SPAN} text-[10px]`}>{byeMonday}</span>
       </m.div>
       <m.div
         style={{ x: x2, y: y2 }}
-        className={`${SHAPE_BASE} w-14 h-14 bottom-20 left-[14%] bg-[var(--color-brand-teal)] rounded-full rotate-[15deg]`}
+        className={`${SHAPE_BASE} size-14 bottom-20 left-[14%] bg-[var(--color-brand-teal)] rounded-full rotate-[15deg]`}
       >
         <span className={`${SHAPE_SPAN} text-[9px]`}>{bossOff}</span>
       </m.div>
       <m.div
         style={{ x: x3, y: y3 }}
-        className={`${SHAPE_BASE} w-[70px] h-[70px] top-24 right-[10%] bg-[var(--color-brand-orange)] rounded-[12px] rotate-[8deg]`}
+        className={`${SHAPE_BASE} size-[70px] top-24 right-[10%] bg-[var(--color-brand-orange)] rounded-[12px] rotate-[8deg]`}
       >
         <span className={`${SHAPE_SPAN} text-[9px]`}>{doNotDisturb}</span>
       </m.div>

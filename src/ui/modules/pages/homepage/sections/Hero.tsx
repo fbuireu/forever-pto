@@ -32,7 +32,7 @@ export const Hero = async () => {
             <Badge variant='outline'>v{version}</Badge>
           </div>
 
-          <h1 className='font-display font-extrabold leading-[0.95] tracking-[-0.035em] mb-7 text-[clamp(48px,7vw,92px)]'>
+          <h1 className='font-display font-semibold leading-[0.95] tracking-[-0.035em] mb-7 text-[clamp(48px,7vw,92px)]'>
             {t('hero.command')}
             <br />
             {t('hero.verb')}{' '}
@@ -66,9 +66,9 @@ export const Hero = async () => {
 
         <div className='bg-card border-[5px] border-[var(--frame)] rounded-[14px] shadow-[10px_10px_0_0_var(--frame)] overflow-hidden rotate-[1.2deg] hover:rotate-0 transition-transform duration-[250ms] ease-out'>
           <div className='flex items-center gap-2.5 px-4 py-[10px] bg-[var(--frame)]'>
-            <div className='w-3 h-3 rounded-full bg-[var(--color-brand-red)] border-[1.5px] border-black' />
-            <div className='w-3 h-3 rounded-full bg-[var(--color-brand-yellow)] border-[1.5px] border-black' />
-            <div className='w-3 h-3 rounded-full bg-[var(--color-brand-green)] border-[1.5px] border-black' />
+            <div className='size-3 rounded-full bg-[var(--color-brand-red)] border-[1.5px] border-black' />
+            <div className='size-3 rounded-full bg-[var(--color-brand-yellow)] border-[1.5px] border-black' />
+            <div className='size-3 rounded-full bg-[var(--color-brand-green)] border-[1.5px] border-black' />
             <span className='ml-auto mr-auto font-mono text-[12px] text-white/75'>forever-pto.com / planner</span>
           </div>
           <div className='p-[22px] bg-card'>
@@ -92,7 +92,7 @@ export const Hero = async () => {
               ))}
             </div>
             <div className='px-[18px] pt-[18px] pb-4 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[4px] border-[var(--frame)] rounded-[10px]'>
-              <div className='font-mono text-[12px] uppercase tracking-[0.1em] mb-1'>
+              <div className='font-mono text-[12px] uppercase tracking-[0.1em] mb-1' suppressHydrationWarning>
                 {t('hero.mockupLabel', { year: new Date().getFullYear() })}
               </div>
               <div className='font-display font-extrabold text-[56px] leading-none tracking-[-0.03em] flex items-baseline gap-2.5'>
@@ -129,7 +129,7 @@ export const Hero = async () => {
                 ] as const
               ).map(({ type, label }) => (
                 <div key={label} className='flex items-center gap-2 text-[11px]'>
-                  <div className={cn(HERO_DAY_CLASS[type], 'h-8 w-8 shrink-0')} />
+                  <div className={cn(HERO_DAY_CLASS[type], 'size-8 shrink-0')} />
                   <span>{label}</span>
                 </div>
               ))}

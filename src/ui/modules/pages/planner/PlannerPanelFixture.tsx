@@ -19,7 +19,7 @@ export const PlannerPanelFixture = () => (
           <ChevronRight size={20} />
         </div>
       </div>
-      <div className='flex flex-nowrap space-x-2'>
+      <div className='flex flex-nowrap gap-x-2'>
         <Bone className='h-11 w-[120px] rounded-[10px]' />
         <Bone className='h-11 w-[120px] rounded-[10px]' />
       </div>

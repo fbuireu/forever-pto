@@ -2,19 +2,19 @@ import { getBetterStackInstance } from '@infrastructure/clients/logging/better-s
 import { loadStripe, type PaymentIntent, type Stripe, type StripeError } from '@stripe/stripe-js';
 import StripeNode from 'stripe';
 
-export interface PaymentResult {
+interface PaymentResult {
   success: boolean;
   paymentIntentId?: string;
   error?: string;
 }
 
-export interface PaymentParams {
+interface PaymentParams {
   clientSecret: string;
   returnUrl?: string;
   alwaysRedirect?: boolean;
 }
 
-export class StripeClient {
+class StripeClient {
   private stripePromise: Promise<Stripe | null> | null = null;
   private stripe: Stripe | null = null;
   private readonly publishableKey: string;
@@ -158,7 +158,7 @@ export const getStripeClientInstance = (): StripeClient => {
   return stripeClientInstance;
 };
 
-export const resetStripeClient = (): void => {
+const _resetStripeClient = (): void => {
   stripeClientInstance = null;
 };
 
@@ -181,11 +181,11 @@ export const getStripeServerInstance = (): StripeNode => {
   return stripeServerInstance;
 };
 
-export const resetStripeServerClient = (): void => {
+const _resetStripeServerClient = (): void => {
   stripeServerInstance = null;
 };
 
-export const constructWebhookEvent = (payload: string | Buffer, signature: string): StripeNode.Event => {
+const _constructWebhookEvent = (payload: string | Buffer, signature: string): StripeNode.Event => {
   const stripe = getStripeServerInstance();
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 

@@ -15,31 +15,31 @@ export const LegendItems = ({ className, itemClassName }: LegendItemsProps) => {
   return (
     <div className={cn('flex flex-wrap justify-center gap-4 text-sm', className)}>
       <div className={cn('flex items-center', itemClassName)}>
-        <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.today)} />
+        <div className={cn('mr-2 size-8', MODIFIERS_CLASS_NAMES.today)} />
         <span>{t('today')}</span>
       </div>
       <div className={cn('flex items-center', itemClassName)}>
-        <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.weekend)} />
+        <div className={cn('mr-2 size-8', MODIFIERS_CLASS_NAMES.weekend)} />
         <span>{t('weekends')}</span>
       </div>
       <div className={cn('flex items-center', itemClassName)}>
-        <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.holiday)} />
+        <div className={cn('mr-2 size-8', MODIFIERS_CLASS_NAMES.holiday)} />
         <span>{t('holidays')}</span>
       </div>
       <div className={cn('flex items-center', itemClassName)}>
-        <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.suggested)} />
+        <div className={cn('mr-2 size-8', MODIFIERS_CLASS_NAMES.suggested)} />
         <span>{t('suggested')}</span>
       </div>
       <div className={cn('flex items-center', itemClassName)}>
-        <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.alternative, 'animate-none')} />
+        <div className={cn('mr-2 size-8', MODIFIERS_CLASS_NAMES.alternative, 'animate-none')} />
         <span>{t('alternatives')}</span>
       </div>
       <div className={cn('flex items-center', itemClassName)}>
-        <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.manuallySelected)} />
+        <div className={cn('mr-2 size-8', MODIFIERS_CLASS_NAMES.manuallySelected)} />
         <span>{t('manual')}</span>
       </div>
       <div className={cn('flex items-center', itemClassName)}>
-        <div className={cn('mr-2 h-8 w-8', MODIFIERS_CLASS_NAMES.custom)} />
+        <div className={cn('mr-2 size-8', MODIFIERS_CLASS_NAMES.custom)} />
         <span>{t('custom')}</span>
       </div>
     </div>

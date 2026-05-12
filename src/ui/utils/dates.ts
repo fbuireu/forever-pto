@@ -126,12 +126,20 @@ export interface FormatDateParams {
   format: string;
 }
 
+const dateFormatCache = new Map<string, Intl.DateTimeFormat>();
+
 export const formatDate = ({ date, locale, format }: FormatDateParams): string => {
   if (format === 'yyyy-MM-dd') return isoDate(date);
   if (format === 'yyyy-MM-dd HH:mm:ss') return isoDateTime(date);
 
   const options = INTL_FORMAT_MAP[format];
-  if (options) return new Intl.DateTimeFormat(locale, options).format(date);
+  if (options) {
+    const key = `${locale}-${format}`;
+    if (!dateFormatCache.has(key)) {
+      dateFormatCache.set(key, new Intl.DateTimeFormat(locale, options));
+    }
+    return dateFormatCache.get(key)!.format(date);
+  }
 
   return date.toLocaleDateString(locale);
 };
@@ -142,9 +150,15 @@ export interface GetWeekdayNamesParams {
   format?: 'narrow' | 'short' | 'long';
 }
 
+const weekdayFmtCache = new Map<string, Intl.DateTimeFormat>();
+
 export const getWeekdayNames = ({ locale, weekStartsOn = 0, format = 'short' }: GetWeekdayNamesParams): string[] => {
   const anchor = new Date(2023, 0, 2);
   const weekStart = startOfWeek(anchor, { weekStartsOn });
-  const fmt = new Intl.DateTimeFormat(locale, { weekday: format });
+  const key = `${locale}-${weekStartsOn}-${format}`;
+  if (!weekdayFmtCache.has(key)) {
+    weekdayFmtCache.set(key, new Intl.DateTimeFormat(locale, { weekday: format }));
+  }
+  const fmt = weekdayFmtCache.get(key)!;
   return Array.from({ length: 7 }, (_, i) => fmt.format(addDays(weekStart, i)));
 };

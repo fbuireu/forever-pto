@@ -1,12 +1,12 @@
 import type React from 'react';
 
-export type FaqItem = {
+type FaqItem = {
   id: string;
   question: string;
   answer: string | React.ReactNode;
 };
 
-export type FaqSection = {
+type FaqSection = {
   id: string;
   title: string;
   items: FaqItem[];

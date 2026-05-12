@@ -81,4 +81,4 @@ function Checkbox({ className, onCheckedChange, motionProps, ...props }: Checkbo
 
 Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
-export { Checkbox, type CheckboxProps };
+export { Checkbox };

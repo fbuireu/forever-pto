@@ -39,7 +39,7 @@ const HolidayRowComponent = ({ holiday, index, isSelected, locale, onToggle }: H
         <PremiumFeature
           feature={t('editHolidays')}
           variant={PremiumFeatureVariant.STACK}
-          iconSize='h-4 w-4'
+          iconSize='size-4'
           className='bg-none'
         >
           <Checkbox
@@ -50,7 +50,7 @@ const HolidayRowComponent = ({ holiday, index, isSelected, locale, onToggle }: H
         </PremiumFeature>
       </TableCell>
       <TableCell className='font-medium'>
-        <div className='flex items-center space-x-2'>
+        <div className='flex items-center gap-x-2'>
           <span className='truncate'>{holiday.name}</span>
         </div>
       </TableCell>

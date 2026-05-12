@@ -117,11 +117,11 @@ export const CalendarExport = () => {
       <PremiumFeature feature={t('title')}>
         <div className='flex flex-col gap-2'>
           <Button onClick={handleDownloadPdf} disabled={!hasData || isPdfPending} className='w-full' variant='outline'>
-            <FileText className='w-3 h-3' />
+            <FileText className='size-3' />
             {isPdfPending ? t('downloadingPdf') : t('downloadPdf')}
           </Button>
           <Button onClick={handleDownloadIcs} disabled={!hasData} className='w-full' variant='outline'>
-            <Download className='w-3 h-3' />
+            <Download className='size-3' />
             {t('download')}
           </Button>
         </div>
