@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/fbuireu/forever-pto/compare/v1.3.0...v1.3.1) (2026-05-12)
+
+
+### Bug Fixes
+
+* bunch of amazing stuff ([b892278](https://github.com/fbuireu/forever-pto/commit/b8922788e03084f732c73e878b16facafc9a7386))
+
 # [1.3.0](https://github.com/fbuireu/forever-pto/compare/v1.2.11...v1.3.0) (2026-05-12)
 
 
