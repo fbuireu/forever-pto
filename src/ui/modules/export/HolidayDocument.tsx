@@ -1,5 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { Document, Page, renderToBuffer, StyleSheet, Text, View } from '@react-pdf/renderer';
+import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 
 const C = {
   orange: '#f97316',
@@ -178,7 +178,7 @@ interface PdfLabels {
   generatedOn: string;
 }
 
-export interface GeneratePdfOptions {
+export interface HolidayDocumentProps {
   year: number;
   holidays: HolidayDTO[];
   ptoDays: Date[];
@@ -188,7 +188,7 @@ export interface GeneratePdfOptions {
   labels: PdfLabels;
 }
 
-function HolidayDocument({ year, holidays, ptoDays, includeHolidays, includePto, locale, labels }: GeneratePdfOptions) {
+export function HolidayDocument({ year, holidays, ptoDays, includeHolidays, includePto, locale, labels }: HolidayDocumentProps) {
   const holidayGroups = includeHolidays ? groupByMonth(holidays, (h) => h.date, locale) : [];
   const ptoGroups = includePto ? groupByMonth(ptoDays, (d) => d, locale) : [];
   const today = new Date();
@@ -252,8 +252,4 @@ function HolidayDocument({ year, holidays, ptoDays, includeHolidays, includePto,
       </Page>
     </Document>
   );
-}
-
-export async function generatePdfBuffer(options: GeneratePdfOptions): Promise<Buffer> {
-  return renderToBuffer(<HolidayDocument {...options} />);
 }

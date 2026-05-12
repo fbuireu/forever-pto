@@ -47,10 +47,12 @@ export const CalendarExport = () => {
 
   const handleDownloadPdf = () => {
     startPdfTransition(async () => {
-      const response = await fetch('/api/pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      try {
+        const [renderer, { HolidayDocument }] = await Promise.all([
+          import('@react-pdf/renderer'),
+          import('@ui/modules/export/HolidayDocument'),
+        ]);
+        const props = {
           year: Number(year),
           holidays: includeHolidays ? (holidays ?? []) : [],
           ptoDays: includePto ? ptoDays : [],
@@ -63,24 +65,20 @@ export const CalendarExport = () => {
             dayOff: t('pdf.dayOff'),
             generatedOn: t('pdf.generatedOn'),
           },
-        }),
-      });
-
-      if (!response.ok) {
+        };
+        const blob = await renderer.pdf(<HolidayDocument {...props} />).toBlob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `forever-pto-${year}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        toast.success(t('pdf.successTitle'), { description: t('pdf.successDescription') });
+      } catch {
         toast.error(t('pdf.errorTitle'), { description: t('pdf.errorDescription') });
-        return;
       }
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `forever-pto-${year}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      toast.success(t('pdf.successTitle'), { description: t('pdf.successDescription') });
     });
   };
 

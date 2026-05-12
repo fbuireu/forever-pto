@@ -46,7 +46,6 @@ const HomePage = async ({ params }: PageProps) => {
 
 export default HomePage;
 
-// throw react-doctor@latest
 // better stack not working properly
 // todo: focus input order in stripe
 // todo: new logo stripe
@@ -56,6 +55,7 @@ export default HomePage;
 // todo: improve responsive
 // todo: recreate bones
 // todo: share button with results?
+// todo: recreate bones
 // todo: migrate temporal API when available in Node
 // todo: sponsor the project (reddit, producthunt)
 // todo: performance audit, react best practices audit
