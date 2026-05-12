@@ -10,7 +10,7 @@ import { getStripeClientInstance } from '@infrastructure/clients/payments/stripe
 import { formatDiscountMessage } from '@infrastructure/services/payments/utils/formatters';
 import { calculateFinalAmount } from '@infrastructure/services/payments/utils/helpers';
 import { Elements } from '@stripe/react-stripe-js';
-import type { Stripe, StripeElementsOptions } from '@stripe/stripe-js';
+import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { initializePayment } from '@ui/adapters/payments/checkout';
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/modules/core/animate/base/Popover';
 import { Star } from '@ui/modules/core/animate/icons/Star';
@@ -18,7 +18,7 @@ import { Button } from '@ui/modules/core/primitives/Button';
 import { cn } from '@ui/utils/utils';
 import { useLocale, useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
-import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
@@ -33,6 +33,7 @@ interface PaymentState {
 }
 
 const logger = getBetterStackInstance();
+const stripePromise = getStripeClientInstance().getStripePromise();
 
 export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
   const locale = useLocale();
@@ -40,7 +41,6 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
   const tDonate = useTranslations('donate');
   const tValidation = useTranslations('validation.payment');
   const { resolvedTheme } = useTheme();
-  const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -76,7 +76,6 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
-      if (open) stripePromiseRef.current ??= getStripeClientInstance().getStripePromise();
       setDonatePopoverOpen(open);
     },
     [setDonatePopoverOpen]
@@ -415,7 +414,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
             />
           ) : (
             elementsOptions && (
-              <Elements stripe={stripePromiseRef.current} options={elementsOptions}>
+              <Elements stripe={stripePromise} options={elementsOptions}>
                 <CheckoutForm
                   amount={finalAmount}
                   email={paymentState.data.email}

@@ -385,7 +385,11 @@
       "holidays": "Feiertage",
       "vacationDays": "Urlaubstage",
       "dayOff": "Urlaubstag",
-      "generatedOn": "Erstellt am"
+      "generatedOn": "Erstellt am",
+      "successTitle": "PDF heruntergeladen",
+      "successDescription": "Ihr Kalender wurde erfolgreich exportiert.",
+      "errorTitle": "Download fehlgeschlagen",
+      "errorDescription": "Das PDF konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
     }
   },
   "ptoStatus": {

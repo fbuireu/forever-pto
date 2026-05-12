@@ -1,6 +1,10 @@
 import type { GeneratePdfOptions } from '@infrastructure/services/export/generatePdf';
 import { generatePdfBuffer } from '@infrastructure/services/export/generatePdf';
-import type { NextRequest } from 'next/server';
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { Effect } from 'effect';
+
+const logger = getBetterStackInstance();
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -11,12 +15,23 @@ export async function POST(request: NextRequest) {
     ptoDays: body.ptoDays.map((d: string) => new Date(d)),
   };
 
-  const buffer = await generatePdfBuffer(options);
-
-  return new Response(new Uint8Array(buffer), {
-    headers: {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="forever-pto-${options.year}.pdf"`,
-    },
-  });
+  return Effect.runPromise(
+    Effect.tryPromise(() => generatePdfBuffer(options)).pipe(
+      Effect.map(
+        (buffer) =>
+          new Response(new Uint8Array(buffer), {
+            headers: {
+              'Content-Type': 'application/pdf',
+              'Content-Disposition': `attachment; filename="forever-pto-${options.year}.pdf"`,
+            },
+          })
+      ),
+      Effect.catchAll((error) =>
+        Effect.sync(() => {
+          logger.logError('PDF generation failed', error, { route: '/api/pdf' });
+          return NextResponse.json({ error: 'internal_error' }, { status: 500 });
+        })
+      )
+    )
+  );
 }

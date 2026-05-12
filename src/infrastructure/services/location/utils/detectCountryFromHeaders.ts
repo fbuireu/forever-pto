@@ -1,6 +1,7 @@
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import type { NextRequest } from 'next/server';
 
+const logger = getBetterStackInstance();
 const CLOUDFLARE_COUNTRY_HEADER = 'cf-ipcountry';
 const UNIDENTIFIED_COUNTRY = 'XX';
 const TOR_COUNTRY = 'T1';
@@ -15,7 +16,7 @@ export async function detectCountryFromHeaders(request: NextRequest): Promise<st
 
     return country.toLowerCase();
   } catch (error) {
-    getBetterStackInstance().warn('Error while detecting country from headers', { error });
+    logger.warn('Error while detecting country from headers', { error });
     return '';
   }
 }

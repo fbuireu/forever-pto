@@ -2,6 +2,8 @@ import { holidayDTO } from '@application/dto/holiday/dto';
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import type { Locale } from 'next-intl';
+
+const logger = getBetterStackInstance();
 import { getNationalHolidays } from './utils/getNationalHolidays';
 import { getRegionalHolidays } from './utils/getRegionalHolidays';
 
@@ -43,7 +45,7 @@ export async function getHolidays({
       })
       .sort((a, b) => a.date.getTime() - b.date.getTime());
   } catch (error) {
-    getBetterStackInstance().logError('Error in getHolidays', error, { country, region, year });
+    logger.logError('Error in getHolidays', error, { country, region, year });
     return [];
   }
 }

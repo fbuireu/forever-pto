@@ -9,6 +9,7 @@ import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { Download, FileText } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
+import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
 
 export const CalendarExport = () => {
@@ -65,6 +66,11 @@ export const CalendarExport = () => {
         }),
       });
 
+      if (!response.ok) {
+        toast.error(t('pdf.errorTitle'), { description: t('pdf.errorDescription') });
+        return;
+      }
+
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -74,6 +80,7 @@ export const CalendarExport = () => {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      toast.success(t('pdf.successTitle'), { description: t('pdf.successDescription') });
     });
   };
 

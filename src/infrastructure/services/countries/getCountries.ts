@@ -2,6 +2,9 @@ import { countryDTO } from '@application/dto/country/dto';
 import type { CountryDTO } from '@application/dto/country/types';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import countries, { type LocaleData } from 'i18n-iso-countries';
+
+const logger = getBetterStackInstance();
+
 import type { Locale } from 'next-intl';
 
 const localeDataLoaders: Record<string, () => Promise<{ default: LocaleData }>> = {
@@ -20,7 +23,7 @@ export async function getCountries(locale: Locale): Promise<CountryDTO[]> {
     countries.registerLocale(localeData.default);
     return countryDTO.create({ raw: countries.getNames(locale) }).sort((a, b) => a.label.localeCompare(b.label));
   } catch (error) {
-    getBetterStackInstance().logError('Error in getCountries', error, { locale });
+    logger.logError('Error in getCountries', error, { locale });
     return [];
   }
 }
