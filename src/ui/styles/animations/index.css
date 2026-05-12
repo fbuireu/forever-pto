@@ -1,4 +1,10 @@
 @layer animations {
+  @keyframes march {
+    to {
+      stroke-dashoffset: -20;
+    }
+  }
+
   @keyframes popover-fade-in {
     from {
       opacity: 0;
