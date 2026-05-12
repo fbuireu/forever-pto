@@ -237,7 +237,7 @@ function AnimateIcon({
 
   const startAnim = useCallback(
     async (anim: 'initial' | 'animate', method: 'start' | 'set' = 'start') => {
-      await controls[method](anim).catch(() => {});
+      await Promise.resolve(controls[method](anim)).catch(() => {});
       statusRef.current = anim;
     },
     [controls]
