@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/fbuireu/forever-pto/compare/v1.2.11...v1.3.0) (2026-05-12)
+
+
+### Features
+
+* react-doctor feedback ([#290](https://github.com/fbuireu/forever-pto/issues/290)) ([1f60341](https://github.com/fbuireu/forever-pto/commit/1f603419ded27e45012a4eaa1721e36792183fc5))
+
 ## [1.2.11](https://github.com/fbuireu/forever-pto/compare/v1.2.10...v1.2.11) (2026-05-11)
 
 
