@@ -53,7 +53,6 @@ export default HomePage;
 // todo: status pages localized
 // todo: all butons (border color to show shadow?)
 // todo: improve responsive
-// todo: recreate bones
 // todo: share button with results?
 // todo: recreate bones
 // todo: migrate temporal API when available in Node

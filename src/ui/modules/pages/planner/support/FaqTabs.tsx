@@ -33,15 +33,17 @@ export const FaqTabs = ({ tabs, title }: FaqTabsProps) => {
         </h2>
       )}
       <Tabs value={active} onValueChange={setActive}>
-        <TabsHighlight>
-          <TabsList className='grid w-full' style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}>
-            {tabs.map((tab) => (
-              <TabsHighlightItem key={tab.id} value={tab.id}>
-                <TabsTrigger value={tab.id}>{tab.title}</TabsTrigger>
-              </TabsHighlightItem>
-            ))}
-          </TabsList>
-        </TabsHighlight>
+        <div className='overflow-x-auto'>
+          <TabsHighlight>
+            <TabsList className='grid min-w-max w-full' style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}>
+              {tabs.map((tab) => (
+                <TabsHighlightItem key={tab.id} value={tab.id}>
+                  <TabsTrigger value={tab.id}>{tab.title}</TabsTrigger>
+                </TabsHighlightItem>
+              ))}
+            </TabsList>
+          </TabsHighlight>
+        </div>
         <TabsContents>
           {tabs.map((tab) => (
             <TabsContent key={tab.id} value={tab.id}>

@@ -26,7 +26,7 @@ export function Contact() {
 
   return (
     <div id='contact' className='container max-w-4xl m-auto'>
-      <Card className='dashed-card group relative border-none shadow-none'>
+      <Card className='dashed-card group relative border-none shadow-none rounded-none'>
         <svg
           className='absolute inset-0 w-full h-full pointer-events-none'
           aria-hidden='true'
