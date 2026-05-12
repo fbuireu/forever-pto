@@ -41,8 +41,8 @@ function pdfExportEffect({ filename, ...docProps }: PdfExportParams) {
   }).pipe(Effect.scoped);
 }
 
-function BoldText({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <strong className='font-black text-foreground'>{children}</strong>;
+function BoldText(chunks: React.ReactNode) {
+  return <strong className='font-black text-foreground'>{chunks}</strong>;
 }
 
 export const CalendarExport = () => {

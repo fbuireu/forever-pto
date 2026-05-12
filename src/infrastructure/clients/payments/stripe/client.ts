@@ -44,44 +44,42 @@ class StripeClient {
   }
 
   async confirmPayment(params: PaymentParams): Promise<PaymentResult> {
-    const program = Effect.gen(this, function* (self) {
-      const stripe = yield* Effect.tryPromise(() => self.getStripe());
-      const result = yield* Effect.tryPromise(() =>
-        stripe.confirmPayment({
-          clientSecret: params.clientSecret,
-          confirmParams: { return_url: params.returnUrl ?? globalThis.location.href },
-          redirect: params.alwaysRedirect ? 'always' : undefined,
+    return Effect.runPromise(
+      Effect.tryPromise(() => this.getStripe()).pipe(
+        Effect.andThen((stripe) =>
+          Effect.tryPromise(() =>
+            stripe.confirmPayment({
+              clientSecret: params.clientSecret,
+              confirmParams: { return_url: params.returnUrl ?? globalThis.location.href },
+              redirect: params.alwaysRedirect ? 'always' : undefined,
+            })
+          )
+        ),
+        Effect.andThen((result) => Effect.sync(() => this.handlePaymentResult(result))),
+        Effect.catchAll((error) => {
+          this.logger.logError('Stripe confirmPayment failed', error, {
+            hasClientSecret: !!params.clientSecret,
+            hasReturnUrl: !!params.returnUrl,
+            alwaysRedirect: params.alwaysRedirect,
+            location: globalThis.location.href,
+          });
+          return Effect.succeed(this.handleError(error));
         })
-      );
-      return self.handlePaymentResult(result);
-    }).pipe(
-      Effect.catchAll((error) => {
-        this.logger.logError('Stripe confirmPayment failed', error, {
-          hasClientSecret: !!params.clientSecret,
-          hasReturnUrl: !!params.returnUrl,
-          alwaysRedirect: params.alwaysRedirect,
-          location: globalThis.location.href,
-        });
-        return Effect.succeed(this.handleError(error));
-      })
+      )
     );
-
-    return Effect.runPromise(program);
   }
 
   async confirmCardPayment(clientSecret: string): Promise<PaymentResult> {
-    const program = Effect.gen(this, function* (self) {
-      const stripe = yield* Effect.tryPromise(() => self.getStripe());
-      const result = yield* Effect.tryPromise(() => stripe.confirmCardPayment(clientSecret));
-      return self.handlePaymentResult(result);
-    }).pipe(
-      Effect.catchAll((error) => {
-        this.logger.logError('Stripe confirmCardPayment failed', error, { hasClientSecret: !!clientSecret });
-        return Effect.succeed(this.handleError(error));
-      })
+    return Effect.runPromise(
+      Effect.tryPromise(() => this.getStripe()).pipe(
+        Effect.andThen((stripe) => Effect.tryPromise(() => stripe.confirmCardPayment(clientSecret))),
+        Effect.andThen((result) => Effect.sync(() => this.handlePaymentResult(result))),
+        Effect.catchAll((error) => {
+          this.logger.logError('Stripe confirmCardPayment failed', error, { hasClientSecret: !!clientSecret });
+          return Effect.succeed(this.handleError(error));
+        })
+      )
     );
-
-    return Effect.runPromise(program);
   }
 
   isLoaded(): boolean {
