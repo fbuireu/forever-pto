@@ -105,9 +105,7 @@ function AccordionTrigger({
             transition={transition}
             className={cn(
               'relative size-7 flex items-center justify-center shrink-0 rounded-[6px] border-[2.5px] border-[var(--frame)] font-black text-lg leading-none select-none transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] before:content-[""] before:absolute before:-inset-[5px]',
-              isOpen
-                ? 'bg-[var(--frame)] text-[var(--background)]'
-                : 'bg-[var(--accent)] text-[var(--color-brand-ink)]'
+              isOpen ? 'bg-[var(--frame)] text-[var(--background)]' : 'bg-[var(--accent)] text-[var(--color-brand-ink)]'
             )}
           >
             +
@@ -163,15 +161,4 @@ function AccordionPanel({
   );
 }
 
-export {
-  Accordion,
-  AccordionItem,
-  type AccordionItemContextType,
-  type AccordionItemProps,
-  AccordionPanel,
-  type AccordionPanelProps,
-  type AccordionProps,
-  AccordionTrigger,
-  type AccordionTriggerProps,
-  useAccordionItem,
-};
+export { Accordion, AccordionItem, AccordionPanel, AccordionTrigger };

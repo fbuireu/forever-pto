@@ -2,7 +2,7 @@ import { StripeServerService } from '@infrastructure/clients/payments/stripe/ser
 import type { PaymentError } from '@infrastructure/errors';
 import { Effect } from 'effect';
 
-export interface ChargeData {
+interface ChargeData {
   id: string;
   receiptUrl: string | null;
   paymentMethodType: string | null;

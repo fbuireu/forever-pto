@@ -37,7 +37,7 @@ function CardDescription({ className, ...props }: ComponentProps<'div'>) {
   return <div data-slot='card-description' className={cn('text-muted-foreground text-sm', className)} {...props} />;
 }
 
-function CardAction({ className, ...props }: ComponentProps<'div'>) {
+function _CardAction({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
       data-slot='card-action'
@@ -51,7 +51,7 @@ function CardContent({ className, ...props }: ComponentProps<'div'>) {
   return <div data-slot='card-content' className={cn('px-6', className)} {...props} />;
 }
 
-function CardFooter({ className, ...props }: ComponentProps<'div'>) {
+function _CardFooter({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
       data-slot='card-footer'
@@ -64,4 +64,4 @@ function CardFooter({ className, ...props }: ComponentProps<'div'>) {
   );
 }
 
-export { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle };
+export { Card, CardContent, CardDescription, CardHeader, CardTitle };

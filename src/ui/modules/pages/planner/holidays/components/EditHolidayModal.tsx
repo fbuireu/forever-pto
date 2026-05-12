@@ -121,12 +121,12 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
       <DialogContent className='sm:max-w-sm' initialFocus={false}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
-            <Edit className='w-5 h-5 text-blue-500' />
+            <Edit className='size-5 text-blue-500' />
             {t('title')}
           </DialogTitle>
           <DialogDescription>
             <span className='block my-2'>
-              <CalendarDays className='w-4 h-4 inline mr-1' />
+              <CalendarDays className='size-4 inline mr-1' />
               {t('description')}
             </span>
           </DialogDescription>
@@ -144,7 +144,6 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
                       type='text'
                       inputMode='text'
                       placeholder={tAdd('namePlaceholder')}
-                      autoFocus
                       autoComplete='off'
                       disabled={isPending}
                       {...field}
@@ -179,7 +178,7 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
                       />
                       {selectedDate && (
                         <div className='mt-3 p-2 bg-muted rounded text-sm align-items-center flex'>
-                          <CalendarIcon className='w-4 h-4 inline mr-2' />
+                          <CalendarIcon className='size-4 inline mr-2' />
                           {tAdd('selected')}: {formatDate({ date: selectedDate, locale, format: 'EEEE, MMMM d, yyyy' })}
                         </div>
                       )}
@@ -192,7 +191,7 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
             <DialogFooter>
               <div className='flex gap-2 pt-2'>
                 <Button type='submit' variant='success' className='flex-1' disabled={isPending}>
-                  <Edit className='w-4 h-4 mr-2' />
+                  <Edit className='size-4 mr-2' />
                   {isPending ? t('submitting') : t('submit')}
                 </Button>
                 <Button type='button' variant='destructive' onClick={handleClose} disabled={isPending}>

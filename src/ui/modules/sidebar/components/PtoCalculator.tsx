@@ -108,7 +108,7 @@ export const PtoCalculator = () => {
       </div>
 
       <Button onClick={handleCalculate} className='w-full' variant='outline'>
-        <Calculator className='w-3 h-3 mr-1' />
+        <Calculator className='size-3 mr-1' />
         {t('calculate')}
       </Button>
 
@@ -132,7 +132,7 @@ export const PtoCalculator = () => {
               variant='success'
               className='w-full justify-start'
             >
-              <Plus className='w-3 h-3 mr-1' />
+              <Plus className='size-3 mr-1' />
               {t('applyToPtoDays')}
             </Button>
           </AnimateIcon>

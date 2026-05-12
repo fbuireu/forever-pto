@@ -12,7 +12,7 @@ export const Features = async () => {
         <div className='flex justify-center mb-4'>
           <Badge variant='outline'>{t('features.badge')}</Badge>
         </div>
-        <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] mb-4 text-[clamp(36px,5vw,64px)]'>
+        <h2 className='font-display font-semibold leading-none tracking-[-0.03em] mb-4 text-[clamp(36px,5vw,64px)]'>
           {t('features.titleStart')} <em className='font-serif italic'>{t('features.titleEmphasis')}</em>{' '}
           {t('features.titleEnd')}
         </h2>
@@ -30,7 +30,7 @@ export const Features = async () => {
           <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] text-foreground border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]'>
             {t('features.bridgeTag')}
           </span>
-          <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em]'>
+          <h3 className='font-display font-semibold text-[26px] mt-3.5 mb-2 tracking-[-0.02em]'>
             {t('features.bridgeTitle')}
           </h3>
           <p className='text-[var(--color-brand-ink)] text-[15px] leading-relaxed mb-4'>
@@ -74,7 +74,7 @@ export const Features = async () => {
           <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]'>
             {t('features.syncTag')}
           </span>
-          <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em]'>
+          <h3 className='font-display font-semibold text-[26px] mt-3.5 mb-2 tracking-[-0.02em]'>
             {t('features.syncTitle')}
           </h3>
           <p className='text-[15px] leading-relaxed'>{t('features.syncDescription')}</p>
@@ -98,7 +98,7 @@ export const Features = async () => {
           <span className='inline-block px-2.5 py-1 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]'>
             {t('features.conflictsTag')}
           </span>
-          <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em]'>
+          <h3 className='font-display font-semibold text-[26px] mt-3.5 mb-2 tracking-[-0.02em]'>
             {t('features.conflictsTitle')}
           </h3>
           <div className='flex flex-wrap gap-1.5 mb-3.5'>
@@ -131,7 +131,7 @@ export const Features = async () => {
           <span className='inline-block px-2.5 py-1 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[6px] font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--frame)] shadow-[var(--shadow-brutal-xs)]'>
             {t('features.countriesTag', { count: 203 })}
           </span>
-          <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em] text-[var(--color-brand-ink)]'>
+          <h3 className='font-display font-semibold text-[26px] mt-3.5 mb-2 tracking-[-0.02em] text-[var(--color-brand-ink)]'>
             {t('features.countriesTitle')}
           </h3>
           <p className='text-[var(--color-brand-ink)]/90 text-[15px] leading-relaxed mb-3'>
@@ -158,7 +158,7 @@ export const Features = async () => {
           <span className='inline-block px-2.5 py-1 bg-[var(--accent)] border-[2.5px] border-[var(--background)] rounded-[6px] font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--color-brand-ink)] shadow-[2px_2px_0_0_var(--background)]'>
             {t('features.privacyTag')}
           </span>
-          <h3 className='font-display font-extrabold text-[26px] mt-3.5 mb-2 tracking-[-0.02em] text-[var(--background)]'>
+          <h3 className='font-display font-semibold text-[26px] mt-3.5 mb-2 tracking-[-0.02em] text-[var(--background)]'>
             {t('features.privacyTitle')}
           </h3>
           <p className='text-[var(--background)]/85 text-[15px] leading-relaxed max-w-[700px]'>

@@ -57,10 +57,4 @@ function ChevronLeft(props: ChevronLeftProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export {
-  animations,
-  ChevronLeft,
-  ChevronLeft as ChevronLeftIcon,
-  type ChevronLeftProps as ChevronLeftIconProps,
-  type ChevronLeftProps,
-};
+export { ChevronLeft };

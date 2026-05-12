@@ -137,7 +137,7 @@ export function DonationForm({
               <span className='text-muted-foreground'>{t('havePromoCode')}</span>
               <ChevronDown
                 className={cn(
-                  'h-4 w-4 text-muted-foreground transition-transform duration-200',
+                  'size-4 text-muted-foreground transition-transform duration-200',
                   showPromoCode && 'rotate-180'
                 )}
                 aria-hidden='true'

@@ -31,7 +31,13 @@ export const createHolidaySet = (holidays: HolidayDTO[], cacheKey?: string): Set
 
   if (cached !== undefined) return cached;
 
-  const holidaySet = new Set(holidays.filter((h) => !isWeekend(new Date(h.date))).map((h) => getKey(new Date(h.date))));
+  const holidaySet = new Set(
+    holidays.reduce<string[]>((acc, h) => {
+      const date = new Date(h.date);
+      if (!isWeekend(date)) acc.push(getKey(date));
+      return acc;
+    }, [])
+  );
 
   HOLIDAY_CACHE.set(key, holidaySet);
   return holidaySet;

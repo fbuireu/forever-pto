@@ -1,4 +1,4 @@
-import { createContext, type JSX, type ReactNode, useContext } from 'react';
+import { createContext, type JSX, type ReactNode, use } from 'react';
 
 function getStrictContext<T>(
   name?: string
@@ -10,7 +10,7 @@ function getStrictContext<T>(
   );
 
   const useSafeContext = () => {
-    const ctx = useContext(Context);
+    const ctx = use(Context);
     if (ctx === undefined) {
       throw new Error(`useContext must be used within ${name ?? 'a Provider'}`);
     }

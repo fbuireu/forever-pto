@@ -32,7 +32,7 @@ function segWidth(start: Date, end: Date, year: number): number {
 
 function groupDates(dates: Date[], maxGapDays: number): Seg[] {
   if (!dates.length) return [];
-  const sorted = [...dates].sort((a, b) => a.getTime() - b.getTime());
+  const sorted = dates.toSorted((a, b) => a.getTime() - b.getTime());
   const out: Seg[] = [];
   let s = sorted[0];
   let e = sorted[0];
@@ -78,17 +78,15 @@ export const YearTimelineChart = ({ year, holidays, suggestion, manuallySelected
   );
 
   const rows = useMemo(() => {
-    const national = holidays
-      .filter((h) => h.variant === HolidayVariant.NATIONAL)
-      .map((h) => ({ start: h.date, end: h.date }));
-
-    const regional = holidays
-      .filter((h) => h.variant === HolidayVariant.REGIONAL)
-      .map((h) => ({ start: h.date, end: h.date }));
-
-    const custom = holidays
-      .filter((h) => h.variant === HolidayVariant.CUSTOM)
-      .map((h) => ({ start: h.date, end: h.date }));
+    const national: Seg[] = [];
+    const regional: Seg[] = [];
+    const custom: Seg[] = [];
+    for (const h of holidays) {
+      const seg = { start: h.date, end: h.date };
+      if (h.variant === HolidayVariant.NATIONAL) national.push(seg);
+      else if (h.variant === HolidayVariant.REGIONAL) regional.push(seg);
+      else if (h.variant === HolidayVariant.CUSTOM) custom.push(seg);
+    }
 
     const pto = groupDates(suggestion?.days ?? [], 3);
 

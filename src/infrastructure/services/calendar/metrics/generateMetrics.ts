@@ -42,7 +42,7 @@ export const generateMetrics = ({
   if (hasManualChanges) {
     const removedSet = new Set(removedSuggestedDays.map((d) => d.toDateString()));
     const filteredSuggested = suggestion.days.filter((d) => !removedSet.has(d.toDateString()));
-    days = [...filteredSuggested, ...manuallySelectedDays].sort((a, b) => a.getTime() - b.getTime());
+    days = [...filteredSuggested, ...manuallySelectedDays].toSorted((a, b) => a.getTime() - b.getTime());
   }
 
   if (days.length === 0) {

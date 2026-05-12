@@ -12,7 +12,7 @@ type CollapsibleContextType = {
 
 const CollapsibleContext = createContext<CollapsibleContextType | undefined>(undefined);
 
-const useCollapsible = (): CollapsibleContextType => {
+const _useCollapsible = (): CollapsibleContextType => {
   const context = use(CollapsibleContext);
   if (!context) {
     throw new Error('useCollapsible must be used within a Collapsible');
@@ -126,13 +126,4 @@ function CollapsibleContent({
   );
 }
 
-export {
-  Collapsible,
-  CollapsibleContent,
-  type CollapsibleContentProps,
-  type CollapsibleContextType,
-  type CollapsibleProps,
-  CollapsibleTrigger,
-  type CollapsibleTriggerProps,
-  useCollapsible,
-};
+export { Collapsible, CollapsibleContent, CollapsibleTrigger };

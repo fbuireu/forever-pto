@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export interface PaymentSchemaMessages {
+interface PaymentSchemaMessages {
   amountMin: string;
   amountMax: string;
   invalidEmail: string;

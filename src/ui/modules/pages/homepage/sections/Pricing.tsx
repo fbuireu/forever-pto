@@ -15,7 +15,7 @@ export const Pricing = async () => {
         <div className='flex justify-center mb-4'>
           <Badge variant='outline'>{t('pricing.badge')}</Badge>
         </div>
-        <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] mb-4 text-[clamp(36px,5vw,64px)]'>
+        <h2 className='font-display font-semibold leading-none tracking-[-0.03em] mb-4 text-[clamp(36px,5vw,64px)]'>
           {t('pricing.titleStart')} <em className='font-serif italic'>{t('pricing.titleEmphasis')}</em>
         </h2>
         <p className='text-[19px] text-muted-foreground max-w-[640px] mx-auto'>{t('pricing.description')}</p>
@@ -28,7 +28,7 @@ export const Pricing = async () => {
             'p-8 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
           )}
         >
-          <h3 className='font-display font-extrabold text-[28px] tracking-[-0.02em] mb-2'>{t('pricing.freeName')}</h3>
+          <h3 className='font-display font-semibold text-[28px] tracking-[-0.02em] mb-2'>{t('pricing.freeName')}</h3>
           <p className='text-[14px] text-muted-foreground mb-4'>{t('pricing.freeTagline')}</p>
           <div className='font-display font-extrabold text-[64px] leading-none tracking-[-0.04em] mb-1.5'>
             {t('pricing.freePrice')}
@@ -67,7 +67,7 @@ export const Pricing = async () => {
           <div className='absolute -top-4 right-[22px] bg-[var(--frame)] text-[var(--background)] font-mono font-bold text-[12px] uppercase tracking-[0.08em] px-3 py-1.5 rounded-[6px] rotate-[4deg]'>
             {t('pricing.popularBadge')}
           </div>
-          <h3 className='font-display font-extrabold text-[28px] tracking-[-0.02em] mb-2'>
+          <h3 className='font-display font-semibold text-[28px] tracking-[-0.02em] mb-2'>
             {t('pricing.lifetimeName')}
           </h3>
           <p className='text-[14px] text-[var(--color-brand-ink)]/60 mb-4'>{t('pricing.lifetimeTagline')}</p>

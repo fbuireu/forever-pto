@@ -1,6 +1,6 @@
 import z from 'zod';
 
-export interface HolidaySchemaMessages {
+interface HolidaySchemaMessages {
   nameRequired: string;
   nameMax: string;
   invalidDate: string;

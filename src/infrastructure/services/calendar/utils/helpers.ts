@@ -16,7 +16,7 @@ function analyzePotentialBridge({ ptoDays, holidaySet }: AnalyzePotentialBridges
     EFFICIENCY: { MINIMUM },
   } = PTO_CONSTANTS;
 
-  const sortedDays = [...ptoDays].sort((a, b) => a.getTime() - b.getTime());
+  const sortedDays = ptoDays.toSorted((a, b) => a.getTime() - b.getTime());
   const firstDay = sortedDays[0];
   const lastDay = sortedDays[sortedDays.length - 1];
 
@@ -140,7 +140,7 @@ export const findBridges = ({ availableWorkdays, holidays }: FindBridgesParams):
   const holidaySet = createHolidaySet(holidays);
   const bridges: Bridge[] = [];
 
-  const sortedWorkdays = [...availableWorkdays].sort((a, b) => a.getTime() - b.getTime());
+  const sortedWorkdays = availableWorkdays.toSorted((a, b) => a.getTime() - b.getTime());
   const workdaySet = new Set(sortedWorkdays.map((d) => d.getTime()));
 
   for (const workday of sortedWorkdays) {

@@ -2,7 +2,6 @@
 
 import { type UseIsInViewOptions, useIsInView } from '@ui/hooks/useIsInView';
 import { getStrictContext } from '@ui/utils/context';
-import { AnimatePresence, type HTMLMotionProps, m } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
 
 type RotatingTextContextType = {
@@ -11,7 +10,7 @@ type RotatingTextContextType = {
   isInView: boolean;
 };
 
-const [RotatingTextProvider, useRotatingText] = getStrictContext<RotatingTextContextType>('RotatingTextContext');
+const [RotatingTextProvider] = getStrictContext<RotatingTextContextType>('RotatingTextContext');
 
 type RotatingTextContainerProps = React.ComponentProps<'div'> & {
   text: string | string[];
@@ -76,34 +75,4 @@ function RotatingTextContainer({
   );
 }
 
-type RotatingTextProps = Omit<HTMLMotionProps<'div'>, 'children'>;
-
-function RotatingText({ transition = { duration: 0.3, ease: 'easeOut' }, ...props }: RotatingTextProps) {
-  const { currentText, y, isInView } = useRotatingText();
-
-  return (
-    <AnimatePresence mode='wait'>
-      {isInView && (
-        <m.div
-          key={currentText}
-          transition={transition}
-          initial={{ opacity: 0, y: -y }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y }}
-          {...props}
-        >
-          {currentText}
-        </m.div>
-      )}
-    </AnimatePresence>
-  );
-}
-
-export {
-  RotatingText,
-  RotatingTextContainer,
-  type RotatingTextContainerProps,
-  type RotatingTextContextType,
-  type RotatingTextProps,
-  useRotatingText,
-};
+export { RotatingTextContainer };

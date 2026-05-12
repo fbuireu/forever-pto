@@ -3,7 +3,6 @@
 import { Switch as SwitchPrimitives } from '@base-ui/react/switch';
 import { getStrictContext } from '@ui/utils/context';
 import { cn } from '@ui/utils/utils';
-import { Check, X } from 'lucide-react';
 import {
   type HTMLMotionProps,
   type LegacyAnimationControls,
@@ -11,7 +10,7 @@ import {
   type TargetAndTransition,
   type VariantLabels,
 } from 'motion/react';
-import { type ComponentProps, type ReactNode, useMemo, useState } from 'react';
+import { type ComponentProps, useState } from 'react';
 import { useControlledState } from 'src/ui/hooks/useControlledState';
 
 type SwitchContextType = {
@@ -136,65 +135,4 @@ function SwitchThumb({
   );
 }
 
-type SwitchIconPosition = 'left' | 'right' | 'thumb';
-type SwitchIconProps = HTMLMotionProps<'div'> & {
-  position: SwitchIconPosition;
-  children?: ReactNode;
-};
-
-function SwitchIcon({
-  position,
-  transition = { type: 'spring', bounce: 0 },
-  children,
-  className,
-  ...props
-}: SwitchIconProps) {
-  const { isChecked } = useSwitch();
-  const isAnimated = useMemo(() => {
-    if (position === 'right') return !isChecked;
-    if (position === 'left') return isChecked;
-    if (position === 'thumb') return true;
-    return false;
-  }, [position, isChecked]);
-
-  const positionClassName =
-    position === 'left'
-      ? 'absolute left-[6px] top-1/2 -translate-y-1/2 text-[var(--frame)]'
-      : position === 'right'
-        ? 'absolute right-[6px] top-1/2 -translate-y-1/2 text-[var(--frame)]'
-        : 'text-[var(--frame)]';
-
-  const defaultIcon =
-    children ??
-    (position === 'left' ? (
-      <Check className='size-2.5' strokeWidth={3} />
-    ) : position === 'right' ? (
-      <X className='size-2.5' strokeWidth={3} />
-    ) : (
-      <div className='size-1.5 rounded-full bg-current' />
-    ));
-
-  return (
-    <m.div
-      data-slot={`switch-${position}-icon`}
-      animate={isAnimated ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
-      transition={transition}
-      className={cn('flex items-center justify-center', positionClassName, className)}
-      {...props}
-    >
-      {defaultIcon}
-    </m.div>
-  );
-}
-
-export {
-  Switch,
-  type SwitchContextType,
-  SwitchIcon,
-  type SwitchIconPosition,
-  type SwitchIconProps,
-  type SwitchProps,
-  SwitchThumb,
-  type SwitchThumbProps,
-  useSwitch,
-};
+export { Switch };

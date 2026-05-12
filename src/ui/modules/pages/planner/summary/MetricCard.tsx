@@ -107,7 +107,7 @@ export const MetricCard = ({
           className
         )}
       >
-        <Icon className={cn('w-4 h-4', colors.icon, 'mx-auto mb-1')} />
+        <Icon className={cn('size-4', colors.icon, 'mx-auto mb-1')} />
         <div className={cn('text-lg font-display font-bold flex justify-center', colors.text)}>
           <SlidingNumber
             number={value}
@@ -134,7 +134,7 @@ export const MetricCard = ({
         {label}
       </span>
       <div className={cn('flex items-center gap-2')}>
-        <Icon className={cn('w-4 h-4', colors.icon)} />
+        <Icon className={cn('size-4', colors.icon)} />
         <span className={cn('text-xl font-display font-bold flex', colors.text)}>
           <SlidingNumber number={value} decimalPlaces={0} />
           {symbol}

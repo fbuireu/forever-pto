@@ -1,11 +1,5 @@
 import { cn } from '@ui/utils/utils';
 import {
-  PopoverBackdrop as PopoverBackdropPrimitive,
-  type PopoverBackdropProps as PopoverBackdropPrimitiveProps,
-  PopoverClose as PopoverClosePrimitive,
-  type PopoverCloseProps as PopoverClosePrimitiveProps,
-  PopoverDescription as PopoverDescriptionPrimitive,
-  type PopoverDescriptionProps as PopoverDescriptionPrimitiveProps,
   PopoverPopup as PopoverPopupPrimitive,
   type PopoverPopupProps as PopoverPopupPrimitiveProps,
   PopoverPortal as PopoverPortalPrimitive,
@@ -13,8 +7,6 @@ import {
   type PopoverPositionerProps as PopoverPositionerPrimitiveProps,
   Popover as PopoverPrimitive,
   type PopoverProps as PopoverPrimitiveProps,
-  PopoverTitle as PopoverTitlePrimitive,
-  type PopoverTitleProps as PopoverTitlePrimitiveProps,
   PopoverTrigger as PopoverTriggerPrimitive,
   type PopoverTriggerProps as PopoverTriggerPrimitiveProps,
 } from '../primitives/base/Popover';
@@ -66,45 +58,4 @@ function PopoverContent({
   );
 }
 
-// Also export as PopoverPanel for new-style usage
-const PopoverPanel = PopoverContent;
-type PopoverPanelProps = PopoverContentProps;
-
-type PopoverCloseProps = PopoverClosePrimitiveProps;
-function PopoverClose(props: PopoverCloseProps) {
-  return <PopoverClosePrimitive {...props} />;
-}
-
-type PopoverBackdropProps = PopoverBackdropPrimitiveProps;
-function PopoverBackdrop(props: PopoverBackdropProps) {
-  return <PopoverBackdropPrimitive {...props} />;
-}
-
-type PopoverTitleProps = PopoverTitlePrimitiveProps;
-function PopoverTitle(props: PopoverTitleProps) {
-  return <PopoverTitlePrimitive {...props} />;
-}
-
-type PopoverDescriptionProps = PopoverDescriptionPrimitiveProps;
-function PopoverDescription(props: PopoverDescriptionProps) {
-  return <PopoverDescriptionPrimitive {...props} />;
-}
-
-export {
-  Popover,
-  PopoverBackdrop,
-  type PopoverBackdropProps,
-  PopoverClose,
-  type PopoverCloseProps,
-  PopoverContent,
-  type PopoverContentProps,
-  PopoverDescription,
-  type PopoverDescriptionProps,
-  PopoverPanel,
-  type PopoverPanelProps,
-  type PopoverProps,
-  PopoverTitle,
-  type PopoverTitleProps,
-  PopoverTrigger,
-  type PopoverTriggerProps,
-};
+export { Popover, PopoverContent, PopoverTrigger };

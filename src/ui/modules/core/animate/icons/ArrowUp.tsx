@@ -128,4 +128,4 @@ function ArrowUp(props: ArrowUpProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export { ArrowUp, ArrowUp as ArrowUpIcon, type ArrowUpProps as ArrowUpIconProps, type ArrowUpProps, animations };
+export { ArrowUp };

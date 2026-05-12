@@ -16,7 +16,7 @@ export const HomepageCta = async () => {
       />
 
       <div className='max-w-[900px] mx-auto text-center relative z-[2]'>
-        <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] mb-5 text-[clamp(40px,6vw,80px)]'>
+        <h2 className='font-display font-semibold leading-none tracking-[-0.03em] mb-5 text-[clamp(40px,6vw,80px)]'>
           {t('closing.titleStart')}{' '}
           <em className='font-serif italic text-[var(--accent)]'>{t('closing.titleEmphasis')}</em>
           <br />

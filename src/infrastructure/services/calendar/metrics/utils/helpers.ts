@@ -8,7 +8,7 @@ export function getMonthlyDist(days: Date[]): number[] {
 
 export function getLongBlocksPerQuarter(days: Date[]): number[] {
   const longBlocksPerQuarter = [0, 0, 0, 0];
-  const sorted = [...days].sort((a, b) => a.getTime() - b.getTime());
+  const sorted = days.toSorted((a, b) => a.getTime() - b.getTime());
   let currentBlock: Date[] = [];
   let lastQuarter = null;
   for (const date of sorted) {
@@ -70,7 +70,7 @@ export const calculateRestBlocks = (dates: Date[]): number => {
   if (dates.length === 0) return 0;
 
   let blocks = 1;
-  const sorted = [...dates].sort((a, b) => a.getTime() - b.getTime());
+  const sorted = dates.toSorted((a, b) => a.getTime() - b.getTime());
 
   for (let i = 1; i < sorted.length; i++) {
     const daysDiff = differenceInDays(sorted[i], sorted[i - 1]);
@@ -125,7 +125,7 @@ interface GetFirstLastBreak {
 export const getFirstLastBreak = ({ dates, locale }: GetFirstLastBreak): FirstLastBreak | null => {
   if (dates.length === 0) return null;
 
-  const sorted = [...dates].sort((a, b) => a.getTime() - b.getTime());
+  const sorted = dates.toSorted((a, b) => a.getTime() - b.getTime());
   return {
     first: formatDate({ date: sorted[0], format: 'MMMM', locale }),
     last: formatDate({ date: sorted[sorted.length - 1], format: 'MMMM', locale }),
@@ -174,7 +174,7 @@ export const calculateLongestVacation = ({ ptoDays, holidays }: CalculateLongest
 
   const freeDays = new Set([...ptoDays.map((d) => d.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
 
-  const allDates = [...ptoDays, ...holidays.map((h) => h.date)].sort((a, b) => a.getTime() - b.getTime());
+  const allDates = [...ptoDays, ...holidays.map((h) => h.date)].toSorted((a, b) => a.getTime() - b.getTime());
   if (allDates.length === 0) return 0;
 
   const minDate = new Date(allDates[0]);
@@ -210,7 +210,7 @@ export const calculateLongWeekends = ({ ptoDays, holidays }: CalculateLongWeeken
   const freeDays = new Set([...ptoDays.map((d) => d.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
 
   let longWeekends = 0;
-  const allDates = [...ptoDays, ...holidays.map((h) => h.date)].sort((a, b) => a.getTime() - b.getTime());
+  const allDates = [...ptoDays, ...holidays.map((h) => h.date)].toSorted((a, b) => a.getTime() - b.getTime());
   if (allDates.length === 0) return 0;
 
   const minDate = new Date(allDates[0]);

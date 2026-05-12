@@ -56,7 +56,7 @@ export const CookieConsentDialog = ({
               <AccordionItem value='necessary-details' className='border-none'>
                 <AccordionTrigger className='text-sm font-medium hover:no-underline py-2 gap-2'>
                   <span className='flex items-center gap-2'>
-                    <Info className='h-4 w-4' />
+                    <Info className='size-4' />
                     {t('cookieDetails')}
                   </span>
                 </AccordionTrigger>
@@ -116,7 +116,7 @@ export const CookieConsentDialog = ({
               <AccordionItem value='analytics-details' className='border-none'>
                 <AccordionTrigger className='text-sm font-medium hover:no-underline py-2 gap-2'>
                   <span className='flex items-center gap-2'>
-                    <Info className='h-4 w-4' />
+                    <Info className='size-4' />
                     {t('cookieDetails')}
                   </span>
                 </AccordionTrigger>

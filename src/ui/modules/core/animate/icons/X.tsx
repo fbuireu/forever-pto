@@ -95,4 +95,4 @@ function X(props: XProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export { animations, X, X as XIcon, type XProps as XIconProps, type XProps };
+export { X };

@@ -4,7 +4,6 @@ import {
   DialogBackdrop as DialogBackdropPrimitive,
   type DialogBackdropProps as DialogBackdropPrimitiveProps,
   DialogClose as DialogClosePrimitive,
-  type DialogCloseProps as DialogClosePrimitiveProps,
   DialogDescription as DialogDescriptionPrimitive,
   type DialogDescriptionProps as DialogDescriptionPrimitiveProps,
   DialogFooter as DialogFooterPrimitive,
@@ -30,11 +29,6 @@ function Dialog(props: DialogProps) {
 type DialogTriggerProps = DialogTriggerPrimitiveProps;
 function DialogTrigger(props: DialogTriggerProps) {
   return <DialogTriggerPrimitive {...props} />;
-}
-
-type DialogCloseProps = DialogClosePrimitiveProps;
-function DialogClose(props: DialogCloseProps) {
-  return <DialogClosePrimitive {...props} />;
 }
 
 type DialogBackdropProps = DialogBackdropPrimitiveProps;
@@ -74,9 +68,7 @@ function DialogPopup({ className, children, showCloseButton = true, ...props }: 
   );
 }
 
-// Alias for backward compatibility with shadcn consumers
 const DialogContent = DialogPopup;
-type DialogContentProps = DialogPopupProps;
 
 type DialogHeaderProps = DialogHeaderPrimitiveProps;
 function DialogHeader({ className, ...props }: DialogHeaderProps) {
@@ -113,24 +105,4 @@ function DialogDescription({ className, ...props }: DialogDescriptionProps) {
   return <DialogDescriptionPrimitive className={cn('text-muted-foreground text-sm', className)} {...props} />;
 }
 
-export {
-  Dialog,
-  DialogBackdrop,
-  DialogClose,
-  type DialogCloseProps,
-  DialogContent,
-  type DialogContentProps,
-  DialogDescription,
-  type DialogDescriptionProps,
-  DialogFooter,
-  type DialogFooterProps,
-  DialogHeader,
-  type DialogHeaderProps,
-  DialogPopup,
-  type DialogPopupProps,
-  type DialogProps,
-  DialogTitle,
-  type DialogTitleProps,
-  DialogTrigger,
-  type DialogTriggerProps,
-};
+export { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger };

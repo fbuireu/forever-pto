@@ -17,7 +17,7 @@ const STATUS_URL = 'https://status.forever-pto.com';
 const CHANGELOG_URL = 'https://github.com/fbuireu/forever-pto/releases';
 const SUPPORT_URL = 'https://github.com/fbuireu/forever-pto/issues/new?template=bug_report.yml';
 
-export interface ErrorContentProps {
+interface ErrorContentProps {
   error: Error & { digest?: string };
   reset: () => void;
 }
@@ -162,11 +162,11 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
             </div>
 
             <span className='inline-flex items-center gap-2 self-start bg-destructive text-white px-3 py-1.5 rounded-[6px] font-mono text-[11px] font-bold tracking-[0.12em] uppercase mb-[14px]'>
-              <span className='w-2 h-2 rounded-full bg-[var(--accent)]' />
+              <span className='size-2 rounded-full bg-[var(--accent)]' />
               {t('kicker', { version, time: ts })}
             </span>
 
-            <h1 className='font-display font-extrabold leading-none tracking-[-0.035em] mb-[18px] text-wrap-pretty text-[clamp(28px,3.8vw,48px)]'>
+            <h1 className='font-display font-semibold leading-none tracking-[-0.035em] mb-[18px] text-wrap-pretty text-[clamp(28px,3.8vw,48px)]'>
               {t('title')}{' '}
               <span className='relative inline-block bg-[var(--color-brand-orange)] text-white px-2 border-[3px] border-[var(--frame)] rounded-[6px] mx-0.5 [animation:highlight-shake_4s_ease-in-out_infinite_1.5s]'>
                 {t('titleHighlight')}
@@ -183,13 +183,13 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
                 onClick={reset}
                 className='[filter:none] hover:[filter:none] active:[filter:none] shadow-[5px_5px_0_0_var(--accent)] hover:shadow-[7px_7px_0_0_var(--accent)] active:shadow-[1px_1px_0_0_var(--accent)]'
               >
-                <RotateCcw className='h-4 w-4' />
+                <RotateCcw className='size-4' />
                 {t('retry')}
               </Button>
               <Button variant='outline' size='lg' asChild>
                 <a href={STATUS_URL} target='_blank' rel='noopener noreferrer'>
                   {t('statusPage')}
-                  <ArrowUpRight className='h-4 w-4' />
+                  <ArrowUpRight className='size-4' />
                 </a>
               </Button>
             </div>
@@ -205,7 +205,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
                   onClick={() => setContactOpen(true)}
                   className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[3px_3px_0_0_var(--frame)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)]'
                 >
-                  <span className='shrink-0 w-6 h-6 bg-[var(--color-brand-purple)] text-white border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
+                  <span className='shrink-0 size-6 bg-[var(--color-brand-purple)] text-white border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
                     @
                   </span>
                   {t('contact')}
@@ -216,7 +216,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
                   className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[3px_3px_0_0_var(--frame)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)]'
                 >
                   <a href={CHANGELOG_URL} target='_blank' rel='noopener noreferrer'>
-                    <span className='shrink-0 w-6 h-6 bg-[var(--color-brand-teal)] border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
+                    <span className='shrink-0 size-6 bg-[var(--color-brand-teal)] border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
                       ∿
                     </span>
                     {t('changelog')}
@@ -228,7 +228,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
                   className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[3px_3px_0_0_var(--frame)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)]'
                 >
                   <a href={SUPPORT_URL} target='_blank' rel='noopener noreferrer'>
-                    <span className='shrink-0 w-6 h-6 bg-[var(--color-brand-orange)] text-white border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
+                    <span className='shrink-0 size-6 bg-[var(--color-brand-orange)] text-white border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
                       !
                     </span>
                     {t('support')}
@@ -241,10 +241,10 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
           <div className='flex items-center justify-center'>
             <div className='w-full max-w-[520px] rounded-[14px] overflow-hidden border-[4px] border-[var(--frame)] [box-shadow:10px_10px_0_var(--color-brand-orange),10px_10px_0_4px_var(--frame)]'>
               <div className='flex items-center gap-2 bg-[#1a1a1a] border-b-2 border-black/80 px-3.5 py-2.5'>
-                <span className='w-3 h-3 rounded-full bg-[var(--color-brand-red)] border border-black/20' />
-                <span className='w-3 h-3 rounded-full bg-[var(--color-brand-yellow)] border border-black/20' />
-                <span className='w-3 h-3 rounded-full bg-[var(--color-brand-green)] border border-black/20' />
-                <span className='ml-auto font-mono text-[11px] text-[#888] tracking-[0.06em]'>server.log — pty/0</span>
+                <span className='size-3 rounded-full bg-[var(--color-brand-red)] border border-black/20' />
+                <span className='size-3 rounded-full bg-[var(--color-brand-yellow)] border border-black/20' />
+                <span className='size-3 rounded-full bg-[var(--color-brand-green)] border border-black/20' />
+                <span className='ml-auto font-mono text-[11px] text-[#888] tracking-[0.06em]'>server.log: pty/0</span>
               </div>
               <div ref={terminalRef} className='overflow-y-auto max-h-[420px] bg-[#1a1a1a]'>
                 <pre className='font-mono text-[13px] leading-[1.55] text-[#ccc] p-[18px_20px_22px] whitespace-pre-wrap break-words m-0'>

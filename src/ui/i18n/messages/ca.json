@@ -385,7 +385,11 @@
       "holidays": "Festius",
       "vacationDays": "Dies de vacances",
       "dayOff": "Dia de vacances",
-      "generatedOn": "Generat el"
+      "generatedOn": "Generat el",
+      "successTitle": "PDF descarregat",
+      "successDescription": "El teu calendari s'ha exportat correctament.",
+      "errorTitle": "Error en descarregar",
+      "errorDescription": "No s'ha pogut generar el PDF. Torna-ho a intentar."
     }
   },
   "ptoStatus": {

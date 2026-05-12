@@ -160,10 +160,4 @@ function SlidersHorizontal(props: SlidersHorizontalProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export {
-  animations,
-  SlidersHorizontal,
-  SlidersHorizontal as SlidersHorizontalIcon,
-  type SlidersHorizontalProps as SlidersHorizontalIconProps,
-  type SlidersHorizontalProps,
-};
+export { SlidersHorizontal };

@@ -137,7 +137,7 @@ export const selectBridgesForStrategy = ({
 
   switch (strategy) {
     case FilterStrategy.GROUPED:
-      sortedBridges = [...bridges].sort((a, b) => {
+      sortedBridges = bridges.toSorted((a, b) => {
         if (a.ptoDaysNeeded !== b.ptoDaysNeeded) {
           return b.ptoDaysNeeded - a.ptoDaysNeeded;
         }
@@ -146,7 +146,7 @@ export const selectBridgesForStrategy = ({
       break;
 
     case FilterStrategy.OPTIMIZED:
-      sortedBridges = [...bridges].sort((a, b) => {
+      sortedBridges = bridges.toSorted((a, b) => {
         const effDiff = b.efficiency - a.efficiency;
         if (Math.abs(effDiff) > PTO_CONSTANTS.BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD) {
           return effDiff;

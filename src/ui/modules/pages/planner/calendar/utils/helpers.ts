@@ -53,7 +53,7 @@ export const getDayClassNames = ({
   const shouldShowAsPast = isPastDay && !allowPastDays;
 
   classes.push(
-    'h-8 w-8 rounded-lg p-0 font-medium text-sm',
+    'size-8 rounded-lg p-0 font-medium text-sm',
     'focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors'
   );
 

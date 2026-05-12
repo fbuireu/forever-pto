@@ -2,16 +2,8 @@
 
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { SearchIcon } from '@ui/modules/core/animate/icons/Search';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@ui/modules/core/primitives/Dialog';
 import { cn } from '@ui/utils/utils';
 import { Command as CommandPrimitive } from 'cmdk';
-import { useTranslations } from 'next-intl';
 import type { ComponentProps } from 'react';
 
 function Command({ className, ...props }: ComponentProps<typeof CommandPrimitive>) {
@@ -24,39 +16,6 @@ function Command({ className, ...props }: ComponentProps<typeof CommandPrimitive
       )}
       {...props}
     />
-  );
-}
-
-function CommandDialog({
-  title,
-  description,
-  children,
-  className,
-  showCloseButton = true,
-  ...props
-}: Omit<ComponentProps<typeof Dialog>, 'children'> & {
-  title?: string;
-  description?: string;
-  className?: string;
-  showCloseButton?: boolean;
-  children?: React.ReactNode;
-}) {
-  const t = useTranslations('command');
-  const finalTitle = title ?? t('commandPalette');
-  const finalDescription = description ?? t('searchPlaceholder');
-
-  return (
-    <Dialog {...props}>
-      <DialogHeader className='sr-only'>
-        <DialogTitle>{finalTitle}</DialogTitle>
-        <DialogDescription>{finalDescription}</DialogDescription>
-      </DialogHeader>
-      <DialogContent className={cn('overflow-hidden p-0', className)} showCloseButton={showCloseButton}>
-        <Command className='[&_[cmdk-group-heading]]:text-muted-foreground **:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5'>
-          {children}
-        </Command>
-      </DialogContent>
-    </Dialog>
   );
 }
 
@@ -108,16 +67,6 @@ function CommandGroup({ className, ...props }: ComponentProps<typeof CommandPrim
   );
 }
 
-function CommandSeparator({ className, ...props }: ComponentProps<typeof CommandPrimitive.Separator>) {
-  return (
-    <CommandPrimitive.Separator
-      data-slot='command-separator'
-      className={cn('bg-border -mx-1 h-px', className)}
-      {...props}
-    />
-  );
-}
-
 function CommandItem({ className, ...props }: ComponentProps<typeof CommandPrimitive.Item>) {
   return (
     <CommandPrimitive.Item
@@ -131,24 +80,4 @@ function CommandItem({ className, ...props }: ComponentProps<typeof CommandPrimi
   );
 }
 
-function CommandShortcut({ className, ...props }: ComponentProps<'span'>) {
-  return (
-    <span
-      data-slot='command-shortcut'
-      className={cn('text-muted-foreground ml-auto text-xs tracking-widest', className)}
-      {...props}
-    />
-  );
-}
-
-export {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-};
+export { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList };

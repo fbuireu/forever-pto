@@ -11,24 +11,25 @@ import { ThemeProvider } from 'next-themes';
 
 const LOCALES = ['en', 'es', 'ca', 'it', 'fr', 'de'] as const;
 type Locale = (typeof LOCALES)[number];
+const LOCALES_SET = new Set<string>(LOCALES);
 
 async function detectLocale(): Promise<Locale> {
   const [headersList, cookieStore] = await Promise.all([headers(), cookies()]);
 
   const intlLocale = headersList.get('x-next-intl-locale');
-  if (intlLocale && (LOCALES as readonly string[]).includes(intlLocale)) {
+  if (intlLocale && LOCALES_SET.has(intlLocale)) {
     return intlLocale as Locale;
   }
 
   const cookieLocale = cookieStore.get('NEXT_LOCALE')?.value;
-  if (cookieLocale && (LOCALES as readonly string[]).includes(cookieLocale)) {
+  if (cookieLocale && LOCALES_SET.has(cookieLocale)) {
     return cookieLocale as Locale;
   }
 
   const acceptLang = headersList.get('accept-language') ?? '';
   for (const tag of acceptLang.split(',')) {
     const lang = tag.split(';')[0].trim().split('-')[0].toLowerCase();
-    if ((LOCALES as readonly string[]).includes(lang)) return lang as Locale;
+    if (LOCALES_SET.has(lang)) return lang as Locale;
   }
 
   return 'en';

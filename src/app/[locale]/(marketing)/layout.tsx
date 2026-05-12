@@ -1,6 +1,6 @@
+import { Toaster } from '@ui/modules/core/primitives/Sonner';
 import { Navigation } from '@ui/modules/pages/homepage/navigation/Navigation';
 import { Footer } from '@ui/modules/shared/footer/Footer';
-import { Toaster } from '@ui/modules/core/primitives/Sonner';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 

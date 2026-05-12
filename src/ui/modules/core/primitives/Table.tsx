@@ -34,7 +34,7 @@ function TableBody({ className, ...props }: ComponentProps<'tbody'>) {
   return <tbody data-slot='table-body' className={cn('[&_tr:last-child]:border-0', className)} {...props} />;
 }
 
-function TableFooter({ className, ...props }: ComponentProps<'tfoot'>) {
+function _TableFooter({ className, ...props }: ComponentProps<'tfoot'>) {
   return (
     <tfoot
       data-slot='table-footer'
@@ -86,10 +86,10 @@ function TableCell({ className, ...props }: ComponentProps<'td'>) {
   );
 }
 
-function TableCaption({ className, ...props }: ComponentProps<'caption'>) {
+function _TableCaption({ className, ...props }: ComponentProps<'caption'>) {
   return (
     <caption data-slot='table-caption' className={cn('text-muted-foreground mt-4 text-sm', className)} {...props} />
   );
 }
 
-export { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow };
+export { Table, TableBody, TableCell, TableHead, TableHeader, TableRow };

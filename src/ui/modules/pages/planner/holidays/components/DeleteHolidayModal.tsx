@@ -62,7 +62,7 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
       <DialogContent className='sm:max-w-sm'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2 text-destructive'>
-            <AlertTriangle className='w-5 h-5' />
+            <AlertTriangle className='size-5' />
             {isMultiple ? t('title') : t('titleSingular')}
           </DialogTitle>
           <DialogDescription className='sr-only'>
@@ -90,7 +90,7 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
           <div className='flex gap-2 pt-4'>
             <AnimateIcon animateOnHover>
               <Button variant='destructive' onClick={handleDelete} className='flex-1' disabled={isPending}>
-                <Trash2 className='w-4 h-4 mr-2' />
+                <Trash2 className='size-4 mr-2' />
                 {isPending ? t('submitting') : t('submit')}
               </Button>
             </AnimateIcon>

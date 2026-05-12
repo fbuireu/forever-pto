@@ -1,6 +1,6 @@
 'use client';
 
-import { type HTMLMotionProps, motion, type TargetAndTransition } from 'motion/react';
+import { type HTMLMotionProps, m, type TargetAndTransition } from 'motion/react';
 import type * as React from 'react';
 import { useAutoHeight } from 'src/ui/hooks/useAutoHeight';
 import { MotionSlot, type WithAsChild } from '../primitives/animate/MotionSlot';
@@ -16,9 +16,11 @@ function isTargetAnimation(animate: HTMLMotionProps<'div'>['animate']): animate 
   return typeof animate === 'object' && animate !== null && !Array.isArray(animate) && !('start' in animate);
 }
 
+const EMPTY_DEPS: React.DependencyList = [];
+
 function AutoHeight({
   children,
-  deps = [],
+  deps = EMPTY_DEPS,
   transition = {
     type: 'spring',
     stiffness: 300,
@@ -46,10 +48,10 @@ function AutoHeight({
   }
 
   return (
-    <motion.div className={className} style={style} animate={mergedAnimate} transition={transition} {...props}>
+    <m.div className={className} style={style} animate={mergedAnimate} transition={transition} {...props}>
       {content}
-    </motion.div>
+    </m.div>
   );
 }
 
-export { AutoHeight, type AutoHeightProps };
+export { AutoHeight };

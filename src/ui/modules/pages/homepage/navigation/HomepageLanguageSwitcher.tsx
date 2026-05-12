@@ -16,7 +16,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 
 export const HomepageLanguageSwitcher = () => {
   const locale = useLocale();
-  const router = useRouter();
+  const { push } = useRouter();
   const pathname = usePathname();
   const languages = useLanguages();
   const t = useTranslations('accessibility');
@@ -25,9 +25,9 @@ export const HomepageLanguageSwitcher = () => {
   const handleLanguageChange = useCallback(
     (newLocale: string) => {
       const newPathname = pathname.replace(`/${locale}`, `/${newLocale}`);
-      router.push(newPathname, { locale: newLocale, scroll: false });
+      push(newPathname, { locale: newLocale, scroll: false });
     },
-    [pathname, locale, router]
+    [pathname, locale, push]
   );
 
   useEffect(() => {
@@ -50,9 +50,13 @@ export const HomepageLanguageSwitcher = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         {languages.map((language) => (
-          <DropdownMenuItem key={language.code} className='flex justify-between' onClick={() => handleLanguageChange(language.code)}>
+          <DropdownMenuItem
+            key={language.code}
+            className='flex justify-between'
+            onClick={() => handleLanguageChange(language.code)}
+          >
             <span>{language.label}</span>
-            {language.code === locale && <Check className='h-4 w-4' />}
+            {language.code === locale && <Check className='size-4' />}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

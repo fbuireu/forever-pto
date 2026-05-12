@@ -110,7 +110,7 @@ function Alternatives({
           <ChevronLeft size={20} />
         </m.button>
         <div className='mx-2 flex grow flex-col items-center justify-center relative duration-300 ease-out py-2'>
-          <div className='flex items-center space-x-1 text-sm tabular-nums'>
+          <div className='flex items-center gap-x-1 text-sm tabular-nums'>
             <span className='text-xs text-muted-foreground'>{t('option')}</span>
             <SlidingNumber className='text-base font-semibold text-foreground' padStart number={currentIndex + 1} />
             <span className='text-muted-foreground'>/ {totalOptions}</span>
@@ -144,7 +144,7 @@ function Alternatives({
       <m.div layout layoutRoot className='flex flex-col gap-2 sm:flex-row sm:flex-nowrap'>
         <m.button
           {...STAT_CARD_MOTION_CONFIG}
-          className='flex h-11 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,black_84%)]'
+          className='flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,black_84%)]'
           aria-label={t('totalDaysOff')}
         >
           <CalendarDays size={20} className='text-green-600 dark:text-green-400 shrink-0' />
@@ -169,7 +169,7 @@ function Alternatives({
 
         <m.button
           {...STAT_CARD_MOTION_CONFIG}
-          className='flex h-11 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_20%,white_80%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]'
+          className='flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_20%,white_80%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]'
           aria-label={t('efficiency')}
         >
           <TrendingUp size={20} className='text-purple-600 dark:text-purple-400 shrink-0' />
@@ -204,7 +204,7 @@ function Alternatives({
         {!isMainSuggestion && (
           <m.button
             {...STAT_CARD_MOTION_CONFIG}
-            className='flex h-11 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-3 py-2 shadow-[var(--shadow-brutal-xs)]'
+            className='flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-3 py-2 shadow-[var(--shadow-brutal-xs)]'
             aria-label={t('comparison')}
           >
             <BarChart3 size={20} className='text-neutral-600 dark:text-neutral-400 shrink-0' />
@@ -285,7 +285,7 @@ function Status({ currentSelection }: StatusProps) {
       <div className='flex items-center justify-between flex-wrap gap-4'>
         <div className='flex items-center gap-4 flex-wrap gap-y-2'>
           <div className='flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_25%,black_75%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>
-            <div className='h-3 w-3 rounded-full bg-teal-500' />
+            <div className='size-3 rounded-full bg-teal-500' />
             <span className='text-sm text-muted-foreground'>{t('autoAssigned')}:</span>
             <SlidingNumber
               number={activeSuggestedCount}
@@ -293,7 +293,7 @@ function Status({ currentSelection }: StatusProps) {
             />
           </div>
           <div className='flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_25%,black_75%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>
-            <div className='h-3 w-3 rounded-full bg-blue-500' />
+            <div className='size-3 rounded-full bg-blue-500' />
             <span className='text-sm text-muted-foreground'>{t('manual')}:</span>
             <SlidingNumber
               number={manualSelectedCount}

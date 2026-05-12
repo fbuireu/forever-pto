@@ -17,7 +17,7 @@ interface PaymentContext {
   ipAddress: string | null;
 }
 
-export interface PaymentResult {
+interface PaymentResult {
   clientSecret: string;
   discountInfo: DiscountInfo | null;
 }

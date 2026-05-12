@@ -52,4 +52,4 @@ function RotatingText({
   );
 }
 
-export { RotatingText, type RotatingTextProps };
+export { RotatingText };

@@ -190,14 +190,14 @@ export function Roadmap() {
   return (
     <div className='container max-w-4xl py-8 space-y-8 m-auto'>
       <div className='space-y-2 text-center mb-0'>
-        <h3 className='font-display font-extrabold text-[clamp(28px,4vw,40px)] leading-none tracking-[-0.03em]'>
+        <h3 className='font-display font-semibold text-[clamp(28px,4vw,40px)] leading-none tracking-[-0.03em]'>
           {t('title')}
         </h3>
         <p className='text-muted-foreground text-[17px]'>{t('subtitle')}</p>
       </div>
       <div className='flex flex-col lg:flex-row gap-8 items-center mt-4'>
         <div className='lg:sticky lg:top-8 flex flex-col items-center w-full lg:w-auto'>
-          <div className='relative h-80 w-80 flex items-center justify-center'>
+          <div className='relative size-80 flex items-center justify-center'>
             <RadialNav
               items={roadmapCategories as unknown as RadialNavProps['items']}
               onActiveChange={(id) => setSelectedCategory(id)}

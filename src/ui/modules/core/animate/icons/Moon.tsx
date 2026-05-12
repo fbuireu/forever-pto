@@ -78,4 +78,4 @@ function Moon(props: MoonProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export { animations, Moon, Moon as MoonIcon, type MoonProps as MoonIconProps, type MoonProps };
+export { Moon };

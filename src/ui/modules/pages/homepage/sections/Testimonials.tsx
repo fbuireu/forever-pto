@@ -19,7 +19,7 @@ const TESTIMONIAL_KEYS: TestimonialKey[] = ['martaR', 'diegoA', 'saraV', 'carlos
 export const Testimonials = async () => {
   const t = await getTranslations('homepage');
 
-  const shuffledKeys = [...TESTIMONIAL_KEYS].sort(() => Math.random() - 0.5);
+  const shuffledKeys = TESTIMONIAL_KEYS.toSorted(() => Math.random() - 0.5);
 
   return (
     <section className='px-7 py-24' id='testimonials'>
@@ -27,7 +27,7 @@ export const Testimonials = async () => {
         <div className='flex justify-center mb-4'>
           <Badge variant='outline'>{t('testimonials.badge')}</Badge>
         </div>
-        <h2 className='font-display font-extrabold leading-none tracking-[-0.03em] text-[clamp(36px,5vw,64px)]'>
+        <h2 className='font-display font-semibold leading-none tracking-[-0.03em] text-[clamp(36px,5vw,64px)]'>
           {t('testimonials.titleStart')} <em className='font-serif italic'>{t('testimonials.titleEmphasis')}</em>{' '}
           {t('testimonials.titleEnd')}
         </h2>
@@ -56,7 +56,7 @@ export const Testimonials = async () => {
               <div className='flex gap-3 items-center pt-3.5 border-t-[2.5px] border-[var(--frame)]'>
                 <div
                   className={cn(
-                    'w-[42px] h-[42px] rounded-full border-[3px] border-[var(--frame)] grid place-items-center font-display font-extrabold text-white shrink-0',
+                    'size-[42px] rounded-full border-[3px] border-[var(--frame)] grid place-items-center font-display font-extrabold text-white shrink-0',
                     avatarBg
                   )}
                 >

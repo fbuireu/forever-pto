@@ -240,4 +240,4 @@ function RadialNav({ size = 180, items, menuButtonConfig, defaultActiveId, onAct
   );
 }
 
-export { type MenuButtonConfig, RadialNav, type RadialNavItem, type RadialNavProps };
+export { RadialNav, type RadialNavProps };

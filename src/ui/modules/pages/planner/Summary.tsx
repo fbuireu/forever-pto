@@ -117,8 +117,11 @@ export const Summary = () => {
 
     const maxAlternative = Math.max(
       effectiveDays,
-      ...(alternatives?.map((a) => a?.metrics?.totalEffectiveDays).filter((n): n is number => typeof n === 'number') ??
-        [])
+      ...(alternatives?.reduce<number[]>((acc, a) => {
+        const v = a?.metrics?.totalEffectiveDays;
+        if (typeof v === 'number') acc.push(v);
+        return acc;
+      }, []) ?? [])
     );
     const canImprove = Math.max(0, maxAlternative - effectiveDays);
 
@@ -132,14 +135,14 @@ export const Summary = () => {
     };
   }, [activeSuggestion, ptoDays, alternatives]);
 
-  const renderContent = () => {
+  const content = (() => {
     if (!metricsData) return null;
     const { metrics, effectiveDays, increment, efficiencyPercentage, canImprove } = metricsData;
     return (
       <div className='w-full max-w-4xl mx-auto space-y-6 z-1'>
         <Card>
           <CardHeader className='pb-2'>
-            <CardTitle className='text-3xl sm:text-4xl font-display font-black text-center tracking-[-0.05em]'>
+            <CardTitle className='text-3xl sm:text-4xl font-display font-bold text-center tracking-[-0.05em]'>
               {t('title', { year, nextYear: Number(year) + 1 })}
               <div className='flex flex-wrap items-center gap-2 mt-3 mb-5 justify-center'>
                 <Badge variant='outline' className='mx-1'>
@@ -300,38 +303,40 @@ export const Summary = () => {
                 <AnimateIcon animateOnHover asChild>
                   <div className='rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] p-4 shadow-[var(--shadow-brutal-sm)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]'>
                     <div className='flex items-center gap-2 mb-3'>
-                      <Clock className='w-4 h-4 text-indigo-500' />
-                      <span className='text-sm font-display font-medium text-indigo-700 dark:text-indigo-300'>
+                      <Clock className='size-4 text-[var(--color-brand-purple)]' />
+                      <span className='text-sm font-display font-medium text-[color-mix(in_srgb,var(--color-brand-purple)_85%,black_15%)] dark:text-[color-mix(in_srgb,var(--color-brand-purple)_70%,white_30%)]'>
                         {t('yearSummary.title')}
                       </span>
                     </div>
                     <div className='grid grid-cols-3 gap-4 text-center'>
                       <div>
                         <div className='text-sm text-muted-foreground'>{t('yearSummary.firstBreak')}</div>
-                        <div className='text-lg flex justify-center font-display font-bold text-indigo-700 dark:text-indigo-300'>
+                        <div className='text-lg flex justify-center font-display font-bold text-[color-mix(in_srgb,var(--color-brand-purple)_85%,black_15%)] dark:text-[color-mix(in_srgb,var(--color-brand-purple)_70%,white_30%)]'>
                           <RotatingText text={metrics.firstLastBreak.first} />
                         </div>
                       </div>
                       <div>
                         <div className='text-sm text-muted-foreground'>{t('yearSummary.maxWorkStreak')}</div>
-                        <div className='text-lg font-display font-bold text-indigo-700 flex justify-center dark:text-indigo-300'>
+                        <div className='text-lg font-display font-bold text-[color-mix(in_srgb,var(--color-brand-purple)_85%,black_15%)] flex justify-center dark:text-[color-mix(in_srgb,var(--color-brand-purple)_70%,white_30%)]'>
                           <SlidingNumber number={metrics.maxWorkingPeriod} />{' '}
                           {t('yearSummary.daysCount', { count: metrics.maxWorkingPeriod })}
                         </div>
                       </div>
                       <div>
                         <div className='text-sm text-muted-foreground'>{t('yearSummary.lastBreak')}</div>
-                        <div className='text-lg font-display font-bold text-indigo-700 dark:text-indigo-300'>
+                        <div className='text-lg font-display font-bold text-[color-mix(in_srgb,var(--color-brand-purple)_85%,black_15%)] dark:text-[color-mix(in_srgb,var(--color-brand-purple)_70%,white_30%)]'>
                           <RotatingText text={metrics.firstLastBreak.last} />
                         </div>
                       </div>
                     </div>
                     <div className='mt-3 text-center'>
                       <div className='text-xs text-muted-foreground mb-1'>{t('yearSummary.totalBonusDays')}</div>
-                      <div className='text-2xl font-display font-bold text-indigo-700 dark:text-indigo-300 flex justify-center'>
+                      <div className='text-2xl font-display font-bold text-[color-mix(in_srgb,var(--color-brand-purple)_85%,black_15%)] dark:text-[color-mix(in_srgb,var(--color-brand-purple)_70%,white_30%)] flex justify-center'>
                         +<SlidingNumber number={metrics.bonusDays} />
                       </div>
-                      <div className='text-xs text-indigo-600 dark:text-indigo-400'>{t('yearSummary.daysGained')}</div>
+                      <div className='text-xs text-[var(--color-brand-purple)] dark:text-[color-mix(in_srgb,var(--color-brand-purple)_60%,white_40%)]'>
+                        {t('yearSummary.daysGained')}
+                      </div>
                     </div>
                   </div>
                 </AnimateIcon>
@@ -412,7 +417,7 @@ export const Summary = () => {
         </Card>
       </div>
     );
-  };
+  })();
 
   return (
     <Skeleton
@@ -422,7 +427,7 @@ export const Summary = () => {
       fallback={<SummaryFixture />}
       className='w-full'
     >
-      {renderContent()}
+      {content}
     </Skeleton>
   );
 };

@@ -15,5 +15,3 @@ export interface PaymentFailedEvent {
   paymentId: string;
   errorMessage: string;
 }
-
-export type PaymentEvent = PaymentSucceededEvent | PaymentFailedEvent;

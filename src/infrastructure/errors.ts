@@ -37,8 +37,3 @@ export class SessionError extends Data.TaggedError('SessionError')<{
 export class ValidationError extends Data.TaggedError('ValidationError')<{
   message: string;
 }> {}
-
-export class NotFoundError extends Data.TaggedError('NotFoundError')<{
-  resource: string;
-  id?: string;
-}> {}

@@ -81,11 +81,6 @@ function PopoverBackdrop(props: PopoverBackdropProps) {
   return <PopoverPrimitive.Backdrop data-slot='popover-backdrop' {...props} />;
 }
 
-type PopoverArrowProps = React.ComponentProps<typeof PopoverPrimitive.Arrow>;
-function PopoverArrow(props: PopoverArrowProps) {
-  return <PopoverPrimitive.Arrow data-slot='popover-arrow' {...props} />;
-}
-
 type PopoverTitleProps = React.ComponentProps<typeof PopoverPrimitive.Title>;
 function PopoverTitle(props: PopoverTitleProps) {
   return <PopoverPrimitive.Title data-slot='popover-title' {...props} />;
@@ -103,25 +98,16 @@ function PopoverClose(props: PopoverCloseProps) {
 
 export {
   Popover,
-  PopoverArrow,
   PopoverBackdrop,
   PopoverClose,
   PopoverDescription,
   PopoverPopup,
+  type PopoverPopupProps,
   PopoverPortal,
   PopoverPositioner,
-  PopoverTitle,
-  PopoverTrigger,
-  usePopover,
-  type PopoverArrowProps,
-  type PopoverBackdropProps,
-  type PopoverCloseProps,
-  type PopoverContextType,
-  type PopoverDescriptionProps,
-  type PopoverPopupProps,
-  type PopoverPortalProps,
   type PopoverPositionerProps,
   type PopoverProps,
-  type PopoverTitleProps,
+  PopoverTitle,
+  PopoverTrigger,
   type PopoverTriggerProps,
 };

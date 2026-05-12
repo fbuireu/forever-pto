@@ -66,4 +66,4 @@ function Sun(props: SunProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export { animations, Sun, Sun as SunIcon, type SunProps as SunIconProps, type SunProps };
+export { Sun };

@@ -86,25 +86,25 @@ function DropdownMenuTrigger({ asChild, children, ...props }: DropdownMenuTrigge
 
 type DropdownMenuGroupProps = React.ComponentProps<typeof DropdownMenuPrimitive.Group>;
 
-function DropdownMenuGroup(props: DropdownMenuGroupProps) {
+function _DropdownMenuGroup(props: DropdownMenuGroupProps) {
   return <DropdownMenuPrimitive.Group data-slot='dropdown-menu-group' {...props} />;
 }
 
 type DropdownMenuPortalProps = React.ComponentProps<typeof DropdownMenuPrimitive.Portal>;
 
-function DropdownMenuPortal(props: DropdownMenuPortalProps) {
+function _DropdownMenuPortal(props: DropdownMenuPortalProps) {
   return <DropdownMenuPrimitive.Portal data-slot='dropdown-menu-portal' {...props} />;
 }
 
 type DropdownMenuSubProps = React.ComponentProps<typeof DropdownMenuPrimitive.SubmenuRoot>;
 
-function DropdownMenuSub(props: DropdownMenuSubProps) {
+function _DropdownMenuSub(props: DropdownMenuSubProps) {
   return <DropdownMenuPrimitive.SubmenuRoot data-slot='dropdown-menu-sub' {...props} />;
 }
 
 type DropdownMenuRadioGroupProps = React.ComponentProps<typeof DropdownMenuPrimitive.RadioGroup>;
 
-function DropdownMenuRadioGroup(props: DropdownMenuRadioGroupProps) {
+function _DropdownMenuRadioGroup(props: DropdownMenuRadioGroupProps) {
   return <DropdownMenuPrimitive.RadioGroup data-slot='dropdown-menu-radio-group' {...props} />;
 }
 
@@ -113,7 +113,7 @@ type DropdownMenuSubTriggerProps = Omit<React.ComponentProps<typeof DropdownMenu
     inset?: boolean;
   };
 
-function DropdownMenuSubTrigger({ className, children, inset, disabled, ...props }: DropdownMenuSubTriggerProps) {
+function _DropdownMenuSubTrigger({ className, children, inset, disabled, ...props }: DropdownMenuSubTriggerProps) {
   return (
     <MotionHighlightItem disabled={disabled}>
       <DropdownMenuPrimitive.SubmenuTrigger
@@ -142,7 +142,7 @@ function DropdownMenuSubTrigger({ className, children, inset, disabled, ...props
 
 type DropdownMenuSubContentProps = Omit<React.ComponentProps<typeof DropdownMenuPrimitive.Popup>, 'render'>;
 
-function DropdownMenuSubContent({ className, ...props }: Readonly<DropdownMenuSubContentProps>) {
+function _DropdownMenuSubContent({ className, ...props }: Readonly<DropdownMenuSubContentProps>) {
   return (
     <DropdownMenuPrimitive.Positioner positionMethod='fixed' className='z-[52]'>
       <DropdownMenuPrimitive.Popup
@@ -197,7 +197,6 @@ function DropdownMenuContent({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={transition}
-                  style={{ willChange: 'opacity, transform' }}
                   {...(props as HTMLMotionProps<'div'>)}
                 />
               }
@@ -268,7 +267,13 @@ function DropdownMenuItem({
 type DropdownMenuCheckboxItemProps = Omit<React.ComponentProps<typeof DropdownMenuPrimitive.CheckboxItem>, 'render'> &
   HTMLMotionProps<'div'>;
 
-function DropdownMenuCheckboxItem({ className, children, checked, disabled, ...props }: DropdownMenuCheckboxItemProps) {
+function _DropdownMenuCheckboxItem({
+  className,
+  children,
+  checked,
+  disabled,
+  ...props
+}: DropdownMenuCheckboxItemProps) {
   return (
     <MotionHighlightItem disabled={disabled}>
       <DropdownMenuPrimitive.CheckboxItem
@@ -301,7 +306,7 @@ function DropdownMenuCheckboxItem({ className, children, checked, disabled, ...p
 type DropdownMenuRadioItemProps = Omit<React.ComponentProps<typeof DropdownMenuPrimitive.RadioItem>, 'render'> &
   HTMLMotionProps<'div'>;
 
-function DropdownMenuRadioItem({ className, children, disabled, ...props }: DropdownMenuRadioItemProps) {
+function _DropdownMenuRadioItem({ className, children, disabled, ...props }: DropdownMenuRadioItemProps) {
   return (
     <MotionHighlightItem disabled={disabled}>
       <DropdownMenuPrimitive.RadioItem
@@ -334,7 +339,7 @@ type DropdownMenuLabelProps = React.ComponentProps<typeof DropdownMenuPrimitive.
   inset?: boolean;
 };
 
-function DropdownMenuLabel({ className, inset, ...props }: DropdownMenuLabelProps) {
+function _DropdownMenuLabel({ className, inset, ...props }: DropdownMenuLabelProps) {
   return (
     <DropdownMenuPrimitive.GroupLabel
       data-slot='dropdown-menu-label'
@@ -351,7 +356,7 @@ function DropdownMenuLabel({ className, inset, ...props }: DropdownMenuLabelProp
 
 type DropdownMenuSeparatorProps = React.ComponentProps<typeof DropdownMenuPrimitive.Separator>;
 
-function DropdownMenuSeparator({ className, ...props }: DropdownMenuSeparatorProps) {
+function _DropdownMenuSeparator({ className, ...props }: DropdownMenuSeparatorProps) {
   return (
     <DropdownMenuPrimitive.Separator
       data-slot='dropdown-menu-separator'
@@ -363,7 +368,7 @@ function DropdownMenuSeparator({ className, ...props }: DropdownMenuSeparatorPro
 
 type DropdownMenuShortcutProps = React.ComponentProps<'span'>;
 
-function DropdownMenuShortcut({ className, ...props }: DropdownMenuShortcutProps) {
+function _DropdownMenuShortcut({ className, ...props }: DropdownMenuShortcutProps) {
   return (
     <span
       data-slot='dropdown-menu-shortcut'
@@ -373,35 +378,4 @@ function DropdownMenuShortcut({ className, ...props }: DropdownMenuShortcutProps
   );
 }
 
-export {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  type DropdownMenuCheckboxItemProps,
-  DropdownMenuContent,
-  type DropdownMenuContentProps,
-  DropdownMenuGroup,
-  type DropdownMenuGroupProps,
-  DropdownMenuItem,
-  type DropdownMenuItemProps,
-  DropdownMenuLabel,
-  type DropdownMenuLabelProps,
-  DropdownMenuPortal,
-  type DropdownMenuPortalProps,
-  type DropdownMenuProps,
-  DropdownMenuRadioGroup,
-  type DropdownMenuRadioGroupProps,
-  DropdownMenuRadioItem,
-  type DropdownMenuRadioItemProps,
-  DropdownMenuSeparator,
-  type DropdownMenuSeparatorProps,
-  DropdownMenuShortcut,
-  type DropdownMenuShortcutProps,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  type DropdownMenuSubContentProps,
-  type DropdownMenuSubProps,
-  DropdownMenuSubTrigger,
-  type DropdownMenuSubTriggerProps,
-  DropdownMenuTrigger,
-  type DropdownMenuTriggerProps,
-};
+export { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger };

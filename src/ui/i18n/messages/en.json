@@ -385,7 +385,11 @@
       "holidays": "Public holidays",
       "vacationDays": "Vacation days",
       "dayOff": "Vacation day",
-      "generatedOn": "Generated on"
+      "generatedOn": "Generated on",
+      "successTitle": "PDF downloaded",
+      "successDescription": "Your calendar has been exported successfully.",
+      "errorTitle": "Download failed",
+      "errorDescription": "Could not generate the PDF. Please try again."
     }
   },
   "ptoStatus": {

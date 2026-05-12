@@ -7,7 +7,7 @@ function Drawer({ shouldScaleBackground = false, ...props }: React.ComponentProp
   return <DrawerPrimitive.Root shouldScaleBackground={shouldScaleBackground} data-slot='drawer' {...props} />;
 }
 
-function DrawerTrigger({ className, ...props }: React.ComponentProps<typeof DrawerPrimitive.Trigger>) {
+function _DrawerTrigger({ className, ...props }: React.ComponentProps<typeof DrawerPrimitive.Trigger>) {
   return <DrawerPrimitive.Trigger data-slot='drawer-trigger' className={cn('cursor-pointer', className)} {...props} />;
 }
 
@@ -15,7 +15,7 @@ function DrawerPortal(props: React.ComponentProps<typeof DrawerPrimitive.Portal>
   return <DrawerPrimitive.Portal data-slot='drawer-portal' {...props} />;
 }
 
-function DrawerClose(props: React.ComponentProps<typeof DrawerPrimitive.Close>) {
+function _DrawerClose(props: React.ComponentProps<typeof DrawerPrimitive.Close>) {
   return <DrawerPrimitive.Close data-slot='drawer-close' {...props} />;
 }
 
@@ -57,8 +57,8 @@ function DrawerTitle({ className, ...props }: React.ComponentProps<typeof Drawer
   return <DrawerPrimitive.Title data-slot='drawer-title' className={cn('sr-only', className)} {...props} />;
 }
 
-function DrawerDescription({ className, ...props }: React.ComponentProps<typeof DrawerPrimitive.Description>) {
+function _DrawerDescription({ className, ...props }: React.ComponentProps<typeof DrawerPrimitive.Description>) {
   return <DrawerPrimitive.Description data-slot='drawer-description' className={cn('sr-only', className)} {...props} />;
 }
 
-export { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger };
+export { Drawer, DrawerContent, DrawerTitle };

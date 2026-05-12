@@ -1,10 +1,9 @@
 'use client';
 
 import { Progress as ProgressPrimitive } from '@base-ui/react/progress';
-import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { getStrictContext } from '@ui/utils/context';
 import { cn } from '@ui/utils/utils';
-import { type HTMLMotionProps, m, motion } from 'motion/react';
+import { type HTMLMotionProps, m } from 'motion/react';
 import type { ComponentProps } from 'react';
 
 type ProgressContextType = { value: number };
@@ -22,7 +21,7 @@ function Progress({ value, children, ...props }: ProgressProps) {
   );
 }
 
-const MotionIndicator = motion.create(ProgressPrimitive.Indicator);
+const MotionIndicator = m.create(ProgressPrimitive.Indicator);
 
 type ProgressTrackProps = ComponentProps<typeof ProgressPrimitive.Track> & {
   indicatorClassName?: string;
@@ -54,18 +53,6 @@ function ProgressTrack({
         transition={transition}
       />
     </ProgressPrimitive.Track>
-  );
-}
-
-type ProgressLabelProps = ComponentProps<typeof ProgressPrimitive.Label>;
-
-function ProgressLabel({ className, ...props }: ProgressLabelProps) {
-  return (
-    <ProgressPrimitive.Label
-      data-slot='progress-label'
-      className={cn('text-sm font-mono font-black uppercase tracking-[0.06em] text-foreground', className)}
-      {...props}
-    />
   );
 }
 
@@ -111,43 +98,4 @@ function ProgressOverlayLabel({
   );
 }
 
-type ProgressValueProps = Omit<ComponentProps<typeof ProgressPrimitive.Value>, 'render'> & {
-  className?: string;
-  suffix?: string;
-};
-
-function ProgressValue({ className, suffix = '%', ...props }: ProgressValueProps) {
-  const { value } = useProgressContext();
-
-  return (
-    <ProgressPrimitive.Value
-      data-slot='progress-value'
-      render={
-        <m.span
-          className={cn(
-            'inline-flex items-baseline gap-0.5 text-sm font-mono font-black tabular-nums text-foreground',
-            className
-          )}
-        >
-          <SlidingNumber number={Math.round(value)} />
-          <span className='text-xs text-muted-foreground'>{suffix}</span>
-        </m.span>
-      }
-      {...props}
-    />
-  );
-}
-
-export {
-  Progress,
-  ProgressLabel,
-  type ProgressLabelProps,
-  ProgressOverlayLabel,
-  type ProgressOverlayLabelProps,
-  type ProgressProps,
-  ProgressTrack,
-  type ProgressTrackProps,
-  ProgressValue,
-  type ProgressValueProps,
-  useProgressContext,
-};
+export { Progress, ProgressOverlayLabel, ProgressTrack };

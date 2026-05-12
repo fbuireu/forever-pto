@@ -48,12 +48,12 @@ export const CalendarSelectionMode = {
 
 export type CalendarSelectionMode = (typeof CalendarSelectionMode)[keyof typeof CalendarSelectionMode];
 
-export const RangeSelection = {
+const RangeSelection = {
   FROM: 'from',
   TO: 'to',
 } as const;
 
-export type RangeSelection = (typeof RangeSelection)[keyof typeof RangeSelection];
+type RangeSelection = (typeof RangeSelection)[keyof typeof RangeSelection];
 
 interface CalendarProps {
   mode?: CalendarSelectionMode;
@@ -85,6 +85,9 @@ interface RangeState {
   selecting: RangeSelection;
 }
 
+const EMPTY_ALTERNATIVES: HolidaysState['alternatives'] = [];
+const EMPTY_DATES: Date[] = [];
+
 export function Calendar({
   mode = CalendarSelectionMode.SINGLE,
   selected,
@@ -100,11 +103,11 @@ export function Calendar({
   holidays,
   allowPastDays = true,
   currentSelection,
-  alternatives = [],
+  alternatives = EMPTY_ALTERNATIVES,
   suggestion,
   previewAlternativeIndex = -1,
-  manuallySelectedDays = [],
-  removedSuggestedDays = [],
+  manuallySelectedDays = EMPTY_DATES,
+  removedSuggestedDays = EMPTY_DATES,
   onDayToggle,
   canSelectMoreDays = true,
   ...props
@@ -391,13 +394,13 @@ export function Calendar({
                   type='button'
                   size='sm'
                   onClick={handlePreviousMonth}
-                  className='h-8 w-8 p-0 bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none'
+                  className='size-8 p-0 bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none'
                   aria-label={tCalendar('previousMonth')}
                 >
-                  <ChevronLeft className='h-4 w-4' />
+                  <ChevronLeft className='size-4' />
                 </Button>
               </AnimateIcon>
-              <h3 className='text-sm font-black'>
+              <h3 className='text-sm font-semibold'>
                 {monthLabel} <span className='font-serif'>{yearLabel}</span>
               </h3>
             </div>
@@ -423,21 +426,21 @@ export function Calendar({
                   type='button'
                   size='sm'
                   onClick={handleNextMonth}
-                  className='h-8 w-8 p-0 bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none'
+                  className='size-8 p-0 bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none'
                   aria-label={tCalendar('nextMonth')}
                 >
-                  <ChevronRight className='h-4 w-4' />
+                  <ChevronRight className='size-4' />
                 </Button>
               </AnimateIcon>
             </div>
           </>
         ) : (
           <div className='flex items-center justify-between w-full'>
-            <h3 className='text-sm font-black'>
+            <h3 className='text-sm font-semibold'>
               {monthLabel} <span className='font-serif'>{yearLabel}</span>
             </h3>
             {monthFreeDays > 0 && (
-              <span className='text-xs font-black text-muted-foreground tabular-nums'>
+              <span className='text-xs font-semibold text-muted-foreground tabular-nums'>
                 {tCalendar('daysOff', { count: monthFreeDays })}
               </span>
             )}
@@ -449,7 +452,7 @@ export function Calendar({
         {weekdayNames.map((day) => (
           <div
             key={day}
-            className='h-8 w-8 flex items-center justify-center text-[0.68rem] font-black uppercase tracking-[0.08em] text-muted-foreground'
+            className='size-8 flex items-center justify-center text-[0.68rem] font-black uppercase tracking-[0.08em] text-muted-foreground'
           >
             {day}
           </div>
@@ -468,7 +471,7 @@ export function Calendar({
           const isOutsideMonth = !isSameMonth(date, currentMonth);
 
           if (!showOutsideDays && isOutsideMonth) {
-            return <div key={date.toISOString()} className='h-8 w-8' />;
+            return <div key={date.toISOString()} className='size-8' />;
           }
 
           const holidayName = holidaysMap.get(date.toDateString());
@@ -484,7 +487,7 @@ export function Calendar({
           });
 
           return (
-            <div key={date.toISOString()} className='relative h-8 w-8 p-0'>
+            <div key={date.toISOString()} className='relative size-8 p-0'>
               <ConditionalWrapper
                 doWrap={!!holidayName}
                 wrapper={(children) => (

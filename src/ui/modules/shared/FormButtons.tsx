@@ -39,7 +39,7 @@ export const FormButtons = ({
       <Button type='submit' disabled={isPending} className={cn(submitClassName ?? 'flex-1')} variant={submitVariant}>
         {isPending ? (
           <>
-            <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+            <Loader2 className='size-4 mr-2 animate-spin' />
             {resolvedLoadingText}
           </>
         ) : (

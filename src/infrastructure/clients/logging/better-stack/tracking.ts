@@ -4,7 +4,7 @@ declare global {
   }
 }
 
-export type TrackEventName =
+type TrackEventName =
   | 'payment_started'
   | 'payment_completed'
   | 'payment_failed'
@@ -15,7 +15,7 @@ export type TrackEventName =
   | 'planner_generated'
   | 'contact_form_submitted';
 
-export interface TrackProperties {
+interface TrackProperties {
   [key: string]: unknown;
 }
 

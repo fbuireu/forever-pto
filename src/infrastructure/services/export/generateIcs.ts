@@ -29,7 +29,7 @@ function buildEvent({ uid, start, summary, categories }: IcsEvent): string {
   ].join('\r\n');
 }
 
-export interface GenerateIcsOptions {
+interface GenerateIcsOptions {
   year: number;
   calendarName: string;
   ptoDayLabel: string;

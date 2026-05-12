@@ -136,4 +136,4 @@ function Lock(props: LockProps) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export { animations, Lock, Lock as LockIcon, type LockProps as LockIconProps, type LockProps };
+export { Lock };
