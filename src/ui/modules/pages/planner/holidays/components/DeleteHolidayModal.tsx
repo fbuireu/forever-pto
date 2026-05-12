@@ -3,6 +3,8 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+
+const logger = getBetterStackInstance();
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Trash2 } from '@ui/modules/core/animate/icons/Trash2';
 import { Button } from '@ui/modules/core/primitives/Button';
@@ -49,7 +51,7 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
 
         onClose();
       } catch (error) {
-        getBetterStackInstance().logError('Error deleting holiday', error, { component: 'DeleteHolidayModal' });
+        logger.logError('Error deleting holiday', error, { component: 'DeleteHolidayModal' });
         toast.error(t('errorTitle'), {
           description: t('errorDescription'),
         });
