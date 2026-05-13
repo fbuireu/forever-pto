@@ -1,4 +1,5 @@
 @custom-variant dark (&:is([data-theme="dark"] *));
+@custom-variant hover (&:hover);
 
 @theme inline {
   --color-background: var(--background);
