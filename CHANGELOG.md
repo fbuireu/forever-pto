@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/fbuireu/forever-pto/compare/v1.3.2...v1.3.3) (2026-05-14)
+
+
+### Bug Fixes
+
+* marquee speed ([bfc6ba5](https://github.com/fbuireu/forever-pto/commit/bfc6ba5745a85b8ad0feb4dac22ef9d86b358b40))
+
 ## [1.3.2](https://github.com/fbuireu/forever-pto/compare/v1.3.1...v1.3.2) (2026-05-14)
 
 
