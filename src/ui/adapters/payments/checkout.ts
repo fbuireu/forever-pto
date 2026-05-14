@@ -2,6 +2,7 @@ import type { CreatePaymentInput } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { createPaymentAction } from '@infrastructure/actions/payment';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { PaymentError } from '@infrastructure/errors';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
 import { Effect } from 'effect';
 
@@ -14,7 +15,7 @@ export const initializePayment = async (params: CreatePaymentInput): Promise<Ini
   const result = await createPaymentAction(params);
 
   if (!result.success) {
-    throw new Error(result.error);
+    throw new PaymentError({ message: result.error ?? 'Payment initialization failed' });
   }
 
   return {
