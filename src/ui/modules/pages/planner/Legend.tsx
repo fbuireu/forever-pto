@@ -50,18 +50,18 @@ export const Legend = () => {
   const t = useTranslations('legend');
 
   return (
-    <div id='legend-sticky' className={cn(styles.stickyContainer, 'hidden md:block')}>
+    <div id='legend-sticky' className={cn(styles.sticky_container, 'hidden md:block')}>
       <input type='checkbox' id='legend-toggle' className={styles.toggle} />
       <section className={styles.section}>
         <Card className={styles.card}>
-          <CardHeader className={styles.cardHeader}>
-            <CardTitle className={styles.cardTitle}>{t('title')}</CardTitle>
-            <label htmlFor='legend-toggle' className={styles.toggleLabel}>
-              <span className={styles.showLabel}>{t('showLegend')}</span>
-              <span className={styles.hideLabel}>{t('hideLegend')}</span>
+          <CardHeader className={styles.card_header}>
+            <CardTitle className={styles.card_title}>{t('title')}</CardTitle>
+            <label htmlFor='legend-toggle' className={styles.toggle_label}>
+              <span className={styles.show_label}>{t('showLegend')}</span>
+              <span className={styles.hide_label}>{t('hideLegend')}</span>
             </label>
           </CardHeader>
-          <CardContent className={styles.cardContent}>
+          <CardContent className={styles.card_content}>
             <LegendItems className={styles.items} itemClassName={styles.item} />
           </CardContent>
         </Card>

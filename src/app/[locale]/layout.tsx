@@ -7,37 +7,11 @@ import '@styles/index.css';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { Analytics } from '@ui/modules/tutorial/Analytics';
 import { BetterStackTracking } from '@ui/modules/tutorial/BetterStackTracking';
-import { Bricolage_Grotesque, Instrument_Serif, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
+import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
 import { notFound } from 'next/navigation';
 import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { ThemeProvider } from 'next-themes';
-
-const bricolage = Bricolage_Grotesque({
-  variable: '--font-bricolage',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: '--font-space-grotesk',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-const instrumentSerif = Instrument_Serif({
-  variable: '--font-instrument-serif',
-  subsets: ['latin'],
-  weight: '400',
-  style: ['normal', 'italic'],
-  display: 'swap',
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: '--font-jetbrains-mono',
-  subsets: ['latin'],
-  display: 'swap',
-});
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -64,24 +38,21 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
           spaceGrotesk.variable,
           instrumentSerif.variable,
           jetbrainsMono.variable,
-          'font-sans antialiased'
-        )}
-      >
+          'font-sans antialiased',
+        )}>
         <a
           href='#main-content'
-          className='sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-3 focus:py-1.5 focus:text-sm focus:bg-background focus:text-foreground focus:border focus:rounded-md focus:shadow-sm'
-        >
+          className='sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-3 focus:py-1.5 focus:text-sm focus:bg-background focus:text-foreground focus:border focus:rounded-md focus:shadow-sm'>
           Skip to main content
         </a>
         <BonesProvider />
         <NextIntlClientProvider>
           <ThemeProvider
             attribute='data-theme'
-            defaultTheme='system'
+            defaultTheme='light'
             storageKey='theme'
             enableSystem
-            disableTransitionOnChange
-          >
+            disableTransitionOnChange>
             <LazyMotionProvider>
               {children}
               <CookieConsentClient />

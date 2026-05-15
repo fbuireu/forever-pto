@@ -49,7 +49,6 @@ export default HomePage;
 // better stack not working properly
 // todo: focus input order in stripe
 // todo: new logo stripe
-// todo: implement animateIcon (check 4-6 components todo)
 // todo: status pages localized
 // todo: all butons (border color to show shadow?)
 // todo: improve responsive
@@ -59,7 +58,7 @@ export default HomePage;
 // todo: sponsor the project (reddit, producthunt)
 // todo: performance audit, react best practices audit
 // todo: ads?
-// todo: add LICENCE, SECURITY, DOCS, WIKI, etc
+// todo: add LICENCE, SECURITY, DOCS (astro starlight), WIKI, etc
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
 // todo: unify component and folder structure (payment/provider should be dto?)
 // todo: Increase test coverage

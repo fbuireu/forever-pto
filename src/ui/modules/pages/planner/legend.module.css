@@ -1,4 +1,4 @@
-.stickyContainer {
+.sticky_container {
   container-type: scroll-state;
   container-name: pto-legend;
   position: sticky;
@@ -14,7 +14,7 @@
   pointer-events: none;
 }
 
-.toggleLabel {
+.toggle_label {
   display: none;
   cursor: pointer;
   font-size: var(--text-sm);
@@ -30,23 +30,23 @@
     transform 150ms ease-in-out,
     background-color 150ms ease-in-out;
   user-select: none;
+
+  &:hover {
+    box-shadow: var(--shadow-brutal-sm);
+    transform: translate(-1px, -1px);
+  }
+
+  &:active {
+    box-shadow: none;
+    transform: translate(1px, 1px);
+  }
 }
 
-.toggleLabel:hover {
-  box-shadow: var(--shadow-brutal-sm);
-  transform: translate(-1px, -1px);
-}
-
-.toggleLabel:active {
-  box-shadow: none;
-  transform: translate(1px, 1px);
-}
-
-.showLabel {
+.show_label {
   display: inline;
 }
 
-.hideLabel {
+.hide_label {
   display: none;
 }
 
@@ -72,14 +72,14 @@
     box-shadow 300ms ease-in-out;
 }
 
-.cardHeader {
+.card_header {
   text-align: center;
   transition:
     padding-top 300ms ease-in-out,
     padding-bottom 300ms ease-in-out;
 }
 
-.cardTitle {
+.card_title {
   font-size: var(--text-3xl);
   line-height: calc(var(--spacing) * 9);
   font-weight: 700;
@@ -88,7 +88,7 @@
     line-height 300ms ease-in-out;
 }
 
-.cardContent {
+.card_content {
   transition:
     padding-top 300ms ease-in-out,
     padding-bottom 300ms ease-in-out;
@@ -137,22 +137,22 @@
       box-shadow: var(--shadow-lg);
     }
 
-    .cardHeader {
+    .card_header {
       padding-block: 0;
     }
 
-    .cardTitle {
+    .card_title {
       font-size: 0;
       line-height: 0;
       overflow: hidden;
       height: 0;
     }
 
-    .toggleLabel {
+    .toggle_label {
       display: inline-block;
     }
 
-    .cardContent {
+    .card_content {
       display: grid;
       grid-template-rows: 0fr;
       transition: grid-template-rows 200ms ease-in-out;
@@ -176,45 +176,31 @@
   /* When checked while stuck: expand + stagger items */
   .toggle:checked ~ .section {
     @container pto-legend scroll-state(stuck: bottom) {
-      .cardContent {
+      .card_content {
         grid-template-rows: 1fr;
         padding-top: calc(var(--spacing) * 2);
         padding-bottom: calc(var(--spacing) * 2);
         overflow: visible;
       }
 
-      .showLabel {
+      .show_label {
         display: none;
       }
 
-      .hideLabel {
+      .hide_label {
         display: inline;
       }
 
       .item {
         animation: legendItemIn 120ms ease-out forwards;
-      }
 
-      .item:nth-child(1) {
-        animation-delay: 0ms;
-      }
-      .item:nth-child(2) {
-        animation-delay: 30ms;
-      }
-      .item:nth-child(3) {
-        animation-delay: 60ms;
-      }
-      .item:nth-child(4) {
-        animation-delay: 90ms;
-      }
-      .item:nth-child(5) {
-        animation-delay: 120ms;
-      }
-      .item:nth-child(6) {
-        animation-delay: 150ms;
-      }
-      .item:nth-child(7) {
-        animation-delay: 180ms;
+        &:nth-child(1) { animation-delay: 0ms; }
+        &:nth-child(2) { animation-delay: 30ms; }
+        &:nth-child(3) { animation-delay: 60ms; }
+        &:nth-child(4) { animation-delay: 90ms; }
+        &:nth-child(5) { animation-delay: 120ms; }
+        &:nth-child(6) { animation-delay: 150ms; }
+        &:nth-child(7) { animation-delay: 180ms; }
       }
     }
   }
