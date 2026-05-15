@@ -1,3 +1,10 @@
+## [1.3.4](https://github.com/fbuireu/forever-pto/compare/v1.3.3...v1.3.4) (2026-05-15)
+
+
+### Bug Fixes
+
+* seo redirect ([d147561](https://github.com/fbuireu/forever-pto/commit/d147561fda34e08920702e05b213a64775c43e5e))
+
 ## [1.3.3](https://github.com/fbuireu/forever-pto/compare/v1.3.2...v1.3.3) (2026-05-14)
 
 
