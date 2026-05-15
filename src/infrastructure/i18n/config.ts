@@ -1,4 +1,5 @@
 import { routing } from '@infrastructure/i18n/routing';
+import { LOCALES } from './locales';
 import { hasLocale } from 'next-intl';
 import { getRequestConfig } from 'next-intl/server';
 
@@ -8,7 +9,7 @@ export const LOCALE_COOKIE = 'NEXT_LOCALE';
 
 export default getRequestConfig(async ({ requestLocale }) => {
   const requested = await requestLocale;
-  const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
+  const locale = hasLocale(LOCALES, requested) ? requested : routing.defaultLocale;
 
   return {
     locale,
