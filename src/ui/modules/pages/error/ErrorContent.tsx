@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { version } from '../../../../../package.json';
+import type { ErrorBoundaryProps } from './types';
 
 const ContactModal = dynamic(() =>
   import('@ui/modules/shared/contact/ContactModal').then((m) => ({ default: m.ContactModal }))
@@ -17,10 +18,7 @@ const STATUS_URL = 'https://status.forever-pto.com';
 const CHANGELOG_URL = 'https://github.com/fbuireu/forever-pto/releases';
 const SUPPORT_URL = 'https://github.com/fbuireu/forever-pto/issues/new?template=bug_report.yml';
 
-interface ErrorContentProps {
-  error: Error & { digest?: string };
-  reset: () => void;
-}
+type ErrorContentProps = ErrorBoundaryProps;
 
 type LogLevel = 'INFO' | 'WARN' | 'ERROR' | 'OK';
 

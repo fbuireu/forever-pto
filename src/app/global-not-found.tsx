@@ -1,33 +1,28 @@
 import '@styles/index.css';
-
 import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
 import { LOCALE_COOKIE } from '@infrastructure/i18n/config';
 import { routing } from '@infrastructure/i18n/routing';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { NotFoundContent } from '@ui/modules/pages/not-found/NotFoundContent';
 import { cn } from '@ui/utils/utils';
-import { type Locale, NextIntlClientProvider } from 'next-intl';
+import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
-import { ThemeProvider } from 'next-themes';
+import { AppThemeProvider } from '@ui/modules/providers/AppThemeProvider';
 import { cookies, headers } from 'next/headers';
 
 async function detectLocale(): Promise<Locale> {
   const [headersList, cookieStore] = await Promise.all([headers(), cookies()]);
 
   const intlLocale = headersList.get('x-next-intl-locale');
-  if (intlLocale && routing.locales.includes(intlLocale)) {
-    return intlLocale;
-  }
+  if (hasLocale(routing.locales, intlLocale)) return intlLocale;
 
   const cookieLocale = cookieStore.get(LOCALE_COOKIE)?.value;
-  if (cookieLocale && routing.locales.includes(cookieLocale)) {
-    return cookieLocale;
-  }
+  if (hasLocale(routing.locales, cookieLocale)) return cookieLocale;
 
   const acceptLang = headersList.get('accept-language') ?? '';
   for (const tag of acceptLang.split(',')) {
     const lang = tag.split(';')[0].trim().split('-')[0].toLowerCase();
-    if (routing.locales.includes(lang)) return lang;
+    if (hasLocale(routing.locales, lang)) return lang;
   }
 
   return routing.defaultLocale;
@@ -53,16 +48,11 @@ export default async function GlobalNotFound() {
           Skip to main content
         </a>
         <NextIntlClientProvider>
-          <ThemeProvider
-            attribute='data-theme'
-            defaultTheme='light'
-            storageKey='theme'
-            enableSystem
-            disableTransitionOnChange>
+          <AppThemeProvider>
             <LazyMotionProvider>
               <NotFoundContent locale={locale} />
             </LazyMotionProvider>
-          </ThemeProvider>
+          </AppThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>
