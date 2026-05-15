@@ -9,13 +9,13 @@ export const Marquee = async () => {
       aria-hidden='true'
     >
       <div
-        className='flex gap-10 whitespace-nowrap font-display font-bold text-[22px] uppercase tracking-[0.06em] [--marquee-duration:4s] md:[--marquee-duration:30s] animate-[marquee_var(--marquee-duration)_linear_infinite]'
+        className='flex whitespace-nowrap font-display font-bold text-[22px] uppercase tracking-[0.06em] will-change-transform [--marquee-duration:4s] md:[--marquee-duration:30s] animate-[marquee_var(--marquee-duration)_linear_infinite]'
       >
         {[0, 1].flatMap((rep) =>
           t('marquee.items')
             .split(' · ')
             .map((text) => (
-              <span key={`${rep}-${text}`} className='inline-flex items-center gap-3.5'>
+              <span key={`${rep}-${text}`} className='inline-flex items-center gap-3.5 pr-10'>
                 {text}
                 <span className='text-[var(--accent)] text-sm'>★</span>
               </span>

@@ -9,7 +9,7 @@ const CDN_TRACE = 'cdn-cgi/trace';
 const detectCountryFromCDNEffect = Effect.gen(function* () {
   const { env } = yield* Effect.tryPromise(() => getCloudflareContext({ async: true }));
   const response = yield* Effect.tryPromise(() =>
-    fetch(`${env.NEXT_PUBLIC_SITE_URL}/${CDN_TRACE}`, { cache: 'force-cache' })
+    fetch(`${env.NEXT_PUBLIC_SITE_URL}/${CDN_TRACE}`, { cache: 'force-cache', signal: AbortSignal.timeout(5000) })
   );
 
   if (!response.ok) {

@@ -7,10 +7,7 @@
     contain-intrinsic-size: auto 800px;
   }
   html {
-    scroll-behavior: smooth;
-    scrollbar-gutter: stable;
-    scrollbar-color: var(--foreground) var(--muted);
-    scrollbar-width: thin;
+    @apply scroll-smooth scrollbar-thin scrollbar-thumb-(--foreground) scrollbar-track-(--muted) scrollbar-gutter-stable;
   }
   body {
     @apply bg-background text-foreground;
