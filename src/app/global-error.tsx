@@ -8,9 +8,10 @@ import { ErrorContent } from '@ui/modules/pages/error/ErrorContent';
 import { cn } from '@ui/utils/utils';
 import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
 import { NextIntlClientProvider } from 'next-intl';
-import { ThemeProvider } from 'next-themes';
+import { AppThemeProvider } from '@ui/modules/providers/AppThemeProvider';
+import type { ErrorBoundaryProps } from '@ui/modules/pages/error/types';
 
-export default function GlobalError({ error, reset }: Readonly<{ error: Error & { digest?: string }; reset: () => void }>) {
+export default function GlobalError({ error, reset }: ErrorBoundaryProps) {
   return (
     <html lang='en' suppressHydrationWarning>
       <body
@@ -23,19 +24,13 @@ export default function GlobalError({ error, reset }: Readonly<{ error: Error & 
         )}
       >
         <NextIntlClientProvider locale='en' messages={enMessages}>
-          <ThemeProvider
-            attribute='data-theme'
-            defaultTheme='light'
-            storageKey='theme'
-            enableSystem
-            disableTransitionOnChange
-          >
+          <AppThemeProvider>
             <LazyMotionProvider>
               <div className='min-h-screen flex flex-col text-foreground bg-background'>
                 <ErrorContent error={error} reset={reset} />
               </div>
             </LazyMotionProvider>
-          </ThemeProvider>
+          </AppThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>

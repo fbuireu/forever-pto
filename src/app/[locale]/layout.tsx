@@ -11,7 +11,7 @@ import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fo
 import { notFound } from 'next/navigation';
 import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
-import { ThemeProvider } from 'next-themes';
+import { AppThemeProvider } from '@ui/modules/providers/AppThemeProvider';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -47,17 +47,12 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
         </a>
         <BonesProvider />
         <NextIntlClientProvider>
-          <ThemeProvider
-            attribute='data-theme'
-            defaultTheme='light'
-            storageKey='theme'
-            enableSystem
-            disableTransitionOnChange>
+          <AppThemeProvider>
             <LazyMotionProvider>
               {children}
               <CookieConsentClient />
             </LazyMotionProvider>
-          </ThemeProvider>
+          </AppThemeProvider>
         </NextIntlClientProvider>
         <WebMCP />
         <Analytics />
