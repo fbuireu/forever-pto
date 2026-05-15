@@ -1,3 +1,10 @@
+## [1.3.5](https://github.com/fbuireu/forever-pto/compare/v1.3.4...v1.3.5) (2026-05-15)
+
+
+### Bug Fixes
+
+* marquee wrapper ([6aa9c6e](https://github.com/fbuireu/forever-pto/commit/6aa9c6ee8ec9dd771fb4f62087e0136c2b3e4faa))
+
 ## [1.3.4](https://github.com/fbuireu/forever-pto/compare/v1.3.3...v1.3.4) (2026-05-15)
 
 
