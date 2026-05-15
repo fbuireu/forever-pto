@@ -26,7 +26,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
   if (!handler) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const { env } = await getCloudflareContext({ async: true });
-  const baseUrl = env.NEXT_PUBLIC_SITE_URL ?? 'https://forever-pto.com';
+  const baseUrl = env.NEXT_PUBLIC_SITE_URL;
 
   return handler(baseUrl);
 }

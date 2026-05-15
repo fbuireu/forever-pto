@@ -850,7 +850,8 @@
     "planner": "Planificateur"
   },
   "accessibility": {
-    "selectLanguage": "Sélectionner la langue, actuelle : {current}"
+    "selectLanguage": "Sélectionner la langue, actuelle : {current}",
+    "skipToMainContent": "Aller au contenu principal"
   },
   "formButtons": {
     "submit": "Envoyer",

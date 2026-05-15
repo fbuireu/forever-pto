@@ -850,7 +850,8 @@
     "planner": "Planner"
   },
   "accessibility": {
-    "selectLanguage": "Select language, current: {current}"
+    "selectLanguage": "Select language, current: {current}",
+    "skipToMainContent": "Skip to main content"
   },
   "formButtons": {
     "submit": "Submit",

@@ -2,6 +2,7 @@ import type { PremiumSessionData } from '@application/dto/premium/types';
 import { SessionError } from '@infrastructure/errors';
 import { Effect } from 'effect';
 import { jwtVerify, SignJWT } from 'jose';
+import { SESSION_DURATION_SECONDS } from './config';
 
 const getJWTSecret = () => {
   const secret = process.env.JWT_SECRET;
@@ -15,7 +16,7 @@ export const createSession = (data: PremiumSessionData): Effect.Effect<string, S
       new SignJWT({ email: data.email, paymentIntentId: data.paymentIntentId })
         .setProtectedHeader({ alg: 'HS256' })
         .setIssuedAt()
-        .setExpirationTime('30d')
+        .setExpirationTime(Math.floor(Date.now() / 1000) + SESSION_DURATION_SECONDS)
         .sign(getJWTSecret()),
     catch: (error) =>
       new SessionError({

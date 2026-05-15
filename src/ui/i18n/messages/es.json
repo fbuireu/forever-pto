@@ -850,7 +850,8 @@
     "planner": "Calculadora"
   },
   "accessibility": {
-    "selectLanguage": "Seleccionar idioma, actual: {current}"
+    "selectLanguage": "Seleccionar idioma, actual: {current}",
+    "skipToMainContent": "Ir al contenido principal"
   },
   "formButtons": {
     "submit": "Enviar",

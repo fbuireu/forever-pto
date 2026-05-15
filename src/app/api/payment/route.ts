@@ -1,4 +1,5 @@
 import { createPayment } from '@application/use-cases/payment';
+import { ApiError } from '@infrastructure/api/errors';
 import { AppLayer } from '@infrastructure/layers';
 import { checkRateLimit } from '@infrastructure/services/payments/rate-limit';
 import { Effect } from 'effect';
@@ -22,14 +23,14 @@ export async function POST(request: NextRequest) {
       Effect.provide(AppLayer),
       Effect.catchTags({
         RateLimitError: () =>
-          Effect.succeed(NextResponse.json({ success: false, error: 'Too many requests' }, { status: 429 })),
+          Effect.succeed(NextResponse.json({ success: false, error: ApiError.RATE_LIMIT_EXCEEDED }, { status: 429 })),
         ValidationError: (e) =>
           Effect.succeed(NextResponse.json({ success: false, error: e.message }, { status: 400 })),
         PromoCodeError: (e) => Effect.succeed(NextResponse.json({ success: false, error: e.message }, { status: 400 })),
-        PaymentError: (e) => Effect.succeed(NextResponse.json({ success: false, error: e.message }, { status: 500 })),
+        PaymentError: () => Effect.succeed(NextResponse.json({ success: false, error: ApiError.INTERNAL_ERROR }, { status: 500 })),
       }),
       Effect.catchAll(() =>
-        Effect.succeed(NextResponse.json({ success: false, error: 'Internal error' }, { status: 500 }))
+        Effect.succeed(NextResponse.json({ success: false, error: ApiError.INTERNAL_ERROR }, { status: 500 }))
       )
     )
   );

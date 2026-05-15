@@ -1,3 +1,4 @@
+import { ApiError } from '@infrastructure/api/errors';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
 import { AppLayer } from '@infrastructure/layers';
 import { processWebhookEvent } from '@infrastructure/webhooks/processor';
@@ -10,7 +11,7 @@ export async function POST(request: NextRequest) {
   const signature = headersList.get('stripe-signature');
 
   if (!signature) {
-    return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
+    return NextResponse.json({ error: ApiError.MISSING_SIGNATURE }, { status: 400 });
   }
 
   return Effect.runPromise(
@@ -24,12 +25,12 @@ export async function POST(request: NextRequest) {
       Effect.catchTag('WebhookError', (e) =>
         Effect.succeed(
           NextResponse.json(
-            { error: e.isSignatureError ? 'Invalid signature' : 'Webhook processing failed' },
+            { error: e.isSignatureError ? ApiError.INVALID_SIGNATURE : ApiError.WEBHOOK_PROCESSING_FAILED },
             { status: e.isSignatureError ? 400 : 500 }
           )
         )
       ),
-      Effect.catchAll(() => Effect.succeed(NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 })))
+      Effect.catchAll(() => Effect.succeed(NextResponse.json({ error: ApiError.WEBHOOK_PROCESSING_FAILED }, { status: 500 })))
     )
   );
 }
