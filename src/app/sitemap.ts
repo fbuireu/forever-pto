@@ -3,10 +3,12 @@ import { localePath } from '@infrastructure/i18n/url';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import type { MetadataRoute } from 'next';
 
-const ROUTES = [
+type Route = Pick<MetadataRoute.Sitemap[number], 'changeFrequency' | 'priority'> & { path: string };
+
+const ROUTES: Route[] = [
   { path: '', changeFrequency: 'monthly', priority: 1 },
   { path: '/planner', changeFrequency: 'weekly', priority: 0.9 },
-] as const;
+];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { env } = await getCloudflareContext({ async: true });

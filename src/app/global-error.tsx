@@ -6,22 +6,11 @@ import enMessages from '@i18n/messages/en.json';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { ErrorContent } from '@ui/modules/pages/error/ErrorContent';
 import { cn } from '@ui/utils/utils';
-import { Bricolage_Grotesque, Instrument_Serif, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
+import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
 import { NextIntlClientProvider } from 'next-intl';
 import { ThemeProvider } from 'next-themes';
 
-const bricolage = Bricolage_Grotesque({ variable: '--font-bricolage', subsets: ['latin'], display: 'swap' });
-const spaceGrotesk = Space_Grotesk({ variable: '--font-space-grotesk', subsets: ['latin'], display: 'swap' });
-const instrumentSerif = Instrument_Serif({
-  variable: '--font-instrument-serif',
-  subsets: ['latin'],
-  weight: '400',
-  style: ['normal', 'italic'],
-  display: 'swap',
-});
-const jetbrainsMono = JetBrains_Mono({ variable: '--font-jetbrains-mono', subsets: ['latin'], display: 'swap' });
-
-export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function GlobalError({ error, reset }: Readonly<{ error: Error & { digest?: string }; reset: () => void }>) {
   return (
     <html lang='en' suppressHydrationWarning>
       <body
@@ -36,7 +25,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
         <NextIntlClientProvider locale='en' messages={enMessages}>
           <ThemeProvider
             attribute='data-theme'
-            defaultTheme='system'
+            defaultTheme='light'
             storageKey='theme'
             enableSystem
             disableTransitionOnChange
