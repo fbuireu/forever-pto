@@ -53,6 +53,8 @@ describe('sitemap', () => {
 
   it('sets lastModified as a Date', async () => {
     const entries = await sitemap();
-    entries.forEach((entry) => expect(entry.lastModified).toBeInstanceOf(Date));
+    for (const entry of entries) {
+      expect(entry.lastModified).toBeInstanceOf(Date);
+    }
   });
 });

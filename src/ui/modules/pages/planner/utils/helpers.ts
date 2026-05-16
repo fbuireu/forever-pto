@@ -29,10 +29,11 @@ export const getWeekdayNames = ({ locale, weekStartsOn }: GetWeekdayNamesParams)
   const monday = new Date(2023, 0, 2);
   const weekStart = startOfWeek(monday, { weekStartsOn });
   const cacheKey = `${locale}-${weekStartsOn}`;
-  if (!weekdayFmtCache.has(cacheKey)) {
-    weekdayFmtCache.set(cacheKey, new Intl.DateTimeFormat(locale as string, { weekday: 'short' }));
+  let fmt = weekdayFmtCache.get(cacheKey);
+  if (!fmt) {
+    fmt = new Intl.DateTimeFormat(locale as string, { weekday: 'short' });
+    weekdayFmtCache.set(cacheKey, fmt);
   }
-  const fmt = weekdayFmtCache.get(cacheKey)!;
   return Array.from({ length: DAYS_PER_WEEK }, (_, i) => fmt.format(addDays(weekStart, i)));
 };
 
@@ -128,10 +129,11 @@ export const getMonthNames = ({
 }: GetMonthsParamsNames): string[] => {
   const monthNames: string[] = [];
   const cacheKey = `${locale}-${monthOutputFormat}`;
-  if (!monthNameFmtCache.has(cacheKey)) {
-    monthNameFmtCache.set(cacheKey, new Intl.DateTimeFormat(locale, { month: monthOutputFormat }));
+  let fmt = monthNameFmtCache.get(cacheKey);
+  if (!fmt) {
+    fmt = new Intl.DateTimeFormat(locale, { month: monthOutputFormat });
+    monthNameFmtCache.set(cacheKey, fmt);
   }
-  const fmt = monthNameFmtCache.get(cacheKey)!;
   for (let i = 0; i < monthCount; i++) {
     const year = startYear + Math.floor(i / 12);
     const month = i % 12;

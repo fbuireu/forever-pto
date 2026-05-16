@@ -3,18 +3,17 @@ import type { Locale } from 'next-intl';
 const amountFormatterCache = new Map<string, Intl.NumberFormat>();
 
 export const amountFormatter = (locale: Locale) => {
-  if (!amountFormatterCache.has(locale)) {
-    amountFormatterCache.set(
-      locale,
-      new Intl.NumberFormat(locale, {
-        style: 'currency',
-        currency: 'EUR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      })
-    );
+  let formatter = amountFormatterCache.get(locale);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+    amountFormatterCache.set(locale, formatter);
   }
-  return amountFormatterCache.get(locale)!;
+  return formatter;
 };
 
 interface GetCurrencySymbolParams {
@@ -27,18 +26,16 @@ const currencySymbolCache = new Map<string, Intl.NumberFormat>();
 export const getCurrencySymbol = ({ locale, currency }: GetCurrencySymbolParams): string => {
   try {
     const key = `${locale}-${currency}`;
-    if (!currencySymbolCache.has(key)) {
-      currencySymbolCache.set(
-        key,
-        new Intl.NumberFormat(locale, {
-          style: 'currency',
-          currency,
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0,
-        })
-      );
+    let formatter = currencySymbolCache.get(key);
+    if (!formatter) {
+      formatter = new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+      currencySymbolCache.set(key, formatter);
     }
-    const formatter = currencySymbolCache.get(key)!;
     return formatter.formatToParts(0).find(({ type }) => type === 'currency')?.value ?? currency;
   } catch {
     return currency;
