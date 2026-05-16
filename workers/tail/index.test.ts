@@ -59,7 +59,7 @@ describe('tail worker', () => {
     it('sets the Authorization header with the Bearer token', async () => {
       await worker.tail([makeEvent({ logs: [{ message: ['msg'], level: 'info', timestamp: 1700000000000 }] })], ENV);
       const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
-      expect((options.headers as Record<string, string>)['Authorization']).toBe('Bearer token-abc');
+      expect((options.headers as Record<string, string>).Authorization).toBe('Bearer token-abc');
     });
 
     it('sets Content-Type to application/json', async () => {

@@ -7,7 +7,7 @@ const BASE_PROPS = {
   name: 'Alice Smith',
   subject: 'Hello there',
   message: 'This is my message.',
-  baseUrl: process.env.NEXT_PUBLIC_SITE_URL!,
+  baseUrl: process.env.NEXT_PUBLIC_SITE_URL,
 };
 
 const getHtml = (props = BASE_PROPS) => render(ContactFormEmail(props));

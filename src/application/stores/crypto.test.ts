@@ -39,7 +39,7 @@ describe('SSR (no window)', () => {
     vi.stubGlobal('window', undefined);
     const { encryptedStorage } = await import('./crypto');
     expect(encryptedStorage).toBeDefined();
-    storage = encryptedStorage!;
+    storage = encryptedStorage as PersistStorage<unknown>;
   });
 
   it('getItem returns null', () => {
@@ -65,7 +65,7 @@ describe('dev mode', () => {
     vi.stubGlobal('localStorage', mockLocalStorage);
     const { encryptedStorage } = await import('./crypto');
     expect(encryptedStorage).toBeDefined();
-    storage = encryptedStorage!;
+    storage = encryptedStorage as PersistStorage<unknown>;
   });
 
   it('getItem reads from localStorage and returns parsed JSON', () => {
@@ -110,7 +110,7 @@ describe('prod mode without SECRET_KEY', () => {
     vi.stubGlobal('localStorage', mockLocalStorage);
     const { encryptedStorage } = await import('./crypto');
     expect(encryptedStorage).toBeDefined();
-    storage = encryptedStorage!;
+    storage = encryptedStorage as PersistStorage<unknown>;
   });
 
   it('falls back to localStorage without encrypting', () => {
@@ -122,7 +122,7 @@ describe('prod mode without SECRET_KEY', () => {
 });
 
 describe('prod mode with SECRET_KEY', () => {
-  const ENCRYPTED = 'enc::' + JSON_STATE;
+  const ENCRYPTED = `enc::${JSON_STATE}`;
   let storage: PersistStorage<unknown>;
 
   beforeEach(async () => {
@@ -133,7 +133,7 @@ describe('prod mode with SECRET_KEY', () => {
     vi.stubGlobal('localStorage', mockLocalStorage);
     const { encryptedStorage } = await import('./crypto');
     expect(encryptedStorage).toBeDefined();
-    storage = encryptedStorage!;
+    storage = encryptedStorage as PersistStorage<unknown>;
   });
 
   it('getItem decrypts the stored value', () => {

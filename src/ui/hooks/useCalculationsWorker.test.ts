@@ -101,7 +101,7 @@ describe('useCalculationsWorker', () => {
 
     act(() => { result.current.triggerCalculation(BASE_PARAMS); });
 
-    const requestId = (mockPostMessage.mock.lastCall![0] as { requestId: string }).requestId;
+    const requestId = (mockPostMessage.mock.lastCall?.[0] as { requestId: string }).requestId;
 
     act(() => {
       workerInstance.onmessage?.({
