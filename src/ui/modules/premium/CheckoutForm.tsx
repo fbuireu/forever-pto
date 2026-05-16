@@ -87,7 +87,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
       setErrorMessage(errorMsg);
       track('payment_failed', { error: errorMsg });
     } else {
-      if (result.sessionData) {
+      if ('sessionData' in result && result.sessionData) {
         setPremiumStatus({
           email: result.sessionData.email,
           premiumKey: result.sessionData.premiumKey,
