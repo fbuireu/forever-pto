@@ -1,6 +1,6 @@
 import { Link } from '@application/i18n/navigation';
 import { Button } from '@ui/modules/core/primitives/Button';
-import { Header as Navigation } from '@ui/modules/pages/homepage/navigation/Navigation';
+import { Header } from '@ui/modules/pages/homepage/navigation/Navigation';
 import { Footer } from '@ui/modules/shared/footer/Footer';
 import { cn } from '@ui/utils/utils';
 import { getTranslations } from 'next-intl/server';
@@ -21,7 +21,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
 
   return (
     <div className='min-h-screen flex flex-col bg-background text-foreground'>
-      <Navigation />
+      <Header />
 
       <main id='main-content' className='flex-1 py-[60px]'>
         <div className='max-w-[1320px] mx-auto grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-[60px] px-7 items-center'>
