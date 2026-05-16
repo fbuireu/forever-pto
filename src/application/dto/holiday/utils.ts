@@ -1,13 +1,9 @@
-import { useLocationStore } from '@application/stores/location';
+import type { RegionDTO } from '@application/dto/region/types';
 import { isWithinInterval } from '@ui/utils/dates';
 
-export function getRegionName(regionCode: string): string {
+export function getRegionName(regionCode: string, regions: RegionDTO[]): string {
   if (!regionCode) return '';
-
-  const regions = useLocationStore.getState().regions;
-
   const region = regions.find((r) => r.value.toLowerCase() === regionCode.toLowerCase());
-
   return region?.label ?? regionCode;
 }
 

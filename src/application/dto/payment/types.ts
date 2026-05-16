@@ -16,13 +16,13 @@ export type DiscountInfo = {
   couponName: string | null;
 };
 
-type PaymentDTOSuccess = {
+type CreatePaymentSuccess = {
   success: true;
   clientSecret: string;
   discountInfo?: DiscountInfo;
 };
 
-type PaymentDTOError = {
+type CreatePaymentError = {
   success: false;
   error?: string;
   stripeError?: Stripe.StripeRawError;
@@ -30,7 +30,7 @@ type PaymentDTOError = {
   type?: string;
 };
 
-export type PaymentDTO = PaymentDTOSuccess | PaymentDTOError;
+export type CreatePaymentResult = CreatePaymentSuccess | CreatePaymentError;
 
 export interface PaymentData {
   id: string;

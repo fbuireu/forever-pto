@@ -1,11 +1,13 @@
 import type { BaseDTO } from '@application/shared/dto/baseDTO';
+import type { RegionDTO } from '@application/dto/region/types';
 import { addMonths, compareAsc, endOfYear, isWithinInterval, startOfYear } from '@ui/utils/dates';
 import { type HolidayDTO, HolidayVariant, type RawHoliday } from './types';
-import { getRegionName, isInSelectedRange } from './utils';
+import { getRegionName } from './utils';
 
 type HolidayDTOParams = {
   year: number;
   carryOverMonths: number;
+  regions: RegionDTO[];
 };
 
 export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> = {
@@ -14,7 +16,7 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> =
       throw new Error('Configuration is required for holiday DTO');
     }
 
-    const { year, carryOverMonths } = params;
+    const { year, carryOverMonths, regions } = params;
     const processedDates = new Set<string>();
 
     const yearStart = startOfYear(new Date(year, 0, 1));
@@ -35,12 +37,8 @@ export const holidayDTO: BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> =
           name: holiday.name,
           type: holiday.type,
           variant: holiday.location ? HolidayVariant.REGIONAL : HolidayVariant.NATIONAL,
-          ...(holiday.location && { location: getRegionName(holiday.location) }),
-          isInSelectedRange: isInSelectedRange({
-            date: holidayDate,
-            rangeStart: yearStart,
-            rangeEnd: selectedRangeEnd,
-          }),
+          ...(holiday.location && { location: getRegionName(holiday.location, regions) }),
+          isInSelectedRange: isWithinInterval(holidayDate, { start: yearStart, end: selectedRangeEnd }),
         });
         return acc;
       }, [])

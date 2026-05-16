@@ -1,3 +1,4 @@
+import { paymentDataDTO } from '@application/dto/payment/dto';
 import type { PaymentData } from '@application/dto/payment/types';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
@@ -9,41 +10,8 @@ import {
   savePayment,
   updatePaymentStatus,
 } from '@infrastructure/services/payments/repository';
-import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
 import { createSession } from '@infrastructure/services/premium/session';
 import { Effect } from 'effect';
-import type Stripe from 'stripe';
-
-const buildPaymentDataFromIntent = (paymentIntent: Stripe.PaymentIntent, email: string): PaymentData => ({
-  id: paymentIntent.id,
-  stripeCreatedAt: new Date(paymentIntent.created * 1000),
-  customerId: extractCustomerId(paymentIntent.customer),
-  chargeId: extractChargeId(paymentIntent.latest_charge),
-  email,
-  amount: paymentIntent.amount,
-  currency: paymentIntent.currency,
-  status: paymentIntent.status,
-  paymentMethodType: paymentIntent.payment_method_types?.[0] ?? null,
-  description: paymentIntent.description ?? null,
-  promoCode: paymentIntent.metadata.promoCode ?? null,
-  userAgent: paymentIntent.metadata.userAgent ?? null,
-  ipAddress: paymentIntent.metadata.ipAddress ?? null,
-  country: null,
-  customerName: null,
-  postalCode: null,
-  city: null,
-  state: null,
-  paymentBrand: null,
-  paymentLast4: null,
-  feeAmount: null,
-  netAmount: null,
-  refundedAt: null,
-  refundReason: null,
-  disputedAt: null,
-  disputeReason: null,
-  parentPaymentId: null,
-  origin: null,
-});
 
 export const activateWithPayment = (
   email: string,
@@ -89,7 +57,17 @@ export const activateWithPayment = (
         );
       }
     } else {
-      yield* savePayment(buildPaymentDataFromIntent(paymentIntent, email)).pipe(
+      const paymentData: PaymentData = paymentDataDTO.create({
+        raw: paymentIntent,
+        params: {
+          email,
+          promoCode: paymentIntent.metadata.promoCode ?? null,
+          userAgent: paymentIntent.metadata.userAgent ?? null,
+          ipAddress: paymentIntent.metadata.ipAddress ?? null,
+        },
+      });
+
+      yield* savePayment(paymentData).pipe(
         Effect.tap(() => Effect.sync(() => logger.info('Payment created successfully', { paymentIntentId }))),
         Effect.tapError((e) =>
           Effect.sync(() => {

@@ -1,4 +1,4 @@
-import type { PaymentData } from '@application/dto/payment/types';
+import { paymentDataDTO } from '@application/dto/payment/dto';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import type { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
@@ -10,40 +10,8 @@ import {
   updatePaymentCharge,
   updatePaymentStatus,
 } from '@infrastructure/services/payments/repository';
-import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
 import { Effect } from 'effect';
 import type { PaymentSucceededEvent } from '../events/types';
-
-const buildPaymentData = (event: PaymentSucceededEvent): PaymentData => ({
-  id: event.paymentIntent.id,
-  stripeCreatedAt: new Date(event.paymentIntent.created * 1000),
-  customerId: extractCustomerId(event.paymentIntent.customer),
-  chargeId: extractChargeId(event.paymentIntent.latest_charge),
-  email: event.email,
-  amount: event.amount,
-  currency: event.paymentIntent.currency,
-  status: event.status,
-  paymentMethodType: event.paymentIntent.payment_method_types?.[0] ?? null,
-  description: event.paymentIntent.description ?? null,
-  promoCode: event.paymentIntent.metadata.promoCode ?? null,
-  userAgent: event.paymentIntent.metadata.userAgent ?? null,
-  ipAddress: event.paymentIntent.metadata.ipAddress ?? null,
-  country: null,
-  customerName: null,
-  postalCode: null,
-  city: null,
-  state: null,
-  paymentBrand: null,
-  paymentLast4: null,
-  feeAmount: null,
-  netAmount: null,
-  refundedAt: null,
-  refundReason: null,
-  disputedAt: null,
-  disputeReason: null,
-  parentPaymentId: null,
-  origin: null,
-});
 
 const updateCharge = (
   event: PaymentSucceededEvent
@@ -116,7 +84,17 @@ export const handlePaymentSucceeded = (
       yield* updatePaymentStatus(event.paymentId, event.status);
     } else {
       logger.warn('Payment not found in DB, creating from webhook', { paymentId: event.paymentId });
-      yield* savePayment(buildPaymentData(event));
+      yield* savePayment(
+        paymentDataDTO.create({
+          raw: event.paymentIntent,
+          params: {
+            email: event.email,
+            promoCode: event.paymentIntent.metadata.promoCode ?? null,
+            userAgent: event.paymentIntent.metadata.userAgent ?? null,
+            ipAddress: event.paymentIntent.metadata.ipAddress ?? null,
+          },
+        })
+      );
     }
 
     yield* updateCharge(event);
