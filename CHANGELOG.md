@@ -1,3 +1,15 @@
+# [1.4.0](https://github.com/fbuireu/forever-pto/compare/v1.3.8...v1.4.0) (2026-05-16)
+
+
+### Bug Fixes
+
+* ntfs ([8af1b7a](https://github.com/fbuireu/forever-pto/commit/8af1b7a4620c7c13c9d5b5e87aacda9ce4204a27))
+
+
+### Features
+
+* add flags ([864a97a](https://github.com/fbuireu/forever-pto/commit/864a97a8cc598300752392ea9a42add02c021e73))
+
 ## [1.3.8](https://github.com/fbuireu/forever-pto/compare/v1.3.7...v1.3.8) (2026-05-16)
 
 
