@@ -1,6 +1,7 @@
 'use server';
 
-import type { ContactFormData, ContactResult } from '@application/dto/contact/types';
+import type { ContactFormData } from '@application/dto/contact/schema';
+import type { ContactResult } from '@application/dto/contact/types';
 import { sendContactEmail } from '@application/use-cases/contact';
 import { AppLayer } from '@infrastructure/layers';
 import { Effect } from 'effect';

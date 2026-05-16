@@ -8,7 +8,7 @@ import { getBetterStackInstance } from '@infrastructure/clients/logging/better-s
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
 import { getStripeClientInstance } from '@infrastructure/clients/payments/stripe/client';
 import { formatDiscountMessage } from '@infrastructure/services/payments/utils/formatters';
-import { calculateFinalAmount } from '@infrastructure/services/payments/utils/helpers';
+import { calculateFinalAmount } from '@application/dto/payment/utils';
 import { Elements } from '@stripe/react-stripe-js';
 import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { initializePayment } from '@ui/adapters/payments/checkout';
