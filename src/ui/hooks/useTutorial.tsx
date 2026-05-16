@@ -21,7 +21,7 @@ export const useTutorial = () => {
     ]);
     const driverClient = getDriverClientInstance();
 
-    const expandDrawer = () => window.dispatchEvent(new CustomEvent('tutorial:expand-drawer'));
+    const expandDrawer = () => globalThis.dispatchEvent(new CustomEvent('tutorial:expand-drawer'));
 
     const steps: DriveStep[] = [
       {

@@ -1,6 +1,7 @@
 import type React from 'react';
 import { Link } from '@application/i18n/navigation';
 import { getWeekdayNames } from '@application/shared/utils/dates';
+import { LOCALES } from '@infrastructure/i18n/locales';
 import { Badge } from '@ui/modules/core/primitives/Badge';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { FlagIcon } from '@ui/modules/core/primitives/FlagIcon';
@@ -30,7 +31,17 @@ export const Hero = async () => {
       <div className='max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-14 items-center'>
         <div>
           <div className='flex gap-2.5 items-center mb-6 flex-wrap'>
-            <Badge variant='outline'>{t('hero.localeBadge')}</Badge>
+            <Badge variant='outline'>
+              <span className='flex items-center gap-1.5'>
+                {LOCALES.map((locale, i) => (
+                  <span key={locale} className='flex items-center gap-1'>
+                    <FlagIcon code={locale} />
+                    <span>{locale.toUpperCase()}</span>
+                    {i < LOCALES.length - 1 && <span className='opacity-40 mx-0.5'>·</span>}
+                  </span>
+                ))}
+              </span>
+            </Badge>
             <Badge variant='outline'>v{version}</Badge>
           </div>
 

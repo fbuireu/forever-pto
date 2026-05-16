@@ -64,3 +64,9 @@ interface WorkerErrorResponse {
 }
 
 export type WorkerResponse = CalculateSuggestionsResponse | WorkerErrorResponse;
+
+export const WORKER_MESSAGE_TYPE = {
+  CALCULATE_SUGGESTIONS: 'CALCULATE_SUGGESTIONS',
+  CALCULATE_SUGGESTIONS_RESULT: 'CALCULATE_SUGGESTIONS_RESULT',
+  WORKER_ERROR: 'WORKER_ERROR',
+} as const;
