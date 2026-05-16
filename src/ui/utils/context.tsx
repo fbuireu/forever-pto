@@ -1,6 +1,6 @@
 import { createContext, type ReactNode, use } from 'react';
 
-function getStrictContext<T>(name?: string) {
+export function getStrictContext<T>(name?: string) {
   const Context = createContext<T | undefined>(undefined);
 
   const Provider = ({ value, children }: { value: T; children?: ReactNode }) => (
@@ -17,5 +17,3 @@ function getStrictContext<T>(name?: string) {
 
   return [Provider, useSafeContext] as const;
 }
-
-export { getStrictContext };
