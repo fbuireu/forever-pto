@@ -143,7 +143,7 @@ export const Summary = () => {
         <Card>
           <CardHeader className='pb-2'>
             <CardTitle className='text-3xl sm:text-4xl font-display font-bold text-center tracking-[-0.05em]'>
-              {t('title', { year, nextYear: Number(year) + 1 })}
+              {t('title', { year, nextYear: year + 1 })}
               <div className='flex flex-wrap items-center gap-2 mt-3 mb-5 justify-center'>
                 <Badge variant='outline' className='mx-1'>
                   <span className='mr-2'>{locationInfo.userCountry?.flag}</span>
@@ -193,7 +193,7 @@ export const Summary = () => {
           <CardContent className='space-y-6'>
             <div className='hidden sm:block'>
               <YearTimelineChart
-                year={Number(year)}
+                year={year}
                 holidays={holidays ?? []}
                 suggestion={activeSuggestion}
                 manuallySelectedDays={manuallySelectedDays}
@@ -207,7 +207,7 @@ export const Summary = () => {
               <BlocksPerQuarterChart blocksPerQuarter={metrics.longBlocksPerQuarter} />
               <MonthlyDistributionChart
                 monthlyDist={metrics.monthlyDist}
-                year={Number(year)}
+                year={year}
                 carryOverMonths={carryOverMonths}
               />
             </div>

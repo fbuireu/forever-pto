@@ -83,7 +83,7 @@ export const calculateRestBlocks = (dates: Date[]): number => {
 interface CalculateMaxWorkingPeriodParams {
   ptoDays: Date[];
   holidays: HolidayDTO[];
-  year: string;
+  year: number;
   allowPastDays: boolean;
 }
 
@@ -93,9 +93,8 @@ export const calculateMaxWorkingPeriod = ({
   year,
   allowPastDays,
 }: CalculateMaxWorkingPeriodParams): number => {
-  const yearNum = parseInt(year, 10);
-  const yearStart = allowPastDays ? startOfYear(new Date(yearNum, 0, 1)) : startOfToday();
-  const yearEnd = endOfYear(new Date(yearNum, 11, 31));
+  const yearStart = allowPastDays ? startOfYear(new Date(year, 0, 1)) : startOfToday();
+  const yearEnd = endOfYear(new Date(year, 11, 31));
   if (yearStart > yearEnd) return 0;
 
   const restDays = new Set([...ptoDays.map((d) => d.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
@@ -146,14 +145,13 @@ export const calculateQuarterDistribution = (dates: Date[]): number[] => {
 
 interface GetWorkingDaysPerWeekParams {
   ptoDays: Date[];
-  year: string;
+  year: number;
   holidays: HolidayDTO[];
 }
 
 export const getWorkingDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkingDaysPerWeekParams): number => {
-  const yearNum = parseInt(year, 10);
-  const yearStart = startOfYear(new Date(yearNum, 0, 1));
-  const yearEnd = endOfYear(new Date(yearNum, 11, 31));
+  const yearStart = startOfYear(new Date(year, 0, 1));
+  const yearEnd = endOfYear(new Date(year, 11, 31));
   const allDaysInYear = eachDayOfInterval({ start: yearStart, end: yearEnd });
   const workingDaysInYear = allDaysInYear.filter((day) => !isWeekend(day)).length;
   const holidaysOnWorkdays = holidays.filter((h) => !isWeekend(h.date)).length;

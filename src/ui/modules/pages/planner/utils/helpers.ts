@@ -39,11 +39,11 @@ export const getWeekdayNames = ({ locale, weekStartsOn }: GetWeekdayNamesParams)
 
 interface GetTotalMonthsParams {
   carryOverMonths: number;
-  year: string;
+  year: number;
 }
 export const getTotalMonths = ({ carryOverMonths, year }: GetTotalMonthsParams) => {
   const totalMonths = 12 + carryOverMonths;
-  const start = startOfMonth(new Date(Number(year), 0, 1));
+  const start = startOfMonth(new Date(year, 0, 1));
 
   return Array.from({ length: totalMonths }, (_, i) => addMonths(start, i));
 };

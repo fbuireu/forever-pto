@@ -3,6 +3,7 @@
 import { type CreatePaymentInput, createPaymentSchemaWithMessages } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
+import { useUIStore } from '@application/stores/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
@@ -44,31 +45,26 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const {
-    premiumKey,
-    userEmail,
-    setEmail,
-    getCurrencyFromLocale,
-    currency,
-    currencySymbol,
-    isOpen,
-    isOpening,
-    setDonatePopoverOpen,
-    clearDonatePopoverOpening,
-  } = usePremiumStore(
+  const { premiumKey, userEmail, setEmail } = usePremiumStore(
     useShallow((state) => ({
       premiumKey: state.premiumKey,
       userEmail: state.userEmail,
       setEmail: state.setEmail,
-      getCurrencyFromLocale: state.getCurrencyFromLocale,
-      currency: state.currency,
-      currencySymbol: state.currencySymbol,
-      isOpen: state.donatePopoverOpen,
-      isOpening: state.donatePopoverIsOpening,
-      setDonatePopoverOpen: state.setDonatePopoverOpen,
-      clearDonatePopoverOpening: state.clearDonatePopoverOpening,
     }))
   );
+
+  const { getCurrencyFromLocale, currency, currencySymbol, isOpen, isOpening, setDonatePopoverOpen, clearDonatePopoverOpening } =
+    useUIStore(
+      useShallow((state) => ({
+        getCurrencyFromLocale: state.getCurrencyFromLocale,
+        currency: state.currency,
+        currencySymbol: state.currencySymbol,
+        isOpen: state.donatePopoverOpen,
+        isOpening: state.donatePopoverIsOpening,
+        setDonatePopoverOpen: state.setDonatePopoverOpen,
+        clearDonatePopoverOpening: state.clearDonatePopoverOpening,
+      }))
+    );
 
   useEffect(() => {
     getCurrencyFromLocale(locale);

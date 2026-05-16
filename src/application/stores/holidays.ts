@@ -1,10 +1,10 @@
-import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
-import { isInSelectedRange } from '@application/dto/holiday/utils';
+import { holidayDTO } from '@application/dto/holiday/dto';
+import { HolidayVariant, type HolidayDTO } from '@application/dto/holiday/types';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { useLocationStore } from './location';
 import { generateMetrics } from '@infrastructure/services/calendar/metrics/generateMetrics';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
-import { addMonths, endOfYear, ensureDate, formatDate, isSameMonth, startOfYear } from '@ui/utils/dates';
+import { ensureDate, isSameMonth } from '@ui/utils/dates';
+import { useLocationStore } from './location';
 import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -55,6 +55,16 @@ interface HolidaysActions {
 }
 
 type HolidaysStore = HolidaysState & HolidaysActions;
+
+function withMetrics(
+  alternatives: Suggestion[],
+  opts: { locale: string; holidays: HolidayDTO[]; allowPastDays: boolean }
+) {
+  return alternatives.map((alt) => ({
+    ...alt,
+    metrics: generateMetrics({ suggestion: alt, locale: opts.locale, bridges: alt.bridges, holidays: opts.holidays, allowPastDays: opts.allowPastDays }),
+  }));
+}
 
 const STORAGE_NAME = 'holidays-store';
 const STORAGE_VERSION = 1;
@@ -130,16 +140,13 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
 
           try {
-            const [{ generateSuggestions }, { generateAlternatives }, { generateMetrics }] = await Promise.all([
+            const [{ generateSuggestions }, { generateAlternatives }] = await Promise.all([
               import('@infrastructure/services/calendar/suggestions/generateSuggestions'),
               import('@infrastructure/services/calendar/alternatives/generateAlternatives'),
-              import('@infrastructure/services/calendar/metrics/generateMetrics'),
             ]);
 
-            const holidaysDates = holidays.map((h) => ({
-              ...h,
-              date: ensureDate(h.date),
-            }));
+            const holidaysDates = holidayDTO.normalize(holidays);
+            const metricsOpts = { locale, holidays: holidaysDates, allowPastDays };
 
             const baseSuggestion = generateSuggestions({
               year,
@@ -161,29 +168,12 @@ export const useHolidaysStore = create<HolidaysStore>()(
               strategy,
             });
 
-            const suggestionMetrics = generateMetrics({
-              suggestion: baseSuggestion,
-              locale,
-              bridges: baseSuggestion.bridges,
-              holidays: holidaysDates,
-              allowPastDays,
-            });
-
             const suggestion = {
               ...baseSuggestion,
-              metrics: suggestionMetrics,
+              metrics: generateMetrics({ suggestion: baseSuggestion, locale, bridges: baseSuggestion.bridges, holidays: holidaysDates, allowPastDays }),
             };
 
-            const alternatives = baseAlternatives.map((alt) => ({
-              ...alt,
-              metrics: generateMetrics({
-                suggestion: alt,
-                locale,
-                bridges: alt.bridges,
-                holidays: holidaysDates,
-                allowPastDays,
-              }),
-            }));
+            const alternatives = withMetrics(baseAlternatives, metricsOpts);
 
             set({
               suggestion,
@@ -231,15 +221,11 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
 
           try {
-            const [{ generateAlternatives }, { generateMetrics }] = await Promise.all([
+            const [{ generateAlternatives }] = await Promise.all([
               import('@infrastructure/services/calendar/alternatives/generateAlternatives'),
-              import('@infrastructure/services/calendar/metrics/generateMetrics'),
             ]);
 
-            const holidaysDates = holidays.map((h) => ({
-              ...h,
-              date: ensureDate(h.date),
-            }));
+            const holidaysDates = holidayDTO.normalize(holidays);
 
             const baseAlternatives = generateAlternatives({
               year,
@@ -252,16 +238,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               strategy,
             });
 
-            const alternatives = baseAlternatives.map((alt) => ({
-              ...alt,
-              metrics: generateMetrics({
-                suggestion: alt,
-                locale,
-                bridges: alt.bridges,
-                holidays: holidaysDates,
-                allowPastDays,
-              }),
-            }));
+            const alternatives = withMetrics(baseAlternatives, { locale, holidays: holidaysDates, allowPastDays });
 
             set({ alternatives });
           } catch (error) {
@@ -339,20 +316,14 @@ export const useHolidaysStore = create<HolidaysStore>()(
             logger.warn('Holiday already exists on this date', { date: holiday.date.toISOString() });
             return;
           }
-          const yearStart = startOfYear(new Date(Number(year), 0, 1));
-          const selectedRangeEnd = addMonths(endOfYear(new Date(Number(year), 0, 1)), carryOverMonths);
 
-          const newHoliday: HolidayDTO = {
-            id: `custom-${formatDate({ date: holiday.date, locale, format: 'yyyy-MM-dd HH:mm:ss' })}`,
+          const newHoliday = holidayDTO.createCustom({
             name: holiday.name,
-            date: ensureDate(holiday.date),
-            variant: HolidayVariant.CUSTOM,
-            isInSelectedRange: isInSelectedRange({
-              date: holiday.date,
-              rangeStart: yearStart,
-              rangeEnd: selectedRangeEnd,
-            }),
-          };
+            date: holiday.date,
+            locale,
+            year,
+            carryOverMonths,
+          });
 
           set({
             holidays: [...holidays, newHoliday].toSorted((a, b) => a.date.getTime() - b.date.getTime()),
@@ -366,27 +337,25 @@ export const useHolidaysStore = create<HolidaysStore>()(
           });
         },
 
-        editHoliday: ({ holidayId, locale, updates }: EditHolidayParams) => {
+        editHoliday: ({ holidayId, locale, updates, year, carryOverMonths }: EditHolidayParams) => {
           const { holidays } = get();
           const holidayIndex = holidays.findIndex((h) => h.id === holidayId);
 
           if (holidayIndex === -1) return;
 
-          const updatedHoliday = {
-            ...holidays[holidayIndex],
-            id: `custom-${formatDate({ date: updates.date, locale, format: 'yyyy-MM-dd HH:mm:ss' })}`,
+          const updatedHoliday = holidayDTO.createCustom({
             name: updates.name,
-            variant: HolidayVariant.CUSTOM,
-            date: ensureDate(updates.date),
-          };
+            date: updates.date,
+            locale,
+            year,
+            carryOverMonths,
+          });
 
           const updatedHolidays = [
             ...holidays.slice(0, holidayIndex),
             updatedHoliday,
             ...holidays.slice(holidayIndex + 1),
-          ];
-
-          updatedHolidays.sort((a, b) => a.date.getTime() - b.date.getTime());
+          ].toSorted((a, b) => a.date.getTime() - b.date.getTime());
 
           set({ holidays: updatedHolidays });
         },

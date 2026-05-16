@@ -1,12 +1,12 @@
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
-import type { Locale } from 'next-intl';
+import { getExistingSession, verifyPremiumEmail } from '@infrastructure/services/session/checkSession';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
+import { TWENTY_FOUR_HOURS } from './utils';
 
 const logger = getBetterStackInstance();
-const localeFormatterCache = new Map<string, Intl.NumberFormat>();
 
 interface PremiumState {
   premiumKey: string | null;
@@ -16,10 +16,6 @@ interface PremiumState {
   modalOpen: boolean;
   currentFeature: string;
   needsSessionCheck: boolean;
-  currency: string;
-  currencySymbol: string;
-  donatePopoverOpen: boolean;
-  donatePopoverIsOpening: boolean;
 }
 
 interface SetPremiumStatusParams {
@@ -35,22 +31,13 @@ interface PremiumActions {
   setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => void;
   refreshPremiumStatus: () => Promise<void>;
   setEmail: (email: string) => void;
-  setCurrency: (currency: string) => void;
-  getCurrencyFromLocale: (locale: Locale) => void;
   resetPremiumStore: () => void;
-  openDonatePopover: () => void;
-  closeDonatePopover: () => void;
-  setDonatePopoverOpen: (isOpen: boolean) => void;
-  clearDonatePopoverOpening: (isOpen: boolean) => void;
 }
 
 type PremiumStore = PremiumState & PremiumActions;
 
-const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 const STORAGE_NAME = 'premium-store';
 const STORAGE_VERSION = 1;
-const DEFAULT_CURRENCY = 'EUR';
-const DEFAULT_CURRENCY_SYMBOL = '€';
 
 const premiumInitialState: PremiumState = {
   premiumKey: null,
@@ -60,10 +47,6 @@ const premiumInitialState: PremiumState = {
   modalOpen: false,
   currentFeature: '',
   needsSessionCheck: false,
-  currency: DEFAULT_CURRENCY,
-  currencySymbol: DEFAULT_CURRENCY_SYMBOL,
-  donatePopoverOpen: false,
-  donatePopoverIsOpening: false,
 };
 
 export const usePremiumStore = create<PremiumStore>()(
@@ -74,31 +57,13 @@ export const usePremiumStore = create<PremiumStore>()(
 
         verifyEmail: async (email: string) => {
           set({ isLoading: true });
-
           try {
-            const response = await fetch('/api/check-session', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email }),
-              credentials: 'include',
-            });
-
-            if (response.ok) {
-              const { premiumKey } = await response.json();
-
-              if (premiumKey) {
-                set({
-                  premiumKey,
-                  userEmail: email,
-                  lastVerified: Date.now(),
-                  isLoading: false,
-                  needsSessionCheck: false,
-                });
-                track('premium_activated', { plan: 'premium' });
-                return true;
-              }
+            const result = await verifyPremiumEmail(email);
+            if (result) {
+              get().setPremiumStatus({ email, premiumKey: result.premiumKey });
+              set({ isLoading: false });
+              return true;
             }
-
             set({ isLoading: false });
             return false;
           } catch (error) {
@@ -113,63 +78,24 @@ export const usePremiumStore = create<PremiumStore>()(
 
         checkExistingSession: async () => {
           const { needsSessionCheck } = get();
-
           if (!needsSessionCheck) return;
 
           try {
-            const response = await fetch('/api/check-session', {
-              credentials: 'include',
-            });
-
-            if (response.ok) {
-              const { premiumKey, email } = await response.json();
-
-              set({
-                premiumKey,
-                userEmail: email ?? null,
-                lastVerified: Date.now(),
-                needsSessionCheck: false,
-              });
-            } else {
-              set({
-                lastVerified: Date.now(),
-                needsSessionCheck: false,
-              });
-            }
-          } catch (error) {
-            logger.logError('Error checking existing session in premium store', error, {
-              needsSessionCheck,
-            });
+            const session = await getExistingSession();
             set({
+              premiumKey: session?.premiumKey ?? null,
+              userEmail: session?.email ?? null,
               lastVerified: Date.now(),
               needsSessionCheck: false,
             });
+          } catch (error) {
+            logger.logError('Error checking existing session in premium store', error, { needsSessionCheck });
+            set({ lastVerified: Date.now(), needsSessionCheck: false });
           }
         },
 
         setEmail: (email: string) => {
           set({ userEmail: email });
-        },
-
-        setCurrency: (currency: string) => {
-          set({ currency });
-        },
-
-        getCurrencyFromLocale: (locale: Locale) => {
-          try {
-            let formatter = localeFormatterCache.get(locale);
-            if (!formatter) {
-              formatter = new Intl.NumberFormat(locale, { style: 'currency', currency: DEFAULT_CURRENCY });
-              localeFormatterCache.set(locale, formatter);
-            }
-            const resolvedCurrency = formatter.resolvedOptions().currency;
-            const currency = resolvedCurrency ?? DEFAULT_CURRENCY;
-            const symbol = formatter.formatToParts(0).find(({ type }) => type === 'currency')?.value ?? currency;
-
-            set({ currency, currencySymbol: symbol });
-          } catch {
-            set({ currency: DEFAULT_CURRENCY, currencySymbol: DEFAULT_CURRENCY_SYMBOL });
-          }
         },
 
         setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => {
@@ -194,35 +120,12 @@ export const usePremiumStore = create<PremiumStore>()(
         },
 
         showUpgradeModal: (feature: string) => {
-          set({
-            currentFeature: feature,
-            modalOpen: true,
-          });
+          set({ currentFeature: feature, modalOpen: true });
           track('upgrade_modal_opened', { feature });
         },
 
         closeModal: () => {
-          set({
-            modalOpen: false,
-            currentFeature: '',
-          });
-        },
-
-        openDonatePopover: () => {
-          set({ donatePopoverOpen: true, donatePopoverIsOpening: true });
-          setTimeout(() => set({ donatePopoverIsOpening: false }), 0);
-        },
-
-        closeDonatePopover: () => {
-          set({ donatePopoverOpen: false, donatePopoverIsOpening: false });
-        },
-
-        setDonatePopoverOpen: (isOpen: boolean) => {
-          set({ donatePopoverOpen: isOpen, donatePopoverIsOpening: false });
-        },
-
-        clearDonatePopoverOpening: () => {
-          set({ donatePopoverIsOpening: false });
+          set({ modalOpen: false, currentFeature: '' });
         },
       }),
       {
@@ -234,8 +137,6 @@ export const usePremiumStore = create<PremiumStore>()(
           userEmail: state.userEmail,
           lastVerified: state.lastVerified,
           needsSessionCheck: state.needsSessionCheck,
-          currency: state.currency,
-          currencySymbol: state.currencySymbol,
         }),
         onRehydrateStorage: () => (state, error) => {
           if (error) {

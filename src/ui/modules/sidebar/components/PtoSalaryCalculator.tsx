@@ -1,6 +1,6 @@
 'use client';
 
-import { usePremiumStore } from '@application/stores/premium';
+import { useUIStore } from '@application/stores/ui';
 import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@ui/modules/core/primitives/InputGroup';
@@ -50,7 +50,7 @@ export const PtoSalaryCalculator = () => {
   const [annualSalary, setAnnualSalary] = useState<number | undefined>();
   const [unusedPTODays, setUnusedPTODays] = useState<number>(5);
 
-  const { currencySymbol, currency } = usePremiumStore(
+  const { currencySymbol, currency } = useUIStore(
     useShallow((state) => ({
       currencySymbol: state.currencySymbol,
       currency: state.currency,

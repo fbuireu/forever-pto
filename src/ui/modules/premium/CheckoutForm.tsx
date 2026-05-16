@@ -1,5 +1,7 @@
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
+import { useUIStore } from '@application/stores/ui';
+import { useShallow } from 'zustand/react/shallow';
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
 import { formatDiscountText } from '@infrastructure/services/payments/utils/formatters';
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
@@ -46,8 +48,9 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   const [hasExpressOptions, setHasExpressOptions] = useState<boolean | null>(null);
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const getCurrencyFromLocale = usePremiumStore((state) => state.getCurrencyFromLocale);
-  const currencySymbol = usePremiumStore((state) => state.currencySymbol);
+  const { getCurrencyFromLocale, currencySymbol } = useUIStore(
+    useShallow((state) => ({ getCurrencyFromLocale: state.getCurrencyFromLocale, currencySymbol: state.currencySymbol }))
+  );
   const setPremiumStatus = usePremiumStore((state) => state.setPremiumStatus);
 
   useEffect(() => {

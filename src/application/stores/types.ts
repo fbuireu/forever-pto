@@ -31,6 +31,8 @@ export interface EditHolidayParams {
   holidayId: string;
   locale: Locale;
   updates: Pick<HolidayDTO, 'name' | 'date'>;
+  year: FiltersState['year'];
+  carryOverMonths: FiltersState['carryOverMonths'];
 }
 
 export interface AlternativeSelectionBaseParams {
@@ -38,12 +40,3 @@ export interface AlternativeSelectionBaseParams {
   index: number;
 }
 
-export interface CryptoParams {
-  text: string;
-  key: string;
-}
-
-export interface GetRegionParams {
-  country: string;
-  region: string;
-}

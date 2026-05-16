@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from '@application/i18n/navigation';
-import { usePremiumStore } from '@application/stores/premium';
+import { useUIStore } from '@application/stores/ui';
 import { useLanguages } from '@ui/hooks/useLanguages';
 import {
   DropdownMenu,
@@ -23,7 +23,7 @@ export const LanguageSelector = () => {
   const { state } = useSidebar();
   const languages = useLanguages();
   const t = useTranslations('accessibility');
-  const getCurrencyFromLocale = usePremiumStore((state) => state.getCurrencyFromLocale);
+  const getCurrencyFromLocale = useUIStore((state) => state.getCurrencyFromLocale);
 
   const handleLanguageChange = useCallback(
     (newLocale: string) => {

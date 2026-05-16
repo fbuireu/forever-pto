@@ -67,7 +67,7 @@ export const CalendarExport = () => {
 
   const handleDownloadIcs = () => {
     const content = generateIcs({
-      year: Number(year),
+      year,
       calendarName: t('calendarName'),
       ptoDayLabel: t('ptoDayLabel'),
       holidays: holidays ?? [],
@@ -83,7 +83,7 @@ export const CalendarExport = () => {
       try {
         await Effect.runPromise(
           pdfExportEffect({
-            year: Number(year),
+            year,
             holidays: includeHolidays ? (holidays ?? []) : [],
             ptoDays: includePto ? ptoDays : [],
             includeHolidays,
