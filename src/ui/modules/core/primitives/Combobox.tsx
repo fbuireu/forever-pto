@@ -11,6 +11,7 @@ import { cn } from '@ui/utils/cn';
 import { Check } from 'lucide-react';
 import { useState } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './Command';
+import { FlagIcon } from './FlagIcon';
 import { hasFlag } from './utils/helpers';
 
 interface ComboboxProps extends Omit<React.HTMLProps<HTMLInputElement>, 'onChange'> {
@@ -65,7 +66,7 @@ export const Combobox = ({
             <span className='truncate min-w-0 flex-1 text-left'>
               {selectedOption ? (
                 <span className='flex items-center gap-2'>
-                  {hasFlag(selectedOption) && <span className='shrink-0'>{selectedOption.flag}</span>}
+                  {hasFlag(selectedOption) && <FlagIcon code={selectedOption.flag} />}
                   <span className='truncate capitalize'>{selectedOption.label}</span>
                 </span>
               ) : (
@@ -85,7 +86,7 @@ export const Combobox = ({
               {options.map((option) => (
                 <CommandItem key={option.value} value={option.label} onSelect={handleSelect}>
                   <div className='flex items-center gap-2'>
-                    {hasFlag(option) && <span>{option.flag}</span>}
+                    {hasFlag(option) && <FlagIcon code={option.flag} />}
                     <span className='capitalize'>{option.label}</span>
                   </div>
                   {value.toLowerCase() === option.value.toLowerCase() && <Check className='ml-auto' />}

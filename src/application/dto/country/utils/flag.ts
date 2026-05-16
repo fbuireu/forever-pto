@@ -1,9 +1,5 @@
-const REGIONAL_INDICATOR_SYMBOL_OFFSET = 127397;
-
-export function getEmojiFlag(countryCode: string) {
+export function getFlagCode(countryCode: string): string {
   if (!countryCode) return '';
 
-  return Array.from(countryCode.toUpperCase())
-    .map((letter) => String.fromCodePoint(REGIONAL_INDICATOR_SYMBOL_OFFSET + (letter.codePointAt(0) ?? 0)))
-    .join('');
+  return countryCode.toLowerCase();
 }

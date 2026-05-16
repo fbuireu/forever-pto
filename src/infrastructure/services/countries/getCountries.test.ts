@@ -51,9 +51,9 @@ describe('getCountries', () => {
     const raw = { US: 'United States', ES: 'Spain', FR: 'France' };
     mockGetNames.mockReturnValue(raw);
     mockCountryDTOCreate.mockReturnValue([
-      { value: 'US', label: 'United States', flag: '🇺🇸' },
-      { value: 'ES', label: 'Spain', flag: '🇪🇸' },
-      { value: 'FR', label: 'France', flag: '🇫🇷' },
+      { value: 'US', label: 'United States', flag: 'us' },
+      { value: 'ES', label: 'Spain', flag: 'es' },
+      { value: 'FR', label: 'France', flag: 'fr' },
     ]);
 
     const result = getCountries(EN);

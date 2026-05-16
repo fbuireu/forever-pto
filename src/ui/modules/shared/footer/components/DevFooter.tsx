@@ -1,7 +1,7 @@
 'use client';
 
 import { blueskyIcon } from '@ui/assets/icons/bluesky';
-import { buyMeACoffeeIcon } from '@ui/assets/icons/buymeacoffee';
+import { buyMeACoffeeIcon } from '@ui/assets/icons/buyMeACoffee';
 import { githubIcon } from '@ui/assets/icons/github';
 import { linkedinIcon } from '@ui/assets/icons/linkedin';
 import { RotatingTextContainer } from '@ui/modules/core/animate/primitives/texts/Rotating';
