@@ -1,3 +1,4 @@
+import type { PaymentConfirmationDTO } from '@application/dto/payment/types';
 import { EN } from '@infrastructure/i18n/locales';
 import { Effect, Layer } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -9,7 +10,12 @@ const mockLogger = { warn: vi.fn(), logError: vi.fn() };
 const mockGetTranslations = vi.fn();
 const mockGetCurrencySymbol = vi.fn().mockReturnValue('$');
 const mockGetPaymentConfirmation = vi.fn(() =>
-  Effect.succeed({ id: PAYMENT_INTENT_ID, status: 'succeeded', amount: 10, currency: 'USD' })
+  Effect.succeed<PaymentConfirmationDTO | null>({
+    id: PAYMENT_INTENT_ID,
+    status: 'succeeded',
+    amount: 10,
+    currency: 'USD',
+  })
 );
 
 vi.mock('next/navigation', () => ({ redirect: mockRedirect }));

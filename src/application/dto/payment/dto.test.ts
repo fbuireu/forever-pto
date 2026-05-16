@@ -51,7 +51,6 @@ describe('paymentConfirmationDTO', () => {
 
 describe('paymentDataDTO', () => {
   it('throws when params are missing', () => {
-    // @ts-expect-error intentionally omitting required params to test the guard
     expect(() => paymentDataDTO.create({ raw: makeIntent() })).toThrow('params required');
   });
 

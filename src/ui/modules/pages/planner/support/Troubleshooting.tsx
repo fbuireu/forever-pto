@@ -50,7 +50,7 @@ export const Troubleshooting = () => {
         await fetchHolidays({ country, region, year, locale, carryOverMonths });
 
         await generateSuggestions({
-          year: parseInt(year, 10),
+          year,
           ptoDays,
           allowPastDays,
           months: getTotalMonths({ carryOverMonths, year }),

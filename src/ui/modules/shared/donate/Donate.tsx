@@ -184,7 +184,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
   }, [form, setDonatePopoverOpen, t]);
 
   useEffect(() => {
-    if (isOpen && isOpening) clearDonatePopoverOpening(isOpening);
+    if (isOpen && isOpening) clearDonatePopoverOpening();
   }, [isOpen, isOpening, clearDonatePopoverOpening]);
 
   const handlePaymentCancel = useCallback(() => {

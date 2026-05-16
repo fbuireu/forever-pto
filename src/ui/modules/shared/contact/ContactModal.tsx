@@ -38,7 +38,6 @@ type Step = (typeof Step)[keyof typeof Step];
 
 export const ContactModal = ({ open, onClose }: ContactModalProps) => {
   const t = useTranslations('contact');
-  const tErrors = useTranslations('errors.contact');
   const tValidation = useTranslations('validation.contact');
   const [step, setStep] = useState<Step>(Step.INPUT);
   const [isPending, startTransition] = useTransition();
@@ -92,9 +91,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
           track('contact_form_submitted');
           setStep(Step.SUCCESS);
         } else {
-          const translatedError = result.errorType
-            ? tErrors(result.errorType as Parameters<typeof tErrors>[0])
-            : (result.error ?? t('failedToSend'));
+          const translatedError = result.error ?? t('failedToSend');
           setErrorMessage(translatedError);
           setStep(Step.ERROR);
         }

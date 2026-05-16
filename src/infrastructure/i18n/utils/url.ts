@@ -11,7 +11,7 @@ export function getLocaleFromPathname(pathname: string) {
   return hasLocale(LOCALES, segment) ? segment : routing.defaultLocale;
 }
 
-export function localeAlternates(path = '') {
+export function localeAlternates(path = ''): Record<string, string> {
   return {
     ...Object.fromEntries(LOCALES.map((l) => [l, localePath(l, path)])),
     'x-default': localePath(routing.defaultLocale, path),
