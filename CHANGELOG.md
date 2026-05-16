@@ -1,3 +1,10 @@
+## [1.3.8](https://github.com/fbuireu/forever-pto/compare/v1.3.7...v1.3.8) (2026-05-16)
+
+
+### Bug Fixes
+
+* test variant ([36f5646](https://github.com/fbuireu/forever-pto/commit/36f5646a549ae76a872b1687867eee648812ef01))
+
 ## [1.3.7](https://github.com/fbuireu/forever-pto/compare/v1.3.6...v1.3.7) (2026-05-16)
 
 
