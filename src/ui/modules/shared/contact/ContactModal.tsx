@@ -112,7 +112,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
       <DialogContent className='sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-3'>
-            <span className='size-9 bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[3px_3px_0_0_var(--frame)] grid place-items-center shrink-0'>
+            <span className='size-9 bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[var(--shadow-brutal-3)] grid place-items-center shrink-0'>
               <Mail className='size-4' />
             </span>
             {t('title')}
@@ -210,7 +210,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
         {step === Step.SUCCESS && (
           <div className='flex flex-col items-center gap-5 py-4'>
-            <div className='size-16 bg-[var(--color-brand-teal)] border-[3px] border-[var(--frame)] rounded-[14px] shadow-[5px_5px_0_0_var(--frame)] grid place-items-center'>
+            <div className='size-16 bg-[var(--color-brand-teal)] border-[3px] border-[var(--frame)] rounded-[14px] shadow-[var(--shadow-brutal-btn)] grid place-items-center'>
               <CircleCheckBig animateOnView className='size-8 text-[var(--color-brand-ink)]' />
             </div>
             <div className='text-center'>
@@ -228,7 +228,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
         {step === Step.ERROR && (
           <div className='flex flex-col items-center gap-5 py-4'>
-            <div className='size-16 bg-destructive border-[3px] border-[var(--frame)] rounded-[14px] shadow-[5px_5px_0_0_var(--frame)] grid place-items-center'>
+            <div className='size-16 bg-destructive border-[3px] border-[var(--frame)] rounded-[14px] shadow-[var(--shadow-brutal-btn)] grid place-items-center'>
               <AlertCircle className='size-8 text-white' />
             </div>
             <div className='text-center'>

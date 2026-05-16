@@ -257,7 +257,7 @@ export function Calendar({
             action: (
               <SupportButton
                 label={tPremium('upgrade')}
-                className='w-full py-3 px-2 !bg-[var(--color-brand-ink)] !text-white !border-transparent !shadow-[5px_5px_0_0_var(--color-brand-orange)] hover:!shadow-[7px_7px_0_0_var(--color-brand-orange)] active:!shadow-[1px_1px_0_0_var(--color-brand-orange)]'
+                className='w-full py-3 px-2 !bg-[var(--color-brand-ink)] !text-white !border-transparent !shadow-[var(--shadow-brutal-btn-orange)] hover:!shadow-[var(--shadow-brutal-btn-orange-hover)] active:!shadow-[var(--shadow-brutal-btn-orange-active)]'
               />
             ),
           });

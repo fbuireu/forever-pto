@@ -39,7 +39,7 @@ function Counter({
       layout
       transition={transition}
       className={cn(
-        'inline-flex items-stretch overflow-hidden rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] shadow-[4px_4px_0_0_var(--frame)]',
+        'inline-flex items-stretch overflow-hidden rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-sm)]',
         className
       )}
       {...props}

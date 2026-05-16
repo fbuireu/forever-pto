@@ -148,13 +148,13 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
         <div className='max-w-[1320px] mx-auto grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-[60px] px-7 items-center'>
           <div className='flex flex-col'>
             <div className='flex items-start gap-[10px] mb-[26px] font-display font-extrabold tracking-[-0.06em] leading-[0.82] text-[clamp(90px,13vw,200px)]'>
-              <span className='inline-block bg-[var(--color-brand-orange)] text-white border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[10px_10px_0_0_var(--frame)] leading-[0.85]'>
+              <span className='inline-block bg-[var(--color-brand-orange)] text-white border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]'>
                 5
               </span>
-              <span className='inline-block bg-[var(--accent)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[10px_10px_0_0_var(--frame)] leading-[0.85]'>
+              <span className='inline-block bg-[var(--accent)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]'>
                 0
               </span>
-              <span className='inline-block bg-[var(--color-brand-teal)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[10px_10px_0_0_var(--frame)] leading-[0.85]'>
+              <span className='inline-block bg-[var(--color-brand-teal)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]'>
                 0
               </span>
             </div>
@@ -179,7 +179,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
                 variant='default'
                 size='lg'
                 onClick={reset}
-                className='[filter:none] hover:[filter:none] active:[filter:none] shadow-[5px_5px_0_0_var(--accent)] hover:shadow-[7px_7px_0_0_var(--accent)] active:shadow-[1px_1px_0_0_var(--accent)]'
+                className='[filter:none] hover:[filter:none] active:[filter:none] shadow-[var(--shadow-brutal-btn-accent)] hover:shadow-[var(--shadow-brutal-btn-accent-hover)] active:shadow-[var(--shadow-brutal-btn-accent-active)]'
               >
                 <RotateCcw className='size-4' />
                 {t('retry')}
@@ -201,7 +201,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
                   type='button'
                   variant='outline'
                   onClick={() => setContactOpen(true)}
-                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[3px_3px_0_0_var(--frame)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)]'
+                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[var(--shadow-brutal-3)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-px active:translate-y-px active:shadow-[var(--shadow-brutal-btn-active)]'
                 >
                   <span className='shrink-0 size-6 bg-[var(--color-brand-purple)] text-white border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
                     @
@@ -211,7 +211,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
                 <Button
                   variant='outline'
                   asChild
-                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[3px_3px_0_0_var(--frame)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)]'
+                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[var(--shadow-brutal-3)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-px active:translate-y-px active:shadow-[var(--shadow-brutal-btn-active)]'
                 >
                   <a href={CHANGELOG_URL} target='_blank' rel='noopener noreferrer'>
                     <span className='shrink-0 size-6 bg-[var(--color-brand-teal)] border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
@@ -223,7 +223,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
                 <Button
                   variant='outline'
                   asChild
-                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[3px_3px_0_0_var(--frame)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)]'
+                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[var(--shadow-brutal-3)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-px active:translate-y-px active:shadow-[var(--shadow-brutal-btn-active)]'
                 >
                   <a href={SUPPORT_URL} target='_blank' rel='noopener noreferrer'>
                     <span className='shrink-0 size-6 bg-[var(--color-brand-orange)] text-white border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
@@ -237,7 +237,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
           </div>
 
           <div className='flex items-center justify-center'>
-            <div className='w-full max-w-[520px] rounded-[14px] overflow-hidden border-[4px] border-[var(--frame)] [box-shadow:10px_10px_0_var(--color-brand-orange),10px_10px_0_4px_var(--frame)]'>
+            <div className='w-full max-w-[520px] rounded-[14px] overflow-hidden border-[4px] border-[var(--frame)] [box-shadow:var(--shadow-brutal-xl-orange)]'>
               <div className='flex items-center gap-2 bg-[#1a1a1a] border-b-2 border-black/80 px-3.5 py-2.5'>
                 <span className='size-3 rounded-full bg-[var(--color-brand-red)] border border-black/20' />
                 <span className='size-3 rounded-full bg-[var(--color-brand-yellow)] border border-black/20' />

@@ -27,13 +27,13 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
         <div className='max-w-[1320px] mx-auto grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-[60px] px-7 items-center'>
           <div className='flex items-start justify-center'>
             <div className='flex items-start gap-[10px] font-display font-extrabold tracking-[-0.06em] leading-[0.82] text-[clamp(120px,18vw,280px)]'>
-              <span className='inline-block bg-[var(--accent)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[10px_10px_0_0_var(--frame)] leading-[0.85]'>
+              <span className='inline-block bg-[var(--accent)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]'>
                 4
               </span>
-              <span className='inline-block bg-[var(--color-brand-teal)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[10px_10px_0_0_var(--frame)] leading-[0.85]'>
+              <span className='inline-block bg-[var(--color-brand-teal)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]'>
                 0
               </span>
-              <span className='inline-block bg-[var(--color-brand-orange)] text-white border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[10px_10px_0_0_var(--frame)] leading-[0.85]'>
+              <span className='inline-block bg-[var(--color-brand-orange)] text-white border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]'>
                 4
               </span>
             </div>
@@ -60,7 +60,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
                 variant='default'
                 size='lg'
                 asChild
-                className='text-[var(--accent)] dark:text-primary-foreground [filter:none] hover:[filter:none] active:[filter:none] shadow-[5px_5px_0_0_var(--accent)] hover:shadow-[7px_7px_0_0_var(--accent)] active:shadow-[1px_1px_0_0_var(--accent)]'
+                className='text-[var(--accent)] dark:text-primary-foreground [filter:none] hover:[filter:none] active:[filter:none] shadow-[var(--shadow-brutal-btn-accent)] hover:shadow-[var(--shadow-brutal-btn-accent-hover)] active:shadow-[var(--shadow-brutal-btn-accent-active)]'
               >
                 <Link href='/'>← {t('ctaPrimary')}</Link>
               </Button>
@@ -78,7 +78,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
                   key={href}
                   variant='outline'
                   asChild
-                  className='justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[3px_3px_0_0_var(--frame)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)]'
+                  className='justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[var(--shadow-brutal-3)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-px active:translate-y-px active:shadow-[var(--shadow-brutal-btn-active)]'
                 >
                   <Link href={href}>
                     <span

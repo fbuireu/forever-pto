@@ -23,7 +23,7 @@
   background: linear-gradient(135deg, var(--accent) 0%, var(--color-brand-orange) 100%);
   border: 3px solid var(--frame);
   border-radius: 8px;
-  box-shadow: 5px 5px 0 0 var(--frame);
+  box-shadow: var(--shadow-brutal-btn);
   color: var(--color-brand-ink);
   filter: none;
   transform: translate(0, 0);
@@ -34,13 +34,13 @@
 
 .donate-brutal .donate-brutal-btn:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0 0 var(--frame);
+  box-shadow: var(--shadow-brutal-btn-hover);
   background: linear-gradient(135deg, var(--accent) 0%, var(--color-brand-orange) 100%);
   filter: none;
 }
 
 .donate-brutal .donate-brutal-btn:active {
   transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 0 var(--frame);
+  box-shadow: var(--shadow-brutal-btn-active);
   filter: none;
 }

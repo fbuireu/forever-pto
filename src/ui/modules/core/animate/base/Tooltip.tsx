@@ -42,7 +42,7 @@ function TooltipContent({ className, sideOffset = 4, children, style, ...props }
       <TooltipPositionerPrimitive sideOffset={sideOffset} className='z-50' {...props}>
         <TooltipPopupPrimitive
           className={cn(
-            'bg-primary text-primary-foreground w-fit origin-(--transform-origin) rounded-[8px] border-[3px] border-[var(--frame)] px-3 py-2 text-xs font-bold text-balance shadow-[3px_3px_0_0_var(--accent)]',
+            'bg-primary text-primary-foreground w-fit origin-(--transform-origin) rounded-[8px] border-[3px] border-[var(--frame)] px-3 py-2 text-xs font-bold text-balance shadow-[var(--shadow-brutal-3-accent)]',
             className
           )}
           style={style}
@@ -60,7 +60,7 @@ function TooltipInfoTrigger({ className, ...props }: TooltipInfoTriggerProps) {
   return (
     <TooltipTriggerPrimitive
       className={cn(
-        'ml-auto cursor-help shrink-0 size-5 grid place-items-center rounded-[5px] border-[2px] border-[var(--frame)] bg-[var(--accent)] text-[var(--color-brand-ink)] shadow-[2px_2px_0_0_var(--frame)] hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_0_var(--frame)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--frame)] transition-[transform,box-shadow] duration-75',
+        'ml-auto cursor-help shrink-0 size-5 grid place-items-center rounded-[5px] border-[2px] border-[var(--frame)] bg-[var(--accent)] text-[var(--color-brand-ink)] shadow-[var(--shadow-brutal-xs)] hover:-translate-x-px hover:-translate-y-px hover:shadow-[var(--shadow-brutal-3)] active:translate-x-px active:translate-y-px active:shadow-[var(--shadow-brutal-btn-active)] transition-[transform,box-shadow] duration-75',
         className
       )}
       {...props}

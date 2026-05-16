@@ -333,7 +333,7 @@ function Status({ currentSelection }: StatusProps) {
         <Progress value={usedPct === 100 ? 100 : usedPct}>
           <div className='relative h-[22px]'>
             <ProgressTrack
-              className='h-[22px] rounded-full bg-background shadow-[3px_3px_0_0_var(--frame)] flex items-center'
+              className='h-[22px] rounded-full bg-background shadow-[var(--shadow-brutal-3)] flex items-center'
               indicatorClassName='rounded-full border-r-[3px] border-[var(--frame)]'
               transition={{ type: 'tween', duration: 0.15, ease: 'easeOut' }}
             />
@@ -348,7 +348,7 @@ function Status({ currentSelection }: StatusProps) {
         <Progress value={remainingPct}>
           <div className='relative h-[22px]'>
             <ProgressTrack
-              className='h-[22px] rounded-full bg-background shadow-[3px_3px_0_0_var(--frame)] flex items-center'
+              className='h-[22px] rounded-full bg-background shadow-[var(--shadow-brutal-3)] flex items-center'
               indicatorClassName='rounded-full border-r-[3px] border-[var(--frame)] bg-[var(--color-brand-teal)]'
               transition={{ type: 'tween', duration: 0.15, ease: 'easeOut' }}
             />
