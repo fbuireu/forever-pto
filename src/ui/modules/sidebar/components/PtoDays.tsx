@@ -5,7 +5,7 @@ import { useHolidaysStore } from '@application/stores/holidays';
 import { Counter } from '@ui/modules/core/animate/components/Counter';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Button } from '@ui/modules/core/primitives/Button';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { CalendarDays, Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef } from 'react';

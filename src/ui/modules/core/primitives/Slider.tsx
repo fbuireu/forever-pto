@@ -1,7 +1,7 @@
 'use client';
 
 import { Slider as SliderPrimitive } from '@base-ui/react/slider';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import * as React from 'react';
 
 interface SliderProps {

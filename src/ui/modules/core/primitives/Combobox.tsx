@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@ui/modules/core/animat
 import { ChevronUpDown } from '@ui/modules/core/animate/icons/ChevronUpDown';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { Check } from 'lucide-react';
 import { useState } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './Command';

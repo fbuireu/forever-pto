@@ -1,7 +1,7 @@
 'use client';
 
 import { Accordion as AccordionPrimitive } from '@base-ui/react/accordion';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
 import { createContext, use, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 

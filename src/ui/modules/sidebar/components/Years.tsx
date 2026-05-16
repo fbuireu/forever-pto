@@ -7,7 +7,7 @@ import { ChevronDown } from '@ui/modules/core/animate/icons/ChevronDown';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Command, CommandGroup, CommandItem, CommandList } from '@ui/modules/core/primitives/Command';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { Calendar } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';

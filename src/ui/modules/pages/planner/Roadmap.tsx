@@ -5,7 +5,7 @@ import { RadialNav, type RadialNavProps } from '@ui/modules/core/animate/compone
 import { CircleCheckBig } from '@ui/modules/core/animate/icons/CircleCheckBig';
 import { Clock } from '@ui/modules/core/animate/icons/Clock';
 import { Badge } from '@ui/modules/core/primitives/Badge';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { Circle, Sparkles } from 'lucide-react';
 import type { SVGMotionProps } from 'motion/react';
 import { useTranslations } from 'next-intl';

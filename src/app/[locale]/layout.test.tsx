@@ -21,7 +21,7 @@ vi.mock('@ui/modules/tutorial/Analytics', () => ({ Analytics: () => null }));
 vi.mock('@ui/modules/tutorial/BetterStackTracking', () => ({ BetterStackTracking: () => null }));
 vi.mock('@ui/modules/core/animate/providers/LazyMotionProvider', () => ({ LazyMotionProvider: ({ children }: { children: unknown }) => children }));
 vi.mock('@ui/modules/providers/AppThemeProvider', () => ({ AppThemeProvider: ({ children }: { children: unknown }) => children }));
-vi.mock('@ui/utils/utils', () => ({ cn: (...args: unknown[]) => args.filter(Boolean).join(' ') }));
+vi.mock('@ui/utils/cn', () => ({ cn: (...args: unknown[]) => args.filter(Boolean).join(' ') }));
 vi.mock('@styles/index.css', () => ({}));
 vi.mock('@app/fonts', () => ({
   bricolage: { variable: 'var-bricolage' },

@@ -4,7 +4,7 @@ import { LOCALE_COOKIE, LOCALES } from '@infrastructure/i18n/config';
 import { routing } from '@infrastructure/i18n/routing';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { NotFoundContent } from '@ui/modules/pages/not-found/NotFoundContent';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { AppThemeProvider } from '@ui/modules/providers/AppThemeProvider';

@@ -1,5 +1,5 @@
 import type { IconProps } from '@ui/modules/core/animate/icons/Icon';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import type { LucideIcon } from 'lucide-react';
 
 interface BannerProps {

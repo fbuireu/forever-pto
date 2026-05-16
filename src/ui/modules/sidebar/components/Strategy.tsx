@@ -8,7 +8,7 @@ import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Users } from '@ui/modules/core/animate/icons/Users';
 import { Card, CardDescription } from '@ui/modules/core/primitives/Card';
 import { Combobox } from '@ui/modules/core/primitives/Combobox';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { AlertCircle, CheckCircle2, DicesIcon, Scale, TrendingUp } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';

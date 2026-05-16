@@ -4,7 +4,7 @@ import { usePremiumStore } from '@application/stores/premium';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/modules/core/animate/base/Tooltip';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Lock } from '@ui/modules/core/animate/icons/Lock';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';

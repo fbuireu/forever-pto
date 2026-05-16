@@ -1,7 +1,7 @@
 import { Link } from '@application/i18n/navigation';
 import { Badge } from '@ui/modules/core/primitives/Badge';
 import { Button } from '@ui/modules/core/primitives/Button';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { getTranslations } from 'next-intl/server';
 import { SupportButton } from '../navigation/SupportButton';
 import { brutCard } from './shared';

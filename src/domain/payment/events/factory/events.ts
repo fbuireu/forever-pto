@@ -1,6 +1,6 @@
 import type Stripe from 'stripe';
 import type { PaymentFailedEvent, PaymentSucceededEvent } from '../types';
-import { resolveChargeId } from './utils';
+import { resolveChargeId } from './resolvers';
 
 export const createPaymentSucceededEvent = (paymentIntent: Stripe.PaymentIntent): PaymentSucceededEvent => ({
   type: 'payment_succeeded',

@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@ui/modules/core/primitives/Button';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { AnimatePresence, m, type Transition } from 'motion/react';

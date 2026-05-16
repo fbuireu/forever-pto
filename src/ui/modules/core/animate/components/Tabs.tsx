@@ -1,7 +1,7 @@
 'use client';
 
 import { AutoHeight } from '@ui/modules/core/animate/effects/AutoHeight';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
 import * as React from 'react';
 import { createContext, use, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';

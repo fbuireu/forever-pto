@@ -5,7 +5,7 @@ import '@styles/index.css';
 import enMessages from '@i18n/messages/en.json';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { ErrorContent } from '@ui/modules/pages/error/ErrorContent';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
 import { getLocaleFromPathname } from '@infrastructure/i18n/url';
 import { NextIntlClientProvider } from 'next-intl';

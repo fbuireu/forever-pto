@@ -1,4 +1,4 @@
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import {
   PopoverPopup as PopoverPopupPrimitive,
   type PopoverPopupProps as PopoverPopupPrimitiveProps,

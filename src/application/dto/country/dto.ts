@@ -1,6 +1,6 @@
 import type { CountryDTO, RawCountry } from '@application/dto/country/types';
 import type { BaseDTO } from '@application/shared/dto/baseDTO';
-import { getEmojiFlag } from './utils';
+import { getEmojiFlag } from './flag';
 
 export const countryDTO: BaseDTO<RawCountry, CountryDTO[]> = {
   create: ({ raw }) => {

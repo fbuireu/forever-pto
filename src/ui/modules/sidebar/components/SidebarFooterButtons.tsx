@@ -1,7 +1,7 @@
 'use client';
 
 import { SidebarFooter, SidebarMenu, SidebarMenuItem, useSidebar } from '@ui/modules/core/animate/base/Sidebar';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { LanguageSelector } from './LanguageSelector';
 import { ThemeSelector } from './ThemeSelector';
 

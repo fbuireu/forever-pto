@@ -2,7 +2,7 @@ import { Link } from '@application/i18n/navigation';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Header } from '@ui/modules/pages/homepage/navigation/Navigation';
 import { Footer } from '@ui/modules/shared/footer/Footer';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { getTranslations } from 'next-intl/server';
 
 interface NotFoundContentProps {

@@ -3,7 +3,7 @@
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { Textarea } from '@ui/modules/core/primitives/Textarea';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { cva, type VariantProps } from 'class-variance-authority';
 import type { ComponentProps } from 'react';
 

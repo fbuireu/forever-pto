@@ -3,7 +3,7 @@ import { ArrowDown } from '@ui/modules/core/animate/icons/ArrowDown';
 import { ArrowUp } from '@ui/modules/core/animate/icons/ArrowUp';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { TableHeader as BaseTableHeader, TableHead, TableRow } from '@ui/modules/core/primitives/Table';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { ArrowUpDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { memo } from 'react';

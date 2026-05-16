@@ -2,7 +2,7 @@
 
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { SearchIcon } from '@ui/modules/core/animate/icons/Search';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { Command as CommandPrimitive } from 'cmdk';
 import type { ComponentProps } from 'react';
 

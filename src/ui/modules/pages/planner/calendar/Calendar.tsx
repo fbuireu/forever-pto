@@ -9,7 +9,7 @@ import { Button } from '@ui/modules/core/primitives/Button';
 import { SupportButton } from '@ui/modules/pages/homepage/navigation/SupportButton';
 import { ConditionalWrapper } from '@ui/modules/shared/ConditionalWrapper';
 import { addMonths, type Day, formatDate, isSameDay, isSameMonth, isWeekend, subMonths } from '@ui/utils/dates';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { LockIcon } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';

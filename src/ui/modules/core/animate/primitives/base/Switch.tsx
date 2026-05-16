@@ -2,7 +2,7 @@
 
 import { Switch as SwitchPrimitives } from '@base-ui/react/switch';
 import { getStrictContext } from '@ui/utils/context';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import {
   type HTMLMotionProps,
   type LegacyAnimationControls,
