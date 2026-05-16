@@ -63,7 +63,7 @@ describe('useTutorial', () => {
     });
 
     const desktopStepCount = 10;
-    const steps = mockStart.mock.lastCall![0] as unknown[];
+    const steps = mockStart.mock.lastCall?.[0] as unknown[];
     expect(steps.length).toBeGreaterThan(desktopStepCount);
   });
 
@@ -74,7 +74,7 @@ describe('useTutorial', () => {
       await result.current.startTutorial();
     });
 
-    const options = mockStart.mock.lastCall![1] as Record<string, string>;
+    const options = mockStart.mock.lastCall?.[1] as Record<string, string>;
     expect(options).toHaveProperty('nextBtnText');
     expect(options).toHaveProperty('prevBtnText');
     expect(options).toHaveProperty('doneBtnText');
