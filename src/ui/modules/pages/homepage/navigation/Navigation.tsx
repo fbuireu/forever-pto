@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { HomepageLanguageSwitcher } from './HomepageLanguageSwitcher';
 
-export const Navigation = async () => {
+export const Header = async () => {
   const t = await getTranslations('homepage');
 
   return (

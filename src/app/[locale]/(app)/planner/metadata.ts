@@ -19,6 +19,7 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
   return {
     title: t('planner.title'),
     description: t('planner.description'),
+    keywords: t('keywords'),
     metadataBase: new URL(baseUrl),
     alternates: {
       canonical: localePath(locale, '/planner'),
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
     openGraph: {
       title: t('planner.title'),
       description: t('planner.description'),
-      url: '/planner',
+      url: localePath(locale, '/planner'),
       siteName: 'Forever PTO',
       locale,
       type: 'website',
@@ -52,6 +53,9 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
       googleBot: {
         index: true,
         follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
       },
     },
   };

@@ -5,9 +5,11 @@ import { localePath } from '../infrastructure/i18n/url';
 
 vi.mock('@opennextjs/cloudflare', () => ({
   getCloudflareContext: vi.fn().mockResolvedValue({
-    env: { NEXT_PUBLIC_SITE_URL: 'https://forever-pto.com' },
+    env: { NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL },
   }),
 }));
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
 const { default: robots, DISALLOWED_PAGES } = await import('./robots');
 
@@ -41,6 +43,6 @@ describe('robots', () => {
   });
 
   it('includes the sitemap URL', () => {
-    expect(result.sitemap).toBe('https://forever-pto.com/sitemap.xml');
+    expect(result.sitemap).toBe(`${BASE_URL}/sitemap.xml`);
   });
 });

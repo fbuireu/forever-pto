@@ -1,5 +1,6 @@
 'use client';
 
+import { EN } from '@infrastructure/i18n/locales';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -60,8 +61,8 @@ export const CookieConsent = () => {
         },
       },
       language: {
-        default: 'en',
-        translations: { en: { consentModal: { title: t('title') }, preferencesModal: { sections: [] } } },
+        default: EN,
+        translations: { [EN]: { consentModal: { title: t('title') }, preferencesModal: { sections: [] } } },
       },
       onConsent: () => {
         const granted = CookieConsentLib.acceptedCategory('analytics');

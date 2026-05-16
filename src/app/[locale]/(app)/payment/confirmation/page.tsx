@@ -3,6 +3,7 @@ import { getBetterStackInstance } from '@infrastructure/clients/logging/better-s
 import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
+import { getCurrencySymbol } from '@ui/utils/currencies';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import type { Locale } from 'next-intl';
@@ -20,29 +21,6 @@ interface PaymentSuccessParams {
   }>;
   params: Promise<{ locale: Locale }>;
 }
-
-const getCurrencySymbol = (
-  locale: string,
-  currency: string,
-  logger: ReturnType<typeof getBetterStackInstance>
-): string => {
-  try {
-    const formatter = new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
-    return formatter.formatToParts(0).find(({ type }) => type === 'currency')?.value ?? currency;
-  } catch (error) {
-    logger.warn('Failed to format currency symbol', {
-      locale,
-      currency,
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
-    return currency;
-  }
-};
 
 async function PaymentError() {
   const t = await getTranslations('paymentConfirmation.failed');
@@ -112,7 +90,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
   const t = await getTranslations('paymentConfirmation.success');
   const amount = paymentIntent.amount / 100;
   const currency = paymentIntent.currency.toUpperCase();
-  const currencySymbol = getCurrencySymbol(locale, currency, logger);
+  const currencySymbol = getCurrencySymbol({ locale, currency });
 
   return (
     <div className='min-h-screen flex items-center justify-center p-4 bg-background m-auto'>

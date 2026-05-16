@@ -1,3 +1,4 @@
+import { EN } from '@infrastructure/i18n/locales';
 import { describe, expect, it } from 'vitest';
 import {
   addDays,
@@ -148,13 +149,13 @@ describe('ensureDate', () => {
 
 describe('formatDate', () => {
   it('formats as ISO date', () => {
-    expect(formatDate({ date: new Date(2024, 0, 5), locale: 'en', format: 'yyyy-MM-dd' })).toBe('2024-01-05');
+    expect(formatDate({ date: new Date(2024, 0, 5), locale: EN, format: 'yyyy-MM-dd' })).toBe('2024-01-05');
   });
 });
 
 describe('getWeekdayNames', () => {
   it('returns 7 names', () => {
-    const names = getWeekdayNames({ locale: 'en' });
+    const names = getWeekdayNames({ locale: EN });
     expect(names).toHaveLength(7);
   });
 

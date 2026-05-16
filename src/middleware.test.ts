@@ -1,3 +1,4 @@
+import { ES } from '@infrastructure/i18n/locales';
 import { LOCALE_COOKIE } from '@infrastructure/i18n/config';
 import { type NextRequest, NextResponse } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -23,7 +24,7 @@ vi.mock('@infrastructure/proxy/location', () => ({
   location: vi.fn(({ response }: { response: NextResponse }) => Promise.resolve(response)),
 }));
 
-const BASE_URL = 'https://forever-pto.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
 const { middleware } = await import('./middleware');
 
@@ -49,7 +50,7 @@ describe('middleware', () => {
       await middleware(request);
 
       expect(spy).toHaveBeenCalledOnce();
-      const url: URL = spy.mock.calls[0][0] as URL;
+      const url = spy.mock.calls[0][0] as URL;
       expect(url.pathname).toBe('/api/markdown');
       expect(url.searchParams.get('path')).toBe('/some-page');
     });
@@ -84,14 +85,14 @@ describe('middleware', () => {
 
   describe('locale cookie hardening', () => {
     it('upgrades the locale cookie to httpOnly + secure + sameSite lax', async () => {
-      mockI18nResponse.cookies.get.mockReturnValue({ value: 'es' });
-      const request = makeRequest('/es');
+      mockI18nResponse.cookies.get.mockReturnValue({ value: ES });
+      const request = makeRequest(`/${ES}`);
 
       await middleware(request);
 
       expect(mockI18nResponse.cookies.set).toHaveBeenCalledWith({
         name: LOCALE_COOKIE,
-        value: 'es',
+        value: ES,
         httpOnly: true,
         secure: true,
         sameSite: 'lax',

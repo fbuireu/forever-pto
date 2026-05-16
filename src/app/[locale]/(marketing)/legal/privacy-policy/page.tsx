@@ -1,5 +1,7 @@
-import { Link } from '@application/i18n/navigation';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { createRichLink } from '@ui/modules/core/primitives/RichLink';
+
+const cookiePolicyLink = createRichLink('/legal/cookie-policy');
 import { LegalLayout } from '@ui/modules/layout/LegalLayout';
 import { Me } from '@ui/modules/pages/legal/Me';
 import type { Locale } from 'next-intl';
@@ -146,13 +148,7 @@ export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPoli
       <section>
         <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.cookiesAndTracking.title')}</h2>
         <p>
-          {t.rich('sections.cookiesAndTracking.description', {
-            link: (chunks) => (
-              <Link href='/legal/cookie-policy' className='text-primary hover:underline'>
-                {chunks}
-              </Link>
-            ),
-          })}
+          {t.rich('sections.cookiesAndTracking.description', { link: cookiePolicyLink })}
         </p>
       </section>
 

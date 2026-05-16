@@ -27,6 +27,7 @@ function selectOptimalCombination({ bridges, targetPtoDays }: SelectOptimalCombi
       b.effectiveDays >= HIGH_VALUE_THRESHOLD_EFFECTIVE &&
       b.efficiency >= ACCEPTABLE
   );
+  const highValueBridgesSet = new Set(highValueBridges);
 
   for (const bridge of highValueBridges) {
     if (totalPtoDays + bridge.ptoDaysNeeded > targetPtoDays) continue;
@@ -45,7 +46,7 @@ function selectOptimalCombination({ bridges, targetPtoDays }: SelectOptimalCombi
   }
 
   if (totalPtoDays < targetPtoDays) {
-    const remainingBridges = bridges.filter((b) => !highValueBridges.includes(b));
+    const remainingBridges = bridges.filter((b) => !highValueBridgesSet.has(b));
 
     for (const bridge of remainingBridges) {
       if (totalPtoDays >= targetPtoDays) break;
