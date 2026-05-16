@@ -32,10 +32,10 @@ interface CreateRichLinkOptions {
 }
 
 export function createRichLink(href: string, options?: CreateRichLinkOptions) {
-  return function RichLinkTag({ children }: { children?: ReactNode }) {
+  return function RichLinkTag(chunks: ReactNode) {
     return (
       <RichLink href={href} className={options?.className} external={options?.external}>
-        {children}
+        {chunks}
       </RichLink>
     );
   };

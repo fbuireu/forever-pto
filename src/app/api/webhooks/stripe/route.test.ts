@@ -23,7 +23,7 @@ vi.mock('@infrastructure/layers', async () => {
       paymentIntents: { create: vi.fn(), retrieve: vi.fn() },
       charges: { retrieve: vi.fn() },
       promotionCodes: { list: vi.fn(), retrieve: vi.fn() },
-      webhooks: { constructEvent: mockConstructEvent },
+      webhooks: { constructEvent: mockConstructEvent as never },
     }),
   };
 });
