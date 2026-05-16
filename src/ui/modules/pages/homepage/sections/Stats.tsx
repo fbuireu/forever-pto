@@ -5,7 +5,7 @@ export const Stats = async () => {
 
   return (
     <section className='px-7 pb-24'>
-      <div className='max-w-[1240px] mx-auto grid grid-cols-2 md:grid-cols-4 border-[4px] border-[var(--frame)] rounded-[14px] overflow-hidden bg-card shadow-[10px_10px_0_0_var(--frame)]'>
+      <div className='max-w-[1240px] mx-auto grid grid-cols-2 md:grid-cols-4 border-[4px] border-[var(--frame)] rounded-[14px] overflow-hidden bg-card shadow-[var(--shadow-brutal-xl)]'>
         {[
           { num: '2.14×', label: t('stats.multiplierLabel'), bg: 'var(--color-brand-yellow)' },
           { num: '47', label: t('stats.daysLabel', { days: 22 }), bg: 'var(--color-brand-teal)' },

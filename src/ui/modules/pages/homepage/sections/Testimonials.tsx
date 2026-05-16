@@ -46,7 +46,7 @@ export const Testimonials = async () => {
               className={cn(brutCard, 'p-6 relative transition-transform duration-200', rotate, hoverRotate)}
             >
               <span
-                className='absolute -top-3.5 left-[18px] bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[8px] px-2.5 font-serif text-[36px] leading-none shadow-[3px_3px_0_0_var(--frame)] rotate-[-5deg]'
+                className='absolute -top-3.5 left-[18px] bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[8px] px-2.5 font-serif text-[36px] leading-none shadow-[var(--shadow-brutal-3)] rotate-[-5deg]'
                 aria-hidden='true'
               >
                 &quot;

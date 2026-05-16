@@ -40,7 +40,7 @@ const WorkdayCounter = dynamic(() => import('./components/WorkdayCounter').then(
 const CalendarExport = dynamic(() => import('./components/CalendarExport').then((m) => m.CalendarExport));
 
 const STEP_CARD_CLASS =
-  'bg-sidebar border-[3px] border-[var(--frame)] rounded-[14px] shadow-[6px_6px_0_0_var(--frame)] p-[18px]';
+  'bg-sidebar border-[3px] border-[var(--frame)] rounded-[14px] shadow-[var(--shadow-brutal-md)] p-[18px]';
 
 interface AppSidebarProps {
   children: React.ReactNode;

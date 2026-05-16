@@ -28,7 +28,7 @@ function InputGroup({ className, ...props }: ComponentProps<'div'>) {
         'has-[[data-slot=input-group-control]:focus-visible]:shadow-[var(--shadow-brutal-sm)]',
 
         // Error state.
-        'has-[[data-slot][aria-invalid=true]]:border-destructive has-[[data-slot][aria-invalid=true]]:shadow-none has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:shadow-[4px_4px_0_0_var(--destructive)]',
+        'has-[[data-slot][aria-invalid=true]]:border-destructive has-[[data-slot][aria-invalid=true]]:shadow-none has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:shadow-[var(--shadow-brutal-sm-destructive)]',
 
         className
       )}

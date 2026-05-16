@@ -34,13 +34,26 @@
     radial-gradient(circle at top right, rgba(255, 122, 69, 0.08), transparent 30%),
     radial-gradient(circle at bottom left, rgba(179, 136, 255, 0.1), transparent 30%);
   --shadow-brutal-xs: 2px 2px 0 0 var(--frame);
+  --shadow-brutal-xs-inverted: 2px 2px 0 0 var(--background);
+  --shadow-brutal-3: 3px 3px 0 0 var(--frame);
+  --shadow-brutal-3-accent: 3px 3px 0 0 var(--accent);
   --shadow-brutal-sm: 4px 4px 0 0 var(--frame);
+  --shadow-brutal-sm-destructive: 4px 4px 0 0 var(--destructive);
   --shadow-brutal-md: 6px 6px 0 0 var(--frame);
   --shadow-brutal-lg: 8px 8px 0 0 var(--frame);
   --shadow-brutal-xl: 10px 10px 0 0 var(--frame);
+  --shadow-brutal-9: 9px 9px 0 0 var(--frame);
+  --shadow-brutal-11: 11px 11px 0 0 var(--frame);
   --shadow-brutal-btn: 5px 5px 0 0 var(--frame);
   --shadow-brutal-btn-hover: 7px 7px 0 0 var(--frame);
   --shadow-brutal-btn-active: 1px 1px 0 0 var(--frame);
+  --shadow-brutal-btn-accent: 5px 5px 0 0 var(--accent);
+  --shadow-brutal-btn-accent-hover: 7px 7px 0 0 var(--accent);
+  --shadow-brutal-btn-accent-active: 1px 1px 0 0 var(--accent);
+  --shadow-brutal-btn-orange: 5px 5px 0 0 var(--color-brand-orange);
+  --shadow-brutal-btn-orange-hover: 7px 7px 0 0 var(--color-brand-orange);
+  --shadow-brutal-btn-orange-active: 1px 1px 0 0 var(--color-brand-orange);
+  --shadow-brutal-xl-orange: 10px 10px 0 var(--color-brand-orange), 10px 10px 0 4px var(--frame);
   --shadow-brutal-btn-inverted: 5px 5px 0 0 var(--background);
   --shadow-brutal-btn-inverted-hover: 7px 7px 0 0 var(--background);
   --shadow-brutal-btn-inverted-active: 1px 1px 0 0 var(--background);

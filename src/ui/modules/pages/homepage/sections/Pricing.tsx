@@ -25,7 +25,7 @@ export const Pricing = async () => {
         <div
           className={cn(
             brutCard,
-            'p-8 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+            'p-8 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-9)]'
           )}
         >
           <h3 className='font-display font-semibold text-[28px] tracking-[-0.02em] mb-2'>{t('pricing.freeName')}</h3>
@@ -60,7 +60,7 @@ export const Pricing = async () => {
         <div
           className={cn(
             brutCard,
-            'p-8 relative rotate-[-1deg] transition-all duration-75 hover:rotate-0 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+            'p-8 relative rotate-[-1deg] transition-all duration-75 hover:rotate-0 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-9)]'
           )}
           style={{ background: 'var(--accent)', color: 'var(--color-brand-ink)' }}
         >
@@ -99,7 +99,7 @@ export const Pricing = async () => {
           </ul>
           <SupportButton
             label={t('pricing.lifetimeCta')}
-            className='w-full justify-center !bg-[var(--color-brand-ink)] !text-white !border-transparent !shadow-[5px_5px_0_0_var(--color-brand-orange)] hover:!shadow-[7px_7px_0_0_var(--color-brand-orange)] active:!shadow-[1px_1px_0_0_var(--color-brand-orange)]'
+            className='w-full justify-center !bg-[var(--color-brand-ink)] !text-white !border-transparent !shadow-[var(--shadow-brutal-btn-orange)] hover:!shadow-[var(--shadow-brutal-btn-orange-hover)] active:!shadow-[var(--shadow-brutal-btn-orange-active)]'
           />
         </div>
       </div>

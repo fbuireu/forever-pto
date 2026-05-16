@@ -107,7 +107,7 @@ export const YearTimelineChart = ({ year, holidays, suggestion, manuallySelected
   }, [holidays, suggestion, manuallySelectedDays, t]);
 
   return (
-    <div className='w-full border-[3px] border-[var(--frame)] rounded-[10px] shadow-[4px_4px_0_0_var(--frame)] overflow-hidden bg-card'>
+    <div className='w-full border-[3px] border-[var(--frame)] rounded-[10px] shadow-[var(--shadow-brutal-sm)] overflow-hidden bg-card'>
       <div className='flex gap-2.5 px-3 border-b-[3px] border-[var(--frame)]'>
         <div className='w-[70px] shrink-0' />
         <div className='flex-1 grid grid-cols-12'>

@@ -23,7 +23,7 @@ export const Features = async () => {
         <div
           className={cn(
             brutCard,
-            'md:col-span-4 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+            'md:col-span-4 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
           )}
           style={{ background: 'var(--accent)', color: 'var(--color-brand-ink)' }}
         >
@@ -53,7 +53,7 @@ export const Features = async () => {
         <div
           className={cn(
             brutCard,
-            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
           )}
         >
           <span className='inline-block px-2.5 py-1 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]'>
@@ -67,7 +67,7 @@ export const Features = async () => {
         <div
           className={cn(
             brutCard,
-            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
           )}
           style={{ background: 'var(--color-brand-teal)' }}
         >
@@ -92,7 +92,7 @@ export const Features = async () => {
         <div
           className={cn(
             brutCard,
-            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
           )}
         >
           <span className='inline-block px-2.5 py-1 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]'>
@@ -124,7 +124,7 @@ export const Features = async () => {
         <div
           className={cn(
             brutCard,
-            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
           )}
           style={{ background: 'var(--color-brand-orange)' }}
         >
@@ -151,11 +151,11 @@ export const Features = async () => {
         <div
           className={cn(
             brutCard,
-            'md:col-span-6 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[9px_9px_0_0_var(--frame)]'
+            'md:col-span-6 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
           )}
           style={{ background: 'var(--frame)', color: 'var(--background)' }}
         >
-          <span className='inline-block px-2.5 py-1 bg-[var(--accent)] border-[2.5px] border-[var(--background)] rounded-[6px] font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--color-brand-ink)] shadow-[2px_2px_0_0_var(--background)]'>
+          <span className='inline-block px-2.5 py-1 bg-[var(--accent)] border-[2.5px] border-[var(--background)] rounded-[6px] font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--color-brand-ink)] shadow-[var(--shadow-brutal-xs-inverted)]'>
             {t('features.privacyTag')}
           </span>
           <h3 className='font-display font-semibold text-[26px] mt-3.5 mb-2 tracking-[-0.02em] text-[var(--background)]'>

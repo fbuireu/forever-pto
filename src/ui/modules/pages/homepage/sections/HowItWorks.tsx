@@ -51,17 +51,17 @@ export const HowItWorks = async () => {
             key={num}
             className={cn(
               brutCard,
-              'px-7 pt-14 pb-7 relative transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[11px_11px_0_0_var(--frame)]'
+              'px-7 pt-14 pb-7 relative transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-11)]'
             )}
           >
             <div
-              className='absolute -top-7 left-[22px] size-14 border-[4px] border-[var(--frame)] rounded-full grid place-items-center font-display font-extrabold text-[26px] shadow-[4px_4px_0_0_var(--frame)] text-[var(--color-brand-ink)]'
+              className='absolute -top-7 left-[22px] size-14 border-[4px] border-[var(--frame)] rounded-full grid place-items-center font-display font-extrabold text-[26px] shadow-[var(--shadow-brutal-sm)] text-[var(--color-brand-ink)]'
               style={{ background: bg }}
             >
               {num}
             </div>
             <div
-              className='size-16 border-[3px] border-[var(--frame)] rounded-[10px] grid place-items-center text-[32px] mb-4 mt-4 shadow-[3px_3px_0_0_var(--frame)]'
+              className='size-16 border-[3px] border-[var(--frame)] rounded-[10px] grid place-items-center text-[32px] mb-4 mt-4 shadow-[var(--shadow-brutal-3)]'
               style={{ background: iconBg }}
             >
               {icon}

@@ -16,13 +16,13 @@ export function Logo() {
       <Link
         href='/'
         onClick={() => isMobile && setOpenMobile(false)}
-        className='no-underline outline-none w-full p-3 flex justify-center hover:opacity-85 transition-opacity'
+        className='no-underline outline-none w-full p-3 flex justify-center hover:opacity-85 transition-opacity group'
         aria-label='Forever PTO'
       >
         <div className='flex items-center gap-2'>
           {(isOpen || isMobile) && <p className='text-3xl font-display font-black tracking-tighter'>Forever</p>}
           <div
-            className='bg-accent border-[3px] border-(--frame) rounded-[8px] shadow-(--shadow-brutal-xs) overflow-hidden shrink-0 -rotate-[4deg]'
+            className='bg-accent border-[3px] border-(--frame) rounded-[8px] shadow-(--shadow-brutal-xs) overflow-hidden shrink-0 -rotate-[4deg] group-hover:rotate-0 transition-transform'
             style={{ width: logoSize, height: logoSize }}
             aria-hidden='true'
           >

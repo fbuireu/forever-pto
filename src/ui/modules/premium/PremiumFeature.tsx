@@ -81,7 +81,7 @@ export const PremiumFeature = ({
             <TooltipProvider delayDuration={200}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className='relative inline-flex items-center justify-center rounded-[8px] border-[3px] border-[var(--frame)] bg-background p-2 rotate-[-4deg] shadow-[3px_3px_0_0_var(--frame)]'>
+                  <div className='relative inline-flex items-center justify-center rounded-[8px] border-[3px] border-[var(--frame)] bg-background p-2 rotate-[-4deg] shadow-[var(--shadow-brutal-3)]'>
                     <Lock className={cn(iconSize, 'text-foreground')} />
                     <span className='absolute -top-2.5 -right-2.5 size-4 inline-flex items-center justify-center rounded-[4px] border-[2px] border-[var(--frame)] bg-[var(--accent)] text-[var(--color-brand-ink)] font-mono font-black text-[10px] leading-none'>
                       i
@@ -93,7 +93,7 @@ export const PremiumFeature = ({
             </TooltipProvider>
           ) : (
             <div className='flex flex-col items-center gap-2 text-center px-4'>
-              <div className='inline-flex items-center justify-center rounded-[8px] border-[3px] border-[var(--frame)] bg-background p-2 rotate-[-4deg] shadow-[3px_3px_0_0_var(--frame)]'>
+              <div className='inline-flex items-center justify-center rounded-[8px] border-[3px] border-[var(--frame)] bg-background p-2 rotate-[-4deg] shadow-[var(--shadow-brutal-3)]'>
                 <Lock className={cn(iconSize, 'text-foreground')} />
               </div>
               {inlineDescription && (

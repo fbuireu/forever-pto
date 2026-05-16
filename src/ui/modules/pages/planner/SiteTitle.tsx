@@ -11,13 +11,13 @@ export const SiteTitle = async () => {
       </h1>
       <p className='font-display font-semibold text-[clamp(28px,4vw,52px)] leading-none tracking-[-0.03em] flex items-center gap-4 flex-wrap justify-center'>
         <span
-          className='inline-block bg-[var(--accent)] text-[var(--color-brand-ink)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[5px_5px_0_0_var(--frame)]'
+          className='inline-block bg-[var(--accent)] text-[var(--color-brand-ink)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[var(--shadow-brutal-btn)]'
           style={{ transform: 'rotate(-4deg)' }}
         >
           {t('titleHighlight1')}
         </span>
         <span
-          className='inline-block bg-[var(--color-brand-sky)] text-[var(--color-brand-ink)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[5px_5px_0_0_var(--frame)]'
+          className='inline-block bg-[var(--color-brand-sky)] text-[var(--color-brand-ink)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[var(--shadow-brutal-btn)]'
           style={{ transform: 'rotate(4deg)' }}
         >
           {t('titleHighlight2')}

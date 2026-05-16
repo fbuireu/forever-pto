@@ -41,7 +41,7 @@ export const Comparison = async () => {
           </ul>
         </div>
         <div className='grid place-items-center'>
-          <div className='size-16 rounded-full bg-[var(--accent)] text-[var(--color-brand-ink)] border-[4px] border-[var(--frame)] shadow-[4px_4px_0_0_var(--frame)] grid place-items-center font-display font-extrabold text-[18px] rotate-[-8deg]'>
+          <div className='size-16 rounded-full bg-[var(--accent)] text-[var(--color-brand-ink)] border-[4px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] grid place-items-center font-display font-extrabold text-[18px] rotate-[-8deg]'>
             VS
           </div>
         </div>

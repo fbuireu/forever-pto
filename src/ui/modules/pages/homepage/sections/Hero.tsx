@@ -36,7 +36,7 @@ export const Hero = async () => {
             {t('hero.command')}
             <br />
             {t('hero.verb')}{' '}
-            <span className='relative inline-block bg-[var(--accent)] text-[var(--color-brand-ink)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[5px_5px_0_0_var(--frame)] mx-1 [animation:highlight-shake_4s_ease-in-out_infinite_1.5s]'>
+            <span className='relative inline-block bg-[var(--accent)] text-[var(--color-brand-ink)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[var(--shadow-brutal-btn)] mx-1 [animation:highlight-shake_4s_ease-in-out_infinite_1.5s]'>
               {t('hero.highlight')}
             </span>
             <span className='inline-block text-[0.75em] rotate-[15deg]'>🌴</span>
@@ -64,7 +64,7 @@ export const Hero = async () => {
           </div>
         </div>
 
-        <div className='bg-card border-[5px] border-[var(--frame)] rounded-[14px] shadow-[10px_10px_0_0_var(--frame)] overflow-hidden rotate-[1.2deg] hover:rotate-0 transition-transform duration-[250ms] ease-out'>
+        <div className='bg-card border-[5px] border-[var(--frame)] rounded-[14px] shadow-[var(--shadow-brutal-xl)] overflow-hidden rotate-[1.2deg] hover:rotate-0 transition-transform duration-[250ms] ease-out'>
           <div className='flex items-center gap-2.5 px-4 py-[10px] bg-[var(--frame)]'>
             <div className='size-3 rounded-full bg-[var(--color-brand-red)] border-[1.5px] border-black' />
             <div className='size-3 rounded-full bg-[var(--color-brand-yellow)] border-[1.5px] border-black' />
