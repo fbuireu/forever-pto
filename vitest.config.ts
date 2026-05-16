@@ -22,6 +22,7 @@ export default defineConfig({
         'src/**/types.ts',
         'src/**/*.types.ts',
         'src/app/fonts.ts',
+        'src/ui/modules/bones/registry.ts',
       ],
     },
   },
