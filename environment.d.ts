@@ -6,6 +6,8 @@ declare global {
     interface ProcessEnv {
       TURSO_AUTH_TOKEN: string;
       TURSO_DATABASE_URL: string;
+      NEXT_PUBLIC_SITE_URL: string;
+      NEXT_PUBLIC_CONTACT_EMAIL: string;
       NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: string;
       NEXT_PUBLIC_STORAGE_KEY: string;
       JWT_SECRET: string;

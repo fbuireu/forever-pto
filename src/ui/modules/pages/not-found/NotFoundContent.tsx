@@ -1,6 +1,6 @@
 import { Link } from '@application/i18n/navigation';
 import { Button } from '@ui/modules/core/primitives/Button';
-import { Navigation } from '@ui/modules/pages/homepage/navigation/Navigation';
+import { Header as Navigation } from '@ui/modules/pages/homepage/navigation/Navigation';
 import { Footer } from '@ui/modules/shared/footer/Footer';
 import { cn } from '@ui/utils/utils';
 import { getTranslations } from 'next-intl/server';
