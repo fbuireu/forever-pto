@@ -1,7 +1,7 @@
+import { processWebhookEvent } from '@application/use-cases/webhook';
 import { ApiError } from '@infrastructure/api/errors';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
 import { AppLayer } from '@infrastructure/layers';
-import { processWebhookEvent } from '@infrastructure/webhooks/processor';
 import { Effect } from 'effect';
 import { headers } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';

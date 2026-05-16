@@ -1,6 +1,7 @@
 import { paymentDataDTO } from '@application/dto/payment/dto';
 import { type CreatePaymentInput, createPaymentSchema } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
+import { zodParse } from '@application/shared/zodParse';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import type { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
@@ -10,7 +11,6 @@ import { validatePromoCode } from '@infrastructure/services/payments/provider/pr
 import { savePayment } from '@infrastructure/services/payments/repository';
 import { Effect } from 'effect';
 import Stripe from 'stripe';
-import { z } from 'zod';
 
 interface PaymentContext {
   userAgent: string | null;
@@ -34,27 +34,7 @@ export const createPayment = (
     const { userAgent, ipAddress } = context;
     const logger = yield* LoggerService;
 
-    const validated = yield* Effect.try({
-      try: () => createPaymentSchema.parse(params),
-      catch: (error) => {
-        if (error instanceof z.ZodError) {
-          const firstError = error.issues[0];
-          logger.warn('Payment validation error', {
-            field: firstError?.path.join('.'),
-            message: firstError?.message,
-            code: firstError?.code,
-          });
-          return new ValidationError({ message: firstError?.message ?? 'Validation failed' });
-        }
-        logger.logError('Unknown payment creation error', error, {
-          amount: params.amount,
-          hasPromoCode: !!params.promoCode,
-          userAgent,
-          ipAddress,
-        });
-        return new ValidationError({ message: error instanceof Error ? error.message : String(error) });
-      },
-    });
+    const validated = yield* zodParse(createPaymentSchema, params);
 
     let finalAmount = validated.amount;
     let discountInfo: DiscountInfo | null = null;
