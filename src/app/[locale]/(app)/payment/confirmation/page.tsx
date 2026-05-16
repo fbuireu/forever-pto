@@ -1,6 +1,6 @@
 import { Link } from '@application/i18n/navigation';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
+import { getPaymentConfirmation } from '@infrastructure/services/payments/getPaymentConfirmation';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { getCurrencySymbol } from '@ui/utils/currencies';
@@ -8,7 +8,6 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
-import type Stripe from 'stripe';
 
 export { generateMetadata } from './metadata';
 
@@ -56,7 +55,6 @@ async function PaymentError() {
 }
 
 export default async function PaymentSuccessPage({ searchParams, params }: Readonly<PaymentSuccessParams>) {
-  const stripe = getStripeServerInstance();
   const logger = getBetterStackInstance();
   const [{ payment_intent: paymentIntentId }, { locale }] = await Promise.all([searchParams, params]);
 
@@ -65,32 +63,22 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
     redirect(`/${locale}`);
   }
 
-  let paymentIntent: Stripe.PaymentIntent;
+  const confirmation = await getPaymentConfirmation(paymentIntentId);
 
-  try {
-    paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-  } catch (error) {
-    logger.logError('Failed to retrieve payment intent', error, {
-      paymentIntentId,
-      page: 'PaymentConfirmation',
-    });
-    return <PaymentError />;
-  }
-
-  if (paymentIntent.status !== 'succeeded') {
-    logger.warn('Payment intent not succeeded', {
-      paymentIntentId,
-      status: paymentIntent.status,
-      amount: paymentIntent.amount,
-      currency: paymentIntent.currency,
-    });
+  if (!confirmation || confirmation.status !== 'succeeded') {
+    if (confirmation) {
+      logger.warn('Payment intent not succeeded', {
+        paymentIntentId: confirmation.id,
+        status: confirmation.status,
+        amount: confirmation.amount,
+        currency: confirmation.currency,
+      });
+    }
     return <PaymentError />;
   }
 
   const t = await getTranslations('paymentConfirmation.success');
-  const amount = paymentIntent.amount / 100;
-  const currency = paymentIntent.currency.toUpperCase();
-  const currencySymbol = getCurrencySymbol({ locale, currency });
+  const currencySymbol = getCurrencySymbol({ locale, currency: confirmation.currency });
 
   return (
     <div className='min-h-screen flex items-center justify-center p-4 bg-background m-auto'>
@@ -108,7 +96,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
               <span className='text-muted-foreground'>{t('amountPaid')}</span>
               <span className='font-medium'>
                 {currencySymbol}
-                {amount.toFixed(2)}
+                {confirmation.amount.toFixed(2)}
               </span>
             </div>
             <div className='flex justify-between text-sm'>
@@ -117,7 +105,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
             </div>
             <div className='flex justify-between text-sm'>
               <span className='text-muted-foreground'>{t('paymentId')}</span>
-              <span className='font-mono text-xs text-muted-foreground'>{paymentIntentId.slice(0, 20)}...</span>
+              <span className='font-mono text-xs text-muted-foreground'>{confirmation.id.slice(0, 20)}...</span>
             </div>
           </div>
 

@@ -1,5 +1,12 @@
 import type Stripe from 'stripe';
 
+export interface PaymentConfirmationDTO {
+  id: string;
+  status: string;
+  amount: number;
+  currency: string;
+}
+
 export type DiscountInfo = {
   type: 'percent' | 'fixed';
   value: number;

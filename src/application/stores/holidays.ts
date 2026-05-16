@@ -1,5 +1,5 @@
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
-import { isInSelectedRange } from '@application/dto/holiday/utils/helpers';
+import { isInSelectedRange } from '@application/dto/holiday/utils';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { generateMetrics } from '@infrastructure/services/calendar/metrics/generateMetrics';
 import type { Suggestion } from '@infrastructure/services/calendar/types';

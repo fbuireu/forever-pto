@@ -1,7 +1,7 @@
 import type { BaseDTO } from '@application/shared/dto/baseDTO';
 import { addMonths, compareAsc, endOfYear, isWithinInterval, startOfYear } from '@ui/utils/dates';
 import { type HolidayDTO, HolidayVariant, type RawHoliday } from './types';
-import { getRegionName, isInSelectedRange } from './utils/helpers';
+import { getRegionName, isInSelectedRange } from './utils';
 
 type HolidayDTOParams = {
   year: number;
