@@ -3,21 +3,6 @@
 import { LOCALES } from '@infrastructure/i18n/locales';
 import { useEffect } from 'react';
 
-declare global {
-  interface Navigator {
-    modelContext?: {
-      provideContext: (context: {
-        tools: Array<{
-          name: string;
-          description: string;
-          inputSchema: Record<string, unknown>;
-          execute: (input: Record<string, unknown>) => Promise<unknown>;
-        }>;
-      }) => void;
-    };
-  }
-}
-
 export function WebMCP() {
   useEffect(() => {
     if (!navigator.modelContext?.provideContext) return;
@@ -40,12 +25,19 @@ export function WebMCP() {
               'National and regional holiday detection',
               'Bridge day optimizer',
               'Three strategies: Grouped, Optimized, Balanced',
+              'Custom holidays: add, edit, and delete national and regional holidays',
+              'Manual editing of suggested days off',
+              'Year selection and carryover months configuration',
               'PTO accrual calculator',
+              'PTO vs salary calculator',
+              'Workday counter',
+              'Date statistics',
+              'Efficiency charts and graphs',
               'Export to Google Calendar, Outlook, Apple Calendar',
             ],
             locales: LOCALES,
             strategies: ['grouped', 'optimized', 'balanced'],
-            url: window.location.origin,
+            url: globalThis.location.origin,
           }),
         },
         {

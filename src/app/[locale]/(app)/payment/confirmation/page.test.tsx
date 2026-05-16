@@ -9,7 +9,7 @@ const mockRedirect = vi.fn();
 const mockLogger = { warn: vi.fn(), logError: vi.fn() };
 const mockGetTranslations = vi.fn();
 const mockGetCurrencySymbol = vi.fn().mockReturnValue('$');
-const mockPaymentConfirmation = vi.hoisted(() => vi.fn());
+const mockConfirmation = vi.hoisted(() => vi.fn());
 
 vi.mock('next/navigation', () => ({ redirect: mockRedirect }));
 
@@ -19,8 +19,8 @@ vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({
 
 vi.mock('@infrastructure/layers', () => ({ ApplicationLayer: Layer.empty }));
 
-vi.mock('@infrastructure/services/payments/paymentConfirmation', () => ({
-  paymentConfirmation: mockPaymentConfirmation,
+vi.mock('@infrastructure/services/payments/confirmation', () => ({
+  confirmation: mockConfirmation,
 }));
 
 vi.mock('next-intl/server', () => ({
@@ -72,7 +72,7 @@ describe('payment/confirmation page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetTranslations.mockResolvedValue(vi.fn((key: string) => `t:${key}`));
-    mockPaymentConfirmation.mockReturnValue(Effect.succeed(SUCCESS_CONFIRMATION));
+    mockConfirmation.mockReturnValue(Effect.succeed(SUCCESS_CONFIRMATION));
   });
 
   describe('redirect', () => {
@@ -86,15 +86,15 @@ describe('payment/confirmation page', () => {
   });
 
   describe('PaymentError state', () => {
-    it('returns PaymentError component when paymentConfirmation returns null', async () => {
-      mockPaymentConfirmation.mockReturnValueOnce(Effect.succeed(null));
+    it('returns PaymentError component when confirmation returns null', async () => {
+      mockConfirmation.mockReturnValueOnce(Effect.succeed(null));
       const element = await PaymentSuccessPage(makeSuccessParams());
       expect(typeof element.type).toBe('function');
       expect((element.type as { name?: string }).name).toBe('PaymentError');
     });
 
     it('returns PaymentError component when status is not succeeded', async () => {
-      mockPaymentConfirmation.mockReturnValueOnce(
+      mockConfirmation.mockReturnValueOnce(
         Effect.succeed({ id: PAYMENT_INTENT_ID, status: 'processing', amount: 10, currency: 'USD' })
       );
       const element = await PaymentSuccessPage(makeSuccessParams());
@@ -103,7 +103,7 @@ describe('payment/confirmation page', () => {
     });
 
     it('logs a warning when status is not succeeded', async () => {
-      mockPaymentConfirmation.mockReturnValueOnce(
+      mockConfirmation.mockReturnValueOnce(
         Effect.succeed({ id: PAYMENT_INTENT_ID, status: 'requires_payment_method', amount: 10, currency: 'USD' })
       );
       await PaymentSuccessPage(makeSuccessParams());
