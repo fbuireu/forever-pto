@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import type Stripe from 'stripe';
+import { describe, expect, it } from 'vitest';
 import { createPaymentFailedEvent, createPaymentSucceededEvent } from './events';
 
 const makeIntent = (overrides: Partial<Stripe.PaymentIntent> = {}): Stripe.PaymentIntent =>
@@ -12,7 +12,7 @@ const makeIntent = (overrides: Partial<Stripe.PaymentIntent> = {}): Stripe.Payme
     latest_charge: null,
     last_payment_error: null,
     ...overrides,
-  } as unknown as Stripe.PaymentIntent);
+  }) as unknown as Stripe.PaymentIntent;
 
 describe('createPaymentSucceededEvent', () => {
   it('maps paymentId from id', () => {

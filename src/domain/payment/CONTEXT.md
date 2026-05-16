@@ -1,6 +1,7 @@
 # domain/payment
 
 ## Purpose
+
 Domain layer for the payment/premium flow. Defines domain events, factories, and handlers using Effect.ts for composable error handling and dependency injection.
 
 ## Domain concepts
@@ -13,7 +14,7 @@ Domain layer for the payment/premium flow. Defines domain events, factories, and
 ## Structure
 
 | Folder | Contents |
-|---|---|
+| --- | --- |
 | `events/` | Types (`PaymentSucceededEvent`, `PaymentFailedEvent`, `PaymentEvent`) |
 | `events/factory/` | `createPaymentSucceededEvent()`, `createPaymentFailedEvent()` — extract domain data from the Stripe `PaymentIntent`; all Stripe coupling is contained here |
 | `handlers/` | `handlePaymentSucceeded()`, `handlePaymentFailed()` — composable effects with DI |

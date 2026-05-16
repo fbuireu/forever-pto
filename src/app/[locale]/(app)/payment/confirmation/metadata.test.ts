@@ -1,4 +1,4 @@
-import { EN, ES } from '../../../../../infrastructure/i18n/locales';
+import { EN, ES } from '@infrastructure/i18n/locales';
 import { describe, expect, it, vi } from 'vitest';
 
 const CANONICAL_PATH = '/payment/confirmation';

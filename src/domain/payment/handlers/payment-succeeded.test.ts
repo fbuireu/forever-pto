@@ -1,9 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
 import { DatabaseError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PaymentSucceededEvent } from '../events/types';
 import { handlePaymentSucceeded } from './payment-succeeded';
 
@@ -105,9 +105,7 @@ describe('handlePaymentSucceeded', () => {
 
   it('resolves even when retrieveCharge fails', async () => {
     const { retrieveCharge } = await import('@infrastructure/services/payments/provider/charge');
-    vi.mocked(retrieveCharge).mockReturnValueOnce(
-      Effect.fail(new DatabaseError({ message: 'stripe error' })) as never
-    );
+    vi.mocked(retrieveCharge).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: 'stripe error' })) as never);
     await expect(run(handlePaymentSucceeded(EVENT))).resolves.toBeUndefined();
   });
 

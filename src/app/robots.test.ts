@@ -1,7 +1,7 @@
+import { LOCALES } from '@infrastructure/i18n/locales';
+import { localePath } from '@infrastructure/i18n/utils/url';
 import type { MetadataRoute } from 'next';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
-import { LOCALES } from '../infrastructure/i18n/locales';
-import { localePath } from '../infrastructure/i18n/url';
 
 vi.mock('@opennextjs/cloudflare', () => ({
   getCloudflareContext: vi.fn().mockResolvedValue({

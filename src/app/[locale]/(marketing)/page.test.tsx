@@ -1,4 +1,4 @@
-import { EN, ES, LOCALES } from '../../../infrastructure/i18n/locales';
+import { EN, ES, LOCALES } from '@infrastructure/i18n/locales';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockSetRequestLocale = vi.fn();
@@ -6,7 +6,7 @@ const mockSetRequestLocale = vi.fn();
 vi.mock('next-intl/server', () => ({ setRequestLocale: mockSetRequestLocale }));
 
 vi.mock('@infrastructure/i18n/config', async () => {
-  const { LOCALES } = await import('../../../infrastructure/i18n/locales');
+  const { LOCALES } = await import('@infrastructure/i18n/locales');
   return { LOCALES };
 });
 

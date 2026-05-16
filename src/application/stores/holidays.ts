@@ -1,14 +1,14 @@
 import { holidayDTO } from '@application/dto/holiday/dto';
-import { HolidayVariant, type HolidayDTO } from '@application/dto/holiday/types';
+import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
+import { ensureDate, isSameMonth } from '@application/shared/utils/dates';
+import { generateMetrics } from '@domain/calendar/metrics/generateMetrics';
+import type { Suggestion } from '@domain/calendar/types';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { generateMetrics } from '@infrastructure/services/calendar/metrics/generateMetrics';
-import type { Suggestion } from '@infrastructure/services/calendar/types';
-import { ensureDate, isSameMonth } from '@ui/utils/dates';
-import { useLocationStore } from './location';
 import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
+import { useLocationStore } from './location';
 import type {
   AddHolidayParams,
   AlternativeSelectionBaseParams,
@@ -62,7 +62,13 @@ function withMetrics(
 ) {
   return alternatives.map((alt) => ({
     ...alt,
-    metrics: generateMetrics({ suggestion: alt, locale: opts.locale, bridges: alt.bridges, holidays: opts.holidays, allowPastDays: opts.allowPastDays }),
+    metrics: generateMetrics({
+      suggestion: alt,
+      locale: opts.locale,
+      bridges: alt.bridges,
+      holidays: opts.holidays,
+      allowPastDays: opts.allowPastDays,
+    }),
   }));
 }
 
@@ -141,8 +147,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
           try {
             const [{ generateSuggestions }, { generateAlternatives }] = await Promise.all([
-              import('@infrastructure/services/calendar/suggestions/generateSuggestions'),
-              import('@infrastructure/services/calendar/alternatives/generateAlternatives'),
+              import('@domain/calendar/suggestions/generateSuggestions'),
+              import('@domain/calendar/alternatives/generateAlternatives'),
             ]);
 
             const holidaysDates = holidayDTO.normalize(holidays);
@@ -170,7 +176,13 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
             const suggestion = {
               ...baseSuggestion,
-              metrics: generateMetrics({ suggestion: baseSuggestion, locale, bridges: baseSuggestion.bridges, holidays: holidaysDates, allowPastDays }),
+              metrics: generateMetrics({
+                suggestion: baseSuggestion,
+                locale,
+                bridges: baseSuggestion.bridges,
+                holidays: holidaysDates,
+                allowPastDays,
+              }),
             };
 
             const alternatives = withMetrics(baseAlternatives, metricsOpts);
@@ -222,7 +234,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
           try {
             const [{ generateAlternatives }] = await Promise.all([
-              import('@infrastructure/services/calendar/alternatives/generateAlternatives'),
+              import('@domain/calendar/alternatives/generateAlternatives'),
             ]);
 
             const holidaysDates = holidayDTO.normalize(holidays);
@@ -360,7 +372,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           set({ holidays: updatedHolidays });
         },
 
-        toggleDaySelection: ({ date, totalPtoDays, locale, allowPastDays }): boolean => {
+        toggleDaySelection: ({ date, totalPtoDays, locale, allowPastDays }) => {
           const { manuallySelectedDays, currentSelection, removedSuggestedDays, holidays } = get();
           const dateStr = date.toDateString();
 
@@ -446,21 +458,21 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
         },
 
-        trimManualDays: (maxPtoDays: number): void => {
+        trimManualDays: (maxPtoDays: number) => {
           const { manuallySelectedDays } = get();
           if (manuallySelectedDays.length > maxPtoDays) {
             set({ manuallySelectedDays: manuallySelectedDays.slice(0, maxPtoDays) });
           }
         },
 
-        getRemainingDays: (totalPtoDays: number): number => {
+        getRemainingDays: (totalPtoDays: number) => {
           const { manuallySelectedDays, currentSelection, removedSuggestedDays } = get();
           const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
           const manualSelectedCount = manuallySelectedDays.length;
           return Math.max(0, totalPtoDays - activeSuggestedCount - manualSelectedCount);
         },
 
-        getFreeDaysForMonth: (month: Date): number => {
+        getFreeDaysForMonth: (month: Date) => {
           const { holidays } = get();
           return holidays.filter((h) => isSameMonth(h.date, month) && h.isInSelectedRange).length;
         },

@@ -31,7 +31,7 @@ function mergeRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCallback<
   };
 }
 
-function mergeProps<T extends HTMLElement>(childProps: AnyProps, slotProps: DOMMotionProps<T>): AnyProps {
+function mergeProps<T extends HTMLElement>(childProps: AnyProps, slotProps: DOMMotionProps<T>) {
   const merged: AnyProps = { ...childProps, ...slotProps };
 
   if (childProps.className || slotProps.className) {

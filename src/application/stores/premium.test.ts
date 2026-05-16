@@ -9,7 +9,7 @@ vi.mock('@infrastructure/clients/logging/better-stack/tracking', () => ({
   track: vi.fn(),
 }));
 
-vi.mock('@infrastructure/services/session/checkSession', () => ({
+vi.mock('@ui/adapters/session/checkSession', () => ({
   verifyPremiumEmail: vi.fn(),
   getExistingSession: vi.fn(),
 }));
@@ -82,7 +82,12 @@ describe('setEmail', () => {
 
 describe('resetPremiumStore', () => {
   it('resets all state to initial values', () => {
-    usePremiumStore.setState({ premiumKey: 'key', userEmail: 'user@example.com', modalOpen: true, currentFeature: 'export' });
+    usePremiumStore.setState({
+      premiumKey: 'key',
+      userEmail: 'user@example.com',
+      modalOpen: true,
+      currentFeature: 'export',
+    });
     usePremiumStore.getState().resetPremiumStore();
     const state = usePremiumStore.getState();
     expect(state.premiumKey).toBeNull();
@@ -94,7 +99,7 @@ describe('resetPremiumStore', () => {
 
 describe('verifyEmail', () => {
   it('returns true and sets premium status on success', async () => {
-    const { verifyPremiumEmail } = await import('@infrastructure/services/session/checkSession');
+    const { verifyPremiumEmail } = await import('@ui/adapters/session/checkSession');
     vi.mocked(verifyPremiumEmail).mockResolvedValueOnce({ premiumKey: 'pk_123' });
 
     const result = await usePremiumStore.getState().verifyEmail('user@example.com');
@@ -105,7 +110,7 @@ describe('verifyEmail', () => {
   });
 
   it('returns false when no premium key returned', async () => {
-    const { verifyPremiumEmail } = await import('@infrastructure/services/session/checkSession');
+    const { verifyPremiumEmail } = await import('@ui/adapters/session/checkSession');
     vi.mocked(verifyPremiumEmail).mockResolvedValueOnce(null);
 
     const result = await usePremiumStore.getState().verifyEmail('user@example.com');
@@ -115,7 +120,7 @@ describe('verifyEmail', () => {
   });
 
   it('returns false and sets isLoading to false on error', async () => {
-    const { verifyPremiumEmail } = await import('@infrastructure/services/session/checkSession');
+    const { verifyPremiumEmail } = await import('@ui/adapters/session/checkSession');
     vi.mocked(verifyPremiumEmail).mockRejectedValueOnce(new Error('network failure'));
 
     const result = await usePremiumStore.getState().verifyEmail('user@example.com');
@@ -126,7 +131,7 @@ describe('verifyEmail', () => {
 
 describe('checkExistingSession', () => {
   it('does nothing when needsSessionCheck is false', async () => {
-    const { getExistingSession } = await import('@infrastructure/services/session/checkSession');
+    const { getExistingSession } = await import('@ui/adapters/session/checkSession');
     usePremiumStore.setState({ needsSessionCheck: false });
 
     await usePremiumStore.getState().checkExistingSession();
@@ -134,7 +139,7 @@ describe('checkExistingSession', () => {
   });
 
   it('sets premium state from session when needsSessionCheck is true', async () => {
-    const { getExistingSession } = await import('@infrastructure/services/session/checkSession');
+    const { getExistingSession } = await import('@ui/adapters/session/checkSession');
     vi.mocked(getExistingSession).mockResolvedValueOnce({ premiumKey: 'pk_session', email: 'session@example.com' });
     usePremiumStore.setState({ needsSessionCheck: true });
 
@@ -146,7 +151,7 @@ describe('checkExistingSession', () => {
   });
 
   it('clears premium state when session returns null', async () => {
-    const { getExistingSession } = await import('@infrastructure/services/session/checkSession');
+    const { getExistingSession } = await import('@ui/adapters/session/checkSession');
     vi.mocked(getExistingSession).mockResolvedValueOnce(null);
     usePremiumStore.setState({ needsSessionCheck: true, premiumKey: 'old_key', userEmail: 'old@example.com' });
 
@@ -158,7 +163,7 @@ describe('checkExistingSession', () => {
   });
 
   it('clears needsSessionCheck on error', async () => {
-    const { getExistingSession } = await import('@infrastructure/services/session/checkSession');
+    const { getExistingSession } = await import('@ui/adapters/session/checkSession');
     vi.mocked(getExistingSession).mockRejectedValueOnce(new Error('server error'));
     usePremiumStore.setState({ needsSessionCheck: true });
 
@@ -169,7 +174,7 @@ describe('checkExistingSession', () => {
 
 describe('refreshPremiumStatus', () => {
   it('calls verifyEmail with the stored email', async () => {
-    const { verifyPremiumEmail } = await import('@infrastructure/services/session/checkSession');
+    const { verifyPremiumEmail } = await import('@ui/adapters/session/checkSession');
     vi.mocked(verifyPremiumEmail).mockResolvedValueOnce({ premiumKey: 'refreshed' });
     usePremiumStore.setState({ userEmail: 'refresh@example.com' });
 
@@ -178,7 +183,7 @@ describe('refreshPremiumStatus', () => {
   });
 
   it('does nothing when userEmail is null', async () => {
-    const { verifyPremiumEmail } = await import('@infrastructure/services/session/checkSession');
+    const { verifyPremiumEmail } = await import('@ui/adapters/session/checkSession');
     usePremiumStore.setState({ userEmail: null });
 
     await usePremiumStore.getState().refreshPremiumStatus();

@@ -2,6 +2,7 @@
 
 import { type CreatePaymentInput, createPaymentSchemaWithMessages } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
+import { calculateFinalAmount } from '@application/dto/payment/utils/helpers';
 import { usePremiumStore } from '@application/stores/premium';
 import { useUIStore } from '@application/stores/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,7 +10,6 @@ import { getBetterStackInstance } from '@infrastructure/clients/logging/better-s
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
 import { getStripeClientInstance } from '@infrastructure/clients/payments/stripe/client';
 import { formatDiscountMessage } from '@infrastructure/services/payments/utils/formatters';
-import { calculateFinalAmount } from '@application/dto/payment/utils';
 import { Elements } from '@stripe/react-stripe-js';
 import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { initializePayment } from '@ui/adapters/payments/checkout';
@@ -25,7 +25,7 @@ import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
 import { DonationForm } from './DonationForm';
 import './donate.css';
-import { CheckoutForm } from '../../premium/CheckoutForm';
+import { CheckoutForm } from '@ui/modules/premium/CheckoutForm';
 
 interface PaymentState {
   clientSecret: string;
@@ -53,18 +53,25 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
     }))
   );
 
-  const { getCurrencyFromLocale, currency, currencySymbol, isOpen, isOpening, setDonatePopoverOpen, clearDonatePopoverOpening } =
-    useUIStore(
-      useShallow((state) => ({
-        getCurrencyFromLocale: state.getCurrencyFromLocale,
-        currency: state.currency,
-        currencySymbol: state.currencySymbol,
-        isOpen: state.donatePopoverOpen,
-        isOpening: state.donatePopoverIsOpening,
-        setDonatePopoverOpen: state.setDonatePopoverOpen,
-        clearDonatePopoverOpening: state.clearDonatePopoverOpening,
-      }))
-    );
+  const {
+    getCurrencyFromLocale,
+    currency,
+    currencySymbol,
+    isOpen,
+    isOpening,
+    setDonatePopoverOpen,
+    clearDonatePopoverOpening,
+  } = useUIStore(
+    useShallow((state) => ({
+      getCurrencyFromLocale: state.getCurrencyFromLocale,
+      currency: state.currency,
+      currencySymbol: state.currencySymbol,
+      isOpen: state.donatePopoverOpen,
+      isOpening: state.donatePopoverIsOpening,
+      setDonatePopoverOpen: state.setDonatePopoverOpen,
+      clearDonatePopoverOpening: state.clearDonatePopoverOpening,
+    }))
+  );
 
   useEffect(() => {
     getCurrencyFromLocale(locale);

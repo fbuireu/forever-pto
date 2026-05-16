@@ -9,7 +9,7 @@ export function useControlledState<T, Rest extends unknown[] = []>(
   props: CommonControlledStateProps<T> & {
     onChange?: (value: T, ...args: Rest) => void;
   }
-): readonly [T, (next: T, ...args: Rest) => void] {
+) {
   const { value, defaultValue, onChange } = props;
 
   const [state, setInternalState] = useState<T>(value ?? (defaultValue as T));

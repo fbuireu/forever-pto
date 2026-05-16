@@ -1,7 +1,7 @@
 import { routing } from '@infrastructure/i18n/routing';
-import { LOCALES } from './locales';
 import { hasLocale } from 'next-intl';
 import { getRequestConfig } from 'next-intl/server';
+import { LOCALES } from './locales';
 
 export { LOCALES } from './locales';
 

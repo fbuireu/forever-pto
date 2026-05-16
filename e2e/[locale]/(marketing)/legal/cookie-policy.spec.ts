@@ -1,5 +1,5 @@
-import { ES } from '../../../../src/infrastructure/i18n/locales';
 import { expect, test } from '@playwright/test';
+import { ES } from '@infrastructure/i18n/locales';
 
 const PATH = '/legal/cookie-policy';
 

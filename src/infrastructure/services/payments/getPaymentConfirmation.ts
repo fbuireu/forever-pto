@@ -1,20 +1,26 @@
 import { paymentConfirmationDTO } from '@application/dto/payment/dto';
 import type { PaymentConfirmationDTO } from '@application/dto/payment/types';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { getStripeServerInstance } from '@infrastructure/clients/payments/stripe/client';
+import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
+import { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
+import { Effect } from 'effect';
 
-export async function getPaymentConfirmation(paymentIntentId: string): Promise<PaymentConfirmationDTO | null> {
-  const stripe = getStripeServerInstance();
-  const logger = getBetterStackInstance();
+export const getPaymentConfirmation = (
+  paymentIntentId: string
+): Effect.Effect<PaymentConfirmationDTO | null, never, StripeServerService | LoggerService> =>
+  Effect.gen(function* () {
+    const stripe = yield* StripeServerService;
+    const logger = yield* LoggerService;
 
-  try {
-    const raw = await stripe.paymentIntents.retrieve(paymentIntentId);
-    return paymentConfirmationDTO.create({ raw });
-  } catch (error) {
-    logger.logError('Failed to retrieve payment intent', error, {
-      paymentIntentId,
-      service: 'getPaymentConfirmation',
-    });
-    return null;
-  }
-}
+    return yield* stripe.paymentIntents.retrieve(paymentIntentId).pipe(
+      Effect.map((raw) => paymentConfirmationDTO.create({ raw })),
+      Effect.catchAll((error) =>
+        Effect.sync(() => {
+          logger.logError('Failed to retrieve payment intent', error, {
+            paymentIntentId,
+            service: 'getPaymentConfirmation',
+          });
+          return null;
+        })
+      )
+    );
+  });

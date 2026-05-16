@@ -5,6 +5,8 @@ import { useHolidaysStore } from '@application/stores/holidays';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 const logger = getBetterStackInstance();
+
+import { formatDate } from '@application/shared/utils/dates';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Trash2 } from '@ui/modules/core/animate/icons/Trash2';
 import { Button } from '@ui/modules/core/primitives/Button';
@@ -16,7 +18,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@ui/modules/core/primitives/Dialog';
-import { formatDate } from '@ui/utils/dates';
 import { AlertTriangle } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';

@@ -6,7 +6,7 @@ import type Stripe from 'stripe';
 
 const MIN_FINAL_AMOUNT = 0.5;
 
-const getCouponValidationError = (coupon: Stripe.Coupon): string | null => {
+const getCouponValidationError = (coupon: Stripe.Coupon) => {
   if (!coupon.valid) return 'This promo code is no longer valid';
   if (coupon.max_redemptions && coupon.times_redeemed >= coupon.max_redemptions)
     return 'This promo code has reached its usage limit';
@@ -14,7 +14,7 @@ const getCouponValidationError = (coupon: Stripe.Coupon): string | null => {
   return null;
 };
 
-const calculateFinalAmount = (coupon: Stripe.Coupon, amount: number): number => {
+const calculateFinalAmount = (coupon: Stripe.Coupon, amount: number) => {
   if (coupon.percent_off) return amount * (1 - coupon.percent_off / 100);
   if (coupon.amount_off) return amount - coupon.amount_off / 100;
   return amount;

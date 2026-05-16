@@ -1,12 +1,14 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_CURRENCY, DEFAULT_CURRENCY_SYMBOL } from '@ui/utils/currencies';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useUIStore } from './ui';
 
 vi.mock('@ui/utils/currencies', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@ui/utils/currencies')>();
   return {
     ...actual,
-    getCurrencyForLocale: vi.fn().mockReturnValue({ currency: actual.DEFAULT_CURRENCY, currencySymbol: actual.DEFAULT_CURRENCY_SYMBOL }),
+    getCurrencyForLocale: vi
+      .fn()
+      .mockReturnValue({ currency: actual.DEFAULT_CURRENCY, currencySymbol: actual.DEFAULT_CURRENCY_SYMBOL }),
   };
 });
 
@@ -87,7 +89,9 @@ describe('getCurrencyFromLocale', () => {
 
   it('falls back to EUR / € when getCurrencyForLocale throws', async () => {
     const { getCurrencyForLocale } = await import('@ui/utils/currencies');
-    vi.mocked(getCurrencyForLocale).mockImplementationOnce(() => { throw new Error('unsupported'); });
+    vi.mocked(getCurrencyForLocale).mockImplementationOnce(() => {
+      throw new Error('unsupported');
+    });
 
     useUIStore.getState().getCurrencyFromLocale('en');
     expect(useUIStore.getState().currency).toBe('EUR');

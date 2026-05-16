@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { DatabaseError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PaymentFailedEvent } from '../events/types';
 import { handlePaymentFailed } from './payment-failed';
 

@@ -32,9 +32,7 @@ test.describe('POST /api/payment', () => {
 
   test('returns 429 after exceeding rate limit', async ({ request }) => {
     const payload = { email: 'ratelimit@example.com', amount: 9.99 };
-    const responses = await Promise.all(
-      Array.from({ length: 11 }, () => request.post(URL, { data: payload }))
-    );
+    const responses = await Promise.all(Array.from({ length: 11 }, () => request.post(URL, { data: payload })));
     expect(responses.map((r) => r.status())).toContain(429);
   });
 });

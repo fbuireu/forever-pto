@@ -1,4 +1,3 @@
-import type { RawHoliday } from '@application/dto/holiday/types';
 import Holidays from 'date-holidays';
 
 interface GetRegionalHolidaysParams {
@@ -10,7 +9,7 @@ interface GetRegionalHolidaysParams {
   year: number;
 }
 
-export function getRegionalHolidays({ country, region, configuration, year }: GetRegionalHolidaysParams): RawHoliday[] {
+export function getRegionalHolidays({ country, region, configuration, year }: GetRegionalHolidaysParams) {
   if (!region) {
     return [];
   }

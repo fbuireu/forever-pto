@@ -18,7 +18,7 @@ export class DriverClient {
     this.config = config;
   }
 
-  private getDriver(): Driver {
+  private getDriver() {
     this.driver ??= driver({
       showProgress: true,
       showButtons: ['next', 'previous', 'close'],
@@ -69,7 +69,7 @@ export class DriverClient {
     return this.driver;
   }
 
-  start(steps?: DriveStep[], overrides?: Partial<DriverConfig>): void {
+  start(steps?: DriveStep[], overrides?: Partial<DriverConfig>) {
     if (steps) {
       this.config.steps = steps;
     }
@@ -90,7 +90,7 @@ export class DriverClient {
     driverInstance.drive();
   }
 
-  destroy(): void {
+  destroy() {
     if (this.driver) {
       this.driver.destroy();
       this.driver = null;
@@ -100,7 +100,7 @@ export class DriverClient {
 
 let driverClientInstance: DriverClient | null = null;
 
-export const getDriverClientInstance = (): DriverClient => {
+export const getDriverClientInstance = () => {
   driverClientInstance ??= new DriverClient({});
   return driverClientInstance;
 };

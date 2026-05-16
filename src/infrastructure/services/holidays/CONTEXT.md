@@ -1,6 +1,7 @@
 # holidays
 
 ## Purpose
+
 Fetches and normalizes national and regional holidays using the `date-holidays` library. Transforms raw data into `HolidayDTO` models ready for consumption by stores and UI.
 
 ## Domain concepts

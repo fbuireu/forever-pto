@@ -27,7 +27,8 @@ export async function POST(request: NextRequest) {
         ValidationError: (e) =>
           Effect.succeed(NextResponse.json({ success: false, error: e.message }, { status: 400 })),
         PromoCodeError: (e) => Effect.succeed(NextResponse.json({ success: false, error: e.message }, { status: 400 })),
-        PaymentError: () => Effect.succeed(NextResponse.json({ success: false, error: ApiError.INTERNAL_ERROR }, { status: 500 })),
+        PaymentError: () =>
+          Effect.succeed(NextResponse.json({ success: false, error: ApiError.INTERNAL_ERROR }, { status: 500 })),
       }),
       Effect.catchAll(() =>
         Effect.succeed(NextResponse.json({ success: false, error: ApiError.INTERNAL_ERROR }, { status: 500 }))

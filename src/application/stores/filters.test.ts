@@ -1,5 +1,5 @@
+import { FilterStrategy } from '@domain/calendar/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { useFiltersStore } from './filters';
 
 vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({

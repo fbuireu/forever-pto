@@ -1,7 +1,6 @@
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { useUIStore } from '@application/stores/ui';
-import { useShallow } from 'zustand/react/shallow';
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
 import { formatDiscountText } from '@infrastructure/services/payments/utils/formatters';
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
@@ -13,6 +12,7 @@ import { Skeleton } from 'boneyard-js/react';
 import { AlertCircle } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { type FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { ExpressCheckoutFixture } from './ExpressCheckoutFixture';
 
 async function fireConfetti() {
@@ -49,7 +49,10 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { getCurrencyFromLocale, currencySymbol } = useUIStore(
-    useShallow((state) => ({ getCurrencyFromLocale: state.getCurrencyFromLocale, currencySymbol: state.currencySymbol }))
+    useShallow((state) => ({
+      getCurrencyFromLocale: state.getCurrencyFromLocale,
+      currencySymbol: state.currencySymbol,
+    }))
   );
   const setPremiumStatus = usePremiumStore((state) => state.setPremiumStatus);
 

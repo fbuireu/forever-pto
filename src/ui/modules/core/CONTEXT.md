@@ -1,12 +1,13 @@
 # core
 
 ## Purpose
+
 Project design system. Provides base primitives, animated variants, and reusable effects. Single source of truth for design tokens, component variants, and interactive behavior.
 
 ## Structure
 
 | Folder | Contents |
-|---|---|
+| --- | --- |
 | `primitives/` | Stateless base components (Button, Card, Input, Dialog, Table, Badge…) |
 | `animate/base/` | Framer Motion–enhanced versions of Radix primitives (Accordion, Popover, Sidebar…) |
 | `animate/components/` | Rich animated compositions (Counter, Tabs, FeatureList, RadialNav) |

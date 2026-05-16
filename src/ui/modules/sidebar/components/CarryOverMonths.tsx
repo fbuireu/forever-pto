@@ -6,9 +6,9 @@ import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { SlidersHorizontal } from '@ui/modules/core/animate/icons/SlidersHorizontal';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Slider } from '@ui/modules/core/primitives/Slider';
+import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { PremiumFeature } from '../../premium/PremiumFeature';
 
 const MIN_VALUE = 1;
 const MAX_VALUE = 12;

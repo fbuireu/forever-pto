@@ -1,4 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
+import { getMonth, getYear } from '@application/shared/utils/dates';
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 
 const C = {
@@ -137,7 +138,7 @@ const fmtDayCache = new Map<string, Intl.DateTimeFormat>();
 const fmtMonthCache = new Map<string, Intl.DateTimeFormat>();
 const fmtDateCache = new Map<string, Intl.DateTimeFormat>();
 
-function fmtDay(date: Date, locale: string): string {
+function fmtDay(date: Date, locale: string) {
   let fmt = fmtDayCache.get(locale);
   if (!fmt) {
     fmt = new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' });
@@ -146,7 +147,7 @@ function fmtDay(date: Date, locale: string): string {
   return fmt.format(date);
 }
 
-function fmtMonth(date: Date, locale: string): string {
+function fmtMonth(date: Date, locale: string) {
   let fmt = fmtMonthCache.get(locale);
   if (!fmt) {
     fmt = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' });
@@ -155,7 +156,7 @@ function fmtMonth(date: Date, locale: string): string {
   return fmt.format(date);
 }
 
-function fmtDate(date: Date, locale: string): string {
+function fmtDate(date: Date, locale: string) {
   let fmt = fmtDateCache.get(locale);
   if (!fmt) {
     fmt = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' });
@@ -164,12 +165,12 @@ function fmtDate(date: Date, locale: string): string {
   return fmt.format(date);
 }
 
-function groupByMonth<T>(items: T[], getDate: (item: T) => Date, locale: string): Array<{ month: string; items: T[] }> {
+function groupByMonth<T>(items: T[], getDate: (item: T) => Date, locale: string) {
   const map = new Map<string, { month: string; items: T[] }>();
 
   for (const item of items) {
     const d = getDate(item);
-    const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`;
+    const key = `${getYear(d)}-${String(getMonth(d)).padStart(2, '0')}`;
     if (!map.has(key)) map.set(key, { month: fmtMonth(d, locale), items: [] });
     map.get(key)?.items.push(item);
   }

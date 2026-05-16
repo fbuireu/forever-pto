@@ -1,12 +1,12 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ResendService } from '@infrastructure/clients/email/resend/service';
 import { TursoService } from '@infrastructure/clients/db/turso/service';
+import { ResendService } from '@infrastructure/clients/email/resend/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { EmailError, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { sendContactEmail } from './contact';
 
-vi.mock('@application/shared/zodParse', () => ({
+vi.mock('@application/shared/utils/zodParse', () => ({
   zodParse: vi.fn((_, data) => Effect.succeed(data)),
 }));
 
@@ -31,8 +31,7 @@ const TestLayer = Layer.mergeAll(
 );
 
 type ContactR = LoggerService | ResendService | TursoService;
-const run = <E>(eff: Effect.Effect<void, E, ContactR>) =>
-  Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
+const run = <E>(eff: Effect.Effect<void, E, ContactR>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
 const runFail = <E>(eff: Effect.Effect<void, E, ContactR>) =>
   Effect.runPromise(Effect.flip(eff).pipe(Effect.provide(TestLayer)));
 
@@ -79,7 +78,7 @@ describe('sendContactEmail', () => {
   });
 
   it('fails with ValidationError when zodParse fails', async () => {
-    const { zodParse } = await import('@application/shared/zodParse');
+    const { zodParse } = await import('@application/shared/utils/zodParse');
     vi.mocked(zodParse).mockReturnValueOnce(Effect.fail(new ValidationError({ message: 'invalid' })));
     const err = await runFail(sendContactEmail(VALID_DATA, CONFIG));
     expect(err).toBeInstanceOf(ValidationError);

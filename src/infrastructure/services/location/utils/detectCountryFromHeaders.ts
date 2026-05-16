@@ -4,7 +4,7 @@ const CLOUDFLARE_COUNTRY_HEADER = 'cf-ipcountry';
 const UNIDENTIFIED_COUNTRY = 'XX';
 const TOR_COUNTRY = 'T1';
 
-export function detectCountryFromHeaders(request: NextRequest): string {
+export function detectCountryFromHeaders(request: NextRequest) {
   const country = request.headers.get(CLOUDFLARE_COUNTRY_HEADER);
 
   if (!country || country === UNIDENTIFIED_COUNTRY || country === TOR_COUNTRY) {

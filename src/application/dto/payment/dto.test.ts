@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import type Stripe from 'stripe';
+import { describe, expect, it } from 'vitest';
 import { paymentConfirmationDTO, paymentDataDTO } from './dto';
 
 const CREATED_UNIX = 1_700_000_000;
@@ -118,10 +118,21 @@ describe('paymentDataDTO', () => {
   it('initialises nullable DB fields to null', () => {
     const result = paymentDataDTO.create({ raw: makeIntent(), params: DATA_PARAMS });
     const nullableFields = [
-      'country', 'customerName', 'postalCode', 'city', 'state',
-      'paymentBrand', 'paymentLast4', 'feeAmount', 'netAmount',
-      'refundedAt', 'refundReason', 'disputedAt', 'disputeReason',
-      'parentPaymentId', 'origin',
+      'country',
+      'customerName',
+      'postalCode',
+      'city',
+      'state',
+      'paymentBrand',
+      'paymentLast4',
+      'feeAmount',
+      'netAmount',
+      'refundedAt',
+      'refundReason',
+      'disputedAt',
+      'disputeReason',
+      'parentPaymentId',
+      'origin',
     ] as const;
 
     for (const field of nullableFields) {

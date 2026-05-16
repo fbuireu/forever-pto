@@ -1,4 +1,3 @@
-import type { RawHoliday } from '@application/dto/holiday/types';
 import Holidays from 'date-holidays';
 
 interface GetNationalHolidaysParams {
@@ -9,7 +8,7 @@ interface GetNationalHolidaysParams {
   year: number;
 }
 
-export function getNationalHolidays({ country, configuration, year }: GetNationalHolidaysParams): RawHoliday[] {
+export function getNationalHolidays({ country, configuration, year }: GetNationalHolidaysParams) {
   const holidays = new Holidays(country, configuration);
 
   const currentYearHolidays = holidays.getHolidays(year);

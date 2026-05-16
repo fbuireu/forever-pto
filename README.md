@@ -11,11 +11,13 @@
 Given your country, region, year, and number of PTO days, Forever PTO suggests the optimal way to place your vacation days so you get the longest possible stretches of time off — automatically accounting for weekends and public holidays.
 
 **Three strategies:**
+
 - **Grouped** — consolidate days into a few long vacations
 - **Optimized** — maximize the total number of days off
 - **Balanced** — a mix of both
 
 **Beyond scheduling:**
+
 - Edit, delete, or add custom holidays
 - See efficiency stats (performance gain, long weekends, work streaks)
 - PTO accrual calculator, PTO vs salary calculator, workday counter
@@ -27,7 +29,7 @@ Given your country, region, year, and number of PTO days, Forever PTO suggests t
 ## Stack
 
 | Layer | Tech |
-|---|---|
+| --- | --- |
 | Framework | Next.js 16 (App Router) + React 19 |
 | Language | TypeScript 6 |
 | Styling | Tailwind CSS v4 + shadcn/ui |
@@ -83,7 +85,7 @@ pnpm format:all       # Format all files
 See [`.env.example`](.env.example) for the full list. Key variables:
 
 | Variable | Description |
-|---|---|
+| --- | --- |
 | `TURSO_DATABASE_URL` | Turso database URL |
 | `TURSO_AUTH_TOKEN` | Turso auth token |
 | `STRIPE_SECRET_KEY` | Stripe secret key |

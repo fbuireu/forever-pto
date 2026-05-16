@@ -1,8 +1,8 @@
-import { getLocaleFromPathname, localePath } from '@infrastructure/i18n/url';
+import { getLocaleFromPathname, localePath } from '@infrastructure/i18n/utils/url';
 import { getTranslations } from 'next-intl/server';
 import pkg from '../../../package.json';
 
-export async function buildMarkdownPage(baseUrl: string, pathname: string): Promise<string> {
+export async function buildMarkdownPage(baseUrl: string, pathname: string) {
   const locale = getLocaleFromPathname(pathname);
   const isPlanner = pathname.includes('/planner');
 

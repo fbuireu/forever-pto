@@ -1,8 +1,8 @@
 import { Link } from '@application/i18n/navigation';
+import { getWeekdayNames } from '@application/shared/utils/dates';
 import { Badge } from '@ui/modules/core/primitives/Badge';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';
-import { getWeekdayNames } from '@ui/utils/dates';
 import { cn } from '@ui/utils/cn';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { version } from '../../../../../../package.json';

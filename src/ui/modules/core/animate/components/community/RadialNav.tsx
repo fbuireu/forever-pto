@@ -91,7 +91,7 @@ function calculateIconOffset({
   return centerOffset - buttonPadding + bias;
 }
 
-function withDefaults<T extends Record<string, unknown>>(defaults: T, overrides?: Partial<T>): T {
+function withDefaults<T extends Record<string, unknown>>(defaults: T, overrides?: Partial<T>) {
   return { ...defaults, ...overrides };
 }
 

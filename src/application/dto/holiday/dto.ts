@@ -1,8 +1,16 @@
-import type { BaseDTO } from '@application/shared/dto/baseDTO';
 import type { RegionDTO } from '@application/dto/region/types';
-import { addMonths, compareAsc, endOfYear, ensureDate, formatDate, isWithinInterval, startOfYear } from '@ui/utils/dates';
+import { getRegionName } from '@application/dto/region/utils/helpers';
+import type { BaseDTO } from '@application/shared/dto/baseDTO';
+import {
+  addMonths,
+  compareAsc,
+  endOfYear,
+  ensureDate,
+  formatDate,
+  isWithinInterval,
+  startOfYear,
+} from '@application/shared/utils/dates';
 import { type HolidayDTO, HolidayVariant, type RawHoliday } from './types';
-import { getRegionName } from './utils';
 
 type HolidayDTOParams = {
   year: number;
@@ -24,7 +32,7 @@ type HolidayDTOShape = BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> & {
 };
 
 export const holidayDTO: HolidayDTOShape = {
-  create: ({ raw, params }: { raw: RawHoliday[]; params?: HolidayDTOParams }): HolidayDTO[] => {
+  create: ({ raw, params }: { raw: RawHoliday[]; params?: HolidayDTOParams }) => {
     if (!params) {
       throw new Error('Configuration is required for holiday DTO');
     }
@@ -58,7 +66,7 @@ export const holidayDTO: HolidayDTOShape = {
       .toSorted((a, b) => compareAsc(a.date, b.date));
   },
 
-  createCustom: ({ name, date, locale, year, carryOverMonths }: CreateCustomHolidayParams): HolidayDTO => {
+  createCustom: ({ name, date, locale, year, carryOverMonths }: CreateCustomHolidayParams) => {
     const yearStart = startOfYear(new Date(year, 0, 1));
     const selectedRangeEnd = addMonths(endOfYear(new Date(year, 0, 1)), carryOverMonths);
     return {
@@ -70,6 +78,5 @@ export const holidayDTO: HolidayDTOShape = {
     };
   },
 
-  normalize: (holidays: HolidayDTO[]): HolidayDTO[] =>
-    holidays.map((h) => ({ ...h, date: ensureDate(h.date) })),
+  normalize: (holidays: HolidayDTO[]) => holidays.map((h) => ({ ...h, date: ensureDate(h.date) })),
 };

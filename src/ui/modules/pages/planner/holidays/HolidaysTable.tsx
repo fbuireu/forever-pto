@@ -2,6 +2,7 @@
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { HolidayVariant } from '@application/dto/holiday/types';
+import { isWeekend } from '@application/shared/utils/dates';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { usePremiumStore } from '@application/stores/premium';
 import { useDebounce } from '@ui/hooks/useDebounce';
@@ -19,7 +20,6 @@ import { Input } from '@ui/modules/core/primitives/Input';
 import { Table, TableBody, TableCell, TableRow } from '@ui/modules/core/primitives/Table';
 import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/premium/PremiumFeature';
 import { ConditionalWrapper } from '@ui/modules/shared/ConditionalWrapper';
-import { isWeekend } from '@ui/utils/dates';
 import { cn } from '@ui/utils/cn';
 import { Edit } from 'lucide-react';
 import dynamic from 'next/dynamic';

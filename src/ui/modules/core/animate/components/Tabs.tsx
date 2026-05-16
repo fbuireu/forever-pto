@@ -14,7 +14,7 @@ type TabsContextType = {
 
 const TabsContext = createContext<TabsContextType | undefined>(undefined);
 
-function useTabs(): TabsContextType {
+function useTabs() {
   const ctx = use(TabsContext);
   if (!ctx) throw new Error('useTabs must be used within a Tabs');
   return ctx;

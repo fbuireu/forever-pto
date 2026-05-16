@@ -2,16 +2,16 @@
 
 import '@styles/index.css';
 
+import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
 import enMessages from '@i18n/messages/en.json';
+import { getLocaleFromPathname } from '@infrastructure/i18n/utils/url';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { ErrorContent } from '@ui/modules/pages/error/ErrorContent';
-import { cn } from '@ui/utils/cn';
-import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
-import { getLocaleFromPathname } from '@infrastructure/i18n/url';
-import { NextIntlClientProvider } from 'next-intl';
-import { AppThemeProvider } from '@ui/modules/providers/AppThemeProvider';
 import type { ErrorBoundaryProps } from '@ui/modules/pages/error/types';
+import { AppThemeProvider } from '@ui/modules/providers/AppThemeProvider';
+import { cn } from '@ui/utils/cn';
 import { usePathname } from 'next/navigation';
+import { NextIntlClientProvider } from 'next-intl';
 
 export default function GlobalError({ error, reset }: ErrorBoundaryProps) {
   const locale = getLocaleFromPathname(usePathname() ?? '');

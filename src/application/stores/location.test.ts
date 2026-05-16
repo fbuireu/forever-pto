@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CountryDTO } from '@application/dto/country/types';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useLocationStore } from './location';
 
 vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({

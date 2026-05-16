@@ -3,11 +3,7 @@ import { LoggerService } from '@infrastructure/clients/logging/better-stack/serv
 import type { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
 import type { DatabaseError } from '@infrastructure/errors';
 import { retrieveCharge } from '@infrastructure/services/payments/provider/charge';
-import {
-  getPaymentById,
-  updatePaymentCharge,
-  updatePaymentStatus,
-} from '@infrastructure/services/payments/repository';
+import { getPaymentById, updatePaymentCharge, updatePaymentStatus } from '@infrastructure/services/payments/repository';
 import { Effect } from 'effect';
 import type { PaymentSucceededEvent } from '../events/types';
 
@@ -22,21 +18,21 @@ const updateCharge = (
 
     yield* retrieveCharge(latestChargeId).pipe(
       Effect.flatMap((charge) =>
-        updatePaymentCharge(
-          event.paymentId,
-          charge.id,
-          charge.receiptUrl,
-          charge.paymentMethodType,
-          charge.country,
-          charge.customerName,
-          charge.postalCode,
-          charge.city,
-          charge.state,
-          charge.paymentBrand,
-          charge.paymentLast4,
-          charge.feeAmount,
-          charge.netAmount
-        ).pipe(
+        updatePaymentCharge({
+          paymentIntentId: event.paymentId,
+          chargeId: charge.id,
+          receiptUrl: charge.receiptUrl,
+          paymentMethodType: charge.paymentMethodType,
+          country: charge.country,
+          customerName: charge.customerName,
+          postalCode: charge.postalCode,
+          city: charge.city,
+          state: charge.state,
+          paymentBrand: charge.paymentBrand,
+          paymentLast4: charge.paymentLast4,
+          feeAmount: charge.feeAmount,
+          netAmount: charge.netAmount,
+        }).pipe(
           Effect.tapError((e) =>
             Effect.sync(() => {
               logger.error('Failed to update charge details', {

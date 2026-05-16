@@ -1,5 +1,5 @@
+import { formatDate, getWeekdayNames } from '@application/shared/utils/dates';
 import { EN } from '@infrastructure/i18n/locales';
-import { formatDate, getWeekdayNames } from '@ui/utils/dates';
 
 const MONTH_KEYS = Array.from({ length: 12 }, (_, i) =>
   formatDate({ date: new Date(2024, i, 1), locale: EN, format: 'MMMM' })

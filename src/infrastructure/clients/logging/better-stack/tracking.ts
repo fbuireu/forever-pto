@@ -19,12 +19,12 @@ interface TrackProperties {
   [key: string]: unknown;
 }
 
-export const track = (event: TrackEventName, properties?: TrackProperties): void => {
-  if (typeof window === 'undefined' || !window.betterstack) return;
-  window.betterstack('track', event, properties);
+export const track = (event: TrackEventName, properties?: TrackProperties) => {
+  if (typeof globalThis.window === 'undefined' || !globalThis.window.betterstack) return;
+  globalThis.window.betterstack('track', event, properties);
 };
 
-export const identifyUser = (email: string, plan: 'premium' | 'free'): void => {
-  if (typeof window === 'undefined' || !window.betterstack) return;
-  window.betterstack('user', { email, plan });
+export const identifyUser = (email: string, plan: 'premium' | 'free') => {
+  if (typeof globalThis.window === 'undefined' || !globalThis.window.betterstack) return;
+  globalThis.window.betterstack('user', { email, plan });
 };

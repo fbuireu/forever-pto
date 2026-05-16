@@ -3,11 +3,13 @@ import { WebhookError } from '@infrastructure/errors';
 import { Effect } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
 
-const mockConstructEvent = vi.hoisted(() => vi.fn<(payload: string, sig: string) => Effect.Effect<{ type: string }, WebhookError>>());
+const mockConstructEvent = vi.hoisted(() =>
+  vi.fn<(payload: string, sig: string) => Effect.Effect<{ type: string }, WebhookError>>()
+);
 const mockProcessWebhookEvent = vi.hoisted(() => vi.fn<(event: unknown) => Effect.Effect<void, WebhookError>>());
 const mockHeadersGet = vi.hoisted(() => vi.fn<(name: string) => string | null>());
 
-vi.mock('@infrastructure/webhooks/processor', () => ({
+vi.mock('@application/use-cases/webhook', () => ({
   processWebhookEvent: mockProcessWebhookEvent,
 }));
 
@@ -48,7 +50,7 @@ describe('POST /api/webhooks/stripe', () => {
   });
 
   it('returns 200 with received:true on successful webhook', async () => {
-    mockHeadersGet.mockImplementation((name) => name === 'stripe-signature' ? 't=123,v1=abc' : null);
+    mockHeadersGet.mockImplementation((name) => (name === 'stripe-signature' ? 't=123,v1=abc' : null));
     mockConstructEvent.mockReturnValue(Effect.succeed({ type: 'payment_intent.succeeded' }));
     mockProcessWebhookEvent.mockReturnValue(Effect.succeed(undefined));
     const response = await POST(makeRequest(JSON.stringify({ type: 'payment_intent.succeeded' })) as never);
@@ -58,7 +60,7 @@ describe('POST /api/webhooks/stripe', () => {
   });
 
   it('returns 400 on signature verification failure', async () => {
-    mockHeadersGet.mockImplementation((name) => name === 'stripe-signature' ? 'bad-sig' : null);
+    mockHeadersGet.mockImplementation((name) => (name === 'stripe-signature' ? 'bad-sig' : null));
     mockConstructEvent.mockReturnValue(
       Effect.fail(new WebhookError({ message: 'Signature mismatch', isSignatureError: true }))
     );
@@ -69,7 +71,7 @@ describe('POST /api/webhooks/stripe', () => {
   });
 
   it('returns 500 on webhook processing failure', async () => {
-    mockHeadersGet.mockImplementation((name) => name === 'stripe-signature' ? 't=123,v1=abc' : null);
+    mockHeadersGet.mockImplementation((name) => (name === 'stripe-signature' ? 't=123,v1=abc' : null));
     mockConstructEvent.mockReturnValue(Effect.succeed({ type: 'payment_intent.succeeded' }));
     mockProcessWebhookEvent.mockReturnValue(
       Effect.fail(new WebhookError({ message: 'Processing failed', isSignatureError: false }))
@@ -81,7 +83,7 @@ describe('POST /api/webhooks/stripe', () => {
   });
 
   it('returns 500 on unexpected typed error', async () => {
-    mockHeadersGet.mockImplementation((name) => name === 'stripe-signature' ? 't=123,v1=abc' : null);
+    mockHeadersGet.mockImplementation((name) => (name === 'stripe-signature' ? 't=123,v1=abc' : null));
     mockConstructEvent.mockReturnValue(
       Effect.fail(new Error('unexpected')) as unknown as Effect.Effect<{ type: string }, WebhookError>
     );

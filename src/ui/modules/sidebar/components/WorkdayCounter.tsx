@@ -1,5 +1,6 @@
 'use client';
 
+import { differenceInCalendarDays, formatDate } from '@application/shared/utils/dates';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
@@ -11,7 +12,6 @@ import {
   calculateWeekends,
   calculateWorkdays,
 } from '@ui/modules/pages/planner/utils/helpers';
-import { differenceInCalendarDays, formatDate } from '@ui/utils/dates';
 import { CalendarDays } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';

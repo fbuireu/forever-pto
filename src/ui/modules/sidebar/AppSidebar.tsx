@@ -15,13 +15,13 @@ import {
 import { ChevronDown } from '@ui/modules/core/animate/icons/ChevronDown';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Settings } from '@ui/modules/core/animate/icons/Settings';
+import { Logo } from '@ui/modules/shared/Logo';
 import { Calculator } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { cookies } from 'next/headers';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
-import { Logo } from '../shared/Logo';
 import { Countries } from './components/Countries';
 import { PtoDays } from './components/PtoDays';
 import { SidebarCollapsibleGroup } from './components/SidebarCollapsibleGroup';

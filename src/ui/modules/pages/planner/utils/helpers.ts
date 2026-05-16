@@ -10,7 +10,7 @@ import {
   isWeekend,
   startOfMonth,
   startOfWeek,
-} from '@ui/utils/dates';
+} from '@application/shared/utils/dates';
 import type { Locale } from 'next-intl';
 import type { FromTo } from '../calendar/Calendar';
 
@@ -25,7 +25,7 @@ interface GetWeekdayNamesParams {
 
 const weekdayFmtCache = new Map<string, Intl.DateTimeFormat>();
 
-export const getWeekdayNames = ({ locale, weekStartsOn }: GetWeekdayNamesParams): string[] => {
+export const getWeekdayNames = ({ locale, weekStartsOn }: GetWeekdayNamesParams) => {
   const monday = new Date(2023, 0, 2);
   const weekStart = startOfWeek(monday, { weekStartsOn });
   const cacheKey = `${locale}-${weekStartsOn}`;
@@ -75,7 +75,7 @@ export const getCalendarDays = ({ month, weekStartsOn, fixedWeeks }: GetCalendar
   return days;
 };
 
-export function calculateWorkdays(range: FromTo, holidays: HolidayDTO[]): number {
+export function calculateWorkdays(range: FromTo, holidays: HolidayDTO[]) {
   const days = eachDayOfInterval({
     start: range.from,
     end: range.to,
@@ -91,7 +91,7 @@ export function calculateWorkdays(range: FromTo, holidays: HolidayDTO[]): number
   }).length;
 }
 
-export function calculateWeekends(range: FromTo): number {
+export function calculateWeekends(range: FromTo) {
   const weekendDays = eachWeekendOfInterval({
     start: range.from,
     end: range.to,
@@ -100,7 +100,7 @@ export function calculateWeekends(range: FromTo): number {
   return weekendDays.length;
 }
 
-export function calculateHolidaysInRange(range: FromTo, holidays: HolidayDTO[]): number {
+export function calculateHolidaysInRange(range: FromTo, holidays: HolidayDTO[]) {
   const days = eachDayOfInterval({
     start: range.from,
     end: range.to,
@@ -121,12 +121,7 @@ interface GetMonthsParamsNames {
 
 const monthNameFmtCache = new Map<string, Intl.DateTimeFormat>();
 
-export const getMonthNames = ({
-  locale,
-  monthCount,
-  startYear,
-  monthOutputFormat = 'short',
-}: GetMonthsParamsNames): string[] => {
+export const getMonthNames = ({ locale, monthCount, startYear, monthOutputFormat = 'short' }: GetMonthsParamsNames) => {
   const monthNames: string[] = [];
   const cacheKey = `${locale}-${monthOutputFormat}`;
   let fmt = monthNameFmtCache.get(cacheKey);

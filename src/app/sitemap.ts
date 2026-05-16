@@ -1,5 +1,5 @@
-import { LOCALES } from '@infrastructure/i18n/config';
-import { localePath } from '@infrastructure/i18n/url';
+import { LOCALES } from '@infrastructure/i18n/locales';
+import { localePath } from '@infrastructure/i18n/utils/url';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import type { MetadataRoute } from 'next';
 

@@ -1,4 +1,4 @@
-import { LOCALES } from '@infrastructure/i18n/config';
+import { LOCALES } from '@infrastructure/i18n/locales';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';

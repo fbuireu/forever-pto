@@ -1,8 +1,6 @@
-import { createContext, type JSX, type ReactNode, use } from 'react';
+import { createContext, type ReactNode, use } from 'react';
 
-function getStrictContext<T>(
-  name?: string
-): readonly [({ value, children }: { value: T; children?: ReactNode }) => JSX.Element, () => T] {
+function getStrictContext<T>(name?: string) {
   const Context = createContext<T | undefined>(undefined);
 
   const Provider = ({ value, children }: { value: T; children?: ReactNode }) => (

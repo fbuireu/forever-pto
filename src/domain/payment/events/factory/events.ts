@@ -1,8 +1,7 @@
 import type Stripe from 'stripe';
-import type { PaymentFailedEvent, PaymentSucceededEvent } from '../types';
 import { resolveChargeId } from './resolvers';
 
-export const createPaymentSucceededEvent = (paymentIntent: Stripe.PaymentIntent): PaymentSucceededEvent => ({
+export const createPaymentSucceededEvent = (paymentIntent: Stripe.PaymentIntent) => ({
   type: 'payment_succeeded',
   paymentId: paymentIntent.id,
   email: paymentIntent.metadata.email ?? paymentIntent.receipt_email ?? '',
@@ -14,7 +13,7 @@ export const createPaymentSucceededEvent = (paymentIntent: Stripe.PaymentIntent)
   ipAddress: paymentIntent.metadata.ipAddress ?? null,
 });
 
-export const createPaymentFailedEvent = (paymentIntent: Stripe.PaymentIntent): PaymentFailedEvent => ({
+export const createPaymentFailedEvent = (paymentIntent: Stripe.PaymentIntent) => ({
   type: 'payment_failed',
   paymentId: paymentIntent.id,
   status: paymentIntent.status,

@@ -1,5 +1,5 @@
-import { ES } from '../../infrastructure/i18n/locales';
-import { routing } from '../../infrastructure/i18n/routing';
+import { ES } from '@infrastructure/i18n/locales';
+import { routing } from '@infrastructure/i18n/routing';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('next-intl/server', () => ({

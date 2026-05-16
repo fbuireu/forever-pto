@@ -7,7 +7,7 @@ interface LogContext {
 
 let logtail: Logtail | null = null;
 
-const getLogtail = (): Logtail => {
+const getLogtail = () => {
   if (!logtail) {
     const sourceToken = process.env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN;
     const ingestingUrl = process.env.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL;
@@ -44,30 +44,30 @@ export class BetterStackClient {
     };
   }
 
-  private getFullContext(context?: LogContext): LogContext {
+  private getFullContext(context?: LogContext) {
     return {
       ...this.baseContext,
       ...context,
     };
   }
 
-  debug(message: string, context?: LogContext): void {
+  debug(message: string, context?: LogContext) {
     void getLogtail().debug(message, this.getFullContext(context), getExecutionContext());
   }
 
-  info(message: string, context?: LogContext): void {
+  info(message: string, context?: LogContext) {
     void getLogtail().info(message, this.getFullContext(context), getExecutionContext());
   }
 
-  warn(message: string, context?: LogContext): void {
+  warn(message: string, context?: LogContext) {
     void getLogtail().warn(message, this.getFullContext(context), getExecutionContext());
   }
 
-  error(message: string, context?: LogContext): void {
+  error(message: string, context?: LogContext) {
     void getLogtail().error(message, this.getFullContext(context), getExecutionContext());
   }
 
-  logError(message: string, error: unknown, context?: LogContext): void {
+  logError(message: string, error: unknown, context?: LogContext) {
     const errorContext: LogContext = {
       ...context,
       error: {
@@ -83,7 +83,7 @@ export class BetterStackClient {
     this.error(message, errorContext);
   }
 
-  logDuration(operation: string, durationMs: number, context?: LogContext): void {
+  logDuration(operation: string, durationMs: number, context?: LogContext) {
     this.info(`${operation} completed`, {
       ...context,
       duration_ms: durationMs,
@@ -91,7 +91,7 @@ export class BetterStackClient {
     });
   }
 
-  async measureAsync<T>(operation: string, fn: () => Promise<T>, context?: LogContext): Promise<T> {
+  async measureAsync<T>(operation: string, fn: () => Promise<T>, context?: LogContext) {
     const startTime = performance.now();
     try {
       const result = await fn();
@@ -109,14 +109,14 @@ export class BetterStackClient {
     }
   }
 
-  withContext(context: LogContext): BetterStackClient {
+  withContext(context: LogContext) {
     return new BetterStackClient({ ...this.baseContext, ...context });
   }
 }
 
 let instance: BetterStackClient | null = null;
 
-export const getBetterStackInstance = (): BetterStackClient => {
+export const getBetterStackInstance = () => {
   instance ??= new BetterStackClient();
   return instance;
 };

@@ -23,6 +23,6 @@ export function mcpServerCard(baseUrl: string) {
         'Content-Type': 'application/json',
         'Cache-Control': 'public, max-age=86400',
       },
-    },
+    }
   );
 }

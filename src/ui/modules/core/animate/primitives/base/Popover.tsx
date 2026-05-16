@@ -1,10 +1,10 @@
 'use client';
 
 import { Popover as PopoverPrimitive } from '@base-ui/react/popover';
+import { useControlledState } from '@ui/hooks/useControlledState';
 import { getStrictContext } from '@ui/utils/context';
 import { AnimatePresence, type HTMLMotionProps, m } from 'motion/react';
 import * as React from 'react';
-import { useControlledState } from 'src/ui/hooks/useControlledState';
 
 type PopoverContextType = { isOpen: boolean; setIsOpen: PopoverProps['onOpenChange'] };
 const [PopoverProvider, usePopover] = getStrictContext<PopoverContextType>('PopoverContext');

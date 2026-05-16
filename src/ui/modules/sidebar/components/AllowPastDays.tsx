@@ -3,10 +3,10 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { Switch } from '@ui/modules/core/animate/primitives/base/Switch';
+import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { Undo2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useShallow } from 'zustand/react/shallow';
-import { PremiumFeature } from '../../premium/PremiumFeature';
 
 export const AllowPastDays = () => {
   const t = useTranslations('sidebar.allowPastDays');

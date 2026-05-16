@@ -1,23 +1,27 @@
-import { EN } from '../../../../../infrastructure/i18n/locales';
+import { EN } from '@infrastructure/i18n/locales';
+import { Effect, Layer } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const PAYMENT_INTENT_ID = 'pi_test_123';
 
 const mockRedirect = vi.fn();
-const mockPaymentIntentsRetrieve = vi.fn();
-const mockStripe = { paymentIntents: { retrieve: mockPaymentIntentsRetrieve } };
 const mockLogger = { warn: vi.fn(), logError: vi.fn() };
 const mockGetTranslations = vi.fn();
 const mockGetCurrencySymbol = vi.fn().mockReturnValue('$');
+const mockGetPaymentConfirmation = vi.fn(() =>
+  Effect.succeed({ id: PAYMENT_INTENT_ID, status: 'succeeded', amount: 10, currency: 'USD' })
+);
 
 vi.mock('next/navigation', () => ({ redirect: mockRedirect }));
 
-vi.mock('@infrastructure/clients/payments/stripe/client', () => ({
-  getStripeServerInstance: vi.fn().mockReturnValue(mockStripe),
-}));
-
 vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({
   getBetterStackInstance: vi.fn().mockReturnValue(mockLogger),
+}));
+
+vi.mock('@infrastructure/layers', () => ({ AppLayer: Layer.empty }));
+
+vi.mock('@infrastructure/services/payments/getPaymentConfirmation', () => ({
+  getPaymentConfirmation: mockGetPaymentConfirmation,
 }));
 
 vi.mock('next-intl/server', () => ({
@@ -62,6 +66,9 @@ describe('payment/confirmation page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetTranslations.mockResolvedValue(vi.fn((key: string) => `t:${key}`));
+    mockGetPaymentConfirmation.mockReturnValue(
+      Effect.succeed({ id: PAYMENT_INTENT_ID, status: 'succeeded', amount: 10, currency: 'USD' })
+    );
   });
 
   describe('redirect', () => {
@@ -75,42 +82,32 @@ describe('payment/confirmation page', () => {
   });
 
   describe('PaymentError state', () => {
-    it('returns PaymentError component when stripe retrieve throws', async () => {
-      mockPaymentIntentsRetrieve.mockRejectedValue(new Error('Stripe error'));
+    it('returns PaymentError component when getPaymentConfirmation returns null', async () => {
+      mockGetPaymentConfirmation.mockReturnValueOnce(Effect.succeed(null));
       const element = await PaymentSuccessPage(makeSuccessParams());
       expect(typeof element.type).toBe('function');
       expect((element.type as { name?: string }).name).toBe('PaymentError');
     });
 
-    it('logs the error when stripe retrieve throws', async () => {
-      mockPaymentIntentsRetrieve.mockRejectedValue(new Error('Stripe error'));
-      await PaymentSuccessPage(makeSuccessParams());
-      expect(mockLogger.logError).toHaveBeenCalled();
-    });
-
     it('returns PaymentError component when status is not succeeded', async () => {
-      mockPaymentIntentsRetrieve.mockResolvedValue({ status: 'processing', amount: 1000, currency: 'usd' });
+      mockGetPaymentConfirmation.mockReturnValueOnce(
+        Effect.succeed({ id: PAYMENT_INTENT_ID, status: 'processing', amount: 10, currency: 'USD' })
+      );
       const element = await PaymentSuccessPage(makeSuccessParams());
       expect(typeof element.type).toBe('function');
       expect((element.type as { name?: string }).name).toBe('PaymentError');
     });
 
     it('logs a warning when status is not succeeded', async () => {
-      mockPaymentIntentsRetrieve.mockResolvedValue({
-        status: 'requires_payment_method',
-        amount: 1000,
-        currency: 'usd',
-      });
+      mockGetPaymentConfirmation.mockReturnValueOnce(
+        Effect.succeed({ id: PAYMENT_INTENT_ID, status: 'requires_payment_method', amount: 10, currency: 'USD' })
+      );
       await PaymentSuccessPage(makeSuccessParams());
       expect(mockLogger.warn).toHaveBeenCalled();
     });
   });
 
   describe('success state', () => {
-    beforeEach(() => {
-      mockPaymentIntentsRetrieve.mockResolvedValue({ status: 'succeeded', amount: 1000, currency: 'usd' });
-    });
-
     it('returns a div wrapper on success', async () => {
       const element = await PaymentSuccessPage(makeSuccessParams());
       expect(element.type).toBe('div');

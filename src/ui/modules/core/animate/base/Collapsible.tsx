@@ -12,7 +12,7 @@ type CollapsibleContextType = {
 
 const CollapsibleContext = createContext<CollapsibleContextType | undefined>(undefined);
 
-const _useCollapsible = (): CollapsibleContextType => {
+const _useCollapsible = () => {
   const context = use(CollapsibleContext);
   if (!context) {
     throw new Error('useCollapsible must be used within a Collapsible');

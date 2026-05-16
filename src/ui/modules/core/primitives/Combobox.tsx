@@ -2,7 +2,7 @@
 
 import type { CountryDTO } from '@application/dto/country/types';
 import type { RegionDTO } from '@application/dto/region/types';
-import type { FilterStrategy } from '@infrastructure/services/calendar/types';
+import type { FilterStrategy } from '@domain/calendar/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/modules/core/animate/base/Popover';
 import { ChevronUpDown } from '@ui/modules/core/animate/icons/ChevronUpDown';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';

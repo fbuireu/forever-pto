@@ -1,9 +1,11 @@
+import { addDays, startOfToday } from '@application/shared/utils/dates';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { createRichLink } from '@ui/modules/core/primitives/RichLink';
 import { LegalLayout } from '@ui/modules/layout/LegalLayout';
 import { Me } from '@ui/modules/pages/legal/Me';
-import { createRichLink } from '@ui/modules/core/primitives/RichLink';
 
 const githubLink = createRichLink('https://github.com/fbuireu/forever-pto', { external: true });
+
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 
@@ -19,8 +21,7 @@ export default async function LegalNoticePage({ params }: LegalNoticePageProps) 
     getCloudflareContext({ async: true }),
     getTranslations({ locale, namespace: 'legalNotice' }),
   ]);
-  const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-  const lastUpdatedDate = new Date(Date.now() - ONE_WEEK_MS).toLocaleDateString(locale, {
+  const lastUpdatedDate = addDays(startOfToday(), -7).toLocaleDateString(locale, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -95,9 +96,7 @@ export default async function LegalNoticePage({ params }: LegalNoticePageProps) 
         <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.intellectualProperty.title')}</h2>
         <p>{t('sections.intellectualProperty.p1')}</p>
         <p className='mt-4'>{t('sections.intellectualProperty.p2')}</p>
-        <p className='mt-4'>
-          {t.rich('sections.intellectualProperty.p3', { link: githubLink })}
-        </p>
+        <p className='mt-4'>{t.rich('sections.intellectualProperty.p3', { link: githubLink })}</p>
       </section>
 
       <section>

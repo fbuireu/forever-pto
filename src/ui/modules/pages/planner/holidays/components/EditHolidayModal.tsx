@@ -1,9 +1,11 @@
 'use client';
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
+import { formatDate } from '@application/shared/utils/dates';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { Button } from '@ui/modules/core/primitives/Button';
 import {
   Dialog,
   DialogContent,
@@ -14,15 +16,13 @@ import {
 } from '@ui/modules/core/primitives/Dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
-import { formatDate } from '@ui/utils/dates';
+import { Calendar, CalendarSelectionMode, type FromTo } from '@ui/modules/pages/planner/calendar/Calendar';
 import { CalendarDays, Calendar as CalendarIcon, Edit } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { Button } from 'src/ui/modules/core/primitives/Button';
-import { Calendar, CalendarSelectionMode, type FromTo } from '../../calendar/Calendar';
 import { createHolidaySchema, type HolidayFormData } from './schema';
 
 interface EditHolidayModalProps {

@@ -3,7 +3,9 @@ import { EmailError, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
 
-const mockSendContactEmail = vi.hoisted(() => vi.fn<(data: unknown) => Effect.Effect<void, ValidationError | EmailError>>());
+const mockSendContactEmail = vi.hoisted(() =>
+  vi.fn<(data: unknown, config: unknown) => Effect.Effect<void, ValidationError | EmailError>>()
+);
 
 vi.mock('@application/use-cases/contact', () => ({
   sendContactEmail: mockSendContactEmail,
@@ -11,6 +13,15 @@ vi.mock('@application/use-cases/contact', () => ({
 
 vi.mock('@infrastructure/layers', () => ({
   AppLayer: Layer.empty,
+}));
+
+vi.mock('@opennextjs/cloudflare', () => ({
+  getCloudflareContext: vi.fn().mockReturnValue({
+    env: {
+      NEXT_PUBLIC_SITE_URL: 'https://example.com',
+      NEXT_PUBLIC_CONTACT_EMAIL: 'contact@example.com',
+    },
+  }),
 }));
 
 const { POST } = await import('./route');
@@ -26,16 +37,16 @@ function makeRequest(body: unknown): Request {
 describe('POST /api/contact', () => {
   it('returns 200 with success on valid submission', async () => {
     mockSendContactEmail.mockReturnValue(Effect.succeed(undefined));
-    const response = await POST(makeRequest({ email: 'test@example.com', name: 'Test', subject: 'Hello', message: 'World' }) as never);
+    const response = await POST(
+      makeRequest({ email: 'test@example.com', name: 'Test', subject: 'Hello', message: 'World' }) as never
+    );
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(body.success).toBe(true);
   });
 
   it('returns 400 on ValidationError', async () => {
-    mockSendContactEmail.mockReturnValue(
-      Effect.fail(new ValidationError({ message: 'Email is required' }))
-    );
+    mockSendContactEmail.mockReturnValue(Effect.fail(new ValidationError({ message: 'Email is required' })));
     const response = await POST(makeRequest({ name: 'Test' }) as never);
     expect(response.status).toBe(400);
     const body = await response.json();
@@ -44,9 +55,7 @@ describe('POST /api/contact', () => {
   });
 
   it('returns 500 on EmailError', async () => {
-    mockSendContactEmail.mockReturnValue(
-      Effect.fail(new EmailError({ message: 'SMTP failed' }))
-    );
+    mockSendContactEmail.mockReturnValue(Effect.fail(new EmailError({ message: 'SMTP failed' })));
     const response = await POST(makeRequest({ email: 'test@example.com' }) as never);
     expect(response.status).toBe(500);
     const body = await response.json();

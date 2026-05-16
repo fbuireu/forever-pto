@@ -5,7 +5,9 @@ const GEO_SERVICE = 'https://ipinfo.io';
 const FORMAT = 'json';
 
 const detectCountryFromIPEffect = Effect.gen(function* () {
-  const ipResponse = yield* Effect.tryPromise(() => fetch(`${IP_SERVICE}?format=${FORMAT}`, { cache: 'force-cache', signal: AbortSignal.timeout(5000) }));
+  const ipResponse = yield* Effect.tryPromise(() =>
+    fetch(`${IP_SERVICE}?format=${FORMAT}`, { cache: 'force-cache', signal: AbortSignal.timeout(5000) })
+  );
 
   if (!ipResponse.ok) return '';
 
@@ -26,6 +28,6 @@ const detectCountryFromIPEffect = Effect.gen(function* () {
   return geoData.country?.toLowerCase() ?? '';
 });
 
-export async function detectCountryFromIP(): Promise<string> {
+export async function detectCountryFromIP() {
   return Effect.runPromise(detectCountryFromIPEffect.pipe(Effect.orElse(() => Effect.succeed(''))));
 }

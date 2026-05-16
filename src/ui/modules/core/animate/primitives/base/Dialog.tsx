@@ -1,10 +1,10 @@
 'use client';
 
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
+import { useControlledState } from '@ui/hooks/useControlledState';
 import { getStrictContext } from '@ui/utils/context';
 import { AnimatePresence, type HTMLMotionProps, m } from 'motion/react';
 import * as React from 'react';
-import { useControlledState } from 'src/ui/hooks/useControlledState';
 
 type DialogContextType = {
   isOpen: boolean;

@@ -5,7 +5,7 @@ import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-function getUserCountryFromCookie(): string | undefined {
+function getUserCountryFromCookie() {
   if (typeof document === 'undefined') return undefined;
   const cookie = document.cookie.split('; ').find((row) => row.startsWith('user-country='));
   return cookie?.split('=')[1];

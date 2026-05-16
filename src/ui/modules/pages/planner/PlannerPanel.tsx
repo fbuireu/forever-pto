@@ -4,7 +4,7 @@ import { useFiltersStore } from '@application/stores/filters';
 import type { HolidaysState } from '@application/stores/holidays';
 import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
-import type { Suggestion } from '@infrastructure/services/calendar/types';
+import type { Suggestion } from '@domain/calendar/types';
 import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
 import { ChevronRight } from '@ui/modules/core/animate/icons/ChevronRight';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';

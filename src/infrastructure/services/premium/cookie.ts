@@ -1,7 +1,7 @@
 import type { NextResponse } from 'next/server';
 import { isProd, PREMIUM_COOKIE, SESSION_DURATION_SECONDS } from './config';
 
-export function setPremiumCookie(response: NextResponse, token: string): void {
+export function setPremiumCookie(response: NextResponse, token: string) {
   response.cookies.set(PREMIUM_COOKIE, token, {
     httpOnly: true,
     secure: isProd,
@@ -11,6 +11,6 @@ export function setPremiumCookie(response: NextResponse, token: string): void {
   });
 }
 
-export function clearPremiumCookie(response: NextResponse): void {
+export function clearPremiumCookie(response: NextResponse) {
   response.cookies.delete(PREMIUM_COOKIE);
 }

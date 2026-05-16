@@ -3,9 +3,24 @@ import { SessionError, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
 
-const mockVerifySession = vi.hoisted(() => vi.fn<(token: string) => Effect.Effect<{ email: string; paymentIntentId: string }, SessionError>>());
-const mockActivateWithEmail = vi.hoisted(() => vi.fn<(email: string) => Effect.Effect<{ email: string; premiumKey: string; token: string }, ValidationError | SessionError>>());
-const mockActivateWithPayment = vi.hoisted(() => vi.fn<(email: string, key: string) => Effect.Effect<{ email: string; premiumKey: string; token: string }, ValidationError | SessionError>>());
+const mockVerifySession = vi.hoisted(() =>
+  vi.fn<(token: string) => Effect.Effect<{ email: string; paymentIntentId: string }, SessionError>>()
+);
+const mockActivateWithEmail = vi.hoisted(() =>
+  vi.fn<
+    (
+      email: string
+    ) => Effect.Effect<{ email: string; premiumKey: string; token: string }, ValidationError | SessionError>
+  >()
+);
+const mockActivateWithPayment = vi.hoisted(() =>
+  vi.fn<
+    (
+      email: string,
+      key: string
+    ) => Effect.Effect<{ email: string; premiumKey: string; token: string }, ValidationError | SessionError>
+  >()
+);
 const mockClearPremiumCookie = vi.hoisted(() => vi.fn());
 const mockSetPremiumCookie = vi.hoisted(() => vi.fn());
 const mockCookiesGet = vi.hoisted(() => vi.fn());
@@ -63,9 +78,7 @@ describe('GET /api/check-session', () => {
 
   it('returns session data when token is valid', async () => {
     mockCookiesGet.mockReturnValue({ value: 'valid-token' });
-    mockVerifySession.mockReturnValue(
-      Effect.succeed({ email: 'user@example.com', paymentIntentId: 'pi_abc' })
-    );
+    mockVerifySession.mockReturnValue(Effect.succeed({ email: 'user@example.com', paymentIntentId: 'pi_abc' }));
     const response = await GET(new Request('http://localhost/api/check-session') as never);
     const body = await response.json();
     expect(body).toEqual({ premiumKey: 'pi_abc', email: 'user@example.com' });
@@ -73,9 +86,7 @@ describe('GET /api/check-session', () => {
 
   it('clears cookie and returns null fields when session is invalid', async () => {
     mockCookiesGet.mockReturnValue({ value: 'bad-token' });
-    mockVerifySession.mockReturnValue(
-      Effect.fail(new SessionError({ message: 'invalid' }))
-    );
+    mockVerifySession.mockReturnValue(Effect.fail(new SessionError({ message: 'invalid' })));
     const response = await GET(new Request('http://localhost/api/check-session') as never);
     const body = await response.json();
     expect(body).toEqual({ premiumKey: null, email: null });
@@ -114,9 +125,7 @@ describe('POST /api/check-session', () => {
   });
 
   it('returns 400 on ValidationError', async () => {
-    mockActivateWithEmail.mockReturnValue(
-      Effect.fail(new ValidationError({ message: 'No payment found' }))
-    );
+    mockActivateWithEmail.mockReturnValue(Effect.fail(new ValidationError({ message: 'No payment found' })));
     const response = await POST(makeRequest({ email: 'user@example.com' }) as never);
     expect(response.status).toBe(400);
     const body = await response.json();
@@ -124,9 +133,7 @@ describe('POST /api/check-session', () => {
   });
 
   it('returns 500 on SessionError', async () => {
-    mockActivateWithEmail.mockReturnValue(
-      Effect.fail(new SessionError({ message: 'jwt error' }))
-    );
+    mockActivateWithEmail.mockReturnValue(Effect.fail(new SessionError({ message: 'jwt error' })));
     const response = await POST(makeRequest({ email: 'user@example.com' }) as never);
     expect(response.status).toBe(500);
     const body = await response.json();

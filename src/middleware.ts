@@ -1,4 +1,5 @@
 import { LOCALE_COOKIE } from '@infrastructure/i18n/config';
+import { setLocaleCookie } from '@infrastructure/i18n/cookie';
 import { routing } from '@infrastructure/i18n/routing';
 import { location as locationProxy } from '@infrastructure/proxy/location';
 import { type NextRequest, NextResponse } from 'next/server';
@@ -15,7 +16,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (isMarkdownRequest && !isInternalPath) {
     const markdownUrl = new URL('/api/markdown', request.url);
     markdownUrl.searchParams.set('path', pathname);
-      
+
     return NextResponse.rewrite(markdownUrl);
   }
 
@@ -23,14 +24,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   const localeCookie = i18nResponse.cookies.get(LOCALE_COOKIE);
   if (localeCookie) {
-    i18nResponse.cookies.set({
-      name: LOCALE_COOKIE,
-      value: localeCookie.value,
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      path: '/',
-    });
+    setLocaleCookie(i18nResponse, localeCookie.value);
   }
 
   return await locationProxy({ request, response: i18nResponse });

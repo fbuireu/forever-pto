@@ -1,19 +1,19 @@
-import type { HolidayDTO } from '../../../application/dto/holiday/types';
-import type { Bridge, Suggestion } from '../../services/calendar/types';
-import type { SerializedBridge, SerializedHolidayDTO, SerializedSuggestion } from './calculations.types';
+import type { HolidayDTO } from '@application/dto/holiday/types';
+import type { Bridge, Suggestion } from '@domain/calendar/types';
+import type { SerializedBridge, SerializedHolidayDTO, SerializedSuggestion } from './types';
 
-export function serializeHolidays(holidays: HolidayDTO[]): SerializedHolidayDTO[] {
+export function serializeHolidays(holidays: HolidayDTO[]) {
   return holidays.map((h) => ({
     ...h,
     date: h.date.toISOString(),
   }));
 }
 
-export function serializeMonths(months: Date[]): string[] {
+export function serializeMonths(months: Date[]) {
   return months.map((m) => m.toISOString());
 }
 
-function serializeBridge(b: Bridge): SerializedBridge {
+function serializeBridge(b: Bridge) {
   return {
     ...b,
     startDate: b.startDate.toISOString(),
@@ -22,17 +22,14 @@ function serializeBridge(b: Bridge): SerializedBridge {
   };
 }
 
-export function serializeSuggestionResult(
-  suggestion: Suggestion,
-  alternatives: Suggestion[]
-): { suggestion: SerializedSuggestion; alternatives: SerializedSuggestion[] } {
+export function serializeSuggestionResult(suggestion: Suggestion, alternatives: Suggestion[]) {
   return {
     suggestion: serializeSuggestion(suggestion),
     alternatives: alternatives.map(serializeSuggestion),
   };
 }
 
-function serializeSuggestion(s: Suggestion): SerializedSuggestion {
+function serializeSuggestion(s: Suggestion) {
   return {
     ...s,
     days: s.days.map((d) => d.toISOString()),
@@ -40,7 +37,7 @@ function serializeSuggestion(s: Suggestion): SerializedSuggestion {
   };
 }
 
-function deserializeBridge(b: SerializedBridge): Bridge {
+function deserializeBridge(b: SerializedBridge) {
   return {
     ...b,
     startDate: new Date(b.startDate),
@@ -49,7 +46,7 @@ function deserializeBridge(b: SerializedBridge): Bridge {
   };
 }
 
-export function deserializeSuggestion(s: SerializedSuggestion): Suggestion {
+export function deserializeSuggestion(s: SerializedSuggestion) {
   return {
     ...s,
     days: s.days.map((d) => new Date(d)),
@@ -58,7 +55,7 @@ export function deserializeSuggestion(s: SerializedSuggestion): Suggestion {
   };
 }
 
-export function deserializeHolidays(holidays: SerializedHolidayDTO[]): HolidayDTO[] {
+export function deserializeHolidays(holidays: SerializedHolidayDTO[]) {
   return holidays.map((h) => ({
     ...h,
     date: new Date(h.date),
@@ -66,6 +63,6 @@ export function deserializeHolidays(holidays: SerializedHolidayDTO[]): HolidayDT
   }));
 }
 
-export function deserializeMonths(months: string[]): Date[] {
+export function deserializeMonths(months: string[]) {
   return months.map((m) => new Date(m));
 }

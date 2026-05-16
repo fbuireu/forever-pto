@@ -1,14 +1,14 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import type { Suggestion } from '@infrastructure/services/calendar/types';
-import { addDays } from '@ui/utils/dates';
+import { addDays } from '@application/shared/utils/dates';
+import type { Suggestion } from '@domain/calendar/types';
 
 const ISO_DATE_SEPARATORS = /-/g;
 const ICS_SPECIAL_CHARS = /[\\;,]/g;
 const NEWLINE = /\n/g;
 
-const toIcsDate = (date: Date): string => date.toISOString().slice(0, 10).replace(ISO_DATE_SEPARATORS, '');
+const toIcsDate = (date: Date) => date.toISOString().slice(0, 10).replace(ISO_DATE_SEPARATORS, '');
 
-const sanitize = (str: string): string => str.replace(ICS_SPECIAL_CHARS, (c) => `\\${c}`).replace(NEWLINE, '\\n');
+const sanitize = (str: string) => str.replace(ICS_SPECIAL_CHARS, (c) => `\\${c}`).replace(NEWLINE, '\\n');
 
 interface IcsEvent {
   uid: string;
@@ -17,7 +17,7 @@ interface IcsEvent {
   categories: string;
 }
 
-function buildEvent({ uid, start, summary, categories }: IcsEvent): string {
+function buildEvent({ uid, start, summary, categories }: IcsEvent) {
   return [
     'BEGIN:VEVENT',
     `DTSTART;VALUE=DATE:${toIcsDate(start)}`,
@@ -47,7 +47,7 @@ export function generateIcs({
   suggestion,
   includeHolidays,
   includePto,
-}: GenerateIcsOptions): string {
+}: GenerateIcsOptions) {
   const events: string[] = [];
 
   if (includeHolidays) {
@@ -74,7 +74,7 @@ export function generateIcs({
   ].join('\r\n');
 }
 
-export function downloadIcs(content: string, filename: string): void {
+export function downloadIcs(content: string, filename: string) {
   const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

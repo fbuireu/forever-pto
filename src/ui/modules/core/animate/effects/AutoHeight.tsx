@@ -1,8 +1,8 @@
 'use client';
 
+import { useAutoHeight } from '@ui/hooks/useAutoHeight';
 import { type HTMLMotionProps, m, type TargetAndTransition } from 'motion/react';
 import type * as React from 'react';
-import { useAutoHeight } from 'src/ui/hooks/useAutoHeight';
 import { MotionSlot, type WithAsChild } from '../primitives/animate/MotionSlot';
 
 type AutoHeightProps = WithAsChild<

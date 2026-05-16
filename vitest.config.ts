@@ -8,12 +8,20 @@ export default defineConfig({
     env: {
       NEXT_PUBLIC_SITE_URL: 'https://forever-pto.com',
     },
+    setupFiles: ['./vitest.setup.ts'],
     exclude: ['e2e/**', 'node_modules/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
       include: ['src/**/*.{ts,tsx}'],
-      exclude: ['src/**/*.test.{ts,tsx}', 'src/**/*.spec.{ts,tsx}', 'src/**/*.d.ts', 'src/**/types.ts', 'src/**/*.types.ts', 'src/app/fonts.ts'],
+      exclude: [
+        'src/**/*.test.{ts,tsx}',
+        'src/**/*.spec.{ts,tsx}',
+        'src/**/*.d.ts',
+        'src/**/types.ts',
+        'src/**/*.types.ts',
+        'src/app/fonts.ts',
+      ],
     },
   },
 });

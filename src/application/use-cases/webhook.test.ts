@@ -1,9 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
 import { Effect, Layer } from 'effect';
 import type Stripe from 'stripe';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { processWebhookEvent } from './webhook';
 
 vi.mock('@domain/payment/events/factory/events', () => ({
@@ -41,11 +41,10 @@ const TestLayer = Layer.mergeAll(
 );
 
 type WebhookR = LoggerService | TursoService | StripeServerService;
-const run = <E>(eff: Effect.Effect<void, E, WebhookR>) =>
-  Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
+const run = <E>(eff: Effect.Effect<void, E, WebhookR>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
 
 const makeEvent = (type: string, object: unknown): Stripe.Event =>
-  ({ type, data: { object }, id: 'evt_test', object: 'event' } as Stripe.Event);
+  ({ type, data: { object }, id: 'evt_test', object: 'event' }) as Stripe.Event;
 
 beforeEach(() => vi.clearAllMocks());
 
