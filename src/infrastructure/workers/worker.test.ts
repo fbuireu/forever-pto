@@ -37,7 +37,7 @@ const sendMessage = (payload: Partial<CalculateSuggestionsRequest['payload']> = 
       ...payload,
     },
   };
-  globalThis.onmessage?.({ data: message } as MessageEvent<CalculateSuggestionsRequest>);
+  (globalThis.onmessage as ((e: MessageEvent<CalculateSuggestionsRequest>) => void) | null)?.({ data: message } as MessageEvent<CalculateSuggestionsRequest>);
 };
 
 describe('worker onmessage', () => {
@@ -49,7 +49,7 @@ describe('worker onmessage', () => {
   });
 
   it('ignores messages with unknown type', () => {
-    globalThis.onmessage?.({ data: { type: 'UNKNOWN', requestId: 'r', payload: {} } } as never);
+    (globalThis.onmessage as ((e: MessageEvent) => void) | null)?.({ data: { type: 'UNKNOWN', requestId: 'r', payload: {} } } as MessageEvent);
     expect(mockPostMessage).not.toHaveBeenCalled();
   });
 
