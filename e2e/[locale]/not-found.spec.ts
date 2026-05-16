@@ -25,12 +25,12 @@ test.describe('[locale] not-found', () => {
   });
 
   test('returns 404 for a locale-prefixed unknown path', async ({ page }) => {
-    const response = await page.goto(`/${ES}` + NONEXISTENT);
+    const response = await page.goto(`/${ES}${NONEXISTENT}`);
     expect(response?.status()).toBe(404);
   });
 
   test('renders in the requested locale', async ({ page }) => {
-    await page.goto(`/${ES}` + NONEXISTENT);
+    await page.goto(`/${ES}${NONEXISTENT}`);
     await expect(page.locator('html')).toHaveAttribute('lang', ES);
   });
 });

@@ -1,4 +1,5 @@
 {
   "src/**/*.{ts,tsx,js,jsx}": ["pnpm format:changed", "pnpm lint:changed"],
-  "src/**/*.{test,spec}.{ts,tsx,js,jsx}": ["pnpm test:ut:changed"]
+  "src/**/*.{test,spec}.{ts,tsx,js,jsx}": ["pnpm test:ut:changed"],
+  "e2e/**/*.{ts,tsx,js,jsx}": ["pnpm format:changed", "pnpm lint:changed"]
 }

@@ -135,10 +135,12 @@ export const formatDate = ({ date, locale, format }: FormatDateParams): string =
   const options = INTL_FORMAT_MAP[format];
   if (options) {
     const key = `${locale}-${format}`;
-    if (!dateFormatCache.has(key)) {
-      dateFormatCache.set(key, new Intl.DateTimeFormat(locale, options));
+    let fmt = dateFormatCache.get(key);
+    if (!fmt) {
+      fmt = new Intl.DateTimeFormat(locale, options);
+      dateFormatCache.set(key, fmt);
     }
-    return dateFormatCache.get(key)!.format(date);
+    return fmt.format(date);
   }
 
   return date.toLocaleDateString(locale);
@@ -156,9 +158,10 @@ export const getWeekdayNames = ({ locale, weekStartsOn = 0, format = 'short' }: 
   const anchor = new Date(2023, 0, 2);
   const weekStart = startOfWeek(anchor, { weekStartsOn });
   const key = `${locale}-${weekStartsOn}-${format}`;
-  if (!weekdayFmtCache.has(key)) {
-    weekdayFmtCache.set(key, new Intl.DateTimeFormat(locale, { weekday: format }));
+  let fmt = weekdayFmtCache.get(key);
+  if (!fmt) {
+    fmt = new Intl.DateTimeFormat(locale, { weekday: format });
+    weekdayFmtCache.set(key, fmt);
   }
-  const fmt = weekdayFmtCache.get(key)!;
   return Array.from({ length: 7 }, (_, i) => fmt.format(addDays(weekStart, i)));
 };

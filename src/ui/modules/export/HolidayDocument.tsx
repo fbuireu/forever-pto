@@ -138,24 +138,30 @@ const fmtMonthCache = new Map<string, Intl.DateTimeFormat>();
 const fmtDateCache = new Map<string, Intl.DateTimeFormat>();
 
 function fmtDay(date: Date, locale: string): string {
-  if (!fmtDayCache.has(locale)) {
-    fmtDayCache.set(locale, new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' }));
+  let fmt = fmtDayCache.get(locale);
+  if (!fmt) {
+    fmt = new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' });
+    fmtDayCache.set(locale, fmt);
   }
-  return fmtDayCache.get(locale)!.format(date);
+  return fmt.format(date);
 }
 
 function fmtMonth(date: Date, locale: string): string {
-  if (!fmtMonthCache.has(locale)) {
-    fmtMonthCache.set(locale, new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }));
+  let fmt = fmtMonthCache.get(locale);
+  if (!fmt) {
+    fmt = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' });
+    fmtMonthCache.set(locale, fmt);
   }
-  return fmtMonthCache.get(locale)!.format(date);
+  return fmt.format(date);
 }
 
 function fmtDate(date: Date, locale: string): string {
-  if (!fmtDateCache.has(locale)) {
-    fmtDateCache.set(locale, new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }));
+  let fmt = fmtDateCache.get(locale);
+  if (!fmt) {
+    fmt = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+    fmtDateCache.set(locale, fmt);
   }
-  return fmtDateCache.get(locale)!.format(date);
+  return fmt.format(date);
 }
 
 function groupByMonth<T>(items: T[], getDate: (item: T) => Date, locale: string): Array<{ month: string; items: T[] }> {

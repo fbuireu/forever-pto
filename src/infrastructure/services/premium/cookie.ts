@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import type { NextResponse } from 'next/server';
 import { isProd, PREMIUM_COOKIE, SESSION_DURATION_SECONDS } from './config';
 
 export function setPremiumCookie(response: NextResponse, token: string): void {

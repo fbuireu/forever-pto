@@ -1,6 +1,6 @@
 import { ApiError } from '@infrastructure/api/errors';
 import { WebhookError } from '@infrastructure/errors';
-import { Effect, Layer } from 'effect';
+import { Effect } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
 
 const mockConstructEvent = vi.hoisted(() => vi.fn<(payload: string, sig: string) => Effect.Effect<{ type: string }, WebhookError>>());

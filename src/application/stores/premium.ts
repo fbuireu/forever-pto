@@ -157,13 +157,11 @@ export const usePremiumStore = create<PremiumStore>()(
 
         getCurrencyFromLocale: (locale: Locale) => {
           try {
-            if (!localeFormatterCache.has(locale)) {
-              localeFormatterCache.set(
-                locale,
-                new Intl.NumberFormat(locale, { style: 'currency', currency: DEFAULT_CURRENCY })
-              );
+            let formatter = localeFormatterCache.get(locale);
+            if (!formatter) {
+              formatter = new Intl.NumberFormat(locale, { style: 'currency', currency: DEFAULT_CURRENCY });
+              localeFormatterCache.set(locale, formatter);
             }
-            const formatter = localeFormatterCache.get(locale)!;
             const resolvedCurrency = formatter.resolvedOptions().currency;
             const currency = resolvedCurrency ?? DEFAULT_CURRENCY;
             const symbol = formatter.formatToParts(0).find(({ type }) => type === 'currency')?.value ?? currency;
