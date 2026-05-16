@@ -37,5 +37,5 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  matcher: [String.raw`/((?!api|_next|_vercel|.*\..*).*)`, '/legal/:path*', '/payment/:path*'],
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };
