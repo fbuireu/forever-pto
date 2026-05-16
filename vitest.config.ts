@@ -5,6 +5,7 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   test: {
+    environment: 'happy-dom',
     env: {
       NEXT_PUBLIC_SITE_URL: 'https://forever-pto.com',
     },

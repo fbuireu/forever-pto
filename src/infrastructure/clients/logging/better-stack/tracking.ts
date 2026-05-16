@@ -14,11 +14,11 @@ interface TrackProperties {
 }
 
 export const track = (event: TrackEventName, properties?: TrackProperties) => {
-  if (typeof globalThis.window === 'undefined' || !globalThis.window.betterstack) return;
+  if (globalThis.window === undefined || !globalThis.window.betterstack) return;
   globalThis.window.betterstack('track', event, properties);
 };
 
 export const identifyUser = (email: string, plan: 'premium' | 'free') => {
-  if (typeof globalThis.window === 'undefined' || !globalThis.window.betterstack) return;
+  if (globalThis.window === undefined || !globalThis.window.betterstack) return;
   globalThis.window.betterstack('user', { email, plan });
 };

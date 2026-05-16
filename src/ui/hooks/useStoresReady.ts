@@ -4,7 +4,7 @@ import { useLocationStore } from '@application/stores/location';
 import { usePremiumStore } from '@application/stores/premium';
 import { useEffect, useMemo, useState } from 'react';
 
-const STORES = [
+const PERSISTED_STORES = [
   { name: 'filters', store: useFiltersStore },
   { name: 'holidays', store: useHolidaysStore },
   { name: 'location', store: useLocationStore },
@@ -13,7 +13,7 @@ const STORES = [
 
 export const useStoresReady = () => {
   const [hydrationStatus, setHydrationStatus] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(STORES.map(({ name, store }) => [name, store.persist.hasHydrated()]))
+    Object.fromEntries(PERSISTED_STORES.map(({ name, store }) => [name, store.persist.hasHydrated()]))
   );
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export const useStoresReady = () => {
       return;
     }
 
-    const unsubscribes = STORES.reduce<(() => void)[]>((acc, { name, store }) => {
+    const unsubscribes = PERSISTED_STORES.reduce<(() => void)[]>((acc, { name, store }) => {
       if (!hydrationStatus[name]) {
         acc.push(
           store.persist.onFinishHydration(() => {

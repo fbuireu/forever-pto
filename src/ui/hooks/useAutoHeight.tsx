@@ -7,12 +7,14 @@ type AutoHeightOptions = {
   includeSelfBox?: boolean;
 };
 
+const DEFAULT_OPTIONS: AutoHeightOptions = {
+  includeParentBox: true,
+  includeSelfBox: false,
+};
+
 export function useAutoHeight<T extends HTMLElement = HTMLDivElement>(
   deps: DependencyList = [],
-  options: AutoHeightOptions = {
-    includeParentBox: true,
-    includeSelfBox: false,
-  }
+  options: AutoHeightOptions = DEFAULT_OPTIONS
 ) {
   const ref = useRef<T | null>(null);
   const roRef = useRef<ResizeObserver | null>(null);
@@ -50,7 +52,7 @@ export function useAutoHeight<T extends HTMLElement = HTMLDivElement>(
       }
     }
 
-    const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
+    const dpr = globalThis.window === undefined ? 1 : window.devicePixelRatio || 1;
     const total = Math.ceil((base + extra) * dpr) / dpr;
 
     return total;

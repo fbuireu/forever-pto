@@ -1,4 +1,5 @@
 import type { CalculateSuggestionsRequest } from './types';
+import { WORKER_MESSAGE_TYPE } from './types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockGenerateSuggestions = vi.hoisted(() => vi.fn());
@@ -22,7 +23,7 @@ await import('./worker');
 
 const sendMessage = (payload: Partial<CalculateSuggestionsRequest['payload']> = {}) => {
   const message: CalculateSuggestionsRequest = {
-    type: 'CALCULATE_SUGGESTIONS',
+    type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS,
     requestId: 'req-1',
     payload: {
       year: 2025,
@@ -63,7 +64,7 @@ describe('worker onmessage', () => {
     sendMessage();
     expect(mockPostMessage).toHaveBeenCalledOnce();
     const response = mockPostMessage.mock.calls[0][0];
-    expect(response.type).toBe('CALCULATE_SUGGESTIONS_RESULT');
+    expect(response.type).toBe(WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT);
     expect(response.requestId).toBe('req-1');
   });
 
@@ -76,14 +77,14 @@ describe('worker onmessage', () => {
   it('posts an empty result when effectivePtoDays is 0', () => {
     sendMessage({ ptoDays: 0 });
     const response = mockPostMessage.mock.calls[0][0];
-    expect(response.type).toBe('CALCULATE_SUGGESTIONS_RESULT');
+    expect(response.type).toBe(WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT);
     expect(response.payload.suggestion.days).toEqual([]);
   });
 
   it('posts an empty result when holidays list is empty', () => {
     sendMessage({ holidays: [], manualDays: [] });
     const response = mockPostMessage.mock.calls[0][0];
-    expect(response.type).toBe('CALCULATE_SUGGESTIONS_RESULT');
+    expect(response.type).toBe(WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT);
     expect(response.payload.suggestion.days).toEqual([]);
   });
 
@@ -91,7 +92,7 @@ describe('worker onmessage', () => {
     mockGenerateSuggestions.mockImplementation(() => { throw new Error('pipeline crash'); });
     sendMessage();
     const response = mockPostMessage.mock.calls[0][0];
-    expect(response.type).toBe('WORKER_ERROR');
+    expect(response.type).toBe(WORKER_MESSAGE_TYPE.WORKER_ERROR);
     expect(response.requestId).toBe('req-1');
     expect(response.error).toContain('pipeline crash');
   });
