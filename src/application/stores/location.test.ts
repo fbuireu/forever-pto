@@ -31,8 +31,8 @@ const INITIAL = {
 };
 
 const MOCK_COUNTRIES: CountryDTO[] = [
-  { value: 'ES', label: 'Spain', flag: '🇪🇸' },
-  { value: 'FR', label: 'France', flag: '🇫🇷' },
+  { value: 'ES', label: 'Spain', flag: 'es' },
+  { value: 'FR', label: 'France', flag: 'fr' },
 ];
 
 beforeEach(() => {

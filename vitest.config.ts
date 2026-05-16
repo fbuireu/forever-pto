@@ -9,7 +9,7 @@ export default defineConfig({
       NEXT_PUBLIC_SITE_URL: 'https://forever-pto.com',
     },
     setupFiles: ['./vitest.setup.ts'],
-    exclude: ['e2e/**', 'node_modules/**'],
+    exclude: ['e2e/**', 'node_modules/**', 'src/ui/assets/icons/**', 'src/ui/modules/core/animate/icons/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],

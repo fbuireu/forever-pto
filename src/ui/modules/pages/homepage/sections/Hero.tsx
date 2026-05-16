@@ -1,7 +1,9 @@
+import type React from 'react';
 import { Link } from '@application/i18n/navigation';
 import { getWeekdayNames } from '@application/shared/utils/dates';
 import { Badge } from '@ui/modules/core/primitives/Badge';
 import { Button } from '@ui/modules/core/primitives/Button';
+import { FlagIcon } from '@ui/modules/core/primitives/FlagIcon';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';
 import { cn } from '@ui/utils/cn';
 import { getLocale, getTranslations } from 'next-intl/server';
@@ -73,10 +75,21 @@ export const Hero = async () => {
           </div>
           <div className='p-[22px] bg-card'>
             <div className='grid grid-cols-2 gap-3.5 mb-4'>
-              {[
-                { label: t('hero.mockupFieldPto'), value: '22', unit: t('hero.mockupFieldPtoUnit') },
-                { label: t('hero.mockupFieldCountry'), value: '🇪🇸 ES', unit: t('hero.mockupFieldHolidays') },
-              ].map(({ label, value, unit }) => (
+              {(
+                [
+                  { label: t('hero.mockupFieldPto'), value: <span>22</span>, unit: t('hero.mockupFieldPtoUnit') },
+                  {
+                    label: t('hero.mockupFieldCountry'),
+                    value: (
+                      <span className='flex items-center gap-1.5'>
+                        <FlagIcon code='es' />
+                        <span>ES</span>
+                      </span>
+                    ),
+                    unit: t('hero.mockupFieldHolidays'),
+                  },
+                ] as { label: string; value: React.ReactNode; unit: string }[]
+              ).map(({ label, value, unit }) => (
                 <div
                   key={label}
                   className='border-[3px] border-[var(--frame)] rounded-[8px] px-3 py-2.5 bg-[var(--background)]'
@@ -84,7 +97,7 @@ export const Hero = async () => {
                   <div className='font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1'>
                     {label}
                   </div>
-                  <div className='font-display font-extrabold text-[28px] leading-none'>
+                  <div className='font-display font-extrabold text-[28px] leading-none flex items-center gap-1'>
                     {value}
                     <span className='text-[14px] font-semibold text-muted-foreground ml-1'>{unit}</span>
                   </div>

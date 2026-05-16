@@ -1,19 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { getEmojiFlag } from './flag';
+import { getFlagCode } from './flag';
 
-describe('getEmojiFlag', () => {
-  it('returns the correct emoji for a known uppercase code', () => {
-    expect(getEmojiFlag('US')).toBe('🇺🇸');
-    expect(getEmojiFlag('ES')).toBe('🇪🇸');
-    expect(getEmojiFlag('FR')).toBe('🇫🇷');
+describe('getFlagCode', () => {
+  it('returns lowercase country code', () => {
+    expect(getFlagCode('US')).toBe('us');
+    expect(getFlagCode('ES')).toBe('es');
+    expect(getFlagCode('FR')).toBe('fr');
   });
 
   it('is case-insensitive', () => {
-    expect(getEmojiFlag('us')).toBe(getEmojiFlag('US'));
-    expect(getEmojiFlag('es')).toBe(getEmojiFlag('ES'));
+    expect(getFlagCode('us')).toBe(getFlagCode('US'));
+    expect(getFlagCode('es')).toBe(getFlagCode('ES'));
   });
 
   it('returns empty string for empty input', () => {
-    expect(getEmojiFlag('')).toBe('');
+    expect(getFlagCode('')).toBe('');
   });
 });

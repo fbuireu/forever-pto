@@ -1,4 +1,5 @@
 import { Badge } from '@ui/modules/core/primitives/Badge';
+import { FlagIcon } from '@ui/modules/core/primitives/FlagIcon';
 import { cn } from '@ui/utils/cn';
 import { getTranslations } from 'next-intl/server';
 import { brutCard, type DayType, dayCell } from './shared';
@@ -138,14 +139,17 @@ export const Features = async () => {
             {t('features.countriesDescription')}
           </p>
           <div className='flex flex-wrap gap-2'>
-            {['🇪🇸', '🇮🇹', '🇩🇪', '🇫🇷', '🇬🇧', '🇺🇸', '+197'].map((flag) => (
+            {(['es', 'it', 'de', 'fr', 'gb', 'us'] as const).map((code) => (
               <span
-                key={flag}
-                className='bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[8px] px-2.5 py-1.5 text-[13px] font-semibold shadow-[var(--shadow-brutal-xs)]'
+                key={code}
+                className='bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[8px] px-2.5 py-1.5 shadow-[var(--shadow-brutal-xs)]'
               >
-                {flag}
+                <FlagIcon code={code} className='w-5 h-4' />
               </span>
             ))}
+            <span className='bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[8px] px-2.5 py-1.5 text-[13px] font-semibold shadow-[var(--shadow-brutal-xs)]'>
+              +197
+            </span>
           </div>
         </div>
         <div

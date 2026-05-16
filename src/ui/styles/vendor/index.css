@@ -1,17 +1,21 @@
-#cc-main {
-  display: none !important;
-}
+@import "flag-icons/css/flag-icons.min.css" layer(vendor);
 
-[data-boneyard] > div:not([data-boneyard-overlay]) {
-  display: contents;
-}
+@layer vendor {
+  #cc-main {
+    display: none !important;
+  }
 
-.boneyard-bordered {
-  border: 2px solid color-mix(in srgb, var(--frame) 30%, transparent);
-  box-sizing: border-box;
-}
+  [data-boneyard] > div:not([data-boneyard-overlay]) {
+    display: contents;
+  }
 
-::selection {
-  background: color-mix(in srgb, var(--color-brand-orange) 60%, transparent 40%);
-  color: var(--color-brand-ink);
+  .boneyard-bordered {
+    border: 2px solid color-mix(in srgb, var(--frame) 30%, transparent);
+    box-sizing: border-box;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-brand-orange) 60%, transparent 40%);
+    color: var(--color-brand-ink);
+  }
 }

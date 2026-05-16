@@ -11,7 +11,7 @@ describe('countryDTO', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({ value: 'US', label: 'United States' });
-    expect(result[0]?.flag).toBe('🇺🇸');
+    expect(result[0]?.flag).toBe('us');
   });
 
   it('maps all entries preserving their codes as value', () => {

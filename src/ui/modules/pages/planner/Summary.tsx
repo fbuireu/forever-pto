@@ -13,6 +13,7 @@ import { MapPin } from '@ui/modules/core/animate/icons/MapPin';
 import { RotatingText } from '@ui/modules/core/animate/text/Rotating';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Badge } from '@ui/modules/core/primitives/Badge';
+import { FlagIcon } from '@ui/modules/core/primitives/FlagIcon';
 import { Banner } from '@ui/modules/core/primitives/Banner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
@@ -146,7 +147,7 @@ export const Summary = () => {
               {t('title', { year, nextYear: year + 1 })}
               <div className='flex flex-wrap items-center gap-2 mt-3 mb-5 justify-center'>
                 <Badge variant='outline' className='mx-1'>
-                  <span className='mr-2'>{locationInfo.userCountry?.flag}</span>
+                  {locationInfo.userCountry?.flag && <FlagIcon code={locationInfo.userCountry.flag} className='mr-2' />}
                   <span>{locationInfo.userCountry?.label}</span>
                 </Badge>
                 {region && locationInfo.userRegion && (
