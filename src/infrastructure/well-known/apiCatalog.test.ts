@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { apiCatalog } from './apiCatalog';
 
-const BASE_URL = 'https://forever-pto.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
 describe('apiCatalog', () => {
   it('returns 200 with linkset+json content-type', () => {

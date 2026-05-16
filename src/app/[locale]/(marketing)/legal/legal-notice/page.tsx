@@ -1,6 +1,9 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { LegalLayout } from '@ui/modules/layout/LegalLayout';
 import { Me } from '@ui/modules/pages/legal/Me';
+import { createRichLink } from '@ui/modules/core/primitives/RichLink';
+
+const githubLink = createRichLink('https://github.com/fbuireu/forever-pto', { external: true });
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 
@@ -93,18 +96,7 @@ export default async function LegalNoticePage({ params }: LegalNoticePageProps) 
         <p>{t('sections.intellectualProperty.p1')}</p>
         <p className='mt-4'>{t('sections.intellectualProperty.p2')}</p>
         <p className='mt-4'>
-          {t.rich('sections.intellectualProperty.p3', {
-            link: (chunks) => (
-              <a
-                href='https://github.com/fbuireu/forever-pto'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-primary hover:underline'
-              >
-                {chunks}
-              </a>
-            ),
-          })}
+          {t.rich('sections.intellectualProperty.p3', { link: githubLink })}
         </p>
       </section>
 

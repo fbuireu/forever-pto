@@ -1,5 +1,5 @@
 import { Toaster } from '@ui/modules/core/primitives/Sonner';
-import { Navigation } from '@ui/modules/pages/homepage/navigation/Navigation';
+import { Header } from '@ui/modules/pages/homepage/navigation/Navigation';
 import { Footer } from '@ui/modules/shared/footer/Footer';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
@@ -15,7 +15,7 @@ const MarketingLayout = async ({ children, params }: Readonly<MarketingLayoutPro
 
   return (
     <div className='min-h-screen flex flex-col text-foreground bg-background'>
-      <Navigation />
+      <Header />
       {children}
       <Footer />
       <Toaster />

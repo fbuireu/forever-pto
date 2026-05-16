@@ -1,5 +1,5 @@
-import { Link } from '@application/i18n/navigation';
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '@ui/modules/core/animate/base/Accordion';
+import { createRichLink } from '@ui/modules/core/primitives/RichLink';
 import { Badge } from '@ui/modules/core/primitives/Badge';
 import { FaqTabs } from '@ui/modules/pages/planner/support/FaqTabs';
 import { Troubleshooting } from '@ui/modules/pages/planner/support/Troubleshooting';
@@ -8,6 +8,15 @@ import { getTranslations } from 'next-intl/server';
 
 const GITHUB_ISSUE_URL =
   'https://github.com/fbuireu/forever-pto/issues/new?template=feature_request.yml&labels=enhancement';
+
+const FAQ_NAV_CLASS =
+  'text-sm font-medium px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75';
+
+const privacyPolicyLink = createRichLink('/legal/privacy-policy', { className: FAQ_NAV_CLASS });
+const githubIssueLink = createRichLink(GITHUB_ISSUE_URL, {
+  external: true,
+  className: `font-semibold ${FAQ_NAV_CLASS}`,
+});
 
 export const Faq = async () => {
   const [t, tLanding] = await Promise.all([getTranslations('faq'), getTranslations('homepage')]);
@@ -58,16 +67,7 @@ export const Faq = async () => {
         {
           id: 'data',
           question: t('sections.security.data.question'),
-          answer: t.rich('sections.security.data.answer', {
-            privacyLink: (chunks) => (
-              <Link
-                href='/legal/privacy-policy'
-                className='text-sm font-medium px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75'
-              >
-                {chunks}
-              </Link>
-            ),
-          }),
+          answer: t.rich('sections.security.data.answer', { privacyLink: privacyPolicyLink }),
         },
         {
           id: 'encryption',
@@ -93,18 +93,7 @@ export const Faq = async () => {
         {
           id: 'code',
           question: t('sections.collaborate.code.question'),
-          answer: t.rich('sections.collaborate.code.answer', {
-            link: (chunks) => (
-              <a
-                href={GITHUB_ISSUE_URL}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-sm font-semibold px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75'
-              >
-                {chunks}
-              </a>
-            ),
-          }),
+          answer: t.rich('sections.collaborate.code.answer', { link: githubIssueLink }),
         },
         {
           id: 'business',

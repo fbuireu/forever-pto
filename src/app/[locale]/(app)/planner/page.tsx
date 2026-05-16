@@ -4,13 +4,13 @@ import dynamic from 'next/dynamic';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 
-const HolidaysList = dynamic(() => import('@ui/modules/pages/planner/HolidaysList').then((mod) => mod.HolidaysList));
-const ManagementBar = dynamic(() => import('@ui/modules/pages/planner/ManagementBar').then((mod) => mod.ManagementBar));
-const CalendarList = dynamic(() => import('@ui/modules/pages/planner/CalendarList').then((mod) => mod.CalendarList));
-const Legend = dynamic(() => import('@ui/modules/pages/planner/Legend').then((mod) => mod.Legend));
-const Summary = dynamic(() => import('@ui/modules/pages/planner/Summary').then((mod) => mod.Summary));
-const Roadmap = dynamic(() => import('@ui/modules/pages/planner/Roadmap').then((mod) => mod.Roadmap));
-const Contact = dynamic(() => import('@ui/modules/pages/planner/Contact').then((mod) => mod.Contact));
+const HolidaysList = dynamic(() => import('@ui/modules/pages/planner/HolidaysList').then((module) => module.HolidaysList));
+const ManagementBar = dynamic(() => import('@ui/modules/pages/planner/ManagementBar').then((module) => module.ManagementBar));
+const CalendarList = dynamic(() => import('@ui/modules/pages/planner/CalendarList').then((module) => module.CalendarList));
+const Legend = dynamic(() => import('@ui/modules/pages/planner/Legend').then((module) => module.Legend));
+const Summary = dynamic(() => import('@ui/modules/pages/planner/Summary').then((module) => module.Summary));
+const Roadmap = dynamic(() => import('@ui/modules/pages/planner/Roadmap').then((module) => module.Roadmap));
+const Contact = dynamic(() => import('@ui/modules/pages/planner/Contact').then((module) => module.Contact));
 
 export { generateMetadata } from './metadata';
 

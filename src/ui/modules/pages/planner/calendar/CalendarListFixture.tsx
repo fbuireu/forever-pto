@@ -1,9 +1,10 @@
+import { EN } from '@infrastructure/i18n/locales';
 import { formatDate, getWeekdayNames } from '@ui/utils/dates';
 
 const MONTH_KEYS = Array.from({ length: 12 }, (_, i) =>
-  formatDate({ date: new Date(2024, i, 1), locale: 'en', format: 'MMMM' })
+  formatDate({ date: new Date(2024, i, 1), locale: EN, format: 'MMMM' })
 );
-const WEEKDAY_KEYS = getWeekdayNames({ locale: 'en', weekStartsOn: 1 });
+const WEEKDAY_KEYS = getWeekdayNames({ locale: EN, weekStartsOn: 1 });
 const DAY_KEYS = Array.from({ length: 42 }, (_, i) => `d${i + 1}`);
 
 const Bone = ({ className }: { className: string }) => (

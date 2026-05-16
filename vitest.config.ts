@@ -5,6 +5,9 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   test: {
+    env: {
+      NEXT_PUBLIC_SITE_URL: 'https://forever-pto.com',
+    },
     exclude: ['e2e/**', 'node_modules/**'],
     coverage: {
       provider: 'v8',

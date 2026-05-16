@@ -1,4 +1,4 @@
-import { LOCALES } from '@infrastructure/i18n/config';
+import { localeAlternates, localePath } from '@infrastructure/i18n/url';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';
@@ -20,8 +20,8 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
     title: t('title'),
     metadataBase: new URL(baseUrl),
     alternates: {
-      canonical: `/${locale}/payment/confirmation`,
-      languages: Object.fromEntries(LOCALES.map((lang) => [lang, `/${lang}/payment/confirmation`])),
+      canonical: localePath(locale, '/payment/confirmation'),
+      languages: localeAlternates('/payment/confirmation'),
     },
     robots: {
       index: false,

@@ -1,8 +1,8 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { LegalLayout } from '@ui/modules/layout/LegalLayout';
+import { createRichLink } from '@ui/modules/core/primitives/RichLink';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
-import { Link } from 'src/application/i18n/navigation';
 
 export { generateMetadata } from './metadata';
 
@@ -16,6 +16,7 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
     getCloudflareContext({ async: true }),
     getTranslations({ locale, namespace: 'cookiePolicy' }),
   ]);
+  const siteLink = createRichLink(env.NEXT_PUBLIC_SITE_URL);
   const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
   const lastUpdatedDate = new Date(Date.now() - ONE_WEEK_MS).toLocaleDateString(locale, {
     day: 'numeric',
@@ -28,13 +29,7 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
       <section>
         <h2 className='text-2xl font-semibold mt-6 mb-4'>{t('sections.introduction.title')}</h2>
         <p>
-          {t.rich('sections.introduction.p1', {
-            link: (chunks) => (
-              <Link href={env.NEXT_PUBLIC_SITE_URL} className='text-primary hover:underline'>
-                {chunks}
-              </Link>
-            ),
-          })}
+          {t.rich('sections.introduction.p1', { link: siteLink })}
         </p>
         <p className='mt-4'>{t('sections.introduction.p2')}</p>
       </section>

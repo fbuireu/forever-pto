@@ -1,4 +1,4 @@
-import { LOCALES } from '@infrastructure/i18n/config';
+import { localeAlternates, localePath } from '@infrastructure/i18n/url';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';
@@ -21,13 +21,13 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
     description: t('description'),
     metadataBase: new URL(baseUrl),
     alternates: {
-      canonical: `/${locale}/legal/cookie-policy`,
-      languages: Object.fromEntries(LOCALES.map((lang) => [lang, `/${lang}/legal/cookie-policy`])),
+      canonical: localePath(locale, '/legal/cookie-policy'),
+      languages: localeAlternates('/legal/cookie-policy'),
     },
     openGraph: {
       title: t('title'),
       description: t('description'),
-      url: `/${locale}/legal/cookie-policy`,
+      url: localePath(locale, '/legal/cookie-policy'),
       siteName: 'Forever PTO',
       locale,
       type: 'website',

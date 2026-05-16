@@ -1,6 +1,10 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { LegalLayout } from '@ui/modules/layout/LegalLayout';
+import { createRichLink } from '@ui/modules/core/primitives/RichLink';
 import type { Locale } from 'next-intl';
+
+const githubLink = createRichLink('https://github.com/fbuireu/forever-pto', { external: true });
+const odrLink = createRichLink('https://ec.europa.eu/consumers/odr', { external: true });
 import { getTranslations } from 'next-intl/server';
 
 export { generateMetadata } from './metadata';
@@ -200,18 +204,7 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
 
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.intellectualProperty.openSource.title')}</h3>
         <p>
-          {t.rich('sections.intellectualProperty.openSource.description', {
-            link: (chunks) => (
-              <a
-                href='https://github.com/fbuireu/forever-pto'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-primary hover:underline'
-              >
-                {chunks}
-              </a>
-            ),
-          })}
+          {t.rich('sections.intellectualProperty.openSource.description', { link: githubLink })}
         </p>
 
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.intellectualProperty.restrictions.title')}</h3>
@@ -300,18 +293,7 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
 
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.governingLaw.euOdr.title')}</h3>
         <p>
-          {t.rich('sections.governingLaw.euOdr.description', {
-            link: (chunks) => (
-              <a
-                href='https://ec.europa.eu/consumers/odr'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-primary hover:underline'
-              >
-                {chunks}
-              </a>
-            ),
-          })}
+          {t.rich('sections.governingLaw.euOdr.description', { link: odrLink })}
         </p>
       </section>
 

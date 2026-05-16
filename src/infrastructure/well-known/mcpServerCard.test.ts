@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { mcpServerCard } from './mcpServerCard';
 
-const BASE_URL = 'https://forever-pto.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
 describe('mcpServerCard', () => {
   it('returns 200 with json content-type', () => {
