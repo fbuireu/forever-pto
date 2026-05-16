@@ -1,5 +1,5 @@
 import type { DiscountInfo } from '@application/dto/payment/types';
-import { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
+import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
 import type { PaymentError } from '@infrastructure/errors';
 import { Effect } from 'effect';
 import type StripeNode from 'stripe';

@@ -1,5 +1,5 @@
 import { ApiError } from '@infrastructure/api/errors';
-import { PaymentError, PromoCodeError, RateLimitError, ValidationError } from '@infrastructure/errors';
+import { PaymentError, PromoCodeError, PromoCodeErrors, RateLimitError, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -13,7 +13,7 @@ const mockCreatePayment = vi.hoisted(() =>
   >()
 );
 
-vi.mock('@infrastructure/services/payments/rate-limit', () => ({
+vi.mock('@infrastructure/services/payments/rateLimit', () => ({
   checkRateLimit: mockCheckRateLimit,
 }));
 
@@ -22,7 +22,7 @@ vi.mock('@application/use-cases/payment', () => ({
 }));
 
 vi.mock('@infrastructure/layers', () => ({
-  AppLayer: Layer.empty,
+  ApplicationLayer: Layer.empty,
 }));
 
 const { POST } = await import('./route');
@@ -73,13 +73,14 @@ describe('POST /api/payment', () => {
     expect(body.error).toBe('Amount is required');
   });
 
-  it('returns 400 on PromoCodeError', async () => {
+  it('returns 400 on PromoCodeError with code and isPromoCodeError', async () => {
     mockCheckRateLimit.mockReturnValue(Effect.succeed(undefined));
-    mockCreatePayment.mockReturnValue(Effect.fail(new PromoCodeError({ message: 'Invalid promo code' })));
+    mockCreatePayment.mockReturnValue(Effect.fail(new PromoCodeError({ code: PromoCodeErrors.INVALID_OR_EXPIRED })));
     const response = await POST(makeRequest({ promoCode: 'NOPE' }) as never);
     expect(response.status).toBe(400);
     const body = await response.json();
-    expect(body.error).toBe('Invalid promo code');
+    expect(body.error).toBe(PromoCodeErrors.INVALID_OR_EXPIRED);
+    expect(body.isPromoCodeError).toBe(true);
   });
 
   it('returns 500 on PaymentError', async () => {

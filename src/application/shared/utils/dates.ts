@@ -60,6 +60,13 @@ export const startOfDay = (date: Date): Date => toDate(toPlainDate(date));
 
 export const startOfToday = (): Date => toDate(Temporal.Now.plainDateISO());
 
+export const toIcsDate = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}${m}${d}`;
+};
+
 export const startOfYear = (date: Date): Date => toDate(toPlainDate(date).with({ month: 1, day: 1 }));
 
 export const endOfYear = (date: Date): Date => toDate(toPlainDate(date).with({ month: 12, day: 31 }));

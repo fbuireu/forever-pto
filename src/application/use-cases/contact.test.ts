@@ -14,7 +14,7 @@ vi.mock('@infrastructure/services/contact/repository', () => ({
   saveContact: vi.fn(() => Effect.succeed(undefined)),
 }));
 
-vi.mock('@infrastructure/services/email/templates/Contact', () => ({
+vi.mock('@application/email/templates/Contact', () => ({
   ContactFormEmail: vi.fn(() => null),
 }));
 
@@ -64,7 +64,7 @@ describe('sendContactEmail', () => {
 
   it('passes siteUrl to the email template', async () => {
     await run(sendContactEmail(VALID_DATA, CONFIG));
-    const { ContactFormEmail } = await import('@infrastructure/services/email/templates/Contact');
+    const { ContactFormEmail } = await import('@application/email/templates/Contact');
     expect(vi.mocked(ContactFormEmail)).toHaveBeenCalledWith(
       expect.objectContaining({ baseUrl: 'https://example.com' })
     );

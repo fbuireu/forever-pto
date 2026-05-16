@@ -448,7 +448,18 @@
     "paymentFailed": "Error en inicialitzar el pagament",
     "paymentFailedDescription": "Torna-ho a provar més tard",
     "paymentSuccess": "Pagament realitzat!",
-    "paymentSuccessDescription": "Gràcies pel teu suport! Ja tens accés premium."
+    "paymentSuccessDescription": "Gràcies pel teu suport! Ja tens accés premium.",
+    "promoApplied": "Codi promocional aplicat!",
+    "promoSavedDescription": "Has estalviat €{saved} (Original: €{original}, Final: €{final})",
+    "promoCodeError": "Error en el codi promocional",
+    "promoCodeErrors": {
+      "invalid_or_expired": "Codi promocional no vàlid o caducat",
+      "usage_limit_reached": "Aquest codi promocional ha assolit el seu límit d'usos",
+      "coupon_expired": "Aquest codi promocional ha caducat",
+      "coupon_invalid": "Aquest codi promocional ja no és vàlid",
+      "failed_to_load": "No s'ha pogut validar el codi promocional",
+      "min_amount_exceeded": "El descompte no es pot aplicar a aquest import"
+    }
   },
   "troubleshooting": {
     "description": "Si l'app es comporta de manera inesperada, pot ser degut a dades locals obsoletes. Quan s'actualitza el projecte, algunes dades emmagatzemades al teu navegador poden quedar desactualitzades. Netejar l'emmagatzematge força un estat nou.",
@@ -622,7 +633,8 @@
     "paymentError": "Error de pagament",
     "paymentFailed": "Pagament fallat",
     "processing": "Processant...",
-    "pay": "Paga"
+    "pay": "Paga",
+    "promoSaved": "Has estalviat €{saved}!"
   },
   "donate": {
     "donateAndUnblock": "Donar i desbloquejar",

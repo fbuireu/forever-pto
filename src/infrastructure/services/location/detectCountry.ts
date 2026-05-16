@@ -1,7 +1,5 @@
-import { detectCountryFromCDN } from '@infrastructure/services/location/utils/detectCountryFromCDN';
 import type { NextRequest } from 'next/server';
-import { detectCountryFromHeaders } from './utils/detectCountryFromHeaders';
-import { detectCountryFromIP } from './utils/detectCountryFromIP';
+import { detectCountryFromCDN, detectCountryFromHeaders, detectCountryFromIP } from './utils/strategies';
 
 export async function detectCountry(request: NextRequest) {
   const cdnLocation = await detectCountryFromCDN();

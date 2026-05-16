@@ -448,7 +448,18 @@
     "paymentFailed": "Error al procesar el pago",
     "paymentFailedDescription": "Inténtalo de nuevo más tarde",
     "paymentSuccess": "Pago completado",
-    "paymentSuccessDescription": "Gracias por tu apoyo. Ya tienes acceso premium."
+    "paymentSuccessDescription": "Gracias por tu apoyo. Ya tienes acceso premium.",
+    "promoApplied": "¡Código promocional aplicado!",
+    "promoSavedDescription": "Ahorraste €{saved} (Original: €{original}, Final: €{final})",
+    "promoCodeError": "Error en el código promocional",
+    "promoCodeErrors": {
+      "invalid_or_expired": "Código promocional inválido o caducado",
+      "usage_limit_reached": "Este código promocional ha alcanzado su límite de usos",
+      "coupon_expired": "Este código promocional ha caducado",
+      "coupon_invalid": "Este código promocional ya no es válido",
+      "failed_to_load": "No se pudo validar el código promocional",
+      "min_amount_exceeded": "El descuento no se puede aplicar a este importe"
+    }
   },
   "troubleshooting": {
     "description": "Si la app se comporta raro, puede ser por datos locales desactualizados. Limpiar el almacenamiento fuerza un estado nuevo y suele arreglarlo.",
@@ -622,7 +633,8 @@
     "paymentError": "Error de pago",
     "paymentFailed": "Pago no completado",
     "processing": "Procesando...",
-    "pay": "Pagar"
+    "pay": "Pagar",
+    "promoSaved": "¡Ahorraste €{saved}!"
   },
   "donate": {
     "donateAndUnblock": "Donar y desbloquear",

@@ -1,5 +1,6 @@
 export const ApiError = {
   INTERNAL_ERROR: 'internal_error',
+  NOT_FOUND: 'not_found',
   RATE_LIMIT_EXCEEDED: 'rate_limit_exceeded',
   EMAIL_REQUIRED: 'email_required',
   MISSING_SIGNATURE: 'missing_signature',

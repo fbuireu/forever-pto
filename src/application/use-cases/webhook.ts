@@ -1,10 +1,10 @@
 import { paymentDataDTO } from '@application/dto/payment/dto';
 import { createPaymentFailedEvent, createPaymentSucceededEvent } from '@domain/payment/events/factory/events';
-import { handlePaymentFailed } from '@domain/payment/handlers/payment-failed';
-import { handlePaymentSucceeded } from '@domain/payment/handlers/payment-succeeded';
+import { handlePaymentFailed } from '@domain/payment/handlers/paymentFailed';
+import { handlePaymentSucceeded } from '@domain/payment/handlers/paymentSucceeded';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
-import type { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
+import type { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
 import type { DatabaseError } from '@infrastructure/errors';
 import { getPaymentById, savePayment } from '@infrastructure/services/payments/repository';
 import { Effect } from 'effect';

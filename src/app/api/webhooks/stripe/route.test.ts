@@ -19,9 +19,9 @@ vi.mock('next/headers', () => ({
 
 vi.mock('@infrastructure/layers', async () => {
   const { Layer } = await import('effect');
-  const { StripeServerService } = await import('@infrastructure/clients/payments/stripe/server-service');
+  const { StripeServerService } = await import('@infrastructure/clients/payments/stripe/serverService');
   return {
-    AppLayer: Layer.succeed(StripeServerService, {
+    ApplicationLayer: Layer.succeed(StripeServerService, {
       paymentIntents: { create: vi.fn(), retrieve: vi.fn() },
       charges: { retrieve: vi.fn() },
       promotionCodes: { list: vi.fn(), retrieve: vi.fn() },

@@ -1,6 +1,6 @@
 import { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
-import { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
+import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
 import { PaymentError, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -18,7 +18,7 @@ vi.mock('@infrastructure/services/payments/provider/intent', () => ({
   createPaymentIntent: vi.fn(() => Effect.succeed({ id: 'pi_test', client_secret: 'cs_test_secret' })),
 }));
 
-vi.mock('@infrastructure/services/payments/provider/promo-code', () => ({
+vi.mock('@infrastructure/services/payments/provider/promoCode', () => ({
   validatePromoCode: vi.fn(() => Effect.succeed({ finalAmount: 799, discountAmount: 200, promoCode: 'SAVE20' })),
 }));
 
@@ -63,13 +63,13 @@ describe('createPayment', () => {
   });
 
   it('does not call validatePromoCode when promoCode is empty', async () => {
-    const { validatePromoCode } = await import('@infrastructure/services/payments/provider/promo-code');
+    const { validatePromoCode } = await import('@infrastructure/services/payments/provider/promoCode');
     await run(createPayment({ ...PARAMS, promoCode: '' }, CONTEXT));
     expect(validatePromoCode).not.toHaveBeenCalled();
   });
 
   it('applies promo code discount when promoCode is provided', async () => {
-    const { validatePromoCode } = await import('@infrastructure/services/payments/provider/promo-code');
+    const { validatePromoCode } = await import('@infrastructure/services/payments/provider/promoCode');
     const { createPaymentIntent } = await import('@infrastructure/services/payments/provider/intent');
     await run(createPayment({ ...PARAMS, promoCode: 'SAVE20' }, CONTEXT));
     expect(validatePromoCode).toHaveBeenCalledWith('SAVE20', 999);

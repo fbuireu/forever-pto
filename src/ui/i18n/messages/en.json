@@ -448,7 +448,18 @@
     "paymentFailed": "Couldn't start payment",
     "paymentFailedDescription": "Try again later",
     "paymentSuccess": "Payment successful!",
-    "paymentSuccessDescription": "Premium access is now active."
+    "paymentSuccessDescription": "Premium access is now active.",
+    "promoApplied": "Promo code applied!",
+    "promoSavedDescription": "You saved €{saved} (Original: €{original}, Final: €{final})",
+    "promoCodeError": "Promo code error",
+    "promoCodeErrors": {
+      "invalid_or_expired": "Invalid or expired promo code",
+      "usage_limit_reached": "This promo code has reached its usage limit",
+      "coupon_expired": "This promo code has expired",
+      "coupon_invalid": "This promo code is no longer valid",
+      "failed_to_load": "Failed to validate promo code",
+      "min_amount_exceeded": "Discount cannot be applied to this amount"
+    }
   },
   "troubleshooting": {
     "description": "If the app is behaving oddly, it's usually due to outdated data in your browser. Clearing local storage resets everything back to defaults.",
@@ -622,7 +633,8 @@
     "paymentError": "Payment error",
     "paymentFailed": "Payment failed",
     "processing": "Processing...",
-    "pay": "Pay"
+    "pay": "Pay",
+    "promoSaved": "You saved €{saved}!"
   },
   "donate": {
     "donateAndUnblock": "Donate & Unblock",

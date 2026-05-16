@@ -14,7 +14,7 @@ vi.mock('../../../package.json', () => ({
 
 import { buildMarkdownPage } from './buildMarkdownPage';
 
-const BASE_URL = 'https://forever-pto.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
 describe('buildMarkdownPage', () => {
   beforeEach(() => {

@@ -2,6 +2,13 @@ import { getBetterStackInstance } from '@infrastructure/clients/logging/better-s
 import { loadStripe, type PaymentIntent, type Stripe, type StripeError } from '@stripe/stripe-js';
 import { Effect } from 'effect';
 
+const StripeClientErrors = {
+  CARD_DECLINED: 'card_declined',
+  INVALID_REQUEST: 'invalid_request',
+  AUTH_ERROR: 'auth_error',
+  GENERIC: 'payment_failed',
+} as const;
+
 interface PaymentParams {
   clientSecret: string;
   returnUrl?: string;
@@ -30,7 +37,7 @@ class StripeClient {
     }
 
     if (!this.stripe) {
-      throw new Error('Stripe failed to load. Please check your internet connection and try again.');
+      throw new Error('Stripe failed to load');
     }
 
     return this.stripe;
@@ -118,27 +125,27 @@ class StripeClient {
     if (stripeError?.type === 'card_error') {
       return {
         success: false as const,
-        error: stripeError.message ?? 'Your card was declined. Please try a different payment method.',
+        error: stripeError.message ?? StripeClientErrors.CARD_DECLINED,
       };
     }
 
     if (stripeError?.type === 'invalid_request_error') {
       return {
         success: false as const,
-        error: 'Payment request is invalid. Please try again.',
+        error: StripeClientErrors.INVALID_REQUEST,
       };
     }
 
     if (stripeError?.type === 'authentication_error') {
       return {
         success: false as const,
-        error: 'Payment service temporarily unavailable. Please try again later.',
+        error: StripeClientErrors.AUTH_ERROR,
       };
     }
 
     return {
       success: false as const,
-      error: stripeError?.message ?? 'Payment could not be processed. Please try again.',
+      error: stripeError?.message ?? StripeClientErrors.GENERIC,
     };
   }
 }

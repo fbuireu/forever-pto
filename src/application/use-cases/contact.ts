@@ -6,7 +6,7 @@ import { ResendService } from '@infrastructure/clients/email/resend/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { EmailError, type ValidationError } from '@infrastructure/errors';
 import { saveContact } from '@infrastructure/services/contact/repository';
-import { ContactFormEmail } from '@infrastructure/services/email/templates/Contact';
+import { ContactFormEmail } from '@application/email/templates/Contact';
 import { render } from '@react-email/render';
 import { Effect } from 'effect';
 

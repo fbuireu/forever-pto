@@ -29,7 +29,7 @@ vi.mock('@infrastructure/services/premium/session', () => ({
   verifySession: mockVerifySession,
 }));
 
-vi.mock('@application/use-cases/activate-premium', () => ({
+vi.mock('@application/use-cases/activatePremium', () => ({
   activateWithEmail: mockActivateWithEmail,
   activateWithPayment: mockActivateWithPayment,
 }));
@@ -37,6 +37,7 @@ vi.mock('@application/use-cases/activate-premium', () => ({
 vi.mock('@infrastructure/services/premium/cookie', () => ({
   clearPremiumCookie: mockClearPremiumCookie,
   setPremiumCookie: mockSetPremiumCookie,
+  PREMIUM_COOKIE: 'premium-token',
 }));
 
 vi.mock('next/headers', () => ({
@@ -44,7 +45,7 @@ vi.mock('next/headers', () => ({
 }));
 
 vi.mock('@infrastructure/layers', () => ({
-  AppLayer: Layer.empty,
+  ApplicationLayer: Layer.empty,
 }));
 
 vi.mock('@infrastructure/api/response', async () => {

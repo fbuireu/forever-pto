@@ -1,15 +1,15 @@
 import { Link } from '@application/i18n/navigation';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { AppLayer } from '@infrastructure/layers';
-import { getPaymentConfirmation } from '@infrastructure/services/payments/getPaymentConfirmation';
+import { ApplicationLayer } from '@infrastructure/layers';
+import { confirmation } from '@infrastructure/services/payments/confirmation';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { getCurrencySymbol } from '@ui/utils/currencies';
 import { Effect } from 'effect';
 import { CheckCircle2, XCircle } from 'lucide-react';
-import { redirect } from 'next/navigation';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
+import { redirect } from 'next/navigation';
 
 export { generateMetadata } from './metadata';
 
@@ -65,22 +65,24 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
     redirect(`/${locale}`);
   }
 
-  const confirmation = await Effect.runPromise(getPaymentConfirmation(paymentIntentId).pipe(Effect.provide(AppLayer)));
+  const data = await Effect.runPromise(
+    confirmation(paymentIntentId).pipe(Effect.provide(ApplicationLayer)),
+  );
 
-  if (!confirmation || confirmation.status !== 'succeeded') {
-    if (confirmation) {
+  if (!data || data.status !== 'succeeded') {
+    if (data) {
       logger.warn('Payment intent not succeeded', {
-        paymentIntentId: confirmation.id,
-        status: confirmation.status,
-        amount: confirmation.amount,
-        currency: confirmation.currency,
+        paymentIntentId: data.id,
+        status: data.status,
+        amount: data.amount,
+        currency: data.currency,
       });
     }
     return <PaymentError />;
   }
 
   const t = await getTranslations('paymentConfirmation.success');
-  const currencySymbol = getCurrencySymbol({ locale, currency: confirmation.currency });
+  const currencySymbol = getCurrencySymbol({ locale, currency: data.currency });
 
   return (
     <div className='min-h-screen flex items-center justify-center p-4 bg-background m-auto'>
@@ -98,7 +100,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
               <span className='text-muted-foreground'>{t('amountPaid')}</span>
               <span className='font-medium'>
                 {currencySymbol}
-                {confirmation.amount.toFixed(2)}
+                {data.amount.toFixed(2)}
               </span>
             </div>
             <div className='flex justify-between text-sm'>
@@ -107,7 +109,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
             </div>
             <div className='flex justify-between text-sm'>
               <span className='text-muted-foreground'>{t('paymentId')}</span>
-              <span className='font-mono text-xs text-muted-foreground'>{confirmation.id.slice(0, 20)}...</span>
+              <span className='font-mono text-xs text-muted-foreground'>{data.id.slice(0, 20)}...</span>
             </div>
           </div>
 

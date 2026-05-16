@@ -448,7 +448,18 @@
     "paymentFailed": "Échec de l'initialisation du paiement",
     "paymentFailedDescription": "Réessaie plus tard",
     "paymentSuccess": "Paiement réussi !",
-    "paymentSuccessDescription": "Merci pour ton soutien ! Tu as maintenant un accès premium."
+    "paymentSuccessDescription": "Merci pour ton soutien ! Tu as maintenant un accès premium.",
+    "promoApplied": "Code promo appliqué !",
+    "promoSavedDescription": "Vous avez économisé €{saved} (Original : €{original}, Final : €{final})",
+    "promoCodeError": "Erreur de code promotionnel",
+    "promoCodeErrors": {
+      "invalid_or_expired": "Code promotionnel invalide ou expiré",
+      "usage_limit_reached": "Ce code promotionnel a atteint sa limite d'utilisation",
+      "coupon_expired": "Ce code promotionnel a expiré",
+      "coupon_invalid": "Ce code promotionnel n'est plus valide",
+      "failed_to_load": "Impossible de valider le code promotionnel",
+      "min_amount_exceeded": "La réduction ne peut pas être appliquée à ce montant"
+    }
   },
   "troubleshooting": {
     "description": "Si l'application se comporte bizarrement, c'est souvent dû à des données locales obsolètes. Quand l'app évolue, certaines données en cache peuvent devenir incompatibles. Vider le stockage local repart de zéro.",
@@ -622,7 +633,8 @@
     "paymentError": "Erreur de paiement",
     "paymentFailed": "Le paiement a échoué",
     "processing": "Traitement en cours...",
-    "pay": "Payer"
+    "pay": "Payer",
+    "promoSaved": "Vous avez économisé €{saved} !"
   },
   "donate": {
     "donateAndUnblock": "Donner et débloquer",

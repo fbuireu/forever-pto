@@ -2,7 +2,7 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { downloadIcs, generateIcs } from '@infrastructure/services/export/generateIcs';
+import { generateIcs } from '@application/export/generateIcs';
 import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { Button } from '@ui/modules/core/primitives/Button';
 import type { HolidayDocumentProps } from '@ui/modules/export/HolidayDocument';
@@ -75,7 +75,15 @@ export const CalendarExport = () => {
       includeHolidays,
       includePto,
     });
-    downloadIcs(content, `forever-pto-${year}.ics`);
+    const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `forever-pto-${year}.ics`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const handleDownloadPdf = () => {

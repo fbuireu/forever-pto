@@ -1,9 +1,8 @@
-import { activateWithEmail, activateWithPayment } from '@application/use-cases/activate-premium';
+import { activateWithEmail, activateWithPayment } from '@application/use-cases/activatePremium';
 import { ApiError } from '@infrastructure/api/errors';
 import { noStore } from '@infrastructure/api/response';
-import { AppLayer } from '@infrastructure/layers';
-import { PREMIUM_COOKIE } from '@infrastructure/services/premium/config';
-import { clearPremiumCookie, setPremiumCookie } from '@infrastructure/services/premium/cookie';
+import { ApplicationLayer } from '@infrastructure/layers';
+import { clearPremiumCookie, PREMIUM_COOKIE, setPremiumCookie } from '@infrastructure/services/premium/cookie';
 import { verifySession as verifySessionEffect } from '@infrastructure/services/premium/session';
 import { Effect } from 'effect';
 import { cookies } from 'next/headers';
@@ -22,8 +21,8 @@ export async function GET(_request: NextRequest) {
         const res = noStore({ premiumKey: null, email: null });
         clearPremiumCookie(res);
         return Effect.succeed(res);
-      })
-    )
+      }),
+    ),
   );
 
   return response;
@@ -48,13 +47,13 @@ export async function POST(request: NextRequest) {
 
       return response;
     }).pipe(
-      Effect.provide(AppLayer),
+      Effect.provide(ApplicationLayer),
       Effect.catchTags({
         ValidationError: (e) => Effect.succeed(noStore({ error: e.message, premiumKey: null }, { status: 400 })),
         SessionError: () => Effect.succeed(noStore({ error: ApiError.INTERNAL_ERROR }, { status: 500 })),
         DatabaseError: () => Effect.succeed(noStore({ error: ApiError.INTERNAL_ERROR }, { status: 500 })),
       }),
-      Effect.catchAll(() => Effect.succeed(noStore({ error: ApiError.INTERNAL_ERROR }, { status: 500 })))
-    )
+      Effect.catchAll(() => Effect.succeed(noStore({ error: ApiError.INTERNAL_ERROR }, { status: 500 }))),
+    ),
   );
 }

@@ -4,8 +4,7 @@ import type { RegionDTO } from '@application/dto/region/types';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { Effect } from 'effect';
 import type { Locale } from 'next-intl';
-import { getNationalHolidays } from './utils/getNationalHolidays';
-import { getRegionalHolidays } from './utils/getRegionalHolidays';
+import { getNationalHolidays, getRegionalHolidays } from './utils/holidays';
 
 const logger = getBetterStackInstance();
 
@@ -19,9 +18,7 @@ interface GetHolidaysParams {
 }
 
 export async function getHolidays({ year, country, region, locale, carryOverMonths, regions }: GetHolidaysParams) {
-  if (!country) {
-    return [];
-  }
+  if (!country) return [];
 
   const program = Effect.try(() => {
     const configuration = { languages: [locale] };

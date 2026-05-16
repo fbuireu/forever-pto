@@ -2,7 +2,7 @@ import type { CreatePaymentInput } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { createPaymentAction } from '@infrastructure/actions/payment';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { PaymentError } from '@infrastructure/errors';
+import { PaymentError, PromoCodeError, type PromoCodeErrorCode } from '@infrastructure/errors';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
 import { Effect } from 'effect';
 
@@ -15,6 +15,9 @@ export const initializePayment = async (params: CreatePaymentInput): Promise<Ini
   const result = await createPaymentAction(params);
 
   if (!result.success) {
+    if (result.isPromoCodeError && result.error) {
+      throw new PromoCodeError({ code: result.error as PromoCodeErrorCode });
+    }
     throw new PaymentError({ message: result.error ?? 'Payment initialization failed' });
   }
 
@@ -31,15 +34,6 @@ interface ConfirmPaymentParams {
   returnUrl: string;
 }
 
-interface ConfirmPaymentResult {
-  success: boolean;
-  error?: string;
-  sessionData?: {
-    premiumKey: string;
-    email: string;
-  };
-}
-
 const logger = getBetterStackInstance();
 
 export const confirmPayment = async (params: ConfirmPaymentParams) => {
@@ -47,7 +41,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams) => {
 
   const program = Effect.gen(function* () {
     const { error: submitError } = yield* Effect.tryPromise(() => elements.submit());
-    if (submitError) return { success: false, error: submitError.message ?? '' } as ConfirmPaymentResult;
+    if (submitError) return { success: false, error: submitError.message ?? '' };
 
     const { error, paymentIntent } = yield* Effect.tryPromise(() =>
       stripe.confirmPayment({
@@ -57,7 +51,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams) => {
       })
     );
 
-    if (error) return { success: false, error: error.message ?? '' } as ConfirmPaymentResult;
+    if (error) return { success: false, error: error.message ?? '' } ;
 
     const sessionResponse = yield* Effect.tryPromise(() =>
       fetch('/api/check-session', {
@@ -76,7 +70,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams) => {
         emailDomain: email?.split('@')[1],
         paymentIntentId: paymentIntent.id,
       });
-      return { success: false, error: errorData.error ?? '' } as ConfirmPaymentResult;
+      return { success: false, error: errorData.error ?? '' };
     }
 
     const sessionData = yield* Effect.tryPromise(
@@ -86,7 +80,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams) => {
     return {
       success: true,
       sessionData: { premiumKey: sessionData.premiumKey, email: sessionData.email },
-    } as ConfirmPaymentResult;
+    };
   }).pipe(
     Effect.catchAll((error) => {
       logger.logError('Payment confirmation error in checkout adapter', error, {
@@ -96,7 +90,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams) => {
       return Effect.succeed({
         success: false,
         error: error instanceof Error ? error.message : '',
-      } as ConfirmPaymentResult);
+      });
     })
   );
 

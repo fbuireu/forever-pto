@@ -1,5 +1,5 @@
 import { ApiError } from '@infrastructure/api/errors';
-import { PaymentError, PromoCodeError, ValidationError } from '@infrastructure/errors';
+import { PaymentError, PromoCodeError, PromoCodeErrors, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -30,7 +30,7 @@ vi.mock('@application/use-cases/payment', () => ({
 }));
 
 vi.mock('@infrastructure/layers', () => ({
-  AppLayer: Layer.empty,
+  ApplicationLayer: Layer.empty,
 }));
 
 vi.mock('next/headers', () => ({
@@ -73,11 +73,14 @@ describe('createPaymentAction', () => {
     if (!result.success) expect(result.error).toBe('Amount is required');
   });
 
-  it('returns success:false with message on PromoCodeError', async () => {
-    mockCreatePayment.mockReturnValue(Effect.fail(new PromoCodeError({ message: 'Invalid promo code' })));
+  it('returns success:false with code and isPromoCodeError on PromoCodeError', async () => {
+    mockCreatePayment.mockReturnValue(Effect.fail(new PromoCodeError({ code: PromoCodeErrors.INVALID_OR_EXPIRED })));
     const result = await createPaymentAction({ ...validInput, promoCode: 'NOPE' });
     expect(result.success).toBe(false);
-    if (!result.success) expect(result.error).toBe('Invalid promo code');
+    if (!result.success) {
+      expect(result.error).toBe(PromoCodeErrors.INVALID_OR_EXPIRED);
+      expect(result.isPromoCodeError).toBe(true);
+    }
   });
 
   it('returns success:false with message on PaymentError', async () => {

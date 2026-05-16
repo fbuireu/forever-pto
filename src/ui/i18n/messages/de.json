@@ -448,7 +448,18 @@
     "paymentFailed": "Zahlung konnte nicht gestartet werden",
     "paymentFailedDescription": "Versuch es gleich nochmal.",
     "paymentSuccess": "Zahlung erfolgreich!",
-    "paymentSuccessDescription": "Vielen Dank für deine Unterstützung! Du hast jetzt Premium-Zugang."
+    "paymentSuccessDescription": "Vielen Dank für deine Unterstützung! Du hast jetzt Premium-Zugang.",
+    "promoApplied": "Aktionscode angewendet!",
+    "promoSavedDescription": "Sie haben €{saved} gespart (Original: €{original}, Endpreis: €{final})",
+    "promoCodeError": "Fehler beim Gutscheincode",
+    "promoCodeErrors": {
+      "invalid_or_expired": "Ungültiger oder abgelaufener Gutscheincode",
+      "usage_limit_reached": "Dieser Gutscheincode hat sein Nutzungslimit erreicht",
+      "coupon_expired": "Dieser Gutscheincode ist abgelaufen",
+      "coupon_invalid": "Dieser Gutscheincode ist nicht mehr gültig",
+      "failed_to_load": "Gutscheincode konnte nicht validiert werden",
+      "min_amount_exceeded": "Rabatt kann auf diesen Betrag nicht angewendet werden"
+    }
   },
   "troubleshooting": {
     "description": "Wenn sich die App seltsam verhält, können veraltete lokale Daten die Ursache sein. Bei App-Updates können gespeicherte Daten mit der neuen Version inkompatibel werden. Wenn du den lokalen Speicher löschst, fängst du mit einem sauberen Stand an.",
@@ -622,7 +633,8 @@
     "paymentError": "Zahlungsfehler",
     "paymentFailed": "Zahlung fehlgeschlagen",
     "processing": "Wird verarbeitet...",
-    "pay": "Bezahlen"
+    "pay": "Bezahlen",
+    "promoSaved": "Sie haben €{saved} gespart!"
   },
   "donate": {
     "donateAndUnblock": "Spenden & Freischalten",
