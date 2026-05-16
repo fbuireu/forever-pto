@@ -62,7 +62,7 @@ function CollapsibleTrigger({ asChild, children, className, ...props }: Collapsi
     <CollapsiblePrimitive.Trigger
       data-slot='collapsible-trigger'
       className={cn(
-        "relative inline-flex w-full cursor-pointer items-center justify-between gap-2 rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] px-3 py-2 text-sm font-semibold shadow-[var(--shadow-brutal-btn)] outline-none transition-[color,background-color,border-color,box-shadow,transform] duration-75 ease-linear before:content-[''] before:absolute before:inset-0 before:-bottom-2 before:-right-2",
+        "relative inline-flex w-full cursor-pointer items-center justify-between gap-2 rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] px-3 py-2 text-sm font-semibold shadow-[var(--shadow-brutal-btn)] outline-none transition-[color,background-color,border-color,box-shadow,transform] duration-75 ease-linear",
         'hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[var(--surface-panel-alt)] hover:shadow-[var(--shadow-brutal-btn-hover)]',
         'active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]',
         'aria-expanded:-translate-x-0.5 aria-expanded:-translate-y-0.5 aria-expanded:shadow-[var(--shadow-brutal-btn-hover)]',
