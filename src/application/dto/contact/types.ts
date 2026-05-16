@@ -1,9 +1,4 @@
-export interface ContactFormData {
-  email: string;
-  name: string;
-  subject: string;
-  message: string;
-}
+export type { ContactFormData } from './schema';
 
 export interface ContactResult {
   success: boolean;

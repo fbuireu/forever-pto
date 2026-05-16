@@ -1,6 +1,7 @@
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import { isInSelectedRange } from '@application/dto/holiday/utils';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { useLocationStore } from './location';
 import { generateMetrics } from '@infrastructure/services/calendar/metrics/generateMetrics';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { addMonths, endOfYear, ensureDate, formatDate, isSameMonth, startOfYear } from '@ui/utils/dates';
@@ -80,10 +81,11 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
         fetchHolidays: async (params: FetchHolidaysParams) => {
           try {
+            const { regions } = useLocationStore.getState();
             const { holidays: currentHolidays } = get();
             const customHolidays = currentHolidays.filter((h) => h.variant === HolidayVariant.CUSTOM);
             const { getHolidays } = await import('@infrastructure/services/holidays/getHolidays');
-            const holidays = await getHolidays(params);
+            const holidays = await getHolidays({ ...params, regions });
             const filteredHolidays = holidays.filter((fetchedHoliday) => {
               const hasCustomOnSameDate = customHolidays.some(
                 (customHoliday) => customHoliday.date.toDateString() === fetchedHoliday.date.toDateString()

@@ -1,3 +1,4 @@
+import { paymentDataDTO } from '@application/dto/payment/dto';
 import { type CreatePaymentInput, createPaymentSchema } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
@@ -7,7 +8,6 @@ import { PaymentError, type PromoCodeError, ValidationError } from '@infrastruct
 import { createPaymentIntent } from '@infrastructure/services/payments/provider/intent';
 import { validatePromoCode } from '@infrastructure/services/payments/provider/promo-code';
 import { savePayment } from '@infrastructure/services/payments/repository';
-import { extractChargeId, extractCustomerId } from '@infrastructure/services/payments/utils/helpers';
 import { Effect } from 'effect';
 import Stripe from 'stripe';
 import { z } from 'zod';
@@ -95,36 +95,17 @@ export const createPayment = (
       )
     );
 
-    yield* savePayment({
-      id: paymentIntent.id,
-      stripeCreatedAt: new Date(paymentIntent.created * 1000),
-      customerId: extractCustomerId(paymentIntent.customer),
-      chargeId: extractChargeId(paymentIntent.latest_charge),
-      email: validated.email,
-      amount: Math.round(finalAmount * 100),
-      currency: paymentIntent.currency,
-      status: paymentIntent.status,
-      paymentMethodType: paymentIntent.payment_method_types?.[0] ?? null,
-      description: paymentIntent.description ?? null,
-      promoCode: validated.promoCode ?? null,
-      userAgent,
-      ipAddress,
-      country: null,
-      customerName: null,
-      postalCode: null,
-      city: null,
-      state: null,
-      paymentBrand: null,
-      paymentLast4: null,
-      feeAmount: null,
-      netAmount: null,
-      refundedAt: null,
-      refundReason: null,
-      disputedAt: null,
-      disputeReason: null,
-      parentPaymentId: null,
-      origin: null,
-    }).pipe(
+    yield* savePayment(
+      paymentDataDTO.create({
+        raw: paymentIntent,
+        params: {
+          email: validated.email,
+          promoCode: validated.promoCode ?? null,
+          userAgent,
+          ipAddress,
+        },
+      })
+    ).pipe(
       Effect.catchAll((e) =>
         Effect.sync(() => {
           logger.warn('Failed to save payment to database, will use webhook fallback', {
