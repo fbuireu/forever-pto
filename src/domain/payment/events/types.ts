@@ -1,17 +1,20 @@
-import type Stripe from 'stripe';
-
 export interface PaymentSucceededEvent {
   type: 'payment_succeeded';
-  paymentIntent: Stripe.PaymentIntent;
   paymentId: string;
   email: string;
   amount: number;
   status: string;
+  latestChargeId: string | null;
+  promoCode: string | null;
+  userAgent: string | null;
+  ipAddress: string | null;
 }
 
 export interface PaymentFailedEvent {
   type: 'payment_failed';
-  paymentIntent: Stripe.PaymentIntent;
   paymentId: string;
+  status: string;
   errorMessage: string;
 }
+
+export type PaymentEvent = PaymentSucceededEvent | PaymentFailedEvent;

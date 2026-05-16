@@ -19,6 +19,15 @@ vi.mock('@domain/payment/handlers/payment-failed', () => ({
   handlePaymentFailed: vi.fn(() => Effect.succeed(undefined)),
 }));
 
+vi.mock('@infrastructure/services/payments/repository', () => ({
+  getPaymentById: vi.fn(() => Effect.succeed({ id: 'pi_test', status: 'pending' })),
+  savePayment: vi.fn(() => Effect.succeed(undefined)),
+}));
+
+vi.mock('@application/dto/payment/dto', () => ({
+  paymentDataDTO: { create: vi.fn().mockReturnValue({ id: 'pi_test' }) },
+}));
+
 const mockLogger = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
 const TestLayer = Layer.mergeAll(
   Layer.succeed(LoggerService, mockLogger),
@@ -52,6 +61,19 @@ describe('processWebhookEvent', () => {
     const intent = { id: 'pi_test', status: 'succeeded' };
     await run(processWebhookEvent(makeEvent('payment_intent.succeeded', intent)));
     expect(createPaymentSucceededEvent).toHaveBeenCalledWith(intent);
+  });
+
+  it('does not call savePayment when payment already exists', async () => {
+    const { savePayment } = await import('@infrastructure/services/payments/repository');
+    await run(processWebhookEvent(makeEvent('payment_intent.succeeded', { id: 'pi_test' })));
+    expect(savePayment).not.toHaveBeenCalled();
+  });
+
+  it('calls savePayment when payment is not found in DB', async () => {
+    const { getPaymentById, savePayment } = await import('@infrastructure/services/payments/repository');
+    vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed(undefined as never));
+    await run(processWebhookEvent(makeEvent('payment_intent.succeeded', { id: 'pi_test' })));
+    expect(savePayment).toHaveBeenCalledOnce();
   });
 
   it('calls handlePaymentFailed for payment_intent.payment_failed', async () => {
