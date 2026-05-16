@@ -1,3 +1,4 @@
+import { ApiError } from '@infrastructure/api/errors';
 import { agentSkillsIndex } from '@infrastructure/well-known/agentSkillsIndex';
 import { apiCatalog } from '@infrastructure/well-known/apiCatalog';
 import { mcpServerCard } from '@infrastructure/well-known/mcpServerCard';
@@ -23,7 +24,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
   const path = slug.join('/');
 
   const handler = ROUTES[path];
-  if (!handler) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  if (!handler) return NextResponse.json({ error: ApiError.NOT_FOUND }, { status: 404 });
 
   const { env } = await getCloudflareContext({ async: true });
   const baseUrl = env.NEXT_PUBLIC_SITE_URL;

@@ -2,7 +2,8 @@ import type { PremiumSessionData } from '@application/dto/premium/types';
 import { SessionError } from '@infrastructure/errors';
 import { Effect } from 'effect';
 import { jwtVerify, SignJWT } from 'jose';
-import { SESSION_DURATION_SECONDS } from './config';
+
+const SESSION_DURATION_SECONDS = 30 * 24 * 60 * 60;
 
 const getJWTSecret = () => {
   const secret = process.env.JWT_SECRET;

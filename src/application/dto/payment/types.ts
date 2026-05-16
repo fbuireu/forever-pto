@@ -25,6 +25,7 @@ type CreatePaymentSuccess = {
 type CreatePaymentError = {
   success: false;
   error?: string;
+  isPromoCodeError?: boolean;
   stripeError?: Stripe.StripeRawError;
   code?: string;
   type?: string;

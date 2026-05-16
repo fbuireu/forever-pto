@@ -1,3 +1,4 @@
+import { ApiError } from '@infrastructure/api/errors';
 import { EmailError, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
@@ -11,7 +12,7 @@ vi.mock('@application/use-cases/contact', () => ({
 }));
 
 vi.mock('@infrastructure/layers', () => ({
-  AppLayer: Layer.empty,
+  ApplicationLayer: Layer.empty,
 }));
 
 vi.mock('@opennextjs/cloudflare', () => ({
@@ -48,13 +49,13 @@ describe('sendContactEmailAction', () => {
     if (!result.success) expect(result.error).toBe('SMTP failed');
   });
 
-  it('returns success:false with generic message on unexpected error', async () => {
+  it('returns success:false with INTERNAL_ERROR on unexpected error', async () => {
     mockSendContactEmail.mockReturnValue(
       Effect.fail(new Error('boom')) as unknown as Effect.Effect<void, ValidationError | EmailError>
     );
     const result = await sendContactEmailAction(validData);
     expect(result.success).toBe(false);
-    if (!result.success) expect(result.error).toBe('Internal error');
+    if (!result.success) expect(result.error).toBe(ApiError.INTERNAL_ERROR);
   });
 
   it('passes env config to sendContactEmail', async () => {

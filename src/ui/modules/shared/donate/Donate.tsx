@@ -8,8 +8,8 @@ import { useUIStore } from '@application/stores/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
+import { PromoCodeError, PromoCodeErrors } from '@infrastructure/errors';
 import { getStripeClientInstance } from '@infrastructure/clients/payments/stripe/client';
-import { formatDiscountMessage } from '@infrastructure/services/payments/utils/formatters';
 import { Elements } from '@stripe/react-stripe-js';
 import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { initializePayment } from '@ui/adapters/payments/checkout';
@@ -136,9 +136,13 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
           });
 
           if (result.discountInfo) {
-            const message = formatDiscountMessage(result.discountInfo);
-            toast.success(message.title, {
-              description: message.description,
+            const saved = (result.discountInfo.originalAmount - result.discountInfo.finalAmount).toFixed(2);
+            toast.success(t('promoApplied'), {
+              description: t('promoSavedDescription', {
+                saved,
+                original: result.discountInfo.originalAmount.toFixed(2),
+                final: result.discountInfo.finalAmount.toFixed(2),
+              }),
             });
             track('promo_code_applied', {
               discountType: result.discountInfo.type,
@@ -163,9 +167,23 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
             currency,
             locale,
           });
-          toast.error(t('paymentFailed'), {
-            description: t('paymentFailedDescription'),
-          });
+          if (error instanceof PromoCodeError) {
+            const descriptions = {
+              [PromoCodeErrors.INVALID_OR_EXPIRED]: t('promoCodeErrors.invalid_or_expired'),
+              [PromoCodeErrors.USAGE_LIMIT_REACHED]: t('promoCodeErrors.usage_limit_reached'),
+              [PromoCodeErrors.COUPON_EXPIRED]: t('promoCodeErrors.coupon_expired'),
+              [PromoCodeErrors.COUPON_INVALID]: t('promoCodeErrors.coupon_invalid'),
+              [PromoCodeErrors.FAILED_TO_LOAD]: t('promoCodeErrors.failed_to_load'),
+              [PromoCodeErrors.MIN_AMOUNT_EXCEEDED]: t('promoCodeErrors.min_amount_exceeded'),
+            };
+            toast.error(t('promoCodeError'), {
+              description: descriptions[error.code],
+            });
+          } else {
+            toast.error(t('paymentFailed'), {
+              description: t('paymentFailedDescription'),
+            });
+          }
         }
       });
     },

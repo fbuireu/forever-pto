@@ -18,6 +18,7 @@ import {
   startOfDay,
   startOfMonth,
   startOfWeek,
+  toIcsDate,
 } from './dates';
 
 describe('isSameDay', () => {
@@ -169,6 +170,20 @@ describe('getWeekdayNames', () => {
   it('starts on Monday when weekStartsOn is 1', () => {
     const names = getWeekdayNames({ locale: 'en-US', weekStartsOn: 1, format: 'long' });
     expect(names[0].toLowerCase()).toContain('mon');
+  });
+});
+
+describe('toIcsDate', () => {
+  it('formats a date as YYYYMMDD', () => {
+    expect(toIcsDate(new Date(2025, 0, 1))).toBe('20250101');
+  });
+
+  it('pads month and day with leading zeros', () => {
+    expect(toIcsDate(new Date(2025, 2, 5))).toBe('20250305');
+  });
+
+  it('handles end-of-year date', () => {
+    expect(toIcsDate(new Date(2025, 11, 31))).toBe('20251231');
   });
 });
 

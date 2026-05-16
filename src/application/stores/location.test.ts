@@ -15,7 +15,7 @@ vi.mock('./crypto', () => ({
 }));
 
 vi.mock('@infrastructure/services/countries/getCountries', () => ({
-  getCountries: vi.fn().mockResolvedValue([]),
+  getCountries: vi.fn().mockReturnValue([]),
 }));
 
 vi.mock('@infrastructure/services/regions/getRegions', () => ({
@@ -87,7 +87,7 @@ describe('fetchRegions', () => {
 describe('fetchCountries', () => {
   it('fetches and stores countries', async () => {
     const { getCountries } = await import('@infrastructure/services/countries/getCountries');
-    vi.mocked(getCountries).mockResolvedValueOnce(MOCK_COUNTRIES);
+    vi.mocked(getCountries).mockReturnValueOnce(MOCK_COUNTRIES);
 
     await useLocationStore.getState().fetchCountries('en');
     const state = useLocationStore.getState();
@@ -106,7 +106,7 @@ describe('fetchCountries', () => {
 
   it('fetches again when last fetch was more than 24h ago', async () => {
     const { getCountries } = await import('@infrastructure/services/countries/getCountries');
-    vi.mocked(getCountries).mockResolvedValueOnce(MOCK_COUNTRIES);
+    vi.mocked(getCountries).mockReturnValueOnce(MOCK_COUNTRIES);
     useLocationStore.setState({ countriesLastFetched: Date.now() - 25 * 60 * 60 * 1000 });
 
     await useLocationStore.getState().fetchCountries('en');
@@ -115,7 +115,7 @@ describe('fetchCountries', () => {
 
   it('sets loading to false on error', async () => {
     const { getCountries } = await import('@infrastructure/services/countries/getCountries');
-    vi.mocked(getCountries).mockRejectedValueOnce(new Error('network error'));
+    vi.mocked(getCountries).mockImplementationOnce(() => { throw new Error('network error'); });
     useLocationStore.setState({ countriesLastFetched: 0 });
 
     await useLocationStore.getState().fetchCountries('en');

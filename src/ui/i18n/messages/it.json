@@ -448,7 +448,18 @@
     "paymentFailed": "Impossibile avviare il pagamento",
     "paymentFailedDescription": "Riprova più tardi",
     "paymentSuccess": "Pagamento riuscito!",
-    "paymentSuccessDescription": "Grazie per il tuo supporto! Ora hai accesso premium."
+    "paymentSuccessDescription": "Grazie per il tuo supporto! Ora hai accesso premium.",
+    "promoApplied": "Codice promozionale applicato!",
+    "promoSavedDescription": "Hai risparmiato €{saved} (Originale: €{original}, Finale: €{final})",
+    "promoCodeError": "Errore nel codice promozionale",
+    "promoCodeErrors": {
+      "invalid_or_expired": "Codice promozionale non valido o scaduto",
+      "usage_limit_reached": "Questo codice promozionale ha raggiunto il limite di utilizzi",
+      "coupon_expired": "Questo codice promozionale è scaduto",
+      "coupon_invalid": "Questo codice promozionale non è più valido",
+      "failed_to_load": "Impossibile convalidare il codice promozionale",
+      "min_amount_exceeded": "Lo sconto non può essere applicato a questo importo"
+    }
   },
   "troubleshooting": {
     "description": "Se l'app si comporta in modo strano, potrebbe dipendere da dati salvati nel browser che non sono più compatibili con la versione attuale. Svuotare la memoria locale ripristina uno stato pulito.",
@@ -622,7 +633,8 @@
     "paymentError": "Errore di pagamento",
     "paymentFailed": "Pagamento fallito",
     "processing": "Elaborando...",
-    "pay": "Paga"
+    "pay": "Paga",
+    "promoSaved": "Hai risparmiato €{saved}!"
   },
   "donate": {
     "donateAndUnblock": "Dona e sblocca",

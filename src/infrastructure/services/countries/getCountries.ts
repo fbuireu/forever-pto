@@ -1,34 +1,30 @@
 import { countryDTO } from '@application/dto/country/dto';
 import type { CountryDTO } from '@application/dto/country/types';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { Effect } from 'effect';
 import countries, { type LocaleData } from 'i18n-iso-countries';
+import caLocale from 'i18n-iso-countries/langs/ca.json';
+import deLocale from 'i18n-iso-countries/langs/de.json';
+import enLocale from 'i18n-iso-countries/langs/en.json';
+import esLocale from 'i18n-iso-countries/langs/es.json';
+import frLocale from 'i18n-iso-countries/langs/fr.json';
+import itLocale from 'i18n-iso-countries/langs/it.json';
+import type { Locale } from 'next-intl';
 
 const logger = getBetterStackInstance();
 
-import type { Locale } from 'next-intl';
+const localeData = new Map<string, LocaleData>(
+  [caLocale, deLocale, enLocale, esLocale, frLocale, itLocale].map((data) => [data.locale, data])
+);
 
-const localeDataLoaders: Record<string, () => Promise<{ default: LocaleData }>> = {
-  ca: () => import('i18n-iso-countries/langs/ca.json'),
-  it: () => import('i18n-iso-countries/langs/it.json'),
-  en: () => import('i18n-iso-countries/langs/en.json'),
-  es: () => import('i18n-iso-countries/langs/es.json'),
-  fr: () => import('i18n-iso-countries/langs/fr.json'),
-  de: () => import('i18n-iso-countries/langs/de.json'),
-};
+for (const data of localeData.values()) {
+  countries.registerLocale(data);
+}
 
-export async function getCountries(locale: Locale) {
-  const program = Effect.gen(function* () {
-    const loader = localeDataLoaders[locale as string] ?? localeDataLoaders.en;
-    const localeData = yield* Effect.tryPromise(() => loader());
-    countries.registerLocale(localeData.default);
+export function getCountries(locale: Locale): CountryDTO[] {
+  try {
     return countryDTO.create({ raw: countries.getNames(locale) }).sort((a, b) => a.label.localeCompare(b.label));
-  }).pipe(
-    Effect.catchAll((error) => {
-      logger.logError('Error in getCountries', error, { locale });
-      return Effect.succeed([] as CountryDTO[]);
-    })
-  );
-
-  return Effect.runPromise(program);
+  } catch (error) {
+    logger.logError('Error in getCountries', error, { locale });
+    return [];
+  }
 }

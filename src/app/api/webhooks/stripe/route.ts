@@ -1,7 +1,7 @@
 import { processWebhookEvent } from '@application/use-cases/webhook';
 import { ApiError } from '@infrastructure/api/errors';
-import { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
-import { AppLayer } from '@infrastructure/layers';
+import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
+import { ApplicationLayer } from '@infrastructure/layers';
 import { Effect } from 'effect';
 import { headers } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
@@ -21,18 +21,18 @@ export async function POST(request: NextRequest) {
       yield* processWebhookEvent(event);
       return NextResponse.json({ received: true });
     }).pipe(
-      Effect.provide(AppLayer),
+      Effect.provide(ApplicationLayer),
       Effect.catchTag('WebhookError', (e) =>
         Effect.succeed(
           NextResponse.json(
             { error: e.isSignatureError ? ApiError.INVALID_SIGNATURE : ApiError.WEBHOOK_PROCESSING_FAILED },
-            { status: e.isSignatureError ? 400 : 500 }
-          )
-        )
+            { status: e.isSignatureError ? 400 : 500 },
+          ),
+        ),
       ),
       Effect.catchAll(() =>
-        Effect.succeed(NextResponse.json({ error: ApiError.WEBHOOK_PROCESSING_FAILED }, { status: 500 }))
-      )
-    )
+        Effect.succeed(NextResponse.json({ error: ApiError.WEBHOOK_PROCESSING_FAILED }, { status: 500 })),
+      ),
+    ),
   );
 }

@@ -1,6 +1,6 @@
 import { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
-import { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
+import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
 import { Effect, Layer } from 'effect';
 import type Stripe from 'stripe';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -11,11 +11,11 @@ vi.mock('@domain/payment/events/factory/events', () => ({
   createPaymentFailedEvent: vi.fn().mockReturnValue({ type: 'payment_failed', paymentId: 'pi_test' }),
 }));
 
-vi.mock('@domain/payment/handlers/payment-succeeded', () => ({
+vi.mock('@domain/payment/handlers/paymentSucceeded', () => ({
   handlePaymentSucceeded: vi.fn(() => Effect.succeed(undefined)),
 }));
 
-vi.mock('@domain/payment/handlers/payment-failed', () => ({
+vi.mock('@domain/payment/handlers/paymentFailed', () => ({
   handlePaymentFailed: vi.fn(() => Effect.succeed(undefined)),
 }));
 
@@ -50,7 +50,7 @@ beforeEach(() => vi.clearAllMocks());
 
 describe('processWebhookEvent', () => {
   it('calls handlePaymentSucceeded for payment_intent.succeeded', async () => {
-    const { handlePaymentSucceeded } = await import('@domain/payment/handlers/payment-succeeded');
+    const { handlePaymentSucceeded } = await import('@domain/payment/handlers/paymentSucceeded');
     await run(processWebhookEvent(makeEvent('payment_intent.succeeded', { id: 'pi_test' })));
     expect(handlePaymentSucceeded).toHaveBeenCalledOnce();
   });
@@ -76,7 +76,7 @@ describe('processWebhookEvent', () => {
   });
 
   it('calls handlePaymentFailed for payment_intent.payment_failed', async () => {
-    const { handlePaymentFailed } = await import('@domain/payment/handlers/payment-failed');
+    const { handlePaymentFailed } = await import('@domain/payment/handlers/paymentFailed');
     await run(processWebhookEvent(makeEvent('payment_intent.payment_failed', { id: 'pi_test' })));
     expect(handlePaymentFailed).toHaveBeenCalledOnce();
   });
@@ -97,8 +97,8 @@ describe('processWebhookEvent', () => {
   });
 
   it('does not call any handler for unhandled event types', async () => {
-    const { handlePaymentSucceeded } = await import('@domain/payment/handlers/payment-succeeded');
-    const { handlePaymentFailed } = await import('@domain/payment/handlers/payment-failed');
+    const { handlePaymentSucceeded } = await import('@domain/payment/handlers/paymentSucceeded');
+    const { handlePaymentFailed } = await import('@domain/payment/handlers/paymentFailed');
     await run(processWebhookEvent(makeEvent('customer.created', {})));
     expect(handlePaymentSucceeded).not.toHaveBeenCalled();
     expect(handlePaymentFailed).not.toHaveBeenCalled();

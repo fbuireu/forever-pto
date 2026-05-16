@@ -2,7 +2,6 @@ import type { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { useUIStore } from '@application/stores/ui';
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
-import { formatDiscountText } from '@infrastructure/services/payments/utils/formatters';
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { confirmPayment } from '@ui/adapters/payments/checkout';
 import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
@@ -65,7 +64,11 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   }, []);
 
   const formattedAmount = useMemo(() => amount.toFixed(2), [amount]);
-  const discountText = useMemo(() => formatDiscountText(discountInfo), [discountInfo]);
+  const discountText = useMemo(() => {
+    if (!discountInfo) return null;
+    const saved = (discountInfo.originalAmount - discountInfo.finalAmount).toFixed(2);
+    return t('promoSaved', { saved });
+  }, [discountInfo, t]);
 
   const processPayment = useCallback(async () => {
     if (!stripe || !elements) return;
