@@ -84,7 +84,9 @@ describe('createPaymentFailedEvent', () => {
   });
 
   it('maps errorMessage from last_payment_error.message', () => {
-    const intent = makeIntent({ last_payment_error: { message: 'Card declined' } as Stripe.StripeRawError });
+    const intent = makeIntent({
+      last_payment_error: { message: 'Card declined' } as Stripe.PaymentIntent.LastPaymentError,
+    });
     expect(createPaymentFailedEvent(intent).errorMessage).toBe('Card declined');
   });
 

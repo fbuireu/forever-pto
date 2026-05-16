@@ -22,7 +22,6 @@ describe('holidayDTO', () => {
   });
 
   it('throws when params are missing', () => {
-    // @ts-expect-error intentionally passing undefined params to test the guard
     expect(() => holidayDTO.create({ raw: [] })).toThrow('Configuration is required');
   });
 

@@ -2,6 +2,7 @@
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { formatDate } from '@application/shared/utils/dates';
+import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
@@ -36,6 +37,7 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
   const t = useTranslations('modals.editHoliday');
   const tAdd = useTranslations('modals.addHoliday');
   const tValidation = useTranslations('validation.holiday');
+  const { year, carryOverMonths } = useFiltersStore();
   const { holidays, editHoliday, currentSelection, alternatives, suggestion } = useHolidaysStore();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(holiday.date);
   const [isPending, startTransition] = useTransition();
@@ -93,6 +95,8 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
           holidayId: holiday.id,
           updates: { name: data.name, date: data.date },
           locale,
+          year,
+          carryOverMonths,
         });
 
         toast.success(t('successTitle'), {

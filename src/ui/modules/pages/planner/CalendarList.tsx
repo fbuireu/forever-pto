@@ -80,7 +80,7 @@ export const CalendarList = () => {
   useEffect(() => {
     if (ptoDays > 0 && holidays.length > 0 && months.length > 0) {
       triggerCalculation({
-        year: parseInt(year, 10),
+        year,
         ptoDays,
         allowPastDays,
         months,
