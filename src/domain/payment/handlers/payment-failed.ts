@@ -10,7 +10,7 @@ export const handlePaymentFailed = (
 ): Effect.Effect<void, DatabaseError, TursoService | LoggerService> =>
   Effect.gen(function* () {
     const logger = yield* LoggerService;
-    yield* updatePaymentStatus(event.paymentId, event.paymentIntent.status).pipe(
+    yield* updatePaymentStatus(event.paymentId, event.status).pipe(
       Effect.tapError((e) =>
         Effect.sync(() => {
           logger.logError('Error handling failed payment', e, { paymentId: event.paymentId });

@@ -1,3 +1,4 @@
+import { paymentDataDTO } from '@application/dto/payment/dto';
 import { createPaymentFailedEvent, createPaymentSucceededEvent } from '@domain/payment/events/factory/events';
 import { handlePaymentFailed } from '@domain/payment/handlers/payment-failed';
 import { handlePaymentSucceeded } from '@domain/payment/handlers/payment-succeeded';
@@ -5,6 +6,7 @@ import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import type { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
 import type { DatabaseError } from '@infrastructure/errors';
+import { getPaymentById, savePayment } from '@infrastructure/services/payments/repository';
 import { Effect } from 'effect';
 import type Stripe from 'stripe';
 
@@ -16,13 +18,32 @@ export const processWebhookEvent = (
 
     switch (event.type) {
       case 'payment_intent.succeeded': {
-        const paymentIntent = event.data.object;
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
         logger.info('Processing payment_intent.succeeded', {
           paymentIntentId: paymentIntent.id,
           status: paymentIntent.status,
           hasId: !!paymentIntent.id,
         });
         const paymentEvent = createPaymentSucceededEvent(paymentIntent);
+
+        const existing = yield* getPaymentById(paymentEvent.paymentId).pipe(
+          Effect.catchAll(() => Effect.succeed(undefined))
+        );
+        if (!existing) {
+          logger.warn('Payment not found in DB, creating from webhook', { paymentId: paymentEvent.paymentId });
+          yield* savePayment(
+            paymentDataDTO.create({
+              raw: paymentIntent,
+              params: {
+                email: paymentEvent.email,
+                promoCode: paymentEvent.promoCode,
+                userAgent: paymentEvent.userAgent,
+                ipAddress: paymentEvent.ipAddress,
+              },
+            })
+          );
+        }
+
         yield* handlePaymentSucceeded(paymentEvent).pipe(
           Effect.tapError((e) =>
             Effect.sync(() => {
@@ -33,7 +54,7 @@ export const processWebhookEvent = (
         break;
       }
       case 'payment_intent.payment_failed': {
-        const paymentEvent = createPaymentFailedEvent(event.data.object);
+        const paymentEvent = createPaymentFailedEvent(event.data.object as Stripe.PaymentIntent);
         yield* handlePaymentFailed(paymentEvent);
         break;
       }
