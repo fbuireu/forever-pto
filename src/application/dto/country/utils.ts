@@ -4,6 +4,6 @@ export function getEmojiFlag(countryCode: string) {
   if (!countryCode) return '';
 
   return Array.from(countryCode.toUpperCase())
-    .map((letter) => String.fromCodePoint(REGIONAL_INDICATOR_SYMBOL_OFFSET + letter.charCodeAt(0)))
+    .map((letter) => String.fromCodePoint(REGIONAL_INDICATOR_SYMBOL_OFFSET + (letter.codePointAt(0) ?? 0)))
     .join('');
 }

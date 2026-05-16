@@ -11,7 +11,7 @@ export interface FiltersState {
   allowPastDays: boolean;
   country: string;
   region: string;
-  year: string;
+  year: number;
   carryOverMonths: number;
   strategy: FilterStrategy;
 }
@@ -21,7 +21,7 @@ interface FilterActions {
   setAllowPastDays: (allow: boolean) => void;
   setCountry: (country: string) => void;
   setRegion: (region: string) => void;
-  setYear: (year: string) => void;
+  setYear: (year: number) => void;
   setCarryOverMonths: (months: number) => void;
   setStrategy: (strategy: FilterStrategy) => void;
   resetToDefaults: () => void;
@@ -37,7 +37,7 @@ const initialState: FiltersState = {
   allowPastDays: false,
   country: '',
   region: '',
-  year: String(new Date().getFullYear()),
+  year: new Date().getFullYear(),
   carryOverMonths: 1,
   strategy: FilterStrategy.GROUPED,
 };
@@ -51,7 +51,7 @@ export const useFiltersStore = create<FiltersStore>()(
         setCountry: (country: string) => set({ country, region: '' }, false, 'setCountry'),
         setRegion: (region: string) => set({ region }, false, 'setRegion'),
         setAllowPastDays: (allow: boolean) => set({ allowPastDays: allow }, false, 'setAllowPastDays'),
-        setYear: (year: string) => set({ year }, false, 'setYear'),
+        setYear: (year: number) => set({ year }, false, 'setYear'),
         setCarryOverMonths: (months: number) => set({ carryOverMonths: months }, false, 'setCarryOverMonths'),
         setStrategy: (strategy: FilterStrategy) => set({ strategy }, false, 'setStrategy'),
         resetToDefaults: () => set(initialState, false, 'resetToDefaults'),

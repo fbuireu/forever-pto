@@ -57,14 +57,14 @@ export const Years = () => {
                       key={yearOption}
                       value={String(yearOption)}
                       onSelect={() => {
-                        setYear(String(yearOption));
+                        setYear(yearOption);
                         setOpen(false);
                       }}
                     >
                       <p className='font-normal text-sm'>{yearOption}</p>
                       <Check
                         animateOnHover
-                        className={cn('ml-auto', Number(year) === yearOption ? 'opacity-100' : 'opacity-0')}
+                        className={cn('ml-auto', year === yearOption ? 'opacity-100' : 'opacity-0')}
                       />
                     </CommandItem>
                   </AnimateIcon>

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { holidayDTO } from './dto';
 import { HolidayVariant } from './types';
-import type { RawHoliday } from './types';
+import type { HolidayDTO, RawHoliday } from './types';
 
 const REGIONS = [{ value: 'CAT', label: 'Catalonia' }];
 
@@ -119,5 +119,71 @@ describe('holidayDTO', () => {
     expect(result[0]?.name).toBe('New Year');
     expect(result[1]?.name).toBe('Midsummer');
     expect(result[2]?.name).toBe('Christmas');
+  });
+});
+
+describe('holidayDTO.createCustom', () => {
+  const BASE = { name: 'Day Off', date: new Date('2024-06-15'), locale: 'en', year: 2024, carryOverMonths: 0 };
+
+  it('creates a CUSTOM variant holiday', () => {
+    const result = holidayDTO.createCustom(BASE);
+    expect(result.variant).toBe(HolidayVariant.CUSTOM);
+  });
+
+  it('id starts with "custom-"', () => {
+    const result = holidayDTO.createCustom(BASE);
+    expect(result.id).toMatch(/^custom-/);
+  });
+
+  it('date is a Date instance', () => {
+    const result = holidayDTO.createCustom(BASE);
+    expect(result.date).toBeInstanceOf(Date);
+  });
+
+  it('preserves name', () => {
+    const result = holidayDTO.createCustom({ ...BASE, name: 'Custom Holiday' });
+    expect(result.name).toBe('Custom Holiday');
+  });
+
+  it('marks isInSelectedRange=true for a date within the year', () => {
+    const result = holidayDTO.createCustom(BASE);
+    expect(result.isInSelectedRange).toBe(true);
+  });
+
+  it('marks isInSelectedRange=false for a date outside the year with carryOverMonths=0', () => {
+    const result = holidayDTO.createCustom({ ...BASE, date: new Date('2025-03-01') });
+    expect(result.isInSelectedRange).toBe(false);
+  });
+
+  it('marks isInSelectedRange=true for a carry-over date within carryOverMonths', () => {
+    const result = holidayDTO.createCustom({ ...BASE, date: new Date('2025-02-01'), carryOverMonths: 3 });
+    expect(result.isInSelectedRange).toBe(true);
+  });
+});
+
+describe('holidayDTO.normalize', () => {
+  it('returns an empty array for empty input', () => {
+    expect(holidayDTO.normalize([])).toEqual([]);
+  });
+
+  it('converts string dates to Date instances', () => {
+    const holidays = [{ id: 'h1', name: 'Test', date: '2024-06-15' as unknown as Date, variant: HolidayVariant.NATIONAL, isInSelectedRange: true }] as HolidayDTO[];
+    const [result] = holidayDTO.normalize(holidays);
+    expect(result?.date).toBeInstanceOf(Date);
+  });
+
+  it('preserves Date instances unchanged', () => {
+    const date = new Date('2024-06-15');
+    const holidays = [{ id: 'h1', name: 'Test', date, variant: HolidayVariant.NATIONAL, isInSelectedRange: true }] as HolidayDTO[];
+    const [result] = holidayDTO.normalize(holidays);
+    expect(result?.date.getTime()).toBe(date.getTime());
+  });
+
+  it('preserves all other fields', () => {
+    const holidays = [{ id: 'h1', name: 'Test', date: new Date('2024-06-15'), variant: HolidayVariant.REGIONAL, location: 'CAT', isInSelectedRange: false }] as HolidayDTO[];
+    const [result] = holidayDTO.normalize(holidays);
+    expect(result?.id).toBe('h1');
+    expect(result?.location).toBe('CAT');
+    expect(result?.isInSelectedRange).toBe(false);
   });
 });

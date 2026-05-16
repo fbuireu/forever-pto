@@ -7,7 +7,7 @@ import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
-import type { GetRegionParams } from './types';
+import { TWENTY_FOUR_HOURS } from './utils';
 
 const logger = getBetterStackInstance();
 
@@ -23,8 +23,7 @@ interface LocationActions {
   fetchCountries: (locale: Locale) => Promise<void>;
   setCountries: (countries: CountryDTO[]) => void;
   getCountryByCode: (code: string) => CountryDTO | undefined;
-  fetchRegions: (countryCode: string) => Promise<void>;
-  getRegion: ({ region }: GetRegionParams) => RegionDTO | undefined;
+  fetchRegions: (countryCode: string) => void;
 }
 
 type LocationStore = LocationState & LocationActions;
@@ -50,7 +49,7 @@ export const useLocationStore = create<LocationStore>()(
           const { countriesLastFetched } = get();
           const now = Date.now();
 
-          if (now - countriesLastFetched < 24 * 60 * 60 * 1000) {
+          if (now - countriesLastFetched < TWENTY_FOUR_HOURS) {
             return;
           }
 
@@ -86,29 +85,8 @@ export const useLocationStore = create<LocationStore>()(
           return countries.find((country) => country.value.toLowerCase() === code.toLowerCase());
         },
 
-        fetchRegions: async (countryCode: string) => {
-          set({ regionsLoading: true });
-
-          try {
-            const regionData = getRegions(countryCode);
-            set({
-              regions: regionData,
-              regionsLoading: false,
-            });
-          } catch (error) {
-            logger.logError('Error fetching regions in location store', error, {
-              countryCode,
-            });
-            set({
-              regionsLoading: false,
-              regions: [],
-            });
-          }
-        },
-
-        getRegion: ({ region }: GetRegionParams) => {
-          const { regions } = get();
-          return regions.find((item) => item.value.toLowerCase() === region.toLowerCase());
+        fetchRegions: (countryCode: string) => {
+          set({ regions: getRegions(countryCode), regionsLoading: false });
         },
       }),
       {
