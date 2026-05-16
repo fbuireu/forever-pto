@@ -45,8 +45,8 @@ describe('global-error', () => {
     expect(element.props.lang).toBe('en');
   });
 
-  it('falls back to default locale when usePathname returns null', () => {
-    mockUsePathname.mockReturnValue(null);
+  it('falls back to default locale when usePathname returns an empty string', () => {
+    mockUsePathname.mockReturnValue('');
     const element = GlobalError({ error: mockError, reset: mockReset });
     expect(element.props.lang).toBe('en');
   });
