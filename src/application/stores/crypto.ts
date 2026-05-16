@@ -1,6 +1,6 @@
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { createJSONStorage } from 'zustand/middleware';
-import { decrypt, encrypt } from './utils';
+import { decrypt, encrypt } from './utils/crypto';
 
 const logger = getBetterStackInstance();
 
@@ -19,16 +19,16 @@ export const encryptedStorage = createJSONStorage(() => {
 
   if (isDev || !SECRET_KEY) {
     return {
-      getItem: (key: string): string | null => localStorage.getItem(key),
-      setItem: (key: string, value: string): void => localStorage.setItem(key, value),
-      removeItem: (key: string): void => localStorage.removeItem(key),
+      getItem: (key: string) => localStorage.getItem(key),
+      setItem: (key: string, value: string) => localStorage.setItem(key, value),
+      removeItem: (key: string) => localStorage.removeItem(key),
     };
   }
 
   const cryptoKey = SECRET_KEY;
 
   return {
-    getItem: (key: string): string | null => {
+    getItem: (key: string) => {
       const encryptedValue = localStorage.getItem(key);
       if (!encryptedValue) return null;
 
@@ -39,14 +39,14 @@ export const encryptedStorage = createJSONStorage(() => {
         return null;
       }
     },
-    setItem: (key: string, value: string): void => {
+    setItem: (key: string, value: string) => {
       try {
         localStorage.setItem(key, encrypt({ text: value, key: cryptoKey }));
       } catch (error) {
         logger.logError('Failed to set item in encrypted storage', error, { key });
       }
     },
-    removeItem: (key: string): void => {
+    removeItem: (key: string) => {
       try {
         localStorage.removeItem(key);
       } catch (error) {

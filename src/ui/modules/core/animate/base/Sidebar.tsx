@@ -1,12 +1,12 @@
 'use client';
 
+import { useIsMobile } from '@ui/hooks/useMobile';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { cn } from '@ui/utils/cn';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { AnimatePresence, m, type Transition } from 'motion/react';
 import { createContext, use, useCallback, useEffect, useMemo, useState } from 'react';
-import { useIsMobile } from 'src/ui/hooks/useMobile';
 import { MotionHighlight, MotionHighlightItem } from '../effects/MotionHighlight';
 import { PanelLeftIcon } from '../icons/PanelLeft';
 import { Slot } from './Slot';

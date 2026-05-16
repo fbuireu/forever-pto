@@ -1,13 +1,6 @@
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { loadStripe, type PaymentIntent, type Stripe, type StripeError } from '@stripe/stripe-js';
 import { Effect } from 'effect';
-import StripeNode from 'stripe';
-
-interface PaymentResult {
-  success: boolean;
-  paymentIntentId?: string;
-  error?: string;
-}
 
 interface PaymentParams {
   clientSecret: string;
@@ -25,12 +18,12 @@ class StripeClient {
     this.publishableKey = publishableKey;
   }
 
-  getStripePromise(): Promise<Stripe | null> {
+  getStripePromise() {
     this.stripePromise ??= loadStripe(this.publishableKey);
     return this.stripePromise;
   }
 
-  async getStripe(): Promise<Stripe> {
+  async getStripe() {
     if (!this.stripe) {
       this.stripePromise ??= loadStripe(this.publishableKey);
       this.stripe = await this.stripePromise;
@@ -43,17 +36,19 @@ class StripeClient {
     return this.stripe;
   }
 
-  async confirmPayment(params: PaymentParams): Promise<PaymentResult> {
+  async confirmPayment(params: PaymentParams) {
     return Effect.runPromise(
       Effect.tryPromise(() => this.getStripe()).pipe(
         Effect.andThen((stripe) =>
-          Effect.tryPromise(() =>
-            stripe.confirmPayment({
-              clientSecret: params.clientSecret,
-              confirmParams: { return_url: params.returnUrl ?? globalThis.location.href },
-              redirect: params.alwaysRedirect ? 'always' : undefined,
-            })
-          )
+          Effect.tryPromise({
+            try: () =>
+              stripe.confirmPayment({
+                clientSecret: params.clientSecret,
+                confirmParams: { return_url: params.returnUrl ?? globalThis.location.href },
+                redirect: params.alwaysRedirect ? 'always' : undefined,
+              }),
+            catch: (e) => e,
+          })
         ),
         Effect.andThen((result) => Effect.sync(() => this.handlePaymentResult(result))),
         Effect.catchAll((error) => {
@@ -69,10 +64,12 @@ class StripeClient {
     );
   }
 
-  async confirmCardPayment(clientSecret: string): Promise<PaymentResult> {
+  async confirmCardPayment(clientSecret: string) {
     return Effect.runPromise(
       Effect.tryPromise(() => this.getStripe()).pipe(
-        Effect.andThen((stripe) => Effect.tryPromise(() => stripe.confirmCardPayment(clientSecret))),
+        Effect.andThen((stripe) =>
+          Effect.tryPromise({ try: () => stripe.confirmCardPayment(clientSecret), catch: (e) => e })
+        ),
         Effect.andThen((result) => Effect.sync(() => this.handlePaymentResult(result))),
         Effect.catchAll((error) => {
           this.logger.logError('Stripe confirmCardPayment failed', error, { hasClientSecret: !!clientSecret });
@@ -82,14 +79,14 @@ class StripeClient {
     );
   }
 
-  isLoaded(): boolean {
+  isLoaded() {
     return this.stripe !== null;
   }
 
-  private handlePaymentResult(result: { error: StripeError } | { paymentIntent: PaymentIntent }): PaymentResult {
+  private handlePaymentResult(result: { error: StripeError } | { paymentIntent: PaymentIntent }) {
     if (this.isErrorResult(result)) {
       return {
-        success: false,
+        success: false as const,
         error: result.error.message ?? '',
       };
     }
@@ -98,13 +95,13 @@ class StripeClient {
 
     if (paymentIntent?.status === 'succeeded') {
       return {
-        success: true,
+        success: true as const,
         paymentIntentId: paymentIntent.id,
       };
     }
 
     return {
-      success: false,
+      success: false as const,
       error: `Payment status: ${paymentIntent?.status ?? 'unknown'}`,
     };
   }
@@ -115,32 +112,32 @@ class StripeClient {
     return 'error' in result;
   }
 
-  private handleError(error: unknown): PaymentResult {
+  private handleError(error: unknown) {
     const stripeError = error as StripeError;
 
     if (stripeError?.type === 'card_error') {
       return {
-        success: false,
+        success: false as const,
         error: stripeError.message ?? 'Your card was declined. Please try a different payment method.',
       };
     }
 
     if (stripeError?.type === 'invalid_request_error') {
       return {
-        success: false,
+        success: false as const,
         error: 'Payment request is invalid. Please try again.',
       };
     }
 
     if (stripeError?.type === 'authentication_error') {
       return {
-        success: false,
+        success: false as const,
         error: 'Payment service temporarily unavailable. Please try again later.',
       };
     }
 
     return {
-      success: false,
+      success: false as const,
       error: stripeError?.message ?? 'Payment could not be processed. Please try again.',
     };
   }
@@ -148,7 +145,7 @@ class StripeClient {
 
 let stripeClientInstance: StripeClient | null = null;
 
-export const getStripeClientInstance = (): StripeClient => {
+export const getStripeClientInstance = () => {
   if (!stripeClientInstance) {
     const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
@@ -159,42 +156,4 @@ export const getStripeClientInstance = (): StripeClient => {
     stripeClientInstance = new StripeClient(publishableKey);
   }
   return stripeClientInstance;
-};
-
-const _resetStripeClient = (): void => {
-  stripeClientInstance = null;
-};
-
-let stripeServerInstance: StripeNode | null = null;
-
-export const getStripeServerInstance = (): StripeNode => {
-  if (!stripeServerInstance) {
-    const secretKey = process.env.STRIPE_SECRET_KEY;
-
-    if (!secretKey) {
-      throw new Error('STRIPE_SECRET_KEY environment variable is not set');
-    }
-
-    stripeServerInstance = new StripeNode(secretKey, {
-      apiVersion: '2026-04-22.dahlia',
-      httpClient: StripeNode.createFetchHttpClient(),
-    });
-  }
-
-  return stripeServerInstance;
-};
-
-const _resetStripeServerClient = (): void => {
-  stripeServerInstance = null;
-};
-
-const _constructWebhookEvent = (payload: string | Buffer, signature: string): StripeNode.Event => {
-  const stripe = getStripeServerInstance();
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-  if (!webhookSecret) {
-    throw new Error('STRIPE_WEBHOOK_SECRET is not defined');
-  }
-
-  return stripe.webhooks.constructEvent(payload, signature, webhookSecret);
 };

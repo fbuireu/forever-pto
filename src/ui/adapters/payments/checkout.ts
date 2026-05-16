@@ -42,7 +42,7 @@ interface ConfirmPaymentResult {
 
 const logger = getBetterStackInstance();
 
-export const confirmPayment = async (params: ConfirmPaymentParams): Promise<ConfirmPaymentResult> => {
+export const confirmPayment = async (params: ConfirmPaymentParams) => {
   const { stripe, elements, email, returnUrl } = params;
 
   const program = Effect.gen(function* () {

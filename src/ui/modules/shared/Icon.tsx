@@ -1,5 +1,5 @@
 import type { SvgIcon } from '@ui/assets/icons/types';
-import { getViewBoxFromSvg } from '../pages/planner/calendar/utils/helpers';
+import { getViewBoxFromSvg } from '@ui/modules/pages/planner/calendar/utils/helpers';
 
 interface IconProps {
   icon: SvgIcon;

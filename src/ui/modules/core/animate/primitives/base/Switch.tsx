@@ -1,8 +1,9 @@
 'use client';
 
 import { Switch as SwitchPrimitives } from '@base-ui/react/switch';
-import { getStrictContext } from '@ui/utils/context';
+import { useControlledState } from '@ui/hooks/useControlledState';
 import { cn } from '@ui/utils/cn';
+import { getStrictContext } from '@ui/utils/context';
 import {
   type HTMLMotionProps,
   type LegacyAnimationControls,
@@ -11,7 +12,6 @@ import {
   type VariantLabels,
 } from 'motion/react';
 import { type ComponentProps, useState } from 'react';
-import { useControlledState } from 'src/ui/hooks/useControlledState';
 
 type SwitchContextType = {
   isChecked: boolean;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useFiltersStore } from '@application/stores/filters';
-import { FilterStrategy } from '@infrastructure/services/calendar/types';
+import { FilterStrategy } from '@domain/calendar/types';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/modules/core/animate/base/Collapsible';
 import { ChevronDown } from '@ui/modules/core/animate/icons/ChevronDown';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';

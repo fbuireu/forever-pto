@@ -12,7 +12,7 @@ type AccordionItemContextType = {
 
 const AccordionItemContext = createContext<AccordionItemContextType | undefined>(undefined);
 
-const useAccordionItem = (): AccordionItemContextType => {
+const useAccordionItem = () => {
   const context = use(AccordionItemContext);
   if (!context) {
     throw new Error('useAccordionItem must be used within an AccordionItem');

@@ -7,7 +7,7 @@ import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';
-import { TWENTY_FOUR_HOURS } from './utils';
+import { TWENTY_FOUR_HOURS } from './utils/crypto';
 
 const logger = getBetterStackInstance();
 

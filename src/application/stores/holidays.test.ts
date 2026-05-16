@@ -1,6 +1,6 @@
+import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
+import type { Suggestion } from '@domain/calendar/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { HolidayVariant, type HolidayDTO } from '@application/dto/holiday/types';
-import type { Suggestion } from '@infrastructure/services/calendar/types';
 import { useHolidaysStore } from './holidays';
 
 vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({
@@ -32,7 +32,7 @@ vi.mock('@application/dto/holiday/dto', () => ({
   },
 }));
 
-vi.mock('@infrastructure/services/calendar/metrics/generateMetrics', () => ({
+vi.mock('@domain/calendar/metrics/generateMetrics', () => ({
   generateMetrics: vi.fn().mockReturnValue({ totalDays: 0, efficiency: 0 }),
 }));
 
@@ -72,7 +72,12 @@ beforeEach(() => {
 describe('addHoliday', () => {
   it('adds a new holiday to the list', () => {
     const date = new Date('2026-01-01');
-    useHolidaysStore.getState().addHoliday({ holiday: { name: 'New Year', date, type: 'public' }, locale: 'en', year: 2026, carryOverMonths: 1 });
+    useHolidaysStore.getState().addHoliday({
+      holiday: { name: 'New Year', date, type: 'public' },
+      locale: 'en',
+      year: 2026,
+      carryOverMonths: 1,
+    });
     expect(useHolidaysStore.getState().holidays).toHaveLength(1);
     expect(useHolidaysStore.getState().holidays[0].name).toBe('New Year');
   });
@@ -80,14 +85,24 @@ describe('addHoliday', () => {
   it('does not add a holiday when one already exists on the same date', () => {
     const date = new Date('2026-01-01');
     useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')] });
-    useHolidaysStore.getState().addHoliday({ holiday: { name: 'Duplicate', date, type: 'public' }, locale: 'en', year: 2026, carryOverMonths: 1 });
+    useHolidaysStore.getState().addHoliday({
+      holiday: { name: 'Duplicate', date, type: 'public' },
+      locale: 'en',
+      year: 2026,
+      carryOverMonths: 1,
+    });
     expect(useHolidaysStore.getState().holidays).toHaveLength(1);
   });
 
   it('sorts holidays by date after adding', () => {
     useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-06-01')] });
     const earlyDate = new Date('2026-01-15');
-    useHolidaysStore.getState().addHoliday({ holiday: { name: 'Early', date: earlyDate, type: 'public' }, locale: 'en', year: 2026, carryOverMonths: 1 });
+    useHolidaysStore.getState().addHoliday({
+      holiday: { name: 'Early', date: earlyDate, type: 'public' },
+      locale: 'en',
+      year: 2026,
+      carryOverMonths: 1,
+    });
     const { holidays } = useHolidaysStore.getState();
     expect(holidays[0].date.getTime()).toBeLessThan(holidays[1].date.getTime());
   });
@@ -113,7 +128,13 @@ describe('editHoliday', () => {
   it('replaces the holiday at the matching index', () => {
     useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')] });
     const newDate = new Date('2026-03-15');
-    useHolidaysStore.getState().editHoliday({ holidayId: 'h1', updates: { name: 'Renamed', date: newDate }, locale: 'en', year: 2026, carryOverMonths: 1 });
+    useHolidaysStore.getState().editHoliday({
+      holidayId: 'h1',
+      updates: { name: 'Renamed', date: newDate },
+      locale: 'en',
+      year: 2026,
+      carryOverMonths: 1,
+    });
     const { holidays } = useHolidaysStore.getState();
     expect(holidays[0].name).toBe('Renamed');
     expect(holidays[0].date).toEqual(newDate);
@@ -121,7 +142,13 @@ describe('editHoliday', () => {
 
   it('does nothing when holidayId is not found', () => {
     useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')] });
-    useHolidaysStore.getState().editHoliday({ holidayId: 'missing', updates: { name: 'X', date: new Date() }, locale: 'en', year: 2026, carryOverMonths: 1 });
+    useHolidaysStore.getState().editHoliday({
+      holidayId: 'missing',
+      updates: { name: 'X', date: new Date() },
+      locale: 'en',
+      year: 2026,
+      carryOverMonths: 1,
+    });
     expect(useHolidaysStore.getState().holidays[0].id).toBe('h1');
   });
 });
@@ -300,13 +327,21 @@ describe('toggleDaySelection', () => {
   });
 
   it('returns false and does not add a day when no remaining budget', () => {
-    const suggestion = makeSuggestion([new Date('2026-05-01'), new Date('2026-05-02'), new Date('2026-05-03'), new Date('2026-05-04'), new Date('2026-05-05')]);
+    const suggestion = makeSuggestion([
+      new Date('2026-05-01'),
+      new Date('2026-05-02'),
+      new Date('2026-05-03'),
+      new Date('2026-05-04'),
+      new Date('2026-05-05'),
+    ]);
     useHolidaysStore.setState({
       currentSelection: suggestion,
       manuallySelectedDays: [],
       removedSuggestedDays: [],
     });
-    const result = useHolidaysStore.getState().toggleDaySelection({ date: baseDate, totalPtoDays: 5, locale: 'en', allowPastDays: false });
+    const result = useHolidaysStore
+      .getState()
+      .toggleDaySelection({ date: baseDate, totalPtoDays: 5, locale: 'en', allowPastDays: false });
     expect(result).toBe(false);
     expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
   });
@@ -318,7 +353,9 @@ describe('toggleDaySelection', () => {
       manuallySelectedDays: [],
       removedSuggestedDays: [],
     });
-    const result = useHolidaysStore.getState().toggleDaySelection({ date: baseDate, totalPtoDays: 5, locale: 'en', allowPastDays: false });
+    const result = useHolidaysStore
+      .getState()
+      .toggleDaySelection({ date: baseDate, totalPtoDays: 5, locale: 'en', allowPastDays: false });
     expect(result).toBe(true);
     expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(1);
   });

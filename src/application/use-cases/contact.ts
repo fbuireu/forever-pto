@@ -1,10 +1,10 @@
 import type { ContactFormData } from '@application/dto/contact/schema';
 import { contactSchema } from '@application/dto/contact/schema';
-import { zodParse } from '@application/shared/zodParse';
+import { zodParse } from '@application/shared/utils/zodParse';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { ResendService } from '@infrastructure/clients/email/resend/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
-import { EmailError, ValidationError } from '@infrastructure/errors';
+import { EmailError, type ValidationError } from '@infrastructure/errors';
 import { saveContact } from '@infrastructure/services/contact/repository';
 import { ContactFormEmail } from '@infrastructure/services/email/templates/Contact';
 import { render } from '@react-email/render';

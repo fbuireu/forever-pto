@@ -1,11 +1,11 @@
 'use client';
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
+import { formatDate, isWeekend } from '@application/shared/utils/dates';
 import { Checkbox } from '@ui/modules/core/animate/base/Checkbox';
 import { Badge } from '@ui/modules/core/primitives/Badge';
 import { TableCell, TableRow } from '@ui/modules/core/primitives/Table';
 import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/premium/PremiumFeature';
-import { formatDate, isWeekend } from '@ui/utils/dates';
 import { cn } from '@ui/utils/cn';
 import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';

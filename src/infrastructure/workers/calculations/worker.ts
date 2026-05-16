@@ -1,0 +1,122 @@
+import { HolidayVariant } from '@application/dto/holiday/types';
+import { generateAlternatives } from '@domain/calendar/alternatives/generateAlternatives';
+import { generateMetrics } from '@domain/calendar/metrics/generateMetrics';
+import { generateSuggestions } from '@domain/calendar/suggestions/generateSuggestions';
+import type { FilterStrategy } from '@domain/calendar/types';
+import { clearDateKeyCache, clearHolidayCache } from '@domain/calendar/utils/cache';
+import { deserializeHolidays, deserializeMonths, serializeSuggestionResult } from './serializers';
+import type { CalculateSuggestionsRequest, WorkerResponse } from './types';
+
+globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
+  const { type, requestId, payload } = e.data;
+
+  if (type !== 'CALCULATE_SUGGESTIONS') return;
+
+  const {
+    year,
+    ptoDays,
+    holidays: rawHolidays,
+    allowPastDays,
+    months: rawMonths,
+    strategy,
+    locale,
+    maxAlternatives,
+    manualDays = [],
+    excludedDays = [],
+    autoSuggestCount,
+  } = payload;
+
+  try {
+    clearDateKeyCache();
+    clearHolidayCache();
+
+    const holidays = deserializeHolidays(rawHolidays);
+    const months = deserializeMonths(rawMonths);
+
+    const manualPseudoHolidays = manualDays.map((isoDate, i) => ({
+      id: `manual-${i}`,
+      date: new Date(isoDate),
+      name: 'Manual day',
+      variant: HolidayVariant.CUSTOM,
+      isInSelectedRange: true,
+    }));
+    const excludedPseudoHolidays = excludedDays.map((isoDate, i) => ({
+      id: `excluded-${i}`,
+      date: new Date(isoDate),
+      name: 'Excluded day',
+      variant: HolidayVariant.CUSTOM,
+      isInSelectedRange: true,
+    }));
+    const holidaysWithManual = [...holidays, ...manualPseudoHolidays, ...excludedPseudoHolidays];
+    const effectivePtoDays = Math.max(0, autoSuggestCount ?? ptoDays - manualDays.length);
+
+    if (effectivePtoDays <= 0 || holidaysWithManual.length === 0) {
+      const response: WorkerResponse = {
+        type: 'CALCULATE_SUGGESTIONS_RESULT',
+        requestId,
+        payload: { suggestion: { days: [] }, alternatives: [] },
+      };
+      self.postMessage(response);
+      return;
+    }
+
+    const typedStrategy = strategy as FilterStrategy;
+
+    const baseSuggestion = generateSuggestions({
+      year,
+      ptoDays: effectivePtoDays,
+      holidays: holidaysWithManual,
+      allowPastDays,
+      months,
+      strategy: typedStrategy,
+    });
+
+    const baseAlternatives = generateAlternatives({
+      year,
+      ptoDays: effectivePtoDays,
+      holidays: holidaysWithManual,
+      allowPastDays,
+      months,
+      maxAlternatives,
+      existingSuggestion: baseSuggestion.days,
+      strategy: typedStrategy,
+    });
+
+    const suggestion = {
+      ...baseSuggestion,
+      metrics: generateMetrics({
+        suggestion: baseSuggestion,
+        locale,
+        bridges: baseSuggestion.bridges,
+        holidays: holidaysWithManual,
+        allowPastDays,
+      }),
+    };
+
+    const alternatives = baseAlternatives.map((alt) => ({
+      ...alt,
+      metrics: generateMetrics({
+        suggestion: alt,
+        locale,
+        bridges: alt.bridges,
+        holidays: holidaysWithManual,
+        allowPastDays,
+      }),
+    }));
+
+    const response: WorkerResponse = {
+      type: 'CALCULATE_SUGGESTIONS_RESULT',
+      requestId,
+      payload: serializeSuggestionResult(suggestion, alternatives),
+    };
+
+    self.postMessage(response);
+  } catch (err) {
+    const response: WorkerResponse = {
+      type: 'WORKER_ERROR',
+      requestId,
+      error: String(err),
+    };
+    self.postMessage(response);
+  }
+};

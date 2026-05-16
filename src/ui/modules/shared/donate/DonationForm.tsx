@@ -9,8 +9,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@ui/modules/core/primitives/Input';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@ui/modules/core/primitives/InputGroup';
 import { Label } from '@ui/modules/core/primitives/Label';
-import { amountFormatter } from '@ui/utils/currencies';
 import { cn } from '@ui/utils/cn';
+import { amountFormatter } from '@ui/utils/currencies';
 import { useTranslations } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
 import { useFormStatus } from 'react-dom';

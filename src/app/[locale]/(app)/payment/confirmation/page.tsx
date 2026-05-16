@@ -1,9 +1,11 @@
 import { Link } from '@application/i18n/navigation';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { AppLayer } from '@infrastructure/layers';
 import { getPaymentConfirmation } from '@infrastructure/services/payments/getPaymentConfirmation';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { getCurrencySymbol } from '@ui/utils/currencies';
+import { Effect } from 'effect';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import type { Locale } from 'next-intl';
@@ -63,7 +65,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
     redirect(`/${locale}`);
   }
 
-  const confirmation = await getPaymentConfirmation(paymentIntentId);
+  const confirmation = await Effect.runPromise(getPaymentConfirmation(paymentIntentId).pipe(Effect.provide(AppLayer)));
 
   if (!confirmation || confirmation.status !== 'succeeded') {
     if (confirmation) {

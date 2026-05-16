@@ -1,6 +1,7 @@
 # ui/i18n
 
 ## Purpose
+
 UI layer translation message files. Contains only language JSON bundles — routing and locale detection configuration lives in `src/infrastructure/i18n/`.
 
 ## Available languages

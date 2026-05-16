@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { holidayDTO } from './dto';
-import { HolidayVariant } from './types';
 import type { HolidayDTO, RawHoliday } from './types';
+import { HolidayVariant } from './types';
 
 const REGIONS = [{ value: 'CAT', label: 'Catalonia' }];
 
@@ -38,7 +38,7 @@ describe('holidayDTO', () => {
   });
 
   it('maps a regional holiday to a HolidayDTO with REGIONAL variant and resolved location', () => {
-    const raw = [makeRaw({ date: '2024-04-23', name: "Sant Jordi", location: 'CAT' })];
+    const raw = [makeRaw({ date: '2024-04-23', name: 'Sant Jordi', location: 'CAT' })];
     const [result] = holidayDTO.create({ raw, params: BASE_PARAMS });
 
     expect(result?.variant).toBe(HolidayVariant.REGIONAL);
@@ -167,20 +167,39 @@ describe('holidayDTO.normalize', () => {
   });
 
   it('converts string dates to Date instances', () => {
-    const holidays = [{ id: 'h1', name: 'Test', date: '2024-06-15' as unknown as Date, variant: HolidayVariant.NATIONAL, isInSelectedRange: true }] as HolidayDTO[];
+    const holidays = [
+      {
+        id: 'h1',
+        name: 'Test',
+        date: '2024-06-15' as unknown as Date,
+        variant: HolidayVariant.NATIONAL,
+        isInSelectedRange: true,
+      },
+    ] as HolidayDTO[];
     const [result] = holidayDTO.normalize(holidays);
     expect(result?.date).toBeInstanceOf(Date);
   });
 
   it('preserves Date instances unchanged', () => {
     const date = new Date('2024-06-15');
-    const holidays = [{ id: 'h1', name: 'Test', date, variant: HolidayVariant.NATIONAL, isInSelectedRange: true }] as HolidayDTO[];
+    const holidays = [
+      { id: 'h1', name: 'Test', date, variant: HolidayVariant.NATIONAL, isInSelectedRange: true },
+    ] as HolidayDTO[];
     const [result] = holidayDTO.normalize(holidays);
     expect(result?.date.getTime()).toBe(date.getTime());
   });
 
   it('preserves all other fields', () => {
-    const holidays = [{ id: 'h1', name: 'Test', date: new Date('2024-06-15'), variant: HolidayVariant.REGIONAL, location: 'CAT', isInSelectedRange: false }] as HolidayDTO[];
+    const holidays = [
+      {
+        id: 'h1',
+        name: 'Test',
+        date: new Date('2024-06-15'),
+        variant: HolidayVariant.REGIONAL,
+        location: 'CAT',
+        isInSelectedRange: false,
+      },
+    ] as HolidayDTO[];
     const [result] = holidayDTO.normalize(holidays);
     expect(result?.id).toBe('h1');
     expect(result?.location).toBe('CAT');

@@ -1,43 +1,42 @@
 'use client';
 
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
-import type { Suggestion } from '@infrastructure/services/calendar/types';
+import { differenceInDays, getDayOfMonth, getMonth } from '@application/shared/utils/dates';
+import type { Suggestion } from '@domain/calendar/types';
 import { cn } from '@ui/utils/cn';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo } from 'react';
-
-const DAY_MS = 86_400_000;
 
 interface Seg {
   start: Date;
   end: Date;
 }
 
-function getDaysInMonth(month: number, year: number): number {
-  return new Date(year, month + 1, 0).getDate();
+function getDaysInMonth(month: number, year: number) {
+  return Temporal.PlainYearMonth.from({ year, month: month + 1 }).daysInMonth;
 }
 
-function segPos(date: Date, year: number): number {
-  const m = date.getMonth();
-  const d = date.getDate();
+function segPos(date: Date, year: number) {
+  const m = getMonth(date);
+  const d = getDayOfMonth(date);
   return (m + (d - 1) / getDaysInMonth(m, year)) / 12;
 }
 
-function segWidth(start: Date, end: Date, year: number): number {
-  const em = end.getMonth();
-  const ed = end.getDate();
+function segWidth(start: Date, end: Date, year: number) {
+  const em = getMonth(end);
+  const ed = getDayOfMonth(end);
   const endFrac = (em + ed / getDaysInMonth(em, year)) / 12;
   return Math.max(endFrac - segPos(start, year), 0.005);
 }
 
-function groupDates(dates: Date[], maxGapDays: number): Seg[] {
+function groupDates(dates: Date[], maxGapDays: number) {
   if (!dates.length) return [];
   const sorted = dates.toSorted((a, b) => a.getTime() - b.getTime());
   const out: Seg[] = [];
   let s = sorted[0];
   let e = sorted[0];
   for (let i = 1; i < sorted.length; i++) {
-    if ((sorted[i].getTime() - e.getTime()) / DAY_MS <= maxGapDays) {
+    if (differenceInDays(sorted[i], e) <= maxGapDays) {
       e = sorted[i];
     } else {
       out.push({ start: s, end: e });

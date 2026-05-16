@@ -1,6 +1,7 @@
 'use client';
 
 import { Tooltip as TooltipPrimitive } from '@base-ui/react/tooltip';
+import { useControlledState } from '@ui/hooks/useControlledState';
 import { getStrictContext } from '@ui/utils/context';
 import {
   AnimatePresence,
@@ -12,7 +13,6 @@ import {
   useSpring,
 } from 'motion/react';
 import * as React from 'react';
-import { useControlledState } from 'src/ui/hooks/useControlledState';
 
 type TooltipContextType = {
   isOpen: boolean;

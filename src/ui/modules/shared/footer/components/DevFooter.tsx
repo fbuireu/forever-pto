@@ -7,9 +7,9 @@ import { linkedinIcon } from '@ui/assets/icons/linkedin';
 import { RotatingTextContainer } from '@ui/modules/core/animate/primitives/texts/Rotating';
 import { RotatingText } from '@ui/modules/core/animate/text/Rotating';
 import { Me } from '@ui/modules/pages/legal/Me';
+import { Icon } from '@ui/modules/shared/Icon';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
-import { Icon } from '../../Icon';
 
 const EMOJIS: string[] = ['☕', '🍺', '❤️', '🚀', '⚡', '🔥', '💻', '🌮', '🍕', '🎵', '🎮', '😴', '🤯', '💡'];
 

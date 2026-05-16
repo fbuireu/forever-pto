@@ -4,14 +4,14 @@ import { CookieConsentClient } from '@ui/modules/shared/cookie-consent/CookieCon
 import { WebMCP } from '@ui/modules/shared/WebMCP';
 import { cn } from '@ui/utils/cn';
 import '@styles/index.css';
+import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
+import { AppThemeProvider } from '@ui/modules/providers/AppThemeProvider';
 import { Analytics } from '@ui/modules/tutorial/Analytics';
 import { BetterStackTracking } from '@ui/modules/tutorial/BetterStackTracking';
-import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
 import { notFound } from 'next/navigation';
 import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { AppThemeProvider } from '@ui/modules/providers/AppThemeProvider';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -39,11 +39,13 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
           spaceGrotesk.variable,
           instrumentSerif.variable,
           jetbrainsMono.variable,
-          'font-sans antialiased',
-        )}>
+          'font-sans antialiased'
+        )}
+      >
         <a
           href='#main-content'
-          className='sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-3 focus:py-1.5 focus:text-sm focus:bg-background focus:text-foreground focus:border focus:rounded-md focus:shadow-sm'>
+          className='sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-3 focus:py-1.5 focus:text-sm focus:bg-background focus:text-foreground focus:border focus:rounded-md focus:shadow-sm'
+        >
           {t('skipToMainContent')}
         </a>
         <BonesProvider />

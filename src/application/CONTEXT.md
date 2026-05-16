@@ -1,12 +1,13 @@
 # application
 
 ## Purpose
+
 Application layer. Defines data contracts (DTOs), client state (stores), and business workflows (use-cases). It is the bridge between UI and infrastructure — it knows nothing about React components or external SDK details directly.
 
 ## Structure
 
 | Folder | Contents |
-|---|---|
+| --- | --- |
 | `dto/` | Factories that transform raw data into canonical models |
 | `stores/` | Global Zustand state with encrypted persistence |
 | `use-cases/` | Business flow orchestration using Effect.ts |

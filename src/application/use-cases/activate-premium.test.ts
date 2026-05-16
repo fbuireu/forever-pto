@@ -1,9 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
 import { ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { activateWithEmail, activateWithPayment } from './activate-premium';
 
 vi.mock('@application/dto/payment/dto', () => ({
@@ -43,8 +43,7 @@ const TestLayer = Layer.mergeAll(
 );
 
 type PremiumR = LoggerService | TursoService | StripeServerService;
-const run = <A, E>(eff: Effect.Effect<A, E, PremiumR>) =>
-  Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
+const run = <A, E>(eff: Effect.Effect<A, E, PremiumR>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
 const runFail = <A, E>(eff: Effect.Effect<A, E, PremiumR>) =>
   Effect.runPromise(Effect.flip(eff).pipe(Effect.provide(TestLayer)));
 
@@ -64,9 +63,7 @@ describe('activateWithPayment', () => {
 
   it('skips savePayment when payment already exists with succeeded status', async () => {
     const { getPaymentById, savePayment } = await import('@infrastructure/services/payments/repository');
-    vi.mocked(getPaymentById).mockReturnValueOnce(
-      Effect.succeed({ id: 'pi_test', status: 'succeeded' } as never)
-    );
+    vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed({ id: 'pi_test', status: 'succeeded' } as never));
     await run(activateWithPayment('test@example.com', 'pi_test'));
     expect(savePayment).not.toHaveBeenCalled();
   });
@@ -75,9 +72,7 @@ describe('activateWithPayment', () => {
     const { getPaymentById, savePayment, updatePaymentStatus } = await import(
       '@infrastructure/services/payments/repository'
     );
-    vi.mocked(getPaymentById).mockReturnValueOnce(
-      Effect.succeed({ id: 'pi_test', status: 'processing' } as never)
-    );
+    vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed({ id: 'pi_test', status: 'processing' } as never));
     await run(activateWithPayment('test@example.com', 'pi_test'));
     expect(updatePaymentStatus).toHaveBeenCalledWith('pi_test', 'succeeded');
     expect(savePayment).not.toHaveBeenCalled();
@@ -107,9 +102,7 @@ describe('activateWithPayment', () => {
 describe('activateWithEmail', () => {
   it('returns email, premiumKey and token on success', async () => {
     const { getPaymentByEmail } = await import('@infrastructure/services/payments/repository');
-    vi.mocked(getPaymentByEmail).mockReturnValueOnce(
-      Effect.succeed({ id: 'pi_found', status: 'succeeded' } as never)
-    );
+    vi.mocked(getPaymentByEmail).mockReturnValueOnce(Effect.succeed({ id: 'pi_found', status: 'succeeded' } as never));
     const result = await run(activateWithEmail('test@example.com'));
     expect(result).toEqual({ email: 'test@example.com', premiumKey: 'pi_found', token: 'jwt-token' });
   });
@@ -121,9 +114,7 @@ describe('activateWithEmail', () => {
 
   it('fails with ValidationError when payment is not succeeded', async () => {
     const { getPaymentByEmail } = await import('@infrastructure/services/payments/repository');
-    vi.mocked(getPaymentByEmail).mockReturnValueOnce(
-      Effect.succeed({ id: 'pi_found', status: 'processing' } as never)
-    );
+    vi.mocked(getPaymentByEmail).mockReturnValueOnce(Effect.succeed({ id: 'pi_found', status: 'processing' } as never));
     const err = await runFail(activateWithEmail('test@example.com'));
     expect(err).toBeInstanceOf(ValidationError);
   });
@@ -131,9 +122,7 @@ describe('activateWithEmail', () => {
   it('calls createSession with the payment id', async () => {
     const { getPaymentByEmail } = await import('@infrastructure/services/payments/repository');
     const { createSession } = await import('@infrastructure/services/premium/session');
-    vi.mocked(getPaymentByEmail).mockReturnValueOnce(
-      Effect.succeed({ id: 'pi_found', status: 'succeeded' } as never)
-    );
+    vi.mocked(getPaymentByEmail).mockReturnValueOnce(Effect.succeed({ id: 'pi_found', status: 'succeeded' } as never));
     await run(activateWithEmail('test@example.com'));
     expect(createSession).toHaveBeenCalledWith(expect.objectContaining({ paymentIntentId: 'pi_found' }));
   });

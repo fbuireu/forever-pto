@@ -1,5 +1,5 @@
-import { ES } from '@infrastructure/i18n/locales';
 import { LOCALE_COOKIE } from '@infrastructure/i18n/config';
+import { ES } from '@infrastructure/i18n/locales';
 import { type NextRequest, NextResponse } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

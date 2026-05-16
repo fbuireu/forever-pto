@@ -30,7 +30,9 @@ export async function POST(request: NextRequest) {
           )
         )
       ),
-      Effect.catchAll(() => Effect.succeed(NextResponse.json({ error: ApiError.WEBHOOK_PROCESSING_FAILED }, { status: 500 })))
+      Effect.catchAll(() =>
+        Effect.succeed(NextResponse.json({ error: ApiError.WEBHOOK_PROCESSING_FAILED }, { status: 500 }))
+      )
     )
   );
 }

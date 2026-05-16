@@ -1,6 +1,6 @@
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '@ui/modules/core/animate/base/Accordion';
-import { createRichLink } from '@ui/modules/core/primitives/RichLink';
 import { Badge } from '@ui/modules/core/primitives/Badge';
+import { createRichLink } from '@ui/modules/core/primitives/RichLink';
 import { FaqTabs } from '@ui/modules/pages/planner/support/FaqTabs';
 import { Troubleshooting } from '@ui/modules/pages/planner/support/Troubleshooting';
 import type { FaqData } from '@ui/modules/pages/planner/support/types';

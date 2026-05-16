@@ -18,6 +18,6 @@ export function apiCatalog(baseUrl: string) {
         'Content-Type': 'application/linkset+json',
         'Cache-Control': 'public, max-age=86400',
       },
-    },
+    }
   );
 }

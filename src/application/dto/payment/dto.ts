@@ -1,7 +1,7 @@
 import type { BaseDTO } from '@application/shared/dto/baseDTO';
 import type Stripe from 'stripe';
 import type { PaymentConfirmationDTO, PaymentData } from './types';
-import { extractChargeId, extractCustomerId } from './utils';
+import { extractChargeId, extractCustomerId } from './utils/helpers';
 
 export const paymentConfirmationDTO: BaseDTO<Stripe.PaymentIntent, PaymentConfirmationDTO> = {
   create: ({ raw }) => ({

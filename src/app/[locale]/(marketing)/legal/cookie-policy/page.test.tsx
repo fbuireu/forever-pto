@@ -32,9 +32,12 @@ const makeParams = (locale = EN) => ({ params: Promise.resolve({ locale: locale 
 describe('cookie-policy/page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    const mockT = Object.assign(vi.fn((key: string) => `t:${key}`), {
-      rich: vi.fn().mockReturnValue(null),
-    });
+    const mockT = Object.assign(
+      vi.fn((key: string) => `t:${key}`),
+      {
+        rich: vi.fn().mockReturnValue(null),
+      }
+    );
     mockGetTranslations.mockResolvedValue(mockT);
     mockGetCloudflareContext.mockResolvedValue({ env: ENV });
   });

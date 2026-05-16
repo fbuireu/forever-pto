@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { LOCALES } from '../src/infrastructure/i18n/locales';
-import { localePath } from '../src/infrastructure/i18n/url';
+import { LOCALES } from 'src/infrastructure/i18n/locales';
+import { localePath } from 'src/infrastructure/i18n/utils/url';
 
 const ROBOTS_URL = '/robots.txt';
 

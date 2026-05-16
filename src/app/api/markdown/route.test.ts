@@ -37,10 +37,7 @@ describe('GET /api/markdown', () => {
     const { buildMarkdownPage } = await import('@infrastructure/markdown/buildMarkdownPage');
     const request = new Request('http://localhost/api/markdown?path=/en/planner');
     await GET(request);
-    expect(buildMarkdownPage).toHaveBeenCalledWith(
-      process.env.NEXT_PUBLIC_SITE_URL,
-      '/en/planner'
-    );
+    expect(buildMarkdownPage).toHaveBeenCalledWith(process.env.NEXT_PUBLIC_SITE_URL, '/en/planner');
   });
 
   it('defaults path to / when query param is absent', async () => {

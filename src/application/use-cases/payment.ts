@@ -1,11 +1,11 @@
 import { paymentDataDTO } from '@application/dto/payment/dto';
 import { type CreatePaymentInput, createPaymentSchema } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
-import { zodParse } from '@application/shared/zodParse';
+import { zodParse } from '@application/shared/utils/zodParse';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import type { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
-import { PaymentError, type PromoCodeError, ValidationError } from '@infrastructure/errors';
+import { PaymentError, type PromoCodeError, type ValidationError } from '@infrastructure/errors';
 import { createPaymentIntent } from '@infrastructure/services/payments/provider/intent';
 import { validatePromoCode } from '@infrastructure/services/payments/provider/promo-code';
 import { savePayment } from '@infrastructure/services/payments/repository';

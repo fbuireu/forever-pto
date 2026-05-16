@@ -1,10 +1,12 @@
+import { addDays, startOfToday } from '@application/shared/utils/dates';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
-import { LegalLayout } from '@ui/modules/layout/LegalLayout';
 import { createRichLink } from '@ui/modules/core/primitives/RichLink';
+import { LegalLayout } from '@ui/modules/layout/LegalLayout';
 import type { Locale } from 'next-intl';
 
 const githubLink = createRichLink('https://github.com/fbuireu/forever-pto', { external: true });
 const odrLink = createRichLink('https://ec.europa.eu/consumers/odr', { external: true });
+
 import { getTranslations } from 'next-intl/server';
 
 export { generateMetadata } from './metadata';
@@ -19,8 +21,7 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
     getCloudflareContext({ async: true }),
     getTranslations({ locale, namespace: 'termsOfService' }),
   ]);
-  const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-  const lastUpdatedDate = new Date(Date.now() - ONE_WEEK_MS).toLocaleDateString(locale, {
+  const lastUpdatedDate = addDays(startOfToday(), -7).toLocaleDateString(locale, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -203,9 +204,7 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
         <p>{t('sections.intellectualProperty.limitedLicense.description')}</p>
 
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.intellectualProperty.openSource.title')}</h3>
-        <p>
-          {t.rich('sections.intellectualProperty.openSource.description', { link: githubLink })}
-        </p>
+        <p>{t.rich('sections.intellectualProperty.openSource.description', { link: githubLink })}</p>
 
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.intellectualProperty.restrictions.title')}</h3>
         <p>{t('sections.intellectualProperty.restrictions.description')}</p>
@@ -292,9 +291,7 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
         </p>
 
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.governingLaw.euOdr.title')}</h3>
-        <p>
-          {t.rich('sections.governingLaw.euOdr.description', { link: odrLink })}
-        </p>
+        <p>{t.rich('sections.governingLaw.euOdr.description', { link: odrLink })}</p>
       </section>
 
       <section>

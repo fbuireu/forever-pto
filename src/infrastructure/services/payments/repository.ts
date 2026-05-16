@@ -68,21 +68,23 @@ export const updatePaymentStatus = (
     );
   });
 
-export const updatePaymentCharge = (
-  paymentIntentId: string,
-  chargeId: string,
-  receiptUrl: string | null,
-  paymentMethodType: string | null,
-  country: string | null,
-  customerName: string | null,
-  postalCode: string | null,
-  city: string | null,
-  state: string | null,
-  paymentBrand: string | null,
-  paymentLast4: string | null,
-  feeAmount: number | null,
-  netAmount: number | null
-): Effect.Effect<void, DatabaseError, TursoService> =>
+export interface PaymentChargeData {
+  paymentIntentId: string;
+  chargeId: string;
+  receiptUrl: string | null;
+  paymentMethodType: string | null;
+  country: string | null;
+  customerName: string | null;
+  postalCode: string | null;
+  city: string | null;
+  state: string | null;
+  paymentBrand: string | null;
+  paymentLast4: string | null;
+  feeAmount: number | null;
+  netAmount: number | null;
+}
+
+export const updatePaymentCharge = (data: PaymentChargeData): Effect.Effect<void, DatabaseError, TursoService> =>
   Effect.gen(function* () {
     const turso = yield* TursoService;
     yield* turso.execute(
@@ -94,19 +96,19 @@ export const updatePaymentCharge = (
            updated_at = datetime('now')
        WHERE id = ?`,
       [
-        chargeId,
-        receiptUrl,
-        paymentMethodType,
-        country,
-        customerName,
-        postalCode,
-        city,
-        state,
-        paymentBrand,
-        paymentLast4,
-        feeAmount,
-        netAmount,
-        paymentIntentId,
+        data.chargeId,
+        data.receiptUrl,
+        data.paymentMethodType,
+        data.country,
+        data.customerName,
+        data.postalCode,
+        data.city,
+        data.state,
+        data.paymentBrand,
+        data.paymentLast4,
+        data.feeAmount,
+        data.netAmount,
+        data.paymentIntentId,
       ]
     );
   });

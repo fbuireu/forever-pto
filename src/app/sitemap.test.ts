@@ -1,6 +1,6 @@
+import { LOCALES } from '@infrastructure/i18n/locales';
+import { routing } from '@infrastructure/i18n/routing';
 import { describe, expect, it, vi } from 'vitest';
-import { LOCALES } from '../infrastructure/i18n/locales';
-import { routing } from '../infrastructure/i18n/routing';
 
 vi.mock('@opennextjs/cloudflare', () => ({
   getCloudflareContext: vi.fn().mockResolvedValue({

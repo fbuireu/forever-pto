@@ -9,6 +9,7 @@ import { usePremiumStore } from '@application/stores/premium';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { Clock } from '@ui/modules/core/animate/icons/Clock';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
+import { MapPin } from '@ui/modules/core/animate/icons/MapPin';
 import { RotatingText } from '@ui/modules/core/animate/text/Rotating';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Badge } from '@ui/modules/core/primitives/Badge';
@@ -21,7 +22,6 @@ import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { MapPin } from '../../core/animate/icons/MapPin';
 import { MetricCard, MetricCardSize } from './summary/MetricCard';
 import { SummaryFixture } from './summary/SummaryFixture';
 

@@ -2,15 +2,12 @@
 
 import { useHolidaysStore } from '@application/stores/holidays';
 import type { GenerateSuggestionsParams } from '@application/stores/types';
-import type {
-  CalculateSuggestionsRequest,
-  WorkerResponse,
-} from '@infrastructure/workers/calculations/calculations.types';
 import {
   deserializeSuggestion,
   serializeHolidays,
   serializeMonths,
 } from '@infrastructure/workers/calculations/serializers';
+import type { CalculateSuggestionsRequest, WorkerResponse } from '@infrastructure/workers/calculations/types';
 import { useCallback, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -33,9 +30,7 @@ export function useCalculationsWorker() {
     (params: GenerateSuggestionsParams) => {
       workerRef.current?.terminate();
 
-      const worker = new Worker(
-        new URL('../../infrastructure/workers/calculations/calculations.worker', import.meta.url)
-      );
+      const worker = new Worker(new URL('../../infrastructure/workers/calculations/worker', import.meta.url));
       workerRef.current = worker;
 
       const requestId = String(Date.now());

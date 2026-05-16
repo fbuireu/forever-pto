@@ -5,6 +5,7 @@ import { useHolidaysStore } from '@application/stores/holidays';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 
 const logger = getBetterStackInstance();
+
 import { Button } from '@ui/modules/core/primitives/Button';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';

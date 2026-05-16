@@ -1,5 +1,5 @@
+import { FilterStrategy } from '@domain/calendar/types';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { FilterStrategy } from '@infrastructure/services/calendar/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { encryptedStorage } from './crypto';

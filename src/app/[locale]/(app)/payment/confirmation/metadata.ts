@@ -1,4 +1,4 @@
-import { localeAlternates, localePath } from '@infrastructure/i18n/url';
+import { localeAlternates, localePath } from '@infrastructure/i18n/utils/url';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';

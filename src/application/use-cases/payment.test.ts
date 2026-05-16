@@ -1,12 +1,12 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/server-service';
 import { PaymentError, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createPayment } from './payment';
 
-vi.mock('@application/shared/zodParse', () => ({
+vi.mock('@application/shared/utils/zodParse', () => ({
   zodParse: vi.fn((_, data) => Effect.succeed(data)),
 }));
 
@@ -15,15 +15,11 @@ vi.mock('@application/dto/payment/dto', () => ({
 }));
 
 vi.mock('@infrastructure/services/payments/provider/intent', () => ({
-  createPaymentIntent: vi.fn(() =>
-    Effect.succeed({ id: 'pi_test', client_secret: 'cs_test_secret' })
-  ),
+  createPaymentIntent: vi.fn(() => Effect.succeed({ id: 'pi_test', client_secret: 'cs_test_secret' })),
 }));
 
 vi.mock('@infrastructure/services/payments/provider/promo-code', () => ({
-  validatePromoCode: vi.fn(() =>
-    Effect.succeed({ finalAmount: 799, discountAmount: 200, promoCode: 'SAVE20' })
-  ),
+  validatePromoCode: vi.fn(() => Effect.succeed({ finalAmount: 799, discountAmount: 200, promoCode: 'SAVE20' })),
 }));
 
 vi.mock('@infrastructure/services/payments/repository', () => ({
@@ -46,8 +42,7 @@ const TestLayer = Layer.mergeAll(
 );
 
 type PaymentR = LoggerService | TursoService | StripeServerService;
-const run = <A, E>(eff: Effect.Effect<A, E, PaymentR>) =>
-  Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
+const run = <A, E>(eff: Effect.Effect<A, E, PaymentR>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
 const runFail = <A, E>(eff: Effect.Effect<A, E, PaymentR>) =>
   Effect.runPromise(Effect.flip(eff).pipe(Effect.provide(TestLayer)));
 
@@ -87,7 +82,7 @@ describe('createPayment', () => {
   });
 
   it('fails with ValidationError when zodParse fails', async () => {
-    const { zodParse } = await import('@application/shared/zodParse');
+    const { zodParse } = await import('@application/shared/utils/zodParse');
     vi.mocked(zodParse).mockReturnValueOnce(Effect.fail(new ValidationError({ message: 'invalid input' })));
     const err = await runFail(createPayment(PARAMS, CONTEXT));
     expect(err).toBeInstanceOf(ValidationError);
@@ -95,27 +90,21 @@ describe('createPayment', () => {
 
   it('fails with PaymentError when createPaymentIntent fails', async () => {
     const { createPaymentIntent } = await import('@infrastructure/services/payments/provider/intent');
-    vi.mocked(createPaymentIntent).mockReturnValueOnce(
-      Effect.fail(new PaymentError({ message: 'Stripe error' }))
-    );
+    vi.mocked(createPaymentIntent).mockReturnValueOnce(Effect.fail(new PaymentError({ message: 'Stripe error' })));
     const err = await runFail(createPayment(PARAMS, CONTEXT));
     expect(err).toBeInstanceOf(PaymentError);
   });
 
   it('fails with PaymentError when client_secret is missing', async () => {
     const { createPaymentIntent } = await import('@infrastructure/services/payments/provider/intent');
-    vi.mocked(createPaymentIntent).mockReturnValueOnce(
-      Effect.succeed({ id: 'pi_test', client_secret: null } as never)
-    );
+    vi.mocked(createPaymentIntent).mockReturnValueOnce(Effect.succeed({ id: 'pi_test', client_secret: null } as never));
     const err = await runFail(createPayment(PARAMS, CONTEXT));
     expect(err).toBeInstanceOf(PaymentError);
   });
 
   it('resolves even when savePayment fails', async () => {
     const { savePayment } = await import('@infrastructure/services/payments/repository');
-    vi.mocked(savePayment).mockReturnValueOnce(
-      Effect.fail({ _tag: 'DatabaseError', message: 'db error' } as never)
-    );
+    vi.mocked(savePayment).mockReturnValueOnce(Effect.fail({ _tag: 'DatabaseError', message: 'db error' } as never));
     const result = await run(createPayment(PARAMS, CONTEXT));
     expect(result.clientSecret).toBe('cs_test_secret');
     expect(mockLogger.warn).toHaveBeenCalledOnce();

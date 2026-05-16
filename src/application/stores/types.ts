@@ -1,5 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import type { FilterStrategy, Suggestion } from '@infrastructure/services/calendar/types';
+import type { FilterStrategy, Suggestion } from '@domain/calendar/types';
 import type { Locale } from 'next-intl';
 import type { FiltersState } from './filters';
 
@@ -39,4 +39,3 @@ export interface AlternativeSelectionBaseParams {
   suggestion: Suggestion | null;
   index: number;
 }
-

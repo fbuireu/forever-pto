@@ -1,34 +1,31 @@
-# clients
+# infrastructure/clients
 
 ## Purpose
-Singleton client instances for external services. Encapsulates initialization, credentials, retries, and response shape. Infrastructure services depend on these clients, never the other way around.
 
-## Available clients
+Effect service wrappers around external SDKs. Each client exposes a `Context.Tag` (the interface) and a Live `Layer` (the real implementation). Tests substitute the tag with a mock layer — the SDK is never called in tests.
 
-| Client | Service | Access pattern |
-|---|---|---|
-| `db/turso/` | Turso (serverless SQLite) | `getTursoClientInstance()` |
-| `email/resend/` | Resend (email delivery) | `getResendClientInstance()` |
-| `logging/better-stack/` | BetterStack (Logtail) | `getBetterStackInstance()` |
-| `payments/stripe/` | Stripe (payments) | `getStripeServerInstance()` / `getStripePromise()` |
+## Pattern
 
-## Response shape
+```ts
+export class FooService extends Context.Tag('FooService')<FooService, { method(): Effect<...> }>() {}
 
-All clients use a discriminated response:
-
-```typescript
-{ success: true; data: T } | { success: false; error: string }
+export const FooServiceLive = Layer.effect(FooService, Effect.gen(function* () {
+  const client = new FooSDK(config);
+  return { method: () => Effect.tryPromise(() => client.method()) };
+}));
 ```
 
-Do not throw exceptions from public client methods — catch and return `{ success: false }`.
+## Clients
 
-## Patterns
+| Folder | SDK | Tag | Env vars |
+| --- | --- | --- | --- |
+| `db/turso/` | `@libsql/client` | `TursoService` | `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` |
+| `email/resend/` | `resend` | `ResendService` | `RESEND_API_KEY` |
+| `logging/better-stack/` | `@logtail/node` | `LoggerService` | `LOGTAIL_SOURCE_TOKEN` |
+| `payments/stripe/` | `stripe` (server) + `@stripe/stripe-js` (browser) | `StripeServerService` | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` |
 
-- **Singleton with null-coalescing**: getters instantiate once and reuse.
-- **Stripe has two entry points**: `getStripePromise()` for the browser client, `getStripeServerInstance()` for Node/Edge.
-- **BetterStack is injected into other clients** (Turso, Resend, Stripe) for centralized logging — do not use `console` inside clients.
-- Credentials are read from environment variables at instantiation time; missing vars throw at startup (fail-fast).
+## Non-obvious details
 
-## Out of scope
-
-Business logic (use services), DTO transformation (use `application/dto`), domain event handling (use `domain/`).
+- `stripe/client.ts` is **browser-only** (`StripeClient` wraps `loadStripe()`). All server-side Stripe must go through `StripeServerService`.
+- `logging/better-stack/client.ts` exports `getBetterStackInstance()` — a singleton for non-Effect contexts (pure utility functions without a layer). Do not use it in Effect code; use `LoggerService` instead.
+- `logging/better-stack/tracking.ts` is client-side browser event tracking. Separate from the server-side logger.

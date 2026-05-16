@@ -9,7 +9,7 @@ export const formatDiscountMessage = (discountInfo: DiscountInfo) => {
   };
 };
 
-export const formatDiscountText = (discountInfo: DiscountInfo | null): string | null => {
+export const formatDiscountText = (discountInfo: DiscountInfo | null) => {
   if (!discountInfo) return null;
 
   const saved = discountInfo.originalAmount - discountInfo.finalAmount;

@@ -1,7 +1,9 @@
+import { addDays, startOfToday } from '@application/shared/utils/dates';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { createRichLink } from '@ui/modules/core/primitives/RichLink';
 
 const cookiePolicyLink = createRichLink('/legal/cookie-policy');
+
 import { LegalLayout } from '@ui/modules/layout/LegalLayout';
 import { Me } from '@ui/modules/pages/legal/Me';
 import type { Locale } from 'next-intl';
@@ -19,8 +21,7 @@ export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPoli
     getCloudflareContext({ async: true }),
     getTranslations({ locale, namespace: 'privacyPolicy' }),
   ]);
-  const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-  const lastUpdatedDate = new Date(Date.now() - ONE_WEEK_MS).toLocaleDateString(locale, {
+  const lastUpdatedDate = addDays(startOfToday(), -7).toLocaleDateString(locale, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -147,9 +148,7 @@ export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPoli
 
       <section>
         <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.cookiesAndTracking.title')}</h2>
-        <p>
-          {t.rich('sections.cookiesAndTracking.description', { link: cookiePolicyLink })}
-        </p>
+        <p>{t.rich('sections.cookiesAndTracking.description', { link: cookiePolicyLink })}</p>
       </section>
 
       <section>

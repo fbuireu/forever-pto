@@ -1,9 +1,9 @@
 'use client';
 
 import { Link } from '@application/i18n/navigation';
+import { useIsMobile } from '@ui/hooks/useMobile';
 import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
 import Image from 'next/image';
-import { useIsMobile } from 'src/ui/hooks/useMobile';
 
 export function Logo() {
   const { state, setOpenMobile } = useSidebar();

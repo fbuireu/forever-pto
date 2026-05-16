@@ -18,7 +18,7 @@ type DropdownMenuContextType = {
 
 const DropdownMenuContext = createContext<DropdownMenuContextType | undefined>(undefined);
 
-const useDropdownMenu = (): DropdownMenuContextType => {
+const useDropdownMenu = () => {
   const context = use(DropdownMenuContext);
   if (!context) {
     throw new Error('useDropdownMenu must be used within a DropdownMenu');

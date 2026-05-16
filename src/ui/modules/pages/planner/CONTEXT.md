@@ -1,12 +1,13 @@
 # planner
 
 ## Purpose
+
 Main page module. Orchestrates the calendar view, holiday management, PTO alternatives, analytics, and user support. It is the sole entry point to the product's core functionality.
 
 ## Main sections
 
 | Component | Role |
-|---|---|
+| --- | --- |
 | `CalendarList` | Renders year months with selectable days |
 | `PlannerPanel` | Alternatives manager + current PTO status |
 | `HolidaysList` | Tabbed view of holidays (National / Regional / Custom) |
@@ -36,7 +37,7 @@ Main page module. Orchestrates the calendar view, holiday management, PTO altern
 
 - `@application/stores/*` — state source of truth
 - `@ui/modules/core/` — design primitives
-- `@infrastructure/services/calendar` — suggestion engine
+- `@domain/calendar` — suggestion engine
 - `motion/react` — animations
 - `next-intl` — translations
 

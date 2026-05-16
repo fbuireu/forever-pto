@@ -1,4 +1,4 @@
-import { isBefore, isSameDay, isSameMonth, startOfDay } from '@ui/utils/dates';
+import { isBefore, isSameDay, isSameMonth, startOfDay } from '@application/shared/utils/dates';
 import type { FromTo } from '../Calendar';
 
 interface GetDayClassNamesParams {
@@ -44,7 +44,7 @@ export const getDayClassNames = ({
   showOutsideDays,
   allowPastDays = true,
   modifiers,
-}: GetDayClassNamesParams): string => {
+}: GetDayClassNamesParams) => {
   const classes: string[] = [];
   const isOutsideMonth = !isSameMonth(date, month);
   const isSelected = selectedDates.some((d) => isSameDay(d, date));
@@ -114,7 +114,7 @@ export const getDayClassNames = ({
   return classes.join(' ');
 };
 
-export function getViewBoxFromSvg(svg: string): string {
+export function getViewBoxFromSvg(svg: string) {
   const VIEWBOX_REGEX = /viewBox="([^"]*)"/;
   const DEFAULT_VIEWBOX = '0 0 24 24';
   const viewBoxMatch = RegExp(VIEWBOX_REGEX).exec(svg);

@@ -17,7 +17,7 @@ const localeDataLoaders: Record<string, () => Promise<{ default: LocaleData }>> 
   de: () => import('i18n-iso-countries/langs/de.json'),
 };
 
-export async function getCountries(locale: Locale): Promise<CountryDTO[]> {
+export async function getCountries(locale: Locale) {
   const program = Effect.gen(function* () {
     const loader = localeDataLoaders[locale as string] ?? localeDataLoaders.en;
     const localeData = yield* Effect.tryPromise(() => loader());

@@ -1,12 +1,13 @@
 # stores
 
 ## Purpose
+
 Global client-side state using Zustand. All stores except `ui` persist to encrypted localStorage and act as the single source of truth for UI and calculations.
 
 ## Stores and responsibilities
 
 | Store | Owned state |
-|---|---|
+| --- | --- |
 | `filters` | `ptoDays`, `year` (number), `country`, `region`, `strategy`, `carryOverMonths`, `allowPastDays` |
 | `holidays` | `holidays[]`, `suggestion`, `alternatives[]`, `currentSelection`, `manuallySelectedDays`, `removedSuggestedDays`, `isCalculating` |
 | `location` | `countries[]`, `regions[]`, `regionsLoading`, `countriesLoading`, `countriesLastFetched` (24h cache) |
@@ -25,7 +26,7 @@ Global client-side state using Zustand. All stores except `ui` persist to encryp
 ## Conventions
 
 - Stores do not fetch directly: they delegate to infrastructure services through their actions.
-- Session checks (`/api/check-session`) are handled by `@infrastructure/services/session/checkSession`.
+- Session checks (`/api/check-session`) are handled by `@ui/adapters/session/checkSession`.
 - Each action logs errors to BetterStack before failing silently.
 - Types shared across stores live in `types.ts` (`GenerateSuggestionsParams`, `FetchHolidaysParams`, etc.).
 - Shared store constants (`TWENTY_FOUR_HOURS`) live in `utils.ts` alongside crypto utilities.

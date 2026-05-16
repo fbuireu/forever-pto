@@ -5,7 +5,7 @@ const localeFormatterCache = new Map<string, Intl.NumberFormat>();
 export const DEFAULT_CURRENCY = 'EUR';
 export const DEFAULT_CURRENCY_SYMBOL = '€';
 
-export const getCurrencyForLocale = (locale: Locale): { currency: string; currencySymbol: string } => {
+export const getCurrencyForLocale = (locale: Locale) => {
   let formatter = localeFormatterCache.get(locale);
   if (!formatter) {
     formatter = new Intl.NumberFormat(locale, { style: CURRENCY_STYLE, currency: DEFAULT_CURRENCY });
@@ -39,7 +39,7 @@ interface GetCurrencySymbolParams {
 
 const currencySymbolCache = new Map<string, Intl.NumberFormat>();
 
-export const getCurrencySymbol = ({ locale, currency }: GetCurrencySymbolParams): string => {
+export const getCurrencySymbol = ({ locale, currency }: GetCurrencySymbolParams) => {
   try {
     const key = `${locale}-${currency}`;
     let formatter = currencySymbolCache.get(key);

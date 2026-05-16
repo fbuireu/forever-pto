@@ -22,7 +22,7 @@ const detectCountryFromCDNEffect = Effect.gen(function* () {
   return location ? location.substring(LOCATION_IDENTIFIER.length).trim().toLowerCase() : '';
 });
 
-export async function detectCountryFromCDN(): Promise<string> {
+export async function detectCountryFromCDN() {
   return Effect.runPromise(
     detectCountryFromCDNEffect.pipe(
       Effect.catchAll((error) => {
