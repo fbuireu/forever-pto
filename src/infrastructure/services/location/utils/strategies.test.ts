@@ -1,4 +1,4 @@
-import { DE, EN, ES, FR } from '@infrastructure/i18n/locales';
+import { DE, ES, FR } from '@infrastructure/i18n/locales';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({

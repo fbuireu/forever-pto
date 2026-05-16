@@ -99,7 +99,7 @@ describe('worker onmessage', () => {
 
   it('maps manualDays into pseudo-holidays with CUSTOM variant', () => {
     sendMessage({ manualDays: [new Date(2025, 2, 5).toISOString()] });
-    const callArgs = mockGenerateSuggestions.mock.lastCall![0];
+    const callArgs = mockGenerateSuggestions.mock.lastCall?.[0];
     const manualEntry = callArgs.holidays.find((h: { id: string }) => h.id === 'manual-0');
     expect(manualEntry).toBeDefined();
     expect(manualEntry.variant).toBe('custom');
@@ -107,7 +107,7 @@ describe('worker onmessage', () => {
 
   it('respects autoSuggestCount over ptoDays when provided', () => {
     sendMessage({ ptoDays: 10, autoSuggestCount: 3 });
-    const callArgs = mockGenerateSuggestions.mock.lastCall![0];
+    const callArgs = mockGenerateSuggestions.mock.lastCall?.[0];
     expect(callArgs.ptoDays).toBe(3);
   });
 });

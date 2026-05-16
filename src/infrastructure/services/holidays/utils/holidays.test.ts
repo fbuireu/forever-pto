@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockGetHolidays, MockHolidays } = vi.hoisted(() => {
   const mockGetHolidays = vi.fn();
+  // biome-ignore lint/complexity/useArrowFunction: called with `new`; arrow fn doesn't return the instance correctly
   const MockHolidays = vi.fn().mockImplementation(function () {
     return { getHolidays: mockGetHolidays };
   });

@@ -78,7 +78,7 @@ describe('serializeSuggestionResult', () => {
     const bridge = makeBridge();
     const suggestion: Suggestion = { days: [], bridges: [bridge] };
     const result = serializeSuggestionResult(suggestion, []);
-    const serializedBridge = result.suggestion.bridges![0];
+    const serializedBridge = result.suggestion.bridges?.[0];
     expect(serializedBridge.startDate).toBe(bridge.startDate.toISOString());
     expect(serializedBridge.endDate).toBe(bridge.endDate.toISOString());
     expect(serializedBridge.ptoDays[0]).toBe(bridge.ptoDays[0].toISOString());
@@ -111,8 +111,8 @@ describe('deserializeSuggestion', () => {
       ],
     };
     const result = deserializeSuggestion(serialized);
-    expect(result.bridges![0].startDate).toBeInstanceOf(Date);
-    expect(result.bridges![0].ptoDays[0]).toBeInstanceOf(Date);
+    expect(result.bridges?.[0].startDate).toBeInstanceOf(Date);
+    expect(result.bridges?.[0].ptoDays[0]).toBeInstanceOf(Date);
   });
 
   it('handles missing bridges gracefully', () => {

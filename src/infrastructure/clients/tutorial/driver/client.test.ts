@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockDrive, mockSetSteps, mockDestroy, mockDriverInstance, mockDriverFn, mockUnmount, mockRender, mockRoot, mockCreateRoot } = vi.hoisted(() => {
+const { mockDrive, mockSetSteps, mockDestroy, mockDriverInstance, mockDriverFn, mockUnmount, mockRender, mockCreateRoot } = vi.hoisted(() => {
   const mockDrive = vi.fn();
   const mockSetSteps = vi.fn();
   const mockDestroy = vi.fn();
@@ -10,7 +10,7 @@ const { mockDrive, mockSetSteps, mockDestroy, mockDriverInstance, mockDriverFn, 
   const mockRender = vi.fn();
   const mockRoot = { render: mockRender, unmount: mockUnmount };
   const mockCreateRoot = vi.fn().mockReturnValue(mockRoot);
-  return { mockDrive, mockSetSteps, mockDestroy, mockDriverInstance, mockDriverFn, mockUnmount, mockRender, mockRoot, mockCreateRoot };
+  return { mockDrive, mockSetSteps, mockDestroy, mockDriverInstance, mockDriverFn, mockUnmount, mockRender, mockCreateRoot };
 });
 
 vi.mock('driver.js', () => ({ driver: mockDriverFn }));

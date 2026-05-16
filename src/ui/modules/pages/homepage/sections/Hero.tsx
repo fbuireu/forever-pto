@@ -11,6 +11,8 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { version } from '../../../../../../package.json';
 import { CAL_ENTRIES, type DayType } from './shared';
 
+const LOCALE_FLAG: Record<string, string> = { en: 'gb', ca: 'es-ct' };
+
 const HERO_DAY_CLASS: Record<DayType, string> = {
   work: 'bg-card border-[2px] border-[var(--frame)]/15 rounded-lg',
   pto: MODIFIERS_CLASS_NAMES.suggested,
@@ -35,7 +37,7 @@ export const Hero = async () => {
               <span className='flex items-center gap-1.5'>
                 {LOCALES.map((locale, i) => (
                   <span key={locale} className='flex items-center gap-1'>
-                    <FlagIcon code={locale} />
+                    <FlagIcon code={LOCALE_FLAG[locale] ?? locale} />
                     <span>{locale.toUpperCase()}</span>
                     {i < LOCALES.length - 1 && <span className='opacity-40 mx-0.5'>·</span>}
                   </span>

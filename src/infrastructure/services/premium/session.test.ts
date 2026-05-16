@@ -31,6 +31,7 @@ beforeEach(() => {
   mockSetProtectedHeader.mockReturnValue(instance);
   mockSetIssuedAt.mockReturnValue(instance);
   mockSetExpirationTime.mockReturnValue(instance);
+  // biome-ignore lint/complexity/useArrowFunction: called with `new`; arrow fn is not a constructor
   MockSignJWT.mockImplementation(function () {
     return instance;
   });
