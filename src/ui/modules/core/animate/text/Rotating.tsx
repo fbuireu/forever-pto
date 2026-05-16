@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
 import { useEffect, useState } from 'react';
 

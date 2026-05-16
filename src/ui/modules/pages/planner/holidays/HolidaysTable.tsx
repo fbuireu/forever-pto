@@ -20,7 +20,7 @@ import { Table, TableBody, TableCell, TableRow } from '@ui/modules/core/primitiv
 import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/premium/PremiumFeature';
 import { ConditionalWrapper } from '@ui/modules/shared/ConditionalWrapper';
 import { isWeekend } from '@ui/utils/dates';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { Edit } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';

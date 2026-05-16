@@ -1,7 +1,7 @@
 'use client';
 
 import { useIsInView } from '@ui/hooks/useIsInView';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import {
   type HTMLMotionProps,
   m,

@@ -2,7 +2,7 @@
 
 import { Progress as ProgressPrimitive } from '@base-ui/react/progress';
 import { getStrictContext } from '@ui/utils/context';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { type HTMLMotionProps, m } from 'motion/react';
 import type { ComponentProps } from 'react';
 

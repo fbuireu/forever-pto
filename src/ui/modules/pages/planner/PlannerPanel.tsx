@@ -10,7 +10,7 @@ import { ChevronRight } from '@ui/modules/core/animate/icons/ChevronRight';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Progress, ProgressOverlayLabel, ProgressTrack } from '@ui/modules/core/primitives/Progress';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { BarChart3, CalendarDays, Sparkles, TrendingUp } from 'lucide-react';
 import { m, type Transition, type Variants } from 'motion/react';
 import { useTranslations } from 'next-intl';

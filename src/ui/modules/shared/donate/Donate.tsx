@@ -16,7 +16,7 @@ import { initializePayment } from '@ui/adapters/payments/checkout';
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/modules/core/animate/base/Popover';
 import { Star } from '@ui/modules/core/animate/icons/Star';
 import { Button } from '@ui/modules/core/primitives/Button';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { useLocale, useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';

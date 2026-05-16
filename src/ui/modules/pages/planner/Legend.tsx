@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { useTranslations } from 'next-intl';
 import styles from './legend.module.css';
 

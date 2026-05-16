@@ -2,7 +2,7 @@ import { LOCALES } from '@infrastructure/i18n/locales';
 import { BonesProvider } from '@ui/modules/providers/BonesProvider';
 import { CookieConsentClient } from '@ui/modules/shared/cookie-consent/CookieConsentClient';
 import { WebMCP } from '@ui/modules/shared/WebMCP';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import '@styles/index.css';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { Analytics } from '@ui/modules/tutorial/Analytics';

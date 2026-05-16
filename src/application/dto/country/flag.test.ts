@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getEmojiFlag } from './utils';
+import { getEmojiFlag } from './flag';
 
 describe('getEmojiFlag', () => {
   it('returns the correct emoji for a known uppercase code', () => {

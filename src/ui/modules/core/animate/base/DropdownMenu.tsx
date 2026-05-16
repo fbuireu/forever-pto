@@ -1,7 +1,7 @@
 'use client';
 
 import { Menu as DropdownMenuPrimitive } from '@base-ui/react/menu';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { Circle } from 'lucide-react';
 import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
 import * as React from 'react';

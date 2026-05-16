@@ -1,5 +1,5 @@
 import { Badge } from '@ui/modules/core/primitives/Badge';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { getTranslations } from 'next-intl/server';
 import { brutCard, type DayType, dayCell } from './shared';
 

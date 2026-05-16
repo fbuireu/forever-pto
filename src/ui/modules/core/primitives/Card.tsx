@@ -1,4 +1,4 @@
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import type { ComponentProps } from 'react';
 
 function Card({ className, ...props }: ComponentProps<'div'>) {

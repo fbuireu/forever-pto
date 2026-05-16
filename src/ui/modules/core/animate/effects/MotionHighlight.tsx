@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import type { Transition } from 'motion/react';
 import { AnimatePresence, m } from 'motion/react';
 import {

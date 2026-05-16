@@ -4,7 +4,7 @@ import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useCalculationsWorker } from '@ui/hooks/useCalculationsWorker';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { Skeleton } from 'boneyard-js/react';
 import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useMemo } from 'react';

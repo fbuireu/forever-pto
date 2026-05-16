@@ -1,4 +1,4 @@
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { XIcon } from 'lucide-react';
 import {
   DialogBackdrop as DialogBackdropPrimitive,

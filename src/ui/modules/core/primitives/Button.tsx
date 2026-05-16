@@ -1,4 +1,4 @@
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { cva, type VariantProps } from 'class-variance-authority';
 import type { ComponentProps } from 'react';
 import { Slot } from '../animate/base/Slot';

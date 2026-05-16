@@ -2,7 +2,7 @@
 
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import type { Suggestion } from '@infrastructure/services/calendar/types';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 

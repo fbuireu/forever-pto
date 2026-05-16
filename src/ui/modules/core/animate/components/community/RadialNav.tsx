@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { type LucideIcon, MousePointer2 } from 'lucide-react';
 import { m, type SVGMotionProps, type Transition, type Variants } from 'motion/react';
 import * as React from 'react';

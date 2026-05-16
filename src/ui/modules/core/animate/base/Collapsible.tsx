@@ -1,7 +1,7 @@
 'use client';
 
 import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { type HTMLMotionProps, m, type Transition } from 'motion/react';
 import * as React from 'react';
 import { createContext, use, useCallback, useState } from 'react';

@@ -1,6 +1,6 @@
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Badge } from '@ui/modules/core/primitives/Badge';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import type { LucideIcon } from 'lucide-react';
 import type { SVGMotionProps } from 'motion/react';
 import type { ReactNode } from 'react';

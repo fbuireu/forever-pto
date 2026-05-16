@@ -1,7 +1,7 @@
 'use client';
 
 import { Label } from '@ui/modules/core/primitives/Label';
-import { cn } from '@ui/utils/utils';
+import { cn } from '@ui/utils/cn';
 import { type ComponentProps, createContext, use, useId } from 'react';
 import {
   Controller,
