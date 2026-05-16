@@ -52,7 +52,7 @@ vi.mock('@domain/calendar/metrics/generateMetrics', () => ({
   generateMetrics: vi.fn().mockReturnValue({ totalDays: 0, efficiency: 0 }),
 }));
 
-const makeHoliday = (id: string, dateStr: string, variant = HolidayVariant.NATIONAL): HolidayDTO => ({
+const makeHoliday = (id: string, dateStr: string, variant: HolidayVariant = HolidayVariant.NATIONAL): HolidayDTO => ({
   id,
   date: new Date(dateStr),
   name: `Holiday ${id}`,
