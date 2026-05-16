@@ -1,3 +1,10 @@
+## [1.3.7](https://github.com/fbuireu/forever-pto/compare/v1.3.6...v1.3.7) (2026-05-16)
+
+
+### Bug Fixes
+
+* config raw ([05de15a](https://github.com/fbuireu/forever-pto/commit/05de15a487398eafcf47678aea3e1e1bc6170c65))
+
 ## [1.3.6](https://github.com/fbuireu/forever-pto/compare/v1.3.5...v1.3.6) (2026-05-15)
 
 
