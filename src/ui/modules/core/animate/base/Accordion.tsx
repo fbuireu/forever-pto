@@ -22,7 +22,7 @@ const useAccordionItem = () => {
 
 type AccordionProps = React.ComponentProps<typeof AccordionPrimitive.Root>;
 
-function Accordion(props: AccordionProps) {
+function Accordion(props: Readonly<AccordionProps>) {
   return <AccordionPrimitive.Root data-slot='accordion' {...props} />;
 }
 
@@ -39,7 +39,7 @@ function AccordionItem({ className, children, ...props }: AccordionItemProps) {
     <AccordionItemContext.Provider value={contextValue}>
       <AccordionPrimitive.Item
         data-slot='accordion-item'
-        className={cn('border-b-[2px] border-[var(--frame)]/18', className)}
+        className={cn('border-b-2 border-(--frame)/18', className)}
         {...props}
       >
         {children}
@@ -71,7 +71,7 @@ function AccordionTrigger({
     const observer = new MutationObserver((mutationsList) => {
       mutationsList.forEach((mutation) => {
         if (mutation.attributeName === 'data-panel-open') {
-          const currentState = node.getAttribute('data-panel-open');
+          const currentState = node.dataset.panelOpen;
           setIsOpen(currentState === '');
         }
       });
@@ -80,7 +80,7 @@ function AccordionTrigger({
       attributes: true,
       attributeFilter: ['data-panel-open'],
     });
-    const initialState = node.getAttribute('data-panel-open');
+    const initialState = node.dataset.panelOpen;
     setIsOpen(initialState === '');
     return () => observer.disconnect();
   }, [setIsOpen]);
@@ -104,8 +104,8 @@ function AccordionTrigger({
             animate={{ rotate: isOpen ? 45 : 0 }}
             transition={transition}
             className={cn(
-              'relative size-7 flex items-center justify-center shrink-0 rounded-[6px] border-[2.5px] border-[var(--frame)] font-black text-lg leading-none select-none transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] before:content-[""] before:absolute before:-inset-[5px]',
-              isOpen ? 'bg-[var(--frame)] text-[var(--background)]' : 'bg-[var(--accent)] text-[var(--color-brand-ink)]'
+              'relative size-7 flex items-center justify-center shrink-0 rounded-md border-[2.5px] border-(--frame) font-black text-lg leading-none select-none transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm)',
+              isOpen ? 'bg-(--frame) text-background' : 'bg-accent text-(--color-brand-ink)'
             )}
           >
             +

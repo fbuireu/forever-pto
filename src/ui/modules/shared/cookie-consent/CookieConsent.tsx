@@ -16,7 +16,7 @@ export const CookieConsent = () => {
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
 
   const updateGtagConsent = useCallback((granted: boolean) => {
-    if (window !== undefined && typeof window.gtag === 'function') {
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
       window.gtag('consent', 'update', { analytics_storage: granted ? 'granted' : 'denied' });
       if (granted) {
         window.gtag('event', 'page_view');
