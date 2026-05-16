@@ -32,6 +32,20 @@ declare global {
 
   interface Window {
     gtag?: (...args: unknown[]) => void;
+    betterstack?: (command: string, ...args: unknown[]) => void;
+  }
+
+  interface Navigator {
+    modelContext?: {
+      provideContext: (context: {
+        tools: Array<{
+          name: string;
+          description: string;
+          inputSchema: Record<string, unknown>;
+          execute: (input: Record<string, unknown>) => Promise<unknown>;
+        }>;
+      }) => void;
+    };
   }
 }
 

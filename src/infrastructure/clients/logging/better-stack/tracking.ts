@@ -1,9 +1,3 @@
-declare global {
-  interface Window {
-    betterstack?: (command: string, ...args: unknown[]) => void;
-  }
-}
-
 type TrackEventName =
   | 'payment_started'
   | 'payment_completed'
