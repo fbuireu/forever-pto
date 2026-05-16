@@ -1,5 +1,5 @@
 import { contactSchema } from '@application/dto/contact/schema';
-import type { ContactFormData } from '@application/dto/contact/types';
+import type { ContactFormData } from '@application/dto/contact/schema';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { ResendService } from '@infrastructure/clients/email/resend/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';

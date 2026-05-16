@@ -1,5 +1,3 @@
-export type { ContactFormData } from './schema';
-
 export interface ContactResult {
   success: boolean;
   error?: string;

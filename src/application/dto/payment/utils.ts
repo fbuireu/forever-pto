@@ -1,4 +1,13 @@
+import type { DiscountInfo } from './types';
 import type Stripe from 'stripe';
+
+interface CalculateFinalAmountParams {
+  baseAmount: number;
+  discountInfo: DiscountInfo | null;
+}
+
+export const calculateFinalAmount = ({ baseAmount, discountInfo }: CalculateFinalAmountParams): number =>
+  discountInfo?.finalAmount ?? baseAmount;
 
 export const extractCustomerId = (
   customer: string | Stripe.Customer | Stripe.DeletedCustomer | null
