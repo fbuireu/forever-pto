@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/fbuireu/forever-pto/compare/v1.4.0...v1.4.1) (2026-05-17)
+
+
+### Performance Improvements
+
+* improve tree-shaking ([6b8bdae](https://github.com/fbuireu/forever-pto/commit/6b8bdae4aedd8b15bfa88c09f079125f2e5dc605))
+
 # [1.4.0](https://github.com/fbuireu/forever-pto/compare/v1.3.8...v1.4.0) (2026-05-16)
 
 
