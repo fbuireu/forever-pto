@@ -1,3 +1,11 @@
+## [1.4.3](https://github.com/fbuireu/forever-pto/compare/v1.4.2...v1.4.3) (2026-05-17)
+
+
+### Bug Fixes
+
+* permissions ci ([925d16d](https://github.com/fbuireu/forever-pto/commit/925d16ddacb119f3d47965e97518aea22f036a5d))
+* slide parent tab ([9fce8f2](https://github.com/fbuireu/forever-pto/commit/9fce8f2eaa95f79f4af79753ceffbe45976081fb))
+
 ## [1.4.2](https://github.com/fbuireu/forever-pto/compare/v1.4.1...v1.4.2) (2026-05-17)
 
 
