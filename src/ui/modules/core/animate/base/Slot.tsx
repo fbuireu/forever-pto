@@ -1,5 +1,5 @@
 import { mergeProps } from '@base-ui/react/merge-props';
-import { cloneElement, HTMLAttributes, isValidElement, ReactElement, ReactNode, Ref, RefObject } from 'react';
+import { cloneElement, type HTMLAttributes, isValidElement, type ReactElement, type ReactNode, type Ref, type RefObject } from 'react';
 
 type SlotProps = HTMLAttributes<HTMLElement> & {
   children?: ReactNode;

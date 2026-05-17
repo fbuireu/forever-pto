@@ -54,7 +54,7 @@ function Switch({
 
   const switchContextValue = useMemo(
     () => ({ isChecked, setIsChecked, isPressed, setIsPressed }),
-    [isChecked, setIsChecked, isPressed, setIsPressed]
+    [isChecked, setIsChecked, isPressed]
   );
   return (
     <SwitchProvider value={switchContextValue}>
