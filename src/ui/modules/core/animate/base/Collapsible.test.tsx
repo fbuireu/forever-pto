@@ -51,7 +51,7 @@ vi.mock('@base-ui/react/collapsible', async () => {
   };
 });
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './Collapsible';
+import { Collapsible, CollapsibleTrigger } from './Collapsible';
 
 describe('Collapsible', () => {
   it('renders with data-slot="collapsible"', () => {
@@ -94,7 +94,7 @@ describe('CollapsibleTrigger', () => {
     const { getByTestId } = render(
       <Collapsible>
         <CollapsibleTrigger asChild>
-          <button data-testid='custom-trigger'>toggle</button>
+          <button type='button' data-testid='custom-trigger'>toggle</button>
         </CollapsibleTrigger>
       </Collapsible>
     );
