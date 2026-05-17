@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/fbuireu/forever-pto/compare/v1.4.1...v1.4.2) (2026-05-17)
+
+
+### Bug Fixes
+
+* show current flag ([7a56eaf](https://github.com/fbuireu/forever-pto/commit/7a56eaf5787c454a51b6918ee79e70c9e504396f))
+
 ## [1.4.1](https://github.com/fbuireu/forever-pto/compare/v1.4.0...v1.4.1) (2026-05-17)
 
 
