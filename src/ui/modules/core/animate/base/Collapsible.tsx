@@ -4,7 +4,7 @@ import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible'
 import { cn } from '@ui/utils/cn';
 import { type HTMLMotionProps, m, type Transition } from 'motion/react';
 import * as React from 'react';
-import { createContext, use, useCallback, useState } from 'react';
+import { createContext, use, useCallback, useMemo, useState } from 'react';
 
 type CollapsibleContextType = {
   isOpen: boolean;
@@ -37,8 +37,9 @@ function Collapsible({ children, ...props }: CollapsibleProps) {
     [props.onOpenChange]
   );
 
+  const collapsibleContextValue = useMemo(() => ({ isOpen }), [isOpen]);
   return (
-    <CollapsibleContext.Provider value={{ isOpen }}>
+    <CollapsibleContext.Provider value={collapsibleContextValue}>
       <CollapsiblePrimitive.Root data-slot='collapsible' {...props} onOpenChange={handleOpenChange}>
         {children}
       </CollapsiblePrimitive.Root>
@@ -62,10 +63,10 @@ function CollapsibleTrigger({ asChild, children, className, ...props }: Collapsi
     <CollapsiblePrimitive.Trigger
       data-slot='collapsible-trigger'
       className={cn(
-        "relative inline-flex w-full cursor-pointer items-center justify-between gap-2 rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] px-3 py-2 text-sm font-semibold shadow-[var(--shadow-brutal-btn)] outline-none transition-[color,background-color,border-color,box-shadow,transform] duration-75 ease-linear",
-        'hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[var(--surface-panel-alt)] hover:shadow-[var(--shadow-brutal-btn-hover)]',
-        'active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]',
-        'aria-expanded:-translate-x-0.5 aria-expanded:-translate-y-0.5 aria-expanded:shadow-[var(--shadow-brutal-btn-hover)]',
+        "relative inline-flex w-full cursor-pointer items-center justify-between gap-2 rounded-[8px] border-[3px] border-(--frame) bg-(--surface-panel) px-3 py-2 text-sm font-semibold shadow-(--shadow-brutal-btn) outline-none transition-[color,background-color,border-color,box-shadow,transform] duration-75 ease-linear",
+        'hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-(--surface-panel-alt) hover:shadow-(--shadow-brutal-btn-hover)',
+        'active:translate-x-0.5 active:translate-y-0.5 active:shadow-(--shadow-brutal-btn-active)',
+        'aria-expanded:-translate-x-0.5 aria-expanded:-translate-y-0.5 aria-expanded:shadow-(--shadow-brutal-btn-hover)',
         'focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2',
         className
       )}

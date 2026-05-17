@@ -39,7 +39,7 @@ function Counter({
       layout
       transition={transition}
       className={cn(
-        'inline-flex items-stretch overflow-hidden rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-sm)]',
+        'inline-flex items-stretch overflow-hidden rounded-xl border-[3px] border-(--frame) bg-(--surface-panel) shadow-(--shadow-brutal-sm)',
         className
       )}
       {...props}
@@ -50,7 +50,7 @@ function Counter({
         {...(buttonProps as object)}
         {...(decrementButtonProps as object)}
         onClick={() => setNumber(number - 1)}
-        className={cn(btnBase, 'border-r-[3px] border-[var(--frame)]', decrementButtonProps?.className)}
+        className={cn(btnBase, 'border-r-[3px] border-(--frame)', decrementButtonProps?.className)}
       >
         −
       </m.button>
@@ -62,7 +62,7 @@ function Counter({
           className={cn('font-display font-black text-[22px] leading-none', slidingNumberProps?.className)}
         />
         {label && (
-          <small className='font-mono text-[10px] font-semibold text-muted-foreground mt-[-1px] tracking-[0.06em]'>
+          <small className='font-mono text-[10px] font-semibold text-muted-foreground -mt-px tracking-[0.06em]'>
             {label}
           </small>
         )}
@@ -74,7 +74,7 @@ function Counter({
         {...(buttonProps as object)}
         {...(incrementButtonProps as object)}
         onClick={() => setNumber(number + 1)}
-        className={cn(btnBase, 'border-l-[3px] border-[var(--frame)]', incrementButtonProps?.className)}
+        className={cn(btnBase, 'border-l-[3px] border-(--frame)', incrementButtonProps?.className)}
       >
         +
       </m.button>

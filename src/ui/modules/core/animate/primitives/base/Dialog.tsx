@@ -21,8 +21,9 @@ function Dialog(props: DialogProps) {
     defaultValue: props?.defaultOpen,
     onChange: props?.onOpenChange,
   });
+  const dialogContextValue = React.useMemo(() => ({ isOpen, setIsOpen }), [isOpen, setIsOpen]);
   return (
-    <DialogProvider value={{ isOpen, setIsOpen }}>
+    <DialogProvider value={dialogContextValue}>
       <DialogPrimitive.Root data-slot='dialog' {...props} onOpenChange={setIsOpen} />
     </DialogProvider>
   );

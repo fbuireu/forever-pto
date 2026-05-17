@@ -48,10 +48,10 @@ const viewAllTextVariants = {
   expanded: { opacity: 1, y: 0, pointerEvents: 'auto' },
 };
 
-export function FeatureList({ features, categoryLabel, detailedViewLabel }: FeatureListProps) {
+export function FeatureList({ features, categoryLabel, detailedViewLabel }: Readonly<FeatureListProps>) {
   return (
     <m.div
-      className='bg-card border-[3px] border-[var(--frame)] rounded-[14px] p-4 w-full space-y-3 shadow-[var(--shadow-brutal-md)]'
+      className='bg-card border-[3px] border-(--frame) rounded-[14px] p-4 w-full space-y-3 shadow-(--shadow-brutal-md)'
       initial='collapsed'
       whileHover='expanded'
       whileTap='expanded'
@@ -60,7 +60,7 @@ export function FeatureList({ features, categoryLabel, detailedViewLabel }: Feat
         {features.map((feature, i) => (
           <m.div
             key={feature.id}
-            className='border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] rounded-[10px] px-4 py-3 relative shadow-[var(--shadow-brutal-xs)]'
+            className='border-[3px] border-(--frame) bg-(--surface-panel-soft) rounded-xl px-4 py-3 relative shadow-(--shadow-brutal-xs)'
             variants={getCardVariants(i)}
             transition={transition}
             style={{
@@ -83,7 +83,7 @@ export function FeatureList({ features, categoryLabel, detailedViewLabel }: Feat
       </div>
 
       <div className='flex items-center gap-2'>
-        <div className='size-6 rounded-full border-[2px] border-[var(--frame)] bg-[var(--accent)] text-[var(--color-brand-ink)] text-xs flex items-center justify-center font-black'>
+        <div className='size-6 rounded-full border-2 border-(--frame) bg-accent text-(--color-brand-ink) text-xs flex items-center justify-center font-black'>
           {features.length}
         </div>
         <span className='grid'>

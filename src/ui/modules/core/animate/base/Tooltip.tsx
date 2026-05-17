@@ -16,13 +16,13 @@ import {
 
 type TooltipProviderProps = TooltipProviderPrimitiveProps & { delayDuration?: number };
 function TooltipProvider({ delay = 0, delayDuration, ...props }: TooltipProviderProps) {
-  const resolvedDelay = delayDuration !== undefined ? delayDuration : delay;
+  const resolvedDelay = delayDuration ?? delay;
   return <TooltipProviderPrimitive delay={resolvedDelay} {...props} />;
 }
 
 type TooltipProps = TooltipPrimitiveProps & { delay?: number; delayDuration?: number };
 function Tooltip({ delay = 0, delayDuration, ...props }: TooltipProps) {
-  const resolvedDelay = delayDuration !== undefined ? delayDuration : delay;
+  const resolvedDelay = delayDuration ?? delay;
   return (
     <TooltipProvider delay={resolvedDelay}>
       <TooltipPrimitive {...props} />
@@ -42,13 +42,13 @@ function TooltipContent({ className, sideOffset = 4, children, style, ...props }
       <TooltipPositionerPrimitive sideOffset={sideOffset} className='z-50' {...props}>
         <TooltipPopupPrimitive
           className={cn(
-            'bg-primary text-primary-foreground w-fit origin-(--transform-origin) rounded-[8px] border-[3px] border-[var(--frame)] px-3 py-2 text-xs font-bold text-balance shadow-[var(--shadow-brutal-3-accent)]',
+            'bg-primary text-primary-foreground w-fit origin-(--transform-origin) rounded-[8px] border-[3px] border-(--frame) px-3 py-2 text-xs font-bold text-balance shadow-(--shadow-brutal-3-accent)',
             className
           )}
           style={style}
         >
           {children}
-          <TooltipArrowPrimitive className="bg-primary fill-primary z-50 size-2.5 border-[3px] border-[var(--frame)] data-[side='bottom']:-top-[4px] data-[side='right']:-left-[4px] data-[side='left']:-right-[4px] data-[side='inline-start']:-right-[4px] data-[side='inline-end']:-left-[4px] rotate-45 rounded-[2px]" />
+          <TooltipArrowPrimitive className="bg-primary fill-primary z-50 size-2.5 border-[3px] border-(--frame) data-[side='bottom']:-top-1 data-[side='right']:-left-1 data-[side='left']:-right-1 data-[side='inline-start']:-right-1 data-[side='inline-end']:-left-1 rotate-45 rounded-xs" />
         </TooltipPopupPrimitive>
       </TooltipPositionerPrimitive>
     </TooltipPortalPrimitive>
@@ -60,7 +60,7 @@ function TooltipInfoTrigger({ className, ...props }: TooltipInfoTriggerProps) {
   return (
     <TooltipTriggerPrimitive
       className={cn(
-        'ml-auto cursor-help shrink-0 size-5 grid place-items-center rounded-[5px] border-[2px] border-[var(--frame)] bg-[var(--accent)] text-[var(--color-brand-ink)] shadow-[var(--shadow-brutal-xs)] hover:-translate-x-px hover:-translate-y-px hover:shadow-[var(--shadow-brutal-3)] active:translate-x-px active:translate-y-px active:shadow-[var(--shadow-brutal-btn-active)] transition-[transform,box-shadow] duration-75',
+        'ml-auto cursor-help shrink-0 size-5 grid place-items-center rounded-[5px] border-2 border-(--frame) bg-accent text-(--color-brand-ink) shadow-(--shadow-brutal-xs) hover:-translate-x-px hover:-translate-y-px hover:shadow-(--shadow-brutal-3) active:translate-x-px active:translate-y-px active:shadow-(--shadow-brutal-btn-active) transition-[transform,box-shadow] duration-75',
         className
       )}
       {...props}

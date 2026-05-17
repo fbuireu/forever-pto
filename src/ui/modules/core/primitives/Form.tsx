@@ -2,7 +2,7 @@
 
 import { Label } from '@ui/modules/core/primitives/Label';
 import { cn } from '@ui/utils/cn';
-import { type ComponentProps, createContext, use, useId } from 'react';
+import { type ComponentProps, createContext, use, useId, useMemo } from 'react';
 import {
   Controller,
   type ControllerProps,
@@ -37,8 +37,9 @@ const FormField = <
 >({
   ...props
 }: ControllerProps<TFieldValues, TName>) => {
+  const fieldContextValue = useMemo(() => ({ name: props.name }), [props.name]);
   return (
-    <FormFieldContext.Provider value={{ name: props.name }}>
+    <FormFieldContext.Provider value={fieldContextValue}>
       <Controller {...props} />
     </FormFieldContext.Provider>
   );
@@ -70,8 +71,9 @@ const useFormField = () => {
 function FormItem({ className, ...props }: ComponentProps<'div'>) {
   const id = useId();
 
+  const itemContextValue = useMemo(() => ({ id }), [id]);
   return (
-    <FormItemContext.Provider value={{ id }}>
+    <FormItemContext.Provider value={itemContextValue}>
       <div data-slot='form-item' className={cn('grid gap-2', className)} {...props} />
     </FormItemContext.Provider>
   );

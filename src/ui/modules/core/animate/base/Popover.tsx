@@ -39,14 +39,14 @@ function PopoverContent({
       <PopoverPositionerPrimitive
         align={align}
         sideOffset={sideOffset}
-        className={cn('z-[52]', positionerClassName)}
+        className={cn('z-52', positionerClassName)}
         {...props}
       >
         <PopoverPopupPrimitive
           initialFocus={initialFocus}
           finalFocus={finalFocus}
           className={cn(
-            'bg-popover text-popover-foreground w-72 rounded-[12px] border-[3px] border-[var(--frame)] p-4 shadow-[var(--shadow-brutal-md)] outline-hidden origin-(--transform-origin)',
+            'bg-popover text-popover-foreground w-72 rounded-[12px] border-[3px] border-(--frame) p-4 shadow-(--shadow-brutal-md) outline-hidden origin-(--transform-origin)',
             className
           )}
           style={style}

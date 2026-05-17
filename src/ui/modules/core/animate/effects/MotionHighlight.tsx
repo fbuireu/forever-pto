@@ -141,7 +141,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
   const safeSetActiveValue = useCallback(
     (id: T | null) => {
       setActiveValue((prev) => (prev === id ? prev : id));
-      if (id !== activeValue) onValueChange?.(id as T);
+      if (id !== activeValue) onValueChange?.(id);
     },
     [activeValue, onValueChange]
   );
@@ -167,8 +167,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
 
       setBoundsState((prev) => {
         if (
-          prev &&
-          prev.top === newBounds.top &&
+          prev?.top === newBounds.top &&
           prev.left === newBounds.left &&
           prev.width === newBounds.width &&
           prev.height === newBounds.height
@@ -292,24 +291,24 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
     ]
   );
 
+  const wrappedChildren = controlledItems
+    ? render(children)
+    : render(
+        Children.toArray(children).reduce<React.ReactElement[]>((acc, child) => {
+          if (isValidElement(child)) {
+            acc.push(
+              <MotionHighlightItem key={child.key ?? undefined} className={itemsClassName}>
+                {child}
+              </MotionHighlightItem>
+            );
+          }
+          return acc;
+        }, [])
+      );
+
   return (
     <MotionHighlightContext.Provider value={contextValue}>
-      {enabled
-        ? controlledItems
-          ? render(children)
-          : render(
-              Children.toArray(children).reduce<React.ReactElement[]>((acc, child) => {
-                if (isValidElement(child)) {
-                  acc.push(
-                    <MotionHighlightItem key={child.key ?? undefined} className={itemsClassName}>
-                      {child}
-                    </MotionHighlightItem>
-                  );
-                }
-                return acc;
-              }, [])
-            )
-        : children}
+      {enabled ? wrappedChildren : children}
     </MotionHighlightContext.Provider>
   );
 }
@@ -400,8 +399,7 @@ function MotionHighlightItem({
 
       if (shouldUpdateBounds) {
         if (
-          previousBounds &&
-          previousBounds.top === bounds.top &&
+          previousBounds?.top === bounds.top &&
           previousBounds.left === bounds.left &&
           previousBounds.width === bounds.width &&
           previousBounds.height === bounds.height
@@ -499,7 +497,7 @@ function MotionHighlightItem({
             )}
           </AnimatePresence>
 
-          <div data-slot='motion-highlight-item' className={cn('relative z-[1]', className)} {...dataAttributes}>
+          <div data-slot='motion-highlight-item' className={cn('relative z-1', className)} {...dataAttributes}>
             {children}
           </div>
         </>

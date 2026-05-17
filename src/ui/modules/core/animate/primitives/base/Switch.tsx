@@ -11,7 +11,7 @@ import {
   type TargetAndTransition,
   type VariantLabels,
 } from 'motion/react';
-import { type ComponentProps, useState } from 'react';
+import { type ComponentProps, useMemo, useState } from 'react';
 
 type SwitchContextType = {
   isChecked: boolean;
@@ -52,8 +52,12 @@ function Switch({
 
   const switchChildren = children ?? <SwitchThumb />;
 
+  const switchContextValue = useMemo(
+    () => ({ isChecked, setIsChecked, isPressed, setIsPressed }),
+    [isChecked, setIsChecked, isPressed, setIsPressed]
+  );
   return (
-    <SwitchProvider value={{ isChecked, setIsChecked, isPressed, setIsPressed }}>
+    <SwitchProvider value={switchContextValue}>
       <SwitchPrimitives.Root
         name={name}
         defaultChecked={defaultChecked}
