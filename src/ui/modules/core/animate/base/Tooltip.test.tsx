@@ -1,30 +1,30 @@
 import { render } from '@testing-library/react';
-import type React from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../primitives/base/Tooltip', () => ({
-  TooltipProvider: ({ children, delay, ...props }: React.ComponentProps<'div'> & { delay?: number }) => (
+  TooltipProvider: ({ children, delay, ...props }: ComponentProps<'div'> & { delay?: number }) => (
     <div data-primitive='tooltip-provider' data-delay={delay} {...props}>
       {children}
     </div>
   ),
-  Tooltip: ({ children, ...props }: React.ComponentProps<'div'>) => (
+  Tooltip: ({ children, ...props }: ComponentProps<'div'>) => (
     <div data-primitive='tooltip' {...props}>
       {children}
     </div>
   ),
-  TooltipTrigger: ({ children, ...props }: React.ComponentProps<'button'>) => (
+  TooltipTrigger: ({ children, ...props }: ComponentProps<'button'>) => (
     <button data-primitive='tooltip-trigger' {...props}>
       {children}
     </button>
   ),
-  TooltipPortal: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+  TooltipPortal: ({ children }: { children?: ReactNode }) => <>{children}</>,
   TooltipPositioner: ({
     children,
     sideOffset,
     className,
     ...props
-  }: React.ComponentProps<'div'> & { sideOffset?: number }) => (
+  }: ComponentProps<'div'> & { sideOffset?: number }) => (
     <div data-primitive='tooltip-positioner' data-side-offset={sideOffset} className={className} {...props}>
       {children}
     </div>
@@ -34,12 +34,12 @@ vi.mock('../primitives/base/Tooltip', () => ({
     className,
     style,
     ...props
-  }: React.ComponentProps<'div'>) => (
+  }: ComponentProps<'div'>) => (
     <div data-primitive='tooltip-popup' className={className} style={style} {...props}>
       {children}
     </div>
   ),
-  TooltipArrow: (props: React.ComponentProps<'div'>) => <div data-primitive='tooltip-arrow' {...props} />,
+  TooltipArrow: (props: ComponentProps<'div'>) => <div data-primitive='tooltip-arrow' {...props} />,
 }));
 
 import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider, TooltipTrigger } from './Tooltip';

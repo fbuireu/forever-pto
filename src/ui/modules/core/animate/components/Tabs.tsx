@@ -3,8 +3,7 @@
 import { AutoHeight } from '@ui/modules/core/animate/effects/AutoHeight';
 import { cn } from '@ui/utils/cn';
 import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
-import * as React from 'react';
-import { createContext, use, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { type ComponentProps, type ReactElement, type ReactNode, Children, cloneElement, createContext, isValidElement, use, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { MotionHighlight, MotionHighlightItem } from '../effects/MotionHighlight';
 
 type TabsContextType = {
@@ -20,7 +19,7 @@ function useTabs() {
   return ctx;
 }
 
-type TabsProps = React.ComponentProps<'div'> & {
+type TabsProps = ComponentProps<'div'> & {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
@@ -51,7 +50,7 @@ function Tabs({ defaultValue, value, onValueChange, children, className, ...prop
 }
 
 type TabsHighlightProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   activeClassName?: string;
   transition?: Transition;
 };
@@ -78,7 +77,7 @@ function TabsHighlight({
   );
 }
 
-type TabsListProps = React.ComponentProps<'div'>;
+type TabsListProps = ComponentProps<'div'>;
 
 function TabsList({ children, className, ...props }: TabsListProps) {
   return (
@@ -98,7 +97,7 @@ function TabsList({ children, className, ...props }: TabsListProps) {
 
 type TabsHighlightItemProps = {
   value: string;
-  children: React.ReactElement;
+  children: ReactElement;
   className?: string;
 };
 
@@ -137,7 +136,7 @@ function TabsTrigger({ ref, value, children, className, ...props }: TabsTriggerP
 }
 
 type TabsContentsProps = Omit<HTMLMotionProps<'div'>, 'children' | 'transition'> & {
-  children?: React.ReactNode;
+  children?: ReactNode;
   mode?: 'auto-height' | 'layout';
   transition?: Transition;
 };
@@ -150,20 +149,34 @@ function TabsContents({
   ...props
 }: TabsContentsProps) {
   const { activeValue } = useTabs();
-  const activeChild = React.Children.toArray(children).find(
-    (child): child is React.ReactElement<TabsContentProps> =>
-      React.isValidElement<TabsContentProps>(child) && child.props.value === activeValue
+  const childrenArray = Children.toArray(children);
+  const allValues = childrenArray.map((child) =>
+    isValidElement<TabsContentProps>(child) ? child.props.value : ''
+  );
+  const activeIndex = allValues.indexOf(activeValue);
+
+  const prevValueRef = useRef(activeValue);
+  const prevIndex = allValues.indexOf(prevValueRef.current);
+  const direction = activeIndex >= prevIndex ? 1 : -1;
+
+  useEffect(() => {
+    prevValueRef.current = activeValue;
+  }, [activeValue]);
+
+  const activeChild = childrenArray.find(
+    (child): child is ReactElement<TabsContentProps> =>
+      isValidElement<TabsContentProps>(child) && child.props.value === activeValue
   );
 
   const content = (
-    <AnimatePresence initial={false} mode='wait'>
-      {activeChild ? React.cloneElement(activeChild, { key: activeValue }) : null}
+    <AnimatePresence initial={false} mode='wait' custom={direction}>
+      {activeChild ? cloneElement(activeChild, { key: activeValue, custom: direction }) : null}
     </AnimatePresence>
   );
 
   if (mode === 'layout') {
     return (
-      <m.div data-slot='tabs-contents' layout className={cn(className)} transition={transition} {...props}>
+      <m.div data-slot='tabs-contents' layout className={cn('overflow-hidden', className)} transition={transition} {...props}>
         {content}
       </m.div>
     );
@@ -172,7 +185,7 @@ function TabsContents({
   return (
     <AutoHeight
       data-slot='tabs-contents'
-      className={cn(className)}
+      className={cn('overflow-hidden', className)}
       deps={[activeValue]}
       transition={transition}
       {...props}
@@ -187,20 +200,27 @@ type TabsContentProps = Omit<HTMLMotionProps<'div'>, 'value'> & {
   transition?: Transition;
 };
 
+const tabsContentVariants = {
+  enter: (dir: number) => ({ x: `${dir * 100}%`, opacity: 0, filter: 'blur(4px)' }),
+  center: { x: '0%', opacity: 1, filter: 'blur(0px)' },
+  exit: (dir: number) => ({ x: `${dir * -100}%`, opacity: 0, filter: 'blur(4px)' }),
+};
+
 function TabsContent({
   value: _value,
   children,
   className,
-  transition = { duration: 0.22, ease: 'easeOut' },
+  transition = { type: 'spring', stiffness: 300, damping: 30, bounce: 0 },
   ...props
 }: TabsContentProps) {
   return (
     <m.div
       role='tabpanel'
       data-slot='tabs-content'
-      initial={{ opacity: 0, filter: 'blur(4px)' }}
-      animate={{ opacity: 1, filter: 'blur(0px)' }}
-      exit={{ opacity: 0, filter: 'blur(4px)' }}
+      variants={tabsContentVariants}
+      initial='enter'
+      animate='center'
+      exit='exit'
       transition={transition}
       className={cn('outline-none', className)}
       {...props}

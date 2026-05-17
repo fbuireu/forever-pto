@@ -3,7 +3,7 @@
 import { cn } from '@ui/utils/cn';
 import { type LucideIcon, MousePointer2 } from 'lucide-react';
 import { m, type SVGMotionProps, type Transition, type Variants } from 'motion/react';
-import * as React from 'react';
+import { type ComponentType, type HTMLAttributes, useCallback, useMemo, useRef, useState } from 'react';
 
 type RadialNavProps = {
   size?: number;
@@ -11,15 +11,15 @@ type RadialNavProps = {
   menuButtonConfig?: MenuButtonConfig;
   defaultActiveId?: number;
   onActiveChange?: (id: number) => void;
-} & React.HTMLAttributes<HTMLDivElement>;
+} & HTMLAttributes<HTMLDivElement>;
 
 type RadialNavItem = {
   id: number;
-  icon: LucideIcon | React.ComponentType<SVGMotionProps<SVGSVGElement>>;
+  icon: LucideIcon | ComponentType<SVGMotionProps<SVGSVGElement>>;
   label: string;
   angle: number;
   badgeClass?: string;
-} & React.HTMLAttributes<HTMLDivElement>;
+} & HTMLAttributes<HTMLDivElement>;
 
 type MenuButtonConfig = {
   iconSize?: number;
@@ -107,8 +107,8 @@ function toNearestTurn(prev: number | undefined, target: number) {
 }
 
 function useShortestRotation(target: number) {
-  const prevRef = React.useRef<number | undefined>(undefined);
-  return React.useMemo(() => {
+  const prevRef = useRef<number | undefined>(undefined);
+  return useMemo(() => {
     const next = toNearestTurn(prevRef.current, target);
     prevRef.current = next;
     return next;
@@ -176,9 +176,9 @@ function MenuButton({ item, isActive, onActivate, menuButtonConfig }: MenuButton
 
 function RadialNav({ size = 180, items, menuButtonConfig, defaultActiveId, onActiveChange }: RadialNavProps) {
   const orbitRadius = size / 2 - 0.5;
-  const [activeId, setActiveId] = React.useState<number | null>(defaultActiveId ?? null);
+  const [activeId, setActiveId] = useState<number | null>(defaultActiveId ?? null);
 
-  const handleActivate = React.useCallback(
+  const handleActivate = useCallback(
     (id: number) => {
       setActiveId(id);
       onActiveChange?.(id);

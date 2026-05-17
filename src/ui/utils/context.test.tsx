@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react';
-import type React from 'react';
+import type { ReactNode } from 'react';
 import { describe, expect, it } from 'vitest';
 import { getStrictContext } from './context';
 
@@ -12,7 +12,7 @@ describe('getStrictContext', () => {
 
   it('provides the value to consumers', () => {
     const [Provider, useCtx] = getStrictContext<number>();
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
+    const wrapper = ({ children }: { children: ReactNode }) => (
       <Provider value={42}>{children}</Provider>
     );
     const { result } = renderHook(() => useCtx(), { wrapper });
@@ -31,7 +31,7 @@ describe('getStrictContext', () => {
 
   it('works with object values', () => {
     const [Provider, useCtx] = getStrictContext<{ count: number }>();
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
+    const wrapper = ({ children }: { children: ReactNode }) => (
       <Provider value={{ count: 7 }}>{children}</Provider>
     );
     const { result } = renderHook(() => useCtx(), { wrapper });
@@ -41,7 +41,7 @@ describe('getStrictContext', () => {
   it('each call to getStrictContext creates an independent context', () => {
     const [ProviderA, useCtxA] = getStrictContext<string>();
     const [ProviderB, useCtxB] = getStrictContext<string>();
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
+    const wrapper = ({ children }: { children: ReactNode }) => (
       <ProviderA value='alpha'>
         <ProviderB value='beta'>{children}</ProviderB>
       </ProviderA>

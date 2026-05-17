@@ -1,10 +1,11 @@
+import type { ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { getTranslations } from 'next-intl/server';
 
 interface LegalLayoutProps {
   title: string;
   lastUpdated: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const LegalLayout = async ({ title, lastUpdated, children }: LegalLayoutProps) => {

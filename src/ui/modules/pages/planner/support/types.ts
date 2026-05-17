@@ -1,9 +1,9 @@
-import type React from 'react';
+import type { ReactNode } from 'react';
 
 type FaqItem = {
   id: string;
   question: string;
-  answer: string | React.ReactNode;
+  answer: string | ReactNode;
 };
 
 type FaqSection = {

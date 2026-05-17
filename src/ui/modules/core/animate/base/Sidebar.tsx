@@ -7,7 +7,7 @@ import { cn } from '@ui/utils/cn';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { AnimatePresence, m, type Transition } from 'motion/react';
-import { createContext, use, useCallback, useEffect, useMemo, useState } from 'react';
+import { type ComponentProps, type CSSProperties, type MouseEvent, createContext, use, useCallback, useEffect, useMemo, useState } from 'react';
 import { MotionHighlight, MotionHighlightItem } from '../effects/MotionHighlight';
 import { PanelLeftIcon } from '../icons/PanelLeft';
 import { Slot } from './Slot';
@@ -41,7 +41,7 @@ function useSidebar() {
   return context;
 }
 
-type SidebarProviderProps = React.ComponentProps<'div'> & {
+type SidebarProviderProps = ComponentProps<'div'> & {
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -123,7 +123,7 @@ function SidebarProvider({
               '--sidebar-width': SIDEBAR_WIDTH,
               '--sidebar-width-icon': SIDEBAR_WIDTH_ICON,
               ...style,
-            } as React.CSSProperties
+            } as CSSProperties
           }
           className={cn(' group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full', className)}
           {...props}
@@ -135,7 +135,7 @@ function SidebarProvider({
   );
 }
 
-type SidebarProps = React.ComponentProps<'div'> & {
+type SidebarProps = ComponentProps<'div'> & {
   side?: 'left' | 'right';
   variant?: 'sidebar' | 'floating' | 'inset';
   collapsible?: 'offcanvas' | 'icon' | 'none';
@@ -212,7 +212,7 @@ function Sidebar({
                 'bg-sidebar text-sidebar-foreground fixed inset-y-0 z-51 flex h-full flex-col border-[3px] border-(--frame) shadow-(--shadow-brutal-xl)',
                 side === 'right' ? 'right-0 rounded-l-[14px]' : 'left-0 rounded-r-[14px]'
               )}
-              style={{ '--sidebar-width': SIDEBAR_WIDTH_MOBILE, width: 'var(--sidebar-width)' } as React.CSSProperties}
+              style={{ '--sidebar-width': SIDEBAR_WIDTH_MOBILE, width: 'var(--sidebar-width)' } as CSSProperties}
               initial={{ x: side === 'right' ? '100%' : '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: side === 'right' ? '100%' : '-100%' }}
@@ -287,7 +287,7 @@ function Sidebar({
   );
 }
 
-type SidebarTriggerProps = React.ComponentProps<typeof Button>;
+type SidebarTriggerProps = ComponentProps<typeof Button>;
 
 function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
   const { toggleSidebar } = useSidebar();
@@ -314,7 +314,7 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
   );
 }
 
-type SidebarInsetProps = React.ComponentProps<'main'>;
+type SidebarInsetProps = ComponentProps<'main'>;
 
 function SidebarInset({ className, ...props }: SidebarInsetProps) {
   return (
@@ -330,7 +330,7 @@ function SidebarInset({ className, ...props }: SidebarInsetProps) {
   );
 }
 
-type SidebarHeaderProps = React.ComponentProps<'div'>;
+type SidebarHeaderProps = ComponentProps<'div'>;
 
 function SidebarHeader({ className, ...props }: SidebarHeaderProps) {
   return (
@@ -343,7 +343,7 @@ function SidebarHeader({ className, ...props }: SidebarHeaderProps) {
   );
 }
 
-type SidebarFooterProps = React.ComponentProps<'div'>;
+type SidebarFooterProps = ComponentProps<'div'>;
 
 function SidebarFooter({ className, ...props }: SidebarFooterProps) {
   return (
@@ -356,7 +356,7 @@ function SidebarFooter({ className, ...props }: SidebarFooterProps) {
   );
 }
 
-type SidebarContentProps = React.ComponentProps<'div'>;
+type SidebarContentProps = ComponentProps<'div'>;
 
 function SidebarContent({ className, ...props }: SidebarContentProps) {
   return (
@@ -372,7 +372,7 @@ function SidebarContent({ className, ...props }: SidebarContentProps) {
   );
 }
 
-type SidebarGroupProps = React.ComponentProps<'div'>;
+type SidebarGroupProps = ComponentProps<'div'>;
 
 function SidebarGroup({ className, ...props }: SidebarGroupProps) {
   return (
@@ -388,7 +388,7 @@ function SidebarGroup({ className, ...props }: SidebarGroupProps) {
   );
 }
 
-type SidebarGroupLabelProps = React.ComponentProps<'div'> & {
+type SidebarGroupLabelProps = ComponentProps<'div'> & {
   asChild?: boolean;
 };
 
@@ -409,7 +409,7 @@ function SidebarGroupLabel({ className, asChild = false, ...props }: SidebarGrou
   );
 }
 
-type SidebarMenuProps = React.ComponentProps<'ul'>;
+type SidebarMenuProps = ComponentProps<'ul'>;
 
 function SidebarMenu({ className, ...props }: SidebarMenuProps) {
   return (
@@ -422,7 +422,7 @@ function SidebarMenu({ className, ...props }: SidebarMenuProps) {
   );
 }
 
-type SidebarMenuItemProps = React.ComponentProps<'li'>;
+type SidebarMenuItemProps = ComponentProps<'li'>;
 
 function SidebarMenuItem({ className, ...props }: SidebarMenuItemProps) {
   return (
@@ -471,10 +471,10 @@ const sidebarMenuButtonActiveVariants = cva('', {
   },
 });
 
-type SidebarMenuButtonProps = React.ComponentProps<'button'> & {
+type SidebarMenuButtonProps = ComponentProps<'button'> & {
   asChild?: boolean;
   isActive?: boolean;
-  tooltip?: string | React.ComponentProps<typeof TooltipContent>;
+  tooltip?: string | ComponentProps<typeof TooltipContent>;
 } & VariantProps<typeof sidebarMenuButtonVariants>;
 
 function SidebarMenuButton({
@@ -489,7 +489,7 @@ function SidebarMenuButton({
   const Comp = asChild ? Slot : 'button';
   const { isMobile, state, setOpen } = useSidebar();
 
-  const expandAndForward = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const expandAndForward = (e: MouseEvent<HTMLButtonElement>) => {
     if (state === 'collapsed' && !isMobile) setOpen(true);
     props.onClick?.(e);
   };

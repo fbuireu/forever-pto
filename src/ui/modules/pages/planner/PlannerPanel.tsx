@@ -98,7 +98,7 @@ function Alternatives({
 
   return (
     <div className='flex flex-wrap items-center gap-3' data-tutorial='alternatives-manager'>
-      <div className='flex shrink-0 grow items-stretch overflow-hidden rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-xs)]'>
+      <div className='flex shrink-0 grow items-stretch overflow-hidden rounded-xl border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-xs)]'>
         <m.button
           type='button'
           whileTap={{ filter: 'brightness(0.85)' }}

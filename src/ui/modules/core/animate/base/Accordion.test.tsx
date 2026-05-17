@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react';
-import type React from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-type MotionDivProps = React.ComponentProps<'div'> & {
+type MotionDivProps = ComponentProps<'div'> & {
   initial?: unknown;
   animate?: unknown;
   exit?: unknown;
@@ -17,7 +17,7 @@ vi.mock('motion/react', async () => {
       div: ({ children, initial: _i, animate: _a, exit: _e, transition: _t, layout: _l, style, ...props }: MotionDivProps) =>
         createElement('div', { style, ...props }, children),
     },
-    AnimatePresence: ({ children }: { children?: React.ReactNode }) => createElement(Fragment, null, children),
+    AnimatePresence: ({ children }: { children?: ReactNode }) => createElement(Fragment, null, children),
   };
 });
 
@@ -25,16 +25,16 @@ vi.mock('@base-ui/react/accordion', async () => {
   const { createElement, forwardRef } = await import('react');
   return {
     Accordion: {
-      Root: ({ children, ...props }: React.ComponentProps<'div'>) =>
+      Root: ({ children, ...props }: ComponentProps<'div'>) =>
         createElement('div', { 'data-slot': 'accordion', ...props }, children),
-      Item: ({ children, ...props }: React.ComponentProps<'div'>) =>
+      Item: ({ children, ...props }: ComponentProps<'div'>) =>
         createElement('div', { 'data-slot': 'accordion-item', ...props }, children),
-      Header: ({ children, ...props }: React.ComponentProps<'div'>) =>
+      Header: ({ children, ...props }: ComponentProps<'div'>) =>
         createElement('div', { 'data-slot': 'accordion-header', ...props }, children),
-      Trigger: forwardRef<HTMLButtonElement, React.ComponentProps<'button'>>(({ children, ...props }, ref) =>
+      Trigger: forwardRef<HTMLButtonElement, ComponentProps<'button'>>(({ children, ...props }, ref) =>
         createElement('button', { ref, 'data-slot': 'accordion-trigger', ...props }, children)
       ),
-      Panel: ({ children, ...props }: React.ComponentProps<'div'> & { render?: unknown; keepMounted?: boolean; hidden?: boolean }) =>
+      Panel: ({ children, ...props }: ComponentProps<'div'> & { render?: unknown; keepMounted?: boolean; hidden?: boolean }) =>
         createElement('div', { 'data-slot': 'accordion-panel', ...props }, children),
     },
   };

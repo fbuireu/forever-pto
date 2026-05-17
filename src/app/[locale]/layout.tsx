@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { LOCALES } from '@infrastructure/i18n/locales';
 import { BonesProvider } from '@ui/modules/providers/BonesProvider';
 import { CookieConsentClient } from '@ui/modules/shared/cookie-consent/CookieConsentClient';
@@ -14,7 +15,7 @@ import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 interface LayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
   params: Promise<{ locale: Locale }>;
 }
 

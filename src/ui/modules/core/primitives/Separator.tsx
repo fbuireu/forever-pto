@@ -1,7 +1,7 @@
 import { cn } from '@ui/utils/cn';
-import type * as React from 'react';
+import type { ComponentProps } from 'react';
 
-interface SeparatorProps extends React.ComponentProps<'div'> {
+interface SeparatorProps extends ComponentProps<'div'> {
   orientation?: 'horizontal' | 'vertical';
   decorative?: boolean;
 }

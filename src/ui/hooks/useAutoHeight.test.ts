@@ -1,3 +1,4 @@
+import type { RefObject } from 'react';
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useAutoHeight } from './useAutoHeight';
@@ -26,7 +27,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const attachRef = (result: { ref: React.RefObject<HTMLElement | null> }) => {
+const attachRef = (result: { ref: RefObject<HTMLElement | null> }) => {
   const el = document.createElement('div');
   document.body.appendChild(el);
   result.ref.current = el;

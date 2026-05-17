@@ -10,7 +10,7 @@ import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { Effect } from 'effect';
 import { Download, FileText } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useState, useTransition } from 'react';
+import { type ReactNode, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -41,7 +41,7 @@ function pdfExportEffect({ filename, ...docProps }: PdfExportParams) {
   }).pipe(Effect.scoped);
 }
 
-function BoldText(chunks: React.ReactNode) {
+function BoldText(chunks: ReactNode) {
   return <strong className='font-black text-foreground'>{chunks}</strong>;
 }
 

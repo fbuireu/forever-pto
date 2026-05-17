@@ -4,6 +4,11 @@ import { cn } from '@ui/utils/cn';
 import type { Transition } from 'motion/react';
 import { AnimatePresence, m } from 'motion/react';
 import {
+  type ComponentProps,
+  type MouseEvent,
+  type ReactElement,
+  type ReactNode,
+  type Ref,
   Children,
   cloneElement,
   createContext,
@@ -79,13 +84,13 @@ type ControlledParentModeMotionHighlightProps<T extends string> = BaseMotionHigh
   ParentModeMotionHighlightProps & {
     mode: 'parent';
     controlledItems: true;
-    children: React.ReactNode;
+    children: ReactNode;
   };
 
 type ControlledChildrenModeMotionHighlightProps<T extends string> = BaseMotionHighlightProps<T> & {
   mode?: 'children' | undefined;
   controlledItems: true;
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 type UncontrolledParentModeMotionHighlightProps<T extends string> = BaseMotionHighlightProps<T> &
@@ -93,17 +98,17 @@ type UncontrolledParentModeMotionHighlightProps<T extends string> = BaseMotionHi
     mode: 'parent';
     controlledItems?: false;
     itemsClassName?: string;
-    children: React.ReactElement | React.ReactElement[];
+    children: ReactElement | ReactElement[];
   };
 
 type UncontrolledChildrenModeMotionHighlightProps<T extends string> = BaseMotionHighlightProps<T> & {
   mode?: 'children';
   controlledItems?: false;
   itemsClassName?: string;
-  children: React.ReactElement | React.ReactElement[];
+  children: ReactElement | ReactElement[];
 };
 
-type MotionHighlightProps<T extends string> = React.ComponentProps<'div'> &
+type MotionHighlightProps<T extends string> = ComponentProps<'div'> &
   (
     | ControlledParentModeMotionHighlightProps<T>
     | ControlledChildrenModeMotionHighlightProps<T>
@@ -211,7 +216,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
   }, [mode, activeValue]);
 
   const render = useCallback(
-    (children: React.ReactNode) => {
+    (children: ReactNode) => {
       if (mode === 'parent') {
         return (
           <div ref={localRef} data-slot='motion-highlight-container' className={cn('relative', containerClassName)}>
@@ -294,7 +299,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
   const wrappedChildren = controlledItems
     ? render(children)
     : render(
-        Children.toArray(children).reduce<React.ReactElement[]>((acc, child) => {
+        Children.toArray(children).reduce<ReactElement[]>((acc, child) => {
           if (isValidElement(child)) {
             acc.push(
               <MotionHighlightItem key={child.key ?? undefined} className={itemsClassName}>
@@ -313,7 +318,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
   );
 }
 
-function getNonOverridingDataAttributes(element: React.ReactElement, dataAttributes: Record<string, unknown>) {
+function getNonOverridingDataAttributes(element: ReactElement, dataAttributes: Record<string, unknown>) {
   return Object.keys(dataAttributes).reduce<Record<string, unknown>>((acc, key) => {
     if ((element.props as Record<string, unknown>)[key] === undefined) {
       acc[key] = dataAttributes[key];
@@ -322,9 +327,9 @@ function getNonOverridingDataAttributes(element: React.ReactElement, dataAttribu
   }, {});
 }
 
-type ExtendedChildProps = React.ComponentProps<'div'> & {
+type ExtendedChildProps = ComponentProps<'div'> & {
   id?: string;
-  ref?: React.Ref<HTMLElement>;
+  ref?: Ref<HTMLElement>;
   'data-active'?: string;
   'data-value'?: string;
   'data-disabled'?: boolean;
@@ -332,8 +337,8 @@ type ExtendedChildProps = React.ComponentProps<'div'> & {
   'data-slot'?: string;
 };
 
-type MotionHighlightItemProps = React.ComponentProps<'div'> & {
-  children: React.ReactElement;
+type MotionHighlightItemProps = ComponentProps<'div'> & {
+  children: ReactElement;
   id?: string;
   value?: string;
   className?: string;
@@ -377,7 +382,7 @@ function MotionHighlightItem({
     setActiveClassName,
   } = useMotionHighlight();
 
-  const element = children as React.ReactElement<ExtendedChildProps>;
+  const element = children as ReactElement<ExtendedChildProps>;
   const childValue = id ?? value ?? element.props?.['data-value'] ?? element.props?.id ?? itemId;
   const isActive = activeValue === childValue;
   const isDisabled = disabled ?? contextDisabled;
@@ -444,17 +449,17 @@ function MotionHighlightItem({
 
   const commonHandlers = hover
     ? {
-        onMouseEnter: (e: React.MouseEvent<HTMLDivElement>) => {
+        onMouseEnter: (e: MouseEvent<HTMLDivElement>) => {
           setActiveValue(childValue);
           element.props.onMouseEnter?.(e);
         },
-        onMouseLeave: (e: React.MouseEvent<HTMLDivElement>) => {
+        onMouseLeave: (e: MouseEvent<HTMLDivElement>) => {
           setActiveValue(null);
           element.props.onMouseLeave?.(e);
         },
       }
     : {
-        onClick: (e: React.MouseEvent<HTMLDivElement>) => {
+        onClick: (e: MouseEvent<HTMLDivElement>) => {
           setActiveValue(childValue);
           element.props.onClick?.(e);
         },

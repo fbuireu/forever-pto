@@ -9,7 +9,7 @@ import { RotatingText } from '@ui/modules/core/animate/text/Rotating';
 import { Me } from '@ui/modules/pages/legal/Me';
 import { Icon } from '@ui/modules/shared/Icon';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
 const EMOJIS: string[] = ['☕', '🍺', '❤️', '🚀', '⚡', '🔥', '💻', '🌮', '🍕', '🎵', '🎮', '😴', '🤯', '💡'];
 
@@ -81,7 +81,7 @@ export const DevFooter = () => {
             rel='noopener noreferrer'
             aria-label={`Visit my ${key.toLowerCase().replace('_', ' ')} profile`}
             className='inline-flex items-center justify-center min-w-11 min-h-11 transition-transform duration-200 hover:scale-110'
-            style={{ '--hover-color': network.COLOR } as React.CSSProperties & { '--hover-color': string }}
+            style={{ '--hover-color': network.COLOR } as CSSProperties & { '--hover-color': string }}
           >
             <Icon icon={network.ICON} size={24} className='transition-colors duration-200 hover:text-(--hover-color)' />
           </a>

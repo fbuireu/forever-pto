@@ -6,10 +6,10 @@ import { TableHeader as BaseTableHeader, TableHead, TableRow } from '@ui/modules
 import { cn } from '@ui/utils/cn';
 import { ArrowUpDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { memo } from 'react';
+import { type ReactNode, memo } from 'react';
 
 interface HolidayTableHeaderProps {
-  selectAllButton: React.ReactNode;
+  selectAllButton: ReactNode;
   sortConfig: {
     key: keyof HolidayDTO | null;
     direction: 'asc' | 'desc';
@@ -18,7 +18,7 @@ interface HolidayTableHeaderProps {
 }
 
 interface TableHeaderProps {
-  children: React.ReactNode;
+  children: ReactNode;
   sortKey: keyof HolidayDTO;
   currentSort: { key: keyof HolidayDTO | null; direction: 'asc' | 'desc' };
   onSort: (key: keyof HolidayDTO) => void;

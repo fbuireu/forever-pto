@@ -3,8 +3,7 @@
 import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible';
 import { cn } from '@ui/utils/cn';
 import { type HTMLMotionProps, m, type Transition } from 'motion/react';
-import * as React from 'react';
-import { createContext, use, useCallback, useMemo, useState } from 'react';
+import { type ComponentProps, type ComponentPropsWithoutRef, type ReactElement, createContext, isValidElement, use, useCallback, useEffect, useMemo, useState } from 'react';
 
 type CollapsibleContextType = {
   isOpen: boolean;
@@ -20,12 +19,12 @@ const _useCollapsible = () => {
   return context;
 };
 
-type CollapsibleProps = React.ComponentProps<typeof CollapsiblePrimitive.Root>;
+type CollapsibleProps = ComponentProps<typeof CollapsiblePrimitive.Root>;
 
 function Collapsible({ children, ...props }: CollapsibleProps) {
   const [isOpen, setIsOpen] = useState(props?.open ?? props?.defaultOpen ?? false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (props?.open !== undefined) setIsOpen(props.open);
   }, [props?.open]);
 
@@ -47,14 +46,14 @@ function Collapsible({ children, ...props }: CollapsibleProps) {
   );
 }
 
-type CollapsibleTriggerProps = React.ComponentProps<typeof CollapsiblePrimitive.Trigger> & { asChild?: boolean };
+type CollapsibleTriggerProps = ComponentProps<typeof CollapsiblePrimitive.Trigger> & { asChild?: boolean };
 
 function CollapsibleTrigger({ asChild, children, className, ...props }: CollapsibleTriggerProps) {
-  if (asChild && React.isValidElement(children)) {
+  if (asChild && isValidElement(children)) {
     return (
       <CollapsiblePrimitive.Trigger
         data-slot='collapsible-trigger'
-        render={children as React.ReactElement}
+        render={children as ReactElement}
         {...props}
       />
     );
@@ -77,7 +76,7 @@ function CollapsibleTrigger({ asChild, children, className, ...props }: Collapsi
   );
 }
 
-type CollapsibleContentProps = Omit<React.ComponentProps<typeof CollapsiblePrimitive.Panel>, 'render'> &
+type CollapsibleContentProps = Omit<ComponentProps<typeof CollapsiblePrimitive.Panel>, 'render'> &
   HTMLMotionProps<'div'> & {
     transition?: Transition;
   };
@@ -92,7 +91,7 @@ function CollapsibleContent({
     <CollapsiblePrimitive.Panel
       keepMounted
       data-slot='collapsible-content'
-      render={(panelProps: React.ComponentPropsWithoutRef<'div'> & { hidden?: boolean }, state: { open: boolean }) => {
+      render={(panelProps: ComponentPropsWithoutRef<'div'> & { hidden?: boolean }, state: { open: boolean }) => {
         const {
           hidden: _hidden,
           style,
@@ -122,7 +121,7 @@ function CollapsibleContent({
           </m.div>
         );
       }}
-      {...(props as React.ComponentProps<typeof CollapsiblePrimitive.Panel>)}
+      {...(props as ComponentProps<typeof CollapsiblePrimitive.Panel>)}
     />
   );
 }

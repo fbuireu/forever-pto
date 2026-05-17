@@ -21,7 +21,7 @@ import dynamic from 'next/dynamic';
 import { cookies } from 'next/headers';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
-import { Suspense } from 'react';
+import { type ReactNode, Suspense } from 'react';
 import { Countries } from './components/Countries';
 import { PtoDays } from './components/PtoDays';
 import { SidebarCollapsibleGroup } from './components/SidebarCollapsibleGroup';
@@ -43,7 +43,7 @@ const STEP_CARD_CLASS =
   'bg-sidebar border-[3px] border-[var(--frame)] rounded-[14px] shadow-[var(--shadow-brutal-md)] p-[18px]';
 
 interface AppSidebarProps {
-  children: React.ReactNode;
+  children: ReactNode;
   locale: Locale;
 }
 

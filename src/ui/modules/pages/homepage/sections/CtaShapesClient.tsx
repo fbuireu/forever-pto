@@ -1,5 +1,6 @@
 'use client';
 
+import type { MouseEvent } from 'react';
 import { m, useMotionValue, useSpring, useTransform } from 'motion/react';
 
 type CtaShapesProps = {
@@ -35,7 +36,7 @@ export function CtaShapes({ byeMonday, bossOff, doNotDisturb, zeroRegrets }: Rea
   const x4 = useTransform(springX, [0, 1], [16, -16]);
   const y4 = useTransform(springY, [0, 1], [-8, 8]);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     rawX.set((e.clientX - rect.left) / rect.width);
     rawY.set((e.clientY - rect.top) / rect.height);

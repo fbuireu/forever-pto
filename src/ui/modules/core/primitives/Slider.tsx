@@ -2,7 +2,7 @@
 
 import { Slider as SliderPrimitive } from '@base-ui/react/slider';
 import { cn } from '@ui/utils/cn';
-import * as React from 'react';
+import { useCallback } from 'react';
 
 interface SliderProps {
   className?: string;
@@ -31,7 +31,7 @@ function Slider({
   ...props
 }: SliderProps) {
   // Normalize value: base-ui may pass number or readonly number[], consumers expect number[]
-  const handleValueChange = React.useCallback(
+  const handleValueChange = useCallback(
     (val: number | readonly number[]) => {
       if (!onValueChange) return;
       const normalized = Array.isArray(val) ? [...val] : [val as number];
@@ -40,7 +40,7 @@ function Slider({
     [onValueChange]
   );
 
-  const handleValueCommitted = React.useCallback(
+  const handleValueCommitted = useCallback(
     (val: number | readonly number[]) => {
       if (!onValueCommitted) return;
       const normalized = Array.isArray(val) ? [...val] : [val as number];

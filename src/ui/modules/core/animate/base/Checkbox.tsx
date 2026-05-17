@@ -3,9 +3,9 @@
 import { Checkbox as CheckboxPrimitive } from '@base-ui/react/checkbox';
 import { cn } from '@ui/utils/cn';
 import { type HTMLMotionProps, m } from 'motion/react';
-import { useCallback, useEffect, useState } from 'react';
+import { type ComponentProps, useCallback, useEffect, useState } from 'react';
 
-type CheckboxProps = Omit<React.ComponentProps<typeof CheckboxPrimitive.Root>, 'render'> & {
+type CheckboxProps = Omit<ComponentProps<typeof CheckboxPrimitive.Root>, 'render'> & {
   motionProps?: HTMLMotionProps<'button'>;
 };
 

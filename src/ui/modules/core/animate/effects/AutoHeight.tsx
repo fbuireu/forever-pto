@@ -2,13 +2,13 @@
 
 import { useAutoHeight } from '@ui/hooks/useAutoHeight';
 import { type HTMLMotionProps, m, type TargetAndTransition } from 'motion/react';
-import type * as React from 'react';
+import type { DependencyList, ReactNode } from 'react';
 import { MotionSlot, type WithAsChild } from '../primitives/animate/MotionSlot';
 
 type AutoHeightProps = WithAsChild<
   {
-    children: React.ReactNode;
-    deps?: React.DependencyList;
+    children: ReactNode;
+    deps?: DependencyList;
   } & Omit<HTMLMotionProps<'div'>, 'children'>
 >;
 
@@ -16,7 +16,7 @@ function isTargetAnimation(animate: HTMLMotionProps<'div'>['animate']): animate 
   return typeof animate === 'object' && animate !== null && !Array.isArray(animate) && !('start' in animate);
 }
 
-const EMPTY_DEPS: React.DependencyList = [];
+const EMPTY_DEPS: DependencyList = [];
 
 function AutoHeight({
   children,

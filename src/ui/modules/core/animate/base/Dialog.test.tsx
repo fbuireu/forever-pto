@@ -1,44 +1,44 @@
 import { render } from '@testing-library/react';
-import type React from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-type MockProps = { children?: React.ReactNode; className?: string };
+type MockProps = { children?: ReactNode; className?: string };
 
 vi.mock('../primitives/base/Dialog', () => ({
-  Dialog: ({ children, ...props }: React.ComponentProps<'div'>) => <div data-primitive='dialog' {...props}>{children}</div>,
-  DialogTrigger: ({ children, ...props }: React.ComponentProps<'button'>) => (
+  Dialog: ({ children, ...props }: ComponentProps<'div'>) => <div data-primitive='dialog' {...props}>{children}</div>,
+  DialogTrigger: ({ children, ...props }: ComponentProps<'button'>) => (
     <button data-primitive='dialog-trigger' {...props}>{children}</button>
   ),
   DialogPortal: ({ children }: MockProps) => <>{children}</>,
-  DialogBackdrop: ({ className, ...props }: React.ComponentProps<'div'>) => (
+  DialogBackdrop: ({ className, ...props }: ComponentProps<'div'>) => (
     <div data-primitive='dialog-backdrop' className={className} {...props} />
   ),
-  DialogPopup: ({ className, children, ...props }: React.ComponentProps<'div'>) => (
+  DialogPopup: ({ className, children, ...props }: ComponentProps<'div'>) => (
     <div data-primitive='dialog-popup' className={className} {...props}>
       {children}
     </div>
   ),
-  DialogClose: ({ children, className, ...props }: React.ComponentProps<'button'>) => (
+  DialogClose: ({ children, className, ...props }: ComponentProps<'button'>) => (
     <button data-primitive='dialog-close' className={className} {...props}>
       {children}
     </button>
   ),
-  DialogHeader: ({ children, className, ...props }: React.ComponentProps<'div'>) => (
+  DialogHeader: ({ children, className, ...props }: ComponentProps<'div'>) => (
     <div data-primitive='dialog-header' className={className} {...props}>
       {children}
     </div>
   ),
-  DialogFooter: ({ children, className, ...props }: React.ComponentProps<'div'>) => (
+  DialogFooter: ({ children, className, ...props }: ComponentProps<'div'>) => (
     <div data-primitive='dialog-footer' className={className} {...props}>
       {children}
     </div>
   ),
-  DialogTitle: ({ children, className, ...props }: React.ComponentProps<'div'>) => (
+  DialogTitle: ({ children, className, ...props }: ComponentProps<'div'>) => (
     <div data-primitive='dialog-title' className={className} {...props}>
       {children}
     </div>
   ),
-  DialogDescription: ({ children, className, ...props }: React.ComponentProps<'div'>) => (
+  DialogDescription: ({ children, className, ...props }: ComponentProps<'div'>) => (
     <div data-primitive='dialog-description' className={className} {...props}>
       {children}
     </div>

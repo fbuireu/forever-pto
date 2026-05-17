@@ -2,7 +2,7 @@
 
 import { type UseIsInViewOptions, useIsInView } from '@ui/hooks/useIsInView';
 import { getStrictContext } from '@ui/utils/context';
-import { useEffect, useMemo, useState } from 'react';
+import { type ComponentProps, type Ref, useEffect, useMemo, useState } from 'react';
 
 type RotatingTextContextType = {
   currentText: string;
@@ -12,7 +12,7 @@ type RotatingTextContextType = {
 
 const [RotatingTextProvider] = getStrictContext<RotatingTextContextType>('RotatingTextContext');
 
-type RotatingTextContainerProps = React.ComponentProps<'div'> & {
+type RotatingTextContainerProps = ComponentProps<'div'> & {
   text: string | string[];
   duration?: number;
   y?: number;
@@ -33,7 +33,7 @@ function RotatingTextContainer({
 }: RotatingTextContainerProps) {
   const [index, setIndex] = useState(0);
 
-  const { ref: localRef, isInView } = useIsInView(ref as React.Ref<HTMLDivElement>, {
+  const { ref: localRef, isInView } = useIsInView(ref as Ref<HTMLDivElement>, {
     inView,
     inViewOnce,
     inViewMargin,

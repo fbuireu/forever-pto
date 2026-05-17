@@ -10,7 +10,7 @@ import {
   useSpring,
   useTransform,
 } from 'motion/react';
-import { useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
+import { type ComponentProps, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import useMeasure from 'react-use-measure';
 
 type SlidingNumberDisplayProps = {
@@ -84,7 +84,7 @@ function SlidingNumberRoller({ prevValue, value, place, transition }: Readonly<S
   );
 }
 
-type SlidingNumberProps = React.ComponentProps<'span'> & {
+type SlidingNumberProps = ComponentProps<'span'> & {
   number: number | string;
   inView?: boolean;
   inViewMargin?: UseInViewOptions['margin'];

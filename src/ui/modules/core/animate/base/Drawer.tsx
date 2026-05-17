@@ -1,17 +1,18 @@
 'use client';
 
+import type { ComponentProps } from 'react';
 import { cn } from '@ui/utils/cn';
 import { Drawer as DrawerPrimitive } from 'vaul';
 
-function Drawer({ shouldScaleBackground = false, ...props }: React.ComponentProps<typeof DrawerPrimitive.Root>) {
+function Drawer({ shouldScaleBackground = false, ...props }: ComponentProps<typeof DrawerPrimitive.Root>) {
   return <DrawerPrimitive.Root shouldScaleBackground={shouldScaleBackground} data-slot='drawer' {...props} />;
 }
 
-function DrawerPortal(props: React.ComponentProps<typeof DrawerPrimitive.Portal>) {
+function DrawerPortal(props: ComponentProps<typeof DrawerPrimitive.Portal>) {
   return <DrawerPrimitive.Portal data-slot='drawer-portal' {...props} />;
 }
 
-function DrawerOverlay({ className, ...props }: React.ComponentProps<typeof DrawerPrimitive.Overlay>) {
+function DrawerOverlay({ className, ...props }: ComponentProps<typeof DrawerPrimitive.Overlay>) {
   return (
     <DrawerPrimitive.Overlay
       data-slot='drawer-overlay'
@@ -26,7 +27,7 @@ function DrawerContent({
   children,
   overlay = true,
   ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Content> & { overlay?: boolean }) {
+}: ComponentProps<typeof DrawerPrimitive.Content> & { overlay?: boolean }) {
   return (
     <DrawerPortal>
       {overlay && <DrawerOverlay />}
@@ -45,7 +46,7 @@ function DrawerContent({
   );
 }
 
-function DrawerTitle({ className, ...props }: React.ComponentProps<typeof DrawerPrimitive.Title>) {
+function DrawerTitle({ className, ...props }: ComponentProps<typeof DrawerPrimitive.Title>) {
   return <DrawerPrimitive.Title data-slot='drawer-title' className={cn('sr-only', className)} {...props} />;
 }
 

@@ -1,4 +1,4 @@
-import type React from 'react';
+import type { ReactNode } from 'react';
 import { Link } from '@application/i18n/navigation';
 import { getWeekdayNames } from '@application/shared/utils/dates';
 import { LOCALES } from '@infrastructure/i18n/locales';
@@ -101,7 +101,7 @@ export const Hero = async () => {
                     ),
                     unit: t('hero.mockupFieldHolidays'),
                   },
-                ] as { label: string; value: React.ReactNode; unit: string }[]
+                ] as { label: string; value: ReactNode; unit: string }[]
               ).map(({ label, value, unit }) => (
                 <div
                   key={label}
