@@ -19,7 +19,7 @@ type RadialNavItem = {
   label: string;
   angle: number;
   badgeClass?: string;
-} & HTMLAttributes<HTMLDivElement>;
+} & Omit<HTMLAttributes<HTMLDivElement>, 'id'>;
 
 type MenuButtonConfig = {
   iconSize?: number;
