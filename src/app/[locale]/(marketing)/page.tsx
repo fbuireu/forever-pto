@@ -47,7 +47,7 @@ const HomePage = async ({ params }: PageProps) => {
 export default HomePage;
 
 // better stack not working properly
-// todo: check everything (unify radius, colors, effects, everything)
+// todo: check everything (algo?, unify radius, colors, effects, everything)
 // todo: focus input order in stripe
 // todo: new logo stripe
 // todo: status pages localized
