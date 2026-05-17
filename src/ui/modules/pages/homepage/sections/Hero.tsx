@@ -95,8 +95,8 @@ export const Hero = async () => {
                     label: t('hero.mockupFieldCountry'),
                     value: (
                       <span className='flex items-center gap-1.5'>
-                        <FlagIcon code='es' />
-                        <span>ES</span>
+                        <FlagIcon code={LOCALE_FLAG[locale] ?? locale} />
+                        <span>{locale.toUpperCase()}</span>
                       </span>
                     ),
                     unit: t('hero.mockupFieldHolidays'),
