@@ -22,9 +22,9 @@ type RadialNavItem = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 type MenuButtonConfig = {
-  iconSize?: number; // px
-  buttonSize?: number; // px, button diameter when collapsed
-  buttonPadding?: number; // px
+  iconSize?: number;
+  buttonSize?: number; 
+  buttonPadding?: number; 
 };
 
 const defaultMenuButtonConfig: Required<MenuButtonConfig> = {
@@ -115,17 +115,14 @@ function useShortestRotation(target: number) {
   }, [target]);
 }
 
-function MenuButton({
-  item,
-  isActive,
-  onActivate,
-  menuButtonConfig,
-}: {
+type MenuButtonProps = Readonly<{
   item: RadialNavItem;
   isActive?: boolean;
   onActivate?: () => void;
   menuButtonConfig: Required<MenuButtonConfig>;
-}) {
+}>;
+
+function MenuButton({ item, isActive, onActivate, menuButtonConfig }: MenuButtonProps) {
   const { icon: Icon, label, badgeClass } = item;
   const { iconSize, buttonSize, buttonPadding } = menuButtonConfig;
 
@@ -140,8 +137,8 @@ function MenuButton({
       initial={false}
       animate={isActive ? 'hover' : 'rest'}
       className={cn(
-        'relative flex items-center gap-1.5 overflow-hidden whitespace-nowrap rounded-full cursor-pointer border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] text-[var(--foreground)] font-black transition-[box-shadow,transform] duration-75 ease-linear shadow-[var(--shadow-brutal-xs)]',
-        isActive && (badgeClass ?? 'bg-[var(--accent)]')
+        'relative flex items-center gap-1.5 overflow-hidden whitespace-nowrap rounded-full cursor-pointer border-[3px] border-(--frame) bg-(--surface-panel) text-foreground font-black transition-[box-shadow,transform] duration-75 ease-linear shadow-(--shadow-brutal-xs)',
+        isActive && (badgeClass ?? 'bg-accent')
       )}
       style={{
         height: buttonSize,
@@ -196,7 +193,7 @@ function RadialNav({ size = 180, items, menuButtonConfig, defaultActiveId, onAct
 
   return (
     <div
-      className='relative flex items-center justify-center rounded-full border-[3px] border-[var(--frame)]'
+      className='relative flex items-center justify-center rounded-full border-[3px] border-(--frame)'
       style={{ width: size, height: size }}
       role='menu'
       aria-label='Radial navigation'

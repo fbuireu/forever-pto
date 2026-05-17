@@ -1,7 +1,7 @@
 'use client';
 
-import { FeatureList } from '@ui/modules/core/animate/components/community/FeatureList';
-import { RadialNav, type RadialNavProps } from '@ui/modules/core/animate/components/community/RadialNav';
+import { FeatureList } from '@ui/modules/core/animate/components/FeatureList';
+import { RadialNav, type RadialNavProps } from '@ui/modules/core/animate/components/RadialNav';
 import { CircleCheckBig } from '@ui/modules/core/animate/icons/CircleCheckBig';
 import { Clock } from '@ui/modules/core/animate/icons/Clock';
 import { Badge } from '@ui/modules/core/primitives/Badge';

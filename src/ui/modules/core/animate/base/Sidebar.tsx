@@ -1,6 +1,7 @@
 'use client';
 
 import { useIsMobile } from '@ui/hooks/useMobile';
+import { setCookie } from '@ui/utils/cookie';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { cn } from '@ui/utils/cn';
 import type { VariantProps } from 'class-variance-authority';
@@ -57,19 +58,17 @@ function SidebarProvider({
 }: SidebarProviderProps) {
   const isMobile = useIsMobile();
   const [openMobile, setOpenMobile] = useState(false);
-  const [_open, _setOpen] = useState(defaultOpen);
-  const open = openProp ?? _open;
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const open = openProp ?? internalOpen;
   const setOpen = useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
       const openState = typeof value === 'function' ? value(open) : value;
       if (setOpenProp) {
         setOpenProp(openState);
       } else {
-        _setOpen(openState);
+        setInternalOpen(openState);
       }
-      const secureAttribute = window.location.protocol === 'https:' ? '; Secure' : '';
-      // biome-ignore lint/suspicious/noDocumentCookie: server-readable sidebar state
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}; SameSite=Lax${secureAttribute}`;
+      setCookie({ name: SIDEBAR_COOKIE_NAME, value: String(openState), maxAge: SIDEBAR_COOKIE_MAX_AGE }).catch(() => {});
     },
     [setOpenProp, open]
   );
@@ -86,8 +85,8 @@ function SidebarProvider({
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    globalThis.addEventListener('keydown', handleKeyDown);
+    return () => globalThis.removeEventListener('keydown', handleKeyDown);
   }, [toggleSidebar]);
 
   useEffect(() => {
@@ -171,7 +170,7 @@ function Sidebar({
         <div
           data-slot='sidebar'
           className={cn(
-            'bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col rounded-[14px] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-lg)]',
+            'bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col rounded-[14px] border-[3px] border-(--frame) shadow-(--shadow-brutal-lg)',
             className
           )}
           {...props}
@@ -193,7 +192,7 @@ function Sidebar({
           <>
             <m.div
               key='sidebar-backdrop'
-              className='fixed inset-0 z-[51] bg-black/80'
+              className='fixed inset-0 z-51 bg-black/80'
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -210,7 +209,7 @@ function Sidebar({
               data-slot='sidebar'
               data-mobile='true'
               className={cn(
-                'bg-sidebar text-sidebar-foreground fixed inset-y-0 z-[51] flex h-full flex-col border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xl)]',
+                'bg-sidebar text-sidebar-foreground fixed inset-y-0 z-51 flex h-full flex-col border-[3px] border-(--frame) shadow-(--shadow-brutal-xl)',
                 side === 'right' ? 'right-0 rounded-l-[14px]' : 'left-0 rounded-r-[14px]'
               )}
               style={{ '--sidebar-width': SIDEBAR_WIDTH_MOBILE, width: 'var(--sidebar-width)' } as React.CSSProperties}
@@ -261,8 +260,8 @@ function Sidebar({
         className={cn(
           'fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-400 ease-[cubic-bezier(0.75,0,0.25,1)] md:flex',
           side === 'left'
-            ? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]'
-            : 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
+            ? 'left-0 group-data-[collapsible=offcanvas]:-left-(--sidebar-width)'
+            : 'right-0 group-data-[collapsible=offcanvas]:-right-(--sidebar-width)',
           variant === 'floating' || variant === 'inset'
             ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]'
             : 'group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l'
@@ -278,7 +277,7 @@ function Sidebar({
         >
           <div
             data-slot='sidebar-content'
-            className='bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col rounded-[14px] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-lg)]'
+            className='bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col rounded-[14px] border-[3px] border-(--frame) shadow-(--shadow-brutal-lg)'
           >
             {children}
           </div>
@@ -300,7 +299,7 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
       variant='ghost'
       size='icon'
       className={cn(
-        'relative z-50 size-11 rounded-[10px] bg-[var(--accent)] text-[var(--accent-foreground)] border-[3px] border-[var(--color-brand-ink)] shadow-[var(--shadow-brutal-xs)] transition-[transform,box-shadow] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] active:bg-[var(--accent)] active:text-[var(--accent-foreground)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)] cursor-pointer',
+        'relative z-50 size-11 rounded-xl bg-accent text-accent-foreground border-[3px] border-(--color-brand-ink) shadow-(--shadow-brutal-xs) transition-[transform,box-shadow] hover:bg-accent hover:text-accent-foreground hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm) active:bg-accent active:text-accent-foreground active:translate-x-0.5 active:translate-y-0.5 active:shadow-(--shadow-brutal-btn-active) cursor-pointer',
         className
       )}
       onClick={(event) => {
@@ -323,7 +322,7 @@ function SidebarInset({ className, ...props }: SidebarInsetProps) {
       data-slot='sidebar-inset'
       className={cn(
         'bg-background relative flex min-h-svh flex-1 flex-col',
-        'peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4)))] md:peer-data-[variant=inset]:m-2.25 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-3 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-[14px] md:peer-data-[variant=inset]:border-[3px] md:peer-data-[variant=inset]:border-[var(--frame)] md:peer-data-[variant=inset]:shadow-[var(--shadow-brutal-lg)]',
+        'peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4)))] md:peer-data-[variant=inset]:m-2.25 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-3 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-[14px] md:peer-data-[variant=inset]:border-[3px] md:peer-data-[variant=inset]:border-(--frame) md:peer-data-[variant=inset]:shadow-(--shadow-brutal-lg)',
         className
       )}
       {...props}
@@ -381,7 +380,7 @@ function SidebarGroup({ className, ...props }: SidebarGroupProps) {
       data-slot='sidebar-group'
       data-sidebar='group'
       className={cn(
-        'relative flex w-full min-w-0 flex-col rounded-[10px] bg-[var(--surface-panel-inset)] p-2.5',
+        'relative flex w-full min-w-0 flex-col rounded-xl bg-(--surface-panel-inset) p-2.5',
         className
       )}
       {...props}
@@ -401,7 +400,7 @@ function SidebarGroupLabel({ className, asChild = false, ...props }: SidebarGrou
       data-slot='sidebar-group-label'
       data-sidebar='group-label'
       className={cn(
-        'text-sidebar-foreground/75 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-[8px] px-2 text-[0.68rem] font-mono font-bold uppercase tracking-[0.1em] outline-hidden transition-[margin,opa] duration-200 ease-linear focus-visible:ring-[3px] [&>svg]:size-4 [&>svg]:shrink-0',
+        'text-sidebar-foreground/75 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-[8px] px-2 text-[0.68rem] font-mono font-bold uppercase tracking-widest outline-hidden transition-[margin,opa] duration-200 ease-linear focus-visible:ring-[3px] [&>svg]:size-4 [&>svg]:shrink-0',
         'group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0',
         className
       )}

@@ -16,8 +16,9 @@ function Popover(props: PopoverProps) {
     defaultValue: props?.defaultOpen,
     onChange: props?.onOpenChange,
   });
+  const popoverContextValue = React.useMemo(() => ({ isOpen, setIsOpen }), [isOpen, setIsOpen]);
   return (
-    <PopoverProvider value={{ isOpen, setIsOpen }}>
+    <PopoverProvider value={popoverContextValue}>
       <PopoverPrimitive.Root data-slot='popover' {...props} onOpenChange={setIsOpen} />
     </PopoverProvider>
   );

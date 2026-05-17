@@ -4,7 +4,7 @@ import { Progress as ProgressPrimitive } from '@base-ui/react/progress';
 import { cn } from '@ui/utils/cn';
 import { getStrictContext } from '@ui/utils/context';
 import { type HTMLMotionProps, m } from 'motion/react';
-import type { ComponentProps } from 'react';
+import { type ComponentProps, useMemo } from 'react';
 
 type ProgressContextType = { value: number };
 const [ProgressProvider, useProgressContext] = getStrictContext<ProgressContextType>('ProgressContext');
@@ -12,8 +12,9 @@ const [ProgressProvider, useProgressContext] = getStrictContext<ProgressContextT
 type ProgressProps = ComponentProps<typeof ProgressPrimitive.Root>;
 
 function Progress({ value, children, ...props }: ProgressProps) {
+  const progressContextValue = useMemo(() => ({ value: value ?? 0 }), [value]);
   return (
-    <ProgressProvider value={{ value: value ?? 0 }}>
+    <ProgressProvider value={progressContextValue}>
       <ProgressPrimitive.Root data-slot='progress' value={value} {...props}>
         {children}
       </ProgressPrimitive.Root>
