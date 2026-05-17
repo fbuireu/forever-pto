@@ -1,8 +1,9 @@
+import type { ReactNode } from 'react';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 
 interface LegalLayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
   params: Promise<{ locale: Locale }>;
 }
 

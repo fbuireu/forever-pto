@@ -1,12 +1,13 @@
+import type { ComponentType, ReactNode } from 'react';
 import type { IconProps } from '@ui/modules/core/animate/icons/Icon';
 import { cn } from '@ui/utils/cn';
 import type { LucideIcon } from 'lucide-react';
 
 interface BannerProps {
-  icon: LucideIcon | React.ComponentType<IconProps<never>>;
+  icon: LucideIcon | ComponentType<IconProps<never>>;
   title: string;
-  children: React.ReactNode;
-  action?: React.ReactNode;
+  children: ReactNode;
+  action?: ReactNode;
   colorScheme: keyof typeof COLOR_SCHEMES;
   className?: string;
 }

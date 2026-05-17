@@ -1,4 +1,5 @@
-﻿import { SidebarProvider } from '@ui/modules/core/animate/base/Sidebar';
+﻿import type { ReactNode } from 'react';
+import { SidebarProvider } from '@ui/modules/core/animate/base/Sidebar';
 import { Toaster } from '@ui/modules/core/primitives/Sonner';
 import { SiteSubtitle } from '@ui/modules/pages/planner/SiteSubtitle';
 import { SiteTitle } from '@ui/modules/pages/planner/SiteTitle';
@@ -15,7 +16,7 @@ const PremiumModal = dynamic(() =>
 );
 
 interface AppLayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
   params: Promise<{ locale: Locale }>;
 }
 

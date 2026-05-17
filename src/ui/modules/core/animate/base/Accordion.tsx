@@ -3,7 +3,7 @@
 import { Accordion as AccordionPrimitive } from '@base-ui/react/accordion';
 import { cn } from '@ui/utils/cn';
 import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
-import { createContext, use, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { type ComponentProps, type ReactNode, createContext, use, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 
 type AccordionItemContextType = {
   isOpen: boolean;
@@ -20,14 +20,14 @@ const useAccordionItem = () => {
   return context;
 };
 
-type AccordionProps = React.ComponentProps<typeof AccordionPrimitive.Root>;
+type AccordionProps = ComponentProps<typeof AccordionPrimitive.Root>;
 
 function Accordion(props: Readonly<AccordionProps>) {
   return <AccordionPrimitive.Root data-slot='accordion' {...props} />;
 }
 
-type AccordionItemProps = React.ComponentProps<typeof AccordionPrimitive.Item> & {
-  children: React.ReactNode;
+type AccordionItemProps = ComponentProps<typeof AccordionPrimitive.Item> & {
+  children: ReactNode;
 };
 
 function AccordionItem({ className, children, ...props }: AccordionItemProps) {
@@ -48,7 +48,7 @@ function AccordionItem({ className, children, ...props }: AccordionItemProps) {
   );
 }
 
-type AccordionTriggerProps = React.ComponentProps<typeof AccordionPrimitive.Trigger> & {
+type AccordionTriggerProps = ComponentProps<typeof AccordionPrimitive.Trigger> & {
   transition?: Transition;
   chevron?: boolean;
 };
@@ -116,7 +116,7 @@ function AccordionTrigger({
   );
 }
 
-type AccordionPanelProps = React.ComponentProps<typeof AccordionPrimitive.Panel> & {
+type AccordionPanelProps = ComponentProps<typeof AccordionPrimitive.Panel> & {
   motionProps?: HTMLMotionProps<'div'>;
   transition?: Transition;
 };

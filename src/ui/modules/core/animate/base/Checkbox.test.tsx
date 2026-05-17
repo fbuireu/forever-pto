@@ -1,8 +1,8 @@
 import { fireEvent, render } from '@testing-library/react';
-import type React from 'react';
+import type { ComponentProps, ReactElement, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-type MotionButtonProps = React.ComponentProps<'button'> & {
+type MotionButtonProps = ComponentProps<'button'> & {
   whileTap?: unknown;
   whileHover?: unknown;
   initial?: unknown;
@@ -10,8 +10,8 @@ type MotionButtonProps = React.ComponentProps<'button'> & {
   exit?: unknown;
   transition?: unknown;
 };
-type MotionSvgProps = React.ComponentProps<'svg'> & { initial?: unknown; animate?: unknown; exit?: unknown; transition?: unknown };
-type MotionPathProps = React.ComponentProps<'path'> & { variants?: unknown };
+type MotionSvgProps = ComponentProps<'svg'> & { initial?: unknown; animate?: unknown; exit?: unknown; transition?: unknown };
+type MotionPathProps = ComponentProps<'path'> & { variants?: unknown };
 
 vi.mock('motion/react', async () => {
   const { createElement, Fragment, forwardRef } = await import('react');
@@ -26,17 +26,17 @@ vi.mock('motion/react', async () => {
       path: ({ variants: _v, strokeLinecap, strokeLinejoin, ...props }: MotionPathProps) =>
         createElement('path', { strokeLinecap, strokeLinejoin, ...props }),
     },
-    AnimatePresence: ({ children }: { children?: React.ReactNode }) => createElement(Fragment, null, children),
+    AnimatePresence: ({ children }: { children?: ReactNode }) => createElement(Fragment, null, children),
   };
 });
 
 vi.mock('@base-ui/react/checkbox', async () => {
   const { createElement, forwardRef } = await import('react');
-  type RootProps = React.ComponentProps<'button'> & {
+  type RootProps = ComponentProps<'button'> & {
     onCheckedChange?: (checked: boolean, details: Record<string, unknown>) => void;
     checked?: boolean;
     defaultChecked?: boolean;
-    render?: React.ReactElement;
+    render?: ReactElement;
     keepMounted?: boolean;
   };
   const Root = forwardRef<HTMLButtonElement, RootProps>(
@@ -51,7 +51,7 @@ vi.mock('@base-ui/react/checkbox', async () => {
   return {
     Checkbox: {
       Root,
-      Indicator: ({ children, keepMounted: _km, ...props }: React.ComponentProps<'span'> & { keepMounted?: boolean }) =>
+      Indicator: ({ children, keepMounted: _km, ...props }: ComponentProps<'span'> & { keepMounted?: boolean }) =>
         createElement('span', props, children),
     },
   };

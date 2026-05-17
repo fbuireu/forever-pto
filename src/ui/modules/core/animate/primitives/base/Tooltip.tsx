@@ -12,7 +12,7 @@ import {
   useMotionValue,
   useSpring,
 } from 'motion/react';
-import * as React from 'react';
+import { type ComponentProps, isValidElement, useMemo } from 'react';
 
 type TooltipContextType = {
   isOpen: boolean;
@@ -24,12 +24,12 @@ type TooltipContextType = {
 };
 const [LocalTooltipProvider, useTooltip] = getStrictContext<TooltipContextType>('TooltipContext');
 
-type TooltipProviderProps = React.ComponentProps<typeof TooltipPrimitive.Provider>;
+type TooltipProviderProps = ComponentProps<typeof TooltipPrimitive.Provider>;
 function TooltipProvider(props: TooltipProviderProps) {
   return <TooltipPrimitive.Provider data-slot='tooltip-provider' {...props} />;
 }
 
-type TooltipProps = React.ComponentProps<typeof TooltipPrimitive.Root> & {
+type TooltipProps = ComponentProps<typeof TooltipPrimitive.Root> & {
   followCursor?: boolean | 'x' | 'y';
   followCursorSpringOptions?: SpringOptions;
 };
@@ -45,7 +45,7 @@ function Tooltip({
   });
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const tooltipContextValue = React.useMemo(
+  const tooltipContextValue = useMemo(
     () => ({ isOpen, setIsOpen, x, y, followCursor, followCursorSpringOptions }),
     [isOpen, setIsOpen, x, y, followCursor, followCursorSpringOptions]
   );
@@ -56,7 +56,7 @@ function Tooltip({
   );
 }
 
-type TooltipTriggerProps = React.ComponentProps<typeof TooltipPrimitive.Trigger> & { asChild?: boolean };
+type TooltipTriggerProps = ComponentProps<typeof TooltipPrimitive.Trigger> & { asChild?: boolean };
 function TooltipTrigger({ onMouseMove, asChild, children, ...props }: TooltipTriggerProps) {
   const { x, y, followCursor } = useTooltip();
   const handleMouseMove = (event: Parameters<NonNullable<TooltipTriggerProps['onMouseMove']>>[0]) => {
@@ -65,7 +65,7 @@ function TooltipTrigger({ onMouseMove, asChild, children, ...props }: TooltipTri
     if (followCursor === 'x' || followCursor === true) x.set((event.clientX - target.left - target.width / 2) / 2);
     if (followCursor === 'y' || followCursor === true) y.set((event.clientY - target.top - target.height / 2) / 2);
   };
-  if (asChild && React.isValidElement(children)) {
+  if (asChild && isValidElement(children)) {
     return (
       <TooltipPrimitive.Trigger
         data-slot='tooltip-trigger'
@@ -82,7 +82,7 @@ function TooltipTrigger({ onMouseMove, asChild, children, ...props }: TooltipTri
   );
 }
 
-type TooltipPortalProps = Omit<React.ComponentProps<typeof TooltipPrimitive.Portal>, 'keepMounted'>;
+type TooltipPortalProps = Omit<ComponentProps<typeof TooltipPrimitive.Portal>, 'keepMounted'>;
 function TooltipPortal(props: TooltipPortalProps) {
   const { isOpen } = useTooltip();
   return (
@@ -92,12 +92,12 @@ function TooltipPortal(props: TooltipPortalProps) {
   );
 }
 
-type TooltipPositionerProps = React.ComponentProps<typeof TooltipPrimitive.Positioner>;
+type TooltipPositionerProps = ComponentProps<typeof TooltipPrimitive.Positioner>;
 function TooltipPositioner(props: TooltipPositionerProps) {
   return <TooltipPrimitive.Positioner data-slot='tooltip-positioner' {...props} />;
 }
 
-type TooltipPopupProps = Omit<React.ComponentProps<typeof TooltipPrimitive.Popup>, 'render'> & HTMLMotionProps<'div'>;
+type TooltipPopupProps = Omit<ComponentProps<typeof TooltipPrimitive.Popup>, 'render'> & HTMLMotionProps<'div'>;
 function TooltipPopup({
   transition = { type: 'spring', stiffness: 300, damping: 25 },
   style,
@@ -128,7 +128,7 @@ function TooltipPopup({
   );
 }
 
-type TooltipArrowProps = React.ComponentProps<typeof TooltipPrimitive.Arrow>;
+type TooltipArrowProps = ComponentProps<typeof TooltipPrimitive.Arrow>;
 function TooltipArrow(props: TooltipArrowProps) {
   return <TooltipPrimitive.Arrow data-slot='tooltip-arrow' {...props} />;
 }

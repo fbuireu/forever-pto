@@ -7,7 +7,7 @@ const Bone = ({ className }: { className: string }) => (
 export const PlannerPanelFixture = () => (
   <div className='w-full rounded-[10px] border-[3px] border-[var(--frame)] bg-card p-3 shadow-[var(--shadow-brutal-md)]'>
     <div className='flex flex-wrap items-center gap-3'>
-      <div className='flex shrink-0 grow items-stretch overflow-hidden rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel)]'>
+      <div className='flex shrink-0 grow items-stretch overflow-hidden rounded-xl border-[3px] border-[var(--frame)] bg-[var(--surface-panel)]'>
         <div className='w-11 flex items-center justify-center bg-[var(--surface-panel-soft)] border-r-[3px] border-[var(--frame)] opacity-50'>
           <ChevronLeft size={20} />
         </div>

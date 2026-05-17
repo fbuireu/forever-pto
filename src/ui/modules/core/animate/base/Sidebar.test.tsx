@@ -1,11 +1,11 @@
 import { renderHook } from '@testing-library/react';
-import type React from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@ui/hooks/useMobile', () => ({ useIsMobile: () => false }));
 vi.mock('@ui/utils/cookie', () => ({ setCookie: vi.fn().mockResolvedValue(undefined) }));
 
-type MotionDivProps = React.ComponentProps<'div'> & {
+type MotionDivProps = ComponentProps<'div'> & {
   initial?: unknown;
   animate?: unknown;
   exit?: unknown;
@@ -22,22 +22,22 @@ vi.mock('motion/react', async () => {
       div: ({ children, initial: _i, animate: _a, exit: _e, transition: _t, layout: _l, whileTap: _wt, whileHover: _wh, style, ...props }: MotionDivProps) =>
         createElement('div', { style, ...props }, children),
     },
-    AnimatePresence: ({ children }: { children?: React.ReactNode }) => createElement(Fragment, null, children),
+    AnimatePresence: ({ children }: { children?: ReactNode }) => createElement(Fragment, null, children),
   };
 });
 
 vi.mock('../effects/MotionHighlight', () => ({
-  MotionHighlight: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
-  MotionHighlightItem: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+  MotionHighlight: ({ children }: { children?: ReactNode }) => <>{children}</>,
+  MotionHighlightItem: ({ children }: { children?: ReactNode }) => <>{children}</>,
 }));
 
 vi.mock('../icons/PanelLeft', () => ({ PanelLeftIcon: () => <svg /> }));
 
 vi.mock('./Tooltip', () => ({
-  Tooltip: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
-  TooltipContent: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
-  TooltipProvider: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
-  TooltipTrigger: ({ children, ...props }: React.ComponentProps<'button'>) => <button {...props}>{children}</button>,
+  Tooltip: ({ children }: { children?: ReactNode }) => <>{children}</>,
+  TooltipContent: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+  TooltipProvider: ({ children }: { children?: ReactNode }) => <>{children}</>,
+  TooltipTrigger: ({ children, ...props }: ComponentProps<'button'>) => <button {...props}>{children}</button>,
 }));
 
 import { SidebarProvider, useSidebar } from './Sidebar';
@@ -51,7 +51,7 @@ describe('useSidebar', () => {
 });
 
 describe('SidebarProvider', () => {
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
+  const wrapper = ({ children }: { children: ReactNode }) => (
     <SidebarProvider>{children}</SidebarProvider>
   );
 
@@ -66,7 +66,7 @@ describe('SidebarProvider', () => {
   });
 
   it('provides state="collapsed" when defaultOpen=false', () => {
-    const collapsedWrapper = ({ children }: { children: React.ReactNode }) => (
+    const collapsedWrapper = ({ children }: { children: ReactNode }) => (
       <SidebarProvider defaultOpen={false}>{children}</SidebarProvider>
     );
     const { result } = renderHook(() => useSidebar(), { wrapper: collapsedWrapper });

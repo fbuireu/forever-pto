@@ -6,7 +6,7 @@ import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Lock } from '@ui/modules/core/animate/icons/Lock';
 import { cn } from '@ui/utils/cn';
 import { useTranslations } from 'next-intl';
-import { useEffect } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { getButtonClass } from './utils/helpers';
 
@@ -19,7 +19,7 @@ export type PremiumFeatureVariant = (typeof PremiumFeatureVariant)[keyof typeof 
 
 interface PremiumFeatureProps {
   feature: string;
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
   description?: string;
   variant?: PremiumFeatureVariant;

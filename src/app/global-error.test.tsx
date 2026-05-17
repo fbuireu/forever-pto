@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 const mockUsePathname = vi.hoisted(() => vi.fn(() => '/en/planner'));
@@ -6,16 +7,16 @@ const MockErrorContent = vi.hoisted(() => vi.fn().mockReturnValue(null));
 vi.mock('next/navigation', () => ({ usePathname: mockUsePathname }));
 vi.mock('@ui/modules/pages/error/ErrorContent', () => ({ ErrorContent: MockErrorContent }));
 vi.mock('@ui/modules/core/animate/providers/LazyMotionProvider', () => ({
-  LazyMotionProvider: ({ children }: { children: React.ReactNode }) => children,
+  LazyMotionProvider: ({ children }: { children: ReactNode }) => children,
 }));
 vi.mock('@ui/modules/providers/AppThemeProvider', () => ({
-  AppThemeProvider: ({ children }: { children: React.ReactNode }) => children,
+  AppThemeProvider: ({ children }: { children: ReactNode }) => children,
 }));
 vi.mock('next-intl', async (importOriginal) => {
   const actual = await importOriginal<typeof import('next-intl')>();
   return {
     ...actual,
-    NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => children,
+    NextIntlClientProvider: ({ children }: { children: ReactNode }) => children,
   };
 });
 vi.mock('@app/fonts', () => ({

@@ -1,24 +1,24 @@
 import { render } from '@testing-library/react';
-import type React from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../primitives/base/Popover', () => ({
-  Popover: ({ children, ...props }: React.ComponentProps<'div'>) => (
+  Popover: ({ children, ...props }: ComponentProps<'div'>) => (
     <div data-primitive='popover' {...props}>{children}</div>
   ),
-  PopoverTrigger: ({ children, ...props }: React.ComponentProps<'button'>) => (
+  PopoverTrigger: ({ children, ...props }: ComponentProps<'button'>) => (
     <button data-primitive='popover-trigger' {...props}>
       {children}
     </button>
   ),
-  PopoverPortal: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+  PopoverPortal: ({ children }: { children?: ReactNode }) => <>{children}</>,
   PopoverPositioner: ({
     children,
     align,
     sideOffset,
     className,
     ...props
-  }: React.ComponentProps<'div'> & { align?: string; sideOffset?: number }) => (
+  }: ComponentProps<'div'> & { align?: string; sideOffset?: number }) => (
     <div
       data-primitive='popover-positioner'
       data-align={align}
@@ -36,7 +36,7 @@ vi.mock('../primitives/base/Popover', () => ({
     finalFocus: _ff,
     style,
     ...props
-  }: React.ComponentProps<'div'> & { initialFocus?: unknown; finalFocus?: unknown }) => (
+  }: ComponentProps<'div'> & { initialFocus?: unknown; finalFocus?: unknown }) => (
     <div data-primitive='popover-popup' className={className} style={style} {...props}>
       {children}
     </div>

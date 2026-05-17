@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react';
-import type React from 'react';
+import type { ComponentProps, ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-type MotionDivProps = React.ComponentProps<'div'> & {
+type MotionDivProps = ComponentProps<'div'> & {
   initial?: unknown;
   animate?: unknown;
   exit?: unknown;
@@ -17,20 +17,20 @@ vi.mock('motion/react', async () => {
       div: ({ children, initial: _i, animate: _a, exit: _e, transition: _t, layout: _l, style, ...props }: MotionDivProps) =>
         createElement('div', { style, ...props }, children),
     },
-    AnimatePresence: ({ children }: { children?: React.ReactNode }) => createElement(Fragment, null, children),
+    AnimatePresence: ({ children }: { children?: ReactNode }) => createElement(Fragment, null, children),
   };
 });
 
 vi.mock('@base-ui/react/collapsible', async () => {
   const { createElement, cloneElement, isValidElement } = await import('react');
-  type RootProps = React.ComponentProps<'div'> & {
+  type RootProps = ComponentProps<'div'> & {
     onOpenChange?: (open: boolean) => void;
     open?: boolean;
     defaultOpen?: boolean;
   };
-  type TriggerProps = React.ComponentProps<'button'> & { render?: React.ReactElement };
-  type PanelProps = React.ComponentProps<'div'> & {
-    render?: (props: React.ComponentPropsWithoutRef<'div'> & { hidden?: boolean }, state: { open: boolean }) => React.ReactNode;
+  type TriggerProps = ComponentProps<'button'> & { render?: ReactElement };
+  type PanelProps = ComponentProps<'div'> & {
+    render?: (props: ComponentPropsWithoutRef<'div'> & { hidden?: boolean }, state: { open: boolean }) => ReactNode;
     keepMounted?: boolean;
   };
   return {

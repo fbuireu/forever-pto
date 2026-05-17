@@ -1,11 +1,12 @@
 'use client';
 
+import type { ComponentProps } from 'react';
 import { cn } from '@ui/utils/cn';
 import { type HTMLMotionProps, m, type Transition } from 'motion/react';
 import type { SlidingNumberProps } from '../text/SlidingNumber';
 import { SlidingNumber } from '../text/SlidingNumber';
 
-type CounterButtonProps = Omit<React.ComponentProps<'button'>, 'onClick' | 'children'>;
+type CounterButtonProps = Omit<ComponentProps<'button'>, 'onClick' | 'children'>;
 
 type CounterProps = Omit<HTMLMotionProps<'div'>, 'children'> & {
   number: number;

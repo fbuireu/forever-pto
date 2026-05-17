@@ -1,17 +1,17 @@
 import { render } from '@testing-library/react';
-import type React from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('vaul', () => ({
   Drawer: {
-    Root: ({ children, ...props }: React.ComponentProps<'div'>) => <div {...props}>{children}</div>,
-    Portal: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-    Overlay: ({ className, ...props }: React.ComponentProps<'div'>) => (
+    Root: ({ children, ...props }: ComponentProps<'div'>) => <div {...props}>{children}</div>,
+    Portal: ({ children }: { children: ReactNode }) => <>{children}</>,
+    Overlay: ({ className, ...props }: ComponentProps<'div'>) => (
       <div data-testid='drawer-overlay' className={className} {...props} />
     ),
-    Content: ({ children, ...props }: React.ComponentProps<'div'>) => <div {...props}>{children}</div>,
-    Handle: (props: React.ComponentProps<'div'>) => <div {...props} />,
-    Title: ({ children, className, ...props }: React.ComponentProps<'div'>) => (
+    Content: ({ children, ...props }: ComponentProps<'div'>) => <div {...props}>{children}</div>,
+    Handle: (props: ComponentProps<'div'>) => <div {...props} />,
+    Title: ({ children, className, ...props }: ComponentProps<'div'>) => (
       <div className={className} {...props}>
         {children}
       </div>

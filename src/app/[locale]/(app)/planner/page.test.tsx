@@ -1,5 +1,5 @@
 import { EN, ES, LOCALES } from '@infrastructure/i18n/locales';
-import React from 'react';
+import { Fragment } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockSetRequestLocale = vi.fn();
@@ -49,7 +49,7 @@ describe('planner/page', () => {
 
     it('returns a React fragment', async () => {
       const element = await AppPage(makeParams());
-      expect(element.type).toBe(React.Fragment);
+      expect(element.type).toBe(Fragment);
     });
 
     it('renders JsonLd with the resolved locale', async () => {

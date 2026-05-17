@@ -9,12 +9,12 @@ import {
   TabsList,
   TabsTrigger,
 } from '@ui/modules/core/animate/components/Tabs';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 
 type TabSection = {
   id: string;
   title: string;
-  content: React.ReactNode;
+  content: ReactNode;
 };
 
 type FaqTabsProps = {

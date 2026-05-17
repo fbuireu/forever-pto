@@ -4,8 +4,7 @@ import { Menu as DropdownMenuPrimitive } from '@base-ui/react/menu';
 import { cn } from '@ui/utils/cn';
 import { Circle } from 'lucide-react';
 import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
-import * as React from 'react';
-import { createContext, use, useCallback, useEffect, useMemo, useState } from 'react';
+import { type ComponentProps, type ReactElement, createContext, isValidElement, use, useCallback, useEffect, useMemo, useState } from 'react';
 import { MotionHighlight, MotionHighlightItem } from '../effects/MotionHighlight';
 import { Check } from '../icons/Check';
 import { ChevronRight } from '../icons/ChevronRight';
@@ -26,7 +25,7 @@ const useDropdownMenu = () => {
   return context;
 };
 
-type DropdownMenuProps = React.ComponentProps<typeof DropdownMenuPrimitive.Root> & {
+type DropdownMenuProps = ComponentProps<typeof DropdownMenuPrimitive.Root> & {
   transition?: Transition;
   animateOnHover?: boolean;
 };
@@ -65,14 +64,14 @@ function DropdownMenu({
   );
 }
 
-type DropdownMenuTriggerProps = React.ComponentProps<typeof DropdownMenuPrimitive.Trigger> & { asChild?: boolean };
+type DropdownMenuTriggerProps = ComponentProps<typeof DropdownMenuPrimitive.Trigger> & { asChild?: boolean };
 
 function DropdownMenuTrigger({ asChild, children, ...props }: DropdownMenuTriggerProps) {
-  if (asChild && React.isValidElement(children)) {
+  if (asChild && isValidElement(children)) {
     return (
       <DropdownMenuPrimitive.Trigger
         data-slot='dropdown-menu-trigger'
-        render={children as React.ReactElement}
+        render={children as ReactElement}
         {...props}
       />
     );
@@ -84,31 +83,31 @@ function DropdownMenuTrigger({ asChild, children, ...props }: DropdownMenuTrigge
   );
 }
 
-type DropdownMenuGroupProps = React.ComponentProps<typeof DropdownMenuPrimitive.Group>;
+type DropdownMenuGroupProps = ComponentProps<typeof DropdownMenuPrimitive.Group>;
 
 function _DropdownMenuGroup(props: DropdownMenuGroupProps) {
   return <DropdownMenuPrimitive.Group data-slot='dropdown-menu-group' {...props} />;
 }
 
-type DropdownMenuPortalProps = React.ComponentProps<typeof DropdownMenuPrimitive.Portal>;
+type DropdownMenuPortalProps = ComponentProps<typeof DropdownMenuPrimitive.Portal>;
 
 function _DropdownMenuPortal(props: DropdownMenuPortalProps) {
   return <DropdownMenuPrimitive.Portal data-slot='dropdown-menu-portal' {...props} />;
 }
 
-type DropdownMenuSubProps = React.ComponentProps<typeof DropdownMenuPrimitive.SubmenuRoot>;
+type DropdownMenuSubProps = ComponentProps<typeof DropdownMenuPrimitive.SubmenuRoot>;
 
 function _DropdownMenuSub(props: DropdownMenuSubProps) {
   return <DropdownMenuPrimitive.SubmenuRoot data-slot='dropdown-menu-sub' {...props} />;
 }
 
-type DropdownMenuRadioGroupProps = React.ComponentProps<typeof DropdownMenuPrimitive.RadioGroup>;
+type DropdownMenuRadioGroupProps = ComponentProps<typeof DropdownMenuPrimitive.RadioGroup>;
 
 function _DropdownMenuRadioGroup(props: DropdownMenuRadioGroupProps) {
   return <DropdownMenuPrimitive.RadioGroup data-slot='dropdown-menu-radio-group' {...props} />;
 }
 
-type DropdownMenuSubTriggerProps = Omit<React.ComponentProps<typeof DropdownMenuPrimitive.SubmenuTrigger>, 'render'> &
+type DropdownMenuSubTriggerProps = Omit<ComponentProps<typeof DropdownMenuPrimitive.SubmenuTrigger>, 'render'> &
   HTMLMotionProps<'div'> & {
     inset?: boolean;
   };
@@ -117,7 +116,7 @@ function _DropdownMenuSubTrigger({ className, children, inset, disabled, ...prop
   return (
     <MotionHighlightItem disabled={disabled}>
       <DropdownMenuPrimitive.SubmenuTrigger
-        {...(props as React.ComponentProps<typeof DropdownMenuPrimitive.SubmenuTrigger>)}
+        {...(props as ComponentProps<typeof DropdownMenuPrimitive.SubmenuTrigger>)}
         disabled={disabled}
         render={
           <m.div
@@ -140,7 +139,7 @@ function _DropdownMenuSubTrigger({ className, children, inset, disabled, ...prop
   );
 }
 
-type DropdownMenuSubContentProps = Omit<React.ComponentProps<typeof DropdownMenuPrimitive.Popup>, 'render'>;
+type DropdownMenuSubContentProps = Omit<ComponentProps<typeof DropdownMenuPrimitive.Popup>, 'render'>;
 
 function _DropdownMenuSubContent({ className, ...props }: Readonly<DropdownMenuSubContentProps>) {
   return (
@@ -157,7 +156,7 @@ function _DropdownMenuSubContent({ className, ...props }: Readonly<DropdownMenuS
   );
 }
 
-type DropdownMenuContentProps = Omit<React.ComponentProps<typeof DropdownMenuPrimitive.Popup>, 'render'> &
+type DropdownMenuContentProps = Omit<ComponentProps<typeof DropdownMenuPrimitive.Popup>, 'render'> &
   HTMLMotionProps<'div'> & {
     transition?: Transition;
     sideOffset?: number;
@@ -218,7 +217,7 @@ function DropdownMenuContent({
   );
 }
 
-type DropdownMenuItemProps = Omit<React.ComponentProps<typeof DropdownMenuPrimitive.Item>, 'render'> &
+type DropdownMenuItemProps = Omit<ComponentProps<typeof DropdownMenuPrimitive.Item>, 'render'> &
   HTMLMotionProps<'div'> & {
     inset?: boolean;
     variant?: 'default' | 'destructive';
@@ -241,7 +240,7 @@ function DropdownMenuItem({
       disabled={disabled}
     >
       <DropdownMenuPrimitive.Item
-        {...(props as React.ComponentProps<typeof DropdownMenuPrimitive.Item>)}
+        {...(props as ComponentProps<typeof DropdownMenuPrimitive.Item>)}
         disabled={disabled}
         render={
           <m.div
@@ -264,7 +263,7 @@ function DropdownMenuItem({
   );
 }
 
-type DropdownMenuCheckboxItemProps = Omit<React.ComponentProps<typeof DropdownMenuPrimitive.CheckboxItem>, 'render'> &
+type DropdownMenuCheckboxItemProps = Omit<ComponentProps<typeof DropdownMenuPrimitive.CheckboxItem>, 'render'> &
   HTMLMotionProps<'div'>;
 
 function _DropdownMenuCheckboxItem({
@@ -277,7 +276,7 @@ function _DropdownMenuCheckboxItem({
   return (
     <MotionHighlightItem disabled={disabled}>
       <DropdownMenuPrimitive.CheckboxItem
-        {...(props as React.ComponentProps<typeof DropdownMenuPrimitive.CheckboxItem>)}
+        {...(props as ComponentProps<typeof DropdownMenuPrimitive.CheckboxItem>)}
         checked={checked}
         disabled={disabled}
         render={
@@ -303,14 +302,14 @@ function _DropdownMenuCheckboxItem({
   );
 }
 
-type DropdownMenuRadioItemProps = Omit<React.ComponentProps<typeof DropdownMenuPrimitive.RadioItem>, 'render'> &
+type DropdownMenuRadioItemProps = Omit<ComponentProps<typeof DropdownMenuPrimitive.RadioItem>, 'render'> &
   HTMLMotionProps<'div'>;
 
 function _DropdownMenuRadioItem({ className, children, disabled, ...props }: DropdownMenuRadioItemProps) {
   return (
     <MotionHighlightItem disabled={disabled}>
       <DropdownMenuPrimitive.RadioItem
-        {...(props as React.ComponentProps<typeof DropdownMenuPrimitive.RadioItem>)}
+        {...(props as ComponentProps<typeof DropdownMenuPrimitive.RadioItem>)}
         disabled={disabled}
         render={
           <m.div
@@ -335,7 +334,7 @@ function _DropdownMenuRadioItem({ className, children, disabled, ...props }: Dro
   );
 }
 
-type DropdownMenuLabelProps = React.ComponentProps<typeof DropdownMenuPrimitive.GroupLabel> & {
+type DropdownMenuLabelProps = ComponentProps<typeof DropdownMenuPrimitive.GroupLabel> & {
   inset?: boolean;
 };
 
@@ -354,7 +353,7 @@ function _DropdownMenuLabel({ className, inset, ...props }: DropdownMenuLabelPro
   );
 }
 
-type DropdownMenuSeparatorProps = React.ComponentProps<typeof DropdownMenuPrimitive.Separator>;
+type DropdownMenuSeparatorProps = ComponentProps<typeof DropdownMenuPrimitive.Separator>;
 
 function _DropdownMenuSeparator({ className, ...props }: DropdownMenuSeparatorProps) {
   return (
@@ -366,7 +365,7 @@ function _DropdownMenuSeparator({ className, ...props }: DropdownMenuSeparatorPr
   );
 }
 
-type DropdownMenuShortcutProps = React.ComponentProps<'span'>;
+type DropdownMenuShortcutProps = ComponentProps<'span'>;
 
 function _DropdownMenuShortcut({ className, ...props }: DropdownMenuShortcutProps) {
   return (

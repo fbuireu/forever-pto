@@ -4,7 +4,7 @@ import { Progress as ProgressPrimitive } from '@base-ui/react/progress';
 import { cn } from '@ui/utils/cn';
 import { getStrictContext } from '@ui/utils/context';
 import { type HTMLMotionProps, m } from 'motion/react';
-import { type ComponentProps, useMemo } from 'react';
+import { type ComponentProps, type ReactNode, useMemo } from 'react';
 
 type ProgressContextType = { value: number };
 const [ProgressProvider, useProgressContext] = getStrictContext<ProgressContextType>('ProgressContext');
@@ -58,7 +58,7 @@ function ProgressTrack({
 }
 
 type ProgressOverlayLabelProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
   overlayClassName?: string;
   transition?: HTMLMotionProps<'div'>['transition'];
