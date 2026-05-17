@@ -2,7 +2,7 @@
 
 import { cn } from '@ui/utils/cn';
 import { type HTMLMotionProps, isMotionComponent, m } from 'motion/react';
-import { type CSSProperties, type ElementType, type Ref, type ReactElement, type RefCallback, type RefObject, isValidElement, useMemo } from 'react';
+import { type CSSProperties, type ElementType, type Ref, type ReactElement, type RefCallback, isValidElement, useMemo } from 'react';
 
 type AnyProps = Record<string, unknown>;
 
@@ -25,7 +25,7 @@ function mergeRefs<T>(...refs: (Ref<T> | undefined)[]): RefCallback<T> {
       if (typeof ref === 'function') {
         ref(node);
       } else {
-        (ref as RefObject<T | null>).current = node;
+        (ref).current = node;
       }
     });
   };
