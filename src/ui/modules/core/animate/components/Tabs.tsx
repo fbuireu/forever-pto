@@ -65,6 +65,7 @@ function TabsHighlight({
   return (
     <MotionHighlight
       controlledItems
+      mode='parent'
       className={cn(
         'rounded-md bg-accent border-2 border-(--frame) shadow-(--shadow-brutal-xs)',
         activeClassName
