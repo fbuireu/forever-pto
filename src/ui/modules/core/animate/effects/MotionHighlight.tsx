@@ -88,7 +88,7 @@ type ControlledParentModeMotionHighlightProps<T extends string> = BaseMotionHigh
   };
 
 type ControlledChildrenModeMotionHighlightProps<T extends string> = BaseMotionHighlightProps<T> & {
-  mode?: 'children' | undefined;
+  mode?: 'children';
   controlledItems: true;
   children: ReactNode;
 };
