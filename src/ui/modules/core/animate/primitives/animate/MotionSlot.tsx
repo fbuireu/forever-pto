@@ -12,7 +12,7 @@ type DOMMotionProps<T extends HTMLElement = HTMLElement> = Omit<HTMLMotionProps<
 
 type WithAsChild<Base extends object> =
   | (Base & { asChild: true; children: ReactElement })
-  | (Base & { asChild?: false | undefined });
+  | (Base & { asChild?: false });
 
 type MotionSlotProps<T extends HTMLElement = HTMLElement> = {
   children: ReactElement;

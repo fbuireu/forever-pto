@@ -20,7 +20,7 @@ jobs:
       environment: development
       wrangler_env: development
       worker_name: pr-${{ github.event.pull_request.number }}-forever-pto-development
-      url: https://pr-${{ github.event.pull_request.number }}-forever-pto-development.forever-pto.workers.dev
+      url: https://pr-${{ github.event.pull_request.number }}-forever-pto-development.fbuireu.workers.dev
     secrets: inherit
 
   comment:
@@ -50,7 +50,7 @@ jobs:
 
             | | |
             |---|---|
-            | **URL** | https://pr-${{ github.event.pull_request.number }}-forever-pto-development.forever-pto.workers.dev |
+            | **URL** | https://pr-${{ github.event.pull_request.number }}-forever-pto-development.fbuireu.workers.dev |
             | **Branch** | `${{ github.head_ref }}` |
             | **Commit** | `${{ github.event.pull_request.head.sha }}` |
 
@@ -76,6 +76,6 @@ jobs:
       - name: Run E2E tests
         run: pnpm test:e2e
         env:
-          BASE_URL: https://pr-${{ github.event.pull_request.number }}-forever-pto-development.forever-pto.workers.dev
+          BASE_URL: https://pr-${{ github.event.pull_request.number }}-forever-pto-development.fbuireu.workers.dev
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
