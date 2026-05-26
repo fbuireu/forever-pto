@@ -2,7 +2,9 @@ import { addDays, startOfToday } from '@application/shared/utils/dates';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { createRichLink } from '@ui/modules/core/primitives/RichLink';
 import { LegalLayout } from '@ui/modules/layout/LegalLayout';
+import { Address } from '@ui/modules/pages/legal/Address';
 import { Me } from '@ui/modules/pages/legal/Me';
+import { Nif } from '@ui/modules/pages/legal/Nif';
 
 const githubLink = createRichLink('https://github.com/fbuireu/forever-pto', { external: true });
 
@@ -37,6 +39,18 @@ export default async function LegalNoticePage({ params }: LegalNoticePageProps) 
             <span className='inline-flex items-center gap-1'>
               <strong>{t('sections.identification.items.owner.label')}</strong>{' '}
               <Me ariaLabel={t('sections.identification.items.owner.label')} />
+            </span>
+          </li>
+          <li>
+            <span className='inline-flex items-center gap-1'>
+              <strong>{t('sections.identification.items.nif.label')}</strong>{' '}
+              <Nif ariaLabel={t('sections.identification.items.nif.label')} />
+            </span>
+          </li>
+          <li>
+            <span className='inline-flex items-center gap-1'>
+              <strong>{t('sections.identification.items.address.label')}</strong>{' '}
+              <Address ariaLabel={t('sections.identification.items.address.label')} />
             </span>
           </li>
           <li>

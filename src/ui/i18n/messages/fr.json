@@ -1864,6 +1864,12 @@
             "label": "Propriétaire :",
             "value": "{author}"
           },
+          "nif": {
+            "label": "NIF :"
+          },
+          "address": {
+            "label": "Adresse :"
+          },
           "email": {
             "label": "E-mail :",
             "value": "{supportEmail}"
