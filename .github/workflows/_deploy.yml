@@ -16,6 +16,21 @@ on:
         required: false
         type: string
         description: Override the worker name (for per-PR preview deployments)
+    secrets:
+      CLOUDFLARE_API_TOKEN:
+        required: true
+      CLOUDFLARE_ACCOUNT_ID:
+        required: true
+      JWT_SECRET:
+        required: true
+      STRIPE_SECRET_KEY:
+        required: true
+      STRIPE_WEBHOOK_SECRET:
+        required: true
+      RESEND_API_KEY:
+        required: true
+      TURSO_AUTH_TOKEN:
+        required: true
 permissions:
   contents: read
 
@@ -31,11 +46,13 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -51,12 +68,15 @@ jobs:
           NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: ${{ vars.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID }}
           NEXT_PUBLIC_STORAGE_KEY: ${{ vars.NEXT_PUBLIC_STORAGE_KEY }}
       - name: Deploy to Cloudflare Workers
+        env:
+          INPUTS_WORKER_NAME: ${{ inputs.worker_name }}
+          INPUTS_WRANGLER_ENV: ${{ inputs.wrangler_env }}
         run: |
           NAME_FLAG=""
-          if [ -n "${{ inputs.worker_name }}" ]; then
-            NAME_FLAG="--name ${{ inputs.worker_name }}"
+          if [ -n "${INPUTS_WORKER_NAME}" ]; then
+            NAME_FLAG="--name ${INPUTS_WORKER_NAME}"
           fi
-          pnpm exec wrangler deploy --env ${{ inputs.wrangler_env }} $NAME_FLAG
+          pnpm exec wrangler deploy --env "${INPUTS_WRANGLER_ENV}" $NAME_FLAG
       - name: Set Worker secrets
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
@@ -64,11 +84,13 @@ jobs:
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          INPUTS_WORKER_NAME: ${{ inputs.worker_name }}
+          INPUTS_WRANGLER_ENV: ${{ inputs.wrangler_env }}
         run: |
-          if [ -n "${{ inputs.worker_name }}" ]; then
-            TARGET_FLAG="--name ${{ inputs.worker_name }}"
+          if [ -n "${INPUTS_WORKER_NAME}" ]; then
+            TARGET_FLAG="--name ${INPUTS_WORKER_NAME}"
           else
-            TARGET_FLAG="--env ${{ inputs.wrangler_env }}"
+            TARGET_FLAG="--env ${INPUTS_WRANGLER_ENV}"
           fi
           node -e "
           const required = ['JWT_SECRET','STRIPE_SECRET_KEY','STRIPE_WEBHOOK_SECRET','RESEND_API_KEY','TURSO_AUTH_TOKEN'];
