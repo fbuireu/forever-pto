@@ -12,6 +12,8 @@ import {
 import { Label } from '@ui/modules/core/primitives/Label';
 import { Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { COOKIE_SECTIONS } from './config/config';
+import type { CookieEntry } from './config/config';
 
 interface CookieConsentDialogProps {
   open: boolean;
@@ -34,6 +36,33 @@ export const CookieConsentDialog = ({
 }: CookieConsentDialogProps) => {
   const t = useTranslations('cookies');
 
+  const isAnalyticsSection = (id: string) => id === 'analytics';
+
+  const renderCookieEntry = (cookie: CookieEntry) => (
+    <div key={cookie.name} className='rounded-md bg-muted/50 p-3 space-y-1'>
+      <div className='flex items-center justify-between'>
+        <span className='font-mono text-sm font-medium'>{cookie.name}</span>
+        <span className='text-xs text-muted-foreground'>
+          {cookie.expiryParams ? t(cookie.expiryKey, cookie.expiryParams) : t(cookie.expiryKey)}
+        </span>
+      </div>
+      <p className='text-sm text-muted-foreground'>
+        {t(cookie.descriptionKey)}
+        {cookie.learnMoreUrl && (
+          <a
+            href={cookie.learnMoreUrl}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='ml-1 underline hover:text-foreground'
+          >
+            {t('learnMore')}
+          </a>
+        )}
+      </p>
+      <p className='text-xs text-muted-foreground'>{t('provider', { name: cookie.provider })}</p>
+    </div>
+  );
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-2xl max-h-[80vh] overflow-y-auto'>
@@ -43,144 +72,40 @@ export const CookieConsentDialog = ({
         </DialogHeader>
 
         <div className='space-y-6 py-4'>
-          <div className='rounded-[12px] border-[3px] border-[var(--frame)] bg-card p-4 space-y-3 shadow-[var(--shadow-brutal-xs)]'>
-            <div className='flex items-start justify-between gap-4'>
-              <div className='flex-1'>
-                <Label className='text-base font-semibold'>{t('necessaryCookies')}</Label>
-                <p className='text-sm text-muted-foreground mt-1'>{t('necessaryDescription')}</p>
+          {COOKIE_SECTIONS.map((section) => (
+            <div
+              key={section.id}
+              className='rounded-[12px] border-[3px] border-[var(--frame)] bg-card p-4 space-y-3 shadow-[var(--shadow-brutal-xs)]'
+            >
+              <div className='flex items-start justify-between gap-4'>
+                <div className='flex-1'>
+                  <Label className='text-base font-semibold'>{t(`${section.id}Cookies`)}</Label>
+                  <p className='text-sm text-muted-foreground mt-1'>
+                    {t(`${section.id}Description`)}
+                  </p>
+                </div>
+                {isAnalyticsSection(section.id) ? (
+                  <Switch checked={analyticsEnabled} onCheckedChange={onAnalyticsChange} />
+                ) : (
+                  <Switch checked disabled />
+                )}
               </div>
-              <Switch checked disabled />
+
+              <Accordion>
+                <AccordionItem value={`${section.id}-details`} className='border-none'>
+                  <AccordionTrigger className='text-sm font-medium hover:no-underline py-2 gap-2'>
+                    <span className='flex items-center gap-2'>
+                      <Info className='size-4' />
+                      {t('cookieDetails')}
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionPanel>
+                    <div className='space-y-4 pt-3'>{section.cookies.map(renderCookieEntry)}</div>
+                  </AccordionPanel>
+                </AccordionItem>
+              </Accordion>
             </div>
-
-            <Accordion>
-              <AccordionItem value='necessary-details' className='border-none'>
-                <AccordionTrigger className='text-sm font-medium hover:no-underline py-2 gap-2'>
-                  <span className='flex items-center gap-2'>
-                    <Info className='size-4' />
-                    {t('cookieDetails')}
-                  </span>
-                </AccordionTrigger>
-                <AccordionPanel>
-                  <div className='space-y-4 pt-3'>
-                    <div className='rounded-md bg-muted/50 p-3 space-y-1'>
-                      <div className='flex items-center justify-between'>
-                        <span className='font-mono text-sm font-medium'>user-country</span>
-                        <span className='text-xs text-muted-foreground'>1 {t('week')}</span>
-                      </div>
-                      <p className='text-sm text-muted-foreground'>{t('userCountryDesc')}</p>
-                      <p className='text-xs text-muted-foreground'>{t('provider', { name: 'Forever PTO' })}</p>
-                    </div>
-
-                    <div className='rounded-md bg-muted/50 p-3 space-y-1'>
-                      <div className='flex items-center justify-between'>
-                        <span className='font-mono text-sm font-medium'>cc_cookie</span>
-                        <span className='text-xs text-muted-foreground'>{t('months', { count: 6 })}</span>
-                      </div>
-                      <p className='text-sm text-muted-foreground'>{t('ccCookieDesc')}</p>
-                      <p className='text-xs text-muted-foreground'>{t('provider', { name: 'Forever PTO' })}</p>
-                    </div>
-
-                    <div className='rounded-md bg-muted/50 p-3 space-y-1'>
-                      <div className='flex items-center justify-between'>
-                        <span className='font-mono text-sm font-medium'>__stripe_mid</span>
-                        <span className='text-xs text-muted-foreground'>{t('year', { count: 1 })}</span>
-                      </div>
-                      <p className='text-sm text-muted-foreground'>{t('stripeMidDesc')}</p>
-                      <p className='text-xs text-muted-foreground'>{t('provider', { name: 'Stripe' })}</p>
-                    </div>
-
-                    <div className='rounded-md bg-muted/50 p-3 space-y-1'>
-                      <div className='flex items-center justify-between'>
-                        <span className='font-mono text-sm font-medium'>__stripe_sid</span>
-                        <span className='text-xs text-muted-foreground'>{t('minutes', { count: 30 })}</span>
-                      </div>
-                      <p className='text-sm text-muted-foreground'>{t('stripeSidDesc')}</p>
-                      <p className='text-xs text-muted-foreground'>{t('provider', { name: 'Stripe' })}</p>
-                    </div>
-                  </div>
-                </AccordionPanel>
-              </AccordionItem>
-            </Accordion>
-          </div>
-
-          <div className='rounded-[12px] border-[3px] border-[var(--frame)] bg-card p-4 space-y-3 shadow-[var(--shadow-brutal-xs)]'>
-            <div className='flex items-start justify-between gap-4'>
-              <div className='flex-1'>
-                <Label className='text-base font-semibold'>{t('analyticsCookies')}</Label>
-                <p className='text-sm text-muted-foreground mt-1'>{t('analyticsDescription')}</p>
-              </div>
-              <Switch checked={analyticsEnabled} onCheckedChange={onAnalyticsChange} />
-            </div>
-
-            <Accordion>
-              <AccordionItem value='analytics-details' className='border-none'>
-                <AccordionTrigger className='text-sm font-medium hover:no-underline py-2 gap-2'>
-                  <span className='flex items-center gap-2'>
-                    <Info className='size-4' />
-                    {t('cookieDetails')}
-                  </span>
-                </AccordionTrigger>
-                <AccordionPanel>
-                  <div className='space-y-4 pt-3'>
-                    <div className='rounded-md bg-muted/50 p-3 space-y-1'>
-                      <div className='flex items-center justify-between'>
-                        <span className='font-mono text-sm font-medium'>_ga</span>
-                        <span className='text-xs text-muted-foreground'>{t('years', { count: 2 })}</span>
-                      </div>
-                      <p className='text-sm text-muted-foreground'>
-                        {t('gaDesc')}
-                        <a
-                          href='https://policies.google.com/technologies/cookies'
-                          target='_blank'
-                          rel='noopener noreferrer'
-                          className='ml-1 underline hover:text-foreground'
-                        >
-                          {t('learnMore')}
-                        </a>
-                      </p>
-                      <p className='text-xs text-muted-foreground'>{t('provider', { name: 'Google Analytics' })}</p>
-                    </div>
-
-                    <div className='rounded-md bg-muted/50 p-3 space-y-1'>
-                      <div className='flex items-center justify-between'>
-                        <span className='font-mono text-sm font-medium'>_ga_*</span>
-                        <span className='text-xs text-muted-foreground'>{t('years', { count: 2 })}</span>
-                      </div>
-                      <p className='text-sm text-muted-foreground'>{t('gaStarDesc')}</p>
-                      <p className='text-xs text-muted-foreground'>{t('provider', { name: 'Google Analytics' })}</p>
-                    </div>
-
-                    <div className='rounded-md bg-muted/50 p-3 space-y-1'>
-                      <div className='flex items-center justify-between'>
-                        <span className='font-mono text-sm font-medium'>_gid</span>
-                        <span className='text-xs text-muted-foreground'>{t('hours', { count: 24 })}</span>
-                      </div>
-                      <p className='text-sm text-muted-foreground'>{t('gidDesc')}</p>
-                      <p className='text-xs text-muted-foreground'>{t('provider', { name: 'Google Analytics' })}</p>
-                    </div>
-
-                    <div className='rounded-md bg-muted/50 p-3 space-y-1'>
-                      <div className='flex items-center justify-between'>
-                        <span className='font-mono text-sm font-medium'>_bs_uid</span>
-                        <span className='text-xs text-muted-foreground'>{t('year', { count: 1 })}</span>
-                      </div>
-                      <p className='text-sm text-muted-foreground'>{t('bsUidDesc')}</p>
-                      <p className='text-xs text-muted-foreground'>{t('provider', { name: 'Better Stack' })}</p>
-                    </div>
-
-                    <div className='rounded-md bg-muted/50 p-3 space-y-1'>
-                      <div className='flex items-center justify-between'>
-                        <span className='font-mono text-sm font-medium'>_bs_sid</span>
-                        <span className='text-xs text-muted-foreground'>{t('session')}</span>
-                      </div>
-                      <p className='text-sm text-muted-foreground'>{t('bsSidDesc')}</p>
-                      <p className='text-xs text-muted-foreground'>{t('provider', { name: 'Better Stack' })}</p>
-                    </div>
-                  </div>
-                </AccordionPanel>
-              </AccordionItem>
-            </Accordion>
-          </div>
+          ))}
         </div>
 
         <DialogFooter className='flex-col-reverse sm:flex-row gap-2 pt-4 border-t'>
