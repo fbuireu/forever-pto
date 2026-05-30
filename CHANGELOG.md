@@ -1,3 +1,11 @@
+## [1.4.4](https://github.com/fbuireu/forever-pto/compare/v1.4.3...v1.4.4) (2026-05-30)
+
+
+### Bug Fixes
+
+* cookie management ([bd316cf](https://github.com/fbuireu/forever-pto/commit/bd316cfba7c50072d7c191742e88e4492edd5728))
+* fine-grain cookie selection ([e3fd38a](https://github.com/fbuireu/forever-pto/commit/e3fd38a261fbbe6f3a18a6de0b647daf12f1b94a))
+
 ## [1.4.3](https://github.com/fbuireu/forever-pto/compare/v1.4.2...v1.4.3) (2026-05-17)
 
 
