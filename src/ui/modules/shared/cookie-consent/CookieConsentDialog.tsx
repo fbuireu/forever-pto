@@ -12,14 +12,16 @@ import {
 import { Label } from '@ui/modules/core/primitives/Label';
 import { Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { COOKIE_SECTIONS } from './config/config';
 import type { CookieEntry } from './config/config';
+import { COOKIE_SECTIONS } from './config/config';
 
 interface CookieConsentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   analyticsEnabled: boolean;
   onAnalyticsChange: (checked: boolean) => void;
+  serviceStates: Record<string, boolean>;
+  onServiceChange: (serviceId: string, checked: boolean) => void;
   onAcceptAll: () => void;
   onRejectAll: () => void;
   onSave: () => void;
@@ -30,6 +32,8 @@ export const CookieConsentDialog = ({
   onOpenChange,
   analyticsEnabled,
   onAnalyticsChange,
+  serviceStates,
+  onServiceChange,
   onAcceptAll,
   onRejectAll,
   onSave,
@@ -72,40 +76,63 @@ export const CookieConsentDialog = ({
         </DialogHeader>
 
         <div className='space-y-6 py-4'>
-          {COOKIE_SECTIONS.map((section) => (
-            <div
-              key={section.id}
-              className='rounded-[12px] border-[3px] border-[var(--frame)] bg-card p-4 space-y-3 shadow-[var(--shadow-brutal-xs)]'
-            >
-              <div className='flex items-start justify-between gap-4'>
-                <div className='flex-1'>
-                  <Label className='text-base font-semibold'>{t(`${section.id}Cookies`)}</Label>
-                  <p className='text-sm text-muted-foreground mt-1'>
-                    {t(`${section.id}Description`)}
-                  </p>
-                </div>
-                {isAnalyticsSection(section.id) ? (
-                  <Switch checked={analyticsEnabled} onCheckedChange={onAnalyticsChange} />
-                ) : (
-                  <Switch checked disabled />
-                )}
-              </div>
+          {COOKIE_SECTIONS.map((section) => {
+            const allCookies = section.services
+              ? section.services.flatMap((s) => s.cookies)
+              : (section.cookies ?? []);
 
-              <Accordion>
-                <AccordionItem value={`${section.id}-details`} className='border-none'>
-                  <AccordionTrigger className='text-sm font-medium hover:no-underline py-2 gap-2'>
-                    <span className='flex items-center gap-2'>
-                      <Info className='size-4' />
-                      {t('cookieDetails')}
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionPanel>
-                    <div className='space-y-4 pt-3'>{section.cookies.map(renderCookieEntry)}</div>
-                  </AccordionPanel>
-                </AccordionItem>
-              </Accordion>
-            </div>
-          ))}
+            return (
+              <div
+                key={section.id}
+                className='rounded-[12px] border-[3px] border-[var(--frame)] bg-card p-4 space-y-3 shadow-[var(--shadow-brutal-xs)]'
+              >
+                <div className='flex items-start justify-between gap-4'>
+                  <div className='flex-1'>
+                    <Label className='text-base font-semibold'>{t(`${section.id}Cookies`)}</Label>
+                    <p className='text-sm text-muted-foreground mt-1'>
+                      {t(`${section.id}Description`)}
+                    </p>
+                  </div>
+                  {isAnalyticsSection(section.id) ? (
+                    <Switch checked={analyticsEnabled} onCheckedChange={onAnalyticsChange} />
+                  ) : (
+                    <Switch checked disabled />
+                  )}
+                </div>
+
+                {isAnalyticsSection(section.id) && section.services && (
+                  <div className='space-y-2 border-t border-border pt-3'>
+                    {section.services.map((service) => (
+                      <div key={service.id} className='flex items-center justify-between pl-2'>
+                        <Label className='text-sm font-medium cursor-pointer'>
+                          {t(service.labelKey)}
+                        </Label>
+                        <Switch
+                          checked={serviceStates[service.id] ?? false}
+                          onCheckedChange={(checked) => onServiceChange(service.id, checked)}
+                          disabled={!analyticsEnabled}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <Accordion>
+                  <AccordionItem value={`${section.id}-details`} className='border-none'>
+                    <AccordionTrigger className='text-sm font-medium hover:no-underline py-2 gap-2'>
+                      <span className='flex items-center gap-2'>
+                        <Info className='size-4' />
+                        {t('cookieDetails')}
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionPanel>
+                      <div className='space-y-4 pt-3'>{allCookies.map(renderCookieEntry)}</div>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+            );
+          })}
         </div>
 
         <DialogFooter className='flex-col-reverse sm:flex-row gap-2 pt-4 border-t'>
