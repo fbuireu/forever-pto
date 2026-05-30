@@ -110,7 +110,6 @@ export const CookieConsentDialog = ({
                         <Switch
                           checked={serviceStates[service.id] ?? false}
                           onCheckedChange={(checked) => onServiceChange(service.id, checked)}
-                          disabled={!analyticsEnabled}
                         />
                       </div>
                     ))}
