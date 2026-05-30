@@ -780,6 +780,8 @@
     "provider": "Proveedor: {name}",
     "bsUidDesc": "Identificador único de visitante para el seguimiento analítico de Better Stack",
     "bsSidDesc": "Identificador de sesión para el seguimiento analítico de Better Stack",
+    "ga4Label": "Google Analytics 4",
+    "betterStackLabel": "Better Stack",
     "session": "Sesión"
   },
   "holidayTableHeader": {

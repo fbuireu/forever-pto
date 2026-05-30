@@ -11,9 +11,16 @@ export interface CookieEntry {
   learnMoreUrl?: string;
 }
 
+export interface CookieService {
+  id: string;
+  labelKey: CookiesKey;
+  cookies: CookieEntry[];
+}
+
 export interface CookieSection {
   id: 'necessary' | 'analytics';
-  cookies: CookieEntry[];
+  cookies?: CookieEntry[];
+  services?: CookieService[];
 }
 
 export const COOKIE_SECTIONS: CookieSection[] = [
@@ -51,41 +58,53 @@ export const COOKIE_SECTIONS: CookieSection[] = [
   },
   {
     id: 'analytics',
-    cookies: [
+    services: [
       {
-        name: '_ga',
-        expiryKey: 'years',
-        expiryParams: { count: 2 },
-        descriptionKey: 'gaDesc',
-        provider: 'Google Analytics',
-        learnMoreUrl: 'https://policies.google.com/technologies/cookies',
+        id: 'ga4',
+        labelKey: 'ga4Label',
+        cookies: [
+          {
+            name: '_ga',
+            expiryKey: 'years',
+            expiryParams: { count: 2 },
+            descriptionKey: 'gaDesc',
+            provider: 'Google Analytics',
+            learnMoreUrl: 'https://policies.google.com/technologies/cookies',
+          },
+          {
+            name: '_ga_*',
+            expiryKey: 'years',
+            expiryParams: { count: 2 },
+            descriptionKey: 'gaStarDesc',
+            provider: 'Google Analytics',
+          },
+          {
+            name: '_gid',
+            expiryKey: 'hours',
+            expiryParams: { count: 24 },
+            descriptionKey: 'gidDesc',
+            provider: 'Google Analytics',
+          },
+        ],
       },
       {
-        name: '_ga_*',
-        expiryKey: 'years',
-        expiryParams: { count: 2 },
-        descriptionKey: 'gaStarDesc',
-        provider: 'Google Analytics',
-      },
-      {
-        name: '_gid',
-        expiryKey: 'hours',
-        expiryParams: { count: 24 },
-        descriptionKey: 'gidDesc',
-        provider: 'Google Analytics',
-      },
-      {
-        name: '_bs_uid',
-        expiryKey: 'year',
-        expiryParams: { count: 1 },
-        descriptionKey: 'bsUidDesc',
-        provider: 'Better Stack',
-      },
-      {
-        name: '_bs_sid',
-        expiryKey: 'session',
-        descriptionKey: 'bsSidDesc',
-        provider: 'Better Stack',
+        id: 'betterStack',
+        labelKey: 'betterStackLabel',
+        cookies: [
+          {
+            name: '_bs_uid',
+            expiryKey: 'year',
+            expiryParams: { count: 1 },
+            descriptionKey: 'bsUidDesc',
+            provider: 'Better Stack',
+          },
+          {
+            name: '_bs_sid',
+            expiryKey: 'session',
+            descriptionKey: 'bsSidDesc',
+            provider: 'Better Stack',
+          },
+        ],
       },
     ],
   },
