@@ -8,8 +8,4 @@ allowBuilds:
   sharp: true
   workerd: true
 minimumReleaseAge: 4320 # 3 days
-trustPolicy: "no-downgrade"
 blockExoticSubdeps: true
-overrides:
-  react-redux: "9.3.0"
-  reselect: "5.2.0"
