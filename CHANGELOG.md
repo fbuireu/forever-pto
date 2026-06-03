@@ -1,3 +1,10 @@
+## [1.4.5](https://github.com/fbuireu/forever-pto/compare/v1.4.4...v1.4.5) (2026-06-03)
+
+
+### Bug Fixes
+
+* e2e ([bf59aeb](https://github.com/fbuireu/forever-pto/commit/bf59aeb2af65028c631b2b9ae4301d19bcf702c5))
+
 ## [1.4.4](https://github.com/fbuireu/forever-pto/compare/v1.4.3...v1.4.4) (2026-05-30)
 
 
