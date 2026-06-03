@@ -21,7 +21,7 @@ test.describe('(marketing) legal-notice', () => {
 
   test('renders a heading', async ({ page }) => {
     await page.goto(PATH);
-    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.getByRole('heading').first()).toBeVisible();
   });
 
   test('does not trigger the error boundary', async ({ page }) => {

@@ -13,8 +13,8 @@ test.describe('robots.txt', () => {
 
   test('allows all crawlers at root', async ({ request }) => {
     const body = await (await request.get(ROBOTS_URL)).text();
-    expect(body).toContain('User-agent: *');
-    expect(body).toContain('Allow: /');
+    expect(body).toMatch(/^User-agent:\s*\*/im);
+    expect(body).toMatch(/^Allow:\s*\//im);
   });
 
   test('disallows _next/static', async ({ request }) => {
