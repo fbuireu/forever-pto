@@ -58,7 +58,7 @@
     "@react-email/render": "2.0.8",
     "@react-pdf/renderer": "4.5.1",
     "@stripe/react-stripe-js": "6.6.0",
-    "@stripe/stripe-js": "9.7.0",
+    "@stripe/stripe-js": "9.8.0",
     "@tursodatabase/serverless": "1.2.2",
     "boneyard-js": "1.8.1",
     "canvas-confetti": "1.9.4",
