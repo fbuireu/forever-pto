@@ -1,3 +1,10 @@
+## [1.4.6](https://github.com/fbuireu/forever-pto/compare/v1.4.5...v1.4.6) (2026-06-15)
+
+
+### Bug Fixes
+
+* **deps:** update dependency effect to v3.21.3 ([#313](https://github.com/fbuireu/forever-pto/issues/313)) ([85eb3ae](https://github.com/fbuireu/forever-pto/commit/85eb3ae580045ba9a8ac2ede1c989114bdf0632e))
+
 ## [1.4.5](https://github.com/fbuireu/forever-pto/compare/v1.4.4...v1.4.5) (2026-06-03)
 
 
