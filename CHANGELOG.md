@@ -1,3 +1,11 @@
+## [1.4.7](https://github.com/fbuireu/forever-pto/compare/v1.4.6...v1.4.7) (2026-06-15)
+
+
+### Bug Fixes
+
+* **dates:** use temporal-polyfill so Temporal works in Cloudflare Workers ([09090d2](https://github.com/fbuireu/forever-pto/commit/09090d29bc9faaac0ba4450ce05076cdeb65e36c))
+* **deps:** update dependency @tursodatabase/serverless to v1.2.2 ([#312](https://github.com/fbuireu/forever-pto/issues/312)) ([916211c](https://github.com/fbuireu/forever-pto/commit/916211ca98f4b055f6b113571e4e210297842427))
+
 ## [1.4.6](https://github.com/fbuireu/forever-pto/compare/v1.4.5...v1.4.6) (2026-06-15)
 
 
