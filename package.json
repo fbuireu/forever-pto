@@ -59,7 +59,7 @@
     "@react-pdf/renderer": "4.5.1",
     "@stripe/react-stripe-js": "6.5.0",
     "@stripe/stripe-js": "9.7.0",
-    "@tursodatabase/serverless": "1.2.0-pre.2",
+    "@tursodatabase/serverless": "1.2.2",
     "boneyard-js": "1.8.1",
     "canvas-confetti": "1.9.4",
     "class-variance-authority": "0.7.1",
