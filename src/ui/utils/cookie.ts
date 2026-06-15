@@ -1,3 +1,5 @@
+import { Temporal } from 'temporal-polyfill';
+
 interface SetCookieParams {
   name: string;
   value: string;

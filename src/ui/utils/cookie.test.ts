@@ -1,3 +1,4 @@
+import { Temporal } from 'temporal-polyfill';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockCookieStoreSet = vi.fn();
@@ -42,9 +43,7 @@ describe('setCookie', () => {
 
   it('sets expires to undefined when maxAge is not provided', async () => {
     await setCookie({ name: 'foo', value: 'bar' });
-    expect(mockCookieStoreSet).toHaveBeenCalledWith(
-      expect.objectContaining({ expires: undefined })
-    );
+    expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ expires: undefined }));
   });
 
   it('respects a custom sameSite option', async () => {
