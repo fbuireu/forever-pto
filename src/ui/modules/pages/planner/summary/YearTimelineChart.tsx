@@ -6,6 +6,7 @@ import type { Suggestion } from '@domain/calendar/types';
 import { cn } from '@ui/utils/cn';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 interface Seg {
   start: Date;

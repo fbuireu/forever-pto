@@ -1,3 +1,5 @@
+import { Temporal } from 'temporal-polyfill';
+
 export type Day = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 const toPlainDate = (date: Date): Temporal.PlainDate =>
