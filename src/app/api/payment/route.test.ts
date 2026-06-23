@@ -25,6 +25,11 @@ vi.mock('@infrastructure/layers', () => ({
   ApplicationLayer: Layer.empty,
 }));
 
+vi.mock('next/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('next/server')>();
+  return { ...actual, after: vi.fn() };
+});
+
 const { POST } = await import('./route');
 
 function makeRequest(body: unknown, headers?: Record<string, string>): Request {

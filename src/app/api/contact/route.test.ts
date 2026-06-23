@@ -4,7 +4,12 @@ import { Effect, Layer } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
 
 const mockSendContactEmail = vi.hoisted(() =>
-  vi.fn<(data: unknown, config: unknown) => Effect.Effect<void, ValidationError | EmailError>>()
+  vi.fn<
+    (
+      data: unknown,
+      config: unknown
+    ) => Effect.Effect<{ deferred: Effect.Effect<void, never, never> }, ValidationError | EmailError>
+  >()
 );
 
 vi.mock('@application/use-cases/contact', () => ({
@@ -14,6 +19,11 @@ vi.mock('@application/use-cases/contact', () => ({
 vi.mock('@infrastructure/layers', () => ({
   ApplicationLayer: Layer.empty,
 }));
+
+vi.mock('next/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('next/server')>();
+  return { ...actual, after: vi.fn() };
+});
 
 vi.mock('@opennextjs/cloudflare', () => ({
   getCloudflareContext: vi.fn().mockReturnValue({
@@ -36,7 +46,7 @@ function makeRequest(body: unknown): Request {
 
 describe('POST /api/contact', () => {
   it('returns 200 with success on valid submission', async () => {
-    mockSendContactEmail.mockReturnValue(Effect.succeed(undefined));
+    mockSendContactEmail.mockReturnValue(Effect.succeed({ deferred: Effect.void }));
     const response = await POST(
       makeRequest({ email: 'test@example.com', name: 'Test', subject: 'Hello', message: 'World' }) as never
     );
@@ -66,7 +76,10 @@ describe('POST /api/contact', () => {
   it('returns 500 on unexpected typed error', async () => {
     // A typed error that slips through catchTags falls to catchAll
     mockSendContactEmail.mockReturnValue(
-      Effect.fail(new Error('unexpected')) as unknown as Effect.Effect<void, ValidationError | EmailError>
+      Effect.fail(new Error('unexpected')) as unknown as Effect.Effect<
+        { deferred: Effect.Effect<void, never, never> },
+        ValidationError | EmailError
+      >
     );
     const response = await POST(makeRequest({}) as never);
     expect(response.status).toBe(500);

@@ -59,6 +59,11 @@ vi.mock('@infrastructure/api/response', async () => {
   };
 });
 
+vi.mock('next/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('next/server')>();
+  return { ...actual, after: vi.fn() };
+});
+
 const { GET, POST } = await import('./route');
 
 function makeRequest(body: unknown): Request {

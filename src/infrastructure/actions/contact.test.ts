@@ -4,7 +4,12 @@ import { Effect, Layer } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
 
 const mockSendContactEmail = vi.hoisted(() =>
-  vi.fn<(data: unknown, config: unknown) => Effect.Effect<void, ValidationError | EmailError>>()
+  vi.fn<
+    (
+      data: unknown,
+      config: unknown
+    ) => Effect.Effect<{ deferred: Effect.Effect<void, never, never> }, ValidationError | EmailError>
+  >()
 );
 
 vi.mock('@application/use-cases/contact', () => ({
@@ -14,6 +19,11 @@ vi.mock('@application/use-cases/contact', () => ({
 vi.mock('@infrastructure/layers', () => ({
   ApplicationLayer: Layer.empty,
 }));
+
+vi.mock('next/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('next/server')>();
+  return { ...actual, after: vi.fn() };
+});
 
 vi.mock('@opennextjs/cloudflare', () => ({
   getCloudflareContext: vi.fn().mockReturnValue({
@@ -30,7 +40,7 @@ const validData = { name: 'Test', email: 'test@example.com', subject: 'Hello', m
 
 describe('sendContactEmailAction', () => {
   it('returns success:true when email is sent', async () => {
-    mockSendContactEmail.mockReturnValue(Effect.succeed(undefined));
+    mockSendContactEmail.mockReturnValue(Effect.succeed({ deferred: Effect.void }));
     const result = await sendContactEmailAction(validData);
     expect(result.success).toBe(true);
   });
@@ -51,7 +61,10 @@ describe('sendContactEmailAction', () => {
 
   it('returns success:false with INTERNAL_ERROR on unexpected error', async () => {
     mockSendContactEmail.mockReturnValue(
-      Effect.fail(new Error('boom')) as unknown as Effect.Effect<void, ValidationError | EmailError>
+      Effect.fail(new Error('boom')) as unknown as Effect.Effect<
+        { deferred: Effect.Effect<void, never, never> },
+        ValidationError | EmailError
+      >
     );
     const result = await sendContactEmailAction(validData);
     expect(result.success).toBe(false);
@@ -59,7 +72,7 @@ describe('sendContactEmailAction', () => {
   });
 
   it('passes env config to sendContactEmail', async () => {
-    mockSendContactEmail.mockReturnValue(Effect.succeed(undefined));
+    mockSendContactEmail.mockReturnValue(Effect.succeed({ deferred: Effect.void }));
     await sendContactEmailAction(validData);
     expect(mockSendContactEmail).toHaveBeenCalledWith(validData, {
       siteUrl: 'https://example.com',

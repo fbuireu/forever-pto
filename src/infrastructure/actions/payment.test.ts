@@ -37,6 +37,11 @@ vi.mock('next/headers', () => ({
   headers: mockHeaders,
 }));
 
+vi.mock('next/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('next/server')>();
+  return { ...actual, after: vi.fn() };
+});
+
 const { createPaymentAction } = await import('./payment');
 
 const validInput = { amount: 9.99, email: 'user@example.com' };
