@@ -1,12 +1,12 @@
 import type { ContactFormData } from '@application/dto/contact/schema';
 import { contactSchema } from '@application/dto/contact/schema';
+import { ContactFormEmail } from '@application/email/templates/Contact';
 import { zodParse } from '@application/shared/utils/zodParse';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { ResendService } from '@infrastructure/clients/email/resend/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { EmailError, type ValidationError } from '@infrastructure/errors';
 import { saveContact } from '@infrastructure/services/contact/repository';
-import { ContactFormEmail } from '@application/email/templates/Contact';
 import { render } from '@react-email/render';
 import { Effect } from 'effect';
 
@@ -18,7 +18,11 @@ interface ContactEmailConfig {
 export const sendContactEmail = (
   data: ContactFormData,
   config: ContactEmailConfig
-): Effect.Effect<void, ValidationError | EmailError, TursoService | ResendService | LoggerService> =>
+): Effect.Effect<
+  { deferred: Effect.Effect<void, never, TursoService> },
+  ValidationError | EmailError,
+  ResendService | LoggerService
+> =>
   Effect.gen(function* () {
     const logger = yield* LoggerService;
 
@@ -46,22 +50,26 @@ export const sendContactEmail = (
       tags: [{ name: 'category', value: 'web_contact_form' }],
     });
 
-    yield* saveContact({
-      email: validated.email,
-      name: validated.name,
-      subject: validated.subject,
-      message: validated.message,
-      messageId: messageId ?? null,
-      origin: null,
-    }).pipe(
-      Effect.catchAll((e) =>
-        Effect.sync(() => {
-          logger.error('Failed to save contact to database', {
-            reason: e.message,
-            emailDomain: validated.email?.split('@')[1],
-            messageId: messageId ?? undefined,
-          });
-        })
+    const deferred = Effect.suspend(() =>
+      saveContact({
+        email: validated.email,
+        name: validated.name,
+        subject: validated.subject,
+        message: validated.message,
+        messageId: messageId ?? null,
+        origin: null,
+      }).pipe(
+        Effect.catchAll((e) =>
+          Effect.sync(() => {
+            logger.error('Failed to save contact to database', {
+              reason: e.message,
+              emailDomain: validated.email?.split('@')[1],
+              messageId: messageId ?? undefined,
+            });
+          })
+        )
       )
     );
+
+    return { deferred };
   });

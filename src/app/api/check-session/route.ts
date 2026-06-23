@@ -6,7 +6,7 @@ import { clearPremiumCookie, PREMIUM_COOKIE, setPremiumCookie } from '@infrastru
 import { verifySession as verifySessionEffect } from '@infrastructure/services/premium/session';
 import { Effect } from 'effect';
 import { cookies } from 'next/headers';
-import type { NextRequest } from 'next/server';
+import { after, type NextRequest } from 'next/server';
 
 export async function GET(_request: NextRequest) {
   const cookieStore = await cookies();
@@ -21,8 +21,8 @@ export async function GET(_request: NextRequest) {
         const res = noStore({ premiumKey: null, email: null });
         clearPremiumCookie(res);
         return Effect.succeed(res);
-      }),
-    ),
+      })
+    )
   );
 
   return response;
@@ -45,6 +45,8 @@ export async function POST(request: NextRequest) {
 
       setPremiumCookie(response, result.token);
 
+      yield* Effect.sync(() => after(() => Effect.runPromise(result.deferred.pipe(Effect.provide(ApplicationLayer)))));
+
       return response;
     }).pipe(
       Effect.provide(ApplicationLayer),
@@ -53,7 +55,7 @@ export async function POST(request: NextRequest) {
         SessionError: () => Effect.succeed(noStore({ error: ApiError.INTERNAL_ERROR }, { status: 500 })),
         DatabaseError: () => Effect.succeed(noStore({ error: ApiError.INTERNAL_ERROR }, { status: 500 })),
       }),
-      Effect.catchAll(() => Effect.succeed(noStore({ error: ApiError.INTERNAL_ERROR }, { status: 500 }))),
-    ),
+      Effect.catchAll(() => Effect.succeed(noStore({ error: ApiError.INTERNAL_ERROR }, { status: 500 })))
+    )
   );
 }

@@ -3,7 +3,7 @@ import { ApiError } from '@infrastructure/api/errors';
 import { ApplicationLayer } from '@infrastructure/layers';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { Effect } from 'effect';
-import { type NextRequest, NextResponse } from 'next/server';
+import { after, type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -11,7 +11,10 @@ export async function POST(request: NextRequest) {
 
   return Effect.runPromise(
     sendContactEmail(body, { siteUrl: env.NEXT_PUBLIC_SITE_URL, contactEmail: env.NEXT_PUBLIC_CONTACT_EMAIL }).pipe(
-      Effect.map(() => NextResponse.json({ success: true })),
+      Effect.map(({ deferred }) => {
+        after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer))));
+        return NextResponse.json({ success: true });
+      }),
       Effect.provide(ApplicationLayer),
       Effect.catchTags({
         ValidationError: (error) =>
@@ -20,8 +23,8 @@ export async function POST(request: NextRequest) {
           Effect.succeed(NextResponse.json({ success: false, error: ApiError.INTERNAL_ERROR }, { status: 500 })),
       }),
       Effect.catchAll(() =>
-        Effect.succeed(NextResponse.json({ success: false, error: ApiError.INTERNAL_ERROR }, { status: 500 })),
-      ),
-    ),
+        Effect.succeed(NextResponse.json({ success: false, error: ApiError.INTERNAL_ERROR }, { status: 500 }))
+      )
+    )
   );
 }

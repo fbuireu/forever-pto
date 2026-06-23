@@ -46,34 +46,46 @@ type PremiumR = LoggerService | TursoService | StripeServerService;
 const run = <A, E>(eff: Effect.Effect<A, E, PremiumR>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
 const runFail = <A, E>(eff: Effect.Effect<A, E, PremiumR>) =>
   Effect.runPromise(Effect.flip(eff).pipe(Effect.provide(TestLayer)));
+const runDeferred = (deferred: Effect.Effect<void, never, TursoService>) =>
+  Effect.runPromise(deferred.pipe(Effect.provide(TestLayer)));
 
 beforeEach(() => vi.clearAllMocks());
 
 describe('activateWithPayment', () => {
   it('returns email, premiumKey and token on success', async () => {
     const result = await run(activateWithPayment('test@example.com', 'pi_test'));
-    expect(result).toEqual({ email: 'test@example.com', premiumKey: 'pi_test', token: 'jwt-token' });
+    expect(result).toMatchObject({ email: 'test@example.com', premiumKey: 'pi_test', token: 'jwt-token' });
   });
 
-  it('saves payment when no existing record', async () => {
-    const { savePayment } = await import('@infrastructure/services/payments/repository');
-    await run(activateWithPayment('test@example.com', 'pi_test'));
-    expect(savePayment).toHaveBeenCalledOnce();
-  });
-
-  it('skips savePayment when payment already exists with succeeded status', async () => {
+  it('does not touch the payment record during the critical path', async () => {
     const { getPaymentById, savePayment } = await import('@infrastructure/services/payments/repository');
-    vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed({ id: 'pi_test', status: 'succeeded' } as never));
     await run(activateWithPayment('test@example.com', 'pi_test'));
+    expect(getPaymentById).not.toHaveBeenCalled();
     expect(savePayment).not.toHaveBeenCalled();
   });
 
-  it('updates status when existing payment is not succeeded', async () => {
+  it('saves payment when no existing record (deferred)', async () => {
+    const { savePayment } = await import('@infrastructure/services/payments/repository');
+    const { deferred } = await run(activateWithPayment('test@example.com', 'pi_test'));
+    await runDeferred(deferred);
+    expect(savePayment).toHaveBeenCalledOnce();
+  });
+
+  it('skips savePayment when payment already exists with succeeded status (deferred)', async () => {
+    const { getPaymentById, savePayment } = await import('@infrastructure/services/payments/repository');
+    vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed({ id: 'pi_test', status: 'succeeded' } as never));
+    const { deferred } = await run(activateWithPayment('test@example.com', 'pi_test'));
+    await runDeferred(deferred);
+    expect(savePayment).not.toHaveBeenCalled();
+  });
+
+  it('updates status when existing payment is not succeeded (deferred)', async () => {
     const { getPaymentById, savePayment, updatePaymentStatus } = await import(
       '@infrastructure/services/payments/repository'
     );
     vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed({ id: 'pi_test', status: 'processing' } as never));
-    await run(activateWithPayment('test@example.com', 'pi_test'));
+    const { deferred } = await run(activateWithPayment('test@example.com', 'pi_test'));
+    await runDeferred(deferred);
     expect(updatePaymentStatus).toHaveBeenCalledWith('pi_test', 'succeeded');
     expect(savePayment).not.toHaveBeenCalled();
   });
@@ -104,7 +116,7 @@ describe('activateWithEmail', () => {
     const { getPaymentByEmail } = await import('@infrastructure/services/payments/repository');
     vi.mocked(getPaymentByEmail).mockReturnValueOnce(Effect.succeed({ id: 'pi_found', status: 'succeeded' } as never));
     const result = await run(activateWithEmail('test@example.com'));
-    expect(result).toEqual({ email: 'test@example.com', premiumKey: 'pi_found', token: 'jwt-token' });
+    expect(result).toMatchObject({ email: 'test@example.com', premiumKey: 'pi_found', token: 'jwt-token' });
   });
 
   it('fails with ValidationError when no payment found', async () => {

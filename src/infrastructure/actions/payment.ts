@@ -7,6 +7,7 @@ import { ApiError } from '@infrastructure/api/errors';
 import { ApplicationLayer } from '@infrastructure/layers';
 import { Effect } from 'effect';
 import { headers } from 'next/headers';
+import { after } from 'next/server';
 
 export async function createPaymentAction(params: CreatePaymentInput): Promise<CreatePaymentResult> {
   const headersList = await headers();
@@ -15,11 +16,14 @@ export async function createPaymentAction(params: CreatePaymentInput): Promise<C
 
   return Effect.runPromise(
     createPayment(params, { userAgent, ipAddress }).pipe(
-      Effect.map(({ clientSecret, discountInfo }) => ({
-        success: true as const,
-        clientSecret,
-        discountInfo: discountInfo ?? undefined,
-      })),
+      Effect.map(({ clientSecret, discountInfo, deferred }) => {
+        after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer))));
+        return {
+          success: true as const,
+          clientSecret,
+          discountInfo: discountInfo ?? undefined,
+        };
+      }),
       Effect.provide(ApplicationLayer),
       Effect.catchTags({
         ValidationError: (e) => Effect.succeed({ success: false as const, error: e.message }),
@@ -27,7 +31,7 @@ export async function createPaymentAction(params: CreatePaymentInput): Promise<C
           Effect.succeed({ success: false as const, error: e.code, isPromoCodeError: true as const }),
         PaymentError: (e) => Effect.succeed({ success: false as const, error: e.message }),
       }),
-      Effect.catchAll(() => Effect.succeed({ success: false as const, error: ApiError.INTERNAL_ERROR })),
-    ),
+      Effect.catchAll(() => Effect.succeed({ success: false as const, error: ApiError.INTERNAL_ERROR }))
+    )
   );
 }

@@ -17,9 +17,9 @@ export const activateWithPayment = (
   email: string,
   paymentIntentId: string
 ): Effect.Effect<
-  { email: string; premiumKey: string; token: string },
-  ValidationError | SessionError | DatabaseError,
-  TursoService | StripeServerService | LoggerService
+  { email: string; premiumKey: string; token: string; deferred: Effect.Effect<void, never, TursoService> },
+  ValidationError | SessionError,
+  StripeServerService | LoggerService
 > =>
   Effect.gen(function* () {
     const logger = yield* LoggerService;
@@ -38,25 +38,28 @@ export const activateWithPayment = (
       return yield* Effect.fail(new ValidationError({ message: 'Email mismatch' }));
     }
 
-    const existingPayment = yield* getPaymentById(paymentIntentId).pipe(
-      Effect.catchAll(() => Effect.succeed(undefined))
-    );
+    const deferred = Effect.gen(function* () {
+      const existingPayment = yield* getPaymentById(paymentIntentId).pipe(
+        Effect.catchAll(() => Effect.succeed(undefined))
+      );
 
-    if (existingPayment) {
-      if (existingPayment.status !== 'succeeded') {
-        yield* updatePaymentStatus(paymentIntentId, 'succeeded').pipe(
-          Effect.catchAll((e) =>
-            Effect.sync(() => {
-              logger.error('Failed to update payment status', {
-                reason: e.message,
-                paymentIntentId,
-                emailDomain: email?.split('@')[1],
-              });
-            })
-          )
-        );
+      if (existingPayment) {
+        if (existingPayment.status !== 'succeeded') {
+          yield* updatePaymentStatus(paymentIntentId, 'succeeded').pipe(
+            Effect.catchAll((e) =>
+              Effect.sync(() => {
+                logger.error('Failed to update payment status', {
+                  reason: e.message,
+                  paymentIntentId,
+                  emailDomain: email?.split('@')[1],
+                });
+              })
+            )
+          );
+        }
+        return;
       }
-    } else {
+
       const paymentData: PaymentData = paymentDataDTO.create({
         raw: paymentIntent,
         params: {
@@ -80,17 +83,17 @@ export const activateWithPayment = (
         ),
         Effect.catchAll(() => Effect.void)
       );
-    }
+    });
 
     const token = yield* createSession({ email, paymentIntentId });
 
-    return { email, premiumKey: paymentIntentId, token };
+    return { email, premiumKey: paymentIntentId, token, deferred };
   });
 
 export const activateWithEmail = (
   email: string
 ): Effect.Effect<
-  { email: string; premiumKey: string; token: string },
+  { email: string; premiumKey: string; token: string; deferred: Effect.Effect<void, never, TursoService> },
   ValidationError | SessionError | DatabaseError,
   TursoService | LoggerService
 > =>
@@ -107,5 +110,5 @@ export const activateWithEmail = (
 
     const token = yield* createSession({ email, paymentIntentId: payment.id });
 
-    return { email, premiumKey: payment.id, token };
+    return { email, premiumKey: payment.id, token, deferred: Effect.void };
   });

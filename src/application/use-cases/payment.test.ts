@@ -45,6 +45,8 @@ type PaymentR = LoggerService | TursoService | StripeServerService;
 const run = <A, E>(eff: Effect.Effect<A, E, PaymentR>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
 const runFail = <A, E>(eff: Effect.Effect<A, E, PaymentR>) =>
   Effect.runPromise(Effect.flip(eff).pipe(Effect.provide(TestLayer)));
+const runDeferred = (deferred: Effect.Effect<void, never, TursoService>) =>
+  Effect.runPromise(deferred.pipe(Effect.provide(TestLayer)));
 
 const PARAMS = { amount: 999, email: 'buyer@example.com', promoCode: undefined };
 const CONTEXT = { userAgent: 'test-agent', ipAddress: '127.0.0.1' };
@@ -102,11 +104,25 @@ describe('createPayment', () => {
     expect(err).toBeInstanceOf(PaymentError);
   });
 
-  it('resolves even when savePayment fails', async () => {
+  it('does not persist the payment during the critical path', async () => {
+    const { savePayment } = await import('@infrastructure/services/payments/repository');
+    await run(createPayment(PARAMS, CONTEXT));
+    expect(savePayment).not.toHaveBeenCalled();
+  });
+
+  it('persists the payment when the deferred effect runs', async () => {
+    const { savePayment } = await import('@infrastructure/services/payments/repository');
+    const { deferred } = await run(createPayment(PARAMS, CONTEXT));
+    await runDeferred(deferred);
+    expect(savePayment).toHaveBeenCalledOnce();
+  });
+
+  it('deferred effect recovers and warns when savePayment fails', async () => {
     const { savePayment } = await import('@infrastructure/services/payments/repository');
     vi.mocked(savePayment).mockReturnValueOnce(Effect.fail({ _tag: 'DatabaseError', message: 'db error' } as never));
     const result = await run(createPayment(PARAMS, CONTEXT));
     expect(result.clientSecret).toBe('cs_test_secret');
+    await expect(runDeferred(result.deferred)).resolves.toBeUndefined();
     expect(mockLogger.warn).toHaveBeenCalledOnce();
   });
 });

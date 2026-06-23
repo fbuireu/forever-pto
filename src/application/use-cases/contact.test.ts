@@ -31,9 +31,11 @@ const TestLayer = Layer.mergeAll(
 );
 
 type ContactR = LoggerService | ResendService | TursoService;
-const run = <E>(eff: Effect.Effect<void, E, ContactR>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
-const runFail = <E>(eff: Effect.Effect<void, E, ContactR>) =>
+const run = <A, E>(eff: Effect.Effect<A, E, ContactR>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
+const runFail = <A, E>(eff: Effect.Effect<A, E, ContactR>) =>
   Effect.runPromise(Effect.flip(eff).pipe(Effect.provide(TestLayer)));
+const runDeferred = (deferred: Effect.Effect<void, never, TursoService>) =>
+  Effect.runPromise(deferred.pipe(Effect.provide(TestLayer)));
 
 const VALID_DATA = {
   name: 'Alice Smith',
@@ -46,8 +48,22 @@ const CONFIG = { siteUrl: 'https://example.com', contactEmail: 'contact@example.
 beforeEach(() => vi.clearAllMocks());
 
 describe('sendContactEmail', () => {
-  it('resolves on success', async () => {
-    await expect(run(sendContactEmail(VALID_DATA, CONFIG))).resolves.toBeUndefined();
+  it('resolves with a deferred effect on success', async () => {
+    const result = await run(sendContactEmail(VALID_DATA, CONFIG));
+    expect(result.deferred).toBeDefined();
+  });
+
+  it('does not persist the contact during the critical path', async () => {
+    const { saveContact } = await import('@infrastructure/services/contact/repository');
+    await run(sendContactEmail(VALID_DATA, CONFIG));
+    expect(saveContact).not.toHaveBeenCalled();
+  });
+
+  it('persists the contact when the deferred effect runs', async () => {
+    const { saveContact } = await import('@infrastructure/services/contact/repository');
+    const { deferred } = await run(sendContactEmail(VALID_DATA, CONFIG));
+    await runDeferred(deferred);
+    expect(saveContact).toHaveBeenCalledOnce();
   });
 
   it('calls resend.send once', async () => {
@@ -99,10 +115,11 @@ describe('sendContactEmail', () => {
     expect(err).toBeInstanceOf(EmailError);
   });
 
-  it('resolves even when saveContact fails', async () => {
+  it('deferred effect recovers and logs when saveContact fails', async () => {
     const { saveContact } = await import('@infrastructure/services/contact/repository');
     vi.mocked(saveContact).mockReturnValueOnce(Effect.fail({ _tag: 'DatabaseError', message: 'db error' } as never));
-    await expect(run(sendContactEmail(VALID_DATA, CONFIG))).resolves.toBeUndefined();
+    const { deferred } = await run(sendContactEmail(VALID_DATA, CONFIG));
+    await expect(runDeferred(deferred)).resolves.toBeUndefined();
     expect(mockLogger.error).toHaveBeenCalledOnce();
   });
 });

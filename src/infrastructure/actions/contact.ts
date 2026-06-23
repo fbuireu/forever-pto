@@ -6,18 +6,22 @@ import { ApiError } from '@infrastructure/api/errors';
 import { ApplicationLayer } from '@infrastructure/layers';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { Effect } from 'effect';
+import { after } from 'next/server';
 
 export async function sendContactEmailAction(data: ContactFormData) {
   const { env } = getCloudflareContext();
   return Effect.runPromise(
     sendContactEmail(data, { siteUrl: env.NEXT_PUBLIC_SITE_URL, contactEmail: env.NEXT_PUBLIC_CONTACT_EMAIL }).pipe(
-      Effect.map(() => ({ success: true as const })),
+      Effect.map(({ deferred }) => {
+        after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer))));
+        return { success: true as const };
+      }),
       Effect.provide(ApplicationLayer),
       Effect.catchTags({
         ValidationError: (e) => Effect.succeed({ success: false as const, error: e.message }),
         EmailError: (e) => Effect.succeed({ success: false as const, error: e.message }),
       }),
-      Effect.catchAll(() => Effect.succeed({ success: false as const, error: ApiError.INTERNAL_ERROR })),
-    ),
+      Effect.catchAll(() => Effect.succeed({ success: false as const, error: ApiError.INTERNAL_ERROR }))
+    )
   );
 }

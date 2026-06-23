@@ -20,16 +20,13 @@ interface PaymentContext {
 interface PaymentResult {
   clientSecret: string;
   discountInfo: DiscountInfo | null;
+  deferred: Effect.Effect<void, never, TursoService>;
 }
 
 export const createPayment = (
   params: CreatePaymentInput,
   context: PaymentContext
-): Effect.Effect<
-  PaymentResult,
-  ValidationError | PaymentError | PromoCodeError,
-  TursoService | StripeServerService | LoggerService
-> =>
+): Effect.Effect<PaymentResult, ValidationError | PaymentError | PromoCodeError, StripeServerService | LoggerService> =>
   Effect.gen(function* () {
     const { userAgent, ipAddress } = context;
     const logger = yield* LoggerService;
@@ -75,31 +72,33 @@ export const createPayment = (
       )
     );
 
-    yield* savePayment(
-      paymentDataDTO.create({
-        raw: paymentIntent,
-        params: {
-          email: validated.email,
-          promoCode: validated.promoCode ?? null,
-          userAgent,
-          ipAddress,
-        },
-      })
-    ).pipe(
-      Effect.catchAll((e) =>
-        Effect.sync(() => {
-          logger.warn('Failed to save payment to database, will use webhook fallback', {
-            reason: e.message,
-            paymentIntentId: paymentIntent.id,
-            emailDomain: validated.email?.split('@')[1],
-          });
-        })
-      )
-    );
-
     if (!paymentIntent.client_secret) {
       return yield* Effect.fail(new PaymentError({ message: 'PaymentIntent missing client_secret' }));
     }
 
-    return { clientSecret: paymentIntent.client_secret, discountInfo };
+    const deferred = Effect.suspend(() =>
+      savePayment(
+        paymentDataDTO.create({
+          raw: paymentIntent,
+          params: {
+            email: validated.email,
+            promoCode: validated.promoCode ?? null,
+            userAgent,
+            ipAddress,
+          },
+        })
+      ).pipe(
+        Effect.catchAll((e) =>
+          Effect.sync(() => {
+            logger.warn('Failed to save payment to database, will use webhook fallback', {
+              reason: e.message,
+              paymentIntentId: paymentIntent.id,
+              emailDomain: validated.email?.split('@')[1],
+            });
+          })
+        )
+      )
+    );
+
+    return { clientSecret: paymentIntent.client_secret, discountInfo, deferred };
   });

@@ -3,7 +3,7 @@ import { ApiError } from '@infrastructure/api/errors';
 import { ApplicationLayer } from '@infrastructure/layers';
 import { checkRateLimit } from '@infrastructure/services/payments/rateLimit';
 import { Effect } from 'effect';
-import { type NextRequest, NextResponse } from 'next/server';
+import { after, type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get('cf-connecting-ip') ?? request.headers.get('x-forwarded-for') ?? 'unknown';
@@ -13,10 +13,12 @@ export async function POST(request: NextRequest) {
     Effect.gen(function* () {
       yield* checkRateLimit(ip);
 
-      const { clientSecret, discountInfo } = yield* createPayment(body, {
+      const { clientSecret, discountInfo, deferred } = yield* createPayment(body, {
         userAgent: request.headers.get('user-agent'),
         ipAddress: ip,
       });
+
+      yield* Effect.sync(() => after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer)))));
 
       return NextResponse.json({ success: true, clientSecret, discountInfo });
     }).pipe(
@@ -32,8 +34,8 @@ export async function POST(request: NextRequest) {
           Effect.succeed(NextResponse.json({ success: false, error: ApiError.INTERNAL_ERROR }, { status: 500 })),
       }),
       Effect.catchAll(() =>
-        Effect.succeed(NextResponse.json({ success: false, error: ApiError.INTERNAL_ERROR }, { status: 500 })),
-      ),
-    ),
+        Effect.succeed(NextResponse.json({ success: false, error: ApiError.INTERNAL_ERROR }, { status: 500 }))
+      )
+    )
   );
 }
