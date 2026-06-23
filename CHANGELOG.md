@@ -1,3 +1,23 @@
+# [1.5.0](https://github.com/fbuireu/forever-pto/compare/v1.4.7...v1.5.0) (2026-06-23)
+
+
+### Bug Fixes
+
+* **deps:** sync pnpm-lock.yaml with bumped package.json versions ([6da2d5a](https://github.com/fbuireu/forever-pto/commit/6da2d5a1fe0b1e8b3186ec736c40afe80eb0e09a))
+* **deps:** sync stripe-js 9.8.0 in lockfile after [#322](https://github.com/fbuireu/forever-pto/issues/322) merge ([1351523](https://github.com/fbuireu/forever-pto/commit/13515239ef56bf439ab758bf708f5bbdefb3da9e))
+* **deps:** update dependency @stripe/react-stripe-js to v6.6.0 ([#321](https://github.com/fbuireu/forever-pto/issues/321)) ([b8b964b](https://github.com/fbuireu/forever-pto/commit/b8b964bff8f65a38f30c5f6f78d882eee5231e59))
+* **deps:** update dependency @stripe/stripe-js to v9.8.0 ([#322](https://github.com/fbuireu/forever-pto/issues/322)) ([8f7ea60](https://github.com/fbuireu/forever-pto/commit/8f7ea6001f810feb14275a07a3c872a5cc76f092))
+* **deps:** update dependency react-hook-form to v7.78.0 ([#323](https://github.com/fbuireu/forever-pto/issues/323)) ([458251d](https://github.com/fbuireu/forever-pto/commit/458251d8652efe4a5d91f87948b6e4451715a2aa))
+* **deps:** update dependency stripe to v22.2.1 ([#315](https://github.com/fbuireu/forever-pto/issues/315)) ([6d4e518](https://github.com/fbuireu/forever-pto/commit/6d4e518ececa29c5c799bd3a12d66c81bcac4f1b))
+* **deps:** update lucide monorepo to v1.18.0 ([#324](https://github.com/fbuireu/forever-pto/issues/324)) ([7760ce5](https://github.com/fbuireu/forever-pto/commit/7760ce576e69b8f7bbd7badc0d43be4484833f11))
+* **deps:** update nextjs monorepo to v16.2.9 ([#316](https://github.com/fbuireu/forever-pto/issues/316)) ([017a093](https://github.com/fbuireu/forever-pto/commit/017a093f1ee132a5752e8dfc3e8d14d9b1ce22c8))
+* tests ([6729c1c](https://github.com/fbuireu/forever-pto/commit/6729c1c3c9b5b52b20f4147cfeb4f8a9c8a203ea))
+
+
+### Features
+
+* add after() ([6002065](https://github.com/fbuireu/forever-pto/commit/600206546678edf391d5c043c570a5595982815b))
+
 ## [1.4.7](https://github.com/fbuireu/forever-pto/compare/v1.4.6...v1.4.7) (2026-06-15)
 
 
