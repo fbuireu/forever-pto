@@ -34,7 +34,7 @@ export const StripeServerServiceLive = Layer.sync(StripeServerService, () => {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   const stripe = new StripeNode(secretKey, {
-    apiVersion: '2026-05-27.dahlia',
+    apiVersion: '2026-06-24.dahlia',
     httpClient: StripeNode.createFetchHttpClient(),
   });
 
