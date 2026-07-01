@@ -18,7 +18,7 @@
   "author": "Ferran Buireu <contact@forever-pto.com>",
   "packageManager": "pnpm@11.8.0",
   "engines": {
-    "node": "v26.2.0"
+    "node": "26.1.0"
   },
   "private": true,
   "scripts": {
