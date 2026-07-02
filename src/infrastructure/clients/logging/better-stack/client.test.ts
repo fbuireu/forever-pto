@@ -134,3 +134,32 @@ describe('BetterStackClient.withContext', () => {
     expect(ctx.traceId).toBe('abc');
   });
 });
+
+describe('BetterStackClient without configured tokens', () => {
+  it('does not throw and no-ops logging when tokens are missing', async () => {
+    vi.resetModules();
+    const prevToken = process.env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN;
+    const prevUrl = process.env.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL;
+    const mutableEnv = process.env as Record<string, string | undefined>;
+    delete mutableEnv.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN;
+    delete mutableEnv.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL;
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    try {
+      const { BetterStackClient: FreshClient } = await import('./client');
+      const client = new FreshClient();
+
+      expect(() => client.warn('boom')).not.toThrow();
+      expect(() => client.error('boom')).not.toThrow();
+      expect(() => client.logError('boom', new Error('x'))).not.toThrow();
+      expect(mockLogtail.warn).not.toHaveBeenCalled();
+      expect(mockLogtail.error).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledOnce();
+    } finally {
+      warnSpy.mockRestore();
+      process.env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN = prevToken;
+      process.env.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL = prevUrl;
+      vi.resetModules();
+    }
+  });
+});
