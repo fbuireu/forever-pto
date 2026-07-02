@@ -1,3 +1,4 @@
+import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { LOCALE_COOKIE } from '@infrastructure/i18n/config';
 import { setLocaleCookie } from '@infrastructure/i18n/cookie';
 import { routing } from '@infrastructure/i18n/routing';
@@ -24,6 +25,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   if (pathname.endsWith(PAYMENT_CONFIRMATION_PATH) && !request.nextUrl.searchParams.has('payment_intent')) {
     const homePath = pathname.slice(0, -PAYMENT_CONFIRMATION_PATH.length) || '/';
+
+    try {
+      getBetterStackInstance().warn('Payment confirmation accessed without payment_intent, redirecting to home', {
+        pathname,
+      });
+    } catch {
+      // logging must never block the redirect
+    }
 
     return NextResponse.redirect(new URL(homePath, request.url));
   }

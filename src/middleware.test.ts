@@ -24,6 +24,12 @@ vi.mock('@infrastructure/proxy/location', () => ({
   location: vi.fn(({ response }: { response: NextResponse }) => Promise.resolve(response)),
 }));
 
+const mockWarn = vi.fn();
+
+vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({
+  getBetterStackInstance: vi.fn(() => ({ warn: mockWarn })),
+}));
+
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
 const { middleware } = await import('./middleware');
@@ -113,6 +119,30 @@ describe('middleware', () => {
       await middleware(request);
 
       expect(spy).not.toHaveBeenCalled();
+      expect(mockWarn).not.toHaveBeenCalled();
+    });
+
+    it('logs a warning when redirecting', async () => {
+      const request = makeRequest('/payment/confirmation');
+
+      await middleware(request);
+
+      expect(mockWarn).toHaveBeenCalledWith(
+        'Payment confirmation accessed without payment_intent, redirecting to home',
+        { pathname: '/payment/confirmation' }
+      );
+    });
+
+    it('still redirects when logging fails', async () => {
+      const spy = vi.spyOn(NextResponse, 'redirect');
+      mockWarn.mockImplementationOnce(() => {
+        throw new Error('missing BetterStack envvars');
+      });
+      const request = makeRequest('/payment/confirmation');
+
+      await middleware(request);
+
+      expect(spy).toHaveBeenCalledOnce();
     });
   });
 
