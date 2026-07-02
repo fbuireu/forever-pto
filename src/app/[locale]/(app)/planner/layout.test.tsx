@@ -1,9 +1,9 @@
 import { EN, ES } from '@infrastructure/i18n/locales';
+import { Fragment, Suspense } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockSetRequestLocale = vi.fn();
 
-const MockSidebarProvider = vi.fn().mockReturnValue(null);
 const MockToaster = vi.fn().mockReturnValue(null);
 const MockSiteSubtitle = vi.fn().mockReturnValue(null);
 const MockSiteTitle = vi.fn().mockReturnValue(null);
@@ -18,7 +18,6 @@ vi.mock('next/dynamic', () => ({
   default: vi.fn().mockReturnValue(vi.fn().mockReturnValue(null)),
 }));
 
-vi.mock('@ui/modules/core/animate/base/Sidebar', () => ({ SidebarProvider: MockSidebarProvider }));
 vi.mock('@ui/modules/core/primitives/Sonner', () => ({ Toaster: MockToaster }));
 vi.mock('@ui/modules/pages/planner/SiteSubtitle', () => ({ SiteSubtitle: MockSiteSubtitle }));
 vi.mock('@ui/modules/pages/planner/SiteTitle', () => ({ SiteTitle: MockSiteTitle }));
@@ -34,6 +33,13 @@ const makeParams = (locale = EN) => ({
   params: Promise.resolve({ locale: locale as never }),
 });
 
+const getAppSidebarEl = (element: { props: { children: unknown } }) => {
+  const rootChildren = [element.props.children].flat();
+  const suspenseEl = rootChildren.find((c: unknown) => (c as { type?: unknown })?.type === Suspense);
+  const suspenseChildren = [(suspenseEl as { props: { children: unknown } })?.props.children].flat();
+  return suspenseChildren.find((c: unknown) => (c as { type?: unknown })?.type === MockAppSidebar);
+};
+
 describe('planner/layout', () => {
   beforeEach(() => vi.clearAllMocks());
 
@@ -47,27 +53,21 @@ describe('planner/layout', () => {
     expect(mockSetRequestLocale).toHaveBeenCalledWith(ES);
   });
 
-  it('renders SidebarProvider as root element', async () => {
+  it('renders a fragment as root element', async () => {
     const element = await AppLayout(makeParams());
-    expect(element.type).toBe(MockSidebarProvider);
+    expect(element.type).toBe(Fragment);
   });
 
   it('renders AppSidebar with the resolved locale', async () => {
     const element = await AppLayout(makeParams(ES));
-    const sidebarProviderChildren = [element.props.children].flat();
-    const appSidebarEl = sidebarProviderChildren.find(
-      (c: unknown) => (c as { type?: unknown })?.type === MockAppSidebar
-    );
+    const appSidebarEl = getAppSidebarEl(element);
     expect(appSidebarEl).toBeDefined();
     expect((appSidebarEl as { props: { locale: string } }).props.locale).toBe(ES);
   });
 
   it('renders SiteTitle inside AppSidebar', async () => {
     const element = await AppLayout(makeParams());
-    const sidebarProviderChildren = [element.props.children].flat();
-    const appSidebarEl = sidebarProviderChildren.find(
-      (c: unknown) => (c as { type?: unknown })?.type === MockAppSidebar
-    );
+    const appSidebarEl = getAppSidebarEl(element);
     const innerChildren = [(appSidebarEl as { props: { children: unknown } }).props.children].flat();
     const types = innerChildren.map((c: unknown) => (c as { type?: unknown })?.type);
     expect(types).toContain(MockSiteTitle);
@@ -75,10 +75,7 @@ describe('planner/layout', () => {
 
   it('renders SiteSubtitle inside AppSidebar', async () => {
     const element = await AppLayout(makeParams());
-    const sidebarProviderChildren = [element.props.children].flat();
-    const appSidebarEl = sidebarProviderChildren.find(
-      (c: unknown) => (c as { type?: unknown })?.type === MockAppSidebar
-    );
+    const appSidebarEl = getAppSidebarEl(element);
     const innerChildren = [(appSidebarEl as { props: { children: unknown } }).props.children].flat();
     const types = innerChildren.map((c: unknown) => (c as { type?: unknown })?.type);
     expect(types).toContain(MockSiteSubtitle);
@@ -86,10 +83,7 @@ describe('planner/layout', () => {
 
   it('renders Footer inside AppSidebar', async () => {
     const element = await AppLayout(makeParams());
-    const sidebarProviderChildren = [element.props.children].flat();
-    const appSidebarEl = sidebarProviderChildren.find(
-      (c: unknown) => (c as { type?: unknown })?.type === MockAppSidebar
-    );
+    const appSidebarEl = getAppSidebarEl(element);
     const innerChildren = [(appSidebarEl as { props: { children: unknown } }).props.children].flat();
     const types = innerChildren.map((c: unknown) => (c as { type?: unknown })?.type);
     expect(types).toContain(MockFooter);
@@ -98,10 +92,7 @@ describe('planner/layout', () => {
   it('passes children inside AppSidebar', async () => {
     const child = 'planner-content';
     const element = await AppLayout({ children: child, params: Promise.resolve({ locale: EN as never }) });
-    const sidebarProviderChildren = [element.props.children].flat();
-    const appSidebarEl = sidebarProviderChildren.find(
-      (c: unknown) => (c as { type?: unknown })?.type === MockAppSidebar
-    );
+    const appSidebarEl = getAppSidebarEl(element);
     const innerChildren = [(appSidebarEl as { props: { children: unknown } }).props.children].flat();
     expect(innerChildren).toContain(child);
   });

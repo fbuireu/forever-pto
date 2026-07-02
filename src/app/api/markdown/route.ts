@@ -1,8 +1,6 @@
 import { buildMarkdownPage } from '@infrastructure/markdown/buildMarkdownPage';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 
-export const dynamic = 'force-dynamic';
-
 export async function GET(request: Request) {
   const { env } = await getCloudflareContext({ async: true });
   const baseUrl = env.NEXT_PUBLIC_SITE_URL;

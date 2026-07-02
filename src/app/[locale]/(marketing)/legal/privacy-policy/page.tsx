@@ -1,11 +1,9 @@
 import { addDays, startOfToday } from '@application/shared/utils/dates';
-import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import { createRichLink } from '@ui/modules/core/primitives/RichLink';
-
-const cookiePolicyLink = createRichLink('/legal/cookie-policy');
-
 import { LegalLayout } from '@ui/modules/layout/LegalLayout';
 import { Me } from '@ui/modules/pages/legal/Me';
+import { cacheLife } from 'next/cache';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 
@@ -16,9 +14,12 @@ interface PrivacyPolicyPageProps {
 }
 
 export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPolicyPageProps>) {
+  'use cache';
+  cacheLife('days');
   const { locale } = await params;
-  const [{ env }, t] = await Promise.all([
-    getCloudflareContext({ async: true }),
+  const cookiePolicyLink = createRichLink('/legal/cookie-policy', { locale });
+  const [{ siteUrl, contactEmail }, t] = await Promise.all([
+    getPublicEnv(),
     getTranslations({ locale, namespace: 'privacyPolicy' }),
   ]);
   const lastUpdatedDate = addDays(startOfToday(), -7).toLocaleDateString(locale, {
@@ -28,7 +29,7 @@ export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPoli
   });
 
   return (
-    <LegalLayout title={t('title')} lastUpdated={t('lastUpdated', { date: lastUpdatedDate })}>
+    <LegalLayout locale={locale} title={t('title')} lastUpdated={t('lastUpdated', { date: lastUpdatedDate })}>
       <section>
         <h2 className='text-2xl font-semibold mt-6 mb-4'>{t('sections.introduction.title')}</h2>
         <p>{t('sections.introduction.p1')}</p>
@@ -47,11 +48,11 @@ export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPoli
           </li>
           <li>
             <strong>{t('sections.dataController.items.email.label')}</strong>{' '}
-            {t('sections.dataController.items.email.value', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}
+            {t('sections.dataController.items.email.value', { supportEmail: contactEmail })}
           </li>
           <li>
             <strong>{t('sections.dataController.items.website.label')}</strong>{' '}
-            {t('sections.dataController.items.website.value', { siteUrl: env.NEXT_PUBLIC_SITE_URL })}
+            {t('sections.dataController.items.website.value', { siteUrl: siteUrl })}
           </li>
         </ul>
       </section>
@@ -239,7 +240,7 @@ export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPoli
             {t('sections.yourRights.items.complaint.description')}
           </li>
         </ul>
-        <p className='mt-4'>{t('sections.yourRights.contact', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}</p>
+        <p className='mt-4'>{t('sections.yourRights.contact', { supportEmail: contactEmail })}</p>
       </section>
 
       <section>
@@ -272,11 +273,11 @@ export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPoli
         <ul className='list-disc pl-6 mt-4 space-y-2'>
           <li>
             <strong>{t('sections.contactInfo.items.email.label')}</strong>{' '}
-            {t('sections.contactInfo.items.email.value', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}
+            {t('sections.contactInfo.items.email.value', { supportEmail: contactEmail })}
           </li>
           <li>
             <strong>{t('sections.contactInfo.items.website.label')}</strong>{' '}
-            {t('sections.contactInfo.items.website.value', { siteUrl: env.NEXT_PUBLIC_SITE_URL })}
+            {t('sections.contactInfo.items.website.value', { siteUrl: siteUrl })}
           </li>
         </ul>
         <p className='mt-4'>{t('sections.contactInfo.responseTime')}</p>

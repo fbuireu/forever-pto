@@ -1,15 +1,17 @@
-import type { ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
+import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
+import type { ReactNode } from 'react';
 
 interface LegalLayoutProps {
   title: string;
   lastUpdated: string;
+  locale: Locale;
   children: ReactNode;
 }
 
-export const LegalLayout = async ({ title, lastUpdated, children }: LegalLayoutProps) => {
-  const t = await getTranslations('legal');
+export const LegalLayout = async ({ title, lastUpdated, locale, children }: LegalLayoutProps) => {
+  const t = await getTranslations({ locale, namespace: 'legal' });
 
   return (
     <div className='container mx-auto px-4 py-8 max-w-4xl z-1'>

@@ -1,4 +1,5 @@
 import { Link } from '@application/i18n/navigation';
+import { getCurrentYear } from '@ui/utils/getCurrentYear';
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { version } from '../../../../../package.json';
@@ -7,7 +8,7 @@ import { CookieButton } from './components/CookieButton';
 import { DevFooter } from './components/DevFooter';
 
 export const Footer = async () => {
-  const t = await getTranslations('footer');
+  const [t, year] = await Promise.all([getTranslations('footer'), getCurrentYear()]);
 
   return (
     <footer className='w-full bg-background border-t-[3px] border-[var(--frame)] relative z-10'>
@@ -73,7 +74,7 @@ export const Footer = async () => {
 
         <div className='px-7 py-3 border-t-[2px] border-dashed border-[var(--frame)]/18 flex justify-center'>
           <span className='font-mono text-[11px] text-muted-foreground text-center' suppressHydrationWarning>
-            {t('copyright', { year: new Date().getFullYear() })}
+            {t('copyright', { year })}
           </span>
         </div>
       </div>
