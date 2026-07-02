@@ -1,6 +1,5 @@
 import { LOCALES } from '@infrastructure/i18n/locales';
 import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
-import { cacheLife } from 'next/cache';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 
@@ -9,8 +8,6 @@ interface JsonLdProps {
 }
 
 export async function JsonLd({ locale }: JsonLdProps) {
-  'use cache';
-  cacheLife('days');
   const [{ siteUrl: baseUrl }, t, tFaq] = await Promise.all([
     getPublicEnv(),
     getTranslations({ locale, namespace: 'metadata' }),

@@ -78,6 +78,14 @@ function SidebarProvider({
   }, [isMobile, setOpen]);
 
   useEffect(() => {
+    if (openProp !== undefined) return;
+    const match = document.cookie.match(new RegExp(`(?:^|; )${SIDEBAR_COOKIE_NAME}=([^;]*)`));
+    if (match) {
+      setInternalOpen(match[1] !== 'false');
+    }
+  }, [openProp]);
+
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === SIDEBAR_KEYBOARD_SHORTCUT && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
