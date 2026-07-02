@@ -7,6 +7,8 @@ import createMiddleware from 'next-intl/middleware';
 
 const i18nProxy = createMiddleware(routing);
 
+const PAYMENT_CONFIRMATION_PATH = '/payment/confirmation';
+
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const accept = request.headers.get('accept') ?? '';
   const pathname = request.nextUrl.pathname;
@@ -18,6 +20,12 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     markdownUrl.searchParams.set('path', pathname);
 
     return NextResponse.rewrite(markdownUrl);
+  }
+
+  if (pathname.endsWith(PAYMENT_CONFIRMATION_PATH) && !request.nextUrl.searchParams.has('payment_intent')) {
+    const homePath = pathname.slice(0, -PAYMENT_CONFIRMATION_PATH.length) || '/';
+
+    return NextResponse.redirect(new URL(homePath, request.url));
   }
 
   const i18nResponse = i18nProxy(request);

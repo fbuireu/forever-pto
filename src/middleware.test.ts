@@ -28,11 +28,11 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
 const { middleware } = await import('./middleware');
 
-function makeRequest(pathname: string, accept = ''): NextRequest {
+function makeRequest(pathname: string, accept = '', search = ''): NextRequest {
   return {
     headers: { get: (key: string) => (key === 'accept' ? accept : null) },
-    nextUrl: { pathname },
-    url: `${BASE_URL}${pathname}`,
+    nextUrl: { pathname, searchParams: new URLSearchParams(search) },
+    url: `${BASE_URL}${pathname}${search ? `?${search}` : ''}`,
   } as unknown as NextRequest;
 }
 
@@ -76,6 +76,39 @@ describe('middleware', () => {
     it('does not rewrite non-markdown requests', async () => {
       const spy = vi.spyOn(NextResponse, 'rewrite');
       const request = makeRequest('/some-page', 'text/html');
+
+      await middleware(request);
+
+      expect(spy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('payment confirmation redirect', () => {
+    it('redirects /payment/confirmation to home when payment_intent is missing', async () => {
+      const spy = vi.spyOn(NextResponse, 'redirect');
+      const request = makeRequest('/payment/confirmation');
+
+      await middleware(request);
+
+      expect(spy).toHaveBeenCalledOnce();
+      const url = spy.mock.calls[0][0] as URL;
+      expect(url.pathname).toBe('/');
+    });
+
+    it('redirects locale-prefixed confirmation to the locale home when payment_intent is missing', async () => {
+      const spy = vi.spyOn(NextResponse, 'redirect');
+      const request = makeRequest(`/${ES}/payment/confirmation`);
+
+      await middleware(request);
+
+      expect(spy).toHaveBeenCalledOnce();
+      const url = spy.mock.calls[0][0] as URL;
+      expect(url.pathname).toBe(`/${ES}`);
+    });
+
+    it('does not redirect when payment_intent is present', async () => {
+      const spy = vi.spyOn(NextResponse, 'redirect');
+      const request = makeRequest('/payment/confirmation', '', 'payment_intent=pi_123&redirect_status=succeeded');
 
       await middleware(request);
 
