@@ -1,4 +1,5 @@
 ﻿import { Toaster } from '@ui/modules/core/primitives/Sonner';
+import { PlannerSkeleton } from '@ui/modules/pages/planner/PlannerSkeleton';
 import { SiteSubtitle } from '@ui/modules/pages/planner/SiteSubtitle';
 import { SiteTitle } from '@ui/modules/pages/planner/SiteTitle';
 import { DonateClient } from '@ui/modules/shared/donate/DonateClient';
@@ -27,7 +28,7 @@ const AppLayout = async ({ children, params }: Readonly<AppLayoutProps>) => {
   return (
     <>
       <StoresInitializer />
-      <Suspense fallback={null}>
+      <Suspense fallback={<PlannerSkeleton />}>
         <AppSidebar locale={locale}>
           <div
             className='pointer-events-none h-full z-1 rounded-[8px] inset-0 absolute
