@@ -1,16 +1,12 @@
-'use client';
-
 import type { Locale } from 'next-intl';
-import { useEffect } from 'react';
 
 interface HtmlLangSyncProps {
   locale: Locale;
 }
 
-export const HtmlLangSync = ({ locale }: HtmlLangSyncProps) => {
-  useEffect(() => {
-    document.documentElement.lang = locale;
-  }, [locale]);
-
-  return null;
-};
+export const HtmlLangSync = ({ locale }: HtmlLangSyncProps) => (
+  <script
+    // biome-ignore lint/security/noDangerouslySetInnerHtml: syncs <html lang> as soon as the streamed chunk parses, without waiting for hydration
+    dangerouslySetInnerHTML={{ __html: `document.documentElement.lang=${JSON.stringify(locale)};` }}
+  />
+);
