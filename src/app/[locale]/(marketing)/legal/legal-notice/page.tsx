@@ -1,10 +1,10 @@
-import { addDays, startOfToday } from '@application/shared/utils/dates';
-import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import { createRichLink } from '@ui/modules/core/primitives/RichLink';
 import { LegalLayout } from '@ui/modules/layout/LegalLayout';
 import { Address } from '@ui/modules/pages/legal/Address';
 import { Me } from '@ui/modules/pages/legal/Me';
 import { Nif } from '@ui/modules/pages/legal/Nif';
+import { getLastUpdatedDate } from '@ui/utils/getLastUpdatedDate';
 
 const githubLink = createRichLink('https://github.com/fbuireu/forever-pto', { external: true });
 
@@ -19,15 +19,11 @@ interface LegalNoticePageProps {
 
 export default async function LegalNoticePage({ params }: LegalNoticePageProps) {
   const { locale } = await params;
-  const [{ env }, t] = await Promise.all([
-    getCloudflareContext({ async: true }),
+  const [{ siteUrl, contactEmail }, t] = await Promise.all([
+    getPublicEnv(),
     getTranslations({ locale, namespace: 'legalNotice' }),
   ]);
-  const lastUpdatedDate = addDays(startOfToday(), -7).toLocaleDateString(locale, {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  const lastUpdatedDate = getLastUpdatedDate(locale);
 
   return (
     <LegalLayout title={t('title')} lastUpdated={t('lastUpdated', { date: lastUpdatedDate })}>
@@ -55,11 +51,11 @@ export default async function LegalNoticePage({ params }: LegalNoticePageProps) 
           </li>
           <li>
             <strong>{t('sections.identification.items.email.label')}</strong>{' '}
-            {t('sections.identification.items.email.value', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}
+            {t('sections.identification.items.email.value', { supportEmail: contactEmail })}
           </li>
           <li>
             <strong>{t('sections.identification.items.website.label')}</strong>{' '}
-            {t('sections.identification.items.website.value', { siteUrl: env.NEXT_PUBLIC_SITE_URL })}
+            {t('sections.identification.items.website.value', { siteUrl })}
           </li>
         </ul>
       </section>
@@ -136,7 +132,7 @@ export default async function LegalNoticePage({ params }: LegalNoticePageProps) 
         <ul className='list-disc pl-6 mt-2 space-y-2'>
           <li>
             <strong>{t('sections.contact.items.email.label')}</strong>{' '}
-            {t('sections.contact.items.email.value', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}
+            {t('sections.contact.items.email.value', { supportEmail: contactEmail })}
           </li>
         </ul>
       </section>

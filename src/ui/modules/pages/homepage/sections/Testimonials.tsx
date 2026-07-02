@@ -1,5 +1,7 @@
 import { Badge } from '@ui/modules/core/primitives/Badge';
 import { cn } from '@ui/utils/cn';
+import { cacheLife } from 'next/cache';
+import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { brutCard } from './shared';
 
@@ -16,8 +18,14 @@ type TestimonialKey = 'martaR' | 'diegoA' | 'saraV' | 'carlosM' | 'lauraT' | 'th
 
 const TESTIMONIAL_KEYS: TestimonialKey[] = ['martaR', 'diegoA', 'saraV', 'carlosM', 'lauraT', 'thomasK'];
 
-export const Testimonials = async () => {
-  const t = await getTranslations('homepage');
+interface TestimonialsProps {
+  locale: Locale;
+}
+
+export const Testimonials = async ({ locale }: TestimonialsProps) => {
+  'use cache';
+  cacheLife('days');
+  const t = await getTranslations({ locale, namespace: 'homepage' });
 
   const shuffledKeys = TESTIMONIAL_KEYS.toSorted(() => Math.random() - 0.5);
 

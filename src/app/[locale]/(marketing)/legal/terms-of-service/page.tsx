@@ -1,7 +1,7 @@
-import { addDays, startOfToday } from '@application/shared/utils/dates';
-import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import { createRichLink } from '@ui/modules/core/primitives/RichLink';
 import { LegalLayout } from '@ui/modules/layout/LegalLayout';
+import { getLastUpdatedDate } from '@ui/utils/getLastUpdatedDate';
 import type { Locale } from 'next-intl';
 
 const githubLink = createRichLink('https://github.com/fbuireu/forever-pto', { external: true });
@@ -17,15 +17,11 @@ interface TermsOfServicePageProps {
 
 export default async function TermsOfServicePage({ params }: Readonly<TermsOfServicePageProps>) {
   const { locale } = await params;
-  const [{ env }, t] = await Promise.all([
-    getCloudflareContext({ async: true }),
+  const [{ siteUrl, contactEmail }, t] = await Promise.all([
+    getPublicEnv(),
     getTranslations({ locale, namespace: 'termsOfService' }),
   ]);
-  const lastUpdatedDate = addDays(startOfToday(), -7).toLocaleDateString(locale, {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  const lastUpdatedDate = getLastUpdatedDate(locale);
 
   return (
     <LegalLayout title={t('title')} lastUpdated={t('lastUpdated', { date: lastUpdatedDate })}>
@@ -130,7 +126,7 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.refundPolicy.process.title')}</h3>
         <p>{t('sections.refundPolicy.process.description')}</p>
         <ol className='list-decimal pl-6 mt-2 space-y-2'>
-          <li>{t('sections.refundPolicy.process.steps.contact', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}</li>
+          <li>{t('sections.refundPolicy.process.steps.contact', { supportEmail: contactEmail })}</li>
           <li>{t('sections.refundPolicy.process.steps.include')}</li>
           <li>{t('sections.refundPolicy.process.steps.review')}</li>
           <li>{t('sections.refundPolicy.process.steps.processing')}</li>
@@ -286,9 +282,7 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
         <p>{t('sections.governingLaw.jurisdiction.description')}</p>
 
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.governingLaw.disputeResolution.title')}</h3>
-        <p>
-          {t('sections.governingLaw.disputeResolution.description', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}
-        </p>
+        <p>{t('sections.governingLaw.disputeResolution.description', { supportEmail: contactEmail })}</p>
 
         <h3 className='text-xl font-semibold mt-6 mb-3'>{t('sections.governingLaw.euOdr.title')}</h3>
         <p>{t.rich('sections.governingLaw.euOdr.description', { link: odrLink })}</p>
@@ -321,11 +315,11 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
         <ul className='list-disc pl-6 mt-4 space-y-2'>
           <li>
             <strong>{t('sections.contactInfo.items.email.label')}</strong>{' '}
-            {t('sections.contactInfo.items.email.value', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}
+            {t('sections.contactInfo.items.email.value', { supportEmail: contactEmail })}
           </li>
           <li>
             <strong>{t('sections.contactInfo.items.website.label')}</strong>{' '}
-            {t('sections.contactInfo.items.website.value', { siteUrl: env.NEXT_PUBLIC_SITE_URL })}
+            {t('sections.contactInfo.items.website.value', { siteUrl })}
           </li>
         </ul>
         <p className='mt-4'>{t('sections.contactInfo.responseTime')}</p>

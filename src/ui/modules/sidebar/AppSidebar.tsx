@@ -1,5 +1,4 @@
 import {
-  SIDEBAR_COOKIE_NAME,
   Sidebar,
   SidebarContent,
   SidebarGroup,
@@ -16,9 +15,9 @@ import { ChevronDown } from '@ui/modules/core/animate/icons/ChevronDown';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Settings } from '@ui/modules/core/animate/icons/Settings';
 import { Logo } from '@ui/modules/shared/Logo';
+import { getCurrentYear } from '@ui/utils/getCurrentYear';
 import { Calculator } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { cookies } from 'next/headers';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { type ReactNode, Suspense } from 'react';
@@ -48,11 +47,10 @@ interface AppSidebarProps {
 }
 
 export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
-  const [t, cookieStore] = await Promise.all([getTranslations('sidebar'), cookies()]);
-  const sidebarOpen = cookieStore.get(SIDEBAR_COOKIE_NAME)?.value !== 'false';
+  const [t, currentYear] = await Promise.all([getTranslations('sidebar'), getCurrentYear()]);
 
   return (
-    <SidebarProvider defaultOpen={sidebarOpen}>
+    <SidebarProvider>
       <Sidebar collapsible='icon' variant='inset'>
         <SidebarHeader className='group-data-[collapsible=icon]:p-0 mb-2.5'>
           <SidebarMenu>
@@ -97,7 +95,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                           <Countries locale={locale} />
                         </Suspense>
                         <Regions />
-                        <Years />
+                        <Years currentYear={currentYear} />
                       </div>
                     </div>
 
@@ -171,7 +169,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                 >
                   <div className='px-1 pt-2 pb-1 space-y-[18px]'>
                     <div className={STEP_CARD_CLASS}>
-                      <PtoCalculator />
+                      <PtoCalculator currentYear={currentYear} />
                     </div>
                     <div className={STEP_CARD_CLASS}>
                       <PtoSalaryCalculator />

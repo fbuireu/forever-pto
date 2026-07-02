@@ -15,7 +15,11 @@ import { useShallow } from 'zustand/react/shallow';
 
 const MAX_YEARS = 10;
 
-export const Years = () => {
+interface YearsProps {
+  currentYear: number;
+}
+
+export const Years = ({ currentYear }: YearsProps) => {
   const t = useTranslations('sidebar.years');
   const [open, setOpen] = useState(false);
   const { year, setYear } = useFiltersStore(
@@ -25,7 +29,7 @@ export const Years = () => {
     }))
   );
 
-  const years = Array.from({ length: MAX_YEARS }, (_, index) => new Date().getFullYear() - MAX_YEARS / 2 + index);
+  const years = Array.from({ length: MAX_YEARS }, (_, index) => currentYear - MAX_YEARS / 2 + index);
 
   return (
     <div className='space-y-2 w-full' data-tutorial='year'>

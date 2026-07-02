@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  boneyard-js: bb7a2d73c2746565d5f05e748e63a61ad9309329a9bd08f121e2d15fe2f7ea99
+
 importers:
 
   .:
@@ -43,7 +46,7 @@ importers:
         version: 1.2.3
       boneyard-js:
         specifier: 1.8.2
-        version: 1.8.2(react@19.2.7)(vite@8.0.14(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.16.9)(yaml@2.9.0))
+        version: 1.8.2(patch_hash=bb7a2d73c2746565d5f05e748e63a61ad9309329a9bd08f121e2d15fe2f7ea99)(react@19.2.7)(vite@8.0.14(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.16.9)(yaml@2.9.0))
       canvas-confetti:
         specifier: 1.9.4
         version: 1.9.4
@@ -8276,7 +8279,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  boneyard-js@1.8.2(react@19.2.7)(vite@8.0.14(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.16.9)(yaml@2.9.0)):
+  boneyard-js@1.8.2(patch_hash=bb7a2d73c2746565d5f05e748e63a61ad9309329a9bd08f121e2d15fe2f7ea99)(react@19.2.7)(vite@8.0.14(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.16.9)(yaml@2.9.0)):
     dependencies:
       playwright: 1.61.1
     optionalDependencies:
@@ -9706,7 +9709,7 @@ snapshots:
   normalize-package-data@8.0.0:
     dependencies:
       hosted-git-info: 9.0.3
-      semver: 7.8.1
+      semver: 7.8.5
       validate-npm-package-license: 3.0.4
 
   normalize-svg-path@1.1.0:

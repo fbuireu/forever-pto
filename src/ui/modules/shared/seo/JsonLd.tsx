@@ -1,5 +1,5 @@
 import { LOCALES } from '@infrastructure/i18n/locales';
-import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 
@@ -8,13 +8,11 @@ interface JsonLdProps {
 }
 
 export async function JsonLd({ locale }: JsonLdProps) {
-  const [{ env }, t, tFaq] = await Promise.all([
-    getCloudflareContext({ async: true }),
+  const [{ siteUrl: baseUrl }, t, tFaq] = await Promise.all([
+    getPublicEnv(),
     getTranslations({ locale, namespace: 'metadata' }),
     getTranslations({ locale, namespace: 'faq' }),
   ]);
-
-  const baseUrl = env.NEXT_PUBLIC_SITE_URL;
 
   const webApplicationSchema = {
     '@context': 'https://schema.org',

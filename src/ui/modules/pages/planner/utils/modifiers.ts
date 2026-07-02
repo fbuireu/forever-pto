@@ -1,5 +1,5 @@
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
-import { isBefore, isSameDay, startOfToday } from '@application/shared/utils/dates';
+import { isBefore, isSameDay, startOfDay } from '@application/shared/utils/dates';
 import type { HolidaysState } from '@application/stores/holidays';
 import type { Suggestion } from '@domain/calendar/types';
 import type { FromTo } from '../calendar/Calendar';
@@ -7,17 +7,17 @@ import type { FromTo } from '../calendar/Calendar';
 export const isHoliday = (holidays: HolidaysState['holidays']) => (date: Date) =>
   holidays.some((holiday) => isSameDay(date, holiday.date));
 
-export const isPast = (allowPastDays: boolean) => {
-  if (allowPastDays) {
+export const isPast = (allowPastDays: boolean, today: Date | null) => {
+  if (allowPastDays || !today) {
     return () => false;
   }
 
-  const today = startOfToday();
+  const todayStart = startOfDay(today);
 
-  return (date: Date) => isBefore(date, today);
+  return (date: Date) => isBefore(date, todayStart);
 };
 
-export const isToday = (date: Date) => isSameDay(date, new Date());
+export const isToday = (today: Date | null) => (date: Date) => (today ? isSameDay(date, today) : false);
 
 export const isSuggestion = (currentSelection: Suggestion | null, removedSuggestedDays: Date[] = []) => {
   return (date: Date) => {
