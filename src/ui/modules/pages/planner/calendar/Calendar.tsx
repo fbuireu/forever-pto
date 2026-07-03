@@ -21,7 +21,7 @@ import { cn } from '@ui/utils/cn';
 import { LockIcon } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
 import {
@@ -126,6 +126,11 @@ export function Calendar({
   const premiumKey = usePremiumStore((state) => state.premiumKey);
   const [currentMonth, setCurrentMonth] = useState(initialMonth ?? new Date());
   const [hoverDate, setHoverDate] = useState<Date | undefined>();
+  const [today, setToday] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setToday(new Date());
+  }, []);
   const [rangeSelection, setRangeSelection] = useState<RangeState>(() => {
     if (mode === CalendarSelectionMode.RANGE && isFromToObject(selected)) {
       return {
@@ -154,7 +159,7 @@ export function Calendar({
     const holidayFn = isHoliday(holidays);
     const customFn = isCustomFn(holidays);
     const bankHolidayFn = isBankHolidayFn(holidays);
-    const isPastFn = isPast(allowPastDays);
+    const isPastFn = isPast(allowPastDays, today);
     const isSuggestionFn = isSuggestion(currentSelection, removedSuggestedDays);
     const isAlternativeFn = isAlternative({ alternatives, suggestion, previewAlternativeIndex, currentSelection });
     const isManuallySelectedFn = isManuallySelected(manuallySelectedDays);
@@ -166,7 +171,7 @@ export function Calendar({
       holiday: holidayFn,
       custom: customFn,
       bankHoliday: bankHolidayFn,
-      today: isToday,
+      today: isToday(today),
       suggested: isSuggestionFn,
       alternative: isAlternativeFn,
       disabled: isPastFn,
@@ -200,6 +205,7 @@ export function Calendar({
     hoverDate,
     manuallySelectedDays,
     removedSuggestedDays,
+    today,
   ]);
 
   const weekdayNames = useMemo(() => getWeekdayNames({ locale, weekStartsOn }), [locale, weekStartsOn]);
@@ -491,6 +497,7 @@ export function Calendar({
             disabled: isDisabled,
             showOutsideDays,
             allowPastDays,
+            today,
             modifiers,
           });
 

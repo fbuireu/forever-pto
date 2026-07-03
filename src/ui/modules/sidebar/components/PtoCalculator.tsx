@@ -19,7 +19,11 @@ interface MonthOption {
   label: string;
 }
 
-export const PtoCalculator = () => {
+interface PtoCalculatorProps {
+  currentYear: number;
+}
+
+export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
   const locale = useLocale();
   const t = useTranslations('ptoCalculator');
   const [daysPerMonth, setDaysPerMonth] = useState<number>(2.5);
@@ -38,7 +42,7 @@ export const PtoCalculator = () => {
     const monthNames = getMonthNames({
       locale,
       monthCount: 12,
-      startYear: new Date().getFullYear(),
+      startYear: currentYear,
       monthOutputFormat: 'long',
     });
 
@@ -46,7 +50,7 @@ export const PtoCalculator = () => {
       value: (index + 1).toString(),
       label: monthName,
     }));
-  }, [locale]);
+  }, [locale, currentYear]);
 
   const handleCalculate = () => {
     const monthNumber = Number(selectedMonth);

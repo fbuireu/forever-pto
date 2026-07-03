@@ -1,5 +1,5 @@
 import { localeAlternates, localePath } from '@infrastructure/i18n/utils/url';
-import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
@@ -10,11 +10,10 @@ interface GenerateMetadataParams {
 
 export async function generateMetadata({ params }: GenerateMetadataParams): Promise<Metadata> {
   const { locale } = await params;
-  const [{ env }, t] = await Promise.all([
-    getCloudflareContext({ async: true }),
+  const [{ siteUrl: baseUrl }, t] = await Promise.all([
+    getPublicEnv(),
     getTranslations({ locale, namespace: 'metadata.termsOfService' }),
   ]);
-  const baseUrl = env.NEXT_PUBLIC_SITE_URL;
 
   return {
     title: t('title'),

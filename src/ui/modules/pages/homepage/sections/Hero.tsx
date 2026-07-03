@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { Link } from '@application/i18n/navigation';
 import { getWeekdayNames } from '@application/shared/utils/dates';
 import { LOCALES } from '@infrastructure/i18n/locales';
@@ -7,7 +6,9 @@ import { Button } from '@ui/modules/core/primitives/Button';
 import { FlagIcon } from '@ui/modules/core/primitives/FlagIcon';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';
 import { cn } from '@ui/utils/cn';
+import { getCurrentYear } from '@ui/utils/getCurrentYear';
 import { getLocale, getTranslations } from 'next-intl/server';
+import type { ReactNode } from 'react';
 import { version } from '../../../../../../package.json';
 import { CAL_ENTRIES, type DayType } from './shared';
 
@@ -22,9 +23,9 @@ const HERO_DAY_CLASS: Record<DayType, string> = {
 };
 
 export const Hero = async () => {
-  const [t, locale] = await Promise.all([getTranslations('homepage'), getLocale()]);
-  const DAY_HEADERS = getWeekdayNames({ locale, weekStartsOn: 1, format: 'narrow' }).map((label) => ({
-    id: crypto.randomUUID(),
+  const [t, locale, year] = await Promise.all([getTranslations('homepage'), getLocale(), getCurrentYear()]);
+  const DAY_HEADERS = getWeekdayNames({ locale, weekStartsOn: 1, format: 'narrow' }).map((label, index) => ({
+    id: `day-${index}`,
     label,
   }));
 
@@ -119,7 +120,7 @@ export const Hero = async () => {
             </div>
             <div className='px-[18px] pt-[18px] pb-4 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[4px] border-[var(--frame)] rounded-[10px]'>
               <div className='font-mono text-[12px] uppercase tracking-[0.1em] mb-1' suppressHydrationWarning>
-                {t('hero.mockupLabel', { year: new Date().getFullYear() })}
+                {t('hero.mockupLabel', { year })}
               </div>
               <div className='font-display font-extrabold text-[56px] leading-none tracking-[-0.03em] flex items-baseline gap-2.5'>
                 47

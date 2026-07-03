@@ -8,6 +8,7 @@ interface GetDayClassNamesParams {
   disabled?: boolean;
   showOutsideDays: boolean;
   allowPastDays?: boolean;
+  today: Date | null;
   modifiers: Record<string, (date: Date) => boolean>;
 }
 
@@ -43,13 +44,13 @@ export const getDayClassNames = ({
   disabled = false,
   showOutsideDays,
   allowPastDays = true,
+  today,
   modifiers,
 }: GetDayClassNamesParams) => {
   const classes: string[] = [];
   const isOutsideMonth = !isSameMonth(date, month);
   const isSelected = selectedDates.some((d) => isSameDay(d, date));
-  const today = startOfDay(new Date());
-  const isPastDay = isBefore(startOfDay(date), today);
+  const isPastDay = today ? isBefore(startOfDay(date), startOfDay(today)) : false;
   const shouldShowAsPast = isPastDay && !allowPastDays;
 
   classes.push(

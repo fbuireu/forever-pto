@@ -5,8 +5,6 @@ import { mcpServerCard } from '@infrastructure/well-known/mcpServerCard';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
-
 type Handler = (baseUrl: string) => NextResponse;
 
 interface RouteContext {

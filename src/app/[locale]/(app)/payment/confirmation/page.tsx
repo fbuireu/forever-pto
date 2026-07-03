@@ -7,13 +7,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/m
 import { getCurrencySymbol } from '@ui/utils/currencies';
 import { Effect } from 'effect';
 import { CheckCircle2, XCircle } from 'lucide-react';
+import { redirect } from 'next/navigation';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
-import { redirect } from 'next/navigation';
 
 export { generateMetadata } from './metadata';
-
-export const dynamic = 'force-dynamic';
 
 interface PaymentSuccessParams {
   searchParams: Promise<{
@@ -65,9 +63,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
     redirect(`/${locale}`);
   }
 
-  const data = await Effect.runPromise(
-    confirmation(paymentIntentId).pipe(Effect.provide(ApplicationLayer)),
-  );
+  const data = await Effect.runPromise(confirmation(paymentIntentId).pipe(Effect.provide(ApplicationLayer)));
 
   if (!data || data.status !== 'succeeded') {
     if (data) {

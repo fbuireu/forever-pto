@@ -1,13 +1,23 @@
 'use client';
 
 import { useIsMobile } from '@ui/hooks/useMobile';
-import { setCookie } from '@ui/utils/cookie';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { cn } from '@ui/utils/cn';
+import { setCookie } from '@ui/utils/cookie';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { AnimatePresence, m, type Transition } from 'motion/react';
-import { type ComponentProps, type CSSProperties, type MouseEvent, createContext, use, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  type ComponentProps,
+  type CSSProperties,
+  createContext,
+  type MouseEvent,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { MotionHighlight, MotionHighlightItem } from '../effects/MotionHighlight';
 import { PanelLeftIcon } from '../icons/PanelLeft';
 import { Slot } from './Slot';
@@ -68,7 +78,9 @@ function SidebarProvider({
       } else {
         setInternalOpen(openState);
       }
-      setCookie({ name: SIDEBAR_COOKIE_NAME, value: String(openState), maxAge: SIDEBAR_COOKIE_MAX_AGE }).catch(() => {});
+      setCookie({ name: SIDEBAR_COOKIE_NAME, value: String(openState), maxAge: SIDEBAR_COOKIE_MAX_AGE }).catch(
+        () => {}
+      );
     },
     [setOpenProp, open]
   );
@@ -76,6 +88,14 @@ function SidebarProvider({
   const toggleSidebar = useCallback(() => {
     return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
   }, [isMobile, setOpen]);
+
+  useEffect(() => {
+    if (openProp !== undefined) return;
+    const match = document.cookie.match(new RegExp(`(?:^|; )${SIDEBAR_COOKIE_NAME}=([^;]*)`));
+    if (match) {
+      setInternalOpen(match[1] !== 'false');
+    }
+  }, [openProp]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -379,10 +399,7 @@ function SidebarGroup({ className, ...props }: SidebarGroupProps) {
     <div
       data-slot='sidebar-group'
       data-sidebar='group'
-      className={cn(
-        'relative flex w-full min-w-0 flex-col rounded-xl bg-(--surface-panel-inset) p-2.5',
-        className
-      )}
+      className={cn('relative flex w-full min-w-0 flex-col rounded-xl bg-(--surface-panel-inset) p-2.5', className)}
       {...props}
     />
   );

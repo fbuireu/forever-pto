@@ -1,7 +1,7 @@
-import { addDays, startOfToday } from '@application/shared/utils/dates';
-import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import { createRichLink } from '@ui/modules/core/primitives/RichLink';
 import { LegalLayout } from '@ui/modules/layout/LegalLayout';
+import { getLastUpdatedDate } from '@ui/utils/getLastUpdatedDate';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 
@@ -13,16 +13,12 @@ interface CookiePolicyPageProps {
 
 export default async function CookiePolicyPage({ params }: Readonly<CookiePolicyPageProps>) {
   const { locale } = await params;
-  const [{ env }, t] = await Promise.all([
-    getCloudflareContext({ async: true }),
+  const [{ siteUrl, contactEmail }, t] = await Promise.all([
+    getPublicEnv(),
     getTranslations({ locale, namespace: 'cookiePolicy' }),
   ]);
-  const siteLink = createRichLink(env.NEXT_PUBLIC_SITE_URL);
-  const lastUpdatedDate = addDays(startOfToday(), -7).toLocaleDateString(locale, {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  const siteLink = createRichLink(siteUrl);
+  const lastUpdatedDate = getLastUpdatedDate(locale);
 
   return (
     <LegalLayout title={t('title')} lastUpdated={t('lastUpdated', { date: lastUpdatedDate })}>
@@ -225,11 +221,10 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
         <ul className='list-disc pl-6 mt-2 space-y-2'>
           <li>
             <strong>{t('sections.contact.email.label')}</strong>{' '}
-            {t('sections.contact.email.value', { supportEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })}
+            {t('sections.contact.email.value', { supportEmail: contactEmail })}
           </li>
           <li>
-            <strong>{t('sections.contact.website.label')}</strong>{' '}
-            {t('sections.contact.website.value', { siteUrl: env.NEXT_PUBLIC_SITE_URL })}
+            <strong>{t('sections.contact.website.label')}</strong> {t('sections.contact.website.value', { siteUrl })}
           </li>
         </ul>
       </section>

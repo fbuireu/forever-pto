@@ -4,12 +4,14 @@ import { LOCALE_COOKIE } from '@infrastructure/i18n/config';
 import { LOCALES } from '@infrastructure/i18n/locales';
 import { routing } from '@infrastructure/i18n/routing';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
+import { HtmlLangSync } from '@ui/modules/pages/not-found/HtmlLangSync';
 import { NotFoundContent } from '@ui/modules/pages/not-found/NotFoundContent';
 import { AppThemeProvider } from '@ui/modules/providers/AppThemeProvider';
 import { cn } from '@ui/utils/cn';
 import { cookies, headers } from 'next/headers';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { Suspense } from 'react';
 
 async function detectLocale() {
   const [headersList, cookieStore] = await Promise.all([headers(), cookies()]);
@@ -29,13 +31,34 @@ async function detectLocale() {
   return routing.defaultLocale;
 }
 
-export default async function GlobalNotFound() {
+const LocalizedNotFound = async () => {
   const locale = await detectLocale();
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'accessibility' });
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <>
+      <HtmlLangSync locale={locale} />
+      <a
+        href='#main-content'
+        className='sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-3 focus:py-1.5 focus:text-sm focus:bg-background focus:text-foreground focus:border focus:rounded-md focus:shadow-sm'
+      >
+        {t('skipToMainContent')}
+      </a>
+      <NextIntlClientProvider>
+        <AppThemeProvider>
+          <LazyMotionProvider>
+            <NotFoundContent locale={locale} />
+          </LazyMotionProvider>
+        </AppThemeProvider>
+      </NextIntlClientProvider>
+    </>
+  );
+};
+
+export default function GlobalNotFound() {
+  return (
+    <html lang={routing.defaultLocale} suppressHydrationWarning>
       <body
         className={cn(
           bricolage.variable,
@@ -45,19 +68,9 @@ export default async function GlobalNotFound() {
           'font-sans antialiased'
         )}
       >
-        <a
-          href='#main-content'
-          className='sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-3 focus:py-1.5 focus:text-sm focus:bg-background focus:text-foreground focus:border focus:rounded-md focus:shadow-sm'
-        >
-          {t('skipToMainContent')}
-        </a>
-        <NextIntlClientProvider>
-          <AppThemeProvider>
-            <LazyMotionProvider>
-              <NotFoundContent locale={locale} />
-            </LazyMotionProvider>
-          </AppThemeProvider>
-        </NextIntlClientProvider>
+        <Suspense fallback={null}>
+          <LocalizedNotFound />
+        </Suspense>
       </body>
     </html>
   );

@@ -35,7 +35,7 @@ const HomePage = async ({ params }: PageProps) => {
       <Stats />
       <Features />
       <Comparison />
-      <Testimonials />
+      <Testimonials locale={locale} />
       <Pricing />
       <Faq />
       <HomepageCta />
