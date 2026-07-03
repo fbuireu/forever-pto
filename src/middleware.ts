@@ -8,9 +8,6 @@ import createMiddleware from 'next-intl/middleware';
 const i18nProxy = createMiddleware(routing);
 
 const PAYMENT_CONFIRMATION_PATH = '/payment/confirmation';
-// Under cacheComponents, Next.js stamps dynamic route-handler responses with a no-store
-// Cache-Control that replaces the handler's own header; middleware response headers are
-// applied after the render, so the intended caching policy is restored here.
 const MARKDOWN_CACHE_CONTROL = 'public, max-age=3600';
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
@@ -34,8 +31,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return response;
   }
 
-  // redirect() inside the PPR page streams after the 200 static shell instead of returning
-  // an HTTP 3xx, so the missing-param guard must answer at the proxy level.
   if (pathname.endsWith(PAYMENT_CONFIRMATION_PATH) && !request.nextUrl.searchParams.has('payment_intent')) {
     const homePath = pathname.slice(0, -PAYMENT_CONFIRMATION_PATH.length) || '/';
 
