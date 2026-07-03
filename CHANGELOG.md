@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/fbuireu/forever-pto/compare/v1.5.0...v1.6.0) (2026-07-03)
+
+
+### Features
+
+* enable cache components ([#330](https://github.com/fbuireu/forever-pto/issues/330)) ([a22de2d](https://github.com/fbuireu/forever-pto/commit/a22de2d20b9d944fd0826d21d69d201d9cc44e9b))
+
 # [1.5.0](https://github.com/fbuireu/forever-pto/compare/v1.4.7...v1.5.0) (2026-06-23)
 
 
