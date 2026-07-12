@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import type { ComponentProps, ReactElement, ReactNode } from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 type MotionDivProps = ComponentProps<'div'> & {
   initial?: unknown;
@@ -22,11 +22,16 @@ vi.mock('motion/react', async () => {
   };
 });
 
-vi.mock('@base-ui/react/tooltip', async () => {
+vi.mock('@base-ui/react/popover', async () => {
   const { createElement, cloneElement, Fragment } = await import('react');
+  type TriggerProps = ComponentProps<'button'> & {
+    render?: ReactElement;
+    openOnHover?: boolean;
+    delay?: number;
+  };
   type RenderableProps = ComponentProps<'div'> & { render?: ReactElement; keepMounted?: boolean };
   const renderable =
-    (slot: string, tag = 'div') =>
+    (slot: string) =>
     ({ render: renderProp, children, keepMounted: _k, ...props }: RenderableProps) =>
       renderProp
         ? cloneElement(
@@ -34,13 +39,17 @@ vi.mock('@base-ui/react/tooltip', async () => {
             props as Record<string, unknown>,
             children ?? (renderProp.props as { children?: ReactNode }).children
           )
-        : createElement(tag, { 'data-slot': slot, ...props }, children);
+        : createElement('div', { 'data-slot': slot, ...props }, children);
   return {
-    Tooltip: {
-      Provider: ({ children }: { children?: ReactNode; delay?: number }) => createElement(Fragment, null, children),
+    Popover: {
       Root: ({ children }: { children?: ReactNode; open?: boolean; onOpenChange?: unknown }) =>
         createElement(Fragment, null, children),
-      Trigger: renderable('base-trigger', 'button'),
+      Trigger: ({ children, openOnHover, delay, ...props }: TriggerProps) =>
+        createElement(
+          'button',
+          { 'data-open-on-hover': String(openOnHover), 'data-delay': String(delay), ...props },
+          children
+        ),
       Portal: ({ children }: { children?: ReactNode; keepMounted?: boolean }) =>
         createElement(Fragment, null, children),
       Positioner: renderable('base-positioner'),
@@ -50,66 +59,45 @@ vi.mock('@base-ui/react/tooltip', async () => {
   };
 });
 
-import { Tooltip, TooltipPopup, TooltipPortal, TooltipPositioner, TooltipTrigger } from './Tooltip';
+import { Tooltip, TooltipPopup, TooltipPortal, TooltipPositioner, TooltipProvider, TooltipTrigger } from './Tooltip';
 
-const stubHoverCapability = (canHover: boolean) => {
-  vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: !canHover }));
-};
-
-const renderTooltip = () =>
+const renderTooltip = (ui?: { delay?: number; triggerDelay?: number; defaultOpen?: boolean }) =>
   render(
-    <Tooltip>
-      <TooltipTrigger>info</TooltipTrigger>
-      <TooltipPortal>
-        <TooltipPositioner>
-          <TooltipPopup>tip content</TooltipPopup>
-        </TooltipPositioner>
-      </TooltipPortal>
-    </Tooltip>
+    <TooltipProvider delay={ui?.delay}>
+      <Tooltip defaultOpen={ui?.defaultOpen}>
+        <TooltipTrigger delay={ui?.triggerDelay}>info</TooltipTrigger>
+        <TooltipPortal>
+          <TooltipPositioner>
+            <TooltipPopup>tip content</TooltipPopup>
+          </TooltipPositioner>
+        </TooltipPortal>
+      </Tooltip>
+    </TooltipProvider>
   );
 
-afterEach(() => {
-  vi.unstubAllGlobals();
-});
-
-describe('Tooltip tap support on touch devices', () => {
-  it('opens on trigger click when the device cannot hover', () => {
-    stubHoverCapability(false);
+describe('Tooltip (popover-based, touch-capable)', () => {
+  it('enables openOnHover on the trigger so hover and tap both open it', () => {
     renderTooltip();
-    expect(screen.queryByText('tip content')).toBeNull();
-
-    fireEvent.click(screen.getByText('info'));
-    expect(screen.queryByText('tip content')).not.toBeNull();
+    expect(screen.getByText('info').getAttribute('data-open-on-hover')).toBe('true');
   });
 
-  it('toggles closed on a second trigger click', () => {
-    stubHoverCapability(false);
+  it('threads the provider delay into the trigger', () => {
+    renderTooltip({ delay: 200 });
+    expect(screen.getByText('info').getAttribute('data-delay')).toBe('200');
+  });
+
+  it('lets an explicit trigger delay override the provider delay', () => {
+    renderTooltip({ delay: 200, triggerDelay: 50 });
+    expect(screen.getByText('info').getAttribute('data-delay')).toBe('50');
+  });
+
+  it('renders the popup only while open', () => {
     renderTooltip();
-    const trigger = screen.getByText('info');
-
-    fireEvent.click(trigger);
-    expect(screen.queryByText('tip content')).not.toBeNull();
-
-    fireEvent.click(trigger);
     expect(screen.queryByText('tip content')).toBeNull();
   });
 
-  it('dismisses on pointerdown outside the trigger', () => {
-    stubHoverCapability(false);
-    renderTooltip();
-
-    fireEvent.click(screen.getByText('info'));
+  it('renders the popup when open', () => {
+    renderTooltip({ defaultOpen: true });
     expect(screen.queryByText('tip content')).not.toBeNull();
-
-    fireEvent.pointerDown(document.body);
-    expect(screen.queryByText('tip content')).toBeNull();
-  });
-
-  it('does not toggle on click when the device can hover', () => {
-    stubHoverCapability(true);
-    renderTooltip();
-
-    fireEvent.click(screen.getByText('info'));
-    expect(screen.queryByText('tip content')).toBeNull();
   });
 });

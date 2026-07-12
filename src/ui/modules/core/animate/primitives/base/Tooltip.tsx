@@ -1,6 +1,6 @@
 'use client';
 
-import { Tooltip as TooltipPrimitive } from '@base-ui/react/tooltip';
+import { Popover as PopoverPrimitive } from '@base-ui/react/popover';
 import { useControlledState } from '@ui/hooks/useControlledState';
 import { getStrictContext } from '@ui/utils/context';
 import {
@@ -12,27 +12,25 @@ import {
   useMotionValue,
   useSpring,
 } from 'motion/react';
-import { type ComponentProps, isValidElement, type RefObject, useCallback, useEffect, useMemo, useRef } from 'react';
+import { type ComponentProps, createContext, isValidElement, type ReactNode, use, useMemo } from 'react';
 
 type TooltipContextType = {
   isOpen: boolean;
-  setIsOpen: TooltipProps['onOpenChange'];
-  /** Programmatic open/close (tap-to-toggle, outside dismiss) without Base UI event details. */
-  setOpen: (open: boolean) => void;
   x: MotionValue<number>;
   y: MotionValue<number>;
   followCursor?: boolean | 'x' | 'y';
   followCursorSpringOptions?: SpringOptions;
-  triggerRef: RefObject<HTMLElement | null>;
 };
 const [LocalTooltipProvider, useTooltip] = getStrictContext<TooltipContextType>('TooltipContext');
 
-type TooltipProviderProps = ComponentProps<typeof TooltipPrimitive.Provider>;
-function TooltipProvider(props: TooltipProviderProps) {
-  return <TooltipPrimitive.Provider data-slot='tooltip-provider' {...props} />;
+const TooltipDelayContext = createContext(0);
+
+type TooltipProviderProps = { delay?: number; children?: ReactNode };
+function TooltipProvider({ delay = 0, children }: TooltipProviderProps) {
+  return <TooltipDelayContext.Provider value={delay}>{children}</TooltipDelayContext.Provider>;
 }
 
-type TooltipProps = ComponentProps<typeof TooltipPrimitive.Root> & {
+type TooltipProps = ComponentProps<typeof PopoverPrimitive.Root> & {
   followCursor?: boolean | 'x' | 'y';
   followCursorSpringOptions?: SpringOptions;
 };
@@ -48,97 +46,68 @@ function Tooltip({
   });
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const triggerRef = useRef<HTMLElement | null>(null);
-
-  const setOpen = useCallback(
-    (open: boolean) => {
-      (setIsOpen as unknown as (open: boolean, eventDetails?: unknown) => void)?.(open, undefined);
-    },
-    [setIsOpen]
-  );
-
-  // Touch devices open the tooltip by tapping the trigger (see TooltipTrigger),
-  // and nothing hover-based ever closes it — dismiss on the next press outside.
-  useEffect(() => {
-    if (!isOpen) return;
-    const handlePointerDown = (event: PointerEvent) => {
-      if (triggerRef.current?.contains(event.target as Node)) return;
-      setOpen(false);
-    };
-    document.addEventListener('pointerdown', handlePointerDown, true);
-    return () => document.removeEventListener('pointerdown', handlePointerDown, true);
-  }, [isOpen, setOpen]);
-
   const tooltipContextValue = useMemo(
-    () => ({ isOpen, setIsOpen, setOpen, x, y, followCursor, followCursorSpringOptions, triggerRef }),
-    [isOpen, setIsOpen, setOpen, x, y, followCursor, followCursorSpringOptions]
+    () => ({ isOpen, x, y, followCursor, followCursorSpringOptions }),
+    [isOpen, x, y, followCursor, followCursorSpringOptions]
   );
   return (
     <LocalTooltipProvider value={tooltipContextValue}>
-      {/* Controlled: the tap-to-open path (touch devices) must drive Base UI's
-          internal state too, or the portal renders inside a [hidden] subtree */}
-      <TooltipPrimitive.Root data-slot='tooltip' {...props} open={isOpen} onOpenChange={setIsOpen} />
+      <PopoverPrimitive.Root data-slot='tooltip' {...props} open={isOpen} onOpenChange={setIsOpen} />
     </LocalTooltipProvider>
   );
 }
 
-type TooltipTriggerProps = ComponentProps<typeof TooltipPrimitive.Trigger> & { asChild?: boolean };
-function TooltipTrigger({ onMouseMove, onClick, asChild, children, ...props }: TooltipTriggerProps) {
-  const { isOpen, setOpen, x, y, followCursor, triggerRef } = useTooltip();
+type TooltipTriggerProps = ComponentProps<typeof PopoverPrimitive.Trigger> & { asChild?: boolean };
+function TooltipTrigger({ onMouseMove, asChild, children, openOnHover = true, delay, ...props }: TooltipTriggerProps) {
+  const providerDelay = use(TooltipDelayContext);
+  const { x, y, followCursor } = useTooltip();
   const handleMouseMove = (event: Parameters<NonNullable<TooltipTriggerProps['onMouseMove']>>[0]) => {
     onMouseMove?.(event);
     const target = event.currentTarget.getBoundingClientRect();
     if (followCursor === 'x' || followCursor === true) x.set((event.clientX - target.left - target.width / 2) / 2);
     if (followCursor === 'y' || followCursor === true) y.set((event.clientY - target.top - target.height / 2) / 2);
   };
-  // Base UI tooltips only open on hover/focus-visible, which never happens on
-  // touch — toggle on tap when the device cannot hover.
-  const handleClick = (event: Parameters<NonNullable<TooltipTriggerProps['onClick']>>[0]) => {
-    onClick?.(event);
-    triggerRef.current = event.currentTarget as HTMLElement;
-    if (globalThis.matchMedia?.('(hover: none)').matches) {
-      setOpen(!isOpen);
-    }
-  };
   if (asChild && isValidElement(children)) {
     return (
-      <TooltipPrimitive.Trigger
+      <PopoverPrimitive.Trigger
         data-slot='tooltip-trigger'
+        openOnHover={openOnHover}
+        delay={delay ?? providerDelay}
         onMouseMove={handleMouseMove}
-        onClick={handleClick}
         render={children}
         {...props}
       />
     );
   }
   return (
-    <TooltipPrimitive.Trigger
+    <PopoverPrimitive.Trigger
       data-slot='tooltip-trigger'
+      openOnHover={openOnHover}
+      delay={delay ?? providerDelay}
       onMouseMove={handleMouseMove}
-      onClick={handleClick}
       {...props}
     >
       {children}
-    </TooltipPrimitive.Trigger>
+    </PopoverPrimitive.Trigger>
   );
 }
 
-type TooltipPortalProps = Omit<ComponentProps<typeof TooltipPrimitive.Portal>, 'keepMounted'>;
+type TooltipPortalProps = Omit<ComponentProps<typeof PopoverPrimitive.Portal>, 'keepMounted'>;
 function TooltipPortal(props: TooltipPortalProps) {
   const { isOpen } = useTooltip();
   return (
     <AnimatePresence>
-      {isOpen && <TooltipPrimitive.Portal keepMounted data-slot='tooltip-portal' {...props} />}
+      {isOpen && <PopoverPrimitive.Portal keepMounted data-slot='tooltip-portal' {...props} />}
     </AnimatePresence>
   );
 }
 
-type TooltipPositionerProps = ComponentProps<typeof TooltipPrimitive.Positioner>;
+type TooltipPositionerProps = ComponentProps<typeof PopoverPrimitive.Positioner>;
 function TooltipPositioner(props: TooltipPositionerProps) {
-  return <TooltipPrimitive.Positioner data-slot='tooltip-positioner' {...props} />;
+  return <PopoverPrimitive.Positioner data-slot='tooltip-positioner' {...props} />;
 }
 
-type TooltipPopupProps = Omit<ComponentProps<typeof TooltipPrimitive.Popup>, 'render'> & HTMLMotionProps<'div'>;
+type TooltipPopupProps = Omit<ComponentProps<typeof PopoverPrimitive.Popup>, 'render'> & HTMLMotionProps<'div'>;
 function TooltipPopup({
   transition = { type: 'spring', stiffness: 300, damping: 25 },
   style,
@@ -148,7 +117,7 @@ function TooltipPopup({
   const translateX = useSpring(x, followCursorSpringOptions);
   const translateY = useSpring(y, followCursorSpringOptions);
   return (
-    <TooltipPrimitive.Popup
+    <PopoverPrimitive.Popup
       render={
         <m.div
           key='tooltip-popup'
@@ -169,9 +138,9 @@ function TooltipPopup({
   );
 }
 
-type TooltipArrowProps = ComponentProps<typeof TooltipPrimitive.Arrow>;
+type TooltipArrowProps = ComponentProps<typeof PopoverPrimitive.Arrow>;
 function TooltipArrow(props: TooltipArrowProps) {
-  return <TooltipPrimitive.Arrow data-slot='tooltip-arrow' {...props} />;
+  return <PopoverPrimitive.Arrow data-slot='tooltip-arrow' {...props} />;
 }
 
 export {

@@ -52,9 +52,6 @@ const viewAllTextVariants = {
 export function FeatureList({ features, categoryLabel, detailedViewLabel }: Readonly<FeatureListProps>) {
   const [expanded, setExpanded] = useState(false);
 
-  // whileTap only lasts while the finger is down, so touch devices (no hover)
-  // need the expansion to persist: tap toggles it. Hover devices keep the
-  // hover-driven behavior untouched.
   const handleClick = () => {
     if (globalThis.matchMedia?.('(hover: none)').matches) {
       setExpanded((value) => !value);
