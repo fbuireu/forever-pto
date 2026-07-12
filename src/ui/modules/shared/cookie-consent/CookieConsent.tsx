@@ -123,12 +123,12 @@ export const CookieConsent = () => {
         role='dialog'
         aria-labelledby='cookie-banner-title'
         aria-describedby='cookie-banner-description'
-        className='fixed bottom-4 left-4 z-[9999] max-w-2xl rounded-[14px] border-[3px] border-[var(--frame)] bg-card p-8 shadow-[var(--shadow-brutal-lg)]'
+        className='fixed bottom-4 inset-x-4 sm:right-auto z-9999 sm:max-w-2xl rounded-[14px] border-[3px] border-(--frame) bg-card p-5 sm:p-8 shadow-(--shadow-brutal-lg)'
       >
-        <h3 id='cookie-banner-title' className='text-xl font-semibold tracking-[-0.03em]'>
+        <h3 id='cookie-banner-title' className='text-lg sm:text-xl font-semibold tracking-[-0.03em]'>
           {t('title')}
         </h3>
-        <p id='cookie-banner-description' className='mt-2 text-sm text-muted-foreground'>
+        <p id='cookie-banner-description' className='mt-2 text-xs sm:text-sm text-muted-foreground'>
           {t('description')}
         </p>
         <div className='mt-4 flex flex-wrap gap-2'>
