@@ -44,6 +44,8 @@ https://pr-<n>-forever-pto-docs.fbuireu.workers.dev
 
 Every push to the PR overwrites the alias, so the preview link posted once on the PR stays valid for the PR's whole life. (`workers_dev` and `preview_urls` are enabled in `docs/wrangler.jsonc` to make these URLs resolve.)
 
+One bootstrap subtlety: `versions upload` cannot *create* a Worker, and the `production` GitHub environment is branch-protected to `main`, so previews are impossible until the first production deploy has created `forever-pto-docs`. The preview job probes for the Worker first (`wrangler versions list`) and skips gracefully with a notice instead of failing — the very first docs PR simply has no preview.
+
 ### Why there is no teardown
 
 Compare with the app's [cleanup workflow](/infra/environments/): app previews are real Workers carrying secrets and consuming names, so they must be deleted. Docs preview versions are immutable, secretless snapshots of static HTML that never activate — when the PR closes they simply stop being interesting. Cloudflare retains a bounded version history per Worker and old versions cost nothing, so a cleanup workflow would be pure ceremony.

@@ -96,7 +96,21 @@ jobs:
         with:
           name: docs-dist
           path: docs/dist
+      # Probe: versions upload cannot create the Worker, and the production
+      # environment is branch-protected, so before the first main deploy there
+      # is nothing to preview against — skip gracefully instead of failing.
+      - name: Check Worker exists
+        id: worker
+        continue-on-error: true
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: docs
+          wranglerVersion: '4.107.1'
+          command: versions list
       - name: Upload preview version
+        if: steps.worker.outcome == 'success'
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -104,7 +118,11 @@ jobs:
           workingDirectory: docs
           wranglerVersion: '4.107.1'
           command: versions upload --preview-alias pr-${{ github.event.pull_request.number }}
+      - name: Bootstrap notice
+        if: steps.worker.outcome != 'success'
+        run: echo "::notice::forever-pto-docs Worker does not exist yet — preview skipped. It is created by the first deploy from main."
       - name: Find existing comment
+        if: steps.worker.outcome == 'success'
         uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4.0.0
         id: find-comment
         with:
@@ -112,6 +130,7 @@ jobs:
           comment-author: github-actions[bot]
           body-includes: ${{ env.PREVIEW_MARKER }}
       - name: Upsert preview comment
+        if: steps.worker.outcome == 'success'
         uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5.0.0
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
