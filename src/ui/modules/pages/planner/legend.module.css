@@ -16,6 +16,7 @@
 
 .toggle_label {
   display: none;
+  position: relative;
   cursor: pointer;
   font-size: var(--text-sm);
   font-weight: 600;
@@ -39,6 +40,21 @@
   &:active {
     box-shadow: none;
     transform: translate(1px, 1px);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  &:hover::after {
+    inset: 0 -8px -8px 0;
+  }
+
+  &:active::after {
+    inset: -8px 0 0 -8px;
   }
 }
 

@@ -3,7 +3,17 @@
 import { Accordion as AccordionPrimitive } from '@base-ui/react/accordion';
 import { cn } from '@ui/utils/cn';
 import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
-import { type ComponentProps, type ReactNode, createContext, use, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import {
+  type ComponentProps,
+  createContext,
+  type ReactNode,
+  use,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 type AccordionItemContextType = {
   isOpen: boolean;
@@ -104,7 +114,7 @@ function AccordionTrigger({
             animate={{ rotate: isOpen ? 45 : 0 }}
             transition={transition}
             className={cn(
-              'relative size-7 flex items-center justify-center shrink-0 rounded-md border-[2.5px] border-(--frame) font-black text-lg leading-none select-none transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm)',
+              'relative hit-area-stable size-7 flex items-center justify-center shrink-0 rounded-md border-[2.5px] border-(--frame) font-black text-lg leading-none select-none transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm)',
               isOpen ? 'bg-(--frame) text-background' : 'bg-accent text-(--color-brand-ink)'
             )}
           >

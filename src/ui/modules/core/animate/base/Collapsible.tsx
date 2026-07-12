@@ -3,7 +3,18 @@
 import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible';
 import { cn } from '@ui/utils/cn';
 import { type HTMLMotionProps, m, type Transition } from 'motion/react';
-import { type ComponentProps, type ComponentPropsWithoutRef, type ReactElement, createContext, isValidElement, use, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  type ComponentProps,
+  type ComponentPropsWithoutRef,
+  createContext,
+  isValidElement,
+  type ReactElement,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 type CollapsibleContextType = {
   isOpen: boolean;
@@ -51,18 +62,14 @@ type CollapsibleTriggerProps = ComponentProps<typeof CollapsiblePrimitive.Trigge
 function CollapsibleTrigger({ asChild, children, className, ...props }: CollapsibleTriggerProps) {
   if (asChild && isValidElement(children)) {
     return (
-      <CollapsiblePrimitive.Trigger
-        data-slot='collapsible-trigger'
-        render={children as ReactElement}
-        {...props}
-      />
+      <CollapsiblePrimitive.Trigger data-slot='collapsible-trigger' render={children as ReactElement} {...props} />
     );
   }
   return (
     <CollapsiblePrimitive.Trigger
       data-slot='collapsible-trigger'
       className={cn(
-        "relative inline-flex w-full cursor-pointer items-center justify-between gap-2 rounded-[8px] border-[3px] border-(--frame) bg-(--surface-panel) px-3 py-2 text-sm font-semibold shadow-(--shadow-brutal-btn) outline-none transition-[color,background-color,border-color,box-shadow,transform] duration-75 ease-linear",
+        'relative hit-area-stable inline-flex w-full cursor-pointer items-center justify-between gap-2 rounded-[8px] border-[3px] border-(--frame) bg-(--surface-panel) px-3 py-2 text-sm font-semibold shadow-(--shadow-brutal-btn) outline-none transition-[color,background-color,border-color,box-shadow,transform] duration-75 ease-linear',
         'hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-(--surface-panel-alt) hover:shadow-(--shadow-brutal-btn-hover)',
         'active:translate-x-0.5 active:translate-y-0.5 active:shadow-(--shadow-brutal-btn-active)',
         'aria-expanded:-translate-x-0.5 aria-expanded:-translate-y-0.5 aria-expanded:shadow-(--shadow-brutal-btn-hover)',

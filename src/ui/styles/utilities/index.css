@@ -1,0 +1,37 @@
+@utility hit-area-stable {
+  :where(&) {
+    position: relative;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  &:hover::after {
+    inset: 0 -8px -8px 0;
+  }
+
+  &:active::after {
+    inset: -8px 0 0 -8px;
+  }
+}
+
+@utility hit-area-stable-tilt {
+  :where(&) {
+    position: relative;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  &:hover::after {
+    inset: -16px;
+  }
+}

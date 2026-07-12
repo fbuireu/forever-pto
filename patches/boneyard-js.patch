@@ -1,7 +1,6 @@
 diff --git a/dist/react.js b/dist/react.js
-index 0ce974e11d9b1413b88346027a4c49ec1b81a043..3d8fcd5ea557b6c413150e7ff7ec570d9600fee7 100644
 --- a/dist/react.js
-+++ b/dist/react.js	
++++ b/dist/react.js
 @@ -1,5 +1,5 @@
  import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 -import { Suspense, useRef, useState, useEffect, useLayoutEffect } from 'react';
@@ -11,7 +10,7 @@ index 0ce974e11d9b1413b88346027a4c49ec1b81a043..3d8fcd5ea557b6c413150e7ff7ec570d
  ensureBuildSnapshotHook();
 @@ -31,7 +31,7 @@ export function configureBoneyard(config) {
   */
- export function Skeleton({ loading, children, name, initialBones, color, darkColor, animate, stagger = false, transition = false, boneClass, className, fallback, fixture, snapshotConfig, }) {
+ export function Skeleton({ loading, children, name, initialBones, color, darkColor, animate, stagger = false, transition = false, boneClass, className, fallback, fixture, snapshotConfig, select, }) {
      const containerRef = useRef(null);
 -    const uid = useRef(Math.random().toString(36).slice(2, 8)).current;
 +    const uid = useId().replace(/[^a-zA-Z0-9-]/g, '');
