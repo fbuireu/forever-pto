@@ -1,0 +1,99 @@
+/*
+ * Docs stylesheet. Reuses the app's real design tokens and Tailwind v4 theme so
+ * the live component demos render exactly as in production.
+ *
+ * Import order matters:
+ * 1. App theme first: its @custom-variant (dark, hover) get defined...
+ * 2. ...then @astrojs/starlight-tailwind re-declares `dark` (root + descendants,
+ *    a superset of the app's descendants-only variant) and wins.
+ * 3. Tailwind theme + utilities WITHOUT preflight — Starlight owns base styles;
+ *    importing 'tailwindcss' wholesale would double the preflight.
+ * Never import src/ui/styles/index.css here (full tailwindcss + app layers).
+ */
+@layer base, starlight, theme, components, utilities;
+
+@import '../../../src/ui/styles/theme/index.css';
+@import '@astrojs/starlight-tailwind';
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+@import '../../../src/ui/styles/global/index.css';
+@import '../../../src/ui/styles/utilities/index.css';
+
+@import '@fontsource-variable/bricolage-grotesque';
+@import '@fontsource-variable/space-grotesk';
+@import '@fontsource-variable/jetbrains-mono';
+@import '@fontsource/instrument-serif';
+@import '@fontsource/instrument-serif/400-italic.css';
+
+/* Generate the Tailwind utilities used by the app components living outside
+   the docs root. @source only extracts class strings — scanning Next-coupled
+   files (Sonner, RichLink...) is harmless. */
+@source '../../../src/ui/modules/core';
+
+/* The app sets these via next/font; here @fontsource self-hosts the same
+   families and we point the raw variables at them. */
+:root {
+  --font-bricolage: 'Bricolage Grotesque Variable';
+  --font-space-grotesk: 'Space Grotesk Variable';
+  --font-instrument-serif: 'Instrument Serif';
+  --font-jetbrains-mono: 'JetBrains Mono Variable';
+
+  --sl-font: var(--font-space-grotesk), system-ui, sans-serif;
+  --sl-font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+/* Map the brand onto Starlight's chrome: starlight-tailwind wires the
+   accent/gray Tailwind scales into the --sl-color-* custom properties. */
+@theme {
+  --color-accent-50: #fffbeb;
+  --color-accent-100: #fff5c7;
+  --color-accent-200: #ffec8a;
+  --color-accent-300: #ffe15c;
+  --color-accent-400: #ffd93d;
+  --color-accent-500: #f2c511;
+  --color-accent-600: #d4a017;
+  --color-accent-700: #a87b0a;
+  --color-accent-800: #8a6508;
+  --color-accent-900: #74540c;
+  --color-accent-950: #452f04;
+
+  --color-gray-100: #fffaf0;
+  --color-gray-200: #fff5e1;
+  --color-gray-300: #e8dcc4;
+  --color-gray-400: #b8a88c;
+  --color-gray-500: #8a7a61;
+  --color-gray-600: #6b5e4e;
+  --color-gray-700: #4a4036;
+  --color-gray-800: #2b241e;
+  --color-gray-900: #1a1612;
+}
+
+/* Brutal touches on Starlight chrome */
+:root {
+  --sl-text-h1: 2.75rem;
+}
+
+.site-title {
+  font-family: var(--font-bricolage), var(--sl-font);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* Scoped copy of the app's base [data-slot] transition block
+   (src/ui/styles/base/index.css is not importable wholesale) so demoed
+   components keep their color/filter easing. */
+button[data-slot],
+[data-slot='button'],
+[data-slot='badge'],
+[data-slot='input'],
+[data-slot='textarea'],
+[data-slot='card'] {
+  transition:
+    transform 80ms linear,
+    filter 80ms linear,
+    box-shadow 80ms linear,
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}

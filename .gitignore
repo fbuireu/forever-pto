@@ -1,5 +1,6 @@
 # Dependencies
 /node_modules
+docs/node_modules
 
 # Testing
 /coverage
@@ -38,6 +39,10 @@ pnpm-debug.log*
 # Cloudflare
 .wrangler/
 .open-next
+
+# Docs (Astro)
+docs/dist/
+docs/.astro/
 
 # AI/Agents
 .claude/

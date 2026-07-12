@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+  <title>Forever PTO</title>
+  <g transform="rotate(-4 18 18)">
+    <rect x="4" y="4" width="28" height="28" rx="7" fill="#FFD93D" stroke="#0E0E0E" stroke-width="3" />
+    <circle cx="18" cy="18" r="5" fill="#0E0E0E" />
+    <g stroke="#0E0E0E" stroke-width="2.5" stroke-linecap="round">
+      <line x1="18" y1="8.5" x2="18" y2="11" />
+      <line x1="18" y1="25" x2="18" y2="27.5" />
+      <line x1="8.5" y1="18" x2="11" y2="18" />
+      <line x1="25" y1="18" x2="27.5" y2="18" />
+      <line x1="11.3" y1="11.3" x2="13" y2="13" />
+      <line x1="23" y1="23" x2="24.7" y2="24.7" />
+      <line x1="24.7" y1="11.3" x2="23" y2="13" />
+      <line x1="13" y1="23" x2="11.3" y2="24.7" />
+    </g>
+  </g>
+</svg>
