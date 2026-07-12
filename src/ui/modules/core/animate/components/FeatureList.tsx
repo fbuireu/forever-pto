@@ -2,6 +2,7 @@
 
 import { Badge } from '@ui/modules/core/primitives/Badge';
 import { m, type Transition } from 'motion/react';
+import { useState } from 'react';
 
 interface RoadmapFeature {
   id: string;
@@ -49,12 +50,25 @@ const viewAllTextVariants = {
 };
 
 export function FeatureList({ features, categoryLabel, detailedViewLabel }: Readonly<FeatureListProps>) {
+  const [expanded, setExpanded] = useState(false);
+
+  // whileTap only lasts while the finger is down, so touch devices (no hover)
+  // need the expansion to persist: tap toggles it. Hover devices keep the
+  // hover-driven behavior untouched.
+  const handleClick = () => {
+    if (globalThis.matchMedia?.('(hover: none)').matches) {
+      setExpanded((value) => !value);
+    }
+  };
+
   return (
     <m.div
       className='bg-card border-[3px] border-(--frame) rounded-[14px] p-4 w-full space-y-3 shadow-(--shadow-brutal-md)'
       initial='collapsed'
+      animate={expanded ? 'expanded' : 'collapsed'}
       whileHover='expanded'
       whileTap='expanded'
+      onClick={handleClick}
     >
       <div>
         {features.map((feature, i) => (
