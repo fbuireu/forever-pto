@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/fbuireu/forever-pto/compare/v1.6.0...v1.6.1) (2026-07-12)
+
+
+### Bug Fixes
+
+* prevent hover flicker on elements that translate on hover ([#331](https://github.com/fbuireu/forever-pto/issues/331)) ([354aff2](https://github.com/fbuireu/forever-pto/commit/354aff2c288ad1c46bdc6fff01cc997c3f7f4eee))
+
 # [1.6.0](https://github.com/fbuireu/forever-pto/compare/v1.5.0...v1.6.0) (2026-07-03)
 
 
