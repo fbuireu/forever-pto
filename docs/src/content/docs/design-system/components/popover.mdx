@@ -1,0 +1,43 @@
+---
+title: Popover
+description: Anchored non-modal panel that springs out of its trigger.
+sidebar:
+  order: 15
+---
+
+import { PopoverDemo } from '../../../../components/demos/PopoverDemo';
+
+Source: `src/ui/modules/core/animate/base/Popover.tsx` — the styling layer. The motion lives one level down in `src/ui/modules/core/animate/primitives/base/Popover.tsx` (Base UI popover + `AnimatePresence`). Needs a `LazyMotionProvider` ancestor.
+
+Exports: `Popover`, `PopoverTrigger`, `PopoverContent`.
+
+<PopoverDemo client:visible />
+
+## How it works
+
+- The popup enters with `opacity 0 → 1` and `scale 0.5 → 1` on a spring (`stiffness: 300, damping: 25` in the motion primitive), growing out of the trigger thanks to `origin-(--transform-origin)` — Base UI computes the transform origin from the anchor side.
+- `PopoverContent` bundles portal + positioner + popup: a `w-72`, `rounded-[12px]`, 3px-frame-border panel with `shadow-brutal-md`. Positioning props go on it directly — `align` (default `'center'`), `sideOffset` (default 4) — and `positionerClassName` styles the positioner (default `z-52`) separately from the panel.
+- Focus management passes through: `initialFocus` / `finalFocus` forward to the Base UI popup.
+- `PopoverTrigger asChild` renders your element as the trigger via Base UI's `render`.
+
+## Usage
+
+```tsx
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/modules/core/animate/base/Popover';
+
+<Popover>
+  <PopoverTrigger asChild>
+    <Button variant='outline'>Filters</Button>
+  </PopoverTrigger>
+  <PopoverContent align='start' className='w-80'>
+    …
+  </PopoverContent>
+</Popover>
+```
+
+Related surfaces: [DropdownMenu](/design-system/components/dropdown-menu/) for action lists, [Tooltip](/design-system/components/tooltip/) for hover-only hints, [Dialog](/design-system/components/dialog/) for modal flows. The country/region combobox (`src/ui/modules/core/primitives/Combobox.tsx`) hosts a [Command](/design-system/components/command/) list inside this Popover.
+
+## Conventions
+
+- `data-slot` hooks (from the motion primitive): `popover`, `popover-trigger`, `popover-portal`, `popover-positioner`, `popover-popup`.
+- The portal stays mounted while the exit animation plays (`keepMounted` under `AnimatePresence`).

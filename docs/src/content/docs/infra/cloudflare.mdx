@@ -1,0 +1,49 @@
+---
+title: Cloudflare stack
+description: The Workers, storage bindings and platform features the app runs on — and how they fit together.
+sidebar:
+  order: 5
+---
+
+Everything runs on Cloudflare. The account hosts three Workers from this repo, plus storage and access-control services, all on the `forever-pto.com` zone.
+
+## The three Workers
+
+| Worker | Config | What it is |
+| --- | --- | --- |
+| `forever-pto` (+ `forever-pto-development`, per-PR previews) | `wrangler.toml` | The Next.js app, compiled to a Worker by OpenNext |
+| `forever-pto-tail` | `workers/tail/wrangler.toml` | Tail Worker forwarding logs to Better Stack |
+| `forever-pto-docs` | `docs/wrangler.jsonc` | This site — pure static assets |
+
+### The app Worker (OpenNext)
+
+`pnpm run cf:build` runs `opennextjs-cloudflare build`, which wraps `next build` and emits `.open-next/worker.js` (the Worker entry in `wrangler.toml`) plus `.open-next/assets` (bound as `ASSETS`). The Worker runs with the `nodejs_compat` compatibility flag family — see `wrangler.toml` for the exact flags and date. Environment split (`[env.development]` / `[env.production]`) is covered on the [environments](/infra/environments/) page.
+
+### The tail Worker
+
+`workers/tail/index.ts` implements a `tail()` handler: Cloudflare streams the app Worker's logs and exceptions to it (declared via `[[tail_consumers]]` in every environment of `wrangler.toml`), and it forwards them to Better Stack. It is a separate, manually deployed Worker — **no workflow deploys it**, a known gap in the CI story.
+
+### The docs Worker
+
+`forever-pto-docs` is a static-assets-only Worker (no code, just the Astro `dist/` directory) with a `custom_domain` route for `docs.forever-pto.com` declared in `docs/wrangler.jsonc` — notably the repo's first infrastructure-as-code custom domain; the app's dev subdomain is dashboard-managed. Deployment is described in [docs CI](/infra/docs-ci/).
+
+## Storage
+
+- **R2 — incremental cache.** `open-next.config.ts` wires OpenNext's `incrementalCache` to R2, using the `NEXT_INC_CACHE_R2_BUCKET` binding. Production uses the `forever-pto-next-inc-cache` bucket; development (and every PR preview) shares `forever-pto-next-inc-cache-dev`. This is where ISR/`use cache` output lives between requests.
+- **KV — rate limiting.** The `RATE_LIMIT_KV` binding (namespace ids per environment in `wrangler.toml`) backs API rate limiting. Like R2, the dev namespace is shared across all previews.
+- **Turso — database.** libSQL over HTTP; one database per environment, configured as the `TURSO_DATABASE_URL` var in `wrangler.toml` with the `TURSO_AUTH_TOKEN` pushed as a [runtime secret](/infra/secrets/). Turso is external to Cloudflare but fits the Worker model (no TCP pooling required).
+
+## Platform features
+
+- **Smart placement.** `[placement] mode = "smart"` lets Cloudflare run the Worker near its backends (the Turso databases) instead of near the user when that lowers total latency — sensible because most requests fan out to the database rather than doing pure edge work.
+- **Observability.** Workers Logs and Traces are enabled with invocation logs, head-sampled at the rate set in `wrangler.toml` (the same rate in every environment). Sampled full-fidelity data lives in the Cloudflare dashboard; the tail Worker independently forwards to Better Stack for retention and alerting.
+- **Cloudflare Access.** The development Worker and every PR preview sit behind Zero Trust Access. `wrangler.toml` carries the team domain and the Access application AUD tags (`CF_ACCESS_WORKERS_AUD` for the stable dev domain, `CF_ACCESS_PREVIEW_AUD` for `workers.dev` previews) so the app can validate Access JWTs. CI's Playwright job authenticates with a service token — see [environments](/infra/environments/).
+
+## Local development
+
+- `pnpm preview` — OpenNext build + local `workerd` preview, the closest thing to production.
+- `next dev` still works because `next.config.ts` calls `initOpenNextCloudflareForDev()`, which materializes the wrangler bindings (R2, KV, vars) inside the dev server.
+- Local Worker secrets live in `.dev.vars` (gitignored) — see [secrets](/infra/secrets/).
+- `pnpm cf:typegen` regenerates `cloudflare-env.d.ts` from the wrangler config (generated on demand, not committed).
+
+Heads-up for Windows contributors: `cf:build` is known to fail locally on Windows; CI builds on Ubuntu, and `next dev` is unaffected.

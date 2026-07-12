@@ -1,0 +1,31 @@
+---
+title: Textarea
+description: Multi-line text field that auto-grows with its content via CSS field-sizing.
+sidebar:
+  order: 22
+---
+
+import { TextareaStatesDemo } from '../../../../components/demos/TextareaDemo';
+
+Source: `src/ui/modules/core/primitives/Textarea.tsx`. The multi-line sibling of [Input](/design-system/components/input/): same `bg-input` surface, 3px frame border, and the same shadow-driven states (hover → extra-small shadow, focus → small shadow, `aria-invalid` → destructive border and focus shadow).
+
+Sizing is handled by CSS alone: `field-sizing-content` lets the field grow with its content from a `min-h-24` baseline — no JS resize logic and no manual `rows` management.
+
+<TextareaStatesDemo client:visible />
+
+## Usage
+
+```tsx
+import { Textarea } from '@ui/modules/core/primitives/Textarea';
+
+<Textarea placeholder='Notes for this holiday…' value={notes} onChange={handleChange} />
+
+<Textarea aria-invalid={Boolean(error)} />
+```
+
+## Conventions
+
+- `data-slot='textarea'` for CSS containment hooks.
+- Validation styling is driven by `aria-invalid`, exactly like [Input](/design-system/components/input/).
+- `field-sizing-content` is progressive enhancement: browsers without support fall back to a fixed `min-h-24` box with the native resize behavior.
+- Pair with [Label](/design-system/components/label/).

@@ -1,0 +1,35 @@
+---
+title: Input
+description: The single-line text field — shadow-based hover, focus and invalid states on the brutal frame.
+sidebar:
+  order: 13
+---
+
+import { InputStatesDemo, InputTypesDemo } from '../../../../components/demos/InputDemo';
+
+Source: `src/ui/modules/core/primitives/Input.tsx`. A styled native `<input>` on `bg-input` with `rounded-[8px]` and the 3px frame border. No variants — state is communicated entirely through the shadow: hover adds the extra-small brutal shadow, focus the small one, and `aria-invalid` swaps the border to destructive with a destructive focus shadow.
+
+<InputStatesDemo client:visible />
+
+## Native types
+
+All native `input` attributes pass through, including `type`. File inputs get dedicated `file:` pseudo-element styling.
+
+<InputTypesDemo client:visible />
+
+## Usage
+
+```tsx
+import { Input } from '@ui/modules/core/primitives/Input';
+
+<Input type='number' min={0} value={ptoDays} onChange={handleChange} />
+
+<Input aria-invalid={Boolean(error)} />
+```
+
+## Conventions
+
+- `data-slot='input'` for CSS containment hooks.
+- Validation styling is driven by `aria-invalid`, not a prop — set it from your form state so styling and accessibility stay in sync.
+- `h-11` matches the default [Button](/design-system/components/button/) height, so inputs and buttons align in rows.
+- Pair with [Label](/design-system/components/label/); for prefixes, suffixes and inline buttons use [InputGroup](/design-system/components/input-group/).

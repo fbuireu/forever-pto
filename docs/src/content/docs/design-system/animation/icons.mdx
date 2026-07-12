@@ -1,7 +1,71 @@
 ---
 title: Animated icons
-description: The AnimateIcon system.
+description: The AnimateIcon system — 22 motion-drawn icons with hover, tap, view and loop triggers driven through context.
+sidebar:
+  order: 1
 ---
 
-Placeholder — content pending.
+import { IconsGalleryDemo, IconTriggersDemo, ICON_COUNT } from '../../../../components/demos/IconsGalleryDemo';
 
+Source: `src/ui/modules/core/animate/icons/`. The directory holds {ICON_COUNT} icon components plus the shared machinery in `Icon.tsx` (`AnimateIcon`, `IconWrapper`, `useAnimateIconContext`, `useVariants`). Every icon draws itself with `m.svg`/`m.path` from Motion, so any subtree that renders one needs a `LazyMotionProvider` ancestor — the demos on this page provide their own.
+
+## Gallery
+
+Hover a tile to play its animation. The gallery imports every icon by its real export name, so a rename in the app breaks `astro check` here. Two exports differ from their file name: `PanelLeft.tsx` exports `PanelLeftIcon` and `Search.tsx` exports both `Search` and `SearchIcon`.
+
+<IconsGalleryDemo client:visible />
+
+## How an icon is built
+
+Each icon file (e.g. `src/ui/modules/core/animate/icons/Check.tsx`) follows one pattern:
+
+1. An `animations` object maps animation names (`default`, and for the directional icons also `default-loop`) to Motion `Variants` per SVG part.
+2. An inner component draws the SVG with `m.*` elements, wiring each part to `useVariants(animations)` and the shared `controls` from `useAnimateIconContext`.
+3. The export wraps it in `IconWrapper`, which connects the icon to the nearest `AnimateIcon` context — or creates one on the fly when trigger props are passed directly to the icon.
+
+On top of the per-icon animations, `Icon.tsx` defines two static animations available to every icon: `path` and `path-loop`, which redraw the strokes via `pathLength`.
+
+## Trigger API
+
+`AnimateIcon` wraps arbitrary children (an `m.span`, or the child itself with `asChild`) and drives all descendant icons through context. The same props are accepted directly on any icon. From `Icon.tsx`:
+
+| Prop | What it does |
+| --- | --- |
+| `animate` | Imperative trigger: `true`/`false`, or an animation name to play immediately. |
+| `animateOnHover` | Play while the pointer is over the wrapper (mouse only); pass a name to pick the animation. |
+| `animateOnTap` | Play while pressed (`pointerdown` → `pointerup`). |
+| `animateOnView` | Play when scrolled into view; tune with `animateOnViewMargin` and `animateOnViewOnce`. |
+| `animation` | Which animation the triggers play: `default`, an icon-specific key, or the static `path` / `path-loop`. |
+| `loop`, `loopDelay` | Restart the animation when it finishes, optionally waiting `loopDelay` ms between runs. |
+| `delay` | Delay (ms) before a trigger actually starts the animation. |
+| `initialOnAnimateEnd`, `persistOnAnimateEnd`, `completeOnStop` | End-state control: snap back to the initial frame after finishing, keep the final frame when the trigger ends, or let an in-flight run finish before stopping. |
+
+<IconTriggersDemo client:visible />
+
+## Context propagation
+
+Because triggers travel through context, one `AnimateIcon` can animate icons buried inside composed children. That is how `Combobox` (`src/ui/modules/core/primitives/Combobox.tsx`) animates the `ChevronUpDown` inside its trigger button: the wrapper toggles `animateOnHover={!open} animate={open}` and the icon simply sits in the button. Individual icons can override any inherited prop; the override wins over the parent context.
+
+## Usage
+
+```tsx
+import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
+import { Trash2 } from '@ui/modules/core/animate/icons/Trash2';
+
+// Standalone: trigger props directly on the icon
+<Trash2 animateOnHover size={20} />
+
+// Composed: the wrapper animates every icon inside it
+<AnimateIcon animateOnHover>
+  <button type='button'>
+    Delete <Trash2 size={16} />
+  </button>
+</AnimateIcon>
+```
+
+## Conventions
+
+- Default `size` is `28`; icons inherit `currentColor` for strokes.
+- Import each icon from its own module (`@ui/modules/core/animate/icons/Check`) — there is no barrel file, by design.
+- Hover and tap triggers ignore touch pointers (`pointerType !== 'mouse'` guard), so mobile users only see `animate`/`animateOnView` animations.
+- Related: [effects](/design-system/animation/effects/), [text animations](/design-system/animation/text/), [animated components](/design-system/animation/components/).

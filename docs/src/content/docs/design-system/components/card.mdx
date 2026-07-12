@@ -1,0 +1,46 @@
+---
+title: Card
+description: The surface container — Card with Header, Title, Description and Content sub-components.
+sidebar:
+  order: 5
+---
+
+import { CardDemo, CardPartsDemo } from '../../../../components/demos/CardDemo';
+
+Source: `src/ui/modules/core/primitives/Card.tsx`. A `bg-card` column with `rounded-[14px]`, the 3px frame border and the medium brutal shadow. No variants — composition happens through the sub-components. Framework-clean, so this page renders the real component.
+
+<CardDemo client:visible />
+
+## Parts
+
+<CardPartsDemo client:visible />
+
+| Part | Role |
+| --- | --- |
+| `Card` | Container: vertical flex, `gap-6`, `py-6`, clips overflow. |
+| `CardHeader` | Grid with a `@container/card-header` container query; reserves a second column when a `data-slot='card-action'` child is present. |
+| `CardTitle` | `font-black` heading text, tight tracking. |
+| `CardDescription` | Muted small text. |
+| `CardContent` | Body area, horizontal padding matching the header. |
+
+Only these five are exported. The source also defines `_CardAction` and `_CardFooter`, currently private — check `src/ui/modules/core/primitives/Card.tsx` before reaching for them.
+
+## Usage
+
+```tsx
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
+
+<Card>
+  <CardHeader>
+    <CardTitle>Summer bridge</CardTitle>
+    <CardDescription>4 PTO days connect two holidays.</CardDescription>
+  </CardHeader>
+  <CardContent>…</CardContent>
+</Card>
+```
+
+## Conventions
+
+- Every part sets a `data-slot` attribute (`card`, `card-header`, `card-title`, …) for CSS containment hooks.
+- Vertical rhythm comes from the container's `gap-6`; parts only own horizontal padding (`px-6`).
+- The homepage sections use their own heavier `brutCard` class (4px border) from `src/ui/modules/pages/homepage/sections/shared.ts` — that is a page-level pattern, not this primitive.

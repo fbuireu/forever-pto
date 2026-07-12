@@ -30,6 +30,9 @@
    the docs root. @source only extracts class strings — scanning Next-coupled
    files (Sonner, RichLink...) is harmless. */
 @source '../../../src/ui/modules/core';
+/* Homepage pattern constants (brutCard, dayCell) demoed on
+   design-system/patterns/homepage — their classes live outside core. */
+@source '../../../src/ui/modules/pages/homepage/sections/shared.ts';
 
 /* The app sets these via next/font; here @fontsource self-hosts the same
    families and we point the raw variables at them. */

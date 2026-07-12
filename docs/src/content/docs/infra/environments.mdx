@@ -1,7 +1,69 @@
 ---
 title: Environments
-description: Production, development and per-PR previews.
+description: Production, stable development and per-PR preview Workers — how each is created, updated and destroyed.
+sidebar:
+  order: 1
 ---
 
-Placeholder — content pending.
+The app runs as a Cloudflare Worker built with OpenNext. There are three kinds of environment, all defined by the two `[env.*]` blocks in `wrangler.toml` — previews are not a third wrangler environment, they are the `development` environment deployed under a different Worker name.
 
+| Environment | Worker | URL | Access |
+| --- | --- | --- | --- |
+| Production | `forever-pto` | `https://forever-pto.com` (zone route `forever-pto.com/*`) | Public |
+| Development (stable) | `forever-pto-development` | `https://development.forever-pto.com` | Cloudflare Access |
+| Per-PR preview | `pr-<n>-forever-pto-development` | `https://pr-<n>-forever-pto-development.fbuireu.workers.dev` | Cloudflare Access |
+
+## Production
+
+Deployed by `.github/workflows/deploy-production.yml` on every push to `main` (see [release](/infra/release/) for why this is *not* gated on CI). The Worker is bound to the `forever-pto.com` zone via a route pattern in `wrangler.toml` — a zone route, not a Workers custom domain. It uses the production R2 incremental-cache bucket, KV namespace and Turso database (see [Cloudflare stack](/infra/cloudflare/)).
+
+## Development (stable)
+
+The `forever-pto-development` Worker is the long-lived development environment. Its custom domain (`development.forever-pto.com`) is managed in the Cloudflare dashboard — `wrangler.toml` only knows the URL as the `NEXT_PUBLIC_SITE_URL` var, there is no route for it in the file. The whole environment sits behind Cloudflare Zero Trust Access (`CF_ACCESS_*` vars in `wrangler.toml`), so a browser hitting it gets an Access login and CI must authenticate with a service token.
+
+## Per-PR previews
+
+Every pull request gets its own throwaway Worker.
+
+### Created
+
+`.github/workflows/deploy-development.yml` fires on `pull_request` (`opened`, `reopened`, `synchronize`) and calls the reusable `.github/workflows/_deploy.yml` with `wrangler_env: development` plus a `worker_name` override of `pr-<n>-forever-pto-development`. The `--name` flag on `wrangler deploy` is what mints a brand-new Worker instead of updating the stable one. After deploying:
+
+1. The five runtime secrets are re-pushed to the new Worker with `wrangler secret bulk --name pr-<n>-…` (Worker-attached secrets do not exist until pushed — see [secrets](/infra/secrets/)).
+2. A sticky PR comment (upserted via a hidden marker) posts the preview URL.
+3. A Playwright E2E job runs against the live preview, authenticating through Cloudflare Access with a service token (`CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET` injected as `CF-Access-Client-Id/Secret` headers by `playwright.config.ts`).
+
+### Destroyed
+
+`.github/workflows/cleanup-development.yml` fires on `pull_request: closed` (merged or not) and runs `wrangler delete pr-<n>-forever-pto-development --force`. That single command is the entirety of teardown: the Worker and its attached secrets disappear.
+
+### What survives
+
+Previews deploy with `--env development`, so they all **share** the development bindings — the dev R2 incremental-cache bucket, the dev rate-limit KV namespace and the dev Turso database (all declared under `[env.development]` in `wrangler.toml`). None of that state is cleaned up when a PR closes, and one preview's writes are visible to every other preview.
+
+## Lifecycle
+
+```text
+ PR opened / synchronized                          PR closed
+        │                                              │
+        ▼                                              ▼
+ deploy-development.yml                       cleanup-development.yml
+        │                                              │
+        ▼                                              ▼
+ _deploy.yml                                  wrangler delete
+   ├─ cf:build (OpenNext)                     pr-<n>-forever-pto-development
+   ├─ wrangler deploy --env development         --force
+   │    --name pr-<n>-forever-pto-development         │
+   ├─ wrangler secret bulk --name pr-<n>-…            ▼
+   ├─ sticky PR comment (preview URL)         Worker + secrets gone.
+   └─ Playwright E2E via Access token         Shared dev R2 / KV / Turso
+                                              persist untouched.
+
+ push to main ──► deploy-production.yml ──► _deploy.yml
+                  (parallel with CI/release)   └─ wrangler deploy --env production
+                                                  → Worker forever-pto @ forever-pto.com/*
+```
+
+## Contrast: the docs site's previews
+
+This documentation site does it differently: PR previews are immutable [Worker versions](/infra/docs-ci/) uploaded with `wrangler versions upload --preview-alias`, not standalone Workers. They carry no secrets and no shared state, so there is **no teardown workflow** — old versions are inert and harmless. When the app's preview model feels heavyweight, that page explains the cheaper alternative.

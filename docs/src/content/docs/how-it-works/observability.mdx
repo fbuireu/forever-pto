@@ -1,0 +1,40 @@
+---
+title: Observability
+description: Workers observability sampling, the tail worker forwarding to Better Stack, server and browser logging, and the typed analytics events.
+sidebar:
+  order: 14
+---
+
+Telemetry converges on **Better Stack** (Logtail), fed from four surfaces: the Cloudflare platform, the server runtime, the browser, plus Google Analytics for product metrics.
+
+## Cloudflare Workers observability
+
+`wrangler.toml` enables platform observability for the worker in every environment: invocation logs and traces, both head-sampled (see the `[observability]` blocks in the file for the current rates). This is the "free" layer — request outcomes, CPU time, exceptions — queryable in the Cloudflare dashboard without any code.
+
+## The tail worker
+
+`workers/tail/index.ts` is a **separate, manually deployed Worker** (`forever-pto-tail`, own `wrangler.toml`) attached to the app via `[[tail_consumers]]` in each environment. Its `tail()` handler receives batches of tail events from the main Worker, flattens each event's `logs` and `exceptions` into structured entries (timestamp, level, message, plus script name, outcome, URL, method and response status), and POSTs them to `BETTER_STACK_INGESTING_URL` with the source token as a bearer. This is what gets `console.*` output and uncaught exceptions from production into Better Stack with zero latency cost on the request path.
+
+## Server-side logging
+
+- `src/infrastructure/clients/logging/better-stack/client.ts` — `getBetterStackInstance()`, a singleton over `@logtail/edge`'s `Logtail` configured with `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN` / `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` and the Cloudflare execution context. Used directly by plain code ([country detection](/how-it-works/country-detection/), stores, services).
+- `src/infrastructure/clients/logging/better-stack/service.ts` — `LoggerService`, the Effect wrapper used inside use-cases; it is part of `ApplicationLayer`.
+- `next.config.ts` wraps the whole Next config in `withBetterStack` from `@logtail/next`.
+
+A privacy convention runs through all call sites: log the email **domain**, ids and flags — never full addresses or payloads.
+
+## Browser analytics: typed `track()`
+
+`src/infrastructure/clients/logging/better-stack/tracking.ts` exposes `track(event, properties?)` and `identifyUser(email, plan)` over `window.betterstack`. Event names are a closed union (`TrackEventName`): `payment_started`, `payment_completed`, `payment_failed`, `promo_code_applied`, `premium_activated`, `upgrade_modal_opened`, `feature_unlocked`, `planner_generated`, `contact_form_submitted` — a typo or ad-hoc event is a compile error. Both functions no-op when the script is absent (SSR, consent denied).
+
+The script itself is injected by `src/ui/modules/tutorial/BetterStackTracking.tsx`, mounted in the root layout but rendering nothing until the analytics [consent category](/how-it-works/cookie-consent/) is accepted and `NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN` is set. Once consented, premium users are identified with `identifyUser(email, 'premium' | 'free')`.
+
+## Google Analytics
+
+`src/ui/modules/tutorial/Analytics.tsx` loads gtag (`NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`) with **Consent Mode defaults of denied** for all storage types; the consent component upgrades `analytics_storage` only after opt-in. GA covers acquisition/product analytics; Better Stack events cover behavioral telemetry the team actually alerts on.
+
+## Where to look when debugging
+
+- Request failed in production → Better Stack (tail worker entries carry URL, method, status, outcome).
+- Effect use-case errors → Better Stack via `LoggerService` with structured context.
+- Client-side behavior funnels → Better Stack events; page analytics → GA.

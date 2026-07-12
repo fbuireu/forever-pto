@@ -1,7 +1,64 @@
 ---
 title: Architecture overview
-description: Layered architecture of the app.
+description: The layered src/ architecture — app, application, domain, infrastructure and ui — plus dependency rules, CONTEXT.md files and path aliases.
+sidebar:
+  order: 1
 ---
 
-Placeholder — content pending.
+Forever PTO is a Next.js App Router application organised into five layers under `src/`, plus `src/middleware.ts` at the root of the tree. Each layer has a single responsibility and a deliberate dependency direction.
 
+## The layers
+
+| Layer | Path | Responsibility |
+| --- | --- | --- |
+| App | `src/app/` | Next.js App Router: routes, layouts, API handlers, metadata, sitemap/robots. Composition only — see [routing](/architecture/routing/). |
+| Application | `src/application/` | Data contracts (DTOs), Zustand stores, Effect use-cases, `next-intl` navigation glue (`src/application/i18n/navigation.ts`), email templates and export generators. |
+| Domain | `src/domain/` | Pure business logic: the calendar suggestion engine (`src/domain/calendar/`) and payment domain events/handlers (`src/domain/payment/`). |
+| Infrastructure | `src/infrastructure/` | Everything that talks to the outside world: SDK clients, services, the middleware proxy helpers, the calculation Web Worker (`src/infrastructure/workers/`), i18n runtime config, the [image loader](/architecture/images/) and `.well-known` payloads. |
+| UI | `src/ui/` | React modules (`src/ui/modules/`), hooks, styles (`src/ui/styles/`), assets and i18n message catalogs (`src/ui/i18n/messages/`). |
+
+## Dependency direction
+
+The intended flow points inwards, towards the domain:
+
+```text
+app  →  ui  →  application  →  domain
+         ↘        ↓
+        infrastructure  (reached through use-cases, services and adapters)
+```
+
+- `src/domain/calendar/` is fully pure — no framework, browser or SDK imports. Its one documented exception is consuming `HolidayDTO` from `@application/dto/holiday/types` (see `src/domain/calendar/CONTEXT.md`).
+- `src/domain/payment/handlers/` is the pragmatic outlier: the webhook handlers consume infrastructure services (Turso repository, Stripe provider) through Effect context rather than instantiating them — see [Effect layers](/architecture/effect-layers/).
+- Stores in `src/application/stores/` never call SDK clients directly; they delegate to `src/infrastructure/services/*`.
+- Server-side composition of external dependencies happens once, in `src/infrastructure/layers.ts` (`ApplicationLayer`).
+
+## CONTEXT.md per folder
+
+Per the repo's `CLAUDE.md`, most significant folders carry a `CONTEXT.md` describing their purpose, conventions and boundaries — read it before touching a folder. Examples: `src/domain/CONTEXT.md` (layer rules and allowed imports), `src/infrastructure/clients/CONTEXT.md` (the Effect client pattern), `src/application/stores/CONTEXT.md` (store conventions). These files are the source of truth for layer boundaries; this page summarises them.
+
+## Path aliases
+
+Defined in the root `tsconfig.json` (`compilerOptions.paths`); Vitest resolves them natively via `resolve.tsconfigPaths` and the docs site replicates the ones it needs.
+
+| Alias | Target |
+| --- | --- |
+| `src/*` | `./src/*` |
+| `@app/*` | `./src/app/*` |
+| `@infrastructure/*` | `./src/infrastructure/*` |
+| `@domain/*` | `./src/domain/*` |
+| `@ui/*` | `./src/ui/*` |
+| `@application/*` | `./src/application/*` |
+| `@assets/*` | `./src/ui/assets/*` |
+| `@styles/*` | `./src/ui/styles/*` |
+| `@i18n/*` | `./src/ui/i18n/*` |
+| `@mocks/*` | `./src/mocks/*` |
+| `@types/*` | `./src/types/*` |
+
+Note that `@assets`, `@styles` and `@i18n` all point inside `src/ui/` — they are shorthands, not separate layers. The `docs/` package is excluded from the app's `tsconfig.json` so the two type-check independently.
+
+## Related pages
+
+- [Routing](/architecture/routing/) — how `src/app/` is laid out.
+- [Middleware](/architecture/middleware/) — the per-request chain.
+- [Effect layers](/architecture/effect-layers/) — server-side dependency injection.
+- [Caching](/architecture/caching/) — Cache Components and the R2 incremental cache.

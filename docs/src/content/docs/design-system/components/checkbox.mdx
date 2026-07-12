@@ -1,0 +1,37 @@
+---
+title: Checkbox
+description: Base UI checkbox rendered as a Motion button — tap/hover scale plus an SVG path-drawn check.
+sidebar:
+  order: 6
+---
+
+import { CheckboxDemo } from '../../../../components/demos/CheckboxDemo';
+
+Source: `src/ui/modules/core/animate/base/Checkbox.tsx`. A Base UI checkbox whose root is rendered as `m.button` (`whileTap` scale 0.95, `whileHover` scale 1.05), so it needs a `LazyMotionProvider` ancestor.
+
+Exports: `Checkbox`.
+
+<CheckboxDemo client:visible />
+
+## How it works
+
+- The check mark is an `m.svg` path animated via `pathLength`: checking draws the stroke in (0.2s, after a 0.2s delay so the background color lands first); unchecking retracts it. The indicator is `keepMounted` so the retract animation can play.
+- The component mirrors `checked`/`defaultChecked` into local state to drive the SVG variants, and forwards `onCheckedChange` untouched (Base UI signature: `(checked, eventDetails)`).
+- Visuals: `size-5`, 3px frame border, `shadow-brutal-xs`; checked state flips to `bg-accent` with ink-colored stroke.
+- Extra Motion props for the button go through the `motionProps` prop.
+
+## Usage
+
+```tsx
+import { Checkbox } from '@ui/modules/core/animate/base/Checkbox';
+
+<Checkbox id='regional' checked={checked} onCheckedChange={(next) => setChecked(next)} />
+<Label htmlFor='regional'>Include regional holidays</Label>
+```
+
+Pair with [Label](/design-system/components/label/) via `id`/`htmlFor`. For an on/off setting rendered as a toggle, use [Switch](/design-system/components/switch/) instead.
+
+## Conventions
+
+- `data-slot='checkbox'` and `data-slot='checkbox-indicator'` for CSS containment hooks; checked styling keys off Base UI's `data-checked` attribute.
+- The `render` prop is reserved by the component (it injects the `m.button`), so it is omitted from the public prop type.

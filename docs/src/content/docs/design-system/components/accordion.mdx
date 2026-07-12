@@ -1,0 +1,43 @@
+---
+title: Accordion
+description: Base UI accordion with a spring-animated panel and a rotating "+" chevron square.
+sidebar:
+  order: 2
+---
+
+import { AccordionDemo, AccordionNoChevronDemo } from '../../../../components/demos/AccordionDemo';
+
+Source: `src/ui/modules/core/animate/base/Accordion.tsx`. Built on the Base UI accordion with Motion (`m.*`) as the visual layer, so any consumer must sit under `LazyMotionProvider` (`src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`) — the app mounts it in the locale layout.
+
+Exports: `Accordion`, `AccordionItem`, `AccordionTrigger`, `AccordionPanel`.
+
+<AccordionDemo client:visible />
+
+## How it works
+
+- The panel animates `height`, `opacity` and a custom `--mask-stop` CSS variable that drives a `linear-gradient` mask, so content fades in top-down while the height springs open (default spring `stiffness: 150, damping: 22`, overridable via the `transition` prop on trigger and panel).
+- Open state is not owned by React alone: `AccordionTrigger` attaches a `MutationObserver` to its own button and watches the `data-panel-open` attribute Base UI stamps on it. That keeps the Motion chevron and the `AnimatePresence`-gated panel in sync with Base UI's internal state, whichever side toggles it.
+- The chevron is a square "+" badge that rotates 45° when open and flips from `bg-accent` to the frame color. Pass `chevron={false}` on `AccordionTrigger` to remove it. It uses the `hit-area-stable` utility so the hover lift does not shift the pointer target — see [Button](/design-system/components/button/) for the same pattern.
+
+<AccordionNoChevronDemo client:visible />
+
+## Usage
+
+```tsx
+import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '@ui/modules/core/animate/base/Accordion';
+
+<Accordion multiple>
+  <AccordionItem value='faq-1'>
+    <AccordionTrigger>How does it work?</AccordionTrigger>
+    <AccordionPanel>It bridges holidays with PTO days.</AccordionPanel>
+  </AccordionItem>
+</Accordion>
+```
+
+Root props are the Base UI accordion root props (e.g. `multiple`, `defaultValue`); the homepage FAQ (`src/ui/modules/pages/homepage/sections/Faq.tsx`) uses `multiple` inside [Tabs](/design-system/components/tabs/).
+
+## Conventions
+
+- `data-slot` hooks: `accordion`, `accordion-item`, `accordion-header`, `accordion-trigger`, `accordion-trigger-chevron`, `accordion-panel`.
+- Items separate with a faint `border-b-2` in the frame color at 18% opacity.
+- The panel stays mounted (`keepMounted`) so exit animations can play.

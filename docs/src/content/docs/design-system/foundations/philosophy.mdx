@@ -1,7 +1,51 @@
 ---
 title: Design philosophy
-description: Neo-brutalist design principles.
+description: The neo-brutalist language — hard borders, offset shadows, translate-on-hover lifts, rotated accents, and a cream/ink palette.
+sidebar:
+  order: 0
 ---
 
-Placeholder — content pending.
+import { PhilosophyDemo } from '../../../../components/demos/PhilosophyDemo';
 
+Forever PTO's UI is neo-brutalist: flat surfaces, thick ink borders, hard offset shadows instead of blur, and playful rotation. Nothing pretends to be glass or paper grain — depth is drawn, not simulated. Every rule below is a CSS custom property or a Tailwind utility, so the whole language lives in stylesheets, not in component logic.
+
+<PhilosophyDemo client:visible />
+
+All raw tokens (colors, surfaces, shadows) are declared in `src/ui/styles/global/index.css`; their Tailwind exposure lives in `src/ui/styles/theme/index.css`. See [colors](/design-system/foundations/colors/), [shadows](/design-system/foundations/shadows/) and [typography](/design-system/foundations/typography/) for each axis in detail.
+
+## Hard borders, scaled by element class
+
+Every bordered element uses the same ink color — `border-[var(--frame)]` — but the width encodes the element's weight in the layout:
+
+| Width | Element class | Examples |
+| --- | --- | --- |
+| `2.5px` | Fine details | Accordion chevron square (`src/ui/modules/core/animate/base/Accordion.tsx`), toasts (`src/ui/modules/core/primitives/Sonner.tsx`), mini calendar cells (`src/ui/modules/pages/homepage/sections/Features.tsx`) |
+| `3px` | Core primitives — the default | Button, Badge, Card, Input (`src/ui/modules/core/primitives/`) |
+| `4px` | Page-level cards | `brutCard` in `src/ui/modules/pages/homepage/sections/shared.ts`, `src/ui/modules/pages/planner/SiteTitle.tsx` |
+| `5px` | Display blocks | Hero panel (`src/ui/modules/pages/homepage/sections/Hero.tsx`), 404/error numerals (`src/ui/modules/pages/error/ErrorContent.tsx`) |
+
+The heavier the border, the higher the element sits in the visual hierarchy. New components should default to `3px` and only escalate when they represent a whole section.
+
+## Offset hard shadows
+
+Elevation is a solid, blur-free copy of the frame color offset down-right: `Npx Npx 0 0 var(--frame)`. The offset distance is the elevation scale — see [shadows](/design-system/foundations/shadows/) for every token and the button choreography.
+
+## Translate-on-hover lift
+
+Interactive elements physically move: hover translates the element up-left (`-2px, -2px`) while the shadow grows by the same amount, so the outer silhouette stays anchored; press does the inverse and the element drops onto its shadow. Because the element moves under the pointer, every lifting element also carries the `hit-area-stable` utility — see [hit-area stability](/design-system/foundations/hit-area-stable/) for why.
+
+## Rotated accents
+
+Static elements get a slight tilt that settles (or straightens on hover) to make the layout feel hand-placed rather than grid-generated: testimonial cards alternate between roughly ±1° (`src/ui/modules/pages/homepage/sections/Testimonials.tsx`), the logo mark and footer mark rest at 4° and straighten on hover (`src/ui/modules/shared/Logo.tsx`, `src/ui/modules/shared/footer/Footer.tsx`), and the hero calendar panel leans 1° (`src/ui/modules/pages/homepage/sections/Hero.tsx`). Rotation stays under ~8° — it is an accent, never a layout mechanic.
+
+## Cream and ink
+
+The light theme is cream paper (`--color-brand-cream` as `--background`) drawn on with near-black ink (`--color-brand-ink` as `--frame`, `--border`, `--primary`). Dark mode swaps the roles — the frame becomes cream on near-black surfaces — while the saturated brand colors (yellow accent, teal, orange, purple…) stay constant across themes. See [colors](/design-system/foundations/colors/) and [dark mode](/design-system/foundations/dark-mode/).
+
+## Type
+
+Display type is Bricolage Grotesque at heavy weights; body copy is Space Grotesk; code is JetBrains Mono; Instrument Serif appears only as an italic flourish. Buttons and badges set `font-black` with uppercase or tight tracking to match the border weight. Details in [typography](/design-system/foundations/typography/).
+
+## Where the rules are enforced
+
+Component-level conventions (CVA variants, `data-slot` hooks, `asChild`) are covered in [conventions](/design-system/foundations/conventions/). The single source of truth for every visual constant on this page is `src/ui/styles/global/index.css` — change a token there and the entire system, including these docs' live demos, follows.

@@ -1,0 +1,40 @@
+---
+title: SEO
+description: Per-locale metadata, JSON-LD structured data, robots.ts, sitemap.ts and the Open Graph setup.
+sidebar:
+  order: 15
+---
+
+SEO is handled with the App Router's native primitives — `generateMetadata`, `robots.ts`, `sitemap.ts` — plus a JSON-LD component. Everything is locale-aware, driven by the same `LOCALES` constant as the rest of the app (see [internationalization](/how-it-works/i18n/)).
+
+## Metadata per locale
+
+Route groups keep their metadata beside the page: `src/app/[locale]/(marketing)/metadata.ts` (homepage), `src/app/[locale]/(app)/planner/metadata.ts`, plus per-page files under `(marketing)/legal/`. The marketing `generateMetadata`:
+
+- Pulls `title`, `description` and `keywords` from the `metadata` i18n namespace for the request's locale.
+- Sets `metadataBase` from `NEXT_PUBLIC_SITE_URL` (via `getPublicEnv`, `src/infrastructure/services/env/getPublicEnv.ts`), a locale-prefixed `canonical`, and `alternates.languages` from `localeAlternates()` (`src/infrastructure/i18n/utils/url.ts`) — the hreflang map across all locales.
+- Declares Open Graph (`type: 'website'`, `siteName`, localized title/description) and a `summary_large_image` Twitter card. Both currently use `public/static/images/forever-pto-logo.png` (declared 1200x630) as the image.
+- Sets explicit `robots` directives including googleBot `max-image-preview: large` and unlimited snippets.
+
+## Structured data: `JsonLd`
+
+`src/ui/modules/shared/seo/JsonLd.tsx` is a server component rendered on the planner page (`src/app/[locale]/(app)/planner/page.tsx`). It emits three `application/ld+json` scripts:
+
+- **WebApplication** — name/description from translations, `applicationCategory: 'ProductivityApplication'`, `availableLanguage` interpolated from `LOCALES`, and the free + premium donation offers.
+- **Organization** — name, URL, logo.
+- **FAQPage** — a dozen questions mirrored from the homepage FAQ, answers pulled from the `faq` namespace so structured data and visible content stay in sync per locale.
+
+`dangerouslySetInnerHTML` is required for JSON-LD scripts; the Biome suppression is annotated inline.
+
+## robots.ts
+
+`src/app/robots.ts` allows everything except `/_next/static/` and, per locale, the pages in `DISALLOWED_PAGES` (`/legal/`, `/payment/`) — legal boilerplate and payment confirmations have no search value. It also points crawlers at `${baseUrl}/sitemap.xml`.
+
+## sitemap.ts
+
+`src/app/sitemap.ts` is the cartesian product of `LOCALES` and a small `ROUTES` table — currently the homepage (`priority 1`, monthly) and `/planner` (`priority 0.9`, weekly) — with URLs built by `localePath`, so English URLs are unprefixed and the rest carry their locale, matching the `as-needed` routing.
+
+## Related
+
+- Agents get a text-first rendition of these same pages via the [Markdown API](/how-it-works/markdown-api/) and discover capabilities through [.well-known](/how-it-works/webmcp/).
+- The middleware redirects `payment/confirmation` hits without a `payment_intent` param to the locale home, keeping junk URLs out of the index.

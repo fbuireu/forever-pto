@@ -1,0 +1,54 @@
+---
+title: Table
+description: Data table with a framed scroll container, primary-colored header row and striped body.
+sidebar:
+  order: 20
+---
+
+import { TableDemo } from '../../../../components/demos/TableDemo';
+
+Source: `src/ui/modules/core/primitives/Table.tsx`. `Table` renders the native `<table>` inside a wrapper div that owns the frame: 3px border, `rounded-[10px]`, medium brutal shadow and — crucially — `overflow-x-auto`, so wide tables scroll inside the frame instead of breaking the page layout.
+
+<TableDemo client:visible />
+
+## Parts
+
+| Part | Role |
+| --- | --- |
+| `Table` | Scroll container + `<table>`. `className` styles the table element; `containerClassName` styles the outer framed div. |
+| `TableHeader` | `<thead>` — its rows get `bg-primary text-primary-foreground` and a heavy bottom border. |
+| `TableBody` | `<tbody>` — strips the border from the last row. |
+| `TableRow` | `<tr>` — odd rows striped with `--surface-panel-soft`, hover and `data-[state=selected]` switch to `--surface-panel-alt`. |
+| `TableHead` | `<th>` — uppercase, `font-black`, checkbox-aware padding. |
+| `TableCell` | `<td>` — `p-3`, `whitespace-nowrap`, checkbox-aware padding. |
+
+Only these six are exported. `_TableFooter` and `_TableCaption` exist in the source but are private — see `src/ui/modules/core/primitives/Table.tsx`.
+
+## Usage
+
+```tsx
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/modules/core/primitives/Table';
+
+<Table containerClassName='max-h-96'>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Holiday</TableHead>
+      <TableHead>Date</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    {holidays.map((holiday) => (
+      <TableRow key={holiday.id}>
+        <TableCell>{holiday.name}</TableCell>
+        <TableCell>{holiday.date}</TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
+```
+
+## Conventions
+
+- Every part sets a `data-slot` attribute (`table-container`, `table`, `table-header`, …).
+- The file carries a `'use client'` directive even though it has no hooks — treat it as a client module when importing from server components.
+- Cells default to `whitespace-nowrap`; override per-cell with `className` when wrapping is wanted.

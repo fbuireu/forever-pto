@@ -1,0 +1,32 @@
+---
+title: Introducción
+description: Qué es Forever PTO y cómo está organizada esta wiki.
+sidebar:
+  order: 0
+---
+
+Forever PTO es una herramienta de optimización de vacaciones. Le dices dónde vives, cuántos días de vacaciones tienes y qué estrategia prefieres, y te sugiere qué días coger para que los fines de semana y los festivos se combinen en las rachas libres más largas posibles. La idea central es el **puente**: un pequeño bloque de días de vacaciones que conecta un fin de semana con un festivo (o dos festivos entre sí), convirtiendo uno o dos días de vacaciones en cuatro o más días libres consecutivos. Consulta el [glosario](/es/reference/glossary/) para la terminología exacta.
+
+La app funciona en [forever-pto.com](https://forever-pto.com) como un Cloudflare Worker.
+
+## Qué cubre esta wiki
+
+| Sección | Contenido |
+| --- | --- |
+| [Empieza aquí](/es/start/local-development/) | Setup local, estructura del repositorio, el stack |
+| [Arquitectura](/es/architecture/overview/) | La estructura en capas bajo `src/` y las reglas entre capas |
+| Cómo funciona | Inmersiones por feature — motor de sugerencias, [detección de país](/es/how-it-works/country-detection/), flujo premium |
+| [Design system](/es/design-system/components/overview/) | Fundamentos, componentes, animación y patrones — con demos en vivo |
+| [Infraestructura y CI/CD](/es/infra/environments/) | Entornos de Cloudflare, pipelines de deploy, releases |
+| Referencia | [Cookies](/es/reference/cookies/), [glosario](/es/reference/glossary/) y otras tablas de consulta |
+| [Contribuir](/es/contributing/conventions/) | Convenciones de commits y código, tooling, testing |
+
+## Cómo está construido este sitio
+
+Esta wiki es parte del propio repositorio: un sitio Astro Starlight en el paquete de workspace `docs/`. No es una reimplementación paralela de la UI de la app — las páginas del design system importan los **componentes reales de la app** a través del alias `@ui` (mapeado a `src/ui` en `docs/astro.config.ts`) y los renderizan como islands de React.
+
+Las demos están tipadas contra las definiciones reales de variantes de cada componente (mira el patrón anti-drift en `docs/src/components/demos/ButtonDemo.tsx`): si una variante se añade, renombra o elimina en la app, `astro check` falla en el build de docs. El mismo principio aplica a la prosa — donde la app exporta una constante, la documentación la importa en lugar de copiar el valor. La [página de Button](/design-system/components/button/) es el ejemplo de referencia.
+
+:::note
+Solo la portada y esta introducción están traducidas. El resto de páginas bajo `/es/` sirven automáticamente la versión en inglés (fallback de Starlight) hasta que se traduzcan.
+:::

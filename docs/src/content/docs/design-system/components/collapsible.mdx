@@ -1,0 +1,40 @@
+---
+title: Collapsible
+description: Single fold-out region with a brutal default trigger and a height/opacity spring.
+sidebar:
+  order: 7
+---
+
+import { CollapsibleAsChildDemo, CollapsibleDemo } from '../../../../components/demos/CollapsibleDemo';
+
+Source: `src/ui/modules/core/animate/base/Collapsible.tsx`. Base UI collapsible with a Motion-animated panel; requires a `LazyMotionProvider` ancestor. Where [Accordion](/design-system/components/accordion/) manages a list of exclusive folds, Collapsible is a single independent one.
+
+Exports: `Collapsible`, `CollapsibleTrigger`, `CollapsibleContent`.
+
+<CollapsibleDemo client:visible />
+
+## How it works
+
+- `CollapsibleContent` animates `height: 0 ↔ 'auto'` plus opacity with a spring (default `stiffness: 150, damping: 22`, `transition` prop to override). The panel is `keepMounted` and rendered through Base UI's `render` callback, which the component uses to strip DOM drag handlers that would collide with Motion's gesture props.
+- The default `CollapsibleTrigger` is a full-width brutal button: 3px frame border, `shadow-brutal-btn`, hover lift, and — the distinctive bit — `aria-expanded` keeps the trigger in the lifted "pressed" style while the panel is open, so open state reads at a glance.
+- `CollapsibleTrigger asChild` swaps in your own element via Base UI's `render`, skipping the default styling entirely.
+
+<CollapsibleAsChildDemo client:visible />
+
+## Usage
+
+```tsx
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/modules/core/animate/base/Collapsible';
+
+<Collapsible defaultOpen>
+  <CollapsibleTrigger>Advanced options</CollapsibleTrigger>
+  <CollapsibleContent>…</CollapsibleContent>
+</Collapsible>
+```
+
+Controlled mode works through the Base UI root props (`open`, `onOpenChange`); the root mirrors them into context for the animation.
+
+## Conventions
+
+- `data-slot` hooks: `collapsible`, `collapsible-trigger`, `collapsible-content`.
+- The default trigger uses `hit-area-stable`, matching [Button](/design-system/components/button/) hover mechanics.

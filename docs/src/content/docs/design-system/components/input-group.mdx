@@ -1,0 +1,48 @@
+---
+title: InputGroup
+description: Frame-sharing wrapper that composes an input with addons — icons, text prefixes and keyboard hints.
+sidebar:
+  order: 12
+---
+
+import { INPUT_GROUP_ADDON_ROWS, InputGroupAlignDemo, InputGroupComposedDemo } from '../../../../components/demos/InputGroupDemo';
+import { VariantsTable } from '../../../../components/VariantsTable';
+
+Source: `src/ui/modules/core/primitives/InputGroup.tsx`. The group owns the frame: one `role='group'` container carries the border, background and shadow states, while `InputGroupInput` renders a borderless, transparent [Input](/design-system/components/input/) inside it. Focus and `aria-invalid` styling bubble from the control to the container through `has-[…]` selectors, so the whole group highlights as a unit.
+
+## Addon alignment
+
+`InputGroupAddon` places content around the control via its `align` variant. The container reads the addon's `data-align` attribute to adjust the control's padding, and `block-*` values flip the group into a column layout.
+
+<InputGroupAlignDemo client:visible />
+
+<VariantsTable rows={INPUT_GROUP_ADDON_ROWS} />
+
+## Composition
+
+`InputGroupText` styles inline text or icon fragments inside an addon; a direct `<kbd>` child gets shortcut-hint styling automatically. Clicking (or pressing Enter/Space on) an addon focuses the inner input, unless the event target is a button inside the addon.
+
+<InputGroupComposedDemo client:visible />
+
+## Usage
+
+```tsx
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@ui/modules/core/primitives/InputGroup';
+import { Search } from 'lucide-react';
+
+<InputGroup>
+  <InputGroupAddon>
+    <Search />
+  </InputGroupAddon>
+  <InputGroupInput placeholder='Search holidays…' />
+  <InputGroupAddon align='inline-end'>
+    <InputGroupText>{results.length}</InputGroupText>
+  </InputGroupAddon>
+</InputGroup>
+```
+
+## Conventions
+
+- Exported parts: `InputGroup`, `InputGroupAddon`, `InputGroupInput`, `InputGroupText`. The source also defines private `_InputGroupButton` (with its own `inputGroupButtonVariants` size axis) and `_InputGroupTextarea` — neither the components nor the CVA objects (`inputGroupAddonVariants`, `inputGroupButtonVariants`) are exported today; check `src/ui/modules/core/primitives/InputGroup.tsx` before relying on them.
+- `InputGroupInput` sets `data-slot='input-group-control'`, which the container's focus and error selectors target.
+- Set `aria-invalid` on the inner control; the container mirrors it (destructive border, destructive focus shadow).

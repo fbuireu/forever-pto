@@ -1,0 +1,40 @@
+---
+title: Images
+description: The Cloudflare image loader in src/infrastructure/images/loader.ts and how static assets are served on Workers.
+sidebar:
+  order: 7
+---
+
+The app does not use Next.js's built-in image optimiser — there is no Node server to run it on Cloudflare Workers. Instead, `next.config.ts` configures a custom loader:
+
+```ts
+images: {
+  loader: 'custom',
+  loaderFile: './src/infrastructure/images/loader.ts',
+},
+```
+
+## The loader
+
+`src/infrastructure/images/loader.ts` exports a single default function that rewrites every `next/image` `src` into a [Cloudflare Image Resizing](https://developers.cloudflare.com/images/transform-images/transform-via-url/) URL:
+
+```text
+/cdn-cgi/image/width=<w>,quality=<q>,format=auto/<src>
+```
+
+- `width` comes from the `next/image` srcset machinery, so responsive sizing keeps working exactly as with the default loader.
+- `quality` falls back to the exported `DEFAULT_QUALITY` constant when the component does not specify one.
+- `format=auto` lets Cloudflare negotiate AVIF/WebP per browser.
+- The leading slash is stripped from `src` so the origin path nests cleanly inside the `/cdn-cgi/image/` prefix.
+
+The `/cdn-cgi/image/` endpoint is handled by Cloudflare at the zone edge: it fetches the original asset from the Worker, transforms it, and caches the result — the app itself never sees these requests. Being a pure function with zero imports, the loader is trivially unit-testable (`src/infrastructure/images/loader.test.ts` sits next to it).
+
+## Static assets
+
+- Original image files live in `public/static/images/` and are addressed with root-relative paths, e.g. the logo in `src/ui/modules/shared/Logo.tsx` renders `next/image` with `src='/static/images/forever-pto-logo.png'` — which the loader then turns into a `/cdn-cgi/image/...` URL.
+- At deploy time OpenNext copies `public/` into `.open-next/assets`, served by the Workers static `ASSETS` binding declared in `wrangler.toml`. Static assets therefore never invoke the Worker.
+- Transformed variants are cached by Cloudflare per the Image Resizing defaults; the originals get standard static-asset caching. Page-level caching is a separate concern — see [caching](/architecture/caching/).
+
+## What is not an image
+
+Icons are code, not assets: social icons live as TypeScript modules in `src/ui/assets/icons/` (aliased as `@assets/icons/...`) and UI icons come from `lucide-react`. SVG logos and favicons for the docs site itself live in `docs/src/assets/` and are unrelated to the app loader.

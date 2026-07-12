@@ -1,7 +1,53 @@
 ---
 title: Homepage patterns
-description: brutCard and dayCell shared patterns.
+description: brutCard and dayCell — the shared class-string constants that keep the marketing homepage sections visually consistent.
+sidebar:
+  order: 1
 ---
 
-Placeholder — content pending.
+import { brutCard } from '@ui/modules/pages/homepage/sections/shared';
+import { BrutCardDemo, DayCellsDemo, DAY_TYPE_ROWS } from '../../../../components/demos/HomepagePatternsDemo';
+import { VariantsTable } from '../../../../components/VariantsTable';
 
+Source: `src/ui/modules/pages/homepage/sections/shared.ts`. The homepage sections (`Hero`, `Features`, `Comparison`, `HowItWorks`, `Pricing`, `Testimonials` under `src/ui/modules/pages/homepage/sections/`) do not share components — they share **class-string constants**. This file is pure data (a type, two class maps, a fixture array), which is why this page can import it and render the real styles live.
+
+## brutCard
+
+The marketing card frame. Every homepage section that draws a card uses this exact string:
+
+<BrutCardDemo client:visible />
+
+The current value, imported from the app (never copied into the docs):
+
+<p><code>{brutCard}</code></p>
+
+Note the **deliberate 4px border**: core primitives like [Button](/design-system/components/button/) and Card use a 3px frame, but homepage cards go one heavier so marketing sections read louder than app chrome. If you see a 4px border anywhere else, it is a bug; here it is the point.
+
+## dayCell
+
+`dayCell` is a `Record<DayType, string>` mapping each calendar day type to its cell classes. `Hero` and `Features` use it together with `CAL_ENTRIES` — a 28-entry fake month exported from the same file — to render the illustrative mini-calendars:
+
+<DayCellsDemo client:visible />
+
+<VariantsTable rows={DAY_TYPE_ROWS} />
+
+The visual language matches the real planner: holidays get the yellow gradient with a full-strength frame, PTO days the brand teal, weekends recede onto the soft panel surface, and plain work days sit on the card background with a faint 15%-opacity border.
+
+## Usage
+
+```tsx
+// From a sibling homepage section (src/ui/modules/pages/homepage/sections/)
+import { brutCard, CAL_ENTRIES, dayCell } from './shared';
+
+<article className={`${brutCard} p-6`}>…</article>
+
+{CAL_ENTRIES.map(({ id, type }) => (
+  <div key={id} className={dayCell[type]} />
+))}
+```
+
+## Conventions
+
+- These constants are homepage-scoped. App surfaces (planner, sidebar) style day cells through `src/ui/modules/pages/planner/calendar/utils/helpers.ts` instead — do not import `shared.ts` outside `src/ui/modules/pages/homepage/`.
+- Extend the pattern by adding to `shared.ts`, not by copying class strings into a section — the constants exist precisely so the sections cannot drift apart.
+- Related: [charts](/design-system/patterns/charts/), [reference components](/design-system/patterns/reference-components/).

@@ -1,4 +1,4 @@
-import { Button, buttonVariants } from '@ui/modules/core/primitives/Button';
+import { Button, type buttonVariants } from '@ui/modules/core/primitives/Button';
 import type { VariantProps } from 'class-variance-authority';
 import { Demo } from '../Demo';
 import type { VariantRow } from '../VariantsTable';
