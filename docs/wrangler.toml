@@ -1,0 +1,14 @@
+name = "forever-pto-docs"
+compatibility_date = "2026-07-01"
+workers_dev = true
+preview_urls = true
+
+[assets]
+directory = "./dist"
+not_found_handling = "404-page"
+
+# docs.forever-pto.com lives here: on deploy, wrangler provisions the DNS
+# record and certificate in the forever-pto.com zone automatically.
+[[routes]]
+pattern = "docs.forever-pto.com"
+custom_domain = true

@@ -5,7 +5,7 @@ sidebar:
   order: 7
 ---
 
-This page is self-documenting: it describes the pipeline that published it. The site is a static Astro/Starlight build served as Worker assets (`forever-pto-docs`, configured in `docs/wrangler.jsonc`), so its CI can be far simpler than the [app's](/infra/workflows/): no runtime secrets, no database, no teardown.
+This page is self-documenting: it describes the pipeline that published it. The site is a static Astro/Starlight build served as Worker assets (`forever-pto-docs`, configured in `docs/wrangler.toml`), so its CI can be far simpler than the [app's](/infra/workflows/): no runtime secrets, no database, no teardown.
 
 ## The workflow
 
@@ -42,7 +42,7 @@ wrangler versions upload --preview-alias pr-<n>
 https://pr-<n>-forever-pto-docs.fbuireu.workers.dev
 ```
 
-Every push to the PR overwrites the alias, so the preview link posted once on the PR stays valid for the PR's whole life. (`workers_dev` and `preview_urls` are enabled in `docs/wrangler.jsonc` to make these URLs resolve.)
+Every push to the PR overwrites the alias, so the preview link posted once on the PR stays valid for the PR's whole life. (`workers_dev` and `preview_urls` are enabled in `docs/wrangler.toml` to make these URLs resolve.)
 
 One bootstrap subtlety: `versions upload` cannot *create* a Worker, and the `production` GitHub environment is branch-protected to `main`, so previews are impossible until the first production deploy has created `forever-pto-docs`. The preview job probes for the Worker first (`wrangler versions list`) and skips gracefully with a notice instead of failing — the very first docs PR simply has no preview.
 

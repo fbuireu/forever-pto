@@ -13,7 +13,7 @@ Everything runs on Cloudflare. The account hosts three Workers from this repo, p
 | --- | --- | --- |
 | `forever-pto` (+ `forever-pto-development`, per-PR previews) | `wrangler.toml` | The Next.js app, compiled to a Worker by OpenNext |
 | `forever-pto-tail` | `workers/tail/wrangler.toml` | Tail Worker forwarding logs to Better Stack |
-| `forever-pto-docs` | `docs/wrangler.jsonc` | This site — pure static assets |
+| `forever-pto-docs` | `docs/wrangler.toml` | This site — pure static assets |
 
 ### The app Worker (OpenNext)
 
@@ -25,7 +25,7 @@ Everything runs on Cloudflare. The account hosts three Workers from this repo, p
 
 ### The docs Worker
 
-`forever-pto-docs` is a static-assets-only Worker (no code, just the Astro `dist/` directory) with a `custom_domain` route for `docs.forever-pto.com` declared in `docs/wrangler.jsonc` — notably the repo's first infrastructure-as-code custom domain; the app's dev subdomain is dashboard-managed. Deployment is described in [docs CI](/infra/docs-ci/).
+`forever-pto-docs` is a static-assets-only Worker (no code, just the Astro `dist/` directory) with a `custom_domain` route for `docs.forever-pto.com` declared in `docs/wrangler.toml` — notably the repo's first infrastructure-as-code custom domain; the app's dev subdomain is dashboard-managed. Deployment is described in [docs CI](/infra/docs-ci/).
 
 ## Storage
 

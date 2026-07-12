@@ -21,5 +21,5 @@ The Forever PTO documentation wiki (docs.forever-pto.com). An Astro Starlight si
 ## Deploy
 
 - PRs: `wrangler versions upload --preview-alias pr-<n>` → deterministic preview URL on workers.dev; versions are immutable, no teardown exists or is needed.
-- main: `wrangler deploy` → docs.forever-pto.com (custom domain declared in `wrangler.jsonc`).
-- Bootstrap: the Worker must exist before the first PR preview — run the Docs workflow once via `workflow_dispatch`.
+- main: `wrangler deploy` → docs.forever-pto.com (custom domain declared in `wrangler.toml`).
+- Bootstrap: `versions upload` cannot create the Worker, so the preview job probes with `versions list` and skips gracefully until the first production deploy has created `forever-pto-docs` (done 2026-07-12).
