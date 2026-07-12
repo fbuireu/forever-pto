@@ -58,7 +58,7 @@ function DialogPopup({ className, children, showCloseButton = true, ...props }: 
       >
         {children}
         {showCloseButton && (
-          <DialogClosePrimitive className="ring-offset-background focus:ring-ring absolute top-4 right-4 cursor-pointer rounded-[8px] border-[3px] border-(--frame) bg-(--surface-panel) p-1.5 opacity-100 shadow-(--shadow-brutal-xs) transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm) focus:ring-[3px] focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+          <DialogClosePrimitive className="ring-offset-background focus:ring-ring absolute top-4 right-4 hit-area-stable cursor-pointer rounded-[8px] border-[3px] border-(--frame) bg-(--surface-panel) p-1.5 opacity-100 shadow-(--shadow-brutal-xs) transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm) focus:ring-[3px] focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
             <XIcon />
             <span className='sr-only'>Close</span>
           </DialogClosePrimitive>
@@ -74,10 +74,7 @@ type DialogHeaderProps = DialogHeaderPrimitiveProps;
 function DialogHeader({ className, ...props }: DialogHeaderProps) {
   return (
     <DialogHeaderPrimitive
-      className={cn(
-        'flex flex-col gap-3 border-b-2 border-(--frame)/18 pb-4 text-center sm:text-left',
-        className
-      )}
+      className={cn('flex flex-col gap-3 border-b-2 border-(--frame)/18 pb-4 text-center sm:text-left', className)}
       {...props}
     />
   );

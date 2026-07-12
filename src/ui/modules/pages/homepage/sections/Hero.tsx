@@ -80,86 +80,88 @@ export const Hero = async () => {
           </div>
         </div>
 
-        <div className='bg-card border-[5px] border-[var(--frame)] rounded-[14px] shadow-[var(--shadow-brutal-xl)] overflow-hidden rotate-[1.2deg] hover:rotate-0 transition-transform duration-[250ms] ease-out'>
-          <div className='flex items-center gap-2.5 px-4 py-[10px] bg-[var(--frame)]'>
-            <div className='size-3 rounded-full bg-[var(--color-brand-red)] border-[1.5px] border-black' />
-            <div className='size-3 rounded-full bg-[var(--color-brand-yellow)] border-[1.5px] border-black' />
-            <div className='size-3 rounded-full bg-[var(--color-brand-green)] border-[1.5px] border-black' />
-            <span className='ml-auto mr-auto font-mono text-[12px] text-white/75'>forever-pto.com / planner</span>
-          </div>
-          <div className='p-[22px] bg-card'>
-            <div className='grid grid-cols-2 gap-3.5 mb-4'>
-              {(
-                [
-                  { label: t('hero.mockupFieldPto'), value: <span>22</span>, unit: t('hero.mockupFieldPtoUnit') },
-                  {
-                    label: t('hero.mockupFieldCountry'),
-                    value: (
-                      <span className='flex items-center gap-1.5'>
-                        <FlagIcon code={LOCALE_FLAG[locale] ?? locale} />
-                        <span>{locale.toUpperCase()}</span>
-                      </span>
-                    ),
-                    unit: t('hero.mockupFieldHolidays'),
-                  },
-                ] as { label: string; value: ReactNode; unit: string }[]
-              ).map(({ label, value, unit }) => (
-                <div
-                  key={label}
-                  className='border-[3px] border-[var(--frame)] rounded-[8px] px-3 py-2.5 bg-[var(--background)]'
-                >
-                  <div className='font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1'>
+        <div className='group'>
+          <div className='bg-card border-[5px] border-[var(--frame)] rounded-[14px] shadow-[var(--shadow-brutal-xl)] overflow-hidden rotate-[1.2deg] group-hover:rotate-0 transition-transform duration-[250ms] ease-out'>
+            <div className='flex items-center gap-2.5 px-4 py-[10px] bg-[var(--frame)]'>
+              <div className='size-3 rounded-full bg-[var(--color-brand-red)] border-[1.5px] border-black' />
+              <div className='size-3 rounded-full bg-[var(--color-brand-yellow)] border-[1.5px] border-black' />
+              <div className='size-3 rounded-full bg-[var(--color-brand-green)] border-[1.5px] border-black' />
+              <span className='ml-auto mr-auto font-mono text-[12px] text-white/75'>forever-pto.com / planner</span>
+            </div>
+            <div className='p-[22px] bg-card'>
+              <div className='grid grid-cols-2 gap-3.5 mb-4'>
+                {(
+                  [
+                    { label: t('hero.mockupFieldPto'), value: <span>22</span>, unit: t('hero.mockupFieldPtoUnit') },
+                    {
+                      label: t('hero.mockupFieldCountry'),
+                      value: (
+                        <span className='flex items-center gap-1.5'>
+                          <FlagIcon code={LOCALE_FLAG[locale] ?? locale} />
+                          <span>{locale.toUpperCase()}</span>
+                        </span>
+                      ),
+                      unit: t('hero.mockupFieldHolidays'),
+                    },
+                  ] as { label: string; value: ReactNode; unit: string }[]
+                ).map(({ label, value, unit }) => (
+                  <div
+                    key={label}
+                    className='border-[3px] border-[var(--frame)] rounded-[8px] px-3 py-2.5 bg-[var(--background)]'
+                  >
+                    <div className='font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1'>
+                      {label}
+                    </div>
+                    <div className='font-display font-extrabold text-[28px] leading-none flex items-center gap-1'>
+                      {value}
+                      <span className='text-[14px] font-semibold text-muted-foreground ml-1'>{unit}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className='px-[18px] pt-[18px] pb-4 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[4px] border-[var(--frame)] rounded-[10px]'>
+                <div className='font-mono text-[12px] uppercase tracking-[0.1em] mb-1' suppressHydrationWarning>
+                  {t('hero.mockupLabel', { year })}
+                </div>
+                <div className='font-display font-extrabold text-[56px] leading-none tracking-[-0.03em] flex items-baseline gap-2.5'>
+                  47
+                  <span className='text-[18px] font-semibold opacity-70'>{t('hero.mockupRatio')}</span>
+                </div>
+                <div className='mt-2 font-serif italic text-[18px]'>{t('hero.mockupQuote')}</div>
+              </div>
+
+              <div className='mt-4 grid grid-cols-7 gap-1'>
+                {DAY_HEADERS.map(({ id, label }) => (
+                  <div key={id} className='text-center font-mono text-[10px] font-bold py-1 text-muted-foreground'>
                     {label}
                   </div>
-                  <div className='font-display font-extrabold text-[28px] leading-none flex items-center gap-1'>
-                    {value}
-                    <span className='text-[14px] font-semibold text-muted-foreground ml-1'>{unit}</span>
+                ))}
+                {CAL_ENTRIES.map(({ id, type }) => (
+                  <div
+                    key={id}
+                    className={cn(
+                      HERO_DAY_CLASS[type],
+                      'aspect-square flex items-center justify-center font-mono text-[11px] font-bold shadow-none'
+                    )}
+                  >
+                    {type === 'pto' ? '✈' : type === 'holiday' ? '★' : ''}
                   </div>
-                </div>
-              ))}
-            </div>
-            <div className='px-[18px] pt-[18px] pb-4 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[4px] border-[var(--frame)] rounded-[10px]'>
-              <div className='font-mono text-[12px] uppercase tracking-[0.1em] mb-1' suppressHydrationWarning>
-                {t('hero.mockupLabel', { year })}
+                ))}
               </div>
-              <div className='font-display font-extrabold text-[56px] leading-none tracking-[-0.03em] flex items-baseline gap-2.5'>
-                47
-                <span className='text-[18px] font-semibold opacity-70'>{t('hero.mockupRatio')}</span>
+              <div className='flex gap-x-4 gap-y-2 mt-3 flex-wrap'>
+                {(
+                  [
+                    { type: 'pto' as DayType, label: t('hero.mockupLegendPto') },
+                    { type: 'holiday' as DayType, label: t('hero.mockupLegendHoliday') },
+                    { type: 'weekend' as DayType, label: t('hero.mockupLegendWeekend') },
+                  ] as const
+                ).map(({ type, label }) => (
+                  <div key={label} className='flex items-center gap-2 text-[11px]'>
+                    <div className={cn(HERO_DAY_CLASS[type], 'size-8 shrink-0')} />
+                    <span>{label}</span>
+                  </div>
+                ))}
               </div>
-              <div className='mt-2 font-serif italic text-[18px]'>{t('hero.mockupQuote')}</div>
-            </div>
-
-            <div className='mt-4 grid grid-cols-7 gap-1'>
-              {DAY_HEADERS.map(({ id, label }) => (
-                <div key={id} className='text-center font-mono text-[10px] font-bold py-1 text-muted-foreground'>
-                  {label}
-                </div>
-              ))}
-              {CAL_ENTRIES.map(({ id, type }) => (
-                <div
-                  key={id}
-                  className={cn(
-                    HERO_DAY_CLASS[type],
-                    'aspect-square flex items-center justify-center font-mono text-[11px] font-bold shadow-none'
-                  )}
-                >
-                  {type === 'pto' ? '✈' : type === 'holiday' ? '★' : ''}
-                </div>
-              ))}
-            </div>
-            <div className='flex gap-x-4 gap-y-2 mt-3 flex-wrap'>
-              {(
-                [
-                  { type: 'pto' as DayType, label: t('hero.mockupLegendPto') },
-                  { type: 'holiday' as DayType, label: t('hero.mockupLegendHoliday') },
-                  { type: 'weekend' as DayType, label: t('hero.mockupLegendWeekend') },
-                ] as const
-              ).map(({ type, label }) => (
-                <div key={label} className='flex items-center gap-2 text-[11px]'>
-                  <div className={cn(HERO_DAY_CLASS[type], 'size-8 shrink-0')} />
-                  <span>{label}</span>
-                </div>
-              ))}
             </div>
           </div>
         </div>

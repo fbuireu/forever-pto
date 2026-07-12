@@ -13,9 +13,9 @@ import { MapPin } from '@ui/modules/core/animate/icons/MapPin';
 import { RotatingText } from '@ui/modules/core/animate/text/Rotating';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Badge } from '@ui/modules/core/primitives/Badge';
-import { FlagIcon } from '@ui/modules/core/primitives/FlagIcon';
 import { Banner } from '@ui/modules/core/primitives/Banner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
+import { FlagIcon } from '@ui/modules/core/primitives/FlagIcon';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { Skeleton } from 'boneyard-js/react';
 import { Award, BarChart3, Calendar, CalendarDays, Palmtree, TrendingUp, Zap } from 'lucide-react';
@@ -351,7 +351,7 @@ export const Summary = () => {
                 action={
                   <Link
                     href='#calendar'
-                    className='inline-flex items-center justify-center gap-2 rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--color-brand-orange)] px-4 py-2 text-sm font-black text-[var(--color-brand-ink)] shadow-[var(--shadow-brutal-btn)] transition-[transform,box-shadow] duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]'
+                    className='hit-area-stable inline-flex items-center justify-center gap-2 rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--color-brand-orange)] px-4 py-2 text-sm font-black text-[var(--color-brand-ink)] shadow-[var(--shadow-brutal-btn)] transition-[transform,box-shadow] duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]'
                   >
                     {premiumKey
                       ? t('notifications.canImprove.reviewOptions')

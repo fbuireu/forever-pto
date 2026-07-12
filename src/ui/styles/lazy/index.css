@@ -105,6 +105,25 @@
     cursor: pointer;
     outline: none;
     margin: 0;
+    position: relative;
+  }
+
+  .driver-popover-navigation-btns button::after,
+  .driver-popover-close-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .driver-popover-navigation-btns button:hover::after,
+  .driver-popover-close-btn:hover::after {
+    inset: 0 -8px -8px 0;
+  }
+
+  .driver-popover-navigation-btns button:active::after,
+  .driver-popover-close-btn:active::after {
+    inset: -8px 0 0 -8px;
   }
 
   .driver-popover-navigation-btns button:disabled {

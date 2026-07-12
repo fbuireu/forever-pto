@@ -4,6 +4,7 @@
 @import "tw-animate-css";
 @import "./base/index.css";
 @import "./theme/index.css";
+@import "./utilities/index.css";
 @import "./animations/index.css";
 @import "./global/index.css";
 @import "./vendor/index.css";

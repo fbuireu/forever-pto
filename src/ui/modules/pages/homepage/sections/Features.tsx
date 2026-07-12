@@ -24,7 +24,7 @@ export const Features = async () => {
         <div
           className={cn(
             brutCard,
-            'md:col-span-4 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
+            'md:col-span-4 p-7 hit-area-stable transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
           )}
           style={{ background: 'var(--accent)', color: 'var(--color-brand-ink)' }}
         >
@@ -54,7 +54,7 @@ export const Features = async () => {
         <div
           className={cn(
             brutCard,
-            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
+            'md:col-span-2 p-7 hit-area-stable transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
           )}
         >
           <span className='inline-block px-2.5 py-1 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]'>
@@ -68,7 +68,7 @@ export const Features = async () => {
         <div
           className={cn(
             brutCard,
-            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
+            'md:col-span-2 p-7 hit-area-stable transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
           )}
           style={{ background: 'var(--color-brand-teal)' }}
         >
@@ -93,7 +93,7 @@ export const Features = async () => {
         <div
           className={cn(
             brutCard,
-            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
+            'md:col-span-2 p-7 hit-area-stable transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
           )}
         >
           <span className='inline-block px-2.5 py-1 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]'>
@@ -125,7 +125,7 @@ export const Features = async () => {
         <div
           className={cn(
             brutCard,
-            'md:col-span-2 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
+            'md:col-span-2 p-7 hit-area-stable transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
           )}
           style={{ background: 'var(--color-brand-orange)' }}
         >
@@ -155,7 +155,7 @@ export const Features = async () => {
         <div
           className={cn(
             brutCard,
-            'md:col-span-6 p-7 transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
+            'md:col-span-6 p-7 hit-area-stable transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]'
           )}
           style={{ background: 'var(--frame)', color: 'var(--background)' }}
         >
