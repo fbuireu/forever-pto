@@ -29,7 +29,7 @@ Everything under `/api`, Next internals (`/_next`, `/_vercel`) and any path with
 
 5. **Country detection — always last.** The i18n response is passed through `location()` from `src/infrastructure/proxy/location.ts`, which runs `detectCountry(request)` and, when a country is found, sets the `USER_COUNTRY_COOKIE` cookie via `src/infrastructure/proxy/cookie.ts`. This cookie is intentionally readable from client JS — the location store uses it to preselect the user's country. The detection strategy chain (Cloudflare trace → `cf-ipcountry` header → IP lookup) is documented in [country detection](/how-it-works/country-detection/).
 
-Running country detection last matters: it decorates whichever response the earlier steps produced (rewrite, redirect or the i18n response) instead of forcing its own.
+Running country detection last matters — but note it only ever decorates the **i18n response**: the markdown branches and the payment-confirmation guard `return` early and skip it entirely, so those responses never carry a fresh `user-country` cookie.
 
 ## Why proxy helpers live in infrastructure
 

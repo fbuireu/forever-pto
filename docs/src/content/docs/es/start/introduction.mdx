@@ -25,7 +25,7 @@ La app funciona en [forever-pto.com](https://forever-pto.com) como un Cloudflare
 
 Esta wiki es parte del propio repositorio: un sitio Astro Starlight en el paquete de workspace `docs/`. No es una reimplementación paralela de la UI de la app — las páginas del design system importan los **componentes reales de la app** a través del alias `@ui` (mapeado a `src/ui` en `docs/astro.config.ts`) y los renderizan como islands de React.
 
-Las demos están tipadas contra las definiciones reales de variantes de cada componente (mira el patrón anti-drift en `docs/src/components/demos/ButtonDemo.tsx`): si una variante se añade, renombra o elimina en la app, `astro check` falla en el build de docs. El mismo principio aplica a la prosa — donde la app exporta una constante, la documentación la importa en lugar de copiar el valor. La [página de Button](/design-system/components/button/) es el ejemplo de referencia.
+Las demos están tipadas contra las definiciones reales de variantes de cada componente (mira el patrón anti-drift en `docs/src/components/demos/ButtonDemo.tsx`): si una variante se añade, renombra o elimina en la app, `astro check` falla en el build de docs. El mismo principio aplica a la prosa — donde la app exporta una constante, la documentación la importa en lugar de copiar el valor. La [página de Button](/es/design-system/components/button/) es el ejemplo de referencia.
 
 :::note
 Solo la portada y esta introducción están traducidas. El resto de páginas bajo `/es/` sirven automáticamente la versión en inglés (fallback de Starlight) hasta que se traduzcan.

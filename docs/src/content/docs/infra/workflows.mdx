@@ -52,7 +52,7 @@ On `pull_request: closed`, runs `cloudflare/wrangler-action` with `delete pr-<n>
 
 ## `docs.yml` — Docs
 
-CI/CD for this documentation site, path-filtered to `docs/**` so app changes never build the docs and vice versa. Quality checks, versioned PR previews and production deploy of the `forever-pto-docs` Worker — the full walkthrough is on [docs CI](/infra/docs-ci/).
+CI/CD for this documentation site, path-filtered to `docs/**` plus the app UI surfaces the demos import (`src/ui/modules/core/**`, `src/ui/styles/**`, `src/ui/utils/**`…). Note the asymmetry: the app workflows have **no** path filters, so docs changes still run the full app CI. Build & test, versioned PR previews and production deploy of the `forever-pto-docs` Worker — the full walkthrough is on [docs CI](/infra/docs-ci/).
 
 ## `zizmor.yml` — Security Analysis with zizmor
 

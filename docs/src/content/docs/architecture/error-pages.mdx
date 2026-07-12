@@ -30,8 +30,8 @@ They differ in how they pick a locale:
 
 `ErrorContent` is a client component that leans fully into the design system's neobrutalism (see [philosophy](/design-system/foundations/philosophy/)):
 
-- **Giant "500"** — three digit blocks with thick `--frame` borders, brand-colour backgrounds and `--shadow-brutal-xl` hard shadows.
-- **A fake terminal** — a styled window (traffic-light dots, `server.log: pty/0` title) that streams a staged log trace line by line on a timer, mixing playful `calc-engine` lines with the *real* `error.message` and stack trace, and ends on a blinking-cursor prompt. Log levels are colour-coded via brand CSS variables.
+- **Giant "500"** — three digit blocks with thick `--frame` borders, brand-color backgrounds and `--shadow-brutal-xl` hard shadows.
+- **A fake terminal** — a styled window (traffic-light dots, `server.log: pty/0` title) that streams a staged log trace line by line on a timer, mixing playful `calc-engine` lines with the *real* `error.message` and stack trace, and ends on a blinking-cursor prompt. Log levels are color-coded via brand CSS variables.
 - **Real observability** — on mount it reports the error (including `error.digest`) to BetterStack through `getBetterStackInstance()`; the kicker badge interpolates the app `version` imported from `package.json`.
 - **Recovery actions** — a retry button wired to the boundary's `reset()`, plus links to the status page, the GitHub releases changelog, a prefilled bug-report issue, and a lazily-loaded `ContactModal`.
 

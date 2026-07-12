@@ -9,30 +9,32 @@ This page is self-documenting: it describes the pipeline that published it. The 
 
 ## The workflow
 
-`.github/workflows/docs.yml` follows the repo's workflow conventions (SHA-pinned actions, `persist-credentials: false`, zizmor-linted) and is **path-filtered to `docs/**`** — app-only changes never build the docs.
+`.github/workflows/docs.yml` follows the repo's workflow conventions (SHA-pinned actions, `persist-credentials: false`, zizmor-linted) and is **path-filtered**: it fires on `docs/**` plus the app surfaces the demos consume (`src/ui/modules/core/**`, `src/ui/styles/**`, `src/ui/utils/**`, the homepage `shared.ts` patterns), `pnpm-lock.yaml` and the workflow file itself. Unrelated app changes never build the docs; changes to the reused UI sources do, on purpose — they can break the demos.
 
 Triggers:
 
-- `pull_request` touching `docs/**` → quality checks + versioned preview.
-- `push` to `main` touching `docs/**` → quality checks + production deploy.
-- `workflow_dispatch` → manual bootstrap run, used for the first deploy (a path-filtered workflow otherwise never fires until `docs/**` changes again) and for redeploying without a commit.
+- `pull_request` touching those paths → build & test + versioned preview.
+- `push` to `main` touching those paths → build & test + production deploy.
+- `workflow_dispatch` → manual bootstrap run, used for the first deploy (a path-filtered workflow otherwise never fires until the paths change again) and for redeploying without a commit.
 
-## Quality job
+## Build & test job
 
-Runs from the `docs/` package (see the scripts in `docs/package.json`):
+Installs the whole workspace (**unfiltered** `pnpm install` — the demos import app sources whose bare imports resolve from the root `node_modules`), then runs, via the scripts in `docs/package.json`:
 
+- `pnpm lint` — Biome over the docs package (root config).
 - `pnpm check` — `astro check`, which typechecks the demo islands. This is the drift tripwire: demos import real app components via the `@ui` alias with exhaustive `Record<Variant, …>` maps, so renaming a CVA variant in the app breaks this build.
-- `pnpm lint` — Biome over the docs package.
-- `pnpm build` — `astro build`; broken internal links fail the build.
+- `pnpm build` — `astro build`; the resulting `docs/dist` is uploaded as an artifact for the deploy jobs.
 - Playwright smoke tests (`pnpm test:e2e`) run against a local preview server — `docs/playwright.config.ts` boots `astro preview` itself via `webServer`, so no deployment is needed to test.
 
 ## PR previews: versions, not Workers
 
-Instead of the app's create-a-Worker-per-PR model, docs previews use Wrangler's **versioned uploads** (the `upload` script in `docs/package.json`):
+Instead of the app's create-a-Worker-per-PR model, the preview job downloads the build artifact and uses Wrangler's **versioned uploads** via `wrangler-action`:
 
 ```bash
-astro build && wrangler versions upload --preview-alias pr-<n>
+wrangler versions upload --preview-alias pr-<n>
 ```
+
+(The `upload` script in `docs/package.json` is the local/manual equivalent, without the alias.)
 
 `wrangler versions upload` publishes a new, *inactive* version of the `forever-pto-docs` Worker — production traffic on `docs.forever-pto.com` is untouched. The `--preview-alias` gives the version a **deterministic URL** derived from the PR number:
 
@@ -48,7 +50,7 @@ Compare with the app's [cleanup workflow](/infra/environments/): app previews ar
 
 ## Production deploy
 
-On `main`, the `deploy` script runs `astro build && wrangler deploy`, activating a new version of `forever-pto-docs` on `docs.forever-pto.com` (an infrastructure-as-code `custom_domain` route — see [Cloudflare stack](/infra/cloudflare/)). The only credentials involved are `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the site has no [runtime secrets](/infra/secrets/) at all.
+On `main`, the deploy job reuses the build job's `docs/dist` artifact and runs `wrangler deploy` via `wrangler-action` (the `deploy` script in `docs/package.json` is the local one-shot equivalent), activating a new version of `forever-pto-docs` on `docs.forever-pto.com` (an infrastructure-as-code `custom_domain` route — see [Cloudflare stack](/infra/cloudflare/)). The only credentials involved are `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the site has no [runtime secrets](/infra/secrets/) at all.
 
 ## Accepted cost: docs PRs still run app CI
 

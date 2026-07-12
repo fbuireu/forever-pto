@@ -5,7 +5,9 @@ on:
     paths:
       - 'docs/**'
       - 'src/ui/modules/core/**'
+      - 'src/ui/modules/pages/homepage/sections/**'
       - 'src/ui/styles/**'
+      - 'src/ui/utils/**'
       - 'pnpm-lock.yaml'
       - '.github/workflows/docs.yml'
   push:
@@ -13,7 +15,9 @@ on:
     paths:
       - 'docs/**'
       - 'src/ui/modules/core/**'
+      - 'src/ui/modules/pages/homepage/sections/**'
       - 'src/ui/styles/**'
+      - 'src/ui/utils/**'
       - 'pnpm-lock.yaml'
       - '.github/workflows/docs.yml'
   workflow_dispatch:
@@ -41,8 +45,13 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: pnpm
+      # Unfiltered: the docs site imports app sources via the @ui alias, whose
+      # bare imports (react-use-measure, motion...) resolve from the ROOT
+      # node_modules — a --filter install would leave them missing.
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --filter forever-pto-docs...
+        run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm --filter forever-pto-docs lint
       - name: Typecheck
         run: pnpm --filter forever-pto-docs check
       - name: Build
