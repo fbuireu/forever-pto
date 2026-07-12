@@ -1,0 +1,44 @@
+---
+title: Button
+description: The primary interactive element — CVA variants, sizes, asChild composition and the brutal hover lift.
+---
+
+import { ButtonSizesDemo, ButtonStatesDemo, ButtonVariantsDemo, BUTTON_VARIANT_ROWS } from '../../../../components/demos/ButtonDemo';
+import { VariantsTable } from '../../../../components/VariantsTable';
+
+Source: `src/ui/modules/core/primitives/Button.tsx`. Built with [CVA](https://cva.style) and rendered through the local `Slot` when `asChild` is set. It is framework-clean (no Next.js imports), which is why this page can render the real component.
+
+## Variants
+
+<ButtonVariantsDemo client:visible />
+
+<VariantsTable rows={BUTTON_VARIANT_ROWS} />
+
+## Sizes
+
+<ButtonSizesDemo client:visible />
+
+## States and composition
+
+Hover lifts the button up-left (`translate -2px, -2px`) while the hard shadow grows; press does the inverse. The pointer hit-area stays stable during the movement thanks to the `hit-area-stable` utility — see [Hit-area stability](/design-system/foundations/hit-area-stable/).
+
+<ButtonStatesDemo client:visible />
+
+## Usage
+
+```tsx
+import { Button } from '@ui/modules/core/primitives/Button';
+
+<Button variant='accent' size='lg'>Plan my year</Button>
+
+// Render as a link while keeping button styling
+<Button asChild>
+  <Link href='/planner'>Open the planner</Link>
+</Button>
+```
+
+## Conventions
+
+- The CVA object is exported alongside the component (`buttonVariants`) so other primitives can reuse the classes.
+- `data-slot='button'` is set for CSS containment hooks (the shared transition block targets it).
+- Icons inside get `pointer-events: none` and a default `size-4` automatically.
