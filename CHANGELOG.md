@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/fbuireu/forever-pto/compare/v1.6.1...v1.6.2) (2026-07-12)
+
+
+### Bug Fixes
+
+* mobile tap support for tooltips and unblock content under the cookie banner ([#333](https://github.com/fbuireu/forever-pto/issues/333)) ([3864b22](https://github.com/fbuireu/forever-pto/commit/3864b22649e2f94cf3b44e8b539ea483f9d07ce1))
+
 ## [1.6.1](https://github.com/fbuireu/forever-pto/compare/v1.6.0...v1.6.1) (2026-07-12)
 
 
