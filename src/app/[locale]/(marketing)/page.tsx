@@ -59,7 +59,7 @@ export default HomePage;
 // todo: sponsor the project (reddit, producthunt)
 // todo: performance audit, react best practices audit
 // todo: ads?
-// todo: add LICENCE, SECURITY, DOCS (astro starlight), WIKI, etc
+// todo: add LICENCE, SECURITY, etc
 // todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
 // todo: unify component and folder structure (payment/provider should be dto?)
 // todo: Increase test coverage (check flows, click, pay, etc. Add thresholds)

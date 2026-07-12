@@ -861,7 +861,8 @@
     "legalNavigation": "Liens légaux et politiques",
     "copyright": "© {year} Forever PTO · Fait depuis un hamac.",
     "version": "v{version} · statut : en vacances ●",
-    "planner": "Planificateur"
+    "planner": "Planificateur",
+    "docs": "Documentation"
   },
   "accessibility": {
     "selectLanguage": "Sélectionner la langue, actuelle : {current}",

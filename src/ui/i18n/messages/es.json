@@ -861,7 +861,8 @@
     "legalNavigation": "Enlaces legales y de política",
     "copyright": "© {year} Forever PTO · Hecho desde una hamaca.",
     "version": "v{version} · status: vacacional ●",
-    "planner": "Calculadora"
+    "planner": "Calculadora",
+    "docs": "Documentación"
   },
   "accessibility": {
     "selectLanguage": "Seleccionar idioma, actual: {current}",

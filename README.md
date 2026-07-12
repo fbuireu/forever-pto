@@ -2,7 +2,7 @@
 
 **Maximize your time off.** Forever PTO helps you strategically combine vacation days with public holidays to get the most out of every PTO day you have.
 
-→ **[forever-pto.com](https://forever-pto.com)**
+→ **[forever-pto.com](https://forever-pto.com)** · **[docs.forever-pto.com](https://docs.forever-pto.com)** (wiki)
 
 ---
 
@@ -23,6 +23,18 @@ Given your country, region, year, and number of PTO days, Forever PTO suggests t
 - PTO accrual calculator, PTO vs salary calculator, workday counter
 - Charts and yearly summary
 - Premium features for advanced analysis
+
+---
+
+## Documentation
+
+The full wiki lives at **[docs.forever-pto.com](https://docs.forever-pto.com)** — architecture, runtime flows (country detection, premium, holidays engine…), the design system with live component demos, and the complete CI/CD and environments lifecycle.
+
+This repo is a pnpm workspace: the app at the root (`forever-pto`) and the docs site in [`docs/`](docs/) (`forever-pto-docs`, Astro Starlight), which reuses the app's real components and tokens and deploys independently. Docs-only changes must use `docs:` commit/PR titles (squash-merge feeds semantic-release).
+
+```bash
+pnpm --filter forever-pto-docs dev   # docs dev server
+```
 
 ---
 

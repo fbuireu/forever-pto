@@ -861,7 +861,8 @@
     "legalNavigation": "Legal and policy links",
     "copyright": "© {year} Forever PTO · Made from a hammock.",
     "version": "v{version} · status: on vacation ●",
-    "planner": "Planner"
+    "planner": "Planner",
+    "docs": "Docs"
   },
   "accessibility": {
     "selectLanguage": "Select language, current: {current}",

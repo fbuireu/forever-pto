@@ -15,6 +15,16 @@ export default defineConfig({
         dark: './src/assets/logo-dark.svg',
       },
       favicon: '/favicon.svg',
+      head: [
+        {
+          tag: 'meta',
+          attrs: { property: 'og:image', content: 'https://docs.forever-pto.com/og.png' },
+        },
+        {
+          tag: 'meta',
+          attrs: { name: 'twitter:card', content: 'summary_large_image' },
+        },
+      ],
       customCss: ['./src/styles/global.css'],
       defaultLocale: 'root',
       locales: {

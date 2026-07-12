@@ -861,7 +861,8 @@
     "legalNavigation": "Link legali e policy",
     "copyright": "© {year} Forever PTO · Fatto da un'amaca.",
     "version": "v{version} · status: in vacanza ●",
-    "planner": "Pianificatore"
+    "planner": "Pianificatore",
+    "docs": "Documentazione"
   },
   "accessibility": {
     "selectLanguage": "Seleziona lingua, attuale: {current}",
