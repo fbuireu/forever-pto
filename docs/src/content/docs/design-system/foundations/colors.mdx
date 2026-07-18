@@ -1,0 +1,107 @@
+---
+title: Colors
+description: Brand palette, semantic tokens, surfaces and the frame — with live swatches read from the real app stylesheets.
+sidebar:
+  order: 1
+---
+
+import { TokenSwatch } from '../../../../components/TokenSwatch';
+
+All color tokens are CSS custom properties declared in `src/ui/styles/global/index.css` (light values in `:root`, dark overrides in the `[data-theme='dark']` block). The swatches below read the variables live, so they always show the current values in your active theme — flip Starlight's toggle to see the [dark mode](/design-system/foundations/dark-mode/) set.
+
+## Brand palette
+
+The raw, theme-independent identity colors. These do **not** flip in dark mode — yellow stays yellow.
+
+<TokenSwatch tokens={[
+  '--color-brand-yellow',
+  '--color-brand-teal',
+  '--color-brand-orange',
+  '--color-brand-purple',
+  '--color-brand-pink',
+  '--color-brand-green',
+  '--color-brand-sky',
+  '--color-brand-red',
+  '--color-brand-ink',
+  '--color-brand-cream',
+]} />
+
+Each hue that needs a readable-on-light variant has a `-deep` counterpart:
+
+<TokenSwatch tokens={[
+  '--color-brand-teal-deep',
+  '--color-brand-orange-deep',
+  '--color-brand-purple-deep',
+  '--color-brand-yellow-deep',
+]} />
+
+## Semantic tokens
+
+The shadcn-style layer components actually consume. These are the tokens that flip between themes:
+
+<TokenSwatch tokens={[
+  '--background',
+  '--foreground',
+  '--primary',
+  '--primary-foreground',
+  '--secondary',
+  '--secondary-foreground',
+  '--accent',
+  '--accent-foreground',
+  '--muted',
+  '--muted-foreground',
+  '--destructive',
+  '--card',
+  '--popover',
+  '--border',
+  '--input',
+  '--ring',
+]} />
+
+Note that `--accent` is pinned to the brand yellow and `--destructive` stays constant in both themes; `--ring` points at `--color-brand-orange`.
+
+## Surfaces and the frame
+
+Panel backgrounds come in three warmth steps plus an inset alias, and `--frame` is the ink used for every hard border and brutal shadow:
+
+<TokenSwatch tokens={[
+  '--surface-panel',
+  '--surface-panel-alt',
+  '--surface-panel-soft',
+  '--surface-panel-inset',
+  '--frame',
+]} />
+
+`--frame` is the pivot of the whole system: it is cream-on-ink in light mode and ink-on-cream in dark mode, and because every `--shadow-brutal-*` token references it, the [shadows](/design-system/foundations/shadows/) re-theme automatically.
+
+## Sidebar
+
+The app sidebar has its own token family (same naming scheme, `--sidebar-*`) so it can be tinted independently of the page:
+
+<TokenSwatch tokens={[
+  '--sidebar',
+  '--sidebar-foreground',
+  '--sidebar-accent',
+  '--sidebar-border',
+]} />
+
+## Gradients and effects
+
+A few tokens hold full gradient values rather than single colors:
+
+<TokenSwatch tokens={[
+  '--brand-gradient',
+  '--page-glow',
+  '--grid-color',
+]} />
+
+`--brand-gradient` is the five-stop brand sweep used for decorative strips; `--page-glow` is the trio of faint radial gradients painted behind the page body (`src/ui/styles/base/index.css` sets it as a fixed `background-image`); `--grid-color` is the near-transparent ink used for background grids.
+
+## How the semantic layer maps to Tailwind
+
+Two files, two jobs:
+
+- `src/ui/styles/global/index.css` declares the raw values (`:root` and `[data-theme='dark']`).
+- `src/ui/styles/theme/index.css` re-exposes a subset under Tailwind v4's `@theme inline` block: `--color-background: var(--background)`, `--color-accent: var(--accent)`, and so on.
+
+Only the tokens aliased inside `@theme inline` become Tailwind utilities (`bg-background`, `text-muted-foreground`, `border-border`, `ring-ring`…). Everything else — brand colors, surfaces, `--frame`, shadows — is consumed through arbitrary values, e.g. `bg-[var(--surface-panel)]`, `border-[var(--frame)]`, `shadow-[var(--shadow-brutal-md)]`. When adding a component, prefer the semantic utilities and reach for `var()` arbitraries only for surfaces and frames, matching the existing primitives in `src/ui/modules/core/primitives/`.

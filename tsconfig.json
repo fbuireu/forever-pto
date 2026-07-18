@@ -1,6 +1,6 @@
 {
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
-  "exclude": [".next/**/*", "node_modules/**/*"],
+  "exclude": [".next/**/*", "node_modules/**/*", "docs/**/*"],
 
   "compilerOptions": {
     "target": "ESNext",

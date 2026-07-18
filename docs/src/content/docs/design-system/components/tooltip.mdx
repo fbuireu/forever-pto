@@ -1,0 +1,48 @@
+---
+title: Tooltip
+description: Primary-colored hint bubble with a rotated square arrow, plus the small "i" info trigger.
+sidebar:
+  order: 23
+---
+
+import { TooltipDemo, TooltipInfoTriggerDemo } from '../../../../components/demos/TooltipDemo';
+
+Source: `src/ui/modules/core/animate/base/Tooltip.tsx` — styling layer over the motion primitive at `src/ui/modules/core/animate/primitives/base/Tooltip.tsx` (Base UI tooltip + `AnimatePresence`). Needs a `LazyMotionProvider` ancestor.
+
+Exports: `Tooltip`, `TooltipTrigger`, `TooltipContent`, `TooltipProvider`, `TooltipInfoTrigger`.
+
+<TooltipDemo client:visible />
+
+## How it works
+
+- The popup scales `0.5 → 1` on a spring out of `origin-(--transform-origin)`. The bubble is `bg-primary` with a 3px frame border and the accent-tinted `shadow-brutal-3-accent`; the "arrow" is a 45°-rotated square that repositions per side via Base UI's `data-side` attribute.
+- Each `Tooltip` wraps itself in its own `TooltipProvider`, so you never need one — but a shared explicit `TooltipProvider` around a group makes them share hover-delay state. Both accept the Base UI `delay` prop and the Radix-style alias `delayDuration` (the alias wins when both are set); default delay is `0`.
+- `TooltipTrigger` supports `asChild`. The underlying motion primitive also implements `followCursor` (`boolean | 'x' | 'y'`) with springed motion values — the styling layer forwards it as part of the root props.
+- `TooltipInfoTrigger` is a ready-made trigger: a `size-5` accent square with a mono "i", `cursor-help`, `hit-area-stable` and the standard hover lift. Drop it next to a stat label and pair it with a `TooltipContent`.
+
+<TooltipInfoTriggerDemo client:visible />
+
+## Usage
+
+```tsx
+import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipTrigger } from '@ui/modules/core/animate/base/Tooltip';
+
+<Tooltip delay={300}>
+  <TooltipTrigger asChild>
+    <Button variant='outline'>Efficiency</Button>
+  </TooltipTrigger>
+  <TooltipContent>Days off gained per PTO day spent.</TooltipContent>
+</Tooltip>
+
+<Tooltip>
+  <TooltipInfoTrigger />
+  <TooltipContent>Shown on hover or focus.</TooltipContent>
+</Tooltip>
+```
+
+Tooltips are hover/focus-only hints — content must be non-essential. For click-to-open content use [Popover](/design-system/components/popover/).
+
+## Conventions
+
+- `data-slot` hooks (from the motion primitive): `tooltip`, `tooltip-trigger`, `tooltip-portal`, `tooltip-positioner`, `tooltip-popup`, `tooltip-arrow`.
+- `TooltipInfoTrigger` defaults to `ml-auto` (it usually sits at the end of a label row); override with `className='ml-0'` when inlining it.

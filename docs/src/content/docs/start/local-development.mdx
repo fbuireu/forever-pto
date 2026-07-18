@@ -1,0 +1,58 @@
+---
+title: Local development
+description: Prerequisites, environment setup and the script cheatsheet.
+sidebar:
+  order: 1
+---
+
+## Prerequisites
+
+- **Node** — the exact version is pinned in `.nvmrc` (use `nvm use` / `fnm use`). CI reads the same file.
+- **pnpm** — the exact version is pinned in the `packageManager` field of `package.json`; `corepack enable` picks it up automatically.
+
+The repo is a pnpm workspace (`pnpm-workspace.yaml`) with two packages: the app at the root and this wiki in `docs/`.
+
+## Setup
+
+```sh
+pnpm install
+```
+
+Installing also runs the `prepare` script, which installs the husky git hooks (see [tooling](/contributing/tooling/)).
+
+### Environment variables
+
+- `.env.example` lists every variable the app needs (Turso, Stripe, Resend, JWT, Better Stack, Cloudflare Access). Copy it and fill in your values.
+- `.dev.vars` holds the Worker-side secrets (same keys) for wrangler. `next.config.ts` calls `initOpenNextCloudflareForDev()`, which makes the Cloudflare bindings from `wrangler.toml` available during `next dev`, so this file matters even outside `pnpm preview`.
+
+## Run it
+
+```sh
+pnpm dev                              # app on http://localhost:3000 (Turbopack)
+pnpm --filter forever-pto-docs dev    # this wiki on http://localhost:4321
+```
+
+## Script cheatsheet
+
+All scripts live in the root `package.json` (which is the source of truth if this table drifts).
+
+| Script | What it does |
+| --- | --- |
+| `dev` | Next dev server with Turbopack |
+| `build` / `start` | Production Next.js build / serve it locally |
+| `preview` | OpenNext Cloudflare build + local workerd preview |
+| `cf:build` | OpenNext Cloudflare build only |
+| `deploy` / `upload` | Build and deploy to Cloudflare / upload a version without activating it |
+| `cf:typegen` | Generate `cloudflare-env.d.ts` from the wrangler config |
+| `bones:build` / `bones:watch` | Generate skeleton components into `src/ui/modules/bones` (boneyard-js, config in `boneyard.config.json`) |
+| `format` / `format:changed` / `format:all` | Biome check with fixes (base / VCS-changed files / whole repo) |
+| `lint` / `lint:changed` / `lint:all` | Biome lint (base / changed with fixes / whole repo) |
+| `lint:ts:typecheck` | `tsc --noEmit` — also runs on pre-push |
+| `test:ut` / `test:coverage` | Vitest unit tests / with v8 coverage |
+| `test:e2e` / `test:e2e:ui` | Playwright end-to-end tests / UI mode |
+
+The docs package has its own scripts (`docs/package.json`): `dev`, `check`, `build`, `preview`, `test:e2e`, `deploy`.
+
+:::note[Windows]
+`cf:build` (the OpenNext Cloudflare build) is known not to work on Windows. Use WSL, or rely on CI — deploys run on Linux runners anyway (see [environments](/infra/environments/)).
+:::

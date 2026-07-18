@@ -1,0 +1,66 @@
+---
+title: Docs CI
+description: How this documentation site builds, previews and deploys itself — deliberately simpler than the app's pipeline.
+sidebar:
+  order: 7
+---
+
+This page is self-documenting: it describes the pipeline that published it. The site is a static Astro/Starlight build served as Worker assets (`forever-pto-docs`, configured in `docs/wrangler.toml`), so its CI can be far simpler than the [app's](/infra/workflows/): no runtime secrets, no database, no teardown.
+
+## The workflow
+
+`.github/workflows/docs.yml` follows the repo's workflow conventions (SHA-pinned actions, `persist-credentials: false`, zizmor-linted) and is **path-filtered**: it fires on `docs/**` plus the app surfaces the demos consume (`src/ui/modules/core/**`, `src/ui/styles/**`, `src/ui/utils/**`, the homepage `shared.ts` patterns), `pnpm-lock.yaml` and the workflow file itself. Unrelated app changes never build the docs; changes to the reused UI sources do, on purpose — they can break the demos.
+
+Triggers:
+
+- `pull_request` touching those paths → build & test + versioned preview.
+- `push` to `main` touching those paths → build & test + production deploy.
+- `workflow_dispatch` → manual bootstrap run, used for the first deploy (a path-filtered workflow otherwise never fires until the paths change again) and for redeploying without a commit.
+
+## Build & test job
+
+Installs the whole workspace (**unfiltered** `pnpm install` — the demos import app sources whose bare imports resolve from the root `node_modules`), then runs, via the scripts in `docs/package.json`:
+
+- `pnpm lint` — Biome over the docs package (root config).
+- `pnpm check` — `astro check`, which typechecks the demo islands. This is the drift tripwire: demos import real app components via the `@ui` alias with exhaustive `Record<Variant, …>` maps, so renaming a CVA variant in the app breaks this build.
+- `pnpm build` — `astro build`; the resulting `docs/dist` is uploaded as an artifact for the deploy jobs.
+- Playwright smoke tests (`pnpm test:e2e`) run against a local preview server — `docs/playwright.config.ts` boots `astro preview` itself via `webServer`, so no deployment is needed to test.
+
+## PR previews: versions, not Workers
+
+Instead of the app's create-a-Worker-per-PR model, the preview job downloads the build artifact and uses Wrangler's **versioned uploads** via `wrangler-action`:
+
+```bash
+wrangler versions upload --preview-alias pr-<n>
+```
+
+(The `upload` script in `docs/package.json` is the local/manual equivalent, without the alias.)
+
+`wrangler versions upload` publishes a new, *inactive* version of the `forever-pto-docs` Worker — production traffic on `docs.forever-pto.com` is untouched. The `--preview-alias` gives the version a **deterministic URL** derived from the PR number:
+
+```text
+https://pr-<n>-forever-pto-docs.fbuireu.workers.dev
+```
+
+Every push to the PR overwrites the alias, so the preview link posted once on the PR stays valid for the PR's whole life. (`workers_dev` and `preview_urls` are enabled in `docs/wrangler.toml` to make these URLs resolve.)
+
+One bootstrap subtlety: `versions upload` cannot *create* a Worker, and the `production` GitHub environment is branch-protected to `main`, so previews are impossible until the first production deploy has created `forever-pto-docs`. The preview job probes for the Worker first (`wrangler versions list`) and skips gracefully with a notice instead of failing — the very first docs PR simply has no preview.
+
+### Why there is no teardown
+
+Compare with the app's [cleanup workflow](/infra/environments/): app previews are real Workers carrying secrets and consuming names, so they must be deleted. Docs preview versions are immutable, secretless snapshots of static HTML that never activate — when the PR closes they simply stop being interesting. Cloudflare retains a bounded version history per Worker and old versions cost nothing, so a cleanup workflow would be pure ceremony.
+
+## Production deploy
+
+On `main`, the deploy job reuses the build job's `docs/dist` artifact and runs `wrangler deploy` via `wrangler-action` (the `deploy` script in `docs/package.json` is the local one-shot equivalent), activating a new version of `forever-pto-docs` on `docs.forever-pto.com` (an infrastructure-as-code `custom_domain` route — see [Cloudflare stack](/infra/cloudflare/)). The only credentials involved are `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the site has no [runtime secrets](/infra/secrets/) at all.
+
+## Accepted cost: docs PRs still run app CI
+
+The app's workflows (`ci.yml`, `deploy-development.yml`, `deploy-production.yml`) have **no path filters**, so a docs-only PR still runs the full app lint/typecheck/test suite, deploys an app preview Worker and runs app E2E — wasted minutes, accepted for now.
+
+The obvious fix, `paths-ignore: ['docs/**']` on the app workflows, has a branch-protection caveat: required status checks that never run **never report**, and GitHub blocks the merge waiting for them. Adopting path filters therefore also means restructuring the required checks (e.g. a summary job that always runs, or `paths`-aware required checks). Tracked as a follow-up; until then the redundancy is the price of simple branch protection.
+
+Two related conventions for docs PRs:
+
+- Title them `docs:` or `chore:` — a `feat:`/`fix:` docs PR would [cut an app release](/infra/release/).
+- Docs dependencies live in `docs/package.json` but share the root `pnpm-lock.yaml`, so [Renovate](/infra/renovate/) manages them under the same policy.

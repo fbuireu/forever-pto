@@ -1,0 +1,67 @@
+---
+title: GitHub workflows
+description: Reference for every workflow in .github/workflows — triggers, jobs and what each one gates.
+sidebar:
+  order: 2
+---
+
+All workflows live in `.github/workflows/`. Two repo-wide conventions, enforced socially and by zizmor: every third-party action is SHA-pinned (with a version comment), and every checkout uses `persist-credentials: false`.
+
+| Workflow | Trigger | Purpose |
+| --- | --- | --- |
+| `ci.yml` | push to `main`, PRs to `main` | Lint, typecheck, unit tests; release on `main` |
+| `_deploy.yml` | `workflow_call` | Reusable OpenNext build + deploy + secret push |
+| `deploy-development.yml` | PR opened/reopened/synchronize | Per-PR preview Worker + comment + E2E |
+| `deploy-production.yml` | push to `main` | Production deploy |
+| `cleanup-development.yml` | PR closed | Delete the per-PR preview Worker |
+| `docs.yml` | push / PR touching `docs/**` | This site's build, checks and deploy |
+| `zizmor.yml` | push to `main`, all PRs | Workflow security linting |
+| `renovate-auto-approve.yml` | Renovate PRs (by label) | Auto-approve safe dependency PRs |
+| `dependabot-auto-merge.yml` | Dependabot PRs | Dormant — Renovate is the active bot |
+
+## `ci.yml` — CI
+
+Runs on pushes to `main` and PRs targeting `main`. Concurrency is per-ref with `cancel-in-progress: true`, so a force-push cancels the stale run.
+
+- **Lint** — `pnpm lint:all` (Biome).
+- **Typecheck** — `pnpm lint:ts:typecheck` (`tsc --noEmit` over the app project).
+- **Unit tests** — `pnpm test:coverage` (Vitest), then coverage upload to Codecov (`fail_ci_if_error: false`, so Codecov outages never block CI).
+- **Semantic Release** — `needs` all three, and only on push to `main`. Covered in depth on the [release](/infra/release/) page.
+
+The three quality jobs are what branch protection gates PRs on. Note they gate *merging*, not *deploying*: `deploy-production.yml` (below) runs in parallel with CI on the same push.
+
+## `_deploy.yml` — Deploy (reusable)
+
+A `workflow_call` workflow shared by both deploy entry points. Inputs: `environment` (GitHub environment name), `wrangler_env` (`--env` for wrangler), optional `url` (shown on the PR/deployments UI) and optional `worker_name` (the per-PR override). Steps:
+
+1. Install deps, then build with `pnpm run cf:build` (OpenNext). The build step receives the `NEXT_PUBLIC_*` GitHub environment *variables* — these are baked into the client bundle at build time.
+2. `pnpm exec wrangler deploy --env <wrangler_env>`, adding `--name <worker_name>` when set — the name override is what creates a fresh per-PR Worker.
+3. Push the five runtime secrets with `wrangler secret bulk` (targeting `--name` for previews, `--env` otherwise). A small Node guard fails the job if any secret is missing rather than deploying a half-configured Worker. See [secrets](/infra/secrets/).
+
+## `deploy-development.yml` — Deploy - Development
+
+Per-PR preview creation; the full lifecycle is on the [environments](/infra/environments/) page. Three jobs: `deploy` (calls `_deploy.yml` with the `pr-<n>-forever-pto-development` name), `comment` (upserts a sticky preview-URL comment keyed on a hidden HTML marker) and `e2e` (Playwright chromium against the live preview through a Cloudflare Access service token, report uploaded as an artifact). Concurrency is per-PR with `cancel-in-progress: true`, so rapid pushes only deploy the latest commit.
+
+## `deploy-production.yml` — Deploy - Production
+
+Push to `main` → `_deploy.yml` with `environment: production`, `wrangler_env: production` and `url: https://forever-pto.com`. No `worker_name` override, so it updates the `forever-pto` Worker in place. Concurrency group `deploy-production` with `cancel-in-progress: false`: deploys queue rather than cancel. It is **not** gated on CI passing — see [release](/infra/release/) for the implications.
+
+## `cleanup-development.yml` — Cleanup - Development
+
+On `pull_request: closed`, runs `cloudflare/wrangler-action` with `delete pr-<n>-forever-pto-development --force`. Nothing else — shared dev R2/KV/Turso state is intentionally left alone.
+
+## `docs.yml` — Docs
+
+CI/CD for this documentation site, path-filtered to `docs/**` plus the app UI surfaces the demos import (`src/ui/modules/core/**`, `src/ui/styles/**`, `src/ui/utils/**`…). Note the asymmetry: the app workflows have **no** path filters, so docs changes still run the full app CI. Build & test, versioned PR previews and production deploy of the `forever-pto-docs` Worker — the full walkthrough is on [docs CI](/infra/docs-ci/).
+
+## `zizmor.yml` — Security Analysis with zizmor
+
+Runs the zizmor GitHub Actions security linter on pushes to `main` and every PR, reporting to GitHub code scanning (`security-events: write` is its only permission). This is what makes the SHA-pinning and `persist-credentials: false` conventions stick — any new workflow (including docs ones) gets linted too.
+
+## `renovate-auto-approve.yml`
+
+Approves Renovate PRs so their automerge can proceed. Gated on the PR author being `renovate[bot]` *and* carrying one of the labels Renovate adds by update type (`patch-update`, `minor-update`, `pin-update`, `lock-maintenance`). It checks for an existing approval first, then `gh pr review --approve` with the `PAT` secret. See [Renovate](/infra/renovate/).
+
+## `dependabot-auto-merge.yml`
+
+Legacy: approves and auto-squash-merges Dependabot patch/minor/dev-dependency PRs and labels them by update type. There is no `.github/dependabot.yml` in the repo, so this workflow's `if: user.login == 'dependabot[bot]'` guard never matches — Renovate is the active dependency bot. Kept dormant; safe to ignore.

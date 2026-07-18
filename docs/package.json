@@ -1,0 +1,49 @@
+{
+  "name": "forever-pto-docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "check": "astro check",
+    "build": "astro build",
+    "preview": "astro preview",
+    "format": "biome check --write .",
+    "lint": "biome lint .",
+    "test:e2e": "playwright test",
+    "deploy": "astro build && wrangler deploy",
+    "upload": "astro build && wrangler versions upload"
+  },
+  "dependencies": {
+    "@astrojs/react": "6.0.1",
+    "@astrojs/starlight": "0.41.3",
+    "@astrojs/starlight-tailwind": "5.0.0",
+    "@base-ui/react": "1.6.0",
+    "@fontsource-variable/bricolage-grotesque": "5.2.10",
+    "@fontsource-variable/jetbrains-mono": "5.2.8",
+    "@fontsource-variable/space-grotesk": "5.2.10",
+    "@fontsource/instrument-serif": "5.2.8",
+    "@tailwindcss/vite": "4.3.2",
+    "astro": "7.0.7",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "cmdk": "1.1.1",
+    "lucide-react": "1.23.0",
+    "motion": "12.42.2",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "sharp": "0.35.3",
+    "tailwind-merge": "3.6.0",
+    "tailwindcss": "4.3.2",
+    "vaul": "1.1.2",
+    "zustand": "5.0.14"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.9",
+    "@playwright/test": "1.61.1",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "typescript": "6.0.3",
+    "wrangler": "4.107.1"
+  }
+}

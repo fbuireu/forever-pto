@@ -1,0 +1,42 @@
+---
+title: Tooling
+description: Biome, git hooks, lint-staged and the security scanners.
+sidebar:
+  order: 1
+---
+
+## Biome
+
+A single `biome.json` at the repo root lints and formats the whole workspace, `docs/` included. Highlights:
+
+- Formatter: 120-char lines, LF, spaces, single quotes (JS and JSX), es5 trailing commas.
+- `assist.actions.source.organizeImports: on` — import sorting is automated, don't hand-sort.
+- Recommended rules plus `suspicious.noConsole` as a warning (only `console.warn`/`console.error` allowed).
+- Generated or vendored CSS layers (`src/ui/styles/base|theme|utilities`, `docs/src/styles`) are excluded from formatting; `*.d.ts` files are excluded from linting.
+- VCS integration is on (`useIgnoreFile`, default branch `main`), which is what powers the `--changed` script variants.
+
+Run `pnpm format:changed` before pushing if you bypassed the hooks; `pnpm lint:all` is what CI runs.
+
+## Git hooks (husky)
+
+Installed by the `prepare` script on `pnpm install`. Three hooks in `.husky/`:
+
+| Hook | Runs | Purpose |
+| --- | --- | --- |
+| `pre-commit` | `pnpm lint-staged` | Format + lint staged files; run unit tests for staged test files |
+| `commit-msg` | `pnpm commitlint --edit` | Enforce conventional commits (see [conventions](/contributing/conventions/)) |
+| `pre-push` | `pnpm lint:ts:typecheck` | Full `tsc --noEmit` before anything leaves your machine |
+
+### lint-staged
+
+The active config is `.lintstagedrc.json`. It scopes to `src/**` and `e2e/**`: JS/TS files get `format:changed` + `lint:changed`, and staged `*.test.*`/`*.spec.*` files additionally run `test:ut:changed` (Vitest with `--bail 1`). Note that `docs/**` files are not covered by these globs — the docs CI workflow is the safety net there.
+
+## CI-side scanners
+
+- **zizmor** (`.github/workflows/zizmor.yml`) — lints the GitHub Actions workflows themselves for security issues and reports to code scanning. This is why every action in the repo is SHA-pinned with `persist-credentials: false`; follow that pattern when touching workflows.
+- **Codecov** — `ci.yml` uploads Vitest coverage (`coverage/lcov.info`) on every push/PR. See [testing](/contributing/testing/).
+- **CodeQL / code scanning** — no workflow file exists in the repo; repository-level code scanning is managed through GitHub settings, not in-repo config.
+
+## Dependency management
+
+Renovate (`.github/renovate.json`) pins everything (including action SHAs), runs twice a month and automerges patch/minor updates via labels that `renovate-auto-approve.yml` keys on. pnpm policy lives in `pnpm-workspace.yaml`: an `allowBuilds` whitelist for postinstall scripts, a minimum release age for new versions, and `patchedDependencies` for the boneyard-js patch.

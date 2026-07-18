@@ -1,0 +1,52 @@
+---
+title: Tabs
+description: Custom tabs with a gliding MotionHighlight pill and auto-height animated panels.
+sidebar:
+  order: 21
+---
+
+import { TabsDemo } from '../../../../components/demos/TabsDemo';
+
+Source: `src/ui/modules/core/animate/components/Tabs.tsx` — this is a hand-rolled compound component (plain `div`s + React context), not a Base UI wrapper. Heavy Motion usage; needs a `LazyMotionProvider` ancestor.
+
+Exports: `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`, `TabsContents`, `TabsHighlight`, `TabsHighlightItem`.
+
+<TabsDemo client:visible />
+
+## How it works
+
+- `Tabs` owns the active value (uncontrolled via `defaultValue` or controlled via `value`/`onValueChange`) and shares it through context.
+- The active-tab pill is `MotionHighlight` in parent mode (`src/ui/modules/core/animate/effects/MotionHighlight.tsx`): a single accent rectangle (`border-2`, `shadow-brutal-xs`) animated to the bounds of the active item with a spring (`stiffness: 200, damping: 25`). That is why the list needs the extra wrapper pair — `TabsHighlight` around `TabsList`, and each `TabsTrigger` inside a `TabsHighlightItem` keyed by the same `value`.
+- `TabsContents` renders only the active `TabsContent` inside `AnimatePresence mode='wait'`. Its `mode` prop picks the height strategy: `'auto-height'` (default) animates the container height to the new panel via `AutoHeight` (`src/ui/modules/core/animate/effects/AutoHeight.tsx`); `'layout'` uses a Motion layout animation instead.
+- Each `TabsContent` enters with an opacity + `blur(4px) → 0` transition, so panel swaps read as a focus pull rather than a hard cut.
+- `TabsTrigger` is an `m.button` with `whileTap` scale 0.95 and proper `role='tab'` / `data-state` attributes; note it does not implement roving arrow-key focus.
+
+## Usage
+
+```tsx
+import { Tabs, TabsContent, TabsContents, TabsHighlight, TabsHighlightItem, TabsList, TabsTrigger } from '@ui/modules/core/animate/components/Tabs';
+
+<Tabs defaultValue='national'>
+  <TabsHighlight>
+    <TabsList>
+      <TabsHighlightItem value='national'>
+        <TabsTrigger value='national'>National</TabsTrigger>
+      </TabsHighlightItem>
+      <TabsHighlightItem value='regional'>
+        <TabsTrigger value='regional'>Regional</TabsTrigger>
+      </TabsHighlightItem>
+    </TabsList>
+  </TabsHighlight>
+  <TabsContents>
+    <TabsContent value='national'>…</TabsContent>
+    <TabsContent value='regional'>…</TabsContent>
+  </TabsContents>
+</Tabs>
+```
+
+Reference consumers: the planner's holidays list (`src/ui/modules/pages/planner/HolidaysList.tsx`) and the FAQ tabs (`src/ui/modules/pages/planner/support/FaqTabs.tsx`), which nest an [Accordion](/design-system/components/accordion/) per panel. The same highlight effect drives [DropdownMenu](/design-system/components/dropdown-menu/) hover.
+
+## Conventions
+
+- `data-slot` hooks: `tabs`, `tabs-list`, `tabs-trigger`, `tabs-contents`, `tabs-content`.
+- The `value` on `TabsHighlightItem` and its inner `TabsTrigger` must match — the highlight and the click handler are wired independently.

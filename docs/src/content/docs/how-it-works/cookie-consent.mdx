@@ -1,0 +1,38 @@
+---
+title: Cookie consent
+description: The vanilla-cookieconsent integration — custom React UI, per-service analytics consent, Google Consent Mode wiring and what needs consent at all.
+sidebar:
+  order: 10
+---
+
+Consent management is built on `vanilla-cookieconsent`, but with the library's UI **disabled** — it runs headless (`autoShow: false`) as the consent state machine, while the banner and preferences dialog are the app's own React components styled like the rest of the design system.
+
+## Composition
+
+- `src/ui/modules/shared/cookie-consent/CookieConsentClient.tsx` — a `dynamic(..., { ssr: false })` wrapper mounted in the root locale layout; consent state lives in the browser, so there is nothing to render on the server.
+- `CookieConsent.tsx` — initializes `CookieConsentLib.run(...)` once, renders the custom banner when no consent cookie exists yet, and otherwise renders `CookieConsentDialog` (the preferences modal, reopened via the `cc:showPreferences` window event, dispatched from the footer).
+- `config/config.ts` — `COOKIE_SECTIONS`, the typed catalog that drives the preferences UI. Description/expiry strings are i18n keys typed against the `cookies` namespace of the English catalog, so a missing translation is a type error.
+
+## Categories and services
+
+Two categories are registered with the library:
+
+- **necessary** — `enabled: true, readOnly: true`; not consentable. Per `COOKIE_SECTIONS` this covers `user-country` (see [country detection](/how-it-works/country-detection/)), the library's own `cc_cookie`, and Stripe's `__stripe_mid`/`__stripe_sid` (set during [donation checkout](/how-it-works/premium/)). The `NEXT_LOCALE` and `premium-token` cookies are likewise functional, not tracking — see [cookies](/reference/cookies/).
+- **analytics** — the only consent-gated category, with two independently toggleable services:
+  - `ga4` — Google Analytics (`_ga*`, `_gid` cookie patterns).
+  - `betterStack` — Better Stack browser analytics (`_bs*` patterns).
+
+  Each service declares its cookies with regex patterns, and `autoClear` deletes them when consent is withdrawn.
+
+## Consent flow
+
+Accepting or saving preferences calls `CookieConsentLib.acceptService(enabledServices, 'analytics')`, then:
+
+- **Google Consent Mode** — `src/ui/modules/tutorial/Analytics.tsx` loads gtag with a default of everything `denied`. On consent changes the component updates `analytics_storage` via `gtag('consent', 'update', ...)` and fires a `page_view` when granted — GA never tracks pre-consent.
+- **Better Stack tracking** — `src/ui/modules/tutorial/BetterStackTracking.tsx` listens to the library's `cc:onConsent` / `cc:onChange` document events and only injects the tracking script when the analytics category is accepted (and a tracking token exists). It also `identifyUser`s premium users post-consent. See [observability](/how-it-works/observability/).
+
+On a revisit, `onConsent` restores per-service state from `CookieConsentLib.getUserPreferences()` so the dialog reflects reality.
+
+## What this means in practice
+
+No analytics code runs until the user opts in; rejecting all is a first-class, equally prominent action. Everything the app strictly needs to function (locale, country, premium session, payment) is in the necessary bucket and never blocked by consent.

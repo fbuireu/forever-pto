@@ -1,0 +1,50 @@
+---
+title: Repository structure
+description: Top-level map of the monorepo and what lives where.
+sidebar:
+  order: 2
+---
+
+The repository is a pnpm workspace with two packages — the Next.js app at the root and this wiki in `docs/` — declared in `pnpm-workspace.yaml`.
+
+```
+forever-pto/
+├── src/                  # app source, layered (see below)
+├── e2e/                  # Playwright specs mirroring the app routes
+├── docs/                 # this wiki — Astro Starlight workspace package
+├── workers/tail/         # forever-pto-tail Worker (forwards logs to Better Stack)
+├── patches/              # pnpm patches applied at install time
+├── .github/workflows/    # CI/CD pipelines
+├── wrangler.toml         # Cloudflare Worker config (app)
+├── open-next.config.ts   # OpenNext adapter config (R2 incremental cache)
+└── next.config.ts        # Next.js config (i18n, headers, cache components)
+```
+
+## `src/` layers
+
+The app follows a layered architecture — each directory has a `CONTEXT.md` describing its purpose and boundaries, and the details are covered in the [architecture overview](/architecture/overview/).
+
+| Directory | Role |
+| --- | --- |
+| `src/app/` | Next.js App Router routes: `[locale]` pages and `api/` route handlers |
+| `src/application/` | Use-cases, DTOs and Zustand stores — orchestration between UI and domain |
+| `src/domain/` | Pure business logic: the calendar suggestion engine, payment domain events |
+| `src/infrastructure/` | External-world adapters: DB and API clients, services, i18n config, proxy helpers |
+| `src/ui/` | Components, styles, hooks, utils and i18n messages |
+| `src/middleware.ts` | Edge middleware: i18n routing, locale cookie hardening, country detection, markdown rewrites |
+
+## `e2e/`
+
+End-to-end Playwright specs (`*.spec.ts`) whose folder structure mirrors the app routes (`e2e/[locale]/(app)/planner/…`, `e2e/api/…`). The docs site has its own smaller suite in `docs/e2e/`. See [testing](/contributing/testing/).
+
+## `patches/`
+
+pnpm patches, wired through the `patchedDependencies` section of `pnpm-workspace.yaml`. Currently `patches/boneyard-js.patch` fixes the skeleton component in `boneyard-js` to derive its unique id from React's `useId()` instead of `Math.random()`, which keeps server and client markup consistent.
+
+## `workers/tail/`
+
+A second, standalone Cloudflare Worker (`forever-pto-tail`) with its own `wrangler.toml`. It implements a `tail()` handler that receives the app Worker's logs and exceptions and forwards them to Better Stack. See [environments](/infra/environments/).
+
+## `docs/`
+
+This site. It has its own `package.json`, `astro.config.ts`, `wrangler.toml`, Playwright config and CI workflow (`.github/workflows/docs.yml`), but shares the root Biome config and imports app components from `src/ui` via the `@ui` alias.

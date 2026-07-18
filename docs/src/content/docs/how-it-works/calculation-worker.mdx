@@ -1,0 +1,38 @@
+---
+title: Calculation worker
+description: The Web Worker pipeline that runs suggestions, alternatives and metrics off the main thread — requestId correlation, Date serialization and per-run cache clearing.
+sidebar:
+  order: 6
+---
+
+Generating suggestions, alternatives and metrics for a whole year is CPU-heavy. Running it on the main thread would freeze the calendar UI, so the production path runs the entire [holidays engine](/how-it-works/holidays-engine/) inside a Web Worker.
+
+## The hook: `useCalculationsWorker`
+
+`src/ui/hooks/useCalculationsWorker.ts` exposes a single `triggerCalculation(params)`:
+
+1. **Terminate and respawn** — any in-flight worker is `terminate()`d and a fresh one is created with `new Worker(new URL('../../infrastructure/workers/worker', import.meta.url))`, the pattern the bundler statically detects to emit a worker chunk. The worker is also terminated on unmount.
+2. **requestId correlation** — each run gets `requestId = String(Date.now())`, remembered in a ref. Incoming messages with a different `requestId` are ignored, so a stale worker that survives long enough to reply cannot clobber newer results.
+3. **Budget bookkeeping** — the hook computes `autoSuggestCount`: when `ptoDays` has not changed since the last run, automatic suggestions are capped at the number of suggested days the user still has active, honoring their manual removals; when the budget changed, the full new budget is used.
+4. **Dispatch** — it posts a `CalculateSuggestionsRequest` (`src/infrastructure/workers/types.ts`) and flips the store's `isCalculating` flag.
+
+Results come back as a `WorkerResponse` and land in the holidays store via `setCalculationResult`, which preserves the selected alternative index — see [state stores](/how-it-works/state-stores/).
+
+## Crossing the boundary: Date ↔ ISO strings
+
+`postMessage` structured-clones `Date`s, but the protocol deliberately uses plain ISO strings (`SerializedHolidayDTO`, `SerializedBridge`, `SerializedSuggestion`) for a stable, inspectable contract. `src/infrastructure/workers/utils/serializers.ts` owns both directions: `serializeHolidays` / `serializeMonths` on the way in, `deserializeSuggestion` on the way out (reviving nested bridge dates too).
+
+Manual edits also cross the boundary as data, not behavior: `manuallySelectedDays` and `removedSuggestedDays` are sent as ISO strings and converted **inside the worker** into pseudo-holidays with `HolidayVariant.CUSTOM` (`manual-{i}` / `excluded-{i}` ids), so the pure engine treats them like any other fixed day.
+
+## The worker: `src/infrastructure/workers/worker.ts`
+
+A single `onmessage` handler for the `CALCULATE_SUGGESTIONS` message type:
+
+1. **Clear caches first** — the domain layer memoizes date keys and holiday lookups; the worker calls `clearDateKeyCache()` and `clearHolidayCache()` (`src/domain/calendar/utils/cache.ts`) before every run. A worker instance can outlive one calculation, and stale memoization across runs with different inputs would produce wrong plans.
+2. Deserialize inputs, merge pseudo-holidays, and compute `effectivePtoDays` (the manual-day budget math, falling back to `autoSuggestCount` when provided). An empty budget short-circuits with an empty result.
+3. Run `generateSuggestions` → `generateAlternatives` → `generateMetrics` (per suggestion and per alternative).
+4. Post back `CALCULATE_SUGGESTIONS_RESULT` with the serialized payload, or `WORKER_ERROR` with the stringified error — the hook then simply stops the loading state.
+
+## Why terminate-and-respawn?
+
+Cancelling a running computation inside a worker requires cooperative checks; terminating the whole worker is simpler and guaranteed. Since every trigger creates a new worker with a new `requestId`, rapid slider changes (e.g. dragging the PTO-days input) cost only worker startup, never a corrupted result.

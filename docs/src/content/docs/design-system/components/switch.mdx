@@ -1,0 +1,37 @@
+---
+title: Switch
+description: 60x32 brutal toggle pill — Base UI switch rendered as a Motion button.
+sidebar:
+  order: 19
+---
+
+import { SwitchDemo } from '../../../../components/demos/SwitchDemo';
+
+Source: `src/ui/modules/core/animate/primitives/base/Switch.tsx` — note this one lives in `animate/primitives/base/`, not `animate/base/`, because the motion behavior and the styling are one layer. Rendered as `m.button`, so it needs a `LazyMotionProvider` ancestor.
+
+Exports: `Switch` (the thumb is an internal sub-component, rendered automatically unless you pass `children`).
+
+<SwitchDemo client:visible />
+
+## How it works
+
+- The root is a Base UI switch rendered through an `m.button`: a 60px-wide pill with 3px frame border and hard shadow. Controlled and uncontrolled modes go through `useControlledState` (`src/ui/hooks/useControlledState.tsx`), so `checked`, `defaultChecked` and `onCheckedChange` behave like the rest of the system.
+- The thumb is an `m.div` that translates 28px to the right when checked (via Base UI's `data-checked` attribute) and flips from frame-on-frame to accent-on-frame coloring. The travel uses a linear 0.15s tween.
+- Press feedback is context-driven: the root tracks tap state (`onTapStart`/`onTapCancel`/`onTap`) and shares it with the thumb, which can react through its `pressedAnimation` prop — pass custom `children` to `Switch` if you want a thumb with icons or a squish animation.
+- Disabled state washes out border, background and shadow with `color-mix` so the hard shadow fades consistently in both themes.
+
+## Usage
+
+```tsx
+import { Switch } from '@ui/modules/core/animate/primitives/base/Switch';
+
+<Switch id='carryover' checked={enabled} onCheckedChange={(next) => setEnabled(next)} />
+<Label htmlFor='carryover'>Enable carryover</Label>
+```
+
+Use Switch for immediate on/off settings; use [Checkbox](/design-system/components/checkbox/) for form selections that are submitted later.
+
+## Conventions
+
+- `data-slot` hooks: `switch`, `switch-thumb`.
+- Form integration comes from Base UI: `name`, `required`, `readOnly` and `inputRef` forward to a hidden input.

@@ -1,0 +1,28 @@
+---
+title: Introduction
+description: What Forever PTO is and how this wiki is organized.
+sidebar:
+  order: 0
+---
+
+Forever PTO is a PTO optimization tool. You tell it where you live, how many vacation days you have and which strategy you prefer, and it suggests which days to take so that weekends and public holidays combine into the longest possible stretches off. The core idea is the **bridge**: a small block of PTO days that connects a weekend to a holiday (or two holidays to each other), turning one or two vacation days into four or more consecutive days off. See the [glossary](/reference/glossary/) for the exact terminology.
+
+The app runs at [forever-pto.com](https://forever-pto.com) as a Cloudflare Worker.
+
+## What this wiki covers
+
+| Section | Contents |
+| --- | --- |
+| [Start here](/start/local-development/) | Local setup, repository layout, the tech stack |
+| [Architecture](/architecture/overview/) | The layered structure under `src/` and the rules between layers |
+| How it works | Feature deep dives — suggestion engine, [country detection](/how-it-works/country-detection/), premium flow |
+| [Design system](/design-system/components/overview/) | Foundations, components, animation and patterns — with live demos |
+| [Infrastructure & CI/CD](/infra/environments/) | Cloudflare environments, deploy pipelines, releases |
+| Reference | [Cookies](/reference/cookies/), [glossary](/reference/glossary/) and other lookup tables |
+| [Contributing](/contributing/conventions/) | Commit and code conventions, tooling, testing |
+
+## How this site is built
+
+This wiki is itself part of the repository: an Astro Starlight site living in the `docs/` workspace package. It is not a parallel re-implementation of the app's UI — the design-system pages import the **actual app components** through the `@ui` alias (mapped to `src/ui` in `docs/astro.config.ts`) and render them as React islands.
+
+Demos are typed against the real component variant definitions (see the drift-guard pattern in `docs/src/components/demos/ButtonDemo.tsx`): if a variant is added, renamed or removed in the app, `astro check` fails in the docs build. The same principle applies to prose — where the app exports a constant, the docs import it instead of copying the value. The [Button page](/design-system/components/button/) is the reference example.

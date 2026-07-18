@@ -1,0 +1,44 @@
+---
+title: Dropdown menu
+description: Base UI menu with a MotionHighlight hover pill and scale-in content.
+sidebar:
+  order: 11
+---
+
+import { DropdownMenuDemo } from '../../../../components/demos/DropdownMenuDemo';
+
+Source: `src/ui/modules/core/animate/base/DropdownMenu.tsx`. Base UI menu plus Motion; needs a `LazyMotionProvider` ancestor.
+
+Public exports: `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`. The file also contains underscore-prefixed sub/checkbox/radio/label/separator/shortcut variants that are deliberately unexported until something needs them — check the source before reinventing one.
+
+<DropdownMenuDemo client:visible />
+
+## How it works
+
+- `DropdownMenuContent` gates the portal behind `AnimatePresence` and renders the popup as an `m.div` scaling `0.95 → 1` with a fade (default `transition={{ duration: 0.2 }}`). The panel is the standard brutal popover surface: 3px frame border, `rounded-xl`, `shadow-brutal-md`, positioned at `z-52` with `sideOffset` (default 4) and `align` (default `'start'`).
+- Hover highlighting is not per-item CSS: the content wraps children in `MotionHighlight` (`src/ui/modules/core/animate/effects/MotionHighlight.tsx`), a single accent pill that glides between items. The spring (default `stiffness: 350, damping: 35`) and the effect itself are configured on the root via `transition` and `animateOnHover`. The same effect powers [Tabs](/design-system/components/tabs/) and the sidebar.
+- `DropdownMenuItem` renders as an `m.div` with `whileTap` scale 0.97 and accepts `variant: 'default' | 'destructive'` (destructive tints the highlight and text red) plus `inset` for left padding alignment.
+- `DropdownMenuTrigger asChild` composes with [Button](/design-system/components/button/) via Base UI's `render`.
+
+## Usage
+
+```tsx
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/modules/core/animate/base/DropdownMenu';
+
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant='outline'>Actions</Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent align='end'>
+    <DropdownMenuItem onClick={edit}>Edit holiday</DropdownMenuItem>
+    <DropdownMenuItem variant='destructive' onClick={remove}>Delete</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+For free-form anchored content (forms, explanations) use [Popover](/design-system/components/popover/) — DropdownMenu is for lists of actions with menu semantics and keyboard navigation.
+
+## Conventions
+
+- `data-slot` hooks: `dropdown-menu`, `dropdown-menu-trigger`, `dropdown-menu-content`, `dropdown-menu-item` (plus `data-variant`/`data-inset` on items).
+- Content height is capped to Base UI's `--available-height` so long menus scroll instead of overflowing the viewport.

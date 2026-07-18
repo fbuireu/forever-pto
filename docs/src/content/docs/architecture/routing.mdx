@@ -1,0 +1,66 @@
+---
+title: Routing
+description: The app/[locale] route tree — marketing and app route groups, API routes, the .well-known catch-all and the error surfaces.
+sidebar:
+  order: 2
+---
+
+All user-facing routes live under `src/app/[locale]/`. The locale segment is driven by `next-intl` with `localePrefix: 'as-needed'` (`src/infrastructure/i18n/routing.ts`): the default locale (English) has no URL prefix, every other locale from `src/infrastructure/i18n/locales.ts` gets one (`/es`, `/ca`, `/it`, `/fr`, `/de`).
+
+## Route tree
+
+```text
+src/app/
+├── [locale]/
+│   ├── layout.tsx              # root layout: fonts, providers, analytics
+│   ├── error.tsx               # locale-scoped error boundary
+│   ├── not-found.tsx           # locale-scoped 404
+│   ├── (marketing)/
+│   │   ├── page.tsx            # homepage
+│   │   ├── layout.tsx
+│   │   ├── error.tsx
+│   │   └── legal/              # cookie-policy, legal-notice,
+│   │                           # privacy-policy, terms-of-service
+│   └── (app)/
+│       ├── planner/            # the tool (sidebar layout)
+│       └── payment/confirmation/
+├── api/                        # route handlers (unlocalised)
+├── .well-known/[...slug]/      # agent-facing discovery documents
+├── global-error.tsx            # root error boundary (own <html> shell)
+├── global-not-found.tsx        # root 404 (experimental.globalNotFound)
+├── robots.ts / sitemap.ts / favicon.ico / fonts.ts
+```
+
+## Route groups
+
+- **`(marketing)`** — the public homepage (`src/app/[locale]/(marketing)/page.tsx`, composed from sections in `src/ui/modules/pages/homepage/sections/`) and the four legal pages, each with a colocated `metadata.ts`. The group has its own `layout.tsx` and `error.tsx`.
+- **`(app)`** — the product itself. `planner/page.tsx` renders the planner; `planner/layout.tsx` wraps it in the sidebar shell (`SidebarProvider`, `AppSidebar`, store initialisation, premium modal, donate widget, footer). `payment/confirmation/page.tsx` reads the `payment_intent` search param and shows the Stripe payment result; requests without that param never reach it — the [middleware](/architecture/middleware/) redirects them home.
+
+Route groups affect layouts only, not URLs: `/planner` and `/payment/confirmation` have no group segment in the path.
+
+## API routes
+
+API routes live outside `[locale]` and are excluded from the middleware matcher (except `/api/markdown`).
+
+| Route | File | Purpose |
+| --- | --- | --- |
+| `POST /api/payment` | `src/app/api/payment/route.ts` | Creates a Stripe PaymentIntent (rate-limited, Effect-based) |
+| `GET/POST /api/check-session` | `src/app/api/check-session/route.ts` | Verifies / mints the premium JWT cookie |
+| `POST /api/contact` | `src/app/api/contact/route.ts` | Contact form → Resend email + Turso record |
+| `POST /api/webhooks/stripe` | `src/app/api/webhooks/stripe/route.ts` | Stripe webhook (payment succeeded/failed fallback) |
+| `GET /api/markdown` | `src/app/api/markdown/route.ts` | Markdown rendition of any page, used by the middleware rewrite |
+| `GET /api/health` | `src/app/api/health/route.ts` | Health check |
+
+## The `.well-known` catch-all
+
+`src/app/.well-known/[...slug]/route.ts` maps a fixed set of slugs to handlers in `src/infrastructure/well-known/`: `api-catalog`, `mcp/server-card.json` and `agent-skills/index.json`. Each handler receives the base URL from the Cloudflare environment (`getCloudflareContext`) and anything else returns a 404. Together with the markdown rewrite in the middleware, this is the app's agent-facing surface.
+
+## Error and not-found surfaces
+
+There are per-locale boundaries (`src/app/[locale]/error.tsx`, `src/app/[locale]/not-found.tsx`) plus root-level `src/app/global-error.tsx` and `src/app/global-not-found.tsx`. The latter requires `experimental.globalNotFound: true` in `next.config.ts` and handles URLs that never match the `[locale]` segment. All four render the shared brutal designs — see [error pages](/architecture/error-pages/) for the full breakdown.
+
+## Everything else at the app root
+
+- `src/app/robots.ts` and `src/app/sitemap.ts` generate `robots.txt` and the sitemap.
+- `src/app/fonts.ts` declares the four `next/font` families whose CSS variables the root layout applies.
+- `src/app/[locale]/layout.tsx` is the composition root for providers: intl client provider, theme, lazy motion, skeleton bones, cookie consent, WebMCP and analytics.

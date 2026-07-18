@@ -1,0 +1,45 @@
+---
+title: Progress
+description: Compound progress bar with a spring-animated indicator and a clip-path overlay label.
+sidebar:
+  order: 16
+---
+
+import { ProgressCustomDemo, ProgressDemo } from '../../../../components/demos/ProgressDemo';
+
+Source: `src/ui/modules/core/primitives/Progress.tsx`. Base UI progress with a Motion indicator (`m.create(ProgressPrimitive.Indicator)`); needs a `LazyMotionProvider` ancestor.
+
+Exports: `Progress`, `ProgressTrack`, `ProgressOverlayLabel`.
+
+<ProgressDemo client:visible />
+
+## How it works
+
+- `Progress` is the root: it forwards `value` to Base UI (which handles the aria progressbar semantics) and also publishes it through a strict context (`getStrictContext` from `src/ui/utils/context.tsx`), so track and label are separate children that both read the same value.
+- `ProgressTrack` renders the brutal track (h-5, 3px frame border, `shadow-brutal-xs`) and animates the indicator's `width` to `{value}%` with a spring (default `stiffness: 100, damping: 30`; override via `transition`). `indicatorClassName` styles the fill independently of the track.
+- `ProgressOverlayLabel` renders the label twice, stacked: a base copy in `text-foreground` and an `aria-hidden` overlay copy whose `clip-path` inset animates with the value. The visible result is text that changes color exactly where the fill has reached it. It positions with `absolute inset-0`, so wrap track + label in a `relative` container sized like the track.
+- Both sub-components throw if rendered outside `Progress` — the context is strict on purpose.
+
+## Customization
+
+The planner panel (`src/ui/modules/pages/planner/PlannerPanel.tsx`) reshapes it into pill-shaped used/remaining meters:
+
+<ProgressCustomDemo client:visible />
+
+## Usage
+
+```tsx
+import { Progress, ProgressOverlayLabel, ProgressTrack } from '@ui/modules/core/primitives/Progress';
+
+<Progress value={usedPct}>
+  <div className='relative h-5'>
+    <ProgressTrack indicatorClassName='bg-[var(--color-brand-teal)]' />
+    <ProgressOverlayLabel>{usedPct}% used</ProgressOverlayLabel>
+  </div>
+</Progress>
+```
+
+## Conventions
+
+- `data-slot` hooks: `progress`, `progress-track`, `progress-indicator`.
+- The label typography is fixed to mono, 11px, bold, uppercase (via CSS, per the no-uppercase-strings rule); pass `className`/`overlayClassName` to recolor rather than restyle.

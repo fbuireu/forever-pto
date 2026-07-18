@@ -1,0 +1,28 @@
+---
+title: Emails
+description: Resend + react-email — which emails exist, when they fire and how the contact pipeline works.
+sidebar:
+  order: 12
+---
+
+Email is deliberately minimal. There is exactly **one** email in the system today: the contact-form notification. No welcome mails, no receipts (Stripe handles its own), no marketing.
+
+## The stack
+
+- **Resend** as the provider, wrapped in an Effect service (`ResendService`, `src/infrastructure/clients/email/resend/service.ts`) that is part of `ApplicationLayer` in `src/infrastructure/layers.ts` — the same dependency-injection pattern as Turso and Stripe.
+- **react-email** for templates: React components rendered to HTML with `@react-email/render` on the server.
+
+## The contact pipeline
+
+1. The contact form (under `src/ui/modules/shared/contact/`) posts to `POST /api/contact` (`src/app/api/contact/route.ts`), which pulls `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_CONTACT_EMAIL` from the Cloudflare context and invokes the use-case.
+2. `sendContactEmail` (`src/application/use-cases/contact.ts`):
+   - Validates the body against `contactSchema` (`src/application/dto/contact/schema.ts`) — a zod failure returns 400 with the message.
+   - Renders `ContactFormEmail` (`src/application/email/templates/Contact.tsx`) to HTML.
+   - Sends via Resend **from and to** the configured contact address, with the site visitor's address as `replyTo` — replying in the mail client goes straight to the user — and a `category=web_contact_form` tag for filtering in the Resend dashboard.
+3. **Deferred persistence** — the submission is also stored in the Turso `contacts` table (`saveContact`, `src/infrastructure/services/contact/repository.ts`), including Resend's `messageId`. Like the payment save, this runs after the response via `next/server`'s `after()`, and a DB failure only logs — the user's message was already delivered.
+
+Render or send failures map to typed errors (`EmailError` → 500); everything is logged to Better Stack with the email domain only, never the full address — see [observability](/how-it-works/observability/).
+
+## Adding a new email
+
+The seams are already in place: add a template under `src/application/email/templates/`, a use-case that renders and sends through `ResendService`, and provide `ApplicationLayer` at the route. Keep the pattern of deferring any DB write with `after()` and tagging the send with a `category`.

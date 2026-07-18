@@ -1,0 +1,47 @@
+---
+title: Text animations
+description: SlidingNumber — the odometer-style digit roller — and RotatingText, the interval word rotator, plus the newer RotatingTextContainer primitive.
+sidebar:
+  order: 3
+---
+
+import { RotatingTextDemo, SlidingNumberDemo } from '../../../../components/demos/TextDemo';
+
+Source: `src/ui/modules/core/animate/text/`. Both components are client-only Motion consumers and require a `LazyMotionProvider` ancestor.
+
+## SlidingNumber
+
+`SlidingNumber` (`src/ui/modules/core/animate/text/SlidingNumber.tsx`) renders a number as a stack of odometer rollers: each digit is a `1ch`-wide window over a column of 0–9 `m.span`s, and a per-digit spring (`stiffness: 200, damping: 20, mass: 0.4` by default) rolls the column the shortest way to the target digit. Digits are measured with `react-use-measure`, so the roller adapts to the surrounding font.
+
+<SlidingNumberDemo client:visible />
+
+Props beyond `number`: `padStart` zero-pads single-digit integers, `decimalPlaces`/`decimalSeparator` control fractions, `transition` overrides the spring, and `inView` (+ `inViewMargin`, `inViewOnce`) holds the value at `0` until the element scrolls into view — useful for stats that should count up on first sight. Negative numbers render a leading minus sign.
+
+This is the number display inside [Counter](/design-system/animation/components/), which the sidebar uses for the PTO-days stepper (`src/ui/modules/sidebar/components/PtoDays.tsx`).
+
+## RotatingText
+
+`RotatingText` (`src/ui/modules/core/animate/text/Rotating.tsx`) cycles through an array of strings on a fixed interval (`duration`, default 2000 ms), fading/sliding each word in and out through `AnimatePresence` in `wait` mode. `y` (default `-50`) sets the vertical travel; `containerClassName` styles the clipping wrapper while the usual motion props spread onto the moving element. Passing a single string renders it statically.
+
+<RotatingTextDemo client:visible />
+
+### RotatingTextContainer
+
+A newer, context-based variant lives at `src/ui/modules/core/animate/primitives/texts/Rotating.tsx`. `RotatingTextContainer` adds what the flat component lacks: a `delay` before the first rotation and in-view awareness (`inView`, `inViewMargin`, `inViewOnce` via `useIsInView`), exposing the current word through a strict context instead of rendering it directly. Both APIs currently coexist; prefer the flat `RotatingText` unless you need the in-view gating.
+
+## Usage
+
+```tsx
+import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
+import { RotatingText } from '@ui/modules/core/animate/text/Rotating';
+
+<SlidingNumber number={efficiency} decimalPlaces={1} inView />
+
+<RotatingText text={['vacations', 'holidays', 'long weekends']} duration={2000} />
+```
+
+## Conventions
+
+- `SlidingNumber` renders `tabular-nums` rollers — keep the surrounding type style on the component itself (`className`) so the measurement matches the render.
+- Both components expose `data-slot` attributes (`sliding-number`, `sliding-number-roller`, `sliding-number-display`) for CSS containment hooks.
+- Related: [animated components](/design-system/animation/components/), [effects](/design-system/animation/effects/).

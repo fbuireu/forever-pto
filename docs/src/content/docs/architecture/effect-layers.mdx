@@ -1,0 +1,75 @@
+---
+title: Effect layers
+description: How server-side code uses Effect — Context.Tag services, Live Layers, the ApplicationLayer and deferred after() database writes.
+sidebar:
+  order: 4
+---
+
+Every server-side flow that touches an external system (database, Stripe, email, logging) is written with [Effect](https://effect.website). The payoff is twofold: **typed errors** that route handlers can exhaustively map to HTTP statuses, and **dependency injection** that lets tests swap real SDKs for mock layers without module mocking.
+
+## The service pattern
+
+Each external SDK is wrapped once, in `src/infrastructure/clients/`, following the pattern documented in `src/infrastructure/clients/CONTEXT.md`: a `Context.Tag` declares the interface, a Live `Layer` provides the real implementation.
+
+```ts
+export class FooService extends Context.Tag('FooService')<
+  FooService,
+  { method(): Effect.Effect<Result, FooError> }
+>() {}
+
+export const FooServiceLive = Layer.sync(FooService, () => {
+  const client = new FooSDK(config);
+  return { method: () => Effect.tryPromise({ try: () => client.method(), catch: wrapError }) };
+});
+```
+
+The concrete services:
+
+| Tag | File | Wraps |
+| --- | --- | --- |
+| `TursoService` | `src/infrastructure/clients/db/turso/service.ts` | `@tursodatabase/serverless` — `query` / `execute` / `batch` |
+| `StripeServerService` | `src/infrastructure/clients/payments/stripe/serverService.ts` | Server-side Stripe SDK |
+| `ResendService` | `src/infrastructure/clients/email/resend/service.ts` | Resend transactional email |
+| `LoggerService` | `src/infrastructure/clients/logging/better-stack/service.ts` | BetterStack/Logtail logging |
+
+For code that runs outside Effect (pure utilities, client components), `src/infrastructure/clients/logging/better-stack/client.ts` exposes a `getBetterStackInstance()` singleton — never use it inside Effect code, where `LoggerService` is the injected equivalent.
+
+## ApplicationLayer
+
+`src/infrastructure/layers.ts` merges all Live layers into one composition root:
+
+```ts
+export const ApplicationLayer = Layer.mergeAll(
+  TursoServiceLive,
+  StripeServerServiceLive,
+  ResendServiceLive,
+  LoggerServiceLive,
+);
+```
+
+Route handlers and server actions provide it exactly once, at the edge of the program: `Effect.runPromise(program.pipe(Effect.provide(ApplicationLayer)))`.
+
+## Where Effect runs
+
+- **Use-cases** (`src/application/use-cases/`): `Effect.gen` pipelines that declare their dependencies in the type signature. `createPayment` in `src/application/use-cases/payment.ts` is the canonical example — it validates with zod (`zodParse`), optionally applies a promo code, creates the Stripe PaymentIntent and returns typed failures (`ValidationError | PaymentError | PromoCodeError`).
+- **Route handlers**: `src/app/api/payment/route.ts`, `src/app/api/check-session/route.ts`, `src/app/api/contact/route.ts` and `src/app/api/webhooks/stripe/route.ts` map typed errors to responses with `Effect.catchTags` (e.g. `RateLimitError` → 429, `ValidationError` → 400, `PaymentError` → 500), with a final `Effect.catchAll` safety net.
+- **Server actions**: `src/infrastructure/actions/payment.ts` and `src/infrastructure/actions/contact.ts` are thin `'use server'` wrappers around the same use-cases, returning discriminated-union results instead of HTTP responses.
+- **Domain handlers**: the Stripe webhook handlers in `src/domain/payment/handlers/` consume `TursoService`/`LoggerService` through context — the domain layer's documented Effect exception.
+
+## Deferred database writes with `after()`
+
+Writes that must not block the response are returned by use-cases as an unexecuted `deferred` Effect and scheduled with `after()` from `next/server`, which runs once the response has been sent:
+
+```ts
+const { clientSecret, discountInfo, deferred } = yield* createPayment(body, context);
+
+yield* Effect.sync(() => after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer)))));
+
+return NextResponse.json({ success: true, clientSecret, discountInfo });
+```
+
+This pattern appears in `src/app/api/payment/route.ts`, `src/app/api/check-session/route.ts`, `src/app/api/contact/route.ts` and both server actions. The deferred Effect swallows its own failures into a warning log — for payments, the Stripe webhook (`src/app/api/webhooks/stripe/route.ts`) recreates the row if the deferred save never landed, so the database converges either way.
+
+## Testing
+
+Because dependencies are tags, unit tests provide mock layers instead of the Live ones — the SDKs are never called in tests (see `src/infrastructure/clients/CONTEXT.md`). This is why the pattern lives in infrastructure rather than being ad-hoc per route.

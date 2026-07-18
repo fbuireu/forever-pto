@@ -1,0 +1,46 @@
+---
+title: Hit-area stability
+description: Why translate-on-hover elements flicker, and the ::after hit-area extension utility that fixes it.
+sidebar:
+  order: 5
+---
+
+import { HitAreaDemo } from '../../../../components/demos/HitAreaDemo';
+
+Every element with the brutal hover lift moves *away from the pointer*. Without compensation, that movement breaks hover itself.
+
+## The problem
+
+Hover translates the element `-2px, -2px` (up-left). If your pointer sits within 2px of the bottom or right edge, the element slides out from under it into the band it just vacated — the region between the element's new position and its shadow. The shadow is paint, not a hit target, so the pointer is now over nothing: hover ends, the element snaps back under the pointer, hover starts again. The result is a rapid hover/unhover loop — visible flicker and, at the edge, an unclickable button.
+
+Compare the two below by parking the pointer exactly on the bottom-right edge:
+
+<HitAreaDemo client:visible />
+
+## The fix
+
+`src/ui/styles/utilities/index.css` defines a Tailwind v4 `@utility` named `hit-area-stable`. It attaches an invisible `::after` overlay (`inset: 0`, `z-index: -1` so it never covers content) that expands asymmetrically with the movement:
+
+- On `:hover`, the overlay grows down-right (`inset: 0 -8px -8px 0`) — covering the band the element vacates when it lifts up-left.
+- On `:active`, it grows up-left (`inset: -8px 0 0 -8px`) — covering the opposite band vacated by the press translate.
+
+The pseudo-element belongs to the host, so the pointer resting on the overlay still counts as hovering the element. The loop never starts.
+
+A second utility, `hit-area-stable-tilt`, expands uniformly (`inset: -16px` on hover) for cards that *rotate* on hover instead of translating — used by the homepage testimonial and pricing cards (`src/ui/modules/pages/homepage/sections/Testimonials.tsx`, `Pricing.tsx`).
+
+## The padding-box gotcha
+
+The `::after` insets do not resolve against the element's visual (border) edge. An absolutely positioned pseudo-element is positioned against its containing block's **padding box** — which sits *inside* the border. On a Button with a 3px border, `inset: -8px` therefore extends only `8 − 3 = 5px` past the visual edge.
+
+That is why the magic number is 8 and not 2: the negative inset must exceed **border-width + translate distance** (3px + 2px = 5px minimum here, with headroom). If you "optimize" it down to `-4px`, the effective coverage past the border is 1px — less than the 2px translate — and the flicker returns. Keep this in mind when applying the utility to elements with heavier borders (see the [border scale](/design-system/foundations/philosophy/)).
+
+## Where it applies
+
+The utility is baked into the base classes of every lifting element, so consumers get it for free:
+
+- `Button` and `Badge` (`src/ui/modules/core/primitives/`)
+- `Slider` thumb (`src/ui/modules/core/primitives/Slider.tsx`)
+- The Accordion chevron square, Collapsible trigger, Dialog close button, Tooltip info trigger, and sidebar menu buttons (`src/ui/modules/core/animate/base/`)
+- Page-level uses in the planner calendar (`src/ui/modules/pages/planner/calendar/utils/helpers.ts`), `Summary.tsx`, and homepage sections
+
+**Rule of thumb:** any new element that combines `hover:-translate-*` with a brutal shadow must include `hit-area-stable` (or the `-tilt` variant if it rotates). The [button choreography](/design-system/foundations/shadows/) assumes it.

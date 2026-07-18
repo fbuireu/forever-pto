@@ -1,0 +1,89 @@
+---
+title: Shadows
+description: The brutal shadow scale — hard offset shadows, the btn/btn-hover/btn-active trio, and the hover/active choreography.
+sidebar:
+  order: 2
+---
+
+import { ShadowScale } from '../../../../components/ShadowScale';
+
+Brutal shadows are solid, blur-free copies of the frame offset down-right: `Npx Npx 0 0 var(--frame)`. The offset **is** the elevation scale. All tokens live in `src/ui/styles/global/index.css` and reference [`--frame`](/design-system/foundations/colors/), so they re-theme automatically in [dark mode](/design-system/foundations/dark-mode/). The boxes below carry the live tokens.
+
+## The elevation scale
+
+Named sizes for static elements — cards, panels, popovers:
+
+<ShadowScale tokens={[
+  '--shadow-brutal-xs',
+  '--shadow-brutal-3',
+  '--shadow-brutal-sm',
+  '--shadow-brutal-md',
+  '--shadow-brutal-lg',
+  '--shadow-brutal-9',
+  '--shadow-brutal-xl',
+  '--shadow-brutal-11',
+]} />
+
+`xs`/`sm`/`md`/`lg`/`xl` are the T-shirt sizes (2/4/6/8/10px); `-3`, `-9` and `-11` are odd-pixel fills used where an element sits between two sizes (e.g. tooltip arrows, large hero cards).
+
+## The button trio
+
+Interactive elements use a dedicated three-state set:
+
+<ShadowScale tokens={[
+  '--shadow-brutal-btn',
+  '--shadow-brutal-btn-hover',
+  '--shadow-brutal-btn-active',
+]} />
+
+The choreography, as implemented in `src/ui/modules/core/primitives/Button.tsx`:
+
+- **Rest** — `--shadow-brutal-btn` (5px offset).
+- **Hover** — the element translates `-2px, -2px` (up-left) while the shadow grows to `--shadow-brutal-btn-hover` (7px). The two changes cancel out at the shadow's outer edge, so the silhouette stays anchored and the element appears to *rise* off the page.
+- **Active** — the element translates `+2px, +2px` while the shadow collapses to `--shadow-brutal-btn-active` (1px): the element drops onto its own shadow, reading as a physical press.
+
+The movement is eased by the shared 80ms linear `transition` block on `[data-slot]` elements in `src/ui/styles/base/index.css`. Because the element slides out from under the pointer on hover, every element using this trio must also apply the `hit-area-stable` utility — see [hit-area stability](/design-system/foundations/hit-area-stable/).
+
+## Colored trios
+
+The same three-state pattern exists with the accent and orange brand colors standing in for the frame, plus a one-off accent size for tooltip arrows:
+
+<ShadowScale tokens={[
+  '--shadow-brutal-btn-accent',
+  '--shadow-brutal-btn-accent-hover',
+  '--shadow-brutal-btn-accent-active',
+  '--shadow-brutal-btn-orange',
+  '--shadow-brutal-btn-orange-hover',
+  '--shadow-brutal-btn-orange-active',
+  '--shadow-brutal-3-accent',
+]} />
+
+Two singles complete the colored set — a destructive small shadow and a layered hero shadow that stacks orange under a frame outline:
+
+<ShadowScale tokens={[
+  '--shadow-brutal-sm-destructive',
+  '--shadow-brutal-xl-orange',
+]} />
+
+## Inverted set
+
+For elements sitting on ink surfaces (e.g. `bg-primary` blocks), the shadow color is `--background` instead of `--frame`:
+
+<ShadowScale tokens={[
+  '--shadow-brutal-xs-inverted',
+  '--shadow-brutal-btn-inverted',
+  '--shadow-brutal-btn-inverted-hover',
+  '--shadow-brutal-btn-inverted-active',
+]} />
+
+These look invisible above — the demo canvas is `bg-background`, the exact color the inverted shadows are made of. That is the point: they only read on inverted surfaces.
+
+## Usage
+
+Shadow tokens are not mapped into Tailwind's theme; components consume them as arbitrary values:
+
+```tsx
+<div className='shadow-[var(--shadow-brutal-md)]' />
+```
+
+Pick from the static scale for non-interactive elements, and use a full trio (rest/hover/active) plus the translate choreography for anything clickable.

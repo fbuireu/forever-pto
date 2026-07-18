@@ -1,0 +1,39 @@
+---
+title: Cookies
+description: Every first-party cookie the app sets, with attributes and source files.
+sidebar:
+  order: 1
+---
+
+import { SIDEBAR_COOKIE_NAME } from '@ui/modules/core/animate/base/Sidebar';
+
+The app sets four first-party cookies. The sidebar cookie name below is imported from the app source, so it cannot drift; the other three names are set in infrastructure modules (not importable into this site) and are quoted as written in code, with the defining file cited.
+
+| Cookie | Purpose | httpOnly | Secure | SameSite | Max age |
+| --- | --- | --- | --- | --- | --- |
+| `user-country` | Detected ISO country code, used to pre-select the holiday calendar | no | yes | `strict` | 7 days (`ONE_WEEK`) |
+| `NEXT_LOCALE` | The user's resolved locale for i18n routing | yes | yes | `lax` | session |
+| `premium-token` | JWT proving an active premium session | yes | production only | `strict` | 30 days |
+| <code>{SIDEBAR_COOKIE_NAME}</code> | Persists whether the sidebar is expanded or collapsed | no | — | `lax` | 7 days |
+
+All four are scoped to `path: '/'`.
+
+## `user-country`
+
+Exported as `USER_COUNTRY_COOKIE` in `src/infrastructure/proxy/cookie.ts`, which also defines `setLocationCookie()` and the attributes above. It is written by the middleware chain: `src/middleware.ts` → `src/infrastructure/proxy/location.ts`, which detects the country from the request and sets the cookie on the response. It is deliberately **not** `httpOnly` — `src/ui/modules/stores/StoresInitializer.tsx` reads it on the client to seed the location store. See [country detection](/how-it-works/country-detection/).
+
+## `NEXT_LOCALE`
+
+The locale cookie used by next-intl, named by the `LOCALE_COOKIE` export in `src/infrastructure/i18n/config.ts`. The next-intl middleware sets it during locale negotiation, and `src/middleware.ts` immediately re-sets it via `setLocaleCookie()` (`src/infrastructure/i18n/cookie.ts`) to harden the attributes: `httpOnly`, `secure`, `sameSite: 'lax'`. No `maxAge` is set, so it is a session cookie.
+
+## `premium-token`
+
+Named by the `PREMIUM_COOKIE` export in `src/infrastructure/services/premium/cookie.ts`. `setPremiumCookie()` stores the signed JWT after a successful premium activation, with `secure` enabled only when `NODE_ENV` is `production` (so it works over plain HTTP in local dev). The session duration constant in the same file is 30 days. It is read and refreshed (or cleared via `clearPremiumCookie()`) by `src/app/api/check-session/route.ts`.
+
+## <code>{SIDEBAR_COOKIE_NAME}</code>
+
+The only client-set cookie of the four. `src/ui/modules/core/animate/base/Sidebar.tsx` exports `SIDEBAR_COOKIE_NAME` (interpolated on this page) and writes `true`/`false` through the `setCookie()` helper in `src/ui/utils/cookie.ts`, which uses the CookieStore API with a `sameSite: 'lax'` default. Being set from the browser it cannot be `httpOnly`; max age is 7 days (`SIDEBAR_COOKIE_MAX_AGE` in the same file).
+
+## Third-party cookies
+
+Cookies set by Stripe, Google Analytics and Better Stack are not controlled by app code. They are catalogued — names, providers and expiries — in `src/ui/modules/shared/cookie-consent/config/config.ts`, which drives the cookie-consent dialog.

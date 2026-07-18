@@ -861,7 +861,8 @@
     "legalNavigation": "Rechtliche Hinweise und Richtlinien",
     "copyright": "© {year} Forever PTO · Von einer Hängematte aus gemacht.",
     "version": "v{version} · Status: im Urlaub ●",
-    "planner": "Planer"
+    "planner": "Planer",
+    "docs": "Dokumentation"
   },
   "accessibility": {
     "selectLanguage": "Sprache auswählen, aktuell: {current}",

@@ -1,0 +1,44 @@
+---
+title: Docs de Forever PTO
+description: Documentación y wiki interna de Forever PTO.
+template: splash
+hero:
+  tagline: La wiki interna de Forever PTO — arquitectura, design system, infraestructura y convenciones, documentadas contra el código real.
+  actions:
+    - text: Empezar
+      link: /es/start/introduction/
+      icon: right-arrow
+    - text: Explorar el design system
+      link: /es/design-system/components/overview/
+      icon: puzzle
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid stagger>
+  <Card title='Empieza aquí' icon='rocket'>
+    Qué es Forever PTO, cómo ejecutarlo en local y cómo está organizado el repositorio.
+    [Introducción →](/es/start/introduction/)
+  </Card>
+  <Card title='Arquitectura' icon='open-book'>
+    La estructura en capas bajo `src/` — app, application, domain, infrastructure y ui — y cómo dependen entre
+    sí. [Visión general →](/es/architecture/overview/)
+  </Card>
+  <Card title='Cómo funciona' icon='information'>
+    Inmersiones por feature: el motor de sugerencias, la detección de país, el flujo premium y más.
+    [Detección de país →](/es/how-it-works/country-detection/)
+  </Card>
+  <Card title='Design system' icon='puzzle'>
+    La librería de componentes neobrutalista, renderizada en vivo en estas páginas con los componentes reales de
+    la app. [Componentes →](/es/design-system/components/overview/)
+  </Card>
+  <Card title='Infraestructura y CI/CD' icon='setting'>
+    Cloudflare Workers, OpenNext, previews por PR y el pipeline de releases.
+    [Entornos →](/es/infra/environments/)
+  </Card>
+  <Card title='Contribuir' icon='pencil'>
+    Convenciones de commits, estilo de código, tooling y reglas de testing para trabajar en este repo.
+    [Convenciones →](/es/contributing/conventions/)
+  </Card>
+</CardGrid>
