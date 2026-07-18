@@ -1,6 +1,6 @@
 'use client';
 
-import { Tooltip as TooltipPrimitive } from '@base-ui/react/tooltip';
+import { Popover as PopoverPrimitive } from '@base-ui/react/popover';
 import { useControlledState } from '@ui/hooks/useControlledState';
 import { getStrictContext } from '@ui/utils/context';
 import {
@@ -12,11 +12,10 @@ import {
   useMotionValue,
   useSpring,
 } from 'motion/react';
-import { type ComponentProps, isValidElement, useMemo } from 'react';
+import { type ComponentProps, createContext, isValidElement, type ReactNode, use, useMemo } from 'react';
 
 type TooltipContextType = {
   isOpen: boolean;
-  setIsOpen: TooltipProps['onOpenChange'];
   x: MotionValue<number>;
   y: MotionValue<number>;
   followCursor?: boolean | 'x' | 'y';
@@ -24,12 +23,14 @@ type TooltipContextType = {
 };
 const [LocalTooltipProvider, useTooltip] = getStrictContext<TooltipContextType>('TooltipContext');
 
-type TooltipProviderProps = ComponentProps<typeof TooltipPrimitive.Provider>;
-function TooltipProvider(props: TooltipProviderProps) {
-  return <TooltipPrimitive.Provider data-slot='tooltip-provider' {...props} />;
+const TooltipDelayContext = createContext(0);
+
+type TooltipProviderProps = { delay?: number; children?: ReactNode };
+function TooltipProvider({ delay = 0, children }: TooltipProviderProps) {
+  return <TooltipDelayContext.Provider value={delay}>{children}</TooltipDelayContext.Provider>;
 }
 
-type TooltipProps = ComponentProps<typeof TooltipPrimitive.Root> & {
+type TooltipProps = ComponentProps<typeof PopoverPrimitive.Root> & {
   followCursor?: boolean | 'x' | 'y';
   followCursorSpringOptions?: SpringOptions;
 };
@@ -40,24 +41,25 @@ function Tooltip({
 }: TooltipProps) {
   const [isOpen, setIsOpen] = useControlledState({
     value: props?.open,
-    defaultValue: props?.defaultOpen,
+    defaultValue: props?.defaultOpen ?? false,
     onChange: props?.onOpenChange,
   });
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const tooltipContextValue = useMemo(
-    () => ({ isOpen, setIsOpen, x, y, followCursor, followCursorSpringOptions }),
-    [isOpen, setIsOpen, x, y, followCursor, followCursorSpringOptions]
+    () => ({ isOpen, x, y, followCursor, followCursorSpringOptions }),
+    [isOpen, x, y, followCursor, followCursorSpringOptions]
   );
   return (
     <LocalTooltipProvider value={tooltipContextValue}>
-      <TooltipPrimitive.Root data-slot='tooltip' {...props} onOpenChange={setIsOpen} />
+      <PopoverPrimitive.Root data-slot='tooltip' {...props} open={isOpen} onOpenChange={setIsOpen} />
     </LocalTooltipProvider>
   );
 }
 
-type TooltipTriggerProps = ComponentProps<typeof TooltipPrimitive.Trigger> & { asChild?: boolean };
-function TooltipTrigger({ onMouseMove, asChild, children, ...props }: TooltipTriggerProps) {
+type TooltipTriggerProps = ComponentProps<typeof PopoverPrimitive.Trigger> & { asChild?: boolean };
+function TooltipTrigger({ onMouseMove, asChild, children, openOnHover = true, delay, ...props }: TooltipTriggerProps) {
+  const providerDelay = use(TooltipDelayContext);
   const { x, y, followCursor } = useTooltip();
   const handleMouseMove = (event: Parameters<NonNullable<TooltipTriggerProps['onMouseMove']>>[0]) => {
     onMouseMove?.(event);
@@ -67,8 +69,10 @@ function TooltipTrigger({ onMouseMove, asChild, children, ...props }: TooltipTri
   };
   if (asChild && isValidElement(children)) {
     return (
-      <TooltipPrimitive.Trigger
+      <PopoverPrimitive.Trigger
         data-slot='tooltip-trigger'
+        openOnHover={openOnHover}
+        delay={delay ?? providerDelay}
         onMouseMove={handleMouseMove}
         render={children}
         {...props}
@@ -76,28 +80,34 @@ function TooltipTrigger({ onMouseMove, asChild, children, ...props }: TooltipTri
     );
   }
   return (
-    <TooltipPrimitive.Trigger data-slot='tooltip-trigger' onMouseMove={handleMouseMove} {...props}>
+    <PopoverPrimitive.Trigger
+      data-slot='tooltip-trigger'
+      openOnHover={openOnHover}
+      delay={delay ?? providerDelay}
+      onMouseMove={handleMouseMove}
+      {...props}
+    >
       {children}
-    </TooltipPrimitive.Trigger>
+    </PopoverPrimitive.Trigger>
   );
 }
 
-type TooltipPortalProps = Omit<ComponentProps<typeof TooltipPrimitive.Portal>, 'keepMounted'>;
+type TooltipPortalProps = Omit<ComponentProps<typeof PopoverPrimitive.Portal>, 'keepMounted'>;
 function TooltipPortal(props: TooltipPortalProps) {
   const { isOpen } = useTooltip();
   return (
     <AnimatePresence>
-      {isOpen && <TooltipPrimitive.Portal keepMounted data-slot='tooltip-portal' {...props} />}
+      {isOpen && <PopoverPrimitive.Portal keepMounted data-slot='tooltip-portal' {...props} />}
     </AnimatePresence>
   );
 }
 
-type TooltipPositionerProps = ComponentProps<typeof TooltipPrimitive.Positioner>;
+type TooltipPositionerProps = ComponentProps<typeof PopoverPrimitive.Positioner>;
 function TooltipPositioner(props: TooltipPositionerProps) {
-  return <TooltipPrimitive.Positioner data-slot='tooltip-positioner' {...props} />;
+  return <PopoverPrimitive.Positioner data-slot='tooltip-positioner' {...props} />;
 }
 
-type TooltipPopupProps = Omit<ComponentProps<typeof TooltipPrimitive.Popup>, 'render'> & HTMLMotionProps<'div'>;
+type TooltipPopupProps = Omit<ComponentProps<typeof PopoverPrimitive.Popup>, 'render'> & HTMLMotionProps<'div'>;
 function TooltipPopup({
   transition = { type: 'spring', stiffness: 300, damping: 25 },
   style,
@@ -107,7 +117,7 @@ function TooltipPopup({
   const translateX = useSpring(x, followCursorSpringOptions);
   const translateY = useSpring(y, followCursorSpringOptions);
   return (
-    <TooltipPrimitive.Popup
+    <PopoverPrimitive.Popup
       render={
         <m.div
           key='tooltip-popup'
@@ -128,9 +138,9 @@ function TooltipPopup({
   );
 }
 
-type TooltipArrowProps = ComponentProps<typeof TooltipPrimitive.Arrow>;
+type TooltipArrowProps = ComponentProps<typeof PopoverPrimitive.Arrow>;
 function TooltipArrow(props: TooltipArrowProps) {
-  return <TooltipPrimitive.Arrow data-slot='tooltip-arrow' {...props} />;
+  return <PopoverPrimitive.Arrow data-slot='tooltip-arrow' {...props} />;
 }
 
 export {
