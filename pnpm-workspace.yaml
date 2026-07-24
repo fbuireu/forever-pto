@@ -8,6 +8,11 @@ allowBuilds:
   sharp: true
   workerd: true
 minimumReleaseAge: 4320 # 3 days
+# Direct security patches (e.g. dependabot vulnerability bumps) are pinned exactly and
+# reviewed in a PR, so the release-age quarantine only delays shipping the fix.
+minimumReleaseAgeExclude:
+  - next
+  - '@next/*'
 blockExoticSubdeps: true
 patchedDependencies:
   boneyard-js: patches/boneyard-js.patch
