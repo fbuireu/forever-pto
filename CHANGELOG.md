@@ -1,3 +1,10 @@
+## [1.6.3](https://github.com/fbuireu/forever-pto/compare/v1.6.2...v1.6.3) (2026-07-24)
+
+
+### Bug Fixes
+
+* **ci:** unblock prod deploy after dependabot next bump ([#336](https://github.com/fbuireu/forever-pto/issues/336)) ([f9d8a8f](https://github.com/fbuireu/forever-pto/commit/f9d8a8fc35c8337c28c9b4cb83c1288b75801ad3)), closes [#335](https://github.com/fbuireu/forever-pto/issues/335)
+
 ## [1.6.2](https://github.com/fbuireu/forever-pto/compare/v1.6.1...v1.6.2) (2026-07-12)
 
 
