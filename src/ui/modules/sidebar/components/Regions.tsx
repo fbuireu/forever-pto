@@ -10,7 +10,6 @@ import { useEffect } from 'react';
 export const Regions = () => {
   const t = useTranslations('sidebar.region');
   const regions = useLocationStore((state) => state.regions);
-  const regionsLoading = useLocationStore((state) => state.regionsLoading);
   const fetchRegions = useLocationStore((state) => state.fetchRegions);
 
   const country = useFiltersStore((state) => state.country);
@@ -34,7 +33,7 @@ export const Regions = () => {
         value={region}
         onChange={setRegion}
         disabled={!country}
-        placeholder={regionsLoading ? t('loading') : t('placeholder')}
+        placeholder={t('placeholder')}
         searchPlaceholder={t('search')}
       />
     </div>

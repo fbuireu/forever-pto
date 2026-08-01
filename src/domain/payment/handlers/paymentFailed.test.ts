@@ -7,6 +7,7 @@ import type { PaymentFailedEvent } from '../events/types';
 import { handlePaymentFailed } from './paymentFailed';
 
 vi.mock('@infrastructure/services/payments/repository', () => ({
+  getPaymentById: vi.fn(() => Effect.succeed({ id: 'pi_test', status: 'processing' })),
   updatePaymentStatus: vi.fn(() => Effect.succeed(undefined)),
 }));
 
@@ -48,6 +49,31 @@ describe('handlePaymentFailed', () => {
     );
     const err = await runFail(handlePaymentFailed(EVENT));
     expect(err).toBeInstanceOf(DatabaseError);
+  });
+
+  it('does not downgrade a payment that already succeeded', async () => {
+    const { getPaymentById, updatePaymentStatus } = await import('@infrastructure/services/payments/repository');
+    vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed({ id: 'pi_test', status: 'succeeded' } as never));
+    await run(handlePaymentFailed(EVENT));
+    expect(updatePaymentStatus).not.toHaveBeenCalled();
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      'Ignoring failed-payment event for an already-succeeded payment',
+      expect.objectContaining({ paymentId: 'pi_test' })
+    );
+  });
+
+  it('still writes the failure when no row exists yet', async () => {
+    const { getPaymentById, updatePaymentStatus } = await import('@infrastructure/services/payments/repository');
+    vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed(undefined as never));
+    await run(handlePaymentFailed(EVENT));
+    expect(updatePaymentStatus).toHaveBeenCalledWith('pi_test', 'requires_payment_method');
+  });
+
+  it('still writes the failure when the status read fails', async () => {
+    const { getPaymentById, updatePaymentStatus } = await import('@infrastructure/services/payments/repository');
+    vi.mocked(getPaymentById).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: 'db error' })) as never);
+    await run(handlePaymentFailed(EVENT));
+    expect(updatePaymentStatus).toHaveBeenCalledWith('pi_test', 'requires_payment_method');
   });
 
   it('calls logError when updatePaymentStatus fails', async () => {

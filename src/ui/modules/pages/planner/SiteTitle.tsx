@@ -6,7 +6,7 @@ export const SiteTitle = async () => {
   return (
     <div className='flex items-center flex-col justify-center mt-8 gap-5'>
       <h1 className='font-display font-semibold text-[clamp(42px,6vw,72px)] leading-none tracking-[-0.04em] flex items-baseline gap-3'>
-        <span>Planner</span>
+        <span>{t('heading')}</span>
         <SiteTitleYear />
       </h1>
       <p className='font-display font-semibold text-[clamp(28px,4vw,52px)] leading-none tracking-[-0.03em] flex items-center gap-4 flex-wrap justify-center'>

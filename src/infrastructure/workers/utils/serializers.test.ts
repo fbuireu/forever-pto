@@ -1,5 +1,5 @@
-import { HolidayVariant } from '@application/dto/holiday/types';
 import type { HolidayDTO } from '@application/dto/holiday/types';
+import { HolidayVariant } from '@application/dto/holiday/types';
 import type { Bridge, Suggestion } from '@domain/calendar/types';
 import { describe, expect, it } from 'vitest';
 import {
@@ -133,7 +133,13 @@ describe('deserializeHolidays', () => {
 
   it('preserves variant and other fields', () => {
     const result = deserializeHolidays([
-      { id: 'h-1', date: new Date(2025, 0, 1).toISOString(), name: 'New Year', variant: 'national', isInSelectedRange: true },
+      {
+        id: 'h-1',
+        date: new Date(2025, 0, 1).toISOString(),
+        name: 'New Year',
+        variant: 'national',
+        isInSelectedRange: true,
+      },
     ]);
     expect(result[0].variant).toBe('national');
     expect(result[0].name).toBe('New Year');

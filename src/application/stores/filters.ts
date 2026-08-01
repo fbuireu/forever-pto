@@ -1,10 +1,14 @@
 import { FilterStrategy } from '@domain/calendar/types';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import type { BetterStackClient } from '@infrastructure/clients/logging/better-stack/client';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { encryptedStorage } from './crypto';
+import { obfuscatedStorage } from './crypto';
 
-const logger = getBetterStackInstance();
+const log = (write: (logger: BetterStackClient) => void) => {
+  void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
+    write(getBetterStackInstance());
+  });
+};
 
 export interface FiltersState {
   ptoDays: number;
@@ -30,7 +34,7 @@ interface FilterActions {
 type FiltersStore = FiltersState & FilterActions;
 
 const STORAGE_NAME = 'filters-store';
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 2;
 
 const initialState: FiltersState = {
   ptoDays: 22,
@@ -41,6 +45,17 @@ const initialState: FiltersState = {
   carryOverMonths: 1,
   strategy: FilterStrategy.GROUPED,
 };
+
+const partializeFilters = (state: FiltersStore) => ({
+  ptoDays: state.ptoDays,
+  allowPastDays: state.allowPastDays,
+  country: state.country,
+  region: state.region,
+  carryOverMonths: state.carryOverMonths,
+  strategy: state.strategy,
+});
+
+type PersistedFiltersState = ReturnType<typeof partializeFilters>;
 
 export const useFiltersStore = create<FiltersStore>()(
   devtools(
@@ -59,22 +74,21 @@ export const useFiltersStore = create<FiltersStore>()(
       {
         name: STORAGE_NAME,
         version: STORAGE_VERSION,
-        storage: encryptedStorage,
-        partialize: (state) => ({
-          ptoDays: state.ptoDays,
-          allowPastDays: state.allowPastDays,
-          country: state.country,
-          region: state.region,
-          carryOverMonths: state.carryOverMonths,
-          strategy: state.strategy,
-        }),
+        storage: obfuscatedStorage,
+        partialize: partializeFilters,
+        migrate: (persisted) => {
+          const { year: _staleYear, ...rest } = (persisted ?? {}) as Partial<FiltersState>;
+          return rest as PersistedFiltersState;
+        },
         onRehydrateStorage: () => (state, error) => {
           if (error) {
-            logger.logError('Error rehydrating filters store', error, {
-              storeName: STORAGE_NAME,
-              hasState: !!state,
-            });
-            localStorage.removeItem(STORAGE_NAME);
+            log((logger) =>
+              logger.logError('Error rehydrating filters store', error, {
+                storeName: STORAGE_NAME,
+                hasState: !!state,
+              })
+            );
+            globalThis.localStorage?.removeItem(STORAGE_NAME);
           }
         },
       }

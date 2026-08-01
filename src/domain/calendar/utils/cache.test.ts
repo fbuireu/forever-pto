@@ -62,18 +62,15 @@ describe('createHolidaySet', () => {
   });
 
   it('includes weekday holidays', () => {
-    // 2025-01-06 is a Monday
     const set = createHolidaySet([makeHoliday(makeDate(2025, 1, 6))]);
     expect(set.has(getKey(makeDate(2025, 1, 6)))).toBe(true);
   });
 
   it('excludes Saturday holidays', () => {
-    // 2025-01-04 is a Saturday
     expect(createHolidaySet([makeHoliday(makeDate(2025, 1, 4))]).size).toBe(0);
   });
 
   it('excludes Sunday holidays', () => {
-    // 2025-01-05 is a Sunday
     expect(createHolidaySet([makeHoliday(makeDate(2025, 1, 5))]).size).toBe(0);
   });
 
@@ -101,5 +98,20 @@ describe('createHolidaySet', () => {
     clearHolidayCache();
     const after = createHolidaySet([holiday], 'key');
     expect(before).not.toBe(after);
+  });
+
+  it('ignores a new holidays array when no cacheKey is given and the cache was not cleared', () => {
+    const first = createHolidaySet([makeHoliday(makeDate(2025, 1, 6))]);
+    const second = createHolidaySet([makeHoliday(makeDate(2025, 2, 3))]);
+    expect(second).toBe(first);
+    expect(second.has(getKey(makeDate(2025, 2, 3)))).toBe(false);
+  });
+
+  it('picks up a new holidays array on the default key once the cache is cleared', () => {
+    createHolidaySet([makeHoliday(makeDate(2025, 1, 6))]);
+    clearHolidayCache();
+    const second = createHolidaySet([makeHoliday(makeDate(2025, 2, 3))]);
+    expect(second.has(getKey(makeDate(2025, 2, 3)))).toBe(true);
+    expect(second.has(getKey(makeDate(2025, 1, 6)))).toBe(false);
   });
 });

@@ -72,8 +72,8 @@ export const PtoSalaryCalculator = () => {
   const dailyRate = annualSalary ? annualSalary / WORKING_DAYS_PER_YEAR : 0;
   const unusedPTOValue = dailyRate * unusedPTODays;
   const normalHourlyRate = annualSalary ? annualSalary / WORKING_DAYS_PER_YEAR / HOURS_PER_DAY : 0;
-  const actualWorkingDays = WORKING_DAYS_PER_YEAR + unusedPTODays;
-  const effectiveHourlyRate = annualSalary ? annualSalary / actualWorkingDays / HOURS_PER_DAY : 0;
+  const workedDays = WORKING_DAYS_PER_YEAR + unusedPTODays;
+  const effectiveHourlyRate = annualSalary ? annualSalary / workedDays / HOURS_PER_DAY : 0;
   const showResults = annualSalary ? annualSalary > 0 && unusedPTODays >= 0 : false;
 
   return (

@@ -54,7 +54,7 @@ export const Comparison = async () => {
             {(
               [
                 'comparison.withItems.planInJanuary',
-                'comparison.withItems.dayMultiplier',
+                'comparison.withItems.dayEfficiency',
                 'comparison.withItems.visualCalendar',
                 'comparison.withItems.bookFirst',
                 'comparison.withItems.burnAllDays',

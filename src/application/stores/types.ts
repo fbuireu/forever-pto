@@ -12,13 +12,15 @@ export interface GenerateSuggestionsParams {
   locale: Locale;
 }
 
-export interface GenerateAlternativesParams extends GenerateSuggestionsParams {
-  maxAlternatives?: number;
+export interface MainThreadSuggestionsParams extends GenerateSuggestionsParams {
+  autoSuggestCount?: number;
 }
 
 export interface FetchHolidaysParams extends Pick<FiltersState, 'year' | 'country' | 'region' | 'carryOverMonths'> {
   locale: Locale;
 }
+
+export type PlanningWindowParams = Pick<FiltersState, 'year' | 'carryOverMonths'>;
 
 export interface AddHolidayParams {
   holiday: Omit<HolidayDTO, 'id' | 'variant' | 'isInSelectedRange'>;

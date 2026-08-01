@@ -18,7 +18,6 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
   const t = useTranslations('sidebar.country');
   const country = useFiltersStore((state) => state.country);
   const setCountry = useFiltersStore((state) => state.setCountry);
-  const countriesLoading = useLocationStore((state) => state.countriesLoading);
   const setCountries = useLocationStore((state) => state.setCountries);
 
   useEffect(() => {
@@ -44,7 +43,7 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
           options={countries}
           value={country}
           onChange={setCountry}
-          placeholder={countriesLoading ? t('loading') : t('placeholder')}
+          placeholder={t('placeholder')}
           searchPlaceholder={t('search')}
         />
       </div>

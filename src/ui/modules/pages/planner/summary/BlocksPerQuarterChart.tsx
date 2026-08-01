@@ -1,3 +1,5 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
@@ -22,8 +24,7 @@ export const BlocksPerQuarterChart = ({ blocksPerQuarter }: BlockPerQuarterChart
   const bestQuarterIndex = blocksPerQuarter.indexOf(Math.max(...blocksPerQuarter));
   const bestQuarter = bestQuarterIndex + 1;
   const maxBlocks = Math.max(...blocksPerQuarter);
-  const bestQuarterPart =
-    totalBlocks > 0 ? t('bestQuarterPart', { bestQuarter, maxBlocks, plural: maxBlocks !== 1 ? 's' : '' }) : '';
+  const bestQuarterPart = totalBlocks > 0 ? t('bestQuarterPart', { bestQuarter, maxBlocks }) : '';
   const description = t('blocksDescription', { totalBlocks, bestQuarterPart });
 
   return (

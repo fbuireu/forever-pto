@@ -87,7 +87,7 @@ export const WorkdayCounter = () => {
       {selectedRange && (
         <div className='space-y-2 w-full bg-muted rounded-md p-3'>
           <div className='text-xs'>
-            <span className='font-display font-medium'>{t('workingDays')}</span>
+            <span className='font-display font-medium'>{t('workdays')}</span>
             <div className='text-2xl font-display font-bold text-primary'>
               <SlidingNumber number={workdayCount} decimalPlaces={0} />
             </div>

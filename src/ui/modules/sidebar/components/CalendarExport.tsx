@@ -1,8 +1,9 @@
 'use client';
 
+import { generateIcs } from '@application/export/generateIcs';
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { generateIcs } from '@application/export/generateIcs';
+import { resolveSelectedDays } from '@domain/calendar/utils/selection';
 import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { Button } from '@ui/modules/core/primitives/Button';
 import type { HolidayDocumentProps } from '@ui/modules/export/HolidayDocument';
@@ -10,7 +11,7 @@ import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { Effect } from 'effect';
 import { Download, FileText } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { type ReactNode, useState, useTransition } from 'react';
+import { type ReactNode, useMemo, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -53,16 +54,26 @@ export const CalendarExport = () => {
   const [isPdfPending, startPdfTransition] = useTransition();
 
   const { year } = useFiltersStore(useShallow((s) => ({ year: s.year })));
-  const { holidays, suggestion, currentSelection } = useHolidaysStore(
+  const { holidays, suggestion, currentSelection, manuallySelectedDays, removedSuggestedDays } = useHolidaysStore(
     useShallow((s) => ({
       holidays: s.holidays,
       suggestion: s.suggestion,
       currentSelection: s.currentSelection,
+      manuallySelectedDays: s.manuallySelectedDays,
+      removedSuggestedDays: s.removedSuggestedDays,
     }))
   );
 
   const activeSuggestion = currentSelection ?? suggestion;
-  const ptoDays = activeSuggestion?.days ?? [];
+  const ptoDays = useMemo(
+    () =>
+      resolveSelectedDays({
+        days: activeSuggestion?.days ?? [],
+        manuallySelectedDays,
+        removedSuggestedDays,
+      }),
+    [activeSuggestion, manuallySelectedDays, removedSuggestedDays]
+  );
   const hasData = (includeHolidays && (holidays?.length ?? 0) > 0) || (includePto && ptoDays.length > 0);
 
   const handleDownloadIcs = () => {
@@ -71,7 +82,7 @@ export const CalendarExport = () => {
       calendarName: t('calendarName'),
       ptoDayLabel: t('ptoDayLabel'),
       holidays: holidays ?? [],
-      suggestion: activeSuggestion,
+      ptoDays,
       includeHolidays,
       includePto,
     });
@@ -99,8 +110,8 @@ export const CalendarExport = () => {
             locale,
             labels: {
               holidays: t('pdf.holidays'),
-              vacationDays: t('pdf.vacationDays'),
-              dayOff: t('pdf.dayOff'),
+              ptoDays: t('pdf.ptoDays'),
+              ptoDay: t('pdf.ptoDay'),
               generatedOn: t('pdf.generatedOn'),
             },
             filename: `forever-pto-${year}.pdf`,

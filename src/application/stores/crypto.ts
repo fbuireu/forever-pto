@@ -1,14 +1,18 @@
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import type { BetterStackClient } from '@infrastructure/clients/logging/better-stack/client';
 import { createJSONStorage } from 'zustand/middleware';
-import { decrypt, encrypt } from './utils/crypto';
+import { deobfuscate, obfuscate } from './utils/crypto';
 
-const logger = getBetterStackInstance();
+const log = (write: (logger: BetterStackClient) => void) => {
+  void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
+    write(getBetterStackInstance());
+  });
+};
 
 const SECRET_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY;
 const isDev = process.env.NODE_ENV === 'development';
 const isClient = globalThis.window !== undefined;
 
-export const encryptedStorage = createJSONStorage(() => {
+export const obfuscatedStorage = createJSONStorage(() => {
   if (!isClient) {
     return {
       getItem: () => null,
@@ -25,32 +29,32 @@ export const encryptedStorage = createJSONStorage(() => {
     };
   }
 
-  const cryptoKey = SECRET_KEY;
+  const obfuscationKey = SECRET_KEY;
 
   return {
     getItem: (key: string) => {
-      const encryptedValue = localStorage.getItem(key);
-      if (!encryptedValue) return null;
+      const obfuscatedValue = localStorage.getItem(key);
+      if (!obfuscatedValue) return null;
 
       try {
-        return decrypt({ text: encryptedValue, key: cryptoKey });
+        return deobfuscate({ text: obfuscatedValue, key: obfuscationKey });
       } catch (error) {
-        logger.logError('Failed to decrypt storage value', error, { key });
+        log((logger) => logger.logError('Failed to deobfuscate storage value', error, { key }));
         return null;
       }
     },
     setItem: (key: string, value: string) => {
       try {
-        localStorage.setItem(key, encrypt({ text: value, key: cryptoKey }));
+        localStorage.setItem(key, obfuscate({ text: value, key: obfuscationKey }));
       } catch (error) {
-        logger.logError('Failed to set item in encrypted storage', error, { key });
+        log((logger) => logger.logError('Failed to set item in obfuscated storage', error, { key }));
       }
     },
     removeItem: (key: string) => {
       try {
         localStorage.removeItem(key);
       } catch (error) {
-        logger.logError('Failed to remove item from encrypted storage', error, { key });
+        log((logger) => logger.logError('Failed to remove item from obfuscated storage', error, { key }));
       }
     },
   };

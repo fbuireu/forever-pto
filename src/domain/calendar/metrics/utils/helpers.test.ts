@@ -3,17 +3,26 @@ import { describe, expect, it } from 'vitest';
 import {
   calculateLongestVacation,
   calculateLongWeekends,
-  calculateMaxWorkingPeriod,
+  calculateMaxWorkStreak,
   calculateQuarterDistribution,
   calculateRestBlocks,
   getFirstLastBreak,
   getLongBlocksPerQuarter,
   getMonthlyDist,
   getTotalEffectiveDays,
-  getWorkingDaysPerMonth,
+  getWorkedDaysPerMonth,
 } from './helpers';
 
 const makeDate = (year: number, month: number, day: number) => new Date(year, month - 1, day);
+
+const makeBridge = (startDate: Date, endDate: Date, ptoDays: Date[]) => ({
+  startDate,
+  endDate,
+  ptoDays,
+  ptoDaysNeeded: ptoDays.length,
+  effectiveDays: Math.round((endDate.getTime() - startDate.getTime()) / 86_400_000) + 1,
+  efficiency: 0,
+});
 
 const makeHoliday = (date: Date) => ({
   id: `h-${date.toISOString()}`,
@@ -23,8 +32,6 @@ const makeHoliday = (date: Date) => ({
   isInSelectedRange: true,
 });
 
-// January 2025: Jan 1=Wed, Jan 3=Fri, Jan 4=Sat, Jan 5=Sun, Jan 6=Mon, Jan 7=Tue, Jan 8=Wed, Jan 9=Thu, Jan 10=Fri
-
 describe('getMonthlyDist', () => {
   it('returns 12 zeros for empty input', () => {
     expect(getMonthlyDist([])).toEqual(new Array(12).fill(0));
@@ -33,52 +40,72 @@ describe('getMonthlyDist', () => {
   it('counts dates into correct month buckets', () => {
     const days = [makeDate(2025, 1, 6), makeDate(2025, 1, 7), makeDate(2025, 3, 1)];
     const dist = getMonthlyDist(days);
-    expect(dist[0]).toBe(2); // January (month index 0)
-    expect(dist[1]).toBe(0); // February
-    expect(dist[2]).toBe(1); // March
+    expect(dist[0]).toBe(2);
+    expect(dist[1]).toBe(0);
+    expect(dist[2]).toBe(1);
   });
 
   it('uses 0-indexed months', () => {
     const dist = getMonthlyDist([makeDate(2025, 12, 1)]);
-    expect(dist[11]).toBe(1); // December = index 11
+    expect(dist[11]).toBe(1);
   });
 });
 
 describe('getLongBlocksPerQuarter', () => {
   it('returns 4 zeros for empty input', () => {
-    expect(getLongBlocksPerQuarter([])).toEqual([0, 0, 0, 0]);
+    expect(getLongBlocksPerQuarter({ ptoDays: [], holidays: [] })).toEqual([0, 0, 0, 0]);
   });
 
-  it('does not count blocks shorter than 3 consecutive days', () => {
-    expect(getLongBlocksPerQuarter([makeDate(2025, 1, 6), makeDate(2025, 1, 7)])).toEqual([0, 0, 0, 0]);
+  it('does not count blocks shorter than 3 consecutive free days', () => {
+    const ptoDays = [makeDate(2025, 1, 8), makeDate(2025, 1, 9)];
+    expect(getLongBlocksPerQuarter({ ptoDays, holidays: [] })).toEqual([0, 0, 0, 0]);
   });
 
-  it('counts a block of exactly 3 consecutive days', () => {
-    const result = getLongBlocksPerQuarter([makeDate(2025, 1, 6), makeDate(2025, 1, 7), makeDate(2025, 1, 8)]);
-    expect(result[0]).toBe(1); // Q1
+  it('counts a block of exactly 3 consecutive free days', () => {
+    const ptoDays = [makeDate(2025, 1, 7), makeDate(2025, 1, 8), makeDate(2025, 1, 9)];
+    expect(getLongBlocksPerQuarter({ ptoDays, holidays: [] })).toEqual([1, 0, 0, 0]);
+  });
+
+  it('counts the weekend a bridge absorbs, so Fri + Mon is one long block', () => {
+    const ptoDays = [makeDate(2025, 1, 3), makeDate(2025, 1, 6)];
+    expect(getLongBlocksPerQuarter({ ptoDays, holidays: [] })).toEqual([1, 0, 0, 0]);
+  });
+
+  it('counts a holiday that extends a run to 3 days', () => {
+    const ptoDays = [makeDate(2025, 1, 8), makeDate(2025, 1, 9)];
+    const withHoliday = getLongBlocksPerQuarter({ ptoDays, holidays: [makeHoliday(makeDate(2025, 1, 10))] });
+    expect(withHoliday).toEqual([1, 0, 0, 0]);
   });
 
   it('counts a single block for 4+ consecutive days', () => {
-    const days = [makeDate(2025, 1, 6), makeDate(2025, 1, 7), makeDate(2025, 1, 8), makeDate(2025, 1, 9)];
-    expect(getLongBlocksPerQuarter(days)[0]).toBe(1);
+    const ptoDays = [makeDate(2025, 1, 6), makeDate(2025, 1, 7), makeDate(2025, 1, 8), makeDate(2025, 1, 9)];
+    expect(getLongBlocksPerQuarter({ ptoDays, holidays: [] })[0]).toBe(1);
   });
 
   it('counts blocks in separate quarters independently', () => {
-    const days = [
-      makeDate(2025, 1, 6),
+    const ptoDays = [
       makeDate(2025, 1, 7),
-      makeDate(2025, 1, 8), // Q1 block
+      makeDate(2025, 1, 8),
+      makeDate(2025, 1, 9),
       makeDate(2025, 4, 1),
       makeDate(2025, 4, 2),
-      makeDate(2025, 4, 3), // Q2 block
+      makeDate(2025, 4, 3),
     ];
-    const result = getLongBlocksPerQuarter(days);
-    expect(result[0]).toBe(1);
-    expect(result[1]).toBe(1);
+    expect(getLongBlocksPerQuarter({ ptoDays, holidays: [] })).toEqual([1, 1, 0, 0]);
   });
 
-  it('does not count non-consecutive days as a block', () => {
-    expect(getLongBlocksPerQuarter([makeDate(2025, 1, 6), makeDate(2025, 1, 8), makeDate(2025, 1, 10)])).toEqual([
+  it('attributes a block straddling a quarter boundary to the quarter it starts in', () => {
+    const ptoDays = [makeDate(2025, 3, 31), makeDate(2025, 4, 1), makeDate(2025, 4, 2)];
+    expect(getLongBlocksPerQuarter({ ptoDays, holidays: [] })).toEqual([1, 0, 0, 0]);
+  });
+
+  it('does not count isolated mid-week days as a block', () => {
+    const ptoDays = [makeDate(2025, 1, 7), makeDate(2025, 1, 9)];
+    expect(getLongBlocksPerQuarter({ ptoDays, holidays: [] })).toEqual([0, 0, 0, 0]);
+  });
+
+  it('ignores holidays when no PTO day is placed', () => {
+    expect(getLongBlocksPerQuarter({ ptoDays: [], holidays: [makeHoliday(makeDate(2025, 1, 6))] })).toEqual([
       0, 0, 0, 0,
     ]);
   });
@@ -93,18 +120,18 @@ describe('getTotalEffectiveDays', () => {
     expect(getTotalEffectiveDays([makeDate(2025, 1, 6)], [])).toBe(1);
   });
 
-  it('uses bridge effectiveDays for PTO days that are part of a bridge', () => {
-    const bridges = [{ ptoDays: [makeDate(2025, 1, 6)], effectiveDays: 3 }];
+  it('counts the whole span a bridge absorbs', () => {
+    const bridges = [makeBridge(makeDate(2025, 1, 4), makeDate(2025, 1, 6), [makeDate(2025, 1, 6)])];
     expect(getTotalEffectiveDays([makeDate(2025, 1, 6)], bridges)).toBe(3);
   });
 
-  it('adds standalone days on top of bridge effective days', () => {
-    const bridges = [{ ptoDays: [makeDate(2025, 1, 6)], effectiveDays: 3 }];
+  it('adds standalone days on top of the spans', () => {
+    const bridges = [makeBridge(makeDate(2025, 1, 4), makeDate(2025, 1, 6), [makeDate(2025, 1, 6)])];
     expect(getTotalEffectiveDays([makeDate(2025, 1, 6), makeDate(2025, 1, 9)], bridges)).toBe(4);
   });
 
   it('ignores a bridge whose PTO days are not all in the selection', () => {
-    const bridges = [{ ptoDays: [makeDate(2025, 1, 6)], effectiveDays: 3 }];
+    const bridges = [makeBridge(makeDate(2025, 1, 4), makeDate(2025, 1, 6), [makeDate(2025, 1, 6)])];
     expect(getTotalEffectiveDays([makeDate(2025, 1, 9)], bridges)).toBe(1);
   });
 });
@@ -169,44 +196,60 @@ describe('getFirstLastBreak', () => {
   });
 });
 
-describe('getWorkingDaysPerMonth', () => {
+describe('getWorkedDaysPerMonth', () => {
   it('returns a positive number for a normal year', () => {
-    const result = getWorkingDaysPerMonth({ ptoDays: [], holidays: [], year: 2025 });
+    const result = getWorkedDaysPerMonth({ ptoDays: [], holidays: [], year: 2025 });
     expect(result).toBeGreaterThan(18);
     expect(result).toBeLessThan(24);
   });
 
   it('decreases when PTO days are added', () => {
-    const baseline = getWorkingDaysPerMonth({ ptoDays: [], holidays: [], year: 2025 });
-    const withPto = getWorkingDaysPerMonth({ ptoDays: [makeDate(2025, 1, 6)], holidays: [], year: 2025 });
+    const baseline = getWorkedDaysPerMonth({ ptoDays: [], holidays: [], year: 2025 });
+    const withPto = getWorkedDaysPerMonth({ ptoDays: [makeDate(2025, 1, 6)], holidays: [], year: 2025 });
     expect(withPto).toBeLessThan(baseline);
   });
 
   it('decreases when holidays are added', () => {
-    const baseline = getWorkingDaysPerMonth({ ptoDays: [], holidays: [], year: 2025 });
-    const withHoliday = getWorkingDaysPerMonth({
+    const baseline = getWorkedDaysPerMonth({ ptoDays: [], holidays: [], year: 2025 });
+    const withHoliday = getWorkedDaysPerMonth({
       ptoDays: [],
       holidays: [makeHoliday(makeDate(2025, 1, 6))],
       year: 2025,
     });
     expect(withHoliday).toBeLessThan(baseline);
   });
+
+  it('ignores holidays that fall outside the measured year', () => {
+    const baseline = getWorkedDaysPerMonth({ ptoDays: [], holidays: [], year: 2025 });
+    const withNextYearHoliday = getWorkedDaysPerMonth({
+      ptoDays: [],
+      holidays: [makeHoliday(makeDate(2026, 1, 6))],
+      year: 2025,
+    });
+    expect(withNextYearHoliday).toBe(baseline);
+  });
+
+  it('ignores PTO days that fall outside the measured year', () => {
+    const baseline = getWorkedDaysPerMonth({ ptoDays: [], holidays: [], year: 2025 });
+    const withCarryOverPto = getWorkedDaysPerMonth({ ptoDays: [makeDate(2026, 1, 6)], holidays: [], year: 2025 });
+    expect(withCarryOverPto).toBe(baseline);
+  });
 });
 
-describe('calculateMaxWorkingPeriod', () => {
+describe('calculateMaxWorkStreak', () => {
   it('returns a positive streak when no PTO or holidays', () => {
-    const result = calculateMaxWorkingPeriod({ ptoDays: [], holidays: [], year: 2025, allowPastDays: true });
+    const result = calculateMaxWorkStreak({ ptoDays: [], holidays: [], year: 2025, allowPastDays: true });
     expect(result).toBeGreaterThan(0);
   });
 
   it('returns 0 when the year is fully in the past and allowPastDays is false', () => {
-    const result = calculateMaxWorkingPeriod({ ptoDays: [], holidays: [], year: 2020, allowPastDays: false });
+    const result = calculateMaxWorkStreak({ ptoDays: [], holidays: [], year: 2020, allowPastDays: false });
     expect(result).toBe(0);
   });
 
   it('reduces max streak when PTO breaks up consecutive workdays', () => {
-    const noBreak = calculateMaxWorkingPeriod({ ptoDays: [], holidays: [], year: 2025, allowPastDays: true });
-    const withBreak = calculateMaxWorkingPeriod({
+    const noBreak = calculateMaxWorkStreak({ ptoDays: [], holidays: [], year: 2025, allowPastDays: true });
+    const withBreak = calculateMaxWorkStreak({
       ptoDays: [
         makeDate(2025, 1, 6),
         makeDate(2025, 1, 7),
@@ -220,6 +263,26 @@ describe('calculateMaxWorkingPeriod', () => {
     });
     expect(withBreak).toBeLessThan(noBreak);
   });
+
+  it('scans only the planning year when the whole year is still in the future', () => {
+    const futureYear = new Date().getFullYear() + 2;
+    const ptoDays = [makeDate(futureYear, 3, 2)];
+    const skippingPast = calculateMaxWorkStreak({ ptoDays, holidays: [], year: futureYear, allowPastDays: false });
+    const wholeYear = calculateMaxWorkStreak({ ptoDays, holidays: [], year: futureYear, allowPastDays: true });
+    expect(skippingPast).toBe(wholeYear);
+  });
+
+  it('still skips the elapsed part of the current year', () => {
+    const currentYear = new Date().getFullYear();
+    const skippingPast = calculateMaxWorkStreak({
+      ptoDays: [],
+      holidays: [],
+      year: currentYear,
+      allowPastDays: false,
+    });
+    const wholeYear = calculateMaxWorkStreak({ ptoDays: [], holidays: [], year: currentYear, allowPastDays: true });
+    expect(skippingPast).toBeLessThanOrEqual(wholeYear);
+  });
 });
 
 describe('calculateLongestVacation', () => {
@@ -228,13 +291,11 @@ describe('calculateLongestVacation', () => {
   });
 
   it('includes adjacent weekend days in the streak', () => {
-    // Jan 3 (Fri PTO) + Jan 4 (Sat) + Jan 5 (Sun) = 3 consecutive free days
     const result = calculateLongestVacation({ ptoDays: [makeDate(2025, 1, 3)], holidays: [] });
     expect(result).toBeGreaterThanOrEqual(3);
   });
 
   it('returns a longer streak when multiple PTO days bridge weekends', () => {
-    // Jan 4(Sat)+Jan 5(Sun)+Jan 6-10(PTO)+Jan 11(Sat)+Jan 12(Sun) = 9 consecutive free days
     const ptoDays = [
       makeDate(2025, 1, 6),
       makeDate(2025, 1, 7),
@@ -262,22 +323,48 @@ describe('calculateLongWeekends', () => {
   });
 
   it('counts a Friday PTO adjacent to a weekend as a long weekend', () => {
-    // Jan 3 (Fri PTO) + Jan 4 (Sat) + Jan 5 (Sun)
     expect(calculateLongWeekends({ ptoDays: [makeDate(2025, 1, 3)], holidays: [] })).toBeGreaterThanOrEqual(1);
   });
 
   it('counts a Monday PTO adjacent to a weekend as a long weekend', () => {
-    // Jan 4 (Sat) + Jan 5 (Sun) + Jan 6 (Mon PTO)
     expect(calculateLongWeekends({ ptoDays: [makeDate(2025, 1, 6)], holidays: [] })).toBeGreaterThanOrEqual(1);
   });
 
   it('does not count isolated mid-week PTO as a long weekend', () => {
-    // Jan 8 (Wed PTO) — surrounded by workdays, no adjacent weekend
     expect(calculateLongWeekends({ ptoDays: [makeDate(2025, 1, 8)], holidays: [] })).toBe(0);
   });
 
   it('counts a holiday adjacent to a weekend as a long weekend', () => {
-    const holiday = makeHoliday(makeDate(2025, 1, 6)); // Monday
+    const holiday = makeHoliday(makeDate(2025, 1, 6));
     expect(calculateLongWeekends({ ptoDays: [makeDate(2025, 1, 6)], holidays: [holiday] })).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('getTotalEffectiveDays overlap', () => {
+  it('counts a weekend shared by two bridges once', () => {
+    const days = [makeDate(2025, 1, 3), makeDate(2025, 1, 6)];
+    const bridges = [
+      makeBridge(makeDate(2025, 1, 3), makeDate(2025, 1, 5), [makeDate(2025, 1, 3)]),
+      makeBridge(makeDate(2025, 1, 4), makeDate(2025, 1, 6), [makeDate(2025, 1, 6)]),
+    ];
+    expect(getTotalEffectiveDays(days, bridges)).toBe(4);
+  });
+
+  it('still adds disjoint bridges in full', () => {
+    const days = [makeDate(2025, 1, 3), makeDate(2025, 6, 2)];
+    const bridges = [
+      makeBridge(makeDate(2025, 1, 3), makeDate(2025, 1, 5), [makeDate(2025, 1, 3)]),
+      makeBridge(makeDate(2025, 5, 31), makeDate(2025, 6, 2), [makeDate(2025, 6, 2)]),
+    ];
+    expect(getTotalEffectiveDays(days, bridges)).toBe(6);
+  });
+
+  it('never reports fewer effective days than days actually spent', () => {
+    const days = [makeDate(2025, 1, 3), makeDate(2025, 1, 6), makeDate(2025, 9, 10)];
+    const bridges = [
+      makeBridge(makeDate(2025, 1, 3), makeDate(2025, 1, 5), [makeDate(2025, 1, 3)]),
+      makeBridge(makeDate(2025, 1, 4), makeDate(2025, 1, 6), [makeDate(2025, 1, 6)]),
+    ];
+    expect(getTotalEffectiveDays(days, bridges)).toBeGreaterThanOrEqual(days.length);
   });
 });

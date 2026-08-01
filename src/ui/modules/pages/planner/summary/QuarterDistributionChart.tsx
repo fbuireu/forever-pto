@@ -1,3 +1,5 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
@@ -21,7 +23,7 @@ export const QuarterDistributionChart = ({ quarterDist }: QuarterDistributionCha
 
   const totalDays = quarterDist.reduce((sum, days) => sum + days, 0);
   const activeQuarters = quarterDist.filter((days) => days > 0).length;
-  const description = t('quarterDescription', { totalDays, activeQuarters, plural: activeQuarters !== 1 ? 's' : '' });
+  const description = t('quarterDescription', { totalDays, activeQuarters });
 
   return (
     <PremiumFeature

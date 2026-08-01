@@ -180,8 +180,8 @@ function groupByMonth<T>(items: T[], getDate: (item: T) => Date, locale: string)
 
 interface PdfLabels {
   holidays: string;
-  vacationDays: string;
-  dayOff: string;
+  ptoDays: string;
+  ptoDay: string;
   generatedOn: string;
 }
 
@@ -241,7 +241,7 @@ export function HolidayDocument({
         {includePto && ptoGroups.length > 0 && (
           <View style={s.section}>
             <View style={s.sectionHeader}>
-              <Text style={s.sectionTitle}>{labels.vacationDays}</Text>
+              <Text style={s.sectionTitle}>{labels.ptoDays}</Text>
               <Text style={s.badgeTeal}>{ptoDays.length}</Text>
             </View>
             {ptoGroups.map((group) => (
@@ -250,7 +250,7 @@ export function HolidayDocument({
                 {group.items.map((d) => (
                   <View key={d.toISOString()} style={s.row}>
                     <Text style={s.rowDate}>{fmtDay(d, locale)}</Text>
-                    <Text style={s.rowName}>{labels.dayOff}</Text>
+                    <Text style={s.rowName}>{labels.ptoDay}</Text>
                   </View>
                 ))}
               </View>

@@ -116,4 +116,26 @@ describe('handlePaymentSucceeded', () => {
     );
     await expect(run(handlePaymentSucceeded(EVENT))).resolves.toBeUndefined();
   });
+
+  it('logs a failing retrieveCharge once, as a retrieval failure', async () => {
+    const { retrieveCharge } = await import('@infrastructure/services/payments/provider/charge');
+    vi.mocked(retrieveCharge).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: 'stripe error' })) as never);
+    await run(handlePaymentSucceeded(EVENT));
+    expect(mockLogger.error).toHaveBeenCalledExactlyOnceWith(
+      'Failed to retrieve charge details',
+      expect.objectContaining({ reason: 'stripe error', chargeId: 'ch_test', paymentId: 'pi_test' })
+    );
+  });
+
+  it('logs a failing updatePaymentCharge once, as an update failure', async () => {
+    const { updatePaymentCharge } = await import('@infrastructure/services/payments/repository');
+    vi.mocked(updatePaymentCharge).mockReturnValueOnce(
+      Effect.fail(new DatabaseError({ message: 'db error' })) as never
+    );
+    await run(handlePaymentSucceeded(EVENT));
+    expect(mockLogger.error).toHaveBeenCalledExactlyOnceWith(
+      'Failed to update charge details',
+      expect.objectContaining({ reason: 'db error', paymentId: 'pi_test', chargeId: 'ch_test' })
+    );
+  });
 });

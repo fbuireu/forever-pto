@@ -45,7 +45,7 @@ export const holidayDTO: HolidayDTOShape = {
     const selectedRangeEnd = addMonths(endOfYear(new Date(year, 0, 1)), carryOverMonths);
 
     return raw
-      .toSorted((a, _) => (a.location ? 1 : -1))
+      .toSorted((a, b) => Number(!!a.location) - Number(!!b.location))
       .reduce<HolidayDTO[]>((acc, holiday) => {
         const holidayDate = new Date(holiday.date);
         if (!isWithinInterval(holidayDate, { start: yearStart, end: nextYearEnd })) return acc;

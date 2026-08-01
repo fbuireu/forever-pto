@@ -1,3 +1,5 @@
+'use client';
+
 import {
   addMonths,
   type Day,
@@ -15,8 +17,8 @@ import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
 import { ChevronRight } from '@ui/modules/core/animate/icons/ChevronRight';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
-import { SupportButton } from '@ui/modules/pages/homepage/navigation/SupportButton';
 import { ConditionalWrapper } from '@ui/modules/shared/ConditionalWrapper';
+import { SupportButton } from '@ui/modules/shared/SupportButton';
 import { cn } from '@ui/utils/cn';
 import { LockIcon } from 'lucide-react';
 import type { Locale } from 'next-intl';
@@ -27,11 +29,11 @@ import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
 import {
   getPreviewRange,
   isAlternative,
-  isBankHoliday as isBankHolidayFn,
   isCustom as isCustomFn,
   isHoliday,
   isInRange,
   isManuallySelected,
+  isNationalOrRegionalHoliday as isNationalOrRegionalHolidayFn,
   isPast,
   isRangeEnd,
   isRangeSelected,
@@ -158,7 +160,7 @@ export function Calendar({
   const modifiers = useMemo(() => {
     const holidayFn = isHoliday(holidays);
     const customFn = isCustomFn(holidays);
-    const bankHolidayFn = isBankHolidayFn(holidays);
+    const nationalOrRegionalHolidayFn = isNationalOrRegionalHolidayFn(holidays);
     const isPastFn = isPast(allowPastDays, today);
     const isSuggestionFn = isSuggestion(currentSelection, removedSuggestedDays);
     const isAlternativeFn = isAlternative({ alternatives, suggestion, previewAlternativeIndex, currentSelection });
@@ -170,7 +172,7 @@ export function Calendar({
       weekend: isWeekend,
       holiday: holidayFn,
       custom: customFn,
-      bankHoliday: bankHolidayFn,
+      nationalOrRegionalHoliday: nationalOrRegionalHolidayFn,
       today: isToday(today),
       suggested: isSuggestionFn,
       alternative: isAlternativeFn,
@@ -249,7 +251,7 @@ export function Calendar({
         const isPastDay = !allowPastDays && modifiers.disabled(date);
         const isManual = modifiers.manuallySelected(date);
         const isSuggested = modifiers.suggested(date);
-        const isBankHoliday = modifiers.bankHoliday(date);
+        const isNationalOrRegionalHoliday = modifiers.nationalOrRegionalHoliday(date);
         if (!premiumKey) {
           toast.info(tPremium('premiumFeature'), {
             description: tPremium('unlockDescription'),
@@ -276,9 +278,9 @@ export function Calendar({
           return;
         }
 
-        if (isBankHoliday) {
-          toast.warning(t('cannotSelectBankHoliday'), {
-            description: t('bankHolidayDescription'),
+        if (isNationalOrRegionalHoliday) {
+          toast.warning(t('cannotSelectHoliday'), {
+            description: t('cannotSelectHolidayDescription'),
           });
           return;
         }
@@ -360,7 +362,7 @@ export function Calendar({
       premiumKey,
       t,
       tPremium,
-      modifiers.bankHoliday,
+      modifiers.nationalOrRegionalHoliday,
     ]
   );
 
@@ -480,7 +482,6 @@ export function Calendar({
           const isManualDay = modifiers.manuallySelected(date);
           const isSuggestedDay = modifiers.suggested(date);
 
-          // In manual mode, allow clicking on suggested/manual days even if they're in the past
           const isDisabled = disabled ?? (isPastDay && !isManualDay && !isSuggestedDay);
           const isOutsideMonth = !isSameMonth(date, currentMonth);
 

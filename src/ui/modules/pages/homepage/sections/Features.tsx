@@ -1,11 +1,17 @@
+import { getWeekdayNames } from '@application/shared/utils/dates';
 import { Badge } from '@ui/modules/core/primitives/Badge';
 import { FlagIcon } from '@ui/modules/core/primitives/FlagIcon';
 import { cn } from '@ui/utils/cn';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { brutCard, type DayType, dayCell } from './shared';
 
+const BRIDGE_WEEK = (['work', 'work', 'work', 'holiday', 'pto', 'weekend', 'weekend'] as DayType[]).map(
+  (type, index) => ({ id: `bridge-day-${index}`, type, index })
+);
+
 export const Features = async () => {
-  const t = await getTranslations('homepage');
+  const [t, locale] = await Promise.all([getTranslations('homepage'), getLocale()]);
+  const weekdayLabels = getWeekdayNames({ locale, weekStartsOn: 1, format: 'narrow' });
 
   return (
     <section className='px-7 py-24' id='features'>
@@ -38,17 +44,14 @@ export const Features = async () => {
             {t('features.bridgeDescription')}
           </p>
           <div className='grid grid-cols-7 gap-1 max-w-[280px]'>
-            {(['weekend', 'pto', 'holiday', 'work', 'work', 'work', 'work'] as DayType[]).map((dt, i) => {
-              const label = ['L', 'M', 'X', 'J', 'V', 'S', 'D'][i];
-              return (
-                <div
-                  key={label}
-                  className={cn(dayCell[dt], 'aspect-square grid place-items-center font-mono text-[11px] font-bold')}
-                >
-                  {label}
-                </div>
-              );
-            })}
+            {BRIDGE_WEEK.map(({ id, type, index }) => (
+              <div
+                key={id}
+                className={cn(dayCell[type], 'aspect-square grid place-items-center font-mono text-[11px] font-bold')}
+              >
+                {weekdayLabels[index]}
+              </div>
+            ))}
           </div>
         </div>
         <div

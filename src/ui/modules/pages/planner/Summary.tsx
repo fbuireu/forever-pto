@@ -114,7 +114,7 @@ export const Summary = () => {
     const { metrics } = activeSuggestion;
     const effectiveDays = metrics.totalEffectiveDays;
     const increment = effectiveDays - ptoDays;
-    const efficiencyPercentage = ptoDays > 0 ? (increment / ptoDays) * 100 : 0;
+    const gain = ptoDays > 0 ? (increment / ptoDays) * 100 : 0;
 
     const maxAlternative = Math.max(
       effectiveDays,
@@ -130,7 +130,7 @@ export const Summary = () => {
       metrics,
       effectiveDays,
       increment,
-      efficiencyPercentage,
+      gain,
       maxAlternative,
       canImprove,
     };
@@ -138,7 +138,7 @@ export const Summary = () => {
 
   const content = (() => {
     if (!metricsData) return null;
-    const { metrics, effectiveDays, increment, efficiencyPercentage, canImprove } = metricsData;
+    const { metrics, effectiveDays, increment, gain, canImprove } = metricsData;
     return (
       <div className='w-full max-w-4xl mx-auto space-y-6 z-1'>
         <Card>
@@ -167,7 +167,7 @@ export const Summary = () => {
                       strategy: tSidebar(`strategy.${strategy}.label`).toLowerCase(),
                       effectiveDays,
                       increment,
-                      percentage: efficiencyPercentage.toFixed(0),
+                      percentage: gain.toFixed(0),
                     })
                   : t('summaryParagraph.withoutGain', {
                       ptoDays,
@@ -214,7 +214,7 @@ export const Summary = () => {
             </div>
             <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
               <MetricCard
-                label={t('metrics.vacationDays')}
+                label={t('metrics.ptoDays')}
                 value={ptoDays}
                 icon={CalendarDays}
                 badge={t('metrics.days')}
@@ -231,15 +231,15 @@ export const Summary = () => {
                 label={t('metrics.effectiveDays')}
                 value={effectiveDays}
                 icon={TrendingUp}
-                badge={increment > 0 ? `+${increment} ${t('metrics.extra')}` : `0 ${t('metrics.extra')}`}
+                badge={increment > 0 ? `+${increment} ${t('metrics.overBudget')}` : `0 ${t('metrics.overBudget')}`}
                 colorScheme='purple'
               />
               <MetricCard
-                label={t('metrics.multiplier')}
-                value={efficiencyPercentage.toFixed(0)}
+                label={t('metrics.gain')}
+                value={gain.toFixed(0)}
                 symbol={'%'}
                 icon={Zap}
-                badge={t('metrics.performance')}
+                badge={t('metrics.perPtoDay')}
                 colorScheme='amber'
               />
             </div>
@@ -255,7 +255,7 @@ export const Summary = () => {
               </PremiumFeature>
               <PremiumFeature feature={t('metrics.advancedMetrics')} iconSize='size-7'>
                 <MetricCard
-                  label={t('metrics.vacationPeriods')}
+                  label={t('metrics.restBlocks')}
                   value={metrics.restBlocks}
                   icon={BarChart3}
                   colorScheme='purple'
@@ -263,7 +263,7 @@ export const Summary = () => {
                 />
               </PremiumFeature>
               <MetricCard
-                label={t('metrics.dayOffRatio')}
+                label={t('metrics.efficiency')}
                 value={metrics.averageEfficiency.toFixed(1)}
                 icon={TrendingUp}
                 colorScheme='amber'
@@ -279,8 +279,8 @@ export const Summary = () => {
                 />
               </PremiumFeature>
               <MetricCard
-                label={t('metrics.workdaysPerMonth')}
-                value={metrics.workingDaysPerMonth}
+                label={t('metrics.workedDaysPerMonth')}
+                value={metrics.workedDaysPerMonth}
                 icon={Award}
                 colorScheme='violet'
                 size={MetricCardSize.COMPACT}
@@ -319,8 +319,8 @@ export const Summary = () => {
                       <div>
                         <div className='text-sm text-muted-foreground'>{t('yearSummary.maxWorkStreak')}</div>
                         <div className='text-lg font-display font-bold text-[color-mix(in_srgb,var(--color-brand-purple)_85%,black_15%)] flex justify-center dark:text-[color-mix(in_srgb,var(--color-brand-purple)_70%,white_30%)]'>
-                          <SlidingNumber number={metrics.maxWorkingPeriod} />{' '}
-                          {t('yearSummary.daysCount', { count: metrics.maxWorkingPeriod })}
+                          <SlidingNumber number={metrics.maxWorkStreak} />{' '}
+                          {t('yearSummary.daysCount', { count: metrics.maxWorkStreak })}
                         </div>
                       </div>
                       <div>
@@ -336,7 +336,7 @@ export const Summary = () => {
                         +<SlidingNumber number={metrics.bonusDays} />
                       </div>
                       <div className='text-xs text-[var(--color-brand-purple)] dark:text-[color-mix(in_srgb,var(--color-brand-purple)_60%,white_40%)]'>
-                        {t('yearSummary.daysGained')}
+                        {t('yearSummary.bonusDaysCaption')}
                       </div>
                     </div>
                   </div>

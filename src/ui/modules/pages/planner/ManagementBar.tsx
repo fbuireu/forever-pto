@@ -18,6 +18,7 @@ import { PlannerPanelFixture } from './PlannerPanelFixture';
 export const ManagementBar = () => {
   const t = useTranslations('toasts');
   const tAlt = useTranslations('alternativesManager');
+  const tPlanner = useTranslations('planner');
   const { areStoresReady } = useStoresReady();
   const isMobile = useIsMobile();
   const { openMobile } = useSidebar();
@@ -108,7 +109,7 @@ export const ManagementBar = () => {
           dismissible={false}
         >
           <DrawerContent overlay={false} className='h-[100dvh] max-h-none'>
-            <DrawerTitle>Planner</DrawerTitle>
+            <DrawerTitle>{tPlanner('heading')}</DrawerTitle>
             <div data-tutorial='planner-drawer' className='px-4 pt-2 pb-3 shrink-0'>
               {isReady ? (
                 <div className='flex items-center justify-between gap-2 flex-wrap'>

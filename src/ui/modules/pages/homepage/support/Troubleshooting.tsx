@@ -2,16 +2,12 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-
-const logger = getBetterStackInstance();
-
 import { Button } from '@ui/modules/core/primitives/Button';
+import { getTotalMonths } from '@ui/modules/pages/planner/utils/helpers';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
-import { getTotalMonths } from '../utils/helpers';
 
 export const Troubleshooting = () => {
   const locale = useLocale();
@@ -64,7 +60,9 @@ export const Troubleshooting = () => {
           description: t('successDescription'),
         });
       } catch (error) {
-        logger.logError('Error resetting to defaults', error, { component: 'Troubleshooting' });
+        void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
+          getBetterStackInstance().logError('Error resetting to defaults', error, { component: 'Troubleshooting' });
+        });
         toast.error(t('errorTitle'), {
           description: t('errorDescription'),
         });

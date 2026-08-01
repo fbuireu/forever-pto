@@ -43,7 +43,6 @@ function analyzePotentialBridge({ ptoDays, holidaySet }: AnalyzePotentialBridges
   let effectiveStart = firstDay;
   let effectiveEnd = lastDay;
 
-  // Expand backward: absorb any free days (weekends/holidays) immediately before the PTO block.
   let current = addDays(firstDay, -1);
   let expansionCount = 0;
 
@@ -53,7 +52,6 @@ function analyzePotentialBridge({ ptoDays, holidaySet }: AnalyzePotentialBridges
     expansionCount++;
   }
 
-  // Expand forward: absorb any free days immediately after the PTO block.
   current = addDays(lastDay, 1);
   expansionCount = 0;
 
@@ -102,12 +100,19 @@ interface GetAvailableWorkdaysParams {
   months: Date[];
   holidays: HolidayDTO[];
   allowPastDays: boolean;
+  removedDays?: Date[];
 }
 
-export function getAvailableWorkdays({ months, holidays, allowPastDays }: GetAvailableWorkdaysParams) {
+export function getAvailableWorkdays({
+  months,
+  holidays,
+  allowPastDays,
+  removedDays = [],
+}: GetAvailableWorkdaysParams) {
   const todayTime = startOfToday().getTime();
 
   const holidaySet = createHolidaySet(holidays);
+  const removedSet = new Set(removedDays.map((day) => getKey(day)));
   const workdays: Date[] = [];
 
   for (const month of months) {
@@ -121,6 +126,7 @@ export function getAvailableWorkdays({ months, holidays, allowPastDays }: GetAva
       if (!allowPastDays && date.getTime() < todayTime) continue;
       if (isWeekend(date)) continue;
       if (holidaySet.has(getKey(date))) continue;
+      if (removedSet.has(getKey(date))) continue;
 
       workdays.push(date);
     }
@@ -173,8 +179,6 @@ export const findBridges = ({ availableWorkdays, holidays }: FindBridgesParams) 
 
   const uniqueBridges = deduplicateBridges(bridges);
 
-  // Sort by efficiency, but treat differences smaller than EFFICIENCY_COMPARISON_THRESHOLD as ties
-  // to avoid noise from floating-point rounding; break ties by total effectiveDays.
   return uniqueBridges.sort((a, b) => {
     const effDiff = b.efficiency - a.efficiency;
     if (Math.abs(effDiff) > PTO_CONSTANTS.BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD) {

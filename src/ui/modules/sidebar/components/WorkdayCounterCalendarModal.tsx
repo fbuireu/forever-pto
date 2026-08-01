@@ -1,7 +1,9 @@
+'use client';
+
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { formatDate } from '@application/shared/utils/dates';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/modules/core/animate/base/Dialog';
 import { Button } from '@ui/modules/core/primitives/Button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/modules/core/primitives/Dialog';
 import type { FromTo } from '@ui/modules/pages/planner/calendar/Calendar';
 import { Calendar, CalendarSelectionMode } from '@ui/modules/pages/planner/calendar/Calendar';
 import { Calendar as CalendarIcon } from 'lucide-react';

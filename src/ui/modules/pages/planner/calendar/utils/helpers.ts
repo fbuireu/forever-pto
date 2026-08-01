@@ -115,14 +115,6 @@ export const getDayClassNames = ({
   return classes.join(' ');
 };
 
-export function getViewBoxFromSvg(svg: string) {
-  const VIEWBOX_REGEX = /viewBox="([^"]*)"/;
-  const DEFAULT_VIEWBOX = '0 0 24 24';
-  const viewBoxMatch = RegExp(VIEWBOX_REGEX).exec(svg);
-
-  return viewBoxMatch ? viewBoxMatch[1] : DEFAULT_VIEWBOX;
-}
-
 export const isFromToObject = (obj: unknown): obj is FromTo => {
   return (
     obj !== null &&

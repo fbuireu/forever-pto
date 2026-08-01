@@ -1,8 +1,17 @@
 import { HolidayVariant } from '@application/dto/holiday/types';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FilterStrategy } from '../types';
 import { clearDateKeyCache, clearHolidayCache } from '../utils/cache';
 import { generateSuggestions } from './generateSuggestions';
+import { selectBridgesForStrategy, selectOptimalDaysFromBridges } from './utils/selectors';
+
+vi.mock('./utils/selectors', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./utils/selectors')>();
+  return {
+    selectBridgesForStrategy: vi.fn(actual.selectBridgesForStrategy),
+    selectOptimalDaysFromBridges: vi.fn(actual.selectOptimalDaysFromBridges),
+  };
+});
 
 const makeDate = (year: number, month: number, day: number) => new Date(year, month - 1, day);
 
@@ -15,7 +24,6 @@ const makeHoliday = (date: Date) => ({
 });
 
 const BASE = {
-  year: 2025,
   holidays: [] as ReturnType<typeof makeHoliday>[],
   allowPastDays: true,
   months: [makeDate(2025, 1, 1)],
@@ -25,6 +33,7 @@ describe('generateSuggestions', () => {
   beforeEach(() => {
     clearDateKeyCache();
     clearHolidayCache();
+    vi.clearAllMocks();
   });
 
   it('returns empty days when ptoDays is 0', () => {
@@ -61,13 +70,13 @@ describe('generateSuggestions', () => {
   });
 
   it('never suggests a day that is already a holiday', () => {
-    const holiday = makeHoliday(makeDate(2025, 1, 6)); // Monday
+    const holiday = makeHoliday(makeDate(2025, 1, 6));
     const result = generateSuggestions({ ...BASE, ptoDays: 5, holidays: [holiday], strategy: FilterStrategy.GROUPED });
     expect(result.days.some((day) => day.toDateString() === makeDate(2025, 1, 6).toDateString())).toBe(false);
   });
 
   it('ignores weekend holidays (they are not workdays)', () => {
-    const weekendHoliday = makeHoliday(makeDate(2025, 1, 4)); // Saturday
+    const weekendHoliday = makeHoliday(makeDate(2025, 1, 4));
     const result = generateSuggestions({
       ...BASE,
       ptoDays: 5,
@@ -85,18 +94,66 @@ describe('generateSuggestions', () => {
     }
   });
 
-  it.each([
-    [FilterStrategy.GROUPED],
-    [FilterStrategy.OPTIMIZED],
-    [FilterStrategy.BALANCED],
-  ] as const)('%s: returned days do not exceed ptoDays budget', (strategy) => {
-    const ptoDays = 5;
-    const result = generateSuggestions({ ...BASE, ptoDays, strategy });
-    expect(result.days.length).toBeLessThanOrEqual(ptoDays);
+  it.each([[FilterStrategy.GROUPED], [FilterStrategy.OPTIMIZED], [FilterStrategy.BALANCED]] as const)(
+    '%s: returned days do not exceed ptoDays budget',
+    (strategy) => {
+      const ptoDays = 5;
+      const result = generateSuggestions({ ...BASE, ptoDays, strategy });
+      expect(result.days.length).toBeLessThanOrEqual(ptoDays);
+    }
+  );
+
+  it('never places a Removed Day', () => {
+    const removed = makeDate(2025, 1, 6);
+    const result = generateSuggestions({
+      ...BASE,
+      ptoDays: 5,
+      removedDays: [removed],
+      strategy: FilterStrategy.GROUPED,
+    });
+    expect(result.days.some((day) => day.toDateString() === removed.toDateString())).toBe(false);
+  });
+
+  it('does not let a Removed Day lengthen a neighbouring bridge', () => {
+    const removed = makeDate(2025, 1, 6);
+    const result = generateSuggestions({
+      ...BASE,
+      ptoDays: 5,
+      removedDays: [removed],
+      strategy: FilterStrategy.GROUPED,
+    });
+    const covering = result.bridges?.filter(
+      (bridge) => bridge.startDate.getTime() <= removed.getTime() && removed.getTime() <= bridge.endDate.getTime()
+    );
+    expect(covering).toEqual([]);
   });
 
   it('caps to available workdays if ptoDays exceeds them', () => {
     const result = generateSuggestions({ ...BASE, ptoDays: 9999, strategy: FilterStrategy.GROUPED });
-    expect(result.days.length).toBeLessThanOrEqual(23); // Jan 2025 has 23 workdays
+    expect(result.days.length).toBeLessThanOrEqual(23);
+  });
+
+  describe('strategy dispatch', () => {
+    it.each([[FilterStrategy.GROUPED], [FilterStrategy.OPTIMIZED]] as const)(
+      '%s routes to selectBridgesForStrategy with its own strategy',
+      (strategy) => {
+        generateSuggestions({ ...BASE, ptoDays: 3, strategy });
+        expect(selectBridgesForStrategy).toHaveBeenCalledWith(expect.objectContaining({ strategy }));
+        expect(selectOptimalDaysFromBridges).not.toHaveBeenCalled();
+      }
+    );
+
+    it('BALANCED routes to selectOptimalDaysFromBridges', () => {
+      generateSuggestions({ ...BASE, ptoDays: 3, strategy: FilterStrategy.BALANCED });
+      expect(selectOptimalDaysFromBridges).toHaveBeenCalledWith(expect.objectContaining({ targetPtoDays: 3 }));
+      expect(selectBridgesForStrategy).not.toHaveBeenCalled();
+    });
+
+    it('falls back to GROUPED for an unknown strategy', () => {
+      generateSuggestions({ ...BASE, ptoDays: 3, strategy: 'unknown' as FilterStrategy });
+      expect(selectBridgesForStrategy).toHaveBeenCalledWith(
+        expect.objectContaining({ strategy: FilterStrategy.GROUPED })
+      );
+    });
   });
 });

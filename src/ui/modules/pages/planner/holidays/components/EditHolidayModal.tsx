@@ -5,8 +5,6 @@ import { formatDate } from '@application/shared/utils/dates';
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { Button } from '@ui/modules/core/primitives/Button';
 import {
   Dialog,
   DialogContent,
@@ -14,7 +12,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@ui/modules/core/primitives/Dialog';
+} from '@ui/modules/core/animate/base/Dialog';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { Calendar, CalendarSelectionMode, type FromTo } from '@ui/modules/pages/planner/calendar/Calendar';
@@ -105,7 +104,9 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
 
         handleClose();
       } catch (error) {
-        getBetterStackInstance().logError('Error editing holiday', error, { component: 'EditHolidayModal' });
+        void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
+          getBetterStackInstance().logError('Error editing holiday', error, { component: 'EditHolidayModal' });
+        });
         toast.error(t('errorTitle'), {
           description: t('errorDescription'),
         });

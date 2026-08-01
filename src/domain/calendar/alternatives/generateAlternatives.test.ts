@@ -15,7 +15,6 @@ const makeHoliday = (date: Date) => ({
 });
 
 const BASE = {
-  year: 2025,
   holidays: [] as ReturnType<typeof makeHoliday>[],
   allowPastDays: true,
   months: [makeDate(2025, 1, 1)],
@@ -60,6 +59,20 @@ describe('generateAlternatives', () => {
     expect(result.length).toBeLessThanOrEqual(2);
   });
 
+  it('fills maxAlternatives on a full year that has bridges to spare', () => {
+    const months = Array.from({ length: 12 }, (_, i) => makeDate(2025, i + 1, 1));
+    const holidays = [makeDate(2025, 1, 1), makeDate(2025, 5, 1), makeDate(2025, 12, 25)].map(makeHoliday);
+    const result = generateAlternatives({
+      ...BASE,
+      months,
+      holidays,
+      ptoDays: 10,
+      maxAlternatives: 4,
+      existingSuggestion: [makeDate(2025, 1, 3)],
+    });
+    expect(result).toHaveLength(4);
+  });
+
   it('alternatives do not contain days from existingSuggestion', () => {
     const existingSuggestion = [makeDate(2025, 1, 6)];
     const existing = new Set(existingSuggestion.map((day) => day.toDateString()));
@@ -102,6 +115,26 @@ describe('generateAlternatives', () => {
     for (const alt of result) {
       for (let i = 1; i < alt.days.length; i++) {
         expect(alt.days[i - 1].getTime()).toBeLessThanOrEqual(alt.days[i].getTime());
+      }
+    }
+  });
+
+  it('never places a Removed Day and does not let it lengthen a neighbouring bridge', () => {
+    const removed = makeDate(2025, 1, 6);
+    const result = generateAlternatives({
+      ...BASE,
+      ptoDays: 5,
+      maxAlternatives: 4,
+      existingSuggestion: [makeDate(2025, 1, 10)],
+      removedDays: [removed],
+    });
+    expect(result.length).toBeGreaterThan(0);
+    for (const alt of result) {
+      expect(alt.days.some((day) => day.toDateString() === removed.toDateString())).toBe(false);
+      for (const bridge of alt.bridges ?? []) {
+        expect(bridge.startDate.getTime() <= removed.getTime() && removed.getTime() <= bridge.endDate.getTime()).toBe(
+          false
+        );
       }
     }
   });

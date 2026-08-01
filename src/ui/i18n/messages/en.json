@@ -24,12 +24,13 @@
     },
     "planner": {
       "title": "Planner | Forever PTO",
-      "description": "Plan and optimize your vacation days. Smart PTO calendar with holiday detection, bridge day optimizer, and export to Google Calendar, Outlook and Apple."
+      "description": "Plan and optimize your PTO days. Smart PTO calendar with holiday detection, bridge day optimizer, and export to Google Calendar, Outlook and Apple."
     }
   },
   "planner": {
     "title": "Forever PTO",
-    "description": "Your smart PTO planner. Configure your vacation days, country and strategy to get the most out of every public holiday.",
+    "heading": "Planner",
+    "description": "Your smart PTO planner. Configure your PTO days, country and strategy to get the most out of every public holiday.",
     "subtitle": "Your smart vacation optimizer. Stop leaving days on the table.",
     "titleHighlight1": "Your year",
     "titleHighlight2": "free",
@@ -55,21 +56,21 @@
   "summary": {
     "title": "PTO Summary {year} - {nextYear}",
     "metrics": {
-      "vacationDays": "Vacation days",
+      "ptoDays": "PTO days",
       "days": "days",
       "holidays": "Holidays",
       "national": "nat.",
       "regional": "reg.",
       "custom": "cust.",
-      "effectiveDays": "Actual days off",
-      "extra": "extra",
-      "multiplier": "Multiplier",
-      "performance": "gain",
+      "effectiveDays": "Effective days off",
+      "overBudget": "over budget",
+      "gain": "Gain",
+      "perPtoDay": "per PTO day",
       "longWeekends": "Long weekends",
-      "vacationPeriods": "Vacation periods",
-      "dayOffRatio": "Day/off ratio",
+      "restBlocks": "Rest blocks",
+      "efficiency": "Efficiency",
       "bridgesUsed": "Bridges used",
-      "workdaysPerMonth": "Workdays/month",
+      "workedDaysPerMonth": "Worked days/month",
       "longestVacation": "Longest vacation",
       "advancedMetrics": "Advanced metrics"
     },
@@ -81,12 +82,12 @@
       "maxWorkStreak": "Max work streak",
       "lastBreak": "Last break",
       "totalBonusDays": "Total bonus days",
-      "daysGained": "days gained by optimizing",
+      "bonusDaysCaption": "bonus days from optimizing",
       "daysCount": "{count, plural, one {day} other {days}}"
     },
     "summaryParagraph": {
-      "withGain": "With your {ptoDays} vacation days and {totalHolidays} public holidays, the {strategy} strategy turns them into {effectiveDays} effective days off, that's {increment} extra days, a +{percentage}% improvement over simply using them as-is.",
-      "withoutGain": "With your {ptoDays} vacation days and {totalHolidays} public holidays, you get {effectiveDays} effective days off using the {strategy} strategy.",
+      "withGain": "With your {ptoDays} PTO days and {totalHolidays} public holidays, the {strategy} strategy turns them into {effectiveDays} effective days off, that’s {increment} days over your budget, a +{percentage}% gain over simply using them as-is.",
+      "withoutGain": "With your {ptoDays} PTO days and {totalHolidays} public holidays, you get {effectiveDays} effective days off using the {strategy} strategy.",
       "noRegionHintTitle": "Add your region",
       "noRegionHint": "Select your region in the sidebar to include regional holidays and squeeze out even more days off.",
       "withRegion": "{regionalDays} of your holidays are specific to {region}."
@@ -147,7 +148,7 @@
         },
         "whyNotSeeingCountry": {
           "question": "Why am I not seeing my country or holidays correctly?",
-          "answer": "For simplicity and performance we use a third-party tool to get the bank holidays for a given country and year. It may happen that your country or region is not supported or the data is not up to date. To fix this you can add custom holidays specific to your needs."
+          "answer": "For simplicity and performance we use a third-party tool to get the public holidays for a given country and year. It may happen that your country or region is not supported or the data is not up to date. To fix this you can add custom holidays specific to your needs."
         },
         "pricing": {
           "question": "Why is there a paid model?",
@@ -213,8 +214,8 @@
     "tooltipLabel": "More information about workday counter",
     "selectRange": "Select dates",
     "clearSelection": "Clear selection",
-    "workingDays": "Working days",
-    "businessDays": "Business days in selected range",
+    "workdays": "Workdays",
+    "businessDays": "Workdays in selected range",
     "days": "Days",
     "weekendDays": "Weekend days",
     "holidays": "Holidays",
@@ -244,7 +245,6 @@
     "onWorkdays": "On workdays",
     "showing": "Showing",
     "of": "of",
-    "total": "total",
     "addHoliday": "Add holiday",
     "add": "Add",
     "editHoliday": "Edit holiday",
@@ -266,7 +266,7 @@
     "distributionDescription": "Distribution of your {ptoDays} PTO days, {nationalDays} national holidays{regionalPart}{customPart}.",
     "regionalPart": ", {regionalDays} regional",
     "customPart": " and {customDays} custom",
-    "quarterDescription": "Distribution of {totalDays} effective days off across {activeQuarters} quarter{plural} of the year.",
+    "quarterDescription": "Distribution of {totalDays} effective days off across {activeQuarters, plural, one {# quarter} other {# quarters}} of the year.",
     "annualTimeline": "Annual timeline",
     "annualTimelineFeature": "Annual timeline chart",
     "timelineDescription": "Monthly evolution of {totalDays} days off distributed across {activeMonths} months. Peak in {peakMonth} with {peakDays} days.",
@@ -274,7 +274,7 @@
     "longBlocksPerQuarter": "Long blocks per quarter",
     "longBlocksFeature": "Long blocks per quarter chart",
     "blocksDescription": "{totalBlocks} long blocks (3+ consecutive days) ideal for vacation{bestQuarterPart}.",
-    "bestQuarterPart": ". Best quarter: Q{bestQuarter} with {maxBlocks} block{plural}",
+    "bestQuarterPart": ". Best quarter: Q{bestQuarter} with {maxBlocks, plural, one {# block} other {# blocks}}",
     "blocks": "blocks",
     "blocksOf3Days": "Blocks of 3+ days"
   },
@@ -325,8 +325,6 @@
   },
   "tutorial": {
     "description": "Set up your plan in 2 steps: your location first, then your days and strategy. Click below for an interactive walkthrough.",
-    "startButton": "Start tutorial",
-    "restartButton": "Restart interactive tutorial",
     "nextBtn": "Next",
     "prevBtn": "Previous",
     "doneBtn": "Done",
@@ -351,7 +349,7 @@
       "step3Title": "Your configuration",
       "step3Description": "Choose your optimization strategy and configure past days and carryover months to fine-tune your plan.",
       "step4Title": "Export your calendar",
-      "step4Description": "Download your holidays and planned vacation days as a .ics file to import into Google Calendar, Apple Calendar or Outlook, or as a PDF to print or share.",
+      "step4Description": "Download your holidays and planned PTO days as a .ics file to import into Google Calendar, Apple Calendar or Outlook, or as a PDF to print or share.",
       "drawerTitle": "Your planner panel",
       "drawerDescription": "This bar always shows your current plan summary. Swipe it up (or drag the handle) to explore alternatives and see how your days are distributed."
     }
@@ -379,12 +377,12 @@
     "ptoDayLabel": "PTO Day",
     "downloadPdf": "Download .pdf",
     "downloadingPdf": "Downloading",
-    "tooltip": "Choose what to include in the export: public holidays, your vacation days, or both.",
+    "tooltip": "Choose what to include in the export: public holidays, your PTO days, or both.",
     "tooltipLabel": "Export options info",
     "pdf": {
       "holidays": "Public holidays",
-      "vacationDays": "Vacation days",
-      "dayOff": "Vacation day",
+      "ptoDays": "PTO days",
+      "ptoDay": "PTO day",
       "generatedOn": "Generated on",
       "successTitle": "PDF downloaded",
       "successDescription": "Your calendar has been exported successfully.",
@@ -396,7 +394,6 @@
     "autoAssigned": "Auto-assigned",
     "manual": "Manual",
     "remaining": "Remaining",
-    "clickDays": "Click days to assign/remove",
     "allAssigned": "All days assigned!",
     "resetManual": "Reset manual changes",
     "usedDays": "{used} / {total} days used · {pct}%",
@@ -421,7 +418,19 @@
     "errorTitle": "Something went wrong",
     "tryAgain": "Try again",
     "close": "Close",
-    "failedToSend": "Failed to send message"
+    "failedToSend": "Failed to send message",
+    "errors": {
+      "internal_error": "Something went wrong on our side. Please try again later.",
+      "invalid_email": "That email address does not look right.",
+      "email_required": "Please enter your email address.",
+      "name_too_short": "Your name needs at least 2 characters.",
+      "name_too_long": "Your name is too long.",
+      "subject_too_short": "The subject needs at least 5 characters.",
+      "subject_too_long": "The subject is too long.",
+      "message_too_short": "Your message needs at least 10 characters.",
+      "message_too_long": "Your message is too long.",
+      "invalid_body": "We could not read that request. Please try again."
+    }
   },
   "alternativesManager": {
     "option": "Option",
@@ -443,8 +452,8 @@
     "enablePastDays": "Enable \"Allow past days\" in settings to select past dates",
     "noPtoDaysRemaining": "No remaining PTO days to assign",
     "removeDaysToFree": "Remove existing days to free up space",
-    "cannotSelectBankHoliday": "Cannot select a bank holiday",
-    "bankHolidayDescription": "This day is already a national or regional holiday",
+    "cannotSelectHoliday": "Cannot select a public holiday",
+    "cannotSelectHolidayDescription": "This day is already a national or regional holiday",
     "paymentFailed": "Couldn't start payment",
     "paymentFailedDescription": "Try again later",
     "paymentSuccess": "Payment successful!",
@@ -481,13 +490,11 @@
       "title": "Country",
       "tooltip": "Detected from your connection. If it's wrong or you want to check another country's holidays, you can change it here.",
       "tooltipLabel": "More information about country selection",
-      "loading": "Loading countries...",
       "placeholder": "Select country...",
       "search": "Search countries..."
     },
     "region": {
       "title": "Region",
-      "loading": "Loading regions...",
       "placeholder": "Select region...",
       "search": "Search regions..."
     },
@@ -516,7 +523,7 @@
         "description": "Maximizes PTO day efficiency",
         "subtitle": "Get the most days off possible",
         "pros": {
-          "maximumPerformance": "Maximum performance",
+          "maximumEfficiency": "Maximum efficiency",
           "moreDays": "More total days"
         },
         "cons": {
@@ -634,7 +641,14 @@
     "paymentFailed": "Payment failed",
     "processing": "Processing...",
     "pay": "Pay",
-    "promoSaved": "You saved €{saved}!"
+    "promoSaved": "You saved {saved}!",
+    "errors": {
+      "internal_error": "Something went wrong on our side. Your card has not been charged.",
+      "email_required": "Please enter your email address.",
+      "invalid_email": "That email address does not look right.",
+      "invalid_body": "We could not read that request. Please try again.",
+      "rate_limit_exceeded": "Too many attempts. Please wait a moment and try again."
+    }
   },
   "donate": {
     "donateAndUnblock": "Donate & Unblock",
@@ -795,28 +809,7 @@
     "selectDateRange": "Select dates"
   },
   "command": {
-    "commandPalette": "Command palette",
     "searchPlaceholder": "Search for a command to run..."
-  },
-  "errors": {
-    "contact": {
-      "VALIDATION_ERROR": "Some fields look invalid. Check them and try again.",
-      "EMAIL_SEND_FAILED": "Couldn't send your message. Try again.",
-      "SAVE_FAILED": "We got your message, though a minor logging issue occurred on our end. No action needed from you.",
-      "RENDER_FAILED": "Couldn't prepare your message. Try again.",
-      "UNKNOWN": "Something went wrong. Try again."
-    },
-    "payment": {
-      "VALIDATION_ERROR": "Some fields look invalid. Check them and try again.",
-      "INVALID_PROMO_CODE": "That promo code is invalid or expired.",
-      "PAYMENT_FAILED": "Payment didn't go through.",
-      "SAVE_FAILED": "Payment went through but we couldn't save it. Contact support with your transaction ID.",
-      "UPDATE_STATUS_FAILED": "Couldn't update your payment status. Contact support if this keeps happening.",
-      "SAVE_FROM_WEBHOOK_FAILED": "Couldn't save your payment confirmation. Contact support.",
-      "CHARGE_UPDATE_FAILED": "Couldn't update the charge details.",
-      "WEBHOOK_PROCESSING_FAILED": "Couldn't process your payment confirmation.",
-      "UNKNOWN": "Something went wrong. Try again."
-    }
   },
   "legal": {
     "lastUpdated": "Last updated: {date}"
@@ -833,8 +826,7 @@
     "link1": "How it works",
     "link2": "Features",
     "link3": "Pricing",
-    "link4": "FAQ & Support",
-    "footerStatus": "status: ok · uptime: 99.98%"
+    "link4": "FAQ & Support"
   },
   "error": {
     "retry": "Try again",
@@ -929,12 +921,12 @@
       "command": "Work less.",
       "verb": "Travel",
       "highlight": "more",
-      "description": "Forever PTO calculates <em>exactly</em> which days to request off so your 22 vacation days become <strong>47+ days out of the office</strong>. No spreadsheets. No math. No guilt.",
+      "description": "Forever PTO calculates <em>exactly</em> which days to request off so your 22 PTO days become <strong>47+ days out of the office</strong>. No spreadsheets. No math. No guilt.",
       "plannerCta": "Calculate my days →",
       "demoLink": "See how it works (30s)",
-      "stars": "4.9 · used by {users} rebel employees",
+      "stars": "{rating} · used by {users} rebel employees",
       "mockupLabel": "Real days off in {year}",
-      "mockupRatio": "days · ratio 2.14×",
+      "mockupRatio": "days · efficiency 2.14×",
       "mockupQuote": "\"That's 9 long weekends, captain.\"",
       "mockupLegendPto": "PTO",
       "mockupLegendHoliday": "Holiday",
@@ -945,7 +937,7 @@
       "mockupFieldHolidays": "14 holidays"
     },
     "marquee": {
-      "items": "easter break · bank holiday weekend · summer stretch · thanksgiving bridge · christmas stretch · november bridge · whit monday bridge · may day long weekend · august bank holiday · new year stretch"
+      "items": "easter break · public holiday weekend · summer stretch · thanksgiving bridge · christmas stretch · november bridge · whit monday bridge · may day long weekend · august public holiday · new year stretch"
     },
     "how": {
       "badge": "how it works · {steps} steps",
@@ -956,17 +948,18 @@
       "titleEnd": "in 60 seconds.",
       "description": "No install. No credit card. No newsletter. Just tell us how many days you have and where you live.",
       "inputDaysTitle": "Enter your days.",
-      "inputDaysDescription": "How many vacation days you have and which country or region you work in. That's it.",
+      "inputDaysDescription": "How many PTO days you have and which country or region you work in. That's it.",
       "engineTitle": "The engine does the magic.",
       "engineDescription": "It crosses your days with official holidays and regional bridges. Finds all possible combos and ranks them by \"rest ratio\".",
       "exportTitle": "Request your days off.",
       "exportDescription": "Export to Google Calendar, Outlook, or a PDF you paste into the HR form and forget. No more guessing."
     },
     "stats": {
-      "multiplierLabel": "Average multiplier",
+      "efficiencyLabel": "Average efficiency",
       "daysLabel": "Days off with {days} PTO",
       "countriesLabel": "Supported countries",
-      "plansLabel": "Plans generated"
+      "plansLabel": "Plans generated",
+      "plansValue": "12k+"
     },
     "features": {
       "badge": "engine tricks",
@@ -977,8 +970,8 @@
       "bridgeTag": "smart bridges",
       "bridgeTitle": "Turn 1 PTO day into 4 days off.",
       "bridgeDescription": "Detects holidays on Tuesdays and Thursdays and suggests minimal bridges. One strategic day = a 4-day weekend.",
-      "ratioTag": "max ratio",
-      "ratioDescription": "Best multiplier: 8 PTO days turned into 28 free days (ES, April '26).",
+      "ratioTag": "max efficiency",
+      "ratioDescription": "Best efficiency: 8 PTO days turned into 28 free days (ES, April '26).",
       "syncTag": "sync in 1 click",
       "syncTitle": "Google · Outlook · iCal",
       "syncDescription": "Export your plan to the calendar you already use. No hassle.",
@@ -1011,7 +1004,7 @@
       "withTitle": "😎 With Forever PTO",
       "withItems": {
         "planInJanuary": "You plan everything in January, while waiting for your coffee.",
-        "dayMultiplier": "Each PTO day gives you back 2.1 free days on average.",
+        "dayEfficiency": "Each PTO day gives you back 2.1 free days on average.",
         "visualCalendar": "You visualize the whole year in a clear calendar.",
         "bookFirst": "You book first, guilt-free, with data.",
         "burnAllDays": "You burn 100% of your days. As it should be."
@@ -1049,7 +1042,7 @@
           "role": "marketing manager · Paris"
         },
         "thomasK": {
-          "text": "ROI: 22 PTO days in, 47 free days out. That's a 2.1× multiplier. I've shipped worse features at work.",
+          "text": "ROI: 22 PTO days in, 47 free days out. That's a 2.1× efficiency. I've shipped worse features at work.",
           "name": "Thomas K.",
           "role": "software architect · Amsterdam"
         }
@@ -1139,7 +1132,7 @@
             },
             "holidays": {
               "label": "Holidays storage:",
-              "description": "Saves your custom holidays and vacation days configuration."
+              "description": "Saves your custom holidays and PTO days configuration."
             },
             "location": {
               "label": "Location storage:",
@@ -1563,7 +1556,7 @@
           "description": "The free version provides:",
           "items": {
             "optimization": "Basic PTO optimization based on public holidays",
-            "visualization": "Calendar visualization of holidays and vacation days",
+            "visualization": "Calendar visualization of holidays and PTO days",
             "customHolidays": "Ability to add custom holidays",
             "metrics": "Basic metrics and summary statistics",
             "strategy": "Selection of different optimization strategies"

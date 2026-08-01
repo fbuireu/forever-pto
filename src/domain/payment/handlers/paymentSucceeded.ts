@@ -17,6 +17,15 @@ const updateCharge = (
     const logger = yield* LoggerService;
 
     yield* retrieveCharge(latestChargeId).pipe(
+      Effect.tapError((e) =>
+        Effect.sync(() => {
+          logger.error('Failed to retrieve charge details', {
+            reason: e.message,
+            chargeId: latestChargeId,
+            paymentId: event.paymentId,
+          });
+        })
+      ),
       Effect.flatMap((charge) =>
         updatePaymentCharge({
           paymentIntentId: event.paymentId,
@@ -43,15 +52,6 @@ const updateCharge = (
             })
           )
         )
-      ),
-      Effect.tapError((e) =>
-        Effect.sync(() => {
-          logger.error('Failed to retrieve charge details', {
-            reason: e.message,
-            chargeId: latestChargeId,
-            paymentId: event.paymentId,
-          });
-        })
       ),
       Effect.catchAll(() => Effect.void)
     );

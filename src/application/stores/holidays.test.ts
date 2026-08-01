@@ -1,12 +1,23 @@
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import { FilterStrategy, type Suggestion } from '@domain/calendar/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useHolidaysStore } from './holidays';
+import { useFiltersStore } from './filters';
+import { type HolidaysState, useHolidaysStore } from './holidays';
 
-const { mockGetHolidays, mockGenerateSuggestionsImpl, mockGenerateAlternativesImpl } = vi.hoisted(() => ({
+const {
+  mockGetHolidays,
+  mockGenerateSuggestionsImpl,
+  mockGenerateAlternativesImpl,
+  mockClearDateKeyCache,
+  mockClearHolidayCache,
+  mockStorageGetItem,
+} = vi.hoisted(() => ({
   mockGetHolidays: vi.fn().mockResolvedValue([]),
   mockGenerateSuggestionsImpl: vi.fn().mockReturnValue({ days: [], bridges: [] }),
   mockGenerateAlternativesImpl: vi.fn().mockReturnValue([]),
+  mockClearDateKeyCache: vi.fn(),
+  mockClearHolidayCache: vi.fn(),
+  mockStorageGetItem: vi.fn().mockResolvedValue(null),
 }));
 
 vi.mock('@infrastructure/services/holidays/getHolidays', () => ({
@@ -18,14 +29,20 @@ vi.mock('@domain/calendar/suggestions/generateSuggestions', () => ({
 vi.mock('@domain/calendar/alternatives/generateAlternatives', () => ({
   generateAlternatives: mockGenerateAlternativesImpl,
 }));
+vi.mock('@domain/calendar/utils/cache', () => ({
+  clearDateKeyCache: mockClearDateKeyCache,
+  clearHolidayCache: mockClearHolidayCache,
+}));
+
+const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
 
 vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({
-  getBetterStackInstance: vi.fn().mockReturnValue({ logError: vi.fn(), warn: vi.fn() }),
+  getBetterStackInstance: vi.fn().mockReturnValue({ logError: mockLogError, warn: mockWarn }),
 }));
 
 vi.mock('./crypto', () => ({
-  encryptedStorage: {
-    getItem: vi.fn().mockResolvedValue(null),
+  obfuscatedStorage: {
+    getItem: mockStorageGetItem,
     setItem: vi.fn().mockResolvedValue(undefined),
     removeItem: vi.fn().mockResolvedValue(undefined),
   },
@@ -72,7 +89,6 @@ const INITIAL = {
   maxAlternatives: 4,
   alternatives: [],
   currentSelection: null,
-  previewAlternativeSelection: null,
   previewAlternativeIndex: 0,
   currentSelectionIndex: 0,
   manuallySelectedDays: [],
@@ -108,6 +124,23 @@ describe('addHoliday', () => {
       carryOverMonths: 1,
     });
     expect(useHolidaysStore.getState().holidays).toHaveLength(1);
+  });
+
+  it('warns about the duplicate without blocking the action on the logging client', async () => {
+    const date = new Date('2026-01-01');
+    useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')] });
+
+    useHolidaysStore.getState().addHoliday({
+      holiday: { name: 'Duplicate', date, type: 'public' },
+      locale: 'en',
+      year: 2026,
+      carryOverMonths: 1,
+    });
+
+    expect(mockWarn).not.toHaveBeenCalled();
+    await vi.waitFor(() =>
+      expect(mockWarn).toHaveBeenCalledWith('Holiday already exists on this date', { date: date.toISOString() })
+    );
   });
 
   it('sorts holidays by date after adding', () => {
@@ -342,6 +375,18 @@ describe('toggleDaySelection', () => {
     expect(useHolidaysStore.getState().removedSuggestedDays).toHaveLength(1);
   });
 
+  it('recomputes the metrics against the planning year held by the filters store', async () => {
+    const { generateMetrics } = await import('@domain/calendar/metrics/generateMetrics');
+    useFiltersStore.setState({ year: 2029 });
+    useHolidaysStore.setState({
+      currentSelection: makeSuggestion([baseDate]),
+      manuallySelectedDays: [],
+      removedSuggestedDays: [],
+    });
+    useHolidaysStore.getState().toggleDaySelection({ date: baseDate, ...PARAMS });
+    expect(vi.mocked(generateMetrics).mock.lastCall?.[0].year).toBe(2029);
+  });
+
   it('returns false and does not add a day when no remaining budget', () => {
     const suggestion = makeSuggestion([
       new Date('2026-05-01'),
@@ -391,13 +436,12 @@ describe('setCalculating', () => {
 });
 
 describe('setCurrentAlternativeSelection', () => {
-  it('sets currentSelection, previewAlternativeSelection and index', () => {
+  it('sets currentSelection and both indices', () => {
     const suggestion = makeSuggestion([new Date('2026-06-01')]);
     useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion, index: 2 });
     const state = useHolidaysStore.getState();
     expect(state.currentSelection).toBe(suggestion);
     expect(state.currentSelectionIndex).toBe(2);
-    expect(state.previewAlternativeSelection).toBe(suggestion);
     expect(state.previewAlternativeIndex).toBe(2);
   });
 
@@ -414,12 +458,10 @@ describe('setCurrentAlternativeSelection', () => {
 });
 
 describe('setPreviewAlternativeSelection', () => {
-  it('sets previewAlternativeSelection and previewAlternativeIndex', () => {
+  it('sets previewAlternativeIndex', () => {
     const suggestion = makeSuggestion([new Date('2026-08-01')]);
     useHolidaysStore.getState().setPreviewAlternativeSelection({ suggestion, index: 1 });
-    const state = useHolidaysStore.getState();
-    expect(state.previewAlternativeSelection).toBe(suggestion);
-    expect(state.previewAlternativeIndex).toBe(1);
+    expect(useHolidaysStore.getState().previewAlternativeIndex).toBe(1);
   });
 
   it('does not modify currentSelection or manuallySelectedDays', () => {
@@ -428,7 +470,9 @@ describe('setPreviewAlternativeSelection', () => {
       currentSelection: currentSuggestion,
       manuallySelectedDays: [new Date('2026-01-10')],
     });
-    useHolidaysStore.getState().setPreviewAlternativeSelection({ suggestion: makeSuggestion([new Date('2026-08-01')]), index: 1 });
+    useHolidaysStore
+      .getState()
+      .setPreviewAlternativeSelection({ suggestion: makeSuggestion([new Date('2026-08-01')]), index: 1 });
     const state = useHolidaysStore.getState();
     expect(state.currentSelection).toBe(currentSuggestion);
     expect(state.manuallySelectedDays).toHaveLength(1);
@@ -484,10 +528,149 @@ describe('fetchHolidays', () => {
     expect(holidays.find((h) => h.id === 'fetched-1')).toBeUndefined();
   });
 
-  it('sets holidays to empty and logs on error', async () => {
+  it('keeps custom holidays and drops the fetched ones on error', async () => {
+    const custom = makeHoliday('custom-1', '2026-05-01', HolidayVariant.CUSTOM);
+    useHolidaysStore.setState({ holidays: [custom, makeHoliday('national-1', '2026-01-01')] });
+    mockGetHolidays.mockRejectedValueOnce(new Error('network error'));
+    await useHolidaysStore.getState().fetchHolidays(FETCH_PARAMS);
+    expect(useHolidaysStore.getState().holidays).toEqual([custom]);
+  });
+
+  it('sets holidays to empty on error when there are no custom holidays', async () => {
+    useHolidaysStore.setState({ holidays: [makeHoliday('national-1', '2026-01-01')] });
     mockGetHolidays.mockRejectedValueOnce(new Error('network error'));
     await useHolidaysStore.getState().fetchHolidays(FETCH_PARAMS);
     expect(useHolidaysStore.getState().holidays).toHaveLength(0);
+  });
+
+  it('logs the failure with the planning inputs', async () => {
+    mockGetHolidays.mockRejectedValueOnce(new Error('network error'));
+
+    await useHolidaysStore.getState().fetchHolidays(FETCH_PARAMS);
+
+    await vi.waitFor(() =>
+      expect(mockLogError).toHaveBeenCalledWith('Error fetching holidays in holidays store', expect.any(Error), {
+        year: 2026,
+        country: 'ES',
+        region: '',
+      })
+    );
+  });
+});
+
+describe('pruneDaysOutsideWindow', () => {
+  const WINDOW = { year: 2026, carryOverMonths: 1 };
+  const inYear = new Date(2026, 6, 15);
+  const inCarryOver = new Date(2027, 0, 20);
+  const beforeWindow = new Date(2025, 11, 31);
+  const afterWindow = new Date(2027, 1, 1);
+
+  it('keeps only the manual days inside the planning window', () => {
+    useHolidaysStore.setState({ manuallySelectedDays: [beforeWindow, inYear, inCarryOver, afterWindow] });
+    useHolidaysStore.getState().pruneDaysOutsideWindow(WINDOW);
+    expect(useHolidaysStore.getState().manuallySelectedDays).toEqual([inYear, inCarryOver]);
+  });
+
+  it('keeps only the removed suggested days inside the planning window', () => {
+    useHolidaysStore.setState({ removedSuggestedDays: [inYear, afterWindow] });
+    useHolidaysStore.getState().pruneDaysOutsideWindow(WINDOW);
+    expect(useHolidaysStore.getState().removedSuggestedDays).toEqual([inYear]);
+  });
+
+  it('drops carry-over days once the window no longer reaches them', () => {
+    useHolidaysStore.setState({ manuallySelectedDays: [inYear, inCarryOver] });
+    useHolidaysStore.getState().pruneDaysOutsideWindow({ year: 2026, carryOverMonths: 0 });
+    expect(useHolidaysStore.getState().manuallySelectedDays).toEqual([inYear]);
+  });
+
+  it('leaves the arrays untouched when every day is inside the window', () => {
+    const manuallySelectedDays = [inYear, inCarryOver];
+    useHolidaysStore.setState({ manuallySelectedDays });
+    useHolidaysStore.getState().pruneDaysOutsideWindow(WINDOW);
+    expect(useHolidaysStore.getState().manuallySelectedDays).toBe(manuallySelectedDays);
+  });
+
+  it('falls back to the window held by the filters store', () => {
+    useFiltersStore.setState({ year: 2026, carryOverMonths: 1 });
+    useHolidaysStore.setState({ manuallySelectedDays: [inYear, afterWindow] });
+    useHolidaysStore.getState().pruneDaysOutsideWindow();
+    expect(useHolidaysStore.getState().manuallySelectedDays).toEqual([inYear]);
+  });
+});
+
+describe('persistence', () => {
+  const persist = (state: Partial<HolidaysState>) => {
+    const partialize = useHolidaysStore.persist.getOptions().partialize;
+    const persisted = partialize?.({ ...useHolidaysStore.getState(), ...state });
+    return JSON.parse(JSON.stringify(persisted));
+  };
+
+  const rehydrateFrom = async (state: Partial<HolidaysState>) => {
+    mockStorageGetItem.mockResolvedValueOnce({ state: persist(state), version: 1 });
+    await useHolidaysStore.persist.rehydrate();
+    return useHolidaysStore.getState();
+  };
+
+  beforeEach(() => {
+    useFiltersStore.setState({ year: 2026, carryOverMonths: 1 });
+  });
+
+  it('revives persisted days as Date instances', async () => {
+    const state = await rehydrateFrom({
+      holidays: [makeHoliday('h1', '2026-01-01')],
+      suggestion: makeSuggestion([new Date(2026, 4, 1)]),
+      currentSelection: makeSuggestion([new Date(2026, 4, 1)]),
+      manuallySelectedDays: [new Date(2026, 6, 15)],
+      removedSuggestedDays: [new Date(2026, 7, 20)],
+    });
+    expect(state.holidays[0].date).toBeInstanceOf(Date);
+    expect(state.suggestion?.days[0]).toBeInstanceOf(Date);
+    expect(state.currentSelection?.days[0]).toBeInstanceOf(Date);
+    expect(state.manuallySelectedDays[0]).toEqual(new Date(2026, 6, 15));
+    expect(state.removedSuggestedDays[0]).toEqual(new Date(2026, 7, 20));
+  });
+
+  it('restores the applied alternative and mirrors its index into the preview', async () => {
+    const alternatives = [makeSuggestion([new Date(2026, 1, 2)]), makeSuggestion([new Date(2026, 2, 3)])];
+    const state = await rehydrateFrom({
+      suggestion: makeSuggestion([new Date(2026, 0, 1)]),
+      alternatives,
+      currentSelection: alternatives[1],
+      currentSelectionIndex: 2,
+    });
+    expect(state.currentSelectionIndex).toBe(2);
+    expect(state.previewAlternativeIndex).toBe(2);
+    expect(state.currentSelection?.days[0]).toEqual(new Date(2026, 2, 3));
+  });
+
+  it('falls back to the base suggestion when the persisted index names no alternative', async () => {
+    const suggestion = makeSuggestion([new Date(2026, 0, 1)]);
+    const state = await rehydrateFrom({
+      suggestion,
+      alternatives: [],
+      currentSelection: makeSuggestion([new Date(2026, 2, 3)]),
+      currentSelectionIndex: 3,
+    });
+    expect(state.currentSelectionIndex).toBe(0);
+    expect(state.currentSelection?.days).toEqual(suggestion.days);
+  });
+
+  it('prunes days belonging to another planning window', async () => {
+    const state = await rehydrateFrom({
+      manuallySelectedDays: [new Date(2026, 6, 15), new Date(2027, 6, 15)],
+      removedSuggestedDays: [new Date(2027, 6, 16)],
+    });
+    expect(state.manuallySelectedDays).toEqual([new Date(2026, 6, 15)]);
+    expect(state.removedSuggestedDays).toEqual([]);
+  });
+
+  it('clears the stored blob when rehydration fails', () => {
+    const removeItem = vi.fn();
+    vi.stubGlobal('localStorage', { removeItem });
+    const listener = useHolidaysStore.persist.getOptions().onRehydrateStorage?.(useHolidaysStore.getState());
+    expect(() => listener?.(undefined, new Error('deobfuscate failed'))).not.toThrow();
+    expect(removeItem).toHaveBeenCalledWith('holidays-store');
+    vi.unstubAllGlobals();
   });
 });
 
@@ -537,9 +720,29 @@ describe('generateSuggestions', () => {
     expect(useHolidaysStore.getState().suggestion).toBeNull();
     expect(useHolidaysStore.getState().alternatives).toHaveLength(0);
   });
+
+  it('clears the calendar caches before running the engine', async () => {
+    useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')] });
+    mockGenerateSuggestionsImpl.mockImplementationOnce(() => {
+      expect(mockClearDateKeyCache).toHaveBeenCalled();
+      expect(mockClearHolidayCache).toHaveBeenCalled();
+      return { days: [new Date('2026-06-01')], bridges: [] };
+    });
+    await useHolidaysStore.getState().generateSuggestions(PARAMS);
+    expect(mockClearDateKeyCache).toHaveBeenCalledTimes(1);
+    expect(mockClearHolidayCache).toHaveBeenCalledTimes(1);
+  });
+
+  it('clears the holiday cache again on a second run so a new holiday set is honoured', async () => {
+    useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')] });
+    await useHolidaysStore.getState().generateSuggestions(PARAMS);
+    useHolidaysStore.setState({ holidays: [makeHoliday('h2', '2026-08-15')] });
+    await useHolidaysStore.getState().generateSuggestions(PARAMS);
+    expect(mockClearHolidayCache).toHaveBeenCalledTimes(2);
+  });
 });
 
-describe('generateAlternatives', () => {
+describe('generateSuggestions agrees with the worker', () => {
   const PARAMS = {
     year: 2026,
     ptoDays: 5,
@@ -549,49 +752,98 @@ describe('generateAlternatives', () => {
     locale: 'en' as const,
   };
 
-  it('sets alternatives to empty when ptoDays is 0', async () => {
-    useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')], suggestion: makeSuggestion([]) });
-    await useHolidaysStore.getState().generateAlternatives({ ...PARAMS, ptoDays: 0 });
-    expect(useHolidaysStore.getState().alternatives).toHaveLength(0);
-  });
+  const ids = (holidays: HolidayDTO[]) => holidays.map((holiday) => holiday.id);
 
-  it('sets alternatives to empty when holidays list is empty', async () => {
-    useHolidaysStore.setState({ holidays: [], suggestion: makeSuggestion([]) });
-    await useHolidaysStore.getState().generateAlternatives(PARAMS);
-    expect(useHolidaysStore.getState().alternatives).toHaveLength(0);
-  });
-
-  it('sets alternatives to empty when maxAlternatives resolves to 0', async () => {
+  it('blocks manual days as holidays and removed days as removedDays', async () => {
+    const { generateMetrics } = await import('@domain/calendar/metrics/generateMetrics');
+    const removed = new Date('2026-04-20');
     useHolidaysStore.setState({
       holidays: [makeHoliday('h1', '2026-01-01')],
-      suggestion: makeSuggestion([]),
-      maxAlternatives: 0,
+      manuallySelectedDays: [new Date('2026-03-10')],
+      removedSuggestedDays: [removed],
     });
-    await useHolidaysStore.getState().generateAlternatives(PARAMS);
-    expect(useHolidaysStore.getState().alternatives).toHaveLength(0);
+
+    await useHolidaysStore.getState().generateSuggestions(PARAMS);
+
+    expect(ids(mockGenerateSuggestionsImpl.mock.calls[0][0].holidays)).toEqual(['h1', 'manual-0']);
+    expect(mockGenerateSuggestionsImpl.mock.calls[0][0].removedDays).toEqual([removed]);
+    expect(ids(mockGenerateAlternativesImpl.mock.calls[0][0].holidays)).toEqual(['h1', 'manual-0']);
+    expect(mockGenerateAlternativesImpl.mock.calls[0][0].removedDays).toEqual([removed]);
+    expect(ids(vi.mocked(generateMetrics).mock.calls[0][0].holidays)).toEqual(['h1', 'manual-0']);
   });
 
-  it('sets alternatives to empty when there is no base suggestion', async () => {
-    useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')], suggestion: null });
-    await useHolidaysStore.getState().generateAlternatives(PARAMS);
-    expect(useHolidaysStore.getState().alternatives).toHaveLength(0);
-  });
-
-  it('sets alternatives on success', async () => {
-    const suggestion = makeSuggestion([new Date('2026-05-01')]);
-    useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')], suggestion, maxAlternatives: 2 });
-    mockGenerateAlternativesImpl.mockReturnValueOnce([{ days: [new Date('2026-07-01')], bridges: [] }]);
-    await useHolidaysStore.getState().generateAlternatives(PARAMS);
-    expect(useHolidaysStore.getState().alternatives).toHaveLength(1);
-  });
-
-  it('sets alternatives to empty on error', async () => {
-    const suggestion = makeSuggestion([new Date('2026-05-01')]);
-    useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')], suggestion, maxAlternatives: 2 });
-    mockGenerateAlternativesImpl.mockImplementationOnce(() => {
-      throw new Error('alt error');
+  it('marks the manual pseudo-holidays as custom so the planner treats them as blocked dates', async () => {
+    useHolidaysStore.setState({
+      holidays: [],
+      manuallySelectedDays: [new Date('2026-03-10')],
+      removedSuggestedDays: [new Date('2026-04-20')],
     });
-    await useHolidaysStore.getState().generateAlternatives(PARAMS);
+
+    await useHolidaysStore.getState().generateSuggestions(PARAMS);
+
+    const blockedHolidays: HolidayDTO[] = mockGenerateSuggestionsImpl.mock.calls[0][0].holidays;
+    expect(blockedHolidays.every((holiday) => holiday.variant === HolidayVariant.CUSTOM)).toBe(true);
+    expect(blockedHolidays.every((holiday) => holiday.isInSelectedRange)).toBe(true);
+  });
+
+  it('scopes the metrics to the planning year rather than the first placed day', async () => {
+    const { generateMetrics } = await import('@domain/calendar/metrics/generateMetrics');
+    useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')] });
+    mockGenerateSuggestionsImpl.mockReturnValueOnce({ days: [new Date(2027, 0, 4)], bridges: [] });
+
+    await useHolidaysStore.getState().generateSuggestions(PARAMS);
+
+    expect(vi.mocked(generateMetrics).mock.calls[0][0].year).toBe(2026);
+  });
+
+  it('clears the plan without running the engine when only removed days block the calendar', async () => {
+    useHolidaysStore.setState({
+      holidays: [],
+      manuallySelectedDays: [],
+      removedSuggestedDays: [new Date('2026-04-20')],
+      suggestion: makeSuggestion([new Date('2026-06-01')]),
+    });
+
+    await useHolidaysStore.getState().generateSuggestions(PARAMS);
+
+    expect(mockGenerateSuggestionsImpl).not.toHaveBeenCalled();
+    expect(useHolidaysStore.getState().suggestion).toBeNull();
+  });
+
+  it('deducts manual days from the PTO budget', async () => {
+    useHolidaysStore.setState({
+      holidays: [makeHoliday('h1', '2026-01-01')],
+      manuallySelectedDays: [new Date('2026-03-10'), new Date('2026-03-11')],
+    });
+
+    await useHolidaysStore.getState().generateSuggestions(PARAMS);
+
+    expect(mockGenerateSuggestionsImpl).toHaveBeenCalledWith(expect.objectContaining({ ptoDays: 3 }));
+    expect(mockGenerateAlternativesImpl).toHaveBeenCalledWith(expect.objectContaining({ ptoDays: 3 }));
+  });
+
+  it('lets autoSuggestCount win over the manual-day deduction', async () => {
+    useHolidaysStore.setState({
+      holidays: [makeHoliday('h1', '2026-01-01')],
+      manuallySelectedDays: [new Date('2026-03-10')],
+    });
+
+    await useHolidaysStore.getState().generateSuggestions({ ...PARAMS, autoSuggestCount: 2 });
+
+    expect(mockGenerateSuggestionsImpl).toHaveBeenCalledWith(expect.objectContaining({ ptoDays: 2 }));
+  });
+
+  it('clears the plan without running the engine when manual days consume the whole budget', async () => {
+    useHolidaysStore.setState({
+      holidays: [makeHoliday('h1', '2026-01-01')],
+      suggestion: makeSuggestion([new Date('2026-06-01')]),
+      manuallySelectedDays: Array.from({ length: 5 }, (_, i) => new Date(2026, 2, i + 1)),
+    });
+
+    await useHolidaysStore.getState().generateSuggestions(PARAMS);
+
+    expect(mockGenerateSuggestionsImpl).not.toHaveBeenCalled();
+    expect(useHolidaysStore.getState().suggestion).toBeNull();
     expect(useHolidaysStore.getState().alternatives).toHaveLength(0);
   });
 });

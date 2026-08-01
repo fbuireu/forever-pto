@@ -6,7 +6,7 @@ import { TableHeader as BaseTableHeader, TableHead, TableRow } from '@ui/modules
 import { cn } from '@ui/utils/cn';
 import { ArrowUpDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type ReactNode, memo } from 'react';
+import { memo, type ReactNode } from 'react';
 
 interface HolidayTableHeaderProps {
   selectAllButton: ReactNode;
