@@ -118,6 +118,39 @@ describe('BetterStackClient.measureAsync', () => {
   });
 });
 
+describe('a log never fails its caller', () => {
+  it('is a no-op when the BetterStack variables are absent', async () => {
+    vi.resetModules();
+    vi.stubEnv('NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN', '');
+    vi.stubEnv('NEXT_PUBLIC_BETTER_STACK_INGESTING_URL', '');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const { BetterStackClient: Unconfigured } = await import('./client');
+    const client = new Unconfigured();
+
+    expect(() => client.info('hello')).not.toThrow();
+    expect(() => client.logError('boom', new Error('x'))).not.toThrow();
+    expect(mockLogtail.info).not.toHaveBeenCalled();
+    expect(warn).toHaveBeenCalledTimes(1);
+
+    warn.mockRestore();
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it('swallows a transport that throws synchronously', async () => {
+    vi.resetModules();
+    mockLogtail.error.mockImplementationOnce(() => {
+      throw new Error('transport down');
+    });
+
+    const { BetterStackClient: Fresh } = await import('./client');
+    expect(() => new Fresh().error('still fine')).not.toThrow();
+
+    vi.resetModules();
+  });
+});
+
 describe('BetterStackClient.withContext', () => {
   it('returns a new BetterStackClient instance', () => {
     const client = new BetterStackClient();
