@@ -36,6 +36,7 @@ pnpm-debug.log*
 .vscode/
 
 # Cloudflare
+cloudflare-env.d.ts
 .wrangler/
 .open-next
 

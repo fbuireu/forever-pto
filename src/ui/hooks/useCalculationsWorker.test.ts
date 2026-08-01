@@ -1,10 +1,21 @@
+import { type CalculateSuggestionsRequest, WORKER_MESSAGE_TYPE } from '@infrastructure/workers/types';
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { WORKER_MESSAGE_TYPE } from '@infrastructure/workers/types';
 
 const mockSetCalculating = vi.hoisted(() => vi.fn());
 const mockSetCalculationResult = vi.hoisted(() => vi.fn());
-const mockGetState = vi.hoisted(() => vi.fn(() => ({ removedSuggestedDays: [], currentSelection: null })));
+const storeState = vi.hoisted(() => ({
+  manuallySelectedDays: [] as Date[],
+  removedSuggestedDays: [] as Date[],
+  currentSelection: null as { days: Date[] } | null,
+}));
+const mockGetState = vi.hoisted(() =>
+  vi.fn(() => ({
+    removedSuggestedDays: storeState.removedSuggestedDays,
+    currentSelection: storeState.currentSelection,
+    setCalculating: mockSetCalculating,
+  }))
+);
 
 vi.mock('@application/stores/holidays', () => ({
   useHolidaysStore: Object.assign(
@@ -13,7 +24,7 @@ vi.mock('@application/stores/holidays', () => ({
       setCalculationResult: mockSetCalculationResult,
       holidays: [],
       maxAlternatives: 3,
-      manuallySelectedDays: [],
+      manuallySelectedDays: storeState.manuallySelectedDays,
     })),
     { getState: mockGetState }
   ),
@@ -33,11 +44,13 @@ const workerInstance: {
   terminate: typeof mockTerminate;
   onmessage: ((e: MessageEvent) => void) | null;
   onerror: (() => void) | null;
+  onmessageerror: (() => void) | null;
 } = {
   postMessage: mockPostMessage,
   terminate: mockTerminate,
   onmessage: null,
   onerror: null,
+  onmessageerror: null,
 };
 
 function MockWorker() {
@@ -57,10 +70,38 @@ const BASE_PARAMS = {
   locale: 'en',
 };
 
+const MANUAL_DAYS = [new Date(2025, 1, 10), new Date(2025, 1, 11)];
+const REMOVED_DAY = new Date(2025, 3, 7);
+const SUGGESTED_DAYS = [new Date(2025, 3, 7), new Date(2025, 3, 8), new Date(2025, 3, 9)];
+
+const lastRequest = (): CalculateSuggestionsRequest => {
+  const [request] = mockPostMessage.mock.lastCall ?? [];
+  if (!request) throw new Error('the worker was never posted a request');
+  return request as CalculateSuggestionsRequest;
+};
+
+const lastPayload = () => lastRequest().payload;
+
+const deliverResult = () => {
+  act(() => {
+    workerInstance.onmessage?.({
+      data: {
+        type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT,
+        requestId: lastRequest().requestId,
+        payload: { suggestion: { days: [], bridges: [] }, alternatives: [] },
+      },
+    } as MessageEvent);
+  });
+};
+
 beforeEach(() => {
   vi.clearAllMocks();
   workerInstance.onmessage = null;
   workerInstance.onerror = null;
+  workerInstance.onmessageerror = null;
+  storeState.manuallySelectedDays = [];
+  storeState.removedSuggestedDays = [];
+  storeState.currentSelection = null;
 });
 
 describe('useCalculationsWorker', () => {
@@ -72,7 +113,9 @@ describe('useCalculationsWorker', () => {
   it('sets calculating to true when a request starts', () => {
     const { result } = renderHook(() => useCalculationsWorker());
 
-    act(() => { result.current.triggerCalculation(BASE_PARAMS); });
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
 
     expect(mockSetCalculating).toHaveBeenCalledWith(true);
   });
@@ -80,8 +123,12 @@ describe('useCalculationsWorker', () => {
   it('terminates the previous worker before starting a new one', () => {
     const { result } = renderHook(() => useCalculationsWorker());
 
-    act(() => { result.current.triggerCalculation(BASE_PARAMS); });
-    act(() => { result.current.triggerCalculation(BASE_PARAMS); });
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
 
     expect(mockTerminate).toHaveBeenCalled();
   });
@@ -89,19 +136,88 @@ describe('useCalculationsWorker', () => {
   it('posts the calculation request to the worker', () => {
     const { result } = renderHook(() => useCalculationsWorker());
 
-    act(() => { result.current.triggerCalculation(BASE_PARAMS); });
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
 
     expect(mockPostMessage).toHaveBeenCalledWith(
       expect.objectContaining({ type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS, payload: expect.any(Object) })
     );
   });
 
+  it('sends the manual and removed days in the payload', () => {
+    storeState.manuallySelectedDays = MANUAL_DAYS;
+    storeState.removedSuggestedDays = [REMOVED_DAY];
+    const { result } = renderHook(() => useCalculationsWorker());
+
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
+
+    expect(lastPayload().manualDays).toEqual(MANUAL_DAYS.map((d) => d.toISOString()));
+    expect(lastPayload().removedDays).toEqual([REMOVED_DAY.toISOString()]);
+  });
+
+  it('caps autoSuggestCount to the days still active in the current selection', () => {
+    storeState.manuallySelectedDays = MANUAL_DAYS;
+    storeState.removedSuggestedDays = [REMOVED_DAY];
+    storeState.currentSelection = { days: SUGGESTED_DAYS };
+    const { result } = renderHook(() => useCalculationsWorker());
+
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
+
+    expect(lastPayload().autoSuggestCount).toBe(
+      Math.min(BASE_PARAMS.ptoDays - MANUAL_DAYS.length, SUGGESTED_DAYS.length - 1)
+    );
+  });
+
+  it('sends no autoSuggestCount when there is no current selection', () => {
+    const { result } = renderHook(() => useCalculationsWorker());
+
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
+
+    expect(lastPayload().autoSuggestCount).toBeUndefined();
+  });
+
+  it('sends no autoSuggestCount when every suggested day has been removed', () => {
+    storeState.currentSelection = { days: SUGGESTED_DAYS };
+    storeState.removedSuggestedDays = SUGGESTED_DAYS;
+    const { result } = renderHook(() => useCalculationsWorker());
+
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
+
+    expect(lastPayload().autoSuggestCount).toBeUndefined();
+  });
+
+  it('sends no autoSuggestCount when ptoDays changed since the last completed run', () => {
+    storeState.currentSelection = { days: SUGGESTED_DAYS };
+    const { result } = renderHook(() => useCalculationsWorker());
+
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
+    deliverResult();
+    act(() => {
+      result.current.triggerCalculation({ ...BASE_PARAMS, ptoDays: BASE_PARAMS.ptoDays + 3 });
+    });
+
+    expect(lastPayload().autoSuggestCount).toBeUndefined();
+  });
+
   it('calls setCalculationResult and clears calculating on a successful response', () => {
     const { result } = renderHook(() => useCalculationsWorker());
 
-    act(() => { result.current.triggerCalculation(BASE_PARAMS); });
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
 
-    const requestId = (mockPostMessage.mock.lastCall?.[0] as { requestId: string }).requestId;
+    const requestId = lastRequest().requestId;
 
     act(() => {
       workerInstance.onmessage?.({
@@ -120,7 +236,9 @@ describe('useCalculationsWorker', () => {
   it('ignores responses with a stale requestId', () => {
     const { result } = renderHook(() => useCalculationsWorker());
 
-    act(() => { result.current.triggerCalculation(BASE_PARAMS); });
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
 
     act(() => {
       workerInstance.onmessage?.({
@@ -138,18 +256,61 @@ describe('useCalculationsWorker', () => {
   it('clears calculating on worker error', () => {
     const { result } = renderHook(() => useCalculationsWorker());
 
-    act(() => { result.current.triggerCalculation(BASE_PARAMS); });
-    act(() => { workerInstance.onerror?.(); });
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
+    act(() => {
+      workerInstance.onerror?.();
+    });
 
     expect(mockSetCalculating).toHaveBeenCalledWith(false);
+  });
+
+  it('clears calculating when the response cannot be deserialized', () => {
+    const { result } = renderHook(() => useCalculationsWorker());
+
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
+    act(() => {
+      workerInstance.onmessageerror?.();
+    });
+
+    expect(mockSetCalculating).toHaveBeenLastCalledWith(false);
   });
 
   it('terminates the worker on unmount', () => {
     const { result, unmount } = renderHook(() => useCalculationsWorker());
 
-    act(() => { result.current.triggerCalculation(BASE_PARAMS); });
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
     unmount();
 
     expect(mockTerminate).toHaveBeenCalled();
+  });
+
+  it('clears calculating when unmounted with a request in flight', () => {
+    const { result, unmount } = renderHook(() => useCalculationsWorker());
+
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
+    unmount();
+
+    expect(mockSetCalculating).toHaveBeenLastCalledWith(false);
+  });
+
+  it('leaves calculating alone when unmounted with no request in flight', () => {
+    const { result, unmount } = renderHook(() => useCalculationsWorker());
+
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
+    deliverResult();
+    mockSetCalculating.mockClear();
+    unmount();
+
+    expect(mockSetCalculating).not.toHaveBeenCalled();
   });
 });
