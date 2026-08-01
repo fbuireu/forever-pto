@@ -28,8 +28,16 @@ vi.mock('motion/react', async () => {
     m: {
       div: ({ children, initial: _i, animate: _a, transition: _t, style, ...props }: MotionDivProps) =>
         createElement('div', { style, ...props }, children),
-      button: ({ children, initial: _i, animate: _a, transition: _t, variants: _v, whileTap: _wt, style, ...props }: MotionButtonProps) =>
-        createElement('button', { style, ...props }, children),
+      button: ({
+        children,
+        initial: _i,
+        animate: _a,
+        transition: _t,
+        variants: _v,
+        whileTap: _wt,
+        style,
+        ...props
+      }: MotionButtonProps) => createElement('button', { style, ...props }, children),
       span: ({ children, variants: _v, transition: _t, ...props }: MotionSpanProps) =>
         createElement('span', props, children),
     },

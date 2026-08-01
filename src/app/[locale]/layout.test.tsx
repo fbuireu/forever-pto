@@ -17,8 +17,8 @@ vi.mock('next-intl', () => ({
 vi.mock('@ui/modules/providers/BonesProvider', () => ({ BonesProvider: () => null }));
 vi.mock('@ui/modules/shared/cookie-consent/CookieConsentClient', () => ({ CookieConsentClient: () => null }));
 vi.mock('@ui/modules/shared/WebMCP', () => ({ WebMCP: () => null }));
-vi.mock('@ui/modules/tutorial/Analytics', () => ({ Analytics: () => null }));
-vi.mock('@ui/modules/tutorial/BetterStackTracking', () => ({ BetterStackTracking: () => null }));
+vi.mock('@ui/modules/tracking/Analytics', () => ({ Analytics: () => null }));
+vi.mock('@ui/modules/tracking/BetterStackTracking', () => ({ BetterStackTracking: () => null }));
 vi.mock('@ui/modules/core/animate/providers/LazyMotionProvider', () => ({
   LazyMotionProvider: ({ children }: { children: unknown }) => children,
 }));

@@ -30,7 +30,6 @@ function Slider({
   id,
   ...props
 }: SliderProps) {
-  // Normalize value: base-ui may pass number or readonly number[], consumers expect number[]
   const handleValueChange = useCallback(
     (val: number | readonly number[]) => {
       if (!onValueChange) return;
@@ -49,7 +48,6 @@ function Slider({
     [onValueCommitted]
   );
 
-  // Normalize value/defaultValue for base-ui (it accepts number | readonly number[])
   const normalizedValue = Array.isArray(value) ? value : value !== undefined ? value : undefined;
   const normalizedDefaultValue = Array.isArray(defaultValue)
     ? defaultValue

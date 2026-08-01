@@ -51,7 +51,7 @@ const {
 
 vi.mock('stripe', () => ({ default: MockStripeNode }));
 
-const { StripeServerService, StripeServerServiceLive } = await import('./serverService');
+const { isWebhookConfigurationError, StripeServerService, StripeServerServiceLive } = await import('./serverService');
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -64,11 +64,22 @@ afterEach(() => {
 });
 
 describe('StripeServerServiceLive initialisation', () => {
-  it('throws when STRIPE_SECRET_KEY is missing', () => {
+  it('builds the layer even when STRIPE_SECRET_KEY is missing', () => {
     vi.stubEnv('STRIPE_SECRET_KEY', '');
-    expect(() => Effect.runSync(Effect.provide(StripeServerService, StripeServerServiceLive))).toThrow(
-      'STRIPE_SECRET_KEY'
+    expect(() => Effect.runSync(Effect.provide(StripeServerService, StripeServerServiceLive))).not.toThrow();
+  });
+
+  it('fails as PaymentError when STRIPE_SECRET_KEY is missing', async () => {
+    vi.stubEnv('STRIPE_SECRET_KEY', '');
+    const error = await Effect.runPromise(
+      Effect.gen(function* () {
+        const stripe = yield* StripeServerService;
+        return yield* stripe.paymentIntents.create({ amount: 999, currency: 'usd' }).pipe(Effect.flip);
+      }).pipe(Effect.provide(StripeServerServiceLive))
     );
+    expect(error).toBeInstanceOf(PaymentError);
+    expect(error.message).toContain('STRIPE_SECRET_KEY');
+    expect(MockStripeNode).not.toHaveBeenCalled();
   });
 });
 
@@ -145,6 +156,18 @@ describe('StripeServerService.charges.retrieve', () => {
       }).pipe(Effect.provide(StripeServerServiceLive))
     );
     expect(result).toEqual(charge);
+    expect(mockChargesRetrieve).toHaveBeenCalledWith('ch_123', {});
+  });
+
+  it('forwards retrieve params to the SDK', async () => {
+    mockChargesRetrieve.mockResolvedValue({ id: 'ch_123' });
+    await Effect.runPromise(
+      Effect.gen(function* () {
+        const stripe = yield* StripeServerService;
+        return yield* stripe.charges.retrieve('ch_123', { expand: ['balance_transaction'] });
+      }).pipe(Effect.provide(StripeServerServiceLive))
+    );
+    expect(mockChargesRetrieve).toHaveBeenCalledWith('ch_123', { expand: ['balance_transaction'] });
   });
 
   it('wraps SDK errors as PaymentError', async () => {
@@ -260,5 +283,42 @@ describe('StripeServerService.webhooks.constructEvent', () => {
       }).pipe(Effect.provide(StripeServerServiceLive))
     );
     expect(error).toBeInstanceOf(WebhookError);
+    expect(error._tag).toBe('WebhookError');
+  });
+
+  it('marks a missing STRIPE_WEBHOOK_SECRET as a configuration failure, not a delivery one', async () => {
+    vi.stubEnv('STRIPE_WEBHOOK_SECRET', '');
+    const error = await Effect.runPromise(
+      Effect.gen(function* () {
+        const stripe = yield* StripeServerService;
+        return yield* stripe.webhooks.constructEvent('payload', 'sig').pipe(Effect.flip);
+      }).pipe(Effect.provide(StripeServerServiceLive))
+    );
+    expect(isWebhookConfigurationError(error)).toBe(true);
+    expect(mockWebhooksConstructEvent).not.toHaveBeenCalled();
+  });
+
+  it('marks a missing STRIPE_SECRET_KEY as a configuration failure', async () => {
+    vi.stubEnv('STRIPE_SECRET_KEY', '');
+    const error = await Effect.runPromise(
+      Effect.gen(function* () {
+        const stripe = yield* StripeServerService;
+        return yield* stripe.webhooks.constructEvent('payload', 'sig').pipe(Effect.flip);
+      }).pipe(Effect.provide(StripeServerServiceLive))
+    );
+    expect(isWebhookConfigurationError(error)).toBe(true);
+  });
+
+  it('does not mark a genuine signature mismatch as a configuration failure', async () => {
+    mockWebhooksConstructEvent.mockImplementation(() => {
+      throw new StripeSignatureVerificationError('invalid signature');
+    });
+    const error = await Effect.runPromise(
+      Effect.gen(function* () {
+        const stripe = yield* StripeServerService;
+        return yield* stripe.webhooks.constructEvent('payload', 'bad-sig').pipe(Effect.flip);
+      }).pipe(Effect.provide(StripeServerServiceLive))
+    );
+    expect(isWebhookConfigurationError(error)).toBe(false);
   });
 });

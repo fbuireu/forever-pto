@@ -1,6 +1,10 @@
 import { processWebhookEvent } from '@application/use-cases/webhook';
 import { ApiError } from '@infrastructure/api/errors';
-import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
+import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
+import {
+  isWebhookConfigurationError,
+  StripeServerService,
+} from '@infrastructure/clients/payments/stripe/serverService';
 import { ApplicationLayer } from '@infrastructure/layers';
 import { Effect } from 'effect';
 import { headers } from 'next/headers';
@@ -21,18 +25,29 @@ export async function POST(request: NextRequest) {
       yield* processWebhookEvent(event);
       return NextResponse.json({ received: true });
     }).pipe(
+      Effect.catchTag('WebhookError', (e): Effect.Effect<NextResponse, never, LoggerService> => {
+        const { isSignatureError } = e;
+
+        if (!isWebhookConfigurationError(e)) {
+          return Effect.succeed(
+            NextResponse.json(
+              { error: isSignatureError ? ApiError.INVALID_SIGNATURE : ApiError.WEBHOOK_PROCESSING_FAILED },
+              { status: isSignatureError ? 400 : 500 }
+            )
+          );
+        }
+
+        return Effect.gen(function* () {
+          const logger = yield* LoggerService;
+          logger.logError('Stripe webhook is misconfigured, rejecting the delivery as non-retryable', e);
+
+          return NextResponse.json({ error: ApiError.WEBHOOK_MISCONFIGURED }, { status: 400 });
+        });
+      }),
       Effect.provide(ApplicationLayer),
-      Effect.catchTag('WebhookError', (e) =>
-        Effect.succeed(
-          NextResponse.json(
-            { error: e.isSignatureError ? ApiError.INVALID_SIGNATURE : ApiError.WEBHOOK_PROCESSING_FAILED },
-            { status: e.isSignatureError ? 400 : 500 },
-          ),
-        ),
-      ),
       Effect.catchAll(() =>
-        Effect.succeed(NextResponse.json({ error: ApiError.WEBHOOK_PROCESSING_FAILED }, { status: 500 })),
-      ),
-    ),
+        Effect.succeed(NextResponse.json({ error: ApiError.WEBHOOK_PROCESSING_FAILED }, { status: 500 }))
+      )
+    )
   );
 }

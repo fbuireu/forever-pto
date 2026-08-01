@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_CURRENCY, amountFormatter, getCurrencyForLocale, getCurrencySymbol } from './currencies';
+import { amountFormatter, DEFAULT_CURRENCY, getCurrencyForLocale, getCurrencySymbol } from './currencies';
 
 describe('getCurrencyForLocale', () => {
   it('returns DEFAULT_CURRENCY as the currency code', () => {

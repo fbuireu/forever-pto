@@ -2,12 +2,12 @@ import { describe, expect, it, vi } from 'vitest';
 
 const mockDetectCountryFromCDN = vi.hoisted(() => vi.fn<() => Promise<string>>());
 const mockDetectCountryFromHeaders = vi.hoisted(() => vi.fn<() => string>());
-const mockDetectCountryFromIP = vi.hoisted(() => vi.fn<() => Promise<string>>());
+const mockDetectCountryFromEgressIP = vi.hoisted(() => vi.fn<() => Promise<string>>());
 
 vi.mock('./utils/strategies', () => ({
   detectCountryFromCDN: mockDetectCountryFromCDN,
   detectCountryFromHeaders: mockDetectCountryFromHeaders,
-  detectCountryFromIP: mockDetectCountryFromIP,
+  detectCountryFromEgressIP: mockDetectCountryFromEgressIP,
 }));
 
 const { detectCountry } = await import('./detectCountry');
@@ -15,31 +15,31 @@ const { detectCountry } = await import('./detectCountry');
 const mockRequest = {} as never;
 
 describe('detectCountry', () => {
-  it('returns the CDN result when non-empty', async () => {
-    mockDetectCountryFromCDN.mockResolvedValue('es');
+  it('returns the header result when non-empty, without any network call', async () => {
+    mockDetectCountryFromHeaders.mockReturnValue('es');
     expect(await detectCountry(mockRequest)).toBe('es');
-    expect(mockDetectCountryFromHeaders).not.toHaveBeenCalled();
-    expect(mockDetectCountryFromIP).not.toHaveBeenCalled();
+    expect(mockDetectCountryFromCDN).not.toHaveBeenCalled();
+    expect(mockDetectCountryFromEgressIP).not.toHaveBeenCalled();
   });
 
-  it('falls back to headers when CDN returns empty', async () => {
-    mockDetectCountryFromCDN.mockResolvedValue('');
-    mockDetectCountryFromHeaders.mockReturnValue('de');
-    expect(await detectCountry(mockRequest)).toBe('de');
-    expect(mockDetectCountryFromIP).not.toHaveBeenCalled();
-  });
-
-  it('falls back to IP when CDN and headers both return empty', async () => {
-    mockDetectCountryFromCDN.mockResolvedValue('');
+  it('falls back to the CDN when the header is empty', async () => {
     mockDetectCountryFromHeaders.mockReturnValue('');
-    mockDetectCountryFromIP.mockResolvedValue('fr');
+    mockDetectCountryFromCDN.mockResolvedValue('de');
+    expect(await detectCountry(mockRequest)).toBe('de');
+    expect(mockDetectCountryFromEgressIP).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the egress IP when the header and the CDN both return empty', async () => {
+    mockDetectCountryFromHeaders.mockReturnValue('');
+    mockDetectCountryFromCDN.mockResolvedValue('');
+    mockDetectCountryFromEgressIP.mockResolvedValue('fr');
     expect(await detectCountry(mockRequest)).toBe('fr');
   });
 
   it('returns empty string when all strategies fail', async () => {
-    mockDetectCountryFromCDN.mockResolvedValue('');
     mockDetectCountryFromHeaders.mockReturnValue('');
-    mockDetectCountryFromIP.mockResolvedValue('');
+    mockDetectCountryFromCDN.mockResolvedValue('');
+    mockDetectCountryFromEgressIP.mockResolvedValue('');
     expect(await detectCountry(mockRequest)).toBe('');
   });
 });

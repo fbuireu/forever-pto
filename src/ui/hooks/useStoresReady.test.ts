@@ -11,7 +11,10 @@ const makeStoreMock = (hydrated: boolean) => {
         return () => {};
       }),
     },
-    _finish: () => listeners.forEach((cb) => { cb(); }),
+    _finish: () =>
+      listeners.forEach((cb) => {
+        cb();
+      }),
   };
 };
 

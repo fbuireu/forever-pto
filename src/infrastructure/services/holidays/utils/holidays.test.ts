@@ -15,14 +15,12 @@ vi.mock('date-holidays', () => ({ default: MockHolidays }));
 const { getHolidaysForYears, getNationalHolidays, getRegionalHolidays } = await import('./holidays');
 
 const YEAR = 2026;
-const CURRENT_YEAR_HOLIDAYS = [{ date: new Date('2026-01-01'), name: 'New Year' }];
-const NEXT_YEAR_HOLIDAYS = [{ date: new Date('2027-01-01'), name: "New Year's" }];
+const CURRENT_YEAR_HOLIDAYS = [{ date: new Date('2026-01-01'), name: 'New Year', type: 'public' }];
+const NEXT_YEAR_HOLIDAYS = [{ date: new Date('2027-01-01'), name: "New Year's", type: 'public' }];
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockGetHolidays.mockImplementation((year: number) =>
-    year === YEAR ? CURRENT_YEAR_HOLIDAYS : NEXT_YEAR_HOLIDAYS
-  );
+  mockGetHolidays.mockImplementation((year: number) => (year === YEAR ? CURRENT_YEAR_HOLIDAYS : NEXT_YEAR_HOLIDAYS));
 });
 
 describe('getHolidaysForYears', () => {
@@ -39,6 +37,24 @@ describe('getHolidaysForYears', () => {
     expect(result).toHaveLength(2);
     expect(result).toContainEqual(CURRENT_YEAR_HOLIDAYS[0]);
     expect(result).toContainEqual(NEXT_YEAR_HOLIDAYS[0]);
+  });
+
+  it('keeps the types that are genuinely non-working days', () => {
+    const bank = { date: new Date('2026-12-24'), name: 'Christmas Eve', type: 'bank' };
+    mockGetHolidays.mockReturnValueOnce([CURRENT_YEAR_HOLIDAYS[0], bank]).mockReturnValueOnce([]);
+
+    expect(getHolidaysForYears(new MockHolidays() as never, YEAR)).toEqual([CURRENT_YEAR_HOLIDAYS[0], bank]);
+  });
+
+  it('drops the types that are ordinary working days', () => {
+    const observance = { date: new Date('2026-02-14'), name: "Valentine's Day", type: 'observance' };
+    const optional = { date: new Date('2026-03-19'), name: "Father's Day", type: 'optional' };
+    const school = { date: new Date('2026-04-06'), name: 'Easter break', type: 'school' };
+    mockGetHolidays
+      .mockReturnValueOnce([CURRENT_YEAR_HOLIDAYS[0], observance, optional, school])
+      .mockReturnValueOnce([]);
+
+    expect(getHolidaysForYears(new MockHolidays() as never, YEAR)).toEqual([CURRENT_YEAR_HOLIDAYS[0]]);
   });
 });
 

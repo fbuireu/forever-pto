@@ -1,13 +1,15 @@
 import { ApiError } from '@infrastructure/api/errors';
+import { WebhookConfigurationError } from '@infrastructure/clients/payments/stripe/serverService';
 import { WebhookError } from '@infrastructure/errors';
 import { Effect } from 'effect';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockConstructEvent = vi.hoisted(() =>
   vi.fn<(payload: string, sig: string) => Effect.Effect<{ type: string }, WebhookError>>()
 );
 const mockProcessWebhookEvent = vi.hoisted(() => vi.fn<(event: unknown) => Effect.Effect<void, WebhookError>>());
 const mockHeadersGet = vi.hoisted(() => vi.fn<(name: string) => string | null>());
+const mockLogError = vi.hoisted(() => vi.fn());
 
 vi.mock('@application/use-cases/webhook', () => ({
   processWebhookEvent: mockProcessWebhookEvent,
@@ -20,13 +22,23 @@ vi.mock('next/headers', () => ({
 vi.mock('@infrastructure/layers', async () => {
   const { Layer } = await import('effect');
   const { StripeServerService } = await import('@infrastructure/clients/payments/stripe/serverService');
+  const { LoggerService } = await import('@infrastructure/clients/logging/better-stack/service');
   return {
-    ApplicationLayer: Layer.succeed(StripeServerService, {
-      paymentIntents: { create: vi.fn(), retrieve: vi.fn() },
-      charges: { retrieve: vi.fn() },
-      promotionCodes: { list: vi.fn(), retrieve: vi.fn() },
-      webhooks: { constructEvent: mockConstructEvent as never },
-    }),
+    ApplicationLayer: Layer.mergeAll(
+      Layer.succeed(StripeServerService, {
+        paymentIntents: { create: vi.fn(), retrieve: vi.fn() },
+        charges: { retrieve: vi.fn() },
+        promotionCodes: { list: vi.fn(), retrieve: vi.fn() },
+        webhooks: { constructEvent: mockConstructEvent as never },
+      }),
+      Layer.succeed(LoggerService, {
+        debug: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        logError: mockLogError,
+      })
+    ),
   };
 });
 
@@ -39,6 +51,10 @@ function makeRequest(body: string, headers?: Record<string, string>): Request {
     body,
   });
 }
+
+beforeEach(() => {
+  mockLogError.mockClear();
+});
 
 describe('POST /api/webhooks/stripe', () => {
   it('returns 400 when stripe-signature header is missing', async () => {
@@ -80,6 +96,43 @@ describe('POST /api/webhooks/stripe', () => {
     expect(response.status).toBe(500);
     const body = await response.json();
     expect(body.error).toBe(ApiError.WEBHOOK_PROCESSING_FAILED);
+  });
+
+  it('does not log a genuine processing failure as a misconfiguration', async () => {
+    mockHeadersGet.mockImplementation((name) => (name === 'stripe-signature' ? 't=123,v1=abc' : null));
+    mockConstructEvent.mockReturnValue(Effect.succeed({ type: 'payment_intent.succeeded' }));
+    mockProcessWebhookEvent.mockReturnValue(
+      Effect.fail(new WebhookError({ message: 'Processing failed', isSignatureError: false }))
+    );
+    await POST(makeRequest('{}') as never);
+    expect(mockLogError).not.toHaveBeenCalled();
+  });
+
+  it('returns a non-retryable 400 when Stripe is misconfigured', async () => {
+    mockHeadersGet.mockImplementation((name) => (name === 'stripe-signature' ? 't=123,v1=abc' : null));
+    mockConstructEvent.mockReturnValue(
+      Effect.fail(
+        new WebhookConfigurationError({ message: 'STRIPE_WEBHOOK_SECRET is not defined', isSignatureError: false })
+      )
+    );
+    const response = await POST(makeRequest('{}') as never);
+    expect(response.status).toBe(400);
+    const body = await response.json();
+    expect(body.error).toBe(ApiError.WEBHOOK_MISCONFIGURED);
+  });
+
+  it('logs a misconfiguration at error level so the 400 does not hide an outage', async () => {
+    mockHeadersGet.mockImplementation((name) => (name === 'stripe-signature' ? 't=123,v1=abc' : null));
+    mockConstructEvent.mockReturnValue(
+      Effect.fail(
+        new WebhookConfigurationError({ message: 'STRIPE_WEBHOOK_SECRET is not defined', isSignatureError: false })
+      )
+    );
+    await POST(makeRequest('{}') as never);
+    expect(mockLogError).toHaveBeenCalledWith(
+      'Stripe webhook is misconfigured, rejecting the delivery as non-retryable',
+      expect.any(WebhookConfigurationError)
+    );
   });
 
   it('returns 500 on unexpected typed error', async () => {

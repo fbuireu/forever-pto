@@ -1,4 +1,4 @@
-@layer base, theme, animations, tutorial, global, vendor;
+@layer base, theme, animations, tutorial, vendor;
 
 @import "tailwindcss";
 @import "tw-animate-css";

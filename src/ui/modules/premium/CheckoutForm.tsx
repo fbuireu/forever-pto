@@ -1,3 +1,5 @@
+'use client';
+
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { useUIStore } from '@application/stores/ui';
@@ -7,12 +9,15 @@ import { confirmPayment } from '@ui/adapters/payments/checkout';
 import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
+import { resolveApiErrorMessage } from '@ui/modules/shared/utils/helpers';
 import { Skeleton } from 'boneyard-js/react';
 import { AlertCircle } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { type FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { ExpressCheckoutFixture } from './ExpressCheckoutFixture';
+
+const UNKNOWN_PAYMENT_ERROR = 'unknown_error';
 
 async function fireConfetti() {
   const confetti = (await import('canvas-confetti')).default;
@@ -43,14 +48,15 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   const elements = useElements();
   const locale = useLocale();
   const t = useTranslations('checkout');
+  const format = useFormatter();
   const [isExpressReady, setIsExpressReady] = useState(false);
   const [hasExpressOptions, setHasExpressOptions] = useState<boolean | null>(null);
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { getCurrencyFromLocale, currencySymbol } = useUIStore(
+  const { getCurrencyFromLocale, currency } = useUIStore(
     useShallow((state) => ({
       getCurrencyFromLocale: state.getCurrencyFromLocale,
-      currencySymbol: state.currencySymbol,
+      currency: state.currency,
     }))
   );
   const setPremiumStatus = usePremiumStore((state) => state.setPremiumStatus);
@@ -63,12 +69,16 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
     void import('canvas-confetti');
   }, []);
 
-  const formattedAmount = useMemo(() => amount.toFixed(2), [amount]);
+  const formatCurrency = useCallback(
+    (value: number) => format.number(value, { style: 'currency', currency, minimumFractionDigits: 2 }),
+    [format, currency]
+  );
+
+  const formattedAmount = useMemo(() => formatCurrency(amount), [amount, formatCurrency]);
   const discountText = useMemo(() => {
     if (!discountInfo) return null;
-    const saved = (discountInfo.originalAmount - discountInfo.finalAmount).toFixed(2);
-    return t('promoSaved', { saved });
-  }, [discountInfo, t]);
+    return t('promoSaved', { saved: formatCurrency(discountInfo.originalAmount - discountInfo.finalAmount) });
+  }, [discountInfo, t, formatCurrency]);
 
   const processPayment = useCallback(async () => {
     if (!stripe || !elements) return;
@@ -83,9 +93,8 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
     });
 
     if (!result.success) {
-      const errorMsg = result.error ?? t('paymentFailed');
-      setErrorMessage(errorMsg);
-      track('payment_failed', { error: errorMsg });
+      setErrorMessage(resolveApiErrorMessage({ code: result.error, t, fallback: t('paymentFailed') }));
+      track('payment_failed', { error: result.error || UNKNOWN_PAYMENT_ERROR });
     } else {
       if ('sessionData' in result && result.sessionData) {
         setPremiumStatus({
@@ -138,7 +147,6 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
         <div className='text-right'>
           <p className='text-sm text-muted-foreground'>{t('totalAmount')}</p>
           <p className='text-2xl font-bold' aria-live='polite'>
-            {currencySymbol}
             {formattedAmount}
           </p>
           {discountText && (
@@ -206,7 +214,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
           className='w-full bg-green-600 hover:bg-green-700'
           aria-busy={isPending}
         >
-          {isPending ? t('processing') : `${t('pay')} ${currencySymbol}${formattedAmount}`}
+          {isPending ? t('processing') : `${t('pay')} ${formattedAmount}`}
         </Button>
       </form>
     </div>

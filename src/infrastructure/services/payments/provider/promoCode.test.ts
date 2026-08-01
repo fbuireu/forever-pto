@@ -21,17 +21,35 @@ const run = (code: string, amount: number) =>
 const runFlip = (code: string, amount: number) =>
   Effect.runPromise(validatePromoCode(code, amount).pipe(Effect.provide(MockStripeLayer), Effect.flip));
 
-const makePromoCode = (id = 'promo_abc') => ({ id });
-
-const makeCoupon = (overrides: Partial<{
-  valid: boolean;
+type PromoCodeOverrides = Partial<{
+  active: boolean;
+  expires_at: number | null;
   max_redemptions: number | null;
   times_redeemed: number;
-  redeem_by: number | null;
-  percent_off: number | null;
-  amount_off: number | null;
-  name: string | null;
-}> = {}) => ({
+  restrictions: { minimum_amount: number | null; minimum_amount_currency: string | null };
+}>;
+
+const makePromoCode = (overrides: PromoCodeOverrides = {}) => ({
+  id: 'promo_abc',
+  active: true,
+  expires_at: null,
+  max_redemptions: null,
+  times_redeemed: 0,
+  restrictions: { minimum_amount: null, minimum_amount_currency: null },
+  ...overrides,
+});
+
+const makeCoupon = (
+  overrides: Partial<{
+    valid: boolean;
+    max_redemptions: number | null;
+    times_redeemed: number;
+    redeem_by: number | null;
+    percent_off: number | null;
+    amount_off: number | null;
+    name: string | null;
+  }> = {}
+) => ({
   id: 'coup_abc',
   valid: true,
   max_redemptions: null,
@@ -47,9 +65,10 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-const setupMocks = (coupon: ReturnType<typeof makeCoupon>) => {
-  mockList.mockReturnValue(Effect.succeed({ data: [makePromoCode()] }));
-  mockRetrieve.mockReturnValue(Effect.succeed({ coupon }));
+const setupMocks = (coupon: ReturnType<typeof makeCoupon>, promoCodeOverrides: PromoCodeOverrides = {}) => {
+  const promotionCode = makePromoCode(promoCodeOverrides);
+  mockList.mockReturnValue(Effect.succeed({ data: [{ id: promotionCode.id }] }));
+  mockRetrieve.mockReturnValue(Effect.succeed({ ...promotionCode, coupon }));
 };
 
 describe('validatePromoCode', () => {
@@ -114,26 +133,64 @@ describe('validatePromoCode', () => {
 
     it('fails with MIN_AMOUNT_EXCEEDED when finalAmount is below 0.50', async () => {
       setupMocks(makeCoupon({ percent_off: 99, amount_off: null }));
-      const error = await runFlip('BIG', 0.10);
+      const error = await runFlip('BIG', 0.1);
       expect((error as PromoCodeError).code).toBe(PromoCodeErrors.MIN_AMOUNT_EXCEEDED);
+    });
+
+    it('fails with MIN_AMOUNT_EXCEEDED when the amount is below the promotion code minimum', async () => {
+      setupMocks(makeCoupon(), { restrictions: { minimum_amount: 2000, minimum_amount_currency: 'eur' } });
+      const error = await runFlip('LAUNCH50', 15);
+      expect((error as PromoCodeError).code).toBe(PromoCodeErrors.MIN_AMOUNT_EXCEEDED);
+    });
+
+    it('accepts an amount that meets the promotion code minimum', async () => {
+      setupMocks(makeCoupon(), { restrictions: { minimum_amount: 2000, minimum_amount_currency: 'eur' } });
+      await expect(run('LAUNCH50', 20)).resolves.toMatchObject({ finalAmount: 18 });
+    });
+
+    it('ignores a minimum priced in another currency', async () => {
+      setupMocks(makeCoupon(), { restrictions: { minimum_amount: 2000, minimum_amount_currency: 'usd' } });
+      await expect(run('LAUNCH50', 15)).resolves.toMatchObject({ finalAmount: 13.5 });
+    });
+
+    it('fails with USAGE_LIMIT_REACHED when the promotion code redemption cap is reached', async () => {
+      setupMocks(makeCoupon(), { max_redemptions: 100, times_redeemed: 100 });
+      const error = await runFlip('MAXED', 10);
+      expect((error as PromoCodeError).code).toBe(PromoCodeErrors.USAGE_LIMIT_REACHED);
+    });
+
+    it('fails with COUPON_EXPIRED when the promotion code expires_at is in the past', async () => {
+      setupMocks(makeCoupon(), { expires_at: Math.floor(Date.now() / 1000) - 3600 });
+      const error = await runFlip('EXPIRED', 10);
+      expect((error as PromoCodeError).code).toBe(PromoCodeErrors.COUPON_EXPIRED);
+    });
+
+    it('fails with INVALID_OR_EXPIRED when the promotion code is inactive', async () => {
+      setupMocks(makeCoupon(), { active: false });
+      const error = await runFlip('OFF', 10);
+      expect((error as PromoCodeError).code).toBe(PromoCodeErrors.INVALID_OR_EXPIRED);
     });
 
     it('fails with FAILED_TO_LOAD when coupon is null on retrieve', async () => {
       mockList.mockReturnValue(Effect.succeed({ data: [makePromoCode()] }));
-      mockRetrieve.mockReturnValue(Effect.succeed({ coupon: null }));
+      mockRetrieve.mockReturnValue(Effect.succeed({ ...makePromoCode(), coupon: null }));
       const error = await runFlip('NULL', 10);
       expect((error as PromoCodeError).code).toBe(PromoCodeErrors.FAILED_TO_LOAD);
     });
 
     it('fails with FAILED_TO_LOAD when list() rejects', async () => {
-      mockList.mockReturnValue(Effect.fail(new PromoCodeError({ code: PromoCodeErrors.FAILED_TO_LOAD, message: 'network error' })));
+      mockList.mockReturnValue(
+        Effect.fail(new PromoCodeError({ code: PromoCodeErrors.FAILED_TO_LOAD, message: 'network error' }))
+      );
       const error = await runFlip('ERR', 10);
       expect((error as PromoCodeError).code).toBe(PromoCodeErrors.FAILED_TO_LOAD);
     });
 
     it('fails with FAILED_TO_LOAD when retrieve() rejects', async () => {
       mockList.mockReturnValue(Effect.succeed({ data: [makePromoCode()] }));
-      mockRetrieve.mockReturnValue(Effect.fail(new PromoCodeError({ code: PromoCodeErrors.FAILED_TO_LOAD, message: 'retrieve error' })));
+      mockRetrieve.mockReturnValue(
+        Effect.fail(new PromoCodeError({ code: PromoCodeErrors.FAILED_TO_LOAD, message: 'retrieve error' }))
+      );
       const error = await runFlip('ERR', 10);
       expect((error as PromoCodeError).code).toBe(PromoCodeErrors.FAILED_TO_LOAD);
     });

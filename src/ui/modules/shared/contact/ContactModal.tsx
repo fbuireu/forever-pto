@@ -4,15 +4,15 @@ import { type ContactFormData, createContactSchema } from '@application/dto/cont
 import { usePremiumStore } from '@application/stores/premium';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
-import { CircleCheckBig } from '@ui/modules/core/animate/icons/CircleCheckBig';
-import { Button } from '@ui/modules/core/primitives/Button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@ui/modules/core/primitives/Dialog';
+} from '@ui/modules/core/animate/base/Dialog';
+import { CircleCheckBig } from '@ui/modules/core/animate/icons/CircleCheckBig';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { Textarea } from '@ui/modules/core/primitives/Textarea';
@@ -22,6 +22,7 @@ import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { useShallow } from 'zustand/react/shallow';
 import { FormButtons } from '../FormButtons';
+import { resolveApiErrorMessage } from '../utils/helpers';
 
 interface ContactModalProps {
   open: boolean;
@@ -91,8 +92,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
           track('contact_form_submitted');
           setStep(Step.SUCCESS);
         } else {
-          const translatedError = result.error ?? t('failedToSend');
-          setErrorMessage(translatedError);
+          setErrorMessage(resolveApiErrorMessage({ code: result.error, t, fallback: t('failedToSend') }));
           setStep(Step.ERROR);
         }
       } catch (error) {

@@ -1,5 +1,5 @@
-import type { RefObject } from 'react';
 import { act, renderHook } from '@testing-library/react';
+import type { RefObject } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useAutoHeight } from './useAutoHeight';
 
@@ -14,13 +14,16 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.stubGlobal('ResizeObserver', MockResizeObserver);
 
-  vi.stubGlobal('getComputedStyle', vi.fn(() => ({
-    paddingTop: '0px',
-    paddingBottom: '0px',
-    borderTopWidth: '0px',
-    borderBottomWidth: '0px',
-    boxSizing: 'content-box',
-  })));
+  vi.stubGlobal(
+    'getComputedStyle',
+    vi.fn(() => ({
+      paddingTop: '0px',
+      paddingBottom: '0px',
+      borderTopWidth: '0px',
+      borderBottomWidth: '0px',
+      boxSizing: 'content-box',
+    }))
+  );
 });
 
 afterEach(() => {
@@ -78,10 +81,16 @@ describe('useAutoHeight', () => {
 
     const el = attachRef(result.current);
 
-    act(() => { deps = [2]; rerender(); });
+    act(() => {
+      deps = [2];
+      rerender();
+    });
     const firstCount = observe.mock.calls.length;
 
-    act(() => { deps = [3]; rerender(); });
+    act(() => {
+      deps = [3];
+      rerender();
+    });
 
     expect(observe.mock.calls.length).toBeGreaterThan(firstCount);
     el.remove();

@@ -9,25 +9,27 @@ const i18nProxy = createMiddleware(routing);
 
 const PAYMENT_CONFIRMATION_PATH = '/payment/confirmation';
 const MARKDOWN_CACHE_CONTROL = 'public, max-age=3600';
+const MARKDOWN_VARY = 'Accept';
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const accept = request.headers.get('accept') ?? '';
   const pathname = request.nextUrl.pathname;
   const isMarkdownRequest = accept.includes('text/markdown');
-  const isInternalPath = pathname.startsWith('/api/') || pathname.startsWith('/.well-known/');
 
   if (pathname === '/api/markdown') {
     const response = NextResponse.next();
     response.headers.set('Cache-Control', MARKDOWN_CACHE_CONTROL);
+    response.headers.set('Vary', MARKDOWN_VARY);
     return response;
   }
 
-  if (isMarkdownRequest && !isInternalPath) {
+  if (isMarkdownRequest) {
     const markdownUrl = new URL('/api/markdown', request.url);
     markdownUrl.searchParams.set('path', pathname);
 
     const response = NextResponse.rewrite(markdownUrl);
     response.headers.set('Cache-Control', MARKDOWN_CACHE_CONTROL);
+    response.headers.set('Vary', MARKDOWN_VARY);
     return response;
   }
 

@@ -20,18 +20,28 @@ vi.mock('motion/react', async () => {
   const { createElement, Fragment } = await import('react');
   return {
     m: {
-      div: ({ children, initial: _i, animate: _a, exit: _e, layout: _l, transition: _t, variants: _v, custom: _c, style, ...props }: MotionDivProps) =>
-        createElement('div', { style, ...props }, children),
-      button: ({ children, whileTap: _wt, ...props }: MotionButtonProps) =>
-        createElement('button', props, children),
+      div: ({
+        children,
+        initial: _i,
+        animate: _a,
+        exit: _e,
+        layout: _l,
+        transition: _t,
+        variants: _v,
+        custom: _c,
+        style,
+        ...props
+      }: MotionDivProps) => createElement('div', { style, ...props }, children),
+      button: ({ children, whileTap: _wt, ...props }: MotionButtonProps) => createElement('button', props, children),
     },
     AnimatePresence: ({ children }: { children?: ReactNode }) => createElement(Fragment, null, children),
   };
 });
 
 vi.mock('../effects/AutoHeight', () => ({
-  AutoHeight: ({ children, deps: _d, ...props }: ComponentProps<'div'> & { deps?: unknown }) =>
-    <div {...props}>{children}</div>,
+  AutoHeight: ({ children, deps: _d, ...props }: ComponentProps<'div'> & { deps?: unknown }) => (
+    <div {...props}>{children}</div>
+  ),
 }));
 
 vi.mock('../effects/MotionHighlight', () => ({
@@ -43,24 +53,40 @@ import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from './Tabs';
 
 describe('Tabs', () => {
   it('renders with data-slot="tabs"', () => {
-    const { container } = render(<Tabs><span /></Tabs>);
+    const { container } = render(
+      <Tabs>
+        <span />
+      </Tabs>
+    );
     expect(container.querySelector('[data-slot="tabs"]')).not.toBeNull();
   });
 
   it('applies custom className', () => {
-    const { container } = render(<Tabs className='my-tabs'><span /></Tabs>);
+    const { container } = render(
+      <Tabs className='my-tabs'>
+        <span />
+      </Tabs>
+    );
     expect(container.querySelector('[data-slot="tabs"]')?.className).toContain('my-tabs');
   });
 });
 
 describe('TabsList', () => {
   it('has role="tablist"', () => {
-    const { getByRole } = render(<Tabs><TabsList /></Tabs>);
+    const { getByRole } = render(
+      <Tabs>
+        <TabsList />
+      </Tabs>
+    );
     expect(getByRole('tablist')).toBeTruthy();
   });
 
   it('applies custom className', () => {
-    const { getByRole } = render(<Tabs><TabsList className='list-class' /></Tabs>);
+    const { getByRole } = render(
+      <Tabs>
+        <TabsList className='list-class' />
+      </Tabs>
+    );
     expect(getByRole('tablist').className).toContain('list-class');
   });
 });
@@ -68,7 +94,11 @@ describe('TabsList', () => {
 describe('TabsTrigger', () => {
   it('has role="tab"', () => {
     const { getByRole } = render(
-      <Tabs><TabsList><TabsTrigger value='a'>A</TabsTrigger></TabsList></Tabs>
+      <Tabs>
+        <TabsList>
+          <TabsTrigger value='a'>A</TabsTrigger>
+        </TabsList>
+      </Tabs>
     );
     expect(getByRole('tab')).toBeTruthy();
   });
@@ -76,7 +106,9 @@ describe('TabsTrigger', () => {
   it('has data-state="active" when it matches the default value', () => {
     const { getByRole } = render(
       <Tabs defaultValue='a'>
-        <TabsList><TabsTrigger value='a'>A</TabsTrigger></TabsList>
+        <TabsList>
+          <TabsTrigger value='a'>A</TabsTrigger>
+        </TabsList>
       </Tabs>
     );
     expect(getByRole('tab').dataset.state).toBe('active');
@@ -98,7 +130,9 @@ describe('TabsTrigger', () => {
     const onValueChange = vi.fn();
     const { getByText } = render(
       <Tabs defaultValue='a' onValueChange={onValueChange}>
-        <TabsList><TabsTrigger value='b'>B</TabsTrigger></TabsList>
+        <TabsList>
+          <TabsTrigger value='b'>B</TabsTrigger>
+        </TabsList>
       </Tabs>
     );
     fireEvent.click(getByText('B'));

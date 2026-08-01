@@ -1,4 +1,5 @@
 import { ApiError } from '@infrastructure/api/errors';
+import { INVALID_BODY } from '@infrastructure/api/parseJsonBody';
 import { EmailError, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
@@ -44,6 +45,14 @@ function makeRequest(body: unknown): Request {
   });
 }
 
+function makeRawRequest(body: string | null): Request {
+  return new Request('http://localhost/api/contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body,
+  });
+}
+
 describe('POST /api/contact', () => {
   it('returns 200 with success on valid submission', async () => {
     mockSendContactEmail.mockReturnValue(Effect.succeed({ deferred: Effect.void }));
@@ -64,6 +73,21 @@ describe('POST /api/contact', () => {
     expect(body.error).toBe('Email is required');
   });
 
+  it('returns 400 with the validation shape when the body is malformed', async () => {
+    const response = await POST(makeRawRequest('{not json') as never);
+    expect(response.status).toBe(400);
+    const body = await response.json();
+    expect(body.success).toBe(false);
+    expect(body.error).toBe(INVALID_BODY);
+  });
+
+  it('returns 400 with the validation shape when the body is empty', async () => {
+    const response = await POST(makeRawRequest(null) as never);
+    expect(response.status).toBe(400);
+    const body = await response.json();
+    expect(body.error).toBe(INVALID_BODY);
+  });
+
   it('returns 500 on EmailError', async () => {
     mockSendContactEmail.mockReturnValue(Effect.fail(new EmailError({ message: 'SMTP failed' })));
     const response = await POST(makeRequest({ email: 'test@example.com' }) as never);
@@ -74,7 +98,6 @@ describe('POST /api/contact', () => {
   });
 
   it('returns 500 on unexpected typed error', async () => {
-    // A typed error that slips through catchTags falls to catchAll
     mockSendContactEmail.mockReturnValue(
       Effect.fail(new Error('unexpected')) as unknown as Effect.Effect<
         { deferred: Effect.Effect<void, never, never> },

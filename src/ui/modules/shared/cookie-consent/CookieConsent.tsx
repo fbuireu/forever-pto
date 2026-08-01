@@ -42,7 +42,7 @@ export const CookieConsent = () => {
       setShowBanner(false);
       setShowPreferences(false);
     },
-    [updateGtagConsent],
+    [updateGtagConsent]
   );
 
   const handleAcceptAll = useCallback(() => {

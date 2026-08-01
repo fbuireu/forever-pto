@@ -10,7 +10,12 @@ type MotionButtonProps = ComponentProps<'button'> & {
   exit?: unknown;
   transition?: unknown;
 };
-type MotionSvgProps = ComponentProps<'svg'> & { initial?: unknown; animate?: unknown; exit?: unknown; transition?: unknown };
+type MotionSvgProps = ComponentProps<'svg'> & {
+  initial?: unknown;
+  animate?: unknown;
+  exit?: unknown;
+  transition?: unknown;
+};
 type MotionPathProps = ComponentProps<'path'> & { variants?: unknown };
 
 vi.mock('motion/react', async () => {
@@ -18,8 +23,10 @@ vi.mock('motion/react', async () => {
   return {
     m: {
       button: forwardRef<HTMLButtonElement, MotionButtonProps>(
-        ({ children, whileTap: _wt, whileHover: _wh, initial: _i, animate: _a, exit: _e, transition: _t, ...props }, ref) =>
-          createElement('button', { ref, ...props }, children)
+        (
+          { children, whileTap: _wt, whileHover: _wh, initial: _i, animate: _a, exit: _e, transition: _t, ...props },
+          ref
+        ) => createElement('button', { ref, ...props }, children)
       ),
       svg: ({ children, initial: _i, animate: _a, exit: _e, transition: _t, ...props }: MotionSvgProps) =>
         createElement('svg', props, children),
@@ -43,7 +50,13 @@ vi.mock('@base-ui/react/checkbox', async () => {
     ({ children, onCheckedChange, checked, defaultChecked: _dc, render: _r, keepMounted: _km, ...props }, ref) =>
       createElement(
         'button',
-        { ref, 'data-slot': 'checkbox', 'data-checked': checked, onClick: () => onCheckedChange?.(!checked, {}), ...props },
+        {
+          ref,
+          'data-slot': 'checkbox',
+          'data-checked': checked,
+          onClick: () => onCheckedChange?.(!checked, {}),
+          ...props,
+        },
         children
       )
   );

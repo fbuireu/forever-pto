@@ -1,6 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { addDays, toIcsDate } from '@application/shared/utils/dates';
-import type { Suggestion } from '@domain/calendar/types';
 import { sanitize } from './utils/sanitizer';
 
 interface IcsEvent {
@@ -27,7 +26,7 @@ export interface GenerateIcsOptions {
   calendarName: string;
   ptoDayLabel: string;
   holidays: HolidayDTO[];
-  suggestion: Suggestion | null;
+  ptoDays: Date[];
   includeHolidays: boolean;
   includePto: boolean;
 }
@@ -37,7 +36,7 @@ export function generateIcs({
   calendarName,
   ptoDayLabel,
   holidays,
-  suggestion,
+  ptoDays,
   includeHolidays,
   includePto,
 }: GenerateIcsOptions) {
@@ -49,8 +48,8 @@ export function generateIcs({
     }
   }
 
-  if (includePto && suggestion) {
-    for (const day of suggestion.days) {
+  if (includePto) {
+    for (const day of ptoDays) {
       events.push(buildEvent({ uid: `pto-${toIcsDate(day)}`, start: day, summary: ptoDayLabel, categories: 'PTO' }));
     }
   }

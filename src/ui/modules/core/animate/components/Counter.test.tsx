@@ -27,9 +27,7 @@ vi.mock('motion/react', async () => {
 });
 
 vi.mock('../text/SlidingNumber', () => ({
-  SlidingNumber: ({ number }: { number: number }) => (
-    <span data-testid='sliding-number'>{number}</span>
-  ),
+  SlidingNumber: ({ number }: { number: number }) => <span data-testid='sliding-number'>{number}</span>,
 }));
 
 import { Counter } from './Counter';
@@ -75,30 +73,22 @@ describe('Counter', () => {
   });
 
   it('disables decrement button via decrementButtonProps', () => {
-    const { getByText } = render(
-      <Counter number={5} setNumber={vi.fn()} decrementButtonProps={{ disabled: true }} />
-    );
+    const { getByText } = render(<Counter number={5} setNumber={vi.fn()} decrementButtonProps={{ disabled: true }} />);
     expect((getByText('−') as HTMLButtonElement).disabled).toBe(true);
   });
 
   it('does not disable increment when only decrementButtonProps.disabled is set', () => {
-    const { getByText } = render(
-      <Counter number={5} setNumber={vi.fn()} decrementButtonProps={{ disabled: true }} />
-    );
+    const { getByText } = render(<Counter number={5} setNumber={vi.fn()} decrementButtonProps={{ disabled: true }} />);
     expect((getByText('+') as HTMLButtonElement).disabled).toBe(false);
   });
 
   it('disables increment button via incrementButtonProps', () => {
-    const { getByText } = render(
-      <Counter number={5} setNumber={vi.fn()} incrementButtonProps={{ disabled: true }} />
-    );
+    const { getByText } = render(<Counter number={5} setNumber={vi.fn()} incrementButtonProps={{ disabled: true }} />);
     expect((getByText('+') as HTMLButtonElement).disabled).toBe(true);
   });
 
   it('does not disable decrement when only incrementButtonProps.disabled is set', () => {
-    const { getByText } = render(
-      <Counter number={5} setNumber={vi.fn()} incrementButtonProps={{ disabled: true }} />
-    );
+    const { getByText } = render(<Counter number={5} setNumber={vi.fn()} incrementButtonProps={{ disabled: true }} />);
     expect((getByText('−') as HTMLButtonElement).disabled).toBe(false);
   });
 });

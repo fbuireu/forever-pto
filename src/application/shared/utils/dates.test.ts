@@ -78,7 +78,7 @@ describe('addMonths', () => {
   it('constrains to last day when target month is shorter', () => {
     const result = addMonths(new Date(2024, 0, 31), 1);
     expect(result.getMonth()).toBe(1);
-    expect(result.getDate()).toBe(29); // 2024 is leap year
+    expect(result.getDate()).toBe(29);
   });
 });
 

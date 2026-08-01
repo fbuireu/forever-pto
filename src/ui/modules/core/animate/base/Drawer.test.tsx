@@ -23,7 +23,11 @@ import { Drawer, DrawerContent, DrawerTitle } from './Drawer';
 
 describe('Drawer', () => {
   it('renders with data-slot="drawer"', () => {
-    const { container } = render(<Drawer><span /></Drawer>);
+    const { container } = render(
+      <Drawer>
+        <span />
+      </Drawer>
+    );
     expect(container.querySelector('[data-slot="drawer"]')).not.toBeNull();
   });
 });

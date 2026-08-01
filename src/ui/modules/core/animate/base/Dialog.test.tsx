@@ -5,9 +5,15 @@ import { describe, expect, it, vi } from 'vitest';
 type MockProps = { children?: ReactNode; className?: string };
 
 vi.mock('../primitives/base/Dialog', () => ({
-  Dialog: ({ children, ...props }: ComponentProps<'div'>) => <div data-primitive='dialog' {...props}>{children}</div>,
+  Dialog: ({ children, ...props }: ComponentProps<'div'>) => (
+    <div data-primitive='dialog' {...props}>
+      {children}
+    </div>
+  ),
   DialogTrigger: ({ children, ...props }: ComponentProps<'button'>) => (
-    <button data-primitive='dialog-trigger' {...props}>{children}</button>
+    <button data-primitive='dialog-trigger' {...props}>
+      {children}
+    </button>
   ),
   DialogPortal: ({ children }: MockProps) => <>{children}</>,
   DialogBackdrop: ({ className, ...props }: ComponentProps<'div'>) => (
@@ -59,7 +65,13 @@ import {
 
 describe('Dialog', () => {
   it('renders without throwing', () => {
-    expect(() => render(<Dialog><span /></Dialog>)).not.toThrow();
+    expect(() =>
+      render(
+        <Dialog>
+          <span />
+        </Dialog>
+      )
+    ).not.toThrow();
   });
 });
 

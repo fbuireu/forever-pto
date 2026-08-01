@@ -1,16 +1,16 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Lock } from '@ui/modules/core/animate/icons/Lock';
-import { Banner } from '@ui/modules/core/primitives/Banner';
-import { Button } from '@ui/modules/core/primitives/Button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@ui/modules/core/primitives/Dialog';
+} from '@ui/modules/core/animate/base/Dialog';
+import { Lock } from '@ui/modules/core/animate/icons/Lock';
+import { Banner } from '@ui/modules/core/primitives/Banner';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { AlertCircle, Crown, Loader2 } from 'lucide-react';

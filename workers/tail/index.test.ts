@@ -109,6 +109,36 @@ describe('tail worker', () => {
     });
   });
 
+  describe('url redaction', () => {
+    it('strips the query string so credentials in it never reach the log sink', async () => {
+      await worker.tail([makeEvent({
+        event: {
+          request: {
+            url: 'https://forever-pto.com/en/payment/confirmation?payment_intent=pi_3Abc&payment_intent_client_secret=pi_3Abc_secret_XYZ',
+            method: 'GET',
+            headers: {},
+          },
+          response: { status: 200 },
+        },
+        logs: [{ message: ['boom'], level: 'error', timestamp: 1 }],
+      })], ENV);
+      const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
+      const body = JSON.parse(options.body as string);
+      expect(body[0].url).toBe('https://forever-pto.com/en/payment/confirmation');
+      expect(options.body as string).not.toContain('secret_XYZ');
+    });
+
+    it('sets url to undefined when the request url is unparseable', async () => {
+      await worker.tail([makeEvent({
+        event: { request: { url: 'not a url', method: 'GET', headers: {} }, response: { status: 500 } },
+        logs: [{ message: ['boom'], level: 'error', timestamp: 1 }],
+      })], ENV);
+      const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
+      const body = JSON.parse(options.body as string);
+      expect(body[0].url).toBeUndefined();
+    });
+  });
+
   describe('null event', () => {
     it('sets url, method and status to undefined when event is null', async () => {
       await worker.tail([makeEvent({ event: null, logs: [{ message: ['msg'], level: 'log', timestamp: 1 }] })], ENV);

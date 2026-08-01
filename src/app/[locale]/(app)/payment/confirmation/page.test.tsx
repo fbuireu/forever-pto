@@ -1,14 +1,19 @@
 import type { PaymentConfirmationDTO } from '@application/dto/payment/types';
-import { EN } from '@infrastructure/i18n/locales';
+import { DE, EN } from '@infrastructure/i18n/locales';
+import { render } from '@testing-library/react';
 import { Effect, Layer } from 'effect';
+import { createFormatter } from 'next-intl';
+import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+const NON_BREAKING_SPACES = /[  ]/g;
 
 const PAYMENT_INTENT_ID = 'pi_test_123';
 
 const mockRedirect = vi.fn();
 const mockLogger = { warn: vi.fn(), logError: vi.fn() };
 const mockGetTranslations = vi.fn();
-const mockGetCurrencySymbol = vi.fn().mockReturnValue('$');
+const mockGetFormatter = vi.fn();
 const mockConfirmation = vi.hoisted(() => vi.fn());
 
 vi.mock('next/navigation', () => ({ redirect: mockRedirect }));
@@ -25,10 +30,7 @@ vi.mock('@infrastructure/services/payments/confirmation', () => ({
 
 vi.mock('next-intl/server', () => ({
   getTranslations: mockGetTranslations,
-}));
-
-vi.mock('@ui/utils/currencies', () => ({
-  getCurrencySymbol: mockGetCurrencySymbol,
+  getFormatter: mockGetFormatter,
 }));
 
 vi.mock('@application/i18n/navigation', () => ({
@@ -39,13 +41,16 @@ vi.mock('@ui/modules/core/primitives/Button', () => ({
   Button: vi.fn().mockReturnValue(null),
 }));
 
-vi.mock('@ui/modules/core/primitives/Card', () => ({
-  Card: vi.fn().mockReturnValue(null),
-  CardContent: vi.fn().mockReturnValue(null),
-  CardDescription: vi.fn().mockReturnValue(null),
-  CardHeader: vi.fn().mockReturnValue(null),
-  CardTitle: vi.fn().mockReturnValue(null),
-}));
+vi.mock('@ui/modules/core/primitives/Card', () => {
+  const passthrough = ({ children }: { children?: ReactNode }) => <div>{children}</div>;
+  return {
+    Card: passthrough,
+    CardContent: passthrough,
+    CardDescription: passthrough,
+    CardHeader: passthrough,
+    CardTitle: passthrough,
+  };
+});
 
 vi.mock('lucide-react', () => ({
   CheckCircle2: vi.fn().mockReturnValue(null),
@@ -72,6 +77,7 @@ describe('payment/confirmation page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetTranslations.mockResolvedValue(vi.fn((key: string) => `t:${key}`));
+    mockGetFormatter.mockResolvedValue(createFormatter({ locale: EN }));
     mockConfirmation.mockReturnValue(Effect.succeed(SUCCESS_CONFIRMATION));
   });
 
@@ -127,9 +133,32 @@ describe('payment/confirmation page', () => {
       expect(mockGetTranslations).toHaveBeenCalledWith('paymentConfirmation.success');
     });
 
-    it('calls getCurrencySymbol with locale and currency', async () => {
-      await PaymentSuccessPage(makeSuccessParams());
-      expect(mockGetCurrencySymbol).toHaveBeenCalledWith(expect.objectContaining({ locale: EN, currency: 'USD' }));
+    it('builds the formatter for the requested locale', async () => {
+      await PaymentSuccessPage(makeParams(DE, PAYMENT_INTENT_ID));
+      expect(mockGetFormatter).toHaveBeenCalledWith({ locale: DE });
+    });
+  });
+
+  describe('amount formatting', () => {
+    const renderAmount = async (locale: string, currency: string, amount: number) => {
+      mockGetFormatter.mockResolvedValue(createFormatter({ locale }));
+      mockConfirmation.mockReturnValueOnce(
+        Effect.succeed({ id: PAYMENT_INTENT_ID, status: 'succeeded', amount, currency })
+      );
+      const { container } = render(await PaymentSuccessPage(makeParams(locale, PAYMENT_INTENT_ID)));
+      return (container.textContent ?? '').replace(NON_BREAKING_SPACES, ' ');
+    };
+
+    it('renders a German amount with comma decimals and a trailing symbol', async () => {
+      expect(await renderAmount(DE, 'eur', 12.5)).toContain('12,50 €');
+    });
+
+    it('renders an English amount with a leading symbol and dot decimals', async () => {
+      expect(await renderAmount(EN, 'usd', 12.5)).toContain('$12.50');
+    });
+
+    it('groups thousands in the amount', async () => {
+      expect(await renderAmount(EN, 'usd', 1234.5)).toContain('$1,234.50');
     });
   });
 });

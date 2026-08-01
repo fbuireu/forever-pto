@@ -429,6 +429,7 @@ function AnimateIcon({
         animate,
         initialOnAnimateEnd,
         completeOnStop,
+        persistOnAnimateEnd,
         delay,
       }}
     >
@@ -535,6 +536,7 @@ function IconWrapper<T extends string>({
           active: parentActive,
           animate: parentAnimate,
           initialOnAnimateEnd: parentInitialOnAnimateEnd,
+          persistOnAnimateEnd: parentPersistOnAnimateEnd,
           delay: parentDelay,
           completeOnStop: parentCompleteOnStop,
         }}

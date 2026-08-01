@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { PaymentError, PromoCodeError, PromoCodeErrors } from '@infrastructure/errors';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -5,10 +7,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mockCreatePaymentAction = vi.hoisted(() => vi.fn());
 const mockLogError = vi.hoisted(() => vi.fn());
 const mockLoggerError = vi.hoisted(() => vi.fn());
+const mockLoggerWarn = vi.hoisted(() => vi.fn());
 
 vi.mock('@infrastructure/actions/payment', () => ({ createPaymentAction: mockCreatePaymentAction }));
 vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({
-  getBetterStackInstance: vi.fn(() => ({ logError: mockLogError, error: mockLoggerError })),
+  getBetterStackInstance: vi.fn(() => ({ logError: mockLogError, error: mockLoggerError, warn: mockLoggerWarn })),
 }));
 
 const mockFetch = vi.fn();
@@ -25,6 +28,18 @@ const BASE_CONFIRM_PARAMS = {
   email: 'user@example.com',
   returnUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/en/payment/confirmation`,
 };
+
+describe('logging imports', () => {
+  const source = readFileSync(resolve(process.cwd(), 'src/ui/adapters/payments/checkout.ts'), 'utf8');
+
+  it('reaches the BetterStack client through a dynamic import only', () => {
+    expect(source).toMatch(/import\('@infrastructure\/clients\/logging\/better-stack\/client'\)/);
+  });
+
+  it('has no value-level static import of the BetterStack client', () => {
+    expect(source).not.toMatch(/^import (?!type )[^\n]*better-stack\/client/m);
+  });
+});
 
 describe('initializePayment', () => {
   beforeEach(() => {
@@ -63,9 +78,9 @@ describe('initializePayment', () => {
       error: PromoCodeErrors.COUPON_EXPIRED,
     });
 
-    await expect(initializePayment({ amount: 100, email: 'user@example.com', promoCode: 'BAD' })).rejects.toBeInstanceOf(
-      PromoCodeError
-    );
+    await expect(
+      initializePayment({ amount: 100, email: 'user@example.com', promoCode: 'BAD' })
+    ).rejects.toBeInstanceOf(PromoCodeError);
   });
 
   it('carries the promo code error code', async () => {
@@ -115,7 +130,9 @@ describe('confirmPayment', () => {
 
   it('returns failure when stripe.confirmPayment returns an error', async () => {
     (mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
-    (mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({ error: { message: 'declined by bank' } });
+    (mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({
+      error: { message: 'declined by bank' },
+    });
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
@@ -136,7 +153,7 @@ describe('confirmPayment', () => {
 
     expect(result.success).toBe(false);
     expect(result.error).toBe('session activation failed');
-    expect(mockLoggerError).toHaveBeenCalled();
+    await vi.waitFor(() => expect(mockLoggerError).toHaveBeenCalled());
   });
 
   it('returns success with sessionData on the happy path', async () => {
@@ -153,6 +170,17 @@ describe('confirmPayment', () => {
     expect('sessionData' in result && result.sessionData).toEqual({ premiumKey: 'pk_abc', email: 'user@example.com' });
   });
 
+  it('returns failure without calling check-session when Stripe handed off to a redirect', async () => {
+    (mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
+    (mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({});
+
+    const result = await confirmPayment(BASE_CONFIRM_PARAMS);
+
+    expect(result.success).toBe(false);
+    expect(mockFetch).not.toHaveBeenCalled();
+    await vi.waitFor(() => expect(mockLoggerWarn).toHaveBeenCalled());
+  });
+
   it('returns failure via catchAll when an unexpected error is thrown', async () => {
     (mockElements.submit as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('network timeout'));
 
@@ -160,6 +188,6 @@ describe('confirmPayment', () => {
 
     expect(result.success).toBe(false);
     expect(typeof result.error).toBe('string');
-    expect(mockLogError).toHaveBeenCalled();
+    await vi.waitFor(() => expect(mockLogError).toHaveBeenCalled());
   });
 });

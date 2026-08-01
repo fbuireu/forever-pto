@@ -61,9 +61,7 @@ describe('useControlledState', () => {
 
   it('forwards extra args to onChange', () => {
     const onChange = vi.fn();
-    const { result } = renderHook(() =>
-      useControlledState<string, [boolean]>({ defaultValue: '', onChange })
-    );
+    const { result } = renderHook(() => useControlledState<string, [boolean]>({ defaultValue: '', onChange }));
 
     act(() => {
       result.current[1]('x', true);

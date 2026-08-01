@@ -1,4 +1,5 @@
 import { ApiError } from '@infrastructure/api/errors';
+import { INVALID_BODY } from '@infrastructure/api/parseJsonBody';
 import { PaymentError, PromoCodeError, PromoCodeErrors, RateLimitError, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
@@ -40,6 +41,14 @@ function makeRequest(body: unknown, headers?: Record<string, string>): Request {
   });
 }
 
+function makeRawRequest(body: string | null): Request {
+  return new Request('http://localhost/api/payment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body,
+  });
+}
+
 describe('POST /api/payment', () => {
   it('returns 200 with clientSecret on success', async () => {
     mockCheckRateLimit.mockReturnValue(Effect.succeed(undefined));
@@ -76,6 +85,23 @@ describe('POST /api/payment', () => {
     const body = await response.json();
     expect(body.success).toBe(false);
     expect(body.error).toBe('Amount is required');
+  });
+
+  it('returns 400 with the validation shape when the body is malformed', async () => {
+    mockCheckRateLimit.mockReturnValue(Effect.succeed(undefined));
+    const response = await POST(makeRawRequest('{not json') as never);
+    expect(response.status).toBe(400);
+    const body = await response.json();
+    expect(body.success).toBe(false);
+    expect(body.error).toBe(INVALID_BODY);
+  });
+
+  it('returns 400 with the validation shape when the body is empty', async () => {
+    mockCheckRateLimit.mockReturnValue(Effect.succeed(undefined));
+    const response = await POST(makeRawRequest(null) as never);
+    expect(response.status).toBe(400);
+    const body = await response.json();
+    expect(body.error).toBe(INVALID_BODY);
   });
 
   it('returns 400 on PromoCodeError with code and isPromoCodeError', async () => {

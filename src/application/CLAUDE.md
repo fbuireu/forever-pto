@@ -1,0 +1,108 @@
+# src/application
+
+## Purpose
+
+Orchestration. This layer decides *what* happens and in what order; `@infrastructure/*` knows how to reach
+the thing it happens to, and `@domain/*` holds the rules. Nothing here constructs an SDK client, opens a
+socket or reads a request.
+
+It is unusual in one respect: it has a server half and a browser half, and they share almost nothing. The
+server half — `use-cases/`, the Zod schemas in `dto/`, `shared/utils/zodParse.ts`, `email/` — is Effect
+programs run at a route handler or a server action. The browser half — `stores/`, `export/`,
+`i18n/navigation.ts` — is Zustand and plain functions, and it is where most of the product actually lives,
+because the planner runs client-side ([ADR 0001](../../docs/adr/0001-planner-runs-in-the-browser.md)). The
+two halves are joined only by `dto/` and `shared/utils/dates.ts`.
+
+## Structure
+
+| Folder | Contents | Runs |
+| --- | --- | --- |
+| `dto/` | The translation seam between foreign shapes and the glossary. See [`dto/CLAUDE.md`](./dto/CLAUDE.md) | both |
+| `stores/` | The five Zustand stores and the storage wrapper. See [`stores/CLAUDE.md`](./stores/CLAUDE.md) | browser |
+| `use-cases/` | The four Effect programs that combine more than one service. See [`use-cases/CLAUDE.md`](./use-cases/CLAUDE.md) | server |
+| `email/templates/` | `Contact.tsx` — the React Email document `sendContactEmail` renders to HTML | server |
+| `export/` | `generateIcs.ts` builds an RFC 5545 calendar string from Holidays and PTO Days; `utils/sanitizer.ts` escapes the four characters that would break a line | browser |
+| `i18n/` | `navigation.ts` — `Link`, `useRouter`, `usePathname` bound to the next-intl routing config, so every internal link carries the locale prefix | browser |
+| `shared/dto/` | `baseDTO.ts` — the `BaseDTO<INPUT, OUTPUT, PARAMS>` contract every mapper implements | both |
+| `shared/utils/` | `dates.ts` — the whole date library; `zodParse.ts` — Zod validation lifted into an Effect that fails with `ValidationError` | `dates.ts` both, `zodParse.ts` server |
+
+## Layer rules
+
+May import from `@domain/*` and `@infrastructure/*`. Must not import React components, build a
+`NextResponse`, or reach for `getCloudflareContext()` — configuration arrives as plain values
+([ADR 0004](../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)).
+
+**Two files import from `@ui/*`, inverting the dependency.** `stores/premium.ts` uses
+`@ui/adapters/session/checkSession`, and `stores/ui.ts` uses `@ui/utils/currencies`. Both are noted in
+[`../ui/CLAUDE.md`](../ui/CLAUDE.md) as known and not endorsed; check before moving either target file. Do
+not add a third.
+
+**No SDK is constructed here.** Stripe, Turso and Resend arrive as Effect service tags that the caller
+provides ([ADR 0002](../../docs/adr/0002-effect-for-external-service-boundaries.md)), so a use-case stays
+substitutable in tests. The one exception is logging: the stores log against the BetterStack singleton rather
+than a tag, because a Zustand action has no Effect context to yield one out of. They reach it through a
+`void import(...)` helper declared in each file — never a static import and never a module-scope `logger`,
+because that client's own top-level imports would land in the client chunk of every component that reads a
+store. Both halves of that exception are deliberate; see [`stores/CLAUDE.md`](./stores/CLAUDE.md).
+
+**`email/templates/Contact.tsx` is the only React in the layer**, and it is not DOM React — its elements
+come from `@react-email/components` and it is rendered to a string by `render()` inside `sendContactEmail`.
+Tailwind classes on it are compiled by React Email's own `Tailwind` wrapper, not by the app's stylesheet.
+
+None of this is lint-enforced. Biome has no import-boundary rule; these are conventions upheld in review.
+
+## Dates
+
+`shared/utils/dates.ts` is the app's date library — there is no `date-fns` and no second implementation.
+Every function converts to `Temporal.PlainDate`, does the arithmetic there and converts back, so the module
+is the single place the `temporal-polyfill` import lives on this side of the tree
+([ADR 0005](../../docs/adr/0005-temporal-polyfill.md)).
+
+Two consequences worth holding on to:
+
+- **Every `Date` this layer produces is local midnight**, built with `new Date(y, m, d)`. There is no time
+  component and no UTC anywhere. Comparing with `toISOString()` across a time zone will shift the day;
+  compare with `isSameDay`, `compareAsc` or `isWithinInterval` instead.
+- **`formatDate` only understands the patterns in its map.** `INTL_FORMAT_MAP` lists the format strings that
+  resolve to an `Intl.DateTimeFormat`; `'yyyy-MM-dd'` and `'yyyy-MM-dd HH:mm:ss'` are handled separately, and
+  anything else falls through to `toLocaleDateString` and silently ignores the pattern. Passing a date-fns
+  token that is not in the map produces plausible-looking wrong output rather than an error.
+
+Weekday numbers are ISO throughout: `Temporal.PlainDate`'s `dayOfWeek` runs 1 (Monday) to 7 (Sunday), which
+is why `isWeekend` tests for 6 and 7. The `weekStartsOn` option is the date-fns convention instead — 0 for
+Sunday through 6 for Saturday — so `startOfWeek` and `endOfWeek` normalise it with
+`options?.weekStartsOn || 7`: 0 is falsy, so Sunday falls through to the ISO 7, and 1–6 already agree between
+the two conventions. `getWeekdayNames` anchors on `new Date(2023, 0, 2)` because that date is a Monday and
+the function walks seven days from the start of its week; a different anchor rotates every localised weekday
+header.
+
+`differenceInDays` and `differenceInCalendarDays` have identical bodies. Both operate on `PlainDate`, so
+there is no partial day for them to disagree about; the pair exists only to keep call sites reading the way
+their date-fns predecessors did.
+
+## Gotchas
+
+**`zodParse.ts` is server-only despite living under `shared/`.** It requires `LoggerService` in its Effect
+context, so calling it from a store or a component will not compile. Browser-side validation goes through the
+schema factories in `dto/` instead — `createContactSchema`, `createPaymentSchemaWithMessages` — which take
+translated messages and hand back a schema the form parses itself.
+
+**The two payment mappers disagree about the unit of `amount`, deliberately** — see
+[`dto/CLAUDE.md`](./dto/CLAUDE.md). Anything summing or formatting a payment needs to know which one it
+holds.
+
+**`export/generateIcs.ts` sanitises the summary only.** `sanitize` escapes `\`, `;`, `,` and newlines inside
+`SUMMARY`, which is the field carrying user text (a Custom Holiday name). `X-WR-CALNAME` and the `UID` are
+not escaped — they are built from a translated label and a generated id. If either ever becomes user-typed,
+it needs the same treatment.
+
+## Testing
+
+Every module has a co-located `.test.ts`, with the type-only DTO folders as the deliberate exception (see
+[`dto/CLAUDE.md`](./dto/CLAUDE.md)). Three patterns split by half:
+
+- **Use-cases** build a `TestLayer` of `Layer.succeed(Tag, mock)` and assert the deferred effect separately
+  from the critical path.
+- **Stores** mock the storage wrapper, the logging client and every dynamically imported module, then drive
+  the store through `getState()`.
+- **DTOs and `shared/utils/`** are pure and are tested with literal inputs and no mocks at all.

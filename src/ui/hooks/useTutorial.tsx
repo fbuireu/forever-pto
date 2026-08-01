@@ -2,6 +2,8 @@
 
 import { useIsMobile } from '@ui/hooks/useMobile';
 import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
+import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
+import { X } from '@ui/modules/core/animate/icons/X';
 import type { DriveStep } from 'driver.js';
 import { useTranslations } from 'next-intl';
 import { useCallback } from 'react';
@@ -140,6 +142,11 @@ export const useTutorial = () => {
     }
 
     driverClient.start(steps, {
+      closeIcon: (
+        <AnimateIcon animateOnHover>
+          <X className='size-4' />
+        </AnimateIcon>
+      ),
       nextBtnText: tUi('nextBtn'),
       prevBtnText: tUi('prevBtn'),
       doneBtnText: tUi('doneBtn'),

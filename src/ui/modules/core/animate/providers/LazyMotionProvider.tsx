@@ -1,7 +1,7 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import { LazyMotion } from 'motion/react';
+import type { ReactNode } from 'react';
 
 const loadFeatures = () => import('motion/react').then((res) => res.domAnimation);
 

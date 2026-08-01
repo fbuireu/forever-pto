@@ -1,7 +1,7 @@
 import type { CreatePaymentInput } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { createPaymentAction } from '@infrastructure/actions/payment';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import type { BetterStackClient } from '@infrastructure/clients/logging/better-stack/client';
 import { PaymentError, PromoCodeError, type PromoCodeErrorCode } from '@infrastructure/errors';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
 import { Effect } from 'effect';
@@ -34,7 +34,11 @@ interface ConfirmPaymentParams {
   returnUrl: string;
 }
 
-const logger = getBetterStackInstance();
+const log = (write: (logger: BetterStackClient) => void) => {
+  void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
+    write(getBetterStackInstance());
+  });
+};
 
 export const confirmPayment = async (params: ConfirmPaymentParams) => {
   const { stripe, elements, email, returnUrl } = params;
@@ -51,7 +55,17 @@ export const confirmPayment = async (params: ConfirmPaymentParams) => {
       })
     );
 
-    if (error) return { success: false, error: error.message ?? '' } ;
+    if (error) return { success: false, error: error.message ?? '' };
+
+    if (!paymentIntent) {
+      log((logger) =>
+        logger.warn('Payment confirmation resolved without a payment intent', {
+          emailDomain: email?.split('@')[1],
+          returnUrl,
+        })
+      );
+      return { success: false, error: '' };
+    }
 
     const sessionResponse = yield* Effect.tryPromise(() =>
       fetch('/api/check-session', {
@@ -64,12 +78,14 @@ export const confirmPayment = async (params: ConfirmPaymentParams) => {
 
     if (!sessionResponse.ok) {
       const errorData = yield* Effect.tryPromise(() => sessionResponse.json() as Promise<{ error?: string }>);
-      logger.error('Session activation failed after payment', {
-        statusCode: sessionResponse.status,
-        reason: errorData.error,
-        emailDomain: email?.split('@')[1],
-        paymentIntentId: paymentIntent.id,
-      });
+      log((logger) =>
+        logger.error('Session activation failed after payment', {
+          statusCode: sessionResponse.status,
+          reason: errorData.error,
+          emailDomain: email?.split('@')[1],
+          paymentIntentId: paymentIntent.id,
+        })
+      );
       return { success: false, error: errorData.error ?? '' };
     }
 
@@ -83,10 +99,12 @@ export const confirmPayment = async (params: ConfirmPaymentParams) => {
     };
   }).pipe(
     Effect.catchAll((error) => {
-      logger.logError('Payment confirmation error in checkout adapter', error, {
-        emailDomain: email?.split('@')[1],
-        returnUrl,
-      });
+      log((logger) =>
+        logger.logError('Payment confirmation error in checkout adapter', error, {
+          emailDomain: email?.split('@')[1],
+          returnUrl,
+        })
+      );
       return Effect.succeed({
         success: false,
         error: error instanceof Error ? error.message : '',

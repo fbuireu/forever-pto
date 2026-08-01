@@ -4,7 +4,17 @@ import { Menu as DropdownMenuPrimitive } from '@base-ui/react/menu';
 import { cn } from '@ui/utils/cn';
 import { Circle } from 'lucide-react';
 import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
-import { type ComponentProps, type ReactElement, createContext, isValidElement, use, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  type ComponentProps,
+  createContext,
+  isValidElement,
+  type ReactElement,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { MotionHighlight, MotionHighlightItem } from '../effects/MotionHighlight';
 import { Check } from '../icons/Check';
 import { ChevronRight } from '../icons/ChevronRight';
@@ -69,11 +79,7 @@ type DropdownMenuTriggerProps = ComponentProps<typeof DropdownMenuPrimitive.Trig
 function DropdownMenuTrigger({ asChild, children, ...props }: DropdownMenuTriggerProps) {
   if (asChild && isValidElement(children)) {
     return (
-      <DropdownMenuPrimitive.Trigger
-        data-slot='dropdown-menu-trigger'
-        render={children as ReactElement}
-        {...props}
-      />
+      <DropdownMenuPrimitive.Trigger data-slot='dropdown-menu-trigger' render={children as ReactElement} {...props} />
     );
   }
   return (

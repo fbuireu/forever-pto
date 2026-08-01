@@ -24,7 +24,18 @@ export const processWebhookEvent = (
           status: paymentIntent.status,
           hasId: !!paymentIntent.id,
         });
-        const paymentEvent = createPaymentSucceededEvent(paymentIntent);
+        const paymentEvent = yield* createPaymentSucceededEvent(paymentIntent).pipe(
+          Effect.tapError((e) =>
+            Effect.sync(() => {
+              logger.logError('Payment succeeded with no donor email, Premium can never be recovered', e, {
+                paymentId: paymentIntent.id,
+              });
+            })
+          ),
+          Effect.catchTag('MissingDonorEmailError', () => Effect.succeed(undefined))
+        );
+
+        if (!paymentEvent) break;
 
         const existing = yield* getPaymentById(paymentEvent.paymentId).pipe(
           Effect.catchAll(() => Effect.succeed(undefined))

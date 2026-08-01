@@ -113,21 +113,87 @@ export const updatePaymentCharge = (data: PaymentChargeData): Effect.Effect<void
     );
   });
 
+interface PaymentRow {
+  id: string;
+  stripe_created_at: string;
+  stripe_customer_id: string | null;
+  stripe_charge_id: string | null;
+  email: string;
+  amount: number;
+  currency: string;
+  status: string;
+  payment_method_type: string | null;
+  description: string | null;
+  promo_code: string | null;
+  user_agent: string | null;
+  ip_address: string | null;
+  country: string | null;
+  customer_name: string | null;
+  postal_code: string | null;
+  city: string | null;
+  state: string | null;
+  payment_brand: string | null;
+  payment_last4: string | null;
+  fee_amount: number | null;
+  net_amount: number | null;
+  refunded_at: string | null;
+  refund_reason: string | null;
+  disputed_at: string | null;
+  dispute_reason: string | null;
+  parent_payment_id: string | null;
+  origin: string | null;
+}
+
+const toDate = (value: string | null) => (value ? new Date(value) : null);
+
+const toPaymentData = (row: PaymentRow): PaymentData => ({
+  id: row.id,
+  stripeCreatedAt: new Date(row.stripe_created_at),
+  customerId: row.stripe_customer_id,
+  chargeId: row.stripe_charge_id,
+  email: row.email,
+  amount: row.amount,
+  currency: row.currency,
+  status: row.status,
+  paymentMethodType: row.payment_method_type,
+  description: row.description,
+  promoCode: row.promo_code,
+  userAgent: row.user_agent,
+  ipAddress: row.ip_address,
+  country: row.country,
+  customerName: row.customer_name,
+  postalCode: row.postal_code,
+  city: row.city,
+  state: row.state,
+  paymentBrand: row.payment_brand,
+  paymentLast4: row.payment_last4,
+  feeAmount: row.fee_amount,
+  netAmount: row.net_amount,
+  refundedAt: toDate(row.refunded_at),
+  refundReason: row.refund_reason,
+  disputedAt: toDate(row.disputed_at),
+  disputeReason: row.dispute_reason,
+  parentPaymentId: row.parent_payment_id,
+  origin: row.origin,
+});
+
 export const getPaymentById = (
   paymentIntentId: string
 ): Effect.Effect<PaymentData | undefined, DatabaseError, TursoService> =>
   Effect.gen(function* () {
     const turso = yield* TursoService;
-    const rows = yield* turso.query<PaymentData>('SELECT * FROM payments WHERE id = ? LIMIT 1', [paymentIntentId]);
-    return rows[0];
+    const rows = yield* turso.query<PaymentRow>('SELECT * FROM payments WHERE id = ? LIMIT 1', [paymentIntentId]);
+    const row = rows[0];
+    return row ? toPaymentData(row) : undefined;
   });
 
 export const getPaymentByEmail = (email: string): Effect.Effect<PaymentData | undefined, DatabaseError, TursoService> =>
   Effect.gen(function* () {
     const turso = yield* TursoService;
-    const rows = yield* turso.query<PaymentData>(
+    const rows = yield* turso.query<PaymentRow>(
       `SELECT * FROM payments WHERE email = ? AND status = 'succeeded' ORDER BY stripe_created_at DESC LIMIT 1`,
       [email]
     );
-    return rows[0];
+    const row = rows[0];
+    return row ? toPaymentData(row) : undefined;
   });

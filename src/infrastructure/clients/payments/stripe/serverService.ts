@@ -2,6 +2,13 @@ import { PaymentError, WebhookError } from '@infrastructure/errors';
 import { Context, Effect, Layer } from 'effect';
 import StripeNode from 'stripe';
 
+class MissingStripeConfiguration extends Error {}
+
+export class WebhookConfigurationError extends WebhookError {}
+
+export const isWebhookConfigurationError = (error: WebhookError): error is WebhookConfigurationError =>
+  error instanceof WebhookConfigurationError;
+
 export class StripeServerService extends Context.Tag('StripeServerService')<
   StripeServerService,
   {
@@ -10,7 +17,7 @@ export class StripeServerService extends Context.Tag('StripeServerService')<
       retrieve(id: string): Effect.Effect<StripeNode.PaymentIntent, PaymentError>;
     };
     charges: {
-      retrieve(id: string): Effect.Effect<StripeNode.Charge, PaymentError>;
+      retrieve(id: string, params?: StripeNode.ChargeRetrieveParams): Effect.Effect<StripeNode.Charge, PaymentError>;
     };
     promotionCodes: {
       list(
@@ -28,15 +35,21 @@ export class StripeServerService extends Context.Tag('StripeServerService')<
 >() {}
 
 export const StripeServerServiceLive = Layer.sync(StripeServerService, () => {
-  const secretKey = process.env.STRIPE_SECRET_KEY;
-  if (!secretKey) throw new Error('STRIPE_SECRET_KEY environment variable is not set');
+  let stripe: StripeNode | null = null;
 
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const getStripe = () => {
+    if (!stripe) {
+      const secretKey = process.env.STRIPE_SECRET_KEY;
+      if (!secretKey) throw new MissingStripeConfiguration('STRIPE_SECRET_KEY environment variable is not set');
 
-  const stripe = new StripeNode(secretKey, {
-    apiVersion: '2026-06-24.dahlia',
-    httpClient: StripeNode.createFetchHttpClient(),
-  });
+      stripe = new StripeNode(secretKey, {
+        apiVersion: '2026-06-24.dahlia',
+        httpClient: StripeNode.createFetchHttpClient(),
+      });
+    }
+
+    return stripe;
+  };
 
   const wrapError = (error: unknown): PaymentError =>
     new PaymentError({
@@ -44,32 +57,43 @@ export const StripeServerServiceLive = Layer.sync(StripeServerService, () => {
       cause: error,
     });
 
+  const wrapWebhookError = (error: unknown): WebhookError => {
+    const message = error instanceof Error ? error.message : String(error);
+
+    if (error instanceof MissingStripeConfiguration) {
+      return new WebhookConfigurationError({ message, isSignatureError: false, cause: error });
+    }
+
+    return new WebhookError({
+      message,
+      isSignatureError: error instanceof StripeNode.errors.StripeSignatureVerificationError,
+      cause: error,
+    });
+  };
+
   return {
     paymentIntents: {
-      create: (params) => Effect.tryPromise({ try: () => stripe.paymentIntents.create(params), catch: wrapError }),
-      retrieve: (id) => Effect.tryPromise({ try: () => stripe.paymentIntents.retrieve(id), catch: wrapError }),
+      create: (params) => Effect.tryPromise({ try: () => getStripe().paymentIntents.create(params), catch: wrapError }),
+      retrieve: (id) => Effect.tryPromise({ try: () => getStripe().paymentIntents.retrieve(id), catch: wrapError }),
     },
     charges: {
-      retrieve: (id) => Effect.tryPromise({ try: () => stripe.charges.retrieve(id), catch: wrapError }),
+      retrieve: (id, params) =>
+        Effect.tryPromise({ try: () => getStripe().charges.retrieve(id, params ?? {}), catch: wrapError }),
     },
     promotionCodes: {
-      list: (params) => Effect.tryPromise({ try: () => stripe.promotionCodes.list(params), catch: wrapError }),
+      list: (params) => Effect.tryPromise({ try: () => getStripe().promotionCodes.list(params), catch: wrapError }),
       retrieve: (id, params) =>
-        Effect.tryPromise({ try: () => stripe.promotionCodes.retrieve(id, params ?? {}), catch: wrapError }),
+        Effect.tryPromise({ try: () => getStripe().promotionCodes.retrieve(id, params ?? {}), catch: wrapError }),
     },
     webhooks: {
       constructEvent: (payload, signature) =>
         Effect.try({
           try: () => {
-            if (!webhookSecret) throw new Error('STRIPE_WEBHOOK_SECRET is not defined');
-            return stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+            const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+            if (!webhookSecret) throw new MissingStripeConfiguration('STRIPE_WEBHOOK_SECRET is not defined');
+            return getStripe().webhooks.constructEvent(payload, signature, webhookSecret);
           },
-          catch: (error) =>
-            new WebhookError({
-              message: error instanceof Error ? error.message : String(error),
-              isSignatureError: error instanceof StripeNode.errors.StripeSignatureVerificationError,
-              cause: error,
-            }),
+          catch: wrapWebhookError,
         }),
     },
   };

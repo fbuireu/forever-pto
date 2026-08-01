@@ -34,7 +34,7 @@ export const activateWithPayment = (
     }
 
     const paymentEmail = paymentIntent.metadata.email ?? paymentIntent.receipt_email ?? undefined;
-    if (paymentEmail && paymentEmail !== email) {
+    if (!paymentEmail || paymentEmail !== email) {
       return yield* Effect.fail(new ValidationError({ message: 'Email mismatch' }));
     }
 
@@ -95,7 +95,7 @@ export const activateWithEmail = (
 ): Effect.Effect<
   { email: string; premiumKey: string; token: string; deferred: Effect.Effect<void, never, TursoService> },
   ValidationError | SessionError | DatabaseError,
-  TursoService | LoggerService
+  TursoService
 > =>
   Effect.gen(function* () {
     const payment = yield* getPaymentByEmail(email);

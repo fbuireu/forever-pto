@@ -1,16 +1,40 @@
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
-import { PromoCodeError, PromoCodeErrors } from '@infrastructure/errors';
 import type { PromoCodeErrorCode } from '@infrastructure/errors';
+import { PromoCodeError, PromoCodeErrors } from '@infrastructure/errors';
 import { Effect } from 'effect';
 import type Stripe from 'stripe';
 
 const MIN_FINAL_AMOUNT = 0.5;
+const PAYMENT_CURRENCY = 'eur';
 
 const getCouponValidationError = (coupon: Stripe.Coupon): PromoCodeErrorCode | null => {
   if (!coupon.valid) return PromoCodeErrors.COUPON_INVALID;
-  if (coupon.max_redemptions && coupon.times_redeemed >= coupon.max_redemptions) return PromoCodeErrors.USAGE_LIMIT_REACHED;
+  if (coupon.max_redemptions && coupon.times_redeemed >= coupon.max_redemptions)
+    return PromoCodeErrors.USAGE_LIMIT_REACHED;
   if (coupon.redeem_by && coupon.redeem_by < Math.floor(Date.now() / 1000)) return PromoCodeErrors.COUPON_EXPIRED;
+  return null;
+};
+
+const getPromotionCodeValidationError = (
+  promotionCode: Stripe.PromotionCode,
+  amount: number
+): PromoCodeErrorCode | null => {
+  if (promotionCode.active === false) return PromoCodeErrors.INVALID_OR_EXPIRED;
+  if (promotionCode.expires_at && promotionCode.expires_at < Math.floor(Date.now() / 1000)) {
+    return PromoCodeErrors.COUPON_EXPIRED;
+  }
+  if (promotionCode.max_redemptions && promotionCode.times_redeemed >= promotionCode.max_redemptions) {
+    return PromoCodeErrors.USAGE_LIMIT_REACHED;
+  }
+
+  const { minimum_amount: minimumAmount, minimum_amount_currency: minimumAmountCurrency } =
+    promotionCode.restrictions ?? {};
+  const comparableCurrency = !minimumAmountCurrency || minimumAmountCurrency.toLowerCase() === PAYMENT_CURRENCY;
+  if (minimumAmount && comparableCurrency && Math.round(amount * 100) < minimumAmount) {
+    return PromoCodeErrors.MIN_AMOUNT_EXCEEDED;
+  }
+
   return null;
 };
 
@@ -35,15 +59,15 @@ export const validatePromoCode = (
       return yield* Effect.fail(new PromoCodeError({ code: PromoCodeErrors.INVALID_OR_EXPIRED }));
     }
 
-    const [promotionCode] = promotionCodes.data;
-    const couponData = yield* stripe.promotionCodes
-      .retrieve(promotionCode.id, { expand: ['coupon'] })
+    const [listed] = promotionCodes.data;
+    const promotionCode = yield* stripe.promotionCodes
+      .retrieve(listed.id, { expand: ['coupon'] })
       .pipe(Effect.mapError((e) => new PromoCodeError({ code: PromoCodeErrors.FAILED_TO_LOAD, message: e.message })));
 
-    const coupon = (couponData as unknown as { coupon: Stripe.Coupon }).coupon;
+    const coupon = (promotionCode as unknown as { coupon: Stripe.Coupon }).coupon;
     if (!coupon) return yield* Effect.fail(new PromoCodeError({ code: PromoCodeErrors.FAILED_TO_LOAD }));
 
-    const validationError = getCouponValidationError(coupon);
+    const validationError = getPromotionCodeValidationError(promotionCode, amount) ?? getCouponValidationError(coupon);
     if (validationError) return yield* Effect.fail(new PromoCodeError({ code: validationError }));
 
     const finalAmount = calculateFinalAmount(coupon, amount);

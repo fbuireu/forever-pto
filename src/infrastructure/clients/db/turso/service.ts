@@ -13,14 +13,16 @@ export class TursoService extends Context.Tag('TursoService')<
 >() {}
 
 export const TursoServiceLive = Layer.sync(TursoService, () => {
-  const url = process.env.TURSO_DATABASE_URL;
-  const authToken = process.env.TURSO_AUTH_TOKEN;
+  const createConnection = () => {
+    const url = process.env.TURSO_DATABASE_URL;
+    const authToken = process.env.TURSO_AUTH_TOKEN;
 
-  if (!url || !authToken) {
-    throw new Error('TURSO_DATABASE_URL and TURSO_AUTH_TOKEN must be defined');
-  }
+    if (!url || !authToken) {
+      throw new Error('TURSO_DATABASE_URL and TURSO_AUTH_TOKEN must be defined');
+    }
 
-  const createConnection = () => connect({ url, authToken });
+    return connect({ url, authToken });
+  };
 
   const wrapError = (error: unknown): DatabaseError =>
     new DatabaseError({
@@ -54,7 +56,7 @@ export const TursoServiceLive = Layer.sync(TursoService, () => {
       Effect.tryPromise({
         try: async () => {
           const conn = createConnection();
-          await conn.batch(statements.map((s) => s.sql));
+          await conn.batch(statements);
         },
         catch: wrapError,
       }),

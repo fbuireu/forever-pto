@@ -1,0 +1,196 @@
+# src/app
+
+## Purpose
+
+The Next.js App Router tree: every URL the app answers, plus the file-convention entry points Next.js
+discovers by name (`sitemap.ts`, `robots.ts`, `global-error.tsx`, `global-not-found.tsx`, `favicon.ico`).
+
+This folder is a thin shell. Pages compose components from `@ui/*`; route handlers parse the request,
+run an Effect program from `@application/use-cases/*` against `ApplicationLayer`, and map the typed
+failure channel onto a status code. Business logic that lands here is in the wrong layer.
+
+## The tree
+
+| Path | Role |
+| --- | --- |
+| `[locale]/layout.tsx` | **The root layout.** There is no layout file at the `src/app` root — this is the only file that renders `<html>`/`<body>` on the normal path |
+| `[locale]/(app)/planner/` | The planner screen: sidebar chrome in `layout.tsx`, content in `page.tsx` |
+| `[locale]/(app)/payment/confirmation/` | Post-Stripe landing page; reads `payment_intent` from the query string |
+| `[locale]/(marketing)/` | Homepage (`page.tsx`) and its header/footer shell (`layout.tsx`) |
+| `[locale]/(marketing)/legal/` | Privacy policy, cookie policy, terms of service, legal notice |
+| `api/` | Six route handlers — see below |
+| `.well-known/[...slug]/` | Catch-all serving three static JSON documents |
+| `fonts.ts` | The four `next/font/google` families, exported as CSS-variable handles |
+| `sitemap.ts`, `robots.ts` | SEO file conventions |
+| `global-error.tsx`, `global-not-found.tsx` | Last-resort boundaries that render their own document |
+
+## How a request reaches a page
+
+`src/middleware.ts` runs first, and its `config.matcher` decides what it sees: everything except `/api`,
+`/_next`, `/_vercel` and any path containing a dot, plus `/api/markdown` explicitly. In order it:
+
+1. Serves `/api/markdown` (only to attach `Cache-Control` and `Vary: Accept`).
+2. Rewrites any request carrying `Accept: text/markdown` to `/api/markdown?path=<pathname>`, so every HTML
+   URL has a Markdown twin without a second route existing.
+3. Redirects `**/payment/confirmation` to the locale home when `payment_intent` is absent.
+4. Runs the `next-intl` middleware, which negotiates the locale and fills the `[locale]` segment.
+5. Re-writes the `NEXT_LOCALE` cookie next-intl just set, through `setLocaleCookie`
+   (`src/infrastructure/i18n/cookie.ts`), which adds `httpOnly`, `secure`, `sameSite: 'lax'` and `path: '/'`.
+   It looks redundant and is not — next-intl's own cookie carries none of those. `middleware.test.ts` guards
+   it under `describe('locale cookie hardening')`.
+6. Hands the response to the location proxy (`src/infrastructure/proxy/location.ts`), which sets the
+   detected-country cookie.
+
+Security headers are **not** set here. They are the `SECURITY_HEADERS` array in `next.config.ts`, applied
+through `async headers()` on `source: '/(.*)'` — which, unlike this matcher, really does cover every request.
+
+Both Markdown branches set `Vary: Accept` next to `Cache-Control`. The body served under an HTML URL
+depends on the `Accept` header, so a shared cache keyed on the URL alone would hand the Markdown twin to
+the next visitor asking for HTML.
+
+`localePrefix` is `as-needed` with `en` as the default (`src/infrastructure/i18n/routing.ts`), so English
+URLs carry **no** `/en` prefix while the other five do. Anything building a URL must go through
+`localePath` / `localeAlternates` in `src/infrastructure/i18n/utils/url.ts` rather than concatenating the
+locale itself.
+
+`[locale]/layout.tsx` re-validates the segment with `hasLocale` and calls `notFound()` — the middleware is
+not treated as the only gate, because a statically rendered path can arrive without it.
+
+Every page and layout under `[locale]/` calls `setRequestLocale(locale)` before awaiting translations.
+Skipping it opts the segment out of static rendering; it is not decoration.
+
+## The two route groups
+
+Groups do not affect the URL — `(app)` and `(marketing)` exist purely to give two different chromes.
+
+**`(marketing)`** has a group-level `layout.tsx` (header, footer, toaster) and its own `error.tsx`. Its
+pages are fully static: `page.tsx` declares `generateStaticParams`, and `metadata.ts` marks the homepage
+indexable while every `legal/` page sets `robots: { index: false }`.
+
+**`(app)`** has *no* group-level layout. The sidebar shell lives one level down in `planner/layout.tsx`,
+so `payment/confirmation/` deliberately renders bare — a Stripe return should not come back into the
+planner chrome. The confirmation route is the one dynamic page in the tree: it reads `searchParams`, runs
+the `confirmation` Effect program and has a `loading.tsx` for the round trip.
+
+## Metadata
+
+Every route that needs metadata keeps a sibling `metadata.ts` exporting `generateMetadata`, which the
+page re-exports (`export { generateMetadata } from './metadata';`). The split is what makes the metadata
+unit-testable on its own — hence the `metadata.test.ts` next to each one.
+
+All of them follow the same shape: resolve `siteUrl` through `getPublicEnv.ts`, pull copy from a
+`metadata.*` translation namespace, and set `alternates.canonical` / `alternates.languages` from
+`localePath` / `localeAlternates`. A new route that skips the `alternates` block ships six URLs competing
+for the same ranking.
+
+## API route handlers
+
+| Route | Method | What it does |
+| --- | --- | --- |
+| `api/payment/route.ts` | POST | Creates a Stripe PaymentIntent for a Donation. Rate-limits on `cf-connecting-ip` before anything else |
+| `api/webhooks/stripe/route.ts` | POST | Verifies the `stripe-signature` header, then hands the event to `processWebhookEvent`. Reads the **raw** body via `request.text()` — parsing it as JSON would break signature verification |
+| `api/check-session/route.ts` | GET, POST | GET verifies the premium cookie; POST activates Premium from an email, optionally with a payment key, and sets the cookie |
+| `api/contact/route.ts` | POST | Contact form submission |
+| `api/markdown/route.ts` | GET | Renders the Markdown twin of a page via `buildMarkdownPage.ts`. Only reached through the middleware rewrite |
+| `api/health/route.ts` | GET | Liveness probe. Answers `status` and `timestamp` and nothing else |
+
+Shared conventions across them:
+
+- The Effect program is run at the boundary — `Effect.runPromise(program.pipe(Effect.provide(ApplicationLayer)))`
+  — and every tagged failure is caught into a `NextResponse`. `Effect.catchAll` closes the tail so a route
+  never rejects.
+- Error bodies use the `ApiError` constants from `src/infrastructure/api/errors.ts`, never a raw message,
+  except `ValidationError` and `PromoCodeError` whose messages are already user-facing.
+- A JSON body is read with `parseJsonBody` (`api/parseJsonBody.ts`) **inside** the Effect program, never with
+  a bare `await request.json()` before it. A malformed, empty or non-object body then fails as a
+  `ValidationError` carrying `invalid_body` and maps onto the same 400 as a schema violation; parsing outside
+  the program rejects before any `catchTags` map exists and Next answers a bare 500. The Stripe webhook is
+  the exception — it needs the raw text.
+- Work that must not delay the response (persisting the payment record, sending the email) is returned by
+  the use-case as a `deferred` Effect and run inside Next's `after()`.
+- `check-session` and `health` respond through `noStore` (`src/infrastructure/api/response.ts`). Anything
+  carrying Premium state must keep doing so.
+
+## The `.well-known` catch-all
+
+`.well-known/[...slug]/route.ts` is a lookup table, not a router: it joins the slug segments and matches
+against three exact keys — `api-catalog`, `mcp/server-card.json`, `agent-skills/index.json` — delegating
+to `apiCatalog.ts`, `mcpServerCard.ts` and `agentSkillsIndex.ts` in `@infrastructure/well-known`. Anything
+else is a 404. Add a document by adding a key; do not branch inside the handler.
+
+These paths contain a dot, so the middleware matcher excludes them — they never see locale negotiation.
+
+## Error and not-found boundaries
+
+| File | Catches |
+| --- | --- |
+| `[locale]/(marketing)/error.tsx` | Errors in marketing pages. Renders inside the marketing layout, so it emits bare content — header and footer are already there |
+| `[locale]/error.tsx` | Everything else under `[locale]/`, including the whole `(app)` group, which has no boundary of its own. Wraps its content in a full-height shell because there is no chrome around it |
+| `global-error.tsx` | Failures of the root layout itself. React has unmounted the layout, so this file renders its own `<html>`/`<body>` and re-applies the font variables |
+| `[locale]/not-found.tsx` | `notFound()` raised inside a matched locale segment |
+| `global-not-found.tsx` | URLs that match no route at all, so no layout ran. Enabled by `experimental.globalNotFound` in `next.config.ts`; it re-detects the locale itself from the `x-next-intl-locale` header, then the locale cookie, then `Accept-Language` |
+
+`global-error.tsx` bundles **only** `en.json` and hard-codes `lang="en"` on the document. That is
+deliberate: pulling all six catalogues into the root bundle would cost every route roughly 500 KB for a
+page most users never see. Do not "fix" the mismatch between the URL locale and the rendered language by
+importing the other five.
+
+## Cloudflare request context
+
+`getCloudflareContext()` may be read here and in server actions, never in a use-case — see
+[ADR 0004](../../docs/adr/0004-cloudflare-workers-as-deployment-target.md). In this folder the readers are
+`api/contact/route.ts`, `api/markdown/route.ts`, `.well-known/[...slug]/route.ts`, `sitemap.ts` and
+`robots.ts`; the `metadata.ts` files reach it indirectly through `getPublicEnv.ts`.
+
+The `{ async: true }` form is not interchangeable with the bare call. Everything that can be evaluated
+outside a live request — `sitemap.ts`, `robots.ts`, the `.well-known` handler, and `getPublicEnv.ts` under
+`'use cache'` — uses the async form. `api/contact/route.ts` only ever runs inside a POST and uses the sync
+form. Copying the sync call into a prerendered path is the failure mode to watch for.
+
+Config is read off the context and passed down as plain values; use-cases receive `{ siteUrl, contactEmail }`
+rather than reaching for the environment themselves.
+
+## SEO files
+
+`sitemap.ts` emits the cross-product of the six locales and a hard-coded `ROUTES` list — currently the
+homepage and `/planner`. Legal and payment pages are absent on purpose; `robots.ts` disallows the same two
+prefixes via `DISALLOWED_PAGES`, expanded per locale. A new public route needs an entry in `ROUTES`, and
+a new private one needs an entry in `DISALLOWED_PAGES` **and** `robots: { index: false }` in its
+`metadata.ts`.
+
+Both files resolve the base URL from the Cloudflare env rather than a constant. Only `sitemap.ts` gets the
+host it is actually served from, though: `robots.ts` is prerendered, so it bakes whatever the build resolved
+— see the Deploy section of the root [`CLAUDE.md`](../../CLAUDE.md).
+
+## Fonts
+
+`fonts.ts` declares Bricolage Grotesque, Space Grotesk, Instrument Serif and JetBrains Mono, each with a
+`--font-*` CSS variable and `display: 'swap'`. Import the handles and spread `.variable` onto `<body>`;
+three files do this — `[locale]/layout.tsx`, `global-error.tsx` and `global-not-found.tsx` — and a new
+document-rendering file must do it too or it will render in the fallback stack. The variables are consumed
+by the Tailwind theme in `@styles`, never by class names in this folder.
+
+## Testing
+
+Every route file has a co-located test: `.test.ts` for handlers, `sitemap.ts`, `robots.ts` and the
+`metadata.ts` files, `.test.tsx` for pages, layouts and error boundaries. `loading.tsx` and `fonts.ts` are
+the exceptions — neither has behaviour worth asserting.
+
+Handler tests mock the infrastructure module rather than the Effect layer where it is cheaper to do so
+(`api/health/route.test.ts` stubs `@infrastructure/api/response`), and reach for `vi.stubEnv` when a route
+reads the environment. Keep the `await import('./route')` after the mocks: route modules read their
+dependencies at module scope, so a top-level import would bind the real ones.
+
+## Gotchas
+
+- **Two guards protect the confirmation page.** The middleware redirects when `payment_intent` is missing
+  *and* `page.tsx` redirects again. Removing either leaves the Effect program running with `undefined`.
+- **`api/health/route.ts` is public and unauthenticated**, and `.well-known/api-catalog` advertises it, so
+  the body says the app is up and nothing else. Do not add configuration to it — not which secrets are set,
+  not the `NODE_ENV`, not a dependency check that names a host.
+- **The middleware's Markdown rewrite trusts `config.matcher` to keep internal paths out.** The matcher
+  excludes `/api` and every dotted path, so `/.well-known/*` and the other route handlers never reach the
+  middleware at all; the rewrite branch has no guard of its own. Widening the matcher means adding one back,
+  which is what the `config matcher` block in `src/middleware.test.ts` is there to catch.
+- **The planner page imports its sections through `next/dynamic`.** That is a bundle-size decision, not an
+  accident; a static import of `CalendarList` or `Summary` pulls the whole planning UI into the first load.

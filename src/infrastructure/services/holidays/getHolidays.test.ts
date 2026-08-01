@@ -74,7 +74,7 @@ describe('getHolidays', () => {
     });
   });
 
-  it('returns holidays sorted by date', async () => {
+  it('returns the DTO output in the order the DTO produced it, without re-sorting', async () => {
     mockHolidayDTOCreate.mockReturnValue([
       { date: new Date('2026-12-25'), name: 'Christmas' },
       { date: new Date('2026-01-01'), name: 'New Year' },
@@ -82,8 +82,7 @@ describe('getHolidays', () => {
 
     const result = await getHolidays(BASE_PARAMS);
 
-    expect(result[0].name).toBe('New Year');
-    expect(result[1].name).toBe('Christmas');
+    expect(result.map(({ name }) => name)).toEqual(['Christmas', 'New Year']);
   });
 
   it('returns empty array and logs error when processing throws', async () => {

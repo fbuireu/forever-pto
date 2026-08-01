@@ -14,8 +14,16 @@ vi.mock('motion/react', async () => {
   const { createElement, Fragment } = await import('react');
   return {
     m: {
-      div: ({ children, initial: _i, animate: _a, exit: _e, transition: _t, layout: _l, style, ...props }: MotionDivProps) =>
-        createElement('div', { style, ...props }, children),
+      div: ({
+        children,
+        initial: _i,
+        animate: _a,
+        exit: _e,
+        transition: _t,
+        layout: _l,
+        style,
+        ...props
+      }: MotionDivProps) => createElement('div', { style, ...props }, children),
     },
     AnimatePresence: ({ children }: { children?: ReactNode }) => createElement(Fragment, null, children),
   };
@@ -60,7 +68,11 @@ describe('Collapsible', () => {
   });
 
   it('starts closed when defaultOpen is not set', () => {
-    const { container } = render(<Collapsible><span /></Collapsible>);
+    const { container } = render(
+      <Collapsible>
+        <span />
+      </Collapsible>
+    );
     expect(container.querySelector('[data-slot="collapsible"]')).not.toBeNull();
   });
 
@@ -73,10 +85,22 @@ describe('Collapsible', () => {
     expect(container.querySelector('[data-slot="collapsible"]')).not.toBeNull();
   });
 
-  it('syncs with controlled open prop changes', () => {
+  it('does not report a controlled open change back to the caller', () => {
     const onOpenChange = vi.fn();
-    const { rerender } = render(<Collapsible open={false} onOpenChange={onOpenChange} />);
-    rerender(<Collapsible open={true} onOpenChange={onOpenChange} />);
+    const { container, rerender } = render(
+      <Collapsible open={false} onOpenChange={onOpenChange}>
+        <span data-testid='child' />
+      </Collapsible>
+    );
+
+    rerender(
+      <Collapsible open={true} onOpenChange={onOpenChange}>
+        <span data-testid='child' />
+      </Collapsible>
+    );
+
+    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(container.querySelector('[data-slot="collapsible"]')).not.toBeNull();
   });
 });
 
@@ -94,7 +118,9 @@ describe('CollapsibleTrigger', () => {
     const { getByTestId } = render(
       <Collapsible>
         <CollapsibleTrigger asChild>
-          <button type='button' data-testid='custom-trigger'>toggle</button>
+          <button type='button' data-testid='custom-trigger'>
+            toggle
+          </button>
         </CollapsibleTrigger>
       </Collapsible>
     );

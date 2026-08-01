@@ -10,6 +10,10 @@ export class EmailError extends Data.TaggedError('EmailError')<{
   cause?: unknown;
 }> {}
 
+export class MissingDonorEmailError extends Data.TaggedError('MissingDonorEmailError')<{
+  paymentId: string;
+}> {}
+
 export class PaymentError extends Data.TaggedError('PaymentError')<{
   message: string;
   cause?: unknown;

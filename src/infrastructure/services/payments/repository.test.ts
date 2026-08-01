@@ -4,8 +4,9 @@ import { Effect, Layer } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PaymentChargeData } from './repository';
 
-const { savePayment, updatePaymentStatus, updatePaymentCharge, getPaymentById, getPaymentByEmail } =
-  await import('./repository');
+const { savePayment, updatePaymentStatus, updatePaymentCharge, getPaymentById, getPaymentByEmail } = await import(
+  './repository'
+);
 
 const mockExecute = vi.fn();
 const mockQuery = vi.fn();
@@ -51,6 +52,40 @@ const BASE_PAYMENT = {
   disputeReason: null,
   parentPaymentId: null,
   origin: process.env.NEXT_PUBLIC_SITE_URL ?? null,
+};
+
+const BASE_ROW = {
+  id: 'pi_test',
+  stripe_created_at: '2024-01-15T10:00:00.000Z',
+  stripe_customer_id: 'cus_123',
+  stripe_charge_id: 'ch_123',
+  email: 'user@example.com',
+  amount: 1000,
+  currency: 'eur',
+  status: 'succeeded',
+  payment_method_type: 'card',
+  description: 'Donation',
+  receipt_url: 'https://receipt.url',
+  promo_code: null,
+  user_agent: 'Mozilla/5.0',
+  ip_address: '1.2.3.4',
+  country: 'ES',
+  customer_name: 'Test User',
+  postal_code: '08001',
+  city: 'Barcelona',
+  state: null,
+  payment_brand: 'visa',
+  payment_last4: '4242',
+  fee_amount: 30,
+  net_amount: 970,
+  refunded_at: null,
+  refund_reason: null,
+  disputed_at: null,
+  dispute_reason: null,
+  parent_payment_id: null,
+  origin: 'https://forever-pto.com',
+  created_at: '2024-01-15 10:00:00',
+  updated_at: '2024-01-15 10:00:00',
 };
 
 beforeEach(() => {
@@ -164,10 +199,20 @@ describe('getPaymentById', () => {
     expect(args[0]).toBe('pi_test');
   });
 
-  it('returns the first row when found', async () => {
-    mockQuery.mockReturnValue(Effect.succeed([BASE_PAYMENT]));
+  it('maps the snake_case row onto PaymentData', async () => {
+    mockQuery.mockReturnValue(Effect.succeed([BASE_ROW]));
     const result = await runEffect(getPaymentById('pi_test'));
-    expect(result).toEqual(BASE_PAYMENT);
+    expect(result).toEqual({ ...BASE_PAYMENT, origin: BASE_ROW.origin });
+  });
+
+  it('converts the text timestamp columns to dates', async () => {
+    mockQuery.mockReturnValue(
+      Effect.succeed([{ ...BASE_ROW, refunded_at: '2024-02-01T09:30:00.000Z', disputed_at: null }])
+    );
+    const result = await runEffect(getPaymentById('pi_test'));
+    expect(result?.stripeCreatedAt).toEqual(new Date('2024-01-15T10:00:00.000Z'));
+    expect(result?.refundedAt).toEqual(new Date('2024-02-01T09:30:00.000Z'));
+    expect(result?.disputedAt).toBeNull();
   });
 
   it('returns undefined when no rows found', async () => {
@@ -191,10 +236,10 @@ describe('getPaymentByEmail', () => {
     expect(args[0]).toBe('user@example.com');
   });
 
-  it('returns the first row when found', async () => {
-    mockQuery.mockReturnValue(Effect.succeed([BASE_PAYMENT]));
+  it('maps the snake_case row onto PaymentData', async () => {
+    mockQuery.mockReturnValue(Effect.succeed([BASE_ROW]));
     const result = await runEffect(getPaymentByEmail('user@example.com'));
-    expect(result).toEqual(BASE_PAYMENT);
+    expect(result).toEqual({ ...BASE_PAYMENT, origin: BASE_ROW.origin });
   });
 
   it('returns undefined when no rows found', async () => {

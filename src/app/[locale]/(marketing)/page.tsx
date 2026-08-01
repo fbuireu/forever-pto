@@ -45,27 +45,3 @@ const HomePage = async ({ params }: PageProps) => {
 };
 
 export default HomePage;
-
-// better stack not working properly
-// todo: check everything (algo?, unify radius, colors, effects, everything)
-// todo: focus input order in stripe
-// todo: new logo stripe
-// todo: status pages localized
-// todo: all buttons (border color to show shadow?)
-// todo: improve responsive
-// todo: add context in every folder level?
-// todo: share button with results?
-// todo: recreate bones
-// todo: sponsor the project (reddit, producthunt)
-// todo: performance audit, react best practices audit
-// todo: ads?
-// todo: add LICENCE, SECURITY, DOCS (astro starlight), WIKI, etc
-// todo: add react compiler (use memo, etc) (at 23rd Dec requires babel plugin)
-// todo: unify component and folder structure (payment/provider should be dto?)
-// todo: Increase test coverage (check flows, click, pay, etc. Add thresholds)
-// todo: track origin of premium key (feature)
-// todo: add custom weekends
-// todo: slider calendar on mobile
-// todo: transformer to make sql data ready ':id': data.id',
-// todo: improve error handling in server actions (send whole error type and change icon when "save to db error")
-// todo: APPLY DDD + check everything (SSR, CSR, etc)

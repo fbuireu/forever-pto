@@ -4,12 +4,11 @@ import { ApplicationLayer } from '@infrastructure/layers';
 import { confirmation } from '@infrastructure/services/payments/confirmation';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
-import { getCurrencySymbol } from '@ui/utils/currencies';
 import { Effect } from 'effect';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import type { Locale } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
+import { getFormatter, getTranslations } from 'next-intl/server';
 
 export { generateMetadata } from './metadata';
 
@@ -77,8 +76,12 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
     return <PaymentError />;
   }
 
-  const t = await getTranslations('paymentConfirmation.success');
-  const currencySymbol = getCurrencySymbol({ locale, currency: data.currency });
+  const [t, format] = await Promise.all([getTranslations('paymentConfirmation.success'), getFormatter({ locale })]);
+  const formattedAmount = format.number(data.amount, {
+    style: 'currency',
+    currency: data.currency,
+    minimumFractionDigits: 2,
+  });
 
   return (
     <div className='min-h-screen flex items-center justify-center p-4 bg-background m-auto'>
@@ -94,10 +97,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
           <div className='rounded-lg bg-muted p-4 space-y-2'>
             <div className='flex justify-between text-sm'>
               <span className='text-muted-foreground'>{t('amountPaid')}</span>
-              <span className='font-medium'>
-                {currencySymbol}
-                {data.amount.toFixed(2)}
-              </span>
+              <span className='font-medium'>{formattedAmount}</span>
             </div>
             <div className='flex justify-between text-sm'>
               <span className='text-muted-foreground'>{t('status')}</span>

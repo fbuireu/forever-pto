@@ -1,4 +1,5 @@
 import { ApiError } from '@infrastructure/api/errors';
+import { INVALID_BODY } from '@infrastructure/api/parseJsonBody';
 import { SessionError, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
@@ -74,6 +75,14 @@ function makeRequest(body: unknown): Request {
   });
 }
 
+function makeRawRequest(body: string | null): Request {
+  return new Request('http://localhost/api/check-session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body,
+  });
+}
+
 describe('GET /api/check-session', () => {
   it('returns null fields when no cookie is present', async () => {
     mockCookiesGet.mockReturnValue(undefined);
@@ -136,6 +145,21 @@ describe('POST /api/check-session', () => {
     expect(response.status).toBe(400);
     const body = await response.json();
     expect(body.error).toBe('No payment found');
+  });
+
+  it('returns 400 with the validation shape when the body is malformed', async () => {
+    const response = await POST(makeRawRequest('{not json') as never);
+    expect(response.status).toBe(400);
+    const body = await response.json();
+    expect(body.error).toBe(INVALID_BODY);
+    expect(body.premiumKey).toBeNull();
+  });
+
+  it('returns 400 with the validation shape when the body is empty', async () => {
+    const response = await POST(makeRawRequest(null) as never);
+    expect(response.status).toBe(400);
+    const body = await response.json();
+    expect(body.error).toBe(INVALID_BODY);
   });
 
   it('returns 500 on SessionError', async () => {

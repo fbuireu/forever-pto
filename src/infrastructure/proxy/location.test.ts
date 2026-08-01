@@ -13,15 +13,18 @@ vi.mock('@infrastructure/services/location/detectCountry', () => ({
 }));
 
 vi.mock('./cookie', () => ({
+  USER_COUNTRY_COOKIE: 'user-country',
   setLocationCookie: mockSetLocationCookie,
 }));
 
 import { location } from './location';
 
-function makeParams(country: string | null = null) {
+function makeParams(country: string | null = null, cookieValue?: string) {
   mockDetectCountry.mockResolvedValue(country);
   const response = { cookies: { set: vi.fn() } };
-  const request = {};
+  const request = {
+    cookies: { get: vi.fn().mockReturnValue(cookieValue ? { value: cookieValue } : undefined) },
+  };
   return { request, response };
 }
 
@@ -50,5 +53,24 @@ describe('location', () => {
   it('still returns the response when no country is detected', async () => {
     const { request, response } = makeParams(null);
     await expect(location({ request, response } as never)).resolves.toBe(response);
+  });
+
+  describe('when the country cookie is already present', () => {
+    it('does not run detection', async () => {
+      const { request, response } = makeParams('FR', 'ES');
+      await location({ request, response } as never);
+      expect(mockDetectCountry).not.toHaveBeenCalled();
+    });
+
+    it('re-sets the cookie so the expiry window slides', async () => {
+      const { request, response } = makeParams('FR', 'ES');
+      await location({ request, response } as never);
+      expect(mockSetLocationCookie).toHaveBeenCalledWith(response, 'ES');
+    });
+
+    it('returns the response', async () => {
+      const { request, response } = makeParams('FR', 'ES');
+      await expect(location({ request, response } as never)).resolves.toBe(response);
+    });
   });
 });

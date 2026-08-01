@@ -17,7 +17,7 @@ const FORMAT = 'json';
 const detectCountryFromCDNEffect = Effect.gen(function* () {
   const { env } = yield* Effect.tryPromise(() => getCloudflareContext({ async: true }));
   const response = yield* Effect.tryPromise(() =>
-    fetch(`${env.NEXT_PUBLIC_SITE_URL}/${CDN_TRACE}`, { cache: 'force-cache', signal: AbortSignal.timeout(5000) })
+    fetch(`${env.NEXT_PUBLIC_SITE_URL}/${CDN_TRACE}`, { cache: 'no-store', signal: AbortSignal.timeout(5000) })
   );
 
   if (!response.ok) {
@@ -51,9 +51,9 @@ export function detectCountryFromHeaders(request: NextRequest) {
   return country.toLowerCase();
 }
 
-const detectCountryFromIPEffect = Effect.gen(function* () {
+const detectCountryFromEgressIPEffect = Effect.gen(function* () {
   const ipResponse = yield* Effect.tryPromise(() =>
-    fetch(`${IP_SERVICE}?format=${FORMAT}`, { cache: 'force-cache', signal: AbortSignal.timeout(5000) })
+    fetch(`${IP_SERVICE}?format=${FORMAT}`, { cache: 'no-store', signal: AbortSignal.timeout(5000) })
   );
 
   if (!ipResponse.ok) return '';
@@ -64,7 +64,7 @@ const detectCountryFromIPEffect = Effect.gen(function* () {
   const geoResponse = yield* Effect.tryPromise(() =>
     fetch(`${GEO_SERVICE}/${ip}/${FORMAT}`, {
       headers: { Accept: 'application/json' },
-      cache: 'force-cache',
+      cache: 'no-store',
       signal: AbortSignal.timeout(5000),
     })
   );
@@ -75,6 +75,6 @@ const detectCountryFromIPEffect = Effect.gen(function* () {
   return geoData.country?.toLowerCase() ?? '';
 });
 
-export async function detectCountryFromIP() {
-  return Effect.runPromise(detectCountryFromIPEffect.pipe(Effect.orElse(() => Effect.succeed(''))));
+export async function detectCountryFromEgressIP() {
+  return Effect.runPromise(detectCountryFromEgressIPEffect.pipe(Effect.orElse(() => Effect.succeed(''))));
 }

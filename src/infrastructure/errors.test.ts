@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DatabaseError,
   EmailError,
+  MissingDonorEmailError,
   PaymentError,
   PromoCodeError,
   PromoCodeErrors,
@@ -49,6 +50,16 @@ describe('EmailError', () => {
 
   it('carries the message', () => {
     expect(new EmailError({ message: 'timeout' }).message).toBe('timeout');
+  });
+});
+
+describe('MissingDonorEmailError', () => {
+  it('has the correct _tag', () => {
+    expect(new MissingDonorEmailError({ paymentId: 'pi_123' })._tag).toBe('MissingDonorEmailError');
+  });
+
+  it('carries the paymentId of the unrecoverable Donation', () => {
+    expect(new MissingDonorEmailError({ paymentId: 'pi_123' }).paymentId).toBe('pi_123');
   });
 });
 

@@ -1,8 +1,5 @@
 'use client';
 
-import type { CountryDTO } from '@application/dto/country/types';
-import type { RegionDTO } from '@application/dto/region/types';
-import type { FilterStrategy } from '@domain/calendar/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/modules/core/animate/base/Popover';
 import { ChevronUpDown } from '@ui/modules/core/animate/icons/ChevronUpDown';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
@@ -14,17 +11,23 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { FlagIcon } from './FlagIcon';
 import { hasFlag } from './utils/helpers';
 
-interface ComboboxProps extends Omit<HTMLProps<HTMLInputElement>, 'onChange'> {
-  searchPlaceholder?: string;
-  notFoundText?: string;
-  options?: CountryDTO[] | RegionDTO[];
-  value?: string;
-  onChange: (value: FilterStrategy) => void;
+interface ComboboxOption<TValue extends string> {
+  value: TValue;
+  label: string;
+  flag?: string;
 }
 
-const EMPTY_OPTIONS: CountryDTO[] | RegionDTO[] = [];
+interface ComboboxProps<TValue extends string> extends Omit<HTMLProps<HTMLInputElement>, 'onChange'> {
+  searchPlaceholder?: string;
+  notFoundText?: string;
+  options?: ComboboxOption<TValue>[];
+  value?: string;
+  onChange: (value: TValue) => void;
+}
 
-export const Combobox = ({
+const EMPTY_OPTIONS: ComboboxOption<never>[] = [];
+
+export const Combobox = <TValue extends string>({
   value = '',
   options = EMPTY_OPTIONS,
   placeholder,
@@ -34,7 +37,7 @@ export const Combobox = ({
   disabled,
   id,
   onChange,
-}: ComboboxProps) => {
+}: ComboboxProps<TValue>) => {
   const [open, setOpen] = useState(false);
 
   const selectedOption = options.find((option) => option.value.toLowerCase() === value.toLowerCase());
@@ -43,7 +46,7 @@ export const Combobox = ({
     const option = options.find((opt) => opt.label === selectedLabel);
     if (option) {
       if (option.value.toLowerCase() !== value.toLowerCase()) {
-        onChange(option.value.toLowerCase() as FilterStrategy);
+        onChange(option.value.toLowerCase() as TValue);
       }
       setOpen(false);
     }

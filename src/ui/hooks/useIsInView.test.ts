@@ -20,7 +20,6 @@ describe('useIsInView', () => {
   it('is true when inView prop is not passed, regardless of element visibility', () => {
     mockUseInView.mockReturnValue(false);
     const { result } = renderHook(() => useIsInView({ current: null }));
-    // !undefined === true, so isInView is always true when inView is omitted
     expect(result.current.isInView).toBe(true);
   });
 

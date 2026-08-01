@@ -14,8 +14,7 @@ const MockStripeLayer = Layer.succeed(StripeServerService, {
   webhooks: { constructEvent: vi.fn() },
 });
 
-const run = (id: string) =>
-  Effect.runPromise(retrieveCharge(id).pipe(Effect.provide(MockStripeLayer)));
+const run = (id: string) => Effect.runPromise(retrieveCharge(id).pipe(Effect.provide(MockStripeLayer)));
 
 const STRIPE_CHARGE = {
   id: 'ch_abc',
@@ -28,8 +27,9 @@ const STRIPE_CHARGE = {
     type: 'card',
     card: { brand: 'visa', last4: '4242' },
   },
-  application_fee_amount: 30,
+  application_fee_amount: null,
   amount: 1000,
+  balance_transaction: { id: 'txn_abc', fee: 54, net: 946 },
 };
 
 beforeEach(() => {
@@ -38,6 +38,11 @@ beforeEach(() => {
 });
 
 describe('retrieveCharge', () => {
+  it('expands the balance transaction, without which Stripe never returns the fee', async () => {
+    await run('ch_abc');
+    expect(mockChargesRetrieve).toHaveBeenCalledWith('ch_abc', { expand: ['balance_transaction'] });
+  });
+
   it('returns ChargeData with all mapped fields', async () => {
     const result = await run('ch_abc');
     expect(result).toEqual({
@@ -51,32 +56,45 @@ describe('retrieveCharge', () => {
       state: null,
       paymentBrand: 'visa',
       paymentLast4: '4242',
-      feeAmount: 30,
-      netAmount: 970,
+      feeAmount: 54,
+      netAmount: 946,
     });
   });
 
-  it('calculates netAmount as amount minus fee', async () => {
+  it('reads fee and net from the balance transaction, not the amount', async () => {
     mockChargesRetrieve.mockReturnValue(
-      Effect.succeed({ ...STRIPE_CHARGE, amount: 2000, application_fee_amount: 50 })
+      Effect.succeed({ ...STRIPE_CHARGE, amount: 2000, balance_transaction: { id: 'txn_abc', fee: 79, net: 1921 } })
     );
     const result = await run('ch_abc');
-    expect(result.netAmount).toBe(1950);
+    expect(result.feeAmount).toBe(79);
+    expect(result.netAmount).toBe(1921);
   });
 
-  it('sets feeAmount and netAmount to null when application_fee_amount is null', async () => {
+  it('reports no fee or net while the charge has not settled', async () => {
+    mockChargesRetrieve.mockReturnValue(Effect.succeed({ ...STRIPE_CHARGE, balance_transaction: null }));
+    const result = await run('ch_abc');
+    expect(result.feeAmount).toBeNull();
+    expect(result.netAmount).toBeNull();
+  });
+
+  it('reports no fee or net when the balance transaction is not expanded', async () => {
+    mockChargesRetrieve.mockReturnValue(Effect.succeed({ ...STRIPE_CHARGE, balance_transaction: 'txn_abc' }));
+    const result = await run('ch_abc');
+    expect(result.feeAmount).toBeNull();
+    expect(result.netAmount).toBeNull();
+  });
+
+  it('never substitutes the Connect application fee for the Stripe processing fee', async () => {
     mockChargesRetrieve.mockReturnValue(
-      Effect.succeed({ ...STRIPE_CHARGE, application_fee_amount: null })
+      Effect.succeed({ ...STRIPE_CHARGE, application_fee_amount: 30, balance_transaction: null })
     );
     const result = await run('ch_abc');
     expect(result.feeAmount).toBeNull();
-    expect(result.netAmount).toBe(1000);
+    expect(result.netAmount).toBeNull();
   });
 
   it('sets billing fields to null when billing_details is missing', async () => {
-    mockChargesRetrieve.mockReturnValue(
-      Effect.succeed({ ...STRIPE_CHARGE, billing_details: null })
-    );
+    mockChargesRetrieve.mockReturnValue(Effect.succeed({ ...STRIPE_CHARGE, billing_details: null }));
     const result = await run('ch_abc');
     expect(result.country).toBeNull();
     expect(result.customerName).toBeNull();
@@ -85,9 +103,7 @@ describe('retrieveCharge', () => {
   });
 
   it('sets card fields to null when payment_method_details is missing', async () => {
-    mockChargesRetrieve.mockReturnValue(
-      Effect.succeed({ ...STRIPE_CHARGE, payment_method_details: null })
-    );
+    mockChargesRetrieve.mockReturnValue(Effect.succeed({ ...STRIPE_CHARGE, payment_method_details: null }));
     const result = await run('ch_abc');
     expect(result.paymentMethodType).toBeNull();
     expect(result.paymentBrand).toBeNull();

@@ -1,13 +1,16 @@
 import { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
+import { DatabaseError, MissingDonorEmailError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
 import type Stripe from 'stripe';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { processWebhookEvent } from './webhook';
 
 vi.mock('@domain/payment/events/factory/events', () => ({
-  createPaymentSucceededEvent: vi.fn().mockReturnValue({ type: 'payment_succeeded', paymentId: 'pi_test' }),
+  createPaymentSucceededEvent: vi
+    .fn()
+    .mockReturnValue(Effect.succeed({ type: 'payment_succeeded', paymentId: 'pi_test' })),
   createPaymentFailedEvent: vi.fn().mockReturnValue({ type: 'payment_failed', paymentId: 'pi_test' }),
 }));
 
@@ -73,6 +76,60 @@ describe('processWebhookEvent', () => {
     vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed(undefined as never));
     await run(processWebhookEvent(makeEvent('payment_intent.succeeded', { id: 'pi_test' })));
     expect(savePayment).toHaveBeenCalledOnce();
+  });
+
+  it('propagates a handlePaymentSucceeded failure so Stripe retries the delivery', async () => {
+    const { handlePaymentSucceeded } = await import('@domain/payment/handlers/paymentSucceeded');
+    vi.mocked(handlePaymentSucceeded).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: 'db down' })));
+    await expect(
+      run(processWebhookEvent(makeEvent('payment_intent.succeeded', { id: 'pi_test' })))
+    ).rejects.toBeDefined();
+  });
+
+  it('logs the error when handlePaymentSucceeded fails', async () => {
+    const { handlePaymentSucceeded } = await import('@domain/payment/handlers/paymentSucceeded');
+    vi.mocked(handlePaymentSucceeded).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: 'db down' })));
+    await run(processWebhookEvent(makeEvent('payment_intent.succeeded', { id: 'pi_test' }))).catch(() => undefined);
+    expect(mockLogger.logError).toHaveBeenCalledWith(
+      'Error handling successful payment',
+      expect.anything(),
+      expect.objectContaining({ paymentId: 'pi_test' })
+    );
+  });
+
+  it('succeeds so Stripe stops redelivering when the intent carries no donor email', async () => {
+    const { createPaymentSucceededEvent } = await import('@domain/payment/events/factory/events');
+    vi.mocked(createPaymentSucceededEvent).mockReturnValueOnce(
+      Effect.fail(new MissingDonorEmailError({ paymentId: 'pi_test' }))
+    );
+    await expect(
+      run(processWebhookEvent(makeEvent('payment_intent.succeeded', { id: 'pi_test' })))
+    ).resolves.toBeUndefined();
+  });
+
+  it('logs an error and touches nothing when the intent carries no donor email', async () => {
+    const { createPaymentSucceededEvent } = await import('@domain/payment/events/factory/events');
+    const { handlePaymentSucceeded } = await import('@domain/payment/handlers/paymentSucceeded');
+    const { savePayment } = await import('@infrastructure/services/payments/repository');
+    vi.mocked(createPaymentSucceededEvent).mockReturnValueOnce(
+      Effect.fail(new MissingDonorEmailError({ paymentId: 'pi_test' }))
+    );
+    await run(processWebhookEvent(makeEvent('payment_intent.succeeded', { id: 'pi_test' })));
+    expect(mockLogger.logError).toHaveBeenCalledWith(
+      'Payment succeeded with no donor email, Premium can never be recovered',
+      expect.any(MissingDonorEmailError),
+      expect.objectContaining({ paymentId: 'pi_test' })
+    );
+    expect(handlePaymentSucceeded).not.toHaveBeenCalled();
+    expect(savePayment).not.toHaveBeenCalled();
+  });
+
+  it('propagates a handlePaymentFailed failure so Stripe retries the delivery', async () => {
+    const { handlePaymentFailed } = await import('@domain/payment/handlers/paymentFailed');
+    vi.mocked(handlePaymentFailed).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: 'db down' })));
+    await expect(
+      run(processWebhookEvent(makeEvent('payment_intent.payment_failed', { id: 'pi_test' })))
+    ).rejects.toBeDefined();
   });
 
   it('calls handlePaymentFailed for payment_intent.payment_failed', async () => {

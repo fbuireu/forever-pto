@@ -20,15 +20,15 @@
   button,
   input,
   textarea,
-  [role='button'] {
+  [role="button"] {
     -webkit-tap-highlight-color: transparent;
   }
   button,
-  [data-slot='button'],
-  [data-slot='badge'],
-  [data-slot='input'],
-  [data-slot='textarea'],
-  [data-slot='card'] {
+  [data-slot="button"],
+  [data-slot="badge"],
+  [data-slot="input"],
+  [data-slot="textarea"],
+  [data-slot="card"] {
     transition:
       transform 80ms linear,
       filter 80ms linear,

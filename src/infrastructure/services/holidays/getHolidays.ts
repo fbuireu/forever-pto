@@ -26,12 +26,10 @@ export async function getHolidays({ year, country, region, locale, carryOverMont
     const nationalHolidays = getNationalHolidays(params);
     const regionalHolidays = getRegionalHolidays({ ...params, region });
 
-    return holidayDTO
-      .create({
-        raw: [...nationalHolidays, ...regionalHolidays],
-        params: { year, carryOverMonths, regions },
-      })
-      .sort((a, b) => a.date.getTime() - b.date.getTime());
+    return holidayDTO.create({
+      raw: [...nationalHolidays, ...regionalHolidays],
+      params: { year, carryOverMonths, regions },
+    });
   }).pipe(
     Effect.catchAll((error) => {
       logger.logError('Error in getHolidays', error, { country, region, year });

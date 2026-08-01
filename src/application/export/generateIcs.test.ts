@@ -1,6 +1,5 @@
-import { HolidayVariant } from '@application/dto/holiday/types';
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import type { Suggestion } from '@domain/calendar/types';
+import { HolidayVariant } from '@application/dto/holiday/types';
 import { describe, expect, it } from 'vitest';
 import { generateIcs } from './generateIcs';
 
@@ -13,14 +12,12 @@ const makeHoliday = (overrides: Partial<HolidayDTO> = {}): HolidayDTO => ({
   ...overrides,
 });
 
-const makeSuggestion = (days: Date[]): Suggestion => ({ days });
-
 const baseOptions = {
   year: 2025,
   calendarName: 'Forever PTO',
   ptoDayLabel: 'PTO Day',
   holidays: [] as HolidayDTO[],
-  suggestion: null as Suggestion | null,
+  ptoDays: [] as Date[],
   includeHolidays: true,
   includePto: true,
 };
@@ -82,10 +79,10 @@ describe('generateIcs', () => {
   });
 
   describe('PTO events', () => {
-    it('includes PTO events when includePto is true and suggestion exists', () => {
+    it('includes PTO events when includePto is true and days are given', () => {
       const result = generateIcs({
         ...baseOptions,
-        suggestion: makeSuggestion([new Date('2025-03-10')]),
+        ptoDays: [new Date('2025-03-10')],
         includePto: true,
       });
       expect(result).toContain('SUMMARY:PTO Day');
@@ -96,20 +93,20 @@ describe('generateIcs', () => {
     it('excludes PTO events when includePto is false', () => {
       const result = generateIcs({
         ...baseOptions,
-        suggestion: makeSuggestion([new Date('2025-03-10')]),
+        ptoDays: [new Date('2025-03-10')],
         includePto: false,
       });
       expect(result).not.toContain('CATEGORIES:PTO');
     });
 
-    it('excludes PTO events when suggestion is null', () => {
-      const result = generateIcs({ ...baseOptions, suggestion: null, includePto: true });
+    it('excludes PTO events when there are no PTO days', () => {
+      const result = generateIcs({ ...baseOptions, ptoDays: [], includePto: true });
       expect(result).not.toContain('CATEGORIES:PTO');
     });
 
     it('includes multiple PTO days', () => {
       const days = [new Date('2025-06-02'), new Date('2025-06-03'), new Date('2025-06-04')];
-      const result = generateIcs({ ...baseOptions, suggestion: makeSuggestion(days), includePto: true });
+      const result = generateIcs({ ...baseOptions, ptoDays: days, includePto: true });
       expect(result).toContain('UID:pto-20250602@forever-pto');
       expect(result).toContain('UID:pto-20250603@forever-pto');
       expect(result).toContain('UID:pto-20250604@forever-pto');
@@ -179,7 +176,7 @@ describe('generateIcs', () => {
       const result = generateIcs({
         ...baseOptions,
         holidays: [makeHoliday({ id: 'h-1', name: 'New Year', date: new Date('2025-01-01') })],
-        suggestion: makeSuggestion([new Date('2025-03-10')]),
+        ptoDays: [new Date('2025-03-10')],
         includeHolidays: true,
         includePto: true,
       });
@@ -191,7 +188,7 @@ describe('generateIcs', () => {
       const result = generateIcs({
         ...baseOptions,
         holidays: [makeHoliday()],
-        suggestion: makeSuggestion([new Date('2025-03-10')]),
+        ptoDays: [new Date('2025-03-10')],
         includeHolidays: false,
         includePto: false,
       });

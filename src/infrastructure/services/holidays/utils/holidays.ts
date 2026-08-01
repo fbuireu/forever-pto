@@ -1,7 +1,11 @@
-import Holidays from 'date-holidays';
+import Holidays, { type HolidaysTypes } from 'date-holidays';
+
+const NON_WORKING_TYPES = new Set<HolidaysTypes.HolidayType>(['public', 'bank']);
 
 export function getHolidaysForYears(holidays: Holidays, year: number) {
-  return [...holidays.getHolidays(year), ...holidays.getHolidays(year + 1)];
+  return [...holidays.getHolidays(year), ...holidays.getHolidays(year + 1)].filter(({ type }) =>
+    NON_WORKING_TYPES.has(type)
+  );
 }
 
 interface GetNationalHolidaysParams {

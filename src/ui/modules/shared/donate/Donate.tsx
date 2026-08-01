@@ -6,10 +6,9 @@ import { calculateFinalAmount } from '@application/dto/payment/utils/helpers';
 import { usePremiumStore } from '@application/stores/premium';
 import { useUIStore } from '@application/stores/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
-import { PromoCodeError, PromoCodeErrors } from '@infrastructure/errors';
 import { getStripeClientInstance } from '@infrastructure/clients/payments/stripe/client';
+import { PromoCodeError, PromoCodeErrors } from '@infrastructure/errors';
 import { Elements } from '@stripe/react-stripe-js';
 import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { initializePayment } from '@ui/adapters/payments/checkout';
@@ -33,7 +32,6 @@ interface PaymentState {
   discountInfo: DiscountInfo | null;
 }
 
-const logger = getBetterStackInstance();
 const stripePromise = getStripeClientInstance().getStripePromise();
 
 export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
@@ -160,12 +158,14 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
             discountInfo: result.discountInfo ?? null,
           });
         } catch (error) {
-          logger.logError('Payment initialization failed in Donate component', error, {
-            amount: data.amount,
-            hasPromoCode: !!data.promoCode,
-            promoCodeLength: data.promoCode?.length,
-            currency,
-            locale,
+          void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
+            getBetterStackInstance().logError('Payment initialization failed in Donate component', error, {
+              amount: data.amount,
+              hasPromoCode: !!data.promoCode,
+              promoCodeLength: data.promoCode?.length,
+              currency,
+              locale,
+            });
           });
           if (error instanceof PromoCodeError) {
             const descriptions = {
@@ -225,26 +225,26 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 
     const t = isDark
       ? {
-          bg: '#1A1612', // --card
-          bgInput: '#181410', // --input
-          fg: '#FFF5E1', // --foreground
-          frame: '#FFF5E1', // --frame
-          accent: '#FFD93D', // --accent (same in both modes)
+          bg: '#1A1612',
+          bgInput: '#181410',
+          fg: '#FFF5E1',
+          frame: '#FFF5E1',
+          accent: '#FFD93D',
           accentText: '#0E0E0E',
-          hover: '#2B241E', // --secondary
+          hover: '#2B241E',
           destructive: '#FF5A5F',
-          muted: '#C6B8A5', // --muted-foreground
+          muted: '#C6B8A5',
         }
       : {
-          bg: '#FFFDF8', // --card
-          bgInput: '#FFFAF0', // --input
-          fg: '#0E0E0E', // --foreground
-          frame: '#0E0E0E', // --frame
-          accent: '#FFD93D', // --accent
+          bg: '#FFFDF8',
+          bgInput: '#FFFAF0',
+          fg: '#0E0E0E',
+          frame: '#0E0E0E',
+          accent: '#FFD93D',
           accentText: '#0E0E0E',
-          hover: '#FFF0C6', // --secondary
+          hover: '#FFF0C6',
           destructive: '#FF5A5F',
-          muted: '#6B5E4E', // --muted-foreground
+          muted: '#6B5E4E',
         };
 
     return {
@@ -268,7 +268,6 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
           fontWeightBold: '700',
           spacingUnit: '4px',
           borderRadius: '8px',
-          // Brutal focus ring
           focusBoxShadow: `4px 4px 0 0 ${t.frame}`,
           focusOutline: 'none',
         },

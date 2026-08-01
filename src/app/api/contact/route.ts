@@ -1,16 +1,20 @@
+import type { ContactFormData } from '@application/dto/contact/schema';
 import { sendContactEmail } from '@application/use-cases/contact';
 import { ApiError } from '@infrastructure/api/errors';
+import { parseJsonBody } from '@infrastructure/api/parseJsonBody';
 import { ApplicationLayer } from '@infrastructure/layers';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { Effect } from 'effect';
 import { after, type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
   const { env } = getCloudflareContext();
 
   return Effect.runPromise(
-    sendContactEmail(body, { siteUrl: env.NEXT_PUBLIC_SITE_URL, contactEmail: env.NEXT_PUBLIC_CONTACT_EMAIL }).pipe(
+    parseJsonBody<ContactFormData>(request).pipe(
+      Effect.flatMap((body) =>
+        sendContactEmail(body, { siteUrl: env.NEXT_PUBLIC_SITE_URL, contactEmail: env.NEXT_PUBLIC_CONTACT_EMAIL })
+      ),
       Effect.map(({ deferred }) => {
         after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer))));
         return NextResponse.json({ success: true });

@@ -2,12 +2,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockLoadStripe = vi.hoisted(() => vi.fn());
 
+const { mockLogError, mockGetBetterStackInstance } = vi.hoisted(() => {
+  const mockLogError = vi.fn();
+  return { mockLogError, mockGetBetterStackInstance: vi.fn(() => ({ logError: mockLogError })) };
+});
+
 vi.mock('@stripe/stripe-js', () => ({
   loadStripe: mockLoadStripe,
 }));
 
 vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({
-  getBetterStackInstance: vi.fn().mockReturnValue({ logError: vi.fn() }),
+  getBetterStackInstance: mockGetBetterStackInstance,
 }));
 
 const mockConfirmPayment = vi.fn();
@@ -41,6 +46,38 @@ describe('getStripeClientInstance', () => {
     const a = getStripeClientInstance();
     const b = getStripeClientInstance();
     expect(a).toBe(b);
+  });
+
+  it('does not reach for the BetterStack client until something fails', async () => {
+    vi.resetModules();
+    const { getStripeClientInstance: freshClientInstance } = await import('./client');
+    mockConfirmPayment.mockResolvedValue({ paymentIntent: { status: 'succeeded', id: 'pi_ok' } });
+    await freshClientInstance().confirmPayment({ clientSecret: 'cs' });
+    expect(mockGetBetterStackInstance).not.toHaveBeenCalled();
+  });
+});
+
+describe('StripeClient logging', () => {
+  it('logs a failed confirmPayment through the BetterStack client', async () => {
+    mockConfirmPayment.mockRejectedValue({ type: 'card_error', message: 'Card declined.' });
+    await getStripeClientInstance().confirmPayment({ clientSecret: 'cs' });
+    await vi.waitFor(() =>
+      expect(mockLogError).toHaveBeenCalledWith(
+        'Stripe confirmPayment failed',
+        expect.anything(),
+        expect.objectContaining({ hasClientSecret: true })
+      )
+    );
+  });
+
+  it('logs a failed confirmCardPayment through the BetterStack client', async () => {
+    mockConfirmCardPayment.mockRejectedValue({ type: 'card_error', message: 'Card declined.' });
+    await getStripeClientInstance().confirmCardPayment('cs');
+    await vi.waitFor(() =>
+      expect(mockLogError).toHaveBeenCalledWith('Stripe confirmCardPayment failed', expect.anything(), {
+        hasClientSecret: true,
+      })
+    );
   });
 });
 

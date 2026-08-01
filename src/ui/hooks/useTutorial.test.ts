@@ -1,4 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
+import { isValidElement } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockToggleSidebar = vi.hoisted(() => vi.fn());
@@ -79,5 +80,16 @@ describe('useTutorial', () => {
     expect(options).toHaveProperty('prevBtnText');
     expect(options).toHaveProperty('doneBtnText');
     expect(options).toHaveProperty('progressText');
+  });
+
+  it('injects the close icon element the driver client renders into the popover', async () => {
+    const { result } = renderHook(() => useTutorial());
+
+    await act(async () => {
+      await result.current.startTutorial();
+    });
+
+    const options = mockStart.mock.lastCall?.[1] as { closeIcon?: unknown };
+    expect(isValidElement(options.closeIcon)).toBe(true);
   });
 });

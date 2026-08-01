@@ -106,6 +106,30 @@ describe('activateWithPayment', () => {
     expect(err).toBeInstanceOf(ValidationError);
   });
 
+  it('fails with ValidationError when the payment intent carries no email', async () => {
+    mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
+      Effect.succeed({ ...SUCCEEDED_INTENT, metadata: {}, receipt_email: null }) as never
+    );
+    const err = await runFail(activateWithPayment('attacker@example.com', 'pi_test'));
+    expect(err).toBeInstanceOf(ValidationError);
+  });
+
+  it('does not mint a session for a payment intent that carries no email', async () => {
+    const { createSession } = await import('@infrastructure/services/premium/session');
+    mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
+      Effect.succeed({ ...SUCCEEDED_INTENT, metadata: {}, receipt_email: null }) as never
+    );
+    await runFail(activateWithPayment('attacker@example.com', 'pi_test'));
+    expect(createSession).not.toHaveBeenCalled();
+  });
+
+  it('accepts when receipt_email matches the provided email', async () => {
+    mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
+      Effect.succeed({ ...SUCCEEDED_INTENT, metadata: {}, receipt_email: 'test@example.com' }) as never
+    );
+    await expect(run(activateWithPayment('test@example.com', 'pi_test'))).resolves.toBeDefined();
+  });
+
   it('accepts when metadata email matches the provided email', async () => {
     await expect(run(activateWithPayment('test@example.com', 'pi_test'))).resolves.toBeDefined();
   });
@@ -129,6 +153,14 @@ describe('activateWithEmail', () => {
     vi.mocked(getPaymentByEmail).mockReturnValueOnce(Effect.succeed({ id: 'pi_found', status: 'processing' } as never));
     const err = await runFail(activateWithEmail('test@example.com'));
     expect(err).toBeInstanceOf(ValidationError);
+  });
+
+  it('runs on a layer providing TursoService alone', async () => {
+    const { getPaymentByEmail } = await import('@infrastructure/services/payments/repository');
+    vi.mocked(getPaymentByEmail).mockReturnValueOnce(Effect.succeed({ id: 'pi_found', status: 'succeeded' } as never));
+    const TursoOnlyLayer = Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn(), batch: vi.fn() });
+    const result = await Effect.runPromise(activateWithEmail('test@example.com').pipe(Effect.provide(TursoOnlyLayer)));
+    expect(result).toMatchObject({ premiumKey: 'pi_found', token: 'jwt-token' });
   });
 
   it('calls createSession with the payment id', async () => {

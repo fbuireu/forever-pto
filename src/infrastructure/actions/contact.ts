@@ -19,7 +19,7 @@ export async function sendContactEmailAction(data: ContactFormData) {
       Effect.provide(ApplicationLayer),
       Effect.catchTags({
         ValidationError: (e) => Effect.succeed({ success: false as const, error: e.message }),
-        EmailError: (e) => Effect.succeed({ success: false as const, error: e.message }),
+        EmailError: () => Effect.succeed({ success: false as const, error: ApiError.INTERNAL_ERROR }),
       }),
       Effect.catchAll(() => Effect.succeed({ success: false as const, error: ApiError.INTERNAL_ERROR }))
     )

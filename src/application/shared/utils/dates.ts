@@ -43,7 +43,7 @@ export const isInSelectedRange = ({ date, rangeStart, rangeEnd }: IsInSelectedRa
 
 export const isWeekend = (date: Date): boolean => {
   const { dayOfWeek } = toPlainDate(date);
-  return dayOfWeek === 6 || dayOfWeek === 7; // ISO: 6=Sat, 7=Sun
+  return dayOfWeek === 6 || dayOfWeek === 7;
 };
 
 export const addDays = (date: Date, days: number): Date => toDate(toPlainDate(date).add({ days }));
@@ -82,7 +82,7 @@ export const endOfMonth = (date: Date): Date => {
 
 export const startOfWeek = (date: Date, options?: { weekStartsOn?: Day }): Date => {
   const pd = toPlainDate(date);
-  const startDay = options?.weekStartsOn || 7; // 0 (Sun) → 7, 1–6 unchanged (ISO dayOfWeek)
+  const startDay = options?.weekStartsOn || 7;
   const diff = (pd.dayOfWeek - startDay + 7) % 7;
   return toDate(pd.subtract({ days: diff }));
 };
@@ -175,7 +175,7 @@ export interface GetWeekdayNamesParams {
 const weekdayFmtCache = new Map<string, Intl.DateTimeFormat>();
 
 export const getWeekdayNames = ({ locale, weekStartsOn = 0, format = 'short' }: GetWeekdayNamesParams): string[] => {
-  const anchor = new Date(2023, 0, 2); // known Monday
+  const anchor = new Date(2023, 0, 2);
   const weekStart = startOfWeek(anchor, { weekStartsOn });
   const key = `${locale}-${weekStartsOn}-${format}`;
   let fmt = weekdayFmtCache.get(key);

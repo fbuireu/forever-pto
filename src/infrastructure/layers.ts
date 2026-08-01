@@ -8,5 +8,5 @@ export const ApplicationLayer = Layer.mergeAll(
   TursoServiceLive,
   StripeServerServiceLive,
   ResendServiceLive,
-  LoggerServiceLive,
+  LoggerServiceLive
 );

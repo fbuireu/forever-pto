@@ -51,8 +51,7 @@ function DialogPortal(props: DialogPortalProps) {
   );
 }
 
-type DialogBackdropProps = Omit<ComponentProps<typeof DialogPrimitive.Backdrop>, 'render'> &
-  HTMLMotionProps<'div'>;
+type DialogBackdropProps = Omit<ComponentProps<typeof DialogPrimitive.Backdrop>, 'render'> & HTMLMotionProps<'div'>;
 function DialogBackdrop({ transition = { duration: 0.2, ease: 'easeInOut' }, ...props }: DialogBackdropProps) {
   return (
     <DialogPrimitive.Backdrop

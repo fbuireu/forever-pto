@@ -14,8 +14,16 @@ vi.mock('motion/react', async () => {
   const { createElement, Fragment } = await import('react');
   return {
     m: {
-      div: ({ children, initial: _i, animate: _a, exit: _e, transition: _t, layout: _l, style, ...props }: MotionDivProps) =>
-        createElement('div', { style, ...props }, children),
+      div: ({
+        children,
+        initial: _i,
+        animate: _a,
+        exit: _e,
+        transition: _t,
+        layout: _l,
+        style,
+        ...props
+      }: MotionDivProps) => createElement('div', { style, ...props }, children),
     },
     AnimatePresence: ({ children }: { children?: ReactNode }) => createElement(Fragment, null, children),
   };
@@ -34,7 +42,10 @@ vi.mock('@base-ui/react/accordion', async () => {
       Trigger: forwardRef<HTMLButtonElement, ComponentProps<'button'>>(({ children, ...props }, ref) =>
         createElement('button', { ref, 'data-slot': 'accordion-trigger', ...props }, children)
       ),
-      Panel: ({ children, ...props }: ComponentProps<'div'> & { render?: unknown; keepMounted?: boolean; hidden?: boolean }) =>
+      Panel: ({
+        children,
+        ...props
+      }: ComponentProps<'div'> & { render?: unknown; keepMounted?: boolean; hidden?: boolean }) =>
         createElement('div', { 'data-slot': 'accordion-panel', ...props }, children),
     },
   };
@@ -51,7 +62,11 @@ describe('Accordion', () => {
 
 describe('AccordionItem', () => {
   it('renders with data-slot="accordion-item"', () => {
-    const { container } = render(<AccordionItem value='item-1'><span /></AccordionItem>);
+    const { container } = render(
+      <AccordionItem value='item-1'>
+        <span />
+      </AccordionItem>
+    );
     expect(container.querySelector('[data-slot="accordion-item"]')).not.toBeNull();
   });
 
@@ -68,9 +83,9 @@ describe('AccordionItem', () => {
 
 describe('AccordionTrigger', () => {
   it('throws when used outside AccordionItem', () => {
-    expect(() =>
-      render(<AccordionTrigger>trigger</AccordionTrigger>)
-    ).toThrow('useAccordionItem must be used within an AccordionItem');
+    expect(() => render(<AccordionTrigger>trigger</AccordionTrigger>)).toThrow(
+      'useAccordionItem must be used within an AccordionItem'
+    );
   });
 
   it('renders inside AccordionItem without throwing', () => {

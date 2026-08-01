@@ -1,6 +1,4 @@
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '@ui/modules/core/animate/base/Accordion';
-import { Switch } from '@ui/modules/core/animate/primitives/base/Switch';
-import { Button } from '@ui/modules/core/primitives/Button';
 import {
   Dialog,
   DialogContent,
@@ -8,7 +6,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@ui/modules/core/primitives/Dialog';
+} from '@ui/modules/core/animate/base/Dialog';
+import { Switch } from '@ui/modules/core/animate/primitives/base/Switch';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { Label } from '@ui/modules/core/primitives/Label';
 import { Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -77,9 +77,7 @@ export const CookieConsentDialog = ({
 
         <div className='space-y-6 py-4'>
           {COOKIE_SECTIONS.map((section) => {
-            const allCookies = section.services
-              ? section.services.flatMap((s) => s.cookies)
-              : (section.cookies ?? []);
+            const allCookies = section.services ? section.services.flatMap((s) => s.cookies) : (section.cookies ?? []);
 
             return (
               <div
@@ -89,9 +87,7 @@ export const CookieConsentDialog = ({
                 <div className='flex items-start justify-between gap-4'>
                   <div className='flex-1'>
                     <Label className='text-base font-semibold'>{t(`${section.id}Cookies`)}</Label>
-                    <p className='text-sm text-muted-foreground mt-1'>
-                      {t(`${section.id}Description`)}
-                    </p>
+                    <p className='text-sm text-muted-foreground mt-1'>{t(`${section.id}Description`)}</p>
                   </div>
                   {isAnalyticsSection(section.id) ? (
                     <Switch checked={analyticsEnabled} onCheckedChange={onAnalyticsChange} />
@@ -104,9 +100,7 @@ export const CookieConsentDialog = ({
                   <div className='space-y-2 border-t border-border pt-3'>
                     {section.services.map((service) => (
                       <div key={service.id} className='flex items-center justify-between pl-2'>
-                        <Label className='text-sm font-medium cursor-pointer'>
-                          {t(service.labelKey)}
-                        </Label>
+                        <Label className='text-sm font-medium cursor-pointer'>{t(service.labelKey)}</Label>
                         <Switch
                           checked={serviceStates[service.id] ?? false}
                           onCheckedChange={(checked) => onServiceChange(service.id, checked)}

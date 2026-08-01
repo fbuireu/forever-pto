@@ -1,5 +1,6 @@
 import { activateWithEmail, activateWithPayment } from '@application/use-cases/activatePremium';
 import { ApiError } from '@infrastructure/api/errors';
+import { parseJsonBody } from '@infrastructure/api/parseJsonBody';
 import { noStore } from '@infrastructure/api/response';
 import { ApplicationLayer } from '@infrastructure/layers';
 import { clearPremiumCookie, PREMIUM_COOKIE, setPremiumCookie } from '@infrastructure/services/premium/cookie';
@@ -29,16 +30,16 @@ export async function GET(_request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const body: Record<string, unknown> = await request.json();
-  const email = typeof body.email === 'string' ? body.email : undefined;
-  const premiumKey = typeof body.premiumKey === 'string' ? body.premiumKey : undefined;
-
-  if (!email) {
-    return noStore({ error: ApiError.EMAIL_REQUIRED }, { status: 400 });
-  }
-
   return Effect.runPromise(
     Effect.gen(function* () {
+      const body = yield* parseJsonBody<Record<string, unknown>>(request);
+      const email = typeof body.email === 'string' ? body.email : undefined;
+      const premiumKey = typeof body.premiumKey === 'string' ? body.premiumKey : undefined;
+
+      if (!email) {
+        return noStore({ error: ApiError.EMAIL_REQUIRED }, { status: 400 });
+      }
+
       const result = yield* premiumKey ? activateWithPayment(email, premiumKey) : activateWithEmail(email);
 
       const response = noStore({ success: true, premiumKey: result.premiumKey, email: result.email });
