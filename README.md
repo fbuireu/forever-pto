@@ -1,6 +1,6 @@
 # Forever PTO
 
-**Maximize your time off.** Forever PTO helps you strategically combine vacation days with public holidays to get the most out of every PTO day you have.
+**Maximize your time off.** Forever PTO helps you strategically combine your PTO days with public holidays to get the most out of every one of them.
 
 → **[forever-pto.com](https://forever-pto.com)**
 
@@ -8,7 +8,7 @@
 
 ## What it does
 
-Given your country, region, year, and number of PTO days, Forever PTO suggests the optimal way to place your vacation days so you get the longest possible stretches of time off — automatically accounting for weekends and public holidays.
+Given your country, region, year, and number of PTO days, Forever PTO suggests the optimal way to place your PTO days so you get the longest possible stretches of time off — automatically accounting for weekends and public holidays.
 
 **Three strategies:**
 
@@ -19,7 +19,7 @@ Given your country, region, year, and number of PTO days, Forever PTO suggests t
 **Beyond scheduling:**
 
 - Edit, delete, or add custom holidays
-- See efficiency stats (performance gain, long weekends, work streaks)
+- See efficiency stats (efficiency, gain, long weekends, max work streak)
 - PTO accrual calculator, PTO vs salary calculator, workday counter
 - Charts and yearly summary
 - Premium features for advanced analysis
@@ -31,14 +31,14 @@ Given your country, region, year, and number of PTO days, Forever PTO suggests t
 | Layer | Tech |
 | --- | --- |
 | Framework | Next.js 16 (App Router) + React 19 |
-| Language | TypeScript 6 |
+| Language | TypeScript 7 (native compiler) |
 | Styling | Tailwind CSS v4 + shadcn/ui |
 | State | Zustand |
-| i18n | next-intl — en, es, ca, it |
+| i18n | next-intl — en, es, ca, it, de, fr |
 | Database | Turso (serverless SQLite) |
 | Payments | Stripe |
 | Email | Resend |
-| Auth | Cloudflare Access + jose |
+| Premium session | `jose` — a signed, HTTP-only JWT cookie; there are no accounts |
 | Deployment | Cloudflare Workers via OpenNextJS |
 | Monitoring | BetterStack |
 | Testing | Vitest + Playwright |
@@ -48,7 +48,7 @@ Given your country, region, year, and number of PTO days, Forever PTO suggests t
 
 ## Getting started
 
-**Requirements:** Node.js ≥ 24, pnpm 10
+**Requirements:** Node.js 26.3.0 (`.nvmrc`, mirrored in `engines.node`), pnpm 11.18.0 (`packageManager`) — pinned, match exactly
 
 ```bash
 # Install dependencies
@@ -72,6 +72,7 @@ pnpm deploy           # Build + deploy to Cloudflare Workers
 pnpm preview          # Local Cloudflare Workers preview
 
 pnpm test:ut          # Unit tests
+pnpm test:docs        # Docs ⟷ code consistency (also runs inside test:ut)
 pnpm test:e2e         # E2E tests (Playwright)
 
 pnpm lint:all:fix     # Fix all lint issues
@@ -91,9 +92,20 @@ See [`.env.example`](.env.example) for the full list. Key variables:
 | `STRIPE_SECRET_KEY` | Stripe secret key |
 | `RESEND_API_KEY` | Resend API key |
 | `JWT_SECRET` | JWT signing secret |
-| `CF_ACCESS_TEAM_DOMAIN` | Cloudflare Access team domain |
-| `CF_ACCESS_WORKERS_AUD` | CF Access AUD for workers.dev |
-| `CF_ACCESS_PREVIEW_AUD` | CF Access AUD for preview URLs |
+
+---
+
+## Documentation
+
+| Document | What it answers |
+| --- | --- |
+| [`CLAUDE.md`](CLAUDE.md) | How the codebase is built, and the rules for changing it. Start here |
+| [`CONTEXT.md`](CONTEXT.md) | The domain glossary — one canonical name per concept |
+| [`docs/adr/`](docs/adr/) | Why it is like this. One hard-to-reverse decision per file |
+
+Selected folders under `src/` carry their own `CLAUDE.md` with the detail for that folder — the five layer roots plus sixteen sub-folders, all listed in the root [`CLAUDE.md`](CLAUDE.md).
+[`docs/docs-consistency.test.ts`](docs/docs-consistency.test.ts) runs with the unit suite and fails the build
+when the docs and the code disagree.
 
 ---
 

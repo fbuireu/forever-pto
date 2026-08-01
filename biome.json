@@ -1,7 +1,12 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "includes": ["**", "!next-env.d.ts", "!src/ui/styles/base", "!src/ui/styles/theme", "!src/ui/styles/utilities"]
+    "includes": ["**", "!next-env.d.ts"]
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
   },
   "assist": {
     "actions": {
@@ -29,7 +34,7 @@
     }
   },
   "linter": {
-    "includes": ["**", "!**/*.d.ts*", "!src/components/animate-ui/**"],
+    "includes": ["**", "!**/*.d.ts*"],
     "rules": {
       "recommended": true,
       "complexity": {
