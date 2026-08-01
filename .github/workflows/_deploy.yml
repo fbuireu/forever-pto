@@ -68,17 +68,24 @@ jobs:
           NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: ${{ vars.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID }}
           NEXT_PUBLIC_STORAGE_KEY: ${{ vars.NEXT_PUBLIC_STORAGE_KEY }}
       - name: Deploy to Cloudflare Workers
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         env:
           INPUTS_WORKER_NAME: ${{ inputs.worker_name }}
           INPUTS_WRANGLER_ENV: ${{ inputs.wrangler_env }}
           DEPLOY_MESSAGE: ${{ github.sha }} - ${{ github.event_name }}
-        run: |
-          NAME_FLAG=""
-          if [ -n "${INPUTS_WORKER_NAME}" ]; then
-            NAME_FLAG="--name ${INPUTS_WORKER_NAME}"
-          fi
-          pnpm exec wrangler deploy --env "${INPUTS_WRANGLER_ENV}" $NAME_FLAG --message "$DEPLOY_MESSAGE"
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          retry_wait_seconds: 15
+          shell: bash
+          command: |
+            NAME_FLAG=""
+            if [ -n "${INPUTS_WORKER_NAME}" ]; then
+              NAME_FLAG="--name ${INPUTS_WORKER_NAME}"
+            fi
+            pnpm exec wrangler deploy --env "${INPUTS_WRANGLER_ENV}" $NAME_FLAG --message "$DEPLOY_MESSAGE"
       - name: Set Worker secrets
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
@@ -87,15 +94,20 @@ jobs:
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           INPUTS_WORKER_NAME: ${{ inputs.worker_name }}
           INPUTS_WRANGLER_ENV: ${{ inputs.wrangler_env }}
-        run: |
-          if [ -n "${INPUTS_WORKER_NAME}" ]; then
-            TARGET_FLAG="--name ${INPUTS_WORKER_NAME}"
-          else
-            TARGET_FLAG="--env ${INPUTS_WRANGLER_ENV}"
-          fi
-          node -e "
-          const required = ['JWT_SECRET','STRIPE_SECRET_KEY','STRIPE_WEBHOOK_SECRET','RESEND_API_KEY','TURSO_AUTH_TOKEN'];
-          const missing = required.filter(k => !process.env[k]);
-          if (missing.length) { console.error('Missing required secrets: ' + missing.join(', ')); process.exit(1); }
-          process.stdout.write(JSON.stringify(Object.fromEntries(required.map(k => [k, process.env[k]]))));
-          " | pnpm exec wrangler secret bulk $TARGET_FLAG
+        with:
+          timeout_minutes: 2
+          max_attempts: 3
+          retry_wait_seconds: 15
+          shell: bash
+          command: |
+            if [ -n "${INPUTS_WORKER_NAME}" ]; then
+              TARGET_FLAG="--name ${INPUTS_WORKER_NAME}"
+            else
+              TARGET_FLAG="--env ${INPUTS_WRANGLER_ENV}"
+            fi
+            node -e "
+            const required = ['JWT_SECRET','STRIPE_SECRET_KEY','STRIPE_WEBHOOK_SECRET','RESEND_API_KEY','TURSO_AUTH_TOKEN'];
+            const missing = required.filter(k => !process.env[k]);
+            if (missing.length) { console.error('Missing required secrets: ' + missing.join(', ')); process.exit(1); }
+            process.stdout.write(JSON.stringify(Object.fromEntries(required.map(k => [k, process.env[k]]))));
+            " | pnpm exec wrangler secret bulk $TARGET_FLAG
