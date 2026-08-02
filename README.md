@@ -31,7 +31,7 @@ Given your country, region, year, and number of PTO days, Forever PTO suggests t
 | Layer | Tech |
 | --- | --- |
 | Framework | Next.js 16 (App Router) + React 19 |
-| Language | TypeScript 7 (native compiler) |
+| Language | TypeScript 6 |
 | Styling | Tailwind CSS v4 + shadcn/ui |
 | State | Zustand |
 | i18n | next-intl — en, es, ca, it, de, fr |

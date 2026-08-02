@@ -285,17 +285,15 @@ describe('CLAUDE.md describes the project as it is configured', () => {
     expect(dangling.map(([alias]) => alias)).toEqual([]);
   });
 
-  // TypeScript 7 ships no lib/typescript.js, so Next's compiler-API path throws and `next build` dies
-  // before it type-checks anything. The flag is what routes it through the CLI instead.
-  it('lets Next reach TypeScript 7 through the CLI', () => {
-    expect(read('next.config.ts')).toContain('useTypeScriptCli: true');
+  // `next build` rewrites tsconfig.json on every run and fills in its own defaults for any key that is
+  // absent — `strict: false` and `allowJs: true`. Both would land at the next build rather than at the
+  // deletion site, so neither is safe to drop as redundant.
+  it('keeps strict on, because next build writes it false when the key is missing', () => {
+    expect(tsconfigOptions.strict).toBe(true);
   });
 
-  // 7 makes strict its default, so the line looks removable. It is not: `next build` rewrites
-  // tsconfig.json on every run and writes `strict: false` whenever the key is absent, which turns strict
-  // mode off at the next build rather than at the deletion site.
-  it('keeps strict explicit, because next build writes it false when it is missing', () => {
-    expect(tsconfigOptions.strict).toBe(true);
+  it('keeps JavaScript out, because next build writes allowJs true when the key is missing', () => {
+    expect(tsconfigOptions.allowJs).toBe(false);
   });
 
   // `include` is `**/*.ts`, so a generated root-level .d.ts joins the program and the workerd globals in it
@@ -303,11 +301,6 @@ describe('CLAUDE.md describes the project as it is configured', () => {
   it('keeps the generated Cloudflare env types out of the program and out of git', () => {
     expect(tsconfigExclude).toContain(GENERATED_ENV_TYPES);
     expect(read('.gitignore')).toContain(GENERATED_ENV_TYPES);
-  });
-
-  it('declares no compiler option TypeScript 7 removed', () => {
-    const removed = ['baseUrl', 'downlevelIteration', 'ignoreDeprecations'];
-    expect(removed.filter((option) => option in tsconfigOptions)).toEqual([]);
   });
 });
 

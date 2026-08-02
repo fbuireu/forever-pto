@@ -91,7 +91,6 @@ const nextConfig: NextConfig = {
   },
   transpilePackages: ['prettier'],
   experimental: {
-    useTypeScriptCli: true,
     globalNotFound: true,
     optimizePackageImports: [
       'lucide-react',

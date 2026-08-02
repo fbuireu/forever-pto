@@ -92,23 +92,17 @@ docs/                 # adr/, plans/, and docs-consistency.test.ts
 last. It is generated and says so; leave whichever version is committed alone rather than committing the
 flip back and forth.
 
-**`next build` owns half of `tsconfig.json` too, so do not tidy it.** Next rewrites the file on every build and
-re-adds `allowJs`, `module` and `esModuleInterop` whatever you set them to — deleting them as "TypeScript 7
-defaults" lasts exactly until the next build. Two settings there are load-bearing for the opposite reason:
+**`next build` fills in `tsconfig.json`, so two settings there are not redundant.** It rewrites the file on
+every run and writes its own default for any key that is absent — `strict: false` and `allowJs: true`. Both
+land at the *next build* rather than at the deletion site, so deleting either as noise turns strict mode off,
+or lets JavaScript into a TypeScript-only codebase, a long way from the change. `docs/docs-consistency.test.ts`
+asserts both, and asserts that `cloudflare-env.d.ts` stays in `exclude` and `.gitignore` for the reason below.
 
-- **`strict: true`** looks removable because 7 defaults it on, and is not. Next writes `"strict": false` into
-  the file whenever the key is absent, so deleting the line turns strict mode off at the *next build*, not at
-  the deletion site — twenty type errors, none of them near the change.
-- **`experimental.useTypeScriptCli: true` in `next.config.ts`** is what makes `pnpm build` work at all.
-  TypeScript 7 ships no `lib/typescript.js`, so Next's compiler-API path throws before it type-checks
-  anything. `pnpm lint:ts:typecheck` runs the bare `tsc` and passes either way, which is exactly why CI stayed
-  green while every deploy was broken.
-
-`baseUrl` is a hard error in 7, which is why every entry in `paths` is relative to the project root, and
-`exclude`'s `cloudflare-env.d.ts` matters for the reason below. `types: ['node']` is explicit but currently
-inert — `next-env.d.ts` already pulls `@types/node` in transitively, so removing it changes nothing today.
-None of this is left to discipline: `docs/docs-consistency.test.ts` asserts the two load-bearing settings and
-that no option 7 removed has crept back.
+**TypeScript stays on 6 until Next supports 7 without an experimental flag.** TypeScript 7 ships no
+`lib/typescript.js`, so Next's compiler-API path throws and `pnpm build` dies before type-checking anything;
+the only ways through are `experimental.useTypeScriptCli` or the native-preview package, and an experimental
+flag in production config to force an unsupported toolchain is not a trade this repo makes. `baseUrl` is
+still absent because 7 removes it, which costs nothing today and is one less thing to undo later.
 
 Path aliases (`tsconfig.json` `compilerOptions.paths`): `src/*`, `@app/*`, `@application/*`, `@domain/*`,
 `@infrastructure/*`, `@ui/*`, `@assets/*` (→ `src/ui/assets`), `@styles/*` (→ `src/ui/styles`), `@i18n/*`
@@ -211,9 +205,9 @@ contiguously from `0001`, carry the template's sections, and are each linked fro
 `docs/adr/` — an ADR nothing points at will not be read; that every relative markdown link resolves and every
 `.ts`/`.tsx` file named in backticks still exists; that every script this file documents exists in
 `package.json`, that every alias `tsconfig.json` declares is documented here and every alias documented here
-is declared there, and that no alias points at a missing directory; that the two settings TypeScript 7 makes
-load-bearing survive — `strict` in `tsconfig.json` and `useTypeScriptCli` in `next.config.ts` — that
-`cloudflare-env.d.ts` stays in both `exclude` and `.gitignore`, and that no option 7 removed has crept back;
+is declared there, and that no alias points at a missing directory; that `tsconfig.json` keeps the two settings
+`next build` would otherwise fill in for it — `strict` on and `allowJs` off — and that
+`cloudflare-env.d.ts` stays in both `exclude` and `.gitignore`;
 and that every locale bundle has exactly the keys `en.json` has.
 
 It reads staged *and* unstaged files, so a rule fires before the offending file is committed. **Each rule was
