@@ -17,9 +17,9 @@ const NON_SCRIPT_PNPM = new Set(['install', 'lint-staged', 'commitlint', 'vitest
 
 const SOURCE_FILE = /\.(ts|tsx)$/;
 const CODE_SHAPED_SUFFIX = /\.(ts|tsx|json|md)$/;
-const GLOSSARY_TERM = /^\*\*(.+?)\*\*:\n(.*)$/gm;
+const GLOSSARY_TERM = /^\*\*(.+?)\*\*:[ \t]*\n(.*)$/gm;
 const GLOSSARY_AVOID_LINE = /^_Avoid_:(.*)$/gm;
-const GLOSSARY_TERM_WITH_AVOID = /^\*\*(.+?)\*\*:\n(.*)\n_Avoid_:(.*)$/gm;
+const GLOSSARY_TERM_WITH_AVOID = /^\*\*(.+?)\*\*:[ \t]*\n((?:.+\n)*?)_Avoid_:(.*)$/gm;
 const ADR_FILENAME = /^\d{4}-[a-z0-9-]+\.md$/;
 const ADR_NUMBERED_HEADING = /^# (\d+)\. \S/;
 const ADR_DATE_LINE = /^Date: \d{4}-\d{2}-\d{2}$/;
@@ -73,7 +73,11 @@ describe('CONTEXT.md is the domain glossary and nothing else', () => {
   it('gives every term a definition', () => {
     const terms = [...glossary.matchAll(GLOSSARY_TERM)];
     expect(terms.length).toBeGreaterThan(0);
-    expect(terms.filter(([, , definition]) => definition.trim().length === 0).map(([, term]) => term)).toEqual([]);
+    const undefined_ = terms.filter(([, , definition]) => {
+      const text = definition.trim();
+      return text.length === 0 || text.startsWith('_Avoid_:');
+    });
+    expect(undefined_.map(([, term]) => term)).toEqual([]);
   });
 
   it('never leaves an _Avoid_ list empty', () => {

@@ -75,6 +75,17 @@ describe('POST /api/webhooks/stripe', () => {
     expect(body.received).toBe(true);
   });
 
+  it('hands Stripe the untouched raw body, because reserialising it invalidates the signature', async () => {
+    const raw = '{"type":"payment_intent.succeeded","id":"evt_1",  "spaced": true}';
+    mockHeadersGet.mockImplementation((name) => (name === 'stripe-signature' ? 'sig-1' : null));
+    mockConstructEvent.mockReturnValue(Effect.succeed({ type: 'payment_intent.succeeded' }));
+    mockProcessWebhookEvent.mockReturnValue(Effect.succeed(undefined));
+
+    await POST(makeRequest(raw) as never);
+
+    expect(mockConstructEvent).toHaveBeenCalledWith(raw, 'sig-1');
+  });
+
   it('returns 400 on signature verification failure', async () => {
     mockHeadersGet.mockImplementation((name) => (name === 'stripe-signature' ? 'bad-sig' : null));
     mockConstructEvent.mockReturnValue(

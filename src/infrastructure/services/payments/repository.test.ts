@@ -229,10 +229,12 @@ describe('getPaymentById', () => {
 });
 
 describe('getPaymentByEmail', () => {
-  it('queries payments by email filtering succeeded status', async () => {
+  it('filters on the email column, which is the only key Premium is recoverable by', async () => {
     await runEffect(getPaymentByEmail('user@example.com'));
     const [sql, args] = mockQuery.mock.calls[0] as [string, unknown[]];
+    expect(sql).toContain('WHERE email = ?');
     expect(sql).toContain("status = 'succeeded'");
+    expect(sql).toContain('ORDER BY stripe_created_at DESC');
     expect(args[0]).toBe('user@example.com');
   });
 

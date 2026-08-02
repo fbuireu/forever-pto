@@ -142,10 +142,12 @@ importing the other five.
 `api/contact/route.ts`, `api/markdown/route.ts`, `.well-known/[...slug]/route.ts`, `sitemap.ts` and
 `robots.ts`; the `metadata.ts` files reach it indirectly through `getPublicEnv.ts`.
 
-The `{ async: true }` form is not interchangeable with the bare call. Everything that can be evaluated
-outside a live request — `sitemap.ts`, `robots.ts`, the `.well-known` handler, and `getPublicEnv.ts` under
-`'use cache'` — uses the async form. `api/contact/route.ts` only ever runs inside a POST and uses the sync
-form. Copying the sync call into a prerendered path is the failure mode to watch for.
+The `{ async: true }` form is not interchangeable with the bare call, but the split is not request versus
+no-request. Only the async form works where there may be no request, so everything evaluable outside one —
+`sitemap.ts`, `robots.ts`, the `.well-known` handler, `getPublicEnv.ts` under `'use cache'` — must use it.
+The reverse does not hold: `api/markdown/route.ts` uses the async form and only ever runs inside a GET,
+because the async form is always safe. `api/contact/route.ts` uses the sync one. Copying a *sync* call into
+a prerendered path is the failure mode to watch for; copying an async one costs nothing.
 
 Config is read off the context and passed down as plain values; use-cases receive `{ siteUrl, contactEmail }`
 rather than reaching for the environment themselves.
