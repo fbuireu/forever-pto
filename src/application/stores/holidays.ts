@@ -1,4 +1,4 @@
-import { holidayDTO } from '@application/dto/holiday/dto';
+import { holidayDTO, isInPlanningWindow } from '@application/dto/holiday/dto';
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import {
   addMonths,
@@ -138,7 +138,16 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
         fetchHolidays: async (params: FetchHolidaysParams) => {
           const { holidays: currentHolidays } = get();
-          const customHolidays = currentHolidays.filter((h) => h.variant === HolidayVariant.CUSTOM);
+          const customHolidays = currentHolidays
+            .filter((h) => h.variant === HolidayVariant.CUSTOM)
+            .map((h) => ({
+              ...h,
+              isInSelectedRange: isInPlanningWindow({
+                date: ensureDate(h.date),
+                year: params.year,
+                carryOverMonths: params.carryOverMonths,
+              }),
+            }));
 
           try {
             const { regions } = useLocationStore.getState();

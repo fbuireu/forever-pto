@@ -62,6 +62,13 @@ That is what lets `HolidayDTO` cross into the domain. The pure calendar context 
 
 **`holidayDTO.create` sorts twice, and the first sort is not chronological.** It compares nothing but the `location` flag, so Regional entries land after National ones and the `processedDates` dedupe keeps the National Holiday when both fall on the same date. Because that comparator is a real ordering, the sort stays stable: two entries of the same variant on the same date survive in the order upstream listed them, whatever the length of the list. The chronological sort happens at the end of the reduce.
 
+**`isInSelectedRange` is a snapshot of the Planning Window, so whoever carries a Holiday across a window
+change has to recompute it.** `isInPlanningWindow` is exported beside the mapper for exactly that: `create`
+and `createCustom` both call it, and so does the holidays store, which preserves Custom Holidays verbatim
+through a `fetchHolidays` and would otherwise keep the flag from the year they were created in. Only a
+flagged Holiday can anchor a Bridge, so a stale `true` lets a Custom Holiday from another year anchor one,
+and a stale `false` hides a Custom Holiday the window has since moved back onto.
+
 **Two date windows, not one.** `create` drops anything outside the chosen year plus the whole of the following year, then sets `isInSelectedRange` from the narrower Planning Window (the year plus its Carry-over Months). Holidays between the two are kept so the UI can show them for context; only those flagged `isInSelectedRange` can anchor a Bridge.
 
 **Schemas carry message keys, not messages.** `contactSchema` and `createPaymentSchema` are pre-bound with keys such as `invalid_email` for server-side validation. The UI calls `createContactSchema` / `createPaymentSchemaWithMessages` with translated strings instead. Adding a validation rule means adding it to the messages interface too, or the localised form silently loses the message.
