@@ -247,7 +247,12 @@ describe('src/ carries no explanatory comments', () => {
   it('leaves the rationale in the folder guides instead', () => {
     const offenders: string[] = [];
     for (const file of sourceFiles.filter((path) => path.startsWith('src/'))) {
-      for (const { line, text } of commentsIn(file, read(file))) {
+      const source = read(file);
+      // parsing every file is what made this rule time out under parallel load; a file holding neither
+      // delimiter anywhere cannot hold a comment, and that is most of them
+      if (!source.includes('//') && !source.includes('/*')) continue;
+
+      for (const { line, text } of commentsIn(file, source)) {
         if (!ALLOWED.test(text)) offenders.push(`${file}:${line}`);
       }
     }

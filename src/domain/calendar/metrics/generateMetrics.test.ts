@@ -97,6 +97,7 @@ describe('generateMetrics', () => {
       allowPastDays: true,
     });
     expect(result.bridgesUsed).toBe(1);
+    expect(result.averageEfficiency).toBe(3);
     expect(result.totalEffectiveDays).toBe(3);
     expect(result.bonusDays).toBe(2);
   });

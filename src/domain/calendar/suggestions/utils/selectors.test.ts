@@ -219,3 +219,42 @@ describe('selectOptimalDaysFromBridges high-value first pass', () => {
     expect(selected).toHaveLength(1);
   });
 });
+
+describe('BALANCED scoring formula', () => {
+  const orderOf = (bridges: Bridge[]) =>
+    selectOptimalDaysFromBridges({ bridges, targetPtoDays: 99 }).bridges.map((bridge) => bridge.effectiveDays);
+
+  it('divides the span by ten so a long low-efficiency bridge cannot outscore a short efficient one', () => {
+    const efficient = makeBridge([makeDate(2025, 2, 3)], 4);
+    const long = makeBridge([makeDate(2025, 3, 3), makeDate(2025, 3, 4), makeDate(2025, 3, 5)], 8);
+
+    expect(orderOf([long, efficient])).toEqual([4, 8]);
+  });
+
+  it('weights efficiency at 0.6 over span at 0.4, so 5.40 beats 5.04 where a swap would make it 4.35 against 4.56', () => {
+    const sharper = makeBridge([makeDate(2025, 2, 3), makeDate(2025, 2, 4), makeDate(2025, 2, 5)], 15);
+    const broader = makeBridge(
+      [
+        makeDate(2025, 4, 7),
+        makeDate(2025, 4, 8),
+        makeDate(2025, 4, 9),
+        makeDate(2025, 4, 10),
+        makeDate(2025, 4, 11),
+        makeDate(2025, 4, 14),
+      ],
+      24
+    );
+
+    expect(orderOf([broader, sharper])).toEqual([15, 24]);
+  });
+
+  it('bonuses a long 2.4-efficiency bridge the high-value pass skips, lifting 1.92 to 2.88 over a 2.56 rival', () => {
+    const longButOrdinary = makeBridge(
+      [makeDate(2025, 5, 5), makeDate(2025, 5, 6), makeDate(2025, 5, 7), makeDate(2025, 5, 8), makeDate(2025, 5, 9)],
+      12
+    );
+    const sharpAndSmall = makeBridge([makeDate(2025, 6, 2)], 4);
+
+    expect(orderOf([sharpAndSmall, longButOrdinary])).toEqual([12, 4]);
+  });
+});

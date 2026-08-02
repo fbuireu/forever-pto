@@ -134,6 +134,15 @@ describe('getTotalEffectiveDays', () => {
     const bridges = [makeBridge(makeDate(2025, 1, 4), makeDate(2025, 1, 6), [makeDate(2025, 1, 6)])];
     expect(getTotalEffectiveDays([makeDate(2025, 1, 9)], bridges)).toBe(1);
   });
+
+  it('discards a multi-day bridge when only part of its PTO days remain selected', () => {
+    const bridges = [
+      makeBridge(makeDate(2025, 1, 9), makeDate(2025, 1, 12), [makeDate(2025, 1, 9), makeDate(2025, 1, 10)]),
+    ];
+
+    expect(getTotalEffectiveDays([makeDate(2025, 1, 9), makeDate(2025, 1, 10)], bridges)).toBe(4);
+    expect(getTotalEffectiveDays([makeDate(2025, 1, 9)], bridges)).toBe(1);
+  });
 });
 
 describe('calculateRestBlocks', () => {
