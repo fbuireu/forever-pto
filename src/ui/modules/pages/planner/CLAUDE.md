@@ -104,6 +104,11 @@ today marker and no past-day dimming on purpose. Every predicate taking `today` 
 snapshots the value only while `isCalculating` is false. That looks like a mistake and is not: without
 it the budget readout drops to zero for the length of every worker round-trip.
 
+**The mobile drawer header reads `previewAlternativeIndex`, not `currentSelectionIndex`.** The two numbers
+beside it — Effective Days and Efficiency — come from `allSuggestions[previewAlternativeIndex]`, so labelling
+them with the *applied* index meant that paging through Alternatives showed "Option 1" above Option 3's
+figures. Whatever index the metrics are read from is the one the label has to name.
+
 **`PlannerPanel` is remounted by `key={previewAlternativeIndex}`.** `ManagementBar` does this so the
 entry animations replay when the user pages through Alternatives. Any state added inside `PlannerPanel`
 is therefore discarded on every Alternative change.

@@ -16,6 +16,36 @@ const makeHoliday = (date: Date) => ({
 const LOCALE = 'en' as const;
 const YEAR = 2025;
 
+describe('generateMetrics window scoping', () => {
+  const outsideWindow = (date: Date) => ({ ...makeHoliday(date), isInSelectedRange: false });
+
+  const metricsFor = (holidays: ReturnType<typeof makeHoliday>[]) =>
+    generateMetrics({
+      suggestion: { days: [makeDate(2025, 5, 2)] },
+      locale: LOCALE,
+      year: YEAR,
+      holidays,
+      allowPastDays: true,
+    });
+
+  it('ignores Holidays outside the Planning Window, which the screen never shows either', () => {
+    const inWindow = [makeHoliday(makeDate(2025, 5, 1))];
+    const withNextYear = [...inWindow, outsideWindow(makeDate(2026, 12, 24)), outsideWindow(makeDate(2026, 12, 25))];
+
+    expect(metricsFor(withNextYear)).toEqual(metricsFor(inWindow));
+  });
+
+  it('does not let next year’s Holidays invent a Long Weekend', () => {
+    const nextYearLongWeekend = [
+      outsideWindow(makeDate(2026, 12, 24)),
+      outsideWindow(makeDate(2026, 12, 25)),
+      outsideWindow(makeDate(2026, 12, 26)),
+    ];
+
+    expect(metricsFor(nextYearLongWeekend).longWeekends).toBe(metricsFor([]).longWeekends);
+  });
+});
+
 describe('generateMetrics', () => {
   it('returns all-zero metrics when suggestion has no days', () => {
     const result = generateMetrics({

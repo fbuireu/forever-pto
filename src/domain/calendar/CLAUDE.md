@@ -101,6 +101,15 @@ to fill.
 
 ## Invariants and traps
 
+**`generateMetrics` scopes the Holiday list to the Planning Window before measuring anything.** The holidays
+store deliberately holds two years — the planning year plus all of year+1 — so the UI can show the extra ones
+for context, and only those inside the window carry `isInSelectedRange`. Every Metric that reads Holidays
+gets the filtered list: without it, Long Weekends counted stretches that next year's public Holidays formed
+on their own, and Longest Vacation could report a run from a year the plan does not touch — while
+[`CONTEXT.md`](../../../CONTEXT.md) defines it as the longest stretch *the plan produces*. The filter belongs
+here, once, rather than at each call site; the manual pseudo-Holidays the worker builds are flagged
+`isInSelectedRange: true` and survive it.
+
 **`monthlyDist` and `quarterDist` bucket by month alone, so a Carry-over Month folds into the same month of
 the planning year.** `getMonthlyDist` and `calculateQuarterDistribution` read `getMonth(date)` and nothing
 else, and the arrays are a fixed 12 and 4 long. With `carryOverMonths: 1` a PTO Day placed on 5 January 2027
