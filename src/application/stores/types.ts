@@ -41,3 +41,7 @@ export interface AlternativeSelectionBaseParams {
   suggestion: Suggestion | null;
   index: number;
 }
+
+export interface ApplyAlternativeParams extends AlternativeSelectionBaseParams {
+  locale: Locale;
+}

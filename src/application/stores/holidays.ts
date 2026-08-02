@@ -21,6 +21,7 @@ import { useLocationStore } from './location';
 import type {
   AddHolidayParams,
   AlternativeSelectionBaseParams,
+  ApplyAlternativeParams,
   EditHolidayParams,
   FetchHolidaysParams,
   MainThreadSuggestionsParams,
@@ -52,7 +53,7 @@ interface HolidaysActions {
   setCalculating: (v: boolean) => void;
   setCalculationResult: (result: { suggestion: Suggestion; alternatives: Suggestion[] }) => void;
   setMaxAlternatives: (max: number) => void;
-  setCurrentAlternativeSelection: (params: AlternativeSelectionBaseParams) => void;
+  setCurrentAlternativeSelection: (params: ApplyAlternativeParams) => void;
   setPreviewAlternativeSelection: (params: AlternativeSelectionBaseParams) => void;
   resetToDefaults: () => void;
   addHoliday: (params: AddHolidayParams) => void;
@@ -333,11 +334,29 @@ export const useHolidaysStore = create<HolidaysStore>()(
           set({ maxAlternatives: Math.max(0, max) });
         },
 
-        setCurrentAlternativeSelection: ({ suggestion, index }: AlternativeSelectionBaseParams) => {
+        setCurrentAlternativeSelection: ({ suggestion, index, locale }: ApplyAlternativeParams) => {
+          const { holidays } = get();
+          const { year, allowPastDays } = useFiltersStore.getState();
+
+          const applied = suggestion
+            ? {
+                ...suggestion,
+                metrics: generateMetrics({
+                  suggestion,
+                  locale,
+                  year,
+                  bridges: suggestion.bridges,
+                  holidays,
+                  allowPastDays,
+                }),
+              }
+            : suggestion;
+
           set({
-            currentSelection: suggestion,
+            currentSelection: applied,
             previewAlternativeIndex: index,
             currentSelectionIndex: index,
+            manuallySelectedDays: [],
             removedSuggestedDays: [],
           });
         },

@@ -101,14 +101,20 @@ to fill.
 
 ## Invariants and traps
 
-**`generateMetrics` scopes the Holiday list to the Planning Window before measuring anything.** The holidays
-store deliberately holds two years — the planning year plus all of year+1 — so the UI can show the extra ones
-for context, and only those inside the window carry `isInSelectedRange`. Every Metric that reads Holidays
-gets the filtered list: without it, Long Weekends counted stretches that next year's public Holidays formed
-on their own, and Longest Vacation could report a run from a year the plan does not touch — while
-[`CONTEXT.md`](../../../CONTEXT.md) defines it as the longest stretch *the plan produces*. The filter belongs
-here, once, rather than at each call site; the manual pseudo-Holidays the worker builds are flagged
-`isInSelectedRange: true` and survive it.
+**`generateMetrics` must see exactly the Holiday list the engine planned against — the whole two-year set,
+unfiltered.** It is tempting to narrow it to `isInSelectedRange`, and that was tried and reverted. The
+planning calls receive the unfiltered list, `createHolidaySet` applies no window filter, and
+`analyzePotentialBridge` expands a Bridge's span straight through a next-year Holiday; `getTotalEffectiveDays`
+then reports that expanded span. Filtering only the *Metrics* input leaves Longest Vacation, Long Weekends
+and Long Blocks scanning a calendar missing the very day the span was built on, so they contradict Effective
+Days inside the same Metrics object. Whatever the engine plans against, the Metrics measure against.
+
+The cost of that rule is real and is the open question: a Long Weekend that next year's public Holidays form
+on their own, with no PTO Day near it, is still counted for a plan that does not touch that year — while
+[`CONTEXT.md`](../../../CONTEXT.md) calls Longest Vacation the longest stretch *the plan produces*. Scoping
+it properly means requiring a stretch to contain a placed day, not trimming the Holiday list, and that
+changes what the Long Weekend card counts. Like the distribution bucketing below, it is a product call and
+is written down rather than guessed at.
 
 **`monthlyDist` and `quarterDist` bucket by month alone, so a Carry-over Month folds into the same month of
 the planning year.** `getMonthlyDist` and `calculateQuarterDistribution` read `getMonth(date)` and nothing

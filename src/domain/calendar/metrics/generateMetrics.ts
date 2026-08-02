@@ -38,7 +38,6 @@ export const generateMetrics = ({
   removedSuggestedDays = [],
 }: GenerateMetricsParams) => {
   const days = resolveSelectedDays({ days: suggestion.days, manuallySelectedDays, removedSuggestedDays });
-  const holidaysInWindow = holidays.filter((holiday) => holiday.isInSelectedRange);
 
   if (days.length === 0) {
     return {
@@ -58,15 +57,15 @@ export const generateMetrics = ({
     };
   }
   const monthlyDist = getMonthlyDist(days);
-  const longBlocksPerQuarter = getLongBlocksPerQuarter({ ptoDays: days, holidays: holidaysInWindow });
+  const longBlocksPerQuarter = getLongBlocksPerQuarter({ ptoDays: days, holidays });
   const totalEffectiveDays = getTotalEffectiveDays(days, bridges);
-  const longWeekends = calculateLongWeekends({ ptoDays: days, holidays: holidaysInWindow });
-  const longestVacation = calculateLongestVacation({ ptoDays: days, holidays: holidaysInWindow });
+  const longWeekends = calculateLongWeekends({ ptoDays: days, holidays });
+  const longestVacation = calculateLongestVacation({ ptoDays: days, holidays });
 
   const restBlocks = calculateRestBlocks(days);
   const maxWorkStreak = calculateMaxWorkStreak({
     ptoDays: days,
-    holidays: holidaysInWindow,
+    holidays,
     allowPastDays,
     year,
   });
@@ -74,7 +73,7 @@ export const generateMetrics = ({
   const quarterDist = calculateQuarterDistribution(days);
   const workedDaysPerMonth = getWorkedDaysPerMonth({
     ptoDays: days,
-    holidays: holidaysInWindow,
+    holidays,
     year,
   });
   const efficiency = totalEffectiveDays / days.length;
