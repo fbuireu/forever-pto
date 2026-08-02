@@ -65,6 +65,7 @@ export const CalendarExport = () => {
   );
 
   const activeSuggestion = currentSelection ?? suggestion;
+  const holidaysInWindow = useMemo(() => (holidays ?? []).filter((holiday) => holiday.isInSelectedRange), [holidays]);
   const ptoDays = useMemo(
     () =>
       resolveSelectedDays({
@@ -74,14 +75,14 @@ export const CalendarExport = () => {
       }),
     [activeSuggestion, manuallySelectedDays, removedSuggestedDays]
   );
-  const hasData = (includeHolidays && (holidays?.length ?? 0) > 0) || (includePto && ptoDays.length > 0);
+  const hasData = (includeHolidays && holidaysInWindow.length > 0) || (includePto && ptoDays.length > 0);
 
   const handleDownloadIcs = () => {
     const content = generateIcs({
       year,
       calendarName: t('calendarName'),
       ptoDayLabel: t('ptoDayLabel'),
-      holidays: holidays ?? [],
+      holidays: holidaysInWindow,
       ptoDays,
       includeHolidays,
       includePto,
@@ -103,7 +104,7 @@ export const CalendarExport = () => {
         await Effect.runPromise(
           pdfExportEffect({
             year,
-            holidays: includeHolidays ? (holidays ?? []) : [],
+            holidays: includeHolidays ? holidaysInWindow : [],
             ptoDays: includePto ? ptoDays : [],
             includeHolidays,
             includePto,
@@ -131,7 +132,7 @@ export const CalendarExport = () => {
       </div>
       <p className='text-xs text-muted-foreground'>
         {t.rich('description', {
-          count: holidays?.length ?? 0,
+          count: holidaysInWindow.length,
           b: BoldText,
         })}
       </p>

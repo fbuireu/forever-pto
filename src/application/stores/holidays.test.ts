@@ -595,15 +595,19 @@ describe('setCurrentAlternativeSelection', () => {
     expect(state.previewAlternativeIndex).toBe(2);
   });
 
-  it('resets manuallySelectedDays and removedSuggestedDays', () => {
-    useHolidaysStore.setState({
-      manuallySelectedDays: [new Date('2026-01-05')],
-      removedSuggestedDays: [new Date('2026-01-06')],
-    });
+  it('drops the Removed Days, which named days of the Suggestion being replaced', () => {
+    useHolidaysStore.setState({ removedSuggestedDays: [new Date('2026-01-06')] });
     useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion: makeSuggestion([]), index: 0 });
-    const state = useHolidaysStore.getState();
-    expect(state.manuallySelectedDays).toHaveLength(0);
-    expect(state.removedSuggestedDays).toHaveLength(0);
+    expect(useHolidaysStore.getState().removedSuggestedDays).toHaveLength(0);
+  });
+
+  it('keeps the Manual Days, which the applied metrics were already measured against', () => {
+    const manual = new Date('2026-01-05');
+    useHolidaysStore.setState({ manuallySelectedDays: [manual] });
+
+    useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion: makeSuggestion([]), index: 0 });
+
+    expect(useHolidaysStore.getState().manuallySelectedDays).toEqual([manual]);
   });
 });
 

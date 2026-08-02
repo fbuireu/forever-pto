@@ -119,6 +119,16 @@ re-fetches Holidays) and would otherwise strand it, spending budget with no way 
 `calendar/Calendar.tsx` repeats the check to choose the toast, exactly as `AddHolidayModal.tsx` does for the
 mirror rule below — the two must agree, or the UI reports a selection the store refused.
 
+**Applying an Alternative keeps the Manual Days and drops the Removed Days, and the asymmetry is what keeps
+the Metrics honest.** Every Suggestion in the list carries Metrics the worker computed *with* the Manual Days
+folded in — they are pseudo-Holidays during planning and named days during measurement — and
+`setCurrentAlternativeSelection` adopts those Metrics verbatim without recomputing. Clearing
+`manuallySelectedDays` on apply therefore left the headline numbers describing a plan several days larger
+than the one on the calendar, and threw away the user's hand-picked days into the bargain. Removed Days are
+different: they named days of the Suggestion being replaced, and `generateAlternatives` already excluded
+them, so dropping them changes no Metric. If this action ever starts clearing the Manual Days again, it has
+to recompute the Metrics in the same breath.
+
 **`editHoliday` carries the same collision rule as `addHoliday`, because moving a Holiday onto a date is
 the same act as creating one there.** It refuses a target date already held by another Holiday or by a
 Manual Day, and `EditHolidayModal.tsx` repeats both checks to pick the toast. The store comparison skips the

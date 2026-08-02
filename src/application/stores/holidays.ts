@@ -338,7 +338,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
             currentSelection: suggestion,
             previewAlternativeIndex: index,
             currentSelectionIndex: index,
-            manuallySelectedDays: [],
             removedSuggestedDays: [],
           });
         },
