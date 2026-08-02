@@ -24,6 +24,15 @@ Imports from `@infrastructure/*` are allowed where there is no alternative, and 
 
 **A confirmation without a PaymentIntent is a redirect hand-off, not a failure.** `adapters/payments/checkout.ts` confirms with `redirect: 'if_required'`, and Stripe then resolves with no `paymentIntent` when it sent the user off to the issuer instead. The adapter logs a warning and returns unsuccessfully on purpose: the session is activated by the `api/payment/activate` route Stripe returns to, which sets the cookie and then redirects to `payment/confirmation`. Treating that branch as an error — or activating Premium from it — breaks the redirect flow. `modules/premium/CheckoutForm.tsx` is what points `return_url` at that route; sending it straight to the confirmation page instead silently reinstates the bug where a redirect payer was told Premium was active and was never given it. See [`../app/CLAUDE.md`](../app/CLAUDE.md) under *The redirect hand-off*.
 
+**A failed confirmation is not always a failed payment, and the copy must not say it is.** Once
+`confirmPayment` has a `PaymentIntent` back from Stripe the card is charged, so a failure after that point —
+the `POST /api/check-session` activation — is a *post-charge* failure. `adapters/payments/checkout.ts` marks
+that branch `charged: true`, and `modules/premium/CheckoutForm.tsx` reads it before anything else and shows
+`checkout.activationFailed`. Without the flag the same branch fell through to `resolveApiErrorMessage`,
+which for the `internal_error` code renders "Your card has not been charged." — told to a payer whose card
+had just been charged. Any new failure branch added to that adapter has to declare which side of the charge
+it is on.
+
 **The BetterStack logging client is reached through a dynamic `import()`, never a static one.** Its module graph pulls `@logtail/edge` and `@opennextjs/cloudflare` in through its own top-level imports, so a static import puts both in the client chunk of every component that touches it. Every call site in this layer therefore looks like the one in the browser Stripe client, `clients/payments/stripe/client.ts`:
 
 ```ts

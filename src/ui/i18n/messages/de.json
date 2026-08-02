@@ -640,6 +640,7 @@
     "expressCheckout": "Express-Bezahlung",
     "orPayWithCard": "Oder mit Karte bezahlen",
     "paymentError": "Zahlungsfehler",
+    "activationFailed": "Deine Zahlung war erfolgreich, aber Premium konnte nicht automatisch freigeschaltet werden. Stelle deinen Zugang mit der E-Mail wieder her, mit der du bezahlt hast, oder schreib uns.",
     "paymentFailed": "Zahlung fehlgeschlagen",
     "processing": "Wird verarbeitet...",
     "pay": "Bezahlen",

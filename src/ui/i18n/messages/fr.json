@@ -640,6 +640,7 @@
     "expressCheckout": "Paiement express",
     "orPayWithCard": "Ou payer par carte",
     "paymentError": "Erreur de paiement",
+    "activationFailed": "Ton paiement a bien été effectué, mais nous n’avons pas pu débloquer premium automatiquement. Récupère ton accès avec l’e-mail utilisé pour payer, ou contacte-nous.",
     "paymentFailed": "Le paiement a échoué",
     "processing": "Traitement en cours...",
     "pay": "Payer",

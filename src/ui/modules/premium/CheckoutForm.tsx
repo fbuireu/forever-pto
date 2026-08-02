@@ -93,6 +93,14 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
     });
 
     if (!result.success) {
+      const charged = 'charged' in result && result.charged === true;
+
+      if (charged) {
+        setErrorMessage(t('activationFailed'));
+        track('payment_activation_failed', { error: result.error || UNKNOWN_PAYMENT_ERROR });
+        return;
+      }
+
       setErrorMessage(resolveApiErrorMessage({ code: result.error, t, fallback: t('paymentFailed') }));
       track('payment_failed', { error: result.error || UNKNOWN_PAYMENT_ERROR });
     } else {

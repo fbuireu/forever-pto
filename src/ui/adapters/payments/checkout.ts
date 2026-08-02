@@ -86,7 +86,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams) => {
           paymentIntentId: paymentIntent.id,
         })
       );
-      return { success: false, error: errorData.error ?? '' };
+      return { success: false, error: errorData.error ?? '', charged: true };
     }
 
     const sessionData = yield* Effect.tryPromise(

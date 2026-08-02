@@ -108,6 +108,16 @@ describe('CheckoutForm failure reporting', () => {
     expect(screen.queryByText('internal_error')).toBeNull();
   });
 
+  it('never tells a payer their card was not charged when it was, and activation is what failed', async () => {
+    vi.mocked(confirmPayment).mockResolvedValue({ success: false, error: 'internal_error', charged: true });
+
+    await submitPayment(messagesWithErrors);
+
+    await waitFor(() => expect(screen.getByText(enMessages.checkout.activationFailed)).toBeTruthy());
+    expect(screen.queryByText(INTERNAL_ERROR_MESSAGE)).toBeNull();
+    expect(screen.queryByText(enMessages.checkout.paymentFailed)).toBeNull();
+  });
+
   it('falls back to the generic message when the code has no key of its own', async () => {
     vi.mocked(confirmPayment).mockResolvedValue({ success: false, error: 'webhook_processing_failed' });
 

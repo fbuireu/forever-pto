@@ -640,6 +640,7 @@
     "expressCheckout": "Pagament ràpid",
     "orPayWithCard": "O paga amb targeta",
     "paymentError": "Error de pagament",
+    "activationFailed": "El teu pagament s’ha completat, però no hem pogut desbloquejar premium automàticament. Recupera el teu accés amb el correu amb què vas pagar o escriu-nos.",
     "paymentFailed": "Pagament fallat",
     "processing": "Processant...",
     "pay": "Paga",

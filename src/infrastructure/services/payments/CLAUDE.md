@@ -34,7 +34,7 @@ read by the premium activation path as well as by the payment one.
 | `activatePremium.ts` (use-case) | `getPaymentByEmail`, `getPaymentById`, `savePayment`, `updatePaymentStatus` |
 | `webhook.ts` (use-case) | `getPaymentById`, `savePayment` |
 | `paymentSucceeded.ts` / `paymentFailed.ts` (domain handlers) | `getPaymentById`, `updatePaymentStatus`, `updatePaymentCharge`, `retrieveCharge` |
-| `src/app/api/payment/route.ts` and `actions/payment.ts` | `checkRateLimit` |
+| `src/app/api/payment/route.ts`, `actions/payment.ts` and `src/app/api/payment/activate/route.ts` | `checkRateLimit` |
 | The confirmation page | `confirmation` |
 
 The domain handlers importing infrastructure directly is the deliberate asymmetry in
@@ -45,8 +45,10 @@ The domain handlers importing infrastructure directly is the deliberate asymmetr
 
 **Both payment entry points rate-limit first.** `src/app/api/payment/route.ts` and the
 `createPaymentAction` server action are two implementations of one operation and must stay behaviourally
-identical; `checkRateLimit` is the first thing either yields. Nothing else in the app is rate-limited —
-not the webhook, not session activation.
+identical; `checkRateLimit` is the first thing either yields. `src/app/api/payment/activate/route.ts` is
+the third caller and the only one outside payment creation: it is a public GET that mints a Premium
+session, so it is limited on the same `cf-connecting-ip` key and shares the same window. Nothing else is —
+not the webhook, and not the `POST /api/check-session` half of session activation.
 
 **`savePayment` is idempotent by SQL, not by check.** `INSERT OR IGNORE` on the primary key is what lets
 the webhook re-create a row the deferred write may have lost, and lets `activateWithPayment` write one for

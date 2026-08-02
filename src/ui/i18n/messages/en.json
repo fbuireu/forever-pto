@@ -640,6 +640,7 @@
     "expressCheckout": "Express checkout",
     "orPayWithCard": "Or pay with card",
     "paymentError": "Payment error",
+    "activationFailed": "Your payment went through, but we could not unlock premium automatically. Recover your access with the email you paid with, or contact us.",
     "paymentFailed": "Payment failed",
     "processing": "Processing...",
     "pay": "Pay",
