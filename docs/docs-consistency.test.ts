@@ -14,6 +14,15 @@ const GENERATED_ENV_TYPES = 'cloudflare-env.d.ts';
 // `pnpm <word>` occurrences in CLAUDE.md that are not package scripts.
 const NON_SCRIPT_PNPM = new Set(['install', 'lint-staged', 'commitlint', 'vitest', 'dlx', 'exec']);
 
+const SOURCE_FILE = /\.(ts|tsx)$/;
+const CODE_SHAPED_SUFFIX = /\.(ts|tsx|json|md)$/;
+const GLOSSARY_TERM = /^\*\*(.+?)\*\*:\n(.*)$/gm;
+const GLOSSARY_AVOID_LINE = /^_Avoid_:(.*)$/gm;
+const GLOSSARY_TERM_WITH_AVOID = /^\*\*(.+?)\*\*:\n(.*)\n_Avoid_:(.*)$/gm;
+const ADR_FILENAME = /^\d{4}-[a-z0-9-]+\.md$/;
+const ADR_NUMBERED_HEADING = /^# (\d+)\. \S/;
+const ADR_DATE_LINE = /^Date: \d{4}-\d{2}-\d{2}$/;
+const MARKDOWN_LINK = /\[([^\]]+)\]\(([^)\s]+)\)/g;
 const BACKTICKED_TOKEN = /`([^`]+)`/g;
 const BACKTICKED_SOURCE_FILE = /`([^`\s]+\.(?:ts|tsx))`/g;
 const BACKTICKED_ALIAS = /`([^`.]+\/\*)`/g;
@@ -32,7 +41,7 @@ const trackedFiles = execFileSync('git', ['ls-files', '--cached', '--others', '-
   .filter((path) => path.length > 0 && !path.startsWith('.') && existsSync(join(ROOT, path)));
 
 const markdownFiles = trackedFiles.filter((path) => path.endsWith('.md'));
-const sourceFiles = trackedFiles.filter((path) => /\.(ts|tsx)$/.test(path));
+const sourceFiles = trackedFiles.filter((path) => SOURCE_FILE.test(path));
 const read = (path: string) => readFileSync(join(ROOT, path), 'utf8');
 
 const rootGuide = read('CLAUDE.md');
@@ -56,24 +65,24 @@ describe('CONTEXT.md is the domain glossary and nothing else', () => {
   it('carries no file paths, identifiers or call signatures', () => {
     const codeShaped = [...glossary.matchAll(BACKTICKED_TOKEN)]
       .map((match) => match[1])
-      .filter((token) => token.includes('/') || token.includes('(') || /\.(ts|tsx|json|md)$/.test(token));
+      .filter((token) => token.includes('/') || token.includes('(') || CODE_SHAPED_SUFFIX.test(token));
     expect(codeShaped).toEqual([]);
   });
 
   it('gives every term a definition', () => {
-    const terms = [...glossary.matchAll(/^\*\*(.+?)\*\*:\n(.*)$/gm)];
+    const terms = [...glossary.matchAll(GLOSSARY_TERM)];
     expect(terms.length).toBeGreaterThan(0);
     expect(terms.filter(([, , definition]) => definition.trim().length === 0).map(([, term]) => term)).toEqual([]);
   });
 
   it('never leaves an _Avoid_ list empty', () => {
-    const empty = [...glossary.matchAll(/^_Avoid_:(.*)$/gm)].filter(([, list]) => list.trim().length === 0);
+    const empty = [...glossary.matchAll(GLOSSARY_AVOID_LINE)].filter(([, list]) => list.trim().length === 0);
     expect(empty).toEqual([]);
   });
 
   it('never lists a term as its own alternative', () => {
     const selfAvoiding: string[] = [];
-    for (const [, term, , avoided] of glossary.matchAll(/^\*\*(.+?)\*\*:\n(.*)\n_Avoid_:(.*)$/gm)) {
+    for (const [, term, , avoided] of glossary.matchAll(GLOSSARY_TERM_WITH_AVOID)) {
       const alternatives = avoided.split(',').map((entry) => entry.trim().toLowerCase());
       if (alternatives.includes(term.toLowerCase())) selfAvoiding.push(term);
     }
@@ -113,7 +122,7 @@ describe('architecture decision records', () => {
   });
 
   it('are all named NNNN-slug.md', () => {
-    expect(adrs.filter((file) => !/^\d{4}-[a-z0-9-]+\.md$/.test(file))).toEqual([]);
+    expect(adrs.filter((file) => !ADR_FILENAME.test(file))).toEqual([]);
   });
 
   it('are numbered contiguously from 0001', () => {
@@ -137,12 +146,12 @@ describe('architecture decision records', () => {
     const malformed: string[] = [];
     for (const file of adrs) {
       const [heading = '', blank, date = ''] = read(`${ADR_DIR}/${file}`).split('\n');
-      const numbered = /^# (\d+)\. \S/.exec(heading);
+      const numbered = ADR_NUMBERED_HEADING.exec(heading);
       if (!numbered || Number(numbered[1]) !== Number(file.slice(0, 4))) {
         malformed.push(`${file} -> heading: ${heading}`);
         continue;
       }
-      if (blank !== '' || !/^Date: \d{4}-\d{2}-\d{2}$/.test(date)) malformed.push(`${file} -> date: ${date}`);
+      if (blank !== '' || !ADR_DATE_LINE.test(date)) malformed.push(`${file} -> date: ${date}`);
     }
     expect(malformed).toEqual([]);
   });
@@ -161,7 +170,7 @@ describe('documentation does not point at things that are gone', () => {
   it('resolves every relative markdown link', () => {
     const broken: string[] = [];
     for (const file of markdownFiles) {
-      for (const [, , target] of read(file).matchAll(/\[([^\]]+)\]\(([^)\s]+)\)/g)) {
+      for (const [, , target] of read(file).matchAll(MARKDOWN_LINK)) {
         if (IGNORED_LINK.test(target)) continue;
         const [path] = target.split('#');
         if (!path) continue;
