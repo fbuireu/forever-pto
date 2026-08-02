@@ -52,10 +52,9 @@ vi.mock('@base-ui/react/checkbox', async () => {
         'button',
         {
           ref,
-          'data-slot': 'checkbox',
-          'data-checked': checked,
-          onClick: () => onCheckedChange?.(!checked, {}),
           ...props,
+          'data-checked': String(checked),
+          onClick: () => onCheckedChange?.(!checked, {}),
         },
         children
       )
@@ -92,11 +91,12 @@ describe('Checkbox', () => {
     expect(spy).toHaveBeenCalledWith(true, {});
   });
 
-  it('syncs internal state when controlled checked prop changes', () => {
+  it('syncs internal state when the controlled checked prop changes', () => {
     const { rerender, container } = render(<Checkbox checked={false} />);
+    expect(container.querySelector('[data-animate="unchecked"]')).not.toBeNull();
+
     rerender(<Checkbox checked={true} />);
-    const root = container.querySelector('[data-slot="checkbox"]') as HTMLButtonElement;
-    expect(root.dataset.checked).toBe('true');
+    expect(container.querySelector('[data-animate="checked"]')).not.toBeNull();
   });
 
   it('renders with data-slot="checkbox"', () => {

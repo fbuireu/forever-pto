@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import type { ComponentProps, ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -43,16 +43,21 @@ vi.mock('@base-ui/react/collapsible', async () => {
   };
   return {
     Collapsible: {
-      Root: ({ children, onOpenChange: _oc, open, defaultOpen, ...props }: RootProps) =>
+      Root: ({ children, onOpenChange, open, defaultOpen, ...props }: RootProps) =>
         createElement(
           'div',
-          { 'data-slot': 'collapsible', 'data-state': (open ?? defaultOpen) ? 'open' : 'closed', ...props },
+          { ...props, 'data-open': String(open ?? defaultOpen ?? 'unset') },
+          createElement('button', {
+            type: 'button',
+            'data-testid': 'primitive-toggle',
+            onClick: () => onOpenChange?.(!(open ?? defaultOpen)),
+          }),
           children
         ),
       Trigger: ({ children, render: renderProp, ...props }: TriggerProps) =>
         renderProp && isValidElement(renderProp)
           ? cloneElement(renderProp, props)
-          : createElement('button', { 'data-slot': 'collapsible-trigger', ...props }, children),
+          : createElement('button', props, children),
       Panel: ({ children, render: renderFn, keepMounted: _km, ...props }: PanelProps) => {
         if (typeof renderFn === 'function') {
           return renderFn({ hidden: false, style: {}, className: '' }, { open: true });
@@ -71,40 +76,44 @@ describe('Collapsible', () => {
     expect(container.querySelector('[data-slot="collapsible"]')).not.toBeNull();
   });
 
-  it('starts closed when defaultOpen is not set', () => {
+  it('forwards defaultOpen to the primitive untouched', () => {
+    const { container } = render(
+      <Collapsible defaultOpen>
+        <span />
+      </Collapsible>
+    );
+    expect(container.querySelector('[data-slot="collapsible"]')?.getAttribute('data-open')).toBe('true');
+  });
+
+  it('forwards a controlled open to the primitive untouched', () => {
+    const { container } = render(
+      <Collapsible open={false}>
+        <span />
+      </Collapsible>
+    );
+    expect(container.querySelector('[data-slot="collapsible"]')?.getAttribute('data-open')).toBe('false');
+  });
+
+  it('leaves open unset when the caller sets neither', () => {
     const { container } = render(
       <Collapsible>
         <span />
       </Collapsible>
     );
-    expect(container.querySelector('[data-slot="collapsible"]')?.getAttribute('data-state')).toBe('closed');
+    expect(container.querySelector('[data-slot="collapsible"]')?.getAttribute('data-open')).toBe('unset');
   });
 
-  it('starts open when defaultOpen=true', () => {
-    const { container } = render(
-      <Collapsible defaultOpen>
-        <span data-testid='child' />
-      </Collapsible>
-    );
-    expect(container.querySelector('[data-slot="collapsible"]')?.getAttribute('data-state')).toBe('open');
-  });
-
-  it('does not report a controlled open change back to the caller', () => {
+  it('forwards the primitive open change to the caller', () => {
     const onOpenChange = vi.fn();
-    const { container, rerender } = render(
+    const { getByTestId } = render(
       <Collapsible open={false} onOpenChange={onOpenChange}>
-        <span data-testid='child' />
+        <span />
       </Collapsible>
     );
 
-    rerender(
-      <Collapsible open={true} onOpenChange={onOpenChange}>
-        <span data-testid='child' />
-      </Collapsible>
-    );
+    fireEvent.click(getByTestId('primitive-toggle'));
 
-    expect(onOpenChange).not.toHaveBeenCalled();
-    expect(container.querySelector('[data-slot="collapsible"]')).not.toBeNull();
+    expect(onOpenChange).toHaveBeenCalledWith(true);
   });
 });
 
