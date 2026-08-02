@@ -234,10 +234,15 @@ cookie restores access without the user retyping their email. `checkExistingSess
 flag is up, which is why every consumer can call it unconditionally.
 
 **`premium_activated` fires on the transition into Premium, not on every `setPremiumStatus`.**
-`refreshPremiumStatus` re-verifies the stored email on every visit and lands in the same action, so tracking
-each call counted one activation per session. The guard is the previous `premiumKey`: no key before, a key
-after. `checkExistingSession` restores the same entitlement from the cookie and deliberately emits nothing —
-a session restored on a second device is not a second activation.
+The guard is the previous `premiumKey`: no key before, a key after. Without it, any second call would have
+counted another activation for the same donor. `checkExistingSession` restores the same entitlement from the
+cookie and deliberately emits nothing — a session restored on a second device is not a second activation.
+
+`refreshPremiumStatus` is the action that guard was written for, and it currently has **no caller** outside
+its own test: nothing re-verifies the stored email on a later visit, so `setPremiumStatus` is reached only
+from the checkout and the "I already donated" modal. Treat it as an entry point that is wired up but unused,
+not as live behaviour — and keep the guard, because the moment anything calls it on mount the double-count
+is back.
 
 **Cross-store reads go through `getState()`, not hooks.** `holidays.ts` reads
 `useLocationStore.getState().regions` and `useFiltersStore.getState()` inside actions. That is correct
