@@ -144,7 +144,7 @@ test covering no single module is `docs/docs-consistency.test.ts`, colocated wit
 - **Use the glossary's words.** [CONTEXT.md](./CONTEXT.md) names one canonical term per concept and lists the
   retired ones. A variable called `vacationDays` where the glossary says PTO Day is a defect, not a style
   preference — the vocabulary is the only thing keeping four names for the same number apart.
-- **No explanatory comments anywhere under `src/`.** The folder's `CLAUDE.md` carries the explanation
+- **No explanatory comments in TypeScript sources under `src/`.** The folder's `CLAUDE.md` carries the explanation
   instead: a magic constant, a deliberate deviation, an ordering that looks wrong but is not, all belong in
   that folder's *Invariants* or *Gotchas* section, not above the line. A comment is invisible to everyone who
   is not already reading that file and nothing checks it against the code; a guide is read before the folder

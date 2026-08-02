@@ -43,8 +43,12 @@ vi.mock('@base-ui/react/collapsible', async () => {
   };
   return {
     Collapsible: {
-      Root: ({ children, onOpenChange: _oc, open: _o, defaultOpen: _do, ...props }: RootProps) =>
-        createElement('div', { 'data-slot': 'collapsible', ...props }, children),
+      Root: ({ children, onOpenChange: _oc, open, defaultOpen, ...props }: RootProps) =>
+        createElement(
+          'div',
+          { 'data-slot': 'collapsible', 'data-state': (open ?? defaultOpen) ? 'open' : 'closed', ...props },
+          children
+        ),
       Trigger: ({ children, render: renderProp, ...props }: TriggerProps) =>
         renderProp && isValidElement(renderProp)
           ? cloneElement(renderProp, props)
@@ -73,7 +77,7 @@ describe('Collapsible', () => {
         <span />
       </Collapsible>
     );
-    expect(container.querySelector('[data-slot="collapsible"]')).not.toBeNull();
+    expect(container.querySelector('[data-slot="collapsible"]')?.getAttribute('data-state')).toBe('closed');
   });
 
   it('starts open when defaultOpen=true', () => {
@@ -82,7 +86,7 @@ describe('Collapsible', () => {
         <span data-testid='child' />
       </Collapsible>
     );
-    expect(container.querySelector('[data-slot="collapsible"]')).not.toBeNull();
+    expect(container.querySelector('[data-slot="collapsible"]')?.getAttribute('data-state')).toBe('open');
   });
 
   it('does not report a controlled open change back to the caller', () => {

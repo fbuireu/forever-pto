@@ -28,8 +28,8 @@ vi.mock('motion/react', async () => {
           ref
         ) => createElement('button', { ref, ...props }, children)
       ),
-      svg: ({ children, initial: _i, animate: _a, exit: _e, transition: _t, ...props }: MotionSvgProps) =>
-        createElement('svg', props, children),
+      svg: ({ children, initial: _i, animate, exit: _e, transition: _t, ...props }: MotionSvgProps) =>
+        createElement('svg', { 'data-animate': animate, ...props }, children),
       path: ({ variants: _v, strokeLinecap, strokeLinejoin, ...props }: MotionPathProps) =>
         createElement('path', { strokeLinecap, strokeLinejoin, ...props }),
     },
@@ -75,12 +75,13 @@ import { Checkbox } from './Checkbox';
 describe('Checkbox', () => {
   it('renders unchecked by default', () => {
     const { container } = render(<Checkbox />);
-    expect(container.querySelector('[data-checked="true"]')).toBeNull();
+    expect(container.querySelector('[data-animate="unchecked"]')).not.toBeNull();
+    expect(container.querySelector('[data-animate="checked"]')).toBeNull();
   });
 
   it('renders checked when defaultChecked=true', () => {
     const { container } = render(<Checkbox defaultChecked />);
-    expect(container.querySelector('[data-slot="checkbox"]')).not.toBeNull();
+    expect(container.querySelector('[data-animate="checked"]')).not.toBeNull();
   });
 
   it('calls onCheckedChange when clicked', () => {

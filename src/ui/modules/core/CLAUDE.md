@@ -126,7 +126,6 @@ test is usually a decision rather than an omission:
   machines, controlled/uncontrolled fallbacks and event composition — the parts that break silently.
 - `primitives/` has **no tests at all**. Those files are markup plus `cn()`; the Playwright suite in
   `e2e/` is what proves they render.
-- `animate/icons/**` is excluded from both the run and the coverage report in `vitest.config.ts`. They
-  are mechanical wrappers around SVG path data — but `animate/icons/Icon.tsx` is not, and the
-  exclusion swallows its co-located `Icon.test.tsx` with the rest of the folder. Until the glob spares
-  that one file, run it with a config whose `include` names it.
+- `animate/icons/` is excluded from the **coverage report** only, and the glob already spares `Icon.tsx`.
+  The 22 icons are mechanical wrappers around SVG path data; `Icon.tsx` is not, and its co-located
+  `Icon.test.tsx` runs with everything else. Nothing under `core/` is excluded from the test run.

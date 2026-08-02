@@ -8,7 +8,7 @@ Everything the user sees, plus the browser plumbing that feeds it: components, h
 
 | Directory | Role |
 | --- | --- |
-| `adapters/` | The only place in the layer that performs network I/O itself: `payments/checkout.ts` (payment intent creation via the `@infrastructure/actions/payment` server action, Stripe confirmation, session activation) and `session/checkSession.ts` (`/api/check-session` lookups) |
+| `adapters/` | Where the layer's network I/O belongs, though not the only place it happens — `modules/shared/WebMCP.tsx` fetches `/api/health` and `modules/shared/contact/ContactModal.tsx` invokes a server action directly: `payments/checkout.ts` (payment intent creation via the `@infrastructure/actions/payment` server action, Stripe confirmation, session activation) and `session/checkSession.ts` (`/api/check-session` lookups) |
 | `assets/` | Brand SVGs as plain data — `icons/types.ts` defines `SvgIcon`; no React. Aliased `@assets/*`, excluded from the test run and from coverage |
 | `hooks/` | Cross-module React hooks. Two carry real coupling: `useCalculationsWorker.ts` owns the Web Worker request lifecycle and `useStoresReady.ts` gates rendering on store rehydration. The rest are generic (`useDebounce.ts`, `useMobile.ts`, `useAutoHeight.tsx`, `useControlledState.tsx`, `useIsInView.tsx`, `useLanguages.ts`, `useTutorial.tsx`) |
 | `i18n/` | The six message bundles and nothing else — routing and locale detection are in `@infrastructure/i18n`. Aliased `@i18n/*`. See [`i18n/CLAUDE.md`](./i18n/CLAUDE.md) |
@@ -20,7 +20,7 @@ Everything the user sees, plus the browser plumbing that feeds it: components, h
 
 This layer may import from `@application/*` — stores, DTO types, `@application/i18n/navigation`, `@application/shared/utils/dates` — and from `@domain/calendar/types` plus the pure `resolveSelectedDays` helper. It must not reach into the planning engine itself: suggestions are produced by the worker and read back from the holidays store.
 
-Imports from `@infrastructure/*` are allowed where there is no alternative, and the list is short enough to keep honest: `i18n/locales`, the BetterStack tracking helper (the logging client itself only through a dynamic import, see below), `errors`, the worker types and serializers, `services/env/getPublicEnv`, `services/countries/getCountries`, the Stripe browser client, and the `actions/payment` server action. Anything beyond outbound I/O the UI genuinely initiates does not belong here.
+Imports from `@infrastructure/*` are allowed where there is no alternative, and the list is short enough to keep honest: `i18n/locales`, the BetterStack tracking helper (the logging client itself only through a dynamic import, see below), `errors`, the worker types and serializers, `services/env/getPublicEnv`, `services/countries/getCountries`, the Stripe browser client, the driver.js tutorial client, and the `actions/payment` and `actions/contact` server actions. Anything beyond outbound I/O the UI genuinely initiates does not belong here.
 
 **A confirmation without a PaymentIntent is a redirect hand-off, not a failure.** `adapters/payments/checkout.ts` confirms with `redirect: 'if_required'`, and Stripe then resolves with no `paymentIntent` when it sent the user off to the issuer instead. The adapter logs a warning and returns unsuccessfully on purpose: the session is activated by the `payment/confirmation` page the user comes back to, not here. Treating that branch as an error — or activating Premium from it — breaks the redirect flow.
 
