@@ -43,11 +43,11 @@ vi.mock('@base-ui/react/menu', async () => {
   type SeparatorProps = ComponentProps<'hr'>;
   const Menu = {
     Root: ({ children, onOpenChange: _oc, open: _o, defaultOpen: _do, ...props }: RootProps) =>
-      createElement('div', { 'data-slot': 'dropdown-menu', ...props }, children),
+      createElement('div', props, children),
     Trigger: ({ children, render: renderProp, ...props }: WithRender) =>
       renderProp && isValidElement(renderProp)
         ? cloneElement(renderProp, props)
-        : createElement('button', { 'data-slot': 'dropdown-menu-trigger', ...props }, children),
+        : createElement('button', props, children),
     Portal: ({ children, keepMounted: _km, ...props }: WithRender) => createElement('div', props, children),
     Positioner: ({
       children,

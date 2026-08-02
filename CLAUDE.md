@@ -198,7 +198,8 @@ list.
 
 [`docs/docs-consistency.test.ts`](./docs/docs-consistency.test.ts) makes the mechanical half of that contract
 executable. It runs with `pnpm test:ut` (so, in CI on every PR) and asserts: that `CONTEXT.md` exists only at
-the root, is linked from here, and stays a glossary — no paths, no identifiers, no call signatures, every term
+the root, is linked from here, and stays a glossary — no backticked token holding a path, a call signature or
+a source-file name, every term
 defined, no empty `_Avoid_` list, no term listing itself as its own alternative; that every layer root and
 every folder in the *Nested guides* table has a `CLAUDE.md`; that ADRs are named `NNNN-slug.md`, numbered
 contiguously from `0001`, carry the template's sections, and are each linked from some document **outside**

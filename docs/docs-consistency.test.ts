@@ -233,7 +233,11 @@ describe('src/ carries no explanatory comments', () => {
       // has to be asked for as *trailing* — TypeScript only calls a comment leading when a line break comes
       // first, and here the brace does. This is the shape every a11y suppression on JSX takes.
       if (ts.isJsxExpression(node)) collect(ts.getTrailingCommentRanges(source, node.getStart() + 1));
-      node.forEachChild(walk);
+      // `forEachChild` yields nodes but never punctuation tokens, so a comment sitting against a `{`, `}`,
+      // `]` or `)` is trivia of nothing it reaches — the last line inside a block escaped entirely, which
+      // is how a probe file with an explanatory comment was committed under `src/` while this was green.
+      // `getChildren` includes the tokens, and needs the `setParentNodes` argument above to be true.
+      for (const child of node.getChildren(parsed)) walk(child);
     };
 
     walk(parsed);

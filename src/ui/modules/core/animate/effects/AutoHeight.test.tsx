@@ -16,29 +16,41 @@ type MotionSlotMockProps = ComponentProps<'div'> & {
   children: ReactNode;
 };
 
+const { measuredRef } = vi.hoisted(() => ({
+  measuredRef: { current: null as HTMLElement | null },
+}));
+
 vi.mock('motion/react', async () => {
   const { createElement } = await import('react');
   return {
     m: {
-      div: ({ children, animate: _a, transition: _t, initial: _i, exit: _e, layout: _l, ...props }: MotionDivProps) =>
-        createElement('div', props, children),
+      div: ({ children, animate, transition: _t, initial: _i, exit: _e, layout: _l, ...props }: MotionDivProps) =>
+        createElement('div', { ...props, 'data-animate': JSON.stringify(animate ?? null) }, children),
     },
   };
 });
 
 vi.mock('@ui/hooks/useAutoHeight', () => ({
-  useAutoHeight: () => ({ ref: { current: null }, height: 100 }),
+  useAutoHeight: () => ({ ref: measuredRef, height: 100 }),
 }));
 
 vi.mock('../primitives/animate/MotionSlot', async () => {
   const { createElement } = await import('react');
   return {
-    MotionSlot: ({ children, animate: _a, transition: _t, ...props }: MotionSlotMockProps) =>
-      createElement('div', { 'data-slot': 'motion-slot', ...props }, children),
+    MotionSlot: ({ children, animate, transition: _t, ...props }: MotionSlotMockProps) =>
+      createElement(
+        'div',
+        { ...props, 'data-slot': 'motion-slot', 'data-animate': JSON.stringify(animate ?? null) },
+        children
+      ),
   };
 });
 
 import { AutoHeight } from './AutoHeight';
+
+function readAnimate(element: Element | null) {
+  return JSON.parse(element?.getAttribute('data-animate') ?? 'null');
+}
 
 describe('AutoHeight', () => {
   it('renders children', () => {
@@ -88,12 +100,50 @@ describe('AutoHeight', () => {
     expect(container.querySelector('[data-slot="motion-slot"]')).toBeNull();
   });
 
-  it('renders without error when animate is a TargetAndTransition object', () => {
+  it('attaches the measuring ref to the wrapper around the children', () => {
     const { getByText } = render(
-      <AutoHeight animate={{ opacity: 1 }}>
-        <span>ok</span>
+      <AutoHeight>
+        <span>measured</span>
       </AutoHeight>
     );
-    expect(getByText('ok')).toBeTruthy();
+    expect(measuredRef.current?.contains(getByText('measured'))).toBe(true);
+  });
+
+  it('animates the measured height', () => {
+    const { container } = render(
+      <AutoHeight data-testid='ah-root'>
+        <span />
+      </AutoHeight>
+    );
+    expect(readAnimate(container.querySelector('[data-testid="ah-root"]'))).toEqual({ height: 100 });
+  });
+
+  it('merges the measured height into a TargetAndTransition animate', () => {
+    const { container } = render(
+      <AutoHeight data-testid='ah-root' animate={{ opacity: 1 }}>
+        <span />
+      </AutoHeight>
+    );
+    expect(readAnimate(container.querySelector('[data-testid="ah-root"]'))).toEqual({ height: 100, opacity: 1 });
+  });
+
+  it('ignores a non-target animate value and animates height alone', () => {
+    const { container } = render(
+      <AutoHeight data-testid='ah-root' animate='visible'>
+        <span />
+      </AutoHeight>
+    );
+    expect(readAnimate(container.querySelector('[data-testid="ah-root"]'))).toEqual({ height: 100 });
+  });
+
+  it('passes the merged animate through MotionSlot when asChild=true', () => {
+    const { container } = render(
+      <AutoHeight asChild animate={{ opacity: 1 }}>
+        <div>
+          <span>child</span>
+        </div>
+      </AutoHeight>
+    );
+    expect(readAnimate(container.querySelector('[data-slot="motion-slot"]'))).toEqual({ height: 100, opacity: 1 });
   });
 });
