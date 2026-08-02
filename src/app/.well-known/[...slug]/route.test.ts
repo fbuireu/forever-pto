@@ -54,4 +54,12 @@ describe('GET /.well-known/[...slug]', () => {
     const body = await response.json();
     expect(body.error).toBeDefined();
   });
+
+  it.each([['constructor'], ['toString'], ['hasOwnProperty'], ['valueOf'], ['__proto__']])(
+    'answers 404 for %s, which a plain object would have resolved to an inherited function',
+    async (slug) => {
+      const response = await GET(new Request('http://localhost'), makeContext([slug]));
+      expect(response.status).toBe(404);
+    }
+  );
 });

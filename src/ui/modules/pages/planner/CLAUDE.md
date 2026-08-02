@@ -79,6 +79,14 @@ recovers on a reload, because the store's other caller is `onRehydrateStorage`.
 `Summary` all gate on `useStoresReady()` and show a `<Skeleton>` until every persisted store reports
 hydrated. Rendering store values on the first pass produces a hydration mismatch, not just a flash.
 
+What makes that gate work is that it reports **not ready on its first render, always** — never
+`store.persist.hasHydrated()` read during render. `obfuscatedStorage` is synchronous, so persist rehydrates
+while the store module is evaluating and `hasHydrated()` is already `true` by the first client render; these
+sections are `dynamic()`-imported without `ssr: false`, so the server renders them too, with an empty store.
+Seeding the hook's state from `hasHydrated()` therefore made the server emit defaults and the first client
+render emit the persisted values — the exact mismatch the gate exists to prevent, with the skeleton never
+shown. The status is seeded `false` and raised in an effect, so both sides agree on the first pass.
+
 **Premium is a store read, never a prop.** `PremiumFeature` from `@ui/modules/premium` wraps the gated
 parts (the Custom Holiday tab, row editing, the advanced charts) and `Calendar` checks `premiumKey`
 directly before honouring a day click. Access is derived from the payment record —

@@ -13,10 +13,16 @@ const PERSISTED_STORES = [
 
 export const useStoresReady = () => {
   const [hydrationStatus, setHydrationStatus] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(PERSISTED_STORES.map(({ name, store }) => [name, store.persist.hasHydrated()]))
+    Object.fromEntries(PERSISTED_STORES.map(({ name }) => [name, false]))
   );
 
   useEffect(() => {
+    setHydrationStatus((previous) => {
+      const settled = PERSISTED_STORES.filter(({ name, store }) => !previous[name] && store.persist.hasHydrated());
+      if (settled.length === 0) return previous;
+      return { ...previous, ...Object.fromEntries(settled.map(({ name }) => [name, true])) };
+    });
+
     if (Object.values(hydrationStatus).every(Boolean)) {
       return;
     }

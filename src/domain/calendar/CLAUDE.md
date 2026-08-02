@@ -101,6 +101,19 @@ to fill.
 
 ## Invariants and traps
 
+**`monthlyDist` and `quarterDist` bucket by month alone, so a Carry-over Month folds into the same month of
+the planning year.** `getMonthlyDist` and `calculateQuarterDistribution` read `getMonth(date)` and nothing
+else, and the arrays are a fixed 12 and 4 long. With `carryOverMonths: 1` a PTO Day placed on 5 January 2027
+inside the 2026 Planning Window is counted in the January column beside days from January 2026 — two months
+twelve months apart, added together. `generateMetrics` does receive `year`, so the information to separate
+them is there.
+
+This is recorded rather than fixed because both repairs change what the chart means, and that is a product
+call, not a refactor: filtering the days outside the planning year makes the columns stop summing to the
+plan's day count, while widening the arrays to `12 + carryOverMonths` changes the shape every consumer
+chart renders. Do not quietly pick one — the same reasoning that keeps the two `Summary.tsx` denominators
+apart applies here.
+
 **A multi-day Bridge is consecutive *calendar* days that are all Workdays.** `findBridges` builds a
 candidate with `addDays(workday, i)` and requires every step to be in the Workday set, so a Friday and the
 following Monday are never one two-day candidate — they surface as two separate one-day Bridges. Combined
