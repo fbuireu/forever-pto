@@ -136,7 +136,10 @@ describe('POST /api/check-session', () => {
     const response = await POST(makeRequest({ email: 'user@example.com', premiumKey: 'pi_abc' }) as never);
     const body = await response.json();
     expect(body.success).toBe(true);
-    expect(mockActivateWithPayment).toHaveBeenCalledWith('user@example.com', 'pi_abc');
+    expect(mockActivateWithPayment).toHaveBeenCalledWith({
+      paymentIntentId: 'pi_abc',
+      expectedEmail: 'user@example.com',
+    });
   });
 
   it('returns 400 on ValidationError', async () => {

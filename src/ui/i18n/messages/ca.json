@@ -906,6 +906,7 @@
       "status": "Estat",
       "confirmed": "Confirmat",
       "paymentId": "ID de pagament",
+      "premiumActivationFailed": "El teu pagament s’ha completat, però no hem pogut activar l’accés premium automàticament. Recarrega aquesta pàgina o recupera el teu accés amb el correu amb què vas pagar.",
       "premiumActivated": "Ja tens accés a totes les funcions premium. Gràcies pel suport!",
       "continueHome": "Continua a la pàgina principal"
     }

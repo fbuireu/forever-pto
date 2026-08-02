@@ -40,7 +40,9 @@ export async function POST(request: NextRequest) {
         return noStore({ error: ApiError.EMAIL_REQUIRED }, { status: 400 });
       }
 
-      const result = yield* premiumKey ? activateWithPayment(email, premiumKey) : activateWithEmail(email);
+      const result = yield* premiumKey
+        ? activateWithPayment({ paymentIntentId: premiumKey, expectedEmail: email })
+        : activateWithEmail(email);
 
       const response = noStore({ success: true, premiumKey: result.premiumKey, email: result.email });
 

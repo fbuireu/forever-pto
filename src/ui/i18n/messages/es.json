@@ -906,6 +906,7 @@
       "status": "Estado",
       "confirmed": "Confirmado",
       "paymentId": "ID de pago",
+      "premiumActivationFailed": "Tu pago se ha completado, pero no hemos podido activar el acceso premium automáticamente. Recarga esta página o recupera tu acceso con el correo con el que pagaste.",
       "premiumActivated": "Tu acceso premium ya está activo.",
       "continueHome": "Ir a la página principal"
     }

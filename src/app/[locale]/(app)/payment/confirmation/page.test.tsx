@@ -1,5 +1,6 @@
 import type { PaymentConfirmationDTO } from '@application/dto/payment/types';
 import { DE, EN } from '@infrastructure/i18n/locales';
+import { ACTIVATION_FAILED } from '@infrastructure/services/premium/activation';
 import { render } from '@testing-library/react';
 import { Effect, Layer } from 'effect';
 import { createFormatter } from 'next-intl';
@@ -65,6 +66,11 @@ const makeParams = (locale = EN, paymentIntent?: string) => ({
 });
 
 const makeSuccessParams = () => makeParams(EN, PAYMENT_INTENT_ID);
+
+const makeFailedActivationParams = () => ({
+  searchParams: Promise.resolve({ payment_intent: PAYMENT_INTENT_ID, activation: ACTIVATION_FAILED }),
+  params: Promise.resolve({ locale: EN as never }),
+});
 
 const SUCCESS_CONFIRMATION: PaymentConfirmationDTO = {
   id: PAYMENT_INTENT_ID,
@@ -136,6 +142,18 @@ describe('payment/confirmation page', () => {
     it('builds the formatter for the requested locale', async () => {
       await PaymentSuccessPage(makeParams(DE, PAYMENT_INTENT_ID));
       expect(mockGetFormatter).toHaveBeenCalledWith({ locale: DE });
+    });
+
+    it('reports Premium as active when the activation route did not flag a failure', async () => {
+      const { container } = render(await PaymentSuccessPage(makeSuccessParams()));
+      expect(container.textContent).toContain('t:premiumActivated');
+      expect(container.textContent).not.toContain('t:premiumActivationFailed');
+    });
+
+    it('never claims Premium is active when the activation route says it failed', async () => {
+      const { container } = render(await PaymentSuccessPage(makeFailedActivationParams()));
+      expect(container.textContent).toContain('t:premiumActivationFailed');
+      expect(container.textContent).not.toContain('t:premiumActivated');
     });
   });
 

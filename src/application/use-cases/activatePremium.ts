@@ -10,13 +10,21 @@ import {
   savePayment,
   updatePaymentStatus,
 } from '@infrastructure/services/payments/repository';
+import { matchesClientSecret } from '@infrastructure/services/premium/activation';
 import { createSession } from '@infrastructure/services/premium/session';
 import { Effect } from 'effect';
 
-export const activateWithPayment = (
-  email: string,
-  paymentIntentId: string
-): Effect.Effect<
+interface ActivateWithPaymentParams {
+  paymentIntentId: string;
+  expectedEmail?: string;
+  clientSecret?: string;
+}
+
+export const activateWithPayment = ({
+  paymentIntentId,
+  expectedEmail,
+  clientSecret,
+}: ActivateWithPaymentParams): Effect.Effect<
   { email: string; premiumKey: string; token: string; deferred: Effect.Effect<void, never, TursoService> },
   ValidationError | SessionError,
   StripeServerService | LoggerService
@@ -29,12 +37,16 @@ export const activateWithPayment = (
       .retrieve(paymentIntentId)
       .pipe(Effect.mapError((e) => new ValidationError({ message: e.message })));
 
+    if (clientSecret && !matchesClientSecret(paymentIntent.client_secret, clientSecret)) {
+      return yield* Effect.fail(new ValidationError({ message: 'Client secret mismatch' }));
+    }
+
     if (paymentIntent.status !== 'succeeded') {
       return yield* Effect.fail(new ValidationError({ message: 'Payment not completed' }));
     }
 
-    const paymentEmail = paymentIntent.metadata.email ?? paymentIntent.receipt_email ?? undefined;
-    if (!paymentEmail || paymentEmail !== email) {
+    const email = paymentIntent.metadata.email ?? paymentIntent.receipt_email ?? undefined;
+    if (!email || (expectedEmail && expectedEmail !== email)) {
       return yield* Effect.fail(new ValidationError({ message: 'Email mismatch' }));
     }
 

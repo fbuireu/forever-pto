@@ -18,7 +18,7 @@ failure channel onto a status code. Business logic that lands here is in the wro
 | `[locale]/(app)/payment/confirmation/` | Post-Stripe landing page; reads `payment_intent` from the query string |
 | `[locale]/(marketing)/` | Homepage (`page.tsx`) and its header/footer shell (`layout.tsx`) |
 | `[locale]/(marketing)/legal/` | Privacy policy, cookie policy, terms of service, legal notice |
-| `api/` | Six route handlers — see below |
+| `api/` | Seven route handlers — see below |
 | `.well-known/[...slug]/` | Catch-all serving three static JSON documents |
 | `fonts.ts` | The four `next/font/google` families, exported as CSS-variable handles |
 | `sitemap.ts`, `robots.ts` | SEO file conventions |
@@ -88,6 +88,7 @@ for the same ranking.
 | Route | Method | What it does |
 | --- | --- | --- |
 | `api/payment/route.ts` | POST | Creates a Stripe PaymentIntent for a Donation. Rate-limits on `cf-connecting-ip` before anything else |
+| `api/payment/activate/route.ts` | GET | Stripe's `return_url`. Activates Premium and redirects to the confirmation page with the cookie already set — see *The redirect hand-off* below |
 | `api/webhooks/stripe/route.ts` | POST | Verifies the `stripe-signature` header, then hands the event to `processWebhookEvent`. Reads the **raw** body via `request.text()` — parsing it as JSON would break signature verification |
 | `api/check-session/route.ts` | GET, POST | GET verifies the premium cookie; POST activates Premium from an email, optionally with a payment key, and sets the cookie |
 | `api/contact/route.ts` | POST | Contact form submission |
@@ -110,6 +111,44 @@ Shared conventions across them:
   the use-case as a `deferred` Effect and run inside Next's `after()`.
 - `check-session` and `health` respond through `noStore` (`src/infrastructure/api/response.ts`). Anything
   carrying Premium state must keep doing so.
+
+## The redirect hand-off
+
+Some payment methods — iDEAL, Bancontact, P24, EPS, and any card that needs a redirect for 3DS — send the
+payer to their bank instead of confirming inline. Stripe then resolves `confirmPayment` with **no**
+`PaymentIntent`, so `src/ui/adapters/payments/checkout.ts` cannot activate anything: the browser has already
+navigated away. Everything those payers get, they get on the way back.
+
+`api/payment/activate/route.ts` is that way back. It is the `return_url` (`premium/CheckoutForm.tsx` builds
+it), so Stripe appends `payment_intent`, `payment_intent_client_secret` and `redirect_status` to it. The
+handler activates Premium, sets the cookie on a redirect response and sends the payer on to
+`payment/confirmation`. The cookie is therefore already set when that page renders — which is why the page
+stays a server component with no activation of its own. A page cannot write a cookie during render; only a
+route handler or a server action can, and that constraint is what decides this shape.
+
+**It is a GET that grants an entitlement**, which is exactly the thing to be careful about, so it carries
+four guards:
+
+- **The client secret is required and verified.** `activateWithPayment` compares it against the retrieved
+  intent's own `client_secret` through `matchesClientSecret` (`src/infrastructure/services/premium/activation.ts`),
+  in constant time and length-first. Without it, anyone holding a leaked payment intent id could mint a
+  session. The length check is not tidiness: `charCodeAt` past the end returns `NaN`, `NaN | 0` is `0`, so a
+  length-blind loop accepts any prefix.
+- **`redirect_status` short-circuits.** Stripe says whether the redirect succeeded; if it did not, the
+  handler never calls Stripe at all.
+- **Rate-limited on `cf-connecting-ip`**, through the same `checkRateLimit` the payment route uses.
+- **Never cached.** `dynamic = 'force-dynamic'` plus an explicit `no-store`, because the response carries a
+  `Set-Cookie`.
+
+Failure is never silent and never a lie: the handler redirects with `activation=failed` and the page then
+renders `premiumActivationFailed` — the payer is told their money went through and their access did not,
+instead of the page claiming Premium is active. That claim was unconditional once, on a page that activated
+nothing, which is the bug this route exists to close.
+
+The cookie is `sameSite: 'strict'`, so the confirmation page must **not** infer success from the cookie
+being present — the payer arrives through a chain that started cross-site and the browser may withhold it on
+that hop. The `activation` query parameter is the signal; the cookie is the entitlement, and the premium
+store picks it up on the next same-site request, when `PremiumFeature.tsx` calls `checkExistingSession()`.
 
 ## The `.well-known` catch-all
 

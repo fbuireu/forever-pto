@@ -89,7 +89,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
       stripe,
       elements,
       email,
-      returnUrl: `${globalThis.location.origin}/${locale}/payment/confirmation`,
+      returnUrl: `${globalThis.location.origin}/api/payment/activate?locale=${locale}`,
     });
 
     if (!result.success) {

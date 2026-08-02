@@ -906,6 +906,7 @@
       "status": "Status",
       "confirmed": "Confirmed",
       "paymentId": "Payment ID",
+      "premiumActivationFailed": "Your payment went through, but we could not activate premium access automatically. Reload this page, or recover your access with the email you paid with.",
       "premiumActivated": "Premium access is active. All premium features are now unlocked.",
       "continueHome": "Continue to homepage"
     }

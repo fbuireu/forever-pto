@@ -11,7 +11,8 @@ A Next.js 16 App Router app deployed to Cloudflare Workers through OpenNext. The
 optional Region, a year and a PTO budget; the planner finds the Bridges that turn that budget into the
 longest stretches off, and reports how well it did. **The whole planner runs in the browser** — the server
 holds payment and contact records and nothing else ([ADR 0001](./docs/adr/0001-planner-runs-in-the-browser.md)).
-The server side is five API route handlers (`check-session`, `contact`, `health`, `markdown`, `payment`), the
+The server side is six API route handlers (`check-session`, `contact`, `health`, `markdown`, `payment`,
+`payment/activate`), the
 Stripe webhook, a `.well-known` catch-all, `middleware.ts`, and some static rendering.
 
 Premium (advanced metrics, manual editing of a Suggestion) is unlocked by a Donation. There are no accounts:

@@ -906,6 +906,7 @@
       "status": "Status",
       "confirmed": "Bestätigt",
       "paymentId": "Zahlungs-ID",
+      "premiumActivationFailed": "Deine Zahlung war erfolgreich, aber der Premium-Zugang konnte nicht automatisch aktiviert werden. Lade diese Seite neu oder stelle deinen Zugang mit der E-Mail wieder her, mit der du bezahlt hast.",
       "premiumActivated": "Dein Premium ist jetzt aktiv. Viel Spaß mit allen Features!",
       "continueHome": "Weiter zur Startseite"
     }

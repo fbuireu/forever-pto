@@ -2,6 +2,7 @@ import { Link } from '@application/i18n/navigation';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { ApplicationLayer } from '@infrastructure/layers';
 import { confirmation } from '@infrastructure/services/payments/confirmation';
+import { ACTIVATION_FAILED } from '@infrastructure/services/premium/activation';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { Effect } from 'effect';
@@ -16,6 +17,7 @@ interface PaymentSuccessParams {
   searchParams: Promise<{
     payment_intent?: string;
     redirect_status?: string;
+    activation?: string;
   }>;
   params: Promise<{ locale: Locale }>;
 }
@@ -55,7 +57,8 @@ async function PaymentError() {
 
 export default async function PaymentSuccessPage({ searchParams, params }: Readonly<PaymentSuccessParams>) {
   const logger = getBetterStackInstance();
-  const [{ payment_intent: paymentIntentId }, { locale }] = await Promise.all([searchParams, params]);
+  const [{ payment_intent: paymentIntentId, activation }, { locale }] = await Promise.all([searchParams, params]);
+  const hasActivated = activation !== ACTIVATION_FAILED;
 
   if (!paymentIntentId) {
     logger.warn('Payment success page accessed without payment_intent, redirecting to home');
@@ -109,9 +112,15 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
             </div>
           </div>
 
-          <div className='rounded-lg bg-green-500/10 border border-green-500/20 p-4 text-sm'>
-            <p className='text-green-700 dark:text-green-300'>{t('premiumActivated')}</p>
-          </div>
+          {hasActivated ? (
+            <div className='rounded-lg bg-green-500/10 border border-green-500/20 p-4 text-sm'>
+              <p className='text-green-700 dark:text-green-300'>{t('premiumActivated')}</p>
+            </div>
+          ) : (
+            <div className='rounded-lg bg-destructive/10 border border-destructive/20 p-4 text-sm'>
+              <p className='text-destructive'>{t('premiumActivationFailed')}</p>
+            </div>
+          )}
 
           <Button asChild className='w-full bg-green-600 hover:bg-green-700'>
             <Link href='/'>{t('continueHome')}</Link>
