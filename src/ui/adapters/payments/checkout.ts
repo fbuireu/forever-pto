@@ -42,6 +42,7 @@ const log = (write: (logger: BetterStackClient) => void) => {
 
 export const confirmPayment = async (params: ConfirmPaymentParams) => {
   const { stripe, elements, email, returnUrl } = params;
+  let charged = false;
 
   const program = Effect.gen(function* () {
     const { error: submitError } = yield* Effect.tryPromise(() => elements.submit());
@@ -67,6 +68,8 @@ export const confirmPayment = async (params: ConfirmPaymentParams) => {
       return { success: false, error: '' };
     }
 
+    charged = true;
+
     const sessionResponse = yield* Effect.tryPromise(() =>
       fetch('/api/check-session', {
         method: 'POST',
@@ -86,7 +89,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams) => {
           paymentIntentId: paymentIntent.id,
         })
       );
-      return { success: false, error: errorData.error ?? '', charged: true };
+      return { success: false, error: errorData.error ?? '', charged };
     }
 
     const sessionData = yield* Effect.tryPromise(
@@ -108,6 +111,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams) => {
       return Effect.succeed({
         success: false,
         error: error instanceof Error ? error.message : '',
+        charged,
       });
     })
   );

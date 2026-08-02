@@ -228,6 +228,31 @@ describe('getWorkedDaysPerMonth', () => {
     expect(withHoliday).toBeLessThan(baseline);
   });
 
+  it('counts a day that is both a Holiday and a PTO Day once, not twice', () => {
+    const shared = makeDate(2025, 1, 6);
+    const baseline = getWorkedDaysPerMonth({ ptoDays: [], holidays: [], year: 2025 });
+    const holidayOnly = getWorkedDaysPerMonth({ ptoDays: [], holidays: [makeHoliday(shared)], year: 2025 });
+    const both = getWorkedDaysPerMonth({ ptoDays: [shared], holidays: [makeHoliday(shared)], year: 2025 });
+
+    expect(both).toBe(holidayOnly);
+    expect(both).toBeLessThan(baseline);
+  });
+
+  it('counts a Manual Day once even though the pipelines pass it as a pseudo-Holiday and as a spent day', () => {
+    const manual = makeDate(2025, 2, 11);
+    const real = makeDate(2025, 1, 6);
+    const pseudoHoliday = makeHoliday(manual);
+
+    const withDuplicate = getWorkedDaysPerMonth({
+      ptoDays: [manual],
+      holidays: [makeHoliday(real), pseudoHoliday],
+      year: 2025,
+    });
+    const counted = getWorkedDaysPerMonth({ ptoDays: [], holidays: [makeHoliday(real), pseudoHoliday], year: 2025 });
+
+    expect(withDuplicate).toBe(counted);
+  });
+
   it('ignores holidays that fall outside the measured year', () => {
     const baseline = getWorkedDaysPerMonth({ ptoDays: [], holidays: [], year: 2025 });
     const withNextYearHoliday = getWorkedDaysPerMonth({

@@ -37,7 +37,8 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
   const tAdd = useTranslations('modals.addHoliday');
   const tValidation = useTranslations('validation.holiday');
   const { year, carryOverMonths } = useFiltersStore();
-  const { holidays, editHoliday, currentSelection, alternatives, suggestion } = useHolidaysStore();
+  const { holidays, editHoliday, currentSelection, alternatives, suggestion, manuallySelectedDays } =
+    useHolidaysStore();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(holiday.date);
   const [isPending, startTransition] = useTransition();
 
@@ -85,6 +86,18 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
             const formattedDate = formatDate({ date: data.date, locale, format: 'MMMM d, yyyy' });
             toast.error(tAdd('existsTitle'), {
               description: tAdd('existsDescription', { date: formattedDate, name: existingHoliday.name }),
+            });
+            return;
+          }
+
+          const isManuallySelected = manuallySelectedDays.some(
+            (day) => day.toDateString() === data.date.toDateString()
+          );
+
+          if (isManuallySelected) {
+            const formattedDate = formatDate({ date: data.date, locale, format: 'MMMM d, yyyy' });
+            toast.error(tAdd('manualDayExistsTitle'), {
+              description: tAdd('manualDayExistsDescription', { date: formattedDate }),
             });
             return;
           }

@@ -178,9 +178,11 @@ export const getWorkedDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkedDays
   const yearEnd = endOfYear(new Date(year, 11, 31));
   const allDaysInYear = eachDayOfInterval({ start: yearStart, end: yearEnd });
   const workdaysInYear = allDaysInYear.filter((day) => !isWeekend(day)).length;
-  const holidaysOnWorkdays = holidays.filter((h) => getYear(h.date) === year && !isWeekend(h.date)).length;
-  const ptoOnWorkdays = ptoDays.filter((d) => getYear(d) === year && !isWeekend(d)).length;
-  const workedDays = workdaysInYear - holidaysOnWorkdays - ptoOnWorkdays;
+  const daysOffOnWorkdays = new Set<string>();
+  for (const date of [...holidays.map((h) => h.date), ...ptoDays]) {
+    if (getYear(date) === year && !isWeekend(date)) daysOffOnWorkdays.add(date.toDateString());
+  }
+  const workedDays = workdaysInYear - daysOffOnWorkdays.size;
   const avgPerMonth = workedDays / 12;
 
   return Number.parseFloat(avgPerMonth.toFixed(1));

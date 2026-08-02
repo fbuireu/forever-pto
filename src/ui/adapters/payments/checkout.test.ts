@@ -140,6 +140,49 @@ describe('confirmPayment', () => {
     expect(result.error).toBe('declined by bank');
   });
 
+  it('does not claim a charge happened when Stripe declined before taking the money', async () => {
+    (mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
+    (mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({
+      error: { message: 'declined by bank' },
+    });
+
+    const result = await confirmPayment(BASE_CONFIRM_PARAMS);
+
+    expect('charged' in result && result.charged).toBeFalsy();
+  });
+
+  it('marks the failure as post-charge when the activation request itself throws', async () => {
+    (mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
+    (mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({ paymentIntent: { id: 'pi_123' } });
+    mockFetch.mockRejectedValue(new Error('network down'));
+
+    const result = await confirmPayment(BASE_CONFIRM_PARAMS);
+
+    expect(result.success).toBe(false);
+    expect('charged' in result && result.charged).toBe(true);
+  });
+
+  it('marks the failure as post-charge when the activation response body cannot be read', async () => {
+    (mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
+    (mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({ paymentIntent: { id: 'pi_123' } });
+    mockFetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockRejectedValue(new Error('bad json')) });
+
+    const result = await confirmPayment(BASE_CONFIRM_PARAMS);
+
+    expect(result.success).toBe(false);
+    expect('charged' in result && result.charged).toBe(true);
+  });
+
+  it('does not claim a charge on the redirect hand-off, where the issuer has not answered yet', async () => {
+    (mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
+    (mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({});
+
+    const result = await confirmPayment(BASE_CONFIRM_PARAMS);
+
+    expect(result.success).toBe(false);
+    expect('charged' in result && result.charged).toBeFalsy();
+  });
+
   it('returns failure and logs when session response is not ok', async () => {
     (mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
     (mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({ paymentIntent: { id: 'pi_123' } });

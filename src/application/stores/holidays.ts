@@ -390,10 +390,21 @@ export const useHolidaysStore = create<HolidaysStore>()(
         },
 
         editHoliday: ({ holidayId, locale, updates, year, carryOverMonths }: EditHolidayParams) => {
-          const { holidays } = get();
+          const { holidays, manuallySelectedDays } = get();
           const holidayIndex = holidays.findIndex((h) => h.id === holidayId);
 
           if (holidayIndex === -1) return;
+
+          const targetDateStr = ensureDate(updates.date).toDateString();
+          const collidesWithHoliday = holidays.some(
+            (h, index) => index !== holidayIndex && ensureDate(h.date).toDateString() === targetDateStr
+          );
+          const collidesWithManualDay = manuallySelectedDays.some((d) => d.toDateString() === targetDateStr);
+
+          if (collidesWithHoliday || collidesWithManualDay) {
+            log((logger) => logger.warn('Refused to move a holiday onto an occupied date', { targetDateStr }));
+            return;
+          }
 
           const updatedHoliday = holidayDTO.createCustom({
             name: updates.name,

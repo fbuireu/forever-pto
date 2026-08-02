@@ -119,6 +119,11 @@ re-fetches Holidays) and would otherwise strand it, spending budget with no way 
 `calendar/Calendar.tsx` repeats the check to choose the toast, exactly as `AddHolidayModal.tsx` does for the
 mirror rule below — the two must agree, or the UI reports a selection the store refused.
 
+**`editHoliday` carries the same collision rule as `addHoliday`, because moving a Holiday onto a date is
+the same act as creating one there.** It refuses a target date already held by another Holiday or by a
+Manual Day, and `EditHolidayModal.tsx` repeats both checks to pick the toast. The store comparison skips the
+entry being edited, so renaming a Holiday without moving it is never blocked by itself.
+
 **A date is occupied by a Holiday *or* by a Manual Day, and `addHoliday` refuses both.** It used to compare
 only against `holidays`, so a Custom Holiday could be created on a date the user had already spent budget
 on: the day then counted against the allowance in `remainingDays` while being a non-working day, so the PTO

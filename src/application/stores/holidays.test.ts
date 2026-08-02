@@ -166,6 +166,64 @@ describe('toggleDaySelection refuses days that are already off', () => {
   });
 });
 
+describe('editHoliday collisions', () => {
+  it('refuses to move a holiday onto a date already spent as a PTO day', () => {
+    useHolidaysStore.setState({
+      holidays: [makeHoliday('custom-1', '2026-03-11', HolidayVariant.CUSTOM)],
+      manuallySelectedDays: [new Date('2026-03-12')],
+    });
+
+    useHolidaysStore.getState().editHoliday({
+      holidayId: 'custom-1',
+      updates: { name: 'Moved', date: new Date('2026-03-12') },
+      locale: 'en',
+      year: 2026,
+      carryOverMonths: 0,
+    });
+
+    const [holiday] = useHolidaysStore.getState().holidays;
+    expect(holiday.date.toDateString()).toBe(new Date('2026-03-11').toDateString());
+  });
+
+  it('refuses to move a holiday onto another holiday', () => {
+    useHolidaysStore.setState({
+      holidays: [
+        makeHoliday('custom-1', '2026-03-11', HolidayVariant.CUSTOM),
+        makeHoliday('national-1', '2026-03-12'),
+      ],
+    });
+
+    useHolidaysStore.getState().editHoliday({
+      holidayId: 'custom-1',
+      updates: { name: 'Moved', date: new Date('2026-03-12') },
+      locale: 'en',
+      year: 2026,
+      carryOverMonths: 0,
+    });
+
+    const moved = useHolidaysStore.getState().holidays.find((h) => h.id === 'custom-1');
+    expect(moved?.date.toDateString()).toBe(new Date('2026-03-11').toDateString());
+  });
+
+  it('still moves a holiday onto a free date', () => {
+    useHolidaysStore.setState({
+      holidays: [makeHoliday('custom-1', '2026-03-11', HolidayVariant.CUSTOM)],
+      manuallySelectedDays: [new Date('2026-03-12')],
+    });
+
+    useHolidaysStore.getState().editHoliday({
+      holidayId: 'custom-1',
+      updates: { name: 'Moved', date: new Date('2026-03-13') },
+      locale: 'en',
+      year: 2026,
+      carryOverMonths: 0,
+    });
+
+    const [holiday] = useHolidaysStore.getState().holidays;
+    expect(holiday.date.toDateString()).toBe(new Date('2026-03-13').toDateString());
+  });
+});
+
 describe('addHoliday', () => {
   it('refuses a date already spent as a PTO day, which would otherwise be paid for twice', () => {
     const date = new Date('2026-03-10');

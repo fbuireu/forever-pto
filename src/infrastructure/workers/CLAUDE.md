@@ -77,14 +77,28 @@ casts the incoming `strategy` string to `FilterStrategy`. An unknown string reac
 
 The two kinds of hand-edited day reach the engine by different routes, and that asymmetry is the point.
 
-- **Manual days** have no parameter of their own. They become pseudo-holidays (`id: 'manual-N'`,
-  `variant: CUSTOM`) appended to the real holidays as `holidaysWithManual`, which is what both planning
-  entry points *and* both `generateMetrics` calls receive. A manual day is genuinely a day off, so counting
-  it as free is correct everywhere.
-- **Removed Days** are dates the user has told us they *will work*. They cross as ISO
-  strings, are mapped straight to `Date` objects and are handed to `generateSuggestions` and
-  `generateAlternatives` as `removedDays`. They are never turned into holidays and never reach
-  `generateMetrics`.
+- **Manual days** reach the *planning* calls only as pseudo-holidays (`id: 'manual-N'`, `variant: CUSTOM`)
+  appended to the real holidays as `holidaysWithManual`. A manual day is genuinely a day off, so counting it
+  as free for Bridge expansion is correct. They additionally reach both `generateMetrics` calls **by name**,
+  as `manuallySelectedDays: manualDates`, because a Metric needs to know not just that the day is free but
+  that the user *paid* for it: without the parameter the denominator is the days the engine placed by itself
+  while the numerator still counts spans expanded through the manual ones, which inflates Efficiency and
+  Bonus Days. See the *Public API* section of
+  [`@domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md).
+- **Removed Days** are dates the user has told us they *will work*. They cross as ISO strings, are mapped
+  straight to `Date` objects and are handed to `generateSuggestions` and `generateAlternatives` as
+  `removedDays`, and to both `generateMetrics` calls as `removedSuggestedDays`. They are never turned into
+  holidays. Passing them to the Metrics is belt and braces rather than load-bearing —
+  `getAvailableWorkdays` already excludes them, so a Removed Day cannot appear in `suggestion.days` for
+  `resolveSelectedDays` to strip — but it keeps the two arguments symmetric and matches what
+  `toggleDaySelection` does on the store side.
+
+**A day passed both ways must only be counted once.** `holidaysWithManual` and `manuallySelectedDays`
+overlap by construction, so any Metric that subtracts Holidays and PTO Days as two independent counts
+subtracts every Manual Day twice. `getWorkedDaysPerMonth` did exactly that and understated Worked Days per
+month by one day per Manual Day; it now unions both lists into a set of `toDateString()` keys before
+counting. Every other Metric touching both lists already built a set. A new Metric that reads `holidays` and
+`ptoDays` together has to do the same.
 
 The engine drops a `removedDays` date from the Workday list and stops there: it does not become a Free Day
 for Bridge expansion or scoring. Folding them back into the holidays array would restore exactly the bias the
