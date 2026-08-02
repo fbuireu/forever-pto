@@ -102,6 +102,70 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
+describe('toggleDaySelection refuses days that are already off', () => {
+  const SUGGESTION = { days: [], bridges: [], metrics: null } as never;
+
+  beforeEach(() => {
+    useHolidaysStore.setState({
+      currentSelection: SUGGESTION,
+      manuallySelectedDays: [],
+      removedSuggestedDays: [],
+      holidays: [],
+    });
+  });
+
+  it('refuses a weekend, which costs budget and buys nothing', () => {
+    const saturday = new Date(2026, 2, 14);
+    expect(saturday.getDay()).toBe(6);
+
+    const accepted = useHolidaysStore
+      .getState()
+      .toggleDaySelection({ date: saturday, totalPtoDays: 10, locale: 'en', allowPastDays: true });
+
+    expect(accepted).toBe(false);
+    expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
+  });
+
+  it('refuses a day that any Holiday already covers, Custom ones included', () => {
+    const date = new Date(2026, 2, 11);
+    useHolidaysStore.setState({ holidays: [makeHoliday('custom-1', '2026-03-11', HolidayVariant.CUSTOM)] });
+
+    const accepted = useHolidaysStore
+      .getState()
+      .toggleDaySelection({ date, totalPtoDays: 10, locale: 'en', allowPastDays: true });
+
+    expect(accepted).toBe(false);
+    expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
+  });
+
+  it('still accepts an ordinary Workday', () => {
+    const wednesday = new Date(2026, 2, 11);
+    expect(wednesday.getDay()).toBe(3);
+
+    const accepted = useHolidaysStore
+      .getState()
+      .toggleDaySelection({ date: wednesday, totalPtoDays: 10, locale: 'en', allowPastDays: true });
+
+    expect(accepted).toBe(true);
+    expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(1);
+  });
+
+  it('still lets an existing Manual Day be removed even once a Holiday has landed on it', () => {
+    const date = new Date(2026, 2, 11);
+    useHolidaysStore.setState({
+      manuallySelectedDays: [date],
+      holidays: [makeHoliday('national-1', '2026-03-11')],
+    });
+
+    const accepted = useHolidaysStore
+      .getState()
+      .toggleDaySelection({ date, totalPtoDays: 10, locale: 'en', allowPastDays: true });
+
+    expect(accepted).toBe(true);
+    expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
+  });
+});
+
 describe('addHoliday', () => {
   it('refuses a date already spent as a PTO day, which would otherwise be paid for twice', () => {
     const date = new Date('2026-03-10');
@@ -361,7 +425,7 @@ describe('trimManualDays', () => {
 });
 
 describe('toggleDaySelection', () => {
-  const baseDate = new Date('2026-05-10');
+  const baseDate = new Date('2026-05-11');
   const PARAMS = { totalPtoDays: 5, locale: 'en', allowPastDays: false };
 
   it('returns false when there is no currentSelection', () => {
@@ -733,6 +797,26 @@ describe('generateSuggestions', () => {
     strategy: FilterStrategy.GROUPED,
     locale: 'en' as const,
   };
+
+  it('measures the metrics against the Manual Days too, mirroring the worker', async () => {
+    const { generateMetrics } = await import('@domain/calendar/metrics/generateMetrics');
+    const manual = new Date(2026, 2, 11);
+    const removed = new Date(2026, 2, 12);
+    useHolidaysStore.setState({
+      holidays: [makeHoliday('h1', '2026-01-01')],
+      manuallySelectedDays: [manual],
+      removedSuggestedDays: [removed],
+    });
+
+    await useHolidaysStore.getState().generateSuggestions({ ...PARAMS, ptoDays: 5 });
+
+    const calls = vi.mocked(generateMetrics).mock.calls;
+    expect(calls.length).toBeGreaterThan(0);
+    for (const [args] of calls) {
+      expect(args.manuallySelectedDays).toEqual([manual]);
+      expect(args.removedSuggestedDays).toEqual([removed]);
+    }
+  });
 
   it('clears suggestions when ptoDays is 0', async () => {
     useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')], suggestion: makeSuggestion([]) });

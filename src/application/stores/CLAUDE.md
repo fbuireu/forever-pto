@@ -103,6 +103,22 @@ The same pipeline exists twice, and the two halves must stay in step:
   one caller is the Troubleshooting reset in `Troubleshooting.tsx`, which fires it after `resetToDefaults()`
   has cleared the manual edits.
 
+**`checkExistingSession` clears Premium only on an authoritative "no session", never on a failed check.**
+`getExistingSession` returns `null` when the server answered and said there is no session — a genuine
+expiry, which should clear the stored `premiumKey` — and **throws** when the request itself failed. The two
+used to collapse into the same `null`, so a 500 or a dropped connection revoked a donor's Premium locally
+until they went and recovered it, which ADR 0008 says never happens. The store's `catch` deliberately
+writes only `lastVerified` and `needsSessionCheck`; adding `premiumKey: null` there reinstates the bug.
+
+**A PTO Day is only ever spent on a Workday, and `toggleDaySelection` enforces it.** Adding a Manual Day is
+refused when the date is a weekend or is already covered by any Holiday — Custom included, which the
+calendar's `nationalOrRegionalHoliday` branch alone did not catch. Both cost a day of budget and buy nothing,
+because the day was already off. The guard runs only on the *add* path: a day already in the plan can always
+be toggled back off, which matters when a Holiday lands on a Manual Day after the fact (a Country change
+re-fetches Holidays) and would otherwise strand it, spending budget with no way to reclaim it.
+`calendar/Calendar.tsx` repeats the check to choose the toast, exactly as `AddHolidayModal.tsx` does for the
+mirror rule below — the two must agree, or the UI reports a selection the store refused.
+
 **A date is occupied by a Holiday *or* by a Manual Day, and `addHoliday` refuses both.** It used to compare
 only against `holidays`, so a Custom Holiday could be created on a date the user had already spent budget
 on: the day then counted against the allowance in `remainingDays` while being a non-working day, so the PTO

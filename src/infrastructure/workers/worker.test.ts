@@ -152,6 +152,27 @@ describe('worker onmessage', () => {
     expect(metricsHolidays.some((h: { id: string }) => h.id === 'manual-0')).toBe(true);
   });
 
+  it('measures the metrics against the Manual Days too, not just the days it placed itself', () => {
+    const manual = new Date(2025, 2, 5);
+    const removed = new Date(2025, 2, 20);
+    sendMessage({ manualDays: [manual.toISOString()], removedDays: [removed.toISOString()] });
+
+    const metricsArgs = mockGenerateMetrics.mock.lastCall?.[0];
+    expect(metricsArgs.manuallySelectedDays.map((d: Date) => d.toDateString())).toEqual([manual.toDateString()]);
+    expect(metricsArgs.removedSuggestedDays.map((d: Date) => d.toDateString())).toEqual([removed.toDateString()]);
+  });
+
+  it('gives the alternatives the same day set as the base suggestion, so their metrics stay comparable', () => {
+    const manual = new Date(2025, 2, 5);
+    sendMessage({ manualDays: [manual.toISOString()] });
+
+    const everyCall = mockGenerateMetrics.mock.calls.map(([args]) => args.manuallySelectedDays);
+    expect(everyCall.length).toBeGreaterThan(0);
+    for (const days of everyCall) {
+      expect(days.map((d: Date) => d.toDateString())).toEqual([manual.toDateString()]);
+    }
+  });
+
   it('scopes the metrics to the requested year, not the 2025 the mocked suggestion would infer', () => {
     sendMessage({ year: 2026 });
     expect(mockGenerateMetrics.mock.lastCall?.[0].year).toBe(2026);

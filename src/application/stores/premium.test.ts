@@ -207,6 +207,17 @@ describe('checkExistingSession', () => {
     await usePremiumStore.getState().checkExistingSession();
     expect(usePremiumStore.getState().needsSessionCheck).toBe(false);
   });
+
+  it('keeps a donor premium when the check fails, since a server blip is not a revocation', async () => {
+    const { getExistingSession } = await import('@ui/adapters/session/checkSession');
+    vi.mocked(getExistingSession).mockRejectedValueOnce(new Error('check-session answered 500'));
+    usePremiumStore.setState({ needsSessionCheck: true, premiumKey: 'pk_paid', userEmail: 'donor@example.com' });
+
+    await usePremiumStore.getState().checkExistingSession();
+    const state = usePremiumStore.getState();
+    expect(state.premiumKey).toBe('pk_paid');
+    expect(state.userEmail).toBe('donor@example.com');
+  });
 });
 
 describe('refreshPremiumStatus', () => {

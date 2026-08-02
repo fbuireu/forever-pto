@@ -210,7 +210,7 @@
   },
   "workdayCounter": {
     "title": "Workday counter",
-    "tooltip": "Count working days between two dates, automatically excluding weekends and holidays. Useful for project planning and deadline calculations.",
+    "tooltip": "Count Workdays between two dates, automatically excluding weekends and holidays. Useful for project planning and deadline calculations.",
     "tooltipLabel": "More information about workday counter",
     "selectRange": "Select dates",
     "clearSelection": "Clear selection",
@@ -339,7 +339,7 @@
       "statusTitle": "PTO status tracker",
       "statusDescription": "Track your PTO at a glance: auto-assigned days, manually selected days, and how many are left. Reset manual changes anytime to go back to the suggested plan.",
       "calendarTitle": "Your interactive PTO calendar",
-      "calendarDescription": "This is your year-at-a-glance calendar. Holidays appear in gray, suggested PTO days in teal, and manually selected days in blue. Click any working day to manually toggle selection. The calendar updates instantly as you explore different alternatives.",
+      "calendarDescription": "This is your year-at-a-glance calendar. Holidays appear in gray, suggested PTO days in teal, and manually selected days in blue. Click any Workday to manually toggle selection. The calendar updates instantly as you explore different alternatives.",
       "finishTitle": "You're all set!",
       "finishDescription": "You're set. Configure your preferences in the sidebar and we'll suggest the best PTO days to take.",
       "holidaysListTitle": "Customize your holidays",
@@ -455,6 +455,9 @@
     "noPtoDaysRemaining": "No remaining PTO days to assign",
     "removeDaysToFree": "Remove existing days to free up space",
     "cannotSelectHoliday": "Cannot select a public holiday",
+    "cannotSelectFreeDay": "That day is already off",
+    "cannotSelectCustomHolidayDescription": "This day is already a custom holiday, so it costs you nothing.",
+    "cannotSelectWeekendDescription": "This day is already part of the weekend, so it costs you nothing.",
     "cannotSelectHolidayDescription": "This day is already a national or regional holiday",
     "paymentFailed": "Couldn't start payment",
     "paymentFailedDescription": "Try again later",
@@ -888,7 +891,7 @@
   },
   "holidayRow": {
     "weekend": "Weekend",
-    "workday": "Working day",
+    "workday": "Workday",
     "select": "Select {name}",
     "editHolidays": "Edit holidays"
   },

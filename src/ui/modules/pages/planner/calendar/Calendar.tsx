@@ -278,6 +278,11 @@ export function Calendar({
           return;
         }
 
+        if (isManual || isSuggested) {
+          onDayToggle(date);
+          return;
+        }
+
         if (isNationalOrRegionalHoliday) {
           toast.warning(t('cannotSelectHoliday'), {
             description: t('cannotSelectHolidayDescription'),
@@ -285,8 +290,17 @@ export function Calendar({
           return;
         }
 
-        if (isManual || isSuggested) {
-          onDayToggle(date);
+        if (modifiers.custom(date)) {
+          toast.warning(t('cannotSelectFreeDay'), {
+            description: t('cannotSelectCustomHolidayDescription'),
+          });
+          return;
+        }
+
+        if (modifiers.weekend(date)) {
+          toast.warning(t('cannotSelectFreeDay'), {
+            description: t('cannotSelectWeekendDescription'),
+          });
           return;
         }
 
@@ -363,6 +377,8 @@ export function Calendar({
       t,
       tPremium,
       modifiers.nationalOrRegionalHoliday,
+      modifiers.custom,
+      modifiers.weekend,
     ]
   );
 

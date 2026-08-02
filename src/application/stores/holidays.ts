@@ -6,6 +6,7 @@ import {
   endOfYear,
   ensureDate,
   isSameMonth,
+  isWeekend,
   isWithinInterval,
 } from '@application/shared/utils/dates';
 import { generateMetrics } from '@domain/calendar/metrics/generateMetrics';
@@ -69,7 +70,14 @@ type HolidaysStore = HolidaysState & HolidaysActions;
 
 function withMetrics(
   alternatives: Suggestion[],
-  opts: { locale: string; year: number; holidays: HolidayDTO[]; allowPastDays: boolean }
+  opts: {
+    locale: string;
+    year: number;
+    holidays: HolidayDTO[];
+    allowPastDays: boolean;
+    manuallySelectedDays: Date[];
+    removedSuggestedDays: Date[];
+  }
 ) {
   return alternatives.map((alt) => ({
     ...alt,
@@ -80,6 +88,8 @@ function withMetrics(
       bridges: alt.bridges,
       holidays: opts.holidays,
       allowPastDays: opts.allowPastDays,
+      manuallySelectedDays: opts.manuallySelectedDays,
+      removedSuggestedDays: opts.removedSuggestedDays,
     }),
   }));
 }
@@ -220,7 +230,14 @@ export const useHolidaysStore = create<HolidaysStore>()(
             clearHolidayCache();
 
             const normalizedHolidays = holidayDTO.normalize(holidaysWithManual);
-            const metricsOpts = { locale, year, holidays: normalizedHolidays, allowPastDays };
+            const metricsOpts = {
+              locale,
+              year,
+              holidays: normalizedHolidays,
+              allowPastDays,
+              manuallySelectedDays,
+              removedSuggestedDays,
+            };
 
             const baseSuggestion = generateSuggestions({
               ptoDays: effectivePtoDays,
@@ -251,6 +268,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
                 bridges: baseSuggestion.bridges,
                 holidays: normalizedHolidays,
                 allowPastDays,
+                manuallySelectedDays,
+                removedSuggestedDays,
               }),
             };
 
@@ -402,6 +421,14 @@ export const useHolidaysStore = create<HolidaysStore>()(
           const isSuggested = currentSelection.days.some((d) => d.toDateString() === dateStr);
           const isManuallySelected = manuallySelectedDays.some((d) => d.toDateString() === dateStr);
           const wasRemoved = removedSuggestedDays.some((d) => d.toDateString() === dateStr);
+
+          const isAlreadyFree =
+            isWeekend(date) || holidays.some((h) => ensureDate(h.date).toDateString() === dateStr);
+
+          if (!isSuggested && !isManuallySelected && isAlreadyFree) {
+            log((logger) => logger.warn('Refused to spend a PTO day on a day that is already off', { dateStr }));
+            return false;
+          }
 
           let updatedManualDays = manuallySelectedDays;
           let updatedRemovedDays = removedSuggestedDays;

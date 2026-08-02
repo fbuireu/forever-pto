@@ -57,6 +57,7 @@ globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
       isInSelectedRange: true,
     }));
     const holidaysWithManual = [...holidays, ...manualPseudoHolidays];
+    const manualDates = manualPseudoHolidays.map((h) => h.date);
     const removedDates = removedDays.map((isoDate) => new Date(isoDate));
     const effectivePtoDays = Math.max(0, autoSuggestCount ?? ptoDays - manualDays.length);
 
@@ -101,6 +102,8 @@ globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
         bridges: baseSuggestion.bridges,
         holidays: holidaysWithManual,
         allowPastDays,
+        manuallySelectedDays: manualDates,
+        removedSuggestedDays: removedDates,
       }),
     };
 
@@ -113,6 +116,8 @@ globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
         bridges: alternative.bridges,
         holidays: holidaysWithManual,
         allowPastDays,
+        manuallySelectedDays: manualDates,
+        removedSuggestedDays: removedDates,
       }),
     }));
 

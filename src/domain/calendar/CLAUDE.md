@@ -38,6 +38,17 @@ Metrics were computed from. It matches on `toDateString()`, so a `Date` carrying
 lines up, and it returns the original array unchanged when there are no Manual or Removed Days. Everything
 else under `utils/` and `suggestions/utils/` is internal.
 
+**That promise only holds while every caller passes `manuallySelectedDays` and `removedSuggestedDays`, and
+`generateMetrics` defaults both to `[]`.** A caller that omits them gets Metrics measured against the days
+the engine placed *by itself*, while `getTotalEffectiveDays` still counts Bridge spans that ran straight
+through the Manual Days — the pseudo-Holidays make them Free Days for the expansion. Efficiency
+(`totalEffectiveDays / days.length`) and Bonus Days (`totalEffectiveDays - days.length`) are then inflated by
+every Manual Day a span covers, and so are the monthly and quarterly distributions. Both planning pipelines
+omitted them once, while `toggleDaySelection` passed them, so the same unchanged plan reported two different
+Efficiency figures depending on which path had last written the Metrics — toggling a day on and off again was
+enough to make the number jump. The mirrored blocks in `worker.test.ts` and `holidays.test.ts` pin it on both
+sides.
+
 Neither planning entry point takes a `year`: the Planning Window is carried entirely by `months`.
 `generateMetrics` is the one that needs it, because Max Work Streak and Worked Days per month are scoped to
 a single calendar year — see the trap below.
