@@ -39,6 +39,7 @@ export const CalendarList = () => {
     fetchHolidays,
     previewAlternativeIndex,
     toggleDaySelection,
+    pruneDaysOutsideWindow,
   } = useHolidaysStore(
     useShallow((state) => ({
       holidays: state.holidays,
@@ -51,6 +52,7 @@ export const CalendarList = () => {
       fetchHolidays: state.fetchHolidays,
       previewAlternativeIndex: state.previewAlternativeIndex,
       toggleDaySelection: state.toggleDaySelection,
+      pruneDaysOutsideWindow: state.pruneDaysOutsideWindow,
     }))
   );
 
@@ -71,6 +73,10 @@ export const CalendarList = () => {
     },
     [toggleDaySelection, ptoDays, locale, allowPastDays]
   );
+
+  useEffect(() => {
+    pruneDaysOutsideWindow({ year, carryOverMonths });
+  }, [pruneDaysOutsideWindow, year, carryOverMonths]);
 
   useEffect(() => {
     if (!country) return;

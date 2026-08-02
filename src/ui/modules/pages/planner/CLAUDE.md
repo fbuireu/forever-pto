@@ -69,6 +69,12 @@ own the clear a level down — the Web Worker and the holidays store — and `Ca
 through `triggerCalculation` while `Troubleshooting` reaches the second directly. A third entry point added
 here would silently reuse the previous run's Holiday set and produce a wrong Suggestion with no error.
 
+**`CalendarList` prunes hand-edited days when the Planning Window moves.** `pruneDaysOutsideWindow` runs on
+every change to `year` or `carryOverMonths`, before the calculation effect. Without it a Manual Day left in a
+year the user has navigated away from keeps counting against the budget — `remainingDays` here subtracts
+`manuallySelectedDays.length` unconditionally — so the allowance shrinks with no visible cause and only
+recovers on a reload, because the store's other caller is `onRehydrateStorage`.
+
 **Nothing renders real numbers before the stores rehydrate.** `CalendarList`, `ManagementBar` and
 `Summary` all gate on `useStoresReady()` and show a `<Skeleton>` until every persisted store reports
 hydrated. Rendering store values on the first pass produces a hydration mismatch, not just a flash.
