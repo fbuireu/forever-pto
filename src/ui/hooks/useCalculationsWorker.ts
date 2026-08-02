@@ -17,13 +17,12 @@ export function useCalculationsWorker() {
   const pendingRequestIdRef = useRef<string | null>(null);
   const lastCalculatedPtoDaysRef = useRef<number | null>(null);
 
-  const { setCalculating, setCalculationResult, holidays, maxAlternatives, manuallySelectedDays } = useHolidaysStore(
+  const { setCalculating, setCalculationResult, holidays, maxAlternatives } = useHolidaysStore(
     useShallow((state) => ({
       setCalculating: state.setCalculating,
       setCalculationResult: state.setCalculationResult,
       holidays: state.holidays,
       maxAlternatives: state.maxAlternatives,
-      manuallySelectedDays: state.manuallySelectedDays,
     }))
   );
 
@@ -68,7 +67,7 @@ export function useCalculationsWorker() {
         }
       };
 
-      const { removedSuggestedDays, currentSelection } = useHolidaysStore.getState();
+      const { removedSuggestedDays, currentSelection, manuallySelectedDays } = useHolidaysStore.getState();
 
       const budgetForAutoSuggest = params.ptoDays - manuallySelectedDays.length;
       const activeSuggestedDays = currentSelection
@@ -103,7 +102,7 @@ export function useCalculationsWorker() {
 
       worker.postMessage(request);
     },
-    [setCalculating, setCalculationResult, holidays, maxAlternatives, manuallySelectedDays]
+    [setCalculating, setCalculationResult, holidays, maxAlternatives]
   );
 
   useEffect(() => {

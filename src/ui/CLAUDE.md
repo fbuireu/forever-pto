@@ -55,6 +55,17 @@ survive the recalculation; a changed budget sends no cap at all, because the use
 new allowance. A cap of nought is dropped rather than sent — it is what an emptied selection produces,
 and honouring it would store another empty plan and re-derive nought on every later run.
 
+**The same hook reads the hand-edited days non-reactively, and that is what keeps a manual edit from
+re-planning the year.** `manuallySelectedDays`, `removedSuggestedDays` and `currentSelection` all come out
+of `useHolidaysStore.getState()` inside `triggerCalculation`, never through the `useShallow` selector. They
+are inputs to the *next* run, not reasons to start one. `CalendarList.tsx` lists `triggerCalculation` in its
+effect's dependencies, so anything in that selector is a trigger by construction: while
+`manuallySelectedDays` sat there, picking one day re-ran the whole engine and moved the auto-assigned days
+out from under the user, while removing a Suggested Day — read through `getState()` — correctly changed
+nothing. The store agrees with the fixed shape: `toggleDaySelection` recomputes the metrics itself and never
+touches `holidays`. Adding a field to that selector means adding a re-plan trigger; keep the list to the one
+in [`modules/pages/planner/CLAUDE.md`](./modules/pages/planner/CLAUDE.md).
+
 **The unmount cleanup in the same hook clears `isCalculating` before it terminates the Worker.**
 Terminating drops the pending `onmessage`/`onerror` that would have cleared the flag, and the holidays
 store is module-global, so the next mount would find the whole calendar frozen mid-calculation.

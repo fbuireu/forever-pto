@@ -8,24 +8,31 @@ const storeState = vi.hoisted(() => ({
   manuallySelectedDays: [] as Date[],
   removedSuggestedDays: [] as Date[],
   currentSelection: null as { days: Date[] } | null,
+  holidays: [] as never[],
+  maxAlternatives: 3,
 }));
 const mockGetState = vi.hoisted(() =>
   vi.fn(() => ({
     removedSuggestedDays: storeState.removedSuggestedDays,
     currentSelection: storeState.currentSelection,
+    manuallySelectedDays: storeState.manuallySelectedDays,
     setCalculating: mockSetCalculating,
   }))
 );
 
 vi.mock('@application/stores/holidays', () => ({
   useHolidaysStore: Object.assign(
-    vi.fn(() => ({
-      setCalculating: mockSetCalculating,
-      setCalculationResult: mockSetCalculationResult,
-      holidays: [],
-      maxAlternatives: 3,
-      manuallySelectedDays: storeState.manuallySelectedDays,
-    })),
+    vi.fn((selector: (state: unknown) => unknown) =>
+      selector({
+        setCalculating: mockSetCalculating,
+        setCalculationResult: mockSetCalculationResult,
+        holidays: storeState.holidays,
+        maxAlternatives: storeState.maxAlternatives,
+        manuallySelectedDays: storeState.manuallySelectedDays,
+        removedSuggestedDays: storeState.removedSuggestedDays,
+        currentSelection: storeState.currentSelection,
+      })
+    ),
     { getState: mockGetState }
   ),
 }));
@@ -105,6 +112,28 @@ beforeEach(() => {
 });
 
 describe('useCalculationsWorker', () => {
+  it('keeps triggerCalculation stable when only the hand-picked days change, so editing one day never re-plans the year', () => {
+    const { result, rerender } = renderHook(() => useCalculationsWorker());
+    const before = result.current.triggerCalculation;
+
+    storeState.manuallySelectedDays = MANUAL_DAYS;
+    rerender();
+
+    expect(result.current.triggerCalculation).toBe(before);
+  });
+
+  it('still reads the hand-picked days set after mount, so a stale identity never sends a stale budget', () => {
+    const { result, rerender } = renderHook(() => useCalculationsWorker());
+
+    storeState.manuallySelectedDays = MANUAL_DAYS;
+    rerender();
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
+
+    expect(lastPayload().manualDays).toEqual(MANUAL_DAYS.map((d) => d.toISOString()));
+  });
+
   it('returns a triggerCalculation function', () => {
     const { result } = renderHook(() => useCalculationsWorker());
     expect(typeof result.current.triggerCalculation).toBe('function');
