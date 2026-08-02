@@ -294,6 +294,8 @@
       "errorTitle": "Fehler beim Erstellen des Feiertags",
       "errorDescription": "Etwas ist schiefgelaufen. Versuch es nochmal.",
       "existsTitle": "Feiertag existiert bereits",
+      "manualDayExistsTitle": "Dieser Tag ist bereits ein Urlaubstag",
+      "manualDayExistsDescription": "Du hast den {date} bereits als freien Tag eingeplant. Nimm ihn zuerst aus deinem Plan und füge dann den Feiertag hinzu.",
       "existsDescription": "Am {date} gibt es bereits einen Feiertag: {name}"
     },
     "editHoliday": {

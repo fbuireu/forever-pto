@@ -324,11 +324,20 @@ export const useHolidaysStore = create<HolidaysStore>()(
         },
 
         addHoliday: ({ holiday, locale, year, carryOverMonths }) => {
-          const { holidays } = get();
+          const { holidays, manuallySelectedDays } = get();
           const existingHoliday = holidays.find((h) => h.date.toDateString() === holiday.date.toDateString());
 
           if (existingHoliday) {
             log((logger) => logger.warn('Holiday already exists on this date', { date: holiday.date.toISOString() }));
+            return;
+          }
+
+          const isManuallySelected = manuallySelectedDays.some(
+            (d) => d.toDateString() === holiday.date.toDateString()
+          );
+
+          if (isManuallySelected) {
+            log((logger) => logger.warn('A PTO day is already booked on this date', { date: holiday.date.toISOString() }));
             return;
           }
 

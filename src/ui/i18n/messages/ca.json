@@ -294,6 +294,8 @@
       "errorTitle": "Error en crear festiu",
       "errorDescription": "Alguna cosa ha anat malament. Torna-ho a provar.",
       "existsTitle": "El festiu ja existeix",
+      "manualDayExistsTitle": "Aquest dia ja és un dia lliure",
+      "manualDayExistsDescription": "Ja has reservat el {date} com a dia lliure. Treu-lo del teu pla i afegeix el festiu després.",
       "existsDescription": "Ja existeix un festiu el {date}: {name}"
     },
     "editHoliday": {

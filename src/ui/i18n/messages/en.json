@@ -294,6 +294,8 @@
       "errorTitle": "Couldn't add holiday",
       "errorDescription": "Something went wrong. Try again.",
       "existsTitle": "Holiday already exists",
+      "manualDayExistsTitle": "That day is already a PTO day",
+      "manualDayExistsDescription": "You have already booked {date} as a day off. Remove it from your plan first, then add the holiday.",
       "existsDescription": "There's already a holiday on {date}: {name}"
     },
     "editHoliday": {

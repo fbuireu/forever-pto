@@ -103,6 +103,13 @@ The same pipeline exists twice, and the two halves must stay in step:
   one caller is the Troubleshooting reset in `Troubleshooting.tsx`, which fires it after `resetToDefaults()`
   has cleared the manual edits.
 
+**A date is occupied by a Holiday *or* by a Manual Day, and `addHoliday` refuses both.** It used to compare
+only against `holidays`, so a Custom Holiday could be created on a date the user had already spent budget
+on: the day then counted against the allowance in `remainingDays` while being a non-working day, so the PTO
+Day was paid for and bought nothing. The check lives in two places on purpose — `AddHolidayModal.tsx` runs
+it to choose the toast, the store runs it so no other caller can bypass it — and they must agree, or the
+modal reports success for something the store dropped.
+
 **The Troubleshooting reset clears two stores and deliberately not the third.** Its copy promises that
 clearing local storage "resets everything back to defaults", so it calls `resetToDefaults` on the holidays
 store *and* on the filters store — clearing only the first left a corrupt Country, Region or budget in place

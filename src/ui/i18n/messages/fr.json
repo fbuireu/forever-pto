@@ -294,6 +294,8 @@
       "errorTitle": "Erreur lors de la création du jour férié",
       "errorDescription": "Quelque chose s'est mal passé. Réessaie.",
       "existsTitle": "Le jour férié existe déjà",
+      "manualDayExistsTitle": "Ce jour est déjà un jour de congé",
+      "manualDayExistsDescription": "Tu as déjà réservé le {date} comme jour de congé. Retire-le de ton plan, puis ajoute le jour férié.",
       "existsDescription": "Il y a déjà un jour férié le {date} : {name}"
     },
     "editHoliday": {

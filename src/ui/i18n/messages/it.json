@@ -294,6 +294,8 @@
       "errorTitle": "Errore nella creazione del festivo",
       "errorDescription": "Qualcosa è andato storto. Riprova.",
       "existsTitle": "Il festivo esiste già",
+      "manualDayExistsTitle": "Quel giorno è già un giorno di ferie",
+      "manualDayExistsDescription": "Hai già prenotato il {date} come giorno libero. Rimuovilo dal piano e aggiungi poi la festività.",
       "existsDescription": "Esiste già un festivo il {date}: {name}"
     },
     "editHoliday": {

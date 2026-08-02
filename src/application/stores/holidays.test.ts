@@ -102,6 +102,33 @@ beforeEach(() => {
 });
 
 describe('addHoliday', () => {
+  it('refuses a date already spent as a PTO day, which would otherwise be paid for twice', () => {
+    const date = new Date('2026-03-10');
+    useHolidaysStore.setState({ manuallySelectedDays: [date] });
+
+    useHolidaysStore.getState().addHoliday({
+      holiday: { name: 'Company day', date: new Date('2026-03-10') },
+      locale: 'en',
+      year: 2026,
+      carryOverMonths: 0,
+    });
+
+    expect(useHolidaysStore.getState().holidays).toHaveLength(0);
+  });
+
+  it('still adds a holiday on a date no PTO day occupies', () => {
+    useHolidaysStore.setState({ manuallySelectedDays: [new Date('2026-03-10')] });
+
+    useHolidaysStore.getState().addHoliday({
+      holiday: { name: 'Company day', date: new Date('2026-03-11') },
+      locale: 'en',
+      year: 2026,
+      carryOverMonths: 0,
+    });
+
+    expect(useHolidaysStore.getState().holidays).toHaveLength(1);
+  });
+
   it('adds a new holiday to the list', () => {
     const date = new Date('2026-01-01');
     useHolidaysStore.getState().addHoliday({
