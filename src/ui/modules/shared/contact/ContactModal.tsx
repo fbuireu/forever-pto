@@ -86,9 +86,9 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
       try {
         const { sendContactEmailAction } = await import('@infrastructure/actions/contact');
         const result = await sendContactEmailAction(data);
-        setEmail(data.email);
 
         if (result.success) {
+          setEmail(data.email);
           track('contact_form_submitted');
           setStep(Step.SUCCESS);
         } else {

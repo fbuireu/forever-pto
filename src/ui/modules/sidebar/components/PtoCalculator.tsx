@@ -1,6 +1,7 @@
 'use client';
 
-import { useFiltersStore } from '@application/stores/filters';
+import { MIN_PTO_DAYS, useFiltersStore } from '@application/stores/filters';
+import { useHolidaysStore } from '@application/stores/holidays';
 import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Plus } from '@ui/modules/core/animate/icons/Plus';
@@ -37,6 +38,12 @@ export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
       setPtoDays: state.setPtoDays,
     }))
   );
+  const { setCalculating, trimManualDays } = useHolidaysStore(
+    useShallow((state) => ({
+      setCalculating: state.setCalculating,
+      trimManualDays: state.trimManualDays,
+    }))
+  );
 
   const monthOptions: MonthOption[] = useMemo(() => {
     const monthNames = getMonthNames({
@@ -65,7 +72,10 @@ export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
   };
 
   const applyToStore = (days: number) => {
-    setPtoDays(Math.round(days));
+    const nextBudget = Math.max(MIN_PTO_DAYS, Math.round(days));
+    setCalculating(true);
+    setPtoDays(nextBudget);
+    trimManualDays(nextBudget);
   };
 
   const handleMonthChange = (value: string) => {

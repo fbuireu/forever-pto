@@ -219,6 +219,7 @@
     "days": "Days",
     "weekendDays": "Weekend days",
     "holidays": "Holidays",
+    "holidaysOutsideRange": "Holidays are only known for {from}–{to}, so any outside that span are counted as workdays.",
     "dateRange": "Date range",
     "from": "From",
     "to": "to"
@@ -393,7 +394,7 @@
     }
   },
   "ptoStatus": {
-    "autoAssigned": "Auto-assigned",
+    "autoAssigned": "Suggested",
     "manual": "Manual",
     "remaining": "Remaining",
     "allAssigned": "All days assigned!",
@@ -437,14 +438,14 @@
   "alternativesManager": {
     "option": "Option",
     "recommended": "Recommended",
-    "totalOff": "Total off",
+    "totalOff": "Effective days",
     "efficiency": "Efficiency",
     "vsMain": "vs main",
     "alreadyApplied": "Already applied",
     "applyAlternative": "Apply alternative",
     "previousSuggestion": "Previous suggestion",
     "nextSuggestion": "Next suggestion",
-    "totalDaysOff": "Total days off",
+    "totalDaysOff": "Total effective days",
     "comparison": "Comparison",
     "daysUnit": "days"
   },

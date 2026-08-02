@@ -56,8 +56,13 @@ locale itself.
 `[locale]/layout.tsx` re-validates the segment with `hasLocale` and calls `notFound()` — the middleware is
 not treated as the only gate, because a statically rendered path can arrive without it.
 
-Every page and layout under `[locale]/` calls `setRequestLocale(locale)` before awaiting translations.
-Skipping it opts the segment out of static rendering; it is not decoration.
+Every page and layout under `[locale]/` that reads translations **from the request locale** calls
+`setRequestLocale(locale)` first. Skipping it there opts the segment out of static rendering; it is not
+decoration. Five of the eleven files do not call it, and each has a reason rather than an oversight: the four
+`legal/` pages pass the locale explicitly — `getTranslations({ locale, namespace })` — so they never read the
+request-locale store and still prerender under the `generateStaticParams` declared in `[locale]/layout.tsx`;
+`payment/confirmation/page.tsx` is the one deliberately dynamic page in the tree, so there is no static
+render for it to opt out of. Copy the explicit-locale form or the `setRequestLocale` form, not neither.
 
 ## The two route groups
 

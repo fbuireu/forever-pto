@@ -219,6 +219,7 @@
     "days": "Jours",
     "weekendDays": "Jours de week-end",
     "holidays": "Jours fériés",
+    "holidaysOutsideRange": "Nous ne connaissons les jours fériés que pour {from}–{to} ; ceux en dehors comptent comme des jours ouvrés.",
     "dateRange": "Plage de dates",
     "from": "Du",
     "to": "au"

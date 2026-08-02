@@ -219,6 +219,7 @@
     "days": "Tage",
     "weekendDays": "Wochenendtage",
     "holidays": "Feiertage",
+    "holidaysOutsideRange": "Feiertage sind nur für {from}–{to} bekannt, alle außerhalb zählen daher als Arbeitstage.",
     "dateRange": "Datumsbereich",
     "from": "Von",
     "to": "bis"

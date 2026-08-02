@@ -91,7 +91,7 @@ function Alternatives({
 
   const effectiveDays = currentSuggestion.metrics?.totalEffectiveDays ?? 0;
   const efficiency = currentSuggestion.metrics?.averageEfficiency ?? 0;
-  const gainedDays = currentSuggestion.metrics?.bonusDays ?? 0;
+  const bonusDays = currentSuggestion.metrics?.bonusDays ?? 0;
   const mainEfficiency = allSuggestions[0]?.metrics?.averageEfficiency ?? 0;
   const efficiencyDiff = efficiency - mainEfficiency;
   const isMainSuggestion = currentIndex === 0;
@@ -155,7 +155,7 @@ function Alternatives({
             />
             <span className='text-xs text-green-600 dark:text-green-400 flex'>
               (+
-              <SlidingNumber number={gainedDays} />)
+              <SlidingNumber number={bonusDays} />)
             </span>
           </div>
           <m.span

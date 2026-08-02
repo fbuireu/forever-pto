@@ -219,6 +219,7 @@
     "days": "Giorni",
     "weekendDays": "Fine settimana",
     "holidays": "Festivi",
+    "holidaysOutsideRange": "Conosciamo le festività solo per {from}–{to}, quindi quelle fuori da questo intervallo contano come giorni lavorativi.",
     "dateRange": "Intervallo di date",
     "from": "Dal",
     "to": "al"

@@ -219,6 +219,7 @@
     "days": "Dies",
     "weekendDays": "Caps de setmana",
     "holidays": "Festius",
+    "holidaysOutsideRange": "Només coneixem els festius de {from}–{to}, així que els de fora d’aquest interval compten com a laborables.",
     "dateRange": "Rang de dates",
     "from": "Des de",
     "to": "fins"

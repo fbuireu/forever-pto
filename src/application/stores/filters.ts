@@ -36,6 +36,8 @@ type FiltersStore = FiltersState & FilterActions;
 const STORAGE_NAME = 'filters-store';
 const STORAGE_VERSION = 2;
 
+export const MIN_PTO_DAYS = 1;
+
 const initialState: FiltersState = {
   ptoDays: 22,
   allowPastDays: false,
@@ -62,7 +64,7 @@ export const useFiltersStore = create<FiltersStore>()(
     persist(
       (set) => ({
         ...initialState,
-        setPtoDays: (days: number) => set({ ptoDays: days }, false, 'setPtoDays'),
+        setPtoDays: (days: number) => set({ ptoDays: Math.max(MIN_PTO_DAYS, Math.round(days)) }, false, 'setPtoDays'),
         setCountry: (country: string) => set({ country, region: '' }, false, 'setCountry'),
         setRegion: (region: string) => set({ region }, false, 'setRegion'),
         setAllowPastDays: (allow: boolean) => set({ allowPastDays: allow }, false, 'setAllowPastDays'),

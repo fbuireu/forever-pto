@@ -1,6 +1,6 @@
 'use client';
 
-import { useFiltersStore } from '@application/stores/filters';
+import { MIN_PTO_DAYS, useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { Counter } from '@ui/modules/core/animate/components/Counter';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
@@ -11,7 +11,6 @@ import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-const MIN_VALUE = 1;
 const MAX_VALUE = 365;
 
 export const PtoDays = () => {
@@ -41,7 +40,7 @@ export const PtoDays = () => {
       setCalculating: state.setCalculating,
     }))
   );
-  const isDecrementDisabled = ptoDays <= MIN_VALUE;
+  const isDecrementDisabled = ptoDays <= MIN_PTO_DAYS;
   const isIncrementDisabled = ptoDays >= MAX_VALUE;
   const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
   const manualSelectedCount = manuallySelectedDays.length;
@@ -57,7 +56,7 @@ export const PtoDays = () => {
 
   const handleChange = useCallback(
     (value: number) => {
-      const newValue = Math.max(MIN_VALUE, value);
+      const newValue = Math.max(MIN_PTO_DAYS, value);
       setCalculating(true);
       setPtoDays(newValue);
       trimManualDays(newValue);

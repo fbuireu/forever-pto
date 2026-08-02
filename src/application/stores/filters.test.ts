@@ -1,6 +1,6 @@
 import { FilterStrategy } from '@domain/calendar/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useFiltersStore } from './filters';
+import { MIN_PTO_DAYS, useFiltersStore } from './filters';
 
 const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
 
@@ -46,6 +46,19 @@ describe('initial state', () => {
 });
 
 describe('setters', () => {
+  it('setPtoDays never drops the budget below one day, whichever control wrote it', () => {
+    useFiltersStore.getState().setPtoDays(0);
+    expect(useFiltersStore.getState().ptoDays).toBe(MIN_PTO_DAYS);
+
+    useFiltersStore.getState().setPtoDays(-5);
+    expect(useFiltersStore.getState().ptoDays).toBe(MIN_PTO_DAYS);
+  });
+
+  it('setPtoDays stores whole days, since the accrual calculator computes fractions', () => {
+    useFiltersStore.getState().setPtoDays(12.6);
+    expect(useFiltersStore.getState().ptoDays).toBe(13);
+  });
+
   it('setPtoDays updates ptoDays', () => {
     useFiltersStore.getState().setPtoDays(15);
     expect(useFiltersStore.getState().ptoDays).toBe(15);

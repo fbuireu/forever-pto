@@ -219,6 +219,7 @@
     "days": "Días",
     "weekendDays": "Fines de semana",
     "holidays": "Festivos",
+    "holidaysOutsideRange": "Solo conocemos los festivos de {from}–{to}, así que los de fuera de ese intervalo cuentan como laborables.",
     "dateRange": "Rango de fechas",
     "from": "Desde",
     "to": "hasta"

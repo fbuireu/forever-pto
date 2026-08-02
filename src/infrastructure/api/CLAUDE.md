@@ -63,9 +63,17 @@ The keys of an `Effect.catchTags` map are checked against the error channel decl
 
 The limit is worth knowing before you rely on it: every entry point ends in `Effect.catchAll(...)` returning `INTERNAL_ERROR`. Add a new failure mode to a use-case and forget to map it, and nothing fails to compile — the request quietly becomes a 500 with the generic code. The catch-all is the safety net and the blind spot at once. Treat the `catchTags` map as the thing you must update by hand.
 
-## Codes are not translated here, and mostly not at all
+## Codes are not translated here, but they are translated
 
-`ApiError` values are snake_case identifiers, not messages. Only the promo-code codes have translations: the `promoCodeErrors.*` keys in the locale bundles, looked up in `Donate.tsx`. Everything else reaches the user raw — `CheckoutForm.tsx` and `ContactModal.tsx` both do `result.error ?? t(...)`, so the fallback is translated but the code is rendered as-is.
+`ApiError` values are snake_case identifiers, not messages, and nothing in this folder localises them. Three
+namespaces do it at the edge: `toasts.promoCodeErrors.*`, looked up in `Donate.tsx`; `contact.errors.*`; and
+`checkout.errors.*`. `ContactModal.tsx` and `CheckoutForm.tsx` both route the code through
+`resolveApiErrorMessage` from `src/ui/modules/shared/utils/helpers.ts`, which decides by shape: a
+machine code — snake_case with no whitespace — is looked up in the component's namespace and falls back to a
+generic translated message when the namespace has no key for it, while prose is shown as it came, because
+that is how a Stripe message Stripe has already localised arrives. So a code a user can see is displayed raw
+only when nobody added a key for it. Add the key when you add the code, and note that a `checkout` failure
+carrying `charged: true` bypasses the lookup entirely — see [`../../ui/CLAUDE.md`](../../ui/CLAUDE.md).
 
 `ValidationError` messages are the sharpest edge. Server-side parsing uses the default schemas in `src/application/dto/payment/schema.ts` and `src/application/dto/contact/schema.ts`, whose messages are themselves codes (`email_required`, `amount_too_low`). The UI rebuilds the same schemas with translated messages for client-side validation, so a user normally sees prose — but a request that reaches the server unvalidated gets the code back and displays it. If you add a code a user can see, give it a lookup of its own; do not assume the code is presentable.
 

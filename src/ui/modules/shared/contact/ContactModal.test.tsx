@@ -48,6 +48,25 @@ describe('ContactModal failure reporting', () => {
     expect(screen.queryByText('internal_error')).toBeNull();
   });
 
+  it('does not remember the address when the send failed, which would reset the form under the user', async () => {
+    premiumState.setEmail.mockClear();
+    sendContactEmailAction.mockResolvedValue({ success: false, error: 'internal_error' });
+
+    await submitMessage(messagesWithErrors);
+
+    await waitFor(() => expect(screen.getByText(INTERNAL_ERROR_MESSAGE)).toBeTruthy());
+    expect(premiumState.setEmail).not.toHaveBeenCalled();
+  });
+
+  it('remembers the address once the message actually went out', async () => {
+    premiumState.setEmail.mockClear();
+    sendContactEmailAction.mockResolvedValue({ success: true });
+
+    await submitMessage(messagesWithErrors);
+
+    await waitFor(() => expect(premiumState.setEmail).toHaveBeenCalledWith('ada@example.com'));
+  });
+
   it('falls back to the generic message when the code has no key of its own', async () => {
     sendContactEmailAction.mockResolvedValue({ success: false, error: 'name_too_long' });
 
