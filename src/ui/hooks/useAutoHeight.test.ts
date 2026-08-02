@@ -30,11 +30,25 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const attachRef = (result: { ref: RefObject<HTMLElement | null> }) => {
+const attachRef = (result: { ref: RefObject<HTMLElement | null> }, rectHeight = 0) => {
   const el = document.createElement('div');
   document.body.appendChild(el);
+  el.getBoundingClientRect = () => ({ height: rectHeight }) as DOMRect;
   result.ref.current = el;
   return el;
+};
+
+const stubBox = (boxSizing: string) => {
+  vi.stubGlobal(
+    'getComputedStyle',
+    vi.fn(() => ({
+      paddingTop: '10px',
+      paddingBottom: '10px',
+      borderTopWidth: '2px',
+      borderBottomWidth: '2px',
+      boxSizing,
+    }))
+  );
 };
 
 describe('useAutoHeight', () => {
@@ -93,6 +107,91 @@ describe('useAutoHeight', () => {
     });
 
     expect(observe.mock.calls.length).toBeGreaterThan(firstCount);
+    el.remove();
+  });
+
+  it('reports the element rect height plus the parent border-box padding and border', () => {
+    stubBox('border-box');
+    let deps = [1];
+    const { result, rerender } = renderHook(() => useAutoHeight(deps));
+
+    const el = attachRef(result.current, 50);
+
+    act(() => {
+      deps = [2];
+      rerender();
+    });
+
+    expect(result.current.height).toBe(74);
+    el.remove();
+  });
+
+  it('adds nothing for a content-box parent', () => {
+    stubBox('content-box');
+    let deps = [1];
+    const { result, rerender } = renderHook(() => useAutoHeight(deps));
+
+    const el = attachRef(result.current, 50);
+
+    act(() => {
+      deps = [2];
+      rerender();
+    });
+
+    expect(result.current.height).toBe(50);
+    el.remove();
+  });
+
+  it('adds the element own box when includeSelfBox is set', () => {
+    stubBox('border-box');
+    let deps = [1];
+    const { result, rerender } = renderHook(() =>
+      useAutoHeight(deps, { includeParentBox: true, includeSelfBox: true })
+    );
+
+    const el = attachRef(result.current, 50);
+
+    act(() => {
+      deps = [2];
+      rerender();
+    });
+
+    expect(result.current.height).toBe(98);
+    el.remove();
+  });
+
+  it('rounds the total up to a whole device pixel', () => {
+    stubBox('content-box');
+    vi.stubGlobal('devicePixelRatio', 3);
+    let deps = [1];
+    const { result, rerender } = renderHook(() => useAutoHeight(deps));
+
+    const el = attachRef(result.current, 50.1);
+
+    act(() => {
+      deps = [2];
+      rerender();
+    });
+
+    expect(result.current.height).toBeCloseTo(151 / 3, 5);
+    el.remove();
+  });
+
+  it('re-measures without a deps change while the height is still 0', () => {
+    stubBox('border-box');
+    const deps = [1];
+    let includeSelfBox = false;
+    const { result, rerender } = renderHook(() => useAutoHeight(deps, { includeParentBox: false, includeSelfBox }));
+
+    const el = attachRef(result.current, 50);
+    expect(result.current.height).toBe(0);
+
+    act(() => {
+      includeSelfBox = true;
+      rerender();
+    });
+
+    expect(result.current.height).toBe(74);
     el.remove();
   });
 });

@@ -198,3 +198,24 @@ describe('selectOptimalDaysFromBridges', () => {
     }
   });
 });
+
+describe('selectOptimalDaysFromBridges high-value first pass', () => {
+  it('takes the high-value block before the crowd of cheap bridges that would exhaust the budget', () => {
+    const highValueThreeDaysNineEffective = makeBridge(
+      [makeDate(2025, 4, 14), makeDate(2025, 4, 15), makeDate(2025, 4, 16)],
+      9
+    );
+    const cheapOne = makeBridge([makeDate(2025, 2, 3)], 3);
+    const cheapTwo = makeBridge([makeDate(2025, 3, 3)], 3);
+    const cheapThree = makeBridge([makeDate(2025, 5, 5)], 3);
+
+    const { bridges: selected } = selectOptimalDaysFromBridges({
+      bridges: [cheapOne, cheapTwo, cheapThree, highValueThreeDaysNineEffective],
+      targetPtoDays: 3,
+      presorted: true,
+    });
+
+    expect(selected).toContain(highValueThreeDaysNineEffective);
+    expect(selected).toHaveLength(1);
+  });
+});

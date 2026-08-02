@@ -108,7 +108,8 @@ Vitest, `happy-dom`, co-located `.test.tsx`. Two exclusions in `vitest.config.ts
 
 - `src/ui/modules/bones/**` — excluded from both the test run *and* the coverage report. It is
   generated data; asserting on it would only assert that the generator ran.
-- `src/ui/modules/core/animate/icons/**` — same treatment, for the same reason: mechanical SVG wrappers.
+- `src/ui/modules/core/animate/icons/` — excluded from the **coverage report** only, and the glob spares
+  `Icon.tsx`, whose co-located test runs with everything else.
 
 Coverage is deliberately uneven and you should not read a missing test as an oversight to fix in
 passing. `core/animate/` is tested close to exhaustively; `core/primitives/` has no tests at all;

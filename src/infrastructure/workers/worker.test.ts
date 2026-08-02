@@ -152,9 +152,9 @@ describe('worker onmessage', () => {
     expect(metricsHolidays.some((h: { id: string }) => h.id === 'manual-0')).toBe(true);
   });
 
-  it('scopes the metrics to the requested planning year', () => {
-    sendMessage({ year: 2025 });
-    expect(mockGenerateMetrics.mock.lastCall?.[0].year).toBe(2025);
+  it('scopes the metrics to the requested year, not the 2025 the mocked suggestion would infer', () => {
+    sendMessage({ year: 2026 });
+    expect(mockGenerateMetrics.mock.lastCall?.[0].year).toBe(2026);
   });
 
   it('short-circuits when the only blocked dates are Removed Days', () => {

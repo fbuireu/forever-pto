@@ -1,4 +1,5 @@
 import { HolidayVariant } from '@application/dto/holiday/types';
+import { PTO_CONSTANTS } from '@domain/calendar/const';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { clearDateKeyCache, clearHolidayCache } from './cache';
 import { findBridges, getAvailableWorkdays } from './helpers';
@@ -171,5 +172,30 @@ describe('findBridges', () => {
     if (singleIdx !== -1 && multiIdx !== -1) {
       expect(singleIdx).toBeLessThan(multiIdx);
     }
+  });
+});
+
+describe('findBridges efficiency floor', () => {
+  it('rejects three PTO days absorbing one weekend, five effective for an efficiency of 1.67', () => {
+    const wednesday = makeDate(2025, 1, 8);
+    const thursday = makeDate(2025, 1, 9);
+    const friday = makeDate(2025, 1, 10);
+
+    const bridges = findBridges({ availableWorkdays: [wednesday, thursday, friday], holidays: [] });
+
+    expect(bridges.some((bridge) => bridge.ptoDaysNeeded === 3)).toBe(false);
+    for (const bridge of bridges) {
+      expect(bridge.efficiency).toBeGreaterThanOrEqual(PTO_CONSTANTS.EFFICIENCY.MINIMUM);
+    }
+  });
+
+  it('keeps the one-day candidate beside the same weekend, which clears the floor', () => {
+    const friday = makeDate(2025, 1, 10);
+
+    const bridges = findBridges({ availableWorkdays: [friday], holidays: [] });
+
+    const single = bridges.find((bridge) => bridge.ptoDaysNeeded === 1);
+    expect(single).toBeDefined();
+    expect(single?.efficiency).toBeGreaterThanOrEqual(PTO_CONSTANTS.EFFICIENCY.MINIMUM);
   });
 });

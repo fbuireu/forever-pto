@@ -88,7 +88,9 @@ change here, not a widening of the tag.
 **The rate limiter fails open.** Any error — no Cloudflare context, KV unavailable — is caught into
 "not blocked", so payment creation keeps working when the limiter does not. It also only ever increments
 while under the limit, so once an IP is blocked the key stops being refreshed and expires 60 s after the
-tenth accepted request. `getCloudflareContext` makes this file valid inside a request and nowhere else
+tenth accepted request. It reads the `RATE_LIMIT_KV` binding through `getCloudflareContext({ async: true })`, the form that also
+resolves outside a request — so what confines this file to a request is the `cf-connecting-ip` header it
+keys on, not the context call
 ([ADR 0004](../../../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)).
 
 **Promotion-code checks come before coupon checks, and the first error wins.** `validatePromoCode` resolves
