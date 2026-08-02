@@ -10,6 +10,7 @@ import {
   savePayment,
   updatePaymentStatus,
 } from '@infrastructure/services/payments/repository';
+import { normalizeEmail } from '@infrastructure/services/payments/normalizeEmail';
 import { matchesClientSecret } from '@infrastructure/services/premium/activation';
 import { createSession } from '@infrastructure/services/premium/session';
 import { Effect } from 'effect';
@@ -45,8 +46,9 @@ export const activateWithPayment = ({
       return yield* Effect.fail(new ValidationError({ message: 'Payment not completed' }));
     }
 
-    const email = paymentIntent.metadata.email ?? paymentIntent.receipt_email ?? undefined;
-    if (!email || (expectedEmail && expectedEmail !== email)) {
+    const intentEmail = paymentIntent.metadata.email ?? paymentIntent.receipt_email ?? undefined;
+    const email = intentEmail ? normalizeEmail(intentEmail) : undefined;
+    if (!email || (expectedEmail && normalizeEmail(expectedEmail) !== email)) {
       return yield* Effect.fail(new ValidationError({ message: 'Email mismatch' }));
     }
 
@@ -110,7 +112,8 @@ export const activateWithEmail = (
   TursoService
 > =>
   Effect.gen(function* () {
-    const payment = yield* getPaymentByEmail(email);
+    const normalizedEmail = normalizeEmail(email);
+    const payment = yield* getPaymentByEmail(normalizedEmail);
 
     if (!payment) {
       return yield* Effect.fail(new ValidationError({ message: 'No payment found' }));
@@ -120,7 +123,7 @@ export const activateWithEmail = (
       return yield* Effect.fail(new ValidationError({ message: `Payment status is ${payment.status}` }));
     }
 
-    const token = yield* createSession({ email, paymentIntentId: payment.id });
+    const token = yield* createSession({ email: normalizedEmail, paymentIntentId: payment.id });
 
-    return { email, premiumKey: payment.id, token, deferred: Effect.void };
+    return { email: normalizedEmail, premiumKey: payment.id, token, deferred: Effect.void };
   });

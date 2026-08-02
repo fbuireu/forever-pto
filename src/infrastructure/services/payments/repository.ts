@@ -1,6 +1,7 @@
 import type { PaymentData } from '@application/dto/payment/types';
 import { TursoService } from '@infrastructure/clients/db/turso/service';
 import type { DatabaseError } from '@infrastructure/errors';
+import { normalizeEmail } from '@infrastructure/services/payments/normalizeEmail';
 import { Effect } from 'effect';
 
 export const savePayment = (data: PaymentData): Effect.Effect<void, DatabaseError, TursoService> =>
@@ -191,8 +192,8 @@ export const getPaymentByEmail = (email: string): Effect.Effect<PaymentData | un
   Effect.gen(function* () {
     const turso = yield* TursoService;
     const rows = yield* turso.query<PaymentRow>(
-      `SELECT * FROM payments WHERE email = ? AND status = 'succeeded' ORDER BY stripe_created_at DESC LIMIT 1`,
-      [email]
+      `SELECT * FROM payments WHERE lower(trim(email)) = ? AND status = 'succeeded' ORDER BY stripe_created_at DESC LIMIT 1`,
+      [normalizeEmail(email)]
     );
     const row = rows[0];
     return row ? toPaymentData(row) : undefined;

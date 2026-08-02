@@ -16,13 +16,14 @@ read by the premium activation path as well as by the payment one.
 | File | Exports | Requires |
 | --- | --- | --- |
 | `repository.ts` | `savePayment`, `updatePaymentStatus`, `updatePaymentCharge`, `getPaymentById`, `getPaymentByEmail`, the `PaymentChargeData` shape | `TursoService` |
+| `normalizeEmail.ts` | `normalizeEmail(email)` — trim and lower-case, applied on both sides of every address comparison | — |
 | `confirmation.ts` | `confirmation(paymentIntentId)` — a `PaymentConfirmationDTO`, or `null` on any failure | `StripeServerService`, `LoggerService` |
 | `rateLimit.ts` | `checkRateLimit(ip)` — fails with `RateLimitError` | the Cloudflare `RATE_LIMIT_KV` binding |
 | `provider/intent.ts` | `createPaymentIntent(params)` — the Stripe intent behind a Donation | `StripeServerService` |
 | `provider/charge.ts` | `retrieveCharge(chargeId)` — normalises a Stripe `Charge` into flat, nullable fields | `StripeServerService` |
 | `provider/promoCode.ts` | `validatePromoCode(code, amount)` — a `DiscountInfo`, or a `PromoCodeError` | `StripeServerService` |
 
-`provider/` is the Stripe side, the two files at the root are the database and the KV limiter, and
+`provider/` is the Stripe side; at the root sit the database, the KV limiter and the address normaliser, and
 `confirmation.ts` sits between: a Stripe read that exists only to render the post-checkout page.
 
 ## Who calls what
@@ -59,6 +60,17 @@ because its output feeds a screen. Two payment shapes with an `amount` field, tw
 **The currency is hard-coded to `eur`** in `createPaymentIntent`, and `provider/promoCode.ts` names the same
 constant so it can refuse to compare a promotion-code minimum priced in anything else. Those two constants
 have to move together.
+
+**The payer's address is compared normalised, never raw.** `normalizeEmail.ts` trims and lower-cases, and
+it is applied on both sides of every comparison: `getPaymentByEmail` matches `lower(trim(email))` against a
+normalised parameter, and `activateWithPayment` normalises the intent's address and the caller's before
+testing them for equality. Email is the only key Premium can be recovered by
+([ADR 0008](../../../../docs/adr/0008-premium-derived-from-payment.md)), and SQLite's `=` on `TEXT` is
+case-sensitive, so a payer who typed `Name@Example.com` at checkout and `name@example.com` on the way back
+was refused access they had paid for. The `lower(trim(...))` on the **column** is what makes rows written
+before this normalisation still match; it forgoes an index on `email`, which is the accepted cost for a
+table of this size. Do not "optimise" it back to a bare `email = ?` without first migrating the stored
+values.
 
 **Every field the entitlement later depends on travels in the intent's `metadata`.** `activateWithPayment`
 matches on `metadata.email`, and `paymentDataDTO` reads `promoCode`, `userAgent` and `ipAddress` from there.

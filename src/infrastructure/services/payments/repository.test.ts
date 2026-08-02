@@ -232,10 +232,22 @@ describe('getPaymentByEmail', () => {
   it('filters on the email column, which is the only key Premium is recoverable by', async () => {
     await runEffect(getPaymentByEmail('user@example.com'));
     const [sql, args] = mockQuery.mock.calls[0] as [string, unknown[]];
-    expect(sql).toContain('WHERE email = ?');
+    expect(sql).toContain('WHERE lower(trim(email)) = ?');
     expect(sql).toContain("status = 'succeeded'");
     expect(sql).toContain('ORDER BY stripe_created_at DESC');
     expect(args[0]).toBe('user@example.com');
+  });
+
+  it('matches an address the payer retyped with different capitalisation or a stray space', async () => {
+    await runEffect(getPaymentByEmail('  User@Example.COM '));
+    const [, args] = mockQuery.mock.calls[0] as [string, unknown[]];
+    expect(args[0]).toBe('user@example.com');
+  });
+
+  it('normalises the stored column too, so rows written before this held for the same payer', async () => {
+    await runEffect(getPaymentByEmail('user@example.com'));
+    const [sql] = mockQuery.mock.calls[0] as [string, unknown[]];
+    expect(sql).not.toContain('WHERE email = ?');
   });
 
   it('maps the snake_case row onto PaymentData', async () => {

@@ -109,6 +109,28 @@ describe('activateWithPayment', () => {
     expect(err).toBeInstanceOf(ValidationError);
   });
 
+  it('accepts the payer address retyped with different capitalisation, the only key Premium is recoverable by', async () => {
+    const result = await run(
+      activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: '  TEST@Example.com ' })
+    );
+    expect(result).toMatchObject({ email: 'test@example.com' });
+  });
+
+  it('still refuses an address that differs by more than case', async () => {
+    const err = await runFail(
+      activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'attacker@example.com' })
+    );
+    expect(err).toBeInstanceOf(ValidationError);
+  });
+
+  it('normalises the address Stripe recorded before it becomes the session key', async () => {
+    mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
+      Effect.succeed({ ...SUCCEEDED_INTENT, metadata: { email: 'Payer@Example.COM' } }) as never
+    );
+    const result = await run(activateWithPayment({ paymentIntentId: 'pi_test' }));
+    expect(result.email).toBe('payer@example.com');
+  });
+
   it('derives the payer email from the payment intent when the caller supplies none', async () => {
     const result = await run(activateWithPayment({ paymentIntentId: 'pi_test' }));
     expect(result).toMatchObject({ email: 'test@example.com', premiumKey: 'pi_test' });
