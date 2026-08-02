@@ -6,13 +6,14 @@ import { Effect } from 'effect';
 import type Stripe from 'stripe';
 
 const MIN_FINAL_AMOUNT = 0.5;
-const PAYMENT_CURRENCY = 'eur';
+const PAYMENT_CURRENCY: string = 'eur';
 
 const getCouponValidationError = (coupon: Stripe.Coupon): PromoCodeErrorCode | null => {
   if (!coupon.valid) return PromoCodeErrors.COUPON_INVALID;
   if (coupon.max_redemptions && coupon.times_redeemed >= coupon.max_redemptions)
     return PromoCodeErrors.USAGE_LIMIT_REACHED;
   if (coupon.redeem_by && coupon.redeem_by < Math.floor(Date.now() / 1000)) return PromoCodeErrors.COUPON_EXPIRED;
+  if (coupon.amount_off && coupon.currency?.toLowerCase() !== PAYMENT_CURRENCY) return PromoCodeErrors.COUPON_INVALID;
   return null;
 };
 

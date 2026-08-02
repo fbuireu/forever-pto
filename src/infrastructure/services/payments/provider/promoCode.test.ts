@@ -47,6 +47,7 @@ const makeCoupon = (
     redeem_by: number | null;
     percent_off: number | null;
     amount_off: number | null;
+    currency: string | null;
     name: string | null;
   }> = {}
 ) => ({
@@ -57,6 +58,7 @@ const makeCoupon = (
   redeem_by: null,
   percent_off: 10,
   amount_off: null,
+  currency: 'eur',
   name: 'SAVE10',
   ...overrides,
 });
@@ -86,6 +88,12 @@ describe('validatePromoCode', () => {
       });
     });
 
+    it('leaves a percentage discount alone, since a percentage has no currency to disagree about', async () => {
+      setupMocks(makeCoupon({ percent_off: 10, amount_off: null, currency: 'usd' }));
+      const result = await run('SAVE10', 10);
+      expect(result).toMatchObject({ type: 'percent', finalAmount: 9 });
+    });
+
     it('returns DiscountInfo with fixed amount discount', async () => {
       setupMocks(makeCoupon({ percent_off: null, amount_off: 200 }));
       const result = await run('FIXED2', 10);
@@ -111,6 +119,18 @@ describe('validatePromoCode', () => {
       const error = await runFlip('BADCODE', 10);
       expect(error).toBeInstanceOf(PromoCodeError);
       expect((error as PromoCodeError).code).toBe(PromoCodeErrors.INVALID_OR_EXPIRED);
+    });
+
+    it('refuses a fixed discount priced in another currency instead of subtracting it as euros', async () => {
+      setupMocks(makeCoupon({ percent_off: null, amount_off: 200, currency: 'usd' }));
+      const error = await runFlip('FIXED2', 10);
+      expect((error as PromoCodeError).code).toBe(PromoCodeErrors.COUPON_INVALID);
+    });
+
+    it('refuses a fixed discount with no currency at all, which cannot be compared', async () => {
+      setupMocks(makeCoupon({ percent_off: null, amount_off: 200, currency: null }));
+      const error = await runFlip('FIXED2', 10);
+      expect((error as PromoCodeError).code).toBe(PromoCodeErrors.COUPON_INVALID);
     });
 
     it('fails with COUPON_INVALID when coupon is not valid', async () => {

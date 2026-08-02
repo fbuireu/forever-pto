@@ -61,6 +61,14 @@ because its output feeds a screen. Two payment shapes with an `amount` field, tw
 constant so it can refuse to compare a promotion-code minimum priced in anything else. Those two constants
 have to move together.
 
+`PAYMENT_CURRENCY` guards **two** places in that file and both are load-bearing. The promotion-code
+`minimum_amount` in another currency is *ignored* — the restriction cannot be evaluated, so it is not
+applied. A coupon's own `amount_off` in another currency is *refused* with `COUPON_INVALID`, because
+`calculateFinalAmount` subtracts `amount_off / 100` as though it were euros: a $200 discount would come off
+a €10 Donation as €2 at whatever the rate happened not to be. Percentage coupons are untouched by either
+check — a percentage has no currency to disagree about. A coupon carrying `amount_off` with no `currency`
+at all is refused too, since there is nothing to compare.
+
 **The payer's address is compared normalised, never raw.** `normalizeEmail.ts` trims and lower-cases, and
 it is applied on both sides of every comparison: `getPaymentByEmail` matches `lower(trim(email))` against a
 normalised parameter, and `activateWithPayment` normalises the intent's address and the caller's before
