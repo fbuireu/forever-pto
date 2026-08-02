@@ -12,17 +12,7 @@ import { useShallow } from 'zustand/react/shallow';
 export const Troubleshooting = () => {
   const locale = useLocale();
   const t = useTranslations('troubleshooting');
-  const { carryOverMonths, country, region, year, allowPastDays, ptoDays, strategy } = useFiltersStore(
-    useShallow((state) => ({
-      carryOverMonths: state.carryOverMonths,
-      country: state.country,
-      region: state.region,
-      year: state.year,
-      allowPastDays: state.allowPastDays,
-      ptoDays: state.ptoDays,
-      strategy: state.strategy,
-    }))
-  );
+  const resetFiltersStore = useFiltersStore((state) => state.resetToDefaults);
 
   const {
     resetToDefaults: resetHolidaysStore,
@@ -42,17 +32,23 @@ export const Troubleshooting = () => {
     startTransition(async () => {
       try {
         resetHolidaysStore();
+        resetFiltersStore();
 
-        await fetchHolidays({ country, region, year, locale, carryOverMonths });
+        const { country, region, year, carryOverMonths, ptoDays, allowPastDays, strategy } =
+          useFiltersStore.getState();
 
-        await generateSuggestions({
-          year,
-          ptoDays,
-          allowPastDays,
-          months: getTotalMonths({ carryOverMonths, year }),
-          strategy,
-          locale,
-        });
+        if (country) {
+          await fetchHolidays({ country, region, year, locale, carryOverMonths });
+
+          await generateSuggestions({
+            year,
+            ptoDays,
+            allowPastDays,
+            months: getTotalMonths({ carryOverMonths, year }),
+            strategy,
+            locale,
+          });
+        }
 
         setCleared(true);
 

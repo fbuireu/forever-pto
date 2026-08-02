@@ -103,6 +103,18 @@ The same pipeline exists twice, and the two halves must stay in step:
   one caller is the Troubleshooting reset in `Troubleshooting.tsx`, which fires it after `resetToDefaults()`
   has cleared the manual edits.
 
+**The Troubleshooting reset clears two stores and deliberately not the third.** Its copy promises that
+clearing local storage "resets everything back to defaults", so it calls `resetToDefaults` on the holidays
+store *and* on the filters store — clearing only the first left a corrupt Country, Region or budget in place
+while telling the user all data had been reset, which is precisely the state the button exists to escape.
+It then re-reads the filters through `getState()` rather than the values captured before the reset, and
+skips the re-fetch entirely when the default empty Country is what it finds; fetching against `''` would
+plan a year with no Holidays in it. `usePremiumStore.resetPremiumStore` is **not** called and must not be:
+Premium is derived from the payment record and access is never revoked from a donor
+([ADR 0008](../../../docs/adr/0008-premium-derived-from-payment.md)), so a troubleshooting button that
+logged a paying user out would be a defect, not a more thorough reset. That action having no caller is the
+correct state, not dead code to wire up.
+
 **They compute the same plan from the same inputs, and that is a maintained property, not a coincidence.**
 The store's action reproduces the worker's rules line for line:
 
