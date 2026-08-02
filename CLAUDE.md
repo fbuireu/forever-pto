@@ -87,13 +87,28 @@ e2e/                  # Playwright specs
 docs/                 # adr/, plans/, and docs-consistency.test.ts
 ```
 
-**`tsconfig.json` is trimmed to what TypeScript 7 does not already do.** `strict`, `module: esnext`,
-`esModuleInterop` and `allowJs: false` are gone because 7 makes the first two its defaults and forces the
-third; `baseUrl` is a hard error there, which is why every entry in `paths` is relative to the project root.
-Two survivors look equally redundant and are not — `types: ['node']`, because 7 changed that default from
-every installed `@types` package to **none**, and `exclude`'s `cloudflare-env.d.ts`, for the reason below.
-Neither is left to discipline: `docs/docs-consistency.test.ts` asserts both, and asserts that no option 7
-removed has crept back.
+**Next owns `next-env.d.ts` outright, and it flaps.** A production build points its route import at
+`.next/types/`, a dev run at `.next/dev/types/`, so the file shows as modified depending on which ran
+last. It is generated and says so; leave whichever version is committed alone rather than committing the
+flip back and forth.
+
+**`next build` owns half of `tsconfig.json` too, so do not tidy it.** Next rewrites the file on every build and
+re-adds `allowJs`, `module` and `esModuleInterop` whatever you set them to — deleting them as "TypeScript 7
+defaults" lasts exactly until the next build. Two settings there are load-bearing for the opposite reason:
+
+- **`strict: true`** looks removable because 7 defaults it on, and is not. Next writes `"strict": false` into
+  the file whenever the key is absent, so deleting the line turns strict mode off at the *next build*, not at
+  the deletion site — twenty type errors, none of them near the change.
+- **`experimental.useTypeScriptCli: true` in `next.config.ts`** is what makes `pnpm build` work at all.
+  TypeScript 7 ships no `lib/typescript.js`, so Next's compiler-API path throws before it type-checks
+  anything. `pnpm lint:ts:typecheck` runs the bare `tsc` and passes either way, which is exactly why CI stayed
+  green while every deploy was broken.
+
+`baseUrl` is a hard error in 7, which is why every entry in `paths` is relative to the project root, and
+`exclude`'s `cloudflare-env.d.ts` matters for the reason below. `types: ['node']` is explicit but currently
+inert — `next-env.d.ts` already pulls `@types/node` in transitively, so removing it changes nothing today.
+None of this is left to discipline: `docs/docs-consistency.test.ts` asserts the two load-bearing settings and
+that no option 7 removed has crept back.
 
 Path aliases (`tsconfig.json` `compilerOptions.paths`): `src/*`, `@app/*`, `@application/*`, `@domain/*`,
 `@infrastructure/*`, `@ui/*`, `@assets/*` (→ `src/ui/assets`), `@styles/*` (→ `src/ui/styles`), `@i18n/*`
@@ -196,10 +211,10 @@ contiguously from `0001`, carry the template's sections, and are each linked fro
 `docs/adr/` — an ADR nothing points at will not be read; that every relative markdown link resolves and every
 `.ts`/`.tsx` file named in backticks still exists; that every script this file documents exists in
 `package.json`, that every alias `tsconfig.json` declares is documented here and every alias documented here
-is declared there, and that no alias points at a missing directory; that `tsconfig.json` still carries the two
-settings TypeScript 7 makes load-bearing — an explicit `types` and `cloudflare-env.d.ts` in both `exclude` and
-`.gitignore` — and none of the options 7 removed; and that every locale bundle has exactly the keys
-`en.json` has.
+is declared there, and that no alias points at a missing directory; that the two settings TypeScript 7 makes
+load-bearing survive — `strict` in `tsconfig.json` and `useTypeScriptCli` in `next.config.ts` — that
+`cloudflare-env.d.ts` stays in both `exclude` and `.gitignore`, and that no option 7 removed has crept back;
+and that every locale bundle has exactly the keys `en.json` has.
 
 It reads staged *and* unstaged files, so a rule fires before the offending file is committed. **Each rule was
 verified by breaking it and confirming the matching case fails** — keep that property when you add one. A

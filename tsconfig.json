@@ -1,9 +1,9 @@
 {
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
   "exclude": [".next/**/*", "node_modules/**/*", "cloudflare-env.d.ts"],
-
   "compilerOptions": {
     "target": "ESNext",
+    "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
     "moduleResolution": "bundler",
@@ -28,6 +28,9 @@
       "@assets/*": ["./src/ui/assets/*"],
       "@styles/*": ["./src/ui/styles/*"],
       "@i18n/*": ["./src/ui/i18n/*"]
-    }
+    },
+    "allowJs": true,
+    "module": "esnext",
+    "esModuleInterop": true
   }
 }

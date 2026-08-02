@@ -285,10 +285,17 @@ describe('CLAUDE.md describes the project as it is configured', () => {
     expect(dangling.map(([alias]) => alias)).toEqual([]);
   });
 
-  // TypeScript 7 changed this default from every installed @types package to none, so the line reads as
-  // redundant and is not: deleting it drops the Node globals with no error at the deletion site.
-  it('keeps the explicit types array TypeScript 7 no longer fills in', () => {
-    expect(tsconfigOptions.types).toContain('node');
+  // TypeScript 7 ships no lib/typescript.js, so Next's compiler-API path throws and `next build` dies
+  // before it type-checks anything. The flag is what routes it through the CLI instead.
+  it('lets Next reach TypeScript 7 through the CLI', () => {
+    expect(read('next.config.ts')).toContain('useTypeScriptCli: true');
+  });
+
+  // 7 makes strict its default, so the line looks removable. It is not: `next build` rewrites
+  // tsconfig.json on every run and writes `strict: false` whenever the key is absent, which turns strict
+  // mode off at the next build rather than at the deletion site.
+  it('keeps strict explicit, because next build writes it false when it is missing', () => {
+    expect(tsconfigOptions.strict).toBe(true);
   });
 
   // `include` is `**/*.ts`, so a generated root-level .d.ts joins the program and the workerd globals in it
