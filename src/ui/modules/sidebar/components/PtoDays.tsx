@@ -57,11 +57,13 @@ export const PtoDays = () => {
   const handleChange = useCallback(
     (value: number) => {
       const newValue = Math.max(MIN_PTO_DAYS, value);
+      if (newValue === ptoDays) return;
+
       setCalculating(true);
       setPtoDays(newValue);
       trimManualDays(newValue);
     },
-    [setCalculating, setPtoDays, trimManualDays]
+    [setCalculating, setPtoDays, trimManualDays, ptoDays]
   );
 
   return (

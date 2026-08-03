@@ -29,7 +29,7 @@ interface SetPremiumStatusParams {
 
 interface PremiumActions {
   verifyEmail: (email: string) => Promise<boolean>;
-  checkExistingSession: () => Promise<void>;
+  checkExistingSession: (options?: { force?: boolean }) => Promise<void>;
   showUpgradeModal: (feature: string) => void;
   closeModal: () => void;
   setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => void;
@@ -82,9 +82,9 @@ export const usePremiumStore = create<PremiumStore>()(
           }
         },
 
-        checkExistingSession: async () => {
+        checkExistingSession: async ({ force }: { force?: boolean } = {}) => {
           const { needsSessionCheck } = get();
-          if (!needsSessionCheck) return;
+          if (!needsSessionCheck && !force) return;
 
           try {
             const session = await getExistingSession();

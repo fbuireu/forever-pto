@@ -32,7 +32,7 @@ export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
   const [calculatedDays, setCalculatedDays] = useState<number | null>(null);
   const calculationSnapshotRef = useRef<{ days: number; month: number } | null>(null);
 
-  const { setPtoDays } = useFiltersStore(
+  const { ptoDays, setPtoDays } = useFiltersStore(
     useShallow((state) => ({
       ptoDays: state.ptoDays,
       setPtoDays: state.setPtoDays,
@@ -73,6 +73,8 @@ export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
 
   const applyToStore = (days: number) => {
     const nextBudget = Math.max(MIN_PTO_DAYS, Math.round(days));
+    if (nextBudget === ptoDays) return;
+
     setCalculating(true);
     setPtoDays(nextBudget);
     trimManualDays(nextBudget);

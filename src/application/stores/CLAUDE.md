@@ -119,6 +119,17 @@ re-fetches Holidays) and would otherwise strand it, spending budget with no way 
 `calendar/Calendar.tsx` repeats the check to choose the toast, exactly as `AddHolidayModal.tsx` does for the
 mirror rule below — the two must agree, or the UI reports a selection the store refused.
 
+**`setCalculating(true)` is a promise that a worker run is about to start, and only a worker reply clears
+it.** Nothing else in the app sets it back to false — `useCalculationsWorker`'s three callbacks and its
+unmount cleanup are the whole list, and the cleanup is gated on a request actually being in flight. The only
+thing that starts a run is `CalendarList`'s effect, keyed on year, budget, past-days, Holidays, months,
+Strategy and locale. So a caller that raises the flag without moving one of those freezes the planner: the
+month grid takes `pointer-events-none` and both remaining-budget readouts stick on their last settled value,
+with no spinner and no error. Both budget writers — the slider and the accrual calculator's *Apply* — now
+return early when the value they would write equals the current one, which is reachable by pressing Apply
+twice or by computing a figure that happens to match the budget. Raise the flag only alongside a change that
+will actually trigger a run.
+
 **Applying an Alternative clears both hand-edit lists *and* recomputes the Metrics, and neither half works
 without the other.** Every stored Suggestion was sized by the worker against
 `effectivePtoDays = ptoDays - manualDays.length` — the manual count **at that run**. Since `toggleDaySelection`

@@ -5,6 +5,7 @@ import { confirmation } from '@infrastructure/services/payments/confirmation';
 import { ACTIVATION_FAILED } from '@infrastructure/services/premium/activation';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
+import { PremiumSessionSync } from '@ui/modules/premium/PremiumSessionSync';
 import { Effect } from 'effect';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { redirect } from 'next/navigation';
@@ -112,6 +113,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
             </div>
           </div>
 
+          {hasActivated && <PremiumSessionSync />}
           {hasActivated ? (
             <div className='rounded-lg bg-green-500/10 border border-green-500/20 p-4 text-sm'>
               <p className='text-green-700 dark:text-green-300'>{t('premiumActivated')}</p>

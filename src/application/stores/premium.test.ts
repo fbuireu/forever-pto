@@ -175,6 +175,17 @@ describe('checkExistingSession', () => {
     expect(getExistingSession).not.toHaveBeenCalled();
   });
 
+  it('checks anyway when forced, which is how a redirect payer picks up the cookie the route just set', async () => {
+    const { getExistingSession } = await import('@ui/adapters/session/checkSession');
+    vi.mocked(getExistingSession).mockResolvedValueOnce({ premiumKey: 'pk_redirect', email: 'donor@example.com' });
+    usePremiumStore.setState({ needsSessionCheck: false, premiumKey: null, userEmail: null });
+
+    await usePremiumStore.getState().checkExistingSession({ force: true });
+
+    expect(getExistingSession).toHaveBeenCalled();
+    expect(usePremiumStore.getState().premiumKey).toBe('pk_redirect');
+  });
+
   it('sets premium state from session when needsSessionCheck is true', async () => {
     const { getExistingSession } = await import('@ui/adapters/session/checkSession');
     vi.mocked(getExistingSession).mockResolvedValueOnce({ premiumKey: 'pk_session', email: 'session@example.com' });
