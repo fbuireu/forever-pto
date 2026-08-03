@@ -1,6 +1,7 @@
 import { LOCALES } from '@infrastructure/i18n/locales';
 import { Comparison } from '@ui/modules/pages/homepage/sections/Comparison';
 import { Faq } from '@ui/modules/pages/homepage/sections/Faq';
+import { FaqJsonLd } from '@ui/modules/shared/seo/JsonLd';
 import { Features } from '@ui/modules/pages/homepage/sections/Features';
 import { Hero } from '@ui/modules/pages/homepage/sections/Hero';
 import { HomepageCta } from '@ui/modules/pages/homepage/sections/HomepageCta';
@@ -38,6 +39,7 @@ const HomePage = async ({ params }: PageProps) => {
       <Testimonials locale={locale} />
       <Pricing />
       <Faq />
+      <FaqJsonLd locale={locale} />
       <HomepageCta />
       <DonateClient bottomClassName='bottom-3 md:bottom-4' />
     </main>

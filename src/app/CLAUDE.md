@@ -214,6 +214,19 @@ Both files resolve the base URL from the Cloudflare env rather than a constant. 
 host it is actually served from, though: `robots.ts` is prerendered, so it bakes whatever the build resolved
 — see the Deploy section of the root [`CLAUDE.md`](../../CLAUDE.md).
 
+## Structured data
+
+`src/ui/modules/shared/seo/JsonLd.tsx` exports two components, mounted on different pages on purpose.
+`JsonLd` carries the `WebApplication` and `Organization` schemas and sits on `/planner`; `FaqJsonLd` carries
+the `FAQPage` schema and sits on the homepage, **because that is the page that renders the FAQ**. Search
+engines expect the marked-up questions to be visible on the page carrying the markup, and the FAQ schema was
+emitted on the planner, which has no FAQ on it at all.
+
+The Premium offer states a `priceSpecification` with a `minPrice`, not a fixed price. Premium is unlocked by
+a Donation the payer chooses — `src/application/dto/payment/schema.ts` accepts 1 to 10000 — so the fixed
+4.99 it used to advertise was simply untrue. If the minimum moves, `MINIMUM_DONATION` and that Zod bound
+move together.
+
 ## Fonts
 
 `fonts.ts` declares Bricolage Grotesque, Space Grotesk, Instrument Serif and JetBrains Mono, each with a
