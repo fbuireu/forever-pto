@@ -158,9 +158,11 @@ export const useTutorial = () => {
 
   useEffect(() => {
     return () => {
-      void import('@infrastructure/clients/tutorial/driver/client').then(({ getDriverClientInstance }) => {
-        getDriverClientInstance().destroy();
-      });
+      void import('@infrastructure/clients/tutorial/driver/client')
+        .then(({ getDriverClientInstance }) => {
+          getDriverClientInstance().destroy();
+        })
+        .catch(() => {});
     };
   }, []);
 

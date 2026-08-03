@@ -4,7 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockToggleSidebar = vi.hoisted(() => vi.fn());
 const mockStart = vi.hoisted(() => vi.fn());
-const mockGetDriverClientInstance = vi.hoisted(() => vi.fn(() => ({ start: mockStart })));
+const mockDestroy = vi.hoisted(() => vi.fn());
+const mockGetDriverClientInstance = vi.hoisted(() => vi.fn(() => ({ start: mockStart, destroy: mockDestroy })));
 const mockUseIsMobile = vi.hoisted(() => vi.fn(() => false));
 const mockUseSidebar = vi.hoisted(() => vi.fn(() => ({ open: true, toggleSidebar: mockToggleSidebar })));
 
@@ -91,5 +92,30 @@ describe('useTutorial', () => {
 
     const options = mockStart.mock.lastCall?.[1] as { closeIcon?: unknown };
     expect(isValidElement(options.closeIcon)).toBe(true);
+  });
+
+  it('destroys the tour on unmount, since the driver client is a module-level singleton', async () => {
+    mockDestroy.mockClear();
+    const { unmount } = renderHook(() => useTutorial());
+
+    unmount();
+
+    await vi.waitFor(() => expect(mockDestroy).toHaveBeenCalled());
+  });
+
+  it('opens the drawer on a phone, where the desktop flag is no guide at all', async () => {
+    mockUseIsMobile.mockReturnValue(true);
+    mockUseSidebar.mockReturnValue({ open: true, openMobile: false, toggleSidebar: mockToggleSidebar });
+    mockToggleSidebar.mockClear();
+
+    const { result } = renderHook(() => useTutorial());
+    await act(async () => {
+      await result.current.startTutorial();
+    });
+
+    expect(mockToggleSidebar).toHaveBeenCalled();
+
+    mockUseIsMobile.mockReturnValue(false);
+    mockUseSidebar.mockReturnValue({ open: true, toggleSidebar: mockToggleSidebar });
   });
 });
