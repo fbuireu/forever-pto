@@ -54,6 +54,37 @@ describe('ManagementBar mobile drawer', () => {
   });
 });
 
+describe('ManagementBar empty plan', () => {
+  it('stops pretending to load once the engine has settled on no plan at all', () => {
+    readyState.areStoresReady = true;
+    holidaysState.suggestion = null;
+    holidaysState.currentSelection = null;
+    holidaysState.alternatives = [];
+    (holidaysState as { isCalculating?: boolean }).isCalculating = false;
+
+    const { container } = renderBar('es', esMessages);
+
+    expect(container.querySelector('[data-tutorial="planner-drawer"]')).toBeNull();
+    expect(container.textContent).not.toContain(esMessages.planner.heading);
+
+    readyState.areStoresReady = false;
+  });
+
+  it('still shows the skeleton while a calculation is genuinely in flight', () => {
+    readyState.areStoresReady = true;
+    holidaysState.suggestion = null;
+    holidaysState.currentSelection = null;
+    (holidaysState as { isCalculating?: boolean }).isCalculating = true;
+
+    const { container } = renderBar('es', esMessages);
+
+    expect(container.textContent).toContain(esMessages.planner.heading);
+
+    readyState.areStoresReady = false;
+    (holidaysState as { isCalculating?: boolean }).isCalculating = false;
+  });
+});
+
 describe('ManagementBar drawer header', () => {
   const makeSuggestion = (effectiveDays: number, efficiency: number) => ({
     days: [new Date(2026, 0, 5)],

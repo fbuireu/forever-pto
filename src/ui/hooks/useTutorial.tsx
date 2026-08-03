@@ -9,6 +9,22 @@ import { useTranslations } from 'next-intl';
 import { useCallback, useEffect } from 'react';
 
 const SIDEBAR_CONTAINER_SELECTOR = '[data-slot="sidebar-container"]';
+const FIRST_STEP_SELECTOR = '[data-tutorial="sidebar-step-1"]';
+const ANCHOR_WAIT_FRAMES = 30;
+const TRANSITION_FALLBACK_MS = 400;
+
+const waitForAnchor = (selector: string) =>
+  new Promise<void>((resolve) => {
+    let framesLeft = ANCHOR_WAIT_FRAMES;
+    const check = () => {
+      if (document.querySelector(selector) || framesLeft-- <= 0) {
+        resolve();
+        return;
+      }
+      requestAnimationFrame(check);
+    };
+    check();
+  });
 
 export const useTutorial = () => {
   const { open, openMobile, toggleSidebar } = useSidebar();
@@ -133,14 +149,15 @@ export const useTutorial = () => {
 
     if (!isSidebarOpen) {
       toggleSidebar();
-      await new Promise<void>((resolve) => {
-        const el = document.querySelector(SIDEBAR_CONTAINER_SELECTOR);
-        if (el) {
-          el.addEventListener('transitionend', () => resolve(), { once: true });
-        } else {
-          resolve();
-        }
-      });
+      await waitForAnchor(FIRST_STEP_SELECTOR);
+
+      const container = document.querySelector(SIDEBAR_CONTAINER_SELECTOR);
+      if (container) {
+        await new Promise<void>((resolve) => {
+          container.addEventListener('transitionend', () => resolve(), { once: true });
+          setTimeout(resolve, TRANSITION_FALLBACK_MS);
+        });
+      }
     }
 
     driverClient.start(steps, {

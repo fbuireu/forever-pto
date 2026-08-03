@@ -152,7 +152,7 @@
         },
         "pricing": {
           "question": "Per què hi ha un model de pagament?",
-          "answer": "Forever PTO és gratuït. No obstant això, usem un model de pagament per cobrir els costos de mantenir dades, infraestructura i millores contínues. El model de pagament finança actualitzacions, suport i hosting. Si vols anar sense anuncis i donar suport al projecte, hi ha una donació voluntària."
+          "answer": "Forever PTO és gratuït. No obstant això, usem un model de pagament per cobrir els costos de mantenir dades, infraestructura i millores contínues. El model de pagament finança actualitzacions, suport i hosting. Si vols donar suport al projecte, hi ha una donació voluntària que desbloqueja les funcions premium."
         },
         "restartTutorial": {
           "question": "Com puc veure el tutorial interactiu de nou?"

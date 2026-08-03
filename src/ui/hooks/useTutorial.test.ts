@@ -7,7 +7,12 @@ const mockStart = vi.hoisted(() => vi.fn());
 const mockDestroy = vi.hoisted(() => vi.fn());
 const mockGetDriverClientInstance = vi.hoisted(() => vi.fn(() => ({ start: mockStart, destroy: mockDestroy })));
 const mockUseIsMobile = vi.hoisted(() => vi.fn(() => false));
-const mockUseSidebar = vi.hoisted(() => vi.fn(() => ({ open: true, toggleSidebar: mockToggleSidebar })));
+const mockUseSidebar = vi.hoisted(() =>
+  vi.fn((): { open: boolean; openMobile?: boolean; toggleSidebar: () => void } => ({
+    open: true,
+    toggleSidebar: mockToggleSidebar,
+  }))
+);
 
 vi.mock('@ui/hooks/useMobile', () => ({ useIsMobile: mockUseIsMobile }));
 vi.mock('@ui/modules/core/animate/base/Sidebar', () => ({ useSidebar: mockUseSidebar }));

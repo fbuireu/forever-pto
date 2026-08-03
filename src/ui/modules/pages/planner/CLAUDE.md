@@ -104,6 +104,14 @@ today marker and no past-day dimming on purpose. Every predicate taking `today` 
 snapshots the value only while `isCalculating` is false. That looks like a mistake and is not: without
 it the budget readout drops to zero for the length of every worker round-trip.
 
+**"No plan" is not "still loading", and `ManagementBar` keeps them apart.** Its `isReady` requires a
+Suggestion with days in it, so a run that legitimately produces nothing — a past year with the past-days
+switch off, which is the default and is Premium-gated, so a free user cannot even turn it on — used to leave
+the desktop panel as a `<Skeleton loading>` and the mobile drawer as a bare pulse, for ever. `isSettledEmpty`
+is the distinction: stores hydrated, nothing in flight, still no plan. The panel is then not rendered at all
+rather than pretending to load. What it *should* say instead is an open copy question; showing nothing is
+merely the honest floor.
+
 **The mobile drawer header reads `previewAlternativeIndex`, not `currentSelectionIndex`.** The two numbers
 beside it — Effective Days and Efficiency — come from `allSuggestions[previewAlternativeIndex]`, so labelling
 them with the *applied* index meant that paging through Alternatives showed "Option 1" above Option 3's

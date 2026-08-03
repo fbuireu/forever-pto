@@ -32,6 +32,7 @@ export const ManagementBar = () => {
     setCurrentAlternativeSelection,
     previewAlternativeIndex,
     currentSelectionIndex,
+    isCalculating,
   } = useHolidaysStore(
     useShallow((state) => ({
       alternatives: state.alternatives,
@@ -40,6 +41,7 @@ export const ManagementBar = () => {
       setPreviewAlternativeSelection: state.setPreviewAlternativeSelection,
       setCurrentAlternativeSelection: state.setCurrentAlternativeSelection,
       previewAlternativeIndex: state.previewAlternativeIndex,
+      isCalculating: state.isCalculating,
       currentSelectionIndex: state.currentSelectionIndex,
     }))
   );
@@ -78,6 +80,7 @@ export const ManagementBar = () => {
   const hasValidCurrentSelection = currentSelection?.days && currentSelection.days.length > 0;
 
   const isReady = areStoresReady && hasValidSuggestions && hasValidCurrentSelection;
+  const isSettledEmpty = areStoresReady && !isCalculating && !isReady;
 
   const plannerPanelProps = {
     currentSelectionIndex,
@@ -94,13 +97,13 @@ export const ManagementBar = () => {
 
   return (
     <div className='col-span-full sticky top-3 z-10'>
-      {!isMobile && (
+      {!isMobile && !isSettledEmpty && (
         <Skeleton name='planner-panel' loading={!isReady} fixture={<PlannerPanelFixture />}>
           {isReady && currentSelection && <PlannerPanel key={previewAlternativeIndex} {...plannerPanelProps} />}
         </Skeleton>
       )}
 
-      {isMobile && (
+      {isMobile && !isSettledEmpty && (
         <Drawer
           snapPoints={[0.15, 1]}
           activeSnapPoint={snap}
