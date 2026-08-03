@@ -23,8 +23,31 @@ interface PaymentSuccessParams {
   params: Promise<{ locale: Locale }>;
 }
 
-async function PaymentError() {
+const NOT_CHARGED_STATUSES = new Set(['requires_payment_method', 'canceled']);
+
+async function PaymentError({ charged }: { charged: boolean }) {
   const t = await getTranslations('paymentConfirmation.failed');
+
+  if (charged) {
+    return (
+      <div className='min-h-screen flex items-center justify-center p-4 bg-background'>
+        <Card className='w-full max-w-md border-amber-500/50'>
+          <CardHeader className='text-center'>
+            <div className='mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-amber-500/10'>
+              <XCircle className='size-6 text-amber-500' />
+            </div>
+            <CardTitle className='text-amber-600 dark:text-amber-400'>{t('unconfirmedTitle')}</CardTitle>
+            <CardDescription>{t('unconfirmedDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild className='w-full'>
+              <Link href='/'>{t('returnHome')}</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className='min-h-screen flex items-center justify-center p-4 bg-background'>
@@ -77,7 +100,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
         currency: data.currency,
       });
     }
-    return <PaymentError />;
+    return <PaymentError charged={!data || !NOT_CHARGED_STATUSES.has(data.status)} />;
   }
 
   const [t, format] = await Promise.all([getTranslations('paymentConfirmation.success'), getFormatter({ locale })]);

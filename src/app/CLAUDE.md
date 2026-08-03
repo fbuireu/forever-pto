@@ -152,8 +152,18 @@ nothing, which is the bug this route exists to close.
 
 The cookie is `sameSite: 'strict'`, so the confirmation page must **not** infer success from the cookie
 being present — the payer arrives through a chain that started cross-site and the browser may withhold it on
-that hop. The `activation` query parameter is the signal; the cookie is the entitlement, and the premium
-store picks it up on the next same-site request, when `PremiumFeature.tsx` calls `checkExistingSession()`.
+that hop. The `activation` query parameter is the signal; the cookie is the entitlement.
+
+**The store does not pick that cookie up on its own, which is why the page mounts
+`src/ui/modules/premium/PremiumSessionSync.tsx`.** `checkExistingSession()` returns early unless
+`needsSessionCheck` is set, and only rehydration raises that flag, only when `lastVerified` is missing or
+over 24 hours old — false for any donor who opened the planner before donating, since `PremiumFeature`'s own
+mount stamps it. `PremiumFeature.tsx` calling `checkExistingSession()` unconditionally therefore does
+nothing for the payer who has just come back. `PremiumSessionSync` renders `null` and calls
+`checkExistingSession({ force: true })` once; it activates nothing — the cookie is already set, server side,
+before this page renders — it only invalidates a client-side cache, which is the one thing a server
+component cannot do. Deleting it as redundant reinstates the bug where a redirect donor is charged, holds a
+valid cookie, is told Premium is active, and finds every feature blurred.
 
 ## The `.well-known` catch-all
 

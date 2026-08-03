@@ -181,7 +181,7 @@
         },
         "encryption": {
           "question": "¿Están mis datos encriptados?",
-          "answer": "Tus datos de planificación de vacaciones se almacenan localmente en tu navegador. Aplicamos ofuscación con cifrado XOR para hacer los datos ilegibles en inspección casual. Este método está diseñado para prevenir exposición accidental, no para proteger contra atacantes determinados. No almacenamos información personal sensible, y mantienes el control total de tus datos en tu dispositivo. Todos tus datos (días de PTO, fechas seleccionadas, festivos personalizados, preferencias) se almacenan exclusivamente en el almacenamiento local de tu navegador. Nunca enviamos esta información a nuestros servidores. Tu planificación de vacaciones permanece completamente privada en tu dispositivo."
+          "answer": "Tus datos de planificación de vacaciones se almacenan localmente en tu navegador. Aplicamos una ofuscación ligera (XOR) para que los datos no sean legibles a simple vista. No es cifrado y no protege frente a un atacante decidido: está pensado para evitar una exposición accidental. No almacenamos información personal sensible, y mantienes el control total de tus datos en tu dispositivo. Todos tus datos (días de PTO, fechas seleccionadas, festivos personalizados, preferencias) se almacenan exclusivamente en el almacenamiento local de tu navegador. Nunca enviamos esta información a nuestros servidores. Tu planificación de vacaciones permanece completamente privada en tu dispositivo."
         },
         "tracking": {
           "question": "¿Vendéis mis datos o seguís mis planes de vacaciones?",
@@ -900,6 +900,8 @@
     "failed": {
       "title": "Pago no completado",
       "description": "No pudimos procesar tu pago. No se te ha cobrado.",
+      "unconfirmedTitle": "Pago aún sin confirmar",
+      "unconfirmedDescription": "No hemos podido confirmar tu pago ahora mismo. Si se ha completado, tu acceso premium se activará solo: recarga esta página en un momento, o escríbenos si no ocurre.",
       "whatHappened": "¿Qué ha pasado?",
       "declined": "Tu pago puede haber sido rechazado",
       "authFailed": "La autenticación puede haber fallado",

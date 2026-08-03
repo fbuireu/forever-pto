@@ -900,6 +900,8 @@
     "failed": {
       "title": "Pagament fallat",
       "description": "No hem pogut processar el teu pagament. No se t'ha cobrat.",
+      "unconfirmedTitle": "Pagament encara sense confirmar",
+      "unconfirmedDescription": "No hem pogut confirmar el teu pagament ara mateix. Si s’ha completat, el teu accés premium s’activarà sol: recarrega aquesta pàgina en un moment, o escriu-nos si no passa.",
       "whatHappened": "Què ha passat?",
       "declined": "El teu pagament pot haver estat rebutjat",
       "authFailed": "L'autenticació pot haver fallat",

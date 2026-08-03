@@ -181,7 +181,7 @@
         },
         "encryption": {
           "question": "Mes données sont-elles chiffrées ?",
-          "answer": "Tes données de planification de vacances sont stockées localement dans ton navigateur. Nous appliquons un chiffrement par obfuscation XOR pour rendre les données illisibles lors d'une inspection rapide. Cette méthode est conçue pour éviter une exposition accidentelle, pas pour protéger contre des attaquants déterminés. Nous ne stockons pas d'informations personnelles sensibles, et tu gardes le contrôle total de tes données sur ton appareil. Toutes tes données (jours de congé, dates sélectionnées, jours fériés personnalisés, préférences) sont stockées exclusivement dans le stockage local de ton navigateur. Nous n'envoyons jamais ces informations à nos serveurs. Ta planification de vacances reste entièrement privée sur ton appareil."
+          "answer": "Tes données de planification de vacances sont stockées localement dans ton navigateur. Nous appliquons une légère obfuscation (XOR) pour que les données ne soient pas lisibles au premier coup d'œil. Ce n'est pas du chiffrement et cela ne protège pas contre un attaquant déterminé : cela évite une exposition accidentelle. Nous ne stockons pas d'informations personnelles sensibles, et tu gardes le contrôle total de tes données sur ton appareil. Toutes tes données (jours de congé, dates sélectionnées, jours fériés personnalisés, préférences) sont stockées exclusivement dans le stockage local de ton navigateur. Nous n'envoyons jamais ces informations à nos serveurs. Ta planification de vacances reste entièrement privée sur ton appareil."
         },
         "tracking": {
           "question": "Vendez-vous mes données ou suivez-vous mes projets de congés ?",
@@ -900,6 +900,8 @@
     "failed": {
       "title": "Paiement échoué",
       "description": "Nous n'avons pas pu traiter ton paiement. Tu n'as pas été débité.",
+      "unconfirmedTitle": "Paiement pas encore confirmé",
+      "unconfirmedDescription": "Nous n’avons pas pu confirmer ton paiement pour le moment. S’il a abouti, ton accès premium s’activera tout seul : recharge cette page dans un instant, ou contacte-nous si ce n’est pas le cas.",
       "whatHappened": "Que s'est-il passé ?",
       "declined": "Ton paiement a peut-être été refusé",
       "authFailed": "L'authentification a peut-être échoué",

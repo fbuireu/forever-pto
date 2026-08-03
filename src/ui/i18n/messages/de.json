@@ -900,6 +900,8 @@
     "failed": {
       "title": "Zahlung fehlgeschlagen",
       "description": "Wir konnten deine Zahlung nicht verarbeiten. Dir wurde nichts berechnet.",
+      "unconfirmedTitle": "Zahlung noch nicht bestätigt",
+      "unconfirmedDescription": "Wir konnten deine Zahlung gerade nicht bestätigen. Falls sie durchging, wird dein Premium-Zugang von selbst aktiviert – lade diese Seite gleich neu, oder schreib uns, wenn nicht.",
       "whatHappened": "Was ist passiert?",
       "declined": "Deine Zahlung wurde möglicherweise abgelehnt",
       "authFailed": "Die Authentifizierung ist möglicherweise fehlgeschlagen",

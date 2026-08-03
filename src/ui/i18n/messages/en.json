@@ -900,6 +900,8 @@
     "failed": {
       "title": "Payment failed",
       "description": "We couldn't process your payment. You have not been charged.",
+      "unconfirmedTitle": "Payment not confirmed yet",
+      "unconfirmedDescription": "We could not confirm your payment right now. If it went through, your premium access activates on its own — reload this page in a moment, or contact us if it does not.",
       "whatHappened": "What happened?",
       "declined": "Your payment may have been declined",
       "authFailed": "Authentication may have failed",

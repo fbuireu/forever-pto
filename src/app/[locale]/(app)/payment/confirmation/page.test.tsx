@@ -53,6 +53,10 @@ vi.mock('@ui/modules/core/primitives/Card', () => {
   };
 });
 
+vi.mock('@ui/modules/premium/PremiumSessionSync', () => ({
+  PremiumSessionSync: () => null,
+}));
+
 vi.mock('lucide-react', () => ({
   CheckCircle2: vi.fn().mockReturnValue(null),
   XCircle: vi.fn().mockReturnValue(null),
@@ -66,6 +70,12 @@ const makeParams = (locale = EN, paymentIntent?: string) => ({
 });
 
 const makeSuccessParams = () => makeParams(EN, PAYMENT_INTENT_ID);
+
+const renderErrorPage = async () => {
+  const element = await PaymentSuccessPage(makeSuccessParams());
+  const resolved = await (element.type as (props: unknown) => Promise<never>)(element.props);
+  return render(resolved);
+};
 
 const makeFailedActivationParams = () => ({
   searchParams: Promise.resolve({ payment_intent: PAYMENT_INTENT_ID, activation: ACTIVATION_FAILED }),
@@ -112,6 +122,30 @@ describe('payment/confirmation page', () => {
       const element = await PaymentSuccessPage(makeSuccessParams());
       expect(typeof element.type).toBe('function');
       expect((element.type as { name?: string }).name).toBe('PaymentError');
+    });
+
+    it('does not claim the payer was spared when Stripe says the payment is still processing', async () => {
+      mockConfirmation.mockReturnValueOnce(
+        Effect.succeed({ id: PAYMENT_INTENT_ID, status: 'processing', amount: 10, currency: 'USD' })
+      );
+      const { container } = await renderErrorPage();
+      expect(container.textContent).toContain('t:unconfirmedTitle');
+      expect(container.textContent).not.toContain('t:description');
+    });
+
+    it('does not claim the payer was spared when the Stripe read itself failed', async () => {
+      mockConfirmation.mockReturnValueOnce(Effect.succeed(null));
+      const { container } = await renderErrorPage();
+      expect(container.textContent).toContain('t:unconfirmedTitle');
+    });
+
+    it('still says the card was untouched when Stripe says the intent was never charged', async () => {
+      mockConfirmation.mockReturnValueOnce(
+        Effect.succeed({ id: PAYMENT_INTENT_ID, status: 'requires_payment_method', amount: 10, currency: 'USD' })
+      );
+      const { container } = await renderErrorPage();
+      expect(container.textContent).toContain('t:description');
+      expect(container.textContent).not.toContain('t:unconfirmedTitle');
     });
 
     it('logs a warning when status is not succeeded', async () => {

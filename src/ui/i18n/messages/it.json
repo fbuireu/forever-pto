@@ -181,7 +181,7 @@
         },
         "encryption": {
           "question": "I miei dati sono crittografati?",
-          "answer": "I tuoi dati di pianificazione delle vacanze sono memorizzati localmente nel tuo browser. Applichiamo offuscamento con cifratura XOR per rendere i dati illeggibili in un'ispezione casuale. Questo metodo è progettato per prevenire l'esposizione accidentale, non per proteggere da attaccanti determinati. Non memorizziamo informazioni personali sensibili, e mantieni il pieno controllo dei tuoi dati sul tuo dispositivo. Tutti i tuoi dati (giorni di PTO, date selezionate, festivi personalizzati, preferenze) sono memorizzati esclusivamente nella memoria locale del tuo browser. Non inviamo mai queste informazioni ai nostri server. La tua pianificazione delle vacanze rimane completamente privata sul tuo dispositivo."
+          "answer": "I tuoi dati di pianificazione delle vacanze sono memorizzati localmente nel tuo browser. Applichiamo una leggera offuscazione (XOR) perché i dati non siano leggibili a colpo d'occhio. Non è crittografia e non protegge da un attaccante determinato: serve a evitare un'esposizione accidentale. Non memorizziamo informazioni personali sensibili, e mantieni il pieno controllo dei tuoi dati sul tuo dispositivo. Tutti i tuoi dati (giorni di PTO, date selezionate, festivi personalizzati, preferenze) sono memorizzati esclusivamente nella memoria locale del tuo browser. Non inviamo mai queste informazioni ai nostri server. La tua pianificazione delle vacanze rimane completamente privata sul tuo dispositivo."
         },
         "tracking": {
           "question": "Vendete i miei dati o tracciate i miei piani ferie?",
@@ -900,6 +900,8 @@
     "failed": {
       "title": "Pagamento fallito",
       "description": "Non siamo riusciti a elaborare il tuo pagamento. Non ti è stato addebitato nulla.",
+      "unconfirmedTitle": "Pagamento non ancora confermato",
+      "unconfirmedDescription": "Non siamo riusciti a confermare il tuo pagamento in questo momento. Se è andato a buon fine, il tuo accesso premium si attiverà da solo: ricarica questa pagina tra poco, oppure scrivici se non succede.",
       "whatHappened": "Cosa è successo?",
       "declined": "Il tuo pagamento potrebbe essere stato rifiutato",
       "authFailed": "L'autenticazione potrebbe essere fallita",
