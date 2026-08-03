@@ -7,8 +7,8 @@ import { checkRateLimit } from '@infrastructure/services/payments/rateLimit';
 import { ACTIVATION_FAILED, ACTIVATION_PARAM } from '@infrastructure/services/premium/activation';
 import { setPremiumCookie } from '@infrastructure/services/premium/cookie';
 import { Effect } from 'effect';
-import { hasLocale } from 'next-intl';
 import { after, type NextRequest, NextResponse } from 'next/server';
+import { hasLocale } from 'next-intl';
 import type Stripe from 'stripe';
 
 const SUCCEEDED_REDIRECT_STATUS: Stripe.PaymentIntent.Status = 'succeeded';

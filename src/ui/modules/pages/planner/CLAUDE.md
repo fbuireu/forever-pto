@@ -70,7 +70,9 @@ The second condition matters: without it, the cold load — where the gate is al
 have not arrived yet — would clear a plan that was never there and mark the store as having calculated.
 
 **Only `CalendarList.tsx` triggers a calculation.** It fires `triggerCalculation` on any change to
-year, PTO budget, Strategy, past-days flag, locale or the Holiday list. `Troubleshooting.tsx`, which now
+year, PTO budget, Strategy, past-days flag, locale or the Holiday list — and on `planRevision`, which
+`setCurrentAlternativeSelection` bumps so that applying a plan re-plans it; see
+[`@application/stores/CLAUDE.md`](../../../../application/stores/CLAUDE.md). `Troubleshooting.tsx`, which now
 lives under `pages/homepage/support/`, is the one other caller and it goes the other way —
 `useHolidaysStore().generateSuggestions`, on the main thread. Those are the two *UI* entry points; the two
 callers [ADR 0006](../../../../../docs/adr/0006-caller-owned-calculation-caches.md) counts are the ones that

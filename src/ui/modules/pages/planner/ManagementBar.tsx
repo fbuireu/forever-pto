@@ -7,7 +7,7 @@ import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { Drawer, DrawerContent, DrawerTitle } from '@ui/modules/core/animate/base/Drawer';
 import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
 import { Skeleton } from 'boneyard-js/react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
@@ -18,7 +18,6 @@ import { PlannerPanelFixture } from './PlannerPanelFixture';
 export const ManagementBar = () => {
   const t = useTranslations('toasts');
   const tAlt = useTranslations('alternativesManager');
-  const locale = useLocale();
   const tPlanner = useTranslations('planner');
   const { areStoresReady } = useStoresReady();
   const isMobile = useIsMobile();
@@ -63,11 +62,11 @@ export const ManagementBar = () => {
 
   const handleSelectionChange = useCallback(
     (params: AlternativeSelectionBaseParams) => {
-      setCurrentAlternativeSelection({ ...params, locale });
+      setCurrentAlternativeSelection(params);
       toast.success(t('suggestionApplied'));
       setSnap(0.15);
     },
-    [setCurrentAlternativeSelection, t, locale]
+    [setCurrentAlternativeSelection, t]
   );
 
   const baseSuggestions = [suggestion, ...alternatives].filter(

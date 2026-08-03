@@ -2,35 +2,41 @@ import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockFiltersState, mockHolidaysState, mockPrune, mockClearCalculation, mockFetchHolidays, mockTriggerCalculation } = vi.hoisted(
-  () => ({
-    mockFiltersState: {
-      carryOverMonths: 0,
-      year: 2026,
-      allowPastDays: true,
-      country: 'ES',
-      region: '',
-      ptoDays: 10,
-      strategy: 'grouped',
-    },
-    mockHolidaysState: {
-      holidays: [
-        { id: 'h1', date: new Date(2026, 0, 1), name: 'New Year', variant: 'national', isInSelectedRange: true },
-      ],
-      alternatives: [],
-      suggestion: null,
-      currentSelection: null,
-      isCalculating: false,
-      manuallySelectedDays: [],
-      removedSuggestedDays: [],
-      previewAlternativeIndex: 0,
-    },
-    mockPrune: vi.fn(),
-    mockClearCalculation: vi.fn(),
-    mockFetchHolidays: vi.fn(),
-    mockTriggerCalculation: vi.fn(),
-  })
-);
+const {
+  mockFiltersState,
+  mockHolidaysState,
+  mockPrune,
+  mockClearCalculation,
+  mockFetchHolidays,
+  mockTriggerCalculation,
+} = vi.hoisted(() => ({
+  mockFiltersState: {
+    carryOverMonths: 0,
+    year: 2026,
+    allowPastDays: true,
+    country: 'ES',
+    region: '',
+    ptoDays: 10,
+    strategy: 'grouped',
+  },
+  mockHolidaysState: {
+    holidays: [
+      { id: 'h1', date: new Date(2026, 0, 1), name: 'New Year', variant: 'national', isInSelectedRange: true },
+    ],
+    alternatives: [],
+    suggestion: null,
+    currentSelection: null,
+    isCalculating: false,
+    manuallySelectedDays: [],
+    removedSuggestedDays: [],
+    previewAlternativeIndex: 0,
+    planRevision: 0,
+  },
+  mockPrune: vi.fn(),
+  mockClearCalculation: vi.fn(),
+  mockFetchHolidays: vi.fn(),
+  mockTriggerCalculation: vi.fn(),
+}));
 
 vi.mock('@application/stores/filters', () => ({
   useFiltersStore: (selector: (state: unknown) => unknown) => selector(mockFiltersState),
@@ -76,6 +82,19 @@ beforeEach(() => {
     { id: 'h1', date: new Date(2026, 0, 1), name: 'New Year', variant: 'national', isInSelectedRange: true },
   ] as never;
   mockHolidaysState.suggestion = null;
+  (mockHolidaysState as { planRevision?: number }).planRevision = 0;
+});
+
+describe('CalendarList re-plans on apply', () => {
+  it('runs the engine again when a plan is applied, which is what reconciles the Manual Days', () => {
+    const { rerender } = render(<CalendarList />);
+    expect(mockTriggerCalculation).toHaveBeenCalledTimes(1);
+
+    (mockHolidaysState as { planRevision?: number }).planRevision = 1;
+    rerender(<CalendarList />);
+
+    expect(mockTriggerCalculation).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('CalendarList stale plans', () => {

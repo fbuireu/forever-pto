@@ -25,10 +25,14 @@ const MockStripeLayer = Layer.succeed(StripeServerService, {
 });
 
 const run = (code: string, amount: number) =>
-  Effect.runPromise(validatePromoCode(code, amount).pipe(Effect.provide(Layer.mergeAll(MockStripeLayer, MockTursoLayer))));
+  Effect.runPromise(
+    validatePromoCode(code, amount).pipe(Effect.provide(Layer.mergeAll(MockStripeLayer, MockTursoLayer)))
+  );
 
 const runFlip = (code: string, amount: number) =>
-  Effect.runPromise(validatePromoCode(code, amount).pipe(Effect.provide(Layer.mergeAll(MockStripeLayer, MockTursoLayer)), Effect.flip));
+  Effect.runPromise(
+    validatePromoCode(code, amount).pipe(Effect.provide(Layer.mergeAll(MockStripeLayer, MockTursoLayer)), Effect.flip)
+  );
 
 type PromoCodeOverrides = Partial<{
   active: boolean;

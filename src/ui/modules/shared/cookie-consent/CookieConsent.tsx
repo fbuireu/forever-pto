@@ -89,14 +89,14 @@ export const CookieConsent = () => {
       },
       onConsent: () => {
         const prefs = CookieConsentLib.getUserPreferences();
-        const acceptedServices = prefs.acceptedServices['analytics'] ?? [];
+        const acceptedServices = prefs.acceptedServices.analytics ?? [];
         setServiceStates(Object.fromEntries(analyticsServiceIds.map((id) => [id, acceptedServices.includes(id)])));
         updateGtagConsent(acceptedServices.length > 0);
       },
       onChange: ({ changedCategories }) => {
         if (changedCategories.includes('analytics')) {
           const prefs = CookieConsentLib.getUserPreferences();
-          const acceptedServices = prefs.acceptedServices['analytics'] ?? [];
+          const acceptedServices = prefs.acceptedServices.analytics ?? [];
           setServiceStates(Object.fromEntries(analyticsServiceIds.map((id) => [id, acceptedServices.includes(id)])));
           updateGtagConsent(acceptedServices.length > 0);
         }
@@ -108,7 +108,7 @@ export const CookieConsent = () => {
       setShowBanner(true);
     } else {
       const prefs = CookieConsentLib.getUserPreferences();
-      const acceptedServices = prefs.acceptedServices['analytics'] ?? [];
+      const acceptedServices = prefs.acceptedServices.analytics ?? [];
       setServiceStates(Object.fromEntries(analyticsServiceIds.map((id) => [id, acceptedServices.includes(id)])));
     }
 

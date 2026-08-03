@@ -41,6 +41,7 @@ export const CalendarList = () => {
     toggleDaySelection,
     pruneDaysOutsideWindow,
     clearCalculation,
+    planRevision,
   } = useHolidaysStore(
     useShallow((state) => ({
       holidays: state.holidays,
@@ -55,6 +56,7 @@ export const CalendarList = () => {
       toggleDaySelection: state.toggleDaySelection,
       pruneDaysOutsideWindow: state.pruneDaysOutsideWindow,
       clearCalculation: state.clearCalculation,
+      planRevision: state.planRevision,
     }))
   );
 
@@ -85,6 +87,7 @@ export const CalendarList = () => {
     fetchHolidays({ year, region, country, locale, carryOverMonths });
   }, [fetchHolidays, year, region, country, locale, carryOverMonths]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: planRevision is a re-plan signal, not a value the body reads
   useEffect(() => {
     if (ptoDays > 0 && holidays.length > 0 && months.length > 0) {
       triggerCalculation({
@@ -110,6 +113,7 @@ export const CalendarList = () => {
     months,
     strategy,
     locale,
+    planRevision,
   ]);
 
   return (

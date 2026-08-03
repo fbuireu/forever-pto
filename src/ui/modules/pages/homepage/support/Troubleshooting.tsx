@@ -34,8 +34,7 @@ export const Troubleshooting = () => {
         resetHolidaysStore();
         resetFiltersStore();
 
-        const { country, region, year, carryOverMonths, ptoDays, allowPastDays, strategy } =
-          useFiltersStore.getState();
+        const { country, region, year, carryOverMonths, ptoDays, allowPastDays, strategy } = useFiltersStore.getState();
 
         if (country) {
           await fetchHolidays({ country, region, year, locale, carryOverMonths });

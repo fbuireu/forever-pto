@@ -21,7 +21,6 @@ import { useLocationStore } from './location';
 import type {
   AddHolidayParams,
   AlternativeSelectionBaseParams,
-  ApplyAlternativeParams,
   EditHolidayParams,
   FetchHolidaysParams,
   MainThreadSuggestionsParams,
@@ -46,6 +45,7 @@ export interface HolidaysState {
   removedSuggestedDays: Date[];
   isCalculating: boolean;
   hasCalculated: boolean;
+  planRevision: number;
 }
 
 interface HolidaysActions {
@@ -54,7 +54,7 @@ interface HolidaysActions {
   setCalculating: (v: boolean) => void;
   setCalculationResult: (result: { suggestion: Suggestion; alternatives: Suggestion[] }) => void;
   setMaxAlternatives: (max: number) => void;
-  setCurrentAlternativeSelection: (params: ApplyAlternativeParams) => void;
+  setCurrentAlternativeSelection: (params: AlternativeSelectionBaseParams) => void;
   setPreviewAlternativeSelection: (params: AlternativeSelectionBaseParams) => void;
   resetToDefaults: () => void;
   addHoliday: (params: AddHolidayParams) => void;
@@ -117,6 +117,7 @@ const holidaysInitialState: HolidaysState = {
   removedSuggestedDays: [],
   isCalculating: false,
   hasCalculated: false,
+  planRevision: 0,
 };
 
 const serializeSuggestion = (suggestion: Suggestion) => ({
@@ -338,30 +339,15 @@ export const useHolidaysStore = create<HolidaysStore>()(
           set({ maxAlternatives: Math.max(0, max) });
         },
 
-        setCurrentAlternativeSelection: ({ suggestion, index, locale }: ApplyAlternativeParams) => {
-          const { holidays } = get();
-          const { year, allowPastDays } = useFiltersStore.getState();
-
-          const applied = suggestion
-            ? {
-                ...suggestion,
-                metrics: generateMetrics({
-                  suggestion,
-                  locale,
-                  year,
-                  bridges: suggestion.bridges,
-                  holidays,
-                  allowPastDays,
-                }),
-              }
-            : suggestion;
+        setCurrentAlternativeSelection: ({ suggestion, index }: AlternativeSelectionBaseParams) => {
+          const { planRevision } = get();
 
           set({
-            currentSelection: applied,
+            currentSelection: suggestion,
             previewAlternativeIndex: index,
             currentSelectionIndex: index,
-            manuallySelectedDays: [],
             removedSuggestedDays: [],
+            planRevision: planRevision + 1,
           });
         },
 
@@ -382,12 +368,12 @@ export const useHolidaysStore = create<HolidaysStore>()(
             return;
           }
 
-          const isManuallySelected = manuallySelectedDays.some(
-            (d) => d.toDateString() === holiday.date.toDateString()
-          );
+          const isManuallySelected = manuallySelectedDays.some((d) => d.toDateString() === holiday.date.toDateString());
 
           if (isManuallySelected) {
-            log((logger) => logger.warn('A PTO day is already booked on this date', { date: holiday.date.toISOString() }));
+            log((logger) =>
+              logger.warn('A PTO day is already booked on this date', { date: holiday.date.toISOString() })
+            );
             return;
           }
 
@@ -455,8 +441,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           const isManuallySelected = manuallySelectedDays.some((d) => d.toDateString() === dateStr);
           const wasRemoved = removedSuggestedDays.some((d) => d.toDateString() === dateStr);
 
-          const isAlreadyFree =
-            isWeekend(date) || holidays.some((h) => ensureDate(h.date).toDateString() === dateStr);
+          const isAlreadyFree = isWeekend(date) || holidays.some((h) => ensureDate(h.date).toDateString() === dateStr);
 
           if (!isSuggested && !isManuallySelected && isAlreadyFree) {
             log((logger) => logger.warn('Refused to spend a PTO day on a day that is already off', { dateStr }));

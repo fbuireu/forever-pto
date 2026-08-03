@@ -187,10 +187,7 @@ describe('editHoliday collisions', () => {
 
   it('refuses to move a holiday onto another holiday', () => {
     useHolidaysStore.setState({
-      holidays: [
-        makeHoliday('custom-1', '2026-03-11', HolidayVariant.CUSTOM),
-        makeHoliday('national-1', '2026-03-12'),
-      ],
+      holidays: [makeHoliday('custom-1', '2026-03-11', HolidayVariant.CUSTOM), makeHoliday('national-1', '2026-03-12')],
     });
 
     useHolidaysStore.getState().editHoliday({
@@ -588,7 +585,7 @@ describe('setCalculating', () => {
 describe('setCurrentAlternativeSelection', () => {
   it('sets currentSelection and both indices', () => {
     const suggestion = makeSuggestion([new Date('2026-06-01')]);
-    useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion, index: 2, locale: 'en' });
+    useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion, index: 2 });
     const state = useHolidaysStore.getState();
     expect(state.currentSelection?.days).toEqual(suggestion.days);
     expect(state.currentSelectionIndex).toBe(2);
@@ -597,41 +594,33 @@ describe('setCurrentAlternativeSelection', () => {
 
   it('drops the Removed Days, which named days of the Suggestion being replaced', () => {
     useHolidaysStore.setState({ removedSuggestedDays: [new Date('2026-01-06')] });
-    useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion: makeSuggestion([]), index: 0, locale: 'en' });
+    useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion: makeSuggestion([]), index: 0 });
     expect(useHolidaysStore.getState().removedSuggestedDays).toHaveLength(0);
   });
 
-  it('drops the Manual Days, which the Alternative was never sized to leave room for', () => {
-    useHolidaysStore.setState({ manuallySelectedDays: [new Date('2026-01-05')] });
+  it('keeps the Manual Days, which every Alternative was planned around', () => {
+    const manual = new Date('2026-01-05');
+    useHolidaysStore.setState({ manuallySelectedDays: [manual] });
 
-    useHolidaysStore
-      .getState()
-      .setCurrentAlternativeSelection({ suggestion: makeSuggestion([]), index: 0, locale: 'en' });
+    useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion: makeSuggestion([]), index: 0 });
 
-    expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
+    expect(useHolidaysStore.getState().manuallySelectedDays).toEqual([manual]);
   });
 
-  it('recomputes the Metrics for the plan it just adopted, rather than trusting the stored ones', async () => {
-    const { generateMetrics } = await import('@domain/calendar/metrics/generateMetrics');
-    vi.mocked(generateMetrics).mockReturnValue({ totalEffectiveDays: 42 } as never);
+  it('asks for a re-plan, which is what reconciles a Manual Day added since the last run', () => {
+    const before = useHolidaysStore.getState().planRevision;
+
+    useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion: makeSuggestion([]), index: 1 });
+
+    expect(useHolidaysStore.getState().planRevision).toBe(before + 1);
+  });
+
+  it('adopts the chosen plan verbatim, leaving its Bridges for the re-plan to rebuild', () => {
     const suggestion = makeSuggestion([new Date('2026-06-01')]);
 
-    useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion, index: 1, locale: 'en' });
+    useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion, index: 1 });
 
-    expect(generateMetrics).toHaveBeenCalled();
-    expect(useHolidaysStore.getState().currentSelection?.metrics).toMatchObject({ totalEffectiveDays: 42 });
-  });
-
-  it('measures those Metrics against no Manual Days, matching the state it just wrote', async () => {
-    const { generateMetrics } = await import('@domain/calendar/metrics/generateMetrics');
-    useHolidaysStore.setState({ manuallySelectedDays: [new Date('2026-01-05')] });
-
-    useHolidaysStore
-      .getState()
-      .setCurrentAlternativeSelection({ suggestion: makeSuggestion([new Date('2026-06-01')]), index: 1, locale: 'en' });
-
-    const [args] = vi.mocked(generateMetrics).mock.lastCall ?? [];
-    expect(args?.manuallySelectedDays ?? []).toHaveLength(0);
+    expect(useHolidaysStore.getState().currentSelection).toBe(suggestion);
   });
 });
 
@@ -695,7 +684,10 @@ describe('fetchHolidays', () => {
   });
 
   it('flags a Custom Holiday the window has moved back onto', async () => {
-    const custom: HolidayDTO = { ...makeHoliday('custom-1', '2026-06-15', HolidayVariant.CUSTOM), isInSelectedRange: false };
+    const custom: HolidayDTO = {
+      ...makeHoliday('custom-1', '2026-06-15', HolidayVariant.CUSTOM),
+      isInSelectedRange: false,
+    };
     useHolidaysStore.setState({ holidays: [custom] });
     mockGetHolidays.mockResolvedValueOnce([]);
 

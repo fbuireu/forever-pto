@@ -69,7 +69,9 @@ describe('activateWithPayment', () => {
 
   it('saves payment when no existing record (deferred)', async () => {
     const { savePayment } = await import('@infrastructure/services/payments/repository');
-    const { deferred } = await run(activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'test@example.com' }));
+    const { deferred } = await run(
+      activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'test@example.com' })
+    );
     await runDeferred(deferred);
     expect(savePayment).toHaveBeenCalledOnce();
   });
@@ -77,7 +79,9 @@ describe('activateWithPayment', () => {
   it('skips savePayment when payment already exists with succeeded status (deferred)', async () => {
     const { getPaymentById, savePayment } = await import('@infrastructure/services/payments/repository');
     vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed({ id: 'pi_test', status: 'succeeded' } as never));
-    const { deferred } = await run(activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'test@example.com' }));
+    const { deferred } = await run(
+      activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'test@example.com' })
+    );
     await runDeferred(deferred);
     expect(savePayment).not.toHaveBeenCalled();
   });
@@ -87,7 +91,9 @@ describe('activateWithPayment', () => {
       '@infrastructure/services/payments/repository'
     );
     vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed({ id: 'pi_test', status: 'processing' } as never));
-    const { deferred } = await run(activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'test@example.com' }));
+    const { deferred } = await run(
+      activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'test@example.com' })
+    );
     await runDeferred(deferred);
     expect(updatePaymentStatus).toHaveBeenCalledWith('pi_test', 'succeeded');
     expect(savePayment).not.toHaveBeenCalled();
@@ -110,9 +116,7 @@ describe('activateWithPayment', () => {
   });
 
   it('accepts the payer address retyped with different capitalisation, the only key Premium is recoverable by', async () => {
-    const result = await run(
-      activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: '  TEST@Example.com ' })
-    );
+    const result = await run(activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: '  TEST@Example.com ' }));
     expect(result).toMatchObject({ email: 'test@example.com' });
   });
 
@@ -166,7 +170,9 @@ describe('activateWithPayment', () => {
     mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
       Effect.succeed({ ...SUCCEEDED_INTENT, metadata: {}, receipt_email: null }) as never
     );
-    const err = await runFail(activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'attacker@example.com' }));
+    const err = await runFail(
+      activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'attacker@example.com' })
+    );
     expect(err).toBeInstanceOf(ValidationError);
   });
 
@@ -183,11 +189,15 @@ describe('activateWithPayment', () => {
     mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
       Effect.succeed({ ...SUCCEEDED_INTENT, metadata: {}, receipt_email: 'test@example.com' }) as never
     );
-    await expect(run(activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'test@example.com' }))).resolves.toBeDefined();
+    await expect(
+      run(activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'test@example.com' }))
+    ).resolves.toBeDefined();
   });
 
   it('accepts when metadata email matches the provided email', async () => {
-    await expect(run(activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'test@example.com' }))).resolves.toBeDefined();
+    await expect(
+      run(activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'test@example.com' }))
+    ).resolves.toBeDefined();
   });
 });
 

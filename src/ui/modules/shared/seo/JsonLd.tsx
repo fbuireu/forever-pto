@@ -50,7 +50,8 @@ export async function JsonLd({ locale }: JsonLdProps) {
           priceCurrency: 'EUR',
           valueAddedTaxIncluded: true,
         },
-        description: 'Premium lifetime access unlocked by a donation of any amount, with advanced metrics, charts, and multiple strategies',
+        description:
+          'Premium lifetime access unlocked by a donation of any amount, with advanced metrics, charts, and multiple strategies',
       },
     ],
     featureList: [

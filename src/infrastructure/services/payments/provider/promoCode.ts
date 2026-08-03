@@ -1,8 +1,8 @@
 import type { DiscountInfo } from '@application/dto/payment/types';
+import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
 import type { PromoCodeErrorCode } from '@infrastructure/errors';
 import { PromoCodeError, PromoCodeErrors } from '@infrastructure/errors';
-import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { countPromoCodeRedemptions } from '@infrastructure/services/payments/repository';
 import { Effect } from 'effect';
 import type Stripe from 'stripe';

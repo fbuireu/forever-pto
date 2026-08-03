@@ -4,13 +4,13 @@ import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
 import { type DatabaseError, type SessionError, ValidationError } from '@infrastructure/errors';
+import { normalizeEmail } from '@infrastructure/services/payments/normalizeEmail';
 import {
   getPaymentByEmail,
   getPaymentById,
   savePayment,
   updatePaymentStatus,
 } from '@infrastructure/services/payments/repository';
-import { normalizeEmail } from '@infrastructure/services/payments/normalizeEmail';
 import { matchesClientSecret } from '@infrastructure/services/premium/activation';
 import { createSession } from '@infrastructure/services/premium/session';
 import { Effect } from 'effect';

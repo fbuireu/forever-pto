@@ -1,7 +1,6 @@
 import { LOCALES } from '@infrastructure/i18n/locales';
 import { Comparison } from '@ui/modules/pages/homepage/sections/Comparison';
 import { Faq } from '@ui/modules/pages/homepage/sections/Faq';
-import { FaqJsonLd } from '@ui/modules/shared/seo/JsonLd';
 import { Features } from '@ui/modules/pages/homepage/sections/Features';
 import { Hero } from '@ui/modules/pages/homepage/sections/Hero';
 import { HomepageCta } from '@ui/modules/pages/homepage/sections/HomepageCta';
@@ -11,6 +10,7 @@ import { Pricing } from '@ui/modules/pages/homepage/sections/Pricing';
 import { Stats } from '@ui/modules/pages/homepage/sections/Stats';
 import { Testimonials } from '@ui/modules/pages/homepage/sections/Testimonials';
 import { DonateClient } from '@ui/modules/shared/donate/DonateClient';
+import { FaqJsonLd } from '@ui/modules/shared/seo/JsonLd';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 

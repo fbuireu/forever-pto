@@ -27,7 +27,6 @@ const MARKDOWN_LINK = /\[([^\]]+)\]\(([^)\s]+)\)/g;
 const BACKTICKED_TOKEN = /`([^`]+)`/g;
 const BACKTICKED_SOURCE_FILE = /`([^`\s]+\.(?:ts|tsx))`/g;
 const BACKTICKED_ALIAS = /`([^`.]+\/\*)`/g;
-const BACKTICK = /`/g;
 const CITED_PNPM_SCRIPT = /\bpnpm ([a-z][a-z0-9:-]*)/g;
 const ALIAS_WILDCARD_SUFFIX = /\/\*$/;
 

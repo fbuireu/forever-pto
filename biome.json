@@ -36,7 +36,7 @@
   "linter": {
     "includes": ["**", "!**/*.d.ts*"],
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "complexity": {
         "noImportantStyles": "off"
       },

@@ -34,8 +34,7 @@ interface AddHolidayModalProps {
 export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps) => {
   const t = useTranslations('modals.addHoliday');
   const tValidation = useTranslations('validation.holiday');
-  const { holidays, addHoliday, currentSelection, alternatives, suggestion, manuallySelectedDays } =
-    useHolidaysStore();
+  const { holidays, addHoliday, currentSelection, alternatives, suggestion, manuallySelectedDays } = useHolidaysStore();
   const { carryOverMonths, year } = useFiltersStore();
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [isPending, startTransition] = useTransition();
@@ -73,9 +72,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
           return;
         }
 
-        const isManuallySelected = manuallySelectedDays.some(
-          (day) => day.toDateString() === data.date.toDateString()
-        );
+        const isManuallySelected = manuallySelectedDays.some((day) => day.toDateString() === data.date.toDateString());
 
         if (isManuallySelected) {
           toast.error(t('manualDayExistsTitle'), {

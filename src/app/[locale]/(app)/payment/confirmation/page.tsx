@@ -91,7 +91,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
 
   const data = await Effect.runPromise(confirmation(paymentIntentId).pipe(Effect.provide(ApplicationLayer)));
 
-  if (!data || data.status !== 'succeeded') {
+  if (data?.status !== 'succeeded') {
     if (data) {
       logger.warn('Payment intent not succeeded', {
         paymentIntentId: data.id,

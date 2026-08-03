@@ -27,7 +27,7 @@ The rest of the application layer contract is in [`../CLAUDE.md`](../CLAUDE.md).
 | Store | Owns | Persisted |
 | --- | --- | --- |
 | `filters` | `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy` | all but `year` |
-| `holidays` | `holidays`, `suggestion`, `alternatives`, `maxAlternatives`, `currentSelection`, `currentSelectionIndex`, `previewAlternativeIndex`, `manuallySelectedDays`, `removedSuggestedDays`, `isCalculating`, `hasCalculated` | all but `previewAlternativeIndex`, `isCalculating` and `hasCalculated` |
+| `holidays` | `holidays`, `suggestion`, `alternatives`, `maxAlternatives`, `currentSelection`, `currentSelectionIndex`, `previewAlternativeIndex`, `manuallySelectedDays`, `removedSuggestedDays`, `isCalculating`, `hasCalculated`, `planRevision` | all but `previewAlternativeIndex`, `isCalculating`, `hasCalculated` and `planRevision` |
 | `location` | `countries`, `regions` | nothing |
 | `premium` | `premiumKey`, `userEmail`, `lastVerified`, `needsSessionCheck`, `isLoading`, `modalOpen`, `currentFeature` | the first four |
 | `ui` | `donatePopoverOpen`, `donatePopoverIsOpening`, `currency`, `currencySymbol` | nothing |
@@ -130,17 +130,25 @@ return early when the value they would write equals the current one, which is re
 twice or by computing a figure that happens to match the budget. Raise the flag only alongside a change that
 will actually trigger a run.
 
-**Applying an Alternative clears both hand-edit lists *and* recomputes the Metrics, and neither half works
-without the other.** Every stored Suggestion was sized by the worker against
-`effectivePtoDays = ptoDays - manualDays.length` — the manual count **at that run**. Since `toggleDaySelection`
-deliberately never re-plans, a Manual Day added afterwards is unreserved in every stored plan, so keeping the
-Manual Days on apply lets `days.length + manuallySelectedDays.length` exceed the budget; `getRemainingDays`
-and `CalendarList.remainingDays` both clamp with `Math.max(0, …)`, so the overdraft shows as zero rather than
-as a negative and is invisible. Clearing them alone is no better: each Suggestion's stored Metrics were
-measured *with* the Manual Days folded in, so the headline numbers would describe a plan larger than the
-calendar. The action therefore does both — clears `manuallySelectedDays` and `removedSuggestedDays`, then
-calls `generateMetrics` for the adopted plan with neither list — which is why it takes a `locale` the other
-alternative action does not need. Changing either half in isolation reintroduces one of the two bugs.
+**Applying an Alternative re-plans, and that is what makes the hand edits safe to keep.** Two things about a
+stored Suggestion go stale the moment it is adopted, and neither can be repaired locally:
+
+- Its size. The worker built it against `effectivePtoDays = ptoDays - manualDays.length`, the manual count
+  **at that run**, and `toggleDaySelection` deliberately never re-plans — so a Manual Day added afterwards is
+  unreserved in every stored plan. Keep the Manual Days and `days.length + manuallySelectedDays.length` can
+  exceed the budget; `getRemainingDays` and `CalendarList.remainingDays` both clamp with `Math.max(0, …)`, so
+  the overdraft reads as zero and is invisible.
+- Its Bridges. They were expanded through the Manual Days as pseudo-Holidays, so clearing those days leaves
+  spans crossing dates the calendar now paints as workdays, and `getTotalEffectiveDays` keeps counting them.
+
+Clearing the Manual Days fixes the first and causes the second; keeping them does the reverse. **Both were
+tried and both were wrong.** So the action keeps them — every Alternative was planned *around* them, and its
+Metrics were measured *with* them — and bumps `planRevision`, which `CalendarList` carries in its calculation
+effect's dependencies. A fresh run then sizes the budget against the current manual count and rebuilds the
+Bridges against the current calendar, and `setCalculationResult` preserves the index the user picked. An
+apply therefore costs one worker round trip; that is the price of the two guarantees. Removing the bump, or
+dropping `planRevision` from those dependencies, silently restores whichever half of the bug the other
+choice would have caused.
 
 **`clearCalculation` is the only way a plan is discarded without a new one replacing it.** It nulls the
 Suggestion, the Alternatives and the current selection, drops the Removed Days and marks `hasCalculated`, so
