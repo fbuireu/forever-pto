@@ -15,13 +15,13 @@ read by the premium activation path as well as by the payment one.
 
 | File | Exports | Requires |
 | --- | --- | --- |
-| `repository.ts` | `savePayment`, `updatePaymentStatus`, `updatePaymentCharge`, `getPaymentById`, `getPaymentByEmail`, the `PaymentChargeData` shape | `TursoService` |
+| `repository.ts` | `savePayment`, `updatePaymentStatus`, `updatePaymentCharge`, `getPaymentById`, `getPaymentByEmail`, `countPromoCodeRedemptions`, `normalizePromoCode`, the `PaymentChargeData` shape | `TursoService` |
 | `normalizeEmail.ts` | `normalizeEmail(email)` — trim and lower-case, applied on both sides of every address comparison | — |
 | `confirmation.ts` | `confirmation(paymentIntentId)` — a `PaymentConfirmationDTO`, or `null` on any failure | `StripeServerService`, `LoggerService` |
 | `rateLimit.ts` | `checkRateLimit(ip)` — fails with `RateLimitError` | the Cloudflare `RATE_LIMIT_KV` binding |
 | `provider/intent.ts` | `createPaymentIntent(params)` — the Stripe intent behind a Donation | `StripeServerService` |
 | `provider/charge.ts` | `retrieveCharge(chargeId)` — normalises a Stripe `Charge` into flat, nullable fields | `StripeServerService` |
-| `provider/promoCode.ts` | `validatePromoCode(code, amount)` — a `DiscountInfo`, or a `PromoCodeError` | `StripeServerService` |
+| `provider/promoCode.ts` | `validatePromoCode(code, amount)` — a `DiscountInfo`, or a `PromoCodeError` | `StripeServerService`, `TursoService` |
 
 `provider/` is the Stripe side; at the root sit the database, the KV limiter and the address normaliser, and
 `confirmation.ts` sits between: a Stripe read that exists only to render the post-checkout page.
@@ -120,6 +120,27 @@ the code, re-retrieves it with `expand: ['coupon']` — casting through `unknown
 not model the expansion — then evaluates the promotion code (active, expiry, redemptions, minimum amount)
 and only then the coupon (valid, redemptions, `redeem_by`). A code failing both reports the promotion-code
 reason. The `PromoCodeErrorCode` returned is a translation key the UI looks up, not a message.
+
+**The redemption cap is counted from our own table, because Stripe never learns the code was used.** A
+promotion code is redeemed by a Checkout Session, an Invoice or a Subscription; this app computes the
+discount locally and sends a bare `paymentIntents.create` with the amount already reduced, so
+`times_redeemed` stays 0 forever and the `max_redemptions` branch in `getPromotionCodeValidationError` can
+never fire on its own. A single-use 90%-off code was therefore permanent for anyone who learned it.
+`validatePromoCode` now counts succeeded rows in `payments` whose `promo_code` matches — normalised on both
+sides, since the column holds what the user typed while Stripe is queried with the upper-cased form — and
+refuses once the count reaches the cap. Three properties are deliberate:
+
+- **It queries only when the code declares a cap.** An uncapped code costs no database round trip.
+- **It fails open.** A failed count is caught to zero rather than refusing a paying donor over an outage,
+  matching the rate limiter's stance.
+- **It is best-effort, not atomic.** Two checkouts racing on the last redemption both see the old count and
+  both pass. Closing that needs a reservation row, which is more machinery than a promotional discount
+  warrants; the cap is a marketing control, not an entitlement.
+
+**The coupon-level cap is still unenforceable.** `coupon.max_redemptions` counts across every promotion code
+sharing that coupon, and the `payments` table records only the code the user typed, so counting by
+`promo_code` under-counts whenever one coupon has several codes. That branch remains dead for the same
+reason the promotion-code one was. Enforcing it means recording `couponId` on the payment row.
 
 **`MIN_FINAL_AMOUNT` is 0.5, in euros, applied after the discount.** A 100% coupon on a small Donation is
 rejected with `MIN_AMOUNT_EXCEEDED` rather than creating a zero-amount intent Stripe would refuse.

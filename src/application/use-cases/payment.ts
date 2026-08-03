@@ -26,7 +26,7 @@ interface PaymentResult {
 export const createPayment = (
   params: CreatePaymentInput,
   context: PaymentContext
-): Effect.Effect<PaymentResult, ValidationError | PaymentError | PromoCodeError, StripeServerService | LoggerService> =>
+): Effect.Effect<PaymentResult, ValidationError | PaymentError | PromoCodeError, StripeServerService | LoggerService | TursoService> =>
   Effect.gen(function* () {
     const { userAgent, ipAddress } = context;
     const logger = yield* LoggerService;

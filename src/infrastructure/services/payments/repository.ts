@@ -198,3 +198,15 @@ export const getPaymentByEmail = (email: string): Effect.Effect<PaymentData | un
     const row = rows[0];
     return row ? toPaymentData(row) : undefined;
   });
+
+export const normalizePromoCode = (code: string): string => code.trim().toUpperCase();
+
+export const countPromoCodeRedemptions = (code: string): Effect.Effect<number, DatabaseError, TursoService> =>
+  Effect.gen(function* () {
+    const turso = yield* TursoService;
+    const rows = yield* turso.query<{ redemptions: number }>(
+      `SELECT COUNT(*) AS redemptions FROM payments WHERE upper(trim(promo_code)) = ? AND status = 'succeeded'`,
+      [normalizePromoCode(code)]
+    );
+    return Number(rows[0]?.redemptions ?? 0);
+  });

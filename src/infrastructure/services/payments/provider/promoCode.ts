@@ -2,6 +2,8 @@ import type { DiscountInfo } from '@application/dto/payment/types';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
 import type { PromoCodeErrorCode } from '@infrastructure/errors';
 import { PromoCodeError, PromoCodeErrors } from '@infrastructure/errors';
+import type { TursoService } from '@infrastructure/clients/db/turso/service';
+import { countPromoCodeRedemptions } from '@infrastructure/services/payments/repository';
 import { Effect } from 'effect';
 import type Stripe from 'stripe';
 
@@ -48,7 +50,7 @@ const calculateFinalAmount = (coupon: Stripe.Coupon, amount: number) => {
 export const validatePromoCode = (
   code: string,
   amount: number
-): Effect.Effect<DiscountInfo, PromoCodeError, StripeServerService> =>
+): Effect.Effect<DiscountInfo, PromoCodeError, StripeServerService | TursoService> =>
   Effect.gen(function* () {
     const stripe = yield* StripeServerService;
 
@@ -70,6 +72,13 @@ export const validatePromoCode = (
 
     const validationError = getPromotionCodeValidationError(promotionCode, amount) ?? getCouponValidationError(coupon);
     if (validationError) return yield* Effect.fail(new PromoCodeError({ code: validationError }));
+
+    if (promotionCode.max_redemptions) {
+      const redemptions = yield* countPromoCodeRedemptions(code).pipe(Effect.catchAll(() => Effect.succeed(0)));
+      if (redemptions >= promotionCode.max_redemptions) {
+        return yield* Effect.fail(new PromoCodeError({ code: PromoCodeErrors.USAGE_LIMIT_REACHED }));
+      }
+    }
 
     const finalAmount = calculateFinalAmount(coupon, amount);
     if (finalAmount < MIN_FINAL_AMOUNT) {

@@ -1,3 +1,4 @@
+import { TursoService } from '@infrastructure/clients/db/turso/service';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
 import { PromoCodeError, PromoCodeErrors } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
@@ -8,6 +9,14 @@ const { validatePromoCode } = await import('./promoCode');
 const mockList = vi.fn();
 const mockRetrieve = vi.fn();
 
+const mockQuery = vi.fn((_sql: string, _args: unknown[]) => Effect.succeed([{ redemptions: 0 }]));
+
+const MockTursoLayer = Layer.succeed(TursoService, {
+  query: mockQuery,
+  execute: vi.fn(),
+  batch: vi.fn(),
+} as never);
+
 const MockStripeLayer = Layer.succeed(StripeServerService, {
   paymentIntents: { create: vi.fn(), retrieve: vi.fn() },
   charges: { retrieve: vi.fn() },
@@ -16,10 +25,10 @@ const MockStripeLayer = Layer.succeed(StripeServerService, {
 });
 
 const run = (code: string, amount: number) =>
-  Effect.runPromise(validatePromoCode(code, amount).pipe(Effect.provide(MockStripeLayer)));
+  Effect.runPromise(validatePromoCode(code, amount).pipe(Effect.provide(Layer.mergeAll(MockStripeLayer, MockTursoLayer))));
 
 const runFlip = (code: string, amount: number) =>
-  Effect.runPromise(validatePromoCode(code, amount).pipe(Effect.provide(MockStripeLayer), Effect.flip));
+  Effect.runPromise(validatePromoCode(code, amount).pipe(Effect.provide(Layer.mergeAll(MockStripeLayer, MockTursoLayer)), Effect.flip));
 
 type PromoCodeOverrides = Partial<{
   active: boolean;
@@ -131,6 +140,47 @@ describe('validatePromoCode', () => {
       setupMocks(makeCoupon({ percent_off: null, amount_off: 200, currency: null }));
       const error = await runFlip('FIXED2', 10);
       expect((error as PromoCodeError).code).toBe(PromoCodeErrors.COUPON_INVALID);
+    });
+
+    it('counts redemptions in our own records, since Stripe never sees the code redeemed', async () => {
+      setupMocks(makeCoupon(), { max_redemptions: 1 });
+      mockQuery.mockReturnValueOnce(Effect.succeed([{ redemptions: 1 }]));
+
+      const error = await runFlip('LAUNCH50', 10);
+
+      expect((error as PromoCodeError).code).toBe(PromoCodeErrors.USAGE_LIMIT_REACHED);
+    });
+
+    it('normalises the code on both sides of the count, since the table holds what the user typed', async () => {
+      setupMocks(makeCoupon(), { max_redemptions: 5 });
+
+      await run('  launch50  ', 10);
+
+      const [, args] = mockQuery.mock.calls[0] ?? [];
+      expect(args?.[0]).toBe('LAUNCH50');
+    });
+
+    it('still accepts the code while the cap has room left', async () => {
+      setupMocks(makeCoupon(), { max_redemptions: 3 });
+      mockQuery.mockReturnValueOnce(Effect.succeed([{ redemptions: 2 }]));
+
+      await expect(run('LAUNCH50', 10)).resolves.toMatchObject({ finalAmount: 9 });
+    });
+
+    it('does not query at all when the code carries no cap', async () => {
+      setupMocks(makeCoupon(), { max_redemptions: null });
+      mockQuery.mockClear();
+
+      await run('LAUNCH50', 10);
+
+      expect(mockQuery).not.toHaveBeenCalled();
+    });
+
+    it('lets the code through when the count itself fails, rather than blocking a paying donor', async () => {
+      setupMocks(makeCoupon(), { max_redemptions: 1 });
+      mockQuery.mockReturnValueOnce(Effect.fail(new Error('db down')) as never);
+
+      await expect(run('LAUNCH50', 10)).resolves.toMatchObject({ finalAmount: 9 });
     });
 
     it('fails with COUPON_INVALID when coupon is not valid', async () => {
