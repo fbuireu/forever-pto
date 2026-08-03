@@ -901,7 +901,7 @@
       "title": "Paiement échoué",
       "description": "Nous n'avons pas pu traiter ton paiement. Tu n'as pas été débité.",
       "unconfirmedTitle": "Paiement pas encore confirmé",
-      "unconfirmedDescription": "Nous n’avons pas pu confirmer ton paiement pour le moment. S’il a abouti, ton accès premium s’activera tout seul : recharge cette page dans un instant, ou contacte-nous si ce n’est pas le cas.",
+      "unconfirmedDescription": "Nous n’avons pas pu confirmer ton paiement pour le moment. S’il a abouti, récupère ton accès avec l’e-mail utilisé pour payer, ou contacte-nous.",
       "whatHappened": "Que s'est-il passé ?",
       "declined": "Ton paiement a peut-être été refusé",
       "authFailed": "L'authentification a peut-être échoué",

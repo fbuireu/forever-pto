@@ -45,6 +45,7 @@ export interface HolidaysState {
   manuallySelectedDays: Date[];
   removedSuggestedDays: Date[];
   isCalculating: boolean;
+  hasCalculated: boolean;
 }
 
 interface HolidaysActions {
@@ -114,6 +115,7 @@ const holidaysInitialState: HolidaysState = {
   manuallySelectedDays: [],
   removedSuggestedDays: [],
   isCalculating: false,
+  hasCalculated: false,
 };
 
 const serializeSuggestion = (suggestion: Suggestion) => ({
@@ -327,6 +329,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
             previewAlternativeIndex: preservedIndex,
             currentSelectionIndex: preservedIndex,
             removedSuggestedDays: [],
+            hasCalculated: true,
           });
         },
 

@@ -107,8 +107,11 @@ it the budget readout drops to zero for the length of every worker round-trip.
 **"No plan" is not "still loading", and `ManagementBar` keeps them apart.** Its `isReady` requires a
 Suggestion with days in it, so a run that legitimately produces nothing — a past year with the past-days
 switch off, which is the default and is Premium-gated, so a free user cannot even turn it on — used to leave
-the desktop panel as a `<Skeleton loading>` and the mobile drawer as a bare pulse, for ever. `isSettledEmpty`
-is the distinction: stores hydrated, nothing in flight, still no plan. The panel is then not rendered at all
+the desktop panel as a `<Skeleton loading>` and the mobile drawer as a bare pulse, for ever. `isSettledEmpty` is the distinction, and all three of its terms are load-bearing: stores hydrated, a
+calculation has completed at least once (`hasCalculated`, set by `setCalculationResult` and not persisted),
+nothing in flight, and still no plan. Without `hasCalculated` the cold load qualifies — `isCalculating` is a
+worker-only flag that the Holiday fetch never raises, so the window between hydration and the first run
+looked "settled" and the panel vanished on every visit. The panel is then not rendered at all
 rather than pretending to load. What it *should* say instead is an open copy question; showing nothing is
 merely the honest floor.
 

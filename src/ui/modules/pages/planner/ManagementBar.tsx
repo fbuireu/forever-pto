@@ -33,6 +33,7 @@ export const ManagementBar = () => {
     previewAlternativeIndex,
     currentSelectionIndex,
     isCalculating,
+    hasCalculated,
   } = useHolidaysStore(
     useShallow((state) => ({
       alternatives: state.alternatives,
@@ -42,6 +43,7 @@ export const ManagementBar = () => {
       setCurrentAlternativeSelection: state.setCurrentAlternativeSelection,
       previewAlternativeIndex: state.previewAlternativeIndex,
       isCalculating: state.isCalculating,
+      hasCalculated: state.hasCalculated,
       currentSelectionIndex: state.currentSelectionIndex,
     }))
   );
@@ -80,7 +82,7 @@ export const ManagementBar = () => {
   const hasValidCurrentSelection = currentSelection?.days && currentSelection.days.length > 0;
 
   const isReady = areStoresReady && hasValidSuggestions && hasValidCurrentSelection;
-  const isSettledEmpty = areStoresReady && !isCalculating && !isReady;
+  const isSettledEmpty = areStoresReady && hasCalculated && !isCalculating && !isReady;
 
   const plannerPanelProps = {
     currentSelectionIndex,

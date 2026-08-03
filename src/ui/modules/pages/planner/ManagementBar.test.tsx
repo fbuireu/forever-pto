@@ -60,12 +60,28 @@ describe('ManagementBar empty plan', () => {
     holidaysState.suggestion = null;
     holidaysState.currentSelection = null;
     holidaysState.alternatives = [];
-    (holidaysState as { isCalculating?: boolean }).isCalculating = false;
+    (holidaysState as { isCalculating?: boolean; hasCalculated?: boolean }).isCalculating = false;
+    (holidaysState as { hasCalculated?: boolean }).hasCalculated = true;
 
     const { container } = renderBar('es', esMessages);
 
     expect(container.querySelector('[data-tutorial="planner-drawer"]')).toBeNull();
     expect(container.textContent).not.toContain(esMessages.planner.heading);
+
+    readyState.areStoresReady = false;
+    (holidaysState as { hasCalculated?: boolean }).hasCalculated = false;
+  });
+
+  it('keeps the panel on a cold load, before any calculation has ever completed', () => {
+    readyState.areStoresReady = true;
+    holidaysState.suggestion = null;
+    holidaysState.currentSelection = null;
+    (holidaysState as { isCalculating?: boolean; hasCalculated?: boolean }).isCalculating = false;
+    (holidaysState as { hasCalculated?: boolean }).hasCalculated = false;
+
+    const { container } = renderBar('es', esMessages);
+
+    expect(container.textContent).toContain(esMessages.planner.heading);
 
     readyState.areStoresReady = false;
   });

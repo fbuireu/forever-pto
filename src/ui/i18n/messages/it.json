@@ -901,7 +901,7 @@
       "title": "Pagamento fallito",
       "description": "Non siamo riusciti a elaborare il tuo pagamento. Non ti è stato addebitato nulla.",
       "unconfirmedTitle": "Pagamento non ancora confermato",
-      "unconfirmedDescription": "Non siamo riusciti a confermare il tuo pagamento in questo momento. Se è andato a buon fine, il tuo accesso premium si attiverà da solo: ricarica questa pagina tra poco, oppure scrivici se non succede.",
+      "unconfirmedDescription": "Non siamo riusciti a confermare il tuo pagamento in questo momento. Se è andato a buon fine, recupera il tuo accesso con l’email con cui hai pagato, oppure scrivici.",
       "whatHappened": "Cosa è successo?",
       "declined": "Il tuo pagamento potrebbe essere stato rifiutato",
       "authFailed": "L'autenticazione potrebbe essere fallita",
