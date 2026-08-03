@@ -92,13 +92,15 @@ export const Summary = () => {
 
   const activeSuggestion = currentSelection ?? suggestion;
 
+  const holidaysInWindow = useMemo(() => (holidays ?? []).filter((holiday) => holiday.isInSelectedRange), [holidays]);
+
   const holidayMetrics = useMemo(() => {
-    const regionalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL).length ?? 0;
-    const nationalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.NATIONAL).length ?? 0;
-    const customDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.CUSTOM).length ?? 0;
+    const regionalDays = holidaysInWindow.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL).length;
+    const nationalDays = holidaysInWindow.filter((holiday) => holiday.variant === HolidayVariant.NATIONAL).length;
+    const customDays = holidaysInWindow.filter((holiday) => holiday.variant === HolidayVariant.CUSTOM).length;
     const totalHolidays = nationalDays + regionalDays + customDays;
     return { regionalDays, nationalDays, customDays, totalHolidays };
-  }, [holidays]);
+  }, [holidaysInWindow]);
 
   const locationInfo = useMemo(() => {
     const userCountry = countries.find(({ value }) => value.toLowerCase() === country.toLowerCase());
@@ -201,7 +203,7 @@ export const Summary = () => {
               />
             </div>
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
-              <HolidaysDistributionChart ptoDays={ptoDays} holidays={holidays ?? []} />
+              <HolidaysDistributionChart ptoDays={ptoDays} holidays={holidaysInWindow} />
               <QuarterDistributionChart quarterDist={metrics.quarterDist} />
             </div>
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>

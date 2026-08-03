@@ -40,6 +40,7 @@ export const CalendarList = () => {
     previewAlternativeIndex,
     toggleDaySelection,
     pruneDaysOutsideWindow,
+    clearCalculation,
   } = useHolidaysStore(
     useShallow((state) => ({
       holidays: state.holidays,
@@ -53,6 +54,7 @@ export const CalendarList = () => {
       previewAlternativeIndex: state.previewAlternativeIndex,
       toggleDaySelection: state.toggleDaySelection,
       pruneDaysOutsideWindow: state.pruneDaysOutsideWindow,
+      clearCalculation: state.clearCalculation,
     }))
   );
 
@@ -93,8 +95,22 @@ export const CalendarList = () => {
         strategy,
         locale,
       });
+      return;
     }
-  }, [triggerCalculation, year, ptoDays, allowPastDays, holidays, months, strategy, locale]);
+
+    if (suggestion) clearCalculation();
+  }, [
+    triggerCalculation,
+    clearCalculation,
+    suggestion,
+    year,
+    ptoDays,
+    allowPastDays,
+    holidays,
+    months,
+    strategy,
+    locale,
+  ]);
 
   return (
     <Skeleton

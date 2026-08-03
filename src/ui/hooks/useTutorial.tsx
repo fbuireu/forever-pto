@@ -175,11 +175,14 @@ export const useTutorial = () => {
 
   useEffect(() => {
     return () => {
-      void import('@infrastructure/clients/tutorial/driver/client')
-        .then(({ getDriverClientInstance }) => {
+      const destroyTour = async () => {
+        try {
+          const { getDriverClientInstance } = await import('@infrastructure/clients/tutorial/driver/client');
           getDriverClientInstance().destroy();
-        })
-        .catch(() => {});
+        } catch {}
+      };
+
+      void destroyTour();
     };
   }, []);
 

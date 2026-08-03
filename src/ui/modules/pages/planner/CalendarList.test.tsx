@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockFiltersState, mockHolidaysState, mockPrune, mockFetchHolidays, mockTriggerCalculation } = vi.hoisted(
+const { mockFiltersState, mockHolidaysState, mockPrune, mockClearCalculation, mockFetchHolidays, mockTriggerCalculation } = vi.hoisted(
   () => ({
     mockFiltersState: {
       carryOverMonths: 0,
@@ -26,6 +26,7 @@ const { mockFiltersState, mockHolidaysState, mockPrune, mockFetchHolidays, mockT
       previewAlternativeIndex: 0,
     },
     mockPrune: vi.fn(),
+    mockClearCalculation: vi.fn(),
     mockFetchHolidays: vi.fn(),
     mockTriggerCalculation: vi.fn(),
   })
@@ -42,6 +43,7 @@ vi.mock('@application/stores/holidays', () => ({
       fetchHolidays: mockFetchHolidays,
       toggleDaySelection: vi.fn(),
       pruneDaysOutsideWindow: mockPrune,
+      clearCalculation: mockClearCalculation,
     }),
 }));
 
@@ -70,6 +72,30 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockFiltersState.year = 2026;
   mockFiltersState.carryOverMonths = 0;
+  mockHolidaysState.holidays = [
+    { id: 'h1', date: new Date(2026, 0, 1), name: 'New Year', variant: 'national', isInSelectedRange: true },
+  ] as never;
+  mockHolidaysState.suggestion = null;
+});
+
+describe('CalendarList stale plans', () => {
+  it('clears the plan when the window has no Holidays left to build one from', () => {
+    mockHolidaysState.holidays = [];
+    mockHolidaysState.suggestion = { days: [new Date(2026, 0, 5)] } as never;
+
+    render(<CalendarList />);
+
+    expect(mockClearCalculation).toHaveBeenCalled();
+  });
+
+  it('does not clear on a cold load, when there is no plan to go stale', () => {
+    mockHolidaysState.holidays = [];
+    mockHolidaysState.suggestion = null;
+
+    render(<CalendarList />);
+
+    expect(mockClearCalculation).not.toHaveBeenCalled();
+  });
 });
 
 describe('CalendarList', () => {

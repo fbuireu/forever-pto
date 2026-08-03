@@ -498,7 +498,7 @@ export function Calendar({
           const isManualDay = modifiers.manuallySelected(date);
           const isSuggestedDay = modifiers.suggested(date);
 
-          const isDisabled = disabled ?? (isPastDay && !isManualDay && !isSuggestedDay);
+          const isDisabled = disabled || (isPastDay && !isManualDay && !isSuggestedDay);
           const isOutsideMonth = !isSameMonth(date, currentMonth);
 
           if (!showOutsideDays && isOutsideMonth) {

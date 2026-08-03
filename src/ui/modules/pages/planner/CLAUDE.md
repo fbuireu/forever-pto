@@ -60,6 +60,15 @@ is only ever painted where it *differs* from the applied Suggestion.
 
 ## Invariants
 
+**`CalendarList` also *clears* the plan, and that is the other half of the same effect.** Its trigger is
+gated on `ptoDays > 0 && holidays.length > 0 && months.length > 0`; when the gate closes the worker is never
+asked, and nothing else in the app nulls a Suggestion — `fetchHolidays` writes only `holidays`, on both its
+success and its catch branch. So a Country whose Holidays fail to load, or a Region that has none, used to
+leave the previous Country's plan painted over a calendar that no longer existed, with no way to re-trigger
+a run. The effect now calls `clearCalculation()` when the gate closes **and** a Suggestion is still standing.
+The second condition matters: without it, the cold load — where the gate is also closed, because Holidays
+have not arrived yet — would clear a plan that was never there and mark the store as having calculated.
+
 **Only `CalendarList.tsx` triggers a calculation.** It fires `triggerCalculation` on any change to
 year, PTO budget, Strategy, past-days flag, locale or the Holiday list. `Troubleshooting.tsx`, which now
 lives under `pages/homepage/support/`, is the one other caller and it goes the other way —
@@ -158,6 +167,18 @@ The other four charts use recharts and are the reason `Summary.tsx` loads all fi
 computes each cell's `isDisabled` as the past-day modifier *minus* those two, so a day the plan already
 contains can still be edited once its date has gone by. Disabling every past day instead would strand
 those days in the Suggestion with no way to remove them.
+
+That expression is combined with `||`, not `??`, and the difference is the whole rule. `disabled` is
+destructured with a default of `false`, so `disabled ?? (…)` never reached the past-day branch at all: every
+past day rendered as an enabled, focusable button with the hover lift, dimmed only by the independent
+opacity class. `||` is what makes a caller's explicit `disabled` and the past-day rule both count.
+
+**The Summary counts Holidays inside the Planning Window only.** The store holds two years so the UI can
+show the extra ones for context, so the Holidays metric card, the composition pie, the "specific to your
+region" line and the custom-Holiday banner all read a list filtered on `isInSelectedRange` — otherwise the
+headline figure is roughly double what the Holidays table beside it lists. This is a *display* filter and
+belongs here; the same narrowing applied to `generateMetrics` was tried and reverted, for the reason in
+[`@domain/calendar/CLAUDE.md`](../../../../domain/calendar/CLAUDE.md).
 
 **`data-tutorial` attributes are load-bearing.** `calendar-list`, `holidays-list`, `planner-drawer`,
 `alternatives-manager` and `pto-status` are the driver.js anchors. `ManagementBar` additionally listens

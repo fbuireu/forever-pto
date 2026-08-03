@@ -27,7 +27,7 @@ The rest of the application layer contract is in [`../CLAUDE.md`](../CLAUDE.md).
 | Store | Owns | Persisted |
 | --- | --- | --- |
 | `filters` | `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy` | all but `year` |
-| `holidays` | `holidays`, `suggestion`, `alternatives`, `maxAlternatives`, `currentSelection`, `currentSelectionIndex`, `previewAlternativeIndex`, `manuallySelectedDays`, `removedSuggestedDays`, `isCalculating` | all but `previewAlternativeIndex` and `isCalculating` |
+| `holidays` | `holidays`, `suggestion`, `alternatives`, `maxAlternatives`, `currentSelection`, `currentSelectionIndex`, `previewAlternativeIndex`, `manuallySelectedDays`, `removedSuggestedDays`, `isCalculating`, `hasCalculated` | all but `previewAlternativeIndex`, `isCalculating` and `hasCalculated` |
 | `location` | `countries`, `regions` | nothing |
 | `premium` | `premiumKey`, `userEmail`, `lastVerified`, `needsSessionCheck`, `isLoading`, `modalOpen`, `currentFeature` | the first four |
 | `ui` | `donatePopoverOpen`, `donatePopoverIsOpening`, `currency`, `currencySymbol` | nothing |
@@ -141,6 +141,12 @@ measured *with* the Manual Days folded in, so the headline numbers would describ
 calendar. The action therefore does both — clears `manuallySelectedDays` and `removedSuggestedDays`, then
 calls `generateMetrics` for the adopted plan with neither list — which is why it takes a `locale` the other
 alternative action does not need. Changing either half in isolation reintroduces one of the two bugs.
+
+**`clearCalculation` is the only way a plan is discarded without a new one replacing it.** It nulls the
+Suggestion, the Alternatives and the current selection, drops the Removed Days and marks `hasCalculated`, so
+the planner shows its settled-empty state rather than a skeleton. Its one caller is `CalendarList`, when the
+calculation gate closes while a plan is still standing — see
+[`../../ui/modules/pages/planner/CLAUDE.md`](../../ui/modules/pages/planner/CLAUDE.md).
 
 **`editHoliday` carries the same collision rule as `addHoliday`, because moving a Holiday onto a date is
 the same act as creating one there.** It refuses a target date already held by another Holiday or by a
