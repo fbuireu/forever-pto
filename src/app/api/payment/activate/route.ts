@@ -11,8 +11,6 @@ import { hasLocale } from 'next-intl';
 import { after, type NextRequest, NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 
-export const dynamic = 'force-dynamic';
-
 const SUCCEEDED_REDIRECT_STATUS: Stripe.PaymentIntent.Status = 'succeeded';
 
 export async function GET(request: NextRequest) {

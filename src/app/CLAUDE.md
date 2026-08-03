@@ -142,8 +142,11 @@ four guards:
 - **`redirect_status` short-circuits.** Stripe says whether the redirect succeeded; if it did not, the
   handler never calls Stripe at all.
 - **Rate-limited on `cf-connecting-ip`**, through the same `checkRateLimit` the payment route uses.
-- **Never cached.** `dynamic = 'force-dynamic'` plus an explicit `no-store`, because the response carries a
-  `Set-Cookie`.
+- **Never cached**, through an explicit `no-store` header on the redirect, because the response carries a
+  `Set-Cookie`. It must **not** also declare `export const dynamic = 'force-dynamic'`: this app runs with
+  `cacheComponents` enabled in `next.config.ts`, and Turbopack rejects that route segment config outright —
+  `next build` fails with "Route segment config "dynamic" is not compatible with
+  `nextConfig.cacheComponents`". The header is the whole mechanism.
 
 Failure is never silent and never a lie: the handler redirects with `activation=failed` and the page then
 renders `premiumActivationFailed` — the payer is told their money went through and their access did not,
