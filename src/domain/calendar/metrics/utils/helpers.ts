@@ -14,10 +14,28 @@ import {
 import type { Locale } from 'next-intl';
 import type { Bridge } from '../../types';
 
-export function getMonthlyDist(days: Date[]) {
-  const monthlyDist = new Array(12).fill(0);
+export const MONTHS_IN_YEAR = 12;
+export const MONTHS_IN_QUARTER = 3;
+
+export interface PlanningWindowShape {
+  year: number;
+  carryOverMonths: number;
+}
+
+export const windowMonthCount = ({ carryOverMonths }: Pick<PlanningWindowShape, 'carryOverMonths'>) =>
+  MONTHS_IN_YEAR + carryOverMonths;
+
+export const windowQuarterCount = (window: Pick<PlanningWindowShape, 'carryOverMonths'>) =>
+  Math.ceil(windowMonthCount(window) / MONTHS_IN_QUARTER);
+
+export const windowMonthIndex = (date: Date, { year }: Pick<PlanningWindowShape, 'year'>) =>
+  (getYear(date) - year) * MONTHS_IN_YEAR + getMonth(date);
+
+export function getMonthlyDist(days: Date[], window: PlanningWindowShape) {
+  const monthlyDist = new Array(windowMonthCount(window)).fill(0);
   days.forEach((date) => {
-    monthlyDist[getMonth(date)]++;
+    const index = windowMonthIndex(date, window);
+    if (index >= 0 && index < monthlyDist.length) monthlyDist[index]++;
   });
   return monthlyDist;
 }
@@ -25,10 +43,11 @@ export function getMonthlyDist(days: Date[]) {
 interface GetLongBlocksPerQuarterParams {
   ptoDays: Date[];
   holidays: HolidayDTO[];
+  window: PlanningWindowShape;
 }
 
-export function getLongBlocksPerQuarter({ ptoDays, holidays }: GetLongBlocksPerQuarterParams) {
-  const longBlocksPerQuarter = [0, 0, 0, 0];
+export function getLongBlocksPerQuarter({ ptoDays, holidays, window }: GetLongBlocksPerQuarterParams) {
+  const longBlocksPerQuarter = new Array(windowQuarterCount(window)).fill(0);
   if (ptoDays.length === 0) return longBlocksPerQuarter;
 
   const freeDays = new Set([...ptoDays.map((d) => d.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
@@ -43,7 +62,8 @@ export function getLongBlocksPerQuarter({ ptoDays, holidays }: GetLongBlocksPerQ
   const closeBlock = () => {
     const start = currentBlock.at(0);
     if (currentBlock.length >= 3 && start !== undefined) {
-      longBlocksPerQuarter[Math.floor(getMonth(start) / 3)]++;
+      const quarter = Math.floor(windowMonthIndex(start, window) / MONTHS_IN_QUARTER);
+      if (quarter >= 0 && quarter < longBlocksPerQuarter.length) longBlocksPerQuarter[quarter]++;
     }
     currentBlock = [];
   };
@@ -155,13 +175,12 @@ export const getFirstLastBreak = ({ dates, locale }: GetFirstLastBreak) => {
   };
 };
 
-export const calculateQuarterDistribution = (dates: Date[]) => {
-  const quarters = [0, 0, 0, 0];
+export const calculateQuarterDistribution = (dates: Date[], window: PlanningWindowShape) => {
+  const quarters = new Array(windowQuarterCount(window)).fill(0);
 
   dates?.forEach((date) => {
-    const month = getMonth(date);
-    const quarter = Math.floor(month / 3);
-    quarters[quarter]++;
+    const quarter = Math.floor(windowMonthIndex(date, window) / MONTHS_IN_QUARTER);
+    if (quarter >= 0 && quarter < quarters.length) quarters[quarter]++;
   });
 
   return quarters;
@@ -233,7 +252,8 @@ interface CalculateLongWeekendsParams {
 export const calculateLongWeekends = ({ ptoDays, holidays }: CalculateLongWeekendsParams) => {
   if (ptoDays.length === 0) return 0;
 
-  const freeDays = new Set([...ptoDays.map((d) => d.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
+  const placedDays = new Set(ptoDays.map((d) => d.toDateString()));
+  const freeDays = new Set([...placedDays, ...holidays.map((h) => h.date.toDateString())]);
 
   let longWeekends = 0;
   const allDates = [...ptoDays, ...holidays.map((h) => h.date)].toSorted((a, b) => a.getTime() - b.getTime());
@@ -256,8 +276,8 @@ export const calculateLongWeekends = ({ ptoDays, holidays }: CalculateLongWeeken
     } else {
       if (currentStreak.length >= 3) {
         const hasWeekend = currentStreak.some((d) => isWeekend(d));
-        const hasPtoOrHoliday = currentStreak.some((d) => freeDays.has(d.toDateString()) && !isWeekend(d));
-        if (hasWeekend && hasPtoOrHoliday) {
+        const hasPlacedDay = currentStreak.some((d) => placedDays.has(d.toDateString()));
+        if (hasWeekend && hasPlacedDay) {
           longWeekends++;
         }
       }
@@ -267,8 +287,8 @@ export const calculateLongWeekends = ({ ptoDays, holidays }: CalculateLongWeeken
 
   if (currentStreak.length >= 3) {
     const hasWeekend = currentStreak.some((d) => isWeekend(d));
-    const hasPtoOrHoliday = currentStreak.some((d) => freeDays.has(d.toDateString()) && !isWeekend(d));
-    if (hasWeekend && hasPtoOrHoliday) {
+    const hasPlacedDay = currentStreak.some((d) => placedDays.has(d.toDateString()));
+    if (hasWeekend && hasPlacedDay) {
       longWeekends++;
     }
   }

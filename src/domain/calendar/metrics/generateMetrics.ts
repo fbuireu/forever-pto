@@ -11,6 +11,8 @@ import {
   getFirstLastBreak,
   getLongBlocksPerQuarter,
   getMonthlyDist,
+  windowMonthCount,
+  windowQuarterCount,
   getTotalEffectiveDays,
   getWorkedDaysPerMonth,
 } from './utils/helpers';
@@ -25,6 +27,7 @@ interface GenerateMetricsParams {
   manuallySelectedDays?: Date[];
   removedSuggestedDays?: Date[];
   totalPtoBudget?: number;
+  carryOverMonths?: number;
 }
 
 export const generateMetrics = ({
@@ -36,7 +39,9 @@ export const generateMetrics = ({
   allowPastDays,
   manuallySelectedDays = [],
   removedSuggestedDays = [],
+  carryOverMonths = 0,
 }: GenerateMetricsParams) => {
+  const planningWindow = { year, carryOverMonths };
   const days = resolveSelectedDays({ days: suggestion.days, manuallySelectedDays, removedSuggestedDays });
 
   if (days.length === 0) {
@@ -47,17 +52,17 @@ export const generateMetrics = ({
       firstLastBreak: null,
       averageEfficiency: 0,
       bonusDays: 0,
-      quarterDist: [0, 0, 0, 0],
+      quarterDist: new Array(windowQuarterCount(planningWindow)).fill(0),
       bridgesUsed: 0,
       workedDaysPerMonth: 0,
       totalEffectiveDays: 0,
-      monthlyDist: new Array(12).fill(0),
-      longBlocksPerQuarter: new Array(4).fill(0),
+      monthlyDist: new Array(windowMonthCount(planningWindow)).fill(0),
+      longBlocksPerQuarter: new Array(windowQuarterCount(planningWindow)).fill(0),
       longestVacation: 0,
     };
   }
-  const monthlyDist = getMonthlyDist(days);
-  const longBlocksPerQuarter = getLongBlocksPerQuarter({ ptoDays: days, holidays });
+  const monthlyDist = getMonthlyDist(days, planningWindow);
+  const longBlocksPerQuarter = getLongBlocksPerQuarter({ ptoDays: days, holidays, window: planningWindow });
   const totalEffectiveDays = getTotalEffectiveDays(days, bridges);
   const longWeekends = calculateLongWeekends({ ptoDays: days, holidays });
   const longestVacation = calculateLongestVacation({ ptoDays: days, holidays });
@@ -70,7 +75,7 @@ export const generateMetrics = ({
     year,
   });
   const firstLastBreak = getFirstLastBreak({ dates: days, locale });
-  const quarterDist = calculateQuarterDistribution(days);
+  const quarterDist = calculateQuarterDistribution(days, planningWindow);
   const workedDaysPerMonth = getWorkedDaysPerMonth({
     ptoDays: days,
     holidays,

@@ -10,6 +10,7 @@ import {
   isWithinInterval,
 } from '@application/shared/utils/dates';
 import { generateMetrics } from '@domain/calendar/metrics/generateMetrics';
+import { MONTHS_IN_YEAR } from '@domain/calendar/metrics/utils/helpers';
 import type { Suggestion } from '@domain/calendar/types';
 import type { BetterStackClient } from '@infrastructure/clients/logging/better-stack/client';
 import type { Locale } from 'next-intl';
@@ -209,6 +210,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
             variant: HolidayVariant.CUSTOM,
             isInSelectedRange: true,
           }));
+          const carryOverMonths = Math.max(0, months.length - MONTHS_IN_YEAR);
           const holidaysWithManual = [...holidays, ...manualPseudoHolidays];
           const effectivePtoDays = Math.max(0, autoSuggestCount ?? ptoDays - manuallySelectedDays.length);
 
@@ -242,6 +244,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               allowPastDays,
               manuallySelectedDays,
               removedSuggestedDays,
+              carryOverMonths,
             };
 
             const baseSuggestion = generateSuggestions({
@@ -275,6 +278,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
                 allowPastDays,
                 manuallySelectedDays,
                 removedSuggestedDays,
+                carryOverMonths,
               }),
             };
 

@@ -17,7 +17,7 @@ export const BlocksPerQuarterChart = ({ blocksPerQuarter }: BlockPerQuarterChart
   const data = blocksPerQuarter.map((value, index) => ({
     name: `Q${index + 1}`,
     blocks: value,
-    color: COLOR_SCHEMES[blocksPerQuarter.length - index - 1],
+    color: COLOR_SCHEMES[(blocksPerQuarter.length - index - 1) % COLOR_SCHEMES.length],
   }));
 
   const totalBlocks = blocksPerQuarter.reduce((sum, blocks) => sum + blocks, 0);

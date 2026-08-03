@@ -22,7 +22,7 @@ in [`CONTEXT.md`](../../../CONTEXT.md).
 | `suggestions/utils/selectors.ts` | `selectBridgesForStrategy` (Grouped, Optimized) and `selectOptimalDaysFromBridges` (Balanced) |
 | `alternatives/generateAlternatives.ts` | Re-runs selection under seven different Bridge orderings to produce distinct Alternatives |
 | `metrics/generateMetrics.ts` | Assembles the `Metrics` object for a Suggestion or an Alternative |
-| `metrics/utils/helpers.ts` | One function per metric — Long Weekends, Rest Blocks, Max Work Streak, Longest Vacation, Worked Days per month, quarterly and monthly distribution |
+| `metrics/utils/helpers.ts` | One function per metric — Long Weekends, Rest Blocks, Max Work Streak, Longest Vacation, Worked Days per month, quarterly and monthly distribution — plus `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER` and the three `window*` helpers that size those distributions |
 
 ## Public API
 
@@ -30,7 +30,7 @@ Three entry points, all called from outside the domain and never from each other
 
 - `generateSuggestions({ ptoDays, holidays, allowPastDays, months, strategy, removedDays? })` → `{ days, bridges?, strategy }`
 - `generateAlternatives({ …, maxAlternatives, existingSuggestion, removedDays? })` → `Suggestion[]`
-- `generateMetrics({ suggestion, locale, year, bridges, holidays, allowPastDays, manuallySelectedDays?, removedSuggestedDays? })` → `Metrics`
+- `generateMetrics({ suggestion, locale, year, bridges, holidays, allowPastDays, manuallySelectedDays?, removedSuggestedDays?, carryOverMonths? })` → `Metrics`
 
 `resolveSelectedDays` is the fourth export the outside world uses: `generateMetrics` applies it to its own
 input, and `CalendarExport.tsx` applies it again so the exported calendar contains exactly the days the
@@ -109,25 +109,26 @@ then reports that expanded span. Filtering only the *Metrics* input leaves Longe
 and Long Blocks scanning a calendar missing the very day the span was built on, so they contradict Effective
 Days inside the same Metrics object. Whatever the engine plans against, the Metrics measure against.
 
-The cost of that rule is real and is the open question: a Long Weekend that next year's public Holidays form
-on their own, with no PTO Day near it, is still counted for a plan that does not touch that year — while
-[`CONTEXT.md`](../../../CONTEXT.md) calls Longest Vacation the longest stretch *the plan produces*. Scoping
-it properly means requiring a stretch to contain a placed day, not trimming the Holiday list, and that
-changes what the Long Weekend card counts. Like the distribution bucketing below, it is a product call and
-is written down rather than guessed at.
+That rule leaves the Metrics seeing Holidays from outside the Planning Window, and **`calculateLongWeekends`
+is what stops them being counted as the plan's own work**: a stretch is a Long Weekend only when it contains
+a day the plan actually placed, not merely any free weekday. Holidays still extend a stretch — that is what
+a Bridge is for — but a run that next year's public Holidays form on their own no longer scores. This is the
+same standard [`CONTEXT.md`](../../../CONTEXT.md) sets for Longest Vacation, *the longest stretch the plan
+produces*, and it is why the fix belongs in the streak test rather than in the Holiday list the engine is
+handed.
 
-**`monthlyDist` and `quarterDist` bucket by month alone, so a Carry-over Month folds into the same month of
-the planning year.** `getMonthlyDist` and `calculateQuarterDistribution` read `getMonth(date)` and nothing
-else, and the arrays are a fixed 12 and 4 long. With `carryOverMonths: 1` a PTO Day placed on 5 January 2027
-inside the 2026 Planning Window is counted in the January column beside days from January 2026 — two months
-twelve months apart, added together. `generateMetrics` does receive `year`, so the information to separate
-them is there.
+**The distributions are bucketed by the Planning Window, not the calendar year.** `getMonthlyDist`,
+`calculateQuarterDistribution` and `getLongBlocksPerQuarter` all take the window and size themselves from
+it: `MONTHS_IN_YEAR + carryOverMonths` buckets for the months, and that count divided into
+`MONTHS_IN_QUARTER` for the quarters. `windowMonthIndex` places a date at `(year(date) - year) * 12 +
+month(date)`, so 5 January 2027 inside a 2026 window lands in bucket 12 rather than folding into January
+2026 — two months twelve months apart used to be added together. A date outside the window is dropped, not
+clamped.
 
-This is recorded rather than fixed because both repairs change what the chart means, and that is a product
-call, not a refactor: filtering the days outside the planning year makes the columns stop summing to the
-plan's day count, while widening the arrays to `12 + carryOverMonths` changes the shape every consumer
-chart renders. Do not quietly pick one — the same reasoning that keeps the two `Summary.tsx` denominators
-apart applies here.
+Neither planning entry point passes `carryOverMonths` on the wire: both derive it as `months.length -
+MONTHS_IN_YEAR`, because `months` already *is* the window. Charts must therefore treat these arrays as
+variable-length — `MonthlyDistributionChart` already did, and the two quarter charts index
+`COLOR_SCHEMES` modulo its length, since four brand colours no longer cover every bucket.
 
 **A multi-day Bridge is consecutive *calendar* days that are all Workdays.** `findBridges` builds a
 candidate with `addDays(workday, i)` and requires every step to be in the Workday set, so a Friday and the

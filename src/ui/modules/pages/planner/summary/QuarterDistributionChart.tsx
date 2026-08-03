@@ -18,7 +18,7 @@ export const QuarterDistributionChart = ({ quarterDist }: QuarterDistributionCha
   const data = quarterDist.map((value, index) => ({
     name: `Q${index + 1}`,
     days: value,
-    color: COLOR_SCHEMES[index],
+    color: COLOR_SCHEMES[index % COLOR_SCHEMES.length],
   }));
 
   const totalDays = quarterDist.reduce((sum, days) => sum + days, 0);

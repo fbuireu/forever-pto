@@ -1,6 +1,7 @@
 import { HolidayVariant } from '@application/dto/holiday/types';
 import { generateAlternatives } from '@domain/calendar/alternatives/generateAlternatives';
 import { generateMetrics } from '@domain/calendar/metrics/generateMetrics';
+import { MONTHS_IN_YEAR } from '@domain/calendar/metrics/utils/helpers';
 import { generateSuggestions } from '@domain/calendar/suggestions/generateSuggestions';
 import type { FilterStrategy, Metrics } from '@domain/calendar/types';
 import { clearDateKeyCache, clearHolidayCache } from '@domain/calendar/utils/cache';
@@ -48,6 +49,7 @@ globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
 
     const holidays = deserializeHolidays(rawHolidays);
     const months = deserializeMonths(rawMonths);
+    const carryOverMonths = Math.max(0, months.length - MONTHS_IN_YEAR);
 
     const manualPseudoHolidays = manualDays.map((isoDate, i) => ({
       id: `manual-${i}`,
@@ -104,6 +106,7 @@ globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
         allowPastDays,
         manuallySelectedDays: manualDates,
         removedSuggestedDays: removedDates,
+        carryOverMonths,
       }),
     };
 
@@ -118,6 +121,7 @@ globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
         allowPastDays,
         manuallySelectedDays: manualDates,
         removedSuggestedDays: removedDates,
+        carryOverMonths,
       }),
     }));
 
