@@ -267,7 +267,7 @@
     "distributionDescription": "Distribuzione dei tuoi {ptoDays} giorni PTO, {nationalDays} festivi nazionali{regionalPart}{customPart}.",
     "regionalPart": ", {regionalDays} regionali",
     "customPart": " e {customDays} personalizzati",
-    "quarterDescription": "Distribuzione di {totalDays} giorni liberi effettivi nel corso di {activeQuarters, plural, one {# trimestre} other {# trimestri}} dell'anno.",
+    "quarterDescription": "Distribuzione di {totalDays} giorni effettivi nel corso di {activeQuarters, plural, one {# trimestre} other {# trimestri}} della tua finestra di pianificazione.",
     "annualTimeline": "Linea temporale annuale",
     "annualTimelineFeature": "Grafico della linea temporale annuale",
     "timelineDescription": "Evoluzione mensile di {totalDays} giorni liberi distribuiti in {activeMonths} mesi. Picco a {peakMonth} con {peakDays} giorni.",

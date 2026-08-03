@@ -1059,3 +1059,43 @@ describe('generateSuggestions agrees with the worker', () => {
     expect(useHolidaysStore.getState().alternatives).toHaveLength(0);
   });
 });
+
+describe('every Metrics writer measures against the same Planning Window', () => {
+  it('toggleDaySelection passes carryOverMonths, so one click cannot collapse the distributions', async () => {
+    const { generateMetrics } = await import('@domain/calendar/metrics/generateMetrics');
+    useFiltersStore.setState({ carryOverMonths: 2, year: 2026 });
+    useHolidaysStore.setState({
+      currentSelection: { days: [], bridges: [], metrics: null } as never,
+      manuallySelectedDays: [],
+      removedSuggestedDays: [],
+      holidays: [],
+    });
+
+    useHolidaysStore
+      .getState()
+      .toggleDaySelection({ date: new Date(2026, 2, 11), totalPtoDays: 10, locale: 'en', allowPastDays: true });
+
+    const [args] = vi.mocked(generateMetrics).mock.lastCall ?? [];
+    expect(args?.carryOverMonths).toBe(2);
+  });
+
+  it('the store pipeline forwards it to every Alternative too', async () => {
+    const { generateMetrics } = await import('@domain/calendar/metrics/generateMetrics');
+    vi.mocked(generateMetrics).mockClear();
+    mockGenerateAlternativesImpl.mockReturnValueOnce([{ days: [new Date(2026, 0, 5)], bridges: [] }]);
+    useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')] });
+
+    await useHolidaysStore.getState().generateSuggestions({
+      year: 2026,
+      ptoDays: 5,
+      allowPastDays: false,
+      months: Array.from({ length: 14 }, (_, i) => new Date(2026, i, 1)),
+      strategy: FilterStrategy.GROUPED,
+      locale: 'en',
+    });
+
+    const calls = vi.mocked(generateMetrics).mock.calls;
+    expect(calls.length).toBeGreaterThan(0);
+    for (const [args] of calls) expect(args.carryOverMonths).toBe(2);
+  });
+});

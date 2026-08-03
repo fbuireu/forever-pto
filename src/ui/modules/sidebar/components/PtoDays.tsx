@@ -28,7 +28,6 @@ export const PtoDays = () => {
     resetManualSelection,
     trimManualDays,
     isCalculating,
-    setCalculating,
   } = useHolidaysStore(
     useShallow((state) => ({
       currentSelection: state.currentSelection,
@@ -37,7 +36,6 @@ export const PtoDays = () => {
       resetManualSelection: state.resetManualSelection,
       trimManualDays: state.trimManualDays,
       isCalculating: state.isCalculating,
-      setCalculating: state.setCalculating,
     }))
   );
   const isDecrementDisabled = ptoDays <= MIN_PTO_DAYS;
@@ -59,11 +57,10 @@ export const PtoDays = () => {
       const newValue = Math.max(MIN_PTO_DAYS, value);
       if (newValue === ptoDays) return;
 
-      setCalculating(true);
       setPtoDays(newValue);
       trimManualDays(newValue);
     },
-    [setCalculating, setPtoDays, trimManualDays, ptoDays]
+    [setPtoDays, trimManualDays, ptoDays]
   );
 
   return (

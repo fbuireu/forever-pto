@@ -267,7 +267,7 @@
     "distributionDescription": "Répartition de tes {ptoDays} jours de congé, {nationalDays} jours fériés nationaux{regionalPart}{customPart}.",
     "regionalPart": ", {regionalDays} régionaux",
     "customPart": " et {customDays} personnalisés",
-    "quarterDescription": "Répartition de {totalDays} jours de repos effectifs sur {activeQuarters, plural, one {# trimestre} other {# trimestres}} de l'année.",
+    "quarterDescription": "Répartition de {totalDays} jours effectifs sur {activeQuarters, plural, one {# trimestre} other {# trimestres}} de ta fenêtre de planification.",
     "annualTimeline": "Chronologie annuelle",
     "annualTimelineFeature": "Graphique de chronologie annuelle",
     "timelineDescription": "Évolution mensuelle de {totalDays} jours de repos répartis sur {activeMonths} mois. Pic en {peakMonth} avec {peakDays} jours.",

@@ -57,12 +57,17 @@ None of this is lint-enforced. Biome has no import-boundary rule; these are conv
 
 ## Gotchas
 
-**`hooks/useCalculationsWorker.ts` caps the auto-suggested count only when the PTO budget has not
-moved.** It compares the budget of the last completed run with the one being requested: an unchanged
-budget caps the request at the number of Suggested Days still active, so the user's Removed Days
-survive the recalculation; a changed budget sends no cap at all, because the user asked for the full
-new allowance. A cap of nought is dropped rather than sent — it is what an emptied selection produces,
-and honouring it would store another empty plan and re-derive nought on every later run.
+**`hooks/useCalculationsWorker.ts` caps the auto-suggested count only to protect Removed Days.** It compares the budget of the last completed run with the one being requested: an unchanged
+budget caps the request at the number of Suggested Days still active, so the user's Removed Days survive the
+recalculation; a changed budget sends no cap at all, because the user asked for the full new allowance. A cap
+of nought is dropped rather than sent — it is what an emptied selection produces, and honouring it would
+store another empty plan and re-derive nought on every later run.
+
+**With no Removed Days there is nothing to protect, so no cap is sent.** That is not an optimisation: after
+applying an Alternative the store holds it as `currentSelection` with `removedSuggestedDays` cleared, and the
+re-plan that follows would otherwise be capped at that Alternative's own day count. An Alternative that
+placed fewer days than the budget would then be re-planned smaller than the one the user previewed, and could
+never grow back — the cap ratchets downwards on every later run.
 
 **The same hook reads the hand-edited days non-reactively, and that is what keeps a manual edit from
 re-planning the year.** `manuallySelectedDays`, `removedSuggestedDays` and `currentSelection` all come out

@@ -267,7 +267,7 @@
     "distributionDescription": "Verteilung deiner {ptoDays} PTO-Tage, {nationalDays} nationalen Feiertage{regionalPart}{customPart}.",
     "regionalPart": ", {regionalDays} regionalen",
     "customPart": " und {customDays} eigenen",
-    "quarterDescription": "Verteilung von {totalDays} effektiven freien Tagen auf {activeQuarters, plural, one {# Quartal} other {# Quartale}} des Jahres.",
+    "quarterDescription": "Verteilung von {totalDays} effektiven Tagen auf {activeQuarters, plural, one {# Quartal} other {# Quartale}} deines Planungszeitraums.",
     "annualTimeline": "Jahresübersicht",
     "annualTimelineFeature": "Diagramm: Jahresübersicht",
     "timelineDescription": "Monatliche Entwicklung von {totalDays} freien Tagen verteilt auf {activeMonths} Monate. Höchstwert im {peakMonth} mit {peakDays} Tagen.",

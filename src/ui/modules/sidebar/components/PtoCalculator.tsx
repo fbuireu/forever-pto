@@ -38,12 +38,7 @@ export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
       setPtoDays: state.setPtoDays,
     }))
   );
-  const { setCalculating, trimManualDays } = useHolidaysStore(
-    useShallow((state) => ({
-      setCalculating: state.setCalculating,
-      trimManualDays: state.trimManualDays,
-    }))
-  );
+  const trimManualDays = useHolidaysStore((state) => state.trimManualDays);
 
   const monthOptions: MonthOption[] = useMemo(() => {
     const monthNames = getMonthNames({
@@ -75,7 +70,6 @@ export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
     const nextBudget = Math.max(MIN_PTO_DAYS, Math.round(days));
     if (nextBudget === ptoDays) return;
 
-    setCalculating(true);
     setPtoDays(nextBudget);
     trimManualDays(nextBudget);
   };

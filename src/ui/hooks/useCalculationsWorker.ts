@@ -70,9 +70,11 @@ export function useCalculationsWorker() {
       const { removedSuggestedDays, currentSelection, manuallySelectedDays } = useHolidaysStore.getState();
 
       const budgetForAutoSuggest = params.ptoDays - manuallySelectedDays.length;
-      const activeSuggestedDays = currentSelection
-        ? Math.max(0, currentSelection.days.length - removedSuggestedDays.length)
-        : undefined;
+      const hasRemovedDays = removedSuggestedDays.length > 0;
+      const activeSuggestedDays =
+        currentSelection && hasRemovedDays
+          ? Math.max(0, currentSelection.days.length - removedSuggestedDays.length)
+          : undefined;
 
       const ptoDaysChanged =
         lastCalculatedPtoDaysRef.current !== null && lastCalculatedPtoDaysRef.current !== params.ptoDays;

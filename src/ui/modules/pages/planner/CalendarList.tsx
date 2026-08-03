@@ -87,34 +87,25 @@ export const CalendarList = () => {
     fetchHolidays({ year, region, country, locale, carryOverMonths });
   }, [fetchHolidays, year, region, country, locale, carryOverMonths]);
 
+  const canCalculate = ptoDays > 0 && holidays.length > 0 && months.length > 0;
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: planRevision is a re-plan signal, not a value the body reads
   useEffect(() => {
-    if (ptoDays > 0 && holidays.length > 0 && months.length > 0) {
-      triggerCalculation({
-        year,
-        ptoDays,
-        allowPastDays,
-        months,
-        strategy,
-        locale,
-      });
-      return;
-    }
+    if (!canCalculate) return;
 
-    if (suggestion) clearCalculation();
-  }, [
-    triggerCalculation,
-    clearCalculation,
-    suggestion,
-    year,
-    ptoDays,
-    allowPastDays,
-    holidays,
-    months,
-    strategy,
-    locale,
-    planRevision,
-  ]);
+    triggerCalculation({
+      year,
+      ptoDays,
+      allowPastDays,
+      months,
+      strategy,
+      locale,
+    });
+  }, [triggerCalculation, canCalculate, year, ptoDays, allowPastDays, months, strategy, locale, planRevision]);
+
+  useEffect(() => {
+    if (!canCalculate && suggestion) clearCalculation();
+  }, [canCalculate, suggestion, clearCalculation]);
 
   return (
     <Skeleton

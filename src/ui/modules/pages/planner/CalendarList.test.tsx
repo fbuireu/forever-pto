@@ -85,6 +85,20 @@ beforeEach(() => {
   (mockHolidaysState as { planRevision?: number }).planRevision = 0;
 });
 
+describe('CalendarList does not re-plan itself', () => {
+  it('does not start another run when the worker writes its result back', () => {
+    const { rerender } = render(<CalendarList />);
+    expect(mockTriggerCalculation).toHaveBeenCalledTimes(1);
+
+    mockHolidaysState.suggestion = { days: [new Date(2026, 0, 5)] } as never;
+    rerender(<CalendarList />);
+    mockHolidaysState.suggestion = { days: [new Date(2026, 0, 5)] } as never;
+    rerender(<CalendarList />);
+
+    expect(mockTriggerCalculation).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('CalendarList re-plans on apply', () => {
   it('runs the engine again when a plan is applied, which is what reconciles the Manual Days', () => {
     const { rerender } = render(<CalendarList />);

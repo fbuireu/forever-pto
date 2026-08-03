@@ -81,6 +81,7 @@ function withMetrics(
     allowPastDays: boolean;
     manuallySelectedDays: Date[];
     removedSuggestedDays: Date[];
+    carryOverMonths: number;
   }
 ) {
   return alternatives.map((alt) => ({
@@ -94,6 +95,7 @@ function withMetrics(
       allowPastDays: opts.allowPastDays,
       manuallySelectedDays: opts.manuallySelectedDays,
       removedSuggestedDays: opts.removedSuggestedDays,
+      carryOverMonths: opts.carryOverMonths,
     }),
   }));
 }
@@ -493,6 +495,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
             allowPastDays,
             manuallySelectedDays: updatedManualDays,
             removedSuggestedDays: updatedRemovedDays,
+            carryOverMonths: useFiltersStore.getState().carryOverMonths,
             totalPtoBudget: totalPtoDays,
           });
 

@@ -267,7 +267,7 @@
     "distributionDescription": "Distribution of your {ptoDays} PTO days, {nationalDays} national holidays{regionalPart}{customPart}.",
     "regionalPart": ", {regionalDays} regional",
     "customPart": " and {customDays} custom",
-    "quarterDescription": "Distribution of {totalDays} effective days off across {activeQuarters, plural, one {# quarter} other {# quarters}} of the year.",
+    "quarterDescription": "Distribution of {totalDays} effective days across {activeQuarters, plural, one {# quarter} other {# quarters}} of your planning window.",
     "annualTimeline": "Annual timeline",
     "annualTimelineFeature": "Annual timeline chart",
     "timelineDescription": "Monthly evolution of {totalDays} days off distributed across {activeMonths} months. Peak in {peakMonth} with {peakDays} days.",

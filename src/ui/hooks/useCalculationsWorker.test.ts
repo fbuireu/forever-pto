@@ -111,6 +111,32 @@ beforeEach(() => {
   storeState.currentSelection = null;
 });
 
+describe('useCalculationsWorker caps only to protect Removed Days', () => {
+  it('sends no cap when nothing was removed, so an applied plan is re-planned at full budget', () => {
+    storeState.currentSelection = { days: [new Date(2025, 0, 6), new Date(2025, 0, 7)] };
+    storeState.removedSuggestedDays = [];
+
+    const { result } = renderHook(() => useCalculationsWorker());
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
+
+    expect(lastPayload().autoSuggestCount).toBeUndefined();
+  });
+
+  it('still caps at the surviving Suggested Days when the user removed some', () => {
+    storeState.currentSelection = { days: [new Date(2025, 0, 6), new Date(2025, 0, 7), new Date(2025, 0, 8)] };
+    storeState.removedSuggestedDays = [new Date(2025, 0, 8)];
+
+    const { result } = renderHook(() => useCalculationsWorker());
+    act(() => {
+      result.current.triggerCalculation(BASE_PARAMS);
+    });
+
+    expect(lastPayload().autoSuggestCount).toBe(2);
+  });
+});
+
 describe('useCalculationsWorker', () => {
   it('keeps triggerCalculation stable when only the hand-picked days change, so editing one day never re-plans the year', () => {
     const { result, rerender } = renderHook(() => useCalculationsWorker());

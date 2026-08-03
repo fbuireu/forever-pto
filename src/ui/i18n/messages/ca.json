@@ -267,7 +267,7 @@
     "distributionDescription": "Distribució dels teus {ptoDays} dies PTO, {nationalDays} festius nacionals{regionalPart}{customPart}.",
     "regionalPart": ", {regionalDays} regionals",
     "customPart": " i {customDays} personalitzats",
-    "quarterDescription": "Distribució de {totalDays} dies lliures efectius al llarg de {activeQuarters, plural, one {# trimestre} other {# trimestres}} de l'any.",
+    "quarterDescription": "Distribució de {totalDays} dies efectius al llarg de {activeQuarters, plural, one {# trimestre} other {# trimestres}} de la teva finestra de planificació.",
     "annualTimeline": "Cronologia anual",
     "annualTimelineFeature": "Gràfica de cronologia anual",
     "timelineDescription": "Evolució mensual de {totalDays} dies lliures distribuïts en {activeMonths} mesos. Màxim a {peakMonth} amb {peakDays} dies.",
