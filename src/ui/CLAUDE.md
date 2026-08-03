@@ -75,6 +75,15 @@ nothing. The store agrees with the fixed shape: `toggleDaySelection` recomputes 
 touches `holidays`. Adding a field to that selector means adding a re-plan trigger; keep the list to the one
 in [`modules/pages/planner/CLAUDE.md`](./modules/pages/planner/CLAUDE.md).
 
+**`hooks/useTutorial.tsx` reads the sidebar flag that matches the viewport, and destroys the tour on
+unmount.** `useSidebar()` exposes two independent flags: `open` for the desktop rail and `openMobile` for
+the drawer. `open` defaults to `true` and mobile never writes it, so checking `open` alone meant the tour
+never opened the drawer on a phone and its first five steps — all anchored inside `AppSidebar` — targeted
+elements that were not rendered, landing on driver.js's dummy-element fallback with nothing highlighted. The
+hook now picks the flag by `useIsMobile()`. It also destroys the driver instance on unmount: the client is a
+module-level singleton, so without that the overlay and its window listeners survived a client-side
+navigation away from the planner.
+
 **The unmount cleanup in the same hook clears `isCalculating` before it terminates the Worker.**
 Terminating drops the pending `onmessage`/`onerror` that would have cleared the flag, and the holidays
 store is module-global, so the next mount would find the whole calendar frozen mid-calculation.

@@ -20,10 +20,26 @@ describe('agentSkillsIndex', () => {
     expect(names).toContain('calendar-export');
   });
 
-  it('prefixes all skill urls with baseUrl', async () => {
+  it('prefixes every advertised url with baseUrl', async () => {
+    const { skills } = await agentSkillsIndex(BASE_URL).json();
+    for (const skill of skills.filter((entry: { url?: string }) => entry.url)) {
+      expect(skill.url).toMatch(new RegExp(`^${BASE_URL}`));
+    }
+  });
+
+  it('advertises only documents the .well-known handler actually serves', async () => {
+    const { skills } = await agentSkillsIndex(BASE_URL).json();
+    const served = [`${BASE_URL}/.well-known/api-catalog`, `${BASE_URL}/.well-known/mcp/server-card.json`];
+
+    for (const skill of skills.filter((entry: { url?: string }) => entry.url)) {
+      expect(served).toContain(skill.url);
+    }
+  });
+
+  it('claims no digest, since nothing here is a file whose contents could be hashed', async () => {
     const { skills } = await agentSkillsIndex(BASE_URL).json();
     for (const skill of skills) {
-      expect(skill.url).toMatch(new RegExp(`^${BASE_URL}`));
+      expect(skill.sha256).toBeUndefined();
     }
   });
 });

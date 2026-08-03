@@ -170,6 +170,14 @@ class of path.
 
 These paths contain a dot, so the middleware matcher excludes them — they never see locale negotiation.
 
+**The skills index advertises only what this handler serves.** `agentSkillsIndex.ts` used to give all five
+entries a `url` under `/.well-known/agent-skills/<name>/SKILL.md` and a `sha256` — every one of those URLs
+404s, because the handler matches three exact keys and none of them is a `SKILL.md`, and every digest was
+`e3b0c442…`, the SHA-256 of the empty string. The two entries describing a document that does exist now
+point at it; the three describing a *behaviour* carry no `url` at all, and nothing carries a digest, because
+none of these is a file whose bytes could be hashed. Adding an entry with a URL means adding the key here
+first.
+
 ## Error and not-found boundaries
 
 | File | Catches |

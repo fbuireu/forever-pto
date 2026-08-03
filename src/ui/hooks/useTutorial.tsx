@@ -6,12 +6,12 @@ import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { X } from '@ui/modules/core/animate/icons/X';
 import type { DriveStep } from 'driver.js';
 import { useTranslations } from 'next-intl';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 const SIDEBAR_CONTAINER_SELECTOR = '[data-slot="sidebar-container"]';
 
 export const useTutorial = () => {
-  const { open, toggleSidebar } = useSidebar();
+  const { open, openMobile, toggleSidebar } = useSidebar();
   const isMobile = useIsMobile();
   const t = useTranslations('tutorial.steps');
   const tUi = useTranslations('tutorial');
@@ -129,7 +129,9 @@ export const useTutorial = () => {
       },
     ];
 
-    if (!open) {
+    const isSidebarOpen = isMobile ? openMobile : open;
+
+    if (!isSidebarOpen) {
       toggleSidebar();
       await new Promise<void>((resolve) => {
         const el = document.querySelector(SIDEBAR_CONTAINER_SELECTOR);
@@ -152,7 +154,15 @@ export const useTutorial = () => {
       doneBtnText: tUi('doneBtn'),
       progressText: `{{current}} ${tUi('progressTextConnector')} {{total}}`,
     });
-  }, [open, isMobile, t, tUi, toggleSidebar]);
+  }, [open, openMobile, isMobile, t, tUi, toggleSidebar]);
+
+  useEffect(() => {
+    return () => {
+      void import('@infrastructure/clients/tutorial/driver/client').then(({ getDriverClientInstance }) => {
+        getDriverClientInstance().destroy();
+      });
+    };
+  }, []);
 
   return { startTutorial };
 };

@@ -1,4 +1,5 @@
 import { LOCALES } from '@infrastructure/i18n/locales';
+import { localePath } from '@infrastructure/i18n/utils/url';
 import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
@@ -20,7 +21,7 @@ export async function JsonLd({ locale }: JsonLdProps) {
     '@type': 'WebApplication',
     name: t('title'),
     description: t('description'),
-    url: `${baseUrl}/${locale}`,
+    url: `${baseUrl}${localePath(locale, '/planner')}`,
     applicationCategory: 'ProductivityApplication',
     operatingSystem: 'Any',
     browserRequirements: 'Requires JavaScript. Requires HTML5.',
