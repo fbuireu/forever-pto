@@ -77,10 +77,9 @@ UI rather than the copy. The parity test above is what keeps that from reaching 
 
 [`CONTEXT.md`](../../../CONTEXT.md) governs the words the product says, and the root guide calls a retired
 name in code or copy a defect. A few **key names** still hold retired terms — `alternativesManager.totalOff`
-and `totalDaysOff` for Effective Day, `ptoStatus.autoAssigned` for Suggested Day — while the **English**
-strings behind them have been corrected. The other five bundles still speak the retired terms in their own
-languages and are outstanding work, not a second deliberate split. That key/string split *is* deliberate: a
-key is an identifier no user reads, renaming one means
+and `totalDaysOff` for Effective Day, `ptoStatus.autoAssigned` for Suggested Day — while the strings behind
+them say Effective Day and Suggested Day, in all six languages. That split is deliberate: a key is an
+identifier no user reads, renaming one means
 editing six bundles and every call site, and `docs/docs-consistency.test.ts` asserts key parity across all
 six, so a half-finished rename fails the suite rather than the eye. Rename a key only as its own change, all
 six bundles at once. **A translated string is different** — it is the product speaking, and it uses the

@@ -62,7 +62,7 @@
       "national": "nac.",
       "regional": "reg.",
       "custom": "prop.",
-      "effectiveDays": "Dies lliures efectius",
+      "effectiveDays": "Dies efectius",
       "overBudget": "sobre pressupost",
       "gain": "Guany",
       "perPtoDay": "per dia de PTO",
@@ -394,7 +394,7 @@
     }
   },
   "ptoStatus": {
-    "autoAssigned": "Auto-assignats",
+    "autoAssigned": "Suggerits",
     "manual": "Manual",
     "remaining": "Restants",
     "allAssigned": "Tots els dies assignats!",
@@ -438,14 +438,14 @@
   "alternativesManager": {
     "option": "Opció",
     "recommended": "Recomanat",
-    "totalOff": "Total lliures",
+    "totalOff": "Dies efectius",
     "efficiency": "Eficiència",
     "vsMain": "vs principal",
     "alreadyApplied": "Ja aplicat",
     "applyAlternative": "Aplicar alternativa",
     "previousSuggestion": "Suggeriment anterior",
     "nextSuggestion": "Següent suggeriment",
-    "totalDaysOff": "Total dies lliures",
+    "totalDaysOff": "Total de dies efectius",
     "comparison": "Comparació",
     "daysUnit": "dies"
   },
@@ -594,7 +594,7 @@
     "iHave": "Tinc",
     "days": "dies",
     "status": "Estat de dies PTO",
-    "autoAssigned": "Auto-assignats:",
+    "autoAssigned": "Suggerits:",
     "manuallySelected": "Seleccionats manualment:",
     "remaining": "Restants:",
     "resetManualChanges": "Restablir canvis manuals",

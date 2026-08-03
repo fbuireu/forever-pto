@@ -8,22 +8,40 @@ import type { DriveStep } from 'driver.js';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect } from 'react';
 
-const SIDEBAR_CONTAINER_SELECTOR = '[data-slot="sidebar-container"]';
 const FIRST_STEP_SELECTOR = '[data-tutorial="sidebar-step-1"]';
-const ANCHOR_WAIT_FRAMES = 30;
-const TRANSITION_FALLBACK_MS = 400;
+const ANCHOR_MIN_FRAMES = 6;
+const ANCHOR_STABLE_FRAMES = 3;
+const ANCHOR_MAX_FRAMES = 90;
 
-const waitForAnchor = (selector: string) =>
+const measure = (selector: string) => {
+  const element = document.querySelector(selector);
+  if (!element) return null;
+  const { x, y, width, height } = element.getBoundingClientRect();
+  return `${Math.round(x)},${Math.round(y)},${Math.round(width)},${Math.round(height)}`;
+};
+
+const waitForAnchorToSettle = (selector: string) =>
   new Promise<void>((resolve) => {
-    let framesLeft = ANCHOR_WAIT_FRAMES;
+    let frames = 0;
+    let stableFrames = 0;
+    let previous: string | null = null;
+
     const check = () => {
-      if (document.querySelector(selector) || framesLeft-- <= 0) {
+      frames++;
+      const current = measure(selector);
+      stableFrames = current !== null && current === previous ? stableFrames + 1 : 0;
+      previous = current;
+
+      const settled = frames >= ANCHOR_MIN_FRAMES && stableFrames >= ANCHOR_STABLE_FRAMES;
+      if (settled || frames >= ANCHOR_MAX_FRAMES) {
         resolve();
         return;
       }
+
       requestAnimationFrame(check);
     };
-    check();
+
+    requestAnimationFrame(check);
   });
 
 export const useTutorial = () => {
@@ -149,15 +167,7 @@ export const useTutorial = () => {
 
     if (!isSidebarOpen) {
       toggleSidebar();
-      await waitForAnchor(FIRST_STEP_SELECTOR);
-
-      const container = document.querySelector(SIDEBAR_CONTAINER_SELECTOR);
-      if (container) {
-        await new Promise<void>((resolve) => {
-          container.addEventListener('transitionend', () => resolve(), { once: true });
-          setTimeout(resolve, TRANSITION_FALLBACK_MS);
-        });
-      }
+      await waitForAnchorToSettle(FIRST_STEP_SELECTOR);
     }
 
     driverClient.start(steps, {

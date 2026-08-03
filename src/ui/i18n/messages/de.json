@@ -62,7 +62,7 @@
       "national": "nat.",
       "regional": "reg.",
       "custom": "eigene",
-      "effectiveDays": "Effektive freie Tage",
+      "effectiveDays": "Effektive Tage",
       "overBudget": "über Budget",
       "gain": "Gewinn",
       "perPtoDay": "pro PTO-Tag",
@@ -394,7 +394,7 @@
     }
   },
   "ptoStatus": {
-    "autoAssigned": "Automatisch zugewiesen",
+    "autoAssigned": "Vorgeschlagen",
     "manual": "Manuell",
     "remaining": "Verbleibend",
     "allAssigned": "Alle Tage zugewiesen!",
@@ -438,14 +438,14 @@
   "alternativesManager": {
     "option": "Option",
     "recommended": "Empfohlen",
-    "totalOff": "Gesamt frei",
+    "totalOff": "Effektive Tage",
     "efficiency": "Effizienz",
     "vsMain": "vs. Haupt",
     "alreadyApplied": "Bereits angewendet",
     "applyAlternative": "Alternative anwenden",
     "previousSuggestion": "Vorheriger Vorschlag",
     "nextSuggestion": "Nächster Vorschlag",
-    "totalDaysOff": "Freie Tage gesamt",
+    "totalDaysOff": "Effektive Tage gesamt",
     "comparison": "Vergleich",
     "daysUnit": "Tage"
   },
@@ -594,7 +594,7 @@
     "iHave": "Ich habe",
     "days": "Tage",
     "status": "PTO-Tage Status",
-    "autoAssigned": "Automatisch zugewiesen:",
+    "autoAssigned": "Vorgeschlagen:",
     "manuallySelected": "Manuell ausgewählt:",
     "remaining": "Verbleibend:",
     "resetManualChanges": "Manuelle Änderungen zurücksetzen",

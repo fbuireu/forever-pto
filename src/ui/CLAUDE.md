@@ -75,7 +75,25 @@ nothing. The store agrees with the fixed shape: `toggleDaySelection` recomputes 
 touches `holidays`. Adding a field to that selector means adding a re-plan trigger; keep the list to the one
 in [`modules/pages/planner/CLAUDE.md`](./modules/pages/planner/CLAUDE.md).
 
-**`hooks/useTutorial.tsx` reads the sidebar flag that matches the viewport, and destroys the tour on
+**`hooks/useTutorial.tsx` waits for the first step's anchor to stop moving, and nothing else.** driver.js
+measures its highlight once and re-measures only on resize, scroll or click, so starting mid-animation leaves
+the cutout and popover at the wrong place for the whole step. Three timing heuristics were tried here and all
+three were wrong, for reasons worth keeping:
+
+- **Waiting for the anchor to *exist* is useless.** `CollapsibleContent` passes `keepMounted` and forces
+  `display: block`, so `sidebar-step-1` is in the DOM while the rail is collapsed.
+- **Waiting on `transitionend` ends early.** It bubbles, and `collapsible='icon'` re-styles the whole subtree,
+  so a 150 ms descendant transition resolves the wait ~250 ms before the container's own `duration-400`.
+- **A timeout is not a signal.** The mobile drawer animates on a motion spring, which emits no CSS transition
+  event at all, and the desktop container selector does not exist on mobile.
+
+`waitForAnchorToSettle` polls `getBoundingClientRect` and resolves once the rounded rect has been identical
+for three consecutive frames, never before six frames have passed — that floor is what stops it resolving on
+the pre-commit state, since React has not yet flipped the sidebar when the wait begins. A 90-frame cap keeps
+a tour that never settles from hanging. The same code covers both viewports and both animation kinds because
+it measures the thing that actually matters.
+
+**The same hook reads the sidebar flag that matches the viewport, and destroys the tour on
 unmount.** `useSidebar()` exposes two independent flags: `open` for the desktop rail and `openMobile` for
 the drawer. `open` defaults to `true` and mobile never writes it, so checking `open` alone meant the tour
 never opened the drawer on a phone and its first five steps — all anchored inside `AppSidebar` — targeted

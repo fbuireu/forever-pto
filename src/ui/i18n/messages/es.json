@@ -62,7 +62,7 @@
       "national": "nac.",
       "regional": "reg.",
       "custom": "prop.",
-      "effectiveDays": "Días libres efectivos",
+      "effectiveDays": "Días efectivos",
       "overBudget": "sobre presupuesto",
       "gain": "Ganancia",
       "perPtoDay": "por día de PTO",
@@ -394,7 +394,7 @@
     }
   },
   "ptoStatus": {
-    "autoAssigned": "Auto-asignados",
+    "autoAssigned": "Sugeridos",
     "manual": "Manual",
     "remaining": "Restantes",
     "allAssigned": "Todos los días asignados.",
@@ -438,14 +438,14 @@
   "alternativesManager": {
     "option": "Opción",
     "recommended": "Recomendado",
-    "totalOff": "Total libres",
+    "totalOff": "Días efectivos",
     "efficiency": "Eficiencia",
     "vsMain": "Vs principal",
     "alreadyApplied": "Ya aplicado",
     "applyAlternative": "Aplicar alternativa",
     "previousSuggestion": "Sugerencia anterior",
     "nextSuggestion": "Siguiente sugerencia",
-    "totalDaysOff": "Total días libres",
+    "totalDaysOff": "Total de días efectivos",
     "comparison": "Comparación",
     "daysUnit": "días"
   },
@@ -594,7 +594,7 @@
     "iHave": "Tengo",
     "days": "días",
     "status": "Estado de días PTO",
-    "autoAssigned": "Auto-asignados:",
+    "autoAssigned": "Sugeridos:",
     "manuallySelected": "Seleccionados manualmente:",
     "remaining": "Restantes:",
     "resetManualChanges": "Deshacer cambios manuales",

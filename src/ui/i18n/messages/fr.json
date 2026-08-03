@@ -62,7 +62,7 @@
       "national": "nat.",
       "regional": "rég.",
       "custom": "perso.",
-      "effectiveDays": "Jours de repos effectifs",
+      "effectiveDays": "Jours effectifs",
       "overBudget": "au-dessus du budget",
       "gain": "Gain",
       "perPtoDay": "par jour de congé",
@@ -394,7 +394,7 @@
     }
   },
   "ptoStatus": {
-    "autoAssigned": "Attribués automatiquement",
+    "autoAssigned": "Suggérés",
     "manual": "Manuel",
     "remaining": "Restants",
     "allAssigned": "Tous tes jours sont attribués !",
@@ -438,14 +438,14 @@
   "alternativesManager": {
     "option": "Option",
     "recommended": "Recommandée",
-    "totalOff": "Total repos",
+    "totalOff": "Jours effectifs",
     "efficiency": "Efficacité",
     "vsMain": "vs principal",
     "alreadyApplied": "Déjà appliquée",
     "applyAlternative": "Appliquer l'alternative",
     "previousSuggestion": "Suggestion précédente",
     "nextSuggestion": "Suggestion suivante",
-    "totalDaysOff": "Total jours de repos",
+    "totalDaysOff": "Total des jours effectifs",
     "comparison": "Comparaison",
     "daysUnit": "jours"
   },
@@ -594,7 +594,7 @@
     "iHave": "J'ai",
     "days": "jours",
     "status": "Statut des jours de congé",
-    "autoAssigned": "Attribués automatiquement :",
+    "autoAssigned": "Suggérés :",
     "manuallySelected": "Sélectionnés manuellement :",
     "remaining": "Restants :",
     "resetManualChanges": "Réinitialiser les modifications manuelles",
