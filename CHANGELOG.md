@@ -1,3 +1,13 @@
+## [1.7.1](https://github.com/fbuireu/forever-pto/compare/v1.7.0...v1.7.1) (2026-08-04)
+
+
+### Bug Fixes
+
+* **ci:** make the deploy scripts runnable ([2028142](https://github.com/fbuireu/forever-pto/commit/2028142cf6704107911d2830d4032a73d4f2b25f))
+* **ci:** unblock the production deploy by dropping --message ([10eb8ad](https://github.com/fbuireu/forever-pto/commit/10eb8ad89d850ec5b7c3dfaad110b1f19b1f62ec))
+* **ci:** use an em dash in the deploy message, and drop the scripts that were not the fix ([c6a78ea](https://github.com/fbuireu/forever-pto/commit/c6a78ea4bedffbe35ffbf7428ceafaac15139ed8))
+* **planner:** key Holiday selection on the Holiday, not on the row index ([dd2b618](https://github.com/fbuireu/forever-pto/commit/dd2b618b890c93e1d7e820bf66248cce2ae87f3e))
+
 # [1.7.0](https://github.com/fbuireu/forever-pto/compare/v1.6.3...v1.7.0) (2026-08-04)
 
 
