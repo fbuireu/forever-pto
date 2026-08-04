@@ -73,7 +73,6 @@ jobs:
           if [ -n "${INPUTS_URL}" ]; then
             VAR_FLAG="--var NEXT_PUBLIC_SITE_URL:${INPUTS_URL}"
           fi
-          set -x
           pnpm exec wrangler deploy --env "${INPUTS_WRANGLER_ENV}" $NAME_FLAG $VAR_FLAG
       - name: Set Worker secrets
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
