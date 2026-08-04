@@ -306,17 +306,14 @@ the deploys had to become jobs. `release` needs `deploy-production`, which is wh
 version is live*. `cancel-in-progress` is conditional on `github.event_name == 'pull_request'` for the same
 reason: cancelling a superseded PR run is free, cancelling a `main` run kills a deploy or a release halfway.
 
-**Nothing may be inlined into a `nick-fields/retry` `command:`, and the deploy is not retried at all.** That
-action re-parses its input and loses the inner quoting, so `--message "<sha> - push"` reached wrangler as
-three arguments — `push` became a second positional and every production deploy failed with
-`Unknown argument: push`, three identical times, because a wrapper that retries every failure cannot tell a
-bad argument from a bad network. `wrangler deploy` now runs as a plain `run:`, where GitHub owns the quoting
-and a deterministic failure fails once.
+**`DEPLOY_MESSAGE` separates its two halves with an em dash (`—`), and an ASCII hyphen there breaks every
+production deploy.** `--message "<sha> - push"` makes wrangler report `Unknown argument: push`: the bare `-`
+is consumed as the `deploy [path]` positional, which leaves `push` as a second one, and yargs rejects it.
+Nothing about the quoting is wrong — the same command parses with the dash changed and fails with it
+restored — so do not go looking for the bug in the shell, in `pnpm exec`, or in the retry action. It is the
+character. `biancafiore/.github/workflows/_deploy.yml` has always used `—` for this reason.
 
-So two of the three shell steps *must* live outside the YAML — `.github/scripts/set-worker-secrets.sh` and
-`delete-preview-worker.sh` are still called from a `command:`, and a pipeline, a `$(…)` or a quoted `grep`
-pattern would not survive being inlined there. `deploy-worker.sh` is the third and it is a choice rather than
-a requirement, kept for two reasons: one convention beats two, and it is the file that broke production, so
-it is worth being able to run it locally against a stub `pnpm` and read back the argv it built. Each script
-takes no arguments and reads its inputs from the step's `env:`, which is also what makes it a single token
-the retry action cannot split.
+The deploy is the one wrangler call **not** wrapped in `nick-fields/retry`, because a wrapper that retries
+every failure cannot tell a bad argument from a bad network: this failure burned three identical attempts per
+run before reporting. The secret upload and the preview delete keep their retry — both are idempotent and
+both fail for reasons that a second attempt can fix.
