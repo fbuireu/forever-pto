@@ -289,6 +289,30 @@ first checking whether the value is still correct for production, which shares t
 always overrides it, and the build never reads it. Build config lives in `next.config.ts` and
 `open-next.config.ts`.
 
-GitHub Actions: `ci.yml` on every PR, `deploy-development.yml` / `deploy-production.yml` calling the shared
-`_deploy.yml`, plus dependabot/renovate auto-merge and a `zizmor` workflow audit. Husky runs `lint-staged` on
-`pre-commit`, `commitlint` on `commit-msg` and `lint:ts:typecheck` on `pre-push`.
+GitHub Actions: `ci.yml` holds the whole `main` pipeline — `lint`, `typecheck` and `test` in parallel, then
+`deploy-production`, then `release`. `deploy-development.yml` deploys a preview per PR, both calling the
+shared `_deploy.yml`, plus dependabot/renovate auto-merge and a `zizmor` workflow audit. Husky runs
+`lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `lint:ts:typecheck` on `pre-push`.
+
+**`release` is downstream of `deploy-production`, and that ordering is the whole reason they share a
+workflow.** They were two workflows on the same `push` trigger, which meant they raced: semantic-release cut a
+tag, a GitHub release and a changelog entry for a version that had just failed to deploy, and nothing in the
+release job could see the deploy. `needs: [lint, typecheck, test, deploy-production]` is what makes a release
+mean *the version is live*. The workflow's `cancel-in-progress` is therefore conditional on
+`github.event_name == 'pull_request'`: cancelling a superseded PR run is free, cancelling a `main` run kills a
+deploy or a release halfway.
+
+**Nothing may be inlined into a `nick-fields/retry` `command:`, and the deploy is not retried at all.** That
+action re-parses its input and loses the inner quoting, so `--message "<sha> - push"` reached wrangler as
+three arguments — `push` became a second positional and every production deploy failed with
+`Unknown argument: push`, three identical times, because a wrapper that retries every failure cannot tell a
+bad argument from a bad network. `wrangler deploy` now runs as a plain `run:`, where GitHub owns the quoting
+and a deterministic failure fails once.
+
+So two of the three shell steps *must* live outside the YAML — `.github/scripts/set-worker-secrets.sh` and
+`delete-preview-worker.sh` are still called from a `command:`, and a pipeline, a `$(…)` or a quoted `grep`
+pattern would not survive being inlined there. `deploy-worker.sh` is the third and it is a choice rather than
+a requirement, kept for two reasons: one convention beats two, and it is the file that broke production, so
+it is worth being able to run it locally against a stub `pnpm` and read back the argv it built. Each script
+takes no arguments and reads its inputs from the step's `env:`, which is also what makes it a single token
+the retry action cannot split.

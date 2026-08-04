@@ -68,27 +68,13 @@ jobs:
           NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: ${{ vars.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID }}
           NEXT_PUBLIC_STORAGE_KEY: ${{ vars.NEXT_PUBLIC_STORAGE_KEY }}
       - name: Deploy to Cloudflare Workers
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
+        shell: bash
         env:
           INPUTS_WORKER_NAME: ${{ inputs.worker_name }}
           INPUTS_WRANGLER_ENV: ${{ inputs.wrangler_env }}
           INPUTS_URL: ${{ inputs.url }}
           DEPLOY_MESSAGE: ${{ github.sha }} - ${{ github.event_name }}
-        with:
-          timeout_minutes: 5
-          max_attempts: 3
-          retry_wait_seconds: 15
-          shell: bash
-          command: |
-            NAME_FLAG=""
-            if [ -n "${INPUTS_WORKER_NAME}" ]; then
-              NAME_FLAG="--name ${INPUTS_WORKER_NAME}"
-            fi
-            VAR_FLAG=""
-            if [ -n "${INPUTS_URL}" ]; then
-              VAR_FLAG="--var NEXT_PUBLIC_SITE_URL:${INPUTS_URL}"
-            fi
-            pnpm exec wrangler deploy --env "${INPUTS_WRANGLER_ENV}" $NAME_FLAG $VAR_FLAG --message "$DEPLOY_MESSAGE"
+        run: .github/scripts/deploy-worker.sh
       - name: Set Worker secrets
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         env:
@@ -104,15 +90,4 @@ jobs:
           max_attempts: 3
           retry_wait_seconds: 15
           shell: bash
-          command: |
-            if [ -n "${INPUTS_WORKER_NAME}" ]; then
-              TARGET_FLAG="--name ${INPUTS_WORKER_NAME}"
-            else
-              TARGET_FLAG="--env ${INPUTS_WRANGLER_ENV}"
-            fi
-            node -e "
-            const required = ['JWT_SECRET','STRIPE_SECRET_KEY','STRIPE_WEBHOOK_SECRET','RESEND_API_KEY','TURSO_AUTH_TOKEN'];
-            const missing = required.filter(k => !process.env[k]);
-            if (missing.length) { console.error('Missing required secrets: ' + missing.join(', ')); process.exit(1); }
-            process.stdout.write(JSON.stringify(Object.fromEntries(required.map(k => [k, process.env[k]]))));
-            " | pnpm exec wrangler secret bulk $TARGET_FLAG
+          command: .github/scripts/set-worker-secrets.sh

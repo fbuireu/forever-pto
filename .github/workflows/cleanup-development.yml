@@ -38,8 +38,4 @@ jobs:
           max_attempts: 5
           retry_wait_seconds: 10
           shell: bash
-          command: |
-            output=$(pnpm exec wrangler delete "$WORKER_NAME" --force 2>&1) && { echo "$output"; exit 0; }
-            echo "$output"
-            echo "$output" | grep -qi "does not exist" && exit 0
-            exit 1
+          command: .github/scripts/delete-preview-worker.sh
