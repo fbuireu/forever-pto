@@ -1,3 +1,54 @@
+# [1.7.0](https://github.com/fbuireu/forever-pto/compare/v1.6.3...v1.7.0) (2026-08-04)
+
+
+### Bug Fixes
+
+* **build:** drop the route segment config cacheComponents rejects ([a60b962](https://github.com/fbuireu/forever-pto/commit/a60b96271634da619182871fc597c06abddb214e))
+* **build:** repair the TypeScript 7 migration, which had broken every deploy ([64a7a91](https://github.com/fbuireu/forever-pto/commit/64a7a91ff0970c4a3700437b7e9ccdd4e161c02c))
+* **checkout:** stop telling a charged payer their card was not charged ([c87f58c](https://github.com/fbuireu/forever-pto/commit/c87f58cb126ad48479496b92642c0ef7a96803bd))
+* close the defects the guide sweep surfaced across the layers ([c15b7da](https://github.com/fbuireu/forever-pto/commit/c15b7da1a4019c5f5ba211e48eac6d601352a5db))
+* close the no-comments rule's blind spot, and three more false-green test files ([ba9cf63](https://github.com/fbuireu/forever-pto/commit/ba9cf6371690e6dee08ea6d014e7fb5c33577218))
+* **discovery:** stop advertising documents that 404, and fix the tutorial on mobile ([5170870](https://github.com/fbuireu/forever-pto/commit/5170870afcf50bce7ccf97a161d65c7d63a2e8c1))
+* **export:** export the Planning Window, not the two years the store holds ([bfbade0](https://github.com/fbuireu/forever-pto/commit/bfbade0531e8836c58c173de58def3018ce3c5f0))
+* **holidays:** recompute isInSelectedRange when the Planning Window moves ([dced0e0](https://github.com/fbuireu/forever-pto/commit/dced0e0f01a53051c896634210562065bb757440))
+* **holidays:** refuse a Custom Holiday on a date already spent as a PTO day ([8db3b50](https://github.com/fbuireu/forever-pto/commit/8db3b5056c332af00091251358cf205c022f7afd))
+* **hydration:** make the store-ready gate actually gate ([fce58f9](https://github.com/fbuireu/forever-pto/commit/fce58f9b357671a7475a203f049914acb14f1b79))
+* **logging:** stop the BetterStack client throwing when it is unconfigured ([d2dbd19](https://github.com/fbuireu/forever-pto/commit/d2dbd19c987b6ac394e2cbf95fe5a45e8f763670))
+* make Collapsible and Checkbox tests grade the component, not the mock ([61a554f](https://github.com/fbuireu/forever-pto/commit/61a554fd6fab7f11b9a153027668cf1fe6fa0c58))
+* make three more tests able to fail, and correct four doc claims ([2709821](https://github.com/fbuireu/forever-pto/commit/2709821a8d88dc550ea416204413056bdd87168a))
+* **metrics:** count a day off once when it arrives by both routes ([c7c19ac](https://github.com/fbuireu/forever-pto/commit/c7c19ace9e351f9453e3c0126694bee08658d8e7))
+* **metrics:** measure only the Planning Window, and label the option being shown ([1a2d8c5](https://github.com/fbuireu/forever-pto/commit/1a2d8c5cd6ec4ad086d93299025aa1d63c66ba90))
+* **payment:** activate premium when the payer returns from a redirect ([ce67800](https://github.com/fbuireu/forever-pto/commit/ce6780069393360f616cf7f183cd4c858f79a033))
+* **payments:** refuse a fixed-amount coupon priced in another currency ([e683871](https://github.com/fbuireu/forever-pto/commit/e683871024bcfe3d8b83544300555f3afbb9fcef))
+* **payment:** stop telling an unconfirmed payer their card was untouched ([d106518](https://github.com/fbuireu/forever-pto/commit/d106518b6571372eaf764732410f9f40815f9f34))
+* **planner:** correct the Alternative apply, and revert the metrics window filter ([0d7c976](https://github.com/fbuireu/forever-pto/commit/0d7c9762322e71410aec962ec26d64cdec2d3f9c))
+* **planner:** never spend PTO on a day that is already off ([8eb2baa](https://github.com/fbuireu/forever-pto/commit/8eb2baa2efd60c5758662b7a707fbcf55bf4988e))
+* **planner:** prune hand-edited days when the planning window moves ([baf4d4d](https://github.com/fbuireu/forever-pto/commit/baf4d4db516bd7c077cc149cb0cf2320e1ba1842))
+* **planner:** stop a hand-picked day from re-planning the whole year ([15ac93b](https://github.com/fbuireu/forever-pto/commit/15ac93b0ea1e58276e5b804832e9fb8ee22d24e0))
+* **planner:** stop the empty-state guard hiding the panel on every cold load ([97024a3](https://github.com/fbuireu/forever-pto/commit/97024a3c2464e65cfbd12a170470373ab0f13eed))
+* **planner:** stop the panel loading for ever when the plan is legitimately empty ([e8e052b](https://github.com/fbuireu/forever-pto/commit/e8e052b85ce5eb5f4d5d7124c6e342e74a19f783))
+* **planner:** stop the planner re-planning itself, and land the plan that was previewed ([2f80000](https://github.com/fbuireu/forever-pto/commit/2f80000bcbcfaaf02f0ae4ac20d5fd5de3b4c954))
+* **planner:** three counts and states the screen was getting wrong ([b81714c](https://github.com/fbuireu/forever-pto/commit/b81714c6bd32ec38ab628b5e7a3afdfb134966ce))
+* **premium:** compare payer addresses normalised, not raw ([7532dc2](https://github.com/fbuireu/forever-pto/commit/7532dc2478735b78a8f0d88b75dde283e25f0221))
+* **premium:** let a redirect payer's cookie reach the store, and stop freezing the planner ([3ff01a4](https://github.com/fbuireu/forever-pto/commit/3ff01a4e0ef0938552631bfd9b66ce7d77ea46cc))
+* **seo:** stop asserting a price Premium does not have, and an FAQ the planner does not show ([50c80b7](https://github.com/fbuireu/forever-pto/commit/50c80b7febc83ba3d66e0039b3d47c705987efe7))
+* **sidebar:** keep the budget consistent whichever control writes it ([75e7f5a](https://github.com/fbuireu/forever-pto/commit/75e7f5ab152d6a8a2d4de5b4e8699be97e738233))
+* **troubleshooting:** reset the filters store the button promised to reset ([91cf38f](https://github.com/fbuireu/forever-pto/commit/91cf38f2189e17b236817d88528c1cb56e4ecd48))
+* **tutorial:** stop the unmount cleanup throwing into an unhandled rejection ([84a4f63](https://github.com/fbuireu/forever-pto/commit/84a4f63741b1fe2f27516ff9b6fcffaa79d9467f))
+* **tutorial:** wait for the anchor to stop moving, and finish the glossary rename ([e975ca2](https://github.com/fbuireu/forever-pto/commit/e975ca2ac611c26813f73fa3b02f39ab1a8c3242))
+
+
+### Features
+
+* **metrics:** bucket the distributions by the Planning Window ([2b842cb](https://github.com/fbuireu/forever-pto/commit/2b842cb073f98f48949310e5e03f0a7293c9a419))
+* **payments:** enforce promotion-code redemption caps from our own records ([78dda70](https://github.com/fbuireu/forever-pto/commit/78dda702d2ad4b81c1adff9e3070af41b7be5608))
+* **planner:** re-plan when a plan is applied, so hand edits stay consistent ([edf6560](https://github.com/fbuireu/forever-pto/commit/edf6560abcd228f5f86a352fe2451c0c17aaab73))
+
+
+### Reverts
+
+* **deps:** go back to TypeScript 6 and drop the experimental Next flag ([e0be0cb](https://github.com/fbuireu/forever-pto/commit/e0be0cb0782e461a291a6dda935684d19f2977ca))
+
 ## [1.6.3](https://github.com/fbuireu/forever-pto/compare/v1.6.2...v1.6.3) (2026-07-24)
 
 
