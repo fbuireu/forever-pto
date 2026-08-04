@@ -306,12 +306,14 @@ the deploys had to become jobs. `release` needs `deploy-production`, which is wh
 version is live*. `cancel-in-progress` is conditional on `github.event_name == 'pull_request'` for the same
 reason: cancelling a superseded PR run is free, cancelling a `main` run kills a deploy or a release halfway.
 
-**`DEPLOY_MESSAGE` separates its two halves with an em dash (`—`), and an ASCII hyphen there breaks every
-production deploy.** `--message "<sha> - push"` makes wrangler report `Unknown argument: push`: the bare `-`
-is consumed as the `deploy [path]` positional, which leaves `push` as a second one, and yargs rejects it.
-Nothing about the quoting is wrong — the same command parses with the dash changed and fails with it
-restored — so do not go looking for the bug in the shell, in `pnpm exec`, or in the retry action. It is the
-character. `biancafiore/.github/workflows/_deploy.yml` has always used `—` for this reason.
+**The deploy passes no `--message`, and putting one back needs a preview PR, not a push to `main`.** Every
+form of `--message "<sha> <separator> <event>"` tried so far makes wrangler 4.115 fail with
+`Unknown argument: push` — the last word of the message arrives as a second positional beside
+`deploy [path]`. It is not the quoting (`pnpm exec` passes argv through untouched, and `nick-fields/retry`
+was wrongly blamed for it first), and it is not the separator character (an em dash fails exactly like a
+hyphen, though `biancafiore/.github/workflows/_deploy.yml` deploys with one). The mechanism is still
+unexplained; the flag is cosmetic, so it is gone rather than diagnosed four broken production deploys at a
+time. Reintroduce it from a PR, where the preview deploy exercises the same `_deploy.yml`.
 
 The deploy is the one wrangler call **not** wrapped in `nick-fields/retry`, because a wrapper that retries
 every failure cannot tell a bad argument from a bad network: this failure burned three identical attempts per
