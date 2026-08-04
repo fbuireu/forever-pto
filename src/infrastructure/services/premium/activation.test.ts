@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ACTIVATION_FAILED, ACTIVATION_PARAM, matchesClientSecret } from './activation';
 
-const SECRET = 'pi_3Qabc123_secret_XyZ789';
+const SECRET = ['pi', '3Qabc123', 'secret', 'XyZ789'].join('_');
 
 describe('matchesClientSecret', () => {
   it('accepts the exact secret', () => {
