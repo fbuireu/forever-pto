@@ -66,7 +66,7 @@ jobs:
           INPUTS_WRANGLER_ENV: ${{ inputs.wrangler_env }}
           INPUTS_URL: ${{ inputs.url }}
           DEPLOY_MESSAGE: ${{ github.sha }} - ${{ github.event_name }}
-        run: .github/scripts/deploy-worker.sh
+        run: bash .github/scripts/deploy-worker.sh
       - name: Set Worker secrets
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         env:
@@ -82,4 +82,4 @@ jobs:
           max_attempts: 3
           retry_wait_seconds: 15
           shell: bash
-          command: .github/scripts/set-worker-secrets.sh
+          command: bash .github/scripts/set-worker-secrets.sh
