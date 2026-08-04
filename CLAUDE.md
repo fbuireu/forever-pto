@@ -289,18 +289,22 @@ first checking whether the value is still correct for production, which shares t
 always overrides it, and the build never reads it. Build config lives in `next.config.ts` and
 `open-next.config.ts`.
 
-GitHub Actions: `ci.yml` holds the whole `main` pipeline — `lint`, `typecheck` and `test` in parallel, then
-`deploy-production`, then `release`. `deploy-development.yml` deploys a preview per PR, both calling the
-shared `_deploy.yml`, plus dependabot/renovate auto-merge and a `zizmor` workflow audit. Husky runs
-`lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `lint:ts:typecheck` on `pre-push`.
+GitHub Actions: **`ci.yml` holds the entire graph** — `lint`, `typecheck` and `test` in parallel, then
+`deploy-production` → `release` on `main`, or `deploy-development` → `comment` / `e2e` on a PR. Both deploy
+jobs call the shared `_deploy.yml`. The only other workflows are `cleanup-development.yml`, the
+dependabot/renovate auto-merges and a `zizmor` audit. Every job that needs a toolchain uses the
+`.github/actions/prepare-env` composite — pnpm, the `.nvmrc` Node, `setup-node`'s dependency cache and
+`pnpm install --frozen-lockfile` — rather than repeating five steps six times; `checkout` stays in the job,
+because `release` needs its own (`fetch-depth: 0` and the PAT). Husky runs `lint-staged` on `pre-commit`,
+`commitlint` on `commit-msg` and `lint:ts:typecheck` on `pre-push`.
 
-**`release` is downstream of `deploy-production`, and that ordering is the whole reason they share a
-workflow.** They were two workflows on the same `push` trigger, which meant they raced: semantic-release cut a
-tag, a GitHub release and a changelog entry for a version that had just failed to deploy, and nothing in the
-release job could see the deploy. `needs: [lint, typecheck, test, deploy-production]` is what makes a release
-mean *the version is live*. The workflow's `cancel-in-progress` is therefore conditional on
-`github.event_name == 'pull_request'`: cancelling a superseded PR run is free, cancelling a `main` run kills a
-deploy or a release halfway.
+**There is no `deploy-production.yml` and no `deploy-development.yml`, and that is the point.** They were
+separate workflows on the same triggers, so they *raced* `ci.yml` instead of following it: semantic-release
+only ever waited for lint, typecheck and test, and duly cut a tag, a GitHub release and a changelog entry for
+a version that had just failed to reach production. Nothing in a workflow can wait on another workflow, so
+the deploys had to become jobs. `release` needs `deploy-production`, which is what makes a release mean *the
+version is live*. `cancel-in-progress` is conditional on `github.event_name == 'pull_request'` for the same
+reason: cancelling a superseded PR run is free, cancelling a `main` run kills a deploy or a release halfway.
 
 **Nothing may be inlined into a `nick-fields/retry` `command:`, and the deploy is not retried at all.** That
 action re-parses its input and loses the inner quoting, so `--message "<sha> - push"` reached wrangler as
