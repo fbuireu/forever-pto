@@ -48,7 +48,6 @@ const holidayDateFmtCache = new Map<string, Intl.DateTimeFormat>();
 
 const HolidayCard = ({
   holiday,
-  index,
   isSelected,
   locale,
   onToggle,
@@ -57,10 +56,9 @@ const HolidayCard = ({
   tPremium,
 }: {
   holiday: HolidayDTO;
-  index: number;
   isSelected: boolean;
   locale: string;
-  onToggle: (holiday: HolidayDTO, index: number) => void;
+  onToggle: (holiday: HolidayDTO) => void;
   premiumKey: string | null;
   t: ReturnType<typeof useTranslations<'holidaysTable'>>;
   tPremium: ReturnType<typeof useTranslations<'premium'>>;
@@ -94,7 +92,7 @@ const HolidayCard = ({
               </PremiumFeature>
             )}
           >
-            <Checkbox checked={isSelected} onCheckedChange={() => onToggle(holiday, index)} className='mt-1 shrink-0' />
+            <Checkbox checked={isSelected} onCheckedChange={() => onToggle(holiday)} className='mt-1 shrink-0' />
           </ConditionalWrapper>
           <div className='flex-1 min-w-0'>
             <h4 className='font-medium text-sm leading-tight wrap-break-word'>{holiday.name}</h4>
@@ -198,18 +196,14 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
     }));
   }, []);
 
-  const getHolidayId = useCallback((holiday: HolidayDTO, index: number) => {
-    return `${holiday.name}-${holiday.date.getTime()}-${index}`;
-  }, []);
+  const getHolidayId = useCallback((holiday: HolidayDTO) => `${holiday.id}::${holiday.name}`, []);
 
   const selectionState = useMemo(() => {
     if (filteredHolidays.length === 0) {
       return { type: 'none' as const, count: 0 };
     }
 
-    const selectedCount = filteredHolidays.filter((holiday, index) =>
-      selectedHolidays.has(getHolidayId(holiday, index))
-    ).length;
+    const selectedCount = filteredHolidays.filter((holiday) => selectedHolidays.has(getHolidayId(holiday))).length;
 
     if (selectedCount === 0) {
       return { type: 'none' as const, count: 0 };
@@ -225,12 +219,12 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
       const newSelected = new Set(prev);
 
       if (selectionState.type === 'all') {
-        filteredHolidays.forEach((holiday, index) => {
-          newSelected.delete(getHolidayId(holiday, index));
+        filteredHolidays.forEach((holiday) => {
+          newSelected.delete(getHolidayId(holiday));
         });
       } else {
-        filteredHolidays.forEach((holiday, index) => {
-          newSelected.add(getHolidayId(holiday, index));
+        filteredHolidays.forEach((holiday) => {
+          newSelected.add(getHolidayId(holiday));
         });
       }
 
@@ -239,9 +233,9 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
   }, [filteredHolidays, selectionState.type, getHolidayId]);
 
   const toggleSelectHoliday = useCallback(
-    (holiday: HolidayDTO, index: number) => {
+    (holiday: HolidayDTO) => {
       setSelectedHolidays((prev) => {
-        const holidayId = getHolidayId(holiday, index);
+        const holidayId = getHolidayId(holiday);
         const newSelected = new Set(prev);
 
         if (newSelected.has(holidayId)) {
@@ -271,11 +265,10 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
     setSelectedHolidays(new Set());
   }, []);
 
-  const getSelectedHolidays = useCallback(() => {
-    return filteredHolidays.filter((holiday, index) => selectedHolidays.has(getHolidayId(holiday, index)));
-  }, [filteredHolidays, selectedHolidays, getHolidayId]);
-
-  const selectedHolidaysList = useMemo(() => getSelectedHolidays(), [getSelectedHolidays]);
+  const selectedHolidaysList = useMemo(
+    () => variantHolidays.filter((holiday) => selectedHolidays.has(getHolidayId(holiday))),
+    [variantHolidays, selectedHolidays, getHolidayId]
+  );
 
   const selectAllButton = useMemo(() => {
     const { type } = selectionState;
@@ -315,7 +308,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
     );
   }, [selectionState, toggleSelectAll, premiumKey, t, tPremium]);
 
-  const selectedCount = selectedHolidays.size;
+  const selectedCount = selectedHolidaysList.length;
   const weekendCount = variantHolidays.filter((h) => isWeekend(h.date)).length;
   const workdayCount = variantHolidays.filter((h) => !isWeekend(h.date)).length;
 
@@ -408,15 +401,14 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                 <HolidayTableHeader selectAllButton={selectAllButton} sortConfig={sortConfig} onSort={handleSort} />
                 <TableBody>
                   {filteredHolidays.length > 0 ? (
-                    filteredHolidays.map((holiday, index) => {
-                      const holidayId = getHolidayId(holiday, index);
+                    filteredHolidays.map((holiday) => {
+                      const holidayId = getHolidayId(holiday);
                       const isSelected = selectedHolidays.has(holidayId);
 
                       return (
                         <HolidayRow
                           key={holidayId}
                           holiday={holiday}
-                          index={index}
                           isSelected={isSelected}
                           locale={locale}
                           onToggle={toggleSelectHoliday}
@@ -455,15 +447,14 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 
               <div className='space-y-3 max-h-96 overflow-y-auto px-1'>
                 {filteredHolidays.length > 0 ? (
-                  filteredHolidays.map((holiday, index) => {
-                    const holidayId = getHolidayId(holiday, index);
+                  filteredHolidays.map((holiday) => {
+                    const holidayId = getHolidayId(holiday);
                     const isSelected = selectedHolidays.has(holidayId);
 
                     return (
                       <HolidayCard
                         key={holidayId}
                         holiday={holiday}
-                        index={index}
                         isSelected={isSelected}
                         locale={locale}
                         onToggle={toggleSelectHoliday}

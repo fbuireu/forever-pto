@@ -157,6 +157,23 @@ another ships a number that is silently wrong by however much budget went unspen
 *should* use is an open product question, recorded in `docs/plans/sweep-findings.md`; until it is answered,
 do not quietly align them.
 
+**Holiday selection is keyed on the Holiday, never on the row's position.** `getHolidayId` in
+`holidays/HolidaysTable.tsx` returns `` `${holiday.id}::${holiday.name}` ``, and it used to append the index
+the row was rendered at — which belongs to the *filtered and sorted* list, so typing in the search box or
+clicking a column header renamed every selection under it. The checkboxes silently cleared while the toolbar
+went on offering "Delete (1)", the delete modal received an empty list, and the edit button rendered above a
+modal that was never mounted, because the count came from the Set's size and the modal from a list resolved
+by index. Both now come from `selectedHolidaysList`, resolved against `variantHolidays` rather than the
+visible rows: the toolbar counts exactly what the modals will act on, a selection scrolled out of view by a
+search still counts, and an id left over from a Holiday that no longer exists resolves to nothing and drops
+out. The select-all checkbox is the deliberate exception — it reads and writes the *visible* rows, which is
+what "select all" means with a filter applied.
+
+**The sortable column headers are buttons inside the `th`, and the `th` carries `aria-sort`.** They were
+`<th onClick>`, which no keyboard can reach and which announces no sort state. Anything added to
+`holidays/components/HolidayTableHeader.tsx` keeps that shape: the cell's own padding moves to the button
+(`p-0` on the `TableHead`, `h-11 px-3` on the button) so the whole cell stays clickable.
+
 **Two unrelated `COLOR_SCHEMES`.** `summary/const.ts` exports an array of four brand CSS variables that
 the recharts charts index into; `summary/MetricCard.tsx` declares its own record keyed by colour name.
 They are not interchangeable and neither is derived from the other.

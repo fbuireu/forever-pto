@@ -13,13 +13,12 @@ import { memo } from 'react';
 
 interface HolidayRowProps {
   holiday: HolidayDTO;
-  index: number;
   isSelected: boolean;
   locale: Locale;
-  onToggle: (holiday: HolidayDTO, index: number) => void;
+  onToggle: (holiday: HolidayDTO) => void;
 }
 
-const HolidayRowComponent = ({ holiday, index, isSelected, locale, onToggle }: HolidayRowProps) => {
+const HolidayRowComponent = ({ holiday, isSelected, locale, onToggle }: HolidayRowProps) => {
   const t = useTranslations('holidayRow');
 
   const getWorkdayStatus = (date: Date) => {
@@ -44,7 +43,7 @@ const HolidayRowComponent = ({ holiday, index, isSelected, locale, onToggle }: H
         >
           <Checkbox
             checked={isSelected}
-            onCheckedChange={() => onToggle(holiday, index)}
+            onCheckedChange={() => onToggle(holiday)}
             aria-label={t('select', { name: holiday.name })}
           />
         </PremiumFeature>
