@@ -24,7 +24,7 @@ declare global {
   interface CloudflareEnv {
     NEXT_PUBLIC_SITE_URL: string;
     NEXT_PUBLIC_CONTACT_EMAIL: string;
-    RATE_LIMIT_KV: KVNamespace;
+    PAYMENT_RATE_LIMITER: { limit: (options: { key: string }) => Promise<{ success: boolean }> };
   }
 
   interface Window {

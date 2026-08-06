@@ -459,6 +459,36 @@ describe('resetManualSelection', () => {
     useHolidaysStore.getState().resetManualSelection();
     expect(useHolidaysStore.getState().currentSelection).toBe(suggestion);
   });
+
+  it('bumps planRevision so the freed budget is re-planned', () => {
+    const suggestion = makeSuggestion([new Date('2026-01-01')]);
+    useHolidaysStore.setState({
+      suggestion,
+      alternatives: [],
+      currentSelection: suggestion,
+      currentSelectionIndex: 0,
+      manuallySelectedDays: [new Date('2026-01-03')],
+      removedSuggestedDays: [],
+      planRevision: 4,
+    });
+
+    useHolidaysStore.getState().resetManualSelection();
+
+    expect(useHolidaysStore.getState().planRevision).toBe(5);
+  });
+
+  it('bumps planRevision even when there is no current selection', () => {
+    useHolidaysStore.setState({
+      currentSelection: null,
+      manuallySelectedDays: [new Date('2026-01-03')],
+      removedSuggestedDays: [],
+      planRevision: 0,
+    });
+
+    useHolidaysStore.getState().resetManualSelection();
+
+    expect(useHolidaysStore.getState().planRevision).toBe(1);
+  });
 });
 
 describe('trimManualDays', () => {

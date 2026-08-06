@@ -75,7 +75,11 @@ describe('getLongBlocksPerQuarter', () => {
 
   it('counts a holiday that extends a run to 3 days', () => {
     const ptoDays = [makeDate(2025, 1, 8), makeDate(2025, 1, 9)];
-    const withHoliday = getLongBlocksPerQuarter({ ptoDays, holidays: [makeHoliday(makeDate(2025, 1, 10))], window: WINDOW });
+    const withHoliday = getLongBlocksPerQuarter({
+      ptoDays,
+      holidays: [makeHoliday(makeDate(2025, 1, 10))],
+      window: WINDOW,
+    });
     expect(withHoliday).toEqual([1, 0, 0, 0]);
   });
 
@@ -107,9 +111,9 @@ describe('getLongBlocksPerQuarter', () => {
   });
 
   it('ignores holidays when no PTO day is placed', () => {
-    expect(getLongBlocksPerQuarter({ ptoDays: [], holidays: [makeHoliday(makeDate(2025, 1, 6))], window: WINDOW })).toEqual([
-      0, 0, 0, 0,
-    ]);
+    expect(
+      getLongBlocksPerQuarter({ ptoDays: [], holidays: [makeHoliday(makeDate(2025, 1, 6))], window: WINDOW })
+    ).toEqual([0, 0, 0, 0]);
   });
 });
 
@@ -446,5 +450,50 @@ describe('calculateLongWeekends counts only what the plan produced', () => {
     const ptoDays = [makeDate(2025, 1, 3)];
 
     expect(calculateLongWeekends({ ptoDays, holidays: [] })).toBe(1);
+  });
+});
+
+describe('calculateLongestVacation counts only what the plan produced', () => {
+  it('ignores a next-year run the Holidays formed on their own', () => {
+    const holidays = [makeHoliday(makeDate(2026, 4, 3)), makeHoliday(makeDate(2026, 4, 6))];
+    const elsewhere = [makeDate(2025, 6, 10)];
+
+    expect(calculateLongestVacation({ ptoDays: elsewhere, holidays })).toBe(1);
+  });
+
+  it('still lets a Holiday extend a stretch the plan started', () => {
+    const holidays = [makeHoliday(makeDate(2025, 1, 7))];
+    const ptoDays = [makeDate(2025, 1, 6)];
+
+    expect(calculateLongestVacation({ ptoDays, holidays })).toBe(4);
+  });
+});
+
+describe('getLongBlocksPerQuarter anchors on the first day inside the window', () => {
+  it('keeps a block that reaches back into the previous December', () => {
+    const result = getLongBlocksPerQuarter({
+      ptoDays: [makeDate(2024, 1, 2)],
+      holidays: [makeHoliday(makeDate(2024, 1, 1))],
+      window: { year: 2024, carryOverMonths: 0 },
+    });
+
+    expect(result).toEqual([1, 0, 0, 0]);
+  });
+});
+
+describe('getTotalEffectiveDays only counts span days that are still free', () => {
+  it('drops a day the span crossed that is now a workday again', () => {
+    const days = [makeDate(2025, 1, 3)];
+    const bridges = [makeBridge(makeDate(2025, 1, 3), makeDate(2025, 1, 7), [makeDate(2025, 1, 3)])];
+
+    expect(getTotalEffectiveDays(days, bridges)).toBe(3);
+  });
+
+  it('counts the span in full while the Holiday inside it still stands', () => {
+    const days = [makeDate(2025, 1, 3)];
+    const bridges = [makeBridge(makeDate(2025, 1, 3), makeDate(2025, 1, 7), [makeDate(2025, 1, 3)])];
+    const holidays = [makeHoliday(makeDate(2025, 1, 6)), makeHoliday(makeDate(2025, 1, 7))];
+
+    expect(getTotalEffectiveDays(days, bridges, holidays)).toBe(5);
   });
 });

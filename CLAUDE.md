@@ -29,15 +29,16 @@ the payment record *is* the entitlement ([ADR 0008](./docs/adr/0008-premium-deri
   ([ADR 0005](./docs/adr/0005-temporal-polyfill.md))
 - **Tailwind CSS v4** + shadcn/ui; **Turso** via `@tursodatabase/serverless` — hand-written SQL, no ORM;
   **Stripe**; **Resend**; **BetterStack**
-- **Cloudflare Workers** via `@opennextjs/cloudflare`, R2 for the incremental cache, KV for the payment rate
-  limiter ([ADR 0004](./docs/adr/0004-cloudflare-workers-as-deployment-target.md))
+- **Cloudflare Workers** via `@opennextjs/cloudflare`, R2 for the incremental cache, the platform's own
+  rate-limiting binding for the payment limiter
+  ([ADR 0004](./docs/adr/0004-cloudflare-workers-as-deployment-target.md))
 - **Biome** (lint + format), **Vitest** (unit, `happy-dom`), **Playwright** (e2e), **semantic-release** +
   commitlint, **husky** + lint-staged
 
 ## Versions (pinned — match exactly)
 
 - Node **26.3.0** (`.nvmrc`, mirrored in `engines.node`) — `.nvmrc` is what every CI job installs
-- pnpm **11.18.0** (`packageManager`) — always use pnpm, never npm/yarn
+- pnpm **11.20.0** (`packageManager`) — always use pnpm, never npm/yarn
 
 ## Commands
 
@@ -263,8 +264,8 @@ one above the highest existing file, and link it from wherever it bites — a go
 ## Deploy
 
 Cloudflare Workers via wrangler (`wrangler.toml`): `.open-next/worker.js` as the entrypoint, `.open-next/assets`
-served through the `ASSETS` binding, an R2 bucket for the incremental cache, a `RATE_LIMIT_KV` namespace for
-the payment rate limiter, smart placement, and a `forever-pto-tail` tail consumer. Only `env.production` binds
+served through the `ASSETS` binding, an R2 bucket for the incremental cache, a `PAYMENT_RATE_LIMITER`
+`[[ratelimits]]` binding for the payment limiter, smart placement, and a `forever-pto-tail` tail consumer. Only `env.production` binds
 a route (`forever-pto.com/*`); `env.development` supplies the preview bindings and CI deploys one worker per
 PR from it — `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes.
 
@@ -285,9 +286,17 @@ So a preview's `robots.txt` advertises the production sitemap. That is tolerated
 previews sit behind Cloudflare Access — nothing crawls them, which is why `playwright.config.ts` has to send
 `CF-Access-Client-Id`/`Secret` to reach one. Do not "fix" it by giving the build step the override without
 first checking whether the value is still correct for production, which shares that build path. The
-`[env.development.vars]` entry is the fallback for a hand-run `wrangler deploy --env development` only: CI
-always overrides it, and the build never reads it. Build config lives in `next.config.ts` and
-`open-next.config.ts`.
+`NEXT_PUBLIC_SITE_URL` line inside `[env.development.vars]` is the fallback for a hand-run
+`wrangler deploy --env development` only: CI always overrides that one key, and the build never reads it.
+
+**The rest of `[env.development.vars]` is load-bearing on every preview, and deleting the block breaks
+them.** `--var` merges, it does not replace: wrangler reads the selected environment's `[vars]` into the
+binding set and only then overwrites the individual keys the flag names. `_deploy.yml` passes exactly one,
+`NEXT_PUBLIC_SITE_URL`, so `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXTJS_ENV` and `TURSO_DATABASE_URL` reach every
+per-PR worker straight from `wrangler.toml`. Only the site URL is dead weight there, and it is not
+removable either — without it a hand-run development deploy would fall through to the top-level `[vars]`
+and advertise itself as `forever-pto.com`. Read the whole block as configuration, not residue. Build config
+lives in `next.config.ts` and `open-next.config.ts`.
 
 GitHub Actions: **`ci.yml` holds the entire graph** — `lint`, `typecheck` and `test` in parallel, then
 `deploy-production` → `release` on `main`, or `deploy-development` → `comment` / `e2e` on a PR. Both deploy
@@ -314,6 +323,10 @@ was wrongly blamed for it first), and it is not the separator character (an em d
 hyphen, though `biancafiore/.github/workflows/_deploy.yml` deploys with one). The mechanism is still
 unexplained; the flag is cosmetic, so it is gone rather than diagnosed four broken production deploys at a
 time. Reintroduce it from a PR, where the preview deploy exercises the same `_deploy.yml`.
+
+That diagnosis was made against wrangler **4.115**, and the pin has since moved to **4.118** — so it is
+untested on the version CI now runs. Nothing here has been re-verified; treat the paragraph above as a
+record of what 4.115 did, and if you try `--message` again, a preview PR is still the way to find out.
 
 The deploy is the one wrangler call **not** wrapped in `nick-fields/retry`, because a wrapper that retries
 every failure cannot tell a bad argument from a bad network: this failure burned three identical attempts per

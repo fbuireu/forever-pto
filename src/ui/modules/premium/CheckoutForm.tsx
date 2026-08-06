@@ -176,7 +176,12 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
               </div>
             </div>
             <div className='relative min-h-12'>
-              <Skeleton name='express-checkout' loading={!isExpressReady} fixture={<ExpressCheckoutFixture />}>
+              <Skeleton
+                name='express-checkout'
+                loading={!isExpressReady}
+                fixture={<ExpressCheckoutFixture />}
+                fallback={<ExpressCheckoutFixture />}
+              >
                 <div />
               </Skeleton>
               <div className={!isExpressReady ? 'invisible absolute inset-0' : 'visible'}>

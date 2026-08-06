@@ -11,10 +11,11 @@ import {
   getFirstLastBreak,
   getLongBlocksPerQuarter,
   getMonthlyDist,
+  getTotalEffectiveDays,
+  getValidBridges,
+  getWorkedDaysPerMonth,
   windowMonthCount,
   windowQuarterCount,
-  getTotalEffectiveDays,
-  getWorkedDaysPerMonth,
 } from './utils/helpers';
 
 interface GenerateMetricsParams {
@@ -63,7 +64,8 @@ export const generateMetrics = ({
   }
   const monthlyDist = getMonthlyDist(days, planningWindow);
   const longBlocksPerQuarter = getLongBlocksPerQuarter({ ptoDays: days, holidays, window: planningWindow });
-  const totalEffectiveDays = getTotalEffectiveDays(days, bridges);
+  const totalEffectiveDays = getTotalEffectiveDays(days, bridges, holidays);
+  const bridgesUsed = getValidBridges(days, bridges).length;
   const longWeekends = calculateLongWeekends({ ptoDays: days, holidays });
   const longestVacation = calculateLongestVacation({ ptoDays: days, holidays });
 
@@ -93,7 +95,7 @@ export const generateMetrics = ({
     averageEfficiency: efficiency,
     bonusDays,
     quarterDist,
-    bridgesUsed: bridges?.length ?? 0,
+    bridgesUsed,
     workedDaysPerMonth,
     totalEffectiveDays,
     monthlyDist,

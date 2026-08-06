@@ -99,7 +99,12 @@ export const ManagementBar = () => {
   return (
     <div className='col-span-full sticky top-3 z-10'>
       {!isMobile && !isSettledEmpty && (
-        <Skeleton name='planner-panel' loading={!isReady} fixture={<PlannerPanelFixture />}>
+        <Skeleton
+          name='planner-panel'
+          loading={!isReady}
+          fixture={<PlannerPanelFixture />}
+          fallback={<PlannerPanelFixture />}
+        >
           {isReady && currentSelection && <PlannerPanel key={previewAlternativeIndex} {...plannerPanelProps} />}
         </Skeleton>
       )}

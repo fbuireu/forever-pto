@@ -117,6 +117,7 @@ export const Summary = () => {
     const effectiveDays = metrics.totalEffectiveDays;
     const increment = effectiveDays - ptoDays;
     const gain = ptoDays > 0 ? (increment / ptoDays) * 100 : 0;
+    const placedDays = activeSuggestion.days.length;
 
     const maxAlternative = Math.max(
       effectiveDays,
@@ -133,6 +134,7 @@ export const Summary = () => {
       effectiveDays,
       increment,
       gain,
+      placedDays,
       maxAlternative,
       canImprove,
     };
@@ -140,7 +142,7 @@ export const Summary = () => {
 
   const content = (() => {
     if (!metricsData) return null;
-    const { metrics, effectiveDays, increment, gain, canImprove } = metricsData;
+    const { metrics, effectiveDays, increment, gain, placedDays, canImprove } = metricsData;
     return (
       <div className='w-full max-w-4xl mx-auto space-y-6 z-1'>
         <Card>
@@ -197,7 +199,8 @@ export const Summary = () => {
             <div className='hidden sm:block'>
               <YearTimelineChart
                 year={year}
-                holidays={holidays ?? []}
+                carryOverMonths={carryOverMonths}
+                holidays={holidaysInWindow}
                 suggestion={activeSuggestion}
                 manuallySelectedDays={manuallySelectedDays}
               />
@@ -233,7 +236,7 @@ export const Summary = () => {
                 label={t('metrics.effectiveDays')}
                 value={effectiveDays}
                 icon={TrendingUp}
-                badge={increment > 0 ? `+${increment} ${t('metrics.overBudget')}` : `0 ${t('metrics.overBudget')}`}
+                badge={`${increment > 0 ? `+${increment}` : '0'} ${t('metrics.overBudget', { ptoDays })}`}
                 colorScheme='purple'
               />
               <MetricCard
@@ -241,7 +244,7 @@ export const Summary = () => {
                 value={gain.toFixed(0)}
                 symbol={'%'}
                 icon={Zap}
-                badge={t('metrics.perPtoDay')}
+                badge={t('metrics.perPtoDay', { ptoDays })}
                 colorScheme='amber'
               />
             </div>
@@ -267,6 +270,8 @@ export const Summary = () => {
               <MetricCard
                 label={t('metrics.efficiency')}
                 value={metrics.averageEfficiency.toFixed(1)}
+                decimalPlaces={1}
+                hint={t('metrics.perPlacedDay', { placedDays })}
                 icon={TrendingUp}
                 colorScheme='amber'
                 size={MetricCardSize.COMPACT}
@@ -283,6 +288,7 @@ export const Summary = () => {
               <MetricCard
                 label={t('metrics.workedDaysPerMonth')}
                 value={metrics.workedDaysPerMonth}
+                decimalPlaces={1}
                 icon={Award}
                 colorScheme='violet'
                 size={MetricCardSize.COMPACT}

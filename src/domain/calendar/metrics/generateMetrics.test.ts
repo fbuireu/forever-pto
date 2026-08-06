@@ -201,4 +201,39 @@ describe('generateMetrics', () => {
     expect(result.bonusDays).toBe(0);
     expect(result.totalEffectiveDays).toBe(0);
   });
+
+  it('counts only the Bridges Effective Days kept', () => {
+    const kept = makeDate(2025, 1, 3);
+    const dropped = [makeDate(2025, 1, 9), makeDate(2025, 1, 10)];
+    const bridges = [
+      {
+        startDate: kept,
+        endDate: makeDate(2025, 1, 5),
+        ptoDaysNeeded: 1,
+        ptoDays: [kept],
+        effectiveDays: 3,
+        efficiency: 3,
+      },
+      {
+        startDate: dropped[0] as Date,
+        endDate: makeDate(2025, 1, 12),
+        ptoDaysNeeded: 2,
+        ptoDays: dropped,
+        effectiveDays: 4,
+        efficiency: 2,
+      },
+    ];
+
+    const result = generateMetrics({
+      suggestion: { days: [kept, ...dropped] },
+      locale: LOCALE,
+      year: YEAR,
+      bridges,
+      holidays: [],
+      allowPastDays: true,
+      removedSuggestedDays: [dropped[0] as Date],
+    });
+
+    expect(result.bridgesUsed).toBe(1);
+  });
 });

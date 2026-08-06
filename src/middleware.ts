@@ -34,9 +34,12 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   }
 
   if (pathname.endsWith(PAYMENT_CONFIRMATION_PATH) && !request.nextUrl.searchParams.has('payment_intent')) {
-    const homePath = pathname.slice(0, -PAYMENT_CONFIRMATION_PATH.length) || '/';
+    const homePath = `/${pathname.slice(0, -PAYMENT_CONFIRMATION_PATH.length).replace(/^\/+/, '')}`;
+    const homeUrl = new URL(request.url);
+    homeUrl.pathname = homePath;
+    homeUrl.search = '';
 
-    return NextResponse.redirect(new URL(homePath, request.url));
+    return NextResponse.redirect(homeUrl);
   }
 
   const i18nResponse = i18nProxy(request);

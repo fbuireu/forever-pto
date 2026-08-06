@@ -18,12 +18,12 @@ read by the premium activation path as well as by the payment one.
 | `repository.ts` | `savePayment`, `updatePaymentStatus`, `updatePaymentCharge`, `getPaymentById`, `getPaymentByEmail`, `countPromoCodeRedemptions`, `normalizePromoCode`, the `PaymentChargeData` shape | `TursoService` |
 | `normalizeEmail.ts` | `normalizeEmail(email)` — trim and lower-case, applied on both sides of every address comparison | — |
 | `confirmation.ts` | `confirmation(paymentIntentId)` — a `PaymentConfirmationDTO`, or `null` on any failure | `StripeServerService`, `LoggerService` |
-| `rateLimit.ts` | `checkRateLimit(ip)` — fails with `RateLimitError` | the Cloudflare `RATE_LIMIT_KV` binding |
+| `rateLimit.ts` | `checkRateLimit(ip)` — fails with `RateLimitError` | the Cloudflare `PAYMENT_RATE_LIMITER` binding |
 | `provider/intent.ts` | `createPaymentIntent(params)` — the Stripe intent behind a Donation | `StripeServerService` |
 | `provider/charge.ts` | `retrieveCharge(chargeId)` — normalises a Stripe `Charge` into flat, nullable fields | `StripeServerService` |
 | `provider/promoCode.ts` | `validatePromoCode(code, amount)` — a `DiscountInfo`, or a `PromoCodeError` | `StripeServerService`, `TursoService` |
 
-`provider/` is the Stripe side; at the root sit the database, the KV limiter and the address normaliser, and
+`provider/` is the Stripe side; at the root sit the database, the rate limiter and the address normaliser, and
 `confirmation.ts` sits between: a Stripe read that exists only to render the post-checkout page.
 
 ## Who calls what
@@ -87,6 +87,21 @@ matches on `metadata.email`, and `paymentDataDTO` reads `promoCode`, `userAgent`
 Stripe metadata values must be strings, which is why the builder is full of `?? ''` and `.toFixed(2)` — a
 value dropped here cannot be recovered from Stripe afterwards.
 
+**Stripe caps a metadata value at 500 characters, and three of ours were unbounded.** `promoCode`,
+`userAgent` and `ipAddress` now go through `clampMetadata`. A `User-Agent` over the cap is trivially
+forgeable and occurs in the wild from AV- and enterprise-injected headers, and it made `paymentIntents.create`
+reject the whole call — so a header the donor never chose failed the Donation, and the route answered a bare
+500. `promoCode` reaches the same place unvalidated whenever it is whitespace: `createPayment` guards with
+`if (validated.promoCode?.trim())`, so `'   '` skips `validatePromoCode` and is written verbatim.
+
+**`email` is deliberately *not* clamped, and must not be.** It is the only key Premium can ever be recovered
+by ([ADR 0008](../../../../docs/adr/0008-premium-derived-from-payment.md)) and `activateWithPayment` matches
+on it exactly, so a truncated address would silently orphan the payer — the same class of failure as writing
+a blank one. An over-long address is refused earlier instead, by the `.max(254)` on
+`createPaymentSchemaWithMessages`, so it fails as a `ValidationError` and a 400 rather than reaching Stripe.
+`promoCode` carries a `.max()` there too, which is what stops the whitespace bypass carrying an arbitrarily
+long string. Adding a new free-text metadata field means deciding which of these two it is.
+
 ## Traps
 
 **`SELECT *` gives a row, not a `PaymentData`.** `TursoService.query` casts with `rows as T[]` and maps
@@ -107,13 +122,25 @@ The SDK still types `balance_transaction` as `string | BalanceTransaction | null
 the SDK through the optional second argument on `StripeServerService.charges.retrieve`; a new expansion is a
 change here, not a widening of the tag.
 
-**The rate limiter fails open.** Any error — no Cloudflare context, KV unavailable — is caught into
-"not blocked", so payment creation keeps working when the limiter does not. It also only ever increments
-while under the limit, so once an IP is blocked the key stops being refreshed and expires 60 s after the
-tenth accepted request. It reads the `RATE_LIMIT_KV` binding through `getCloudflareContext({ async: true })`, the form that also
-resolves outside a request — so what confines this file to a request is the `cf-connecting-ip` header it
-keys on, not the context call
-([ADR 0004](../../../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)).
+**The rate limiter fails open.** Any error — no Cloudflare context, the binding unavailable — is caught into
+"not blocked", so payment creation keeps working when the limiter does not. It reads the
+`PAYMENT_RATE_LIMITER` binding through `getCloudflareContext({ async: true })`, the form that also resolves
+outside a request — so what confines this file to a request is the `cf-connecting-ip` header it keys on, not
+the context call ([ADR 0004](../../../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)).
+
+**It counts on the platform, because a KV counter cannot be made correct here.** This was a read-modify-write
+over `RATE_LIMIT_KV` — `get`, compare, `put(count + 1)` — and Workers KV offers neither compare-and-swap nor
+atomic increment, so every request whose `get` resolved before a peer's `put` landed read the same value and
+wrote the same number. The 10-per-60 s bound therefore held only for strictly serialised traffic: two hundred
+parallel `POST /api/payment` from one IP — which is exactly the shape of card-testing traffic — advanced the
+counter by an amount unrelated to the burst and admitted almost all of them to
+`stripe.paymentIntents.create`. Two KV properties widened the window rather than narrowing it: a `get` is
+served from a per-colo cache whose minimum TTL is 60 s, the same as the window, and writes to one key are
+throttled to roughly one per second. `simple = { limit = 10, period = 60 }` in `wrangler.toml` now owns both
+bounds — `period` accepts only 10 or 60 — so there is no `LIMIT`, no `WINDOW_SECONDS` and no `rl:payment:`
+key in this file. This is distinct from the fail-open stance above, which covers errors only, and from the
+"best-effort, not atomic" caveat granted to the promo-code cap below: that one is a marketing control, this
+one is the only thing in front of the card processor.
 
 **Promotion-code checks come before coupon checks, and the first error wins.** `validatePromoCode` resolves
 the code, re-retrieves it with `expand: ['coupon']` — casting through `unknown` because the SDK type does
@@ -154,7 +181,9 @@ only in the logs.
 
 Every file has a co-located `.test.ts`, all built the same way: `Layer.succeed(Tag, mock)` for each tag in
 `R`, a local `run` helper that provides the merged layer, and `Effect.flip` where the assertion is about the
-failure. `rateLimit.test.ts` mocks `@opennextjs/cloudflare` instead, since KV is its only dependency.
+failure. `rateLimit.test.ts` mocks `@opennextjs/cloudflare` instead, since the rate-limiting binding is its only
+dependency; its burst case drives 200 concurrent `checkRateLimit` calls to pin that the count is the
+platform’s and not a local read-modify-write.
 
 No test constructs a Stripe or Turso client. `repository.test.ts` asserts positionally — one statement
 keyword via `toContain`, then each value by its index in the argument array — so reordering a column without

@@ -81,7 +81,7 @@ use-cases may not, and receive configuration as plain values instead — `contac
 `env.NEXT_PUBLIC_SITE_URL` and `env.NEXT_PUBLIC_CONTACT_EMAIL` and passes them down as a plain object.
 
 Five places inside this layer read it directly, and each has a reason: `actions/contact.ts` (config for the
-use-case), `services/payments/rateLimit.ts` (the `RATE_LIMIT_KV` binding),
+use-case), `services/payments/rateLimit.ts` (the `PAYMENT_RATE_LIMITER` binding),
 `services/env/getPublicEnv.ts` (a `'use cache'` function, so it uses the `{ async: true }` form),
 `clients/logging/better-stack/client.ts` (the execution context for `waitUntil`, wrapped in a `try` that
 returns `undefined` so logging still works off-request), and `services/location/utils/strategies.ts` (only

@@ -2,6 +2,7 @@
 
 import { HolidayVariant } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
+import { useStoresReady } from '@ui/hooks/useStoresReady';
 import {
   Tabs,
   TabsContent,
@@ -18,16 +19,18 @@ import { HolidaysTable } from './holidays/HolidaysTable';
 
 export const HolidaysList = () => {
   const t = useTranslations('holidaysTable');
+  const { areStoresReady } = useStoresReady();
   const holidays = useHolidaysStore((state) => state.holidays);
   const [activeTab, setActiveTab] = useState<HolidayVariant>(HolidayVariant.NATIONAL);
   const regionalHolidays = useMemo(
     () => holidays.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL),
     [holidays]
   );
+  const hasRegionalHolidays = areStoresReady && regionalHolidays.length > 0;
 
   const handleTabChange = (value: string) => {
     const variant = value as HolidayVariant;
-    if (variant === HolidayVariant.REGIONAL && regionalHolidays.length === 0) return;
+    if (variant === HolidayVariant.REGIONAL && !hasRegionalHolidays) return;
     setActiveTab(variant);
   };
 
@@ -39,7 +42,7 @@ export const HolidaysList = () => {
             <TabsHighlightItem value={HolidayVariant.NATIONAL}>
               <TabsTrigger value={HolidayVariant.NATIONAL}>{t('nationalTab')}</TabsTrigger>
             </TabsHighlightItem>
-            {regionalHolidays.length > 0 ? (
+            {hasRegionalHolidays ? (
               <TabsHighlightItem value={HolidayVariant.REGIONAL}>
                 <TabsTrigger value={HolidayVariant.REGIONAL}>{t('regionalTab')}</TabsTrigger>
               </TabsHighlightItem>
@@ -61,13 +64,13 @@ export const HolidaysList = () => {
         </TabsHighlight>
         <TabsContents className='mx-1 mb-1 rounded-sm bg-background py-4'>
           <TabsContent value={HolidayVariant.NATIONAL}>
-            <HolidaysTable variant={HolidayVariant.NATIONAL} title={t('nationalTitle')} open />
+            {areStoresReady && <HolidaysTable variant={HolidayVariant.NATIONAL} title={t('nationalTitle')} open />}
           </TabsContent>
           <TabsContent value={HolidayVariant.REGIONAL}>
-            <HolidaysTable variant={HolidayVariant.REGIONAL} title={t('regionalTitle')} open />
+            {areStoresReady && <HolidaysTable variant={HolidayVariant.REGIONAL} title={t('regionalTitle')} open />}
           </TabsContent>
           <TabsContent value={HolidayVariant.CUSTOM}>
-            <HolidaysTable variant={HolidayVariant.CUSTOM} title={t('customTitle')} open />
+            {areStoresReady && <HolidaysTable variant={HolidayVariant.CUSTOM} title={t('customTitle')} open />}
           </TabsContent>
         </TabsContents>
       </Tabs>

@@ -41,23 +41,32 @@ processing fee is actually read instead of writing NULL to every payment row, th
 rows instead of returning raw snake_case typed as something else, per-visitor geolocation stopped being
 served from a shared cache, and observances stopped counting as Holidays and inflating Effective Days.
 
-## Still open
+## Closed on 2026-08-06 — and it was never the blocker it was written up as
 
-**The skeleton registry has drifted from what the components ask for.**
-`src/ui/modules/bones/alternatives-manager.bones.json` and `pto-status.bones.json` are registered but no
-`<Skeleton>` requests them — both are 35-byte empty descriptors, so the shipped cost is two registry entries
-rather than two real skeletons. Conversely `express-checkout` *is* requested, by `premium/CheckoutForm.tsx`,
-but was never captured, so that Skeleton always falls back to its hand-written fixture.
+**The skeleton registry drift is fixed, by deleting two files.** This entry stood for five days as "cannot
+be fixed by editing anything", on the reasoning that `registry.ts` is generated and the CLI needs headless
+Chromium over a running app. Both halves were wrong, and the way they were wrong is the lesson.
 
-This one cannot be fixed by editing anything: `registry.ts` is generated, and `boneyard.config.json` has no
-list of bone names — the CLI drives headless Chromium over the running app and captures whatever `<Skeleton>`
-it finds rendered. Closing it means deleting the two stale descriptors and re-running `pnpm bones:build`, and
-for `express-checkout` reaching a state where the checkout form is mounted behind a real Stripe client
-secret. Worth deciding first whether that last one is wanted at all: the `<Skeleton>` in question wraps an
-empty `div`, so a capture would yield nothing and the fixture is the only meaningful placeholder — dropping
-its `name` and leaving it fixture-only is a legitimate answer.
-[`src/ui/modules/CLAUDE.md`](../../src/ui/modules/CLAUDE.md) carries the same warning where a reader will meet
-it.
+`registry.ts` is generated, but its body is a pure function of the `.bones.json` files on disk and
+`boneyard.config.json` — there was nothing to *capture* in order to remove something. And the two dead
+descriptors were in the registry precisely *because* they were on disk: the CLI merges what it captured with
+every descriptor it finds (`mergePreservingExisting`, absent `--force`), so a rebuild would have re-registered
+them for ever. Deleting `alternatives-manager.bones.json` and `pto-status.bones.json` — 35 bytes each, both
+empty — and dropping their two imports and two `registerBones` entries is exactly what the next build emits.
+
+**Reading the library instead of the write-up also turned up a real defect the write-up had inverted.** It
+recorded that `express-checkout` "always falls back to its hand-written fixture". It does not, and could not:
+`Skeleton` renders `showFallback ? fallback : children`, and `fixture` is build-time only — returned early,
+behind `window.__BONEYARD_BUILD`, so the capture has a shape to measure. `premium/CheckoutForm.tsx` passed
+`fixture` and no `fallback`, so with no bone registered under that name the express-checkout slot rendered an
+**empty container** for the whole time Stripe took to be ready, and `ExpressCheckoutFixture.tsx` was dead code
+at runtime. `pages/planner/ManagementBar.tsx` had the same shape, exposed only in the window before its
+container is measured. Both now pass `fallback` alongside `fixture`.
+
+For the same reason, capturing `express-checkout` never needed a real Stripe client secret: the CLI renders
+the `fixture`, not the real children. It remains uncaptured, which is now cosmetic.
+[`src/ui/modules/CLAUDE.md`](../../src/ui/modules/CLAUDE.md) carries the `fixture`-versus-`fallback` rule
+where a reader will meet it before writing the next `<Skeleton>`.
 
 ## The older record
 

@@ -63,16 +63,17 @@
       "regional": "reg.",
       "custom": "prop.",
       "effectiveDays": "Dies efectius",
-      "overBudget": "sobre pressupost",
+      "overBudget": "sobre el teu pressupost de {ptoDays} dies",
       "gain": "Guany",
-      "perPtoDay": "per dia de PTO",
+      "perPtoDay": "del teu pressupost de {ptoDays} dies",
       "longWeekends": "Ponts de cap de setmana",
       "restBlocks": "Blocs de descans",
       "efficiency": "Eficiència",
       "bridgesUsed": "Ponts usats",
       "workedDaysPerMonth": "Dies treballats/mes",
       "longestVacation": "Vacances més llargues",
-      "advancedMetrics": "Mètriques avançades"
+      "advancedMetrics": "Mètriques avançades",
+      "perPlacedDay": "per dia gastat ({placedDays})"
     },
     "yearSummary": {
       "feature": "Resum anual",

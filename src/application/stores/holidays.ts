@@ -539,12 +539,13 @@ export const useHolidaysStore = create<HolidaysStore>()(
         },
 
         resetManualSelection: () => {
-          const { currentSelection, currentSelectionIndex, suggestion, alternatives } = get();
+          const { currentSelection, currentSelectionIndex, suggestion, alternatives, planRevision } = get();
 
           if (!currentSelection) {
             set({
               manuallySelectedDays: [],
               removedSuggestedDays: [],
+              planRevision: planRevision + 1,
             });
             return;
           }
@@ -556,11 +557,13 @@ export const useHolidaysStore = create<HolidaysStore>()(
               manuallySelectedDays: [],
               removedSuggestedDays: [],
               currentSelection: baseSelection,
+              planRevision: planRevision + 1,
             });
           } else {
             set({
               manuallySelectedDays: [],
               removedSuggestedDays: [],
+              planRevision: planRevision + 1,
             });
           }
         },

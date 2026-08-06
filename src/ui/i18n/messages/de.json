@@ -63,16 +63,17 @@
       "regional": "reg.",
       "custom": "eigene",
       "effectiveDays": "Effektive Tage",
-      "overBudget": "über Budget",
+      "overBudget": "über dein Budget von {ptoDays} Tagen",
       "gain": "Gewinn",
-      "perPtoDay": "pro PTO-Tag",
+      "perPtoDay": "deines Budgets von {ptoDays} Tagen",
       "longWeekends": "Lange Wochenenden",
       "restBlocks": "Ruheblöcke",
       "efficiency": "Effizienz",
       "bridgesUsed": "Brückentage genutzt",
       "workedDaysPerMonth": "Gearbeitete Tage/Monat",
       "longestVacation": "Längster Urlaub",
-      "advancedMetrics": "Erweiterte Kennzahlen"
+      "advancedMetrics": "Erweiterte Kennzahlen",
+      "perPlacedDay": "pro genutztem Tag ({placedDays})"
     },
     "yearSummary": {
       "feature": "Jahresübersicht",

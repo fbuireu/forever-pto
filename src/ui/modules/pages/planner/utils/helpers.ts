@@ -18,6 +18,8 @@ const CALENDAR_WEEKS = 6;
 const DAYS_PER_WEEK = 7;
 const CALENDAR_SIZE = CALENDAR_WEEKS * DAYS_PER_WEEK;
 
+export const MONTHS_IN_YEAR = 12;
+
 interface GetWeekdayNamesParams {
   locale: Locale;
   weekStartsOn: Day;
@@ -42,7 +44,7 @@ interface GetTotalMonthsParams {
   year: number;
 }
 export const getTotalMonths = ({ carryOverMonths, year }: GetTotalMonthsParams) => {
-  const totalMonths = 12 + carryOverMonths;
+  const totalMonths = MONTHS_IN_YEAR + carryOverMonths;
   const start = startOfMonth(new Date(year, 0, 1));
 
   return Array.from({ length: totalMonths }, (_, i) => addMonths(start, i));
@@ -130,11 +132,11 @@ export const getMonthNames = ({ locale, monthCount, startYear, monthOutputFormat
     monthNameFmtCache.set(cacheKey, fmt);
   }
   for (let i = 0; i < monthCount; i++) {
-    const year = startYear + Math.floor(i / 12);
-    const month = i % 12;
+    const year = startYear + Math.floor(i / MONTHS_IN_YEAR);
+    const month = i % MONTHS_IN_YEAR;
     const date = new Date(year, month, 1);
     const monthName = fmt.format(date);
-    const yearSuffix = i >= 12 ? ` '${year.toString().slice(-2)}` : '';
+    const yearSuffix = i >= MONTHS_IN_YEAR ? ` '${year.toString().slice(-2)}` : '';
     monthNames.push(`${monthName}${yearSuffix}`);
   }
   return monthNames;

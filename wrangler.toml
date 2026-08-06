@@ -29,9 +29,10 @@ mode = "smart"
 binding = "NEXT_INC_CACHE_R2_BUCKET"
 bucket_name = "forever-pto-next-inc-cache"
 
-[[kv_namespaces]]
-binding = "RATE_LIMIT_KV"
-id = "830b55c22c574287acebb51ca89b01f0"
+[[ratelimits]]
+name = "PAYMENT_RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }
 
 [vars]
 NEXT_PUBLIC_SITE_URL = "https://forever-pto.com"
@@ -65,9 +66,10 @@ TURSO_DATABASE_URL = "libsql://forever-pto-development-fbuireu.aws-eu-west-1.tur
 binding = "NEXT_INC_CACHE_R2_BUCKET"
 bucket_name = "forever-pto-next-inc-cache-dev"
 
-[[env.development.kv_namespaces]]
-binding = "RATE_LIMIT_KV"
-id = "deae751b22674c0695fc1581161193dd"
+[[env.development.ratelimits]]
+name = "PAYMENT_RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }
 
 [env.production]
 name = "forever-pto"
@@ -100,6 +102,7 @@ zone_name = "forever-pto.com"
 binding = "NEXT_INC_CACHE_R2_BUCKET"
 bucket_name = "forever-pto-next-inc-cache"
 
-[[env.production.kv_namespaces]]
-binding = "RATE_LIMIT_KV"
-id = "830b55c22c574287acebb51ca89b01f0"
+[[env.production.ratelimits]]
+name = "PAYMENT_RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }

@@ -48,7 +48,7 @@ Given your country, region, year, and number of PTO days, Forever PTO suggests t
 
 ## Getting started
 
-**Requirements:** Node.js 26.3.0 (`.nvmrc`, mirrored in `engines.node`), pnpm 11.18.0 (`packageManager`) — pinned, match exactly
+**Requirements:** Node.js 26.3.0 (`.nvmrc`, mirrored in `engines.node`), pnpm 11.20.0 (`packageManager`) — pinned, match exactly
 
 ```bash
 # Install dependencies

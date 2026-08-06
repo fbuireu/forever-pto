@@ -32,7 +32,7 @@ this order; the layout adds `SiteTitle.tsx` and `SiteSubtitle.tsx` above them.
 | `calendar/` | `calendar/Calendar.tsx` — one month grid, ~540 lines, four selection modes; `calendar/utils/helpers.ts` — `MODIFIERS_CLASS_NAMES` and `getDayClassNames`; `calendar/CalendarListFixture.tsx` |
 | `holidays/` | `holidays/HolidaysTable.tsx` plus `holidays/components/` — `HolidayRow.tsx`, `HolidayTableHeader.tsx`, the three modals, and the Zod factory in `holidays/components/schema.ts` |
 | `summary/` | The five charts, `summary/MetricCard.tsx`, `summary/SummaryFixture.tsx` and `summary/const.ts` |
-| `utils/` | `utils/helpers.ts` — Planning Window and calendar-grid construction, workday/weekend counting; `utils/modifiers.ts` — the day predicates |
+| `utils/` | `utils/helpers.ts` — Planning Window and calendar-grid construction, workday/weekend counting, and the `MONTHS_IN_YEAR` constant every `12 + carryOverMonths` on this screen is built from; `utils/modifiers.ts` — the day predicates |
 
 ## Day classification
 
@@ -153,9 +153,19 @@ always — a Removed Day, or a Bridge that no longer fits, leaves budget standin
 [`@domain/calendar/CLAUDE.md`](../../../../domain/calendar/CLAUDE.md)). Gain is therefore **not** Efficiency
 minus one, and the badge is **not** a Bonus Day count as [`CONTEXT.md`](../../../../../CONTEXT.md) defines it
 — which is why its label says "over budget" and never the word bonus. Collapsing any of these into one
-another ships a number that is silently wrong by however much budget went unspent. Which baseline the screen
-*should* use is an open product question, recorded in `docs/plans/sweep-findings.md`; until it is answered,
-do not quietly align them.
+another ships a number that is silently wrong by however much budget went unspent.
+
+**That question is now answered: name the baseline, never align the numbers.** Both figures are correct for
+what they measure, so the screen states what each is measured against rather than picking a winner. The
+Effective Days badge and the Gain badge interpolate `ptoDays`, and the Efficiency card carries a `hint`
+naming `activeSuggestion.days.length` — the days the plan actually placed. A future change that makes the
+two agree by moving a denominator is a regression, not a simplification; the disagreement is information.
+
+**`MetricCard` rounds to whole numbers unless told otherwise, and two of these values are fractional.**
+`SlidingNumber` runs `value.toFixed(decimalPlaces)`, and the card defaulted every caller to `0` with no way
+to override it — so Efficiency arrived as `'1.6'` and rendered `2`, and `workedDaysPerMonth`, which
+`getWorkedDaysPerMonth` deliberately returns as `Number.parseFloat(avg.toFixed(1))`, rendered as an integer.
+Both now pass `decimalPlaces={1}`. A new fractional metric has to do the same.
 
 **Holiday selection is keyed on the Holiday, never on the row's position.** `getHolidayId` in
 `holidays/HolidaysTable.tsx` returns `` `${holiday.id}::${holiday.name}` ``, and it used to append the index
@@ -181,6 +191,22 @@ They are not interchangeable and neither is derived from the other.
 **`YearTimelineChart.tsx` is not a recharts chart.** It is hand-built positioned `div`s using
 `Temporal.PlainYearMonth` for month lengths ([ADR 0005](../../../../../docs/adr/0005-temporal-polyfill.md)).
 The other four charts use recharts and are the reason `Summary.tsx` loads all five through `dynamic()`.
+
+**It spans the Planning Window, not the calendar year, and both halves of that were once wrong.** `segPos`
+positioned a segment from `getMonth(date)` and `getDayOfMonth(date)` alone — the year was discarded — over a
+hard-coded twelve columns, while `Summary` handed it the raw two-year `holidays` array. So every Holiday of
+`year + 1` was painted onto the `year` strip: for ES/2026 the National row marked 26 March, which is Good
+Friday **2027** and an ordinary Workday in 2026. The two defects are independent, and filtering alone does
+not fix it — with the default `carryOverMonths: 1` the window itself reaches into January of `year + 1`, so
+an in-window date there still folded onto the January column. The chart now takes `carryOverMonths`, sizes
+itself to `12 + carryOverMonths` columns, and places a date at
+`(getYear(date) - year) * 12 + getMonth(date)` — the same arithmetic as `windowMonthIndex` in the engine.
+`Summary` passes `holidaysInWindow`, matching `HolidaysDistributionChart`. A stretch crossing 31 December
+now also gets a real width instead of hitting the `Math.max(…, 0.005)` clamp.
+
+**Its month labels repeat, so they cannot be React keys.** With a Carry-over Month the strip shows January
+twice, and the header keyed on the localised label. Each cell now carries a `${year}-${month}` key built from
+the date it represents.
 
 **A past day stays clickable when it is already a Manual Day or a Suggested Day.** `calendar/Calendar.tsx`
 computes each cell's `isDisabled` as the past-day modifier *minus* those two, so a day the plan already
@@ -213,9 +239,11 @@ listener's caller.
 - Consume several store fields through one `useShallow` selector, not one `useState`-shaped read per field.
 - Motion configuration lives at module scope (`STAT_CARD_MOTION_CONFIG`, `LABEL_VARIANTS`,
   `BADGE_VARIANTS` in `PlannerPanel.tsx`), so the object identity is stable across renders.
-- `<Skeleton name='…' fixture={…}>` for loading states, never a hand-rolled shimmer. The bones
-  `calendar-list`, `planner-panel` and `summary` are registered in `modules/bones/registry.ts`; the
-  fixtures beside each component are the fallback.
+- `<Skeleton name='…' fixture={…} fallback={…}>` for loading states, never a hand-rolled shimmer. The
+  bones `calendar-list`, `planner-panel` and `summary` are registered in `modules/bones/registry.ts`.
+  Both props take the same fixture component and both are required: `fixture` is read only by the
+  capture CLI, `fallback` is what renders when no bone resolves, so passing `fixture` alone shows an
+  empty container. See [`../../CLAUDE.md`](../../CLAUDE.md).
 
 ## Screen boundaries
 
@@ -235,12 +263,19 @@ and `pages/homepage/sections/Hero.tsx` both read from this screen's `utils/`, fo
 
 ## Testing
 
-Four test files: `ManagementBar.test.tsx`, `SiteTitle.test.tsx`,
-`summary/BlocksPerQuarterChart.test.tsx` and `summary/QuarterDistributionChart.test.tsx`. That is not
-an oversight to close in passing — the components with tests are the ones holding logic, and the rest
-are covered by the Playwright suite in `e2e/`.
+Five test files: `ManagementBar.test.tsx`, `SiteTitle.test.tsx`,
+`summary/BlocksPerQuarterChart.test.tsx`, `summary/QuarterDistributionChart.test.tsx` and
+`summary/YearTimelineChart.test.tsx`. That is not an oversight to close in passing — the components with
+tests are the ones holding logic, and the rest are covered by the Playwright suite in `e2e/`.
 
 The chart tests are the pattern worth copying: mock `recharts` down to inert elements and mock
 `@ui/modules/premium/PremiumFeature` to a pass-through, then assert on the data the component derived
 rather than on the SVG. Component tests render inside `NextIntlClientProvider` with the real message
 bundles, often two locales at once, which is what catches a key that only exists in `en.json`.
+
+**`YearTimelineChart` is the exception: it renders no recharts and is asserted on inline geometry.** Its
+tests read `style.left` off the segment `div`s, and they read `left` rather than `width` for a reason —
+happy-dom drops any declaration whose value it cannot parse, and the width is `max(8px, N%)`, so
+`style.width` comes back as the empty string no matter what the component computed. Asserting a width here
+passes vacuously. Positions are exact fractions of the strip, so assert them with `toBeCloseTo` against
+`column / monthCount`.

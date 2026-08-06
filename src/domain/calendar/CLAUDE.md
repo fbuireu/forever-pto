@@ -109,13 +109,20 @@ then reports that expanded span. Filtering only the *Metrics* input leaves Longe
 and Long Blocks scanning a calendar missing the very day the span was built on, so they contradict Effective
 Days inside the same Metrics object. Whatever the engine plans against, the Metrics measure against.
 
-That rule leaves the Metrics seeing Holidays from outside the Planning Window, and **`calculateLongWeekends`
-is what stops them being counted as the plan's own work**: a stretch is a Long Weekend only when it contains
-a day the plan actually placed, not merely any free weekday. Holidays still extend a stretch — that is what
-a Bridge is for — but a run that next year's public Holidays form on their own no longer scores. This is the
-same standard [`CONTEXT.md`](../../../CONTEXT.md) sets for Longest Vacation, *the longest stretch the plan
-produces*, and it is why the fix belongs in the streak test rather than in the Holiday list the engine is
-handed.
+That rule leaves the Metrics seeing Holidays from outside the Planning Window, and **the placed-day test is
+what stops them being counted as the plan's own work**: a stretch scores only when it contains a day the plan
+actually placed, not merely any free weekday. Holidays still extend a stretch — that is what a Bridge is for
+— but a run that next year's public Holidays form on their own no longer counts. This is the standard
+[`CONTEXT.md`](../../../CONTEXT.md) sets for Longest Vacation, *the longest stretch the plan produces*, and
+it is why the fix belongs in the streak test rather than in the Holiday list the engine is handed.
+
+**`calculateLongWeekends` and `calculateLongestVacation` both apply it, and for a while only the first did.**
+Longest Vacation folded every free run into its maximum as the streak grew, so it reported whatever the
+longest holiday-and-weekend run in the two-year set happened to be — including one lying entirely in
+`year + 1`, on which the plan spends nothing. A Catalan 2026 plan placing a single July day reported a
+Longest Vacation of 4, from Good Friday to Easter Monday 2027. It now tracks whether the current streak has
+touched a placed day and folds the streak in only on close, which is also why the final streak has to be
+closed after the loop rather than inside it.
 
 **The distributions are bucketed by the Planning Window, not the calendar year.** `getMonthlyDist`,
 `calculateQuarterDistribution` and `getLongBlocksPerQuarter` all take the window and size themselves from
@@ -166,9 +173,28 @@ genuinely distinct, and also why a strong Bridge in the current plan cannot reap
 it can pass it, and is deliberately ignored — the baseline is what the plan actually spent.
 
 **Removing one day of a Bridge discards the whole Bridge.** `getTotalEffectiveDays` keeps only Bridges
-whose every PTO Day is still selected, then unions their spans (union, not sum — two Bridges either side of
-the same weekend both absorb it, and adding them would count those Free Days twice). Take one day out of a
+whose every PTO Day is still selected — that filter is `getValidBridges`, shared so nothing can disagree
+about which Bridges survive — then unions their spans (union, not sum — two Bridges either side of the same
+weekend both absorb it, and adding them would count those Free Days twice). Take one day out of a
 three-day Bridge and its entire span stops counting, which is why Effective Days can drop by more than one.
+
+**A surviving Bridge's span is re-checked day by day, because the span can outlive what made it free.** The
+`ptoDays` filter guards the Bridge's *cost*, never its span's interior, and a Manual Day can only ever enter
+a span through `analyzePotentialBridge`'s expansion — `getAvailableWorkdays` excludes it as a pseudo-Holiday,
+so it never appears in `ptoDays` and the filter cannot see it. Hand a Manual Day back and the neighbouring
+Bridge stayed valid while its span still ran through a date the calendar had gone back to painting as a
+workday, and every metric derived from Effective Days — Bonus Days, Efficiency — was inflated by one per such
+day. The union now admits a span day only when it is a weekend, a Holiday, or still placed, which is why
+`getTotalEffectiveDays` takes `holidays` as a third argument. A caller that omits it gets the days-only
+reading, so `generateMetrics` passes the same unfiltered set it hands every other metric.
+
+**`bridgesUsed` counts the Bridges that survived, not the ones the plan was born with.** It was
+`bridges?.length`, taken straight from the array the caller passed, while Effective Days had already
+discarded some through `getValidBridges` — so a two-day Bridge with one day removed left the card reading
+"Bridges used: 1" beside an Efficiency of exactly 1.0 and no Bonus Days, describing bridging that was no
+longer happening. Both numbers now come from `getValidBridges`. `toggleDaySelection` never re-derives
+`currentSelection.bridges` and starts no worker run, so the two would otherwise stay out of step until an
+unrelated change forced a re-plan.
 
 **`removedDays` reaches `getAvailableWorkdays` and nothing else, on purpose.** A Removed Day is a date the
 user has told us they *will work*: the planner must not place it, but it is not a Free Day. Passing it into
@@ -193,6 +219,16 @@ between now and January as one uninterrupted streak.
 **A Long Block counts the Free Days a Bridge absorbs, not just the PTO Days.** `getLongBlocksPerQuarter`
 scans the real calendar and treats weekends and Holidays as part of the run, so a Friday plus the following
 Monday is one four-day Long Block rather than two isolated PTO Days.
+
+**A Long Block is filed under the first of its days that lies *inside* the window, not its first day.** The
+scan starts seven days before the earliest date, so a block can open in December of `year - 1` — every
+planning year whose 1 January is a Monday or a Sunday does it, with a PTO Day on the adjacent January
+workday. Anchoring on `currentBlock.at(0)` then gave `windowMonthIndex` a negative index, `Math.floor(-1 / 3)`
+is `-1`, and the `quarter >= 0` guard threw away a Long Block the plan had paid for — while
+`calculateLongWeekends` counted the same stretch and `calculateQuarterDistribution` put the placed day in Q1,
+so the Summary's two quarter charts disagreed about the same quarter. `closeBlock` now anchors on
+`currentBlock.find((day) => windowMonthIndex(day, window) >= 0)`; the guard stays, so a block lying wholly
+outside the window is still dropped.
 
 **Rest Blocks are separated by more than seven days.** Two PTO Days five days apart are one Rest Block even
 with Workdays between them. Long Weekends, Longest Vacation and Long Blocks use a different rule entirely —

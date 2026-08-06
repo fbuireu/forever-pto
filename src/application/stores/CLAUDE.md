@@ -151,6 +151,15 @@ apply therefore costs one worker round trip; that is the price of the two guaran
 dropping `planRevision` from those dependencies, silently restores whichever half of the bug the other
 choice would have caused.
 
+**`resetManualSelection` bumps it too, and for the mirror-image reason.** It clears the Manual Days rather
+than keeping them, and the plan it restores was built against `effectivePtoDays = ptoDays - manualDays.length`
+— so without a re-plan the freed budget is never spent again, and the restored Suggestion's Metrics were
+measured *with* the Manual Days included, over Bridges expanded through them as pseudo-Holidays. Recomputing
+`generateMetrics` the way `toggleDaySelection` does would fix the stale numbers and not the unspent budget;
+only the bump fixes both, because the follow-up run sends no Manual Days, no Removed Days and therefore no
+`autoSuggestCount` cap, and re-plans the whole budget. All three `set` branches carry it, including the one
+that runs with no `currentSelection`.
+
 **`clearCalculation` is the only way a plan is discarded without a new one replacing it.** It nulls the
 Suggestion, the Alternatives and the current selection, drops the Removed Days and marks `hasCalculated`, so
 the planner shows its settled-empty state rather than a skeleton. Its one caller is `CalendarList`, when the

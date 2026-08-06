@@ -60,7 +60,7 @@ export function getLongBlocksPerQuarter({ ptoDays, holidays, window }: GetLongBl
   let currentBlock: Date[] = [];
 
   const closeBlock = () => {
-    const start = currentBlock.at(0);
+    const start = currentBlock.find((day) => windowMonthIndex(day, window) >= 0);
     if (currentBlock.length >= 3 && start !== undefined) {
       const quarter = Math.floor(windowMonthIndex(start, window) / MONTHS_IN_QUARTER);
       if (quarter >= 0 && quarter < longBlocksPerQuarter.length) longBlocksPerQuarter[quarter]++;
@@ -80,23 +80,28 @@ export function getLongBlocksPerQuarter({ ptoDays, holidays, window }: GetLongBl
   return longBlocksPerQuarter;
 }
 
-export function getTotalEffectiveDays(days: Date[], bridges?: Bridge[]) {
-  if (!bridges || bridges.length === 0) {
-    return days.length;
-  }
+export function getValidBridges(days: Date[], bridges?: Bridge[]) {
+  if (!bridges || bridges.length === 0) return [];
 
   const daysSet = new Set(days.map((day) => day.toDateString()));
-  const validBridges = bridges.filter((bridge) => bridge.ptoDays.every((ptoDay) => daysSet.has(ptoDay.toDateString())));
+
+  return bridges.filter((bridge) => bridge.ptoDays.every((ptoDay) => daysSet.has(ptoDay.toDateString())));
+}
+
+export function getTotalEffectiveDays(days: Date[], bridges?: Bridge[], holidays: HolidayDTO[] = []) {
+  const validBridges = getValidBridges(days, bridges);
 
   if (validBridges.length === 0) {
     return days.length;
   }
 
+  const freeDays = new Set([...days.map((day) => day.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
   const covered = new Set<string>();
 
   for (const bridge of validBridges) {
     for (const day of eachDayOfInterval({ start: bridge.startDate, end: bridge.endDate })) {
-      covered.add(day.toDateString());
+      const key = day.toDateString();
+      if (isWeekend(day) || freeDays.has(key)) covered.add(key);
     }
   }
 
@@ -215,7 +220,8 @@ interface CalculateLongestVacationParams {
 export const calculateLongestVacation = ({ ptoDays, holidays }: CalculateLongestVacationParams) => {
   if (ptoDays.length === 0) return 0;
 
-  const freeDays = new Set([...ptoDays.map((d) => d.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
+  const placedDays = new Set(ptoDays.map((d) => d.toDateString()));
+  const freeDays = new Set([...placedDays, ...holidays.map((h) => h.date.toDateString())]);
 
   const allDates = [...ptoDays, ...holidays.map((h) => h.date)].toSorted((a, b) => a.getTime() - b.getTime());
   if (allDates.length === 0) return 0;
@@ -229,17 +235,25 @@ export const calculateLongestVacation = ({ ptoDays, holidays }: CalculateLongest
 
   let longestVacation = 0;
   let currentStreak = 0;
+  let streakHasPlacedDay = false;
+
+  const closeStreak = () => {
+    if (streakHasPlacedDay) longestVacation = Math.max(longestVacation, currentStreak);
+    currentStreak = 0;
+    streakHasPlacedDay = false;
+  };
 
   for (const day of eachDayOfInterval({ start: minDate, end: maxDate })) {
-    const isFreeDay = isWeekend(day) || freeDays.has(day.toDateString());
+    const key = day.toDateString();
 
-    if (isFreeDay) {
+    if (isWeekend(day) || freeDays.has(key)) {
       currentStreak++;
-      longestVacation = Math.max(longestVacation, currentStreak);
+      if (placedDays.has(key)) streakHasPlacedDay = true;
     } else {
-      currentStreak = 0;
+      closeStreak();
     }
   }
+  closeStreak();
 
   return longestVacation;
 };

@@ -163,6 +163,18 @@ describe('middleware', () => {
 
       expect(spy).not.toHaveBeenCalled();
     });
+
+    it('keeps the redirect on this origin when the path is protocol-relative', async () => {
+      const spy = vi.spyOn(NextResponse, 'redirect');
+      const request = makeRequest('//1234567890/payment/confirmation');
+
+      await middleware(request);
+
+      expect(spy).toHaveBeenCalledOnce();
+      const url = spy.mock.calls[0][0] as URL;
+      expect(url.origin).toBe(new URL(request.url).origin);
+      expect(url.pathname).toBe('/1234567890');
+    });
   });
 
   describe('locale cookie hardening', () => {

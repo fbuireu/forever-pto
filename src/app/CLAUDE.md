@@ -271,6 +271,15 @@ dependencies at module scope, so a top-level import would bind the real ones.
 
 - **Two guards protect the confirmation page.** The middleware redirects when `payment_intent` is missing
   *and* `page.tsx` redirects again. Removing either leaves the Effect program running with `undefined`.
+- **That redirect sets `pathname` on a parsed URL; it must never resolve a path as a relative reference.**
+  The target is the request path with `/payment/confirmation` sliced off, and it was built as
+  `new URL(homePath, request.url)`. A pathname beginning with two slashes is *protocol-relative*, so that
+  expression returns a different origin entirely — and `config.matcher` does not stop one arriving, because
+  its only exclusion beyond `/api` and `/_next` is a **literal** dot: `//1234567890/payment/confirmation`
+  carries none, and a leading `/%2e` is stripped as a dot segment after the match, leaving the doubled slash
+  behind. A visitor following a `/payment/` link on this domain was answered `307` to whatever host the path
+  spelled. `homePath` is now forced to a single leading slash and assigned to `new URL(request.url).pathname`,
+  which cannot change the origin whatever it contains. `src/middleware.test.ts` asserts the origin survives.
 - **`api/health/route.ts` is public and unauthenticated**, and `.well-known/api-catalog` advertises it, so
   the body says the app is up and nothing else. Do not add configuration to it — not which secrets are set,
   not the `NODE_ENV`, not a dependency check that names a host.
