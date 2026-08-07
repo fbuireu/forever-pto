@@ -1,3 +1,11 @@
+## [1.7.2](https://github.com/fbuireu/forever-pto/compare/v1.7.1...v1.7.2) (2026-08-07)
+
+
+### Bug Fixes
+
+* domain bugs ([40e1a65](https://github.com/fbuireu/forever-pto/commit/40e1a65ed083438d7a673e1e2e2bacda238610b9))
+* skeletons + bump deps ([d40bc25](https://github.com/fbuireu/forever-pto/commit/d40bc2537b46c6ec5cd2c4b6850ce646abc954f1))
+
 ## [1.7.1](https://github.com/fbuireu/forever-pto/compare/v1.7.0...v1.7.1) (2026-08-04)
 
 
