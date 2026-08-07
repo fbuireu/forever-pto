@@ -176,6 +176,11 @@ describe('findBridges', () => {
 });
 
 describe('findBridges efficiency floor', () => {
+  beforeEach(() => {
+    clearDateKeyCache();
+    clearHolidayCache();
+  });
+
   it('rejects three PTO days absorbing one weekend, five effective for an efficiency of 1.67', () => {
     const wednesday = makeDate(2025, 1, 8);
     const thursday = makeDate(2025, 1, 9);
@@ -197,5 +202,24 @@ describe('findBridges efficiency floor', () => {
     const single = bridges.find((bridge) => bridge.ptoDaysNeeded === 1);
     expect(single).toBeDefined();
     expect(single?.efficiency).toBeGreaterThanOrEqual(PTO_CONSTANTS.EFFICIENCY.MINIMUM);
+  });
+
+  it('expands through a shutdown longer than the old thirty-day cap', () => {
+    const shutdownStart = makeDate(2025, 8, 4);
+    const shutdown = Array.from({ length: 35 }, (_, offset) => {
+      const date = new Date(shutdownStart);
+      date.setDate(date.getDate() + offset);
+      return makeHoliday(date);
+    });
+    const lastFreeDay = shutdown[shutdown.length - 1]?.date as Date;
+    const anchor = makeDate(2025, 8, 1);
+
+    const bridges = findBridges({ availableWorkdays: [anchor], holidays: shutdown });
+    const bridge = bridges.find(({ ptoDays }) => ptoDays[0]?.toDateString() === anchor.toDateString());
+
+    expect(bridge).toBeDefined();
+    expect(bridge?.startDate.toDateString()).toBe(anchor.toDateString());
+    expect(bridge?.endDate.toDateString()).toBe(lastFreeDay.toDateString());
+    expect(bridge?.effectiveDays).toBe(38);
   });
 });

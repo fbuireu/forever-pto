@@ -85,6 +85,35 @@ describe('getHolidays', () => {
     expect(result.map(({ name }) => name)).toEqual(['Christmas', 'New Year']);
   });
 
+  it('drops a National Holiday the selected Region does not observe', async () => {
+    mockGetNationalHolidays.mockReturnValue([
+      { date: '2027-01-01 00:00:00', name: 'New Year', type: 'public' },
+      { date: '2027-10-11 00:00:00', name: 'Columbus Day', type: 'public' },
+    ]);
+    mockGetRegionalHolidays.mockReturnValue([
+      { date: '2027-01-01 00:00:00', name: 'New Year', type: 'public', location: 'CA' },
+      { date: '2027-03-31 00:00:00', name: 'Cesar Chavez Day', type: 'public', location: 'CA' },
+    ]);
+
+    await getHolidays({ ...BASE_PARAMS, country: 'US', region: 'CA' });
+
+    const [{ raw }] = mockHolidayDTOCreate.mock.calls[0] as [{ raw: Array<{ name: string }> }];
+    expect(raw.map(({ name }) => name)).toEqual(['New Year', 'New Year', 'Cesar Chavez Day']);
+  });
+
+  it('keeps every National Holiday when no Region is selected', async () => {
+    mockGetNationalHolidays.mockReturnValue([
+      { date: '2027-01-01 00:00:00', name: 'New Year', type: 'public' },
+      { date: '2027-10-11 00:00:00', name: 'Columbus Day', type: 'public' },
+    ]);
+    mockGetRegionalHolidays.mockReturnValue([]);
+
+    await getHolidays({ ...BASE_PARAMS, country: 'US', region: '' });
+
+    const [{ raw }] = mockHolidayDTOCreate.mock.calls[0] as [{ raw: Array<{ name: string }> }];
+    expect(raw.map(({ name }) => name)).toEqual(['New Year', 'Columbus Day']);
+  });
+
   it('returns empty array and logs error when processing throws', async () => {
     mockGetNationalHolidays.mockImplementation(() => {
       throw new Error('date-holidays failure');

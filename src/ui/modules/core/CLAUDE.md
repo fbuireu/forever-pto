@@ -67,8 +67,11 @@ Coupling back into the rest of the app is small, but it is not zero. The complet
 
 - `@ui/hooks/*` is fair game — `useControlledState.tsx`, `useIsInView.tsx`, `useAutoHeight.tsx`,
   `useMobile.ts`. These are generic React utilities, not product state.
-- `animate/base/Sidebar.tsx` writes the `sidebar_state` cookie through `@ui/utils/cookie`, and exports
-  `SIDEBAR_COOKIE_NAME` so the server layout can read the same key.
+- `animate/base/Sidebar.tsx` writes the `sidebar_state` cookie through `@ui/utils/cookie` and reads it back
+  from `document.cookie` on mount. It exports `SIDEBAR_COOKIE_NAME`, but **nothing outside that file imports
+  it** — no server layout reads the cookie and passes a `defaultOpen`, so the rail always renders expanded
+  and then collapses once the effect runs. Either wire the layout up or stop describing the export as
+  shared; what is not true today is that anything else uses the key.
 - `animate/text/SlidingNumber.tsx` calls `useLocale()` to pick the decimal separator. It is the only
   `next-intl` import here, and it reads the locale rather than any copy.
 - `primitives/RichLink.tsx` imports the locale-aware `Link` from `@application/i18n/navigation`,
@@ -81,6 +84,24 @@ Coupling back into the rest of the app is small, but it is not zero. The complet
 No component here calls `useTranslations` or touches a Zustand store, and that line should hold.
 
 ## Gotchas
+
+**`Tooltip` only mints a `TooltipProvider` when it is given a delay of its own.** It used to mint one
+unconditionally, defaulting to `delay = 0` — and since `TooltipTrigger` resolves `delay ?? use(TooltipDelayContext)`
+from the *nearest* provider, and a trigger is always inside a `Tooltip`, that inner provider shadowed every
+outer one. The `delayDuration={200}` written at all ten call sites, `SidebarProvider` included, was dead:
+every tooltip in the app opened instantly, not even at Base UI's own default. `Tooltip` now renders the
+primitive bare unless a `delay`/`delayDuration` is passed to it directly, so the ambient provider is the one
+that counts. A component in this layer that wraps its subtree in a context provider has to ask whether it is
+overriding one the caller set.
+
+**`utils/cookie.ts` feature-detects the Cookie Store API and falls back to `document.cookie`.** The bare
+`cookieStore` global does not exist in Firefox, in Safari before 18.4, or in any insecure context, so the
+write threw a `ReferenceError` that `SidebarProvider.setOpen`'s `.catch(() => {})` swallowed — the sidebar
+silently forgot its collapsed state on every reload in those browsers, with nothing logged. The `typeof`
+guard is the same shape the root guide mandates for `window` and `document`, and for the same reason: a bare
+identifier that is not defined throws rather than evaluating to `undefined`. `cookie.test.ts` stubs the
+global in its `beforeEach`, which is exactly what hid this, so the fallback has its own block that stubs it
+away.
 
 **The dialog lives in `animate/base/Dialog.tsx` and nowhere else.** `primitives/` used to carry a
 pure re-export of it; the seven callers now import the implementation directly. Do not reintroduce a

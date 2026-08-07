@@ -47,7 +47,7 @@ const CurrencyNumber = ({ value, decimalPlaces = 0, currencyPosition, currencySy
 export const PtoSalaryCalculator = () => {
   const locale = useLocale();
   const t = useTranslations('ptoSalaryCalculator');
-  const [annualSalary, setAnnualSalary] = useState<number | undefined>();
+  const [annualSalaryInput, setAnnualSalaryInput] = useState('');
   const [unusedPTODays, setUnusedPTODays] = useState<number>(5);
 
   const { currencySymbol, currency } = useUIStore(
@@ -69,12 +69,15 @@ export const PtoSalaryCalculator = () => {
     }
   }, [locale, currency, currencySymbol]);
 
-  const dailyRate = annualSalary ? annualSalary / WORKING_DAYS_PER_YEAR : 0;
+  const parsedSalary = Number.parseFloat(annualSalaryInput);
+  const annualSalary = Number.isFinite(parsedSalary) && parsedSalary > 0 ? parsedSalary : 0;
+
+  const dailyRate = annualSalary / WORKING_DAYS_PER_YEAR;
   const unusedPTOValue = dailyRate * unusedPTODays;
-  const normalHourlyRate = annualSalary ? annualSalary / WORKING_DAYS_PER_YEAR / HOURS_PER_DAY : 0;
+  const normalHourlyRate = annualSalary / WORKING_DAYS_PER_YEAR / HOURS_PER_DAY;
   const workedDays = WORKING_DAYS_PER_YEAR + unusedPTODays;
-  const effectiveHourlyRate = annualSalary ? annualSalary / workedDays / HOURS_PER_DAY : 0;
-  const showResults = annualSalary ? annualSalary > 0 && unusedPTODays >= 0 : false;
+  const effectiveHourlyRate = annualSalary / workedDays / HOURS_PER_DAY;
+  const showResults = annualSalary > 0 && unusedPTODays >= 0;
 
   return (
     <div className='space-y-2 w-full'>
@@ -101,8 +104,8 @@ export const PtoSalaryCalculator = () => {
             autoComplete='off'
             min='0'
             step='1000'
-            value={annualSalary}
-            onChange={(e) => setAnnualSalary(Number(e.target.value))}
+            value={annualSalaryInput}
+            onChange={(e) => setAnnualSalaryInput(e.target.value)}
             placeholder={t('annualSalaryPlaceholder', { amount: 50_000 })}
           />
         </InputGroup>

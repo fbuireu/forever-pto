@@ -124,8 +124,18 @@ The price is that a lost log is silent, and `getExecutionContext()` reads the Cl
 
 Both `DriverClient` and `StripeClient` keep mutable instance state behind a module-level singleton, so a
 second `getDriverClientInstance()` returns the same tour. `DriverClient.start()` destroys a live driver before
-building a new one, and unmounts the React roots it created for the close buttons in `onDestroyStarted` —
-skipping either leaks a root per tour.
+building a new one, and the React roots it created for the close buttons are unmounted by
+`unmountCloseButtonRoots` — skipping either leaks a root per tour.
+
+**That unmount cannot live in `onDestroyStarted` alone, because driver.js's own `destroy()` does not call
+it.** The library's teardown is `h(e = true)`, and it only invokes the `onDestroyStarted` hook when `e` is
+truthy; the public `destroy()` is literally `h(false)`. So the user-driven closes — close button, Done on the
+last step, ESC, overlay click — reach the hook and clean up, while every *programmatic* teardown skips it:
+`useTutorial`'s unmount cleanup when the user navigates away from the planner mid-tour, and `start()`'s own
+`if (this.driver) this.destroy()`. Each of those left one React root per rendered popover step mounted on a
+detached container, with the animated close icon's motion controls and in-view observers still live, and grew
+`closeButtonRoots` without bound on a singleton that survives the navigation. `destroy()` now unmounts before
+delegating, and the array is reset so the hook path calling it a second time is a no-op.
 
 `DriverClient` mounts a close button only when a `closeIcon` was injected — `onPopoverRender` leaves
 driver.js's own markup alone otherwise. The caller supplies it: the UI layer's `hooks/useTutorial.tsx` passes the

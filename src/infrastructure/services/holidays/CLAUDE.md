@@ -70,6 +70,20 @@ entry it returns and national lookups leave it absent. Downstream, that single f
 NATIONAL and drives the dedupe that keeps the National Holiday when both fall on the same date. Dropping
 it, or setting it on national entries, silently rewrites the calendar.
 
+**A Region can *remove* a National Holiday, and the national list is filtered against it.**
+`new Holidays(country, region)` does not return a region's extras — it returns that region's **complete**
+calendar, country rules included, minus whatever the region does not observe. So concatenating the
+country-level lookup put back every national day the region had dropped: a Californian's 2027 calendar
+carried Columbus Day, a Scot's carried Easter Monday, Luzern's carried Ostermontag and Pfingstmontag. Those
+dates then became Free Days — struck from the Workday list so no PTO Day was ever placed on them, and
+expanded straight through by `analyzePotentialBridge`, inflating Effective Days, Efficiency and Longest
+Vacation. `getHolidays` now keeps a national entry only when the regional lookup emitted the same date.
+
+The national lookup cannot simply be dropped in its place, and that is why this is a filter: it is the only
+source of entries *without* `location`, so removing it would label New Year's Day itself REGIONAL. The
+`region ? … : nationalHolidays` short-circuit is load-bearing for the same reason — with no Region the
+regional lookup returns `[]`, and an unconditional filter would empty the calendar.
+
 **Failure means an empty calendar, never a throw.** `Effect.try` plus `catchAll` logs `Error in getHolidays`
 to BetterStack with `{ country, region, year }` and returns `[]`. A country the package has no data for,
 a rejected region code, a DTO that throws — all degrade to a Country with no Holidays. The store wraps the
@@ -87,9 +101,15 @@ array as it comes. There is exactly one sort in the path; do not add another her
 DTO's is incidental.
 
 **Regional entries are appended after national ones on purpose.** `getHolidays` builds
-`[...nationalHolidays, ...regionalHolidays]`, and the DTO's first sort relies on regional entries being
-distinguishable so the dedupe resolves in favour of the national one. The ordering of that array is part
-of the contract with `src/application/dto/holiday/dto.ts`, not an implementation detail.
+`[...observedNationalHolidays, ...regionalHolidays]`, and the DTO's first sort relies on regional entries
+being distinguishable so the dedupe resolves in favour of the national one. The ordering of that array is
+part of the contract with `src/application/dto/holiday/dto.ts`, not an implementation detail.
+
+**The two lookups agree on the raw date string, which is what makes the filter above safe.** The DTO dedupes
+on `holiday.date` verbatim rather than on the calendar day, and both lookups emit the same
+`YYYY-MM-DD HH:mm:ss` for a shared Holiday — checked across a full year of US/CA. A future upstream that
+formatted the two differently would defeat both the dedupe and the filter at once, and neither would report
+anything.
 
 ## Testing
 

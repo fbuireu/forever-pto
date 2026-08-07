@@ -30,7 +30,7 @@ describe('ContactFormEmail', () => {
 
   it('renders a mailto link for the sender email', async () => {
     const html = await getHtml();
-    expect(html).toContain('mailto:alice@example.com');
+    expect(html).toContain('mailto:alice%40example.com');
   });
 
   it('renders the subject', async () => {
@@ -45,7 +45,7 @@ describe('ContactFormEmail', () => {
 
   it('reply button links to mailto with subject prefixed Re:', async () => {
     const html = await getHtml();
-    expect(html).toContain('mailto:alice@example.com?subject=Re: Hello there');
+    expect(html).toContain('mailto:alice%40example.com?subject=Re%3A%20Hello%20there');
   });
 
   it('logo src uses baseUrl', async () => {
@@ -56,5 +56,13 @@ describe('ContactFormEmail', () => {
   it('logo src updates when baseUrl changes', async () => {
     const html = await getHtml({ ...BASE_PROPS, baseUrl: 'https://staging.example.com' });
     expect(html).toContain('https://staging.example.com/static/logo/forever-pto-logo.png');
+  });
+
+  it('does not let a crafted subject add headers to the reply', async () => {
+    const html = await getHtml({ ...BASE_PROPS, subject: 'Hi&bcc=victim@example.com&body=drained' });
+
+    expect(html).not.toContain('&bcc=');
+    expect(html).not.toContain('&body=');
+    expect(html).toContain('bcc%3Dvictim');
   });
 });

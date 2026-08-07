@@ -54,7 +54,7 @@ describe('generateIcs', () => {
       expect(result).toContain('BEGIN:VEVENT');
       expect(result).toContain('SUMMARY:New Year');
       expect(result).toContain('CATEGORIES:HOLIDAY');
-      expect(result).toContain('UID:holiday-h-1@forever-pto');
+      expect(result).toContain('UID:holiday-unknown-h-1@forever-pto');
     });
 
     it('excludes holiday events when includeHolidays is false', () => {
@@ -73,8 +73,8 @@ describe('generateIcs', () => {
         makeHoliday({ id: 'h-2', name: 'Easter', date: new Date('2025-04-20') }),
       ];
       const result = generateIcs({ ...baseOptions, holidays, includeHolidays: true });
-      expect(result).toContain('UID:holiday-h-1@forever-pto');
-      expect(result).toContain('UID:holiday-h-2@forever-pto');
+      expect(result).toContain('UID:holiday-unknown-h-1@forever-pto');
+      expect(result).toContain('UID:holiday-unknown-h-2@forever-pto');
     });
   });
 
@@ -87,7 +87,7 @@ describe('generateIcs', () => {
       });
       expect(result).toContain('SUMMARY:PTO Day');
       expect(result).toContain('CATEGORIES:PTO');
-      expect(result).toContain('UID:pto-20250310@forever-pto');
+      expect(result).toContain('UID:pto-unknown-20250310@forever-pto');
     });
 
     it('excludes PTO events when includePto is false', () => {
@@ -107,9 +107,9 @@ describe('generateIcs', () => {
     it('includes multiple PTO days', () => {
       const days = [new Date('2025-06-02'), new Date('2025-06-03'), new Date('2025-06-04')];
       const result = generateIcs({ ...baseOptions, ptoDays: days, includePto: true });
-      expect(result).toContain('UID:pto-20250602@forever-pto');
-      expect(result).toContain('UID:pto-20250603@forever-pto');
-      expect(result).toContain('UID:pto-20250604@forever-pto');
+      expect(result).toContain('UID:pto-unknown-20250602@forever-pto');
+      expect(result).toContain('UID:pto-unknown-20250603@forever-pto');
+      expect(result).toContain('UID:pto-unknown-20250604@forever-pto');
     });
   });
 
@@ -193,6 +193,50 @@ describe('generateIcs', () => {
         includePto: false,
       });
       expect(result).not.toContain('BEGIN:VEVENT');
+    });
+  });
+
+  describe('RFC 5545 required properties', () => {
+    it('stamps every VEVENT with a UTC DTSTAMP', () => {
+      const result = generateIcs({
+        ...baseOptions,
+        holidays: [makeHoliday()],
+        ptoDays: [new Date(2025, 2, 10)],
+      });
+
+      const events = result.split('BEGIN:VEVENT').slice(1);
+      expect(events).toHaveLength(2);
+      for (const event of events) {
+        expect(event).toMatch(/\r\nDTSTAMP:\d{8}T\d{6}Z\r\n/);
+      }
+    });
+  });
+
+  describe('UID uniqueness across calendars', () => {
+    it('scopes a Holiday UID by Country and Region', () => {
+      const spain = generateIcs({ ...baseOptions, holidays: [makeHoliday()], country: 'ES', region: 'CT' });
+      const france = generateIcs({ ...baseOptions, holidays: [makeHoliday()], country: 'FR' });
+
+      expect(spain).toContain('UID:holiday-ES-CT-h-1@forever-pto');
+      expect(france).toContain('UID:holiday-FR-h-1@forever-pto');
+    });
+
+    it('scopes a PTO Day UID the same way, so two exports can coexist', () => {
+      const spain = generateIcs({ ...baseOptions, ptoDays: [new Date(2025, 2, 10)], country: 'ES' });
+      const france = generateIcs({ ...baseOptions, ptoDays: [new Date(2025, 2, 10)], country: 'FR' });
+
+      expect(spain).toContain('UID:pto-ES-20250310@forever-pto');
+      expect(france).toContain('UID:pto-FR-20250310@forever-pto');
+    });
+
+    it('strips characters a UID cannot carry out of the Holiday id', () => {
+      const result = generateIcs({
+        ...baseOptions,
+        holidays: [makeHoliday({ id: 'national-2027-03-09 00:00:00 -0600' })],
+        country: 'MY',
+      });
+
+      expect(result).toContain('UID:holiday-MY-national-2027-03-09000000-0600@forever-pto');
     });
   });
 });

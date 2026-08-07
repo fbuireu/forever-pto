@@ -53,7 +53,9 @@ export const CalendarExport = () => {
   const [includePto, setIncludePto] = useState(true);
   const [isPdfPending, startPdfTransition] = useTransition();
 
-  const { year } = useFiltersStore(useShallow((s) => ({ year: s.year })));
+  const { year, country, region } = useFiltersStore(
+    useShallow((s) => ({ year: s.year, country: s.country, region: s.region }))
+  );
   const { holidays, suggestion, currentSelection, manuallySelectedDays, removedSuggestedDays } = useHolidaysStore(
     useShallow((s) => ({
       holidays: s.holidays,
@@ -86,6 +88,8 @@ export const CalendarExport = () => {
       ptoDays,
       includeHolidays,
       includePto,
+      country,
+      region,
     });
     const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
     const url = URL.createObjectURL(blob);

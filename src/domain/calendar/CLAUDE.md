@@ -148,6 +148,18 @@ outwards through adjacent Free Days first, capped at `SAFETY_LIMIT` steps each w
 `effectiveDays / ptoDaysNeeded` taken. This is why one PTO Day can score 4.0. A candidate with no adjacent
 Free Day at all is rejected outright before any of that.
 
+**`SAFETY_LIMIT` must stay far above any real free run, because a cap that can be reached is a plan
+constraint wearing a guard's clothes.** It was 30, and this guide called it "a loop guard, not a plan
+constraint" — but the expansion loops already terminate on the first day that is neither a weekend nor a
+Holiday, so the only genuine runaway is a calendar containing no working day at all. What 30 actually did
+was truncate real spans: a company shutdown entered as Custom Holidays over five weeks left the Bridge
+beside it reporting a 31-day span where the free run was 38. `getTotalEffectiveDays` consumes exactly those
+two dates, so the Summary showed Effective Days 31 next to Longest Vacation 38 — two numbers in one
+`Metrics` object contradicting each other, the invariant two sections above. Bounding by the Planning Window
+instead was the other candidate and is wrong: a span is *meant* to expand into next year's Holidays, which
+is why the Metrics see the unfiltered two-year set. 366 is chosen so no free run inside the fetched data can
+reach it.
+
 **`presorted` is load-bearing.** `selectBridgesForStrategy` and `selectOptimalDaysFromBridges` re-sort
 their input unless the caller sets `presorted: true`. `generateAlternatives` exists to impose its own
 orderings, so without the flag every ordering would collapse back to the same greedy result and all seven
@@ -271,7 +283,7 @@ behaviour change and expect the selector tests to move.
 
 | Field | Value | Unit and meaning |
 | --- | --- | --- |
-| `SAFETY_LIMIT` | 30 | Days. The most a Bridge boundary may expand backwards or forwards through Free Days. It is a loop guard, not a plan constraint — without it a very long Holiday streak never terminates the expansion |
+| `SAFETY_LIMIT` | 366 | Days. The most a Bridge boundary may expand backwards or forwards through Free Days. A loop guard, and it has to be set high enough to stay one — see the trap below |
 | `BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD` | 0.1 | Efficiency ratio. Differences smaller than this count as a tie and are resolved by `effectiveDays` |
 | `SCORING.BASE_SCORE` | 1 | Neutral multiplier, applied when a Bridge does not qualify for the multi-day bonus |
 | `SCORING.MULTI_DAY_BONUS` | 1.5 | Multiplier applied to Bridges meeting both `HIGH_VALUE_THRESHOLD_*` |
@@ -302,6 +314,14 @@ Any test whose subject reaches `getKey` or `createHolidaySet` **must** call `cle
 passes or fails for reasons that have nothing to do with what it asserts. `cache.test.ts` pins that
 behaviour deliberately, including the case proving a second `createHolidaySet` call ignores its new
 argument.
+
+**The rule is per `describe`, not per file, and one block was missing it.**
+`describe('findBridges efficiency floor')` in `utils/helpers.test.ts` had no `beforeEach`, so every case in
+it ran against whatever Holiday set the block above had left behind — invisibly, because its cases pass
+`holidays: []` and happened to assert things the stale set did not disturb. The first case added there that
+actually depended on its own Holidays failed with a span truncated by a set it never passed. A new
+`describe` in these files starts with the two clears, even when its cases look like they have no Holidays
+in them.
 
 That covers `generateSuggestions.test.ts`, `generateAlternatives.test.ts`, `utils/helpers.test.ts`,
 `utils/cache.test.ts` and `suggestions/utils/selectors.test.ts`, which drives selectors that key their

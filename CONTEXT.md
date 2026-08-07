@@ -13,7 +13,7 @@ The territory whose Holiday calendar drives the plan. It is detected on first vi
 _Avoid_: locale
 
 **Region**:
-An administrative subdivision of a Country that adds its own Holidays on top of the national ones. Optional — a plan without a Region simply has no Regional Holidays.
+An administrative subdivision of a Country with its own calendar: it may add Holidays the Country does not have, and it may drop national ones it does not observe. Optional — a plan without a Region uses the national calendar whole.
 _Avoid_: state
 
 **Carry-over Months**:

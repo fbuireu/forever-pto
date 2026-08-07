@@ -21,10 +21,13 @@ function TooltipProvider({ delay = 0, delayDuration, ...props }: TooltipProvider
 }
 
 type TooltipProps = TooltipPrimitiveProps & { delay?: number; delayDuration?: number };
-function Tooltip({ delay = 0, delayDuration, ...props }: TooltipProps) {
-  const resolvedDelay = delayDuration ?? delay;
+function Tooltip({ delay, delayDuration, ...props }: TooltipProps) {
+  const explicitDelay = delayDuration ?? delay;
+
+  if (explicitDelay === undefined) return <TooltipPrimitive {...props} />;
+
   return (
-    <TooltipProvider delay={resolvedDelay}>
+    <TooltipProvider delay={explicitDelay}>
       <TooltipPrimitive {...props} />
     </TooltipProvider>
   );

@@ -19,6 +19,7 @@ import {
   startOfMonth,
   startOfWeek,
   toIcsDate,
+  toLocalDay,
 } from './dates';
 
 describe('isSameDay', () => {
@@ -152,6 +153,25 @@ describe('ensureDate', () => {
     const result = ensureDate('2024-01-15');
     expect(result).toBeInstanceOf(Date);
     expect(result.getFullYear()).toBe(2024);
+  });
+});
+
+describe('toLocalDay', () => {
+  it('reads the calendar day and returns it at local midnight', () => {
+    const result = toLocalDay('2027-03-09 00:00:00');
+
+    expect(result.getFullYear()).toBe(2027);
+    expect(result.getMonth()).toBe(2);
+    expect(result.getDate()).toBe(9);
+    expect(result.getHours()).toBe(0);
+  });
+
+  it('ignores a trailing UTC offset instead of shifting the day', () => {
+    const withOffset = toLocalDay('2027-03-09 00:00:00 -0600');
+
+    expect(withOffset.getDate()).toBe(9);
+    expect(withOffset.getMonth()).toBe(2);
+    expect(withOffset.getTime()).toBe(new Date(2027, 2, 9).getTime());
   });
 });
 

@@ -25,9 +25,13 @@ export async function getHolidays({ year, country, region, locale, carryOverMont
     const params = { country, configuration, year };
     const nationalHolidays = getNationalHolidays(params);
     const regionalHolidays = getRegionalHolidays({ ...params, region });
+    const observedDates = new Set(regionalHolidays.map(({ date }) => date));
+    const observedNationalHolidays = region
+      ? nationalHolidays.filter(({ date }) => observedDates.has(date))
+      : nationalHolidays;
 
     return holidayDTO.create({
-      raw: [...nationalHolidays, ...regionalHolidays],
+      raw: [...observedNationalHolidays, ...regionalHolidays],
       params: { year, carryOverMonths, regions },
     });
   }).pipe(

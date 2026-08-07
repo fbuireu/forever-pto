@@ -9,6 +9,7 @@ import {
   formatDate,
   isWithinInterval,
   startOfYear,
+  toLocalDay,
 } from '@application/shared/utils/dates';
 import { type HolidayDTO, HolidayVariant, type RawHoliday } from './types';
 
@@ -58,7 +59,7 @@ export const holidayDTO: HolidayDTOShape = {
     return raw
       .toSorted((a, b) => Number(!!a.location) - Number(!!b.location))
       .reduce<HolidayDTO[]>((acc, holiday) => {
-        const holidayDate = new Date(holiday.date);
+        const holidayDate = toLocalDay(holiday.date);
         if (!isWithinInterval(holidayDate, { start: yearStart, end: nextYearEnd })) return acc;
         const dateKey = holiday.date;
         if (processedDates.has(dateKey)) return acc;

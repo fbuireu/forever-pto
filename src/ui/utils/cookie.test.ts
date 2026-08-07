@@ -62,3 +62,21 @@ describe('setCookie', () => {
     expect(call).not.toHaveProperty('secure');
   });
 });
+
+describe('setCookie without the Cookie Store API', () => {
+  beforeEach(() => {
+    vi.stubGlobal('cookieStore', undefined);
+    // biome-ignore lint/suspicious/noDocumentCookie: clearing the jar is the point of this block's setup
+    document.cookie = '';
+  });
+
+  it('still writes the cookie through document.cookie', async () => {
+    await setCookie({ name: 'sidebar_state', value: 'false', maxAge: 604_800 });
+
+    expect(document.cookie).toContain('sidebar_state=false');
+  });
+
+  it('does not throw when the global is absent', async () => {
+    await expect(setCookie({ name: 'foo', value: 'bar' })).resolves.toBeUndefined();
+  });
+});

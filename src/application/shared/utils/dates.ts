@@ -12,6 +12,10 @@ export const ensureDate = (date: Date | string): Date => {
   return date instanceof Date ? date : new Date(date);
 };
 
+const DAY_PREFIX_LENGTH = 10;
+
+export const toLocalDay = (value: string): Date => toDate(Temporal.PlainDate.from(value.slice(0, DAY_PREFIX_LENGTH)));
+
 export const isSameDay = (a: Date, b: Date): boolean => toPlainDate(a).equals(toPlainDate(b));
 
 export const isSameMonth = (a: Date, b: Date): boolean => {
@@ -68,6 +72,8 @@ export const toIcsDate = (date: Date): string => {
   const d = String(date.getDate()).padStart(2, '0');
   return `${y}${m}${d}`;
 };
+
+export const toIcsTimestamp = (date: Date): string => `${date.toISOString().replace(/[-:]/g, '').split('.')[0]}Z`;
 
 export const startOfYear = (date: Date): Date => toDate(toPlainDate(date).with({ month: 1, day: 1 }));
 

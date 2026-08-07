@@ -12,7 +12,7 @@ import { Input } from '@ui/modules/core/primitives/Input';
 import { getMonthNames } from '@ui/modules/pages/planner/utils/helpers';
 import { Calculator } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 interface MonthOption {
@@ -29,8 +29,7 @@ export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
   const t = useTranslations('ptoCalculator');
   const [daysPerMonth, setDaysPerMonth] = useState<number>(2.5);
   const [selectedMonth, setSelectedMonth] = useState<string>('1');
-  const [calculatedDays, setCalculatedDays] = useState<number | null>(null);
-  const calculationSnapshotRef = useRef<{ days: number; month: number } | null>(null);
+  const [result, setResult] = useState<{ total: number; days: number; month: number } | null>(null);
 
   const { ptoDays, setPtoDays } = useFiltersStore(
     useShallow((state) => ({
@@ -58,12 +57,11 @@ export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
     const monthNumber = Number(selectedMonth);
     const accumulated = daysPerMonth * monthNumber;
 
-    calculationSnapshotRef.current = {
+    setResult({
+      total: Number(accumulated.toFixed(2)),
       days: daysPerMonth,
       month: monthNumber,
-    };
-
-    setCalculatedDays(Number(accumulated.toFixed(2)));
+    });
   };
 
   const applyToStore = (days: number) => {
@@ -122,22 +120,22 @@ export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
         {t('calculate')}
       </Button>
 
-      {calculatedDays !== null && calculationSnapshotRef.current && (
+      {result !== null && (
         <div className='space-y-2 p-2 bg-muted rounded-md w-full'>
           <div className='text-xs'>
             <span className='font-display font-medium'>{t('result')}</span>
             <div className='text-lg font-display font-bold text-primary flex items-center gap-1'>
-              <SlidingNumber number={calculatedDays} decimalPlaces={2} />
+              <SlidingNumber number={result.total} decimalPlaces={2} />
               <span>{t('days')}</span>
             </div>
             <p className='text-muted-foreground flex gap-0.5'>
-              <SlidingNumber number={calculationSnapshotRef.current.days} decimalPlaces={1} /> {t('daysMonth')} ×{' '}
-              <SlidingNumber number={calculationSnapshotRef.current.month} decimalPlaces={0} /> {t('months')}
+              <SlidingNumber number={result.days} decimalPlaces={1} /> {t('daysMonth')} ×{' '}
+              <SlidingNumber number={result.month} decimalPlaces={0} /> {t('months')}
             </p>
           </div>
           <AnimateIcon animateOnHover>
             <Button
-              onClick={() => applyToStore(calculatedDays)}
+              onClick={() => applyToStore(result.total)}
               size='sm'
               variant='success'
               className='w-full justify-start'

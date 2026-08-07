@@ -17,7 +17,7 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 | `providers/` | Context wrappers mounted once in the locale layout: `providers/AppThemeProvider.tsx`, `providers/BonesProvider.tsx` | Once |
 | `stores/` | `stores/StoresInitializer.tsx` — a render-nothing component that seeds the filters store from the `user-country` cookie | Once |
 | `tutorial/` | `tutorial/DriverStyles.tsx` only — a render-nothing component whose single job is to make the driver.js stylesheet import lazy | Once |
-| `tracking/` | The third-party script mounts: `tracking/Analytics.tsx` (Google gtag consent defaults and config) and `tracking/BetterStackTracking.tsx` (the Better Stack snippet, gated on the cookieconsent `analytics` category) | Once |
+| `tracking/` | The third-party script mounts: `tracking/Analytics.tsx` (Google gtag consent defaults and config) and `tracking/BetterStackTracking.tsx` (the Better Stack snippet, gated on the cookieconsent `betterStack` **service**, not the category) | Once |
 | `export/` | `export/HolidayDocument.tsx` — the `@react-pdf/renderer` document tree. Not DOM React; it renders in the PDF reconciler only | Once |
 | `bones/` | Generated skeleton data, see below. Not hand-written | n/a |
 
@@ -134,7 +134,10 @@ Vitest, `happy-dom`, co-located `.test.tsx`. Two exclusions in `vitest.config.ts
 Coverage is deliberately uneven and you should not read a missing test as an oversight to fix in
 passing. `core/animate/` is tested close to exhaustively; `core/primitives/` has no tests at all;
 `pages/`, `shared/` and `sidebar/` have tests only where logic lives (`ManagementBar`, `Summary` charts,
-homepage sections, `shared/utils/helpers.ts` and the two forms that render an API failure). Components whose body is markup plus translation calls are covered by the Playwright
+homepage sections, `shared/utils/helpers.ts`, the two forms that render an API failure, and — because both
+held a defect that no type or lint rule can catch — `sidebar/components/PtoCalculator.tsx` and
+`PtoSalaryCalculator.tsx`, whose cases drive the real inputs and assert on what the field and the caption
+actually show). Components whose body is markup plus translation calls are covered by the Playwright
 suite in `e2e/` instead.
 
 When a component is mocked in a sibling's test, mock the module path it actually imports —
@@ -142,6 +145,43 @@ When a component is mocked in a sibling's test, mock the module path it actually
 leaving either real drags the Stripe element tree into the test.
 
 ## Gotchas
+
+**vanilla-cookieconsent dispatches its `cc:*` events on `window`, never on `document`.** Its emitter is a
+bare `dispatchEvent(new CustomEvent(...))`, which resolves to `window`, and an event dispatched on `window`
+does not reach a listener on `document`. `tracking/BetterStackTracking.tsx` listened on `document`, so its
+`cc:onConsent`/`cc:onChange` handlers never fired and the snippet was never injected — `window.betterstack`
+stayed undefined and every `track()` and `identifyUser()` call no-opped for **every** consenting visitor.
+`shared/cookie-consent/CookieConsent.tsx` already used `window` for `cc:showPreferences`; the two now agree.
+
+**Consent is collected per service, so it has to be *read* per service.** The preferences dialog offers
+`ga4` and `betterStack` as separate switches, but both gates asked `acceptedCategory('analytics')`, which the
+library keeps true while *any* service in the category is on. Turning Google Analytics off and leaving Better
+Stack on therefore granted `analytics_storage` and fired a `page_view` — Google Analytics writing `_ga` for a
+user who had just refused it, and the mirror case mounting Better Stack for someone who had refused *that*.
+Both now read `acceptedService(id, 'analytics')`. A new service in `config/config.ts` needs its own gate; the
+category is not a proxy for it.
+
+**The footer's "Manage cookies" was dead while the first-visit banner was up.** `CookieButton` dispatches
+`cc:showPreferences`, and `CookieConsent`'s handler set `showPreferences` without clearing `showBanner` — the
+`if (showBanner) return …banner…` early return then short-circuited before the dialog could render, so the
+click did nothing at all. The handler now clears the banner first, which is exactly what the banner's own
+"Manage preferences" button already did; the two entry points had silently disagreed.
+
+**Anything the render reads has to be state, not a ref — React bails out of equal updates.**
+`sidebar/components/PtoCalculator.tsx` kept the inputs behind the accrual result in a
+`calculationSnapshotRef` written by the Calculate handler and read during render. The only re-render on that
+path was `setCalculatedDays`, so a second Calculate landing on the *same* total scheduled no render at all
+and the caption went on describing the previous inputs: 2 days/month × 6 months, then 1 × 12, both totalling
+12, and the caption still read "2 × 6". Total and snapshot are now one state object, so a fresh identity
+makes `Object.is` fail and the render happens. A ref is for values the render does not read.
+
+**An input whose state starts `undefined` mounts uncontrolled and cannot be cleared afterwards.**
+`sidebar/components/PtoSalaryCalculator.tsx` held its salary as `useState<number | undefined>()` and spread
+`value={undefined}` onto a bare `<input>`, so React mounted the field uncontrolled and warned on the first
+keystroke. Worse, `onChange` did `Number(e.target.value)`, and an emptied `type='number'` field gives `''`,
+which is `0` — React wrote that `0` straight back into the box and re-applied it on every Backspace, so the
+placeholder could never return. Hold a text field as a string and parse at the point of use; the numeric
+state is derived, not stored.
 
 `core/animate/primitives/` is a second, lower layer under `core/animate/` — the unstyled wrappers over
 `@base-ui/react` that `core/animate/base/*` builds on. `MotionSlot.tsx` there is the shared `asChild`

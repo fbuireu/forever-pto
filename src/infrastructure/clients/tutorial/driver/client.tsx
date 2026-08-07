@@ -51,10 +51,7 @@ export class DriverClient {
       onDestroyStarted: (element, step, options) => {
         this.config.onDestroyStarted?.(element, step, options);
 
-        this.closeButtonRoots.forEach((root) => {
-          root.unmount();
-        });
-        this.closeButtonRoots = [];
+        this.unmountCloseButtonRoots();
 
         if (this.driver) {
           this.driver.destroy();
@@ -86,8 +83,16 @@ export class DriverClient {
     driverInstance.drive();
   }
 
+  private unmountCloseButtonRoots() {
+    this.closeButtonRoots.forEach((root) => {
+      root.unmount();
+    });
+    this.closeButtonRoots = [];
+  }
+
   destroy() {
     if (this.driver) {
+      this.unmountCloseButtonRoots();
       this.driver.destroy();
       this.driver = null;
     }

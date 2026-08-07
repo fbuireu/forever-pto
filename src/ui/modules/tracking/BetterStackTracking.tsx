@@ -9,6 +9,7 @@ import { useShallow } from 'zustand/shallow';
 
 const TRACKING_TOKEN = process.env.NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN;
 const ENV = process.env.NODE_ENV;
+const BETTER_STACK_SERVICE_ID = 'betterStack';
 
 export const BetterStackTracking = () => {
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
@@ -21,18 +22,18 @@ export const BetterStackTracking = () => {
   );
 
   useEffect(() => {
-    setAnalyticsEnabled(CookieConsentLib.acceptedCategory('analytics'));
-
-    const handleConsentChange = () => {
-      setAnalyticsEnabled(CookieConsentLib.acceptedCategory('analytics'));
+    const readConsent = () => {
+      setAnalyticsEnabled(CookieConsentLib.acceptedService(BETTER_STACK_SERVICE_ID, 'analytics'));
     };
 
-    document.addEventListener('cc:onConsent', handleConsentChange);
-    document.addEventListener('cc:onChange', handleConsentChange);
+    readConsent();
+
+    window.addEventListener('cc:onConsent', readConsent);
+    window.addEventListener('cc:onChange', readConsent);
 
     return () => {
-      document.removeEventListener('cc:onConsent', handleConsentChange);
-      document.removeEventListener('cc:onChange', handleConsentChange);
+      window.removeEventListener('cc:onConsent', readConsent);
+      window.removeEventListener('cc:onChange', readConsent);
     };
   }, []);
 

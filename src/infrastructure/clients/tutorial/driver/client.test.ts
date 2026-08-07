@@ -97,6 +97,26 @@ describe('DriverClient.destroy', () => {
     client.destroy();
     expect(mockDestroy).not.toHaveBeenCalled();
   });
+
+  it('unmounts the close-button roots, which driver.js own destroy() never triggers', () => {
+    const { client, onPopoverRender } = getCallbacks();
+    onPopoverRender(makePopover({ appendChild: vi.fn() }), { config: {}, state: {} });
+    expect(mockCreateRoot).toHaveBeenCalledOnce();
+
+    client.destroy();
+
+    expect(mockUnmount).toHaveBeenCalledOnce();
+  });
+
+  it('does not unmount the same root twice when a second tour starts', () => {
+    const { client, onPopoverRender } = getCallbacks();
+    onPopoverRender(makePopover({ appendChild: vi.fn() }), { config: {}, state: {} });
+
+    client.start();
+    client.destroy();
+
+    expect(mockUnmount).toHaveBeenCalledOnce();
+  });
 });
 
 const mockIconContainer = { style: {} as CSSStyleDeclaration, appendChild: vi.fn() };

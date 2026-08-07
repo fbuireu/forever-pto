@@ -11,6 +11,7 @@ import { COOKIE_SECTIONS } from './config/config';
 
 const analyticsSection = COOKIE_SECTIONS.find((s) => s.id === 'analytics');
 const analyticsServiceIds = analyticsSection?.services?.map((s) => s.id) ?? [];
+const GOOGLE_ANALYTICS_SERVICE_ID = 'ga4';
 const allServicesEnabled = Object.fromEntries(analyticsServiceIds.map((id) => [id, true]));
 const allServicesDisabled = Object.fromEntries(analyticsServiceIds.map((id) => [id, false]));
 
@@ -38,7 +39,7 @@ export const CookieConsent = () => {
         .filter(([, v]) => v)
         .map(([k]) => k);
       CookieConsentLib.acceptService(enabledServices, 'analytics');
-      updateGtagConsent(enabledServices.length > 0);
+      updateGtagConsent(enabledServices.includes(GOOGLE_ANALYTICS_SERVICE_ID));
       setShowBanner(false);
       setShowPreferences(false);
     },
@@ -91,14 +92,14 @@ export const CookieConsent = () => {
         const prefs = CookieConsentLib.getUserPreferences();
         const acceptedServices = prefs.acceptedServices.analytics ?? [];
         setServiceStates(Object.fromEntries(analyticsServiceIds.map((id) => [id, acceptedServices.includes(id)])));
-        updateGtagConsent(acceptedServices.length > 0);
+        updateGtagConsent(acceptedServices.includes(GOOGLE_ANALYTICS_SERVICE_ID));
       },
       onChange: ({ changedCategories }) => {
         if (changedCategories.includes('analytics')) {
           const prefs = CookieConsentLib.getUserPreferences();
           const acceptedServices = prefs.acceptedServices.analytics ?? [];
           setServiceStates(Object.fromEntries(analyticsServiceIds.map((id) => [id, acceptedServices.includes(id)])));
-          updateGtagConsent(acceptedServices.length > 0);
+          updateGtagConsent(acceptedServices.includes(GOOGLE_ANALYTICS_SERVICE_ID));
         }
       },
     });
@@ -112,7 +113,10 @@ export const CookieConsent = () => {
       setServiceStates(Object.fromEntries(analyticsServiceIds.map((id) => [id, acceptedServices.includes(id)])));
     }
 
-    const handleShowPreferences = () => setShowPreferences(true);
+    const handleShowPreferences = () => {
+      setShowBanner(false);
+      setShowPreferences(true);
+    };
     window.addEventListener('cc:showPreferences', handleShowPreferences);
     return () => window.removeEventListener('cc:showPreferences', handleShowPreferences);
   }, [updateGtagConsent, t]);

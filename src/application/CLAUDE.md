@@ -63,6 +63,15 @@ Two consequences worth holding on to:
 - **Every `Date` this layer produces is local midnight**, built with `new Date(y, m, d)`. There is no time
   component and no UTC anywhere. Comparing with `toISOString()` across a time zone will shift the day;
   compare with `isSameDay`, `compareAsc` or `isWithinInterval` instead.
+- **A date string from outside comes in through `toLocalDay`, never `new Date(string)`.** It keeps
+  the leading `YYYY-MM-DD` and drops whatever follows, so the calendar day upstream named is the calendar
+  day we store. `date-holidays` emits its Islamic-calendar entries with an explicit offset —
+  `'2027-03-09 00:00:00 -0600'` — and `new Date()` reads that as a fixed instant, `06:00Z`, which is still
+  8 March for anyone at UTC−07:00 or further west. `holidayDTO.create` used it, so Eid al-Fitr landed a day
+  early for a visitor in Denver, Los Angeles, Anchorage or Honolulu: the planner protected the wrong day and
+  placed a PTO Day on the real Holiday. `ensureDate` is **not** the same tool and keeps `new Date()` on
+  purpose — it rehydrates ISO strings this app itself wrote with `toISOString()`, where the instant is the
+  thing being round-tripped.
 - **`formatDate` only understands the patterns in its map.** `INTL_FORMAT_MAP` lists the format strings that
   resolve to an `Intl.DateTimeFormat`; `'yyyy-MM-dd'` and `'yyyy-MM-dd HH:mm:ss'` are handled separately, and
   anything else falls through to `toLocaleDateString` and silently ignores the pattern. Passing a date-fns
@@ -92,9 +101,27 @@ translated messages and hand back a schema the form parses itself.
 holds.
 
 **`export/generateIcs.ts` sanitises the summary only.** `sanitize` escapes `\`, `;`, `,` and newlines inside
-`SUMMARY`, which is the field carrying user text (a Custom Holiday name). `X-WR-CALNAME` and the `UID` are
-not escaped — they are built from a translated label and a generated id. If either ever becomes user-typed,
-it needs the same treatment.
+`SUMMARY`, which is the field carrying user text (a Custom Holiday name). `X-WR-CALNAME` is not escaped — it
+is a translated label. If it ever becomes user-typed, it needs the same treatment.
+
+**`DTSTAMP` is required on every `VEVENT`, and it was missing.** RFC 5545 lists it alongside `UID` as
+mandatory; without it a strict parser is entitled to reject the file, and the ones that accept it have no
+"when was this written" to order revisions by. One stamp is computed per call so every event in a download
+shares it.
+
+**A `UID` must be unique across every calendar it might land in, not just within one file.** It was
+`holiday-${holiday.id}`, and `holiday.id` is `national-<upstream date>` — the same string for the same day in
+every country. Importing a Spanish and a French export into one calendar therefore silently dropped events:
+the second New Year's Day overwrote the first. UIDs are now scoped by Country and Region, which is why
+`generateIcs` takes them and `CalendarExport.tsx` widened its filters selector to pass them. They also run
+through `toUidToken`, which strips everything outside `[a-zA-Z0-9-]`: the id embeds the raw upstream date,
+which carries a space and sometimes a UTC offset, and a space inside a `UID` is what content-line folding
+eats first.
+
+**`email/templates/Contact.tsx` encodes both halves of its `mailto:`.** The reply button's `href` was
+`mailto:${email}?subject=Re: ${subject}`, and `subject` is whatever the sender typed — so `&bcc=` in a
+subject line added a recipient to the operator's reply the moment they clicked it. Both the address and the
+subject go through `encodeURIComponent` now. Anything else appended to that URL has to as well.
 
 ## Testing
 
