@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/fbuireu/forever-pto/compare/v1.7.2...v1.8.0) (2026-08-13)
+
+
+### Features
+
+* add text-scale meta tag to page metadata ([543805d](https://github.com/fbuireu/forever-pto/commit/543805d7300314d10998aaf4b856d16b2c12fe13))
+
 ## [1.7.2](https://github.com/fbuireu/forever-pto/compare/v1.7.1...v1.7.2) (2026-08-07)
 
 
