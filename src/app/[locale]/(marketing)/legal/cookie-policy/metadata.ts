@@ -35,5 +35,8 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
       index: false,
       follow: false,
     },
+    other: {
+      'text-scale': 'scale',
+    },
   };
 }

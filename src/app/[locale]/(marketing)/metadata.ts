@@ -57,5 +57,8 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
         'max-video-preview': -1,
       },
     },
+    other: {
+      'text-scale': 'scale',
+    },
   };
 }
