@@ -59,16 +59,16 @@ describe('runPlanningPipeline', () => {
       const { suggestion } = runPlanningPipeline({ ...baseInput, ptoDays: 0 });
 
       expect(suggestion.metrics).toBeDefined();
-      expect(suggestion.metrics?.averageEfficiency).toBe(0);
-      expect(suggestion.metrics?.totalEffectiveDays).toBe(0);
-      expect(suggestion.metrics?.firstLastBreak).toBeNull();
+      expect(suggestion.metrics.averageEfficiency).toBe(0);
+      expect(suggestion.metrics.totalEffectiveDays).toBe(0);
+      expect(suggestion.metrics.firstLastBreak).toBeNull();
     });
 
     it('sizes those Metrics to the Planning Window, not to a hard-coded twelve months', () => {
       const { suggestion } = runPlanningPipeline({ ...baseInput, ptoDays: 0, months: monthsFor(3) });
 
-      expect(suggestion.metrics?.monthlyDist).toHaveLength(15);
-      expect(suggestion.metrics?.monthlyDist.every((count) => count === 0)).toBe(true);
+      expect(suggestion.metrics.monthlyDist).toHaveLength(15);
+      expect(suggestion.metrics.monthlyDist.every((count) => count === 0)).toBe(true);
     });
 
     it('refuses to plan when there is nothing free to bridge', () => {

@@ -1,3 +1,4 @@
+import { fromStoredInstant } from '@application/shared/utils/dateIntake';
 import { runPlanningPipeline } from '@domain/calendar/pipeline';
 import type { FilterStrategy } from '@domain/calendar/types';
 import { type CalculateSuggestionsRequest, WORKER_MESSAGE_TYPE, type WorkerResponse } from './types';
@@ -28,8 +29,8 @@ globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
       ptoDays,
       autoSuggestCount,
       holidays: deserializeHolidays(rawHolidays),
-      manuallySelectedDays: manualDays.map((isoDate) => new Date(isoDate)),
-      removedSuggestedDays: removedDays.map((isoDate) => new Date(isoDate)),
+      manuallySelectedDays: manualDays.map(fromStoredInstant),
+      removedSuggestedDays: removedDays.map(fromStoredInstant),
       allowPastDays,
       months: deserializeMonths(rawMonths),
       strategy: strategy as FilterStrategy,

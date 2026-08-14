@@ -1,5 +1,5 @@
 import { ApiError } from '@infrastructure/api/errors';
-import { PaymentError, RateLimitError, ValidationError } from '@infrastructure/errors';
+import { PaymentError, PromoCodeError, PromoCodeErrors, RateLimitError, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -39,7 +39,10 @@ describe('createPaymentRequest', () => {
   it('answers 200 and the client secret on success', async () => {
     const outcome = await createPaymentRequest(Effect.succeed(INPUT), CONTEXT);
 
-    expect(outcome).toEqual({ status: 200, body: { success: true, clientSecret: 'pi_secret', discountInfo: undefined } });
+    expect(outcome).toEqual({
+      status: 200,
+      body: { success: true, clientSecret: 'pi_secret', discountInfo: undefined },
+    });
   });
 
   it('rate-limits before it reaches the use-case, whichever transport called it', async () => {
@@ -78,6 +81,19 @@ describe('createPaymentRequest', () => {
     const outcome = await createPaymentRequest(Effect.fail(new ValidationError({ message: 'invalid_body' })), CONTEXT);
 
     expect(outcome).toEqual({ status: 400, body: { success: false, error: 'invalid_body' } });
+  });
+
+  it('maps a promo-code failure to 400 carrying the code and its own flag', async () => {
+    mockCreatePayment.mockReturnValue(
+      Effect.fail(new PromoCodeError({ code: PromoCodeErrors.USAGE_LIMIT_REACHED })) as never
+    );
+
+    const outcome = await createPaymentRequest(Effect.succeed(INPUT), CONTEXT);
+
+    expect(outcome).toEqual({
+      status: 400,
+      body: { success: false, error: PromoCodeErrors.USAGE_LIMIT_REACHED, isPromoCodeError: true },
+    });
   });
 
   it('maps a payment failure to 500 without leaking the reason', async () => {

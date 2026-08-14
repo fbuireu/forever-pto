@@ -24,6 +24,7 @@ in [`CONTEXT.md`](../../../CONTEXT.md).
 | `pipeline.ts` | `runPlanningPipeline` — the whole run: caches, pseudo-Holidays, budget, the two planning calls and the Metrics |
 | `alternatives/generateAlternatives.ts` | Re-runs selection under seven different Bridge orderings to produce distinct Alternatives |
 | `metrics/generateMetrics.ts` | Assembles the `Metrics` object for a Suggestion or an Alternative |
+| `metrics/utils/streaks.ts` | `freeStreaks` — the one scan of the free-day runs the plan produces |
 | `metrics/utils/helpers.ts` | One function per metric — Long Weekends, Rest Blocks, Max Work Streak, Longest Vacation, Worked Days per month, quarterly and monthly distribution — plus `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER` and the three `window*` helpers that size those distributions |
 
 ## Public API
@@ -153,6 +154,16 @@ actually placed, not merely any free weekday. Holidays still extend a stretch �
 [`CONTEXT.md`](../../../CONTEXT.md) sets for Longest Vacation, *the longest stretch the plan produces*, and
 it is why the fix belongs in the streak test rather than in the Holiday list the engine is handed.
 
+**Three metrics walk the free-day runs, and they walk them once.** `freeStreaks` builds the placed-day set,
+unions it with the Holidays, expands seven days either side of the data and yields each unbroken run of Free
+Days with two facts attached: whether it contains a day the plan placed, and whether it contains a weekend.
+Longest Vacation, Long Weekends and Long Blocks are then predicates over that sequence — `hasPlacedDay`,
+`length >= 3 && hasWeekend && hasPlacedDay`, and `length >= 3` anchored on the first day inside the window.
+
+Each used to own its copy: three near-identical loops and five separate constructions of the same
+"placed days ∪ Holidays" set. That is how the placed-day rule below came to be applied by one and not the
+other. A new metric about stretches of time off belongs here as a predicate, not as a fourth loop.
+
 **`calculateLongWeekends` and `calculateLongestVacation` both apply it, and for a while only the first did.**
 Longest Vacation folded every free run into its maximum as the streak grew, so it reported whatever the
 longest holiday-and-weekend run in the two-year set happened to be — including one lying entirely in
@@ -201,6 +212,14 @@ reach it.
 their input unless the caller sets `presorted: true`. `generateAlternatives` exists to impose its own
 orderings, so without the flag every ordering would collapse back to the same greedy result and all seven
 "alternatives" would be identical.
+
+It is a precondition the callee cannot check, which normally argues for taking the *ordering* instead of a
+claim about it — and that does not work here, so do not re-propose it. Past the seventh comparator
+`generateAlternatives` **rotates** an already-sorted array rather than sorting again, and a rotation is not
+expressible as a comparator: `presorted: true` is the only way to say "walk exactly this array". The
+alternatives are a branded ordered-array type, which buys type safety at the cost of ceremony on the hottest
+path in the engine, or a renamed flag, which is the same boolean wearing better clothes. The flag has one
+caller and `generateAlternatives.test.ts` pins the distinctness it protects.
 
 **The seventh Alternative ordering sorts on `Math.sin` on purpose.** Six of the comparators in
 `generateAlternatives.ts` bias selection along a real axis — Efficiency, span, PTO cost, month, and

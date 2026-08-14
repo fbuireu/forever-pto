@@ -33,8 +33,6 @@ const CAL_PATTERN: DayType[] = [
 
 export const CAL_ENTRIES = CAL_PATTERN.map((type, i) => ({ id: `d${i + 1}`, type }));
 
-const _DAY_HEADERS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
-
 export const dayCell: Record<DayType, string> = {
   work: 'rounded-lg bg-card text-foreground border-[2px] border-[var(--frame)]/15',
   holiday:

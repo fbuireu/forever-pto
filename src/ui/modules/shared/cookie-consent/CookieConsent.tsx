@@ -7,13 +7,15 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import * as CookieConsentLib from 'vanilla-cookieconsent';
 
 import { CookieConsentDialog } from './CookieConsentDialog';
-import { COOKIE_SECTIONS } from './config/config';
+import {
+  ANALYTICS_CATEGORY,
+  allAnalyticsServices,
+  consentedAnalyticsServices,
+  GOOGLE_ANALYTICS_SERVICE_ID,
+} from './utils/consent';
 
-const analyticsSection = COOKIE_SECTIONS.find((s) => s.id === 'analytics');
-const analyticsServiceIds = analyticsSection?.services?.map((s) => s.id) ?? [];
-const GOOGLE_ANALYTICS_SERVICE_ID = 'ga4';
-const allServicesEnabled = Object.fromEntries(analyticsServiceIds.map((id) => [id, true]));
-const allServicesDisabled = Object.fromEntries(analyticsServiceIds.map((id) => [id, false]));
+const allServicesEnabled = allAnalyticsServices(true);
+const allServicesDisabled = allAnalyticsServices(false);
 
 export const CookieConsent = () => {
   const t = useTranslations('cookies');
@@ -38,7 +40,7 @@ export const CookieConsent = () => {
       const enabledServices = Object.entries(services)
         .filter(([, v]) => v)
         .map(([k]) => k);
-      CookieConsentLib.acceptService(enabledServices, 'analytics');
+      CookieConsentLib.acceptService(enabledServices, ANALYTICS_CATEGORY);
       updateGtagConsent(enabledServices.includes(GOOGLE_ANALYTICS_SERVICE_ID));
       setShowBanner(false);
       setShowPreferences(false);
@@ -68,6 +70,12 @@ export const CookieConsent = () => {
     setServiceStates((prev) => ({ ...prev, [serviceId]: checked }));
   }, []);
 
+  const syncFromLibrary = useCallback(() => {
+    const consented = consentedAnalyticsServices();
+    setServiceStates(consented);
+    updateGtagConsent(consented[GOOGLE_ANALYTICS_SERVICE_ID] === true);
+  }, [updateGtagConsent]);
+
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
@@ -88,19 +96,9 @@ export const CookieConsent = () => {
         default: EN,
         translations: { [EN]: { consentModal: { title: t('title') }, preferencesModal: { sections: [] } } },
       },
-      onConsent: () => {
-        const prefs = CookieConsentLib.getUserPreferences();
-        const acceptedServices = prefs.acceptedServices.analytics ?? [];
-        setServiceStates(Object.fromEntries(analyticsServiceIds.map((id) => [id, acceptedServices.includes(id)])));
-        updateGtagConsent(acceptedServices.includes(GOOGLE_ANALYTICS_SERVICE_ID));
-      },
+      onConsent: syncFromLibrary,
       onChange: ({ changedCategories }) => {
-        if (changedCategories.includes('analytics')) {
-          const prefs = CookieConsentLib.getUserPreferences();
-          const acceptedServices = prefs.acceptedServices.analytics ?? [];
-          setServiceStates(Object.fromEntries(analyticsServiceIds.map((id) => [id, acceptedServices.includes(id)])));
-          updateGtagConsent(acceptedServices.includes(GOOGLE_ANALYTICS_SERVICE_ID));
-        }
+        if (changedCategories.includes(ANALYTICS_CATEGORY)) syncFromLibrary();
       },
     });
 
@@ -108,9 +106,7 @@ export const CookieConsent = () => {
     if (!existingConsent || Object.keys(existingConsent).length === 0) {
       setShowBanner(true);
     } else {
-      const prefs = CookieConsentLib.getUserPreferences();
-      const acceptedServices = prefs.acceptedServices.analytics ?? [];
-      setServiceStates(Object.fromEntries(analyticsServiceIds.map((id) => [id, acceptedServices.includes(id)])));
+      setServiceStates(consentedAnalyticsServices());
     }
 
     const handleShowPreferences = () => {
@@ -119,7 +115,7 @@ export const CookieConsent = () => {
     };
     window.addEventListener('cc:showPreferences', handleShowPreferences);
     return () => window.removeEventListener('cc:showPreferences', handleShowPreferences);
-  }, [updateGtagConsent, t]);
+  }, [syncFromLibrary, t]);
 
   if (showBanner) {
     return (
