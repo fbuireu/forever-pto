@@ -164,8 +164,8 @@ stored Suggestion go stale the moment it is adopted, and neither can be repaired
 - Its size. The worker built it against `effectivePtoDays = ptoDays - manualDays.length`, the manual count
   **at that run**, and `toggleDaySelection` deliberately never re-plans — so a Manual Day added afterwards is
   unreserved in every stored plan. Keep the Manual Days and `days.length + manuallySelectedDays.length` can
-  exceed the budget; `getRemainingDays` and `CalendarList.remainingDays` both clamp with `Math.max(0, …)`, so
-  the overdraft reads as zero and is invisible.
+  exceed the budget; `measureBudget` clamps the Remaining Budget at zero, so the overdraft reads as nothing
+  left rather than as a negative allowance — correct for the user, and invisible to anyone debugging.
 - Its Bridges. They were expanded through the Manual Days as pseudo-Holidays, so clearing those days leaves
   spans crossing dates the calendar now paints as workdays, and `getTotalEffectiveDays` keeps counting them.
 

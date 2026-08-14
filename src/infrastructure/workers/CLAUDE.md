@@ -62,6 +62,13 @@ using the global, and this worker is one of the three realms that has to work
 ([ADR 0005](../../../docs/adr/0005-temporal-polyfill.md)). Nothing here imports `Temporal` directly, but a
 codemod that "modernises" the engine's import breaks this thread too.
 
+**The way back from a string is `fromStoredInstant`, not `new Date`.** Everything crossing this boundary was
+written by this app with `toISOString()`, so the instant is the thing being round-tripped — the same
+provenance the persistence layer has, and the same intake function answers it
+([`@application/shared/utils/dateIntake`](../../application/CLAUDE.md)). `serializers.ts` and `worker.ts`
+called `new Date(x)` inline seven times between them, which is the rule that module exists to hold restated
+as bare code. `fromUpstreamCalendarDay` is the wrong tool here and would silently discard the time component.
+
 **Every `Date` crosses as an ISO string, in both directions.** This is not a structured-clone limitation —
 structured clone carries `Date` natively. It is a choice to make the boundary an explicit, inspectable type:
 `SerializedHolidayDTO`, `SerializedBridge` and `SerializedSuggestion` in `types.ts` are what the two sides

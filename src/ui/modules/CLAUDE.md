@@ -160,6 +160,14 @@ does not reach a listener on `document`. `tracking/BetterStackTracking.tsx` list
 stayed undefined and every `track()` and `identifyUser()` call no-opped for **every** consenting visitor.
 `shared/cookie-consent/CookieConsent.tsx` already used `window` for `cc:showPreferences`; the two now agree.
 
+**One module answers what has been consented to, and every reader uses it.**
+`shared/cookie-consent/utils/consent.ts` holds the analytics service ids and three functions over them —
+`isServiceConsented`, `consentedAnalyticsServices`, `allAnalyticsServices`. `CookieConsent.tsx` derived that
+state inline at three separate call sites (the initial read, `onConsent` and `onChange`), and
+`tracking/BetterStackTracking.tsx` answered the same question through a different library call. Two
+mechanisms for one question is exactly how the category-versus-service bug below shipped; both now read
+`acceptedService`, through this module.
+
 **Consent is collected per service, so it has to be *read* per service.** The preferences dialog offers
 `ga4` and `betterStack` as separate switches, but both gates asked `acceptedCategory('analytics')`, which the
 library keeps true while *any* service in the category is on. Turning Google Analytics off and leaving Better

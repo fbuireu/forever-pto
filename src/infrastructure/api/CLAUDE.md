@@ -102,7 +102,8 @@ machine code — snake_case with no whitespace — is looked up in the component
 generic translated message when the namespace has no key for it, while prose is shown as it came, because
 that is how a Stripe message Stripe has already localised arrives. So a code a user can see is displayed raw
 only when nobody added a key for it. Add the key when you add the code, and note that a `checkout` failure
-carrying `charged: true` bypasses the lookup entirely — see [`../../ui/CLAUDE.md`](../../ui/CLAUDE.md).
+whose outcome is `FAILED_AFTER_CHARGE` bypasses the lookup entirely — see
+[`../../ui/CLAUDE.md`](../../ui/CLAUDE.md).
 
 `ValidationError` messages are the sharpest edge. Server-side parsing uses the default schemas in `src/application/dto/payment/schema.ts` and `src/application/dto/contact/schema.ts`, whose messages are themselves codes (`email_required`, `amount_too_low`). The UI rebuilds the same schemas with translated messages for client-side validation, so a user normally sees prose — but a request that reaches the server unvalidated gets the code back and displays it. If you add a code a user can see, give it a lookup of its own; do not assume the code is presentable.
 
