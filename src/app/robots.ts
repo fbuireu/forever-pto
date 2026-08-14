@@ -1,17 +1,15 @@
 import { LOCALES } from '@infrastructure/i18n/locales';
 import { localePath } from '@infrastructure/i18n/utils/url';
-import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { privateRoutes } from '@infrastructure/seo/routes';
+import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import type { MetadataRoute } from 'next';
 
-export const DISALLOWED_PAGES = ['/legal/', '/payment/'];
-
 export default async function robots(): Promise<MetadataRoute.Robots> {
-  const { env } = await getCloudflareContext({ async: true });
-  const baseUrl = env.NEXT_PUBLIC_SITE_URL;
+  const { siteUrl: baseUrl } = await getPublicEnv();
 
   const disallow = [
     '/_next/static/',
-    ...LOCALES.flatMap((locale) => DISALLOWED_PAGES.map((page) => localePath(locale, page))),
+    ...LOCALES.flatMap((locale) => privateRoutes().map(({ path }) => localePath(locale, path))),
   ];
 
   return {

@@ -1,8 +1,12 @@
 import { localeAlternates, localePath } from '@infrastructure/i18n/utils/url';
+import { buildMetadata } from '@infrastructure/seo/buildMetadata';
+import { isIndexable } from '@infrastructure/seo/routes';
 import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
+
+const PATH = '/legal/terms-of-service';
 
 interface GenerateMetadataParams {
   params: Promise<{ locale: Locale }>;
@@ -15,28 +19,12 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
     getTranslations({ locale, namespace: 'metadata.termsOfService' }),
   ]);
 
-  return {
+  return buildMetadata({
+    baseUrl,
+    locale,
+    path: PATH,
     title: t('title'),
     description: t('description'),
-    metadataBase: new URL(baseUrl),
-    alternates: {
-      canonical: localePath(locale, '/legal/terms-of-service'),
-      languages: localeAlternates('/legal/terms-of-service'),
-    },
-    openGraph: {
-      title: t('title'),
-      description: t('description'),
-      url: localePath(locale, '/legal/terms-of-service'),
-      siteName: 'Forever PTO',
-      locale,
-      type: 'website',
-    },
-    robots: {
-      index: false,
-      follow: false,
-    },
-    other: {
-      'text-scale': 'scale',
-    },
-  };
+    indexable: isIndexable(PATH),
+  });
 }

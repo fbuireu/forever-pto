@@ -1,8 +1,12 @@
 import { localeAlternates, localePath } from '@infrastructure/i18n/utils/url';
+import { buildMetadata } from '@infrastructure/seo/buildMetadata';
+import { isIndexable } from '@infrastructure/seo/routes';
 import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
+
+const PATH = '/legal/privacy-policy';
 
 interface GenerateMetadataParams {
   params: Promise<{ locale: Locale }>;
@@ -15,28 +19,12 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
     getTranslations({ locale, namespace: 'metadata.privacyPolicy' }),
   ]);
 
-  return {
+  return buildMetadata({
+    baseUrl,
+    locale,
+    path: PATH,
     title: t('title'),
     description: t('description'),
-    metadataBase: new URL(baseUrl),
-    alternates: {
-      canonical: localePath(locale, '/legal/privacy-policy'),
-      languages: localeAlternates('/legal/privacy-policy'),
-    },
-    openGraph: {
-      title: t('title'),
-      description: t('description'),
-      url: localePath(locale, '/legal/privacy-policy'),
-      siteName: 'Forever PTO',
-      locale,
-      type: 'website',
-    },
-    robots: {
-      index: false,
-      follow: false,
-    },
-    other: {
-      'text-scale': 'scale',
-    },
-  };
+    indexable: isIndexable(PATH),
+  });
 }
