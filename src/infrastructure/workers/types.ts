@@ -29,7 +29,7 @@ export interface SerializedSuggestion {
   days: string[];
   bridges?: SerializedBridge[];
   strategy?: string;
-  metrics?: Metrics;
+  metrics: Metrics;
 }
 
 interface CalculateSuggestionsPayload {

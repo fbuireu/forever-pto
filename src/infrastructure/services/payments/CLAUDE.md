@@ -43,9 +43,10 @@ The domain handlers importing infrastructure directly is the deliberate asymmetr
 
 ## Invariants
 
-**Both payment entry points rate-limit first.** `src/app/api/payment/route.ts` and the
-`createPaymentAction` server action are two implementations of one operation and must stay behaviourally
-identical; `checkRateLimit` is the first thing either yields. `src/app/api/payment/activate/route.ts` is
+**Payment creation rate-limits first, in one place.** The route handler and the `createPaymentAction` server
+action are two transports over one operation — `createPaymentRequest` under
+[`@infrastructure/api/operations`](../../api/CLAUDE.md) — and `checkRateLimit` is the first thing it yields,
+before the request body is even read. `src/app/api/payment/activate/route.ts` is
 the third caller and the only one outside payment creation: it is a public GET that mints a Premium
 session, so it is limited on the same `cf-connecting-ip` key and shares the same window. Nothing else is —
 not the webhook, and not the `POST /api/check-session` half of session activation.
@@ -102,6 +103,14 @@ a blank one. An over-long address is refused earlier instead, by the `.max(254)`
 `promoCode` carries a `.max()` there too, which is what stops the whitespace bypass carrying an arbitrarily
 long string. Adding a new free-text metadata field means deciding which of these two it is.
 
+Both of those `.max()` rules carry a message key, and the promo-code one did not at first. A Zod rule
+without `{ message }` falls back to Zod's own English prose, and that string is what `zodParse` puts into
+`ValidationError` and what `/api/payment` returns as the 400 body's `error` — so a Catalan or German donor
+was shown "Too big: expected string to have <=100 characters", in the form and from the API alike. The rule
+now names `messages.promoCodeTooLong`, pre-bound to the machine code `promo_code_too_long` for the server
+and resolved through `validation.payment.promoCodeTooLong` for the form; `checkout.errors.promo_code_too_long`
+is its lookup in all six bundles. See [`../../../application/dto/CLAUDE.md`](../../../application/dto/CLAUDE.md).
+
 ## Traps
 
 **`SELECT *` gives a row, not a `PaymentData`.** `TursoService.query` casts with `rows as T[]` and maps
@@ -142,11 +151,39 @@ key in this file. This is distinct from the fail-open stance above, which covers
 "best-effort, not atomic" caveat granted to the promo-code cap below: that one is a marketing control, this
 one is the only thing in front of the card processor.
 
+**A promotion code carries its coupon under `promotion`, not at the top level, and reading the wrong one
+broke every promo code in production.** On the `dahlia` API version this repo pins, `PromotionCode` has
+`promotion: { type: 'coupon', coupon: string | Coupon | null }` and **no** `coupon` field of its own.
+`validatePromoCode` read `promotionCode.coupon` through an `as unknown as { coupon: Stripe.Coupon }` cast —
+which is exactly what stopped the compiler saying so — got `undefined`, and failed every single valid code
+with `FAILED_TO_LOAD`. Nothing caught it: the co-located test built its mock in the shape the code expected
+rather than the shape Stripe sends, so the suite agreed with the bug. Verified against the real test account
+by creating codes and running the program over them; with the old read, seven of nine live cases returned
+`failed_to_load`, and the only two that passed were the ones that never reach a coupon at all.
+
+The coupon is a bare id unless asked for, so `list` now carries `expand: ['data.promotion.coupon']` and the
+second `retrieve` call is gone — one round trip, not two. That expansion is the load-bearing part: without
+it `promotion.coupon` is a string and the guard refuses it. `expand: ['coupon']`, the old path, is not
+rejected by the API — it is simply ignored, which is why the failure was silent.
+
 **Promotion-code checks come before coupon checks, and the first error wins.** `validatePromoCode` resolves
-the code, re-retrieves it with `expand: ['coupon']` — casting through `unknown` because the SDK type does
-not model the expansion — then evaluates the promotion code (active, expiry, redemptions, minimum amount)
+the code, then evaluates the promotion code (active, expiry, redemptions, minimum amount)
 and only then the coupon (valid, redemptions, `redeem_by`). A code failing both reports the promotion-code
 reason. The `PromoCodeErrorCode` returned is a translation key the UI looks up, not a message.
+
+**Two branches here are unreachable through this path, and both are deliberate.** `list` is called with
+`active: true`, which the API honours by hiding deactivated codes entirely — so a code the operator switched
+off comes back as an empty list and reports `INVALID_OR_EXPIRED` from the length check, never from the
+`promotionCode.active === false` test below it. And Stripe refuses to *create* a coupon whose `redeem_by` or
+a code whose `expires_at` is already in the past, so those two comparisons can only fire on an object that
+aged into expiry. Keep them: they are the only thing standing between a stale object and a discount.
+
+**Discounted amounts are rounded to whole cents where they are computed.** `amount * (1 - percent_off / 100)`
+is binary floating point — a 90% code on €10 yields `0.9999999999999998` — and while `createPaymentIntent`'s
+own `Math.round(amount * 100)` charges the right number of cents regardless, `MIN_FINAL_AMOUNT` compares the
+unrounded value. A 90% code on a €5 Donation computes `0.4999999999999999` and was refused with
+`MIN_AMOUNT_EXCEEDED` for a result that is exactly the €0.50 floor. `calculateFinalAmount` rounds to cents
+before returning, so the floor comparison and the figure shown to the donor both see the real amount.
 
 **The redemption cap is counted from our own table, because Stripe never learns the code was used.** A
 promotion code is redeemed by a Checkout Session, an Invoice or a Subscription; this app computes the
@@ -185,7 +222,14 @@ failure. `rateLimit.test.ts` mocks `@opennextjs/cloudflare` instead, since the r
 dependency; its burst case drives 200 concurrent `checkRateLimit` calls to pin that the count is the
 platform’s and not a local read-modify-write.
 
-No test constructs a Stripe or Turso client. `repository.test.ts` asserts positionally — one statement
+No test constructs a Stripe or Turso client — and that is exactly how the promotion-code shape above went
+unnoticed for as long as it did. A mock is written from the same reading of the API the code was written
+from, so when the reading is wrong the mock agrees with it and the suite proves nothing. Where a shape
+matters, build the fixture from a response the real account actually returned, and say in the test what
+about it is load-bearing: `promoCode.test.ts` now nests the coupon under `promotion` and carries a case
+asserting the code never reaches for a top-level `coupon`.
+
+`repository.test.ts` asserts positionally — one statement
 keyword via `toContain`, then each value by its index in the argument array — so reordering a column without
 reordering its value is caught, while rewording the SQL is not. Add a column at the end or the indices in
 that file stop meaning what they say.

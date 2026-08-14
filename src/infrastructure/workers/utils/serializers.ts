@@ -1,5 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import type { Bridge, Suggestion } from '@domain/calendar/types';
+import type { Bridge, MeasuredSuggestion, Suggestion } from '@domain/calendar/types';
 import type { SerializedBridge, SerializedHolidayDTO, SerializedSuggestion } from '../types';
 
 export function serializeHolidays(holidays: HolidayDTO[]) {
@@ -22,14 +22,14 @@ function serializeBridge(bridge: Bridge) {
   };
 }
 
-export function serializeSuggestionResult(suggestion: Suggestion, alternatives: Suggestion[]) {
+export function serializeSuggestionResult(suggestion: MeasuredSuggestion, alternatives: MeasuredSuggestion[]) {
   return {
     suggestion: serializeSuggestion(suggestion),
     alternatives: alternatives.map(serializeSuggestion),
   };
 }
 
-function serializeSuggestion(suggestion: Suggestion) {
+function serializeSuggestion(suggestion: MeasuredSuggestion) {
   return {
     ...suggestion,
     days: suggestion.days.map((day) => day.toISOString()),
@@ -46,7 +46,7 @@ function deserializeBridge(bridge: SerializedBridge) {
   };
 }
 
-export function deserializeSuggestion(serialized: SerializedSuggestion) {
+export function deserializeSuggestion(serialized: SerializedSuggestion): MeasuredSuggestion {
   return {
     ...serialized,
     days: serialized.days.map((day) => new Date(day)),

@@ -44,6 +44,7 @@ type EmailFormData = z.infer<ReturnType<typeof createEmailSchema>>;
 
 export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading }: UpgradeModalProps) => {
   const t = useTranslations('upgrade');
+  const tA11y = useTranslations('a11y');
   const [step, setStep] = useState<Step>(Step.INPUT);
 
   const emailSchema = useMemo(
@@ -88,7 +89,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-md' initialFocus={false}>
+      <DialogContent className='sm:max-w-md' closeLabel={tA11y('closeDialog')} initialFocus={false}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Crown className='size-5 text-yellow-500' />

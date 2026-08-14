@@ -20,7 +20,7 @@ The rest of the application layer contract is in [`../CLAUDE.md`](../CLAUDE.md).
 | `ui.ts` | `useUIStore` — donate popover and currency; the one store with no persistence |
 | `crypto.ts` | `obfuscatedStorage`, the zustand `PersistStorage` the four persisted stores share. Not a store |
 | `utils/crypto.ts` | `obfuscate` / `deobfuscate` / `base64Encode` / `base64Decode`, plus `TWENTY_FOUR_HOURS` and `BASE64_PATTERN`. Not a store |
-| `types.ts` | The action parameter objects shared between the stores and their callers — `GenerateSuggestionsParams`, `MainThreadSuggestionsParams`, `FetchHolidaysParams`, `PlanningWindowParams`, `AddHolidayParams`, `EditHolidayParams`, `AlternativeSelectionBaseParams` |
+| `types.ts` | The action parameter objects shared between the stores and their callers — `GenerateSuggestionsParams`, `MainThreadSuggestionsParams`, `FetchHolidaysParams`, `PlanningWindowParams`, `AddHolidayParams`, `EditHolidayParams`, `AlternativeSelectionBaseParams` — plus the outcomes the actions answer with: `DayRefusal`/`DayOutcome` and `HolidayRefusal`/`HolidayOutcome` |
 
 ## The five stores
 
@@ -34,6 +34,17 @@ The rest of the application layer contract is in [`../CLAUDE.md`](../CLAUDE.md).
 
 `setCountry` clears `region` in the same `set` call — a Region code is only meaningful under its Country, and
 leaving a stale one produces a plan with holidays from the wrong place.
+
+**The numeric filters are clamped in the store, because the controls are not the only writers.** `MIN_PTO_DAYS`,
+`MAX_PTO_DAYS`, `MIN_CARRY_OVER_MONTHS` and `MAX_CARRY_OVER_MONTHS` live in `filters.ts` and the setters hold
+them; `PtoDays.tsx` and `CarryOverMonths.tsx` import the same constants rather than declaring their own. Each
+setter used to clamp the floor and nothing else, and the ceiling was enforced only by the control that owned
+it — `PtoDays`'s increment button going disabled at 365. That left two ways past it: the accrual calculator
+in `PtoCalculator.tsx`, which writes a computed budget straight through `setPtoDays` (its `max='8'` is an
+HTML attribute, which stops the stepper and not a typed number), and a persisted blob carrying whatever a
+previous version allowed. `onRehydrateStorage` clamps as well for the second case — `migrate` only runs on a
+version change, so a stored out-of-range value would otherwise outlive the bound for ever. A ceiling enforced
+at one control is not an invariant; put it where every writer passes.
 
 ## Persistence is obfuscated, not encrypted
 
@@ -73,7 +84,8 @@ design, and three of those omissions are load-bearing:
 
 **`Date` does not survive JSON.** `partializeHolidays` maps every `Date` to an ISO string — inside
 `holidays`, and inside `days`, `bridges[].startDate`, `bridges[].endDate` and `bridges[].ptoDays` of each
-Suggestion — and `onRehydrateStorage` maps them all back through `ensureDate`. Adding a `Date` anywhere in
+Suggestion — and `onRehydrateStorage` maps them all back through `fromStoredInstant`, the intake function
+for values this app itself wrote (see [`../CLAUDE.md`](../CLAUDE.md)). Adding a `Date` anywhere in
 persisted holidays state means editing both halves; miss one and you get a string where the calendar expects
 a `Date`, which only surfaces at render.
 
@@ -91,17 +103,23 @@ form. Introducing an off-by-one here silently applies the wrong plan rather than
 The rehydration guard `currentSelectionIndex > alternatives.length` exists because `maxAlternatives` can
 shrink between sessions, leaving a persisted index that names nothing. It resets to the base Suggestion.
 
-## Two ways a plan gets calculated
+## Two threads run one pipeline
 
-The same pipeline exists twice, and the two halves must stay in step:
+There are two ways a plan gets calculated, and they are two *callers* of `runPlanningPipeline` under
+`@domain/calendar` — not two implementations:
 
-- **The normal path** is the Web Worker. `useCalculationsWorker.ts` posts to `worker.ts`, which runs
-  `generateSuggestions`, `generateAlternatives` and `generateMetrics` off the main thread and hands the result
-  back through `setCalculationResult`. See
+- **The normal path** is the Web Worker. `useCalculationsWorker.ts` posts to `worker.ts`, which deserialises
+  the request, calls the pipeline off the main thread, serialises the result and hands it back through
+  `setCalculationResult`. See
   [`../../infrastructure/workers/CLAUDE.md`](../../infrastructure/workers/CLAUDE.md).
-- **The store's own `generateSuggestions` action** runs the same three engine calls on the main thread. Its
+- **The store's own `generateSuggestions` action** calls the same pipeline on the main thread. Its
   one caller is the Troubleshooting reset in `Troubleshooting.tsx`, which fires it after `resetToDefaults()`
   has cleared the manual edits.
+
+Everything that used to be restated on both sides — clearing the caches, building the `manual-N`
+pseudo-Holidays, deriving `carryOverMonths`, `effectivePtoDays`, the empty guard, measuring the Suggestion and
+each Alternative — is inside the pipeline. What is left here is genuinely this side's: reading the store,
+normalising the Holidays through `holidayDTO.normalize`, and deciding what "nothing to plan" writes to state.
 
 **`checkExistingSession` clears Premium only on an authoritative "no session", never on a failed check.**
 `getExistingSession` returns `null` when the server answered and said there is no session — a genuine
@@ -116,8 +134,17 @@ calendar's `nationalOrRegionalHoliday` branch alone did not catch. Both cost a d
 because the day was already off. The guard runs only on the *add* path: a day already in the plan can always
 be toggled back off, which matters when a Holiday lands on a Manual Day after the fact (a Country change
 re-fetches Holidays) and would otherwise strand it, spending budget with no way to reclaim it.
-`calendar/Calendar.tsx` repeats the check to choose the toast, exactly as `AddHolidayModal.tsx` does for the
-mirror rule below — the two must agree, or the UI reports a selection the store refused.
+
+**The refusal reason crosses the seam, so no caller re-derives the rule.** `toggleDaySelection` returns a
+`DayOutcome` and `addHoliday`/`editHoliday` return a `HolidayOutcome` — both declared in `types.ts`, both
+either `{ applied: true }` or `{ applied: false, reason }`, with `HolidayOutcome` additionally carrying
+`heldBy` so a caller can name the Holiday already on the date without looking it up. They used to answer
+`boolean` (or nothing at all), which is why `calendar/Calendar.tsx`, `AddHolidayModal.tsx` and
+`EditHolidayModal.tsx` each reimplemented the occupancy check purely to pick a toast — four hand-rolled
+`toDateString()` comparisons for one rule, kept in agreement by review. The reasons are the distinctions the
+copy actually needs: a weekend, a National or Regional Holiday and a Custom Holiday are three different
+refusals because the UI says three different things. Adding a refusal branch means adding a reason, not a
+second copy of the condition.
 
 **Only `triggerCalculation` raises `isCalculating`, and only a worker reply clears it.** Nothing else in the app sets it back to false — `useCalculationsWorker`'s three callbacks and its
 unmount cleanup are the whole list, and the cleanup is gated on a request actually being in flight. The only
@@ -168,15 +195,13 @@ calculation gate closes while a plan is still standing — see
 
 **`editHoliday` carries the same collision rule as `addHoliday`, because moving a Holiday onto a date is
 the same act as creating one there.** It refuses a target date already held by another Holiday or by a
-Manual Day, and `EditHolidayModal.tsx` repeats both checks to pick the toast. The store comparison skips the
-entry being edited, so renaming a Holiday without moving it is never blocked by itself.
+Manual Day. The store comparison skips the entry being edited, so renaming a Holiday without moving it is
+never blocked by itself.
 
 **A date is occupied by a Holiday *or* by a Manual Day, and `addHoliday` refuses both.** It used to compare
 only against `holidays`, so a Custom Holiday could be created on a date the user had already spent budget
-on: the day then counted against the allowance in `remainingDays` while being a non-working day, so the PTO
-Day was paid for and bought nothing. The check lives in two places on purpose — `AddHolidayModal.tsx` runs
-it to choose the toast, the store runs it so no other caller can bypass it — and they must agree, or the
-modal reports success for something the store dropped.
+on: the day then counted against the allowance while being a non-working day, so the PTO Day was paid for
+and bought nothing. The check lives in the store alone, and the modals render whichever refusal comes back.
 
 **The Troubleshooting reset clears two stores and deliberately not the third.** Its copy promises that
 clearing local storage "resets everything back to defaults", so it calls `resetToDefaults` on the holidays
@@ -190,8 +215,9 @@ Premium is derived from the payment record and access is never revoked from a do
 logged a paying user out would be a defect, not a more thorough reset. That action having no caller is the
 correct state, not dead code to wire up.
 
-**They compute the same plan from the same inputs, and that is a maintained property, not a coincidence.**
-The store's action reproduces the worker's rules line for line:
+**They compute the same plan from the same inputs, and that is now structural rather than maintained.** The
+rules below live in `runPlanningPipeline`, once. They are documented here because they are what the pipeline
+does with what this store hands it, and getting the *inputs* wrong still produces a wrong plan:
 
 - **Manual Days become `manual-N` pseudo-Holidays of Variant Custom**, so the engine cannot re-suggest a date
   the user has already spent budget on.
@@ -210,24 +236,21 @@ The store's action reproduces the worker's rules line for line:
 - **Both guard on `holidaysWithManual.length === 0`.** A calendar with no Holidays and only Removed Days now
   short-circuits, which it did not when the Removed Days padded the array the guard counted.
 
-The `describe('generateSuggestions agrees with the worker')` block in `holidays.test.ts` mirrors the
-assertions in `worker.test.ts`; change one side and both fail. Editing either pipeline without the other is
-how the same Planning Window came to produce two different plans.
+The `describe('generateSuggestions agrees with the worker')` block in `holidays.test.ts` still mirrors
+`worker.test.ts`, and both now assert the same thing from opposite sides: that each caller hands the pipeline
+the right inputs. The pipeline's own behaviour is tested once, in `pipeline.test.ts`, against the real engine.
 
-One difference is left on purpose: when the budget clamps to zero the worker replies with an empty Suggestion
-carrying zeroed Metrics, while the store writes `null` across `suggestion`, `alternatives` and
-`currentSelection` — its existing "no plan" state, which the calendar already renders.
+**The two sides still differ on what "nothing to plan" means, and that is the one deliberate difference
+left.** The pipeline answers `planned: false` with an empty Suggestion whose Metrics are real; the worker
+forwards it as-is, because the wire type has no null, while this store maps it to `null` across `suggestion`,
+`alternatives` and `currentSelection` — its existing "no plan" state, which the calendar already renders.
 
-Both must call `clearDateKeyCache()` and `clearHolidayCache()` before every run. The engine memoises the
-holiday set under one fixed key and never evicts it, so a second run without a clear silently reuses the
-previous run's Holidays — a structurally valid, wrong answer with no error
-([ADR 0006](../../../docs/adr/0006-caller-owned-calculation-caches.md)). These two are the only callers the
-ADR sanctions; a third means switching to a content-derived cache key, not adding a third `clear` pair.
+Cache clearing is no longer either caller's job — `runPlanningPipeline` does it, per the 2026-08-14 amendment
+to [ADR 0006](../../../docs/adr/0006-caller-owned-calculation-caches.md).
 
-`generateSuggestions`, `generateAlternatives`, the cache module and `getHolidays.ts` are reached through
-`await import(...)` inside the actions, not top-level imports. That keeps the bulk of the planner out of the
-bundle any page that merely touches the store would otherwise pull in. Converting one to a static import is
-not a tidy-up.
+The pipeline and `getHolidays.ts` are reached through `await import(...)` inside the actions, not top-level
+imports. That keeps the bulk of the planner out of the bundle any page that merely touches the store would
+otherwise pull in. Converting one to a static import is not a tidy-up.
 
 **`generateMetrics` is the exception, and it is imported statically.** `toggleDaySelection` is synchronous and
 returns a `boolean`, so it cannot await an import without changing its signature and every call site with it.
@@ -272,6 +295,12 @@ The names are historical. Nothing in this folder makes an HTTP request except `p
 fetched Holiday sharing a date with one, and re-sorts. `editHoliday` rebuilds through
 `holidayDTO.createCustom`, so editing a National or Regional Holiday converts it to a Custom one and it will
 survive the next fetch — that is the intended behaviour, not a leak.
+
+**The budget arithmetic is not written here.** `measureBudget` under `@domain/calendar/utils` owns it, and
+`toggleDaySelection` asks it whether anything is left rather than subtracting two lengths itself. The store
+used to expose `getRemainingDays` for the same question; **nothing ever called it**, every real caller inlined
+the three lines instead, and it was nonetheless the only copy with tests. It is gone — the deletion is the
+fix, not a regression to restore.
 
 **`toggleDaySelection` recomputes metrics but does not re-plan.** It moves a date between
 `manuallySelectedDays` and `removedSuggestedDays`, calls `generateMetrics` with the updated sets and writes

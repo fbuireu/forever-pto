@@ -1,6 +1,6 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { HolidayVariant } from '@application/dto/holiday/types';
-import type { Bridge, Suggestion } from '@domain/calendar/types';
+import type { Bridge, MeasuredSuggestion, Metrics } from '@domain/calendar/types';
 import { describe, expect, it } from 'vitest';
 import {
   deserializeHolidays,
@@ -28,7 +28,12 @@ const makeBridge = (): Bridge => ({
   ptoDays: [new Date(2025, 0, 2), new Date(2025, 0, 3)],
 });
 
-const makeSuggestion = (days: Date[] = [new Date(2025, 2, 10)]): Suggestion => ({ days });
+const EMPTY_METRICS = { averageEfficiency: 0 } as Metrics;
+
+const makeSuggestion = (days: Date[] = [new Date(2025, 2, 10)]): MeasuredSuggestion => ({
+  days,
+  metrics: EMPTY_METRICS,
+});
 
 describe('serializeHolidays', () => {
   it('converts each date to an ISO string', () => {
@@ -76,7 +81,7 @@ describe('serializeSuggestionResult', () => {
 
   it('serializes bridge dates when present', () => {
     const bridge = makeBridge();
-    const suggestion: Suggestion = { days: [], bridges: [bridge] };
+    const suggestion: MeasuredSuggestion = { days: [], bridges: [bridge], metrics: EMPTY_METRICS };
     const result = serializeSuggestionResult(suggestion, []);
     const serializedBridge = result.suggestion.bridges?.[0];
     expect(serializedBridge?.startDate).toBe(bridge.startDate.toISOString());
@@ -88,7 +93,7 @@ describe('serializeSuggestionResult', () => {
 describe('deserializeSuggestion', () => {
   it('converts day ISO strings back to Dates', () => {
     const date = new Date(2025, 2, 10);
-    const result = deserializeSuggestion({ days: [date.toISOString()] });
+    const result = deserializeSuggestion({ days: [date.toISOString()], metrics: EMPTY_METRICS });
     expect(result.days[0]).toBeInstanceOf(Date);
     expect(result.days[0].getFullYear()).toBe(2025);
     expect(result.days[0].getMonth()).toBe(2);
@@ -99,6 +104,7 @@ describe('deserializeSuggestion', () => {
     const bridge = makeBridge();
     const serialized = {
       days: [],
+      metrics: EMPTY_METRICS,
       bridges: [
         {
           startDate: bridge.startDate.toISOString(),
@@ -116,7 +122,7 @@ describe('deserializeSuggestion', () => {
   });
 
   it('handles missing bridges gracefully', () => {
-    const result = deserializeSuggestion({ days: [] });
+    const result = deserializeSuggestion({ days: [], metrics: EMPTY_METRICS });
     expect(result.bridges).toBeUndefined();
   });
 });

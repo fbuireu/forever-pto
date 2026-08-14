@@ -6,6 +6,7 @@ import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useLocationStore } from '@application/stores/location';
 import { usePremiumStore } from '@application/stores/premium';
+import { resolveSelectedDays } from '@domain/calendar/utils/selection';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { Clock } from '@ui/modules/core/animate/icons/Clock';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
@@ -117,12 +118,16 @@ export const Summary = () => {
     const effectiveDays = metrics.totalEffectiveDays;
     const increment = effectiveDays - ptoDays;
     const gain = ptoDays > 0 ? (increment / ptoDays) * 100 : 0;
-    const placedDays = activeSuggestion.days.length;
+    const placedDays = resolveSelectedDays({
+      days: activeSuggestion.days,
+      manuallySelectedDays,
+      removedSuggestedDays,
+    }).length;
 
     const maxAlternative = Math.max(
       effectiveDays,
       ...(alternatives?.reduce<number[]>((acc, a) => {
-        const v = a?.metrics?.totalEffectiveDays;
+        const v = a?.metrics.totalEffectiveDays;
         if (typeof v === 'number') acc.push(v);
         return acc;
       }, []) ?? [])
@@ -138,7 +143,7 @@ export const Summary = () => {
       maxAlternative,
       canImprove,
     };
-  }, [activeSuggestion, ptoDays, alternatives]);
+  }, [activeSuggestion, ptoDays, alternatives, manuallySelectedDays, removedSuggestedDays]);
 
   const content = (() => {
     if (!metricsData) return null;

@@ -37,6 +37,11 @@ const STORAGE_NAME = 'filters-store';
 const STORAGE_VERSION = 2;
 
 export const MIN_PTO_DAYS = 1;
+export const MAX_PTO_DAYS = 365;
+export const MIN_CARRY_OVER_MONTHS = 1;
+export const MAX_CARRY_OVER_MONTHS = 12;
+
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 const initialState: FiltersState = {
   ptoDays: 22,
@@ -64,12 +69,18 @@ export const useFiltersStore = create<FiltersStore>()(
     persist(
       (set) => ({
         ...initialState,
-        setPtoDays: (days: number) => set({ ptoDays: Math.max(MIN_PTO_DAYS, Math.round(days)) }, false, 'setPtoDays'),
+        setPtoDays: (days: number) =>
+          set({ ptoDays: clamp(Math.round(days), MIN_PTO_DAYS, MAX_PTO_DAYS) }, false, 'setPtoDays'),
         setCountry: (country: string) => set({ country, region: '' }, false, 'setCountry'),
         setRegion: (region: string) => set({ region }, false, 'setRegion'),
         setAllowPastDays: (allow: boolean) => set({ allowPastDays: allow }, false, 'setAllowPastDays'),
         setYear: (year: number) => set({ year }, false, 'setYear'),
-        setCarryOverMonths: (months: number) => set({ carryOverMonths: months }, false, 'setCarryOverMonths'),
+        setCarryOverMonths: (months: number) =>
+          set(
+            { carryOverMonths: clamp(Math.round(months), MIN_CARRY_OVER_MONTHS, MAX_CARRY_OVER_MONTHS) },
+            false,
+            'setCarryOverMonths'
+          ),
         setStrategy: (strategy: FilterStrategy) => set({ strategy }, false, 'setStrategy'),
         resetToDefaults: () => set(initialState, false, 'resetToDefaults'),
       }),
@@ -83,6 +94,15 @@ export const useFiltersStore = create<FiltersStore>()(
           return rest as PersistedFiltersState;
         },
         onRehydrateStorage: () => (state, error) => {
+          if (state) {
+            state.ptoDays = clamp(Math.round(state.ptoDays), MIN_PTO_DAYS, MAX_PTO_DAYS);
+            state.carryOverMonths = clamp(
+              Math.round(state.carryOverMonths),
+              MIN_CARRY_OVER_MONTHS,
+              MAX_CARRY_OVER_MONTHS
+            );
+          }
+
           if (error) {
             log((logger) =>
               logger.logError('Error rehydrating filters store', error, {

@@ -83,6 +83,21 @@ Coupling back into the rest of the app is small, but it is not zero. The complet
 
 No component here calls `useTranslations` or touches a Zustand store, and that line should hold.
 
+**That rule makes a hard-coded accessible name a defect, not a shortcut.** A component in this folder cannot
+translate, so a literal `aria-label` or `sr-only` string ships one language to screen-reader users on all six
+locales — and it is invisible to everyone testing visually. Four of them shipped that way: `Dialog`'s close
+button said "Close" on every modal in the app, `SidebarTrigger` said "Toggle Sidebar", `Sidebar`'s mobile
+landmark said "Sidebar" and `RadialNav` said "Radial navigation". Each now takes the string as a prop —
+`closeLabel`, `label`, `landmarkLabel`, `aria-label` — keeping the English literal as the default so a caller
+that forgets degrades to what it said before rather than to nothing. The callers pass the `a11y` namespace;
+see [`../../i18n/CLAUDE.md`](../../i18n/CLAUDE.md). A brand name is the one thing that stays literal:
+`aria-label='Forever PTO'` is correct in every locale.
+
+**`RadialNav` accepts `HTMLAttributes` and spreads none of them.** It destructures what it uses and drops the
+rest, so `aria-label` had to be named explicitly to be honoured at all. Anything else a caller passes —
+`id`, `data-*`, a handler — is silently discarded today. Widen the destructure rather than assuming the
+prop arrives.
+
 ## Gotchas
 
 **`Tooltip` only mints a `TooltipProvider` when it is given a delay of its own.** It used to mint one
@@ -145,8 +160,9 @@ test is usually a decision rather than an omission:
 - `animate/base/` is covered file for file, and so are `animate/components/`, `animate/effects/`,
   `animate/text/SlidingNumber.tsx` and `animate/primitives/base/Tooltip.tsx`. These carry state
   machines, controlled/uncontrolled fallbacks and event composition — the parts that break silently.
-- `primitives/` has **no tests at all**. Those files are markup plus `cn()`; the Playwright suite in
-  `e2e/` is what proves they render.
+- `primitives/` has **no tests at all**. Those files are markup plus `cn()`, and the Playwright suite in
+  `e2e/` only proves the pages holding them render — see [`../CLAUDE.md`](../CLAUDE.md) for what those specs
+  actually assert, which is less than the word "covered" suggests.
 - `animate/icons/` is excluded from the **coverage report** only, and the glob already spares `Icon.tsx`.
   The 22 icons are mechanical wrappers around SVG path data; `Icon.tsx` is not, and its co-located
   `Icon.test.tsx` runs with everything else. Nothing under `core/` is excluded from the test run.

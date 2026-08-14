@@ -170,7 +170,14 @@ function MenuButton({ item, isActive, onActivate, menuButtonConfig }: MenuButton
   );
 }
 
-function RadialNav({ size = 180, items, menuButtonConfig, defaultActiveId, onActiveChange }: RadialNavProps) {
+function RadialNav({
+  size = 180,
+  items,
+  menuButtonConfig,
+  defaultActiveId,
+  onActiveChange,
+  'aria-label': ariaLabel = 'Radial navigation',
+}: RadialNavProps) {
   const orbitRadius = size / 2 - 0.5;
   const [activeId, setActiveId] = useState<number | null>(defaultActiveId ?? null);
 
@@ -192,7 +199,7 @@ function RadialNav({ size = 180, items, menuButtonConfig, defaultActiveId, onAct
       className='relative flex items-center justify-center rounded-full border-[3px] border-(--frame)'
       style={{ width: size, height: size }}
       role='menu'
-      aria-label='Radial navigation'
+      aria-label={ariaLabel}
     >
       <m.div
         initial={false}

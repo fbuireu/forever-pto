@@ -162,6 +162,7 @@ type SidebarProps = ComponentProps<'div'> & {
   containerClassName?: string;
   animateOnHover?: boolean;
   transition?: Transition;
+  landmarkLabel?: string;
 };
 
 function Sidebar({
@@ -173,6 +174,7 @@ function Sidebar({
   animateOnHover = true,
   containerClassName,
   transition = { type: 'spring', stiffness: 350, damping: 35 },
+  landmarkLabel = 'Sidebar',
   ...props
 }: SidebarProps) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
@@ -224,7 +226,7 @@ function Sidebar({
               key='sidebar-drawer'
               role='dialog'
               aria-modal='false'
-              aria-label='Sidebar'
+              aria-label={landmarkLabel}
               data-sidebar='sidebar'
               data-slot='sidebar'
               data-mobile='true'
@@ -307,9 +309,9 @@ function Sidebar({
   );
 }
 
-type SidebarTriggerProps = ComponentProps<typeof Button>;
+type SidebarTriggerProps = ComponentProps<typeof Button> & { label?: string };
 
-function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
+function SidebarTrigger({ className, onClick, label = 'Toggle Sidebar', ...props }: SidebarTriggerProps) {
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -329,7 +331,7 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
       {...props}
     >
       <PanelLeftIcon className='size-full' />
-      <span className='sr-only'>Toggle Sidebar</span>
+      <span className='sr-only'>{label}</span>
     </Button>
   );
 }

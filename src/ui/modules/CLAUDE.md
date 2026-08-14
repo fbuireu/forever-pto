@@ -137,8 +137,15 @@ passing. `core/animate/` is tested close to exhaustively; `core/primitives/` has
 homepage sections, `shared/utils/helpers.ts`, the two forms that render an API failure, and — because both
 held a defect that no type or lint rule can catch — `sidebar/components/PtoCalculator.tsx` and
 `PtoSalaryCalculator.tsx`, whose cases drive the real inputs and assert on what the field and the caption
-actually show). Components whose body is markup plus translation calls are covered by the Playwright
-suite in `e2e/` instead.
+actually show). Components whose body is markup plus translation calls are left to the Playwright suite in
+`e2e/` instead.
+
+**Be precise about what that buys, because it is less than "covered".** The `e2e/` specs are smoke tests: a
+page answers 200, has a non-empty `<title>`, carries the right `lang`, and a handful of section ids and links
+are visible. Nothing there drives the planner — no budget change, no calculation, no day toggled, no Premium
+gate — so a component reached only through `e2e/` is proven to *mount inside a page that renders*, and
+nothing more. Reading "covered by e2e" as "its behaviour is asserted somewhere" is how a defect in an
+untested component survives a green suite. If a component has behaviour, it needs a co-located test.
 
 When a component is mocked in a sibling's test, mock the module path it actually imports —
 `premium/CheckoutForm.test.tsx` mocks both `boneyard-js/react` and `./ExpressCheckoutFixture`, because

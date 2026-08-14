@@ -41,9 +41,11 @@ const getPromotionCodeValidationError = (
   return null;
 };
 
+const toCents = (value: number) => Math.round(value * 100) / 100;
+
 const calculateFinalAmount = (coupon: Stripe.Coupon, amount: number) => {
-  if (coupon.percent_off) return amount * (1 - coupon.percent_off / 100);
-  if (coupon.amount_off) return amount - coupon.amount_off / 100;
+  if (coupon.percent_off) return toCents(amount * (1 - coupon.percent_off / 100));
+  if (coupon.amount_off) return toCents(amount - coupon.amount_off / 100);
   return amount;
 };
 
@@ -55,20 +57,18 @@ export const validatePromoCode = (
     const stripe = yield* StripeServerService;
 
     const promotionCodes = yield* stripe.promotionCodes
-      .list({ code: code.toUpperCase().trim(), active: true, limit: 1 })
+      .list({ code: code.toUpperCase().trim(), active: true, limit: 1, expand: ['data.promotion.coupon'] })
       .pipe(Effect.mapError((e) => new PromoCodeError({ code: PromoCodeErrors.FAILED_TO_LOAD, message: e.message })));
 
     if (promotionCodes.data.length === 0) {
       return yield* Effect.fail(new PromoCodeError({ code: PromoCodeErrors.INVALID_OR_EXPIRED }));
     }
 
-    const [listed] = promotionCodes.data;
-    const promotionCode = yield* stripe.promotionCodes
-      .retrieve(listed.id, { expand: ['coupon'] })
-      .pipe(Effect.mapError((e) => new PromoCodeError({ code: PromoCodeErrors.FAILED_TO_LOAD, message: e.message })));
-
-    const coupon = (promotionCode as unknown as { coupon: Stripe.Coupon }).coupon;
-    if (!coupon) return yield* Effect.fail(new PromoCodeError({ code: PromoCodeErrors.FAILED_TO_LOAD }));
+    const [promotionCode] = promotionCodes.data;
+    const { coupon } = promotionCode.promotion;
+    if (!coupon || typeof coupon === 'string') {
+      return yield* Effect.fail(new PromoCodeError({ code: PromoCodeErrors.FAILED_TO_LOAD }));
+    }
 
     const validationError = getPromotionCodeValidationError(promotionCode, amount) ?? getCouponValidationError(coupon);
     if (validationError) return yield* Effect.fail(new PromoCodeError({ code: validationError }));

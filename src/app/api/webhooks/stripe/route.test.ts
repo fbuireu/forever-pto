@@ -28,7 +28,7 @@ vi.mock('@infrastructure/layers', async () => {
       Layer.succeed(StripeServerService, {
         paymentIntents: { create: vi.fn(), retrieve: vi.fn() },
         charges: { retrieve: vi.fn() },
-        promotionCodes: { list: vi.fn(), retrieve: vi.fn() },
+        promotionCodes: { list: vi.fn() },
         webhooks: { constructEvent: mockConstructEvent as never },
       }),
       Layer.succeed(LoggerService, {

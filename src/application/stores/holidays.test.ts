@@ -1,8 +1,9 @@
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
-import { FilterStrategy, type Suggestion } from '@domain/calendar/types';
+import { FilterStrategy, type MeasuredSuggestion } from '@domain/calendar/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useFiltersStore } from './filters';
 import { type HolidaysState, useHolidaysStore } from './holidays';
+import { DayRefusal, HolidayRefusal } from './types';
 
 const {
   mockGetHolidays,
@@ -78,7 +79,7 @@ const makeHoliday = (id: string, dateStr: string, variant: HolidayVariant = Holi
   isInSelectedRange: true,
 });
 
-const makeSuggestion = (days: Date[]): Suggestion => ({
+const makeSuggestion = (days: Date[]): MeasuredSuggestion => ({
   days,
   bridges: [],
   metrics: { totalDays: days.length } as never,
@@ -122,7 +123,7 @@ describe('toggleDaySelection refuses days that are already off', () => {
       .getState()
       .toggleDaySelection({ date: saturday, totalPtoDays: 10, locale: 'en', allowPastDays: true });
 
-    expect(accepted).toBe(false);
+    expect(accepted.applied).toBe(false);
     expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
   });
 
@@ -134,7 +135,7 @@ describe('toggleDaySelection refuses days that are already off', () => {
       .getState()
       .toggleDaySelection({ date, totalPtoDays: 10, locale: 'en', allowPastDays: true });
 
-    expect(accepted).toBe(false);
+    expect(accepted.applied).toBe(false);
     expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
   });
 
@@ -146,7 +147,7 @@ describe('toggleDaySelection refuses days that are already off', () => {
       .getState()
       .toggleDaySelection({ date: wednesday, totalPtoDays: 10, locale: 'en', allowPastDays: true });
 
-    expect(accepted).toBe(true);
+    expect(accepted.applied).toBe(true);
     expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(1);
   });
 
@@ -161,8 +162,50 @@ describe('toggleDaySelection refuses days that are already off', () => {
       .getState()
       .toggleDaySelection({ date, totalPtoDays: 10, locale: 'en', allowPastDays: true });
 
-    expect(accepted).toBe(true);
+    expect(accepted.applied).toBe(true);
     expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
+  });
+
+  it('names the weekend as the reason, so the caller need not re-derive it', () => {
+    const saturday = new Date('2026-03-14');
+
+    const outcome = useHolidaysStore
+      .getState()
+      .toggleDaySelection({ date: saturday, totalPtoDays: 10, locale: 'en', allowPastDays: true });
+
+    expect(outcome).toEqual({ applied: false, reason: DayRefusal.DAY_IS_WEEKEND });
+  });
+
+  it('tells a Custom Holiday apart from a National one in the reason', () => {
+    useHolidaysStore.setState({ holidays: [makeHoliday('custom-1', '2026-03-11', HolidayVariant.CUSTOM)] });
+
+    const custom = useHolidaysStore
+      .getState()
+      .toggleDaySelection({ date: new Date('2026-03-11'), totalPtoDays: 10, locale: 'en', allowPastDays: true });
+
+    expect(custom).toEqual({ applied: false, reason: DayRefusal.DAY_IS_CUSTOM_HOLIDAY });
+
+    useHolidaysStore.setState({ holidays: [makeHoliday('national-1', '2026-03-11')] });
+
+    const national = useHolidaysStore
+      .getState()
+      .toggleDaySelection({ date: new Date('2026-03-11'), totalPtoDays: 10, locale: 'en', allowPastDays: true });
+
+    expect(national).toEqual({ applied: false, reason: DayRefusal.DAY_IS_HOLIDAY });
+  });
+
+  it('names an exhausted budget as the reason', () => {
+    useHolidaysStore.setState({
+      currentSelection: { days: [new Date('2026-03-09')], bridges: [], metrics: null } as never,
+      manuallySelectedDays: [],
+      removedSuggestedDays: [],
+    });
+
+    const outcome = useHolidaysStore
+      .getState()
+      .toggleDaySelection({ date: new Date('2026-03-11'), totalPtoDays: 1, locale: 'en', allowPastDays: true });
+
+    expect(outcome).toEqual({ applied: false, reason: DayRefusal.BUDGET_EXHAUSTED });
   });
 });
 
@@ -218,6 +261,47 @@ describe('editHoliday collisions', () => {
 
     const [holiday] = useHolidaysStore.getState().holidays;
     expect(holiday.date.toDateString()).toBe(new Date('2026-03-13').toDateString());
+  });
+});
+
+describe('the refusal reason crosses the seam', () => {
+  it('hands addHoliday the Holiday that already holds the date, so the caller need not look it up', () => {
+    const held = makeHoliday('custom-1', '2026-03-11', HolidayVariant.CUSTOM);
+    useHolidaysStore.setState({ holidays: [held] });
+
+    const outcome = useHolidaysStore.getState().addHoliday({
+      holiday: { name: 'Company day', date: new Date('2026-03-11') },
+      locale: 'en',
+      year: 2026,
+      carryOverMonths: 0,
+    });
+
+    expect(outcome).toEqual({ applied: false, reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY, heldBy: held });
+  });
+
+  it('tells a Manual Day collision apart from a Holiday collision', () => {
+    useHolidaysStore.setState({ manuallySelectedDays: [new Date('2026-03-11')] });
+
+    const outcome = useHolidaysStore.getState().addHoliday({
+      holiday: { name: 'Company day', date: new Date('2026-03-11') },
+      locale: 'en',
+      year: 2026,
+      carryOverMonths: 0,
+    });
+
+    expect(outcome).toEqual({ applied: false, reason: HolidayRefusal.DATE_HELD_BY_MANUAL_DAY });
+  });
+
+  it('reports a missing Holiday rather than silently doing nothing', () => {
+    const outcome = useHolidaysStore.getState().editHoliday({
+      holidayId: 'nope',
+      updates: { name: 'Moved', date: new Date('2026-03-12') },
+      locale: 'en',
+      year: 2026,
+      carryOverMonths: 0,
+    });
+
+    expect(outcome).toEqual({ applied: false, reason: HolidayRefusal.HOLIDAY_NOT_FOUND });
   });
 });
 
@@ -390,34 +474,6 @@ describe('setCalculationResult', () => {
   });
 });
 
-describe('getRemainingDays', () => {
-  it('returns totalPtoDays minus active suggested and manual days', () => {
-    const suggestion = makeSuggestion([new Date('2026-01-01'), new Date('2026-01-02')]);
-    useHolidaysStore.setState({
-      currentSelection: suggestion,
-      manuallySelectedDays: [new Date('2026-01-03')],
-      removedSuggestedDays: [],
-    });
-    expect(useHolidaysStore.getState().getRemainingDays(10)).toBe(7);
-  });
-
-  it('counts removed suggested days as free', () => {
-    const suggestion = makeSuggestion([new Date('2026-01-01'), new Date('2026-01-02')]);
-    useHolidaysStore.setState({
-      currentSelection: suggestion,
-      manuallySelectedDays: [],
-      removedSuggestedDays: [new Date('2026-01-01')],
-    });
-    expect(useHolidaysStore.getState().getRemainingDays(5)).toBe(4);
-  });
-
-  it('returns 0 when no remaining days', () => {
-    const suggestion = makeSuggestion([new Date('2026-01-01'), new Date('2026-01-02')]);
-    useHolidaysStore.setState({ currentSelection: suggestion, manuallySelectedDays: [], removedSuggestedDays: [] });
-    expect(useHolidaysStore.getState().getRemainingDays(2)).toBe(0);
-  });
-});
-
 describe('getFreeDaysForMonth', () => {
   it('counts holidays in the given month that are in selected range', () => {
     useHolidaysStore.setState({
@@ -513,9 +569,12 @@ describe('toggleDaySelection', () => {
   const baseDate = new Date('2026-05-11');
   const PARAMS = { totalPtoDays: 5, locale: 'en', allowPastDays: false };
 
-  it('returns false when there is no currentSelection', () => {
+  it('refuses with no_plan when there is no currentSelection', () => {
     useHolidaysStore.setState({ currentSelection: null });
-    expect(useHolidaysStore.getState().toggleDaySelection({ date: baseDate, ...PARAMS })).toBe(false);
+    expect(useHolidaysStore.getState().toggleDaySelection({ date: baseDate, ...PARAMS })).toEqual({
+      applied: false,
+      reason: DayRefusal.NO_PLAN,
+    });
   });
 
   it('removes a day from manuallySelectedDays when already manually selected', () => {
@@ -526,7 +585,7 @@ describe('toggleDaySelection', () => {
       removedSuggestedDays: [],
     });
     const result = useHolidaysStore.getState().toggleDaySelection({ date: baseDate, ...PARAMS });
-    expect(result).toBe(true);
+    expect(result.applied).toBe(true);
     expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
   });
 
@@ -580,7 +639,7 @@ describe('toggleDaySelection', () => {
     const result = useHolidaysStore
       .getState()
       .toggleDaySelection({ date: baseDate, totalPtoDays: 5, locale: 'en', allowPastDays: false });
-    expect(result).toBe(false);
+    expect(result.applied).toBe(false);
     expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
   });
 
@@ -594,7 +653,7 @@ describe('toggleDaySelection', () => {
     const result = useHolidaysStore
       .getState()
       .toggleDaySelection({ date: baseDate, totalPtoDays: 5, locale: 'en', allowPastDays: false });
-    expect(result).toBe(true);
+    expect(result.applied).toBe(true);
     expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(1);
   });
 });

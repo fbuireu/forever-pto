@@ -34,6 +34,13 @@ this order; the layout adds `SiteTitle.tsx` and `SiteSubtitle.tsx` above them.
 | `summary/` | The five charts, `summary/MetricCard.tsx`, `summary/SummaryFixture.tsx` and `summary/const.ts` |
 | `utils/` | `utils/helpers.ts` — Planning Window and calendar-grid construction, workday/weekend counting, and the `MONTHS_IN_YEAR` constant every `12 + carryOverMonths` on this screen is built from; `utils/modifiers.ts` — the day predicates |
 
+`calendar/utils/refusals.ts` holds both refusal mappings, and neither is a rule — the rules are in the store.
+`DAY_REFUSAL_COPY` is the reason-to-message-key map `Calendar` renders. `describeHolidayRefusal` is the same
+idea for the Holiday modals, written as a function rather than a table because its two cases interpolate
+different values; it returns `null` for the one refusal that has no copy of its own, and both modals render
+their own generic error for that case. Adding a `HolidayRefusal` without a branch there is a compile error,
+which is the point: the two modals used to hand-write the same chain and one refusal reached neither.
+
 ## Day classification
 
 `utils/modifiers.ts` exports curried predicates (`isHoliday`, `isSuggestion`, `isManuallySelected`,
@@ -113,7 +120,15 @@ today marker and no past-day dimming on purpose. Every predicate taking `today` 
 **The remaining-days counter freezes during a recalculation.** `Status` in `PlannerPanel.tsx` keeps a
 `lastSettledRemaining` ref updated by an effect *with no dependency array* — it runs every render and
 snapshots the value only while `isCalculating` is false. That looks like a mistake and is not: without
-it the budget readout drops to zero for the length of every worker round-trip.
+it the budget readout drops to zero for the length of every worker round-trip. `sidebar/components/PtoDays.tsx`
+holds the same ref for the same reason; they are two readouts of one number, so they freeze together or they
+disagree on screen.
+
+**Neither of them computes that number.** The Remaining Budget comes from `measureBudget` in
+`@domain/calendar/utils`, which is also what `toggleDaySelection` consults before spending a day — so the
+readout and the rule that refuses a day cannot drift. Subtracting `days.length` and `manuallySelectedDays.length`
+by hand is how they drifted before, and it also skipped `resolveSelectedDays`, which is the count Efficiency
+is measured against.
 
 **"No plan" is not "still loading", and `ManagementBar` keeps them apart.** Its `isReady` requires a
 Suggestion with days in it, so a run that legitimately produces nothing — a past year with the past-days
@@ -158,14 +173,43 @@ another ships a number that is silently wrong by however much budget went unspen
 **That question is now answered: name the baseline, never align the numbers.** Both figures are correct for
 what they measure, so the screen states what each is measured against rather than picking a winner. The
 Effective Days badge and the Gain badge interpolate `ptoDays`, and the Efficiency card carries a `hint`
-naming `activeSuggestion.days.length` — the days the plan actually placed. A future change that makes the
+naming the days the plan actually placed. A future change that makes the
 two agree by moving a denominator is a regression, not a simplification; the disagreement is information.
+
+**The hint has to be counted the way `generateMetrics` counts, which is not `activeSuggestion.days.length`.**
+`toggleDaySelection` never rewrites `currentSelection.days` — it records the edit in `manuallySelectedDays`
+and `removedSuggestedDays` and recomputes the Metrics — so the stored day list is the plan as the engine
+first placed it, for ever. Efficiency is `totalEffectiveDays / resolveSelectedDays(…).length`, so a hint
+reading the raw array named the wrong number the moment anything was hand-edited, which is precisely when a
+label naming the baseline earns its place: with no Manual or Removed Days the two agree and nobody needed
+the label. `Summary` therefore applies `resolveSelectedDays` itself, with the same two lists the store
+holds. Anything else on this screen that wants "the days spent" needs the same treatment.
+
+**The two badges that interpolate `ptoDays` need an ICU plural, and five bundles once lacked one.**
+`MIN_PTO_DAYS` is 1, so `metrics.overBudget` and `metrics.perPtoDay` are reachable at a count of one; `en`
+survives it because "your 1-day budget" is an attributive, while `es`, `ca`, `it`, `de` and `fr` all put a
+bare plural noun after the number. Both keys select the noun with `{ptoDays, plural, one {…} other {…}}` in
+every bundle now. A new string interpolating a count belongs in the same shape — see
+[`../../../i18n/CLAUDE.md`](../../../i18n/CLAUDE.md).
+
+**`MetricCard` renders `hint` in the compact layout only.** The default branch destructures the prop and
+never uses it, so passing a hint to a full-size card is silently dropped rather than misplaced. Every
+current caller passing one is compact; a new full-size caller needs the element added, not just the prop.
 
 **`MetricCard` rounds to whole numbers unless told otherwise, and two of these values are fractional.**
 `SlidingNumber` runs `value.toFixed(decimalPlaces)`, and the card defaulted every caller to `0` with no way
 to override it — so Efficiency arrived as `'1.6'` and rendered `2`, and `workedDaysPerMonth`, which
 `getWorkedDaysPerMonth` deliberately returns as `Number.parseFloat(avg.toFixed(1))`, rendered as an integer.
 Both now pass `decimalPlaces={1}`. A new fractional metric has to do the same.
+
+**`Calendar` no longer predicts what the store will accept.** Its click handler keeps the two rules it owns —
+the Premium gate and the past-day rule, which depend on `premiumKey` and on `today`, neither of which the
+store sees — then calls `onDayToggle` and renders whatever refusal comes back through `DAY_REFUSAL_COPY`. It
+used to test for a Holiday, a Custom Holiday, a weekend and an exhausted budget *before* calling, so the same
+condition existed on both sides of the seam and the store's own answer was discarded. A new refusal is a new
+reason in the stores' [`types.ts`](../../../../application/stores/types.ts) plus an entry in that map;
+it is never a new branch in the handler. `canSelectMoreDays` is gone from the component's interface for the
+same reason — the budget question is answered by the refusal, not predicted by the caller.
 
 **Holiday selection is keyed on the Holiday, never on the row's position.** `getHolidayId` in
 `holidays/HolidaysTable.tsx` returns `` `${holiday.id}::${holiday.name}` ``, and it used to append the index
@@ -263,10 +307,18 @@ and `pages/homepage/sections/Hero.tsx` both read from this screen's `utils/`, fo
 
 ## Testing
 
-Five test files: `ManagementBar.test.tsx`, `SiteTitle.test.tsx`,
+Six test files: `ManagementBar.test.tsx`, `SiteTitle.test.tsx`, `Summary.test.tsx`,
 `summary/BlocksPerQuarterChart.test.tsx`, `summary/QuarterDistributionChart.test.tsx` and
 `summary/YearTimelineChart.test.tsx`. That is not an oversight to close in passing — the components with
-tests are the ones holding logic, and the rest are covered by the Playwright suite in `e2e/`.
+tests are the ones holding logic, and the rest are left to the Playwright suite in `e2e/` — which on this
+screen asserts only that `/planner` answers 200, has a title, and does not trip the error boundary. No e2e
+spec drives a calculation, so nothing outside these six files pins planner *behaviour*.
+
+`Summary.test.tsx` covers the two things on that screen a type cannot catch: which denominator the Efficiency
+hint names, and whether the budget badges read grammatically at a budget of one. It mocks all four stores,
+`next/dynamic` (so none of the five charts render) and `SlidingNumber`, then asserts on `container.textContent`.
+Leave `core/animate/icons/Icon` real — mocking it drops `IconWrapper`, which every animated icon on the screen
+renders through.
 
 The chart tests are the pattern worth copying: mock `recharts` down to inert elements and mock
 `@ui/modules/premium/PremiumFeature` to a pass-through, then assert on the data the component derived

@@ -1,6 +1,6 @@
 import { FilterStrategy } from '@domain/calendar/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { MIN_PTO_DAYS, useFiltersStore } from './filters';
+import { MAX_CARRY_OVER_MONTHS, MAX_PTO_DAYS, MIN_CARRY_OVER_MONTHS, MIN_PTO_DAYS, useFiltersStore } from './filters';
 
 const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
 
@@ -62,6 +62,19 @@ describe('setters', () => {
   it('setPtoDays updates ptoDays', () => {
     useFiltersStore.getState().setPtoDays(15);
     expect(useFiltersStore.getState().ptoDays).toBe(15);
+  });
+
+  it('setPtoDays caps the budget at a year, since the accrual calculator can compute past it', () => {
+    useFiltersStore.getState().setPtoDays(5000);
+    expect(useFiltersStore.getState().ptoDays).toBe(MAX_PTO_DAYS);
+  });
+
+  it('setCarryOverMonths holds the slider bounds, whichever caller wrote it', () => {
+    useFiltersStore.getState().setCarryOverMonths(99);
+    expect(useFiltersStore.getState().carryOverMonths).toBe(MAX_CARRY_OVER_MONTHS);
+
+    useFiltersStore.getState().setCarryOverMonths(-3);
+    expect(useFiltersStore.getState().carryOverMonths).toBe(MIN_CARRY_OVER_MONTHS);
   });
 
   it('setAllowPastDays updates allowPastDays', () => {
@@ -161,6 +174,15 @@ describe('onRehydrateStorage', () => {
 
     await Promise.resolve();
     expect(mockLogError).not.toHaveBeenCalled();
+  });
+
+  it('pulls a stored budget back inside its bounds, since the blob predates the cap', () => {
+    useFiltersStore.setState({ ptoDays: 9000, carryOverMonths: 40 });
+
+    runRehydrate();
+
+    expect(useFiltersStore.getState().ptoDays).toBe(MAX_PTO_DAYS);
+    expect(useFiltersStore.getState().carryOverMonths).toBe(MAX_CARRY_OVER_MONTHS);
   });
 });
 

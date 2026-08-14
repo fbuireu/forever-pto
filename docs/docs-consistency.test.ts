@@ -1,7 +1,11 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import ts from 'typescript';
+// Not `typescript`: 7.0 ships the Go compiler and no `lib/typescript.js`, so the JavaScript compiler API this
+// file parses with is gone from the main package. `@typescript/typescript6` is Microsoft's compatibility
+// package carrying the 6.x API, and it is the supported bridge until 7.1 ships the replacement API. It is a
+// parser for this test only — the repo type-checks and builds with 7.
+import ts from '@typescript/typescript6';
 import { describe, expect, it } from 'vitest';
 
 const ROOT = resolve(__dirname, '..');

@@ -93,8 +93,8 @@ export const ManagementBar = () => {
   };
 
   const previewSuggestion = allSuggestions[previewAlternativeIndex] ?? allSuggestions[0];
-  const effectiveDays = previewSuggestion?.metrics?.totalEffectiveDays ?? 0;
-  const efficiency = previewSuggestion?.metrics?.averageEfficiency ?? 0;
+  const effectiveDays = previewSuggestion?.metrics.totalEffectiveDays ?? 0;
+  const efficiency = previewSuggestion?.metrics.averageEfficiency ?? 0;
 
   return (
     <div className='col-span-full sticky top-3 z-10'>

@@ -64,17 +64,8 @@ export const CalendarList = () => {
 
   const months = useMemo(() => getTotalMonths({ carryOverMonths, year }), [carryOverMonths, year]);
 
-  const remainingDays = useMemo(() => {
-    const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
-    const manualSelectedCount = manuallySelectedDays.length;
-    return Math.max(0, ptoDays - activeSuggestedCount - manualSelectedCount);
-  }, [currentSelection, removedSuggestedDays, manuallySelectedDays, ptoDays]);
-  const canSelectMoreDays = remainingDays > 0;
-
   const handleDayToggle = useCallback(
-    (date: Date) => {
-      toggleDaySelection({ date, totalPtoDays: ptoDays, locale, allowPastDays });
-    },
+    (date: Date) => toggleDaySelection({ date, totalPtoDays: ptoDays, locale, allowPastDays }),
     [toggleDaySelection, ptoDays, locale, allowPastDays]
   );
 
@@ -140,7 +131,6 @@ export const CalendarList = () => {
             manuallySelectedDays={manuallySelectedDays}
             removedSuggestedDays={removedSuggestedDays}
             onDayToggle={handleDayToggle}
-            canSelectMoreDays={canSelectMoreDays}
             showOutsideDays
             fixedWeeks
           />

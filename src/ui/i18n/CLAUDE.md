@@ -20,7 +20,7 @@ breaks the dynamic import in `config.ts` at request time.
 
 ## Namespaces
 
-`en.json` has 48 top-level namespaces and roughly 1,250 leaf keys. A namespace is the scope passed to
+`en.json` has 49 top-level namespaces and roughly 1,250 leaf keys. A namespace is the scope passed to
 `useTranslations` in a client component or `getTranslations` in a server one:
 
 ```typescript
@@ -54,6 +54,12 @@ go hunting for a key:
   invisible: if you add a code a user can reach, add its key in the same change.
 - Never write a string in ALL CAPS. If an element must render uppercase, apply the `uppercase` class
   in the component — otherwise the copy is unreadable to screen readers and unfixable per locale.
+- **`a11y` holds the accessible names that belong to `core/` components.** Those files may not call
+  `useTranslations` ([`../modules/core/CLAUDE.md`](../modules/core/CLAUDE.md)), so each takes its label as a
+  prop and the *caller* supplies the string from this namespace — `closeDialog` for every modal's close
+  button, `toggleSidebar` and `sidebarLandmark` for the sidebar, `radialNavigation` for the roadmap dial. Put
+  a name here only when the component that renders it cannot translate it itself; anything a feature
+  component owns belongs in that feature's namespace, next to the copy it sits beside.
 - Interpolation is `{variable}`; plurals use ICU (`{count, plural, one {…} other {…}}`); inline markup
   uses rich-text tags (`<b>`, `<link>`, `<em>`) that the component supplies as render functions.
   `createRichLink` in `core/primitives/RichLink.tsx` is the helper for the `<link>` case.

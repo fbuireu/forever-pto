@@ -1,4 +1,10 @@
 {
+  "a11y": {
+    "closeDialog": "Cerrar",
+    "toggleSidebar": "Mostrar u ocultar la barra lateral",
+    "sidebarLandmark": "Controles del planificador",
+    "radialNavigation": "Navegación de funciones"
+  },
   "metadata": {
     "title": "Forever PTO - Gestiona tus días libres",
     "description": "Planifica y optimiza tus vacaciones con Forever PTO. Encuentra los mejores puentes y aprovecha al máximo tu tiempo libre.",
@@ -63,9 +69,9 @@
       "regional": "reg.",
       "custom": "prop.",
       "effectiveDays": "Días efectivos",
-      "overBudget": "sobre tu presupuesto de {ptoDays} días",
+      "overBudget": "sobre tu presupuesto de {ptoDays} {ptoDays, plural, one {día} other {días}}",
       "gain": "Ganancia",
-      "perPtoDay": "de tu presupuesto de {ptoDays} días",
+      "perPtoDay": "de tu presupuesto de {ptoDays} {ptoDays, plural, one {día} other {días}}",
       "longWeekends": "Puentes de fin de semana",
       "restBlocks": "Bloques de descanso",
       "efficiency": "Eficiencia",
@@ -655,7 +661,8 @@
       "email_required": "Introduce tu email.",
       "invalid_email": "Ese email no parece correcto.",
       "invalid_body": "No hemos podido leer esa petición. Inténtalo de nuevo.",
-      "rate_limit_exceeded": "Demasiados intentos. Espera un momento e inténtalo de nuevo."
+      "rate_limit_exceeded": "Demasiados intentos. Espera un momento e inténtalo de nuevo.",
+      "promo_code_too_long": "Ese código promocional es demasiado largo."
     }
   },
   "donate": {
@@ -711,7 +718,8 @@
       "amountMin": "La cantidad mínima es 1",
       "amountMax": "La cantidad máxima es 10.000",
       "invalidEmail": "Introduce un email válido",
-      "emailRequired": "El email es obligatorio"
+      "emailRequired": "El email es obligatorio",
+      "promoCodeTooLong": "El código promocional es demasiado largo"
     },
     "holiday": {
       "nameRequired": "El nombre del festivo es obligatorio",

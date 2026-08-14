@@ -12,6 +12,7 @@ import {
 import type { FiltersState } from '@application/stores/filters';
 import type { HolidaysState } from '@application/stores/holidays';
 import { usePremiumStore } from '@application/stores/premium';
+import type { DayOutcome } from '@application/stores/types';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/modules/core/animate/base/Tooltip';
 import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
 import { ChevronRight } from '@ui/modules/core/animate/icons/ChevronRight';
@@ -43,6 +44,7 @@ import {
   isToday,
 } from '../utils/modifiers';
 import { getDayClassNames, isFromToObject } from './utils/helpers';
+import { DAY_REFUSAL_COPY } from './utils/refusals';
 
 export interface FromTo {
   from: Date;
@@ -85,8 +87,7 @@ interface CalendarProps {
   previewAlternativeIndex?: HolidaysState['previewAlternativeIndex'];
   manuallySelectedDays?: Date[];
   removedSuggestedDays?: Date[];
-  onDayToggle?: (date: Date) => void;
-  canSelectMoreDays?: boolean;
+  onDayToggle?: (date: Date) => DayOutcome;
 }
 
 interface RangeState {
@@ -119,7 +120,6 @@ export function Calendar({
   manuallySelectedDays = EMPTY_DATES,
   removedSuggestedDays = EMPTY_DATES,
   onDayToggle,
-  canSelectMoreDays = true,
   ...props
 }: Readonly<CalendarProps>) {
   const t = useTranslations('toasts');
@@ -251,7 +251,6 @@ export function Calendar({
         const isPastDay = !allowPastDays && modifiers.disabled(date);
         const isManual = modifiers.manuallySelected(date);
         const isSuggested = modifiers.suggested(date);
-        const isNationalOrRegionalHoliday = modifiers.nationalOrRegionalHoliday(date);
         if (!premiumKey) {
           toast.info(tPremium('premiumFeature'), {
             description: tPremium('unlockDescription'),
@@ -278,40 +277,13 @@ export function Calendar({
           return;
         }
 
-        if (isManual || isSuggested) {
-          onDayToggle(date);
-          return;
-        }
+        const outcome = onDayToggle(date);
 
-        if (isNationalOrRegionalHoliday) {
-          toast.warning(t('cannotSelectHoliday'), {
-            description: t('cannotSelectHolidayDescription'),
-          });
-          return;
-        }
+        if (outcome.applied) return;
 
-        if (modifiers.custom(date)) {
-          toast.warning(t('cannotSelectFreeDay'), {
-            description: t('cannotSelectCustomHolidayDescription'),
-          });
-          return;
-        }
+        const refusal = DAY_REFUSAL_COPY[outcome.reason];
+        if (refusal) toast.warning(t(refusal.title), { description: t(refusal.description) });
 
-        if (modifiers.weekend(date)) {
-          toast.warning(t('cannotSelectFreeDay'), {
-            description: t('cannotSelectWeekendDescription'),
-          });
-          return;
-        }
-
-        if (canSelectMoreDays) {
-          onDayToggle(date);
-          return;
-        }
-
-        toast.warning(t('noPtoDaysRemaining'), {
-          description: t('removeDaysToFree'),
-        });
         return;
       }
 
@@ -372,13 +344,9 @@ export function Calendar({
       modifiers.disabled,
       modifiers.suggested,
       modifiers.manuallySelected,
-      canSelectMoreDays,
       premiumKey,
       t,
       tPremium,
-      modifiers.nationalOrRegionalHoliday,
-      modifiers.custom,
-      modifiers.weekend,
     ]
   );
 

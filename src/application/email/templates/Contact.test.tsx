@@ -60,9 +60,11 @@ describe('ContactFormEmail', () => {
 
   it('does not let a crafted subject add headers to the reply', async () => {
     const html = await getHtml({ ...BASE_PROPS, subject: 'Hi&bcc=victim@example.com&body=drained' });
+    const replyHref = /href="(mailto:[^"]*\?subject=[^"]*)"/.exec(html)?.[1];
 
-    expect(html).not.toContain('&bcc=');
-    expect(html).not.toContain('&body=');
-    expect(html).toContain('bcc%3Dvictim');
+    expect(replyHref).not.toContain('&amp;');
+    expect(replyHref).toBe(
+      'mailto:alice%40example.com?subject=Re%3A%20Hi%26bcc%3Dvictim%40example.com%26body%3Ddrained'
+    );
   });
 });

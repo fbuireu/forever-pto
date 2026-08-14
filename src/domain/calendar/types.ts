@@ -14,6 +14,8 @@ export interface Suggestion {
   metrics?: Metrics;
 }
 
+export type MeasuredSuggestion = Suggestion & { metrics: Metrics };
+
 export const FilterStrategy = {
   GROUPED: 'grouped',
   OPTIMIZED: 'optimized',

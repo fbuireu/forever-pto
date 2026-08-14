@@ -23,10 +23,6 @@ export class StripeServerService extends Context.Tag('StripeServerService')<
       list(
         params: StripeNode.PromotionCodeListParams
       ): Effect.Effect<StripeNode.ApiList<StripeNode.PromotionCode>, PaymentError>;
-      retrieve(
-        id: string,
-        params?: StripeNode.PromotionCodeRetrieveParams
-      ): Effect.Effect<StripeNode.PromotionCode, PaymentError>;
     };
     webhooks: {
       constructEvent(payload: string, signature: string): Effect.Effect<StripeNode.Event, WebhookError>;
@@ -82,8 +78,6 @@ export const StripeServerServiceLive = Layer.sync(StripeServerService, () => {
     },
     promotionCodes: {
       list: (params) => Effect.tryPromise({ try: () => getStripe().promotionCodes.list(params), catch: wrapError }),
-      retrieve: (id, params) =>
-        Effect.tryPromise({ try: () => getStripe().promotionCodes.retrieve(id, params ?? {}), catch: wrapError }),
     },
     webhooks: {
       constructEvent: (payload, signature) =>

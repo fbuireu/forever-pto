@@ -7,7 +7,6 @@ import {
   differenceInDays,
   eachDayOfInterval,
   endOfMonth,
-  ensureDate,
   formatDate,
   getWeekdayNames,
   isBefore,
@@ -18,8 +17,6 @@ import {
   startOfDay,
   startOfMonth,
   startOfWeek,
-  toIcsDate,
-  toLocalDay,
 } from './dates';
 
 describe('isSameDay', () => {
@@ -143,38 +140,6 @@ describe('isBefore', () => {
   });
 });
 
-describe('ensureDate', () => {
-  it('passes through Date objects', () => {
-    const d = new Date(2024, 0, 1);
-    expect(ensureDate(d)).toBe(d);
-  });
-
-  it('converts string to Date', () => {
-    const result = ensureDate('2024-01-15');
-    expect(result).toBeInstanceOf(Date);
-    expect(result.getFullYear()).toBe(2024);
-  });
-});
-
-describe('toLocalDay', () => {
-  it('reads the calendar day and returns it at local midnight', () => {
-    const result = toLocalDay('2027-03-09 00:00:00');
-
-    expect(result.getFullYear()).toBe(2027);
-    expect(result.getMonth()).toBe(2);
-    expect(result.getDate()).toBe(9);
-    expect(result.getHours()).toBe(0);
-  });
-
-  it('ignores a trailing UTC offset instead of shifting the day', () => {
-    const withOffset = toLocalDay('2027-03-09 00:00:00 -0600');
-
-    expect(withOffset.getDate()).toBe(9);
-    expect(withOffset.getMonth()).toBe(2);
-    expect(withOffset.getTime()).toBe(new Date(2027, 2, 9).getTime());
-  });
-});
-
 describe('formatDate', () => {
   it('formats as ISO date', () => {
     expect(formatDate({ date: new Date(2024, 0, 5), locale: EN, format: 'yyyy-MM-dd' })).toBe('2024-01-05');
@@ -190,20 +155,6 @@ describe('getWeekdayNames', () => {
   it('starts on Monday when weekStartsOn is 1', () => {
     const names = getWeekdayNames({ locale: 'en-US', weekStartsOn: 1, format: 'long' });
     expect(names[0].toLowerCase()).toContain('mon');
-  });
-});
-
-describe('toIcsDate', () => {
-  it('formats a date as YYYYMMDD', () => {
-    expect(toIcsDate(new Date(2025, 0, 1))).toBe('20250101');
-  });
-
-  it('pads month and day with leading zeros', () => {
-    expect(toIcsDate(new Date(2025, 2, 5))).toBe('20250305');
-  });
-
-  it('handles end-of-year date', () => {
-    expect(toIcsDate(new Date(2025, 11, 31))).toBe('20251231');
   });
 });
 

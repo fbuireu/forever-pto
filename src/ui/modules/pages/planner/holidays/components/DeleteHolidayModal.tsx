@@ -29,6 +29,7 @@ interface DeleteHolidayModalProps {
 
 export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHolidayModalProps) => {
   const t = useTranslations('modals.deleteHoliday');
+  const tA11y = useTranslations('a11y');
   const { removeHoliday } = useHolidaysStore();
   const [isPending, startTransition] = useTransition();
   const isMultiple = holidays.length > 1;
@@ -60,7 +61,7 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className='sm:max-w-sm'>
+      <DialogContent className='sm:max-w-sm' closeLabel={tA11y('closeDialog')}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2 text-destructive'>
             <AlertTriangle className='size-5' />

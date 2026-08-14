@@ -12,9 +12,16 @@ Cloudflare Worker that hosts the app is configured in `wrangler.toml`, not here.
 
 ## Files
 
+**This folder holds no planning rule.** `worker.ts` deserialises a request, calls `runPlanningPipeline` from
+`@domain/calendar`, serialises the result and posts it. Everything the handler used to do around those calls —
+clearing the caches, building the `manual-N` pseudo-Holidays, deriving `carryOverMonths`, computing the
+budget, short-circuiting an empty plan, measuring each Suggestion — moved into that module, because the
+holidays store had its own copy of all of it and the two were kept in step by a pair of hand-mirrored test
+suites. A rule you want to change is in the domain; what lives here is the boundary.
+
 | File | Contents |
 | --- | --- |
-| `worker.ts` | The entry point. Registers `globalThis.onmessage`, runs the pipeline, replies with `self.postMessage` |
+| `worker.ts` | The entry point. Registers `globalThis.onmessage`, calls the pipeline, replies with `self.postMessage` |
 | `types.ts` | `WORKER_MESSAGE_TYPE`, `CalculateSuggestionsRequest`, `WorkerResponse`, and the `Serialized*` wire types |
 | `utils/serializers.ts` | Both directions of the boundary conversion, in one file so they cannot drift apart |
 
@@ -29,10 +36,9 @@ The main thread posts one `CalculateSuggestionsRequest` carrying a `requestId`; 
 ```
 main thread                              worker
     |                                       |
-    |── CALCULATE_SUGGESTIONS ────────────▶ | clearDateKeyCache / clearHolidayCache
-    |                                       | generateSuggestions
-    |                                       | generateAlternatives
-    |◀── CALCULATE_SUGGESTIONS_RESULT ───── | generateMetrics per suggestion
+    |── CALCULATE_SUGGESTIONS ────────────▶ | deserialise
+    |                                       | runPlanningPipeline
+    |◀── CALCULATE_SUGGESTIONS_RESULT ───── | serialise
     |    or WORKER_ERROR                    |
 ```
 
@@ -45,12 +51,11 @@ and `onmessageerror` handlers, because a worker that fails to *load* never reach
 
 ## Invariants
 
-**Both calculation caches are cleared before any work.** `clearDateKeyCache()` and `clearHolidayCache()` open
-the handler's `try` block — after the message-type guard, so an unrelated message never wipes them, and
-inside the `try`, so a throw while clearing still becomes a `WORKER_ERROR`. The engine memoises the holiday set under one fixed key and never evicts it,
-so a second run would silently reuse the first run's holidays. This worker is one of exactly two callers that
-own that clear — the other is the holidays store, `holidays.ts` under `@application/stores/`
-([ADR 0006](../../../docs/adr/0006-caller-owned-calculation-caches.md)).
+**This worker no longer clears the calculation caches, and must not start again.** `runPlanningPipeline`
+clears them on entry, which is what the 2026-08-14 amendment to
+[ADR 0006](../../../docs/adr/0006-caller-owned-calculation-caches.md) moved. The pipeline call sits inside the
+handler's `try`, after the message-type guard, so a throw anywhere in a run still becomes a `WORKER_ERROR` and
+an unrelated message never starts one.
 
 **`Temporal` reaches this thread through `temporal-polyfill`.** The engine imports it explicitly rather than
 using the global, and this worker is one of the three realms that has to work
@@ -68,6 +73,13 @@ that crosses here means adding it to the serialiser and to the wire type, or it 
 rather than mirroring it, and that is safe only because `Metrics` holds no `Date` — every field is a number, a
 number array or a `{ first, last }` pair of strings. Put a `Date` in `Metrics` and `SerializedSuggestion`
 starts lying without a single type error.
+
+**`SerializedSuggestion.metrics` is required, not optional, and the serialisers speak `MeasuredSuggestion`.**
+The pipeline measures both of its branches, so a Suggestion crossing this boundary always has Metrics; saying
+so on the wire type is what lets the store hold `MeasuredSuggestion` and the planner screen stop
+optional-chaining. `deserializeSuggestion` returns `MeasuredSuggestion` on that strength — it still casts
+rather than validates, so a wire message genuinely missing `metrics` would arrive as a lie. Nothing else
+produces these messages, which is what makes the claim safe.
 
 **Deserialisation casts, it does not validate.** `deserializeHolidays` casts `variant` to
 `HolidayDTO['variant']` and `deserializeSuggestion` casts `strategy` to `Suggestion['strategy']`; `worker.ts`
@@ -113,19 +125,19 @@ lands in `year + 1` whenever the plan starts in the Carry-over Months.
 
 ## The budget, and the empty-result short circuit
 
-`effectivePtoDays = Math.max(0, autoSuggestCount ?? ptoDays - manualDays.length)`. `??` binds looser than `-`,
-so the fallback is `ptoDays - manualDays.length` as a whole: an explicit `autoSuggestCount` wins outright, and
-otherwise hand-placed days come out of the budget.
+Both live in `runPlanningPipeline` now; the rule is in
+[`@domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). What matters on this side is the wire: the
+pipeline's `planned: false` result carries an empty Suggestion whose `metrics` are **measured by the engine**,
+so `serializeSuggestionResult` has a real object to send and `currentSelection.metrics` is never `undefined`.
 
-When `effectivePtoDays <= 0` — or `holidaysWithManual` is empty, which is the honest reading of "no Holidays
-to bridge": Removed Days no longer keep a run alive, because they are not holidays — the worker posts
-`{ suggestion: { days: [], metrics: EMPTY_METRICS }, alternatives: [] }` and returns without running the
-engine. `EMPTY_METRICS` is a module-level constant in `worker.ts`, typed as `Metrics` so a new field cannot
-be forgotten, and it reproduces by hand the zeroed object `generateMetrics` returns for an empty day list:
-the short circuit must never leave `currentSelection.metrics` `undefined`, and it must not call the engine to
-avoid it. The consequence that remains is the stored empty plan being what the next run reads back, which is
-how an emptied selection can pin the auto-suggest cap at zero. `useCalculationsWorker.ts` guards that by
-treating a computed cap of `0` as "no cap".
+`worker.ts` used to hand-write that object as a module-level `EMPTY_METRICS` constant, and it was wrong in a
+way nothing caught: it hard-coded twelve monthly buckets and four quarterly ones, while the engine sizes both
+to the Planning Window — so with any Carry-over Month the empty plan reported a differently-shaped `Metrics`
+than a real one. Deriving it removed the constant and the bug together.
+
+The consequence that remains is the stored empty plan being what the next run reads back, which is how an
+emptied selection can pin the auto-suggest cap at zero. `useCalculationsWorker.ts` guards that by treating a
+computed cap of `0` as "no cap".
 
 ## A worker per calculation, on purpose
 
@@ -141,12 +153,18 @@ stale *work*.
 for its registration side effect — the import must come after the stubs, and the mocks are `vi.hoisted` for the
 same reason. Messages are driven by invoking `globalThis.onmessage` directly.
 
-What it pins, and should keep pinning: that both caches are cleared on every run — the test asserts the two
-calls, not their order, so ordering rests on review; that manual days
-become `CUSTOM` pseudo-holidays; that Removed Days reach the planner as `removedDays` and appear in no
-holidays array at all; that `generateMetrics` gets the request's `year`; that manual days are deducted from
-the budget; that an over-committed budget short-circuits to an empty result carrying a zeroed `Metrics`
-rather than none; and that a throw becomes `WORKER_ERROR` rather than an unhandled rejection.
+What it pins, and should keep pinning: that this side hands the pipeline the right inputs — manual days become
+`CUSTOM` pseudo-holidays, Removed Days reach the planner as `removedDays` and appear in no holidays array at
+all, `generateMetrics` gets the request's `year`, manual days are deducted from the budget — that an
+over-committed budget short-circuits to an empty result whose `Metrics` came from the engine rather than a
+literal, and that a throw becomes `WORKER_ERROR` rather than an unhandled rejection.
+
+Those input assertions reach through the pipeline to the mocked generators, which is why the mocks are keyed
+on the engine modules and not on the pipeline: mocking the pipeline would assert only that the worker called
+it. The pipeline's own behaviour is pinned once, against the real engine, in
+[`pipeline.test.ts`](../../domain/calendar/pipeline.test.ts) — including the cache clearing, which is now
+testable as behaviour (run twice, check the second run answers for its own Holidays) rather than as two spy
+calls in no particular order.
 
 `utils/serializers.test.ts` covers the round trip. It is the cheaper place to catch a new `Date` field than a
 worker test is.

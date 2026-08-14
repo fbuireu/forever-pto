@@ -21,10 +21,10 @@ two halves are joined only by `dto/` and `shared/utils/dates.ts`.
 | `stores/` | The five Zustand stores and the storage wrapper. See [`stores/CLAUDE.md`](./stores/CLAUDE.md) | browser |
 | `use-cases/` | The four Effect programs that combine more than one service. See [`use-cases/CLAUDE.md`](./use-cases/CLAUDE.md) | server |
 | `email/templates/` | `Contact.tsx` — the React Email document `sendContactEmail` renders to HTML | server |
-| `export/` | `generateIcs.ts` builds an RFC 5545 calendar string from Holidays and PTO Days; `utils/sanitizer.ts` escapes the four characters that would break a line | browser |
+| `export/` | `generateIcs.ts` builds an RFC 5545 calendar string from Holidays and PTO Days; `utils/sanitizer.ts` escapes the four characters that would break a line; `utils/serializers.ts` holds the two ICS date formats, which live here rather than in the shared date library because nothing else speaks them | browser |
 | `i18n/` | `navigation.ts` — `Link`, `useRouter`, `usePathname` bound to the next-intl routing config, so every internal link carries the locale prefix | browser |
 | `shared/dto/` | `baseDTO.ts` — the `BaseDTO<INPUT, OUTPUT, PARAMS>` contract every mapper implements | both |
-| `shared/utils/` | `dates.ts` — the whole date library; `zodParse.ts` — Zod validation lifted into an Effect that fails with `ValidationError` | `dates.ts` both, `zodParse.ts` server |
+| `shared/utils/` | `dates.ts` — calendar arithmetic, comparison and formatting; `dateIntake.ts` — the two ways a date arrives from outside; `zodParse.ts` — Zod validation lifted into an Effect that fails with `ValidationError` | `dates.ts` and `dateIntake.ts` both, `zodParse.ts` server |
 
 ## Layer rules
 
@@ -53,25 +53,32 @@ None of this is lint-enforced. Biome has no import-boundary rule; these are conv
 
 ## Dates
 
-`shared/utils/dates.ts` is the app's date library — there is no `date-fns` and no second implementation.
-Every function converts to `Temporal.PlainDate`, does the arithmetic there and converts back, so the module
-is the single place the `temporal-polyfill` import lives on this side of the tree
-([ADR 0005](../../docs/adr/0005-temporal-polyfill.md)).
+`shared/utils/dates.ts` is the app's date library — there is no `date-fns` and no second implementation of
+the arithmetic. Every function converts to `Temporal.PlainDate`, does the work there and converts back
+([ADR 0005](../../docs/adr/0005-temporal-polyfill.md)); `dateIntake.ts` beside it is the only other file on
+this side of the tree that imports `temporal-polyfill`.
 
 Two consequences worth holding on to:
 
 - **Every `Date` this layer produces is local midnight**, built with `new Date(y, m, d)`. There is no time
   component and no UTC anywhere. Comparing with `toISOString()` across a time zone will shift the day;
   compare with `isSameDay`, `compareAsc` or `isWithinInterval` instead.
-- **A date string from outside comes in through `toLocalDay`, never `new Date(string)`.** It keeps
-  the leading `YYYY-MM-DD` and drops whatever follows, so the calendar day upstream named is the calendar
-  day we store. `date-holidays` emits its Islamic-calendar entries with an explicit offset —
+- **A date arriving from outside goes through `dateIntake.ts`, and which function you want is a question
+  about the source, not about the type.** The module has exactly two entry points and they are named for
+  their contracts, because they are not interchangeable:
+  - `fromUpstreamCalendarDay(value)` — the source named a **calendar day**. It keeps the leading
+    `YYYY-MM-DD` and drops whatever follows.
+  - `fromStoredInstant(value)` — this app wrote the value with `toISOString()`, so the **instant** is the
+    thing being round-tripped, and `new Date()` is correct.
+
+  They used to be `toLocalDay` and `ensureDate`, two similarly-generic names sharing one flat namespace with
+  thirty other date helpers, both `Date | string → Date`, and picking the wrong one is a real bug that
+  shipped: `date-holidays` emits its Islamic-calendar entries with an explicit offset —
   `'2027-03-09 00:00:00 -0600'` — and `new Date()` reads that as a fixed instant, `06:00Z`, which is still
-  8 March for anyone at UTC−07:00 or further west. `holidayDTO.create` used it, so Eid al-Fitr landed a day
-  early for a visitor in Denver, Los Angeles, Anchorage or Honolulu: the planner protected the wrong day and
-  placed a PTO Day on the real Holiday. `ensureDate` is **not** the same tool and keeps `new Date()` on
-  purpose — it rehydrates ISO strings this app itself wrote with `toISOString()`, where the instant is the
-  thing being round-tripped.
+  8 March for anyone at UTC−07:00 or further west. `holidayDTO.create` used the instant parser, so Eid
+  al-Fitr landed a day early for a visitor in Denver, Los Angeles, Anchorage or Honolulu: the planner
+  protected the wrong day and placed a PTO Day on the real Holiday. `dateIntake.test.ts` pins that the two
+  answer differently for the same string, which is the whole reason they are two functions.
 - **`formatDate` only understands the patterns in its map.** `INTL_FORMAT_MAP` lists the format strings that
   resolve to an `Intl.DateTimeFormat`; `'yyyy-MM-dd'` and `'yyyy-MM-dd HH:mm:ss'` are handled separately, and
   anything else falls through to `toLocaleDateString` and silently ignores the pattern. Passing a date-fns
@@ -122,6 +129,13 @@ eats first.
 `mailto:${email}?subject=Re: ${subject}`, and `subject` is whatever the sender typed — so `&bcc=` in a
 subject line added a recipient to the operator's reply the moment they clicked it. Both the address and the
 subject go through `encodeURIComponent` now. Anything else appended to that URL has to as well.
+
+**Pin that one on the `href`, never on the whole document.** The rendered email prints the raw subject twice
+as ordinary text — in the preview block and beside the "Subject:" label — and React escapes `&` to `&amp;`
+in both, so a document-wide `expect(html).not.toContain('&bcc=')` passes whatever the template does, and
+`not.toContain('&amp;bcc=')` fails even when the template is right. `Contact.test.tsx` extracts the reply
+button's `href` with a regex and asserts on that string alone. Both assertions were checked by reverting the
+template and watching them go red.
 
 ## Testing
 

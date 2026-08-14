@@ -4,7 +4,10 @@ Date: 2026-07-26
 
 ## Status
 
-Accepted.
+Amended on 2026-08-14. The caches stay module-level and fixed-key; what changed is who clears them. The
+orchestration that both callers duplicated is now one module, `runPlanningPipeline`, and it clears on entry —
+so the clear moved *inside* the run without moving inside either generator. The reasoning below stands; the
+"caller" it names is now the pipeline rather than the Web Worker and the holidays store.
 
 ## Context
 
@@ -14,13 +17,22 @@ The engine cannot clear them itself, because it has no way to know where one log
 
 Deriving the cache key from the holiday set instead would remove the problem outright. With two callers that is more machinery than the bug it prevents is worth; the trade-off is recorded here rather than engineered away.
 
+**What the amendment rests on.** The original decision assumed the orchestration would keep living at each
+call site, so "the caller" was the only place that knew a run had begun. That assumption is what stopped
+holding: the Web Worker and the holidays store were two copies of one pipeline, kept in step by a pair of
+hand-mirrored test suites, and the clear was one of the several things both had to remember. Collapsing them
+gives the run an owner. `runPlanningPipeline` is not a generator — it is the thing that calls both — so it
+knows exactly where a run starts, which is the knowledge the engine lacked and the callers had to supply.
+
 ## Decision
 
-The caches stay module-level and keyed by a fixed key, and clearing them is the caller's job. Every caller that starts a full calculation clears both caches first. There are exactly two: the Web Worker, and the holidays store on the main thread.
+The caches stay module-level and keyed by a fixed key. `runPlanningPipeline` clears both before it does
+anything else; nothing else clears them in production. Callers of the pipeline — the Web Worker and the
+holidays store — pass inputs and read a result, and neither knows the caches exist.
 
 ## Consequences
 
-- Adding a third caller without clearing produces silently wrong Suggestions rather than an error, because the stale holiday set is structurally valid. This is the failure mode to watch for, and nothing detects it automatically.
-- Reordering the engine so it clears its own caches would break the sharing between the two generators.
-- Tests that exercise the engine must clear in setup for the same reason. The `clearDateKeyCache()` / `clearHolidayCache()` pair exists for that.
-- Correctness here depends on discipline, and the discipline is documented in the layer guides rather than enforced.
+- The failure mode the original decision watched for is gone: there is no third caller to forget the clear, because there is nothing left to forget. A new entry point calls the pipeline or it does not plan at all.
+- Reordering the engine so a *generator* clears its own caches would still break the sharing between the two. The pipeline is above both, which is why it may.
+- Tests that exercise a generator directly must still clear in setup. The `clearDateKeyCache()` / `clearHolidayCache()` pair exists for that, and the domain guide still requires it per `describe`. Tests that exercise the pipeline need no setup, because it clears for them — `pipeline.test.ts` pins that by running twice with different Holidays and checking the second run answers for its own.
+- The correctness that used to depend on discipline is now structural. What still depends on discipline is the narrower rule above: a generator must not clear.

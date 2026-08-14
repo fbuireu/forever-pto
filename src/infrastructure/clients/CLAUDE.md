@@ -81,7 +81,7 @@ earlier ones committed.
 
 Two clients, and the split is the trap:
 
-- `payments/stripe/serverService.ts` — the Effect service. Node SDK, API version pinned to `'2026-06-24.dahlia'`,
+- `payments/stripe/serverService.ts` — the Effect service. Node SDK, API version pinned to `'2026-07-29.dahlia'`,
   and `StripeNode.createFetchHttpClient()` because the Workers runtime has no Node HTTP stack
   ([ADR 0004](../../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)). Every server-side Stripe
   call goes through this tag. It also exports `WebhookConfigurationError` and `isWebhookConfigurationError`.
@@ -93,6 +93,21 @@ Two clients, and the split is the trap:
   own failures are logged through a **dynamic** `import()` of the BetterStack client, never a static one —
   that module's top-level imports of `@logtail/edge` and `@opennextjs/cloudflare` would otherwise land in the
   client chunk of every `'use client'` component that touches Stripe.
+
+**The pinned API version decides object *shapes*, not just endpoints, and the tag hides that from the
+compiler.** The tag's methods are typed from `StripeNode.*`, which the SDK generates for the version it
+ships — so a bump moves the types and the wire format together, and code that reads a response through a
+cast is left describing whatever the previous version sent. That is not hypothetical here: the
+22.3.2 → 22.4.0 bump moved the pin to `'2026-07-29.dahlia'`, where a `PromotionCode` carries its coupon
+under `promotion` rather than at the top level, and a lone `as unknown as` in the promo-code service went
+on reading the old field and returned `undefined` for every code
+(see [`../services/payments/CLAUDE.md`](../services/payments/CLAUDE.md)). When you bump the SDK, the
+`apiVersion` string is the smallest part of the change: grep the payment paths for `as unknown as` and for
+`expand`, because those are the two places the types stop checking anything.
+
+**The tag carries only the methods something calls.** `promotionCodes.retrieve` was on it until the promo-code
+service stopped needing a second round trip; it went with the caller rather than staying as surface nothing
+exercises. Adding a method here means adding its caller and its error mapping in the same change.
 
 ## The clients that are not services
 
