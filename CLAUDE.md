@@ -84,10 +84,10 @@ src/
   app/                # App Router: [locale]/(app|marketing) pages, api/ route handlers, sitemap, robots
   application/        # use-cases, DTOs, Zustand stores, export, email templates — orchestration, no I/O clients
   domain/             # calendar/ (pure planning engine) and payment/ (Effect programs)
-  infrastructure/     # everything outbound: clients, services, workers, proxy, api error mapping
+  infrastructure/     # everything outbound: clients, services, workers, proxy, api operations, seo route table
   ui/                 # adapters, hooks, i18n, modules (components), styles, assets
 e2e/                  # Playwright specs
-docs/                 # adr/, plans/, and docs-consistency.test.ts
+docs/                 # adr/ and docs-consistency.test.ts
 ```
 
 **Next owns `next-env.d.ts` outright, and it flaps.** A production build points its route import at
