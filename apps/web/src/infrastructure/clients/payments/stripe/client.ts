@@ -1,3 +1,4 @@
+import { logClientError } from '@application/shared/utils/clientLog';
 import { loadStripe, type PaymentIntent, type Stripe, type StripeError } from '@stripe/stripe-js';
 import { Effect } from 'effect';
 
@@ -89,9 +90,7 @@ class StripeClient {
   }
 
   private logError(message: string, error: unknown, context: Record<string, unknown>) {
-    void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
-      getBetterStackInstance().logError(message, error, context);
-    });
+    logClientError(message, error, context);
   }
 
   private handlePaymentResult(result: { error: StripeError } | { paymentIntent: PaymentIntent }) {

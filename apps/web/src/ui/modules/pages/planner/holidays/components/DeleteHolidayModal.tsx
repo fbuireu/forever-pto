@@ -1,6 +1,7 @@
 'use client';
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
+import { logClientError } from '@application/shared/utils/clientLog';
 import { formatDate } from '@application/shared/utils/dates';
 import { useHolidaysStore } from '@application/stores/holidays';
 import {
@@ -49,9 +50,7 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
 
         onClose();
       } catch (error) {
-        void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
-          getBetterStackInstance().logError('Error deleting holiday', error, { component: 'DeleteHolidayModal' });
-        });
+        logClientError('Error deleting holiday', error, { component: 'DeleteHolidayModal' });
         toast.error(t('errorTitle'), {
           description: t('errorDescription'),
         });

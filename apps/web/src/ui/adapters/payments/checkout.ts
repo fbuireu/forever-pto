@@ -1,7 +1,7 @@
 import type { CreatePaymentInput } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
+import { logClient } from '@application/shared/utils/clientLog';
 import { createPaymentAction } from '@infrastructure/actions/payment';
-import type { BetterStackClient } from '@infrastructure/clients/logging/better-stack/client';
 import { PaymentError, PromoCodeError, type PromoCodeErrorCode } from '@infrastructure/errors';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
 import { Effect } from 'effect';
@@ -49,12 +49,6 @@ export type ConfirmPaymentResult =
   | { outcome: typeof ConfirmPaymentOutcome.FAILED_AFTER_CHARGE; error: string }
   | { outcome: typeof ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER };
 
-const log = (write: (logger: BetterStackClient) => void) => {
-  void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
-    write(getBetterStackInstance());
-  });
-};
-
 export const confirmPayment = async (params: ConfirmPaymentParams): Promise<ConfirmPaymentResult> => {
   const { stripe, elements, email, returnUrl } = params;
   let charged = false;
@@ -74,7 +68,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
     if (error) return { outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE, error: error.message ?? '' };
 
     if (!paymentIntent) {
-      log((logger) =>
+      logClient((logger) =>
         logger.warn('Payment confirmation resolved without a payment intent', {
           emailDomain: email?.split('@')[1],
           returnUrl,
@@ -96,7 +90,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
 
     if (!sessionResponse.ok) {
       const errorData = yield* Effect.tryPromise(() => sessionResponse.json() as Promise<{ error?: string }>);
-      log((logger) =>
+      logClient((logger) =>
         logger.error('Session activation failed after payment', {
           statusCode: sessionResponse.status,
           reason: errorData.error,
@@ -117,7 +111,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
     };
   }).pipe(
     Effect.catchAll((error) => {
-      log((logger) =>
+      logClient((logger) =>
         logger.logError('Payment confirmation error in checkout adapter', error, {
           emailDomain: email?.split('@')[1],
           returnUrl,

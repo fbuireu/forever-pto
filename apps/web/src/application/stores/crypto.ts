@@ -1,12 +1,6 @@
-import type { BetterStackClient } from '@infrastructure/clients/logging/better-stack/client';
+import { logClient } from '@application/shared/utils/clientLog';
 import { createJSONStorage } from 'zustand/middleware';
 import { deobfuscate, obfuscate } from './utils/crypto';
-
-const log = (write: (logger: BetterStackClient) => void) => {
-  void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
-    write(getBetterStackInstance());
-  });
-};
 
 const SECRET_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY;
 const isDev = process.env.NODE_ENV === 'development';
@@ -39,7 +33,7 @@ export const obfuscatedStorage = createJSONStorage(() => {
       try {
         return deobfuscate({ text: obfuscatedValue, key: obfuscationKey });
       } catch (error) {
-        log((logger) => logger.logError('Failed to deobfuscate storage value', error, { key }));
+        logClient((logger) => logger.logError('Failed to deobfuscate storage value', error, { key }));
         return null;
       }
     },
@@ -47,14 +41,14 @@ export const obfuscatedStorage = createJSONStorage(() => {
       try {
         localStorage.setItem(key, obfuscate({ text: value, key: obfuscationKey }));
       } catch (error) {
-        log((logger) => logger.logError('Failed to set item in obfuscated storage', error, { key }));
+        logClient((logger) => logger.logError('Failed to set item in obfuscated storage', error, { key }));
       }
     },
     removeItem: (key: string) => {
       try {
         localStorage.removeItem(key);
       } catch (error) {
-        log((logger) => logger.logError('Failed to remove item from obfuscated storage', error, { key }));
+        logClient((logger) => logger.logError('Failed to remove item from obfuscated storage', error, { key }));
       }
     },
   };

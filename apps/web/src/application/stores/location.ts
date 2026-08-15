@@ -1,16 +1,10 @@
 import type { CountryDTO } from '@application/dto/country/types';
 import type { RegionDTO } from '@application/dto/region/types';
-import type { BetterStackClient } from '@infrastructure/clients/logging/better-stack/client';
+import { logClient } from '@application/shared/utils/clientLog';
 import { getRegions } from '@infrastructure/services/regions/getRegions';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { obfuscatedStorage } from './crypto';
-
-const log = (write: (logger: BetterStackClient) => void) => {
-  void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
-    write(getBetterStackInstance());
-  });
-};
 
 interface LocationState {
   countries: CountryDTO[];
@@ -56,7 +50,7 @@ export const useLocationStore = create<LocationStore>()(
         migrate: (): PersistedLocationState => ({}),
         onRehydrateStorage: () => (state, error) => {
           if (error) {
-            log((logger) =>
+            logClient((logger) =>
               logger.logError('Error rehydrating location store', error, {
                 storeName: STORAGE_NAME,
                 hasState: !!state,

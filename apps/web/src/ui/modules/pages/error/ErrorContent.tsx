@@ -1,5 +1,6 @@
 'use client';
 
+import { logClientError } from '@application/shared/utils/clientLog';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { ArrowUpRight, RotateCcw } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -84,11 +85,9 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
   const terminalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
-      getBetterStackInstance().logError('Unhandled error caught by error boundary', error, {
-        component: 'ErrorPage',
-        digest: error.digest,
-      });
+    logClientError('Unhandled error caught by error boundary', error, {
+      component: 'ErrorPage',
+      digest: error.digest,
     });
   }, [error]);
 

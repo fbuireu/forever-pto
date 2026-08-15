@@ -1,5 +1,6 @@
 'use client';
 
+import { logClientError } from '@application/shared/utils/clientLog';
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { Button } from '@ui/modules/core/primitives/Button';
@@ -55,9 +56,7 @@ export const Troubleshooting = () => {
           description: t('successDescription'),
         });
       } catch (error) {
-        void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
-          getBetterStackInstance().logError('Error resetting to defaults', error, { component: 'Troubleshooting' });
-        });
+        logClientError('Error resetting to defaults', error, { component: 'Troubleshooting' });
         toast.error(t('errorTitle'), {
           description: t('errorDescription'),
         });

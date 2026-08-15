@@ -1,5 +1,6 @@
 'use client';
 
+import { logClientError } from '@application/shared/utils/clientLog';
 import { formatDate } from '@application/shared/utils/dates';
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
@@ -82,9 +83,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
 
         handleClose();
       } catch (error) {
-        void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
-          getBetterStackInstance().logError('Error creating holiday', error, { component: 'AddHolidayModal' });
-        });
+        logClientError('Error creating holiday', error, { component: 'AddHolidayModal' });
         toast.error(t('errorTitle'), {
           description: t('errorDescription'),
         });

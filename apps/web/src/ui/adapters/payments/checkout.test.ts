@@ -32,8 +32,8 @@ const BASE_CONFIRM_PARAMS = {
 describe('logging imports', () => {
   const source = readFileSync(resolve(process.cwd(), 'src/ui/adapters/payments/checkout.ts'), 'utf8');
 
-  it('reaches the BetterStack client through a dynamic import only', () => {
-    expect(source).toMatch(/import\('@infrastructure\/clients\/logging\/better-stack\/client'\)/);
+  it('reaches the BetterStack client through the shared client-log helper', () => {
+    expect(source).toMatch(/from '@application\/shared\/utils\/clientLog'/);
   });
 
   it('has no value-level static import of the BetterStack client', () => {

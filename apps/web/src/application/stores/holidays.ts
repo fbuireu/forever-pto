@@ -1,5 +1,6 @@
 import { holidayDTO, isInPlanningWindow } from '@application/dto/holiday/dto';
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
+import { logClient } from '@application/shared/utils/clientLog';
 import { fromStoredInstant } from '@application/shared/utils/dateIntake';
 import {
   addMonths,
@@ -12,7 +13,6 @@ import {
 import { generateMetrics } from '@domain/calendar/metrics/generateMetrics';
 import type { MeasuredSuggestion, Suggestion } from '@domain/calendar/types';
 import { measureBudget } from '@domain/calendar/utils/budget';
-import type { BetterStackClient } from '@infrastructure/clients/logging/better-stack/client';
 import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -31,12 +31,6 @@ import {
   type MainThreadSuggestionsParams,
   type PlanningWindowParams,
 } from './types';
-
-const log = (write: (logger: BetterStackClient) => void) => {
-  void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
-    write(getBetterStackInstance());
-  });
-};
 
 export interface HolidaysState {
   holidays: HolidayDTO[];
@@ -163,7 +157,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               ),
             });
           } catch (error) {
-            log((logger) =>
+            logClient((logger) =>
               logger.logError('Error fetching holidays in holidays store', error, {
                 year: params.year,
                 country: params.country,
@@ -221,7 +215,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               currentSelectionIndex: 0,
             });
           } catch (error) {
-            log((logger) =>
+            logClient((logger) =>
               logger.logError('Error generating suggestions in holidays store', error, {
                 year,
                 ptoDays,
@@ -297,14 +291,16 @@ export const useHolidaysStore = create<HolidaysStore>()(
           const existingHoliday = holidays.find((h) => h.date.toDateString() === holiday.date.toDateString());
 
           if (existingHoliday) {
-            log((logger) => logger.warn('Holiday already exists on this date', { date: holiday.date.toISOString() }));
+            logClient((logger) =>
+              logger.warn('Holiday already exists on this date', { date: holiday.date.toISOString() })
+            );
             return { applied: false, reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY, heldBy: existingHoliday };
           }
 
           const isManuallySelected = manuallySelectedDays.some((d) => d.toDateString() === holiday.date.toDateString());
 
           if (isManuallySelected) {
-            log((logger) =>
+            logClient((logger) =>
               logger.warn('A PTO day is already booked on this date', { date: holiday.date.toISOString() })
             );
             return { applied: false, reason: HolidayRefusal.DATE_HELD_BY_MANUAL_DAY };
@@ -344,7 +340,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           const collidesWithManualDay = manuallySelectedDays.some((d) => d.toDateString() === targetDateStr);
 
           if (heldBy || collidesWithManualDay) {
-            log((logger) => logger.warn('Refused to move a holiday onto an occupied date', { targetDateStr }));
+            logClient((logger) => logger.warn('Refused to move a holiday onto an occupied date', { targetDateStr }));
 
             return heldBy
               ? { applied: false, reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY, heldBy }
@@ -382,7 +378,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           const holidayOnDate = holidays.find((h) => fromStoredInstant(h.date).toDateString() === dateStr);
 
           if (!isSuggested && !isManuallySelected && (isWeekend(date) || holidayOnDate)) {
-            log((logger) => logger.warn('Refused to spend a PTO day on a day that is already off', { dateStr }));
+            logClient((logger) => logger.warn('Refused to spend a PTO day on a day that is already off', { dateStr }));
 
             if (holidayOnDate) {
               return {
@@ -417,7 +413,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
             });
 
             if (budget.remaining <= 0) {
-              log((logger) => logger.warn('No remaining PTO days to assign', { totalPtoDays, spent: budget.spent }));
+              logClient((logger) =>
+                logger.warn('No remaining PTO days to assign', { totalPtoDays, spent: budget.spent })
+              );
               return { applied: false, reason: DayRefusal.BUDGET_EXHAUSTED };
             }
 
@@ -528,7 +526,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
         partialize: partializeHolidays,
         onRehydrateStorage: () => (state, error) => {
           if (error) {
-            log((logger) =>
+            logClient((logger) =>
               logger.logError('Error rehydrating holidays store', error, {
                 storeName: STORAGE_NAME,
                 hasState: !!state,

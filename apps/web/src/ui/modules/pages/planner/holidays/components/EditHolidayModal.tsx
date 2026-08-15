@@ -1,6 +1,7 @@
 'use client';
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
+import { logClientError } from '@application/shared/utils/clientLog';
 import { formatDate } from '@application/shared/utils/dates';
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
@@ -101,9 +102,7 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
 
         handleClose();
       } catch (error) {
-        void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
-          getBetterStackInstance().logError('Error editing holiday', error, { component: 'EditHolidayModal' });
-        });
+        logClientError('Error editing holiday', error, { component: 'EditHolidayModal' });
         toast.error(t('errorTitle'), {
           description: t('errorDescription'),
         });

@@ -262,20 +262,12 @@ chunk that reads this store — and making it dynamic is not a tidy-up either.
 **No file here imports the BetterStack client statically, and none holds a module-scope `logger`.** That
 client's own top-level imports pull in `@logtail/edge` and `@opennextjs/cloudflare`, so a static import lands
 both in the client chunk of every component that reads a store — which is every planner and marketing screen.
-Each of `crypto.ts`, `filters.ts`, `holidays.ts`, `location.ts` and `premium.ts` therefore declares the same
-local helper, the one the UI layer's `adapters/payments/checkout.ts` uses
-([`../../ui/CLAUDE.md`](../../ui/CLAUDE.md)):
 
-```ts
-const log = (write: (logger: BetterStackClient) => void) => {
-  void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
-    write(getBetterStackInstance());
-  });
-};
-```
-
-A call site is `log((logger) => logger.logError(message, error, context))`. The `import type { BetterStackClient }`
-beside it is erased, so it costs nothing.
+`logClient` and `logClientError` in `@application/shared/utils/clientLog` hold the whole incantation. Each of
+`crypto.ts`, `filters.ts`, `holidays.ts`, `location.ts` and `premium.ts` declared its own byte-identical copy
+until then, and the UI layer's `adapters/payments/checkout.ts` a sixth; seven more files open-coded it. Call
+`logClient((logger) => logger.warn(message, context))` for anything but an error, and `logClientError(message,
+error, context)` for the common case.
 
 **Nothing awaits that import.** Several of these actions are called synchronously from React —
 `addHoliday`, `toggleDaySelection`, every `onRehydrateStorage` listener — so awaiting would turn a

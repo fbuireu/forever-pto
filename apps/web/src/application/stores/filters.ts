@@ -1,14 +1,8 @@
+import { logClient } from '@application/shared/utils/clientLog';
 import { FilterStrategy } from '@domain/calendar/types';
-import type { BetterStackClient } from '@infrastructure/clients/logging/better-stack/client';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { obfuscatedStorage } from './crypto';
-
-const log = (write: (logger: BetterStackClient) => void) => {
-  void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
-    write(getBetterStackInstance());
-  });
-};
 
 export interface FiltersState {
   ptoDays: number;
@@ -104,7 +98,7 @@ export const useFiltersStore = create<FiltersStore>()(
           }
 
           if (error) {
-            log((logger) =>
+            logClient((logger) =>
               logger.logError('Error rehydrating filters store', error, {
                 storeName: STORAGE_NAME,
                 hasState: !!state,

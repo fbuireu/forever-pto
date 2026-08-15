@@ -1,7 +1,6 @@
+'use client';
+
 import { holidaysInPlanningWindow } from '@application/dto/holiday/dto';
-
-('use client');
-
 import { HolidayVariant } from '@application/dto/holiday/types';
 import { Link } from '@application/i18n/navigation';
 import { useFiltersStore } from '@application/stores/filters';

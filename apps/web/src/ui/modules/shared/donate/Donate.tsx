@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
 import { DonationForm } from './DonationForm';
 import './donate.css';
+import { logClientError } from '@application/shared/utils/clientLog';
 import { CheckoutForm } from '@ui/modules/premium/CheckoutForm';
 
 interface PaymentState {
@@ -159,14 +160,12 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
             discountInfo: result.discountInfo ?? null,
           });
         } catch (error) {
-          void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
-            getBetterStackInstance().logError('Payment initialization failed in Donate component', error, {
-              amount: data.amount,
-              hasPromoCode: !!data.promoCode,
-              promoCodeLength: data.promoCode?.length,
-              currency,
-              locale,
-            });
+          logClientError('Payment initialization failed in Donate component', error, {
+            amount: data.amount,
+            hasPromoCode: !!data.promoCode,
+            promoCodeLength: data.promoCode?.length,
+            currency,
+            locale,
           });
           if (error instanceof PromoCodeError) {
             const descriptions = {
