@@ -12,7 +12,7 @@ import {
 } from '@application/shared/utils/dates';
 import type { Locale } from 'next-intl';
 import type { Bridge } from '../../types';
-import { freeStreaks } from './streaks';
+import type { FreeStreak } from './streaks';
 
 export const MONTHS_IN_YEAR = 12;
 export const MONTHS_IN_QUARTER = 3;
@@ -44,15 +44,14 @@ export function getMonthlyDist(days: Date[], window: PlanningWindowShape) {
 }
 
 interface GetLongBlocksPerQuarterParams {
-  ptoDays: Date[];
-  holidays: HolidayDTO[];
+  streaks: FreeStreak[];
   window: PlanningWindowShape;
 }
 
-export function getLongBlocksPerQuarter({ ptoDays, holidays, window }: GetLongBlocksPerQuarterParams) {
+export function getLongBlocksPerQuarter({ streaks, window }: GetLongBlocksPerQuarterParams) {
   const longBlocksPerQuarter = new Array(windowQuarterCount(window)).fill(0);
 
-  for (const streak of freeStreaks({ placedDays: ptoDays, holidays })) {
+  for (const streak of streaks) {
     if (streak.length < LONG_BLOCK_MINIMUM_DAYS) continue;
 
     const start = streak.days.find((day) => windowMonthIndex(day, window) >= 0);
@@ -197,22 +196,9 @@ export const getWorkedDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkedDays
   return Number.parseFloat(avgPerMonth.toFixed(1));
 };
 
-interface CalculateLongestVacationParams {
-  ptoDays: Date[];
-  holidays: HolidayDTO[];
-}
+export const calculateLongestVacation = (streaks: FreeStreak[]) =>
+  streaks.filter((streak) => streak.hasPlacedDay).reduce((longest, streak) => Math.max(longest, streak.length), 0);
 
-export const calculateLongestVacation = ({ ptoDays, holidays }: CalculateLongestVacationParams) =>
-  freeStreaks({ placedDays: ptoDays, holidays })
-    .filter((streak) => streak.hasPlacedDay)
-    .reduce((longest, streak) => Math.max(longest, streak.length), 0);
-
-interface CalculateLongWeekendsParams {
-  ptoDays: Date[];
-  holidays: HolidayDTO[];
-}
-
-export const calculateLongWeekends = ({ ptoDays, holidays }: CalculateLongWeekendsParams) =>
-  freeStreaks({ placedDays: ptoDays, holidays }).filter(
-    (streak) => streak.length >= LONG_WEEKEND_MINIMUM_DAYS && streak.hasWeekend && streak.hasPlacedDay
-  ).length;
+export const calculateLongWeekends = (streaks: FreeStreak[]) =>
+  streaks.filter((streak) => streak.length >= LONG_WEEKEND_MINIMUM_DAYS && streak.hasWeekend && streak.hasPlacedDay)
+    .length;

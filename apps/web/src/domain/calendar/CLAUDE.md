@@ -154,8 +154,13 @@ actually placed, not merely any free weekday. Holidays still extend a stretch �
 [`CONTEXT.md`](../../../../../CONTEXT.md) sets for Longest Vacation, *the longest stretch the plan produces*, and
 it is why the fix belongs in the streak test rather than in the Holiday list the engine is handed.
 
-**Three metrics walk the free-day runs, and they walk them once.** `freeStreaks` builds the placed-day set,
-unions it with the Holidays, expands seven days either side of the data and yields each unbroken run of Free
+**Three metrics walk the free-day runs, and they walk them once — in the source and now in the run.**
+`generateMetrics` calls `freeStreaks` once and hands the `FreeStreak[]` to all three; the helpers take the
+array, not the inputs to rebuild it from. They each called it themselves until a spy over one
+`runPlanningPipeline` counted 33 scans where 11 were needed, one per plan. A fourth streak-derived metric is
+a predicate over an array the caller already holds, and costs no scan at all.
+
+`freeStreaks` builds the placed-day set, unions it with the Holidays, expands seven days either side of the data and yields each unbroken run of Free
 Days with two facts attached: whether it contains a day the plan placed, and whether it contains a weekend.
 Longest Vacation, Long Weekends and Long Blocks are then predicates over that sequence — `hasPlacedDay`,
 `length >= 3 && hasWeekend && hasPlacedDay`, and `length >= 3` anchored on the first day inside the window.

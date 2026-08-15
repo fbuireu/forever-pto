@@ -12,6 +12,7 @@ import {
   getTotalEffectiveDays,
   getWorkedDaysPerMonth,
 } from './helpers';
+import { freeStreaks } from './streaks';
 
 const WINDOW = { year: 2025, carryOverMonths: 0 };
 
@@ -55,29 +56,36 @@ describe('getMonthlyDist', () => {
 
 describe('getLongBlocksPerQuarter', () => {
   it('returns 4 zeros for empty input', () => {
-    expect(getLongBlocksPerQuarter({ ptoDays: [], holidays: [], window: WINDOW })).toEqual([0, 0, 0, 0]);
+    expect(getLongBlocksPerQuarter({ streaks: freeStreaks({ placedDays: [], holidays: [] }), window: WINDOW })).toEqual(
+      [0, 0, 0, 0]
+    );
   });
 
   it('does not count blocks shorter than 3 consecutive free days', () => {
     const ptoDays = [makeDate(2025, 1, 8), makeDate(2025, 1, 9)];
-    expect(getLongBlocksPerQuarter({ ptoDays, holidays: [], window: WINDOW })).toEqual([0, 0, 0, 0]);
+    expect(
+      getLongBlocksPerQuarter({ streaks: freeStreaks({ placedDays: ptoDays, holidays: [] }), window: WINDOW })
+    ).toEqual([0, 0, 0, 0]);
   });
 
   it('counts a block of exactly 3 consecutive free days', () => {
     const ptoDays = [makeDate(2025, 1, 7), makeDate(2025, 1, 8), makeDate(2025, 1, 9)];
-    expect(getLongBlocksPerQuarter({ ptoDays, holidays: [], window: WINDOW })).toEqual([1, 0, 0, 0]);
+    expect(
+      getLongBlocksPerQuarter({ streaks: freeStreaks({ placedDays: ptoDays, holidays: [] }), window: WINDOW })
+    ).toEqual([1, 0, 0, 0]);
   });
 
   it('counts the weekend a bridge absorbs, so Fri + Mon is one long block', () => {
     const ptoDays = [makeDate(2025, 1, 3), makeDate(2025, 1, 6)];
-    expect(getLongBlocksPerQuarter({ ptoDays, holidays: [], window: WINDOW })).toEqual([1, 0, 0, 0]);
+    expect(
+      getLongBlocksPerQuarter({ streaks: freeStreaks({ placedDays: ptoDays, holidays: [] }), window: WINDOW })
+    ).toEqual([1, 0, 0, 0]);
   });
 
   it('counts a holiday that extends a run to 3 days', () => {
     const ptoDays = [makeDate(2025, 1, 8), makeDate(2025, 1, 9)];
     const withHoliday = getLongBlocksPerQuarter({
-      ptoDays,
-      holidays: [makeHoliday(makeDate(2025, 1, 10))],
+      streaks: freeStreaks({ placedDays: ptoDays, holidays: [makeHoliday(makeDate(2025, 1, 10))] }),
       window: WINDOW,
     });
     expect(withHoliday).toEqual([1, 0, 0, 0]);
@@ -85,7 +93,9 @@ describe('getLongBlocksPerQuarter', () => {
 
   it('counts a single block for 4+ consecutive days', () => {
     const ptoDays = [makeDate(2025, 1, 6), makeDate(2025, 1, 7), makeDate(2025, 1, 8), makeDate(2025, 1, 9)];
-    expect(getLongBlocksPerQuarter({ ptoDays, holidays: [], window: WINDOW })[0]).toBe(1);
+    expect(
+      getLongBlocksPerQuarter({ streaks: freeStreaks({ placedDays: ptoDays, holidays: [] }), window: WINDOW })[0]
+    ).toBe(1);
   });
 
   it('counts blocks in separate quarters independently', () => {
@@ -97,22 +107,31 @@ describe('getLongBlocksPerQuarter', () => {
       makeDate(2025, 4, 2),
       makeDate(2025, 4, 3),
     ];
-    expect(getLongBlocksPerQuarter({ ptoDays, holidays: [], window: WINDOW })).toEqual([1, 1, 0, 0]);
+    expect(
+      getLongBlocksPerQuarter({ streaks: freeStreaks({ placedDays: ptoDays, holidays: [] }), window: WINDOW })
+    ).toEqual([1, 1, 0, 0]);
   });
 
   it('attributes a block straddling a quarter boundary to the quarter it starts in', () => {
     const ptoDays = [makeDate(2025, 3, 31), makeDate(2025, 4, 1), makeDate(2025, 4, 2)];
-    expect(getLongBlocksPerQuarter({ ptoDays, holidays: [], window: WINDOW })).toEqual([1, 0, 0, 0]);
+    expect(
+      getLongBlocksPerQuarter({ streaks: freeStreaks({ placedDays: ptoDays, holidays: [] }), window: WINDOW })
+    ).toEqual([1, 0, 0, 0]);
   });
 
   it('does not count isolated mid-week days as a block', () => {
     const ptoDays = [makeDate(2025, 1, 7), makeDate(2025, 1, 9)];
-    expect(getLongBlocksPerQuarter({ ptoDays, holidays: [], window: WINDOW })).toEqual([0, 0, 0, 0]);
+    expect(
+      getLongBlocksPerQuarter({ streaks: freeStreaks({ placedDays: ptoDays, holidays: [] }), window: WINDOW })
+    ).toEqual([0, 0, 0, 0]);
   });
 
   it('ignores holidays when no PTO day is placed', () => {
     expect(
-      getLongBlocksPerQuarter({ ptoDays: [], holidays: [makeHoliday(makeDate(2025, 1, 6))], window: WINDOW })
+      getLongBlocksPerQuarter({
+        streaks: freeStreaks({ placedDays: [], holidays: [makeHoliday(makeDate(2025, 1, 6))] }),
+        window: WINDOW,
+      })
     ).toEqual([0, 0, 0, 0]);
   });
 });
@@ -327,11 +346,11 @@ describe('calculateMaxWorkStreak', () => {
 
 describe('calculateLongestVacation', () => {
   it('returns 0 when ptoDays is empty', () => {
-    expect(calculateLongestVacation({ ptoDays: [], holidays: [] })).toBe(0);
+    expect(calculateLongestVacation(freeStreaks({ placedDays: [], holidays: [] }))).toBe(0);
   });
 
   it('includes adjacent weekend days in the streak', () => {
-    const result = calculateLongestVacation({ ptoDays: [makeDate(2025, 1, 3)], holidays: [] });
+    const result = calculateLongestVacation(freeStreaks({ placedDays: [makeDate(2025, 1, 3)], holidays: [] }));
     expect(result).toBeGreaterThanOrEqual(3);
   });
 
@@ -343,40 +362,45 @@ describe('calculateLongestVacation', () => {
       makeDate(2025, 1, 9),
       makeDate(2025, 1, 10),
     ];
-    const result = calculateLongestVacation({ ptoDays, holidays: [] });
+    const result = calculateLongestVacation(freeStreaks({ placedDays: ptoDays, holidays: [] }));
     expect(result).toBeGreaterThanOrEqual(9);
   });
 
   it('includes holidays in the free-day streak', () => {
-    const withHoliday = calculateLongestVacation({
-      ptoDays: [makeDate(2025, 1, 6)],
-      holidays: [makeHoliday(makeDate(2025, 1, 7))],
-    });
-    const withoutHoliday = calculateLongestVacation({ ptoDays: [makeDate(2025, 1, 6)], holidays: [] });
+    const withHoliday = calculateLongestVacation(
+      freeStreaks({ placedDays: [makeDate(2025, 1, 6)], holidays: [makeHoliday(makeDate(2025, 1, 7))] })
+    );
+    const withoutHoliday = calculateLongestVacation(freeStreaks({ placedDays: [makeDate(2025, 1, 6)], holidays: [] }));
     expect(withHoliday).toBeGreaterThanOrEqual(withoutHoliday);
   });
 });
 
 describe('calculateLongWeekends', () => {
   it('returns 0 when ptoDays is empty', () => {
-    expect(calculateLongWeekends({ ptoDays: [], holidays: [] })).toBe(0);
+    expect(calculateLongWeekends(freeStreaks({ placedDays: [], holidays: [] }))).toBe(0);
   });
 
   it('counts a Friday PTO adjacent to a weekend as a long weekend', () => {
-    expect(calculateLongWeekends({ ptoDays: [makeDate(2025, 1, 3)], holidays: [] })).toBeGreaterThanOrEqual(1);
+    expect(
+      calculateLongWeekends(freeStreaks({ placedDays: [makeDate(2025, 1, 3)], holidays: [] }))
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('counts a Monday PTO adjacent to a weekend as a long weekend', () => {
-    expect(calculateLongWeekends({ ptoDays: [makeDate(2025, 1, 6)], holidays: [] })).toBeGreaterThanOrEqual(1);
+    expect(
+      calculateLongWeekends(freeStreaks({ placedDays: [makeDate(2025, 1, 6)], holidays: [] }))
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('does not count isolated mid-week PTO as a long weekend', () => {
-    expect(calculateLongWeekends({ ptoDays: [makeDate(2025, 1, 8)], holidays: [] })).toBe(0);
+    expect(calculateLongWeekends(freeStreaks({ placedDays: [makeDate(2025, 1, 8)], holidays: [] }))).toBe(0);
   });
 
   it('counts a holiday adjacent to a weekend as a long weekend', () => {
     const holiday = makeHoliday(makeDate(2025, 1, 6));
-    expect(calculateLongWeekends({ ptoDays: [makeDate(2025, 1, 6)], holidays: [holiday] })).toBeGreaterThanOrEqual(1);
+    expect(
+      calculateLongWeekends(freeStreaks({ placedDays: [makeDate(2025, 1, 6)], holidays: [holiday] }))
+    ).toBeGreaterThanOrEqual(1);
   });
 });
 
@@ -434,7 +458,9 @@ describe('the Planning Window shapes the distributions', () => {
   });
 
   it('extends the long-block quarters the same way', () => {
-    expect(getLongBlocksPerQuarter({ ptoDays: [], holidays: [], window: CARRY_OVER })).toHaveLength(5);
+    expect(
+      getLongBlocksPerQuarter({ streaks: freeStreaks({ placedDays: [], holidays: [] }), window: CARRY_OVER })
+    ).toHaveLength(5);
   });
 });
 
@@ -443,13 +469,13 @@ describe('calculateLongWeekends counts only what the plan produced', () => {
     const holidays = [makeHoliday(makeDate(2025, 1, 6))];
     const elsewhere = [makeDate(2025, 6, 10)];
 
-    expect(calculateLongWeekends({ ptoDays: elsewhere, holidays })).toBe(0);
+    expect(calculateLongWeekends(freeStreaks({ placedDays: elsewhere, holidays: holidays }))).toBe(0);
   });
 
   it('counts a stretch a placed day joined to the weekend', () => {
     const ptoDays = [makeDate(2025, 1, 3)];
 
-    expect(calculateLongWeekends({ ptoDays, holidays: [] })).toBe(1);
+    expect(calculateLongWeekends(freeStreaks({ placedDays: ptoDays, holidays: [] }))).toBe(1);
   });
 });
 
@@ -458,22 +484,21 @@ describe('calculateLongestVacation counts only what the plan produced', () => {
     const holidays = [makeHoliday(makeDate(2026, 4, 3)), makeHoliday(makeDate(2026, 4, 6))];
     const elsewhere = [makeDate(2025, 6, 10)];
 
-    expect(calculateLongestVacation({ ptoDays: elsewhere, holidays })).toBe(1);
+    expect(calculateLongestVacation(freeStreaks({ placedDays: elsewhere, holidays: holidays }))).toBe(1);
   });
 
   it('still lets a Holiday extend a stretch the plan started', () => {
     const holidays = [makeHoliday(makeDate(2025, 1, 7))];
     const ptoDays = [makeDate(2025, 1, 6)];
 
-    expect(calculateLongestVacation({ ptoDays, holidays })).toBe(4);
+    expect(calculateLongestVacation(freeStreaks({ placedDays: ptoDays, holidays: holidays }))).toBe(4);
   });
 });
 
 describe('getLongBlocksPerQuarter anchors on the first day inside the window', () => {
   it('keeps a block that reaches back into the previous December', () => {
     const result = getLongBlocksPerQuarter({
-      ptoDays: [makeDate(2024, 1, 2)],
-      holidays: [makeHoliday(makeDate(2024, 1, 1))],
+      streaks: freeStreaks({ placedDays: [makeDate(2024, 1, 2)], holidays: [makeHoliday(makeDate(2024, 1, 1))] }),
       window: { year: 2024, carryOverMonths: 0 },
     });
 

@@ -17,6 +17,7 @@ import {
   windowMonthCount,
   windowQuarterCount,
 } from './utils/helpers';
+import { freeStreaks } from './utils/streaks';
 
 interface GenerateMetricsParams {
   suggestion: Omit<Suggestion, 'metrics'>;
@@ -63,11 +64,12 @@ export const generateMetrics = ({
     };
   }
   const monthlyDist = getMonthlyDist(days, planningWindow);
-  const longBlocksPerQuarter = getLongBlocksPerQuarter({ ptoDays: days, holidays, window: planningWindow });
+  const streaks = freeStreaks({ placedDays: days, holidays });
+  const longBlocksPerQuarter = getLongBlocksPerQuarter({ streaks, window: planningWindow });
   const totalEffectiveDays = getTotalEffectiveDays(days, bridges, holidays);
   const bridgesUsed = getValidBridges(days, bridges).length;
-  const longWeekends = calculateLongWeekends({ ptoDays: days, holidays });
-  const longestVacation = calculateLongestVacation({ ptoDays: days, holidays });
+  const longWeekends = calculateLongWeekends(streaks);
+  const longestVacation = calculateLongestVacation(streaks);
 
   const restBlocks = calculateRestBlocks(days);
   const maxWorkStreak = calculateMaxWorkStreak({
