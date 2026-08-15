@@ -1,10 +1,4 @@
 {
-  "a11y": {
-    "closeDialog": "Fermer",
-    "toggleSidebar": "Afficher ou masquer la barre latérale",
-    "sidebarLandmark": "Réglages du planificateur",
-    "radialNavigation": "Navigation des fonctionnalités"
-  },
   "metadata": {
     "title": "Forever PTO - Gère tes jours de congé",
     "description": "Planifie et optimise tes vacances et jours de congé avec Forever PTO. Trouve les meilleurs ponts et maximise ton temps libre.",
@@ -69,9 +63,9 @@
       "regional": "rég.",
       "custom": "perso.",
       "effectiveDays": "Jours effectifs",
-      "overBudget": "sur ton budget de {ptoDays} {ptoDays, plural, one {jour} other {jours}}",
+      "overBudget": "sur ton budget de {ptoDays} jours",
       "gain": "Gain",
-      "perPtoDay": "de ton budget de {ptoDays} {ptoDays, plural, one {jour} other {jours}}",
+      "perPtoDay": "de ton budget de {ptoDays} jours",
       "longWeekends": "Longs week-ends",
       "restBlocks": "Blocs de repos",
       "efficiency": "Efficacité",
@@ -661,8 +655,7 @@
       "email_required": "Saisis ton adresse e-mail.",
       "invalid_email": "Cette adresse e-mail ne semble pas valide.",
       "invalid_body": "Nous n'avons pas pu lire cette demande. Réessaie.",
-      "rate_limit_exceeded": "Trop de tentatives. Patiente un instant et réessaie.",
-      "promo_code_too_long": "Ce code promo est trop long."
+      "rate_limit_exceeded": "Trop de tentatives. Patiente un instant et réessaie."
     }
   },
   "donate": {
@@ -718,8 +711,7 @@
       "amountMin": "Le montant minimum est de 1",
       "amountMax": "Le montant maximum est de 10 000",
       "invalidEmail": "Un e-mail valide est requis",
-      "emailRequired": "L'e-mail est requis",
-      "promoCodeTooLong": "Le code promo est trop long"
+      "emailRequired": "L'e-mail est requis"
     },
     "holiday": {
       "nameRequired": "Le nom du jour férié est requis",

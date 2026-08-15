@@ -38,8 +38,7 @@ the payment record *is* the entitlement ([ADR 0008](./docs/adr/0008-premium-deri
 ## Versions (pinned — match exactly)
 
 - Node **26.3.0** (`.nvmrc`, mirrored in `engines.node`) — `.nvmrc` is what every CI job installs
-- pnpm **11.21.0** (`packageManager`) — always use pnpm, never npm/yarn
-- TypeScript **7** and Next **16.3+** move together, in that order — see *Structure & aliases* for why
+- pnpm **11.20.0** (`packageManager`) — always use pnpm, never npm/yarn
 
 ## Commands
 
@@ -84,10 +83,10 @@ src/
   app/                # App Router: [locale]/(app|marketing) pages, api/ route handlers, sitemap, robots
   application/        # use-cases, DTOs, Zustand stores, export, email templates — orchestration, no I/O clients
   domain/             # calendar/ (pure planning engine) and payment/ (Effect programs)
-  infrastructure/     # everything outbound: clients, services, workers, proxy, api operations, seo route table
+  infrastructure/     # everything outbound: clients, services, workers, proxy, api error mapping
   ui/                 # adapters, hooks, i18n, modules (components), styles, assets
 e2e/                  # Playwright specs
-docs/                 # adr/ and docs-consistency.test.ts
+docs/                 # adr/, plans/, and docs-consistency.test.ts
 ```
 
 **Next owns `next-env.d.ts` outright, and it flaps.** A production build points its route import at
@@ -101,29 +100,11 @@ land at the *next build* rather than at the deletion site, so deleting either as
 or lets JavaScript into a TypeScript-only codebase, a long way from the change. `docs/docs-consistency.test.ts`
 asserts both, and asserts that `cloudflare-env.d.ts` stays in `exclude` and `.gitignore` for the reason below.
 
-**TypeScript is 7, and Next 16.3 is what made that possible — the two versions are one decision.** TypeScript 7
-ships the Go compiler and no `lib/typescript.js`, so the JavaScript compiler API is gone. Next's old
-type-checking path loaded exactly that file, which is why 6 was the ceiling until 16.3: from 16.3 `next build`
-shells out to the project-local `tsc` instead, and the switch is the default, so nothing in `next.config.ts`
-turns it on. Downgrading Next below 16.3 without downgrading TypeScript first kills `pnpm build` before it
-type-checks anything. `experimental.useTypeScriptCli: false` is the opt-out back to the compiler API and is a
-build failure while TypeScript is 7 — the flag exists only for a project still on 6.
-
-Two consequences worth knowing before they surprise you. `tsc` prints its own diagnostics, so Next's code
-frames and its rewritten messages for pages, layouts and route handlers are gone from build output; and the
-CLI checks the whole project the `tsconfig` selects — tests and `.next/dev/types` included — so a type error
-in a `*.test.ts` now fails the production build, not just `pnpm lint:ts:typecheck`.
-
-The rest of the 7 migration cost this repo nothing, because the settings 7 removes or re-defaults were already
-right: `baseUrl` was dropped ahead of time, `strict` and `esModuleInterop` were already on, `types` was already
-an explicit `["node"]` rather than the implicit everything, and `target`/`module` were already `ESNext`. The
-one thing that did break is [`docs/docs-consistency.test.ts`](./docs/docs-consistency.test.ts): it parses
-source files with the compiler API to enforce the no-comments rule, so it imports `@typescript/typescript6` —
-Microsoft's compatibility package pinning the 6.x API — rather than `typescript`. That import is a parser for
-one test and not a second toolchain; drop it when 7.1 ships the replacement API. The same missing API is why
-the `{ "name": "next" }` `tsserver` plugin no longer loads if the editor is pointed at the workspace
-TypeScript: leave VS Code on its bundled version to keep the plugin's `'use client'` and segment-config
-checks.
+**TypeScript stays on 6 until Next supports 7 without an experimental flag.** TypeScript 7 ships no
+`lib/typescript.js`, so Next's compiler-API path throws and `pnpm build` dies before type-checking anything;
+the only ways through are `experimental.useTypeScriptCli` or the native-preview package, and an experimental
+flag in production config to force an unsupported toolchain is not a trade this repo makes. `baseUrl` is
+still absent because 7 removes it, which costs nothing today and is one less thing to undo later.
 
 Path aliases (`tsconfig.json` `compilerOptions.paths`): `src/*`, `@app/*`, `@application/*`, `@domain/*`,
 `@infrastructure/*`, `@ui/*`, `@assets/*` (→ `src/ui/assets`), `@styles/*` (→ `src/ui/styles`), `@i18n/*`
@@ -248,10 +229,10 @@ one above the highest existing file, and link it from wherever it bites — a go
 
 ## Gotchas
 
-- **The calculation caches are cleared by the pipeline, not the engine and no longer by each caller.**
-  `cache.ts` memoises the holiday set under one fixed key and never evicts it, so a second run silently reuses
-  the first run's holidays. `runPlanningPipeline` clears both on entry; a generator still must not.
-  [ADR 0006](./docs/adr/0006-caller-owned-calculation-caches.md), amended 2026-08-14.
+- **The calculation caches are cleared by the caller, not the engine.** `cache.ts` memoises the holiday set
+  under one fixed key and never evicts it, so a second run silently reuses the first run's holidays. Both
+  callers — `worker.ts` and the holidays store — must clear before every full run, and a third caller means
+  switching to a content-derived key. [ADR 0006](./docs/adr/0006-caller-owned-calculation-caches.md).
 - **`Temporal` comes from `temporal-polyfill`, never the global.** The global does not resolve in the deployed
   Workers runtime, and a local run proves nothing. Do not let a codemod "modernise" the import.
   [ADR 0005](./docs/adr/0005-temporal-polyfill.md).
@@ -275,12 +256,10 @@ one above the highest existing file, and link it from wherever it bites — a go
   [ADR 0004](./docs/adr/0004-cloudflare-workers-as-deployment-target.md).
 - **Biome's `noConsole` is a warning with `warn`/`error` allowed**, not an error — `console.log` will not fail
   the build, so it is on you not to leave one behind.
-- **The planning pipeline exists once, and used to exist twice.** `runPlanningPipeline` under
-  `src/domain/calendar/` is the whole run — caches, pseudo-Holidays, budget, both planning calls, the Metrics.
-  The Web Worker and the holidays store's own action are its two callers and add only transport. They were two
-  copies held together by mirrored test blocks, they drifted, and the symptom was one Planning Window
-  producing two different plans depending on which path ran. Do not reintroduce orchestration at a caller.
-  See [`src/application/stores/CLAUDE.md`](./src/application/stores/CLAUDE.md).
+- **The planning pipeline exists twice and the copies must stay in step.** The Web Worker and the holidays
+  store's own action compute the same plan from the same inputs; mirrored test blocks hold them together.
+  They have drifted before, and the symptom is one Planning Window producing two different plans depending on
+  which path ran. See [`src/application/stores/CLAUDE.md`](./src/application/stores/CLAUDE.md).
 
 ## Deploy
 

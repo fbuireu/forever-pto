@@ -1,11 +1,8 @@
-import { buildMetadata } from '@infrastructure/seo/buildMetadata';
-import { isIndexable } from '@infrastructure/seo/routes';
+import { localeAlternates, localePath } from '@infrastructure/i18n/utils/url';
 import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
-
-const PATH = '/payment/confirmation';
 
 interface GenerateMetadataParams {
   params: Promise<{ locale: Locale }>;
@@ -18,5 +15,19 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
     getTranslations({ locale, namespace: 'metadata.paymentConfirmation' }),
   ]);
 
-  return buildMetadata({ baseUrl, locale, path: PATH, title: t('title'), indexable: isIndexable(PATH) });
+  return {
+    title: t('title'),
+    metadataBase: new URL(baseUrl),
+    alternates: {
+      canonical: localePath(locale, '/payment/confirmation'),
+      languages: localeAlternates('/payment/confirmation'),
+    },
+    robots: {
+      index: false,
+      follow: false,
+    },
+    other: {
+      'text-scale': 'scale',
+    },
+  };
 }

@@ -15,15 +15,7 @@ vi.mock('@application/stores/premium', () => ({
   usePremiumStore: (selector: (state: typeof premiumState) => unknown) => selector(premiumState),
 }));
 vi.mock('@infrastructure/clients/logging/better-stack/tracking', () => ({ track: vi.fn() }));
-vi.mock('@ui/adapters/payments/checkout', () => ({
-  confirmPayment: vi.fn(),
-  ConfirmPaymentOutcome: {
-    SUCCEEDED: 'succeeded',
-    REFUSED_BEFORE_CHARGE: 'refused_before_charge',
-    FAILED_AFTER_CHARGE: 'failed_after_charge',
-    HANDED_OFF_TO_ISSUER: 'handed_off_to_issuer',
-  },
-}));
+vi.mock('@ui/adapters/payments/checkout', () => ({ confirmPayment: vi.fn() }));
 vi.mock('@stripe/react-stripe-js', () => ({
   ExpressCheckoutElement: () => null,
   PaymentElement: () => null,
@@ -41,7 +33,7 @@ vi.mock('@ui/modules/core/primitives/Button', () => ({
 vi.mock('./ExpressCheckoutFixture', () => ({ ExpressCheckoutFixture: () => null }));
 
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
-import { ConfirmPaymentOutcome, confirmPayment } from '@ui/adapters/payments/checkout';
+import { confirmPayment } from '@ui/adapters/payments/checkout';
 import { CheckoutForm } from './CheckoutForm';
 
 const NON_BREAKING_SPACES = /[  ]/g;
@@ -108,10 +100,7 @@ const submitPayment = async (messages: object) => {
 
 describe('CheckoutForm failure reporting', () => {
   it('renders the translated message for a machine code instead of the code itself', async () => {
-    vi.mocked(confirmPayment).mockResolvedValue({
-      outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE,
-      error: 'internal_error',
-    });
+    vi.mocked(confirmPayment).mockResolvedValue({ success: false, error: 'internal_error' });
 
     await submitPayment(messagesWithErrors);
 
@@ -120,10 +109,7 @@ describe('CheckoutForm failure reporting', () => {
   });
 
   it('never tells a payer their card was not charged when it was, and activation is what failed', async () => {
-    vi.mocked(confirmPayment).mockResolvedValue({
-      outcome: ConfirmPaymentOutcome.FAILED_AFTER_CHARGE,
-      error: 'internal_error',
-    });
+    vi.mocked(confirmPayment).mockResolvedValue({ success: false, error: 'internal_error', charged: true });
 
     await submitPayment(messagesWithErrors);
 
@@ -133,10 +119,7 @@ describe('CheckoutForm failure reporting', () => {
   });
 
   it('falls back to the generic message when the code has no key of its own', async () => {
-    vi.mocked(confirmPayment).mockResolvedValue({
-      outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE,
-      error: 'webhook_processing_failed',
-    });
+    vi.mocked(confirmPayment).mockResolvedValue({ success: false, error: 'webhook_processing_failed' });
 
     await submitPayment(messagesWithErrors);
 
@@ -144,10 +127,7 @@ describe('CheckoutForm failure reporting', () => {
   });
 
   it('keeps the prose Stripe already localised', async () => {
-    vi.mocked(confirmPayment).mockResolvedValue({
-      outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE,
-      error: 'Your card was declined.',
-    });
+    vi.mocked(confirmPayment).mockResolvedValue({ success: false, error: 'Your card was declined.' });
 
     await submitPayment(messagesWithErrors);
 
@@ -155,10 +135,7 @@ describe('CheckoutForm failure reporting', () => {
   });
 
   it('sends the machine code to analytics, never the translated message', async () => {
-    vi.mocked(confirmPayment).mockResolvedValue({
-      outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE,
-      error: 'internal_error',
-    });
+    vi.mocked(confirmPayment).mockResolvedValue({ success: false, error: 'internal_error' });
 
     await submitPayment(messagesWithErrors);
 
@@ -166,7 +143,7 @@ describe('CheckoutForm failure reporting', () => {
   });
 
   it('reports a stable code to analytics when the failure carries none', async () => {
-    vi.mocked(confirmPayment).mockResolvedValue({ outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE, error: '' });
+    vi.mocked(confirmPayment).mockResolvedValue({ success: false, error: '' });
 
     await submitPayment(messagesWithErrors);
 

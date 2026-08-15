@@ -31,12 +31,7 @@ failure channel onto a status code. Business logic that lands here is in the wro
 
 1. Serves `/api/markdown` (only to attach `Cache-Control` and `Vary: Accept`).
 2. Rewrites any request carrying `Accept: text/markdown` to `/api/markdown?path=<pathname>`, so every HTML
-   URL has a Markdown twin without a second route existing. **That promise is only as good as
-   `buildMarkdownPage`'s route table** — it matched `/planner` on a substring and handed every other path the
-   homepage body, so the four legal pages and the confirmation page each answered with the marketing copy
-   under the homepage's title. Routes are now listed explicitly with the `metadata.*` entry they take their
-   title and description from; a new route added to the middleware's reach needs a row there, or it inherits
-   the homepage again.
+   URL has a Markdown twin without a second route existing.
 3. Redirects `**/payment/confirmation` to the locale home when `payment_intent` is absent.
 4. Runs the `next-intl` middleware, which negotiates the locale and fills the `[locale]` segment.
 5. Re-writes the `NEXT_LOCALE` cookie next-intl just set, through `setLocaleCookie`
@@ -88,19 +83,10 @@ Every route that needs metadata keeps a sibling `metadata.ts` exporting `generat
 page re-exports (`export { generateMetadata } from './metadata';`). The split is what makes the metadata
 unit-testable on its own — hence the `metadata.test.ts` next to each one.
 
-**The shape lives in one module; each file supplies only what its route knows.** `buildMetadata` under
-`@infrastructure/seo` owns `metadataBase`, the `alternates` pair, `openGraph`, `twitter`, the `robots` block
-and `other`. A route file resolves `siteUrl` through `getPublicEnv.ts`, pulls its copy from a `metadata.*`
-namespace, and passes strings: `title`, optional `description` and `keywords`, an optional `path`, and
-`indexable`. Two rules are derived rather than repeated — `openGraph` appears when there is a description,
-and `images`/`twitter`/`keywords` only when the route is indexable — which is exactly what the seven files
-did by hand.
-
-They were seven copies of one 43-line shape; the four `legal/` ones were identical bar a namespace and a
-path repeated three times each. The translation call stays per-route on purpose: `getTranslations` types its
-keys against the namespace, so resolving the strings at the call site is what keeps a typo in a message key a
-compile error instead of a runtime blank. A new route that skips the `alternates` block ships six URLs
-competing for the same ranking — passing `path` is what prevents it.
+All of them follow the same shape: resolve `siteUrl` through `getPublicEnv.ts`, pull copy from a
+`metadata.*` translation namespace, and set `alternates.canonical` / `alternates.languages` from
+`localePath` / `localeAlternates`. A new route that skips the `alternates` block ships six URLs competing
+for the same ranking.
 
 ## API route handlers
 
@@ -239,18 +225,11 @@ rather than reaching for the environment themselves.
 
 ## SEO files
 
-**One table says which routes exist and which are public.** `SITE_ROUTES` under `@infrastructure/seo` carries
-a `path`, an `indexable` flag and the sitemap hints, and three readers derive from it: `sitemap.ts` emits the
-cross-product of the six locales and `indexableRoutes()`, `robots.ts` disallows every locale-expanded
-`privateRoutes()` path, and each `metadata.ts` asks `isIndexable(PATH)` rather than restating the answer.
-**Adding a route is one row.**
-
-That used to be three edits in three files — a `ROUTES` entry, a `DISALLOWED_PAGES` prefix, and
-`robots: { index: false }` — with nothing tying them together. It also closed a hole: `DISALLOWED_PAGES`
-blocked the prefixes `/legal/` and `/payment/`, so a private route anywhere else was disallowed by nobody.
-`isIndexable` **fails closed** — a path with no row is treated as private — so the failure mode of forgetting
-the table is a page missing from the sitemap, not a private page advertised to crawlers. `routes.test.ts`
-pins that, and `robots.test.ts` additionally pins that nothing the sitemap advertises is disallowed.
+`sitemap.ts` emits the cross-product of the six locales and a hard-coded `ROUTES` list — currently the
+homepage and `/planner`. Legal and payment pages are absent on purpose; `robots.ts` disallows the same two
+prefixes via `DISALLOWED_PAGES`, expanded per locale. A new public route needs an entry in `ROUTES`, and
+a new private one needs an entry in `DISALLOWED_PAGES` **and** `robots: { index: false }` in its
+`metadata.ts`.
 
 Both files resolve the base URL from the Cloudflare env rather than a constant. Only `sitemap.ts` gets the
 host it is actually served from, though: `robots.ts` is prerendered, so it bakes whatever the build resolved

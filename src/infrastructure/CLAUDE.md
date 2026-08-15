@@ -15,13 +15,12 @@ The largest single thing in here is a browser file — the Web Worker.
 
 | Directory | Contents |
 | --- | --- |
-| `actions/` | The two `'use server'` entry points: `payment.ts` and `contact.ts`. They read request-scoped config and hand it to the matching operation under `api/operations/` |
-| `api/` | The wire vocabulary for failures, the no-store response helper, and the operations both transports terminate. See [`api/CLAUDE.md`](./api/CLAUDE.md) |
+| `actions/` | The two `'use server'` entry points: `payment.ts` and `contact.ts`. They read request-scoped config and terminate an Effect program |
+| `api/` | The wire vocabulary for failures and the one no-store response helper. See [`api/CLAUDE.md`](./api/CLAUDE.md) |
 | `clients/` | SDK wrappers — four Effect service tags plus four modules that are deliberately not services. See [`clients/CLAUDE.md`](./clients/CLAUDE.md) |
 | `i18n/` | `routing.ts` (next-intl routing, `localePrefix: 'as-needed'`), `config.ts` (request config + message loading), `locales.ts` (the six codes), `cookie.ts` (`NEXT_LOCALE`), `utils/url.ts` (`localePath`, `getLocaleFromPathname`, `localeAlternates`) |
 | `images/` | `loader.ts` — rewrites an image src to `/cdn-cgi/image/...`, the Cloudflare optimiser used in place of Next's built-in one ([ADR 0004](../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)) |
 | `markdown/` | `buildMarkdownPage.ts` — the Markdown twin of a page, served when the request asks for `text/markdown` |
-| `seo/` | `buildMetadata.ts` — the `Metadata` shape every route's `generateMetadata` fills in; `routes.ts` — `SITE_ROUTES`, the one list of pages and whether each is indexable |
 | `proxy/` | Middleware helpers: `location.ts` (country detection + cookie) and `cookie.ts` (`user-country`, one week) |
 | `services/` | Everything with a purpose but no SDK of its own: `contact/`, `countries/`, `env/`, `holidays/`, `location/`, `payments/`, `premium/`, `regions/`. Three carry their own guides — [holidays](./services/holidays/CLAUDE.md), [location](./services/location/CLAUDE.md), [payments](./services/payments/CLAUDE.md) |
 | `well-known/` | `apiCatalog.ts` (RFC 9727 linkset), `mcpServerCard.ts` (SEP-1649), `agentSkillsIndex.ts` — all three return a `NextResponse` directly |
@@ -90,17 +89,15 @@ returns `undefined` so logging still works off-request), and `services/location/
 the Cloudflare context at all: it is the `cf-ipcountry` request header, read by `detectCountryFromHeaders`,
 which touches no context and is why the common path needs no geolocation service.
 
-## Two transports per operation, one implementation
+## Two entry points per operation
 
-Payment creation and contact submission are each reachable two ways: a route handler under `src/app/api/` and
-a server action here. They no longer restate the operation. Both call the module under
-[`api/operations/`](./api/CLAUDE.md), which owns the rate limit, the use-case, the deferred write and the
-failure-to-status mapping, and answers a transport-free `{ status, body }`. The action drops the status; the
-route puts it on a `NextResponse`.
+Payment creation and contact submission each exist twice: as a route handler under `src/app/api/` and as a
+server action here. They are meant to stay behaviourally identical, and they are not checked against each
+other — grep both when you change either. `actions/payment.ts` must call `checkRateLimit` before
+`createPayment` for the same reason `src/app/api/payment/route.ts` does.
 
-`actions/payment.ts` cannot forget to rate-limit before creating a payment, because it no longer does either —
-that ordering lives in the operation and is asserted once. The two used to be kept equal by grep, and had
-already drifted over how a missing IP header was recorded.
+The status-and-code half of that agreement is documented in [`api/CLAUDE.md`](./api/CLAUDE.md), including the
+places where the two already differ.
 
 ## Gotchas
 

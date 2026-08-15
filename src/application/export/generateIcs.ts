@@ -1,7 +1,6 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { addDays } from '@application/shared/utils/dates';
+import { addDays, toIcsDate, toIcsTimestamp } from '@application/shared/utils/dates';
 import { sanitize } from './utils/sanitizer';
-import { toIcsDate, toIcsTimestamp } from './utils/serializers';
 
 interface IcsEvent {
   uid: string;

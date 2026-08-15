@@ -137,15 +137,8 @@ passing. `core/animate/` is tested close to exhaustively; `core/primitives/` has
 homepage sections, `shared/utils/helpers.ts`, the two forms that render an API failure, and — because both
 held a defect that no type or lint rule can catch — `sidebar/components/PtoCalculator.tsx` and
 `PtoSalaryCalculator.tsx`, whose cases drive the real inputs and assert on what the field and the caption
-actually show). Components whose body is markup plus translation calls are left to the Playwright suite in
-`e2e/` instead.
-
-**Be precise about what that buys, because it is less than "covered".** The `e2e/` specs are smoke tests: a
-page answers 200, has a non-empty `<title>`, carries the right `lang`, and a handful of section ids and links
-are visible. Nothing there drives the planner — no budget change, no calculation, no day toggled, no Premium
-gate — so a component reached only through `e2e/` is proven to *mount inside a page that renders*, and
-nothing more. Reading "covered by e2e" as "its behaviour is asserted somewhere" is how a defect in an
-untested component survives a green suite. If a component has behaviour, it needs a co-located test.
+actually show). Components whose body is markup plus translation calls are covered by the Playwright
+suite in `e2e/` instead.
 
 When a component is mocked in a sibling's test, mock the module path it actually imports —
 `premium/CheckoutForm.test.tsx` mocks both `boneyard-js/react` and `./ExpressCheckoutFixture`, because
@@ -159,14 +152,6 @@ does not reach a listener on `document`. `tracking/BetterStackTracking.tsx` list
 `cc:onConsent`/`cc:onChange` handlers never fired and the snippet was never injected — `window.betterstack`
 stayed undefined and every `track()` and `identifyUser()` call no-opped for **every** consenting visitor.
 `shared/cookie-consent/CookieConsent.tsx` already used `window` for `cc:showPreferences`; the two now agree.
-
-**One module answers what has been consented to, and every reader uses it.**
-`shared/cookie-consent/utils/consent.ts` holds the analytics service ids and three functions over them —
-`isServiceConsented`, `consentedAnalyticsServices`, `allAnalyticsServices`. `CookieConsent.tsx` derived that
-state inline at three separate call sites (the initial read, `onConsent` and `onChange`), and
-`tracking/BetterStackTracking.tsx` answered the same question through a different library call. Two
-mechanisms for one question is exactly how the category-versus-service bug below shipped; both now read
-`acceptedService`, through this module.
 
 **Consent is collected per service, so it has to be *read* per service.** The preferences dialog offers
 `ga4` and `betterStack` as separate switches, but both gates asked `acceptedCategory('analytics')`, which the

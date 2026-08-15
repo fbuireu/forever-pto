@@ -18,57 +18,19 @@ in [`CONTEXT.md`](../../../CONTEXT.md).
 | `utils/cache.ts` | `getKey`, `getCombinationKey`, `createHolidaySet`, and the two `clear*` functions the caller must use |
 | `utils/helpers.ts` | `getAvailableWorkdays` (Workday enumeration) and `findBridges` (candidate generation and ranking) |
 | `utils/selection.ts` | `resolveSelectedDays` — folds Manual Days in and Removed Days out of a Suggestion's day list |
-| `utils/budget.ts` | `measureBudget` — how much of the PTO budget a plan has spent, and the Remaining Budget |
 | `suggestions/generateSuggestions.ts` | The entry point: Workdays → Bridges → Strategy selector → Suggestion |
 | `suggestions/utils/selectors.ts` | `selectBridgesForStrategy` (Grouped, Optimized) and `selectOptimalDaysFromBridges` (Balanced) |
-| `pipeline.ts` | `runPlanningPipeline` — the whole run: caches, pseudo-Holidays, budget, the two planning calls and the Metrics |
 | `alternatives/generateAlternatives.ts` | Re-runs selection under seven different Bridge orderings to produce distinct Alternatives |
 | `metrics/generateMetrics.ts` | Assembles the `Metrics` object for a Suggestion or an Alternative |
-| `metrics/utils/streaks.ts` | `freeStreaks` — the one scan of the free-day runs the plan produces |
 | `metrics/utils/helpers.ts` | One function per metric — Long Weekends, Rest Blocks, Max Work Streak, Longest Vacation, Worked Days per month, quarterly and monthly distribution — plus `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER` and the three `window*` helpers that size those distributions |
 
 ## Public API
 
-**`runPlanningPipeline` is the entry point the outside world calls.** One function, one input object, one
-result:
-
-```
-runPlanningPipeline({ year, ptoDays, autoSuggestCount?, holidays, manuallySelectedDays?,
-                      removedSuggestedDays?, allowPastDays, months, strategy, locale, maxAlternatives })
-  → { planned, suggestion, alternatives }
-```
-
-It owns everything a run needs and a caller used to have to remember: clearing both caches, turning Manual
-Days into `manual-N` pseudo-Holidays, deriving `carryOverMonths` from `months.length`, computing
-`effectivePtoDays`, short-circuiting when there is nothing to plan, and measuring the Suggestion and every
-Alternative with the same arguments. `planned: false` is the short circuit — the suggestion it carries is
-empty but its Metrics are real, measured by the engine, so no caller has to invent a zeroed object.
-
-**`PlanningResult` is a discriminated union, and everything in it is a `MeasuredSuggestion`.** `Suggestion`
-declares `metrics?` because the two generators produce one without Metrics; this pipeline never does, on
-either branch. Saying so in the type is what lets the stores and the whole planner screen read
-`suggestion.metrics.totalEffectiveDays` rather than `metrics?.x ?? 0` — six files used to guard against a
-state this producer cannot be in, which turns a genuine regression into a silent zero instead of a type
-error. `MeasuredSuggestion` is `Suggestion & { metrics: Metrics }` and it travels: the worker's wire type
-requires `metrics`, `deserializeSuggestion` returns one, and `HolidaysState` holds them. The one place that
-has to earn it is rehydration — `onRehydrateStorage` drops a persisted Suggestion with no Metrics rather
-than pretending, because a stored blob is the only input the type cannot vouch for.
-
-The three generators below are still exported and still tested on their own, but nothing outside the domain
-calls them directly:
+Three entry points, all called from outside the domain and never from each other:
 
 - `generateSuggestions({ ptoDays, holidays, allowPastDays, months, strategy, removedDays? })` → `{ days, bridges?, strategy }`
 - `generateAlternatives({ …, maxAlternatives, existingSuggestion, removedDays? })` → `Suggestion[]`
 - `generateMetrics({ suggestion, locale, year, bridges, holidays, allowPastDays, manuallySelectedDays?, removedSuggestedDays?, carryOverMonths? })` → `Metrics`
-
-**`measureBudget` is the one place the budget arithmetic lives, and it is built on `resolveSelectedDays` so it
-cannot disagree with the Metrics.** It answers `{ suggested, manual, spent, remaining }` for a budget and a
-plan; `spent` is exactly `resolveSelectedDays(...).length`, which is the same denominator Efficiency uses, and
-`remaining` is the Remaining Budget as [`CONTEXT.md`](../../../CONTEXT.md) defines it — clamped at zero. That
-arithmetic used to be written out at four call sites plus a fifth copy behind a store action nothing called;
-the store action was the only one with tests. `toggleDaySelection`, `PlannerPanel`'s status readout and the
-sidebar's budget control all route through this now. A new caller asking "how many days are left" imports
-this rather than subtracting two lengths.
 
 `resolveSelectedDays` is the fourth export the outside world uses: `generateMetrics` applies it to its own
 input, and `CalendarExport.tsx` applies it again so the exported calendar contains exactly the days the
@@ -154,16 +116,6 @@ actually placed, not merely any free weekday. Holidays still extend a stretch �
 [`CONTEXT.md`](../../../CONTEXT.md) sets for Longest Vacation, *the longest stretch the plan produces*, and
 it is why the fix belongs in the streak test rather than in the Holiday list the engine is handed.
 
-**Three metrics walk the free-day runs, and they walk them once.** `freeStreaks` builds the placed-day set,
-unions it with the Holidays, expands seven days either side of the data and yields each unbroken run of Free
-Days with two facts attached: whether it contains a day the plan placed, and whether it contains a weekend.
-Longest Vacation, Long Weekends and Long Blocks are then predicates over that sequence — `hasPlacedDay`,
-`length >= 3 && hasWeekend && hasPlacedDay`, and `length >= 3` anchored on the first day inside the window.
-
-Each used to own its copy: three near-identical loops and five separate constructions of the same
-"placed days ∪ Holidays" set. That is how the placed-day rule below came to be applied by one and not the
-other. A new metric about stretches of time off belongs here as a predicate, not as a fourth loop.
-
 **`calculateLongWeekends` and `calculateLongestVacation` both apply it, and for a while only the first did.**
 Longest Vacation folded every free run into its maximum as the streak grew, so it reported whatever the
 longest holiday-and-weekend run in the two-year set happened to be — including one lying entirely in
@@ -212,14 +164,6 @@ reach it.
 their input unless the caller sets `presorted: true`. `generateAlternatives` exists to impose its own
 orderings, so without the flag every ordering would collapse back to the same greedy result and all seven
 "alternatives" would be identical.
-
-It is a precondition the callee cannot check, which normally argues for taking the *ordering* instead of a
-claim about it — and that does not work here, so do not re-propose it. Past the seventh comparator
-`generateAlternatives` **rotates** an already-sorted array rather than sorting again, and a rotation is not
-expressible as a comparator: `presorted: true` is the only way to say "walk exactly this array". The
-alternatives are a branded ordered-array type, which buys type safety at the cost of ceremony on the hottest
-path in the engine, or a renamed flag, which is the same boolean wearing better clothes. The flag has one
-caller and `generateAlternatives.test.ts` pins the distinctness it protects.
 
 **The seventh Alternative ordering sorts on `Math.sin` on purpose.** Six of the comparators in
 `generateAlternatives.ts` bias selection along a real axis — Efficiency, span, PTO cost, month, and
@@ -310,19 +254,22 @@ every production call site stores the Holiday set under the same fixed `'default
 therefore reuses the first run's Holidays unless someone clears it — silently, because a stale Holiday set
 is structurally valid.
 
-**`runPlanningPipeline` owns the clear, and nothing else in production calls it.** `clearDateKeyCache()` and
-`clearHolidayCache()` open the pipeline; they must not move into a *generator*, because one run calls
+**The caller that owns a run owns the clear.** `clearDateKeyCache()` and `clearHolidayCache()` must be
+called before every full calculation, and never from inside the engine: one run calls
 `generateSuggestions` and `generateAlternatives` separately and both must see the same memoised set, so
-clearing there would destroy the sharing the caches exist for. The pipeline sits above both, which is what
-makes it the right owner — it is the only code that knows where a run begins.
+clearing internally would destroy the sharing the caches exist for.
 
-That is an amendment to [ADR 0006](../../../docs/adr/0006-caller-owned-calculation-caches.md), which
-originally put the clear at each caller because the orchestration lived at each caller. It no longer does.
-`worker.ts` and the holidays store's `generateSuggestions` action now pass inputs and read a result; neither
-knows the caches exist, and a new entry point cannot forget a step it never had.
+There are two callers, and both must keep clearing:
 
-`fetchHolidays` replaces the Holiday set without planning, and `toggleDaySelection` recomputes Metrics, which
-reach neither cache — a `clear` in either would evict a set the next run is about to rebuild anyway.
+- `worker.ts` under `@infrastructure/workers` — the path the planner actually uses.
+- `holidays.ts` under `@application/stores` — the main-thread path behind the Troubleshooting reset. Its
+  `generateSuggestions` action is the only place it clears, because it is the only one of its actions that
+  starts a run. `fetchHolidays` replaces the Holiday set without calling the engine, and `toggleDaySelection`
+  recomputes Metrics, which reach neither cache; a `clear` in either would evict a set the run that follows
+  is about to rebuild anyway.
+
+A third caller means replacing the fixed key with one derived from the Holiday set rather than adding a
+third `clear` call. See [ADR 0006](../../../docs/adr/0006-caller-owned-calculation-caches.md).
 
 `getKey` is keyed on `Date.getTime()`, so two `Date` objects for the same day at different times of day
 produce two cache entries with the same string value — harmless, but it is why every date the engine

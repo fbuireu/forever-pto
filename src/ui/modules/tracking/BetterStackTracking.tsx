@@ -2,13 +2,14 @@
 
 import { usePremiumStore } from '@application/stores/premium';
 import { identifyUser } from '@infrastructure/clients/logging/better-stack/tracking';
-import { BETTER_STACK_SERVICE_ID, isServiceConsented } from '@ui/modules/shared/cookie-consent/utils/consent';
 import Script from 'next/script';
 import { useEffect, useState } from 'react';
+import * as CookieConsentLib from 'vanilla-cookieconsent';
 import { useShallow } from 'zustand/shallow';
 
 const TRACKING_TOKEN = process.env.NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN;
 const ENV = process.env.NODE_ENV;
+const BETTER_STACK_SERVICE_ID = 'betterStack';
 
 export const BetterStackTracking = () => {
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
@@ -22,7 +23,7 @@ export const BetterStackTracking = () => {
 
   useEffect(() => {
     const readConsent = () => {
-      setAnalyticsEnabled(isServiceConsented(BETTER_STACK_SERVICE_ID));
+      setAnalyticsEnabled(CookieConsentLib.acceptedService(BETTER_STACK_SERVICE_ID, 'analytics'));
     };
 
     readConsent();

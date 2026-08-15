@@ -1,10 +1,4 @@
 {
-  "a11y": {
-    "closeDialog": "Tanca",
-    "toggleSidebar": "Mostra o amaga la barra lateral",
-    "sidebarLandmark": "Controls del planificador",
-    "radialNavigation": "Navegació de funcions"
-  },
   "metadata": {
     "title": "Forever PTO - Gestiona les teves vacances",
     "description": "Planifica i optimitza les teves vacances i dies lliures amb Forever PTO. Troba els millors ponts i maximitza el teu temps lliure.",
@@ -69,9 +63,9 @@
       "regional": "reg.",
       "custom": "prop.",
       "effectiveDays": "Dies efectius",
-      "overBudget": "sobre el teu pressupost de {ptoDays} {ptoDays, plural, one {dia} other {dies}}",
+      "overBudget": "sobre el teu pressupost de {ptoDays} dies",
       "gain": "Guany",
-      "perPtoDay": "del teu pressupost de {ptoDays} {ptoDays, plural, one {dia} other {dies}}",
+      "perPtoDay": "del teu pressupost de {ptoDays} dies",
       "longWeekends": "Ponts de cap de setmana",
       "restBlocks": "Blocs de descans",
       "efficiency": "Eficiència",
@@ -661,8 +655,7 @@
       "email_required": "Introdueix el teu email.",
       "invalid_email": "Aquest email no sembla correcte.",
       "invalid_body": "No hem pogut llegir aquesta petició. Torna-ho a provar.",
-      "rate_limit_exceeded": "Massa intents. Espera un moment i torna-ho a provar.",
-      "promo_code_too_long": "Aquest codi promocional és massa llarg."
+      "rate_limit_exceeded": "Massa intents. Espera un moment i torna-ho a provar."
     }
   },
   "donate": {
@@ -718,8 +711,7 @@
       "amountMin": "La quantitat mínima és 1",
       "amountMax": "La quantitat màxima és 10.000",
       "invalidEmail": "Es requereix un email vàlid",
-      "emailRequired": "L'email és obligatori",
-      "promoCodeTooLong": "El codi promocional és massa llarg"
+      "emailRequired": "L'email és obligatori"
     },
     "holiday": {
       "nameRequired": "El nom del festiu és obligatori",

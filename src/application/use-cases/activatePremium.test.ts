@@ -34,7 +34,7 @@ const SUCCEEDED_INTENT = {
 const mockStripe = {
   paymentIntents: { retrieve: vi.fn(() => Effect.succeed(SUCCEEDED_INTENT) as never), create: vi.fn() },
   charges: { retrieve: vi.fn() },
-  promotionCodes: { list: vi.fn() },
+  promotionCodes: { list: vi.fn(), retrieve: vi.fn() },
   webhooks: { constructEvent: vi.fn() },
 };
 

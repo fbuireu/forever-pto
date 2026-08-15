@@ -1,6 +1,6 @@
 'use client';
 
-import { MAX_CARRY_OVER_MONTHS, MIN_CARRY_OVER_MONTHS, useFiltersStore } from '@application/stores/filters';
+import { useFiltersStore } from '@application/stores/filters';
 import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { SlidersHorizontal } from '@ui/modules/core/animate/icons/SlidersHorizontal';
@@ -10,8 +10,8 @@ import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const MIN_VALUE = MIN_CARRY_OVER_MONTHS;
-const MAX_VALUE = MAX_CARRY_OVER_MONTHS;
+const MIN_VALUE = 1;
+const MAX_VALUE = 12;
 const DEBOUNCE_DELAY = 300;
 
 export const CarryOverMonths = () => {

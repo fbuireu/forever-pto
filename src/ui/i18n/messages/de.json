@@ -1,10 +1,4 @@
 {
-  "a11y": {
-    "closeDialog": "Schließen",
-    "toggleSidebar": "Seitenleiste ein- oder ausblenden",
-    "sidebarLandmark": "Planer-Einstellungen",
-    "radialNavigation": "Funktionsnavigation"
-  },
   "metadata": {
     "title": "Forever PTO – Verwalte deine freien Tage",
     "description": "Plane und optimiere deine PTO-Tage und Feiertage mit Forever PTO. Finde die besten langen Wochenenden und maximiere deine freie Zeit.",
@@ -69,9 +63,9 @@
       "regional": "reg.",
       "custom": "eigene",
       "effectiveDays": "Effektive Tage",
-      "overBudget": "über dein Budget von {ptoDays} {ptoDays, plural, one {Tag} other {Tagen}}",
+      "overBudget": "über dein Budget von {ptoDays} Tagen",
       "gain": "Gewinn",
-      "perPtoDay": "deines Budgets von {ptoDays} {ptoDays, plural, one {Tag} other {Tagen}}",
+      "perPtoDay": "deines Budgets von {ptoDays} Tagen",
       "longWeekends": "Lange Wochenenden",
       "restBlocks": "Ruheblöcke",
       "efficiency": "Effizienz",
@@ -661,8 +655,7 @@
       "email_required": "Gib deine E-Mail-Adresse ein.",
       "invalid_email": "Diese E-Mail-Adresse sieht nicht richtig aus.",
       "invalid_body": "Wir konnten diese Anfrage nicht lesen. Bitte versuche es noch einmal.",
-      "rate_limit_exceeded": "Zu viele Versuche. Warte einen Moment und versuche es noch einmal.",
-      "promo_code_too_long": "Dieser Promo-Code ist zu lang."
+      "rate_limit_exceeded": "Zu viele Versuche. Warte einen Moment und versuche es noch einmal."
     }
   },
   "donate": {
@@ -718,8 +711,7 @@
       "amountMin": "Mindestbetrag ist 1",
       "amountMax": "Höchstbetrag ist 10.000",
       "invalidEmail": "Gib eine gültige E-Mail-Adresse ein.",
-      "emailRequired": "Gib deine E-Mail-Adresse ein.",
-      "promoCodeTooLong": "Der Promo-Code ist zu lang"
+      "emailRequired": "Gib deine E-Mail-Adresse ein."
     },
     "holiday": {
       "nameRequired": "Name des Feiertags fehlt.",

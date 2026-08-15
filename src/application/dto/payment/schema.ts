@@ -5,7 +5,6 @@ interface PaymentSchemaMessages {
   amountMax: string;
   invalidEmail: string;
   emailRequired: string;
-  promoCodeTooLong: string;
 }
 
 const EMAIL_MAX_LENGTH = 254;
@@ -18,7 +17,7 @@ export const createPaymentSchemaWithMessages = (messages: PaymentSchemaMessages)
       .email({ message: messages.invalidEmail })
       .min(1, { message: messages.emailRequired })
       .max(EMAIL_MAX_LENGTH, { message: messages.invalidEmail }),
-    promoCode: z.string().max(PROMO_CODE_MAX_LENGTH, { message: messages.promoCodeTooLong }).optional(),
+    promoCode: z.string().max(PROMO_CODE_MAX_LENGTH).optional(),
   });
 
 export const createPaymentSchema = createPaymentSchemaWithMessages({
@@ -26,7 +25,6 @@ export const createPaymentSchema = createPaymentSchemaWithMessages({
   amountMax: 'amount_too_high',
   invalidEmail: 'invalid_email',
   emailRequired: 'email_required',
-  promoCodeTooLong: 'promo_code_too_long',
 });
 
 export type CreatePaymentInput = z.infer<typeof createPaymentSchema>;

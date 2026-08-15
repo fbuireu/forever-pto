@@ -10,7 +10,7 @@ const mockChargesRetrieve = vi.fn();
 const MockStripeLayer = Layer.succeed(StripeServerService, {
   paymentIntents: { create: vi.fn(), retrieve: vi.fn() },
   charges: { retrieve: mockChargesRetrieve },
-  promotionCodes: { list: vi.fn() },
+  promotionCodes: { list: vi.fn(), retrieve: vi.fn() },
   webhooks: { constructEvent: vi.fn() },
 });
 

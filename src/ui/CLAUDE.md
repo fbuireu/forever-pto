@@ -22,22 +22,16 @@ This layer may import from `@application/*` — stores, DTO types, `@application
 
 Imports from `@infrastructure/*` are allowed where there is no alternative, and the list is short enough to keep honest: `i18n/locales`, the BetterStack tracking helper (the logging client itself only through a dynamic import, see below), `errors`, the worker types and serializers, `services/env/getPublicEnv`, `services/countries/getCountries`, the Stripe browser client, the driver.js tutorial client, and the `actions/payment` and `actions/contact` server actions. Anything beyond outbound I/O the UI genuinely initiates does not belong here.
 
-**A confirmation without a PaymentIntent is a redirect hand-off, not a failure.** `adapters/payments/checkout.ts` confirms with `redirect: 'if_required'`, and Stripe then resolves with no `paymentIntent` when it sent the user off to the issuer instead. The adapter logs a warning and answers `HANDED_OFF_TO_ISSUER` — its own case, neither success nor failure, so no caller has to decide what an empty error string meant: the session is activated by the `api/payment/activate` route Stripe returns to, which sets the cookie and then redirects to `payment/confirmation`. Treating that branch as an error — or activating Premium from it — breaks the redirect flow. `modules/premium/CheckoutForm.tsx` is what points `return_url` at that route; sending it straight to the confirmation page instead silently reinstates the bug where a redirect payer was told Premium was active and was never given it. See [`../app/CLAUDE.md`](../app/CLAUDE.md) under *The redirect hand-off*.
+**A confirmation without a PaymentIntent is a redirect hand-off, not a failure.** `adapters/payments/checkout.ts` confirms with `redirect: 'if_required'`, and Stripe then resolves with no `paymentIntent` when it sent the user off to the issuer instead. The adapter logs a warning and returns unsuccessfully on purpose: the session is activated by the `api/payment/activate` route Stripe returns to, which sets the cookie and then redirects to `payment/confirmation`. Treating that branch as an error — or activating Premium from it — breaks the redirect flow. `modules/premium/CheckoutForm.tsx` is what points `return_url` at that route; sending it straight to the confirmation page instead silently reinstates the bug where a redirect payer was told Premium was active and was never given it. See [`../app/CLAUDE.md`](../app/CLAUDE.md) under *The redirect hand-off*.
 
 **A failed confirmation is not always a failed payment, and the copy must not say it is.** Once
 `confirmPayment` has a `PaymentIntent` back from Stripe the card is charged, so a failure after that point —
-the `POST /api/check-session` activation — is a *post-charge* failure. Getting that wrong showed a payer
-whose card had just been charged the `internal_error` copy, which reads "Your card has not been charged."
-
-**That distinction is a case in the result, not a flag on it.** `confirmPayment` answers a
-`ConfirmPaymentResult`: `SUCCEEDED` carries the session data, `REFUSED_BEFORE_CHARGE` and
-`FAILED_AFTER_CHARGE` carry the message, and `HANDED_OFF_TO_ISSUER` carries nothing because the browser has
-already navigated away. `CheckoutForm.tsx` switches on `outcome` and the compiler makes the switch total. It
-used to be an optional `charged: true` written on two of five return branches and absent — not `false` — on
-the other three, so every reader narrowed with `'charged' in result && result.charged === true`: once in the
-component and five times in its test, because there was no type either could lean on. A new failure branch
-now cannot compile without saying which side of the charge it is on; that used to be a rule stated here and
-checked in review.
+the `POST /api/check-session` activation — is a *post-charge* failure. `adapters/payments/checkout.ts` marks
+that branch `charged: true`, and `modules/premium/CheckoutForm.tsx` reads it before anything else and shows
+`checkout.activationFailed`. Without the flag the same branch fell through to `resolveApiErrorMessage`,
+which for the `internal_error` code renders "Your card has not been charged." — told to a payer whose card
+had just been charged. Any new failure branch added to that adapter has to declare which side of the charge
+it is on.
 
 **The BetterStack logging client is reached through a dynamic `import()`, never a static one.** Its module graph pulls `@logtail/edge` and `@opennextjs/cloudflare` in through its own top-level imports, so a static import puts both in the client chunk of every component that touches it. Every call site in this layer therefore looks like the one in the browser Stripe client, `clients/payments/stripe/client.ts`:
 

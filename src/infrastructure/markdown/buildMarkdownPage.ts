@@ -2,35 +2,13 @@ import { getLocaleFromPathname, localePath } from '@infrastructure/i18n/utils/ur
 import { getTranslations } from 'next-intl/server';
 import pkg from '../../../package.json';
 
-const MARKDOWN_ROUTES = [
-  { path: '/legal/cookie-policy', title: 'cookiePolicy.title', description: 'cookiePolicy.description' },
-  { path: '/legal/privacy-policy', title: 'privacyPolicy.title', description: 'privacyPolicy.description' },
-  { path: '/legal/terms-of-service', title: 'termsOfService.title', description: 'termsOfService.description' },
-  { path: '/legal/legal-notice', title: 'legalNotice.title', description: 'legalNotice.description' },
-  { path: '/payment/confirmation', title: 'paymentConfirmation.title', description: undefined },
-] as const;
-
 export async function buildMarkdownPage(baseUrl: string, pathname: string) {
   const locale = getLocaleFromPathname(pathname);
+  const isPlanner = pathname.includes('/planner');
+
   const t = await getTranslations({ locale, namespace: 'metadata' });
 
-  const route = MARKDOWN_ROUTES.find(({ path }) => pathname.includes(path));
-
-  if (route) {
-    return `# ${t(route.title)}
-
-${route.description ? `${t(route.description)}\n` : ''}
-## Version
-
-${pkg.version}
-
-## URL
-
-${baseUrl}${localePath(locale, route.path)}
-`;
-  }
-
-  if (pathname.includes('/planner')) {
+  if (isPlanner) {
     const tPlanner = await getTranslations({ locale, namespace: 'planner' });
 
     return `# ${t('planner.title')}

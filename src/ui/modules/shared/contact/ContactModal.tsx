@@ -39,7 +39,6 @@ type Step = (typeof Step)[keyof typeof Step];
 
 export const ContactModal = ({ open, onClose }: ContactModalProps) => {
   const t = useTranslations('contact');
-  const tA11y = useTranslations('a11y');
   const tValidation = useTranslations('validation.contact');
   const [step, setStep] = useState<Step>(Step.INPUT);
   const [isPending, startTransition] = useTransition();
@@ -110,7 +109,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-lg' closeLabel={tA11y('closeDialog')}>
+      <DialogContent className='sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-3'>
             <span className='size-9 bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[var(--shadow-brutal-3)] grid place-items-center shrink-0'>

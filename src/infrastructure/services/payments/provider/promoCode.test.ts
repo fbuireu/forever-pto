@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { validatePromoCode } = await import('./promoCode');
 
 const mockList = vi.fn();
+const mockRetrieve = vi.fn();
 
 const mockQuery = vi.fn((_sql: string, _args: unknown[]) => Effect.succeed([{ redemptions: 0 }]));
 
@@ -19,7 +20,7 @@ const MockTursoLayer = Layer.succeed(TursoService, {
 const MockStripeLayer = Layer.succeed(StripeServerService, {
   paymentIntents: { create: vi.fn(), retrieve: vi.fn() },
   charges: { retrieve: vi.fn() },
-  promotionCodes: { list: mockList },
+  promotionCodes: { list: mockList, retrieve: mockRetrieve },
   webhooks: { constructEvent: vi.fn() },
 });
 
@@ -81,7 +82,8 @@ beforeEach(() => {
 
 const setupMocks = (coupon: ReturnType<typeof makeCoupon>, promoCodeOverrides: PromoCodeOverrides = {}) => {
   const promotionCode = makePromoCode(promoCodeOverrides);
-  mockList.mockReturnValue(Effect.succeed({ data: [{ ...promotionCode, promotion: { type: 'coupon', coupon } }] }));
+  mockList.mockReturnValue(Effect.succeed({ data: [{ id: promotionCode.id }] }));
+  mockRetrieve.mockReturnValue(Effect.succeed({ ...promotionCode, coupon }));
 };
 
 describe('validatePromoCode', () => {
@@ -243,19 +245,10 @@ describe('validatePromoCode', () => {
       expect((error as PromoCodeError).code).toBe(PromoCodeErrors.INVALID_OR_EXPIRED);
     });
 
-    it('fails with FAILED_TO_LOAD when the promotion carries no coupon', async () => {
-      mockList.mockReturnValue(
-        Effect.succeed({ data: [{ ...makePromoCode(), promotion: { type: 'coupon', coupon: null } }] })
-      );
+    it('fails with FAILED_TO_LOAD when coupon is null on retrieve', async () => {
+      mockList.mockReturnValue(Effect.succeed({ data: [makePromoCode()] }));
+      mockRetrieve.mockReturnValue(Effect.succeed({ ...makePromoCode(), coupon: null }));
       const error = await runFlip('NULL', 10);
-      expect((error as PromoCodeError).code).toBe(PromoCodeErrors.FAILED_TO_LOAD);
-    });
-
-    it('fails with FAILED_TO_LOAD when the coupon came back unexpanded, as a bare id', async () => {
-      mockList.mockReturnValue(
-        Effect.succeed({ data: [{ ...makePromoCode(), promotion: { type: 'coupon', coupon: 'coup_abc' } }] })
-      );
-      const error = await runFlip('BARE', 10);
       expect((error as PromoCodeError).code).toBe(PromoCodeErrors.FAILED_TO_LOAD);
     });
 
@@ -266,46 +259,13 @@ describe('validatePromoCode', () => {
       const error = await runFlip('ERR', 10);
       expect((error as PromoCodeError).code).toBe(PromoCodeErrors.FAILED_TO_LOAD);
     });
-  });
 
-  describe('cent arithmetic', () => {
-    it('leaves a percentage discount on a whole number of cents, not on float noise', async () => {
-      setupMocks(makeCoupon({ percent_off: 90, amount_off: null }));
-
-      await expect(run('SAVE90', 10)).resolves.toMatchObject({ finalAmount: 1 });
-    });
-
-    it('admits a discount landing exactly on the 0.50 floor', async () => {
-      setupMocks(makeCoupon({ percent_off: 90, amount_off: null }));
-
-      await expect(run('SAVE90', 5)).resolves.toMatchObject({ finalAmount: 0.5 });
-    });
-  });
-
-  describe('the shape it asks Stripe for', () => {
-    it('asks for the coupon expanded, since a promotion code carries only its id', async () => {
-      setupMocks(makeCoupon());
-
-      await run('SAVE10', 10);
-
-      const [params] = mockList.mock.calls[0] as [{ expand?: string[] }];
-      expect(params.expand).toEqual(['data.promotion.coupon']);
-    });
-
-    it('reads the coupon from the promotion, which is where the API puts it', async () => {
-      setupMocks(makeCoupon({ percent_off: 25 }));
-
-      await expect(run('SAVE25', 100)).resolves.toMatchObject({ type: 'percent', value: 25, finalAmount: 75 });
-    });
-
-    it('never reaches for a top-level coupon field, which this API version does not send', async () => {
-      const coupon = makeCoupon({ percent_off: 25 });
-      mockList.mockReturnValue(
-        Effect.succeed({ data: [{ ...makePromoCode(), coupon, promotion: { type: 'coupon', coupon: null } }] })
+    it('fails with FAILED_TO_LOAD when retrieve() rejects', async () => {
+      mockList.mockReturnValue(Effect.succeed({ data: [makePromoCode()] }));
+      mockRetrieve.mockReturnValue(
+        Effect.fail(new PromoCodeError({ code: PromoCodeErrors.FAILED_TO_LOAD, message: 'retrieve error' }))
       );
-
-      const error = await runFlip('SAVE25', 100);
-
+      const error = await runFlip('ERR', 10);
       expect((error as PromoCodeError).code).toBe(PromoCodeErrors.FAILED_TO_LOAD);
     });
   });

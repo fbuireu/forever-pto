@@ -1,15 +1,15 @@
 import { regionDTO } from '@application/dto/region/dto';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { dateHolidaysSource } from '@infrastructure/services/holidays/source/dateHolidays';
-import type { HolidaySource } from '@infrastructure/services/holidays/source/types';
+import Holidays from 'date-holidays';
 
 const logger = getBetterStackInstance();
 
-export function getRegions(countryCode?: string, source: HolidaySource = dateHolidaysSource) {
+export function getRegions(countryCode?: string) {
   if (!countryCode) return [];
 
   try {
-    const regions = source.regionsOf(countryCode);
+    const holidays = new Holidays(countryCode);
+    const regions = holidays.getStates(countryCode.toLowerCase());
 
     if (!regions || !Object.values(regions).length) return [];
 

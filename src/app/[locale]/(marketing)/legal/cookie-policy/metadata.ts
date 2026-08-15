@@ -1,12 +1,8 @@
 import { localeAlternates, localePath } from '@infrastructure/i18n/utils/url';
-import { buildMetadata } from '@infrastructure/seo/buildMetadata';
-import { isIndexable } from '@infrastructure/seo/routes';
 import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
-
-const PATH = '/legal/cookie-policy';
 
 interface GenerateMetadataParams {
   params: Promise<{ locale: Locale }>;
@@ -19,12 +15,28 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
     getTranslations({ locale, namespace: 'metadata.cookiePolicy' }),
   ]);
 
-  return buildMetadata({
-    baseUrl,
-    locale,
-    path: PATH,
+  return {
     title: t('title'),
     description: t('description'),
-    indexable: isIndexable(PATH),
-  });
+    metadataBase: new URL(baseUrl),
+    alternates: {
+      canonical: localePath(locale, '/legal/cookie-policy'),
+      languages: localeAlternates('/legal/cookie-policy'),
+    },
+    openGraph: {
+      title: t('title'),
+      description: t('description'),
+      url: localePath(locale, '/legal/cookie-policy'),
+      siteName: 'Forever PTO',
+      locale,
+      type: 'website',
+    },
+    robots: {
+      index: false,
+      follow: false,
+    },
+    other: {
+      'text-scale': 'scale',
+    },
+  };
 }

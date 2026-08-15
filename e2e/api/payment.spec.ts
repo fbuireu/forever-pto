@@ -2,12 +2,6 @@ import { expect, test } from '@playwright/test';
 
 const URL = '/api/payment';
 
-// Serial, and the burst case stays last: the route rate-limits on cf-connecting-ip before it parses the
-// body, every test here shares the runner's single IP, and the window is 10 requests per 60s. Run in
-// parallel and the burst drains the budget under the four tests that assert 400, which then see 429 —
-// and `retries` re-runs them inside the same window, so all three attempts fail together.
-test.describe.configure({ mode: 'serial' });
-
 test.describe('POST /api/payment', () => {
   test('returns 400 when body is empty', async ({ request }) => {
     const response = await request.post(URL, { data: {} });

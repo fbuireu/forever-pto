@@ -17,7 +17,7 @@ vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({
 const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);
 
-const { initializePayment, confirmPayment, ConfirmPaymentOutcome } = await import('./checkout');
+const { initializePayment, confirmPayment } = await import('./checkout');
 
 const mockStripe = { confirmPayment: vi.fn() } as unknown as Stripe;
 const mockElements = { submit: vi.fn() } as unknown as StripeElements;
@@ -124,7 +124,8 @@ describe('confirmPayment', () => {
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-    expect(result).toEqual({ outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE, error: 'card incomplete' });
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('card incomplete');
   });
 
   it('returns failure when stripe.confirmPayment returns an error', async () => {
@@ -135,7 +136,8 @@ describe('confirmPayment', () => {
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-    expect(result).toEqual({ outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE, error: 'declined by bank' });
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('declined by bank');
   });
 
   it('does not claim a charge happened when Stripe declined before taking the money', async () => {
@@ -146,7 +148,7 @@ describe('confirmPayment', () => {
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-    expect(result.outcome).not.toBe(ConfirmPaymentOutcome.FAILED_AFTER_CHARGE);
+    expect('charged' in result && result.charged).toBeFalsy();
   });
 
   it('marks the failure as post-charge when the activation request itself throws', async () => {
@@ -156,7 +158,8 @@ describe('confirmPayment', () => {
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-    expect(result.outcome).toBe(ConfirmPaymentOutcome.FAILED_AFTER_CHARGE);
+    expect(result.success).toBe(false);
+    expect('charged' in result && result.charged).toBe(true);
   });
 
   it('marks the failure as post-charge when the activation response body cannot be read', async () => {
@@ -166,7 +169,8 @@ describe('confirmPayment', () => {
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-    expect(result.outcome).toBe(ConfirmPaymentOutcome.FAILED_AFTER_CHARGE);
+    expect(result.success).toBe(false);
+    expect('charged' in result && result.charged).toBe(true);
   });
 
   it('does not claim a charge on the redirect hand-off, where the issuer has not answered yet', async () => {
@@ -175,7 +179,8 @@ describe('confirmPayment', () => {
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-    expect(result).toEqual({ outcome: ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER });
+    expect(result.success).toBe(false);
+    expect('charged' in result && result.charged).toBeFalsy();
   });
 
   it('returns failure and logs when session response is not ok', async () => {
@@ -189,7 +194,8 @@ describe('confirmPayment', () => {
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-    expect(result).toEqual({ outcome: ConfirmPaymentOutcome.FAILED_AFTER_CHARGE, error: 'session activation failed' });
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('session activation failed');
     await vi.waitFor(() => expect(mockLoggerError).toHaveBeenCalled());
   });
 
@@ -203,10 +209,8 @@ describe('confirmPayment', () => {
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-    expect(result).toEqual({
-      outcome: ConfirmPaymentOutcome.SUCCEEDED,
-      sessionData: { premiumKey: 'pk_abc', email: 'user@example.com' },
-    });
+    expect(result.success).toBe(true);
+    expect('sessionData' in result && result.sessionData).toEqual({ premiumKey: 'pk_abc', email: 'user@example.com' });
   });
 
   it('returns failure without calling check-session when Stripe handed off to a redirect', async () => {
@@ -215,7 +219,7 @@ describe('confirmPayment', () => {
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-    expect(result.outcome).toBe(ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER);
+    expect(result.success).toBe(false);
     expect(mockFetch).not.toHaveBeenCalled();
     await vi.waitFor(() => expect(mockLoggerWarn).toHaveBeenCalled());
   });
@@ -225,7 +229,8 @@ describe('confirmPayment', () => {
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-    expect(result.outcome).toBe(ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE);
+    expect(result.success).toBe(false);
+    expect(typeof result.error).toBe('string');
     await vi.waitFor(() => expect(mockLogError).toHaveBeenCalled());
   });
 });

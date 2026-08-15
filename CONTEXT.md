@@ -81,10 +81,6 @@ _Avoid_: selected day, custom day
 A Suggested Day the user has taken back, returning its budget without rejecting the rest of the Suggestion.
 _Avoid_: excluded day
 
-**Remaining Budget**:
-The PTO Days the user still has to spend: their budget less every Suggested Day the plan still holds and every Manual Day they added, with Removed Days handed back. It never reads below zero — a plan that overspends reports nothing left rather than a negative allowance, because the user cannot owe days.
-_Avoid_: remaining days, available days, unused days
-
 ## Measuring a plan
 
 **Effective Day**:

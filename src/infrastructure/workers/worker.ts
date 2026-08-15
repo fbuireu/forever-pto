@@ -1,8 +1,28 @@
-import { fromStoredInstant } from '@application/shared/utils/dateIntake';
-import { runPlanningPipeline } from '@domain/calendar/pipeline';
-import type { FilterStrategy } from '@domain/calendar/types';
+import { HolidayVariant } from '@application/dto/holiday/types';
+import { generateAlternatives } from '@domain/calendar/alternatives/generateAlternatives';
+import { generateMetrics } from '@domain/calendar/metrics/generateMetrics';
+import { MONTHS_IN_YEAR } from '@domain/calendar/metrics/utils/helpers';
+import { generateSuggestions } from '@domain/calendar/suggestions/generateSuggestions';
+import type { FilterStrategy, Metrics } from '@domain/calendar/types';
+import { clearDateKeyCache, clearHolidayCache } from '@domain/calendar/utils/cache';
 import { type CalculateSuggestionsRequest, WORKER_MESSAGE_TYPE, type WorkerResponse } from './types';
 import { deserializeHolidays, deserializeMonths, serializeSuggestionResult } from './utils/serializers';
+
+const EMPTY_METRICS: Metrics = {
+  longWeekends: 0,
+  restBlocks: 0,
+  maxWorkStreak: 0,
+  firstLastBreak: null,
+  averageEfficiency: 0,
+  bonusDays: 0,
+  quarterDist: [0, 0, 0, 0],
+  bridgesUsed: 0,
+  workedDaysPerMonth: 0,
+  totalEffectiveDays: 0,
+  monthlyDist: Array.from({ length: 12 }, () => 0),
+  longBlocksPerQuarter: [0, 0, 0, 0],
+  longestVacation: 0,
+};
 
 globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
   const { type, requestId, payload } = e.data;
@@ -24,19 +44,86 @@ globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
   } = payload;
 
   try {
-    const { suggestion, alternatives } = runPlanningPipeline({
-      year,
-      ptoDays,
-      autoSuggestCount,
-      holidays: deserializeHolidays(rawHolidays),
-      manuallySelectedDays: manualDays.map(fromStoredInstant),
-      removedSuggestedDays: removedDays.map(fromStoredInstant),
+    clearDateKeyCache();
+    clearHolidayCache();
+
+    const holidays = deserializeHolidays(rawHolidays);
+    const months = deserializeMonths(rawMonths);
+    const carryOverMonths = Math.max(0, months.length - MONTHS_IN_YEAR);
+
+    const manualPseudoHolidays = manualDays.map((isoDate, i) => ({
+      id: `manual-${i}`,
+      date: new Date(isoDate),
+      name: 'Manual day',
+      variant: HolidayVariant.CUSTOM,
+      isInSelectedRange: true,
+    }));
+    const holidaysWithManual = [...holidays, ...manualPseudoHolidays];
+    const manualDates = manualPseudoHolidays.map((h) => h.date);
+    const removedDates = removedDays.map((isoDate) => new Date(isoDate));
+    const effectivePtoDays = Math.max(0, autoSuggestCount ?? ptoDays - manualDays.length);
+
+    if (effectivePtoDays <= 0 || holidaysWithManual.length === 0) {
+      const response: WorkerResponse = {
+        type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT,
+        requestId,
+        payload: { suggestion: { days: [], metrics: EMPTY_METRICS }, alternatives: [] },
+      };
+      self.postMessage(response);
+      return;
+    }
+
+    const typedStrategy = strategy as FilterStrategy;
+
+    const baseSuggestion = generateSuggestions({
+      ptoDays: effectivePtoDays,
+      holidays: holidaysWithManual,
       allowPastDays,
-      months: deserializeMonths(rawMonths),
-      strategy: strategy as FilterStrategy,
-      locale,
-      maxAlternatives,
+      months,
+      strategy: typedStrategy,
+      removedDays: removedDates,
     });
+
+    const baseAlternatives = generateAlternatives({
+      ptoDays: effectivePtoDays,
+      holidays: holidaysWithManual,
+      allowPastDays,
+      months,
+      maxAlternatives,
+      existingSuggestion: baseSuggestion.days,
+      strategy: typedStrategy,
+      removedDays: removedDates,
+    });
+
+    const suggestion = {
+      ...baseSuggestion,
+      metrics: generateMetrics({
+        suggestion: baseSuggestion,
+        locale,
+        year,
+        bridges: baseSuggestion.bridges,
+        holidays: holidaysWithManual,
+        allowPastDays,
+        manuallySelectedDays: manualDates,
+        removedSuggestedDays: removedDates,
+        carryOverMonths,
+      }),
+    };
+
+    const alternatives = baseAlternatives.map((alternative) => ({
+      ...alternative,
+      metrics: generateMetrics({
+        suggestion: alternative,
+        locale,
+        year,
+        bridges: alternative.bridges,
+        holidays: holidaysWithManual,
+        allowPastDays,
+        manuallySelectedDays: manualDates,
+        removedSuggestedDays: removedDates,
+        carryOverMonths,
+      }),
+    }));
 
     const response: WorkerResponse = {
       type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT,

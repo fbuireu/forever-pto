@@ -1,10 +1,4 @@
 {
-  "a11y": {
-    "closeDialog": "Close",
-    "toggleSidebar": "Toggle sidebar",
-    "sidebarLandmark": "Planner controls",
-    "radialNavigation": "Feature navigation"
-  },
   "metadata": {
     "title": "Forever PTO - Manage your paid time off",
     "description": "Plan and optimize your holidays and PTO with Forever PTO. Find the best long weekends and maximized time off.",
@@ -661,8 +655,7 @@
       "email_required": "Please enter your email address.",
       "invalid_email": "That email address does not look right.",
       "invalid_body": "We could not read that request. Please try again.",
-      "rate_limit_exceeded": "Too many attempts. Please wait a moment and try again.",
-      "promo_code_too_long": "That promo code is too long."
+      "rate_limit_exceeded": "Too many attempts. Please wait a moment and try again."
     }
   },
   "donate": {
@@ -718,8 +711,7 @@
       "amountMin": "Minimum amount is 1",
       "amountMax": "Maximum amount is 10,000",
       "invalidEmail": "Enter a valid email address",
-      "emailRequired": "Email is required",
-      "promoCodeTooLong": "Promo code is too long"
+      "emailRequired": "Email is required"
     },
     "holiday": {
       "nameRequired": "Holiday name is required",

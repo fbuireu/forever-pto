@@ -13,37 +13,12 @@ are not non-working days, tags and hands over.
 
 | File | Role |
 | --- | --- |
-| `getHolidays.ts` | Asks the Holiday source what is observed and maps it through `holidayDTO`. That is all it does |
-| `source/types.ts` | `HolidaySource` — the seam: `observedHolidays(lookup)` and `regionsOf(country)` |
-| `source/dateHolidays.ts` | The production adapter. The **only** place in the app that constructs `Holidays` |
-| `source/fixture.ts` | `createFixtureHolidaySource(calendar)` — the test adapter, plain data in |
-| `source/utils/observed.ts` | `resolveObservedHolidays` — the Region-over-Country rule, pure, shared by both adapters |
-
-## The seam is the source, not the mapper
-
-The DTO translates *shape*; it never decided what a Holiday is. Three rules did, and they used to sit in
-three different places: what counts as a non-working day lived in a wrapper over the package, the
-Region-removes-a-National-day correction lived in `getHolidays.ts`, and the ordering the mapper's dedupe
-depends on was an undocumented property of how `getHolidays` concatenated two arrays. Swapping the upstream
-package meant editing all three plus a fourth call site in `getRegions.ts`.
-
-They now sit behind `HolidaySource`, and there are two adapters — which is what makes it a real seam rather
-than a hypothetical one:
-
-- `dateHolidaysSource` in production. It owns the `Holidays` constructor, the two-year fetch, the
-  `public`/`bank` filter, the `location` stamp and the observed-day resolution.
-- `createFixtureHolidaySource` in tests. `getHolidays.test.ts` uses it to run the **real** DTO over
-  fixture data, so the whole path is asserted end to end. It used to mock the package wrapper *and* the DTO,
-  which meant the folder's load-bearing invariant had no test that could fail for the right reason.
-
-`getRegions.ts` under `services/regions/` calls `regionsOf` on the same adapter rather than constructing its
-own `Holidays`. It stays in its own folder because a Region list is a location concern, but it no longer has
-its own dependency on the package.
+| `getHolidays.ts` | The only export anything outside this folder uses: combines national and regional raw holidays, hands them to `holidayDTO` and returns what it gets back |
+| `utils/holidays.ts` | `getHolidaysForYears`, `getNationalHolidays`, `getRegionalHolidays` — thin wrappers over the `Holidays` constructor, plus the `type` filter. The only `date-holidays` calls in the app besides `getRegions.ts` |
 
 ## Public API
 
-`getHolidays({ year, country, carryOverMonths, region, locale, regions, source? })` → `Promise<HolidayDTO[]>`.
-`source` defaults to `dateHolidaysSource`; nothing in production passes it.
+`getHolidays({ year, country, carryOverMonths, region, locale, regions })` → `Promise<HolidayDTO[]>`.
 
 - **No `country` → `[]`, immediately.** That is the normal first call, not an error: the planner renders
   before a Country has been detected or chosen.
@@ -71,14 +46,14 @@ through a dynamic `import()`. Holiday data ships in the client bundle and is com
 
 ## Invariants
 
-**Two years are always fetched, and 12 is the number that makes that safe.** The adapter asks
+**Two years are always fetched, and 12 is the number that makes that safe.** `getHolidaysForYears` asks
 for `year` and `year + 1` regardless of `carryOverMonths`; `holidayDTO.create` then drops anything past the
 end of `year + 1` and flags only the Planning Window as `isInSelectedRange`. The Carry-over Months slider
 is capped at 12 in `CarryOverMonths.tsx`, so the widest possible window ends exactly at the last day
 fetched. Raise that cap and the extra months arrive empty, with no error anywhere.
 
 **Only `public` and `bank` entries survive.** `date-holidays` classifies every entry it emits with a `type` —
-`public`, `bank`, `school`, `optional` or `observance` — and the adapter keeps the first two and
+`public`, `bank`, `school`, `optional` or `observance` — and `getHolidaysForYears` keeps the first two and
 drops the rest. Those two are the days offices are closed and nobody is expected to work, which is what a
 Holiday means here. `school` closes schools only; `optional` ("majority of people take a day off") and
 `observance` ("optional festivity, no paid day off") still cost the user a PTO Day, so admitting them would
@@ -102,14 +77,12 @@ country-level lookup put back every national day the region had dropped: a Calif
 carried Columbus Day, a Scot's carried Easter Monday, Luzern's carried Ostermontag and Pfingstmontag. Those
 dates then became Free Days — struck from the Workday list so no PTO Day was ever placed on them, and
 expanded straight through by `analyzePotentialBridge`, inflating Effective Days, Efficiency and Longest
-Vacation. `resolveObservedHolidays` keeps a national entry only when the regional lookup emitted the same
-date.
+Vacation. `getHolidays` now keeps a national entry only when the regional lookup emitted the same date.
 
 The national lookup cannot simply be dropped in its place, and that is why this is a filter: it is the only
 source of entries *without* `location`, so removing it would label New Year's Day itself REGIONAL. The
-`hasRegion` flag is load-bearing for the same reason — with no Region the regional lookup returns `[]`, and
-an unconditional filter would empty the calendar. That rule is a pure function over plain arrays now, so it
-is asserted directly in `source/utils/observed.test.ts` rather than through a mocked package.
+`region ? … : nationalHolidays` short-circuit is load-bearing for the same reason — with no Region the
+regional lookup returns `[]`, and an unconditional filter would empty the calendar.
 
 **Failure means an empty calendar, never a throw.** `Effect.try` plus `catchAll` logs `Error in getHolidays`
 to BetterStack with `{ country, region, year }` and returns `[]`. A country the package has no data for,
@@ -118,7 +91,7 @@ call in a second `try`/`catch` for the same reason, and keeps existing Custom Ho
 
 ## Gotchas
 
-**`type` is filtered in the adapter and nowhere else.** Past this folder the string is carried through to
+**`type` is filtered here and nowhere else.** Past this folder the string is carried through to
 `HolidayDTO.type` untouched and only ever displayed, by `HolidaysTable.tsx` and `HolidayRow.tsx`. Neither the
 DTO nor the domain reads it, so the accepted set above is the single place that decides what counts as a
 non-working day — a second filter downstream would be invisible.
@@ -127,11 +100,10 @@ non-working day — a second filter downstream would be invisible.
 array as it comes. There is exactly one sort in the path; do not add another here on the assumption that the
 DTO's is incidental.
 
-**Regional entries are appended after national ones on purpose.** `resolveObservedHolidays` returns
-national first, and the DTO's first sort relies on regional entries being distinguishable so the dedupe
-resolves in favour of the national one. The ordering is part of the contract with
-`src/application/dto/holiday/dto.ts`, not an implementation detail — which is why it is a rule inside the
-source rather than the shape of a concatenation at a call site, and why `observed.test.ts` asserts it.
+**Regional entries are appended after national ones on purpose.** `getHolidays` builds
+`[...observedNationalHolidays, ...regionalHolidays]`, and the DTO's first sort relies on regional entries
+being distinguishable so the dedupe resolves in favour of the national one. The ordering of that array is
+part of the contract with `src/application/dto/holiday/dto.ts`, not an implementation detail.
 
 **The two lookups agree on the raw date string, which is what makes the filter above safe.** The DTO dedupes
 on `holiday.date` verbatim rather than on the calendar day, and both lookups emit the same
@@ -141,13 +113,10 @@ anything.
 
 ## Testing
 
-`getHolidays.test.ts` runs the **real** DTO over `createFixtureHolidaySource`, so it asserts the path a user
-gets: a Region drops the National day it does not observe, a shared date resolves to the National entry, a
-source that throws yields an empty calendar and a log. It mocks only the logging singleton.
-`source/utils/observed.test.ts` pins the Region-over-Country rule on plain arrays.
+Both files have a co-located test. `getHolidays.test.ts` mocks `./utils/holidays` and the DTO, so it
+asserts wiring — which params reach the package, that both lists are concatenated, that the error path
+logs and returns `[]`. `utils/holidays.test.ts` mocks the `date-holidays` default export.
 
-`source/dateHolidays.ts` has no test of its own, and that is the deliberate line: everything in it is either
-a `date-holidays` call or `resolveObservedHolidays`, which is tested. Holiday data itself is upstream's, and
-pinning assertions to it would break on every dependency bump — the version bundled is the version shipped
-([ADR 0001](../../../../docs/adr/0001-planner-runs-in-the-browser.md)). If you add a rule to the adapter,
-put it in `source/utils/` where it can be tested without the package.
+No test constructs the real package. Holiday data itself is upstream's, and pinning assertions to it would
+break on every dependency bump — the version bundled is the version shipped
+([ADR 0001](../../../../docs/adr/0001-planner-runs-in-the-browser.md)).

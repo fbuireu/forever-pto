@@ -5,7 +5,7 @@ import { usePremiumStore } from '@application/stores/premium';
 import { useUIStore } from '@application/stores/ui';
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import { ConfirmPaymentOutcome, confirmPayment } from '@ui/adapters/payments/checkout';
+import { confirmPayment } from '@ui/adapters/payments/checkout';
 import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
@@ -92,28 +92,30 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
       returnUrl: `${globalThis.location.origin}/api/payment/activate?locale=${locale}`,
     });
 
-    switch (result.outcome) {
-      case ConfirmPaymentOutcome.FAILED_AFTER_CHARGE:
+    if (!result.success) {
+      const charged = 'charged' in result && result.charged === true;
+
+      if (charged) {
         setErrorMessage(t('activationFailed'));
         track('payment_activation_failed', { error: result.error || UNKNOWN_PAYMENT_ERROR });
         return;
+      }
 
-      case ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE:
-        setErrorMessage(resolveApiErrorMessage({ code: result.error, t, fallback: t('paymentFailed') }));
-        track('payment_failed', { error: result.error || UNKNOWN_PAYMENT_ERROR });
-        return;
+      setErrorMessage(resolveApiErrorMessage({ code: result.error, t, fallback: t('paymentFailed') }));
+      track('payment_failed', { error: result.error || UNKNOWN_PAYMENT_ERROR });
+    } else {
+      if ('sessionData' in result && result.sessionData) {
+        setPremiumStatus({
+          email: result.sessionData.email,
+          premiumKey: result.sessionData.premiumKey,
+        });
+      }
 
-      case ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER:
-        return;
-
-      case ConfirmPaymentOutcome.SUCCEEDED:
-        setPremiumStatus({ email: result.sessionData.email, premiumKey: result.sessionData.premiumKey });
-        track('payment_completed', { amount });
-        void fireConfetti();
-        setTimeout(() => {
-          onSuccess();
-        }, 1000);
-        return;
+      track('payment_completed', { amount });
+      void fireConfetti();
+      setTimeout(() => {
+        onSuccess();
+      }, 1000);
     }
   }, [stripe, elements, email, onSuccess, setPremiumStatus, t, locale, amount]);
 

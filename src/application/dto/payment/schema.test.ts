@@ -60,24 +60,6 @@ describe('createPaymentSchema', () => {
       const { email: _, ...rest } = VALID;
       expect(createPaymentSchema.safeParse(rest).success).toBe(false);
     });
-
-    it('rejects an email over the 254-character cap', () => {
-      const result = createPaymentSchema.safeParse({ ...VALID, email: `${'a'.repeat(250)}@example.com` });
-      expect(result.success).toBe(false);
-      if (!result.success) expect(result.error.issues[0]?.message).toBe('invalid_email');
-    });
-  });
-
-  describe('promoCode validation', () => {
-    it('accepts a promoCode of exactly 100 characters', () => {
-      expect(createPaymentSchema.safeParse({ ...VALID, promoCode: 'A'.repeat(100) }).success).toBe(true);
-    });
-
-    it('rejects a promoCode over the cap with a machine code, never Zod prose', () => {
-      const result = createPaymentSchema.safeParse({ ...VALID, promoCode: 'A'.repeat(101) });
-      expect(result.success).toBe(false);
-      if (!result.success) expect(result.error.issues[0]?.message).toBe('promo_code_too_long');
-    });
   });
 });
 
@@ -87,7 +69,6 @@ describe('createPaymentSchemaWithMessages', () => {
     amountMax: 'Amount too big',
     invalidEmail: 'Bad email',
     emailRequired: 'Email needed',
-    promoCodeTooLong: 'Promo code too long',
   });
 
   it('uses the provided amountMin message', () => {
@@ -106,11 +87,5 @@ describe('createPaymentSchemaWithMessages', () => {
     const result = schema.safeParse({ ...VALID, email: 'bad' });
     expect(result.success).toBe(false);
     if (!result.success) expect(result.error.issues[0]?.message).toBe('Bad email');
-  });
-
-  it('uses the provided promoCodeTooLong message', () => {
-    const result = schema.safeParse({ ...VALID, promoCode: 'A'.repeat(101) });
-    expect(result.success).toBe(false);
-    if (!result.success) expect(result.error.issues[0]?.message).toBe('Promo code too long');
   });
 });

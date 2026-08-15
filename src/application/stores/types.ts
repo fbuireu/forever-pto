@@ -1,5 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import type { FilterStrategy, MeasuredSuggestion } from '@domain/calendar/types';
+import type { FilterStrategy, Suggestion } from '@domain/calendar/types';
 import type { Locale } from 'next-intl';
 import type { FiltersState } from './filters';
 
@@ -38,28 +38,6 @@ export interface EditHolidayParams {
 }
 
 export interface AlternativeSelectionBaseParams {
-  suggestion: MeasuredSuggestion | null;
+  suggestion: Suggestion | null;
   index: number;
 }
-
-export const DayRefusal = {
-  NO_PLAN: 'no_plan',
-  DAY_IS_WEEKEND: 'day_is_weekend',
-  DAY_IS_HOLIDAY: 'day_is_holiday',
-  DAY_IS_CUSTOM_HOLIDAY: 'day_is_custom_holiday',
-  BUDGET_EXHAUSTED: 'budget_exhausted',
-} as const;
-
-export type DayRefusal = (typeof DayRefusal)[keyof typeof DayRefusal];
-
-export type DayOutcome = { applied: true } | { applied: false; reason: DayRefusal };
-
-export const HolidayRefusal = {
-  DATE_HELD_BY_HOLIDAY: 'date_held_by_holiday',
-  DATE_HELD_BY_MANUAL_DAY: 'date_held_by_manual_day',
-  HOLIDAY_NOT_FOUND: 'holiday_not_found',
-} as const;
-
-export type HolidayRefusal = (typeof HolidayRefusal)[keyof typeof HolidayRefusal];
-
-export type HolidayOutcome = { applied: true } | { applied: false; reason: HolidayRefusal; heldBy?: HolidayDTO };

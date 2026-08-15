@@ -1,6 +1,5 @@
 import { LOCALES } from '@infrastructure/i18n/locales';
 import { localePath } from '@infrastructure/i18n/utils/url';
-import { privateRoutes, SITE_ROUTES } from '@infrastructure/seo/routes';
 import type { MetadataRoute } from 'next';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
@@ -12,7 +11,7 @@ vi.mock('@opennextjs/cloudflare', () => ({
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
-const { default: robots } = await import('./robots');
+const { default: robots, DISALLOWED_PAGES } = await import('./robots');
 
 type UnwrapRules<T> = T extends Array<infer U> ? U : T;
 type RobotsRule = UnwrapRules<MetadataRoute.Robots['rules']>;
@@ -35,20 +34,10 @@ describe('robots', () => {
     expect(rule.disallow).toContain('/_next/static/');
   });
 
-  it('disallows every private route, in every locale', () => {
+  it('disallows all pages for all locales', () => {
     for (const locale of LOCALES) {
-      for (const { path } of privateRoutes()) {
-        expect(rule.disallow).toContain(localePath(locale, path));
-      }
-    }
-  });
-
-  it('never disallows a route the sitemap advertises', () => {
-    const indexable = SITE_ROUTES.filter((route) => route.indexable);
-
-    for (const locale of LOCALES) {
-      for (const { path } of indexable) {
-        expect(rule.disallow).not.toContain(localePath(locale, path));
+      for (const page of DISALLOWED_PAGES) {
+        expect(rule.disallow).toContain(localePath(locale, page));
       }
     }
   });

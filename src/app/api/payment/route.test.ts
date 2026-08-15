@@ -83,7 +83,7 @@ describe('POST /api/payment', () => {
     const body = await response.json();
     expect(body.success).toBe(true);
     expect(body.clientSecret).toBe('pi_secret_abc');
-    expect(body.discountInfo).toBeUndefined();
+    expect(body.discountInfo).toBeNull();
   });
 
   it('uses cf-connecting-ip header for rate limiting', async () => {

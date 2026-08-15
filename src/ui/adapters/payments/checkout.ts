@@ -34,34 +34,19 @@ interface ConfirmPaymentParams {
   returnUrl: string;
 }
 
-export const ConfirmPaymentOutcome = {
-  SUCCEEDED: 'succeeded',
-  REFUSED_BEFORE_CHARGE: 'refused_before_charge',
-  FAILED_AFTER_CHARGE: 'failed_after_charge',
-  HANDED_OFF_TO_ISSUER: 'handed_off_to_issuer',
-} as const;
-
-export type ConfirmPaymentOutcome = (typeof ConfirmPaymentOutcome)[keyof typeof ConfirmPaymentOutcome];
-
-export type ConfirmPaymentResult =
-  | { outcome: typeof ConfirmPaymentOutcome.SUCCEEDED; sessionData: { premiumKey: string; email: string } }
-  | { outcome: typeof ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE; error: string }
-  | { outcome: typeof ConfirmPaymentOutcome.FAILED_AFTER_CHARGE; error: string }
-  | { outcome: typeof ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER };
-
 const log = (write: (logger: BetterStackClient) => void) => {
   void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
     write(getBetterStackInstance());
   });
 };
 
-export const confirmPayment = async (params: ConfirmPaymentParams): Promise<ConfirmPaymentResult> => {
+export const confirmPayment = async (params: ConfirmPaymentParams) => {
   const { stripe, elements, email, returnUrl } = params;
   let charged = false;
 
   const program = Effect.gen(function* () {
     const { error: submitError } = yield* Effect.tryPromise(() => elements.submit());
-    if (submitError) return { outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE, error: submitError.message ?? '' };
+    if (submitError) return { success: false, error: submitError.message ?? '' };
 
     const { error, paymentIntent } = yield* Effect.tryPromise(() =>
       stripe.confirmPayment({
@@ -71,7 +56,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
       })
     );
 
-    if (error) return { outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE, error: error.message ?? '' };
+    if (error) return { success: false, error: error.message ?? '' };
 
     if (!paymentIntent) {
       log((logger) =>
@@ -80,7 +65,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
           returnUrl,
         })
       );
-      return { outcome: ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER };
+      return { success: false, error: '' };
     }
 
     charged = true;
@@ -104,7 +89,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
           paymentIntentId: paymentIntent.id,
         })
       );
-      return { outcome: ConfirmPaymentOutcome.FAILED_AFTER_CHARGE, error: errorData.error ?? '' };
+      return { success: false, error: errorData.error ?? '', charged };
     }
 
     const sessionData = yield* Effect.tryPromise(
@@ -112,7 +97,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
     );
 
     return {
-      outcome: ConfirmPaymentOutcome.SUCCEEDED,
+      success: true,
       sessionData: { premiumKey: sessionData.premiumKey, email: sessionData.email },
     };
   }).pipe(
@@ -123,14 +108,11 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
           returnUrl,
         })
       );
-
-      const message = error instanceof Error ? error.message : '';
-
-      return Effect.succeed<ConfirmPaymentResult>(
-        charged
-          ? { outcome: ConfirmPaymentOutcome.FAILED_AFTER_CHARGE, error: message }
-          : { outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE, error: message }
-      );
+      return Effect.succeed({
+        success: false,
+        error: error instanceof Error ? error.message : '',
+        charged,
+      });
     })
   );
 

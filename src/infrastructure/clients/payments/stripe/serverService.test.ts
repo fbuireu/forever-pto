@@ -8,6 +8,7 @@ const {
   mockPaymentIntentsRetrieve,
   mockChargesRetrieve,
   mockPromotionCodesList,
+  mockPromotionCodesRetrieve,
   mockWebhooksConstructEvent,
   MockStripeNode,
 } = vi.hoisted(() => {
@@ -21,11 +22,12 @@ const {
   const mockPaymentIntentsRetrieve = vi.fn();
   const mockChargesRetrieve = vi.fn();
   const mockPromotionCodesList = vi.fn();
+  const mockPromotionCodesRetrieve = vi.fn();
   const mockWebhooksConstructEvent = vi.fn();
   class MockStripe {
     paymentIntents = { create: mockPaymentIntentsCreate, retrieve: mockPaymentIntentsRetrieve };
     charges = { retrieve: mockChargesRetrieve };
-    promotionCodes = { list: mockPromotionCodesList };
+    promotionCodes = { list: mockPromotionCodesList, retrieve: mockPromotionCodesRetrieve };
     webhooks = { constructEvent: mockWebhooksConstructEvent };
   }
   const MockStripeNode = Object.assign(
@@ -41,6 +43,7 @@ const {
     mockPaymentIntentsRetrieve,
     mockChargesRetrieve,
     mockPromotionCodesList,
+    mockPromotionCodesRetrieve,
     mockWebhooksConstructEvent,
     MockStripeNode,
   };
@@ -205,16 +208,28 @@ describe('StripeServerService.promotionCodes.list', () => {
   });
 });
 
-describe('StripeServerService.promotionCodes.list', () => {
-  it('passes the coupon expansion through to the SDK', async () => {
-    mockPromotionCodesList.mockResolvedValue({ data: [], has_more: false });
-    await Effect.runPromise(
+describe('StripeServerService.promotionCodes.retrieve', () => {
+  it('returns the promotion code on success', async () => {
+    const promo = { id: 'promo_1', code: 'SAVE10' };
+    mockPromotionCodesRetrieve.mockResolvedValue(promo);
+    const result = await Effect.runPromise(
       Effect.gen(function* () {
         const stripe = yield* StripeServerService;
-        return yield* stripe.promotionCodes.list({ code: 'SAVE10', expand: ['data.promotion.coupon'] });
+        return yield* stripe.promotionCodes.retrieve('promo_1');
       }).pipe(Effect.provide(StripeServerServiceLive))
     );
-    expect(mockPromotionCodesList).toHaveBeenCalledWith({ code: 'SAVE10', expand: ['data.promotion.coupon'] });
+    expect(result).toEqual(promo);
+  });
+
+  it('wraps SDK errors as PaymentError', async () => {
+    mockPromotionCodesRetrieve.mockRejectedValue(new Error('not found'));
+    const error = await Effect.runPromise(
+      Effect.gen(function* () {
+        const stripe = yield* StripeServerService;
+        return yield* stripe.promotionCodes.retrieve('promo_bad').pipe(Effect.flip);
+      }).pipe(Effect.provide(StripeServerServiceLive))
+    );
+    expect(error).toBeInstanceOf(PaymentError);
   });
 });
 

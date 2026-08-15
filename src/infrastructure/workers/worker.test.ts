@@ -192,14 +192,17 @@ describe('worker onmessage', () => {
     expect(mockGenerateAlternatives.mock.lastCall?.[0].ptoDays).toBe(8);
   });
 
-  it('derives the empty result Metrics from the engine rather than a hand-written constant', () => {
+  it('posts a zeroed Metrics object with the empty result, never undefined', () => {
     sendMessage({ ptoDays: 0 });
     const { metrics } = mockPostMessage.mock.calls[0][0].payload.suggestion;
-
-    expect(mockGenerateMetrics).toHaveBeenCalledWith(
-      expect.objectContaining({ suggestion: expect.objectContaining({ days: [], bridges: [] }) })
-    );
-    expect(metrics).toEqual(mockGenerateMetrics.mock.results[0]?.value);
+    expect(metrics).toBeDefined();
+    expect(metrics.averageEfficiency).toBe(0);
+    expect(metrics.totalEffectiveDays).toBe(0);
+    expect(metrics.bonusDays).toBe(0);
+    expect(metrics.firstLastBreak).toBeNull();
+    expect(metrics.quarterDist).toEqual([0, 0, 0, 0]);
+    expect(metrics.longBlocksPerQuarter).toEqual([0, 0, 0, 0]);
+    expect(metrics.monthlyDist).toEqual(new Array(12).fill(0));
   });
 
   it('posts an empty result when manualDays exceed the budget', () => {

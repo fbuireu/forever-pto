@@ -39,7 +39,6 @@ export const CookieConsentDialog = ({
   onSave,
 }: CookieConsentDialogProps) => {
   const t = useTranslations('cookies');
-  const tA11y = useTranslations('a11y');
 
   const isAnalyticsSection = (id: string) => id === 'analytics';
 
@@ -70,7 +69,7 @@ export const CookieConsentDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-2xl max-h-[80vh] overflow-y-auto' closeLabel={tA11y('closeDialog')}>
+      <DialogContent className='sm:max-w-2xl max-h-[80vh] overflow-y-auto'>
         <DialogHeader>
           <DialogTitle>{t('preferencesTitle')}</DialogTitle>
           <DialogDescription>{t('preferencesDescription')}</DialogDescription>

@@ -1,7 +1,6 @@
 # src/infrastructure/api
 
-The wire vocabulary for failures, the response helper that opts out of caching, the request-body parser — and
-`operations/`, where the two flows that exist behind *two* transports are terminated once.
+Three small modules every route handler and server action leans on: the wire vocabulary for failures, the one response helper that opts out of caching, and the request-body parser. Nothing here runs an Effect, imports a client, or knows a domain rule — it is plain values, one `NextResponse` wrapper and one `Effect.tryPromise`.
 
 ## Files
 
@@ -10,34 +9,6 @@ The wire vocabulary for failures, the response helper that opts out of caching, 
 | `errors.ts` | `ApiError` — the machine-readable failure codes that go on the wire |
 | `response.ts` | `noStore(body, init?)` — `NextResponse.json` with `Cache-Control: no-store` |
 | `parseJsonBody.ts` | `parseJsonBody<T>(request)` — `request.json()` as an Effect, plus the `INVALID_BODY` code |
-| `operations/types.ts` | `ApiOutcome<BODY>` (`{ status, body }`), `RequestContext`, `resolveClientIp`, `UNKNOWN_IP` |
-| `operations/payment.ts` | `createPaymentRequest` — rate limit, use-case, deferred write and failure mapping, transport-free |
-| `operations/contact.ts` | `sendContactRequest` — the same shape for the contact form |
-
-## One operation, two transports
-
-Payment creation and contact submission each have a route handler **and** a server action. They are meant to
-behave identically, and for a long while they were two hand-written copies of one policy — same four
-`catchTags` branches, same rate-limit call, same `after()` hand-off, restated per transport. They had already
-drifted: a request with no IP header wrote the string `'unknown'` into the payments table through the route
-and `null` through the action, because the two resolved the address with a different chain of headers.
-
-`operations/` is the seam that removes the possibility. Each operation is an `async` function taking the input
-as an **Effect** — `parseJsonBody(request)` from a route, `Effect.succeed(params)` from an action — and
-answering an `ApiOutcome`: a status and a body. It provides `ApplicationLayer`, maps every tagged failure, and
-schedules the deferred half. The route wraps the outcome in `NextResponse.json(body, { status })`; the action
-returns `body` and drops the status. Nothing else differs, because nothing else is allowed to.
-
-Taking the input as an Effect rather than a value is what lets a malformed body stay a `ValidationError` on the
-route path while the action path has nothing to parse — and it is what makes the ordering testable: the
-limiter runs before the input Effect is ever evaluated, so `operations/payment.test.ts` can assert the body is
-not read when the limiter refuses. That ordering used to be a rule stated in prose and asserted twice, once
-per entry point.
-
-`resolveClientIp` is the settled version of the drift: it reads `cf-connecting-ip`, then `x-forwarded-for`,
-then `x-real-ip`, and answers `null` when none is present. The limiter keys on `UNKNOWN_IP` in that case
-because a limiter needs a key; the use-case receives the `null`, because a payment record should say we do not
-know the address rather than claim it is called "unknown".
 
 ## From a typed failure to a status code
 
@@ -47,11 +18,11 @@ What the code does today:
 
 | Tagged error | Status | `error` in the body | Mapped in |
 | --- | --- | --- | --- |
-| `RateLimitError` | 429 | `RATE_LIMIT_EXCEEDED` | `operations/payment.ts` |
-| `ValidationError` | 400 | the error's own `message`, verbatim | `operations/payment.ts`, `operations/contact.ts`, check-session |
-| `PromoCodeError` | 400 | the error's `code`, plus `isPromoCodeError: true` | `operations/payment.ts` |
-| `PaymentError` | 500 | `INTERNAL_ERROR` | `operations/payment.ts` |
-| `EmailError` | 500 | `INTERNAL_ERROR` | `operations/contact.ts` |
+| `RateLimitError` | 429 | `RATE_LIMIT_EXCEEDED` | `src/app/api/payment/route.ts`, `src/infrastructure/actions/payment.ts` |
+| `ValidationError` | 400 | the error's own `message`, verbatim | payment, contact and check-session entry points |
+| `PromoCodeError` | 400 | the error's `code`, plus `isPromoCodeError: true` | `src/app/api/payment/route.ts`, `src/infrastructure/actions/payment.ts` |
+| `PaymentError` | 500 | `INTERNAL_ERROR` | `src/app/api/payment/route.ts`, `src/infrastructure/actions/payment.ts` |
+| `EmailError` | 500 | `INTERNAL_ERROR` | `src/app/api/contact/route.ts`, `src/infrastructure/actions/contact.ts` |
 | `SessionError`, `DatabaseError` | 500 | `INTERNAL_ERROR` | `src/app/api/check-session/route.ts` |
 | `WebhookError` | 400 or 500 | `INVALID_SIGNATURE` when `isSignatureError`, `WEBHOOK_MISCONFIGURED` (400) when the secret is missing, else `WEBHOOK_PROCESSING_FAILED` (500) | `src/app/api/webhooks/stripe/route.ts` |
 | `MissingDonorEmailError` | — | never reaches the wire: absorbed and logged in `webhook.ts` | `src/application/use-cases/webhook.ts` |
@@ -102,8 +73,7 @@ machine code — snake_case with no whitespace — is looked up in the component
 generic translated message when the namespace has no key for it, while prose is shown as it came, because
 that is how a Stripe message Stripe has already localised arrives. So a code a user can see is displayed raw
 only when nobody added a key for it. Add the key when you add the code, and note that a `checkout` failure
-whose outcome is `FAILED_AFTER_CHARGE` bypasses the lookup entirely — see
-[`../../ui/CLAUDE.md`](../../ui/CLAUDE.md).
+carrying `charged: true` bypasses the lookup entirely — see [`../../ui/CLAUDE.md`](../../ui/CLAUDE.md).
 
 `ValidationError` messages are the sharpest edge. Server-side parsing uses the default schemas in `src/application/dto/payment/schema.ts` and `src/application/dto/contact/schema.ts`, whose messages are themselves codes (`email_required`, `amount_too_low`). The UI rebuilds the same schemas with translated messages for client-side validation, so a user normally sees prose — but a request that reaches the server unvalidated gets the code back and displays it. If you add a code a user can see, give it a lookup of its own; do not assume the code is presentable.
 
@@ -117,7 +87,7 @@ whose outcome is `FAILED_AFTER_CHARGE` bypasses the lookup entirely — see
 
 1. Declare the tagged error in `src/infrastructure/errors.ts` and add it to the use-case's error channel.
 2. Add a code to `ApiError` only if a client has to branch on it. If it just means "we failed", reuse `INTERNAL_ERROR`.
-3. Map the tag in the `catchTags` of whatever runs the program. For payment and contact that is one place — the operation under `operations/` — and both transports pick the change up. For check-session and the webhook it is still the route handler.
+3. Map the tag in the `catchTags` of every entry point that runs the program. Grep the tag name — the payment and contact flows each have two runners, a route handler and a server action, and they are meant to agree.
 4. If it is user-visible, add the message key to every locale bundle. The docs consistency suite fails when a bundle's keys differ from `en.json`.
 5. Assert the status and the code in the route test.
 

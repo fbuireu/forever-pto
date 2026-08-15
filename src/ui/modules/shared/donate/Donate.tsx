@@ -108,7 +108,6 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
     amountMax: tValidation('amountMax'),
     invalidEmail: tValidation('invalidEmail'),
     emailRequired: tValidation('emailRequired'),
-    promoCodeTooLong: tValidation('promoCodeTooLong'),
   });
 
   const form = useForm<CreatePaymentInput>({

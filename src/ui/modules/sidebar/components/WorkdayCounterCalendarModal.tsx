@@ -27,7 +27,6 @@ export const WorkdayCounterCalendarModal = ({
   holidays,
 }: WorkdayCounterCalendarModalProps) => {
   const t = useTranslations('workdayCounterModal');
-  const tA11y = useTranslations('a11y');
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -39,7 +38,7 @@ export const WorkdayCounterCalendarModal = ({
             : t('selectDateRange')}
         </Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-sm' closeLabel={tA11y('closeDialog')}>
+      <DialogContent className='sm:max-w-sm'>
         <DialogHeader>
           <DialogTitle className='text-sm'>{t('selectDateRange')}</DialogTitle>
         </DialogHeader>
@@ -52,9 +51,9 @@ export const WorkdayCounterCalendarModal = ({
             locale={locale}
             holidays={holidays}
             allowPastDays
-            currentSelection={null}
+            currentSelection={{ days: [] }}
             alternatives={[]}
-            suggestion={null}
+            suggestion={{ days: [] }}
             className='w-full'
           />
         </div>

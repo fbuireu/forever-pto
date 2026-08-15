@@ -17,7 +17,6 @@ import { Button } from '@ui/modules/core/primitives/Button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { Calendar, CalendarSelectionMode, type FromTo } from '@ui/modules/pages/planner/calendar/Calendar';
-import { describeHolidayRefusal } from '@ui/modules/pages/planner/calendar/utils/refusals';
 import { CalendarDays, Calendar as CalendarIcon, Edit } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';
@@ -35,11 +34,11 @@ interface EditHolidayModalProps {
 
 export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHolidayModalProps) => {
   const t = useTranslations('modals.editHoliday');
-  const tA11y = useTranslations('a11y');
   const tAdd = useTranslations('modals.addHoliday');
   const tValidation = useTranslations('validation.holiday');
   const { year, carryOverMonths } = useFiltersStore();
-  const { holidays, editHoliday, currentSelection, alternatives, suggestion } = useHolidaysStore();
+  const { holidays, editHoliday, currentSelection, alternatives, suggestion, manuallySelectedDays } =
+    useHolidaysStore();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(holiday.date);
   const [isPending, startTransition] = useTransition();
 
@@ -78,23 +77,39 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
           return;
         }
 
-        const outcome = editHoliday({
+        if (data.date.getTime() !== holiday.date.getTime()) {
+          const existingHoliday = holidays.find(
+            (h) => h.id !== holiday.id && h.date.toDateString() === data.date.toDateString()
+          );
+
+          if (existingHoliday) {
+            const formattedDate = formatDate({ date: data.date, locale, format: 'MMMM d, yyyy' });
+            toast.error(tAdd('existsTitle'), {
+              description: tAdd('existsDescription', { date: formattedDate, name: existingHoliday.name }),
+            });
+            return;
+          }
+
+          const isManuallySelected = manuallySelectedDays.some(
+            (day) => day.toDateString() === data.date.toDateString()
+          );
+
+          if (isManuallySelected) {
+            const formattedDate = formatDate({ date: data.date, locale, format: 'MMMM d, yyyy' });
+            toast.error(tAdd('manualDayExistsTitle'), {
+              description: tAdd('manualDayExistsDescription', { date: formattedDate }),
+            });
+            return;
+          }
+        }
+
+        editHoliday({
           holidayId: holiday.id,
           updates: { name: data.name, date: data.date },
           locale,
           year,
           carryOverMonths,
         });
-
-        if (!outcome.applied) {
-          const formattedDate = formatDate({ date: data.date, locale, format: 'MMMM d, yyyy' });
-          const refusal = describeHolidayRefusal({ outcome, t: tAdd, formattedDate });
-
-          if (refusal) toast.error(refusal.title, { description: refusal.description });
-          else toast.error(t('errorTitle'), { description: t('errorDescription') });
-
-          return;
-        }
 
         toast.success(t('successTitle'), {
           description: t('successDescription', { name: data.name }),
@@ -121,7 +136,7 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-sm' closeLabel={tA11y('closeDialog')} initialFocus={false}>
+      <DialogContent className='sm:max-w-sm' initialFocus={false}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Edit className='size-5 text-blue-500' />

@@ -1,82 +1,131 @@
-import type { RawHoliday } from '@application/dto/holiday/types';
 import { EN } from '@infrastructure/i18n/locales';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createFixtureHolidaySource } from './source/fixture';
-import type { HolidaySource } from './source/types';
 
 const { mockLogError } = vi.hoisted(() => ({ mockLogError: vi.fn() }));
+const { mockGetNationalHolidays, mockGetRegionalHolidays } = vi.hoisted(() => ({
+  mockGetNationalHolidays: vi.fn().mockReturnValue([]),
+  mockGetRegionalHolidays: vi.fn().mockReturnValue([]),
+}));
+const { mockHolidayDTOCreate } = vi.hoisted(() => ({ mockHolidayDTOCreate: vi.fn() }));
 
 vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({
   getBetterStackInstance: vi.fn().mockReturnValue({ logError: mockLogError }),
 }));
 
+vi.mock('./utils/holidays', () => ({
+  getNationalHolidays: mockGetNationalHolidays,
+  getRegionalHolidays: mockGetRegionalHolidays,
+}));
+
+vi.mock('@application/dto/holiday/dto', () => ({
+  holidayDTO: { create: mockHolidayDTOCreate },
+}));
+
 const { getHolidays } = await import('./getHolidays');
 
-const raw = (date: string, name: string, location?: string) => ({ date, name, type: 'public', location }) as RawHoliday;
-
-const CALENDAR = {
-  national: [raw('2027-01-01 00:00:00', 'New Year'), raw('2027-10-11 00:00:00', 'Columbus Day')],
-  regional: {
-    CA: [raw('2027-01-01 00:00:00', 'New Year', 'CA'), raw('2027-03-31 00:00:00', 'Cesar Chavez Day', 'CA')],
-  },
-};
-
 const BASE_PARAMS = {
-  year: 2027,
-  country: 'US',
+  year: 2026,
+  country: 'ES',
   region: '',
   locale: EN,
   carryOverMonths: 1,
   regions: [],
-  source: createFixtureHolidaySource(CALENDAR),
 };
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockHolidayDTOCreate.mockReturnValue([]);
 });
 
 describe('getHolidays', () => {
-  it('returns an empty calendar when no Country has been chosen yet', async () => {
-    expect(await getHolidays({ ...BASE_PARAMS, country: undefined })).toEqual([]);
+  it('returns empty array when no country is provided', async () => {
+    const result = await getHolidays({ ...BASE_PARAMS, country: undefined });
+    expect(result).toEqual([]);
+    expect(mockGetNationalHolidays).not.toHaveBeenCalled();
   });
 
-  it('maps the source through the DTO into the glossary shape', async () => {
-    const holidays = await getHolidays(BASE_PARAMS);
+  it('calls getNationalHolidays and getRegionalHolidays with correct params', async () => {
+    await getHolidays({ ...BASE_PARAMS, region: 'CAT' });
+    expect(mockGetNationalHolidays).toHaveBeenCalledWith({
+      country: 'ES',
+      configuration: { languages: [EN] },
+      year: 2026,
+    });
+    expect(mockGetRegionalHolidays).toHaveBeenCalledWith({
+      country: 'ES',
+      region: 'CAT',
+      configuration: { languages: [EN] },
+      year: 2026,
+    });
+  });
 
-    expect(holidays.map(({ name }) => name)).toEqual(['New Year', 'Columbus Day']);
-    expect(holidays[0].variant).toBe('national');
-    expect(holidays[0].date).toBeInstanceOf(Date);
+  it('passes combined raw holidays to holidayDTO.create', async () => {
+    const national = [{ date: new Date('2026-01-01'), name: 'New Year', type: 'public' }];
+    const regional = [{ date: new Date('2026-06-24'), name: 'Sant Joan', type: 'public' }];
+    mockGetNationalHolidays.mockReturnValue(national);
+    mockGetRegionalHolidays.mockReturnValue(regional);
+    mockHolidayDTOCreate.mockReturnValue([]);
+
+    await getHolidays(BASE_PARAMS);
+
+    expect(mockHolidayDTOCreate).toHaveBeenCalledWith({
+      raw: [...national, ...regional],
+      params: { year: 2026, carryOverMonths: 1, regions: [] },
+    });
+  });
+
+  it('returns the DTO output in the order the DTO produced it, without re-sorting', async () => {
+    mockHolidayDTOCreate.mockReturnValue([
+      { date: new Date('2026-12-25'), name: 'Christmas' },
+      { date: new Date('2026-01-01'), name: 'New Year' },
+    ]);
+
+    const result = await getHolidays(BASE_PARAMS);
+
+    expect(result.map(({ name }) => name)).toEqual(['Christmas', 'New Year']);
   });
 
   it('drops a National Holiday the selected Region does not observe', async () => {
-    const holidays = await getHolidays({ ...BASE_PARAMS, region: 'CA' });
+    mockGetNationalHolidays.mockReturnValue([
+      { date: '2027-01-01 00:00:00', name: 'New Year', type: 'public' },
+      { date: '2027-10-11 00:00:00', name: 'Columbus Day', type: 'public' },
+    ]);
+    mockGetRegionalHolidays.mockReturnValue([
+      { date: '2027-01-01 00:00:00', name: 'New Year', type: 'public', location: 'CA' },
+      { date: '2027-03-31 00:00:00', name: 'Cesar Chavez Day', type: 'public', location: 'CA' },
+    ]);
 
-    expect(holidays.map(({ name }) => name)).not.toContain('Columbus Day');
-    expect(holidays.map(({ name }) => name)).toContain('Cesar Chavez Day');
+    await getHolidays({ ...BASE_PARAMS, country: 'US', region: 'CA' });
+
+    const [{ raw }] = mockHolidayDTOCreate.mock.calls[0] as [{ raw: Array<{ name: string }> }];
+    expect(raw.map(({ name }) => name)).toEqual(['New Year', 'New Year', 'Cesar Chavez Day']);
   });
 
-  it('keeps the National entry when both lookups name the same date', async () => {
-    const holidays = await getHolidays({ ...BASE_PARAMS, region: 'CA' });
-    const newYear = holidays.find(({ name }) => name === 'New Year');
+  it('keeps every National Holiday when no Region is selected', async () => {
+    mockGetNationalHolidays.mockReturnValue([
+      { date: '2027-01-01 00:00:00', name: 'New Year', type: 'public' },
+      { date: '2027-10-11 00:00:00', name: 'Columbus Day', type: 'public' },
+    ]);
+    mockGetRegionalHolidays.mockReturnValue([]);
 
-    expect(newYear?.variant).toBe('national');
+    await getHolidays({ ...BASE_PARAMS, country: 'US', region: '' });
+
+    const [{ raw }] = mockHolidayDTOCreate.mock.calls[0] as [{ raw: Array<{ name: string }> }];
+    expect(raw.map(({ name }) => name)).toEqual(['New Year', 'Columbus Day']);
   });
 
-  it('returns an empty calendar and logs when the source throws', async () => {
-    const brokenSource: HolidaySource = {
-      observedHolidays: () => {
-        throw new Error('date-holidays failure');
-      },
-      regionsOf: () => null,
-    };
+  it('returns empty array and logs error when processing throws', async () => {
+    mockGetNationalHolidays.mockImplementation(() => {
+      throw new Error('date-holidays failure');
+    });
 
-    const holidays = await getHolidays({ ...BASE_PARAMS, source: brokenSource });
+    const result = await getHolidays(BASE_PARAMS);
 
-    expect(holidays).toEqual([]);
+    expect(result).toEqual([]);
     expect(mockLogError).toHaveBeenCalledWith('Error in getHolidays', expect.any(Error), {
-      country: 'US',
+      country: 'ES',
       region: '',
-      year: 2027,
+      year: 2026,
     });
   });
 });

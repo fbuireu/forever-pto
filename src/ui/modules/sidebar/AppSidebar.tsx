@@ -47,15 +47,11 @@ interface AppSidebarProps {
 }
 
 export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
-  const [t, tA11y, currentYear] = await Promise.all([
-    getTranslations('sidebar'),
-    getTranslations('a11y'),
-    getCurrentYear(),
-  ]);
+  const [t, currentYear] = await Promise.all([getTranslations('sidebar'), getCurrentYear()]);
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible='icon' variant='inset' landmarkLabel={tA11y('sidebarLandmark')}>
+      <Sidebar collapsible='icon' variant='inset'>
         <SidebarHeader className='group-data-[collapsible=icon]:p-0 mb-2.5'>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -190,7 +186,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
         <SidebarFooterButtons />
       </Sidebar>
       <SidebarInset id='main-content' tabIndex={-1} className='outline-none'>
-        <SidebarTrigger className={'cursor-pointer size-11 fixed m-3 z-51 p-1'} label={tA11y('toggleSidebar')} />
+        <SidebarTrigger className={'cursor-pointer size-11 fixed m-3 z-51 p-1'} />
         {children}
       </SidebarInset>
     </SidebarProvider>

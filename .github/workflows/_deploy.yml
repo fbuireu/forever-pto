@@ -34,10 +34,6 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: deploy-${{ inputs.wrangler_env }}-${{ inputs.worker_name }}
-  cancel-in-progress: false
-
 jobs:
   deploy:
     name: Deploy to ${{ inputs.environment }}
@@ -50,12 +46,12 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
       - uses: ./.github/actions/prepare-env
       - name: Build
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
+        run: pnpm run cf:build
         env:
           NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: ${{ vars.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN }}
           NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: ${{ vars.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL }}
@@ -63,34 +59,21 @@ jobs:
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
           NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: ${{ vars.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID }}
           NEXT_PUBLIC_STORAGE_KEY: ${{ vars.NEXT_PUBLIC_STORAGE_KEY }}
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          retry_wait_seconds: 15
-          shell: bash
-          command: pnpm run cf:build
       - name: Deploy to Cloudflare Workers
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         env:
           INPUTS_WORKER_NAME: ${{ inputs.worker_name }}
           INPUTS_WRANGLER_ENV: ${{ inputs.wrangler_env }}
           INPUTS_URL: ${{ inputs.url }}
-          DEPLOY_MESSAGE: ${{ github.sha }}-${{ github.event_name }}
-        with:
-          timeout_minutes: 5
-          max_attempts: 3
-          retry_wait_seconds: 15
-          shell: bash
-          command: |
-            NAME_FLAG=""
-            if [ -n "${INPUTS_WORKER_NAME}" ]; then
-              NAME_FLAG="--name ${INPUTS_WORKER_NAME}"
-            fi
-            VAR_FLAG=""
-            if [ -n "${INPUTS_URL}" ]; then
-              VAR_FLAG="--var NEXT_PUBLIC_SITE_URL:${INPUTS_URL}"
-            fi
-            pnpm exec wrangler deploy --env "${INPUTS_WRANGLER_ENV}" --message "$DEPLOY_MESSAGE" $NAME_FLAG $VAR_FLAG
+        run: |
+          NAME_FLAG=""
+          if [ -n "${INPUTS_WORKER_NAME}" ]; then
+            NAME_FLAG="--name ${INPUTS_WORKER_NAME}"
+          fi
+          VAR_FLAG=""
+          if [ -n "${INPUTS_URL}" ]; then
+            VAR_FLAG="--var NEXT_PUBLIC_SITE_URL:${INPUTS_URL}"
+          fi
+          pnpm exec wrangler deploy --env "${INPUTS_WRANGLER_ENV}" $NAME_FLAG $VAR_FLAG
       - name: Set Worker secrets
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         env:
