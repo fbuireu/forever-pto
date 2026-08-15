@@ -1,9 +1,25 @@
+import { Counter } from '@ui/modules/core/animate/components/Counter';
 import { FeatureList } from '@ui/modules/core/animate/components/FeatureList';
 import { RadialNav, type RadialNavProps } from '@ui/modules/core/animate/components/RadialNav';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { Calendar, Settings, Star, Users } from 'lucide-react';
 import { useState } from 'react';
 import { Demo } from '../Demo';
+import { DemoIntlProvider } from '../DemoIntlProvider';
+
+export const CounterDemo = () => {
+  const [days, setDays] = useState(23);
+
+  return (
+    <DemoIntlProvider>
+      <LazyMotionProvider>
+        <Demo>
+          <Counter number={days} setNumber={setDays} label='PTO days' />
+        </Demo>
+      </LazyMotionProvider>
+    </DemoIntlProvider>
+  );
+};
 
 const FEATURES = [
   {

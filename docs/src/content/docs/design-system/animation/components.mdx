@@ -5,20 +5,15 @@ sidebar:
   order: 4
 ---
 
-import { FeatureListDemo, RadialNavDemo } from '../../../../components/demos/AnimationComponentsDemo';
+import { CounterDemo, FeatureListDemo, RadialNavDemo } from '../../../../components/demos/AnimationComponentsDemo';
 
-Source: `src/ui/modules/core/animate/components/`. Composite motion components (the fourth file in the directory, `Tabs.tsx`, is documented with the other Base UI wrappers). `FeatureList` and `RadialNav` are framework-clean — Motion, `cn()`, `lucide-react` and the core `Badge` are their only dependencies — so this page renders the real components. As always with `m.*` consumers, they need a `LazyMotionProvider` ancestor. `Counter` is the exception and is documented rather than rendered, for the reason under its heading.
+Source: `src/ui/modules/core/animate/components/`. Composite motion components (the fourth file in the directory, `Tabs.tsx`, is documented with the other Base UI wrappers). `FeatureList` and `RadialNav` are framework-clean — Motion, `cn()`, `lucide-react` and the core `Badge` are their only dependencies. `Counter` wraps [SlidingNumber](/design-system/animation/text/), which reads the locale through `next-intl`, so its demo adds a `DemoIntlProvider`. All three render the real components; as always with `m.*` consumers, they need a `LazyMotionProvider` ancestor.
 
 ## Counter
 
 `Counter` (`Counter.tsx`) is a stepper: minus and plus `m.button`s flanking a [SlidingNumber](/design-system/animation/text/) inside a brutal-framed pill, with `layout` animation so the pill resizes smoothly as digit count changes. It is controlled: pass `number` and `setNumber`. Optional props: `label` (small caption under the number), `slidingNumberProps`, `buttonProps` / `decrementButtonProps` / `incrementButtonProps` (e.g. to `disable` a bound), and `transition`.
 
-:::note[Not rendered here]
-`Counter` wraps [SlidingNumber](/design-system/animation/text/), which reads the active locale through
-`next-intl` to pick its decimal separator. Components that touch `next-intl` are reference-only in this
-wiki — there is no intl provider to render them against. The demo returns if `SlidingNumber` takes the
-separator as a prop instead.
-:::
+<CounterDemo client:visible />
 
 ## FeatureList
 
