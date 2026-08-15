@@ -1,5 +1,3 @@
-import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
-import { Button } from '@ui/modules/core/primitives/Button';
 import {
   Dialog,
   DialogContent,
@@ -9,6 +7,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@ui/modules/core/animate/base/Dialog';
+import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { useState } from 'react';
 import { Demo } from '../Demo';
 

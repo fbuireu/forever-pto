@@ -1,11 +1,11 @@
-import { CA, DE, EN, ES, FR, IT } from '@infrastructure/i18n/locales';
-import { getLocaleFromPathname, localePath } from '@infrastructure/i18n/utils/url';
 import ca from '@i18n/messages/ca.json';
 import de from '@i18n/messages/de.json';
 import en from '@i18n/messages/en.json';
 import es from '@i18n/messages/es.json';
 import fr from '@i18n/messages/fr.json';
 import it from '@i18n/messages/it.json';
+import { CA, DE, EN, ES, FR, IT } from '@infrastructure/i18n/locales';
+import { getLocaleFromPathname, localePath } from '@infrastructure/i18n/utils/url';
 import { createTranslator } from 'next-intl';
 import pkg from '../../../package.json';
 

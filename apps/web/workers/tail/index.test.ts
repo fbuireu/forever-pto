@@ -6,13 +6,18 @@ const ENV = {
   BETTER_STACK_INGESTING_URL: 'https://logs.example.com/ingest',
 };
 
-const makeEvent = (overrides: Partial<{
-  scriptName: string;
-  outcome: string;
-  event: { request?: { url: string; method: string; headers: Record<string, string> }; response?: { status: number } } | null;
-  logs: Array<{ message: unknown[]; level: string; timestamp: number }>;
-  exceptions: Array<{ name: string; message: string; timestamp: number }>;
-}> = {}) => ({
+const makeEvent = (
+  overrides: Partial<{
+    scriptName: string;
+    outcome: string;
+    event: {
+      request?: { url: string; method: string; headers: Record<string, string> };
+      response?: { status: number };
+    } | null;
+    logs: Array<{ message: unknown[]; level: string; timestamp: number }>;
+    exceptions: Array<{ name: string; message: string; timestamp: number }>;
+  }> = {}
+) => ({
   scriptName: 'forever-pto',
   outcome: 'ok',
   eventTimestamp: 1700000000000,
@@ -53,7 +58,10 @@ describe('tail worker', () => {
   describe('log entries', () => {
     it('sends a POST request to BETTER_STACK_INGESTING_URL', async () => {
       await worker.tail([makeEvent({ logs: [{ message: ['hello'], level: 'log', timestamp: 1700000000000 }] })], ENV);
-      expect(mockFetch).toHaveBeenCalledWith(ENV.BETTER_STACK_INGESTING_URL, expect.objectContaining({ method: 'POST' }));
+      expect(mockFetch).toHaveBeenCalledWith(
+        ENV.BETTER_STACK_INGESTING_URL,
+        expect.objectContaining({ method: 'POST' })
+      );
     });
 
     it('sets the Authorization header with the Bearer token', async () => {
@@ -96,7 +104,10 @@ describe('tail worker', () => {
   describe('exception entries', () => {
     it('maps exceptions with level "error" and formatted message', async () => {
       const ts = 1700000001000;
-      await worker.tail([makeEvent({ exceptions: [{ name: 'TypeError', message: 'is not a function', timestamp: ts }] })], ENV);
+      await worker.tail(
+        [makeEvent({ exceptions: [{ name: 'TypeError', message: 'is not a function', timestamp: ts }] })],
+        ENV
+      );
       const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
       const body = JSON.parse(options.body as string);
       expect(body[0]).toMatchObject({
@@ -111,17 +122,22 @@ describe('tail worker', () => {
 
   describe('url redaction', () => {
     it('strips the query string so credentials in it never reach the log sink', async () => {
-      await worker.tail([makeEvent({
-        event: {
-          request: {
-            url: 'https://forever-pto.com/en/payment/confirmation?payment_intent=pi_3Abc&payment_intent_client_secret=pi_3Abc_secret_XYZ',
-            method: 'GET',
-            headers: {},
-          },
-          response: { status: 200 },
-        },
-        logs: [{ message: ['boom'], level: 'error', timestamp: 1 }],
-      })], ENV);
+      await worker.tail(
+        [
+          makeEvent({
+            event: {
+              request: {
+                url: 'https://forever-pto.com/en/payment/confirmation?payment_intent=pi_3Abc&payment_intent_client_secret=pi_3Abc_secret_XYZ',
+                method: 'GET',
+                headers: {},
+              },
+              response: { status: 200 },
+            },
+            logs: [{ message: ['boom'], level: 'error', timestamp: 1 }],
+          }),
+        ],
+        ENV
+      );
       const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
       const body = JSON.parse(options.body as string);
       expect(body[0].url).toBe('https://forever-pto.com/en/payment/confirmation');
@@ -129,10 +145,15 @@ describe('tail worker', () => {
     });
 
     it('sets url to undefined when the request url is unparseable', async () => {
-      await worker.tail([makeEvent({
-        event: { request: { url: 'not a url', method: 'GET', headers: {} }, response: { status: 500 } },
-        logs: [{ message: ['boom'], level: 'error', timestamp: 1 }],
-      })], ENV);
+      await worker.tail(
+        [
+          makeEvent({
+            event: { request: { url: 'not a url', method: 'GET', headers: {} }, response: { status: 500 } },
+            logs: [{ message: ['boom'], level: 'error', timestamp: 1 }],
+          }),
+        ],
+        ENV
+      );
       const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
       const body = JSON.parse(options.body as string);
       expect(body[0].url).toBeUndefined();
@@ -165,10 +186,15 @@ describe('tail worker', () => {
     });
 
     it('includes both logs and exceptions from the same event', async () => {
-      await worker.tail([makeEvent({
-        logs: [{ message: ['log msg'], level: 'log', timestamp: 1 }],
-        exceptions: [{ name: 'Error', message: 'boom', timestamp: 2 }],
-      })], ENV);
+      await worker.tail(
+        [
+          makeEvent({
+            logs: [{ message: ['log msg'], level: 'log', timestamp: 1 }],
+            exceptions: [{ name: 'Error', message: 'boom', timestamp: 2 }],
+          }),
+        ],
+        ENV
+      );
       const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
       const body = JSON.parse(options.body as string);
       expect(body).toHaveLength(2);
