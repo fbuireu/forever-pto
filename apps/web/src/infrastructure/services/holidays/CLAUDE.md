@@ -18,6 +18,7 @@ are not non-working days, tags and hands over.
 | `source/dateHolidays.ts` | The production adapter. The **only** place in the app that constructs `Holidays` |
 | `source/fixture.ts` | `createFixtureHolidaySource(calendar)` — the test adapter, plain data in |
 | `source/utils/observed.ts` | `resolveObservedHolidays` — the Region-over-Country rule, pure, shared by both adapters |
+| `source/utils/nonWorking.ts` | `keepNonWorking` (the `public`/`bank` filter) and `stampRegion` (the `location` stamp) — the adapter's two rules, pure and tested |
 
 ## The seam is the source, not the mapper
 
@@ -30,8 +31,9 @@ package meant editing all three plus a fourth call site in `getRegions.ts`.
 They now sit behind `HolidaySource`, and there are two adapters — which is what makes it a real seam rather
 than a hypothetical one:
 
-- `dateHolidaysSource` in production. It owns the `Holidays` constructor, the two-year fetch, the
-  `public`/`bank` filter, the `location` stamp and the observed-day resolution.
+- `dateHolidaysSource` in production. It owns the `Holidays` constructor and the two-year fetch, and calls
+  out to `source/utils/` for every rule: the `public`/`bank` filter, the `location` stamp and the observed-day
+  resolution.
 - `createFixtureHolidaySource` in tests. `getHolidays.test.ts` uses it to run the **real** DTO over
   fixture data, so the whole path is asserted end to end. It used to mock the package wrapper *and* the DTO,
   which meant the folder's load-bearing invariant had no test that could fail for the right reason.
@@ -148,7 +150,9 @@ source that throws yields an empty calendar and a log. It mocks only the logging
 `source/utils/observed.test.ts` pins the Region-over-Country rule on plain arrays.
 
 `source/dateHolidays.ts` has no test of its own, and that is the deliberate line: everything in it is either
-a `date-holidays` call or `resolveObservedHolidays`, which is tested. Holiday data itself is upstream's, and
+a `date-holidays` call or a call into `source/utils/`, which is tested. It held two rules of its own until
+the guide's next sentence was taken at its word — the `public`/`bank` filter and the `location` stamp are now
+`keepNonWorking` and `stampRegion`, testable without constructing `Holidays`. Holiday data itself is upstream's, and
 pinning assertions to it would break on every dependency bump — the version bundled is the version shipped
 ([ADR 0001](../../../../../../adr/0001-planner-runs-in-the-browser.md)). If you add a rule to the adapter,
 put it in `source/utils/` where it can be tested without the package.

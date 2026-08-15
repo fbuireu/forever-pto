@@ -25,7 +25,7 @@ A reader who finds two contracts inside one layer assumes one is a mistake. Both
 - `@application/dto/holiday/types` — `HolidayDTO` and `HolidayVariant`
 - `@application/shared/utils/dates` — the Temporal-backed date helpers
 - `temporal-polyfill` — in `utils/helpers.ts` only, for `PlainYearMonth.daysInMonth`
-- `next-intl` — the `Locale` type alone, for month-name formatting in the Metrics
+- `next-intl` — the `Locale` type alone, threaded through `pipeline.ts` to the Metrics, where it formats month names
 
 No `@infrastructure/*`, no `@ui/*`, no Effect. The reason is the runtime rather than taste: the planner
 evaluates this code inside a Web Worker with no DOM and no server context
