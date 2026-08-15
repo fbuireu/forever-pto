@@ -26,6 +26,7 @@ export default defineConfig({
         },
       ],
       customCss: ['./src/styles/global.css'],
+      components: { SiteTitle: './src/components/SiteTitle.astro' },
       defaultLocale: 'root',
       locales: {
         root: { label: 'English', lang: 'en' },
