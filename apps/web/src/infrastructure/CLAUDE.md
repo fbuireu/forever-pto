@@ -121,7 +121,7 @@ already drifted over how a missing IP header was recorded.
   It lives beside the cookie rather than beside the token because the cookie's `maxAge` is what fixes the
   unit — seconds — for both. Do not reintroduce a second constant: they were separate before, and nothing
   would have caught them drifting apart.
-- **Turso opens a connection per call.** `query`, `execute` and `batch` each call `connect()` themselves, so
+- **Turso opens a connection per call.** `query` and `execute` each call `connect()` themselves, so
   two calls are two connections and nothing spans them transactionally.
 - **A route handler must not translate through `next-intl/server`.** `getTranslations` memoises its message
   loading, and on Cloudflare that cache outlives the request that filled it — the second request onward throws

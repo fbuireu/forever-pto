@@ -27,7 +27,7 @@ const mockSend = vi.fn(() => Effect.succeed({ messageId: 'msg_123' }));
 const TestLayer = Layer.mergeAll(
   Layer.succeed(LoggerService, mockLogger),
   Layer.succeed(ResendService, { send: mockSend }),
-  Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn(), batch: vi.fn() })
+  Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn() })
 );
 
 type ContactR = LoggerService | ResendService | TursoService;

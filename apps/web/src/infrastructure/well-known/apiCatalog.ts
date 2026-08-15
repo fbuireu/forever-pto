@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { WELL_KNOWN_CACHE_CONTROL } from './types';
 
 export function apiCatalog(baseUrl: string) {
   return NextResponse.json(
@@ -16,7 +17,7 @@ export function apiCatalog(baseUrl: string) {
     {
       headers: {
         'Content-Type': 'application/linkset+json',
-        'Cache-Control': 'public, max-age=86400',
+        'Cache-Control': WELL_KNOWN_CACHE_CONTROL,
       },
     }
   );

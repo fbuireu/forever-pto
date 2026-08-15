@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import pkg from '../../../package.json';
+import { WELL_KNOWN_CACHE_CONTROL } from './types';
 
 export function mcpServerCard(baseUrl: string) {
   return NextResponse.json(
@@ -21,7 +22,7 @@ export function mcpServerCard(baseUrl: string) {
     {
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=86400',
+        'Cache-Control': WELL_KNOWN_CACHE_CONTROL,
       },
     }
   );

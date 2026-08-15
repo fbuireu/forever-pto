@@ -32,7 +32,7 @@ vi.mock('@infrastructure/services/payments/repository', () => ({
 const mockLogger = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
 const TestLayer = Layer.mergeAll(
   Layer.succeed(LoggerService, mockLogger),
-  Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn(), batch: vi.fn() }),
+  Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn() }),
   Layer.succeed(StripeServerService, {
     paymentIntents: { create: vi.fn(), retrieve: vi.fn() },
     charges: { retrieve: vi.fn() },

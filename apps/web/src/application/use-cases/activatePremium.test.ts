@@ -41,7 +41,7 @@ const mockStripe = {
 const mockLogger = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
 const TestLayer = Layer.mergeAll(
   Layer.succeed(LoggerService, mockLogger),
-  Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn(), batch: vi.fn() }),
+  Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn() }),
   Layer.succeed(StripeServerService, mockStripe)
 );
 
@@ -224,7 +224,7 @@ describe('activateWithEmail', () => {
   it('runs on a layer providing TursoService alone', async () => {
     const { getPaymentByEmail } = await import('@infrastructure/services/payments/repository');
     vi.mocked(getPaymentByEmail).mockReturnValueOnce(Effect.succeed({ id: 'pi_found', status: 'succeeded' } as never));
-    const TursoOnlyLayer = Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn(), batch: vi.fn() });
+    const TursoOnlyLayer = Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn() });
     const result = await Effect.runPromise(activateWithEmail('test@example.com').pipe(Effect.provide(TursoOnlyLayer)));
     expect(result).toMatchObject({ premiumKey: 'pi_found', token: 'jwt-token' });
   });

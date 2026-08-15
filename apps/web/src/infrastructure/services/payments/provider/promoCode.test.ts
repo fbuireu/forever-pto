@@ -13,7 +13,6 @@ const mockQuery = vi.fn((_sql: string, _args: unknown[]) => Effect.succeed([{ re
 const MockTursoLayer = Layer.succeed(TursoService, {
   query: mockQuery,
   execute: vi.fn(),
-  batch: vi.fn(),
 } as never);
 
 const MockStripeLayer = Layer.succeed(StripeServerService, {

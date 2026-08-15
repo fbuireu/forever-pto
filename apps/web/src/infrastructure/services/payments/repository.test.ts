@@ -14,7 +14,6 @@ const mockQuery = vi.fn();
 const MockTursoLayer = Layer.succeed(TursoService, {
   execute: mockExecute,
   query: mockQuery,
-  batch: vi.fn(),
 });
 
 const runEffect = <A>(effect: Effect.Effect<A, DatabaseError, TursoService>) =>

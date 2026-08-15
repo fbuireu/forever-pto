@@ -2,13 +2,12 @@ import { DatabaseError } from '@infrastructure/errors';
 import { Effect } from 'effect';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockAll, mockRun, mockBatch, mockPrepare, mockConnect } = vi.hoisted(() => {
+const { mockAll, mockRun, mockPrepare, mockConnect } = vi.hoisted(() => {
   const mockAll = vi.fn();
   const mockRun = vi.fn();
-  const mockBatch = vi.fn();
   const mockPrepare = vi.fn().mockImplementation(() => ({ all: mockAll, run: mockRun }));
-  const mockConnect = vi.fn().mockReturnValue({ prepare: mockPrepare, batch: mockBatch });
-  return { mockAll, mockRun, mockBatch, mockPrepare, mockConnect };
+  const mockConnect = vi.fn().mockReturnValue({ prepare: mockPrepare });
+  return { mockAll, mockRun, mockPrepare, mockConnect };
 });
 
 vi.mock('@tursodatabase/serverless', () => ({
@@ -116,47 +115,6 @@ describe('TursoService.execute', () => {
       Effect.gen(function* () {
         const turso = yield* TursoService;
         return yield* turso.execute('INSERT INTO test VALUES (?)').pipe(Effect.flip);
-      }).pipe(Effect.provide(TursoServiceLive))
-    );
-    expect(error).toBeInstanceOf(DatabaseError);
-  });
-});
-
-describe('TursoService.batch', () => {
-  it('executes all statements', async () => {
-    mockBatch.mockResolvedValue(undefined);
-    await Effect.runPromise(
-      Effect.gen(function* () {
-        const turso = yield* TursoService;
-        yield* turso.batch([{ sql: 'INSERT INTO a VALUES (1)' }, { sql: 'INSERT INTO b VALUES (2)' }]);
-      }).pipe(Effect.provide(TursoServiceLive))
-    );
-    expect(mockBatch).toHaveBeenCalledWith([{ sql: 'INSERT INTO a VALUES (1)' }, { sql: 'INSERT INTO b VALUES (2)' }]);
-  });
-
-  it('passes the args of each statement to the client', async () => {
-    mockBatch.mockResolvedValue(undefined);
-    await Effect.runPromise(
-      Effect.gen(function* () {
-        const turso = yield* TursoService;
-        yield* turso.batch([
-          { sql: 'INSERT INTO a VALUES (?)', args: [1] },
-          { sql: 'UPDATE b SET name = ? WHERE id = ?', args: ['Eve', 2] },
-        ]);
-      }).pipe(Effect.provide(TursoServiceLive))
-    );
-    expect(mockBatch).toHaveBeenCalledWith([
-      { sql: 'INSERT INTO a VALUES (?)', args: [1] },
-      { sql: 'UPDATE b SET name = ? WHERE id = ?', args: ['Eve', 2] },
-    ]);
-  });
-
-  it('wraps thrown errors as DatabaseError', async () => {
-    mockBatch.mockRejectedValue(new Error('batch failed'));
-    const error = await Effect.runPromise(
-      Effect.gen(function* () {
-        const turso = yield* TursoService;
-        return yield* turso.batch([{ sql: 'INSERT INTO a VALUES (1)' }]).pipe(Effect.flip);
       }).pipe(Effect.provide(TursoServiceLive))
     );
     expect(error).toBeInstanceOf(DatabaseError);

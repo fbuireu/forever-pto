@@ -10,7 +10,6 @@ const mockExecute = vi.fn();
 const MockTursoLayer = Layer.succeed(TursoService, {
   execute: mockExecute,
   query: vi.fn(),
-  batch: vi.fn(),
 });
 
 const CONTACT_DATA = {

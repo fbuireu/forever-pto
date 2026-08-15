@@ -67,15 +67,15 @@ error from `src/infrastructure/errors.ts`; a client never lets a raw SDK excepti
 
 ## Turso
 
-`service.ts` exposes `query`, `execute` and `batch`, each taking SQL and positional `InValue[]` args. There is
+`service.ts` exposes `query` and `execute`, each taking SQL and positional `InValue[]` args. There is
 no ORM and no schema layer in the repo — SQL is written by hand in `services/*/repository.ts`.
 
-Each of the three calls `connect()` itself, so every call is its own connection and nothing spans them. If you
-need two writes to succeed together, that guarantee does not exist here today.
+Both call `connect()` themselves, so every call is its own connection and nothing spans them. If you need two
+writes to succeed together, that guarantee does not exist here today.
 
-`batch` hands the statements to the driver as they are, `args` included — the driver's `BatchStatement` accepts
-the same `{ sql, args }` shape. It runs them without a locking mode, so a failure part-way through leaves the
-earlier ones committed.
+The tag carried a third method, `batch`, until nothing was found calling it. It ran its statements without a
+locking mode, so a failure part-way through left the earlier ones committed — a partial-failure hazard on a
+seam no caller used. Adding it back means adding a caller in the same commit.
 
 ## Stripe
 

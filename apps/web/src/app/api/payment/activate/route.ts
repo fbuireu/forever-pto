@@ -1,4 +1,5 @@
 import { activateWithPayment } from '@application/use-cases/activatePremium';
+import { resolveClientIp, UNKNOWN_IP } from '@infrastructure/api/operations/types';
 import { LOCALES } from '@infrastructure/i18n/locales';
 import { routing } from '@infrastructure/i18n/routing';
 import { localePath } from '@infrastructure/i18n/utils/url';
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
   if (!paymentIntentId || !clientSecret) return redirectTo(false);
   if (redirectStatus && redirectStatus !== SUCCEEDED_REDIRECT_STATUS) return redirectTo(false);
 
-  const ip = request.headers.get('cf-connecting-ip') ?? request.headers.get('x-forwarded-for') ?? 'unknown';
+  const ip = resolveClientIp(request.headers) ?? UNKNOWN_IP;
 
   const activation = await Effect.runPromise(
     checkRateLimit(ip).pipe(
