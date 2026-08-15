@@ -1,5 +1,5 @@
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { runPlanningPipeline } from './pipeline';
 import { FilterStrategy } from './types';
 
@@ -89,5 +89,15 @@ describe('runPlanningPipeline', () => {
 
     expect(second.planned).toBe(true);
     expect([...secondMonths].some((month) => !firstMonths.has(month))).toBe(true);
+  });
+
+  it('finds the Bridges once per run, not once per generator', async () => {
+    const helpers = await import('./utils/helpers');
+    const findBridges = vi.spyOn(helpers, 'findBridges');
+
+    runPlanningPipeline(baseInput);
+
+    expect(findBridges).toHaveBeenCalledTimes(1);
+    findBridges.mockRestore();
   });
 });

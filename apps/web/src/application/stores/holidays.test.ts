@@ -9,15 +9,13 @@ const {
   mockGetHolidays,
   mockGenerateSuggestionsImpl,
   mockGenerateAlternativesImpl,
-  mockClearDateKeyCache,
-  mockClearHolidayCache,
+  mockFindPlanningCandidates,
   mockStorageGetItem,
 } = vi.hoisted(() => ({
   mockGetHolidays: vi.fn().mockResolvedValue([]),
   mockGenerateSuggestionsImpl: vi.fn().mockReturnValue({ days: [], bridges: [] }),
   mockGenerateAlternativesImpl: vi.fn().mockReturnValue([]),
-  mockClearDateKeyCache: vi.fn(),
-  mockClearHolidayCache: vi.fn(),
+  mockFindPlanningCandidates: vi.fn().mockReturnValue({ availableWorkdays: [], bridges: [] }),
   mockStorageGetItem: vi.fn().mockResolvedValue(null),
 }));
 
@@ -30,9 +28,8 @@ vi.mock('@domain/calendar/suggestions/generateSuggestions', () => ({
 vi.mock('@domain/calendar/alternatives/generateAlternatives', () => ({
   generateAlternatives: mockGenerateAlternativesImpl,
 }));
-vi.mock('@domain/calendar/utils/cache', () => ({
-  clearDateKeyCache: mockClearDateKeyCache,
-  clearHolidayCache: mockClearHolidayCache,
+vi.mock('@domain/calendar/utils/candidates', () => ({
+  findPlanningCandidates: mockFindPlanningCandidates,
 }));
 
 const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
@@ -1007,26 +1004,6 @@ describe('generateSuggestions', () => {
     expect(useHolidaysStore.getState().suggestion).toBeNull();
     expect(useHolidaysStore.getState().alternatives).toHaveLength(0);
   });
-
-  it('clears the calendar caches before running the engine', async () => {
-    useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')] });
-    mockGenerateSuggestionsImpl.mockImplementationOnce(() => {
-      expect(mockClearDateKeyCache).toHaveBeenCalled();
-      expect(mockClearHolidayCache).toHaveBeenCalled();
-      return { days: [new Date('2026-06-01')], bridges: [] };
-    });
-    await useHolidaysStore.getState().generateSuggestions(PARAMS);
-    expect(mockClearDateKeyCache).toHaveBeenCalledTimes(1);
-    expect(mockClearHolidayCache).toHaveBeenCalledTimes(1);
-  });
-
-  it('clears the holiday cache again on a second run so a new holiday set is honoured', async () => {
-    useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')] });
-    await useHolidaysStore.getState().generateSuggestions(PARAMS);
-    useHolidaysStore.setState({ holidays: [makeHoliday('h2', '2026-08-15')] });
-    await useHolidaysStore.getState().generateSuggestions(PARAMS);
-    expect(mockClearHolidayCache).toHaveBeenCalledTimes(2);
-  });
 });
 
 describe('generateSuggestions agrees with the worker', () => {
@@ -1052,10 +1029,8 @@ describe('generateSuggestions agrees with the worker', () => {
 
     await useHolidaysStore.getState().generateSuggestions(PARAMS);
 
-    expect(ids(mockGenerateSuggestionsImpl.mock.calls[0][0].holidays)).toEqual(['h1', 'manual-0']);
-    expect(mockGenerateSuggestionsImpl.mock.calls[0][0].removedDays).toEqual([removed]);
-    expect(ids(mockGenerateAlternativesImpl.mock.calls[0][0].holidays)).toEqual(['h1', 'manual-0']);
-    expect(mockGenerateAlternativesImpl.mock.calls[0][0].removedDays).toEqual([removed]);
+    expect(ids(mockFindPlanningCandidates.mock.calls[0][0].holidays)).toEqual(['h1', 'manual-0']);
+    expect(mockFindPlanningCandidates.mock.calls[0][0].removedDays).toEqual([removed]);
     expect(ids(vi.mocked(generateMetrics).mock.calls[0][0].holidays)).toEqual(['h1', 'manual-0']);
   });
 
@@ -1068,7 +1043,7 @@ describe('generateSuggestions agrees with the worker', () => {
 
     await useHolidaysStore.getState().generateSuggestions(PARAMS);
 
-    const blockedHolidays: HolidayDTO[] = mockGenerateSuggestionsImpl.mock.calls[0][0].holidays;
+    const blockedHolidays: HolidayDTO[] = mockFindPlanningCandidates.mock.calls[0][0].holidays;
     expect(blockedHolidays.every((holiday) => holiday.variant === HolidayVariant.CUSTOM)).toBe(true);
     expect(blockedHolidays.every((holiday) => holiday.isInSelectedRange)).toBe(true);
   });

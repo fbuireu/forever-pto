@@ -6,6 +6,7 @@ import { MONTHS_IN_YEAR } from './metrics/utils/helpers';
 import { generateSuggestions } from './suggestions/generateSuggestions';
 import type { FilterStrategy, MeasuredSuggestion, Suggestion } from './types';
 import { clearDateKeyCache, clearHolidayCache } from './utils/cache';
+import { findPlanningCandidates } from './utils/candidates';
 
 export interface PlanningInput {
   year: number;
@@ -73,24 +74,21 @@ export function runPlanningPipeline({
     return { planned: false, suggestion: measure({ days: [], bridges: [], strategy }), alternatives: [] };
   }
 
-  const baseSuggestion = generateSuggestions({
-    ptoDays: effectivePtoDays,
+  const candidates = findPlanningCandidates({
     holidays: holidaysWithManual,
-    allowPastDays,
     months,
-    strategy,
+    allowPastDays,
     removedDays: removedSuggestedDays,
   });
 
+  const baseSuggestion = generateSuggestions({ ptoDays: effectivePtoDays, candidates, strategy });
+
   const baseAlternatives = generateAlternatives({
     ptoDays: effectivePtoDays,
-    holidays: holidaysWithManual,
-    allowPastDays,
-    months,
+    candidates,
     maxAlternatives,
     existingSuggestion: baseSuggestion.days,
     strategy,
-    removedDays: removedSuggestedDays,
   });
 
   return {

@@ -1,17 +1,12 @@
-import type { HolidayDTO } from '@application/dto/holiday/types';
-import { isWeekend } from '@application/shared/utils/dates';
 import type { Bridge } from '../types';
 import { FilterStrategy } from '../types';
-import { findBridges, getAvailableWorkdays } from '../utils/helpers';
+import type { PlanningCandidates } from '../utils/candidates';
 import { selectBridgesForStrategy, selectOptimalDaysFromBridges } from './utils/selectors';
 
 export interface GenerateSuggestionsParams {
   ptoDays: number;
-  holidays: HolidayDTO[];
-  allowPastDays: boolean;
-  months: Date[];
+  candidates: PlanningCandidates;
   strategy: FilterStrategy;
-  removedDays?: Date[];
 }
 
 const selectGroupedStrategy = (bridges: Bridge[], ptoDays: number) =>
@@ -31,37 +26,18 @@ const STRATEGY_MAP = {
   [FilterStrategy.OPTIMIZED]: selectOptimizedStrategy,
 } as const;
 
-export function generateSuggestions({
-  ptoDays,
-  holidays,
-  allowPastDays,
-  months,
-  strategy,
-  removedDays,
-}: GenerateSuggestionsParams) {
+export function generateSuggestions({ ptoDays, candidates, strategy }: GenerateSuggestionsParams) {
   if (ptoDays <= 0) {
     return { days: [], strategy };
   }
 
-  const effectiveHolidays = holidays.filter((h) => {
-    const date = new Date(h.date);
-    return !isWeekend(date);
-  });
-
-  const availableWorkdays = getAvailableWorkdays({
-    months,
-    holidays: effectiveHolidays,
-    allowPastDays,
-    removedDays,
-  });
+  const { availableWorkdays, bridges } = candidates;
 
   if (availableWorkdays.length === 0) {
     return { days: [], strategy };
   }
 
   const effectivePtoDays = Math.min(availableWorkdays.length, ptoDays);
-
-  const bridges = findBridges({ availableWorkdays, holidays: effectiveHolidays });
 
   const selector = Object.hasOwn(STRATEGY_MAP, strategy) ? STRATEGY_MAP[strategy] : DEFAULT_STRATEGY;
 

@@ -2,22 +2,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CalculateSuggestionsRequest } from './types';
 import { WORKER_MESSAGE_TYPE } from './types';
 
+const mockFindPlanningCandidates = vi.hoisted(() => vi.fn());
 const mockGenerateSuggestions = vi.hoisted(() => vi.fn());
 const mockGenerateAlternatives = vi.hoisted(() => vi.fn());
 const mockGenerateMetrics = vi.hoisted(() => vi.fn());
-const mockClearDateKeyCache = vi.hoisted(() => vi.fn());
-const mockClearHolidayCache = vi.hoisted(() => vi.fn());
 const mockPostMessage = vi.hoisted(() => vi.fn());
 
+vi.mock('@domain/calendar/utils/candidates', () => ({ findPlanningCandidates: mockFindPlanningCandidates }));
 vi.mock('@domain/calendar/suggestions/generateSuggestions', () => ({ generateSuggestions: mockGenerateSuggestions }));
 vi.mock('@domain/calendar/alternatives/generateAlternatives', () => ({
   generateAlternatives: mockGenerateAlternatives,
 }));
 vi.mock('@domain/calendar/metrics/generateMetrics', () => ({ generateMetrics: mockGenerateMetrics }));
-vi.mock('@domain/calendar/utils/cache', () => ({
-  clearDateKeyCache: mockClearDateKeyCache,
-  clearHolidayCache: mockClearHolidayCache,
-}));
 
 vi.stubGlobal('self', { postMessage: mockPostMessage });
 
@@ -56,6 +52,7 @@ const sendMessage = (payload: Partial<CalculateSuggestionsRequest['payload']> = 
 describe('worker onmessage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockFindPlanningCandidates.mockReturnValue({ availableWorkdays: [], bridges: [] });
     mockGenerateSuggestions.mockReturnValue({ days: [new Date(2025, 2, 10)], bridges: [] });
     mockGenerateAlternatives.mockReturnValue([]);
     mockGenerateMetrics.mockReturnValue({ efficiency: 2, totalDaysOff: 7 });
@@ -66,12 +63,6 @@ describe('worker onmessage', () => {
       data: { type: 'UNKNOWN', requestId: 'r', payload: {} },
     } as MessageEvent);
     expect(mockPostMessage).not.toHaveBeenCalled();
-  });
-
-  it('clears caches before processing', () => {
-    sendMessage();
-    expect(mockClearDateKeyCache).toHaveBeenCalled();
-    expect(mockClearHolidayCache).toHaveBeenCalled();
   });
 
   it('posts CALCULATE_SUGGESTIONS_RESULT on success', () => {
@@ -115,7 +106,7 @@ describe('worker onmessage', () => {
 
   it('maps manualDays into pseudo-holidays with CUSTOM variant', () => {
     sendMessage({ manualDays: [new Date(2025, 2, 5).toISOString()] });
-    const callArgs = mockGenerateSuggestions.mock.lastCall?.[0];
+    const callArgs = mockFindPlanningCandidates.mock.lastCall?.[0];
     const manualEntry = callArgs.holidays.find((h: { id: string }) => h.id === 'manual-0');
     expect(manualEntry).toBeDefined();
     expect(manualEntry.variant).toBe('custom');
@@ -133,12 +124,9 @@ describe('worker onmessage', () => {
     const carriesRemovedDay = (holidays: { date: Date }[]) =>
       holidays.some((h) => h.date.toDateString() === removed.toDateString());
 
-    const suggestionArgs = mockGenerateSuggestions.mock.lastCall?.[0];
-    expect(suggestionArgs.removedDays).toEqual([removed]);
-    expect(carriesRemovedDay(suggestionArgs.holidays)).toBe(false);
-    const alternativesArgs = mockGenerateAlternatives.mock.lastCall?.[0];
-    expect(alternativesArgs.removedDays).toEqual([removed]);
-    expect(carriesRemovedDay(alternativesArgs.holidays)).toBe(false);
+    const candidateArgs = mockFindPlanningCandidates.mock.lastCall?.[0];
+    expect(candidateArgs.removedDays).toEqual([removed]);
+    expect(carriesRemovedDay(candidateArgs.holidays)).toBe(false);
   });
 
   it('keeps removedDays out of the metrics holidays, since they are days the user works', () => {

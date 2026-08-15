@@ -17,6 +17,7 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 | `const.ts` | `PTO_CONSTANTS` — every tunable in the engine; the unit and meaning of each are in [Constants](#constants) below |
 | `utils/cache.ts` | `getKey`, `getCombinationKey`, `createHolidaySet`, and the two `clear*` functions the caller must use |
 | `utils/helpers.ts` | `getAvailableWorkdays` (Workday enumeration) and `findBridges` (candidate generation and ranking) |
+| `utils/candidates.ts` | `findPlanningCandidates` — the Workdays and the Bridges, found once per run and handed to both generators |
 | `utils/selection.ts` | `resolveSelectedDays` — folds Manual Days in and Removed Days out of a Suggestion's day list |
 | `utils/budget.ts` | `measureBudget` — how much of the PTO budget a plan has spent, and the Remaining Budget |
 | `suggestions/generateSuggestions.ts` | The entry point: Workdays → Bridges → Strategy selector → Suggestion |
@@ -57,8 +58,8 @@ than pretending, because a stored blob is the only input the type cannot vouch f
 The three generators below are still exported and still tested on their own, but nothing outside the domain
 calls them directly:
 
-- `generateSuggestions({ ptoDays, holidays, allowPastDays, months, strategy, removedDays? })` → `{ days, bridges?, strategy }`
-- `generateAlternatives({ …, maxAlternatives, existingSuggestion, removedDays? })` → `Suggestion[]`
+- `generateSuggestions({ ptoDays, candidates, strategy })` → `{ days, bridges?, strategy }`
+- `generateAlternatives({ ptoDays, candidates, maxAlternatives, existingSuggestion, strategy })` → `Suggestion[]`
 - `generateMetrics({ suggestion, locale, year, bridges, holidays, allowPastDays, manuallySelectedDays, removedSuggestedDays, carryOverMonths? })` → `Metrics`
 
 **`measureBudget` is the one place the budget arithmetic lives, and it is built on `resolveSelectedDays` so it
@@ -212,6 +213,22 @@ two dates, so the Summary showed Effective Days 31 next to Longest Vacation 38 �
 instead was the other candidate and is wrong: a span is *meant* to expand into next year's Holidays, which
 is why the Metrics see the unfiltered two-year set. 366 is chosen so no free run inside the fetched data can
 reach it.
+
+**The two generators are ranking policies over one candidate set, and the set is found once.**
+`findPlanningCandidates` enumerates the Workdays and finds the Bridges; `runPlanningPipeline` calls it once
+and hands the result to both. They each carried the same four-step prologue until then — the weekend filter,
+`getAvailableWorkdays`, `findBridges`, then a selector — on identical arguments, so the whole candidate half
+of the engine ran twice per plan. `pipeline.test.ts` pins it: one `findBridges` call per run.
+
+The weekend filter is gone from both, not moved: `createHolidaySet` drops weekend Holidays itself, and it is
+the only consumer of the `holidays` argument in either `getAvailableWorkdays` or `findBridges`, so the
+generators' copies were inert. The rule the filter enforced — a Bridge must not claim credit for absorbing a
+Saturday — is enforced there and stated in the cache row above.
+
+`effectivePtoDays = Math.min(availableWorkdays.length, ptoDays)` stays in `generateSuggestions` alone. It is
+inert (both selectors add a Bridge only when its PTO Days are unused, so a selection can never exceed the
+distinct available Workdays) and giving it to `generateAlternatives` for symmetry would be a behaviour change
+wearing a tidy-up's clothes.
 
 **`presorted` is load-bearing.** `selectBridgesForStrategy` and `selectOptimalDaysFromBridges` re-sort
 their input unless the caller sets `presorted: true`. `generateAlternatives` exists to impose its own
