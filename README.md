@@ -1,8 +1,18 @@
+<div align="center">
+
+<img src="public/static/images/forever-pto-logo.png" alt="" width="80" align="center">
+
 # Forever PTO
 
-**Maximize your time off.** Forever PTO helps you strategically combine your PTO days with public holidays to get the most out of every one of them.
+**Maximize your time off. Forever PTO helps you strategically combine your PTO days with public holidays to get the most out of every one of them.**
 
-→ **[forever-pto.com](https://forever-pto.com)** · **[docs.forever-pto.com](https://docs.forever-pto.com)** (wiki)
+[![CI](https://img.shields.io/github/actions/workflow/status/fbuireu/forever-pto/ci.yml?style=flat-square&logo=github&label=CI)](https://github.com/fbuireu/forever-pto/actions/workflows/ci.yml)
+[![Uptime](https://uptime.betterstack.com/status-badges/v1/monitor/272ww.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
+[![License: Private](https://img.shields.io/badge/License-Private-lightgrey?style=flat-square)](#license)
+
+**[forever-pto.com](https://forever-pto.com)** · **[Documentation](https://docs.forever-pto.com)** · **[Getting Started](#getting-started)** · **[Stack](#stack)** · **[Contributing](./CONTRIBUTING.md)**
+
+</div>
 
 ---
 
@@ -138,5 +148,3 @@ Conventional commits required. Run `pnpm prepare` to set up git hooks.
 ## License
 
 Private — © Ferran Buireu
-
-[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/272ww.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
