@@ -5,14 +5,20 @@ import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
 const ROOT = resolve(__dirname, '..');
-const LAYER_ROOTS = ['src/app', 'src/application', 'src/domain', 'src/infrastructure', 'src/ui'];
-const LOCALES_DIR = 'src/ui/i18n/messages';
-const ADR_DIR = 'docs/adr';
+const WEB = 'apps/web';
+const DOCS = 'apps/docs';
+const WORKSPACE_PACKAGES = [WEB, DOCS];
+const PACKAGE_GUIDES = WORKSPACE_PACKAGES.map((pkg) => `${pkg}/CLAUDE.md`);
+const LAYER_ROOTS = ['app', 'application', 'domain', 'infrastructure', 'ui'].map((layer) => `${WEB}/src/${layer}`);
+const LOCALES_DIR = `${WEB}/src/ui/i18n/messages`;
+const ADR_DIR = 'adr';
 const ADR_TEMPLATE = '0000-adr-template.md';
-// Written by `pnpm cf:typegen`, so it is absent from the tracked tree by design.
+// Written by `pnpm cf:typegen` into the web package, so it is absent from the tracked tree by design.
 const GENERATED_ENV_TYPES = 'cloudflare-env.d.ts';
+// Written by semantic-release: a record of the past, not a claim about the tree as it stands.
+const GENERATED_MARKDOWN = new Set([`${WEB}/CHANGELOG.md`]);
 
-// `pnpm <word>` occurrences in CLAUDE.md that are not package scripts.
+// `pnpm <word>` occurrences in a guide that are not package scripts.
 const NON_SCRIPT_PNPM = new Set(['install', 'lint-staged', 'commitlint', 'vitest', 'dlx', 'exec']);
 
 const SOURCE_FILE = /\.(ts|tsx)$/;
@@ -29,6 +35,7 @@ const BACKTICKED_SOURCE_FILE = /`([^`\s]+\.(?:ts|tsx))`/g;
 const BACKTICKED_ALIAS = /`([^`.]+\/\*)`/g;
 const CITED_PNPM_SCRIPT = /\bpnpm ([a-z][a-z0-9:-]*)/g;
 const ALIAS_WILDCARD_SUFFIX = /\/\*$/;
+const WORKSPACE_PACKAGE_GLOB = /^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
 
 // Everything the repo would ship, staged or not, so a rule fires before the offending file is committed.
 // Ignored paths and vendored tooling under dotfolders are excluded — they are not ours to fix.
@@ -41,15 +48,31 @@ const trackedFiles = execFileSync('git', ['ls-files', '--cached', '--others', '-
   .filter((path) => path.length > 0 && !path.startsWith('.') && existsSync(join(ROOT, path)));
 
 const markdownFiles = trackedFiles.filter((path) => path.endsWith('.md'));
+const authoredMarkdown = markdownFiles.filter((path) => !GENERATED_MARKDOWN.has(path));
 const sourceFiles = trackedFiles.filter((path) => SOURCE_FILE.test(path));
 const read = (path: string) => readFileSync(join(ROOT, path), 'utf8');
+// A missing guide fails its own assertion rather than crashing the module and taking every rule with it.
+const readIfPresent = (path: string) => (existsSync(join(ROOT, path)) ? read(path) : '');
+const readJson = (path: string) => JSON.parse(read(path));
+
+const isGitIgnored = (path: string) => {
+  try {
+    execFileSync('git', ['check-ignore', '--no-index', '-q', '--', path], { cwd: ROOT });
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 const rootGuide = read('CLAUDE.md');
-const packageScripts: Record<string, string> = JSON.parse(read('package.json')).scripts ?? {};
-const tsconfig = JSON.parse(read('tsconfig.json'));
-const tsconfigOptions: Record<string, unknown> = tsconfig.compilerOptions;
-const tsconfigExclude: string[] = tsconfig.exclude ?? [];
-const tsconfigPaths: Record<string, string[]> = tsconfigOptions.paths as Record<string, string[]>;
+const webGuide = readIfPresent(`${WEB}/CLAUDE.md`);
+const rootManifest = readJson('package.json');
+const rootScripts: Record<string, string> = rootManifest.scripts ?? {};
+const webScripts: Record<string, string> = readJson(`${WEB}/package.json`).scripts ?? {};
+const webTsconfig = readJson(`${WEB}/tsconfig.json`);
+const webTsconfigOptions: Record<string, unknown> = webTsconfig.compilerOptions;
+const webTsconfigExclude: string[] = webTsconfig.exclude ?? [];
+const webTsconfigPaths: Record<string, string[]> = webTsconfigOptions.paths as Record<string, string[]>;
 
 describe('CONTEXT.md is the domain glossary and nothing else', () => {
   const glossary = read('CONTEXT.md');
@@ -94,17 +117,67 @@ describe('CONTEXT.md is the domain glossary and nothing else', () => {
   });
 });
 
+describe('the workspace is shaped the way the guides describe it', () => {
+  const workspaceGlobs = [...read('pnpm-workspace.yaml').matchAll(WORKSPACE_PACKAGE_GLOB)].map(([, glob]) => glob);
+
+  it('declares package globs that match a directory holding a manifest', () => {
+    const dangling = workspaceGlobs.filter((glob) => {
+      const [base] = glob.split('/*');
+      return !existsSync(join(ROOT, base ?? '')) || !statSync(join(ROOT, base ?? '')).isDirectory();
+    });
+    expect(dangling).toEqual([]);
+  });
+
+  it.each(WORKSPACE_PACKAGES)('%s is a workspace member with its own manifest', (pkg) => {
+    expect(existsSync(join(ROOT, pkg, 'package.json'))).toBe(true);
+    expect(workspaceGlobs.some((glob) => pkg.startsWith(glob.replace(/\*$/, '')))).toBe(true);
+  });
+
+  // The root is the workspace root, not a package. A dependency here would be installed for both
+  // packages and belong to neither, which is the coupling the split exists to remove.
+  it('keeps the root private, unversioned and dependency-free', () => {
+    expect(rootManifest.private).toBe(true);
+    expect(rootManifest.version).toBe('0.0.0');
+    expect(rootManifest.dependencies).toBeUndefined();
+  });
+
+  // One Biome config and one lockfile are deliberate: `--changed` needs the git root, and a second
+  // lockfile inside a package silently shadows the workspace resolution.
+  it.each(WORKSPACE_PACKAGES)('%s carries no biome config and no lockfile of its own', (pkg) => {
+    expect(existsSync(join(ROOT, pkg, 'biome.json'))).toBe(false);
+    expect(existsSync(join(ROOT, pkg, 'pnpm-lock.yaml'))).toBe(false);
+  });
+
+  // The strict/allowJs guard below reads apps/web/tsconfig.json because that is the file `next build`
+  // rewrites. It only rewrites the one beside its own config, so if these ever part company the guard
+  // would be watching a file nothing writes.
+  it('keeps the web tsconfig beside the next config it is rewritten by', () => {
+    expect(existsSync(join(ROOT, WEB, 'next.config.ts'))).toBe(true);
+    expect(existsSync(join(ROOT, WEB, 'tsconfig.json'))).toBe(true);
+  });
+});
+
 describe('folder guides exist where they are promised', () => {
-  const nestedGuides = markdownFiles.filter((path) => path.startsWith('src/') && path.endsWith('/CLAUDE.md'));
+  const nestedGuides = markdownFiles.filter((path) => path !== 'CLAUDE.md' && path.endsWith('CLAUDE.md'));
+  const webSrcGuides = nestedGuides.filter((path) => path.startsWith(`${WEB}/src/`));
 
   it.each(LAYER_ROOTS)('%s has a CLAUDE.md', (layer) => {
     expect(existsSync(join(ROOT, layer, 'CLAUDE.md'))).toBe(true);
   });
 
-  // The reverse direction of the link check: a guide the root table forgets will not be read.
-  it('lists every nested guide in the root CLAUDE.md table', () => {
-    expect(nestedGuides.length).toBeGreaterThan(LAYER_ROOTS.length);
-    expect(nestedGuides.filter((path) => !rootGuide.includes(`./${path}`))).toEqual([]);
+  it.each(PACKAGE_GUIDES)('%s exists', (guide) => {
+    expect(existsSync(join(ROOT, guide))).toBe(true);
+  });
+
+  // The reverse direction of the link check, in two levels: a guide no index points at will not be read.
+  it('lists every package guide in the root CLAUDE.md', () => {
+    expect(PACKAGE_GUIDES.filter((guide) => !rootGuide.includes(`./${guide}`))).toEqual([]);
+  });
+
+  it('lists every web source guide in the apps/web CLAUDE.md table', () => {
+    expect(webSrcGuides.length).toBeGreaterThan(LAYER_ROOTS.length);
+    const missing = webSrcGuides.filter((path) => !webGuide.includes(`./${path.slice(`${WEB}/`.length)}`));
+    expect(missing).toEqual([]);
   });
 
   // The heading is the guide's only self-identification; a wrong one sends a reader to another folder.
@@ -161,8 +234,8 @@ describe('architecture decision records', () => {
   });
 
   // An ADR only its own folder points at will not be read.
-  it('are each linked from a document outside docs/adr/', () => {
-    const elsewhere = markdownFiles.filter((path) => !path.startsWith(`${ADR_DIR}/`)).map(read);
+  it('are each linked from a document outside adr/', () => {
+    const elsewhere = authoredMarkdown.filter((path) => !path.startsWith(`${ADR_DIR}/`)).map(read);
     const orphaned = decisions.filter((file) => !elsewhere.some((body) => body.includes(file)));
     expect(orphaned).toEqual([]);
   });
@@ -173,7 +246,7 @@ describe('documentation does not point at things that are gone', () => {
 
   it('resolves every relative markdown link', () => {
     const broken: string[] = [];
-    for (const file of markdownFiles) {
+    for (const file of authoredMarkdown) {
       for (const [, , target] of read(file).matchAll(MARKDOWN_LINK)) {
         if (IGNORED_LINK.test(target)) continue;
         const [path] = target.split('#');
@@ -191,7 +264,7 @@ describe('documentation does not point at things that are gone', () => {
     const exists = (token: string) => sourceFiles.some((path) => path === token || path.endsWith(`/${token}`));
 
     const missing: string[] = [];
-    for (const file of markdownFiles) {
+    for (const file of authoredMarkdown) {
       for (const [, token] of read(file).matchAll(BACKTICKED_SOURCE_FILE)) {
         if (token.includes('*') || token.startsWith('.') || GENERATED.has(token)) continue;
         if (!exists(token)) missing.push(`${file} -> ${token}`);
@@ -201,10 +274,11 @@ describe('documentation does not point at things that are gone', () => {
   });
 });
 
-describe('src/ carries no explanatory comments', () => {
+describe('apps/web/src carries no explanatory comments', () => {
   // A suppression changes what the linter does, and a generated file's banner is not ours to delete.
   // Both comment forms count: a11y suppressions on JSX are written `{/* biome-ignore … */}`.
   const ALLOWED = /(?:\/\/|\/\*)\s*(biome-ignore\b|Auto-generated by\b)/;
+  const webSources = sourceFiles.filter((path) => path.startsWith(`${WEB}/src/`));
 
   // This parses the file rather than matching comment delimiters by hand. Four hand-rolled versions were
   // written and every one was wrong somewhere: a URL inside a multi-line template read as a comment; a stray
@@ -247,9 +321,15 @@ describe('src/ carries no explanatory comments', () => {
     return found.sort((a, b) => a.line - b.line);
   };
 
+  // A prefix that matches nothing makes this rule pass on an empty set, which is exactly how it read
+  // for the length of the move commit. The rule is only worth anything while it has files to check.
+  it('has app sources to check at all', () => {
+    expect(webSources.length).toBeGreaterThan(100);
+  });
+
   it('leaves the rationale in the folder guides instead', () => {
     const offenders: string[] = [];
-    for (const file of sourceFiles.filter((path) => path.startsWith('src/'))) {
+    for (const file of webSources) {
       const source = read(file);
       // parsing every file is what made this rule time out under parallel load; a file holding neither
       // delimiter anywhere cannot hold a comment, and that is most of them
@@ -263,52 +343,63 @@ describe('src/ carries no explanatory comments', () => {
   });
 });
 
-describe('CLAUDE.md describes the project as it is configured', () => {
+describe('the guides describe the project as it is configured', () => {
   // Backticked `foo/*` tokens are aliases; the dot filter drops the wrangler route pattern
   // `forever-pto.com/*`. Whole backticked tokens, not substrings: the rule this replaced stripped the
   // `/*` and searched the raw file, so `@app` matched inside `@application` and `src/*` reduced to `src`,
   // and either alias could be deleted from the guide with every assertion still green.
-  const documentedAliases = new Set([...rootGuide.matchAll(BACKTICKED_ALIAS)].map(([, alias]) => alias));
+  const documentedAliases = new Set([...webGuide.matchAll(BACKTICKED_ALIAS)].map(([, alias]) => alias));
+  const citedScripts = (guide: string) =>
+    [...new Set([...guide.matchAll(CITED_PNPM_SCRIPT)].map(([, script]) => script))].filter(
+      (script) => !NON_SCRIPT_PNPM.has(script)
+    );
 
-  it('documents only package scripts that exist', () => {
-    const cited = [...rootGuide.matchAll(CITED_PNPM_SCRIPT)]
-      .map(([, script]) => script)
-      .filter((script) => !NON_SCRIPT_PNPM.has(script));
-    expect([...new Set(cited)].filter((script) => !(script in packageScripts))).toEqual([]);
+  it('cites only root scripts that the root manifest has', () => {
+    expect(citedScripts(rootGuide).filter((script) => !(script in rootScripts))).toEqual([]);
   });
 
-  it('documents every path alias tsconfig declares', () => {
-    expect(Object.keys(tsconfigPaths).filter((alias) => !documentedAliases.has(alias))).toEqual([]);
+  // A root passthrough of the same name satisfies a reader either way, so both manifests count.
+  it('cites only web scripts that resolve in the web or root manifest', () => {
+    const unknown = citedScripts(webGuide).filter((script) => !(script in webScripts) && !(script in rootScripts));
+    expect(unknown).toEqual([]);
   });
 
-  it('documents no path alias tsconfig does not declare', () => {
-    expect([...documentedAliases].filter((alias) => !(alias in tsconfigPaths))).toEqual([]);
+  it('documents every path alias the web tsconfig declares', () => {
+    expect(Object.keys(webTsconfigPaths).filter((alias) => !documentedAliases.has(alias))).toEqual([]);
   });
 
+  it('documents no path alias the web tsconfig does not declare', () => {
+    expect([...documentedAliases].filter((alias) => !(alias in webTsconfigPaths))).toEqual([]);
+  });
+
+  // Targets are relative to the tsconfig that declares them, which now sits two levels below the root.
+  // `resolve` rather than `join`, because a cross-package target legitimately starts with `../`.
   it('declares no alias pointing at a directory that does not exist', () => {
-    const dangling = Object.entries(tsconfigPaths).filter(([, [target]]) => {
-      const path = join(ROOT, (target ?? '').replace(ALIAS_WILDCARD_SUFFIX, ''));
+    const dangling = Object.entries(webTsconfigPaths).filter(([, [target]]) => {
+      const path = resolve(ROOT, WEB, (target ?? '').replace(ALIAS_WILDCARD_SUFFIX, ''));
       return !existsSync(path) || !statSync(path).isDirectory();
     });
     expect(dangling.map(([alias]) => alias)).toEqual([]);
   });
 
-  // `next build` rewrites tsconfig.json on every run and fills in its own defaults for any key that is
-  // absent — `strict: false` and `allowJs: true`. Both would land at the next build rather than at the
-  // deletion site, so neither is safe to drop as redundant.
+  // `next build` rewrites apps/web/tsconfig.json on every run and fills in its own defaults for any key
+  // that is absent — `strict: false` and `allowJs: true`. Both would land at the next build rather than at
+  // the deletion site, so neither is safe to drop as redundant.
   it('keeps strict on, because next build writes it false when the key is missing', () => {
-    expect(tsconfigOptions.strict).toBe(true);
+    expect(webTsconfigOptions.strict).toBe(true);
   });
 
   it('keeps JavaScript out, because next build writes allowJs true when the key is missing', () => {
-    expect(tsconfigOptions.allowJs).toBe(false);
+    expect(webTsconfigOptions.allowJs).toBe(false);
   });
 
-  // `include` is `**/*.ts`, so a generated root-level .d.ts joins the program and the workerd globals in it
-  // replace lib.dom's Response. Both halves of the guard are asserted because either alone is useless.
+  // `include` is `**/*.ts`, so a generated .d.ts at the package root joins the program and the workerd
+  // globals in it replace lib.dom's Response. Both halves of the guard are asserted because either alone
+  // is useless. The ignore half is asked of git rather than matched against .gitignore as a substring,
+  // so an unanchored pattern that stops covering the file is caught.
   it('keeps the generated Cloudflare env types out of the program and out of git', () => {
-    expect(tsconfigExclude).toContain(GENERATED_ENV_TYPES);
-    expect(read('.gitignore')).toContain(GENERATED_ENV_TYPES);
+    expect(webTsconfigExclude).toContain(GENERATED_ENV_TYPES);
+    expect(isGitIgnored(`${WEB}/${GENERATED_ENV_TYPES}`)).toBe(true);
   });
 });
 
