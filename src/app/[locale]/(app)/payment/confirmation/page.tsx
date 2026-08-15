@@ -2,14 +2,15 @@ import { Link } from '@application/i18n/navigation';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { ApplicationLayer } from '@infrastructure/layers';
 import { confirmation } from '@infrastructure/services/payments/confirmation';
+import { ACTIVATION_FAILED } from '@infrastructure/services/premium/activation';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
-import { getCurrencySymbol } from '@ui/utils/currencies';
+import { PremiumSessionSync } from '@ui/modules/premium/PremiumSessionSync';
 import { Effect } from 'effect';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import type { Locale } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
+import { getFormatter, getTranslations } from 'next-intl/server';
 
 export { generateMetadata } from './metadata';
 
@@ -17,12 +18,36 @@ interface PaymentSuccessParams {
   searchParams: Promise<{
     payment_intent?: string;
     redirect_status?: string;
+    activation?: string;
   }>;
   params: Promise<{ locale: Locale }>;
 }
 
-async function PaymentError() {
+const NOT_CHARGED_STATUSES = new Set(['requires_payment_method', 'canceled']);
+
+async function PaymentError({ charged }: { charged: boolean }) {
   const t = await getTranslations('paymentConfirmation.failed');
+
+  if (charged) {
+    return (
+      <div className='min-h-screen flex items-center justify-center p-4 bg-background'>
+        <Card className='w-full max-w-md border-amber-500/50'>
+          <CardHeader className='text-center'>
+            <div className='mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-amber-500/10'>
+              <XCircle className='size-6 text-amber-500' />
+            </div>
+            <CardTitle className='text-amber-600 dark:text-amber-400'>{t('unconfirmedTitle')}</CardTitle>
+            <CardDescription>{t('unconfirmedDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild className='w-full'>
+              <Link href='/'>{t('returnHome')}</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className='min-h-screen flex items-center justify-center p-4 bg-background'>
@@ -56,7 +81,8 @@ async function PaymentError() {
 
 export default async function PaymentSuccessPage({ searchParams, params }: Readonly<PaymentSuccessParams>) {
   const logger = getBetterStackInstance();
-  const [{ payment_intent: paymentIntentId }, { locale }] = await Promise.all([searchParams, params]);
+  const [{ payment_intent: paymentIntentId, activation }, { locale }] = await Promise.all([searchParams, params]);
+  const hasActivated = activation !== ACTIVATION_FAILED;
 
   if (!paymentIntentId) {
     logger.warn('Payment success page accessed without payment_intent, redirecting to home');
@@ -65,7 +91,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
 
   const data = await Effect.runPromise(confirmation(paymentIntentId).pipe(Effect.provide(ApplicationLayer)));
 
-  if (!data || data.status !== 'succeeded') {
+  if (data?.status !== 'succeeded') {
     if (data) {
       logger.warn('Payment intent not succeeded', {
         paymentIntentId: data.id,
@@ -74,11 +100,15 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
         currency: data.currency,
       });
     }
-    return <PaymentError />;
+    return <PaymentError charged={!data || !NOT_CHARGED_STATUSES.has(data.status)} />;
   }
 
-  const t = await getTranslations('paymentConfirmation.success');
-  const currencySymbol = getCurrencySymbol({ locale, currency: data.currency });
+  const [t, format] = await Promise.all([getTranslations('paymentConfirmation.success'), getFormatter({ locale })]);
+  const formattedAmount = format.number(data.amount, {
+    style: 'currency',
+    currency: data.currency,
+    minimumFractionDigits: 2,
+  });
 
   return (
     <div className='min-h-screen flex items-center justify-center p-4 bg-background m-auto'>
@@ -94,10 +124,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
           <div className='rounded-lg bg-muted p-4 space-y-2'>
             <div className='flex justify-between text-sm'>
               <span className='text-muted-foreground'>{t('amountPaid')}</span>
-              <span className='font-medium'>
-                {currencySymbol}
-                {data.amount.toFixed(2)}
-              </span>
+              <span className='font-medium'>{formattedAmount}</span>
             </div>
             <div className='flex justify-between text-sm'>
               <span className='text-muted-foreground'>{t('status')}</span>
@@ -109,9 +136,16 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
             </div>
           </div>
 
-          <div className='rounded-lg bg-green-500/10 border border-green-500/20 p-4 text-sm'>
-            <p className='text-green-700 dark:text-green-300'>{t('premiumActivated')}</p>
-          </div>
+          {hasActivated && <PremiumSessionSync />}
+          {hasActivated ? (
+            <div className='rounded-lg bg-green-500/10 border border-green-500/20 p-4 text-sm'>
+              <p className='text-green-700 dark:text-green-300'>{t('premiumActivated')}</p>
+            </div>
+          ) : (
+            <div className='rounded-lg bg-destructive/10 border border-destructive/20 p-4 text-sm'>
+              <p className='text-destructive'>{t('premiumActivationFailed')}</p>
+            </div>
+          )}
 
           <Button asChild className='w-full bg-green-600 hover:bg-green-700'>
             <Link href='/'>{t('continueHome')}</Link>

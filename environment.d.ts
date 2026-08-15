@@ -18,16 +18,13 @@ declare global {
       NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: string;
       NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: string;
       NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN: string;
-      CF_ACCESS_TEAM_DOMAIN: string;
-      CF_ACCESS_WORKERS_AUD: string;
-      CF_ACCESS_PREVIEW_AUD: string;
     }
   }
 
   interface CloudflareEnv {
     NEXT_PUBLIC_SITE_URL: string;
     NEXT_PUBLIC_CONTACT_EMAIL: string;
-    RATE_LIMIT_KV: KVNamespace;
+    PAYMENT_RATE_LIMITER: { limit: (options: { key: string }) => Promise<{ success: boolean }> };
   }
 
   interface Window {

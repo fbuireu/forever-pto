@@ -1,18 +1,23 @@
+'use client';
+
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { usePremiumStore } from '@application/stores/premium';
 import { useUIStore } from '@application/stores/ui';
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import { confirmPayment } from '@ui/adapters/payments/checkout';
+import { ConfirmPaymentOutcome, confirmPayment } from '@ui/adapters/payments/checkout';
 import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
+import { resolveApiErrorMessage } from '@ui/modules/shared/utils/helpers';
 import { Skeleton } from 'boneyard-js/react';
 import { AlertCircle } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { type FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { ExpressCheckoutFixture } from './ExpressCheckoutFixture';
+
+const UNKNOWN_PAYMENT_ERROR = 'unknown_error';
 
 async function fireConfetti() {
   const confetti = (await import('canvas-confetti')).default;
@@ -43,14 +48,15 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   const elements = useElements();
   const locale = useLocale();
   const t = useTranslations('checkout');
+  const format = useFormatter();
   const [isExpressReady, setIsExpressReady] = useState(false);
   const [hasExpressOptions, setHasExpressOptions] = useState<boolean | null>(null);
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { getCurrencyFromLocale, currencySymbol } = useUIStore(
+  const { getCurrencyFromLocale, currency } = useUIStore(
     useShallow((state) => ({
       getCurrencyFromLocale: state.getCurrencyFromLocale,
-      currencySymbol: state.currencySymbol,
+      currency: state.currency,
     }))
   );
   const setPremiumStatus = usePremiumStore((state) => state.setPremiumStatus);
@@ -63,12 +69,16 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
     void import('canvas-confetti');
   }, []);
 
-  const formattedAmount = useMemo(() => amount.toFixed(2), [amount]);
+  const formatCurrency = useCallback(
+    (value: number) => format.number(value, { style: 'currency', currency, minimumFractionDigits: 2 }),
+    [format, currency]
+  );
+
+  const formattedAmount = useMemo(() => formatCurrency(amount), [amount, formatCurrency]);
   const discountText = useMemo(() => {
     if (!discountInfo) return null;
-    const saved = (discountInfo.originalAmount - discountInfo.finalAmount).toFixed(2);
-    return t('promoSaved', { saved });
-  }, [discountInfo, t]);
+    return t('promoSaved', { saved: formatCurrency(discountInfo.originalAmount - discountInfo.finalAmount) });
+  }, [discountInfo, t, formatCurrency]);
 
   const processPayment = useCallback(async () => {
     if (!stripe || !elements) return;
@@ -79,26 +89,31 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
       stripe,
       elements,
       email,
-      returnUrl: `${globalThis.location.origin}/${locale}/payment/confirmation`,
+      returnUrl: `${globalThis.location.origin}/api/payment/activate?locale=${locale}`,
     });
 
-    if (!result.success) {
-      const errorMsg = result.error ?? t('paymentFailed');
-      setErrorMessage(errorMsg);
-      track('payment_failed', { error: errorMsg });
-    } else {
-      if ('sessionData' in result && result.sessionData) {
-        setPremiumStatus({
-          email: result.sessionData.email,
-          premiumKey: result.sessionData.premiumKey,
-        });
-      }
+    switch (result.outcome) {
+      case ConfirmPaymentOutcome.FAILED_AFTER_CHARGE:
+        setErrorMessage(t('activationFailed'));
+        track('payment_activation_failed', { error: result.error || UNKNOWN_PAYMENT_ERROR });
+        return;
 
-      track('payment_completed', { amount });
-      void fireConfetti();
-      setTimeout(() => {
-        onSuccess();
-      }, 1000);
+      case ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE:
+        setErrorMessage(resolveApiErrorMessage({ code: result.error, t, fallback: t('paymentFailed') }));
+        track('payment_failed', { error: result.error || UNKNOWN_PAYMENT_ERROR });
+        return;
+
+      case ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER:
+        return;
+
+      case ConfirmPaymentOutcome.SUCCEEDED:
+        setPremiumStatus({ email: result.sessionData.email, premiumKey: result.sessionData.premiumKey });
+        track('payment_completed', { amount });
+        void fireConfetti();
+        setTimeout(() => {
+          onSuccess();
+        }, 1000);
+        return;
     }
   }, [stripe, elements, email, onSuccess, setPremiumStatus, t, locale, amount]);
 
@@ -138,7 +153,6 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
         <div className='text-right'>
           <p className='text-sm text-muted-foreground'>{t('totalAmount')}</p>
           <p className='text-2xl font-bold' aria-live='polite'>
-            {currencySymbol}
             {formattedAmount}
           </p>
           {discountText && (
@@ -160,7 +174,12 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
               </div>
             </div>
             <div className='relative min-h-12'>
-              <Skeleton name='express-checkout' loading={!isExpressReady} fixture={<ExpressCheckoutFixture />}>
+              <Skeleton
+                name='express-checkout'
+                loading={!isExpressReady}
+                fixture={<ExpressCheckoutFixture />}
+                fallback={<ExpressCheckoutFixture />}
+              >
                 <div />
               </Skeleton>
               <div className={!isExpressReady ? 'invisible absolute inset-0' : 'visible'}>
@@ -206,7 +225,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
           className='w-full bg-green-600 hover:bg-green-700'
           aria-busy={isPending}
         >
-          {isPending ? t('processing') : `${t('pay')} ${currencySymbol}${formattedAmount}`}
+          {isPending ? t('processing') : `${t('pay')} ${formattedAmount}`}
         </Button>
       </form>
     </div>

@@ -15,7 +15,7 @@ const MockStripeLayer = Layer.succeed(StripeServerService, {
     retrieve: mockRetrieve,
   },
   charges: { retrieve: vi.fn() },
-  promotionCodes: { list: vi.fn(), retrieve: vi.fn() },
+  promotionCodes: { list: vi.fn() },
   webhooks: { constructEvent: vi.fn() },
 });
 
@@ -29,8 +29,7 @@ const MockLoggerLayer = Layer.succeed(LoggerService, {
 
 const MockLayer = Layer.mergeAll(MockStripeLayer, MockLoggerLayer);
 
-const run = (id: string) =>
-  Effect.runPromise(confirmation(id).pipe(Effect.provide(MockLayer)));
+const run = (id: string) => Effect.runPromise(confirmation(id).pipe(Effect.provide(MockLayer)));
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -38,25 +37,19 @@ beforeEach(() => {
 
 describe('confirmation', () => {
   it('returns a DTO when the payment intent is retrieved successfully', async () => {
-    mockRetrieve.mockReturnValue(
-      Effect.succeed({ id: 'pi_123', status: 'succeeded', amount: 1000, currency: 'eur' })
-    );
+    mockRetrieve.mockReturnValue(Effect.succeed({ id: 'pi_123', status: 'succeeded', amount: 1000, currency: 'eur' }));
     const result = await run('pi_123');
     expect(result).toEqual({ id: 'pi_123', status: 'succeeded', amount: 10, currency: 'EUR' });
   });
 
   it('converts amount from cents to euros', async () => {
-    mockRetrieve.mockReturnValue(
-      Effect.succeed({ id: 'pi_456', status: 'succeeded', amount: 500, currency: 'eur' })
-    );
+    mockRetrieve.mockReturnValue(Effect.succeed({ id: 'pi_456', status: 'succeeded', amount: 500, currency: 'eur' }));
     const result = await run('pi_456');
     expect(result?.amount).toBe(5);
   });
 
   it('uppercases the currency', async () => {
-    mockRetrieve.mockReturnValue(
-      Effect.succeed({ id: 'pi_789', status: 'succeeded', amount: 200, currency: 'usd' })
-    );
+    mockRetrieve.mockReturnValue(Effect.succeed({ id: 'pi_789', status: 'succeeded', amount: 200, currency: 'usd' }));
     const result = await run('pi_789');
     expect(result?.currency).toBe('USD');
   });

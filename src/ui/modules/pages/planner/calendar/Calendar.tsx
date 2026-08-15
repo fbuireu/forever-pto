@@ -1,3 +1,5 @@
+'use client';
+
 import {
   addMonths,
   type Day,
@@ -10,13 +12,14 @@ import {
 import type { FiltersState } from '@application/stores/filters';
 import type { HolidaysState } from '@application/stores/holidays';
 import { usePremiumStore } from '@application/stores/premium';
+import type { DayOutcome } from '@application/stores/types';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/modules/core/animate/base/Tooltip';
 import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
 import { ChevronRight } from '@ui/modules/core/animate/icons/ChevronRight';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
-import { SupportButton } from '@ui/modules/pages/homepage/navigation/SupportButton';
 import { ConditionalWrapper } from '@ui/modules/shared/ConditionalWrapper';
+import { SupportButton } from '@ui/modules/shared/SupportButton';
 import { cn } from '@ui/utils/cn';
 import { LockIcon } from 'lucide-react';
 import type { Locale } from 'next-intl';
@@ -27,11 +30,11 @@ import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
 import {
   getPreviewRange,
   isAlternative,
-  isBankHoliday as isBankHolidayFn,
   isCustom as isCustomFn,
   isHoliday,
   isInRange,
   isManuallySelected,
+  isNationalOrRegionalHoliday as isNationalOrRegionalHolidayFn,
   isPast,
   isRangeEnd,
   isRangeSelected,
@@ -41,6 +44,7 @@ import {
   isToday,
 } from '../utils/modifiers';
 import { getDayClassNames, isFromToObject } from './utils/helpers';
+import { DAY_REFUSAL_COPY } from './utils/refusals';
 
 export interface FromTo {
   from: Date;
@@ -83,8 +87,7 @@ interface CalendarProps {
   previewAlternativeIndex?: HolidaysState['previewAlternativeIndex'];
   manuallySelectedDays?: Date[];
   removedSuggestedDays?: Date[];
-  onDayToggle?: (date: Date) => void;
-  canSelectMoreDays?: boolean;
+  onDayToggle?: (date: Date) => DayOutcome;
 }
 
 interface RangeState {
@@ -117,7 +120,6 @@ export function Calendar({
   manuallySelectedDays = EMPTY_DATES,
   removedSuggestedDays = EMPTY_DATES,
   onDayToggle,
-  canSelectMoreDays = true,
   ...props
 }: Readonly<CalendarProps>) {
   const t = useTranslations('toasts');
@@ -158,7 +160,7 @@ export function Calendar({
   const modifiers = useMemo(() => {
     const holidayFn = isHoliday(holidays);
     const customFn = isCustomFn(holidays);
-    const bankHolidayFn = isBankHolidayFn(holidays);
+    const nationalOrRegionalHolidayFn = isNationalOrRegionalHolidayFn(holidays);
     const isPastFn = isPast(allowPastDays, today);
     const isSuggestionFn = isSuggestion(currentSelection, removedSuggestedDays);
     const isAlternativeFn = isAlternative({ alternatives, suggestion, previewAlternativeIndex, currentSelection });
@@ -170,7 +172,7 @@ export function Calendar({
       weekend: isWeekend,
       holiday: holidayFn,
       custom: customFn,
-      bankHoliday: bankHolidayFn,
+      nationalOrRegionalHoliday: nationalOrRegionalHolidayFn,
       today: isToday(today),
       suggested: isSuggestionFn,
       alternative: isAlternativeFn,
@@ -249,7 +251,6 @@ export function Calendar({
         const isPastDay = !allowPastDays && modifiers.disabled(date);
         const isManual = modifiers.manuallySelected(date);
         const isSuggested = modifiers.suggested(date);
-        const isBankHoliday = modifiers.bankHoliday(date);
         if (!premiumKey) {
           toast.info(tPremium('premiumFeature'), {
             description: tPremium('unlockDescription'),
@@ -276,26 +277,13 @@ export function Calendar({
           return;
         }
 
-        if (isBankHoliday) {
-          toast.warning(t('cannotSelectBankHoliday'), {
-            description: t('bankHolidayDescription'),
-          });
-          return;
-        }
+        const outcome = onDayToggle(date);
 
-        if (isManual || isSuggested) {
-          onDayToggle(date);
-          return;
-        }
+        if (outcome.applied) return;
 
-        if (canSelectMoreDays) {
-          onDayToggle(date);
-          return;
-        }
+        const refusal = DAY_REFUSAL_COPY[outcome.reason];
+        if (refusal) toast.warning(t(refusal.title), { description: t(refusal.description) });
 
-        toast.warning(t('noPtoDaysRemaining'), {
-          description: t('removeDaysToFree'),
-        });
         return;
       }
 
@@ -356,11 +344,9 @@ export function Calendar({
       modifiers.disabled,
       modifiers.suggested,
       modifiers.manuallySelected,
-      canSelectMoreDays,
       premiumKey,
       t,
       tPremium,
-      modifiers.bankHoliday,
     ]
   );
 
@@ -480,8 +466,7 @@ export function Calendar({
           const isManualDay = modifiers.manuallySelected(date);
           const isSuggestedDay = modifiers.suggested(date);
 
-          // In manual mode, allow clicking on suggested/manual days even if they're in the past
-          const isDisabled = disabled ?? (isPastDay && !isManualDay && !isSuggestedDay);
+          const isDisabled = disabled || (isPastDay && !isManualDay && !isSuggestedDay);
           const isOutsideMonth = !isSameMonth(date, currentMonth);
 
           if (!showOutsideDays && isOutsideMonth) {

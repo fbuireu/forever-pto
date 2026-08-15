@@ -52,11 +52,11 @@ describe('sendContactEmailAction', () => {
     if (!result.success) expect(result.error).toBe('Email is required');
   });
 
-  it('returns success:false with error message on EmailError', async () => {
+  it('returns success:false with INTERNAL_ERROR on EmailError, matching the contact route', async () => {
     mockSendContactEmail.mockReturnValue(Effect.fail(new EmailError({ message: 'SMTP failed' })));
     const result = await sendContactEmailAction(validData);
     expect(result.success).toBe(false);
-    if (!result.success) expect(result.error).toBe('SMTP failed');
+    if (!result.success) expect(result.error).toBe(ApiError.INTERNAL_ERROR);
   });
 
   it('returns success:false with INTERNAL_ERROR on unexpected error', async () => {

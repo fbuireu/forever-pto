@@ -1,5 +1,11 @@
 import type { Metrics } from '@domain/calendar/types';
 
+export const WORKER_MESSAGE_TYPE = {
+  CALCULATE_SUGGESTIONS: 'CALCULATE_SUGGESTIONS',
+  CALCULATE_SUGGESTIONS_RESULT: 'CALCULATE_SUGGESTIONS_RESULT',
+  WORKER_ERROR: 'WORKER_ERROR',
+} as const;
+
 export interface SerializedHolidayDTO {
   id: string;
   date: string;
@@ -23,7 +29,7 @@ export interface SerializedSuggestion {
   days: string[];
   bridges?: SerializedBridge[];
   strategy?: string;
-  metrics?: Metrics;
+  metrics: Metrics;
 }
 
 interface CalculateSuggestionsPayload {
@@ -36,12 +42,12 @@ interface CalculateSuggestionsPayload {
   locale: string;
   maxAlternatives: number;
   manualDays: string[];
-  excludedDays?: string[];
+  removedDays?: string[];
   autoSuggestCount?: number;
 }
 
 export interface CalculateSuggestionsRequest {
-  type: 'CALCULATE_SUGGESTIONS';
+  type: typeof WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS;
   requestId: string;
   payload: CalculateSuggestionsPayload;
 }
@@ -52,21 +58,15 @@ interface CalculateSuggestionsResultPayload {
 }
 
 interface CalculateSuggestionsResponse {
-  type: 'CALCULATE_SUGGESTIONS_RESULT';
+  type: typeof WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT;
   requestId: string;
   payload: CalculateSuggestionsResultPayload;
 }
 
 interface WorkerErrorResponse {
-  type: 'WORKER_ERROR';
+  type: typeof WORKER_MESSAGE_TYPE.WORKER_ERROR;
   requestId: string;
   error: string;
 }
 
 export type WorkerResponse = CalculateSuggestionsResponse | WorkerErrorResponse;
-
-export const WORKER_MESSAGE_TYPE = {
-  CALCULATE_SUGGESTIONS: 'CALCULATE_SUGGESTIONS',
-  CALCULATE_SUGGESTIONS_RESULT: 'CALCULATE_SUGGESTIONS_RESULT',
-  WORKER_ERROR: 'WORKER_ERROR',
-} as const;

@@ -10,8 +10,20 @@ import {
   useSpring,
   useTransform,
 } from 'motion/react';
+import { useLocale } from 'next-intl';
 import { type ComponentProps, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import useMeasure from 'react-use-measure';
+
+const decimalSeparatorCache = new Map<string, string>();
+
+function getDecimalSeparator(locale: string): string {
+  let separator = decimalSeparatorCache.get(locale);
+  if (!separator) {
+    separator = new Intl.NumberFormat(locale).formatToParts(1.1).find(({ type }) => type === 'decimal')?.value ?? '.';
+    decimalSeparatorCache.set(locale, separator);
+  }
+  return separator;
+}
 
 type SlidingNumberDisplayProps = {
   motionValue: MotionValue<number>;
@@ -103,7 +115,7 @@ function SlidingNumber({
   inViewMargin = '0px',
   inViewOnce = true,
   padStart = false,
-  decimalSeparator = '.',
+  decimalSeparator,
   decimalPlaces = 0,
   transition = {
     stiffness: 200,
@@ -112,6 +124,9 @@ function SlidingNumber({
   },
   ...props
 }: SlidingNumberProps) {
+  const locale = useLocale();
+  const separator = decimalSeparator ?? getDecimalSeparator(locale);
+
   const localRef = useRef<HTMLSpanElement>(null);
   useImperativeHandle(ref, () => {
     if (!localRef.current) throw new Error('SlidingNumber ref not mounted');
@@ -188,7 +203,7 @@ function SlidingNumber({
 
       {newDecStrRaw && (
         <>
-          <span>{decimalSeparator}</span>
+          <span>{separator}</span>
           {decPlaces.map((place) => (
             <SlidingNumberRoller
               key={`dec-${place}`}

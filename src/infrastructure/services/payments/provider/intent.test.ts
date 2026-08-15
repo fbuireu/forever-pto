@@ -10,7 +10,7 @@ const mockIntentsCreate = vi.fn();
 const MockStripeLayer = Layer.succeed(StripeServerService, {
   paymentIntents: { create: mockIntentsCreate, retrieve: vi.fn() },
   charges: { retrieve: vi.fn() },
-  promotionCodes: { list: vi.fn(), retrieve: vi.fn() },
+  promotionCodes: { list: vi.fn() },
   webhooks: { constructEvent: vi.fn() },
 });
 
@@ -96,5 +96,29 @@ describe('createPaymentIntent', () => {
       )
     );
     expect(error).toBeInstanceOf(PaymentError);
+  });
+
+  it('clamps free-text metadata to the 500-character Stripe cap', async () => {
+    await run({
+      amount: 10,
+      email: 'user@example.com',
+      promoCode: 'P'.repeat(900),
+      userAgent: 'U'.repeat(900),
+      ipAddress: 'I'.repeat(900),
+      discountInfo: null,
+    });
+    const [params] = mockIntentsCreate.mock.calls[0] as [{ metadata: Record<string, string> }];
+
+    expect(params.metadata.promoCode).toHaveLength(500);
+    expect(params.metadata.userAgent).toHaveLength(500);
+    expect(params.metadata.ipAddress).toHaveLength(500);
+  });
+
+  it('leaves the email untouched, because the entitlement is recovered by it', async () => {
+    const email = `${'a'.repeat(240)}@example.com`;
+    await run({ amount: 10, email, discountInfo: null });
+    const [params] = mockIntentsCreate.mock.calls[0] as [{ metadata: Record<string, string> }];
+
+    expect(params.metadata.email).toBe(email);
   });
 });

@@ -1,15 +1,15 @@
-import type { ReactNode } from 'react';
 import { LOCALES } from '@infrastructure/i18n/locales';
 import { BonesProvider } from '@ui/modules/providers/BonesProvider';
 import { CookieConsentClient } from '@ui/modules/shared/cookie-consent/CookieConsentClient';
 import { WebMCP } from '@ui/modules/shared/WebMCP';
 import { cn } from '@ui/utils/cn';
+import type { ReactNode } from 'react';
 import '@styles/index.css';
 import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { AppThemeProvider } from '@ui/modules/providers/AppThemeProvider';
-import { Analytics } from '@ui/modules/tutorial/Analytics';
-import { BetterStackTracking } from '@ui/modules/tutorial/BetterStackTracking';
+import { Analytics } from '@ui/modules/tracking/Analytics';
+import { BetterStackTracking } from '@ui/modules/tracking/BetterStackTracking';
 import { notFound } from 'next/navigation';
 import { hasLocale, type Locale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';

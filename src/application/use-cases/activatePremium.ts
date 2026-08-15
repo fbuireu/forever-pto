@@ -4,19 +4,28 @@ import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
 import { type DatabaseError, type SessionError, ValidationError } from '@infrastructure/errors';
+import { normalizeEmail } from '@infrastructure/services/payments/normalizeEmail';
 import {
   getPaymentByEmail,
   getPaymentById,
   savePayment,
   updatePaymentStatus,
 } from '@infrastructure/services/payments/repository';
+import { matchesClientSecret } from '@infrastructure/services/premium/activation';
 import { createSession } from '@infrastructure/services/premium/session';
 import { Effect } from 'effect';
 
-export const activateWithPayment = (
-  email: string,
-  paymentIntentId: string
-): Effect.Effect<
+interface ActivateWithPaymentParams {
+  paymentIntentId: string;
+  expectedEmail?: string;
+  clientSecret?: string;
+}
+
+export const activateWithPayment = ({
+  paymentIntentId,
+  expectedEmail,
+  clientSecret,
+}: ActivateWithPaymentParams): Effect.Effect<
   { email: string; premiumKey: string; token: string; deferred: Effect.Effect<void, never, TursoService> },
   ValidationError | SessionError,
   StripeServerService | LoggerService
@@ -29,12 +38,17 @@ export const activateWithPayment = (
       .retrieve(paymentIntentId)
       .pipe(Effect.mapError((e) => new ValidationError({ message: e.message })));
 
+    if (clientSecret && !matchesClientSecret(paymentIntent.client_secret, clientSecret)) {
+      return yield* Effect.fail(new ValidationError({ message: 'Client secret mismatch' }));
+    }
+
     if (paymentIntent.status !== 'succeeded') {
       return yield* Effect.fail(new ValidationError({ message: 'Payment not completed' }));
     }
 
-    const paymentEmail = paymentIntent.metadata.email ?? paymentIntent.receipt_email ?? undefined;
-    if (paymentEmail && paymentEmail !== email) {
+    const intentEmail = paymentIntent.metadata.email ?? paymentIntent.receipt_email ?? undefined;
+    const email = intentEmail ? normalizeEmail(intentEmail) : undefined;
+    if (!email || (expectedEmail && normalizeEmail(expectedEmail) !== email)) {
       return yield* Effect.fail(new ValidationError({ message: 'Email mismatch' }));
     }
 
@@ -95,10 +109,11 @@ export const activateWithEmail = (
 ): Effect.Effect<
   { email: string; premiumKey: string; token: string; deferred: Effect.Effect<void, never, TursoService> },
   ValidationError | SessionError | DatabaseError,
-  TursoService | LoggerService
+  TursoService
 > =>
   Effect.gen(function* () {
-    const payment = yield* getPaymentByEmail(email);
+    const normalizedEmail = normalizeEmail(email);
+    const payment = yield* getPaymentByEmail(normalizedEmail);
 
     if (!payment) {
       return yield* Effect.fail(new ValidationError({ message: 'No payment found' }));
@@ -108,7 +123,7 @@ export const activateWithEmail = (
       return yield* Effect.fail(new ValidationError({ message: `Payment status is ${payment.status}` }));
     }
 
-    const token = yield* createSession({ email, paymentIntentId: payment.id });
+    const token = yield* createSession({ email: normalizedEmail, paymentIntentId: payment.id });
 
-    return { email, premiumKey: payment.id, token, deferred: Effect.void };
+    return { email: normalizedEmail, premiumKey: payment.id, token, deferred: Effect.void };
   });

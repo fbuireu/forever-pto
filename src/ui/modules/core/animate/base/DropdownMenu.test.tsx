@@ -15,8 +15,17 @@ vi.mock('motion/react', async () => {
   const { createElement, Fragment } = await import('react');
   return {
     m: {
-      div: ({ children, initial: _i, animate: _a, exit: _e, transition: _t, layout: _l, whileTap: _wt, style, ...props }: MotionDivProps) =>
-        createElement('div', { style, ...props }, children),
+      div: ({
+        children,
+        initial: _i,
+        animate: _a,
+        exit: _e,
+        transition: _t,
+        layout: _l,
+        whileTap: _wt,
+        style,
+        ...props
+      }: MotionDivProps) => createElement('div', { style, ...props }, children),
     },
     AnimatePresence: ({ children }: { children?: ReactNode }) => createElement(Fragment, null, children),
   };
@@ -34,13 +43,16 @@ vi.mock('@base-ui/react/menu', async () => {
   type SeparatorProps = ComponentProps<'hr'>;
   const Menu = {
     Root: ({ children, onOpenChange: _oc, open: _o, defaultOpen: _do, ...props }: RootProps) =>
-      createElement('div', { 'data-slot': 'dropdown-menu', ...props }, children),
+      createElement('div', props, children),
     Trigger: ({ children, render: renderProp, ...props }: WithRender) =>
       renderProp && isValidElement(renderProp)
         ? cloneElement(renderProp, props)
-        : createElement('button', { 'data-slot': 'dropdown-menu-trigger', ...props }, children),
+        : createElement('button', props, children),
     Portal: ({ children, keepMounted: _km, ...props }: WithRender) => createElement('div', props, children),
-    Positioner: ({ children, ...props }: ComponentProps<'div'> & { sideOffset?: number; align?: string; positionMethod?: string }) =>
+    Positioner: ({
+      children,
+      ...props
+    }: ComponentProps<'div'> & { sideOffset?: number; align?: string; positionMethod?: string }) =>
       createElement('div', props, children),
     Popup: ({ children, render: renderProp, ...props }: WithRender) =>
       renderProp && isValidElement(renderProp)
@@ -74,7 +86,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 describe('DropdownMenu', () => {
   it('renders with data-slot="dropdown-menu"', () => {
-    const { container } = render(<DropdownMenu><span /></DropdownMenu>);
+    const { container } = render(
+      <DropdownMenu>
+        <span />
+      </DropdownMenu>
+    );
     expect(container.querySelector('[data-slot="dropdown-menu"]')).not.toBeNull();
   });
 

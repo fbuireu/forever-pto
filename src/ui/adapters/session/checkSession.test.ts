@@ -42,10 +42,10 @@ describe('verifyPremiumEmail', () => {
 });
 
 describe('getExistingSession', () => {
-  it('returns null when response is not ok', async () => {
-    mockFetch.mockResolvedValue({ ok: false });
+  it('throws when the check itself failed, so a server blip is never read as an absent session', async () => {
+    mockFetch.mockResolvedValue({ ok: false, status: 500 });
 
-    expect(await getExistingSession()).toBeNull();
+    await expect(getExistingSession()).rejects.toThrow('500');
   });
 
   it('returns null when premiumKey is absent in response', async () => {
@@ -64,7 +64,7 @@ describe('getExistingSession', () => {
   });
 
   it('uses a GET request with credentials included', async () => {
-    mockFetch.mockResolvedValue({ ok: false });
+    mockFetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue({}) });
 
     await getExistingSession();
 

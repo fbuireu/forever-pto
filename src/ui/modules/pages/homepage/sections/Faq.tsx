@@ -1,9 +1,9 @@
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '@ui/modules/core/animate/base/Accordion';
 import { Badge } from '@ui/modules/core/primitives/Badge';
 import { createRichLink } from '@ui/modules/core/primitives/RichLink';
-import { FaqTabs } from '@ui/modules/pages/planner/support/FaqTabs';
-import { Troubleshooting } from '@ui/modules/pages/planner/support/Troubleshooting';
-import type { FaqData } from '@ui/modules/pages/planner/support/types';
+import { FaqTabs } from '@ui/modules/pages/homepage/support/FaqTabs';
+import { Troubleshooting } from '@ui/modules/pages/homepage/support/Troubleshooting';
+import type { FaqData } from '@ui/modules/pages/homepage/support/types';
 import { getTranslations } from 'next-intl/server';
 
 const GITHUB_ISSUE_URL =

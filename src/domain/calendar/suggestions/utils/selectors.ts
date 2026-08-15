@@ -6,10 +6,12 @@ import { getKey } from '@domain/calendar/utils/cache';
 interface SelectOptimalDaysBase {
   bridges: Bridge[];
   targetPtoDays: number;
+  presorted?: boolean;
 }
 
-interface SelectOptimalCombinationParams extends SelectOptimalDaysBase {
-  bridges: (Bridge & { score: number })[];
+interface SelectOptimalCombinationParams {
+  bridges: Bridge[];
+  targetPtoDays: number;
 }
 
 function canSelectBridge(bridge: Bridge, usedDates: Set<string>, total: number, target: number): boolean {
@@ -33,10 +35,6 @@ function selectFromCandidates(
   return total;
 }
 
-// Two-pass greedy selection:
-// Pass 1 — fill with "high value" bridges first (multi-day, high span, acceptable efficiency).
-// Pass 2 — fill remaining PTO budget with whatever non-conflicting bridges are left.
-// This prevents many small single-day bridges from crowding out long high-value blocks.
 function selectOptimalCombination({ bridges, targetPtoDays }: SelectOptimalCombinationParams) {
   const {
     EFFICIENCY: { ACCEPTABLE },
@@ -52,22 +50,12 @@ function selectOptimalCombination({ bridges, targetPtoDays }: SelectOptimalCombi
   const usedDates = new Set<string>();
 
   const highValueBridges = bridges.filter(isHighValue);
-  let total = selectFromCandidates(highValueBridges, selected, usedDates, 0, targetPtoDays);
+  const total = selectFromCandidates(highValueBridges, selected, usedDates, 0, targetPtoDays);
 
   if (total < targetPtoDays) {
     const highValueSet = new Set(highValueBridges);
-    total = selectFromCandidates(
-      bridges.filter((b) => !highValueSet.has(b)),
-      selected,
-      usedDates,
-      total,
-      targetPtoDays
-    );
-  }
-
-  if (total < targetPtoDays) {
     selectFromCandidates(
-      bridges.filter((b) => b.ptoDaysNeeded === 1),
+      bridges.filter((b) => !highValueSet.has(b)),
       selected,
       usedDates,
       total,
@@ -78,23 +66,20 @@ function selectOptimalCombination({ bridges, targetPtoDays }: SelectOptimalCombi
   return selected;
 }
 
-export const selectOptimalDaysFromBridges = ({ bridges, targetPtoDays }: SelectOptimalDaysBase) => {
+const sortByScore = (bridges: Bridge[]) => {
   const {
     SCORING: { BASE_SCORE, MULTI_DAY_BONUS, EFFICIENCY, TOTAL_VALUE },
     SELECTION_WEIGHTS: { HIGH_VALUE_THRESHOLD_EFFECTIVE, HIGH_VALUE_THRESHOLD_DAYS },
   } = PTO_CONSTANTS;
   const scoredBridges = bridges.map((bridge) => {
     const efficiencyScore = bridge.efficiency;
-    const valueScore = bridge.effectiveDays / 10; // normalise absolute span to a comparable scale
+    const valueScore = bridge.effectiveDays / 10;
 
-    // High-value bridges (long + efficient) get a score multiplier so they outrank
-    // many small single-day bridges that would otherwise accumulate a similar raw score.
     const multiDayBonus =
       bridge.ptoDaysNeeded >= HIGH_VALUE_THRESHOLD_DAYS && bridge.effectiveDays >= HIGH_VALUE_THRESHOLD_EFFECTIVE
         ? MULTI_DAY_BONUS
         : BASE_SCORE;
 
-    // score = (efficiency * 0.6 + normalised_span * 0.4) * bonus
     const totalScore = (efficiencyScore * EFFICIENCY + valueScore * TOTAL_VALUE) * multiDayBonus;
 
     return {
@@ -105,7 +90,13 @@ export const selectOptimalDaysFromBridges = ({ bridges, targetPtoDays }: SelectO
 
   scoredBridges.sort((a, b) => b.score - a.score);
 
-  const selectedBridges = selectOptimalCombination({ bridges: scoredBridges, targetPtoDays });
+  return scoredBridges;
+};
+
+export const selectOptimalDaysFromBridges = ({ bridges, targetPtoDays, presorted = false }: SelectOptimalDaysBase) => {
+  const orderedBridges = presorted ? bridges : sortByScore(bridges);
+
+  const selectedBridges = selectOptimalCombination({ bridges: orderedBridges, targetPtoDays });
 
   const selectedDays = selectedBridges.flatMap((bridge) => bridge.ptoDays);
   const totalEffectiveDays = selectedBridges.reduce((sum, b) => sum + b.effectiveDays, 0);
@@ -117,36 +108,43 @@ export const selectOptimalDaysFromBridges = ({ bridges, targetPtoDays }: SelectO
   };
 };
 
-interface SelectBridgesForStrategy {
-  bridges: Bridge[];
-  targetPtoDays: number;
+interface SelectBridgesForStrategy extends SelectOptimalDaysBase {
   strategy: FilterStrategy;
 }
 
-export const selectBridgesForStrategy = ({ bridges, targetPtoDays, strategy }: SelectBridgesForStrategy) => {
+const compareGrouped = (a: Bridge, b: Bridge) => {
+  if (a.ptoDaysNeeded !== b.ptoDaysNeeded) {
+    return b.ptoDaysNeeded - a.ptoDaysNeeded;
+  }
+  return b.efficiency - a.efficiency;
+};
+
+const compareOptimized = (a: Bridge, b: Bridge) => {
+  const effDiff = b.efficiency - a.efficiency;
+  if (Math.abs(effDiff) > PTO_CONSTANTS.BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD) {
+    return effDiff;
+  }
+  return b.effectiveDays - a.effectiveDays;
+};
+
+export const selectBridgesForStrategy = ({
+  bridges,
+  targetPtoDays,
+  strategy,
+  presorted = false,
+}: SelectBridgesForStrategy) => {
   let sortedBridges: Bridge[];
 
   switch (strategy) {
     case FilterStrategy.GROUPED:
-      sortedBridges = bridges.toSorted((a, b) => {
-        if (a.ptoDaysNeeded !== b.ptoDaysNeeded) {
-          return b.ptoDaysNeeded - a.ptoDaysNeeded;
-        }
-        return b.efficiency - a.efficiency;
-      });
+      sortedBridges = presorted ? bridges : bridges.toSorted(compareGrouped);
       break;
 
     case FilterStrategy.OPTIMIZED:
-      sortedBridges = bridges.toSorted((a, b) => {
-        const effDiff = b.efficiency - a.efficiency;
-        if (Math.abs(effDiff) > PTO_CONSTANTS.BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD) {
-          return effDiff;
-        }
-        return b.effectiveDays - a.effectiveDays;
-      });
+      sortedBridges = presorted ? bridges : bridges.toSorted(compareOptimized);
       break;
     default:
-      return selectOptimalDaysFromBridges({ bridges, targetPtoDays });
+      return selectOptimalDaysFromBridges({ bridges, targetPtoDays, presorted });
   }
 
   const selectedBridges: Bridge[] = [];

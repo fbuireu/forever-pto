@@ -19,8 +19,18 @@ vi.mock('motion/react', async () => {
   const { createElement, Fragment } = await import('react');
   return {
     m: {
-      div: ({ children, initial: _i, animate: _a, exit: _e, transition: _t, layout: _l, whileTap: _wt, whileHover: _wh, style, ...props }: MotionDivProps) =>
-        createElement('div', { style, ...props }, children),
+      div: ({
+        children,
+        initial: _i,
+        animate: _a,
+        exit: _e,
+        transition: _t,
+        layout: _l,
+        whileTap: _wt,
+        whileHover: _wh,
+        style,
+        ...props
+      }: MotionDivProps) => createElement('div', { style, ...props }, children),
     },
     AnimatePresence: ({ children }: { children?: ReactNode }) => createElement(Fragment, null, children),
   };
@@ -44,16 +54,12 @@ import { SidebarProvider, useSidebar } from './Sidebar';
 
 describe('useSidebar', () => {
   it('throws when used outside SidebarProvider', () => {
-    expect(() => renderHook(() => useSidebar())).toThrow(
-      'useSidebar must be used within a SidebarProvider.'
-    );
+    expect(() => renderHook(() => useSidebar())).toThrow('useSidebar must be used within a SidebarProvider.');
   });
 });
 
 describe('SidebarProvider', () => {
-  const wrapper = ({ children }: { children: ReactNode }) => (
-    <SidebarProvider>{children}</SidebarProvider>
-  );
+  const wrapper = ({ children }: { children: ReactNode }) => <SidebarProvider>{children}</SidebarProvider>;
 
   it('provides open=true by default', () => {
     const { result } = renderHook(() => useSidebar(), { wrapper });

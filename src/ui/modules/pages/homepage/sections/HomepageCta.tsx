@@ -1,14 +1,14 @@
 import { Link } from '@application/i18n/navigation';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { getTranslations } from 'next-intl/server';
-import { CtaShapes } from './CtaShapesClient';
+import { CtaShapesClient } from './CtaShapesClient';
 
 export const HomepageCta = async () => {
   const t = await getTranslations('homepage');
 
   return (
     <section className='px-7 py-24 bg-[var(--frame)] text-[var(--background)] border-t-[4px] border-[var(--frame)] relative overflow-hidden'>
-      <CtaShapes
+      <CtaShapesClient
         byeMonday={t('closing.shapes.byeMonday')}
         bossOff={t('closing.shapes.bossOff')}
         doNotDisturb={t('closing.shapes.doNotDisturb')}

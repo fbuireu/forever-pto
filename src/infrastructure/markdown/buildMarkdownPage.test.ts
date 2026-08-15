@@ -121,4 +121,47 @@ describe('buildMarkdownPage', () => {
       expect(result).not.toContain('## API');
     });
   });
+
+  describe('every other route gets its own twin, not the homepage', () => {
+    const ROUTES = [
+      ['/legal/cookie-policy', 'cookiePolicy'],
+      ['/legal/privacy-policy', 'privacyPolicy'],
+      ['/legal/terms-of-service', 'termsOfService'],
+      ['/legal/legal-notice', 'legalNotice'],
+    ] as const;
+
+    it.each(ROUTES)('titles %s from its own metadata entry', async (path, namespaceKey) => {
+      const result = await buildMarkdownPage(BASE_URL, path);
+
+      expect(result).toContain(`# [metadata:${namespaceKey}.title]`);
+      expect(result).toContain(`[metadata:${namespaceKey}.description]`);
+    });
+
+    it.each(ROUTES)('does not hand %s the homepage body', async (path) => {
+      const result = await buildMarkdownPage(BASE_URL, path);
+
+      expect(result).not.toContain('## Site');
+      expect(result).not.toContain('## API');
+      expect(result).not.toContain('[metadata:description]');
+    });
+
+    it.each(ROUTES)('points %s at its own canonical URL', async (path) => {
+      const result = await buildMarkdownPage(BASE_URL, path);
+
+      expect(result).toContain(`## URL\n\n${BASE_URL}${path}`);
+    });
+
+    it('carries the locale prefix on a non-default locale', async () => {
+      const result = await buildMarkdownPage(BASE_URL, '/es/legal/privacy-policy');
+
+      expect(result).toContain(`${BASE_URL}/es/legal/privacy-policy`);
+    });
+
+    it('titles the confirmation page, which has no description of its own', async () => {
+      const result = await buildMarkdownPage(BASE_URL, '/payment/confirmation');
+
+      expect(result).toContain('# [metadata:paymentConfirmation.title]');
+      expect(result).not.toContain('[metadata:description]');
+    });
+  });
 });

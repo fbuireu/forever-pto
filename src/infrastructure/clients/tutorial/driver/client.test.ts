@@ -1,6 +1,16 @@
+import { createElement } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockDrive, mockSetSteps, mockDestroy, mockDriverInstance, mockDriverFn, mockUnmount, mockRender, mockCreateRoot } = vi.hoisted(() => {
+const {
+  mockDrive,
+  mockSetSteps,
+  mockDestroy,
+  mockDriverInstance,
+  mockDriverFn,
+  mockUnmount,
+  mockRender,
+  mockCreateRoot,
+} = vi.hoisted(() => {
   const mockDrive = vi.fn();
   const mockSetSteps = vi.fn();
   const mockDestroy = vi.fn();
@@ -10,13 +20,20 @@ const { mockDrive, mockSetSteps, mockDestroy, mockDriverInstance, mockDriverFn, 
   const mockRender = vi.fn();
   const mockRoot = { render: mockRender, unmount: mockUnmount };
   const mockCreateRoot = vi.fn().mockReturnValue(mockRoot);
-  return { mockDrive, mockSetSteps, mockDestroy, mockDriverInstance, mockDriverFn, mockUnmount, mockRender, mockCreateRoot };
+  return {
+    mockDrive,
+    mockSetSteps,
+    mockDestroy,
+    mockDriverInstance,
+    mockDriverFn,
+    mockUnmount,
+    mockRender,
+    mockCreateRoot,
+  };
 });
 
 vi.mock('driver.js', () => ({ driver: mockDriverFn }));
 vi.mock('react-dom/client', () => ({ createRoot: mockCreateRoot }));
-vi.mock('@ui/modules/core/animate/icons/Icon', () => ({ AnimateIcon: () => null }));
-vi.mock('@ui/modules/core/animate/icons/X', () => ({ X: () => null }));
 
 const { DriverClient, getDriverClientInstance } = await import('./client');
 
@@ -80,12 +97,34 @@ describe('DriverClient.destroy', () => {
     client.destroy();
     expect(mockDestroy).not.toHaveBeenCalled();
   });
+
+  it('unmounts the close-button roots, which driver.js own destroy() never triggers', () => {
+    const { client, onPopoverRender } = getCallbacks();
+    onPopoverRender(makePopover({ appendChild: vi.fn() }), { config: {}, state: {} });
+    expect(mockCreateRoot).toHaveBeenCalledOnce();
+
+    client.destroy();
+
+    expect(mockUnmount).toHaveBeenCalledOnce();
+  });
+
+  it('does not unmount the same root twice when a second tour starts', () => {
+    const { client, onPopoverRender } = getCallbacks();
+    onPopoverRender(makePopover({ appendChild: vi.fn() }), { config: {}, state: {} });
+
+    client.start();
+    client.destroy();
+
+    expect(mockUnmount).toHaveBeenCalledOnce();
+  });
 });
 
 const mockIconContainer = { style: {} as CSSStyleDeclaration, appendChild: vi.fn() };
 
-function getCallbacks() {
-  const client = new DriverClient({});
+const CLOSE_ICON = createElement('span');
+
+function getCallbacks(clientConfig: ConstructorParameters<typeof DriverClient>[0] = { closeIcon: CLOSE_ICON }) {
+  const client = new DriverClient(clientConfig);
   client.start();
   const config = mockDriverFn.mock.calls[0][0] as {
     onPopoverRender: (popover: unknown, options: unknown) => void;
@@ -118,12 +157,19 @@ describe('DriverClient - onPopoverRender', () => {
     expect(userCallback).toHaveBeenCalledWith(popover, options);
   });
 
-  it('renders close icon into button when close button exists', () => {
+  it('renders the injected close icon into the button when a close button exists', () => {
     const { onPopoverRender } = getCallbacks();
     const mockCloseButton = { innerHTML: '', appendChild: vi.fn() };
     onPopoverRender(makePopover(mockCloseButton), { state: { activeIndex: 0 }, config: { steps: [{}, {}] } });
     expect(mockCreateRoot).toHaveBeenCalled();
-    expect(mockRender).toHaveBeenCalled();
+    expect(mockRender).toHaveBeenCalledWith(CLOSE_ICON);
+  });
+
+  it('does not call createRoot when no close icon is injected', () => {
+    const { onPopoverRender } = getCallbacks({});
+    const mockCloseButton = { innerHTML: '', appendChild: vi.fn() };
+    onPopoverRender(makePopover(mockCloseButton), { state: { activeIndex: 0 }, config: { steps: [{}, {}] } });
+    expect(mockCreateRoot).not.toHaveBeenCalled();
   });
 
   it('does not call createRoot when close button is absent', () => {
@@ -162,7 +208,9 @@ describe('DriverClient - onDestroyStarted', () => {
     const userCallback = vi.fn();
     const client = new DriverClient({ onDestroyStarted: userCallback });
     client.start();
-    const { onDestroyStarted } = mockDriverFn.mock.calls[0][0] as { onDestroyStarted: (a: unknown, b: unknown, c: unknown) => void };
+    const { onDestroyStarted } = mockDriverFn.mock.calls[0][0] as {
+      onDestroyStarted: (a: unknown, b: unknown, c: unknown) => void;
+    };
     onDestroyStarted(null, null, null);
     expect(userCallback).toHaveBeenCalledWith(null, null, null);
   });

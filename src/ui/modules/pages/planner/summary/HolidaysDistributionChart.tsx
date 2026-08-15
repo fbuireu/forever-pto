@@ -1,3 +1,5 @@
+'use client';
+
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';

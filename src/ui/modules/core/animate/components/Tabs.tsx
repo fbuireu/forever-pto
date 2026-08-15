@@ -3,7 +3,21 @@
 import { AutoHeight } from '@ui/modules/core/animate/effects/AutoHeight';
 import { cn } from '@ui/utils/cn';
 import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
-import { type ComponentProps, type ReactElement, type ReactNode, Children, cloneElement, createContext, isValidElement, use, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import {
+  Children,
+  type ComponentProps,
+  cloneElement,
+  createContext,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+  use,
+  useCallback,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { MotionHighlight, MotionHighlightItem } from '../effects/MotionHighlight';
 
 type TabsContextType = {
@@ -66,10 +80,7 @@ function TabsHighlight({
     <MotionHighlight
       controlledItems
       mode='parent'
-      className={cn(
-        'rounded-md bg-accent border-2 border-(--frame) shadow-(--shadow-brutal-xs)',
-        activeClassName
-      )}
+      className={cn('rounded-md bg-accent border-2 border-(--frame) shadow-(--shadow-brutal-xs)', activeClassName)}
       value={activeValue}
       transition={transition}
     >

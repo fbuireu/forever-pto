@@ -73,7 +73,6 @@ const SECURITY_HEADERS = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   cacheComponents: true,
-  // partialPrefetching: true, // requires Next 16.3
   compiler: {
     removeConsole: isProd,
   },

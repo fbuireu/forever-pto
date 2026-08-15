@@ -1,7 +1,8 @@
 'use client';
 
-import { useFiltersStore } from '@application/stores/filters';
+import { MAX_PTO_DAYS, MIN_PTO_DAYS, useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
+import { measureBudget } from '@domain/calendar/utils/budget';
 import { Counter } from '@ui/modules/core/animate/components/Counter';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Button } from '@ui/modules/core/primitives/Button';
@@ -10,9 +11,6 @@ import { CalendarDays, Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-
-const MIN_VALUE = 1;
-const MAX_VALUE = 365;
 
 export const PtoDays = () => {
   const t = useTranslations('ptoDays');
@@ -29,7 +27,6 @@ export const PtoDays = () => {
     resetManualSelection,
     trimManualDays,
     isCalculating,
-    setCalculating,
   } = useHolidaysStore(
     useShallow((state) => ({
       currentSelection: state.currentSelection,
@@ -38,31 +35,36 @@ export const PtoDays = () => {
       resetManualSelection: state.resetManualSelection,
       trimManualDays: state.trimManualDays,
       isCalculating: state.isCalculating,
-      setCalculating: state.setCalculating,
     }))
   );
-  const isDecrementDisabled = ptoDays <= MIN_VALUE;
-  const isIncrementDisabled = ptoDays >= MAX_VALUE;
-  const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
-  const manualSelectedCount = manuallySelectedDays.length;
-
-  const rawRemaining = Math.max(0, ptoDays - activeSuggestedCount - manualSelectedCount);
-  const lastSettledRemaining = useRef(rawRemaining);
-  useEffect(() => {
-    if (!isCalculating) lastSettledRemaining.current = rawRemaining;
+  const isDecrementDisabled = ptoDays <= MIN_PTO_DAYS;
+  const isIncrementDisabled = ptoDays >= MAX_PTO_DAYS;
+  const budget = measureBudget({
+    ptoDays,
+    days: currentSelection?.days,
+    manuallySelectedDays,
+    removedSuggestedDays,
   });
-  const remaining = isCalculating ? lastSettledRemaining.current : rawRemaining;
+  const activeSuggestedCount = budget.suggested;
+  const manualSelectedCount = budget.manual;
+
+  const lastSettledRemaining = useRef(budget.remaining);
+  useEffect(() => {
+    if (!isCalculating) lastSettledRemaining.current = budget.remaining;
+  });
+  const remaining = isCalculating ? lastSettledRemaining.current : budget.remaining;
 
   const hasManualChanges = manualSelectedCount > 0 || removedSuggestedDays.length > 0;
 
   const handleChange = useCallback(
     (value: number) => {
-      const newValue = Math.max(MIN_VALUE, value);
-      setCalculating(true);
+      const newValue = Math.min(MAX_PTO_DAYS, Math.max(MIN_PTO_DAYS, value));
+      if (newValue === ptoDays) return;
+
       setPtoDays(newValue);
       trimManualDays(newValue);
     },
-    [setCalculating, setPtoDays, trimManualDays]
+    [setPtoDays, trimManualDays, ptoDays]
   );
 
   return (

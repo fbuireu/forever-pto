@@ -1,17 +1,19 @@
 import { LOCALES } from '@infrastructure/i18n/locales';
+import { localePath } from '@infrastructure/i18n/utils/url';
 import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
+
+const MINIMUM_DONATION = '1';
 
 interface JsonLdProps {
   locale: Locale;
 }
 
 export async function JsonLd({ locale }: JsonLdProps) {
-  const [{ siteUrl: baseUrl }, t, tFaq] = await Promise.all([
+  const [{ siteUrl: baseUrl }, t] = await Promise.all([
     getPublicEnv(),
     getTranslations({ locale, namespace: 'metadata' }),
-    getTranslations({ locale, namespace: 'faq' }),
   ]);
 
   const webApplicationSchema = {
@@ -19,7 +21,7 @@ export async function JsonLd({ locale }: JsonLdProps) {
     '@type': 'WebApplication',
     name: t('title'),
     description: t('description'),
-    url: `${baseUrl}/${locale}`,
+    url: `${baseUrl}${localePath(locale, '/planner')}`,
     applicationCategory: 'ProductivityApplication',
     operatingSystem: 'Any',
     browserRequirements: 'Requires JavaScript. Requires HTML5.',
@@ -42,9 +44,14 @@ export async function JsonLd({ locale }: JsonLdProps) {
       },
       {
         '@type': 'Offer',
-        price: '4.99',
-        priceCurrency: 'EUR',
-        description: 'Premium lifetime access with advanced metrics, charts, and multiple strategies',
+        priceSpecification: {
+          '@type': 'PriceSpecification',
+          minPrice: MINIMUM_DONATION,
+          priceCurrency: 'EUR',
+          valueAddedTaxIncluded: true,
+        },
+        description:
+          'Premium lifetime access unlocked by a donation of any amount, with advanced metrics, charts, and multiple strategies',
       },
     ],
     featureList: [
@@ -64,6 +71,19 @@ export async function JsonLd({ locale }: JsonLdProps) {
     url: baseUrl,
     logo: `${baseUrl}/static/images/forever-pto-logo.png`,
   };
+
+  return (
+    <>
+      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: required for JSON-LD structured data scripts */}
+      <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationSchema) }} />
+      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: required for JSON-LD structured data scripts */}
+      <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+    </>
+  );
+}
+
+export async function FaqJsonLd({ locale }: JsonLdProps) {
+  const tFaq = await getTranslations({ locale, namespace: 'faq' });
 
   const faqSchema = {
     '@context': 'https://schema.org',
@@ -169,13 +189,7 @@ export async function JsonLd({ locale }: JsonLdProps) {
   };
 
   return (
-    <>
-      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: required for JSON-LD structured data scripts */}
-      <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationSchema) }} />
-      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: required for JSON-LD structured data scripts */}
-      <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
-      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: required for JSON-LD structured data scripts */}
-      <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-    </>
+    // biome-ignore lint/security/noDangerouslySetInnerHtml: required for JSON-LD structured data scripts
+    <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
   );
 }

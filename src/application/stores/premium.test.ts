@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { usePremiumStore } from './premium';
 
+const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
+
 vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({
-  getBetterStackInstance: vi.fn().mockReturnValue({ logError: vi.fn(), warn: vi.fn() }),
+  getBetterStackInstance: vi.fn().mockReturnValue({ logError: mockLogError, warn: mockWarn }),
 }));
 
 vi.mock('@infrastructure/clients/logging/better-stack/tracking', () => ({
@@ -15,7 +17,7 @@ vi.mock('@ui/adapters/session/checkSession', () => ({
 }));
 
 vi.mock('./crypto', () => ({
-  encryptedStorage: {
+  obfuscatedStorage: {
     getItem: vi.fn().mockResolvedValue(null),
     setItem: vi.fn().mockResolvedValue(undefined),
     removeItem: vi.fn().mockResolvedValue(undefined),
@@ -48,10 +50,31 @@ describe('setPremiumStatus', () => {
     expect(state.needsSessionCheck).toBe(false);
   });
 
-  it('tracks premium_activated', async () => {
+  it('tracks premium_activated on the transition into premium', async () => {
     const { track } = await import('@infrastructure/clients/logging/better-stack/tracking');
     usePremiumStore.getState().setPremiumStatus({ email: 'user@example.com', premiumKey: 'key123' });
     expect(track).toHaveBeenCalledWith('premium_activated', { plan: 'premium' });
+  });
+
+  it('does not track premium_activated when the same entitlement is re-verified', async () => {
+    const { track } = await import('@infrastructure/clients/logging/better-stack/tracking');
+    usePremiumStore.setState({ premiumKey: 'key123' });
+    usePremiumStore.getState().setPremiumStatus({ email: 'user@example.com', premiumKey: 'key123' });
+    expect(track).not.toHaveBeenCalled();
+  });
+
+  it('does not track premium_activated when verification returns no key', async () => {
+    const { track } = await import('@infrastructure/clients/logging/better-stack/tracking');
+    usePremiumStore.getState().setPremiumStatus({ email: 'user@example.com', premiumKey: null });
+    expect(track).not.toHaveBeenCalled();
+  });
+
+  it('tracks once per activation across a re-verification cycle', async () => {
+    const { track } = await import('@infrastructure/clients/logging/better-stack/tracking');
+    usePremiumStore.getState().setPremiumStatus({ email: 'user@example.com', premiumKey: 'key123' });
+    usePremiumStore.getState().setPremiumStatus({ email: 'user@example.com', premiumKey: 'key123' });
+    usePremiumStore.getState().setPremiumStatus({ email: 'user@example.com', premiumKey: 'key123' });
+    expect(track).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -127,6 +150,20 @@ describe('verifyEmail', () => {
     expect(result).toBe(false);
     expect(usePremiumStore.getState().isLoading).toBe(false);
   });
+
+  it('logs the failure with the email domain only, and never the address', async () => {
+    const { verifyPremiumEmail } = await import('@ui/adapters/session/checkSession');
+    vi.mocked(verifyPremiumEmail).mockRejectedValueOnce(new Error('network failure'));
+
+    await usePremiumStore.getState().verifyEmail('user@example.com');
+
+    await vi.waitFor(() =>
+      expect(mockLogError).toHaveBeenCalledWith('Error verifying premium email in premium store', expect.any(Error), {
+        emailDomain: 'example.com',
+        hasEmail: true,
+      })
+    );
+  });
 });
 
 describe('checkExistingSession', () => {
@@ -136,6 +173,17 @@ describe('checkExistingSession', () => {
 
     await usePremiumStore.getState().checkExistingSession();
     expect(getExistingSession).not.toHaveBeenCalled();
+  });
+
+  it('checks anyway when forced, which is how a redirect payer picks up the cookie the route just set', async () => {
+    const { getExistingSession } = await import('@ui/adapters/session/checkSession');
+    vi.mocked(getExistingSession).mockResolvedValueOnce({ premiumKey: 'pk_redirect', email: 'donor@example.com' });
+    usePremiumStore.setState({ needsSessionCheck: false, premiumKey: null, userEmail: null });
+
+    await usePremiumStore.getState().checkExistingSession({ force: true });
+
+    expect(getExistingSession).toHaveBeenCalled();
+    expect(usePremiumStore.getState().premiumKey).toBe('pk_redirect');
   });
 
   it('sets premium state from session when needsSessionCheck is true', async () => {
@@ -170,6 +218,17 @@ describe('checkExistingSession', () => {
     await usePremiumStore.getState().checkExistingSession();
     expect(usePremiumStore.getState().needsSessionCheck).toBe(false);
   });
+
+  it('keeps a donor premium when the check fails, since a server blip is not a revocation', async () => {
+    const { getExistingSession } = await import('@ui/adapters/session/checkSession');
+    vi.mocked(getExistingSession).mockRejectedValueOnce(new Error('check-session answered 500'));
+    usePremiumStore.setState({ needsSessionCheck: true, premiumKey: 'pk_paid', userEmail: 'donor@example.com' });
+
+    await usePremiumStore.getState().checkExistingSession();
+    const state = usePremiumStore.getState();
+    expect(state.premiumKey).toBe('pk_paid');
+    expect(state.userEmail).toBe('donor@example.com');
+  });
 });
 
 describe('refreshPremiumStatus', () => {
@@ -188,5 +247,64 @@ describe('refreshPremiumStatus', () => {
 
     await usePremiumStore.getState().refreshPremiumStatus();
     expect(verifyPremiumEmail).not.toHaveBeenCalled();
+  });
+});
+
+describe('onRehydrateStorage', () => {
+  const runRehydrate = (
+    state: { lastVerified: number | null; needsSessionCheck: boolean } | undefined,
+    error?: Error
+  ) => {
+    const options = usePremiumStore.persist.getOptions();
+    const listener = options.onRehydrateStorage?.(usePremiumStore.getState() as never);
+    listener?.(state as never, error);
+    return state;
+  };
+
+  it('flags a session check when the device has never verified', () => {
+    const state = runRehydrate({ lastVerified: null, needsSessionCheck: false });
+    expect(state?.needsSessionCheck).toBe(true);
+  });
+
+  it('flags a session check when the last verification is older than 24h', () => {
+    const state = runRehydrate({ lastVerified: Date.now() - 25 * 60 * 60 * 1000, needsSessionCheck: false });
+    expect(state?.needsSessionCheck).toBe(true);
+  });
+
+  it('does not flag a session check when verification is recent', () => {
+    const state = runRehydrate({ lastVerified: Date.now() - 60 * 1000, needsSessionCheck: false });
+    expect(state?.needsSessionCheck).toBe(false);
+  });
+
+  it('flags a session check when rehydration failed, so the cookie can restore access', () => {
+    const state = runRehydrate({ lastVerified: Date.now(), needsSessionCheck: false }, new Error('deobfuscate failed'));
+    expect(state?.needsSessionCheck).toBe(true);
+  });
+
+  it('does not throw when there is no state to rehydrate', () => {
+    expect(() => runRehydrate(undefined)).not.toThrow();
+  });
+
+  it('warns when there is no state, without blocking the listener on the logging client', async () => {
+    runRehydrate(undefined);
+
+    expect(mockWarn).not.toHaveBeenCalled();
+    await vi.waitFor(() =>
+      expect(mockWarn).toHaveBeenCalledWith('No state to rehydrate in premium store', {
+        storeName: 'premium-store',
+      })
+    );
+  });
+
+  it('logs a rehydration failure', async () => {
+    runRehydrate({ lastVerified: Date.now(), needsSessionCheck: false }, new Error('deobfuscate failed'));
+
+    expect(mockLogError).not.toHaveBeenCalled();
+    await vi.waitFor(() =>
+      expect(mockLogError).toHaveBeenCalledWith('Error rehydrating premium store', expect.any(Error), {
+        storeName: 'premium-store',
+        hasState: true,
+      })
+    );
   });
 });

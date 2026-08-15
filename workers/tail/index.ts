@@ -15,13 +15,27 @@ interface TailEvent {
   scriptName: string;
 }
 
+// Query strings carry credentials (Stripe appends payment_intent_client_secret to the confirmation
+// return URL), so only origin + path is ever shipped off-worker.
+function stripQuery(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+
+  try {
+    const parsed = new URL(url);
+
+    return `${parsed.origin}${parsed.pathname}`;
+  } catch {
+    return undefined;
+  }
+}
+
 export default {
   async tail(events: TailEvent[], env: Env): Promise<void> {
     const entries = events.flatMap((event) => {
       const base = {
         script: event.scriptName,
         outcome: event.outcome,
-        url: event.event?.request?.url,
+        url: stripQuery(event.event?.request?.url),
         method: event.event?.request?.method,
         status: event.event?.response?.status,
       };

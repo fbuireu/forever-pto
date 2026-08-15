@@ -28,6 +28,8 @@ interface MetricCardProps {
   size?: MetricCardSize;
   className?: string;
   symbol?: string;
+  hint?: string;
+  decimalPlaces?: number;
 }
 
 const COLOR_SCHEMES = {
@@ -92,6 +94,8 @@ export const MetricCard = ({
   badge,
   colorScheme,
   symbol,
+  hint,
+  decimalPlaces = 0,
   size = MetricCardSize.DEFAULT,
   className = '',
 }: MetricCardProps) => {
@@ -112,11 +116,12 @@ export const MetricCard = ({
           <SlidingNumber
             number={value}
             className={cn('text-lg font-display font-bold', colors.text)}
-            decimalPlaces={0}
+            decimalPlaces={decimalPlaces}
           />
           {symbol}
         </div>
         <div className={cn('text-xs', colors.text)}>{label}</div>
+        {hint && <div className={cn('text-[0.65rem] opacity-70', colors.text)}>{hint}</div>}
       </div>
     );
   }
@@ -136,7 +141,7 @@ export const MetricCard = ({
       <div className={cn('flex items-center gap-2')}>
         <Icon className={cn('size-4', colors.icon)} />
         <span className={cn('text-xl font-display font-bold flex', colors.text)}>
-          <SlidingNumber number={value} decimalPlaces={0} />
+          <SlidingNumber number={value} decimalPlaces={decimalPlaces} />
           {symbol}
         </span>
       </div>

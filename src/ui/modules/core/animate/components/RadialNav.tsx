@@ -23,8 +23,8 @@ type RadialNavItem = {
 
 type MenuButtonConfig = {
   iconSize?: number;
-  buttonSize?: number; 
-  buttonPadding?: number; 
+  buttonSize?: number;
+  buttonPadding?: number;
 };
 
 const defaultMenuButtonConfig: Required<MenuButtonConfig> = {
@@ -170,11 +170,14 @@ function MenuButton({ item, isActive, onActivate, menuButtonConfig }: MenuButton
   );
 }
 
-// orbitRadius determines how far from the center each item should be placed.
-// It positions the CENTER of each small circle exactly on the parent circle's stroke.
-// Formula: parentRadius (size/2) minus half of the child diameter (~0.5 accounts for border).
-
-function RadialNav({ size = 180, items, menuButtonConfig, defaultActiveId, onActiveChange }: RadialNavProps) {
+function RadialNav({
+  size = 180,
+  items,
+  menuButtonConfig,
+  defaultActiveId,
+  onActiveChange,
+  'aria-label': ariaLabel = 'Radial navigation',
+}: RadialNavProps) {
   const orbitRadius = size / 2 - 0.5;
   const [activeId, setActiveId] = useState<number | null>(defaultActiveId ?? null);
 
@@ -196,7 +199,7 @@ function RadialNav({ size = 180, items, menuButtonConfig, defaultActiveId, onAct
       className='relative flex items-center justify-center rounded-full border-[3px] border-(--frame)'
       style={{ width: size, height: size }}
       role='menu'
-      aria-label='Radial navigation'
+      aria-label={ariaLabel}
     >
       <m.div
         initial={false}

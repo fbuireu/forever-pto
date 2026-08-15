@@ -2,6 +2,7 @@ type TrackEventName =
   | 'payment_started'
   | 'payment_completed'
   | 'payment_failed'
+  | 'payment_activation_failed'
   | 'promo_code_applied'
   | 'premium_activated'
   | 'upgrade_modal_opened'

@@ -1,41 +1,14 @@
-import { createPayment } from '@application/use-cases/payment';
-import { ApiError } from '@infrastructure/api/errors';
-import { ApplicationLayer } from '@infrastructure/layers';
-import { checkRateLimit } from '@infrastructure/services/payments/rateLimit';
-import { Effect } from 'effect';
-import { after, type NextRequest, NextResponse } from 'next/server';
+import type { CreatePaymentInput } from '@application/dto/payment/schema';
+import { createPaymentRequest } from '@infrastructure/api/operations/payment';
+import { resolveClientIp } from '@infrastructure/api/operations/types';
+import { parseJsonBody } from '@infrastructure/api/parseJsonBody';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get('cf-connecting-ip') ?? request.headers.get('x-forwarded-for') ?? 'unknown';
-  const body = await request.json();
+  const { status, body } = await createPaymentRequest(parseJsonBody<CreatePaymentInput>(request), {
+    userAgent: request.headers.get('user-agent'),
+    ipAddress: resolveClientIp(request.headers),
+  });
 
-  return Effect.runPromise(
-    Effect.gen(function* () {
-      yield* checkRateLimit(ip);
-
-      const { clientSecret, discountInfo, deferred } = yield* createPayment(body, {
-        userAgent: request.headers.get('user-agent'),
-        ipAddress: ip,
-      });
-
-      yield* Effect.sync(() => after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer)))));
-
-      return NextResponse.json({ success: true, clientSecret, discountInfo });
-    }).pipe(
-      Effect.provide(ApplicationLayer),
-      Effect.catchTags({
-        RateLimitError: () =>
-          Effect.succeed(NextResponse.json({ success: false, error: ApiError.RATE_LIMIT_EXCEEDED }, { status: 429 })),
-        ValidationError: (e) =>
-          Effect.succeed(NextResponse.json({ success: false, error: e.message }, { status: 400 })),
-        PromoCodeError: (e) =>
-          Effect.succeed(NextResponse.json({ success: false, error: e.code, isPromoCodeError: true }, { status: 400 })),
-        PaymentError: () =>
-          Effect.succeed(NextResponse.json({ success: false, error: ApiError.INTERNAL_ERROR }, { status: 500 })),
-      }),
-      Effect.catchAll(() =>
-        Effect.succeed(NextResponse.json({ success: false, error: ApiError.INTERNAL_ERROR }, { status: 500 }))
-      )
-    )
-  );
+  return NextResponse.json(body, { status });
 }

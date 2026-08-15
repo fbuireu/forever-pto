@@ -4,7 +4,9 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../primitives/base/Popover', () => ({
   Popover: ({ children, ...props }: ComponentProps<'div'>) => (
-    <div data-primitive='popover' {...props}>{children}</div>
+    <div data-primitive='popover' {...props}>
+      {children}
+    </div>
   ),
   PopoverTrigger: ({ children, ...props }: ComponentProps<'button'>) => (
     <button data-primitive='popover-trigger' {...props}>
@@ -47,7 +49,13 @@ import { Popover, PopoverContent, PopoverTrigger } from './Popover';
 
 describe('Popover', () => {
   it('renders without throwing', () => {
-    expect(() => render(<Popover><span /></Popover>)).not.toThrow();
+    expect(() =>
+      render(
+        <Popover>
+          <span />
+        </Popover>
+      )
+    ).not.toThrow();
   });
 });
 

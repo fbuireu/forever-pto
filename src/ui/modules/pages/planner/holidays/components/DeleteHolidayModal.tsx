@@ -1,15 +1,8 @@
 'use client';
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { useHolidaysStore } from '@application/stores/holidays';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-
-const logger = getBetterStackInstance();
-
 import { formatDate } from '@application/shared/utils/dates';
-import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
-import { Trash2 } from '@ui/modules/core/animate/icons/Trash2';
-import { Button } from '@ui/modules/core/primitives/Button';
+import { useHolidaysStore } from '@application/stores/holidays';
 import {
   Dialog,
   DialogContent,
@@ -17,7 +10,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@ui/modules/core/primitives/Dialog';
+} from '@ui/modules/core/animate/base/Dialog';
+import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
+import { Trash2 } from '@ui/modules/core/animate/icons/Trash2';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { AlertTriangle } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';
@@ -33,6 +29,7 @@ interface DeleteHolidayModalProps {
 
 export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHolidayModalProps) => {
   const t = useTranslations('modals.deleteHoliday');
+  const tA11y = useTranslations('a11y');
   const { removeHoliday } = useHolidaysStore();
   const [isPending, startTransition] = useTransition();
   const isMultiple = holidays.length > 1;
@@ -52,7 +49,9 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
 
         onClose();
       } catch (error) {
-        logger.logError('Error deleting holiday', error, { component: 'DeleteHolidayModal' });
+        void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
+          getBetterStackInstance().logError('Error deleting holiday', error, { component: 'DeleteHolidayModal' });
+        });
         toast.error(t('errorTitle'), {
           description: t('errorDescription'),
         });
@@ -62,7 +61,7 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className='sm:max-w-sm'>
+      <DialogContent className='sm:max-w-sm' closeLabel={tA11y('closeDialog')}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2 text-destructive'>
             <AlertTriangle className='size-5' />

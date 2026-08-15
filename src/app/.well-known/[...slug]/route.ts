@@ -11,17 +11,17 @@ interface RouteContext {
   params: Promise<{ slug: string[] }>;
 }
 
-const ROUTES: Record<string, Handler> = {
-  'api-catalog': apiCatalog,
-  'mcp/server-card.json': mcpServerCard,
-  'agent-skills/index.json': agentSkillsIndex,
-};
+const ROUTES = new Map<string, Handler>([
+  ['api-catalog', apiCatalog],
+  ['mcp/server-card.json', mcpServerCard],
+  ['agent-skills/index.json', agentSkillsIndex],
+]);
 
 export async function GET(_request: Request, { params }: RouteContext) {
   const { slug } = await params;
   const path = slug.join('/');
 
-  const handler = ROUTES[path];
+  const handler = ROUTES.get(path);
   if (!handler) return NextResponse.json({ error: ApiError.NOT_FOUND }, { status: 404 });
 
   const { env } = await getCloudflareContext({ async: true });

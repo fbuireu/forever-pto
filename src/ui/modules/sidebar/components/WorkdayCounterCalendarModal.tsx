@@ -1,7 +1,9 @@
+'use client';
+
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { formatDate } from '@application/shared/utils/dates';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/modules/core/animate/base/Dialog';
 import { Button } from '@ui/modules/core/primitives/Button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/modules/core/primitives/Dialog';
 import type { FromTo } from '@ui/modules/pages/planner/calendar/Calendar';
 import { Calendar, CalendarSelectionMode } from '@ui/modules/pages/planner/calendar/Calendar';
 import { Calendar as CalendarIcon } from 'lucide-react';
@@ -25,6 +27,7 @@ export const WorkdayCounterCalendarModal = ({
   holidays,
 }: WorkdayCounterCalendarModalProps) => {
   const t = useTranslations('workdayCounterModal');
+  const tA11y = useTranslations('a11y');
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -36,7 +39,7 @@ export const WorkdayCounterCalendarModal = ({
             : t('selectDateRange')}
         </Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-sm'>
+      <DialogContent className='sm:max-w-sm' closeLabel={tA11y('closeDialog')}>
         <DialogHeader>
           <DialogTitle className='text-sm'>{t('selectDateRange')}</DialogTitle>
         </DialogHeader>
@@ -49,9 +52,9 @@ export const WorkdayCounterCalendarModal = ({
             locale={locale}
             holidays={holidays}
             allowPastDays
-            currentSelection={{ days: [] }}
+            currentSelection={null}
             alternatives={[]}
-            suggestion={{ days: [] }}
+            suggestion={null}
             className='w-full'
           />
         </div>

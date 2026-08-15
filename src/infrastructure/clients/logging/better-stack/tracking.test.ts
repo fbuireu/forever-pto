@@ -7,7 +7,6 @@ afterEach(() => {
 
 describe('track', () => {
   it('is a no-op when window is undefined (SSR)', () => {
-    // default node environment: window is undefined — should not throw
     expect(() => track('payment_started')).not.toThrow();
   });
 

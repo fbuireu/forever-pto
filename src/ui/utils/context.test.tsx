@@ -12,9 +12,7 @@ describe('getStrictContext', () => {
 
   it('provides the value to consumers', () => {
     const [Provider, useCtx] = getStrictContext<number>();
-    const wrapper = ({ children }: { children: ReactNode }) => (
-      <Provider value={42}>{children}</Provider>
-    );
+    const wrapper = ({ children }: { children: ReactNode }) => <Provider value={42}>{children}</Provider>;
     const { result } = renderHook(() => useCtx(), { wrapper });
     expect(result.current).toBe(42);
   });
@@ -31,9 +29,7 @@ describe('getStrictContext', () => {
 
   it('works with object values', () => {
     const [Provider, useCtx] = getStrictContext<{ count: number }>();
-    const wrapper = ({ children }: { children: ReactNode }) => (
-      <Provider value={{ count: 7 }}>{children}</Provider>
-    );
+    const wrapper = ({ children }: { children: ReactNode }) => <Provider value={{ count: 7 }}>{children}</Provider>;
     const { result } = renderHook(() => useCtx(), { wrapper });
     expect(result.current.count).toBe(7);
   });

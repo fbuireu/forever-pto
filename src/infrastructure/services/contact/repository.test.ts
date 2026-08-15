@@ -24,9 +24,7 @@ const CONTACT_DATA = {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.spyOn(globalThis.crypto, 'randomUUID').mockReturnValue(
-    'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
-  );
+  vi.spyOn(globalThis.crypto, 'randomUUID').mockReturnValue('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee');
   mockExecute.mockReturnValue(Effect.succeed(undefined));
 });
 
@@ -69,9 +67,7 @@ describe('saveContact', () => {
     const dbError = new DatabaseError({ message: 'connection refused', cause: new Error('test-error') });
     mockExecute.mockReturnValue(Effect.fail(dbError));
 
-    const error = await Effect.runPromise(
-      saveContact(CONTACT_DATA).pipe(Effect.provide(MockTursoLayer), Effect.flip)
-    );
+    const error = await Effect.runPromise(saveContact(CONTACT_DATA).pipe(Effect.provide(MockTursoLayer), Effect.flip));
 
     expect(error).toBeInstanceOf(DatabaseError);
     expect(error.message).toBe('connection refused');

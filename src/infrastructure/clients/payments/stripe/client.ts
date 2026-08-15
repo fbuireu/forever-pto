@@ -1,4 +1,3 @@
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { loadStripe, type PaymentIntent, type Stripe, type StripeError } from '@stripe/stripe-js';
 import { Effect } from 'effect';
 
@@ -19,7 +18,6 @@ class StripeClient {
   private stripePromise: Promise<Stripe | null> | null = null;
   private stripe: Stripe | null = null;
   private readonly publishableKey: string;
-  private logger = getBetterStackInstance();
 
   constructor(publishableKey: string) {
     this.publishableKey = publishableKey;
@@ -59,7 +57,7 @@ class StripeClient {
         ),
         Effect.andThen((result) => Effect.sync(() => this.handlePaymentResult(result))),
         Effect.catchAll((error) => {
-          this.logger.logError('Stripe confirmPayment failed', error, {
+          this.logError('Stripe confirmPayment failed', error, {
             hasClientSecret: !!params.clientSecret,
             hasReturnUrl: !!params.returnUrl,
             alwaysRedirect: params.alwaysRedirect,
@@ -79,7 +77,7 @@ class StripeClient {
         ),
         Effect.andThen((result) => Effect.sync(() => this.handlePaymentResult(result))),
         Effect.catchAll((error) => {
-          this.logger.logError('Stripe confirmCardPayment failed', error, { hasClientSecret: !!clientSecret });
+          this.logError('Stripe confirmCardPayment failed', error, { hasClientSecret: !!clientSecret });
           return Effect.succeed(this.handleError(error));
         })
       )
@@ -88,6 +86,12 @@ class StripeClient {
 
   isLoaded() {
     return this.stripe !== null;
+  }
+
+  private logError(message: string, error: unknown, context: Record<string, unknown>) {
+    void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
+      getBetterStackInstance().logError(message, error, context);
+    });
   }
 
   private handlePaymentResult(result: { error: StripeError } | { paymentIntent: PaymentIntent }) {

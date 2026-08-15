@@ -3,57 +3,15 @@
 import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible';
 import { cn } from '@ui/utils/cn';
 import { type HTMLMotionProps, m, type Transition } from 'motion/react';
-import {
-  type ComponentProps,
-  type ComponentPropsWithoutRef,
-  createContext,
-  isValidElement,
-  type ReactElement,
-  use,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
-
-type CollapsibleContextType = {
-  isOpen: boolean;
-};
-
-const CollapsibleContext = createContext<CollapsibleContextType | undefined>(undefined);
-
-const _useCollapsible = () => {
-  const context = use(CollapsibleContext);
-  if (!context) {
-    throw new Error('useCollapsible must be used within a Collapsible');
-  }
-  return context;
-};
+import { type ComponentProps, type ComponentPropsWithoutRef, isValidElement, type ReactElement } from 'react';
 
 type CollapsibleProps = ComponentProps<typeof CollapsiblePrimitive.Root>;
 
 function Collapsible({ children, ...props }: CollapsibleProps) {
-  const [isOpen, setIsOpen] = useState(props?.open ?? props?.defaultOpen ?? false);
-
-  useEffect(() => {
-    if (props?.open !== undefined) setIsOpen(props.open);
-  }, [props?.open]);
-
-  const handleOpenChange = useCallback(
-    (...args: Parameters<NonNullable<CollapsibleProps['onOpenChange']>>) => {
-      setIsOpen(args[0]);
-      props.onOpenChange?.(...args);
-    },
-    [props.onOpenChange]
-  );
-
-  const collapsibleContextValue = useMemo(() => ({ isOpen }), [isOpen]);
   return (
-    <CollapsibleContext.Provider value={collapsibleContextValue}>
-      <CollapsiblePrimitive.Root data-slot='collapsible' {...props} onOpenChange={handleOpenChange}>
-        {children}
-      </CollapsiblePrimitive.Root>
-    </CollapsibleContext.Provider>
+    <CollapsiblePrimitive.Root data-slot='collapsible' {...props}>
+      {children}
+    </CollapsiblePrimitive.Root>
   );
 }
 

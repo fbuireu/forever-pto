@@ -6,6 +6,5 @@ export const ApiError = {
   MISSING_SIGNATURE: 'missing_signature',
   INVALID_SIGNATURE: 'invalid_signature',
   WEBHOOK_PROCESSING_FAILED: 'webhook_processing_failed',
+  WEBHOOK_MISCONFIGURED: 'webhook_misconfigured',
 } as const;
-
-export type ApiErrorCode = (typeof ApiError)[keyof typeof ApiError];

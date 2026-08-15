@@ -11,8 +11,14 @@ vi.mock('@opennextjs/cloudflare', () => ({
   getCloudflareContext: mockGetCloudflareContext,
 }));
 
-const { detectCountryFromCDN, detectCountryFromHeaders, detectCountryFromIP, CLOUDFLARE_COUNTRY_HEADER, UNIDENTIFIED_COUNTRY, TOR_COUNTRY } =
-  await import('./strategies');
+const {
+  detectCountryFromCDN,
+  detectCountryFromHeaders,
+  detectCountryFromEgressIP,
+  CLOUDFLARE_COUNTRY_HEADER,
+  UNIDENTIFIED_COUNTRY,
+  TOR_COUNTRY,
+} = await import('./strategies');
 
 function makeRequest(country: string | null) {
   return { headers: { get: (header: string) => (header === CLOUDFLARE_COUNTRY_HEADER ? country : null) } } as never;
@@ -86,9 +92,16 @@ describe('detectCountryFromCDN', () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network error')));
     expect(await detectCountryFromCDN()).toBe('');
   });
+
+  it('never lets the per-visitor trace be served from a cache', async () => {
+    const mockFetch = vi.fn().mockResolvedValue(makeResponse(true, `loc=${ES.toUpperCase()}\n`));
+    vi.stubGlobal('fetch', mockFetch);
+    await detectCountryFromCDN();
+    expect(mockFetch).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ cache: 'no-store' }));
+  });
 });
 
-describe('detectCountryFromIP', () => {
+describe('detectCountryFromEgressIP', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -101,17 +114,31 @@ describe('detectCountryFromIP', () => {
         .mockResolvedValueOnce(makeResponse(true, { ip: '1.2.3.4' }))
         .mockResolvedValueOnce(makeResponse(true, { country: FR.toUpperCase() }))
     );
-    expect(await detectCountryFromIP()).toBe(FR);
+    expect(await detectCountryFromEgressIP()).toBe(FR);
+  });
+
+  it('never lets either per-caller lookup be served from a cache', async () => {
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce(makeResponse(true, { ip: '1.2.3.4' }))
+      .mockResolvedValueOnce(makeResponse(true, { country: FR.toUpperCase() }));
+    vi.stubGlobal('fetch', mockFetch);
+
+    await detectCountryFromEgressIP();
+
+    for (const [, init] of mockFetch.mock.calls) {
+      expect(init).toEqual(expect.objectContaining({ cache: 'no-store' }));
+    }
   });
 
   it('returns empty string when ipify response is not ok', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeResponse(false, {})));
-    expect(await detectCountryFromIP()).toBe('');
+    expect(await detectCountryFromEgressIP()).toBe('');
   });
 
   it('returns empty string when ip field is missing', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(makeResponse(true, {})));
-    expect(await detectCountryFromIP()).toBe('');
+    expect(await detectCountryFromEgressIP()).toBe('');
   });
 
   it('returns empty string when ipinfo response is not ok', async () => {
@@ -122,7 +149,7 @@ describe('detectCountryFromIP', () => {
         .mockResolvedValueOnce(makeResponse(true, { ip: '1.2.3.4' }))
         .mockResolvedValueOnce(makeResponse(false, {}))
     );
-    expect(await detectCountryFromIP()).toBe('');
+    expect(await detectCountryFromEgressIP()).toBe('');
   });
 
   it('returns empty string when country field is absent from geo data', async () => {
@@ -133,11 +160,11 @@ describe('detectCountryFromIP', () => {
         .mockResolvedValueOnce(makeResponse(true, { ip: '1.2.3.4' }))
         .mockResolvedValueOnce(makeResponse(true, {}))
     );
-    expect(await detectCountryFromIP()).toBe('');
+    expect(await detectCountryFromEgressIP()).toBe('');
   });
 
   it('returns empty string when fetch rejects', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network error')));
-    expect(await detectCountryFromIP()).toBe('');
+    expect(await detectCountryFromEgressIP()).toBe('');
   });
 });

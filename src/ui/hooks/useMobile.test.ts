@@ -9,7 +9,10 @@ const makeMediaQueryList = (matches: boolean) => ({
 });
 
 beforeEach(() => {
-  vi.stubGlobal('matchMedia', vi.fn((query: string) => makeMediaQueryList(query.includes('767px') || query.includes('max-width: 767px'))));
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn((query: string) => makeMediaQueryList(query.includes('767px') || query.includes('max-width: 767px')))
+  );
 });
 
 afterEach(() => {
@@ -18,20 +21,29 @@ afterEach(() => {
 
 describe('useIsMobile', () => {
   it('returns false when viewport is wider than breakpoint', () => {
-    vi.stubGlobal('matchMedia', vi.fn(() => makeMediaQueryList(false)));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => makeMediaQueryList(false))
+    );
     const { result } = renderHook(() => useIsMobile());
     expect(result.current).toBe(false);
   });
 
   it('returns true when viewport is narrower than breakpoint', () => {
-    vi.stubGlobal('matchMedia', vi.fn(() => makeMediaQueryList(true)));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => makeMediaQueryList(true))
+    );
     const { result } = renderHook(() => useIsMobile());
     expect(result.current).toBe(true);
   });
 
   it('subscribes to media query change events', () => {
     const mql = makeMediaQueryList(false);
-    vi.stubGlobal('matchMedia', vi.fn(() => mql));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => mql)
+    );
 
     renderHook(() => useIsMobile());
 
@@ -40,7 +52,10 @@ describe('useIsMobile', () => {
 
   it('unsubscribes on unmount', () => {
     const mql = makeMediaQueryList(false);
-    vi.stubGlobal('matchMedia', vi.fn(() => mql));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => mql)
+    );
 
     const { unmount } = renderHook(() => useIsMobile());
     unmount();

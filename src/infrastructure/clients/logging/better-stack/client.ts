@@ -5,7 +5,13 @@ interface LogContext {
   [key: string]: unknown;
 }
 
+type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+
+const UNCONFIGURED_WARNING =
+  'BetterStack logging is disabled: NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN and NEXT_PUBLIC_BETTER_STACK_INGESTING_URL are not both defined';
+
 let logtail: Logtail | null = null;
+let warnedUnconfigured = false;
 
 const getLogtail = () => {
   if (!logtail) {
@@ -13,9 +19,12 @@ const getLogtail = () => {
     const ingestingUrl = process.env.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL;
 
     if (!sourceToken || !ingestingUrl) {
-      throw new Error(
-        'NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN and NEXT_PUBLIC_BETTER_STACK_INGESTING_URL must be defined'
-      );
+      if (!warnedUnconfigured) {
+        warnedUnconfigured = true;
+        console.warn(UNCONFIGURED_WARNING);
+      }
+
+      return null;
     }
 
     logtail = new Logtail(sourceToken, { endpoint: ingestingUrl, warnAboutMissingExecutionContext: false });
@@ -30,6 +39,14 @@ const getExecutionContext = () => {
     return ctx;
   } catch {
     return undefined;
+  }
+};
+
+const send = (level: LogLevel, message: string, context: LogContext) => {
+  try {
+    void getLogtail()?.[level](message, context, getExecutionContext());
+  } catch {
+    return;
   }
 };
 
@@ -52,19 +69,19 @@ export class BetterStackClient {
   }
 
   debug(message: string, context?: LogContext) {
-    void getLogtail().debug(message, this.getFullContext(context), getExecutionContext());
+    send('debug', message, this.getFullContext(context));
   }
 
   info(message: string, context?: LogContext) {
-    void getLogtail().info(message, this.getFullContext(context), getExecutionContext());
+    send('info', message, this.getFullContext(context));
   }
 
   warn(message: string, context?: LogContext) {
-    void getLogtail().warn(message, this.getFullContext(context), getExecutionContext());
+    send('warn', message, this.getFullContext(context));
   }
 
   error(message: string, context?: LogContext) {
-    void getLogtail().error(message, this.getFullContext(context), getExecutionContext());
+    send('error', message, this.getFullContext(context));
   }
 
   logError(message: string, error: unknown, context?: LogContext) {

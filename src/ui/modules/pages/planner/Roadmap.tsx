@@ -29,6 +29,7 @@ type CategoryStatus = (typeof CategoryStatus)[keyof typeof CategoryStatus];
 
 export function Roadmap() {
   const t = useTranslations('roadmap');
+  const tA11y = useTranslations('a11y');
   const [selectedCategory, setSelectedCategory] = useState<number>(1);
 
   const roadmapCategories = useMemo(
@@ -202,6 +203,7 @@ export function Roadmap() {
               items={roadmapCategories as unknown as RadialNavProps['items']}
               onActiveChange={(id) => setSelectedCategory(id)}
               defaultActiveId={selectedCategory}
+              aria-label={tA11y('radialNavigation')}
             />
           </div>
           {selectedNavItem && (

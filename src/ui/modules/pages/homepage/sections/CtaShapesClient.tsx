@@ -1,9 +1,9 @@
 'use client';
 
-import type { MouseEvent } from 'react';
 import { m, useMotionValue, useSpring, useTransform } from 'motion/react';
+import type { MouseEvent } from 'react';
 
-type CtaShapesProps = {
+type CtaShapesClientProps = {
   byeMonday: string;
   bossOff: string;
   doNotDisturb: string;
@@ -16,14 +16,13 @@ const SHAPE_BASE =
 
 const SPRING = { stiffness: 80, damping: 20, mass: 0.5 };
 
-export function CtaShapes({ byeMonday, bossOff, doNotDisturb, zeroRegrets }: Readonly<CtaShapesProps>) {
+export function CtaShapesClient({ byeMonday, bossOff, doNotDisturb, zeroRegrets }: Readonly<CtaShapesClientProps>) {
   const rawX = useMotionValue(0.5);
   const rawY = useMotionValue(0.5);
 
   const springX = useSpring(rawX, SPRING);
   const springY = useSpring(rawY, SPRING);
 
-  // Each shape gets a different depth multiplier for the parallax feel
   const x1 = useTransform(springX, [0, 1], [-14, 14]);
   const y1 = useTransform(springY, [0, 1], [-10, 10]);
 

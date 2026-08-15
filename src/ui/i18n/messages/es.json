@@ -1,4 +1,10 @@
 {
+  "a11y": {
+    "closeDialog": "Cerrar",
+    "toggleSidebar": "Mostrar u ocultar la barra lateral",
+    "sidebarLandmark": "Controles del planificador",
+    "radialNavigation": "Navegación de funciones"
+  },
   "metadata": {
     "title": "Forever PTO - Gestiona tus días libres",
     "description": "Planifica y optimiza tus vacaciones con Forever PTO. Encuentra los mejores puentes y aprovecha al máximo tu tiempo libre.",
@@ -24,13 +30,14 @@
     },
     "planner": {
       "title": "Planificador | Forever PTO",
-      "description": "Planifica y optimiza tus días de vacaciones. Calendario de PTO con detección de festivos, optimización de puentes y exportación a Google Calendar, Outlook y Apple."
+      "description": "Planifica y optimiza tus días de PTO. Calendario de PTO con detección de festivos, optimización de puentes y exportación a Google Calendar, Outlook y Apple."
     }
   },
   "planner": {
     "title": "Forever PTO",
-    "description": "Tu planificador de PTO. Configura tus días de vacaciones, país y estrategia para sacarle partido a cada festivo.",
-    "subtitle": "Deja de perder días de vacaciones.",
+    "heading": "Planificador",
+    "description": "Tu planificador de PTO. Configura tus días de PTO, país y estrategia para sacarle partido a cada festivo.",
+    "subtitle": "Deja de perder días de PTO.",
     "titleHighlight1": "Tu año",
     "titleHighlight2": "libre",
     "instructions": "Empieza añadiendo tus días en la barra lateral y ajusta el resto. ¿Aún tienes dudas?",
@@ -55,23 +62,24 @@
   "summary": {
     "title": "Resumen de PTO {year} - {nextYear}",
     "metrics": {
-      "vacationDays": "Días de vacaciones",
+      "ptoDays": "Días de PTO",
       "days": "días",
       "holidays": "Festivos",
       "national": "nac.",
       "regional": "reg.",
       "custom": "prop.",
-      "effectiveDays": "Días libres reales",
-      "extra": "extra",
-      "multiplier": "Multiplicador",
-      "performance": "rendimiento",
+      "effectiveDays": "Días efectivos",
+      "overBudget": "sobre tu presupuesto de {ptoDays} {ptoDays, plural, one {día} other {días}}",
+      "gain": "Ganancia",
+      "perPtoDay": "de tu presupuesto de {ptoDays} {ptoDays, plural, one {día} other {días}}",
       "longWeekends": "Puentes de fin de semana",
-      "vacationPeriods": "Períodos vacacionales",
-      "dayOffRatio": "Ratio día/libre",
+      "restBlocks": "Bloques de descanso",
+      "efficiency": "Eficiencia",
       "bridgesUsed": "Puentes usados",
-      "workdaysPerMonth": "Días laborales/mes",
+      "workedDaysPerMonth": "Días trabajados/mes",
       "longestVacation": "Vacaciones más largas",
-      "advancedMetrics": "Métricas avanzadas"
+      "advancedMetrics": "Métricas avanzadas",
+      "perPlacedDay": "por día gastado ({placedDays})"
     },
     "yearSummary": {
       "feature": "Resumen anual",
@@ -81,12 +89,12 @@
       "maxWorkStreak": "Racha laboral máxima",
       "lastBreak": "Última pausa",
       "totalBonusDays": "Días bonus totales",
-      "daysGained": "Días ganados optimizando",
+      "bonusDaysCaption": "días bonus por optimizar",
       "daysCount": "{count, plural, one {día} other {días}}"
     },
     "summaryParagraph": {
-      "withGain": "Con tus {ptoDays} días de vacaciones y {totalHolidays} festivos, la estrategia {strategy} los convierte en {effectiveDays} días libres efectivos, es decir, {increment} días extra, una mejora del +{percentage}% respecto a usarlos sin optimizar.",
-      "withoutGain": "Con tus {ptoDays} días de vacaciones y {totalHolidays} festivos, obtienes {effectiveDays} días libres efectivos usando la estrategia {strategy}.",
+      "withGain": "Con tus {ptoDays} días de PTO y {totalHolidays} festivos, la estrategia {strategy} los convierte en {effectiveDays} días libres efectivos, es decir, {increment} días por encima de tu presupuesto, una ganancia del +{percentage}% respecto a usarlos sin optimizar.",
+      "withoutGain": "Con tus {ptoDays} días de PTO y {totalHolidays} festivos, obtienes {effectiveDays} días libres efectivos usando la estrategia {strategy}.",
       "noRegionHintTitle": "Añade tu región",
       "noRegionHint": "Selecciona tu región en la barra lateral para incluir festivos regionales y conseguir más días libres.",
       "withRegion": "{regionalDays} de tus festivos son específicos de {region}."
@@ -180,7 +188,7 @@
         },
         "encryption": {
           "question": "¿Están mis datos encriptados?",
-          "answer": "Tus datos de planificación de vacaciones se almacenan localmente en tu navegador. Aplicamos ofuscación con cifrado XOR para hacer los datos ilegibles en inspección casual. Este método está diseñado para prevenir exposición accidental, no para proteger contra atacantes determinados. No almacenamos información personal sensible, y mantienes el control total de tus datos en tu dispositivo. Todos tus datos (días de PTO, fechas seleccionadas, festivos personalizados, preferencias) se almacenan exclusivamente en el almacenamiento local de tu navegador. Nunca enviamos esta información a nuestros servidores. Tu planificación de vacaciones permanece completamente privada en tu dispositivo."
+          "answer": "Tus datos de planificación de vacaciones se almacenan localmente en tu navegador. Aplicamos una ofuscación ligera (XOR) para que los datos no sean legibles a simple vista. No es cifrado y no protege frente a un atacante decidido: está pensado para evitar una exposición accidental. No almacenamos información personal sensible, y mantienes el control total de tus datos en tu dispositivo. Todos tus datos (días de PTO, fechas seleccionadas, festivos personalizados, preferencias) se almacenan exclusivamente en el almacenamiento local de tu navegador. Nunca enviamos esta información a nuestros servidores. Tu planificación de vacaciones permanece completamente privada en tu dispositivo."
         },
         "tracking": {
           "question": "¿Vendéis mis datos o seguís mis planes de vacaciones?",
@@ -213,11 +221,12 @@
     "tooltipLabel": "Más información sobre el contador",
     "selectRange": "Seleccionar fechas",
     "clearSelection": "Limpiar selección",
-    "workingDays": "Días laborables",
-    "businessDays": "Días hábiles en el rango",
+    "workdays": "Días laborables",
+    "businessDays": "Días laborables en el rango seleccionado",
     "days": "Días",
     "weekendDays": "Fines de semana",
     "holidays": "Festivos",
+    "holidaysOutsideRange": "Solo conocemos los festivos de {from}–{to}, así que los de fuera de ese intervalo cuentan como laborables.",
     "dateRange": "Rango de fechas",
     "from": "Desde",
     "to": "hasta"
@@ -244,7 +253,6 @@
     "onWorkdays": "En laborables",
     "showing": "Mostrando",
     "of": "de",
-    "total": "total",
     "addHoliday": "Añadir festivo",
     "add": "Añadir",
     "editHoliday": "Editar festivo",
@@ -266,7 +274,7 @@
     "distributionDescription": "Distribución de tus {ptoDays} días PTO, {nationalDays} festivos nacionales{regionalPart}{customPart}.",
     "regionalPart": ", {regionalDays} regionales",
     "customPart": " y {customDays} personalizados",
-    "quarterDescription": "Distribución de {totalDays} días libres efectivos a lo largo de {activeQuarters} trimestre{plural} del año.",
+    "quarterDescription": "Distribución de {totalDays} días efectivos a lo largo de {activeQuarters, plural, one {# trimestre} other {# trimestres}} de tu ventana de planificación.",
     "annualTimeline": "Línea temporal anual",
     "annualTimelineFeature": "Gráfica de línea temporal anual",
     "timelineDescription": "Evolución mensual de {totalDays} días libres distribuidos en {activeMonths} meses. Pico en {peakMonth} con {peakDays} días.",
@@ -274,7 +282,7 @@
     "longBlocksPerQuarter": "Bloques largos por trimestre",
     "longBlocksFeature": "Gráfica de bloques largos por trimestre",
     "blocksDescription": "{totalBlocks} bloques largos (3+ días consecutivos) ideales para vacaciones{bestQuarterPart}.",
-    "bestQuarterPart": ". Mejor trimestre: Q{bestQuarter} con {maxBlocks} bloque{plural}",
+    "bestQuarterPart": ". Mejor trimestre: Q{bestQuarter} con {maxBlocks, plural, one {# bloque} other {# bloques}}",
     "blocks": "bloques",
     "blocksOf3Days": "Bloques de 3+ días"
   },
@@ -294,6 +302,8 @@
       "errorTitle": "Error al crear festivo",
       "errorDescription": "Algo ha fallado. Inténtalo de nuevo.",
       "existsTitle": "El festivo ya existe",
+      "manualDayExistsTitle": "Ese día ya es un día libre",
+      "manualDayExistsDescription": "Ya has reservado el {date} como día libre. Quítalo de tu plan y añade el festivo después.",
       "existsDescription": "Ya existe un festivo el {date}: {name}"
     },
     "editHoliday": {
@@ -325,8 +335,6 @@
   },
   "tutorial": {
     "description": "Configura tu plan en 2 pasos: primero tu ubicación, luego tus días y estrategia. Pulsa el botón para empezar el tutorial.",
-    "restartButton": "Reiniciar tutorial interactivo",
-    "startButton": "Iniciar tutorial",
     "nextBtn": "Siguiente",
     "prevBtn": "Anterior",
     "doneBtn": "Listo",
@@ -347,11 +355,11 @@
       "step1Title": "Tu contexto",
       "step1Description": "Selecciona tu país, región y el año que quieres planificar. Esto configura tu calendario de festivos para encontrar los mejores puentes.",
       "step2Title": "Días disponibles",
-      "step2Description": "Indica cuántos días de vacaciones tienes. Esta es la base para todos los cálculos.",
+      "step2Description": "Indica cuántos días de PTO tienes. Esta es la base para todos los cálculos.",
       "step3Title": "Tu configuración",
       "step3Description": "Elige tu estrategia de optimización y ajusta los días pasados y los meses de arrastre para afinar el plan.",
       "step4Title": "Exporta tu calendario",
-      "step4Description": "Descarga tus festivos y días de vacaciones como archivo .ics para importarlos en Google Calendar, Apple Calendar u Outlook, o como PDF para imprimir o compartir.",
+      "step4Description": "Descarga tus festivos y días de PTO como archivo .ics para importarlos en Google Calendar, Apple Calendar u Outlook, o como PDF para imprimir o compartir.",
       "drawerTitle": "Tu panel de planificación",
       "drawerDescription": "Esta barra siempre muestra un resumen de tu plan. Deslízala hacia arriba (o arrastra el tirador) para explorar alternativas y ver cómo se distribuyen tus días."
     }
@@ -379,12 +387,12 @@
     "ptoDayLabel": "Día de PTO",
     "downloadPdf": "Descargar .pdf",
     "downloadingPdf": "Descargando",
-    "tooltip": "Elige qué incluir en la exportación: festivos, tus días de vacaciones o ambos.",
+    "tooltip": "Elige qué incluir en la exportación: festivos, tus días de PTO o ambos.",
     "tooltipLabel": "Info opciones de exportación",
     "pdf": {
       "holidays": "Festivos",
-      "vacationDays": "Días de vacaciones",
-      "dayOff": "Día de vacaciones",
+      "ptoDays": "Días de PTO",
+      "ptoDay": "Día de PTO",
       "generatedOn": "Generado el",
       "successTitle": "PDF descargado",
       "successDescription": "Tu calendario se ha exportado correctamente.",
@@ -393,10 +401,9 @@
     }
   },
   "ptoStatus": {
-    "autoAssigned": "Auto-asignados",
+    "autoAssigned": "Sugeridos",
     "manual": "Manual",
     "remaining": "Restantes",
-    "clickDays": "Haz clic en los días para asignar/quitar",
     "allAssigned": "Todos los días asignados.",
     "resetManual": "Deshacer cambios manuales",
     "usedDays": "{used} / {total} días usados · {pct}%",
@@ -421,19 +428,31 @@
     "errorTitle": "Algo ha fallado",
     "tryAgain": "Intentar de nuevo",
     "close": "Cerrar",
-    "failedToSend": "Error al enviar el mensaje"
+    "failedToSend": "Error al enviar el mensaje",
+    "errors": {
+      "internal_error": "Algo ha fallado por nuestra parte. Inténtalo de nuevo más tarde.",
+      "invalid_email": "Ese email no parece correcto.",
+      "email_required": "Introduce tu email.",
+      "name_too_short": "Tu nombre necesita al menos 2 caracteres.",
+      "name_too_long": "Tu nombre es demasiado largo.",
+      "subject_too_short": "El asunto necesita al menos 5 caracteres.",
+      "subject_too_long": "El asunto es demasiado largo.",
+      "message_too_short": "Tu mensaje necesita al menos 10 caracteres.",
+      "message_too_long": "Tu mensaje es demasiado largo.",
+      "invalid_body": "No hemos podido leer esa petición. Inténtalo de nuevo."
+    }
   },
   "alternativesManager": {
     "option": "Opción",
     "recommended": "Recomendado",
-    "totalOff": "Total libres",
+    "totalOff": "Días efectivos",
     "efficiency": "Eficiencia",
     "vsMain": "Vs principal",
     "alreadyApplied": "Ya aplicado",
     "applyAlternative": "Aplicar alternativa",
     "previousSuggestion": "Sugerencia anterior",
     "nextSuggestion": "Siguiente sugerencia",
-    "totalDaysOff": "Total días libres",
+    "totalDaysOff": "Total de días efectivos",
     "comparison": "Comparación",
     "daysUnit": "días"
   },
@@ -443,8 +462,11 @@
     "enablePastDays": "Habilita 'permitir días pasados' en ajustes para seleccionar fechas pasadas",
     "noPtoDaysRemaining": "No quedan días de PTO para asignar",
     "removeDaysToFree": "Quita algún día para poder añadir más",
-    "cannotSelectBankHoliday": "No se puede seleccionar un día festivo",
-    "bankHolidayDescription": "Este día ya es un festivo nacional o regional",
+    "cannotSelectHoliday": "No se puede seleccionar un día festivo",
+    "cannotSelectFreeDay": "Ese día ya es libre",
+    "cannotSelectCustomHolidayDescription": "Este día ya es un festivo personalizado, así que no te cuesta nada.",
+    "cannotSelectWeekendDescription": "Este día ya es fin de semana, así que no te cuesta nada.",
+    "cannotSelectHolidayDescription": "Este día ya es un festivo nacional o regional",
     "paymentFailed": "Error al procesar el pago",
     "paymentFailedDescription": "Inténtalo de nuevo más tarde",
     "paymentSuccess": "Pago completado",
@@ -481,13 +503,11 @@
       "title": "País",
       "tooltip": "Lo detectamos automáticamente por tu conexión. Si no es correcto, cámbialo aquí.",
       "tooltipLabel": "Más información sobre selección de país",
-      "loading": "Cargando países...",
       "placeholder": "Seleccionar país...",
       "search": "Buscar países..."
     },
     "region": {
       "title": "Región",
-      "loading": "Cargando regiones...",
       "placeholder": "Seleccionar región...",
       "search": "Buscar regiones..."
     },
@@ -516,7 +536,7 @@
         "description": "Maximiza eficiencia de días PTO",
         "subtitle": "Obtén la mayor cantidad de días libres",
         "pros": {
-          "maximumPerformance": "Máximo rendimiento",
+          "maximumEfficiency": "Máxima eficiencia",
           "moreDays": "Más días totales"
         },
         "cons": {
@@ -581,7 +601,7 @@
     "iHave": "Tengo",
     "days": "días",
     "status": "Estado de días PTO",
-    "autoAssigned": "Auto-asignados:",
+    "autoAssigned": "Sugeridos:",
     "manuallySelected": "Seleccionados manualmente:",
     "remaining": "Restantes:",
     "resetManualChanges": "Deshacer cambios manuales",
@@ -631,10 +651,19 @@
     "expressCheckout": "Pago rápido",
     "orPayWithCard": "O pagar con tarjeta",
     "paymentError": "Error de pago",
+    "activationFailed": "Tu pago se ha completado, pero no hemos podido desbloquear premium automáticamente. Recupera tu acceso con el correo con el que pagaste o escríbenos.",
     "paymentFailed": "Pago no completado",
     "processing": "Procesando...",
     "pay": "Pagar",
-    "promoSaved": "¡Ahorraste €{saved}!"
+    "promoSaved": "¡Ahorraste {saved}!",
+    "errors": {
+      "internal_error": "Algo ha fallado por nuestra parte. No se ha hecho ningún cargo en tu tarjeta.",
+      "email_required": "Introduce tu email.",
+      "invalid_email": "Ese email no parece correcto.",
+      "invalid_body": "No hemos podido leer esa petición. Inténtalo de nuevo.",
+      "rate_limit_exceeded": "Demasiados intentos. Espera un momento e inténtalo de nuevo.",
+      "promo_code_too_long": "Ese código promocional es demasiado largo."
+    }
   },
   "donate": {
     "donateAndUnblock": "Donar y desbloquear",
@@ -689,7 +718,8 @@
       "amountMin": "La cantidad mínima es 1",
       "amountMax": "La cantidad máxima es 10.000",
       "invalidEmail": "Introduce un email válido",
-      "emailRequired": "El email es obligatorio"
+      "emailRequired": "El email es obligatorio",
+      "promoCodeTooLong": "El código promocional es demasiado largo"
     },
     "holiday": {
       "nameRequired": "El nombre del festivo es obligatorio",
@@ -795,28 +825,7 @@
     "selectDateRange": "Seleccionar fechas"
   },
   "command": {
-    "commandPalette": "Paleta de comandos",
     "searchPlaceholder": "Buscar un comando para ejecutar..."
-  },
-  "errors": {
-    "contact": {
-      "VALIDATION_ERROR": "Hay campos con errores. Revísalos e inténtalo de nuevo.",
-      "EMAIL_SEND_FAILED": "No se pudo enviar el correo. Inténtalo de nuevo.",
-      "SAVE_FAILED": "Hemos recibido tu consulta, aunque hubo un problema técnico al guardar los datos. No tienes que hacer nada más.",
-      "RENDER_FAILED": "No se pudo preparar el correo. Inténtalo de nuevo.",
-      "UNKNOWN": "Algo ha fallado. Inténtalo de nuevo."
-    },
-    "payment": {
-      "VALIDATION_ERROR": "Hay campos con errores. Revísalos e inténtalo de nuevo.",
-      "INVALID_PROMO_CODE": "El código promocional no es válido o ha caducado.",
-      "PAYMENT_FAILED": "No hemos podido procesar el pago. Inténtalo de nuevo.",
-      "SAVE_FAILED": "El pago se procesó, pero hubo un problema al registrarlo. Contacta con soporte con tu ID de transacción.",
-      "UPDATE_STATUS_FAILED": "Error al actualizar el estado del pago. Contacta con soporte si el problema persiste.",
-      "SAVE_FROM_WEBHOOK_FAILED": "No se pudo guardar el pago recibido. Contacta con soporte.",
-      "CHARGE_UPDATE_FAILED": "Error al actualizar los detalles del cargo.",
-      "WEBHOOK_PROCESSING_FAILED": "Error al procesar la confirmación del pago.",
-      "UNKNOWN": "Algo ha fallado. Inténtalo de nuevo."
-    }
   },
   "legal": {
     "lastUpdated": "Última actualización: {date}"
@@ -833,8 +842,7 @@
     "link1": "Cómo funciona",
     "link2": "Funcionalidades",
     "link3": "Planes y precio",
-    "link4": "FAQ y soporte",
-    "footerStatus": "estado: ok · uptime: 99.98%"
+    "link4": "FAQ y soporte"
   },
   "error": {
     "retry": "Intentar de nuevo",
@@ -902,6 +910,8 @@
     "failed": {
       "title": "Pago no completado",
       "description": "No pudimos procesar tu pago. No se te ha cobrado.",
+      "unconfirmedTitle": "Pago aún sin confirmar",
+      "unconfirmedDescription": "No hemos podido confirmar tu pago ahora mismo. Si se ha completado, recupera tu acceso con el correo con el que pagaste, o escríbenos.",
       "whatHappened": "¿Qué ha pasado?",
       "declined": "Tu pago puede haber sido rechazado",
       "authFailed": "La autenticación puede haber fallado",
@@ -915,6 +925,7 @@
       "status": "Estado",
       "confirmed": "Confirmado",
       "paymentId": "ID de pago",
+      "premiumActivationFailed": "Tu pago se ha completado, pero no hemos podido activar el acceso premium automáticamente. Recarga esta página o recupera tu acceso con el correo con el que pagaste.",
       "premiumActivated": "Tu acceso premium ya está activo.",
       "continueHome": "Ir a la página principal"
     }
@@ -930,12 +941,12 @@
       "command": "Trabaja menos.",
       "verb": "Viaja",
       "highlight": "más",
-      "description": "Forever PTO calcula <em>exactamente</em> qué días pedir libre para que tus 22 días de vacaciones se conviertan en <strong>47+ días fuera de la oficina</strong>. Sin excels. Sin matemáticas. Sin remordimiento.",
+      "description": "Forever PTO calcula <em>exactamente</em> qué días pedir libre para que tus 22 días de PTO se conviertan en <strong>47+ días fuera de la oficina</strong>. Sin excels. Sin matemáticas. Sin remordimiento.",
       "plannerCta": "Calcular mis días →",
       "demoLink": "Ver cómo va (30s)",
-      "stars": "4.9 · {users} empleados rebeldes ya lo usan",
+      "stars": "{rating} · {users} empleados rebeldes ya lo usan",
       "mockupLabel": "Días libres reales en {year}",
-      "mockupRatio": "días · ratio 2.14×",
+      "mockupRatio": "días · eficiencia 2,14×",
       "mockupQuote": "\"Eso son 9 escapadas largas, capitán.\"",
       "mockupLegendPto": "PTO",
       "mockupLegendHoliday": "Festivo",
@@ -957,17 +968,18 @@
       "titleEnd": "en 60 segundos.",
       "description": "Sin instalar nada. Sin tarjeta. Sin newsletter. Solo dinos cuántos días tienes y dónde vives.",
       "inputDaysTitle": "Mete tus días.",
-      "inputDaysDescription": "Cuántos días de vacaciones tienes, en qué país o región trabajas. Eso es todo.",
+      "inputDaysDescription": "Cuántos días de PTO tienes, en qué país o región trabajas. Eso es todo.",
       "engineTitle": "El motor hace magia.",
       "engineDescription": "Cruza tus días con los festivos oficiales y los puentes regionales. Encuentra todas las combinaciones posibles y las ordena por ratio de descanso.",
       "exportTitle": "Pides los días.",
       "exportDescription": "Exporta a Google Calendar, Outlook o un PDF que pegas en el formulario de RR.HH. y ya está. Sin dudas."
     },
     "stats": {
-      "multiplierLabel": "Multiplicador medio",
+      "efficiencyLabel": "Eficiencia media",
       "daysLabel": "Días libres con {days} PTO",
       "countriesLabel": "Países soportados",
-      "plansLabel": "Planes generados"
+      "plansLabel": "Planes generados",
+      "plansValue": "12 mil+"
     },
     "features": {
       "badge": "trucos del motor",
@@ -978,8 +990,8 @@
       "bridgeTag": "puentes inteligentes",
       "bridgeTitle": "Convierte 1 día de PTO en 4 libres.",
       "bridgeDescription": "Detecta festivos en martes y jueves y te sugiere construir puentes mínimos. Un día estratégico = un fin de semana de 4 días.",
-      "ratioTag": "ratio max",
-      "ratioDescription": "Mejor multiplicador: 8 días de PTO convertidos en 28 libres (ES, abril '26).",
+      "ratioTag": "max eficiencia",
+      "ratioDescription": "Mejor eficiencia: 8 días de PTO convertidos en 28 libres (ES, abril '26).",
       "syncTag": "sync en 1 clic",
       "syncTitle": "Google · Outlook · iCal",
       "syncDescription": "Exporta tu plan al calendario que ya usas. Sin liarte.",
@@ -1012,7 +1024,7 @@
       "withTitle": "😎 Con Forever PTO",
       "withItems": {
         "planInJanuary": "Lo planificas todo en enero, mientras esperas el café.",
-        "dayMultiplier": "Cada día de PTO te devuelve 2,1 días libres de media.",
+        "dayEfficiency": "Cada día de PTO te devuelve 2,1 días libres de media.",
         "visualCalendar": "Visualizas el año entero en un calendario claro.",
         "bookFirst": "Pides primero, sin remordimiento, con datos.",
         "burnAllDays": "Quemas el 100% de tus días. Como debe ser."
@@ -1045,12 +1057,12 @@
           "role": "QA engineer · Lisboa"
         },
         "lauraT": {
-          "text": "Mi jefa me preguntó cómo conseguí 34 días libres con solo 22 días de vacaciones. Le dije \"estrategia\". No mencioné la app.",
+          "text": "Mi jefa me preguntó cómo conseguí 34 días libres con solo 22 días de PTO. Le dije \"estrategia\". No mencioné la app.",
           "name": "Laura T.",
           "role": "marketing manager · París"
         },
         "thomasK": {
-          "text": "ROI: 22 días de vacaciones de entrada, 47 días libres de salida. Eso es un multiplicador de 2,1×. He lanzado peores features en el trabajo.",
+          "text": "ROI: 22 días de PTO de entrada, 47 días libres de salida. Eso es una eficiencia de 2,1×. He lanzado peores features en el trabajo.",
           "name": "Thomas K.",
           "role": "software architect · Ámsterdam"
         }
@@ -1140,7 +1152,7 @@
             },
             "holidays": {
               "label": "Almacenamiento de festivos:",
-              "description": "Guarda la configuración de tus festivos personalizados y días de vacaciones."
+              "description": "Guarda la configuración de tus festivos personalizados y días de PTO."
             },
             "location": {
               "label": "Almacenamiento de ubicación:",
@@ -1564,7 +1576,7 @@
           "description": "La versión gratuita incluye:",
           "items": {
             "optimization": "Optimización básica de PTO basada en festivos públicos",
-            "visualization": "Visualización del calendario con festivos y días de vacaciones",
+            "visualization": "Visualización del calendario con festivos y días de PTO",
             "customHolidays": "Posibilidad de añadir festivos personalizados",
             "metrics": "Métricas básicas y estadísticas resumidas",
             "strategy": "Selección de diferentes estrategias de optimización"

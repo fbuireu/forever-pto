@@ -1,7 +1,7 @@
 export const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 export const BASE64_PATTERN = /^[A-Za-z0-9+/=]+$/;
 
-export interface CryptoParams {
+export interface ObfuscationParams {
   text: string;
   key: string;
 }
@@ -21,15 +21,15 @@ export function base64Decode(str: string) {
   return new TextDecoder().decode(bytes);
 }
 
-export function encrypt({ text, key }: CryptoParams) {
-  const encrypted = text
+export function obfuscate({ text, key }: ObfuscationParams) {
+  const obfuscated = text
     .split('')
     .map((char, i) => String.fromCodePoint((char.codePointAt(0) ?? 0) ^ (key.codePointAt(i % key.length) ?? 0)))
     .join('');
-  return base64Encode(encrypted);
+  return base64Encode(obfuscated);
 }
 
-export function decrypt({ text, key }: CryptoParams) {
+export function deobfuscate({ text, key }: ObfuscationParams) {
   const decoded = base64Decode(text);
   return decoded
     .split('')

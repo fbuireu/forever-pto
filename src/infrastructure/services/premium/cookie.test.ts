@@ -30,6 +30,19 @@ describe('setPremiumCookie', () => {
     });
   });
 
+  it('expires the cookie exactly when the session token it carries does', async () => {
+    const { setPremiumCookie, PREMIUM_COOKIE, PREMIUM_SESSION_LIFETIME_SECONDS } = await import('./cookie');
+    const response = makeMockResponse();
+
+    setPremiumCookie(response, 'my-token');
+
+    expect(response.cookies.set).toHaveBeenCalledWith(
+      PREMIUM_COOKIE,
+      'my-token',
+      expect.objectContaining({ maxAge: PREMIUM_SESSION_LIFETIME_SECONDS })
+    );
+  });
+
   it('sets secure:false in development', async () => {
     vi.stubEnv('NODE_ENV', 'development');
     const { setPremiumCookie, PREMIUM_COOKIE } = await import('./cookie');
@@ -37,7 +50,11 @@ describe('setPremiumCookie', () => {
 
     setPremiumCookie(response, 'my-token');
 
-    expect(response.cookies.set).toHaveBeenCalledWith(PREMIUM_COOKIE, 'my-token', expect.objectContaining({ secure: false }));
+    expect(response.cookies.set).toHaveBeenCalledWith(
+      PREMIUM_COOKIE,
+      'my-token',
+      expect.objectContaining({ secure: false })
+    );
   });
 });
 

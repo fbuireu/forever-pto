@@ -4,9 +4,6 @@ import { formatDate } from '@application/shared/utils/dates';
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { Plus } from '@ui/modules/core/animate/icons/Plus';
-import { Button } from '@ui/modules/core/primitives/Button';
 import {
   Dialog,
   DialogContent,
@@ -14,10 +11,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@ui/modules/core/primitives/Dialog';
+} from '@ui/modules/core/animate/base/Dialog';
+import { Plus } from '@ui/modules/core/animate/icons/Plus';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { Calendar, CalendarSelectionMode, type FromTo } from '@ui/modules/pages/planner/calendar/Calendar';
+import { describeHolidayRefusal } from '@ui/modules/pages/planner/calendar/utils/refusals';
 import { CalendarDays, Calendar as CalendarIcon } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';
@@ -34,6 +34,7 @@ interface AddHolidayModalProps {
 
 export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps) => {
   const t = useTranslations('modals.addHoliday');
+  const tA11y = useTranslations('a11y');
   const tValidation = useTranslations('validation.holiday');
   const { holidays, addHoliday, currentSelection, alternatives, suggestion } = useHolidaysStore();
   const { carryOverMonths, year } = useFiltersStore();
@@ -63,17 +64,17 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
   const onSubmit = (data: HolidayFormData) => {
     startTransition(() => {
       try {
-        const existingHoliday = holidays.find((holiday) => holiday.date.toDateString() === data.date.toDateString());
         const formattedDate = formatDate({ date: data.date, locale, format: 'MMMM d, yyyy' });
+        const outcome = addHoliday({ holiday: { name: data.name, date: data.date }, locale, carryOverMonths, year });
 
-        if (existingHoliday) {
-          toast.error(t('existsTitle'), {
-            description: t('existsDescription', { date: formattedDate, name: existingHoliday.name }),
-          });
+        if (!outcome.applied) {
+          const refusal = describeHolidayRefusal({ outcome, t, formattedDate });
+
+          if (refusal) toast.error(refusal.title, { description: refusal.description });
+          else toast.error(t('errorTitle'), { description: t('errorDescription') });
+
           return;
         }
-
-        addHoliday({ holiday: { name: data.name, date: data.date }, locale, carryOverMonths, year });
 
         toast.success(t('successTitle'), {
           description: t('successDescription', { name: data.name, date: formattedDate }),
@@ -81,7 +82,9 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
 
         handleClose();
       } catch (error) {
-        getBetterStackInstance().logError('Error creating holiday', error, { component: 'AddHolidayModal' });
+        void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
+          getBetterStackInstance().logError('Error creating holiday', error, { component: 'AddHolidayModal' });
+        });
         toast.error(t('errorTitle'), {
           description: t('errorDescription'),
         });
@@ -98,7 +101,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-sm' initialFocus={false}>
+      <DialogContent className='sm:max-w-sm' closeLabel={tA11y('closeDialog')} initialFocus={false}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Plus className='size-5 text-primary' animateOnHover />

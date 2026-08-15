@@ -6,12 +6,12 @@ import { findBridges, getAvailableWorkdays } from '../utils/helpers';
 import { selectBridgesForStrategy, selectOptimalDaysFromBridges } from './utils/selectors';
 
 export interface GenerateSuggestionsParams {
-  year: number;
   ptoDays: number;
   holidays: HolidayDTO[];
   allowPastDays: boolean;
   months: Date[];
   strategy: FilterStrategy;
+  removedDays?: Date[];
 }
 
 const selectGroupedStrategy = (bridges: Bridge[], ptoDays: number) =>
@@ -31,7 +31,14 @@ const STRATEGY_MAP = {
   [FilterStrategy.OPTIMIZED]: selectOptimizedStrategy,
 } as const;
 
-export function generateSuggestions({ ptoDays, holidays, allowPastDays, months, strategy }: GenerateSuggestionsParams) {
+export function generateSuggestions({
+  ptoDays,
+  holidays,
+  allowPastDays,
+  months,
+  strategy,
+  removedDays,
+}: GenerateSuggestionsParams) {
   if (ptoDays <= 0) {
     return { days: [], strategy };
   }
@@ -45,6 +52,7 @@ export function generateSuggestions({ ptoDays, holidays, allowPastDays, months, 
     months,
     holidays: effectiveHolidays,
     allowPastDays,
+    removedDays,
   });
 
   if (availableWorkdays.length === 0) {

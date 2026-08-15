@@ -1,12 +1,13 @@
 'use client';
 
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
-import { differenceInDays, getDayOfMonth, getMonth } from '@application/shared/utils/dates';
+import { differenceInDays, getDayOfMonth, getMonth, getYear } from '@application/shared/utils/dates';
 import type { Suggestion } from '@domain/calendar/types';
 import { cn } from '@ui/utils/cn';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { Temporal } from 'temporal-polyfill';
+import { MONTHS_IN_YEAR } from '../utils/helpers';
 
 interface Seg {
   start: Date;
@@ -17,17 +18,20 @@ function getDaysInMonth(month: number, year: number) {
   return Temporal.PlainYearMonth.from({ year, month: month + 1 }).daysInMonth;
 }
 
-function segPos(date: Date, year: number) {
-  const m = getMonth(date);
-  const d = getDayOfMonth(date);
-  return (m + (d - 1) / getDaysInMonth(m, year)) / 12;
+function windowColumn(date: Date, year: number) {
+  return (getYear(date) - year) * MONTHS_IN_YEAR + getMonth(date);
 }
 
-function segWidth(start: Date, end: Date, year: number) {
-  const em = getMonth(end);
-  const ed = getDayOfMonth(end);
-  const endFrac = (em + ed / getDaysInMonth(em, year)) / 12;
-  return Math.max(endFrac - segPos(start, year), 0.005);
+function segPos(date: Date, year: number, monthCount: number) {
+  const day = getDayOfMonth(date);
+  const daysInMonth = getDaysInMonth(getMonth(date), getYear(date));
+  return (windowColumn(date, year) + (day - 1) / daysInMonth) / monthCount;
+}
+
+function segWidth(start: Date, end: Date, year: number, monthCount: number) {
+  const daysInMonth = getDaysInMonth(getMonth(end), getYear(end));
+  const endFrac = (windowColumn(end, year) + getDayOfMonth(end) / daysInMonth) / monthCount;
+  return Math.max(endFrac - segPos(start, year, monthCount), 0.005);
 }
 
 function groupDates(dates: Date[], maxGapDays: number) {
@@ -51,6 +55,7 @@ function groupDates(dates: Date[], maxGapDays: number) {
 
 interface YearTimelineChartProps {
   year: number;
+  carryOverMonths: number;
   holidays: HolidayDTO[];
   suggestion: Suggestion | null;
   manuallySelectedDays: Date[];
@@ -65,16 +70,27 @@ const ROW_COLOR: Record<string, string> = {
   manual: 'bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--color-brand-teal)_82%)]',
 };
 
-export const YearTimelineChart = ({ year, holidays, suggestion, manuallySelectedDays }: YearTimelineChartProps) => {
+export const YearTimelineChart = ({
+  year,
+  carryOverMonths,
+  holidays,
+  suggestion,
+  manuallySelectedDays,
+}: YearTimelineChartProps) => {
   const t = useTranslations('summary');
   const locale = useLocale();
+  const monthCount = MONTHS_IN_YEAR + carryOverMonths;
 
-  const monthNames = useMemo(
+  const months = useMemo(
     () =>
-      Array.from({ length: 12 }, (_, i) =>
-        new Date(year, i, 1).toLocaleDateString(locale, { month: 'short' }).toUpperCase()
-      ),
-    [year, locale]
+      Array.from({ length: monthCount }, (_, i) => {
+        const date = new Date(year, i, 1);
+        return {
+          key: `${getYear(date)}-${getMonth(date)}`,
+          label: date.toLocaleDateString(locale, { month: 'short' }).toUpperCase(),
+        };
+      }),
+    [year, locale, monthCount]
   );
 
   const rows = useMemo(() => {
@@ -111,16 +127,16 @@ export const YearTimelineChart = ({ year, holidays, suggestion, manuallySelected
     <div className='w-full border-[3px] border-[var(--frame)] rounded-[10px] shadow-[var(--shadow-brutal-sm)] overflow-hidden bg-card'>
       <div className='flex gap-2.5 px-3 border-b-[3px] border-[var(--frame)]'>
         <div className='w-[70px] shrink-0' />
-        <div className='flex-1 grid grid-cols-12'>
-          {monthNames.map((name, i) => (
+        <div className='flex-1 grid' style={{ gridTemplateColumns: `repeat(${monthCount}, minmax(0, 1fr))` }}>
+          {months.map(({ key, label }, i) => (
             <div
-              key={name}
+              key={key}
               className={cn(
                 'py-2 px-1 text-center text-[11px] font-mono font-bold tracking-[0.05em]',
-                i < 11 && 'border-r-[2px] border-[var(--frame)]'
+                i < monthCount - 1 && 'border-r-[2px] border-[var(--frame)]'
               )}
             >
-              {name}
+              {label}
             </div>
           ))}
         </div>
@@ -138,8 +154,8 @@ export const YearTimelineChart = ({ year, holidays, suggestion, manuallySelected
                   key={seg.start.toISOString()}
                   className={cn('absolute inset-y-0 rounded-full border-[2px] border-[var(--frame)]', ROW_COLOR[key])}
                   style={{
-                    left: `${segPos(seg.start, year) * 100}%`,
-                    width: `max(8px, ${segWidth(seg.start, seg.end, year) * 100}%)`,
+                    left: `${segPos(seg.start, year, monthCount) * 100}%`,
+                    width: `max(8px, ${segWidth(seg.start, seg.end, year, monthCount) * 100}%)`,
                   }}
                 />
               ))}

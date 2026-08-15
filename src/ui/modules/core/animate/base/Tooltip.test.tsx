@@ -29,12 +29,7 @@ vi.mock('../primitives/base/Tooltip', () => ({
       {children}
     </div>
   ),
-  TooltipPopup: ({
-    children,
-    className,
-    style,
-    ...props
-  }: ComponentProps<'div'>) => (
+  TooltipPopup: ({ children, className, style, ...props }: ComponentProps<'div'>) => (
     <div data-primitive='tooltip-popup' className={className} style={style} {...props}>
       {children}
     </div>
@@ -63,13 +58,35 @@ describe('TooltipProvider', () => {
 
 describe('Tooltip', () => {
   it('wraps content in a TooltipProvider with the resolved delay', () => {
-    const { container } = render(<Tooltip delayDuration={200}><span /></Tooltip>);
+    const { container } = render(
+      <Tooltip delayDuration={200}>
+        <span />
+      </Tooltip>
+    );
     expect(container.querySelector<HTMLElement>('[data-primitive="tooltip-provider"]')?.dataset.delay).toBe('200');
   });
 
-  it('defaults delay to 0', () => {
-    const { container } = render(<Tooltip><span /></Tooltip>);
-    expect(container.querySelector<HTMLElement>('[data-primitive="tooltip-provider"]')?.dataset.delay).toBe('0');
+  it('mints no provider of its own when given no delay, so the ambient one survives', () => {
+    const { container } = render(
+      <Tooltip>
+        <span />
+      </Tooltip>
+    );
+    expect(container.querySelector('[data-primitive="tooltip-provider"]')).toBeNull();
+  });
+
+  it('leaves an enclosing provider as the nearest one', () => {
+    const { container } = render(
+      <TooltipProvider delayDuration={200}>
+        <Tooltip>
+          <span />
+        </Tooltip>
+      </TooltipProvider>
+    );
+    const providers = container.querySelectorAll<HTMLElement>('[data-primitive="tooltip-provider"]');
+
+    expect(providers).toHaveLength(1);
+    expect(providers[0]?.dataset.delay).toBe('200');
   });
 });
 

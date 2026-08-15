@@ -39,6 +39,9 @@ export const CalendarList = () => {
     fetchHolidays,
     previewAlternativeIndex,
     toggleDaySelection,
+    pruneDaysOutsideWindow,
+    clearCalculation,
+    planRevision,
   } = useHolidaysStore(
     useShallow((state) => ({
       holidays: state.holidays,
@@ -51,6 +54,9 @@ export const CalendarList = () => {
       fetchHolidays: state.fetchHolidays,
       previewAlternativeIndex: state.previewAlternativeIndex,
       toggleDaySelection: state.toggleDaySelection,
+      pruneDaysOutsideWindow: state.pruneDaysOutsideWindow,
+      clearCalculation: state.clearCalculation,
+      planRevision: state.planRevision,
     }))
   );
 
@@ -58,37 +64,39 @@ export const CalendarList = () => {
 
   const months = useMemo(() => getTotalMonths({ carryOverMonths, year }), [carryOverMonths, year]);
 
-  const remainingDays = useMemo(() => {
-    const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
-    const manualSelectedCount = manuallySelectedDays.length;
-    return Math.max(0, ptoDays - activeSuggestedCount - manualSelectedCount);
-  }, [currentSelection, removedSuggestedDays, manuallySelectedDays, ptoDays]);
-  const canSelectMoreDays = remainingDays > 0;
-
   const handleDayToggle = useCallback(
-    (date: Date) => {
-      toggleDaySelection({ date, totalPtoDays: ptoDays, locale, allowPastDays });
-    },
+    (date: Date) => toggleDaySelection({ date, totalPtoDays: ptoDays, locale, allowPastDays }),
     [toggleDaySelection, ptoDays, locale, allowPastDays]
   );
+
+  useEffect(() => {
+    pruneDaysOutsideWindow({ year, carryOverMonths });
+  }, [pruneDaysOutsideWindow, year, carryOverMonths]);
 
   useEffect(() => {
     if (!country) return;
     fetchHolidays({ year, region, country, locale, carryOverMonths });
   }, [fetchHolidays, year, region, country, locale, carryOverMonths]);
 
+  const canCalculate = ptoDays > 0 && holidays.length > 0 && months.length > 0;
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: planRevision is a re-plan signal, not a value the body reads
   useEffect(() => {
-    if (ptoDays > 0 && holidays.length > 0 && months.length > 0) {
-      triggerCalculation({
-        year,
-        ptoDays,
-        allowPastDays,
-        months,
-        strategy,
-        locale,
-      });
-    }
-  }, [triggerCalculation, year, ptoDays, allowPastDays, holidays, months, strategy, locale]);
+    if (!canCalculate) return;
+
+    triggerCalculation({
+      year,
+      ptoDays,
+      allowPastDays,
+      months,
+      strategy,
+      locale,
+    });
+  }, [triggerCalculation, canCalculate, year, ptoDays, allowPastDays, months, strategy, locale, planRevision]);
+
+  useEffect(() => {
+    if (!canCalculate && suggestion) clearCalculation();
+  }, [canCalculate, suggestion, clearCalculation]);
 
   return (
     <Skeleton
@@ -123,7 +131,6 @@ export const CalendarList = () => {
             manuallySelectedDays={manuallySelectedDays}
             removedSuggestedDays={removedSuggestedDays}
             onDayToggle={handleDayToggle}
-            canSelectMoreDays={canSelectMoreDays}
             showOutsideDays
             fixedWeeks
           />

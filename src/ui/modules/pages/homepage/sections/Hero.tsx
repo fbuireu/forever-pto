@@ -7,7 +7,7 @@ import { FlagIcon } from '@ui/modules/core/primitives/FlagIcon';
 import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';
 import { cn } from '@ui/utils/cn';
 import { getCurrentYear } from '@ui/utils/getCurrentYear';
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getFormatter, getLocale, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { version } from '../../../../../../package.json';
 import { CAL_ENTRIES, type DayType } from './shared';
@@ -22,8 +22,16 @@ const HERO_DAY_CLASS: Record<DayType, string> = {
     'rounded-lg bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--card)_82%)] text-muted-foreground border-[2px] border-[var(--frame)]/20',
 };
 
+const SOCIAL_PROOF_RATING = 4.9;
+const SOCIAL_PROOF_USERS = 12847;
+
 export const Hero = async () => {
-  const [t, locale, year] = await Promise.all([getTranslations('homepage'), getLocale(), getCurrentYear()]);
+  const [t, locale, year, format] = await Promise.all([
+    getTranslations('homepage'),
+    getLocale(),
+    getCurrentYear(),
+    getFormatter(),
+  ]);
   const DAY_HEADERS = getWeekdayNames({ locale, weekStartsOn: 1, format: 'narrow' }).map((label, index) => ({
     id: `day-${index}`,
     label,
@@ -76,7 +84,12 @@ export const Hero = async () => {
 
           <div className='flex gap-2.5 items-center font-mono text-sm'>
             <span className='text-[#FFB800] tracking-[2px] text-lg'>★★★★★</span>
-            <span>{t('hero.stars', { users: '12.847' })}</span>
+            <span>
+              {t('hero.stars', {
+                rating: format.number(SOCIAL_PROOF_RATING),
+                users: format.number(SOCIAL_PROOF_USERS),
+              })}
+            </span>
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 import type { NextResponse } from 'next/server';
 
 export const PREMIUM_COOKIE = 'premium-token';
-const SESSION_DURATION_SECONDS = 30 * 24 * 60 * 60;
+export const PREMIUM_SESSION_LIFETIME_SECONDS = 30 * 24 * 60 * 60;
 const isProd = process.env.NODE_ENV === 'production';
 
 export function setPremiumCookie(response: NextResponse, token: string) {
@@ -9,7 +9,7 @@ export function setPremiumCookie(response: NextResponse, token: string) {
     httpOnly: true,
     secure: isProd,
     sameSite: 'strict',
-    maxAge: SESSION_DURATION_SECONDS,
+    maxAge: PREMIUM_SESSION_LIFETIME_SECONDS,
     path: '/',
   });
 }

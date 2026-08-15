@@ -1,7 +1,7 @@
 import { ApiError } from '@infrastructure/api/errors';
-import { PaymentError, PromoCodeError, PromoCodeErrors, ValidationError } from '@infrastructure/errors';
+import { PaymentError, PromoCodeError, PromoCodeErrors, RateLimitError, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockCreatePayment = vi.hoisted(() =>
   vi.fn<
@@ -25,8 +25,14 @@ const mockHeaders = vi.hoisted(() =>
   })
 );
 
+const mockCheckRateLimit = vi.hoisted(() => vi.fn<(ip: string) => Effect.Effect<void, RateLimitError>>());
+
 vi.mock('@application/use-cases/payment', () => ({
   createPayment: mockCreatePayment,
+}));
+
+vi.mock('@infrastructure/services/payments/rateLimit', () => ({
+  checkRateLimit: mockCheckRateLimit,
 }));
 
 vi.mock('@infrastructure/layers', () => ({
@@ -47,6 +53,12 @@ const { createPaymentAction } = await import('./payment');
 const validInput = { amount: 9.99, email: 'user@example.com' };
 
 describe('createPaymentAction', () => {
+  beforeEach(() => {
+    mockCreatePayment.mockClear();
+    mockCheckRateLimit.mockClear();
+    mockCheckRateLimit.mockReturnValue(Effect.void);
+  });
+
   it('returns success:true with clientSecret on success', async () => {
     mockCreatePayment.mockReturnValue(Effect.succeed({ clientSecret: 'pi_secret_abc', discountInfo: null }));
     const result = await createPaymentAction(validInput);
@@ -88,11 +100,46 @@ describe('createPaymentAction', () => {
     }
   });
 
-  it('returns success:false with message on PaymentError', async () => {
+  it('returns success:false with INTERNAL_ERROR on PaymentError, matching the payment route', async () => {
     mockCreatePayment.mockReturnValue(Effect.fail(new PaymentError({ message: 'Stripe declined' })));
     const result = await createPaymentAction(validInput);
     expect(result.success).toBe(false);
-    if (!result.success) expect(result.error).toBe('Stripe declined');
+    if (!result.success) expect(result.error).toBe(ApiError.INTERNAL_ERROR);
+  });
+
+  it('rate-limits before reaching the payment use-case', async () => {
+    mockCheckRateLimit.mockReturnValue(Effect.fail(new RateLimitError({ ip: '1.2.3.4' })));
+    const result = await createPaymentAction(validInput);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toBe(ApiError.RATE_LIMIT_EXCEEDED);
+    expect(mockCreatePayment).not.toHaveBeenCalled();
+  });
+
+  it('keys the rate limit on the request IP', async () => {
+    mockCreatePayment.mockReturnValue(Effect.succeed({ clientSecret: 'pi_secret', discountInfo: null }));
+    await createPaymentAction(validInput);
+    expect(mockCheckRateLimit).toHaveBeenCalledWith('1.2.3.4');
+  });
+
+  it('prefers cf-connecting-ip over x-forwarded-for for the rate limit key', async () => {
+    mockHeaders.mockResolvedValueOnce({
+      get: vi.fn((key: string) => {
+        if (key === 'user-agent') return 'test-agent';
+        if (key === 'cf-connecting-ip') return '9.9.9.9';
+        if (key === 'x-forwarded-for') return 'spoofed';
+        return null;
+      }),
+    });
+    mockCreatePayment.mockReturnValue(Effect.succeed({ clientSecret: 'pi_secret', discountInfo: null }));
+    await createPaymentAction(validInput);
+    expect(mockCheckRateLimit).toHaveBeenCalledWith('9.9.9.9');
+  });
+
+  it('falls back to "unknown" when no IP header is present', async () => {
+    mockHeaders.mockResolvedValueOnce({ get: vi.fn(() => null) });
+    mockCreatePayment.mockReturnValue(Effect.succeed({ clientSecret: 'pi_secret', discountInfo: null }));
+    await createPaymentAction(validInput);
+    expect(mockCheckRateLimit).toHaveBeenCalledWith('unknown');
   });
 
   it('returns success:false with INTERNAL_ERROR on unexpected error', async () => {

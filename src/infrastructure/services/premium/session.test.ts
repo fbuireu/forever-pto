@@ -15,6 +15,7 @@ const { mockSign, mockSetProtectedHeader, mockSetIssuedAt, mockSetExpirationTime
 vi.mock('jose', () => ({ SignJWT: MockSignJWT, jwtVerify: mockJwtVerify }));
 
 const { createSession, verifySession } = await import('./session');
+const { PREMIUM_SESSION_LIFETIME_SECONDS } = await import('./cookie');
 
 const SESSION_DATA = { email: 'user@example.com', paymentIntentId: 'pi_abc123' };
 
@@ -55,7 +56,10 @@ describe('createSession', () => {
 
     await Effect.runPromise(createSession(SESSION_DATA));
 
-    expect(MockSignJWT).toHaveBeenCalledWith({ email: SESSION_DATA.email, paymentIntentId: SESSION_DATA.paymentIntentId });
+    expect(MockSignJWT).toHaveBeenCalledWith({
+      email: SESSION_DATA.email,
+      paymentIntentId: SESSION_DATA.paymentIntentId,
+    });
   });
 
   it('sets HS256 header, issuedAt, and expiration', async () => {
@@ -66,6 +70,17 @@ describe('createSession', () => {
     expect(mockSetProtectedHeader).toHaveBeenCalledWith({ alg: 'HS256' });
     expect(mockSetIssuedAt).toHaveBeenCalled();
     expect(mockSetExpirationTime).toHaveBeenCalledWith(expect.any(Number));
+  });
+
+  it('expires the token one session duration from now', async () => {
+    mockSign.mockResolvedValue('token');
+    const before = Math.floor(Date.now() / 1000);
+
+    await Effect.runPromise(createSession(SESSION_DATA));
+
+    const [expiration] = mockSetExpirationTime.mock.calls[0] as [number];
+    expect(expiration).toBeGreaterThanOrEqual(before + PREMIUM_SESSION_LIFETIME_SECONDS);
+    expect(expiration).toBeLessThanOrEqual(Math.floor(Date.now() / 1000) + PREMIUM_SESSION_LIFETIME_SECONDS);
   });
 
   it('passes encoded JWT_SECRET to sign', async () => {

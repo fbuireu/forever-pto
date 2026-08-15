@@ -64,6 +64,34 @@ describe('holidayDTO', () => {
     expect(result[0]?.variant).toBe(HolidayVariant.NATIONAL);
   });
 
+  it('keeps the national one on every shared date across a long list', () => {
+    const raw = Array.from({ length: 12 }, (_, index) => {
+      const date = `2024-01-${String(index + 1).padStart(2, '0')}`;
+      return [
+        makeRaw({ date, name: `Regional ${date}`, location: 'CAT' }),
+        makeRaw({ date, name: `National ${date}` }),
+      ];
+    }).flat();
+
+    const result = holidayDTO.create({ raw, params: BASE_PARAMS });
+
+    expect(result).toHaveLength(12);
+    expect(result.every((holiday) => holiday.variant === HolidayVariant.NATIONAL)).toBe(true);
+  });
+
+  it('keeps the first national entry when two national holidays share a date', () => {
+    const raw = [
+      makeRaw({ date: '2024-01-01', name: 'New Year' }),
+      makeRaw({ date: '2024-01-01', name: 'New Year Observance' }),
+      makeRaw({ date: '2024-01-01', name: 'Cap d Any', location: 'CAT' }),
+    ];
+
+    const result = holidayDTO.create({ raw, params: BASE_PARAMS });
+
+    expect(result).toHaveLength(1);
+    expect(result[0]?.name).toBe('New Year');
+  });
+
   it('filters out holidays outside the year and next year range', () => {
     const raw = [
       makeRaw({ date: '2023-12-31', name: 'Last Year' }),

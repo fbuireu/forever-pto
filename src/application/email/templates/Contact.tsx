@@ -73,7 +73,7 @@ export const ContactFormEmail = ({ email, name, subject, message, baseUrl }: Con
                   <strong className='text-zinc-900'>Email:</strong>
                 </Text>
                 <Link
-                  href={`mailto:${email}`}
+                  href={`mailto:${encodeURIComponent(email)}`}
                   className='text-[14px] text-brand-teal no-underline font-medium inline-block'
                 >
                   {email}
@@ -97,7 +97,7 @@ export const ContactFormEmail = ({ email, name, subject, message, baseUrl }: Con
             <Section className='mt-8 mb-8 text-center'>
               <Button
                 className='rounded-lg bg-brand-teal px-8 py-3.5 text-center font-semibold text-[15px] text-white no-underline shadow-md'
-                href={`mailto:${email}?subject=Re: ${subject}`}
+                href={`mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(`Re: ${subject}`)}`}
               >
                 Reply to {name}
               </Button>

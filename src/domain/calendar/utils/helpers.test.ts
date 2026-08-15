@@ -1,9 +1,9 @@
 import { HolidayVariant } from '@application/dto/holiday/types';
+import { PTO_CONSTANTS } from '@domain/calendar/const';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { clearDateKeyCache, clearHolidayCache } from './cache';
 import { findBridges, getAvailableWorkdays } from './helpers';
 
-// January 2025: 1=Wed, 3=Fri, 4=Sat, 5=Sun, 6=Mon, 7=Tue, 8=Wed, 9=Thu, 10=Fri, 11=Sat
 const makeDate = (year: number, month: number, day: number) => new Date(year, month - 1, day);
 
 const makeHoliday = (date: Date) => ({
@@ -36,7 +36,7 @@ describe('getAvailableWorkdays', () => {
   it('excludes holiday workdays', () => {
     const workdays = getAvailableWorkdays({
       months: [makeDate(2025, 1, 1)],
-      holidays: [makeHoliday(makeDate(2025, 1, 6))], // Monday
+      holidays: [makeHoliday(makeDate(2025, 1, 6))],
       allowPastDays: true,
     });
     expect(workdays).toHaveLength(22);
@@ -46,7 +46,7 @@ describe('getAvailableWorkdays', () => {
   it('does not exclude a weekend holiday (weekend already excluded)', () => {
     const workdays = getAvailableWorkdays({
       months: [makeDate(2025, 1, 1)],
-      holidays: [makeHoliday(makeDate(2025, 1, 4))], // Saturday
+      holidays: [makeHoliday(makeDate(2025, 1, 4))],
       allowPastDays: true,
     });
     expect(workdays).toHaveLength(23);
@@ -60,6 +60,37 @@ describe('getAvailableWorkdays', () => {
   it('includes past days when allowPastDays is true', () => {
     const workdays = getAvailableWorkdays({ months: [makeDate(2020, 1, 1)], holidays: [], allowPastDays: true });
     expect(workdays.length).toBeGreaterThan(0);
+  });
+
+  it('excludes a Removed Day from the Workday list', () => {
+    const removedMonday = makeDate(2025, 1, 6);
+    const workdays = getAvailableWorkdays({
+      months: [makeDate(2025, 1, 1)],
+      holidays: [],
+      allowPastDays: true,
+      removedDays: [removedMonday],
+    });
+    expect(workdays).toHaveLength(22);
+    expect(workdays.some((w) => w.toDateString() === removedMonday.toDateString())).toBe(false);
+  });
+
+  it('does not turn a Removed Day into a free day for the bridges around it', () => {
+    const removedMonday = makeDate(2025, 1, 6);
+    const workdays = getAvailableWorkdays({
+      months: [makeDate(2025, 1, 1)],
+      holidays: [],
+      allowPastDays: true,
+      removedDays: [removedMonday],
+    });
+    const bridges = findBridges({ availableWorkdays: workdays, holidays: [] });
+    const singleDayBridgeOn = (date: Date) =>
+      bridges.find((b) => b.ptoDaysNeeded === 1 && b.ptoDays[0].toDateString() === date.toDateString());
+
+    const fridayBefore = singleDayBridgeOn(makeDate(2025, 1, 3));
+    expect(fridayBefore?.effectiveDays).toBe(3);
+
+    const tuesdayAfter = singleDayBridgeOn(makeDate(2025, 1, 7));
+    expect(tuesdayAfter).toBeUndefined();
   });
 
   it('combines workdays across multiple months', () => {
@@ -85,7 +116,6 @@ describe('findBridges', () => {
   });
 
   it('returns a bridge for a Monday (adjacent to the preceding weekend)', () => {
-    // Jan 6 (Mon): Sat Jan 4 + Sun Jan 5 precede it → effectiveDays = 3
     const bridges = findBridges({ availableWorkdays: [makeDate(2025, 1, 6)], holidays: [] });
     const bridge = bridges.find((b) => b.ptoDays[0].toDateString() === makeDate(2025, 1, 6).toDateString());
     expect(bridge).toBeDefined();
@@ -95,7 +125,6 @@ describe('findBridges', () => {
   });
 
   it('returns a bridge for a Friday (adjacent to the following weekend)', () => {
-    // Jan 10 (Fri): Sat Jan 11 + Sun Jan 12 follow it → effectiveDays = 3
     const bridges = findBridges({ availableWorkdays: [makeDate(2025, 1, 10)], holidays: [] });
     expect(bridges).toHaveLength(1);
     expect(bridges[0].effectiveDays).toBe(3);
@@ -103,13 +132,11 @@ describe('findBridges', () => {
   });
 
   it('does not create a bridge for an isolated mid-week workday', () => {
-    // Jan 8 (Wed): no adjacent free day
     const bridges = findBridges({ availableWorkdays: [makeDate(2025, 1, 8)], holidays: [] });
     expect(bridges).toHaveLength(0);
   });
 
   it('creates a 2-day bridge when consecutive days bridge a weekend', () => {
-    // Thu Jan 9 + Fri Jan 10 → +Sat+Sun = 4 effective days
     const bridges = findBridges({ availableWorkdays: [makeDate(2025, 1, 9), makeDate(2025, 1, 10)], holidays: [] });
     const multiDay = bridges.find((b) => b.ptoDaysNeeded === 2);
     expect(multiDay).toBeDefined();
@@ -118,12 +145,11 @@ describe('findBridges', () => {
   });
 
   it('expands the effective range to absorb an adjacent holiday', () => {
-    // Workday: Thu Jan 9. Holiday: Fri Jan 10 → effective block extends to Sat+Sun
     const holiday = makeHoliday(makeDate(2025, 1, 10));
     const bridges = findBridges({ availableWorkdays: [makeDate(2025, 1, 9)], holidays: [holiday] });
     const bridge = bridges.find((b) => b.ptoDays[0].toDateString() === makeDate(2025, 1, 9).toDateString());
     expect(bridge).toBeDefined();
-    expect(bridge?.effectiveDays).toBe(4); // Thu + Fri(holiday) + Sat + Sun
+    expect(bridge?.effectiveDays).toBe(4);
   });
 
   it('deduplicates bridges with identical PTO day sets', () => {
@@ -139,7 +165,6 @@ describe('findBridges', () => {
   });
 
   it('places higher-efficiency bridges before lower-efficiency ones', () => {
-    // Mon (eff 3.0) and Mon+Tue (eff 2.0) — diff 1.0 > threshold 0.1
     const workdays = [makeDate(2025, 1, 6), makeDate(2025, 1, 7)];
     const bridges = findBridges({ availableWorkdays: workdays, holidays: [] });
     const singleIdx = bridges.findIndex((b) => b.ptoDaysNeeded === 1);
@@ -147,5 +172,54 @@ describe('findBridges', () => {
     if (singleIdx !== -1 && multiIdx !== -1) {
       expect(singleIdx).toBeLessThan(multiIdx);
     }
+  });
+});
+
+describe('findBridges efficiency floor', () => {
+  beforeEach(() => {
+    clearDateKeyCache();
+    clearHolidayCache();
+  });
+
+  it('rejects three PTO days absorbing one weekend, five effective for an efficiency of 1.67', () => {
+    const wednesday = makeDate(2025, 1, 8);
+    const thursday = makeDate(2025, 1, 9);
+    const friday = makeDate(2025, 1, 10);
+
+    const bridges = findBridges({ availableWorkdays: [wednesday, thursday, friday], holidays: [] });
+
+    expect(bridges.some((bridge) => bridge.ptoDaysNeeded === 3)).toBe(false);
+    for (const bridge of bridges) {
+      expect(bridge.efficiency).toBeGreaterThanOrEqual(PTO_CONSTANTS.EFFICIENCY.MINIMUM);
+    }
+  });
+
+  it('keeps the one-day candidate beside the same weekend, which clears the floor', () => {
+    const friday = makeDate(2025, 1, 10);
+
+    const bridges = findBridges({ availableWorkdays: [friday], holidays: [] });
+
+    const single = bridges.find((bridge) => bridge.ptoDaysNeeded === 1);
+    expect(single).toBeDefined();
+    expect(single?.efficiency).toBeGreaterThanOrEqual(PTO_CONSTANTS.EFFICIENCY.MINIMUM);
+  });
+
+  it('expands through a shutdown longer than the old thirty-day cap', () => {
+    const shutdownStart = makeDate(2025, 8, 4);
+    const shutdown = Array.from({ length: 35 }, (_, offset) => {
+      const date = new Date(shutdownStart);
+      date.setDate(date.getDate() + offset);
+      return makeHoliday(date);
+    });
+    const lastFreeDay = shutdown[shutdown.length - 1]?.date as Date;
+    const anchor = makeDate(2025, 8, 1);
+
+    const bridges = findBridges({ availableWorkdays: [anchor], holidays: shutdown });
+    const bridge = bridges.find(({ ptoDays }) => ptoDays[0]?.toDateString() === anchor.toDateString());
+
+    expect(bridge).toBeDefined();
+    expect(bridge?.startDate.toDateString()).toBe(anchor.toDateString());
+    expect(bridge?.endDate.toDateString()).toBe(lastFreeDay.toDateString());
+    expect(bridge?.effectiveDays).toBe(38);
   });
 });

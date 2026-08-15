@@ -15,7 +15,7 @@ import {
 import { CalendarDays } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 const CalendarModal = dynamic(() =>
@@ -54,6 +54,18 @@ export const WorkdayCounter = () => {
   const weekendDays = selectedRange ? calculateWeekends(selectedRange) : 0;
   const holidayDays = selectedRange ? calculateHolidaysInRange(selectedRange, holidays) : 0;
 
+  const knownHolidayYears = useMemo(() => {
+    const years = holidays.map((holiday) => holiday.date.getFullYear());
+    return years.length > 0 ? { first: Math.min(...years), last: Math.max(...years) } : null;
+  }, [holidays]);
+
+  const reachesUnknownYears =
+    !!selectedRange?.from &&
+    !!selectedRange?.to &&
+    !!knownHolidayYears &&
+    (selectedRange.from.getFullYear() < knownHolidayYears.first ||
+      selectedRange.to.getFullYear() > knownHolidayYears.last);
+
   return (
     <div className='space-y-2 w-full'>
       <Label className='flex gap-2 text-sm font-mono font-normal'>
@@ -87,7 +99,7 @@ export const WorkdayCounter = () => {
       {selectedRange && (
         <div className='space-y-2 w-full bg-muted rounded-md p-3'>
           <div className='text-xs'>
-            <span className='font-display font-medium'>{t('workingDays')}</span>
+            <span className='font-display font-medium'>{t('workdays')}</span>
             <div className='text-2xl font-display font-bold text-primary'>
               <SlidingNumber number={workdayCount} decimalPlaces={0} />
             </div>
@@ -114,6 +126,12 @@ export const WorkdayCounter = () => {
               </div>
             </div>
           </div>
+
+          {reachesUnknownYears && knownHolidayYears && (
+            <p className='text-[11px] text-amber-700 dark:text-amber-400'>
+              {t('holidaysOutsideRange', { from: knownHolidayYears.first, to: knownHolidayYears.last })}
+            </p>
+          )}
 
           <div className='bg-blue-50 dark:bg-blue-900/20 p-3 rounded text-xs'>
             <p className='text-blue-700 dark:text-blue-400 font-display font-medium'>{t('dateRange')}</p>

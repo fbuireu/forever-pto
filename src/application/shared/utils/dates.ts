@@ -7,11 +7,6 @@ const toPlainDate = (date: Date): Temporal.PlainDate =>
 
 const toDate = (pd: Temporal.PlainDate): Date => new Date(pd.year, pd.month - 1, pd.day);
 
-export const ensureDate = (date: Date | string): Date => {
-  if (typeof date === 'string') return new Date(date);
-  return date instanceof Date ? date : new Date(date);
-};
-
 export const isSameDay = (a: Date, b: Date): boolean => toPlainDate(a).equals(toPlainDate(b));
 
 export const isSameMonth = (a: Date, b: Date): boolean => {
@@ -43,7 +38,7 @@ export const isInSelectedRange = ({ date, rangeStart, rangeEnd }: IsInSelectedRa
 
 export const isWeekend = (date: Date): boolean => {
   const { dayOfWeek } = toPlainDate(date);
-  return dayOfWeek === 6 || dayOfWeek === 7; // ISO: 6=Sat, 7=Sun
+  return dayOfWeek === 6 || dayOfWeek === 7;
 };
 
 export const addDays = (date: Date, days: number): Date => toDate(toPlainDate(date).add({ days }));
@@ -62,13 +57,6 @@ export const startOfDay = (date: Date): Date => toDate(toPlainDate(date));
 
 export const startOfToday = (): Date => toDate(Temporal.Now.plainDateISO());
 
-export const toIcsDate = (date: Date): string => {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}${m}${d}`;
-};
-
 export const startOfYear = (date: Date): Date => toDate(toPlainDate(date).with({ month: 1, day: 1 }));
 
 export const endOfYear = (date: Date): Date => toDate(toPlainDate(date).with({ month: 12, day: 31 }));
@@ -82,7 +70,7 @@ export const endOfMonth = (date: Date): Date => {
 
 export const startOfWeek = (date: Date, options?: { weekStartsOn?: Day }): Date => {
   const pd = toPlainDate(date);
-  const startDay = options?.weekStartsOn || 7; // 0 (Sun) → 7, 1–6 unchanged (ISO dayOfWeek)
+  const startDay = options?.weekStartsOn || 7;
   const diff = (pd.dayOfWeek - startDay + 7) % 7;
   return toDate(pd.subtract({ days: diff }));
 };
@@ -175,7 +163,7 @@ export interface GetWeekdayNamesParams {
 const weekdayFmtCache = new Map<string, Intl.DateTimeFormat>();
 
 export const getWeekdayNames = ({ locale, weekStartsOn = 0, format = 'short' }: GetWeekdayNamesParams): string[] => {
-  const anchor = new Date(2023, 0, 2); // known Monday
+  const anchor = new Date(2023, 0, 2);
   const weekStart = startOfWeek(anchor, { weekStartsOn });
   const key = `${locale}-${weekStartsOn}-${format}`;
   let fmt = weekdayFmtCache.get(key);

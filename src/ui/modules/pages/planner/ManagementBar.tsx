@@ -18,6 +18,7 @@ import { PlannerPanelFixture } from './PlannerPanelFixture';
 export const ManagementBar = () => {
   const t = useTranslations('toasts');
   const tAlt = useTranslations('alternativesManager');
+  const tPlanner = useTranslations('planner');
   const { areStoresReady } = useStoresReady();
   const isMobile = useIsMobile();
   const { openMobile } = useSidebar();
@@ -30,6 +31,8 @@ export const ManagementBar = () => {
     setCurrentAlternativeSelection,
     previewAlternativeIndex,
     currentSelectionIndex,
+    isCalculating,
+    hasCalculated,
   } = useHolidaysStore(
     useShallow((state) => ({
       alternatives: state.alternatives,
@@ -38,6 +41,8 @@ export const ManagementBar = () => {
       setPreviewAlternativeSelection: state.setPreviewAlternativeSelection,
       setCurrentAlternativeSelection: state.setCurrentAlternativeSelection,
       previewAlternativeIndex: state.previewAlternativeIndex,
+      isCalculating: state.isCalculating,
+      hasCalculated: state.hasCalculated,
       currentSelectionIndex: state.currentSelectionIndex,
     }))
   );
@@ -76,6 +81,7 @@ export const ManagementBar = () => {
   const hasValidCurrentSelection = currentSelection?.days && currentSelection.days.length > 0;
 
   const isReady = areStoresReady && hasValidSuggestions && hasValidCurrentSelection;
+  const isSettledEmpty = areStoresReady && hasCalculated && !isCalculating && !isReady;
 
   const plannerPanelProps = {
     currentSelectionIndex,
@@ -87,18 +93,23 @@ export const ManagementBar = () => {
   };
 
   const previewSuggestion = allSuggestions[previewAlternativeIndex] ?? allSuggestions[0];
-  const effectiveDays = previewSuggestion?.metrics?.totalEffectiveDays ?? 0;
-  const efficiency = previewSuggestion?.metrics?.averageEfficiency ?? 0;
+  const effectiveDays = previewSuggestion?.metrics.totalEffectiveDays ?? 0;
+  const efficiency = previewSuggestion?.metrics.averageEfficiency ?? 0;
 
   return (
     <div className='col-span-full sticky top-3 z-10'>
-      {!isMobile && (
-        <Skeleton name='planner-panel' loading={!isReady} fixture={<PlannerPanelFixture />}>
+      {!isMobile && !isSettledEmpty && (
+        <Skeleton
+          name='planner-panel'
+          loading={!isReady}
+          fixture={<PlannerPanelFixture />}
+          fallback={<PlannerPanelFixture />}
+        >
           {isReady && currentSelection && <PlannerPanel key={previewAlternativeIndex} {...plannerPanelProps} />}
         </Skeleton>
       )}
 
-      {isMobile && (
+      {isMobile && !isSettledEmpty && (
         <Drawer
           snapPoints={[0.15, 1]}
           activeSnapPoint={snap}
@@ -108,12 +119,12 @@ export const ManagementBar = () => {
           dismissible={false}
         >
           <DrawerContent overlay={false} className='h-[100dvh] max-h-none'>
-            <DrawerTitle>Planner</DrawerTitle>
+            <DrawerTitle>{tPlanner('heading')}</DrawerTitle>
             <div data-tutorial='planner-drawer' className='px-4 pt-2 pb-3 shrink-0'>
               {isReady ? (
                 <div className='flex items-center justify-between gap-2 flex-wrap'>
                   <span className='text-sm font-black shrink-0'>
-                    {tAlt('option')} {currentSelectionIndex + 1}
+                    {tAlt('option')} {previewAlternativeIndex + 1}
                     <span className='font-normal text-muted-foreground'> / {allSuggestions.length}</span>
                   </span>
                   <div className='flex items-center gap-2 shrink-0'>

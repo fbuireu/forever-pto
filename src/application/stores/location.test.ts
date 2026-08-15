@@ -2,20 +2,18 @@ import type { CountryDTO } from '@application/dto/country/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useLocationStore } from './location';
 
+const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
+
 vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({
-  getBetterStackInstance: vi.fn().mockReturnValue({ logError: vi.fn(), warn: vi.fn() }),
+  getBetterStackInstance: vi.fn().mockReturnValue({ logError: mockLogError, warn: mockWarn }),
 }));
 
 vi.mock('./crypto', () => ({
-  encryptedStorage: {
+  obfuscatedStorage: {
     getItem: vi.fn().mockResolvedValue(null),
     setItem: vi.fn().mockResolvedValue(undefined),
     removeItem: vi.fn().mockResolvedValue(undefined),
   },
-}));
-
-vi.mock('@infrastructure/services/countries/getCountries', () => ({
-  getCountries: vi.fn().mockReturnValue([]),
 }));
 
 vi.mock('@infrastructure/services/regions/getRegions', () => ({
@@ -24,10 +22,7 @@ vi.mock('@infrastructure/services/regions/getRegions', () => ({
 
 const INITIAL = {
   countries: [],
-  countriesLoading: false,
-  countriesLastFetched: 0,
   regions: [],
-  regionsLoading: false,
 };
 
 const MOCK_COUNTRIES: CountryDTO[] = [
@@ -41,32 +36,21 @@ beforeEach(() => {
 });
 
 describe('setCountries', () => {
-  it('sets countries and updates timestamp', () => {
-    const before = Date.now();
+  it('stores the countries it is given', () => {
     useLocationStore.getState().setCountries(MOCK_COUNTRIES);
-    const state = useLocationStore.getState();
-    expect(state.countries).toEqual(MOCK_COUNTRIES);
-    expect(state.countriesLoading).toBe(false);
-    expect(state.countriesLastFetched).toBeGreaterThanOrEqual(before);
-  });
-});
-
-describe('getCountryByCode', () => {
-  beforeEach(() => {
-    useLocationStore.setState({ countries: MOCK_COUNTRIES });
+    expect(useLocationStore.getState().countries).toEqual(MOCK_COUNTRIES);
   });
 
-  it('finds a country by exact code', () => {
-    expect(useLocationStore.getState().getCountryByCode('ES')).toEqual(MOCK_COUNTRIES[0]);
+  it('replaces a previous list rather than merging it', () => {
+    useLocationStore.getState().setCountries(MOCK_COUNTRIES);
+    useLocationStore.getState().setCountries([MOCK_COUNTRIES[0]]);
+    expect(useLocationStore.getState().countries).toEqual([MOCK_COUNTRIES[0]]);
   });
 
-  it('is case-insensitive', () => {
-    expect(useLocationStore.getState().getCountryByCode('es')).toEqual(MOCK_COUNTRIES[0]);
-    expect(useLocationStore.getState().getCountryByCode('FR')).toEqual(MOCK_COUNTRIES[1]);
-  });
-
-  it('returns undefined for unknown code', () => {
-    expect(useLocationStore.getState().getCountryByCode('XX')).toBeUndefined();
+  it('accepts an empty list', () => {
+    useLocationStore.getState().setCountries(MOCK_COUNTRIES);
+    useLocationStore.getState().setCountries([]);
+    expect(useLocationStore.getState().countries).toEqual([]);
   });
 });
 
@@ -77,48 +61,56 @@ describe('fetchRegions', () => {
     vi.mocked(getRegions).mockReturnValueOnce(MOCK_REGIONS);
 
     useLocationStore.getState().fetchRegions('ES');
-    const state = useLocationStore.getState();
     expect(getRegions).toHaveBeenCalledWith('ES');
-    expect(state.regions).toEqual(MOCK_REGIONS);
-    expect(state.regionsLoading).toBe(false);
+    expect(useLocationStore.getState().regions).toEqual(MOCK_REGIONS);
+  });
+
+  it('clears the previous regions when a country has none', async () => {
+    const { getRegions } = await import('@infrastructure/services/regions/getRegions');
+    useLocationStore.setState({ regions: [{ value: 'CAT', label: 'Catalonia' }] });
+    vi.mocked(getRegions).mockReturnValueOnce([]);
+
+    useLocationStore.getState().fetchRegions('FR');
+    expect(useLocationStore.getState().regions).toEqual([]);
   });
 });
 
-describe('fetchCountries', () => {
-  it('fetches and stores countries', async () => {
-    const { getCountries } = await import('@infrastructure/services/countries/getCountries');
-    vi.mocked(getCountries).mockReturnValueOnce(MOCK_COUNTRIES);
-
-    await useLocationStore.getState().fetchCountries('en');
-    const state = useLocationStore.getState();
-    expect(state.countries).toEqual(MOCK_COUNTRIES);
-    expect(state.countriesLoading).toBe(false);
-    expect(state.countriesLastFetched).toBeGreaterThan(0);
+describe('persistence', () => {
+  it('persists nothing, because both lists are rebuilt on mount', () => {
+    useLocationStore.setState({ countries: MOCK_COUNTRIES, regions: [{ value: 'CAT', label: 'Catalonia' }] });
+    const { partialize } = useLocationStore.persist.getOptions();
+    expect(partialize?.(useLocationStore.getState())).toEqual({});
   });
 
-  it('skips fetch when data was fetched within 24h', async () => {
-    const { getCountries } = await import('@infrastructure/services/countries/getCountries');
-    useLocationStore.setState({ countriesLastFetched: Date.now() });
+  it('drops an older blob instead of reviving the lists it carries', () => {
+    const { migrate } = useLocationStore.persist.getOptions();
+    expect(migrate?.({ countries: MOCK_COUNTRIES, regions: [{ value: 'CAT', label: 'Catalonia' }] }, 2)).toEqual({});
+  });
+});
 
-    await useLocationStore.getState().fetchCountries('en');
-    expect(getCountries).not.toHaveBeenCalled();
+describe('onRehydrateStorage', () => {
+  const runRehydrate = (error?: Error) => {
+    const options = useLocationStore.persist.getOptions();
+    const listener = options.onRehydrateStorage?.(useLocationStore.getState() as never);
+    listener?.(useLocationStore.getState() as never, error);
+  };
+
+  it('logs a rehydration failure without blocking the listener on the logging client', async () => {
+    runRehydrate(new Error('deobfuscate failed'));
+
+    expect(mockLogError).not.toHaveBeenCalled();
+    await vi.waitFor(() =>
+      expect(mockLogError).toHaveBeenCalledWith('Error rehydrating location store', expect.any(Error), {
+        storeName: 'location-store',
+        hasState: true,
+      })
+    );
   });
 
-  it('fetches again when last fetch was more than 24h ago', async () => {
-    const { getCountries } = await import('@infrastructure/services/countries/getCountries');
-    vi.mocked(getCountries).mockReturnValueOnce(MOCK_COUNTRIES);
-    useLocationStore.setState({ countriesLastFetched: Date.now() - 25 * 60 * 60 * 1000 });
+  it('logs nothing when rehydration succeeds', async () => {
+    runRehydrate();
 
-    await useLocationStore.getState().fetchCountries('en');
-    expect(getCountries).toHaveBeenCalledOnce();
-  });
-
-  it('sets loading to false on error', async () => {
-    const { getCountries } = await import('@infrastructure/services/countries/getCountries');
-    vi.mocked(getCountries).mockImplementationOnce(() => { throw new Error('network error'); });
-    useLocationStore.setState({ countriesLastFetched: 0 });
-
-    await useLocationStore.getState().fetchCountries('en');
-    expect(useLocationStore.getState().countriesLoading).toBe(false);
+    await Promise.resolve();
+    expect(mockLogError).not.toHaveBeenCalled();
   });
 });

@@ -1,6 +1,5 @@
 'use client';
 
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { ArrowUpRight, RotateCcw } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -13,7 +12,6 @@ const ContactModal = dynamic(() =>
   import('@ui/modules/shared/contact/ContactModal').then((m) => ({ default: m.ContactModal }))
 );
 
-const logger = getBetterStackInstance();
 const STATUS_URL = 'https://status.forever-pto.com';
 const CHANGELOG_URL = 'https://github.com/fbuireu/forever-pto/releases';
 const SUPPORT_URL = 'https://github.com/fbuireu/forever-pto/issues/new?template=bug_report.yml';
@@ -86,9 +84,11 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
   const terminalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    logger.logError('Unhandled error caught by error boundary', error, {
-      component: 'ErrorPage',
-      digest: error.digest,
+    void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
+      getBetterStackInstance().logError('Unhandled error caught by error boundary', error, {
+        component: 'ErrorPage',
+        digest: error.digest,
+      });
     });
   }, [error]);
 
@@ -135,6 +135,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
   return (
     <>
       <main
+        data-testid='error-boundary'
         className='flex-1 py-[60px]'
         style={{
           background: [

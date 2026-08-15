@@ -1,5 +1,4 @@
-﻿import type { ReactNode } from 'react';
-import { SidebarProvider } from '@ui/modules/core/animate/base/Sidebar';
+﻿import { SidebarProvider } from '@ui/modules/core/animate/base/Sidebar';
 import { Toaster } from '@ui/modules/core/primitives/Sonner';
 import { SiteSubtitle } from '@ui/modules/pages/planner/SiteSubtitle';
 import { SiteTitle } from '@ui/modules/pages/planner/SiteTitle';
@@ -10,6 +9,7 @@ import { StoresInitializer } from '@ui/modules/stores/StoresInitializer';
 import dynamic from 'next/dynamic';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
+import type { ReactNode } from 'react';
 
 const PremiumModal = dynamic(() =>
   import('@ui/modules/premium/PremiumModal').then((module) => ({ default: module.PremiumModal }))

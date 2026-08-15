@@ -1,71 +1,101 @@
-export function getMonthlyDist(days: Date[]) {
-  const monthlyDist = new Array(12).fill(0);
-  days.forEach((date) => {
-    monthlyDist[getMonth(date)]++;
-  });
-  return monthlyDist;
-}
-
-export function getLongBlocksPerQuarter(days: Date[]) {
-  const longBlocksPerQuarter = [0, 0, 0, 0];
-  const sorted = days.toSorted((a, b) => a.getTime() - b.getTime());
-  let currentBlock: Date[] = [];
-  let lastQuarter = null;
-  for (const date of sorted) {
-    const quarter = Math.floor(getMonth(date) / 3);
-    const lastInBlock = currentBlock.at(-1);
-    if (lastInBlock === undefined || differenceInDays(date, lastInBlock) === 1) {
-      currentBlock.push(date);
-      lastQuarter = quarter;
-    } else {
-      if (currentBlock.length >= 3 && lastQuarter !== null) {
-        longBlocksPerQuarter[lastQuarter]++;
-      }
-      currentBlock = [date];
-      lastQuarter = quarter;
-    }
-  }
-  if (currentBlock.length >= 3 && lastQuarter !== null) {
-    longBlocksPerQuarter[lastQuarter]++;
-  }
-  return longBlocksPerQuarter;
-}
-
-export function getTotalEffectiveDays(days: Date[], bridges?: { effectiveDays: number; ptoDays: Date[] }[]) {
-  if (!bridges || bridges.length === 0) {
-    return days.length;
-  }
-
-  const daysSet = new Set(days.map((d) => d.toDateString()));
-
-  const validBridges = bridges.filter((bridge) => bridge.ptoDays.every((ptoDay) => daysSet.has(ptoDay.toDateString())));
-
-  const daysInBridges = new Set<string>();
-  validBridges.forEach((bridge) => {
-    bridge.ptoDays.forEach((ptoDay) => {
-      daysInBridges.add(ptoDay.toDateString());
-    });
-  });
-
-  const effectiveDaysFromBridges = validBridges.reduce((sum, bridge) => sum + bridge.effectiveDays, 0);
-  const standaloneDays = days.filter((day) => !daysInBridges.has(day.toDateString())).length;
-
-  return effectiveDaysFromBridges + standaloneDays;
-}
-
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import {
-  addDays,
   differenceInDays,
   eachDayOfInterval,
   endOfYear,
   formatDate,
   getMonth,
+  getYear,
   isWeekend,
   startOfToday,
   startOfYear,
 } from '@application/shared/utils/dates';
 import type { Locale } from 'next-intl';
+import type { Bridge } from '../../types';
+import { freeStreaks } from './streaks';
+
+export const MONTHS_IN_YEAR = 12;
+export const MONTHS_IN_QUARTER = 3;
+
+const LONG_BLOCK_MINIMUM_DAYS = 3;
+const LONG_WEEKEND_MINIMUM_DAYS = 3;
+
+export interface PlanningWindowShape {
+  year: number;
+  carryOverMonths: number;
+}
+
+export const windowMonthCount = ({ carryOverMonths }: Pick<PlanningWindowShape, 'carryOverMonths'>) =>
+  MONTHS_IN_YEAR + carryOverMonths;
+
+export const windowQuarterCount = (window: Pick<PlanningWindowShape, 'carryOverMonths'>) =>
+  Math.ceil(windowMonthCount(window) / MONTHS_IN_QUARTER);
+
+export const windowMonthIndex = (date: Date, { year }: Pick<PlanningWindowShape, 'year'>) =>
+  (getYear(date) - year) * MONTHS_IN_YEAR + getMonth(date);
+
+export function getMonthlyDist(days: Date[], window: PlanningWindowShape) {
+  const monthlyDist = new Array(windowMonthCount(window)).fill(0);
+  days.forEach((date) => {
+    const index = windowMonthIndex(date, window);
+    if (index >= 0 && index < monthlyDist.length) monthlyDist[index]++;
+  });
+  return monthlyDist;
+}
+
+interface GetLongBlocksPerQuarterParams {
+  ptoDays: Date[];
+  holidays: HolidayDTO[];
+  window: PlanningWindowShape;
+}
+
+export function getLongBlocksPerQuarter({ ptoDays, holidays, window }: GetLongBlocksPerQuarterParams) {
+  const longBlocksPerQuarter = new Array(windowQuarterCount(window)).fill(0);
+
+  for (const streak of freeStreaks({ placedDays: ptoDays, holidays })) {
+    if (streak.length < LONG_BLOCK_MINIMUM_DAYS) continue;
+
+    const start = streak.days.find((day) => windowMonthIndex(day, window) >= 0);
+    if (start === undefined) continue;
+
+    const quarter = Math.floor(windowMonthIndex(start, window) / MONTHS_IN_QUARTER);
+    if (quarter >= 0 && quarter < longBlocksPerQuarter.length) longBlocksPerQuarter[quarter]++;
+  }
+
+  return longBlocksPerQuarter;
+}
+
+export function getValidBridges(days: Date[], bridges?: Bridge[]) {
+  if (!bridges || bridges.length === 0) return [];
+
+  const daysSet = new Set(days.map((day) => day.toDateString()));
+
+  return bridges.filter((bridge) => bridge.ptoDays.every((ptoDay) => daysSet.has(ptoDay.toDateString())));
+}
+
+export function getTotalEffectiveDays(days: Date[], bridges?: Bridge[], holidays: HolidayDTO[] = []) {
+  const validBridges = getValidBridges(days, bridges);
+
+  if (validBridges.length === 0) {
+    return days.length;
+  }
+
+  const freeDays = new Set([...days.map((day) => day.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
+  const covered = new Set<string>();
+
+  for (const bridge of validBridges) {
+    for (const day of eachDayOfInterval({ start: bridge.startDate, end: bridge.endDate })) {
+      const key = day.toDateString();
+      if (isWeekend(day) || freeDays.has(key)) covered.add(key);
+    }
+  }
+
+  for (const day of days) {
+    covered.add(day.toDateString());
+  }
+
+  return covered.size;
+}
 
 export const calculateRestBlocks = (dates: Date[]) => {
   if (dates.length === 0) return 0;
@@ -84,42 +114,39 @@ export const calculateRestBlocks = (dates: Date[]) => {
   return blocks;
 };
 
-interface CalculateMaxWorkingPeriodParams {
+interface CalculateMaxWorkStreakParams {
   ptoDays: Date[];
   holidays: HolidayDTO[];
   year: number;
   allowPastDays: boolean;
 }
 
-export const calculateMaxWorkingPeriod = ({
-  ptoDays,
-  holidays,
-  year,
-  allowPastDays,
-}: CalculateMaxWorkingPeriodParams) => {
-  const yearStart = allowPastDays ? startOfYear(new Date(year, 0, 1)) : startOfToday();
+export const calculateMaxWorkStreak = ({ ptoDays, holidays, year, allowPastDays }: CalculateMaxWorkStreakParams) => {
+  const yearStart = startOfYear(new Date(year, 0, 1));
   const yearEnd = endOfYear(new Date(year, 11, 31));
-  if (yearStart > yearEnd) return 0;
+  const today = startOfToday();
+  const scanStart = allowPastDays || today < yearStart ? yearStart : today;
+  if (scanStart > yearEnd) return 0;
 
   const restDays = new Set([...ptoDays.map((d) => d.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
 
-  let maxWorkingStreak = 0;
+  let maxWorkStreak = 0;
   let currentStreak = 0;
 
-  for (const day of eachDayOfInterval({ start: yearStart, end: yearEnd })) {
+  for (const day of eachDayOfInterval({ start: scanStart, end: yearEnd })) {
     if (isWeekend(day)) continue;
 
     if (restDays.has(day.toDateString())) {
-      maxWorkingStreak = Math.max(maxWorkingStreak, currentStreak);
+      maxWorkStreak = Math.max(maxWorkStreak, currentStreak);
       currentStreak = 0;
     } else {
       currentStreak++;
     }
   }
 
-  maxWorkingStreak = Math.max(maxWorkingStreak, currentStreak);
+  maxWorkStreak = Math.max(maxWorkStreak, currentStreak);
 
-  return maxWorkingStreak;
+  return maxWorkStreak;
 };
 interface GetFirstLastBreak {
   dates: Date[];
@@ -138,33 +165,34 @@ export const getFirstLastBreak = ({ dates, locale }: GetFirstLastBreak) => {
   };
 };
 
-export const calculateQuarterDistribution = (dates: Date[]) => {
-  const quarters = [0, 0, 0, 0];
+export const calculateQuarterDistribution = (dates: Date[], window: PlanningWindowShape) => {
+  const quarters = new Array(windowQuarterCount(window)).fill(0);
 
   dates?.forEach((date) => {
-    const month = getMonth(date);
-    const quarter = Math.floor(month / 3);
-    quarters[quarter]++;
+    const quarter = Math.floor(windowMonthIndex(date, window) / MONTHS_IN_QUARTER);
+    if (quarter >= 0 && quarter < quarters.length) quarters[quarter]++;
   });
 
   return quarters;
 };
 
-interface GetWorkingDaysPerWeekParams {
+interface GetWorkedDaysPerMonthParams {
   ptoDays: Date[];
   year: number;
   holidays: HolidayDTO[];
 }
 
-export const getWorkingDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkingDaysPerWeekParams) => {
+export const getWorkedDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkedDaysPerMonthParams) => {
   const yearStart = startOfYear(new Date(year, 0, 1));
   const yearEnd = endOfYear(new Date(year, 11, 31));
   const allDaysInYear = eachDayOfInterval({ start: yearStart, end: yearEnd });
-  const workingDaysInYear = allDaysInYear.filter((day) => !isWeekend(day)).length;
-  const holidaysOnWorkdays = holidays.filter((h) => !isWeekend(h.date)).length;
-  const ptoOnWorkdays = ptoDays.filter((d) => !isWeekend(d)).length;
-  const actualWorkingDays = workingDaysInYear - holidaysOnWorkdays - ptoOnWorkdays;
-  const avgPerMonth = actualWorkingDays / 12;
+  const workdaysInYear = allDaysInYear.filter((day) => !isWeekend(day)).length;
+  const daysOffOnWorkdays = new Set<string>();
+  for (const date of [...holidays.map((h) => h.date), ...ptoDays]) {
+    if (getYear(date) === year && !isWeekend(date)) daysOffOnWorkdays.add(date.toDateString());
+  }
+  const workedDays = workdaysInYear - daysOffOnWorkdays.size;
+  const avgPerMonth = workedDays / 12;
 
   return Number.parseFloat(avgPerMonth.toFixed(1));
 };
@@ -174,85 +202,17 @@ interface CalculateLongestVacationParams {
   holidays: HolidayDTO[];
 }
 
-export const calculateLongestVacation = ({ ptoDays, holidays }: CalculateLongestVacationParams) => {
-  if (ptoDays.length === 0) return 0;
-
-  const freeDays = new Set([...ptoDays.map((d) => d.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
-
-  const allDates = [...ptoDays, ...holidays.map((h) => h.date)].toSorted((a, b) => a.getTime() - b.getTime());
-  if (allDates.length === 0) return 0;
-
-  const firstDate = allDates.at(0);
-  const lastDate = allDates.at(-1);
-  if (firstDate === undefined || lastDate === undefined) return 0;
-
-  const minDate = addDays(firstDate, -7);
-  const maxDate = addDays(lastDate, 7);
-
-  let maxStreak = 0;
-  let currentStreak = 0;
-
-  for (const day of eachDayOfInterval({ start: minDate, end: maxDate })) {
-    const isFreeDay = isWeekend(day) || freeDays.has(day.toDateString());
-
-    if (isFreeDay) {
-      currentStreak++;
-      maxStreak = Math.max(maxStreak, currentStreak);
-    } else {
-      currentStreak = 0;
-    }
-  }
-
-  return maxStreak;
-};
+export const calculateLongestVacation = ({ ptoDays, holidays }: CalculateLongestVacationParams) =>
+  freeStreaks({ placedDays: ptoDays, holidays })
+    .filter((streak) => streak.hasPlacedDay)
+    .reduce((longest, streak) => Math.max(longest, streak.length), 0);
 
 interface CalculateLongWeekendsParams {
   ptoDays: Date[];
   holidays: HolidayDTO[];
 }
 
-export const calculateLongWeekends = ({ ptoDays, holidays }: CalculateLongWeekendsParams) => {
-  if (ptoDays.length === 0) return 0;
-
-  const freeDays = new Set([...ptoDays.map((d) => d.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
-
-  let longWeekends = 0;
-  const allDates = [...ptoDays, ...holidays.map((h) => h.date)].toSorted((a, b) => a.getTime() - b.getTime());
-  if (allDates.length === 0) return 0;
-
-  const firstDate = allDates.at(0);
-  const lastDate = allDates.at(-1);
-  if (firstDate === undefined || lastDate === undefined) return 0;
-
-  const minDate = addDays(firstDate, -7);
-  const maxDate = addDays(lastDate, 7);
-
-  let currentStreak: Date[] = [];
-
-  for (const day of eachDayOfInterval({ start: minDate, end: maxDate })) {
-    const isFreeDay = isWeekend(day) || freeDays.has(day.toDateString());
-
-    if (isFreeDay) {
-      currentStreak.push(day);
-    } else {
-      if (currentStreak.length >= 3) {
-        const hasWeekend = currentStreak.some((d) => isWeekend(d));
-        const hasPtoOrHoliday = currentStreak.some((d) => freeDays.has(d.toDateString()) && !isWeekend(d));
-        if (hasWeekend && hasPtoOrHoliday) {
-          longWeekends++;
-        }
-      }
-      currentStreak = [];
-    }
-  }
-
-  if (currentStreak.length >= 3) {
-    const hasWeekend = currentStreak.some((d) => isWeekend(d));
-    const hasPtoOrHoliday = currentStreak.some((d) => freeDays.has(d.toDateString()) && !isWeekend(d));
-    if (hasWeekend && hasPtoOrHoliday) {
-      longWeekends++;
-    }
-  }
-
-  return longWeekends;
-};
+export const calculateLongWeekends = ({ ptoDays, holidays }: CalculateLongWeekendsParams) =>
+  freeStreaks({ placedDays: ptoDays, holidays }).filter(
+    (streak) => streak.length >= LONG_WEEKEND_MINIMUM_DAYS && streak.hasWeekend && streak.hasPlacedDay
+  ).length;

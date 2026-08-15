@@ -26,7 +26,7 @@ vi.mock('@infrastructure/proxy/location', () => ({
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
-const { middleware } = await import('./middleware');
+const { config, middleware } = await import('./middleware');
 
 function makeRequest(pathname: string, accept = '', search = ''): NextRequest {
   return {
@@ -35,6 +35,31 @@ function makeRequest(pathname: string, accept = '', search = ''): NextRequest {
     url: `${BASE_URL}${pathname}${search ? `?${search}` : ''}`,
   } as unknown as NextRequest;
 }
+
+describe('config matcher', () => {
+  const matchesPage = (pathname: string) => new RegExp(`^${config.matcher[0]}$`).test(pathname);
+
+  it('matches page paths', () => {
+    expect(matchesPage('/')).toBe(true);
+    expect(matchesPage('/some-page')).toBe(true);
+    expect(matchesPage(`/${ES}/planner`)).toBe(true);
+  });
+
+  it('excludes /api paths, and re-adds /api/markdown explicitly', () => {
+    expect(matchesPage('/api/some-endpoint')).toBe(false);
+    expect(matchesPage('/api/markdown')).toBe(false);
+    expect(config.matcher).toContain('/api/markdown');
+  });
+
+  it('excludes dotted paths such as /.well-known/*', () => {
+    expect(matchesPage('/.well-known/security.txt')).toBe(false);
+  });
+
+  it('excludes framework paths', () => {
+    expect(matchesPage('/_next/static/chunk.js')).toBe(false);
+    expect(matchesPage('/_vercel/insights')).toBe(false);
+  });
+});
 
 describe('middleware', () => {
   beforeEach(() => {
@@ -55,24 +80,6 @@ describe('middleware', () => {
       expect(url.searchParams.get('path')).toBe('/some-page');
     });
 
-    it('does not rewrite markdown requests to /api/* paths', async () => {
-      const spy = vi.spyOn(NextResponse, 'rewrite');
-      const request = makeRequest('/api/some-endpoint', 'text/markdown');
-
-      await middleware(request);
-
-      expect(spy).not.toHaveBeenCalled();
-    });
-
-    it('does not rewrite markdown requests to /.well-known/* paths', async () => {
-      const spy = vi.spyOn(NextResponse, 'rewrite');
-      const request = makeRequest('/.well-known/security.txt', 'text/markdown');
-
-      await middleware(request);
-
-      expect(spy).not.toHaveBeenCalled();
-    });
-
     it('does not rewrite non-markdown requests', async () => {
       const spy = vi.spyOn(NextResponse, 'rewrite');
       const request = makeRequest('/some-page', 'text/html');
@@ -89,6 +96,14 @@ describe('middleware', () => {
 
       expect(response.headers.get('Cache-Control')).toBe('public, max-age=3600');
     });
+
+    it('sets Vary: Accept on the markdown rewrite response so caches key on the negotiated body', async () => {
+      const request = makeRequest('/some-page', 'text/markdown');
+
+      const response = await middleware(request);
+
+      expect(response.headers.get('Vary')).toBe('Accept');
+    });
   });
 
   describe('markdown api cache header', () => {
@@ -98,6 +113,14 @@ describe('middleware', () => {
       const response = await middleware(request);
 
       expect(response.headers.get('Cache-Control')).toBe('public, max-age=3600');
+    });
+
+    it('sets Vary: Accept for direct /api/markdown requests', async () => {
+      const request = makeRequest('/api/markdown', '', 'path=/');
+
+      const response = await middleware(request);
+
+      expect(response.headers.get('Vary')).toBe('Accept');
     });
 
     it('does not run the i18n proxy for /api/markdown requests', async () => {
@@ -139,6 +162,18 @@ describe('middleware', () => {
       await middleware(request);
 
       expect(spy).not.toHaveBeenCalled();
+    });
+
+    it('keeps the redirect on this origin when the path is protocol-relative', async () => {
+      const spy = vi.spyOn(NextResponse, 'redirect');
+      const request = makeRequest('//1234567890/payment/confirmation');
+
+      await middleware(request);
+
+      expect(spy).toHaveBeenCalledOnce();
+      const url = spy.mock.calls[0][0] as URL;
+      expect(url.origin).toBe(new URL(request.url).origin);
+      expect(url.pathname).toBe('/1234567890');
     });
   });
 

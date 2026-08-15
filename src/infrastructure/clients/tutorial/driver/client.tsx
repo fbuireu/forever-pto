@@ -1,12 +1,12 @@
 'use client';
 
-import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
-import { X } from '@ui/modules/core/animate/icons/X';
 import { type Config, type Driver, type DriveStep, driver } from 'driver.js';
+import type { ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 
 interface DriverConfig extends Omit<Config, 'steps'> {
   steps?: DriveStep[];
+  closeIcon?: ReactNode;
 }
 
 export class DriverClient {
@@ -30,18 +30,14 @@ export class DriverClient {
         this.config.onPopoverRender?.(popover, options);
 
         const closeButton = popover.wrapper.querySelector('.driver-popover-close-btn');
-        if (closeButton) {
+        if (closeButton && this.config.closeIcon) {
           closeButton.innerHTML = '';
           const iconContainer = document.createElement('span');
           iconContainer.style.color = 'var(--foreground)';
           closeButton.appendChild(iconContainer);
           const root = createRoot(iconContainer);
 
-          root.render(
-            <AnimateIcon animateOnHover>
-              <X className='size-4' />
-            </AnimateIcon>
-          );
+          root.render(this.config.closeIcon);
           this.closeButtonRoots.push(root);
         }
 
@@ -55,10 +51,7 @@ export class DriverClient {
       onDestroyStarted: (element, step, options) => {
         this.config.onDestroyStarted?.(element, step, options);
 
-        this.closeButtonRoots.forEach((root) => {
-          root.unmount();
-        });
-        this.closeButtonRoots = [];
+        this.unmountCloseButtonRoots();
 
         if (this.driver) {
           this.driver.destroy();
@@ -90,8 +83,16 @@ export class DriverClient {
     driverInstance.drive();
   }
 
+  private unmountCloseButtonRoots() {
+    this.closeButtonRoots.forEach((root) => {
+      root.unmount();
+    });
+    this.closeButtonRoots = [];
+  }
+
   destroy() {
     if (this.driver) {
+      this.unmountCloseButtonRoots();
       this.driver.destroy();
       this.driver = null;
     }

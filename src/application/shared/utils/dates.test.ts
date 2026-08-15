@@ -7,7 +7,6 @@ import {
   differenceInDays,
   eachDayOfInterval,
   endOfMonth,
-  ensureDate,
   formatDate,
   getWeekdayNames,
   isBefore,
@@ -18,7 +17,6 @@ import {
   startOfDay,
   startOfMonth,
   startOfWeek,
-  toIcsDate,
 } from './dates';
 
 describe('isSameDay', () => {
@@ -78,7 +76,7 @@ describe('addMonths', () => {
   it('constrains to last day when target month is shorter', () => {
     const result = addMonths(new Date(2024, 0, 31), 1);
     expect(result.getMonth()).toBe(1);
-    expect(result.getDate()).toBe(29); // 2024 is leap year
+    expect(result.getDate()).toBe(29);
   });
 });
 
@@ -142,19 +140,6 @@ describe('isBefore', () => {
   });
 });
 
-describe('ensureDate', () => {
-  it('passes through Date objects', () => {
-    const d = new Date(2024, 0, 1);
-    expect(ensureDate(d)).toBe(d);
-  });
-
-  it('converts string to Date', () => {
-    const result = ensureDate('2024-01-15');
-    expect(result).toBeInstanceOf(Date);
-    expect(result.getFullYear()).toBe(2024);
-  });
-});
-
 describe('formatDate', () => {
   it('formats as ISO date', () => {
     expect(formatDate({ date: new Date(2024, 0, 5), locale: EN, format: 'yyyy-MM-dd' })).toBe('2024-01-05');
@@ -170,20 +155,6 @@ describe('getWeekdayNames', () => {
   it('starts on Monday when weekStartsOn is 1', () => {
     const names = getWeekdayNames({ locale: 'en-US', weekStartsOn: 1, format: 'long' });
     expect(names[0].toLowerCase()).toContain('mon');
-  });
-});
-
-describe('toIcsDate', () => {
-  it('formats a date as YYYYMMDD', () => {
-    expect(toIcsDate(new Date(2025, 0, 1))).toBe('20250101');
-  });
-
-  it('pads month and day with leading zeros', () => {
-    expect(toIcsDate(new Date(2025, 2, 5))).toBe('20250305');
-  });
-
-  it('handles end-of-year date', () => {
-    expect(toIcsDate(new Date(2025, 11, 31))).toBe('20251231');
   });
 });
 

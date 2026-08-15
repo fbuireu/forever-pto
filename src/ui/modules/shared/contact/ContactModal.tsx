@@ -4,15 +4,15 @@ import { type ContactFormData, createContactSchema } from '@application/dto/cont
 import { usePremiumStore } from '@application/stores/premium';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
-import { CircleCheckBig } from '@ui/modules/core/animate/icons/CircleCheckBig';
-import { Button } from '@ui/modules/core/primitives/Button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@ui/modules/core/primitives/Dialog';
+} from '@ui/modules/core/animate/base/Dialog';
+import { CircleCheckBig } from '@ui/modules/core/animate/icons/CircleCheckBig';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { Textarea } from '@ui/modules/core/primitives/Textarea';
@@ -22,6 +22,7 @@ import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { useShallow } from 'zustand/react/shallow';
 import { FormButtons } from '../FormButtons';
+import { resolveApiErrorMessage } from '../utils/helpers';
 
 interface ContactModalProps {
   open: boolean;
@@ -38,6 +39,7 @@ type Step = (typeof Step)[keyof typeof Step];
 
 export const ContactModal = ({ open, onClose }: ContactModalProps) => {
   const t = useTranslations('contact');
+  const tA11y = useTranslations('a11y');
   const tValidation = useTranslations('validation.contact');
   const [step, setStep] = useState<Step>(Step.INPUT);
   const [isPending, startTransition] = useTransition();
@@ -85,14 +87,13 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
       try {
         const { sendContactEmailAction } = await import('@infrastructure/actions/contact');
         const result = await sendContactEmailAction(data);
-        setEmail(data.email);
 
         if (result.success) {
+          setEmail(data.email);
           track('contact_form_submitted');
           setStep(Step.SUCCESS);
         } else {
-          const translatedError = result.error ?? t('failedToSend');
-          setErrorMessage(translatedError);
+          setErrorMessage(resolveApiErrorMessage({ code: result.error, t, fallback: t('failedToSend') }));
           setStep(Step.ERROR);
         }
       } catch (error) {
@@ -109,7 +110,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-lg'>
+      <DialogContent className='sm:max-w-lg' closeLabel={tA11y('closeDialog')}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-3'>
             <span className='size-9 bg-[var(--accent)] border-[3px] border-[var(--frame)] rounded-[8px] shadow-[var(--shadow-brutal-3)] grid place-items-center shrink-0'>

@@ -1,16 +1,13 @@
-import { HolidayVariant } from '@application/dto/holiday/types';
-import { generateAlternatives } from '@domain/calendar/alternatives/generateAlternatives';
-import { generateMetrics } from '@domain/calendar/metrics/generateMetrics';
-import { generateSuggestions } from '@domain/calendar/suggestions/generateSuggestions';
+import { fromStoredInstant } from '@application/shared/utils/dateIntake';
+import { runPlanningPipeline } from '@domain/calendar/pipeline';
 import type { FilterStrategy } from '@domain/calendar/types';
-import { clearDateKeyCache, clearHolidayCache } from '@domain/calendar/utils/cache';
+import { type CalculateSuggestionsRequest, WORKER_MESSAGE_TYPE, type WorkerResponse } from './types';
 import { deserializeHolidays, deserializeMonths, serializeSuggestionResult } from './utils/serializers';
-import type { CalculateSuggestionsRequest, WorkerResponse } from './types';
 
 globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
   const { type, requestId, payload } = e.data;
 
-  if (type !== 'CALCULATE_SUGGESTIONS') return;
+  if (type !== WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS) return;
 
   const {
     year,
@@ -22,90 +19,27 @@ globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
     locale,
     maxAlternatives,
     manualDays = [],
-    excludedDays = [],
+    removedDays = [],
     autoSuggestCount,
   } = payload;
 
   try {
-    clearDateKeyCache();
-    clearHolidayCache();
-
-    const holidays = deserializeHolidays(rawHolidays);
-    const months = deserializeMonths(rawMonths);
-
-    const manualPseudoHolidays = manualDays.map((isoDate, i) => ({
-      id: `manual-${i}`,
-      date: new Date(isoDate),
-      name: 'Manual day',
-      variant: HolidayVariant.CUSTOM,
-      isInSelectedRange: true,
-    }));
-    const excludedPseudoHolidays = excludedDays.map((isoDate, i) => ({
-      id: `excluded-${i}`,
-      date: new Date(isoDate),
-      name: 'Excluded day',
-      variant: HolidayVariant.CUSTOM,
-      isInSelectedRange: true,
-    }));
-    const holidaysWithManual = [...holidays, ...manualPseudoHolidays, ...excludedPseudoHolidays];
-    const effectivePtoDays = Math.max(0, autoSuggestCount ?? ptoDays - manualDays.length);
-
-    if (effectivePtoDays <= 0 || holidaysWithManual.length === 0) {
-      const response: WorkerResponse = {
-        type: 'CALCULATE_SUGGESTIONS_RESULT',
-        requestId,
-        payload: { suggestion: { days: [] }, alternatives: [] },
-      };
-      self.postMessage(response);
-      return;
-    }
-
-    const typedStrategy = strategy as FilterStrategy;
-
-    const baseSuggestion = generateSuggestions({
+    const { suggestion, alternatives } = runPlanningPipeline({
       year,
-      ptoDays: effectivePtoDays,
-      holidays: holidaysWithManual,
+      ptoDays,
+      autoSuggestCount,
+      holidays: deserializeHolidays(rawHolidays),
+      manuallySelectedDays: manualDays.map(fromStoredInstant),
+      removedSuggestedDays: removedDays.map(fromStoredInstant),
       allowPastDays,
-      months,
-      strategy: typedStrategy,
-    });
-
-    const baseAlternatives = generateAlternatives({
-      year,
-      ptoDays: effectivePtoDays,
-      holidays: holidaysWithManual,
-      allowPastDays,
-      months,
+      months: deserializeMonths(rawMonths),
+      strategy: strategy as FilterStrategy,
+      locale,
       maxAlternatives,
-      existingSuggestion: baseSuggestion.days,
-      strategy: typedStrategy,
     });
-
-    const suggestion = {
-      ...baseSuggestion,
-      metrics: generateMetrics({
-        suggestion: baseSuggestion,
-        locale,
-        bridges: baseSuggestion.bridges,
-        holidays: holidaysWithManual,
-        allowPastDays,
-      }),
-    };
-
-    const alternatives = baseAlternatives.map((alternative) => ({
-      ...alternative,
-      metrics: generateMetrics({
-        suggestion: alternative,
-        locale,
-        bridges: alternative.bridges,
-        holidays: holidaysWithManual,
-        allowPastDays,
-      }),
-    }));
 
     const response: WorkerResponse = {
-      type: 'CALCULATE_SUGGESTIONS_RESULT',
+      type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT,
       requestId,
       payload: serializeSuggestionResult(suggestion, alternatives),
     };
@@ -113,7 +47,7 @@ globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
     self.postMessage(response);
   } catch (err) {
     const response: WorkerResponse = {
-      type: 'WORKER_ERROR',
+      type: WORKER_MESSAGE_TYPE.WORKER_ERROR,
       requestId,
       error: String(err),
     };

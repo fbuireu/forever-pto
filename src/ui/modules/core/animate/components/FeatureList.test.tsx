@@ -20,8 +20,15 @@ vi.mock('motion/react', async () => {
   const { createElement } = await import('react');
   return {
     m: {
-      div: ({ children, initial: _i, whileHover: _wh, whileTap: _wt, transition: _t, style, ...props }: MotionDivProps) =>
-        createElement('div', { style, ...props }, children),
+      div: ({
+        children,
+        initial: _i,
+        whileHover: _wh,
+        whileTap: _wt,
+        transition: _t,
+        style,
+        ...props
+      }: MotionDivProps) => createElement('div', { style, ...props }, children),
       span: ({ children, variants: _v, transition: _t, ...props }: MotionSpanProps) =>
         createElement('span', props, children),
     },
@@ -30,7 +37,9 @@ vi.mock('motion/react', async () => {
 
 vi.mock('@ui/modules/core/primitives/Badge', () => ({
   Badge: ({ children, ...props }: ComponentProps<'span'>) => (
-    <span data-testid='badge' {...props}>{children}</span>
+    <span data-testid='badge' {...props}>
+      {children}
+    </span>
   ),
 }));
 

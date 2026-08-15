@@ -1,16 +1,16 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Lock } from '@ui/modules/core/animate/icons/Lock';
-import { Banner } from '@ui/modules/core/primitives/Banner';
-import { Button } from '@ui/modules/core/primitives/Button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@ui/modules/core/primitives/Dialog';
+} from '@ui/modules/core/animate/base/Dialog';
+import { Lock } from '@ui/modules/core/animate/icons/Lock';
+import { Banner } from '@ui/modules/core/primitives/Banner';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { AlertCircle, Crown, Loader2 } from 'lucide-react';
@@ -44,6 +44,7 @@ type EmailFormData = z.infer<ReturnType<typeof createEmailSchema>>;
 
 export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading }: UpgradeModalProps) => {
   const t = useTranslations('upgrade');
+  const tA11y = useTranslations('a11y');
   const [step, setStep] = useState<Step>(Step.INPUT);
 
   const emailSchema = useMemo(
@@ -88,7 +89,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-md' initialFocus={false}>
+      <DialogContent className='sm:max-w-md' closeLabel={tA11y('closeDialog')} initialFocus={false}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Crown className='size-5 text-yellow-500' />

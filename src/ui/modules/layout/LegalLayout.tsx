@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { getTranslations } from 'next-intl/server';
+import type { ReactNode } from 'react';
 
 interface LegalLayoutProps {
   title: string;

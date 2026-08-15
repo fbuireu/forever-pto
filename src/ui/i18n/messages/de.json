@@ -1,8 +1,14 @@
 {
+  "a11y": {
+    "closeDialog": "Schließen",
+    "toggleSidebar": "Seitenleiste ein- oder ausblenden",
+    "sidebarLandmark": "Planer-Einstellungen",
+    "radialNavigation": "Funktionsnavigation"
+  },
   "metadata": {
     "title": "Forever PTO – Verwalte deine freien Tage",
-    "description": "Plane und optimiere deine Urlaubstage und Feiertage mit Forever PTO. Finde die besten langen Wochenenden und maximiere deine freie Zeit.",
-    "keywords": "Urlaubstage, Feiertage, freie Tage, Urlaub, langes Wochenende, bezahlter Urlaub, Kalender",
+    "description": "Plane und optimiere deine PTO-Tage und Feiertage mit Forever PTO. Finde die besten langen Wochenenden und maximiere deine freie Zeit.",
+    "keywords": "PTO-Tage, Feiertage, freie Tage, Urlaub, langes Wochenende, bezahlter Urlaub, Kalender",
     "cookiePolicy": {
       "title": "Cookie-Richtlinie | Forever PTO",
       "description": "Informationen darüber, wie Forever PTO Cookies und lokalen Speicher verwendet."
@@ -24,12 +30,13 @@
     },
     "planner": {
       "title": "Planer | Forever PTO",
-      "description": "Plane und optimiere deine Urlaubstage. Intelligenter PTO-Kalender mit Feiertagserkennung, Brückentagsoptimierung und Export nach Google Kalender, Outlook und Apple."
+      "description": "Plane und optimiere deine PTO-Tage. Intelligenter PTO-Kalender mit Feiertagserkennung, Brückentagsoptimierung und Export nach Google Kalender, Outlook und Apple."
     }
   },
   "planner": {
     "title": "Forever PTO",
-    "description": "Dein intelligenter PTO-Planer. Konfiguriere deine Urlaubstage, dein Land und deine Strategie, um jeden Feiertag optimal zu nutzen.",
+    "heading": "Planer",
+    "description": "Dein intelligenter PTO-Planer. Konfiguriere deine PTO-Tage, dein Land und deine Strategie, um jeden Feiertag optimal zu nutzen.",
     "subtitle": "Dein intelligenter Urlaubsoptimierer. Hör auf, Tage zu verschwenden.",
     "titleHighlight1": "Dein Jahr",
     "titleHighlight2": "frei",
@@ -55,23 +62,24 @@
   "summary": {
     "title": "Urlaubsübersicht {year} – {nextYear}",
     "metrics": {
-      "vacationDays": "Urlaubstage",
+      "ptoDays": "PTO-Tage",
       "days": "Tage",
       "holidays": "Feiertage",
       "national": "nat.",
       "regional": "reg.",
       "custom": "eigene",
-      "effectiveDays": "Tatsächliche freie Tage",
-      "extra": "extra",
-      "multiplier": "Multiplikator",
-      "performance": "Gewinn",
+      "effectiveDays": "Effektive Tage",
+      "overBudget": "über dein Budget von {ptoDays} {ptoDays, plural, one {Tag} other {Tagen}}",
+      "gain": "Gewinn",
+      "perPtoDay": "deines Budgets von {ptoDays} {ptoDays, plural, one {Tag} other {Tagen}}",
       "longWeekends": "Lange Wochenenden",
-      "vacationPeriods": "Urlaubszeiträume",
-      "dayOffRatio": "Tag/Frei-Verhältnis",
+      "restBlocks": "Ruheblöcke",
+      "efficiency": "Effizienz",
       "bridgesUsed": "Brückentage genutzt",
-      "workdaysPerMonth": "Arbeitstage/Monat",
+      "workedDaysPerMonth": "Gearbeitete Tage/Monat",
       "longestVacation": "Längster Urlaub",
-      "advancedMetrics": "Erweiterte Kennzahlen"
+      "advancedMetrics": "Erweiterte Kennzahlen",
+      "perPlacedDay": "pro genutztem Tag ({placedDays})"
     },
     "yearSummary": {
       "feature": "Jahresübersicht",
@@ -81,12 +89,12 @@
       "maxWorkStreak": "Längste Arbeitsserie",
       "lastBreak": "Letzte Pause",
       "totalBonusDays": "Gesamte Bonustage",
-      "daysGained": "Tage durch Optimierung gewonnen",
+      "bonusDaysCaption": "Bonustage durch Optimierung",
       "daysCount": "{count, plural, one {Tag} other {Tage}}"
     },
     "summaryParagraph": {
-      "withGain": "Mit deinen {ptoDays} Urlaubstagen und {totalHolidays} Feiertagen verwandelt die {strategy}-Strategie deine Tage in {effectiveDays} effektive freie Tage – das sind {increment} mehr als ohne Optimierung (+{percentage}%).",
-      "withoutGain": "Mit deinen {ptoDays} Urlaubstagen und {totalHolidays} Feiertagen erhältst du {effectiveDays} effektive freie Tage mit der {strategy}-Strategie.",
+      "withGain": "Mit deinen {ptoDays} PTO-Tagen und {totalHolidays} Feiertagen verwandelt die {strategy}-Strategie deine Tage in {effectiveDays} effektive freie Tage – das sind {increment} Tage über deinem Budget, ein Gewinn von +{percentage}% gegenüber der Nutzung ohne Optimierung.",
+      "withoutGain": "Mit deinen {ptoDays} PTO-Tagen und {totalHolidays} Feiertagen erhältst du {effectiveDays} effektive freie Tage mit der {strategy}-Strategie.",
       "noRegionHintTitle": "Region hinzufügen",
       "noRegionHint": "Wähle deine Region in der Seitenleiste aus, um regionale Feiertage einzubeziehen und möglicherweise noch mehr freie Tage zu erhalten.",
       "withRegion": "{regionalDays} deiner Feiertage sind spezifisch für {region}."
@@ -140,7 +148,7 @@
         },
         "whatIs": {
           "question": "Was ist das?",
-          "answer": "Forever PTO ist ein Tool, das dir hilft, deine Urlaubstage optimal zu planen. Es schlägt dir basierend auf Feiertagen und deinen Präferenzen die besten freien Tage vor. Du kannst verschiedene Strategien wählen und Feiertage – inklusive eigener Firmen- oder Regionsfeiertage – vollständig anpassen."
+          "answer": "Forever PTO ist ein Tool, das dir hilft, deine PTO-Tage optimal zu planen. Es schlägt dir basierend auf Feiertagen und deinen Präferenzen die besten freien Tage vor. Du kannst verschiedene Strategien wählen und Feiertage – inklusive eigener Firmen- oder Regionsfeiertage – vollständig anpassen."
         },
         "howWorks": {
           "question": "Wie funktioniert es?"
@@ -165,7 +173,7 @@
         },
         "strategies": {
           "question": "Was ist der Unterschied zwischen \"ausgewogen\" und \"optimiert\"?",
-          "answer": "Ausgewogen verteilt freie Tage gleichmäßig über das Jahr. Optimiert maximiert dagegen die Effizienz – also möglichst viele freie Tage pro eingesetztem Urlaubstag."
+          "answer": "Ausgewogen verteilt freie Tage gleichmäßig über das Jahr. Optimiert maximiert dagegen die Effizienz – also möglichst viele freie Tage pro eingesetztem PTO-Tag."
         },
         "results": {
           "question": "Warum ändern sich meine Empfehlungen, wenn ich Einstellungen oder Feiertage anpasse?",
@@ -213,11 +221,12 @@
     "tooltipLabel": "Mehr Informationen zum Arbeitstage-Zähler",
     "selectRange": "Daten auswählen",
     "clearSelection": "Auswahl löschen",
-    "workingDays": "Arbeitstage",
-    "businessDays": "Geschäftstage im ausgewählten Zeitraum",
+    "workdays": "Arbeitstage",
+    "businessDays": "Arbeitstage im ausgewählten Zeitraum",
     "days": "Tage",
     "weekendDays": "Wochenendtage",
     "holidays": "Feiertage",
+    "holidaysOutsideRange": "Feiertage sind nur für {from}–{to} bekannt, alle außerhalb zählen daher als Arbeitstage.",
     "dateRange": "Datumsbereich",
     "from": "Von",
     "to": "bis"
@@ -244,7 +253,6 @@
     "onWorkdays": "An Arbeitstagen",
     "showing": "Anzeige",
     "of": "von",
-    "total": "gesamt",
     "addHoliday": "Feiertag hinzufügen",
     "add": "Hinzufügen",
     "editHoliday": "Feiertag bearbeiten",
@@ -259,14 +267,14 @@
     "quarterDistributionFeature": "Diagramm: Quartalsverteilung",
     "days": "Tage",
     "daysOff": "Freie Tage",
-    "pto": "Urlaubstage",
+    "pto": "PTO-Tage",
     "national": "National",
     "regional": "Regional",
     "custom": "Eigene",
-    "distributionDescription": "Verteilung deiner {ptoDays} Urlaubstage, {nationalDays} nationalen Feiertage{regionalPart}{customPart}.",
+    "distributionDescription": "Verteilung deiner {ptoDays} PTO-Tage, {nationalDays} nationalen Feiertage{regionalPart}{customPart}.",
     "regionalPart": ", {regionalDays} regionalen",
     "customPart": " und {customDays} eigenen",
-    "quarterDescription": "Verteilung von {totalDays} effektiven freien Tagen auf {activeQuarters} Quartal{plural} des Jahres.",
+    "quarterDescription": "Verteilung von {totalDays} effektiven Tagen auf {activeQuarters, plural, one {# Quartal} other {# Quartale}} deines Planungszeitraums.",
     "annualTimeline": "Jahresübersicht",
     "annualTimelineFeature": "Diagramm: Jahresübersicht",
     "timelineDescription": "Monatliche Entwicklung von {totalDays} freien Tagen verteilt auf {activeMonths} Monate. Höchstwert im {peakMonth} mit {peakDays} Tagen.",
@@ -274,7 +282,7 @@
     "longBlocksPerQuarter": "Lange Blöcke pro Quartal",
     "longBlocksFeature": "Diagramm: Lange Blöcke pro Quartal",
     "blocksDescription": "{totalBlocks} lange Blöcke (3+ aufeinanderfolgende Tage) ideal für Urlaub{bestQuarterPart}.",
-    "bestQuarterPart": ". Bestes Quartal: Q{bestQuarter} mit {maxBlocks} Block{plural}",
+    "bestQuarterPart": ". Bestes Quartal: Q{bestQuarter} mit {maxBlocks, plural, one {# Block} other {# Blöcke}}",
     "blocks": "Blöcke",
     "blocksOf3Days": "Blöcke von 3+ Tagen"
   },
@@ -294,6 +302,8 @@
       "errorTitle": "Fehler beim Erstellen des Feiertags",
       "errorDescription": "Etwas ist schiefgelaufen. Versuch es nochmal.",
       "existsTitle": "Feiertag existiert bereits",
+      "manualDayExistsTitle": "Dieser Tag ist bereits ein Urlaubstag",
+      "manualDayExistsDescription": "Du hast den {date} bereits als freien Tag eingeplant. Nimm ihn zuerst aus deinem Plan und füge dann den Feiertag hinzu.",
       "existsDescription": "Am {date} gibt es bereits einen Feiertag: {name}"
     },
     "editHoliday": {
@@ -325,21 +335,19 @@
   },
   "tutorial": {
     "description": "Richte deinen Plan in 2 Schritten ein: zuerst deinen Standort, dann deine Tage und Strategie. Klicke den Button für ein interaktives Tutorial.",
-    "startButton": "Tutorial starten",
-    "restartButton": "Interaktives Tutorial neu starten",
     "nextBtn": "Weiter",
     "prevBtn": "Zurück",
     "doneBtn": "Fertig",
     "progressTextConnector": "von",
     "steps": {
       "toolsTitle": "Rechner & Werkzeuge",
-      "toolsDescription": "Greife hier auf hilfreiche Rechner zu: Schätze deine Urlaubstage basierend auf deiner Berufserfahrung, berechne den Geldwert ungenutzter Urlaubstage oder zähle Arbeitstage zwischen zwei Daten.",
+      "toolsDescription": "Greife hier auf hilfreiche Rechner zu: Schätze deine PTO-Tage basierend auf deiner Berufserfahrung, berechne den Geldwert ungenutzter PTO-Tage oder zähle Arbeitstage zwischen zwei Daten.",
       "alternativesTitle": "Alternativen-Manager",
       "alternativesDescription": "Sieh dir verschiedene Urlaubsvorschläge an, die wir für dich berechnet haben. Vergleiche Effizienzkennzahlen, Gesamttage frei und finde die perfekte Balance. Die erste Option ist immer unser Empfehlungsvorschlag, markiert mit einem Funkelsymbol. Nutze die Pfeile, um Alternativen zu erkunden, und klicke auf \"Alternative anwenden\", um einen anderen Vorschlag zu übernehmen.",
       "statusTitle": "Urlaubsstatus-Tracker",
       "statusDescription": "Verfolge deine Urlaubszuweisung in Echtzeit. Sieh automatisch zugewiesene Tage (von unserem System vorgeschlagen), manuell ausgewählte Tage und verbleibende verfügbare Tage. Du kannst manuelle Änderungen jederzeit zurücksetzen, um zum automatischen Vorschlag zurückzukehren.",
       "calendarTitle": "Dein interaktiver Urlaubskalender",
-      "calendarDescription": "Dies ist dein Jahresübersichtskalender. Feiertage erscheinen in Grau, vorgeschlagene Urlaubstage in Türkis und manuell ausgewählte Tage in Blau. Klicke auf einen beliebigen Arbeitstag, um die Auswahl manuell umzuschalten. Der Kalender aktualisiert sich sofort, wenn du verschiedene Alternativen erkundest.",
+      "calendarDescription": "Dies ist dein Jahresübersichtskalender. Feiertage erscheinen in Grau, vorgeschlagene PTO-Tage in Türkis und manuell ausgewählte Tage in Blau. Klicke auf einen beliebigen Arbeitstag, um die Auswahl manuell umzuschalten. Der Kalender aktualisiert sich sofort, wenn du verschiedene Alternativen erkundest.",
       "finishTitle": "Du bist startklar!",
       "finishDescription": "Du kennst jetzt die wichtigsten Funktionen. Stell deine Einstellungen in der Seitenleiste ein – die App erledigt den Rest. Viel Spaß beim freien Sein!",
       "holidaysListTitle": "Passe deine Feiertage an",
@@ -347,11 +355,11 @@
       "step1Title": "Dein Kontext",
       "step1Description": "Wähle dein Land, deine Region und das Jahr, für das du planen möchtest. Dies konfiguriert deinen Feiertagskalender, damit wir die besten Brückentage finden.",
       "step2Title": "Deine verfügbaren Tage",
-      "step2Description": "Gib an, wie viele Urlaubstage du hast. Dies ist die Grundlage für alle Berechnungen.",
+      "step2Description": "Gib an, wie viele PTO-Tage du hast. Dies ist die Grundlage für alle Berechnungen.",
       "step3Title": "Deine Konfiguration",
       "step3Description": "Wähle deine Optimierungsstrategie und konfiguriere vergangene Tage und Übertragsmonate, um deinen Plan zu verfeinern.",
       "step4Title": "Kalender exportieren",
-      "step4Description": "Lade deine Feiertage und geplanten Urlaubstage als .ics-Datei herunter, um sie in Google Calendar, Apple Calendar oder Outlook zu importieren, oder als PDF zum Drucken oder Teilen.",
+      "step4Description": "Lade deine Feiertage und geplanten PTO-Tage als .ics-Datei herunter, um sie in Google Calendar, Apple Calendar oder Outlook zu importieren, oder als PDF zum Drucken oder Teilen.",
       "drawerTitle": "Dein Planungspanel",
       "drawerDescription": "Diese Leiste zeigt immer eine Zusammenfassung deines Plans. Wische nach oben (oder ziehe den Griff) um Alternativen zu erkunden und zu sehen, wie deine Tage verteilt sind."
     }
@@ -379,12 +387,12 @@
     "ptoDayLabel": "PTO-Tag",
     "downloadPdf": "Als .pdf herunterladen",
     "downloadingPdf": "Wird heruntergeladen",
-    "tooltip": "Wähle, was du in den Export einbeziehen möchtest: Feiertage, deine Urlaubstage oder beides.",
+    "tooltip": "Wähle, was du in den Export einbeziehen möchtest: Feiertage, deine PTO-Tage oder beides.",
     "tooltipLabel": "Info Exportoptionen",
     "pdf": {
       "holidays": "Feiertage",
-      "vacationDays": "Urlaubstage",
-      "dayOff": "Urlaubstag",
+      "ptoDays": "PTO-Tage",
+      "ptoDay": "PTO-Tag",
       "generatedOn": "Erstellt am",
       "successTitle": "PDF heruntergeladen",
       "successDescription": "Ihr Kalender wurde erfolgreich exportiert.",
@@ -393,10 +401,9 @@
     }
   },
   "ptoStatus": {
-    "autoAssigned": "Automatisch zugewiesen",
+    "autoAssigned": "Vorgeschlagen",
     "manual": "Manuell",
     "remaining": "Verbleibend",
-    "clickDays": "Klicke auf einen Tag, um ihn hinzuzufügen oder zu entfernen",
     "allAssigned": "Alle Tage zugewiesen!",
     "resetManual": "Manuelle Änderungen zurücksetzen",
     "usedDays": "{used} / {total} Tage genutzt · {pct}%",
@@ -421,19 +428,31 @@
     "errorTitle": "Ein Fehler ist aufgetreten",
     "tryAgain": "Erneut versuchen",
     "close": "Schließen",
-    "failedToSend": "Nachricht konnte nicht gesendet werden"
+    "failedToSend": "Nachricht konnte nicht gesendet werden",
+    "errors": {
+      "internal_error": "Bei uns ist etwas schiefgelaufen. Bitte versuche es später noch einmal.",
+      "invalid_email": "Diese E-Mail-Adresse sieht nicht richtig aus.",
+      "email_required": "Gib deine E-Mail-Adresse ein.",
+      "name_too_short": "Dein Name braucht mindestens 2 Zeichen.",
+      "name_too_long": "Dein Name ist zu lang.",
+      "subject_too_short": "Der Betreff braucht mindestens 5 Zeichen.",
+      "subject_too_long": "Der Betreff ist zu lang.",
+      "message_too_short": "Deine Nachricht braucht mindestens 10 Zeichen.",
+      "message_too_long": "Deine Nachricht ist zu lang.",
+      "invalid_body": "Wir konnten diese Anfrage nicht lesen. Bitte versuche es noch einmal."
+    }
   },
   "alternativesManager": {
     "option": "Option",
     "recommended": "Empfohlen",
-    "totalOff": "Gesamt frei",
+    "totalOff": "Effektive Tage",
     "efficiency": "Effizienz",
     "vsMain": "vs. Haupt",
     "alreadyApplied": "Bereits angewendet",
     "applyAlternative": "Alternative anwenden",
     "previousSuggestion": "Vorheriger Vorschlag",
     "nextSuggestion": "Nächster Vorschlag",
-    "totalDaysOff": "Freie Tage gesamt",
+    "totalDaysOff": "Effektive Tage gesamt",
     "comparison": "Vergleich",
     "daysUnit": "Tage"
   },
@@ -441,10 +460,13 @@
     "suggestionApplied": "Vorschlag erfolgreich angewendet",
     "cannotSelectPastDays": "Vergangene Tage können nicht ausgewählt werden",
     "enablePastDays": "Aktiviere \"Vergangene Tage erlauben\" in den Einstellungen, um vergangene Daten auszuwählen.",
-    "noPtoDaysRemaining": "Keine verbleibenden Urlaubstage zum Zuweisen",
+    "noPtoDaysRemaining": "Keine verbleibenden PTO-Tage zum Zuweisen",
     "removeDaysToFree": "Entferne bestehende Tage, um Platz freizugeben",
-    "cannotSelectBankHoliday": "Ein gesetzlicher Feiertag kann nicht ausgewählt werden",
-    "bankHolidayDescription": "Dieser Tag ist bereits ein nationaler oder regionaler Feiertag",
+    "cannotSelectHoliday": "Ein gesetzlicher Feiertag kann nicht ausgewählt werden",
+    "cannotSelectFreeDay": "Dieser Tag ist schon frei",
+    "cannotSelectCustomHolidayDescription": "Dieser Tag ist bereits ein eigener Feiertag und kostet dich nichts.",
+    "cannotSelectWeekendDescription": "Dieser Tag gehört bereits zum Wochenende und kostet dich nichts.",
+    "cannotSelectHolidayDescription": "Dieser Tag ist bereits ein nationaler oder regionaler Feiertag",
     "paymentFailed": "Zahlung konnte nicht gestartet werden",
     "paymentFailedDescription": "Versuch es gleich nochmal.",
     "paymentSuccess": "Zahlung erfolgreich!",
@@ -481,13 +503,11 @@
       "title": "Land",
       "tooltip": "Dein Land wird automatisch anhand deiner Verbindung erkannt. Wenn es nicht stimmt oder du Feiertage eines anderen Landes sehen möchtest, kannst du es hier manuell ändern.",
       "tooltipLabel": "Mehr Informationen zur Landesauswahl",
-      "loading": "Länder werden geladen...",
       "placeholder": "Land auswählen...",
       "search": "Länder suchen..."
     },
     "region": {
       "title": "Region",
-      "loading": "Regionen werden geladen...",
       "placeholder": "Region auswählen...",
       "search": "Regionen suchen..."
     },
@@ -513,10 +533,10 @@
       },
       "optimized": {
         "label": "Optimiert",
-        "description": "Maximiert die Effizienz der Urlaubstage",
+        "description": "Maximiert die Effizienz der PTO-Tage",
         "subtitle": "Hole die meisten freien Tage heraus",
         "pros": {
-          "maximumPerformance": "Maximale Leistung",
+          "maximumEfficiency": "Maximale Effizienz",
           "moreDays": "Mehr Gesamttage"
         },
         "cons": {
@@ -581,7 +601,7 @@
     "iHave": "Ich habe",
     "days": "Tage",
     "status": "PTO-Tage Status",
-    "autoAssigned": "Automatisch zugewiesen:",
+    "autoAssigned": "Vorgeschlagen:",
     "manuallySelected": "Manuell ausgewählt:",
     "remaining": "Verbleibend:",
     "resetManualChanges": "Manuelle Änderungen zurücksetzen",
@@ -631,10 +651,19 @@
     "expressCheckout": "Express-Bezahlung",
     "orPayWithCard": "Oder mit Karte bezahlen",
     "paymentError": "Zahlungsfehler",
+    "activationFailed": "Deine Zahlung war erfolgreich, aber Premium konnte nicht automatisch freigeschaltet werden. Stelle deinen Zugang mit der E-Mail wieder her, mit der du bezahlt hast, oder schreib uns.",
     "paymentFailed": "Zahlung fehlgeschlagen",
     "processing": "Wird verarbeitet...",
     "pay": "Bezahlen",
-    "promoSaved": "Sie haben €{saved} gespart!"
+    "promoSaved": "Sie haben {saved} gespart!",
+    "errors": {
+      "internal_error": "Bei uns ist etwas schiefgelaufen. Deine Karte wurde nicht belastet.",
+      "email_required": "Gib deine E-Mail-Adresse ein.",
+      "invalid_email": "Diese E-Mail-Adresse sieht nicht richtig aus.",
+      "invalid_body": "Wir konnten diese Anfrage nicht lesen. Bitte versuche es noch einmal.",
+      "rate_limit_exceeded": "Zu viele Versuche. Warte einen Moment und versuche es noch einmal.",
+      "promo_code_too_long": "Dieser Promo-Code ist zu lang."
+    }
   },
   "donate": {
     "donateAndUnblock": "Spenden & Freischalten",
@@ -689,7 +718,8 @@
       "amountMin": "Mindestbetrag ist 1",
       "amountMax": "Höchstbetrag ist 10.000",
       "invalidEmail": "Gib eine gültige E-Mail-Adresse ein.",
-      "emailRequired": "Gib deine E-Mail-Adresse ein."
+      "emailRequired": "Gib deine E-Mail-Adresse ein.",
+      "promoCodeTooLong": "Der Promo-Code ist zu lang"
     },
     "holiday": {
       "nameRequired": "Name des Feiertags fehlt.",
@@ -736,7 +766,7 @@
       "aiSuggestions": "KI-Vorschläge",
       "aiSuggestionsDescription": "KI-gestützte Empfehlungen basierend auf deinen Präferenzen und bisherigen Mustern.",
       "weatherIntegration": "Wetter-Integration",
-      "weatherIntegrationDescription": "Wettervorhersagen für deine geplanten Urlaubstage.",
+      "weatherIntegrationDescription": "Wettervorhersagen für deine geplanten PTO-Tage.",
       "blockedPeriods": "Gesperrte Zeiträume",
       "blockedPeriodsDescription": "Markiere Datumsbereiche, in denen du keine PTO-Vorschläge möchtest: Konferenzen, Reisen, Krankschreibungen oder Zeiten, von denen du weißt, dass du beschäftigt sein wirst.",
       "performanceOptimization": "Performance-Optimierung",
@@ -795,28 +825,7 @@
     "selectDateRange": "Daten auswählen"
   },
   "command": {
-    "commandPalette": "Befehlspalette",
     "searchPlaceholder": "Suche nach einem Befehl zum Ausführen..."
-  },
-  "errors": {
-    "contact": {
-      "VALIDATION_ERROR": "Überprüf deine Eingaben.",
-      "EMAIL_SEND_FAILED": "E-Mail konnte nicht gesendet werden. Versuch es nochmal.",
-      "SAVE_FAILED": "Deine Anfrage ist angekommen, aber beim Abschließen lief technisch etwas schief. Du musst nichts weiter tun.",
-      "RENDER_FAILED": "E-Mail konnte nicht vorbereitet werden. Versuch es nochmal.",
-      "UNKNOWN": "Ein unerwarteter Fehler ist aufgetreten. Versuch es nochmal."
-    },
-    "payment": {
-      "VALIDATION_ERROR": "Überprüf deine Eingaben.",
-      "INVALID_PROMO_CODE": "Der Promo-Code ist ungültig oder abgelaufen.",
-      "PAYMENT_FAILED": "Zahlung fehlgeschlagen.",
-      "SAVE_FAILED": "Zahlung eingeleitet, aber beim Speichern ist etwas schiefgelaufen. Meld dich beim Support.",
-      "UPDATE_STATUS_FAILED": "Zahlungsstatus konnte nicht aktualisiert werden.",
-      "SAVE_FROM_WEBHOOK_FAILED": "Zahlung vom Webhook konnte nicht gespeichert werden.",
-      "CHARGE_UPDATE_FAILED": "Belastungsdetails konnten nicht aktualisiert werden.",
-      "WEBHOOK_PROCESSING_FAILED": "Webhook-Ereignis konnte nicht verarbeitet werden.",
-      "UNKNOWN": "Ein unerwarteter Fehler ist aufgetreten. Versuch es nochmal."
-    }
   },
   "legal": {
     "lastUpdated": "Zuletzt aktualisiert: {date}"
@@ -833,8 +842,7 @@
     "link1": "Wie es funktioniert",
     "link2": "Funktionen",
     "link3": "Preise",
-    "link4": "FAQ & Support",
-    "footerStatus": "status: ok · uptime: 99.98%"
+    "link4": "FAQ & Support"
   },
   "error": {
     "retry": "Erneut versuchen",
@@ -902,6 +910,8 @@
     "failed": {
       "title": "Zahlung fehlgeschlagen",
       "description": "Wir konnten deine Zahlung nicht verarbeiten. Dir wurde nichts berechnet.",
+      "unconfirmedTitle": "Zahlung noch nicht bestätigt",
+      "unconfirmedDescription": "Wir konnten deine Zahlung gerade nicht bestätigen. Falls sie durchging, stelle deinen Zugang mit der E-Mail wieder her, mit der du bezahlt hast, oder schreib uns.",
       "whatHappened": "Was ist passiert?",
       "declined": "Deine Zahlung wurde möglicherweise abgelehnt",
       "authFailed": "Die Authentifizierung ist möglicherweise fehlgeschlagen",
@@ -915,6 +925,7 @@
       "status": "Status",
       "confirmed": "Bestätigt",
       "paymentId": "Zahlungs-ID",
+      "premiumActivationFailed": "Deine Zahlung war erfolgreich, aber der Premium-Zugang konnte nicht automatisch aktiviert werden. Lade diese Seite neu oder stelle deinen Zugang mit der E-Mail wieder her, mit der du bezahlt hast.",
       "premiumActivated": "Dein Premium ist jetzt aktiv. Viel Spaß mit allen Features!",
       "continueHome": "Weiter zur Startseite"
     }
@@ -930,12 +941,12 @@
       "command": "Weniger arbeiten.",
       "verb": "Reise",
       "highlight": "mehr",
-      "description": "Forever PTO berechnet <em>genau</em>, welche Tage du beantragen musst, damit aus deinen 22 Urlaubstagen <strong>47+ Tage außer Haus</strong> werden. Keine Tabellen. Kein Kopfzerbrechen. Kein schlechtes Gewissen.",
+      "description": "Forever PTO berechnet <em>genau</em>, welche Tage du beantragen musst, damit aus deinen 22 PTO-Tagen <strong>47+ Tage außer Haus</strong> werden. Keine Tabellen. Kein Kopfzerbrechen. Kein schlechtes Gewissen.",
       "plannerCta": "Meine Tage berechnen →",
       "demoLink": "Wie es funktioniert (30s)",
-      "stars": "4.9 · genutzt von {users} rebellischen Mitarbeitern",
+      "stars": "{rating} · genutzt von {users} rebellischen Mitarbeitern",
       "mockupLabel": "Echte freie Tage {year}",
-      "mockupRatio": "Tage · Verhältnis 2.14×",
+      "mockupRatio": "Tage · Effizienz 2,14×",
       "mockupQuote": "\"Das sind 9 lange Wochenenden, Kapitän.\"",
       "mockupLegendPto": "Urlaub",
       "mockupLegendHoliday": "Feiertag",
@@ -957,17 +968,18 @@
       "titleEnd": "in 60 Sekunden.",
       "description": "Keine Installation. Keine Kreditkarte. Kein Newsletter. Sag uns einfach, wie viele Tage du hast und wo du wohnst.",
       "inputDaysTitle": "Tage eingeben.",
-      "inputDaysDescription": "Wie viele Urlaubstage du hast und in welchem Land oder welcher Region du arbeitest. Das war's.",
+      "inputDaysDescription": "Wie viele PTO-Tage du hast und in welchem Land oder welcher Region du arbeitest. Das war's.",
       "engineTitle": "Die Engine macht die Magie.",
-      "engineDescription": "Die Engine gleicht deine Tage mit offiziellen Feiertagen und regionalen Brückentagen ab, findet alle möglichen Kombinationen und sortiert sie nach dem Verhältnis freie Tage zu eingesetzten Urlaubstagen.",
-      "exportTitle": "Urlaubstage beantragen.",
+      "engineDescription": "Die Engine gleicht deine Tage mit offiziellen Feiertagen und regionalen Brückentagen ab, findet alle möglichen Kombinationen und sortiert sie nach dem Verhältnis freie Tage zu eingesetzten PTO-Tagen.",
+      "exportTitle": "PTO-Tage beantragen.",
       "exportDescription": "Exportiere den Plan nach Google Kalender, Outlook oder als PDF – einfach ins HR-Formular einfügen und fertig. Kein Rätselraten mehr."
     },
     "stats": {
-      "multiplierLabel": "Durchschnittlicher Multiplikator",
-      "daysLabel": "Freie Tage mit {days} Urlaubstagen",
+      "efficiencyLabel": "Durchschnittliche Effizienz",
+      "daysLabel": "Freie Tage mit {days} PTO-Tagen",
       "countriesLabel": "Unterstützte Länder",
-      "plansLabel": "Generierte Pläne"
+      "plansLabel": "Generierte Pläne",
+      "plansValue": "12 Tsd.+"
     },
     "features": {
       "badge": "engine-tricks",
@@ -976,10 +988,10 @@
       "titleEnd": "gegen Montage.",
       "description": "Das sind die Züge, die Forever PTO automatisch für dich macht.",
       "bridgeTag": "clevere brücken",
-      "bridgeTitle": "1 Urlaubstag in 4 freie Tage verwandeln.",
+      "bridgeTitle": "1 PTO-Tag in 4 freie Tage verwandeln.",
       "bridgeDescription": "Erkennt Feiertage an Dienstagen und Donnerstagen und schlägt minimale Brücken vor. Ein strategischer Tag = ein 4-Tage-Wochenende.",
-      "ratioTag": "max-verhältnis",
-      "ratioDescription": "Bestes Verhältnis: 8 Urlaubstage zu 28 freien Tagen (ES, April 26).",
+      "ratioTag": "max-effizienz",
+      "ratioDescription": "Beste Effizienz: 8 PTO-Tage zu 28 freien Tagen (ES, April 26).",
       "syncTag": "sync in 1 klick",
       "syncTitle": "Google · Outlook · iCal",
       "syncDescription": "Exportiere deinen Plan in den Kalender, den du bereits nutzt.",
@@ -1012,7 +1024,7 @@
       "withTitle": "😎 Mit Forever PTO",
       "withItems": {
         "planInJanuary": "Du planst alles im Januar, während du auf deinen Kaffee wartest.",
-        "dayMultiplier": "Jeder Urlaubstag gibt dir im Schnitt 2,1 freie Tage zurück.",
+        "dayEfficiency": "Jeder PTO-Tag gibt dir im Schnitt 2,1 freie Tage zurück.",
         "visualCalendar": "Du siehst das ganze Jahr in einem übersichtlichen Kalender.",
         "bookFirst": "Du buchst zuerst, ohne schlechtes Gewissen, mit Daten.",
         "burnAllDays": "Du verbrauchst 100% deiner Tage. So wie es sein sollte."
@@ -1045,12 +1057,12 @@
           "role": "QA engineer · Lissabon"
         },
         "lauraT": {
-          "text": "Meine Chefin fragte mich, wie ich 34 freie Tage mit nur 22 Urlaubstagen hatte. Ich sagte „Strategie\". Die App habe ich nicht erwähnt.",
+          "text": "Meine Chefin fragte mich, wie ich 34 freie Tage mit nur 22 PTO-Tagen hatte. Ich sagte „Strategie\". Die App habe ich nicht erwähnt.",
           "name": "Laura T.",
           "role": "Marketing Manager · Paris"
         },
         "thomasK": {
-          "text": "ROI: 22 Urlaubstage rein, 47 freie Tage raus. Das ist ein Multiplikator von 2,1×. Schlechtere Features habe ich schon bei der Arbeit geliefert.",
+          "text": "ROI: 22 PTO-Tage rein, 47 freie Tage raus. Das ist eine Effizienz von 2,1×. Schlechtere Features habe ich schon bei der Arbeit geliefert.",
           "name": "Thomas K.",
           "role": "Software-Architekt · Amsterdam"
         }
@@ -1140,7 +1152,7 @@
             },
             "holidays": {
               "label": "Feiertags-Speicher:",
-              "description": "Speichert deine benutzerdefinierten Feiertage und Urlaubstage-Konfiguration."
+              "description": "Speichert deine benutzerdefinierten Feiertage und PTO-Tage-Konfiguration."
             },
             "location": {
               "label": "Standort-Speicher:",
@@ -1564,7 +1576,7 @@
           "description": "Die kostenlose Version bietet:",
           "items": {
             "optimization": "Grundlegende PTO-Optimierung basierend auf gesetzlichen Feiertagen",
-            "visualization": "Kalendervisualisierung von Feiertagen und Urlaubstagen",
+            "visualization": "Kalendervisualisierung von Feiertagen und PTO-Tagen",
             "customHolidays": "Möglichkeit, benutzerdefinierte Feiertage hinzuzufügen",
             "metrics": "Grundlegende Kennzahlen und zusammenfassende Statistiken",
             "strategy": "Auswahl verschiedener Optimierungsstrategien"

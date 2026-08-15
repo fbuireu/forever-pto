@@ -6,6 +6,7 @@ import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useLocationStore } from '@application/stores/location';
 import { usePremiumStore } from '@application/stores/premium';
+import { resolveSelectedDays } from '@domain/calendar/utils/selection';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { Clock } from '@ui/modules/core/animate/icons/Clock';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
@@ -92,13 +93,15 @@ export const Summary = () => {
 
   const activeSuggestion = currentSelection ?? suggestion;
 
+  const holidaysInWindow = useMemo(() => (holidays ?? []).filter((holiday) => holiday.isInSelectedRange), [holidays]);
+
   const holidayMetrics = useMemo(() => {
-    const regionalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL).length ?? 0;
-    const nationalDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.NATIONAL).length ?? 0;
-    const customDays = holidays?.filter((holiday) => holiday.variant === HolidayVariant.CUSTOM).length ?? 0;
+    const regionalDays = holidaysInWindow.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL).length;
+    const nationalDays = holidaysInWindow.filter((holiday) => holiday.variant === HolidayVariant.NATIONAL).length;
+    const customDays = holidaysInWindow.filter((holiday) => holiday.variant === HolidayVariant.CUSTOM).length;
     const totalHolidays = nationalDays + regionalDays + customDays;
     return { regionalDays, nationalDays, customDays, totalHolidays };
-  }, [holidays]);
+  }, [holidaysInWindow]);
 
   const locationInfo = useMemo(() => {
     const userCountry = countries.find(({ value }) => value.toLowerCase() === country.toLowerCase());
@@ -114,12 +117,17 @@ export const Summary = () => {
     const { metrics } = activeSuggestion;
     const effectiveDays = metrics.totalEffectiveDays;
     const increment = effectiveDays - ptoDays;
-    const efficiencyPercentage = ptoDays > 0 ? (increment / ptoDays) * 100 : 0;
+    const gain = ptoDays > 0 ? (increment / ptoDays) * 100 : 0;
+    const placedDays = resolveSelectedDays({
+      days: activeSuggestion.days,
+      manuallySelectedDays,
+      removedSuggestedDays,
+    }).length;
 
     const maxAlternative = Math.max(
       effectiveDays,
       ...(alternatives?.reduce<number[]>((acc, a) => {
-        const v = a?.metrics?.totalEffectiveDays;
+        const v = a?.metrics.totalEffectiveDays;
         if (typeof v === 'number') acc.push(v);
         return acc;
       }, []) ?? [])
@@ -130,15 +138,16 @@ export const Summary = () => {
       metrics,
       effectiveDays,
       increment,
-      efficiencyPercentage,
+      gain,
+      placedDays,
       maxAlternative,
       canImprove,
     };
-  }, [activeSuggestion, ptoDays, alternatives]);
+  }, [activeSuggestion, ptoDays, alternatives, manuallySelectedDays, removedSuggestedDays]);
 
   const content = (() => {
     if (!metricsData) return null;
-    const { metrics, effectiveDays, increment, efficiencyPercentage, canImprove } = metricsData;
+    const { metrics, effectiveDays, increment, gain, placedDays, canImprove } = metricsData;
     return (
       <div className='w-full max-w-4xl mx-auto space-y-6 z-1'>
         <Card>
@@ -167,7 +176,7 @@ export const Summary = () => {
                       strategy: tSidebar(`strategy.${strategy}.label`).toLowerCase(),
                       effectiveDays,
                       increment,
-                      percentage: efficiencyPercentage.toFixed(0),
+                      percentage: gain.toFixed(0),
                     })
                   : t('summaryParagraph.withoutGain', {
                       ptoDays,
@@ -195,13 +204,14 @@ export const Summary = () => {
             <div className='hidden sm:block'>
               <YearTimelineChart
                 year={year}
-                holidays={holidays ?? []}
+                carryOverMonths={carryOverMonths}
+                holidays={holidaysInWindow}
                 suggestion={activeSuggestion}
                 manuallySelectedDays={manuallySelectedDays}
               />
             </div>
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
-              <HolidaysDistributionChart ptoDays={ptoDays} holidays={holidays ?? []} />
+              <HolidaysDistributionChart ptoDays={ptoDays} holidays={holidaysInWindow} />
               <QuarterDistributionChart quarterDist={metrics.quarterDist} />
             </div>
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
@@ -214,7 +224,7 @@ export const Summary = () => {
             </div>
             <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
               <MetricCard
-                label={t('metrics.vacationDays')}
+                label={t('metrics.ptoDays')}
                 value={ptoDays}
                 icon={CalendarDays}
                 badge={t('metrics.days')}
@@ -231,15 +241,15 @@ export const Summary = () => {
                 label={t('metrics.effectiveDays')}
                 value={effectiveDays}
                 icon={TrendingUp}
-                badge={increment > 0 ? `+${increment} ${t('metrics.extra')}` : `0 ${t('metrics.extra')}`}
+                badge={`${increment > 0 ? `+${increment}` : '0'} ${t('metrics.overBudget', { ptoDays })}`}
                 colorScheme='purple'
               />
               <MetricCard
-                label={t('metrics.multiplier')}
-                value={efficiencyPercentage.toFixed(0)}
+                label={t('metrics.gain')}
+                value={gain.toFixed(0)}
                 symbol={'%'}
                 icon={Zap}
-                badge={t('metrics.performance')}
+                badge={t('metrics.perPtoDay', { ptoDays })}
                 colorScheme='amber'
               />
             </div>
@@ -255,7 +265,7 @@ export const Summary = () => {
               </PremiumFeature>
               <PremiumFeature feature={t('metrics.advancedMetrics')} iconSize='size-7'>
                 <MetricCard
-                  label={t('metrics.vacationPeriods')}
+                  label={t('metrics.restBlocks')}
                   value={metrics.restBlocks}
                   icon={BarChart3}
                   colorScheme='purple'
@@ -263,8 +273,10 @@ export const Summary = () => {
                 />
               </PremiumFeature>
               <MetricCard
-                label={t('metrics.dayOffRatio')}
+                label={t('metrics.efficiency')}
                 value={metrics.averageEfficiency.toFixed(1)}
+                decimalPlaces={1}
+                hint={t('metrics.perPlacedDay', { placedDays })}
                 icon={TrendingUp}
                 colorScheme='amber'
                 size={MetricCardSize.COMPACT}
@@ -279,8 +291,9 @@ export const Summary = () => {
                 />
               </PremiumFeature>
               <MetricCard
-                label={t('metrics.workdaysPerMonth')}
-                value={metrics.workingDaysPerMonth}
+                label={t('metrics.workedDaysPerMonth')}
+                value={metrics.workedDaysPerMonth}
+                decimalPlaces={1}
                 icon={Award}
                 colorScheme='violet'
                 size={MetricCardSize.COMPACT}
@@ -319,8 +332,8 @@ export const Summary = () => {
                       <div>
                         <div className='text-sm text-muted-foreground'>{t('yearSummary.maxWorkStreak')}</div>
                         <div className='text-lg font-display font-bold text-[color-mix(in_srgb,var(--color-brand-purple)_85%,black_15%)] flex justify-center dark:text-[color-mix(in_srgb,var(--color-brand-purple)_70%,white_30%)]'>
-                          <SlidingNumber number={metrics.maxWorkingPeriod} />{' '}
-                          {t('yearSummary.daysCount', { count: metrics.maxWorkingPeriod })}
+                          <SlidingNumber number={metrics.maxWorkStreak} />{' '}
+                          {t('yearSummary.daysCount', { count: metrics.maxWorkStreak })}
                         </div>
                       </div>
                       <div>
@@ -336,7 +349,7 @@ export const Summary = () => {
                         +<SlidingNumber number={metrics.bonusDays} />
                       </div>
                       <div className='text-xs text-[var(--color-brand-purple)] dark:text-[color-mix(in_srgb,var(--color-brand-purple)_60%,white_40%)]'>
-                        {t('yearSummary.daysGained')}
+                        {t('yearSummary.bonusDaysCaption')}
                       </div>
                     </div>
                   </div>

@@ -1,14 +1,18 @@
 import { FilterStrategy } from '@domain/calendar/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useFiltersStore } from './filters';
+import { MAX_CARRY_OVER_MONTHS, MAX_PTO_DAYS, MIN_CARRY_OVER_MONTHS, MIN_PTO_DAYS, useFiltersStore } from './filters';
+
+const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
 
 vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({
-  getBetterStackInstance: vi.fn().mockReturnValue({ logError: vi.fn(), warn: vi.fn() }),
+  getBetterStackInstance: vi.fn().mockReturnValue({ logError: mockLogError, warn: mockWarn }),
 }));
 
+const { mockStorageGetItem } = vi.hoisted(() => ({ mockStorageGetItem: vi.fn().mockResolvedValue(null) }));
+
 vi.mock('./crypto', () => ({
-  encryptedStorage: {
-    getItem: vi.fn().mockResolvedValue(null),
+  obfuscatedStorage: {
+    getItem: mockStorageGetItem,
     setItem: vi.fn().mockResolvedValue(undefined),
     removeItem: vi.fn().mockResolvedValue(undefined),
   },
@@ -42,9 +46,35 @@ describe('initial state', () => {
 });
 
 describe('setters', () => {
+  it('setPtoDays never drops the budget below one day, whichever control wrote it', () => {
+    useFiltersStore.getState().setPtoDays(0);
+    expect(useFiltersStore.getState().ptoDays).toBe(MIN_PTO_DAYS);
+
+    useFiltersStore.getState().setPtoDays(-5);
+    expect(useFiltersStore.getState().ptoDays).toBe(MIN_PTO_DAYS);
+  });
+
+  it('setPtoDays stores whole days, since the accrual calculator computes fractions', () => {
+    useFiltersStore.getState().setPtoDays(12.6);
+    expect(useFiltersStore.getState().ptoDays).toBe(13);
+  });
+
   it('setPtoDays updates ptoDays', () => {
     useFiltersStore.getState().setPtoDays(15);
     expect(useFiltersStore.getState().ptoDays).toBe(15);
+  });
+
+  it('setPtoDays caps the budget at a year, since the accrual calculator can compute past it', () => {
+    useFiltersStore.getState().setPtoDays(5000);
+    expect(useFiltersStore.getState().ptoDays).toBe(MAX_PTO_DAYS);
+  });
+
+  it('setCarryOverMonths holds the slider bounds, whichever caller wrote it', () => {
+    useFiltersStore.getState().setCarryOverMonths(99);
+    expect(useFiltersStore.getState().carryOverMonths).toBe(MAX_CARRY_OVER_MONTHS);
+
+    useFiltersStore.getState().setCarryOverMonths(-3);
+    expect(useFiltersStore.getState().carryOverMonths).toBe(MIN_CARRY_OVER_MONTHS);
   });
 
   it('setAllowPastDays updates allowPastDays', () => {
@@ -83,6 +113,76 @@ describe('setCountry', () => {
     useFiltersStore.setState({ region: 'CAT' });
     useFiltersStore.getState().setCountry('FR');
     expect(useFiltersStore.getState().region).toBe('');
+  });
+});
+
+describe('persistence', () => {
+  it('discards the year stored by a pre-partialize payload', async () => {
+    mockStorageGetItem.mockResolvedValueOnce({
+      state: { ptoDays: 15, carryOverMonths: 3, strategy: FilterStrategy.OPTIMIZED, year: 2020 },
+      version: 1,
+    });
+
+    await useFiltersStore.persist.rehydrate();
+
+    const state = useFiltersStore.getState();
+    expect(state.year).toBe(new Date().getFullYear());
+    expect(state.ptoDays).toBe(15);
+    expect(state.carryOverMonths).toBe(3);
+  });
+
+  it('keeps the persisted filters of a current payload', async () => {
+    mockStorageGetItem.mockResolvedValueOnce({
+      state: { ptoDays: 8, country: 'IT', carryOverMonths: 2 },
+      version: 2,
+    });
+
+    await useFiltersStore.persist.rehydrate();
+
+    const state = useFiltersStore.getState();
+    expect(state.ptoDays).toBe(8);
+    expect(state.country).toBe('IT');
+    expect(state.year).toBe(new Date().getFullYear());
+  });
+});
+
+describe('onRehydrateStorage', () => {
+  const runRehydrate = (error?: Error) => {
+    const options = useFiltersStore.persist.getOptions();
+    const listener = options.onRehydrateStorage?.(useFiltersStore.getState() as never);
+    listener?.(useFiltersStore.getState() as never, error);
+  };
+
+  it('logs a rehydration failure without blocking the listener on the logging client', async () => {
+    mockLogError.mockClear();
+
+    runRehydrate(new Error('deobfuscate failed'));
+
+    expect(mockLogError).not.toHaveBeenCalled();
+    await vi.waitFor(() =>
+      expect(mockLogError).toHaveBeenCalledWith('Error rehydrating filters store', expect.any(Error), {
+        storeName: 'filters-store',
+        hasState: true,
+      })
+    );
+  });
+
+  it('logs nothing when rehydration succeeds', async () => {
+    mockLogError.mockClear();
+
+    runRehydrate();
+
+    await Promise.resolve();
+    expect(mockLogError).not.toHaveBeenCalled();
+  });
+
+  it('pulls a stored budget back inside its bounds, since the blob predates the cap', () => {
+    useFiltersStore.setState({ ptoDays: 9000, carryOverMonths: 40 });
+
+    runRehydrate();
+
+    expect(useFiltersStore.getState().ptoDays).toBe(MAX_PTO_DAYS);
+    expect(useFiltersStore.getState().carryOverMonths).toBe(MAX_CARRY_OVER_MONTHS);
   });
 });
 

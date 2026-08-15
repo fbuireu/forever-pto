@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import enMessages from '@i18n/messages/en.json';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -33,23 +36,18 @@ const mockError = Object.assign(new Error('catastrophic failure'), { digest: 'xy
 const mockReset = vi.fn();
 
 describe('global-error', () => {
-  it('renders an html element with the detected locale', () => {
+  it('declares English on <html lang>, because English is the only catalogue it bundles', () => {
     mockUsePathname.mockReturnValue('/es/planner');
     const element = GlobalError({ error: mockError, reset: mockReset });
     expect(element.type).toBe('html');
-    expect(element.props.lang).toBe('es');
-  });
-
-  it('falls back to the default locale when pathname has no locale segment', () => {
-    mockUsePathname.mockReturnValue('/');
-    const element = GlobalError({ error: mockError, reset: mockReset });
     expect(element.props.lang).toBe('en');
   });
 
-  it('falls back to default locale when usePathname returns an empty string', () => {
-    mockUsePathname.mockReturnValue('');
-    const element = GlobalError({ error: mockError, reset: mockReset });
-    expect(element.props.lang).toBe('en');
+  it('declares English regardless of the locale in the pathname', () => {
+    for (const pathname of ['/', '', '/de/planner', '/fr']) {
+      mockUsePathname.mockReturnValue(pathname);
+      expect(GlobalError({ error: mockError, reset: mockReset }).props.lang).toBe('en');
+    }
   });
 
   it('renders a body element with font variables', () => {
@@ -60,10 +58,30 @@ describe('global-error', () => {
     expect(body.props.className).toContain('bricolage-var');
   });
 
+  it('supplies the error copy in the language it declares on <html lang>', () => {
+    mockUsePathname.mockReturnValue('/de/planner');
+    const element = GlobalError({ error: mockError, reset: mockReset });
+    const nextIntl = element.props.children.props.children;
+    expect(element.props.lang).toBe('en');
+    expect(nextIntl.props.messages.error).toEqual(enMessages.error);
+  });
+
+  it('bundles exactly one catalogue — importing all six costs every route ~500 KB', () => {
+    const source = readFileSync(resolve(process.cwd(), 'src/app/global-error.tsx'), 'utf8');
+    const catalogues = source.match(/from '@i18n\/messages\/\w+\.json'/g) ?? [];
+    expect(catalogues).toEqual(["from '@i18n/messages/en.json'"]);
+  });
+
+  it('falls back to the English copy when the pathname carries no locale', () => {
+    mockUsePathname.mockReturnValue('/');
+    const element = GlobalError({ error: mockError, reset: mockReset });
+    const nextIntl = element.props.children.props.children;
+    expect(nextIntl.props.messages.error).toEqual(enMessages.error);
+  });
+
   it('forwards error and reset to ErrorContent', () => {
     mockUsePathname.mockReturnValue('/en');
     const element = GlobalError({ error: mockError, reset: mockReset });
-    // html > body > NextIntlClientProvider > AppThemeProvider > LazyMotionProvider > div > ErrorContent
     const body = element.props.children;
     const nextIntl = body.props.children;
     const themeProvider = nextIntl.props.children;

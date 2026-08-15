@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react';
 import { Toaster } from '@ui/modules/core/primitives/Sonner';
 import { Header } from '@ui/modules/pages/homepage/navigation/Navigation';
 import { Footer } from '@ui/modules/shared/footer/Footer';
 import type { Locale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
+import type { ReactNode } from 'react';
 
 interface MarketingLayoutProps {
   children: ReactNode;

@@ -7,7 +7,6 @@ import { getCombinationKey } from '../utils/cache';
 import { findBridges, getAvailableWorkdays } from '../utils/helpers';
 
 export interface GenerateAlternativesParams {
-  year: number;
   ptoDays: number;
   holidays: HolidayDTO[];
   allowPastDays: boolean;
@@ -15,10 +14,12 @@ export interface GenerateAlternativesParams {
   maxAlternatives: number;
   existingSuggestion: Date[];
   strategy: FilterStrategy;
+  removedDays?: Date[];
 }
 
 export function generateAlternatives(params: GenerateAlternativesParams) {
-  const { ptoDays, holidays, allowPastDays, months, maxAlternatives, existingSuggestion, strategy } = params;
+  const { ptoDays, holidays, allowPastDays, months, maxAlternatives, existingSuggestion, strategy, removedDays } =
+    params;
 
   if (ptoDays <= 0 || maxAlternatives <= 0 || existingSuggestion.length === 0) {
     return [];
@@ -33,6 +34,7 @@ export function generateAlternatives(params: GenerateAlternativesParams) {
     months,
     holidays: effectiveHolidays,
     allowPastDays,
+    removedDays,
   });
 
   const bridges = findBridges({ availableWorkdays, holidays: effectiveHolidays });
@@ -45,9 +47,6 @@ export function generateAlternatives(params: GenerateAlternativesParams) {
   const alternatives: Suggestion[] = [];
   const usedCombinations = new Set<string>();
 
-  // Each comparator biases bridge selection differently (efficiency, span, PTO cost, month, etc.).
-  // Cycling through multiple orderings produces genuinely distinct alternatives rather than
-  // minor variations of the same top bridges.
   const sortingStrategies = [
     (a: Bridge, b: Bridge) => b.efficiency - a.efficiency,
     (a: Bridge, b: Bridge) => b.effectiveDays - a.effectiveDays,
@@ -55,7 +54,6 @@ export function generateAlternatives(params: GenerateAlternativesParams) {
     (a: Bridge, b: Bridge) => b.efficiency * b.ptoDaysNeeded - a.efficiency * a.ptoDaysNeeded,
     (a: Bridge, b: Bridge) => (a.ptoDays[0]?.getMonth() || 0) - (b.ptoDays[0]?.getMonth() || 0),
     (a: Bridge, b: Bridge) => a.efficiency - b.efficiency,
-    // Intentional pseudo-random ordering to surface bridges all other strategies would bury.
     (a: Bridge, b: Bridge) => Math.sin(a.efficiency * 1000) - Math.sin(b.efficiency * 1000),
   ];
   const maxAttempts = Math.max(maxAlternatives * 3, 15);
@@ -64,16 +62,14 @@ export function generateAlternatives(params: GenerateAlternativesParams) {
   for (let attempt = 0; attempt < maxAttempts && alternatives.length < maxAlternatives; attempt++) {
     const strategyIndex = attempt % sortingStrategies.length;
     const shuffledBridges = [...sortedVariants[strategyIndex]];
-    // After one full cycle through all sort strategies, rotate the starting index on each
-    // subsequent pass so the selector picks different bridges from the same sorted order.
     if (attempt >= sortingStrategies.length) {
       const rotateBy = attempt - sortingStrategies.length;
       shuffledBridges.push(...shuffledBridges.splice(0, rotateBy % Math.max(shuffledBridges.length, 1)));
     }
     const selection =
       strategy === FilterStrategy.BALANCED
-        ? selectOptimalDaysFromBridges({ bridges: shuffledBridges, targetPtoDays: ptoDays })
-        : selectBridgesForStrategy({ bridges: shuffledBridges, targetPtoDays: ptoDays, strategy });
+        ? selectOptimalDaysFromBridges({ bridges: shuffledBridges, targetPtoDays: ptoDays, presorted: true })
+        : selectBridgesForStrategy({ bridges: shuffledBridges, targetPtoDays: ptoDays, strategy, presorted: true });
     if (selection.days.length > 0) {
       const alternative: Suggestion = {
         days: selection.days.toSorted((a, b) => a.getTime() - b.getTime()),

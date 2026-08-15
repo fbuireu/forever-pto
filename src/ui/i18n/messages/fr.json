@@ -1,4 +1,10 @@
 {
+  "a11y": {
+    "closeDialog": "Fermer",
+    "toggleSidebar": "Afficher ou masquer la barre latérale",
+    "sidebarLandmark": "Réglages du planificateur",
+    "radialNavigation": "Navigation des fonctionnalités"
+  },
   "metadata": {
     "title": "Forever PTO - Gère tes jours de congé",
     "description": "Planifie et optimise tes vacances et jours de congé avec Forever PTO. Trouve les meilleurs ponts et maximise ton temps libre.",
@@ -29,6 +35,7 @@
   },
   "planner": {
     "title": "Forever PTO",
+    "heading": "Planificateur",
     "description": "Ton planificateur PTO intelligent. Configure tes jours de congé, pays et stratégie pour profiter au maximum de chaque jour férié.",
     "subtitle": "Ton optimiseur de congés intelligent. Arrête de perdre des jours.",
     "titleHighlight1": "Ton année",
@@ -55,23 +62,24 @@
   "summary": {
     "title": "Récapitulatif congés {year} - {nextYear}",
     "metrics": {
-      "vacationDays": "Jours de vacances",
+      "ptoDays": "Jours de congé",
       "days": "jours",
       "holidays": "Jours fériés",
       "national": "nat.",
       "regional": "rég.",
       "custom": "perso.",
-      "effectiveDays": "Jours de repos effectifs",
-      "extra": "supplémentaires",
-      "multiplier": "Multiplicateur",
-      "performance": "gain",
+      "effectiveDays": "Jours effectifs",
+      "overBudget": "sur ton budget de {ptoDays} {ptoDays, plural, one {jour} other {jours}}",
+      "gain": "Gain",
+      "perPtoDay": "de ton budget de {ptoDays} {ptoDays, plural, one {jour} other {jours}}",
       "longWeekends": "Longs week-ends",
-      "vacationPeriods": "Périodes de vacances",
-      "dayOffRatio": "Ratio jour/repos",
+      "restBlocks": "Blocs de repos",
+      "efficiency": "Efficacité",
       "bridgesUsed": "Ponts utilisés",
-      "workdaysPerMonth": "Jours ouvrés/mois",
+      "workedDaysPerMonth": "Jours travaillés/mois",
       "longestVacation": "Plus longues vacances",
-      "advancedMetrics": "Métriques avancées"
+      "advancedMetrics": "Métriques avancées",
+      "perPlacedDay": "par jour utilisé ({placedDays})"
     },
     "yearSummary": {
       "feature": "Résumé de l'année",
@@ -81,12 +89,12 @@
       "maxWorkStreak": "Plus longue série de travail",
       "lastBreak": "Dernière pause",
       "totalBonusDays": "Total jours bonus",
-      "daysGained": "jours gagnés grâce à l'optimisation",
+      "bonusDaysCaption": "jours bonus grâce à l’optimisation",
       "daysCount": "{count, plural, one {jour} other {jours}}"
     },
     "summaryParagraph": {
-      "withGain": "Avec tes {ptoDays} jours de vacances et {totalHolidays} jours fériés, la stratégie {strategy} les transforme en {effectiveDays} jours de repos effectifs, soit {increment} jours supplémentaires, une amélioration de +{percentage}% par rapport à une utilisation classique.",
-      "withoutGain": "Avec tes {ptoDays} jours de vacances et {totalHolidays} jours fériés, tu obtiens {effectiveDays} jours de repos effectifs avec la stratégie {strategy}.",
+      "withGain": "Avec tes {ptoDays} jours de congé et {totalHolidays} jours fériés, la stratégie {strategy} les transforme en {effectiveDays} jours de repos effectifs, soit {increment} jours au-dessus de ton budget, un gain de +{percentage}% par rapport à une utilisation classique.",
+      "withoutGain": "Avec tes {ptoDays} jours de congé et {totalHolidays} jours fériés, tu obtiens {effectiveDays} jours de repos effectifs avec la stratégie {strategy}.",
       "noRegionHintTitle": "Ajoute ta région",
       "noRegionHint": "Sélectionne ta région dans la barre latérale pour inclure les jours fériés régionaux et potentiellement obtenir encore plus de jours de repos.",
       "withRegion": "{regionalDays} de tes jours fériés sont spécifiques à {region}."
@@ -180,7 +188,7 @@
         },
         "encryption": {
           "question": "Mes données sont-elles chiffrées ?",
-          "answer": "Tes données de planification de vacances sont stockées localement dans ton navigateur. Nous appliquons un chiffrement par obfuscation XOR pour rendre les données illisibles lors d'une inspection rapide. Cette méthode est conçue pour éviter une exposition accidentelle, pas pour protéger contre des attaquants déterminés. Nous ne stockons pas d'informations personnelles sensibles, et tu gardes le contrôle total de tes données sur ton appareil. Toutes tes données (jours de congé, dates sélectionnées, jours fériés personnalisés, préférences) sont stockées exclusivement dans le stockage local de ton navigateur. Nous n'envoyons jamais ces informations à nos serveurs. Ta planification de vacances reste entièrement privée sur ton appareil."
+          "answer": "Tes données de planification de vacances sont stockées localement dans ton navigateur. Nous appliquons une légère obfuscation (XOR) pour que les données ne soient pas lisibles au premier coup d'œil. Ce n'est pas du chiffrement et cela ne protège pas contre un attaquant déterminé : cela évite une exposition accidentelle. Nous ne stockons pas d'informations personnelles sensibles, et tu gardes le contrôle total de tes données sur ton appareil. Toutes tes données (jours de congé, dates sélectionnées, jours fériés personnalisés, préférences) sont stockées exclusivement dans le stockage local de ton navigateur. Nous n'envoyons jamais ces informations à nos serveurs. Ta planification de vacances reste entièrement privée sur ton appareil."
         },
         "tracking": {
           "question": "Vendez-vous mes données ou suivez-vous mes projets de congés ?",
@@ -213,11 +221,12 @@
     "tooltipLabel": "Plus d'informations sur le compteur de jours ouvrés",
     "selectRange": "Sélectionner des dates",
     "clearSelection": "Effacer la sélection",
-    "workingDays": "Jours ouvrés",
+    "workdays": "Jours ouvrés",
     "businessDays": "Jours ouvrés dans la plage sélectionnée",
     "days": "Jours",
     "weekendDays": "Jours de week-end",
     "holidays": "Jours fériés",
+    "holidaysOutsideRange": "Nous ne connaissons les jours fériés que pour {from}–{to} ; ceux en dehors comptent comme des jours ouvrés.",
     "dateRange": "Plage de dates",
     "from": "Du",
     "to": "au"
@@ -244,7 +253,6 @@
     "onWorkdays": "Les jours ouvrés",
     "showing": "Affichage de",
     "of": "sur",
-    "total": "au total",
     "addHoliday": "Ajouter un jour férié",
     "add": "Ajouter",
     "editHoliday": "Modifier le jour férié",
@@ -266,7 +274,7 @@
     "distributionDescription": "Répartition de tes {ptoDays} jours de congé, {nationalDays} jours fériés nationaux{regionalPart}{customPart}.",
     "regionalPart": ", {regionalDays} régionaux",
     "customPart": " et {customDays} personnalisés",
-    "quarterDescription": "Répartition de {totalDays} jours de repos effectifs sur {activeQuarters} trimestre{plural} de l'année.",
+    "quarterDescription": "Répartition de {totalDays} jours effectifs sur {activeQuarters, plural, one {# trimestre} other {# trimestres}} de ta fenêtre de planification.",
     "annualTimeline": "Chronologie annuelle",
     "annualTimelineFeature": "Graphique de chronologie annuelle",
     "timelineDescription": "Évolution mensuelle de {totalDays} jours de repos répartis sur {activeMonths} mois. Pic en {peakMonth} avec {peakDays} jours.",
@@ -274,7 +282,7 @@
     "longBlocksPerQuarter": "Blocs longs par trimestre",
     "longBlocksFeature": "Graphique des blocs longs par trimestre",
     "blocksDescription": "{totalBlocks} blocs longs (3+ jours consécutifs) idéaux pour les vacances{bestQuarterPart}.",
-    "bestQuarterPart": ". Meilleur trimestre : T{bestQuarter} avec {maxBlocks} bloc{plural}",
+    "bestQuarterPart": ". Meilleur trimestre : T{bestQuarter} avec {maxBlocks, plural, one {# bloc} other {# blocs}}",
     "blocks": "blocs",
     "blocksOf3Days": "Blocs de 3+ jours"
   },
@@ -294,6 +302,8 @@
       "errorTitle": "Erreur lors de la création du jour férié",
       "errorDescription": "Quelque chose s'est mal passé. Réessaie.",
       "existsTitle": "Le jour férié existe déjà",
+      "manualDayExistsTitle": "Ce jour est déjà un jour de congé",
+      "manualDayExistsDescription": "Tu as déjà réservé le {date} comme jour de congé. Retire-le de ton plan, puis ajoute le jour férié.",
       "existsDescription": "Il y a déjà un jour férié le {date} : {name}"
     },
     "editHoliday": {
@@ -325,8 +335,6 @@
   },
   "tutorial": {
     "description": "Configure ton plan en 2 étapes : d'abord ta localisation, puis tes jours et ta stratégie. Clique sur le bouton pour un tutoriel interactif.",
-    "startButton": "Démarrer le tutoriel",
-    "restartButton": "Relancer le tutoriel interactif",
     "nextBtn": "Suivant",
     "prevBtn": "Précédent",
     "doneBtn": "Terminé",
@@ -383,8 +391,8 @@
     "tooltipLabel": "Info options d'export",
     "pdf": {
       "holidays": "Jours fériés",
-      "vacationDays": "Jours de vacances",
-      "dayOff": "Jour de vacances",
+      "ptoDays": "Jours de congé",
+      "ptoDay": "Jour de congé",
       "generatedOn": "Généré le",
       "successTitle": "PDF téléchargé",
       "successDescription": "Votre calendrier a été exporté avec succès.",
@@ -393,10 +401,9 @@
     }
   },
   "ptoStatus": {
-    "autoAssigned": "Attribués automatiquement",
+    "autoAssigned": "Suggérés",
     "manual": "Manuel",
     "remaining": "Restants",
-    "clickDays": "Clique sur les jours pour attribuer/retirer",
     "allAssigned": "Tous tes jours sont attribués !",
     "resetManual": "Réinitialiser les modifications manuelles",
     "usedDays": "{used} / {total} jours utilisés · {pct}%",
@@ -421,19 +428,31 @@
     "errorTitle": "Une erreur est survenue",
     "tryAgain": "Réessayer",
     "close": "Fermer",
-    "failedToSend": "Échec de l'envoi du message"
+    "failedToSend": "Échec de l'envoi du message",
+    "errors": {
+      "internal_error": "Quelque chose s'est mal passé de notre côté. Réessaie plus tard.",
+      "invalid_email": "Cette adresse e-mail ne semble pas valide.",
+      "email_required": "Saisis ton adresse e-mail.",
+      "name_too_short": "Ton nom doit contenir au moins 2 caractères.",
+      "name_too_long": "Ton nom est trop long.",
+      "subject_too_short": "Le sujet doit contenir au moins 5 caractères.",
+      "subject_too_long": "Le sujet est trop long.",
+      "message_too_short": "Ton message doit contenir au moins 10 caractères.",
+      "message_too_long": "Ton message est trop long.",
+      "invalid_body": "Nous n'avons pas pu lire cette demande. Réessaie."
+    }
   },
   "alternativesManager": {
     "option": "Option",
     "recommended": "Recommandée",
-    "totalOff": "Total repos",
+    "totalOff": "Jours effectifs",
     "efficiency": "Efficacité",
     "vsMain": "vs principal",
     "alreadyApplied": "Déjà appliquée",
     "applyAlternative": "Appliquer l'alternative",
     "previousSuggestion": "Suggestion précédente",
     "nextSuggestion": "Suggestion suivante",
-    "totalDaysOff": "Total jours de repos",
+    "totalDaysOff": "Total des jours effectifs",
     "comparison": "Comparaison",
     "daysUnit": "jours"
   },
@@ -443,8 +462,11 @@
     "enablePastDays": "Active \"Autoriser les jours passés\" dans les paramètres pour sélectionner des dates passées",
     "noPtoDaysRemaining": "Plus de jours de congé à attribuer",
     "removeDaysToFree": "Supprime des jours existants pour libérer de la place",
-    "cannotSelectBankHoliday": "Impossible de sélectionner un jour férié",
-    "bankHolidayDescription": "Ce jour est déjà un jour férié national ou régional",
+    "cannotSelectHoliday": "Impossible de sélectionner un jour férié",
+    "cannotSelectFreeDay": "Ce jour est déjà libre",
+    "cannotSelectCustomHolidayDescription": "Ce jour est déjà un jour férié personnalisé, il ne te coûte rien.",
+    "cannotSelectWeekendDescription": "Ce jour fait déjà partie du week-end, il ne te coûte rien.",
+    "cannotSelectHolidayDescription": "Ce jour est déjà un jour férié national ou régional",
     "paymentFailed": "Échec de l'initialisation du paiement",
     "paymentFailedDescription": "Réessaie plus tard",
     "paymentSuccess": "Paiement réussi !",
@@ -481,13 +503,11 @@
       "title": "Pays",
       "tooltip": "On détecte ton pays depuis ta connexion. Si ce n'est pas le bon ou si tu veux voir les jours fériés d'un autre pays, tu peux le changer ici.",
       "tooltipLabel": "Plus d'informations sur la sélection du pays",
-      "loading": "Chargement des pays...",
       "placeholder": "Sélectionner un pays...",
       "search": "Rechercher des pays..."
     },
     "region": {
       "title": "Région",
-      "loading": "Chargement des régions...",
       "placeholder": "Sélectionner une région...",
       "search": "Rechercher des régions..."
     },
@@ -516,7 +536,7 @@
         "description": "Maximise l'efficacité des jours de congé",
         "subtitle": "Obtiens le maximum de jours de repos possible",
         "pros": {
-          "maximumPerformance": "Performance maximale",
+          "maximumEfficiency": "Efficacité maximale",
           "moreDays": "Plus de jours au total"
         },
         "cons": {
@@ -581,7 +601,7 @@
     "iHave": "J'ai",
     "days": "jours",
     "status": "Statut des jours de congé",
-    "autoAssigned": "Attribués automatiquement :",
+    "autoAssigned": "Suggérés :",
     "manuallySelected": "Sélectionnés manuellement :",
     "remaining": "Restants :",
     "resetManualChanges": "Réinitialiser les modifications manuelles",
@@ -631,10 +651,19 @@
     "expressCheckout": "Paiement express",
     "orPayWithCard": "Ou payer par carte",
     "paymentError": "Erreur de paiement",
+    "activationFailed": "Ton paiement a bien été effectué, mais nous n’avons pas pu débloquer premium automatiquement. Récupère ton accès avec l’e-mail utilisé pour payer, ou contacte-nous.",
     "paymentFailed": "Le paiement a échoué",
     "processing": "Traitement en cours...",
     "pay": "Payer",
-    "promoSaved": "Vous avez économisé €{saved} !"
+    "promoSaved": "Vous avez économisé {saved} !",
+    "errors": {
+      "internal_error": "Quelque chose s'est mal passé de notre côté. Ta carte n'a pas été débitée.",
+      "email_required": "Saisis ton adresse e-mail.",
+      "invalid_email": "Cette adresse e-mail ne semble pas valide.",
+      "invalid_body": "Nous n'avons pas pu lire cette demande. Réessaie.",
+      "rate_limit_exceeded": "Trop de tentatives. Patiente un instant et réessaie.",
+      "promo_code_too_long": "Ce code promo est trop long."
+    }
   },
   "donate": {
     "donateAndUnblock": "Donner et débloquer",
@@ -689,7 +718,8 @@
       "amountMin": "Le montant minimum est de 1",
       "amountMax": "Le montant maximum est de 10 000",
       "invalidEmail": "Un e-mail valide est requis",
-      "emailRequired": "L'e-mail est requis"
+      "emailRequired": "L'e-mail est requis",
+      "promoCodeTooLong": "Le code promo est trop long"
     },
     "holiday": {
       "nameRequired": "Le nom du jour férié est requis",
@@ -795,28 +825,7 @@
     "selectDateRange": "Sélectionner des dates"
   },
   "command": {
-    "commandPalette": "Palette de commandes",
     "searchPlaceholder": "Rechercher une commande à exécuter..."
-  },
-  "errors": {
-    "contact": {
-      "VALIDATION_ERROR": "Données saisies invalides.",
-      "EMAIL_SEND_FAILED": "L'envoi de l'e-mail a échoué. Réessaie.",
-      "SAVE_FAILED": "Nous avons bien reçu ta demande, même si nous avons rencontré un petit problème technique lors de la finalisation des logs. Aucune action supplémentaire n'est nécessaire de ta part.",
-      "RENDER_FAILED": "La préparation de l'e-mail a échoué. Réessaie.",
-      "UNKNOWN": "Une erreur inattendue s'est produite. Réessaie."
-    },
-    "payment": {
-      "VALIDATION_ERROR": "Données saisies invalides.",
-      "INVALID_PROMO_CODE": "Le code promotionnel est invalide ou expiré.",
-      "PAYMENT_FAILED": "Le traitement du paiement a échoué.",
-      "SAVE_FAILED": "Ton paiement a bien été effectué, mais une erreur technique est survenue lors de la finalisation. Contacte le support avec ton identifiant de transaction.",
-      "UPDATE_STATUS_FAILED": "Impossible de confirmer le statut de ton paiement. Contacte le support.",
-      "SAVE_FROM_WEBHOOK_FAILED": "La confirmation du paiement n'a pas pu être enregistrée. Contacte le support.",
-      "CHARGE_UPDATE_FAILED": "Les détails du paiement n'ont pas pu être mis à jour.",
-      "WEBHOOK_PROCESSING_FAILED": "La confirmation du paiement a rencontré un problème. Contacte le support.",
-      "UNKNOWN": "Une erreur inattendue s'est produite. Réessaie."
-    }
   },
   "legal": {
     "lastUpdated": "Dernière mise à jour : {date}"
@@ -833,8 +842,7 @@
     "link1": "Comment ça marche",
     "link2": "Fonctionnalités",
     "link3": "Tarifs",
-    "link4": "FAQ et support",
-    "footerStatus": "statut : ok · uptime : 99.98%"
+    "link4": "FAQ et support"
   },
   "error": {
     "retry": "Réessayer",
@@ -890,7 +898,7 @@
     "previousMonth": "Mois précédent",
     "nextMonth": "Mois suivant",
     "today": "Aujourd'hui",
-    "daysOff": "{count, plural, one {# jour de congé} other {# jours de congé}}"
+    "daysOff": "{count, plural, one {# jour libre} other {# jours libres}}"
   },
   "holidayRow": {
     "weekend": "Week-end",
@@ -902,6 +910,8 @@
     "failed": {
       "title": "Paiement échoué",
       "description": "Nous n'avons pas pu traiter ton paiement. Tu n'as pas été débité.",
+      "unconfirmedTitle": "Paiement pas encore confirmé",
+      "unconfirmedDescription": "Nous n’avons pas pu confirmer ton paiement pour le moment. S’il a abouti, récupère ton accès avec l’e-mail utilisé pour payer, ou contacte-nous.",
       "whatHappened": "Que s'est-il passé ?",
       "declined": "Ton paiement a peut-être été refusé",
       "authFailed": "L'authentification a peut-être échoué",
@@ -915,6 +925,7 @@
       "status": "Statut",
       "confirmed": "Confirmé",
       "paymentId": "Identifiant de paiement",
+      "premiumActivationFailed": "Ton paiement a bien été effectué, mais nous n’avons pas pu activer l’accès premium automatiquement. Recharge cette page ou récupère ton accès avec l’e-mail utilisé pour payer.",
       "premiumActivated": "Ton accès premium a été activé. Tu peux désormais profiter de toutes les fonctionnalités premium !",
       "continueHome": "Continuer vers l'accueil"
     }
@@ -933,9 +944,9 @@
       "description": "Forever PTO calcule <em>exactement</em> quels jours demander pour transformer tes 22 jours de congé en <strong>47+ jours libres</strong>. Sans tableurs. Sans calculs. Sans culpabilité.",
       "plannerCta": "Calculer mes jours →",
       "demoLink": "Voir comment ça marche (30s)",
-      "stars": "4.9 · utilisé par {users} employés rebelles",
+      "stars": "{rating} · utilisé par {users} employés rebelles",
       "mockupLabel": "Vrais jours libres en {year}",
-      "mockupRatio": "jours · ratio 2.14×",
+      "mockupRatio": "jours · efficacité 2,14×",
       "mockupQuote": "\"C'est 9 longs week-ends, capitaine.\"",
       "mockupLegendPto": "Congés",
       "mockupLegendHoliday": "Férié",
@@ -964,10 +975,11 @@
       "exportDescription": "Exporte vers Google Agenda, Outlook, ou un PDF à coller dans le formulaire RH et oublie. Fini les hésitations."
     },
     "stats": {
-      "multiplierLabel": "Multiplicateur moyen",
+      "efficiencyLabel": "Efficacité moyenne",
       "daysLabel": "Jours libres avec {days} congés",
       "countriesLabel": "Pays couverts",
-      "plansLabel": "Plans générés"
+      "plansLabel": "Plans générés",
+      "plansValue": "12 k+"
     },
     "features": {
       "badge": "astuces du moteur",
@@ -978,8 +990,8 @@
       "bridgeTag": "ponts intelligents",
       "bridgeTitle": "Transforme 1 congé en 4 jours libres.",
       "bridgeDescription": "Détecte les jours fériés les mardis et jeudis et suggère des ponts minimaux. Un jour stratégique = un week-end de 4 jours.",
-      "ratioTag": "ratio max",
-      "ratioDescription": "Meilleur multiplicateur : 8 jours de congé en 28 jours libres (FR, avril 2026).",
+      "ratioTag": "max efficacité",
+      "ratioDescription": "Meilleure efficacité : 8 jours de congé en 28 jours libres (FR, avril 2026).",
       "syncTag": "sync en 1 clic",
       "syncTitle": "Google · Outlook · iCal",
       "syncDescription": "Exporte ton plan vers le calendrier que tu utilises déjà. Sans prise de tête.",
@@ -1012,7 +1024,7 @@
       "withTitle": "😎 Avec Forever PTO",
       "withItems": {
         "planInJanuary": "Tu planifies tout en janvier, en attendant ton café.",
-        "dayMultiplier": "Chaque jour de congé te rend 2,1 jours libres en moyenne.",
+        "dayEfficiency": "Chaque jour de congé te rend 2,1 jours libres en moyenne.",
         "visualCalendar": "Tu visualises toute l'année dans un calendrier clair.",
         "bookFirst": "Tu réserves en premier, sans culpabilité, avec des données.",
         "burnAllDays": "Tu utilises 100% de tes jours. Comme il se doit."
@@ -1045,12 +1057,12 @@
           "role": "QA engineer · Lisbonne"
         },
         "lauraT": {
-          "text": "Ma responsable m'a demandé comment j'avais pris 34 jours de congé avec seulement 22 jours de PTO. J'ai dit \"stratégie\". Je n'ai pas mentionné l'appli.",
+          "text": "Ma responsable m'a demandé comment j'avais pris 34 jours libres avec seulement 22 jours de PTO. J'ai dit \"stratégie\". Je n'ai pas mentionné l'appli.",
           "name": "Laura T.",
           "role": "marketing manager · Paris"
         },
         "thomasK": {
-          "text": "ROI : 22 jours de PTO en entrée, 47 jours de congé en sortie. C'est un multiplicateur de 2,1×. J'ai livré des fonctionnalités pires au boulot.",
+          "text": "ROI : 22 jours de PTO en entrée, 47 jours libres en sortie. C'est une efficacité de 2,1×. J'ai livré des fonctionnalités pires au boulot.",
           "name": "Thomas K.",
           "role": "software architect · Amsterdam"
         }

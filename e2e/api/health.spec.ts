@@ -23,12 +23,9 @@ test.describe('GET /api/health', () => {
     expect(new Date(body.timestamp).toISOString()).toBe(body.timestamp);
   });
 
-  test('body has env object with expected keys', async ({ request }) => {
+  test('discloses nothing about the deployment', async ({ request }) => {
     const body = await (await request.get(URL)).json();
-    expect(body.env).toHaveProperty('hasStripeKey');
-    expect(body.env).toHaveProperty('hasTursoUrl');
-    expect(body.env).toHaveProperty('hasTursoToken');
-    expect(body.env).toHaveProperty('nodeEnv');
+    expect(Object.keys(body).sort()).toEqual(['status', 'timestamp']);
   });
 
   test('sets Cache-Control: no-store', async ({ request }) => {

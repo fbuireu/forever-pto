@@ -11,7 +11,10 @@ const makeStoreMock = (hydrated: boolean) => {
         return () => {};
       }),
     },
-    _finish: () => listeners.forEach((cb) => { cb(); }),
+    _finish: () =>
+      listeners.forEach((cb) => {
+        cb();
+      }),
   };
 };
 
@@ -40,6 +43,28 @@ describe('useStoresReady', () => {
     premiumStore.persist.hasHydrated.mockReturnValue(true);
 
     const { result } = renderHook(() => useStoresReady());
+    expect(result.current.areStoresReady).toBe(true);
+
+    filtersStore.persist.hasHydrated.mockReturnValue(false);
+    holidaysStore.persist.hasHydrated.mockReturnValue(false);
+    locationStore.persist.hasHydrated.mockReturnValue(false);
+    premiumStore.persist.hasHydrated.mockReturnValue(false);
+  });
+
+  it('reports not ready on the first render even when every store is already hydrated', () => {
+    filtersStore.persist.hasHydrated.mockReturnValue(true);
+    holidaysStore.persist.hasHydrated.mockReturnValue(true);
+    locationStore.persist.hasHydrated.mockReturnValue(true);
+    premiumStore.persist.hasHydrated.mockReturnValue(true);
+
+    const seen: boolean[] = [];
+    const { result } = renderHook(() => {
+      const value = useStoresReady();
+      seen.push(value.areStoresReady);
+      return value;
+    });
+
+    expect(seen[0]).toBe(false);
     expect(result.current.areStoresReady).toBe(true);
 
     filtersStore.persist.hasHydrated.mockReturnValue(false);

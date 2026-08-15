@@ -1,79 +1,92 @@
-import { holidayDTO } from '@application/dto/holiday/dto';
+import { holidayDTO, isInPlanningWindow } from '@application/dto/holiday/dto';
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
-import { ensureDate, isSameMonth } from '@application/shared/utils/dates';
+import { fromStoredInstant } from '@application/shared/utils/dateIntake';
+import {
+  addMonths,
+  endOfMonth,
+  endOfYear,
+  isSameMonth,
+  isWeekend,
+  isWithinInterval,
+} from '@application/shared/utils/dates';
 import { generateMetrics } from '@domain/calendar/metrics/generateMetrics';
-import type { Suggestion } from '@domain/calendar/types';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import type { MeasuredSuggestion, Suggestion } from '@domain/calendar/types';
+import { measureBudget } from '@domain/calendar/utils/budget';
+import type { BetterStackClient } from '@infrastructure/clients/logging/better-stack/client';
 import type { Locale } from 'next-intl';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { encryptedStorage } from './crypto';
+import { obfuscatedStorage } from './crypto';
+import { useFiltersStore } from './filters';
 import { useLocationStore } from './location';
-import type {
-  AddHolidayParams,
-  AlternativeSelectionBaseParams,
-  EditHolidayParams,
-  FetchHolidaysParams,
-  GenerateAlternativesParams,
-  GenerateSuggestionsParams,
+import {
+  type AddHolidayParams,
+  type AlternativeSelectionBaseParams,
+  type DayOutcome,
+  DayRefusal,
+  type EditHolidayParams,
+  type FetchHolidaysParams,
+  type HolidayOutcome,
+  HolidayRefusal,
+  type MainThreadSuggestionsParams,
+  type PlanningWindowParams,
 } from './types';
 
-const logger = getBetterStackInstance();
+const log = (write: (logger: BetterStackClient) => void) => {
+  void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
+    write(getBetterStackInstance());
+  });
+};
 
 export interface HolidaysState {
   holidays: HolidayDTO[];
-  suggestion: Suggestion | null;
+  suggestion: MeasuredSuggestion | null;
   maxAlternatives: number;
-  alternatives: Suggestion[];
-  currentSelection: Suggestion | null;
-  previewAlternativeSelection: Suggestion | null;
+  alternatives: MeasuredSuggestion[];
+  currentSelection: MeasuredSuggestion | null;
   previewAlternativeIndex: number;
   currentSelectionIndex: number;
   manuallySelectedDays: Date[];
   removedSuggestedDays: Date[];
   isCalculating: boolean;
+  hasCalculated: boolean;
+  planRevision: number;
 }
 
 interface HolidaysActions {
   fetchHolidays: (params: FetchHolidaysParams) => Promise<void>;
-  generateSuggestions: (params: GenerateSuggestionsParams) => Promise<void>;
-  generateAlternatives: (params: GenerateAlternativesParams) => Promise<void>;
+  generateSuggestions: (params: MainThreadSuggestionsParams) => Promise<void>;
   setCalculating: (v: boolean) => void;
-  setCalculationResult: (result: { suggestion: Suggestion; alternatives: Suggestion[] }) => void;
+  setCalculationResult: (result: { suggestion: MeasuredSuggestion; alternatives: MeasuredSuggestion[] }) => void;
   setMaxAlternatives: (max: number) => void;
   setCurrentAlternativeSelection: (params: AlternativeSelectionBaseParams) => void;
   setPreviewAlternativeSelection: (params: AlternativeSelectionBaseParams) => void;
   resetToDefaults: () => void;
-  addHoliday: (params: AddHolidayParams) => void;
-  editHoliday: (params: EditHolidayParams) => void;
+  addHoliday: (params: AddHolidayParams) => HolidayOutcome;
+  editHoliday: (params: EditHolidayParams) => HolidayOutcome;
   removeHoliday: (holidayId: string) => void;
-  toggleDaySelection: (params: { date: Date; totalPtoDays: number; locale: Locale; allowPastDays: boolean }) => boolean;
+  toggleDaySelection: (params: {
+    date: Date;
+    totalPtoDays: number;
+    locale: Locale;
+    allowPastDays: boolean;
+  }) => DayOutcome;
+  pruneDaysOutsideWindow: (params?: PlanningWindowParams) => void;
+  clearCalculation: () => void;
   resetManualSelection: () => void;
   trimManualDays: (maxPtoDays: number) => void;
-  getRemainingDays: (totalPtoDays: number) => number;
   getFreeDaysForMonth: (month: Date) => number;
 }
 
 type HolidaysStore = HolidaysState & HolidaysActions;
 
-function withMetrics(
-  alternatives: Suggestion[],
-  opts: { locale: string; holidays: HolidayDTO[]; allowPastDays: boolean }
-) {
-  return alternatives.map((alt) => ({
-    ...alt,
-    metrics: generateMetrics({
-      suggestion: alt,
-      locale: opts.locale,
-      bridges: alt.bridges,
-      holidays: opts.holidays,
-      allowPastDays: opts.allowPastDays,
-    }),
-  }));
-}
-
 const STORAGE_NAME = 'holidays-store';
 const STORAGE_VERSION = 1;
+
+const getPlanningWindow = ({ year, carryOverMonths }: PlanningWindowParams) => {
+  const start = new Date(year, 0, 1);
+  return { start, end: endOfMonth(addMonths(endOfYear(start), carryOverMonths)) };
+};
 
 const holidaysInitialState: HolidaysState = {
   holidays: [],
@@ -81,13 +94,39 @@ const holidaysInitialState: HolidaysState = {
   maxAlternatives: 4,
   alternatives: [],
   currentSelection: null,
-  previewAlternativeSelection: null,
   previewAlternativeIndex: 0,
   currentSelectionIndex: 0,
   manuallySelectedDays: [],
   removedSuggestedDays: [],
   isCalculating: false,
+  hasCalculated: false,
+  planRevision: 0,
 };
+
+const serializeSuggestion = (suggestion: Suggestion) => ({
+  ...suggestion,
+  days: suggestion.days.map((d) => d.toISOString()),
+  bridges: suggestion.bridges?.map((b) => ({
+    ...b,
+    startDate: b.startDate.toISOString(),
+    endDate: b.endDate.toISOString(),
+    ptoDays: b.ptoDays.map((d) => d.toISOString()),
+  })),
+});
+
+const partializeHolidays = (state: HolidaysStore) => ({
+  holidays: state.holidays.map((h) => ({
+    ...h,
+    date: h.date.toISOString(),
+  })),
+  suggestion: state.suggestion ? serializeSuggestion(state.suggestion) : null,
+  maxAlternatives: state.maxAlternatives,
+  alternatives: state.alternatives.map(serializeSuggestion),
+  currentSelection: state.currentSelection ? serializeSuggestion(state.currentSelection) : null,
+  currentSelectionIndex: state.currentSelectionIndex,
+  manuallySelectedDays: state.manuallySelectedDays.map((d) => d.toISOString()),
+  removedSuggestedDays: state.removedSuggestedDays.map((d) => d.toISOString()),
+});
 
 export const useHolidaysStore = create<HolidaysStore>()(
   devtools(
@@ -96,10 +135,20 @@ export const useHolidaysStore = create<HolidaysStore>()(
         ...holidaysInitialState,
 
         fetchHolidays: async (params: FetchHolidaysParams) => {
+          const { holidays: currentHolidays } = get();
+          const customHolidays = currentHolidays
+            .filter((h) => h.variant === HolidayVariant.CUSTOM)
+            .map((h) => ({
+              ...h,
+              isInSelectedRange: isInPlanningWindow({
+                date: fromStoredInstant(h.date),
+                year: params.year,
+                carryOverMonths: params.carryOverMonths,
+              }),
+            }));
+
           try {
             const { regions } = useLocationStore.getState();
-            const { holidays: currentHolidays } = get();
-            const customHolidays = currentHolidays.filter((h) => h.variant === HolidayVariant.CUSTOM);
             const { getHolidays } = await import('@infrastructure/services/holidays/getHolidays');
             const holidays = await getHolidays({ ...params, regions });
             const filteredHolidays = holidays.filter((fetchedHoliday) => {
@@ -114,12 +163,14 @@ export const useHolidaysStore = create<HolidaysStore>()(
               ),
             });
           } catch (error) {
-            logger.logError('Error fetching holidays in holidays store', error, {
-              year: params.year,
-              country: params.country,
-              region: params.region,
-            });
-            set({ holidays: [] });
+            log((logger) =>
+              logger.logError('Error fetching holidays in holidays store', error, {
+                year: params.year,
+                country: params.country,
+                region: params.region,
+              })
+            );
+            set({ holidays: customHolidays });
           }
         },
 
@@ -130,140 +181,63 @@ export const useHolidaysStore = create<HolidaysStore>()(
           months,
           strategy,
           locale,
-        }: GenerateSuggestionsParams) => {
-          const { holidays, maxAlternatives } = get();
-
-          if (ptoDays <= 0 || holidays.length === 0) {
-            set({
-              suggestion: null,
-              alternatives: [],
-              currentSelection: null,
-              previewAlternativeSelection: null,
-              previewAlternativeIndex: 0,
-              currentSelectionIndex: 0,
-            });
-            return;
-          }
+          autoSuggestCount,
+        }: MainThreadSuggestionsParams) => {
+          const { holidays, maxAlternatives, manuallySelectedDays, removedSuggestedDays } = get();
 
           try {
-            const [{ generateSuggestions }, { generateAlternatives }] = await Promise.all([
-              import('@domain/calendar/suggestions/generateSuggestions'),
-              import('@domain/calendar/alternatives/generateAlternatives'),
-            ]);
+            const { runPlanningPipeline } = await import('@domain/calendar/pipeline');
 
-            const holidaysDates = holidayDTO.normalize(holidays);
-            const metricsOpts = { locale, holidays: holidaysDates, allowPastDays };
-
-            const baseSuggestion = generateSuggestions({
+            const { planned, suggestion, alternatives } = runPlanningPipeline({
               year,
               ptoDays,
-              holidays: holidaysDates,
+              autoSuggestCount,
+              holidays: holidayDTO.normalize(holidays),
+              manuallySelectedDays,
+              removedSuggestedDays,
               allowPastDays,
               months,
               strategy,
-            });
-
-            const baseAlternatives = generateAlternatives({
-              year,
-              ptoDays,
-              holidays: holidaysDates,
-              allowPastDays,
-              months,
+              locale,
               maxAlternatives,
-              existingSuggestion: baseSuggestion.days,
-              strategy,
             });
 
-            const suggestion = {
-              ...baseSuggestion,
-              metrics: generateMetrics({
-                suggestion: baseSuggestion,
-                locale,
-                bridges: baseSuggestion.bridges,
-                holidays: holidaysDates,
-                allowPastDays,
-              }),
-            };
-
-            const alternatives = withMetrics(baseAlternatives, metricsOpts);
+            if (!planned) {
+              set({
+                suggestion: null,
+                alternatives: [],
+                currentSelection: null,
+                previewAlternativeIndex: 0,
+                currentSelectionIndex: 0,
+              });
+              return;
+            }
 
             set({
               suggestion,
               alternatives,
               currentSelection: suggestion,
-              previewAlternativeSelection: suggestion,
               previewAlternativeIndex: 0,
               currentSelectionIndex: 0,
             });
           } catch (error) {
-            logger.logError('Error generating suggestions in holidays store', error, {
-              year,
-              ptoDays,
-              holidaysCount: holidays.length,
-              allowPastDays,
-              strategy,
-              locale,
-            });
+            log((logger) =>
+              logger.logError('Error generating suggestions in holidays store', error, {
+                year,
+                ptoDays,
+                holidaysCount: holidays.length,
+                allowPastDays,
+                strategy,
+                locale,
+              })
+            );
             set({
               suggestion: null,
               alternatives: [],
               currentSelection: null,
-              previewAlternativeSelection: null,
               previewAlternativeIndex: 0,
               currentSelectionIndex: 0,
             });
-          }
-        },
-
-        generateAlternatives: async ({
-          year,
-          ptoDays,
-          allowPastDays,
-          months,
-          maxAlternatives,
-          strategy,
-          locale,
-        }: GenerateAlternativesParams) => {
-          const { holidays, maxAlternatives: stateMaxAlternatives, suggestion } = get();
-          const maxToGenerate = maxAlternatives ?? stateMaxAlternatives;
-
-          if (ptoDays <= 0 || holidays.length === 0 || maxToGenerate <= 0 || !suggestion) {
-            set({ alternatives: [] });
-            return;
-          }
-
-          try {
-            const [{ generateAlternatives }] = await Promise.all([
-              import('@domain/calendar/alternatives/generateAlternatives'),
-            ]);
-
-            const holidaysDates = holidayDTO.normalize(holidays);
-
-            const baseAlternatives = generateAlternatives({
-              year,
-              ptoDays,
-              holidays: holidaysDates,
-              allowPastDays,
-              months,
-              maxAlternatives: maxToGenerate,
-              existingSuggestion: suggestion.days,
-              strategy,
-            });
-
-            const alternatives = withMetrics(baseAlternatives, { locale, holidays: holidaysDates, allowPastDays });
-
-            set({ alternatives });
-          } catch (error) {
-            logger.logError('Error generating alternatives in holidays store', error, {
-              year,
-              ptoDays,
-              holidaysCount: holidays.length,
-              maxAlternatives: maxToGenerate,
-              allowPastDays,
-              strategy,
-              locale,
-            });
-            set({ alternatives: [] });
           }
         },
 
@@ -275,8 +249,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
           suggestion,
           alternatives,
         }: {
-          suggestion: Suggestion;
-          alternatives: Suggestion[];
+          suggestion: MeasuredSuggestion;
+          alternatives: MeasuredSuggestion[];
         }) => {
           const { currentSelectionIndex } = get();
           const allSuggestions = [suggestion, ...alternatives];
@@ -287,10 +261,10 @@ export const useHolidaysStore = create<HolidaysStore>()(
             suggestion,
             alternatives,
             currentSelection: preservedSelection,
-            previewAlternativeSelection: preservedSelection,
             previewAlternativeIndex: preservedIndex,
             currentSelectionIndex: preservedIndex,
             removedSuggestedDays: [],
+            hasCalculated: true,
           });
         },
 
@@ -299,21 +273,19 @@ export const useHolidaysStore = create<HolidaysStore>()(
         },
 
         setCurrentAlternativeSelection: ({ suggestion, index }: AlternativeSelectionBaseParams) => {
+          const { planRevision } = get();
+
           set({
             currentSelection: suggestion,
-            previewAlternativeSelection: suggestion,
             previewAlternativeIndex: index,
             currentSelectionIndex: index,
-            manuallySelectedDays: [],
             removedSuggestedDays: [],
+            planRevision: planRevision + 1,
           });
         },
 
-        setPreviewAlternativeSelection: ({ suggestion, index }: AlternativeSelectionBaseParams) => {
-          set({
-            previewAlternativeSelection: suggestion,
-            previewAlternativeIndex: index,
-          });
+        setPreviewAlternativeSelection: ({ index }: AlternativeSelectionBaseParams) => {
+          set({ previewAlternativeIndex: index });
         },
 
         resetToDefaults: () => {
@@ -321,12 +293,21 @@ export const useHolidaysStore = create<HolidaysStore>()(
         },
 
         addHoliday: ({ holiday, locale, year, carryOverMonths }) => {
-          const { holidays } = get();
+          const { holidays, manuallySelectedDays } = get();
           const existingHoliday = holidays.find((h) => h.date.toDateString() === holiday.date.toDateString());
 
           if (existingHoliday) {
-            logger.warn('Holiday already exists on this date', { date: holiday.date.toISOString() });
-            return;
+            log((logger) => logger.warn('Holiday already exists on this date', { date: holiday.date.toISOString() }));
+            return { applied: false, reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY, heldBy: existingHoliday };
+          }
+
+          const isManuallySelected = manuallySelectedDays.some((d) => d.toDateString() === holiday.date.toDateString());
+
+          if (isManuallySelected) {
+            log((logger) =>
+              logger.warn('A PTO day is already booked on this date', { date: holiday.date.toISOString() })
+            );
+            return { applied: false, reason: HolidayRefusal.DATE_HELD_BY_MANUAL_DAY };
           }
 
           const newHoliday = holidayDTO.createCustom({
@@ -340,6 +321,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
           set({
             holidays: [...holidays, newHoliday].toSorted((a, b) => a.date.getTime() - b.date.getTime()),
           });
+
+          return { applied: true };
         },
 
         removeHoliday: (holidayId: string) => {
@@ -350,10 +333,24 @@ export const useHolidaysStore = create<HolidaysStore>()(
         },
 
         editHoliday: ({ holidayId, locale, updates, year, carryOverMonths }: EditHolidayParams) => {
-          const { holidays } = get();
+          const { holidays, manuallySelectedDays } = get();
           const holidayIndex = holidays.findIndex((h) => h.id === holidayId);
 
-          if (holidayIndex === -1) return;
+          if (holidayIndex === -1) return { applied: false, reason: HolidayRefusal.HOLIDAY_NOT_FOUND };
+
+          const targetDateStr = fromStoredInstant(updates.date).toDateString();
+          const heldBy = holidays.find(
+            (h, index) => index !== holidayIndex && fromStoredInstant(h.date).toDateString() === targetDateStr
+          );
+          const collidesWithManualDay = manuallySelectedDays.some((d) => d.toDateString() === targetDateStr);
+
+          if (heldBy || collidesWithManualDay) {
+            log((logger) => logger.warn('Refused to move a holiday onto an occupied date', { targetDateStr }));
+
+            return heldBy
+              ? { applied: false, reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY, heldBy }
+              : { applied: false, reason: HolidayRefusal.DATE_HELD_BY_MANUAL_DAY };
+          }
 
           const updatedHoliday = holidayDTO.createCustom({
             name: updates.name,
@@ -370,17 +367,37 @@ export const useHolidaysStore = create<HolidaysStore>()(
           ].toSorted((a, b) => a.date.getTime() - b.date.getTime());
 
           set({ holidays: updatedHolidays });
+
+          return { applied: true };
         },
 
         toggleDaySelection: ({ date, totalPtoDays, locale, allowPastDays }) => {
           const { manuallySelectedDays, currentSelection, removedSuggestedDays, holidays } = get();
           const dateStr = date.toDateString();
 
-          if (!currentSelection) return false;
+          if (!currentSelection) return { applied: false, reason: DayRefusal.NO_PLAN };
 
           const isSuggested = currentSelection.days.some((d) => d.toDateString() === dateStr);
           const isManuallySelected = manuallySelectedDays.some((d) => d.toDateString() === dateStr);
           const wasRemoved = removedSuggestedDays.some((d) => d.toDateString() === dateStr);
+
+          const holidayOnDate = holidays.find((h) => fromStoredInstant(h.date).toDateString() === dateStr);
+
+          if (!isSuggested && !isManuallySelected && (isWeekend(date) || holidayOnDate)) {
+            log((logger) => logger.warn('Refused to spend a PTO day on a day that is already off', { dateStr }));
+
+            if (holidayOnDate) {
+              return {
+                applied: false,
+                reason:
+                  holidayOnDate.variant === HolidayVariant.CUSTOM
+                    ? DayRefusal.DAY_IS_CUSTOM_HOLIDAY
+                    : DayRefusal.DAY_IS_HOLIDAY,
+              };
+            }
+
+            return { applied: false, reason: DayRefusal.DAY_IS_WEEKEND };
+          }
 
           let updatedManualDays = manuallySelectedDays;
           let updatedRemovedDays = removedSuggestedDays;
@@ -390,24 +407,23 @@ export const useHolidaysStore = create<HolidaysStore>()(
           } else if (isSuggested && wasRemoved) {
             updatedRemovedDays = removedSuggestedDays.filter((d) => d.toDateString() !== dateStr);
           } else if (isSuggested && !wasRemoved) {
-            updatedRemovedDays = [...removedSuggestedDays, ensureDate(date)].toSorted(
+            updatedRemovedDays = [...removedSuggestedDays, fromStoredInstant(date)].toSorted(
               (a, b) => a.getTime() - b.getTime()
             );
           } else {
-            const activeSuggestedCount = currentSelection.days.length - removedSuggestedDays.length;
-            const manualSelectedCount = manuallySelectedDays.length;
-            const remaining = totalPtoDays - activeSuggestedCount - manualSelectedCount;
+            const budget = measureBudget({
+              ptoDays: totalPtoDays,
+              days: currentSelection.days,
+              manuallySelectedDays,
+              removedSuggestedDays,
+            });
 
-            if (remaining <= 0) {
-              logger.warn('No remaining PTO days to assign', {
-                totalPtoDays,
-                activeSuggestedCount,
-                manualSelectedCount,
-              });
-              return false;
+            if (budget.remaining <= 0) {
+              log((logger) => logger.warn('No remaining PTO days to assign', { totalPtoDays, spent: budget.spent }));
+              return { applied: false, reason: DayRefusal.BUDGET_EXHAUSTED };
             }
 
-            updatedManualDays = [...manuallySelectedDays, ensureDate(date)].toSorted(
+            updatedManualDays = [...manuallySelectedDays, fromStoredInstant(date)].toSorted(
               (a, b) => a.getTime() - b.getTime()
             );
           }
@@ -415,11 +431,13 @@ export const useHolidaysStore = create<HolidaysStore>()(
           const updatedMetrics = generateMetrics({
             suggestion: currentSelection,
             locale,
+            year: useFiltersStore.getState().year,
             bridges: currentSelection.bridges,
             holidays,
             allowPastDays,
             manuallySelectedDays: updatedManualDays,
             removedSuggestedDays: updatedRemovedDays,
+            carryOverMonths: useFiltersStore.getState().carryOverMonths,
             totalPtoBudget: totalPtoDays,
           });
 
@@ -428,16 +446,49 @@ export const useHolidaysStore = create<HolidaysStore>()(
             removedSuggestedDays: updatedRemovedDays,
             currentSelection: { ...currentSelection, metrics: updatedMetrics },
           });
-          return true;
+
+          return { applied: true };
+        },
+
+        pruneDaysOutsideWindow: (params?: PlanningWindowParams) => {
+          const { year, carryOverMonths } = params ?? useFiltersStore.getState();
+          const planningWindow = getPlanningWindow({ year, carryOverMonths });
+          const { manuallySelectedDays, removedSuggestedDays } = get();
+
+          const isInWindow = (date: Date) => isWithinInterval(date, planningWindow);
+          const prunedManualDays = manuallySelectedDays.filter(isInWindow);
+          const prunedRemovedDays = removedSuggestedDays.filter(isInWindow);
+
+          if (
+            prunedManualDays.length === manuallySelectedDays.length &&
+            prunedRemovedDays.length === removedSuggestedDays.length
+          ) {
+            return;
+          }
+
+          set({ manuallySelectedDays: prunedManualDays, removedSuggestedDays: prunedRemovedDays });
+        },
+
+        clearCalculation: () => {
+          set({
+            suggestion: null,
+            alternatives: [],
+            currentSelection: null,
+            previewAlternativeIndex: 0,
+            currentSelectionIndex: 0,
+            removedSuggestedDays: [],
+            hasCalculated: true,
+          });
         },
 
         resetManualSelection: () => {
-          const { currentSelection, currentSelectionIndex, suggestion, alternatives } = get();
+          const { currentSelection, currentSelectionIndex, suggestion, alternatives, planRevision } = get();
 
           if (!currentSelection) {
             set({
               manuallySelectedDays: [],
               removedSuggestedDays: [],
+              planRevision: planRevision + 1,
             });
             return;
           }
@@ -449,11 +500,13 @@ export const useHolidaysStore = create<HolidaysStore>()(
               manuallySelectedDays: [],
               removedSuggestedDays: [],
               currentSelection: baseSelection,
+              planRevision: planRevision + 1,
             });
           } else {
             set({
               manuallySelectedDays: [],
               removedSuggestedDays: [],
+              planRevision: planRevision + 1,
             });
           }
         },
@@ -465,13 +518,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
           }
         },
 
-        getRemainingDays: (totalPtoDays: number) => {
-          const { manuallySelectedDays, currentSelection, removedSuggestedDays } = get();
-          const activeSuggestedCount = (currentSelection?.days.length || 0) - removedSuggestedDays.length;
-          const manualSelectedCount = manuallySelectedDays.length;
-          return Math.max(0, totalPtoDays - activeSuggestedCount - manualSelectedCount);
-        },
-
         getFreeDaysForMonth: (month: Date) => {
           const { holidays } = get();
           return holidays.filter((h) => isSameMonth(h.date, month) && h.isInSelectedRange).length;
@@ -480,71 +526,33 @@ export const useHolidaysStore = create<HolidaysStore>()(
       {
         name: STORAGE_NAME,
         version: STORAGE_VERSION,
-        storage: encryptedStorage,
-        partialize: (state) => ({
-          holidays: state.holidays.map((h) => ({
-            ...h,
-            date: h.date.toISOString(),
-          })),
-          suggestion: state.suggestion
-            ? {
-                ...state.suggestion,
-                days: state.suggestion.days.map((d) => d.toISOString()),
-                bridges: state.suggestion.bridges?.map((b) => ({
-                  ...b,
-                  startDate: b.startDate.toISOString(),
-                  endDate: b.endDate.toISOString(),
-                  ptoDays: b.ptoDays.map((d) => d.toISOString()),
-                })),
-              }
-            : null,
-          maxAlternatives: state.maxAlternatives,
-          alternatives: state.alternatives.map((alt) => ({
-            ...alt,
-            days: alt.days.map((d) => d.toISOString()),
-            bridges: alt.bridges?.map((b) => ({
-              ...b,
-              startDate: b.startDate.toISOString(),
-              endDate: b.endDate.toISOString(),
-              ptoDays: b.ptoDays.map((d) => d.toISOString()),
-            })),
-          })),
-          currentSelection: state.currentSelection
-            ? {
-                ...state.currentSelection,
-                days: state.currentSelection.days.map((d) => d.toISOString()),
-                bridges: state.currentSelection.bridges?.map((b) => ({
-                  ...b,
-                  startDate: b.startDate.toISOString(),
-                  endDate: b.endDate.toISOString(),
-                  ptoDays: b.ptoDays.map((d) => d.toISOString()),
-                })),
-              }
-            : null,
-          manuallySelectedDays: state.manuallySelectedDays.map((d) => d.toISOString()),
-          removedSuggestedDays: state.removedSuggestedDays.map((d) => d.toISOString()),
-        }),
+        storage: obfuscatedStorage,
+        partialize: partializeHolidays,
         onRehydrateStorage: () => (state, error) => {
           if (error) {
-            logger.logError('Error rehydrating holidays store', error, {
-              storeName: STORAGE_NAME,
-              hasState: !!state,
-            });
-            localStorage.removeItem(STORAGE_NAME);
+            log((logger) =>
+              logger.logError('Error rehydrating holidays store', error, {
+                storeName: STORAGE_NAME,
+                hasState: !!state,
+              })
+            );
+            globalThis.localStorage?.removeItem(STORAGE_NAME);
             return;
           }
 
           if (state) {
-            const reviveSuggestion = (s: Suggestion | null): Suggestion | null => {
-              if (!s) return null;
+            const reviveSuggestion = (s: Suggestion | null): MeasuredSuggestion | null => {
+              if (!s?.metrics) return null;
+
               return {
                 ...s,
-                days: s.days.map(ensureDate),
+                metrics: s.metrics,
+                days: s.days.map(fromStoredInstant),
                 bridges: s.bridges?.map((b) => ({
                   ...b,
-                  startDate: ensureDate(b.startDate),
-                  endDate: ensureDate(b.endDate),
-                  ptoDays: b.ptoDays.map(ensureDate),
+                  startDate: fromStoredInstant(b.startDate),
+                  endDate: fromStoredInstant(b.endDate),
+                  ptoDays: b.ptoDays.map(fromStoredInstant),
                 })),
               };
             };
@@ -552,7 +560,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
             if (state.holidays) {
               state.holidays = state.holidays.map((h) => ({
                 ...h,
-                date: ensureDate(h.date),
+                date: fromStoredInstant(h.date),
               }));
             }
 
@@ -561,7 +569,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
             }
 
             if (state.alternatives) {
-              state.alternatives = state.alternatives.map((alt) => reviveSuggestion(alt) as Suggestion);
+              state.alternatives = state.alternatives
+                .map(reviveSuggestion)
+                .filter((alt): alt is MeasuredSuggestion => alt !== null);
             }
 
             if (state.currentSelection) {
@@ -569,12 +579,20 @@ export const useHolidaysStore = create<HolidaysStore>()(
             }
 
             if (state.manuallySelectedDays) {
-              state.manuallySelectedDays = state.manuallySelectedDays.map(ensureDate);
+              state.manuallySelectedDays = state.manuallySelectedDays.map(fromStoredInstant);
             }
 
             if (state.removedSuggestedDays) {
-              state.removedSuggestedDays = state.removedSuggestedDays.map(ensureDate);
+              state.removedSuggestedDays = state.removedSuggestedDays.map(fromStoredInstant);
             }
+
+            if (state.currentSelectionIndex > (state.alternatives?.length ?? 0)) {
+              state.currentSelectionIndex = 0;
+              state.currentSelection = state.suggestion;
+            }
+            state.previewAlternativeIndex = state.currentSelectionIndex;
+
+            state.pruneDaysOutsideWindow();
           }
         },
       }

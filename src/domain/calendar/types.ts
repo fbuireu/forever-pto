@@ -14,6 +14,8 @@ export interface Suggestion {
   metrics?: Metrics;
 }
 
+export type MeasuredSuggestion = Suggestion & { metrics: Metrics };
+
 export const FilterStrategy = {
   GROUPED: 'grouped',
   OPTIMIZED: 'optimized',
@@ -30,13 +32,13 @@ export interface FirstLastBreak {
 export interface Metrics {
   longWeekends: number;
   restBlocks: number;
-  maxWorkingPeriod: number;
+  maxWorkStreak: number;
   firstLastBreak: FirstLastBreak | null;
   averageEfficiency: number;
   bonusDays: number;
   quarterDist: number[];
   bridgesUsed: number;
-  workingDaysPerMonth: number;
+  workedDaysPerMonth: number;
   totalEffectiveDays: number;
   monthlyDist: number[];
   longBlocksPerQuarter: number[];

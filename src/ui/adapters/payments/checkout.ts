@@ -1,7 +1,7 @@
 import type { CreatePaymentInput } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { createPaymentAction } from '@infrastructure/actions/payment';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import type { BetterStackClient } from '@infrastructure/clients/logging/better-stack/client';
 import { PaymentError, PromoCodeError, type PromoCodeErrorCode } from '@infrastructure/errors';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
 import { Effect } from 'effect';
@@ -34,14 +34,34 @@ interface ConfirmPaymentParams {
   returnUrl: string;
 }
 
-const logger = getBetterStackInstance();
+export const ConfirmPaymentOutcome = {
+  SUCCEEDED: 'succeeded',
+  REFUSED_BEFORE_CHARGE: 'refused_before_charge',
+  FAILED_AFTER_CHARGE: 'failed_after_charge',
+  HANDED_OFF_TO_ISSUER: 'handed_off_to_issuer',
+} as const;
 
-export const confirmPayment = async (params: ConfirmPaymentParams) => {
+export type ConfirmPaymentOutcome = (typeof ConfirmPaymentOutcome)[keyof typeof ConfirmPaymentOutcome];
+
+export type ConfirmPaymentResult =
+  | { outcome: typeof ConfirmPaymentOutcome.SUCCEEDED; sessionData: { premiumKey: string; email: string } }
+  | { outcome: typeof ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE; error: string }
+  | { outcome: typeof ConfirmPaymentOutcome.FAILED_AFTER_CHARGE; error: string }
+  | { outcome: typeof ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER };
+
+const log = (write: (logger: BetterStackClient) => void) => {
+  void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
+    write(getBetterStackInstance());
+  });
+};
+
+export const confirmPayment = async (params: ConfirmPaymentParams): Promise<ConfirmPaymentResult> => {
   const { stripe, elements, email, returnUrl } = params;
+  let charged = false;
 
   const program = Effect.gen(function* () {
     const { error: submitError } = yield* Effect.tryPromise(() => elements.submit());
-    if (submitError) return { success: false, error: submitError.message ?? '' };
+    if (submitError) return { outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE, error: submitError.message ?? '' };
 
     const { error, paymentIntent } = yield* Effect.tryPromise(() =>
       stripe.confirmPayment({
@@ -51,7 +71,19 @@ export const confirmPayment = async (params: ConfirmPaymentParams) => {
       })
     );
 
-    if (error) return { success: false, error: error.message ?? '' } ;
+    if (error) return { outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE, error: error.message ?? '' };
+
+    if (!paymentIntent) {
+      log((logger) =>
+        logger.warn('Payment confirmation resolved without a payment intent', {
+          emailDomain: email?.split('@')[1],
+          returnUrl,
+        })
+      );
+      return { outcome: ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER };
+    }
+
+    charged = true;
 
     const sessionResponse = yield* Effect.tryPromise(() =>
       fetch('/api/check-session', {
@@ -64,13 +96,15 @@ export const confirmPayment = async (params: ConfirmPaymentParams) => {
 
     if (!sessionResponse.ok) {
       const errorData = yield* Effect.tryPromise(() => sessionResponse.json() as Promise<{ error?: string }>);
-      logger.error('Session activation failed after payment', {
-        statusCode: sessionResponse.status,
-        reason: errorData.error,
-        emailDomain: email?.split('@')[1],
-        paymentIntentId: paymentIntent.id,
-      });
-      return { success: false, error: errorData.error ?? '' };
+      log((logger) =>
+        logger.error('Session activation failed after payment', {
+          statusCode: sessionResponse.status,
+          reason: errorData.error,
+          emailDomain: email?.split('@')[1],
+          paymentIntentId: paymentIntent.id,
+        })
+      );
+      return { outcome: ConfirmPaymentOutcome.FAILED_AFTER_CHARGE, error: errorData.error ?? '' };
     }
 
     const sessionData = yield* Effect.tryPromise(
@@ -78,19 +112,25 @@ export const confirmPayment = async (params: ConfirmPaymentParams) => {
     );
 
     return {
-      success: true,
+      outcome: ConfirmPaymentOutcome.SUCCEEDED,
       sessionData: { premiumKey: sessionData.premiumKey, email: sessionData.email },
     };
   }).pipe(
     Effect.catchAll((error) => {
-      logger.logError('Payment confirmation error in checkout adapter', error, {
-        emailDomain: email?.split('@')[1],
-        returnUrl,
-      });
-      return Effect.succeed({
-        success: false,
-        error: error instanceof Error ? error.message : '',
-      });
+      log((logger) =>
+        logger.logError('Payment confirmation error in checkout adapter', error, {
+          emailDomain: email?.split('@')[1],
+          returnUrl,
+        })
+      );
+
+      const message = error instanceof Error ? error.message : '';
+
+      return Effect.succeed<ConfirmPaymentResult>(
+        charged
+          ? { outcome: ConfirmPaymentOutcome.FAILED_AFTER_CHARGE, error: message }
+          : { outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE, error: message }
+      );
     })
   );
 

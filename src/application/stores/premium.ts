@@ -1,12 +1,16 @@
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import type { BetterStackClient } from '@infrastructure/clients/logging/better-stack/client';
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
 import { getExistingSession, verifyPremiumEmail } from '@ui/adapters/session/checkSession';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { encryptedStorage } from './crypto';
+import { obfuscatedStorage } from './crypto';
 import { TWENTY_FOUR_HOURS } from './utils/crypto';
 
-const logger = getBetterStackInstance();
+const log = (write: (logger: BetterStackClient) => void) => {
+  void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
+    write(getBetterStackInstance());
+  });
+};
 
 interface PremiumState {
   premiumKey: string | null;
@@ -25,7 +29,7 @@ interface SetPremiumStatusParams {
 
 interface PremiumActions {
   verifyEmail: (email: string) => Promise<boolean>;
-  checkExistingSession: () => Promise<void>;
+  checkExistingSession: (options?: { force?: boolean }) => Promise<void>;
   showUpgradeModal: (feature: string) => void;
   closeModal: () => void;
   setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => void;
@@ -67,18 +71,20 @@ export const usePremiumStore = create<PremiumStore>()(
             set({ isLoading: false });
             return false;
           } catch (error) {
-            logger.logError('Error verifying premium email in premium store', error, {
-              emailDomain: email?.split('@')[1],
-              hasEmail: !!email,
-            });
+            log((logger) =>
+              logger.logError('Error verifying premium email in premium store', error, {
+                emailDomain: email?.split('@')[1],
+                hasEmail: !!email,
+              })
+            );
             set({ isLoading: false });
             return false;
           }
         },
 
-        checkExistingSession: async () => {
+        checkExistingSession: async ({ force }: { force?: boolean } = {}) => {
           const { needsSessionCheck } = get();
-          if (!needsSessionCheck) return;
+          if (!needsSessionCheck && !force) return;
 
           try {
             const session = await getExistingSession();
@@ -89,7 +95,9 @@ export const usePremiumStore = create<PremiumStore>()(
               needsSessionCheck: false,
             });
           } catch (error) {
-            logger.logError('Error checking existing session in premium store', error, { needsSessionCheck });
+            log((logger) =>
+              logger.logError('Error checking existing session in premium store', error, { needsSessionCheck })
+            );
             set({ lastVerified: Date.now(), needsSessionCheck: false });
           }
         },
@@ -99,13 +107,18 @@ export const usePremiumStore = create<PremiumStore>()(
         },
 
         setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => {
+          const wasPremium = !!get().premiumKey;
+
           set({
             premiumKey,
             userEmail: email,
             lastVerified: Date.now(),
             needsSessionCheck: false,
           });
-          track('premium_activated', { plan: 'premium' });
+
+          if (!wasPremium && premiumKey) {
+            track('premium_activated', { plan: 'premium' });
+          }
         },
 
         resetPremiumStore: () => {
@@ -131,7 +144,7 @@ export const usePremiumStore = create<PremiumStore>()(
       {
         name: STORAGE_NAME,
         version: STORAGE_VERSION,
-        storage: encryptedStorage,
+        storage: obfuscatedStorage,
         partialize: (state) => ({
           premiumKey: state.premiumKey,
           userEmail: state.userEmail,
@@ -140,22 +153,25 @@ export const usePremiumStore = create<PremiumStore>()(
         }),
         onRehydrateStorage: () => (state, error) => {
           if (error) {
-            logger.logError('Error rehydrating premium store', error, {
-              storeName: STORAGE_NAME,
-              hasState: !!state,
-            });
-            localStorage.removeItem(STORAGE_NAME);
-            return;
+            log((logger) =>
+              logger.logError('Error rehydrating premium store', error, {
+                storeName: STORAGE_NAME,
+                hasState: !!state,
+              })
+            );
+            globalThis.localStorage?.removeItem(STORAGE_NAME);
           }
 
           if (!state) {
-            logger.warn('No state to rehydrate in premium store', {
-              storeName: STORAGE_NAME,
-            });
+            log((logger) =>
+              logger.warn('No state to rehydrate in premium store', {
+                storeName: STORAGE_NAME,
+              })
+            );
             return;
           }
 
-          if (state.lastVerified && Date.now() - state.lastVerified > TWENTY_FOUR_HOURS) {
+          if (error || !state.lastVerified || Date.now() - state.lastVerified > TWENTY_FOUR_HOURS) {
             state.needsSessionCheck = true;
           }
         },

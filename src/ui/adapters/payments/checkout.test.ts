@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { PaymentError, PromoCodeError, PromoCodeErrors } from '@infrastructure/errors';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -5,16 +7,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mockCreatePaymentAction = vi.hoisted(() => vi.fn());
 const mockLogError = vi.hoisted(() => vi.fn());
 const mockLoggerError = vi.hoisted(() => vi.fn());
+const mockLoggerWarn = vi.hoisted(() => vi.fn());
 
 vi.mock('@infrastructure/actions/payment', () => ({ createPaymentAction: mockCreatePaymentAction }));
 vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({
-  getBetterStackInstance: vi.fn(() => ({ logError: mockLogError, error: mockLoggerError })),
+  getBetterStackInstance: vi.fn(() => ({ logError: mockLogError, error: mockLoggerError, warn: mockLoggerWarn })),
 }));
 
 const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);
 
-const { initializePayment, confirmPayment } = await import('./checkout');
+const { initializePayment, confirmPayment, ConfirmPaymentOutcome } = await import('./checkout');
 
 const mockStripe = { confirmPayment: vi.fn() } as unknown as Stripe;
 const mockElements = { submit: vi.fn() } as unknown as StripeElements;
@@ -25,6 +28,18 @@ const BASE_CONFIRM_PARAMS = {
   email: 'user@example.com',
   returnUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/en/payment/confirmation`,
 };
+
+describe('logging imports', () => {
+  const source = readFileSync(resolve(process.cwd(), 'src/ui/adapters/payments/checkout.ts'), 'utf8');
+
+  it('reaches the BetterStack client through a dynamic import only', () => {
+    expect(source).toMatch(/import\('@infrastructure\/clients\/logging\/better-stack\/client'\)/);
+  });
+
+  it('has no value-level static import of the BetterStack client', () => {
+    expect(source).not.toMatch(/^import (?!type )[^\n]*better-stack\/client/m);
+  });
+});
 
 describe('initializePayment', () => {
   beforeEach(() => {
@@ -63,9 +78,9 @@ describe('initializePayment', () => {
       error: PromoCodeErrors.COUPON_EXPIRED,
     });
 
-    await expect(initializePayment({ amount: 100, email: 'user@example.com', promoCode: 'BAD' })).rejects.toBeInstanceOf(
-      PromoCodeError
-    );
+    await expect(
+      initializePayment({ amount: 100, email: 'user@example.com', promoCode: 'BAD' })
+    ).rejects.toBeInstanceOf(PromoCodeError);
   });
 
   it('carries the promo code error code', async () => {
@@ -109,18 +124,58 @@ describe('confirmPayment', () => {
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-    expect(result.success).toBe(false);
-    expect(result.error).toBe('card incomplete');
+    expect(result).toEqual({ outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE, error: 'card incomplete' });
   });
 
   it('returns failure when stripe.confirmPayment returns an error', async () => {
     (mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
-    (mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({ error: { message: 'declined by bank' } });
+    (mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({
+      error: { message: 'declined by bank' },
+    });
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-    expect(result.success).toBe(false);
-    expect(result.error).toBe('declined by bank');
+    expect(result).toEqual({ outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE, error: 'declined by bank' });
+  });
+
+  it('does not claim a charge happened when Stripe declined before taking the money', async () => {
+    (mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
+    (mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({
+      error: { message: 'declined by bank' },
+    });
+
+    const result = await confirmPayment(BASE_CONFIRM_PARAMS);
+
+    expect(result.outcome).not.toBe(ConfirmPaymentOutcome.FAILED_AFTER_CHARGE);
+  });
+
+  it('marks the failure as post-charge when the activation request itself throws', async () => {
+    (mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
+    (mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({ paymentIntent: { id: 'pi_123' } });
+    mockFetch.mockRejectedValue(new Error('network down'));
+
+    const result = await confirmPayment(BASE_CONFIRM_PARAMS);
+
+    expect(result.outcome).toBe(ConfirmPaymentOutcome.FAILED_AFTER_CHARGE);
+  });
+
+  it('marks the failure as post-charge when the activation response body cannot be read', async () => {
+    (mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
+    (mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({ paymentIntent: { id: 'pi_123' } });
+    mockFetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockRejectedValue(new Error('bad json')) });
+
+    const result = await confirmPayment(BASE_CONFIRM_PARAMS);
+
+    expect(result.outcome).toBe(ConfirmPaymentOutcome.FAILED_AFTER_CHARGE);
+  });
+
+  it('does not claim a charge on the redirect hand-off, where the issuer has not answered yet', async () => {
+    (mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
+    (mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({});
+
+    const result = await confirmPayment(BASE_CONFIRM_PARAMS);
+
+    expect(result).toEqual({ outcome: ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER });
   });
 
   it('returns failure and logs when session response is not ok', async () => {
@@ -134,9 +189,8 @@ describe('confirmPayment', () => {
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-    expect(result.success).toBe(false);
-    expect(result.error).toBe('session activation failed');
-    expect(mockLoggerError).toHaveBeenCalled();
+    expect(result).toEqual({ outcome: ConfirmPaymentOutcome.FAILED_AFTER_CHARGE, error: 'session activation failed' });
+    await vi.waitFor(() => expect(mockLoggerError).toHaveBeenCalled());
   });
 
   it('returns success with sessionData on the happy path', async () => {
@@ -149,8 +203,21 @@ describe('confirmPayment', () => {
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-    expect(result.success).toBe(true);
-    expect('sessionData' in result && result.sessionData).toEqual({ premiumKey: 'pk_abc', email: 'user@example.com' });
+    expect(result).toEqual({
+      outcome: ConfirmPaymentOutcome.SUCCEEDED,
+      sessionData: { premiumKey: 'pk_abc', email: 'user@example.com' },
+    });
+  });
+
+  it('returns failure without calling check-session when Stripe handed off to a redirect', async () => {
+    (mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
+    (mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({});
+
+    const result = await confirmPayment(BASE_CONFIRM_PARAMS);
+
+    expect(result.outcome).toBe(ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER);
+    expect(mockFetch).not.toHaveBeenCalled();
+    await vi.waitFor(() => expect(mockLoggerWarn).toHaveBeenCalled());
   });
 
   it('returns failure via catchAll when an unexpected error is thrown', async () => {
@@ -158,8 +225,7 @@ describe('confirmPayment', () => {
 
     const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-    expect(result.success).toBe(false);
-    expect(typeof result.error).toBe('string');
-    expect(mockLogError).toHaveBeenCalled();
+    expect(result.outcome).toBe(ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE);
+    await vi.waitFor(() => expect(mockLogError).toHaveBeenCalled());
   });
 });

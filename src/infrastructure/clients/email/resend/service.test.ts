@@ -31,9 +31,22 @@ const baseParams = {
 };
 
 describe('ResendServiceLive initialisation', () => {
-  it('throws when RESEND_API_KEY is missing', () => {
+  it('builds the layer even when RESEND_API_KEY is missing', () => {
     vi.stubEnv('RESEND_API_KEY', '');
-    expect(() => Effect.runSync(Effect.provide(ResendService, ResendServiceLive))).toThrow('RESEND_API_KEY');
+    expect(() => Effect.runSync(Effect.provide(ResendService, ResendServiceLive))).not.toThrow();
+  });
+
+  it('fails as EmailError when RESEND_API_KEY is missing', async () => {
+    vi.stubEnv('RESEND_API_KEY', '');
+    const error = await Effect.runPromise(
+      Effect.gen(function* () {
+        const resend = yield* ResendService;
+        return yield* resend.send(baseParams).pipe(Effect.flip);
+      }).pipe(Effect.provide(ResendServiceLive))
+    );
+    expect(error).toBeInstanceOf(EmailError);
+    expect(error.message).toContain('RESEND_API_KEY');
+    expect(mockSend).not.toHaveBeenCalled();
   });
 });
 

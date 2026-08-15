@@ -47,7 +47,7 @@ export const Strategy = () => {
         icon: STRATEGY_ICONS[FilterStrategy.OPTIMIZED],
         description: t('optimized.description'),
         subtitle: t('optimized.subtitle'),
-        pros: [t('optimized.pros.maximumPerformance'), t('optimized.pros.moreDays')],
+        pros: [t('optimized.pros.maximumEfficiency'), t('optimized.pros.moreDays')],
         cons: [t('optimized.cons.shortBridges'), t('optimized.cons.scatteredDays')],
       },
       {

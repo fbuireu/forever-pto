@@ -17,17 +17,11 @@ function InputGroup({ className, ...props }: ComponentProps<'div'>) {
         'group/input-group relative flex w-full items-center rounded-[8px] border-[3px] border-[var(--frame)] bg-input transition-[box-shadow,transform] duration-75 ease-linear outline-none',
         'h-11 has-[>textarea]:h-auto',
         'hover:shadow-[var(--shadow-brutal-xs)]',
-
-        // Variants based on alignment.
         'has-[>[data-align=inline-start]]:[&>input]:pl-2',
         'has-[>[data-align=inline-end]]:[&>input]:pr-2',
         'has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>[data-align=block-start]]:[&>input]:pb-3',
         'has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3',
-
-        // Focus state.
         'has-[[data-slot=input-group-control]:focus-visible]:shadow-[var(--shadow-brutal-sm)]',
-
-        // Error state.
         'has-[[data-slot][aria-invalid=true]]:border-destructive has-[[data-slot][aria-invalid=true]]:shadow-none has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:shadow-[var(--shadow-brutal-sm-destructive)]',
 
         className

@@ -4,6 +4,7 @@ import '@styles/index.css';
 
 import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
 import enMessages from '@i18n/messages/en.json';
+import { EN } from '@infrastructure/i18n/locales';
 import { getLocaleFromPathname } from '@infrastructure/i18n/utils/url';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { ErrorContent } from '@ui/modules/pages/error/ErrorContent';
@@ -17,7 +18,7 @@ export default function GlobalError({ error, reset }: ErrorBoundaryProps) {
   const locale = getLocaleFromPathname(usePathname() ?? '');
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={EN} suppressHydrationWarning>
       <body
         className={cn(
           bricolage.variable,

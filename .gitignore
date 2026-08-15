@@ -37,15 +37,16 @@ pnpm-debug.log*
 .vscode/
 
 # Cloudflare
+cloudflare-env.d.ts
 .wrangler/
 .open-next
+
+# AI/Agents
+.claude/
+.agents/
 
 # Docs (Astro)
 docs/dist/
 docs/.astro/
 docs/test-results/
 docs/playwright-report/
-
-# AI/Agents
-.claude/
-.agents/

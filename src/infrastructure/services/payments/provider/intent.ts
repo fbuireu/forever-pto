@@ -4,6 +4,10 @@ import type { PaymentError } from '@infrastructure/errors';
 import { Effect } from 'effect';
 import type StripeNode from 'stripe';
 
+const STRIPE_METADATA_MAX_LENGTH = 500;
+
+const clampMetadata = (value: string | null | undefined) => (value ?? '').slice(0, STRIPE_METADATA_MAX_LENGTH);
+
 interface CreatePaymentIntentParams {
   amount: number;
   email: string;
@@ -28,9 +32,9 @@ export const createPaymentIntent = (
       metadata: {
         type: 'donation',
         email,
-        promoCode: promoCode ?? '',
-        userAgent: userAgent ?? '',
-        ipAddress: ipAddress ?? '',
+        promoCode: clampMetadata(promoCode),
+        userAgent: clampMetadata(userAgent),
+        ipAddress: clampMetadata(ipAddress),
         ...(discountInfo && {
           couponId: discountInfo.couponId,
           couponName: discountInfo.couponName ?? '',

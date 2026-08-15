@@ -10,7 +10,12 @@ type MotionButtonProps = ComponentProps<'button'> & {
   exit?: unknown;
   transition?: unknown;
 };
-type MotionSvgProps = ComponentProps<'svg'> & { initial?: unknown; animate?: unknown; exit?: unknown; transition?: unknown };
+type MotionSvgProps = ComponentProps<'svg'> & {
+  initial?: unknown;
+  animate?: unknown;
+  exit?: unknown;
+  transition?: unknown;
+};
 type MotionPathProps = ComponentProps<'path'> & { variants?: unknown };
 
 vi.mock('motion/react', async () => {
@@ -18,11 +23,13 @@ vi.mock('motion/react', async () => {
   return {
     m: {
       button: forwardRef<HTMLButtonElement, MotionButtonProps>(
-        ({ children, whileTap: _wt, whileHover: _wh, initial: _i, animate: _a, exit: _e, transition: _t, ...props }, ref) =>
-          createElement('button', { ref, ...props }, children)
+        (
+          { children, whileTap: _wt, whileHover: _wh, initial: _i, animate: _a, exit: _e, transition: _t, ...props },
+          ref
+        ) => createElement('button', { ref, ...props }, children)
       ),
-      svg: ({ children, initial: _i, animate: _a, exit: _e, transition: _t, ...props }: MotionSvgProps) =>
-        createElement('svg', props, children),
+      svg: ({ children, initial: _i, animate, exit: _e, transition: _t, ...props }: MotionSvgProps) =>
+        createElement('svg', { 'data-animate': animate, ...props }, children),
       path: ({ variants: _v, strokeLinecap, strokeLinejoin, ...props }: MotionPathProps) =>
         createElement('path', { strokeLinecap, strokeLinejoin, ...props }),
     },
@@ -43,7 +50,12 @@ vi.mock('@base-ui/react/checkbox', async () => {
     ({ children, onCheckedChange, checked, defaultChecked: _dc, render: _r, keepMounted: _km, ...props }, ref) =>
       createElement(
         'button',
-        { ref, 'data-slot': 'checkbox', 'data-checked': checked, onClick: () => onCheckedChange?.(!checked, {}), ...props },
+        {
+          ref,
+          ...props,
+          'data-checked': String(checked),
+          onClick: () => onCheckedChange?.(!checked, {}),
+        },
         children
       )
   );
@@ -62,12 +74,13 @@ import { Checkbox } from './Checkbox';
 describe('Checkbox', () => {
   it('renders unchecked by default', () => {
     const { container } = render(<Checkbox />);
-    expect(container.querySelector('[data-checked="true"]')).toBeNull();
+    expect(container.querySelector('[data-animate="unchecked"]')).not.toBeNull();
+    expect(container.querySelector('[data-animate="checked"]')).toBeNull();
   });
 
   it('renders checked when defaultChecked=true', () => {
     const { container } = render(<Checkbox defaultChecked />);
-    expect(container.querySelector('[data-slot="checkbox"]')).not.toBeNull();
+    expect(container.querySelector('[data-animate="checked"]')).not.toBeNull();
   });
 
   it('calls onCheckedChange when clicked', () => {
@@ -78,11 +91,12 @@ describe('Checkbox', () => {
     expect(spy).toHaveBeenCalledWith(true, {});
   });
 
-  it('syncs internal state when controlled checked prop changes', () => {
+  it('syncs internal state when the controlled checked prop changes', () => {
     const { rerender, container } = render(<Checkbox checked={false} />);
+    expect(container.querySelector('[data-animate="unchecked"]')).not.toBeNull();
+
     rerender(<Checkbox checked={true} />);
-    const root = container.querySelector('[data-slot="checkbox"]') as HTMLButtonElement;
-    expect(root.dataset.checked).toBe('true');
+    expect(container.querySelector('[data-animate="checked"]')).not.toBeNull();
   });
 
   it('renders with data-slot="checkbox"', () => {

@@ -5,8 +5,6 @@ import { formatDate } from '@application/shared/utils/dates';
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
-import { Button } from '@ui/modules/core/primitives/Button';
 import {
   Dialog,
   DialogContent,
@@ -14,10 +12,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@ui/modules/core/primitives/Dialog';
+} from '@ui/modules/core/animate/base/Dialog';
+import { Button } from '@ui/modules/core/primitives/Button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { Calendar, CalendarSelectionMode, type FromTo } from '@ui/modules/pages/planner/calendar/Calendar';
+import { describeHolidayRefusal } from '@ui/modules/pages/planner/calendar/utils/refusals';
 import { CalendarDays, Calendar as CalendarIcon, Edit } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';
@@ -35,6 +35,7 @@ interface EditHolidayModalProps {
 
 export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHolidayModalProps) => {
   const t = useTranslations('modals.editHoliday');
+  const tA11y = useTranslations('a11y');
   const tAdd = useTranslations('modals.addHoliday');
   const tValidation = useTranslations('validation.holiday');
   const { year, carryOverMonths } = useFiltersStore();
@@ -77,21 +78,7 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
           return;
         }
 
-        if (data.date.getTime() !== holiday.date.getTime()) {
-          const existingHoliday = holidays.find(
-            (h) => h.id !== holiday.id && h.date.toDateString() === data.date.toDateString()
-          );
-
-          if (existingHoliday) {
-            const formattedDate = formatDate({ date: data.date, locale, format: 'MMMM d, yyyy' });
-            toast.error(tAdd('existsTitle'), {
-              description: tAdd('existsDescription', { date: formattedDate, name: existingHoliday.name }),
-            });
-            return;
-          }
-        }
-
-        editHoliday({
+        const outcome = editHoliday({
           holidayId: holiday.id,
           updates: { name: data.name, date: data.date },
           locale,
@@ -99,13 +86,25 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
           carryOverMonths,
         });
 
+        if (!outcome.applied) {
+          const formattedDate = formatDate({ date: data.date, locale, format: 'MMMM d, yyyy' });
+          const refusal = describeHolidayRefusal({ outcome, t: tAdd, formattedDate });
+
+          if (refusal) toast.error(refusal.title, { description: refusal.description });
+          else toast.error(t('errorTitle'), { description: t('errorDescription') });
+
+          return;
+        }
+
         toast.success(t('successTitle'), {
           description: t('successDescription', { name: data.name }),
         });
 
         handleClose();
       } catch (error) {
-        getBetterStackInstance().logError('Error editing holiday', error, { component: 'EditHolidayModal' });
+        void import('@infrastructure/clients/logging/better-stack/client').then(({ getBetterStackInstance }) => {
+          getBetterStackInstance().logError('Error editing holiday', error, { component: 'EditHolidayModal' });
+        });
         toast.error(t('errorTitle'), {
           description: t('errorDescription'),
         });
@@ -122,7 +121,7 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-sm' initialFocus={false}>
+      <DialogContent className='sm:max-w-sm' closeLabel={tA11y('closeDialog')} initialFocus={false}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Edit className='size-5 text-blue-500' />

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@infrastructure/api/response', async () => {
   const { NextResponse } = await import('next/server');
@@ -14,10 +14,6 @@ vi.mock('@infrastructure/api/response', async () => {
 const { GET } = await import('./route');
 
 describe('GET /api/health', () => {
-  beforeEach(() => {
-    vi.unstubAllEnvs();
-  });
-
   it('returns 200 with status ok', async () => {
     const response = await GET();
     expect(response.status).toBe(200);
@@ -35,33 +31,18 @@ describe('GET /api/health', () => {
     expect(ts).toBeLessThanOrEqual(after);
   });
 
-  it('reports hasStripeKey as true when set', async () => {
+  it('reports liveness only, without disclosing which secrets are configured', async () => {
     vi.stubEnv('STRIPE_SECRET_KEY', 'sk_test_123');
-    const response = await GET();
-    const body = await response.json();
-    expect(body.env.hasStripeKey).toBe(true);
-  });
-
-  it('reports hasStripeKey as false when not set', async () => {
-    vi.stubEnv('STRIPE_SECRET_KEY', '');
-    const response = await GET();
-    const body = await response.json();
-    expect(body.env.hasStripeKey).toBe(false);
-  });
-
-  it('reports hasTursoUrl and hasTursoToken correctly', async () => {
     vi.stubEnv('TURSO_DATABASE_URL', 'libsql://test.turso.io');
     vi.stubEnv('TURSO_AUTH_TOKEN', 'token-abc');
-    const response = await GET();
-    const body = await response.json();
-    expect(body.env.hasTursoUrl).toBe(true);
-    expect(body.env.hasTursoToken).toBe(true);
-  });
 
-  it('includes nodeEnv', async () => {
     const response = await GET();
     const body = await response.json();
-    expect(body.env.nodeEnv).toBe(process.env.NODE_ENV);
+
+    expect(Object.keys(body)).toEqual(['status', 'timestamp']);
+    expect(JSON.stringify(body)).not.toContain('sk_test_123');
+
+    vi.unstubAllEnvs();
   });
 
   it('sets Cache-Control: no-store', async () => {

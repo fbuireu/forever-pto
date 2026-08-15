@@ -6,7 +6,7 @@ import { TableHeader as BaseTableHeader, TableHead, TableRow } from '@ui/modules
 import { cn } from '@ui/utils/cn';
 import { ArrowUpDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type ReactNode, memo } from 'react';
+import { memo, type ReactNode } from 'react';
 
 interface HolidayTableHeaderProps {
   selectAllButton: ReactNode;
@@ -31,14 +31,18 @@ const TableHeader = ({ children, sortKey, currentSort, onSort, className = '' }:
 
   return (
     <TableHead
-      className={cn('cursor-pointer select-none hover:bg-muted/50 transition-colors', className)}
-      onClick={() => onSort(sortKey)}
+      className={cn('select-none p-0', className)}
+      aria-sort={isActive ? (currentSort.direction === 'asc' ? 'ascending' : 'descending') : 'none'}
     >
       <AnimateIcon animateOnHover asChild>
-        <div className='flex items-center gap-x-1 text-foreground'>
+        <button
+          type='button'
+          onClick={() => onSort(sortKey)}
+          className='flex h-11 w-full cursor-pointer items-center gap-x-1 px-3 text-left text-foreground transition-colors hover:bg-muted/50'
+        >
           <span>{children}</span>
           <Icon className='size-4' />
-        </div>
+        </button>
       </AnimateIcon>
     </TableHead>
   );

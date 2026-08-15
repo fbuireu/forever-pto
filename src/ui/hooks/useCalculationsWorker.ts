@@ -3,26 +3,26 @@
 import { useHolidaysStore } from '@application/stores/holidays';
 import type { GenerateSuggestionsParams } from '@application/stores/types';
 import {
-  deserializeSuggestion,
-  serializeHolidays,
-  serializeMonths,
-} from '@infrastructure/workers/utils/serializers';
-import type { CalculateSuggestionsRequest, WorkerResponse } from '@infrastructure/workers/types';
+  type CalculateSuggestionsRequest,
+  WORKER_MESSAGE_TYPE,
+  type WorkerResponse,
+} from '@infrastructure/workers/types';
+import { deserializeSuggestion, serializeHolidays, serializeMonths } from '@infrastructure/workers/utils/serializers';
 import { useCallback, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 export function useCalculationsWorker() {
   const workerRef = useRef<Worker | null>(null);
   const currentRequestIdRef = useRef<string>('');
+  const pendingRequestIdRef = useRef<string | null>(null);
   const lastCalculatedPtoDaysRef = useRef<number | null>(null);
 
-  const { setCalculating, setCalculationResult, holidays, maxAlternatives, manuallySelectedDays } = useHolidaysStore(
+  const { setCalculating, setCalculationResult, holidays, maxAlternatives } = useHolidaysStore(
     useShallow((state) => ({
       setCalculating: state.setCalculating,
       setCalculationResult: state.setCalculationResult,
       holidays: state.holidays,
       maxAlternatives: state.maxAlternatives,
-      manuallySelectedDays: state.manuallySelectedDays,
     }))
   );
 
@@ -35,13 +35,15 @@ export function useCalculationsWorker() {
 
       const requestId = String(Date.now());
       currentRequestIdRef.current = requestId;
+      pendingRequestIdRef.current = requestId;
 
       setCalculating(true);
 
       worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
         if (e.data.requestId !== currentRequestIdRef.current) return;
+        pendingRequestIdRef.current = null;
         setCalculating(false);
-        if (e.data.type === 'CALCULATE_SUGGESTIONS_RESULT') {
+        if (e.data.type === WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT) {
           lastCalculatedPtoDaysRef.current = params.ptoDays;
           const { suggestion, alternatives } = e.data.payload;
           setCalculationResult({
@@ -53,29 +55,37 @@ export function useCalculationsWorker() {
 
       worker.onerror = () => {
         if (currentRequestIdRef.current === requestId) {
+          pendingRequestIdRef.current = null;
           setCalculating(false);
         }
       };
 
-      const { removedSuggestedDays, currentSelection } = useHolidaysStore.getState();
+      worker.onmessageerror = () => {
+        if (currentRequestIdRef.current === requestId) {
+          pendingRequestIdRef.current = null;
+          setCalculating(false);
+        }
+      };
+
+      const { removedSuggestedDays, currentSelection, manuallySelectedDays } = useHolidaysStore.getState();
 
       const budgetForAutoSuggest = params.ptoDays - manuallySelectedDays.length;
-      const activeSuggestedDays = currentSelection
-        ? Math.max(0, currentSelection.days.length - removedSuggestedDays.length)
-        : undefined;
+      const hasRemovedDays = removedSuggestedDays.length > 0;
+      const activeSuggestedDays =
+        currentSelection && hasRemovedDays
+          ? Math.max(0, currentSelection.days.length - removedSuggestedDays.length)
+          : undefined;
 
-      // Only cap suggestions when ptoDays hasn't changed since last result.
-      // If ptoDays increased we want the full new budget; otherwise we respect
-      // how many days the user has left active (honoring their removals).
       const ptoDaysChanged =
         lastCalculatedPtoDaysRef.current !== null && lastCalculatedPtoDaysRef.current !== params.ptoDays;
-      const autoSuggestCount =
+      const cap =
         !ptoDaysChanged && activeSuggestedDays !== undefined
           ? Math.min(budgetForAutoSuggest, activeSuggestedDays)
           : undefined;
+      const autoSuggestCount = cap && cap > 0 ? cap : undefined;
 
       const request: CalculateSuggestionsRequest = {
-        type: 'CALCULATE_SUGGESTIONS',
+        type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS,
         requestId,
         payload: {
           year: params.year,
@@ -87,18 +97,21 @@ export function useCalculationsWorker() {
           locale: params.locale,
           maxAlternatives,
           manualDays: manuallySelectedDays.map((d) => d.toISOString()),
-          excludedDays: removedSuggestedDays.map((d) => d.toISOString()),
+          removedDays: removedSuggestedDays.map((d) => d.toISOString()),
           autoSuggestCount,
         },
       };
 
       worker.postMessage(request);
     },
-    [setCalculating, setCalculationResult, holidays, maxAlternatives, manuallySelectedDays]
+    [setCalculating, setCalculationResult, holidays, maxAlternatives]
   );
 
   useEffect(() => {
     return () => {
+      if (pendingRequestIdRef.current) {
+        useHolidaysStore.getState().setCalculating(false);
+      }
       workerRef.current?.terminate();
     };
   }, []);

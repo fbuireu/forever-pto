@@ -66,7 +66,7 @@ export const isCustom = (holidays: HolidayDTO[]) => (date: Date) => {
   return holidays.some((holiday) => isSameDay(holiday.date, date) && holiday.variant === HolidayVariant.CUSTOM);
 };
 
-export const isBankHoliday = (holidays: HolidayDTO[]) => (date: Date) => {
+export const isNationalOrRegionalHoliday = (holidays: HolidayDTO[]) => (date: Date) => {
   return holidays.some(
     (holiday) =>
       isSameDay(holiday.date, date) &&

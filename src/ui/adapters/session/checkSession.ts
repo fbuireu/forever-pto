@@ -18,7 +18,7 @@ export async function verifyPremiumEmail(email: string) {
 
 export async function getExistingSession() {
   const response = await fetch('/api/check-session', { credentials: 'include' });
-  if (!response.ok) return null;
+  if (!response.ok) throw new Error(`check-session answered ${response.status}`);
   const data = (await response.json()) as SessionData;
   return data.premiumKey ? data : null;
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BASE64_PATTERN, base64Decode, base64Encode, decrypt, encrypt, TWENTY_FOUR_HOURS } from './crypto';
+import { BASE64_PATTERN, base64Decode, base64Encode, deobfuscate, obfuscate, TWENTY_FOUR_HOURS } from './crypto';
 
 describe('TWENTY_FOUR_HOURS', () => {
   it('equals 86400000 ms', () => {
@@ -27,30 +27,30 @@ describe('base64Encode / base64Decode', () => {
   });
 });
 
-describe('encrypt / decrypt', () => {
+describe('obfuscate / deobfuscate', () => {
   const key = 'secret-key';
 
-  it('encrypt produces a different string than the input', () => {
-    expect(encrypt({ text: 'plaintext', key })).not.toBe('plaintext');
+  it('obfuscate produces a different string than the input', () => {
+    expect(obfuscate({ text: 'plaintext', key })).not.toBe('plaintext');
   });
 
   it('round-trips ASCII text', () => {
     const text = 'some payload';
-    expect(decrypt({ text: encrypt({ text, key }), key })).toBe(text);
+    expect(deobfuscate({ text: obfuscate({ text, key }), key })).toBe(text);
   });
 
   it('round-trips unicode text', () => {
     const text = '{"value":"café","n":42}';
-    expect(decrypt({ text: encrypt({ text, key }), key })).toBe(text);
+    expect(deobfuscate({ text: obfuscate({ text, key }), key })).toBe(text);
   });
 
-  it('different keys produce different ciphertext', () => {
+  it('different keys produce different output', () => {
     const text = 'hello';
-    expect(encrypt({ text, key: 'key-a' })).not.toBe(encrypt({ text, key: 'key-b' }));
+    expect(obfuscate({ text, key: 'key-a' })).not.toBe(obfuscate({ text, key: 'key-b' }));
   });
 
-  it('decrypt with wrong key does not reproduce original', () => {
-    const encrypted = encrypt({ text: 'hello', key: 'correct' });
-    expect(decrypt({ text: encrypted, key: 'wrong' })).not.toBe('hello');
+  it('deobfuscate with wrong key does not reproduce original', () => {
+    const obfuscated = obfuscate({ text: 'hello', key: 'correct' });
+    expect(deobfuscate({ text: obfuscated, key: 'wrong' })).not.toBe('hello');
   });
 });

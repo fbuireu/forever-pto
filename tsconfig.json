@@ -1,7 +1,6 @@
 {
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
-  "exclude": [".next/**/*", "node_modules/**/*", "docs/**/*"],
-
+  "exclude": [".next/**/*", "node_modules/**/*", "cloudflare-env.d.ts", "docs/**/*"],
   "compilerOptions": {
     "target": "ESNext",
     "esModuleInterop": true,
@@ -9,7 +8,7 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
-    "module": "ESNext",
+    "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -31,9 +30,7 @@
       "@application/*": ["./src/application/*"],
       "@assets/*": ["./src/ui/assets/*"],
       "@styles/*": ["./src/ui/styles/*"],
-      "@i18n/*": ["./src/ui/i18n/*"],
-      "@mocks/*": ["./src/mocks/*"],
-      "@types/*": ["./src/types/*"]
+      "@i18n/*": ["./src/ui/i18n/*"]
     }
   }
 }

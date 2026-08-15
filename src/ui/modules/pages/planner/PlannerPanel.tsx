@@ -4,7 +4,8 @@ import { useFiltersStore } from '@application/stores/filters';
 import type { HolidaysState } from '@application/stores/holidays';
 import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
-import type { Suggestion } from '@domain/calendar/types';
+import type { MeasuredSuggestion } from '@domain/calendar/types';
+import { measureBudget } from '@domain/calendar/utils/budget';
 import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
 import { ChevronRight } from '@ui/modules/core/animate/icons/ChevronRight';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
@@ -54,7 +55,7 @@ const BADGE_VARIANTS: Variants = {
 };
 
 interface AlternativesProps {
-  allSuggestions: Suggestion[];
+  allSuggestions: MeasuredSuggestion[];
   onSelectionChange: (params: AlternativeSelectionBaseParams) => void;
   onPreviewChange: (params: AlternativeSelectionBaseParams) => void;
   selectedIndex: number;
@@ -89,10 +90,10 @@ function Alternatives({
     }
   }, [currentIndex, totalOptions, allSuggestions, onPreviewChange]);
 
-  const effectiveDays = currentSuggestion.metrics?.totalEffectiveDays ?? 0;
-  const efficiency = currentSuggestion.metrics?.averageEfficiency ?? 0;
-  const gainedDays = currentSuggestion.metrics?.bonusDays ?? 0;
-  const mainEfficiency = allSuggestions[0]?.metrics?.averageEfficiency ?? 0;
+  const effectiveDays = currentSuggestion.metrics.totalEffectiveDays;
+  const efficiency = currentSuggestion.metrics.averageEfficiency;
+  const bonusDays = currentSuggestion.metrics.bonusDays;
+  const mainEfficiency = allSuggestions[0]?.metrics.averageEfficiency ?? 0;
   const efficiencyDiff = efficiency - mainEfficiency;
   const isMainSuggestion = currentIndex === 0;
 
@@ -155,7 +156,7 @@ function Alternatives({
             />
             <span className='text-xs text-green-600 dark:text-green-400 flex'>
               (+
-              <SlidingNumber number={gainedDays} />)
+              <SlidingNumber number={bonusDays} />)
             </span>
           </div>
           <m.span
@@ -267,15 +268,20 @@ function Status({ currentSelection }: StatusProps) {
     }))
   );
 
-  const activeSuggestedCount = currentSelection.days.length - removedSuggestedDays.length;
-  const manualSelectedCount = manuallySelectedDays.length;
-  const usedDays = activeSuggestedCount + manualSelectedCount;
-  const rawRemaining = Math.max(0, ptoDays - activeSuggestedCount - manualSelectedCount);
-  const lastSettledRemaining = useRef(rawRemaining);
-  useEffect(() => {
-    if (!isCalculating) lastSettledRemaining.current = rawRemaining;
+  const budget = measureBudget({
+    ptoDays,
+    days: currentSelection.days,
+    manuallySelectedDays,
+    removedSuggestedDays,
   });
-  const remaining = isCalculating ? lastSettledRemaining.current : rawRemaining;
+  const activeSuggestedCount = budget.suggested;
+  const manualSelectedCount = budget.manual;
+  const usedDays = budget.spent;
+  const lastSettledRemaining = useRef(budget.remaining);
+  useEffect(() => {
+    if (!isCalculating) lastSettledRemaining.current = budget.remaining;
+  });
+  const remaining = isCalculating ? lastSettledRemaining.current : budget.remaining;
   const hasManualChanges = manualSelectedCount > 0 || removedSuggestedDays.length > 0;
   const usedPct = ptoDays > 0 ? Math.min(100, Math.round((usedDays / ptoDays) * 100)) : 0;
   const remainingPct = Math.max(0, 100 - usedPct);

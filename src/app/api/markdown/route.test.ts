@@ -26,6 +26,12 @@ describe('GET /api/markdown', () => {
     expect(response.headers.get('Cache-Control')).toContain('max-age=3600');
   });
 
+  it('sets Vary: Accept so a shared cache does not serve markdown to an HTML request', async () => {
+    const request = new Request('http://localhost/api/markdown');
+    const response = await GET(request);
+    expect(response.headers.get('Vary')).toBe('Accept');
+  });
+
   it('returns the built markdown content', async () => {
     const request = new Request('http://localhost/api/markdown');
     const response = await GET(request);
