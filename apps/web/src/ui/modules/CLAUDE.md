@@ -1,4 +1,4 @@
-# src/ui/modules
+# apps/web/src/ui/modules
 
 Every React component the product renders. Nothing else in `src/ui/` holds components — `hooks/`,
 `utils/`, `adapters/`, `styles/`, `assets/` and `i18n/` are support code, and the route files under
@@ -34,7 +34,7 @@ Walk the questions in order and stop at the first yes.
    the screen folder passes roughly a dozen files, as `planner/` has.
 3. Is it mounted by more than one screen and does it carry product meaning? → `shared/`.
 4. Does it gate something behind Premium, or move money? → `premium/`, whatever screen uses it. Access
-   is derived from the payment record, not stored as a flag — [ADR 0008](../../../docs/adr/0008-premium-derived-from-payment.md).
+   is derived from the payment record, not stored as a flag — [ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md).
 5. Is it a context provider, or a component whose whole job is a side effect and whose render is
    `null`? → `providers/`, `stores/`, `tracking/` or `tutorial/` depending on what the effect is: a
    context wrapper, seeding a store, mounting a consent-gated third-party script, or loading the
@@ -77,7 +77,7 @@ the module path anyway, so a file whose export is named something else just make
 **Server by default.** A file gets `'use client'` only when it needs state, an effect, a store or a
 browser API. `sidebar/AppSidebar.tsx` and `layout/LegalLayout.tsx` are `async` server components that
 call `getTranslations` from `next-intl/server`; client components use the `useTranslations` hook. The
-planner itself is client-side end to end — [ADR 0001](../../../docs/adr/0001-planner-runs-in-the-browser.md).
+planner itself is client-side end to end — [ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md).
 
 ## Skeletons and bones
 

@@ -1,4 +1,4 @@
-# src/domain/calendar
+# apps/web/src/domain/calendar
 
 ## Purpose
 
@@ -6,8 +6,8 @@ The planning engine. Given a Planning Window, a set of Holidays and a PTO budget
 turn that budget into the longest stretches away from work, picks a set of them under the chosen Strategy,
 offers Alternatives, and measures the result. Pure functions throughout — same inputs, same output, no
 clock beyond `startOfToday()`, no I/O. The layer contract it sits under is in [`../CLAUDE.md`](../CLAUDE.md)
-([ADR 0003](../../../docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md)); the words it uses are
-in [`CONTEXT.md`](../../../CONTEXT.md).
+([ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md)); the words it uses are
+in [`CONTEXT.md`](../../../../../CONTEXT.md).
 
 ## Files
 
@@ -64,7 +64,7 @@ calls them directly:
 **`measureBudget` is the one place the budget arithmetic lives, and it is built on `resolveSelectedDays` so it
 cannot disagree with the Metrics.** It answers `{ suggested, manual, spent, remaining }` for a budget and a
 plan; `spent` is exactly `resolveSelectedDays(...).length`, which is the same denominator Efficiency uses, and
-`remaining` is the Remaining Budget as [`CONTEXT.md`](../../../CONTEXT.md) defines it — clamped at zero. That
+`remaining` is the Remaining Budget as [`CONTEXT.md`](../../../../../CONTEXT.md) defines it — clamped at zero. That
 arithmetic used to be written out at four call sites plus a fifth copy behind a store action nothing called;
 the store action was the only one with tests. `toggleDaySelection`, `PlannerPanel`'s status readout and the
 sidebar's budget control all route through this now. A new caller asking "how many days are left" imports
@@ -151,7 +151,7 @@ That rule leaves the Metrics seeing Holidays from outside the Planning Window, a
 what stops them being counted as the plan's own work**: a stretch scores only when it contains a day the plan
 actually placed, not merely any free weekday. Holidays still extend a stretch — that is what a Bridge is for
 — but a run that next year's public Holidays form on their own no longer counts. This is the standard
-[`CONTEXT.md`](../../../CONTEXT.md) sets for Longest Vacation, *the longest stretch the plan produces*, and
+[`CONTEXT.md`](../../../../../CONTEXT.md) sets for Longest Vacation, *the longest stretch the plan produces*, and
 it is why the fix belongs in the streak test rather than in the Holiday list the engine is handed.
 
 **Three metrics walk the free-day runs, and they walk them once.** `freeStreaks` builds the placed-day set,
@@ -316,7 +316,7 @@ is structurally valid.
 clearing there would destroy the sharing the caches exist for. The pipeline sits above both, which is what
 makes it the right owner — it is the only code that knows where a run begins.
 
-That is an amendment to [ADR 0006](../../../docs/adr/0006-caller-owned-calculation-caches.md), which
+That is an amendment to [ADR 0006](../../../../../adr/0006-caller-owned-calculation-caches.md), which
 originally put the clear at each caller because the orchestration lived at each caller. It no longer does.
 `worker.ts` and the holidays store's `generateSuggestions` action now pass inputs and read a result; neither
 knows the caches exist, and a new entry point cannot forget a step it never had.

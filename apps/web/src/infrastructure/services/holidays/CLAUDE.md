@@ -1,4 +1,4 @@
-# src/infrastructure/services/holidays
+# apps/web/src/infrastructure/services/holidays
 
 ## Purpose
 
@@ -58,12 +58,12 @@ its own dependency on the package.
 
 The one caller is `fetchHolidays` in `src/application/stores/holidays.ts`, and it reaches this module
 through a dynamic `import()`. Holiday data ships in the client bundle and is computed on the device
-([ADR 0001](../../../../docs/adr/0001-planner-runs-in-the-browser.md)). Two consequences are easy to miss:
+([ADR 0001](../../../../../../adr/0001-planner-runs-in-the-browser.md)). Two consequences are easy to miss:
 
 - **No Node and no Cloudflare APIs may appear here or in anything it imports.** Logging goes through the
   `getBetterStackInstance()` singleton rather than `LoggerService`, because there is no Effect layer on
   the browser path — the logging exception in
-  [ADR 0002](../../../../docs/adr/0002-effect-for-external-service-boundaries.md).
+  [ADR 0002](../../../../../../adr/0002-effect-for-external-service-boundaries.md).
 - **The work is synchronous and it is not offloaded to the Web Worker.** `Effect.try` wraps a plain
   computation; only suggestion generation goes through `src/infrastructure/workers/worker.ts`. Building
   two years of Holidays blocks the main thread, and it re-runs on every Country, Region, year or
@@ -88,7 +88,7 @@ it deliberately or not at all.
 
 **`type` is upstream's classification and is never the Holiday Variant.** The two are separate fields on
 `HolidayDTO`; `variant` is National, Regional or Custom and is derived from `location`. The glossary reserves
-the word "type" for the upstream sense — see [`CONTEXT.md`](../../../../CONTEXT.md).
+the word "type" for the upstream sense — see [`CONTEXT.md`](../../../../../../CONTEXT.md).
 
 **`location` is the only signal of Variant.** `getRegionalHolidays` stamps `location: region` onto every
 entry it returns and national lookups leave it absent. Downstream, that single field decides REGIONAL vs
@@ -149,5 +149,5 @@ source that throws yields an empty calendar and a log. It mocks only the logging
 `source/dateHolidays.ts` has no test of its own, and that is the deliberate line: everything in it is either
 a `date-holidays` call or `resolveObservedHolidays`, which is tested. Holiday data itself is upstream's, and
 pinning assertions to it would break on every dependency bump — the version bundled is the version shipped
-([ADR 0001](../../../../docs/adr/0001-planner-runs-in-the-browser.md)). If you add a rule to the adapter,
+([ADR 0001](../../../../../../adr/0001-planner-runs-in-the-browser.md)). If you add a rule to the adapter,
 put it in `source/utils/` where it can be tested without the package.

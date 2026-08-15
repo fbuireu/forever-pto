@@ -47,7 +47,7 @@ Next is pinned to **16.2.12** and TypeScript to **6.0.3**, and they move as a pa
 raised until `@opennextjs/cloudflare` publishes a release that supports Next 16.3.
 
 `partialPrefetching` stays out of `next.config.ts`: it is a 16.3 option and a config error on 16.2. The
-`@typescript/typescript6` compatibility package is not a dependency, and `docs/docs-consistency.test.ts`
+`@typescript/typescript6` compatibility package is not a dependency, and `tests/docs-consistency.test.ts`
 imports `typescript` directly for its compiler-API parsing — under TypeScript 7 that import has to become the
 compatibility package, which is why the two versions travel together.
 
@@ -74,4 +74,4 @@ does not control the traffic to, in order to keep a toolchain version the app ga
 - **`/[locale]/payment/confirmation` renders at request time too**, and escapes the e2e suite only because
   `middleware.ts` redirects it away when `payment_intent` is absent. It was never confirmed broken or
   healthy under 16.3; whoever revisits this pin should check it with a real payment intent first.
-- Recorded in [`CLAUDE.md`](../../CLAUDE.md) under *Versions* and *Structure & aliases*.
+- Recorded in [`CLAUDE.md`](../apps/web/CLAUDE.md) under *Versions* and *Structure & aliases*.

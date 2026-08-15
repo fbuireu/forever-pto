@@ -1,10 +1,10 @@
-# src/ui/modules/pages/planner
+# apps/web/src/ui/modules/pages/planner
 
 ## Purpose
 
 The planner screen: twelve-plus month calendars, the Holiday tables, the Alternative switcher, the PTO
 budget readout and the analytics. This is where the product's whole surface lives, and — because the
-planner runs entirely in the browser ([ADR 0001](../../../../../docs/adr/0001-planner-runs-in-the-browser.md))
+planner runs entirely in the browser ([ADR 0001](../../../../../../../adr/0001-planner-runs-in-the-browser.md))
 — where the loop of *filter changes → recalculation → repaint* actually closes.
 
 Nothing here computes a Suggestion. `CalendarList.tsx` asks `useCalculationsWorker` to run the engine
@@ -82,7 +82,7 @@ year, PTO budget, Strategy, past-days flag, locale or the Holiday list — and o
 [`@application/stores/CLAUDE.md`](../../../../application/stores/CLAUDE.md). `Troubleshooting.tsx`, which now
 lives under `pages/homepage/support/`, is the one other caller and it goes the other way —
 `useHolidaysStore().generateSuggestions`, on the main thread. Those are the two *UI* entry points; the two
-callers [ADR 0006](../../../../../docs/adr/0006-caller-owned-calculation-caches.md) counts are the ones that
+callers [ADR 0006](../../../../../../../adr/0006-caller-owned-calculation-caches.md) counts are the ones that
 own the clear a level down — the Web Worker and the holidays store — and `CalendarList` reaches the first
 through `triggerCalculation` while `Troubleshooting` reaches the second directly. A third entry point added
 here would silently reuse the previous run's Holiday set and produce a wrong Suggestion with no error.
@@ -108,7 +108,7 @@ shown. The status is seeded `false` and raised in an effect, so both sides agree
 **Premium is a store read, never a prop.** `PremiumFeature` from `@ui/modules/premium` wraps the gated
 parts (the Custom Holiday tab, row editing, the advanced charts) and `Calendar` checks `premiumKey`
 directly before honouring a day click. Access is derived from the payment record —
-[ADR 0008](../../../../../docs/adr/0008-premium-derived-from-payment.md) — so there is no boolean to
+[ADR 0008](../../../../../../../adr/0008-premium-derived-from-payment.md) — so there is no boolean to
 thread through props and no point caching one.
 
 ## Gotchas
@@ -166,7 +166,7 @@ days the plan actually *placed* (`days.length` in `generateMetrics.ts`). So:
 The two denominators are equal only when the plan spends the whole budget, and it deliberately does not
 always — a Removed Day, or a Bridge that no longer fits, leaves budget standing (see
 [`@domain/calendar/CLAUDE.md`](../../../../domain/calendar/CLAUDE.md)). Gain is therefore **not** Efficiency
-minus one, and the badge is **not** a Bonus Day count as [`CONTEXT.md`](../../../../../CONTEXT.md) defines it
+minus one, and the badge is **not** a Bonus Day count as [`CONTEXT.md`](../../../../../../../CONTEXT.md) defines it
 — which is why its label says "over budget" and never the word bonus. Collapsing any of these into one
 another ships a number that is silently wrong by however much budget went unspent.
 
@@ -233,7 +233,7 @@ the recharts charts index into; `summary/MetricCard.tsx` declares its own record
 They are not interchangeable and neither is derived from the other.
 
 **`YearTimelineChart.tsx` is not a recharts chart.** It is hand-built positioned `div`s using
-`Temporal.PlainYearMonth` for month lengths ([ADR 0005](../../../../../docs/adr/0005-temporal-polyfill.md)).
+`Temporal.PlainYearMonth` for month lengths ([ADR 0005](../../../../../../../adr/0005-temporal-polyfill.md)).
 The other four charts use recharts and are the reason `Summary.tsx` loads all five through `dynamic()`.
 
 **It spans the Planning Window, not the calendar year, and both halves of that were once wrong.** `segPos`

@@ -1,4 +1,4 @@
-# src/app
+# apps/web/src/app
 
 ## Purpose
 
@@ -223,7 +223,7 @@ importing the other five.
 ## Cloudflare request context
 
 `getCloudflareContext()` may be read here and in server actions, never in a use-case — see
-[ADR 0004](../../docs/adr/0004-cloudflare-workers-as-deployment-target.md). In this folder the readers are
+[ADR 0004](../../../../adr/0004-cloudflare-workers-as-deployment-target.md). In this folder the readers are
 `api/contact/route.ts`, `api/markdown/route.ts`, `.well-known/[...slug]/route.ts`, `sitemap.ts` and
 `robots.ts`; the `metadata.ts` files reach it indirectly through `getPublicEnv.ts`.
 
@@ -254,7 +254,7 @@ pins that, and `robots.test.ts` additionally pins that nothing the sitemap adver
 
 Both files resolve the base URL from the Cloudflare env rather than a constant. Only `sitemap.ts` gets the
 host it is actually served from, though: `robots.ts` is prerendered, so it bakes whatever the build resolved
-— see the Deploy section of the root [`CLAUDE.md`](../../CLAUDE.md).
+— see the Deploy section of the root [`CLAUDE.md`](../../../../CLAUDE.md).
 
 ## Structured data
 

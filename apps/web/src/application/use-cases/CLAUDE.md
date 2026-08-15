@@ -1,4 +1,4 @@
-# src/application/use-cases
+# apps/web/src/application/use-cases
 
 ## Purpose
 
@@ -25,7 +25,7 @@ parameters written out explicitly rather than inferred. That signature is the co
   `ResendService`, `LoggerService`. Tags are `yield*`-ed out of context; no client is ever constructed here.
 - **`E`** lists the tagged errors from `errors.ts` the caller has to map. The boundary matches on
   `_tag` via `Effect.catchTags`, so adding a failure mode to `E` turns every unhandled call site into a
-  type error instead of a silent 500 ([ADR 0002](../../../docs/adr/0002-effect-for-external-service-boundaries.md)).
+  type error instead of a silent 500 ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)).
 - Success values are plain objects. Nothing here builds a `NextResponse`.
 
 Failures the flow is expected to survive are absorbed in place rather than widening `E`: a repository read
@@ -55,7 +55,7 @@ The same holds for `sendContactEmail`.
 
 A use-case must not call `getCloudflareContext()`. The Cloudflare context is only valid inside a request,
 and a use-case is a value that may be run later — including from inside `after()`, after the response has
-been sent ([ADR 0004](../../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)). The caller reads
+been sent ([ADR 0004](../../../../../adr/0004-cloudflare-workers-as-deployment-target.md)). The caller reads
 the context and passes what it found down as an ordinary object: `sendContactEmail` takes
 `{ siteUrl, contactEmail }`, `createPayment` takes `{ userAgent, ipAddress }`. Anything read from headers,
 cookies or `env` belongs in that parameter.
@@ -80,7 +80,7 @@ caller can treat all four uniformly.
 
 ## Premium activation
 
-`activatePremium.ts` is the code behind [ADR 0008](../../../docs/adr/0008-premium-derived-from-payment.md):
+`activatePremium.ts` is the code behind [ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md):
 there is no accounts table, so a succeeded payment record *is* the entitlement, and both exports end by
 minting the same 30-day session token via `createSession` in `session.ts`.
 
@@ -123,7 +123,7 @@ from `createPayment` or `activateWithPayment` recoverable.
 **`MissingDonorEmailError` is the one failure that goes the other way**, and the asymmetry is the point. The
 event factory now refuses to invent an email when a succeeded intent carries neither `metadata.email` nor
 `receipt_email`, because that address is the only key Premium can ever be recovered by
-([ADR 0008](../../../docs/adr/0008-premium-derived-from-payment.md)) and a blank one orphans the Donation
+([ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md)) and a blank one orphans the Donation
 permanently. But redelivering the same intent will produce the same missing email forever, so the succeeded
 branch logs it at error level through `tapError` and then absorbs it, letting the route answer 2xx. Retrying
 a failure that can never succeed is not resilience. The log is the whole remedy here — the payer has paid and

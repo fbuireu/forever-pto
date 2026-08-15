@@ -1,4 +1,4 @@
-# src/infrastructure/api
+# apps/web/src/infrastructure/api
 
 The wire vocabulary for failures, the response helper that opts out of caching, the request-body parser — and
 `operations/`, where the two flows that exist behind *two* transports are terminated once.
@@ -41,7 +41,7 @@ know the address rather than claim it is called "unknown".
 
 ## From a typed failure to a status code
 
-A use-case fails with a tagged error declared in `src/infrastructure/errors.ts` (`DatabaseError`, `EmailError`, `MissingDonorEmailError`, `PaymentError`, `PromoCodeError`, `RateLimitError`, `SessionError`, `ValidationError`, `WebhookError`). The entry point — the only place the program is run — maps each tag with `Effect.catchTags` onto a status and a body. That mapping is the whole reason this folder exists; see [ADR 0002](../../../docs/adr/0002-effect-for-external-service-boundaries.md).
+A use-case fails with a tagged error declared in `src/infrastructure/errors.ts` (`DatabaseError`, `EmailError`, `MissingDonorEmailError`, `PaymentError`, `PromoCodeError`, `RateLimitError`, `SessionError`, `ValidationError`, `WebhookError`). The entry point — the only place the program is run — maps each tag with `Effect.catchTags` onto a status and a body. That mapping is the whole reason this folder exists; see [ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md).
 
 What the code does today:
 

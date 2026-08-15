@@ -1,4 +1,4 @@
-# src/infrastructure
+# apps/web/src/infrastructure
 
 ## Purpose
 
@@ -7,7 +7,7 @@ Cloudflare runtime or another thread lives here: SDK wrappers, server actions, m
 routing, the `.well-known` endpoints and the calculations Web Worker. It holds no planning rule and no
 orchestration — a use-case decides *what* happens, this layer knows *how* to reach the thing it happens to.
 
-Because the planner runs in the browser ([ADR 0001](../../docs/adr/0001-planner-runs-in-the-browser.md)), the
+Because the planner runs in the browser ([ADR 0001](../../../../adr/0001-planner-runs-in-the-browser.md)), the
 server side of this layer is small: payments, one contact form, a Stripe webhook and some static rendering.
 The largest single thing in here is a browser file — the Web Worker.
 
@@ -19,7 +19,7 @@ The largest single thing in here is a browser file — the Web Worker.
 | `api/` | The wire vocabulary for failures, the no-store response helper, and the operations both transports terminate. See [`api/CLAUDE.md`](./api/CLAUDE.md) |
 | `clients/` | SDK wrappers — four Effect service tags plus four modules that are deliberately not services. See [`clients/CLAUDE.md`](./clients/CLAUDE.md) |
 | `i18n/` | `routing.ts` (next-intl routing, `localePrefix: 'as-needed'`), `config.ts` (request config + message loading), `locales.ts` (the six codes), `cookie.ts` (`NEXT_LOCALE`), `utils/url.ts` (`localePath`, `getLocaleFromPathname`, `localeAlternates`) |
-| `images/` | `loader.ts` — rewrites an image src to `/cdn-cgi/image/...`, the Cloudflare optimiser used in place of Next's built-in one ([ADR 0004](../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)) |
+| `images/` | `loader.ts` — rewrites an image src to `/cdn-cgi/image/...`, the Cloudflare optimiser used in place of Next's built-in one ([ADR 0004](../../../../adr/0004-cloudflare-workers-as-deployment-target.md)) |
 | `markdown/` | `buildMarkdownPage.ts` — the Markdown twin of a page, served when the request asks for `text/markdown`. Translates through `createTranslator` over statically imported bundles, never `next-intl/server` — see *Gotchas* |
 | `seo/` | `buildMetadata.ts` — the `Metadata` shape every route's `generateMetadata` fills in; `routes.ts` — `SITE_ROUTES`, the one list of pages and whether each is indexable |
 | `proxy/` | Middleware helpers: `location.ts` (country detection + cookie) and `cookie.ts` (`user-country`, one week) |
@@ -49,7 +49,7 @@ None of this is lint-enforced. Biome has no import-boundary rule; these are conv
 
 Every server path that talks to Stripe, Turso or Resend is an Effect program with a typed error channel and
 its dependencies injected as service tags
-([ADR 0002](../../docs/adr/0002-effect-for-external-service-boundaries.md)). The program is *composed* in
+([ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.md)). The program is *composed* in
 `services/` and `@domain/payment/`, and *terminated* at an entry point — a route handler under `src/app/api/`
 or a server action here — with `Effect.runPromise(program.pipe(Effect.provide(ApplicationLayer), …))`.
 
@@ -72,12 +72,12 @@ its requirements with it and would not compile otherwise.
 **Logging is the documented exception.** BetterStack has a tag *and* a plain singleton, and the singleton is
 what `getCountries.ts`, `getRegions.ts`, the country-detection strategies and the browser Stripe client use —
 anywhere there is no layer to provide. "All external calls go through Effect" is false for logging, on
-purpose ([ADR 0002](../../docs/adr/0002-effect-for-external-service-boundaries.md)).
+purpose ([ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.md)).
 
 ## The Cloudflare context is request-scoped
 
 `getCloudflareContext()` is only valid inside a request
-([ADR 0004](../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)). Entry points may call it;
+([ADR 0004](../../../../adr/0004-cloudflare-workers-as-deployment-target.md)). Entry points may call it;
 use-cases may not, and receive configuration as plain values instead — `contact.ts` reads
 `env.NEXT_PUBLIC_SITE_URL` and `env.NEXT_PUBLIC_CONTACT_EMAIL` and passes them down as a plain object.
 

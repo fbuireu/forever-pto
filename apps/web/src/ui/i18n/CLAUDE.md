@@ -1,4 +1,4 @@
-# src/ui/i18n
+# apps/web/src/ui/i18n
 
 ## Purpose
 
@@ -70,7 +70,7 @@ go hunting for a key:
 ## Invariants
 
 **Every bundle has exactly the keys `en.json` has** — no missing keys, no leftovers. This is asserted
-by [`docs/docs-consistency.test.ts`](../../../docs/docs-consistency.test.ts), which flattens each file
+by [`tests/docs-consistency.test.ts`](../../../../../tests/docs-consistency.test.ts), which flattens each file
 and diffs it against the reference, so a half-finished translation fails the unit suite rather than
 rendering a raw key in production. It reads unstaged files, so it fires before you commit.
 
@@ -81,12 +81,12 @@ UI rather than the copy. The parity test above is what keeps that from reaching 
 
 ## Key names may carry a retired term; the strings may not
 
-[`CONTEXT.md`](../../../CONTEXT.md) governs the words the product says, and the root guide calls a retired
+[`CONTEXT.md`](../../../../../CONTEXT.md) governs the words the product says, and the root guide calls a retired
 name in code or copy a defect. A few **key names** still hold retired terms — `alternativesManager.totalOff`
 and `totalDaysOff` for Effective Day, `ptoStatus.autoAssigned` for Suggested Day — while the strings behind
 them say Effective Day and Suggested Day, in all six languages. That split is deliberate: a key is an
 identifier no user reads, renaming one means
-editing six bundles and every call site, and `docs/docs-consistency.test.ts` asserts key parity across all
+editing six bundles and every call site, and `tests/docs-consistency.test.ts` asserts key parity across all
 six, so a half-finished rename fails the suite rather than the eye. Rename a key only as its own change, all
 six bundles at once. **A translated string is different** — it is the product speaking, and it uses the
 glossary's word.
@@ -99,7 +99,7 @@ active locale — about 93 KB of JSON for `en`, more for the others. There is no
 Adding a namespace makes every page heavier, so a large block of copy used by one screen is worth
 weighing rather than adding by reflex. Trimming this by rendering more copy on the server is not
 available either: the planner is client-side end to end
-([ADR 0001](../../../docs/adr/0001-planner-runs-in-the-browser.md)), so most of the catalogue has to
+([ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md)), so most of the catalogue has to
 reach the browser one way or another.
 
 **`src/app/global-error.tsx` is English-only, on purpose.** It static-imports `en.json` alone and sets

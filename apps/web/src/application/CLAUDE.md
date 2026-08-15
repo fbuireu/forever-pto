@@ -1,4 +1,4 @@
-# src/application
+# apps/web/src/application
 
 ## Purpose
 
@@ -10,7 +10,7 @@ It is unusual in one respect: it has a server half and a browser half, and they 
 server half — `use-cases/`, the Zod schemas in `dto/`, `shared/utils/zodParse.ts`, `email/` — is Effect
 programs run at a route handler or a server action. The browser half — `stores/`, `export/`,
 `i18n/navigation.ts` — is Zustand and plain functions, and it is where most of the product actually lives,
-because the planner runs client-side ([ADR 0001](../../docs/adr/0001-planner-runs-in-the-browser.md)). The
+because the planner runs client-side ([ADR 0001](../../../../adr/0001-planner-runs-in-the-browser.md)). The
 two halves are joined only by `dto/` and `shared/utils/dates.ts`.
 
 ## Structure
@@ -30,7 +30,7 @@ two halves are joined only by `dto/` and `shared/utils/dates.ts`.
 
 May import from `@domain/*` and `@infrastructure/*`. Must not import React components, build a
 `NextResponse`, or reach for `getCloudflareContext()` — configuration arrives as plain values
-([ADR 0004](../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)).
+([ADR 0004](../../../../adr/0004-cloudflare-workers-as-deployment-target.md)).
 
 **Two files import from `@ui/*`, inverting the dependency.** `stores/premium.ts` uses
 `@ui/adapters/session/checkSession`, and `stores/ui.ts` uses `@ui/utils/currencies`. Both are noted in
@@ -38,7 +38,7 @@ May import from `@domain/*` and `@infrastructure/*`. Must not import React compo
 not add a third.
 
 **No SDK is constructed here.** Stripe, Turso and Resend arrive as Effect service tags that the caller
-provides ([ADR 0002](../../docs/adr/0002-effect-for-external-service-boundaries.md)), so a use-case stays
+provides ([ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.md)), so a use-case stays
 substitutable in tests. The one exception is logging: the stores log against the BetterStack singleton rather
 than a tag, because a Zustand action has no Effect context to yield one out of. They reach it through a
 `void import(...)` helper declared in each file — never a static import and never a module-scope `logger`,
@@ -55,7 +55,7 @@ None of this is lint-enforced. Biome has no import-boundary rule; these are conv
 
 `shared/utils/dates.ts` is the app's date library — there is no `date-fns` and no second implementation of
 the arithmetic. Every function converts to `Temporal.PlainDate`, does the work there and converts back
-([ADR 0005](../../docs/adr/0005-temporal-polyfill.md)); `dateIntake.ts` beside it is the only other file on
+([ADR 0005](../../../../adr/0005-temporal-polyfill.md)); `dateIntake.ts` beside it is the only other file on
 this side of the tree that imports `temporal-polyfill`.
 
 Two consequences worth holding on to:

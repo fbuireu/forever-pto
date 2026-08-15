@@ -1,4 +1,4 @@
-# src/ui/modules/core
+# apps/web/src/ui/modules/core
 
 ## Purpose
 
@@ -60,7 +60,7 @@ because the app wraps everything in `LazyMotionProvider`, which loads `domAnimat
 `motion.div` re-introduces the full feature bundle that the provider exists to defer. There is not a
 single `motion.` usage in `src/ui` today; keep it that way. Nearly everything here ships to the
 browser — the planner runs there end to end
-([ADR 0001](../../../../docs/adr/0001-planner-runs-in-the-browser.md)) — so a dependency added in this
+([ADR 0001](../../../../../../adr/0001-planner-runs-in-the-browser.md)) — so a dependency added in this
 folder is a dependency added to the client bundle of every screen.
 
 Coupling back into the rest of the app is small, but it is not zero. The complete list:

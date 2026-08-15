@@ -1,4 +1,4 @@
-# src/ui/styles
+# apps/web/src/ui/styles
 
 ## Purpose
 

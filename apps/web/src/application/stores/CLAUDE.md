@@ -1,9 +1,9 @@
-# src/application/stores
+# apps/web/src/application/stores
 
 ## Purpose
 
 All client state. Because the planner runs in the browser
-([ADR 0001](../../../docs/adr/0001-planner-runs-in-the-browser.md)), these five Zustand stores are the
+([ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md)), these five Zustand stores are the
 product's real database: the Holiday calendar, the Suggestion and its Alternatives, the user's manual edits
 and their Premium session all live here and nowhere else. Lose local storage and the plan is gone.
 
@@ -50,7 +50,7 @@ at one control is not an invariant; put it where every writer passes.
 
 `crypto.ts` XORs the serialised blob against `NEXT_PUBLIC_STORAGE_KEY` and base64-encodes it. The key ships in
 the client bundle, so this is obfuscation and nothing more — never call it encryption, and never put anything
-confidential behind it ([ADR 0007](../../../docs/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)).
+confidential behind it ([ADR 0007](../../../../../adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)).
 The exported names say so — `obfuscate`, `deobfuscate`, `obfuscatedStorage` — and so do the log messages. Only
 the two file names still read as a cipher, because renaming them would break the paths the guides above this
 folder quote; the vocabulary inside them is the part that matters.
@@ -211,7 +211,7 @@ It then re-reads the filters through `getState()` rather than the values capture
 skips the re-fetch entirely when the default empty Country is what it finds; fetching against `''` would
 plan a year with no Holidays in it. `usePremiumStore.resetPremiumStore` is **not** called and must not be:
 Premium is derived from the payment record and access is never revoked from a donor
-([ADR 0008](../../../docs/adr/0008-premium-derived-from-payment.md)), so a troubleshooting button that
+([ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md)), so a troubleshooting button that
 logged a paying user out would be a defect, not a more thorough reset. That action having no caller is the
 correct state, not dead code to wire up.
 
@@ -246,7 +246,7 @@ forwards it as-is, because the wire type has no null, while this store maps it t
 `alternatives` and `currentSelection` — its existing "no plan" state, which the calendar already renders.
 
 Cache clearing is no longer either caller's job — `runPlanningPipeline` does it, per the 2026-08-14 amendment
-to [ADR 0006](../../../docs/adr/0006-caller-owned-calculation-caches.md).
+to [ADR 0006](../../../../../adr/0006-caller-owned-calculation-caches.md).
 
 The pipeline and `getHolidays.ts` are reached through `await import(...)` inside the actions, not top-level
 imports. That keeps the bulk of the planner out of the bundle any page that merely touches the store would
@@ -307,8 +307,8 @@ fix, not a regression to restore.
 the result onto `currentSelection` — leaving `suggestion` and `alternatives` untouched. It returns `false`
 without changing anything when the budget is exhausted. Re-planning is a separate worker run.
 
-**`needsSessionCheck` decides when the cookie is consulted, not what is authoritative.** The client-side Premium gate is the persisted `premiumKey` itself ([ADR 0007](../../../docs/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)); the cookie only seeds it. The premium session is a signed HTTP-only
-cookie, not store state ([ADR 0008](../../../docs/adr/0008-premium-derived-from-payment.md)); `premiumKey`
+**`needsSessionCheck` decides when the cookie is consulted, not what is authoritative.** The client-side Premium gate is the persisted `premiumKey` itself ([ADR 0007](../../../../../adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)); the cookie only seeds it. The premium session is a signed HTTP-only
+cookie, not store state ([ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md)); `premiumKey`
 here is a cache of it. `onRehydrateStorage` raises `needsSessionCheck` whenever this device has no fresh
 verification — never verified, verified more than `TWENTY_FOUR_HOURS` ago, or nothing decoded — so a valid
 cookie restores access without the user retyping their email. `checkExistingSession` is a no-op unless the

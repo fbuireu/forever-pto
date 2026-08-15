@@ -1,10 +1,10 @@
-# src/infrastructure/clients
+# apps/web/src/infrastructure/clients
 
 ## Purpose
 
 One folder per external SDK, and nothing else in the repo constructs one. Four of them are Effect services —
 a `Context.Tag` for the interface and a Live `Layer` for the real implementation, so a test can substitute the
-tag and never reach the network ([ADR 0002](../../../docs/adr/0002-effect-for-external-service-boundaries.md)).
+tag and never reach the network ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)).
 Four modules here are not services at all, for the reasons given below.
 
 ## Effect services
@@ -83,7 +83,7 @@ Two clients, and the split is the trap:
 
 - `payments/stripe/serverService.ts` — the Effect service. Node SDK, API version pinned to `'2026-07-29.dahlia'`,
   and `StripeNode.createFetchHttpClient()` because the Workers runtime has no Node HTTP stack
-  ([ADR 0004](../../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)). Every server-side Stripe
+  ([ADR 0004](../../../../../adr/0004-cloudflare-workers-as-deployment-target.md)). Every server-side Stripe
   call goes through this tag. It also exports `WebhookConfigurationError` and `isWebhookConfigurationError`.
 - `payments/stripe/client.ts` — browser only, `@stripe/stripe-js`. The `StripeClient` class is **not**
   exported; the module's only export is `getStripeClientInstance()`, a lazy singleton that throws if
@@ -114,7 +114,7 @@ exercises. Adding a method here means adding its caller and its error mapping in
 | Path | Why it is not an Effect service |
 | --- | --- |
 | `payments/stripe/client.ts` | Runs in the browser, where there is no layer to provide |
-| `logging/better-stack/client.ts` | Deliberate exception — `getBetterStackInstance()` is what stores, lookups and components use ([ADR 0002](../../../docs/adr/0002-effect-for-external-service-boundaries.md)) |
+| `logging/better-stack/client.ts` | Deliberate exception — `getBetterStackInstance()` is what stores, lookups and components use ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)) |
 | `logging/better-stack/tracking.ts` | Not a logger at all: `track()` and `identifyUser()` push to the `window.betterstack` snippet injected by the UI layer's `modules/tracking/BetterStackTracking.tsx`. Both no-op when the snippet has not loaded |
 | `tutorial/driver/client.tsx` | Wraps driver.js, a DOM library. It renders a close icon into the popover, but never imports one: the icon arrives as the injected `closeIcon?: ReactNode` config field, so nothing here reaches into `@ui/*` |
 

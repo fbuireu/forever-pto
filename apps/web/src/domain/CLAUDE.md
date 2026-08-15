@@ -1,8 +1,8 @@
-# src/domain
+# apps/web/src/domain
 
 The business rules, in two bounded contexts that deliberately do not follow the same rule. Nothing here
 renders, routes, reads a request or reaches for a browser global. The vocabulary is
-[`CONTEXT.md`](../../CONTEXT.md) — a variable named for a retired term is a defect here, not a style
+[`CONTEXT.md`](../../../../CONTEXT.md) — a variable named for a retired term is a defect here, not a style
 preference.
 
 ## Bounded contexts
@@ -18,7 +18,7 @@ thing that connects them, and that connection lives in the application layer, no
 ## Two rules, on purpose
 
 A reader who finds two contracts inside one layer assumes one is a mistake. Both are intended — see
-[ADR 0003](../../docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md).
+[ADR 0003](../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md).
 
 **`calendar/` is pure.** Its outside imports are exactly four, and the list is meant to stay that short:
 
@@ -29,7 +29,7 @@ A reader who finds two contracts inside one layer assumes one is a mistake. Both
 
 No `@infrastructure/*`, no `@ui/*`, no Effect. The reason is the runtime rather than taste: the planner
 evaluates this code inside a Web Worker with no DOM and no server context
-([ADR 0001](../../docs/adr/0001-planner-runs-in-the-browser.md)). An import that touches `window`,
+([ADR 0001](../../../../adr/0001-planner-runs-in-the-browser.md)). An import that touches `window`,
 `process` or a Node built-in breaks the planner in a way no server-side test will catch, because every
 test in this repo runs on the main thread.
 
@@ -54,7 +54,7 @@ the user sees an empty plan and no error. That is the contract to guard.
 
 `Temporal` resolves from `temporal-polyfill` only, never the ambient global, because the global does not
 exist in the deployed Workers runtime and a local run proves nothing
-([ADR 0005](../../docs/adr/0005-temporal-polyfill.md)). Almost all use here is indirect, through
+([ADR 0005](../../../../adr/0005-temporal-polyfill.md)). Almost all use here is indirect, through
 `@application/shared/utils/dates`.
 
 ## Testing
@@ -68,7 +68,7 @@ plus the `FilterStrategy` const, and `payment/events/factory/resolvers.ts` is co
   whose subject reaches `getKey` or `createHolidaySet` **must** call `clearDateKeyCache()` and
   `clearHolidayCache()` in `beforeEach`: the caches in `calendar/utils/cache.ts` are module-level and
   survive between cases in the same file
-  ([ADR 0006](../../docs/adr/0006-caller-owned-calculation-caches.md)). The `metrics/` subtree reaches
+  ([ADR 0006](../../../../adr/0006-caller-owned-calculation-caches.md)). The `metrics/` subtree reaches
   neither and is exempt — see [`calendar/CLAUDE.md`](./calendar/CLAUDE.md).
 - `payment/` tests build a `Layer.succeed(Tag, mock)` for every tag the handler requires and run the
   program over it. No test constructs a real Stripe or Turso client.

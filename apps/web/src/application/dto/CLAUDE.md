@@ -1,8 +1,8 @@
-# src/application/dto
+# apps/web/src/application/dto
 
 ## Purpose
 
-The translation seam between external shapes and the vocabulary in [`CONTEXT.md`](../../../CONTEXT.md). A holiday arrives from `date-holidays` as a `RawHoliday`, a payment arrives from Stripe as a `PaymentIntent`, a country list arrives from `i18n-iso-countries` as a map of code to name. Nothing downstream should have to know any of that. A DTO takes the foreign shape in and hands back the canonical one — `HolidayDTO`, `PaymentData`, `CountryDTO` — so stores, use-cases, the domain and the UI only ever speak the glossary.
+The translation seam between external shapes and the vocabulary in [`CONTEXT.md`](../../../../../CONTEXT.md). A holiday arrives from `date-holidays` as a `RawHoliday`, a payment arrives from Stripe as a `PaymentIntent`, a country list arrives from `i18n-iso-countries` as a map of code to name. Nothing downstream should have to know any of that. A DTO takes the foreign shape in and hands back the canonical one — `HolidayDTO`, `PaymentData`, `CountryDTO` — so stores, use-cases, the domain and the UI only ever speak the glossary.
 
 The rest of the application layer contract is in [`../CLAUDE.md`](../CLAUDE.md).
 
@@ -52,7 +52,7 @@ type BaseDTO<INPUT, OUTPUT, PARAMS = unknown> = {
 
 Nothing here fetches, writes, logs or reads a clock it was not handed. `create` is a pure function of `raw` and `params`. `stripe`, `date-holidays` and `i18n-iso-countries` appear only as `import type` — no SDK is constructed, so nothing in this folder pulls a runtime dependency in behind it.
 
-That is what lets `HolidayDTO` cross into the domain. The pure calendar context imports `@application/dto/holiday/types` directly, which is a layering inversion on paper: the type describes a Holiday, so it belongs in the domain. It is a known pragmatic exception — moving it means touching every calendar module and its tests — and it is safe only because the file is types and one const object, evaluable inside a Web Worker with no DOM. See [ADR 0003](../../../docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md) and [`../../domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). If anything with a runtime dependency is ever added to `holiday/types.ts`, the planner breaks in the worker and no server-side test will catch it.
+That is what lets `HolidayDTO` cross into the domain. The pure calendar context imports `@application/dto/holiday/types` directly, which is a layering inversion on paper: the type describes a Holiday, so it belongs in the domain. It is a known pragmatic exception — moving it means touching every calendar module and its tests — and it is safe only because the file is types and one const object, evaluable inside a Web Worker with no DOM. See [ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md) and [`../../domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). If anything with a runtime dependency is ever added to `holiday/types.ts`, the planner breaks in the worker and no server-side test will catch it.
 
 `RegionDTO` also crosses outwards, but downwards only: `holidayDTO.create` takes the region list so `getRegionName` can turn a region code into a display label. No domain code imports it.
 

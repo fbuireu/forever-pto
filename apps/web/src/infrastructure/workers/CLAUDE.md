@@ -1,9 +1,9 @@
-# src/infrastructure/workers
+# apps/web/src/infrastructure/workers
 
 ## Purpose
 
 The browser Web Worker that runs the planning pipeline off the main thread. The planner computes everything
-client-side ([ADR 0001](../../../docs/adr/0001-planner-runs-in-the-browser.md)), so a full run — suggestions,
+client-side ([ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md)), so a full run — suggestions,
 alternatives and metrics for each of them — is the one piece of work in the app long enough to freeze a
 slider drag if it stayed on the main thread.
 
@@ -53,13 +53,13 @@ and `onmessageerror` handlers, because a worker that fails to *load* never reach
 
 **This worker no longer clears the calculation caches, and must not start again.** `runPlanningPipeline`
 clears them on entry, which is what the 2026-08-14 amendment to
-[ADR 0006](../../../docs/adr/0006-caller-owned-calculation-caches.md) moved. The pipeline call sits inside the
+[ADR 0006](../../../../../adr/0006-caller-owned-calculation-caches.md) moved. The pipeline call sits inside the
 handler's `try`, after the message-type guard, so a throw anywhere in a run still becomes a `WORKER_ERROR` and
 an unrelated message never starts one.
 
 **`Temporal` reaches this thread through `temporal-polyfill`.** The engine imports it explicitly rather than
 using the global, and this worker is one of the three realms that has to work
-([ADR 0005](../../../docs/adr/0005-temporal-polyfill.md)). Nothing here imports `Temporal` directly, but a
+([ADR 0005](../../../../../adr/0005-temporal-polyfill.md)). Nothing here imports `Temporal` directly, but a
 codemod that "modernises" the engine's import breaks this thread too.
 
 **The way back from a string is `fromStoredInstant`, not `new Date`.** Everything crossing this boundary was

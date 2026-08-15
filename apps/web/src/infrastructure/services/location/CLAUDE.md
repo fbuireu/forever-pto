@@ -1,4 +1,4 @@
-# src/infrastructure/services/location
+# apps/web/src/infrastructure/services/location
 
 ## Purpose
 
@@ -43,7 +43,7 @@ network strategies sit in front of an HTML response only when both have already 
 **The trace is fetched from this app's own origin, not from `cloudflare.com`.** If `NEXT_PUBLIC_SITE_URL` is
 unset the fetch simply fails and the chain continues; if it points at another environment, the trace reports
 that environment's answer. The value is environment-specific configuration, not a constant
-([ADR 0004](../../../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)).
+([ADR 0004](../../../../../../adr/0004-cloudflare-workers-as-deployment-target.md)).
 
 **All three fetches are `cache: 'no-store'`, and must stay that way.** Every response here identifies whoever
 asked for it, so a stored copy would hand one visitor's Country to the next — which then gets written to the
@@ -61,7 +61,7 @@ it up the chain.
 
 **The same reservation applies to the trace, in weaker form.** It is fetched by the Worker rather than by the
 browser, so `loc=` describes the subrequest's client. `cf-ipcountry` is the only signal derived from the
-visitor's own connection ([ADR 0004](../../../../docs/adr/0004-cloudflare-workers-as-deployment-target.md) —
+visitor's own connection ([ADR 0004](../../../../../../adr/0004-cloudflare-workers-as-deployment-target.md) —
 the edge exposing the country on the request is the reason no geolocation service is needed on the common
 path).
 
@@ -73,7 +73,7 @@ is passed through as-is, so the same two codes can reach the cookie by that rout
 their own wrapper with `Effect.runPromise`, because the middleware has no `ApplicationLayer` to provide. For
 the same reason logging goes through the `getBetterStackInstance()` singleton rather than `LoggerService` —
 the documented logging exception in
-[ADR 0002](../../../../docs/adr/0002-effect-for-external-service-boundaries.md).
+[ADR 0002](../../../../../../adr/0002-effect-for-external-service-boundaries.md).
 
 **Only the CDN failure is logged.** It goes through `logger.warn`. The egress-IP chain is closed with
 `Effect.orElse`, so a failure there is invisible — if detection has quietly stopped working, absence of logs

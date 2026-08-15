@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/static/images/forever-pto-logo.png" alt="" width="80" align="center">
+<img src="apps/web/public/static/images/forever-pto-logo.png" alt="" width="80" align="center">
 
 # Forever PTO
 
@@ -40,7 +40,7 @@ Given your country, region, year, and number of PTO days, Forever PTO suggests t
 
 The full wiki lives at **[docs.forever-pto.com](https://docs.forever-pto.com)** — architecture, runtime flows (country detection, premium, holidays engine…), the design system with live component demos, and the complete CI/CD and environments lifecycle.
 
-This repo is a pnpm workspace: the app at the root (`forever-pto`) and the docs site in [`docs/`](docs/) (`forever-pto-docs`, Astro Starlight), which reuses the app's real components and tokens and deploys independently. Docs-only changes must use `docs:` commit/PR titles (squash-merge feeds semantic-release).
+This repo is a pnpm workspace with two packages: the app in [`apps/web/`](apps/web/) (`forever-pto`) and the docs site in [`apps/docs/`](apps/docs/) (`forever-pto-docs`, Astro Starlight), which reuses the app's real components and tokens and deploys independently. Each versions itself: a commit is attributed to whichever package its paths fall under, so keep a pull request to one package.
 
 ```bash
 pnpm --filter forever-pto-docs dev   # docs dev server
@@ -70,14 +70,14 @@ pnpm --filter forever-pto-docs dev   # docs dev server
 
 ## Getting started
 
-**Requirements:** Node.js 26.3.0 (`.nvmrc`, mirrored in `engines.node`), pnpm 11.20.0 (`packageManager`) — pinned, match exactly
+**Requirements:** Node.js 26.3.0 (`.nvmrc`, mirrored in `engines.node`), pnpm 11.21.0 (`packageManager`) — pinned, match exactly
 
 ```bash
 # Install dependencies
 pnpm install
 
 # Copy env file and fill in values
-cp .env.example .env.development
+cp apps/web/.env.example apps/web/.env.development
 
 # Start dev server
 pnpm dev
@@ -105,7 +105,7 @@ pnpm format:all       # Format all files
 
 ## Environment variables
 
-See [`.env.example`](.env.example) for the full list. Key variables:
+See [`apps/web/.env.example`](apps/web/.env.example) for the full list. Key variables:
 
 | Variable | Description |
 | --- | --- |
@@ -123,10 +123,10 @@ See [`.env.example`](.env.example) for the full list. Key variables:
 | --- | --- |
 | [`CLAUDE.md`](CLAUDE.md) | How the codebase is built, and the rules for changing it. Start here |
 | [`CONTEXT.md`](CONTEXT.md) | The domain glossary — one canonical name per concept |
-| [`docs/adr/`](docs/adr/) | Why it is like this. One hard-to-reverse decision per file |
+| [`adr/`](adr/) | Why it is like this. One hard-to-reverse decision per file |
 
-Selected folders under `src/` carry their own `CLAUDE.md` with the detail for that folder — the five layer roots plus sixteen sub-folders, all listed in the root [`CLAUDE.md`](CLAUDE.md).
-[`docs/docs-consistency.test.ts`](docs/docs-consistency.test.ts) runs with the unit suite and fails the build
+Selected folders under `apps/web/src/` carry their own `CLAUDE.md` with the detail for that folder — the five layer roots plus sixteen sub-folders, all listed in [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md).
+[`tests/docs-consistency.test.ts`](tests/docs-consistency.test.ts) runs with the unit suite and fails the build
 when the docs and the code disagree.
 
 ---
