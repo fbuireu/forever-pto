@@ -24,6 +24,8 @@ describe('generateMetrics', () => {
       year: YEAR,
       holidays: [],
       allowPastDays: true,
+      manuallySelectedDays: [],
+      removedSuggestedDays: [],
     });
     expect(result.longWeekends).toBe(0);
     expect(result.restBlocks).toBe(0);
@@ -47,6 +49,8 @@ describe('generateMetrics', () => {
       year: YEAR,
       holidays: [],
       allowPastDays: true,
+      manuallySelectedDays: [],
+      removedSuggestedDays: [],
     });
     expect(result.restBlocks).toBe(1);
     expect(result.totalEffectiveDays).toBeGreaterThanOrEqual(1);
@@ -61,6 +65,8 @@ describe('generateMetrics', () => {
       year: YEAR,
       holidays: [],
       allowPastDays: true,
+      manuallySelectedDays: [],
+      removedSuggestedDays: [],
     });
     expect(result.monthlyDist[0]).toBe(2);
     expect(result.quarterDist[0]).toBe(2);
@@ -73,6 +79,8 @@ describe('generateMetrics', () => {
       year: YEAR,
       holidays: [],
       allowPastDays: true,
+      manuallySelectedDays: [],
+      removedSuggestedDays: [],
     });
     expect(result.firstLastBreak).not.toBeNull();
     expect(result.firstLastBreak?.first).toMatch(/January|january/i);
@@ -95,6 +103,8 @@ describe('generateMetrics', () => {
       bridges: [bridge],
       holidays: [],
       allowPastDays: true,
+      manuallySelectedDays: [],
+      removedSuggestedDays: [],
     });
     expect(result.bridgesUsed).toBe(1);
     expect(result.averageEfficiency).toBe(3);
@@ -110,6 +120,7 @@ describe('generateMetrics', () => {
       holidays: [],
       allowPastDays: true,
       manuallySelectedDays: [makeDate(2025, 1, 7)],
+      removedSuggestedDays: [],
     });
     expect(result.monthlyDist[0]).toBe(2);
   });
@@ -122,6 +133,7 @@ describe('generateMetrics', () => {
       holidays: [],
       allowPastDays: true,
       removedSuggestedDays: [makeDate(2025, 1, 6)],
+      manuallySelectedDays: [],
     });
     expect(result.monthlyDist[0]).toBe(1);
   });
@@ -133,6 +145,8 @@ describe('generateMetrics', () => {
       year: YEAR,
       holidays: [],
       allowPastDays: true,
+      manuallySelectedDays: [],
+      removedSuggestedDays: [],
     });
     expect(result.longBlocksPerQuarter).toEqual([1, 0, 0, 0]);
   });
@@ -144,6 +158,8 @@ describe('generateMetrics', () => {
       year: YEAR,
       holidays: [makeHoliday(makeDate(2025, 1, 10))],
       allowPastDays: true,
+      manuallySelectedDays: [],
+      removedSuggestedDays: [],
     });
     expect(result.longBlocksPerQuarter).toEqual([1, 0, 0, 0]);
   });
@@ -164,6 +180,7 @@ describe('generateMetrics', () => {
       bridges: [bridge],
       holidays: [],
       allowPastDays: true,
+      manuallySelectedDays: [],
       removedSuggestedDays: [makeDate(2025, 1, 20)],
     };
     const withoutBudget = generateMetrics(params);
@@ -180,8 +197,8 @@ describe('generateMetrics', () => {
       holidays: [],
       allowPastDays: true,
     };
-    const planned = generateMetrics({ ...params, year: 2025 });
-    const inferred = generateMetrics({ ...params, year: 2026 });
+    const planned = generateMetrics({ ...params, year: 2025, manuallySelectedDays: [], removedSuggestedDays: [] });
+    const inferred = generateMetrics({ ...params, year: 2026, manuallySelectedDays: [], removedSuggestedDays: [] });
 
     expect(planned.workedDaysPerMonth).toBe(21.8);
     expect(inferred.workedDaysPerMonth).toBe(21.7);
@@ -197,6 +214,7 @@ describe('generateMetrics', () => {
       holidays: [],
       allowPastDays: true,
       removedSuggestedDays: [makeDate(2025, 1, 6)],
+      manuallySelectedDays: [],
     });
     expect(result.bonusDays).toBe(0);
     expect(result.totalEffectiveDays).toBe(0);
@@ -232,6 +250,7 @@ describe('generateMetrics', () => {
       holidays: [],
       allowPastDays: true,
       removedSuggestedDays: [dropped[0] as Date],
+      manuallySelectedDays: [],
     });
 
     expect(result.bridgesUsed).toBe(1);

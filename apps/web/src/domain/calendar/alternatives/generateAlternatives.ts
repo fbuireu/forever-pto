@@ -63,7 +63,7 @@ export function generateAlternatives(params: GenerateAlternativesParams) {
     const strategyIndex = attempt % sortingStrategies.length;
     const shuffledBridges = [...sortedVariants[strategyIndex]];
     if (attempt >= sortingStrategies.length) {
-      const rotateBy = attempt - sortingStrategies.length;
+      const rotateBy = attempt - sortingStrategies.length + 1;
       shuffledBridges.push(...shuffledBridges.splice(0, rotateBy % Math.max(shuffledBridges.length, 1)));
     }
     const selection =

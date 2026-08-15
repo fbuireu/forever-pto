@@ -32,8 +32,7 @@ export const createHolidaySet = (holidays: HolidayDTO[], cacheKey?: string) => {
   if (cached !== undefined) return cached;
 
   const holidaySet = new Set(
-    holidays.reduce<string[]>((acc, h) => {
-      const date = new Date(h.date);
+    holidays.reduce<string[]>((acc, { date }) => {
       if (!isWeekend(date)) acc.push(getKey(date));
       return acc;
     }, [])

@@ -59,7 +59,7 @@ calls them directly:
 
 - `generateSuggestions({ ptoDays, holidays, allowPastDays, months, strategy, removedDays? })` → `{ days, bridges?, strategy }`
 - `generateAlternatives({ …, maxAlternatives, existingSuggestion, removedDays? })` → `Suggestion[]`
-- `generateMetrics({ suggestion, locale, year, bridges, holidays, allowPastDays, manuallySelectedDays?, removedSuggestedDays?, carryOverMonths? })` → `Metrics`
+- `generateMetrics({ suggestion, locale, year, bridges, holidays, allowPastDays, manuallySelectedDays, removedSuggestedDays, carryOverMonths? })` → `Metrics`
 
 **`measureBudget` is the one place the budget arithmetic lives, and it is built on `resolveSelectedDays` so it
 cannot disagree with the Metrics.** It answers `{ suggested, manual, spent, remaining }` for a budget and a
@@ -76,12 +76,12 @@ Metrics were computed from. It matches on `toDateString()`, so a `Date` carrying
 lines up, and it returns the original array unchanged when there are no Manual or Removed Days. Everything
 else under `utils/` and `suggestions/utils/` is internal.
 
-**That promise only holds while every caller passes `manuallySelectedDays` and `removedSuggestedDays`, and
-`generateMetrics` defaults both to `[]`.** A caller that omits them gets Metrics measured against the days
+**Both `manuallySelectedDays` and `removedSuggestedDays` are required, and neither defaults.** They used to
+default to `[]`, and a caller that omitted them got Metrics measured against the days
 the engine placed *by itself*, while `getTotalEffectiveDays` still counts Bridge spans that ran straight
 through the Manual Days — the pseudo-Holidays make them Free Days for the expansion. Efficiency
-(`totalEffectiveDays / days.length`) and Bonus Days (`totalEffectiveDays - days.length`) are then inflated by
-every Manual Day a span covers, and so are the monthly and quarterly distributions. Both planning pipelines
+(`totalEffectiveDays / days.length`) and Bonus Days (`totalEffectiveDays - days.length`) were then inflated by
+every Manual Day a span covered, and so were the monthly and quarterly distributions. Both planning pipelines
 omitted them once, while `toggleDaySelection` passed them, so the same unchanged plan reported two different
 Efficiency figures depending on which path had last written the Metrics — toggling a day on and off again was
 enough to make the number jump. The mirrored blocks in `worker.test.ts` and `holidays.test.ts` pin it on both

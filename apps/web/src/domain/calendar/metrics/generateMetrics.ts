@@ -25,8 +25,8 @@ interface GenerateMetricsParams {
   bridges?: Bridge[];
   holidays: HolidayDTO[];
   allowPastDays: boolean;
-  manuallySelectedDays?: Date[];
-  removedSuggestedDays?: Date[];
+  manuallySelectedDays: Date[];
+  removedSuggestedDays: Date[];
   totalPtoBudget?: number;
   carryOverMonths?: number;
 }
@@ -38,8 +38,8 @@ export const generateMetrics = ({
   bridges,
   holidays,
   allowPastDays,
-  manuallySelectedDays = [],
-  removedSuggestedDays = [],
+  manuallySelectedDays,
+  removedSuggestedDays,
   carryOverMonths = 0,
 }: GenerateMetricsParams) => {
   const planningWindow = { year, carryOverMonths };
