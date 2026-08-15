@@ -1,5 +1,5 @@
 name: Prepare environment
-description: Sets up pnpm and the pinned Node.js version, then installs dependencies
+description: Sets up pnpm, Node.js and dependencies
 
 runs:
   using: composite
