@@ -159,6 +159,8 @@ gate protects web production and the app's `NEXT_PUBLIC_*` vars were visible to 
 The `vars` are environment-scoped and live on the two `web-*` environments; the Cloudflare and release
 secrets are repository-level and are read outside any environment.
 
+**`deploy-tail` is gated on its own files.** The tail consumer is a second Worker with its own `wrangler.toml`; the app declares it in `[[tail_consumers]]` but does not carry it. It changes rarely, so it deploys only when `apps/web/workers/tail/**` does.
+
 **`cross-package-notice` is advisory, not a gate.** A pull request touching both packages lands in both
 changelogs, because attribution is by path and `main` takes squash merges. Sometimes that is what you
 want, so the job posts a sticky comment saying what will happen and does not fail the run.

@@ -217,7 +217,7 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
 Cloudflare Workers via wrangler (`wrangler.toml`): `.open-next/worker.js` as the entrypoint,
 `.open-next/assets` served through the `ASSETS` binding, an R2 bucket for the incremental cache, a
 `PAYMENT_RATE_LIMITER` `[[ratelimits]]` binding for the payment limiter, smart placement, and a
-`forever-pto-tail` tail consumer. Only `env.production` binds a route (`forever-pto.com/*`);
+`forever-pto-tail` tail consumer, which is its own Worker under `workers/tail/` and is deployed by the `deploy-tail` job when its own files change. Only `env.production` binds a route (`forever-pto.com/*`);
 `env.development` supplies the preview bindings and CI deploys one worker per PR from it —
 `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes.
 

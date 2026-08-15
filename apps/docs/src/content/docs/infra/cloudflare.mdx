@@ -21,7 +21,7 @@ Everything runs on Cloudflare. The account hosts three Workers from this repo, p
 
 ### The tail Worker
 
-`workers/tail/index.ts` implements a `tail()` handler: Cloudflare streams the app Worker's logs and exceptions to it (declared via `[[tail_consumers]]` in every environment of `wrangler.toml`), and it forwards them to Better Stack. It is a separate, manually deployed Worker — **no workflow deploys it**, a known gap in the CI story.
+`workers/tail/index.ts` implements a `tail()` handler: Cloudflare streams the app Worker's logs and exceptions to it (declared via `[[tail_consumers]]` in every environment of `wrangler.toml`), and it forwards them to Better Stack. It is a separate Worker with its own `wrangler.toml`, deployed by the `deploy-tail` job of `ci.yml` — gated on `apps/web/workers/tail/**` actually changing, since it rarely does. The job also re-pushes its ingest token, so rotating the secret is "update the variable, rerun the job".
 
 ### The docs Worker
 
