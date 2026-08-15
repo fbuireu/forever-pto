@@ -65,7 +65,7 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
     startTransition(() => {
       try {
         const formattedDate = formatDate({ date: data.date, locale, format: 'MMMM d, yyyy' });
-        const outcome = addHoliday({ holiday: { name: data.name, date: data.date }, locale, carryOverMonths, year });
+        const outcome = addHoliday({ holiday: { name: data.name, date: data.date }, carryOverMonths, year });
 
         if (!outcome.applied) {
           const refusal = describeHolidayRefusal({ outcome, t, formattedDate });

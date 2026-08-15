@@ -81,7 +81,6 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
         const outcome = editHoliday({
           holidayId: holiday.id,
           updates: { name: data.name, date: data.date },
-          locale,
           year,
           carryOverMonths,
         });

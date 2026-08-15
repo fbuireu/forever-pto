@@ -292,7 +292,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           set({ ...holidaysInitialState });
         },
 
-        addHoliday: ({ holiday, locale, year, carryOverMonths }) => {
+        addHoliday: ({ holiday, year, carryOverMonths }) => {
           const { holidays, manuallySelectedDays } = get();
           const existingHoliday = holidays.find((h) => h.date.toDateString() === holiday.date.toDateString());
 
@@ -313,7 +313,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
           const newHoliday = holidayDTO.createCustom({
             name: holiday.name,
             date: holiday.date,
-            locale,
             year,
             carryOverMonths,
           });
@@ -332,7 +331,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
           });
         },
 
-        editHoliday: ({ holidayId, locale, updates, year, carryOverMonths }: EditHolidayParams) => {
+        editHoliday: ({ holidayId, updates, year, carryOverMonths }: EditHolidayParams) => {
           const { holidays, manuallySelectedDays } = get();
           const holidayIndex = holidays.findIndex((h) => h.id === holidayId);
 
@@ -355,7 +354,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
           const updatedHoliday = holidayDTO.createCustom({
             name: updates.name,
             date: updates.date,
-            locale,
             year,
             carryOverMonths,
           });

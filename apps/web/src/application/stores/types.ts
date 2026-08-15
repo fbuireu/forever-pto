@@ -26,12 +26,10 @@ export interface AddHolidayParams {
   holiday: Omit<HolidayDTO, 'id' | 'variant' | 'isInSelectedRange'>;
   year: FiltersState['year'];
   carryOverMonths: FiltersState['carryOverMonths'];
-  locale: Locale;
 }
 
 export interface EditHolidayParams {
   holidayId: string;
-  locale: Locale;
   updates: Pick<HolidayDTO, 'name' | 'date'>;
   year: FiltersState['year'];
   carryOverMonths: FiltersState['carryOverMonths'];

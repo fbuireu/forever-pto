@@ -43,7 +43,9 @@ type BaseDTO<INPUT, OUTPUT, PARAMS = unknown> = {
 
 `holidayDTO` widens `BaseDTO` with two extra entry points:
 
-- `createCustom` — builds a Custom Holiday from what the user typed, rather than from upstream data.
+- `createCustom` — builds a Custom Holiday from what the user typed, rather than from upstream data. It
+  takes no `locale`: its id is an ISO datetime, built by `isoDateTime` directly rather than through
+  `formatDate`, which returned on that format before ever reading a locale.
 - `normalize` — coerces `date` back into a `Date`, passing every other field through untouched. Its one caller is the holidays store's `generateSuggestions`, which runs it over the merged Holiday list immediately before handing it to the engine: Manual Days arrive as pseudo-Holidays built in the store and rehydrated state arrives with dates as strings, so the array reaching the planner is otherwise not uniformly typed. It is **not** part of rehydration — `onRehydrateStorage` revives its own dates through `fromStoredInstant` and never touches this DTO. Deleting `normalize` after checking the rehydration path would break the planner, not dead code.
 
 `Raw*` types must not escape this folder. If a `RawHoliday` shows up in a store or a component, a mapping step was skipped.

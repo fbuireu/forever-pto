@@ -219,7 +219,6 @@ describe('editHoliday collisions', () => {
     useHolidaysStore.getState().editHoliday({
       holidayId: 'custom-1',
       updates: { name: 'Moved', date: new Date('2026-03-12') },
-      locale: 'en',
       year: 2026,
       carryOverMonths: 0,
     });
@@ -236,7 +235,6 @@ describe('editHoliday collisions', () => {
     useHolidaysStore.getState().editHoliday({
       holidayId: 'custom-1',
       updates: { name: 'Moved', date: new Date('2026-03-12') },
-      locale: 'en',
       year: 2026,
       carryOverMonths: 0,
     });
@@ -254,7 +252,6 @@ describe('editHoliday collisions', () => {
     useHolidaysStore.getState().editHoliday({
       holidayId: 'custom-1',
       updates: { name: 'Moved', date: new Date('2026-03-13') },
-      locale: 'en',
       year: 2026,
       carryOverMonths: 0,
     });
@@ -271,7 +268,6 @@ describe('the refusal reason crosses the seam', () => {
 
     const outcome = useHolidaysStore.getState().addHoliday({
       holiday: { name: 'Company day', date: new Date('2026-03-11') },
-      locale: 'en',
       year: 2026,
       carryOverMonths: 0,
     });
@@ -284,7 +280,6 @@ describe('the refusal reason crosses the seam', () => {
 
     const outcome = useHolidaysStore.getState().addHoliday({
       holiday: { name: 'Company day', date: new Date('2026-03-11') },
-      locale: 'en',
       year: 2026,
       carryOverMonths: 0,
     });
@@ -296,7 +291,6 @@ describe('the refusal reason crosses the seam', () => {
     const outcome = useHolidaysStore.getState().editHoliday({
       holidayId: 'nope',
       updates: { name: 'Moved', date: new Date('2026-03-12') },
-      locale: 'en',
       year: 2026,
       carryOverMonths: 0,
     });
@@ -312,7 +306,6 @@ describe('addHoliday', () => {
 
     useHolidaysStore.getState().addHoliday({
       holiday: { name: 'Company day', date: new Date('2026-03-10') },
-      locale: 'en',
       year: 2026,
       carryOverMonths: 0,
     });
@@ -325,7 +318,6 @@ describe('addHoliday', () => {
 
     useHolidaysStore.getState().addHoliday({
       holiday: { name: 'Company day', date: new Date('2026-03-11') },
-      locale: 'en',
       year: 2026,
       carryOverMonths: 0,
     });
@@ -337,7 +329,6 @@ describe('addHoliday', () => {
     const date = new Date('2026-01-01');
     useHolidaysStore.getState().addHoliday({
       holiday: { name: 'New Year', date, type: 'public' },
-      locale: 'en',
       year: 2026,
       carryOverMonths: 1,
     });
@@ -350,7 +341,6 @@ describe('addHoliday', () => {
     useHolidaysStore.setState({ holidays: [makeHoliday('h1', '2026-01-01')] });
     useHolidaysStore.getState().addHoliday({
       holiday: { name: 'Duplicate', date, type: 'public' },
-      locale: 'en',
       year: 2026,
       carryOverMonths: 1,
     });
@@ -363,7 +353,6 @@ describe('addHoliday', () => {
 
     useHolidaysStore.getState().addHoliday({
       holiday: { name: 'Duplicate', date, type: 'public' },
-      locale: 'en',
       year: 2026,
       carryOverMonths: 1,
     });
@@ -379,7 +368,6 @@ describe('addHoliday', () => {
     const earlyDate = new Date('2026-01-15');
     useHolidaysStore.getState().addHoliday({
       holiday: { name: 'Early', date: earlyDate, type: 'public' },
-      locale: 'en',
       year: 2026,
       carryOverMonths: 1,
     });
@@ -411,7 +399,6 @@ describe('editHoliday', () => {
     useHolidaysStore.getState().editHoliday({
       holidayId: 'h1',
       updates: { name: 'Renamed', date: newDate },
-      locale: 'en',
       year: 2026,
       carryOverMonths: 1,
     });
@@ -425,7 +412,6 @@ describe('editHoliday', () => {
     useHolidaysStore.getState().editHoliday({
       holidayId: 'missing',
       updates: { name: 'X', date: new Date() },
-      locale: 'en',
       year: 2026,
       carryOverMonths: 1,
     });

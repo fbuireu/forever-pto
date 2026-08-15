@@ -7,6 +7,7 @@ import {
   compareAsc,
   endOfYear,
   formatDate,
+  isoDateTime,
   isWithinInterval,
   startOfYear,
 } from '@application/shared/utils/dates';
@@ -21,7 +22,6 @@ type HolidayDTOParams = {
 export interface CreateCustomHolidayParams {
   name: string;
   date: Date;
-  locale: string;
   year: number;
   carryOverMonths: number;
 }
@@ -77,8 +77,8 @@ export const holidayDTO: HolidayDTOShape = {
       .toSorted((a, b) => compareAsc(a.date, b.date));
   },
 
-  createCustom: ({ name, date, locale, year, carryOverMonths }: CreateCustomHolidayParams) => ({
-    id: `custom-${formatDate({ date, locale, format: 'yyyy-MM-dd HH:mm:ss' })}`,
+  createCustom: ({ name, date, year, carryOverMonths }: CreateCustomHolidayParams) => ({
+    id: `custom-${isoDateTime(date)}`,
     name,
     date: fromStoredInstant(date),
     variant: HolidayVariant.CUSTOM,

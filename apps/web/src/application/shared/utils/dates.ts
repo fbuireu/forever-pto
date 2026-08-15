@@ -107,7 +107,7 @@ const isoDate = (date: Date) => {
   return `${pd.year}-${String(pd.month).padStart(2, '0')}-${String(pd.day).padStart(2, '0')}`;
 };
 
-const isoDateTime = (date: Date) => {
+export const isoDateTime = (date: Date) => {
   const base = isoDate(date);
   const h = String(date.getHours()).padStart(2, '0');
   const m = String(date.getMinutes()).padStart(2, '0');
