@@ -123,6 +123,10 @@ when the docs and the code disagree.
 
 ## Contributing
 
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup, checks and conventions,
+and the [Code of Conduct](./CODE_OF_CONDUCT.md). Security issues follow the
+[Security Policy](./SECURITY.md) — never a public issue.
+
 - [Open a feature request](https://github.com/fbuireu/forever-pto/issues/new?template=feature_request.yml&labels=enhancement)
 - [Report a bug](https://github.com/fbuireu/forever-pto/issues/new?template=bug_report.yml)
 - [Start a discussion](https://github.com/fbuireu/forever-pto/discussions)
