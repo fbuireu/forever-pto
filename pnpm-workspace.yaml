@@ -1,6 +1,5 @@
 packages:
-  - ./
-  - docs
+  - apps/*
 allowBuilds:
   '@biomejs/biome': true
   '@parcel/watcher': true
