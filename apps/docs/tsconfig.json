@@ -7,7 +7,7 @@
     "jsxImportSource": "react",
     "skipLibCheck": true,
     "paths": {
-      "@ui/*": ["../src/ui/*"]
+      "@ui/*": ["../web/src/ui/*"]
     }
   }
 }

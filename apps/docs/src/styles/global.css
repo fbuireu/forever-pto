@@ -8,17 +8,17 @@
  *    a superset of the app's descendants-only variant) and wins.
  * 3. Tailwind theme + utilities WITHOUT preflight — Starlight owns base styles;
  *    importing 'tailwindcss' wholesale would double the preflight.
- * Never import src/ui/styles/index.css here (full tailwindcss + app layers).
+ * Never import apps/web/src/ui/styles/index.css here (full tailwindcss + app layers).
  */
 @layer base, starlight, theme, components, utilities;
 
-@import '../../../src/ui/styles/theme/index.css';
+@import '../../../web/src/ui/styles/theme/index.css';
 @import '@astrojs/starlight-tailwind';
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 
-@import '../../../src/ui/styles/global/index.css';
-@import '../../../src/ui/styles/utilities/index.css';
+@import '../../../web/src/ui/styles/global/index.css';
+@import '../../../web/src/ui/styles/utilities/index.css';
 
 @import '@fontsource-variable/bricolage-grotesque';
 @import '@fontsource-variable/space-grotesk';
@@ -29,10 +29,10 @@
 /* Generate the Tailwind utilities used by the app components living outside
    the docs root. @source only extracts class strings — scanning Next-coupled
    files (Sonner, RichLink...) is harmless. */
-@source '../../../src/ui/modules/core';
+@source '../../../web/src/ui/modules/core';
 /* Homepage pattern constants (brutCard, dayCell) demoed on
    design-system/patterns/homepage — their classes live outside core. */
-@source '../../../src/ui/modules/pages/homepage/sections/shared.ts';
+@source '../../../web/src/ui/modules/pages/homepage/sections/shared.ts';
 
 /* The app sets these via next/font; here @fontsource self-hosts the same
    families and we point the raw variables at them. */
@@ -84,7 +84,7 @@
 }
 
 /* Scoped copy of the app's base [data-slot] transition block
-   (src/ui/styles/base/index.css is not importable wholesale) so demoed
+   (apps/web/src/ui/styles/base/index.css is not importable wholesale) so demoed
    components keep their color/filter easing. */
 button[data-slot],
 [data-slot='button'],

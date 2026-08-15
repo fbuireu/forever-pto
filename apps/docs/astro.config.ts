@@ -32,7 +32,7 @@ export default defineConfig({
         es: { label: 'Español', lang: 'es' },
       },
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/fbuireu/forever-pto' }],
-      editLink: { baseUrl: 'https://github.com/fbuireu/forever-pto/edit/main/docs/' },
+      editLink: { baseUrl: 'https://github.com/fbuireu/forever-pto/edit/main/apps/docs/' },
       lastUpdated: true,
       expressiveCode: { themes: ['github-dark', 'github-light'] },
       sidebar: [
@@ -108,7 +108,7 @@ export default defineConfig({
     css: { postcss: { plugins: [] } },
     resolve: {
       alias: {
-        '@ui': fileURLToPath(new URL('../src/ui', import.meta.url)),
+        '@ui': fileURLToPath(new URL('../web/src/ui', import.meta.url)),
       },
     },
   },

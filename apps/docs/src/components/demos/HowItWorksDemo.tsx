@@ -1,5 +1,5 @@
-import { FilterStrategy } from '../../../../src/domain/calendar/types';
-import { LOCALES } from '../../../../src/infrastructure/i18n/locales';
+import { FilterStrategy } from '../../../../web/src/domain/calendar/types';
+import { LOCALES } from '../../../../web/src/infrastructure/i18n/locales';
 
 // These two app modules are dependency-free (no Next.js imports, no path
 // aliases), so they are safe to import here via relative path even though they
