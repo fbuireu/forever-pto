@@ -12,3 +12,6 @@ minimumReleaseAge: 4320 # 3 days
 blockExoticSubdeps: true
 patchedDependencies:
   boneyard-js: patches/boneyard-js.patch
+minimumReleaseAgeExclude:
+  # Renovate security update: astro@7.1.0
+  - astro@7.1.0
