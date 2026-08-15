@@ -268,8 +268,6 @@ describe('documentation does not point at things that are gone', () => {
     expect(citedSourceFiles(authoredMarkdown)).toEqual([]);
   });
 
-  // The published wiki is .mdx, which every rule above skips by extension. That is how 454 stale
-  // paths and a citation of a CONTEXT.md the contract forbids survived a restructure unnoticed.
   it('names only source files that still exist, in the published wiki too', () => {
     expect(contentFiles.length).toBeGreaterThan(50);
     expect(citedSourceFiles(contentFiles)).toEqual([]);
