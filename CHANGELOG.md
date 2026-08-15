@@ -1,3 +1,12 @@
+## [1.8.1](https://github.com/fbuireu/forever-pto/compare/v1.8.0...v1.8.1) (2026-08-15)
+
+
+### Bug Fixes
+
+* **deps:** pin next to 16.2 and typescript to 6 until the adapter supports 16.3 ([#349](https://github.com/fbuireu/forever-pto/issues/349)) ([28ba47c](https://github.com/fbuireu/forever-pto/commit/28ba47c4e2f8db8659811b583fd342f5c1c3d5cd))
+* **deps:** update astro monorepo ([#356](https://github.com/fbuireu/forever-pto/issues/356)) ([6f4e4e8](https://github.com/fbuireu/forever-pto/commit/6f4e4e874944010760ca28fc578e25052295dcf2))
+* **markdown:** translate without next-intl/server so the Worker stops throwing ([#353](https://github.com/fbuireu/forever-pto/issues/353)) ([cd7049c](https://github.com/fbuireu/forever-pto/commit/cd7049c29105ced4d755ac3d670e6c377f7964db))
+
 # [1.8.0](https://github.com/fbuireu/forever-pto/compare/v1.7.2...v1.8.0) (2026-08-13)
 
 
