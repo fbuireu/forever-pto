@@ -87,3 +87,6 @@ export const holidayDTO: HolidayDTOShape = {
 
   normalize: (holidays: HolidayDTO[]) => holidays.map((h) => ({ ...h, date: fromStoredInstant(h.date) })),
 };
+
+export const holidaysInPlanningWindow = (holidays: HolidayDTO[] | undefined): HolidayDTO[] =>
+  (holidays ?? []).filter(({ isInSelectedRange }) => isInSelectedRange);

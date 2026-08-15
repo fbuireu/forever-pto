@@ -81,9 +81,9 @@ interface CalendarProps {
   showOutsideDays?: boolean;
   holidays: HolidaysState['holidays'];
   allowPastDays: FiltersState['allowPastDays'];
-  currentSelection: HolidaysState['currentSelection'];
-  alternatives: HolidaysState['alternatives'];
-  suggestion: HolidaysState['suggestion'];
+  currentSelection?: HolidaysState['currentSelection'];
+  alternatives?: HolidaysState['alternatives'];
+  suggestion?: HolidaysState['suggestion'];
   previewAlternativeIndex?: HolidaysState['previewAlternativeIndex'];
   manuallySelectedDays?: Date[];
   removedSuggestedDays?: Date[];
@@ -113,9 +113,9 @@ export function Calendar({
   showOutsideDays = true,
   holidays,
   allowPastDays = true,
-  currentSelection,
+  currentSelection = null,
   alternatives = EMPTY_ALTERNATIVES,
-  suggestion,
+  suggestion = null,
   previewAlternativeIndex = -1,
   manuallySelectedDays = EMPTY_DATES,
   removedSuggestedDays = EMPTY_DATES,

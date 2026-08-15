@@ -1,4 +1,6 @@
-'use client';
+import { holidaysInPlanningWindow } from '@application/dto/holiday/dto';
+
+('use client');
 
 import { HolidayVariant } from '@application/dto/holiday/types';
 import { Link } from '@application/i18n/navigation';
@@ -93,7 +95,7 @@ export const Summary = () => {
 
   const activeSuggestion = currentSelection ?? suggestion;
 
-  const holidaysInWindow = useMemo(() => (holidays ?? []).filter((holiday) => holiday.isInSelectedRange), [holidays]);
+  const holidaysInWindow = useMemo(() => holidaysInPlanningWindow(holidays), [holidays]);
 
   const holidayMetrics = useMemo(() => {
     const regionalDays = holidaysInWindow.filter((holiday) => holiday.variant === HolidayVariant.REGIONAL).length;

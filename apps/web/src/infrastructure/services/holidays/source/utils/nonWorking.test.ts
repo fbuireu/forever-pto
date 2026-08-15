@@ -12,7 +12,11 @@ describe('keepNonWorking', () => {
   });
 
   it('drops the three types the planner treats as working days', () => {
-    const kept = keepNonWorking([raw('Term ends', 'school'), raw('Half day', 'optional'), raw('Name day', 'observance')]);
+    const kept = keepNonWorking([
+      raw('Term ends', 'school'),
+      raw('Half day', 'optional'),
+      raw('Name day', 'observance'),
+    ]);
     expect(kept).toEqual([]);
   });
 

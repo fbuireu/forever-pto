@@ -1,4 +1,6 @@
-'use client';
+import { holidaysInPlanningWindow } from '@application/dto/holiday/dto';
+
+('use client');
 
 import { generateIcs } from '@application/export/generateIcs';
 import { useFiltersStore } from '@application/stores/filters';
@@ -67,7 +69,7 @@ export const CalendarExport = () => {
   );
 
   const activeSuggestion = currentSelection ?? suggestion;
-  const holidaysInWindow = useMemo(() => (holidays ?? []).filter((holiday) => holiday.isInSelectedRange), [holidays]);
+  const holidaysInWindow = useMemo(() => holidaysInPlanningWindow(holidays), [holidays]);
   const ptoDays = useMemo(
     () =>
       resolveSelectedDays({

@@ -52,9 +52,6 @@ export const WorkdayCounterCalendarModal = ({
             locale={locale}
             holidays={holidays}
             allowPastDays
-            currentSelection={null}
-            alternatives={[]}
-            suggestion={null}
             className='w-full'
           />
         </div>
