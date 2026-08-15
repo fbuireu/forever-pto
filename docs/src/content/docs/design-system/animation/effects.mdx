@@ -1,0 +1,65 @@
+---
+title: Effects
+description: MotionHighlight — the shared hover/active pill behind DropdownMenu, Sidebar and Tabs — and AutoHeight for animated container resizing.
+sidebar:
+  order: 2
+---
+
+import { AutoHeightDemo, MotionHighlightChildrenDemo, MotionHighlightParentDemo } from '../../../../components/demos/EffectsDemo';
+
+Source: `src/ui/modules/core/animate/effects/`. Two reusable motion behaviors that other components compose rather than reimplement. Both are client components built on Motion's `m.*` layer, so they need a `LazyMotionProvider` ancestor.
+
+## MotionHighlight
+
+`MotionHighlight` renders the animated background pill that follows the hovered or selected item. It is the workhorse behind `DropdownMenu` and `Sidebar` (`src/ui/modules/core/animate/base/`) and `Tabs` (`src/ui/modules/core/animate/components/Tabs.tsx`) — any place where a highlight glides between siblings.
+
+### Modes
+
+**`mode='children'`** (default): each item renders its own absolutely-positioned background `m.div` sharing a `layoutId`, so Motion morphs the pill between items as the active one changes. Hover an item below — the pill travels with the pointer:
+
+<MotionHighlightChildrenDemo client:visible />
+
+**`mode='parent'`**: a single `m.div` lives in the container and animates `top/left/width/height` to the measured bounds of the active item (recomputed on container scroll, or continuously with `forceUpdateBounds`). Use it when items live in a scrollable or oddly-nested layout where per-item `layoutId` morphing misbehaves:
+
+<MotionHighlightParentDemo client:visible />
+
+### Controlled vs uncontrolled items
+
+- **Uncontrolled** (`controlledItems` unset): pass plain elements as children and `MotionHighlight` wraps each one in a `MotionHighlightItem` automatically, keyed by an internal id. Combine with `hover` for pointer-following highlights.
+- **Controlled** (`controlledItems`): you place `MotionHighlightItem` yourself and give each a `value`. Drive the active item with `value`/`onValueChange` (or seed with `defaultValue`). This is what `Tabs` and `Sidebar` do — the parent-mode demo above is controlled.
+
+### Key props
+
+`hover` switches activation from click to pointer-enter; `transition` (spring `stiffness: 350, damping: 35` by default) and `exitDelay` shape the movement; `className` styles the pill itself while `containerClassName` (parent mode) styles the wrapper; `enabled`/`disabled` switch the whole effect off; `boundsOffset` nudges the parent-mode pill. Items expose `data-active`, `data-value` and `data-highlight` attributes for CSS hooks.
+
+## AutoHeight
+
+`AutoHeight` animates a container's height to match its content. It measures the inner content with a `ResizeObserver` (via `useAutoHeight` in `src/ui/hooks/useAutoHeight.tsx`) and springs the outer `m.div` to the new height — pass `deps` to force a re-measure when content changes for reasons the observer cannot see:
+
+<AutoHeightDemo client:visible />
+
+`TabsContents` (`src/ui/modules/core/animate/components/Tabs.tsx`) uses it in its default `auto-height` mode so panels of different heights cross-fade without layout jumps. Supports `asChild` through `MotionSlot`, and a custom `transition` (default spring `stiffness: 300, damping: 30, bounce: 0`).
+
+## Usage
+
+```tsx
+import { MotionHighlight, MotionHighlightItem } from '@ui/modules/core/animate/effects/MotionHighlight';
+import { AutoHeight } from '@ui/modules/core/animate/effects/AutoHeight';
+
+// Hover pill across plain children
+<MotionHighlight hover className='rounded-lg bg-accent'>
+  <button type='button'>Grouped</button>
+  <button type='button'>Optimized</button>
+</MotionHighlight>
+
+// Animated container height, re-measured when `expanded` flips
+<AutoHeight deps={[expanded]} className='overflow-hidden'>
+  {expanded ? <LongContent /> : <ShortContent />}
+</AutoHeight>
+```
+
+## Conventions
+
+- Never hand-roll a moving highlight in a new component — compose `MotionHighlight` like `DropdownMenu`, `Sidebar` and `Tabs` do.
+- The pill defaults to `bg-muted rounded-md`; pass `className` to restyle it (the app usually uses the accent with a 2px frame).
+- Related: [animated components](/design-system/animation/components/), [animated icons](/design-system/animation/icons/).

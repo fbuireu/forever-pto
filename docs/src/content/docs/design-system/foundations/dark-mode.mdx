@@ -1,0 +1,44 @@
+---
+title: Dark mode
+description: The data-theme attribute mechanism, which tokens flip, the @custom-variant, and why Starlight's toggle drives app components unchanged.
+sidebar:
+  order: 4
+---
+
+import { DarkModeDemo } from '../../../../components/demos/DarkModeDemo';
+
+Theming is a single attribute: `data-theme='dark'` on a root element. No duplicate component styles, no context providers in the design system — components reference semantic tokens, and the tokens flip.
+
+<DarkModeDemo client:visible />
+
+## The mechanism
+
+Dark values are declared in `src/ui/styles/global/index.css` under a `[data-theme="dark"]` selector that overrides the `:root` light values. In the app, `src/ui/modules/providers/AppThemeProvider.tsx` wraps the tree in `next-themes`' `ThemeProvider` configured with `attribute='data-theme'`, a light default, system-preference support, and localStorage persistence (see the file for the exact config). next-themes stamps the attribute on `<html>` before first paint, so there is no flash of the wrong theme.
+
+## Which tokens flip
+
+The `[data-theme="dark"]` block overrides:
+
+- **Page tokens** — `--background`, `--foreground`, `--card`, `--popover`, `--input`, and the whole `--sidebar-*` family.
+- **The frame** — `--frame` and `--border` invert from ink to cream. Every `--shadow-brutal-*` token references `--frame` (or `--background` for the inverted set), so all [shadows](/design-system/foundations/shadows/) re-theme without their own dark declarations.
+- **Surfaces** — `--surface-panel`, `--surface-panel-alt`, `--surface-panel-soft` move from warm creams to warm near-blacks.
+- **Muted/secondary pairs** and `--accent-foreground` (re-pinned to brand ink so text on yellow stays readable).
+- **Effects** — `--grid-color` and `--page-glow` get slightly stronger to survive the dark background.
+
+What does **not** flip: the brand palette (`--color-brand-*`), `--accent` (brand yellow in both themes), `--destructive`, and `--radius`. The identity colors are constants; only the paper and ink swap.
+
+## The Tailwind side
+
+`src/ui/styles/theme/index.css` declares:
+
+```css
+@custom-variant dark (&:is([data-theme="dark"] *));
+```
+
+This redefines Tailwind v4's `dark:` variant to match *descendants of* the themed root instead of the default `prefers-color-scheme` media query. Components rarely need it — the token flip covers most cases — but it exists for one-off dark adjustments (e.g. the color-mix schemes in `src/ui/modules/core/primitives/Banner.tsx`).
+
+## Why Starlight's toggle just works
+
+Starlight persists its theme by setting the same `data-theme` attribute on `<html>`. Since the app's dark block and the `@custom-variant` both key off that attribute selector — matched on *any* ancestor, not a specific element — the docs' theme toggle drives every embedded app component with zero adaptation. The import order in `docs/src/styles/global.css` lets `@astrojs/starlight-tailwind` re-declare the `dark` variant as a superset (root *or* descendants), which stays compatible with the app's descendants-only definition.
+
+The one component that would need more is `Toaster` (`src/ui/modules/core/primitives/Sonner.tsx`): it reads the active theme via `next-themes`' `useTheme` hook, which is why it is reference-only in these docs — see [conventions](/design-system/foundations/conventions/) for the portability rules.

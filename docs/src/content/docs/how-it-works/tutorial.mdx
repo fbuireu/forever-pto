@@ -1,0 +1,33 @@
+---
+title: Onboarding tutorial
+description: The driver.js guided tour — the DriverClient singleton, data-tutorial anchors, lazy-loaded styling and when it runs.
+sidebar:
+  order: 13
+---
+
+The planner ships a guided tour built on `driver.js`. It never auto-starts: it runs **on demand**, when the user clicks the "quick tour" link in the planner subtitle (`src/ui/modules/pages/planner/SiteSubtitle.tsx`).
+
+## The client: a wrapped singleton
+
+`src/infrastructure/clients/tutorial/driver/client.tsx` wraps `driver.js` in a `DriverClient` class, exposed through `getDriverClientInstance()` (singleton — one driver, one overlay). Defaults: progress indicator on, `next`/`previous`/`close` buttons, smooth scroll, `stagePadding: 10`, `stageRadius: 12`.
+
+Two customizations happen in `onPopoverRender`:
+
+- The library's close button is replaced with a **React-rendered animated X icon** (`AnimateIcon` + `X` from `src/ui/modules/core/animate/icons/`) mounted via `createRoot` into the popover DOM. The roots are tracked and unmounted in `onDestroyStarted` to avoid leaks.
+- On the last step, the next button gets the `driver-popover-done-btn` class so it can be styled as a "done" action.
+
+## The hook: `useTutorial`
+
+`src/ui/hooks/useTutorial.tsx` builds the steps and starts the tour. Everything heavy is lazy: `startTutorial` dynamic-imports the driver client **and** `@ui/modules/tutorial/DriverStyles` in parallel, so neither `driver.js` nor its CSS is in the initial bundle.
+
+- Steps target elements by `data-tutorial` attributes: `sidebar-step-1` through `sidebar-step-4`, `sidebar-tools`, `alternatives-manager`, `pto-status`, `holidays-list`, `calendar-list`, plus a final unanchored step. Titles and descriptions come from the `tutorial.steps` i18n namespace; button labels and the progress text from `tutorial` (see [internationalization](/how-it-works/i18n/)).
+- **Mobile** (`useIsMobile`) inserts an extra `planner-drawer` step, and the alternatives step dispatches a `tutorial:expand-drawer` custom event so the drawer opens before it is highlighted.
+- If the sidebar is closed, the hook toggles it first and waits for the container's `transitionend` before starting — otherwise the first highlights would target collapsed elements.
+
+## Styling
+
+`DriverStyles.tsx` is a render-null component whose only job is importing `src/ui/styles/lazy/index.css`. That file pulls `driver.js/dist/driver.css` into the `tutorial` CSS layer and then overrides it with the app's neobrutalist theme: card background, 3px `--frame` border, 14px radius, `--shadow-brutal-xl`, the Space Grotesk font variable, and a transparent overlay replaced by a 5000px outline trick on the highlight stage. Because it lives in a dedicated `@layer tutorial` (declared in `src/ui/styles/index.css`), the overrides are ordered predictably against the rest of the styles.
+
+## Adding a step
+
+Add a `data-tutorial="..."` attribute to the target element, a step entry in `useTutorial`, and `step*Title`/`step*Description` keys to every locale's `tutorial.steps` namespace. Nothing else registers steps — the attribute is the contract.

@@ -1,0 +1,37 @@
+---
+title: Markdown API
+description: Content negotiation for agents — how Accept text/markdown requests are rewritten to /api/markdown and served a Markdown rendition of the page.
+sidebar:
+  order: 8
+---
+
+Any page of the site can be fetched as Markdown instead of HTML by sending `Accept: text/markdown`. This exists for **agents**: LLMs and crawlers that consume text get a compact, token-cheap rendition of the site instead of a hydrated React tree.
+
+```bash
+curl -H 'Accept: text/markdown' https://forever-pto.com/planner
+```
+
+## The rewrite
+
+Markdown negotiation is the **first** check in `src/middleware.ts`:
+
+- If the request's `Accept` header contains `text/markdown` and the path is not internal (`/api/*`, `/.well-known/*`), the middleware issues `NextResponse.rewrite` to `/api/markdown?path=<pathname>`. A rewrite, not a redirect — the URL the agent requested stays canonical.
+- Both the rewrite response and direct hits on `/api/markdown` get `Cache-Control: public, max-age=3600` (`MARKDOWN_CACHE_CONTROL` in the middleware), so repeated agent traffic is served from cache for an hour.
+- The middleware matcher explicitly includes `/api/markdown` (the only API path it touches) so the cache header applies there too.
+
+## The route
+
+`src/app/api/markdown/route.ts` is thin: it resolves `NEXT_PUBLIC_SITE_URL` from the Cloudflare context, reads the `path` query param (defaulting to `/`) and returns `buildMarkdownPage(baseUrl, pathname)` as `text/markdown; charset=utf-8`.
+
+## Building the page
+
+`src/infrastructure/markdown/buildMarkdownPage.ts` produces one of two documents:
+
+- **Planner** (paths containing `/planner`) — title and description from the `metadata` and `planner` i18n namespaces, a feature list, step-by-step usage, the app version (read from the root `package.json`) and the locale-prefixed planner URL.
+- **Everything else** — a site-level document: features, how it works, a pointer to `GET /api/health`, version and site URL.
+
+The locale is extracted from the pathname (`getLocaleFromPathname` in `src/infrastructure/i18n/utils/url.ts`), so `/es/planner` returns Spanish Markdown. Content is translated with `getTranslations` — the same catalogs the HTML site uses (see [internationalization](/how-it-works/i18n/)).
+
+## Related agent surfaces
+
+Markdown negotiation is one of several agent-facing affordances; the others (`navigator.modelContext` tools and the `.well-known` catalog, whose `agent-skills` index advertises this very feature) are covered in [WebMCP and .well-known](/how-it-works/webmcp/).

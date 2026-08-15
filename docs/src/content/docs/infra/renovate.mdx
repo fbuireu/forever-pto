@@ -1,0 +1,48 @@
+---
+title: Renovate
+description: Dependency update policy — pin everything, batch twice a month, automerge the safe classes by label.
+sidebar:
+  order: 4
+---
+
+Renovate is the repo's dependency bot, configured in `.github/renovate.json`. (A `dependabot-auto-merge.yml` workflow still exists but is dormant — there is no `dependabot.yml`, so Dependabot never opens PRs. See [workflows](/infra/workflows/).)
+
+## Schedule and pacing
+
+- Updates run **on the 1st and 15th of the month** — two predictable batches instead of a constant PR drizzle.
+- `minimumReleaseAge` (currently a few days, see the config) skips freshly published versions, buying time for upstream regressions and supply-chain attacks to surface. The pnpm workspace applies its own, independent `minimumReleaseAge` at install time in `pnpm-workspace.yaml`.
+- Vulnerability alerts are exempt from the schedule (`"at any time"`) and get `security` / `vulnerability` labels.
+
+## Pin everything
+
+- `rangeStrategy: pin` — every dependency is an exact version, no `^`/`~` ranges. This pairs with `save-prefix=` in `.npmrc`, which makes manual installs exact too.
+- `pinDigests: true` — GitHub Actions are pinned to commit SHAs (the `uses: owner/action@<sha> # vX.Y.Z` pattern you see in every workflow). Renovate keeps both the SHA and the version comment in sync.
+
+## Automerge by label
+
+Package rules label each PR by update type, and those labels drive the approval workflow:
+
+| Update type | Label | Automerge |
+| --- | --- | --- |
+| pin / digest | `pin-update` | yes |
+| patch | `patch-update` | yes |
+| minor | `minor-update` | yes |
+| major | `major-update` | no — manual review |
+| lockfile maintenance | `lock-maintenance` | yes |
+
+Automerge uses squash (`automergeStrategy: squash`), which matters for [releases](/infra/release/): Renovate's PR titles are conventional (`chore(deps): …` / `fix(deps): …`), so most dependency merges do not cut a release.
+
+Renovate cannot merge without a review, so `.github/workflows/renovate-auto-approve.yml` closes the loop: on Renovate PRs carrying one of the four automerge labels it submits an approval with the `PAT` secret (checking for an existing approval first to stay idempotent). GitHub's auto-merge then completes once CI is green — automerged updates still pass the full lint/typecheck/test gauntlet and get a [preview deploy](/infra/environments/).
+
+## Lockfile maintenance
+
+`lockFileMaintenance` is enabled on the same 1st/15th schedule: Renovate periodically regenerates `pnpm-lock.yaml` from scratch to pick up transitive updates that no direct-dependency bump would trigger. These PRs are labeled `lock-maintenance` and automerged.
+
+## Extras
+
+- Node is constrained to even (LTS-track) majors via an `allowedVersions` regex on the `node` dep.
+- `customManagers:biomeVersions` keeps the Biome schema version in `biome.json` in step with the installed package.
+- Assignees and reviewers come from `CODEOWNERS` (`assigneesFromCodeOwners` / `reviewersFromCodeOwners`).
+- The dependency dashboard issue (`:dependencyDashboard`) lists pending/blocked updates.
+
+Since `docs/` joined the pnpm workspace, Renovate also manages this site's dependencies under the same policy — a docs dependency PR runs docs CI via the path filter in `docs.yml` (see [docs CI](/infra/docs-ci/)).

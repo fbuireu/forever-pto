@@ -1,0 +1,51 @@
+---
+title: Holidays engine
+description: How holidays are fetched with date-holidays and how the pure domain engine turns them into bridge-day suggestions, alternatives and metrics.
+sidebar:
+  order: 5
+---
+
+import { StrategiesTable } from '../../../components/demos/HowItWorksDemo';
+
+Two layers cooperate here: an infrastructure service that **fetches** holidays, and a pure domain engine (`src/domain/calendar/`) that **computes** what to do with them. The engine has no framework or SDK imports, which is also what lets it run inside a [Web Worker](/how-it-works/calculation-worker/).
+
+## Fetching holidays
+
+`src/infrastructure/services/holidays/getHolidays.ts` uses the `date-holidays` package. `getNationalHolidays` and `getRegionalHolidays` (`src/infrastructure/services/holidays/utils/holidays.ts`) fetch the selected year **and the next one** in a single call — carryover months need next year's holidays too. Raw entries are transformed by `holidayDTO.create` (`src/application/dto/holiday/dto.ts`) into `HolidayDTO { id, name, date, variant, location, isInSelectedRange }`, where `variant` is one of `HolidayVariant.NATIONAL | REGIONAL | CUSTOM`. Errors resolve to an empty array and a Better Stack log — the planner degrades instead of crashing.
+
+User-created holidays get the `CUSTOM` variant; the [holidays store](/how-it-works/state-stores/) preserves them across refetches.
+
+## Bridges
+
+The engine's core concept is the **Bridge** (`src/domain/calendar/types.ts`):
+
+```ts
+interface Bridge {
+  startDate: Date;
+  endDate: Date;
+  ptoDaysNeeded: number;
+  effectiveDays: number;
+  efficiency: number; // effectiveDays / ptoDaysNeeded
+  ptoDays: Date[];
+}
+```
+
+A bridge is a block of PTO days that connects weekends and holidays into one continuous break. `efficiency` is the payoff ratio: how many effective days off you get per PTO day spent.
+
+## Strategies
+
+`FilterStrategy` is a const object in `src/domain/calendar/types.ts`. The table below is rendered from the imported constant, so it cannot drift from the code:
+
+<StrategiesTable />
+
+Tunables (efficiency thresholds, scoring weights, multi-day bonuses) live in `PTO_CONSTANTS` in `src/domain/calendar/const.ts`, each with an explanatory comment.
+
+## Entry points
+
+- `src/domain/calendar/suggestions/generateSuggestions.ts` — the main pipeline: drop holidays that fall on weekends (they add nothing), compute `getAvailableWorkdays`, `findBridges` (both in `src/domain/calendar/utils/helpers.ts`), then dispatch to the strategy selector via `STRATEGY_MAP`. Unknown strategies fall back to grouped. Returns sorted `days`, the chosen `bridges` and the `strategy`.
+- `src/domain/calendar/alternatives/generateAlternatives.ts` — produces distinct alternative plans (default cap of 4, from the holidays store's `maxAlternatives`). It first excludes bridges overlapping the current suggestion, then cycles through seven different bridge orderings (by efficiency, span, PTO cost, month, inverse efficiency, a composite, and a deliberate pseudo-random `Math.sin` ordering) plus rotation on later passes, deduplicating candidate plans via `getCombinationKey`. This yields genuinely different plans rather than near-duplicates.
+- `src/domain/calendar/metrics/generateMetrics.ts` — computes the `Metrics` block shown in the summary: long weekends, rest blocks, max working period, average efficiency, bonus days, quarterly/monthly distribution, bridges used, total effective days, longest vacation, and more.
+
+## Who calls this
+
+The synchronous path (store actions `generateSuggestions` / `generateAlternatives`) dynamic-imports these functions, but the primary production path runs the whole pipeline off the main thread — see [calculation worker](/how-it-works/calculation-worker/).

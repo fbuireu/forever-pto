@@ -1,0 +1,13 @@
+{
+  "search.label": "Buscar",
+  "search.ctrlKey": "Ctrl K",
+  "themeSelect.accessibleLabel": "Seleccionar tema",
+  "themeSelect.dark": "Oscuro",
+  "themeSelect.light": "Claro",
+  "themeSelect.auto": "Auto",
+  "languageSelect.accessibleLabel": "Seleccionar idioma",
+  "page.editLink": "Editar esta página",
+  "page.lastUpdated": "Última actualización:",
+  "page.previousLink": "Anterior",
+  "page.nextLink": "Siguiente"
+}

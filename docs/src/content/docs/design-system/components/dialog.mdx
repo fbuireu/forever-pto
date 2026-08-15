@@ -1,0 +1,51 @@
+---
+title: Dialog
+description: Centered modal with a gradient blurred backdrop, brutal close button and Motion enter/exit.
+sidebar:
+  order: 9
+---
+
+import { DialogDemo, DialogNoCloseButtonDemo } from '../../../../components/demos/DialogDemo';
+
+Source: `src/ui/modules/core/primitives/Dialog.tsx` — a pure re-export of `src/ui/modules/core/animate/base/Dialog.tsx`, which is itself a styling layer over the Motion dialog primitive at `src/ui/modules/core/animate/primitives/base/Dialog.tsx` (Base UI dialog + `AnimatePresence`). Import from the `primitives/Dialog` path; the layering is an implementation detail. Needs a `LazyMotionProvider` ancestor.
+
+Exports: `Dialog`, `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter`.
+
+<DialogDemo client:visible />
+
+## How it works
+
+- `DialogContent` (an alias of the internal `DialogPopup`) renders the portal, backdrop and popup in one go: a centered `bg-card` panel with 3px frame border, `rounded-[14px]` and `shadow-brutal-xl`, capped at `sm:max-w-lg`.
+- The backdrop is a fixed vertical gradient of near-black ink with `backdrop-blur-[2px]`, at `z-200` together with the popup.
+- `showCloseButton` (default `true`) controls the top-right X — a brutal mini-button with `hit-area-stable` and hover lift. With it off, Esc and backdrop click still dismiss.
+- The root supports uncontrolled and controlled use (`open` / `onOpenChange`); the motion layer gates the portal behind `AnimatePresence` with `keepMounted` so exit animations complete before unmount.
+- `DialogTrigger` supports `asChild` (via Base UI's `render`) so a [Button](/design-system/components/button/) can be the trigger without nesting buttons.
+
+<DialogNoCloseButtonDemo client:visible />
+
+## Usage
+
+```tsx
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@ui/modules/core/primitives/Dialog';
+
+<Dialog open={open} onOpenChange={setOpen}>
+  <DialogTrigger asChild>
+    <Button>Open</Button>
+  </DialogTrigger>
+  <DialogContent showCloseButton={false}>
+    <DialogHeader>
+      <DialogTitle>Reset your plan?</DialogTitle>
+      <DialogDescription>This cannot be undone.</DialogDescription>
+    </DialogHeader>
+    <DialogFooter>…</DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+For a mobile-first bottom sheet use [Drawer](/design-system/components/drawer/); for non-modal anchored content use [Popover](/design-system/components/popover/).
+
+## Conventions
+
+- `DialogHeader` draws the standard 2px bottom hairline (frame color at 18% opacity); `DialogFooter` stacks buttons column-reverse on mobile, row-end on desktop.
+- `DialogTitle` is `font-black` with tight tracking, matching the app's display type.
+- Always include `DialogTitle` (and ideally `DialogDescription`) for accessible labelling — Base UI wires the aria attributes.

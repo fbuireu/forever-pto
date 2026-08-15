@@ -1,0 +1,42 @@
+---
+title: Banner
+description: Inline callout with icon, uppercase title and brand-tinted color schemes for tips, notices and confirmations.
+sidebar:
+  order: 4
+---
+
+import { BANNER_SCHEME_ROWS, BannerActionDemo, BannerSchemesDemo } from '../../../../components/demos/BannerDemo';
+import { VariantsTable } from '../../../../components/VariantsTable';
+
+Source: `src/ui/modules/core/primitives/Banner.tsx`. A bordered, shadowed callout box (`role='note'`, labelled by its `title`) with an icon row on top and the message below. Framework-clean, so this page renders the real component.
+
+## Color schemes
+
+`colorScheme` is not a CVA axis — it indexes a `COLOR_SCHEMES` lookup object in the source file that derives background, icon, title and message colors from the brand CSS variables via `color-mix()`, with separate light and dark recipes.
+
+<BannerSchemesDemo client:visible />
+
+<VariantsTable rows={BANNER_SCHEME_ROWS} />
+
+## Icon and action
+
+`icon` accepts either a Lucide icon or one of the animated icon components from `src/ui/modules/core/animate/icons/` (they share the same call signature). The optional `action` slot renders any node below the message with top margin — typically a small [Button](/design-system/components/button/).
+
+<BannerActionDemo client:visible />
+
+## Usage
+
+```tsx
+import { Banner } from '@ui/modules/core/primitives/Banner';
+import { Lightbulb } from 'lucide-react';
+
+<Banner colorScheme='orange' icon={Lightbulb} title='Tip'>
+  Two PTO days around a Thursday holiday unlock a 5-day break.
+</Banner>
+```
+
+## Conventions
+
+- `title` is rendered uppercase by CSS — pass a normal-case string.
+- The icon is `aria-hidden`; the accessible name comes from `aria-label={title}` on the container.
+- `children` renders in a `flex flex-wrap items-baseline` row, so inline fragments (values, links) line up on the baseline.

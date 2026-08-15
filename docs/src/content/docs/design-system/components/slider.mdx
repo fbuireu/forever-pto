@@ -1,0 +1,51 @@
+---
+title: Slider
+description: Base UI slider with an accent thumb and number-to-array value normalization.
+sidebar:
+  order: 18
+---
+
+import { SliderDemo, SliderDisabledDemo, SliderRangeDemo } from '../../../../components/demos/SliderDemo';
+
+Source: `src/ui/modules/core/primitives/Slider.tsx`. A Base UI slider under a brutal skin. No Motion here — the thumb's hover lift is plain CSS transition — so it works without `LazyMotionProvider`.
+
+Exports: `Slider`.
+
+<SliderDemo client:visible />
+
+## How it works
+
+- **Value normalization is the whole point of the wrapper.** Base UI emits `number` for single-thumb sliders and `readonly number[]` for ranges; consumers always want a mutable `number[]`. The component wraps `onValueChange` and `onValueCommitted` so both callbacks always receive `number[]` regardless of thumb count — a single value arrives as `[value]`. Inbound `value`/`defaultValue` accept `number | number[]` and pass through.
+- `onValueChange` fires continuously while dragging; `onValueCommitted` fires once on release — use the latter for expensive recalculation.
+- Pass an array `value`/`defaultValue` with two entries and Base UI renders a range; the single `Thumb` in this wrapper is reused per handle by Base UI.
+- Anatomy: `Root > Control > Track (surface-panel-alt, 3px frame border) > Indicator (frame-colored fill)` plus a `size-7` accent thumb with `hit-area-stable` and the standard hover lift (translate -0.5, shadow grows) — same mechanics as [Button](/design-system/components/button/).
+
+<SliderRangeDemo client:visible />
+
+## States
+
+`disabled` dims root and thumb to 50% opacity and disables pointer events via Base UI's `data-disabled`.
+
+<SliderDisabledDemo client:visible />
+
+## Usage
+
+```tsx
+import { Slider } from '@ui/modules/core/primitives/Slider';
+
+<Slider
+  value={[ptoDays]}
+  min={0}
+  max={30}
+  step={1}
+  onValueChange={([days]) => setPtoDays(days)}
+  onValueCommitted={(value) => recalculate(value)}
+/>
+```
+
+For discrete numeric stepping the app also has the animated `Counter` (`src/ui/modules/core/animate/components/Counter.tsx`).
+
+## Conventions
+
+- Prop surface is a deliberate subset (`className`, `value`, `defaultValue`, `min`, `max`, `step`, the two callbacks, `disabled`, `id`) — extend the interface in the source if you need more of Base UI's API rather than reaching for the primitive directly.
+- Defaults: `min=0`, `max=100`, `step=1`.

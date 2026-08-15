@@ -1,0 +1,57 @@
+---
+title: State stores
+description: The Zustand stores — filters, holidays, location, premium and ui — their shapes, encrypted localStorage persistence and the useShallow convention.
+sidebar:
+  order: 3
+---
+
+All client state lives in Zustand stores under `src/application/stores/`. Four of them persist; each is created as `create()(devtools(persist(...)))` with a versioned storage name. The `ui` store is devtools-only. Store conventions are documented in `src/application/stores/CONTEXT.md`.
+
+## Persistence: encrypted localStorage
+
+Persisted stores share `encryptedStorage` from `src/application/stores/crypto.ts`, a `createJSONStorage` wrapper over `localStorage`:
+
+- In production with `NEXT_PUBLIC_STORAGE_KEY` set, values are encrypted (XOR + base64, `encrypt`/`decrypt` in `src/application/stores/utils/crypto.ts`) before hitting `localStorage`. This is obfuscation, not cryptography — it keeps casual tampering out, nothing more.
+- In development, or when the key is missing, it falls back to plain `localStorage`.
+- On the server it is a no-op storage, so SSR never touches `localStorage`.
+
+Every persisted store implements the same `onRehydrateStorage` pattern: on error, log to Better Stack and `localStorage.removeItem(STORAGE_NAME)` so a corrupt blob cannot brick the app.
+
+## Selector convention
+
+Multi-field selections always go through `useShallow` from `zustand/react/shallow`:
+
+```ts
+const { year } = useFiltersStore(useShallow((s) => ({ year: s.year })));
+```
+
+This prevents re-renders when unrelated fields change. Stores never fetch data themselves; they delegate to `src/infrastructure/services/*` (often via dynamic import to keep bundles lean).
+
+## `filters` (`useFiltersStore`, storage `filters-store`)
+
+User-facing planner configuration: `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy` (a `FilterStrategy`, defaulting to grouped — see [holidays engine](/how-it-works/holidays-engine/)). Two quirks:
+
+- `partialize` persists everything **except `year`** — the year deliberately resets to the current year on every visit.
+- `setCountry` resets `region` to `''`, since regions belong to a country.
+
+## `holidays` (`useHolidaysStore`, storage `holidays-store`)
+
+The largest store: `holidays` (the `HolidayDTO[]`), the current `suggestion`, `alternatives` (capped by `maxAlternatives`), selection/preview indexes, `manuallySelectedDays`, `removedSuggestedDays` and `isCalculating`. Key actions:
+
+- `fetchHolidays` dynamic-imports `@infrastructure/services/holidays/getHolidays`, preserves user-created (`CUSTOM`) holidays and dedupes by date.
+- `generateSuggestions` / `generateAlternatives` dynamic-import the domain functions for the synchronous path; `setCalculationResult` is the entry point used by the [Web Worker path](/how-it-works/calculation-worker/), preserving the selected alternative index across recalculations.
+- `addHoliday` / `editHoliday` / `removeHoliday` manage custom holidays; `toggleDaySelection` implements manual day editing with PTO-budget enforcement; `trimManualDays`, `getRemainingDays` and `getFreeDaysForMonth` support the calendar UI.
+
+Because `Date` does not survive JSON, `partialize` serializes every date (including nested bridge dates) to ISO strings and `onRehydrateStorage` revives them.
+
+## `location` (`useLocationStore`, storage `location-store`)
+
+Country and region option lists: `countries`, `regions`, loading flags and `countriesLastFetched`. `fetchCountries(locale)` is throttled by `TWENTY_FOUR_HOURS` (`src/application/stores/utils/crypto.ts`) and delegates to `src/infrastructure/services/countries/getCountries.ts` (built on `i18n-iso-countries`) and `src/infrastructure/services/regions/getRegions.ts`. Loading flags are not persisted.
+
+## `premium` (`usePremiumStore`, storage `premium-store`)
+
+Premium session mirror: `premiumKey`, `userEmail`, `lastVerified`, `needsSessionCheck` (all persisted) plus transient modal state (`modalOpen`, `currentFeature`, `isLoading`). On rehydrate, if `lastVerified` is older than 24 hours it flips `needsSessionCheck`, and `checkExistingSession()` revalidates against `GET /api/check-session` (via `src/ui/adapters/session/checkSession.ts`). `setPremiumStatus` fires the `premium_activated` [analytics event](/how-it-works/observability/). Details of the whole flow are on the [premium page](/how-it-works/premium/).
+
+## `ui` (`useUIStore`, not persisted)
+
+Ephemeral UI state: the Donate popover open/opening flags and the currency derived from the locale (`getCurrencyFromLocale`, defaults in `src/ui/utils/currencies.ts`).

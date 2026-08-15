@@ -44,6 +44,14 @@ export const Footer = async () => {
           >
             {t('planner')}
           </Link>
+          <a
+            href='https://docs.forever-pto.com'
+            target='_blank'
+            rel='noreferrer'
+            className='text-sm font-semibold px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75'
+          >
+            {t('docs')}
+          </a>
           <Link
             href='/legal/privacy-policy'
             className='text-sm font-medium px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75'

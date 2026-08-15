@@ -1,0 +1,46 @@
+---
+title: Summary charts
+description: The four Recharts visualizations in the planner summary — what each shows and how data flows from the Zustand stores into them.
+sidebar:
+  order: 2
+---
+
+Source: `src/ui/modules/pages/planner/summary/`. These components are **reference-only**: they pull in `next-intl` (`useTranslations('charts')`, `useLocale`), the premium gate (`src/ui/modules/premium/PremiumFeature.tsx`) and app DTO types, so the docs describe them without rendering live demos.
+
+## The four Recharts components
+
+All four follow the same skeleton: a core `Card` with an icon-and-title header, a description line computed from the data, and a `ResponsiveContainer` chart body — each wrapped in `PremiumFeature`, which blurs the chart and pitches the upgrade for free users.
+
+### QuarterDistributionChart
+
+`QuarterDistributionChart.tsx` — a `BarChart` of suggested days off per quarter (`quarterDist: number[]`, one bar per Q1–Q4). Bars are colored per quarter from `COLOR_SCHEMES` in `summary/const.ts` (the four brand CSS variables: teal, purple, yellow, green). The description summarizes total days and how many quarters are active.
+
+### MonthlyDistributionChart
+
+`MonthlyDistributionChart.tsx` — an `AreaChart` of days off per month across the plan (`monthlyDist: number[]`, plus `year` and `carryOverMonths`). When carryover months are configured the x-axis extends past December, with month names localized via `useLocale` and `getMonthNames` from `../utils/helpers`. The description calls out the peak month.
+
+### HolidaysDistributionChart
+
+`HolidaysDistributionChart.tsx` — a `PieChart` splitting the year's free days into national holidays, regional holidays (via `HolidayVariant` from `@application/dto/holiday/types`) and PTO days (`ptoDays`, `holidays: HolidayDTO[]`). A custom legend reuses the planner calendar's `MODIFIERS_CLASS_NAMES` colors (`src/ui/modules/pages/planner/calendar/utils/helpers.ts`) so pie slices match the day colors users see in the calendar.
+
+### BlocksPerQuarterChart
+
+`BlocksPerQuarterChart.tsx` — a `BarChart` of long rest blocks per quarter (`blocksPerQuarter: number[]`). The description highlights the best quarter (the one with the most long blocks).
+
+The same folder also contains `YearTimelineChart.tsx` — the year-at-a-glance strip — but it is hand-rolled CSS segments over Temporal date math, not Recharts.
+
+## How data reaches the charts
+
+The charts themselves are pure props-in components — no store access, per the project's core-component rules. The wiring lives one level up in `src/ui/modules/pages/planner/Summary.tsx`:
+
+1. `Summary` reads the Zustand stores — `useFiltersStore` (ptoDays, country, region, strategy, year, carryOverMonths), `useHolidaysStore`, `useLocationStore` and `usePremiumStore` — through `useShallow` selectors, waiting on `useStoresReady` before rendering.
+2. It derives the metrics objects (`quarterDist`, `monthlyDist`, `longBlocksPerQuarter`, efficiency stats) from the active suggestion in a `useMemo`.
+3. Each chart is loaded with `next/dynamic`, so Recharts stays out of the initial planner bundle, and receives only plain arrays and DTOs as props.
+
+This makes the charts easy to test and reuse: any caller that can produce a `number[]` (or `HolidayDTO[]`) can render them — the Next.js coupling is in the surrounding translation and premium layers, not the data flow.
+
+## Conventions
+
+- Chart colors come from `COLOR_SCHEMES` (`summary/const.ts`) and `MODIFIERS_CLASS_NAMES` — never hard-code hex values in a chart; both resolve to the brand CSS variables so charts follow light/dark themes automatically.
+- Grid strokes use `color-mix` on `var(--frame)` to stay on-brand at low opacity.
+- Related: [homepage patterns](/design-system/patterns/homepage/), [reference components](/design-system/patterns/reference-components/).

@@ -1,0 +1,33 @@
+---
+title: Conventions
+description: Commit types, code style and component rules.
+sidebar:
+  order: 0
+---
+
+## Commits
+
+Commit messages follow **conventional commits**, enforced locally by commitlint (`commitlint.config.ts`, extending `@commitlint/config-conventional`) via the husky `commit-msg` hook.
+
+PRs are **squash-merged**, so the **PR title becomes the commit that lands on `main`** — and that title is what semantic-release (`.releaserc.json`) analyzes. Get the type right on the PR title, not just on intermediate commits:
+
+| PR title type | Release effect |
+| --- | --- |
+| `feat: …` | Minor version bump, changelog entry, deploy |
+| `fix: …` / `perf: …` | Patch version bump, changelog entry, deploy |
+| `feat!: …` or a `BREAKING CHANGE:` footer | Major version bump |
+| `docs: …`, `chore: …`, `ci: …`, `refactor: …`, `test: …` | **No release** |
+
+Changes to this wiki (`docs/**`) MUST use the `docs:` type — they should never cut an app release. The release commit itself is created by semantic-release as `chore(release): x.y.z [skip ci]`.
+
+## Code conventions
+
+- **No barrel files.** Import directly from the source module; never create pass-through `index.ts` re-export files.
+- **Named exports.** Default exports are used only where Next.js requires them (route files, config files). Everything else exports by name — including the CVA variants object next to its component.
+- **CVA pattern.** Styled primitives define a `cva()` object and export it alongside the component (e.g. `buttonVariants` in `src/ui/modules/core/primitives/Button.tsx`) so variants stay reusable and type-derivable. See the [Button page](/design-system/components/button/) for how the docs exploit this.
+- **`CONTEXT.md` per folder.** Significant directories carry a `CONTEXT.md` describing purpose, domain concepts and boundaries. Read it before modifying a folder; update it when the boundaries change. This convention is declared in the root `CLAUDE.md`.
+- **No uppercase in i18n strings.** Translation strings in `src/ui/i18n/messages/` are written in normal casing; if a design calls for uppercase, apply it with a CSS `uppercase` class in the component. Casing is presentation, not content.
+
+## Formatting
+
+Formatting is not a convention you follow by hand — Biome formats staged files on every commit. See [tooling](/contributing/tooling/) for the hook chain and [testing](/contributing/testing/) for test-file conventions.

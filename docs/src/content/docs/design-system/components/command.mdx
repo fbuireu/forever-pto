@@ -1,0 +1,42 @@
+---
+title: Command
+description: cmdk-powered filterable list — the engine inside the country/region combobox.
+sidebar:
+  order: 8
+---
+
+import { CommandDemo } from '../../../../components/demos/CommandDemo';
+
+Source: `src/ui/modules/core/primitives/Command.tsx`. A styled wrapper around [cmdk](https://cmdk.paco.me): type in the input and the list filters, ranks and keyboard-navigates automatically. `CommandInput` wraps its search icon in `AnimateIcon animateOnHover` (see [animated icons](/design-system/animation/icons/)), which is why demos need a `LazyMotionProvider` ancestor.
+
+Exports: `Command`, `CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup`, `CommandItem`.
+
+<CommandDemo client:visible />
+
+## How it works
+
+- All filtering, scoring and arrow-key navigation come from cmdk; this module only applies the brutal skin. Each sub-component forwards the full cmdk prop surface (`value`, `onSelect`, `disabled`, `heading`, `shouldFilter` on the root, and so on).
+- `CommandInput` renders inside a wrapper row with a 2px bottom border and the animated `SearchIcon` from `src/ui/modules/core/animate/icons/Search.tsx`; hovering the row plays the icon's draw animation.
+- `CommandList` caps at `max-h-[300px]` with vertical scroll; `CommandGroup` headings render as small black-weight uppercase labels (styled via CSS, per the no-uppercase-strings convention); selected items get `bg-accent` through cmdk's `data-selected` attribute.
+- The root has no border of its own — in the app it lives inside a [Popover](/design-system/components/popover/) (see `src/ui/modules/core/primitives/Combobox.tsx`, the country/region picker, which is app-coupled and documented separately). Standalone use adds its own frame, as the demo above does.
+
+## Usage
+
+```tsx
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@ui/modules/core/primitives/Command';
+
+<Command>
+  <CommandInput placeholder='Search a country…' />
+  <CommandList>
+    <CommandEmpty>No results found.</CommandEmpty>
+    <CommandGroup heading='Countries'>
+      <CommandItem onSelect={(value) => select(value)}>Spain</CommandItem>
+    </CommandGroup>
+  </CommandList>
+</Command>
+```
+
+## Conventions
+
+- `data-slot` hooks: `command`, `command-input-wrapper`, `command-input`, `command-list`, `command-empty`, `command-group`, `command-item`.
+- Icons inside items are auto-sized to `size-4` and muted unless they carry an explicit `text-*`/`size-*` class.

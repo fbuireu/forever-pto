@@ -1,0 +1,53 @@
+---
+title: Premium and donations
+description: The donation-based premium model — Stripe PaymentIntents as premium keys, the JWT session cookie, activation paths, promo codes and the webhook fallback.
+sidebar:
+  order: 4
+---
+
+Forever PTO has no accounts and no subscriptions. Premium is **donation-based**: donate once through Stripe and the app treats you as premium. The central trick: **the premium key *is* the Stripe PaymentIntent id**. There is no separate license table — Stripe (plus a payments table in Turso) is the source of truth.
+
+## The Donate popover
+
+`src/ui/modules/shared/donate/Donate.tsx` renders the donation UI, mounted through `DonateClient.tsx` (a `dynamic(..., { ssr: false })` wrapper) in the planner layout and homepage. It combines `react-hook-form` + zod (`createPaymentSchemaWithMessages`), Stripe Elements via `getStripeClientInstance()` (`src/infrastructure/clients/payments/stripe/client.ts`), theming from `next-themes`, and `initializePayment` from `src/ui/adapters/payments/checkout.ts`. The checkout itself is `src/ui/modules/premium/CheckoutForm.tsx`. Popover open state lives in the [ui store](/how-it-works/state-stores/).
+
+## Creating the payment: `POST /api/payment`
+
+`src/app/api/payment/route.ts`:
+
+1. Resolves the client IP (`cf-connecting-ip`, falling back to `x-forwarded-for`) and runs the [KV rate limiter](/how-it-works/rate-limiting/).
+2. Delegates to the `createPayment` use-case (`src/application/use-cases/payment.ts`): zod validation, optional promo-code resolution, then `createPaymentIntent` (`src/infrastructure/services/payments/provider/intent.ts`) with `email`, `promoCode`, `userAgent` and `ipAddress` stored as PaymentIntent metadata.
+3. Returns `clientSecret` + `discountInfo` to the browser.
+4. The Turso `savePayment` is **not** awaited: it is a deferred Effect scheduled with `next/server`'s `after()`, provided with `ApplicationLayer` (`src/infrastructure/layers.ts`). If it fails, a warning is logged and the webhook fallback takes over.
+
+Typed Effect errors map to HTTP: `RateLimitError` → 429, `ValidationError`/`PromoCodeError` → 400, `PaymentError` → 500.
+
+### Promo codes
+
+`validatePromoCode` (`src/infrastructure/services/payments/provider/promoCode.ts`) looks up an active Stripe promotion code (uppercased, trimmed), expands its coupon, and rejects invalid/expired/exhausted coupons with typed `PromoCodeError` codes. After applying `percent_off` or `amount_off`, the discounted total must still clear `MIN_FINAL_AMOUNT` (a constant in that file) or the code is refused — Stripe cannot charge amounts below its minimum.
+
+## Webhook as DB fallback: `POST /api/webhooks/stripe`
+
+The route verifies the `stripe-signature` header, then `processWebhookEvent` (`src/application/use-cases/webhook.ts`) handles:
+
+- `payment_intent.succeeded` — if the payment row is missing (the deferred save failed), it **creates it from the webhook payload**, then runs the domain handler (`src/domain/payment/handlers/paymentSucceeded.ts`).
+- `payment_intent.payment_failed` — `src/domain/payment/handlers/paymentFailed.ts`.
+
+So the database converges even if the original request died after charging.
+
+## The session: `premium-token` cookie
+
+A premium session is a JWT (jose, HS256, signed with `JWT_SECRET`, 30-day expiry — `src/infrastructure/services/premium/session.ts`) carrying `{ email, paymentIntentId }`. It is stored in the `premium-token` cookie (`PREMIUM_COOKIE` in `src/infrastructure/services/premium/cookie.ts`): `httpOnly`, `sameSite: 'strict'`, `secure` in production, 30-day `maxAge`.
+
+`src/app/api/check-session/route.ts`:
+
+- **GET** — reads the cookie, verifies the JWT, returns `{ premiumKey: paymentIntentId, email }`. On `SessionError` it clears the cookie and returns nulls. Responses are `noStore` (never cached).
+- **POST** `{ email, premiumKey? }` — the two activation paths in `src/application/use-cases/activatePremium.ts`:
+  - `activateWithPayment(email, paymentIntentId)` — used right after checkout. Retrieves the PaymentIntent from Stripe, requires `status === 'succeeded'` and that the metadata email matches, then upserts the payment row (deferred via `after()`).
+  - `activateWithEmail(email)` — used on a new device. Looks up the latest succeeded payment for that email in Turso.
+
+  Both mint the JWT and set the cookie; the browser side mirrors the result into the [premium store](/how-it-works/state-stores/), which re-checks the session after 24 hours.
+
+## Gating features
+
+`src/ui/modules/premium/PremiumFeature.tsx` wraps premium-only UI: for free users it blurs the children, overlays a lock icon and opens `UpgradeModal` via the store's `showUpgradeModal(feature)`. Current premium surfaces include [calendar exports](/how-it-works/exports/) and advanced metrics.

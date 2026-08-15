@@ -1,0 +1,57 @@
+---
+title: Reference components
+description: The Next-coupled core components — RichLink, Sonner, Combobox, Sidebar, Form and FlagIcon — documented without live demos, with the exact import that couples each one.
+sidebar:
+  order: 3
+---
+
+import { SIDEBAR_COOKIE_NAME } from '@ui/modules/core/animate/base/Sidebar';
+
+Most core components are framework-clean and get live demos elsewhere in this section. The six below are not: each depends on Next.js infrastructure, app-layer types or a stylesheet the docs site does not load. They are documented **reference-only** — read the source at the paths given.
+
+## RichLink
+
+`src/ui/modules/core/primitives/RichLink.tsx` — the locale-aware link. Internal links render through the `next-intl` navigation `Link`, so hrefs are automatically prefixed with the active locale; `external` switches to a plain `<a target='_blank' rel='noopener noreferrer'>`.
+
+- **API**: `href`, `className` (defaults to `text-primary hover:underline`), `external`, `children`. Plus the `createRichLink(href, { className, external })` factory, which returns a chunk-rendering function for `next-intl` rich-text tags (`t.rich('key', { link: createRichLink('/pricing') })`).
+- **Coupling**: `import { Link } from '@application/i18n/navigation'` (next-intl's locale router).
+
+## Sonner (Toaster)
+
+`src/ui/modules/core/primitives/Sonner.tsx` — the toast host, a brutal-styled wrapper over `sonner`'s `Toaster`. Defaults: `position='bottom-center'`, `duration={5000}`, `closeButton`. Per-type classes (success, warning, error, info) restyle toasts through a `--toast-bg` variable onto the brand colors, with 3px frames and hard shadows; the close button gets the standard hover lift.
+
+- **API**: re-exports `sonner`'s `ToasterProps`; fire toasts with `toast(...)` from `sonner` anywhere below it.
+- **Coupling**: `import { useTheme } from 'next-themes'` — it reads the active theme to keep toasts in sync with dark mode.
+
+## Combobox
+
+`src/ui/modules/core/primitives/Combobox.tsx` — the searchable select used for country, region and strategy pickers. Composes `Popover` + `Command` (cmdk) + `Button` + `FlagIcon`, with an `AnimateIcon`-driven `ChevronUpDown` that animates on hover and while open.
+
+- **API**: `options?: CountryDTO[] | RegionDTO[]`, `value?`, `onChange: (value: FilterStrategy) => void`, `placeholder`, `searchPlaceholder`, `notFoundText`, `disabled`, `id`. Options with a flag render a `FlagIcon` next to the label.
+- **Coupling**: type imports from `@application/dto/country/types`, `@application/dto/region/types` and `@domain/calendar/types` (`FilterStrategy`) tie it to the app's DTO layer.
+
+## Sidebar
+
+`src/ui/modules/core/animate/base/Sidebar.tsx` — the full sidebar system: `SidebarProvider`, `Sidebar`, `SidebarTrigger`, `SidebarInset`, header/footer/content/group parts, `SidebarMenu*` and the `useSidebar` hook. Open state persists in the <code>{SIDEBAR_COOKIE_NAME}</code> cookie (name imported from the real export, see also [cookies](/reference/cookies/)), toggles with Ctrl/Cmd+B, collapses to an icon rail, and becomes a spring-animated drawer on mobile. Menu buttons share a [MotionHighlight](/design-system/animation/effects/) hover pill and grow tooltips when collapsed.
+
+- **API**: root props `side: 'left' | 'right'`, `variant: 'sidebar' | 'floating' | 'inset'`, `collapsible: 'offcanvas' | 'icon' | 'none'`; `SidebarMenuButton` exposes the CVA axes `variant: 'default' | 'outline'` and `size: 'default' | 'sm' | 'lg'` plus `asChild`, `isActive` and `tooltip`.
+- **Coupling**: `import { setCookie } from '@ui/utils/cookie'` (the `cookieStore` API plus `temporal-polyfill`) and `import { useIsMobile } from '@ui/hooks/useMobile'` — browser/app runtime dependencies rather than `next/*`, but enough to keep it out of the docs bundle.
+
+## Form
+
+`src/ui/modules/core/primitives/Form.tsx` — the shadcn-style `react-hook-form` glue. `Form` is `FormProvider`; `FormField` wraps RHF's `Controller` and publishes the field name through context; `FormItem` mints an id; `FormLabel`, `FormControl` (a `Slot`) and `FormMessage` consume both contexts to wire `htmlFor`, `aria-describedby` and `aria-invalid` automatically, with `FormMessage` rendering the field error.
+
+- **API**: `Form`, `FormField` (takes RHF `ControllerProps`: `control`, `name`, `render`), `FormItem`, `FormLabel`, `FormControl`, `FormMessage`.
+- **Coupling**: `react-hook-form` (`Controller`, `FormProvider`, `useFormContext`, `useFormState`) — a runtime dependency the docs site intentionally does not install.
+
+## FlagIcon
+
+`src/ui/modules/core/primitives/FlagIcon.tsx` — renders a country flag as `<span class='fi fi-{code}' aria-hidden='true'>`. The component itself is dependency-free (only `cn()`), but the visuals come entirely from the `flag-icons` stylesheet.
+
+- **API**: `code` (ISO country code, lowercase; returns `null` when empty), `className`.
+- **Coupling**: requires the `flag-icons` CSS, which the app imports in `src/ui/styles/vendor/index.css` — the docs stylesheet deliberately loads only the app's theme and utility layers, so flags would render as empty squares here.
+
+## Conventions
+
+- If you need one of these in a new surface, check the coupling first: `RichLink` and `Sonner` only work inside the Next app shell; `Combobox` follows the DTOs; `Form` follows RHF; `Sidebar` and `FlagIcon` follow browser APIs and vendor CSS.
+- Everything else in `src/ui/modules/core/` is framework-clean — see the live pages under [components](/design-system/components/overview/) and the animation section starting at [animated icons](/design-system/animation/icons/).

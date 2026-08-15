@@ -1,0 +1,60 @@
+---
+title: Caching
+description: Next Cache Components ('use cache' + cacheLife), the OpenNext R2 incremental cache and the middleware markdown cache.
+sidebar:
+  order: 5
+---
+
+Caching happens at three levels: Next.js Cache Components inside the rendering layer, an R2-backed incremental cache at the OpenNext/Workers level, and plain `Cache-Control` headers for the agent-facing markdown surface.
+
+## Cache Components
+
+`next.config.ts` enables `cacheComponents: true` (Next 16 Cache Components). `partialPrefetching` is intentionally commented out there — the inline comment records the Next version it is waiting on.
+
+With Cache Components enabled, anything dynamic must either be wrapped in Suspense or explicitly cached with a `'use cache'` directive plus a `cacheLife` profile. Current cache sites:
+
+| Function / component | File | Profile |
+| --- | --- | --- |
+| `getCurrentYear()` | `src/ui/utils/getCurrentYear.ts` | `cacheLife('days')` |
+| `getPublicEnv()` | `src/infrastructure/services/env/getPublicEnv.ts` | `cacheLife('days')` |
+| `Testimonials` (RSC) | `src/ui/modules/pages/homepage/sections/Testimonials.tsx` | `cacheLife('days')` |
+
+The pattern is always the same:
+
+```ts
+import { cacheLife } from 'next/cache';
+
+export async function getCurrentYear() {
+  'use cache';
+  cacheLife('days');
+  return new Date().getFullYear();
+}
+```
+
+`getCurrentYear` and `getPublicEnv` exist precisely because `new Date()` and `getCloudflareContext()` are dynamic APIs — hoisting them behind `'use cache'` keeps the pages that call them prerenderable. `Testimonials` caches a whole server component subtree (including its shuffled card order) for the same reason.
+
+**Testing consequence:** `vitest.setup.ts` mocks `next/cache` (`cacheLife`, `cacheTag` as no-ops) because the directive is meaningless in a unit-test runtime.
+
+## OpenNext incremental cache on R2
+
+The app deploys to Cloudflare Workers via OpenNext. `open-next.config.ts` selects the R2 incremental cache:
+
+```ts
+import { defineCloudflareConfig } from '@opennextjs/cloudflare';
+import r2IncrementalCache from '@opennextjs/cloudflare/overrides/incremental-cache/r2-incremental-cache';
+
+export default defineCloudflareConfig({
+  incrementalCache: r2IncrementalCache,
+});
+```
+
+At runtime this is backed by the R2 bucket bound as `NEXT_INC_CACHE_R2_BUCKET` in `wrangler.toml`, with separate buckets per environment (see [environments](/infra/environments/)). Everything Next.js would put in its incremental cache — prerendered pages, `'use cache'` entries, fetch cache — is persisted there, so cache entries survive Worker isolate recycling and are shared across the fleet.
+
+## HTTP-level caches
+
+- **Markdown renditions**: the [middleware](/architecture/middleware/) sets a one-hour public `Cache-Control` header on `/api/markdown` responses and on the `Accept: text/markdown` rewrites that target it.
+- **Images**: transformed image URLs under `/cdn-cgi/image/` are cached by Cloudflare at the edge — see [images](/architecture/images/).
+
+## What is deliberately not cached
+
+API routes that carry user state opt out explicitly: `src/app/api/check-session/route.ts` wraps every response in `noStore()` from `src/infrastructure/api/response.ts`, since premium-session payloads must never be shared between users.

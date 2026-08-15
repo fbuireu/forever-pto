@@ -1,0 +1,42 @@
+---
+title: Testing
+description: Vitest unit tests, the two Playwright suites and file conventions.
+sidebar:
+  order: 2
+---
+
+## Unit tests (Vitest)
+
+Configured in `vitest.config.ts` with `resolve.tsconfigPaths: true`, so all the app's path aliases (`@ui`, `@domain`, …) work in tests without extra mapping.
+
+- **Environment**: happy-dom.
+- **Setup** (`vitest.setup.ts`): mocks `next/cache` (`cacheLife`, `cacheTag`) — required because the app enables Cache Components — and runs Testing Library's `cleanup` after each test.
+- **Excluded from the runner**: `e2e/**`, `docs/**`, generated bones, icon directories and i18n message JSON.
+- **Coverage**: v8 provider over `src/**/*.{ts,tsx}` (tests, `*.d.ts`, `types.ts` files and generated code excluded), reported as text + lcov. `ci.yml` runs `pnpm test:coverage` and uploads `coverage/lcov.info` to Codecov on every push and PR.
+
+Run locally with `pnpm test:ut` (or `pnpm test:coverage`).
+
+## End-to-end tests (Playwright)
+
+There are **two independent suites**:
+
+### App suite — root `e2e/`
+
+Configured in the root `playwright.config.ts`. Specs mirror the app's route structure (`e2e/[locale]/(app)/planner/planner.spec.ts`, `e2e/api/health.spec.ts`, …), which makes it obvious which route a failing spec covers.
+
+- `baseURL` comes from the `BASE_URL` env var (default `http://localhost:3000`).
+- In CI these tests run **against the live per-PR preview deployment**, authenticating through Cloudflare Access with a service token (`CF_ACCESS_CLIENT_ID`/`CF_ACCESS_CLIENT_SECRET` injected as headers by the config). See [environments](/infra/environments/).
+- CI runs chromium only with retries; locally you get chromium, firefox and webkit.
+
+### Docs suite — `docs/e2e/`
+
+Configured in `docs/playwright.config.ts`: a small smoke suite (`docs/e2e/docs.spec.ts`) that builds the site and runs it via `astro preview` (`webServer` block), chromium only. It runs in `.github/workflows/docs.yml` after the build.
+
+## File conventions
+
+| Kind | Pattern | Location |
+| --- | --- | --- |
+| Unit test | `*.test.ts` / `*.test.tsx` | Colocated next to the source file it tests |
+| E2E test | `*.spec.ts` | Only in `e2e/` (or `docs/e2e/`), mirroring routes |
+
+Keep the split strict: the Vitest runner excludes `e2e/**`, and lint-staged uses the patterns to decide when to run `test:ut:changed` on commit (see [tooling](/contributing/tooling/)).

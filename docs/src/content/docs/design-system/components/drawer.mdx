@@ -1,0 +1,43 @@
+---
+title: Drawer
+description: vaul bottom sheet with a drag handle — the mobile counterpart to Dialog.
+sidebar:
+  order: 10
+---
+
+import { DrawerDemo } from '../../../../components/demos/DrawerDemo';
+
+Source: `src/ui/modules/core/animate/base/Drawer.tsx`. A thin skin over [vaul](https://vaul.emilkowal.ski)'s drawer: vaul handles the drag-to-dismiss gesture and slide animation itself (no Motion `m.*` here, so no `LazyMotionProvider` needed — the exception in `animate/base/`).
+
+Exports: `Drawer`, `DrawerContent`, `DrawerTitle`. There is intentionally no `DrawerTrigger` export — open it with controlled state.
+
+<DrawerDemo client:visible />
+
+## How it works
+
+- `Drawer` wraps `vaul`'s root with `shouldScaleBackground` defaulting to `false` (the app's brutal layout should not zoom out behind the sheet). All other vaul root props (`open`, `onOpenChange`, `dismissible`, snap points…) pass through.
+- `DrawerContent` renders the portal, an optional black/50 overlay (`overlay` prop, default `true`), and the sheet itself: fixed to the bottom edge, `rounded-t-[14px]`, 3px frame border on top and sides, `bg-card`, capped at `max-h-[85dvh]`. A pill-shaped vaul `Handle` is always rendered above your content for drag affordance.
+- `DrawerTitle` is visually hidden (`sr-only`) by default — vaul warns when a drawer has no accessible title, so always include one and override the class only if you want it visible.
+
+## Usage
+
+```tsx
+import { Drawer, DrawerContent, DrawerTitle } from '@ui/modules/core/animate/base/Drawer';
+
+const [open, setOpen] = useState(false);
+
+<Button onClick={() => setOpen(true)}>Preferences</Button>
+<Drawer open={open} onOpenChange={setOpen}>
+  <DrawerContent>
+    <DrawerTitle>Cookie preferences</DrawerTitle>
+    <div className='p-6'>…</div>
+  </DrawerContent>
+</Drawer>
+```
+
+For desktop-centric confirmations prefer [Dialog](/design-system/components/dialog/). The planner's management bar (`src/ui/modules/pages/planner/ManagementBar.tsx`) is the reference consumer: it renders inline on desktop and switches to a full-height Drawer (`overlay={false}`, `max-h-none`) on mobile via the `useIsMobile` hook.
+
+## Conventions
+
+- `data-slot` hooks: `drawer`, `drawer-portal`, `drawer-overlay`, `drawer-content`, `drawer-title`.
+- Content sits at `z-51` above a `z-50` overlay — below dialogs (`z-200`) by design.

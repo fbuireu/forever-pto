@@ -1,0 +1,44 @@
+---
+title: Tech stack
+description: Every major dependency and why it was chosen.
+sidebar:
+  order: 3
+---
+
+Exact versions are pinned in `package.json` (the repo uses exact pins — `save-prefix=` in `.npmrc`), so none are repeated here.
+
+## Runtime
+
+| Technology | Role | Why |
+| --- | --- | --- |
+| Next.js (App Router) | Framework | Server Components plus Cache Components (`cacheComponents: true` in `next.config.ts`) give per-fragment caching that maps well onto a Cloudflare Worker |
+| React | UI runtime | Required by Next; concurrent features (`use`, transitions) are used throughout |
+| TypeScript | Language | `strict: true`; typed boundaries between layers are load-bearing (see the drift-guard pattern in the docs demos) |
+| Tailwind CSS | Styling | v4 CSS-first config — no `tailwind.config` file; theme lives in CSS under `src/ui/styles/` |
+| Base UI | Headless primitives | Accessible behavior (tooltips, popovers, dialogs) without imposed styling, so the neo-brutalist skin stays in our CSS |
+| Motion | Animation | `LazyMotion` keeps the animation runtime out of the initial bundle; see the design-system animation pages |
+| Zustand | Client state | Small store-per-concern model (`filters`, `holidays`, `location`, `premium`) with persistence, accessed via `useShallow` selectors |
+| Effect | Server flows | Typed, composable error handling for the payment/premium pipeline (`src/domain/payment/`, `src/application/use-cases/`) — no try/catch pyramids |
+| next-intl | i18n | Locale routing plus namespaced messages for the four locales in `src/ui/i18n/messages/` |
+| boneyard-js | Loading skeletons | Generates skeleton components from real rendered output into `src/ui/modules/bones` instead of hand-maintaining them (patched — see [repo structure](/start/repo-structure/)) |
+| driver.js | Onboarding | Lightweight product-tour overlay with no framework coupling |
+
+## Services
+
+| Technology | Role | Why |
+| --- | --- | --- |
+| Turso | Database | libSQL at the edge — low-latency reads from a Worker without managing a server |
+| Stripe | Payments | Premium one-time purchase; webhooks handled in `src/app/api/` |
+| Resend | Email | Transactional email with react-email templates |
+| OpenNext + Cloudflare Workers | Hosting | Runs the full Next.js app on Workers with R2-backed incremental cache (`open-next.config.ts`); see [environments](/infra/environments/) |
+
+## Tooling
+
+| Technology | Role | Why |
+| --- | --- | --- |
+| Biome | Lint + format | One fast tool instead of ESLint + Prettier; single config at the repo root covers app and docs |
+| Vitest | Unit tests | Vite-native, first-class TS paths support, happy-dom environment |
+| Playwright | E2E tests | Runs against real preview deployments in CI, cross-browser locally |
+| semantic-release | Releases | Versions, changelog and GitHub releases derived from conventional commits — see [conventions](/contributing/conventions/) |
+
+More detail on the last three in [tooling](/contributing/tooling/) and [testing](/contributing/testing/).

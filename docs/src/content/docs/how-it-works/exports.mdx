@@ -1,0 +1,35 @@
+---
+title: Calendar exports
+description: PDF and ICS exports — the CalendarExport component, @react-pdf rendering, the hand-rolled ICS generator and premium gating.
+sidebar:
+  order: 7
+---
+
+Users can take their plan with them in two formats: a printable **PDF** and an **ICS** file that imports into Google Calendar, Outlook and Apple Calendar. Both live behind the premium gate.
+
+## The component
+
+`src/ui/modules/sidebar/components/CalendarExport.tsx` (a sidebar tool, tutorial anchor `data-tutorial='calendar-export'`) reads `year` from the filters store and `holidays` + the active suggestion from the holidays store (`currentSelection ?? suggestion` — manual edits win over the raw suggestion). Two toggle buttons choose what to include: holidays, PTO days, or both; the download buttons disable when the resulting selection is empty.
+
+The download buttons — and only the buttons — are wrapped in `PremiumFeature` (`src/ui/modules/premium/PremiumFeature.tsx`), so free users see the tool blurred with a lock and get the upgrade modal on interaction. See [premium](/how-it-works/premium/).
+
+## PDF export
+
+The PDF path is fully lazy: neither `@react-pdf/renderer` nor the document component is in the main bundle. Inside a React transition, `pdfExportEffect` dynamic-imports both, renders `HolidayDocument` (`src/ui/modules/export/HolidayDocument.tsx`) to a blob with `renderer.pdf(...).toBlob()`, and triggers a download named `forever-pto-{year}.pdf`.
+
+Two details worth copying elsewhere:
+
+- The object URL is managed with `Effect.acquireRelease` + `Effect.scoped`, so `URL.revokeObjectURL` runs even on failure — no leaked blob URLs.
+- All labels (`pdf.holidays`, `pdf.vacationDays`, ...) are passed in from the `calendarExport` i18n namespace; the document component itself stays translation-agnostic.
+
+Success and failure surface as `sonner` toasts.
+
+## ICS export
+
+`generateIcs` (`src/application/export/generateIcs.ts`) is a small hand-rolled generator — no calendar dependency. Each holiday and each PTO day becomes an all-day `VEVENT` (`DTSTART;VALUE=DATE` / `DTEND` next day) with a `CATEGORIES` of `HOLIDAY` or `PTO` and a deterministic `UID` (`holiday-{id}@forever-pto`, `pto-{yyyymmdd}@forever-pto`). Summaries pass through `sanitize` (`src/application/export/utils/sanitizer.ts`) to escape ICS-reserved characters, lines join with `\r\n` per RFC 5545, and the calendar carries a localized `X-WR-CALNAME` plus the year. The component wraps the string in a `text/calendar` blob and downloads it as `forever-pto-{year}.ics`.
+
+Because UIDs are deterministic, re-importing a regenerated file updates events in place in most calendar clients instead of duplicating them.
+
+## Testing
+
+`src/application/export/generateIcs.test.ts` covers the generator; the PDF path is exercised through the component tests.

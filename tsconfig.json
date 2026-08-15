@@ -1,6 +1,6 @@
 {
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
-  "exclude": [".next/**/*", "node_modules/**/*", "cloudflare-env.d.ts"],
+  "exclude": [".next/**/*", "node_modules/**/*", "cloudflare-env.d.ts", "docs/**/*"],
   "compilerOptions": {
     "target": "ESNext",
     "esModuleInterop": true,

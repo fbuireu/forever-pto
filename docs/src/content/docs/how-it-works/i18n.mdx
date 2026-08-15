@@ -1,0 +1,50 @@
+---
+title: Internationalization
+description: next-intl routing, the supported locales, message catalogs, the NEXT_LOCALE cookie and the navigation wrapper.
+sidebar:
+  order: 2
+---
+
+import { APP_LOCALES } from '../../../components/demos/HowItWorksDemo';
+
+The app is localized with `next-intl`. The supported locales are defined once in `src/infrastructure/i18n/locales.ts` and imported below directly from that file, so this list cannot drift: <span>{APP_LOCALES.map((locale) => <span key={locale}><code>{locale}</code>{' '}</span>)}</span> ({APP_LOCALES.length} locales).
+
+## Routing
+
+`src/infrastructure/i18n/routing.ts` calls `defineRouting` with:
+
+- `locales: LOCALES`, `defaultLocale: EN`.
+- `localePrefix: 'as-needed'` — English lives at `/`, every other locale gets a prefix (`/es/...`, `/ca/...`).
+- `localeCookie: { secure: true, sameSite: 'lax' }`.
+
+The `next-intl` middleware (`createMiddleware(routing)` in `src/middleware.ts`) resolves the locale per request. Unknown locales hit `notFound()` in the root layout, which renders `generateStaticParams` over all locales.
+
+## The NEXT_LOCALE cookie
+
+`next-intl` persists the resolved locale in the `NEXT_LOCALE` cookie (constant `LOCALE_COOKIE` in `src/infrastructure/i18n/config.ts`). The middleware then **re-sets** that same cookie through `setLocaleCookie()` (`src/infrastructure/i18n/cookie.ts`) to harden it: `httpOnly: true`, `secure: true`, `sameSite: 'lax'`, `path: '/'`, and no `maxAge` — a session cookie. See [cookies](/reference/cookies/).
+
+## Messages
+
+- Catalogs live in `src/ui/i18n/messages/{locale}.json`, one file per locale (aliased as `@i18n/*`).
+- `next.config.ts` wires them via `createNextIntlPlugin` pointing `requestConfig` at `src/infrastructure/i18n/config.ts`, with the experimental `messages` option (path `./src/ui/i18n/messages`, locales inferred, precompiled).
+- `src/infrastructure/i18n/config.ts` is the request config: it validates the requested locale with `hasLocale`, falls back to `routing.defaultLocale` and dynamically imports the matching JSON.
+- `environment.d.ts` augments the `next-intl` `AppConfig` interface so message keys are fully typed against the English catalog.
+
+## Navigation wrapper
+
+App code never imports `Link` or `useRouter` from `next/link` / `next/navigation` directly. `src/application/i18n/navigation.ts` exports locale-aware versions:
+
+```ts
+import { createNavigation } from 'next-intl/navigation';
+import { routing } from '@infrastructure/i18n/routing';
+
+export const { Link, usePathname, useRouter } = createNavigation(routing);
+```
+
+Everything imports these from `@application/i18n/navigation`, so hrefs stay locale-prefixed automatically.
+
+## Conventions
+
+- Components use namespaced hooks: `useTranslations('sidebar')`, `useTranslations('donate')`, `useTranslations('tutorial.steps')`. Cross-namespace access means multiple hooks, not one giant namespace.
+- Translation strings never contain ALL-CAPS text; uppercase is applied with CSS in the component.
+- Server code uses `getTranslations({ locale, namespace })` — see the [markdown API](/how-it-works/markdown-api/) and [SEO](/how-it-works/seo/) pages for examples.

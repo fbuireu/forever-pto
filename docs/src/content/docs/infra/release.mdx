@@ -1,0 +1,53 @@
+---
+title: Releases
+description: How semantic-release cuts versions from conventional commits, and why the PR title is the release note.
+sidebar:
+  order: 3
+---
+
+Releases are fully automated by [semantic-release](https://semantic-release.gitbook.io), configured in `.releaserc.json` and run by the `release` job of `.github/workflows/ci.yml`.
+
+## The flow
+
+```text
+ push to main
+   ├────────────────────────────┬─────────────────────────────┐
+   ▼                            ▼                             ▼
+ ci.yml                    deploy-production.yml         zizmor.yml
+   ├─ lint ─┐                (deploys the merge
+   ├─ typecheck ─┼─ all green ─┐   commit immediately,
+   └─ unit tests ┘             │   NOT gated on CI)
+                               ▼
+                         semantic-release
+                           ├─ analyze commits since last tag
+                           ├─ CHANGELOG.md + version bump
+                           ├─ commit "chore(release): x.y.z [skip ci]"
+                           ├─ git tag vX.Y.Z + GitHub Release
+                           └─ force-move floating major tag (vX)
+```
+
+1. **Quality gates.** The `release` job `needs` lint, typecheck and unit tests, and only runs on a push to `main` (not on PRs). Its concurrency group is `release` with `cancel-in-progress: false`, so releases queue instead of racing.
+2. **semantic-release** analyzes conventional commits since the last tag (`@semantic-release/commit-analyzer`): `fix:` → patch, `feat:` → minor, `BREAKING CHANGE` → major; `docs:`, `chore:`, `ci:` etc. produce **no release**.
+3. Plugins run in the order declared in `.releaserc.json`: release notes → `CHANGELOG.md` (`@semantic-release/changelog`) → version bump in `package.json` (`@semantic-release/npm` with `npmPublish: false` — the package is private, only the version field matters) → a git commit of `package.json`, `pnpm-lock.yaml` and `CHANGELOG.md` with the message `chore(release): <version> [skip ci]` → a GitHub Release.
+4. **Floating major tag.** A final workflow step force-moves the major tag (e.g. `v1`) to the new release tag and force-pushes it, using the `PAT` secret (a plain `GITHUB_TOKEN` push would not re-trigger anything and lacks tag-force rights on protected refs).
+
+The `[skip ci]` marker on the release commit is load-bearing: without it, the version-bump push to `main` would trigger `ci.yml` *and* `deploy-production.yml` again, in an infinite-ish loop.
+
+## Deploys are parallel, not sequenced
+
+`deploy-production.yml` triggers on the same push event as `ci.yml`. Production deploys the merge commit **immediately and unconditionally** — it does not wait for tests, and it does not wait for (or care about) the release. A red `main` still ships. The safety net is that branch protection makes CI green *before* merge; the trade-off is faster deploys at the cost of no post-merge gate. Keep this in mind when reading the [environments lifecycle](/infra/environments/).
+
+## Squash merge: the PR title is the commit
+
+`main` receives squash merges, so the **PR title becomes the conventional commit** that semantic-release analyzes. Individual commit messages inside the PR are irrelevant to releasing (though `commitlint` via Husky still enforces the convention locally — see `commitlint.config.ts`).
+
+Consequences:
+
+- A PR titled `feat: …` or `fix: …` bumps the app version and cuts a GitHub Release — even if it only touches `docs/**`, because semantic-release is single-package and versions the root `package.json`.
+- **Documentation PRs (including this site) must use `docs:` or `chore:` titles** so they produce no app release. This is a convention, not something CI enforces; a `paths`-aware release scoping is a known follow-up.
+
+## Source files
+
+- `.releaserc.json` — branches, plugin chain, release-commit message.
+- `.github/workflows/ci.yml` — the `release` job and the major-tag step.
+- `commitlint.config.ts` + `.husky/commit-msg` — local enforcement of conventional commits.

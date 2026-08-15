@@ -1,5 +1,6 @@
 # Dependencies
 /node_modules
+docs/node_modules
 
 # Testing
 /coverage
@@ -43,3 +44,9 @@ cloudflare-env.d.ts
 # AI/Agents
 .claude/
 .agents/
+
+# Docs (Astro)
+docs/dist/
+docs/.astro/
+docs/test-results/
+docs/playwright-report/

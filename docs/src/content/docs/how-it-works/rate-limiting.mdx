@@ -1,0 +1,31 @@
+---
+title: Rate limiting
+description: The Cloudflare KV counter guarding the payment endpoint — fixed window, fail-open, typed 429s.
+sidebar:
+  order: 11
+---
+
+Exactly one endpoint is rate limited: `POST /api/payment`, the route that creates Stripe PaymentIntents. It is the only unauthenticated endpoint that triggers billable third-party work, which makes it the natural abuse target.
+
+## How it works
+
+`checkRateLimit(ip)` in `src/infrastructure/services/payments/rateLimit.ts` implements a **fixed-window counter** on Cloudflare KV:
+
+- The key is `rl:payment:{ip}`; the IP comes from the `cf-connecting-ip` header (falling back to `x-forwarded-for`, then `'unknown'`) in `src/app/api/payment/route.ts`.
+- Each request reads the current count; at or above `LIMIT` (10) it is blocked, otherwise the counter is incremented with `expirationTtl: WINDOW_SECONDS` (60) — KV's TTL does the window reset, no cleanup job needed.
+- A blocked request fails the Effect with a typed `RateLimitError`, which the route maps to **HTTP 429** with `ApiError.RATE_LIMIT_EXCEEDED` before any Stripe call happens.
+
+The KV namespace is the `RATE_LIMIT_KV` binding declared in `wrangler.toml` (per environment — see [environments](/infra/environments/)).
+
+## Fail-open by design
+
+The KV interaction is wrapped in `Effect.catchAll(() => Effect.succeed(false))`: if KV is unreachable or throws, the request is treated as **not** blocked. A KV outage degrades to "no rate limiting" rather than "nobody can donate". The trade-off is deliberate — the guarded action costs the attacker a Stripe checkout flow anyway, so availability wins over strictness.
+
+Two consequences worth knowing:
+
+- The counter is not atomic (read-then-write), so concurrent bursts can slightly exceed the limit. For this threat model that is acceptable.
+- Blocked requests do not write to KV, so they never extend the window: once the key's TTL lapses (60 seconds after the last counted request), the counter resets and the client gets a fresh budget.
+
+## Where it sits in the flow
+
+The limiter is the first step of the payment route, before validation, promo-code checks or PaymentIntent creation — see [premium and donations](/how-it-works/premium/) for the rest of the pipeline.

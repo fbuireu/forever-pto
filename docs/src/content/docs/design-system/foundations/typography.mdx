@@ -1,0 +1,49 @@
+---
+title: Typography
+description: The four type roles, how fonts load in the app versus these docs, and the variable-font weight caps.
+sidebar:
+  order: 3
+---
+
+import { TypeSpecimen } from '../../../../components/TypeSpecimen';
+
+Four families, four roles. The specimens below render with the same font tokens the app uses:
+
+<TypeSpecimen />
+
+## Roles
+
+| Token | Family | Role |
+| --- | --- | --- |
+| `--font-display` | Bricolage Grotesque | Headlines and display blocks, usually at heavy weights |
+| `--font-sans` | Space Grotesk | Body copy and UI — the default `font-sans` |
+| `--font-serif` | Instrument Serif | Italic flourishes only (single 400 weight, normal + italic) |
+| `--font-mono` | JetBrains Mono | Code and tabular figures |
+
+The role tokens are mapped in `src/ui/styles/theme/index.css` under `@theme inline` (`--font-sans: var(--font-space-grotesk)`, `--font-display: var(--font-bricolage)`, …), which makes Tailwind's `font-sans` / `font-display` / `font-serif` / `font-mono` utilities point at the right family.
+
+## Two loading pipelines, same variables
+
+The role mapping targets raw per-family variables (`--font-bricolage`, `--font-space-grotesk`, `--font-instrument-serif`, `--font-jetbrains-mono`), and *who defines those variables* differs by host:
+
+- **The app** loads each family through `next/font/google` in `src/app/fonts.ts`. Each export sets its `variable` name, and the root layouts attach the generated classes, so Next.js self-hosts the files and injects the `@font-face` rules at build time.
+- **These docs** cannot use `next/font` (no Next.js), so `docs/src/styles/global.css` imports the same families from `@fontsource-variable/*` / `@fontsource/*` packages and points the identical raw variables at the self-hosted faces.
+
+Because both pipelines feed the same variables, the specimens above and every component demo render with production-accurate type.
+
+## Weight-axis caps
+
+The two grotesques are variable fonts with **capped weight axes**:
+
+| Family | `wght` axis |
+| --- | --- |
+| Bricolage Grotesque | 200–800 |
+| Space Grotesk | 300–700 |
+
+Requesting a weight above the cap — e.g. `font-black` (900), which Button and Badge both use — clamps to the axis maximum, and the browser may add synthetic emboldening on top (subject to `font-synthesis`). In practice that means:
+
+- "Black" display type in Bricolage really renders at 800. `TypeSpecimen` deliberately samples it at 800, the honest maximum.
+- Body-font `font-black` in Space Grotesk renders at 700 (plus possible synthesis), so don't expect a visible step between `font-bold` and `font-black` there.
+- Instrument Serif has no axis at all — one 400 weight in normal and italic (see the explicit `weight`/`style` config in `src/app/fonts.ts`).
+
+When designing a new heavy-type treatment, verify it at the real axis cap rather than trusting the utility name.

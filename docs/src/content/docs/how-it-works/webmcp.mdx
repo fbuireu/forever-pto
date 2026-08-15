@@ -1,0 +1,31 @@
+---
+title: WebMCP and .well-known
+description: Browser-side Model Context tools via navigator.modelContext, plus the .well-known endpoints — API catalog, MCP server card and agent-skills index.
+sidebar:
+  order: 9
+---
+
+Beyond the [Markdown API](/how-it-works/markdown-api/), the app exposes itself to AI agents through two mechanisms: in-page tools via the emerging WebMCP browser API, and static discovery documents under `/.well-known/`.
+
+## WebMCP: `navigator.modelContext`
+
+`src/ui/modules/shared/WebMCP.tsx` is a render-null client component mounted in the root locale layout (`src/app/[locale]/layout.tsx`). On mount it feature-detects `navigator.modelContext?.provideContext` — a no-op in browsers without WebMCP — and registers two tools:
+
+- `get_site_info` — returns a structured description of Forever PTO: feature list, supported locales (interpolated from the real `LOCALES` constant in `src/infrastructure/i18n/locales.ts`), the strategy names and the origin URL.
+- `check_status` — fetches `/api/health` and returns the JSON, so an agent driving the page can verify the service is up.
+
+Both tools take no input (`inputSchema: { type: 'object', properties: {} }`) and execute entirely client-side. Agents embedded in WebMCP-capable browsers can call them without scraping the DOM.
+
+## `.well-known` endpoints
+
+`src/app/.well-known/[...slug]/route.ts` is a catch-all GET handler with an explicit route table — unknown slugs get a 404. Each handler lives in `src/infrastructure/well-known/` and receives the base URL from the Cloudflare context (`NEXT_PUBLIC_SITE_URL`). All three respond with `Cache-Control: public, max-age=86400`.
+
+| Path | Builder | What it serves |
+| --- | --- | --- |
+| `/.well-known/api-catalog` | `apiCatalog.ts` | An RFC 9727 API catalog (`application/linkset+json`) pointing `service-doc` and `status` relations at `/api/health`. |
+| `/.well-known/mcp/server-card.json` | `mcpServerCard.ts` | An MCP server card (SEP-1649): server name, description, the app version read from the root `package.json`, and capability flags (currently all `false` — the site is not a remote MCP server; tools are browser-side only). |
+| `/.well-known/agent-skills/index.json` | `agentSkillsIndex.ts` | An agentskills.io-schema index advertising the agent-facing features as named skills: `markdown-negotiation`, `api-catalog`, `mcp-server-card` and `webmcp`, each with a `SKILL.md` URL. |
+
+## Why this shape
+
+The three documents make the site self-describing: an agent that lands anywhere can walk `/.well-known/` to discover that Markdown renditions exist, that health is machine-checkable, and that in-page tools are available — without any of it being hard-coded into the agent. Version numbers in the payloads come from `package.json` at build time, so they track releases automatically.

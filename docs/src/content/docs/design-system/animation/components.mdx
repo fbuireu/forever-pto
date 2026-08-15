@@ -1,0 +1,54 @@
+---
+title: Animated components
+description: Counter, FeatureList and RadialNav — the composite motion components built from the primitives, effects and text animations.
+sidebar:
+  order: 4
+---
+
+import { CounterDemo, FeatureListDemo, RadialNavDemo } from '../../../../components/demos/AnimationComponentsDemo';
+
+Source: `src/ui/modules/core/animate/components/`. Composite, app-agnostic motion components (the fourth file in the directory, `Tabs.tsx`, is documented with the other Base UI wrappers). All three below are framework-clean — Motion, `cn()`, `lucide-react` and the core `Badge` are their only dependencies — so this page renders the real components. As always with `m.*` consumers, they need a `LazyMotionProvider` ancestor.
+
+## Counter
+
+`Counter` (`Counter.tsx`) is a stepper: minus and plus `m.button`s flanking a [SlidingNumber](/design-system/animation/text/) inside a brutal-framed pill, with `layout` animation so the pill resizes smoothly as digit count changes. It is controlled: pass `number` and `setNumber`. Optional props: `label` (small caption under the number), `slidingNumberProps`, `buttonProps` / `decrementButtonProps` / `incrementButtonProps` (e.g. to `disable` a bound), and `transition`.
+
+<CounterDemo client:visible />
+
+## FeatureList
+
+`FeatureList` (`FeatureList.tsx`) is the roadmap card deck: features render as stacked cards, collapsed into a fanned pile (`marginTop: -44`, progressively narrower `scaleX`) that expands to a full list on hover or tap, while the footer cross-fades between `categoryLabel` and `detailedViewLabel`. Props: `features: { id, title, description, quarter? }[]` (the optional `quarter` renders a secondary `Badge`), `categoryLabel`, `detailedViewLabel`. The app feeds it translated roadmap entries in `src/ui/modules/pages/planner/Roadmap.tsx`.
+
+<FeatureListDemo client:visible />
+
+## RadialNav
+
+`RadialNav` (`RadialNav.tsx`) is a circular menu: items are placed by polar coordinates on a ring (`size`, default 180 px diameter), and a central `MousePointer2` cursor rotates to the active item along the shortest arc (spring `stiffness: 220, damping: 26`). The active button expands from a 40 px circle to reveal its uppercase label.
+
+<RadialNavDemo client:visible />
+
+Props: `items: { id, icon, label, angle, badgeClass? }[]` — `icon` accepts a Lucide icon or any SVG motion component, including the [animated icons](/design-system/animation/icons/) (the button auto-passes `animateOnHover` when the icon supports it); `badgeClass` recolors the active state (default `bg-accent`). Plus `menuButtonConfig { iconSize, buttonSize, buttonPadding }`, `defaultActiveId` and `onActiveChange`. Note that ids are used as 1-based positional indexes into `items`, so keep them sequential from 1.
+
+## Usage
+
+```tsx
+import { Counter } from '@ui/modules/core/animate/components/Counter';
+import { FeatureList } from '@ui/modules/core/animate/components/FeatureList';
+import { RadialNav } from '@ui/modules/core/animate/components/RadialNav';
+
+<Counter number={days} setNumber={setDays} label='PTO days' />
+
+<FeatureList features={roadmap} categoryLabel='Roadmap' detailedViewLabel='Detailed view' />
+
+<RadialNav
+  items={[{ id: 1, icon: Calendar, label: 'Calendar', angle: 0 }]}
+  defaultActiveId={1}
+  onActiveChange={setSection}
+/>
+```
+
+## Conventions
+
+- These components stay presentation-only: labels arrive as props, never from `useTranslations`, per the core rules in `src/ui/modules/core/CONTEXT.md`.
+- `RadialNav` ignores `className` on the root (props are not spread) — wrap it in a positioned container and leave room around the ring for the expanding buttons.
+- Related: [effects](/design-system/animation/effects/), [text animations](/design-system/animation/text/), [animated icons](/design-system/animation/icons/).
