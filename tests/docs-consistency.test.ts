@@ -377,6 +377,16 @@ describe('the guides describe the project as it is configured', () => {
     expect(citedScripts(rootGuide).filter((script) => !(script in rootScripts))).toEqual([]);
   });
 
+  // A README is where someone copies a command from, so a script it names has to exist somewhere
+  // a reader could run it: the root, or the package the README belongs to.
+  it.each([
+    ['README.md', rootScripts],
+    [`${WEB}/README.md`, { ...rootScripts, ...webScripts }],
+    [`${DOCS}/README.md`, { ...rootScripts, ...readJson(`${DOCS}/package.json`).scripts }],
+  ])('%s cites only scripts a reader could run', (file, available) => {
+    expect(citedScripts(readIfPresent(file)).filter((script) => !(script in available))).toEqual([]);
+  });
+
   it('cites only web scripts that resolve in the web or root manifest', () => {
     const unknown = citedScripts(webGuide).filter((script) => !(script in webScripts) && !(script in rootScripts));
     expect(unknown).toEqual([]);
