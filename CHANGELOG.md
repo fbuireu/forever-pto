@@ -1,3 +1,20 @@
+## [1.8.2](https://github.com/fbuireu/forever-pto/compare/v1.8.1...v1.8.2) (2026-08-15)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @astrojs/starlight to v0.41.7 ([#360](https://github.com/fbuireu/forever-pto/issues/360)) ([4f08495](https://github.com/fbuireu/forever-pto/commit/4f084950da064f1469e3d1aa8c35f6a1bbcfd9b4))
+* **deps:** update react monorepo ([#361](https://github.com/fbuireu/forever-pto/issues/361)) ([19ea5ea](https://github.com/fbuireu/forever-pto/commit/19ea5ea1452cfd8c3a752fe385ffa7b140400b7d))
+
+## [1.8.1](https://github.com/fbuireu/forever-pto/compare/v1.8.0...v1.8.1) (2026-08-15)
+
+
+### Bug Fixes
+
+* **deps:** pin next to 16.2 and typescript to 6 until the adapter supports 16.3 ([#349](https://github.com/fbuireu/forever-pto/issues/349)) ([28ba47c](https://github.com/fbuireu/forever-pto/commit/28ba47c4e2f8db8659811b583fd342f5c1c3d5cd))
+* **deps:** update astro monorepo ([#356](https://github.com/fbuireu/forever-pto/issues/356)) ([6f4e4e8](https://github.com/fbuireu/forever-pto/commit/6f4e4e874944010760ca28fc578e25052295dcf2))
+* **markdown:** translate without next-intl/server so the Worker stops throwing ([#353](https://github.com/fbuireu/forever-pto/issues/353)) ([cd7049c](https://github.com/fbuireu/forever-pto/commit/cd7049c29105ced4d755ac3d670e6c377f7964db))
+
 # [1.8.0](https://github.com/fbuireu/forever-pto/compare/v1.7.2...v1.8.0) (2026-08-13)
 
 

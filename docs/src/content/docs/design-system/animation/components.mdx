@@ -7,7 +7,7 @@ sidebar:
 
 import { CounterDemo, FeatureListDemo, RadialNavDemo } from '../../../../components/demos/AnimationComponentsDemo';
 
-Source: `src/ui/modules/core/animate/components/`. Composite, app-agnostic motion components (the fourth file in the directory, `Tabs.tsx`, is documented with the other Base UI wrappers). All three below are framework-clean — Motion, `cn()`, `lucide-react` and the core `Badge` are their only dependencies — so this page renders the real components. As always with `m.*` consumers, they need a `LazyMotionProvider` ancestor.
+Source: `src/ui/modules/core/animate/components/`. Composite motion components (the fourth file in the directory, `Tabs.tsx`, is documented with the other Base UI wrappers). `FeatureList` and `RadialNav` are framework-clean — Motion, `cn()`, `lucide-react` and the core `Badge` are their only dependencies. `Counter` wraps [SlidingNumber](/design-system/animation/text/), which reads the locale through `next-intl`, so its demo adds a `DemoIntlProvider`. All three render the real components; as always with `m.*` consumers, they need a `LazyMotionProvider` ancestor.
 
 ## Counter
 
