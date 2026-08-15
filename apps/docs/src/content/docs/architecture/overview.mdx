@@ -5,17 +5,17 @@ sidebar:
   order: 1
 ---
 
-Forever PTO is a Next.js App Router application organized into five layers under `src/`, plus `src/middleware.ts` at the root of the tree. Each layer has a single responsibility and a deliberate dependency direction.
+Forever PTO is a Next.js App Router application organized into five layers under `apps/web/src/`, plus `apps/web/src/middleware.ts` at the root of the tree. Each layer has a single responsibility and a deliberate dependency direction.
 
 ## The layers
 
 | Layer | Path | Responsibility |
 | --- | --- | --- |
-| App | `src/app/` | Next.js App Router: routes, layouts, API handlers, metadata, sitemap/robots. Composition only — see [routing](/architecture/routing/). |
-| Application | `src/application/` | Data contracts (DTOs), Zustand stores, Effect use-cases, `next-intl` navigation glue (`src/application/i18n/navigation.ts`), email templates and export generators. |
-| Domain | `src/domain/` | Pure business logic: the calendar suggestion engine (`src/domain/calendar/`) and payment domain events/handlers (`src/domain/payment/`). |
-| Infrastructure | `src/infrastructure/` | Everything that talks to the outside world: SDK clients, services, the middleware proxy helpers, the calculation Web Worker (`src/infrastructure/workers/`), i18n runtime config, the [image loader](/architecture/images/) and `.well-known` payloads. |
-| UI | `src/ui/` | React modules (`src/ui/modules/`), hooks, styles (`src/ui/styles/`), assets and i18n message catalogs (`src/ui/i18n/messages/`). |
+| App | `apps/web/src/app/` | Next.js App Router: routes, layouts, API handlers, metadata, sitemap/robots. Composition only — see [routing](/architecture/routing/). |
+| Application | `apps/web/src/application/` | Data contracts (DTOs), Zustand stores, Effect use-cases, `next-intl` navigation glue (`apps/web/src/application/i18n/navigation.ts`), email templates and export generators. |
+| Domain | `apps/web/src/domain/` | Pure business logic: the calendar suggestion engine (`apps/web/src/domain/calendar/`) and payment domain events/handlers (`apps/web/src/domain/payment/`). |
+| Infrastructure | `apps/web/src/infrastructure/` | Everything that talks to the outside world: SDK clients, services, the middleware proxy helpers, the calculation Web Worker (`apps/web/src/infrastructure/workers/`), i18n runtime config, the [image loader](/architecture/images/) and `.well-known` payloads. |
+| UI | `apps/web/src/ui/` | React modules (`apps/web/src/ui/modules/`), hooks, styles (`apps/web/src/ui/styles/`), assets and i18n message catalogs (`apps/web/src/ui/i18n/messages/`). |
 
 ## Dependency direction
 
@@ -27,14 +27,14 @@ app  →  ui  →  application  →  domain
         infrastructure  (reached through use-cases, services and adapters)
 ```
 
-- `src/domain/calendar/` is fully pure — no framework, browser or SDK imports. Its one documented exception is consuming `HolidayDTO` from `@application/dto/holiday/types` (see `src/domain/calendar/CONTEXT.md`).
-- `src/domain/payment/handlers/` is the pragmatic outlier: the webhook handlers consume infrastructure services (Turso repository, Stripe provider) through Effect context rather than instantiating them — see [Effect layers](/architecture/effect-layers/).
-- Stores in `src/application/stores/` never call SDK clients directly; they delegate to `src/infrastructure/services/*`.
-- Server-side composition of external dependencies happens once, in `src/infrastructure/layers.ts` (`ApplicationLayer`).
+- `apps/web/src/domain/calendar/` is fully pure — no framework, browser or SDK imports. Its one documented exception is consuming `HolidayDTO` from `@application/dto/holiday/types` (see `apps/web/src/domain/calendar/CONTEXT.md`).
+- `apps/web/src/domain/payment/handlers/` is the pragmatic outlier: the webhook handlers consume infrastructure services (Turso repository, Stripe provider) through Effect context rather than instantiating them — see [Effect layers](/architecture/effect-layers/).
+- Stores in `apps/web/src/application/stores/` never call SDK clients directly; they delegate to `apps/web/src/infrastructure/services/*`.
+- Server-side composition of external dependencies happens once, in `apps/web/src/infrastructure/layers.ts` (`ApplicationLayer`).
 
 ## CONTEXT.md per folder
 
-Per the repo's `CLAUDE.md`, most significant folders carry a `CONTEXT.md` describing their purpose, conventions and boundaries — read it before touching a folder. Examples: `src/domain/CONTEXT.md` (layer rules and allowed imports), `src/infrastructure/clients/CONTEXT.md` (the Effect client pattern), `src/application/stores/CONTEXT.md` (store conventions). These files are the source of truth for layer boundaries; this page summarizes them.
+Per the repo's `CLAUDE.md`, most significant folders carry a `CONTEXT.md` describing their purpose, conventions and boundaries — read it before touching a folder. Examples: `apps/web/src/domain/CONTEXT.md` (layer rules and allowed imports), `apps/web/src/infrastructure/clients/CONTEXT.md` (the Effect client pattern), `apps/web/src/application/stores/CONTEXT.md` (store conventions). These files are the source of truth for layer boundaries; this page summarizes them.
 
 ## Path aliases
 
@@ -42,7 +42,7 @@ Defined in the root `tsconfig.json` (`compilerOptions.paths`); Vitest resolves t
 
 | Alias | Target |
 | --- | --- |
-| `src/*` | `./src/*` |
+| `apps/web/src/*` | `./src/*` |
 | `@app/*` | `./src/app/*` |
 | `@infrastructure/*` | `./src/infrastructure/*` |
 | `@domain/*` | `./src/domain/*` |
@@ -54,11 +54,11 @@ Defined in the root `tsconfig.json` (`compilerOptions.paths`); Vitest resolves t
 | `@mocks/*` | `./src/mocks/*` |
 | `@types/*` | `./src/types/*` |
 
-Note that `@assets`, `@styles` and `@i18n` all point inside `src/ui/` — they are shorthands, not separate layers. The `docs/` package is excluded from the app's `tsconfig.json` so the two type-check independently.
+Note that `@assets`, `@styles` and `@i18n` all point inside `apps/web/src/ui/` — they are shorthands, not separate layers. Each package has its own `tsconfig.json`, so the two type-check independently; the app's aliases carry no `baseUrl` and resolve against that file.
 
 ## Related pages
 
-- [Routing](/architecture/routing/) — how `src/app/` is laid out.
+- [Routing](/architecture/routing/) — how `apps/web/src/app/` is laid out.
 - [Middleware](/architecture/middleware/) — the per-request chain.
 - [Effect layers](/architecture/effect-layers/) — server-side dependency injection.
 - [Caching](/architecture/caching/) — Cache Components and the R2 incremental cache.

@@ -9,16 +9,16 @@ Beyond the [Markdown API](/how-it-works/markdown-api/), the app exposes itself t
 
 ## WebMCP: `navigator.modelContext`
 
-`src/ui/modules/shared/WebMCP.tsx` is a render-null client component mounted in the root locale layout (`src/app/[locale]/layout.tsx`). On mount it feature-detects `navigator.modelContext?.provideContext` — a no-op in browsers without WebMCP — and registers two tools:
+`apps/web/src/ui/modules/shared/WebMCP.tsx` is a render-null client component mounted in the root locale layout (`apps/web/src/app/[locale]/layout.tsx`). On mount it feature-detects `navigator.modelContext?.provideContext` — a no-op in browsers without WebMCP — and registers two tools:
 
-- `get_site_info` — returns a structured description of Forever PTO: feature list, supported locales (interpolated from the real `LOCALES` constant in `src/infrastructure/i18n/locales.ts`), the strategy names and the origin URL.
+- `get_site_info` — returns a structured description of Forever PTO: feature list, supported locales (interpolated from the real `LOCALES` constant in `apps/web/src/infrastructure/i18n/locales.ts`), the strategy names and the origin URL.
 - `check_status` — fetches `/api/health` and returns the JSON, so an agent driving the page can verify the service is up.
 
 Both tools take no input (`inputSchema: { type: 'object', properties: {} }`) and execute entirely client-side. Agents embedded in WebMCP-capable browsers can call them without scraping the DOM.
 
 ## `.well-known` endpoints
 
-`src/app/.well-known/[...slug]/route.ts` is a catch-all GET handler with an explicit route table — unknown slugs get a 404. Each handler lives in `src/infrastructure/well-known/` and receives the base URL from the Cloudflare context (`NEXT_PUBLIC_SITE_URL`). All three respond with `Cache-Control: public, max-age=86400`.
+`apps/web/src/app/.well-known/[...slug]/route.ts` is a catch-all GET handler with an explicit route table — unknown slugs get a 404. Each handler lives in `apps/web/src/infrastructure/well-known/` and receives the base URL from the Cloudflare context (`NEXT_PUBLIC_SITE_URL`). All three respond with `Cache-Control: public, max-age=86400`.
 
 | Path | Builder | What it serves |
 | --- | --- | --- |

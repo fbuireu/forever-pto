@@ -8,7 +8,7 @@ sidebar:
 import { INPUT_GROUP_ADDON_ROWS, InputGroupAlignDemo, InputGroupComposedDemo } from '../../../../components/demos/InputGroupDemo';
 import { VariantsTable } from '../../../../components/VariantsTable';
 
-Source: `src/ui/modules/core/primitives/InputGroup.tsx`. The group owns the frame: one `role='group'` container carries the border, background and shadow states, while `InputGroupInput` renders a borderless, transparent [Input](/design-system/components/input/) inside it. Focus and `aria-invalid` styling bubble from the control to the container through `has-[…]` selectors, so the whole group highlights as a unit.
+Source: `apps/web/src/ui/modules/core/primitives/InputGroup.tsx`. The group owns the frame: one `role='group'` container carries the border, background and shadow states, while `InputGroupInput` renders a borderless, transparent [Input](/design-system/components/input/) inside it. Focus and `aria-invalid` styling bubble from the control to the container through `has-[…]` selectors, so the whole group highlights as a unit.
 
 ## Addon alignment
 
@@ -43,6 +43,6 @@ import { Search } from 'lucide-react';
 
 ## Conventions
 
-- Exported parts: `InputGroup`, `InputGroupAddon`, `InputGroupInput`, `InputGroupText`. The source also defines private `_InputGroupButton` (with its own `inputGroupButtonVariants` size axis) and `_InputGroupTextarea` — neither the components nor the CVA objects (`inputGroupAddonVariants`, `inputGroupButtonVariants`) are exported today; check `src/ui/modules/core/primitives/InputGroup.tsx` before relying on them.
+- Exported parts: `InputGroup`, `InputGroupAddon`, `InputGroupInput`, `InputGroupText`. The source also defines private `_InputGroupButton` (with its own `inputGroupButtonVariants` size axis) and `_InputGroupTextarea` — neither the components nor the CVA objects (`inputGroupAddonVariants`, `inputGroupButtonVariants`) are exported today; check `apps/web/src/ui/modules/core/primitives/InputGroup.tsx` before relying on them.
 - `InputGroupInput` sets `data-slot='input-group-control'`, which the container's focus and error selectors target.
 - Set `aria-invalid` on the inner control; the container mirrors it (destructive border, destructive focus shadow).

@@ -7,7 +7,7 @@ sidebar:
 
 import { DrawerDemo } from '../../../../components/demos/DrawerDemo';
 
-Source: `src/ui/modules/core/animate/base/Drawer.tsx`. A thin skin over [vaul](https://vaul.emilkowal.ski)'s drawer: vaul handles the drag-to-dismiss gesture and slide animation itself (no Motion `m.*` here, so no `LazyMotionProvider` needed — the exception in `animate/base/`).
+Source: `apps/web/src/ui/modules/core/animate/base/Drawer.tsx`. A thin skin over [vaul](https://vaul.emilkowal.ski)'s drawer: vaul handles the drag-to-dismiss gesture and slide animation itself (no Motion `m.*` here, so no `LazyMotionProvider` needed — the exception in `animate/base/`).
 
 Exports: `Drawer`, `DrawerContent`, `DrawerTitle`. There is intentionally no `DrawerTrigger` export — open it with controlled state.
 
@@ -35,7 +35,7 @@ const [open, setOpen] = useState(false);
 </Drawer>
 ```
 
-For desktop-centric confirmations prefer [Dialog](/design-system/components/dialog/). The planner's management bar (`src/ui/modules/pages/planner/ManagementBar.tsx`) is the reference consumer: it renders inline on desktop and switches to a full-height Drawer (`overlay={false}`, `max-h-none`) on mobile via the `useIsMobile` hook.
+For desktop-centric confirmations prefer [Dialog](/design-system/components/dialog/). The planner's management bar (`apps/web/src/ui/modules/pages/planner/ManagementBar.tsx`) is the reference consumer: it renders inline on desktop and switches to a full-height Drawer (`overlay={false}`, `max-h-none`) on mobile via the `useIsMobile` hook.
 
 ## Conventions
 

@@ -18,15 +18,21 @@ PRs are **squash-merged**, so the **PR title becomes the commit that lands on `m
 | `feat!: …` or a `BREAKING CHANGE:` footer | Major version bump |
 | `docs: …`, `chore: …`, `ci: …`, `refactor: …`, `test: …` | **No release** |
 
-Changes to this wiki (`docs/**`) MUST use the `docs:` type — they should never cut an app release. The release commit itself is created by semantic-release as `chore(release): x.y.z [skip ci]`.
+Each package versions itself, and a commit is attributed to whichever package its paths fall under, so the type no longer has to compensate for the layout. Three rules follow:
+
+- **One package per pull request.** The repo squash-merges, so a PR touching both `apps/web` and `apps/docs` lands in both changelogs.
+- **The title describes the package it touches.** A `fix:` on a wiki-only PR releases the wiki, not the app.
+- **A change confined to the repo root releases nothing** — `.github/`, `biome.json`, `adr/`, `tests/`, the root manifest.
+
+The release commits are created by semantic-release as `chore(release): web x.y.z [skip ci]`; the docs package writes no commit at all.
 
 ## Code conventions
 
 - **No barrel files.** Import directly from the source module; never create pass-through `index.ts` re-export files.
 - **Named exports.** Default exports are used only where Next.js requires them (route files, config files). Everything else exports by name — including the CVA variants object next to its component.
-- **CVA pattern.** Styled primitives define a `cva()` object and export it alongside the component (e.g. `buttonVariants` in `src/ui/modules/core/primitives/Button.tsx`) so variants stay reusable and type-derivable. See the [Button page](/design-system/components/button/) for how the docs exploit this.
+- **CVA pattern.** Styled primitives define a `cva()` object and export it alongside the component (e.g. `buttonVariants` in `apps/web/src/ui/modules/core/primitives/Button.tsx`) so variants stay reusable and type-derivable. See the [Button page](/design-system/components/button/) for how the docs exploit this.
 - **`CONTEXT.md` per folder.** Significant directories carry a `CONTEXT.md` describing purpose, domain concepts and boundaries. Read it before modifying a folder; update it when the boundaries change. This convention is declared in the root `CLAUDE.md`.
-- **No uppercase in i18n strings.** Translation strings in `src/ui/i18n/messages/` are written in normal casing; if a design calls for uppercase, apply it with a CSS `uppercase` class in the component. Casing is presentation, not content.
+- **No uppercase in i18n strings.** Translation strings in `apps/web/src/ui/i18n/messages/` are written in normal casing; if a design calls for uppercase, apply it with a CSS `uppercase` class in the component. Casing is presentation, not content.
 
 ## Formatting
 

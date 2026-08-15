@@ -9,28 +9,27 @@ All workflows live in `.github/workflows/`. Two repo-wide conventions, enforced 
 
 | Workflow | Trigger | Purpose |
 | --- | --- | --- |
-| `ci.yml` | push to `main`, PRs to `main` | Lint, typecheck, unit tests; release on `main` |
-| `_deploy.yml` | `workflow_call` | Reusable OpenNext build + deploy + secret push |
-| `deploy-development.yml` | PR opened/reopened/synchronize | Per-PR preview Worker + comment + E2E |
-| `deploy-production.yml` | push to `main` | Production deploy |
+| `ci.yml` | push to `main`, PRs to `main` | The whole app graph: change detection, quality gates, both deploys, the web release |
+| `_deploy-web.yml` | `workflow_call` | Reusable OpenNext build + deploy + secret push |
 | `cleanup-development.yml` | PR closed | Delete the per-PR preview Worker |
-| `docs.yml` | push / PR touching `docs/**` | This site's build, checks and deploy |
+| `docs.yml` | push / PR touching `apps/docs/**` | This site's build, checks and deploy |
 | `zizmor.yml` | push to `main`, all PRs | Workflow security linting |
 | `renovate-auto-approve.yml` | Renovate PRs (by label) | Auto-approve safe dependency PRs |
 | `dependabot-auto-merge.yml` | Dependabot PRs | Dormant — Renovate is the active bot |
 
 ## `ci.yml` — CI
 
-Runs on pushes to `main` and PRs targeting `main`. Concurrency is per-ref with `cancel-in-progress: true`, so a force-push cancels the stale run.
+Runs on pushes to `main` and PRs targeting `main`. `cancel-in-progress` is conditional on `pull_request`: cancelling a superseded PR run is free, cancelling a `main` run would kill a deploy or a release halfway.
 
-- **Lint** — `pnpm lint:all` (Biome).
-- **Typecheck** — `pnpm lint:ts:typecheck` (`tsc --noEmit` over the app project).
-- **Unit tests** — `pnpm test:coverage` (Vitest), then coverage upload to Codecov (`fail_ci_if_error: false`, so Codecov outages never block CI).
-- **Semantic Release** — `needs` all three, and only on push to `main`. Covered in depth on the [release](/infra/release/) page.
+- **changes** — derives from `git diff` whether `apps/web` (or anything the app build depends on) was touched, and exposes it as an output. It uses `git diff` rather than a filter action because every third-party action here is SHA-pinned and an unpinnable one trips zizmor. It fails open.
+- **Lint** — `pnpm lint:all` (Biome), at the repo root, over both packages.
+- **Typecheck** — `pnpm lint:ts:typecheck` at the repo root, which chains the root program (`tests/`, `commitlint.config.ts`) and then `apps/web`.
+- **Unit tests** — `pnpm test:coverage` with `working-directory: apps/web`, then `pnpm test:docs` at the root, then coverage upload to Codecov (`fail_ci_if_error: false`, so Codecov outages never block CI).
+- **deploy-production → release-web → docs-refresh** on `main`, or **deploy-development → comment / e2e** on a PR. The first three are gated on the `changes` output; the quality jobs are not.
 
-The three quality jobs are what branch protection gates PRs on. Note they gate *merging*, not *deploying*: `deploy-production.yml` (below) runs in parallel with CI on the same push.
+The quality jobs are what branch protection gates PRs on. Unlike the arrangement this replaced, they also gate *deploying*: `deploy-production` `needs` all three, and `release-web` `needs` the deploy, so a tag means the version is live. Package scoping uses step-level `working-directory`; a job-level default would not reach a `uses:` step, which is why every `nick-fields/retry` command begins with an explicit `cd`.
 
-## `_deploy.yml` — Deploy (reusable)
+## `_deploy-web.yml` — Deploy web (reusable)
 
 A `workflow_call` workflow shared by both deploy entry points. Inputs: `environment` (GitHub environment name), `wrangler_env` (`--env` for wrangler), optional `url` (shown on the PR/deployments UI) and optional `worker_name` (the per-PR override). Steps:
 
@@ -38,13 +37,11 @@ A `workflow_call` workflow shared by both deploy entry points. Inputs: `environm
 2. `pnpm exec wrangler deploy --env <wrangler_env>`, adding `--name <worker_name>` when set — the name override is what creates a fresh per-PR Worker.
 3. Push the five runtime secrets with `wrangler secret bulk` (targeting `--name` for previews, `--env` otherwise). A small Node guard fails the job if any secret is missing rather than deploying a half-configured Worker. See [secrets](/infra/secrets/).
 
-## `deploy-development.yml` — Deploy - Development
+### The deploy jobs
 
-Per-PR preview creation; the full lifecycle is on the [environments](/infra/environments/) page. Three jobs: `deploy` (calls `_deploy.yml` with the `pr-<n>-forever-pto-development` name), `comment` (upserts a sticky preview-URL comment keyed on a hidden HTML marker) and `e2e` (Playwright chromium against the live preview through a Cloudflare Access service token, report uploaded as an artifact). Concurrency is per-PR with `cancel-in-progress: true`, so rapid pushes only deploy the latest commit.
+`deploy-development` calls `_deploy-web.yml` with the `pr-<n>-forever-pto-development` name override, then `comment` upserts a sticky preview-URL comment keyed on a hidden HTML marker and `e2e` runs Playwright chromium against the live preview through a Cloudflare Access service token. The full lifecycle is on the [environments](/infra/environments/) page.
 
-## `deploy-production.yml` — Deploy - Production
-
-Push to `main` → `_deploy.yml` with `environment: production`, `wrangler_env: production` and `url: https://forever-pto.com`. No `worker_name` override, so it updates the `forever-pto` Worker in place. Concurrency group `deploy-production` with `cancel-in-progress: false`: deploys queue rather than cancel. It is **not** gated on CI passing — see [release](/infra/release/) for the implications.
+`deploy-production` calls the same reusable workflow with `environment: web-production`, `wrangler_env: production` and `url: https://forever-pto.com`, and no `worker_name` override, so it updates the `forever-pto` Worker in place.
 
 ## `cleanup-development.yml` — Cleanup - Development
 
@@ -52,7 +49,7 @@ On `pull_request: closed`, runs `cloudflare/wrangler-action` with `delete pr-<n>
 
 ## `docs.yml` — Docs
 
-CI/CD for this documentation site, path-filtered to `docs/**` plus the app UI surfaces the demos import (`src/ui/modules/core/**`, `src/ui/styles/**`, `src/ui/utils/**`…). Note the asymmetry: the app workflows have **no** path filters, so docs changes still run the full app CI. Build & test, versioned PR previews and production deploy of the `forever-pto-docs` Worker — the full walkthrough is on [docs CI](/infra/docs-ci/).
+CI/CD for this documentation site, path-filtered to `apps/docs/**` plus the app UI surfaces the demos import (`apps/web/src/ui/modules/core/**`, `apps/web/src/ui/styles/**`, `apps/web/src/ui/utils/**`…). It also carries `release-docs`, which runs after the docs deploy so a `docs-v*` tag only exists once the site is live. Build & test, versioned PR previews and production deploy of the `forever-pto-docs` Worker — the full walkthrough is on [docs CI](/infra/docs-ci/).
 
 ## `zizmor.yml` — Security Analysis with zizmor
 

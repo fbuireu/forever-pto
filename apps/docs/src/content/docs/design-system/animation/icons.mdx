@@ -7,7 +7,7 @@ sidebar:
 
 import { IconsGalleryDemo, IconTriggersDemo, ICON_COUNT } from '../../../../components/demos/IconsGalleryDemo';
 
-Source: `src/ui/modules/core/animate/icons/`. The directory holds {ICON_COUNT} icon components plus the shared machinery in `Icon.tsx` (`AnimateIcon`, `IconWrapper`, `useAnimateIconContext`, `useVariants`). Every icon draws itself with `m.svg`/`m.path` from Motion, so any subtree that renders one needs a `LazyMotionProvider` ancestor — the demos on this page provide their own.
+Source: `apps/web/src/ui/modules/core/animate/icons/`. The directory holds {ICON_COUNT} icon components plus the shared machinery in `Icon.tsx` (`AnimateIcon`, `IconWrapper`, `useAnimateIconContext`, `useVariants`). Every icon draws itself with `m.svg`/`m.path` from Motion, so any subtree that renders one needs a `LazyMotionProvider` ancestor — the demos on this page provide their own.
 
 ## Gallery
 
@@ -17,7 +17,7 @@ Hover a tile to play its animation. The gallery imports every icon by its real e
 
 ## How an icon is built
 
-Each icon file (e.g. `src/ui/modules/core/animate/icons/Check.tsx`) follows one pattern:
+Each icon file (e.g. `apps/web/src/ui/modules/core/animate/icons/Check.tsx`) follows one pattern:
 
 1. An `animations` object maps animation names (`default`, and for the directional icons also `default-loop`) to Motion `Variants` per SVG part.
 2. An inner component draws the SVG with `m.*` elements, wiring each part to `useVariants(animations)` and the shared `controls` from `useAnimateIconContext`.
@@ -44,7 +44,7 @@ On top of the per-icon animations, `Icon.tsx` defines two static animations avai
 
 ## Context propagation
 
-Because triggers travel through context, one `AnimateIcon` can animate icons buried inside composed children. That is how `Combobox` (`src/ui/modules/core/primitives/Combobox.tsx`) animates the `ChevronUpDown` inside its trigger button: the wrapper toggles `animateOnHover={!open} animate={open}` and the icon simply sits in the button. Individual icons can override any inherited prop; the override wins over the parent context.
+Because triggers travel through context, one `AnimateIcon` can animate icons buried inside composed children. That is how `Combobox` (`apps/web/src/ui/modules/core/primitives/Combobox.tsx`) animates the `ChevronUpDown` inside its trigger button: the wrapper toggles `animateOnHover={!open} animate={open}` and the icon simply sits in the button. Individual icons can override any inherited prop; the override wins over the parent context.
 
 ## Usage
 

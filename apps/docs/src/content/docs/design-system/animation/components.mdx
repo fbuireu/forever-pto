@@ -7,7 +7,7 @@ sidebar:
 
 import { CounterDemo, FeatureListDemo, RadialNavDemo } from '../../../../components/demos/AnimationComponentsDemo';
 
-Source: `src/ui/modules/core/animate/components/`. Composite motion components (the fourth file in the directory, `Tabs.tsx`, is documented with the other Base UI wrappers). `FeatureList` and `RadialNav` are framework-clean — Motion, `cn()`, `lucide-react` and the core `Badge` are their only dependencies. `Counter` wraps [SlidingNumber](/design-system/animation/text/), which reads the locale through `next-intl`, so its demo adds a `DemoIntlProvider`. All three render the real components; as always with `m.*` consumers, they need a `LazyMotionProvider` ancestor.
+Source: `apps/web/src/ui/modules/core/animate/components/`. Composite motion components (the fourth file in the directory, `Tabs.tsx`, is documented with the other Base UI wrappers). `FeatureList` and `RadialNav` are framework-clean — Motion, `cn()`, `lucide-react` and the core `Badge` are their only dependencies. `Counter` wraps [SlidingNumber](/design-system/animation/text/), which reads the locale through `next-intl`, so its demo adds a `DemoIntlProvider`. All three render the real components; as always with `m.*` consumers, they need a `LazyMotionProvider` ancestor.
 
 ## Counter
 
@@ -17,7 +17,7 @@ Source: `src/ui/modules/core/animate/components/`. Composite motion components (
 
 ## FeatureList
 
-`FeatureList` (`FeatureList.tsx`) is the roadmap card deck: features render as stacked cards, collapsed into a fanned pile (`marginTop: -44`, progressively narrower `scaleX`) that expands to a full list on hover or tap, while the footer cross-fades between `categoryLabel` and `detailedViewLabel`. Props: `features: { id, title, description, quarter? }[]` (the optional `quarter` renders a secondary `Badge`), `categoryLabel`, `detailedViewLabel`. The app feeds it translated roadmap entries in `src/ui/modules/pages/planner/Roadmap.tsx`.
+`FeatureList` (`FeatureList.tsx`) is the roadmap card deck: features render as stacked cards, collapsed into a fanned pile (`marginTop: -44`, progressively narrower `scaleX`) that expands to a full list on hover or tap, while the footer cross-fades between `categoryLabel` and `detailedViewLabel`. Props: `features: { id, title, description, quarter? }[]` (the optional `quarter` renders a secondary `Badge`), `categoryLabel`, `detailedViewLabel`. The app feeds it translated roadmap entries in `apps/web/src/ui/modules/pages/planner/Roadmap.tsx`.
 
 <FeatureListDemo client:visible />
 
@@ -49,6 +49,6 @@ import { RadialNav } from '@ui/modules/core/animate/components/RadialNav';
 
 ## Conventions
 
-- These components stay presentation-only: labels arrive as props, never from `useTranslations`, per the core rules in `src/ui/modules/core/CONTEXT.md`.
+- These components stay presentation-only: labels arrive as props, never from `useTranslations`, per the core rules in `apps/web/src/ui/modules/core/CONTEXT.md`.
 - `RadialNav` ignores `className` on the root (props are not spread) — wrap it in a positioned container and leave room around the ring for the expanding buttons.
 - Related: [effects](/design-system/animation/effects/), [text animations](/design-system/animation/text/), [animated icons](/design-system/animation/icons/).

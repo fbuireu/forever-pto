@@ -5,11 +5,11 @@ sidebar:
   order: 2
 ---
 
-The suggestion-engine terms below are defined in code in `src/domain/calendar/types.ts` and explained in depth in `src/domain/calendar/CONTEXT.md`.
+The suggestion-engine terms below are defined in code in `apps/web/src/domain/calendar/types.ts` and explained in depth in `apps/web/src/domain/calendar/CONTEXT.md`.
 
 ### PTO
 
-Paid time off — the user's budget of vacation days for the planning period (`ptoDays` in the filters store, `src/application/stores/filters.ts`). Everything the engine does is about spending this budget as efficiently as possible.
+Paid time off — the user's budget of vacation days for the planning period (`ptoDays` in the filters store, `apps/web/src/application/stores/filters.ts`). Everything the engine does is about spending this budget as efficiently as possible.
 
 ### Bridge
 
@@ -17,11 +17,11 @@ A block of PTO days that connects weekends and public holidays into one contiguo
 
 ### Effective days
 
-The total consecutive days off a bridge or suggestion produces — PTO days plus the weekends and holidays they absorb. **Efficiency** is `effectiveDays / ptoDaysNeeded`; the engine discards bridges below a minimum efficiency threshold (tunables in `src/domain/calendar/const.ts`).
+The total consecutive days off a bridge or suggestion produces — PTO days plus the weekends and holidays they absorb. **Efficiency** is `effectiveDays / ptoDaysNeeded`; the engine discards bridges below a minimum efficiency threshold (tunables in `apps/web/src/domain/calendar/const.ts`).
 
 ### FilterStrategy
 
-How bridges are ranked and selected. Three values, exported as the `FilterStrategy` const object in `src/domain/calendar/types.ts`:
+How bridges are ranked and selected. Three values, exported as the `FilterStrategy` const object in `apps/web/src/domain/calendar/types.ts`:
 
 - **`grouped`** — prefer multi-day blocks, with efficiency as the tiebreaker. Fewer, longer breaks.
 - **`optimized`** — prefer the highest-efficiency bridges first. Maximum days off per PTO day.
@@ -29,11 +29,11 @@ How bridges are ranked and selected. Three values, exported as the `FilterStrate
 
 ### Suggestion
 
-The engine's output for a given budget, calendar and strategy: the set of recommended PTO dates plus the bridges and metrics behind them (`Suggestion` interface, produced by `src/domain/calendar/suggestions/generateSuggestions.ts`). Users can hand-edit the suggested days afterwards.
+The engine's output for a given budget, calendar and strategy: the set of recommended PTO dates plus the bridges and metrics behind them (`Suggestion` interface, produced by `apps/web/src/domain/calendar/suggestions/generateSuggestions.ts`). Users can hand-edit the suggested days afterwards.
 
 ### Alternatives
 
-Distinct alternative PTO plans for the same inputs, produced by `src/domain/calendar/alternatives/generateAlternatives.ts` using different bridge-ordering strategies — so the user can compare plans rather than accept a single answer.
+Distinct alternative PTO plans for the same inputs, produced by `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` using different bridge-ordering strategies — so the user can compare plans rather than accept a single answer.
 
 ### Carry-over
 
@@ -41,4 +41,4 @@ Months of the following year included in the planning window (`carryOverMonths` 
 
 ### Premium key
 
-The identifier of a premium purchase — the Stripe PaymentIntent id, surfaced as `premiumKey` (see `src/application/use-cases/activatePremium.ts` and the premium store `src/application/stores/premium.ts`). The active session itself is carried by the `premium-token` JWT cookie — see [cookies](/reference/cookies/).
+The identifier of a premium purchase — the Stripe PaymentIntent id, surfaced as `premiumKey` (see `apps/web/src/application/use-cases/activatePremium.ts` and the premium store `apps/web/src/application/stores/premium.ts`). The active session itself is carried by the `premium-token` JWT cookie — see [cookies](/reference/cookies/).

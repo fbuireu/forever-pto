@@ -5,12 +5,12 @@ sidebar:
   order: 0
 ---
 
-All core components live in `src/ui/modules/core/` and follow the conventions in `src/ui/modules/core/CONTEXT.md`: CVA variants, `data-slot` attributes, named exports, no business logic or translations inside components. See [Philosophy](/design-system/foundations/philosophy/) for the visual language.
+All core components live in `apps/web/src/ui/modules/core/` and follow the conventions in `apps/web/src/ui/modules/core/CONTEXT.md`: CVA variants, `data-slot` attributes, named exports, no business logic or translations inside components. See [Philosophy](/design-system/foundations/philosophy/) for the visual language.
 
 These docs import the real components through the `@ui` alias and render them as Astro islands. Portability determines what a page can show:
 
 - **Live** — framework-clean module (no Next.js in its import graph); the docs render the real component.
-- **Live (motion)** — also portable, but built on `motion`'s `m.*` components, so demos wrap it in `LazyMotionProvider` (`src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`).
+- **Live (motion)** — also portable, but built on `motion`'s `m.*` components, so demos wrap it in `LazyMotionProvider` (`apps/web/src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`).
 - **Reference-only** — the module (or a transitive import) touches Next.js or app layers; documented without importing it.
 
 ## Catalog
@@ -47,9 +47,9 @@ These cannot be imported by the docs site — each drags Next.js or app-layer co
 
 | Component | Source | Why it is coupled |
 | --- | --- | --- |
-| `RichLink` | `src/ui/modules/core/primitives/RichLink.tsx` | Imports `Link` from `@application/i18n/navigation` (next-intl locale-aware routing). |
-| `Sonner` (Toaster) | `src/ui/modules/core/primitives/Sonner.tsx` | Reads the active theme with `useTheme` from `next-themes`. |
-| `Combobox` | `src/ui/modules/core/primitives/Combobox.tsx` | Typed against app DTOs (`@application/dto/*`) and `@domain/calendar/types`; composes `FlagIcon`. |
-| `Sidebar` | `src/ui/modules/core/animate/base/Sidebar.tsx` | App-shell component: cookie persistence via `src/ui/utils/cookie.ts`, `useIsMobile` hook, keyboard shortcut wiring. |
-| `Form` | `src/ui/modules/core/primitives/Form.tsx` | react-hook-form binding (`FormProvider`, `Controller`) — the dependency is not shipped with the docs site and the component only makes sense around app form flows. |
-| `FlagIcon` | `src/ui/modules/core/primitives/FlagIcon.tsx` | Renders `fi fi-{code}` spans that require the `flag-icons` stylesheet loaded by the app. |
+| `RichLink` | `apps/web/src/ui/modules/core/primitives/RichLink.tsx` | Imports `Link` from `@application/i18n/navigation` (next-intl locale-aware routing). |
+| `Sonner` (Toaster) | `apps/web/src/ui/modules/core/primitives/Sonner.tsx` | Reads the active theme with `useTheme` from `next-themes`. |
+| `Combobox` | `apps/web/src/ui/modules/core/primitives/Combobox.tsx` | Typed against app DTOs (`@application/dto/*`) and `@domain/calendar/types`; composes `FlagIcon`. |
+| `Sidebar` | `apps/web/src/ui/modules/core/animate/base/Sidebar.tsx` | App-shell component: cookie persistence via `apps/web/src/ui/utils/cookie.ts`, `useIsMobile` hook, keyboard shortcut wiring. |
+| `Form` | `apps/web/src/ui/modules/core/primitives/Form.tsx` | react-hook-form binding (`FormProvider`, `Controller`) — the dependency is not shipped with the docs site and the component only makes sense around app form flows. |
+| `FlagIcon` | `apps/web/src/ui/modules/core/primitives/FlagIcon.tsx` | Renders `fi fi-{code}` spans that require the `flag-icons` stylesheet loaded by the app. |

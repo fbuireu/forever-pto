@@ -7,7 +7,7 @@ sidebar:
 
 import { PopoverDemo } from '../../../../components/demos/PopoverDemo';
 
-Source: `src/ui/modules/core/animate/base/Popover.tsx` — the styling layer. The motion lives one level down in `src/ui/modules/core/animate/primitives/base/Popover.tsx` (Base UI popover + `AnimatePresence`). Needs a `LazyMotionProvider` ancestor.
+Source: `apps/web/src/ui/modules/core/animate/base/Popover.tsx` — the styling layer. The motion lives one level down in `apps/web/src/ui/modules/core/animate/primitives/base/Popover.tsx` (Base UI popover + `AnimatePresence`). Needs a `LazyMotionProvider` ancestor.
 
 Exports: `Popover`, `PopoverTrigger`, `PopoverContent`.
 
@@ -35,7 +35,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@ui/modules/core/animat
 </Popover>
 ```
 
-Related surfaces: [DropdownMenu](/design-system/components/dropdown-menu/) for action lists, [Tooltip](/design-system/components/tooltip/) for hover-only hints, [Dialog](/design-system/components/dialog/) for modal flows. The country/region combobox (`src/ui/modules/core/primitives/Combobox.tsx`) hosts a [Command](/design-system/components/command/) list inside this Popover.
+Related surfaces: [DropdownMenu](/design-system/components/dropdown-menu/) for action lists, [Tooltip](/design-system/components/tooltip/) for hover-only hints, [Dialog](/design-system/components/dialog/) for modal flows. The country/region combobox (`apps/web/src/ui/modules/core/primitives/Combobox.tsx`) hosts a [Command](/design-system/components/command/) list inside this Popover.
 
 ## Conventions
 

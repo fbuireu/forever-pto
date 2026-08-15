@@ -11,7 +11,7 @@ Forever PTO's UI is neo-brutalist: flat surfaces, thick ink borders, hard offset
 
 <PhilosophyDemo client:visible />
 
-All raw tokens (colors, surfaces, shadows) are declared in `src/ui/styles/global/index.css`; their Tailwind exposure lives in `src/ui/styles/theme/index.css`. See [colors](/design-system/foundations/colors/), [shadows](/design-system/foundations/shadows/) and [typography](/design-system/foundations/typography/) for each axis in detail.
+All raw tokens (colors, surfaces, shadows) are declared in `apps/web/src/ui/styles/global/index.css`; their Tailwind exposure lives in `apps/web/src/ui/styles/theme/index.css`. See [colors](/design-system/foundations/colors/), [shadows](/design-system/foundations/shadows/) and [typography](/design-system/foundations/typography/) for each axis in detail.
 
 ## Hard borders, scaled by element class
 
@@ -19,10 +19,10 @@ Every bordered element uses the same ink color — `border-[var(--frame)]` — b
 
 | Width | Element class | Examples |
 | --- | --- | --- |
-| `2.5px` | Fine details | Accordion chevron square (`src/ui/modules/core/animate/base/Accordion.tsx`), toasts (`src/ui/modules/core/primitives/Sonner.tsx`), mini calendar cells (`src/ui/modules/pages/homepage/sections/Features.tsx`) |
-| `3px` | Core primitives — the default | Button, Badge, Card, Input (`src/ui/modules/core/primitives/`) |
-| `4px` | Page-level cards | `brutCard` in `src/ui/modules/pages/homepage/sections/shared.ts`, `src/ui/modules/pages/planner/SiteTitle.tsx` |
-| `5px` | Display blocks | Hero panel (`src/ui/modules/pages/homepage/sections/Hero.tsx`), 404/error numerals (`src/ui/modules/pages/error/ErrorContent.tsx`) |
+| `2.5px` | Fine details | Accordion chevron square (`apps/web/src/ui/modules/core/animate/base/Accordion.tsx`), toasts (`apps/web/src/ui/modules/core/primitives/Sonner.tsx`), mini calendar cells (`apps/web/src/ui/modules/pages/homepage/sections/Features.tsx`) |
+| `3px` | Core primitives — the default | Button, Badge, Card, Input (`apps/web/src/ui/modules/core/primitives/`) |
+| `4px` | Page-level cards | `brutCard` in `apps/web/src/ui/modules/pages/homepage/sections/shared.ts`, `apps/web/src/ui/modules/pages/planner/SiteTitle.tsx` |
+| `5px` | Display blocks | Hero panel (`apps/web/src/ui/modules/pages/homepage/sections/Hero.tsx`), 404/error numerals (`apps/web/src/ui/modules/pages/error/ErrorContent.tsx`) |
 
 The heavier the border, the higher the element sits in the visual hierarchy. New components should default to `3px` and only escalate when they represent a whole section.
 
@@ -36,7 +36,7 @@ Interactive elements physically move: hover translates the element up-left (`-2p
 
 ## Rotated accents
 
-Static elements get a slight tilt that settles (or straightens on hover) to make the layout feel hand-placed rather than grid-generated: testimonial cards alternate between roughly ±1° (`src/ui/modules/pages/homepage/sections/Testimonials.tsx`), the logo mark and footer mark rest at 4° and straighten on hover (`src/ui/modules/shared/Logo.tsx`, `src/ui/modules/shared/footer/Footer.tsx`), and the hero calendar panel leans 1° (`src/ui/modules/pages/homepage/sections/Hero.tsx`). Rotation stays under ~8° — it is an accent, never a layout mechanic.
+Static elements get a slight tilt that settles (or straightens on hover) to make the layout feel hand-placed rather than grid-generated: testimonial cards alternate between roughly ±1° (`apps/web/src/ui/modules/pages/homepage/sections/Testimonials.tsx`), the logo mark and footer mark rest at 4° and straighten on hover (`apps/web/src/ui/modules/shared/Logo.tsx`, `apps/web/src/ui/modules/shared/footer/Footer.tsx`), and the hero calendar panel leans 1° (`apps/web/src/ui/modules/pages/homepage/sections/Hero.tsx`). Rotation stays under ~8° — it is an accent, never a layout mechanic.
 
 ## Cream and ink
 
@@ -48,4 +48,4 @@ Display type is Bricolage Grotesque at heavy weights; body copy is Space Grotesk
 
 ## Where the rules are enforced
 
-Component-level conventions (CVA variants, `data-slot` hooks, `asChild`) are covered in [conventions](/design-system/foundations/conventions/). The single source of truth for every visual constant on this page is `src/ui/styles/global/index.css` — change a token there and the entire system, including these docs' live demos, follows.
+Component-level conventions (CVA variants, `data-slot` hooks, `asChild`) are covered in [conventions](/design-system/foundations/conventions/). The single source of truth for every visual constant on this page is `apps/web/src/ui/styles/global/index.css` — change a token there and the entire system, including these docs' live demos, follows.

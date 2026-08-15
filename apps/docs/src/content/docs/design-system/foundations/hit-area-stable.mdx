@@ -19,14 +19,14 @@ Compare the two below by parking the pointer exactly on the bottom-right edge:
 
 ## The fix
 
-`src/ui/styles/utilities/index.css` defines a Tailwind v4 `@utility` named `hit-area-stable`. It attaches an invisible `::after` overlay (`inset: 0`, `z-index: -1` so it never covers content) that expands asymmetrically with the movement:
+`apps/web/src/ui/styles/utilities/index.css` defines a Tailwind v4 `@utility` named `hit-area-stable`. It attaches an invisible `::after` overlay (`inset: 0`, `z-index: -1` so it never covers content) that expands asymmetrically with the movement:
 
 - On `:hover`, the overlay grows down-right (`inset: 0 -8px -8px 0`) — covering the band the element vacates when it lifts up-left.
 - On `:active`, it grows up-left (`inset: -8px 0 0 -8px`) — covering the opposite band vacated by the press translate.
 
 The pseudo-element belongs to the host, so the pointer resting on the overlay still counts as hovering the element. The loop never starts.
 
-A second utility, `hit-area-stable-tilt`, expands uniformly (`inset: -16px` on hover) for cards that *rotate* on hover instead of translating — used by the homepage testimonial and pricing cards (`src/ui/modules/pages/homepage/sections/Testimonials.tsx`, `Pricing.tsx`).
+A second utility, `hit-area-stable-tilt`, expands uniformly (`inset: -16px` on hover) for cards that *rotate* on hover instead of translating — used by the homepage testimonial and pricing cards (`apps/web/src/ui/modules/pages/homepage/sections/Testimonials.tsx`, `Pricing.tsx`).
 
 ## The padding-box gotcha
 
@@ -38,9 +38,9 @@ That is why the magic number is 8 and not 2: the negative inset must exceed **bo
 
 The utility is baked into the base classes of every lifting element, so consumers get it for free:
 
-- `Button` and `Badge` (`src/ui/modules/core/primitives/`)
-- `Slider` thumb (`src/ui/modules/core/primitives/Slider.tsx`)
-- The Accordion chevron square, Collapsible trigger, Dialog close button, Tooltip info trigger, and sidebar menu buttons (`src/ui/modules/core/animate/base/`)
-- Page-level uses in the planner calendar (`src/ui/modules/pages/planner/calendar/utils/helpers.ts`), `Summary.tsx`, and homepage sections
+- `Button` and `Badge` (`apps/web/src/ui/modules/core/primitives/`)
+- `Slider` thumb (`apps/web/src/ui/modules/core/primitives/Slider.tsx`)
+- The Accordion chevron square, Collapsible trigger, Dialog close button, Tooltip info trigger, and sidebar menu buttons (`apps/web/src/ui/modules/core/animate/base/`)
+- Page-level uses in the planner calendar (`apps/web/src/ui/modules/pages/planner/calendar/utils/helpers.ts`), `Summary.tsx`, and homepage sections
 
 **Rule of thumb:** any new element that combines `hover:-translate-*` with a brutal shadow must include `hit-area-stable` (or the `-tilt` variant if it rotates). The [button choreography](/design-system/foundations/shadows/) assumes it.

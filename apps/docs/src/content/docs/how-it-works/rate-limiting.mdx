@@ -9,9 +9,9 @@ Exactly one endpoint is rate limited: `POST /api/payment`, the route that create
 
 ## How it works
 
-`checkRateLimit(ip)` in `src/infrastructure/services/payments/rateLimit.ts` implements a **fixed-window counter** on Cloudflare KV:
+`checkRateLimit(ip)` in `apps/web/src/infrastructure/services/payments/rateLimit.ts` implements a **fixed-window counter** on Cloudflare KV:
 
-- The key is `rl:payment:{ip}`; the IP comes from the `cf-connecting-ip` header (falling back to `x-forwarded-for`, then `'unknown'`) in `src/app/api/payment/route.ts`.
+- The key is `rl:payment:{ip}`; the IP comes from the `cf-connecting-ip` header (falling back to `x-forwarded-for`, then `'unknown'`) in `apps/web/src/app/api/payment/route.ts`.
 - Each request reads the current count; at or above `LIMIT` (10) it is blocked, otherwise the counter is incremented with `expirationTtl: WINDOW_SECONDS` (60) — KV's TTL does the window reset, no cleanup job needed.
 - A blocked request fails the Effect with a typed `RateLimitError`, which the route maps to **HTTP 429** with `ApiError.RATE_LIMIT_EXCEEDED` before any Stripe call happens.
 

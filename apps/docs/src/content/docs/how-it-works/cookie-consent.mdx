@@ -9,7 +9,7 @@ Consent management is built on `vanilla-cookieconsent`, but with the library's U
 
 ## Composition
 
-- `src/ui/modules/shared/cookie-consent/CookieConsentClient.tsx` — a `dynamic(..., { ssr: false })` wrapper mounted in the root locale layout; consent state lives in the browser, so there is nothing to render on the server.
+- `apps/web/src/ui/modules/shared/cookie-consent/CookieConsentClient.tsx` — a `dynamic(..., { ssr: false })` wrapper mounted in the root locale layout; consent state lives in the browser, so there is nothing to render on the server.
 - `CookieConsent.tsx` — initializes `CookieConsentLib.run(...)` once, renders the custom banner when no consent cookie exists yet, and otherwise renders `CookieConsentDialog` (the preferences modal, reopened via the `cc:showPreferences` window event, dispatched from the footer).
 - `config/config.ts` — `COOKIE_SECTIONS`, the typed catalog that drives the preferences UI. Description/expiry strings are i18n keys typed against the `cookies` namespace of the English catalog, so a missing translation is a type error.
 
@@ -28,8 +28,8 @@ Two categories are registered with the library:
 
 Accepting or saving preferences calls `CookieConsentLib.acceptService(enabledServices, 'analytics')`, then:
 
-- **Google Consent Mode** — `src/ui/modules/tutorial/Analytics.tsx` loads gtag with a default of everything `denied`. On consent changes the component updates `analytics_storage` via `gtag('consent', 'update', ...)` and fires a `page_view` when granted — GA never tracks pre-consent.
-- **Better Stack tracking** — `src/ui/modules/tutorial/BetterStackTracking.tsx` listens to the library's `cc:onConsent` / `cc:onChange` document events and only injects the tracking script when the analytics category is accepted (and a tracking token exists). It also `identifyUser`s premium users post-consent. See [observability](/how-it-works/observability/).
+- **Google Consent Mode** — `apps/web/src/ui/modules/tutorial/Analytics.tsx` loads gtag with a default of everything `denied`. On consent changes the component updates `analytics_storage` via `gtag('consent', 'update', ...)` and fires a `page_view` when granted — GA never tracks pre-consent.
+- **Better Stack tracking** — `apps/web/src/ui/modules/tutorial/BetterStackTracking.tsx` listens to the library's `cc:onConsent` / `cc:onChange` document events and only injects the tracking script when the analytics category is accepted (and a tracking token exists). It also `identifyUser`s premium users post-consent. See [observability](/how-it-works/observability/).
 
 On a revisit, `onConsent` restores per-service state from `CookieConsentLib.getUserPreferences()` so the dialog reflects reality.
 

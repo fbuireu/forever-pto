@@ -1,53 +1,74 @@
 ---
 title: Releases
-description: How semantic-release cuts versions from conventional commits, and why the PR title is the release note.
+description: How each package versions itself from conventional commits, and why a release means the version is live.
 sidebar:
   order: 3
 ---
 
-Releases are fully automated by [semantic-release](https://semantic-release.gitbook.io), configured in `.releaserc.json` and run by the `release` job of `.github/workflows/ci.yml`.
+Each package releases itself. [semantic-release](https://semantic-release.gitbook.io) runs once per package, configured in `apps/web/.releaserc.json` and `apps/docs/.releaserc.json`, and [`semantic-release-monorepo`](https://github.com/pmowrer/semantic-release-monorepo) attributes a commit to a package by the paths it touches. A wiki change never cuts an app release, and an app change never cuts a wiki one.
+
+| Package | Tags | Writes | Runs in |
+| --- | --- | --- | --- |
+| `apps/web` | `web-vX.Y.Z` | `package.json`, `CHANGELOG.md`, a GitHub Release | `ci.yml`, after the production deploy |
+| `apps/docs` | `docs-vX.Y.Z` | a tag and a GitHub Release, nothing else | `docs.yml`, after the docs deploy |
 
 ## The flow
 
 ```text
  push to main
-   ├────────────────────────────┬─────────────────────────────┐
-   ▼                            ▼                             ▼
- ci.yml                    deploy-production.yml         zizmor.yml
-   ├─ lint ─┐                (deploys the merge
-   ├─ typecheck ─┼─ all green ─┐   commit immediately,
-   └─ unit tests ┘             │   NOT gated on CI)
+   ├──────────────────────────────────┬─────────────────┐
+   ▼                                  ▼                 ▼
+ ci.yml                            docs.yml          zizmor.yml
+   ├─ changes (did apps/web move?)    ├─ build
+   ├─ lint ─┐                         └─ deploy
+   ├─ typecheck ─┼─ all green ─┐           └─ release-docs
+   └─ unit tests ┘             │                └─ docs-vX.Y.Z + GitHub Release
                                ▼
-                         semantic-release
-                           ├─ analyze commits since last tag
-                           ├─ CHANGELOG.md + version bump
-                           ├─ commit "chore(release): x.y.z [skip ci]"
-                           ├─ git tag vX.Y.Z + GitHub Release
-                           └─ force-move floating major tag (vX)
+                      deploy-production
+                               ▼
+                        release-web
+                          ├─ verify a web-v* tag exists
+                          ├─ analyze commits touching apps/web
+                          ├─ CHANGELOG.md + version bump
+                          ├─ commit "chore(release): web x.y.z [skip ci]"
+                          └─ tag web-vX.Y.Z + GitHub Release
+                               ▼
+                         docs-refresh
+                          └─ dispatch docs.yml so the site
+                             shows the new app version
 ```
 
-1. **Quality gates.** The `release` job `needs` lint, typecheck and unit tests, and only runs on a push to `main` (not on PRs). Its concurrency group is `release` with `cancel-in-progress: false`, so releases queue instead of racing.
-2. **semantic-release** analyzes conventional commits since the last tag (`@semantic-release/commit-analyzer`): `fix:` → patch, `feat:` → minor, `BREAKING CHANGE` → major; `docs:`, `chore:`, `ci:` etc. produce **no release**.
-3. Plugins run in the order declared in `.releaserc.json`: release notes → `CHANGELOG.md` (`@semantic-release/changelog`) → version bump in `package.json` (`@semantic-release/npm` with `npmPublish: false` — the package is private, only the version field matters) → a git commit of `package.json`, `pnpm-lock.yaml` and `CHANGELOG.md` with the message `chore(release): <version> [skip ci]` → a GitHub Release.
-4. **Floating major tag.** A final workflow step force-moves the major tag (e.g. `v1`) to the new release tag and force-pushes it, using the `PAT` secret (a plain `GITHUB_TOKEN` push would not re-trigger anything and lacks tag-force rights on protected refs).
+1. **A release means the version is live.** `release-web` `needs: deploy-production`, so nothing is tagged until the deploy has succeeded. `release-docs` sits behind the docs deploy for the same reason. Both share the concurrency group `release` with `cancel-in-progress: false`, so they queue instead of racing.
+2. **Attribution is by path.** `fix:` → patch, `feat:` → minor, `BREAKING CHANGE` → major; `docs:`, `chore:`, `ci:` and friends produce no release. But the type only decides *how big* the bump is — *which* package it lands in is decided by the files the commit touched.
+3. **`apps/web` runs the full plugin chain**: release notes → `CHANGELOG.md` → version bump in `package.json` (`@semantic-release/npm` with `npmPublish: false`; the package is private, only the version field matters) → a git commit of `package.json` and `CHANGELOG.md` → a GitHub Release. The lockfile is not in the asset list: it lives two levels above the package and nothing in this chain dirties it.
+4. **`apps/docs` runs commit-analyzer, release notes and GitHub only.** No changelog, no npm, no git plugin — it pushes nothing to `main`, which is what keeps the two release jobs from competing for the branch. Its own version stays `0.0.0` and nothing reads it: the site displays the **app's** version.
+5. **`docs-refresh` closes the loop.** The release commit carries `[skip ci]`, so nothing would otherwise rebuild the wiki after an app version bump, and the published header would keep showing the previous one.
 
-The `[skip ci]` marker on the release commit is load-bearing: without it, the version-bump push to `main` would trigger `ci.yml` *and* `deploy-production.yml` again, in an infinite-ish loop.
+The `[skip ci]` marker is load-bearing: without it, the version-bump push to `main` re-triggers the whole graph.
 
-## Deploys are parallel, not sequenced
+## The bridge tag
 
-`deploy-production.yml` triggers on the same push event as `ci.yml`. Production deploys the merge commit **immediately and unconditionally** — it does not wait for tests, and it does not wait for (or care about) the release. A red `main` still ships. The safety net is that branch protection makes CI green *before* merge; the trade-off is faster deploys at the cost of no post-merge gate. Keep this in mind when reading the [environments lifecycle](/infra/environments/).
+`web-v1.8.2` sits on the same commit as the older `v1.8.2` and carries no annotation, so it reads like debris. It is not. semantic-release finds the previous release by `tagFormat`, and the app's history was written under the plain `vX.Y.Z` shape; without a tag matching `web-v*`, the next release is computed as a *first* release and published as `web-v1.0.0` over a 1.8.x line — which cannot be recalled from GitHub Releases.
+
+`release-web` carries a step that fails the job outright when no `web-v*` tag exists, so the silent version of that failure became a loud one.
+
+The historical plain `v*` tags are left in place and are not part of this scheme. Neither is the floating `v1` tag: nothing moves it, no ADR records it, and it diverges between local and remote — which makes semantic-release's own `git fetch --tags` fail with *would clobber existing tag*.
 
 ## Squash merge: the PR title is the commit
 
-`main` receives squash merges, so the **PR title becomes the conventional commit** that semantic-release analyzes. Individual commit messages inside the PR are irrelevant to releasing (though `commitlint` via Husky still enforces the convention locally — see `commitlint.config.ts`).
+`main` receives squash merges, so the **PR title becomes the conventional commit** that semantic-release analyzes. Individual commit messages inside the PR are irrelevant to releasing, though `commitlint` via Husky still enforces the convention locally.
+
+That makes squash merge load-bearing for a second reason: attribution reads the paths a commit touched, and `git diff-tree` prints nothing for a true merge commit. Enabling merge commits would make every merge release nothing, silently.
 
 Consequences:
 
-- A PR titled `feat: …` or `fix: …` bumps the app version and cuts a GitHub Release — even if it only touches `docs/**`, because semantic-release is single-package and versions the root `package.json`.
-- **Documentation PRs (including this site) must use `docs:` or `chore:` titles** so they produce no app release. This is a convention, not something CI enforces; a `paths`-aware release scoping is a known follow-up.
+- **One package per pull request.** A PR spanning both packages appears in both changelogs.
+- **A change confined to the repo root releases nothing** — `.github/`, `biome.json`, `adr/`, `tests/`, the root manifest.
+- The old rule requiring documentation PRs to use `docs:` titles is gone, along with the matching `semanticCommitType` override in `renovate.json`. Both existed only to stop single-package versioning doing the wrong thing.
 
 ## Source files
 
-- `.releaserc.json` — branches, plugin chain, release-commit message.
-- `.github/workflows/ci.yml` — the `release` job and the major-tag step.
+- `apps/web/.releaserc.json`, `apps/docs/.releaserc.json` — branches, tag formats, plugin chains.
+- `.github/workflows/ci.yml` — the `changes`, `release-web` and `docs-refresh` jobs.
+- `.github/workflows/docs.yml` — the `release-docs` job.
 - `commitlint.config.ts` + `.husky/commit-msg` — local enforcement of conventional commits.

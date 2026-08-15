@@ -7,7 +7,7 @@ sidebar:
 
 import { ShadowScale } from '../../../../components/ShadowScale';
 
-Brutal shadows are solid, blur-free copies of the frame offset down-right: `Npx Npx 0 0 var(--frame)`. The offset **is** the elevation scale. All tokens live in `src/ui/styles/global/index.css` and reference [`--frame`](/design-system/foundations/colors/), so they re-theme automatically in [dark mode](/design-system/foundations/dark-mode/). The boxes below carry the live tokens.
+Brutal shadows are solid, blur-free copies of the frame offset down-right: `Npx Npx 0 0 var(--frame)`. The offset **is** the elevation scale. All tokens live in `apps/web/src/ui/styles/global/index.css` and reference [`--frame`](/design-system/foundations/colors/), so they re-theme automatically in [dark mode](/design-system/foundations/dark-mode/). The boxes below carry the live tokens.
 
 ## The elevation scale
 
@@ -36,13 +36,13 @@ Interactive elements use a dedicated three-state set:
   '--shadow-brutal-btn-active',
 ]} />
 
-The choreography, as implemented in `src/ui/modules/core/primitives/Button.tsx`:
+The choreography, as implemented in `apps/web/src/ui/modules/core/primitives/Button.tsx`:
 
 - **Rest** — `--shadow-brutal-btn` (5px offset).
 - **Hover** — the element translates `-2px, -2px` (up-left) while the shadow grows to `--shadow-brutal-btn-hover` (7px). The two changes cancel out at the shadow's outer edge, so the silhouette stays anchored and the element appears to *rise* off the page.
 - **Active** — the element translates `+2px, +2px` while the shadow collapses to `--shadow-brutal-btn-active` (1px): the element drops onto its own shadow, reading as a physical press.
 
-The movement is eased by the shared 80ms linear `transition` block on `[data-slot]` elements in `src/ui/styles/base/index.css`. Because the element slides out from under the pointer on hover, every element using this trio must also apply the `hit-area-stable` utility — see [hit-area stability](/design-system/foundations/hit-area-stable/).
+The movement is eased by the shared 80ms linear `transition` block on `[data-slot]` elements in `apps/web/src/ui/styles/base/index.css`. Because the element slides out from under the pointer on hover, every element using this trio must also apply the `hit-area-stable` utility — see [hit-area stability](/design-system/foundations/hit-area-stable/).
 
 ## Colored trios
 

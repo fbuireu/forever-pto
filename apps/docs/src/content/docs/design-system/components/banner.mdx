@@ -8,7 +8,7 @@ sidebar:
 import { BANNER_SCHEME_ROWS, BannerActionDemo, BannerSchemesDemo } from '../../../../components/demos/BannerDemo';
 import { VariantsTable } from '../../../../components/VariantsTable';
 
-Source: `src/ui/modules/core/primitives/Banner.tsx`. A bordered, shadowed callout box (`role='note'`, labelled by its `title`) with an icon row on top and the message below. Framework-clean, so this page renders the real component.
+Source: `apps/web/src/ui/modules/core/primitives/Banner.tsx`. A bordered, shadowed callout box (`role='note'`, labelled by its `title`) with an icon row on top and the message below. Framework-clean, so this page renders the real component.
 
 ## Color schemes
 
@@ -20,7 +20,7 @@ Source: `src/ui/modules/core/primitives/Banner.tsx`. A bordered, shadowed callou
 
 ## Icon and action
 
-`icon` accepts either a Lucide icon or one of the animated icon components from `src/ui/modules/core/animate/icons/` (they share the same call signature). The optional `action` slot renders any node below the message with top margin — typically a small [Button](/design-system/components/button/).
+`icon` accepts either a Lucide icon or one of the animated icon components from `apps/web/src/ui/modules/core/animate/icons/` (they share the same call signature). The optional `action` slot renders any node below the message with top margin — typically a small [Button](/design-system/components/button/).
 
 <BannerActionDemo client:visible />
 

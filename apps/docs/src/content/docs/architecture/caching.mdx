@@ -15,9 +15,9 @@ With Cache Components enabled, anything dynamic must either be wrapped in Suspen
 
 | Function / component | File | Profile |
 | --- | --- | --- |
-| `getCurrentYear()` | `src/ui/utils/getCurrentYear.ts` | `cacheLife('days')` |
-| `getPublicEnv()` | `src/infrastructure/services/env/getPublicEnv.ts` | `cacheLife('days')` |
-| `Testimonials` (RSC) | `src/ui/modules/pages/homepage/sections/Testimonials.tsx` | `cacheLife('days')` |
+| `getCurrentYear()` | `apps/web/src/ui/utils/getCurrentYear.ts` | `cacheLife('days')` |
+| `getPublicEnv()` | `apps/web/src/infrastructure/services/env/getPublicEnv.ts` | `cacheLife('days')` |
+| `Testimonials` (RSC) | `apps/web/src/ui/modules/pages/homepage/sections/Testimonials.tsx` | `cacheLife('days')` |
 
 The pattern is always the same:
 
@@ -57,4 +57,4 @@ At runtime this is backed by the R2 bucket bound as `NEXT_INC_CACHE_R2_BUCKET` i
 
 ## What is deliberately not cached
 
-API routes that carry user state opt out explicitly: `src/app/api/check-session/route.ts` wraps every response in `noStore()` from `src/infrastructure/api/response.ts`, since premium-session payloads must never be shared between users.
+API routes that carry user state opt out explicitly: `apps/web/src/app/api/check-session/route.ts` wraps every response in `noStore()` from `apps/web/src/infrastructure/api/response.ts`, since premium-session payloads must never be shared between users.

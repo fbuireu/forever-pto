@@ -8,7 +8,7 @@ sidebar:
 import { BADGE_VARIANT_ROWS, BadgeAsLinkDemo, BadgeVariantsDemo } from '../../../../components/demos/BadgeDemo';
 import { VariantsTable } from '../../../../components/VariantsTable';
 
-Source: `src/ui/modules/core/primitives/Badge.tsx`. A rounded-full pill with the 3px frame border and the smallest brutal shadow. Text is styled uppercase by CSS (`uppercase tracking-[0.08em]`) — pass normal-case children. Framework-clean, so this page renders the real component.
+Source: `apps/web/src/ui/modules/core/primitives/Badge.tsx`. A rounded-full pill with the 3px frame border and the smallest brutal shadow. Text is styled uppercase by CSS (`uppercase tracking-[0.08em]`) — pass normal-case children. Framework-clean, so this page renders the real component.
 
 ## Variants
 
@@ -37,8 +37,8 @@ import { Badge } from '@ui/modules/core/primitives/Badge';
 
 ## Conventions
 
-- The CVA object is exported alongside the component (`badgeVariants`), per the core conventions in `src/ui/modules/core/CONTEXT.md`.
-- `asChild` composes through the local `Slot` (`src/ui/modules/core/animate/base/Slot.tsx`), same as [Button](/design-system/components/button/).
+- The CVA object is exported alongside the component (`badgeVariants`), per the core conventions in `apps/web/src/ui/modules/core/CONTEXT.md`.
+- `asChild` composes through the local `Slot` (`apps/web/src/ui/modules/core/animate/base/Slot.tsx`), same as [Button](/design-system/components/button/).
 - `data-slot='badge'` is set for CSS containment hooks.
 - `hit-area-stable` keeps the pointer hit-area steady during the link hover lift — see [Hit-area stability](/design-system/foundations/hit-area-stable/).
 - SVG children are auto-sized to `size-3` and get `pointer-events: none`.

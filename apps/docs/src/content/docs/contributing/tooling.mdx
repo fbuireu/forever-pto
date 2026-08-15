@@ -7,12 +7,12 @@ sidebar:
 
 ## Biome
 
-A single `biome.json` at the repo root lints and formats the whole workspace, `docs/` included. Highlights:
+A single `biome.json` at the repo root lints and formats the whole workspace, `apps/docs/` included. Highlights:
 
 - Formatter: 120-char lines, LF, spaces, single quotes (JS and JSX), es5 trailing commas.
 - `assist.actions.source.organizeImports: on` — import sorting is automated, don't hand-sort.
 - Recommended rules plus `suspicious.noConsole` as a warning (only `console.warn`/`console.error` allowed).
-- Generated or vendored CSS layers (`src/ui/styles/base|theme|utilities`, `docs/src/styles`) are excluded from formatting; `*.d.ts` files are excluded from linting.
+- `apps/docs/src/styles` is excluded from formatting, because it carries Tailwind directives; the app's own style layers are not excluded, since `css.parser.tailwindDirectives` handles them in place. `*.d.ts` and `*.astro` files are excluded from linting — Biome parses only an Astro file's frontmatter, so every import used in the template body would read as unused, and `astro check` covers those files instead.
 - VCS integration is on (`useIgnoreFile`, default branch `main`), which is what powers the `--changed` script variants.
 
 Run `pnpm format:changed` before pushing if you bypassed the hooks; `pnpm lint:all` is what CI runs.
@@ -29,7 +29,7 @@ Installed by the `prepare` script on `pnpm install`. Three hooks in `.husky/`:
 
 ### lint-staged
 
-The active config is `.lintstagedrc.json`. It scopes to `src/**` and `e2e/**`: JS/TS files get `format:changed` + `lint:changed`, and staged `*.test.*`/`*.spec.*` files additionally run `test:ut:changed` (Vitest with `--bail 1`). Note that `docs/**` files are not covered by these globs — the docs CI workflow is the safety net there.
+The active config is `.lintstagedrc.json`. It scopes to `apps/web/src/**` and `apps/web/e2e/**`: JS/TS files get `format:changed` + `lint:changed`, and staged `*.test.*`/`*.spec.*` files additionally run `test:ut:changed` (Vitest with `--bail 1`). Note that `apps/docs/**` files are not covered by these globs — the docs CI workflow is the safety net there.
 
 ## CI-side scanners
 

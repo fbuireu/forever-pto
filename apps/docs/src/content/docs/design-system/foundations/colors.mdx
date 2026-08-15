@@ -7,7 +7,7 @@ sidebar:
 
 import { TokenSwatch } from '../../../../components/TokenSwatch';
 
-All color tokens are CSS custom properties declared in `src/ui/styles/global/index.css` (light values in `:root`, dark overrides in the `[data-theme='dark']` block). The swatches below read the variables live, so they always show the current values in your active theme — flip Starlight's toggle to see the [dark mode](/design-system/foundations/dark-mode/) set.
+All color tokens are CSS custom properties declared in `apps/web/src/ui/styles/global/index.css` (light values in `:root`, dark overrides in the `[data-theme='dark']` block). The swatches below read the variables live, so they always show the current values in your active theme — flip Starlight's toggle to see the [dark mode](/design-system/foundations/dark-mode/) set.
 
 ## Brand palette
 
@@ -95,13 +95,13 @@ A few tokens hold full gradient values rather than single colors:
   '--grid-color',
 ]} />
 
-`--brand-gradient` is the five-stop brand sweep used for decorative strips; `--page-glow` is the trio of faint radial gradients painted behind the page body (`src/ui/styles/base/index.css` sets it as a fixed `background-image`); `--grid-color` is the near-transparent ink used for background grids.
+`--brand-gradient` is the five-stop brand sweep used for decorative strips; `--page-glow` is the trio of faint radial gradients painted behind the page body (`apps/web/src/ui/styles/base/index.css` sets it as a fixed `background-image`); `--grid-color` is the near-transparent ink used for background grids.
 
 ## How the semantic layer maps to Tailwind
 
 Two files, two jobs:
 
-- `src/ui/styles/global/index.css` declares the raw values (`:root` and `[data-theme='dark']`).
-- `src/ui/styles/theme/index.css` re-exposes a subset under Tailwind v4's `@theme inline` block: `--color-background: var(--background)`, `--color-accent: var(--accent)`, and so on.
+- `apps/web/src/ui/styles/global/index.css` declares the raw values (`:root` and `[data-theme='dark']`).
+- `apps/web/src/ui/styles/theme/index.css` re-exposes a subset under Tailwind v4's `@theme inline` block: `--color-background: var(--background)`, `--color-accent: var(--accent)`, and so on.
 
-Only the tokens aliased inside `@theme inline` become Tailwind utilities (`bg-background`, `text-muted-foreground`, `border-border`, `ring-ring`…). Everything else — brand colors, surfaces, `--frame`, shadows — is consumed through arbitrary values, e.g. `bg-[var(--surface-panel)]`, `border-[var(--frame)]`, `shadow-[var(--shadow-brutal-md)]`. When adding a component, prefer the semantic utilities and reach for `var()` arbitraries only for surfaces and frames, matching the existing primitives in `src/ui/modules/core/primitives/`.
+Only the tokens aliased inside `@theme inline` become Tailwind utilities (`bg-background`, `text-muted-foreground`, `border-border`, `ring-ring`…). Everything else — brand colors, surfaces, `--frame`, shadows — is consumed through arbitrary values, e.g. `bg-[var(--surface-panel)]`, `border-[var(--frame)]`, `shadow-[var(--shadow-brutal-md)]`. When adding a component, prefer the semantic utilities and reach for `var()` arbitraries only for surfaces and frames, matching the existing primitives in `apps/web/src/ui/modules/core/primitives/`.

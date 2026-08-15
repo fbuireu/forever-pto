@@ -7,7 +7,7 @@ sidebar:
 
 import { AccordionDemo, AccordionNoChevronDemo } from '../../../../components/demos/AccordionDemo';
 
-Source: `src/ui/modules/core/animate/base/Accordion.tsx`. Built on the Base UI accordion with Motion (`m.*`) as the visual layer, so any consumer must sit under `LazyMotionProvider` (`src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`) — the app mounts it in the locale layout.
+Source: `apps/web/src/ui/modules/core/animate/base/Accordion.tsx`. Built on the Base UI accordion with Motion (`m.*`) as the visual layer, so any consumer must sit under `LazyMotionProvider` (`apps/web/src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`) — the app mounts it in the locale layout.
 
 Exports: `Accordion`, `AccordionItem`, `AccordionTrigger`, `AccordionPanel`.
 
@@ -34,7 +34,7 @@ import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '@ui/
 </Accordion>
 ```
 
-Root props are the Base UI accordion root props (e.g. `multiple`, `defaultValue`); the homepage FAQ (`src/ui/modules/pages/homepage/sections/Faq.tsx`) uses `multiple` inside [Tabs](/design-system/components/tabs/).
+Root props are the Base UI accordion root props (e.g. `multiple`, `defaultValue`); the homepage FAQ (`apps/web/src/ui/modules/pages/homepage/sections/Faq.tsx`) uses `multiple` inside [Tabs](/design-system/components/tabs/).
 
 ## Conventions
 

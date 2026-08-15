@@ -14,7 +14,7 @@ La app funciona en [forever-pto.com](https://forever-pto.com) como un Cloudflare
 | Sección | Contenido |
 | --- | --- |
 | [Empieza aquí](/es/start/local-development/) | Setup local, estructura del repositorio, el stack |
-| [Arquitectura](/es/architecture/overview/) | La estructura en capas bajo `src/` y las reglas entre capas |
+| [Arquitectura](/es/architecture/overview/) | La estructura en capas bajo `apps/web/src/` y las reglas entre capas |
 | Cómo funciona | Inmersiones por feature — motor de sugerencias, [detección de país](/es/how-it-works/country-detection/), flujo premium |
 | [Design system](/es/design-system/components/overview/) | Fundamentos, componentes, animación y patrones — con demos en vivo |
 | [Infraestructura y CI/CD](/es/infra/environments/) | Entornos de Cloudflare, pipelines de deploy, releases |
@@ -23,9 +23,9 @@ La app funciona en [forever-pto.com](https://forever-pto.com) como un Cloudflare
 
 ## Cómo está construido este sitio
 
-Esta wiki es parte del propio repositorio: un sitio Astro Starlight en el paquete de workspace `docs/`. No es una reimplementación paralela de la UI de la app — las páginas del design system importan los **componentes reales de la app** a través del alias `@ui` (mapeado a `src/ui` en `docs/astro.config.ts`) y los renderizan como islands de React.
+Esta wiki es parte del propio repositorio: un sitio Astro Starlight en el paquete de workspace `apps/docs/`. No es una reimplementación paralela de la UI de la app — las páginas del design system importan los **componentes reales de la app** a través del alias `@ui` (mapeado a `apps/web/src/ui` en `apps/docs/astro.config.ts`) y los renderizan como islands de React.
 
-Las demos están tipadas contra las definiciones reales de variantes de cada componente (mira el patrón anti-drift en `docs/src/components/demos/ButtonDemo.tsx`): si una variante se añade, renombra o elimina en la app, `astro check` falla en el build de docs. El mismo principio aplica a la prosa — donde la app exporta una constante, la documentación la importa en lugar de copiar el valor. La [página de Button](/es/design-system/components/button/) es el ejemplo de referencia.
+Las demos están tipadas contra las definiciones reales de variantes de cada componente (mira el patrón anti-drift en `apps/docs/src/components/demos/ButtonDemo.tsx`): si una variante se añade, renombra o elimina en la app, `astro check` falla en el build de docs. El mismo principio aplica a la prosa — donde la app exporta una constante, la documentación la importa en lugar de copiar el valor. La [página de Button](/es/design-system/components/button/) es el ejemplo de referencia.
 
 :::note
 Solo la portada y esta introducción están traducidas. El resto de páginas bajo `/es/` sirven automáticamente la versión en inglés (fallback de Starlight) hasta que se traduzcan.

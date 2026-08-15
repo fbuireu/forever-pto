@@ -7,7 +7,7 @@ sidebar:
 
 import { LabelDemo } from '../../../../components/demos/LabelDemo';
 
-Source: `src/ui/modules/core/primitives/Label.tsx`. A styled native `<label>` (small, medium weight, tight leading). It carries no logic — association happens through the standard `htmlFor` attribute passed via props.
+Source: `apps/web/src/ui/modules/core/primitives/Label.tsx`. A styled native `<label>` (small, medium weight, tight leading). It carries no logic — association happens through the standard `htmlFor` attribute passed via props.
 
 <LabelDemo client:visible />
 
@@ -24,5 +24,5 @@ import { Label } from '@ui/modules/core/primitives/Label';
 ## Conventions
 
 - `peer-disabled:` styles dim the label and switch the cursor when a sibling control marked `peer` is disabled. The control must precede the label in the DOM for Tailwind's peer selector to apply — reorder visually with CSS (`order-*`) if the label should appear first.
-- The app's form layer (`src/ui/modules/core/primitives/Form.tsx`, reference-only here) wraps this same component as `FormLabel` and adds error coloring plus automatic `htmlFor` wiring.
+- The app's form layer (`apps/web/src/ui/modules/core/primitives/Form.tsx`, reference-only here) wraps this same component as `FormLabel` and adds error coloring plus automatic `htmlFor` wiring.
 - Pair with [Input](/design-system/components/input/) and [Textarea](/design-system/components/textarea/).
