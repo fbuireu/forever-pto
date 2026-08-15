@@ -1,6 +1,22 @@
+import { CA, DE, EN, ES, FR, IT } from '@infrastructure/i18n/locales';
 import { getLocaleFromPathname, localePath } from '@infrastructure/i18n/utils/url';
-import { getTranslations } from 'next-intl/server';
+import ca from '@i18n/messages/ca.json';
+import de from '@i18n/messages/de.json';
+import en from '@i18n/messages/en.json';
+import es from '@i18n/messages/es.json';
+import fr from '@i18n/messages/fr.json';
+import it from '@i18n/messages/it.json';
+import { createTranslator } from 'next-intl';
 import pkg from '../../../package.json';
+
+const MESSAGES: Record<string, typeof en> = {
+  [CA]: ca,
+  [DE]: de,
+  [EN]: en,
+  [ES]: es,
+  [FR]: fr,
+  [IT]: it,
+};
 
 const MARKDOWN_ROUTES = [
   { path: '/legal/cookie-policy', title: 'cookiePolicy.title', description: 'cookiePolicy.description' },
@@ -12,7 +28,8 @@ const MARKDOWN_ROUTES = [
 
 export async function buildMarkdownPage(baseUrl: string, pathname: string) {
   const locale = getLocaleFromPathname(pathname);
-  const t = await getTranslations({ locale, namespace: 'metadata' });
+  const messages = MESSAGES[locale];
+  const t = createTranslator({ locale, messages, namespace: 'metadata' });
 
   const route = MARKDOWN_ROUTES.find(({ path }) => pathname.includes(path));
 
@@ -31,7 +48,7 @@ ${baseUrl}${localePath(locale, route.path)}
   }
 
   if (pathname.includes('/planner')) {
-    const tPlanner = await getTranslations({ locale, namespace: 'planner' });
+    const tPlanner = createTranslator({ locale, messages, namespace: 'planner' });
 
     return `# ${t('planner.title')}
 

@@ -20,7 +20,7 @@ The largest single thing in here is a browser file — the Web Worker.
 | `clients/` | SDK wrappers — four Effect service tags plus four modules that are deliberately not services. See [`clients/CLAUDE.md`](./clients/CLAUDE.md) |
 | `i18n/` | `routing.ts` (next-intl routing, `localePrefix: 'as-needed'`), `config.ts` (request config + message loading), `locales.ts` (the six codes), `cookie.ts` (`NEXT_LOCALE`), `utils/url.ts` (`localePath`, `getLocaleFromPathname`, `localeAlternates`) |
 | `images/` | `loader.ts` — rewrites an image src to `/cdn-cgi/image/...`, the Cloudflare optimiser used in place of Next's built-in one ([ADR 0004](../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)) |
-| `markdown/` | `buildMarkdownPage.ts` — the Markdown twin of a page, served when the request asks for `text/markdown` |
+| `markdown/` | `buildMarkdownPage.ts` — the Markdown twin of a page, served when the request asks for `text/markdown`. Translates through `createTranslator` over statically imported bundles, never `next-intl/server` — see *Gotchas* |
 | `seo/` | `buildMetadata.ts` — the `Metadata` shape every route's `generateMetadata` fills in; `routes.ts` — `SITE_ROUTES`, the one list of pages and whether each is indexable |
 | `proxy/` | Middleware helpers: `location.ts` (country detection + cookie) and `cookie.ts` (`user-country`, one week) |
 | `services/` | Everything with a purpose but no SDK of its own: `contact/`, `countries/`, `env/`, `holidays/`, `location/`, `payments/`, `premium/`, `regions/`. Three carry their own guides — [holidays](./services/holidays/CLAUDE.md), [location](./services/location/CLAUDE.md), [payments](./services/payments/CLAUDE.md) |
@@ -123,6 +123,15 @@ already drifted over how a missing IP header was recorded.
   would have caught them drifting apart.
 - **Turso opens a connection per call.** `query`, `execute` and `batch` each call `connect()` themselves, so
   two calls are two connections and nothing spans them transactionally.
+- **A route handler must not translate through `next-intl/server`.** `getTranslations` memoises its message
+  loading, and on Cloudflare that cache outlives the request that filled it — the second request onward throws
+  `Cannot perform I/O on behalf of a different request`, which is workerd refusing to let one request touch an
+  I/O object another created. `/api/markdown` did exactly this: the first request after each deploy answered
+  200 and every one after it answered 500, which read as flakiness because only some tests ran second.
+  `buildMarkdownPage.ts` uses `createTranslator` from `next-intl` over the six statically imported bundles
+  instead — no cache, no request scope, same compile-time checking of message keys — and its test asserts the
+  module never imports `next-intl/server` again. Nothing reproduces this locally: Node has no such rule, and
+  20 consecutive requests to `next start` all succeed.
 
 ## Testing
 
