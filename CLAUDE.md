@@ -159,6 +159,10 @@ gate protects web production and the app's `NEXT_PUBLIC_*` vars were visible to 
 The `vars` are environment-scoped and live on the two `web-*` environments; the Cloudflare and release
 secrets are repository-level and are read outside any environment.
 
+**`cross-package-notice` is advisory, not a gate.** A pull request touching both packages lands in both
+changelogs, because attribution is by path and `main` takes squash merges. Sometimes that is what you
+want, so the job posts a sticky comment saying what will happen and does not fail the run.
+
 **`docs-refresh` exists because the release commit carries `[skip ci]`.** The docs site renders the app
 version from `apps/web/package.json`; without a dispatch after a web release, the published site keeps
 advertising the previous one.

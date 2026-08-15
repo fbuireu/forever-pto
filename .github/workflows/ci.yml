@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       web: ${{ steps.filter.outputs.web }}
+      cross_package: ${{ steps.filter.outputs.cross_package }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -34,6 +35,7 @@ jobs:
         run: |
           if [ -z "$BASE_SHA" ] || ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
             echo 'web=true' >> "$GITHUB_OUTPUT"
+            echo 'cross_package=false' >> "$GITHUB_OUTPUT"
             echo "::notice::No usable base commit, treating this as a web change."
             exit 0
           fi
@@ -44,6 +46,12 @@ jobs:
           else
             echo 'web=false' >> "$GITHUB_OUTPUT"
             echo "::notice::No apps/web change in this range; the web deploy and release are skipped."
+          fi
+          if printf '%s\n' "$changed" | grep -qE '^apps/web/' && printf '%s\n' "$changed" | grep -qE '^apps/docs/'; then
+            echo 'cross_package=true' >> "$GITHUB_OUTPUT"
+            echo "::warning::This range touches both apps/web and apps/docs. Releases are attributed by path, so a squash merge of this will appear in both changelogs. See adr/0011."
+          else
+            echo 'cross_package=false' >> "$GITHUB_OUTPUT"
           fi
 
   lint:
@@ -165,6 +173,42 @@ jobs:
           GH_TOKEN: ${{ secrets.PAT }}
           GH_REPO: ${{ github.repository }}
         run: gh workflow run docs.yml --ref main
+
+  cross-package-notice:
+    name: Cross-package pull request
+    needs: [changes]
+    if: ${{ github.event_name == 'pull_request' && needs.changes.outputs.cross_package == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    env:
+      MARKER: '<!-- cross-package -->'
+    steps:
+      - name: Find existing comment
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4.0.0
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: github-actions[bot]
+          body-includes: ${{ env.MARKER }}
+      - name: Upsert notice
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5.0.0
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            ${{ env.MARKER }}
+            ### This pull request touches both packages
+
+            Releases are attributed by the paths a commit touches, and `main` takes squash
+            merges — so this will be listed in **both** the `apps/web` and the `apps/docs`
+            changelog, under whatever type the PR title carries.
+
+            That is sometimes what you want (a change that genuinely spans both). If it is
+            not, split it. See [adr/0011](../blob/main/adr/0011-per-package-versioning-with-a-bridge-tag.md).
+
+            This is advisory. It does not block the merge.
 
   deploy-development:
     name: Deploy to development
