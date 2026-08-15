@@ -90,8 +90,9 @@ it deliberately or not at all.
 `HolidayDTO`; `variant` is National, Regional or Custom and is derived from `location`. The glossary reserves
 the word "type" for the upstream sense — see [`CONTEXT.md`](../../../../../../CONTEXT.md).
 
-**`location` is the only signal of Variant.** `getRegionalHolidays` stamps `location: region` onto every
-entry it returns and national lookups leave it absent. Downstream, that single field decides REGIONAL vs
+**`location` is the only signal of Variant.** `observedHolidays` looks the country up twice — once bare, once
+with the region — and stamps `location: region` onto the regional entries only; the national lookup leaves it
+absent. Downstream, that single field decides REGIONAL vs
 NATIONAL and drives the dedupe that keeps the National Holiday when both fall on the same date. Dropping
 it, or setting it on national entries, silently rewrites the calendar.
 

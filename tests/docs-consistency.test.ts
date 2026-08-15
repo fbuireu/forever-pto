@@ -47,6 +47,7 @@ const trackedFiles = execFileSync('git', ['ls-files', '--cached', '--others', '-
   .filter((path) => path.length > 0 && !path.startsWith('.') && existsSync(join(ROOT, path)));
 
 const markdownFiles = trackedFiles.filter((path) => path.endsWith('.md'));
+const contentFiles = trackedFiles.filter((path) => path.endsWith('.mdx'));
 const authoredMarkdown = markdownFiles.filter((path) => !GENERATED_MARKDOWN.has(path));
 const sourceFiles = trackedFiles.filter((path) => SOURCE_FILE.test(path));
 const read = (path: string) => readFileSync(join(ROOT, path), 'utf8');
@@ -251,17 +252,27 @@ describe('documentation does not point at things that are gone', () => {
   // Absent from the tracked tree by design, yet the guides have to name it.
   const GENERATED = new Set([GENERATED_ENV_TYPES]);
 
-  it('names only source files that still exist somewhere', () => {
-    const exists = (token: string) => sourceFiles.some((path) => path === token || path.endsWith(`/${token}`));
-
+  const exists = (token: string) => sourceFiles.some((path) => path === token || path.endsWith(`/${token}`));
+  const citedSourceFiles = (files: string[]) => {
     const missing: string[] = [];
-    for (const file of authoredMarkdown) {
+    for (const file of files) {
       for (const [, token] of read(file).matchAll(BACKTICKED_SOURCE_FILE)) {
         if (token.includes('*') || token.startsWith('.') || GENERATED.has(token)) continue;
         if (!exists(token)) missing.push(`${file} -> ${token}`);
       }
     }
-    expect(missing).toEqual([]);
+    return missing;
+  };
+
+  it('names only source files that still exist somewhere', () => {
+    expect(citedSourceFiles(authoredMarkdown)).toEqual([]);
+  });
+
+  // The published wiki is .mdx, which every rule above skips by extension. That is how 454 stale
+  // paths and a citation of a CONTEXT.md the contract forbids survived a restructure unnoticed.
+  it('names only source files that still exist, in the published wiki too', () => {
+    expect(contentFiles.length).toBeGreaterThan(50);
+    expect(citedSourceFiles(contentFiles)).toEqual([]);
   });
 });
 
