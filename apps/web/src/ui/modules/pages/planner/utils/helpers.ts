@@ -11,7 +11,6 @@ import {
   startOfMonth,
   startOfWeek,
 } from '@application/shared/utils/dates';
-import type { Locale } from 'next-intl';
 import type { FromTo } from '../calendar/Calendar';
 
 const CALENDAR_WEEKS = 6;
@@ -19,25 +18,6 @@ const DAYS_PER_WEEK = 7;
 const CALENDAR_SIZE = CALENDAR_WEEKS * DAYS_PER_WEEK;
 
 export const MONTHS_IN_YEAR = 12;
-
-interface GetWeekdayNamesParams {
-  locale: Locale;
-  weekStartsOn: Day;
-}
-
-const weekdayFmtCache = new Map<string, Intl.DateTimeFormat>();
-
-export const getWeekdayNames = ({ locale, weekStartsOn }: GetWeekdayNamesParams) => {
-  const monday = new Date(2023, 0, 2);
-  const weekStart = startOfWeek(monday, { weekStartsOn });
-  const cacheKey = `${locale}-${weekStartsOn}`;
-  let fmt = weekdayFmtCache.get(cacheKey);
-  if (!fmt) {
-    fmt = new Intl.DateTimeFormat(locale as string, { weekday: 'short' });
-    weekdayFmtCache.set(cacheKey, fmt);
-  }
-  return Array.from({ length: DAYS_PER_WEEK }, (_, i) => fmt.format(addDays(weekStart, i)));
-};
 
 interface GetTotalMonthsParams {
   carryOverMonths: number;

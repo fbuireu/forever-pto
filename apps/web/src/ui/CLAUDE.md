@@ -18,7 +18,11 @@ Everything the user sees, plus the browser plumbing that feeds it: components, h
 
 ## Layer rules
 
-This layer may import from `@application/*` — stores, DTO types, `@application/i18n/navigation`, `@application/shared/utils/dates` — and from `@domain/calendar/types` plus two pure helpers, `resolveSelectedDays` and `measureBudget`. It must not reach into the planning engine itself: suggestions are produced by the worker and read back from the holidays store.
+This layer may import from `@application/*` — stores, DTO types, `@application/i18n/navigation`, `@application/shared/utils/dates` — and from `@domain/calendar` a short list of **pure value helpers**: the `types`, `resolveSelectedDays`,
+`measureBudget`, and `windowMonthCount`/`windowMonthIndex` for the timeline strip. It must not reach into
+the planning engine itself — no generator, no selector, no `findPlanningCandidates`: Suggestions are
+produced by the worker and read back from the holidays store. The line is between *arithmetic the engine
+happens to own* and *the act of planning*.
 
 Imports from `@infrastructure/*` are allowed where there is no alternative, and the list is short enough to keep honest: `i18n/locales`, `i18n/utils/url` (`localePath`, in `JsonLd.tsx`), the BetterStack tracking helper (the logging client itself only through a dynamic import, see below), `errors`, the worker types and serializers, `services/env/getPublicEnv`, `services/countries/getCountries`, the Stripe browser client, the driver.js tutorial client, and the `actions/payment` and `actions/contact` server actions. Anything beyond outbound I/O the UI genuinely initiates does not belong here.
 

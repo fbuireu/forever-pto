@@ -2,12 +2,12 @@
 
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import { differenceInDays, getDayOfMonth, getMonth, getYear } from '@application/shared/utils/dates';
+import { windowMonthCount, windowMonthIndex } from '@domain/calendar/metrics/utils/helpers';
 import type { Suggestion } from '@domain/calendar/types';
 import { cn } from '@ui/utils/cn';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { Temporal } from 'temporal-polyfill';
-import { MONTHS_IN_YEAR } from '../utils/helpers';
 
 interface Seg {
   start: Date;
@@ -18,19 +18,15 @@ function getDaysInMonth(month: number, year: number) {
   return Temporal.PlainYearMonth.from({ year, month: month + 1 }).daysInMonth;
 }
 
-function windowColumn(date: Date, year: number) {
-  return (getYear(date) - year) * MONTHS_IN_YEAR + getMonth(date);
-}
-
 function segPos(date: Date, year: number, monthCount: number) {
   const day = getDayOfMonth(date);
   const daysInMonth = getDaysInMonth(getMonth(date), getYear(date));
-  return (windowColumn(date, year) + (day - 1) / daysInMonth) / monthCount;
+  return (windowMonthIndex(date, { year }) + (day - 1) / daysInMonth) / monthCount;
 }
 
 function segWidth(start: Date, end: Date, year: number, monthCount: number) {
   const daysInMonth = getDaysInMonth(getMonth(end), getYear(end));
-  const endFrac = (windowColumn(end, year) + getDayOfMonth(end) / daysInMonth) / monthCount;
+  const endFrac = (windowMonthIndex(end, { year }) + getDayOfMonth(end) / daysInMonth) / monthCount;
   return Math.max(endFrac - segPos(start, year, monthCount), 0.005);
 }
 
@@ -79,7 +75,7 @@ export const YearTimelineChart = ({
 }: YearTimelineChartProps) => {
   const t = useTranslations('summary');
   const locale = useLocale();
-  const monthCount = MONTHS_IN_YEAR + carryOverMonths;
+  const monthCount = windowMonthCount({ carryOverMonths });
 
   const months = useMemo(
     () =>

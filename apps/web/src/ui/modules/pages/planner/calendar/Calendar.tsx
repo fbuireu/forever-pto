@@ -4,6 +4,7 @@ import {
   addMonths,
   type Day,
   formatDate,
+  getWeekdayNames,
   isSameDay,
   isSameMonth,
   isWeekend,
@@ -26,7 +27,7 @@ import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { getCalendarDays, getWeekdayNames } from '../utils/helpers';
+import { getCalendarDays } from '../utils/helpers';
 import {
   getPreviewRange,
   isAlternative,

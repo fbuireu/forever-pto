@@ -242,9 +242,10 @@ hard-coded twelve columns, while `Summary` handed it the raw two-year `holidays`
 `year + 1` was painted onto the `year` strip: for ES/2026 the National row marked 26 March, which is Good
 Friday **2027** and an ordinary Workday in 2026. The two defects are independent, and filtering alone does
 not fix it — with the default `carryOverMonths: 1` the window itself reaches into January of `year + 1`, so
-an in-window date there still folded onto the January column. The chart now takes `carryOverMonths`, sizes
-itself to `12 + carryOverMonths` columns, and places a date at
-`(getYear(date) - year) * 12 + getMonth(date)` — the same arithmetic as `windowMonthIndex` in the engine.
+an in-window date there still folded onto the January column. The chart now takes `carryOverMonths` and calls the
+engine's own `windowMonthCount` and `windowMonthIndex` rather than restating them. It carried a private
+`windowColumn` that was `windowMonthIndex` character for character, kept in step by this sentence; a rule
+two files hold and a paragraph reconciles is a rule that will drift.
 `Summary` passes `holidaysInWindow`, matching `HolidaysDistributionChart`. A stretch crossing 31 December
 now also gets a real width instead of hitting the `Math.max(…, 0.005)` clamp.
 
