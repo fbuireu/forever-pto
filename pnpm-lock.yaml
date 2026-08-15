@@ -232,8 +232,8 @@ importers:
         specifier: 5.0.0
         version: 5.0.0(@astrojs/starlight@0.41.7(astro@7.1.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.2.0)(aws4fetch@1.0.20)(jiti@2.7.0)(terser@5.16.9)(yaml@2.9.0))(supports-color@10.2.2)(typescript@6.0.3))(tailwindcss@4.3.3)
       '@base-ui/react':
-        specifier: 1.6.0
-        version: 1.6.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: 1.7.0
+        version: 1.7.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@fontsource-variable/bricolage-grotesque':
         specifier: 5.2.10
         version: 5.2.10
@@ -818,23 +818,6 @@ packages:
     resolution: {integrity: sha512-Vj1jF3cPfxg7OAfoI7QnVKLoILlm2JF9pnVHrX8qx7AHMiYWT+NDAA7jChlNgRS4WTLc/fD1lXLmPixluj+3Gg==}
     engines: {node: '>=6.9.0'}
 
-  '@base-ui/react@1.6.0':
-    resolution: {integrity: sha512-/jzjTWJYXhRFO45Bev9lc3cHbmjzCMpUqbMZ2AgKy/z25mY9B6shGSNcXcjQar9n5doM0KYW1W8fcFv2jZBuMw==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      '@date-fns/tz': ^1.2.0
-      '@types/react': ^17 || ^18 || ^19
-      date-fns: ^4.0.0
-      react: ^17 || ^18 || ^19
-      react-dom: ^17 || ^18 || ^19
-    peerDependenciesMeta:
-      '@date-fns/tz':
-        optional: true
-      '@types/react':
-        optional: true
-      date-fns:
-        optional: true
-
   '@base-ui/react@1.7.0':
     resolution: {integrity: sha512-j+8QjX44C32jrXD/qyEAGpFr70FRpGL2CY61mQd9nBPWN737CK0xxD1ceJ055rW4RtdvFDT1e7otzdlfxvsYug==}
     engines: {node: '>=14.0.0'}
@@ -850,16 +833,6 @@ packages:
       '@types/react':
         optional: true
       date-fns:
-        optional: true
-
-  '@base-ui/utils@0.3.1':
-    resolution: {integrity: sha512-gFFiltORVmW/N6IILTGxizP3PBpVpysqML1ALY5Vk0mH+7faVkCknOU31goYHN5Aoek2dkjxva1XOD2Ce9WuIg==}
-    peerDependencies:
-      '@types/react': ^17 || ^18 || ^19
-      react: ^17 || ^18 || ^19
-      react-dom: ^17 || ^18 || ^19
-    peerDependenciesMeta:
-      '@types/react':
         optional: true
 
   '@base-ui/utils@0.3.2':
@@ -8740,18 +8713,6 @@ snapshots:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
 
-  '@base-ui/react@1.6.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
-    dependencies:
-      '@babel/runtime': 7.29.7
-      '@base-ui/utils': 0.3.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@floating-ui/react-dom': 2.1.9(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@floating-ui/utils': 0.2.12
-      react: 19.2.8
-      react-dom: 19.2.8(react@19.2.8)
-      use-sync-external-store: 1.6.0(react@19.2.8)
-    optionalDependencies:
-      '@types/react': 19.2.18
-
   '@base-ui/react@1.7.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@babel/runtime': 7.29.7
@@ -8760,17 +8721,6 @@ snapshots:
       '@floating-ui/utils': 0.2.12
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
-      use-sync-external-store: 1.6.0(react@19.2.8)
-    optionalDependencies:
-      '@types/react': 19.2.18
-
-  '@base-ui/utils@0.3.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
-    dependencies:
-      '@babel/runtime': 7.29.7
-      '@floating-ui/utils': 0.2.12
-      react: 19.2.8
-      react-dom: 19.2.8(react@19.2.8)
-      reselect: 5.2.0
       use-sync-external-store: 1.6.0(react@19.2.8)
     optionalDependencies:
       '@types/react': 19.2.18
