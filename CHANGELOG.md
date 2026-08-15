@@ -1,3 +1,11 @@
+## [1.8.2](https://github.com/fbuireu/forever-pto/compare/v1.8.1...v1.8.2) (2026-08-15)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @astrojs/starlight to v0.41.7 ([#360](https://github.com/fbuireu/forever-pto/issues/360)) ([4f08495](https://github.com/fbuireu/forever-pto/commit/4f084950da064f1469e3d1aa8c35f6a1bbcfd9b4))
+* **deps:** update react monorepo ([#361](https://github.com/fbuireu/forever-pto/issues/361)) ([19ea5ea](https://github.com/fbuireu/forever-pto/commit/19ea5ea1452cfd8c3a752fe385ffa7b140400b7d))
+
 ## [1.8.1](https://github.com/fbuireu/forever-pto/compare/v1.8.0...v1.8.1) (2026-08-15)
 
 
