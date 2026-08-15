@@ -5,23 +5,23 @@ on:
     paths:
       - 'apps/docs/**'
       - 'apps/web/package.json'
-      - 'apps/web/src/ui/modules/core/**'
-      - 'apps/web/src/ui/modules/pages/homepage/sections/**'
-      - 'apps/web/src/ui/styles/**'
-      - 'apps/web/src/ui/utils/**'
+      - 'apps/web/src/ui/**'
+      - 'apps/web/src/domain/calendar/types.ts'
+      - 'apps/web/src/infrastructure/i18n/locales.ts'
       - 'pnpm-lock.yaml'
       - '.github/workflows/docs.yml'
+      - '.github/actions/prepare-env/**'
   push:
     branches: [main]
     paths:
       - 'apps/docs/**'
       - 'apps/web/package.json'
-      - 'apps/web/src/ui/modules/core/**'
-      - 'apps/web/src/ui/modules/pages/homepage/sections/**'
-      - 'apps/web/src/ui/styles/**'
-      - 'apps/web/src/ui/utils/**'
+      - 'apps/web/src/ui/**'
+      - 'apps/web/src/domain/calendar/types.ts'
+      - 'apps/web/src/infrastructure/i18n/locales.ts'
       - 'pnpm-lock.yaml'
       - '.github/workflows/docs.yml'
+      - '.github/actions/prepare-env/**'
   workflow_dispatch:
 
 permissions:
