@@ -132,6 +132,12 @@ describe('the workspace is shaped the way the guides describe it', () => {
     expect(workspaceGlobs.some((glob) => pkg.startsWith(glob.replace(/\*$/, '')))).toBe(true);
   });
 
+  it.each(WORKSPACE_PACKAGES)('%s explains itself to a human and to an agent', (pkg) => {
+    expect(existsSync(join(ROOT, pkg, 'README.md'))).toBe(true);
+    expect(existsSync(join(ROOT, pkg, 'CLAUDE.md'))).toBe(true);
+    expect(read('README.md')).toContain(`(${pkg}/README.md)`);
+  });
+
   it('keeps the root private, unversioned and dependency-free', () => {
     expect(rootManifest.private).toBe(true);
     expect(rootManifest.version).toBe('0.0.0');

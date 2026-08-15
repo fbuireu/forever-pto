@@ -1,6 +1,9 @@
 <div align="center">
 
-<img src="apps/web/public/static/images/forever-pto-logo.png" alt="" width="80" align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="apps/web/public/static/images/forever-pto-logo-dark.png">
+  <img src="apps/web/public/static/images/forever-pto-logo.png" alt="" width="80" align="center">
+</picture>
 
 # Forever PTO
 
@@ -121,7 +124,9 @@ See [`apps/web/.env.example`](apps/web/.env.example) for the full list. Key vari
 
 | Document | What it answers |
 | --- | --- |
-| [`CLAUDE.md`](CLAUDE.md) | How the codebase is built, and the rules for changing it. Start here |
+| [`CLAUDE.md`](CLAUDE.md) | How the repository is put together, and the rules for changing it. Start here |
+| [`apps/web/README.md`](apps/web/README.md) | The planner: what it does, how to run it, how it releases |
+| [`apps/docs/README.md`](apps/docs/README.md) | The wiki: how to run it, and how to write a page |
 | [`CONTEXT.md`](CONTEXT.md) | The domain glossary — one canonical name per concept |
 | [`adr/`](adr/) | Why it is like this. One hard-to-reverse decision per file |
 

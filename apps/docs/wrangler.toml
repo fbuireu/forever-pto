@@ -7,8 +7,14 @@ preview_urls = true
 directory = "./dist"
 not_found_handling = "404-page"
 
-# docs.forever-pto.com lives here: on deploy, wrangler provisions the DNS
-# record and certificate in the forever-pto.com zone automatically.
-[[routes]]
+[env.production]
+name = "forever-pto-docs"
+
+[[env.production.routes]]
 pattern = "docs.forever-pto.com"
 custom_domain = true
+
+[env.development]
+name = "forever-pto-docs-development"
+workers_dev = true
+preview_urls = true

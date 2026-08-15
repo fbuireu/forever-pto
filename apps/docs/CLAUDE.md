@@ -21,6 +21,10 @@ The Forever PTO documentation wiki (docs.forever-pto.com). An Astro Starlight si
 
 ## Deploy
 
-- PRs: `wrangler versions upload --preview-alias pr-<n>` → deterministic preview URL on workers.dev; versions are immutable, no teardown exists or is needed.
-- main: `wrangler deploy` → docs.forever-pto.com (custom domain declared in `wrangler.toml`).
-- Bootstrap: `versions upload` cannot create the Worker, so the preview job probes with `versions list` and skips gracefully until the first production deploy has created `forever-pto-docs` (done 2026-07-12).
+Two wrangler environments, the same shape the app uses. `[assets]` is declared once at the top level and both inherit it; only `name` and the route differ.
+
+- **main**: `deploy --env production` → `forever-pto-docs`, bound to docs.forever-pto.com. The route is `custom_domain = true`, so wrangler provisions the DNS record and the certificate in the forever-pto.com zone itself — there is nothing to configure in the dashboard.
+- **PRs**: `deploy --env development --name pr-<n>-forever-pto-docs-development` → one Worker per pull request at `pr-<n>-forever-pto-docs-development.fbuireu.workers.dev`. The `--name` override is what mints a fresh Worker instead of updating the stable one, so two open PRs never overwrite each other's preview.
+- **`cleanup-development.yml` deletes it when the PR closes**, in a job of its own beside the app's. A per-PR Worker that nothing tears down accumulates forever.
+- **Previews never touch the production Worker**, which is the whole point of the development environment: it carries no custom domain, so a preview cannot answer on docs.forever-pto.com.
+- The four GitHub environments are split per package: this site uses `docs-production` and `docs-development`, and carries no configuration in either — the Cloudflare credentials are repository-level secrets.
