@@ -39,7 +39,7 @@ the payment record *is* the entitlement ([ADR 0008](./docs/adr/0008-premium-deri
 
 - Node **26.3.0** (`.nvmrc`, mirrored in `engines.node`) — `.nvmrc` is what every CI job installs
 - pnpm **11.21.0** (`packageManager`) — always use pnpm, never npm/yarn
-- TypeScript **7** and Next **16.3+** move together, in that order — see *Structure & aliases* for why
+- TypeScript **6** and Next **16.2** — pinned as a pair by the Cloudflare adapter, see *Structure & aliases*
 
 ## Commands
 
@@ -101,29 +101,24 @@ land at the *next build* rather than at the deletion site, so deleting either as
 or lets JavaScript into a TypeScript-only codebase, a long way from the change. `docs/docs-consistency.test.ts`
 asserts both, and asserts that `cloudflare-env.d.ts` stays in `exclude` and `.gitignore` for the reason below.
 
-**TypeScript is 7, and Next 16.3 is what made that possible — the two versions are one decision.** TypeScript 7
-ships the Go compiler and no `lib/typescript.js`, so the JavaScript compiler API is gone. Next's old
-type-checking path loaded exactly that file, which is why 6 was the ceiling until 16.3: from 16.3 `next build`
-shells out to the project-local `tsc` instead, and the switch is the default, so nothing in `next.config.ts`
-turns it on. Downgrading Next below 16.3 without downgrading TypeScript first kills `pnpm build` before it
-type-checks anything. `experimental.useTypeScriptCli: false` is the opt-out back to the compiler API and is a
-build failure while TypeScript is 7 — the flag exists only for a project still on 6.
+**TypeScript stays on 6 and Next stays on 16.2, and the pair is one decision, forced by Cloudflare.** Next 16.3
+crashes the deployed Worker on any route rendered at request time: `@opennextjs/cloudflare` 1.20.2 is the
+latest adapter and shipped 2026-08-01, two days before 16.3.0 existed, and there is no newer version or beta.
+The symptom is the 404 page answering with Cloudflare **Error 1101 (Worker threw exception)** instead of
+itself, which is what `e2e/[locale]/not-found.spec.ts` catches. `/_not-found` is the only page that renders
+per request — everything else is prerendered and served from cache, so nothing else shows it.
+[ADR 0009](./docs/adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md).
 
-Two consequences worth knowing before they surprise you. `tsc` prints its own diagnostics, so Next's code
-frames and its rewritten messages for pages, layouts and route handlers are gone from build output; and the
-CLI checks the whole project the `tsconfig` selects — tests and `.next/dev/types` included — so a type error
-in a `*.test.ts` now fails the production build, not just `pnpm lint:ts:typecheck`.
+TypeScript is pinned to 6 because it cannot move without Next moving first. TypeScript 7 ships the Go compiler
+and no `lib/typescript.js`, and Next's type-checking path loads exactly that file; only from 16.3 does
+`next build` shell out to the project-local `tsc` instead. So raising TypeScript to 7 while Next is 16.2 kills
+`pnpm build` before it type-checks anything. Raise Next first, and only once the adapter supports it.
 
-The rest of the 7 migration cost this repo nothing, because the settings 7 removes or re-defaults were already
-right: `baseUrl` was dropped ahead of time, `strict` and `esModuleInterop` were already on, `types` was already
-an explicit `["node"]` rather than the implicit everything, and `target`/`module` were already `ESNext`. The
-one thing that did break is [`docs/docs-consistency.test.ts`](./docs/docs-consistency.test.ts): it parses
-source files with the compiler API to enforce the no-comments rule, so it imports `@typescript/typescript6` —
-Microsoft's compatibility package pinning the 6.x API — rather than `typescript`. That import is a parser for
-one test and not a second toolchain; drop it when 7.1 ships the replacement API. The same missing API is why
-the `{ "name": "next" }` `tsserver` plugin no longer loads if the editor is pointed at the workspace
-TypeScript: leave VS Code on its bundled version to keep the plugin's `'use client'` and segment-config
-checks.
+Two things follow that are easy to trip over. `partialPrefetching` in `next.config.ts` is a 16.3 option and is
+a config error on 16.2 — it must stay out while Next is pinned. And
+[`docs/docs-consistency.test.ts`](./docs/docs-consistency.test.ts) imports `typescript` directly for its
+compiler-API parsing; under TypeScript 7 that import has to become `@typescript/typescript6`, Microsoft's
+compatibility package pinning the 6.x API, so the two move together too.
 
 Path aliases (`tsconfig.json` `compilerOptions.paths`): `src/*`, `@app/*`, `@application/*`, `@domain/*`,
 `@infrastructure/*`, `@ui/*`, `@assets/*` (→ `src/ui/assets`), `@styles/*` (→ `src/ui/styles`), `@i18n/*`
