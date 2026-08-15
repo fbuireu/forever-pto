@@ -1,11 +1,14 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockGetTranslations } = vi.hoisted(() => ({
-  mockGetTranslations: vi.fn(),
+const { mockCreateTranslator } = vi.hoisted(() => ({
+  mockCreateTranslator: vi.fn(),
 }));
 
-vi.mock('next-intl/server', () => ({
-  getTranslations: mockGetTranslations,
+vi.mock('next-intl', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('next-intl')>()),
+  createTranslator: mockCreateTranslator,
 }));
 
 vi.mock('../../../package.json', () => ({
@@ -16,10 +19,19 @@ import { buildMarkdownPage } from './buildMarkdownPage';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
+describe('stays free of request-scoped translation APIs', () => {
+  it('never imports next-intl/server', () => {
+    const source = readFileSync(join(__dirname, 'buildMarkdownPage.ts'), 'utf8');
+    expect(source).not.toContain('next-intl/server');
+  });
+});
+
 describe('buildMarkdownPage', () => {
   beforeEach(() => {
-    mockGetTranslations.mockImplementation(({ namespace }: { namespace: string }) =>
-      Promise.resolve((key: string) => `[${namespace}:${key}]`)
+    mockCreateTranslator.mockImplementation(
+      ({ namespace }: { namespace: string }) =>
+        (key: string) =>
+          `[${namespace}:${key}]`
     );
   });
 
