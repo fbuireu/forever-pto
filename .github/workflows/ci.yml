@@ -97,7 +97,7 @@ jobs:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.web == 'true' }}
     uses: ./.github/workflows/_deploy-web.yml
     with:
-      environment: production
+      environment: web-production
       wrangler_env: production
       url: https://forever-pto.com
     secrets:
@@ -172,7 +172,7 @@ jobs:
     if: ${{ github.event_name == 'pull_request' && needs.changes.outputs.web == 'true' }}
     uses: ./.github/workflows/_deploy-web.yml
     with:
-      environment: development
+      environment: web-development
       wrangler_env: development
       worker_name: pr-${{ github.event.pull_request.number }}-forever-pto-development
       url: https://pr-${{ github.event.pull_request.number }}-forever-pto-development.fbuireu.workers.dev
@@ -222,7 +222,7 @@ jobs:
     name: E2E tests
     needs: [deploy-development]
     runs-on: ubuntu-latest
-    environment: development
+    environment: web-development
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

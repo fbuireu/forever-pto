@@ -68,7 +68,7 @@ jobs:
     if: github.event_name == 'pull_request'
     needs: [build]
     runs-on: ubuntu-latest
-    environment: development
+    environment: docs-development
     permissions:
       contents: read
       pull-requests: write
@@ -138,7 +138,7 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     environment:
-      name: production
+      name: docs-production
       url: https://docs.forever-pto.com
     steps:
       - name: Checkout
