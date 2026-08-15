@@ -1,4 +1,3 @@
-import { localeAlternates, localePath } from '@infrastructure/i18n/utils/url';
 import { buildMetadata } from '@infrastructure/seo/buildMetadata';
 import { isIndexable } from '@infrastructure/seo/routes';
 import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';

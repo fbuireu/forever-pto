@@ -34,7 +34,7 @@
     }
   },
   "linter": {
-    "includes": ["**", "!**/*.d.ts*"],
+    "includes": ["**", "!**/*.d.ts*", "!**/*.astro"],
     "rules": {
       "preset": "recommended",
       "complexity": {

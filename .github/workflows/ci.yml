@@ -14,6 +14,38 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  changes:
+    name: Detect changed packages
+    runs-on: ubuntu-latest
+    outputs:
+      web: ${{ steps.filter.outputs.web }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Filter
+        id: filter
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+          WEB_PATHS: '^(apps/web/|patches/|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$|biome\.json$|\.npmrc$|\.nvmrc$|\.github/actions/|\.github/workflows/(ci|_deploy-web)\.yml$)'
+        run: |
+          if [ -z "$BASE_SHA" ] || ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            echo 'web=true' >> "$GITHUB_OUTPUT"
+            echo "::notice::No usable base commit, treating this as a web change."
+            exit 0
+          fi
+          changed=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          echo "$changed"
+          if printf '%s\n' "$changed" | grep -qE "$WEB_PATHS"; then
+            echo 'web=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'web=false' >> "$GITHUB_OUTPUT"
+            echo "::notice::No apps/web change in this range; the web deploy and release are skipped."
+          fi
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -47,20 +79,23 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/prepare-env
-      - name: Run tests with coverage
+      - name: Run app tests with coverage
+        working-directory: apps/web
         run: pnpm test:coverage
+      - name: Run the documentation contract suite
+        run: pnpm test:docs
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/lcov.info
+          files: ./apps/web/coverage/lcov.info
           fail_ci_if_error: false
 
   deploy-production:
     name: Deploy to production
-    needs: [lint, typecheck, test]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-    uses: ./.github/workflows/_deploy.yml
+    needs: [changes, lint, typecheck, test]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.web == 'true' }}
+    uses: ./.github/workflows/_deploy-web.yml
     with:
       environment: production
       wrangler_env: production
@@ -74,11 +109,11 @@ jobs:
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
 
-  release:
-    name: Semantic Release
+  release-web:
+    name: Semantic Release (web)
     runs-on: ubuntu-latest
-    needs: [lint, typecheck, test, deploy-production]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    needs: [changes, lint, typecheck, test, deploy-production]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.web == 'true' }}
     permissions:
       contents: write
       issues: write
@@ -86,6 +121,8 @@ jobs:
     concurrency:
       group: release
       cancel-in-progress: false
+    outputs:
+      released: ${{ steps.release.outputs.released }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -94,16 +131,46 @@ jobs:
           token: ${{ secrets.PAT }}
           persist-credentials: false
       - uses: ./.github/actions/prepare-env
+      - name: Verify a web release tag exists
+        run: |
+          if [ -z "$(git tag --list 'web-v*')" ]; then
+            echo '::error::No web-v* tag found. semantic-release would restart the web line at 1.0.0.'
+            exit 1
+          fi
       - name: Semantic Release
+        id: release
+        working-directory: apps/web
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
-        run: npx semantic-release
+        run: |
+          before=$(git tag --list 'web-v*' | wc -l)
+          pnpm exec semantic-release
+          after=$(git tag --list 'web-v*' | wc -l)
+          if [ "$after" -gt "$before" ]; then
+            echo 'released=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'released=false' >> "$GITHUB_OUTPUT"
+          fi
+
+  docs-refresh:
+    name: Rebuild the docs site on the new app version
+    runs-on: ubuntu-latest
+    needs: [release-web]
+    if: ${{ needs.release-web.outputs.released == 'true' }}
+    permissions:
+      actions: write
+    steps:
+      - name: Dispatch the docs workflow
+        env:
+          GH_TOKEN: ${{ secrets.PAT }}
+          GH_REPO: ${{ github.repository }}
+        run: gh workflow run docs.yml --ref main
 
   deploy-development:
     name: Deploy to development
-    needs: [lint, typecheck, test]
-    if: ${{ github.event_name == 'pull_request' }}
-    uses: ./.github/workflows/_deploy.yml
+    needs: [changes, lint, typecheck, test]
+    if: ${{ github.event_name == 'pull_request' && needs.changes.outputs.web == 'true' }}
+    uses: ./.github/workflows/_deploy-web.yml
     with:
       environment: development
       wrangler_env: development
@@ -170,11 +237,14 @@ jobs:
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
+        working-directory: apps/web
         run: pnpm exec playwright install --with-deps chromium
       - name: Install Playwright OS dependencies
         if: steps.playwright-cache.outputs.cache-hit == 'true'
+        working-directory: apps/web
         run: pnpm exec playwright install-deps chromium
       - name: Run E2E tests
+        working-directory: apps/web
         run: pnpm test:e2e
         env:
           BASE_URL: https://pr-${{ github.event.pull_request.number }}-forever-pto-development.fbuireu.workers.dev
@@ -185,5 +255,5 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: playwright-report
-          path: playwright-report/
+          path: apps/web/playwright-report/
           retention-days: 7

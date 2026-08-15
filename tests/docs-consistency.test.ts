@@ -15,7 +15,6 @@ const ADR_DIR = 'adr';
 const ADR_TEMPLATE = '0000-adr-template.md';
 // Written by `pnpm cf:typegen` into the web package, so it is absent from the tracked tree by design.
 const GENERATED_ENV_TYPES = 'cloudflare-env.d.ts';
-// Written by semantic-release: a record of the past, not a claim about the tree as it stands.
 const GENERATED_MARKDOWN = new Set([`${WEB}/CHANGELOG.md`]);
 
 // `pnpm <word>` occurrences in a guide that are not package scripts.
@@ -51,7 +50,6 @@ const markdownFiles = trackedFiles.filter((path) => path.endsWith('.md'));
 const authoredMarkdown = markdownFiles.filter((path) => !GENERATED_MARKDOWN.has(path));
 const sourceFiles = trackedFiles.filter((path) => SOURCE_FILE.test(path));
 const read = (path: string) => readFileSync(join(ROOT, path), 'utf8');
-// A missing guide fails its own assertion rather than crashing the module and taking every rule with it.
 const readIfPresent = (path: string) => (existsSync(join(ROOT, path)) ? read(path) : '');
 const readJson = (path: string) => JSON.parse(read(path));
 
@@ -133,24 +131,17 @@ describe('the workspace is shaped the way the guides describe it', () => {
     expect(workspaceGlobs.some((glob) => pkg.startsWith(glob.replace(/\*$/, '')))).toBe(true);
   });
 
-  // The root is the workspace root, not a package. A dependency here would be installed for both
-  // packages and belong to neither, which is the coupling the split exists to remove.
   it('keeps the root private, unversioned and dependency-free', () => {
     expect(rootManifest.private).toBe(true);
     expect(rootManifest.version).toBe('0.0.0');
     expect(rootManifest.dependencies).toBeUndefined();
   });
 
-  // One Biome config and one lockfile are deliberate: `--changed` needs the git root, and a second
-  // lockfile inside a package silently shadows the workspace resolution.
   it.each(WORKSPACE_PACKAGES)('%s carries no biome config and no lockfile of its own', (pkg) => {
     expect(existsSync(join(ROOT, pkg, 'biome.json'))).toBe(false);
     expect(existsSync(join(ROOT, pkg, 'pnpm-lock.yaml'))).toBe(false);
   });
 
-  // The strict/allowJs guard below reads apps/web/tsconfig.json because that is the file `next build`
-  // rewrites. It only rewrites the one beside its own config, so if these ever part company the guard
-  // would be watching a file nothing writes.
   it('keeps the web tsconfig beside the next config it is rewritten by', () => {
     expect(existsSync(join(ROOT, WEB, 'next.config.ts'))).toBe(true);
     expect(existsSync(join(ROOT, WEB, 'tsconfig.json'))).toBe(true);
@@ -321,8 +312,6 @@ describe('apps/web/src carries no explanatory comments', () => {
     return found.sort((a, b) => a.line - b.line);
   };
 
-  // A prefix that matches nothing makes this rule pass on an empty set, which is exactly how it read
-  // for the length of the move commit. The rule is only worth anything while it has files to check.
   it('has app sources to check at all', () => {
     expect(webSources.length).toBeGreaterThan(100);
   });
@@ -358,7 +347,6 @@ describe('the guides describe the project as it is configured', () => {
     expect(citedScripts(rootGuide).filter((script) => !(script in rootScripts))).toEqual([]);
   });
 
-  // A root passthrough of the same name satisfies a reader either way, so both manifests count.
   it('cites only web scripts that resolve in the web or root manifest', () => {
     const unknown = citedScripts(webGuide).filter((script) => !(script in webScripts) && !(script in rootScripts));
     expect(unknown).toEqual([]);
@@ -372,8 +360,6 @@ describe('the guides describe the project as it is configured', () => {
     expect([...documentedAliases].filter((alias) => !(alias in webTsconfigPaths))).toEqual([]);
   });
 
-  // Targets are relative to the tsconfig that declares them, which now sits two levels below the root.
-  // `resolve` rather than `join`, because a cross-package target legitimately starts with `../`.
   it('declares no alias pointing at a directory that does not exist', () => {
     const dangling = Object.entries(webTsconfigPaths).filter(([, [target]]) => {
       const path = resolve(ROOT, WEB, (target ?? '').replace(ALIAS_WILDCARD_SUFFIX, ''));

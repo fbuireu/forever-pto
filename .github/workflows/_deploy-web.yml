@@ -1,4 +1,4 @@
-name: Deploy (reusable)
+name: Deploy web (reusable)
 
 on:
   workflow_call:
@@ -68,7 +68,9 @@ jobs:
           max_attempts: 3
           retry_wait_seconds: 15
           shell: bash
-          command: pnpm run cf:build
+          command: |
+            cd "$GITHUB_WORKSPACE/apps/web"
+            pnpm run cf:build
       - name: Deploy to Cloudflare Workers
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         env:
@@ -82,6 +84,7 @@ jobs:
           retry_wait_seconds: 15
           shell: bash
           command: |
+            cd "$GITHUB_WORKSPACE/apps/web"
             NAME_FLAG=""
             if [ -n "${INPUTS_WORKER_NAME}" ]; then
               NAME_FLAG="--name ${INPUTS_WORKER_NAME}"
@@ -107,6 +110,7 @@ jobs:
           retry_wait_seconds: 15
           shell: bash
           command: |
+            cd "$GITHUB_WORKSPACE/apps/web"
             if [ -n "${INPUTS_WORKER_NAME}" ]; then
               TARGET_FLAG="--name ${INPUTS_WORKER_NAME}"
             else
