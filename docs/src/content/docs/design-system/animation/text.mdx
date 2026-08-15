@@ -5,15 +5,19 @@ sidebar:
   order: 3
 ---
 
-import { RotatingTextDemo, SlidingNumberDemo } from '../../../../components/demos/TextDemo';
+import { RotatingTextDemo } from '../../../../components/demos/TextDemo';
 
-Source: `src/ui/modules/core/animate/text/`. Both components are client-only Motion consumers and require a `LazyMotionProvider` ancestor.
+Source: `src/ui/modules/core/animate/text/`. Both components are client-only Motion consumers and require a `LazyMotionProvider` ancestor. `RotatingText` renders live below; `SlidingNumber` is documented rather than rendered, for the reason under its heading.
 
 ## SlidingNumber
 
 `SlidingNumber` (`src/ui/modules/core/animate/text/SlidingNumber.tsx`) renders a number as a stack of odometer rollers: each digit is a `1ch`-wide window over a column of 0–9 `m.span`s, and a per-digit spring (`stiffness: 200, damping: 20, mass: 0.4` by default) rolls the column the shortest way to the target digit. Digits are measured with `react-use-measure`, so the roller adapts to the surrounding font.
 
-<SlidingNumberDemo client:visible />
+:::note[Not rendered here]
+This component reads the active locale through `next-intl` to pick its decimal separator, and components that
+touch `next-intl` are reference-only in this wiki — there is no intl provider to render them against. The demo
+returns if `SlidingNumber` takes the separator as a prop instead.
+:::
 
 Props beyond `number`: `padStart` zero-pads single-digit integers, `decimalPlaces`/`decimalSeparator` control fractions, `transition` overrides the spring, and `inView` (+ `inViewMargin`, `inViewOnce`) holds the value at `0` until the element scrolls into view — useful for stats that should count up on first sight. Negative numbers render a leading minus sign.
 

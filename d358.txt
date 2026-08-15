@@ -1,0 +1,458 @@
+﻿2026-08-15T11:36:34.6574822Z Current runner version: '2.336.0'
+2026-08-15T11:36:34.6603266Z ##[group]Runner Image Provisioner
+2026-08-15T11:36:34.6604736Z Hosted Compute Agent
+2026-08-15T11:36:34.6605382Z Version: 20260729.566
+2026-08-15T11:36:34.6606166Z Commit: cf7153fe6e25b664e8693c24944bf2b00355d109
+2026-08-15T11:36:34.6606948Z Build Date: 2026-07-29T19:17:02Z
+2026-08-15T11:36:34.6607678Z Worker ID: {e7f7a812-dbd7-4ade-8d33-cbbfb1a888f1}
+2026-08-15T11:36:34.6608530Z Azure Region: westus
+2026-08-15T11:36:34.6609133Z ##[endgroup]
+2026-08-15T11:36:34.6611186Z ##[group]Operating System
+2026-08-15T11:36:34.6611893Z Ubuntu
+2026-08-15T11:36:34.6612447Z 24.04.4
+2026-08-15T11:36:34.6613060Z LTS
+2026-08-15T11:36:34.6613611Z ##[endgroup]
+2026-08-15T11:36:34.6614458Z ##[group]Runner Image
+2026-08-15T11:36:34.6615234Z Image: ubuntu-24.04
+2026-08-15T11:36:34.6615883Z Version: 20260810.271.1
+2026-08-15T11:36:34.6617496Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260810.271/images/ubuntu/Ubuntu2404-Readme.md
+2026-08-15T11:36:34.6619394Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260810.271
+2026-08-15T11:36:34.6620503Z ##[endgroup]
+2026-08-15T11:36:34.6621658Z ##[group]GITHUB_TOKEN Permissions
+2026-08-15T11:36:34.6624232Z Contents: read
+2026-08-15T11:36:34.6624877Z Metadata: read
+2026-08-15T11:36:34.6625508Z ##[endgroup]
+2026-08-15T11:36:34.6627796Z Secret source: Actions
+2026-08-15T11:36:34.6628851Z Prepare workflow directory
+2026-08-15T11:36:34.7080099Z Prepare all required actions
+2026-08-15T11:36:34.7149673Z Getting action download info
+2026-08-15T11:36:35.0680895Z Download action repository 'actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10' (SHA:df4cb1c069e1874edd31b4311f1884172cec0e10)
+2026-08-15T11:36:35.2489912Z Download action repository 'pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86' (SHA:0977fd99725f1db4007ccb2928dbb4e90d06cc86)
+2026-08-15T11:36:35.5182670Z Download action repository 'actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e' (SHA:48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e)
+2026-08-15T11:36:35.6848991Z Download action repository 'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a' (SHA:043fb46d1a93c77aae656e7c1c64a875d1fc6a0a)
+2026-08-15T11:36:35.9375646Z Complete job name: Build & test
+2026-08-15T11:36:36.0331418Z ##[group]Run actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+2026-08-15T11:36:36.0332861Z with:
+2026-08-15T11:36:36.0333387Z   persist-credentials: false
+2026-08-15T11:36:36.0334313Z   repository: fbuireu/forever-pto
+2026-08-15T11:36:36.0342221Z   token: ***
+2026-08-15T11:36:36.0342743Z   ssh-strict: true
+2026-08-15T11:36:36.0343255Z   ssh-user: git
+2026-08-15T11:36:36.0343743Z   clean: true
+2026-08-15T11:36:36.0344461Z   sparse-checkout-cone-mode: true
+2026-08-15T11:36:36.0345153Z   fetch-depth: 1
+2026-08-15T11:36:36.0345674Z   fetch-tags: false
+2026-08-15T11:36:36.0346201Z   show-progress: true
+2026-08-15T11:36:36.0346734Z   lfs: false
+2026-08-15T11:36:36.0347230Z   submodules: false
+2026-08-15T11:36:36.0347814Z   set-safe-directory: true
+2026-08-15T11:36:36.0348705Z ##[endgroup]
+2026-08-15T11:36:36.1432679Z Syncing repository: fbuireu/forever-pto
+2026-08-15T11:36:36.1435888Z ##[group]Getting Git version info
+2026-08-15T11:36:36.1437228Z Working directory is '/home/runner/work/forever-pto/forever-pto'
+2026-08-15T11:36:36.1439334Z [command]/usr/bin/git version
+2026-08-15T11:36:36.1513366Z git version 2.54.0
+2026-08-15T11:36:36.1579043Z ##[endgroup]
+2026-08-15T11:36:36.1597247Z Temporarily overriding HOME='/home/runner/work/_temp/561b5f16-d0e2-42ea-8228-6b3ac3b42c70' before making global git config changes
+2026-08-15T11:36:36.1600023Z Adding repository directory to the temporary git global config as a safe directory
+2026-08-15T11:36:36.1603371Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/forever-pto/forever-pto
+2026-08-15T11:36:36.1654637Z Deleting the contents of '/home/runner/work/forever-pto/forever-pto'
+2026-08-15T11:36:36.1660178Z ##[group]Determining repository object format
+2026-08-15T11:36:36.1662603Z ##[endgroup]
+2026-08-15T11:36:36.1663789Z ##[group]Initializing the repository
+2026-08-15T11:36:36.1670396Z [command]/usr/bin/git init /home/runner/work/forever-pto/forever-pto
+2026-08-15T11:36:36.1822125Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-08-15T11:36:36.1825453Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-08-15T11:36:36.1827961Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-08-15T11:36:36.1830503Z hint: call:
+2026-08-15T11:36:36.1831531Z hint:
+2026-08-15T11:36:36.1833496Z hint: 	git config --global init.defaultBranch <name>
+2026-08-15T11:36:36.1836067Z hint:
+2026-08-15T11:36:36.1837455Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-08-15T11:36:36.1839032Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-08-15T11:36:36.1840581Z hint:
+2026-08-15T11:36:36.1841381Z hint: 	git branch -m <name>
+2026-08-15T11:36:36.1842397Z hint:
+2026-08-15T11:36:36.1843363Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-08-15T11:36:36.1845660Z Initialized empty Git repository in /home/runner/work/forever-pto/forever-pto/.git/
+2026-08-15T11:36:36.1848584Z [command]/usr/bin/git remote add origin https://github.com/fbuireu/forever-pto
+2026-08-15T11:36:36.1902851Z ##[endgroup]
+2026-08-15T11:36:36.1905456Z ##[group]Disabling automatic garbage collection
+2026-08-15T11:36:36.1907746Z [command]/usr/bin/git config --local gc.auto 0
+2026-08-15T11:36:36.2006855Z ##[endgroup]
+2026-08-15T11:36:36.2008343Z ##[group]Setting up auth
+2026-08-15T11:36:36.2009497Z Removing SSH command configuration
+2026-08-15T11:36:36.2011436Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-08-15T11:36:36.2017243Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-08-15T11:36:36.2413534Z Removing HTTP extra header
+2026-08-15T11:36:36.2422291Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-08-15T11:36:36.2461972Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-08-15T11:36:36.2694296Z Removing includeIf entries pointing to credentials config files
+2026-08-15T11:36:36.2702251Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-08-15T11:36:36.2746524Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-08-15T11:36:36.2994431Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-eb415259-407a-4825-859a-46e147c00b86.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-08-15T11:36:36.3042064Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/forever-pto/forever-pto/.git.path /home/runner/work/_temp/git-credentials-eb415259-407a-4825-859a-46e147c00b86.config
+2026-08-15T11:36:36.3079314Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/forever-pto/forever-pto/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-eb415259-407a-4825-859a-46e147c00b86.config
+2026-08-15T11:36:36.3127277Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-eb415259-407a-4825-859a-46e147c00b86.config
+2026-08-15T11:36:36.3165397Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-eb415259-407a-4825-859a-46e147c00b86.config
+2026-08-15T11:36:36.3196416Z ##[endgroup]
+2026-08-15T11:36:36.3206309Z ##[group]Fetching the repository
+2026-08-15T11:36:36.3210395Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +b0da730bdfe1ce957f4982266501ec000eb8900e:refs/remotes/pull/358/merge
+2026-08-15T11:36:36.9696956Z From https://github.com/fbuireu/forever-pto
+2026-08-15T11:36:36.9699077Z  * [new ref]         b0da730bdfe1ce957f4982266501ec000eb8900e -> pull/358/merge
+2026-08-15T11:36:36.9740773Z ##[endgroup]
+2026-08-15T11:36:36.9742369Z ##[group]Determining the checkout info
+2026-08-15T11:36:36.9743734Z ##[endgroup]
+2026-08-15T11:36:36.9748101Z [command]/usr/bin/git sparse-checkout disable
+2026-08-15T11:36:36.9802465Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-08-15T11:36:36.9839608Z ##[group]Checking out the ref
+2026-08-15T11:36:36.9842872Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/358/merge
+2026-08-15T11:36:37.0460111Z Note: switching to 'refs/remotes/pull/358/merge'.
+2026-08-15T11:36:37.0461438Z 
+2026-08-15T11:36:37.0462683Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-08-15T11:36:37.0467194Z changes and commit them, and you can discard any commits you make in this
+2026-08-15T11:36:37.0470941Z state without impacting any branches by switching back to a branch.
+2026-08-15T11:36:37.0473380Z 
+2026-08-15T11:36:37.0474744Z If you want to create a new branch to retain commits you create, you may
+2026-08-15T11:36:37.0477660Z do so (now or later) by using -c with the switch command. Example:
+2026-08-15T11:36:37.0479242Z 
+2026-08-15T11:36:37.0479939Z   git switch -c <new-branch-name>
+2026-08-15T11:36:37.0480983Z 
+2026-08-15T11:36:37.0481681Z Or undo this operation with:
+2026-08-15T11:36:37.0482707Z 
+2026-08-15T11:36:37.0483379Z   git switch -
+2026-08-15T11:36:37.0484574Z 
+2026-08-15T11:36:37.0485841Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-08-15T11:36:37.0487923Z 
+2026-08-15T11:36:37.0489208Z HEAD is now at b0da730 Merge 57740bb3739687dd1e7f2e1be7ef6db6c8845540 into 6f4e4e874944010760ca28fc578e25052295dcf2
+2026-08-15T11:36:37.0493446Z ##[endgroup]
+2026-08-15T11:36:37.0526461Z [command]/usr/bin/git log -1 --format=%H
+2026-08-15T11:36:37.0556513Z b0da730bdfe1ce957f4982266501ec000eb8900e
+2026-08-15T11:36:37.0569571Z ##[group]Removing auth
+2026-08-15T11:36:37.0571266Z Removing SSH command configuration
+2026-08-15T11:36:37.0573693Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-08-15T11:36:37.0613154Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-08-15T11:36:37.0848057Z Removing HTTP extra header
+2026-08-15T11:36:37.0852227Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-08-15T11:36:37.0903250Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-08-15T11:36:37.1146377Z Removing includeIf entries pointing to credentials config files
+2026-08-15T11:36:37.1150581Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-08-15T11:36:37.1184138Z includeif.gitdir:/home/runner/work/forever-pto/forever-pto/.git.path
+2026-08-15T11:36:37.1186912Z includeif.gitdir:/home/runner/work/forever-pto/forever-pto/.git/worktrees/*.path
+2026-08-15T11:36:37.1189415Z includeif.gitdir:/github/workspace/.git.path
+2026-08-15T11:36:37.1191136Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-08-15T11:36:37.1196362Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/forever-pto/forever-pto/.git.path
+2026-08-15T11:36:37.1223282Z /home/runner/work/_temp/git-credentials-eb415259-407a-4825-859a-46e147c00b86.config
+2026-08-15T11:36:37.1234466Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/forever-pto/forever-pto/.git.path /home/runner/work/_temp/git-credentials-eb415259-407a-4825-859a-46e147c00b86.config
+2026-08-15T11:36:37.1272657Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/forever-pto/forever-pto/.git/worktrees/*.path
+2026-08-15T11:36:37.1299492Z /home/runner/work/_temp/git-credentials-eb415259-407a-4825-859a-46e147c00b86.config
+2026-08-15T11:36:37.1310579Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/forever-pto/forever-pto/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-eb415259-407a-4825-859a-46e147c00b86.config
+2026-08-15T11:36:37.1349494Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-08-15T11:36:37.1377282Z /github/runner_temp/git-credentials-eb415259-407a-4825-859a-46e147c00b86.config
+2026-08-15T11:36:37.1391093Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-eb415259-407a-4825-859a-46e147c00b86.config
+2026-08-15T11:36:37.1438587Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-08-15T11:36:37.1466973Z /github/runner_temp/git-credentials-eb415259-407a-4825-859a-46e147c00b86.config
+2026-08-15T11:36:37.1486781Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-eb415259-407a-4825-859a-46e147c00b86.config
+2026-08-15T11:36:37.1524837Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-08-15T11:36:37.1758307Z Removing credentials config '/home/runner/work/_temp/git-credentials-eb415259-407a-4825-859a-46e147c00b86.config'
+2026-08-15T11:36:37.1767410Z ##[endgroup]
+2026-08-15T11:36:37.2068612Z ##[group]Run pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86
+2026-08-15T11:36:37.2069974Z with:
+2026-08-15T11:36:37.2070767Z   dest: ~/setup-pnpm
+2026-08-15T11:36:37.2071626Z   run_install: null
+2026-08-15T11:36:37.2072493Z   cache: false
+2026-08-15T11:36:37.2073384Z   cache_dependency_path: pnpm-lock.yaml
+2026-08-15T11:36:37.2074863Z   package_json_file: package.json
+2026-08-15T11:36:37.2075846Z   standalone: false
+2026-08-15T11:36:37.2076682Z ##[endgroup]
+2026-08-15T11:36:37.3769400Z ##[group]Running self-installer...
+2026-08-15T11:36:39.3499447Z 
+2026-08-15T11:36:39.3500133Z added 1 package, and audited 2 packages in 2s
+2026-08-15T11:36:39.3500860Z 
+2026-08-15T11:36:39.3501098Z 1 package is looking for funding
+2026-08-15T11:36:39.3501718Z   run `npm fund` for details
+2026-08-15T11:36:39.3509411Z 
+2026-08-15T11:36:39.3510203Z found 0 vulnerabilities
+2026-08-15T11:36:39.9991799Z Checking for updates...
+2026-08-15T11:36:40.1478035Z Switching pnpm from v11.19.0 to v11.21.0...
+2026-08-15T11:36:40.5991322Z .../v11/912-1a00535b30e-135b7fb46dbdc2d7 | Progress: resolved 1, reused 0, downloaded 0, added 0
+2026-08-15T11:36:40.6011834Z .../v11/912-1a00535b30e-135b7fb46dbdc2d7 |   +1 +
+2026-08-15T11:36:40.9191860Z .../v11/912-1a00535b30e-135b7fb46dbdc2d7 | Progress: resolved 1, reused 0, downloaded 1, added 1, done
+2026-08-15T11:36:41.6371733Z [WARN] Detected a pnpm v10 installation layout at PNPM_HOME. The pnpm shims at PNPM_HOME have been refreshed so the new version is active, but pnpm v11 expects bins in PNPM_HOME/bin. Run "pnpm setup" to migrate your PATH to the v11 layout.
+2026-08-15T11:36:41.6429252Z Successfully updated pnpm to v11.21.0
+2026-08-15T11:36:41.6786358Z ##[endgroup]
+2026-08-15T11:36:41.6787419Z Installation Completed!
+2026-08-15T11:36:41.6999740Z ##[group]Run actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+2026-08-15T11:36:41.7000167Z with:
+2026-08-15T11:36:41.7000373Z   node-version-file: .nvmrc
+2026-08-15T11:36:41.7000625Z   cache: pnpm
+2026-08-15T11:36:41.7000827Z   check-latest: false
+2026-08-15T11:36:41.7003086Z   token: ***
+2026-08-15T11:36:41.7003320Z   package-manager-cache: true
+2026-08-15T11:36:41.7003566Z env:
+2026-08-15T11:36:41.7003806Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-08-15T11:36:41.7004778Z ##[endgroup]
+2026-08-15T11:36:41.8530341Z Node version file is not JSON file
+2026-08-15T11:36:41.8531894Z Resolved .nvmrc as 26.3.0
+2026-08-15T11:36:41.8555935Z Attempting to download 26.3.0...
+2026-08-15T11:36:42.7271547Z Acquiring 26.3.0 - x64 from https://github.com/actions/node-versions/releases/download/26.3.0-26776574275/node-26.3.0-linux-x64.tar.gz
+2026-08-15T11:36:43.2382084Z Extracting ...
+2026-08-15T11:36:43.2498694Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/e47486a2-cf1a-4930-a005-17b44a637ff9 -f /home/runner/work/_temp/311409d1-a863-4d7e-8ae4-a43b5db78ca8
+2026-08-15T11:36:44.6199507Z Adding to the cache ...
+2026-08-15T11:36:46.7137272Z ##[group]Environment details
+2026-08-15T11:36:46.9627531Z node: v26.3.0
+2026-08-15T11:36:46.9627829Z npm: 11.16.0
+2026-08-15T11:36:46.9628043Z yarn: 1.22.22
+2026-08-15T11:36:46.9628667Z ##[endgroup]
+2026-08-15T11:36:46.9654280Z [command]/home/runner/setup-pnpm/node_modules/.bin/bin/pnpm store path --silent
+2026-08-15T11:36:47.5807024Z /home/runner/setup-pnpm/node_modules/.bin/store/v11
+2026-08-15T11:36:47.8360891Z pnpm cache is not found
+2026-08-15T11:36:47.8557985Z ##[group]Run pnpm install --frozen-lockfile
+2026-08-15T11:36:47.8558445Z pnpm install --frozen-lockfile
+2026-08-15T11:36:47.8601768Z shell: /usr/bin/bash -e {0}
+2026-08-15T11:36:47.8602090Z env:
+2026-08-15T11:36:47.8602406Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-08-15T11:36:47.8602803Z ##[endgroup]
+2026-08-15T11:36:48.3430813Z Scope: all 2 workspace projects
+2026-08-15T11:36:48.4943481Z ? Verifying lockfile against supply-chain policies (1637 entries)...
+2026-08-15T11:36:48.5888075Z Lockfile is up to date, resolution step is skipped
+2026-08-15T11:36:48.8775702Z Progress: resolved 1, reused 0, downloaded 0, added 0
+2026-08-15T11:36:49.0480099Z Packages: +1412
+2026-08-15T11:36:49.0481260Z ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-08-15T11:36:49.8772931Z Progress: resolved 1412, reused 0, downloaded 0, added 0
+2026-08-15T11:36:51.8637332Z Progress: resolved 1412, reused 0, downloaded 1, added 0
+2026-08-15T11:36:52.8896080Z Progress: resolved 1412, reused 0, downloaded 57, added 0
+2026-08-15T11:36:53.6355384Z Packages are hard linked from the content-addressable store to the virtual store.
+2026-08-15T11:36:53.6356629Z   Content-addressable store is at: /home/runner/setup-pnpm/node_modules/.bin/store/v11
+2026-08-15T11:36:53.6357468Z   Virtual store is at:             node_modules/.pnpm
+2026-08-15T11:36:53.8955516Z Progress: resolved 1412, reused 0, downloaded 82, added 4
+2026-08-15T11:36:54.8939266Z Progress: resolved 1412, reused 0, downloaded 114, added 4
+2026-08-15T11:36:55.9285548Z Progress: resolved 1412, reused 0, downloaded 168, added 8
+2026-08-15T11:36:56.9205480Z ✓ Lockfile passes supply-chain policies (1637 entries in 8.4s)
+2026-08-15T11:36:56.9315224Z Progress: resolved 1412, reused 0, downloaded 228, added 12
+2026-08-15T11:36:57.9345345Z Progress: resolved 1412, reused 0, downloaded 387, added 24
+2026-08-15T11:36:58.9353017Z Progress: resolved 1412, reused 0, downloaded 589, added 39
+2026-08-15T11:36:59.9365897Z Progress: resolved 1412, reused 0, downloaded 780, added 52
+2026-08-15T11:37:00.9485150Z Progress: resolved 1412, reused 0, downloaded 902, added 61
+2026-08-15T11:37:01.9445449Z Progress: resolved 1412, reused 0, downloaded 1095, added 72
+2026-08-15T11:37:02.9444283Z Progress: resolved 1412, reused 0, downloaded 1386, added 166
+2026-08-15T11:37:03.9442261Z Progress: resolved 1412, reused 0, downloaded 1386, added 1215
+2026-08-15T11:37:03.9968027Z Progress: resolved 1412, reused 0, downloaded 1386, added 1412, done
+2026-08-15T11:37:04.5365190Z .../node_modules/@parcel/watcher install$ node scripts/build-from-source.js
+2026-08-15T11:37:04.5646779Z .../sharp@0.34.5/node_modules/sharp install$ node install/check.js || npm run build
+2026-08-15T11:37:04.5899769Z .../node_modules/@parcel/watcher install: Done
+2026-08-15T11:37:04.5933340Z .../node_modules/workerd postinstall$ node install.js
+2026-08-15T11:37:04.5957627Z .../esbuild@0.28.1/node_modules/esbuild postinstall$ node install.js
+2026-08-15T11:37:04.5971987Z .../esbuild@0.25.4/node_modules/esbuild postinstall$ node install.js
+2026-08-15T11:37:04.9412656Z .../esbuild@0.28.1/node_modules/esbuild postinstall: Done
+2026-08-15T11:37:04.9413605Z .../node_modules/workerd postinstall: Done
+2026-08-15T11:37:04.9425792Z .../sharp@0.34.5/node_modules/sharp install: Done
+2026-08-15T11:37:04.9448821Z .../node_modules/@swc/core postinstall$ node postinstall.js
+2026-08-15T11:37:04.9967346Z .../node_modules/workerd postinstall$ node install.js
+2026-08-15T11:37:05.0366245Z .../esbuild@0.25.4/node_modules/esbuild postinstall: Done
+2026-08-15T11:37:05.0545398Z .../node_modules/@swc/core postinstall: Done
+2026-08-15T11:37:05.1095291Z .../node_modules/workerd postinstall: Done
+2026-08-15T11:37:05.7570185Z 
+2026-08-15T11:37:05.7570726Z dependencies:
+2026-08-15T11:37:05.7571314Z + @base-ui/react 1.7.0
+2026-08-15T11:37:05.7571833Z + @hookform/resolvers 5.7.1
+2026-08-15T11:37:05.7572401Z + @logtail/edge 0.5.8
+2026-08-15T11:37:05.7572863Z + @logtail/next 0.4.0
+2026-08-15T11:37:05.7574276Z + @opennextjs/cloudflare 1.20.2
+2026-08-15T11:37:05.7574913Z + @react-email/components 1.0.12
+2026-08-15T11:37:05.7575616Z + @react-email/render 2.1.0
+2026-08-15T11:37:05.7576285Z + @react-pdf/renderer 4.6.0
+2026-08-15T11:37:05.7577010Z + @stripe/react-stripe-js 6.8.1
+2026-08-15T11:37:05.7577752Z + @stripe/stripe-js 9.13.0
+2026-08-15T11:37:05.7578277Z + @tursodatabase/serverless 1.4.0
+2026-08-15T11:37:05.7578702Z + boneyard-js 1.9.0
+2026-08-15T11:37:05.7579063Z + canvas-confetti 1.9.4
+2026-08-15T11:37:05.7579729Z + class-variance-authority 0.7.1
+2026-08-15T11:37:05.7580363Z + clsx 2.1.1
+2026-08-15T11:37:05.7580874Z + cmdk 1.1.1
+2026-08-15T11:37:05.7581824Z + date-holidays 3.34.1
+2026-08-15T11:37:05.7582558Z + driver.js 1.8.0
+2026-08-15T11:37:05.7583175Z + effect 3.22.1
+2026-08-15T11:37:05.7583788Z + flag-icons 7.5.0
+2026-08-15T11:37:05.7613047Z + i18n-iso-countries 7.14.0
+2026-08-15T11:37:05.7613581Z + jose 6.2.8
+2026-08-15T11:37:05.7614200Z + lucide-react 1.31.0
+2026-08-15T11:37:05.7614606Z + motion 13.1.0
+2026-08-15T11:37:05.7614942Z + next 16.2.12
+2026-08-15T11:37:05.7615293Z + next-intl 4.13.6
+2026-08-15T11:37:05.7615659Z + next-themes 0.4.6
+2026-08-15T11:37:05.7616018Z + react 19.2.8
+2026-08-15T11:37:05.7616458Z + react-dom 19.2.8
+2026-08-15T11:37:05.7616863Z + react-hook-form 7.85.0
+2026-08-15T11:37:05.7617307Z + react-use-measure 2.1.7
+2026-08-15T11:37:05.7617795Z + recharts 3.10.1
+2026-08-15T11:37:05.7618151Z + resend 6.19.0
+2026-08-15T11:37:05.7618509Z + sonner 2.0.8
+2026-08-15T11:37:05.7618863Z + stripe 22.5.0
+2026-08-15T11:37:05.7619274Z + tailwind-merge 3.6.0
+2026-08-15T11:37:05.7619726Z + temporal-polyfill 1.0.3
+2026-08-15T11:37:05.7620192Z + vanilla-cookieconsent 3.1.0
+2026-08-15T11:37:05.7620646Z + vaul 1.1.2
+2026-08-15T11:37:05.7620998Z + zod 4.4.3
+2026-08-15T11:37:05.7621329Z + zustand 5.0.14
+2026-08-15T11:37:05.7621554Z 
+2026-08-15T11:37:05.7621730Z devDependencies:
+2026-08-15T11:37:05.7622150Z + @biomejs/biome 2.5.8
+2026-08-15T11:37:05.7622588Z + @commitlint/cli 21.2.1
+2026-08-15T11:37:05.7623137Z + @commitlint/config-conventional 21.2.0
+2026-08-15T11:37:05.7623690Z + @commitlint/format 21.2.0
+2026-08-15T11:37:05.7630744Z + @commitlint/types 21.2.0
+2026-08-15T11:37:05.7631252Z + @playwright/test 1.62.1
+2026-08-15T11:37:05.7631783Z + @semantic-release/changelog 7.0.0
+2026-08-15T11:37:05.7632338Z + @semantic-release/git 11.0.1
+2026-08-15T11:37:05.7632835Z + @semantic-release/npm 13.1.5
+2026-08-15T11:37:05.7633657Z + @tailwindcss/postcss 4.3.3
+2026-08-15T11:37:05.7634419Z + @testing-library/react 16.3.2
+2026-08-15T11:37:05.7634947Z + @testing-library/user-event 14.6.3
+2026-08-15T11:37:05.7635479Z + @types/canvas-confetti 1.9.0
+2026-08-15T11:37:05.7636000Z + @types/node 26.2.0
+2026-08-15T11:37:05.7636401Z + @types/react 19.2.18
+2026-08-15T11:37:05.7636812Z + @types/react-dom 19.2.4
+2026-08-15T11:37:05.7637251Z + @vitejs/plugin-react 6.0.5
+2026-08-15T11:37:05.7638524Z + @vitest/coverage-v8 4.1.10
+2026-08-15T11:37:05.7638985Z + @vitest/ui 4.1.10
+2026-08-15T11:37:05.7639392Z + happy-dom 20.11.2
+2026-08-15T11:37:05.7639773Z + husky 9.1.7
+2026-08-15T11:37:05.7640158Z + lint-staged 17.3.0
+2026-08-15T11:37:05.7640672Z + semantic-release 25.0.9
+2026-08-15T11:37:05.7641569Z + tailwindcss 4.3.3
+2026-08-15T11:37:05.7641981Z + tw-animate-css 1.4.0
+2026-08-15T11:37:05.7642391Z + typescript 6.0.3
+2026-08-15T11:37:05.7642744Z + vitest 4.1.10
+2026-08-15T11:37:05.7643120Z + wrangler 4.120.1
+2026-08-15T11:37:05.7643339Z 
+2026-08-15T11:37:05.8021496Z . prepare$ husky
+2026-08-15T11:37:05.8670991Z . prepare: Done
+2026-08-15T11:37:05.8871980Z Done in 17.9s using pnpm v11.21.0
+2026-08-15T11:37:05.9959225Z ##[group]Run pnpm --filter forever-pto-docs lint
+2026-08-15T11:37:05.9959753Z pnpm --filter forever-pto-docs lint
+2026-08-15T11:37:05.9998782Z shell: /usr/bin/bash -e {0}
+2026-08-15T11:37:05.9999066Z env:
+2026-08-15T11:37:05.9999349Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-08-15T11:37:05.9999726Z ##[endgroup]
+2026-08-15T11:37:06.4892404Z $ biome lint .
+2026-08-15T11:37:06.5717653Z Checked 48 files in 32ms. No fixes applied.
+2026-08-15T11:37:06.5932628Z ##[group]Run pnpm --filter forever-pto-docs check
+2026-08-15T11:37:06.5933073Z pnpm --filter forever-pto-docs check
+2026-08-15T11:37:06.5971901Z shell: /usr/bin/bash -e {0}
+2026-08-15T11:37:06.5972196Z env:
+2026-08-15T11:37:06.5972499Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-08-15T11:37:06.5972887Z ##[endgroup]
+2026-08-15T11:37:07.0892884Z $ astro check
+2026-08-15T11:37:09.9441825Z 11:37:09 [content] Syncing content
+2026-08-15T11:37:10.1702185Z 11:37:10 [content] Synced content
+2026-08-15T11:37:10.1713743Z 11:37:10 [types] Generated 1.03s
+2026-08-15T11:37:10.1796548Z 11:37:10 [check] Getting diagnostics for Astro files in /home/runner/work/forever-pto/forever-pto/docs...
+2026-08-15T11:37:17.0956970Z Result (43 files): 
+2026-08-15T11:37:17.0957378Z - 0 errors
+2026-08-15T11:37:17.0957754Z - 0 warnings
+2026-08-15T11:37:17.0958096Z - 0 hints
+2026-08-15T11:37:17.0958376Z 
+2026-08-15T11:37:17.1767431Z ##[group]Run pnpm --filter forever-pto-docs build
+2026-08-15T11:37:17.1767969Z pnpm --filter forever-pto-docs build
+2026-08-15T11:37:17.1806427Z shell: /usr/bin/bash -e {0}
+2026-08-15T11:37:17.1806760Z env:
+2026-08-15T11:37:17.1807102Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-08-15T11:37:17.1807544Z ##[endgroup]
+2026-08-15T11:37:17.6709891Z $ astro build
+2026-08-15T11:37:20.1129854Z 11:37:20 [content] Syncing content
+2026-08-15T11:37:20.1576037Z 11:37:20 [content] Synced content
+2026-08-15T11:37:20.1589677Z 11:37:20 [types] Generated 748ms
+2026-08-15T11:37:20.1593420Z 11:37:20 [build] output: "static"
+2026-08-15T11:37:20.1594937Z 11:37:20 [build] mode: "static"
+2026-08-15T11:37:20.1596797Z 11:37:20 [build] directory: /home/runner/work/forever-pto/forever-pto/docs/dist/
+2026-08-15T11:37:20.1598515Z 11:37:20 [build] Collecting build info...
+2026-08-15T11:37:20.1600438Z 11:37:20 [build] ✓ Completed in 918ms.
+2026-08-15T11:37:20.1612451Z 11:37:20 [build] Building static entrypoints...
+2026-08-15T11:37:22.1387312Z 11:37:22 [vite] ✓ built in 1.95s
+2026-08-15T11:37:23.3211175Z 11:37:23 [WARN] [vite] [INEFFECTIVE_DYNAMIC_IMPORT] ../node_modules/.pnpm/motion@13.1.0_react-dom@19.2.8_react@19.2.8__react@19.2.8/node_modules/motion/dist/es/react.mjs is dynamically imported by ../src/ui/modules/core/animate/providers/LazyMotionProvider.tsx but also statically imported by ../src/ui/hooks/useIsInView.tsx, ../src/ui/modules/core/animate/base/Accordion.tsx, ../src/ui/modules/core/animate/base/Checkbox.tsx, ../src/ui/modules/core/animate/base/Collapsible.tsx, ../src/ui/modules/core/animate/base/DropdownMenu.tsx, ..., dynamic import will not move module into another chunk.
+2026-08-15T11:37:23.3217511Z 
+2026-08-15T11:37:23.3223327Z 11:37:23 [vite] ✓ built in 1.17s
+2026-08-15T11:37:23.3531541Z 11:37:23 [build] Rearranging server assets...
+2026-08-15T11:37:23.3808316Z 
+2026-08-15T11:37:23.3809245Z  generating static routes 
+2026-08-15T11:37:23.4251694Z Entry docs → 404 was not found.
+2026-08-15T11:37:23.4532739Z 11:37:23   ├─ /404.html (+37ms) 
+2026-08-15T11:37:23.4712238Z 11:37:23   ├─ /architecture/caching/index.html (+18ms) 
+2026-08-15T11:37:23.4805388Z 11:37:23   ├─ /architecture/effect-layers/index.html (+9ms) 
+2026-08-15T11:37:23.4897270Z 11:37:23   ├─ /architecture/error-pages/index.html (+9ms) 
+2026-08-15T11:37:23.4978908Z 11:37:23   ├─ /architecture/images/index.html (+8ms) 
+2026-08-15T11:37:23.5060572Z 11:37:23   ├─ /architecture/middleware/index.html (+8ms) 
+2026-08-15T11:37:23.5149181Z 11:37:23   ├─ /architecture/overview/index.html (+9ms) 
+2026-08-15T11:37:23.5226238Z 11:37:23   ├─ /architecture/routing/index.html (+8ms) 
+2026-08-15T11:37:23.5306754Z 11:37:23   ├─ /contributing/conventions/index.html (+8ms) 
+2026-08-15T11:37:23.5446486Z 11:37:23   ├─ /contributing/testing/index.html (+14ms) 
+2026-08-15T11:37:23.5547455Z 11:37:23   ├─ /contributing/tooling/index.html (+10ms) 
+2026-08-15T11:37:23.8000778Z TypeError: Cannot read properties of null (reading 'useContext')
+2026-08-15T11:37:23.8002395Z     at exports.useContext (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react@19.2.8/node_modules/react/cjs/react.production.js:489:33)
+2026-08-15T11:37:23.8005523Z     at p (file:///home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/use-intl@4.13.6_react@19.2.8/node_modules/use-intl/dist/esm/production/react.js:1:804)
+2026-08-15T11:37:23.8007826Z     at Z (file:///home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/use-intl@4.13.6_react@19.2.8/node_modules/use-intl/dist/esm/production/react.js:1:1301)
+2026-08-15T11:37:23.8009793Z     at SlidingNumber (file:///home/runner/work/forever-pto/forever-pto/docs/dist/.prerender/chunks/SlidingNumber_DHa4WbXt.mjs:80:17)
+2026-08-15T11:37:23.8012108Z     at renderWithHooks (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react-dom@19.2.7_react@19.2.7/node_modules/react-dom/cjs/react-dom-server.node.production.js:4647:18)
+2026-08-15T11:37:23.8014955Z     at renderElement (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react-dom@19.2.7_react@19.2.7/node_modules/react-dom/cjs/react-dom-server.node.production.js:4785:14)
+2026-08-15T11:37:23.8017258Z     at retryNode (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react-dom@19.2.7_react@19.2.7/node_modules/react-dom/cjs/react-dom-server.node.production.js:5503:16)
+2026-08-15T11:37:23.8019586Z     at renderNodeDestructive (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react-dom@19.2.7_react@19.2.7/node_modules/react-dom/cjs/react-dom-server.node.production.js:5297:7)
+2026-08-15T11:37:23.8021918Z     at renderNode (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react-dom@19.2.7_react@19.2.7/node_modules/react-dom/cjs/react-dom-server.node.production.js:5864:14)
+2026-08-15T11:37:23.8024528Z     at renderChildrenArray (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react-dom@19.2.7_react@19.2.7/node_modules/react-dom/cjs/react-dom-server.node.production.js:5646:7)
+2026-08-15T11:37:23.8119795Z 11:37:23 [ERROR] TypeError: Cannot read properties of null (reading 'useContext')
+2026-08-15T11:37:23.8122756Z     at exports.useContext (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react@19.2.8/node_modules/react/cjs/react.production.js:489:33)
+2026-08-15T11:37:23.8125017Z     at p (file:///home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/use-intl@4.13.6_react@19.2.8/node_modules/use-intl/dist/esm/production/react.js:1:804)
+2026-08-15T11:37:23.8126358Z     at Z (file:///home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/use-intl@4.13.6_react@19.2.8/node_modules/use-intl/dist/esm/production/react.js:1:1301)
+2026-08-15T11:37:23.8127522Z     at SlidingNumber (file:///home/runner/work/forever-pto/forever-pto/docs/dist/.prerender/chunks/SlidingNumber_DHa4WbXt.mjs:80:17)
+2026-08-15T11:37:23.8128829Z     at renderWithHooks (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react-dom@19.2.7_react@19.2.7/node_modules/react-dom/cjs/react-dom-server.node.production.js:4647:18)
+2026-08-15T11:37:23.8130305Z     at renderElement (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react-dom@19.2.7_react@19.2.7/node_modules/react-dom/cjs/react-dom-server.node.production.js:4785:14)
+2026-08-15T11:37:23.8131773Z     at retryNode (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react-dom@19.2.7_react@19.2.7/node_modules/react-dom/cjs/react-dom-server.node.production.js:5503:16)
+2026-08-15T11:37:23.8133266Z     at renderNodeDestructive (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react-dom@19.2.7_react@19.2.7/node_modules/react-dom/cjs/react-dom-server.node.production.js:5297:7)
+2026-08-15T11:37:23.8134883Z     at renderNode (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react-dom@19.2.7_react@19.2.7/node_modules/react-dom/cjs/react-dom-server.node.production.js:5864:14)
+2026-08-15T11:37:23.8136275Z     at renderChildrenArray (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react-dom@19.2.7_react@19.2.7/node_modules/react-dom/cjs/react-dom-server.node.production.js:5646:7)
+2026-08-15T11:37:23.8138148Z 11:37:23 [ERROR] [build] Caught error rendering /design-system/animation/components: TypeError: Cannot read properties of null (reading 'useContext')
+2026-08-15T11:37:23.8331302Z Cannot read properties of null (reading 'useContext')
+2026-08-15T11:37:23.8332201Z   Hint:
+2026-08-15T11:37:23.8333079Z     This issue often occurs when your MDX component encounters runtime errors.
+2026-08-15T11:37:23.8334174Z   Stack trace:
+2026-08-15T11:37:23.8337195Z     at exports.useContext (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react@19.2.8/node_modules/react/cjs/react.production.js:489:33)
+2026-08-15T11:37:23.8342338Z     at Z (file:///home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/use-intl@4.13.6_react@19.2.8/node_modules/use-intl/dist/esm/production/react.js:1:1301)
+2026-08-15T11:37:23.8345504Z     at renderWithHooks (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react-dom@19.2.7_react@19.2.7/node_modules/react-dom/cjs/react-dom-server.node.production.js:4647:18)
+2026-08-15T11:37:23.8348741Z     at retryNode (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react-dom@19.2.7_react@19.2.7/node_modules/react-dom/cjs/react-dom-server.node.production.js:5503:16)
+2026-08-15T11:37:23.8351183Z     at renderNode (/home/runner/work/forever-pto/forever-pto/node_modules/.pnpm/react-dom@19.2.7_react@19.2.7/node_modules/react-dom/cjs/react-dom-server.node.production.js:5864:14)
+2026-08-15T11:37:23.9058218Z 11:37:23   ├─ /design-system/animation/components/index.html/home/runner/work/forever-pto/forever-pto/docs:
+2026-08-15T11:37:23.9060718Z [ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] forever-pto-docs@0.0.0 build: `astro build`
+2026-08-15T11:37:23.9061461Z Exit status 1
+2026-08-15T11:37:23.9317035Z ##[error]Process completed with exit code 1.
+2026-08-15T11:37:23.9402829Z ##[group]Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+2026-08-15T11:37:23.9403411Z with:
+2026-08-15T11:37:23.9403624Z   name: docs-playwright-report
+2026-08-15T11:37:23.9404219Z   path: docs/playwright-report/
+2026-08-15T11:37:23.9404491Z   retention-days: 7
+2026-08-15T11:37:23.9404703Z   if-no-files-found: warn
+2026-08-15T11:37:23.9404933Z   compression-level: 6
+2026-08-15T11:37:23.9405146Z   overwrite: false
+2026-08-15T11:37:23.9405352Z   include-hidden-files: false
+2026-08-15T11:37:23.9405584Z   archive: true
+2026-08-15T11:37:23.9405770Z env:
+2026-08-15T11:37:23.9406005Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-08-15T11:37:23.9406309Z ##[endgroup]
+2026-08-15T11:37:24.0888167Z ##[warning]No files were found with the provided path: docs/playwright-report/. No artifacts will be uploaded.
+2026-08-15T11:37:24.1020384Z Post job cleanup.
+2026-08-15T11:37:24.2608520Z Pruning is unnecessary.
+2026-08-15T11:37:24.2843037Z Post job cleanup.
+2026-08-15T11:37:24.3851832Z [command]/usr/bin/git version
+2026-08-15T11:37:24.3904340Z git version 2.54.0
+2026-08-15T11:37:24.3958248Z Temporarily overriding HOME='/home/runner/work/_temp/e44e210d-1fa4-4fef-8f9e-715bde94d1a7' before making global git config changes
+2026-08-15T11:37:24.3960511Z Adding repository directory to the temporary git global config as a safe directory
+2026-08-15T11:37:24.3964629Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/forever-pto/forever-pto
+2026-08-15T11:37:24.4013177Z Removing SSH command configuration
+2026-08-15T11:37:24.4024285Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-08-15T11:37:24.4069388Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-08-15T11:37:24.4335734Z Removing HTTP extra header
+2026-08-15T11:37:24.4343142Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-08-15T11:37:24.4388490Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-08-15T11:37:24.4666301Z Removing includeIf entries pointing to credentials config files
+2026-08-15T11:37:24.4676985Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-08-15T11:37:24.4720371Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-08-15T11:37:24.5133030Z Cleaning up orphan processes
