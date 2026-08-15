@@ -5,16 +5,19 @@ import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotio
 import { Calendar, Settings, Star, Users } from 'lucide-react';
 import { useState } from 'react';
 import { Demo } from '../Demo';
+import { DemoIntlProvider } from '../DemoIntlProvider';
 
 export const CounterDemo = () => {
   const [days, setDays] = useState(23);
 
   return (
-    <LazyMotionProvider>
-      <Demo>
-        <Counter number={days} setNumber={setDays} label='PTO days' />
-      </Demo>
-    </LazyMotionProvider>
+    <DemoIntlProvider>
+      <LazyMotionProvider>
+        <Demo>
+          <Counter number={days} setNumber={setDays} label='PTO days' />
+        </Demo>
+      </LazyMotionProvider>
+    </DemoIntlProvider>
   );
 };
 

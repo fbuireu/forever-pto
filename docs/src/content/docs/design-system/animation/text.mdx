@@ -7,7 +7,7 @@ sidebar:
 
 import { RotatingTextDemo, SlidingNumberDemo } from '../../../../components/demos/TextDemo';
 
-Source: `src/ui/modules/core/animate/text/`. Both components are client-only Motion consumers and require a `LazyMotionProvider` ancestor.
+Source: `src/ui/modules/core/animate/text/`. Both components are client-only Motion consumers and require a `LazyMotionProvider` ancestor. `SlidingNumber` additionally reads the active locale through `next-intl` to pick its decimal separator, so its demo adds a `DemoIntlProvider` — the same pattern as the Motion provider, an app context the component needs to run at all.
 
 ## SlidingNumber
 
