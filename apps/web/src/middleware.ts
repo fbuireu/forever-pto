@@ -1,5 +1,5 @@
-import { LOCALE_COOKIE } from '@infrastructure/i18n/config';
 import { setLocaleCookie } from '@infrastructure/i18n/cookie';
+import { LOCALE_COOKIE } from '@infrastructure/i18n/locales';
 import { routing } from '@infrastructure/i18n/routing';
 import { location as locationProxy } from '@infrastructure/proxy/location';
 import { type NextRequest, NextResponse } from 'next/server';

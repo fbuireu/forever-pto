@@ -50,15 +50,4 @@ describe('config', () => {
     const result = await call('unknown');
     expect(result.messages).toEqual({ key: 'en-value' });
   });
-
-  it('exports LOCALE_COOKIE as "NEXT_LOCALE"', async () => {
-    const { LOCALE_COOKIE } = await import('./config');
-    expect(LOCALE_COOKIE).toBe('NEXT_LOCALE');
-  });
-
-  it('re-exports LOCALES from locales.ts', async () => {
-    const { LOCALES: configLocales } = await import('./config');
-    const { LOCALES: sourceLocales } = await import('./locales');
-    expect(configLocales).toEqual(sourceLocales);
-  });
 });

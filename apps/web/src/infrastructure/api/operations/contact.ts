@@ -3,20 +3,16 @@ import { sendContactEmail } from '@application/use-cases/contact';
 import { ApiError } from '@infrastructure/api/errors';
 import type { ValidationError } from '@infrastructure/errors';
 import { ApplicationLayer } from '@infrastructure/layers';
+import type { PublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import { Effect } from 'effect';
 import { after } from 'next/server';
 import type { ApiOutcome } from './types';
-
-interface ContactConfig {
-  siteUrl: string;
-  contactEmail: string;
-}
 
 type ContactBody = { success: true } | { success: false; error: string };
 
 export const sendContactRequest = (
   input: Effect.Effect<ContactFormData, ValidationError>,
-  config: ContactConfig
+  config: PublicEnv
 ): Promise<ApiOutcome<ContactBody>> =>
   Effect.runPromise(
     input.pipe(

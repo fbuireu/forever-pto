@@ -6,7 +6,7 @@ vi.mock('@infrastructure/i18n/config', () => ({
   LOCALE_COOKIE: 'NEXT_LOCALE',
 }));
 
-import { LOCALE_COOKIE } from '@infrastructure/i18n/config';
+import { LOCALE_COOKIE } from '@infrastructure/i18n/locales';
 
 function makeResponse() {
   const cookiesSet = vi.fn();

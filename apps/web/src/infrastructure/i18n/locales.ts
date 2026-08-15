@@ -6,3 +6,5 @@ export const FR = 'fr';
 export const DE = 'de';
 
 export const LOCALES = [CA, IT, EN, ES, FR, DE];
+
+export const LOCALE_COOKIE = 'NEXT_LOCALE';

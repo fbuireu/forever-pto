@@ -1,7 +1,6 @@
 import '@styles/index.css';
 import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
-import { LOCALE_COOKIE } from '@infrastructure/i18n/config';
-import { LOCALES } from '@infrastructure/i18n/locales';
+import { LOCALE_COOKIE, LOCALES } from '@infrastructure/i18n/locales';
 import { routing } from '@infrastructure/i18n/routing';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { HtmlLangSync } from '@ui/modules/pages/not-found/HtmlLangSync';

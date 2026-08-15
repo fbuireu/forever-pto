@@ -1,7 +1,7 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { cacheLife } from 'next/cache';
 
-interface PublicEnv {
+export interface PublicEnv {
   siteUrl: string;
   contactEmail: string;
 }

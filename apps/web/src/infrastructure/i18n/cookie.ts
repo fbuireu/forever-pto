@@ -1,4 +1,4 @@
-import { LOCALE_COOKIE } from '@infrastructure/i18n/config';
+import { LOCALE_COOKIE } from '@infrastructure/i18n/locales';
 import type { NextResponse } from 'next/server';
 
 export function setLocaleCookie(response: NextResponse, value: string) {
