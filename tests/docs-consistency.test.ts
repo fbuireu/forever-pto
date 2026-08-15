@@ -278,6 +278,21 @@ describe('documentation does not point at things that are gone', () => {
     expect(contentFiles.length).toBeGreaterThan(50);
     expect(citedSourceFiles(contentFiles)).toEqual([]);
   });
+
+  // A guide may write `src/…` because it sits inside the package it describes, and the rules above
+  // match a citation by suffix so both forms resolve. The wiki has no such context: `workers/tail`
+  // is a different directory from `src/infrastructure/workers`, and `src/` alone names neither
+  // package. Every repo path it prints has to carry its own prefix.
+  it('prints repo-relative paths in the published wiki, never package-relative ones', () => {
+    const ambiguous = /^(src|e2e|workers|public)\//;
+    const offenders: string[] = [];
+    for (const file of contentFiles) {
+      for (const [, token] of read(file).matchAll(BACKTICKED_TOKEN)) {
+        if (ambiguous.test(token)) offenders.push(`${file} -> ${token}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
 });
 
 describe('apps/web/src carries no explanatory comments', () => {

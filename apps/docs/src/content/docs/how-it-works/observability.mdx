@@ -13,7 +13,7 @@ Telemetry converges on **Better Stack** (Logtail), fed from four surfaces: the C
 
 ## The tail worker
 
-`workers/tail/index.ts` is a **separate, manually deployed Worker** (`forever-pto-tail`, own `wrangler.toml`) attached to the app via `[[tail_consumers]]` in each environment. Its `tail()` handler receives batches of tail events from the main Worker, flattens each event's `logs` and `exceptions` into structured entries (timestamp, level, message, plus script name, outcome, URL, method and response status), and POSTs them to `BETTER_STACK_INGESTING_URL` with the source token as a bearer. This is what gets `console.*` output and uncaught exceptions from production into Better Stack with zero latency cost on the request path.
+`apps/web/workers/tail/index.ts` is a **separate Worker** (`forever-pto-tail`, own `wrangler.toml`, deployed by the `deploy-tail` job of `ci.yml`) attached to the app via `[[tail_consumers]]` in each environment. Its `tail()` handler receives batches of tail events from the main Worker, flattens each event's `logs` and `exceptions` into structured entries (timestamp, level, message, plus script name, outcome, URL, method and response status), and POSTs them to `BETTER_STACK_INGESTING_URL` with the source token as a bearer. This is what gets `console.*` output and uncaught exceptions from production into Better Stack with zero latency cost on the request path.
 
 ## Server-side logging
 
