@@ -99,11 +99,9 @@ export const selectOptimalDaysFromBridges = ({ bridges, targetPtoDays, presorted
   const selectedBridges = selectOptimalCombination({ bridges: orderedBridges, targetPtoDays });
 
   const selectedDays = selectedBridges.flatMap((bridge) => bridge.ptoDays);
-  const totalEffectiveDays = selectedBridges.reduce((sum, b) => sum + b.effectiveDays, 0);
 
   return {
     days: selectedDays.toSorted((a, b) => a.getTime() - b.getTime()),
-    totalEffectiveDays,
     bridges: selectedBridges,
   };
 };
@@ -150,7 +148,6 @@ export const selectBridgesForStrategy = ({
   const selectedBridges: Bridge[] = [];
   const usedDates = new Set<string>();
   let totalPtoDays = 0;
-  let totalEffectiveDays = 0;
 
   for (const bridge of sortedBridges) {
     if (totalPtoDays >= targetPtoDays) break;
@@ -163,7 +160,6 @@ export const selectBridgesForStrategy = ({
         usedDates.add(getKey(day));
       });
       totalPtoDays += bridge.ptoDaysNeeded;
-      totalEffectiveDays += bridge.effectiveDays;
     }
   }
 
@@ -171,7 +167,6 @@ export const selectBridgesForStrategy = ({
 
   return {
     days: selectedDays.toSorted((a, b) => a.getTime() - b.getTime()),
-    totalEffectiveDays,
     bridges: selectedBridges,
   };
 };

@@ -151,7 +151,7 @@ describe('selectOptimalDaysFromBridges', () => {
   it('returns empty result for empty bridges', () => {
     const result = selectOptimalDaysFromBridges({ bridges: [], targetPtoDays: 5 });
     expect(result.days).toHaveLength(0);
-    expect(result.totalEffectiveDays).toBe(0);
+    expect(result.bridges).toHaveLength(0);
   });
 
   it('selects bridges without exceeding targetPtoDays', () => {
@@ -161,11 +161,6 @@ describe('selectOptimalDaysFromBridges', () => {
     });
     const total = result.bridges.reduce((sum, b) => sum + b.ptoDaysNeeded, 0);
     expect(total).toBeLessThanOrEqual(2);
-  });
-
-  it('accumulates totalEffectiveDays from selected bridges', () => {
-    const result = selectOptimalDaysFromBridges({ bridges: [bridgeA], targetPtoDays: 1 });
-    expect(result.totalEffectiveDays).toBe(3);
   });
 
   it('does not select conflicting bridges', () => {
