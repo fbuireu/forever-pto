@@ -1,0 +1,6 @@
+name = "forever-pto-tail"
+main = "index.ts"
+compatibility_date = "2025-11-25"
+
+[vars]
+BETTER_STACK_INGESTING_URL = "https://s2341878.eu-fsn-3.betterstackdata.com"

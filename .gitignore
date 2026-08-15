@@ -1,21 +1,24 @@
 # Dependencies
-/node_modules
-docs/node_modules
+node_modules/
 
 # Testing
-/coverage
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
+coverage/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
 
 # Next.js
-/.next/
-/out/
+.next/
+out/
 .vercel/
 
 # Production
-/build
+build/
+
+# Astro
+dist/
+.astro/
 
 # OS
 .DS_Store
@@ -39,14 +42,11 @@ pnpm-debug.log*
 # Cloudflare
 cloudflare-env.d.ts
 .wrangler/
-.open-next
+.open-next/
 
 # AI/Agents
 .claude/
 .agents/
 
-# Docs (Astro)
-docs/dist/
-docs/.astro/
-docs/test-results/
-docs/playwright-report/
+# pnpm workspace: only the root lockfile is valid
+apps/*/pnpm-lock.yaml
