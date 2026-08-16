@@ -92,12 +92,23 @@ design, and three of those omissions are load-bearing:
   empty object: dropping is the honest answer here, and without a `migrate` zustand logs an error instead of
   dropping quietly.
 
-**`Date` does not survive JSON.** `partializeHolidays` maps every `Date` to an ISO string — inside
-`holidays`, and inside `days`, `bridges[].startDate`, `bridges[].endDate` and `bridges[].ptoDays` of each
-Suggestion — and `onRehydrateStorage` maps them all back through `fromStoredInstant`, the intake function
-for values this app itself wrote (see [`../CLAUDE.md`](../CLAUDE.md)). Adding a `Date` anywhere in
-persisted holidays state means editing both halves; miss one and you get a string where the calendar expects
-a `Date`, which only surfaces at render.
+**`Date` survives the write and not the read, so only the read half is hand-written.** `obfuscatedStorage`
+is a `createJSONStorage`, so what `partialize` returns is `JSON.stringify`d — and `JSON.stringify` already
+calls `Date.prototype.toJSON`, which *is* `toISOString`. `partializeHolidays` used to map every `Date` by
+hand on the way out, inside `holidays` and inside `days`, `bridges[].startDate`, `bridges[].endDate` and
+`bridges[].ptoDays` of each Suggestion, through a `serializeSuggestion` helper. Every one of those produced
+a string byte-identical to the one `JSON.stringify` would have produced on its own, which is why no test
+could falsify them: deleting `bridges[].startDate.toISOString()` left the persisted blob unchanged. The
+helper is gone and `partializeHolidays` now just names the eight fields that persist.
+
+`onRehydrateStorage` is the half that does work, mapping them all back through `fromStoredInstant`, the
+intake function for values this app itself wrote (see [`../CLAUDE.md`](../CLAUDE.md)). **Adding a `Date`
+anywhere in persisted holidays state means editing that half only** — miss it and you get a string where
+the calendar expects a `Date`, which only surfaces at render. `holidays.test.ts` covers the nested case:
+`makeSuggestion` builds a real Bridge, and one case asserts `startDate`, `endDate` and `ptoDays[]` come back
+as `Date`s through the suggestion, the current selection and an alternative. That assertion was verified by
+removing one `fromStoredInstant` from the revive and watching it go red — which is exactly what the same
+deletion on the serialise side could not do.
 
 `onRehydrateStorage` runs where `localStorage` may be absent, so its error branch reaches it as
 `globalThis.localStorage?.` rather than the bare global.

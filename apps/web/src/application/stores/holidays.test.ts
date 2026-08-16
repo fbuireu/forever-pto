@@ -76,9 +76,18 @@ const makeHoliday = (id: string, dateStr: string, variant: HolidayVariant = Holi
   isInSelectedRange: true,
 });
 
+const makeBridge = (start: Date, end: Date, ptoDays: Date[]) => ({
+  startDate: start,
+  endDate: end,
+  ptoDaysNeeded: ptoDays.length,
+  effectiveDays: 0,
+  efficiency: 0,
+  ptoDays,
+});
+
 const makeSuggestion = (days: Date[]): MeasuredSuggestion => ({
   days,
-  bridges: [],
+  bridges: days.length ? [makeBridge(days[0], days[days.length - 1], days)] : [],
   metrics: { totalDays: days.length } as never,
 });
 
@@ -892,6 +901,22 @@ describe('persistence', () => {
     expect(state.currentSelection?.days[0]).toBeInstanceOf(Date);
     expect(state.manuallySelectedDays[0]).toEqual(new Date(2026, 6, 15));
     expect(state.removedSuggestedDays[0]).toEqual(new Date(2026, 7, 20));
+  });
+
+  it('revives the Dates nested inside a Bridge, two levels down', async () => {
+    const day = new Date(2026, 4, 1);
+    const state = await rehydrateFrom({
+      suggestion: makeSuggestion([day]),
+      currentSelection: makeSuggestion([day]),
+      alternatives: [makeSuggestion([new Date(2026, 5, 2)])],
+    });
+
+    const bridge = state.suggestion?.bridges?.[0];
+    expect(bridge?.startDate).toEqual(day);
+    expect(bridge?.endDate).toEqual(day);
+    expect(bridge?.ptoDays[0]).toEqual(day);
+    expect(state.currentSelection?.bridges?.[0].startDate).toEqual(day);
+    expect(state.alternatives[0].bridges?.[0].ptoDays[0]).toEqual(new Date(2026, 5, 2));
   });
 
   it('restores the applied alternative and mirrors its index into the preview', async () => {

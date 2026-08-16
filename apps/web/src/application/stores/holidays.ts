@@ -97,29 +97,15 @@ const holidaysInitialState: HolidaysState = {
   planRevision: 0,
 };
 
-const serializeSuggestion = (suggestion: Suggestion) => ({
-  ...suggestion,
-  days: suggestion.days.map((d) => d.toISOString()),
-  bridges: suggestion.bridges?.map((b) => ({
-    ...b,
-    startDate: b.startDate.toISOString(),
-    endDate: b.endDate.toISOString(),
-    ptoDays: b.ptoDays.map((d) => d.toISOString()),
-  })),
-});
-
 const partializeHolidays = (state: HolidaysStore) => ({
-  holidays: state.holidays.map((h) => ({
-    ...h,
-    date: h.date.toISOString(),
-  })),
-  suggestion: state.suggestion ? serializeSuggestion(state.suggestion) : null,
+  holidays: state.holidays,
+  suggestion: state.suggestion,
   maxAlternatives: state.maxAlternatives,
-  alternatives: state.alternatives.map(serializeSuggestion),
-  currentSelection: state.currentSelection ? serializeSuggestion(state.currentSelection) : null,
+  alternatives: state.alternatives,
+  currentSelection: state.currentSelection,
   currentSelectionIndex: state.currentSelectionIndex,
-  manuallySelectedDays: state.manuallySelectedDays.map((d) => d.toISOString()),
-  removedSuggestedDays: state.removedSuggestedDays.map((d) => d.toISOString()),
+  manuallySelectedDays: state.manuallySelectedDays,
+  removedSuggestedDays: state.removedSuggestedDays,
 });
 
 export const useHolidaysStore = create<HolidaysStore>()(
