@@ -126,12 +126,17 @@ have no such short-circuit of their own.
 mount. The server has no "today" that will still be true on the client, so the first paint has no
 today marker and no past-day dimming on purpose. Every predicate taking `today` handles `null`.
 
-**The remaining-days counter freezes during a recalculation.** `Status` in `PlannerPanel.tsx` keeps a
-`lastSettledRemaining` ref updated by an effect *with no dependency array* — it runs every render and
-snapshots the value only while `isCalculating` is false. That looks like a mistake and is not: without
-it the budget readout drops to zero for the length of every worker round-trip. `sidebar/components/PtoDays.tsx`
-holds the same ref for the same reason; they are two readouts of one number, so they freeze together or they
-disagree on screen.
+**The remaining-days counter freezes during a recalculation, and one module owns the freeze.**
+`@ui/hooks/usePlanReadout` keeps a `lastSettledRemaining` ref updated by an effect *with no dependency
+array* — it runs every render and snapshots the value only while `isCalculating` is false. That looks like a
+mistake and is not: without it the budget readout drops to zero for the length of every worker round-trip.
+
+`Status` in `PlannerPanel.tsx` and `sidebar/components/PtoDays.tsx` each held their own copy of that ref,
+that effect, that `useShallow` subscription and that `measureBudget` call — six statements, twice, and this
+paragraph was the only thing keeping them in step. They had already drifted in a small way: one passed
+`currentSelection.days`, the other `currentSelection?.days`. Both read fields off the hook now, and the
+freeze is pinned by `usePlanReadout.test.ts` rather than by the sentence you are reading. A third readout
+gets the frozen number by construction.
 
 **Neither of them computes that number.** The Remaining Budget comes from `measureBudget` in
 `@domain/calendar/utils`, which is also what `toggleDaySelection` consults before spending a day — so the

@@ -1,11 +1,10 @@
 'use client';
 
-import { useFiltersStore } from '@application/stores/filters';
 import type { HolidaysState } from '@application/stores/holidays';
 import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
 import type { MeasuredSuggestion } from '@domain/calendar/types';
-import { measureBudget } from '@domain/calendar/utils/budget';
+import { usePlanReadout } from '@ui/hooks/usePlanReadout';
 import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
 import { ChevronRight } from '@ui/modules/core/animate/icons/ChevronRight';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
@@ -15,8 +14,7 @@ import { cn } from '@ui/utils/cn';
 import { BarChart3, CalendarDays, Sparkles, TrendingUp } from 'lucide-react';
 import { m, type Transition, type Variants } from 'motion/react';
 import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useShallow } from 'zustand/react/shallow';
+import { useCallback, useState } from 'react';
 
 const STAT_CARD_MOTION_CONFIG = {
   initial: 'rest',
@@ -259,30 +257,14 @@ interface StatusProps {
 function Status({ currentSelection }: StatusProps) {
   const t = useTranslations('ptoStatus');
   const resetManualSelection = useHolidaysStore((state) => state.resetManualSelection);
-  const ptoDays = useFiltersStore((state) => state.ptoDays);
-  const { removedSuggestedDays, manuallySelectedDays, isCalculating } = useHolidaysStore(
-    useShallow((state) => ({
-      removedSuggestedDays: state.removedSuggestedDays,
-      manuallySelectedDays: state.manuallySelectedDays,
-      isCalculating: state.isCalculating,
-    }))
-  );
-
-  const budget = measureBudget({
+  const {
     ptoDays,
-    days: currentSelection.days,
-    manuallySelectedDays,
-    removedSuggestedDays,
-  });
-  const activeSuggestedCount = budget.suggested;
-  const manualSelectedCount = budget.manual;
-  const usedDays = budget.spent;
-  const lastSettledRemaining = useRef(budget.remaining);
-  useEffect(() => {
-    if (!isCalculating) lastSettledRemaining.current = budget.remaining;
-  });
-  const remaining = isCalculating ? lastSettledRemaining.current : budget.remaining;
-  const hasManualChanges = manualSelectedCount > 0 || removedSuggestedDays.length > 0;
+    suggested: activeSuggestedCount,
+    manual: manualSelectedCount,
+    spent: usedDays,
+    remaining,
+    hasManualChanges,
+  } = usePlanReadout();
   const usedPct = ptoDays > 0 ? Math.min(100, Math.round((usedDays / ptoDays) * 100)) : 0;
   const remainingPct = Math.max(0, 100 - usedPct);
 

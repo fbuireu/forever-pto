@@ -2,14 +2,14 @@
 
 import { MAX_PTO_DAYS, MIN_PTO_DAYS, useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { measureBudget } from '@domain/calendar/utils/budget';
+import { usePlanReadout } from '@ui/hooks/usePlanReadout';
 import { Counter } from '@ui/modules/core/animate/components/Counter';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { cn } from '@ui/utils/cn';
 import { CalendarDays, Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 export const PtoDays = () => {
@@ -20,41 +20,21 @@ export const PtoDays = () => {
       setPtoDays: state.setPtoDays,
     }))
   );
-  const {
-    currentSelection,
-    removedSuggestedDays,
-    manuallySelectedDays,
-    resetManualSelection,
-    trimManualDays,
-    isCalculating,
-  } = useHolidaysStore(
+  const { resetManualSelection, trimManualDays } = useHolidaysStore(
     useShallow((state) => ({
-      currentSelection: state.currentSelection,
-      removedSuggestedDays: state.removedSuggestedDays,
-      manuallySelectedDays: state.manuallySelectedDays,
       resetManualSelection: state.resetManualSelection,
       trimManualDays: state.trimManualDays,
-      isCalculating: state.isCalculating,
     }))
   );
+  const {
+    manuallySelectedDays,
+    suggested: activeSuggestedCount,
+    manual: manualSelectedCount,
+    remaining,
+    hasManualChanges,
+  } = usePlanReadout();
   const isDecrementDisabled = ptoDays <= MIN_PTO_DAYS;
   const isIncrementDisabled = ptoDays >= MAX_PTO_DAYS;
-  const budget = measureBudget({
-    ptoDays,
-    days: currentSelection?.days,
-    manuallySelectedDays,
-    removedSuggestedDays,
-  });
-  const activeSuggestedCount = budget.suggested;
-  const manualSelectedCount = budget.manual;
-
-  const lastSettledRemaining = useRef(budget.remaining);
-  useEffect(() => {
-    if (!isCalculating) lastSettledRemaining.current = budget.remaining;
-  });
-  const remaining = isCalculating ? lastSettledRemaining.current : budget.remaining;
-
-  const hasManualChanges = manualSelectedCount > 0 || removedSuggestedDays.length > 0;
 
   const handleChange = useCallback(
     (value: number) => {
