@@ -8,16 +8,15 @@ import { useShallow } from 'zustand/react/shallow';
 
 export const usePlanReadout = () => {
   const ptoDays = useFiltersStore((state) => state.ptoDays);
-  const { currentSelection, suggestion, manuallySelectedDays, removedSuggestedDays, isCalculating } =
-    useHolidaysStore(
-      useShallow((state) => ({
-        currentSelection: state.currentSelection,
-        suggestion: state.suggestion,
-        manuallySelectedDays: state.manuallySelectedDays,
-        removedSuggestedDays: state.removedSuggestedDays,
-        isCalculating: state.isCalculating,
-      }))
-    );
+  const { currentSelection, suggestion, manuallySelectedDays, removedSuggestedDays, isCalculating } = useHolidaysStore(
+    useShallow((state) => ({
+      currentSelection: state.currentSelection,
+      suggestion: state.suggestion,
+      manuallySelectedDays: state.manuallySelectedDays,
+      removedSuggestedDays: state.removedSuggestedDays,
+      isCalculating: state.isCalculating,
+    }))
+  );
 
   const activeSuggestion = currentSelection ?? suggestion;
   const budget = measureBudget({

@@ -8,7 +8,6 @@ import { cn } from '@ui/utils/cn';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { getButtonClass } from './utils/helpers';
 
 export const PremiumFeatureVariant = {
   DEFAULT: 'default',
@@ -58,7 +57,11 @@ export const PremiumFeature = ({
       <div
         role='button'
         tabIndex={0}
-        className={cn('relative m-0 focus:outline-none', getButtonClass(variant), className)}
+        className={cn(
+          'relative m-0 focus:outline-none p-2 rounded-full cursor-pointer',
+          variant === PremiumFeatureVariant.STACK ? 'w-fit' : 'w-full backdrop-blur-sm',
+          className
+        )}
         aria-label={description ?? t('unlockFeature', { feature })}
         onClick={() => showUpgradeModal(feature)}
         onKeyDown={(e) => {
