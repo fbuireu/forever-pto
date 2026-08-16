@@ -226,13 +226,23 @@ class of path.
 
 These paths contain a dot, so the middleware matcher excludes them — they never see locale negotiation.
 
-**The skills index advertises only what this handler serves.** `agentSkillsIndex.ts` used to give all five
-entries a `url` under `/.well-known/agent-skills/<name>/SKILL.md` and a `sha256` — every one of those URLs
-404s, because the handler matches three exact keys and none of them is a `SKILL.md`, and every digest was
-`e3b0c442…`, the SHA-256 of the empty string. The two entries describing a document that does exist now
-point at it; the three describing a *behaviour* carry no `url` at all, and nothing carries a digest, because
-none of these is a file whose bytes could be hashed. Adding an entry with a URL means adding the key here
-first.
+**The skills index advertises only what this handler serves, and that is now one list rather than a rule.**
+`agentSkillsIndex.ts` used to give all five entries a `url` under `/.well-known/agent-skills/<name>/SKILL.md`
+and a `sha256` — every one of those URLs 404s, because the handler matches three exact keys and none of them
+is a `SKILL.md`, and every digest was `e3b0c442…`, the SHA-256 of the empty string. The two entries
+describing a document that does exist now point at it; the three describing a *behaviour* carry no `url` at
+all, and nothing carries a digest, because none of these is a file whose bytes could be hashed.
+
+The fix for the join was a sentence — "adding an entry with a URL means adding the key here first" — and it
+is a value now: `well-known/slugs.ts` holds the three slugs and `wellKnownUrl`, `well-known/documents.ts`
+maps each slug to its content type and builder, the route builds its lookup from that map, and the index
+interpolates the same constants. `agentSkillsIndex.test.ts` asserts every advertised URL resolves to a served
+key, verified by pointing one at `api-catalogue` and watching it fail.
+
+**The three document modules return plain objects; the route owns the envelope.** Each used to build its own
+`NextResponse.json(...)` with its own `Content-Type` and the shared `Cache-Control`, so a fourth document
+meant remembering both headers and every test had to `await res.json()` to reach a value the module had
+computed synchronously.
 
 ## Error and not-found boundaries
 

@@ -4,24 +4,18 @@ import { mcpServerCard } from './mcpServerCard';
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
 describe('mcpServerCard', () => {
-  it('returns 200 with json content-type', () => {
-    const res = mcpServerCard(BASE_URL);
-    expect(res.status).toBe(200);
-    expect(res.headers.get('Content-Type')).toBe('application/json');
-  });
-
-  it('sets schemaVersion to v1', async () => {
-    const body = await mcpServerCard(BASE_URL).json();
+  it('sets schemaVersion to v1', () => {
+    const body = mcpServerCard(BASE_URL);
     expect(body.schemaVersion).toBe('v1');
   });
 
-  it('sets serverInfo url to baseUrl', async () => {
-    const { serverInfo } = await mcpServerCard(BASE_URL).json();
+  it('sets serverInfo url to baseUrl', () => {
+    const { serverInfo } = mcpServerCard(BASE_URL);
     expect(serverInfo.url).toBe(BASE_URL);
   });
 
-  it('declares no capabilities', async () => {
-    const { capabilities } = await mcpServerCard(BASE_URL).json();
+  it('declares no capabilities', () => {
+    const { capabilities } = mcpServerCard(BASE_URL);
     expect(capabilities).toEqual({ resources: false, tools: false, prompts: false });
   });
 });

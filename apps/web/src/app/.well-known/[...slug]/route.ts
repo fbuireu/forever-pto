@@ -1,31 +1,27 @@
 import { ApiError } from '@infrastructure/api/errors';
-import { agentSkillsIndex } from '@infrastructure/well-known/agentSkillsIndex';
-import { apiCatalog } from '@infrastructure/well-known/apiCatalog';
-import { mcpServerCard } from '@infrastructure/well-known/mcpServerCard';
+import { WELL_KNOWN_DOCUMENTS } from '@infrastructure/well-known/documents';
+import { WELL_KNOWN_CACHE_CONTROL } from '@infrastructure/well-known/slugs';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { NextResponse } from 'next/server';
-
-type Handler = (baseUrl: string) => NextResponse;
 
 interface RouteContext {
   params: Promise<{ slug: string[] }>;
 }
 
-const ROUTES = new Map<string, Handler>([
-  ['api-catalog', apiCatalog],
-  ['mcp/server-card.json', mcpServerCard],
-  ['agent-skills/index.json', agentSkillsIndex],
-]);
-
 export async function GET(_request: Request, { params }: RouteContext) {
   const { slug } = await params;
-  const path = slug.join('/');
+  const document = Object.hasOwn(WELL_KNOWN_DOCUMENTS, slug.join('/'))
+    ? WELL_KNOWN_DOCUMENTS[slug.join('/')]
+    : undefined;
 
-  const handler = ROUTES.get(path);
-  if (!handler) return NextResponse.json({ error: ApiError.NOT_FOUND }, { status: 404 });
+  if (!document) return NextResponse.json({ error: ApiError.NOT_FOUND }, { status: 404 });
 
   const { env } = await getCloudflareContext({ async: true });
-  const baseUrl = env.NEXT_PUBLIC_SITE_URL;
 
-  return handler(baseUrl);
+  return NextResponse.json(document.build(env.NEXT_PUBLIC_SITE_URL), {
+    headers: {
+      'Content-Type': document.contentType,
+      'Cache-Control': WELL_KNOWN_CACHE_CONTROL,
+    },
+  });
 }

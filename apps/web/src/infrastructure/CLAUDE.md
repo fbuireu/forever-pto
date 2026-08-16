@@ -31,7 +31,7 @@ the caller decides the fallback and the precedence is assertable without renderi
 | `seo/` | `buildMetadata.ts` — the `Metadata` shape every route's `generateMetadata` fills in; `routes.ts` — `SITE_ROUTES`, the one list of pages and whether each is indexable |
 | `proxy/` | Middleware helpers: `location.ts` (country detection + cookie) and `cookie.ts` (`user-country`, one week) |
 | `services/` | Everything with a purpose but no SDK of its own: `contact/`, `countries/`, `env/`, `holidays/`, `location/`, `payments/`, `premium/`, `regions/`. Three carry their own guides — [holidays](./services/holidays/CLAUDE.md), [location](./services/location/CLAUDE.md), [payments](./services/payments/CLAUDE.md) |
-| `well-known/` | `apiCatalog.ts` (RFC 9727 linkset), `mcpServerCard.ts` (SEP-1649), `agentSkillsIndex.ts` — all three return a `NextResponse` directly |
+| `well-known/` | `slugs.ts` (the three slugs, the shared cache header, `wellKnownUrl`), `documents.ts` (slug → content type and builder), and the builders `apiCatalog.ts` (RFC 9727 linkset), `mcpServerCard.ts` (SEP-1649) and `agentSkillsIndex.ts` — each returning a plain object, with the route owning the response envelope |
 | `workers/` | The calculations Web Worker and its message contract. See [`workers/CLAUDE.md`](./workers/CLAUDE.md) |
 | `errors.ts` | Every tagged error in the app — `DatabaseError`, `EmailError`, `MissingDonorEmailError`, `PaymentError`, `PromoCodeError`, `RateLimitError`, `SessionError`, `ValidationError`, `WebhookError` |
 | `layers.ts` | `ApplicationLayer` — the four Live layers merged, provided at every entry point |
@@ -160,7 +160,7 @@ already drifted over how a missing IP header was recorded.
 ## Testing
 
 Every module with behaviour has a co-located `.test.ts`. Five files have none, and each is one of three
-things: types only (`workers/types.ts`, `well-known/types.ts`, `services/holidays/source/types.ts`); a const map whose contract is asserted through the route tests instead
+things: types only (`workers/types.ts`, `services/holidays/source/types.ts`); a const map whose contract is asserted through the route tests instead
 (`api/errors.ts` — see [`api/CLAUDE.md`](./api/CLAUDE.md)); or itself a test double
 (`services/holidays/source/fixture.ts`, the second adapter at the `HolidaySource` seam, exercised by every
 test that uses it).
