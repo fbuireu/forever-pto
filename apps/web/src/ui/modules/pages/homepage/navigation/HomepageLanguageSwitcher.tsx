@@ -1,7 +1,6 @@
 'use client';
 
 import { usePathname, useRouter } from '@application/i18n/navigation';
-import { useUIStore } from '@application/stores/ui';
 import { useLanguages } from '@ui/hooks/useLanguages';
 import {
   DropdownMenu,
@@ -12,7 +11,7 @@ import {
 import { Check } from '@ui/modules/core/animate/icons/Check';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { useLocale, useTranslations } from 'next-intl';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 export const HomepageLanguageSwitcher = () => {
   const locale = useLocale();
@@ -20,7 +19,6 @@ export const HomepageLanguageSwitcher = () => {
   const pathname = usePathname();
   const languages = useLanguages();
   const t = useTranslations('accessibility');
-  const getCurrencyFromLocale = useUIStore((state) => state.getCurrencyFromLocale);
 
   const handleLanguageChange = useCallback(
     (newLocale: string) => {
@@ -29,10 +27,6 @@ export const HomepageLanguageSwitcher = () => {
     },
     [pathname, locale, push]
   );
-
-  useEffect(() => {
-    getCurrencyFromLocale(locale);
-  }, [locale, getCurrencyFromLocale]);
 
   const currentLanguage = useMemo(() => languages.find(({ code }) => code === locale), [languages, locale]);
 

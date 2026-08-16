@@ -1,7 +1,6 @@
 'use client';
 
 import { usePathname, useRouter } from '@application/i18n/navigation';
-import { useUIStore } from '@application/stores/ui';
 import { useLanguages } from '@ui/hooks/useLanguages';
 import {
   DropdownMenu,
@@ -14,7 +13,7 @@ import { Check } from '@ui/modules/core/animate/icons/Check';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { useLocale, useTranslations } from 'next-intl';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 export const LanguageSelector = () => {
   const locale = useLocale();
@@ -23,7 +22,6 @@ export const LanguageSelector = () => {
   const { state } = useSidebar();
   const languages = useLanguages();
   const t = useTranslations('accessibility');
-  const getCurrencyFromLocale = useUIStore((state) => state.getCurrencyFromLocale);
 
   const handleLanguageChange = useCallback(
     (newLocale: string) => {
@@ -32,10 +30,6 @@ export const LanguageSelector = () => {
     },
     [pathname, locale, push]
   );
-
-  useEffect(() => {
-    getCurrencyFromLocale(locale);
-  }, [locale, getCurrencyFromLocale]);
 
   const currentLanguage = useMemo(() => languages.find(({ code }) => code === locale), [languages, locale]);
   const displayText = state === 'collapsed' ? currentLanguage?.code : currentLanguage?.label;

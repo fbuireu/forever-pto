@@ -52,17 +52,8 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
     }))
   );
 
-  const {
-    getCurrencyFromLocale,
-    currency,
-    currencySymbol,
-    isOpen,
-    isOpening,
-    setDonatePopoverOpen,
-    clearDonatePopoverOpening,
-  } = useUIStore(
+  const { currency, currencySymbol, isOpen, isOpening, setDonatePopoverOpen, clearDonatePopoverOpening } = useUIStore(
     useShallow((state) => ({
-      getCurrencyFromLocale: state.getCurrencyFromLocale,
       currency: state.currency,
       currencySymbol: state.currencySymbol,
       isOpen: state.donatePopoverOpen,
@@ -71,10 +62,6 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
       clearDonatePopoverOpening: state.clearDonatePopoverOpening,
     }))
   );
-
-  useEffect(() => {
-    getCurrencyFromLocale(locale);
-  }, [locale, getCurrencyFromLocale]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {

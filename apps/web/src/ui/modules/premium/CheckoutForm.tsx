@@ -14,7 +14,6 @@ import { Skeleton } from 'boneyard-js/react';
 import { AlertCircle } from 'lucide-react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { type FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 import { ExpressCheckoutFixture } from './ExpressCheckoutFixture';
 
 const UNKNOWN_PAYMENT_ERROR = 'unknown_error';
@@ -53,17 +52,8 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   const [hasExpressOptions, setHasExpressOptions] = useState<boolean | null>(null);
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { getCurrencyFromLocale, currency } = useUIStore(
-    useShallow((state) => ({
-      getCurrencyFromLocale: state.getCurrencyFromLocale,
-      currency: state.currency,
-    }))
-  );
+  const currency = useUIStore((state) => state.currency);
   const setPremiumStatus = usePremiumStore((state) => state.setPremiumStatus);
-
-  useEffect(() => {
-    getCurrencyFromLocale(locale);
-  }, [locale, getCurrencyFromLocale]);
 
   useEffect(() => {
     void import('canvas-confetti');

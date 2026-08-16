@@ -6,7 +6,6 @@ import {
   addMonths,
   compareAsc,
   endOfYear,
-  formatDate,
   isoDateTime,
   isWithinInterval,
   startOfYear,

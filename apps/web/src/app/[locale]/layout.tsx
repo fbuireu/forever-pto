@@ -8,6 +8,7 @@ import '@styles/index.css';
 import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { AppThemeProvider } from '@ui/modules/providers/AppThemeProvider';
+import { CurrencySync } from '@ui/modules/stores/CurrencySync';
 import { Analytics } from '@ui/modules/tracking/Analytics';
 import { BetterStackTracking } from '@ui/modules/tracking/BetterStackTracking';
 import { notFound } from 'next/navigation';
@@ -51,6 +52,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
         </a>
         <BonesProvider />
         <NextIntlClientProvider>
+          <CurrencySync />
           <AppThemeProvider>
             <LazyMotionProvider>
               {children}
