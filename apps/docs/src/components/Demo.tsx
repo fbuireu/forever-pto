@@ -19,6 +19,7 @@ export const Demo = ({ children, className }: DemoProps) => {
     <LazyMotionProvider>
       <DemoIntlProvider>
         <div
+          data-demo
           className={`not-content bg-background text-foreground border-[3px] border-[var(--frame)] rounded-[14px] p-8 my-4 flex flex-wrap items-center gap-4 ${className ?? ''}`}
           style={{ backgroundImage: 'var(--page-glow)' }}
         >

@@ -18,6 +18,18 @@ The Forever PTO documentation wiki (docs.forever-pto.com). An Astro Starlight si
 
 - **Anti-drift rule**: prose names a file, never a volatile literal. Where the app exports a constant (cookie names, enums, CVA objects), import it into the MDX/demo and interpolate; component variant tables are typed `Record`s over `VariantProps<typeof xxxVariants>` so renames break `astro check`. Token values render through the runtime visualizers (`TokenSwatch`, `ShadowScale`, `TypeSpecimen`).
 - Demos live in `src/components/demos/`, wrapped in `<Demo>` and hydrated with `client:visible`. Motion-based components need `<LazyMotionProvider>`.
+- **`Demo` marks its frame with `data-demo`, and `e2e/demos.spec.ts` walks every page that carries one.** The
+  list is derived from `dist/**/index.html` after the build, not from the MDX sources, because the source
+  question — "does this file import from `components/demos/`?" — answers yes for a page that merely names the
+  folder in prose and for one that imports a plain constant like `APP_LOCALES`. The built HTML is what is
+  actually served. Sixty-three tests cover 62 pages plus a floor assertion, so a build that stops emitting
+  demos fails rather than passing with an empty list.
+
+  Each page is asserted three ways: it answers 200, every `data-demo` frame has at least one element child
+  once scrolled into view, and the page raises no `pageerror` and logs no `console.error`. That third one is
+  the point — **a demo can break in the browser and build green.** A `useEffect` that throws was used to
+  verify it: `astro build` reported 155 pages built, and the suite went red. Asserting on *text* instead does
+  not work, and was the first attempt: an `Input` or `Slider` demo legitimately renders no text at all.
 - Content lives in `src/content/docs/` (root locale = English, pathless URLs). `es/` mirrors filenames; untranslated pages fall back to English automatically. Sidebar order via `sidebar.order` frontmatter.
 - Formatting/linting: root Biome config (docs is not excluded; only `docs/src/styles` is, for Tailwind directives). No Prettier.
 - **Commits touching docs use the `docs:` type** — the repo squash-merges and the PR title becomes the commit on main, so a `feat:`/`fix:` title would cut an app release. See `/contributing/conventions/`.
