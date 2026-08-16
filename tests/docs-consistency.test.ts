@@ -149,6 +149,15 @@ describe('the workspace is shaped the way the guides describe it', () => {
     expect(existsSync(join(ROOT, pkg, 'pnpm-lock.yaml'))).toBe(false);
   });
 
+  it("resolves every repo-relative path biome's includes list excludes", () => {
+    const includes: string[] = readJson('biome.json').files.includes;
+    const dangling = includes
+      .filter((entry) => entry.startsWith('!') && !entry.includes('*'))
+      .map((entry) => entry.slice(1))
+      .filter((path) => !existsSync(join(ROOT, path)));
+    expect(dangling).toEqual([]);
+  });
+
   it('keeps the web tsconfig beside the next config it is rewritten by', () => {
     expect(existsSync(join(ROOT, WEB, 'next.config.ts'))).toBe(true);
     expect(existsSync(join(ROOT, WEB, 'tsconfig.json'))).toBe(true);

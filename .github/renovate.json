@@ -54,6 +54,11 @@
       "allowedVersions": "/^[0-9]*[02468]\\./"
     },
     {
+      "matchDepNames": ["boneyard-js"],
+      "automerge": false,
+      "addLabels": ["patched-dependency"]
+    },
+    {
       "matchFileNames": ["apps/docs/package.json"],
       "addLabels": ["docs"]
     }

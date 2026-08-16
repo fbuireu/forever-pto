@@ -70,8 +70,8 @@ documents it as a repo-level command.
 
 **One Biome config, at the root, for both packages.** `--changed` needs the git root to compare against,
 and a single pass is what lints `apps/docs` now that its workflow no longer has a Biome step of its own.
-Its `files.includes` exclusions are repo-relative paths, so any future move has to re-prefix them — and
-nothing asserts they still resolve. `.astro` files are excluded from the **linter** only: Biome parses just
+Its `files.includes` exclusions are repo-relative paths, so any future move has to re-prefix them;
+`tests/docs-consistency.test.ts` asserts every one that names a literal path still resolves. `.astro` files are excluded from the **linter** only: Biome parses just
 their frontmatter, so every import used in the template body reads as unused. `astro check` covers them.
 
 **One lockfile, at the root.** `.gitignore` carries `apps/*/pnpm-lock.yaml` so a stray per-package lockfile
@@ -235,8 +235,8 @@ contract executable. It runs with `pnpm test:ut` (so, in CI on every PR) and ass
 exists only at the root, is linked from here, and stays a glossary — no backticked token holding a path, a
 call signature or a source-file name, every term defined, no empty `_Avoid_` list, no term listing itself as
 its own alternative; that the workspace globs resolve, both packages are members with their own manifests,
-the root stays private and dependency-free at `0.0.0`, and neither package carries its own Biome config or
-lockfile; that every layer root has a `CLAUDE.md`, that both package guides exist and are listed here, and
+the root stays private and dependency-free at `0.0.0`, neither package carries its own Biome config or
+lockfile, and every literal path Biome's `files.includes` excludes still resolves; that every layer root has a `CLAUDE.md`, that both package guides exist and are listed here, and
 that every guide under `apps/web/src` is listed in the web package's own table; that ADRs are named
 `NNNN-slug.md`, numbered contiguously from `0001`, carry the template's sections, and are each linked from
 some document **outside** `adr/` — an ADR nothing points at will not be read; that every relative markdown
@@ -275,5 +275,16 @@ list.
 - **The `v1` floating tag is stale and nothing maintains it.** It diverges between local and remote, which
   makes semantic-release's own `git fetch --tags` fail outright with *would clobber existing tag*. No
   workflow moves it and no ADR records it.
+- **`boneyard-js` is patched, so Renovate must not automerge it.** `pnpm-workspace.yaml` keys
+  `patchedDependencies` by bare name, with no version, so the patch is applied to whatever version resolves.
+  A bump that still applies cleanly but no longer patches what the diff was written against is silent — the
+  install succeeds and CI stays green. `.github/renovate.json` therefore carries a `boneyard-js` rule turning
+  `automerge` off, against the blanket patch/minor automerge above it; a human reads the upstream diff. It is
+  the only dependency in the tree with a patch, and a second one needs the same rule.
+- **`minimumReleaseAge` is declared twice and nothing keeps the two in step.** `pnpm-workspace.yaml` says
+  4320 minutes (3 days), `.github/renovate.json` says 4 days. Renovate being the stricter of the two is what
+  makes it safe: it cannot open a pull request for a release the installer would then refuse. Lower it below
+  the workspace's and CI fails on the lockfile rather than at resolution, because the age is re-checked on
+  **every** install and not only when a version is picked.
 - **Never run `lint-staged` by hand.** It stashes the whole tree; interrupting it can revert the working
   copy. Let the hook run it.
