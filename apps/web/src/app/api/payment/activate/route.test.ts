@@ -31,7 +31,7 @@ vi.mock('next/server', async (importOriginal) => {
 
 const { GET } = await import('./route');
 
-const CLIENT_SECRET = 'pi_test_123_secret_abc';
+const CLIENT_SECRET = 'fixture-client-secret';
 const PAYMENT_INTENT_ID = 'pi_test_123';
 
 const makeRequest = (query: Record<string, string>, headers: Record<string, string> = {}) => {

@@ -21,7 +21,7 @@ vi.mock('@infrastructure/services/premium/session', () => ({
   createSession: vi.fn(() => Effect.succeed('jwt-token')),
 }));
 
-const CLIENT_SECRET = 'pi_test_secret_abcdef';
+const CLIENT_SECRET = 'fixture-client-secret';
 
 const SUCCEEDED_INTENT = {
   id: 'pi_test',
@@ -171,14 +171,14 @@ describe('activateWithPayment', () => {
 
   it('rejects a client secret that does not belong to the payment intent', async () => {
     const err = await runFail(
-      activateWithPayment({ paymentIntentId: 'pi_test', clientSecret: 'pi_test_secret_WRONGx' })
+      activateWithPayment({ paymentIntentId: 'pi_test', clientSecret: 'fixture-client-WRONGx' })
     );
     expect(err).toBeInstanceOf(ValidationError);
   });
 
   it('does not mint a session for a mismatched client secret', async () => {
     const { createSession } = await import('@infrastructure/services/premium/session');
-    await runFail(activateWithPayment({ paymentIntentId: 'pi_test', clientSecret: 'pi_test_secret_WRONGx' }));
+    await runFail(activateWithPayment({ paymentIntentId: 'pi_test', clientSecret: 'fixture-client-WRONGx' }));
     expect(createSession).not.toHaveBeenCalled();
   });
 

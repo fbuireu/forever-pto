@@ -127,7 +127,7 @@ describe('tail worker', () => {
           makeEvent({
             event: {
               request: {
-                url: 'https://forever-pto.com/en/payment/confirmation?payment_intent=pi_3Abc&payment_intent_client_secret=pi_3Abc_secret_XYZ',
+                url: 'https://forever-pto.com/en/payment/confirmation?payment_intent=pi_3Abc&payment_intent_client_secret=redacted-in-fixture',
                 method: 'GET',
                 headers: {},
               },
@@ -141,7 +141,7 @@ describe('tail worker', () => {
       const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
       const body = JSON.parse(options.body as string);
       expect(body[0].url).toBe('https://forever-pto.com/en/payment/confirmation');
-      expect(options.body as string).not.toContain('secret_XYZ');
+      expect(options.body as string).not.toContain('redacted-in-fixture');
     });
 
     it('sets url to undefined when the request url is unparseable', async () => {

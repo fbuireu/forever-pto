@@ -261,6 +261,14 @@ failure. `rateLimit.test.ts` mocks `@opennextjs/cloudflare` instead, since the r
 dependency; its burst case drives 200 concurrent `checkRateLimit` calls to pin that the count is the
 platform’s and not a local read-modify-write.
 
+**No fixture may be shaped like a real Stripe client secret.** Secret scanners match `pi_<id>_secret_<rest>`
+and cannot tell a test double from a leak, so a fake in that shape fails the scan on every push and trains
+everyone to wave the alert through. The fixtures read `fixture-client-secret` and `client-secret-abc`
+instead. **The pair in `activatePremium.test.ts` is deliberately the same length** —
+`fixture-client-secret` and `fixture-client-WRONGx`, both 21 — because `matchesClientSecret` short-circuits
+on length, so an unequal pair would exercise the guard rather than the constant-time comparison the test is
+there for.
+
 No test constructs a Stripe or Turso client — and that is exactly how the promotion-code shape above went
 unnoticed for as long as it did. A mock is written from the same reading of the API the code was written
 from, so when the reading is wrong the mock agrees with it and the suite proves nothing. Where a shape

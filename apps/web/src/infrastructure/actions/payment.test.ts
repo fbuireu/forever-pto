@@ -60,11 +60,11 @@ describe('createPaymentAction', () => {
   });
 
   it('returns success:true with clientSecret on success', async () => {
-    mockCreatePayment.mockReturnValue(Effect.succeed({ clientSecret: 'pi_secret_abc', discountInfo: null }));
+    mockCreatePayment.mockReturnValue(Effect.succeed({ clientSecret: 'client-secret-abc', discountInfo: null }));
     const result = await createPaymentAction(validInput);
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.clientSecret).toBe('pi_secret_abc');
+      expect(result.clientSecret).toBe('client-secret-abc');
       expect(result.discountInfo).toBeUndefined();
     }
   });

@@ -55,16 +55,16 @@ describe('initializePayment', () => {
       couponId: 'c1',
       couponName: 'SAVE10',
     };
-    mockCreatePaymentAction.mockResolvedValue({ success: true, clientSecret: 'pi_secret_123', discountInfo });
+    mockCreatePaymentAction.mockResolvedValue({ success: true, clientSecret: 'client-secret-123', discountInfo });
 
     const result = await initializePayment({ amount: 100, email: 'user@example.com' });
 
-    expect(result.clientSecret).toBe('pi_secret_123');
+    expect(result.clientSecret).toBe('client-secret-123');
     expect(result.discountInfo).toEqual(discountInfo);
   });
 
   it('returns null discountInfo when not provided', async () => {
-    mockCreatePaymentAction.mockResolvedValue({ success: true, clientSecret: 'pi_secret_123' });
+    mockCreatePaymentAction.mockResolvedValue({ success: true, clientSecret: 'client-secret-123' });
 
     const result = await initializePayment({ amount: 100, email: 'user@example.com' });
 

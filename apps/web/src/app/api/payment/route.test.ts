@@ -60,7 +60,7 @@ describe('POST /api/payment', () => {
     mockCheckRateLimit.mockReturnValue(Effect.succeed(undefined));
     mockCreatePayment.mockReturnValue(
       Effect.succeed({
-        clientSecret: 'pi_secret_deferred',
+        clientSecret: 'client-secret-deferred',
         discountInfo: null,
         deferred: Effect.sync(persisted),
       })
@@ -76,13 +76,13 @@ describe('POST /api/payment', () => {
   it('returns 200 with clientSecret on success', async () => {
     mockCheckRateLimit.mockReturnValue(Effect.succeed(undefined));
     mockCreatePayment.mockReturnValue(
-      Effect.succeed({ clientSecret: 'pi_secret_abc', discountInfo: null, deferred: Effect.void })
+      Effect.succeed({ clientSecret: 'client-secret-abc', discountInfo: null, deferred: Effect.void })
     );
     const response = await POST(makeRequest({ amount: 9.99, email: 'user@example.com' }) as never);
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(body.success).toBe(true);
-    expect(body.clientSecret).toBe('pi_secret_abc');
+    expect(body.clientSecret).toBe('client-secret-abc');
     expect(body.discountInfo).toBeUndefined();
   });
 
