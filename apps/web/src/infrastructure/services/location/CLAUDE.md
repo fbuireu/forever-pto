@@ -14,7 +14,8 @@ costs one interaction. Nothing downstream should treat the result as authoritati
 | File | Role |
 | --- | --- |
 | `detectCountry.ts` | Runs the chain. The ordering and nothing else |
-| `utils/strategies.ts` | The three strategies plus the constants they share (`CLOUDFLARE_COUNTRY_HEADER`, `UNIDENTIFIED_COUNTRY`, `TOR_COUNTRY`) |
+| `utils/strategies.ts` | The three strategies and `CLOUDFLARE_COUNTRY_HEADER` |
+| `utils/normalize.ts` | `normalizeCountryCode` — the one exit rule — plus `noStoreFetch` and the `UNIDENTIFIED_COUNTRY` / `TOR_COUNTRY` sentinels |
 
 ## The chain
 
@@ -65,9 +66,17 @@ visitor's own connection ([ADR 0004](../../../../../../adr/0004-cloudflare-worke
 the edge exposing the country on the request is the reason no geolocation service is needed on the common
 path).
 
-**`XX` and `T1` are filtered, and only in the header strategy.** They mean unidentified traffic and a Tor
-exit node — not countries, and not values `date-holidays` could do anything with. The CDN trace's `loc` line
-is passed through as-is, so the same two codes can reach the cookie by that route.
+**`XX` and `T1` are filtered, and now in every strategy.** They mean unidentified traffic and a Tor exit
+node — not countries, and not values `date-holidays` could do anything with. The filter used to live in the
+header strategy alone: the CDN trace's `loc` line was passed through as-is and the egress-IP answer was
+`geoData.country?.toLowerCase() ?? ''`, so the same two codes could reach the week-long `user-country` cookie
+by either route. Each strategy also spelled its own exit normalisation, three times, differently, and none
+checked the shape — so a malformed header reached the cookie and then `new Holidays(country)`.
+
+`normalizeCountryCode` is that one rule: trim, lower-case, reject anything that is not two ASCII letters,
+reject the sentinels. `noStoreFetch` beside it owns `cache: 'no-store'` and the 5 s timeout, which were
+re-typed at all three fetches — and the cache mode is a privacy invariant, not a preference, so a fourth
+strategy must not be able to forget it.
 
 **Effect is used here but never escapes.** Both async strategies are `Effect.gen` programs terminated inside
 their own wrapper with `Effect.runPromise`, because the middleware has no `ApplicationLayer` to provide. For

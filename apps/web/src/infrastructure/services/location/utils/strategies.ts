@@ -2,23 +2,20 @@ import { getBetterStackInstance } from '@infrastructure/clients/logging/better-s
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { Effect } from 'effect';
 import type { NextRequest } from 'next/server';
+import { normalizeCountryCode, noStoreFetch } from './normalize';
 
 const logger = getBetterStackInstance();
 
 const LOCATION_IDENTIFIER = 'loc=';
 const CDN_TRACE = 'cdn-cgi/trace';
 export const CLOUDFLARE_COUNTRY_HEADER = 'cf-ipcountry';
-export const UNIDENTIFIED_COUNTRY = 'XX';
-export const TOR_COUNTRY = 'T1';
 const IP_SERVICE = 'https://api.ipify.org';
 const GEO_SERVICE = 'https://ipinfo.io';
 const FORMAT = 'json';
 
 const detectCountryFromCDNEffect = Effect.gen(function* () {
   const { env } = yield* Effect.tryPromise(() => getCloudflareContext({ async: true }));
-  const response = yield* Effect.tryPromise(() =>
-    fetch(`${env.NEXT_PUBLIC_SITE_URL}/${CDN_TRACE}`, { cache: 'no-store', signal: AbortSignal.timeout(5000) })
-  );
+  const response = yield* Effect.tryPromise(() => noStoreFetch(`${env.NEXT_PUBLIC_SITE_URL}/${CDN_TRACE}`));
 
   if (!response.ok) {
     return yield* Effect.fail(new Error('Error while getting information from the CDN'));
@@ -27,7 +24,7 @@ const detectCountryFromCDNEffect = Effect.gen(function* () {
   const text = yield* Effect.tryPromise(() => response.text());
   const location = text.split('\n').find((line) => line.startsWith(LOCATION_IDENTIFIER));
 
-  return location ? location.substring(LOCATION_IDENTIFIER.length).trim().toLowerCase() : '';
+  return normalizeCountryCode(location?.substring(LOCATION_IDENTIFIER.length));
 });
 
 export async function detectCountryFromCDN() {
@@ -42,19 +39,11 @@ export async function detectCountryFromCDN() {
 }
 
 export function detectCountryFromHeaders(request: NextRequest) {
-  const country = request.headers.get(CLOUDFLARE_COUNTRY_HEADER);
-
-  if (!country || country === UNIDENTIFIED_COUNTRY || country === TOR_COUNTRY) {
-    return '';
-  }
-
-  return country.toLowerCase();
+  return normalizeCountryCode(request.headers.get(CLOUDFLARE_COUNTRY_HEADER));
 }
 
 const detectCountryFromEgressIPEffect = Effect.gen(function* () {
-  const ipResponse = yield* Effect.tryPromise(() =>
-    fetch(`${IP_SERVICE}?format=${FORMAT}`, { cache: 'no-store', signal: AbortSignal.timeout(5000) })
-  );
+  const ipResponse = yield* Effect.tryPromise(() => noStoreFetch(`${IP_SERVICE}?format=${FORMAT}`));
 
   if (!ipResponse.ok) return '';
 
@@ -62,17 +51,13 @@ const detectCountryFromEgressIPEffect = Effect.gen(function* () {
   if (!ip) return '';
 
   const geoResponse = yield* Effect.tryPromise(() =>
-    fetch(`${GEO_SERVICE}/${ip}/${FORMAT}`, {
-      headers: { Accept: 'application/json' },
-      cache: 'no-store',
-      signal: AbortSignal.timeout(5000),
-    })
+    noStoreFetch(`${GEO_SERVICE}/${ip}/${FORMAT}`, { headers: { Accept: 'application/json' } })
   );
 
   if (!geoResponse.ok) return '';
 
   const geoData = yield* Effect.tryPromise(() => geoResponse.json() as Promise<{ country?: string }>);
-  return geoData.country?.toLowerCase() ?? '';
+  return normalizeCountryCode(geoData.country);
 });
 
 export async function detectCountryFromEgressIP() {

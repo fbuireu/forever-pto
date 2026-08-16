@@ -11,14 +11,10 @@ vi.mock('@opennextjs/cloudflare', () => ({
   getCloudflareContext: mockGetCloudflareContext,
 }));
 
-const {
-  detectCountryFromCDN,
-  detectCountryFromHeaders,
-  detectCountryFromEgressIP,
-  CLOUDFLARE_COUNTRY_HEADER,
-  UNIDENTIFIED_COUNTRY,
-  TOR_COUNTRY,
-} = await import('./strategies');
+const { detectCountryFromCDN, detectCountryFromHeaders, detectCountryFromEgressIP, CLOUDFLARE_COUNTRY_HEADER } =
+  await import('./strategies');
+
+const { UNIDENTIFIED_COUNTRY, TOR_COUNTRY } = await import('./normalize');
 
 function makeRequest(country: string | null) {
   return { headers: { get: (header: string) => (header === CLOUDFLARE_COUNTRY_HEADER ? country : null) } } as never;
