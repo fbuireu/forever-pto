@@ -1,10 +1,11 @@
+import { AMOUNT_MIN } from '@application/dto/payment/schema';
 import { LOCALES } from '@infrastructure/i18n/locales';
 import { localePath } from '@infrastructure/i18n/utils/url';
 import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 
-const MINIMUM_DONATION = '1';
+const MINIMUM_DONATION = String(AMOUNT_MIN);
 
 interface JsonLdProps {
   locale: Locale;

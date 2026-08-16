@@ -75,6 +75,15 @@ and a stale `false` hides a Custom Holiday the window has since moved back onto.
 
 **Schemas carry message keys, not messages.** `contactSchema` and `createPaymentSchema` are pre-bound with keys such as `invalid_email` for server-side validation. The UI calls `createContactSchema` / `createPaymentSchemaWithMessages` with translated strings instead. Adding a validation rule means adding it to the messages interface too, or the localised form silently loses the message.
 
+**The bounds are exported, and the bundles interpolate them.** `AMOUNT_MIN`/`AMOUNT_MAX` and
+`NAME_MIN_LENGTH`/`SUBJECT_MIN_LENGTH`/`MESSAGE_MIN_LENGTH` come out of the schema modules, so the rule and
+the message it explains move together. They did not: `payment/schema.ts` said `.max(10000)` while twelve
+hand-written strings said "Maximum amount is 10,000" — one per bound per locale, each with its own grouping
+separator (`10.000`, `10 000`, `10,000`). Raising the cap made every bundle lie. The keys are
+`{max, number}` now, so ICU does the grouping per locale and the number comes from the schema.
+`JsonLd.tsx`'s `MINIMUM_DONATION` reads `AMOUNT_MIN` for the same reason — the structured data advertises a
+`minPrice`, and the app guide used to say the two "move together" as an instruction to the reader.
+
 **`calculateFinalAmount` in `payment/utils/helpers.ts` is not the one in the promo-code service.** This one just unwraps an already-computed `DiscountInfo` for display; the identically named private function in `@infrastructure/services/payments/provider/promoCode` is what actually applies a Stripe coupon.
 
 ## Testing

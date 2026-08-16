@@ -715,8 +715,8 @@
       "messageMax": "Message is too long"
     },
     "payment": {
-      "amountMin": "Minimum amount is 1",
-      "amountMax": "Maximum amount is 10,000",
+      "amountMin": "Minimum amount is {min, number}",
+      "amountMax": "Maximum amount is {max, number}",
       "invalidEmail": "Enter a valid email address",
       "emailRequired": "Email is required",
       "promoCodeTooLong": "Promo code is too long"

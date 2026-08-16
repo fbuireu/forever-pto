@@ -8,12 +8,17 @@ interface PaymentSchemaMessages {
   promoCodeTooLong: string;
 }
 
+export const AMOUNT_MIN = 1;
+export const AMOUNT_MAX = 10000;
 const EMAIL_MAX_LENGTH = 254;
 const PROMO_CODE_MAX_LENGTH = 100;
 
 export const createPaymentSchemaWithMessages = (messages: PaymentSchemaMessages) =>
   z.object({
-    amount: z.number().min(1, { message: messages.amountMin }).max(10000, { message: messages.amountMax }),
+    amount: z
+      .number()
+      .min(AMOUNT_MIN, { message: messages.amountMin })
+      .max(AMOUNT_MAX, { message: messages.amountMax }),
     email: z
       .email({ message: messages.invalidEmail })
       .min(1, { message: messages.emailRequired })

@@ -11,12 +11,16 @@ interface ContactSchemaMessages {
   messageMax: string;
 }
 
+export const NAME_MIN_LENGTH = 2;
+export const SUBJECT_MIN_LENGTH = 5;
+export const MESSAGE_MIN_LENGTH = 10;
+
 export const createContactSchema = (messages: ContactSchemaMessages) =>
   z.object({
     email: z.email(messages.invalidEmail).min(1, messages.emailRequired),
-    name: z.string().min(2, messages.nameMin).max(100, messages.nameMax),
-    subject: z.string().min(5, messages.subjectMin).max(200, messages.subjectMax),
-    message: z.string().min(10, messages.messageMin).max(1000, messages.messageMax),
+    name: z.string().min(NAME_MIN_LENGTH, messages.nameMin).max(100, messages.nameMax),
+    subject: z.string().min(SUBJECT_MIN_LENGTH, messages.subjectMin).max(200, messages.subjectMax),
+    message: z.string().min(MESSAGE_MIN_LENGTH, messages.messageMin).max(1000, messages.messageMax),
   });
 
 export const contactSchema = createContactSchema({

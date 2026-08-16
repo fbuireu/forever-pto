@@ -1,6 +1,11 @@
 'use client';
 
-import { type CreatePaymentInput, createPaymentSchemaWithMessages } from '@application/dto/payment/schema';
+import {
+  AMOUNT_MAX,
+  AMOUNT_MIN,
+  type CreatePaymentInput,
+  createPaymentSchemaWithMessages,
+} from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { calculateFinalAmount } from '@application/dto/payment/utils/helpers';
 import { usePremiumStore } from '@application/stores/premium';
@@ -71,8 +76,8 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
   );
 
   const paymentSchema = createPaymentSchemaWithMessages({
-    amountMin: tValidation('amountMin'),
-    amountMax: tValidation('amountMax'),
+    amountMin: tValidation('amountMin', { min: AMOUNT_MIN }),
+    amountMax: tValidation('amountMax', { max: AMOUNT_MAX }),
     invalidEmail: tValidation('invalidEmail'),
     emailRequired: tValidation('emailRequired'),
     promoCodeTooLong: tValidation('promoCodeTooLong'),

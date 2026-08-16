@@ -1,6 +1,12 @@
 'use client';
 
-import { type ContactFormData, createContactSchema } from '@application/dto/contact/schema';
+import {
+  type ContactFormData,
+  createContactSchema,
+  MESSAGE_MIN_LENGTH,
+  NAME_MIN_LENGTH,
+  SUBJECT_MIN_LENGTH,
+} from '@application/dto/contact/schema';
 import { usePremiumStore } from '@application/stores/premium';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
@@ -54,11 +60,11 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
   const contactSchema = createContactSchema({
     invalidEmail: tValidation('invalidEmail'),
     emailRequired: tValidation('emailRequired'),
-    nameMin: tValidation('nameMin', { min: 2 }),
+    nameMin: tValidation('nameMin', { min: NAME_MIN_LENGTH }),
     nameMax: tValidation('nameMax'),
-    subjectMin: tValidation('subjectMin', { min: 5 }),
+    subjectMin: tValidation('subjectMin', { min: SUBJECT_MIN_LENGTH }),
     subjectMax: tValidation('subjectMax'),
-    messageMin: tValidation('messageMin', { min: 10 }),
+    messageMin: tValidation('messageMin', { min: MESSAGE_MIN_LENGTH }),
     messageMax: tValidation('messageMax'),
   });
 

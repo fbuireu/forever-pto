@@ -300,8 +300,8 @@ emitted on the planner, which has no FAQ on it at all.
 
 The Premium offer states a `priceSpecification` with a `minPrice`, not a fixed price. Premium is unlocked by
 a Donation the payer chooses — `src/application/dto/payment/schema.ts` accepts 1 to 10000 — so the fixed
-4.99 it used to advertise was simply untrue. If the minimum moves, `MINIMUM_DONATION` and that Zod bound
-move together.
+4.99 it used to advertise was simply untrue. `MINIMUM_DONATION` reads `AMOUNT_MIN` out of that schema now, so
+the two cannot drift — this sentence used to ask the reader to move them together by hand.
 
 ## Fonts
 

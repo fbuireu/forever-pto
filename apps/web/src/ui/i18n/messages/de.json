@@ -715,8 +715,8 @@
       "messageMax": "Die Nachricht ist zu lang"
     },
     "payment": {
-      "amountMin": "Mindestbetrag ist 1",
-      "amountMax": "Höchstbetrag ist 10.000",
+      "amountMin": "Mindestbetrag ist {min, number}",
+      "amountMax": "Höchstbetrag ist {max, number}",
       "invalidEmail": "Gib eine gültige E-Mail-Adresse ein.",
       "emailRequired": "Gib deine E-Mail-Adresse ein.",
       "promoCodeTooLong": "Der Promo-Code ist zu lang"
