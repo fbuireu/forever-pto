@@ -70,27 +70,6 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
     [setDonatePopoverOpen]
   );
 
-  useEffect(() => {
-    const legend = document.getElementById('legend-sticky');
-    if (!legend) {
-      document.documentElement.setAttribute('data-legend-stuck', '');
-      return () => document.documentElement.removeAttribute('data-legend-stuck');
-    }
-
-    const update = () => {
-      const { bottom } = legend.getBoundingClientRect();
-      document.documentElement.toggleAttribute('data-legend-stuck', Math.round(bottom) < window.innerHeight - 1);
-    };
-
-    window.addEventListener('scroll', update, { passive: true });
-    update();
-
-    return () => {
-      window.removeEventListener('scroll', update);
-      document.documentElement.removeAttribute('data-legend-stuck');
-    };
-  }, []);
-
   const paymentSchema = createPaymentSchemaWithMessages({
     amountMin: tValidation('amountMin'),
     amountMax: tValidation('amountMax'),

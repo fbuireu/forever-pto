@@ -279,6 +279,15 @@ headline figure is roughly double what the Holidays table beside it lists. This 
 belongs here; the same narrowing applied to `generateMetrics` was tried and reverted, for the reason in
 [`@domain/calendar/CLAUDE.md`](../../../../domain/calendar/CLAUDE.md).
 
+**The Legend's stuck state is CSS, and the JavaScript that shadowed it was dead.** `legend.module.css`
+declares `container-type: scroll-state` on `.sticky_container` and styles the collapsed form under
+`@container pto-legend scroll-state(stuck: bottom)`. `shared/donate/Donate.tsx` also carried an effect that
+found the Legend by a `legend-sticky` id, listened on `scroll` unthrottled, called `getBoundingClientRect()`
+per frame and toggled `data-legend-stuck` on `<html>` — an attribute no stylesheet in the package ever read,
+so it was not the `@supports` fallback it looked like. Both the effect and the id are gone. If a fallback for
+browsers without `scroll-state()` is ever wanted, it belongs beside `Legend.tsx` **with a CSS rule that
+consumes the attribute**, not in a cross-screen component reaching in by DOM id.
+
 **`data-tutorial` attributes are load-bearing.** `calendar-list`, `holidays-list`, `planner-drawer`,
 `alternatives-manager` and `pto-status` are the driver.js anchors. `ManagementBar` additionally listens
 for a `tutorial:expand-drawer` window event dispatched by `hooks/useTutorial.tsx` — a deliberately

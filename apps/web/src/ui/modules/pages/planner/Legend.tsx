@@ -50,7 +50,7 @@ export const Legend = () => {
   const t = useTranslations('legend');
 
   return (
-    <div id='legend-sticky' className={cn(styles.sticky_container, 'hidden md:block')}>
+    <div className={cn(styles.sticky_container, 'hidden md:block')}>
       <input type='checkbox' id='legend-toggle' className={styles.toggle} />
       <section className={styles.section}>
         <Card className={styles.card}>
