@@ -23,10 +23,7 @@ vi.mock('next-intl', async (importOriginal) => {
   };
 });
 vi.mock('@app/fonts', () => ({
-  bricolage: { variable: 'bricolage-var' },
-  spaceGrotesk: { variable: 'space-grotesk-var' },
-  instrumentSerif: { variable: 'instrument-serif-var' },
-  jetbrainsMono: { variable: 'jetbrains-mono-var' },
+  DOCUMENT_BODY_CLASS: 'bricolage-var space-grotesk-var instrument-serif-var jetbrains-mono-var font-sans antialiased',
 }));
 vi.mock('@styles/index.css', () => ({}));
 

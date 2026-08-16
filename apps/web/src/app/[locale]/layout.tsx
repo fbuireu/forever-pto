@@ -2,11 +2,11 @@ import { LOCALES } from '@infrastructure/i18n/locales';
 import { BonesProvider } from '@ui/modules/providers/BonesProvider';
 import { CookieConsentClient } from '@ui/modules/shared/cookie-consent/CookieConsentClient';
 import { WebMCP } from '@ui/modules/shared/WebMCP';
-import { cn } from '@ui/utils/cn';
 import type { ReactNode } from 'react';
 import '@styles/index.css';
-import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
+import { DOCUMENT_BODY_CLASS } from '@app/fonts';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
+import { SkipToContent } from '@ui/modules/layout/SkipToContent';
 import { AppThemeProvider } from '@ui/modules/providers/AppThemeProvider';
 import { CurrencySync } from '@ui/modules/stores/CurrencySync';
 import { Analytics } from '@ui/modules/tracking/Analytics';
@@ -35,21 +35,8 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body
-        className={cn(
-          bricolage.variable,
-          spaceGrotesk.variable,
-          instrumentSerif.variable,
-          jetbrainsMono.variable,
-          'font-sans antialiased'
-        )}
-      >
-        <a
-          href='#main-content'
-          className='sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-3 focus:py-1.5 focus:text-sm focus:bg-background focus:text-foreground focus:border focus:rounded-md focus:shadow-sm'
-        >
-          {t('skipToMainContent')}
-        </a>
+      <body className={DOCUMENT_BODY_CLASS}>
+        <SkipToContent label={t('skipToMainContent')} />
         <BonesProvider />
         <NextIntlClientProvider>
           <CurrencySync />

@@ -28,10 +28,7 @@ vi.mock('@ui/modules/providers/AppThemeProvider', () => ({
 vi.mock('@ui/utils/cn', () => ({ cn: (...args: unknown[]) => args.filter(Boolean).join(' ') }));
 vi.mock('@styles/index.css', () => ({}));
 vi.mock('@app/fonts', () => ({
-  bricolage: { variable: 'var-bricolage' },
-  spaceGrotesk: { variable: 'var-space-grotesk' },
-  instrumentSerif: { variable: 'var-instrument-serif' },
-  jetbrainsMono: { variable: 'var-jetbrains-mono' },
+  DOCUMENT_BODY_CLASS: 'var-bricolage var-space-grotesk var-instrument-serif var-jetbrains-mono font-sans antialiased',
 }));
 
 const { default: Layout, generateStaticParams } = await import('./layout');

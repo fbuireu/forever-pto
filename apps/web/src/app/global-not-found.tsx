@@ -1,13 +1,13 @@
 import '@styles/index.css';
-import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
+import { DOCUMENT_BODY_CLASS } from '@app/fonts';
 import { LOCALE_COOKIE, LOCALES } from '@infrastructure/i18n/locales';
 import { routing } from '@infrastructure/i18n/routing';
 import { localeFromAcceptLanguage, resolveLocale } from '@infrastructure/i18n/utils/url';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
+import { SkipToContent } from '@ui/modules/layout/SkipToContent';
 import { HtmlLangSync } from '@ui/modules/pages/not-found/HtmlLangSync';
 import { NotFoundContent } from '@ui/modules/pages/not-found/NotFoundContent';
 import { AppThemeProvider } from '@ui/modules/providers/AppThemeProvider';
-import { cn } from '@ui/utils/cn';
 import { cookies, headers } from 'next/headers';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
@@ -33,12 +33,7 @@ const LocalizedNotFound = async () => {
   return (
     <>
       <HtmlLangSync locale={locale} />
-      <a
-        href='#main-content'
-        className='sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-3 focus:py-1.5 focus:text-sm focus:bg-background focus:text-foreground focus:border focus:rounded-md focus:shadow-sm'
-      >
-        {t('skipToMainContent')}
-      </a>
+      <SkipToContent label={t('skipToMainContent')} />
       <NextIntlClientProvider>
         <AppThemeProvider>
           <LazyMotionProvider>
@@ -53,15 +48,7 @@ const LocalizedNotFound = async () => {
 export default function GlobalNotFound() {
   return (
     <html lang={routing.defaultLocale} suppressHydrationWarning>
-      <body
-        className={cn(
-          bricolage.variable,
-          spaceGrotesk.variable,
-          instrumentSerif.variable,
-          jetbrainsMono.variable,
-          'font-sans antialiased'
-        )}
-      >
+      <body className={DOCUMENT_BODY_CLASS}>
         <Suspense fallback={null}>
           <LocalizedNotFound />
         </Suspense>

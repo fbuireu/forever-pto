@@ -25,3 +25,11 @@ export const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   display: 'swap',
 });
+
+export const DOCUMENT_BODY_CLASS = [
+  bricolage.variable,
+  spaceGrotesk.variable,
+  instrumentSerif.variable,
+  jetbrainsMono.variable,
+  'font-sans antialiased',
+].join(' ');
