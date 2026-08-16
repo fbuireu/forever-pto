@@ -23,7 +23,11 @@ A reader who finds two contracts inside one layer assumes one is a mistake. Both
 **`calendar/` is pure.** Its outside imports are exactly four, and the list is meant to stay that short:
 
 - `@application/dto/holiday/types` — `HolidayDTO` and `HolidayVariant`
-- `@application/shared/utils/dates` — the Temporal-backed date helpers
+- `@application/shared/utils/dates` — the Temporal-backed date helpers. The arrow points the wrong way and
+  stays that way on purpose; the alternatives cost more than the tidiness is worth, and
+  [ADR 0012](../../../../adr/0012-shared-date-helpers-stay-in-the-application-layer.md) records why. **The
+  test for a fifth entry on this list is the runtime, not the layer** — does the module resolve inside a Web
+  Worker with no DOM and no server context
 - `temporal-polyfill` — in `utils/helpers.ts` only, for `PlainYearMonth.daysInMonth`
 - `next-intl` — the `Locale` type alone, threaded through `pipeline.ts` to the Metrics, where it formats month names
 
