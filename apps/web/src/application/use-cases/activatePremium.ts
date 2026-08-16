@@ -4,7 +4,7 @@ import { PAYMENT_SUCCEEDED } from '@domain/payment/events/types';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
-import { type DatabaseError, type SessionError, ValidationError } from '@infrastructure/errors';
+import { type DatabaseError, type PaymentError, type SessionError, ValidationError } from '@infrastructure/errors';
 import { normalizeEmail } from '@infrastructure/services/payments/normalizeEmail';
 import { readDonationMetadata } from '@infrastructure/services/payments/provider/metadata';
 import {
@@ -29,16 +29,14 @@ export const activateWithPayment = ({
   clientSecret,
 }: ActivateWithPaymentParams): Effect.Effect<
   { email: string; premiumKey: string; token: string; deferred: Effect.Effect<void, never, TursoService> },
-  ValidationError | SessionError,
+  ValidationError | SessionError | PaymentError,
   StripeServerService | LoggerService
 > =>
   Effect.gen(function* () {
     const logger = yield* LoggerService;
     const stripe = yield* StripeServerService;
 
-    const paymentIntent = yield* stripe.paymentIntents
-      .retrieve(paymentIntentId)
-      .pipe(Effect.mapError((e) => new ValidationError({ message: e.message })));
+    const paymentIntent = yield* stripe.paymentIntents.retrieve(paymentIntentId);
 
     if (clientSecret && !matchesClientSecret(paymentIntent.client_secret, clientSecret)) {
       return yield* Effect.fail(new ValidationError({ message: 'Client secret mismatch' }));

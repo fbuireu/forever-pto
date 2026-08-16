@@ -1,7 +1,7 @@
 import { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
-import { ValidationError } from '@infrastructure/errors';
+import { PaymentError, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { activateWithEmail, activateWithPayment } from './activatePremium';
@@ -97,6 +97,16 @@ describe('activateWithPayment', () => {
     await runDeferred(deferred);
     expect(updatePaymentStatus).toHaveBeenCalledWith('pi_test', 'succeeded');
     expect(savePayment).not.toHaveBeenCalled();
+  });
+
+  it('lets a Stripe failure stay a PaymentError, so its message never reaches the payer', async () => {
+    mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
+      Effect.fail(new PaymentError({ message: "No such payment_intent: 'pi_3ABC'" })) as never
+    );
+    const err = await runFail(activateWithPayment({ paymentIntentId: 'pi_test' }));
+
+    expect(err).toBeInstanceOf(PaymentError);
+    expect(err).not.toBeInstanceOf(ValidationError);
   });
 
   it('fails with ValidationError when payment intent is not succeeded', async () => {

@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
       Effect.provide(ApplicationLayer),
       Effect.catchTags({
         ValidationError: (e) => Effect.succeed(noStore({ error: e.message, premiumKey: null }, { status: 400 })),
+        PaymentError: () => Effect.succeed(noStore({ error: ApiError.INTERNAL_ERROR }, { status: 500 })),
         SessionError: () => Effect.succeed(noStore({ error: ApiError.INTERNAL_ERROR }, { status: 500 })),
         DatabaseError: () => Effect.succeed(noStore({ error: ApiError.INTERNAL_ERROR }, { status: 500 })),
       }),

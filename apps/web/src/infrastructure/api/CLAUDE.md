@@ -50,7 +50,7 @@ What the code does today:
 | `RateLimitError` | 429 | `RATE_LIMIT_EXCEEDED` | `operations/payment.ts` |
 | `ValidationError` | 400 | the error's own `message`, verbatim | `operations/payment.ts`, `operations/contact.ts`, check-session |
 | `PromoCodeError` | 400 | the error's `code`, plus `isPromoCodeError: true` | `operations/payment.ts` |
-| `PaymentError` | 500 | `INTERNAL_ERROR` | `operations/payment.ts` |
+| `PaymentError` | 500 | `INTERNAL_ERROR` | `operations/payment.ts`, check-session |
 | `EmailError` | 500 | `INTERNAL_ERROR` | `operations/contact.ts` |
 | `SessionError`, `DatabaseError` | 500 | `INTERNAL_ERROR` | `src/app/api/check-session/route.ts` |
 | `WebhookError` | 400 or 500 | `INVALID_SIGNATURE` when `isSignatureError`, `WEBHOOK_MISCONFIGURED` (400) when the secret is missing, else `WEBHOOK_PROCESSING_FAILED` (500) | `src/app/api/webhooks/stripe/route.ts` |

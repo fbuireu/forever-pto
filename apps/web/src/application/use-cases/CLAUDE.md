@@ -107,6 +107,18 @@ therefore does not require `TursoService` at all — that requirement lives only
 `ValidationError` is the only failure the boundary turns into a 400 here, and its `message` is returned to
 the client verbatim, so keep those strings safe to show and free of anything about the payer.
 
+**That is why the Stripe read is not relabelled, and it used to be.** `stripe.paymentIntents.retrieve` was
+piped through `Effect.mapError((e) => new ValidationError({ message: e.message }))`, which took an outage or
+a bad key — a `PaymentError`, mapped to 500 `INTERNAL_ERROR` everywhere else — and turned it into the one tag
+whose message is shown. The path that reaches it is the post-charge one: `confirmPayment` POSTs to
+`/api/check-session` immediately after the card clears, and on a non-ok response the checkout adapter returns
+`FAILED_AFTER_CHARGE` carrying `errorData.error`, which `resolveApiErrorMessage` renders as prose because it
+*is* prose. So a Stripe blip after the money moved showed the payer something like
+`No such payment_intent: 'pi_3ABC…'`, under a 400 telling every layer above that the request was wrong and
+there was nothing to retry. `PaymentError` now travels in `activateWithPayment`'s error channel and
+`check-session` maps it beside `SessionError` and `DatabaseError`. `ValidationError` is reserved for the
+three conditions this file decides for itself: secret mismatch, not succeeded, email mismatch.
+
 ## Webhook
 
 `processWebhookEvent` receives an already-verified `Stripe.Event` — signature checking happens at the route,
