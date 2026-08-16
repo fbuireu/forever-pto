@@ -18,7 +18,6 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { obfuscatedStorage } from './crypto';
 import { useFiltersStore } from './filters';
-import { useLocationStore } from './location';
 import {
   type AddHolidayParams,
   type AlternativeSelectionBaseParams,
@@ -128,9 +127,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
             }));
 
           try {
-            const { regions } = useLocationStore.getState();
             const { getHolidays } = await import('@infrastructure/services/holidays/getHolidays');
-            const holidays = await getHolidays({ ...params, regions });
+            const holidays = await getHolidays(params);
             const filteredHolidays = holidays.filter((fetchedHoliday) => {
               const hasCustomOnSameDate = customHolidays.some(
                 (customHoliday) => customHoliday.date.toDateString() === fetchedHoliday.date.toDateString()

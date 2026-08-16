@@ -44,14 +44,19 @@ its own dependency on the package.
 
 ## Public API
 
-`getHolidays({ year, country, carryOverMonths, region, locale, regions, source? })` → `Promise<HolidayDTO[]>`.
+`getHolidays({ year, country, carryOverMonths, region, locale, source? })` → `Promise<HolidayDTO[]>`.
 `source` defaults to `dateHolidaysSource`; nothing in production passes it.
 
 - **No `country` → `[]`, immediately.** That is the normal first call, not an error: the planner renders
   before a Country has been detected or chosen.
 - `locale` is passed on as `{ languages: [locale] }`, so the package returns translated Holiday names.
-- `regions` is the `RegionDTO[]` list from the location store. It is forwarded to the DTO purely so a
-  region code can be rendered as a label; it plays no part in the lookup.
+- **The Region *list* is derived here, from the same `source`, and is not a parameter.** The DTO needs it
+  only to render a region code as a label; it plays no part in the lookup. It used to arrive as a `regions`
+  argument that `fetchHolidays` read out of the location store — a store populated by `Regions.tsx`'s effect,
+  a different `dynamic()` component. Nothing ordered the two, and `regions` sits in no dependency array, so
+  whenever this ran first the label stayed the raw code — `CA` instead of `California` — for the rest of the
+  session. `getRegions` is a pure synchronous function of the Country over this same adapter, so deriving it
+  removes the ordering question rather than answering it. Do not reintroduce the parameter.
 - `region` must be a key from `getRegions.ts` (`getStates()` output), because that is what
   `new Holidays(country, region)` expects. An unusable code never surfaces as an exception — see the
   error contract below.

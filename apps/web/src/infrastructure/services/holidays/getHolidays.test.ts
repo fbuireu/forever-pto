@@ -19,6 +19,7 @@ const CALENDAR = {
   regional: {
     CA: [raw('2027-01-01 00:00:00', 'New Year', 'CA'), raw('2027-03-31 00:00:00', 'Cesar Chavez Day', 'CA')],
   },
+  regions: { US: { CA: 'California' } },
 };
 
 const BASE_PARAMS = {
@@ -27,7 +28,6 @@ const BASE_PARAMS = {
   region: '',
   locale: EN,
   carryOverMonths: 1,
-  regions: [],
   source: createFixtureHolidaySource(CALENDAR),
 };
 
@@ -53,6 +53,13 @@ describe('getHolidays', () => {
 
     expect(holidays.map(({ name }) => name)).not.toContain('Columbus Day');
     expect(holidays.map(({ name }) => name)).toContain('Cesar Chavez Day');
+  });
+
+  it('resolves the Region label from the same source, with no caller supplying one', async () => {
+    const holidays = await getHolidays({ ...BASE_PARAMS, region: 'CA' });
+    const regional = holidays.find(({ name }) => name === 'Cesar Chavez Day');
+
+    expect(regional?.location).toBe('California');
   });
 
   it('keeps the National entry when both lookups name the same date', async () => {

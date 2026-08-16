@@ -1,7 +1,7 @@
 import { holidayDTO } from '@application/dto/holiday/dto';
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import type { RegionDTO } from '@application/dto/region/types';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
+import { getRegions } from '@infrastructure/services/regions/getRegions';
 import { Effect } from 'effect';
 import type { Locale } from 'next-intl';
 import { dateHolidaysSource } from './source/dateHolidays';
@@ -15,7 +15,6 @@ interface GetHolidaysParams {
   carryOverMonths: number;
   region?: string;
   locale: Locale;
-  regions: RegionDTO[];
   source?: HolidaySource;
 }
 
@@ -25,10 +24,11 @@ export async function getHolidays({
   region,
   locale,
   carryOverMonths,
-  regions,
   source = dateHolidaysSource,
 }: GetHolidaysParams) {
   if (!country) return [];
+
+  const regions = getRegions(country, source);
 
   const program = Effect.try(() =>
     holidayDTO.create({

@@ -338,10 +338,19 @@ from the checkout and the "I already donated" modal. Treat it as an entry point 
 not as live behaviour — and keep the guard, because the moment anything calls it on mount the double-count
 is back.
 
-**Cross-store reads go through `getState()`, not hooks.** `holidays.ts` reads
-`useLocationStore.getState().regions` and `useFiltersStore.getState()` inside actions. That is correct
-outside React, but it means those reads are not reactive: an action sees whatever was in the other store at
-call time.
+**Cross-store reads go through `getState()`, not hooks.** `holidays.ts` reads `useFiltersStore.getState()`
+inside actions. That is correct outside React, but it means the read is not reactive: an action sees whatever
+was in the other store at call time.
+
+**There was a second such read and it was a bug, so weigh the next one.** `fetchHolidays` took
+`useLocationStore.getState().regions` and forwarded it to `getHolidays` for the region *label*. That store is
+filled by `Regions.tsx`'s effect, and `CalendarList`'s effect is what calls `fetchHolidays`; both components
+are `dynamic()`-imported from different levels, so chunk arrival decides which runs first, and `regions` is
+in no dependency array. Losing the race left every Regional Holiday reading `CA` rather than `California`
+for the whole session. `getHolidays` derives the list itself now — see
+[`../../infrastructure/services/holidays/CLAUDE.md`](../../infrastructure/services/holidays/CLAUDE.md). A
+non-reactive read of a store another component populates is an ordering dependency; if the value can be
+derived, derive it.
 
 **Selecting several fields without `useShallow` re-renders on every store write.** Every multi-field consumer
 in `src/ui/` wraps its selector in `useShallow`; a new one that forgets is the usual cause of a janky
