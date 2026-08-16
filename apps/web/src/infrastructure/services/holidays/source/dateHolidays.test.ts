@@ -25,19 +25,19 @@ beforeEach(() => {
   constructorCalls.length = 0;
 });
 
-describe('dateHolidaysSource.observedHolidays', () => {
+describe('dateHolidaysSource.rawHolidays', () => {
   it('asks for the Planning Window, which reaches into the following year', () => {
-    dateHolidaysSource.observedHolidays(LOOKUP);
+    dateHolidaysSource.rawHolidays(LOOKUP);
     expect(getHolidays.mock.calls.map(([year]) => year)).toEqual([2026, 2027]);
   });
 
   it('constructs one lookup for the Country and passes the locale to it', () => {
-    dateHolidaysSource.observedHolidays(LOOKUP);
+    dateHolidaysSource.rawHolidays(LOOKUP);
     expect(constructorCalls).toEqual([['ES', { languages: ['es'] }]]);
   });
 
   it('constructs a second, Region-scoped lookup only when a Region is given', () => {
-    dateHolidaysSource.observedHolidays({ ...LOOKUP, region: 'CT' });
+    dateHolidaysSource.rawHolidays({ ...LOOKUP, region: 'CT' });
     expect(constructorCalls).toEqual([
       ['ES', { languages: ['es'] }],
       ['ES', 'CT', { languages: ['es'] }],

@@ -14,11 +14,12 @@ are not non-working days, tags and hands over.
 | File | Role |
 | --- | --- |
 | `getHolidays.ts` | Asks the Holiday source what is observed and maps it through `holidayDTO`. That is all it does |
-| `source/types.ts` | `HolidaySource` — the seam: `observedHolidays(lookup)` and `regionsOf(country)` |
+| `source/types.ts` | `HolidaySource` — the seam: `rawHolidays(lookup)` and `regionsOf(country)`, and nothing else |
 | `source/dateHolidays.ts` | The production adapter. The **only** place in the app that constructs `Holidays` |
 | `source/fixture.ts` | `createFixtureHolidaySource(calendar)` — the test adapter, plain data in |
-| `source/utils/observed.ts` | `resolveObservedHolidays` — the Region-over-Country rule, pure, shared by both adapters |
-| `source/utils/nonWorking.ts` | `keepNonWorking` (the `public`/`bank` filter) and `stampRegion` (the `location` stamp) — the adapter's two rules, pure and tested |
+| `source/observedHolidays.ts` | `observedHolidays(source, lookup)` — the three rules, composed **above** the seam so both adapters go through them |
+| `source/utils/observed.ts` | `resolveObservedHolidays` — the Region-over-Country rule, pure |
+| `source/utils/nonWorking.ts` | `keepNonWorking` (the `public`/`bank` filter) and `stampRegion` (the `location` stamp), pure |
 
 ## The seam is the source, not the mapper
 
@@ -28,12 +29,20 @@ Region-removes-a-National-day correction lived in `getHolidays.ts`, and the orde
 depends on was an undocumented property of how `getHolidays` concatenated two arrays. Swapping the upstream
 package meant editing all three plus a fourth call site in `getRegions.ts`.
 
-They now sit behind `HolidaySource`, and there are two adapters — which is what makes it a real seam rather
-than a hypothetical one:
+They now sit in `observedHolidays`, which composes them **above** the seam, and there are two adapters below
+it — which is what makes it a real seam rather than a hypothetical one:
 
-- `dateHolidaysSource` in production. It owns the `Holidays` constructor and the two-year fetch, and calls
-  out to `source/utils/` for every rule: the `public`/`bank` filter, the `location` stamp and the observed-day
-  resolution.
+- `dateHolidaysSource` in production. It owns the `Holidays` constructor and the two-year fetch and
+  **nothing else** — it returns the two raw lookups and lets the rules run over them.
+
+**The seam used to sit one level higher, and two of the three rules were stranded above the fixture.**
+`HolidaySource.observedHolidays` promised "already filtered, already stamped", so `keepNonWorking` and
+`stampRegion` ran inside `dateHolidaysSource` only. The consequence was visible in the very test this guide
+holds up as the end-to-end one: `getHolidays.test.ts` hand-wrote `location: 'CA'` on its regional fixtures —
+exactly what `stampRegion` would have set — and every entry was `type: 'public'` because nothing on that path
+filtered. Deleting `keepNonWorking` from the adapter left that suite green. Both rules are now reachable
+from it, and the fixtures stop performing them as ritual: an `observance` entry proves the filter and the
+regional entries carry no `location` of their own.
 - `createFixtureHolidaySource` in tests. `getHolidays.test.ts` uses it to run the **real** DTO over
   fixture data, so the whole path is asserted end to end. It used to mock the package wrapper *and* the DTO,
   which meant the folder's load-bearing invariant had no test that could fail for the right reason.
@@ -164,6 +173,7 @@ the Planning Window reaches into the following year — that a second, Region-sc
 only when a Region is given, that the locale travels as `languages: [locale]`, and that `regionsOf`
 lower-cases the Country and normalises the package's absent answer to `null`.
 
-It carried two more rules until the sentence below was taken at its word — the `public`/`bank` filter and the
-`location` stamp are now `keepNonWorking` and `stampRegion`, testable without constructing `Holidays` at all.
-That is still where a new rule belongs: put it in `source/utils/`, not in the adapter.
+It carried the `public`/`bank` filter and the `location` stamp until those became `keepNonWorking` and
+`stampRegion` — and then carried them again by *calling* them, which is what put them out of the fixture's
+reach. They are applied in `observedHolidays` now, above the seam. A new rule goes in `source/utils/` and is
+composed there; putting it in the adapter makes it unreachable from every test that uses the fixture.

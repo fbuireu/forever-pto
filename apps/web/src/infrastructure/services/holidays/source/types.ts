@@ -7,7 +7,12 @@ export interface HolidayLookup {
   locale: string;
 }
 
+export interface RawLookupResult {
+  national: RawHoliday[];
+  regional: RawHoliday[];
+}
+
 export interface HolidaySource {
-  observedHolidays: (lookup: HolidayLookup) => RawHoliday[];
+  rawHolidays: (lookup: HolidayLookup) => RawLookupResult;
   regionsOf: (country: string) => Record<string, string> | null;
 }

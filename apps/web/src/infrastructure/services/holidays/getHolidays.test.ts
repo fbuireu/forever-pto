@@ -12,12 +12,17 @@ vi.mock('@infrastructure/clients/logging/better-stack/client', () => ({
 
 const { getHolidays } = await import('./getHolidays');
 
-const raw = (date: string, name: string, location?: string) => ({ date, name, type: 'public', location }) as RawHoliday;
+const raw = (date: string, name: string, type = 'public') => ({ date, name, type }) as RawHoliday;
 
 const CALENDAR = {
-  national: [raw('2027-01-01 00:00:00', 'New Year'), raw('2027-10-11 00:00:00', 'Columbus Day')],
+  national: [
+    raw('2027-01-01 00:00:00', 'New Year'),
+    raw('2027-10-11 00:00:00', 'Columbus Day'),
+    raw('2027-02-14 00:00:00', "Valentine's Day", 'observance'),
+    raw('2027-07-04 00:00:00', 'Independence Day', 'bank'),
+  ],
   regional: {
-    CA: [raw('2027-01-01 00:00:00', 'New Year', 'CA'), raw('2027-03-31 00:00:00', 'Cesar Chavez Day', 'CA')],
+    CA: [raw('2027-01-01 00:00:00', 'New Year'), raw('2027-03-31 00:00:00', 'Cesar Chavez Day')],
   },
   regions: { US: { CA: 'California' } },
 };
@@ -43,7 +48,7 @@ describe('getHolidays', () => {
   it('maps the source through the DTO into the glossary shape', async () => {
     const holidays = await getHolidays(BASE_PARAMS);
 
-    expect(holidays.map(({ name }) => name)).toEqual(['New Year', 'Columbus Day']);
+    expect(holidays.map(({ name }) => name)).toEqual(['New Year', 'Independence Day', 'Columbus Day']);
     expect(holidays[0].variant).toBe('national');
     expect(holidays[0].date).toBeInstanceOf(Date);
   });
@@ -53,6 +58,20 @@ describe('getHolidays', () => {
 
     expect(holidays.map(({ name }) => name)).not.toContain('Columbus Day');
     expect(holidays.map(({ name }) => name)).toContain('Cesar Chavez Day');
+  });
+
+  it('keeps only the classifications that mean the office is shut', async () => {
+    const names = (await getHolidays(BASE_PARAMS)).map(({ name }) => name);
+
+    expect(names).toContain('Independence Day');
+    expect(names).not.toContain("Valentine's Day");
+  });
+
+  it('stamps the Region onto the regional entries, which the fixture never says itself', async () => {
+    const holidays = await getHolidays({ ...BASE_PARAMS, region: 'CA' });
+    const regional = holidays.find(({ name }) => name === 'Cesar Chavez Day');
+
+    expect(regional?.variant).toBe('regional');
   });
 
   it('resolves the Region label from the same source, with no caller supplying one', async () => {
@@ -71,7 +90,7 @@ describe('getHolidays', () => {
 
   it('returns an empty calendar and logs when the source throws', async () => {
     const brokenSource: HolidaySource = {
-      observedHolidays: () => {
+      rawHolidays: () => {
         throw new Error('date-holidays failure');
       },
       regionsOf: () => null,

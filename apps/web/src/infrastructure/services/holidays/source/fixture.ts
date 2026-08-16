@@ -1,6 +1,5 @@
 import type { RawHoliday } from '@application/dto/holiday/types';
 import type { HolidayLookup, HolidaySource } from './types';
-import { resolveObservedHolidays } from './utils/observed';
 
 interface FixtureCalendar {
   national?: RawHoliday[];
@@ -10,12 +9,10 @@ interface FixtureCalendar {
 
 export function createFixtureHolidaySource(calendar: FixtureCalendar): HolidaySource {
   return {
-    observedHolidays: ({ region }: HolidayLookup) =>
-      resolveObservedHolidays({
-        national: calendar.national ?? [],
-        regional: (region ? calendar.regional?.[region] : undefined) ?? [],
-        hasRegion: Boolean(region),
-      }),
+    rawHolidays: ({ region }: HolidayLookup) => ({
+      national: calendar.national ?? [],
+      regional: (region ? calendar.regional?.[region] : undefined) ?? [],
+    }),
 
     regionsOf: (country: string) => calendar.regions?.[country] ?? null,
   };

@@ -5,6 +5,7 @@ import { getRegions } from '@infrastructure/services/regions/getRegions';
 import { Effect } from 'effect';
 import type { Locale } from 'next-intl';
 import { dateHolidaysSource } from './source/dateHolidays';
+import { observedHolidays } from './source/observedHolidays';
 import type { HolidaySource } from './source/types';
 
 const logger = getBetterStackInstance();
@@ -32,7 +33,7 @@ export async function getHolidays({
 
   const program = Effect.try(() =>
     holidayDTO.create({
-      raw: source.observedHolidays({ country, region, year, locale }),
+      raw: observedHolidays(source, { country, region, year, locale }),
       params: { year, carryOverMonths, regions },
     })
   ).pipe(
