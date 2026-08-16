@@ -307,6 +307,63 @@ describe('documentation does not point at things that are gone', () => {
     expect(offenders).toEqual([]);
   });
 
+  // The wiki's copy-pasteable Usage blocks are the largest slice of the cross-package seam and the only
+  // one nothing checked: `astro check` registers no MDX plugin, and the citation rules above match file
+  // paths rather than exported symbols. A rename in apps/web silently published a wrong import.
+  it('imports only symbols apps/web still exports, in the published wiki fences', () => {
+    const FENCE = /```(?:tsx?|ts)\n([\s\S]*?)```/g;
+    const UI_IMPORT = /import\s*\{([^}]+)\}\s*from\s*'(@ui\/[^']+)'/g;
+
+    const exportsOf = (specifier: string): Set<string> | null => {
+      const base = join(ROOT, 'apps/web/src/ui', specifier.replace('@ui/', ''));
+      const path = [`${base}.tsx`, `${base}.ts`].find((candidate) => existsSync(candidate));
+      if (!path) return null;
+
+      const source = readFileSync(path, 'utf8');
+      const names = new Set<string>();
+
+      for (const [, name] of source.matchAll(
+        /export\s+(?:declare\s+)?(?:const|let|function|class|interface|type|enum)\s+(\w+)/g
+      )) {
+        names.add(name);
+      }
+      for (const [, group] of source.matchAll(/export\s*\{([^}]+)\}/g)) {
+        for (const entry of group.split(',')) {
+          const alias = entry
+            .trim()
+            .split(/\s+as\s+/)
+            .at(-1);
+          if (alias) names.add(alias.replace(/^type\s+/, '').trim());
+        }
+      }
+
+      return names;
+    };
+
+    const offenders: string[] = [];
+    let checked = 0;
+
+    for (const file of contentFiles) {
+      for (const [, fence] of read(file).matchAll(FENCE)) {
+        for (const [, names, specifier] of fence.matchAll(UI_IMPORT)) {
+          const exported = exportsOf(specifier);
+          if (!exported) {
+            offenders.push(`${file} -> ${specifier} (no such module)`);
+            continue;
+          }
+          for (const name of names.split(',').map((entry) => entry.replace(/^type\s+/, '').trim())) {
+            if (!name) continue;
+            checked += 1;
+            if (!exported.has(name)) offenders.push(`${file} -> ${specifier} has no ${name}`);
+          }
+        }
+      }
+    }
+
+    expect(checked).toBeGreaterThan(50);
+    expect(offenders).toEqual([]);
+  });
+
   it('prints repo-relative paths in the published wiki, never package-relative ones', () => {
     const ambiguous = /^(src|e2e|workers|public)\//;
     const offenders: string[] = [];

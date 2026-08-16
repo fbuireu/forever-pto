@@ -240,7 +240,11 @@ lockfile, and every literal path Biome's `files.includes` excludes still resolve
 that every guide under `apps/web/src` is listed in the web package's own table; that ADRs are named
 `NNNN-slug.md`, numbered contiguously from `0001`, carry the template's sections, and are each linked from
 some document **outside** `adr/` — an ADR nothing points at will not be read; that every relative markdown
-link resolves and every `.ts`/`.tsx` file named in backticks still exists; that every script this file
+link resolves, every `.ts`/`.tsx` file named in backticks still exists, no document cites a nested
+`CONTEXT.md`, and every symbol the published wiki's `tsx` fences import from `@ui/…` is still exported by the
+module they name — that last one is the largest slice of the cross-package seam and had nothing checking it,
+because `astro check` registers no MDX plugin and the citation rules match paths rather than symbols; that
+every script this file
 documents exists in the root manifest and every script the web guide documents exists in one of the two;
 that `apps/web/tsconfig.json` keeps the two settings `next build` would otherwise fill in for it — `strict`
 on and `allowJs` off — that it sits beside the `next.config.ts` that rewrites it, and that
