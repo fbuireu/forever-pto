@@ -1,23 +1,17 @@
 import { Counter } from '@ui/modules/core/animate/components/Counter';
 import { FeatureList } from '@ui/modules/core/animate/components/FeatureList';
 import { RadialNav, type RadialNavProps } from '@ui/modules/core/animate/components/RadialNav';
-import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { Calendar, Settings, Star, Users } from 'lucide-react';
 import { useState } from 'react';
 import { Demo } from '../Demo';
-import { DemoIntlProvider } from '../DemoIntlProvider';
 
 export const CounterDemo = () => {
   const [days, setDays] = useState(23);
 
   return (
-    <DemoIntlProvider>
-      <LazyMotionProvider>
-        <Demo>
-          <Counter number={days} setNumber={setDays} label='PTO days' />
-        </Demo>
-      </LazyMotionProvider>
-    </DemoIntlProvider>
+    <Demo>
+      <Counter number={days} setNumber={setDays} label='PTO days' />
+    </Demo>
   );
 };
 
@@ -43,13 +37,11 @@ const FEATURES = [
 ];
 
 export const FeatureListDemo = () => (
-  <LazyMotionProvider>
-    <Demo>
-      <div className='w-full max-w-sm'>
-        <FeatureList features={FEATURES} categoryLabel='Roadmap' detailedViewLabel='Detailed view' />
-      </div>
-    </Demo>
-  </LazyMotionProvider>
+  <Demo>
+    <div className='w-full max-w-sm'>
+      <FeatureList features={FEATURES} categoryLabel='Roadmap' detailedViewLabel='Detailed view' />
+    </div>
+  </Demo>
 );
 
 // Typed against the real component props so an API change in RadialNav
@@ -63,11 +55,9 @@ const NAV_ITEMS: RadialNavProps['items'] = [
 ];
 
 export const RadialNavDemo = () => (
-  <LazyMotionProvider>
-    <Demo>
-      <div className='mx-auto px-24 py-14'>
-        <RadialNav items={NAV_ITEMS} defaultActiveId={1} />
-      </div>
-    </Demo>
-  </LazyMotionProvider>
+  <Demo>
+    <div className='mx-auto px-24 py-14'>
+      <RadialNav items={NAV_ITEMS} defaultActiveId={1} />
+    </div>
+  </Demo>
 );

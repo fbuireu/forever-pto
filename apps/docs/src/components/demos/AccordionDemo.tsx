@@ -1,5 +1,4 @@
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '@ui/modules/core/animate/base/Accordion';
-import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { Demo } from '../Demo';
 
 const ITEMS = [
@@ -23,30 +22,26 @@ const ITEMS = [
 
 export const AccordionDemo = () => (
   <Demo>
-    <LazyMotionProvider>
-      <Accordion className='w-full max-w-md'>
-        {ITEMS.map((item) => (
-          <AccordionItem key={item.id} value={item.id}>
-            <AccordionTrigger>{item.question}</AccordionTrigger>
-            <AccordionPanel className='text-muted-foreground'>{item.answer}</AccordionPanel>
-          </AccordionItem>
-        ))}
-      </Accordion>
-    </LazyMotionProvider>
+    <Accordion className='w-full max-w-md'>
+      {ITEMS.map((item) => (
+        <AccordionItem key={item.id} value={item.id}>
+          <AccordionTrigger>{item.question}</AccordionTrigger>
+          <AccordionPanel className='text-muted-foreground'>{item.answer}</AccordionPanel>
+        </AccordionItem>
+      ))}
+    </Accordion>
   </Demo>
 );
 
 export const AccordionNoChevronDemo = () => (
   <Demo>
-    <LazyMotionProvider>
-      <Accordion className='w-full max-w-md'>
-        <AccordionItem value='plain'>
-          <AccordionTrigger chevron={false}>No chevron on this trigger</AccordionTrigger>
-          <AccordionPanel className='text-muted-foreground'>
-            Pass chevron={'{false}'} when the trigger supplies its own affordance.
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
-    </LazyMotionProvider>
+    <Accordion className='w-full max-w-md'>
+      <AccordionItem value='plain'>
+        <AccordionTrigger chevron={false}>No chevron on this trigger</AccordionTrigger>
+        <AccordionPanel className='text-muted-foreground'>
+          Pass chevron={'{false}'} when the trigger supplies its own affordance.
+        </AccordionPanel>
+      </AccordionItem>
+    </Accordion>
   </Demo>
 );

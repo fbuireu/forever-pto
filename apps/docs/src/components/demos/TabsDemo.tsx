@@ -7,7 +7,6 @@ import {
   TabsList,
   TabsTrigger,
 } from '@ui/modules/core/animate/components/Tabs';
-import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { Demo } from '../Demo';
 
 const TABS = [
@@ -31,25 +30,23 @@ const TABS = [
 
 export const TabsDemo = () => (
   <Demo>
-    <LazyMotionProvider>
-      <Tabs defaultValue={TABS[0].id} className='w-full max-w-md'>
-        <TabsHighlight>
-          <TabsList>
-            {TABS.map((tab) => (
-              <TabsHighlightItem key={tab.id} value={tab.id}>
-                <TabsTrigger value={tab.id}>{tab.label}</TabsTrigger>
-              </TabsHighlightItem>
-            ))}
-          </TabsList>
-        </TabsHighlight>
-        <TabsContents>
+    <Tabs defaultValue={TABS[0].id} className='w-full max-w-md'>
+      <TabsHighlight>
+        <TabsList>
           {TABS.map((tab) => (
-            <TabsContent key={tab.id} value={tab.id} className='py-2 text-sm text-muted-foreground'>
-              {tab.content}
-            </TabsContent>
+            <TabsHighlightItem key={tab.id} value={tab.id}>
+              <TabsTrigger value={tab.id}>{tab.label}</TabsTrigger>
+            </TabsHighlightItem>
           ))}
-        </TabsContents>
-      </Tabs>
-    </LazyMotionProvider>
+        </TabsList>
+      </TabsHighlight>
+      <TabsContents>
+        {TABS.map((tab) => (
+          <TabsContent key={tab.id} value={tab.id} className='py-2 text-sm text-muted-foreground'>
+            {tab.content}
+          </TabsContent>
+        ))}
+      </TabsContents>
+    </Tabs>
   </Demo>
 );

@@ -21,7 +21,6 @@ import { Sun } from '@ui/modules/core/animate/icons/Sun';
 import { Trash2 } from '@ui/modules/core/animate/icons/Trash2';
 import { Users } from '@ui/modules/core/animate/icons/Users';
 import { X } from '@ui/modules/core/animate/icons/X';
-import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import type { ComponentType } from 'react';
 import { Demo } from '../Demo';
 
@@ -58,50 +57,46 @@ const ICONS: ReadonlyArray<{ name: string; Icon: AnimatedIcon }> = [
 export const ICON_COUNT = ICONS.length;
 
 export const IconsGalleryDemo = () => (
-  <LazyMotionProvider>
-    <Demo>
-      {ICONS.map(({ name, Icon }) => (
-        <AnimateIcon key={name} animateOnHover>
-          <span className='flex w-28 cursor-pointer flex-col items-center gap-2 rounded-xl border-[3px] border-[var(--frame)] bg-card p-3 shadow-[var(--shadow-brutal-xs)]'>
-            <Icon size={28} />
-            <code className='text-[11px] leading-none'>{name}</code>
-          </span>
-        </AnimateIcon>
-      ))}
-    </Demo>
-  </LazyMotionProvider>
+  <Demo>
+    {ICONS.map(({ name, Icon }) => (
+      <AnimateIcon key={name} animateOnHover>
+        <span className='flex w-28 cursor-pointer flex-col items-center gap-2 rounded-xl border-[3px] border-[var(--frame)] bg-card p-3 shadow-[var(--shadow-brutal-xs)]'>
+          <Icon size={28} />
+          <code className='text-[11px] leading-none'>{name}</code>
+        </span>
+      </AnimateIcon>
+    ))}
+  </Demo>
 );
 
 const tileClass =
   'flex w-40 flex-col items-center gap-2 rounded-xl border-[3px] border-[var(--frame)] bg-card p-3 shadow-[var(--shadow-brutal-xs)]';
 
 export const IconTriggersDemo = () => (
-  <LazyMotionProvider>
-    <Demo>
-      <AnimateIcon animate loop loopDelay={1200}>
-        <span className={tileClass}>
-          <Clock size={28} />
-          <code className='text-[11px] leading-none'>animate loop</code>
-        </span>
-      </AnimateIcon>
-      <AnimateIcon animateOnHover animation='path'>
-        <span className={`${tileClass} cursor-pointer`}>
-          <Settings size={28} />
-          <code className='text-[11px] leading-none'>hover, path</code>
-        </span>
-      </AnimateIcon>
-      <AnimateIcon animateOnTap>
-        <span className={`${tileClass} cursor-pointer`}>
-          <Star size={28} />
-          <code className='text-[11px] leading-none'>animateOnTap</code>
-        </span>
-      </AnimateIcon>
-      <AnimateIcon animateOnView animateOnViewOnce={false} delay={300}>
-        <span className={tileClass}>
-          <MapPin size={28} />
-          <code className='text-[11px] leading-none'>animateOnView</code>
-        </span>
-      </AnimateIcon>
-    </Demo>
-  </LazyMotionProvider>
+  <Demo>
+    <AnimateIcon animate loop loopDelay={1200}>
+      <span className={tileClass}>
+        <Clock size={28} />
+        <code className='text-[11px] leading-none'>animate loop</code>
+      </span>
+    </AnimateIcon>
+    <AnimateIcon animateOnHover animation='path'>
+      <span className={`${tileClass} cursor-pointer`}>
+        <Settings size={28} />
+        <code className='text-[11px] leading-none'>hover, path</code>
+      </span>
+    </AnimateIcon>
+    <AnimateIcon animateOnTap>
+      <span className={`${tileClass} cursor-pointer`}>
+        <Star size={28} />
+        <code className='text-[11px] leading-none'>animateOnTap</code>
+      </span>
+    </AnimateIcon>
+    <AnimateIcon animateOnView animateOnViewOnce={false} delay={300}>
+      <span className={tileClass}>
+        <MapPin size={28} />
+        <code className='text-[11px] leading-none'>animateOnView</code>
+      </span>
+    </AnimateIcon>
+  </Demo>
 );
