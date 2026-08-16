@@ -82,7 +82,7 @@ describe('getCurrencyFromLocale', () => {
     const { getCurrencyForLocale } = await import('@ui/utils/currencies');
     vi.mocked(getCurrencyForLocale).mockReturnValueOnce({ currency: 'USD', currencySymbol: '$' });
 
-    useUIStore.getState().getCurrencyFromLocale('en-US');
+    useUIStore.getState().getCurrencyFromLocale('en');
     expect(useUIStore.getState().currency).toBe('USD');
     expect(useUIStore.getState().currencySymbol).toBe('$');
   });

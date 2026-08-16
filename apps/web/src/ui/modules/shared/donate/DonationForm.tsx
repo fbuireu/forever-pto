@@ -11,6 +11,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@u
 import { Label } from '@ui/modules/core/primitives/Label';
 import { cn } from '@ui/utils/cn';
 import { amountFormatter } from '@ui/utils/currencies';
+import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
 import { useFormStatus } from 'react-dom';
@@ -23,7 +24,7 @@ interface DonationFormProps {
   form: UseFormReturn<CreatePaymentInput>;
   onSubmit: (data: CreatePaymentInput) => void;
   currentAmount: number;
-  locale: string;
+  locale: Locale;
   currency: string;
   currencySymbol: string;
   isPending?: boolean;

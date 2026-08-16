@@ -3,7 +3,7 @@ import { DE, EN } from '@infrastructure/i18n/locales';
 import { ACTIVATION_FAILED } from '@infrastructure/services/premium/activation';
 import { render } from '@testing-library/react';
 import { Effect, Layer } from 'effect';
-import { createFormatter } from 'next-intl';
+import { createFormatter, type Locale } from 'next-intl';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -192,7 +192,7 @@ describe('payment/confirmation page', () => {
   });
 
   describe('amount formatting', () => {
-    const renderAmount = async (locale: string, currency: string, amount: number) => {
+    const renderAmount = async (locale: Locale, currency: string, amount: number) => {
       mockGetFormatter.mockResolvedValue(createFormatter({ locale }));
       mockConfirmation.mockReturnValueOnce(
         Effect.succeed({ id: PAYMENT_INTENT_ID, status: 'succeeded', amount, currency })

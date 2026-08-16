@@ -10,7 +10,7 @@ import type { HolidaySource } from './source/types';
 
 const logger = getBetterStackInstance();
 
-interface GetHolidaysParams {
+export interface GetHolidaysParams {
   year: number;
   country?: string;
   carryOverMonths: number;

@@ -127,7 +127,7 @@ describe('toggleDaySelection refuses days that are already off', () => {
 
     const accepted = useHolidaysStore
       .getState()
-      .toggleDaySelection({ date: saturday, totalPtoDays: 10, locale: 'en', allowPastDays: true });
+      .toggleDaySelection({ date: saturday, totalPtoDays: 10, locale: 'en' as const, allowPastDays: true });
 
     expect(accepted.applied).toBe(false);
     expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
@@ -139,7 +139,7 @@ describe('toggleDaySelection refuses days that are already off', () => {
 
     const accepted = useHolidaysStore
       .getState()
-      .toggleDaySelection({ date, totalPtoDays: 10, locale: 'en', allowPastDays: true });
+      .toggleDaySelection({ date, totalPtoDays: 10, locale: 'en' as const, allowPastDays: true });
 
     expect(accepted.applied).toBe(false);
     expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
@@ -151,7 +151,7 @@ describe('toggleDaySelection refuses days that are already off', () => {
 
     const accepted = useHolidaysStore
       .getState()
-      .toggleDaySelection({ date: wednesday, totalPtoDays: 10, locale: 'en', allowPastDays: true });
+      .toggleDaySelection({ date: wednesday, totalPtoDays: 10, locale: 'en' as const, allowPastDays: true });
 
     expect(accepted.applied).toBe(true);
     expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(1);
@@ -166,7 +166,7 @@ describe('toggleDaySelection refuses days that are already off', () => {
 
     const accepted = useHolidaysStore
       .getState()
-      .toggleDaySelection({ date, totalPtoDays: 10, locale: 'en', allowPastDays: true });
+      .toggleDaySelection({ date, totalPtoDays: 10, locale: 'en' as const, allowPastDays: true });
 
     expect(accepted.applied).toBe(true);
     expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
@@ -177,7 +177,7 @@ describe('toggleDaySelection refuses days that are already off', () => {
 
     const outcome = useHolidaysStore
       .getState()
-      .toggleDaySelection({ date: saturday, totalPtoDays: 10, locale: 'en', allowPastDays: true });
+      .toggleDaySelection({ date: saturday, totalPtoDays: 10, locale: 'en' as const, allowPastDays: true });
 
     expect(outcome).toEqual({ applied: false, reason: DayRefusal.DAY_IS_WEEKEND });
   });
@@ -185,17 +185,23 @@ describe('toggleDaySelection refuses days that are already off', () => {
   it('tells a Custom Holiday apart from a National one in the reason', () => {
     useHolidaysStore.setState({ holidays: [makeHoliday('custom-1', '2026-03-11', HolidayVariant.CUSTOM)] });
 
-    const custom = useHolidaysStore
-      .getState()
-      .toggleDaySelection({ date: new Date('2026-03-11'), totalPtoDays: 10, locale: 'en', allowPastDays: true });
+    const custom = useHolidaysStore.getState().toggleDaySelection({
+      date: new Date('2026-03-11'),
+      totalPtoDays: 10,
+      locale: 'en' as const,
+      allowPastDays: true,
+    });
 
     expect(custom).toEqual({ applied: false, reason: DayRefusal.DAY_IS_CUSTOM_HOLIDAY });
 
     useHolidaysStore.setState({ holidays: [makeHoliday('national-1', '2026-03-11')] });
 
-    const national = useHolidaysStore
-      .getState()
-      .toggleDaySelection({ date: new Date('2026-03-11'), totalPtoDays: 10, locale: 'en', allowPastDays: true });
+    const national = useHolidaysStore.getState().toggleDaySelection({
+      date: new Date('2026-03-11'),
+      totalPtoDays: 10,
+      locale: 'en' as const,
+      allowPastDays: true,
+    });
 
     expect(national).toEqual({ applied: false, reason: DayRefusal.DAY_IS_HOLIDAY });
   });
@@ -207,9 +213,12 @@ describe('toggleDaySelection refuses days that are already off', () => {
       removedSuggestedDays: [],
     });
 
-    const outcome = useHolidaysStore
-      .getState()
-      .toggleDaySelection({ date: new Date('2026-03-11'), totalPtoDays: 1, locale: 'en', allowPastDays: true });
+    const outcome = useHolidaysStore.getState().toggleDaySelection({
+      date: new Date('2026-03-11'),
+      totalPtoDays: 1,
+      locale: 'en' as const,
+      allowPastDays: true,
+    });
 
     expect(outcome).toEqual({ applied: false, reason: DayRefusal.BUDGET_EXHAUSTED });
   });
@@ -559,7 +568,7 @@ describe('trimManualDays', () => {
 
 describe('toggleDaySelection', () => {
   const baseDate = new Date('2026-05-11');
-  const PARAMS = { totalPtoDays: 5, locale: 'en', allowPastDays: false };
+  const PARAMS = { totalPtoDays: 5, locale: 'en' as const, allowPastDays: false };
 
   it('refuses with no_plan when there is no currentSelection', () => {
     useHolidaysStore.setState({ currentSelection: null });
@@ -630,7 +639,7 @@ describe('toggleDaySelection', () => {
     });
     const result = useHolidaysStore
       .getState()
-      .toggleDaySelection({ date: baseDate, totalPtoDays: 5, locale: 'en', allowPastDays: false });
+      .toggleDaySelection({ date: baseDate, totalPtoDays: 5, locale: 'en' as const, allowPastDays: false });
     expect(result.applied).toBe(false);
     expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
   });
@@ -644,7 +653,7 @@ describe('toggleDaySelection', () => {
     });
     const result = useHolidaysStore
       .getState()
-      .toggleDaySelection({ date: baseDate, totalPtoDays: 5, locale: 'en', allowPastDays: false });
+      .toggleDaySelection({ date: baseDate, totalPtoDays: 5, locale: 'en' as const, allowPastDays: false });
     expect(result.applied).toBe(true);
     expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(1);
   });
@@ -1146,9 +1155,12 @@ describe('every Metrics writer measures against the same Planning Window', () =>
       holidays: [],
     });
 
-    useHolidaysStore
-      .getState()
-      .toggleDaySelection({ date: new Date(2026, 2, 11), totalPtoDays: 10, locale: 'en', allowPastDays: true });
+    useHolidaysStore.getState().toggleDaySelection({
+      date: new Date(2026, 2, 11),
+      totalPtoDays: 10,
+      locale: 'en' as const,
+      allowPastDays: true,
+    });
 
     const [args] = vi.mocked(generateMetrics).mock.lastCall ?? [];
     expect(args?.carryOverMonths).toBe(2);
@@ -1166,7 +1178,7 @@ describe('every Metrics writer measures against the same Planning Window', () =>
       allowPastDays: false,
       months: Array.from({ length: 14 }, (_, i) => new Date(2026, i, 1)),
       strategy: FilterStrategy.GROUPED,
-      locale: 'en',
+      locale: 'en' as const,
     });
 
     const calls = vi.mocked(generateMetrics).mock.calls;

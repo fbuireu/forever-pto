@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { NextIntlClientProvider } from 'next-intl';
+import { type Locale, NextIntlClientProvider } from 'next-intl';
 import type { ComponentProps, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -22,7 +22,7 @@ vi.mock('react-use-measure', () => ({ default: () => [vi.fn(), { height: 0 }] })
 
 import { SlidingNumber } from './SlidingNumber';
 
-const renderIn = (locale: string, children: ReactNode) =>
+const renderIn = (locale: Locale, children: ReactNode) =>
   render(<NextIntlClientProvider locale={locale}>{children}</NextIntlClientProvider>);
 
 const separatorOf = (container: HTMLElement) =>

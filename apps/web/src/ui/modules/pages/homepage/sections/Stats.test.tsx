@@ -1,7 +1,7 @@
 import deMessages from '@i18n/messages/de.json';
 import enMessages from '@i18n/messages/en.json';
 import { render } from '@testing-library/react';
-import { createFormatter, createTranslator } from 'next-intl';
+import { createFormatter, createTranslator, type Locale } from 'next-intl';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockGetTranslations = vi.hoisted(() => vi.fn());
@@ -14,7 +14,7 @@ vi.mock('next-intl/server', () => ({
 
 import { Stats } from './Stats';
 
-const renderStats = async (locale: string, messages: typeof enMessages) => {
+const renderStats = async (locale: Locale, messages: typeof enMessages) => {
   mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: 'homepage' }));
   mockGetFormatter.mockResolvedValue(createFormatter({ locale }));
   const { container } = render(await Stats());

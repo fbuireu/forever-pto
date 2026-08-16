@@ -23,7 +23,7 @@ const baseInput = {
   allowPastDays: true,
   months: monthsFor(0),
   strategy: FilterStrategy.GROUPED,
-  locale: 'en',
+  locale: 'en' as const,
   maxAlternatives: 2,
 };
 

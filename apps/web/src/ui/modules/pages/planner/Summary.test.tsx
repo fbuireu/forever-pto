@@ -2,6 +2,7 @@ import deMessages from '@i18n/messages/de.json';
 import enMessages from '@i18n/messages/en.json';
 import esMessages from '@i18n/messages/es.json';
 import { render } from '@testing-library/react';
+import type { Locale } from 'next-intl';
 import { NextIntlClientProvider } from 'next-intl';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -70,7 +71,7 @@ const METRICS = {
   workedDaysPerMonth: 20,
 };
 
-const renderSummary = (locale = 'en', messages: object = enMessages) =>
+const renderSummary = (locale: Locale = 'en', messages: object = enMessages) =>
   render(
     <NextIntlClientProvider locale={locale} messages={messages}>
       <Summary />

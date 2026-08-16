@@ -46,7 +46,7 @@ describe('(marketing)/page', () => {
 
     it('covers all supported locales', () => {
       const locales = generateStaticParams().map((p) => p.locale);
-      expect(locales).toEqual(expect.arrayContaining(LOCALES));
+      expect(locales).toEqual(expect.arrayContaining([...LOCALES]));
     });
   });
 

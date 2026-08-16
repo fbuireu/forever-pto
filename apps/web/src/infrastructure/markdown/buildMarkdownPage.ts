@@ -4,13 +4,14 @@ import en from '@i18n/messages/en.json';
 import es from '@i18n/messages/es.json';
 import fr from '@i18n/messages/fr.json';
 import it from '@i18n/messages/it.json';
+import type { LocaleCode } from '@infrastructure/i18n/locales';
 import { CA, DE, EN, ES, FR, IT } from '@infrastructure/i18n/locales';
 import { getLocaleFromPathname, localePath, routePathFromPathname } from '@infrastructure/i18n/utils/url';
 import { findRoute } from '@infrastructure/seo/routes';
 import { createTranslator } from 'next-intl';
 import pkg from '../../../package.json';
 
-const MESSAGES: Record<string, typeof en> = {
+const MESSAGES: Record<LocaleCode, typeof en> = {
   [CA]: ca,
   [DE]: de,
   [EN]: en,

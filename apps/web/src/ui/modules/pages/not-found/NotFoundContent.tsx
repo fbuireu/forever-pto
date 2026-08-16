@@ -3,10 +3,11 @@ import { Button } from '@ui/modules/core/primitives/Button';
 import { Header } from '@ui/modules/pages/homepage/navigation/Navigation';
 import { Footer } from '@ui/modules/shared/footer/Footer';
 import { cn } from '@ui/utils/cn';
+import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 
 interface NotFoundContentProps {
-  locale: string;
+  locale: Locale;
 }
 
 export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {

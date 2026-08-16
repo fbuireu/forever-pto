@@ -1,6 +1,7 @@
 import type { RawHoliday } from '@application/dto/holiday/types';
 import { EN } from '@infrastructure/i18n/locales';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { GetHolidaysParams } from './getHolidays';
 import { createFixtureHolidaySource } from './source/fixture';
 import type { HolidaySource } from './source/types';
 
@@ -27,7 +28,7 @@ const CALENDAR = {
   regions: { US: { CA: 'California' } },
 };
 
-const BASE_PARAMS = {
+const BASE_PARAMS: GetHolidaysParams = {
   year: 2027,
   country: 'US',
   region: '',

@@ -7,6 +7,7 @@ import { Button } from '@ui/modules/core/primitives/Button';
 import type { FromTo } from '@ui/modules/pages/planner/calendar/Calendar';
 import { Calendar, CalendarSelectionMode } from '@ui/modules/pages/planner/calendar/Calendar';
 import { Calendar as CalendarIcon } from 'lucide-react';
+import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';
 
 interface WorkdayCounterCalendarModalProps {
@@ -14,7 +15,7 @@ interface WorkdayCounterCalendarModalProps {
   setOpen: (open: boolean) => void;
   selectedRange: FromTo | undefined;
   handleRangeSelect: (date: Date | Date[] | FromTo | undefined) => void;
-  locale: string;
+  locale: Locale;
   holidays: HolidayDTO[];
 }
 

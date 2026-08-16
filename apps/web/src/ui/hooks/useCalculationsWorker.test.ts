@@ -74,7 +74,7 @@ const BASE_PARAMS = {
   allowPastDays: false,
   months: [new Date(2025, 0, 1)],
   strategy: 'grouped' as const,
-  locale: 'en',
+  locale: 'en' as const,
 };
 
 const MANUAL_DAYS = [new Date(2025, 1, 10), new Date(2025, 1, 11)];

@@ -20,6 +20,25 @@ The largest single thing in here is a browser file — the Web Worker.
 | `clients/` | SDK wrappers — four Effect service tags plus four modules that are deliberately not services. See [`clients/CLAUDE.md`](./clients/CLAUDE.md) |
 | `i18n/` | `routing.ts` (next-intl routing, `localePrefix: 'as-needed'`), `config.ts` (request config + message loading), `locales.ts` (the six codes and `LOCALE_COOKIE`), `cookie.ts` (writes `NEXT_LOCALE` with the flags next-intl's own cookie lacks), `utils/url.ts` (`localePath`, `resolveLocale`, `getLocaleFromPathname`, `routePathFromPathname`, `localeFromAcceptLanguage`, `localeAlternates`) |
 
+**`LOCALES` is `as const`, and until it was, `Locale` was `string`.** The array was an unannotated literal,
+so TypeScript widened it to `string[]`, and `AppConfig['Locale']` in `environment.d.ts` reads
+`(typeof routing.locales)[number]` — which resolved to `string`. Eighteen files annotated a type that carried
+no information: `hasLocale(LOCALES, x)` narrowed `x` to `string`, and every `{ locale: Locale }` route param
+was `{ locale: string }`. This was proven with a compiler probe rather than read off the source, because it
+is invisible at every call site.
+
+The live consequence was in `markdown/buildMarkdownPage.ts`, which keys `MESSAGES` by that value with
+`noUncheckedIndexedAccess` off: adding a seventh locale and forgetting the row compiled, then handed
+`createTranslator` an undefined bundle at runtime. `MESSAGES` is `Record<LocaleCode, …>` now, so the same
+omission is a compile error — verified by adding a `pt` locale and watching it fail, which also caught the
+missing `languages.pt` key that `useLanguages`'s now-deleted `as Parameters<typeof t>[0]` cast had been
+hiding. `SITE_ROUTES` already had this discipline; the locales never did.
+
+`isLocale` sits beside the codes rather than being derived from `resolveLocale`, because the Web Worker needs
+it and `resolveLocale` pulls `routing`. The worker narrows the incoming `locale` with it exactly as it
+already narrows `strategy` with `isFilterStrategy` — the wire value is genuinely unvalidated there, which is
+the one place `string` is the honest type.
+
 **`resolveLocale` is the one place a candidate becomes a locale.** `hasLocale(LOCALES, x) ? x : routing.defaultLocale`
 was written out verbatim at three sites — the request config, the activate route's `?locale=` and the
 path-segment reader — and a fourth, `global-not-found.tsx`, hand-rolled a header→cookie→`Accept-Language`

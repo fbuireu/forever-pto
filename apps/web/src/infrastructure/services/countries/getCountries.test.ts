@@ -16,12 +16,12 @@ vi.mock('i18n-iso-countries', () => ({
   default: { registerLocale: mockRegisterLocale, getNames: mockGetNames },
 }));
 
-vi.mock('i18n-iso-countries/langs/ca.json', () => ({ default: { locale: 'ca' } }));
-vi.mock('i18n-iso-countries/langs/de.json', () => ({ default: { locale: 'de' } }));
-vi.mock('i18n-iso-countries/langs/en.json', () => ({ default: { locale: 'en' } }));
-vi.mock('i18n-iso-countries/langs/es.json', () => ({ default: { locale: 'es' } }));
-vi.mock('i18n-iso-countries/langs/fr.json', () => ({ default: { locale: 'fr' } }));
-vi.mock('i18n-iso-countries/langs/it.json', () => ({ default: { locale: 'it' } }));
+vi.mock('i18n-iso-countries/langs/ca.json', () => ({ default: { locale: 'ca' as const } }));
+vi.mock('i18n-iso-countries/langs/de.json', () => ({ default: { locale: 'de' as const } }));
+vi.mock('i18n-iso-countries/langs/en.json', () => ({ default: { locale: 'en' as const } }));
+vi.mock('i18n-iso-countries/langs/es.json', () => ({ default: { locale: 'es' as const } }));
+vi.mock('i18n-iso-countries/langs/fr.json', () => ({ default: { locale: 'fr' as const } }));
+vi.mock('i18n-iso-countries/langs/it.json', () => ({ default: { locale: 'it' as const } }));
 
 vi.mock('@application/dto/country/dto', () => ({
   countryDTO: { create: mockCountryDTOCreate },
@@ -71,10 +71,10 @@ describe('getCountries', () => {
       throw new Error('unsupported locale');
     });
 
-    const result = getCountries('xx');
+    const result = getCountries('ca');
 
     expect(result).toEqual([]);
-    expect(mockLogError).toHaveBeenCalledWith('Error in getCountries', expect.any(Error), { locale: 'xx' });
+    expect(mockLogError).toHaveBeenCalledWith('Error in getCountries', expect.any(Error), { locale: 'ca' });
   });
 
   it('returns empty array and logs error when countryDTO.create throws', () => {
@@ -86,6 +86,6 @@ describe('getCountries', () => {
     const result = getCountries('en');
 
     expect(result).toEqual([]);
-    expect(mockLogError).toHaveBeenCalledWith('Error in getCountries', expect.any(Error), { locale: 'en' });
+    expect(mockLogError).toHaveBeenCalledWith('Error in getCountries', expect.any(Error), { locale: 'en' as const });
   });
 });

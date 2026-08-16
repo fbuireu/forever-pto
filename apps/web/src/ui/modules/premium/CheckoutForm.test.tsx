@@ -1,7 +1,7 @@
 import deMessages from '@i18n/messages/de.json';
 import enMessages from '@i18n/messages/en.json';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { NextIntlClientProvider } from 'next-intl';
+import { type Locale, NextIntlClientProvider } from 'next-intl';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -48,7 +48,7 @@ const NON_BREAKING_SPACES = /[  ]/g;
 
 const DISCOUNT = { originalAmount: 15, finalAmount: 12.5, code: 'LAUNCH50', percentOff: 50 };
 
-const renderForm = (locale: string, messages: object, amount: number, discountInfo: unknown = null) => {
+const renderForm = (locale: Locale, messages: object, amount: number, discountInfo: unknown = null) => {
   const { container } = render(
     <NextIntlClientProvider locale={locale} messages={messages}>
       <CheckoutForm

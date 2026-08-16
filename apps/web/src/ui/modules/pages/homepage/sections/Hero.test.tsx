@@ -2,7 +2,7 @@ import deMessages from '@i18n/messages/de.json';
 import enMessages from '@i18n/messages/en.json';
 import frMessages from '@i18n/messages/fr.json';
 import { render } from '@testing-library/react';
-import { createFormatter, createTranslator } from 'next-intl';
+import { createFormatter, createTranslator, type Locale } from 'next-intl';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -32,7 +32,7 @@ import { Hero } from './Hero';
 
 const NON_BREAKING_SPACES = /[  ]/g;
 
-const renderHero = async (locale: string, messages: typeof enMessages) => {
+const renderHero = async (locale: Locale, messages: typeof enMessages) => {
   mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: 'homepage' }));
   mockGetFormatter.mockResolvedValue(createFormatter({ locale }));
   mockGetLocale.mockResolvedValue(locale);

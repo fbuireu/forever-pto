@@ -6,6 +6,6 @@ export function useLanguages() {
 
   return LOCALES.map((code) => ({
     code,
-    label: t(code as Parameters<typeof t>[0]),
+    label: t(code),
   }));
 }

@@ -1,7 +1,7 @@
 import deMessages from '@i18n/messages/de.json';
 import itMessages from '@i18n/messages/it.json';
 import { render } from '@testing-library/react';
-import { NextIntlClientProvider } from 'next-intl';
+import { type Locale, NextIntlClientProvider } from 'next-intl';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -26,7 +26,7 @@ vi.mock('@ui/modules/premium/PremiumFeature', () => ({
 
 import { BlocksPerQuarterChart } from './BlocksPerQuarterChart';
 
-const renderChart = (locale: string, messages: object, blocksPerQuarter: number[]) =>
+const renderChart = (locale: Locale, messages: object, blocksPerQuarter: number[]) =>
   render(
     <NextIntlClientProvider locale={locale} messages={messages}>
       <BlocksPerQuarterChart blocksPerQuarter={blocksPerQuarter} />

@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from '@application/i18n/navigation';
+import type { LocaleCode } from '@infrastructure/i18n/locales';
 import { useLanguages } from '@ui/hooks/useLanguages';
 import {
   DropdownMenu,
@@ -24,7 +25,7 @@ export const LanguageSelector = () => {
   const t = useTranslations('accessibility');
 
   const handleLanguageChange = useCallback(
-    (newLocale: string) => {
+    (newLocale: LocaleCode) => {
       const newPathname = pathname.replace(`/${locale}`, `/${newLocale}`);
       push(newPathname, { locale: newLocale, scroll: false });
     },

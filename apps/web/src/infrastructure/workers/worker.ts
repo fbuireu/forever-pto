@@ -1,6 +1,7 @@
 import { fromStoredInstant } from '@application/shared/utils/dateIntake';
 import { runPlanningPipeline } from '@domain/calendar/pipeline';
 import { DEFAULT_FILTER_STRATEGY, isFilterStrategy } from '@domain/calendar/types';
+import { EN, isLocale } from '@infrastructure/i18n/locales';
 import { type CalculateSuggestionsRequest, WORKER_MESSAGE_TYPE, type WorkerResponse } from './types';
 import { deserializeHolidays, deserializeMonths, serializeSuggestionResult } from './utils/serializers';
 
@@ -34,7 +35,7 @@ globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
       allowPastDays,
       months: deserializeMonths(rawMonths),
       strategy: isFilterStrategy(strategy) ? strategy : DEFAULT_FILTER_STRATEGY,
-      locale,
+      locale: isLocale(locale) ? locale : EN,
       maxAlternatives,
     });
 

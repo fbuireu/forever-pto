@@ -1,7 +1,7 @@
 import deMessages from '@i18n/messages/de.json';
 import esMessages from '@i18n/messages/es.json';
 import { render } from '@testing-library/react';
-import { NextIntlClientProvider } from 'next-intl';
+import { type Locale, NextIntlClientProvider } from 'next-intl';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -35,7 +35,7 @@ vi.mock('./PlannerPanelFixture', () => ({ PlannerPanelFixture: () => null }));
 
 import { ManagementBar } from './ManagementBar';
 
-const renderBar = (locale: string, messages: object) =>
+const renderBar = (locale: Locale, messages: object) =>
   render(
     <NextIntlClientProvider locale={locale} messages={messages}>
       <ManagementBar />
