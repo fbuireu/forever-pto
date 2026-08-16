@@ -178,9 +178,15 @@ discovers the config by walking up from the working directory and resolves every
 that file, which is why the deploy steps `cd` into the package first.
 
 The app's bindings, environments and the `NEXT_PUBLIC_SITE_URL` resolution are in
-[`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md). The docs site has no bindings and no secrets, which is why
-it deploys to a single Worker and previews with immutable `versions upload --preview-alias` rather than a
-per-PR Worker.
+[`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md).
+
+**Both packages preview the same way: one Worker per pull request, deleted when it closes.** `apps/web`
+deploys `pr-<number>-forever-pto-development` from `_deploy-web.yml`, `apps/docs` deploys
+`pr-<number>-forever-pto-docs-development` from the `preview` job in `docs.yml`, and
+`cleanup-development.yml` carries a job for each. What differs is only what the docs site does *not* need:
+it has no bindings and no secrets, so its deploy has no `wrangler secret bulk` step and no `--var`
+override, and it ships the `docs-dist` artifact the `build` job already produced rather than building a
+second time.
 
 ## Maintenance contract
 
