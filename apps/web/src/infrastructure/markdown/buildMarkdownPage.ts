@@ -5,7 +5,8 @@ import es from '@i18n/messages/es.json';
 import fr from '@i18n/messages/fr.json';
 import it from '@i18n/messages/it.json';
 import { CA, DE, EN, ES, FR, IT } from '@infrastructure/i18n/locales';
-import { getLocaleFromPathname, localePath } from '@infrastructure/i18n/utils/url';
+import { getLocaleFromPathname, localePath, routePathFromPathname } from '@infrastructure/i18n/utils/url';
+import { findRoute } from '@infrastructure/seo/routes';
 import { createTranslator } from 'next-intl';
 import pkg from '../../../package.json';
 
@@ -18,25 +19,21 @@ const MESSAGES: Record<string, typeof en> = {
   [IT]: it,
 };
 
-const MARKDOWN_ROUTES = [
-  { path: '/legal/cookie-policy', title: 'cookiePolicy.title', description: 'cookiePolicy.description' },
-  { path: '/legal/privacy-policy', title: 'privacyPolicy.title', description: 'privacyPolicy.description' },
-  { path: '/legal/terms-of-service', title: 'termsOfService.title', description: 'termsOfService.description' },
-  { path: '/legal/legal-notice', title: 'legalNotice.title', description: 'legalNotice.description' },
-  { path: '/payment/confirmation', title: 'paymentConfirmation.title', description: undefined },
-] as const;
+const HOME_PATH = '';
+const PLANNER_PATH = '/planner';
 
 export async function buildMarkdownPage(baseUrl: string, pathname: string) {
   const locale = getLocaleFromPathname(pathname);
   const messages = MESSAGES[locale];
   const t = createTranslator({ locale, messages, namespace: 'metadata' });
 
-  const route = MARKDOWN_ROUTES.find(({ path }) => pathname.includes(path));
+  const routePath = routePathFromPathname(pathname);
+  const route = findRoute(routePath);
 
-  if (route) {
-    return `# ${t(route.title)}
+  if (route && routePath !== HOME_PATH && routePath !== PLANNER_PATH) {
+    return `# ${t(route.titleKey)}
 
-${route.description ? `${t(route.description)}\n` : ''}
+${route.descriptionKey ? `${t(route.descriptionKey)}\n` : ''}
 ## Version
 
 ${pkg.version}
@@ -47,7 +44,7 @@ ${baseUrl}${localePath(locale, route.path)}
 `;
   }
 
-  if (pathname.includes('/planner')) {
+  if (routePath === PLANNER_PATH) {
     const tPlanner = createTranslator({ locale, messages, namespace: 'planner' });
 
     return `# ${t('planner.title')}

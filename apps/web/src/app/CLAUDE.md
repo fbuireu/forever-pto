@@ -31,12 +31,18 @@ failure channel onto a status code. Business logic that lands here is in the wro
 
 1. Serves `/api/markdown` (only to attach `Cache-Control` and `Vary: Accept`).
 2. Rewrites any request carrying `Accept: text/markdown` to `/api/markdown?path=<pathname>`, so every HTML
-   URL has a Markdown twin without a second route existing. **That promise is only as good as
-   `buildMarkdownPage`'s route table** — it matched `/planner` on a substring and handed every other path the
-   homepage body, so the four legal pages and the confirmation page each answered with the marketing copy
-   under the homepage's title. Routes are now listed explicitly with the `metadata.*` entry they take their
-   title and description from; a new route added to the middleware's reach needs a row there, or it inherits
-   the homepage again.
+   URL has a Markdown twin without a second route existing. **The Markdown twin reads `SITE_ROUTES`, the same
+   table the sitemap, `robots.txt` and every `generateMetadata` read** — it kept a second list of its own,
+   with the `metadata.*` keys on it, so a route was one row here and another row there. `titleKey` and
+   `descriptionKey` moved onto `SiteRoute`; adding a route is genuinely one row now.
+
+   **The lookup is an exact match on the locale-stripped path, and that is load-bearing.** It was
+   `pathname.includes(path)`, which once handed every unlisted path the homepage body — the four legal pages
+   and the confirmation page all answered with the marketing copy under the homepage's title. Listing the
+   routes fixed the symptom and left the mechanism: `/legal/privacy-policy-2024` still resolved *as* the
+   privacy policy, and `/planner-comparison` as the planner. `routePathFromPathname` drops the locale segment
+   and the comparison is `===`, so the homepage is the empty path matched deliberately rather than whatever
+   fell through. `buildMarkdownPage.test.ts` pins both directions.
 3. Redirects `**/payment/confirmation` to the locale home when `payment_intent` is absent.
 4. Runs the `next-intl` middleware, which negotiates the locale and fills the `[locale]` segment.
 5. Re-writes the `NEXT_LOCALE` cookie next-intl just set, through `setLocaleCookie`
@@ -262,11 +268,16 @@ rather than reaching for the environment themselves.
 
 ## SEO files
 
-**One table says which routes exist and which are public.** `SITE_ROUTES` under `@infrastructure/seo` carries
-a `path`, an `indexable` flag and the sitemap hints, and three readers derive from it: `sitemap.ts` emits the
-cross-product of the six locales and `indexableRoutes()`, `robots.ts` disallows every locale-expanded
-`privateRoutes()` path, and each `metadata.ts` asks `isIndexable(PATH)` rather than restating the answer.
-**Adding a route is one row.**
+**One table says which routes exist, which are public, and what each is called.** `SITE_ROUTES` under
+`@infrastructure/seo` carries a `path`, an `indexable` flag, the sitemap hints and the `metadata.*` message
+keys, and four readers derive from it: `sitemap.ts` emits the cross-product of the six locales and
+`indexableRoutes()`, `robots.ts` disallows every locale-expanded `privateRoutes()` path, `buildMetadata`
+resolves `isIndexable(route)` for itself, and `buildMarkdownPage` looks the title and description up through
+`findRoute`. **Adding a route is one row.**
+
+It is declared `as const satisfies readonly SiteRoute[]` rather than annotated `SiteRoute[]`, and that is not
+style: the literal `titleKey` types are what let `createTranslator`'s `t()` reject a typo in a message key at
+compile time. Widening them to `string` compiles and fails at runtime with a blank heading.
 
 That used to be three edits in three files — a `ROUTES` entry, a `DISALLOWED_PAGES` prefix, and
 `robots: { index: false }` — with nothing tying them together. It also closed a hole: `DISALLOWED_PAGES`

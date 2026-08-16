@@ -35,6 +35,31 @@ describe('buildMarkdownPage', () => {
     );
   });
 
+  describe('route resolution is exact, not a substring match', () => {
+    it.each([
+      ['/legal/privacy-policy-2024', '[metadata:privacyPolicy.title]'],
+      ['/es/legal/privacy-policy/archive', '[metadata:privacyPolicy.title]'],
+      ['/planner-comparison', '[metadata:planner.title]'],
+    ])('does not serve %s as the route it merely contains', async (pathname, foreignTitle) => {
+      const result = await buildMarkdownPage(BASE_URL, pathname);
+      expect(result).not.toContain(foreignTitle);
+      expect(result).toContain('[metadata:title]');
+    });
+
+    it.each([
+      ['/legal/privacy-policy', '[metadata:privacyPolicy.title]'],
+      ['/es/legal/privacy-policy', '[metadata:privacyPolicy.title]'],
+      ['/payment/confirmation', '[metadata:paymentConfirmation.title]'],
+    ])('still serves %s itself', async (pathname, title) => {
+      expect(await buildMarkdownPage(BASE_URL, pathname)).toContain(title);
+    });
+
+    it('resolves the homepage by matching the empty path, not by falling through', async () => {
+      const { findRoute } = await import('@infrastructure/seo/routes');
+      expect(findRoute('')?.titleKey).toBe('title');
+    });
+  });
+
   describe('non-planner path', () => {
     it('uses t("title") as the page title', async () => {
       const result = await buildMarkdownPage(BASE_URL, '/');
