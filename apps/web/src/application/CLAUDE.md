@@ -24,7 +24,7 @@ two halves are joined only by `dto/` and `shared/utils/dates.ts`.
 | `export/` | `generateIcs.ts` builds an RFC 5545 calendar string from Holidays and PTO Days; `utils/sanitizer.ts` escapes the four characters that would break a line; `utils/serializers.ts` holds the two ICS date formats, which live here rather than in the shared date library because nothing else speaks them | browser |
 | `i18n/` | `navigation.ts` — `Link`, `useRouter`, `usePathname` bound to the next-intl routing config, so every internal link carries the locale prefix | browser |
 | `shared/dto/` | `baseDTO.ts` — the `BaseDTO<INPUT, OUTPUT, PARAMS>` contract every mapper implements | both |
-| `shared/utils/` | `dates.ts` — calendar arithmetic, comparison and formatting; `dateIntake.ts` — the two ways a date arrives from outside; `zodParse.ts` — Zod validation lifted into an Effect that fails with `ValidationError` | `dates.ts` and `dateIntake.ts` both, `zodParse.ts` server |
+| `shared/utils/` | `dates.ts` — calendar arithmetic, comparison and formatting; `dateIntake.ts` — the two ways a date arrives from outside; `zodParse.ts` — Zod validation lifted into an Effect that fails with `ValidationError`; `collate.ts` — `collateByLabel`, the one place a localised option list is ordered | `dates.ts`, `dateIntake.ts` and `collate.ts` both, `zodParse.ts` server |
 
 ## Layer rules
 

@@ -112,6 +112,14 @@ already drifted over how a missing IP header was recorded.
 - **"Worker" means two different things in this repo.** `workers/` is a browser Web Worker. The Cloudflare
   Worker is the deployment target, configured in `wrangler.toml` and built by OpenNext. Nothing in `workers/`
   runs on the server.
+- **An option list is collated by `collateByLabel`, and only one of the two callers has a locale to give
+  it.** `getCountries` localises its labels through `i18n-iso-countries` and then has to collate them in that
+  same locale — it used to end in a bare `localeCompare` with no argument, so every non-English visitor got a
+  Country list ordered by the runtime default, which on the deployed Worker is not theirs. The two services
+  each held their own copy of that sort, which is how one of them came to be wrong. `getRegions` passes no
+  locale on purpose: its labels come from `date-holidays`' `getStates()` in whatever language that package
+  emits, and it is reached from the location store and from `getHolidays`, neither of which carries one.
+  Giving it a locale means threading one from both call sites first.
 - **`getCountries.ts` and `getRegions.ts` call `getBetterStackInstance()` at module scope.** Importing either
   constructs the logger. The Logtail transport itself is created lazily on the first log, so the import does
   not require the BetterStack environment variables — but it does pull the logging client into whatever bundle

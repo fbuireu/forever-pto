@@ -1,5 +1,6 @@
 import { countryDTO } from '@application/dto/country/dto';
 import type { CountryDTO } from '@application/dto/country/types';
+import { collateByLabel } from '@application/shared/utils/collate';
 import { getBetterStackInstance } from '@infrastructure/clients/logging/better-stack/client';
 import countries, { type LocaleData } from 'i18n-iso-countries';
 import caLocale from 'i18n-iso-countries/langs/ca.json';
@@ -22,7 +23,7 @@ for (const data of localeData.values()) {
 
 export function getCountries(locale: Locale): CountryDTO[] {
   try {
-    return countryDTO.create({ raw: countries.getNames(locale) }).sort((a, b) => a.label.localeCompare(b.label));
+    return collateByLabel(countryDTO.create({ raw: countries.getNames(locale) }), locale);
   } catch (error) {
     logger.logError('Error in getCountries', error, { locale });
     return [];
