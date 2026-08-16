@@ -416,6 +416,50 @@ describe('documentation does not point at things that are gone', () => {
     expect(headings.filter((heading) => !canonical.has(heading.toLowerCase()))).toEqual([]);
   });
 
+  // IconsGalleryDemo says it is exhaustive, and a rename does break the build through import resolution —
+  // but an addition does not, because ICONS is a hand-written array rather than a union over the directory.
+  // The 23rd icon would simply be absent from the published gallery.
+  it('shows every animated icon in the published gallery', () => {
+    const ICONS_DIR = `${WEB}/src/ui/modules/core/animate/icons`;
+    const shipped = trackedFiles
+      .filter((path) => path.startsWith(`${ICONS_DIR}/`) && path.endsWith('.tsx') && !path.includes('.test.'))
+      .map((path) => path.slice(ICONS_DIR.length + 1).replace('.tsx', ''))
+      .filter((name) => name !== 'Icon');
+
+    const gallery = read(`${DOCS}/src/components/demos/IconsGalleryDemo.tsx`);
+    const listed = new Set(
+      [...gallery.matchAll(/from '@ui\/modules\/core\/animate\/icons\/([^']+)'/g)].map(([, module]) => module)
+    );
+
+    expect(shipped.length).toBeGreaterThan(15);
+    expect(shipped.filter((name) => !listed.has(name))).toEqual([]);
+  });
+
+  // TokenSwatch takes string[], so a renamed token renders `background: var(--gone)` — transparent, which
+  // reads as a legitimate pale colour rather than an error. Nothing else checks these: astro check does not
+  // see .mdx, and the citation rules match file paths.
+  it('names only design tokens the stylesheets still declare', () => {
+    const styles = trackedFiles
+      .filter((path) => path.startsWith(`${WEB}/src/ui/styles/`) && path.endsWith('.css'))
+      .map((path) => read(path))
+      .join('\n');
+    const fontVariables = [...read(`${WEB}/src/app/fonts.ts`).matchAll(/variable: '(--[\w-]+)'/g)].map(
+      ([, token]) => token
+    );
+    const declared = new Set([
+      ...[...styles.matchAll(/^\s*(--[\w-]+)\s*:/gm)].map(([, token]) => token),
+      ...fontVariables,
+    ]);
+
+    const designSystemPages = contentFiles.filter((path) => path.includes('/design-system/'));
+    const cited = new Set(
+      designSystemPages.flatMap((path) => [...read(path).matchAll(/var\((--[\w-]+)\)/g)].map(([, token]) => token))
+    );
+
+    expect(declared.size).toBeGreaterThan(20);
+    expect([...cited].filter((token) => !declared.has(token))).toEqual([]);
+  });
+
   it('prints repo-relative paths in the published wiki, never package-relative ones', () => {
     const ambiguous = /^(src|e2e|workers|public)\//;
     const offenders: string[] = [];
