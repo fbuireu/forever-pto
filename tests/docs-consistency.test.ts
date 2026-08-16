@@ -364,6 +364,35 @@ describe('documentation does not point at things that are gone', () => {
     expect(offenders).toEqual([]);
   });
 
+  // The docs site imports app sources, so a change under apps/web has to retrigger the docs workflow or
+  // the published site keeps serving the old build. docs.yml enumerates that reach by hand, in two
+  // identical trigger blocks, and nothing compared the list against what the site actually imports.
+  it('triggers the docs workflow on every apps/web path the docs site reaches into', () => {
+    const workflow = read('.github/workflows/docs.yml');
+    const watched = [...workflow.matchAll(/^\s+-\s+'([^']+)'$/gm)]
+      .map(([, path]) => path)
+      .filter((path) => path.startsWith('apps/web'))
+      .map((path) => path.replace(/\/\*\*$/, '').replace(SOURCE_FILE, ''));
+
+    const docsSources = trackedFiles.filter((path) => path.startsWith(`${DOCS}/src/`));
+    const reached = new Set<string>();
+
+    for (const file of docsSources) {
+      const source = read(file);
+      for (const [, specifier] of source.matchAll(/from\s+'@ui\/([^']+)'/g)) {
+        reached.add(`${WEB}/src/ui/${specifier}`);
+      }
+      for (const [, specifier] of source.matchAll(/['"(]((?:\.\.\/)+web\/[^'")]+)['")]/g)) {
+        reached.add(join(dirname(file), specifier).replace(/\\/g, '/'));
+      }
+    }
+
+    expect(reached.size).toBeGreaterThan(10);
+
+    const unwatched = [...reached].filter((path) => !watched.some((prefix) => path.startsWith(prefix)));
+    expect(unwatched).toEqual([]);
+  });
+
   it('prints repo-relative paths in the published wiki, never package-relative ones', () => {
     const ambiguous = /^(src|e2e|workers|public)\//;
     const offenders: string[] = [];

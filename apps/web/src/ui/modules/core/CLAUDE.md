@@ -68,10 +68,14 @@ Coupling back into the rest of the app is small, but it is not zero. The complet
 - `@ui/hooks/*` is fair game — `useControlledState.tsx`, `useIsInView.tsx`, `useAutoHeight.tsx`,
   `useMobile.ts`. These are generic React utilities, not product state.
 - `animate/base/Sidebar.tsx` writes the `sidebar_state` cookie through `@ui/utils/cookie` and reads it back
-  from `document.cookie` on mount. It exports `SIDEBAR_COOKIE_NAME`, but **nothing outside that file imports
+  from `document.cookie` on mount. It exports `SIDEBAR_COOKIE_NAME`, and **nothing in this package imports
   it** — no server layout reads the cookie and passes a `defaultOpen`, so the rail always renders expanded
   and then collapses once the effect runs. Either wire the layout up or stop describing the export as
-  shared; what is not true today is that anything else uses the key.
+  shared; what is not true today is that anything in `apps/web` uses the key. The docs site does: two wiki
+  pages import it to document the cookie's name, which is also why `temporal-polyfill` ends up in the docs
+  dependency list to render a string. This bullet said "nothing outside that file" until that reach was
+  derived mechanically — the seam is invisible from this side, which is the reason to check rather than
+  assert.
 - `animate/text/SlidingNumber.tsx` calls `useLocale()` to pick the decimal separator. It is the only
   `next-intl` import here, and it reads the locale rather than any copy.
 - `primitives/RichLink.tsx` imports the locale-aware `Link` from `@application/i18n/navigation`,
