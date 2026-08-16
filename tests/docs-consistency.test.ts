@@ -393,6 +393,29 @@ describe('documentation does not point at things that are gone', () => {
     expect(unwatched).toEqual([]);
   });
 
+  // CONTEXT.md names one canonical term per concept and lists the retired ones, and the root guide says to
+  // use those names "in code, copy and docs". The published wiki is the one place that was unenforced: it
+  // kept a second, diverged glossary that headed a section `FilterStrategy` (Avoid: filter) and described
+  // a Donation as "a premium purchase" (Avoid: purchase).
+  it('heads the published glossary with canonical terms, never retired ones', () => {
+    const glossary = read('CONTEXT.md');
+    const canonical = new Set([...glossary.matchAll(GLOSSARY_TERM)].map(([, term]) => term.toLowerCase()));
+    const retired = new Set(
+      [...glossary.matchAll(GLOSSARY_AVOID_LINE)].flatMap(([, list]) =>
+        list.split(',').map((entry) => entry.trim().toLowerCase())
+      )
+    );
+
+    const wikiGlossary = contentFiles.find((path) => path.endsWith('reference/glossary.mdx'));
+    expect(wikiGlossary).toBeDefined();
+
+    const headings = [...read(wikiGlossary as string).matchAll(/^#{2,4} (.+)$/gm)].map(([, heading]) => heading.trim());
+    expect(headings.length).toBeGreaterThan(3);
+
+    expect(headings.filter((heading) => retired.has(heading.toLowerCase()))).toEqual([]);
+    expect(headings.filter((heading) => !canonical.has(heading.toLowerCase()))).toEqual([]);
+  });
+
   it('prints repo-relative paths in the published wiki, never package-relative ones', () => {
     const ambiguous = /^(src|e2e|workers|public)\//;
     const offenders: string[] = [];

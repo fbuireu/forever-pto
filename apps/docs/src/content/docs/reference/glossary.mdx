@@ -7,21 +7,21 @@ sidebar:
 
 The suggestion-engine terms below are defined in code in `apps/web/src/domain/calendar/types.ts` and explained in depth in `apps/web/src/domain/calendar/CLAUDE.md`.
 
-### PTO
+### PTO Day
 
-Paid time off — the user's budget of vacation days for the planning period (`ptoDays` in the filters store, `apps/web/src/application/stores/filters.ts`). Everything the engine does is about spending this budget as efficiently as possible.
+One day from the user's annual budget of paid days off — a unit of budget, not a date on the calendar, until a Suggestion places it (`ptoDays` in the filters store, `apps/web/src/application/stores/filters.ts`). Everything the engine does is about spending this budget as efficiently as possible.
 
 ### Bridge
 
 A block of PTO days that connects weekends and public holidays into one contiguous stretch off. A single PTO day on a Monday before a Tuesday holiday "bridges" the weekend to the holiday, yielding four days off for one day spent. Modeled by the `Bridge` interface: `ptoDaysNeeded`, `effectiveDays`, `efficiency` and the concrete `ptoDays` dates. A **bridge day** is one of the PTO days inside a bridge.
 
-### Effective days
+### Effective Day
 
-The total consecutive days off a bridge or suggestion produces — PTO days plus the weekends and holidays they absorb. **Efficiency** is `effectiveDays / ptoDaysNeeded`; the engine discards bridges below a minimum efficiency threshold (tunables in `apps/web/src/domain/calendar/const.ts`).
+One day of the continuous stretch off a Bridge or Suggestion produces — the total counts — PTO days plus the weekends and holidays they absorb. **Efficiency** is `effectiveDays / ptoDaysNeeded`; the engine discards bridges below a minimum efficiency threshold (tunables in `apps/web/src/domain/calendar/const.ts`).
 
-### FilterStrategy
+### Strategy
 
-How bridges are ranked and selected. Three values, exported as the `FilterStrategy` const object in `apps/web/src/domain/calendar/types.ts`:
+The rule that decides which Bridges make it into a Suggestion when the budget cannot cover them all. Three values, exported as the `FilterStrategy` const object in `apps/web/src/domain/calendar/types.ts`:
 
 - **`grouped`** — prefer multi-day blocks, with efficiency as the tiebreaker. Fewer, longer breaks.
 - **`optimized`** — prefer the highest-efficiency bridges first. Maximum days off per PTO day.
@@ -31,14 +31,14 @@ How bridges are ranked and selected. Three values, exported as the `FilterStrate
 
 The engine's output for a given budget, calendar and strategy: the set of recommended PTO dates plus the bridges and metrics behind them (`Suggestion` interface, produced by `apps/web/src/domain/calendar/suggestions/generateSuggestions.ts`). Users can hand-edit the suggested days afterwards.
 
-### Alternatives
+### Alternative
 
-Distinct alternative PTO plans for the same inputs, produced by `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` using different bridge-ordering strategies — so the user can compare plans rather than accept a single answer.
+A genuinely distinct plan for the same inputs, produced by `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` using different bridge-ordering strategies — so the user can compare plans rather than accept a single answer.
 
-### Carry-over
+### Carry-over Months
 
 Months of the following year included in the planning window (`carryOverMonths` in the filters store). It lets a plan spill unused PTO past the year boundary — e.g. bridging the winter holidays into January.
 
-### Premium key
+### Premium
 
-The identifier of a premium purchase — the Stripe PaymentIntent id, surfaced as `premiumKey` (see `apps/web/src/application/use-cases/activatePremium.ts` and the premium store `apps/web/src/application/stores/premium.ts`). The active session itself is carried by the `premium-token` JWT cookie — see [cookies](/reference/cookies/).
+The tier unlocked by a Donation. Its key is the Stripe PaymentIntent id, surfaced as `premiumKey` (see `apps/web/src/application/use-cases/activatePremium.ts` and the premium store `apps/web/src/application/stores/premium.ts`). The active session itself is carried by the `premium-token` JWT cookie — see [cookies](/reference/cookies/).
