@@ -7,7 +7,7 @@ import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useLocationStore } from '@application/stores/location';
 import { usePremiumStore } from '@application/stores/premium';
-import { resolveSelectedDays } from '@domain/calendar/utils/selection';
+import { usePlanReadout } from '@ui/hooks/usePlanReadout';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { Clock } from '@ui/modules/core/animate/icons/Clock';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
@@ -69,17 +69,13 @@ export const Summary = () => {
       carryOverMonths: state.carryOverMonths ?? 0,
     }))
   );
-  const { suggestion, holidays, alternatives, currentSelection, manuallySelectedDays, removedSuggestedDays } =
-    useHolidaysStore(
-      useShallow((state) => ({
-        suggestion: state.suggestion,
-        holidays: state.holidays,
-        alternatives: state.alternatives,
-        currentSelection: state.currentSelection,
-        manuallySelectedDays: state.manuallySelectedDays,
-        removedSuggestedDays: state.removedSuggestedDays,
-      }))
-    );
+  const { holidays, alternatives } = useHolidaysStore(
+    useShallow((state) => ({
+      holidays: state.holidays,
+      alternatives: state.alternatives,
+      removedSuggestedDays: state.removedSuggestedDays,
+    }))
+  );
   const { countries, regions } = useLocationStore(
     useShallow((state) => ({
       countries: state.countries,
@@ -92,7 +88,7 @@ export const Summary = () => {
     }))
   );
 
-  const activeSuggestion = currentSelection ?? suggestion;
+  const { activeSuggestion, placedDays, manuallySelectedDays, removedSuggestedDays } = usePlanReadout();
 
   const holidaysInWindow = useMemo(() => holidaysInPlanningWindow(holidays), [holidays]);
 
@@ -119,11 +115,7 @@ export const Summary = () => {
     const effectiveDays = metrics.totalEffectiveDays;
     const increment = effectiveDays - ptoDays;
     const gain = ptoDays > 0 ? (increment / ptoDays) * 100 : 0;
-    const placedDays = resolveSelectedDays({
-      days: activeSuggestion.days,
-      manuallySelectedDays,
-      removedSuggestedDays,
-    }).length;
+    const placedDayCount = placedDays.length;
 
     const maxAlternative = Math.max(
       effectiveDays,
@@ -140,15 +132,15 @@ export const Summary = () => {
       effectiveDays,
       increment,
       gain,
-      placedDays,
+      placedDayCount,
       maxAlternative,
       canImprove,
     };
-  }, [activeSuggestion, ptoDays, alternatives, manuallySelectedDays, removedSuggestedDays]);
+  }, [activeSuggestion, ptoDays, alternatives, placedDays.length]);
 
   const content = (() => {
     if (!metricsData) return null;
-    const { metrics, effectiveDays, increment, gain, placedDays, canImprove } = metricsData;
+    const { metrics, effectiveDays, increment, gain, placedDayCount, canImprove } = metricsData;
     return (
       <div className='w-full max-w-4xl mx-auto space-y-6 z-1'>
         <Card>
@@ -277,7 +269,7 @@ export const Summary = () => {
                 label={t('metrics.efficiency')}
                 value={metrics.averageEfficiency.toFixed(1)}
                 decimalPlaces={1}
-                hint={t('metrics.perPlacedDay', { placedDays })}
+                hint={t('metrics.perPlacedDay', { placedDays: placedDayCount })}
                 icon={TrendingUp}
                 colorScheme='amber'
                 size={MetricCardSize.COMPACT}

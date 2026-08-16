@@ -256,7 +256,7 @@ interface StatusProps {
   currentSelection: NonNullable<HolidaysState['currentSelection']>;
 }
 
-function Status({ currentSelection }: StatusProps) {
+function Status() {
   const t = useTranslations('ptoStatus');
   const resetManualSelection = useHolidaysStore((state) => state.resetManualSelection);
   const {
@@ -363,6 +363,6 @@ export const PlannerPanel = ({ currentSelection, ...alternativesProps }: Planner
   <div className='w-full rounded-[10px] border-[3px] border-[var(--frame)] bg-card p-3 shadow-[var(--shadow-brutal-md)]'>
     <Alternatives {...alternativesProps} />
     <div className='mt-3 border-t-[2px] border-[var(--frame)]/15' />
-    <Status currentSelection={currentSelection} />
+    <Status />
   </div>
 );

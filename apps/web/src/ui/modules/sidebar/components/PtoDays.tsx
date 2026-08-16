@@ -27,7 +27,6 @@ export const PtoDays = () => {
     }))
   );
   const {
-    manuallySelectedDays,
     suggested: activeSuggestedCount,
     manual: manualSelectedCount,
     remaining,

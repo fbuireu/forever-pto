@@ -4,7 +4,7 @@ import { holidaysInPlanningWindow } from '@application/dto/holiday/dto';
 import { generateIcs } from '@application/export/generateIcs';
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { resolveSelectedDays } from '@domain/calendar/utils/selection';
+import { usePlanReadout } from '@ui/hooks/usePlanReadout';
 import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { Button } from '@ui/modules/core/primitives/Button';
 import type { HolidayDocumentProps } from '@ui/modules/export/HolidayDocument';
@@ -57,27 +57,10 @@ export const CalendarExport = () => {
   const { year, country, region } = useFiltersStore(
     useShallow((s) => ({ year: s.year, country: s.country, region: s.region }))
   );
-  const { holidays, suggestion, currentSelection, manuallySelectedDays, removedSuggestedDays } = useHolidaysStore(
-    useShallow((s) => ({
-      holidays: s.holidays,
-      suggestion: s.suggestion,
-      currentSelection: s.currentSelection,
-      manuallySelectedDays: s.manuallySelectedDays,
-      removedSuggestedDays: s.removedSuggestedDays,
-    }))
-  );
+  const holidays = useHolidaysStore((s) => s.holidays);
 
-  const activeSuggestion = currentSelection ?? suggestion;
+  const { activeSuggestion, placedDays: ptoDays } = usePlanReadout();
   const holidaysInWindow = useMemo(() => holidaysInPlanningWindow(holidays), [holidays]);
-  const ptoDays = useMemo(
-    () =>
-      resolveSelectedDays({
-        days: activeSuggestion?.days ?? [],
-        manuallySelectedDays,
-        removedSuggestedDays,
-      }),
-    [activeSuggestion, manuallySelectedDays, removedSuggestedDays]
-  );
   const hasData = (includeHolidays && holidaysInWindow.length > 0) || (includePto && ptoDays.length > 0);
 
   const handleDownloadIcs = () => {

@@ -196,8 +196,11 @@ and `removedSuggestedDays` and recomputes the Metrics — so the stored day list
 first placed it, for ever. Efficiency is `totalEffectiveDays / resolveSelectedDays(…).length`, so a hint
 reading the raw array named the wrong number the moment anything was hand-edited, which is precisely when a
 label naming the baseline earns its place: with no Manual or Removed Days the two agree and nobody needed
-the label. `Summary` therefore applies `resolveSelectedDays` itself, with the same two lists the store
-holds. Anything else on this screen that wants "the days spent" needs the same treatment.
+the label. `Summary` therefore reads `placedDays` off `usePlanReadout`, which applies `resolveSelectedDays`
+with the same two lists the store holds. `sidebar/components/CalendarExport.tsx` reads the same field — it
+wants the array rather than the count, so the exported calendar carries exactly the days the Metrics were
+measured from. Anything else on this screen that wants "the days spent" takes it from the hook; those two
+used to fold it themselves and this sentence was the whole mechanism keeping them in step.
 
 **The two badges that interpolate `ptoDays` need an ICU plural, and five bundles once lacked one.**
 `MIN_PTO_DAYS` is 1, so `metrics.overBudget` and `metrics.perPtoDay` are reachable at a count of one; `en`
