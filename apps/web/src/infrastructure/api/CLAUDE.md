@@ -7,13 +7,13 @@ The wire vocabulary for failures, the response helper that opts out of caching, 
 
 | File | Contents |
 | --- | --- |
-| `errors.ts` | `ApiError` — the machine-readable failure codes that go on the wire |
+| `errors.ts` | `ApiError` — the machine-readable failure codes that go on the wire — and `describeFailure`, the one tag→status table |
 | `response.ts` | `noStore(body, init?)` — `NextResponse.json` with `Cache-Control: no-store` |
 | `parseJsonBody.ts` | `parseJsonBody<T>(request)` — `request.json()` as an Effect, plus the `INVALID_BODY` code |
 | `operations/types.ts` | `ApiOutcome<BODY>` (`{ status, body }`), `RequestContext`, `resolveClientIp`, `UNKNOWN_IP` |
 | `operations/payment.ts` | `createPaymentRequest` — rate limit, use-case, deferred write and failure mapping, transport-free |
 | `operations/contact.ts` | `sendContactRequest` — the same shape for the contact form |
-| `operations/activatePremium.ts` | `activatePremiumRequest` — the deferred hand-off, the tag→status map and a log line per failure, for the two transports that grant Premium |
+| `operations/activatePremium.ts` | `activatePremiumRequest` — the deferred hand-off, the status map and a log line per failure, for the two transports that grant Premium |
 
 ## One operation, two transports
 
@@ -42,18 +42,32 @@ know the address rather than claim it is called "unknown".
 
 ## From a typed failure to a status code
 
-A use-case fails with a tagged error declared in `src/infrastructure/errors.ts` (`DatabaseError`, `EmailError`, `MissingDonorEmailError`, `PaymentError`, `PromoCodeError`, `RateLimitError`, `SessionError`, `ValidationError`, `WebhookError`). The entry point — the only place the program is run — maps each tag with `Effect.catchTags` onto a status and a body. That mapping is the whole reason this folder exists; see [ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md).
+A use-case fails with a tagged error declared in `src/infrastructure/errors.ts` (`DatabaseError`, `EmailError`, `MissingDonorEmailError`, `PaymentError`, `PromoCodeError`, `RateLimitError`, `SessionError`, `ValidationError`, `WebhookError`). The entry point — the only place the program is run — turns each tag into a status and a body. That mapping is the whole reason this folder exists; see [ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md).
 
 What the code does today:
 
+**This table is a description of `describeFailure` in `errors.ts`, not a hand-maintained mirror of three
+`catchTags` blocks.** It was the latter: `ApiError.INTERNAL_ERROR` appeared seven times across the two
+operations and check-session, always with `status: 500`, and `ValidationError → 400, message verbatim` was
+written out three times. The mapping is a property of the *error*, not of the transport, so it lives once —
+`FAILURE_RESPONSES` is typed `{ [TAG in TaggedFailure['_tag']]: … }`, which means a tag added to the union
+without a row is a compile error rather than a silent fall into the catch-all. Each operation now ends in one
+`Effect.catchAll` that calls `describeFailure` and wraps the answer in **its own** body shape — the status and
+the code are shared, the body is not, which is why `operations/payment.ts` still adds `isPromoCodeError` and
+check-session still adds `premiumKey: null`.
+
+`describeFailure` falls back to 500 for a tag it does not know. That is not a hole in the exhaustiveness: the
+type already guarantees every member of the union has a row, and the fallback is what keeps the safety net
+under a value that arrived lying about its type — which a test injecting an off-union error does deliberately.
+
 | Tagged error | Status | `error` in the body | Mapped in |
 | --- | --- | --- | --- |
-| `RateLimitError` | 429 | `RATE_LIMIT_EXCEEDED` | `operations/payment.ts` |
-| `ValidationError` | 400 | the error's own `message`, verbatim | `operations/payment.ts`, `operations/contact.ts`, check-session |
-| `PromoCodeError` | 400 | the error's `code`, plus `isPromoCodeError: true` | `operations/payment.ts` |
-| `PaymentError` | 500 | `INTERNAL_ERROR` | `operations/payment.ts`, `operations/activatePremium.ts` |
-| `EmailError` | 500 | `INTERNAL_ERROR` | `operations/contact.ts` |
-| `SessionError`, `DatabaseError` | 500 | `INTERNAL_ERROR` | `operations/activatePremium.ts` |
+| `RateLimitError` | 429 | `RATE_LIMIT_EXCEEDED` | `errors.ts` |
+| `ValidationError` | 400 | the error's own `message`, verbatim | `errors.ts` |
+| `PromoCodeError` | 400 | the error's `code`, plus `isPromoCodeError: true` | `errors.ts` |
+| `PaymentError` | 500 | `INTERNAL_ERROR` | `errors.ts` |
+| `EmailError` | 500 | `INTERNAL_ERROR` | `errors.ts` |
+| `SessionError`, `DatabaseError` | 500 | `INTERNAL_ERROR` | `errors.ts` |
 | `WebhookError` | 400 or 500 | `INVALID_SIGNATURE` when `isSignatureError`, `WEBHOOK_MISCONFIGURED` (400) when the secret is missing, else `WEBHOOK_PROCESSING_FAILED` (500) | `src/app/api/webhooks/stripe/route.ts` |
 | `MissingDonorEmailError` | — | never reaches the wire: absorbed and logged in `webhook.ts` | `src/application/use-cases/webhook.ts` |
 
@@ -89,9 +103,21 @@ The `GET` half of check-session is the odd one out: a `SessionError` there is no
 
 ## What the typed error channel actually buys
 
-The keys of an `Effect.catchTags` map are checked against the error channel declared by the use-case, so a misspelled tag or one that can no longer occur is a compile error rather than a branch that never fires.
+`FAILURE_RESPONSES` in `errors.ts` is typed `{ [TAG in TaggedFailure['_tag']]: … }`, so every tag in the union
+has a row or the file does not compile. That is the property the old shape lacked: three `catchTags` maps, each
+covering the tags *that use-case* declared, each ending in an `Effect.catchAll` returning `INTERNAL_ERROR` —
+so adding a failure mode and forgetting to map it compiled fine and quietly became a 500 with the generic
+code. The catch-all was the safety net and the blind spot at once.
 
-The limit is worth knowing before you rely on it: every entry point ends in `Effect.catchAll(...)` returning `INTERNAL_ERROR`. Add a new failure mode to a use-case and forget to map it, and nothing fails to compile — the request quietly becomes a 500 with the generic code. The catch-all is the safety net and the blind spot at once. Treat the `catchTags` map as the thing you must update by hand.
+**The blind spot narrowed but did not close, and the remaining half is worth knowing.** Adding a new tagged
+error to `errors.ts` and to a use-case's channel *does* now fail to compile — but only once that tag joins
+`TaggedFailure`. Leave it out of the union and the operation's `catchAll` still receives it and
+`describeFailure` still answers 500. So the thing to update by hand is one line — the union — rather than
+three maps, and the compiler takes it from there.
+
+`Effect.catchTags` is still the right tool where a branch is genuinely local rather than a property of the
+error: the webhook route narrows `WebhookError` on `isWebhookConfigurationError`, and the `GET` half of
+check-session turns a `SessionError` into a 200.
 
 ## Codes are not translated here, but they are translated
 

@@ -1,4 +1,4 @@
-import { ApiError } from '@infrastructure/api/errors';
+import { ApiError, describeFailure } from '@infrastructure/api/errors';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import type { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
@@ -43,38 +43,20 @@ export const activatePremiumRequest = (
         after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer))));
         return { status: 200, token, email, premiumKey, error: null };
       }),
-      Effect.catchTags({
-        RateLimitError: () =>
-          Effect.gen(function* () {
-            const logger = yield* LoggerService;
-            logger.warn('Premium activation rate limited');
-            return refused(429, ApiError.RATE_LIMIT_EXCEEDED);
-          }),
-        ValidationError: (error) =>
-          Effect.gen(function* () {
-            const logger = yield* LoggerService;
-            logger.warn('Premium activation refused', { reason: error.message });
-            return refused(400, error.message);
-          }),
-        PaymentError: (error) =>
-          Effect.gen(function* () {
-            const logger = yield* LoggerService;
-            logger.error('Premium activation could not reach Stripe', { reason: error.message });
-            return refused(500, ApiError.INTERNAL_ERROR);
-          }),
-        SessionError: (error) =>
-          Effect.gen(function* () {
-            const logger = yield* LoggerService;
-            logger.error('Premium activation could not mint a session', { reason: error.message });
-            return refused(500, ApiError.INTERNAL_ERROR);
-          }),
-        DatabaseError: (error) =>
-          Effect.gen(function* () {
-            const logger = yield* LoggerService;
-            logger.error('Premium activation could not read the payment', { reason: error.message });
-            return refused(500, ApiError.INTERNAL_ERROR);
-          }),
-      }),
+      Effect.catchAll((failure) =>
+        Effect.gen(function* () {
+          const logger = yield* LoggerService;
+          const { status, error } = describeFailure(failure);
+
+          if (status >= 500) {
+            logger.error('Premium activation failed', { tag: failure._tag, reason: failure.message });
+          } else {
+            logger.warn('Premium activation refused', { tag: failure._tag, reason: failure.message });
+          }
+
+          return refused(status as 400 | 429 | 500, error);
+        })
+      ),
       Effect.provide(ApplicationLayer),
       Effect.catchAll(() => Effect.succeed(refused(500, ApiError.INTERNAL_ERROR)))
     )

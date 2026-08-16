@@ -1,3 +1,4 @@
+import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { EN, ES } from '@infrastructure/i18n/locales';
 import { ACTIVATION_FAILED, ACTIVATION_PARAM } from '@infrastructure/services/premium/activation';
 import { PREMIUM_COOKIE } from '@infrastructure/services/premium/cookie';
@@ -13,7 +14,15 @@ const { mockActivateWithPayment, mockCheckRateLimit, mockAfter } = vi.hoisted(()
 
 vi.mock('@application/use-cases/activatePremium', () => ({ activateWithPayment: mockActivateWithPayment }));
 vi.mock('@infrastructure/services/payments/rateLimit', () => ({ checkRateLimit: mockCheckRateLimit }));
-vi.mock('@infrastructure/layers', () => ({ ApplicationLayer: Layer.empty }));
+vi.mock('@infrastructure/layers', () => ({
+  ApplicationLayer: Layer.succeed(LoggerService, {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    logError: vi.fn(),
+  }),
+}));
 
 vi.mock('next/server', async (importOriginal) => {
   const actual = await importOriginal<typeof import('next/server')>();

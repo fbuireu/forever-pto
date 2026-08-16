@@ -1,6 +1,6 @@
 import type { ContactFormData } from '@application/dto/contact/schema';
 import { sendContactEmail } from '@application/use-cases/contact';
-import { ApiError } from '@infrastructure/api/errors';
+import { describeFailure } from '@infrastructure/api/errors';
 import type { ValidationError } from '@infrastructure/errors';
 import { ApplicationLayer } from '@infrastructure/layers';
 import type { PublicEnv } from '@infrastructure/services/env/getPublicEnv';
@@ -22,14 +22,9 @@ export const sendContactRequest = (
         return { status: 200, body: { success: true as const } };
       }),
       Effect.provide(ApplicationLayer),
-      Effect.catchTags({
-        ValidationError: (error) =>
-          Effect.succeed({ status: 400, body: { success: false as const, error: error.message } }),
-        EmailError: () =>
-          Effect.succeed({ status: 500, body: { success: false as const, error: ApiError.INTERNAL_ERROR } }),
-      }),
-      Effect.catchAll(() =>
-        Effect.succeed({ status: 500, body: { success: false as const, error: ApiError.INTERNAL_ERROR } })
-      )
+      Effect.catchAll((failure) => {
+        const { status, error } = describeFailure(failure);
+        return Effect.succeed({ status, body: { success: false as const, error } });
+      })
     )
   );
