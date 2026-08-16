@@ -25,7 +25,7 @@ vi.mock('@infrastructure/services/payments/provider/promoCode', () => ({
 vi.mock('@infrastructure/services/payments/repository', () => ({
   savePayment: vi.fn(() => Effect.succeed(undefined)),
   getPaymentById: vi.fn(() => Effect.succeed(undefined)),
-  getPaymentByEmail: vi.fn(() => Effect.succeed(undefined)),
+  getSucceededPaymentByEmail: vi.fn(() => Effect.succeed(undefined)),
   updatePaymentStatus: vi.fn(() => Effect.succeed(undefined)),
 }));
 

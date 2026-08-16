@@ -193,7 +193,9 @@ export const getPaymentById = (
     return row ? toPaymentData(row) : undefined;
   });
 
-export const getPaymentByEmail = (email: string): Effect.Effect<PaymentData | undefined, DatabaseError, TursoService> =>
+export const getSucceededPaymentByEmail = (
+  email: string
+): Effect.Effect<PaymentData | undefined, DatabaseError, TursoService> =>
   Effect.gen(function* () {
     const turso = yield* TursoService;
     const rows = yield* turso.query<PaymentRow>(

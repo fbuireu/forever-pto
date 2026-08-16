@@ -7,7 +7,11 @@ import { StripeServerService } from '@infrastructure/clients/payments/stripe/ser
 import { type DatabaseError, type PaymentError, type SessionError, ValidationError } from '@infrastructure/errors';
 import { normalizeEmail } from '@infrastructure/services/payments/normalizeEmail';
 import { readDonationMetadata } from '@infrastructure/services/payments/provider/metadata';
-import { getPaymentByEmail, savePayment, updatePaymentStatus } from '@infrastructure/services/payments/repository';
+import {
+  getSucceededPaymentByEmail,
+  savePayment,
+  updatePaymentStatus,
+} from '@infrastructure/services/payments/repository';
 import { matchesClientSecret } from '@infrastructure/services/premium/activation';
 import { createSession } from '@infrastructure/services/premium/session';
 import { Effect } from 'effect';
@@ -99,14 +103,10 @@ export const activateWithEmail = (
 > =>
   Effect.gen(function* () {
     const normalizedEmail = normalizeEmail(email);
-    const payment = yield* getPaymentByEmail(normalizedEmail);
+    const payment = yield* getSucceededPaymentByEmail(normalizedEmail);
 
     if (!payment) {
       return yield* Effect.fail(new ValidationError({ message: 'No payment found' }));
-    }
-
-    if (payment.status !== PAYMENT_SUCCEEDED) {
-      return yield* Effect.fail(new ValidationError({ message: `Payment status is ${payment.status}` }));
     }
 
     const token = yield* createSession({ email: normalizedEmail, paymentIntentId: payment.id });

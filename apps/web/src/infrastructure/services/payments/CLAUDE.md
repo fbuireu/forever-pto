@@ -15,7 +15,7 @@ read by the premium activation path as well as by the payment one.
 
 | File | Exports | Requires |
 | --- | --- | --- |
-| `repository.ts` | `savePayment`, `updatePaymentStatus`, `updatePaymentCharge`, `getPaymentById`, `getPaymentByEmail`, `countPromoCodeRedemptions`, `normalizePromoCode`, the `PaymentChargeData` shape | `TursoService` |
+| `repository.ts` | `savePayment`, `updatePaymentStatus`, `updatePaymentCharge`, `getPaymentById`, `getSucceededPaymentByEmail`, `countPromoCodeRedemptions`, `normalizePromoCode`, the `PaymentChargeData` shape | `TursoService` |
 | `normalizeEmail.ts` | `normalizeEmail(email)` — trim and lower-case, applied on both sides of every address comparison | — |
 | `confirmation.ts` | `confirmation(paymentIntentId)` — a `PaymentConfirmationDTO`, or `null` on any failure | `StripeServerService`, `LoggerService` |
 | `rateLimit.ts` | `checkRateLimit(ip)` — fails with `RateLimitError` | the Cloudflare `PAYMENT_RATE_LIMITER` binding |
@@ -32,7 +32,7 @@ read by the premium activation path as well as by the payment one.
 | Caller | Uses |
 | --- | --- |
 | `payment.ts` (use-case) | `validatePromoCode`, `createPaymentIntent`, `savePayment` (deferred) |
-| `activatePremium.ts` (use-case) | `getPaymentByEmail`, `getPaymentById`, `savePayment`, `updatePaymentStatus` |
+| `activatePremium.ts` (use-case) | `getSucceededPaymentByEmail`, `getPaymentById`, `savePayment`, `updatePaymentStatus` |
 | `webhook.ts` (use-case) | `getPaymentById`, `savePayment` |
 | `paymentSucceeded.ts` / `paymentFailed.ts` (domain handlers) | `getPaymentById`, `updatePaymentStatus`, `updatePaymentCharge`, `retrieveCharge` |
 | `src/app/api/payment/route.ts`, `actions/payment.ts` and `src/app/api/payment/activate/route.ts` | `checkRateLimit` |
@@ -90,8 +90,18 @@ a €10 Donation as €2 at whatever the rate happened not to be. Percentage cou
 check — a percentage has no currency to disagree about. A coupon carrying `amount_off` with no `currency`
 at all is refused too, since there is nothing to compare.
 
+**The name carries the filter, because the filter is in the `WHERE` and nothing else could see it.** It was
+`getPaymentByEmail`, whose signature promised "the payment for this address" while its SQL also required
+`status = 'succeeded'` — so `activateWithEmail` wrote that predicate a second time as a TypeScript `if`, over
+a row the query cannot return. The dead branch had a passing test: it mocked
+`{ id: 'pi_found', status: 'processing' }`, a shape that function does not produce, which is the failure this
+folder already confesses to for the promotion-code case — a mock built from the same reading as the code
+proves nothing, and here it disagreed with the repository's own SQL and still went green. The `ORDER BY
+stripe_created_at DESC LIMIT 1` beside it is only meaningful once "succeeded" is part of the question, which
+is the other reason the filter belongs in the name rather than at the caller.
+
 **The payer's address is compared normalised, never raw.** `normalizeEmail.ts` trims and lower-cases, and
-it is applied on both sides of every comparison: `getPaymentByEmail` matches `lower(trim(email))` against a
+it is applied on both sides of every comparison: `getSucceededPaymentByEmail` matches `lower(trim(email))` against a
 normalised parameter, and `activateWithPayment` normalises the intent's address and the caller's before
 testing them for equality. Email is the only key Premium can be recovered by
 ([ADR 0008](../../../../../../adr/0008-premium-derived-from-payment.md)), and SQLite's `=` on `TEXT` is

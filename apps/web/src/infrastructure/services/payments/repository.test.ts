@@ -5,9 +5,8 @@ import { Effect, Layer } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PaymentChargeData } from './repository';
 
-const { savePayment, updatePaymentStatus, updatePaymentCharge, getPaymentById, getPaymentByEmail } = await import(
-  './repository'
-);
+const { savePayment, updatePaymentStatus, updatePaymentCharge, getPaymentById, getSucceededPaymentByEmail } =
+  await import('./repository');
 
 const mockExecute = vi.fn();
 const mockQuery = vi.fn();
@@ -313,9 +312,9 @@ describe('getPaymentById', () => {
   });
 });
 
-describe('getPaymentByEmail', () => {
+describe('getSucceededPaymentByEmail', () => {
   it('filters on the email column, which is the only key Premium is recoverable by', async () => {
-    await runEffect(getPaymentByEmail('user@example.com'));
+    await runEffect(getSucceededPaymentByEmail('user@example.com'));
     const [sql, args] = mockQuery.mock.calls[0] as [string, unknown[]];
     expect(sql).toContain('WHERE lower(trim(email)) = ?');
     expect(sql).toContain("status = 'succeeded'");
@@ -324,31 +323,31 @@ describe('getPaymentByEmail', () => {
   });
 
   it('matches an address the payer retyped with different capitalisation or a stray space', async () => {
-    await runEffect(getPaymentByEmail('  User@Example.COM '));
+    await runEffect(getSucceededPaymentByEmail('  User@Example.COM '));
     const [, args] = mockQuery.mock.calls[0] as [string, unknown[]];
     expect(args[0]).toBe('user@example.com');
   });
 
   it('normalises the stored column too, so rows written before this held for the same payer', async () => {
-    await runEffect(getPaymentByEmail('user@example.com'));
+    await runEffect(getSucceededPaymentByEmail('user@example.com'));
     const [sql] = mockQuery.mock.calls[0] as [string, unknown[]];
     expect(sql).not.toContain('WHERE email = ?');
   });
 
   it('maps the snake_case row onto PaymentData', async () => {
     mockQuery.mockReturnValue(Effect.succeed([BASE_ROW]));
-    const result = await runEffect(getPaymentByEmail('user@example.com'));
+    const result = await runEffect(getSucceededPaymentByEmail('user@example.com'));
     expect(result).toEqual({ ...BASE_PAYMENT, origin: BASE_ROW.origin });
   });
 
   it('returns undefined when no rows found', async () => {
-    const result = await runEffect(getPaymentByEmail('unknown@example.com'));
+    const result = await runEffect(getSucceededPaymentByEmail('unknown@example.com'));
     expect(result).toBeUndefined();
   });
 
   it('propagates DatabaseError when query fails', async () => {
     mockQuery.mockReturnValue(Effect.fail(new DatabaseError({ message: 'query failed' })));
-    const error = await runFlipEffect(getPaymentByEmail('user@example.com'));
+    const error = await runFlipEffect(getSucceededPaymentByEmail('user@example.com'));
     expect(error).toBeInstanceOf(DatabaseError);
   });
 });

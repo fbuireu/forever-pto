@@ -84,7 +84,7 @@ handlers. `PaymentConfirmationDTO.status` is narrowed instead of named, since it
 Stripe read.
 
 **Three copies of the literal remain, all inside SQL, and none of them can take the constant.**
-`repository.ts` spells `'succeeded'` in the `succeeded_at` `CASE`, in `getPaymentByEmail`'s `WHERE` and in
+`repository.ts` spells `'succeeded'` in the `succeeded_at` `CASE`, in `getSucceededPaymentByEmail`'s `WHERE` and in
 `countPromoCodeRedemptions`'. Interpolating a TypeScript value into a query string to remove them would
 trade a checkable drift for something that reads as injection. `repository.test.ts` ties the first to the
 constant by assertion instead; the other two are covered by their own query assertions.
