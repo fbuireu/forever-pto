@@ -15,6 +15,7 @@ import { ChevronDown } from '@ui/modules/core/animate/icons/ChevronDown';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Settings } from '@ui/modules/core/animate/icons/Settings';
 import { Logo } from '@ui/modules/shared/Logo';
+import { TUTORIAL_ANCHOR } from '@ui/modules/tutorial/anchors';
 import { getCurrentYear } from '@ui/utils/getCurrentYear';
 import { Calculator } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -72,7 +73,6 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
               <SidebarMenuItem>
                 <SidebarCollapsibleGroup
                   defaultOpen
-                  data-tutorial='sidebar-filters'
                   trigger={
                     <SidebarMenuButton variant='outline' tooltip={t('steps')}>
                       <AnimateIcon animateOnHover>
@@ -84,7 +84,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                   }
                 >
                   <div className='px-1 pt-2 pb-1 space-y-[18px]'>
-                    <div data-tutorial='sidebar-step-1' className={STEP_CARD_CLASS}>
+                    <div data-tutorial={TUTORIAL_ANCHOR.SIDEBAR_STEP_1} className={STEP_CARD_CLASS}>
                       <h3 className='font-display font-semibold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
                         <span>
                           {t('step1.titleStart')}
@@ -103,7 +103,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                       </div>
                     </div>
 
-                    <div data-tutorial='sidebar-step-2' className={STEP_CARD_CLASS}>
+                    <div data-tutorial={TUTORIAL_ANCHOR.SIDEBAR_STEP_2} className={STEP_CARD_CLASS}>
                       <h3 className='font-display font-semibold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
                         <span>
                           {t('step2.titleStart')}
@@ -118,7 +118,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                       </div>
                     </div>
 
-                    <div data-tutorial='sidebar-step-3' className={STEP_CARD_CLASS}>
+                    <div data-tutorial={TUTORIAL_ANCHOR.SIDEBAR_STEP_3} className={STEP_CARD_CLASS}>
                       <h3 className='font-display font-semibold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
                         <span>
                           {t('step3.titleStart')}
@@ -135,7 +135,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
                       </div>
                     </div>
 
-                    <div data-tutorial='sidebar-step-4' className={STEP_CARD_CLASS}>
+                    <div data-tutorial={TUTORIAL_ANCHOR.SIDEBAR_STEP_4} className={STEP_CARD_CLASS}>
                       <h3 className='font-display font-semibold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none'>
                         <span>
                           {t('step4.titleStart')}
@@ -160,7 +160,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarCollapsibleGroup
-                  data-tutorial='sidebar-tools'
+                  data-tutorial={TUTORIAL_ANCHOR.SIDEBAR_TOOLS}
                   trigger={
                     <SidebarMenuButton variant='outline' tooltip={t('tools')}>
                       <AnimateIcon animateOnHover>

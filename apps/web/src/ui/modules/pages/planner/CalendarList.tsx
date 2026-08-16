@@ -4,6 +4,7 @@ import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useCalculationsWorker } from '@ui/hooks/useCalculationsWorker';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
+import { TUTORIAL_ANCHOR } from '@ui/modules/tutorial/anchors';
 import { cn } from '@ui/utils/cn';
 import { Skeleton } from 'boneyard-js/react';
 import { useLocale } from 'next-intl';
@@ -112,7 +113,7 @@ export const CalendarList = () => {
           isCalculating && 'pointer-events-none'
         )}
         id='calendar'
-        data-tutorial='calendar-list'
+        data-tutorial={TUTORIAL_ANCHOR.CALENDAR_LIST}
       >
         {months.map((month) => (
           <Calendar

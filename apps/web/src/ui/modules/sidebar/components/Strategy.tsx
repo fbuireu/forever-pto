@@ -66,7 +66,7 @@ export const Strategy = () => {
   const currentStrategy = strategies.find(({ value }) => value === strategy);
 
   return (
-    <div className='space-y-2 w-full' data-tutorial='strategy'>
+    <div className='space-y-2 w-full'>
       <label className='flex gap-2 text-sm font-mono font-medium' htmlFor='strategy'>
         <DicesIcon size={16} /> {t('title')}
       </label>

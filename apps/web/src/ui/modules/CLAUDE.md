@@ -218,8 +218,14 @@ styles are `StyleSheet.create` objects, so Tailwind classes and `cn()` do nothin
 through a dynamic import inside an Effect program in `sidebar/components/CalendarExport.tsx`; importing
 it statically would pull the whole PDF renderer into the client bundle.
 
-`data-tutorial="*"` attributes scattered through `sidebar/` and `pages/planner/` are the tutorial's
-anchors. They look like dead attributes and are not.
+`data-tutorial` attributes scattered through `sidebar/` and `pages/planner/` are the tutorial's anchors, and
+both sides now name them through `TUTORIAL_ANCHOR` in `tutorial/anchors.ts` rather than as strings. They look
+like dead attributes and are not — **but nine of them were**. The components declared nineteen anchors while
+`useTutorial` targeted ten, and the gap was invisible in either direction: a step whose anchor is not
+rendered lands on driver.js's dummy-element fallback with nothing highlighted and no error, which is exactly
+how the mobile `open`-vs-`openMobile` bug stayed hidden. The nine unclaimed ones are gone; a future step adds
+its anchor back through the const. `tutorial/anchors.test.ts` reads the component tree and asserts the two
+sets match in both directions.
 
 `resolveApiErrorMessage` in `shared/utils/helpers.ts` tells a machine code from prose by shape. A
 failure payload from this app carries a code — an `ApiError` value, or a Zod code such as

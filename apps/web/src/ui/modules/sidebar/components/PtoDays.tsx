@@ -48,7 +48,7 @@ export const PtoDays = () => {
   );
 
   return (
-    <div className='space-y-2 w-full' data-tutorial='pto-days'>
+    <div className='space-y-2 w-full'>
       <label className='flex gap-2 my-2 text-sm font-mono font-normal' htmlFor='pto-days'>
         <CalendarDays size={16} /> {t('title')}
       </label>

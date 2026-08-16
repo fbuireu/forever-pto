@@ -1,4 +1,6 @@
-'use client';
+import { TUTORIAL_ANCHOR } from '@ui/modules/tutorial/anchors';
+
+('use client');
 
 import type { HolidaysState } from '@application/stores/holidays';
 import { useHolidaysStore } from '@application/stores/holidays';
@@ -96,7 +98,7 @@ function Alternatives({
   const isMainSuggestion = currentIndex === 0;
 
   return (
-    <div className='flex flex-wrap items-center gap-3' data-tutorial='alternatives-manager'>
+    <div className='flex flex-wrap items-center gap-3' data-tutorial={TUTORIAL_ANCHOR.ALTERNATIVES_MANAGER}>
       <div className='flex shrink-0 grow items-stretch overflow-hidden rounded-xl border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-xs)]'>
         <m.button
           type='button'
@@ -269,7 +271,7 @@ function Status({ currentSelection }: StatusProps) {
   const remainingPct = Math.max(0, 100 - usedPct);
 
   return (
-    <div className='pt-3' data-tutorial='pto-status'>
+    <div className='pt-3' data-tutorial={TUTORIAL_ANCHOR.PTO_STATUS}>
       <div className='flex items-center justify-between flex-wrap gap-4'>
         <div className='flex items-center gap-4 flex-wrap gap-y-2'>
           <div className='flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_25%,black_75%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]'>

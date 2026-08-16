@@ -4,11 +4,12 @@ import { useIsMobile } from '@ui/hooks/useMobile';
 import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { X } from '@ui/modules/core/animate/icons/X';
+import { TUTORIAL_ANCHOR, tutorialSelector } from '@ui/modules/tutorial/anchors';
 import type { DriveStep } from 'driver.js';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect } from 'react';
 
-const FIRST_STEP_SELECTOR = '[data-tutorial="sidebar-step-1"]';
+const FIRST_STEP_SELECTOR = tutorialSelector(TUTORIAL_ANCHOR.SIDEBAR_STEP_1);
 const ANCHOR_MIN_FRAMES = 6;
 const ANCHOR_STABLE_FRAMES = 3;
 const ANCHOR_MAX_FRAMES = 90;
@@ -61,7 +62,7 @@ export const useTutorial = () => {
 
     const steps: DriveStep[] = [
       {
-        element: '[data-tutorial="sidebar-step-1"]',
+        element: tutorialSelector(TUTORIAL_ANCHOR.SIDEBAR_STEP_1),
         popover: {
           title: t('step1Title'),
           description: t('step1Description'),
@@ -70,7 +71,7 @@ export const useTutorial = () => {
         },
       },
       {
-        element: '[data-tutorial="sidebar-step-2"]',
+        element: tutorialSelector(TUTORIAL_ANCHOR.SIDEBAR_STEP_2),
         popover: {
           title: t('step2Title'),
           description: t('step2Description'),
@@ -79,7 +80,7 @@ export const useTutorial = () => {
         },
       },
       {
-        element: '[data-tutorial="sidebar-step-3"]',
+        element: tutorialSelector(TUTORIAL_ANCHOR.SIDEBAR_STEP_3),
         popover: {
           title: t('step3Title'),
           description: t('step3Description'),
@@ -88,7 +89,7 @@ export const useTutorial = () => {
         },
       },
       {
-        element: '[data-tutorial="sidebar-step-4"]',
+        element: tutorialSelector(TUTORIAL_ANCHOR.SIDEBAR_STEP_4),
         popover: {
           title: t('step4Title'),
           description: t('step4Description'),
@@ -97,7 +98,7 @@ export const useTutorial = () => {
         },
       },
       {
-        element: '[data-tutorial="sidebar-tools"]',
+        element: tutorialSelector(TUTORIAL_ANCHOR.SIDEBAR_TOOLS),
         popover: {
           title: t('toolsTitle'),
           description: t('toolsDescription'),
@@ -108,7 +109,7 @@ export const useTutorial = () => {
       ...(isMobile
         ? [
             {
-              element: '[data-tutorial="planner-drawer"]',
+              element: tutorialSelector(TUTORIAL_ANCHOR.PLANNER_DRAWER),
               popover: {
                 title: t('drawerTitle'),
                 description: t('drawerDescription'),
@@ -119,7 +120,7 @@ export const useTutorial = () => {
           ]
         : []),
       {
-        element: '[data-tutorial="alternatives-manager"]',
+        element: tutorialSelector(TUTORIAL_ANCHOR.ALTERNATIVES_MANAGER),
         popover: {
           title: t('alternativesTitle'),
           description: t('alternativesDescription'),
@@ -129,7 +130,7 @@ export const useTutorial = () => {
         onHighlightStarted: isMobile ? expandDrawer : undefined,
       },
       {
-        element: '[data-tutorial="pto-status"]',
+        element: tutorialSelector(TUTORIAL_ANCHOR.PTO_STATUS),
         popover: {
           title: t('statusTitle'),
           description: t('statusDescription'),
@@ -138,7 +139,7 @@ export const useTutorial = () => {
         },
       },
       {
-        element: '[data-tutorial="holidays-list"]',
+        element: tutorialSelector(TUTORIAL_ANCHOR.HOLIDAYS_LIST),
         popover: {
           title: t('holidaysListTitle'),
           description: t('holidaysListDescription'),
@@ -147,7 +148,7 @@ export const useTutorial = () => {
         },
       },
       {
-        element: '[data-tutorial="calendar-list"]',
+        element: tutorialSelector(TUTORIAL_ANCHOR.CALENDAR_LIST),
         popover: {
           title: t('calendarTitle'),
           description: t('calendarDescription'),

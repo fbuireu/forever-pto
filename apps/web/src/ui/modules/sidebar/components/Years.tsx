@@ -32,7 +32,7 @@ export const Years = ({ currentYear }: YearsProps) => {
   const years = Array.from({ length: MAX_YEARS }, (_, index) => currentYear - MAX_YEARS / 2 + index);
 
   return (
-    <div className='space-y-2 w-full' data-tutorial='year'>
+    <div className='space-y-2 w-full'>
       <label className='flex gap-2 my-2 text-sm font-mono font-normal' htmlFor='years'>
         <Calendar size={16} /> {t('title')}
       </label>

@@ -1,4 +1,6 @@
-'use client';
+import { TUTORIAL_ANCHOR } from '@ui/modules/tutorial/anchors';
+
+('use client');
 
 import { HolidayVariant } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
@@ -35,7 +37,7 @@ export const HolidaysList = () => {
   };
 
   return (
-    <div className='rounded-lg w-full col-span-full z-1 bg-background' data-tutorial='holidays-list'>
+    <div className='rounded-lg w-full col-span-full z-1 bg-background' data-tutorial={TUTORIAL_ANCHOR.HOLIDAYS_LIST}>
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsHighlight>
           <TabsList className='grid w-full grid-cols-3'>

@@ -131,7 +131,7 @@ export const CalendarExport = () => {
   };
 
   return (
-    <div className='space-y-3 w-full' data-tutorial='calendar-export'>
+    <div className='space-y-3 w-full'>
       <div className='flex gap-2 my-2 text-sm font-normal'>
         <Download size={16} /> {t('title')}
       </div>

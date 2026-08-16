@@ -1,4 +1,6 @@
-'use client';
+import { TUTORIAL_ANCHOR } from '@ui/modules/tutorial/anchors';
+
+('use client');
 
 import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
@@ -120,7 +122,7 @@ export const ManagementBar = () => {
         >
           <DrawerContent overlay={false} className='h-[100dvh] max-h-none'>
             <DrawerTitle>{tPlanner('heading')}</DrawerTitle>
-            <div data-tutorial='planner-drawer' className='px-4 pt-2 pb-3 shrink-0'>
+            <div data-tutorial={TUTORIAL_ANCHOR.PLANNER_DRAWER} className='px-4 pt-2 pb-3 shrink-0'>
               {isReady ? (
                 <div className='flex items-center justify-between gap-2 flex-wrap'>
                   <span className='text-sm font-black shrink-0'>

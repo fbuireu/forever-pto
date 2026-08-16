@@ -293,8 +293,10 @@ so it was not the `@supports` fallback it looked like. Both the effect and the i
 browsers without `scroll-state()` is ever wanted, it belongs beside `Legend.tsx` **with a CSS rule that
 consumes the attribute**, not in a cross-screen component reaching in by DOM id.
 
-**`data-tutorial` attributes are load-bearing.** `calendar-list`, `holidays-list`, `planner-drawer`,
-`alternatives-manager` and `pto-status` are the driver.js anchors. `ManagementBar` additionally listens
+**`data-tutorial` attributes are load-bearing, and they come from `TUTORIAL_ANCHOR`.** `CALENDAR_LIST`,
+`HOLIDAYS_LIST`, `PLANNER_DRAWER`, `ALTERNATIVES_MANAGER` and `PTO_STATUS` are this screen's driver.js
+anchors; the const in [`../../tutorial/anchors.ts`](../../tutorial/anchors.ts) is the only place their
+strings are written, so a rename is a compile error rather than a step that silently highlights nothing. `ManagementBar` additionally listens
 for a `tutorial:expand-drawer` window event dispatched by `hooks/useTutorial.tsx` — a deliberately
 loose coupling so the tutorial does not import planner state, and invisible to a search for the
 listener's caller.

@@ -22,7 +22,7 @@ export const Regions = () => {
   }, [country, fetchRegions]);
 
   return (
-    <div className='space-y-2 w-full' data-tutorial='region'>
+    <div className='space-y-2 w-full'>
       <label className='flex gap-2 my-2 text-sm font-mono font-normal' htmlFor='regions'>
         <MapPinned size={16} /> {t('title')}
       </label>
