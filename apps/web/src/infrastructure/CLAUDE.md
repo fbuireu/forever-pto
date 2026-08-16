@@ -18,7 +18,14 @@ The largest single thing in here is a browser file — the Web Worker.
 | `actions/` | The two `'use server'` entry points: `payment.ts` and `contact.ts`. They read request-scoped config and hand it to the matching operation under `api/operations/` |
 | `api/` | The wire vocabulary for failures, the no-store response helper, and the operations both transports terminate. See [`api/CLAUDE.md`](./api/CLAUDE.md) |
 | `clients/` | SDK wrappers — four Effect service tags plus four modules that are deliberately not services. See [`clients/CLAUDE.md`](./clients/CLAUDE.md) |
-| `i18n/` | `routing.ts` (next-intl routing, `localePrefix: 'as-needed'`), `config.ts` (request config + message loading), `locales.ts` (the six codes and `LOCALE_COOKIE`), `cookie.ts` (writes `NEXT_LOCALE` with the flags next-intl's own cookie lacks), `utils/url.ts` (`localePath`, `getLocaleFromPathname`, `routePathFromPathname`, `localeAlternates`) |
+| `i18n/` | `routing.ts` (next-intl routing, `localePrefix: 'as-needed'`), `config.ts` (request config + message loading), `locales.ts` (the six codes and `LOCALE_COOKIE`), `cookie.ts` (writes `NEXT_LOCALE` with the flags next-intl's own cookie lacks), `utils/url.ts` (`localePath`, `resolveLocale`, `getLocaleFromPathname`, `routePathFromPathname`, `localeFromAcceptLanguage`, `localeAlternates`) |
+
+**`resolveLocale` is the one place a candidate becomes a locale.** `hasLocale(LOCALES, x) ? x : routing.defaultLocale`
+was written out verbatim at three sites — the request config, the activate route's `?locale=` and the
+path-segment reader — and a fourth, `global-not-found.tsx`, hand-rolled a header→cookie→`Accept-Language`
+chain that existed nowhere else and was reachable only through a page most users never see. The
+`Accept-Language` half is `localeFromAcceptLanguage` now and answers `undefined` rather than the default, so
+the caller decides the fallback and the precedence is assertable without rendering a document.
 | `images/` | `loader.ts` — rewrites an image src to `/cdn-cgi/image/...`, the Cloudflare optimiser used in place of Next's built-in one ([ADR 0004](../../../../adr/0004-cloudflare-workers-as-deployment-target.md)) |
 | `markdown/` | `buildMarkdownPage.ts` — the Markdown twin of a page, served when the request asks for `text/markdown`. Translates through `createTranslator` over statically imported bundles, never `next-intl/server` — see *Gotchas* |
 | `seo/` | `buildMetadata.ts` — the `Metadata` shape every route's `generateMetadata` fills in; `routes.ts` — `SITE_ROUTES`, the one list of pages and whether each is indexable |

@@ -1,4 +1,4 @@
-import { hasLocale } from 'next-intl';
+import { hasLocale, type Locale } from 'next-intl';
 import { LOCALES } from '../locales';
 import { routing } from '../routing';
 
@@ -6,9 +6,21 @@ export function localePath(locale: string, path = '') {
   return locale === routing.defaultLocale ? path || '/' : `/${locale}${path}`;
 }
 
+export function resolveLocale(candidate: string | null | undefined): Locale {
+  return hasLocale(LOCALES, candidate) ? candidate : routing.defaultLocale;
+}
+
 export function getLocaleFromPathname(pathname: string) {
-  const segment = pathname.split('/')[1] ?? '';
-  return hasLocale(LOCALES, segment) ? segment : routing.defaultLocale;
+  return resolveLocale(pathname.split('/')[1]);
+}
+
+export function localeFromAcceptLanguage(header: string | null | undefined): Locale | undefined {
+  for (const tag of (header ?? '').split(',')) {
+    const language = tag.split(';')[0].trim().split('-')[0].toLowerCase();
+    if (hasLocale(LOCALES, language)) return language;
+  }
+
+  return undefined;
 }
 
 export function routePathFromPathname(pathname: string): string {

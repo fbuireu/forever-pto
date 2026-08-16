@@ -1,15 +1,12 @@
 import { activateWithPayment } from '@application/use-cases/activatePremium';
 import { activatePremiumRequest } from '@infrastructure/api/operations/activatePremium';
 import { resolveClientIp, UNKNOWN_IP } from '@infrastructure/api/operations/types';
-import { LOCALES } from '@infrastructure/i18n/locales';
-import { routing } from '@infrastructure/i18n/routing';
-import { localePath } from '@infrastructure/i18n/utils/url';
+import { localePath, resolveLocale } from '@infrastructure/i18n/utils/url';
 import { checkRateLimit } from '@infrastructure/services/payments/rateLimit';
 import { ACTIVATION_FAILED, ACTIVATION_PARAM } from '@infrastructure/services/premium/activation';
 import { setPremiumCookie } from '@infrastructure/services/premium/cookie';
 import { Effect } from 'effect';
 import { type NextRequest, NextResponse } from 'next/server';
-import { hasLocale } from 'next-intl';
 import type Stripe from 'stripe';
 
 const SUCCEEDED_REDIRECT_STATUS: Stripe.PaymentIntent.Status = 'succeeded';
@@ -20,7 +17,7 @@ export async function GET(request: NextRequest) {
   const clientSecret = searchParams.get('payment_intent_client_secret');
   const redirectStatus = searchParams.get('redirect_status');
   const requested = searchParams.get('locale');
-  const locale = hasLocale(LOCALES, requested) ? requested : routing.defaultLocale;
+  const locale = resolveLocale(requested);
 
   const destination = new URL(localePath(locale, '/payment/confirmation'), origin);
   if (paymentIntentId) destination.searchParams.set('payment_intent', paymentIntentId);

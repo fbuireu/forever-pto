@@ -2,6 +2,7 @@ import '@styles/index.css';
 import { bricolage, instrumentSerif, jetbrainsMono, spaceGrotesk } from '@app/fonts';
 import { LOCALE_COOKIE, LOCALES } from '@infrastructure/i18n/locales';
 import { routing } from '@infrastructure/i18n/routing';
+import { localeFromAcceptLanguage, resolveLocale } from '@infrastructure/i18n/utils/url';
 import { LazyMotionProvider } from '@ui/modules/core/animate/providers/LazyMotionProvider';
 import { HtmlLangSync } from '@ui/modules/pages/not-found/HtmlLangSync';
 import { NotFoundContent } from '@ui/modules/pages/not-found/NotFoundContent';
@@ -21,13 +22,7 @@ async function detectLocale() {
   const cookieLocale = cookieStore.get(LOCALE_COOKIE)?.value;
   if (hasLocale(LOCALES, cookieLocale)) return cookieLocale;
 
-  const acceptLang = headersList.get('accept-language') ?? '';
-  for (const tag of acceptLang.split(',')) {
-    const lang = tag.split(';')[0].trim().split('-')[0].toLowerCase();
-    if (hasLocale(LOCALES, lang)) return lang;
-  }
-
-  return routing.defaultLocale;
+  return resolveLocale(localeFromAcceptLanguage(headersList.get('accept-language')));
 }
 
 const LocalizedNotFound = async () => {
