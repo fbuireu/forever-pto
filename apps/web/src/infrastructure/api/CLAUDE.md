@@ -1,7 +1,7 @@
 # apps/web/src/infrastructure/api
 
 The wire vocabulary for failures, the response helper that opts out of caching, the request-body parser — and
-`operations/`, where the two flows that exist behind *two* transports are terminated once.
+`operations/`, where the three flows that exist behind *two* transports are terminated once.
 
 ## Files
 
@@ -13,6 +13,7 @@ The wire vocabulary for failures, the response helper that opts out of caching, 
 | `operations/types.ts` | `ApiOutcome<BODY>` (`{ status, body }`), `RequestContext`, `resolveClientIp`, `UNKNOWN_IP` |
 | `operations/payment.ts` | `createPaymentRequest` — rate limit, use-case, deferred write and failure mapping, transport-free |
 | `operations/contact.ts` | `sendContactRequest` — the same shape for the contact form |
+| `operations/activatePremium.ts` | `activatePremiumRequest` — the deferred hand-off, the tag→status map and a log line per failure, for the two transports that grant Premium |
 
 ## One operation, two transports
 
@@ -50,9 +51,9 @@ What the code does today:
 | `RateLimitError` | 429 | `RATE_LIMIT_EXCEEDED` | `operations/payment.ts` |
 | `ValidationError` | 400 | the error's own `message`, verbatim | `operations/payment.ts`, `operations/contact.ts`, check-session |
 | `PromoCodeError` | 400 | the error's `code`, plus `isPromoCodeError: true` | `operations/payment.ts` |
-| `PaymentError` | 500 | `INTERNAL_ERROR` | `operations/payment.ts`, check-session |
+| `PaymentError` | 500 | `INTERNAL_ERROR` | `operations/payment.ts`, `operations/activatePremium.ts` |
 | `EmailError` | 500 | `INTERNAL_ERROR` | `operations/contact.ts` |
-| `SessionError`, `DatabaseError` | 500 | `INTERNAL_ERROR` | `src/app/api/check-session/route.ts` |
+| `SessionError`, `DatabaseError` | 500 | `INTERNAL_ERROR` | `operations/activatePremium.ts` |
 | `WebhookError` | 400 or 500 | `INVALID_SIGNATURE` when `isSignatureError`, `WEBHOOK_MISCONFIGURED` (400) when the secret is missing, else `WEBHOOK_PROCESSING_FAILED` (500) | `src/app/api/webhooks/stripe/route.ts` |
 | `MissingDonorEmailError` | — | never reaches the wire: absorbed and logged in `webhook.ts` | `src/application/use-cases/webhook.ts` |
 

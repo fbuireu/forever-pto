@@ -1,5 +1,6 @@
 import { ApiError } from '@infrastructure/api/errors';
 import { INVALID_BODY } from '@infrastructure/api/parseJsonBody';
+import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { SessionError, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
@@ -46,7 +47,13 @@ vi.mock('next/headers', () => ({
 }));
 
 vi.mock('@infrastructure/layers', () => ({
-  ApplicationLayer: Layer.empty,
+  ApplicationLayer: Layer.succeed(LoggerService, {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    logError: vi.fn(),
+  }),
 }));
 
 vi.mock('@infrastructure/api/response', async () => {

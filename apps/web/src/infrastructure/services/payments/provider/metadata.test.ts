@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import type StripeNode from 'stripe';
+import { describe, expect, it } from 'vitest';
 import { clampMetadata, readDonationMetadata } from './metadata';
 
 const intent = (metadata: Record<string, string>, receiptEmail: string | null = null) =>

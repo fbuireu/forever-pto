@@ -162,6 +162,16 @@ four guards:
   `next build` fails with "Route segment config "dynamic" is not compatible with
   `nextConfig.cacheComponents`". The header is the whole mechanism.
 
+**Failure used to be silent to the operator, and that was the worse half.** The whole program was
+`checkRateLimit(ip).pipe(Effect.andThen(activateWithPayment), Effect.catchAll(() => Effect.succeed(null)))`,
+so a rate limit, a replayed payment-intent id, a Stripe outage and a rotated `JWT_SECRET` all became the same
+`null` — and the file imported no logger at all. A rotated secret meant every donor paid, was redirected, saw
+`premiumActivationFailed`, and nothing anywhere emitted a line. Both transports now go through
+`activatePremiumRequest` in [`@infrastructure/api/operations`](../infrastructure/api/CLAUDE.md), which owns
+the deferred hand-off, the tag→status map and one log line per failure — `warn` for a refusal the payer
+caused, `error` for Stripe, the session and the database. The route keeps only what is its own: the redirect,
+the cookie and the `no-store` header.
+
 Failure is never silent and never a lie: the handler redirects with `activation=failed` and the page then
 renders `premiumActivationFailed` — the payer is told their money went through and their access did not,
 instead of the page claiming Premium is active. That claim was unconditional once, on a page that activated

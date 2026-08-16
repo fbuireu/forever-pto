@@ -1,13 +1,14 @@
 import { activateWithEmail, activateWithPayment } from '@application/use-cases/activatePremium';
 import { ApiError } from '@infrastructure/api/errors';
+import { activatePremiumRequest } from '@infrastructure/api/operations/activatePremium';
 import { parseJsonBody } from '@infrastructure/api/parseJsonBody';
 import { noStore } from '@infrastructure/api/response';
-import { ApplicationLayer } from '@infrastructure/layers';
+import { ValidationError } from '@infrastructure/errors';
 import { clearPremiumCookie, PREMIUM_COOKIE, setPremiumCookie } from '@infrastructure/services/premium/cookie';
 import { verifySession as verifySessionEffect } from '@infrastructure/services/premium/session';
 import { Effect } from 'effect';
 import { cookies } from 'next/headers';
-import { after, type NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 export async function GET(_request: NextRequest) {
   const cookieStore = await cookies();
@@ -30,36 +31,27 @@ export async function GET(_request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  return Effect.runPromise(
+  const outcome = await activatePremiumRequest(
     Effect.gen(function* () {
       const body = yield* parseJsonBody<Record<string, unknown>>(request);
       const email = typeof body.email === 'string' ? body.email : undefined;
       const premiumKey = typeof body.premiumKey === 'string' ? body.premiumKey : undefined;
 
-      if (!email) {
-        return noStore({ error: ApiError.EMAIL_REQUIRED }, { status: 400 });
-      }
+      if (!email) return yield* Effect.fail(new ValidationError({ message: ApiError.EMAIL_REQUIRED }));
 
-      const result = yield* premiumKey
+      return yield* premiumKey
         ? activateWithPayment({ paymentIntentId: premiumKey, expectedEmail: email })
         : activateWithEmail(email);
-
-      const response = noStore({ success: true, premiumKey: result.premiumKey, email: result.email });
-
-      setPremiumCookie(response, result.token);
-
-      yield* Effect.sync(() => after(() => Effect.runPromise(result.deferred.pipe(Effect.provide(ApplicationLayer)))));
-
-      return response;
-    }).pipe(
-      Effect.provide(ApplicationLayer),
-      Effect.catchTags({
-        ValidationError: (e) => Effect.succeed(noStore({ error: e.message, premiumKey: null }, { status: 400 })),
-        PaymentError: () => Effect.succeed(noStore({ error: ApiError.INTERNAL_ERROR }, { status: 500 })),
-        SessionError: () => Effect.succeed(noStore({ error: ApiError.INTERNAL_ERROR }, { status: 500 })),
-        DatabaseError: () => Effect.succeed(noStore({ error: ApiError.INTERNAL_ERROR }, { status: 500 })),
-      }),
-      Effect.catchAll(() => Effect.succeed(noStore({ error: ApiError.INTERNAL_ERROR }, { status: 500 })))
-    )
+    })
   );
+
+  if (outcome.error !== null) {
+    const body = outcome.status === 400 ? { error: outcome.error, premiumKey: null } : { error: outcome.error };
+    return noStore(body, { status: outcome.status });
+  }
+
+  const response = noStore({ success: true, premiumKey: outcome.premiumKey, email: outcome.email });
+  setPremiumCookie(response, outcome.token);
+
+  return response;
 }

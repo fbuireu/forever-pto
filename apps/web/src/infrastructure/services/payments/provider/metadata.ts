@@ -9,8 +9,7 @@ export interface DonationMetadata {
   ipAddress: string | null;
 }
 
-export const clampMetadata = (value: string | null | undefined) =>
-  (value ?? '').slice(0, STRIPE_METADATA_MAX_LENGTH);
+export const clampMetadata = (value: string | null | undefined) => (value ?? '').slice(0, STRIPE_METADATA_MAX_LENGTH);
 
 export const readDonationMetadata = (paymentIntent: StripeNode.PaymentIntent): DonationMetadata => ({
   email: [paymentIntent.metadata.email, paymentIntent.receipt_email]

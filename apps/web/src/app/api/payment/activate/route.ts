@@ -1,4 +1,5 @@
 import { activateWithPayment } from '@application/use-cases/activatePremium';
+import { activatePremiumRequest } from '@infrastructure/api/operations/activatePremium';
 import { resolveClientIp, UNKNOWN_IP } from '@infrastructure/api/operations/types';
 import { LOCALES } from '@infrastructure/i18n/locales';
 import { routing } from '@infrastructure/i18n/routing';
@@ -37,20 +38,13 @@ export async function GET(request: NextRequest) {
 
   const ip = resolveClientIp(request.headers) ?? UNKNOWN_IP;
 
-  const activation = await Effect.runPromise(
-    checkRateLimit(ip).pipe(
-      Effect.andThen(() => activateWithPayment({ paymentIntentId, clientSecret })),
-      Effect.catchAll(() => Effect.succeed(null)),
-      Effect.provide(ApplicationLayer)
-    )
+  const { token } = await activatePremiumRequest(
+    checkRateLimit(ip).pipe(Effect.andThen(() => activateWithPayment({ paymentIntentId, clientSecret })))
   );
 
-  if (!activation) return redirectTo(false);
+  if (!token) return redirectTo(false);
 
   const response = redirectTo(true);
-  setPremiumCookie(response, activation.token);
-
-  after(() => Effect.runPromise(activation.deferred.pipe(Effect.provide(ApplicationLayer))));
-
+  setPremiumCookie(response, token);
   return response;
 }
