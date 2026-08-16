@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
-import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { BarChart3 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -48,7 +47,7 @@ export const QuarterDistributionChart = ({ quarterDist }: QuarterDistributionCha
               <YAxis axisLine={false} tickLine={false} fontSize={14} allowDecimals={false} />
               <Bar dataKey='days' radius={[6, 6, 0, 0]} maxBarSize={60}>
                 {data.map((entry) => (
-                  <Cell key={entry.name} fill={MODIFIERS_CLASS_NAMES[entry.name] || entry.color} />
+                  <Cell key={entry.name} fill={entry.color} />
                 ))}
               </Bar>
               <Tooltip

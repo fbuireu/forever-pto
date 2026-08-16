@@ -2,7 +2,6 @@
 
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
-import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { PieChart } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -24,16 +23,7 @@ const HolidaysDistributionChartLegend = ({ payload }: { payload?: readonly Legen
   <ul className='flex gap-4 justify-center mt-2'>
     {payload?.map((entry) => (
       <li key={entry.value} className='flex items-center gap-2'>
-        <span
-          className='inline-block size-3 rounded-sm'
-          style={{
-            backgroundColor:
-              typeof entry.value === 'string' &&
-              MODIFIERS_CLASS_NAMES[entry.value as keyof typeof MODIFIERS_CLASS_NAMES]
-                ? MODIFIERS_CLASS_NAMES[entry.value as keyof typeof MODIFIERS_CLASS_NAMES]
-                : entry.color,
-          }}
-        />
+        <span className='inline-block size-3 rounded-sm' style={{ backgroundColor: entry.color }} />
         <span className='text-sm text-foreground'>{entry.value}</span>
       </li>
     ))}
@@ -90,7 +80,7 @@ export const HolidaysDistributionChart = ({ ptoDays, holidays }: HolidaysDistrib
                 outerRadius={85}
               >
                 {chartData.data.map((entry) => (
-                  <Cell key={entry.name} fill={MODIFIERS_CLASS_NAMES[entry.name] || entry.color} />
+                  <Cell key={entry.name} fill={entry.color} />
                 ))}
               </Pie>
               <Tooltip

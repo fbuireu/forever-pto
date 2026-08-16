@@ -62,6 +62,14 @@ Two modifiers carry no class of their own: `nationalOrRegionalHoliday` and `disa
 so `Calendar`'s click handler can branch on them. Adding an entry for either under the same key would
 silently start painting them.
 
+**A mistyped key is a compile error now, and was not.** `MODIFIERS_CLASS_NAMES` was annotated
+`Record<string, string>` above its own `as const`, which widened the keys straight back and made every
+lookup — including `Legend`'s seven swatches — unchecked; a typo painted nothing, silently. The annotation is
+a `satisfies` now, so the keys stay literal. Typing them also exposed four dead lookups: the three quarter
+charts indexed the record by `Q1`…`Q4` and the pie chart's legend by a translated label, none of which can
+match a day state, so all four always fell through to `entry.color` — and a Tailwind class list is not a
+valid SVG `fill` in any case. The fall-throughs are gone.
+
 `isAlternative` deliberately returns `false` for any date already in `currentSelection`: an Alternative
 is only ever painted where it *differs* from the applied Suggestion.
 

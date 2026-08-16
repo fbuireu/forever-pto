@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
-import { MODIFIERS_CLASS_NAMES } from '@ui/modules/pages/planner/calendar/utils/helpers';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { Calendar } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -45,7 +44,7 @@ export const BlocksPerQuarterChart = ({ blocksPerQuarter }: BlockPerQuarterChart
               <YAxis axisLine={false} tickLine={false} fontSize={14} allowDecimals={false} />
               <Bar dataKey='blocks' radius={[6, 6, 0, 0]} maxBarSize={60} cursor={''}>
                 {data.map((entry) => (
-                  <Cell key={entry.name} fill={MODIFIERS_CLASS_NAMES[entry.name] || entry.color} />
+                  <Cell key={entry.name} fill={entry.color} />
                 ))}
               </Bar>
               <Tooltip

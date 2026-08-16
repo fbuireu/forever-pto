@@ -12,7 +12,7 @@ interface GetDayClassNamesParams {
   modifiers: Record<string, (date: Date) => boolean>;
 }
 
-export const MODIFIERS_CLASS_NAMES: Record<string, string> = {
+export const MODIFIERS_CLASS_NAMES = {
   weekend:
     'rounded-lg text-muted-foreground bg-[var(--surface-panel-soft)] hover:bg-[var(--surface-panel-alt)] transition-colors border-[2px] border-[var(--frame)]/15 shadow-[var(--shadow-brutal-xs)]',
   holiday:
@@ -35,7 +35,11 @@ export const MODIFIERS_CLASS_NAMES: Record<string, string> = {
   rangeEnd:
     'rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground font-black',
   previewRange: 'rounded-lg bg-primary/10',
-} as const;
+} as const satisfies Record<string, string>;
+
+export type DayStateClass = keyof typeof MODIFIERS_CLASS_NAMES;
+
+const RANGE_KEYS: string[] = ['inRange', 'rangeStart', 'rangeEnd'];
 
 export const getDayClassNames = ({
   date,
@@ -68,12 +72,9 @@ export const getDayClassNames = ({
       classes.push(MODIFIERS_CLASS_NAMES.today);
     } else {
       Object.entries(modifiers).forEach(([name, modifierFn]) => {
-        if (
-          modifierFn?.(date) &&
-          MODIFIERS_CLASS_NAMES[name] &&
-          !['inRange', 'rangeStart', 'rangeEnd'].includes(name)
-        ) {
-          classes.push(MODIFIERS_CLASS_NAMES[name]);
+        const className = MODIFIERS_CLASS_NAMES[name as DayStateClass];
+        if (modifierFn?.(date) && className && !RANGE_KEYS.includes(name)) {
+          classes.push(className);
         }
       });
     }
