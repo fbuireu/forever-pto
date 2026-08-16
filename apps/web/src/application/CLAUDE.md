@@ -92,9 +92,12 @@ the two conventions. `getWeekdayNames` anchors on `new Date(2023, 0, 2)` because
 the function walks seven days from the start of its week; a different anchor rotates every localised weekday
 header.
 
-`differenceInDays` and `differenceInCalendarDays` have identical bodies. Both operate on `PlainDate`, so
-there is no partial day for them to disagree about; the pair exists only to keep call sites reading the way
-their date-fns predecessors did.
+**Two exports are gone and should not come back.** `differenceInCalendarDays` was byte-identical to
+`differenceInDays` — both operate on `PlainDate`, so there is no partial day for them to disagree about — and
+had one caller, kept only so a call site read the way its date-fns predecessor did. `isInSelectedRange` was a
+pure alias of `isWithinInterval` with the two bounds renamed, had **no** caller outside its own five tests,
+and actively misled: `HolidayDTO.isInSelectedRange` is computed by `isInPlanningWindow` in
+[`dto/holiday/dto.ts`](./dto/holiday/dto.ts), not by this. A rename of two parameters is not a module.
 
 ## Gotchas
 

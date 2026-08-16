@@ -1,6 +1,6 @@
 'use client';
 
-import { differenceInCalendarDays, formatDate } from '@application/shared/utils/dates';
+import { differenceInDays, formatDate } from '@application/shared/utils/dates';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
@@ -50,7 +50,7 @@ export const WorkdayCounter = () => {
   };
 
   const workdayCount = selectedRange ? calculateWorkdays(selectedRange, holidays) : 0;
-  const totalDays = selectedRange ? differenceInCalendarDays(selectedRange.to, selectedRange.from) + 1 : 0;
+  const totalDays = selectedRange ? differenceInDays(selectedRange.to, selectedRange.from) + 1 : 0;
   const weekendDays = selectedRange ? calculateWeekends(selectedRange) : 0;
   const holidayDays = selectedRange ? calculateHolidaysInRange(selectedRange, holidays) : 0;
 

@@ -27,15 +27,6 @@ export const isWithinInterval = (date: Date, { start, end }: { start: Date; end:
   );
 };
 
-interface IsInSelectedRangeParams {
-  date: Date;
-  rangeStart: Date;
-  rangeEnd: Date;
-}
-
-export const isInSelectedRange = ({ date, rangeStart, rangeEnd }: IsInSelectedRangeParams): boolean =>
-  isWithinInterval(date, { start: rangeStart, end: rangeEnd });
-
 export const isWeekend = (date: Date): boolean => {
   const { dayOfWeek } = toPlainDate(date);
   return dayOfWeek === 6 || dayOfWeek === 7;
@@ -48,9 +39,6 @@ export const addMonths = (date: Date, months: number): Date => toDate(toPlainDat
 export const subMonths = (date: Date, months: number): Date => toDate(toPlainDate(date).subtract({ months }));
 
 export const differenceInDays = (dateLeft: Date, dateRight: Date): number =>
-  toPlainDate(dateRight).until(toPlainDate(dateLeft), { largestUnit: 'days' }).days;
-
-export const differenceInCalendarDays = (dateLeft: Date, dateRight: Date): number =>
   toPlainDate(dateRight).until(toPlainDate(dateLeft), { largestUnit: 'days' }).days;
 
 export const startOfDay = (date: Date): Date => toDate(toPlainDate(date));

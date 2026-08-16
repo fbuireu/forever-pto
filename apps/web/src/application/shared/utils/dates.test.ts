@@ -3,14 +3,12 @@ import { describe, expect, it } from 'vitest';
 import {
   addDays,
   addMonths,
-  differenceInCalendarDays,
   differenceInDays,
   eachDayOfInterval,
   endOfMonth,
   formatDate,
   getWeekdayNames,
   isBefore,
-  isInSelectedRange,
   isSameDay,
   isSameMonth,
   isWeekend,
@@ -88,14 +86,6 @@ describe('differenceInDays', () => {
   });
 });
 
-describe('differenceInCalendarDays', () => {
-  it('counts calendar days ignoring time', () => {
-    const left = new Date(2024, 0, 3, 23, 59);
-    const right = new Date(2024, 0, 1, 0, 0);
-    expect(differenceInCalendarDays(left, right)).toBe(2);
-  });
-});
-
 describe('startOfDay', () => {
   it('sets time to midnight', () => {
     const d = startOfDay(new Date(2024, 0, 15, 14, 30, 45));
@@ -155,30 +145,5 @@ describe('getWeekdayNames', () => {
   it('starts on Monday when weekStartsOn is 1', () => {
     const names = getWeekdayNames({ locale: 'en-US', weekStartsOn: 1, format: 'long' });
     expect(names[0].toLowerCase()).toContain('mon');
-  });
-});
-
-describe('isInSelectedRange', () => {
-  const rangeStart = new Date(2024, 0, 1);
-  const rangeEnd = new Date(2024, 11, 31);
-
-  it('returns true for a date within the range', () => {
-    expect(isInSelectedRange({ date: new Date(2024, 5, 15), rangeStart, rangeEnd })).toBe(true);
-  });
-
-  it('returns true for a date on the start boundary', () => {
-    expect(isInSelectedRange({ date: rangeStart, rangeStart, rangeEnd })).toBe(true);
-  });
-
-  it('returns true for a date on the end boundary', () => {
-    expect(isInSelectedRange({ date: rangeEnd, rangeStart, rangeEnd })).toBe(true);
-  });
-
-  it('returns false for a date before the range', () => {
-    expect(isInSelectedRange({ date: new Date(2023, 11, 31), rangeStart, rangeEnd })).toBe(false);
-  });
-
-  it('returns false for a date after the range', () => {
-    expect(isInSelectedRange({ date: new Date(2025, 0, 1), rangeStart, rangeEnd })).toBe(false);
   });
 });
