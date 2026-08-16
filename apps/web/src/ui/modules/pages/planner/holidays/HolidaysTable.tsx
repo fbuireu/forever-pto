@@ -1,10 +1,8 @@
-import { formatDate } from '@application/shared/utils/dates';
-
-('use client');
+'use client';
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { HolidayVariant } from '@application/dto/holiday/types';
-import { isWeekend } from '@application/shared/utils/dates';
+import { formatDate, isWeekend } from '@application/shared/utils/dates';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useDebounce } from '@ui/hooks/useDebounce';
 import { Checkbox } from '@ui/modules/core/animate/base/Checkbox';

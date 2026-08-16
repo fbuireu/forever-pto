@@ -1,6 +1,4 @@
-import { TUTORIAL_ANCHOR } from '@ui/modules/tutorial/anchors';
-
-('use client');
+'use client';
 
 import type { HolidaysState } from '@application/stores/holidays';
 import { useHolidaysStore } from '@application/stores/holidays';
@@ -12,6 +10,7 @@ import { ChevronRight } from '@ui/modules/core/animate/icons/ChevronRight';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Progress, ProgressOverlayLabel, ProgressTrack } from '@ui/modules/core/primitives/Progress';
+import { TUTORIAL_ANCHOR } from '@ui/modules/tutorial/anchors';
 import { cn } from '@ui/utils/cn';
 import { BarChart3, CalendarDays, Sparkles, TrendingUp } from 'lucide-react';
 import { m, type Transition, type Variants } from 'motion/react';

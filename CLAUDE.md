@@ -256,8 +256,9 @@ every script this file
 documents exists in the root manifest and every script the web guide documents exists in one of the two;
 that `apps/web/tsconfig.json` keeps the two settings `next build` would otherwise fill in for it — `strict`
 on and `allowJs` off — that it sits beside the `next.config.ts` that rewrites it, and that
-`cloudflare-env.d.ts` stays both excluded from the program and ignored by git; and that every locale bundle
-has exactly the keys `en.json` has.
+`cloudflare-env.d.ts` stays both excluded from the program and ignored by git; that every `'use client'`,
+`'use server'` and `'use cache'` under either package's `src/` is a bare string literal in first position;
+and that every locale bundle has exactly the keys `en.json` has.
 
 It reads staged *and* unstaged files, so a rule fires before the offending file is committed. **Each rule was
 verified by breaking it and confirming the matching case fails** — keep that property when you add one. A
@@ -300,5 +301,11 @@ relative-link rule could not catch because they were prose rather than links.
   makes it safe: it cannot open a pull request for a release the installer would then refuse. Lower it below
   the workspace's and CI fails on the lockfile rather than at resolution, because the age is re-checked on
   **every** install and not only when a version is picked.
+- **An import sorted above a `'use client'` silently deletes it, and only `next build` notices.** Biome's
+  import sorting moves an added import to the top of the file; the directive then stops being the first
+  statement, and the formatter parenthesises the orphaned string, leaving `('use client');`. That is an
+  ordinary expression — the module becomes a Server Component. Typecheck, Biome and the whole unit suite
+  stay green, because none of them models the RSC boundary. Six planner files sat like that for several
+  commits. `tests/docs-consistency.test.ts` parses for it now, in both shapes.
 - **Never run `lint-staged` by hand.** It stashes the whole tree; interrupting it can revert the working
   copy. Let the hook run it.

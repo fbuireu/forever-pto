@@ -539,6 +539,53 @@ describe('apps/web/src carries no explanatory comments', () => {
   });
 });
 
+describe('directives sit where the compiler can see them', () => {
+  // A directive is a bare string literal as the file's first statement. Wrap it in parentheses or let an
+  // import sort above it and it silently becomes an ordinary expression: `'use client'` stops applying, the
+  // module is treated as a Server Component, and nothing here notices. Typecheck passes, Biome passes, every
+  // unit test passes — only `next build` fails, in CI, on a full production build. Six planner files spent
+  // several commits in that state after an added import was hoisted over the directive and the formatter
+  // parenthesised what was left behind.
+  const DIRECTIVES = new Set(['use client', 'use server', 'use cache', 'use strict']);
+  const packageSources = sourceFiles.filter(
+    (path) => path.startsWith(`${WEB}/src/`) || path.startsWith(`${DOCS}/src/`)
+  );
+
+  it('has sources to check at all', () => {
+    expect(packageSources.length).toBeGreaterThan(100);
+  });
+
+  it('keeps every directive a bare string literal in first position', () => {
+    const offenders: string[] = [];
+
+    for (const file of packageSources) {
+      const source = read(file);
+      if (!/['"]use (client|server|cache|strict)['"]/.test(source)) continue;
+
+      const parsed = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+
+      parsed.statements.forEach((statement, index) => {
+        if (!ts.isExpressionStatement(statement)) return;
+
+        let expression = statement.expression;
+        let parenthesised = false;
+        while (ts.isParenthesizedExpression(expression)) {
+          parenthesised = true;
+          expression = expression.expression;
+        }
+        if (!ts.isStringLiteral(expression) || !DIRECTIVES.has(expression.text)) return;
+
+        const line = parsed.getLineAndCharacterOfPosition(statement.getStart(parsed)).line + 1;
+        if (parenthesised)
+          offenders.push(`${file}:${line} '${expression.text}' is parenthesised, so it is not a directive`);
+        else if (index !== 0) offenders.push(`${file}:${line} '${expression.text}' is not the first statement`);
+      });
+    }
+
+    expect(offenders).toEqual([]);
+  });
+});
+
 describe('the guides describe the project as it is configured', () => {
   // Backticked `foo/*` tokens are aliases; the dot filter drops the wrangler route pattern
   // `forever-pto.com/*`. Whole backticked tokens, not substrings: the rule this replaced stripped the

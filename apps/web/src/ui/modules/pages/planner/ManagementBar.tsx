@@ -1,6 +1,4 @@
-import { TUTORIAL_ANCHOR } from '@ui/modules/tutorial/anchors';
-
-('use client');
+'use client';
 
 import { useHolidaysStore } from '@application/stores/holidays';
 import type { AlternativeSelectionBaseParams } from '@application/stores/types';
@@ -8,6 +6,7 @@ import { useIsMobile } from '@ui/hooks/useMobile';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { Drawer, DrawerContent, DrawerTitle } from '@ui/modules/core/animate/base/Drawer';
 import { useSidebar } from '@ui/modules/core/animate/base/Sidebar';
+import { TUTORIAL_ANCHOR } from '@ui/modules/tutorial/anchors';
 import { Skeleton } from 'boneyard-js/react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';

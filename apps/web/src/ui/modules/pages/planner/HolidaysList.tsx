@@ -1,6 +1,4 @@
-import { TUTORIAL_ANCHOR } from '@ui/modules/tutorial/anchors';
-
-('use client');
+'use client';
 
 import { HolidayVariant } from '@application/dto/holiday/types';
 import { useHolidaysStore } from '@application/stores/holidays';
@@ -15,6 +13,7 @@ import {
   TabsTrigger,
 } from '@ui/modules/core/animate/components/Tabs';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
+import { TUTORIAL_ANCHOR } from '@ui/modules/tutorial/anchors';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { HolidaysTable } from './holidays/HolidaysTable';

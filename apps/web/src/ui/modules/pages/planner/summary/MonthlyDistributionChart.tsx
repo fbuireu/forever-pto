@@ -1,6 +1,6 @@
-import { formatDate } from '@application/shared/utils/dates';
+'use client';
 
-('use client');
+import { formatDate } from '@application/shared/utils/dates';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';

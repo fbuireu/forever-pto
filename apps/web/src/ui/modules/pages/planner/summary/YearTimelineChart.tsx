@@ -1,9 +1,7 @@
-import { formatDate } from '@application/shared/utils/dates';
-
-('use client');
+'use client';
 
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
-import { differenceInDays, getDayOfMonth, getMonth, getYear } from '@application/shared/utils/dates';
+import { differenceInDays, formatDate, getDayOfMonth, getMonth, getYear } from '@application/shared/utils/dates';
 import { windowMonthCount, windowMonthIndex } from '@domain/calendar/metrics/utils/helpers';
 import type { Suggestion } from '@domain/calendar/types';
 import { cn } from '@ui/utils/cn';
