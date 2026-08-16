@@ -55,7 +55,7 @@ pnpm cf:typegen         # regenerate apps/web/cloudflare-env.d.ts (reference onl
 
 pnpm lint:all           # biome lint over both packages (:fix to autofix)
 pnpm format:all         # biome check --write over both packages
-pnpm lint:ts:typecheck  # the root program, then apps/web
+pnpm lint:ts:typecheck  # the root program, then apps/web, then apps/docs (astro check)
 
 pnpm test:ut            # apps/web unit tests, then the contract suite
 pnpm test:docs          # the contract suite alone
@@ -186,6 +186,14 @@ version from `apps/web/package.json`; without a dispatch after a web release, th
 advertising the previous one.
 
 Husky runs `lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `lint:ts:typecheck` on `pre-push`.
+
+**`lint:ts:typecheck` ends with `astro check`, and that tail is what puts the cross-package seam in front of
+the author.** The docs site typechecks the 32 demo components against `apps/web`'s real props — a renamed
+`Button` variant fails there because `ButtonDemo`'s `Record<ButtonVariant, string>` is exhaustive — but the
+check used to run only inside `docs.yml`'s `build` job. So an app PR that broke the docs passed `pre-push`,
+passed the `CI` workflow, and failed in a workflow called **Docs** that does not read as blocking. Whether it
+*was* blocking depended on branch protection, and this repo has already been bitten once by the required
+checks not including the one that mattered.
 
 ## Deploy
 

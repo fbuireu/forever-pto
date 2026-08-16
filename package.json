@@ -26,7 +26,7 @@
     "lint:all": "pnpm lint .",
     "lint:all:fix": "pnpm lint:all --fix",
     "lint:changed": "pnpm lint --write --changed",
-    "lint:ts:typecheck": "tsc --project . --noEmit && pnpm --filter forever-pto lint:ts:typecheck",
+    "lint:ts:typecheck": "tsc --project . --noEmit && pnpm --filter forever-pto lint:ts:typecheck && pnpm --filter forever-pto-docs check",
     "test:ut": "pnpm --filter forever-pto test:ut && vitest run",
     "test:ut:changed": "pnpm --filter forever-pto test:ut:changed",
     "test:docs": "vitest run",
