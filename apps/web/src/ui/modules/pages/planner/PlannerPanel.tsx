@@ -252,10 +252,6 @@ function Alternatives({
   );
 }
 
-interface StatusProps {
-  currentSelection: NonNullable<HolidaysState['currentSelection']>;
-}
-
 function Status() {
   const t = useTranslations('ptoStatus');
   const resetManualSelection = useHolidaysStore((state) => state.resetManualSelection);

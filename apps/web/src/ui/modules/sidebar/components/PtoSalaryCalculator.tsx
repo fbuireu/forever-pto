@@ -1,10 +1,10 @@
 'use client';
 
 import { useUIStore } from '@application/stores/ui';
-import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@ui/modules/core/primitives/InputGroup';
 import { ConditionalWrapper } from '@ui/modules/shared/ConditionalWrapper';
+import { SidebarFieldTooltip } from '@ui/modules/sidebar/components/SidebarFieldLabel';
 import { Euro } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
@@ -83,12 +83,9 @@ export const PtoSalaryCalculator = () => {
     <div className='space-y-2 w-full'>
       <div className='flex gap-2 text-sm font-normal'>
         <Euro size={16} /> {t('title')}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
-            <TooltipContent className='w-60 text-pretty'>{t('tooltip')}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <SidebarFieldTooltip label={t('tooltipLabel')} className='w-60'>
+          {t('tooltip')}
+        </SidebarFieldTooltip>
       </div>
 
       <div className='space-y-2 w-full'>

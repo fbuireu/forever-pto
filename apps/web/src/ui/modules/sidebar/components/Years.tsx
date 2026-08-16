@@ -7,6 +7,7 @@ import { ChevronDown } from '@ui/modules/core/animate/icons/ChevronDown';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Command, CommandGroup, CommandItem, CommandList } from '@ui/modules/core/primitives/Command';
+import { SidebarFieldLabel } from '@ui/modules/sidebar/components/SidebarFieldLabel';
 import { cn } from '@ui/utils/cn';
 import { Calendar } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -33,9 +34,7 @@ export const Years = ({ currentYear }: YearsProps) => {
 
   return (
     <div className='space-y-2 w-full'>
-      <label className='flex gap-2 my-2 text-sm font-mono font-normal' htmlFor='years'>
-        <Calendar size={16} /> {t('title')}
-      </label>
+      <SidebarFieldLabel controlId='years' icon={<Calendar size={16} />} title={t('title')} />
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -52,7 +51,7 @@ export const Years = ({ currentYear }: YearsProps) => {
           </Button>
         </PopoverTrigger>
         <PopoverContent className='w-50 p-0'>
-          <Command id='years'>
+          <Command>
             <CommandList>
               <CommandGroup>
                 {years.map((yearOption) => (

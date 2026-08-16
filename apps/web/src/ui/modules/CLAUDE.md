@@ -245,6 +245,25 @@ Elements iframe cannot read this app's CSS custom properties, so the light and d
 `--muted-foreground` from `src/ui/styles/global/index.css` by value. Change a token there and this
 object has to be changed by hand, or the donation form drifts from the page around it.
 
+**One module answers how a sidebar control is labelled, and its interface is where the two accessibility
+defects came from.** `sidebar/components/SidebarFieldLabel.tsx` exports `SidebarFieldLabel` (icon, title,
+optional tooltip, optional `controlId`) and `SidebarFieldTooltip` (the six-line
+provider/trigger/content block, which four widgets use without a label around it). Eleven call sites had
+written both out by hand, and the copies had drifted in ways nothing could see:
+
+- **`PtoDays.tsx` carried `<label htmlFor='remaining-days'>` over a read-only status group, and no element
+  in the tree has that id.** A label naming nothing is not inert — it is a promise to a screen reader that
+  never resolves. It is a heading, so it takes no `controlId` now and renders a `div`; the module's test
+  fails if that branch emits a `<label>` instead.
+- **`Years.tsx` used `id='years'` twice** — on the popover trigger and again on the `Command` inside the
+  popover. With the popover open the document held two `#years`, and the label resolved to whichever came
+  first. Nothing referenced the second one; it is gone.
+
+The tooltip width is the caller's (`w-50` for the fields, `w-60` for the three calculators) and `Strategy`
+keeps `font-medium` with no vertical margin, both passed through `className` so the render is unchanged.
+That drift is real but cosmetic, and flattening it silently would have been a visual change hiding inside a
+refactor.
+
 `BRIDGE_WEEK` in `pages/homepage/sections/Features.tsx` is the shape the card's copy describes:
 Workdays Monday to Wednesday, a Thursday Holiday, a Friday PTO Day, then the weekend — a Bridge.
 Reordering the array desyncs the illustration from the translated text beside it.

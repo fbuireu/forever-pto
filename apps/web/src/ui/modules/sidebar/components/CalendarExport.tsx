@@ -5,10 +5,10 @@ import { generateIcs } from '@application/export/generateIcs';
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { usePlanReadout } from '@ui/hooks/usePlanReadout';
-import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { Button } from '@ui/modules/core/primitives/Button';
 import type { HolidayDocumentProps } from '@ui/modules/export/HolidayDocument';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
+import { SidebarFieldTooltip } from '@ui/modules/sidebar/components/SidebarFieldLabel';
 import { Effect } from 'effect';
 import { Download, FileText } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -59,7 +59,7 @@ export const CalendarExport = () => {
   );
   const holidays = useHolidaysStore((s) => s.holidays);
 
-  const { activeSuggestion, placedDays: ptoDays } = usePlanReadout();
+  const { placedDays: ptoDays } = usePlanReadout();
   const holidaysInWindow = useMemo(() => holidaysInPlanningWindow(holidays), [holidays]);
   const hasData = (includeHolidays && holidaysInWindow.length > 0) || (includePto && ptoDays.length > 0);
 
@@ -143,12 +143,7 @@ export const CalendarExport = () => {
         >
           {t('includePto')}
         </Button>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
-            <TooltipContent className='w-50 text-pretty'>{t('tooltip')}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <SidebarFieldTooltip label={t('tooltipLabel')}>{t('tooltip')}</SidebarFieldTooltip>
       </div>
       <PremiumFeature feature={t('title')}>
         <div className='flex flex-col gap-2'>

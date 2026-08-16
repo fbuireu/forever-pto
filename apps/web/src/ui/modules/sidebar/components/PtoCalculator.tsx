@@ -2,7 +2,6 @@
 
 import { MIN_PTO_DAYS, useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Plus } from '@ui/modules/core/animate/icons/Plus';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
@@ -10,6 +9,7 @@ import { Button } from '@ui/modules/core/primitives/Button';
 import { Combobox } from '@ui/modules/core/primitives/Combobox';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { getMonthNames } from '@ui/modules/pages/planner/utils/helpers';
+import { SidebarFieldTooltip } from '@ui/modules/sidebar/components/SidebarFieldLabel';
 import { Calculator } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
@@ -80,12 +80,9 @@ export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
     <div className='space-y-2 w-full'>
       <div className='flex gap-2 my-2 text-sm font-normal'>
         <Calculator size={16} /> {t('title')}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
-            <TooltipContent className='w-60 text-pretty'>{t('tooltip')}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <SidebarFieldTooltip label={t('tooltipLabel')} className='w-60'>
+          {t('tooltip')}
+        </SidebarFieldTooltip>
       </div>
 
       <div className='space-y-2 w-full'>

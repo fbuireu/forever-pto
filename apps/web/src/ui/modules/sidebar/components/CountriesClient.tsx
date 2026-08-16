@@ -3,10 +3,10 @@
 import type { CountryDTO } from '@application/dto/country/types';
 import { useFiltersStore } from '@application/stores/filters';
 import { useLocationStore } from '@application/stores/location';
-import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { MapPin } from '@ui/modules/core/animate/icons/MapPin';
 import { Combobox } from '@ui/modules/core/primitives/Combobox';
+import { SidebarFieldLabel } from '@ui/modules/sidebar/components/SidebarFieldLabel';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 
@@ -28,15 +28,12 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
   return (
     <AnimateIcon animateOnHover asChild>
       <div className='space-y-2 w-full'>
-        <label className='flex gap-2 my-2 text-sm font-mono font-normal' htmlFor='countries'>
-          <MapPin size={16} /> {t('title')}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
-              <TooltipContent className='w-50 text-pretty'>{t('tooltip')}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </label>
+        <SidebarFieldLabel
+          controlId='countries'
+          icon={<MapPin size={16} />}
+          title={t('title')}
+          tooltip={{ label: t('tooltipLabel'), content: t('tooltip') }}
+        />
         <Combobox
           className='w-full'
           id='countries'

@@ -1,12 +1,12 @@
 'use client';
 
 import { MAX_CARRY_OVER_MONTHS, MIN_CARRY_OVER_MONTHS, useFiltersStore } from '@application/stores/filters';
-import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider } from '@ui/modules/core/animate/base/Tooltip';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { SlidersHorizontal } from '@ui/modules/core/animate/icons/SlidersHorizontal';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Slider } from '@ui/modules/core/primitives/Slider';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
+import { SidebarFieldLabel } from '@ui/modules/sidebar/components/SidebarFieldLabel';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -55,15 +55,12 @@ export const CarryOverMonths = () => {
   return (
     <AnimateIcon animateOnHover>
       <div className='space-y-2 w-full pb-4'>
-        <label className='flex gap-2 my-2 text-sm font-mono font-normal' htmlFor='carry-over-months'>
-          <SlidersHorizontal size={16} /> {t('title')}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
-              <TooltipContent className='w-50 text-pretty'>{t('tooltip')}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </label>
+        <SidebarFieldLabel
+          controlId='carry-over-months'
+          icon={<SlidersHorizontal size={16} />}
+          title={t('title')}
+          tooltip={{ label: t('tooltipLabel'), content: t('tooltip') }}
+        />
         <PremiumFeature feature={t('title')}>
           <div className='flex gap-4 items-center w-full'>
             <p className='font-normal text-sm'>{MIN_VALUE}</p>

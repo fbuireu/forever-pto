@@ -3,6 +3,7 @@
 import { useFiltersStore } from '@application/stores/filters';
 import { useLocationStore } from '@application/stores/location';
 import { Combobox } from '@ui/modules/core/primitives/Combobox';
+import { SidebarFieldLabel } from '@ui/modules/sidebar/components/SidebarFieldLabel';
 import { MapPinned } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
@@ -23,9 +24,7 @@ export const Regions = () => {
 
   return (
     <div className='space-y-2 w-full'>
-      <label className='flex gap-2 my-2 text-sm font-mono font-normal' htmlFor='regions'>
-        <MapPinned size={16} /> {t('title')}
-      </label>
+      <SidebarFieldLabel controlId='regions' icon={<MapPinned size={16} />} title={t('title')} />
       <Combobox
         className='w-full'
         id='regions'

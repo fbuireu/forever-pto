@@ -8,6 +8,7 @@ import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Users } from '@ui/modules/core/animate/icons/Users';
 import { Card, CardDescription } from '@ui/modules/core/primitives/Card';
 import { Combobox } from '@ui/modules/core/primitives/Combobox';
+import { SidebarFieldLabel } from '@ui/modules/sidebar/components/SidebarFieldLabel';
 import { cn } from '@ui/utils/cn';
 import { AlertCircle, CheckCircle2, DicesIcon, Scale, TrendingUp } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -67,9 +68,12 @@ export const Strategy = () => {
 
   return (
     <div className='space-y-2 w-full'>
-      <label className='flex gap-2 text-sm font-mono font-medium' htmlFor='strategy'>
-        <DicesIcon size={16} /> {t('title')}
-      </label>
+      <SidebarFieldLabel
+        controlId='strategy'
+        icon={<DicesIcon size={16} />}
+        title={t('title')}
+        className='my-0 font-medium'
+      />
       <Combobox
         className='w-full'
         id='strategy'

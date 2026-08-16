@@ -6,6 +6,7 @@ import { usePlanReadout } from '@ui/hooks/usePlanReadout';
 import { Counter } from '@ui/modules/core/animate/components/Counter';
 import { SlidingNumber } from '@ui/modules/core/animate/text/SlidingNumber';
 import { Button } from '@ui/modules/core/primitives/Button';
+import { SidebarFieldLabel } from '@ui/modules/sidebar/components/SidebarFieldLabel';
 import { cn } from '@ui/utils/cn';
 import { CalendarDays, Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -48,9 +49,7 @@ export const PtoDays = () => {
 
   return (
     <div className='space-y-2 w-full'>
-      <label className='flex gap-2 my-2 text-sm font-mono font-normal' htmlFor='pto-days'>
-        <CalendarDays size={16} /> {t('title')}
-      </label>
+      <SidebarFieldLabel controlId='pto-days' icon={<CalendarDays size={16} />} title={t('title')} />
       <div className='flex items-center gap-3 justify-between'>
         <p className='text-sm text-muted-foreground'>{t('iHave')}</p>
         <Counter
@@ -67,9 +66,7 @@ export const PtoDays = () => {
         />
       </div>
       <div className='space-y-2 mt-4 w-full'>
-        <label className='flex gap-2 my-2 text-sm font-mono font-normal' htmlFor='remaining-days'>
-          <Clock size={16} /> {t('status')}
-        </label>
+        <SidebarFieldLabel icon={<Clock size={16} />} title={t('status')} />
         <div className='space-y-2 w-full'>
           <div className='flex items-center justify-between text-sm'>
             <span className='text-muted-foreground'>{t('autoAssigned')}</span>
