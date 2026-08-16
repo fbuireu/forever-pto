@@ -458,8 +458,6 @@
   },
   "toasts": {
     "suggestionApplied": "Suggeriment aplicat correctament",
-    "cannotSelectPastDays": "No es poden seleccionar dies passats",
-    "enablePastDays": "Habilita \"Permetre dies passats\" a la configuració per seleccionar dates passades",
     "noPtoDaysRemaining": "No queden dies de PTO per assignar",
     "removeDaysToFree": "Elimina dies existents per alliberar espai",
     "cannotSelectHoliday": "Aquest dia ja és festiu",

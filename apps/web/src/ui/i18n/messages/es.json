@@ -458,8 +458,6 @@
   },
   "toasts": {
     "suggestionApplied": "Sugerencia aplicada correctamente",
-    "cannotSelectPastDays": "No se pueden seleccionar días pasados",
-    "enablePastDays": "Habilita 'permitir días pasados' en ajustes para seleccionar fechas pasadas",
     "noPtoDaysRemaining": "No quedan días de PTO para asignar",
     "removeDaysToFree": "Quita algún día para poder añadir más",
     "cannotSelectHoliday": "No se puede seleccionar un día festivo",

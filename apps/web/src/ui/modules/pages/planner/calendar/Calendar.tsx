@@ -12,21 +12,16 @@ import {
 } from '@application/shared/utils/dates';
 import type { FiltersState } from '@application/stores/filters';
 import type { HolidaysState } from '@application/stores/holidays';
-import { usePremiumStore } from '@application/stores/premium';
-import type { DayOutcome } from '@application/stores/types';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/modules/core/animate/base/Tooltip';
 import { ChevronLeft } from '@ui/modules/core/animate/icons/ChevronLeft';
 import { ChevronRight } from '@ui/modules/core/animate/icons/ChevronRight';
 import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { ConditionalWrapper } from '@ui/modules/shared/ConditionalWrapper';
-import { SupportButton } from '@ui/modules/shared/SupportButton';
 import { cn } from '@ui/utils/cn';
-import { LockIcon } from 'lucide-react';
 import type { Locale } from 'next-intl';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { toast } from 'sonner';
 import { getCalendarDays } from '../utils/helpers';
 import {
   getPreviewRange,
@@ -45,7 +40,6 @@ import {
   isToday,
 } from '../utils/modifiers';
 import { getDayClassNames, isFromToObject } from './utils/helpers';
-import { DAY_REFUSAL_COPY } from './utils/refusals';
 
 export interface FromTo {
   from: Date;
@@ -88,7 +82,7 @@ interface CalendarProps {
   previewAlternativeIndex?: HolidaysState['previewAlternativeIndex'];
   manuallySelectedDays?: Date[];
   removedSuggestedDays?: Date[];
-  onDayToggle?: (date: Date) => DayOutcome;
+  onDayToggle?: (date: Date) => void;
 }
 
 interface RangeState {
@@ -123,10 +117,7 @@ export function Calendar({
   onDayToggle,
   ...props
 }: Readonly<CalendarProps>) {
-  const t = useTranslations('toasts');
-  const tPremium = useTranslations('premium');
   const tCalendar = useTranslations('calendar');
-  const premiumKey = usePremiumStore((state) => state.premiumKey);
   const [currentMonth, setCurrentMonth] = useState(initialMonth ?? new Date());
   const [hoverDate, setHoverDate] = useState<Date | undefined>();
   const [today, setToday] = useState<Date | null>(null);
@@ -248,47 +239,10 @@ export function Calendar({
     (date: Date) => {
       if (disabled) return;
 
-      if (mode === CalendarSelectionMode.NONE && onDayToggle) {
-        const isPastDay = !allowPastDays && modifiers.disabled(date);
-        const isManual = modifiers.manuallySelected(date);
-        const isSuggested = modifiers.suggested(date);
-        if (!premiumKey) {
-          toast.info(tPremium('premiumFeature'), {
-            description: tPremium('unlockDescription'),
-            duration: 7_500,
-            classNames: {
-              toast: 'flex flex-wrap items-center overflow-visible',
-              icon: 'mt-0.5 shrink-0',
-              content: 'flex-1',
-            },
-            icon: <LockIcon size='16' />,
-            action: (
-              <SupportButton
-                label={tPremium('upgrade')}
-                className='w-full py-3 px-2 !bg-[var(--color-brand-ink)] !text-white !border-transparent !shadow-[var(--shadow-brutal-btn-orange)] hover:!shadow-[var(--shadow-brutal-btn-orange-hover)] active:!shadow-[var(--shadow-brutal-btn-orange-active)]'
-              />
-            ),
-          });
-          return;
-        }
-        if (isPastDay && !isManual && !isSuggested) {
-          toast.warning(t('cannotSelectPastDays'), {
-            description: t('enablePastDays'),
-          });
-          return;
-        }
-
-        const outcome = onDayToggle(date);
-
-        if (outcome.applied) return;
-
-        const refusal = DAY_REFUSAL_COPY[outcome.reason];
-        if (refusal) toast.warning(t(refusal.title), { description: t(refusal.description) });
-
+      if (mode === CalendarSelectionMode.NONE) {
+        onDayToggle?.(date);
         return;
       }
-
-      if (mode === CalendarSelectionMode.NONE) return;
 
       switch (mode) {
         case CalendarSelectionMode.MULTIPLE: {
@@ -334,21 +288,7 @@ export function Calendar({
         }
       }
     },
-    [
-      disabled,
-      mode,
-      selectedDates,
-      onSelect,
-      rangeSelection,
-      onDayToggle,
-      allowPastDays,
-      modifiers.disabled,
-      modifiers.suggested,
-      modifiers.manuallySelected,
-      premiumKey,
-      t,
-      tPremium,
-    ]
+    [disabled, mode, selectedDates, onSelect, rangeSelection, onDayToggle]
   );
 
   const handleDayHover = useCallback(

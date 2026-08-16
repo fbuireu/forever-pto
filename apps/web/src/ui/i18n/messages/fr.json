@@ -458,8 +458,6 @@
   },
   "toasts": {
     "suggestionApplied": "Suggestion appliquée",
-    "cannotSelectPastDays": "Impossible de sélectionner des jours passés",
-    "enablePastDays": "Active \"Autoriser les jours passés\" dans les paramètres pour sélectionner des dates passées",
     "noPtoDaysRemaining": "Plus de jours de congé à attribuer",
     "removeDaysToFree": "Supprime des jours existants pour libérer de la place",
     "cannotSelectHoliday": "Impossible de sélectionner un jour férié",

@@ -458,8 +458,6 @@
   },
   "toasts": {
     "suggestionApplied": "Suggestion applied",
-    "cannotSelectPastDays": "Cannot select past days",
-    "enablePastDays": "Enable \"Allow past days\" in settings to select past dates",
     "noPtoDaysRemaining": "No remaining PTO days to assign",
     "removeDaysToFree": "Remove existing days to free up space",
     "cannotSelectHoliday": "Cannot select a public holiday",

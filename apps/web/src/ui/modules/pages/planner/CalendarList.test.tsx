@@ -72,6 +72,8 @@ vi.mock('./calendar/Calendar', () => ({
 
 vi.mock('./calendar/CalendarListFixture', () => ({ CalendarListFixture: () => null }));
 
+vi.mock('./calendar/usePlannerDayClick', () => ({ usePlannerDayClick: (toggle: unknown) => toggle }));
+
 const { CalendarList } = await import('./CalendarList');
 
 beforeEach(() => {

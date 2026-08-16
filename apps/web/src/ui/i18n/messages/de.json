@@ -458,8 +458,6 @@
   },
   "toasts": {
     "suggestionApplied": "Vorschlag erfolgreich angewendet",
-    "cannotSelectPastDays": "Vergangene Tage können nicht ausgewählt werden",
-    "enablePastDays": "Aktiviere \"Vergangene Tage erlauben\" in den Einstellungen, um vergangene Daten auszuwählen.",
     "noPtoDaysRemaining": "Keine verbleibenden PTO-Tage zum Zuweisen",
     "removeDaysToFree": "Entferne bestehende Tage, um Platz freizugeben",
     "cannotSelectHoliday": "Ein gesetzlicher Feiertag kann nicht ausgewählt werden",

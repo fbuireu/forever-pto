@@ -12,6 +12,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { Calendar, CalendarSelectionMode } from './calendar/Calendar';
 import { CalendarListFixture } from './calendar/CalendarListFixture';
+import { usePlannerDayClick } from './calendar/usePlannerDayClick';
 import { getTotalMonths } from './utils/helpers';
 
 export const CalendarList = () => {
@@ -65,10 +66,11 @@ export const CalendarList = () => {
 
   const months = useMemo(() => getTotalMonths({ carryOverMonths, year }), [carryOverMonths, year]);
 
-  const handleDayToggle = useCallback(
+  const toggleDay = useCallback(
     (date: Date) => toggleDaySelection({ date, totalPtoDays: ptoDays, locale, allowPastDays }),
     [toggleDaySelection, ptoDays, locale, allowPastDays]
   );
+  const handleDayToggle = usePlannerDayClick(toggleDay);
 
   useEffect(() => {
     pruneDaysOutsideWindow({ year, carryOverMonths });

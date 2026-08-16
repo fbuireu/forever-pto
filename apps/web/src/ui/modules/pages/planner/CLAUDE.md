@@ -29,7 +29,7 @@ this order; the layout adds `SiteTitle.tsx` and `SiteSubtitle.tsx` above them.
 
 | Directory | Contents |
 | --- | --- |
-| `calendar/` | `calendar/Calendar.tsx` — one month grid, ~540 lines, four selection modes; `calendar/utils/helpers.ts` — `MODIFIERS_CLASS_NAMES` and `getDayClassNames`; `calendar/CalendarListFixture.tsx` |
+| `calendar/` | `calendar/Calendar.tsx` — one month grid, four selection modes, and nothing that knows what a planner is; `calendar/usePlannerDayClick.tsx` — the planner's click policy, which used to live inside it; `calendar/utils/helpers.ts` — `MODIFIERS_CLASS_NAMES` and `getDayClassNames`; `calendar/utils/refusals.ts`; `calendar/CalendarListFixture.tsx` |
 | `holidays/` | `holidays/HolidaysTable.tsx` plus `holidays/components/` — `HolidayRow.tsx`, `HolidayTableHeader.tsx`, `HolidayFormModal.tsx` and the two thin callers that configure it, `DeleteHolidayModal.tsx`, and the Zod factory in `holidays/components/schema.ts` |
 | `summary/` | The five charts, `summary/MetricCard.tsx`, `summary/SummaryFixture.tsx` and `summary/const.ts` |
 | `utils/` | `utils/helpers.ts` — Planning Window and calendar-grid construction, workday/weekend counting, and the `MONTHS_IN_YEAR` constant every `12 + carryOverMonths` on this screen is built from; `utils/modifiers.ts` — the day predicates |
@@ -48,6 +48,24 @@ follow-up is renaming it, which costs an edit in six bundles.
 
 `HolidayFormModal.test.tsx` is the first test either modal has had: applied, a refusal with copy, a refusal
 without copy falling through to the generic error, and the `null` no-op.
+
+**The planner's click policy lives in `calendar/usePlannerDayClick.tsx`, not in the calendar.** `Calendar`
+serves three callers and only one of them is the planner: `CalendarList` picks days out of a plan,
+`HolidayFormModal` picks a single date and `WorkdayCounterCalendarModal` picks a range. The Premium gate and
+the refusal toast were written inside `Calendar.handleDayClick` anyway, so the two modals paid for the
+premium store subscription, two extra translators, `SupportButton`, `LockIcon`, `toast` and
+`DAY_REFUSAL_COPY` to reach a branch neither of them can take. `Calendar` now calls `onDayToggle?.(date)` in
+`NONE` mode and does nothing with the answer; the hook wraps the store action `CalendarList` already had.
+
+The policy is four branches — no Premium, applied, a refusal with copy, a refusal without — and
+`usePlannerDayClick.test.tsx` drives each one. It is the first test any of them has had; the component was
+526 lines and testing a toast through it meant mounting the whole grid.
+
+**Extracting it turned up a fifth branch that could never run**, and it is gone. `handleDayClick` warned
+`cannotSelectPastDays` when a day was past, not manual and not suggested — but `isPast(allowPastDays, …)`
+already returns `() => false` while past days are allowed, so that condition is *character for character*
+the one the render uses to set `disabled` on the cell's `<Button>`. A native disabled button fires no
+`onClick`. The two translation keys behind it are deleted from all six bundles.
 
 `calendar/utils/refusals.ts` holds both refusal mappings, and neither is a rule — the rules are in the store.
 `DAY_REFUSAL_COPY` is the reason-to-message-key map `Calendar` renders. `describeHolidayRefusal` is the same
@@ -346,7 +364,7 @@ listener's caller.
 Anything two screens share belongs in `shared/`, never in the other screen's folder. Both directions
 between this screen and the homepage used to be crossed and are not any more:
 
-- `SupportButton.tsx` — mounted by `calendar/Calendar.tsx` inside the "this is a Premium feature" toast
+- `SupportButton.tsx` — mounted by `calendar/usePlannerDayClick.tsx` inside the "this is a Premium feature" toast
   *and* by `pages/homepage/sections/Pricing.tsx` — lives in `shared/`.
 - `FaqTabs.tsx`, `Troubleshooting.tsx` and their `types.ts` sat here while `pages/homepage/sections/Faq.tsx`
   was their only consumer; they now live under `pages/homepage/support/`.

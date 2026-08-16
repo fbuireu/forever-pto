@@ -1,9 +1,9 @@
-import { HolidayRefusal, type HolidayOutcome } from '@application/stores/types';
+import { type HolidayOutcome, HolidayRefusal } from '@application/stores/types';
+import en from '@i18n/messages/en.json';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NextIntlClientProvider } from 'next-intl';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import en from '@i18n/messages/en.json';
 
 const { mockToastError, mockToastSuccess } = vi.hoisted(() => ({
   mockToastError: vi.fn(),

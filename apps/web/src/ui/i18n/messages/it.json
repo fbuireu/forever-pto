@@ -458,8 +458,6 @@
   },
   "toasts": {
     "suggestionApplied": "Suggerimento applicato con successo",
-    "cannotSelectPastDays": "Non puoi selezionare giorni passati",
-    "enablePastDays": "Attiva 'consenti giorni passati' nelle impostazioni per sbloccare questa opzione",
     "noPtoDaysRemaining": "Nessun giorno PTO rimasto",
     "removeDaysToFree": "Rimuovi dei giorni già assegnati per farne spazio a nuovi",
     "cannotSelectHoliday": "Non puoi selezionare un giorno festivo",
