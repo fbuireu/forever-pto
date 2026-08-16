@@ -1,6 +1,6 @@
 import type { BaseDTO } from '@application/shared/dto/baseDTO';
 import type Stripe from 'stripe';
-import type { PaymentConfirmationDTO, PaymentData } from './types';
+import type { NewPayment, PaymentConfirmationDTO } from './types';
 import { extractChargeId, extractCustomerId } from './utils/helpers';
 
 export const paymentConfirmationDTO: BaseDTO<Stripe.PaymentIntent, PaymentConfirmationDTO> = {
@@ -19,7 +19,7 @@ type PaymentDataDTOParams = {
   ipAddress: string | null;
 };
 
-export const paymentDataDTO: BaseDTO<Stripe.PaymentIntent, PaymentData, PaymentDataDTOParams> = {
+export const paymentDataDTO: BaseDTO<Stripe.PaymentIntent, NewPayment, PaymentDataDTOParams> = {
   create: ({ raw, params }) => {
     return {
       id: raw.id,
@@ -35,21 +35,6 @@ export const paymentDataDTO: BaseDTO<Stripe.PaymentIntent, PaymentData, PaymentD
       promoCode: params.promoCode,
       userAgent: params.userAgent,
       ipAddress: params.ipAddress,
-      country: null,
-      customerName: null,
-      postalCode: null,
-      city: null,
-      state: null,
-      paymentBrand: null,
-      paymentLast4: null,
-      feeAmount: null,
-      netAmount: null,
-      refundedAt: null,
-      refundReason: null,
-      disputedAt: null,
-      disputeReason: null,
-      parentPaymentId: null,
-      origin: null,
     };
   },
 };

@@ -25,7 +25,7 @@ Not every folder needs every file. `email/` and `premium/` are `types.ts` alone:
 | `country/` | `CountryDTO` | `i18n-iso-countries` localised names |
 | `email/` | `SendEmailParams` | — |
 | `holiday/` | `HolidayDTO` | `date-holidays` |
-| `payment/` | `PaymentConfirmationDTO`, `PaymentData`, `CreatePaymentInput`, `DiscountInfo` | Stripe `PaymentIntent`, the donation form |
+| `payment/` | `PaymentConfirmationDTO`, `NewPayment` (what `paymentDataDTO` produces) and `PaymentData` (the stored record it grows into), `CreatePaymentInput`, `DiscountInfo` | Stripe `PaymentIntent`, the donation form |
 | `premium/` | `PremiumSessionData` | — |
 | `region/` | `RegionDTO` | `i18n-iso-countries` localised names |
 

@@ -1,5 +1,5 @@
 import { paymentDataDTO } from '@application/dto/payment/dto';
-import type { PaymentData } from '@application/dto/payment/types';
+import type { NewPayment } from '@application/dto/payment/types';
 import { PAYMENT_SUCCEEDED } from '@domain/payment/events/types';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
@@ -52,7 +52,7 @@ export const activateWithPayment = ({
     }
 
     const deferred = Effect.gen(function* () {
-      const paymentData: PaymentData = paymentDataDTO.create({
+      const paymentData: NewPayment = paymentDataDTO.create({
         raw: paymentIntent,
         params: { email, promoCode, userAgent, ipAddress },
       });

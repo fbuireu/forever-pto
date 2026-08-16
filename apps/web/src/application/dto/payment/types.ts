@@ -34,7 +34,7 @@ type CreatePaymentError = {
 
 export type CreatePaymentResult = CreatePaymentSuccess | CreatePaymentError;
 
-export interface PaymentData {
+export interface NewPayment {
   id: string;
   stripeCreatedAt: Date;
   customerId: string | null;
@@ -48,6 +48,9 @@ export interface PaymentData {
   promoCode: string | null;
   userAgent: string | null;
   ipAddress: string | null;
+}
+
+export interface PaymentData extends NewPayment {
   country: string | null;
   customerName: string | null;
   postalCode: string | null;

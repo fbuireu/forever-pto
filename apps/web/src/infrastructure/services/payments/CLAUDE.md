@@ -152,6 +152,26 @@ is its lookup in all six bundles. See [`../../../application/dto/CLAUDE.md`](../
 
 ## Traps
 
+**A payment is written with `NewPayment` and read back as `PaymentData`, and the two are different
+widths.** `PaymentData` is the stored record — 28 fields, one per column. `NewPayment` is the thirteen the
+`PaymentIntent` actually knows, and `paymentDataDTO` produces that. The DTO used to produce all 28 by
+hardcoding `null` for the other fifteen, which read as "we checked and there is nothing there" when it meant
+"this is not knowable yet": twelve of them are filled minutes later by `updatePaymentCharge` off the expanded
+charge, and the last four — the refund, dispute, parent and origin columns — have no writer anywhere in this
+codebase.
+
+**The `INSERT` still names all 29 columns and binds a literal `null` to the fifteen, and that is
+deliberate.** Omitting a column is not the same statement: a `NOT NULL` column with a `DEFAULT` takes the
+default when omitted and rejects an explicit `NULL`. The schema lives in Turso, not in this repo, so nothing
+here can prove which columns those are. Binding `null` is what the code already did, byte for byte, and the
+narrowing is a type change only. Trimming the column list is a separate change that needs the real schema in
+front of you.
+
+The fixture in `repository.test.ts` had been lying about this in a way the suite could not catch. It passed
+`savePayment` a fully populated 28-field object including `country: 'ES'` and `paymentBrand: 'visa'`, and the
+by-column assertion duly confirmed they arrived — for values no production caller has ever sent, because the
+only producer wrote `null`. It is `NewPayment` now, and the read tests get their own `BASE_STORED_PAYMENT`.
+
 **`SELECT *` gives a row, not a `PaymentData`.** `TursoService.query` casts with `rows as T[]` and maps
 nothing, so both readers type the query as the snake_case `PaymentRow` and run it through `toPaymentData`.
 That mapper is the only place the column names and the camelCase field names meet, and the only place

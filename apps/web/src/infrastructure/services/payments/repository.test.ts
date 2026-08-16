@@ -36,21 +36,6 @@ const BASE_PAYMENT = {
   promoCode: null,
   userAgent: 'Mozilla/5.0',
   ipAddress: '1.2.3.4',
-  country: 'ES',
-  customerName: 'Test User',
-  postalCode: '08001',
-  city: 'Barcelona',
-  state: null,
-  paymentBrand: 'visa',
-  paymentLast4: '4242',
-  feeAmount: 30,
-  netAmount: 970,
-  refundedAt: null,
-  refundReason: null,
-  disputedAt: null,
-  disputeReason: null,
-  parentPaymentId: null,
-  origin: process.env.NEXT_PUBLIC_SITE_URL ?? null,
 };
 
 const BASE_ROW = {
@@ -85,6 +70,25 @@ const BASE_ROW = {
   origin: 'https://forever-pto.com',
   created_at: '2024-01-15 10:00:00',
   updated_at: '2024-01-15 10:00:00',
+};
+
+const BASE_STORED_PAYMENT = {
+  ...BASE_PAYMENT,
+  country: 'ES',
+  customerName: 'Test User',
+  postalCode: '08001',
+  city: 'Barcelona',
+  state: null,
+  paymentBrand: 'visa',
+  paymentLast4: '4242',
+  feeAmount: 30,
+  netAmount: 970,
+  refundedAt: null,
+  refundReason: null,
+  disputedAt: null,
+  disputeReason: null,
+  parentPaymentId: null,
+  origin: 'https://forever-pto.com',
 };
 
 beforeEach(() => {
@@ -145,21 +149,21 @@ describe('savePayment', () => {
       promo_code: null,
       user_agent: 'Mozilla/5.0',
       ip_address: '1.2.3.4',
-      country: 'ES',
-      customer_name: 'Test User',
-      postal_code: '08001',
-      city: 'Barcelona',
+      country: null,
+      customer_name: null,
+      postal_code: null,
+      city: null,
       state: null,
-      payment_brand: 'visa',
-      payment_last4: '4242',
-      fee_amount: 30,
-      net_amount: 970,
+      payment_brand: null,
+      payment_last4: null,
+      fee_amount: null,
+      net_amount: null,
       refunded_at: null,
       refund_reason: null,
       disputed_at: null,
       dispute_reason: null,
       parent_payment_id: null,
-      origin: BASE_PAYMENT.origin,
+      origin: null,
     });
   });
 
@@ -286,7 +290,7 @@ describe('getPaymentById', () => {
   it('maps the snake_case row onto PaymentData', async () => {
     mockQuery.mockReturnValue(Effect.succeed([BASE_ROW]));
     const result = await runEffect(getPaymentById('pi_test'));
-    expect(result).toEqual({ ...BASE_PAYMENT, origin: BASE_ROW.origin });
+    expect(result).toEqual(BASE_STORED_PAYMENT);
   });
 
   it('converts the text timestamp columns to dates', async () => {
@@ -337,7 +341,7 @@ describe('getSucceededPaymentByEmail', () => {
   it('maps the snake_case row onto PaymentData', async () => {
     mockQuery.mockReturnValue(Effect.succeed([BASE_ROW]));
     const result = await runEffect(getSucceededPaymentByEmail('user@example.com'));
-    expect(result).toEqual({ ...BASE_PAYMENT, origin: BASE_ROW.origin });
+    expect(result).toEqual(BASE_STORED_PAYMENT);
   });
 
   it('returns undefined when no rows found', async () => {

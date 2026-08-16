@@ -1,11 +1,11 @@
-import type { PaymentData } from '@application/dto/payment/types';
+import type { NewPayment, PaymentData } from '@application/dto/payment/types';
 import type { PaymentStatus } from '@domain/payment/events/types';
 import { TursoService } from '@infrastructure/clients/db/turso/service';
 import type { DatabaseError } from '@infrastructure/errors';
 import { normalizeEmail } from '@infrastructure/services/payments/normalizeEmail';
 import { Effect } from 'effect';
 
-export const savePayment = (data: PaymentData): Effect.Effect<boolean, DatabaseError, TursoService> =>
+export const savePayment = (data: NewPayment): Effect.Effect<boolean, DatabaseError, TursoService> =>
   Effect.gen(function* () {
     const turso = yield* TursoService;
     const rowsAffected = yield* turso.execute(
@@ -35,21 +35,21 @@ export const savePayment = (data: PaymentData): Effect.Effect<boolean, DatabaseE
         data.promoCode ?? null,
         data.userAgent ?? null,
         data.ipAddress ?? null,
-        data.country ?? null,
-        data.customerName ?? null,
-        data.postalCode ?? null,
-        data.city ?? null,
-        data.state ?? null,
-        data.paymentBrand ?? null,
-        data.paymentLast4 ?? null,
-        data.feeAmount ?? null,
-        data.netAmount ?? null,
-        data.refundedAt?.toISOString() ?? null,
-        data.refundReason ?? null,
-        data.disputedAt?.toISOString() ?? null,
-        data.disputeReason ?? null,
-        data.parentPaymentId ?? null,
-        data.origin ?? null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
       ]
     );
 

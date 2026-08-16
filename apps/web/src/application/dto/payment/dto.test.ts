@@ -110,29 +110,26 @@ describe('paymentDataDTO', () => {
     expect(result.ipAddress).toBe('1.2.3.4');
   });
 
-  it('initialises nullable DB fields to null', () => {
+  it('carries only what the PaymentIntent knows, and does not invent the columns the charge fills later', () => {
     const result = paymentDataDTO.create({ raw: makeIntent(), params: DATA_PARAMS });
-    const nullableFields = [
-      'country',
-      'customerName',
-      'postalCode',
-      'city',
-      'state',
-      'paymentBrand',
-      'paymentLast4',
-      'feeAmount',
-      'netAmount',
-      'refundedAt',
-      'refundReason',
-      'disputedAt',
-      'disputeReason',
-      'parentPaymentId',
-      'origin',
-    ] as const;
 
-    for (const field of nullableFields) {
-      expect(result[field], field).toBeNull();
-    }
+    expect(Object.keys(result).sort()).toEqual(
+      [
+        'amount',
+        'chargeId',
+        'currency',
+        'customerId',
+        'description',
+        'email',
+        'id',
+        'ipAddress',
+        'paymentMethodType',
+        'promoCode',
+        'status',
+        'stripeCreatedAt',
+        'userAgent',
+      ].sort()
+    );
   });
 
   it('uses the first payment_method_type when available', () => {
