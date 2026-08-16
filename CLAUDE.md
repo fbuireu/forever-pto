@@ -113,8 +113,11 @@ carries no annotation. semantic-release finds the last release by `tagFormat`; d
 app release publishes `web-v1.0.0` over a 1.8.x line, which cannot be recalled from GitHub Releases. The
 `release-web` job fails loudly if no `web-v*` tag exists rather than letting it happen quietly.
 
-**A change confined to the repo root releases nothing** — `.github/`, `biome.json`, `adr/`, `tests/`, the root
-manifest. That is correct and occasionally surprising.
+**A change confined to the repo root releases nothing** — `adr/`, `tests/`, `README.md`, `CONTEXT.md`, this
+file. That is correct and occasionally surprising. **It is narrower than it reads**: `WEB_PATHS` in `ci.yml`
+also matches `package.json`, `pnpm-workspace.yaml`, `biome.json`, `.npmrc`, `.nvmrc` and
+`.github/actions/`, all of which do cut a release. That is deliberate — each of them changes what the app
+builds from — but it means "the repo root" is not the boundary; the regex is.
 
 ## CI
 
@@ -122,7 +125,8 @@ manifest. That is correct and occasionally surprising.
 `deploy-production` → `release-web` → `docs-refresh` on `main`, or `deploy-development` → `comment` / `e2e`
 on a PR. Both deploy jobs call the shared `_deploy-web.yml`. `docs.yml` holds the docs graph — `build`, then
 `preview` on a PR or `deploy` → `release-docs` on `main`. The rest are `cleanup-development.yml`, the
-dependabot/renovate auto-merges and a `zizmor` audit.
+renovate auto-merge, a `zizmor` audit, and `dependabot-auto-merge.yml` — which is **dormant**: there is no
+`.github/dependabot.yml` in the tree, so nothing ever triggers it. It is kept for the day one appears.
 
 Every job that needs a toolchain uses the `.github/actions/prepare-env` composite — pnpm, the `.nvmrc` Node,
 `setup-node`'s dependency cache and `pnpm install --frozen-lockfile` — rather than repeating five steps.

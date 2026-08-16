@@ -393,6 +393,47 @@ describe('documentation does not point at things that are gone', () => {
     expect(unwatched).toEqual([]);
   });
 
+  // An output the `changes` job declares but never writes is the empty string, and a job guarded on
+  // `== 'true'` then never runs — silently, with a green tick, forever. `deploy-tail` shipped that way: the
+  // Filter step wrote `tail=false` on its no-base-commit early exit and nothing at all on the normal path,
+  // so the tail consumer Worker was never deployed while four documents said it was. Nothing catches this
+  // by reading the workflow, because both halves are individually well-formed.
+  it('writes every output the changes job declares, on both paths through its Filter step', () => {
+    const workflow = read('.github/workflows/ci.yml');
+    const declared = [
+      ...(workflow.match(/outputs:\n((?:\s+\w+: \$\{\{ steps\.filter\.outputs\.\w+ \}\}\n)+)/)?.[1] ?? '').matchAll(
+        /^\s+(\w+):/gm
+      ),
+    ].map(([, name]) => name);
+    const script = workflow.slice(workflow.indexOf('        run: |'), workflow.indexOf('\n  lint:'));
+    const [earlyExit, mainPath] = script.split('exit 0');
+
+    expect(declared.length).toBeGreaterThan(1);
+    expect(mainPath, 'the Filter step has no code after its early exit').toBeTruthy();
+
+    const missingFromEarlyExit = declared.filter((name) => !earlyExit.includes(`echo '${name}=`));
+    expect(missingFromEarlyExit, 'not written before the early exit, so it stays empty there').toEqual([]);
+
+    // Checking the whole script rather than this half is what let the original defect through: `tail` was
+    // written once, on the early-exit path, and a substring search over the script found it there.
+    const missingFromMainPath = declared.filter((name) => !mainPath?.includes(`echo '${name}=`));
+    expect(missingFromMainPath, 'never written on the normal path, so it stays empty on every real run').toEqual([]);
+  });
+
+  // `cloudflare/wrangler-action` installs the version its `wranglerVersion` input names, so the docs deploy
+  // runs a CLI the manifest does not pin. Renovate bumps the manifest — it is an npm devDependency — and
+  // nothing touches the two workflow literals, so the first bump silently desynchronises them. `apps/web`
+  // has no equivalent exposure: `_deploy-web.yml` runs `pnpm exec wrangler`, which is the pinned one.
+  it('pins wrangler-action to the same wrangler the docs package declares', () => {
+    const declared = readJson(`${DOCS}/package.json`).devDependencies.wrangler;
+    const inputs = [...read('.github/workflows/docs.yml').matchAll(/wranglerVersion: '([^']+)'/g)].map(
+      ([, version]) => version
+    );
+
+    expect(inputs.length).toBeGreaterThan(0);
+    expect(inputs.filter((version) => version !== declared)).toEqual([]);
+  });
+
   // CONTEXT.md names one canonical term per concept and lists the retired ones, and the root guide says to
   // use those names "in code, copy and docs". The published wiki is the one place that was unenforced: it
   // kept a second, diverged glossary that headed a section `FilterStrategy` (Avoid: filter) and described

@@ -33,10 +33,11 @@ jobs:
           BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
           HEAD_SHA: ${{ github.sha }}
           WEB_PATHS: '^(apps/web/|patches/|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$|biome\.json$|\.npmrc$|\.nvmrc$|\.github/actions/|\.github/workflows/(ci|_deploy-web)\.yml$)'
+          TAIL_PATHS: '^(apps/web/workers/tail/|\.github/workflows/ci\.yml$)'
         run: |
           if [ -z "$BASE_SHA" ] || ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
             echo 'web=true' >> "$GITHUB_OUTPUT"
-            echo 'tail=false' >> "$GITHUB_OUTPUT"
+            echo 'tail=true' >> "$GITHUB_OUTPUT"
             echo 'cross_package=false' >> "$GITHUB_OUTPUT"
             echo "::notice::No usable base commit, treating this as a web change."
             exit 0
@@ -48,6 +49,11 @@ jobs:
           else
             echo 'web=false' >> "$GITHUB_OUTPUT"
             echo "::notice::No apps/web change in this range; the web deploy and release are skipped."
+          fi
+          if printf '%s\n' "$changed" | grep -qE "$TAIL_PATHS"; then
+            echo 'tail=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'tail=false' >> "$GITHUB_OUTPUT"
           fi
           if printf '%s\n' "$changed" | grep -qE '^apps/web/' && printf '%s\n' "$changed" | grep -qE '^apps/docs/'; then
             echo 'cross_package=true' >> "$GITHUB_OUTPUT"
@@ -322,7 +328,7 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         working-directory: apps/web

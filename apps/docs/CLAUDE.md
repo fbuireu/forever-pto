@@ -31,7 +31,7 @@ The Forever PTO documentation wiki (docs.forever-pto.com). An Astro Starlight si
   verify it: `astro build` reported 155 pages built, and the suite went red. Asserting on *text* instead does
   not work, and was the first attempt: an `Input` or `Slider` demo legitimately renders no text at all.
 - Content lives in `src/content/docs/` (root locale = English, pathless URLs). `es/` mirrors filenames; untranslated pages fall back to English automatically. Sidebar order via `sidebar.order` frontmatter.
-- Formatting/linting: root Biome config (docs is not excluded; only `docs/src/styles` is, for Tailwind directives). No Prettier.
+- Formatting/linting: root Biome config (docs is not excluded; only `apps/docs/src/styles` is, for Tailwind directives). No Prettier.
 - **Commits touching docs use the `docs:` type** — the repo squash-merges and the PR title becomes the commit on main, so a `feat:`/`fix:` title would cut an app release. See `/contributing/conventions/`.
 
 ## Deploy
