@@ -1,3 +1,4 @@
+import { PAYMENT_SUCCEEDED } from '@domain/payment/events/types';
 import { TursoService } from '@infrastructure/clients/db/turso/service';
 import { DatabaseError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
@@ -93,6 +94,25 @@ beforeEach(() => {
   mockQuery.mockReturnValue(Effect.succeed([]));
 });
 
+const insertedColumns = (sql: string) => {
+  const list = sql.slice(sql.indexOf('(') + 1, sql.indexOf(') VALUES'));
+  return list
+    .split(',')
+    .map((column) => column.trim())
+    .filter((column) => column !== 'created_at' && column !== 'updated_at');
+};
+
+const updatedColumns = (sql: string) => [
+  ...sql
+    .slice(0, sql.indexOf('WHERE'))
+    .matchAll(/(\w+) = \?/g)
+    .map(([, column]) => column),
+  'id',
+];
+
+const boundRow = (columns: string[], args: unknown[]) =>
+  Object.fromEntries(columns.map((column, index) => [column, args[index]]));
+
 describe('savePayment', () => {
   it('executes an INSERT INTO payments', async () => {
     await runEffect(savePayment(BASE_PAYMENT));
@@ -101,26 +121,56 @@ describe('savePayment', () => {
     expect(sql).toContain('INSERT OR IGNORE INTO payments');
   });
 
-  it('passes id as first argument', async () => {
+  it('binds exactly one value per placeholder', async () => {
     await runEffect(savePayment(BASE_PAYMENT));
-    const [, args] = mockExecute.mock.calls[0] as [string, unknown[]];
-    expect(args[0]).toBe('pi_test');
+    const [sql, args] = mockExecute.mock.calls[0] as [string, unknown[]];
+    expect(sql.split('?')).toHaveLength(args.length + 1);
+    expect(insertedColumns(sql)).toHaveLength(args.length);
   });
 
-  it('passes email, amount, currency and status in correct positions', async () => {
+  it('binds every value under the column the INSERT names at that position', async () => {
     await runEffect(savePayment(BASE_PAYMENT));
-    const [, args] = mockExecute.mock.calls[0] as [string, unknown[]];
-    expect(args[4]).toBe('user@example.com');
-    expect(args[5]).toBe(1000);
-    expect(args[6]).toBe('eur');
-    expect(args[7]).toBe('succeeded');
+    const [sql, args] = mockExecute.mock.calls[0] as [string, unknown[]];
+    expect(boundRow(insertedColumns(sql), args)).toEqual({
+      id: 'pi_test',
+      stripe_created_at: '2024-01-15T10:00:00.000Z',
+      stripe_customer_id: 'cus_123',
+      stripe_charge_id: 'ch_123',
+      email: 'user@example.com',
+      amount: 1000,
+      currency: 'eur',
+      status: 'succeeded',
+      payment_method_type: 'card',
+      description: 'Donation',
+      receipt_url: null,
+      promo_code: null,
+      user_agent: 'Mozilla/5.0',
+      ip_address: '1.2.3.4',
+      country: 'ES',
+      customer_name: 'Test User',
+      postal_code: '08001',
+      city: 'Barcelona',
+      state: null,
+      payment_brand: 'visa',
+      payment_last4: '4242',
+      fee_amount: 30,
+      net_amount: 970,
+      refunded_at: null,
+      refund_reason: null,
+      disputed_at: null,
+      dispute_reason: null,
+      parent_payment_id: null,
+      origin: BASE_PAYMENT.origin,
+    });
   });
 
   it('passes null for optional fields when they are null', async () => {
     await runEffect(savePayment({ ...BASE_PAYMENT, customerId: null, chargeId: null, promoCode: null }));
-    const [, args] = mockExecute.mock.calls[0] as [string, unknown[]];
-    expect(args[2]).toBeNull();
-    expect(args[3]).toBeNull();
+    const [sql, args] = mockExecute.mock.calls[0] as [string, unknown[]];
+    const row = boundRow(insertedColumns(sql), args);
+    expect(row.stripe_customer_id).toBeNull();
+    expect(row.stripe_charge_id).toBeNull();
+    expect(row.promo_code).toBeNull();
   });
 
   it('propagates DatabaseError when execute fails', async () => {
@@ -143,6 +193,12 @@ describe('updatePaymentStatus', () => {
     const [, args] = mockExecute.mock.calls[0] as [string, unknown[]];
     expect(args[0]).toBe('succeeded');
     expect(args[2]).toBe('pi_test');
+  });
+
+  it('stamps succeeded_at against the same literal the domain calls the entitlement', async () => {
+    await runEffect(updatePaymentStatus('pi_test', PAYMENT_SUCCEEDED));
+    const [sql] = mockExecute.mock.calls[0] as [string, unknown[]];
+    expect(sql).toContain(`WHEN ? = '${PAYMENT_SUCCEEDED}'`);
   });
 
   it('propagates DatabaseError when execute fails', async () => {
@@ -176,11 +232,25 @@ describe('updatePaymentCharge', () => {
     expect(sql).toContain('stripe_charge_id');
   });
 
-  it('passes chargeId and paymentIntentId as first and last arguments', async () => {
+  it('binds every value under the column the SET clause assigns it to', async () => {
     await runEffect(updatePaymentCharge(chargeData));
-    const [, args] = mockExecute.mock.calls[0] as [string, unknown[]];
-    expect(args[0]).toBe('ch_abc');
-    expect(args[args.length - 1]).toBe('pi_test');
+    const [sql, args] = mockExecute.mock.calls[0] as [string, unknown[]];
+    expect(sql.split('?')).toHaveLength(args.length + 1);
+    expect(boundRow(updatedColumns(sql), args)).toEqual({
+      stripe_charge_id: 'ch_abc',
+      receipt_url: 'https://receipt.url',
+      payment_method_type: 'card',
+      country: 'ES',
+      customer_name: 'Test User',
+      postal_code: '08001',
+      city: 'Barcelona',
+      state: null,
+      payment_brand: 'visa',
+      payment_last4: '4242',
+      fee_amount: 30,
+      net_amount: 970,
+      id: 'pi_test',
+    });
   });
 
   it('propagates DatabaseError when execute fails', async () => {

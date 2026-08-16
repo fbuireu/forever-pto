@@ -1,4 +1,5 @@
 import type { PaymentData } from '@application/dto/payment/types';
+import type { PaymentStatus } from '@domain/payment/events/types';
 import { TursoService } from '@infrastructure/clients/db/turso/service';
 import type { DatabaseError } from '@infrastructure/errors';
 import { normalizeEmail } from '@infrastructure/services/payments/normalizeEmail';
@@ -55,7 +56,7 @@ export const savePayment = (data: PaymentData): Effect.Effect<void, DatabaseErro
 
 export const updatePaymentStatus = (
   paymentIntentId: string,
-  status: string
+  status: PaymentStatus
 ): Effect.Effect<void, DatabaseError, TursoService> =>
   Effect.gen(function* () {
     const turso = yield* TursoService;

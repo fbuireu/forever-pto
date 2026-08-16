@@ -3,7 +3,7 @@ import { LoggerService } from '@infrastructure/clients/logging/better-stack/serv
 import type { DatabaseError } from '@infrastructure/errors';
 import { getPaymentById, updatePaymentStatus } from '@infrastructure/services/payments/repository';
 import { Effect } from 'effect';
-import type { PaymentFailedEvent } from '../events/types';
+import { PAYMENT_SUCCEEDED, type PaymentFailedEvent } from '../events/types';
 
 export const handlePaymentFailed = (
   event: PaymentFailedEvent
@@ -13,7 +13,7 @@ export const handlePaymentFailed = (
 
     const existing = yield* getPaymentById(event.paymentId).pipe(Effect.catchAll(() => Effect.succeed(undefined)));
 
-    if (existing?.status === 'succeeded') {
+    if (existing?.status === PAYMENT_SUCCEEDED) {
       logger.warn('Ignoring failed-payment event for an already-succeeded payment', { paymentId: event.paymentId });
       return;
     }

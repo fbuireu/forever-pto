@@ -229,7 +229,21 @@ matters, build the fixture from a response the real account actually returned, a
 about it is load-bearing: `promoCode.test.ts` now nests the coupon under `promotion` and carries a case
 asserting the code never reaches for a top-level `coupon`.
 
-`repository.test.ts` asserts positionally — one statement
-keyword via `toContain`, then each value by its index in the argument array — so reordering a column without
-reordering its value is caught, while rewording the SQL is not. Add a column at the end or the indices in
-that file stop meaning what they say.
+**`repository.test.ts` reads the column order out of the SQL and asserts against that, rather than against
+literal indices.** `insertedColumns` slices the `INSERT`'s own column list, `updatedColumns` matches the
+`SET x = ?` assignments and appends the `WHERE id` key, and `boundRow` zips either list against the argument
+array — so the expectation is a named row, `{ email: 'user@example.com', … }`, and a column inserted mid-list
+shifts every name-value pair below it and fails loudly. It also ties the two counts nothing used to compare:
+`sql.split('?')` against `args.length + 1`, so a placeholder added without its value, or the reverse, is
+caught on its own.
+
+That replaced seven positional spot checks over a 29-column insert. They covered indices 0 and 4–7 and left
+everything from `payment_method_type` through `origin` unasserted — which is precisely the stretch a mid-list
+insertion shifts — and `updatePaymentCharge` asserted only its first and last argument over a thirteen-field
+payload whose middle is entirely nullable strings and numbers, where a one-place shift is type-clean. Both
+falsifications were run: swapping two column names in the `INSERT`, and dropping one placeholder along with
+its value.
+
+`updatePaymentStatus`'s test also pins the SQL's `WHEN ? = 'succeeded'` against `PAYMENT_SUCCEEDED`. That
+literal is the one copy of the entitlement value the type system cannot reach — see
+[`../../../domain/payment/CLAUDE.md`](../../../domain/payment/CLAUDE.md).

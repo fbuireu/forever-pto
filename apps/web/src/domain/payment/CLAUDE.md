@@ -16,7 +16,7 @@ keeping that row honest.
 
 | File | Contents |
 | --- | --- |
-| `events/types.ts` | `PaymentSucceededEvent` and `PaymentFailedEvent` — plain interfaces, no Stripe types |
+| `events/types.ts` | `PaymentSucceededEvent` and `PaymentFailedEvent` — plain interfaces, no Stripe types — plus the `PaymentStatus` union and the `PAYMENT_SUCCEEDED` constant |
 | `events/factory/events.ts` | `createPaymentSucceededEvent` (an Effect, it can fail), `createPaymentFailedEvent` — the only place a `Stripe.PaymentIntent` is read |
 | `events/factory/resolvers.ts` | `resolveChargeId` — flattens `latest_charge`, which Stripe returns as an id, an expanded object or nothing |
 | `handlers/paymentSucceeded.ts` | `handlePaymentSucceeded` — status reconciliation plus best-effort charge enrichment |
@@ -59,6 +59,35 @@ Both factories are annotated with the interface they produce (`createPaymentSucc
 success channel of its Effect), so a field dropped from `events/types.ts` — or one the factory forgets to set
 — is a compile error in `events/factory/events.ts` itself rather than at the call site in another layer. Keep
 the annotations when adding a field.
+
+## The entitlement value is typed where it can be proved, and named where it cannot
+
+`PaymentStatus` restates Stripe's seven `PaymentIntent.Status` members by hand — it is not imported from the
+SDK, because this folder keeps Stripe at the factory. The factory assigns `paymentIntent.status` into it, so
+a member Stripe adds is a compile error there, at the one place that translates Stripe into the domain, and
+nowhere else.
+
+It types the two events' `status`, and `updatePaymentStatus`'s parameter — a function that used to take
+`(paymentIntentId: string, status: string)`, where swapping the two arguments compiled. Every caller passes
+either a literal from this codebase or an event's status, so the union is true at all three.
+
+**`PaymentData.status` deliberately stays `string`, and the union would be a lie there.** It has two
+producers: `paymentDataDTO`, which reads a `Stripe.PaymentIntent`, and `toPaymentData` in
+[`@infrastructure/services/payments/repository`](../../infrastructure/services/payments/CLAUDE.md), which
+reads a SQLite `TEXT` column. Nothing constrains what that column holds — an older deploy, a manual fix — so
+narrowing the field would need an `as` at the read, which buys a claim the code cannot check in exchange for
+nothing: no consumer switches on the status, they all test it against one value.
+
+That is what `PAYMENT_SUCCEEDED` is for. It is redundant where the union already applies, and it is the only
+check available at the four sites that compare a `PaymentData.status` — `activatePremium` twice, and both
+handlers. `PaymentConfirmationDTO.status` is narrowed instead of named, since its single producer is the
+Stripe read.
+
+**Three copies of the literal remain, all inside SQL, and none of them can take the constant.**
+`repository.ts` spells `'succeeded'` in the `succeeded_at` `CASE`, in `getPaymentByEmail`'s `WHERE` and in
+`countPromoCodeRedemptions`'. Interpolating a TypeScript value into a query string to remove them would
+trade a checkable drift for something that reads as injection. `repository.test.ts` ties the first to the
+constant by assertion instead; the other two are covered by their own query assertions.
 
 ## Invariants and traps
 

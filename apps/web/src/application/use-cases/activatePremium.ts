@@ -1,5 +1,6 @@
 import { paymentDataDTO } from '@application/dto/payment/dto';
 import type { PaymentData } from '@application/dto/payment/types';
+import { PAYMENT_SUCCEEDED } from '@domain/payment/events/types';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
@@ -58,8 +59,8 @@ export const activateWithPayment = ({
       );
 
       if (existingPayment) {
-        if (existingPayment.status !== 'succeeded') {
-          yield* updatePaymentStatus(paymentIntentId, 'succeeded').pipe(
+        if (existingPayment.status !== PAYMENT_SUCCEEDED) {
+          yield* updatePaymentStatus(paymentIntentId, PAYMENT_SUCCEEDED).pipe(
             Effect.catchAll((e) =>
               Effect.sync(() => {
                 logger.error('Failed to update payment status', {
@@ -119,7 +120,7 @@ export const activateWithEmail = (
       return yield* Effect.fail(new ValidationError({ message: 'No payment found' }));
     }
 
-    if (payment.status !== 'succeeded') {
+    if (payment.status !== PAYMENT_SUCCEEDED) {
       return yield* Effect.fail(new ValidationError({ message: `Payment status is ${payment.status}` }));
     }
 
