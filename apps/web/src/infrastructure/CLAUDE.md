@@ -140,9 +140,24 @@ already drifted over how a missing IP header was recorded.
 
 ## Testing
 
-Every module with behaviour has a co-located `.test.ts`. Two files have none and should not grow one:
-`workers/types.ts` is types only, and `api/errors.ts` is a const map whose contract is asserted through the
-route tests instead — see [`api/CLAUDE.md`](./api/CLAUDE.md). Tests substitute a service tag with
+Every module with behaviour has a co-located `.test.ts`. Six files have none, and each is one of three
+things: types only (`workers/types.ts`, `api/operations/types.ts`, `well-known/types.ts`,
+`services/holidays/source/types.ts`); a const map whose contract is asserted through the route tests instead
+(`api/errors.ts` — see [`api/CLAUDE.md`](./api/CLAUDE.md)); or itself a test double
+(`services/holidays/source/fixture.ts`, the second adapter at the `HolidaySource` seam, exercised by every
+test that uses it).
+
+**`seo/buildMetadata.ts` and `services/holidays/source/dateHolidays.ts` were a fourth kind — untested — and
+are not any more.** `buildMetadata` was reached only through the seven route `metadata.test.ts` files, and
+every twitter/images assertion in them was positive and lived in the two indexable routes, so both
+`indexable &&` guards could be deleted and the suite stayed green while a noindex legal page began
+advertising an Open Graph image and a `summary_large_image` card. `dateHolidays` is the adapter that decides
+the two-year Planning Window and whether a Region-scoped lookup is constructed at all; its co-located test
+asserts the *call pattern* — which years are asked for, how many `Holidays` are built, that `getStates` is
+given the lower-cased Country — rather than the shape `date-holidays` returns, which is the only kind of
+claim a mock of that package can honestly make.
+
+Tests substitute a service tag with
 `Layer.succeed(Tag, { … })` — no test constructs a real Stripe, Turso or Resend client.
 
 `layers.test.ts` is the shape to copy when a test has to import something that transitively pulls in

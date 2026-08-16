@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MODIFIERS_CLASS_NAMES, getDayClassNames } from './helpers';
+import { getDayClassNames, MODIFIERS_CLASS_NAMES } from './helpers';
 
 const MONTH = new Date(2025, 0, 1);
 const DAY = new Date(2025, 0, 15);

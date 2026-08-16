@@ -149,10 +149,16 @@ gets: a Region drops the National day it does not observe, a shared date resolve
 source that throws yields an empty calendar and a log. It mocks only the logging singleton.
 `source/utils/observed.test.ts` pins the Region-over-Country rule on plain arrays.
 
-`source/dateHolidays.ts` has no test of its own, and that is the deliberate line: everything in it is either
-a `date-holidays` call or a call into `source/utils/`, which is tested. It held two rules of its own until
-the guide's next sentence was taken at its word — the `public`/`bank` filter and the `location` stamp are now
-`keepNonWorking` and `stampRegion`, testable without constructing `Holidays`. Holiday data itself is upstream's, and
-pinning assertions to it would break on every dependency bump — the version bundled is the version shipped
-([ADR 0001](../../../../../../adr/0001-planner-runs-in-the-browser.md)). If you add a rule to the adapter,
-put it in `source/utils/` where it can be tested without the package.
+**`source/dateHolidays.ts` is tested on its call pattern and on nothing else, and the distinction is the
+whole point.** Holiday data is upstream's: the version bundled is the version shipped
+([ADR 0001](../../../../../../adr/0001-planner-runs-in-the-browser.md)), so an assertion about what
+`date-holidays` returns for a given date would break on every dependency bump and would prove only that the
+fixture agreed with whoever wrote it. What the adapter decides for itself is *how the package is asked*, and
+that a mock can answer honestly: `dateHolidays.test.ts` pins that both `year` and `year + 1` are fetched —
+the Planning Window reaches into the following year — that a second, Region-scoped `Holidays` is constructed
+only when a Region is given, that the locale travels as `languages: [locale]`, and that `regionsOf`
+lower-cases the Country and normalises the package's absent answer to `null`.
+
+It carried two more rules until the sentence below was taken at its word — the `public`/`bank` filter and the
+`location` stamp are now `keepNonWorking` and `stampRegion`, testable without constructing `Holidays` at all.
+That is still where a new rule belongs: put it in `source/utils/`, not in the adapter.
