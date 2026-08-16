@@ -88,9 +88,24 @@ optional-chaining. `deserializeSuggestion` returns `MeasuredSuggestion` on that 
 rather than validates, so a wire message genuinely missing `metrics` would arrive as a lie. Nothing else
 produces these messages, which is what makes the claim safe.
 
-**Deserialisation casts, it does not validate.** `deserializeHolidays` casts `variant` to
-`HolidayDTO['variant']` and `deserializeSuggestion` casts `strategy` to `Suggestion['strategy']`; `worker.ts`
-casts the incoming `strategy` string to `FilterStrategy`. An unknown string reaches the engine unchallenged.
+**Deserialisation casts, it does not validate — with one exception, and that one had teeth.**
+`deserializeHolidays` casts `variant` to `HolidayDTO['variant']` and `deserializeSuggestion` casts `strategy`
+to `Suggestion['strategy']`. Both are on the way *back* from the worker, over values the worker itself
+produced.
+
+`worker.ts` is the inbound direction and now parses: `isFilterStrategy` from
+[`@domain/calendar/types`](../../domain/calendar/types.ts) narrows the incoming string, falling back to
+`DEFAULT_FILTER_STRATEGY`, which is also what the filters store initialises to — one declaration, so the wire
+default and the store default cannot drift. It used to be `strategy as FilterStrategy`, and an unrecognised
+string did not land harmlessly: `generateSuggestions` looks the strategy up in `STRATEGY_MAP` and falls back
+to **Grouped**, while `generateAlternatives` sends anything that is not Balanced into
+`selectBridgesForStrategy`, whose `switch` default is **Balanced**. So one bad string produced a Grouped
+Suggestion beside Balanced Alternatives, from a single run.
+
+Neither of those two fallbacks was the defect and neither has been touched. `selectBridgesForStrategy`'s
+default is a real, tested branch — it is how Balanced is dispatched at all. The fix belongs at the seam the
+untyped value crosses, and it is one predicate at one call site: do not grow it into a validation layer over
+the rest of the wire type.
 
 ## Manual and Removed Days
 

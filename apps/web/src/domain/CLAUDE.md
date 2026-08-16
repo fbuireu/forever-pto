@@ -60,9 +60,10 @@ exist in the deployed Workers runtime and a local run proves nothing
 ## Testing
 
 Every module with behaviour has a co-located `.test.ts`, run by Vitest. Four have none and should not grow
-one: `calendar/const.ts` is a tunables object, `calendar/types.ts` is types plus the `FilterStrategy` const,
-`payment/events/types.ts` is types plus `PAYMENT_SUCCEEDED`, and `payment/events/factory/resolvers.ts` is
-covered through `events.test.ts`.
+one: `calendar/const.ts` is a tunables object, `payment/events/types.ts` is types plus `PAYMENT_SUCCEEDED`,
+and `payment/events/factory/resolvers.ts` is covered through `events.test.ts`. `calendar/types.ts` grew one:
+it holds `isFilterStrategy`, the predicate the Web Worker narrows an incoming strategy string with, and
+`DEFAULT_FILTER_STRATEGY`, the value both that fallback and the filters store's initial state read.
 
 - `calendar/` tests take literal inputs and assert on returned values — there is nothing to mock. Those
   whose subject reaches `getKey` or `createHolidaySet` **must** call `clearDateKeyCache()` and

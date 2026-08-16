@@ -79,6 +79,18 @@ describe('worker onmessage', () => {
     expect(typeof response.payload.suggestion.days[0]).toBe('string');
   });
 
+  it('passes a recognised strategy through to both generators', () => {
+    sendMessage({ strategy: 'optimized' });
+    expect(mockGenerateSuggestions).toHaveBeenCalledWith(expect.objectContaining({ strategy: 'optimized' }));
+    expect(mockGenerateAlternatives).toHaveBeenCalledWith(expect.objectContaining({ strategy: 'optimized' }));
+  });
+
+  it('replaces an unrecognised strategy with the default, so the two generators cannot disagree', () => {
+    sendMessage({ strategy: 'balanced-ish' as never });
+    expect(mockGenerateSuggestions).toHaveBeenCalledWith(expect.objectContaining({ strategy: 'grouped' }));
+    expect(mockGenerateAlternatives).toHaveBeenCalledWith(expect.objectContaining({ strategy: 'grouped' }));
+  });
+
   it('posts an empty result when effectivePtoDays is 0', () => {
     sendMessage({ ptoDays: 0 });
     const response = mockPostMessage.mock.calls[0][0];

@@ -1,5 +1,5 @@
 import { logClient } from '@application/shared/utils/clientLog';
-import { FilterStrategy } from '@domain/calendar/types';
+import { DEFAULT_FILTER_STRATEGY, type FilterStrategy } from '@domain/calendar/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { obfuscatedStorage } from './crypto';
@@ -44,7 +44,7 @@ const initialState: FiltersState = {
   region: '',
   year: new Date().getFullYear(),
   carryOverMonths: 1,
-  strategy: FilterStrategy.GROUPED,
+  strategy: DEFAULT_FILTER_STRATEGY,
 };
 
 const partializeFilters = (state: FiltersStore) => ({

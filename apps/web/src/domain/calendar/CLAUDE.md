@@ -13,7 +13,7 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 
 | File | Contents |
 | --- | --- |
-| `types.ts` | `Bridge`, `Suggestion`, `Metrics`, `FirstLastBreak`, and the `FilterStrategy` const object plus its type |
+| `types.ts` | `Bridge`, `Suggestion`, `Metrics`, `FirstLastBreak`, the `FilterStrategy` const object plus its type, and the pair that guards the wire: `isFilterStrategy` and `DEFAULT_FILTER_STRATEGY` |
 | `const.ts` | `PTO_CONSTANTS` — every tunable in the engine; the unit and meaning of each are in [Constants](#constants) below |
 | `utils/cache.ts` | `getKey`, `getCombinationKey`, `createHolidaySet`, and the two `clear*` functions the caller must use |
 | `utils/helpers.ts` | `getAvailableWorkdays` (Workday enumeration) and `findBridges` (candidate generation and ranking) |
@@ -126,12 +126,20 @@ only the order the greedy pass walks them in.
 `MULTI_DAY_BONUS` for Bridges meeting both `HIGH_VALUE_THRESHOLD_*` and `BASE_SCORE` otherwise. The `/ 10`
 brings an absolute span onto the same scale as a ratio, so the two weights mean what they say. It then
 fills from the high-value Bridges first and only afterwards from the rest, so a crowd of one-day Bridges
-cannot squeeze out a long block. An unknown Strategy value falls through to `GROUPED` — but only in `generateSuggestions`, which looks the
-value up with `Object.hasOwn` and falls back to `DEFAULT_STRATEGY`. `generateAlternatives` routes anything
-that is not `BALANCED` into `selectBridgesForStrategy`, whose `switch` defaults to
-`selectOptimalDaysFromBridges`, so there an unknown value is selected *as* `BALANCED`. That is reachable:
-`worker.ts` casts the incoming string to `FilterStrategy` without checking it, so one bad value yields a
-Grouped Suggestion beside Balanced Alternatives.
+cannot squeeze out a long block.
+
+**The two generators still disagree about an unknown Strategy value, and it is no longer reachable.**
+`generateSuggestions` looks the value up with `Object.hasOwn` and falls back to `DEFAULT_STRATEGY`, which is
+`GROUPED`; `generateAlternatives` routes anything that is not `BALANCED` into `selectBridgesForStrategy`,
+whose `switch` defaults to `selectOptimalDaysFromBridges`, so there an unknown value is selected *as*
+`BALANCED`. One bad string therefore produced a Grouped Suggestion beside Balanced Alternatives.
+`worker.ts` used to cast, and was the way in; it now narrows with `isFilterStrategy` from `types.ts` and
+falls back to `DEFAULT_FILTER_STRATEGY`.
+
+Both fallbacks stay. `selectBridgesForStrategy`'s `switch` default is not an error path — it is how
+`BALANCED` is dispatched, and `selectors.test.ts` asserts exactly that. `generateSuggestions`'
+`Object.hasOwn` is one line of depth against a caller that has not been type-checked. What was wrong was the
+cast at the seam, not the behaviour behind it.
 
 Those are the only two passes. A third used to run after them and could select nothing at all, because both
 earlier passes leave the budget short only when every remaining Bridge conflicts with one already taken.

@@ -24,6 +24,11 @@ export const FilterStrategy = {
 
 export type FilterStrategy = (typeof FilterStrategy)[keyof typeof FilterStrategy];
 
+export const DEFAULT_FILTER_STRATEGY: FilterStrategy = FilterStrategy.GROUPED;
+
+export const isFilterStrategy = (value: unknown): value is FilterStrategy =>
+  Object.values(FilterStrategy).includes(value as FilterStrategy);
+
 export interface FirstLastBreak {
   first: string;
   last: string;
