@@ -31,6 +31,7 @@ const ADR_DATE_LINE = /^Date: \d{4}-\d{2}-\d{2}$/;
 const MARKDOWN_LINK = /\[([^\]]+)\]\(([^)\s]+)\)/g;
 const BACKTICKED_TOKEN = /`([^`]+)`/g;
 const BACKTICKED_SOURCE_FILE = /`([^`\s]+\.(?:ts|tsx))`/g;
+const NESTED_CONTEXT_CITATION = /((?:[\w@-]+\/)+CONTEXT\.md)/g;
 const BACKTICKED_ALIAS = /`([^`.]+\/\*)`/g;
 const CITED_PNPM_SCRIPT = /\bpnpm ([a-z][a-z0-9:-]*)/g;
 const ALIAS_WILDCARD_SUFFIX = /\/\*$/;
@@ -292,6 +293,20 @@ describe('documentation does not point at things that are gone', () => {
   // match a citation by suffix so both forms resolve. The wiki has no such context: `workers/tail`
   // is a different directory from `src/infrastructure/workers`, and `src/` alone names neither
   // package. Every repo path it prints has to carry its own prefix.
+  // The root guide forbids a nested CONTEXT.md outright — the name would mean two things, and the
+  // domain-modeling skill reads it as vocabulary. The wiki taught the opposite under a heading of
+  // "CONTEXT.md per folder" and cited five paths that have never existed. A relative-link rule cannot
+  // catch it, because these are prose citations rather than links.
+  it('never teaches a nested CONTEXT.md, which the root guide forbids', () => {
+    const offenders: string[] = [];
+    for (const file of [...authoredMarkdown, ...contentFiles]) {
+      for (const [, token] of read(file).matchAll(NESTED_CONTEXT_CITATION)) {
+        offenders.push(`${file} -> ${token}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+
   it('prints repo-relative paths in the published wiki, never package-relative ones', () => {
     const ambiguous = /^(src|e2e|workers|public)\//;
     const offenders: string[] = [];

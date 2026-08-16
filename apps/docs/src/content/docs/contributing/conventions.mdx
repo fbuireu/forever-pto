@@ -31,7 +31,7 @@ The release commits are created by semantic-release as `chore(release): web x.y.
 - **No barrel files.** Import directly from the source module; never create pass-through `index.ts` re-export files.
 - **Named exports.** Default exports are used only where Next.js requires them (route files, config files). Everything else exports by name — including the CVA variants object next to its component.
 - **CVA pattern.** Styled primitives define a `cva()` object and export it alongside the component (e.g. `buttonVariants` in `apps/web/src/ui/modules/core/primitives/Button.tsx`) so variants stay reusable and type-derivable. See the [Button page](/design-system/components/button/) for how the docs exploit this.
-- **`CONTEXT.md` per folder.** Significant directories carry a `CONTEXT.md` describing purpose, domain concepts and boundaries. Read it before modifying a folder; update it when the boundaries change. This convention is declared in the root `CLAUDE.md`.
+- **A `CLAUDE.md` per folder.** Significant directories carry a `CLAUDE.md` describing what may be changed there, its public API, invariants and gotchas. Read it before modifying a folder; update it in the same commit when the rules change. The convention is declared in the root `CLAUDE.md`. `CONTEXT.md` is the domain glossary and lives at the repo root only — never create a nested one.
 - **No uppercase in i18n strings.** Translation strings in `apps/web/src/ui/i18n/messages/` are written in normal casing; if a design calls for uppercase, apply it with a CSS `uppercase` class in the component. Casing is presentation, not content.
 
 ## Formatting

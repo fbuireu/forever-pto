@@ -263,7 +263,9 @@ above the highest existing file, and link it from wherever it bites — a gotcha
 
 `CONTEXT.md` is reserved for the root glossary. **Never create a nested one** — the name would mean two
 things, and the `domain-modeling` skill reads it as vocabulary and would rewrite a layer contract as a term
-list.
+list. `tests/docs-consistency.test.ts` asserts no document *cites* one either: the published wiki taught the
+opposite under a heading of "CONTEXT.md per folder" and named five paths that have never existed, which the
+relative-link rule could not catch because they were prose rather than links.
 
 ## Gotchas
 

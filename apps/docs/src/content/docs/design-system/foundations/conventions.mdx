@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-The design system lives in `apps/web/src/ui/modules/core/` and its governing rules are written down in `apps/web/src/ui/modules/core/CONTEXT.md`. This page documents each rule and the mechanics behind it.
+The design system lives in `apps/web/src/ui/modules/core/` and its governing rules are written down in `apps/web/src/ui/modules/core/CLAUDE.md`. This page documents each rule and the mechanics behind it.
 
 ## CVA variants, always exported
 
@@ -40,7 +40,7 @@ Polymorphism uses the `asChild` pattern, but the `Slot` is **local**: `apps/web/
 </Button>
 ```
 
-Note the headless layer throughout core is **Base UI** (`@base-ui/react`) — `CONTEXT.md` still says "Radix" in places, but no Radix packages are installed; the accessibility primitives (Dialog, Popover, Tooltip, Menu, Accordion…) all come from `@base-ui/react/*`. A motion-aware sibling, `MotionSlot` (`apps/web/src/ui/modules/core/animate/primitives/animate/MotionSlot.tsx`), does the same job for `m.*` components. Do not reinvent either.
+Note the headless layer throughout core is **Base UI** (`@base-ui/react`) — that guide named Radix for a while, but no Radix packages are installed; the accessibility primitives (Dialog, Popover, Tooltip, Menu, Accordion…) all come from `@base-ui/react/*`. A motion-aware sibling, `MotionSlot` (`apps/web/src/ui/modules/core/animate/primitives/animate/MotionSlot.tsx`), does the same job for `m.*` components. Do not reinvent either.
 
 ## Named exports only
 
