@@ -1,5 +1,4 @@
 import { buildMetadata } from '@infrastructure/seo/buildMetadata';
-import { isIndexable } from '@infrastructure/seo/routes';
 import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
 import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';
@@ -21,9 +20,8 @@ export async function generateMetadata({ params }: GenerateMetadataParams): Prom
   return buildMetadata({
     baseUrl,
     locale,
-    path: PATH,
+    route: PATH,
     title: t('title'),
     description: t('description'),
-    indexable: isIndexable(PATH),
   });
 }

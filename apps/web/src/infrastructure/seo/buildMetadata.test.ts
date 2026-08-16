@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { buildMetadata } from './buildMetadata';
 
+const NOINDEX_ROUTE = '/legal/legal-notice';
+
 const BASE = {
   baseUrl: 'https://forever-pto.com',
   locale: 'en' as const,
-  path: '/planner',
+  route: '/planner',
   title: 'Planner',
   description: 'Plan your days off',
-  indexable: true,
 };
 
 describe('buildMetadata', () => {
@@ -18,9 +19,14 @@ describe('buildMetadata', () => {
   });
 
   it('withholds both from a noindex page, so a legal notice advertises no card', () => {
-    const metadata = buildMetadata({ ...BASE, indexable: false });
+    const metadata = buildMetadata({ ...BASE, route: NOINDEX_ROUTE });
     expect(metadata.openGraph?.images).toBeUndefined();
     expect(metadata.twitter).toBeUndefined();
+  });
+
+  it('reads indexability off the route table, so no caller can contradict it', () => {
+    expect(buildMetadata({ ...BASE, route: NOINDEX_ROUTE, keywords: 'pto' }).keywords).toBeUndefined();
+    expect(buildMetadata({ ...BASE, route: '/not-in-the-table' }).robots).toEqual({ index: false, follow: false });
   });
 
   it('withholds the whole Open Graph block, and the card with it, when there is no description', () => {
@@ -36,7 +42,7 @@ describe('buildMetadata', () => {
       follow: true,
       googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
     });
-    expect(buildMetadata({ ...BASE, indexable: false }).robots).toEqual({ index: false, follow: false });
+    expect(buildMetadata({ ...BASE, route: NOINDEX_ROUTE }).robots).toEqual({ index: false, follow: false });
   });
 
   it('canonicalises against the locale-prefixed path and lists every locale alternate', () => {

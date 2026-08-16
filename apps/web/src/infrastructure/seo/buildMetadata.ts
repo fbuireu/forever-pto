@@ -1,4 +1,5 @@
 import { localeAlternates, localePath } from '@infrastructure/i18n/utils/url';
+import { isIndexable } from '@infrastructure/seo/routes';
 import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';
 
@@ -10,32 +11,24 @@ const OG_IMAGE_HEIGHT = 630;
 interface BuildMetadataParams {
   baseUrl: string;
   locale: Locale;
-  path?: string;
+  route: string;
   title: string;
   description?: string;
   keywords?: string;
-  indexable: boolean;
 }
 
-export function buildMetadata({
-  baseUrl,
-  locale,
-  path,
-  title,
-  description,
-  keywords,
-  indexable,
-}: BuildMetadataParams): Metadata {
-  const url = localePath(locale, path);
+export function buildMetadata({ baseUrl, locale, route, title, description, keywords }: BuildMetadataParams): Metadata {
+  const url = localePath(locale, route);
+  const indexable = isIndexable(route);
 
   return {
     title,
     ...(description && { description }),
-    ...(keywords && { keywords }),
+    ...(indexable && keywords && { keywords }),
     metadataBase: new URL(baseUrl),
     alternates: {
       canonical: url,
-      languages: localeAlternates(path),
+      languages: localeAlternates(route),
     },
     ...(description && {
       openGraph: {

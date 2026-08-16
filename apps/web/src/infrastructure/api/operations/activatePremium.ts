@@ -2,7 +2,13 @@ import { ApiError } from '@infrastructure/api/errors';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import type { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
-import type { DatabaseError, PaymentError, RateLimitError, SessionError, ValidationError } from '@infrastructure/errors';
+import type {
+  DatabaseError,
+  PaymentError,
+  RateLimitError,
+  SessionError,
+  ValidationError,
+} from '@infrastructure/errors';
 import { ApplicationLayer } from '@infrastructure/layers';
 import { Effect } from 'effect';
 import { after } from 'next/server';

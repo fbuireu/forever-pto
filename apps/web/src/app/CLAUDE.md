@@ -91,16 +91,29 @@ unit-testable on its own — hence the `metadata.test.ts` next to each one.
 **The shape lives in one module; each file supplies only what its route knows.** `buildMetadata` under
 `@infrastructure/seo` owns `metadataBase`, the `alternates` pair, `openGraph`, `twitter`, the `robots` block
 and `other`. A route file resolves `siteUrl` through `getPublicEnv.ts`, pulls its copy from a `metadata.*`
-namespace, and passes strings: `title`, optional `description` and `keywords`, an optional `path`, and
-`indexable`. Two rules are derived rather than repeated — `openGraph` appears when there is a description,
-and `images`/`twitter`/`keywords` only when the route is indexable — which is exactly what the seven files
-did by hand.
+namespace, and passes strings: `title`, optional `description` and `keywords`, and a **required `route`**.
+Three rules are derived rather than repeated — `openGraph` appears when there is a description, and
+`images`/`twitter`/`keywords` only when the route is indexable — which is exactly what the seven files did
+by hand.
+
+**`indexable` used to be a parameter, and every one of the seven callers computed it the same single way.**
+It is a pure function of the path, so `buildMetadata` calls `isIndexable(route)` itself and `SITE_ROUTES`
+becomes the only thing that decides. Nothing can now pass `{ route: '/legal/privacy-policy', indexable: true }`,
+because there is nothing to pass. Making `route` required closed the other half: it was optional, so a route
+could omit it and get `canonical: localePath(locale, undefined)` — `'/'` — and the marketing page *did*,
+carrying an unused `HOME_PATH` const while canonicalising through the fallback. It read correctly only
+because the homepage's canonical happens to be `/`. The guide used to say "passing `path` is what prevents
+it"; the type says it now.
+
+The `keywords` gate is new in the code and old in this file — the rule was written here and the
+implementation spread `...(keywords && { keywords })` ungated. It held only because no caller passed keywords
+on a noindex route.
 
 They were seven copies of one 43-line shape; the four `legal/` ones were identical bar a namespace and a
 path repeated three times each. The translation call stays per-route on purpose: `getTranslations` types its
 keys against the namespace, so resolving the strings at the call site is what keeps a typo in a message key a
 compile error instead of a runtime blank. A new route that skips the `alternates` block ships six URLs
-competing for the same ranking — passing `path` is what prevents it.
+competing for the same ranking; the required `route` parameter is what prevents it.
 
 ## API route handlers
 

@@ -1,12 +1,6 @@
 import { ApiError } from '@infrastructure/api/errors';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
-import {
-  DatabaseError,
-  PaymentError,
-  RateLimitError,
-  SessionError,
-  ValidationError,
-} from '@infrastructure/errors';
+import { DatabaseError, PaymentError, RateLimitError, SessionError, ValidationError } from '@infrastructure/errors';
 import { Effect, Layer } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
