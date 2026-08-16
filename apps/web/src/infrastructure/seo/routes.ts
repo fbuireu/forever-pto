@@ -53,6 +53,15 @@ export const SITE_ROUTES = [
   { path: '/payment/confirmation', indexable: false, titleKey: 'paymentConfirmation.title', descriptionKey: undefined },
 ] as const satisfies readonly SiteRoute[];
 
+export type SiteRouteEntry = (typeof SITE_ROUTES)[number];
+export type RoutePath = SiteRouteEntry['path'];
+
+const ROUTES_BY_PATH = Object.fromEntries(SITE_ROUTES.map((route) => [route.path, route])) as {
+  [PATH in RoutePath]: Extract<SiteRouteEntry, { path: PATH }>;
+};
+
+export const routeFor = <PATH extends RoutePath>(path: PATH) => ROUTES_BY_PATH[path];
+
 export const findRoute = (path: string) => SITE_ROUTES.find((route) => route.path === path);
 
 export const indexableRoutes = (): SiteRoute[] => SITE_ROUTES.filter(({ indexable }) => indexable);

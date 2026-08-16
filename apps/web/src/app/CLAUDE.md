@@ -281,10 +281,35 @@ rather than reaching for the environment themselves.
 
 **One table says which routes exist, which are public, and what each is called.** `SITE_ROUTES` under
 `@infrastructure/seo` carries a `path`, an `indexable` flag, the sitemap hints and the `metadata.*` message
-keys, and four readers derive from it: `sitemap.ts` emits the cross-product of the six locales and
+keys, and five readers derive from it: `sitemap.ts` emits the cross-product of the six locales and
 `indexableRoutes()`, `robots.ts` disallows every locale-expanded `privateRoutes()` path, `buildMetadata`
-resolves `isIndexable(route)` for itself, and `buildMarkdownPage` looks the title and description up through
-`findRoute`. **Adding a route is one row.**
+resolves `isIndexable(route)` for itself, `buildMarkdownPage` looks the title and description up through
+`findRoute`, and `routeMetadata` builds the whole `generateMetadata` from the row.
+
+**Adding a route is one row and one line.** It used to be one row, one 27-line `metadata.ts` and one 63-line
+`metadata.test.ts`, seven times over — the four `legal/` pairs differed from each other on exactly two lines
+each. A route file is now:
+
+```ts
+export const generateMetadata = routeMetadata('/legal/privacy-policy');
+```
+
+`routeMetadata` takes a `RoutePath`, the literal union of the table's own `path` values, so a typo is a
+compile error rather than a silent fallthrough. `routeFor` is what makes the lookup total where `findRoute`
+cannot be: it indexes a record derived from `SITE_ROUTES` and keyed by that same union, so it returns a row
+rather than `row | undefined`. The one cast in `routes.ts` is where that record is built, and it is safe
+because the table is the only source of both its keys and its values.
+
+**The per-route tests could not fail for the reason they existed.** Each mocked `getTranslations` as
+`(key) => \`t:${key}\`` — discarding the namespace — so `privacy-policy/metadata.ts` could have read
+`metadata.termsOfService` and stayed green, and the namespace was the only thing those files decided for
+themselves. Everything else they asserted was `buildMetadata` behaviour, which `buildMetadata.test.ts` owns.
+
+Their replacement had to avoid the opposite trap, and the first draft did not: asserting
+`title === t(route.titleKey)` in a loop over `SITE_ROUTES` reads the row on both sides, so swapping one
+route's keys for another's keeps it green — verified by doing exactly that. What catches it is a property the
+table alone can violate (**no two routes share a `titleKey`**) plus a genuinely second source (**every key
+resolves to a real message in `en.json`**). Both were confirmed by breaking them.
 
 It is declared `as const satisfies readonly SiteRoute[]` rather than annotated `SiteRoute[]`, and that is not
 style: the literal `titleKey` types are what let `createTranslator`'s `t()` reject a typo in a message key at
