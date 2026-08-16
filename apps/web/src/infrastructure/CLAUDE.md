@@ -152,9 +152,8 @@ already drifted over how a missing IP header was recorded.
 
 ## Testing
 
-Every module with behaviour has a co-located `.test.ts`. Six files have none, and each is one of three
-things: types only (`workers/types.ts`, `api/operations/types.ts`, `well-known/types.ts`,
-`services/holidays/source/types.ts`); a const map whose contract is asserted through the route tests instead
+Every module with behaviour has a co-located `.test.ts`. Five files have none, and each is one of three
+things: types only (`workers/types.ts`, `well-known/types.ts`, `services/holidays/source/types.ts`); a const map whose contract is asserted through the route tests instead
 (`api/errors.ts` — see [`api/CLAUDE.md`](./api/CLAUDE.md)); or itself a test double
 (`services/holidays/source/fixture.ts`, the second adapter at the `HolidaySource` seam, exercised by every
 test that uses it).

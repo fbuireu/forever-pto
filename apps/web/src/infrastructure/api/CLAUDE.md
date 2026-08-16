@@ -36,7 +36,10 @@ not read when the limiter refuses. That ordering used to be a rule stated in pro
 per entry point.
 
 `resolveClientIp` is the settled version of the drift: it reads `cf-connecting-ip`, then `x-forwarded-for`,
-then `x-real-ip`, and answers `null` when none is present. The limiter keys on `UNKNOWN_IP` in that case
+then `x-real-ip`, and answers `null` when none is present. **That order is a security decision, not a
+preference** — behind Cloudflare only the first is set by the edge, and the other two arrive from the client;
+`operations/types.test.ts` names it, and until it existed the third rung had never been executed by any test
+and the first two were covered incidentally, through a server action with two mocks. The limiter keys on `UNKNOWN_IP` in that case
 because a limiter needs a key; the use-case receives the `null`, because a payment record should say we do not
 know the address rather than claim it is called "unknown".
 
