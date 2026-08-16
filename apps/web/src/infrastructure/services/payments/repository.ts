@@ -5,10 +5,10 @@ import type { DatabaseError } from '@infrastructure/errors';
 import { normalizeEmail } from '@infrastructure/services/payments/normalizeEmail';
 import { Effect } from 'effect';
 
-export const savePayment = (data: PaymentData): Effect.Effect<void, DatabaseError, TursoService> =>
+export const savePayment = (data: PaymentData): Effect.Effect<boolean, DatabaseError, TursoService> =>
   Effect.gen(function* () {
     const turso = yield* TursoService;
-    yield* turso.execute(
+    const rowsAffected = yield* turso.execute(
       `INSERT OR IGNORE INTO payments (
         id, stripe_created_at, stripe_customer_id, stripe_charge_id,
         email, amount, currency, status, payment_method_type,
@@ -52,22 +52,26 @@ export const savePayment = (data: PaymentData): Effect.Effect<void, DatabaseErro
         data.origin ?? null,
       ]
     );
+
+    return rowsAffected > 0;
   });
 
 export const updatePaymentStatus = (
   paymentIntentId: string,
   status: PaymentStatus
-): Effect.Effect<void, DatabaseError, TursoService> =>
+): Effect.Effect<boolean, DatabaseError, TursoService> =>
   Effect.gen(function* () {
     const turso = yield* TursoService;
-    yield* turso.execute(
+    const rowsAffected = yield* turso.execute(
       `UPDATE payments
        SET status = ?,
            succeeded_at = CASE WHEN ? = 'succeeded' THEN datetime('now') ELSE succeeded_at END,
            updated_at = datetime('now')
-       WHERE id = ?`,
+       WHERE id = ? AND status != 'succeeded'`,
       [status, status, paymentIntentId]
     );
+
+    return rowsAffected > 0;
   });
 
 export interface PaymentChargeData {

@@ -65,15 +65,23 @@ describe('processWebhookEvent', () => {
     expect(createPaymentSucceededEvent).toHaveBeenCalledWith(intent);
   });
 
-  it('does not call savePayment when payment already exists', async () => {
-    const { savePayment } = await import('@infrastructure/services/payments/repository');
+  it('leaves an existing row alone, and says nothing about creating one', async () => {
+    const { savePayment, getPaymentById } = await import('@infrastructure/services/payments/repository');
+    vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(false) as never);
+
     await run(processWebhookEvent(makeEvent('payment_intent.succeeded', { id: 'pi_test' })));
-    expect(savePayment).not.toHaveBeenCalled();
+
+    expect(getPaymentById).not.toHaveBeenCalled();
+    expect(savePayment).toHaveBeenCalledOnce();
+    expect(mockLogger.warn).not.toHaveBeenCalledWith(
+      'Payment was missing from the DB and was created from the webhook',
+      expect.anything()
+    );
   });
 
-  it('calls savePayment when payment is not found in DB', async () => {
-    const { getPaymentById, savePayment } = await import('@infrastructure/services/payments/repository');
-    vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed(undefined as never));
+  it('reports a created row on the answer the insert itself gave', async () => {
+    const { savePayment } = await import('@infrastructure/services/payments/repository');
+    vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(true) as never);
     await run(processWebhookEvent(makeEvent('payment_intent.succeeded', { id: 'pi_test' })));
     expect(savePayment).toHaveBeenCalledOnce();
   });

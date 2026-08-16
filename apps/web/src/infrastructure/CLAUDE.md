@@ -134,6 +134,10 @@ already drifted over how a missing IP header was recorded.
   It lives beside the cookie rather than beside the token because the cookie's `maxAge` is what fixes the
   unit — seconds — for both. Do not reintroduce a second constant: they were separate before, and nothing
   would have caught them drifting apart.
+- **`execute` answers with `rowsAffected`, which is what makes a guarded write usable.** It returned `void`,
+  so a caller wanting to know whether its `UPDATE ... WHERE <guard>` matched had to read the row first — and
+  with a connection per call, that read guarded nothing. The payments repository is the consumer: see
+  [`services/payments/CLAUDE.md`](./services/payments/CLAUDE.md).
 - **Turso opens a connection per call.** `query` and `execute` each call `connect()` themselves, so
   two calls are two connections and nothing spans them transactionally.
 - **A route handler must not translate through `next-intl/server`.** `getTranslations` memoises its message

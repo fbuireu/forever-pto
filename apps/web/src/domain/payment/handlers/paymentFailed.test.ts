@@ -51,15 +51,20 @@ describe('handlePaymentFailed', () => {
     expect(err).toBeInstanceOf(DatabaseError);
   });
 
-  it('does not downgrade a payment that already succeeded', async () => {
-    const { getPaymentById, updatePaymentStatus } = await import('@infrastructure/services/payments/repository');
-    vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed({ id: 'pi_test', status: 'succeeded' } as never));
+  it('warns rather than retrying when the guarded update touched no row', async () => {
+    const { updatePaymentStatus } = await import('@infrastructure/services/payments/repository');
+    vi.mocked(updatePaymentStatus).mockReturnValueOnce(Effect.succeed(false) as never);
     await run(handlePaymentFailed(EVENT));
-    expect(updatePaymentStatus).not.toHaveBeenCalled();
     expect(mockLogger.warn).toHaveBeenCalledWith(
-      'Ignoring failed-payment event for an already-succeeded payment',
+      'Ignoring failed-payment event for an already-succeeded or absent payment',
       expect.objectContaining({ paymentId: 'pi_test' })
     );
+  });
+
+  it('reads nothing before writing — the succeeded row is protected by the WHERE clause', async () => {
+    const { getPaymentById } = await import('@infrastructure/services/payments/repository');
+    await run(handlePaymentFailed(EVENT));
+    expect(getPaymentById).not.toHaveBeenCalled();
   });
 
   it('still writes the failure when no row exists yet', async () => {

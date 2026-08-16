@@ -7,12 +7,7 @@ import { StripeServerService } from '@infrastructure/clients/payments/stripe/ser
 import { type DatabaseError, type PaymentError, type SessionError, ValidationError } from '@infrastructure/errors';
 import { normalizeEmail } from '@infrastructure/services/payments/normalizeEmail';
 import { readDonationMetadata } from '@infrastructure/services/payments/provider/metadata';
-import {
-  getPaymentByEmail,
-  getPaymentById,
-  savePayment,
-  updatePaymentStatus,
-} from '@infrastructure/services/payments/repository';
+import { getPaymentByEmail, savePayment, updatePaymentStatus } from '@infrastructure/services/payments/repository';
 import { matchesClientSecret } from '@infrastructure/services/premium/activation';
 import { createSession } from '@infrastructure/services/premium/session';
 import { Effect } from 'effect';
@@ -53,34 +48,17 @@ export const activateWithPayment = ({
     }
 
     const deferred = Effect.gen(function* () {
-      const existingPayment = yield* getPaymentById(paymentIntentId).pipe(
-        Effect.catchAll(() => Effect.succeed(undefined))
-      );
-
-      if (existingPayment) {
-        if (existingPayment.status !== PAYMENT_SUCCEEDED) {
-          yield* updatePaymentStatus(paymentIntentId, PAYMENT_SUCCEEDED).pipe(
-            Effect.catchAll((e) =>
-              Effect.sync(() => {
-                logger.error('Failed to update payment status', {
-                  reason: e.message,
-                  paymentIntentId,
-                  emailDomain: email?.split('@')[1],
-                });
-              })
-            )
-          );
-        }
-        return;
-      }
-
       const paymentData: PaymentData = paymentDataDTO.create({
         raw: paymentIntent,
         params: { email, promoCode, userAgent, ipAddress },
       });
 
       yield* savePayment(paymentData).pipe(
-        Effect.tap(() => Effect.sync(() => logger.info('Payment created successfully', { paymentIntentId }))),
+        Effect.tap((created) =>
+          Effect.sync(() => {
+            if (created) logger.info('Payment created successfully', { paymentIntentId });
+          })
+        ),
         Effect.tapError((e) =>
           Effect.sync(() => {
             logger.error('Failed to save payment to DB', {
@@ -90,7 +68,20 @@ export const activateWithPayment = ({
             });
           })
         ),
-        Effect.catchAll(() => Effect.void)
+        Effect.catchAll(() => Effect.succeed(false))
+      );
+
+      yield* updatePaymentStatus(paymentIntentId, PAYMENT_SUCCEEDED).pipe(
+        Effect.catchAll((e) =>
+          Effect.sync(() => {
+            logger.error('Failed to update payment status', {
+              reason: e.message,
+              paymentIntentId,
+              emailDomain: email?.split('@')[1],
+            });
+            return false;
+          })
+        )
       );
     });
 

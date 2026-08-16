@@ -92,9 +92,17 @@ constant by assertion instead; the other two are covered by their own query asse
 ## Invariants and traps
 
 **Stripe redelivers, and does not guarantee order.** Both handlers are written to be replayed. A failure
-event can arrive after the retry has already succeeded, so `handlePaymentFailed` treats `succeeded` as
-terminal: it logs and returns rather than overwriting the status, because that row is the entitlement.
-`handlePaymentSucceeded` writes the status only when the stored one is not already `succeeded`.
+event can arrive after the retry has already succeeded, and that row is the entitlement, so it must not be
+overwritten — but **the rule lives in the `WHERE` clause now, not in either handler**.
+`updatePaymentStatus` carries `AND status != 'succeeded'` and answers whether it wrote, so
+`handlePaymentFailed` calls it and warns when nothing was touched instead of reading the row first. That
+read never guarded anything: `TursoService` opens a connection per call, so a redelivery racing the original
+could have both reads see `processing`. See
+[`../../infrastructure/services/payments/CLAUDE.md`](../../infrastructure/services/payments/CLAUDE.md).
+
+`handlePaymentSucceeded` still reads, and that is deliberate: 0 rows affected cannot distinguish "already
+succeeded" from "no such row", and this handler owes a different answer to each — a missing row warns and
+skips the charge enrichment.
 
 **A Donation with no email is dropped, loudly, by the caller.** `processWebhookEvent` catches
 `MissingDonorEmailError`, logs it through `logger.logError` and returns without touching the payments table,

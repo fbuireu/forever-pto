@@ -76,27 +76,29 @@ describe('activateWithPayment', () => {
     expect(savePayment).toHaveBeenCalledOnce();
   });
 
-  it('skips savePayment when payment already exists with succeeded status (deferred)', async () => {
-    const { getPaymentById, savePayment } = await import('@infrastructure/services/payments/repository');
-    vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed({ id: 'pi_test', status: 'succeeded' } as never));
-    const { deferred } = await run(
-      activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'test@example.com' })
-    );
-    await runDeferred(deferred);
-    expect(savePayment).not.toHaveBeenCalled();
-  });
-
-  it('updates status when existing payment is not succeeded (deferred)', async () => {
+  it('reconciles without reading first — insert-or-ignore, then the guarded update (deferred)', async () => {
     const { getPaymentById, savePayment, updatePaymentStatus } = await import(
       '@infrastructure/services/payments/repository'
     );
-    vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed({ id: 'pi_test', status: 'processing' } as never));
     const { deferred } = await run(
       activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'test@example.com' })
     );
     await runDeferred(deferred);
+
+    expect(getPaymentById).not.toHaveBeenCalled();
+    expect(savePayment).toHaveBeenCalledOnce();
     expect(updatePaymentStatus).toHaveBeenCalledWith('pi_test', 'succeeded');
-    expect(savePayment).not.toHaveBeenCalled();
+  });
+
+  it('still marks the row succeeded when the insert was ignored (deferred)', async () => {
+    const { savePayment, updatePaymentStatus } = await import('@infrastructure/services/payments/repository');
+    vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(false) as never);
+    const { deferred } = await run(
+      activateWithPayment({ paymentIntentId: 'pi_test', expectedEmail: 'test@example.com' })
+    );
+    await runDeferred(deferred);
+
+    expect(updatePaymentStatus).toHaveBeenCalledWith('pi_test', 'succeeded');
   });
 
   it('lets a Stripe failure stay a PaymentError, so its message never reaches the payer', async () => {

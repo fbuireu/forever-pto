@@ -7,8 +7,9 @@ on:
 permissions:
   contents: read
 
-# Queues behind ci.yml, whose group is `${{ github.workflow }}-${{ github.ref }}`.
-# Rename that workflow and this silently stops waiting — see the repo guide.
+# Queues behind ci.yml, whose `e2e` job drives this same preview Worker. The
+# group is its `${{ github.workflow }}-${{ github.ref }}`; renaming that workflow
+# silently stops the wait. Full reasoning in the repo guide.
 concurrency:
   group: CI-${{ github.ref }}
   cancel-in-progress: false

@@ -6,7 +6,7 @@ import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
 import type { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
 import type { DatabaseError } from '@infrastructure/errors';
-import { getPaymentById, savePayment } from '@infrastructure/services/payments/repository';
+import { savePayment } from '@infrastructure/services/payments/repository';
 import { Effect } from 'effect';
 import type Stripe from 'stripe';
 
@@ -37,22 +37,22 @@ export const processWebhookEvent = (
 
         if (!paymentEvent) break;
 
-        const existing = yield* getPaymentById(paymentEvent.paymentId).pipe(
-          Effect.catchAll(() => Effect.succeed(undefined))
+        const created = yield* savePayment(
+          paymentDataDTO.create({
+            raw: paymentIntent,
+            params: {
+              email: paymentEvent.email,
+              promoCode: paymentEvent.promoCode,
+              userAgent: paymentEvent.userAgent,
+              ipAddress: paymentEvent.ipAddress,
+            },
+          })
         );
-        if (!existing) {
-          logger.warn('Payment not found in DB, creating from webhook', { paymentId: paymentEvent.paymentId });
-          yield* savePayment(
-            paymentDataDTO.create({
-              raw: paymentIntent,
-              params: {
-                email: paymentEvent.email,
-                promoCode: paymentEvent.promoCode,
-                userAgent: paymentEvent.userAgent,
-                ipAddress: paymentEvent.ipAddress,
-              },
-            })
-          );
+
+        if (created) {
+          logger.warn('Payment was missing from the DB and was created from the webhook', {
+            paymentId: paymentEvent.paymentId,
+          });
         }
 
         yield* handlePaymentSucceeded(paymentEvent).pipe(

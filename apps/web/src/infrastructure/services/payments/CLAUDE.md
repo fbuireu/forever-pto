@@ -57,6 +57,23 @@ the webhook re-create a row the deferred write may have lost, and lets `activate
 a Donation the webhook has not caught up with yet. Nothing reads before writing, and nothing merges: a
 second insert for the same intent is dropped whole, including any column the first one left null.
 
+**`updatePaymentStatus` is guarded the same way, and both answer whether they wrote.** Its `WHERE` carries
+`AND status != 'succeeded'`, so a succeeded row — the entitlement — cannot be overwritten by a late or
+redelivered event, and both functions return a `boolean` off `rowsAffected`. That is what removed the
+read-compare-write those callers each spelled out: `getPaymentById(...)` absorbed to `undefined`, a
+comparison against `PAYMENT_SUCCEEDED`, then the write, written four times over. It was never a real guard
+anyway — `TursoService` opens a connection per call, so nothing spanned the read and the write, and two
+webhook deliveries could both read `processing` and both write. The rule is now one predicate the database
+evaluates atomically.
+
+Three callers lost their read entirely. `handlePaymentFailed` writes and warns when `rowsAffected` is 0;
+`processWebhookEvent` inserts unconditionally and logs a creation only when the insert reports one — which
+also fixed a lie, since the old read-then-insert could be beaten to the row and still claim it had created
+it; and `activateWithPayment`'s deferred is now insert-or-ignore followed by the guarded update, correct
+whether or not the row was already there. **`handlePaymentSucceeded` keeps its read**, because 0 rows cannot
+tell "already succeeded" from "no such row" and that handler treats them differently — a missing row skips
+the charge enrichment and warns.
+
 **Amounts are in Stripe minor units everywhere except `confirmation.ts`.** `createPaymentIntent` multiplies
 by 100 on the way in, `paymentDataDTO` keeps minor units for the table, and `confirmation` divides by 100
 because its output feeds a screen. Two payment shapes with an `amount` field, two different units.

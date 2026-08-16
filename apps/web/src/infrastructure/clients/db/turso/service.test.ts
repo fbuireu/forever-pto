@@ -96,16 +96,16 @@ describe('TursoService.query', () => {
 });
 
 describe('TursoService.execute', () => {
-  it('runs the statement successfully', async () => {
-    mockRun.mockResolvedValue(undefined);
+  it('answers with the number of rows the statement touched', async () => {
+    mockRun.mockResolvedValue({ rowsAffected: 1 });
     await expect(
       Effect.runPromise(
         Effect.gen(function* () {
           const turso = yield* TursoService;
-          yield* turso.execute('DELETE FROM test WHERE id = ?', [1]);
+          return yield* turso.execute('DELETE FROM test WHERE id = ?', [1]);
         }).pipe(Effect.provide(TursoServiceLive))
       )
-    ).resolves.toBeUndefined();
+    ).resolves.toBe(1);
     expect(mockRun).toHaveBeenCalledWith([1]);
   });
 

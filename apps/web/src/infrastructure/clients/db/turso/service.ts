@@ -7,7 +7,7 @@ export class TursoService extends Context.Tag('TursoService')<
   TursoService,
   {
     query<T = unknown>(sql: string, args?: InValue[]): Effect.Effect<T[], DatabaseError>;
-    execute(sql: string, args?: InValue[]): Effect.Effect<void, DatabaseError>;
+    execute(sql: string, args?: InValue[]): Effect.Effect<number, DatabaseError>;
   }
 >() {}
 
@@ -41,12 +41,13 @@ export const TursoServiceLive = Layer.sync(TursoService, () => {
         catch: wrapError,
       }),
 
-    execute: (sql: string, args?: InValue[]): Effect.Effect<void, DatabaseError> =>
+    execute: (sql: string, args?: InValue[]): Effect.Effect<number, DatabaseError> =>
       Effect.tryPromise({
         try: async () => {
           const conn = createConnection();
           const stmt = await conn.prepare(sql);
-          await stmt.run(args ?? []);
+          const result = await stmt.run(args ?? []);
+          return result.rowsAffected;
         },
         catch: wrapError,
       }),

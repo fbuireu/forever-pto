@@ -188,6 +188,22 @@ describe('updatePaymentStatus', () => {
     expect(sql).toContain('SET status');
   });
 
+  it('refuses to overwrite a succeeded row, in the WHERE clause rather than at the caller', async () => {
+    await runEffect(updatePaymentStatus('pi_test', 'canceled'));
+    const [sql] = mockExecute.mock.calls[0] as [string, unknown[]];
+    const where = sql.slice(sql.indexOf('WHERE'));
+
+    expect(where).toContain("status != 'succeeded'");
+  });
+
+  it('answers whether it wrote, so no caller has to read the row first', async () => {
+    mockExecute.mockReturnValueOnce(Effect.succeed(0));
+    await expect(runEffect(updatePaymentStatus('pi_test', 'canceled'))).resolves.toBe(false);
+
+    mockExecute.mockReturnValueOnce(Effect.succeed(1));
+    await expect(runEffect(updatePaymentStatus('pi_test', 'canceled'))).resolves.toBe(true);
+  });
+
   it('passes status and paymentIntentId as arguments', async () => {
     await runEffect(updatePaymentStatus('pi_test', 'succeeded'));
     const [, args] = mockExecute.mock.calls[0] as [string, unknown[]];
