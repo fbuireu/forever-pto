@@ -21,7 +21,6 @@ type PaymentDataDTOParams = {
 
 export const paymentDataDTO: BaseDTO<Stripe.PaymentIntent, PaymentData, PaymentDataDTOParams> = {
   create: ({ raw, params }) => {
-    if (!params) throw new Error('params required for paymentDataDTO');
     return {
       id: raw.id,
       stripeCreatedAt: new Date(raw.created * 1000),

@@ -21,10 +21,6 @@ describe('holidayDTO', () => {
     expect(holidayDTO.create({ raw: [], params: BASE_PARAMS })).toEqual([]);
   });
 
-  it('throws when params are missing', () => {
-    expect(() => holidayDTO.create({ raw: [] })).toThrow('Configuration is required');
-  });
-
   it('maps a national holiday to a HolidayDTO with NATIONAL variant', () => {
     const raw = [makeRaw({ date: '2024-01-01', name: 'New Year' })];
     const [result] = holidayDTO.create({ raw, params: BASE_PARAMS });

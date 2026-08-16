@@ -43,11 +43,7 @@ export const isInPlanningWindow = ({ date, year, carryOverMonths }: PlanningWind
   });
 
 export const holidayDTO: HolidayDTOShape = {
-  create: ({ raw, params }: { raw: RawHoliday[]; params?: HolidayDTOParams }) => {
-    if (!params) {
-      throw new Error('Configuration is required for holiday DTO');
-    }
-
+  create: ({ raw, params }: { raw: RawHoliday[]; params: HolidayDTOParams }) => {
     const { year, carryOverMonths, regions } = params;
     const processedDates = new Set<string>();
 

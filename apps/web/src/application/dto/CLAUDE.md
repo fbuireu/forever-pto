@@ -34,12 +34,21 @@ Not every folder needs every file. `email/` and `premium/` are `types.ts` alone:
 Every mapper implements `BaseDTO` from [`../shared/dto/baseDTO.ts`](../shared/dto/baseDTO.ts):
 
 ```typescript
-type BaseDTO<INPUT, OUTPUT, PARAMS = unknown> = {
-  create: (params: { raw: INPUT; params?: PARAMS }) => OUTPUT;
-};
+type BaseDTO<INPUT, OUTPUT, PARAMS = undefined> = [PARAMS] extends [undefined]
+  ? { create: (args: { raw: INPUT }) => OUTPUT }
+  : { create: (args: { raw: INPUT; params: PARAMS }) => OUTPUT };
 ```
 
-`PARAMS` is optional in the type but not always optional at runtime. `holidayDTO.create` and `paymentDataDTO.create` throw when it is missing, because there is no sane default for a Planning Window or for the request metadata attached to a Donation. That throw is the contract — callers pass params or they get an exception, never a half-built object.
+**The shape depends on whether the mapper declared a `PARAMS` type, so the requirement is stated once.**
+`holidayDTO` and `paymentDataDTO` need params — there is no sane default for a Planning Window or for the
+request metadata attached to a Donation — and omitting them is a compile error. `countryDTO`, `regionDTO` and
+`paymentConfirmationDTO` declare none and cannot be handed a spurious one.
+
+That used to be `params?: PARAMS` for every mapper, enforced by two hand-written throws with two different
+messages plus a test each — for a condition the compiler had enough information to reject, while the other
+three would have accepted an extra argument silently. Both throws and both tests are gone because the case
+is unrepresentable. The trade is real and worth naming: the throw also guarded an untyped call path, and
+there are none today.
 
 `holidayDTO` widens `BaseDTO` with two extra entry points:
 

@@ -50,10 +50,6 @@ describe('paymentConfirmationDTO', () => {
 });
 
 describe('paymentDataDTO', () => {
-  it('throws when params are missing', () => {
-    expect(() => paymentDataDTO.create({ raw: makeIntent() })).toThrow('params required');
-  });
-
   it('preserves amount in cents as-is (no division)', () => {
     const result = paymentDataDTO.create({ raw: makeIntent({ amount: 999 }), params: DATA_PARAMS });
     expect(result.amount).toBe(999);
