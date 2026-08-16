@@ -7,6 +7,15 @@ on:
 permissions:
   contents: read
 
+# Queue behind ci.yml's run for this same pull request, which holds
+# `${{ github.workflow }}-${{ github.ref }}` — "CI" plus the identical
+# `refs/pull/<number>/merge` this event carries. `cancel-in-progress: false`
+# makes this run wait for that one instead of cancelling it, so the preview
+# Worker outlives the E2E job that is driving it.
+concurrency:
+  group: CI-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   cleanup-web:
     name: Delete the web preview Worker

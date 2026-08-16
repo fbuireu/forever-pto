@@ -165,6 +165,22 @@ secrets are repository-level and are read outside any environment.
 changelogs, because attribution is by path and `main` takes squash merges. Sometimes that is what you
 want, so the job posts a sticky comment saying what will happen and does not fail the run.
 
+**`cleanup-development.yml` shares `ci.yml`'s concurrency group, which is what stops it deleting a Worker
+that is still under test.** It fires on `pull_request: closed`, and closing a pull request does not cancel
+the run already going: `e2e` needs `deploy-development` and drives the per-PR Worker over the network, so
+the delete raced it and turned every remaining spec into a "There is nothing here yet" placeholder — one run
+on #343 reported 47 failures with nothing wrong in the code. Renovate is how it happens, because it
+auto-merges on the required checks and `e2e` is not one of them.
+
+The fix is a queue, not a wait loop: the cleanup declares `group: CI-${{ github.ref }}` with
+`cancel-in-progress: false`. `ci.yml`'s group is `${{ github.workflow }}-${{ github.ref }}`, and a
+`pull_request` event carries the same `refs/pull/<number>/merge` whichever activity type fired it, so the two
+strings match and GitHub holds the cleanup pending until the CI run completes. A pending run occupies no
+runner, so this costs nothing. **The coupling is by workflow *name*** — renaming `ci.yml`'s `name: CI`
+silently unqueues the cleanup and the race comes back. A concurrency group is per run, so the whole workflow
+queues and `cleanup-docs` rides along; that is harmless, and it needs no wait of its own since the docs smoke
+tests run against the build artifact before the preview Worker exists.
+
 **`docs-refresh` exists because the release commit carries `[skip ci]`.** The docs site renders the app
 version from `apps/web/package.json`; without a dispatch after a web release, the published site keeps
 advertising the previous one.
