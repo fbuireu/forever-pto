@@ -30,9 +30,24 @@ this order; the layout adds `SiteTitle.tsx` and `SiteSubtitle.tsx` above them.
 | Directory | Contents |
 | --- | --- |
 | `calendar/` | `calendar/Calendar.tsx` — one month grid, ~540 lines, four selection modes; `calendar/utils/helpers.ts` — `MODIFIERS_CLASS_NAMES` and `getDayClassNames`; `calendar/CalendarListFixture.tsx` |
-| `holidays/` | `holidays/HolidaysTable.tsx` plus `holidays/components/` — `HolidayRow.tsx`, `HolidayTableHeader.tsx`, the three modals, and the Zod factory in `holidays/components/schema.ts` |
+| `holidays/` | `holidays/HolidaysTable.tsx` plus `holidays/components/` — `HolidayRow.tsx`, `HolidayTableHeader.tsx`, `HolidayFormModal.tsx` and the two thin callers that configure it, `DeleteHolidayModal.tsx`, and the Zod factory in `holidays/components/schema.ts` |
 | `summary/` | The five charts, `summary/MetricCard.tsx`, `summary/SummaryFixture.tsx` and `summary/const.ts` |
 | `utils/` | `utils/helpers.ts` — Planning Window and calendar-grid construction, workday/weekend counting, and the `MONTHS_IN_YEAR` constant every `12 + carryOverMonths` on this screen is built from; `utils/modifiers.ts` — the day predicates |
+
+**Adding and editing a Holiday are one form, `HolidayFormModal`.** They were two 200-line components sharing
+their imports, the schema construction, the `useForm` setup, `handleClose`, the date-select narrowing, the
+whole refusal chain and both `FormField`s character for character. The duplication was already showing: the
+Edit modal imported a *second* translator, `tAdd = useTranslations('modals.addHoliday')`, and rendered the
+Add modal's copy for its labels, its placeholder, its footer **and** its refusals.
+
+`Add` and `Edit` are ~35-line callers now: each supplies its icon, its copy namespace and an `onCommit` bound
+to its own store action. `onCommit` answers the store's `HolidayOutcome`, or **`null`** — which is how Edit
+says "nothing changed" without the shared form needing to know what an edit is. The field chrome is read
+from `modals.addHoliday` deliberately rather than accidentally; that namespace is now shared and the honest
+follow-up is renaming it, which costs an edit in six bundles.
+
+`HolidayFormModal.test.tsx` is the first test either modal has had: applied, a refusal with copy, a refusal
+without copy falling through to the generic error, and the `null` no-op.
 
 `calendar/utils/refusals.ts` holds both refusal mappings, and neither is a rule — the rules are in the store.
 `DAY_REFUSAL_COPY` is the reason-to-message-key map `Calendar` renders. `describeHolidayRefusal` is the same
