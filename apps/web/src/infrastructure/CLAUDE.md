@@ -88,14 +88,27 @@ purpose ([ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.
 use-cases may not, and receive configuration as plain values instead — `contact.ts` reads
 `env.NEXT_PUBLIC_SITE_URL` and `env.NEXT_PUBLIC_CONTACT_EMAIL` and passes them down as a plain object.
 
-Five places inside this layer read it directly, and each has a reason: `actions/contact.ts` (config for the
-use-case), `services/payments/rateLimit.ts` (the `PAYMENT_RATE_LIMITER` binding),
+Five places inside this layer read it directly, and each has a reason:
+`services/env/getRequestPublicEnv.ts` (the per-request config both contact transports pass down),
+`services/payments/rateLimit.ts` (the `PAYMENT_RATE_LIMITER` binding),
 `services/env/getPublicEnv.ts` (a `'use cache'` function, so it uses the `{ async: true }` form),
 `clients/logging/better-stack/client.ts` (the execution context for `waitUntil`, wrapped in a `try` that
 returns `undefined` so logging still works off-request), and `services/location/utils/strategies.ts` (only
 `env.NEXT_PUBLIC_SITE_URL`, to build the CDN trace URL). The signal that makes country detection cheap is not
 the Cloudflare context at all: it is the `cf-ipcountry` request header, read by `detectCountryFromHeaders`,
 which touches no context and is why the common path needs no geolocation service.
+
+**There are two readers of the same two variables, and the difference is *when* they are asked.**
+`getPublicEnv` is the cached, build-safe one — `'use cache'`, `cacheLife('days')`, the `{ async: true }`
+context — and `sitemap.ts`, `robots.ts` and the `metadata.ts` files use it because they are evaluated outside
+a request. `getRequestPublicEnv` beside it is the synchronous, per-request one, and the two contact
+transports use it. They each hand-mapped those four lines before, which is the residue of exactly the drift
+`operations/` exists to prevent.
+
+They are deliberately not merged. Pointing the transports at `getPublicEnv` would change both the context
+form and the cache lifetime on the path that decides where a contact email is sent, and that is the same
+class of question as the `NEXT_PUBLIC_SITE_URL` resolution below — verifiable only against a real build,
+which is currently the thing that cannot be run locally. One reader per timing, one place each.
 
 `getPublicEnv` carries `'use cache'` with `cacheLife('days')`, and neither is visible at its signature. The
 lifetime is safe because both values are deploy-time constants — a caller cannot observe a stale one. Its

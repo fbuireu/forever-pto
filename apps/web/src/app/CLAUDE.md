@@ -263,8 +263,9 @@ importing the other five.
 
 `getCloudflareContext()` may be read here and in server actions, never in a use-case — see
 [ADR 0004](../../../../adr/0004-cloudflare-workers-as-deployment-target.md). In this folder the only direct readers are
-`api/contact/route.ts`, `api/markdown/route.ts` and `.well-known/[...slug]/route.ts`. `sitemap.ts`,
-`robots.ts` and the `metadata.ts` files reach it indirectly, through `getPublicEnv.ts`.
+`api/markdown/route.ts` and `.well-known/[...slug]/route.ts`. `api/contact/route.ts` reaches it through
+`getRequestPublicEnv.ts`, the per-request reader it shares with the contact server action; `sitemap.ts`,
+`robots.ts` and the `metadata.ts` files reach it through `getPublicEnv.ts`, the cached one.
 
 The `{ async: true }` form is not interchangeable with the bare call, but the split is not request versus
 no-request. Only the async form works where there may be no request, so everything evaluable outside one —
