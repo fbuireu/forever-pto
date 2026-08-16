@@ -25,6 +25,7 @@ import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { useShallow } from 'zustand/react/shallow';
 import { createHolidaySchema, type HolidayFormData } from './schema';
 
 interface EditHolidayModalProps {
@@ -39,8 +40,18 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
   const tA11y = useTranslations('a11y');
   const tAdd = useTranslations('modals.addHoliday');
   const tValidation = useTranslations('validation.holiday');
-  const { year, carryOverMonths } = useFiltersStore();
-  const { holidays, editHoliday, currentSelection, alternatives, suggestion } = useHolidaysStore();
+  const { year, carryOverMonths } = useFiltersStore(
+    useShallow((state) => ({ year: state.year, carryOverMonths: state.carryOverMonths }))
+  );
+  const { holidays, editHoliday, currentSelection, alternatives, suggestion } = useHolidaysStore(
+    useShallow((state) => ({
+      holidays: state.holidays,
+      editHoliday: state.editHoliday,
+      currentSelection: state.currentSelection,
+      alternatives: state.alternatives,
+      suggestion: state.suggestion,
+    }))
+  );
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(holiday.date);
   const [isPending, startTransition] = useTransition();
 

@@ -111,6 +111,15 @@ directly before honouring a day click. Access is derived from the payment record
 [ADR 0008](../../../../../../../adr/0008-premium-derived-from-payment.md) — so there is no boolean to
 thread through props and no point caching one.
 
+**And `PremiumFeature` already answers "is this user a donor" for itself, so no caller re-asks.**
+Its first statement is `if (premiumKey) return <>{children}</>`, which is the whole of the gate.
+`holidays/HolidaysTable.tsx` used to read `premiumKey` from the store and wrap each `PremiumFeature` in a
+`ConditionalWrapper doWrap={!premiumKey}` — a second copy of the same predicate, evaluated a render earlier,
+which meant the gate could be opened by either of two reads of one store field. The wrapper, the prop it
+threaded to `HolidayCard`, the store read and the memo dependency are gone. `ConditionalWrapper` itself
+stays: `calendar/Calendar.tsx` and `sidebar/components/PtoSalaryCalculator.tsx` use it for wrappers that
+have no such short-circuit of their own.
+
 ## Gotchas
 
 **`today` is state initialised to `null`, not `new Date()`.** `Calendar` sets it in an effect on
@@ -308,12 +317,25 @@ and `pages/homepage/sections/Hero.tsx` both read from this screen's `utils/`, fo
 
 ## Testing
 
-Six test files: `ManagementBar.test.tsx`, `SiteTitle.test.tsx`, `Summary.test.tsx`,
-`summary/BlocksPerQuarterChart.test.tsx`, `summary/QuarterDistributionChart.test.tsx` and
-`summary/YearTimelineChart.test.tsx`. That is not an oversight to close in passing — the components with
-tests are the ones holding logic, and the rest are left to the Playwright suite in `e2e/` — which on this
-screen asserts only that `/planner` answers 200, has a title, and does not trip the error boundary. No e2e
-spec drives a calculation, so nothing outside these six files pins planner *behaviour*.
+Seven test files: `ManagementBar.test.tsx`, `SiteTitle.test.tsx`, `Summary.test.tsx`,
+`calendar/utils/helpers.test.ts`, `summary/BlocksPerQuarterChart.test.tsx`,
+`summary/QuarterDistributionChart.test.tsx` and `summary/YearTimelineChart.test.tsx`. That is not an
+oversight to close in passing — the components with tests are the ones holding logic, and the rest are left
+to the Playwright suite in `e2e/` — which on this screen asserts only that `/planner` answers 200, has a
+title, and does not trip the error boundary. No e2e spec drives a calculation, so nothing outside these
+seven files pins planner *behaviour*.
+
+`calendar/utils/helpers.test.ts` is the one that pins the precedence chain documented under *Day
+classification*, which is the only ordering on this screen that a reader is likely to get wrong from the
+source: the object-key order is not the precedence order, `today` short-circuits, and `selected` is appended
+after the loop it skipped. It calls `getDayClassNames` directly with synthetic modifier predicates and
+asserts on the returned string, so it needs no render and no store.
+
+**It asserts by substring, and two of the class strings are identical.** `rangeStart` and `rangeEnd` in
+`MODIFIERS_CLASS_NAMES` are the same value character for character, so no substring test can tell which of
+the two produced a match, and a test claiming to is passing on the other one. The distinction the tests do
+draw is the real one — `inRange` is suppressed by `selected` and `rangeStart` is not, because they sit
+behind separate guards.
 
 `Summary.test.tsx` covers the two things on that screen a type cannot catch: which denominator the Efficiency
 hint names, and whether the budget badges read grammatically at a budget of one. It mocks all four stores,

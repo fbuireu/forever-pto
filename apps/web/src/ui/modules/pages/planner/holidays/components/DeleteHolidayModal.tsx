@@ -31,7 +31,7 @@ interface DeleteHolidayModalProps {
 export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHolidayModalProps) => {
   const t = useTranslations('modals.deleteHoliday');
   const tA11y = useTranslations('a11y');
-  const { removeHoliday } = useHolidaysStore();
+  const removeHoliday = useHolidaysStore((state) => state.removeHoliday);
   const [isPending, startTransition] = useTransition();
   const isMultiple = holidays.length > 1;
 

@@ -4,7 +4,6 @@ import type { HolidayDTO } from '@application/dto/holiday/types';
 import { HolidayVariant } from '@application/dto/holiday/types';
 import { isWeekend } from '@application/shared/utils/dates';
 import { useHolidaysStore } from '@application/stores/holidays';
-import { usePremiumStore } from '@application/stores/premium';
 import { useDebounce } from '@ui/hooks/useDebounce';
 import { Checkbox } from '@ui/modules/core/animate/base/Checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/modules/core/animate/base/Collapsible';
@@ -19,7 +18,6 @@ import { Button } from '@ui/modules/core/primitives/Button';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { Table, TableBody, TableCell, TableRow } from '@ui/modules/core/primitives/Table';
 import { PremiumFeature, PremiumFeatureVariant } from '@ui/modules/premium/PremiumFeature';
-import { ConditionalWrapper } from '@ui/modules/shared/ConditionalWrapper';
 import { cn } from '@ui/utils/cn';
 import { Edit } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -51,7 +49,6 @@ const HolidayCard = ({
   isSelected,
   locale,
   onToggle,
-  premiumKey,
   t,
   tPremium,
 }: {
@@ -59,7 +56,6 @@ const HolidayCard = ({
   isSelected: boolean;
   locale: string;
   onToggle: (holiday: HolidayDTO) => void;
-  premiumKey: string | null;
   t: ReturnType<typeof useTranslations<'holidaysTable'>>;
   tPremium: ReturnType<typeof useTranslations<'premium'>>;
 }) => {
@@ -80,20 +76,9 @@ const HolidayCard = ({
     >
       <div className='flex items-start justify-between gap-2'>
         <div className='flex items-start gap-3 flex-1 min-w-0'>
-          <ConditionalWrapper
-            doWrap={!premiumKey}
-            wrapper={(children) => (
-              <PremiumFeature
-                feature={tPremium('selectHoliday')}
-                variant={PremiumFeatureVariant.STACK}
-                iconSize='size-4'
-              >
-                {children}
-              </PremiumFeature>
-            )}
-          >
+          <PremiumFeature feature={tPremium('selectHoliday')} variant={PremiumFeatureVariant.STACK} iconSize='size-4'>
             <Checkbox checked={isSelected} onCheckedChange={() => onToggle(holiday)} className='mt-1 shrink-0' />
-          </ConditionalWrapper>
+          </PremiumFeature>
           <div className='flex-1 min-w-0'>
             <h4 className='font-medium text-sm leading-tight wrap-break-word'>{holiday.name}</h4>
             <p className='text-xs text-muted-foreground mt-1'>{dateFormatted}</p>
@@ -119,7 +104,6 @@ const HolidayCard = ({
 };
 
 export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
-  const premiumKey = usePremiumStore((state) => state.premiumKey);
   const holidays = useHolidaysStore((state) => state.holidays);
 
   const locale = useLocale();
@@ -285,18 +269,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
     };
 
     return (
-      <ConditionalWrapper
-        doWrap={!premiumKey}
-        wrapper={(children) => (
-          <PremiumFeature
-            feature={tPremium('selectAllHolidays')}
-            variant={PremiumFeatureVariant.STACK}
-            iconSize='size-4'
-          >
-            {children}
-          </PremiumFeature>
-        )}
-      >
+      <PremiumFeature feature={tPremium('selectAllHolidays')} variant={PremiumFeatureVariant.STACK} iconSize='size-4'>
         <Checkbox
           checked={type === 'all'}
           indeterminate={type === 'some'}
@@ -304,9 +277,9 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
           aria-label={getLabel()}
           title={getLabel()}
         />
-      </ConditionalWrapper>
+      </PremiumFeature>
     );
-  }, [selectionState, toggleSelectAll, premiumKey, t, tPremium]);
+  }, [selectionState, toggleSelectAll, t, tPremium]);
 
   const selectedCount = selectedHolidaysList.length;
   const weekendCount = variantHolidays.filter((h) => isWeekend(h.date)).length;
@@ -458,7 +431,6 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
                         isSelected={isSelected}
                         locale={locale}
                         onToggle={toggleSelectHoliday}
-                        premiumKey={premiumKey}
                         t={t}
                         tPremium={tPremium}
                       />
