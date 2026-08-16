@@ -105,4 +105,24 @@ describe('useStoresReady', () => {
     expect(locationStore.persist.onFinishHydration).toHaveBeenCalled();
     expect(premiumStore.persist.onFinishHydration).toHaveBeenCalled();
   });
+
+  it('subscribes each store once even though the effect depends on what it sets', () => {
+    vi.clearAllMocks();
+    filtersStore.persist.hasHydrated.mockReturnValue(true);
+    holidaysStore.persist.hasHydrated.mockReturnValue(true);
+    locationStore.persist.hasHydrated.mockReturnValue(true);
+    premiumStore.persist.hasHydrated.mockReturnValue(true);
+
+    renderHook(() => useStoresReady());
+
+    expect(filtersStore.persist.onFinishHydration).toHaveBeenCalledTimes(1);
+    expect(holidaysStore.persist.onFinishHydration).toHaveBeenCalledTimes(1);
+    expect(locationStore.persist.onFinishHydration).toHaveBeenCalledTimes(1);
+    expect(premiumStore.persist.onFinishHydration).toHaveBeenCalledTimes(1);
+
+    filtersStore.persist.hasHydrated.mockReturnValue(false);
+    holidaysStore.persist.hasHydrated.mockReturnValue(false);
+    locationStore.persist.hasHydrated.mockReturnValue(false);
+    premiumStore.persist.hasHydrated.mockReturnValue(false);
+  });
 });

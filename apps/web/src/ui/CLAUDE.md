@@ -86,6 +86,15 @@ nothing. The store agrees with the fixed shape: `toggleDaySelection` recomputes 
 touches `holidays`. Adding a field to that selector means adding a re-plan trigger; keep the list to the one
 in [`modules/pages/planner/CLAUDE.md`](./modules/pages/planner/CLAUDE.md).
 
+**`hooks/useStoresReady.ts`'s effect depends on the state it sets, and that costs one pass, not a loop.**
+It reads as churn — five consumers, an effect keyed on `hydrationStatus`, subscriptions torn down and
+rebuilt on every transition — and it is not. `obfuscatedStorage` is synchronous, so all four stores report
+`hasHydrated()` on the first effect; the early-return guard sees the *stale* closure value and subscribes
+anyway, the state flips to all-true, and the re-run unsubscribes and returns. One subscribe and one
+unsubscribe per store per mount, which `useStoresReady.test.ts` pins with an exact call count. It cannot
+spin either: the `setHydrationStatus` updater returns the previous object identity when nothing settled, so
+React bails out rather than re-rendering. Do not "fix" the dependency array on sight.
+
 **`hooks/useTutorial.tsx` waits for the first step's anchor to stop moving, and nothing else.** driver.js
 measures its highlight once and re-measures only on resize, scroll or click, so starting mid-animation leaves
 the cutout and popover at the wrong place for the whole step. Three timing heuristics were tried here and all
