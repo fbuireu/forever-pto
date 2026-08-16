@@ -1,4 +1,6 @@
-'use client';
+import { formatDate } from '@application/shared/utils/dates';
+
+('use client');
 
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import { differenceInDays, getDayOfMonth, getMonth, getYear } from '@application/shared/utils/dates';
@@ -83,7 +85,7 @@ export const YearTimelineChart = ({
         const date = new Date(year, i, 1);
         return {
           key: `${getYear(date)}-${getMonth(date)}`,
-          label: date.toLocaleDateString(locale, { month: 'short' }).toUpperCase(),
+          label: formatDate({ date, locale, format: 'MMM' }).toUpperCase(),
         };
       }),
     [year, locale, monthCount]

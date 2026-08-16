@@ -1,4 +1,6 @@
-'use client';
+import { formatDate } from '@application/shared/utils/dates';
+
+('use client');
 
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { HolidayVariant } from '@application/dto/holiday/types';
@@ -42,7 +44,7 @@ const DeleteHolidayModal = dynamic(() =>
   import('./components/DeleteHolidayModal').then((module) => ({ default: module.DeleteHolidayModal }))
 );
 
-const holidayDateFmtCache = new Map<string, Intl.DateTimeFormat>();
+const _holidayDateFmtCache = new Map<string, Intl.DateTimeFormat>();
 
 const HolidayCard = ({
   holiday,
@@ -59,13 +61,7 @@ const HolidayCard = ({
   t: ReturnType<typeof useTranslations<'holidaysTable'>>;
   tPremium: ReturnType<typeof useTranslations<'premium'>>;
 }) => {
-  if (!holidayDateFmtCache.has(locale)) {
-    holidayDateFmtCache.set(
-      locale,
-      new Intl.DateTimeFormat(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-    );
-  }
-  const dateFormatted = holidayDateFmtCache.get(locale)?.format(holiday.date);
+  const dateFormatted = formatDate({ date: holiday.date, locale, format: 'EEEE, MMMM d, yyyy' });
 
   return (
     <div

@@ -1,4 +1,6 @@
-'use client';
+import { formatDate } from '@application/shared/utils/dates';
+
+('use client');
 
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
@@ -27,10 +29,7 @@ export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }:
       days: value,
     }));
     const labelMap = new Map(
-      names.map((name, idx) => [
-        name,
-        new Date(year, idx, 1).toLocaleDateString(locale, { month: 'long', year: 'numeric' }),
-      ])
+      names.map((name, idx) => [name, formatDate({ date: new Date(year, idx, 1), locale, format: 'LLLL yyyy' })])
     );
     return { monthNames: names, timelineData: data, monthLabelMap: labelMap };
   }, [locale, carryOverMonths, year, monthlyDist]);

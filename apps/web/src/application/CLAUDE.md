@@ -79,10 +79,16 @@ Two consequences worth holding on to:
   al-Fitr landed a day early for a visitor in Denver, Los Angeles, Anchorage or Honolulu: the planner
   protected the wrong day and placed a PTO Day on the real Holiday. `dateIntake.test.ts` pins that the two
   answer differently for the same string, which is the whole reason they are two functions.
-- **`formatDate` only understands the patterns in its map.** `INTL_FORMAT_MAP` lists the format strings that
-  resolve to an `Intl.DateTimeFormat`; `'yyyy-MM-dd'` and `'yyyy-MM-dd HH:mm:ss'` are handled separately, and
-  anything else falls through to `toLocaleDateString` and silently ignores the pattern. Passing a date-fns
-  token that is not in the map produces plausible-looking wrong output rather than an error.
+- **`formatDate` understands exactly the patterns in its map, and the compiler now says so.** `format` is
+  typed `DateFormat` — the keys of `INTL_FORMAT_MAP` plus the two ISO forms — so an unrecognised pattern is a
+  compile error. It used to be `string` with a `toLocaleDateString` fall-through that silently ignored the
+  pattern and returned plausible-looking wrong output, and that branch is gone.
+
+  **This is also the only place an `Intl.DateTimeFormat` is constructed and memoised.** Six files had routed
+  around the whitelist and rebuilt both halves — five private `Map<string, Intl.DateTimeFormat>` caches plus
+  two uncached `toLocaleDateString` calls — and three of those constructed option objects byte-identical to
+  entries already in the map. The map gained `'MMM'` and `'EE, MMM d'`, which is all the six needed, and the
+  caches are gone. A caller wanting a new combination adds a row here rather than a sixth cache.
 
 Weekday numbers are ISO throughout: `Temporal.PlainDate`'s `dayOfWeek` runs 1 (Monday) to 7 (Sunday), which
 is why `isWeekend` tests for 6 and 7. The `weekStartsOn` option is the date-fns convention instead — 0 for

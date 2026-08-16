@@ -7,6 +7,7 @@ import {
   eachWeekendOfInterval,
   endOfMonth,
   endOfWeek,
+  formatDate,
   isWeekend,
   startOfMonth,
   startOfWeek,
@@ -101,21 +102,14 @@ interface GetMonthsParamsNames {
   monthOutputFormat?: 'short' | 'long';
 }
 
-const monthNameFmtCache = new Map<string, Intl.DateTimeFormat>();
-
 export const getMonthNames = ({ locale, monthCount, startYear, monthOutputFormat = 'short' }: GetMonthsParamsNames) => {
   const monthNames: string[] = [];
-  const cacheKey = `${locale}-${monthOutputFormat}`;
-  let fmt = monthNameFmtCache.get(cacheKey);
-  if (!fmt) {
-    fmt = new Intl.DateTimeFormat(locale, { month: monthOutputFormat });
-    monthNameFmtCache.set(cacheKey, fmt);
-  }
+  const format = monthOutputFormat === 'long' ? 'MMMM' : 'MMM';
   for (let i = 0; i < monthCount; i++) {
     const year = startYear + Math.floor(i / MONTHS_IN_YEAR);
     const month = i % MONTHS_IN_YEAR;
     const date = new Date(year, month, 1);
-    const monthName = fmt.format(date);
+    const monthName = formatDate({ date, locale, format });
     const yearSuffix = i >= MONTHS_IN_YEAR ? ` '${year.toString().slice(-2)}` : '';
     monthNames.push(`${monthName}${yearSuffix}`);
   }

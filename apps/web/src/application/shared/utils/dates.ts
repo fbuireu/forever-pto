@@ -103,43 +103,46 @@ export const isoDateTime = (date: Date) => {
   return `${base} ${h}:${m}:${s}`;
 };
 
-const INTL_FORMAT_MAP: Record<string, Intl.DateTimeFormatOptions> = {
+const INTL_FORMAT_MAP = {
   yyyy: { year: 'numeric' },
+  MMM: { month: 'short' },
   MMMM: { month: 'long' },
   'LLLL yyyy': { month: 'long', year: 'numeric' },
   'MMM d': { month: 'short', day: 'numeric' },
   'MMM d, yyyy': { month: 'short', day: 'numeric', year: 'numeric' },
   'MMMM d, yyyy': { month: 'long', day: 'numeric', year: 'numeric' },
+  'EE, MMM d': { weekday: 'short', day: 'numeric', month: 'short' },
   'EEEE, MMMM d, yyyy': { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' },
   EEEE: { weekday: 'long' },
   EE: { weekday: 'short' },
   d: { day: 'numeric' },
-};
+} satisfies Record<string, Intl.DateTimeFormatOptions>;
+
+const ISO_DATE = 'yyyy-MM-dd';
+const ISO_DATE_TIME = 'yyyy-MM-dd HH:mm:ss';
+
+export type DateFormat = keyof typeof INTL_FORMAT_MAP | typeof ISO_DATE | typeof ISO_DATE_TIME;
 
 export interface FormatDateParams {
   date: Date;
   locale: string;
-  format: string;
+  format: DateFormat;
 }
 
 const dateFormatCache = new Map<string, Intl.DateTimeFormat>();
 
 export const formatDate = ({ date, locale, format }: FormatDateParams): string => {
-  if (format === 'yyyy-MM-dd') return isoDate(date);
-  if (format === 'yyyy-MM-dd HH:mm:ss') return isoDateTime(date);
+  if (format === ISO_DATE) return isoDate(date);
+  if (format === ISO_DATE_TIME) return isoDateTime(date);
 
-  const options = INTL_FORMAT_MAP[format];
-  if (options) {
-    const key = `${locale}-${format}`;
-    let fmt = dateFormatCache.get(key);
-    if (!fmt) {
-      fmt = new Intl.DateTimeFormat(locale, options);
-      dateFormatCache.set(key, fmt);
-    }
-    return fmt.format(date);
+  const key = `${locale}-${format}`;
+  let fmt = dateFormatCache.get(key);
+  if (!fmt) {
+    fmt = new Intl.DateTimeFormat(locale, INTL_FORMAT_MAP[format]);
+    dateFormatCache.set(key, fmt);
   }
 
-  return date.toLocaleDateString(locale);
+  return fmt.format(date);
 };
 
 export interface GetWeekdayNamesParams {

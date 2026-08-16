@@ -1,5 +1,5 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
-import { getMonth, getYear } from '@application/shared/utils/dates';
+import { formatDate, getMonth, getYear } from '@application/shared/utils/dates';
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 
 const C = {
@@ -134,36 +134,11 @@ const s = StyleSheet.create({
   },
 });
 
-const fmtDayCache = new Map<string, Intl.DateTimeFormat>();
-const fmtMonthCache = new Map<string, Intl.DateTimeFormat>();
-const fmtDateCache = new Map<string, Intl.DateTimeFormat>();
+const fmtDay = (date: Date, locale: string) => formatDate({ date, locale, format: 'EE, MMM d' });
 
-function fmtDay(date: Date, locale: string) {
-  let fmt = fmtDayCache.get(locale);
-  if (!fmt) {
-    fmt = new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' });
-    fmtDayCache.set(locale, fmt);
-  }
-  return fmt.format(date);
-}
+const fmtMonth = (date: Date, locale: string) => formatDate({ date, locale, format: 'LLLL yyyy' });
 
-function fmtMonth(date: Date, locale: string) {
-  let fmt = fmtMonthCache.get(locale);
-  if (!fmt) {
-    fmt = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' });
-    fmtMonthCache.set(locale, fmt);
-  }
-  return fmt.format(date);
-}
-
-function fmtDate(date: Date, locale: string) {
-  let fmt = fmtDateCache.get(locale);
-  if (!fmt) {
-    fmt = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' });
-    fmtDateCache.set(locale, fmt);
-  }
-  return fmt.format(date);
-}
+const fmtDate = (date: Date, locale: string) => formatDate({ date, locale, format: 'MMMM d, yyyy' });
 
 function groupByMonth<T>(items: T[], getDate: (item: T) => Date, locale: string) {
   const map = new Map<string, { month: string; items: T[] }>();
