@@ -1,18 +1,14 @@
 import { MissingDonorEmailError } from '@infrastructure/errors';
+import { readDonationMetadata } from '@infrastructure/services/payments/provider/metadata';
 import { Effect } from 'effect';
 import type Stripe from 'stripe';
 import type { PaymentFailedEvent, PaymentSucceededEvent } from '../types';
 import { resolveChargeId } from './resolvers';
 
-const resolveDonorEmail = (paymentIntent: Stripe.PaymentIntent): string | undefined =>
-  [paymentIntent.metadata.email, paymentIntent.receipt_email]
-    .map((candidate) => candidate?.trim())
-    .find((candidate) => !!candidate);
-
 export const createPaymentSucceededEvent = (
   paymentIntent: Stripe.PaymentIntent
 ): Effect.Effect<PaymentSucceededEvent, MissingDonorEmailError> => {
-  const email = resolveDonorEmail(paymentIntent);
+  const { email, promoCode, userAgent, ipAddress } = readDonationMetadata(paymentIntent);
 
   if (!email) return Effect.fail(new MissingDonorEmailError({ paymentId: paymentIntent.id }));
 
@@ -23,9 +19,9 @@ export const createPaymentSucceededEvent = (
     amount: paymentIntent.amount,
     status: paymentIntent.status,
     latestChargeId: resolveChargeId(paymentIntent.latest_charge),
-    promoCode: paymentIntent.metadata.promoCode ?? null,
-    userAgent: paymentIntent.metadata.userAgent ?? null,
-    ipAddress: paymentIntent.metadata.ipAddress ?? null,
+    promoCode,
+    userAgent,
+    ipAddress,
   });
 };
 

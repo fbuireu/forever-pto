@@ -20,6 +20,7 @@ read by the premium activation path as well as by the payment one.
 | `confirmation.ts` | `confirmation(paymentIntentId)` — a `PaymentConfirmationDTO`, or `null` on any failure | `StripeServerService`, `LoggerService` |
 | `rateLimit.ts` | `checkRateLimit(ip)` — fails with `RateLimitError` | the Cloudflare `PAYMENT_RATE_LIMITER` binding |
 | `provider/intent.ts` | `createPaymentIntent(params)` — the Stripe intent behind a Donation | `StripeServerService` |
+| `provider/metadata.ts` | `readDonationMetadata(intent)` and `clampMetadata(value)` — the two halves of the donation metadata format | — |
 | `provider/charge.ts` | `retrieveCharge(chargeId)` — normalises a Stripe `Charge` into flat, nullable fields | `StripeServerService` |
 | `provider/promoCode.ts` | `validatePromoCode(code, amount)` — a `DiscountInfo`, or a `PromoCodeError` | `StripeServerService`, `TursoService` |
 
@@ -87,6 +88,17 @@ values.
 matches on `metadata.email`, and `paymentDataDTO` reads `promoCode`, `userAgent` and `ipAddress` from there.
 Stripe metadata values must be strings, which is why the builder is full of `?? ''` and `.toFixed(2)` — a
 value dropped here cannot be recovered from Stripe afterwards.
+
+**`provider/metadata.ts` is both halves of that format, and it exists because they had drifted.**
+`createPaymentIntent` is the only writer of the donation metadata block, and the read was open-coded twice —
+in `@domain/payment`'s event factory and in `activateWithPayment`. They did not agree. The factory took the
+first non-blank of `metadata.email` and `receipt_email` after trimming; `activateWithPayment` used `??`
+alone, which accepts the empty string Stripe allows. So an intent carrying `metadata.email = '   '` and a
+valid `receipt_email` had the webhook record the row correctly while the redirect path refused it with
+`'Email mismatch'` and sent the payer to `activation=failed` — for a Donation that had cleared. Both callers
+now read through `readDonationMetadata`, and `clampMetadata` moved beside it. The reader returns
+`email: string | undefined` rather than failing, because the two callers owe different errors:
+`MissingDonorEmailError` in the factory, `ValidationError` at the use-case.
 
 **Stripe caps a metadata value at 500 characters, and three of ours were unbounded.** `promoCode`,
 `userAgent` and `ipAddress` now go through `clampMetadata`. A `User-Agent` over the cap is trivially

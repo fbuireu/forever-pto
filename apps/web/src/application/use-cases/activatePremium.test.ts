@@ -135,6 +135,18 @@ describe('activateWithPayment', () => {
     expect(result.email).toBe('payer@example.com');
   });
 
+  it('falls through a blank metadata email to receipt_email, as the webhook does', async () => {
+    mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
+      Effect.succeed({
+        ...SUCCEEDED_INTENT,
+        metadata: { email: '   ' },
+        receipt_email: 'payer@example.com',
+      }) as never
+    );
+    const result = await run(activateWithPayment({ paymentIntentId: 'pi_test' }));
+    expect(result.email).toBe('payer@example.com');
+  });
+
   it('derives the payer email from the payment intent when the caller supplies none', async () => {
     const result = await run(activateWithPayment({ paymentIntentId: 'pi_test' }));
     expect(result).toMatchObject({ email: 'test@example.com', premiumKey: 'pi_test' });

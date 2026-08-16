@@ -6,6 +6,7 @@ import { LoggerService } from '@infrastructure/clients/logging/better-stack/serv
 import { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
 import { type DatabaseError, type SessionError, ValidationError } from '@infrastructure/errors';
 import { normalizeEmail } from '@infrastructure/services/payments/normalizeEmail';
+import { readDonationMetadata } from '@infrastructure/services/payments/provider/metadata';
 import {
   getPaymentByEmail,
   getPaymentById,
@@ -47,7 +48,7 @@ export const activateWithPayment = ({
       return yield* Effect.fail(new ValidationError({ message: 'Payment not completed' }));
     }
 
-    const intentEmail = paymentIntent.metadata.email ?? paymentIntent.receipt_email ?? undefined;
+    const { email: intentEmail, promoCode, userAgent, ipAddress } = readDonationMetadata(paymentIntent);
     const email = intentEmail ? normalizeEmail(intentEmail) : undefined;
     if (!email || (expectedEmail && normalizeEmail(expectedEmail) !== email)) {
       return yield* Effect.fail(new ValidationError({ message: 'Email mismatch' }));
@@ -77,12 +78,7 @@ export const activateWithPayment = ({
 
       const paymentData: PaymentData = paymentDataDTO.create({
         raw: paymentIntent,
-        params: {
-          email,
-          promoCode: paymentIntent.metadata.promoCode ?? null,
-          userAgent: paymentIntent.metadata.userAgent ?? null,
-          ipAddress: paymentIntent.metadata.ipAddress ?? null,
-        },
+        params: { email, promoCode, userAgent, ipAddress },
       });
 
       yield* savePayment(paymentData).pipe(

@@ -3,10 +3,7 @@ import { StripeServerService } from '@infrastructure/clients/payments/stripe/ser
 import type { PaymentError } from '@infrastructure/errors';
 import { Effect } from 'effect';
 import type StripeNode from 'stripe';
-
-const STRIPE_METADATA_MAX_LENGTH = 500;
-
-const clampMetadata = (value: string | null | undefined) => (value ?? '').slice(0, STRIPE_METADATA_MAX_LENGTH);
+import { clampMetadata } from './metadata';
 
 interface CreatePaymentIntentParams {
   amount: number;
