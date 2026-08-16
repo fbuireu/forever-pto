@@ -1,6 +1,6 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { addDays } from '@application/shared/utils/dates';
-import { sanitize } from './utils/sanitizer';
+import { contentLine } from './utils/sanitizer';
 import { toIcsDate, toIcsTimestamp } from './utils/serializers';
 
 interface IcsEvent {
@@ -16,12 +16,12 @@ const toUidToken = (value: string) => value.replace(/[^a-zA-Z0-9-]/g, '');
 function buildEvent({ uid, stamp, start, summary, categories }: IcsEvent) {
   return [
     'BEGIN:VEVENT',
-    `DTSTAMP:${stamp}`,
-    `DTSTART;VALUE=DATE:${toIcsDate(start)}`,
-    `DTEND;VALUE=DATE:${toIcsDate(addDays(start, 1))}`,
-    `SUMMARY:${sanitize(summary)}`,
-    `CATEGORIES:${categories}`,
-    `UID:${uid}@forever-pto`,
+    contentLine('DTSTAMP', stamp),
+    contentLine('DTSTART;VALUE=DATE', toIcsDate(start)),
+    contentLine('DTEND;VALUE=DATE', toIcsDate(addDays(start, 1))),
+    contentLine('SUMMARY', summary),
+    contentLine('CATEGORIES', categories),
+    contentLine('UID', `${uid}@forever-pto`),
     'END:VEVENT',
   ].join('\r\n');
 }
@@ -87,7 +87,7 @@ export function generateIcs({
     'PRODID:-//Forever PTO//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
-    `X-WR-CALNAME:${calendarName} ${year}`,
+    contentLine('X-WR-CALNAME', `${calendarName} ${year}`),
     ...events,
     'END:VCALENDAR',
   ].join('\r\n');

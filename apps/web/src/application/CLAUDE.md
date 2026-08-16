@@ -116,9 +116,17 @@ translated messages and hand back a schema the form parses itself.
 [`dto/CLAUDE.md`](./dto/CLAUDE.md). Anything summing or formatting a payment needs to know which one it
 holds.
 
-**`export/generateIcs.ts` sanitises the summary only.** `sanitize` escapes `\`, `;`, `,` and newlines inside
-`SUMMARY`, which is the field carrying user text (a Custom Holiday name). `X-WR-CALNAME` is not escaped — it
-is a translated label. If it ever becomes user-typed, it needs the same treatment.
+**Escaping and folding are properties of a content line, not of a call site.** RFC 5545 has one rule for
+every property: escape the value, then fold anything past 75 **octets** onto a continuation line.
+`contentLine(name, value)` in `export/utils/sanitizer.ts` does both, and `buildEvent` is a list of calls to
+it — `X-WR-CALNAME`, `UID` and `CATEGORIES` included.
+
+It used to be `sanitize`, applied by hand at `SUMMARY` alone, which is why this guide carried "if
+`X-WR-CALNAME` ever becomes user-typed it needs the same treatment" as an instruction to a future reader.
+Folding was absent entirely and unasserted, and a Custom Holiday name is user-typed and unbounded, so a long
+one produced a line a strict parser is entitled to reject. `sanitize` also handled `\n` but not `\r`, so a
+pasted CRLF left a bare carriage return inside a value. The fold counts octets rather than characters —
+`é` is two — which is what makes it correct for the non-English names this app is full of.
 
 **`DTSTAMP` is required on every `VEVENT`, and it was missing.** RFC 5545 lists it alongside `UID` as
 mandatory; without it a strict parser is entitled to reject the file, and the ones that accept it have no
