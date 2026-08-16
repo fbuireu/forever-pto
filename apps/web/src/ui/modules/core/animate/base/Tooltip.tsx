@@ -14,8 +14,10 @@ import {
   type TooltipTriggerProps as TooltipTriggerPrimitiveProps,
 } from '../primitives/base/Tooltip';
 
+export const TOOLTIP_DELAY_MS = 200;
+
 type TooltipProviderProps = TooltipProviderPrimitiveProps & { delayDuration?: number };
-function TooltipProvider({ delay = 0, delayDuration, ...props }: TooltipProviderProps) {
+function TooltipProvider({ delay = TOOLTIP_DELAY_MS, delayDuration, ...props }: TooltipProviderProps) {
   const resolvedDelay = delayDuration ?? delay;
   return <TooltipProviderPrimitive delay={resolvedDelay} {...props} />;
 }

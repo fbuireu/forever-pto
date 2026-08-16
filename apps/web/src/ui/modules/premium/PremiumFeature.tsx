@@ -78,7 +78,7 @@ export const PremiumFeature = ({
           )}
         >
           {description && !inlineDescription ? (
-            <TooltipProvider delayDuration={200}>
+            <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className='relative inline-flex items-center justify-center rounded-[8px] border-[3px] border-[var(--frame)] bg-background p-2 rotate-[-4deg] shadow-[var(--shadow-brutal-3)]'>

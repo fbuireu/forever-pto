@@ -70,7 +70,7 @@ export const WorkdayCounter = () => {
     <div className='space-y-2 w-full'>
       <Label className='flex gap-2 text-sm font-mono font-normal'>
         <CalendarDays size={16} /> {t('title')}
-        <TooltipProvider delayDuration={200}>
+        <TooltipProvider>
           <Tooltip>
             <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
             <TooltipContent className='w-60 text-pretty'>{t('tooltip')}</TooltipContent>

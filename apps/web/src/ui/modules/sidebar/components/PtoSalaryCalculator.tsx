@@ -83,7 +83,7 @@ export const PtoSalaryCalculator = () => {
     <div className='space-y-2 w-full'>
       <div className='flex gap-2 text-sm font-normal'>
         <Euro size={16} /> {t('title')}
-        <TooltipProvider delayDuration={200}>
+        <TooltipProvider>
           <Tooltip>
             <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
             <TooltipContent className='w-60 text-pretty'>{t('tooltip')}</TooltipContent>

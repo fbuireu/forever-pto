@@ -37,12 +37,21 @@ vi.mock('../primitives/base/Tooltip', () => ({
   TooltipArrow: (props: ComponentProps<'div'>) => <div data-primitive='tooltip-arrow' {...props} />,
 }));
 
-import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider, TooltipTrigger } from './Tooltip';
+import {
+  TOOLTIP_DELAY_MS,
+  Tooltip,
+  TooltipContent,
+  TooltipInfoTrigger,
+  TooltipProvider,
+  TooltipTrigger,
+} from './Tooltip';
 
 describe('TooltipProvider', () => {
-  it('defaults delay to 0', () => {
+  it('defaults delay to the shared tooltip delay, so no call site repeats it', () => {
     const { container } = render(<TooltipProvider />);
-    expect(container.querySelector<HTMLElement>('[data-primitive="tooltip-provider"]')?.dataset.delay).toBe('0');
+    expect(container.querySelector<HTMLElement>('[data-primitive="tooltip-provider"]')?.dataset.delay).toBe(
+      String(TOOLTIP_DELAY_MS)
+    );
   });
 
   it('passes delayDuration as delay to the primitive', () => {

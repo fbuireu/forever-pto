@@ -160,7 +160,7 @@ export const CalendarExport = () => {
         >
           {t('includePto')}
         </Button>
-        <TooltipProvider delayDuration={200}>
+        <TooltipProvider>
           <Tooltip>
             <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
             <TooltipContent className='w-50 text-pretty'>{t('tooltip')}</TooltipContent>

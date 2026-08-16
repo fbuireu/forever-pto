@@ -57,7 +57,7 @@ export const CarryOverMonths = () => {
       <div className='space-y-2 w-full pb-4' data-tutorial='carry-over'>
         <label className='flex gap-2 my-2 text-sm font-mono font-normal' htmlFor='carry-over-months'>
           <SlidersHorizontal size={16} /> {t('title')}
-          <TooltipProvider delayDuration={200}>
+          <TooltipProvider>
             <Tooltip>
               <TooltipInfoTrigger aria-label={t('tooltipLabel')} />
               <TooltipContent className='w-50 text-pretty'>{t('tooltip')}</TooltipContent>

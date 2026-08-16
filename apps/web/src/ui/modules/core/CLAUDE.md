@@ -105,9 +105,15 @@ unconditionally, defaulting to `delay = 0` — and since `TooltipTrigger` resolv
 from the *nearest* provider, and a trigger is always inside a `Tooltip`, that inner provider shadowed every
 outer one. The `delayDuration={200}` written at all ten call sites, `SidebarProvider` included, was dead:
 every tooltip in the app opened instantly, not even at Base UI's own default. `Tooltip` now renders the
-primitive bare unless a `delay`/`delayDuration` is passed to it directly, so the ambient provider is the one
-that counts. A component in this layer that wraps its subtree in a context provider has to ask whether it is
-overriding one the caller set.
+primitive bare unless a `delay`/`delayDuration` is passed to it directly, so the nearest enclosing
+`TooltipProvider` is the one that counts. A component in this layer that wraps its subtree in a context
+provider has to ask whether it is overriding one the caller set.
+
+**There is no app-wide tooltip provider, and 200 ms is `TooltipProvider`'s own default.** The root layout
+mounts `BonesProvider`, `NextIntlClientProvider`, `AppThemeProvider` and `LazyMotionProvider` and no tooltip
+one, so every tooltip depends on a provider some ancestor happened to mint. All ten of those wrote
+`delayDuration={200}` by hand; the default carries it now and the call sites say nothing. Passing a delay
+still overrides it, which is what `Tooltip.test.tsx` pins.
 
 **`utils/cookie.ts` feature-detects the Cookie Store API and falls back to `document.cookie`.** The bare
 `cookieStore` global does not exist in Firefox, in Safari before 18.4, or in any insecure context, so the
