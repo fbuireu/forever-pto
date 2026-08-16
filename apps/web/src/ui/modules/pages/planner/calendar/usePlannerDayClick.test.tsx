@@ -1,9 +1,9 @@
-import { DayRefusal, type DayOutcome } from '@application/stores/types';
+import { type DayOutcome, DayRefusal } from '@application/stores/types';
+import en from '@i18n/messages/en.json';
 import { renderHook } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import en from '@i18n/messages/en.json';
 
 const { mockToastInfo, mockToastWarning, premiumKey } = vi.hoisted(() => ({
   mockToastInfo: vi.fn(),

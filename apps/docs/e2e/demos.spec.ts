@@ -13,7 +13,12 @@ const pages = (dir: string): string[] =>
 
 const demoPages = pages(DIST)
   .filter((path) => readFileSync(path, 'utf8').includes('data-demo'))
-  .map((path) => `/${relative(DIST, path).replaceAll('\\', '/').replace(/index\.html$/, '')}`)
+  .map(
+    (path) =>
+      `/${relative(DIST, path)
+        .replaceAll('\\', '/')
+        .replace(/index\.html$/, '')}`
+  )
   .sort();
 
 test('discovers the demo pages from what was built, so this suite cannot silently shrink', () => {
