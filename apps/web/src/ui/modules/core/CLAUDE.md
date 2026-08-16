@@ -17,7 +17,7 @@ change reaches.
 | Folder | Contents |
 | --- | --- |
 | `primitives/` | The plain layer: `Button.tsx`, `Card.tsx`, `Badge.tsx`, `Input.tsx`, `Textarea.tsx`, `Label.tsx`, `Table.tsx`, `Separator.tsx`, `Banner.tsx`, `Form.tsx` (react-hook-form context), `InputGroup.tsx`, `Command.tsx` (cmdk), `Combobox.tsx`, `FlagIcon.tsx`, `Progress.tsx`, `Slider.tsx`, `Sonner.tsx` (the toaster), `RichLink.tsx`. Plus `primitives/utils/helpers.ts` — one predicate, `hasFlag` |
-| `animate/primitives/` | Unstyled wrappers over `@base-ui/react`, the bottom of the animated stack: `animate/primitives/base/Dialog.tsx`, `Popover.tsx`, `Tooltip.tsx`, `Switch.tsx`; `animate/primitives/animate/MotionSlot.tsx`; `animate/primitives/texts/Rotating.tsx` |
+| `animate/primitives/` | Unstyled wrappers over `@base-ui/react`, the bottom of the animated stack, and internal to `animate/`: `animate/primitives/base/Dialog.tsx`, `Popover.tsx`, `Tooltip.tsx`; `animate/primitives/animate/MotionSlot.tsx` |
 | `animate/base/` | The styled, motion-aware components built on the layer above or directly on `@base-ui/react`: `Accordion.tsx`, `Checkbox.tsx`, `Collapsible.tsx`, `Dialog.tsx`, `DropdownMenu.tsx`, `Popover.tsx`, `Tooltip.tsx`, `Sidebar.tsx`, plus `animate/base/Drawer.tsx` (vaul) and `animate/base/Slot.tsx` |
 | `animate/components/` | Compositions with their own behaviour: `Counter.tsx`, `Tabs.tsx`, `FeatureList.tsx`, `RadialNav.tsx` |
 | `animate/effects/` | `AutoHeight.tsx` and `MotionHighlight.tsx` — behaviour applied to someone else's children |
@@ -25,7 +25,7 @@ change reaches.
 | `animate/text/` | `SlidingNumber.tsx` and `animate/text/Rotating.tsx` |
 | `animate/providers/` | `LazyMotionProvider.tsx` — a nine-line `LazyMotion` wrapper, mounted once in the locale layout |
 
-There is no `Switch` in `primitives/`; the only one is `animate/primitives/base/Switch.tsx`.
+There is no `Switch` in `primitives/`; the only one is `animate/base/Switch.tsx`.
 
 ## Conventions
 
@@ -132,17 +132,30 @@ away.
 pure re-export of it; the seven callers now import the implementation directly. Do not reintroduce a
 re-export — the no-barrel convention has no exception here.
 
-**There are two `Rotating.tsx` files and they are different components.**
-`animate/text/Rotating.tsx` exports `RotatingText`, a self-contained `AnimatePresence` cycle over a
-string array — that is the one `pages/planner/Summary.tsx` uses. `animate/primitives/texts/Rotating.tsx`
-exports only `RotatingTextContainer`, a context provider with no visual output. `shared/footer/components/DevFooter.tsx`
-imports one from each and nests them. Check the import path before assuming which you have.
+**There is one `Rotating.tsx` now, and there used to be two.** `animate/text/Rotating.tsx` exports
+`RotatingText`, a self-contained `AnimatePresence` cycle over a string array, and it supplies its own
+`overflow-hidden py-1` wrapper. A second file under `animate/primitives/texts/` exported `RotatingTextContainer`,
+described here as "a context provider with no visual output" — it was the opposite on both counts. It built
+its context with `const [RotatingTextProvider] = getStrictContext(…)`, discarding the consumer hook, and
+**nothing in `src/` ever read that context**; its only output was a redundant `div`. So its `useIsInView`
+subscription and its `setTimeout`+`setInterval` cycle re-rendered the footer forever while changing nothing
+on screen. `DevFooter` nested one inside the other and drove the emoji from a *third* interval of its own —
+random, not sequential, which is why it does not simply pass `EMOJIS` to `RotatingText` now. Deleting the
+container left the render identical.
 
-**`animate/primitives/` is reachable from outside, and is reached.** Nothing there is styled, so it
-was meant to stay internal to `animate/`, but `Switch` has no wrapper in `animate/base/` and so
-`sidebar/components/AllowPastDays.tsx` and `shared/cookie-consent/CookieConsentDialog.tsx` both import
-it directly. Giving Switch a styled wrapper in `animate/base/` is the fix; importing from
-`animate/primitives/` for anything else is not.
+**`animate/primitives/` is internal to `animate/`, and that is now true rather than aspirational.** It had
+three importers from outside. One was the no-op above. The other two took `Switch` — which was never an
+unstyled wrapper: it carried the full `border-[3px] border-[var(--frame)]` and `--shadow-brutal-3` treatment,
+so it was misfiled rather than merely leaked. It lives in `animate/base/Switch.tsx` now beside `Checkbox` and
+`Collapsible`, its two styled siblings, and it has the co-located test they have. The folder has zero
+external importers; keep it that way, and promote rather than reach in.
+
+`Switch`'s context was the same shape as the one above on a smaller scale: it published `isChecked`,
+`setIsChecked`, `isPressed` and `setIsPressed`, and `SwitchThumb` — the only consumer — reads `isPressed`
+alone. It carries `isPressed` and nothing else now. Note when reading its test that the controlled/
+uncontrolled behaviour is enforced *twice*: `useControlledState` and `SwitchPrimitives.Root`'s own `checked`
+prop both do it, so removing either one alone leaves the suite green. `useControlledState` earns its place
+for `onCheckedChange`, not for the rendered state.
 
 **`IconWrapper` still drops `persistOnAnimateEnd` when there is no parent context.** The two context
 values in `animate/icons/Icon.tsx` carry it, so a parent `AnimateIcon` reaches a nested icon, but the

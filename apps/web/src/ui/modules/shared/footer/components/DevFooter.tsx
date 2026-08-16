@@ -4,7 +4,6 @@ import { blueskyIcon } from '@ui/assets/icons/bluesky';
 import { buyMeACoffeeIcon } from '@ui/assets/icons/buyMeACoffee';
 import { githubIcon } from '@ui/assets/icons/github';
 import { linkedinIcon } from '@ui/assets/icons/linkedin';
-import { RotatingTextContainer } from '@ui/modules/core/animate/primitives/texts/Rotating';
 import { RotatingText } from '@ui/modules/core/animate/text/Rotating';
 import { Me } from '@ui/modules/pages/legal/Me';
 import { Icon } from '@ui/modules/shared/Icon';
@@ -64,9 +63,7 @@ export const DevFooter = () => {
     <div className='p-4 flex flex-col items-center justify-center gap-4'>
       <div className='text-sm flex items-baseline gap-1.5 text-muted-foreground text-center'>
         {t('madeWith')}
-        <RotatingTextContainer text={EMOJIS}>
-          <RotatingText text={currentEmoji} transition={{ type: 'spring', bounce: 0.5, stiffness: 300, duration: 2 }} />
-        </RotatingTextContainer>
+        <RotatingText text={currentEmoji} transition={{ type: 'spring', bounce: 0.5, stiffness: 300, duration: 2 }} />
         {t('by')}
         <span className='font-medium text-foreground hover:text-primary p-0 h-auto min-w-0'>
           <Me ariaLabel='Ferran Buireu' />

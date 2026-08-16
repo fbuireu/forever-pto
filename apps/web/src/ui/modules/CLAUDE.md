@@ -202,12 +202,11 @@ state is derived, not stored.
 `@base-ui/react` that `core/animate/base/*` builds on. `MotionSlot.tsx` there is the shared `asChild`
 mechanism used by `core/animate/effects/AutoHeight.tsx` and `core/animate/icons/Icon.tsx`.
 
-It was meant to be internal to `core/animate/`, and it is not: three files outside `core/` reach into it by
-alias today — `shared/cookie-consent/CookieConsentDialog.tsx` and `sidebar/components/AllowPastDays.tsx` both
-import `Switch` from `primitives/base/`, and `shared/footer/components/DevFooter.tsx` imports
-`RotatingTextContainer` from `primitives/texts/`. So it is a public surface in practice. Either promote what
-those three need into `core/animate/base/` and re-privatise the folder, or stop describing it as internal —
-what is not defensible is the current state, where the rule exists only in prose and is already broken.
+It is internal to `core/animate/`, and that is now true rather than aspirational — it has zero importers
+from outside. It had three. `DevFooter` took `RotatingTextContainer`, which turned out to publish into a
+context nothing read; it is deleted. `CookieConsentDialog` and `AllowPastDays` took `Switch`, which was never
+unstyled — it carried the full frame and shadow — so it moved up to `core/animate/base/` rather than getting
+a wrapper. Promote what a feature needs; do not reach in.
 
 `tutorial/DriverStyles.tsx` renders `null` and exists solely to make its CSS import lazy — `useTutorial.tsx`
 dynamic-imports it alongside the driver client so the tutorial stylesheet never lands in the initial

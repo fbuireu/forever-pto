@@ -307,6 +307,28 @@ describe('documentation does not point at things that are gone', () => {
     expect(offenders).toEqual([]);
   });
 
+  // `astro check` does not resolve a `@ui/…` specifier that points at nothing: moving Switch from
+  // animate/primitives/base/ to animate/base/ left SwitchDemo importing the old path, `astro check`
+  // reported zero errors, and only `astro build` failed — in the Docs workflow, after the app's own CI
+  // had gone green. The guides claim the `astro check` tail covers this seam; for a missing module it
+  // does not, and this is the cheaper place to catch it than a build is.
+  it('resolves every @ui specifier the docs sources import to a file that exists', () => {
+    const UI_SPECIFIER = /from\s*['"](@ui\/[^'"]+)['"]/g;
+    const dangling: string[] = [];
+
+    for (const file of trackedFiles.filter((path) => path.startsWith(`${DOCS}/src/`))) {
+      for (const [, specifier] of read(file).matchAll(UI_SPECIFIER)) {
+        const base = join(ROOT, WEB, 'src/ui', specifier.replace('@ui/', ''));
+        const resolved = [`${base}.tsx`, `${base}.ts`, `${base}/index.tsx`, `${base}/index.ts`, base].some(
+          (candidate) => existsSync(candidate)
+        );
+        if (!resolved) dangling.push(`${file} -> ${specifier}`);
+      }
+    }
+
+    expect(dangling).toEqual([]);
+  });
+
   // The wiki's copy-pasteable Usage blocks are the largest slice of the cross-package seam and the only
   // one nothing checked: `astro check` registers no MDX plugin, and the citation rules above match file
   // paths rather than exported symbols. A rename in apps/web silently published a wrong import.

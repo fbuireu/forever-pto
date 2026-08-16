@@ -1,4 +1,4 @@
-import { Switch } from '@ui/modules/core/animate/primitives/base/Switch';
+import { Switch } from '@ui/modules/core/animate/base/Switch';
 import { Label } from '@ui/modules/core/primitives/Label';
 import { useState } from 'react';
 import { Demo } from '../Demo';

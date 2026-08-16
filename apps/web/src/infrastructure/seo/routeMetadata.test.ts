@@ -17,8 +17,10 @@ const BASE_URL = 'https://forever-pto.com';
 beforeEach(() => {
   vi.clearAllMocks();
   mockGetPublicEnv.mockResolvedValue({ siteUrl: BASE_URL });
-  mockGetTranslations.mockImplementation(async ({ namespace }: { namespace: string }) => (key: string) =>
-    `[${namespace}:${key}]`
+  mockGetTranslations.mockImplementation(
+    async ({ namespace }: { namespace: string }) =>
+      (key: string) =>
+        `[${namespace}:${key}]`
   );
 });
 

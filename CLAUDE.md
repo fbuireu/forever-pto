@@ -199,6 +199,8 @@ passed the `CI` workflow, and failed in a workflow called **Docs** that does not
 *was* blocking depended on branch protection, and this repo has already been bitten once by the required
 checks not including the one that mattered.
 
+**What that tail does *not* cover is a `@ui/…` specifier pointing at nothing.** Moving a component between folders under `apps/web/src/ui/` left a demo importing the old path; `astro check` reported zero errors and only `astro build` failed, in the Docs workflow, after the app's CI had gone green. `tests/docs-consistency.test.ts` resolves every one of those specifiers now.
+
 ## Deploy
 
 Both packages deploy to Cloudflare Workers through wrangler, each from its own `wrangler.toml`. Wrangler

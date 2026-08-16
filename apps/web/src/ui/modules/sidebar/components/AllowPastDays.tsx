@@ -1,7 +1,7 @@
 'use client';
 
 import { useFiltersStore } from '@application/stores/filters';
-import { Switch } from '@ui/modules/core/animate/primitives/base/Switch';
+import { Switch } from '@ui/modules/core/animate/base/Switch';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { SidebarFieldLabel } from '@ui/modules/sidebar/components/SidebarFieldLabel';
 import { Undo2 } from 'lucide-react';

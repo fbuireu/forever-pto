@@ -14,10 +14,7 @@ import {
 import { type ComponentProps, useMemo, useState } from 'react';
 
 type SwitchContextType = {
-  isChecked: boolean;
-  setIsChecked: SwitchProps['onCheckedChange'];
   isPressed: boolean;
-  setIsPressed: (isPressed: boolean) => void;
 };
 
 const [SwitchProvider, useSwitch] = getStrictContext<SwitchContextType>('SwitchContext');
@@ -44,7 +41,7 @@ function Switch({
   ...props
 }: SwitchProps) {
   const [isPressed, setIsPressed] = useState(false);
-  const [isChecked, setIsChecked] = useControlledState({
+  const [, setIsChecked] = useControlledState({
     value: checked,
     defaultValue: defaultChecked,
     onChange: onCheckedChange,
@@ -52,10 +49,7 @@ function Switch({
 
   const switchChildren = children ?? <SwitchThumb />;
 
-  const switchContextValue = useMemo(
-    () => ({ isChecked, setIsChecked, isPressed, setIsPressed }),
-    [isChecked, setIsChecked, isPressed]
-  );
+  const switchContextValue = useMemo(() => ({ isPressed }), [isPressed]);
   return (
     <SwitchProvider value={switchContextValue}>
       <SwitchPrimitives.Root

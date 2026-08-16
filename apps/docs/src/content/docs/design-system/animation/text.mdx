@@ -1,6 +1,6 @@
 ---
 title: Text animations
-description: SlidingNumber — the odometer-style digit roller — and RotatingText, the interval word rotator, plus the newer RotatingTextContainer primitive.
+description: SlidingNumber — the odometer-style digit roller — and RotatingText, the interval word rotator.
 sidebar:
   order: 3
 ---
@@ -24,10 +24,6 @@ This is the number display inside [Counter](/design-system/animation/components/
 `RotatingText` (`apps/web/src/ui/modules/core/animate/text/Rotating.tsx`) cycles through an array of strings on a fixed interval (`duration`, default 2000 ms), fading/sliding each word in and out through `AnimatePresence` in `wait` mode. `y` (default `-50`) sets the vertical travel; `containerClassName` styles the clipping wrapper while the usual motion props spread onto the moving element. Passing a single string renders it statically.
 
 <RotatingTextDemo client:visible />
-
-### RotatingTextContainer
-
-A newer, context-based variant lives at `apps/web/src/ui/modules/core/animate/primitives/texts/Rotating.tsx`. `RotatingTextContainer` adds what the flat component lacks: a `delay` before the first rotation and in-view awareness (`inView`, `inViewMargin`, `inViewOnce` via `useIsInView`), exposing the current word through a strict context instead of rendering it directly. Both APIs currently coexist; prefer the flat `RotatingText` unless you need the in-view gating.
 
 ## Usage
 

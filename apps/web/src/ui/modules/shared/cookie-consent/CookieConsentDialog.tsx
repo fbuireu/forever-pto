@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@ui/modules/core/animate/base/Dialog';
-import { Switch } from '@ui/modules/core/animate/primitives/base/Switch';
+import { Switch } from '@ui/modules/core/animate/base/Switch';
 import { Button } from '@ui/modules/core/primitives/Button';
 import { Label } from '@ui/modules/core/primitives/Label';
 import { Info } from 'lucide-react';
