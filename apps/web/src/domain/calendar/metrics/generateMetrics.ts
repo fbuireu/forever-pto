@@ -2,6 +2,7 @@ import type { HolidayDTO } from '@application/dto/holiday/types';
 import type { Locale } from 'next-intl';
 import type { Bridge, Suggestion } from '../types';
 import { resolveSelectedDays } from '../utils/selection';
+import { windowMonthCount, windowQuarterCount } from '../window';
 import {
   calculateLongestVacation,
   calculateLongWeekends,
@@ -14,8 +15,6 @@ import {
   getTotalEffectiveDays,
   getValidBridges,
   getWorkedDaysPerMonth,
-  windowMonthCount,
-  windowQuarterCount,
 } from './utils/helpers';
 import { freeStreaks } from './utils/streaks';
 

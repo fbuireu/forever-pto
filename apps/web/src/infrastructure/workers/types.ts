@@ -34,10 +34,10 @@ export interface SerializedSuggestion {
 
 interface CalculateSuggestionsPayload {
   year: number;
+  carryOverMonths: number;
   ptoDays: number;
   holidays: SerializedHolidayDTO[];
   allowPastDays: boolean;
-  months: string[];
   strategy: string;
   locale: string;
   maxAlternatives: number;

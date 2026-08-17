@@ -34,13 +34,13 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 result:
 
 ```
-runPlanningPipeline({ year, ptoDays, autoSuggestCount?, holidays, manuallySelectedDays?,
-                      removedSuggestedDays?, allowPastDays, months, strategy, locale, maxAlternatives })
+runPlanningPipeline({ window, ptoDays, autoSuggestCount?, holidays, manuallySelectedDays?,
+                      removedSuggestedDays?, allowPastDays, strategy, locale, maxAlternatives })
   → { planned, suggestion, alternatives }
 ```
 
 It owns everything a run needs and a caller used to have to remember: clearing both caches, turning Manual
-Days into `manual-N` pseudo-Holidays, deriving `carryOverMonths` from `months.length`, computing
+Days into `manual-N` pseudo-Holidays, expanding the Planning Window into months, computing
 `effectivePtoDays`, short-circuiting when there is nothing to plan, and measuring the Suggestion and every
 Alternative with the same arguments. `planned: false` is the short circuit — the suggestion it carries is
 empty but its Metrics are real, measured by the engine, so no caller has to invent a zeroed object.
@@ -88,18 +88,33 @@ Efficiency figures depending on which path had last written the Metrics — togg
 enough to make the number jump. The mirrored blocks in `worker.test.ts` and `holidays.test.ts` pin it on both
 sides.
 
-Neither planning entry point takes a `year`: the Planning Window is carried entirely by `months`.
-`generateMetrics` is the one that needs it, because Max Work Streak and Worked Days per month are scoped to
-a single calendar year — see the trap below.
+**The Planning Window is two numbers, and `window.ts` is where they become months.** `PlanningWindow` is
+`{ year, carryOverMonths }` — the glossary term, with the shape it has always had — and
+`planningWindowMonths` expands it. `runPlanningPipeline` takes the window and expands it itself.
+
+It used to take `year` *and* `months: Date[]`, and the round trip that produced was the finding: the UI
+expanded `{ year, carryOverMonths }` with its own copy of `MONTHS_IN_YEAR`, serialised 12–24 `Date`s to ISO
+strings, the worker parsed them back, and the pipeline reversed the expansion with
+`Math.max(0, months.length - MONTHS_IN_YEAR)` using the *domain's* copy of the same constant. Both halves
+travelled, and **nothing checked they agreed**: a `year` of 2026 beside months built for 2025 would place
+the plan in one year and scope Max Work Streak, Worked Days per month and every `windowMonthIndex` bucket to
+the other, with no error and no way to see it. That is now unrepresentable. `serializeMonths`,
+`deserializeMonths`, the UI's duplicate constant and the UI's `getTotalMonths` are all gone with it.
+
+`window.test.ts` pins that the expansion and `windowMonthCount` agree, which is the property the two
+constants made possible to break; verified by desyncing them.
+
+`generateMetrics` still takes `year` and `carryOverMonths` separately, because Max Work Streak and Worked
+Days per month are scoped to a single calendar year — see the trap below.
 
 ## The pipeline, in order
 
 1. `generateSuggestions` drops Holidays that fall on a weekend. They are already Free Days, and keeping
    them would let a Bridge claim credit for absorbing a Saturday.
-2. `getAvailableWorkdays` walks each entry of `months` day by day and keeps the Workdays — not a weekend,
-   not a Holiday, not one of `removedDays`, and (unless `allowPastDays`) not before today. `months` *is*
-   the Planning Window: this function has no other notion of range, and a duplicated month yields
-   duplicated Workdays.
+2. `getAvailableWorkdays` walks each month of the expanded window day by day and keeps the Workdays — not
+   a weekend, not a Holiday, not one of `removedDays`, and (unless `allowPastDays`) not before today. It has
+   no other notion of range, and a duplicated month would yield duplicated Workdays — which is why the
+   expansion has one owner and callers no longer hand one in.
 3. `findBridges` generates candidates of 1, 2 and 3 consecutive Workdays, expands each candidate outwards
    through the Free Days on either side, computes `effectiveDays / ptoDaysNeeded`, and keeps the candidate
    only if that ratio reaches `EFFICIENCY.MINIMUM`. Duplicates are collapsed by their PTO-day set, keeping

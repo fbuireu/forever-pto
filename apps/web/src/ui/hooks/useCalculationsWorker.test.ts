@@ -39,7 +39,6 @@ vi.mock('@application/stores/holidays', () => ({
 
 vi.mock('@infrastructure/workers/utils/serializers', () => ({
   serializeHolidays: vi.fn(() => []),
-  serializeMonths: vi.fn((months: Date[]) => months.map((m) => m.toISOString())),
   deserializeSuggestion: vi.fn((s: unknown) => s),
 }));
 
@@ -72,7 +71,7 @@ const BASE_PARAMS = {
   year: 2025,
   ptoDays: 5,
   allowPastDays: false,
-  months: [new Date(2025, 0, 1)],
+  carryOverMonths: 0,
   strategy: 'grouped' as const,
   locale: 'en' as const,
 };

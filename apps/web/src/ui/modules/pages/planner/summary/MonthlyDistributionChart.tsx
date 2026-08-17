@@ -1,14 +1,14 @@
 'use client';
 
 import { formatDate } from '@application/shared/utils/dates';
-
+import { MONTHS_IN_YEAR } from '@domain/calendar/window';
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
 import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
 import { TrendingUp } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { getMonthNames, MONTHS_IN_YEAR } from '../utils/helpers';
+import { getMonthNames } from '../utils/helpers';
 import { COLOR_SCHEMES } from './const';
 
 interface MonthlyDistributionChartProps {

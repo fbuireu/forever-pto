@@ -19,7 +19,7 @@ this order; the layout adds `SiteTitle.tsx` and `SiteSubtitle.tsx` above them.
 | --- | --- |
 | `HolidaysList.tsx` | Tabs over `HolidaysTable.tsx`, one per Holiday Variant. The Custom tab is behind the Premium gate; the Regional tab is inert when the Region has no Holidays |
 | `ManagementBar.tsx` | Sticky host for `PlannerPanel.tsx`. On desktop it renders it inline; on mobile it renders it inside a `vaul` drawer |
-| `CalendarList.tsx` | Owns the Planning Window (`getTotalMonths`), the Holiday fetch and the worker trigger. Renders one `Calendar` per month |
+| `CalendarList.tsx` | Expands the Planning Window for rendering (`planningWindowMonths`, from `@domain/calendar/window`), owns the Holiday fetch and the worker trigger. Renders one `Calendar` per month. It no longer *owns* the window: the trigger sends `{ year, carryOverMonths }` and the engine expands its own |
 | `Legend.tsx` | Explains the day colours. Exports `Legend` *and* `LegendItems`, which `ManagementBar` reuses inside the mobile drawer |
 | `Summary.tsx` | Metric cards plus five charts, all five `dynamic()`-imported from here rather than from the route |
 | `Roadmap.tsx` | Feature map over `RadialNav` and `FeatureList` from `core/animate/components/` |
@@ -371,9 +371,11 @@ between this screen and the homepage used to be crossed and are not any more:
 - `getViewBoxFromSvg` moved out of `calendar/utils/helpers.ts` into `shared/utils/helpers.ts`, so
   `shared/Icon.tsx` no longer reaches into this screen.
 
-One import still points the other way, and it is a util rather than a component: `Troubleshooting.tsx`
-and `pages/homepage/sections/Hero.tsx` both read from this screen's `utils/`, for `getTotalMonths` and
-`MODIFIERS_CLASS_NAMES` respectively. Promote either to `shared/` before a third caller appears.
+One import still points the other way, and it is a util rather than a component:
+`pages/homepage/sections/Hero.tsx` reads `MODIFIERS_CLASS_NAMES` from this screen's `utils/`. Promote it to
+`shared/` before a second caller appears. `Troubleshooting.tsx` was the other one, for `getTotalMonths`; that
+function moved into `@domain/calendar/window` as `planningWindowMonths` and the component no longer needs it
+at all, because `generateSuggestions` takes the window rather than its expansion.
 
 ## Testing
 

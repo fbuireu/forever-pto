@@ -2,21 +2,20 @@ import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types'
 import type { Locale } from 'next-intl';
 import { generateAlternatives } from './alternatives/generateAlternatives';
 import { generateMetrics } from './metrics/generateMetrics';
-import { MONTHS_IN_YEAR } from './metrics/utils/helpers';
 import { generateSuggestions } from './suggestions/generateSuggestions';
 import type { FilterStrategy, MeasuredSuggestion, Suggestion } from './types';
 import { clearDateKeyCache, clearHolidayCache } from './utils/cache';
 import { findPlanningCandidates } from './utils/candidates';
+import { type PlanningWindow, planningWindowMonths } from './window';
 
 export interface PlanningInput {
-  year: number;
+  window: PlanningWindow;
   ptoDays: number;
   autoSuggestCount?: number;
   holidays: HolidayDTO[];
   manuallySelectedDays?: Date[];
   removedSuggestedDays?: Date[];
   allowPastDays: boolean;
-  months: Date[];
   strategy: FilterStrategy;
   locale: Locale;
   maxAlternatives: number;
@@ -29,14 +28,13 @@ export type PlanningResult =
 const MANUAL_DAY_NAME = 'Manual day';
 
 export function runPlanningPipeline({
-  year,
+  window,
   ptoDays,
   autoSuggestCount,
   holidays,
   manuallySelectedDays = [],
   removedSuggestedDays = [],
   allowPastDays,
-  months,
   strategy,
   locale,
   maxAlternatives,
@@ -44,7 +42,7 @@ export function runPlanningPipeline({
   clearDateKeyCache();
   clearHolidayCache();
 
-  const carryOverMonths = Math.max(0, months.length - MONTHS_IN_YEAR);
+  const months = planningWindowMonths(window);
   const manualPseudoHolidays: HolidayDTO[] = manuallySelectedDays.map((date, index) => ({
     id: `manual-${index}`,
     date,
@@ -60,13 +58,13 @@ export function runPlanningPipeline({
     metrics: generateMetrics({
       suggestion,
       locale,
-      year,
+      year: window.year,
       bridges: suggestion.bridges,
       holidays: holidaysWithManual,
       allowPastDays,
       manuallySelectedDays,
       removedSuggestedDays,
-      carryOverMonths,
+      carryOverMonths: window.carryOverMonths,
     }),
   });
 

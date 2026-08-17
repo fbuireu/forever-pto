@@ -3,7 +3,7 @@ import { runPlanningPipeline } from '@domain/calendar/pipeline';
 import { DEFAULT_FILTER_STRATEGY, isFilterStrategy } from '@domain/calendar/types';
 import { EN, isLocale } from '@infrastructure/i18n/locales';
 import { type CalculateSuggestionsRequest, WORKER_MESSAGE_TYPE, type WorkerResponse } from './types';
-import { deserializeHolidays, deserializeMonths, serializeSuggestionResult } from './utils/serializers';
+import { deserializeHolidays, serializeSuggestionResult } from './utils/serializers';
 
 globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
   const { type, requestId, payload } = e.data;
@@ -12,10 +12,10 @@ globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
 
   const {
     year,
+    carryOverMonths,
     ptoDays,
     holidays: rawHolidays,
     allowPastDays,
-    months: rawMonths,
     strategy,
     locale,
     maxAlternatives,
@@ -26,14 +26,13 @@ globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
 
   try {
     const { suggestion, alternatives } = runPlanningPipeline({
-      year,
+      window: { year, carryOverMonths },
       ptoDays,
       autoSuggestCount,
       holidays: deserializeHolidays(rawHolidays),
       manuallySelectedDays: manualDays.map(fromStoredInstant),
       removedSuggestedDays: removedDays.map(fromStoredInstant),
       allowPastDays,
-      months: deserializeMonths(rawMonths),
       strategy: isFilterStrategy(strategy) ? strategy : DEFAULT_FILTER_STRATEGY,
       locale: isLocale(locale) ? locale : EN,
       maxAlternatives,

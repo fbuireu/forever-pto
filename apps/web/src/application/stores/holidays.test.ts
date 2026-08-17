@@ -977,7 +977,7 @@ describe('generateSuggestions', () => {
     year: 2026,
     ptoDays: 5,
     allowPastDays: false,
-    months: [] as Date[],
+    carryOverMonths: 0,
     strategy: FilterStrategy.GROUPED,
     locale: 'en' as const,
   };
@@ -1045,7 +1045,7 @@ describe('generateSuggestions agrees with the worker', () => {
     year: 2026,
     ptoDays: 5,
     allowPastDays: false,
-    months: [] as Date[],
+    carryOverMonths: 0,
     strategy: FilterStrategy.GROUPED,
     locale: 'en' as const,
   };
@@ -1176,7 +1176,7 @@ describe('every Metrics writer measures against the same Planning Window', () =>
       year: 2026,
       ptoDays: 5,
       allowPastDays: false,
-      months: Array.from({ length: 14 }, (_, i) => new Date(2026, i, 1)),
+      carryOverMonths: 2,
       strategy: FilterStrategy.GROUPED,
       locale: 'en' as const,
     });

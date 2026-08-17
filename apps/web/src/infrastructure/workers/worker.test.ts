@@ -36,7 +36,7 @@ const sendMessage = (payload: Partial<CalculateSuggestionsRequest['payload']> = 
         },
       ],
       allowPastDays: false,
-      months: [new Date(2025, 0, 1).toISOString()],
+      carryOverMonths: 0,
       strategy: 'grouped',
       locale: 'en',
       maxAlternatives: 3,

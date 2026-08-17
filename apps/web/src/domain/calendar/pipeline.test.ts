@@ -5,9 +5,6 @@ import { FilterStrategy } from './types';
 
 const YEAR = 2025;
 
-const monthsFor = (carryOverMonths: number) =>
-  Array.from({ length: 12 + carryOverMonths }, (_, index) => new Date(YEAR, index, 1));
-
 const holiday = (id: string, date: Date): HolidayDTO => ({
   id,
   date,
@@ -17,11 +14,10 @@ const holiday = (id: string, date: Date): HolidayDTO => ({
 });
 
 const baseInput = {
-  year: YEAR,
+  window: { year: YEAR, carryOverMonths: 0 },
   ptoDays: 5,
   holidays: [holiday('new-year', new Date(YEAR, 0, 1)), holiday('epiphany', new Date(YEAR, 0, 6))],
   allowPastDays: true,
-  months: monthsFor(0),
   strategy: FilterStrategy.GROUPED,
   locale: 'en' as const,
   maxAlternatives: 2,
@@ -65,7 +61,11 @@ describe('runPlanningPipeline', () => {
     });
 
     it('sizes those Metrics to the Planning Window, not to a hard-coded twelve months', () => {
-      const { suggestion } = runPlanningPipeline({ ...baseInput, ptoDays: 0, months: monthsFor(3) });
+      const { suggestion } = runPlanningPipeline({
+        ...baseInput,
+        ptoDays: 0,
+        window: { year: YEAR, carryOverMonths: 3 },
+      });
 
       expect(suggestion.metrics.monthlyDist).toHaveLength(15);
       expect(suggestion.metrics.monthlyDist.every((count) => count === 0)).toBe(true);

@@ -19,7 +19,8 @@ Everything the user sees, plus the browser plumbing that feeds it: components, h
 ## Layer rules
 
 This layer may import from `@application/*` — stores, DTO types, `@application/i18n/navigation`, `@application/shared/utils/dates` — and from `@domain/calendar` a short list of **pure value helpers**: the `types`, `resolveSelectedDays`,
-`measureBudget`, and `windowMonthCount`/`windowMonthIndex` for the timeline strip. It must not reach into
+`measureBudget`, `windowMonthCount`/`windowMonthIndex` for the timeline strip, and `planningWindowMonths`,
+which `CalendarList` uses to render one `Calendar` per month of the Planning Window. It must not reach into
 the planning engine itself — no generator, no selector, no `findPlanningCandidates`: Suggestions are
 produced by the worker and read back from the holidays store. The line is between *arithmetic the engine
 happens to own* and *the act of planning*.

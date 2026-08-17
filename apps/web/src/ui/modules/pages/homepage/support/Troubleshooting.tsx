@@ -4,7 +4,6 @@ import { logClientError } from '@application/shared/utils/clientLog';
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { Button } from '@ui/modules/core/primitives/Button';
-import { getTotalMonths } from '@ui/modules/pages/planner/utils/helpers';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
@@ -42,9 +41,9 @@ export const Troubleshooting = () => {
 
           await generateSuggestions({
             year,
+            carryOverMonths,
             ptoDays,
             allowPastDays,
-            months: getTotalMonths({ carryOverMonths, year }),
             strategy,
             locale,
           });

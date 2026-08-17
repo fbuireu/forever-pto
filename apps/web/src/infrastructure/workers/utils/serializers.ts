@@ -10,10 +10,6 @@ export function serializeHolidays(holidays: HolidayDTO[]) {
   }));
 }
 
-export function serializeMonths(months: Date[]) {
-  return months.map((month) => month.toISOString());
-}
-
 function serializeBridge(bridge: Bridge) {
   return {
     ...bridge,
@@ -62,8 +58,4 @@ export function deserializeHolidays(holidays: SerializedHolidayDTO[]) {
     date: fromStoredInstant(holiday.date),
     variant: holiday.variant as HolidayDTO['variant'],
   }));
-}
-
-export function deserializeMonths(months: string[]) {
-  return months.map(fromStoredInstant);
 }

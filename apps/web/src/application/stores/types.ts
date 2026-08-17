@@ -5,9 +5,9 @@ import type { FiltersState } from './filters';
 
 export interface GenerateSuggestionsParams {
   year: number;
+  carryOverMonths: number;
   ptoDays: number;
   allowPastDays: boolean;
-  months: Date[];
   strategy: FilterStrategy;
   locale: Locale;
 }

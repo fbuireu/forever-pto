@@ -4,10 +4,8 @@ import type { Bridge, MeasuredSuggestion, Metrics } from '@domain/calendar/types
 import { describe, expect, it } from 'vitest';
 import {
   deserializeHolidays,
-  deserializeMonths,
   deserializeSuggestion,
   serializeHolidays,
-  serializeMonths,
   serializeSuggestionResult,
 } from './serializers';
 
@@ -52,17 +50,6 @@ describe('serializeHolidays', () => {
 
   it('returns an empty array for empty input', () => {
     expect(serializeHolidays([])).toEqual([]);
-  });
-});
-
-describe('serializeMonths', () => {
-  it('converts each Date to an ISO string', () => {
-    const month = new Date(2025, 0, 1);
-    expect(serializeMonths([month])).toEqual([month.toISOString()]);
-  });
-
-  it('returns an empty array for empty input', () => {
-    expect(serializeMonths([])).toEqual([]);
   });
 });
 
@@ -153,18 +140,5 @@ describe('deserializeHolidays', () => {
 
   it('returns empty array for empty input', () => {
     expect(deserializeHolidays([])).toEqual([]);
-  });
-});
-
-describe('deserializeMonths', () => {
-  it('converts ISO strings back to Dates', () => {
-    const month = new Date(2025, 0, 1);
-    const result = deserializeMonths([month.toISOString()]);
-    expect(result[0]).toBeInstanceOf(Date);
-    expect(result[0].getFullYear()).toBe(2025);
-  });
-
-  it('returns empty array for empty input', () => {
-    expect(deserializeMonths([])).toEqual([]);
   });
 });

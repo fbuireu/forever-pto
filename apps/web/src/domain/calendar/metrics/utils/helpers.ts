@@ -12,29 +12,22 @@ import {
 } from '@application/shared/utils/dates';
 import type { Locale } from 'next-intl';
 import type { Bridge } from '../../types';
+import {
+  MONTHS_IN_QUARTER,
+  MONTHS_IN_YEAR,
+  type PlanningWindow,
+  windowMonthCount,
+  windowQuarterCount,
+} from '../../window';
 import type { FreeStreak } from './streaks';
-
-export const MONTHS_IN_YEAR = 12;
-export const MONTHS_IN_QUARTER = 3;
 
 const LONG_BLOCK_MINIMUM_DAYS = 3;
 const LONG_WEEKEND_MINIMUM_DAYS = 3;
 
-export interface PlanningWindowShape {
-  year: number;
-  carryOverMonths: number;
-}
-
-export const windowMonthCount = ({ carryOverMonths }: Pick<PlanningWindowShape, 'carryOverMonths'>) =>
-  MONTHS_IN_YEAR + carryOverMonths;
-
-export const windowQuarterCount = (window: Pick<PlanningWindowShape, 'carryOverMonths'>) =>
-  Math.ceil(windowMonthCount(window) / MONTHS_IN_QUARTER);
-
-export const windowMonthIndex = (date: Date, { year }: Pick<PlanningWindowShape, 'year'>) =>
+export const windowMonthIndex = (date: Date, { year }: Pick<PlanningWindow, 'year'>) =>
   (getYear(date) - year) * MONTHS_IN_YEAR + getMonth(date);
 
-export function getMonthlyDist(days: Date[], window: PlanningWindowShape) {
+export function getMonthlyDist(days: Date[], window: PlanningWindow) {
   const monthlyDist = new Array(windowMonthCount(window)).fill(0);
   days.forEach((date) => {
     const index = windowMonthIndex(date, window);
@@ -45,7 +38,7 @@ export function getMonthlyDist(days: Date[], window: PlanningWindowShape) {
 
 interface GetLongBlocksPerQuarterParams {
   streaks: FreeStreak[];
-  window: PlanningWindowShape;
+  window: PlanningWindow;
 }
 
 export function getLongBlocksPerQuarter({ streaks, window }: GetLongBlocksPerQuarterParams) {
@@ -164,7 +157,7 @@ export const getFirstLastBreak = ({ dates, locale }: GetFirstLastBreak) => {
   };
 };
 
-export const calculateQuarterDistribution = (dates: Date[], window: PlanningWindowShape) => {
+export const calculateQuarterDistribution = (dates: Date[], window: PlanningWindow) => {
   const quarters = new Array(windowQuarterCount(window)).fill(0);
 
   dates?.forEach((date) => {

@@ -2,6 +2,7 @@
 
 import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
+import { planningWindowMonths } from '@domain/calendar/window';
 import { useCalculationsWorker } from '@ui/hooks/useCalculationsWorker';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { TUTORIAL_ANCHOR } from '@ui/modules/tutorial/anchors';
@@ -13,7 +14,6 @@ import { useShallow } from 'zustand/react/shallow';
 import { Calendar, CalendarSelectionMode } from './calendar/Calendar';
 import { CalendarListFixture } from './calendar/CalendarListFixture';
 import { usePlannerDayClick } from './calendar/usePlannerDayClick';
-import { getTotalMonths } from './utils/helpers';
 
 export const CalendarList = () => {
   const locale = useLocale();
@@ -64,7 +64,7 @@ export const CalendarList = () => {
 
   const { triggerCalculation } = useCalculationsWorker();
 
-  const months = useMemo(() => getTotalMonths({ carryOverMonths, year }), [carryOverMonths, year]);
+  const months = useMemo(() => planningWindowMonths({ carryOverMonths, year }), [carryOverMonths, year]);
 
   const toggleDay = useCallback(
     (date: Date) => toggleDaySelection({ date, totalPtoDays: ptoDays, locale, allowPastDays }),
@@ -89,13 +89,13 @@ export const CalendarList = () => {
 
     triggerCalculation({
       year,
+      carryOverMonths,
       ptoDays,
       allowPastDays,
-      months,
       strategy,
       locale,
     });
-  }, [triggerCalculation, canCalculate, year, ptoDays, allowPastDays, months, strategy, locale, planRevision]);
+  }, [triggerCalculation, canCalculate, year, carryOverMonths, ptoDays, allowPastDays, strategy, locale, planRevision]);
 
   useEffect(() => {
     if (!canCalculate && suggestion) clearCalculation();

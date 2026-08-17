@@ -1,7 +1,6 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import {
   addDays,
-  addMonths,
   type Day,
   eachDayOfInterval,
   eachWeekendOfInterval,
@@ -12,24 +11,12 @@ import {
   startOfMonth,
   startOfWeek,
 } from '@application/shared/utils/dates';
+import { MONTHS_IN_YEAR } from '@domain/calendar/window';
 import type { FromTo } from '../calendar/Calendar';
 
 const CALENDAR_WEEKS = 6;
 const DAYS_PER_WEEK = 7;
 const CALENDAR_SIZE = CALENDAR_WEEKS * DAYS_PER_WEEK;
-
-export const MONTHS_IN_YEAR = 12;
-
-interface GetTotalMonthsParams {
-  carryOverMonths: number;
-  year: number;
-}
-export const getTotalMonths = ({ carryOverMonths, year }: GetTotalMonthsParams) => {
-  const totalMonths = MONTHS_IN_YEAR + carryOverMonths;
-  const start = startOfMonth(new Date(year, 0, 1));
-
-  return Array.from({ length: totalMonths }, (_, i) => addMonths(start, i));
-};
 
 interface GetCalendarDaysParams {
   month: Date;

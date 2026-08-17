@@ -7,7 +7,7 @@ import {
   WORKER_MESSAGE_TYPE,
   type WorkerResponse,
 } from '@infrastructure/workers/types';
-import { deserializeSuggestion, serializeHolidays, serializeMonths } from '@infrastructure/workers/utils/serializers';
+import { deserializeSuggestion, serializeHolidays } from '@infrastructure/workers/utils/serializers';
 import { useCallback, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -89,10 +89,10 @@ export function useCalculationsWorker() {
         requestId,
         payload: {
           year: params.year,
+          carryOverMonths: params.carryOverMonths,
           ptoDays: params.ptoDays,
           holidays: serializeHolidays(holidays),
           allowPastDays: params.allowPastDays,
-          months: serializeMonths(params.months),
           strategy: params.strategy,
           locale: params.locale,
           maxAlternatives,

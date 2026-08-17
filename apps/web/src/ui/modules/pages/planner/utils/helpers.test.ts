@@ -7,7 +7,6 @@ import {
   calculateWorkdays,
   getCalendarDays,
   getMonthNames,
-  getTotalMonths,
 } from './helpers';
 
 const holiday = (date: Date): HolidayDTO => ({
@@ -16,27 +15,6 @@ const holiday = (date: Date): HolidayDTO => ({
   name: 'Holiday',
   variant: HolidayVariant.NATIONAL,
   isInSelectedRange: true,
-});
-
-describe('getTotalMonths', () => {
-  it('returns twelve months for a window with no carry-over', () => {
-    const months = getTotalMonths({ carryOverMonths: 0, year: 2025 });
-    expect(months).toHaveLength(12);
-    expect(months[0]).toEqual(new Date(2025, 0, 1));
-    expect(months[11]).toEqual(new Date(2025, 11, 1));
-  });
-
-  it('extends into the following year by the carry-over months', () => {
-    const months = getTotalMonths({ carryOverMonths: 3, year: 2025 });
-    expect(months).toHaveLength(15);
-    expect(months[12]).toEqual(new Date(2026, 0, 1));
-    expect(months[14]).toEqual(new Date(2026, 2, 1));
-  });
-
-  it('never emits a month twice, so a Workday cannot be enumerated twice', () => {
-    const months = getTotalMonths({ carryOverMonths: 12, year: 2025 });
-    expect(new Set(months.map((month) => month.getTime())).size).toBe(months.length);
-  });
 });
 
 describe('getMonthNames', () => {

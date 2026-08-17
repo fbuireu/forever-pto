@@ -154,9 +154,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
         generateSuggestions: async ({
           year,
+          carryOverMonths,
           ptoDays,
           allowPastDays,
-          months,
           strategy,
           locale,
           autoSuggestCount,
@@ -167,14 +167,13 @@ export const useHolidaysStore = create<HolidaysStore>()(
             const { runPlanningPipeline } = await import('@domain/calendar/pipeline');
 
             const { planned, suggestion, alternatives } = runPlanningPipeline({
-              year,
+              window: { year, carryOverMonths },
               ptoDays,
               autoSuggestCount,
               holidays: holidayDTO.normalize(holidays),
               manuallySelectedDays,
               removedSuggestedDays,
               allowPastDays,
-              months,
               strategy,
               locale,
               maxAlternatives,
