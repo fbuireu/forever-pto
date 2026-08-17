@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { holidayDTO } from './dto';
-import type { HolidayDTO, RawHoliday } from './types';
+import type { RawHoliday } from './types';
 import { HolidayVariant } from './types';
 
 const REGIONS = [{ value: 'CAT', label: 'Catalonia' }];
@@ -181,51 +181,5 @@ describe('holidayDTO.createCustom', () => {
   it('marks isInSelectedRange=true for a carry-over date within carryOverMonths', () => {
     const result = holidayDTO.createCustom({ ...BASE, date: new Date('2025-02-01'), carryOverMonths: 3 });
     expect(result.isInSelectedRange).toBe(true);
-  });
-});
-
-describe('holidayDTO.normalize', () => {
-  it('returns an empty array for empty input', () => {
-    expect(holidayDTO.normalize([])).toEqual([]);
-  });
-
-  it('converts string dates to Date instances', () => {
-    const holidays = [
-      {
-        id: 'h1',
-        name: 'Test',
-        date: '2024-06-15' as unknown as Date,
-        variant: HolidayVariant.NATIONAL,
-        isInSelectedRange: true,
-      },
-    ] as HolidayDTO[];
-    const [result] = holidayDTO.normalize(holidays);
-    expect(result?.date).toBeInstanceOf(Date);
-  });
-
-  it('preserves Date instances unchanged', () => {
-    const date = new Date('2024-06-15');
-    const holidays = [
-      { id: 'h1', name: 'Test', date, variant: HolidayVariant.NATIONAL, isInSelectedRange: true },
-    ] as HolidayDTO[];
-    const [result] = holidayDTO.normalize(holidays);
-    expect(result?.date.getTime()).toBe(date.getTime());
-  });
-
-  it('preserves all other fields', () => {
-    const holidays = [
-      {
-        id: 'h1',
-        name: 'Test',
-        date: new Date('2024-06-15'),
-        variant: HolidayVariant.REGIONAL,
-        location: 'CAT',
-        isInSelectedRange: false,
-      },
-    ] as HolidayDTO[];
-    const [result] = holidayDTO.normalize(holidays);
-    expect(result?.id).toBe('h1');
-    expect(result?.location).toBe('CAT');
-    expect(result?.isInSelectedRange).toBe(false);
   });
 });

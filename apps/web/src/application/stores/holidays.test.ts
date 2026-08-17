@@ -60,7 +60,6 @@ vi.mock('@application/dto/holiday/dto', async (importOriginal) => ({
       variant: HolidayVariant.CUSTOM,
       isInSelectedRange: true,
     })),
-    normalize: vi.fn((holidays: HolidayDTO[]) => holidays),
   },
 }));
 

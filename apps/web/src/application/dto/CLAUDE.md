@@ -55,7 +55,27 @@ there are none today.
 - `createCustom` — builds a Custom Holiday from what the user typed, rather than from upstream data. It
   takes no `locale`: its id is an ISO datetime, built by `isoDateTime` directly rather than through
   `formatDate`, which returned on that format before ever reading a locale.
-- `normalize` — coerces `date` back into a `Date`, passing every other field through untouched. Its one caller is the holidays store's `generateSuggestions`, which runs it over the merged Holiday list immediately before handing it to the engine: Manual Days arrive as pseudo-Holidays built in the store and rehydrated state arrives with dates as strings, so the array reaching the planner is otherwise not uniformly typed. It is **not** part of rehydration — `onRehydrateStorage` revives its own dates through `fromStoredInstant` and never touches this DTO. Deleting `normalize` after checking the rehydration path would break the planner, not dead code.
+**`normalize` is gone, and the paragraph that used to sit here said deleting it "would break the planner,
+not dead code".** That was true when it was written and had stopped being true. Its stated reasons were that
+Manual Days arrive as pseudo-Holidays built in the store and that rehydrated state arrives with dates as
+strings. Neither holds: `runPlanningPipeline` builds the `manual-N` pseudo-Holidays now, and
+`onRehydrateStorage` revives `state.holidays` through `fromStoredInstant` before anything can read them.
+
+There are exactly four producers of a `HolidayDTO` — `create`, `createCustom`, the worker's
+`deserializeHolidays`, and the rehydration revive — and all four hand back a real `Date`. So `normalize` was
+the identity function, and its one caller ran it over an array that was already uniform.
+
+**Nothing could have told you that from the tests**, which is the part worth remembering. Its own four cases
+included one asserting the coercion, written as `date: '2024-06-15' as unknown as Date` — a cast whose only
+purpose is to defeat the type the code does not believe. And `holidays.test.ts` mocked `normalize` to the
+identity function, so the store test could not distinguish "essential" from "no-op" either. Both are gone
+with it.
+
+The invariant that replaces it is pinned where it is actually established: `holidays.test.ts` round-trips a
+persisted Holiday through real `JSON.parse(JSON.stringify(...))` and asserts `state.holidays[0].date` comes
+back `instanceof Date`. That is a boundary test over the real serialiser rather than a coercion applied on
+the way past. If a producer is ever added that hands back a string, the fix is to type the persisted shape,
+not to reinstate a runtime sweep.
 
 `Raw*` types must not escape this folder. If a `RawHoliday` shows up in a store or a component, a mapping step was skipped.
 

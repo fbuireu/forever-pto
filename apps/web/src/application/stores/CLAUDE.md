@@ -139,8 +139,8 @@ There are two ways a plan gets calculated, and they are two *callers* of `runPla
 
 Everything that used to be restated on both sides — clearing the caches, building the `manual-N`
 pseudo-Holidays, deriving `carryOverMonths`, `effectivePtoDays`, the empty guard, measuring the Suggestion and
-each Alternative — is inside the pipeline. What is left here is genuinely this side's: reading the store,
-normalising the Holidays through `holidayDTO.normalize`, and deciding what "nothing to plan" writes to state.
+each Alternative — is inside the pipeline. What is left here is genuinely this side's: reading the store
+and deciding what "nothing to plan" writes to state.
 
 **`checkExistingSession` clears Premium only on an authoritative "no session", never on a failed check.**
 `getExistingSession` returns `null` when the server answered and said there is no session — a genuine

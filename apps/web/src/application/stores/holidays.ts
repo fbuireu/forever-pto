@@ -165,7 +165,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
               window: { year, carryOverMonths },
               ptoDays,
               autoSuggestCount,
-              holidays: holidayDTO.normalize(holidays),
+              holidays,
               manuallySelectedDays,
               removedSuggestedDays,
               allowPastDays,

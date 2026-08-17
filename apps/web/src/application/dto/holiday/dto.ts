@@ -27,7 +27,6 @@ export interface CreateCustomHolidayParams {
 
 type HolidayDTOShape = BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> & {
   createCustom: (params: CreateCustomHolidayParams) => HolidayDTO;
-  normalize: (holidays: HolidayDTO[]) => HolidayDTO[];
 };
 
 export interface PlanningWindowBounds {
@@ -79,8 +78,6 @@ export const holidayDTO: HolidayDTOShape = {
     variant: HolidayVariant.CUSTOM,
     isInSelectedRange: isInPlanningWindow({ date, year, carryOverMonths }),
   }),
-
-  normalize: (holidays: HolidayDTO[]) => holidays.map((h) => ({ ...h, date: fromStoredInstant(h.date) })),
 };
 
 export const holidaysInPlanningWindow = (holidays: HolidayDTO[] | undefined): HolidayDTO[] =>
