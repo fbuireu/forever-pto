@@ -2,7 +2,7 @@ import type { Bridge } from '@domain/calendar/types';
 import { FilterStrategy } from '@domain/calendar/types';
 import { clearDateKeyCache, clearHolidayCache } from '@domain/calendar/utils/cache';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { selectBridgesForStrategy, selectOptimalDaysFromBridges } from './selectors';
+import { selectBridgesForStrategy } from './selectors';
 
 beforeEach(() => {
   clearDateKeyCache();
@@ -125,16 +125,6 @@ describe('selectBridgesForStrategy', () => {
     expect(jan6Count).toBeLessThanOrEqual(1);
   });
 
-  it('BALANCED delegates to selectOptimalDaysFromBridges', () => {
-    const balanced = selectBridgesForStrategy({
-      bridges: [bridgeA, bridgeB],
-      targetPtoDays: 2,
-      strategy: FilterStrategy.BALANCED,
-    });
-    const optimal = selectOptimalDaysFromBridges({ bridges: [bridgeA, bridgeB], targetPtoDays: 2 });
-    expect(balanced.days.map((day) => day.toDateString())).toEqual(optimal.days.map((day) => day.toDateString()));
-  });
-
   it('returns days sorted chronologically', () => {
     const result = selectBridgesForStrategy({
       bridges: [bridgeC, bridgeA],
@@ -147,17 +137,18 @@ describe('selectBridgesForStrategy', () => {
   });
 });
 
-describe('selectOptimalDaysFromBridges', () => {
+describe('selectBridgesForStrategy, BALANCED', () => {
   it('returns empty result for empty bridges', () => {
-    const result = selectOptimalDaysFromBridges({ bridges: [], targetPtoDays: 5 });
+    const result = selectBridgesForStrategy({ bridges: [], targetPtoDays: 5, strategy: FilterStrategy.BALANCED });
     expect(result.days).toHaveLength(0);
     expect(result.bridges).toHaveLength(0);
   });
 
   it('selects bridges without exceeding targetPtoDays', () => {
-    const result = selectOptimalDaysFromBridges({
+    const result = selectBridgesForStrategy({
       bridges: [bridgeA, bridgeB, bridgeC],
       targetPtoDays: 2,
+      strategy: FilterStrategy.BALANCED,
     });
     const total = result.bridges.reduce((sum, b) => sum + b.ptoDaysNeeded, 0);
     expect(total).toBeLessThanOrEqual(2);
@@ -165,15 +156,24 @@ describe('selectOptimalDaysFromBridges', () => {
 
   it('does not select conflicting bridges', () => {
     const overlap = makeBridge([makeDate(2025, 1, 6)], 3);
-    const result = selectOptimalDaysFromBridges({ bridges: [bridgeA, overlap], targetPtoDays: 2 });
+    const result = selectBridgesForStrategy({
+      bridges: [bridgeA, overlap],
+      targetPtoDays: 2,
+      strategy: FilterStrategy.BALANCED,
+    });
     const jan6Count = result.days.filter((day) => day.toDateString() === new Date(2025, 0, 6).toDateString()).length;
     expect(jan6Count).toBe(1);
   });
 
   it('presorted keeps the caller ordering instead of re-scoring', () => {
     const bridges = [bridgeB, bridgeA];
-    const rescored = selectOptimalDaysFromBridges({ bridges, targetPtoDays: 2 });
-    const kept = selectOptimalDaysFromBridges({ bridges, targetPtoDays: 2, presorted: true });
+    const rescored = selectBridgesForStrategy({ bridges, targetPtoDays: 2, strategy: FilterStrategy.BALANCED });
+    const kept = selectBridgesForStrategy({
+      bridges,
+      targetPtoDays: 2,
+      presorted: true,
+      strategy: FilterStrategy.BALANCED,
+    });
     expect(rescored.days).toEqual(bridgeA.ptoDays);
     expect(kept.days).toEqual(bridgeB.ptoDays);
   });
@@ -181,20 +181,28 @@ describe('selectOptimalDaysFromBridges', () => {
   it('leaves the budget unspent when every remaining single-day bridge is already taken', () => {
     const highValue = makeBridge([makeDate(2025, 1, 20), makeDate(2025, 1, 21), makeDate(2025, 1, 22)], 9);
     const conflicting = makeBridge([makeDate(2025, 1, 20)], 3);
-    const result = selectOptimalDaysFromBridges({ bridges: [highValue, conflicting], targetPtoDays: 4 });
+    const result = selectBridgesForStrategy({
+      bridges: [highValue, conflicting],
+      targetPtoDays: 4,
+      strategy: FilterStrategy.BALANCED,
+    });
     expect(result.bridges).toHaveLength(1);
     expect(result.days).toEqual(highValue.ptoDays);
   });
 
   it('returns days sorted chronologically', () => {
-    const result = selectOptimalDaysFromBridges({ bridges: [bridgeC, bridgeA], targetPtoDays: 2 });
+    const result = selectBridgesForStrategy({
+      bridges: [bridgeC, bridgeA],
+      targetPtoDays: 2,
+      strategy: FilterStrategy.BALANCED,
+    });
     for (let i = 1; i < result.days.length; i++) {
       expect(result.days[i - 1].getTime()).toBeLessThanOrEqual(result.days[i].getTime());
     }
   });
 });
 
-describe('selectOptimalDaysFromBridges high-value first pass', () => {
+describe('the BALANCED ordering, high-value first', () => {
   it('takes the high-value block before the crowd of cheap bridges that would exhaust the budget', () => {
     const highValueThreeDaysNineEffective = makeBridge(
       [makeDate(2025, 4, 14), makeDate(2025, 4, 15), makeDate(2025, 4, 16)],
@@ -204,20 +212,35 @@ describe('selectOptimalDaysFromBridges high-value first pass', () => {
     const cheapTwo = makeBridge([makeDate(2025, 3, 3)], 3);
     const cheapThree = makeBridge([makeDate(2025, 5, 5)], 3);
 
-    const { bridges: selected } = selectOptimalDaysFromBridges({
+    const { bridges: selected } = selectBridgesForStrategy({
       bridges: [cheapOne, cheapTwo, cheapThree, highValueThreeDaysNineEffective],
       targetPtoDays: 3,
-      presorted: true,
+      strategy: FilterStrategy.BALANCED,
     });
 
     expect(selected).toContain(highValueThreeDaysNineEffective);
     expect(selected).toHaveLength(1);
   });
+
+  it('rescues a long block the score alone would have lost to three cheaper bridges', () => {
+    const block = makeBridge([makeDate(2025, 4, 14), makeDate(2025, 4, 15), makeDate(2025, 4, 16)], 9);
+    const cheap = [makeDate(2025, 2, 3), makeDate(2025, 3, 3), makeDate(2025, 5, 5)].map((day) => makeBridge([day], 6));
+
+    const { bridges: selected } = selectBridgesForStrategy({
+      bridges: [...cheap, block],
+      targetPtoDays: 3,
+      strategy: FilterStrategy.BALANCED,
+    });
+
+    expect(selected).toEqual([block]);
+  });
 });
 
 describe('BALANCED scoring formula', () => {
   const orderOf = (bridges: Bridge[]) =>
-    selectOptimalDaysFromBridges({ bridges, targetPtoDays: 99 }).bridges.map((bridge) => bridge.effectiveDays);
+    selectBridgesForStrategy({ bridges, targetPtoDays: 99, strategy: FilterStrategy.BALANCED }).bridges.map(
+      (bridge) => bridge.effectiveDays
+    );
 
   it('divides the span by ten so a long low-efficiency bridge cannot outscore a short efficient one', () => {
     const efficient = makeBridge([makeDate(2025, 2, 3)], 4);

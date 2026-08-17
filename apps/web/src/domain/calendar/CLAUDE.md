@@ -21,12 +21,13 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 | `utils/selection.ts` | `resolveSelectedDays` — folds Manual Days in and Removed Days out of a Suggestion's day list |
 | `utils/budget.ts` | `measureBudget` — how much of the PTO budget a plan has spent, and the Remaining Budget |
 | `suggestions/generateSuggestions.ts` | The entry point: Workdays → Bridges → Strategy selector → Suggestion |
-| `suggestions/utils/selectors.ts` | `selectBridgesForStrategy` (Grouped, Optimized) and `selectOptimalDaysFromBridges` (Balanced) |
+| `suggestions/utils/selectors.ts` | `STRATEGY_ORDERING` — one `Ordering` per Strategy — plus `selectGreedily`, the single walk they all feed, and `selectBridgesForStrategy` which composes the two |
+| `window.ts` | `PlanningWindow`, `planningWindowMonths`, `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER` and `windowMonthCount`/`windowQuarterCount` |
 | `pipeline.ts` | `runPlanningPipeline` — the whole run: caches, pseudo-Holidays, budget, the two planning calls and the Metrics |
 | `alternatives/generateAlternatives.ts` | Re-runs selection under seven different Bridge orderings to produce distinct Alternatives |
 | `metrics/generateMetrics.ts` | Assembles the `Metrics` object for a Suggestion or an Alternative |
 | `metrics/utils/streaks.ts` | `freeStreaks` — the one scan of the free-day runs the plan produces |
-| `metrics/utils/helpers.ts` | One function per metric — Long Weekends, Rest Blocks, Max Work Streak, Longest Vacation, Worked Days per month, quarterly and monthly distribution — plus `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER` and the three `window*` helpers that size those distributions |
+| `metrics/utils/helpers.ts` | One function per metric — Long Weekends, Rest Blocks, Max Work Streak, Longest Vacation, Worked Days per month, quarterly and monthly distribution — plus `windowMonthIndex`, which places a date in one of the buckets `window.ts` sizes |
 
 ## Public API
 
@@ -135,31 +136,47 @@ only the order the greedy pass walks them in.
 | --- | --- |
 | `GROUPED` | Most PTO Days first, Efficiency as the tie-break — longest blocks win |
 | `OPTIMIZED` | Efficiency first, but differences within `EFFICIENCY_COMPARISON_THRESHOLD` count as a tie and the longer stretch wins |
-| `BALANCED` | Scored, then selected in two passes |
+| `BALANCED` | Scored, then stably partitioned so high-value Bridges come first |
 
-`BALANCED` scores each Bridge as `(efficiency × 0.6 + effectiveDays / 10 × 0.4) × bonus`, where `bonus` is
-`MULTI_DAY_BONUS` for Bridges meeting both `HIGH_VALUE_THRESHOLD_*` and `BASE_SCORE` otherwise. The `/ 10`
-brings an absolute span onto the same scale as a ratio, so the two weights mean what they say. It then
-fills from the high-value Bridges first and only afterwards from the rest, so a crowd of one-day Bridges
-cannot squeeze out a long block.
+`BALANCED` scores each Bridge as `(efficiency × 0.6 + effectiveDays / VALUE_DIVISOR × 0.4) × bonus`, where
+`bonus` is `MULTI_DAY_BONUS` for Bridges meeting both `HIGH_VALUE_THRESHOLD_*` and `BASE_SCORE` otherwise.
+The divisor brings an absolute span onto the same scale as a ratio, so the two weights mean what they say.
+It then partitions that order so high-value Bridges come first, which is what stops a crowd of one-day
+Bridges squeezing out a long block — `selectors.test.ts` pins that with three 6-effective single-day Bridges
+that outscore a 3-day/9-effective block and lose to it anyway.
 
-**The two generators still disagree about an unknown Strategy value, and it is no longer reachable.**
-`generateSuggestions` looks the value up with `Object.hasOwn` and falls back to `DEFAULT_STRATEGY`, which is
-`GROUPED`; `generateAlternatives` routes anything that is not `BALANCED` into `selectBridgesForStrategy`,
-whose `switch` defaults to `selectOptimalDaysFromBridges`, so there an unknown value is selected *as*
-`BALANCED`. One bad string therefore produced a Grouped Suggestion beside Balanced Alternatives.
-`worker.ts` used to cast, and was the way in; it now narrows with `isFilterStrategy` from `types.ts` and
-falls back to `DEFAULT_FILTER_STRATEGY`.
+**A Strategy is an `Ordering`, and the greedy walk is written once.** `STRATEGY_ORDERING` maps each
+`FilterStrategy` to a `(bridges: Bridge[]) => Bridge[]`; `selectGreedily` walks whatever it is given, taking
+any Bridge that fits the remaining budget and reuses no date. That is the whole of selection.
 
-Both fallbacks stay. `selectBridgesForStrategy`'s `switch` default is not an error path — it is how
-`BALANCED` is dispatched, and `selectors.test.ts` asserts exactly that. `generateSuggestions`'
-`Object.hasOwn` is one line of depth against a caller that has not been type-checked. What was wrong was the
-cast at the seam, not the behaviour behind it.
+It was three dispatch sites over two functions: a lookup table in `generateSuggestions`, a `switch` in
+`selectors.ts` whose `default` *was* the BALANCED branch, and a ternary in `generateAlternatives`. A fourth
+Strategy meant editing all three and knowing that default was load-bearing rather than defensive. The greedy
+walk itself was written twice in one file, and BALANCED's "two passes" were not two: the second call shared
+the first's accumulator and its `total < target` guard was already enforced by the loop's own `break`, so it
+was a stable partition followed by one walk. It is now written as one.
 
-Those are the only two passes. A third used to run after them and could select nothing at all, because both
-earlier passes leave the budget short only when every remaining Bridge conflicts with one already taken.
-`selectors.test.ts` pins that state deliberately — leaving budget unspent is the correct outcome, not a gap
-to fill.
+An `Ordering` is an array transform rather than a comparator, which is why it survives the rotation case
+below that a comparator cannot express.
+
+**`byScore` no longer attaches the score to the Bridge.** It used to `map` each Bridge into
+`{ ...bridge, score }` and sort those, so a BALANCED Suggestion carried an undeclared `score` field on every
+Bridge it returned, across the wire and into the store. It scores into a side `Map` now and sorts the
+originals, which also keeps object identity — the thing that made the high-value test assert on identity and
+then fail once the ordering always ran.
+
+**The two generators used to disagree about an unknown Strategy value, and now cannot.**
+`generateSuggestions` looked the value up with `Object.hasOwn` and fell back to `GROUPED`, while
+`generateAlternatives` routed anything not `BALANCED` into a `switch` whose default *was* `BALANCED` — so one
+bad string produced a Grouped Suggestion beside Balanced Alternatives. There is one fallback now,
+`STRATEGY_ORDERING[strategy] ?? STRATEGY_ORDERING[GROUPED]`, reached by both, and
+`generateSuggestions.test.ts` pins that an unknown Strategy *plans* identically to `GROUPED` rather than
+merely that it routes somewhere. `worker.ts` narrows with `isFilterStrategy` before any of this and was the
+way in; the fallback is depth against a caller that has not been type-checked, not an error path.
+
+Leaving budget unspent is a correct outcome, not a gap to fill: the walk stops short only when every
+remaining Bridge conflicts with one already taken, and `selectors.test.ts` pins that state deliberately. A
+third pass used to run after the other two and could select nothing at all.
 
 ## Invariants and traps
 
@@ -209,8 +226,8 @@ month(date)`, so 5 January 2027 inside a 2026 window lands in bucket 12 rather t
 2026 — two months twelve months apart used to be added together. A date outside the window is dropped, not
 clamped.
 
-Neither planning entry point passes `carryOverMonths` on the wire: both derive it as `months.length -
-MONTHS_IN_YEAR`, because `months` already *is* the window. Charts must therefore treat these arrays as
+Both planning entry points pass `carryOverMonths` on the wire as itself now, rather than deriving it back
+out of a month array — see the Planning Window section above. Charts must treat these arrays as
 variable-length — `MonthlyDistributionChart` already did, and the two quarter charts index
 `COLOR_SCHEMES` modulo its length, since four brand colours no longer cover every bucket.
 
@@ -253,8 +270,15 @@ inert (both selectors add a Bridge only when its PTO Days are unused, so a selec
 distinct available Workdays) and giving it to `generateAlternatives` for symmetry would be a behaviour change
 wearing a tidy-up's clothes.
 
-**`presorted` is load-bearing.** `selectBridgesForStrategy` and `selectOptimalDaysFromBridges` re-sort
-their input unless the caller sets `presorted: true`. `generateAlternatives` exists to impose its own
+**`presorted` is load-bearing, and it now means what it says.** `selectBridgesForStrategy` applies the
+Strategy's `Ordering` unless the caller sets `presorted: true`.
+
+**That is a behaviour change for BALANCED Alternatives, and it is deliberate.** The flag used to skip only
+the scoring sort; the high-value partition ran regardless, inside the selector. So `generateAlternatives`
+supplied a diverse ordering for BALANCED and had it partly reordered underneath — the opposite of what the
+flag exists for, and it reduced the distinctness those Alternatives are generated to produce. The ordering
+is respected whole now. The set of BALANCED Alternatives a user sees shifts as a result; none of them
+becomes wrong. `generateAlternatives` exists to impose its own
 orderings, so without the flag every ordering would collapse back to the same greedy result and all seven
 "alternatives" would be identical.
 
@@ -405,7 +429,8 @@ behaviour change and expect the selector tests to move.
 | `SCORING.BASE_SCORE` | 1 | Neutral multiplier, applied when a Bridge does not qualify for the multi-day bonus |
 | `SCORING.MULTI_DAY_BONUS` | 1.5 | Multiplier applied to Bridges meeting both `HIGH_VALUE_THRESHOLD_*` |
 | `SCORING.EFFICIENCY` | 0.6 | Weight of the Efficiency term in the `BALANCED` score |
-| `SCORING.TOTAL_VALUE` | 0.4 | Weight of the span term (`effectiveDays / 10`) in the `BALANCED` score |
+| `SCORING.TOTAL_VALUE` | 0.4 | Weight of the span term (`effectiveDays / VALUE_DIVISOR`) in the `BALANCED` score |
+| `SCORING.VALUE_DIVISOR` | 10 | Brings an absolute span onto the same scale as an Efficiency ratio, so the two weights above mean what they say |
 | `SELECTION_WEIGHTS.HIGH_VALUE_THRESHOLD_DAYS` | 3 | PTO Days. At or above this a Bridge is "high value" for the two-pass selector |
 | `SELECTION_WEIGHTS.HIGH_VALUE_THRESHOLD_EFFECTIVE` | 9 | Effective Days. Same role, on the span rather than the cost — a Bridge must clear both |
 | `EFFICIENCY.ACCEPTABLE` | 2.5 | Efficiency ratio a Bridge must also reach to be "high value" in the `BALANCED` first pass |
@@ -422,9 +447,9 @@ Fixtures share January 2025 as their reference month, because its shape exercise
 is a Friday, Jan 4 and Jan 5 the weekend, Jan 6 to Jan 10 Monday through Friday, and the month holds 23
 Workdays. A new case belongs in that month unless it is specifically about year boundaries or quarters.
 
-`generateSuggestions.test.ts` is the exception: it wraps the two selectors in `vi.fn(actual.…)` spies rather
-than replacing them, so every other case still runs the real selection while the Strategy-to-selector wiring
-stays assertable.
+`generateSuggestions.test.ts` is the exception: it wraps `selectBridgesForStrategy` in a `vi.fn(actual.…)`
+spy rather than replacing it, so every other case still runs the real selection while the Strategy reaching
+the selector stays assertable.
 
 Any test whose subject reaches `getKey` or `createHolidaySet` **must** call `clearDateKeyCache()` and
 `clearHolidayCache()` in `beforeEach`. Without it a case inherits the previous case's Holiday set and

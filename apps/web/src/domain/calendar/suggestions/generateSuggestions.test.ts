@@ -5,7 +5,7 @@ import { FilterStrategy } from '../types';
 import { clearDateKeyCache, clearHolidayCache } from '../utils/cache';
 import { findPlanningCandidates } from '../utils/candidates';
 import { generateSuggestions } from './generateSuggestions';
-import { selectBridgesForStrategy, selectOptimalDaysFromBridges } from './utils/selectors';
+import { selectBridgesForStrategy } from './utils/selectors';
 
 const planSuggestions = ({
   ptoDays,
@@ -32,7 +32,6 @@ vi.mock('./utils/selectors', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./utils/selectors')>();
   return {
     selectBridgesForStrategy: vi.fn(actual.selectBridgesForStrategy),
-    selectOptimalDaysFromBridges: vi.fn(actual.selectOptimalDaysFromBridges),
   };
 });
 
@@ -157,26 +156,19 @@ describe('generateSuggestions', () => {
   });
 
   describe('strategy dispatch', () => {
-    it.each([[FilterStrategy.GROUPED], [FilterStrategy.OPTIMIZED]] as const)(
-      '%s routes to selectBridgesForStrategy with its own strategy',
+    it.each([[FilterStrategy.GROUPED], [FilterStrategy.OPTIMIZED], [FilterStrategy.BALANCED]] as const)(
+      'hands %s to the selector unchanged',
       (strategy) => {
         planSuggestions({ ...BASE, ptoDays: 3, strategy });
         expect(selectBridgesForStrategy).toHaveBeenCalledWith(expect.objectContaining({ strategy }));
-        expect(selectOptimalDaysFromBridges).not.toHaveBeenCalled();
       }
     );
 
-    it('BALANCED routes to selectOptimalDaysFromBridges', () => {
-      planSuggestions({ ...BASE, ptoDays: 3, strategy: FilterStrategy.BALANCED });
-      expect(selectOptimalDaysFromBridges).toHaveBeenCalledWith(expect.objectContaining({ targetPtoDays: 3 }));
-      expect(selectBridgesForStrategy).not.toHaveBeenCalled();
-    });
+    it('plans an unknown strategy as GROUPED, in the suggestion and in the alternatives alike', () => {
+      const unknown = planSuggestions({ ...BASE, ptoDays: 3, strategy: 'unknown' as FilterStrategy });
+      const grouped = planSuggestions({ ...BASE, ptoDays: 3, strategy: FilterStrategy.GROUPED });
 
-    it('falls back to GROUPED for an unknown strategy', () => {
-      planSuggestions({ ...BASE, ptoDays: 3, strategy: 'unknown' as FilterStrategy });
-      expect(selectBridgesForStrategy).toHaveBeenCalledWith(
-        expect.objectContaining({ strategy: FilterStrategy.GROUPED })
-      );
+      expect(unknown.days.map((day) => day.toDateString())).toEqual(grouped.days.map((day) => day.toDateString()));
     });
   });
 });

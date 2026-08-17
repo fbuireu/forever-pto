@@ -1,6 +1,5 @@
-import { selectBridgesForStrategy, selectOptimalDaysFromBridges } from '../suggestions/utils/selectors';
-import type { Bridge, Suggestion } from '../types';
-import { FilterStrategy } from '../types';
+import { selectBridgesForStrategy } from '../suggestions/utils/selectors';
+import type { Bridge, FilterStrategy, Suggestion } from '../types';
 import { getCombinationKey } from '../utils/cache';
 import type { PlanningCandidates } from '../utils/candidates';
 
@@ -48,10 +47,12 @@ export function generateAlternatives(params: GenerateAlternativesParams) {
       const rotateBy = attempt - sortingStrategies.length + 1;
       shuffledBridges.push(...shuffledBridges.splice(0, rotateBy % Math.max(shuffledBridges.length, 1)));
     }
-    const selection =
-      strategy === FilterStrategy.BALANCED
-        ? selectOptimalDaysFromBridges({ bridges: shuffledBridges, targetPtoDays: ptoDays, presorted: true })
-        : selectBridgesForStrategy({ bridges: shuffledBridges, targetPtoDays: ptoDays, strategy, presorted: true });
+    const selection = selectBridgesForStrategy({
+      bridges: shuffledBridges,
+      targetPtoDays: ptoDays,
+      strategy,
+      presorted: true,
+    });
     if (selection.days.length > 0) {
       const alternative: Suggestion = {
         days: selection.days.toSorted((a, b) => a.getTime() - b.getTime()),

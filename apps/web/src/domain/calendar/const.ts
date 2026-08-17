@@ -10,6 +10,7 @@ export const PTO_CONSTANTS = {
     MULTI_DAY_BONUS: 1.5,
     EFFICIENCY: 0.6,
     TOTAL_VALUE: 0.4,
+    VALUE_DIVISOR: 10,
   },
 
   SELECTION_WEIGHTS: {

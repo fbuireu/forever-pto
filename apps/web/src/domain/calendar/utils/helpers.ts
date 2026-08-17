@@ -3,7 +3,7 @@ import { addDays, differenceInDays, isWeekend, startOfToday } from '@application
 import { Temporal } from 'temporal-polyfill';
 import { PTO_CONSTANTS } from '../const';
 import type { Bridge } from '../types';
-import { createHolidaySet, getKey } from './cache';
+import { createHolidaySet, getCombinationKey, getKey } from './cache';
 
 interface AnalyzePotentialBridgesParams {
   ptoDays: Date[];
@@ -78,14 +78,21 @@ function analyzePotentialBridge({ ptoDays, holidaySet }: AnalyzePotentialBridges
   return null;
 }
 
+export const compareByEfficiency = (a: Bridge, b: Bridge) => {
+  const difference = b.efficiency - a.efficiency;
+
+  if (Math.abs(difference) > PTO_CONSTANTS.BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD) {
+    return difference;
+  }
+
+  return b.effectiveDays - a.effectiveDays;
+};
+
 function deduplicateBridges(bridges: Bridge[]) {
   const seen = new Map<string, Bridge>();
 
   for (const bridge of bridges) {
-    const key = bridge.ptoDays
-      .map((d) => getKey(d))
-      .sort((a, b) => a.localeCompare(b))
-      .join(',');
+    const key = getCombinationKey(bridge.ptoDays);
     const existing = seen.get(key);
 
     if (!existing || bridge.efficiency > existing.efficiency) {
@@ -177,13 +184,5 @@ export const findBridges = ({ availableWorkdays, holidays }: FindBridgesParams) 
     }
   }
 
-  const uniqueBridges = deduplicateBridges(bridges);
-
-  return uniqueBridges.sort((a, b) => {
-    const effDiff = b.efficiency - a.efficiency;
-    if (Math.abs(effDiff) > PTO_CONSTANTS.BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD) {
-      return effDiff;
-    }
-    return b.effectiveDays - a.effectiveDays;
-  });
+  return deduplicateBridges(bridges).sort(compareByEfficiency);
 };
