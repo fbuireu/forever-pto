@@ -38,6 +38,8 @@ type PremiumStore = PremiumState & PremiumActions;
 const STORAGE_NAME = 'premium-store';
 const STORAGE_VERSION = 1;
 
+let sessionCheckInFlight: Promise<void> | null = null;
+
 const premiumInitialState: PremiumState = {
   premiumKey: null,
   userEmail: null,
@@ -78,19 +80,26 @@ export const usePremiumStore = create<PremiumStore>()(
         checkExistingSession: async ({ force }: { force?: boolean } = {}) => {
           const { needsSessionCheck } = get();
           if (!needsSessionCheck && !force) return;
+          if (sessionCheckInFlight) return sessionCheckInFlight;
 
-          try {
-            const session = await getExistingSession();
-            set({
-              premiumKey: session?.premiumKey ?? null,
-              userEmail: session?.email ?? null,
-              lastVerified: Date.now(),
-              needsSessionCheck: false,
-            });
-          } catch (error) {
-            logClientError('Error checking existing session in premium store', error, { needsSessionCheck });
-            set({ lastVerified: Date.now(), needsSessionCheck: false });
-          }
+          sessionCheckInFlight = (async () => {
+            try {
+              const session = await getExistingSession();
+              set({
+                premiumKey: session?.premiumKey ?? null,
+                userEmail: session?.email ?? null,
+                lastVerified: Date.now(),
+                needsSessionCheck: false,
+              });
+            } catch (error) {
+              logClientError('Error checking existing session in premium store', error, { needsSessionCheck });
+              set({ lastVerified: Date.now(), needsSessionCheck: false });
+            } finally {
+              sessionCheckInFlight = null;
+            }
+          })();
+
+          return sessionCheckInFlight;
         },
 
         setEmail: (email: string) => {

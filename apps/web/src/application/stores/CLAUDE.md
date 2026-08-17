@@ -167,6 +167,18 @@ instead — so the wrapper's only callers were outside the folder its own rule g
 was its own test file. `logClient` remains for anything that is *not* an error, which is now the honest
 distinction between the two.
 
+**`checkExistingSession` answers one request for concurrent callers, and it had to learn to.**
+`needsSessionCheck` is cleared only *after* `await getExistingSession()`, and `PremiumFeature` runs the check
+in its own effect — at nine call sites, one of them per Holiday row. So every instance mounting in the same
+commit read `needsSessionCheck: true` and issued its own `GET /api/check-session`. A module-level in-flight
+promise now hands the same one back to every caller until it settles.
+
+The deduplication sits here rather than at the component on purpose. Hoisting the effect into a single mount
+is the other shape, and `modules/premium/PremiumSessionSync.tsx` already models it for the confirmation page
+— but the gate is mounted from several screens and moving the trigger risks a route where the check never
+runs at all. Fixing it in the store also covers every future caller. A gate component that *fetches* rather
+than *reads* is still the odd part; this makes it cheap rather than correct.
+
 **`checkExistingSession` clears Premium only on an authoritative "no session", never on a failed check.**
 `getExistingSession` returns `null` when the server answered and said there is no session — a genuine
 expiry, which should clear the stored `premiumKey` — and **throws** when the request itself failed. The two

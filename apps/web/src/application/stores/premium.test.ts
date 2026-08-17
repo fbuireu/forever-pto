@@ -167,6 +167,30 @@ describe('verifyEmail', () => {
 });
 
 describe('checkExistingSession', () => {
+  it('answers one request for concurrent callers, because every PremiumFeature mount asks', async () => {
+    const { getExistingSession } = await import('@ui/adapters/session/checkSession');
+    vi.mocked(getExistingSession).mockClear();
+    let settle: (value: { premiumKey: string; email: string }) => void = () => {};
+    vi.mocked(getExistingSession).mockReturnValueOnce(
+      new Promise((resolve) => {
+        settle = resolve;
+      })
+    );
+    usePremiumStore.setState({ needsSessionCheck: true, premiumKey: null });
+
+    const inFlight = [
+      usePremiumStore.getState().checkExistingSession(),
+      usePremiumStore.getState().checkExistingSession(),
+      usePremiumStore.getState().checkExistingSession(),
+    ];
+
+    settle({ premiumKey: 'pk_one', email: 'donor@example.com' });
+    await Promise.all(inFlight);
+
+    expect(getExistingSession).toHaveBeenCalledTimes(1);
+    expect(usePremiumStore.getState().premiumKey).toBe('pk_one');
+  });
+
   it('does nothing when needsSessionCheck is false', async () => {
     const { getExistingSession } = await import('@ui/adapters/session/checkSession');
     usePremiumStore.setState({ needsSessionCheck: false });
