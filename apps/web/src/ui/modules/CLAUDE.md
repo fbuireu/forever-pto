@@ -199,6 +199,21 @@ state inline at three separate call sites (the initial read, `onConsent` and `on
 mechanisms for one question is exactly how the category-versus-service bug below shipped; both now read
 `acceptedService`, through this module.
 
+**`utils/consent.ts` has a test now, and it reproduces the defect below.** The trio had none, against three
+shipped defects on record. Its cases pin the thing that went wrong: `isServiceConsented` is called with the
+*service* id and the category, `consentedAnalyticsServices` reports one service off while the other is on —
+which asking the category could not — and it covers every id the dialog config declares, so a gate can never
+read `undefined` for one. Swapping the service id for the category turns two of the five red.
+
+**Consent is *answered* one way and *notified* two, and that second part is structural rather than drift.**
+`CookieConsent.tsx` owns the config it hands to `CookieConsentLib.run`, so it reacts through that config's
+`onConsent`/`onChange` callbacks. `tracking/BetterStackTracking.tsx` is a separate component and cannot add a
+callback to someone else's config, so it listens for the `cc:onConsent`/`cc:onChange` window events the
+library dispatches. Collapsing the two would mean making `CookieConsent` listen for its own library's events
+instead of using the callbacks it already registers — plausible, but the callbacks fire synchronously with the
+decision and `updateGtagConsent` runs inside one, so the timing is not something a unit test can vouch for.
+Left as is, deliberately, and written down so it does not read as an oversight.
+
 **Consent is collected per service, so it has to be *read* per service.** The preferences dialog offers
 `ga4` and `betterStack` as separate switches, but both gates asked `acceptedCategory('analytics')`, which the
 library keeps true while *any* service in the category is on. Turning Google Analytics off and leaving Better
