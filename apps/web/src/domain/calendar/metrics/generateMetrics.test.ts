@@ -164,31 +164,6 @@ describe('generateMetrics', () => {
     expect(result.longBlocksPerQuarter).toEqual([1, 0, 0, 0]);
   });
 
-  it('measures bonus days against the days placed, not the budget', () => {
-    const bridge = {
-      startDate: makeDate(2025, 1, 4),
-      endDate: makeDate(2025, 1, 6),
-      ptoDaysNeeded: 1,
-      effectiveDays: 3,
-      efficiency: 3,
-      ptoDays: [makeDate(2025, 1, 6)],
-    };
-    const params = {
-      suggestion: { days: [makeDate(2025, 1, 6), makeDate(2025, 1, 20)] },
-      locale: LOCALE,
-      year: YEAR,
-      bridges: [bridge],
-      holidays: [],
-      allowPastDays: true,
-      manuallySelectedDays: [],
-      removedSuggestedDays: [makeDate(2025, 1, 20)],
-    };
-    const withoutBudget = generateMetrics(params);
-    const withBudget = generateMetrics({ ...params, totalPtoBudget: 10 });
-    expect(withoutBudget.bonusDays).toBe(2);
-    expect(withBudget.bonusDays).toBe(withoutBudget.bonusDays);
-  });
-
   it('scopes the year-wide metrics to the year passed in, not the year the first day falls in', () => {
     const carryOverDay = makeDate(2026, 1, 5);
     const params = {

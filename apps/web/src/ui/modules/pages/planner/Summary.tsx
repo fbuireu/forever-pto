@@ -7,6 +7,7 @@ import { useFiltersStore } from '@application/stores/filters';
 import { useHolidaysStore } from '@application/stores/holidays';
 import { useLocationStore } from '@application/stores/location';
 import { usePremiumStore } from '@application/stores/premium';
+import { measureGain } from '@domain/calendar/utils/budget';
 import { usePlanReadout } from '@ui/hooks/usePlanReadout';
 import { useStoresReady } from '@ui/hooks/useStoresReady';
 import { Clock } from '@ui/modules/core/animate/icons/Clock';
@@ -113,8 +114,7 @@ export const Summary = () => {
 
     const { metrics } = activeSuggestion;
     const effectiveDays = metrics.totalEffectiveDays;
-    const increment = effectiveDays - ptoDays;
-    const gain = ptoDays > 0 ? (increment / ptoDays) * 100 : 0;
+    const { overBudget: increment, gain } = measureGain({ totalEffectiveDays: effectiveDays, ptoDays });
     const placedDayCount = placedDays.length;
 
     const maxAlternative = Math.max(

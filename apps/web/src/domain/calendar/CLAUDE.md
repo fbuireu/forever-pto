@@ -281,9 +281,22 @@ and yields a distinct plan from the same order. Sorting afresh would return the 
 every Bridge overlapping `existingSuggestion` before it starts. That is what keeps the offered plans
 genuinely distinct, and also why a strong Bridge in the current plan cannot reappear in any Alternative.
 
-**Bonus Days are measured against days placed, not the budget.** `generateMetrics` computes
-`bonusDays = totalEffectiveDays − days.length`. `totalPtoBudget` is accepted so callers that already have
-it can pass it, and is deliberately ignored — the baseline is what the plan actually spent.
+**Bonus Days are measured against days placed, not the budget, and `generateMetrics` no longer takes the
+budget at all.** It computes `bonusDays = totalEffectiveDays − days.length`; the baseline is what the plan
+actually spent. It used to accept `totalPtoBudget` "so callers that already have it can pass it" and then
+never destructure it — an interface with a parameter and no behaviour behind it, which one caller dutifully
+supplied and one test existed only to confirm was discarded. Both are gone.
+
+**Gain is the budget-based twin, and it lives in `utils/budget.ts` beside `measureBudget`.** `measureGain`
+answers `{ overBudget, gain }` from `totalEffectiveDays` and the whole budget. It was six characters of
+arithmetic inside a `useMemo` in `Summary.tsx` — a [`CONTEXT.md`](../../../../../CONTEXT.md) term with no
+owner and no test — and the thing that makes it worth naming is the denominator: Gain divides by the
+**budget**, Efficiency by the **days placed**, so the two coincide only when the plan spends the budget in
+full. `budget.test.ts` pins that they part company, verified by swapping the denominator.
+
+`overBudget` is deliberately not called a Bonus Day. It is Gain's numerator measured against the budget,
+which is a different quantity from the glossary's Bonus Day, and the planner guide explains why the badge
+reading it says "over budget" and never the word bonus.
 
 **Removing one day of a Bridge discards the whole Bridge.** `getTotalEffectiveDays` keeps only Bridges
 whose every PTO Day is still selected — that filter is `getValidBridges`, shared so nothing can disagree

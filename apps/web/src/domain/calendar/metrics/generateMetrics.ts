@@ -27,7 +27,6 @@ interface GenerateMetricsParams {
   allowPastDays: boolean;
   manuallySelectedDays: Date[];
   removedSuggestedDays: Date[];
-  totalPtoBudget?: number;
   carryOverMonths?: number;
 }
 

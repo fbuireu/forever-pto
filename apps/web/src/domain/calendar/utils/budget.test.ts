@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { measureBudget } from './budget';
+import { measureBudget, measureGain } from './budget';
 
 const JAN = (day: number) => new Date(2025, 0, day);
 
@@ -51,5 +51,32 @@ describe('measureBudget', () => {
 
   it('answers for a plan that placed nothing at all', () => {
     expect(measureBudget({ ptoDays: 4 })).toEqual({ suggested: 0, manual: 0, spent: 0, remaining: 4 });
+  });
+});
+
+describe('measureGain', () => {
+  it('measures against the whole budget, not the days the plan placed', () => {
+    expect(measureGain({ totalEffectiveDays: 24, ptoDays: 10 })).toEqual({ overBudget: 14, gain: 140 });
+  });
+
+  it('answers zero rather than dividing by an empty budget', () => {
+    expect(measureGain({ totalEffectiveDays: 5, ptoDays: 0 })).toEqual({ overBudget: 5, gain: 0 });
+  });
+
+  it('goes negative when the plan returns less than the budget it was given', () => {
+    expect(measureGain({ totalEffectiveDays: 6, ptoDays: 10 })).toEqual({ overBudget: -4, gain: -40 });
+  });
+
+  it('parts company with Efficiency by whatever budget went unspent', () => {
+    const ptoDays = 10;
+    const placed = 8;
+    const totalEffectiveDays = 24;
+
+    const { gain } = measureGain({ totalEffectiveDays, ptoDays });
+    const efficiency = totalEffectiveDays / placed;
+
+    expect(gain).toBe(140);
+    expect(efficiency).toBe(3);
+    expect(gain / 100 + 1).not.toBe(efficiency);
   });
 });

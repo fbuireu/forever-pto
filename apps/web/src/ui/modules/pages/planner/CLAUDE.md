@@ -213,7 +213,7 @@ modal in `shared/contact/`. It also imports `contact.css`, which is global CSS, 
 `ptoDays` here is the *budget*, read from the filters store; the engine's `Metrics` are computed against the
 days the plan actually *placed* (`days.length` in `generateMetrics.ts`). So:
 
-- `gain` is `(totalEffectiveDays - ptoDays) / ptoDays * 100` — budget-based.
+- `gain` comes from `measureGain` in `@domain/calendar/utils/budget` — `(totalEffectiveDays - ptoDays) / ptoDays * 100`, budget-based. It was derived inline here until it got an owner and a test.
 - `metrics.averageEfficiency` is `totalEffectiveDays / days.length` — placed-based.
 - the badge on the Effective Days card shows `increment`, budget-based, while `yearSummary.totalBonusDays`
   further down shows `metrics.bonusDays`, placed-based.

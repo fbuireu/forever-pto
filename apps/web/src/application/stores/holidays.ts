@@ -417,7 +417,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
             manuallySelectedDays: updatedManualDays,
             removedSuggestedDays: updatedRemovedDays,
             carryOverMonths: useFiltersStore.getState().carryOverMonths,
-            totalPtoBudget: totalPtoDays,
           });
 
           set({

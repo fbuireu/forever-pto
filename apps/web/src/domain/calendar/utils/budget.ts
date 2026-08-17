@@ -30,3 +30,19 @@ export function measureBudget({
     remaining: Math.max(0, ptoDays - spent),
   };
 }
+
+interface MeasureGainParams {
+  totalEffectiveDays: number;
+  ptoDays: number;
+}
+
+export interface GainMeasure {
+  overBudget: number;
+  gain: number;
+}
+
+export function measureGain({ totalEffectiveDays, ptoDays }: MeasureGainParams): GainMeasure {
+  const overBudget = totalEffectiveDays - ptoDays;
+
+  return { overBudget, gain: ptoDays > 0 ? (overBudget / ptoDays) * 100 : 0 };
+}
