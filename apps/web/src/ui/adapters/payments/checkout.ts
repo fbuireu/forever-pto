@@ -1,6 +1,7 @@
 import type { CreatePaymentInput } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
 import { logClient } from '@application/shared/utils/clientLog';
+import { emailDomain } from '@application/shared/utils/redact';
 import { createPaymentAction } from '@infrastructure/actions/payment';
 import { PaymentError, PromoCodeError, type PromoCodeErrorCode } from '@infrastructure/errors';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
@@ -70,7 +71,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
     if (!paymentIntent) {
       logClient((logger) =>
         logger.warn('Payment confirmation resolved without a payment intent', {
-          emailDomain: email?.split('@')[1],
+          emailDomain: emailDomain(email),
           returnUrl,
         })
       );
@@ -94,7 +95,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
         logger.error('Session activation failed after payment', {
           statusCode: sessionResponse.status,
           reason: errorData.error,
-          emailDomain: email?.split('@')[1],
+          emailDomain: emailDomain(email),
           paymentIntentId: paymentIntent.id,
         })
       );
@@ -113,7 +114,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
     Effect.catchAll((error) => {
       logClient((logger) =>
         logger.logError('Payment confirmation error in checkout adapter', error, {
-          emailDomain: email?.split('@')[1],
+          emailDomain: emailDomain(email),
           returnUrl,
         })
       );

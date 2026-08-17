@@ -1,5 +1,6 @@
 import { paymentDataDTO } from '@application/dto/payment/dto';
 import type { NewPayment } from '@application/dto/payment/types';
+import { emailDomain } from '@application/shared/utils/redact';
 import { PAYMENT_SUCCEEDED } from '@domain/payment/events/types';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
@@ -65,10 +66,10 @@ export const activateWithPayment = ({
         ),
         Effect.tapError((e) =>
           Effect.sync(() => {
-            logger.error('Failed to save payment to DB', {
+            logger.warn('Failed to save payment to database, will use webhook fallback', {
               reason: e.message,
               paymentIntentId,
-              emailDomain: email?.split('@')[1],
+              emailDomain: emailDomain(email),
             });
           })
         ),
@@ -81,7 +82,7 @@ export const activateWithPayment = ({
             logger.error('Failed to update payment status', {
               reason: e.message,
               paymentIntentId,
-              emailDomain: email?.split('@')[1],
+              emailDomain: emailDomain(email),
             });
             return false;
           })

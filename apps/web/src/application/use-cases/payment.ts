@@ -1,6 +1,7 @@
 import { paymentDataDTO } from '@application/dto/payment/dto';
 import { type CreatePaymentInput, createPaymentSchema } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
+import { emailDomain } from '@application/shared/utils/redact';
 import { zodParse } from '@application/shared/utils/zodParse';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
@@ -97,7 +98,7 @@ export const createPayment = (
             logger.warn('Failed to save payment to database, will use webhook fallback', {
               reason: e.message,
               paymentIntentId: paymentIntent.id,
-              emailDomain: validated.email?.split('@')[1],
+              emailDomain: emailDomain(validated.email),
             });
           })
         )

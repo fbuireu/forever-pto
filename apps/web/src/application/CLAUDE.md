@@ -154,6 +154,26 @@ in both, so a document-wide `expect(html).not.toContain('&bcc=')` passes whateve
 button's `href` with a regex and asserts on that string alone. Both assertions were checked by reverting the
 template and watching them go red.
 
+## Logging a failed write
+
+**Never log an email address; log `emailDomain(email)`.** That rule was written out at nine sites as
+`email?.split('@')[1]` — in both use-cases that defer a write, the premium store and the checkout adapter,
+twice on a value already narrowed to non-null. `shared/utils/redact.ts` owns it now, and its test pins the
+part that matters: a value with no `@` answers `undefined` rather than falling back to the whole string, so a
+malformed address cannot leak through the redaction.
+
+**The severity follows whether there is a backstop, not which file the log sits in.** A deferred write that
+fails is logged and swallowed — the error channel is `never`, because the response has already gone out. What
+differed was the level: `payment.ts` warned "will use webhook fallback", `activatePremium.ts` errored, and
+both write the same payments row through the same repository with the same Stripe webhook behind them. They
+both warn now. `contact.ts` keeps `error` and that is the distinction: a lost contact write has no backstop,
+so it is genuinely lost.
+
+There is deliberately no `deferWrite` combinator. The three bodies compose differently — one is
+`Effect.suspend` over a single `catchAll`, one an `Effect.gen` with `tap`/`tapError`/`catchAll` over two
+writes — so a shared helper would need the message, the severity and the shape as parameters, which is as
+much interface as implementation.
+
 ## Testing
 
 Every module has a co-located `.test.ts`, with the type-only DTO folders as the deliberate exception (see

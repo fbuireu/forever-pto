@@ -1,6 +1,7 @@
 import type { ContactFormData } from '@application/dto/contact/schema';
 import { contactSchema } from '@application/dto/contact/schema';
 import { ContactFormEmail } from '@application/email/templates/Contact';
+import { emailDomain } from '@application/shared/utils/redact';
 import { zodParse } from '@application/shared/utils/zodParse';
 import type { TursoService } from '@infrastructure/clients/db/turso/service';
 import { ResendService } from '@infrastructure/clients/email/resend/service';
@@ -32,7 +33,7 @@ export const sendContactEmail = (
       try: () => render(ContactFormEmail({ ...validated, baseUrl: config.siteUrl })),
       catch: (error) => {
         logger.logError('Contact email render failed', error, {
-          emailDomain: validated.email?.split('@')[1],
+          emailDomain: emailDomain(validated.email),
           name: validated.name,
           subject: validated.subject,
         });
@@ -63,7 +64,7 @@ export const sendContactEmail = (
           Effect.sync(() => {
             logger.error('Failed to save contact to database', {
               reason: e.message,
-              emailDomain: validated.email?.split('@')[1],
+              emailDomain: emailDomain(validated.email),
               messageId: messageId ?? undefined,
             });
           })

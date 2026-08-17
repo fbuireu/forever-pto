@@ -1,4 +1,5 @@
 import { logClient, logClientError } from '@application/shared/utils/clientLog';
+import { emailDomain } from '@application/shared/utils/redact';
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
 import { getExistingSession, verifyPremiumEmail } from '@ui/adapters/session/checkSession';
 import { create } from 'zustand';
@@ -69,7 +70,7 @@ export const usePremiumStore = create<PremiumStore>()(
             return false;
           } catch (error) {
             logClientError('Error verifying premium email in premium store', error, {
-              emailDomain: email?.split('@')[1],
+              emailDomain: emailDomain(email),
               hasEmail: !!email,
             });
             set({ isLoading: false });
