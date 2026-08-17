@@ -1,5 +1,6 @@
 import { Logtail } from '@logtail/edge';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { LOG_SERVICE } from './contract';
 
 interface LogContext {
   [key: string]: unknown;
@@ -56,7 +57,7 @@ export class BetterStackClient {
   constructor(baseContext?: LogContext) {
     this.baseContext = {
       environment: process.env.NODE_ENV || 'development',
-      service: 'forever-pto',
+      service: LOG_SERVICE,
       ...baseContext,
     };
   }

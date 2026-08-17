@@ -1,5 +1,27 @@
 # apps/web/src/infrastructure/clients
 
+## The tail Worker and the app share one log contract
+
+`better-stack/contract.ts` holds `LOG_SERVICE`, the four levels the app emits and `toLogLevel`. It is types
+and constants only — deliberately, because `workers/tail/index.ts` imports it by relative path and must not
+pull `@logtail/edge` or `@opennextjs/cloudflare` into a Worker that has neither. `wrangler deploy --dry-run`
+over `workers/tail/wrangler.toml` confirms the bundle still builds at 1.87 KiB.
+
+Both sides ship to the same BetterStack source and **shared no queryable field**. The app stamps
+`{ environment, service: 'forever-pto' }` on every entry; the tail Worker stamped
+`{ script, outcome, url, method, status }` and neither of those two, so "all errors in production" could not
+be expressed in one query. The tail Worker stamps `service` now. `environment` stays out of it on purpose:
+that Worker is deployed once and receives events from every app Worker, so a fixed value would be wrong —
+`script` is the discriminator, carrying `forever-pto` or `pr-<n>-forever-pto-development`.
+
+**The level vocabularies also disagreed.** workerd emits `log` and `trace`, which the app never does, so a
+filter on `level` silently missed them. `toLogLevel` folds anything unrecognised onto `info`; `index.test.ts`
+pins `['log', 'warn', 'trace'] → ['info', 'warn', 'info']`.
+
+`stripQuery` is still local to the tail Worker, and it is the one thing that arguably should not be: it
+encodes "a URL logged off-worker must not carry its query string, because Stripe appends
+`payment_intent_client_secret` to the return URL" — a statement about this app's payment flow, living in a
+Worker that shares no other module with it. Nothing on the app side enforces the same rule.
 ## Purpose
 
 One folder per external SDK, and nothing else in the repo constructs one. Four of them are Effect services —

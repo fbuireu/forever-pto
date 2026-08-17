@@ -1,3 +1,5 @@
+import { LOG_LEVEL, LOG_SERVICE, toLogLevel } from '../../src/infrastructure/clients/logging/better-stack/contract';
+
 interface Env {
   BETTER_STACK_SOURCE_TOKEN: string;
   BETTER_STACK_INGESTING_URL: string;
@@ -33,6 +35,7 @@ export default {
   async tail(events: TailEvent[], env: Env): Promise<void> {
     const entries = events.flatMap((event) => {
       const base = {
+        service: LOG_SERVICE,
         script: event.scriptName,
         outcome: event.outcome,
         url: stripQuery(event.event?.request?.url),
@@ -42,14 +45,14 @@ export default {
 
       const logs = event.logs.map((log) => ({
         dt: new Date(log.timestamp).toISOString(),
-        level: log.level,
+        level: toLogLevel(log.level),
         message: log.message.map(String).join(' '),
         ...base,
       }));
 
       const exceptions = event.exceptions.map((ex) => ({
         dt: new Date(ex.timestamp).toISOString(),
-        level: 'error',
+        level: LOG_LEVEL.ERROR,
         message: `${ex.name}: ${ex.message}`,
         ...base,
       }));

@@ -198,8 +198,35 @@ describe('tail worker', () => {
       const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
       const body = JSON.parse(options.body as string);
       expect(body).toHaveLength(2);
-      expect(body[0].level).toBe('log');
+      expect(body[0].level).toBe('info');
       expect(body[1].level).toBe('error');
+    });
+
+    it("normalises workerd's own levels onto the four the app emits", async () => {
+      await worker.tail(
+        [
+          makeEvent({
+            logs: [
+              { message: ['a'], level: 'log', timestamp: 1 },
+              { message: ['b'], level: 'warn', timestamp: 2 },
+              { message: ['c'], level: 'trace', timestamp: 3 },
+            ],
+          }),
+        ],
+        ENV
+      );
+      const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
+      const body = JSON.parse(options.body as string);
+
+      expect(body.map((entry: { level: string }) => entry.level)).toEqual(['info', 'warn', 'info']);
+    });
+
+    it('stamps the same service field the app stamps, so one query reaches both streams', async () => {
+      await worker.tail([makeEvent({ logs: [{ message: ['x'], level: 'log', timestamp: 1 }] })], ENV);
+      const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
+      const [entry] = JSON.parse(options.body as string);
+
+      expect(entry.service).toBe('forever-pto');
     });
 
     it('sends exactly one fetch call regardless of the number of events', async () => {
