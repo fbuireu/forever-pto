@@ -1,11 +1,28 @@
+import type { generateMetrics } from '@domain/calendar/metrics/generateMetrics';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CalculateSuggestionsRequest } from './types';
 import { WORKER_MESSAGE_TYPE } from './types';
 
+const METRICS = {
+  longWeekends: 0,
+  restBlocks: 0,
+  maxWorkStreak: 0,
+  firstLastBreak: null,
+  averageEfficiency: 2,
+  bonusDays: 0,
+  quarterDist: [],
+  bridgesUsed: 0,
+  workedDaysPerMonth: 0,
+  totalEffectiveDays: 7,
+  monthlyDist: [],
+  longBlocksPerQuarter: [],
+  longestVacation: 0,
+};
+
 const mockFindPlanningCandidates = vi.hoisted(() => vi.fn());
 const mockGenerateSuggestions = vi.hoisted(() => vi.fn());
 const mockGenerateAlternatives = vi.hoisted(() => vi.fn());
-const mockGenerateMetrics = vi.hoisted(() => vi.fn());
+const mockGenerateMetrics = vi.hoisted(() => vi.fn<typeof generateMetrics>());
 const mockPostMessage = vi.hoisted(() => vi.fn());
 
 vi.mock('@domain/calendar/utils/candidates', () => ({ findPlanningCandidates: mockFindPlanningCandidates }));
@@ -55,7 +72,7 @@ describe('worker onmessage', () => {
     mockFindPlanningCandidates.mockReturnValue({ availableWorkdays: [], bridges: [] });
     mockGenerateSuggestions.mockReturnValue({ days: [new Date(2025, 2, 10)], bridges: [] });
     mockGenerateAlternatives.mockReturnValue([]);
-    mockGenerateMetrics.mockReturnValue({ efficiency: 2, totalDaysOff: 7 });
+    mockGenerateMetrics.mockReturnValue(METRICS);
   });
 
   it('ignores messages with unknown type', () => {
@@ -146,10 +163,10 @@ describe('worker onmessage', () => {
       removedDays: [new Date(2025, 2, 20).toISOString()],
       manualDays: [new Date(2025, 2, 5).toISOString()],
     });
-    const metricsHolidays = mockGenerateMetrics.mock.lastCall?.[0].holidays;
+    const [metricsArgs] = mockGenerateMetrics.mock.lastCall ?? [];
     const removed = new Date(2025, 2, 20);
-    expect(metricsHolidays.some((h: { date: Date }) => h.date.toDateString() === removed.toDateString())).toBe(false);
-    expect(metricsHolidays.some((h: { id: string }) => h.id === 'manual-0')).toBe(true);
+    expect(metricsArgs?.holidays.some(({ date }) => date.toDateString() === removed.toDateString())).toBe(false);
+    expect(metricsArgs?.holidays.some(({ id }) => id === 'manual-0')).toBe(true);
   });
 
   it('measures the metrics against the Manual Days too, not just the days it placed itself', () => {
@@ -157,9 +174,9 @@ describe('worker onmessage', () => {
     const removed = new Date(2025, 2, 20);
     sendMessage({ manualDays: [manual.toISOString()], removedDays: [removed.toISOString()] });
 
-    const metricsArgs = mockGenerateMetrics.mock.lastCall?.[0];
-    expect(metricsArgs.manuallySelectedDays.map((d: Date) => d.toDateString())).toEqual([manual.toDateString()]);
-    expect(metricsArgs.removedSuggestedDays.map((d: Date) => d.toDateString())).toEqual([removed.toDateString()]);
+    const [metricsArgs] = mockGenerateMetrics.mock.lastCall ?? [];
+    expect(metricsArgs?.manuallySelectedDays?.map((day) => day.toDateString())).toEqual([manual.toDateString()]);
+    expect(metricsArgs?.removedSuggestedDays?.map((day) => day.toDateString())).toEqual([removed.toDateString()]);
   });
 
   it('gives the alternatives the same day set as the base suggestion, so their metrics stay comparable', () => {

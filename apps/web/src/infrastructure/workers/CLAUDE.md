@@ -76,10 +76,28 @@ agree on, and `utils/serializers.ts` is the only place that converts. Adding a `
 that crosses here means adding it to the serialiser and to the wire type, or it arrives as a string typed as a
 `Date`.
 
-**`Metrics` is the one domain type reused verbatim.** `types.ts` imports `Metrics` from `@domain/calendar/types`
-rather than mirroring it, and that is safe only because `Metrics` holds no `Date` — every field is a number, a
-number array or a `{ first, last }` pair of strings. Put a `Date` in `Metrics` and `SerializedSuggestion`
-starts lying without a single type error.
+**`Metrics` is the one domain type reused verbatim, and a type now enforces what made that safe.**
+`types.ts` imports `Metrics` from `@domain/calendar/types` rather than mirroring it, which holds only while
+`Metrics` carries no `Date` — every field is a number, a number array or a `{ first, last }` pair of strings.
+Put one in and `SerializedSuggestion` claims a `Date` survives on a wire whose every sibling field was
+deliberately stringified.
+
+`MetricsHoldNoDate` in `types.ts` is that claim as a type: `DateFields<Metrics>` walks the shape, and the
+assertion resolves to `true` only when it finds none. An added `measuredAt?: Date` fails **one** line —
+`Type '"measuredAt"' does not satisfy the constraint 'true'` — in the file that makes the reuse, naming the
+field. Verified by adding exactly that.
+
+This replaces a test that could not fail for the reason it existed. `serializers.test.ts` guarded the
+invariant with `const EMPTY_METRICS = { averageEfficiency: 0 } as Metrics`, and no assertion in the file
+touched `metrics` at all, so a new field did not even redden the fixture. A round-trip test cannot catch a
+type claim; only a type can. The fixture is a real, fully populated `Metrics` now, which is separately worth
+having — it fails to compile when the shape changes.
+
+`worker.test.ts`'s metrics mock is `vi.fn<typeof generateMetrics>()`. It was untyped and returned
+`{ efficiency: 2, totalDaysOff: 7 }` — neither field exists on `Metrics`, and `totalDaysOff` is a name
+[`CONTEXT.md`](../../../../../CONTEXT.md) retired under **Effective Day**, so a reader learning the shape
+from that fixture learned two names that are not real. Typing it also typed the recorded arguments, which
+removed four hand-written `(h: { date: Date })` casts from the assertions below.
 
 **`SerializedSuggestion.metrics` is required, not optional, and the serialisers speak `MeasuredSuggestion`.**
 The pipeline measures both of its branches, so a Suggestion crossing this boundary always has Metrics; saying

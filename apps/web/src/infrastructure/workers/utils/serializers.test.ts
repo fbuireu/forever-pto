@@ -26,7 +26,21 @@ const makeBridge = (): Bridge => ({
   ptoDays: [new Date(2025, 0, 2), new Date(2025, 0, 3)],
 });
 
-const EMPTY_METRICS = { averageEfficiency: 0 } as Metrics;
+const EMPTY_METRICS: Metrics = {
+  longWeekends: 0,
+  restBlocks: 0,
+  maxWorkStreak: 0,
+  firstLastBreak: null,
+  averageEfficiency: 0,
+  bonusDays: 0,
+  quarterDist: [],
+  bridgesUsed: 0,
+  workedDaysPerMonth: 0,
+  totalEffectiveDays: 0,
+  monthlyDist: [],
+  longBlocksPerQuarter: [],
+  longestVacation: 0,
+};
 
 const makeSuggestion = (days: Date[] = [new Date(2025, 2, 10)]): MeasuredSuggestion => ({
   days,

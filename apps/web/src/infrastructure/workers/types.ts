@@ -1,5 +1,21 @@
 import type { Metrics } from '@domain/calendar/types';
 
+type DateFields<T> = {
+  [KEY in keyof T]-?: NonNullable<T[KEY]> extends Date
+    ? KEY
+    : NonNullable<T[KEY]> extends readonly unknown[] | string | number | boolean
+      ? never
+      : NonNullable<T[KEY]> extends object
+        ? DateFields<NonNullable<T[KEY]>> extends never
+          ? never
+          : KEY
+        : never;
+}[keyof T];
+
+type Assert<CLEAN extends true> = CLEAN;
+
+export type MetricsHoldNoDate = Assert<DateFields<Metrics> extends never ? true : DateFields<Metrics>>;
+
 export const WORKER_MESSAGE_TYPE = {
   CALCULATE_SUGGESTIONS: 'CALCULATE_SUGGESTIONS',
   CALCULATE_SUGGESTIONS_RESULT: 'CALCULATE_SUGGESTIONS_RESULT',
