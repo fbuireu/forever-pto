@@ -1,5 +1,5 @@
 import { ApiError } from '@infrastructure/api/errors';
-import { WELL_KNOWN_DOCUMENTS } from '@infrastructure/well-known/documents';
+import { lookupWellKnownDocument } from '@infrastructure/well-known/documents';
 import { WELL_KNOWN_CACHE_CONTROL } from '@infrastructure/well-known/slugs';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { NextResponse } from 'next/server';
@@ -10,9 +10,7 @@ interface RouteContext {
 
 export async function GET(_request: Request, { params }: RouteContext) {
   const { slug } = await params;
-  const document = Object.hasOwn(WELL_KNOWN_DOCUMENTS, slug.join('/'))
-    ? WELL_KNOWN_DOCUMENTS[slug.join('/')]
-    : undefined;
+  const document = lookupWellKnownDocument(slug.join('/'));
 
   if (!document) return NextResponse.json({ error: ApiError.NOT_FOUND }, { status: 404 });
 

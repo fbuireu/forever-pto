@@ -232,11 +232,20 @@ against three exact keys — `api-catalog`, `mcp/server-card.json`, `agent-skill
 to `apiCatalog.ts`, `mcpServerCard.ts` and `agentSkillsIndex.ts` in `@infrastructure/well-known`. Anything
 else is a 404. Add a document by adding a key; do not branch inside the handler.
 
-**That table is a `Map`, and it has to stay one.** As a plain object it answered `/.well-known/constructor`
-— and `toString`, `valueOf`, `hasOwnProperty` — with an inherited `Object.prototype` function, which passed
-the `if (!handler)` guard and was then called as a handler, so the route returned 500 where it owed 404. A
-`Map` has no prototype chain to walk into. Converting it back to an object literal reinstates that whole
-class of path.
+**That table is a `Map` again, and the route no longer carries the guard for it.** As a plain object it
+answered `/.well-known/constructor` — and `toString`, `valueOf`, `hasOwnProperty` — with an inherited
+`Object.prototype` function, which passed the `if (!handler)` guard and was then called as a handler, so the
+route returned 500 where it owed 404. A `Map` has no prototype chain to walk into.
+
+It had drifted back to a `Record<string, WellKnownDocument>` while this paragraph still insisted it must not,
+and behaviour stayed correct only because the *route* had grown its own `Object.hasOwn` check. That put the
+safety **above** the interface: `documents.ts` exported an indexable object typed `Record<string, …>`, and
+with `noUncheckedIndexedAccess` off a second consumer indexing it directly would get a non-optional
+`WellKnownDocument` from the compiler and reinstate the bug with no warning.
+
+`lookupWellKnownDocument(slug)` is the only way in now, and `wellKnownSlugs()` is what the agent-skills test
+enumerates. Nothing indexable leaves the module. Verified by swapping the `Map` back for an object literal:
+four prototype-key cases go red.
 
 These paths contain a dot, so the middleware matcher excludes them — they never see locale negotiation.
 

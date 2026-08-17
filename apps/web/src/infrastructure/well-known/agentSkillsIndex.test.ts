@@ -40,8 +40,8 @@ describe('agentSkillsIndex', () => {
 
 describe('the advertised urls and the served slugs are one list', () => {
   it('never advertises a url the catch-all route has no key for', async () => {
-    const { WELL_KNOWN_DOCUMENTS } = await import('./documents');
-    const served = new Set(Object.keys(WELL_KNOWN_DOCUMENTS).map((slug) => `${BASE_URL}/.well-known/${slug}`));
+    const { wellKnownSlugs } = await import('./documents');
+    const served = new Set(wellKnownSlugs().map((slug) => `${BASE_URL}/.well-known/${slug}`));
 
     const advertised = agentSkillsIndex(BASE_URL)
       .skills.map((skill) => ('url' in skill ? skill.url : undefined))
