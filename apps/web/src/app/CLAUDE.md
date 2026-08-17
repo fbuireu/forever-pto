@@ -29,9 +29,14 @@ failure channel onto a status code. Business logic that lands here is in the wro
 `src/middleware.ts` runs first, and its `config.matcher` decides what it sees: everything except `/api`,
 `/_next`, `/_vercel` and any path containing a dot, plus `/api/markdown` explicitly. In order it:
 
-1. Serves `/api/markdown` (only to attach `Cache-Control` and `Vary: Accept`).
-2. Rewrites any request carrying `Accept: text/markdown` to `/api/markdown?path=<pathname>`, so every HTML
-   URL has a Markdown twin without a second route existing. **The Markdown twin reads `SITE_ROUTES`, the same
+1. Lets a direct `/api/markdown` request through, and **strips the path header** on the way — see below.
+   The branch is not decoration: without it a direct hit carrying `Accept: text/markdown` would match the
+   next rule and rewrite the route onto itself. This file used to say the branch existed "only to attach
+   `Cache-Control` and `Vary: Accept`", which was both its least important effect and the one that turned out
+   to be wrong.
+2. Rewrites any request carrying `Accept: text/markdown` to `/api/markdown`, passing the pathname in an
+   `x-markdown-path` **request header**, so every HTML URL has a Markdown twin without a second route
+   existing. **The Markdown twin reads `SITE_ROUTES`, the same
    table the sitemap, `robots.txt` and every `generateMetadata` read** — it kept a second list of its own,
    with the `metadata.*` keys on it, so a route was one row here and another row there. `titleKey` and
    `descriptionKey` moved onto `SiteRoute`; adding a route is genuinely one row now.
@@ -57,6 +62,13 @@ failure channel onto a status code. Business logic that lands here is in the wro
    `Accept: text/markdown`, which tells a crawler or an agent that the page exists. The `Vary: Accept` header
    is on the 404 too, so a shared cache cannot serve one representation for the other. Verified by restoring
    the fallthrough and watching four cases go red.
+
+   **That 404 was unreachable end to end until the header fix below, and this paragraph read as though it
+   were live.** `buildMarkdownPage` did answer `null` and the route did turn it into a 404 — but no request
+   arriving through the rewrite ever asked it about an unlisted path, because the pathname never reached the
+   handler at all. Curling `/totally-made-up-xyz` with `Accept: text/markdown` answered 200 with the homepage
+   until both were fixed together. A unit test proving a branch and a request never reaching it are different
+   claims; only the second one is the feature.
 3. Redirects `**/payment/confirmation` to the locale home when `payment_intent` is absent.
 4. Runs the `next-intl` middleware, which negotiates the locale and fills the `[locale]` segment.
 5. Re-writes the `NEXT_LOCALE` cookie next-intl just set, through `setLocaleCookie`
@@ -69,9 +81,44 @@ failure channel onto a status code. Business logic that lands here is in the wro
 Security headers are **not** set here. They are the `SECURITY_HEADERS` array in `next.config.ts`, applied
 through `async headers()` on `source: '/(.*)'` — which, unlike this matcher, really does cover every request.
 
-Both Markdown branches set `Vary: Accept` next to `Cache-Control`. The body served under an HTML URL
-depends on the `Accept` header, so a shared cache keyed on the URL alone would hand the Markdown twin to
-the next visitor asking for HTML.
+**The pathname travels in a header because a rewrite does not change what the handler reads from the URL.**
+It used to be `/api/markdown?path=<pathname>`, and the query never arrived: inside a route handler
+`request.url` is the URL the *visitor* asked for, not the rewrite target, so `searchParams.get('path')`
+answered `null` and the route fell through to its `?? '/'` default. **Every Markdown twin served the
+homepage** — `/planner`, `/es/planner` and all four legal pages answered 200 with the marketing copy under
+the homepage's title. The unit suite could not see it, because `route.test.ts` called `GET` with a URL that
+had the query on it, which is a fixture built from the same misreading as the code.
+
+The same defect had a second half. Since the only `path` the handler could ever see was the visitor's own,
+`/planner?path=/legal/terms-of-service` served the terms of service **under the planner's URL**, with
+`Cache-Control: public, max-age=3600` on it. So the representation of a URL was decided by a query parameter
+anyone could append.
+
+Both halves close the same way: the middleware `set`s the header, which overwrites anything inbound, and the
+direct-hit branch `delete`s it. The route reads *only* the header and 404s when it is absent, with no
+fallback to the query — the fallback is the vulnerability, not a convenience. `middleware.test.ts` asserts
+the overwrite and the strip; `route.test.ts` asserts the header wins over a disagreeing query and that an
+absent header never reaches the builder. Verified by restoring the `??` fallback and watching the case fail.
+
+**One module states the cache policy, and it is the one that knows the outcome.**
+`src/infrastructure/markdown/twin.ts` owns `MARKDOWN_ROUTE`, `MARKDOWN_ACCEPT`, `MARKDOWN_PATH_HEADER` and
+`markdownTwinHeaders({ found })` — content type, `Cache-Control` and `Vary` together. It was written in two
+modules with three copies of `max-age=3600`, and the middleware's copy was applied *before*
+`buildMarkdownPage` had run, so it could only ever be a guess about a page it had not looked up. The
+measurable consequence: a 404 went out with `public, max-age=3600` on it, because the route set only `Vary`
+on that branch and the middleware supplied the rest. A shared cache would answer "Not Found" for an hour to
+everyone. A miss is `no-store` now, and the middleware states no cache policy at all.
+
+`Vary: Accept` is on both branches. The body served under an HTML URL depends on the `Accept` header, so a
+shared cache keyed on the URL alone would hand the Markdown twin to the next visitor asking for HTML.
+
+**The HTML half of that pair does *not* carry `Vary: Accept`, and that is a known gap rather than an
+oversight.** The app itself is safe — the middleware runs before any cache lookup, so a markdown request is
+rewritten and never reaches the HTML cache entry — but an intermediary cache could store the HTML for
+`/planner` keyed on the URL alone and then serve it to a client asking for markdown. Closing it means adding
+`Vary: Accept` to `SECURITY_HEADERS`' `source: '/(.*)'` in `next.config.ts`, which applies to every asset and
+fragments the CDN cache on a header browsers send in wildly varying forms. That is a hit-rate decision with a
+real cost, not a refactor, so it is written down here instead of being made in passing.
 
 `localePrefix` is `as-needed` with `en` as the default (`src/infrastructure/i18n/routing.ts`), so English
 URLs carry **no** `/en` prefix while the other five do. Anything building a URL must go through
@@ -144,7 +191,7 @@ competing for the same ranking; the required `route` parameter is what prevents 
 | `api/webhooks/stripe/route.ts` | POST | Verifies the `stripe-signature` header, then hands the event to `processWebhookEvent`. Reads the **raw** body via `request.text()` — parsing it as JSON would break signature verification |
 | `api/check-session/route.ts` | GET, POST | GET verifies the premium cookie; POST activates Premium from an email, optionally with a payment key, and sets the cookie |
 | `api/contact/route.ts` | POST | Contact form submission |
-| `api/markdown/route.ts` | GET | Renders the Markdown twin of a page via `buildMarkdownPage.ts`. Only reached through the middleware rewrite |
+| `api/markdown/route.ts` | GET | Renders the Markdown twin of a page via `buildMarkdownPage.ts`. Only reached through the middleware rewrite, and now only *drivable* through it — the pathname comes from the `x-markdown-path` header, never the query string |
 | `api/health/route.ts` | GET | Liveness probe. Answers `status` and `timestamp` and nothing else |
 
 Shared conventions across them:

@@ -1,20 +1,18 @@
 import { buildMarkdownPage } from '@infrastructure/markdown/buildMarkdownPage';
+import { MARKDOWN_PATH_HEADER, markdownTwinHeaders } from '@infrastructure/markdown/twin';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 
+const notFound = () => new Response('Not Found', { status: 404, headers: markdownTwinHeaders({ found: false }) });
+
 export async function GET(request: Request) {
+  const pathname = request.headers.get(MARKDOWN_PATH_HEADER);
+
+  if (pathname === null) return notFound();
+
   const { env } = await getCloudflareContext({ async: true });
-  const baseUrl = env.NEXT_PUBLIC_SITE_URL;
-  const pathname = new URL(request.url).searchParams.get('path') ?? '/';
+  const body = await buildMarkdownPage(env.NEXT_PUBLIC_SITE_URL, pathname);
 
-  const body = await buildMarkdownPage(baseUrl, pathname);
+  if (body === null) return notFound();
 
-  if (body === null) return new Response('Not Found', { status: 404, headers: { Vary: 'Accept' } });
-
-  return new Response(body, {
-    headers: {
-      'Content-Type': 'text/markdown; charset=utf-8',
-      'Cache-Control': 'public, max-age=3600',
-      Vary: 'Accept',
-    },
-  });
+  return new Response(body, { headers: markdownTwinHeaders({ found: true }) });
 }
