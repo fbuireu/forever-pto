@@ -2,14 +2,7 @@ import { holidayDTO, isInPlanningWindow } from '@application/dto/holiday/dto';
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
 import { logClient } from '@application/shared/utils/clientLog';
 import { fromStoredInstant } from '@application/shared/utils/dateIntake';
-import {
-  addMonths,
-  endOfMonth,
-  endOfYear,
-  isSameDay,
-  isWeekend,
-  isWithinInterval,
-} from '@application/shared/utils/dates';
+import { isSameDay, isWeekend } from '@application/shared/utils/dates';
 import { generateMetrics } from '@domain/calendar/metrics/generateMetrics';
 import type { MeasuredSuggestion, Suggestion } from '@domain/calendar/types';
 import { measureBudget } from '@domain/calendar/utils/budget';
@@ -85,11 +78,6 @@ type HolidaysStore = HolidaysState & HolidaysActions;
 
 const STORAGE_NAME = 'holidays-store';
 const STORAGE_VERSION = 1;
-
-const getPlanningWindow = ({ year, carryOverMonths }: PlanningWindowParams) => {
-  const start = new Date(year, 0, 1);
-  return { start, end: endOfMonth(addMonths(endOfYear(start), carryOverMonths)) };
-};
 
 const holidaysInitialState: HolidaysState = {
   holidays: [],
@@ -441,10 +429,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
         pruneDaysOutsideWindow: (params?: PlanningWindowParams) => {
           const { year, carryOverMonths } = params ?? useFiltersStore.getState();
-          const planningWindow = getPlanningWindow({ year, carryOverMonths });
           const { manuallySelectedDays, removedSuggestedDays } = get();
 
-          const isInWindow = (date: Date) => isWithinInterval(date, planningWindow);
+          const isInWindow = (date: Date) => isInPlanningWindow({ date, year, carryOverMonths });
           const prunedManualDays = manuallySelectedDays.filter(isInWindow);
           const prunedRemovedDays = removedSuggestedDays.filter(isInWindow);
 

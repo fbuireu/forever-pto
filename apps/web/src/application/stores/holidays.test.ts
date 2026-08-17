@@ -851,6 +851,16 @@ describe('pruneDaysOutsideWindow', () => {
   const beforeWindow = new Date(2025, 11, 31);
   const afterWindow = new Date(2027, 1, 1);
 
+  it('keeps the last day of the last carry-over month, which is where the two window definitions could differ', () => {
+    const lastDay = new Date(2027, 0, 31);
+    const firstDayAfter = new Date(2027, 1, 1);
+    useHolidaysStore.setState({ manuallySelectedDays: [lastDay, firstDayAfter] });
+
+    useHolidaysStore.getState().pruneDaysOutsideWindow(WINDOW);
+
+    expect(useHolidaysStore.getState().manuallySelectedDays).toEqual([lastDay]);
+  });
+
   it('keeps only the manual days inside the planning window', () => {
     useHolidaysStore.setState({ manuallySelectedDays: [beforeWindow, inYear, inCarryOver, afterWindow] });
     useHolidaysStore.getState().pruneDaysOutsideWindow(WINDOW);

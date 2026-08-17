@@ -80,6 +80,21 @@ through a `fetchHolidays` and would otherwise keep the flag from the year they w
 flagged Holiday can anchor a Bridge, so a stale `true` lets a Custom Holiday from another year anchor one,
 and a stale `false` hides a Custom Holiday the window has since moved back onto.
 
+**It is also the only definition of those bounds, which took a second pass.** The holidays store imported
+`isInPlanningWindow` on its first line and then declared a private `getPlanningWindow` that recomputed the
+identical interval by hand for `pruneDaysOutsideWindow`. The two spellings differed twice: the store used a
+bare `new Date(year, 0, 1)` where this one uses `startOfYear` (a no-op on 1 January), and it wrapped the end
+in an extra `endOfMonth`.
+
+That `endOfMonth` is the interesting half. `addMonths` on 31 December already lands on the last day of the
+target month — Temporal constrains the day when the month is shorter — so the wrapper could never change the
+answer. Which means the two agreed only because of the polyfill's overflow behaviour, and the extra call is
+evidence that whoever wrote it was not sure of that. Checked across four years and seven carry-over counts
+before deleting it: the two ends are identical at every boundary.
+
+`holidays.test.ts` now pins the last day of the last carry-over month, which is the date the two definitions
+could have disagreed on and nothing covered.
+
 **Two date windows, not one.** `create` drops anything outside the chosen year plus the whole of the following year, then sets `isInSelectedRange` from the narrower Planning Window (the year plus its Carry-over Months). Holidays between the two are kept so the UI can show them for context; only those flagged `isInSelectedRange` can anchor a Bridge.
 
 **Schemas carry message keys, not messages.** `contactSchema` and `createPaymentSchema` are pre-bound with keys such as `invalid_email` for server-side validation. The UI calls `createContactSchema` / `createPaymentSchemaWithMessages` with translated strings instead. Adding a validation rule means adding it to the messages interface too, or the localised form silently loses the message.
