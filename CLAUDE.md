@@ -160,8 +160,39 @@ reason: cancelling a superseded PR run is free, cancelling a `main` run kills a 
 **Each package has its own pair of GitHub environments** — `web-production`, `web-development`,
 `docs-production`, `docs-development`. They were shared, which meant a docs deploy passed through whatever
 gate protects web production and the app's `NEXT_PUBLIC_*` vars were visible to jobs with no use for them.
-The `vars` are environment-scoped and live on the two `web-*` environments; the Cloudflare and release
-secrets are repository-level and are read outside any environment.
+
+**Those four environments are settings, and the workflows point at them before the settings exist.** This
+guide claimed the Cloudflare and release secrets were repository-level and therefore unaffected by the
+rename. They are not: `gh secret list` returns exactly `CODECOV_TOKEN` and `PAT`, and everything else —
+`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `JWT_SECRET`, `STRIPE_*`, `RESEND_API_KEY`,
+`TURSO_AUTH_TOKEN`, `CF_ACCESS_CLIENT_*` — is an **environment** secret on the old `development` and
+`production`. So a job naming `web-development` gets empty strings, wrangler falls back to interactive
+OAuth, opens a browser on a headless runner and times out after 120 seconds per attempt:
+
+```
+✘ [ERROR] Timed out waiting for authorization code, please try again.
+Error: Failed to provision remote R2 bucket … wrangler login failed
+```
+
+Passing the secret explicitly in the caller's `secrets:` block does not rescue it. A caller job cannot
+declare an `environment:`, so `${{ secrets.CLOUDFLARE_API_TOKEN }}` there resolves against repository
+secrets only. The value that works on `main` comes from the *callee* job's own `environment: production`.
+
+**Before this branch merges, four things have to happen in repo settings and none of them is a code
+change:**
+
+1. Create `web-production` and `docs-production` — they do not exist yet, so `deploy-production` will fail
+   the same way the first time it runs on `main`.
+2. Copy the secrets from `development`/`production` onto all four, plus `CF_ACCESS_CLIENT_ID` and
+   `CF_ACCESS_CLIENT_SECRET` on `web-development`, which `e2e` reads to reach a preview behind Cloudflare
+   Access.
+3. Move the `NEXT_PUBLIC_*` vars onto the two `web-*` environments.
+4. Change ruleset `main` (`required_deployments`) from `development` to `web-development`. It is a merge
+   gate, so even a green deploy to `web-development` leaves the pull request blocked until it names the
+   environment the branch actually deploys to.
+
+The alternative is to revert the rename in `ci.yml`, `docs.yml` and `cleanup-development.yml` and keep one
+shared pair, which is what the split exists to stop.
 
 **`deploy-tail` is gated on its own files.** The tail consumer is a second Worker with its own `wrangler.toml`; the app declares it in `[[tail_consumers]]` but does not carry it. It changes rarely, so it deploys only when `apps/web/workers/tail/**` does.
 
