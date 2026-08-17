@@ -1,5 +1,20 @@
 # apps/web/src/infrastructure/clients
 
+## `LoggerService` is a tag with one adapter, on purpose
+
+It looks like ceremony and the cost is real — eleven modules carry it in `R`, twelve test files build a
+five-method stub, and `LoggerServiceLive` hands back the same singleton `getBetterStackInstance()` does. It
+buys one property, verified rather than assumed: because `activateWithEmail` annotates its return type as
+requiring `TursoService` and nothing else, a `yield* LoggerService` creeping into its body fails the build at
+that function. A singleton call cannot do that, since it is not a requirement and never appears in a type.
+
+**The guarantee is the tag *and* the explicit annotation together.** A program that leaves `R` inferred gets
+nothing — the inferred type widens to include `LoggerService` and the build stays green. That makes
+"annotate the return type" load-bearing on any Effect program under `@application/use-cases`, not stylistic.
+
+[ADR 0013](../../../../../adr/0013-loggerservice-stays-a-tag.md) records the decision and what it costs, so
+the next architecture pass does not re-propose deleting it.
+
 ## The tail Worker and the app share one log contract
 
 `better-stack/contract.ts` holds `LOG_SERVICE`, the four levels the app emits and `toLogLevel`. It is types
