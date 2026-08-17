@@ -1,10 +1,10 @@
 import type { CountryDTO } from '@application/dto/country/types';
 import type { RegionDTO } from '@application/dto/region/types';
-import { logClient } from '@application/shared/utils/clientLog';
 import { getRegions } from '@infrastructure/services/regions/getRegions';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { obfuscatedStorage } from './crypto';
+import { onRehydrateFailure } from './rehydration';
 
 interface LocationState {
   countries: CountryDTO[];
@@ -50,13 +50,7 @@ export const useLocationStore = create<LocationStore>()(
         migrate: (): PersistedLocationState => ({}),
         onRehydrateStorage: () => (state, error) => {
           if (error) {
-            logClient((logger) =>
-              logger.logError('Error rehydrating location store', error, {
-                storeName: STORAGE_NAME,
-                hasState: !!state,
-              })
-            );
-            globalThis.localStorage?.removeItem(STORAGE_NAME);
+            onRehydrateFailure({ storeName: STORAGE_NAME, error, state });
           }
         },
       }

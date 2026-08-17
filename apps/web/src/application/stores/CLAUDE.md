@@ -142,6 +142,31 @@ pseudo-Holidays, deriving `carryOverMonths`, `effectivePtoDays`, the empty guard
 each Alternative — is inside the pipeline. What is left here is genuinely this side's: reading the store
 and deciding what "nothing to plan" writes to state.
 
+**All four stores fail rehydration through `onRehydrateFailure`, and one of them was clamping first.**
+The four callbacks wrote the same three statements — the same log message, the same `{ storeName, hasState }`
+context and the same `globalThis.localStorage?.removeItem`, whose guard exists because the callback also runs
+where `localStorage` is absent. What differed was *where the block sat*:
+
+- `holidays` checked the error, returned, then revived.
+- **`filters` clamped `ptoDays` and `carryOverMonths` first and only then handled the error**, so a failed
+  rehydration clamped whatever partial state had arrived and *afterwards* dropped the key. That ordering
+  reads as deliberate and was not. It checks the error first and returns now, pinned by a case that sets
+  out-of-range values and asserts they are left alone.
+- `premium` deliberately does **not** return — it re-reads `error` two guards later to raise
+  `needsSessionCheck`. It is now the only one that falls through, which is what makes the deviation visible
+  instead of looking like a fourth accident.
+- `location` had the error branch and nothing else.
+
+The log message names the storage key verbatim (`Error rehydrating filters-store`) rather than a prose label,
+because the helper has the key and the key is what a person debugging goes looking for. That is a change to
+the log text.
+
+**And the eleven store-side error logs go through `logClientError`.** This guide already said to use it "for
+the common case", and every error site in this folder wrote `logClient((logger) => logger.logError(…))`
+instead — so the wrapper's only callers were outside the folder its own rule governs, and its only coverage
+was its own test file. `logClient` remains for anything that is *not* an error, which is now the honest
+distinction between the two.
+
 **`checkExistingSession` clears Premium only on an authoritative "no session", never on a failed check.**
 `getExistingSession` returns `null` when the server answered and said there is no session — a genuine
 expiry, which should clear the stored `premiumKey` — and **throws** when the request itself failed. The two

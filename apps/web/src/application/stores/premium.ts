@@ -1,9 +1,10 @@
-import { logClient } from '@application/shared/utils/clientLog';
+import { logClient, logClientError } from '@application/shared/utils/clientLog';
 import { track } from '@infrastructure/clients/logging/better-stack/tracking';
 import { getExistingSession, verifyPremiumEmail } from '@ui/adapters/session/checkSession';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { obfuscatedStorage } from './crypto';
+import { onRehydrateFailure } from './rehydration';
 import { TWENTY_FOUR_HOURS } from './utils/crypto';
 
 interface PremiumState {
@@ -65,12 +66,10 @@ export const usePremiumStore = create<PremiumStore>()(
             set({ isLoading: false });
             return false;
           } catch (error) {
-            logClient((logger) =>
-              logger.logError('Error verifying premium email in premium store', error, {
-                emailDomain: email?.split('@')[1],
-                hasEmail: !!email,
-              })
-            );
+            logClientError('Error verifying premium email in premium store', error, {
+              emailDomain: email?.split('@')[1],
+              hasEmail: !!email,
+            });
             set({ isLoading: false });
             return false;
           }
@@ -89,9 +88,7 @@ export const usePremiumStore = create<PremiumStore>()(
               needsSessionCheck: false,
             });
           } catch (error) {
-            logClient((logger) =>
-              logger.logError('Error checking existing session in premium store', error, { needsSessionCheck })
-            );
+            logClientError('Error checking existing session in premium store', error, { needsSessionCheck });
             set({ lastVerified: Date.now(), needsSessionCheck: false });
           }
         },
@@ -147,13 +144,7 @@ export const usePremiumStore = create<PremiumStore>()(
         }),
         onRehydrateStorage: () => (state, error) => {
           if (error) {
-            logClient((logger) =>
-              logger.logError('Error rehydrating premium store', error, {
-                storeName: STORAGE_NAME,
-                hasState: !!state,
-              })
-            );
-            globalThis.localStorage?.removeItem(STORAGE_NAME);
+            onRehydrateFailure({ storeName: STORAGE_NAME, error, state });
           }
 
           if (!state) {

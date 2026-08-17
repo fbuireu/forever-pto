@@ -153,6 +153,15 @@ describe('onRehydrateStorage', () => {
     listener?.(useFiltersStore.getState() as never, error);
   };
 
+  it('does not clamp a partially rehydrated state it is about to throw away', () => {
+    useFiltersStore.setState({ ptoDays: 9999, carryOverMonths: 99 } as never);
+
+    runRehydrate(new Error('deobfuscate failed'));
+
+    expect(useFiltersStore.getState().ptoDays).toBe(9999);
+    expect(useFiltersStore.getState().carryOverMonths).toBe(99);
+  });
+
   it('logs a rehydration failure without blocking the listener on the logging client', async () => {
     mockLogError.mockClear();
 
@@ -160,7 +169,7 @@ describe('onRehydrateStorage', () => {
 
     expect(mockLogError).not.toHaveBeenCalled();
     await vi.waitFor(() =>
-      expect(mockLogError).toHaveBeenCalledWith('Error rehydrating filters store', expect.any(Error), {
+      expect(mockLogError).toHaveBeenCalledWith('Error rehydrating filters-store', expect.any(Error), {
         storeName: 'filters-store',
         hasState: true,
       })

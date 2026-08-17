@@ -1,8 +1,8 @@
-import { logClient } from '@application/shared/utils/clientLog';
 import { DEFAULT_FILTER_STRATEGY, type FilterStrategy } from '@domain/calendar/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { obfuscatedStorage } from './crypto';
+import { onRehydrateFailure } from './rehydration';
 
 export interface FiltersState {
   ptoDays: number;
@@ -88,6 +88,11 @@ export const useFiltersStore = create<FiltersStore>()(
           return rest as PersistedFiltersState;
         },
         onRehydrateStorage: () => (state, error) => {
+          if (error) {
+            onRehydrateFailure({ storeName: STORAGE_NAME, error, state });
+            return;
+          }
+
           if (state) {
             state.ptoDays = clamp(Math.round(state.ptoDays), MIN_PTO_DAYS, MAX_PTO_DAYS);
             state.carryOverMonths = clamp(
@@ -95,16 +100,6 @@ export const useFiltersStore = create<FiltersStore>()(
               MIN_CARRY_OVER_MONTHS,
               MAX_CARRY_OVER_MONTHS
             );
-          }
-
-          if (error) {
-            logClient((logger) =>
-              logger.logError('Error rehydrating filters store', error, {
-                storeName: STORAGE_NAME,
-                hasState: !!state,
-              })
-            );
-            globalThis.localStorage?.removeItem(STORAGE_NAME);
           }
         },
       }

@@ -1,6 +1,6 @@
 import { holidayDTO, isInPlanningWindow } from '@application/dto/holiday/dto';
 import { type HolidayDTO, HolidayVariant } from '@application/dto/holiday/types';
-import { logClient } from '@application/shared/utils/clientLog';
+import { logClient, logClientError } from '@application/shared/utils/clientLog';
 import { fromStoredInstant } from '@application/shared/utils/dateIntake';
 import { isSameDay, isWeekend } from '@application/shared/utils/dates';
 import { generateMetrics } from '@domain/calendar/metrics/generateMetrics';
@@ -11,6 +11,7 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { obfuscatedStorage } from './crypto';
 import { useFiltersStore } from './filters';
+import { onRehydrateFailure } from './rehydration';
 import {
   type AddHolidayParams,
   type AlternativeSelectionBaseParams,
@@ -136,13 +137,11 @@ export const useHolidaysStore = create<HolidaysStore>()(
               ),
             });
           } catch (error) {
-            logClient((logger) =>
-              logger.logError('Error fetching holidays in holidays store', error, {
-                year: params.year,
-                country: params.country,
-                region: params.region,
-              })
-            );
+            logClientError('Error fetching holidays in holidays store', error, {
+              year: params.year,
+              country: params.country,
+              region: params.region,
+            });
             set({ holidays: customHolidays });
           }
         },
@@ -193,16 +192,14 @@ export const useHolidaysStore = create<HolidaysStore>()(
               currentSelectionIndex: 0,
             });
           } catch (error) {
-            logClient((logger) =>
-              logger.logError('Error generating suggestions in holidays store', error, {
-                year,
-                ptoDays,
-                holidaysCount: holidays.length,
-                allowPastDays,
-                strategy,
-                locale,
-              })
-            );
+            logClientError('Error generating suggestions in holidays store', error, {
+              year,
+              ptoDays,
+              holidaysCount: holidays.length,
+              allowPastDays,
+              strategy,
+              locale,
+            });
             set({
               suggestion: null,
               alternatives: [],
@@ -501,13 +498,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
         partialize: partializeHolidays,
         onRehydrateStorage: () => (state, error) => {
           if (error) {
-            logClient((logger) =>
-              logger.logError('Error rehydrating holidays store', error, {
-                storeName: STORAGE_NAME,
-                hasState: !!state,
-              })
-            );
-            globalThis.localStorage?.removeItem(STORAGE_NAME);
+            onRehydrateFailure({ storeName: STORAGE_NAME, error, state });
             return;
           }
 

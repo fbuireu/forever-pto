@@ -100,7 +100,7 @@ describe('onRehydrateStorage', () => {
 
     expect(mockLogError).not.toHaveBeenCalled();
     await vi.waitFor(() =>
-      expect(mockLogError).toHaveBeenCalledWith('Error rehydrating location store', expect.any(Error), {
+      expect(mockLogError).toHaveBeenCalledWith('Error rehydrating location-store', expect.any(Error), {
         storeName: 'location-store',
         hasState: true,
       })

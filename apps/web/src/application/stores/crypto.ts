@@ -1,4 +1,4 @@
-import { logClient } from '@application/shared/utils/clientLog';
+import { logClientError } from '@application/shared/utils/clientLog';
 import { createJSONStorage } from 'zustand/middleware';
 import { deobfuscate, obfuscate } from './utils/crypto';
 
@@ -33,7 +33,7 @@ export const obfuscatedStorage = createJSONStorage(() => {
       try {
         return deobfuscate({ text: obfuscatedValue, key: obfuscationKey });
       } catch (error) {
-        logClient((logger) => logger.logError('Failed to deobfuscate storage value', error, { key }));
+        logClientError('Failed to deobfuscate storage value', error, { key });
         return null;
       }
     },
@@ -41,14 +41,14 @@ export const obfuscatedStorage = createJSONStorage(() => {
       try {
         localStorage.setItem(key, obfuscate({ text: value, key: obfuscationKey }));
       } catch (error) {
-        logClient((logger) => logger.logError('Failed to set item in obfuscated storage', error, { key }));
+        logClientError('Failed to set item in obfuscated storage', error, { key });
       }
     },
     removeItem: (key: string) => {
       try {
         localStorage.removeItem(key);
       } catch (error) {
-        logClient((logger) => logger.logError('Failed to remove item from obfuscated storage', error, { key }));
+        logClientError('Failed to remove item from obfuscated storage', error, { key });
       }
     },
   };
