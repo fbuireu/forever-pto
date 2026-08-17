@@ -1,8 +1,7 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { addDays, eachDayOfInterval, isWeekend } from '@application/shared/utils/dates';
+import { PTO_CONSTANTS } from '@domain/calendar/const';
 import { dayKey, dayOffKeys } from './dayOff';
-
-const SCAN_MARGIN_DAYS = 7;
 
 export interface FreeStreak {
   days: Date[];
@@ -45,8 +44,8 @@ export function freeStreaks({ placedDays, holidays }: FreeStreaksParams): FreeSt
   };
 
   const scan = eachDayOfInterval({
-    start: addDays(firstDate, -SCAN_MARGIN_DAYS),
-    end: addDays(lastDate, SCAN_MARGIN_DAYS),
+    start: addDays(firstDate, -PTO_CONSTANTS.METRICS.STREAK_SCAN_MARGIN_DAYS),
+    end: addDays(lastDate, PTO_CONSTANTS.METRICS.STREAK_SCAN_MARGIN_DAYS),
   });
 
   for (const day of scan) {

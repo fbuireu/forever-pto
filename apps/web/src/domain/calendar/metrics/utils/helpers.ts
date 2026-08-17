@@ -11,6 +11,7 @@ import {
   startOfYear,
 } from '@application/shared/utils/dates';
 import type { Locale } from 'next-intl';
+import { PTO_CONSTANTS } from '../../const';
 import type { Bridge } from '../../types';
 import {
   MONTHS_IN_QUARTER,
@@ -21,9 +22,6 @@ import {
 } from '../../window';
 import { dayKey, dayOffKeys } from './dayOff';
 import type { FreeStreak } from './streaks';
-
-const LONG_BLOCK_MINIMUM_DAYS = 3;
-const LONG_WEEKEND_MINIMUM_DAYS = 3;
 
 export const windowMonthIndex = (date: Date, { year }: Pick<PlanningWindow, 'year'>) =>
   (getYear(date) - year) * MONTHS_IN_YEAR + getMonth(date);
@@ -46,7 +44,7 @@ export function getLongBlocksPerQuarter({ streaks, window }: GetLongBlocksPerQua
   const longBlocksPerQuarter = new Array(windowQuarterCount(window)).fill(0);
 
   for (const streak of streaks) {
-    if (streak.length < LONG_BLOCK_MINIMUM_DAYS) continue;
+    if (streak.length < PTO_CONSTANTS.METRICS.LONG_BLOCK_MINIMUM_DAYS) continue;
 
     const start = streak.days.find((day) => windowMonthIndex(day, window) >= 0);
     if (start === undefined) continue;
@@ -101,7 +99,7 @@ export const calculateRestBlocks = (dates: Date[]) => {
     const prev = sorted[i - 1];
     if (curr === undefined || prev === undefined) continue;
     const daysDiff = differenceInDays(curr, prev);
-    if (daysDiff > 7) blocks++;
+    if (daysDiff > PTO_CONSTANTS.METRICS.REST_BLOCK_SEPARATION_DAYS) blocks++;
   }
 
   return blocks;
@@ -186,7 +184,7 @@ export const getWorkedDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkedDays
     holidays: holidays.filter(({ date }) => isWorkdayInYear(date)),
   });
   const workedDays = workdaysInYear - daysOffOnWorkdays.size;
-  const avgPerMonth = workedDays / 12;
+  const avgPerMonth = workedDays / MONTHS_IN_YEAR;
 
   return Number.parseFloat(avgPerMonth.toFixed(1));
 };
@@ -195,5 +193,7 @@ export const calculateLongestVacation = (streaks: FreeStreak[]) =>
   streaks.filter((streak) => streak.hasPlacedDay).reduce((longest, streak) => Math.max(longest, streak.length), 0);
 
 export const calculateLongWeekends = (streaks: FreeStreak[]) =>
-  streaks.filter((streak) => streak.length >= LONG_WEEKEND_MINIMUM_DAYS && streak.hasWeekend && streak.hasPlacedDay)
-    .length;
+  streaks.filter(
+    (streak) =>
+      streak.length >= PTO_CONSTANTS.METRICS.LONG_WEEKEND_MINIMUM_DAYS && streak.hasWeekend && streak.hasPlacedDay
+  ).length;

@@ -432,7 +432,11 @@ constructs is at local midnight.
 ## Constants
 
 Every tunable lives in `PTO_CONSTANTS` in `const.ts`. A magic number anywhere else in this folder is a
-defect: add the field instead. Changing one changes the plans users see, so treat an edit here as a
+defect: add the field instead. That was a rule this guide stated and the folder broke — the metrics kept
+`LONG_BLOCK_MINIMUM_DAYS` and `LONG_WEEKEND_MINIMUM_DAYS` as file-local consts, `SCAN_MARGIN_DAYS` in
+`streaks.ts`, a bare `daysDiff > 7` for the Rest Block separation and a bare `/ 12` sitting below the file's
+own month count. They are the `METRICS` block now, and `grep` for a loose numeric literal under this folder
+comes back empty. Changing one changes the plans users see, so treat an edit here as a
 behaviour change and expect the selector tests to move.
 
 | Field | Value | Unit and meaning |
@@ -450,6 +454,10 @@ behaviour change and expect the selector tests to move.
 | `EFFICIENCY.MINIMUM` | 2 | Admission floor: below this ratio a candidate is not a Bridge at all. Strategy-agnostic — `OPTIMIZED` ranks by Efficiency first but admits the same population as the others |
 | `BRIDGE_SEARCH.MIN_MULTI_DAY_SIZE` | 2 | Consecutive Workdays. Smallest multi-day candidate tried, in addition to the single-day ones |
 | `BRIDGE_SEARCH.MAX_MULTI_DAY_SIZE` | 3 | Consecutive Workdays. Largest multi-day candidate tried — see the first trap above |
+| `METRICS.LONG_BLOCK_MINIMUM_DAYS` | 3 | Consecutive days. Below this a Rest Block is not a Long Block |
+| `METRICS.LONG_WEEKEND_MINIMUM_DAYS` | 3 | Consecutive Free Days. The floor for a Long Weekend, which must also contain a weekend and a placed day |
+| `METRICS.REST_BLOCK_SEPARATION_DAYS` | 7 | Days. Two placed days further apart than this are separate Rest Blocks. **Not the same seven** as the scan margin below, and they are free to move independently |
+| `METRICS.STREAK_SCAN_MARGIN_DAYS` | 7 | Days. How far either side of the data `freeStreaks` scans, so a stretch straddling the edge is still counted whole |
 
 ## Testing
 
