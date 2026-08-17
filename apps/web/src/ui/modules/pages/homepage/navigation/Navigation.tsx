@@ -31,11 +31,7 @@ export const Header = async () => {
             { href: '/#features', label: t('nav.features') },
             { href: '/#pricing', label: t('nav.pricing') },
           ].map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className='px-2 py-1 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75'
-            >
+            <Link key={href} href={href} className='px-2 py-1 quiet-link'>
               {label}
             </Link>
           ))}

@@ -9,8 +9,7 @@ import { getTranslations } from 'next-intl/server';
 const GITHUB_ISSUE_URL =
   'https://github.com/fbuireu/forever-pto/issues/new?template=feature_request.yml&labels=enhancement';
 
-const FAQ_NAV_CLASS =
-  'text-sm font-medium px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75';
+const FAQ_NAV_CLASS = 'text-sm font-medium px-1.5 py-0.5 quiet-link';
 
 const privacyPolicyLink = createRichLink('/legal/privacy-policy', { className: FAQ_NAV_CLASS });
 const githubIssueLink = createRichLink(GITHUB_ISSUE_URL, {

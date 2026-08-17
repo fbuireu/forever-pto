@@ -35,3 +35,16 @@
     inset: -16px;
   }
 }
+
+@utility quiet-link {
+  border: 3px solid transparent;
+  border-radius: 8px;
+  transition-property: background-color, border-color, color;
+  transition-duration: 75ms;
+
+  &:hover {
+    background-color: var(--accent);
+    border-color: var(--frame);
+    color: var(--accent-foreground);
+  }
+}

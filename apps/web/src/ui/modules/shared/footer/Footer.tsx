@@ -38,42 +38,27 @@ export const Footer = async () => {
           aria-label={t('legalNavigation')}
           className='flex flex-col sm:flex-row justify-center items-center gap-3 py-5 px-7 border-t-[2px] border-dashed border-[var(--frame)]/18'
         >
-          <Link
-            href='/planner'
-            className='text-sm font-semibold px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75'
-          >
+          <Link href='/planner' className='text-sm font-semibold px-1.5 py-0.5 quiet-link'>
             {t('planner')}
           </Link>
           <a
             href='https://docs.forever-pto.com'
             target='_blank'
             rel='noreferrer'
-            className='text-sm font-semibold px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75'
+            className='text-sm font-semibold px-1.5 py-0.5 quiet-link'
           >
             {t('docs')}
           </a>
-          <Link
-            href='/legal/privacy-policy'
-            className='text-sm font-medium px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75'
-          >
+          <Link href='/legal/privacy-policy' className='text-sm font-medium px-1.5 py-0.5 quiet-link'>
             {t('privacyPolicy')}
           </Link>
-          <Link
-            href='/legal/terms-of-service'
-            className='text-sm font-medium px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75'
-          >
+          <Link href='/legal/terms-of-service' className='text-sm font-medium px-1.5 py-0.5 quiet-link'>
             {t('termsOfService')}
           </Link>
-          <Link
-            href='/legal/cookie-policy'
-            className='text-sm font-medium px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75'
-          >
+          <Link href='/legal/cookie-policy' className='text-sm font-medium px-1.5 py-0.5 quiet-link'>
             {t('cookiePolicy')}
           </Link>
-          <Link
-            href='/legal/legal-notice'
-            className='text-sm font-medium px-1.5 py-0.5 border-[3px] border-transparent rounded-[8px] hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground transition-[background-color,border-color,color] duration-75'
-          >
+          <Link href='/legal/legal-notice' className='text-sm font-medium px-1.5 py-0.5 quiet-link'>
             {t('legalNotice')}
           </Link>
           <CookieButton />
