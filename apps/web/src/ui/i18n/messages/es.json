@@ -3,7 +3,9 @@
     "closeDialog": "Cerrar",
     "toggleSidebar": "Mostrar u ocultar la barra lateral",
     "sidebarLandmark": "Controles del planificador",
-    "radialNavigation": "Navegación de funciones"
+    "radialNavigation": "Navegación de funciones",
+    "selectLanguage": "Seleccionar idioma, actual: {current}",
+    "skipToMainContent": "Ir al contenido principal"
   },
   "metadata": {
     "title": "Forever PTO - Gestiona tus días libres",
@@ -692,15 +694,10 @@
     "accessGranted": "Acceso concedido",
     "welcomeToPremium": "Ya tienes acceso a todas las funciones premium. Cerramos esto en {seconds} segundos.",
     "accessDenied": "Acceso denegado",
-    "emailNotFound": "Este email no está en nuestra base de usuarios premium.",
-    "emailNotFoundError": "Email no encontrado entre los usuarios premium",
-    "invalidEmail": "Introduce un email válido",
-    "emailRequired": "El email es obligatorio"
+    "emailNotFound": "Este email no está en nuestra base de usuarios premium."
   },
   "validation": {
     "contact": {
-      "invalidEmail": "Introduce un email válido",
-      "emailRequired": "El email es obligatorio",
       "nameMin": "El nombre debe tener al menos {min} caracteres",
       "nameMax": "El nombre es demasiado largo",
       "subjectMin": "El asunto debe tener al menos {min} caracteres",
@@ -711,14 +708,16 @@
     "payment": {
       "amountMin": "La cantidad mínima es {min, number}",
       "amountMax": "La cantidad máxima es {max, number}",
-      "invalidEmail": "Introduce un email válido",
-      "emailRequired": "El email es obligatorio",
       "promoCodeTooLong": "El código promocional es demasiado largo"
     },
     "holiday": {
       "nameRequired": "El nombre del festivo es obligatorio",
       "nameMax": "El nombre del festivo es demasiado largo",
       "invalidDate": "Selecciona una fecha válida"
+    },
+    "email": {
+      "invalid": "Introduce un email válido",
+      "required": "El email es obligatorio"
     }
   },
   "roadmap": {
@@ -865,10 +864,6 @@
     "version": "v{version} · status: vacacional ●",
     "planner": "Calculadora",
     "docs": "Documentación"
-  },
-  "accessibility": {
-    "selectLanguage": "Seleccionar idioma, actual: {current}",
-    "skipToMainContent": "Ir al contenido principal"
   },
   "formButtons": {
     "submit": "Enviar",

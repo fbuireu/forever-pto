@@ -3,7 +3,9 @@
     "closeDialog": "Schließen",
     "toggleSidebar": "Seitenleiste ein- oder ausblenden",
     "sidebarLandmark": "Planer-Einstellungen",
-    "radialNavigation": "Funktionsnavigation"
+    "radialNavigation": "Funktionsnavigation",
+    "selectLanguage": "Sprache auswählen, aktuell: {current}",
+    "skipToMainContent": "Zum Hauptinhalt springen"
   },
   "metadata": {
     "title": "Forever PTO – Verwalte deine freien Tage",
@@ -692,15 +694,10 @@
     "accessGranted": "Zugang gewährt!",
     "welcomeToPremium": "Willkommen bei Premium! Du kannst dieses Fenster schließen – es schließt sich in {seconds} Sekunden von selbst.",
     "accessDenied": "Zugang verweigert",
-    "emailNotFound": "Diese E-Mail-Adresse ist nicht als Premium-Nutzer:in registriert.",
-    "emailNotFoundError": "E-Mail-Adresse nicht gefunden",
-    "invalidEmail": "Gib eine gültige E-Mail-Adresse ein.",
-    "emailRequired": "Gib deine E-Mail-Adresse ein."
+    "emailNotFound": "Diese E-Mail-Adresse ist nicht als Premium-Nutzer:in registriert."
   },
   "validation": {
     "contact": {
-      "invalidEmail": "Gib eine gültige E-Mail-Adresse ein.",
-      "emailRequired": "Gib deine E-Mail-Adresse ein.",
       "nameMin": "Der Name muss mindestens {min} Zeichen lang sein",
       "nameMax": "Der Name ist zu lang",
       "subjectMin": "Der Betreff muss mindestens {min} Zeichen lang sein",
@@ -711,14 +708,16 @@
     "payment": {
       "amountMin": "Mindestbetrag ist {min, number}",
       "amountMax": "Höchstbetrag ist {max, number}",
-      "invalidEmail": "Gib eine gültige E-Mail-Adresse ein.",
-      "emailRequired": "Gib deine E-Mail-Adresse ein.",
       "promoCodeTooLong": "Der Promo-Code ist zu lang"
     },
     "holiday": {
       "nameRequired": "Name des Feiertags fehlt.",
       "nameMax": "Name des Feiertags ist zu lang.",
       "invalidDate": "Wähle ein gültiges Datum."
+    },
+    "email": {
+      "invalid": "Gib eine gültige E-Mail-Adresse ein.",
+      "required": "Gib deine E-Mail-Adresse ein."
     }
   },
   "roadmap": {
@@ -865,10 +864,6 @@
     "version": "v{version} · Status: im Urlaub ●",
     "planner": "Planer",
     "docs": "Dokumentation"
-  },
-  "accessibility": {
-    "selectLanguage": "Sprache auswählen, aktuell: {current}",
-    "skipToMainContent": "Zum Hauptinhalt springen"
   },
   "formButtons": {
     "submit": "Absenden",

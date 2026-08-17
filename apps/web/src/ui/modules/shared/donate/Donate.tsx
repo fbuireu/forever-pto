@@ -45,6 +45,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
   const t = useTranslations('toasts');
   const tDonate = useTranslations('donate');
   const tValidation = useTranslations('validation.payment');
+  const tEmail = useTranslations('validation.email');
   const { resolvedTheme } = useTheme();
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -78,8 +79,8 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
   const paymentSchema = createPaymentSchemaWithMessages({
     amountMin: tValidation('amountMin', { min: AMOUNT_MIN }),
     amountMax: tValidation('amountMax', { max: AMOUNT_MAX }),
-    invalidEmail: tValidation('invalidEmail'),
-    emailRequired: tValidation('emailRequired'),
+    invalidEmail: tEmail('invalid'),
+    emailRequired: tEmail('required'),
     promoCodeTooLong: tValidation('promoCodeTooLong'),
   });
 

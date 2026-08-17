@@ -31,9 +31,9 @@ interface UpgradeModalProps {
 const MS_PER_SECOND = 1000;
 const AUTO_CLOSE_MS = 5 * MS_PER_SECOND;
 
-const createEmailSchema = (getMessage: (key: string) => string) =>
+const createEmailSchema = ({ invalid, required }: { invalid: string; required: string }) =>
   z.object({
-    email: z.email(getMessage('invalidEmail')).min(1, getMessage('emailRequired')),
+    email: z.email(invalid).min(1, required),
   });
 
 type EmailFormData = z.infer<ReturnType<typeof createEmailSchema>>;
@@ -41,11 +41,12 @@ type EmailFormData = z.infer<ReturnType<typeof createEmailSchema>>;
 export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading }: UpgradeModalProps) => {
   const t = useTranslations('upgrade');
   const tA11y = useTranslations('a11y');
+  const tEmail = useTranslations('validation.email');
   const [step, setStep] = useState<Step>(Step.INPUT);
 
   const emailSchema = useMemo(
-    () => createEmailSchema((key: string) => t(key as 'invalidEmail' | 'emailRequired')),
-    [t]
+    () => createEmailSchema({ invalid: tEmail('invalid'), required: tEmail('required') }),
+    [tEmail]
   );
 
   const form = useForm<EmailFormData>({

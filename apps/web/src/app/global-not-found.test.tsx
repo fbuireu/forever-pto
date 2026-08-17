@@ -96,6 +96,6 @@ describe('global-not-found locale detection', () => {
   it('translates in the locale it detected', async () => {
     request({ cookieLocale: 'es' });
     await resolveLocale();
-    expect(mockGetTranslations).toHaveBeenCalledWith({ locale: 'es', namespace: 'accessibility' });
+    expect(mockGetTranslations).toHaveBeenCalledWith({ locale: 'es', namespace: 'a11y' });
   });
 });

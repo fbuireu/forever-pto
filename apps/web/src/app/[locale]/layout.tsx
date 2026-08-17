@@ -31,7 +31,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
     notFound();
   }
   setRequestLocale(locale);
-  const t = await getTranslations('accessibility');
+  const t = await getTranslations('a11y');
 
   return (
     <html lang={locale} suppressHydrationWarning>

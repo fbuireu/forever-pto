@@ -54,12 +54,30 @@ go hunting for a key:
   invisible: if you add a code a user can reach, add its key in the same change.
 - Never write a string in ALL CAPS. If an element must render uppercase, apply the `uppercase` class
   in the component — otherwise the copy is unreadable to screen readers and unfixable per locale.
-- **`a11y` holds the accessible names that belong to `core/` components.** Those files may not call
-  `useTranslations` ([`../modules/core/CLAUDE.md`](../modules/core/CLAUDE.md)), so each takes its label as a
-  prop and the *caller* supplies the string from this namespace — `closeDialog` for every modal's close
-  button, `toggleSidebar` and `sidebarLandmark` for the sidebar, `radialNavigation` for the roadmap dial. Put
-  a name here only when the component that renders it cannot translate it itself; anything a feature
-  component owns belongs in that feature's namespace, next to the copy it sits beside.
+- **`a11y` holds accessible names, and it is the only namespace that does.** Two kinds live here. Names a
+  `core/` component cannot translate for itself, because those files may not call `useTranslations`
+  ([`../modules/core/CLAUDE.md`](../modules/core/CLAUDE.md)) — each takes its label as a prop and the *caller*
+  supplies it: `closeDialog` for every modal's close button, `toggleSidebar` and `sidebarLandmark` for the
+  sidebar, `radialNavigation` for the roadmap dial, `skipToMainContent` for `SkipToContent`. And names more
+  than one feature needs: `selectLanguage`, read by both the sidebar's `LanguageSelector` and the homepage's
+  switcher. A name only one feature uses still belongs in that feature's namespace, next to the copy it sits
+  beside.
+
+  There was a second namespace called `accessibility` holding exactly those last two keys, and this file did
+  not mention it — so an author asking "where does my `aria-label` go" had two plausible answers and no way
+  to choose. It is merged in.
+
+- **Two validation messages live in `validation.email` because three forms need them.** `invalid` and
+  `required` were written out in `validation.contact`, `validation.payment` **and** `upgrade` — six strings
+  across six locales for two messages. **Two had already drifted**: Catalan and French `validation.payment`
+  said "a valid email is required" where every other copy, and the English, say "enter a valid email
+  address". The imperative form is canonical and the payment copies were replaced, so merging fixed two
+  strings rather than picking arbitrarily.
+
+  The key-parity rule in `tests/docs-consistency.test.ts` could not have caught that: it compares key *sets*,
+  not values, so duplicated copy is free to diverge. One home is the only real defence. A form reads
+  `useTranslations('validation.email')` alongside its own namespace; the schema factories take their messages
+  as a parameter object and did not change.
 - Interpolation is `{variable}`; plurals use ICU (`{count, plural, one {…} other {…}}`); inline markup
   uses rich-text tags (`<b>`, `<link>`, `<em>`) that the component supplies as render functions.
   `createRichLink` in `core/primitives/RichLink.tsx` is the helper for the `<link>` case.

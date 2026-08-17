@@ -22,7 +22,7 @@ export const LanguageSelector = () => {
   const pathname = usePathname();
   const { state } = useSidebar();
   const languages = useLanguages();
-  const t = useTranslations('accessibility');
+  const t = useTranslations('a11y');
 
   const handleLanguageChange = useCallback(
     (newLocale: LocaleCode) => {

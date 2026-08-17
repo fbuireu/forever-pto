@@ -19,7 +19,7 @@ export const HomepageLanguageSwitcher = () => {
   const { push } = useRouter();
   const pathname = usePathname();
   const languages = useLanguages();
-  const t = useTranslations('accessibility');
+  const t = useTranslations('a11y');
 
   const handleLanguageChange = useCallback(
     (newLocale: LocaleCode) => {

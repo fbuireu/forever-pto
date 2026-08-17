@@ -3,7 +3,9 @@
     "closeDialog": "Close",
     "toggleSidebar": "Toggle sidebar",
     "sidebarLandmark": "Planner controls",
-    "radialNavigation": "Feature navigation"
+    "radialNavigation": "Feature navigation",
+    "selectLanguage": "Select language, current: {current}",
+    "skipToMainContent": "Skip to main content"
   },
   "metadata": {
     "title": "Forever PTO - Manage your paid time off",
@@ -692,15 +694,10 @@
     "accessGranted": "Access granted!",
     "welcomeToPremium": "Welcome to premium. You can close this or it will close in {seconds} seconds.",
     "accessDenied": "Access denied",
-    "emailNotFound": "That email isn't in our premium users list.",
-    "emailNotFoundError": "Email not found in our premium users list",
-    "invalidEmail": "Enter a valid email address",
-    "emailRequired": "Email is required"
+    "emailNotFound": "That email isn't in our premium users list."
   },
   "validation": {
     "contact": {
-      "invalidEmail": "Enter a valid email address",
-      "emailRequired": "Email is required",
       "nameMin": "Name must be at least {min} characters",
       "nameMax": "Name is too long",
       "subjectMin": "Subject must be at least {min} characters",
@@ -711,14 +708,16 @@
     "payment": {
       "amountMin": "Minimum amount is {min, number}",
       "amountMax": "Maximum amount is {max, number}",
-      "invalidEmail": "Enter a valid email address",
-      "emailRequired": "Email is required",
       "promoCodeTooLong": "Promo code is too long"
     },
     "holiday": {
       "nameRequired": "Holiday name is required",
       "nameMax": "Holiday name is too long",
       "invalidDate": "Select a valid date"
+    },
+    "email": {
+      "invalid": "Enter a valid email address",
+      "required": "Email is required"
     }
   },
   "roadmap": {
@@ -865,10 +864,6 @@
     "version": "v{version} · status: on vacation ●",
     "planner": "Planner",
     "docs": "Docs"
-  },
-  "accessibility": {
-    "selectLanguage": "Select language, current: {current}",
-    "skipToMainContent": "Skip to main content"
   },
   "formButtons": {
     "submit": "Submit",

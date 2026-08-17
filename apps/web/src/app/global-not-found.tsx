@@ -28,7 +28,7 @@ async function detectLocale() {
 const LocalizedNotFound = async () => {
   const locale = await detectLocale();
   setRequestLocale(locale);
-  const t = await getTranslations({ locale, namespace: 'accessibility' });
+  const t = await getTranslations({ locale, namespace: 'a11y' });
 
   return (
     <>

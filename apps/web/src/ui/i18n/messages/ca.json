@@ -3,7 +3,9 @@
     "closeDialog": "Tanca",
     "toggleSidebar": "Mostra o amaga la barra lateral",
     "sidebarLandmark": "Controls del planificador",
-    "radialNavigation": "Navegació de funcions"
+    "radialNavigation": "Navegació de funcions",
+    "selectLanguage": "Seleccionar idioma, actual: {current}",
+    "skipToMainContent": "Vés al contingut principal"
   },
   "metadata": {
     "title": "Forever PTO - Gestiona les teves vacances",
@@ -692,15 +694,10 @@
     "accessGranted": "Accés concedit!",
     "welcomeToPremium": "Ja tens accés a les funcions premium. Pots tancar aquest modal o ho farem en {seconds} s.",
     "accessDenied": "Accés denegat",
-    "emailNotFound": "Aquest email no està a la nostra llista d'usuaris premium.",
-    "emailNotFoundError": "Email no trobat a la nostra llista d'usuaris premium",
-    "invalidEmail": "Introdueix un email vàlid",
-    "emailRequired": "L'email és obligatori"
+    "emailNotFound": "Aquest email no està a la nostra llista d'usuaris premium."
   },
   "validation": {
     "contact": {
-      "invalidEmail": "Introdueix un email vàlid",
-      "emailRequired": "L'email és obligatori",
       "nameMin": "El nom ha de tenir almenys {min} caràcters",
       "nameMax": "El nom és massa llarg",
       "subjectMin": "L'assumpte ha de tenir almenys {min} caràcters",
@@ -711,14 +708,16 @@
     "payment": {
       "amountMin": "La quantitat mínima és {min, number}",
       "amountMax": "La quantitat màxima és {max, number}",
-      "invalidEmail": "Es requereix un email vàlid",
-      "emailRequired": "L'email és obligatori",
       "promoCodeTooLong": "El codi promocional és massa llarg"
     },
     "holiday": {
       "nameRequired": "El nom del festiu és obligatori",
       "nameMax": "El nom del festiu és massa llarg",
       "invalidDate": "Selecciona una data vàlida"
+    },
+    "email": {
+      "invalid": "Introdueix un email vàlid",
+      "required": "L'email és obligatori"
     }
   },
   "roadmap": {
@@ -865,10 +864,6 @@
     "version": "v{version} · estat: vacacional ●",
     "planner": "Calculadora",
     "docs": "Documentació"
-  },
-  "accessibility": {
-    "selectLanguage": "Seleccionar idioma, actual: {current}",
-    "skipToMainContent": "Vés al contingut principal"
   },
   "formButtons": {
     "submit": "Envia",

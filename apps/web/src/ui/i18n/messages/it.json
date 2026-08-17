@@ -3,7 +3,9 @@
     "closeDialog": "Chiudi",
     "toggleSidebar": "Mostra o nascondi la barra laterale",
     "sidebarLandmark": "Controlli del pianificatore",
-    "radialNavigation": "Navigazione delle funzioni"
+    "radialNavigation": "Navigazione delle funzioni",
+    "selectLanguage": "Seleziona lingua, attuale: {current}",
+    "skipToMainContent": "Vai al contenuto principale"
   },
   "metadata": {
     "title": "Forever PTO - Gestisci le tue ferie",
@@ -692,15 +694,10 @@
     "accessGranted": "Accesso concesso!",
     "welcomeToPremium": "Hai sbloccato le funzioni premium. Puoi chiudere questo messaggio o lo chiudiamo noi in {seconds} secondi.",
     "accessDenied": "Accesso negato",
-    "emailNotFound": "Questa email non è nella nostra lista di utenti premium.",
-    "emailNotFoundError": "Email non trovata nella nostra lista di utenti premium",
-    "invalidEmail": "Inserisci un'email valida",
-    "emailRequired": "L'email è obbligatoria"
+    "emailNotFound": "Questa email non è nella nostra lista di utenti premium."
   },
   "validation": {
     "contact": {
-      "invalidEmail": "Inserisci un'email valida",
-      "emailRequired": "L'email è obbligatoria",
       "nameMin": "Il nome deve avere almeno {min} caratteri",
       "nameMax": "Il nome è troppo lungo",
       "subjectMin": "L'oggetto deve avere almeno {min} caratteri",
@@ -711,14 +708,16 @@
     "payment": {
       "amountMin": "L'importo minimo è {min, number}",
       "amountMax": "L'importo massimo è {max, number}",
-      "invalidEmail": "Inserisci un'email valida",
-      "emailRequired": "L'email è obbligatoria",
       "promoCodeTooLong": "Il codice promozionale è troppo lungo"
     },
     "holiday": {
       "nameRequired": "Il nome del festivo è obbligatorio",
       "nameMax": "Il nome del festivo è troppo lungo",
       "invalidDate": "Seleziona una data valida"
+    },
+    "email": {
+      "invalid": "Inserisci un'email valida",
+      "required": "L'email è obbligatoria"
     }
   },
   "roadmap": {
@@ -865,10 +864,6 @@
     "version": "v{version} · status: in vacanza ●",
     "planner": "Pianificatore",
     "docs": "Documentazione"
-  },
-  "accessibility": {
-    "selectLanguage": "Seleziona lingua, attuale: {current}",
-    "skipToMainContent": "Vai al contenuto principale"
   },
   "formButtons": {
     "submit": "Invia",

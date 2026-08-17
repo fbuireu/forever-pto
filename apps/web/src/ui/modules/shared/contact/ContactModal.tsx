@@ -39,6 +39,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
   const t = useTranslations('contact');
   const tA11y = useTranslations('a11y');
   const tValidation = useTranslations('validation.contact');
+  const tEmail = useTranslations('validation.email');
   const [step, setStep] = useState<Step>(Step.INPUT);
   const [isPending, startTransition] = useTransition();
   const { setEmail, userEmail } = usePremiumStore(
@@ -50,8 +51,8 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   const contactSchema = createContactSchema({
-    invalidEmail: tValidation('invalidEmail'),
-    emailRequired: tValidation('emailRequired'),
+    invalidEmail: tEmail('invalid'),
+    emailRequired: tEmail('required'),
     nameMin: tValidation('nameMin', { min: NAME_MIN_LENGTH }),
     nameMax: tValidation('nameMax'),
     subjectMin: tValidation('subjectMin', { min: SUBJECT_MIN_LENGTH }),
