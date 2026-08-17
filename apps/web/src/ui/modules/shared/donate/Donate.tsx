@@ -7,7 +7,6 @@ import {
   createPaymentSchemaWithMessages,
 } from '@application/dto/payment/schema';
 import type { DiscountInfo } from '@application/dto/payment/types';
-import { calculateFinalAmount } from '@application/dto/payment/utils/helpers';
 import { usePremiumStore } from '@application/stores/premium';
 import { useUIStore } from '@application/stores/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -181,14 +180,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
     setPaymentState(null);
   }, []);
 
-  const finalAmount = useMemo(
-    () =>
-      calculateFinalAmount({
-        baseAmount: currentAmount,
-        discountInfo: paymentState?.discountInfo ?? null,
-      }),
-    [currentAmount, paymentState?.discountInfo]
-  );
+  const finalAmount = paymentState?.discountInfo?.finalAmount ?? currentAmount;
 
   const elementsOptions = useMemo<StripeElementsOptions | undefined>(() => {
     if (!paymentState?.clientSecret) return undefined;

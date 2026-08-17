@@ -1,9 +1,9 @@
 import type Stripe from 'stripe';
 import { describe, expect, it } from 'vitest';
 import type { DiscountInfo } from '../types';
-import { calculateFinalAmount, extractChargeId, extractCustomerId } from './helpers';
+import { extractChargeId, extractCustomerId } from './helpers';
 
-const DISCOUNT: DiscountInfo = {
+const _DISCOUNT: DiscountInfo = {
   type: 'percent',
   value: 10,
   originalAmount: 10,
@@ -11,20 +11,6 @@ const DISCOUNT: DiscountInfo = {
   couponId: 'coupon_123',
   couponName: 'PROMO10',
 };
-
-describe('calculateFinalAmount', () => {
-  it('returns baseAmount when discountInfo is null', () => {
-    expect(calculateFinalAmount({ baseAmount: 10, discountInfo: null })).toBe(10);
-  });
-
-  it('returns finalAmount from discountInfo when present', () => {
-    expect(calculateFinalAmount({ baseAmount: 10, discountInfo: DISCOUNT })).toBe(9);
-  });
-
-  it('returns zero baseAmount correctly', () => {
-    expect(calculateFinalAmount({ baseAmount: 0, discountInfo: null })).toBe(0);
-  });
-});
 
 describe('extractCustomerId', () => {
   it('returns the string as-is when customer is already a string', () => {

@@ -128,7 +128,7 @@ separator (`10.000`, `10 000`, `10,000`). Raising the cap made every bundle lie.
 `JsonLd.tsx`'s `MINIMUM_DONATION` reads `AMOUNT_MIN` for the same reason — the structured data advertises a
 `minPrice`, and the app guide used to say the two "move together" as an instruction to the reader.
 
-**`calculateFinalAmount` in `payment/utils/helpers.ts` is not the one in the promo-code service.** This one just unwraps an already-computed `DiscountInfo` for display; the identically named private function in `@infrastructure/services/payments/provider/promoCode` is what actually applies a Stripe coupon.
+**There is one `calculateFinalAmount` now, and it is the private one in `@infrastructure/services/payments/provider/promoCode` that actually applies a Stripe coupon.** This folder used to export a second function of the same name whose whole body was `discountInfo?.finalAmount ?? baseAmount` — one caller, three tests, and a paragraph here whose only job was to stop a reader confusing it with the one that does the work. `Donate.tsx` reads the field directly.
 
 ## Testing
 

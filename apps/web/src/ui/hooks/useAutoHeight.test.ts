@@ -142,24 +142,6 @@ describe('useAutoHeight', () => {
     el.remove();
   });
 
-  it('adds the element own box when includeSelfBox is set', () => {
-    stubBox('border-box');
-    let deps = [1];
-    const { result, rerender } = renderHook(() =>
-      useAutoHeight(deps, { includeParentBox: true, includeSelfBox: true })
-    );
-
-    const el = attachRef(result.current, 50);
-
-    act(() => {
-      deps = [2];
-      rerender();
-    });
-
-    expect(result.current.height).toBe(98);
-    el.remove();
-  });
-
   it('rounds the total up to a whole device pixel', () => {
     stubBox('content-box');
     vi.stubGlobal('devicePixelRatio', 3);
@@ -177,21 +159,18 @@ describe('useAutoHeight', () => {
     el.remove();
   });
 
-  it('re-measures without a deps change while the height is still 0', () => {
+  it('retries the measurement at mount when the element measures zero, and only then', () => {
     stubBox('border-box');
-    const deps = [1];
-    let includeSelfBox = false;
-    const { result, rerender } = renderHook(() => useAutoHeight(deps, { includeParentBox: false, includeSelfBox }));
+    const { result, rerender } = renderHook(() => useAutoHeight([1]));
 
     const el = attachRef(result.current, 50);
     expect(result.current.height).toBe(0);
 
     act(() => {
-      includeSelfBox = true;
       rerender();
     });
 
-    expect(result.current.height).toBe(74);
+    expect(result.current.height).toBe(0);
     el.remove();
   });
 });

@@ -87,6 +87,22 @@ nothing. The store agrees with the fixed shape: `toggleDaySelection` recomputes 
 touches `holidays`. Adding a field to that selector means adding a re-plan trigger; keep the list to the one
 in [`modules/pages/planner/CLAUDE.md`](./modules/pages/planner/CLAUDE.md).
 
+**`hooks/useAutoHeight.tsx` takes `deps` and nothing else, and its zero-height retry fires only at mount.**
+It used to accept an `AutoHeightOptions` of `includeParentBox` and `includeSelfBox`, exposing four
+configurations of which **one** was reachable — its single caller, `core/animate/effects/AutoHeight.tsx`,
+passes `deps` alone. `includeSelfBox` was not merely unreachable but arithmetically wrong:
+`getBoundingClientRect().height` is already the border-box height, so adding the element's own padding and
+border counts them twice. Its test asserted `98` for a 50px element and could not have told, because the
+bounding rect is stubbed — the fixture had no way to contradict the reading. Both branches were also the same
+twelve lines with `el.parentElement` swapped for `el`; that is one `borderBoxExtra(element)` now.
+
+The retry is worth knowing about because it reads like a safety net for a late layout and is not one. The
+third `useLayoutEffect` is keyed on `[height, measure]` and re-measures while `height === 0`; with the
+options gone `measure` is stable, and `height` cannot change while it is stuck at zero, so the effect runs at
+mount and never again. The old test only exercised it by toggling an option, which changed `measure`'s
+identity — something no production caller ever did. The case now asserts what actually happens. Making the
+retry real is a behaviour change and belongs in its own commit.
+
 **`hooks/useStoresReady.ts`'s effect depends on the state it sets, and that costs one pass, not a loop.**
 It reads as churn — five consumers, an effect keyed on `hydrationStatus`, subscriptions torn down and
 rebuilt on every transition — and it is not. `obfuscatedStorage` is synchronous, so all four stores report
