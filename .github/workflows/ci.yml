@@ -27,7 +27,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Filter
+      - name: Filter changed paths
         id: filter
         env:
           BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
@@ -98,7 +98,7 @@ jobs:
       - name: Run app tests with coverage
         working-directory: apps/web
         run: pnpm test:coverage
-      - name: Run the documentation contract suite
+      - name: Run documentation contract suite
         run: pnpm test:docs
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
@@ -147,7 +147,7 @@ jobs:
           token: ${{ secrets.PAT }}
           persist-credentials: false
       - uses: ./.github/actions/prepare-env
-      - name: Verify a web release tag exists
+      - name: Verify web release tag exists
         run: |
           if [ -z "$(git tag --list 'web-v*')" ]; then
             echo '::error::No web-v* tag found. semantic-release would restart the web line at 1.0.0.'
@@ -176,7 +176,7 @@ jobs:
     permissions:
       actions: write
     steps:
-      - name: Dispatch the docs workflow
+      - name: Dispatch docs workflow
         env:
           GH_TOKEN: ${{ secrets.PAT }}
           GH_REPO: ${{ github.repository }}
@@ -197,7 +197,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/prepare-env
-      - name: Deploy
+      - name: Deploy to Cloudflare Workers
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         with:
           timeout_minutes: 3
@@ -207,7 +207,7 @@ jobs:
           command: |
             cd "$GITHUB_WORKSPACE/apps/web/workers/tail"
             pnpm exec wrangler deploy
-      - name: Set the ingest token
+      - name: Set ingest token
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         env:
           BETTER_STACK_SOURCE_TOKEN: ${{ vars.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN }}
@@ -241,7 +241,7 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: github-actions[bot]
           body-includes: ${{ env.MARKER }}
-      - name: Upsert notice
+      - name: Upsert cross-package comment
         uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5.0.0
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}

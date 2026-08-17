@@ -4,6 +4,8 @@ import { expect, test } from '@playwright/test';
 
 const DIST = join(import.meta.dirname, '..', 'dist');
 
+const DEMO_ATTRIBUTE = /<[^>]*\sdata-demo[=\s>]/;
+
 const pages = (dir: string): string[] =>
   readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const path = join(dir, entry.name);
@@ -12,7 +14,7 @@ const pages = (dir: string): string[] =>
   });
 
 const demoPages = pages(DIST)
-  .filter((path) => readFileSync(path, 'utf8').includes('data-demo'))
+  .filter((path) => DEMO_ATTRIBUTE.test(readFileSync(path, 'utf8')))
   .map(
     (path) =>
       `/${relative(DIST, path)
