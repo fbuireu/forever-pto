@@ -91,7 +91,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/docs
-          wranglerVersion: '4.107.1'
+          wranglerVersion: '4.121.0'
           command: deploy --env development --name pr-${{ github.event.pull_request.number }}-forever-pto-docs-development
       - name: Find existing comment
         uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4.0.0
@@ -140,7 +140,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/docs
-          wranglerVersion: '4.107.1'
+          wranglerVersion: '4.121.0'
           command: deploy --env production
 
   release-docs:

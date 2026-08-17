@@ -258,7 +258,7 @@ last word of the message arrived as a second positional beside `deploy [path]`. 
 (`pnpm exec` passes argv through untouched, and `nick-fields/retry` was wrongly blamed for it first), and not
 the separator character. `_deploy-web.yml` now passes `${{ github.sha }}-${{ github.event_name }}`, which
 contains no spaces at all and so cannot split. That diagnosis was made against wrangler **4.115** and the pin
-has since moved to **4.120.1**; nothing has been re-verified, so treat the mechanism as recorded rather than
+has since moved to **4.121.0**; nothing has been re-verified, so treat the mechanism as recorded rather than
 retested, and reintroduce any multi-word form from a PR where the preview deploy exercises the same file.
 
 The deploy is the one wrangler call **not** wrapped in `nick-fields/retry`'s usual forgiveness for argument
