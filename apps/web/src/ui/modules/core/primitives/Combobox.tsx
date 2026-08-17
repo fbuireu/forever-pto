@@ -42,11 +42,11 @@ export const Combobox = <TValue extends string>({
 
   const selectedOption = options.find((option) => option.value.toLowerCase() === value.toLowerCase());
 
-  const handleSelect = (selectedLabel: string) => {
-    const option = options.find((opt) => opt.label === selectedLabel);
+  const handleSelect = (selectedValue: string) => {
+    const option = options.find((opt) => opt.value === selectedValue);
     if (option) {
       if (option.value.toLowerCase() !== value.toLowerCase()) {
-        onChange(option.value.toLowerCase() as TValue);
+        onChange(option.value);
       }
       setOpen(false);
     }
@@ -80,14 +80,14 @@ export const Combobox = <TValue extends string>({
           </Button>
         </PopoverTrigger>
       </AnimateIcon>
-      <PopoverContent className='w-[200px] p-0' id='combobox-listbox'>
+      <PopoverContent className='w-[200px] p-0'>
         <Command>
           <CommandInput placeholder={searchPlaceholder} className='h-9' />
           <CommandList>
             <CommandEmpty>{notFoundText}</CommandEmpty>
             <CommandGroup>
               {options.map((option) => (
-                <CommandItem key={option.value} value={option.label} onSelect={handleSelect}>
+                <CommandItem key={option.value} value={option.value} keywords={[option.label]} onSelect={handleSelect}>
                   <div className='flex items-center gap-2'>
                     {hasFlag(option) && <FlagIcon code={option.flag} />}
                     <span className='capitalize'>{option.label}</span>

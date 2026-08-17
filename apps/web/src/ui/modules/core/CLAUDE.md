@@ -167,6 +167,39 @@ and `onValueCommitted` callbacks a `number | readonly number[]`; every caller in
 mutable `number[]`, so the wrapper copies the array or boxes the lone number before calling back.
 Widening the prop type instead would push that fork into each caller.
 
+**`primitives/Combobox.tsx` keys its `CommandItem` by `option.value` and carries the label in `keywords`,
+and the two halves are one decision.** cmdk hands `onSelect` the item's own `value` — trimmed, case intact —
+and that string is the only thing identifying which row was clicked. The item used to be keyed by
+`option.label`, so `handleSelect` had to reverse-look-up the option *by label*: two options sharing a label
+collided on the first one, which Regions can plausibly do. Keying by `value` fixes that, but cmdk also
+filters on `value`, so the change on its own would have silently reduced the country search to matching ISO
+codes — nobody types `ES` to find Spain. `keywords={[option.label]}` puts the label back in the filter's
+input; cmdk scores value and keywords together, so both now match. Removing the `keywords` prop is not a
+tidy-up, and `Combobox.test.tsx` has a case that goes red for it.
+
+**It hands the option's own value back, and it used to lower-case it behind an `as`.** `onChange` was called
+with `option.value.toLowerCase() as TValue` — the cast existed only to silence the compiler about a string
+the component had just changed. Country and Region codes arrive uppercase (`i18n-iso-countries` and
+`date-holidays`' `getStates()` both emit them that way), so the store held a value no option list contained.
+Nothing broke, because every reader compares case-insensitively — `getRegionName`, `Summary`'s two lookups,
+this component's own `selectedOption`, and `date-holidays` itself, which accepts either casing for country
+and region alike. That is what made it safe to remove and also what made it invisible. A primitive that
+rewrites the value it was given is lying to its caller; hand back what the option holds.
+
+**The comparison guarding that call stays case-insensitive, and it is not symmetry with the line above.**
+`option.value.toLowerCase() !== value.toLowerCase()` is what stops a click on the already-selected option
+from firing `onChange`, and `setCountry` clears the Region in the same `set` — so a strict compare would
+wipe a visitor's Region the moment they re-picked their own country, for the whole population whose stored
+country is still the lower-cased one the old code wrote or the `user-country` cookie supplies. The value
+handed back is exact; the question of whether it *changed* is not.
+
+**Its `PopoverContent` carried `id='combobox-listbox'` and nothing referenced it.** No `aria-controls`
+anywhere in `apps/web/src` named it, so it bought no accessibility — and `PopoverContent` spreads its rest
+props onto the *positioner*, not the popup, so it was not even labelling the list. What it did do is put a
+literal id on a component the sidebar mounts four times: open two of them and the document holds two
+`#combobox-listbox`. It is gone. If a listbox relationship is wanted here it has to be a generated id
+threaded to a real `aria-controls`, not a constant.
+
 **`RadialNav`'s `orbitRadius` is `size / 2 - 0.5`, and the half pixel is not slop.** It puts the
 *centre* of each item circle on the parent circle's stroke rather than outside it: the parent radius
 less half the border the child draws. Drop the `0.5` and the ring stops reading as concentric.
@@ -183,9 +216,14 @@ test is usually a decision rather than an omission:
 - `animate/base/` is covered file for file, and so are `animate/components/`, `animate/effects/`,
   `animate/text/SlidingNumber.tsx` and `animate/primitives/base/Tooltip.tsx`. These carry state
   machines, controlled/uncontrolled fallbacks and event composition — the parts that break silently.
-- `primitives/` has **no tests at all**. Those files are markup plus `cn()`, and the Playwright suite in
-  `e2e/` only proves the pages holding them render — see [`../CLAUDE.md`](../CLAUDE.md) for what those specs
-  actually assert, which is less than the word "covered" suggests.
+- `primitives/` has **one test, `Combobox.test.tsx`, and that is the whole list**. The rest of those files
+  are markup plus `cn()`, and the Playwright suite in `e2e/` only proves the pages holding them render — see
+  [`../CLAUDE.md`](../CLAUDE.md) for what those specs actually assert, which is less than the word "covered"
+  suggests. `Combobox` earns its test because it is the one primitive here with a behaviour: it maps a click
+  on a list item back to an option and decides what to hand its caller. It mocks
+  `animate/base/Popover` the way `animate/base/Popover.test.tsx` mocks the Base UI primitives — the popup
+  needs layout this environment does not have — and keeps `cmdk` real, because cmdk is what decides which
+  string `onSelect` receives.
 - `animate/icons/` is excluded from the **coverage report** only, and the glob already spares `Icon.tsx`.
   The 22 icons are mechanical wrappers around SVG path data; `Icon.tsx` is not, and its co-located
   `Icon.test.tsx` runs with everything else. Nothing under `core/` is excluded from the test run.
