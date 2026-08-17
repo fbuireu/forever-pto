@@ -13,7 +13,32 @@ The wire vocabulary for failures, the response helper that opts out of caching, 
 | `operations/types.ts` | `ApiOutcome<BODY>` (`{ status, body }`), `RequestContext`, `resolveClientIp`, `UNKNOWN_IP` |
 | `operations/payment.ts` | `createPaymentRequest` — rate limit, use-case, deferred write and failure mapping, transport-free |
 | `operations/contact.ts` | `sendContactRequest` — the same shape for the contact form |
-| `operations/activatePremium.ts` | `activatePremiumRequest` — the deferred hand-off, the status map and a log line per failure, for the two transports that grant Premium |
+| `operations/activatePremium.ts` | `activatePremiumRequest` — the rate limit, the deferred hand-off, the status map and a log line per failure, for the two transports that grant Premium |
+
+## The Premium activation operation owns its rate limit now
+
+`activatePremiumRequest` takes `{ ipAddress }` and the *use-case* program, and runs `checkRateLimit` itself.
+It used to take whatever pipeline the caller handed it, and the two transports disagreed about what that
+should contain: `api/payment/activate` composed `checkRateLimit(ip).pipe(Effect.andThen(…))` before calling
+in, and `api/check-session`'s `POST` passed a program with **no limiter at all** — an endpoint that grants
+Premium from an email address, and therefore the one an attacker would enumerate against.
+
+That ordering is the thing this folder exists to own, and while the operation accepted any program it was
+neither enforceable nor assertable at the seam. It is asserted once now: a limited caller never reaches the
+use-case, verified by moving the limiter after it and watching the case go red. **Adding the limiter to
+`check-session` is a behaviour change** — that endpoint can now answer 429 where it previously could not.
+
+`resolveClientIp(headers) ?? UNKNOWN_IP` came with it. The `?? UNKNOWN_IP` half had crawled back up into
+`api/payment/activate`, which is exactly the pair of lines `operations/types.ts` was created to stop drifting
+— `'unknown'` from one transport and `null` from the other is the defect recorded below.
+
+**The outcome stays a flat union rather than `ApiOutcome<BODY>`, unlike its two siblings, and that is not an
+oversight.** It carries a `token` that must go into a `Set-Cookie` and must *not* reach the JSON body, so
+`{ status, body }` cannot express it without a second field beside the body. What did go is the branch that
+chose the failure body from the status: `check-session` answered `{ error, premiumKey: null }` on a 400 and
+`{ error }` on anything else, so a `RateLimitError` took the 429 branch and dropped a field the client was
+assumed to destructure. It does not — `verifyPremiumEmail` returns `null` on any non-ok response and never
+reads the body, and `checkout.ts` reads `error` alone. Every failure answers `{ error }`.
 
 ## One operation, two transports
 

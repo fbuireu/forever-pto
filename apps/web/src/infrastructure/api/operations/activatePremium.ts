@@ -10,8 +10,10 @@ import type {
   ValidationError,
 } from '@infrastructure/errors';
 import { ApplicationLayer } from '@infrastructure/layers';
+import { checkRateLimit } from '@infrastructure/services/payments/rateLimit';
 import { Effect } from 'effect';
 import { after } from 'next/server';
+import { type RequestContext, UNKNOWN_IP } from './types';
 
 interface ActivationResult {
   email: string;
@@ -35,10 +37,12 @@ const refused = (status: 400 | 429 | 500, error: string): ActivationOutcome => (
 });
 
 export const activatePremiumRequest = (
+  { ipAddress }: Pick<RequestContext, 'ipAddress'>,
   program: Effect.Effect<ActivationResult, ActivationFailure, StripeServerService | LoggerService | TursoService>
 ): Promise<ActivationOutcome> =>
   Effect.runPromise(
-    program.pipe(
+    checkRateLimit(ipAddress ?? UNKNOWN_IP).pipe(
+      Effect.andThen(() => program),
       Effect.map(({ email, premiumKey, token, deferred }): ActivationOutcome => {
         after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer))));
         return { status: 200, token, email, premiumKey, error: null };

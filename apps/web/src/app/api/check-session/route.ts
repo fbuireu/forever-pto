@@ -1,6 +1,7 @@
 import { activateWithEmail, activateWithPayment } from '@application/use-cases/activatePremium';
 import { ApiError } from '@infrastructure/api/errors';
 import { activatePremiumRequest } from '@infrastructure/api/operations/activatePremium';
+import { resolveClientIp } from '@infrastructure/api/operations/types';
 import { parseJsonBody } from '@infrastructure/api/parseJsonBody';
 import { noStore } from '@infrastructure/api/response';
 import { ValidationError } from '@infrastructure/errors';
@@ -32,6 +33,7 @@ export async function GET(_request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const outcome = await activatePremiumRequest(
+    { ipAddress: resolveClientIp(request.headers) },
     Effect.gen(function* () {
       const body = yield* parseJsonBody<Record<string, unknown>>(request);
       const email = typeof body.email === 'string' ? body.email : undefined;
@@ -45,10 +47,7 @@ export async function POST(request: NextRequest) {
     })
   );
 
-  if (outcome.error !== null) {
-    const body = outcome.status === 400 ? { error: outcome.error, premiumKey: null } : { error: outcome.error };
-    return noStore(body, { status: outcome.status });
-  }
+  if (outcome.error !== null) return noStore({ error: outcome.error }, { status: outcome.status });
 
   const response = noStore({ success: true, premiumKey: outcome.premiumKey, email: outcome.email });
   setPremiumCookie(response, outcome.token);

@@ -1,11 +1,9 @@
 import { activateWithPayment } from '@application/use-cases/activatePremium';
 import { activatePremiumRequest } from '@infrastructure/api/operations/activatePremium';
-import { resolveClientIp, UNKNOWN_IP } from '@infrastructure/api/operations/types';
+import { resolveClientIp } from '@infrastructure/api/operations/types';
 import { localePath, resolveLocale } from '@infrastructure/i18n/utils/url';
-import { checkRateLimit } from '@infrastructure/services/payments/rateLimit';
 import { ACTIVATION_FAILED, ACTIVATION_PARAM } from '@infrastructure/services/premium/activation';
 import { setPremiumCookie } from '@infrastructure/services/premium/cookie';
-import { Effect } from 'effect';
 import { type NextRequest, NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 
@@ -32,10 +30,9 @@ export async function GET(request: NextRequest) {
   if (!paymentIntentId || !clientSecret) return redirectTo(false);
   if (redirectStatus && redirectStatus !== SUCCEEDED_REDIRECT_STATUS) return redirectTo(false);
 
-  const ip = resolveClientIp(request.headers) ?? UNKNOWN_IP;
-
   const { token } = await activatePremiumRequest(
-    checkRateLimit(ip).pipe(Effect.andThen(() => activateWithPayment({ paymentIntentId, clientSecret })))
+    { ipAddress: resolveClientIp(request.headers) },
+    activateWithPayment({ paymentIntentId, clientSecret })
   );
 
   if (!token) return redirectTo(false);

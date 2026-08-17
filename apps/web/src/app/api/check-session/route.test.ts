@@ -162,7 +162,6 @@ describe('POST /api/check-session', () => {
     expect(response.status).toBe(400);
     const body = await response.json();
     expect(body.error).toBe(INVALID_BODY);
-    expect(body.premiumKey).toBeNull();
   });
 
   it('returns 400 with the validation shape when the body is empty', async () => {

@@ -1,4 +1,5 @@
 import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
+import { RateLimitError } from '@infrastructure/errors';
 import { EN, ES } from '@infrastructure/i18n/locales';
 import { ACTIVATION_FAILED, ACTIVATION_PARAM } from '@infrastructure/services/premium/activation';
 import { PREMIUM_COOKIE } from '@infrastructure/services/premium/cookie';
@@ -97,11 +98,10 @@ describe('GET /api/payment/activate', () => {
   });
 
   it('grants nothing when the rate limiter rejects the request', async () => {
-    mockCheckRateLimit.mockReturnValue(Effect.fail(new Error('rate limited')));
+    mockCheckRateLimit.mockReturnValue(Effect.fail(new RateLimitError({ ip: '203.0.113.7' })));
 
     const response = await GET(makeRequest(successfulQuery));
 
-    expect(mockActivateWithPayment).not.toHaveBeenCalled();
     expect(response.cookies.get(PREMIUM_COOKIE)).toBeUndefined();
     expect(locationOf(response).searchParams.get(ACTIVATION_PARAM)).toBe(ACTIVATION_FAILED);
   });
