@@ -210,6 +210,19 @@ Each used to own its copy: three near-identical loops and five separate construc
 "placed days ∪ Holidays" set. That is how the placed-day rule below came to be applied by one and not the
 other. A new metric about stretches of time off belongs here as a predicate, not as a fourth loop.
 
+**That set has one owner now: `dayOffKeys` in `metrics/utils/dayOff.ts`.** It was still being built by hand
+four times — in `freeStreaks`, `getTotalEffectiveDays`, `calculateMaxWorkStreak` and
+`getWorkedDaysPerMonth`, the fourth with an extra "in this year and not a weekend" filter. That fourth one
+*was* the bug: it subtracted Holidays and PTO Days as two independent counts and understated Worked Days per
+month by one day per Manual Day, because the two lists overlap by construction. It filters its inputs and
+then unions them through the same helper.
+
+`dayKey` is exported beside it and is the only spelling of `toDateString()` left under `metrics/` — there
+are none loose in either file. It is deliberately **not** `getKey` from `utils/cache.ts`: that one is keyed
+on `Date.getTime()` and distinguishes noon from midnight, which is right for the memoisation it serves and
+wrong here, where a Holiday carrying a time component still has to line up with a placed day at local
+midnight. Two conventions, both correct, and conflating them is the failure mode to watch for.
+
 **`calculateLongWeekends` and `calculateLongestVacation` both apply it, and for a while only the first did.**
 Longest Vacation folded every free run into its maximum as the streak grew, so it reported whatever the
 longest holiday-and-weekend run in the two-year set happened to be — including one lying entirely in

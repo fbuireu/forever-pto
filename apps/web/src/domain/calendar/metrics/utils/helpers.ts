@@ -19,6 +19,7 @@ import {
   windowMonthCount,
   windowQuarterCount,
 } from '../../window';
+import { dayKey, dayOffKeys } from './dayOff';
 import type { FreeStreak } from './streaks';
 
 const LONG_BLOCK_MINIMUM_DAYS = 3;
@@ -60,9 +61,9 @@ export function getLongBlocksPerQuarter({ streaks, window }: GetLongBlocksPerQua
 export function getValidBridges(days: Date[], bridges?: Bridge[]) {
   if (!bridges || bridges.length === 0) return [];
 
-  const daysSet = new Set(days.map((day) => day.toDateString()));
+  const daysSet = new Set(days.map(dayKey));
 
-  return bridges.filter((bridge) => bridge.ptoDays.every((ptoDay) => daysSet.has(ptoDay.toDateString())));
+  return bridges.filter((bridge) => bridge.ptoDays.every((ptoDay) => daysSet.has(dayKey(ptoDay))));
 }
 
 export function getTotalEffectiveDays(days: Date[], bridges?: Bridge[], holidays: HolidayDTO[] = []) {
@@ -72,18 +73,18 @@ export function getTotalEffectiveDays(days: Date[], bridges?: Bridge[], holidays
     return days.length;
   }
 
-  const freeDays = new Set([...days.map((day) => day.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
+  const freeDays = dayOffKeys({ placedDays: days, holidays });
   const covered = new Set<string>();
 
   for (const bridge of validBridges) {
     for (const day of eachDayOfInterval({ start: bridge.startDate, end: bridge.endDate })) {
-      const key = day.toDateString();
+      const key = dayKey(day);
       if (isWeekend(day) || freeDays.has(key)) covered.add(key);
     }
   }
 
   for (const day of days) {
-    covered.add(day.toDateString());
+    covered.add(dayKey(day));
   }
 
   return covered.size;
@@ -120,7 +121,7 @@ export const calculateMaxWorkStreak = ({ ptoDays, holidays, year, allowPastDays 
   const scanStart = allowPastDays || today < yearStart ? yearStart : today;
   if (scanStart > yearEnd) return 0;
 
-  const restDays = new Set([...ptoDays.map((d) => d.toDateString()), ...holidays.map((h) => h.date.toDateString())]);
+  const restDays = dayOffKeys({ placedDays: ptoDays, holidays });
 
   let maxWorkStreak = 0;
   let currentStreak = 0;
@@ -128,7 +129,7 @@ export const calculateMaxWorkStreak = ({ ptoDays, holidays, year, allowPastDays 
   for (const day of eachDayOfInterval({ start: scanStart, end: yearEnd })) {
     if (isWeekend(day)) continue;
 
-    if (restDays.has(day.toDateString())) {
+    if (restDays.has(dayKey(day))) {
       maxWorkStreak = Math.max(maxWorkStreak, currentStreak);
       currentStreak = 0;
     } else {
@@ -179,10 +180,11 @@ export const getWorkedDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkedDays
   const yearEnd = endOfYear(new Date(year, 11, 31));
   const allDaysInYear = eachDayOfInterval({ start: yearStart, end: yearEnd });
   const workdaysInYear = allDaysInYear.filter((day) => !isWeekend(day)).length;
-  const daysOffOnWorkdays = new Set<string>();
-  for (const date of [...holidays.map((h) => h.date), ...ptoDays]) {
-    if (getYear(date) === year && !isWeekend(date)) daysOffOnWorkdays.add(date.toDateString());
-  }
+  const isWorkdayInYear = (date: Date) => getYear(date) === year && !isWeekend(date);
+  const daysOffOnWorkdays = dayOffKeys({
+    placedDays: ptoDays.filter(isWorkdayInYear),
+    holidays: holidays.filter(({ date }) => isWorkdayInYear(date)),
+  });
   const workedDays = workdaysInYear - daysOffOnWorkdays.size;
   const avgPerMonth = workedDays / 12;
 

@@ -1,5 +1,6 @@
 import type { HolidayDTO } from '@application/dto/holiday/types';
 import { addDays, eachDayOfInterval, isWeekend } from '@application/shared/utils/dates';
+import { dayKey, dayOffKeys } from './dayOff';
 
 const SCAN_MARGIN_DAYS = 7;
 
@@ -18,8 +19,8 @@ interface FreeStreaksParams {
 export function freeStreaks({ placedDays, holidays }: FreeStreaksParams): FreeStreak[] {
   if (placedDays.length === 0) return [];
 
-  const placed = new Set(placedDays.map((day) => day.toDateString()));
-  const free = new Set([...placed, ...holidays.map((holiday) => holiday.date.toDateString())]);
+  const placed = new Set(placedDays.map(dayKey));
+  const free = dayOffKeys({ placedDays, holidays });
 
   const allDates = [...placedDays, ...holidays.map((holiday) => holiday.date)].toSorted(
     (a, b) => a.getTime() - b.getTime()
@@ -36,7 +37,7 @@ export function freeStreaks({ placedDays, holidays }: FreeStreaksParams): FreeSt
       streaks.push({
         days: current,
         length: current.length,
-        hasPlacedDay: current.some((day) => placed.has(day.toDateString())),
+        hasPlacedDay: current.some((day) => placed.has(dayKey(day))),
         hasWeekend: current.some(isWeekend),
       });
     }
@@ -49,7 +50,7 @@ export function freeStreaks({ placedDays, holidays }: FreeStreaksParams): FreeSt
   });
 
   for (const day of scan) {
-    if (isWeekend(day) || free.has(day.toDateString())) current.push(day);
+    if (isWeekend(day) || free.has(dayKey(day))) current.push(day);
     else close();
   }
   close();

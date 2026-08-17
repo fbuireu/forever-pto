@@ -148,9 +148,10 @@ The two kinds of hand-edited day reach the engine by different routes, and that 
 **A day passed both ways must only be counted once.** `holidaysWithManual` and `manuallySelectedDays`
 overlap by construction, so any Metric that subtracts Holidays and PTO Days as two independent counts
 subtracts every Manual Day twice. `getWorkedDaysPerMonth` did exactly that and understated Worked Days per
-month by one day per Manual Day; it now unions both lists into a set of `toDateString()` keys before
-counting. Every other Metric touching both lists already built a set. A new Metric that reads `holidays` and
-`ptoDays` together has to do the same.
+month by one day per Manual Day. Every Metric touching both lists now goes through one helper,
+`dayOffKeys`, in the calendar domain's `metrics/utils/dayOff.ts`, so a new Metric that reads `holidays` and
+`ptoDays` together cannot forget — there is no second way to build the set. That instruction used to live
+here as a note to future readers, which is where a function should have been.
 
 The engine drops a `removedDays` date from the Workday list and stops there: it does not become a Free Day
 for Bridge expansion or scoring. Folding them back into the holidays array would restore exactly the bias the
