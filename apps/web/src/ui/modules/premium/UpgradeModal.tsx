@@ -10,10 +10,11 @@ import {
 } from '@ui/modules/core/animate/base/Dialog';
 import { Lock } from '@ui/modules/core/animate/icons/Lock';
 import { Banner } from '@ui/modules/core/primitives/Banner';
-import { Button } from '@ui/modules/core/primitives/Button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
-import { AlertCircle, Crown, Loader2 } from 'lucide-react';
+import { FormButtons } from '@ui/modules/shared/FormButtons';
+import { Step, StepOutcome, StepOutcomeTone } from '@ui/modules/shared/StepOutcome';
+import { AlertCircle, Crown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -27,13 +28,8 @@ interface UpgradeModalProps {
   isLoading: boolean;
 }
 
-const Step = {
-  INPUT: 'input',
-  SUCCESS: 'success',
-  ERROR: 'error',
-} as const;
-
-type Step = (typeof Step)[keyof typeof Step];
+const MS_PER_SECOND = 1000;
+const AUTO_CLOSE_MS = 5 * MS_PER_SECOND;
 
 const createEmailSchema = (getMessage: (key: string) => string) =>
   z.object({
@@ -70,16 +66,11 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
 
     if (success) {
       setStep(Step.SUCCESS);
-      setTimeout(() => {
-        handleClose();
-      }, 5000);
-    } else {
-      form.setError('email', {
-        type: 'manual',
-        message: t('emailNotFoundError'),
-      });
-      setStep(Step.ERROR);
+      setTimeout(handleClose, AUTO_CLOSE_MS);
+      return;
     }
+
+    setStep(Step.ERROR);
   };
 
   const handleTryAgain = () => {
@@ -128,51 +119,36 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
                 )}
               />
 
-              <div className='flex gap-2'>
-                <Button type='submit' variant='success' disabled={isLoading} className='flex-1'>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className='size-4 mr-2 animate-spin' />
-                      {t('verifying')}
-                    </>
-                  ) : (
-                    t('verifyAccess')
-                  )}
-                </Button>
-                <Button type='button' variant='destructive' onClick={handleClose} disabled={isLoading}>
-                  {t('cancel')}
-                </Button>
-              </div>
+              <FormButtons
+                pending={isLoading}
+                submitText={t('verifyAccess')}
+                loadingText={t('verifying')}
+                cancelText={t('cancel')}
+                onCancel={handleClose}
+              />
             </form>
           </Form>
         )}
 
         {step === Step.SUCCESS && (
-          <div className='text-center space-y-4 py-4'>
-            <Crown className='size-12 text-yellow-500 mx-auto animate-pulse' />
-            <div>
-              <h3 className='font-semibold text-green-600'>{t('accessGranted')}</h3>
-              <p className='text-sm text-muted-foreground mt-1'>{t('welcomeToPremium', { seconds: 5 })}</p>
-            </div>
-          </div>
+          <StepOutcome
+            tone={StepOutcomeTone.SUCCESS}
+            icon={<Crown className='size-8 text-[var(--color-brand-ink)]' />}
+            title={t('accessGranted')}
+            description={t('welcomeToPremium', { seconds: AUTO_CLOSE_MS / MS_PER_SECOND })}
+            onClose={handleClose}
+          />
         )}
 
         {step === Step.ERROR && (
-          <div className='text-center space-y-4'>
-            <AlertCircle className='size-12 text-destructive mx-auto' />
-            <div>
-              <h3 className='font-semibold'>{t('accessDenied')}</h3>
-              <p className='text-sm text-muted-foreground mt-1'>{t('emailNotFound')}</p>
-            </div>
-            <div className='flex gap-2 pt-2'>
-              <Button onClick={handleTryAgain} variant='outline' className='flex-1'>
-                {t('tryAgain')}
-              </Button>
-              <Button onClick={handleClose} variant='destructive' className='flex-1'>
-                {t('close')}
-              </Button>
-            </div>
-          </div>
+          <StepOutcome
+            tone={StepOutcomeTone.ERROR}
+            icon={<AlertCircle className='size-8 text-white' />}
+            title={t('accessDenied')}
+            description={t('emailNotFound')}
+            onClose={handleClose}
+            onTryAgain={handleTryAgain}
+          />
         )}
       </DialogContent>
     </Dialog>

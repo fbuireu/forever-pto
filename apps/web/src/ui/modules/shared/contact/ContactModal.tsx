@@ -18,7 +18,6 @@ import {
   DialogTitle,
 } from '@ui/modules/core/animate/base/Dialog';
 import { CircleCheckBig } from '@ui/modules/core/animate/icons/CircleCheckBig';
-import { Button } from '@ui/modules/core/primitives/Button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/modules/core/primitives/Form';
 import { Input } from '@ui/modules/core/primitives/Input';
 import { Textarea } from '@ui/modules/core/primitives/Textarea';
@@ -28,20 +27,13 @@ import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { useShallow } from 'zustand/react/shallow';
 import { FormButtons } from '../FormButtons';
+import { Step, StepOutcome, StepOutcomeTone } from '../StepOutcome';
 import { resolveApiErrorMessage } from '../utils/helpers';
 
 interface ContactModalProps {
   open: boolean;
   onClose: () => void;
 }
-
-const Step = {
-  INPUT: 'input',
-  SUCCESS: 'success',
-  ERROR: 'error',
-} as const;
-
-type Step = (typeof Step)[keyof typeof Step];
 
 export const ContactModal = ({ open, onClose }: ContactModalProps) => {
   const t = useTranslations('contact');
@@ -216,44 +208,24 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
         )}
 
         {step === Step.SUCCESS && (
-          <div className='flex flex-col items-center gap-5 py-4'>
-            <div className='size-16 bg-[var(--color-brand-teal)] border-[3px] border-[var(--frame)] rounded-[14px] shadow-[var(--shadow-brutal-btn)] grid place-items-center'>
-              <CircleCheckBig animateOnView className='size-8 text-[var(--color-brand-ink)]' />
-            </div>
-            <div className='text-center'>
-              <span className='inline-flex items-center gap-2 bg-[var(--color-brand-teal)] border-[2px] border-[var(--frame)] rounded-[6px] px-3 py-1 font-mono text-[11px] font-bold tracking-[0.12em] uppercase mb-3'>
-                <span className='size-1.5 rounded-full bg-[var(--color-brand-ink)]' />
-                {t('successTitle')}
-              </span>
-              <p className='text-sm text-muted-foreground'>{t('successDescription')}</p>
-            </div>
-            <Button variant='destructive' size='sm' onClick={handleClose}>
-              {t('close')}
-            </Button>
-          </div>
+          <StepOutcome
+            tone={StepOutcomeTone.SUCCESS}
+            icon={<CircleCheckBig animateOnView className='size-8 text-[var(--color-brand-ink)]' />}
+            title={t('successTitle')}
+            description={t('successDescription')}
+            onClose={handleClose}
+          />
         )}
 
         {step === Step.ERROR && (
-          <div className='flex flex-col items-center gap-5 py-4'>
-            <div className='size-16 bg-destructive border-[3px] border-[var(--frame)] rounded-[14px] shadow-[var(--shadow-brutal-btn)] grid place-items-center'>
-              <AlertCircle className='size-8 text-white' />
-            </div>
-            <div className='text-center'>
-              <span className='inline-flex items-center gap-2 bg-destructive text-white border-[2px] border-[var(--frame)] rounded-[6px] px-3 py-1 font-mono text-[11px] font-bold tracking-[0.12em] uppercase mb-3'>
-                <span className='size-1.5 rounded-full bg-white' />
-                {t('errorTitle')}
-              </span>
-              <p className='text-sm text-muted-foreground'>{errorMessage}</p>
-            </div>
-            <div className='flex gap-2 w-full'>
-              <Button variant='outline' onClick={handleTryAgain} className='flex-1'>
-                {t('tryAgain')}
-              </Button>
-              <Button onClick={handleClose} variant='destructive' className='flex-1'>
-                {t('close')}
-              </Button>
-            </div>
-          </div>
+          <StepOutcome
+            tone={StepOutcomeTone.ERROR}
+            icon={<AlertCircle className='size-8 text-white' />}
+            title={t('errorTitle')}
+            description={errorMessage}
+            onClose={handleClose}
+            onTryAgain={handleTryAgain}
+          />
         )}
       </DialogContent>
     </Dialog>

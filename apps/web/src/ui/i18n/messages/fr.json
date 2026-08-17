@@ -426,8 +426,6 @@
     "successTitle": "Message envoyé !",
     "successDescription": "Nous te répondrons dès que possible.",
     "errorTitle": "Une erreur est survenue",
-    "tryAgain": "Réessayer",
-    "close": "Fermer",
     "failedToSend": "Échec de l'envoi du message",
     "errors": {
       "internal_error": "Quelque chose s'est mal passé de notre côté. Réessaie plus tard.",
@@ -696,8 +694,6 @@
     "accessDenied": "Accès refusé",
     "emailNotFound": "Cet e-mail ne figure pas dans notre liste d'utilisateurs premium.",
     "emailNotFoundError": "E-mail introuvable dans notre liste d'utilisateurs premium",
-    "tryAgain": "Réessayer",
-    "close": "Fermer",
     "invalidEmail": "Saisis une adresse e-mail valide",
     "emailRequired": "L'e-mail est requis"
   },
@@ -877,7 +873,9 @@
   "formButtons": {
     "submit": "Envoyer",
     "processing": "Traitement en cours...",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "tryAgain": "Réessayer",
+    "close": "Fermer"
   },
   "devFooter": {
     "madeWith": "Fait avec",

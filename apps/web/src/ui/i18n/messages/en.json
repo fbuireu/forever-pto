@@ -426,8 +426,6 @@
     "successTitle": "Message sent!",
     "successDescription": "We'll get back to you shortly.",
     "errorTitle": "Something went wrong",
-    "tryAgain": "Try again",
-    "close": "Close",
     "failedToSend": "Failed to send message",
     "errors": {
       "internal_error": "Something went wrong on our side. Please try again later.",
@@ -696,8 +694,6 @@
     "accessDenied": "Access denied",
     "emailNotFound": "That email isn't in our premium users list.",
     "emailNotFoundError": "Email not found in our premium users list",
-    "tryAgain": "Try again",
-    "close": "Close",
     "invalidEmail": "Enter a valid email address",
     "emailRequired": "Email is required"
   },
@@ -877,7 +873,9 @@
   "formButtons": {
     "submit": "Submit",
     "processing": "Processing...",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "tryAgain": "Try again",
+    "close": "Close"
   },
   "devFooter": {
     "madeWith": "Made with",

@@ -426,8 +426,6 @@
     "successTitle": "Mensaje enviado",
     "successDescription": "Te respondemos lo antes posible.",
     "errorTitle": "Algo ha fallado",
-    "tryAgain": "Intentar de nuevo",
-    "close": "Cerrar",
     "failedToSend": "Error al enviar el mensaje",
     "errors": {
       "internal_error": "Algo ha fallado por nuestra parte. Inténtalo de nuevo más tarde.",
@@ -696,8 +694,6 @@
     "accessDenied": "Acceso denegado",
     "emailNotFound": "Este email no está en nuestra base de usuarios premium.",
     "emailNotFoundError": "Email no encontrado entre los usuarios premium",
-    "tryAgain": "Intentar de nuevo",
-    "close": "Cerrar",
     "invalidEmail": "Introduce un email válido",
     "emailRequired": "El email es obligatorio"
   },
@@ -877,7 +873,9 @@
   "formButtons": {
     "submit": "Enviar",
     "processing": "Procesando...",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "tryAgain": "Intentar de nuevo",
+    "close": "Cerrar"
   },
   "devFooter": {
     "madeWith": "Hecho con",

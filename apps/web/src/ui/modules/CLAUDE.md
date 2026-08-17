@@ -10,7 +10,7 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 | --- | --- | --- |
 | `core/` | The design system: `primitives/` plus the `animate/` layer. See [core/CLAUDE.md](./core/CLAUDE.md) | Yes, everywhere |
 | `pages/` | One folder per screen — `homepage/`, `planner/`, `legal/`, `error/`, `not-found/`. See [pages/planner/CLAUDE.md](./pages/planner/CLAUDE.md) | No, by definition |
-| `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, `shared/Logo.tsx`, `shared/Icon.tsx`, `shared/FormButtons.tsx`, `shared/SupportButton.tsx`, `shared/ConditionalWrapper.tsx`, `shared/WebMCP.tsx`, plus `shared/utils/helpers.ts` for the helpers those pieces need | Yes |
+| `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, `shared/Logo.tsx`, `shared/Icon.tsx`, `shared/FormButtons.tsx`, `shared/StepOutcome.tsx`, `shared/SupportButton.tsx`, `shared/ConditionalWrapper.tsx`, `shared/WebMCP.tsx`, plus `shared/utils/helpers.ts` for the helpers those pieces need | Yes |
 | `layout/` | `layout/LegalLayout.tsx` only — the card chrome the four legal pages share | Between sibling routes |
 | `sidebar/` | `sidebar/AppSidebar.tsx` and its controls: country, region, year, Strategy, PTO Day budget, the calculators, calendar export | One screen, but not a page section |
 | `premium/` | The Premium gate and the Donation checkout: `premium/PremiumFeature.tsx`, `premium/PremiumModal.tsx`, `premium/UpgradeModal.tsx`, `premium/CheckoutForm.tsx` | Yes |
@@ -78,6 +78,37 @@ the module path anyway, so a file whose export is named something else just make
 browser API. `sidebar/AppSidebar.tsx` and `layout/LegalLayout.tsx` are `async` server components that
 call `getTranslations` from `next-intl/server`; client components use the `useTranslations` hook. The
 planner itself is client-side end to end — [ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md).
+
+## A three-step form modal
+
+`shared/StepOutcome.tsx` holds what `premium/UpgradeModal.tsx` and
+`shared/contact/ContactModal.tsx` were writing out twice: the `Step`
+(`INPUT | SUCCESS | ERROR`) const both declared identically, and the success and
+error panels they both render once the form is done.
+
+The panels had **drifted visually**, not just structurally. `ContactModal` used the
+neo-brutalist treatment — a 64px tile with a 3px frame and hard shadow, and an
+uppercase mono badge over the description — while `UpgradeModal` rendered a plain
+centred icon and heading. They are both brutalist now; `StepOutcome` takes a `tone`
+(`SUCCESS` or `ERROR`), an icon, a title, a description, and an `onTryAgain` whose
+presence is what decides between one Close button and the Try-again/Close pair.
+
+Three other things the two disagreed about are gone with it:
+
+- **`UpgradeModal` hand-wrote the submit row**, including a verbatim copy of
+  `FormButtons`' own `<Loader2 className='size-4 mr-2 animate-spin' />`, while
+  `FormButtons` exists for exactly that. It uses it now.
+- **It reported one failure twice** — `form.setError('email', …)` *and* the ERROR
+  panel, with two near-identical strings. The field error was invisible anyway,
+  because the ERROR step unmounts the form that would render it. Only the panel
+  remains.
+- **`setTimeout(handleClose, 5000)` sat beside `t('welcomeToPremium', { seconds: 5 })`**
+  with nothing tying the two numbers together. Both read `AUTO_CLOSE_MS` now.
+
+`tryAgain` and `close` moved from the `contact` and `upgrade` namespaces into
+`formButtons`, where `submit`, `processing` and `cancel` already live. They were
+character-identical in all six locales, so that is twelve translations recovered and
+one place left to edit.
 
 ## Skeletons and bones
 

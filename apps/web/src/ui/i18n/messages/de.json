@@ -426,8 +426,6 @@
     "successTitle": "Nachricht gesendet!",
     "successDescription": "Wir melden uns so schnell wie möglich bei dir.",
     "errorTitle": "Ein Fehler ist aufgetreten",
-    "tryAgain": "Erneut versuchen",
-    "close": "Schließen",
     "failedToSend": "Nachricht konnte nicht gesendet werden",
     "errors": {
       "internal_error": "Bei uns ist etwas schiefgelaufen. Bitte versuche es später noch einmal.",
@@ -696,8 +694,6 @@
     "accessDenied": "Zugang verweigert",
     "emailNotFound": "Diese E-Mail-Adresse ist nicht als Premium-Nutzer:in registriert.",
     "emailNotFoundError": "E-Mail-Adresse nicht gefunden",
-    "tryAgain": "Erneut versuchen",
-    "close": "Schließen",
     "invalidEmail": "Gib eine gültige E-Mail-Adresse ein.",
     "emailRequired": "Gib deine E-Mail-Adresse ein."
   },
@@ -877,7 +873,9 @@
   "formButtons": {
     "submit": "Absenden",
     "processing": "Wird verarbeitet...",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "tryAgain": "Erneut versuchen",
+    "close": "Schließen"
   },
   "devFooter": {
     "madeWith": "Gemacht mit",

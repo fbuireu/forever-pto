@@ -426,8 +426,6 @@
     "successTitle": "Messaggio inviato!",
     "successDescription": "Ti risponderemo il prima possibile.",
     "errorTitle": "Qualcosa è andato storto",
-    "tryAgain": "Riprova",
-    "close": "Chiudi",
     "failedToSend": "Impossibile inviare il messaggio",
     "errors": {
       "internal_error": "Qualcosa è andato storto da parte nostra. Riprova più tardi.",
@@ -696,8 +694,6 @@
     "accessDenied": "Accesso negato",
     "emailNotFound": "Questa email non è nella nostra lista di utenti premium.",
     "emailNotFoundError": "Email non trovata nella nostra lista di utenti premium",
-    "tryAgain": "Riprova",
-    "close": "Chiudi",
     "invalidEmail": "Inserisci un'email valida",
     "emailRequired": "L'email è obbligatoria"
   },
@@ -877,7 +873,9 @@
   "formButtons": {
     "submit": "Invia",
     "processing": "Elaborazione...",
-    "cancel": "Annulla"
+    "cancel": "Annulla",
+    "tryAgain": "Riprova",
+    "close": "Chiudi"
   },
   "devFooter": {
     "madeWith": "Fatto con",

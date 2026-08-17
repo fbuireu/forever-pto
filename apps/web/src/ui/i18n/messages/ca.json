@@ -426,8 +426,6 @@
     "successTitle": "Missatge enviat!",
     "successDescription": "T'escrivim de seguida.",
     "errorTitle": "Alguna cosa ha fallat",
-    "tryAgain": "Tornar a provar",
-    "close": "Tanca",
     "failedToSend": "Error en enviar el missatge",
     "errors": {
       "internal_error": "Alguna cosa ha fallat per part nostra. Torna-ho a provar més tard.",
@@ -696,8 +694,6 @@
     "accessDenied": "Accés denegat",
     "emailNotFound": "Aquest email no està a la nostra llista d'usuaris premium.",
     "emailNotFoundError": "Email no trobat a la nostra llista d'usuaris premium",
-    "tryAgain": "Tornar a provar",
-    "close": "Tanca",
     "invalidEmail": "Introdueix un email vàlid",
     "emailRequired": "L'email és obligatori"
   },
@@ -877,7 +873,9 @@
   "formButtons": {
     "submit": "Envia",
     "processing": "Processant...",
-    "cancel": "Cancel·la"
+    "cancel": "Cancel·la",
+    "tryAgain": "Tornar a provar",
+    "close": "Tanca"
   },
   "devFooter": {
     "madeWith": "Fet amb",
