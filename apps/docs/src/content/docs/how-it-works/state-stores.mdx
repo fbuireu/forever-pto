@@ -40,7 +40,7 @@ The largest store: `holidays` (the `HolidayDTO[]`), the current `suggestion`, `a
 
 - `fetchHolidays` dynamic-imports `@infrastructure/services/holidays/getHolidays`, preserves user-created (`CUSTOM`) holidays and dedupes by date.
 - `generateSuggestions` / `generateAlternatives` dynamic-import the domain functions for the synchronous path; `setCalculationResult` is the entry point used by the [Web Worker path](/how-it-works/calculation-worker/), preserving the selected alternative index across recalculations.
-- `addHoliday` / `editHoliday` / `removeHoliday` manage custom holidays; `toggleDaySelection` implements manual day editing with PTO-budget enforcement; `trimManualDays`, `getRemainingDays` and `getFreeDaysForMonth` support the calendar UI.
+- `addHoliday` / `editHoliday` / `removeHoliday` manage custom holidays, and all three ask one predicate — `heldOn` — whether the date is already taken and by what; `toggleDaySelection` implements manual day editing with PTO-budget enforcement; `trimManualDays` supports the calendar UI. Remaining Budget comes from `measureBudget` in the calendar domain rather than from a store action.
 
 Because `Date` does not survive JSON, `partialize` serializes every date (including nested bridge dates) to ISO strings and `onRehydrateStorage` revives them.
 
