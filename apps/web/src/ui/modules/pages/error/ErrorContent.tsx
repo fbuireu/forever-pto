@@ -1,0 +1,262 @@
+'use client';
+
+import { logClientError } from '@application/shared/utils/clientLog';
+import { Button } from '@ui/modules/core/primitives/Button';
+import { ArrowUpRight, RotateCcw } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
+import { useEffect, useRef, useState } from 'react';
+import { version } from '../../../../../package.json';
+import type { ErrorBoundaryProps } from './types';
+
+const ContactModal = dynamic(() =>
+  import('@ui/modules/shared/contact/ContactModal').then((m) => ({ default: m.ContactModal }))
+);
+
+const STATUS_URL = 'https://status.forever-pto.com';
+const CHANGELOG_URL = 'https://github.com/fbuireu/forever-pto/releases';
+const SUPPORT_URL = 'https://github.com/fbuireu/forever-pto/issues/new?template=bug_report.yml';
+
+type ErrorContentProps = ErrorBoundaryProps;
+
+type LogLevel = 'INFO' | 'WARN' | 'ERROR' | 'OK';
+
+const LEVEL_COLORS: Record<LogLevel, string> = {
+  INFO: 'var(--color-brand-teal)',
+  WARN: 'var(--color-brand-yellow)',
+  ERROR: 'var(--color-brand-red)',
+  OK: 'var(--color-brand-green)',
+};
+
+const LOG_LINE_REGEX = /^(\[\d{2}:\d{2}:\d{2}\])\s+(INFO|WARN|ERROR|OK)\s+(.*)$/;
+
+function TerminalLine({ line }: { line: string }) {
+  const m = line.match(LOG_LINE_REGEX);
+  if (m) {
+    const [, ts, level, rest] = m;
+    return (
+      <div>
+        <span className='text-[#666]'>{ts} </span>
+        <span className='font-bold inline-block min-w-[3.5em]' style={{ color: LEVEL_COLORS[level as LogLevel] }}>
+          {level}
+        </span>
+        {rest}
+      </div>
+    );
+  }
+
+  if (line.startsWith('💥')) {
+    return (
+      <span className='inline-flex items-center gap-1.5 border border-[var(--color-brand-red)] rounded px-1.5 py-0.5 text-[var(--color-brand-red)] text-[12px]'>
+        {line}
+      </span>
+    );
+  }
+
+  if (line.startsWith('  at ')) return <div className='text-[#666]'>{line}</div>;
+  if (line === '---') return <div className='text-[#444]'>---</div>;
+
+  if (line.startsWith('$ ')) {
+    const content = line.slice(2);
+    const hasCursor = content.endsWith(' _');
+    const text = hasCursor ? content.slice(0, -2) : content;
+    return (
+      <div>
+        <span className='text-[var(--color-brand-teal)]'>$ </span>
+        {text}
+        {hasCursor && (
+          <span className='inline-block w-[0.5em] h-[1em] bg-[var(--color-brand-yellow)] align-text-bottom ml-[2px] [animation:term-blink_1s_steps(2,start)_infinite]' />
+        )}
+      </div>
+    );
+  }
+
+  if (line === '') return <div className='h-[1.4em]' />;
+  return <div>{line}</div>;
+}
+
+const LINE_DELAY_MS = 130;
+
+export function ErrorContent({ error, reset }: ErrorContentProps) {
+  const t = useTranslations('error');
+  const [contactOpen, setContactOpen] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(0);
+  const capturedAt = useRef(new Date());
+  const terminalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    logClientError('Unhandled error caught by error boundary', error, {
+      component: 'ErrorPage',
+      digest: error.digest,
+    });
+  }, [error]);
+
+  const ts = [
+    capturedAt.current.getUTCHours().toString().padStart(2, '0'),
+    capturedAt.current.getUTCMinutes().toString().padStart(2, '0'),
+    capturedAt.current.getUTCSeconds().toString().padStart(2, '0'),
+  ].join(':');
+  const year = capturedAt.current.getFullYear();
+
+  const [traceLines] = useState(() =>
+    [
+      `[${ts}] INFO  calc-engine: computing bridges for ${year}`,
+      `[${ts}] INFO  loaded holidays · ratio target 3.5x`,
+      `[${ts}] WARN  calendar-sync: rate limit close (external API)`,
+      `[${ts}] WARN  retry #1 · backoff 400ms`,
+      `[${ts}] ERROR unexpected <palm/> token`,
+      `[${ts}] ERROR ${error.message || t('internalServerError')}`,
+      ``,
+      `  at calcBridges (vacation-optimizer.ts:127:14)`,
+      `  at Object.computePlan (engine.ts:48:22)`,
+      `  at async handler (api/bridges.ts:31:9)`,
+      ...(error.stack ? [``, ...error.stack.split('\n')] : []),
+      ``,
+      `💥 HTTP 500 — caught`,
+      ``,
+      `[${ts}] OK    alerting on-call · #ops-urgent`,
+      `[${ts}] OK    fallback → cached plan (stale 12m)`,
+      `---`,
+      `$ ${t('terminalPrompt')}`,
+    ].map((line, id) => ({ id, line }))
+  );
+
+  useEffect(() => {
+    if (visibleCount >= traceLines.length) return;
+    const id = setTimeout(() => setVisibleCount((c) => c + 1), LINE_DELAY_MS);
+    return () => clearTimeout(id);
+  }, [visibleCount, traceLines.length]);
+
+  useEffect(() => {
+    terminalRef.current?.scrollTo({ top: terminalRef.current.scrollHeight, behavior: 'smooth' });
+  }, []);
+
+  return (
+    <>
+      <main
+        data-testid='error-boundary'
+        className='flex-1 py-[60px]'
+        style={{
+          background: [
+            'linear-gradient(0deg, transparent 95%, var(--grid-color) 95%)',
+            'linear-gradient(90deg, transparent 95%, var(--grid-color) 95%)',
+            'var(--background)',
+          ].join(', '),
+          backgroundSize: '32px 32px',
+        }}
+      >
+        <div className='max-w-[1320px] mx-auto grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-[60px] px-7 items-center'>
+          <div className='flex flex-col'>
+            <div className='flex items-start gap-[10px] mb-[26px] font-display font-extrabold tracking-[-0.06em] leading-[0.82] text-[clamp(90px,13vw,200px)]'>
+              <span className='inline-block bg-[var(--color-brand-orange)] text-white border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]'>
+                5
+              </span>
+              <span className='inline-block bg-[var(--accent)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]'>
+                0
+              </span>
+              <span className='inline-block bg-[var(--color-brand-teal)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]'>
+                0
+              </span>
+            </div>
+
+            <span className='inline-flex items-center gap-2 self-start bg-destructive text-white px-3 py-1.5 rounded-[6px] font-mono text-[11px] font-bold tracking-[0.12em] uppercase mb-[14px]'>
+              <span className='size-2 rounded-full bg-[var(--accent)]' />
+              {t('kicker', { version, time: ts })}
+            </span>
+
+            <h1 className='font-display font-semibold leading-none tracking-[-0.035em] mb-[18px] text-wrap-pretty text-[clamp(28px,3.8vw,48px)]'>
+              {t('title')}{' '}
+              <span className='relative inline-block bg-[var(--color-brand-orange)] text-white px-2 border-[3px] border-[var(--frame)] rounded-[6px] mx-0.5 [animation:highlight-shake_4s_ease-in-out_infinite_1.5s]'>
+                {t('titleHighlight')}
+              </span>{' '}
+              <em className='font-serif italic font-normal'>{t('titleEmphasis')}</em>
+            </h1>
+
+            <p className='text-[18px] leading-[1.55] text-muted-foreground max-w-[46ch] mb-8'>{t('lede')}</p>
+
+            <div className='flex flex-wrap gap-[14px] mb-9'>
+              <Button
+                variant='default'
+                size='lg'
+                onClick={reset}
+                className='[filter:none] hover:[filter:none] active:[filter:none] shadow-[var(--shadow-brutal-btn-accent)] hover:shadow-[var(--shadow-brutal-btn-accent-hover)] active:shadow-[var(--shadow-brutal-btn-accent-active)]'
+              >
+                <RotateCcw className='size-4' />
+                {t('retry')}
+              </Button>
+              <Button variant='outline' size='lg' asChild>
+                <a href={STATUS_URL} target='_blank' rel='noopener noreferrer'>
+                  {t('statusPage')}
+                  <ArrowUpRight className='size-4' />
+                </a>
+              </Button>
+            </div>
+
+            <div className='border-t-2 border-dashed border-[var(--frame)] pt-[22px] max-w-[520px]'>
+              <span className='block font-mono text-[11px] font-bold text-muted-foreground tracking-[0.12em] uppercase mb-3'>
+                {t('meanwhile')}
+              </span>
+              <div className='flex flex-col gap-2'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  onClick={() => setContactOpen(true)}
+                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[var(--shadow-brutal-3)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-px active:translate-y-px active:shadow-[var(--shadow-brutal-btn-active)]'
+                >
+                  <span className='shrink-0 size-6 bg-[var(--color-brand-purple)] text-white border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
+                    @
+                  </span>
+                  {t('contact')}
+                </Button>
+                <Button
+                  variant='outline'
+                  asChild
+                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[var(--shadow-brutal-3)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-px active:translate-y-px active:shadow-[var(--shadow-brutal-btn-active)]'
+                >
+                  <a href={CHANGELOG_URL} target='_blank' rel='noopener noreferrer'>
+                    <span className='shrink-0 size-6 bg-[var(--color-brand-teal)] border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
+                      ∿
+                    </span>
+                    {t('changelog')}
+                  </a>
+                </Button>
+                <Button
+                  variant='outline'
+                  asChild
+                  className='w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[var(--shadow-brutal-3)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-px active:translate-y-px active:shadow-[var(--shadow-brutal-btn-active)]'
+                >
+                  <a href={SUPPORT_URL} target='_blank' rel='noopener noreferrer'>
+                    <span className='shrink-0 size-6 bg-[var(--color-brand-orange)] text-white border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold'>
+                      !
+                    </span>
+                    {t('support')}
+                  </a>
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className='flex items-center justify-center'>
+            <div className='w-full max-w-[520px] rounded-[14px] overflow-hidden border-[4px] border-[var(--frame)] [box-shadow:var(--shadow-brutal-xl-orange)]'>
+              <div className='flex items-center gap-2 bg-[#1a1a1a] border-b-2 border-black/80 px-3.5 py-2.5'>
+                <span className='size-3 rounded-full bg-[var(--color-brand-red)] border border-black/20' />
+                <span className='size-3 rounded-full bg-[var(--color-brand-yellow)] border border-black/20' />
+                <span className='size-3 rounded-full bg-[var(--color-brand-green)] border border-black/20' />
+                <span className='ml-auto font-mono text-[11px] text-[#888] tracking-[0.06em]'>server.log: pty/0</span>
+              </div>
+              <div ref={terminalRef} className='overflow-y-auto max-h-[420px] bg-[#1a1a1a]'>
+                <pre className='font-mono text-[13px] leading-[1.55] text-[#ccc] p-[18px_20px_22px] whitespace-pre-wrap break-words m-0'>
+                  {traceLines.slice(0, visibleCount).map(({ id, line }) => (
+                    <TerminalLine key={id} line={line} />
+                  ))}
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
+    </>
+  );
+}

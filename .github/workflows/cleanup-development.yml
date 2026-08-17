@@ -7,11 +7,18 @@ on:
 permissions:
   contents: read
 
+# Queues behind ci.yml, whose `e2e` job drives this same preview Worker. The
+# group is its `${{ github.workflow }}-${{ github.ref }}`; renaming that workflow
+# silently stops the wait. Full reasoning in the repo guide.
+concurrency:
+  group: CI-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
-  cleanup:
-    name: Delete preview Worker
+  cleanup-web:
+    name: Delete the web preview Worker
     runs-on: ubuntu-latest
-    environment: development
+    environment: web-development
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -31,6 +38,36 @@ jobs:
           retry_wait_seconds: 10
           shell: bash
           command: |
+            cd "$GITHUB_WORKSPACE/apps/web"
+            output=$(pnpm exec wrangler delete "$WORKER_NAME" --force 2>&1) && { echo "$output"; exit 0; }
+            echo "$output"
+            echo "$output" | grep -qi "does not exist" && exit 0
+            exit 1
+
+  cleanup-docs:
+    name: Delete the docs preview Worker
+    runs-on: ubuntu-latest
+    environment: docs-development
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/prepare-env
+      - name: Delete preview Worker
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
+        env:
+          WORKER_NAME: pr-${{ github.event.pull_request.number }}-forever-pto-docs-development
+        with:
+          timeout_minutes: 2
+          max_attempts: 5
+          retry_wait_seconds: 10
+          shell: bash
+          command: |
+            cd "$GITHUB_WORKSPACE/apps/docs"
             output=$(pnpm exec wrangler delete "$WORKER_NAME" --force 2>&1) && { echo "$output"; exit 0; }
             echo "$output"
             echo "$output" | grep -qi "does not exist" && exit 0

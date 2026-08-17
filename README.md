@@ -1,8 +1,21 @@
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="apps/web/public/static/images/forever-pto-logo-dark.png">
+  <img src="apps/web/public/static/images/forever-pto-logo.png" alt="" width="80" align="center">
+</picture>
+
 # Forever PTO
 
-**Maximize your time off.** Forever PTO helps you strategically combine your PTO days with public holidays to get the most out of every one of them.
+**Maximize your time off. Forever PTO helps you strategically combine your PTO days with public holidays to get the most out of every one of them.**
 
-→ **[forever-pto.com](https://forever-pto.com)** · **[docs.forever-pto.com](https://docs.forever-pto.com)** (wiki)
+[![CI](https://img.shields.io/github/actions/workflow/status/fbuireu/forever-pto/ci.yml?style=flat-square&logo=github&label=CI)](https://github.com/fbuireu/forever-pto/actions/workflows/ci.yml)
+[![Uptime](https://uptime.betterstack.com/status-badges/v1/monitor/272ww.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
+[![License: Private](https://img.shields.io/badge/License-Private-lightgrey?style=flat-square)](#license)
+
+**[forever-pto.com](https://forever-pto.com)** · **[Documentation](https://docs.forever-pto.com)** · **[Getting Started](#getting-started)** · **[Stack](#stack)** · **[Contributing](./CONTRIBUTING.md)**
+
+</div>
 
 ---
 
@@ -30,7 +43,7 @@ Given your country, region, year, and number of PTO days, Forever PTO suggests t
 
 The full wiki lives at **[docs.forever-pto.com](https://docs.forever-pto.com)** — architecture, runtime flows (country detection, premium, holidays engine…), the design system with live component demos, and the complete CI/CD and environments lifecycle.
 
-This repo is a pnpm workspace: the app at the root (`forever-pto`) and the docs site in [`docs/`](docs/) (`forever-pto-docs`, Astro Starlight), which reuses the app's real components and tokens and deploys independently. Docs-only changes must use `docs:` commit/PR titles (squash-merge feeds semantic-release).
+This repo is a workspace with two packages: the app in [`apps/web/`](apps/web/) (`forever-pto`) and the docs site in [`apps/docs/`](apps/docs/) (`forever-pto-docs`, Astro Starlight), which reuses the app's real components and tokens and deploys independently. Each versions itself: a commit is attributed to whichever package its paths fall under, so keep a pull request to one package.
 
 ```bash
 pnpm --filter forever-pto-docs dev   # docs dev server
@@ -60,14 +73,14 @@ pnpm --filter forever-pto-docs dev   # docs dev server
 
 ## Getting started
 
-**Requirements:** Node.js 26.3.0 (`.nvmrc`, mirrored in `engines.node`), pnpm 11.20.0 (`packageManager`) — pinned, match exactly
+**Requirements:** Node.js 26.3.0 (`.nvmrc`, mirrored in `engines.node`), pnpm 11.21.0 (`packageManager`) — pinned, match exactly
 
 ```bash
 # Install dependencies
 pnpm install
 
 # Copy env file and fill in values
-cp .env.example .env.development
+cp apps/web/.env.example apps/web/.env.development
 
 # Start dev server
 pnpm dev
@@ -95,7 +108,7 @@ pnpm format:all       # Format all files
 
 ## Environment variables
 
-See [`.env.example`](.env.example) for the full list. Key variables:
+See [`apps/web/.env.example`](apps/web/.env.example) for the full list. Key variables:
 
 | Variable | Description |
 | --- | --- |
@@ -111,12 +124,14 @@ See [`.env.example`](.env.example) for the full list. Key variables:
 
 | Document | What it answers |
 | --- | --- |
-| [`CLAUDE.md`](CLAUDE.md) | How the codebase is built, and the rules for changing it. Start here |
+| [`CLAUDE.md`](CLAUDE.md) | How the repository is put together, and the rules for changing it. Start here |
+| [`apps/web/README.md`](apps/web/README.md) | The planner: what it does, how to run it, how it releases |
+| [`apps/docs/README.md`](apps/docs/README.md) | The wiki: how to run it, and how to write a page |
 | [`CONTEXT.md`](CONTEXT.md) | The domain glossary — one canonical name per concept |
-| [`docs/adr/`](docs/adr/) | Why it is like this. One hard-to-reverse decision per file |
+| [`adr/`](adr/) | Why it is like this. One hard-to-reverse decision per file |
 
-Selected folders under `src/` carry their own `CLAUDE.md` with the detail for that folder — the five layer roots plus sixteen sub-folders, all listed in the root [`CLAUDE.md`](CLAUDE.md).
-[`docs/docs-consistency.test.ts`](docs/docs-consistency.test.ts) runs with the unit suite and fails the build
+Selected folders under `apps/web/src/` carry their own `CLAUDE.md` with the detail for that folder — the five layer roots plus sixteen sub-folders, all listed in [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md).
+[`tests/docs-consistency.test.ts`](tests/docs-consistency.test.ts) runs with the unit suite and fails the build
 when the docs and the code disagree.
 
 ---
@@ -138,5 +153,3 @@ Conventional commits required. Run `pnpm prepare` to set up git hooks.
 ## License
 
 Private — © Ferran Buireu
-
-[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/272ww.svg)](https://uptime.betterstack.com/?utm_source=status_badge)

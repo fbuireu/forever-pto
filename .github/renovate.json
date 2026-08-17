@@ -54,9 +54,12 @@
       "allowedVersions": "/^[0-9]*[02468]\\./"
     },
     {
-      "description": "The repo squash-merges and the PR title becomes the commit on main, so renovate's default fix(deps) on a docs-only dependency cuts an app release for a change the app never saw. Only the commit type changes; the automerge rules above still apply.",
-      "matchFileNames": ["docs/package.json"],
-      "semanticCommitType": "docs",
+      "matchDepNames": ["boneyard-js"],
+      "automerge": false,
+      "addLabels": ["patched-dependency"]
+    },
+    {
+      "matchFileNames": ["apps/docs/package.json"],
       "addLabels": ["docs"]
     }
   ]

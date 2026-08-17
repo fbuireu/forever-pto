@@ -1,0 +1,51 @@
+export interface Bridge {
+  startDate: Date;
+  endDate: Date;
+  ptoDaysNeeded: number;
+  effectiveDays: number;
+  efficiency: number;
+  ptoDays: Date[];
+}
+
+export interface Suggestion {
+  days: Date[];
+  bridges?: Bridge[];
+  strategy?: FilterStrategy;
+  metrics?: Metrics;
+}
+
+export type MeasuredSuggestion = Suggestion & { metrics: Metrics };
+
+export const FilterStrategy = {
+  GROUPED: 'grouped',
+  OPTIMIZED: 'optimized',
+  BALANCED: 'balanced',
+} as const;
+
+export type FilterStrategy = (typeof FilterStrategy)[keyof typeof FilterStrategy];
+
+export const DEFAULT_FILTER_STRATEGY: FilterStrategy = FilterStrategy.GROUPED;
+
+export const isFilterStrategy = (value: unknown): value is FilterStrategy =>
+  Object.values(FilterStrategy).includes(value as FilterStrategy);
+
+export interface FirstLastBreak {
+  first: string;
+  last: string;
+}
+
+export interface Metrics {
+  longWeekends: number;
+  restBlocks: number;
+  maxWorkStreak: number;
+  firstLastBreak: FirstLastBreak | null;
+  averageEfficiency: number;
+  bonusDays: number;
+  quarterDist: number[];
+  bridgesUsed: number;
+  workedDaysPerMonth: number;
+  totalEffectiveDays: number;
+  monthlyDist: number[];
+  longBlocksPerQuarter: number[];
+  longestVacation: number;
+}

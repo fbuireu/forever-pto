@@ -9,7 +9,7 @@ save you a rejected commit.
 If you want the shape of the codebase, that is [CLAUDE.md](./CLAUDE.md) and
 the nested guides it links. If you want the vocabulary, that is
 [CONTEXT.md](./CONTEXT.md). If you want the *why*, that is
-[docs/adr/](./docs/adr/).
+[docs/adr/](./adr/).
 
 ## Code of Conduct
 
@@ -103,7 +103,7 @@ typecheck on pre-push.
 ## The docs are part of the change
 
 This repo treats its documentation as part of the code: change one, update the
-other **in the same commit**. `docs/docs-consistency.test.ts` runs with the
+other **in the same commit**. `tests/docs-consistency.test.ts` runs with the
 unit tests and fails the build when the mechanical half of that contract is
 broken — scripts that no longer exist, links that no longer resolve, aliases
 that moved. [CLAUDE.md](./CLAUDE.md) has the full table of what to update for

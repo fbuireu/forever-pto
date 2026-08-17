@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "includes": ["**", "!next-env.d.ts", "!docs/src/styles"]
+    "includes": ["**", "!apps/web/next-env.d.ts", "!apps/docs/src/styles"]
   },
   "css": {
     "parser": {
@@ -34,7 +34,7 @@
     }
   },
   "linter": {
-    "includes": ["**", "!**/*.d.ts*"],
+    "includes": ["**", "!**/*.d.ts*", "!**/*.astro"],
     "rules": {
       "preset": "recommended",
       "complexity": {

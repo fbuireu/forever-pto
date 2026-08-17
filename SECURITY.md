@@ -62,11 +62,11 @@ Please check these before reporting:
 - **Persisted client state is obfuscated, not encrypted** (XOR + base64 with a
   bundled key). It protects against nothing but casual inspection, on purpose —
   nothing confidential is stored behind it. See
-  [ADR 0007](./docs/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md).
+  [ADR 0007](./adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md).
 - **The "I already donated" recovery path is unverified, and Premium is never
   revoked.** There are no accounts; the payment record is the entitlement.
   Both follow from that decision. See
-  [ADR 0008](./docs/adr/0008-premium-derived-from-payment.md).
+  [ADR 0008](./adr/0008-premium-derived-from-payment.md).
 
 A report that one of these exposes something *beyond* its documented scope —
 confidential data behind the obfuscation, or an entitlement without any

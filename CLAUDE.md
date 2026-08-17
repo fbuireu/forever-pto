@@ -1,230 +1,300 @@
 # CLAUDE.md
 
-Agent-facing guide for **forever-pto** — a planner that turns a fixed budget of paid days off into the
-longest possible stretches away from work. See [CONTEXT.md](./CONTEXT.md) for the domain glossary (PTO Day,
-Bridge, Suggestion, Alternative, Effective Day, Efficiency, Donation…); do not duplicate it here, and use its
+Agent-facing guide for the **forever-pto** repository — a workspace holding the Forever PTO planner
+and its documentation site. See [CONTEXT.md](./CONTEXT.md) for the domain glossary (PTO Day, Bridge,
+Suggestion, Alternative, Effective Day, Efficiency, Donation…); do not duplicate it here, and use its
 canonical names in code, copy and docs.
 
-## What this is
+This file covers the repository: its layout, its shared tooling, how versions are cut and how CI is wired.
+**The guide for the code you are about to touch is the package's own**, and it carries the detail this one
+omits.
 
-A Next.js 16 App Router app deployed to Cloudflare Workers through OpenNext. The user picks a Country, an
-optional Region, a year and a PTO budget; the planner finds the Bridges that turn that budget into the
-longest stretches off, and reports how well it did. **The whole planner runs in the browser** — the server
-holds payment and contact records and nothing else ([ADR 0001](./docs/adr/0001-planner-runs-in-the-browser.md)).
-The server side is six API route handlers (`check-session`, `contact`, `health`, `markdown`, `payment`,
-`payment/activate`), the
-Stripe webhook, a `.well-known` catch-all, `middleware.ts`, and some static rendering.
+## Packages
 
-Premium (advanced metrics, manual editing of a Suggestion) is unlocked by a Donation. There are no accounts:
-the payment record *is* the entitlement ([ADR 0008](./docs/adr/0008-premium-derived-from-payment.md)).
+| Package | Guide | What it is |
+| --- | --- | --- |
+| `apps/web` (`forever-pto`) | [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md) | The planner. Next 16 App Router on Cloudflare Workers through OpenNext |
+| `apps/docs` (`forever-pto-docs`) | [`./apps/docs/CLAUDE.md`](./apps/docs/CLAUDE.md) | docs.forever-pto.com. Astro Starlight, rendering the app's real components |
 
-## Stack
+## Layout
 
-- **Next.js 16** App Router + **React 19**, `next-intl` for i18n over six locales (en, es, ca, it, de, fr)
-- **Zustand** stores for all client state, persisted to local storage through an obfuscating wrapper
-  ([ADR 0007](./docs/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md))
-- **Effect 3** on every server path that talks to Stripe, Turso or Resend — typed error channel, dependencies
-  injected as service tags ([ADR 0002](./docs/adr/0002-effect-for-external-service-boundaries.md))
-- **Temporal** via `temporal-polyfill`, never the global
-  ([ADR 0005](./docs/adr/0005-temporal-polyfill.md))
-- **Tailwind CSS v4** + shadcn/ui; **Turso** via `@tursodatabase/serverless` — hand-written SQL, no ORM;
-  **Stripe**; **Resend**; **BetterStack**
-- **Cloudflare Workers** via `@opennextjs/cloudflare`, R2 for the incremental cache, the platform's own
-  rate-limiting binding for the payment limiter
-  ([ADR 0004](./docs/adr/0004-cloudflare-workers-as-deployment-target.md))
-- **Biome** (lint + format), **Vitest** (unit, `happy-dom`), **Playwright** (e2e), **semantic-release** +
-  commitlint, **husky** + lint-staged
+```
+apps/
+  web/                Next 16 + React 19 + OpenNext → Cloudflare Workers
+  docs/               Astro Starlight → Cloudflare Workers (static assets)
+adr/                  Architecture decision records, one decision per file
+tests/                docs-consistency, which asserts repo-wide contracts
+patches/              patchedDependencies, applied by pnpm
+.github/              Workflows and the prepare-env composite action
+biome.json            Lint and format for both packages
+CONTEXT.md            The domain glossary, root only
+```
+
+There is no `packages/` tier. It is added to `pnpm-workspace.yaml` the day a real shared package exists,
+not before — see [ADR 0010](./adr/0010-apps-web-and-apps-docs-monorepo-layout.md).
 
 ## Versions (pinned — match exactly)
 
 - Node **26.3.0** (`.nvmrc`, mirrored in `engines.node`) — `.nvmrc` is what every CI job installs
 - pnpm **11.21.0** (`packageManager`) — always use pnpm, never npm/yarn
-- TypeScript **6** and Next **16.2** — pinned as a pair by the Cloudflare adapter, see *Structure & aliases*
+- TypeScript **6** and Next **16.2** — pinned as a pair by the Cloudflare adapter. That constraint belongs
+  to the app; the reasoning is in [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md) and
+  [ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)
 
 ## Commands
 
+Every command below runs from the repo root. The build and run scripts delegate to `apps/web`; the lint,
+format and test scripts are root-owned because they span both packages.
+
 ```bash
-pnpm dev                # next dev --turbopack
-pnpm build              # next build
-pnpm preview            # opennextjs-cloudflare build && preview (real Workers runtime)
-pnpm deploy             # cf:build && opennextjs-cloudflare deploy
-pnpm cf:typegen         # regenerate cloudflare-env.d.ts from wrangler.toml (reference only)
+pnpm dev                # apps/web dev server
+pnpm build              # apps/web production build
+pnpm preview            # apps/web on the real Workers runtime
+pnpm deploy             # apps/web build + deploy to Cloudflare
+pnpm cf:typegen         # regenerate apps/web/cloudflare-env.d.ts (reference only)
 
-pnpm lint:all           # biome lint over the repo (:fix to autofix)
-pnpm format:all         # biome check --write over the repo
-pnpm lint:ts:typecheck  # tsc --noEmit
+pnpm lint:all           # biome lint over both packages (:fix to autofix)
+pnpm format:all         # biome check --write over both packages
+pnpm lint:ts:typecheck  # the root program, then apps/web, then apps/docs (astro check)
 
-pnpm test:ut            # vitest run (unit)
-pnpm test:docs          # docs ⟷ code consistency alone (also runs inside test:ut)
-pnpm test:coverage      # vitest run --coverage
-pnpm test:e2e           # playwright
+pnpm test:ut            # apps/web unit tests, then the contract suite
+pnpm test:docs          # the contract suite alone
+pnpm test:coverage      # apps/web with coverage
+pnpm test:e2e           # apps/web playwright
 ```
 
-Env: copy `.env.example`. Local Worker secrets go in `.dev.vars`. The typed surface the build uses is
-`environment.d.ts` and nothing else — it hand-declares both `ProcessEnv` and the global `CloudflareEnv` the
-Cloudflare context is read through, and it is tracked.
+`pnpm --filter forever-pto-docs dev` runs the docs site; it has no root passthrough because nothing else
+documents it as a repo-level command.
 
-`pnpm cf:typegen` writes wrangler's own inference to `cloudflare-env.d.ts` at the repo root. It is reference
-material, not part of the program: read it when adding a binding, then widen `environment.d.ts` by hand. Two
-lines keep it that way and both are load-bearing — `.gitignore` so it never gets committed, and an explicit
-`cloudflare-env.d.ts` entry in `tsconfig.json`'s `exclude`, because `include` is `**/*.ts` and would otherwise
-pull a root-level `.d.ts` straight into the program.
+## Shared tooling
 
-Letting it in does not fail the way you would expect. It declares `CloudflareEnv` a second time, with `[vars]`
-typed as string literals where `environment.d.ts` says `string`, but `skipLibCheck: true` means those two
-declarations are never compared — that clash only surfaces with `skipLibCheck: false`. What actually breaks is
-the other 14,000 lines: the workerd runtime globals replace `lib.dom`'s `Response`, and roughly fifty call
-sites start reporting `'body' is of type 'unknown'`.
+**One Biome config, at the root, for both packages.** `--changed` needs the git root to compare against,
+and a single pass is what lints `apps/docs` now that its workflow no longer has a Biome step of its own.
+Its `files.includes` exclusions are repo-relative paths, so any future move has to re-prefix them;
+`tests/docs-consistency.test.ts` asserts every one that names a literal path still resolves. `.astro` files are excluded from the **linter** only: Biome parses just
+their frontmatter, so every import used in the template body reads as unused. `astro check` covers them.
 
-## Structure & aliases
+**One lockfile, at the root.** `.gitignore` carries `apps/*/pnpm-lock.yaml` so a stray per-package lockfile
+cannot shadow the workspace resolution.
 
-```
-src/
-  middleware.ts       # locale + country cookies, markdown rewrite; skips /api/* except /api/markdown
-  app/                # App Router: [locale]/(app|marketing) pages, api/ route handlers, sitemap, robots
-  application/        # use-cases, DTOs, Zustand stores, export, email templates — orchestration, no I/O clients
-  domain/             # calendar/ (pure planning engine) and payment/ (Effect programs)
-  infrastructure/     # everything outbound: clients, services, workers, proxy, api operations, seo route table
-  ui/                 # adapters, hooks, i18n, modules (components), styles, assets
-e2e/                  # Playwright specs
-docs/                 # adr/ and docs-consistency.test.ts
-```
-
-**Next owns `next-env.d.ts` outright, and it flaps.** A production build points its route import at
-`.next/types/`, a dev run at `.next/dev/types/`, so the file shows as modified depending on which ran
-last. It is generated and says so; leave whichever version is committed alone rather than committing the
-flip back and forth.
-
-**`next build` fills in `tsconfig.json`, so two settings there are not redundant.** It rewrites the file on
-every run and writes its own default for any key that is absent — `strict: false` and `allowJs: true`. Both
-land at the *next build* rather than at the deletion site, so deleting either as noise turns strict mode off,
-or lets JavaScript into a TypeScript-only codebase, a long way from the change. `docs/docs-consistency.test.ts`
-asserts both, and asserts that `cloudflare-env.d.ts` stays in `exclude` and `.gitignore` for the reason below.
-
-**TypeScript stays on 6 and Next stays on 16.2, and the pair is one decision, forced by Cloudflare.** Next 16.3
-crashes the deployed Worker on any route rendered at request time: `@opennextjs/cloudflare` 1.20.2 is the
-latest adapter and shipped 2026-08-01, two days before 16.3.0 existed, and there is no newer version or beta.
-The symptom is the 404 page answering with Cloudflare **Error 1101 (Worker threw exception)** instead of
-itself, which is what `e2e/[locale]/not-found.spec.ts` catches. `/_not-found` is the only page that renders
-per request — everything else is prerendered and served from cache, so nothing else shows it.
-[ADR 0009](./docs/adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md).
-
-TypeScript is pinned to 6 because it cannot move without Next moving first. TypeScript 7 ships the Go compiler
-and no `lib/typescript.js`, and Next's type-checking path loads exactly that file; only from 16.3 does
-`next build` shell out to the project-local `tsc` instead. So raising TypeScript to 7 while Next is 16.2 kills
-`pnpm build` before it type-checks anything. Raise Next first, and only once the adapter supports it.
-
-Two things follow that are easy to trip over. `partialPrefetching` in `next.config.ts` is a 16.3 option and is
-a config error on 16.2 — it must stay out while Next is pinned. And
-[`docs/docs-consistency.test.ts`](./docs/docs-consistency.test.ts) imports `typescript` directly for its
-compiler-API parsing; under TypeScript 7 that import has to become `@typescript/typescript6`, Microsoft's
-compatibility package pinning the 6.x API, so the two move together too.
-
-Path aliases (`tsconfig.json` `compilerOptions.paths`): `src/*`, `@app/*`, `@application/*`, `@domain/*`,
-`@infrastructure/*`, `@ui/*`, `@assets/*` (→ `src/ui/assets`), `@styles/*` (→ `src/ui/styles`), `@i18n/*`
-(→ `src/ui/i18n`). Prefer aliases over relative paths for cross-layer imports; keep same-folder imports
-relative. `vitest.config.ts` sets `resolve.tsconfigPaths`, so a new alias needs exactly one edit — in
-`tsconfig.json`, not in the test config.
-
-Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.tsx` for components). The one
-test covering no single module is `docs/docs-consistency.test.ts`, colocated with the docs it checks.
-
-**Nested guides** — read the one for the folder you are touching; they carry the detail this file omits:
-
-| Folder | Covers |
-| --- | --- |
-| [`src/app/`](./src/app/CLAUDE.md) | Route groups, the `[locale]` segment, API route handlers, metadata |
-| [`src/application/`](./src/application/CLAUDE.md) | Layer contract: what orchestration may touch |
-| [`src/application/dto/`](./src/application/dto/CLAUDE.md) | The DTO mapping convention, one folder per concept |
-| [`src/application/stores/`](./src/application/stores/CLAUDE.md) | The five Zustand stores, persistence, rehydration |
-| [`src/application/use-cases/`](./src/application/use-cases/CLAUDE.md) | Effect entry points and how they terminate |
-| [`src/domain/`](./src/domain/CLAUDE.md) | Layer contract: the two bounded contexts and their different rules |
-| [`src/domain/calendar/`](./src/domain/calendar/CLAUDE.md) | The planning engine: bridges, strategies, metrics, the cache protocol |
-| [`src/domain/payment/`](./src/domain/payment/CLAUDE.md) | Payment events, factory and handlers |
-| [`src/infrastructure/`](./src/infrastructure/CLAUDE.md) | Layer contract: the only layer that reaches outward |
-| [`src/infrastructure/api/`](./src/infrastructure/api/CLAUDE.md) | Failure → HTTP status mapping |
-| [`src/infrastructure/clients/`](./src/infrastructure/clients/CLAUDE.md) | Effect service tags for db, email, logging, payments |
-| [`src/infrastructure/services/holidays/`](./src/infrastructure/services/holidays/CLAUDE.md) | Holiday lookup and normalisation |
-| [`src/infrastructure/services/location/`](./src/infrastructure/services/location/CLAUDE.md) | Country detection strategies |
-| [`src/infrastructure/services/payments/`](./src/infrastructure/services/payments/CLAUDE.md) | Stripe provider, repository, promo codes |
-| [`src/infrastructure/workers/`](./src/infrastructure/workers/CLAUDE.md) | The calculations Web Worker and its message contract |
-| [`src/ui/`](./src/ui/CLAUDE.md) | Layer contract: adapters, hooks, modules, styles |
-| [`src/ui/i18n/`](./src/ui/i18n/CLAUDE.md) | Message bundles, namespaces, adding a locale |
-| [`src/ui/modules/`](./src/ui/modules/CLAUDE.md) | How component folders are organised |
-| [`src/ui/modules/core/`](./src/ui/modules/core/CLAUDE.md) | Primitives and the animation layer |
-| [`src/ui/modules/pages/planner/`](./src/ui/modules/pages/planner/CLAUDE.md) | The planner screen: calendar, holidays, summary |
-| [`src/ui/styles/`](./src/ui/styles/CLAUDE.md) | Layer order, tokens, what Biome does not format |
+**The root package is `forever-pto-monorepo`, private, at `0.0.0`, with no dependencies.** A dependency
+there would be installed for both packages and belong to neither. `tests/docs-consistency.test.ts` asserts
+all three properties.
 
 ## Conventions
 
-- **Use the glossary's words.** [CONTEXT.md](./CONTEXT.md) names one canonical term per concept and lists the
-  retired ones. A variable called `vacationDays` where the glossary says PTO Day is a defect, not a style
-  preference — the vocabulary is the only thing keeping four names for the same number apart.
-- **No explanatory comments in TypeScript sources under `src/`.** The folder's `CLAUDE.md` carries the explanation
-  instead: a magic constant, a deliberate deviation, an ordering that looks wrong but is not, all belong in
-  that folder's *Invariants* or *Gotchas* section, not above the line. A comment is invisible to everyone who
-  is not already reading that file and nothing checks it against the code; a guide is read before the folder
-  is touched, and `docs/docs-consistency.test.ts` does check it. Directives (`'use client'`, `'use server'`,
-  `'use cache'`) are strings, not comments, and are unaffected. Two things are **not** explanatory comments
-  and stay: a `biome-ignore` suppression, which changes what the linter does and must carry its reason on the
-  same line; and the do-not-edit banner on generated output (`src/ui/modules/bones/registry.ts`). A
-  suppression counts in either form, including the `{/* biome-ignore … */}` shape JSX forces. The rule is
-  asserted wherever a comment sits — opening a line, trailing code, or inside JSX — and it stops at `src/`,
-  because `docs/docs-consistency.test.ts` explains itself inline: it is the one source file with no folder
-  guide behind it.
+- **Use the glossary's words.** [CONTEXT.md](./CONTEXT.md) names one canonical term per concept and lists
+  the retired ones. A variable called `vacationDays` where the glossary says PTO Day is a defect, not a
+  style preference — the vocabulary is the only thing keeping four names for the same number apart.
 - **No re-export barrel files.** Import from the source module; a pass-through `index.ts` hides the real
   dependency graph and defeats the layer rules.
-- **No ALL-CAPS in translation strings.** Uppercasing is a presentation choice — do it with a CSS class in the
-  component, so the six bundles stay comparable and other scripts are not mangled.
-- **`typeof window`/`typeof document` guards stay.** They look redundant to a linter but are required under
-  SSR: the bare identifier throws `ReferenceError` on the server.
-- **Cross-layer imports use the alias, same-folder imports stay relative.** Mixed forms of the same module
-  break Biome's import sorting.
 - **Conventional commits** (commitlint + husky). semantic-release owns versioning. Do NOT add a
   Co-Authored-By / Claude trailer to commits or PRs.
+- **One package per pull request.** The repo squash-merges, and a release is attributed to a package by the
+  paths the commit touches, so a PR spanning both packages lands in both changelogs.
+
+## Releases
+
+Each package versions itself, through `semantic-release-monorepo`. A commit belongs to whichever package
+its paths fall under, so a docs change never cuts an app release and vice versa.
+[ADR 0011](./adr/0011-per-package-versioning-with-a-bridge-tag.md) records the decision and its costs.
+
+| Package | Tags | Writes | Runs in |
+| --- | --- | --- | --- |
+| `apps/web` | `web-vX.Y.Z` | `apps/web/package.json`, `apps/web/CHANGELOG.md`, a GitHub release | `ci.yml`, after the production deploy |
+| `apps/docs` | `docs-vX.Y.Z` | a tag and a GitHub release, nothing else | `docs.yml`, after the docs deploy |
+
+`apps/docs` has no changelog, npm or git plugin on purpose: it pushes nothing to `main`, which is what keeps
+the two release jobs from racing each other. Its package version stays `0.0.0` forever and nothing reads it —
+the docs site displays the **app's** version.
+
+**`web-v1.8.2` is a bridge tag and looks like debris.** It sits on the same commit as the older `v1.8.2` and
+carries no annotation. semantic-release finds the last release by `tagFormat`; delete that tag and the next
+app release publishes `web-v1.0.0` over a 1.8.x line, which cannot be recalled from GitHub Releases. The
+`release-web` job fails loudly if no `web-v*` tag exists rather than letting it happen quietly.
+
+**A change confined to the repo root releases nothing** — `adr/`, `tests/`, `README.md`, `CONTEXT.md`, this
+file. That is correct and occasionally surprising. **It is narrower than it reads**: `WEB_PATHS` in `ci.yml`
+also matches `package.json`, `pnpm-workspace.yaml`, `biome.json`, `.npmrc`, `.nvmrc` and
+`.github/actions/`, all of which do cut a release. That is deliberate — each of them changes what the app
+builds from — but it means "the repo root" is not the boundary; the regex is.
+
+## CI
+
+**`ci.yml` holds the whole app graph**: `changes`, then `lint`, `typecheck` and `test` in parallel, then
+`deploy-production` → `release-web` → `docs-refresh` on `main`, or `deploy-development` → `comment` / `e2e`
+on a PR. Both deploy jobs call the shared `_deploy-web.yml`. `docs.yml` holds the docs graph — `build`, then
+`preview` on a PR or `deploy` → `release-docs` on `main`. The rest are `cleanup-development.yml`, the
+renovate auto-merge, a `zizmor` audit, and `dependabot-auto-merge.yml` — which is **dormant**: there is no
+`.github/dependabot.yml` in the tree, so nothing ever triggers it. It is kept for the day one appears.
+
+Every job that needs a toolchain uses the `.github/actions/prepare-env` composite — pnpm, the `.nvmrc` Node,
+`setup-node`'s dependency cache and `pnpm install --frozen-lockfile` — rather than repeating five steps.
+`checkout` stays in the job, because the release jobs need their own (`fetch-depth: 0` and the PAT).
+
+**The install must not be filtered.** The docs site imports app sources through the `@ui` alias, and their
+bare imports resolve from the package the *importing file* sits in. A `--filter forever-pto-docs` install
+would leave `apps/web/node_modules` absent and the docs build would fail on a dependency it never declared.
+
+**Jobs are scoped with step-level `working-directory`, never a job-level default.** A job default does not
+reach a `uses:` step, and `nick-fields/retry` exposes no cwd input, so every command it wraps starts with an
+explicit `cd "$GITHUB_WORKSPACE/apps/web"`. Some steps cannot be scoped at all because they resolve from
+`GITHUB_WORKSPACE` — codecov's `files`, the artifact `path` inputs, `wrangler-action`'s `workingDirectory` —
+and those had their inputs repointed instead.
+
+**The `changes` job gates the web deploy and release on whether `apps/web` was touched**, so a docs-only or
+markdown-only commit no longer redeploys production. It derives the answer from `git diff` rather than a
+third-party filter action, because every other action here is pinned to a commit SHA and an unpinnable one
+trips `zizmor`. It fails open. `lint`, `typecheck` and `test` stay unconditional — the contract suite reads
+`CONTEXT.md`, `adr/` and every guide, so a markdown-only change must not slip past it.
+
+**There is no `deploy-production.yml` and no `deploy-development.yml`, and that is the point.** They were
+separate workflows on the same triggers, so they *raced* `ci.yml` instead of following it: semantic-release
+only ever waited for lint, typecheck and test, and duly cut a tag, a GitHub release and a changelog entry for
+a version that had just failed to reach production. Nothing in a workflow can wait on another workflow, so
+the deploys had to become jobs. `release-web` needs `deploy-production`, which is what makes a release mean
+*the version is live*. The same rule is why `release-docs` lives in `docs.yml` next to the docs deploy rather
+than in `ci.yml`. `cancel-in-progress` is conditional on `github.event_name == 'pull_request'` for the same
+reason: cancelling a superseded PR run is free, cancelling a `main` run kills a deploy or a release halfway.
+
+**Each package has its own pair of GitHub environments** — `web-production`, `web-development`,
+`docs-production`, `docs-development`. They were shared, which meant a docs deploy passed through whatever
+gate protects web production and the app's `NEXT_PUBLIC_*` vars were visible to jobs with no use for them.
+
+**Those four environments are settings, and the workflows point at them before the settings exist.** This
+guide claimed the Cloudflare and release secrets were repository-level and therefore unaffected by the
+rename. They are not: `gh secret list` returns exactly `CODECOV_TOKEN` and `PAT`, and everything else —
+`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `JWT_SECRET`, `STRIPE_*`, `RESEND_API_KEY`,
+`TURSO_AUTH_TOKEN`, `CF_ACCESS_CLIENT_*` — is an **environment** secret on the old `development` and
+`production`. So a job naming `web-development` gets empty strings, wrangler falls back to interactive
+OAuth, opens a browser on a headless runner and times out after 120 seconds per attempt:
+
+```
+✘ [ERROR] Timed out waiting for authorization code, please try again.
+Error: Failed to provision remote R2 bucket … wrangler login failed
+```
+
+Passing the secret explicitly in the caller's `secrets:` block does not rescue it. A caller job cannot
+declare an `environment:`, so `${{ secrets.CLOUDFLARE_API_TOKEN }}` there resolves against repository
+secrets only. The value that works on `main` comes from the *callee* job's own `environment: production`.
+
+**Before this branch merges, four things have to happen in repo settings and none of them is a code
+change:**
+
+1. Create `web-production` and `docs-production` — they do not exist yet, so `deploy-production` will fail
+   the same way the first time it runs on `main`.
+2. Copy the secrets from `development`/`production` onto all four, plus `CF_ACCESS_CLIENT_ID` and
+   `CF_ACCESS_CLIENT_SECRET` on `web-development`, which `e2e` reads to reach a preview behind Cloudflare
+   Access.
+3. Move the `NEXT_PUBLIC_*` vars onto the two `web-*` environments.
+4. Change ruleset `main` (`required_deployments`) from `development` to `web-development`. It is a merge
+   gate, so even a green deploy to `web-development` leaves the pull request blocked until it names the
+   environment the branch actually deploys to.
+
+The alternative is to revert the rename in `ci.yml`, `docs.yml` and `cleanup-development.yml` and keep one
+shared pair, which is what the split exists to stop.
+
+**`deploy-tail` is gated on its own files.** The tail consumer is a second Worker with its own `wrangler.toml`; the app declares it in `[[tail_consumers]]` but does not carry it. It changes rarely, so it deploys only when `apps/web/workers/tail/**` does.
+
+**`cross-package-notice` is advisory, not a gate.** A pull request touching both packages lands in both
+changelogs, because attribution is by path and `main` takes squash merges. Sometimes that is what you
+want, so the job posts a sticky comment saying what will happen and does not fail the run.
+
+**`cleanup-development.yml` shares `ci.yml`'s concurrency group, which is what stops it deleting a Worker
+that is still under test.** It fires on `pull_request: closed`, and closing a pull request does not cancel
+the run already going: `e2e` needs `deploy-development` and drives the per-PR Worker over the network, so
+the delete raced it and turned every remaining spec into a "There is nothing here yet" placeholder — one run
+on #343 reported 47 failures with nothing wrong in the code. Renovate is how it happens, because it
+auto-merges on the required checks and `e2e` is not one of them.
+
+The fix is a queue, not a wait loop: the cleanup declares `group: CI-${{ github.ref }}` with
+`cancel-in-progress: false`. `ci.yml`'s group is `${{ github.workflow }}-${{ github.ref }}`, and a
+`pull_request` event carries the same `refs/pull/<number>/merge` whichever activity type fired it, so the two
+strings match and GitHub holds the cleanup pending until the CI run completes. A pending run occupies no
+runner, so this costs nothing. **The coupling is by workflow *name*** — renaming `ci.yml`'s `name: CI`
+silently unqueues the cleanup and the race comes back. A concurrency group is per run, so the whole workflow
+queues and `cleanup-docs` rides along; that is harmless, and it needs no wait of its own since the docs smoke
+tests run against the build artifact before the preview Worker exists.
+
+**`docs-refresh` exists because the release commit carries `[skip ci]`.** The docs site renders the app
+version from `apps/web/package.json`; without a dispatch after a web release, the published site keeps
+advertising the previous one.
+
+Husky runs `lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `lint:ts:typecheck` on `pre-push`.
+
+**`lint:ts:typecheck` ends with `astro check`, and that tail is what puts the cross-package seam in front of
+the author.** The docs site typechecks the 32 demo components against `apps/web`'s real props — a renamed
+`Button` variant fails there because `ButtonDemo`'s `Record<ButtonVariant, string>` is exhaustive — but the
+check used to run only inside `docs.yml`'s `build` job. So an app PR that broke the docs passed `pre-push`,
+passed the `CI` workflow, and failed in a workflow called **Docs** that does not read as blocking. Whether it
+*was* blocking depended on branch protection, and this repo has already been bitten once by the required
+checks not including the one that mattered.
+
+**What that tail does *not* cover is a `@ui/…` specifier pointing at nothing.** Moving a component between folders under `apps/web/src/ui/` left a demo importing the old path; `astro check` reported zero errors and only `astro build` failed, in the Docs workflow, after the app's CI had gone green. `tests/docs-consistency.test.ts` resolves every one of those specifiers now.
+
+## Deploy
+
+Both packages deploy to Cloudflare Workers through wrangler, each from its own `wrangler.toml`. Wrangler
+discovers the config by walking up from the working directory and resolves every path in it relative to
+that file, which is why the deploy steps `cd` into the package first.
+
+The app's bindings, environments and the `NEXT_PUBLIC_SITE_URL` resolution are in
+[`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md).
+
+**Both packages preview the same way: one Worker per pull request, deleted when it closes.** `apps/web`
+deploys `pr-<number>-forever-pto-development` from `_deploy-web.yml`, `apps/docs` deploys
+`pr-<number>-forever-pto-docs-development` from the `preview` job in `docs.yml`, and
+`cleanup-development.yml` carries a job for each. What differs is only what the docs site does *not* need:
+it has no bindings and no secrets, so its deploy has no `wrangler secret bulk` step and no `--var`
+override, and it ships the `docs-dist` artifact the `build` job already produced rather than building a
+second time.
 
 ## Maintenance contract
 
-These documents are not generated. A change that does not update them leaves the tree describing code that no
-longer exists, so when you change code, update the docs **in the same commit** — a follow-up commit is a
+These documents are not generated. A change that does not update them leaves the tree describing code that
+no longer exists, so when you change code, update the docs **in the same commit** — a follow-up commit is a
 promise, not a fix.
-
-Four artefacts, four jobs:
 
 | Document | Answers | Update it when |
 | --- | --- | --- |
 | [`CONTEXT.md`](./CONTEXT.md) (root only) | *What does this word mean?* A domain glossary, and nothing else — no file names, no libraries, no implementation detail | A domain term changes meaning, a new one appears, or a second name for an existing concept shows up in the code or the UI |
-| `src/**/CLAUDE.md` | *What may I touch here, and how is this folder built?* Layer contract at a layer root; files, public API, invariants and gotchas below it. Its `# ` heading is the folder's own path, repo-relative — `# src/domain/calendar`, never `# domain/calendar` | You change a layer's dependencies, a signature, an invariant, or the files in that folder |
-| [`docs/adr/`](./docs/adr/) | *Why is it like this?* One decision per file | You make a decision that is hard to reverse, surprising without context, **and** the result of a real trade-off. If any of the three is missing, skip the ADR |
+| This file | *How is the repository put together?* Layout, shared tooling, releases, CI | You change the workspace, the release setup, a workflow, or a rule that spans both packages |
+| `apps/*/README.md` | *What is this package, and how do I run it?* The human-facing front page for one package |
+| `apps/*/CLAUDE.md` | *What may I change here, and what are its rules?* The agent-facing guide | You change a package's stack, commands, deployment or its own conventions. Both files, and they answer different questions |
+| `apps/web/src/**/CLAUDE.md` | *What may I touch here, and how is this folder built?* Layer contract at a layer root; files, public API, invariants and gotchas below it. Its `# ` heading is the folder's own path, repo-relative — `# apps/web/src/domain/calendar`, never `# domain/calendar` | You change a layer's dependencies, a signature, an invariant, or the files in that folder |
+| [`adr/`](./adr/) | *Why is it like this?* One decision per file | You make a decision that is hard to reverse, surprising without context, **and** the result of a real trade-off. If any of the three is missing, skip the ADR |
 | [`README.md`](./README.md) | *What is this product and how do I run it?* The human-facing front page | The product's capabilities, the stack table, the scripts or the required versions change |
-
-`CONTEXT.md` is reserved for the root glossary. **Never create a nested one** — the name would mean two
-things, and the `domain-modeling` skill reads it as vocabulary and would rewrite a layer contract as a term
-list.
 
 | If you change | Update |
 | --- | --- |
 | What a domain word means, or introduce a new one | [`CONTEXT.md`](./CONTEXT.md) — the glossary, vocabulary only |
-| A folder's layout, the files a concept is made of, or a rule its guide states | that folder's nested `CLAUDE.md` (table above) |
+| A folder's layout, the files a concept is made of, or a rule its guide states | that folder's nested `CLAUDE.md` |
 | A behaviour a doc states as an invariant or a gotcha | that bullet, or delete it if it stopped being true |
 | A layer's allowed imports | that layer's `CLAUDE.md`, and the ADR that decided the boundary |
-| A package script, a path alias, or the folder tree | the *Commands* / *Structure & aliases* sections here, and `README.md` if it lists the script |
-| A translation key | all six bundles under `src/ui/i18n/messages/` — parity is asserted |
+| A package script, a path alias, or the folder tree | the *Commands* section here or in the package guide, and `README.md` if it lists the script |
+| A translation key | all six bundles under `apps/web/src/ui/i18n/messages/` — parity is asserted |
 | A decision an ADR records | that ADR — amend it, or supersede it and say so in both `## Status` blocks |
 
-[`docs/docs-consistency.test.ts`](./docs/docs-consistency.test.ts) makes the mechanical half of that contract
-executable. It runs with `pnpm test:ut` (so, in CI on every PR) and asserts: that `CONTEXT.md` exists only at
-the root, is linked from here, and stays a glossary — no backticked token holding a path, a call signature or
-a source-file name, every term
-defined, no empty `_Avoid_` list, no term listing itself as its own alternative; that every layer root and
-every folder in the *Nested guides* table has a `CLAUDE.md`; that ADRs are named `NNNN-slug.md`, numbered
-contiguously from `0001`, carry the template's sections, and are each linked from some document **outside**
-`docs/adr/` — an ADR nothing points at will not be read; that every relative markdown link resolves and every
-`.ts`/`.tsx` file named in backticks still exists; that every script this file documents exists in
-`package.json`, that every alias `tsconfig.json` declares is documented here and every alias documented here
-is declared there, and that no alias points at a missing directory; that `tsconfig.json` keeps the two settings
-`next build` would otherwise fill in for it — `strict` on and `allowJs` off — and that
-`cloudflare-env.d.ts` stays in both `exclude` and `.gitignore`;
+[`tests/docs-consistency.test.ts`](./tests/docs-consistency.test.ts) makes the mechanical half of that
+contract executable. It runs with `pnpm test:ut` (so, in CI on every PR) and asserts: that `CONTEXT.md`
+exists only at the root, is linked from here, and stays a glossary — no backticked token holding a path, a
+call signature or a source-file name, every term defined, no empty `_Avoid_` list, no term listing itself as
+its own alternative; that the workspace globs resolve, both packages are members with their own manifests,
+the root stays private and dependency-free at `0.0.0`, neither package carries its own Biome config or
+lockfile, and every literal path Biome's `files.includes` excludes still resolves; that every layer root has a `CLAUDE.md`, that both package guides exist and are listed here, and
+that every guide under `apps/web/src` is listed in the web package's own table; that ADRs are named
+`NNNN-slug.md`, numbered contiguously from `0001`, carry the template's sections, and are each linked from
+some document **outside** `adr/` — an ADR nothing points at will not be read; that every relative markdown
+link resolves, every `.ts`/`.tsx` file named in backticks still exists, no document cites a nested
+`CONTEXT.md`, and every symbol the published wiki's `tsx` fences import from `@ui/…` is still exported by the
+module they name — that last one is the largest slice of the cross-package seam and had nothing checking it,
+because `astro check` registers no MDX plugin and the citation rules match paths rather than symbols; that
+every script this file
+documents exists in the root manifest and every script the web guide documents exists in one of the two;
+that `apps/web/tsconfig.json` keeps the two settings `next build` would otherwise fill in for it — `strict`
+on and `allowJs` off — that it sits beside the `next.config.ts` that rewrites it, and that
+`cloudflare-env.d.ts` stays both excluded from the program and ignored by git; that every `'use client'`,
+`'use server'` and `'use cache'` under either package's `src/` is a bare string literal in first position;
 and that every locale bundle has exactly the keys `en.json` has.
 
 It reads staged *and* unstaged files, so a rule fires before the offending file is committed. **Each rule was
@@ -237,114 +307,42 @@ tidying to do later; and a `file.ts:123` citation rots the moment anything above
 instead.
 
 Propose an ADR when a decision is **hard to reverse**, **surprising without context** and **the result of a
-real trade-off**. All three, or it is not an ADR. Copy [ADR 0000](./docs/adr/0000-adr-template.md), number it
-one above the highest existing file, and link it from wherever it bites — a gotcha here, a nested guide, a
+real trade-off**. All three, or it is not an ADR. Copy [ADR 0000](./adr/0000-adr-template.md), number it one
+above the highest existing file, and link it from wherever it bites — a gotcha here, a package guide, a
 `CONTEXT.md` entry.
+
+`CONTEXT.md` is reserved for the root glossary. **Never create a nested one** — the name would mean two
+things, and the `domain-modeling` skill reads it as vocabulary and would rewrite a layer contract as a term
+list. `tests/docs-consistency.test.ts` asserts no document *cites* one either: the published wiki taught the
+opposite under a heading of "CONTEXT.md per folder" and named five paths that have never existed, which the
+relative-link rule could not catch because they were prose rather than links.
 
 ## Gotchas
 
-- **The calculation caches are cleared by the pipeline, not the engine and no longer by each caller.**
-  `cache.ts` memoises the holiday set under one fixed key and never evicts it, so a second run silently reuses
-  the first run's holidays. `runPlanningPipeline` clears both on entry; a generator still must not.
-  [ADR 0006](./docs/adr/0006-caller-owned-calculation-caches.md), amended 2026-08-14.
-- **`Temporal` comes from `temporal-polyfill`, never the global.** The global does not resolve in the deployed
-  Workers runtime, and a local run proves nothing. Do not let a codemod "modernise" the import.
-  [ADR 0005](./docs/adr/0005-temporal-polyfill.md).
-- **Persisted store state is obfuscated, not encrypted.** XOR + base64 with a key shipped in the bundle. Never
-  call it encryption and never put anything confidential behind it.
-  [ADR 0007](./docs/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md).
-- **The "I already donated" path is unverified, and Premium is never revoked.** v1 ships with no accounts and
-  no user authentication, so the recovery path grants Premium to anyone who types an address with a succeeded
-  payment behind it, and there is no revocation path for a donor. Both follow from the decision, not from an
-  oversight — do not "harden" either in passing. There *is* a session layer: the entitlement travels in a
-  signed HTTP-only cookie.
-  [ADR 0008](./docs/adr/0008-premium-derived-from-payment.md).
-- **The two bounded contexts under `src/domain/` follow different rules.** `calendar/` is pure because it runs
-  in a Web Worker; `payment/` composes Effect against infrastructure tags. Neither is lint-enforced.
-  [ADR 0003](./docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md).
-- **Logging is the one external call that does not go through Effect.** BetterStack has both a service tag and
-  a plain singleton, and the singleton is what the stores, lookups and components use.
-  [ADR 0002](./docs/adr/0002-effect-for-external-service-boundaries.md).
-- **The Cloudflare context is request-scoped.** Route handlers and server actions may read it; use-cases may
-  not, and must receive configuration as plain values.
-  [ADR 0004](./docs/adr/0004-cloudflare-workers-as-deployment-target.md).
-- **Biome's `noConsole` is a warning with `warn`/`error` allowed**, not an error — `console.log` will not fail
-  the build, so it is on you not to leave one behind.
-- **The planning pipeline exists once, and used to exist twice.** `runPlanningPipeline` under
-  `src/domain/calendar/` is the whole run — caches, pseudo-Holidays, budget, both planning calls, the Metrics.
-  The Web Worker and the holidays store's own action are its two callers and add only transport. They were two
-  copies held together by mirrored test blocks, they drifted, and the symptom was one Planning Window
-  producing two different plans depending on which path ran. Do not reintroduce orchestration at a caller.
-  See [`src/application/stores/CLAUDE.md`](./src/application/stores/CLAUDE.md).
-
-## Deploy
-
-Cloudflare Workers via wrangler (`wrangler.toml`): `.open-next/worker.js` as the entrypoint, `.open-next/assets`
-served through the `ASSETS` binding, an R2 bucket for the incremental cache, a `PAYMENT_RATE_LIMITER`
-`[[ratelimits]]` binding for the payment limiter, smart placement, and a `forever-pto-tail` tail consumer. Only `env.production` binds
-a route (`forever-pto.com/*`); `env.development` supplies the preview bindings and CI deploys one worker per
-PR from it — `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes.
-
-**`NEXT_PUBLIC_SITE_URL` is resolved twice, and the two resolutions disagree on a preview.** No file reads
-`process.env.NEXT_PUBLIC_SITE_URL`; every read goes through the Cloudflare context. But that context resolves
-differently depending on when it is asked:
-
-- **Per request**, on the deployed worker, it is the Worker's runtime var. `_deploy.yml` passes
-  `--var NEXT_PUBLIC_SITE_URL:<inputs.url>`, so `sitemap.xml`, the API routes and the `.well-known` handler
-  all name the host actually being served — a per-PR preview names itself.
-- **During `next build`**, there is no request, so `getCloudflareContext({ async: true })` falls back to
-  `getPlatformProxy`, which reads `wrangler.toml`'s **top-level** `[vars]`. `cf:build` passes no `--env`, so
-  every build — production and preview alike — bakes `https://forever-pto.com` into whatever is prerendered.
-  `robots.txt` is fully static with no revalidation and keeps it for the life of the deployment; the
-  `[locale]` shells carry it in `canonical`, `hrefLang` and `og:url` until their 24-hour revalidation.
-
-So a preview's `robots.txt` advertises the production sitemap. That is tolerated rather than fixed because
-previews sit behind Cloudflare Access — nothing crawls them, which is why `playwright.config.ts` has to send
-`CF-Access-Client-Id`/`Secret` to reach one. Do not "fix" it by giving the build step the override without
-first checking whether the value is still correct for production, which shares that build path. The
-`NEXT_PUBLIC_SITE_URL` line inside `[env.development.vars]` is the fallback for a hand-run
-`wrangler deploy --env development` only: CI always overrides that one key, and the build never reads it.
-
-**The rest of `[env.development.vars]` is load-bearing on every preview, and deleting the block breaks
-them.** `--var` merges, it does not replace: wrangler reads the selected environment's `[vars]` into the
-binding set and only then overwrites the individual keys the flag names. `_deploy.yml` passes exactly one,
-`NEXT_PUBLIC_SITE_URL`, so `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXTJS_ENV` and `TURSO_DATABASE_URL` reach every
-per-PR worker straight from `wrangler.toml`. Only the site URL is dead weight there, and it is not
-removable either — without it a hand-run development deploy would fall through to the top-level `[vars]`
-and advertise itself as `forever-pto.com`. Read the whole block as configuration, not residue. Build config
-lives in `next.config.ts` and `open-next.config.ts`.
-
-GitHub Actions: **`ci.yml` holds the entire graph** — `lint`, `typecheck` and `test` in parallel, then
-`deploy-production` → `release` on `main`, or `deploy-development` → `comment` / `e2e` on a PR. Both deploy
-jobs call the shared `_deploy.yml`. The only other workflows are `cleanup-development.yml`, the
-dependabot/renovate auto-merges and a `zizmor` audit. Every job that needs a toolchain uses the
-`.github/actions/prepare-env` composite — pnpm, the `.nvmrc` Node, `setup-node`'s dependency cache and
-`pnpm install --frozen-lockfile` — rather than repeating five steps six times; `checkout` stays in the job,
-because `release` needs its own (`fetch-depth: 0` and the PAT). Husky runs `lint-staged` on `pre-commit`,
-`commitlint` on `commit-msg` and `lint:ts:typecheck` on `pre-push`.
-
-**There is no `deploy-production.yml` and no `deploy-development.yml`, and that is the point.** They were
-separate workflows on the same triggers, so they *raced* `ci.yml` instead of following it: semantic-release
-only ever waited for lint, typecheck and test, and duly cut a tag, a GitHub release and a changelog entry for
-a version that had just failed to reach production. Nothing in a workflow can wait on another workflow, so
-the deploys had to become jobs. `release` needs `deploy-production`, which is what makes a release mean *the
-version is live*. `cancel-in-progress` is conditional on `github.event_name == 'pull_request'` for the same
-reason: cancelling a superseded PR run is free, cancelling a `main` run kills a deploy or a release halfway.
-
-**The deploy passes no `--message`, and putting one back needs a preview PR, not a push to `main`.** Every
-form of `--message "<sha> <separator> <event>"` tried so far makes wrangler 4.115 fail with
-`Unknown argument: push` — the last word of the message arrives as a second positional beside
-`deploy [path]`. It is not the quoting (`pnpm exec` passes argv through untouched, and `nick-fields/retry`
-was wrongly blamed for it first), and it is not the separator character (an em dash fails exactly like a
-hyphen, though `biancafiore/.github/workflows/_deploy.yml` deploys with one). The mechanism is still
-unexplained; the flag is cosmetic, so it is gone rather than diagnosed four broken production deploys at a
-time. Reintroduce it from a PR, where the preview deploy exercises the same `_deploy.yml`.
-
-That diagnosis was made against wrangler **4.115**, and the pin has since moved to **4.118** — so it is
-untested on the version CI now runs. Nothing here has been re-verified; treat the paragraph above as a
-record of what 4.115 did, and if you try `--message` again, a preview PR is still the way to find out.
-
-The deploy is the one wrangler call **not** wrapped in `nick-fields/retry`, because a wrapper that retries
-every failure cannot tell a bad argument from a bad network: this failure burned three identical attempts per
-run before reporting. The secret upload and the preview delete keep their retry — both are idempotent and
-both fail for reasons that a second attempt can fix.
+- **Biome's `noConsole` is a warning with `warn`/`error` allowed**, not an error — `console.log` will not
+  fail the build, so it is on you not to leave one behind.
+- **`format:changed` and `lint:changed` pass `--changed`, which means "changed against `main`".** On a
+  branch that moves or renames a large number of files that is every one of them, and a `pre-commit` hook
+  will happily reformat and stage files the commit was never about.
+- **The `v1` floating tag is stale and nothing maintains it.** It diverges between local and remote, which
+  makes semantic-release's own `git fetch --tags` fail outright with *would clobber existing tag*. No
+  workflow moves it and no ADR records it.
+- **`boneyard-js` is patched, so Renovate must not automerge it.** `pnpm-workspace.yaml` keys
+  `patchedDependencies` by bare name, with no version, so the patch is applied to whatever version resolves.
+  A bump that still applies cleanly but no longer patches what the diff was written against is silent — the
+  install succeeds and CI stays green. `.github/renovate.json` therefore carries a `boneyard-js` rule turning
+  `automerge` off, against the blanket patch/minor automerge above it; a human reads the upstream diff. It is
+  the only dependency in the tree with a patch, and a second one needs the same rule.
+- **`minimumReleaseAge` is declared twice and nothing keeps the two in step.** `pnpm-workspace.yaml` says
+  4320 minutes (3 days), `.github/renovate.json` says 4 days. Renovate being the stricter of the two is what
+  makes it safe: it cannot open a pull request for a release the installer would then refuse. Lower it below
+  the workspace's and CI fails on the lockfile rather than at resolution, because the age is re-checked on
+  **every** install and not only when a version is picked.
+- **An import sorted above a `'use client'` silently deletes it, and only `next build` notices.** Biome's
+  import sorting moves an added import to the top of the file; the directive then stops being the first
+  statement, and the formatter parenthesises the orphaned string, leaving `('use client');`. That is an
+  ordinary expression — the module becomes a Server Component. Typecheck, Biome and the whole unit suite
+  stay green, because none of them models the RSC boundary. Six planner files sat like that for several
+  commits. `tests/docs-consistency.test.ts` parses for it now, in both shapes.
+- **Never run `lint-staged` by hand.** It stashes the whole tree; interrupting it can revert the working
+  copy. Let the hook run it.

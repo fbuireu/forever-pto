@@ -1,0 +1,416 @@
+'use client';
+
+import {
+  AMOUNT_MAX,
+  AMOUNT_MIN,
+  type CreatePaymentInput,
+  createPaymentSchemaWithMessages,
+} from '@application/dto/payment/schema';
+import type { DiscountInfo } from '@application/dto/payment/types';
+import { usePremiumStore } from '@application/stores/premium';
+import { useUIStore } from '@application/stores/ui';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { track } from '@infrastructure/clients/logging/better-stack/tracking';
+import { getStripeClientInstance } from '@infrastructure/clients/payments/stripe/client';
+import { PromoCodeError, PromoCodeErrors } from '@infrastructure/errors';
+import { Elements } from '@stripe/react-stripe-js';
+import type { StripeElementsOptions } from '@stripe/stripe-js';
+import { initializePayment } from '@ui/adapters/payments/checkout';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/modules/core/animate/base/Popover';
+import { Star } from '@ui/modules/core/animate/icons/Star';
+import { Button } from '@ui/modules/core/primitives/Button';
+import { cn } from '@ui/utils/cn';
+import { useLocale, useTranslations } from 'next-intl';
+import { useTheme } from 'next-themes';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { useShallow } from 'zustand/react/shallow';
+import { DonationForm } from './DonationForm';
+import './donate.css';
+import { logClientError } from '@application/shared/utils/clientLog';
+import { CheckoutForm } from '@ui/modules/premium/CheckoutForm';
+
+interface PaymentState {
+  clientSecret: string;
+  data: CreatePaymentInput;
+  discountInfo: DiscountInfo | null;
+}
+
+const stripePromise = getStripeClientInstance().getStripePromise();
+
+export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
+  const locale = useLocale();
+  const t = useTranslations('toasts');
+  const tDonate = useTranslations('donate');
+  const tValidation = useTranslations('validation.payment');
+  const tEmail = useTranslations('validation.email');
+  const { resolvedTheme } = useTheme();
+  const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  const { premiumKey, userEmail, setEmail } = usePremiumStore(
+    useShallow((state) => ({
+      premiumKey: state.premiumKey,
+      userEmail: state.userEmail,
+      setEmail: state.setEmail,
+    }))
+  );
+
+  const { currency, currencySymbol, isOpen, isOpening, setDonatePopoverOpen, clearDonatePopoverOpening } = useUIStore(
+    useShallow((state) => ({
+      currency: state.currency,
+      currencySymbol: state.currencySymbol,
+      isOpen: state.donatePopoverOpen,
+      isOpening: state.donatePopoverIsOpening,
+      setDonatePopoverOpen: state.setDonatePopoverOpen,
+      clearDonatePopoverOpening: state.clearDonatePopoverOpening,
+    }))
+  );
+
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      setDonatePopoverOpen(open);
+    },
+    [setDonatePopoverOpen]
+  );
+
+  const paymentSchema = createPaymentSchemaWithMessages({
+    amountMin: tValidation('amountMin', { min: AMOUNT_MIN }),
+    amountMax: tValidation('amountMax', { max: AMOUNT_MAX }),
+    invalidEmail: tEmail('invalid'),
+    emailRequired: tEmail('required'),
+    promoCodeTooLong: tValidation('promoCodeTooLong'),
+  });
+
+  const form = useForm<CreatePaymentInput>({
+    resolver: zodResolver(paymentSchema),
+    resetOptions: { keepDirtyValues: true },
+    values: {
+      amount: 5,
+      promoCode: '',
+      email: userEmail ?? '',
+    },
+  });
+
+  const currentAmount = form.watch('amount');
+
+  const onSubmit = useCallback(
+    (data: CreatePaymentInput) => {
+      startTransition(async () => {
+        try {
+          setEmail(data.email);
+          const result = await initializePayment({
+            amount: data.amount,
+            email: data.email,
+            promoCode: data.promoCode,
+          });
+
+          if (result.discountInfo) {
+            const saved = (result.discountInfo.originalAmount - result.discountInfo.finalAmount).toFixed(2);
+            toast.success(t('promoApplied'), {
+              description: t('promoSavedDescription', {
+                saved,
+                original: result.discountInfo.originalAmount.toFixed(2),
+                final: result.discountInfo.finalAmount.toFixed(2),
+              }),
+            });
+            track('promo_code_applied', {
+              discountType: result.discountInfo.type,
+              discountValue: result.discountInfo.value,
+              originalAmount: result.discountInfo.originalAmount,
+              finalAmount: result.discountInfo.finalAmount,
+            });
+          }
+
+          track('payment_started', { amount: data.amount, currency, hasPromoCode: !!data.promoCode });
+
+          setPaymentState({
+            clientSecret: result.clientSecret,
+            data,
+            discountInfo: result.discountInfo ?? null,
+          });
+        } catch (error) {
+          logClientError('Payment initialization failed in Donate component', error, {
+            amount: data.amount,
+            hasPromoCode: !!data.promoCode,
+            promoCodeLength: data.promoCode?.length,
+            currency,
+            locale,
+          });
+          if (error instanceof PromoCodeError) {
+            const descriptions = {
+              [PromoCodeErrors.INVALID_OR_EXPIRED]: t('promoCodeErrors.invalid_or_expired'),
+              [PromoCodeErrors.USAGE_LIMIT_REACHED]: t('promoCodeErrors.usage_limit_reached'),
+              [PromoCodeErrors.COUPON_EXPIRED]: t('promoCodeErrors.coupon_expired'),
+              [PromoCodeErrors.COUPON_INVALID]: t('promoCodeErrors.coupon_invalid'),
+              [PromoCodeErrors.FAILED_TO_LOAD]: t('promoCodeErrors.failed_to_load'),
+              [PromoCodeErrors.MIN_AMOUNT_EXCEEDED]: t('promoCodeErrors.min_amount_exceeded'),
+            };
+            toast.error(t('promoCodeError'), {
+              description: descriptions[error.code],
+            });
+          } else {
+            toast.error(t('paymentFailed'), {
+              description: t('paymentFailedDescription'),
+            });
+          }
+        }
+      });
+    },
+    [setEmail, locale, currency, t]
+  );
+
+  const handlePaymentSuccess = useCallback(() => {
+    toast.success(t('paymentSuccess'), {
+      description: t('paymentSuccessDescription'),
+      duration: 8000,
+    });
+
+    form.reset();
+    setPaymentState(null);
+    setDonatePopoverOpen(false);
+  }, [form, setDonatePopoverOpen, t]);
+
+  useEffect(() => {
+    if (isOpen && isOpening) clearDonatePopoverOpening();
+  }, [isOpen, isOpening, clearDonatePopoverOpening]);
+
+  const handlePaymentCancel = useCallback(() => {
+    setPaymentState(null);
+  }, []);
+
+  const finalAmount = paymentState?.discountInfo?.finalAmount ?? currentAmount;
+
+  const elementsOptions = useMemo<StripeElementsOptions | undefined>(() => {
+    if (!paymentState?.clientSecret) return undefined;
+
+    const isDark = resolvedTheme === 'dark';
+
+    const t = isDark
+      ? {
+          bg: '#1A1612',
+          bgInput: '#181410',
+          fg: '#FFF5E1',
+          frame: '#FFF5E1',
+          accent: '#FFD93D',
+          accentText: '#0E0E0E',
+          hover: '#2B241E',
+          destructive: '#FF5A5F',
+          muted: '#C6B8A5',
+        }
+      : {
+          bg: '#FFFDF8',
+          bgInput: '#FFFAF0',
+          fg: '#0E0E0E',
+          frame: '#0E0E0E',
+          accent: '#FFD93D',
+          accentText: '#0E0E0E',
+          hover: '#FFF0C6',
+          destructive: '#FF5A5F',
+          muted: '#6B5E4E',
+        };
+
+    return {
+      clientSecret: paymentState.clientSecret,
+      loader: 'always',
+      appearance: {
+        theme: undefined,
+        labels: 'above',
+        variables: {
+          colorBackground: t.bg,
+          colorText: t.fg,
+          colorPrimary: t.frame,
+          colorDanger: t.destructive,
+          colorTextSecondary: t.muted,
+          colorTextPlaceholder: t.muted,
+          accessibleColorOnColorPrimary: t.fg,
+          fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontSizeBase: '14px',
+          fontWeightNormal: '400',
+          fontWeightMedium: '500',
+          fontWeightBold: '700',
+          spacingUnit: '4px',
+          borderRadius: '8px',
+          focusBoxShadow: `4px 4px 0 0 ${t.frame}`,
+          focusOutline: 'none',
+        },
+        rules: {
+          '.Input': {
+            backgroundColor: t.bgInput,
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            borderColor: t.frame,
+            padding: '10px 12px',
+            fontSize: '14px',
+            color: t.fg,
+            boxShadow: 'none',
+            borderRadius: '8px',
+            transition: 'box-shadow 75ms linear',
+          },
+          '.Input:hover': {
+            boxShadow: `2px 2px 0 0 ${t.frame}`,
+          },
+          '.Input:focus': {
+            boxShadow: `4px 4px 0 0 ${t.frame}`,
+            outline: 'none',
+          },
+
+          '.Input--invalid': {
+            borderColor: t.destructive,
+            boxShadow: 'none',
+          },
+          '.Input--invalid:focus': {
+            boxShadow: `4px 4px 0 0 ${t.destructive}`,
+          },
+          '.Input::placeholder': {
+            color: t.muted,
+          },
+          '.Label': {
+            fontSize: '11px',
+            fontWeight: '700',
+            color: t.fg,
+            letterSpacing: '0.07em',
+            textTransform: 'uppercase',
+          },
+          '.Error': {
+            fontSize: '12px',
+            color: t.destructive,
+            fontWeight: '500',
+          },
+          '.Tab': {
+            backgroundColor: t.bg,
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            borderColor: t.frame,
+            boxShadow: 'none',
+            color: t.fg,
+            borderRadius: '8px',
+            padding: '10px 16px',
+            transition: 'box-shadow 80ms linear',
+          },
+          '.Tab:hover': {
+            backgroundColor: t.hover,
+            boxShadow: `3px 3px 0 0 ${t.frame}`,
+          },
+          '.Tab--selected': {
+            backgroundColor: t.accent,
+            color: t.accentText,
+            borderColor: t.frame,
+            boxShadow: `4px 4px 0 0 ${t.frame}`,
+          },
+          '.Tab--selected:hover': {
+            boxShadow: `5px 5px 0 0 ${t.frame}`,
+          },
+          '.Block': {
+            backgroundColor: t.bg,
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            borderColor: t.frame,
+            borderRadius: '8px',
+            boxShadow: 'none',
+          },
+          '.PickerItem': {
+            backgroundColor: t.bg,
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            borderColor: t.frame,
+            borderRadius: '8px',
+            boxShadow: 'none',
+            transition: 'box-shadow 80ms linear',
+          },
+          '.PickerItem:hover': {
+            backgroundColor: t.hover,
+            boxShadow: `3px 3px 0 0 ${t.frame}`,
+          },
+          '.PickerItem--selected': {
+            backgroundColor: t.accent,
+            borderColor: t.frame,
+            color: t.accentText,
+            boxShadow: `4px 4px 0 0 ${t.frame}`,
+          },
+          '.PickerItem--selected:hover': {
+            boxShadow: `5px 5px 0 0 ${t.frame}`,
+          },
+          '.AccordionItem': {
+            backgroundColor: t.bg,
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            borderColor: t.frame,
+            borderRadius: '8px',
+            boxShadow: 'none',
+          },
+          '.AccordionItem:focus-within': {
+            boxShadow: `4px 4px 0 0 ${t.frame}`,
+          },
+          '.CheckboxInput': {
+            border: `2px solid ${t.frame}`,
+            borderRadius: '4px',
+            backgroundColor: t.bgInput,
+          },
+          '.CheckboxInput--checked': {
+            backgroundColor: t.accent,
+            borderColor: t.frame,
+          },
+        },
+      },
+    };
+  }, [paymentState?.clientSecret, resolvedTheme]);
+
+  return (
+    <Popover open={isOpen} onOpenChange={handleOpenChange}>
+      <div
+        className={cn(
+          'donate-trigger fixed w-full right-0 md:w-auto md:right-4 z-50',
+          bottomClassName ?? 'bottom-[calc(15dvh+8px)] md:bottom-4'
+        )}
+      >
+        <div className='donate-brutal' style={{ animationPlayState: isOpen ? 'paused' : 'running' }}>
+          <PopoverTrigger asChild>
+            <Button className='donate-brutal-btn w-full py-3'>{tDonate('donateAndUnblock')}</Button>
+          </PopoverTrigger>
+        </div>
+      </div>
+      <PopoverContent className='w-96 bg-card text-card-foreground' positionerClassName='z-[53]'>
+        <div className='grid gap-4'>
+          <div className='space-y-2'>
+            <h4 className='leading-none font-medium'>{tDonate('supportAndUnblock')}</h4>
+            <p className='text-muted-foreground text-sm'>{tDonate('makeDonation')}</p>
+            {premiumKey && (
+              <div className='flex items-center gap-2 p-2 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700'>
+                <Star className='size-4 text-green-500' fill='currentColor' aria-hidden='true' animateOnView loop />
+                <span className='text-green-700 dark:text-green-300 font-semibold text-sm'>
+                  {tDonate('alreadyPremium')}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {!paymentState ? (
+            <DonationForm
+              form={form}
+              onSubmit={onSubmit}
+              currentAmount={currentAmount}
+              locale={locale}
+              currency={currency}
+              currencySymbol={currencySymbol}
+              isPending={isPending}
+            />
+          ) : (
+            elementsOptions && (
+              <Elements stripe={stripePromise} options={elementsOptions}>
+                <CheckoutForm
+                  amount={finalAmount}
+                  email={paymentState.data.email}
+                  discountInfo={paymentState.discountInfo}
+                  onSuccess={handlePaymentSuccess}
+                  onCancel={handlePaymentCancel}
+                />
+              </Elements>
+            )
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};

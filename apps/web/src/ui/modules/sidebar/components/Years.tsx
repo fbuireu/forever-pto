@@ -1,0 +1,82 @@
+'use client';
+
+import { useFiltersStore } from '@application/stores/filters';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/modules/core/animate/base/Popover';
+import { Check } from '@ui/modules/core/animate/icons/Check';
+import { ChevronDown } from '@ui/modules/core/animate/icons/ChevronDown';
+import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
+import { Button } from '@ui/modules/core/primitives/Button';
+import { Command, CommandGroup, CommandItem, CommandList } from '@ui/modules/core/primitives/Command';
+import { SidebarFieldLabel } from '@ui/modules/sidebar/components/SidebarFieldLabel';
+import { cn } from '@ui/utils/cn';
+import { Calendar } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+
+const MAX_YEARS = 10;
+
+interface YearsProps {
+  currentYear: number;
+}
+
+export const Years = ({ currentYear }: YearsProps) => {
+  const t = useTranslations('sidebar.years');
+  const [open, setOpen] = useState(false);
+  const { year, setYear } = useFiltersStore(
+    useShallow((state) => ({
+      year: state.year,
+      setYear: state.setYear,
+    }))
+  );
+
+  const years = Array.from({ length: MAX_YEARS }, (_, index) => currentYear - MAX_YEARS / 2 + index);
+
+  return (
+    <div className='space-y-2 w-full'>
+      <SidebarFieldLabel controlId='years' icon={<Calendar size={16} />} title={t('title')} />
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            id='years'
+            variant='outline'
+            aria-expanded={open}
+            aria-haspopup='listbox'
+            className={cn('w-full justify-between')}
+          >
+            {year}
+            <AnimateIcon animateOnHover>
+              <ChevronDown className={cn('opacity-50 transition-transform duration-200', open && 'rotate-180')} />
+            </AnimateIcon>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className='w-50 p-0'>
+          <Command>
+            <CommandList>
+              <CommandGroup>
+                {years.map((yearOption) => (
+                  <AnimateIcon animateOnHover key={yearOption}>
+                    <CommandItem
+                      key={yearOption}
+                      value={String(yearOption)}
+                      onSelect={() => {
+                        setYear(yearOption);
+                        setOpen(false);
+                      }}
+                    >
+                      <p className='font-normal text-sm'>{yearOption}</p>
+                      <Check
+                        animateOnHover
+                        className={cn('ml-auto', year === yearOption ? 'opacity-100' : 'opacity-0')}
+                      />
+                    </CommandItem>
+                  </AnimateIcon>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+};

@@ -1,0 +1,29 @@
+export type PaymentStatus =
+  | 'canceled'
+  | 'processing'
+  | 'requires_action'
+  | 'requires_capture'
+  | 'requires_confirmation'
+  | 'requires_payment_method'
+  | 'succeeded';
+
+export const PAYMENT_SUCCEEDED: PaymentStatus = 'succeeded';
+
+export interface PaymentSucceededEvent {
+  type: 'payment_succeeded';
+  paymentId: string;
+  email: string;
+  amount: number;
+  status: PaymentStatus;
+  latestChargeId: string | null;
+  promoCode: string | null;
+  userAgent: string | null;
+  ipAddress: string | null;
+}
+
+export interface PaymentFailedEvent {
+  type: 'payment_failed';
+  paymentId: string;
+  status: PaymentStatus;
+  errorMessage: string;
+}
