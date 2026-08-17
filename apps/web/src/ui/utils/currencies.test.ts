@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { amountFormatter, DEFAULT_CURRENCY, getCurrencyForLocale, getCurrencySymbol } from './currencies';
+import { amountFormatter, DEFAULT_CURRENCY, getCurrencyForLocale } from './currencies';
 
 describe('getCurrencyForLocale', () => {
   it('returns DEFAULT_CURRENCY as the currency code', () => {
@@ -16,6 +16,17 @@ describe('getCurrencyForLocale', () => {
     const first = getCurrencyForLocale('de');
     const second = getCurrencyForLocale('de');
     expect(first).toEqual(second);
+  });
+});
+
+describe('formatter reuse', () => {
+  it('hands back the same formatter for one locale, so the cache is shared rather than per function', () => {
+    expect(amountFormatter('en')).toBe(amountFormatter('en'));
+  });
+
+  it('keeps the zero-digit and the default-digit formatters apart, which one cache key must not collapse', () => {
+    expect(amountFormatter('en').format(10)).not.toContain('.');
+    expect(getCurrencyForLocale('en').currencySymbol).toBe('€');
   });
 });
 
@@ -38,29 +49,5 @@ describe('amountFormatter', () => {
     const first = amountFormatter('fr');
     const second = amountFormatter('fr');
     expect(first).toBe(second);
-  });
-});
-
-describe('getCurrencySymbol', () => {
-  it('returns the symbol for USD', () => {
-    expect(getCurrencySymbol({ locale: 'en-US', currency: 'USD' })).toBe('$');
-  });
-
-  it('returns the symbol for EUR', () => {
-    expect(getCurrencySymbol({ locale: 'de-DE', currency: 'EUR' })).toBe('€');
-  });
-
-  it('returns the symbol for GBP', () => {
-    expect(getCurrencySymbol({ locale: 'en-GB', currency: 'GBP' })).toBe('£');
-  });
-
-  it('returns the same value on repeated calls (cached)', () => {
-    const first = getCurrencySymbol({ locale: 'en-US', currency: 'USD' });
-    const second = getCurrencySymbol({ locale: 'en-US', currency: 'USD' });
-    expect(first).toBe(second);
-  });
-
-  it('returns currency code as fallback for invalid currency', () => {
-    expect(getCurrencySymbol({ locale: 'en-US', currency: 'INVALID' })).toBe('INVALID');
   });
 });

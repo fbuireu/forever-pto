@@ -1,59 +1,45 @@
 import type { Locale } from 'next-intl';
 
-const CURRENCY_STYLE = 'currency' as const;
-const localeFormatterCache = new Map<string, Intl.NumberFormat>();
+const CURRENCY_PART = 'currency' as const;
+
 export const DEFAULT_CURRENCY = 'EUR';
 export const DEFAULT_CURRENCY_SYMBOL = '€';
 
-export const getCurrencyForLocale = (locale: Locale) => {
-  let formatter = localeFormatterCache.get(locale);
-  if (!formatter) {
-    formatter = new Intl.NumberFormat(locale, { style: CURRENCY_STYLE, currency: DEFAULT_CURRENCY });
-    localeFormatterCache.set(locale, formatter);
-  }
-  const currency = formatter.resolvedOptions().currency ?? DEFAULT_CURRENCY;
-  const currencySymbol = formatter.formatToParts(0).find(({ type }) => type === CURRENCY_STYLE)?.value ?? currency;
-  return { currency, currencySymbol };
-};
+interface FormatterKey {
+  locale: string;
+  currency: string;
+  fractionDigits?: number;
+}
 
-const amountFormatterCache = new Map<string, Intl.NumberFormat>();
+const formatterCache = new Map<string, Intl.NumberFormat>();
 
-export const amountFormatter = (locale: Locale) => {
-  let formatter = amountFormatterCache.get(locale);
-  if (!formatter) {
-    formatter = new Intl.NumberFormat(locale, {
-      style: CURRENCY_STYLE,
-      currency: 'EUR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
-    amountFormatterCache.set(locale, formatter);
-  }
+const formatterFor = ({ locale, currency, fractionDigits }: FormatterKey): Intl.NumberFormat => {
+  const key = `${locale}|${currency}|${fractionDigits ?? 'auto'}`;
+  const cached = formatterCache.get(key);
+
+  if (cached) return cached;
+
+  const formatter = new Intl.NumberFormat(locale, {
+    style: CURRENCY_PART,
+    currency,
+    ...(fractionDigits !== undefined && {
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits,
+    }),
+  });
+
+  formatterCache.set(key, formatter);
+
   return formatter;
 };
 
-interface GetCurrencySymbolParams {
-  locale: string;
-  currency: string;
-}
+const symbolOf = (formatter: Intl.NumberFormat, fallback: string) =>
+  formatter.formatToParts(0).find(({ type }) => type === CURRENCY_PART)?.value ?? fallback;
 
-const currencySymbolCache = new Map<string, Intl.NumberFormat>();
+export const getCurrencyForLocale = (locale: Locale) => ({
+  currency: DEFAULT_CURRENCY,
+  currencySymbol: symbolOf(formatterFor({ locale, currency: DEFAULT_CURRENCY }), DEFAULT_CURRENCY),
+});
 
-export const getCurrencySymbol = ({ locale, currency }: GetCurrencySymbolParams) => {
-  try {
-    const key = `${locale}-${currency}`;
-    let formatter = currencySymbolCache.get(key);
-    if (!formatter) {
-      formatter = new Intl.NumberFormat(locale, {
-        style: CURRENCY_STYLE,
-        currency,
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      });
-      currencySymbolCache.set(key, formatter);
-    }
-    return formatter.formatToParts(0).find(({ type }) => type === CURRENCY_STYLE)?.value ?? currency;
-  } catch {
-    return currency;
-  }
-};
+export const amountFormatter = (locale: Locale) =>
+  formatterFor({ locale, currency: DEFAULT_CURRENCY, fractionDigits: 0 });
