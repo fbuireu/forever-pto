@@ -8,6 +8,8 @@ export async function GET(request: Request) {
 
   const body = await buildMarkdownPage(baseUrl, pathname);
 
+  if (body === null) return new Response('Not Found', { status: 404, headers: { Vary: 'Accept' } });
+
   return new Response(body, {
     headers: {
       'Content-Type': 'text/markdown; charset=utf-8',

@@ -40,10 +40,10 @@ describe('buildMarkdownPage', () => {
       ['/legal/privacy-policy-2024', '[metadata:privacyPolicy.title]'],
       ['/es/legal/privacy-policy/archive', '[metadata:privacyPolicy.title]'],
       ['/planner-comparison', '[metadata:planner.title]'],
-    ])('does not serve %s as the route it merely contains', async (pathname, foreignTitle) => {
+    ])('answers nothing for %s rather than the route it merely contains', async (pathname, foreignTitle) => {
       const result = await buildMarkdownPage(BASE_URL, pathname);
-      expect(result).not.toContain(foreignTitle);
-      expect(result).toContain('[metadata:title]');
+      expect(result).toBeNull();
+      expect(result ?? '').not.toContain(foreignTitle);
     });
 
     it.each([
@@ -54,9 +54,9 @@ describe('buildMarkdownPage', () => {
       expect(await buildMarkdownPage(BASE_URL, pathname)).toContain(title);
     });
 
-    it('resolves the homepage by matching the empty path, not by falling through', async () => {
-      const { findRoute } = await import('@infrastructure/seo/routes');
-      expect(findRoute('')?.titleKey).toBe('title');
+    it('serves the homepage for the empty path, and only for it', async () => {
+      expect(await buildMarkdownPage(BASE_URL, '/')).toContain('[metadata:title]');
+      expect(await buildMarkdownPage(BASE_URL, '/does-not-exist')).toBeNull();
     });
   });
 

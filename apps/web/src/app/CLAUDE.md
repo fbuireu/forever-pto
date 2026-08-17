@@ -41,8 +41,22 @@ failure channel onto a status code. Business logic that lands here is in the wro
    and the confirmation page all answered with the marketing copy under the homepage's title. Listing the
    routes fixed the symptom and left the mechanism: `/legal/privacy-policy-2024` still resolved *as* the
    privacy policy, and `/planner-comparison` as the planner. `routePathFromPathname` drops the locale segment
-   and the comparison is `===`, so the homepage is the empty path matched deliberately rather than whatever
-   fell through. `buildMarkdownPage.test.ts` pins both directions.
+   and the comparison is `===`.
+
+   **The claim that used to end this paragraph — that the homepage is "the empty path matched deliberately
+   rather than whatever fell through" — was false, and the test named after it asserted a different module.**
+   The mis-resolution was fixed; the fallthrough never was. `buildMarkdownPage` ended with an unguarded
+   homepage body, so *any* path `findRoute` did not know reached it, and the suite pinned exactly that: three
+   cases asserting `/legal/privacy-policy-2024` and friends are served the homepage. Meanwhile the case
+   called *"resolves the homepage by matching the empty path, not by falling through"* imported `findRoute`
+   and never called `buildMarkdownPage` at all — it would have stayed green with the module deleted.
+
+   `buildMarkdownPage` answers `null` for an unlisted path now, and `api/markdown/route.ts` turns that into a
+   **404**. The two representations of one URL agreed on nothing before: `/does-not-exist` returned the
+   app's own 404 page as HTML and the homepage's markdown at 200 to anything sending
+   `Accept: text/markdown`, which tells a crawler or an agent that the page exists. The `Vary: Accept` header
+   is on the 404 too, so a shared cache cannot serve one representation for the other. Verified by restoring
+   the fallthrough and watching four cases go red.
 3. Redirects `**/payment/confirmation` to the locale home when `payment_intent` is absent.
 4. Runs the `next-intl` middleware, which negotiates the locale and fills the `[locale]` segment.
 5. Re-writes the `NEXT_LOCALE` cookie next-intl just set, through `setLocaleCookie`

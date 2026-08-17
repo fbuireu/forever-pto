@@ -23,7 +23,7 @@ const MESSAGES: Record<LocaleCode, typeof en> = {
 const HOME_PATH = '';
 const PLANNER_PATH = '/planner';
 
-export async function buildMarkdownPage(baseUrl: string, pathname: string) {
+export async function buildMarkdownPage(baseUrl: string, pathname: string): Promise<string | null> {
   const locale = getLocaleFromPathname(pathname);
   const messages = MESSAGES[locale];
   const t = createTranslator({ locale, messages, namespace: 'metadata' });
@@ -31,7 +31,9 @@ export async function buildMarkdownPage(baseUrl: string, pathname: string) {
   const routePath = routePathFromPathname(pathname);
   const route = findRoute(routePath);
 
-  if (route && routePath !== HOME_PATH && routePath !== PLANNER_PATH) {
+  if (!route) return null;
+
+  if (routePath !== HOME_PATH && routePath !== PLANNER_PATH) {
     return `# ${t(route.titleKey)}
 
 ${route.descriptionKey ? `${t(route.descriptionKey)}\n` : ''}

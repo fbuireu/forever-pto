@@ -1,3 +1,4 @@
+import { buildMarkdownPage } from '@infrastructure/markdown/buildMarkdownPage';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@opennextjs/cloudflare', () => ({
@@ -13,6 +14,15 @@ vi.mock('@infrastructure/markdown/buildMarkdownPage', () => ({
 const { GET } = await import('./route');
 
 describe('GET /api/markdown', () => {
+  it('answers 404 for a path the route table does not list, so the two representations agree', async () => {
+    vi.mocked(buildMarkdownPage).mockResolvedValueOnce(null);
+
+    const response = await GET(new Request('http://localhost/api/markdown?path=/does-not-exist'));
+
+    expect(response.status).toBe(404);
+    expect(response.headers.get('Vary')).toBe('Accept');
+  });
+
   it('returns 200 with text/markdown content-type', async () => {
     const request = new Request('http://localhost/api/markdown');
     const response = await GET(request);
