@@ -6,6 +6,7 @@ import {
   addMonths,
   endOfMonth,
   endOfYear,
+  isSameDay,
   isSameMonth,
   isWeekend,
   isWithinInterval,
@@ -46,6 +47,16 @@ export interface HolidaysState {
   planRevision: number;
 }
 
+interface HeldOnParams {
+  date: Date;
+  exceptHolidayIndex?: number;
+}
+
+interface DateHolder {
+  holiday?: HolidayDTO;
+  manualDay: boolean;
+}
+
 interface HolidaysActions {
   fetchHolidays: (params: FetchHolidaysParams) => Promise<void>;
   generateSuggestions: (params: MainThreadSuggestionsParams) => Promise<void>;
@@ -55,6 +66,7 @@ interface HolidaysActions {
   setCurrentAlternativeSelection: (params: AlternativeSelectionBaseParams) => void;
   setPreviewAlternativeSelection: (params: AlternativeSelectionBaseParams) => void;
   resetToDefaults: () => void;
+  heldOn: (params: HeldOnParams) => DateHolder;
   addHoliday: (params: AddHolidayParams) => HolidayOutcome;
   editHoliday: (params: EditHolidayParams) => HolidayOutcome;
   removeHoliday: (holidayId: string) => void;
@@ -129,12 +141,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
           try {
             const { getHolidays } = await import('@infrastructure/services/holidays/getHolidays');
             const holidays = await getHolidays(params);
-            const filteredHolidays = holidays.filter((fetchedHoliday) => {
-              const hasCustomOnSameDate = customHolidays.some(
-                (customHoliday) => customHoliday.date.toDateString() === fetchedHoliday.date.toDateString()
-              );
-              return !hasCustomOnSameDate;
-            });
+            const filteredHolidays = holidays.filter(
+              (fetchedHoliday) => !customHolidays.some((custom) => isSameDay(custom.date, fetchedHoliday.date))
+            );
             set({
               holidays: [...customHolidays, ...filteredHolidays].toSorted(
                 (a, b) => a.date.getTime() - b.date.getTime()
@@ -269,9 +278,18 @@ export const useHolidaysStore = create<HolidaysStore>()(
           set({ ...holidaysInitialState });
         },
 
-        addHoliday: ({ holiday, year, carryOverMonths }) => {
+        heldOn: ({ date, exceptHolidayIndex }) => {
           const { holidays, manuallySelectedDays } = get();
-          const existingHoliday = holidays.find((h) => h.date.toDateString() === holiday.date.toDateString());
+
+          return {
+            holiday: holidays.find((holiday, index) => index !== exceptHolidayIndex && isSameDay(holiday.date, date)),
+            manualDay: manuallySelectedDays.some((day) => isSameDay(day, date)),
+          };
+        },
+
+        addHoliday: ({ holiday, year, carryOverMonths }) => {
+          const { holidays } = get();
+          const { holiday: existingHoliday, manualDay } = get().heldOn({ date: holiday.date });
 
           if (existingHoliday) {
             logClient((logger) =>
@@ -280,9 +298,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
             return { applied: false, reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY, heldBy: existingHoliday };
           }
 
-          const isManuallySelected = manuallySelectedDays.some((d) => d.toDateString() === holiday.date.toDateString());
-
-          if (isManuallySelected) {
+          if (manualDay) {
             logClient((logger) =>
               logger.warn('A PTO day is already booked on this date', { date: holiday.date.toISOString() })
             );
@@ -311,18 +327,18 @@ export const useHolidaysStore = create<HolidaysStore>()(
         },
 
         editHoliday: ({ holidayId, updates, year, carryOverMonths }: EditHolidayParams) => {
-          const { holidays, manuallySelectedDays } = get();
+          const { holidays } = get();
           const holidayIndex = holidays.findIndex((h) => h.id === holidayId);
 
           if (holidayIndex === -1) return { applied: false, reason: HolidayRefusal.HOLIDAY_NOT_FOUND };
 
-          const targetDateStr = fromStoredInstant(updates.date).toDateString();
-          const heldBy = holidays.find(
-            (h, index) => index !== holidayIndex && fromStoredInstant(h.date).toDateString() === targetDateStr
-          );
-          const collidesWithManualDay = manuallySelectedDays.some((d) => d.toDateString() === targetDateStr);
+          const { holiday: heldBy, manualDay: collidesWithManualDay } = get().heldOn({
+            date: updates.date,
+            exceptHolidayIndex: holidayIndex,
+          });
 
           if (heldBy || collidesWithManualDay) {
+            const targetDateStr = updates.date.toDateString();
             logClient((logger) => logger.warn('Refused to move a holiday onto an occupied date', { targetDateStr }));
 
             return heldBy
@@ -354,11 +370,10 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
           if (!currentSelection) return { applied: false, reason: DayRefusal.NO_PLAN };
 
-          const isSuggested = currentSelection.days.some((d) => d.toDateString() === dateStr);
-          const isManuallySelected = manuallySelectedDays.some((d) => d.toDateString() === dateStr);
-          const wasRemoved = removedSuggestedDays.some((d) => d.toDateString() === dateStr);
+          const isSuggested = currentSelection.days.some((day) => isSameDay(day, date));
+          const wasRemoved = removedSuggestedDays.some((day) => isSameDay(day, date));
 
-          const holidayOnDate = holidays.find((h) => fromStoredInstant(h.date).toDateString() === dateStr);
+          const { holiday: holidayOnDate, manualDay: isManuallySelected } = get().heldOn({ date });
 
           if (!isSuggested && !isManuallySelected && (isWeekend(date) || holidayOnDate)) {
             logClient((logger) => logger.warn('Refused to spend a PTO day on a day that is already off', { dateStr }));
@@ -380,13 +395,11 @@ export const useHolidaysStore = create<HolidaysStore>()(
           let updatedRemovedDays = removedSuggestedDays;
 
           if (isManuallySelected) {
-            updatedManualDays = manuallySelectedDays.filter((d) => d.toDateString() !== dateStr);
+            updatedManualDays = manuallySelectedDays.filter((day) => !isSameDay(day, date));
           } else if (isSuggested && wasRemoved) {
-            updatedRemovedDays = removedSuggestedDays.filter((d) => d.toDateString() !== dateStr);
+            updatedRemovedDays = removedSuggestedDays.filter((day) => !isSameDay(day, date));
           } else if (isSuggested && !wasRemoved) {
-            updatedRemovedDays = [...removedSuggestedDays, fromStoredInstant(date)].toSorted(
-              (a, b) => a.getTime() - b.getTime()
-            );
+            updatedRemovedDays = [...removedSuggestedDays, date].toSorted((a, b) => a.getTime() - b.getTime());
           } else {
             const budget = measureBudget({
               ptoDays: totalPtoDays,

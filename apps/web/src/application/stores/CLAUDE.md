@@ -167,6 +167,26 @@ copy actually needs: a weekend, a National or Regional Holiday and a Custom Holi
 refusals because the UI says three different things. Adding a refusal branch means adding a reason, not a
 second copy of the condition.
 
+**`heldOn` is that rule inside the store, and it took a second pass to get there.** The refusal *reasons*
+crossed the seam; the *rule* stayed written out at every action that needed it — thirteen `toDateString()`
+comparisons in one file, where the layer guide says to compare with `isSameDay`. That is untidy but
+survivable. What was not survivable is that the copies had split over date coercion, inside the same
+function: `fetchHolidays` built its Custom Holidays through `isInPlanningWindow({ date: fromStoredInstant(h.date) })`
+— treating a stored date as possibly a string — and four lines later compared `customHoliday.date.toDateString()`
+raw. Both cannot be right. `addHoliday` compared raw and `editHoliday` coerced, for what this guide calls
+deliberately the same act, and `toggleDaySelection` called `fromStoredInstant` on a parameter its own
+signature types `Date`.
+
+The answer is that a stored date is always a `Date` by the time an action runs: `onRehydrateStorage` maps
+`state.holidays` through `fromStoredInstant` before anything can read it. So the coercions were decoration,
+and they are gone.
+
+`heldOn({ date, exceptHolidayIndex? })` answers `{ holiday?, manualDay }` — is this date taken, and by what.
+`addHoliday` asks without an index, `editHoliday` with its own (a Holiday cannot collide with itself, which
+is the one branch nothing tested: renaming a Holiday without moving it would have been refused), and
+`toggleDaySelection` reads `.holiday` for its Holiday check and `.manualDay` for its Manual Day one. The
+three refusal *shapes* stay different; the rule is one. Both halves were verified by breaking them.
+
 **Only `triggerCalculation` raises `isCalculating`, and only a worker reply clears it.** Nothing else in the app sets it back to false — `useCalculationsWorker`'s three callbacks and its
 unmount cleanup are the whole list, and the cleanup is gated on a request actually being in flight. The only
 thing that starts a run is `CalendarList`'s effect, keyed on year, budget, past-days, Holidays, months,

@@ -225,6 +225,24 @@ describe('toggleDaySelection refuses days that are already off', () => {
 });
 
 describe('editHoliday collisions', () => {
+  it('lets a holiday keep its own date, since it cannot collide with itself', () => {
+    useHolidaysStore.setState({
+      holidays: [makeHoliday('custom-1', '2026-03-11', HolidayVariant.CUSTOM)],
+      manuallySelectedDays: [],
+    });
+
+    const outcome = useHolidaysStore.getState().editHoliday({
+      holidayId: 'custom-1',
+      updates: { name: 'Renamed, same day', date: new Date('2026-03-11') },
+      year: 2026,
+      carryOverMonths: 0,
+    });
+
+    const [holiday] = useHolidaysStore.getState().holidays;
+    expect(outcome).toEqual({ applied: true });
+    expect(holiday.name).toBe('Renamed, same day');
+  });
+
   it('refuses to move a holiday onto a date already spent as a PTO day', () => {
     useHolidaysStore.setState({
       holidays: [makeHoliday('custom-1', '2026-03-11', HolidayVariant.CUSTOM)],
