@@ -430,16 +430,12 @@
     "errorTitle": "Something went wrong",
     "failedToSend": "Failed to send message",
     "errors": {
-      "internal_error": "Something went wrong on our side. Please try again later.",
-      "invalid_email": "That email address does not look right.",
-      "email_required": "Please enter your email address.",
       "name_too_short": "Your name needs at least 2 characters.",
       "name_too_long": "Your name is too long.",
       "subject_too_short": "The subject needs at least 5 characters.",
       "subject_too_long": "The subject is too long.",
       "message_too_short": "Your message needs at least 10 characters.",
-      "message_too_long": "Your message is too long.",
-      "invalid_body": "We could not read that request. Please try again."
+      "message_too_long": "Your message is too long."
     }
   },
   "alternativesManager": {
@@ -656,9 +652,6 @@
     "promoSaved": "You saved {saved}!",
     "errors": {
       "internal_error": "Something went wrong on our side. Your card has not been charged.",
-      "email_required": "Please enter your email address.",
-      "invalid_email": "That email address does not look right.",
-      "invalid_body": "We could not read that request. Please try again.",
       "rate_limit_exceeded": "Too many attempts. Please wait a moment and try again.",
       "promo_code_too_long": "That promo code is too long."
     }
@@ -1956,5 +1949,11 @@
         }
       }
     }
+  },
+  "errors": {
+    "invalid_email": "That email address does not look right.",
+    "email_required": "Please enter your email address.",
+    "invalid_body": "We could not read that request. Please try again.",
+    "internal_error": "Something went wrong on our side. Please try again later."
   }
 }

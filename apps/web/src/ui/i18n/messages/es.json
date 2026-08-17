@@ -430,16 +430,12 @@
     "errorTitle": "Algo ha fallado",
     "failedToSend": "Error al enviar el mensaje",
     "errors": {
-      "internal_error": "Algo ha fallado por nuestra parte. Inténtalo de nuevo más tarde.",
-      "invalid_email": "Ese email no parece correcto.",
-      "email_required": "Introduce tu email.",
       "name_too_short": "Tu nombre necesita al menos 2 caracteres.",
       "name_too_long": "Tu nombre es demasiado largo.",
       "subject_too_short": "El asunto necesita al menos 5 caracteres.",
       "subject_too_long": "El asunto es demasiado largo.",
       "message_too_short": "Tu mensaje necesita al menos 10 caracteres.",
-      "message_too_long": "Tu mensaje es demasiado largo.",
-      "invalid_body": "No hemos podido leer esa petición. Inténtalo de nuevo."
+      "message_too_long": "Tu mensaje es demasiado largo."
     }
   },
   "alternativesManager": {
@@ -656,9 +652,6 @@
     "promoSaved": "¡Ahorraste {saved}!",
     "errors": {
       "internal_error": "Algo ha fallado por nuestra parte. No se ha hecho ningún cargo en tu tarjeta.",
-      "email_required": "Introduce tu email.",
-      "invalid_email": "Ese email no parece correcto.",
-      "invalid_body": "No hemos podido leer esa petición. Inténtalo de nuevo.",
       "rate_limit_exceeded": "Demasiados intentos. Espera un momento e inténtalo de nuevo.",
       "promo_code_too_long": "Ese código promocional es demasiado largo."
     }
@@ -1956,5 +1949,11 @@
         }
       }
     }
+  },
+  "errors": {
+    "invalid_email": "Ese email no parece correcto.",
+    "email_required": "Introduce tu email.",
+    "invalid_body": "No hemos podido leer esa petición. Inténtalo de nuevo.",
+    "internal_error": "Algo ha fallado por nuestra parte. Inténtalo de nuevo más tarde."
   }
 }

@@ -47,6 +47,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
   const elements = useElements();
   const locale = useLocale();
   const t = useTranslations('checkout');
+  const tErrors = useTranslations('errors');
   const format = useFormatter();
   const [isExpressReady, setIsExpressReady] = useState(false);
   const [hasExpressOptions, setHasExpressOptions] = useState<boolean | null>(null);
@@ -89,7 +90,9 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
         return;
 
       case ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE:
-        setErrorMessage(resolveApiErrorMessage({ code: result.error, t, fallback: t('paymentFailed') }));
+        setErrorMessage(
+          resolveApiErrorMessage({ code: result.error, t, shared: tErrors, fallback: t('paymentFailed') })
+        );
         track('payment_failed', { error: result.error || UNKNOWN_PAYMENT_ERROR });
         return;
 
@@ -105,7 +108,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
         }, 1000);
         return;
     }
-  }, [stripe, elements, email, onSuccess, setPremiumStatus, t, locale, amount]);
+  }, [stripe, elements, email, onSuccess, setPremiumStatus, t, tErrors, locale, amount]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {

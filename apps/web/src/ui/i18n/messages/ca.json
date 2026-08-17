@@ -430,16 +430,12 @@
     "errorTitle": "Alguna cosa ha fallat",
     "failedToSend": "Error en enviar el missatge",
     "errors": {
-      "internal_error": "Alguna cosa ha fallat per part nostra. Torna-ho a provar més tard.",
-      "invalid_email": "Aquest email no sembla correcte.",
-      "email_required": "Introdueix el teu email.",
       "name_too_short": "El teu nom necessita almenys 2 caràcters.",
       "name_too_long": "El teu nom és massa llarg.",
       "subject_too_short": "L'assumpte necessita almenys 5 caràcters.",
       "subject_too_long": "L'assumpte és massa llarg.",
       "message_too_short": "El teu missatge necessita almenys 10 caràcters.",
-      "message_too_long": "El teu missatge és massa llarg.",
-      "invalid_body": "No hem pogut llegir aquesta petició. Torna-ho a provar."
+      "message_too_long": "El teu missatge és massa llarg."
     }
   },
   "alternativesManager": {
@@ -656,9 +652,6 @@
     "promoSaved": "Has estalviat {saved}!",
     "errors": {
       "internal_error": "Alguna cosa ha fallat per part nostra. No s'ha fet cap càrrec a la teva targeta.",
-      "email_required": "Introdueix el teu email.",
-      "invalid_email": "Aquest email no sembla correcte.",
-      "invalid_body": "No hem pogut llegir aquesta petició. Torna-ho a provar.",
       "rate_limit_exceeded": "Massa intents. Espera un moment i torna-ho a provar.",
       "promo_code_too_long": "Aquest codi promocional és massa llarg."
     }
@@ -1956,5 +1949,11 @@
         }
       }
     }
+  },
+  "errors": {
+    "invalid_email": "Aquest email no sembla correcte.",
+    "email_required": "Introdueix el teu email.",
+    "invalid_body": "No hem pogut llegir aquesta petició. Torna-ho a provar.",
+    "internal_error": "Alguna cosa ha fallat per part nostra. Torna-ho a provar més tard."
   }
 }

@@ -6,20 +6,26 @@ interface ApiErrorTranslator {
 interface ResolveApiErrorMessageParams {
   code: string | null | undefined;
   t: ApiErrorTranslator;
+  shared: ApiErrorTranslator;
   fallback: string;
 }
 
 const MACHINE_CODE = /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/;
 
-export const resolveApiErrorMessage = ({ code, t, fallback }: ResolveApiErrorMessageParams) => {
+const messageFrom = (translator: ApiErrorTranslator, key: string) => {
+  if (!translator.has(key as never)) return undefined;
+
+  const message = translator.raw(key as never);
+
+  return typeof message === 'string' ? message : undefined;
+};
+
+export const resolveApiErrorMessage = ({ code, t, shared, fallback }: ResolveApiErrorMessageParams) => {
   if (!code) return fallback;
 
-  const key = `errors.${code}` as never;
+  const message = messageFrom(t, `errors.${code}`) ?? messageFrom(shared, code);
 
-  if (t.has(key)) {
-    const message = t.raw(key);
-    if (typeof message === 'string') return message;
-  }
+  if (message !== undefined) return message;
 
   return MACHINE_CODE.test(code) ? fallback : code;
 };

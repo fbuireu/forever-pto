@@ -67,6 +67,17 @@ go hunting for a key:
   not mention it — so an author asking "where does my `aria-label` go" had two plausible answers and no way
   to choose. It is merged in.
 
+- **`errors` is the shared base for machine codes, and a feature namespace overrides it.**
+  `resolveApiErrorMessage` looks in the caller's `<feature>.errors.<code>` first and falls back to
+  `errors.<code>`, so a feature only carries the codes whose copy it needs to change. `contact.errors` and
+  `checkout.errors` used to duplicate `invalid_email`, `email_required` and `invalid_body` character for
+  character, and `internal_error` was the *only* one that legitimately differed — the checkout copy adds
+  "Your card has not been charged", which [`../CLAUDE.md`](../CLAUDE.md) explains is load-bearing.
+
+  So the generic `internal_error` is in the base too and `checkout` overrides it. That is what makes the
+  precedence real rather than decorative: while nothing overlapped, inverting the lookup order changed
+  nothing and no test could tell. Now it turns a case red.
+
 - **Two validation messages live in `validation.email` because three forms need them.** `invalid` and
   `required` were written out in `validation.contact`, `validation.payment` **and** `upgrade` — six strings
   across six locales for two messages. **Two had already drifted**: Catalan and French `validation.payment`

@@ -430,16 +430,12 @@
     "errorTitle": "Une erreur est survenue",
     "failedToSend": "Échec de l'envoi du message",
     "errors": {
-      "internal_error": "Quelque chose s'est mal passé de notre côté. Réessaie plus tard.",
-      "invalid_email": "Cette adresse e-mail ne semble pas valide.",
-      "email_required": "Saisis ton adresse e-mail.",
       "name_too_short": "Ton nom doit contenir au moins 2 caractères.",
       "name_too_long": "Ton nom est trop long.",
       "subject_too_short": "Le sujet doit contenir au moins 5 caractères.",
       "subject_too_long": "Le sujet est trop long.",
       "message_too_short": "Ton message doit contenir au moins 10 caractères.",
-      "message_too_long": "Ton message est trop long.",
-      "invalid_body": "Nous n'avons pas pu lire cette demande. Réessaie."
+      "message_too_long": "Ton message est trop long."
     }
   },
   "alternativesManager": {
@@ -656,9 +652,6 @@
     "promoSaved": "Vous avez économisé {saved} !",
     "errors": {
       "internal_error": "Quelque chose s'est mal passé de notre côté. Ta carte n'a pas été débitée.",
-      "email_required": "Saisis ton adresse e-mail.",
-      "invalid_email": "Cette adresse e-mail ne semble pas valide.",
-      "invalid_body": "Nous n'avons pas pu lire cette demande. Réessaie.",
       "rate_limit_exceeded": "Trop de tentatives. Patiente un instant et réessaie.",
       "promo_code_too_long": "Ce code promo est trop long."
     }
@@ -1956,5 +1949,11 @@
         }
       }
     }
+  },
+  "errors": {
+    "invalid_email": "Cette adresse e-mail ne semble pas valide.",
+    "email_required": "Saisis ton adresse e-mail.",
+    "invalid_body": "Nous n'avons pas pu lire cette demande. Réessaie.",
+    "internal_error": "Quelque chose s'est mal passé de notre côté. Réessaie plus tard."
   }
 }

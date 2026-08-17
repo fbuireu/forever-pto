@@ -37,6 +37,7 @@ interface ContactModalProps {
 
 export const ContactModal = ({ open, onClose }: ContactModalProps) => {
   const t = useTranslations('contact');
+  const tErrors = useTranslations('errors');
   const tA11y = useTranslations('a11y');
   const tValidation = useTranslations('validation.contact');
   const tEmail = useTranslations('validation.email');
@@ -92,7 +93,9 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
           track('contact_form_submitted');
           setStep(Step.SUCCESS);
         } else {
-          setErrorMessage(resolveApiErrorMessage({ code: result.error, t, fallback: t('failedToSend') }));
+          setErrorMessage(
+            resolveApiErrorMessage({ code: result.error, t, shared: tErrors, fallback: t('failedToSend') })
+          );
           setStep(Step.ERROR);
         }
       } catch (error) {

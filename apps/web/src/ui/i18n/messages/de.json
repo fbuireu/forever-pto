@@ -430,16 +430,12 @@
     "errorTitle": "Ein Fehler ist aufgetreten",
     "failedToSend": "Nachricht konnte nicht gesendet werden",
     "errors": {
-      "internal_error": "Bei uns ist etwas schiefgelaufen. Bitte versuche es später noch einmal.",
-      "invalid_email": "Diese E-Mail-Adresse sieht nicht richtig aus.",
-      "email_required": "Gib deine E-Mail-Adresse ein.",
       "name_too_short": "Dein Name braucht mindestens 2 Zeichen.",
       "name_too_long": "Dein Name ist zu lang.",
       "subject_too_short": "Der Betreff braucht mindestens 5 Zeichen.",
       "subject_too_long": "Der Betreff ist zu lang.",
       "message_too_short": "Deine Nachricht braucht mindestens 10 Zeichen.",
-      "message_too_long": "Deine Nachricht ist zu lang.",
-      "invalid_body": "Wir konnten diese Anfrage nicht lesen. Bitte versuche es noch einmal."
+      "message_too_long": "Deine Nachricht ist zu lang."
     }
   },
   "alternativesManager": {
@@ -656,9 +652,6 @@
     "promoSaved": "Sie haben {saved} gespart!",
     "errors": {
       "internal_error": "Bei uns ist etwas schiefgelaufen. Deine Karte wurde nicht belastet.",
-      "email_required": "Gib deine E-Mail-Adresse ein.",
-      "invalid_email": "Diese E-Mail-Adresse sieht nicht richtig aus.",
-      "invalid_body": "Wir konnten diese Anfrage nicht lesen. Bitte versuche es noch einmal.",
       "rate_limit_exceeded": "Zu viele Versuche. Warte einen Moment und versuche es noch einmal.",
       "promo_code_too_long": "Dieser Promo-Code ist zu lang."
     }
@@ -1956,5 +1949,11 @@
         }
       }
     }
+  },
+  "errors": {
+    "invalid_email": "Diese E-Mail-Adresse sieht nicht richtig aus.",
+    "email_required": "Gib deine E-Mail-Adresse ein.",
+    "invalid_body": "Wir konnten diese Anfrage nicht lesen. Bitte versuche es noch einmal.",
+    "internal_error": "Bei uns ist etwas schiefgelaufen. Bitte versuche es später noch einmal."
   }
 }
