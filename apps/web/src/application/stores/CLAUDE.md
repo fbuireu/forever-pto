@@ -335,6 +335,16 @@ used to expose `getRemainingDays` for the same question; **nothing ever called i
 the three lines instead, and it was nonetheless the only copy with tests. It is gone — the deletion is the
 fix, not a regression to restore.
 
+**`getFreeDaysForMonth` was the second instance of that pattern, and it was worse than uncalled.** It
+counted the Holidays in a month carrying `isInSelectedRange` and answered that as a month's "free days" —
+but [`CONTEXT.md`](../../../../../CONTEXT.md) defines a **Free Day** as any non-working day, weekends
+included, so the action published a store-level name for a rule the glossary contradicts. Its only
+references were its own line in the actions interface, its implementation and one `describe` block, and it
+never had a caller in `src/`, in `apps/docs/src` or in `e2e/`. A wrong domain word on the public surface of
+a store is a liability even at zero call sites, because the next reader will believe it; the deletion is
+again the fix. Anything that genuinely needs a per-month count derives it from `holidays` at the call site,
+under a name the glossary agrees with.
+
 **`toggleDaySelection` recomputes metrics but does not re-plan.** It moves a date between
 `manuallySelectedDays` and `removedSuggestedDays`, calls `generateMetrics` with the updated sets and writes
 the result onto `currentSelection` — leaving `suggestion` and `alternatives` untouched. It returns `false`

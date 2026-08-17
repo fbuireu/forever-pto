@@ -7,7 +7,6 @@ import {
   endOfMonth,
   endOfYear,
   isSameDay,
-  isSameMonth,
   isWeekend,
   isWithinInterval,
 } from '@application/shared/utils/dates';
@@ -80,7 +79,6 @@ interface HolidaysActions {
   clearCalculation: () => void;
   resetManualSelection: () => void;
   trimManualDays: (maxPtoDays: number) => void;
-  getFreeDaysForMonth: (month: Date) => number;
 }
 
 type HolidaysStore = HolidaysState & HolidaysActions;
@@ -507,11 +505,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
           if (manuallySelectedDays.length > maxPtoDays) {
             set({ manuallySelectedDays: manuallySelectedDays.slice(0, maxPtoDays) });
           }
-        },
-
-        getFreeDaysForMonth: (month: Date) => {
-          const { holidays } = get();
-          return holidays.filter((h) => isSameMonth(h.date, month) && h.isInSelectedRange).length;
         },
       }),
       {

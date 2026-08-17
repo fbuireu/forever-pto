@@ -493,20 +493,6 @@ describe('setCalculationResult', () => {
   });
 });
 
-describe('getFreeDaysForMonth', () => {
-  it('counts holidays in the given month that are in selected range', () => {
-    useHolidaysStore.setState({
-      holidays: [
-        { ...makeHoliday('h1', '2026-05-01'), isInSelectedRange: true },
-        { ...makeHoliday('h2', '2026-05-15'), isInSelectedRange: true },
-        { ...makeHoliday('h3', '2026-06-01'), isInSelectedRange: true },
-        { ...makeHoliday('h4', '2026-05-20'), isInSelectedRange: false },
-      ],
-    });
-    expect(useHolidaysStore.getState().getFreeDaysForMonth(new Date('2026-05-01'))).toBe(2);
-  });
-});
-
 describe('resetManualSelection', () => {
   it('clears manually selected and removed days', () => {
     useHolidaysStore.setState({
